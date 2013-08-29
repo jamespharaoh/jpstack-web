@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+
+require "pp"
+
+require "shellwords"
+require "tempfile"
+require "xml"
+
+global_doc = XML::Document.file "etc/global.xml"
+global_elem = global_doc.root
+
+global_elem.find("modules/module").each do
+	|module_elem|
+
+	module_name = module_elem["name"]
+
+	temp = Tempfile.new "txt2-rebuild-"
+
+	xqilla_args = [
+		"xqilla",
+		"etc/build-xml.xquery",
+		"-i", "txt2-#{module_name}/module.xml",
+		"-o", temp.path,
+	]
+
+	xqilla_cmd = Shellwords.join xqilla_args
+
+	system xqilla_cmd \
+		or raise "Error #{xqilla_cmd}"
+
+	xmllint_args = [
+		"xmllint",
+		"--format",
+		temp.path,
+		"--output",
+		"txt2-#{module_name}/build.xml",
+	]
+
+	xmllint_cmd = Shellwords.join xmllint_args
+
+	system xmllint_cmd \
+		or raise "Error #{xmllint_cmd}"
+
+end
