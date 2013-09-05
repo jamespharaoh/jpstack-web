@@ -2,12 +2,12 @@
 
 	<modules>
 		<module name="alerts"/>
-		<module name="autoresponder"/>
+		<module name="auto-responder"/>
 		<module name="broadcast"/>
-		<module name="broadcastsystems"/>
+		<module name="broadcast-systems"/>
 		<module name="chat"/>
 		<module name="core"/>
-		<module name="dbpool"/>
+		<module name="db-pool"/>
 		<module name="dialogue"/>
 		<module name="forwarder"/>
 		<module name="g8wave"/>
@@ -16,15 +16,15 @@
 		<module name="hybyte"/>
 		<module name="jigsaw"/>
 		<module name="locator"/>
-		<module name="magicnumber"/>
-		<module name="manualresponder"/>
+		<module name="magic-number"/>
+		<module name="manual-responder"/>
 		<module name="media"/>
 		<module name="mediaburst"/>
 		<module name="mig"/>
-		<module name="modempoll"/>
+		<module name="modem-poll"/>
 		<module name="orderer"/>
 		<module name="oxygen8"/>
-		<module name="photograbber"/>
+		<module name="photo-grabber"/>
 		<module name="php"/>
 		<module name="psychic"/>
 		<module name="rpc"/>
@@ -33,9 +33,9 @@
 		<module name="subscription"/>
 		<module name="test"/>
 		<module name="ticketer"/>
-		<module name="unwiredplaza"/>
+		<module name="unwired-plaza"/>
 		<module name="utils"/>
-		<module name="wappush"/>
+		<module name="wap-push"/>
 	</modules>
 
 </txt2-global>

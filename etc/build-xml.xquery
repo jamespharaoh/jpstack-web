@@ -17,94 +17,94 @@ declare variable $envs := ('test', 'live');
 
 	<target
 		name="svn-up"
-		depends="
-			just-svn-up-deps,
-			just-svn-up
-		"/>
+		depends="{ string-join ((
+			'just-svn-up-deps',
+			'just-svn-up'
+		), ', ') }"/>
 
 	<target
 		name="build"
-		depends="
-			just-build-deps,
-			just-build
-		"/>
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build'
+		), ', ') }"/>
 
 	<target
 		name="console-live"
-		depends="
-			just-build-deps,
-			just-build,
-			just-console-live
-		"/>
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-console-live'
+		), ', ') }"/>
 
 	<target
 		name="console-test"
-		depends="
-			just-build-deps,
-			just-build,
-			just-console-test
-		"/>
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-console-test'
+		), ', ') }"/>
 
 	<target
 		name="console-auto"
-		depends="
-			just-build-deps,
-			just-build,
-			just-console-live,
-			just-console-restart
-		"/>
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-console-live',
+			'just-console-restart'
+		), ', ') }"/>
 
 	<target
 		name="api-live"
-		depends="
-			just-build-deps,
-			just-build,
-			just-api-live
-		"/>
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-api-live'
+		), ', ') }"/>
 
 	<target
 		name="api-auto"
-		depends="
-			just-build-deps,
-			just-build,
-			just-api-live,
-			just-api-restart
-		"/>
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-api-live',
+			'just-api-restart'
+		), ', ') }"/>
 
 	<target
 		name="daemon-auto"
-		depends="
-			just-build-deps,
-			just-build,
-			just-daemon-restart
-		"/>
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-daemon-restart'
+		), ', ') }"/>
 
 	<target
 		name="all-auto"
-		depends="
-			just-build-deps,
-			just-build,
-			just-api-live,
-			just-api-restart,
-			just-console-live,
-			just-console-restart,
-			just-daemon-restart
-		"/>
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-api-live',
+			'just-api-restart',
+			'just-console-live',
+			'just-console-restart',
+			'just-daemon-restart'
+		), ', ') }"/>
 
 	<target
 		name="javadoc-auto"
-		depends="
-			just-javadoc
-		"/>
+		depends="{ string-join ((
+			'just-javadoc'
+		), ', ') }"/>
 
 	<target
 		name="cukes"
-		depends="
-			just-build-deps,
-			just-build,
-			just-build-tests,
-			just-cukes
-		"/>
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-build-tests',
+			'just-cukes'
+		), ', ') }"/>
 
 	<target name="just-build-deps">
 		{ for $depend in $module/depend-module
@@ -266,9 +266,6 @@ declare variable $envs := ('test', 'live');
 			fork="true"
 			failonerror="false"
 			resultproperty="cucumber.exitstatus">
-
-			<sysproperty key="log4j.configuration"
-				value="file://${log4j-properties}"/>
 
 			<classpath refid="classpath"/>
 

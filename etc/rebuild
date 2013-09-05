@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require "pp"
-
 require "shellwords"
 require "tempfile"
 require "xml"
@@ -9,36 +7,71 @@ require "xml"
 global_doc = XML::Document.file "etc/global.xml"
 global_elem = global_doc.root
 
-global_elem.find("modules/module").each do
-	|module_elem|
-
-	module_name = module_elem["name"]
+def create_xml module_name, template_name, target, vars = {}
 
 	temp = Tempfile.new "txt2-rebuild-"
 
 	xqilla_args = [
 		"xqilla",
-		"etc/build-xml.xquery",
-		"-i", "txt2-#{module_name}/module.xml",
+		"etc/#{template_name}.xquery",
+		"-i", "txt2-#{module_name}/#{module_name}-module.xml",
 		"-o", temp.path,
-	]
+	] + vars.map { |key, value| [ "-v", key, value ] }.flatten
 
 	xqilla_cmd = Shellwords.join xqilla_args
 
 	system xqilla_cmd \
 		or raise "Error #{xqilla_cmd}"
 
+	FileUtils.mkdir_p File.dirname "txt2-#{module_name}/#{target}"
+
 	xmllint_args = [
 		"xmllint",
 		"--format",
 		temp.path,
 		"--output",
-		"txt2-#{module_name}/build.xml",
+		"txt2-#{module_name}/#{target}",
 	]
 
 	xmllint_cmd = Shellwords.join xmllint_args
 
 	system xmllint_cmd \
 		or raise "Error #{xmllint_cmd}"
+
+
+end
+
+global_elem.find("modules/module").each do
+	|module_elem|
+
+	module_name = module_elem["name"]
+	package_name = module_name.gsub "-", ""
+
+	create_xml module_name, "build-xml", "build.xml"
+
+	create_xml module_name, "classpath", ".classpath"
+	create_xml module_name, "project", ".project"
+
+	create_xml module_name, "beans-xml",
+		"src/txt2/#{package_name}/misc/#{module_name}-misc-beans.xml",
+		"mode" => "misc"
+
+	create_xml module_name, "beans-xml",
+		"src/txt2/#{package_name}/console/#{module_name}-console-beans.xml",
+		"mode" => "console"
+
+	create_xml module_name, "beans-xml",
+		"src/txt2/#{package_name}/api/#{module_name}-api-beans.xml",
+		"mode" => "api"
+
+	create_xml module_name, "beans-xml",
+		"src/txt2/#{package_name}/daemon/#{module_name}-daemon-beans.xml",
+		"mode" => "daemon"
+
+	create_xml module_name, "beans-xml",
+		"src/txt2/#{package_name}/hibernate/#{module_name}-hibernate-beans.xml",
+		"mode" => "hibernate"
+
+	FileUtils.mkdir_p "txt2-#{module_name}/test"
 
 end
