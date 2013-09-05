@@ -72,6 +72,12 @@ global_elem.find("modules/module").each do
 		"src/txt2/#{package_name}/hibernate/#{module_name}-hibernate-beans.xml",
 		"mode" => "hibernate"
 
-	FileUtils.mkdir_p "txt2-#{module_name}/test"
+	[ "test", "api/files", "console/files" ].each do
+		|dir|
+
+		FileUtils.mkdir_p "txt2-#{module_name}/#{dir}"
+		FileUtils.touch "txt2-#{module_name}/#{dir}/.mark"
+
+	end
 
 end
