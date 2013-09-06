@@ -170,6 +170,7 @@ declare variable $envs := ('test', 'live');
 				return (
 					<fileset dir="../txt2-{$depend/@name}/console/files"/>
 				) }
+				<fileset dir="console/files"/>
 			</copy>
 			<copy todir="console/{$env}/WEB-INF/classes">
 				{ for $depend in $module/depend-module
@@ -199,6 +200,7 @@ declare variable $envs := ('test', 'live');
 				return (
 					<fileset dir="../txt2-{$depend/@name}/api/files"/>
 				) }
+				<fileset dir="api/files"/>
 			</copy>
 			<copy todir="api/{$env}/WEB-INF/classes">
 				{ for $depend in $module/depend-module
