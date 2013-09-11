@@ -72,6 +72,14 @@ global_elem.find("modules/module").each do
 		"src/txt2/#{package_name}/hibernate/#{module_name}-hibernate-beans.xml",
 		"mode" => "hibernate"
 
+	create_xml module_name, "console-web-xml",
+		"console/web-live.xml",
+		"mode" => "live"
+
+	create_xml module_name, "console-web-xml",
+		"console/web-test.xml",
+		"mode" => "test"
+
 	[ "test", "api/files", "console/files" ].each do
 		|dir|
 

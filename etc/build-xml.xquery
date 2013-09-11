@@ -183,6 +183,39 @@ declare variable $envs := ('test', 'live');
 				<fileset dir="lib" excludes="servlet-api.jar"/>
 			</copy>
 			<copy file="console/web-{$env}.xml" tofile="console/{$env}/WEB-INF/web.xml"/>
+		</target>,
+
+		<target name="tomcat-{$env}" depends="console-{$env}">
+
+			<mkdir dir="temp"/>
+
+			<exec
+				dir="temp"
+				executable="tar">
+				<arg line="--extract"/>
+				<arg line="--file ../../binaries/packages/apache-tomcat-6.0.37.tar.gz"/>
+			</exec>
+
+			<delete dir="console/tomcat-{$env}"/>
+
+			<move
+				file="temp/apache-tomcat-6.0.37"
+				tofile="console/tomcat-{$env}"/>
+
+			<delete dir="temp"/>
+
+			<delete dir="console/tomcat-{$env}/webapps/ROOT"/>
+
+			<copy todir="console/tomcat-{$env}/webapps/ROOT">
+				<fileset dir="console/test"/>
+			</copy>
+
+			<exec
+				dir="console/tomcat-{$env}"
+				executable="bin/catalina.sh">
+				<arg line="run"/>
+			</exec>
+
 		</target>
 
 	) }
