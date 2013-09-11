@@ -23,6 +23,13 @@ declare variable $envs := ('test', 'live');
 		), ', ') }"/>
 
 	<target
+		name="clean"
+		depends="{ string-join ((
+			'just-clean-deps',
+			'just-clean'
+		), ', ') }"/>
+
+	<target
 		name="build"
 		depends="{ string-join ((
 			'just-build-deps',
@@ -106,6 +113,49 @@ declare variable $envs := ('test', 'live');
 			'just-cukes'
 		), ', ') }"/>
 
+	<target
+		name="sql"
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-db-drop',
+			'just-db-create',
+			'just-sql-deps',
+			'just-sql'
+		), ', ') }"/>
+
+	<target
+		name="sql-test"
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-db-drop',
+			'just-db-create',
+			'just-sql-deps',
+			'just-sql',
+			'just-sql-test-deps',
+			'just-sql-test'
+		), ', ') }"/>
+
+	<target name="just-clean-deps">
+		{ for $depend in $module/depend-module
+		return (
+			<ant dir="../txt2-{$depend/@name}" target="just-clean"/>
+		) }
+	</target>
+
+	<target name="just-clean">
+		<delete dir="bin"/>
+		<delete dir="console/live"/>
+		<delete dir="console/test"/>
+		<delete dir="console/tomcat-live"/>
+		<delete dir="console/tomcat-test"/>
+		<delete dir="api/live"/>
+		<delete dir="api/test"/>
+		<delete dir="api/tomcat-live"/>
+		<delete dir="api/tomcat-test"/>
+	</target>
+
 	<target name="just-build-deps">
 		{ for $depend in $module/depend-module
 		return (
@@ -152,9 +202,13 @@ declare variable $envs := ('test', 'live');
 	</target>
 
 	<target name="just-svn-up">
-		<exec executable="svn">
+
+		<exec
+			failonerror="true"
+			executable="svn">
 			<arg value="up"/>
 		</exec>
+
 	</target>
 
 	{ for $env in $envs
@@ -190,6 +244,7 @@ declare variable $envs := ('test', 'live');
 			<mkdir dir="temp"/>
 
 			<exec
+				failonerror="true"
 				dir="temp"
 				executable="tar">
 				<arg line="--extract"/>
@@ -211,6 +266,7 @@ declare variable $envs := ('test', 'live');
 			</copy>
 
 			<exec
+				failonerror="true"
 				dir="console/tomcat-{$env}"
 				executable="bin/catalina.sh">
 				<arg line="run"/>
@@ -251,50 +307,125 @@ declare variable $envs := ('test', 'live');
 	) }
 
 	<target name="just-api-restart">
-		<exec executable="./service">
+		<exec executable="./service" failonerror="true">
 			<arg value="tomcat_api"/>
 			<arg value="restart"/>
 		</exec>
 	</target>
 
 	<target name="just-console-restart">
-		<exec executable="./service">
+		<exec executable="./service" failonerror="true">
 			<arg value="tomcat_console"/>
 			<arg value="restart"/>
 		</exec>
 	</target>
 
 	<target name="just-daemon-restart">
-		<exec executable="./service">
+		<exec executable="./service" failonerror="true">
 			<arg value="daemon"/>
 			<arg value="restart"/>
 		</exec>
 	</target>
 
 	<target name="just-javadoc">
+
 		<mkdir dir="javadoc"/>
+
 		<javadoc destdir="javadoc" access="private" linksource="yes">
+
 			{ for $depend in $module/depend-module
 			return (
 				<fileset dir="../txt2-{$depend/@name}/src"/>
 			) }
+
 			<fileset dir="src"/>
+
 			<classpath refid="classpath"/>
-			<link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+
+			<link href="http://java.sun.com/j2se/1.6.0/docs/api"/>
 			<link href="http://logging.apache.org/log4j/docs/api"/>
 			<link href="http://www.hibernate.org/hib_docs/v3/api"/>
 			<link href="http://www.xom.nu/apidocs"/>
+
 		</javadoc>
+
+	</target>
+
+	<target name="just-db-drop">
+
+		<exec
+			failonerror="false"
+			executable="dropdb">
+			<arg line="txt2-test"/>
+		</exec>
+
+	</target>
+
+	<target name="just-db-create">
+
+		<exec
+			failonerror="true"
+			executable="createdb">
+			<arg line="txt2-test"/>
+		</exec>
+
+	</target>
+
+	<target name="just-sql-deps">
+		{ for $depend in $module/depend-module
+		return (
+			<ant dir="../txt2-{$depend/@name}" target="just-sql"/>
+		) }
+	</target>
+
+	<target name="just-sql-test-deps">
+		{ for $depend in $module/depend-module
+		return (
+			<ant dir="../txt2-{$depend/@name}" target="just-sql-test"/>
+		) }
+	</target>
+
+	<target name="just-sql">
+
+		{ if ($module/sql) then (
+
+			<taskdef
+				name="database-init"
+				classname="txt2.pgsql.ant.DatabaseInitTask"
+				classpathref="classpath"/>,
+
+			<database-init>
+				{ for $sql in $module/sql
+				return (
+					<script name="sql/{$sql/@name}.sql"/>
+				) }
+			</database-init>
+
+		) else () }
+
+	</target>
+
+	<target name="just-sql-test">
+
+		{ if ($module/sql-test) then (
+
+			<taskdef
+				name="database-init"
+				classname="txt2.pgsql.ant.DatabaseInitTask"
+				classpathref="classpath"/>,
+
+			<database-init>
+				{ for $sql in $module/sql-test
+				return (
+					<script name="sql/{$sql/@name}.sql"/>
+				) }
+			</database-init>
+
+		) else () }
+
 	</target>
 
 	<target name="just-cukes">
-
-		<taskdef
-			name="database-init"
-			classname="txt2.psychic.cuke.DatabaseInitTask"
-			classpathref="classpath"/>
-
-		<database-init/>
 
 		<java
 			classname="cucumber.api.cli.Main"
@@ -310,6 +441,15 @@ declare variable $envs := ('test', 'live');
 			<arg value="features"/>
 
 		</java>
+
+	</target>
+
+	<target name="rebuild">
+
+		<exec
+			dir=".."
+			executable="etc/rebuild"
+			failonerror="true"/>
 
 	</target>
 
