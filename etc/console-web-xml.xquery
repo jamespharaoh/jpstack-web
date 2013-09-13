@@ -40,6 +40,13 @@ declare variable $mode external;
 		), ' ') }</param-value>
 	</context-param>
 
+	<context-param>
+		<param-name>contextInitializerClasses</param-name>
+		<param-value>{ string-join ((
+			'txt2.servlet.Txt2WebContextInitializer'
+		), ' ') }</param-value>
+	</context-param>
+
 	<!-- ======================================================== listeners -->
 
 	<listener>
@@ -49,14 +56,14 @@ declare variable $mode external;
 	<!-- ========================================================== filters -->
 
 	<filter>
-		<filter-name>AuthFilter</filter-name>
-		<filter-class>txt2.core.console.AuthFilter</filter-class>
+		<filter-name>authFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
 	</filter>
 
 	<!-- ================================================== filter mappings -->
 
 	<filter-mapping>
-		<filter-name>AuthFilter</filter-name>
+		<filter-name>authFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
