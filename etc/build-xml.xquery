@@ -390,8 +390,8 @@ declare variable $envs := ('test', 'live');
 		{ if ($module/sql) then (
 
 			<taskdef
-				name="database-init"
-				classname="txt2.pgsql.ant.DatabaseInitTask"
+					name="database-init"
+				classname="txt2.utils.ant.DatabaseInitTask"
 				classpathref="classpath"/>,
 
 			<database-init>
@@ -411,7 +411,7 @@ declare variable $envs := ('test', 'live');
 
 			<taskdef
 				name="database-init"
-				classname="txt2.pgsql.ant.DatabaseInitTask"
+				classname="txt2.utils.ant.DatabaseInitTask"
 				classpathref="classpath"/>,
 
 			<database-init>
