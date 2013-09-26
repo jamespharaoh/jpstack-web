@@ -28,6 +28,7 @@
 		<module name="php"/>
 		<module name="psychic"/>
 		<module name="rpc"/>
+		<module name="simulator"/>
 		<module name="smpp"/>
 		<module name="sms"/>
 		<module name="subscription"/>

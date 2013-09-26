@@ -137,6 +137,20 @@ declare variable $envs := ('test', 'live');
 			'just-sql-test'
 		), ', ') }"/>
 
+	<target
+		name="fixtures"
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-build-tests-deps',
+			'just-build-tests',
+			'just-db-drop',
+			'just-db-create',
+			'just-sql-deps',
+			'just-sql',
+			'just-fixtures'
+		), ', ') }"/>
+
 	<target name="just-clean-deps">
 		{ for $depend in $module/depend-module
 		return (
@@ -160,6 +174,13 @@ declare variable $envs := ('test', 'live');
 		{ for $depend in $module/depend-module
 		return (
 			<ant dir="../txt2-{$depend/@name}" target="just-build"/>
+		) }
+	</target>
+
+	<target name="just-build-tests-deps">
+		{ for $depend in $module/depend-module
+		return (
+			<ant dir="../txt2-{$depend/@name}" target="just-build-tests"/>
 		) }
 	</target>
 
@@ -450,6 +471,14 @@ declare variable $envs := ('test', 'live');
 			dir=".."
 			executable="etc/rebuild"
 			failonerror="true"/>
+
+	</target>
+
+	<target name="just-fixtures">
+
+		<java
+			classname="txt2.test.TestFixtures"
+			classpathref="classpath"/>
 
 	</target>
 

@@ -34,6 +34,7 @@ declare variable $mode external;
 			),
 			if ($mode = 'test') then (
 				'classpath:txt2/test/console/test-console-beans.xml',
+				'classpath:txt2/test/daemon/test-daemon-beans.xml',
 				'classpath:txt2/test/hibernate/test-hibernate-beans.xml',
 				'classpath:txt2/test/misc/test-misc-beans.xml'
 			) else ()

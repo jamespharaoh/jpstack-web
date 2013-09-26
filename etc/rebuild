@@ -9,12 +9,25 @@ global_elem = global_doc.root
 
 def create_xml module_name, template_name, target, vars = {}
 
+	template_path = "etc/#{template_name}.xquery"
+	module_path = "txt2-#{module_name}/#{module_name}-module.xml"
+	target_path = "txt2-#{module_name}/#{target}"
+
+	if File.exist? target_path
+		template_mtime = File.mtime template_path
+		module_mtime = File.mtime module_path
+		target_mtime = File.mtime target_path
+		return if target_mtime > [ template_mtime, module_mtime ].max
+	end
+
+	puts target_path
+
 	temp = Tempfile.new "txt2-rebuild-"
 
 	xqilla_args = [
 		"xqilla",
-		"etc/#{template_name}.xquery",
-		"-i", "txt2-#{module_name}/#{module_name}-module.xml",
+		template_path,
+		"-i", module_path,
 		"-o", temp.path,
 	] + vars.map { |key, value| [ "-v", key, value ] }.flatten
 
@@ -23,14 +36,14 @@ def create_xml module_name, template_name, target, vars = {}
 	system xqilla_cmd \
 		or raise "Error #{xqilla_cmd}"
 
-	FileUtils.mkdir_p File.dirname "txt2-#{module_name}/#{target}"
+	FileUtils.mkdir_p File.dirname target_path
 
 	xmllint_args = [
 		"xmllint",
 		"--format",
 		temp.path,
 		"--output",
-		"txt2-#{module_name}/#{target}",
+		target_path,
 	]
 
 	xmllint_cmd = Shellwords.join xmllint_args
