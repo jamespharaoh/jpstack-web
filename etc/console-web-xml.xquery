@@ -19,7 +19,7 @@ declare variable $mode external;
 				'-console-beans.xml'
 			),
 			concat (
-i				'classpath:txt2/',
+				'classpath:txt2/',
 				replace ($module/@name, '-', ''),
 				'/hibernate/',
 				$module/@name,
