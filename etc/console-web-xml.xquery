@@ -57,11 +57,25 @@ declare variable $mode external;
 	<!-- ========================================================== filters -->
 
 	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>txt2.core.console.core.SetCharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+
+	<filter>
 		<filter-name>authFilter</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
 	</filter>
 
 	<!-- ================================================== filter mappings -->
+
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
 	<filter-mapping>
 		<filter-name>authFilter</filter-name>
