@@ -33,10 +33,13 @@ declare variable $mode external;
 				'-misc-beans.xml'
 			),
 			if ($mode = 'test') then (
-				'classpath:txt2/test/console/test-console-beans.xml',
-				'classpath:txt2/test/daemon/test-daemon-beans.xml',
-				'classpath:txt2/test/hibernate/test-hibernate-beans.xml',
-				'classpath:txt2/test/misc/test-misc-beans.xml'
+				concat (
+					'classpath:txt2/',
+					replace ($module/@name, '-', ''),
+					'/daemon/',
+					$module/@name,
+					'-daemon-beans.xml'
+				)
 			) else ()
 		), ' ') }</param-value>
 	</context-param>
