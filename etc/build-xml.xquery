@@ -392,33 +392,33 @@ declare variable $envs := ('test', 'live');
 
 	</target>
 
-	<target name="just-sql-deps">
+	<target name="just-sql-schema-deps">
 		{ for $depend in $module/depend-module
 		return (
-			<ant dir="../txt2-{$depend/@name}" target="just-sql"/>
+			<ant dir="../txt2-{$depend/@name}" target="just-sql-schema"/>
 		) }
 	</target>
 
-	<target name="just-sql-test-deps">
+	<target name="just-sql-data-deps">
 		{ for $depend in $module/depend-module
 		return (
-			<ant dir="../txt2-{$depend/@name}" target="just-sql-test"/>
+			<ant dir="../txt2-{$depend/@name}" target="just-sql-data"/>
 		) }
 	</target>
 
-	<target name="just-sql">
+	<target name="just-sql-schema">
 
-		{ if ($module/sql) then (
+		{ if ($module/sql-schema) then (
 
 			<taskdef
-					name="database-init"
+				name="database-init"
 				classname="txt2.utils.ant.DatabaseInitTask"
 				classpathref="classpath"/>,
 
 			<database-init>
-				{ for $sql in $module/sql
+				{ for $sql-schema in $module/sql-schema
 				return (
-					<script name="sql/{$sql/@name}.sql"/>
+					<script name="sql/{$sql-schema/@name}.sql"/>
 				) }
 			</database-init>
 
@@ -426,7 +426,7 @@ declare variable $envs := ('test', 'live');
 
 	</target>
 
-	<target name="just-sql-test">
+	<target name="just-sql-data">
 
 		{ if ($module/sql-test) then (
 
@@ -436,9 +436,9 @@ declare variable $envs := ('test', 'live');
 				classpathref="classpath"/>,
 
 			<database-init>
-				{ for $sql in $module/sql-test
+				{ for $sql-data in $module/sql-data
 				return (
-					<script name="sql/{$sql/@name}.sql"/>
+					<script name="sql/{$sql-data/@name}.sql"/>
 				) }
 			</database-init>
 
