@@ -120,21 +120,30 @@ declare variable $envs := ('test', 'live');
 			'just-build',
 			'just-db-drop',
 			'just-db-create',
-			'just-sql-deps',
-			'just-sql'
+			'just-sql-schema-deps',
+			'just-sql-schema',
+			'just-sql-data-deps',
+			'just-sql-data'
 		), ', ') }"/>
 
 	<target
-		name="sql-test"
+		name="sql-schema"
 		depends="{ string-join ((
 			'just-build-deps',
 			'just-build',
 			'just-db-drop',
 			'just-db-create',
-			'just-sql-deps',
-			'just-sql',
-			'just-sql-test-deps',
-			'just-sql-test'
+			'just-sql-schema-deps',
+			'just-sql-schema'
+		), ', ') }"/>
+
+	<target
+		name="sql-data"
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-sql-data-deps',
+			'just-sql-data'
 		), ', ') }"/>
 
 	<target
@@ -146,8 +155,10 @@ declare variable $envs := ('test', 'live');
 			'just-build-tests',
 			'just-db-drop',
 			'just-db-create',
-			'just-sql-deps',
-			'just-sql',
+			'just-sql-schema-deps',
+			'just-sql-schema',
+			'just-sql-data-deps',
+			'just-sql-data',
 			'just-fixtures'
 		), ', ') }"/>
 
@@ -428,7 +439,7 @@ declare variable $envs := ('test', 'live');
 
 	<target name="just-sql-data">
 
-		{ if ($module/sql-test) then (
+		{ if ($module/sql-data) then (
 
 			<taskdef
 				name="database-init"
