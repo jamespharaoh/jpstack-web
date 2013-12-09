@@ -57,6 +57,10 @@ declare variable $mode external;
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 
+	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+
 	<!-- ========================================================== filters -->
 
 	<filter>
@@ -73,10 +77,20 @@ declare variable $mode external;
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
 	</filter>
 
+	<filter>
+		<filter-name>responseFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+
 	<!-- ================================================== filter mappings -->
 
 	<filter-mapping>
 		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>responseFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
