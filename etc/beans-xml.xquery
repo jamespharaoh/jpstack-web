@@ -44,6 +44,59 @@ declare variable $mode external;
 			) }"/>
 	) }
 
+	{ for $package in $module/* [name () = 'package']
+	return (
+
+		for $group in $package/* [name () = 'group']
+		return (
+
+			for $model in $group/* [name () = 'model']
+			return (
+
+				if ($mode = 'hibernate') then (
+
+					<bean
+						id="{$model/@name}ObjectHelperProvider"
+						class="txt2.core.hibernate.object.ObjectHelperProviderFactory">
+
+						<property name="modelHelper">
+							<ref bean="{$model/@name}ModelHelper"/>
+						</property>
+
+					</bean>
+
+				) else if ($mode = 'model') then (
+
+					<bean
+						id="{$model/@name}ObjectHelper"
+						class="txt2.core.hibernate.object.ObjectHelperFactory">
+
+						<property name="objectHelperProvider">
+							<ref bean="{$model/@name}ObjectHelperProvider"/>
+						</property>
+
+					</bean>
+
+				) else if ($mode = 'console') then (
+
+					<bean
+						id="{$model/@name}ConsoleHelper"
+						class="txt2.core.console.object.ConsoleHelperFactory">
+
+						<property name="consoleHelperProvider">
+							<ref bean="{$model/@name}ConsoleHelperProvider"/>
+						</property>
+
+					</bean>
+
+				) else ()
+
+			)
+
+		)
+
+	) }
+
 	{ for $beans in $module/* [name () = concat ($mode, '-beans')]
 	return $beans/* }
 

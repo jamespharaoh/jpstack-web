@@ -14,6 +14,13 @@ declare variable $mode external;
 			concat (
 				'classpath:txt2/',
 				replace ($module/@name, '-', ''),
+				'/model/',
+				$module/@name,
+				'-model-beans.xml'
+			),
+			concat (
+				'classpath:txt2/',
+				replace ($module/@name, '-', ''),
 				'/console/',
 				$module/@name,
 				'-console-beans.xml'

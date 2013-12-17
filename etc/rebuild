@@ -66,6 +66,10 @@ global_elem.find("modules/module").each do
 	create_xml module_name, "project", ".project"
 
 	create_xml module_name, "beans-xml",
+		"src/txt2/#{package_name}/model/#{module_name}-model-beans.xml",
+		"mode" => "model"
+
+	create_xml module_name, "beans-xml",
 		"src/txt2/#{package_name}/misc/#{module_name}-misc-beans.xml",
 		"mode" => "misc"
 
