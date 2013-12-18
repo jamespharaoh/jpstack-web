@@ -171,14 +171,14 @@ declare variable $envs := ('test', 'live');
 
 	<target name="just-clean">
 		<delete dir="bin"/>
-		<delete dir="console/live"/>
-		<delete dir="console/test"/>
-		<delete dir="console/tomcat-live"/>
-		<delete dir="console/tomcat-test"/>
-		<delete dir="api/live"/>
-		<delete dir="api/test"/>
-		<delete dir="api/tomcat-live"/>
-		<delete dir="api/tomcat-test"/>
+		<delete dir="console/live/**/*"/>
+		<delete dir="console/test/**/*"/>
+		<delete dir="console/tomcat-live/**/*"/>
+		<delete dir="console/tomcat-test/**/*"/>
+		<delete dir="api/live/**/*"/>
+		<delete dir="api/test/**/*"/>
+		<delete dir="api/tomcat-live/**/*"/>
+		<delete dir="api/tomcat-test/**/*"/>
 	</target>
 
 	<target name="just-build-deps">
@@ -247,10 +247,12 @@ declare variable $envs := ('test', 'live');
 	return (
 
 		<target name="just-console-{$env}">
+
 			<mkdir dir="console/{$env}"/>
 			<mkdir dir="console/{$env}/WEB-INF"/>
 			<mkdir dir="console/{$env}/WEB-INF/classes"/>
 			<mkdir dir="console/{$env}/WEB-INF/lib"/>
+
 			<copy todir="console/{$env}">
 				{ for $depend in $module/depend-module
 				return (
@@ -258,6 +260,7 @@ declare variable $envs := ('test', 'live');
 				) }
 				<fileset dir="console/files"/>
 			</copy>
+
 			<copy todir="console/{$env}/WEB-INF/classes">
 				{ for $depend in $module/depend-module
 				return (
@@ -265,10 +268,13 @@ declare variable $envs := ('test', 'live');
 				) }
 				<fileset dir="bin"/>
 			</copy>
+
 			<copy todir="console/{$env}/WEB-INF/lib">
 				<fileset dir="lib" excludes="servlet-api.jar"/>
 			</copy>
+
 			<copy file="console/web-{$env}.xml" tofile="console/{$env}/WEB-INF/web.xml"/>
+
 		</target>,
 
 		<target name="tomcat-{$env}" depends="console-{$env}">
@@ -283,7 +289,7 @@ declare variable $envs := ('test', 'live');
 				<arg line="--file ../../binaries/packages/apache-tomcat-6.0.37.tar.gz"/>
 			</exec>
 
-			<delete dir="console/tomcat-{$env}"/>
+			<delete dir="console/tomcat-{$env}/**/*"/>
 
 			<move
 				file="temp/apache-tomcat-6.0.37"
