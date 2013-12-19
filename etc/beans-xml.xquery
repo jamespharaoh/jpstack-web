@@ -69,10 +69,10 @@ declare variable $mode external;
 
 					<bean
 						id="{$model/@name}ObjectHelper"
-						class="txt2.core.hibernate.object.ObjectHelperFactory">
+						class="txt2.core.misc.object.ObjectHelperFactory">
 
-						<property name="objectHelperProvider">
-							<ref bean="{$model/@name}ObjectHelperProvider"/>
+						<property name="objectName">
+							<value>{ string ($model/@name) }</value>
 						</property>
 
 					</bean>

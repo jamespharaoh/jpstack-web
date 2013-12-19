@@ -171,14 +171,24 @@ declare variable $envs := ('test', 'live');
 
 	<target name="just-clean">
 		<delete dir="bin"/>
-		<delete dir="console/live/**/*"/>
-		<delete dir="console/test/**/*"/>
-		<delete dir="console/tomcat-live/**/*"/>
-		<delete dir="console/tomcat-test/**/*"/>
-		<delete dir="api/live/**/*"/>
-		<delete dir="api/test/**/*"/>
-		<delete dir="api/tomcat-live/**/*"/>
-		<delete dir="api/tomcat-test/**/*"/>
+		{ for $dir in (
+				'console/live',
+				'console/test',
+				'console/tomcat-live',
+				'console/tomcat-test',
+				'api/live',
+				'api/test',
+				'api/tomcat-live',
+				'api/tomcat-test'
+			)
+		return (
+			<delete includeemptydirs="true">
+				<fileset
+					dir="{$dir}"
+					includes="**/*"
+					erroronmissingdir="false"/>
+			</delete>
+		) }
 	</target>
 
 	<target name="just-build-deps">
