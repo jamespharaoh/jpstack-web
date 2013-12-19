@@ -70,6 +70,14 @@ declare variable $envs := ('test', 'live');
 		), ', ') }"/>
 
 	<target
+		name="api-test"
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-api-test'
+		), ', ') }"/>
+
+	<target
 		name="api-auto"
 		depends="{ string-join ((
 			'just-build-deps',
@@ -287,7 +295,11 @@ declare variable $envs := ('test', 'live');
 
 		</target>,
 
-		<target name="tomcat-{$env}" depends="console-{$env}">
+		<target
+			name="tomcat-{$env}"
+			depends="console-{$env}, api-{$env}">
+
+			<!-- install tomcat -->
 
 			<mkdir dir="temp"/>
 
@@ -299,23 +311,41 @@ declare variable $envs := ('test', 'live');
 				<arg line="--file ../../binaries/packages/apache-tomcat-6.0.37.tar.gz"/>
 			</exec>
 
-			<delete dir="console/tomcat-{$env}/**/*"/>
+			<delete dir="tomcat-{$env}/**/*"/>
 
 			<move
 				file="temp/apache-tomcat-6.0.37"
-				tofile="console/tomcat-{$env}"/>
+				tofile="tomcat-{$env}"/>
 
 			<delete dir="temp"/>
 
-			<delete dir="console/tomcat-{$env}/webapps/ROOT"/>
+			<!-- configure tomcat -->
 
-			<copy todir="console/tomcat-{$env}/webapps/ROOT">
+			<copy
+				file="console/server-{$env}.xml"
+				tofile="tomcat-{$env}/conf/server.xml"/>
+
+			<!-- deploy console -->
+
+			<delete dir="tomcat-{$env}/apps/console/ROOT"/>
+
+			<copy todir="tomcat-{$env}/apps/console/ROOT">
 				<fileset dir="console/test"/>
 			</copy>
 
+			<!-- deploy api -->
+
+			<delete dir="tomcat-{$env}/apps/api/ROOT"/>
+
+			<copy todir="tomcat-{$env}/apps/api/ROOT">
+				<fileset dir="api/test"/>
+			</copy>
+
+			<!-- start tomcat -->
+
 			<exec
 				failonerror="true"
-				dir="console/tomcat-{$env}"
+				dir="tomcat-{$env}"
 				executable="bin/catalina.sh">
 				<arg line="run"/>
 			</exec>

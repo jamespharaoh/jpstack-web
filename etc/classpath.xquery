@@ -10,10 +10,12 @@ declare variable $module := //txt2-module;
 
 	{ for $depend in $module/depend-module
 	return (
+
 		<classpathentry
 			combineaccessrules="false"
 			kind="src"
 			path="/txt2-{$depend/@name}"/>
+
 	) }
 
 	<classpathentry kind="output" path=".bin"/>

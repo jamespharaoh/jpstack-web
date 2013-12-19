@@ -97,6 +97,14 @@ global_elem.find("modules/module").each do
 		"console/web-test.xml",
 		"mode" => "test"
 
+	create_xml module_name, "api-web-xml",
+		"api/web-test.xml",
+		"mode" => "test"
+
+	create_xml module_name, "server-xml",
+		"console/server-test.xml",
+		"mode" => "test"
+
 	[ "test", "api/files", "console/files" ].each do
 		|dir|
 
