@@ -6,7 +6,7 @@ declare variable $mode external;
 
 	<display-name>Txt2 API</display-name>
 
-	<!-- ============================================== context init params -->
+	<!-- =============================== context params -->
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
@@ -49,7 +49,7 @@ declare variable $mode external;
 		), ' ') }</param-value>
 	</context-param>
 
-	<!-- ======================================================== listeners -->
+	<!-- =============================== listeners -->
 
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -59,45 +59,21 @@ declare variable $mode external;
 		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
 	</listener>
 
-	<!-- ========================================================== filters -->
-
-	<filter>
-		<filter-name>encodingFilter</filter-name>
-		<filter-class>txt2.core.console.core.SetCharacterEncodingFilter</filter-class>
-		<init-param>
-			<param-name>encoding</param-name>
-			<param-value>UTF-8</param-value>
-		</init-param>
-	</filter>
-
-	<filter>
-		<filter-name>authFilter</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-	</filter>
+	<!-- =============================== filters -->
 
 	<filter>
 		<filter-name>responseFilter</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
 	</filter>
 
-	<!-- ================================================== filter mappings -->
-
-	<filter-mapping>
-		<filter-name>encodingFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+	<!-- =============================== filter mappings -->
 
 	<filter-mapping>
 		<filter-name>responseFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<filter-mapping>
-		<filter-name>authFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
-	<!-- ========================================================= servlets -->
+	<!-- =============================== servlets -->
 
 	<servlet>
 		<display-name>g8wave</display-name>
@@ -119,7 +95,7 @@ declare variable $mode external;
 		</init-param>
 	</servlet>
 
-	<!-- ================================================== servlet mappings -->
+	<!-- =============================== servlet mappings -->
 
 	<servlet-mapping>
 		<servlet-name>DefaultServlet</servlet-name>

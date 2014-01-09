@@ -28,8 +28,8 @@
 	<Service name="console">
 
 		<Executor
-			name="tomcatThreadPool"
-			namePrefix="catalina-exec-"
+			name="console-executor"
+			namePrefix="console-exec-"
 			maxThreads="150"
 			minSpareThreads="4"/>
 
@@ -40,7 +40,7 @@
 			redirectPort="8443" />
 
 		<Engine
-			name="Catalina"
+			name="console-engine"
 			defaultHost="localhost">
 
 			<Realm
@@ -64,8 +64,8 @@
 	<Service name="api">
 
 		<Executor
-			name="tomcatThreadPool"
-			namePrefix="catalina-exec-"
+			name="api-executor"
+			namePrefix="api-exec-"
 			maxThreads="150"
 			minSpareThreads="4"/>
 
@@ -76,7 +76,7 @@
 			redirectPort="8444" />
 
 		<Engine
-			name="Catalina"
+			name="api-engine"
 			defaultHost="localhost">
 
 			<Realm
