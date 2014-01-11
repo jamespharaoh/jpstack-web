@@ -54,6 +54,25 @@ def create_xml module_name, template_name, target, vars = {}
 
 end
 
+File.open "etc/libraries.xml", "w" do
+	|file|
+
+	file.write "<libraries>\n"
+
+	Dir.entries("binaries/libraries").sort.each do
+		|library|
+
+		next if library == "."
+		next if library == ".."
+
+		file.write "\t<library name=\"#{library}\"/>\n"
+
+	end
+
+	file.write "</libraries>\n"
+
+end
+
 global_elem.find("modules/module").each do
 	|module_elem|
 
