@@ -180,16 +180,12 @@ declare variable $envs := ('test', 'live');
 	<target name="just-clean">
 		<delete dir="bin"/>
 		{ for $dir in (
-				'console/live',
-				'console/test',
-				'console/tomcat-live',
-				'console/tomcat-test',
-				'api/live',
-				'api/test',
-				'api/tomcat-live',
-				'api/tomcat-test'
+			for $env in $envs return (
+				concat ('api/', $env),
+				concat ('console/', $env),
+				concat ('tomcat-', $env)
 			)
-		return (
+		) return (
 			<delete includeemptydirs="true">
 				<fileset
 					dir="{$dir}"
@@ -325,6 +321,10 @@ declare variable $envs := ('test', 'live');
 				file="console/server-{$env}.xml"
 				tofile="tomcat-{$env}/conf/server.xml"/>
 
+			<copy
+				file="../conf/tomcat-users.xml"
+				tofile="tomcat-{$env}/conf/tomcat-users.xml"/>
+
 			<!-- deploy console -->
 
 			<delete dir="tomcat-{$env}/apps/console/ROOT"/>
@@ -333,12 +333,28 @@ declare variable $envs := ('test', 'live');
 				<fileset dir="console/test"/>
 			</copy>
 
+			<copy todir="tomcat-{$env}/apps/console/manager">
+				<fileset dir="tomcat-{$env}/webapps/manager"/>
+			</copy>
+
+			<copy todir="tomcat-{$env}/apps/console/host-manager">
+				<fileset dir="tomcat-{$env}/webapps/host-manager"/>
+			</copy>
+
 			<!-- deploy api -->
 
 			<delete dir="tomcat-{$env}/apps/api/ROOT"/>
 
 			<copy todir="tomcat-{$env}/apps/api/ROOT">
 				<fileset dir="api/test"/>
+			</copy>
+
+			<copy todir="tomcat-{$env}/apps/api/manager">
+				<fileset dir="tomcat-{$env}/webapps/manager"/>
+			</copy>
+
+			<copy todir="tomcat-{$env}/apps/api/host-manager">
+				<fileset dir="tomcat-{$env}/webapps/host-manager"/>
 			</copy>
 
 			<!-- start tomcat -->

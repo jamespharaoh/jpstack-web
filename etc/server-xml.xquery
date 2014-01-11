@@ -50,10 +50,15 @@
 			<Host
 				name="localhost"
 				appBase="apps/console"
-				unpackWARs="true"
-				autoDeploy="true"
+				unpackWARs="false"
+				autoDeploy="false"
 				xmlValidation="false"
 				xmlNamespaceAware="false">
+
+				<context
+					docBase="ROOT"
+					path="/"
+					reloadable="true"/>
 
 			</Host>
 
@@ -86,10 +91,15 @@
 			<Host
 				name="localhost"
 				appBase="apps/api"
-				unpackWARs="true"
-				autoDeploy="true"
+				unpackWARs="false"
+				autoDeploy="false"
 				xmlValidation="false"
 				xmlNamespaceAware="false">
+
+				<context
+					docBase="ROOT"
+					path="/"
+					reloadable="true"/>
 
 			</Host>
 
