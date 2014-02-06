@@ -18,32 +18,6 @@ declare variable $mode external;
 
 	<context:annotation-config/>
 
-	{ for $depend in $module/* [name () = 'depend-module']
-	return (
-		<import resource="{ concat (
-			'classpath:txt2/',
-			replace ($depend/@name, '-', ''),
-			'/',
-			$mode,
-			'/',
-			$depend/@name,
-			'-',
-			$mode,
-			'-beans.xml'
-		) }"/>
-	) }
-
-	{ for $package in $module/* [name () = 'package']
-	return (
-		<context:component-scan
-			base-package="{ concat (
-				'txt2.',
-				$package/@name,
-				'.',
-				$mode
-			) }"/>
-	) }
-
 	{ for $package in $module/* [name () = 'package']
 	return (
 
@@ -87,6 +61,19 @@ declare variable $mode external;
 							<ref bean="{$model/@name}ConsoleHelperProvider"/>
 						</property>
 
+						<property name="consoleHelperClassName">
+							<value>{ concat (
+								'txt2.',
+								$package/@name,
+								'.console.',
+								$group/@name,
+								'.',
+								upper-case (substring ($model/@name, 1, 1)),
+								substring ($model/@name, 2),
+								'ConsoleHelper'
+							) }</value>
+						</property>
+
 					</bean>
 
 				) else ()
@@ -99,5 +86,16 @@ declare variable $mode external;
 
 	{ for $beans in $module/* [name () = concat ($mode, '-beans')]
 	return $beans/* }
+
+	{ for $package in $module/* [name () = 'package']
+	return (
+		<context:component-scan
+			base-package="{ concat (
+				'txt2.',
+				$package/@name,
+				'.',
+				$mode
+			) }"/>
+	) }
 
 </beans>

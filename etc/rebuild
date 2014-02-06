@@ -84,29 +84,24 @@ global_elem.find("modules/module").each do
 	create_xml module_name, "classpath", ".classpath"
 	create_xml module_name, "project", ".project"
 
-	create_xml module_name, "beans-xml",
-		"src/txt2/#{package_name}/model/#{module_name}-model-beans.xml",
-		"mode" => "model"
+	[
+		"model",
+		"misc",
+		"web",
+		"console",
+		"api",
+		"daemon",
+		"hibernate",
+	].each do
+		|mode|
 
-	create_xml module_name, "beans-xml",
-		"src/txt2/#{package_name}/misc/#{module_name}-misc-beans.xml",
-		"mode" => "misc"
+		create_xml \
+			module_name,
+			"beans-xml",
+			"src/txt2/#{package_name}/#{mode}/#{module_name}-#{mode}-beans.xml",
+			"mode" => mode
 
-	create_xml module_name, "beans-xml",
-		"src/txt2/#{package_name}/console/#{module_name}-console-beans.xml",
-		"mode" => "console"
-
-	create_xml module_name, "beans-xml",
-		"src/txt2/#{package_name}/api/#{module_name}-api-beans.xml",
-		"mode" => "api"
-
-	create_xml module_name, "beans-xml",
-		"src/txt2/#{package_name}/daemon/#{module_name}-daemon-beans.xml",
-		"mode" => "daemon"
-
-	create_xml module_name, "beans-xml",
-		"src/txt2/#{package_name}/hibernate/#{module_name}-hibernate-beans.xml",
-		"mode" => "hibernate"
+	end
 
 	create_xml module_name, "console-web-xml",
 		"console/web-live.xml",

@@ -551,7 +551,32 @@ declare variable $envs := ('test', 'live');
 
 		<java
 			classname="txt2.test.TestFixtures"
-			classpathref="classpath"/>
+			classpathref="classpath">
+			{ for
+				$module-name in (
+					$module/@name,
+					for $depend in $module/* [name () = 'depend-module']
+					return $depend/@name
+				),
+				$layer-name in (
+					'model',
+					'hibernate',
+					'misc'
+				)
+			return (
+				<arg line="{ concat (
+					'classpath:/txt2/',
+					replace ($module-name, '-', ''),
+					'/',
+					$layer-name,
+					'/',
+					$module-name,
+					'-',
+					$layer-name,
+					'-beans.xml'
+				) }"/>
+			) }
+		</java>
 
 	</target>
 

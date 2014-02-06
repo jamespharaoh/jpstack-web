@@ -11,50 +11,33 @@ declare variable $mode external;
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>{ string-join ((
-			concat (
-				'classpath:txt2/',
-				replace ($module/@name, '-', ''),
-				'/model/',
-				$module/@name,
-				'-model-beans.xml'
-			),
-			concat (
-				'classpath:txt2/',
-				replace ($module/@name, '-', ''),
-				'/web/',
-				$module/@name,
-				'-web-beans.xml'
-			),
-			concat (
-				'classpath:txt2/',
-				replace ($module/@name, '-', ''),
-				'/console/',
-				$module/@name,
-				'-console-beans.xml'
-			),
-			concat (
-				'classpath:txt2/',
-				replace ($module/@name, '-', ''),
-				'/hibernate/',
-				$module/@name,
-				'-hibernate-beans.xml'
-			),
-			concat (
-				'classpath:txt2/',
-				replace ($module/@name, '-', ''),
-				'/misc/',
-				$module/@name,
-				'-misc-beans.xml'
-			),
-			if ($mode = 'test') then (
-				concat (
-					'classpath:txt2/',
-					replace ($module/@name, '-', ''),
-					'/daemon/',
-					$module/@name,
-					'-daemon-beans.xml'
+			for
+				$module-name in (
+					for $depend in $module/* [name () = 'depend-module']
+					return $depend/@name,
+					$module/@name
+				),
+				$layer-name in (
+					'model',
+					'web',
+					'console',
+					'hibernate',
+					'misc',
+					if ($mode = 'test') then (
+						'daemon'
+					) else ()
 				)
-			) else ()
+			return concat (
+				'classpath:txt2/',
+				replace ($module-name, '-', ''),
+				'/',
+				$layer-name,
+				'/',
+				$module-name,
+				'-',
+				$layer-name,
+				'-beans.xml'
+			)
 		), ' ') }</param-value>
 	</context-param>
 
