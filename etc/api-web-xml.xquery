@@ -11,40 +11,29 @@ declare variable $mode external;
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>{ string-join ((
-			concat (
+			for
+				$module-name in (
+					for $depend in $module/* [name () = 'depend-module']
+					return $depend/@name,
+					$module/@name
+				),
+				$layer-name in (
+					'model',
+					'web',
+					'api',
+					'hibernate',
+					'misc'
+				)
+			return concat (
 				'classpath:txt2/',
-				replace ($module/@name, '-', ''),
-				'/model/',
-				$module/@name,
-				'-model-beans.xml'
-			),
-			concat (
-				'classpath:txt2/',
-				replace ($module/@name, '-', ''),
-				'/web/',
-				$module/@name,
-				'-web-beans.xml'
-			),
-			concat (
-				'classpath:txt2/',
-				replace ($module/@name, '-', ''),
-				'/api/',
-				$module/@name,
-				'-api-beans.xml'
-			),
-			concat (
-				'classpath:txt2/',
-				replace ($module/@name, '-', ''),
-				'/hibernate/',
-				$module/@name,
-				'-hibernate-beans.xml'
-			),
-			concat (
-				'classpath:txt2/',
-				replace ($module/@name, '-', ''),
-				'/misc/',
-				$module/@name,
-				'-misc-beans.xml'
+				replace ($module-name, '-', ''),
+				'/',
+				$layer-name,
+				'/',
+				$module-name,
+				'-',
+				$layer-name,
+				'-beans.xml'
 			)
 		), ' ') }</param-value>
 	</context-param>

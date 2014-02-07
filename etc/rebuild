@@ -112,6 +112,10 @@ global_elem.find("modules/module").each do
 		"mode" => "test"
 
 	create_xml module_name, "api-web-xml",
+		"api/web-live.xml",
+		"mode" => "live"
+
+	create_xml module_name, "api-web-xml",
 		"api/web-test.xml",
 		"mode" => "test"
 
