@@ -81,6 +81,15 @@
 			name="httpmime"
 			rev="4.3.1"/>
 
+		<!-- javaee-api -->
+
+		<!--
+		<dependency
+			org="javax"
+			name="javaee-api"
+			rev="6.0"/>
+		-->
+
 		<!-- json-simple -->
 
 		<dependency
@@ -171,6 +180,10 @@
 			org="org.hibernate"
 			artifact="hibernate-entitymanager"/>
 
+		<exclude
+			org="org.hibernate"
+			artifact="ejb3-persistence"/>
+
 		<!--
 		<exclude
 			artifact="hibernate-validator"/>
@@ -181,6 +194,27 @@
 
 		<exclude
 			org="spring-webmvc"/>
+
+		<exclude
+			org="javax.persistence"/>
+
+		<exclude
+			org="org.apache.geronimo.specs"/>
+
+		<exclude
+			org="org.apache.openjpa"/>
+
+		<exclude
+			org="org.apache.openejb"/>
+
+		<exclude
+			org="javax"/>
+
+		<exclude
+			org="toplink.essentials"/>
+
+		<exclude
+			org="javax"/>
 
 	</dependencies>
 

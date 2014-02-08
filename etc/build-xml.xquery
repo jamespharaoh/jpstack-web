@@ -73,16 +73,16 @@ declare variable $envs := ('test', 'live');
 	<target
 		name="api-live"
 		depends="{ string-join ((
-			'just-build-deps',
-			'just-build',
+			(: 'just-build-deps', :)
+			(: 'just-build', :)
 			'just-api-live'
 		), ', ') }"/>
 
 	<target
 		name="api-test"
 		depends="{ string-join ((
-			'just-build-deps',
-			'just-build',
+			(: 'just-build-deps', :)
+			(: 'just-build', :)
 			'just-api-test'
 		), ', ') }"/>
 
@@ -166,10 +166,10 @@ declare variable $envs := ('test', 'live');
 	<target
 		name="fixtures"
 		depends="{ string-join ((
-			'just-build-deps',
-			'just-build',
-			'just-build-tests-deps',
-			'just-build-tests',
+			(: 'just-build-deps', :)
+			(: 'just-build', :)
+			(: 'just-build-tests-deps', :)
+			(: 'just-build-tests', :)
 			'just-db-drop',
 			'just-db-create',
 			'just-sql-schema-deps',
@@ -190,9 +190,9 @@ declare variable $envs := ('test', 'live');
 		<delete dir="bin"/>
 		{ for $dir in (
 			for $env in $envs return (
-				concat ('api/', $env),
-				concat ('console/', $env),
-				concat ('tomcat-', $env)
+				concat ('../api-', $env),
+				concat ('../console-', $env),
+				concat ('../tomcat-', $env)
 			)
 		) return (
 			<delete includeemptydirs="true">
@@ -231,19 +231,6 @@ declare variable $envs := ('test', 'live');
 			<include name="**/*.xml"/>
 			<include name="log4j.properties"/>
 		</fileset></copy>
-
-		<copy
-			file="{ concat (
-				$module/@name,
-				'-module.xml'
-			) }"
-			tofile="{ concat (
-				'bin/txt2/',
-				replace ($module/@name, '-', ''),
-				'/',
-				$module/@name,
-				'-module.xml'
-			) }"/>
 
 	</target>
 
@@ -284,12 +271,12 @@ declare variable $envs := ('test', 'live');
 
 		<target name="just-console-{$env}">
 
-			<mkdir dir="console/{$env}"/>
-			<mkdir dir="console/{$env}/WEB-INF"/>
-			<mkdir dir="console/{$env}/WEB-INF/classes"/>
-			<mkdir dir="console/{$env}/WEB-INF/lib"/>
+			<mkdir dir="../console-{$env}"/>
+			<mkdir dir="../console-{$env}/WEB-INF"/>
+			<mkdir dir="../console-{$env}/WEB-INF/classes"/>
+			<mkdir dir="../console-{$env}/WEB-INF/lib"/>
 
-			<copy todir="console/{$env}">
+			<copy todir="../console-{$env}">
 				{ for $depend in $module/depend-module
 				return (
 					<fileset dir="../txt2-{$depend/@name}/console/files"/>
@@ -297,7 +284,7 @@ declare variable $envs := ('test', 'live');
 				<fileset dir="console/files"/>
 			</copy>
 
-			<copy todir="console/{$env}/WEB-INF/classes">
+			<copy todir="../console-{$env}/WEB-INF/classes">
 				{ for $depend in $module/depend-module
 				return (
 					<fileset dir="../txt2-{$depend/@name}/bin"/>
@@ -305,11 +292,13 @@ declare variable $envs := ('test', 'live');
 				<fileset dir="bin"/>
 			</copy>
 
-			<copy todir="console/{$env}/WEB-INF/lib">
+			<copy todir="../console-{$env}/WEB-INF/lib">
 				<fileset dir="lib" excludes="servlet-api.jar"/>
 			</copy>
 
-			<copy file="console/web-{$env}.xml" tofile="console/{$env}/WEB-INF/web.xml"/>
+			<copy
+				file="console/web-{$env}.xml"
+				tofile="../console-{$env}/WEB-INF/web.xml"/>
 
 		</target>,
 
@@ -319,72 +308,71 @@ declare variable $envs := ('test', 'live');
 
 			<!-- install tomcat -->
 
-			<mkdir dir="temp"/>
+			<mkdir dir="../temp"/>
 
 			<exec
 				failonerror="true"
-				dir="temp"
+				dir="../temp"
 				executable="tar">
 				<arg line="--extract"/>
-				<arg line="--file ../../binaries/packages/apache-tomcat-6.0.37.tar.gz"/>
+				<arg line="--file ../binaries/packages/apache-tomcat-6.0.37.tar.gz"/>
 			</exec>
 
-			<delete dir="tomcat-{$env}/**/*"/>
+			<delete dir="../tomcat-{$env}/**/*"/>
 
 			<move
-				file="temp/apache-tomcat-6.0.37"
-				tofile="tomcat-{$env}"/>
+				file="../temp/apache-tomcat-6.0.37"
+				tofile="../tomcat-{$env}"/>
 
-			<delete dir="temp"/>
+			<delete dir="../temp"/>
 
 			<!-- configure tomcat -->
 
 			<copy
 				file="console/server-{$env}.xml"
-				tofile="tomcat-{$env}/conf/server.xml"/>
+				tofile="../tomcat-{$env}/conf/server.xml"/>
 
 			<copy
 				file="../conf/tomcat-users.xml"
-				tofile="tomcat-{$env}/conf/tomcat-users.xml"/>
+				tofile="../tomcat-{$env}/conf/tomcat-users.xml"/>
 
 			<!-- deploy console -->
 
-			<delete dir="tomcat-{$env}/apps/console/ROOT"/>
+			<delete dir="../tomcat-{$env}/apps/console/ROOT"/>
 
-			<copy todir="tomcat-{$env}/apps/console/ROOT">
-				<fileset dir="console/test"/>
+			<copy todir="../tomcat-{$env}/apps/console/ROOT">
+				<fileset dir="../console-{$env}"/>
 			</copy>
 
-			<copy todir="tomcat-{$env}/apps/console/manager">
-				<fileset dir="tomcat-{$env}/webapps/manager"/>
+			<copy todir="../tomcat-{$env}/apps/console/manager">
+				<fileset dir="../tomcat-{$env}/webapps/manager"/>
 			</copy>
 
-			<copy todir="tomcat-{$env}/apps/console/host-manager">
-				<fileset dir="tomcat-{$env}/webapps/host-manager"/>
+			<copy todir="../tomcat-{$env}/apps/console/host-manager">
+				<fileset dir="../tomcat-{$env}/webapps/host-manager"/>
 			</copy>
 
 			<!-- deploy api -->
 
-			<delete dir="tomcat-{$env}/apps/api/ROOT"/>
+			<delete dir="../tomcat-{$env}/apps/api/ROOT"/>
 
-			<copy todir="tomcat-{$env}/apps/api/ROOT">
-				<fileset dir="api/test"/>
+			<copy todir="../tomcat-{$env}/apps/api/ROOT">
+				<fileset dir="../api-{$env}"/>
 			</copy>
 
-			<copy todir="tomcat-{$env}/apps/api/manager">
-				<fileset dir="tomcat-{$env}/webapps/manager"/>
+			<copy todir="../tomcat-{$env}/apps/api/manager">
+				<fileset dir="../tomcat-{$env}/webapps/manager"/>
 			</copy>
 
-			<copy todir="tomcat-{$env}/apps/api/host-manager">
-				<fileset dir="tomcat-{$env}/webapps/host-manager"/>
+			<copy todir="../tomcat-{$env}/apps/api/host-manager">
+				<fileset dir="../tomcat-{$env}/webapps/host-manager"/>
 			</copy>
 
 			<!-- start tomcat -->
 
 			<exec
 				failonerror="true"
-				dir="tomcat-{$env}"
-				executable="bin/catalina.sh">
+				executable="../tomcat-{$env}/bin/catalina.sh">
 				<arg line="run"/>
 			</exec>
 
@@ -396,28 +384,28 @@ declare variable $envs := ('test', 'live');
 	return (
 
 		<target name="just-api-{$env}">
-			<mkdir dir="api/{$env}"/>
-			<mkdir dir="api/{$env}/WEB-INF"/>
-			<mkdir dir="api/{$env}/WEB-INF/classes"/>
-			<mkdir dir="api/{$env}/WEB-INF/lib"/>
-			<copy todir="api/{$env}">
+			<mkdir dir="../api-{$env}"/>
+			<mkdir dir="../api-{$env}/WEB-INF"/>
+			<mkdir dir="../api-{$env}/WEB-INF/classes"/>
+			<mkdir dir="../api-{$env}/WEB-INF/lib"/>
+			<copy todir="../api-{$env}">
 				{ for $depend in $module/depend-module
 				return (
 					<fileset dir="../txt2-{$depend/@name}/api/files"/>
 				) }
 				<fileset dir="api/files"/>
 			</copy>
-			<copy todir="api/{$env}/WEB-INF/classes">
+			<copy todir="../api-{$env}/WEB-INF/classes">
 				{ for $depend in $module/depend-module
 				return (
 					<fileset dir="../txt2-{$depend/@name}/bin"/>
 				) }
 				<fileset dir="bin"/>
 			</copy>
-			<copy todir="api/{$env}/WEB-INF/lib">
+			<copy todir="../api-{$env}/WEB-INF/lib">
 				<fileset dir="lib" excludes="servlet-api.jar"/>
 			</copy>
-			<copy file="api/web-{$env}.xml" tofile="api/{$env}/WEB-INF/web.xml"/>
+			<copy file="api/web-{$env}.xml" tofile="../api-{$env}/WEB-INF/web.xml"/>
 		</target>
 
 	) }

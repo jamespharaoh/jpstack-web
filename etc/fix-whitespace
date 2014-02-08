@@ -1,0 +1,10 @@
+#!/bin/bash
+
+fix-whitespace \
+	$(
+		find txt2-*/{src,sql,test} \
+			-name '*.java' \
+			-o -name '*.xml' \
+			-o -name '*.sql' \
+	) \
+	etc/*

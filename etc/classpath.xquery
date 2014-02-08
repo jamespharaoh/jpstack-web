@@ -22,7 +22,29 @@ declare variable $module := //txt2-module;
 
 		<classpathentry
 			kind="lib"
-			path="../binaries/libraries/{$library/@name}"/>
+			path="{ concat (
+				'../binaries/libraries/',
+				$library/@name,
+				'-',
+				$library/@type,
+				'-',
+				$library/@version,
+				'.jar'
+			) }">
+
+			{ if ($library/@source = 'yes') then (
+				attribute sourcepath {
+					concat (
+						'/home/james/projects/txt2/binaries/libraries/',
+						$library/@name,
+						'-source-',
+						$library/@version,
+						'.jar'
+					)
+				}
+			) else () }
+
+		</classpathentry>
 
 	) }
 
