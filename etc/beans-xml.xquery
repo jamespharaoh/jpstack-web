@@ -2,6 +2,23 @@ declare variable $module := //txt2-module;
 
 declare variable $mode external;
 
+declare function local:hyphenated-to-camel-case (
+	$string as xs:string
+) as xs:string {
+
+	string-join (
+		for $word at $position in tokenize ($string, '-')
+		return if ($position = 1) then (
+			$word
+		) else concat (
+			upper-case (substring ($word, 1, 1)),
+			substring ($word, 2)
+		),
+		''
+	)
+
+};
+
 <beans
 	xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -49,6 +66,22 @@ declare variable $mode external;
 							<value>{ string ($model/@name) }</value>
 						</property>
 
+						<property name="objectHelperClassName">
+							<value>{ concat (
+								'txt2.',
+								$package/@name,
+								'.model.',
+								$group/@name,
+								'.',
+								upper-case (substring ($model/@name, 1, 1)),
+								substring ($model/@name, 2),
+								'Rec$',
+								upper-case (substring ($model/@name, 1, 1)),
+								substring ($model/@name, 2),
+								'ObjectHelper'
+							) }</value>
+						</property>
+
 					</bean>
 
 				) else if ($mode = 'console') then (
@@ -83,6 +116,16 @@ declare variable $mode external;
 		)
 
 	) }
+
+	{ if ($mode = 'misc') then (
+		<bean
+			id="{local:hyphenated-to-camel-case ($module/@name)}Module"
+			class="txt2.core.misc.module.Txt2ModuleFactory">
+			<property name="name">
+				<value>{string ($module/@name)}</value>
+			</property>
+		</bean>
+	) else () }
 
 	{ for $beans in $module/* [name () = concat ($mode, '-beans')]
 	return $beans/* }

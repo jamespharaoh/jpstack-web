@@ -26,6 +26,6 @@ declare variable $module := //txt2-module;
 
 	) }
 
-	<classpathentry kind="output" path=".bin"/>
+	<classpathentry kind="output" path="bin"/>
 
 </classpath>

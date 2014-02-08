@@ -39,16 +39,16 @@ declare variable $envs := ('test', 'live');
 	<target
 		name="console-live"
 		depends="{ string-join ((
-			'just-build-deps',
-			'just-build',
+			(: 'just-build-deps', :)
+			(: 'just-build', :)
 			'just-console-live'
 		), ', ') }"/>
 
 	<target
 		name="console-test"
 		depends="{ string-join ((
-			'just-build-deps',
-			'just-build',
+			(: 'just-build-deps', :)
+			(: 'just-build', :)
 			'just-console-test'
 		), ', ') }"/>
 
@@ -222,6 +222,19 @@ declare variable $envs := ('test', 'live');
 			<include name="**/*.xml"/>
 			<include name="log4j.properties"/>
 		</fileset></copy>
+
+		<copy
+			file="{ concat (
+				$module/@name,
+				'-module.xml'
+			) }"
+			tofile="{ concat (
+				'bin/txt2/',
+				replace ($module/@name, '-', ''),
+				'/',
+				$module/@name,
+				'-module.xml'
+			) }"/>
 
 	</target>
 
