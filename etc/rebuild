@@ -4,6 +4,8 @@ require "shellwords"
 require "tempfile"
 require "xml"
 
+ENV["XMLLINT_INDENT"] = "\t"
+
 global_doc = XML::Document.file "etc/global.xml"
 global_elem = global_doc.root
 

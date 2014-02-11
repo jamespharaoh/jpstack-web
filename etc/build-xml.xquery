@@ -37,6 +37,15 @@ declare variable $envs := ('test', 'live');
 		), ', ') }"/>
 
 	<target
+		name="build-tests"
+		depends="{ string-join ((
+			'just-build-deps',
+			'just-build',
+			'just-build-tests-deps',
+			'just-build-tests'
+		), ', ') }"/>
+
+	<target
 		name="console-live"
 		depends="{ string-join ((
 			(: 'just-build-deps', :)
