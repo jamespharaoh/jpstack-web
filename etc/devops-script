@@ -1,0 +1,176 @@
+#!/usr/bin/env ruby
+
+require "pp"
+
+Dir.chdir "#{ENV["HOME"]}/projects/wbs"
+
+def title message
+	return unless STDIN.tty?
+	puts "\e]0;#{message}\a"
+end
+
+daemon_log = "/service/daemon/log/main/current"
+api_log = "/service/tomcat-api/log/main/current"
+console_log = "/service/tomcat-console/log/main/current"
+access_log = "/var/log/apache2/access.log"
+
+def ssh term, *cmd
+
+	args = [
+		"ssh",
+		term,
+		"james@hades.apnuk.com",
+		cmd,
+	].flatten
+
+	system *args or raise "Error"
+
+end
+
+def log *logs
+
+	if STDIN.tty?
+		follow = [ "-F" ]
+		count = [ "-n", "1000" ]
+		term = [ "-t" ]
+	else
+		follow = []
+		count = [ "-n", "1000" ]
+		term = [ "-T" ]
+	end
+
+	if logs.size > 1
+		count = [ "-n", "0" ]
+	end
+
+	ssh term, [
+		"tail",
+		"-s", "0.1",
+		count,
+		follow,
+		logs,
+		"|",
+		"tai64nlocal",
+		"|",
+		"cut -c12-19,30-",
+	]
+end
+
+def system_string_nofail command
+	ret = `#{command}`
+	unless $?.to_i == 0
+		puts ret
+		exit 1
+	end
+	return ret.strip
+end
+
+def system_nofail command
+	system command
+	exit unless $?.to_i == 0
+end
+
+command = ARGV.shift
+case command
+
+	when "sql"
+		title "wbs sql"
+		ssh "-t", "psql txt2", *ARGV
+
+	when "daemon-log"
+		title "wbs daemon log"
+		log daemon_log
+
+	when "api-log"
+		title "wbs api log"
+		log api_log
+
+	when "console-log"
+		title "wbs console log"
+		log console_log
+
+	when "all-log"
+		title "wbs all log"
+		log daemon_log api_log console_log access_log
+
+	when "access-log"
+		title "wbs access log"
+		log access_log
+
+	when "git"
+		title "wbs git"
+		ssh "-t", "cd wbs/wbs-apn; git", *ARGV
+
+	when "build"
+		title "wbs #{command}"
+		ssh "-t", "cd wbs/wbs-apn; ant", command
+
+	when /-auto$/
+		title "wbs #{command}"
+		ssh "-t", "cd wbs/wbs-apn; ant", command
+
+	when "clean"
+		title "wbs clean"
+		ssh "-t", "rm -rf wbs/wbs-*/bin"
+		;;
+
+	when "console-clean"
+		title "wbs clean"
+		ssh "-t", "rm -rf wbs/console-live"
+		;;
+
+	when "api-clean"
+		title "wbs clean"
+		ssh "-t", "rm -rf wbs/api-live"
+		;;
+
+	when "top"
+		title "wbs top"
+		ssh "-t", "top"
+
+	when "help", nil
+		puts ""
+		puts "Syntax:"
+		puts ""
+		puts "    $0 COMMAND ..."
+		puts ""
+		puts "Commands:"
+		puts ""
+		puts "    sql         Execute a psql command on the specified database"
+		puts "    *-log       Watch logs for the specified service(s)"
+		puts "    *-auto      Redeploy the specified service(s)"
+		puts ""
+
+	when "wip"
+
+		system_nofail \
+			"git add -A ."
+
+		tree_id = system_string_nofail \
+			"git write-tree"
+
+		commit_id = system_string_nofail \
+			"git commit-tree #{tree_id} -p HEAD -m wip"
+
+		system_nofail \
+			"git update-ref refs/heads/wip #{commit_id}"
+
+		system_nofail \
+			"git push origin +wip"
+
+		ssh "-t",
+			"cd wbs; git fetch; git checkout -B wip origin/wip"
+
+	when "wip"
+
+		system_nofail \
+			"git push origin master"
+
+		ssh "-t",
+			"cd wbs; git fetch; git checkout master; git rebase"
+
+	else
+		STDERR.puts "Unknown command #{command}"
+		exit 1
+
+end

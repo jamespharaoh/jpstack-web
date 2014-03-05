@@ -1,0 +1,16 @@
+#!/bin/bash
+
+rsync \
+	--recursive \
+	--times \
+	--verbose \
+	$HOME/projects/txt2/ \
+	$1:projects/txt2-copy/ \
+	--exclude /.git \
+	--exclude /.metadata \
+	--exclude /binaries \
+	--exclude /txt2-*/bin \
+	--exclude /txt2-*/lib \
+	--exclude /txt2-*/src/build.xml \
+	--exclude /work \
+	--delete

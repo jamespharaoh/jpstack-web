@@ -1,8 +1,8 @@
-declare variable $module := //txt2-module;
+declare variable $project := //project;
 
 <projectDescription>
 
-	<name>txt2-{string ($module/@name)}</name>
+	<name>{ string ($project/@name) }</name>
 	<comment></comment>
 	<projects>
 	</projects>

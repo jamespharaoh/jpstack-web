@@ -1,68 +1,61 @@
-declare variable $module := //txt2-module;
+declare variable $project := //project;
 
 declare variable $mode external;
 
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" version="2.4">
 
-	<display-name>Txt2 console</display-name>
+	<display-name>WBS console</display-name>
 
-	<!-- ============================================== context init params -->
+	<!-- context init params -->
 
 	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>{ string-join ((
-			for
-				$module-name in (
-					for $depend in $module/* [name () = 'depend-module']
-					return $depend/@name,
-					$module/@name
-				),
-				$layer-name in (
-					'model',
-					'web',
-					'console',
-					'hibernate',
-					'misc',
-					if ($mode = 'test') then (
-						'daemon'
-					) else ()
-				)
-			return concat (
-				'classpath:txt2/',
-				replace ($module-name, '-', ''),
-				'/',
-				$layer-name,
-				'/',
-				$module-name,
-				'-',
-				$layer-name,
-				'-beans.xml'
-			)
-		), ' ') }</param-value>
+		<param-name>primaryProjectName</param-name>
+		<param-value>{ string ($project/@name) }</param-value>
 	</context-param>
 
 	<context-param>
-		<param-name>contextInitializerClasses</param-name>
-		<param-value>{ string-join ((
-			'txt2.servlet.Txt2WebContextInitializer'
-		), ' ') }</param-value>
+		<param-name>primaryProjectPackageName</param-name>
+		<param-value>{ string ($project/@package) }</param-value>
 	</context-param>
 
-	<!-- ======================================================== listeners -->
+	<context-param>
+		<param-name>beanDefinitionOutputPath</param-name>
+		<param-value>../work/console-{$mode}-beans</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>layerNames</param-name>
+		<param-value>{ string-join ((
+			'data',
+			'entity',
+			'schema',
+			'sql',
+			'model',
+			'hibernate',
+			'object',
+			'logic',
+			'web',
+			'console',
+			if ($mode = 'test') then ('daemon') else ()
+		), ',') }</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>configNames</param-name>
+		<param-value>{$mode},hibernate,console</param-value>
+	</context-param>
+
+	<!-- listeners -->
 
 	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+		<listener-class>wbs.platform.servlet.WbsServletListener</listener-class>
 	</listener>
 
-	<listener>
-		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-	</listener>
-
-	<!-- ========================================================== filters -->
+	<!-- filters -->
 
 	<filter>
 		<filter-name>encodingFilter</filter-name>
-		<filter-class>txt2.core.console.core.SetCharacterEncodingFilter</filter-class>
+		<filter-class>wbs.framework.servlet.SetCharacterEncodingFilter</filter-class>
 		<init-param>
 			<param-name>encoding</param-name>
 			<param-value>UTF-8</param-value>
@@ -70,16 +63,16 @@ declare variable $mode external;
 	</filter>
 
 	<filter>
-		<filter-name>authFilter</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<filter-name>responseFilter</filter-name>
+		<filter-class>wbs.framework.servlet.BeanFilterProxy</filter-class>
 	</filter>
 
 	<filter>
-		<filter-name>responseFilter</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<filter-name>authFilter</filter-name>
+		<filter-class>wbs.framework.servlet.BeanFilterProxy</filter-class>
 	</filter>
 
-	<!-- ================================================== filter mappings -->
+	<!-- filter mappings -->
 
 	<filter-mapping>
 		<filter-name>encodingFilter</filter-name>
@@ -96,12 +89,12 @@ declare variable $mode external;
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<!-- ========================================================= servlets -->
+	<!-- servlets -->
 
 	<servlet>
 		<display-name>default</display-name>
 		<servlet-name>DefaultServlet</servlet-name>
-		<servlet-class>txt2.servlet.PathHandlerServlet</servlet-class>
+		<servlet-class>wbs.framework.web.PathHandlerServlet</servlet-class>
 		<init-param>
 			<param-name>pathHandler</param-name>
 			<param-value>rootPathHandler</param-value>
@@ -122,38 +115,24 @@ declare variable $mode external;
 		<servlet-name>DefaultServlet</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>*.css</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>*.js</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>*.gif</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>*.txt</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>*.png</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>*.ico</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>*.swf</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>*.yml</url-pattern>
-	</servlet-mapping>
+
+	{ for $extension in (
+		'css',
+		'js',
+		'gif',
+		'txt',
+		'png',
+		'ico',
+		'swf',
+		'yml'
+	) return (
+
+		<servlet-mapping>
+			<servlet-name>default</servlet-name>
+			<url-pattern>*.{ $extension }</url-pattern>
+		</servlet-mapping>
+
+	) }
 
 	<mime-mapping>
 		<extension>ico</extension>

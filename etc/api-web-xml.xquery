@@ -1,86 +1,75 @@
-declare variable $module := //txt2-module;
+declare variable $project := //project;
 
 declare variable $mode external;
 
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" version="2.4">
 
-	<display-name>Txt2 API</display-name>
+	<display-name>WBS API</display-name>
 
-	<!-- =============================== context params -->
+	<!-- context params -->
 
 	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>{ string-join ((
-			for
-				$module-name in (
-					for $depend in $module/* [name () = 'depend-module']
-					return $depend/@name,
-					$module/@name
-				),
-				$layer-name in (
-					'model',
-					'web',
-					'api',
-					'hibernate',
-					'misc'
-				)
-			return concat (
-				'classpath:txt2/',
-				replace ($module-name, '-', ''),
-				'/',
-				$layer-name,
-				'/',
-				$module-name,
-				'-',
-				$layer-name,
-				'-beans.xml'
-			)
-		), ' ') }</param-value>
+		<param-name>primaryProjectName</param-name>
+		<param-value>{ string ($project/@name) }</param-value>
 	</context-param>
 
 	<context-param>
-		<param-name>contextInitializerClasses</param-name>
-		<param-value>{ string-join ((
-			'txt2.servlet.Txt2WebContextInitializer'
-		), ' ') }</param-value>
+		<param-name>primaryProjectPackageName</param-name>
+		<param-value>{ string ($project/@package) }</param-value>
 	</context-param>
 
-	<!-- =============================== listeners -->
+	<context-param>
+		<param-name>beanDefinitionOutputPath</param-name>
+		<param-value>../work/api-{$mode}-beans</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>layerNames</param-name>
+		<param-value>{ string-join ((
+			'data',
+			'entity',
+			'schema',
+			'sql',
+			'model',
+			'hibernate',
+			'object',
+			'logic',
+			'web',
+			'api'
+		), ',') }</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>configNames</param-name>
+		<param-value>{$mode},hibernate,api</param-value>
+	</context-param>
+
+	<!-- listeners -->
 
 	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+		<listener-class>wbs.platform.servlet.WbsServletListener</listener-class>
 	</listener>
 
-	<listener>
-		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-	</listener>
-
-	<!-- =============================== filters -->
+	<!-- filters -->
 
 	<filter>
 		<filter-name>responseFilter</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<filter-class>wbs.framework.servlet.BeanFilterProxy</filter-class>
 	</filter>
 
-	<!-- =============================== filter mappings -->
+	<!-- filter mappings -->
 
 	<filter-mapping>
 		<filter-name>responseFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<!-- =============================== servlets -->
-
-	<servlet>
-		<display-name>g8wave</display-name>
-		<servlet-name>G8waveApiServlet</servlet-name>
-		<servlet-class>txt2.g8wave.webapi.G8waveApiServlet</servlet-class>
-	</servlet>
+	<!-- servlets -->
 
 	<servlet>
 		<display-name>default</display-name>
 		<servlet-name>DefaultServlet</servlet-name>
-		<servlet-class>txt2.servlet.PathHandlerServlet</servlet-class>
+		<servlet-class>wbs.framework.web.PathHandlerServlet</servlet-class>
 		<init-param>
 			<param-name>pathHandler</param-name>
 			<param-value>rootPathHandler</param-value>
@@ -91,16 +80,11 @@ declare variable $mode external;
 		</init-param>
 	</servlet>
 
-	<!-- =============================== servlet mappings -->
+	<!-- servlet mappings -->
 
 	<servlet-mapping>
 		<servlet-name>DefaultServlet</servlet-name>
 		<url-pattern>/</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>G8waveApiServlet</servlet-name>
-		<url-pattern>/g8wave/*</url-pattern>
 	</servlet-mapping>
 
 </web-app>

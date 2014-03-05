@@ -1,18 +1,29 @@
-declare variable $module := //txt2-module;
+declare variable $project := //project;
 
 declare variable $envs := ('test', 'live');
 
-<project name="{$module/@name}" basedir="." default="build">
+<project name="{$project/@name}" basedir="." default="build">
 
 	<property file="build.properties"/>
 
 	<path id="classpath">
-		<fileset dir="../lib" includes="*.jar"/>
-		{ for $depend in $module/depend-module
+
+		<fileset dir="../binaries/libraries" includes="*.jar"/>
+
+		{ for $depends-project in $project/depends-projects/depends-project
 		return (
-			<pathelement path="../txt2-{$depend/@name}/bin"/>
+
+			<pathelement
+				path="{ concat (
+					'../',
+					$depends-project/@name,
+					'/bin'
+				) }"/>
+
 		) }
+
 		<pathelement path="bin"/>
+
 	</path>
 
 	<target
@@ -48,16 +59,16 @@ declare variable $envs := ('test', 'live');
 	<target
 		name="console-live"
 		depends="{ string-join ((
-			(: 'just-build-deps', :)
-			(: 'just-build', :)
+			'just-build-deps',
+			'just-build',
 			'just-console-live'
 		), ', ') }"/>
 
 	<target
 		name="console-test"
 		depends="{ string-join ((
-			(: 'just-build-deps', :)
-			(: 'just-build', :)
+			'just-build-deps',
+			'just-build',
 			'just-console-test'
 		), ', ') }"/>
 
@@ -73,16 +84,16 @@ declare variable $envs := ('test', 'live');
 	<target
 		name="api-live"
 		depends="{ string-join ((
-			(: 'just-build-deps', :)
-			(: 'just-build', :)
+			'just-build-deps',
+			'just-build',
 			'just-api-live'
 		), ', ') }"/>
 
 	<target
 		name="api-test"
 		depends="{ string-join ((
-			(: 'just-build-deps', :)
-			(: 'just-build', :)
+			'just-build-deps',
+			'just-build',
 			'just-api-test'
 		), ', ') }"/>
 
@@ -166,12 +177,13 @@ declare variable $envs := ('test', 'live');
 	<target
 		name="fixtures"
 		depends="{ string-join ((
-			(: 'just-build-deps', :)
-			(: 'just-build', :)
-			(: 'just-build-tests-deps', :)
-			(: 'just-build-tests', :)
+			'just-build-deps',
+			'just-build',
+			'just-build-tests-deps',
+			'just-build-tests',
 			'just-db-drop',
 			'just-db-create',
+			'just-schema-create',
 			'just-sql-schema-deps',
 			'just-sql-schema',
 			'just-sql-data-deps',
@@ -180,10 +192,20 @@ declare variable $envs := ('test', 'live');
 		), ', ') }"/>
 
 	<target name="just-clean-deps">
-		{ for $depend in $module/depend-module
+
+		{ for $depends-project
+			in $project/depends-projects/depends-project
 		return (
-			<ant dir="../txt2-{$depend/@name}" target="just-clean"/>
+
+			<ant
+				dir="{ concat (
+					'../',
+					$depends-project/@name
+				) }"
+				target="just-clean"/>
+
 		) }
+
 	</target>
 
 	<target name="just-clean">
@@ -205,17 +227,37 @@ declare variable $envs := ('test', 'live');
 	</target>
 
 	<target name="just-build-deps">
-		{ for $depend in $module/depend-module
+
+		{ for $depends-project
+			in $project/depends-projects/depends-project
 		return (
-			<ant dir="../txt2-{$depend/@name}" target="just-build"/>
+
+			<ant
+				dir="{ concat (
+					'../',
+					$depends-project/@name
+				) }"
+				target="just-build"/>
+
 		) }
+
 	</target>
 
 	<target name="just-build-tests-deps">
-		{ for $depend in $module/depend-module
+
+		{ for $depends-project
+			in $project/depends-projects/depends-project
 		return (
-			<ant dir="../txt2-{$depend/@name}" target="just-build-tests"/>
+
+			<ant
+				dir="{ concat (
+					'../',
+					$depends-project/@name
+				) }"
+				target="just-build-tests"/>
+
 		) }
+
 	</target>
 
 	<target name="just-build">
@@ -250,10 +292,20 @@ declare variable $envs := ('test', 'live');
 	</target>
 
 	<target name="just-svn-up-deps">
-		{ for $depend in $module/depend-module
+
+		{ for $depends-project
+			in $project/depends-projects/depends-project
 		return (
-			<ant dir="../txt2-{$depend/@name}" target="just-svn-up"/>
+
+			<ant
+				dir="{ concat (
+					'../',
+					$depends-project/@name
+				) }"
+				target="just-svn-up"/>
+
 		) }
+
 	</target>
 
 	<target name="just-svn-up">
@@ -277,23 +329,46 @@ declare variable $envs := ('test', 'live');
 			<mkdir dir="../console-{$env}/WEB-INF/lib"/>
 
 			<copy todir="../console-{$env}">
-				{ for $depend in $module/depend-module
+
+				{ for $depends-project
+					in $project/depends-projects/depends-project
 				return (
-					<fileset dir="../txt2-{$depend/@name}/console/files"/>
+
+					<fileset
+						dir="{ concat (
+							'../',
+							$depends-project/@name,
+							'/console/files'
+						) }"/>
+
 				) }
-				<fileset dir="console/files"/>
+
+				<fileset
+					dir="console/files"/>
+
 			</copy>
 
 			<copy todir="../console-{$env}/WEB-INF/classes">
-				{ for $depend in $module/depend-module
+
+				{ for $depends-project
+					in $project/depends-projects/depends-project
 				return (
-					<fileset dir="../txt2-{$depend/@name}/bin"/>
+
+					<fileset
+						dir="{ concat (
+							'../',
+							$depends-project/@name,
+							'/bin'
+						) }"/>
+
 				) }
+
 				<fileset dir="bin"/>
+
 			</copy>
 
 			<copy todir="../console-{$env}/WEB-INF/lib">
-				<fileset dir="lib" excludes="servlet-api.jar"/>
+				<fileset dir="../binaries/libraries" excludes="servlet-api.jar"/>
 			</copy>
 
 			<copy
@@ -384,28 +459,63 @@ declare variable $envs := ('test', 'live');
 	return (
 
 		<target name="just-api-{$env}">
+
 			<mkdir dir="../api-{$env}"/>
 			<mkdir dir="../api-{$env}/WEB-INF"/>
 			<mkdir dir="../api-{$env}/WEB-INF/classes"/>
 			<mkdir dir="../api-{$env}/WEB-INF/lib"/>
+
 			<copy todir="../api-{$env}">
-				{ for $depend in $module/depend-module
+
+				{ for $depends-project
+					in $project/depends-projects/depends-project
 				return (
-					<fileset dir="../txt2-{$depend/@name}/api/files"/>
+
+					<fileset
+						dir="{ concat (
+							'../',
+							$depends-project/@name,
+							'/api/files'
+						) }"/>
+
 				) }
+
 				<fileset dir="api/files"/>
+
 			</copy>
+
 			<copy todir="../api-{$env}/WEB-INF/classes">
-				{ for $depend in $module/depend-module
+
+				{ for $depends-project
+					in $project/depends-projects/depends-project
 				return (
-					<fileset dir="../txt2-{$depend/@name}/bin"/>
+
+					<fileset
+						dir="{ concat (
+							'../',
+							$depends-project/@name,
+							'/bin'
+						) }"/>
+
 				) }
+
 				<fileset dir="bin"/>
+
 			</copy>
-			<copy todir="../api-{$env}/WEB-INF/lib">
-				<fileset dir="lib" excludes="servlet-api.jar"/>
+
+			<copy
+				todir="../api-{$env}/WEB-INF/lib">
+
+				<fileset
+					dir="../binaries/libraries"
+					excludes="servlet-api.jar"/>
+
 			</copy>
-			<copy file="api/web-{$env}.xml" tofile="../api-{$env}/WEB-INF/web.xml"/>
+
+			<copy
+				file="api/web-{$env}.xml"
+				tofile="../api-{$env}/WEB-INF/web.xml"/>
+
 		</target>
 
 	) }
@@ -437,9 +547,17 @@ declare variable $envs := ('test', 'live');
 
 		<javadoc destdir="javadoc" access="private" linksource="yes">
 
-			{ for $depend in $module/depend-module
+			{ for $depends-project
+				in $project/depends-projects/depends-project
 			return (
-				<fileset dir="../txt2-{$depend/@name}/src"/>
+
+				<fileset
+					dir="{ concat (
+						'../',
+						$depends-project/@name,
+						'/src'
+					) }"/>
+
 			) }
 
 			<fileset dir="src"/>
@@ -476,33 +594,63 @@ declare variable $envs := ('test', 'live');
 	</target>
 
 	<target name="just-sql-schema-deps">
-		{ for $depend in $module/depend-module
+
+		{ for $depends-project
+			in $project/depends-projects/depends-project
 		return (
-			<ant dir="../txt2-{$depend/@name}" target="just-sql-schema"/>
+
+			<ant
+				dir="{ concat (
+					'../',
+					$depends-project/@name
+				) }"
+				target="just-sql-schema"/>
+
 		) }
+
 	</target>
 
 	<target name="just-sql-data-deps">
-		{ for $depend in $module/depend-module
+
+		{ for $depends-project
+			in $project/depends-projects/depends-project
 		return (
-			<ant dir="../txt2-{$depend/@name}" target="just-sql-data"/>
+
+			<ant
+				dir="{ concat (
+					'../',
+					$depends-project/@name
+				) }"
+				target="just-sql-data"/>
+
 		) }
+
 	</target>
 
 	<target name="just-sql-schema">
 
-		{ if ($module/sql-schema) then (
+		{ if ($project/sql-schemas/sql-schema) then (
 
 			<taskdef
 				name="database-init"
-				classname="txt2.utils.ant.DatabaseInitTask"
+				classname="wbs.framework.utils.ant.DatabaseInitTask"
 				classpathref="classpath"/>,
 
 			<database-init>
-				{ for $sql-schema in $module/sql-schema
+
+				{ for $sql-schema
+					in $project/sql-schemas/sql-schema
 				return (
-					<script name="sql/{$sql-schema/@name}.sql"/>
+
+					<script
+						name="{ concat (
+							'sql/',
+							$sql-schema/@name,
+							'.sql'
+						) }"/>
+
 				) }
+
 			</database-init>
 
 		) else () }
@@ -511,18 +659,28 @@ declare variable $envs := ('test', 'live');
 
 	<target name="just-sql-data">
 
-		{ if ($module/sql-data) then (
+		{ if ($project/sql-datas/sql-data) then (
 
 			<taskdef
 				name="database-init"
-				classname="txt2.utils.ant.DatabaseInitTask"
+				classname="wbs.framework.utils.ant.DatabaseInitTask"
 				classpathref="classpath"/>,
 
 			<database-init>
-				{ for $sql-data in $module/sql-data
+
+				{ for $sql-data
+					in $project/sql-datas/sql-data
 				return (
-					<script name="sql/{$sql-data/@name}.sql"/>
+
+					<script
+						name="{ concat (
+							'sql/',
+							$sql-data/@name,
+							'.sql'
+						) }"/>
+
 				) }
+
 			</database-init>
 
 		) else () }
@@ -560,32 +718,31 @@ declare variable $envs := ('test', 'live');
 	<target name="just-fixtures">
 
 		<java
-			classname="txt2.test.TestFixtures"
-			classpathref="classpath">
-			{ for
-				$module-name in (
-					$module/@name,
-					for $depend in $module/* [name () = 'depend-module']
-					return $depend/@name
-				),
-				$layer-name in (
-					'model',
-					'hibernate',
-					'misc'
-				)
-			return (
-				<arg line="{ concat (
-					'classpath:/txt2/',
-					replace ($module-name, '-', ''),
-					'/',
-					$layer-name,
-					'/',
-					$module-name,
-					'-',
-					$layer-name,
-					'-beans.xml'
-				) }"/>
-			) }
+			classname="wbs.platform.application.tools.BeanRunner"
+			classpathref="classpath"
+			failonerror="true">
+			<arg line="wbs-test"/>
+			<arg line="wbs.test"/>
+			<arg line="data,entity,schema,sql,model,hibernate,object,logic"/>
+			<arg line="test,hibernate"/>
+			<arg line="wbs.test.fixtures.TestFixtures"/>
+			<arg line="createFixtures"/>
+		</java>
+
+	</target>
+
+	<target name="just-schema-create">
+
+		<java
+			classname="wbs.platform.application.tools.BeanRunner"
+			classpathref="classpath"
+			failonerror="true">
+			<arg line="wbs-test"/>
+			<arg line="wbs.test"/>
+			<arg line="data,entity,schema,sql,schema-tool"/>
+			<arg line="test"/>
+			<arg line="wbs.platform.schema.tool.SchemaTool"/>
+			<arg line="schemaCreate"/>
 		</java>
 
 	</target>

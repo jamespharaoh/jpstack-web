@@ -1,4 +1,4 @@
-declare variable $module := //txt2-module;
+declare variable $project := //project;
 
 <classpath>
 
@@ -7,13 +7,17 @@ declare variable $module := //txt2-module;
 
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 
-	{ for $depend in $module/depend-module
+	{ for $depends-project
+		in $project/depends-projects/depends-project
 	return (
 
 		<classpathentry
 			combineaccessrules="false"
 			kind="src"
-			path="/txt2-{$depend/@name}"/>
+			path="{ concat (
+				'/',
+				$depends-project/@name
+			) }"/>
 
 	) }
 

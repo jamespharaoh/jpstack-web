@@ -9,29 +9,59 @@ ENV["XMLLINT_INDENT"] = "\t"
 global_doc = XML::Document.file "etc/global.xml"
 global_elem = global_doc.root
 
-def create_xml module_name, template_name, target, vars = {}
+def create_xml \
+		project_name,
+		package_name,
+		template_name,
+		target,
+		vars = {}
 
-	package_name = module_name.gsub "-", ""
+	template_path =
+		"etc/#{template_name}.xquery"
 
-	template_path = "etc/#{template_name}.xquery"
-	module_path = "txt2-#{module_name}/src/txt2/#{package_name}/#{module_name}-module.xml"
-	target_path = "txt2-#{module_name}/#{target}"
+	project_path =
+		"%s/src/%s/%s-project.xml" % [
+			project_name,
+			package_name.gsub(".", "/"),
+			project_name,
+		]
+
+	target_path =
+		"%s/%s" % [
+			project_name,
+			target,
+		]
 
 	if File.exist? target_path
-		template_mtime = File.mtime template_path
-		module_mtime = File.mtime module_path
-		target_mtime = File.mtime target_path
-		return if target_mtime > [ template_mtime, module_mtime ].max
+
+		template_mtime =
+			File.mtime template_path
+
+		project_mtime =
+			File.mtime project_path
+
+		target_mtime =
+			File.mtime target_path
+
+		# TODO make this more clever
+
+		max_mtime = [
+			template_mtime,
+			project_mtime,
+		].max
+
+		return if target_mtime > max_mtime
+
 	end
 
 	puts target_path
 
-	temp = Tempfile.new "txt2-rebuild-"
+	temp = Tempfile.new "wbs-rebuild-"
 
 	xqilla_args = [
 		"xqilla",
 		template_path,
-		"-i", module_path,
+		"-i", project_path,
 		"-o", temp.path,
 	] + vars.map { |key, value| [ "-v", key, value ] }.flatten
 
@@ -104,61 +134,73 @@ File.open "etc/libraries.xml", "w" do
 
 end
 
-global_elem.find("modules/module").each do
-	|module_elem|
+global_elem.find("projects/project").each do
+	|project_elem|
 
-	module_name = module_elem["name"]
-	package_name = module_name.gsub "-", ""
+	project_name = project_elem["name"]
+	package_name = project_elem["package"]
 
-	create_xml module_name, "build-xml", "build.xml"
+	create_xml \
+		project_name,
+		package_name,
+		"build-xml",
+		"build.xml"
 
-	create_xml module_name, "classpath", ".classpath"
-	create_xml module_name, "project", ".project"
+	create_xml \
+		project_name,
+		package_name,
+		"classpath",
+		".classpath"
 
-	[
-		"model",
-		"misc",
-		"web",
-		"console",
-		"api",
-		"daemon",
-		"hibernate",
-	].each do
-		|mode|
+	create_xml \
+		project_name,
+		package_name,
+		"project",
+		".project"
 
-		create_xml \
-			module_name,
-			"beans-xml",
-			"src/txt2/#{package_name}/#{mode}/#{module_name}-#{mode}-beans.xml",
-			"mode" => mode
-
-	end
-
-	create_xml module_name, "console-web-xml",
+	create_xml \
+		project_name,
+		package_name,
+		"console-web-xml",
 		"console/web-live.xml",
 		"mode" => "live"
 
-	create_xml module_name, "console-web-xml",
+	create_xml \
+		project_name,
+		package_name,
+		"console-web-xml",
 		"console/web-test.xml",
 		"mode" => "test"
 
-	create_xml module_name, "api-web-xml",
+	create_xml \
+		project_name,
+		package_name,
+		"api-web-xml",
 		"api/web-live.xml",
 		"mode" => "live"
 
-	create_xml module_name, "api-web-xml",
+	create_xml \
+		project_name,
+		package_name,
+		"api-web-xml",
 		"api/web-test.xml",
 		"mode" => "test"
 
-	create_xml module_name, "server-xml",
+	create_xml \
+		project_name,
+		package_name,
+		"server-xml",
 		"console/server-test.xml",
 		"mode" => "test"
 
-	[ "test", "api/files", "console/files" ].each do
+	[
+		"test",
+		"api/files",
+		"console/files",
+	].each do
 		|dir|
 
-		FileUtils.mkdir_p "txt2-#{module_name}/#{dir}"
-		#FileUtils.touch "txt2-#{module_name}/#{dir}/.mark"
+		FileUtils.mkdir_p "#{project_name}/#{dir}"
 
 	end
 
