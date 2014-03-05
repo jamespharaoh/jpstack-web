@@ -2,9 +2,10 @@
 
 fix-whitespace \
 	$(
-		find wbs-*/{src,sql,test} \
+		find wbs-*/{src,sql,test,console/files} \
 			-name '*.java' \
 			-o -name '*.xml' \
 			-o -name '*.sql' \
+			-o -name '*.js' \
 	) \
 	etc/*
