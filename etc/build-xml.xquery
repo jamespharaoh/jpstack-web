@@ -629,7 +629,7 @@ declare variable $envs := ('test', 'live');
 
 	<target name="just-sql-schema">
 
-		{ if ($project/sql-schemas/sql-schema) then (
+		{ if ($project/plugin/sql-scripts/sql-schema) then (
 
 			<taskdef
 				name="database-init"
@@ -639,7 +639,7 @@ declare variable $envs := ('test', 'live');
 			<database-init>
 
 				{ for $sql-schema
-					in $project/sql-schemas/sql-schema
+					in $project/plugin/sql-scripts/sql-schema
 				return (
 
 					<script
@@ -659,7 +659,7 @@ declare variable $envs := ('test', 'live');
 
 	<target name="just-sql-data">
 
-		{ if ($project/sql-datas/sql-data) then (
+		{ if ($project/plugin/sql-scripts/sql-data) then (
 
 			<taskdef
 				name="database-init"
@@ -669,7 +669,7 @@ declare variable $envs := ('test', 'live');
 			<database-init>
 
 				{ for $sql-data
-					in $project/sql-datas/sql-data
+					in $project/plugin/sql-scripts/sql-data
 				return (
 
 					<script
