@@ -102,6 +102,20 @@
 			name="javax.inject"
 			rev="1"/>
 
+		<!-- jetty -->
+
+		<!--
+		<dependency
+			org="org.eclipse.jetty"
+			name="jetty-project"
+			rev="9.1.0.v20131115"/>
+
+		<dependency
+			org="org.eclipse.jetty"
+			name="jetty-webapp"
+			rev="9.1.0.v20131115"/>
+		-->
+
 		<!-- joda-time -->
 
 		<dependency
@@ -188,6 +202,16 @@
 			rev="1.1"/>
 
 		<!-- exclusions -->
+
+		<!--
+		<exclude
+			org="javax.servlet"
+			artifact="servlet-api"/>
+		-->
+
+		<exclude
+			org="org.apache.openejb"
+			artifact="javaee-api"/>
 
 		<exclude
 			org="org.hibernate"

@@ -2,6 +2,7 @@
 
 	<projects>
 		<project name="wbs-apn" package="wbs.apn"/>
+		<project name="wbs-business" package="wbs.business"/>
 		<project name="wbs-framework" package="wbs.framework"/>
 		<project name="wbs-platform" package="wbs.platform"/>
 		<project name="wbs-integrations" package="wbs.integrations"/>
