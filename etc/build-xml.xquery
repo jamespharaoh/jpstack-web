@@ -2,13 +2,20 @@ declare variable $project := //project;
 
 declare variable $envs := ('test', 'live');
 
-<project name="{$project/@name}" basedir="." default="build">
+<project
+	name="{$project/@name}"
+	basedir="."
+	default="build">
 
-	<property file="build.properties"/>
+	<property
+		file="build.properties"/>
 
-	<path id="classpath">
+	<path
+		id="classpath">
 
-		<fileset dir="../binaries/libraries" includes="*.jar"/>
+		<fileset
+			dir="../lib"
+			includes="*.jar"/>
 
 		{ for $depends-project in $project/depends-projects/depends-project
 		return (
@@ -264,13 +271,22 @@ declare variable $envs := ('test', 'live');
 
 		<mkdir dir="bin"/>
 
-		<javac destdir="bin" debug="on" includeantruntime="false">
-			<src path="src"/>
-			<classpath refid="classpath"/>
+		<javac
+			destdir="bin"
+			debug="on"
+			includeantruntime="false">
+
+			<src
+				path="src"/>
+
+			<classpath
+				refid="classpath"/>
+
 		</javac>
 
 		<copy todir="bin"><fileset dir="src">
 			<include name="**/*.xml"/>
+			<include name="META-INF/**/*"/>
 			<include name="log4j.properties"/>
 		</fileset></copy>
 
@@ -368,7 +384,7 @@ declare variable $envs := ('test', 'live');
 			</copy>
 
 			<copy todir="../console-{$env}/WEB-INF/lib">
-				<fileset dir="../binaries/libraries" excludes="servlet-api.jar"/>
+				<fileset dir="../lib" excludes="servlet-api.jar"/>
 			</copy>
 
 			<copy
@@ -393,7 +409,8 @@ declare variable $envs := ('test', 'live');
 				<arg line="--file ../binaries/packages/apache-tomcat-6.0.37.tar.gz"/>
 			</exec>
 
-			<delete dir="../tomcat-{$env}/**/*"/>
+			<delete
+				dir="../tomcat-{$env}/**/*"/>
 
 			<move
 				file="../temp/apache-tomcat-6.0.37"
@@ -507,7 +524,7 @@ declare variable $envs := ('test', 'live');
 				todir="../api-{$env}/WEB-INF/lib">
 
 				<fileset
-					dir="../binaries/libraries"
+					dir="../lib"
 					excludes="servlet-api.jar"/>
 
 			</copy>
@@ -723,7 +740,7 @@ declare variable $envs := ('test', 'live');
 			failonerror="true">
 			<arg line="wbs-test"/>
 			<arg line="wbs.test"/>
-			<arg line="data,entity,schema,sql,model,hibernate,object,logic"/>
+			<arg line="config,data,entity,schema,sql,model,hibernate,object,logic"/>
 			<arg line="test,hibernate"/>
 			<arg line="wbs.test.fixtures.TestFixtures"/>
 			<arg line="createFixtures"/>
@@ -739,9 +756,9 @@ declare variable $envs := ('test', 'live');
 			failonerror="true">
 			<arg line="wbs-test"/>
 			<arg line="wbs.test"/>
-			<arg line="data,entity,schema,sql,schema-tool"/>
+			<arg line="config,data,entity,schema,sql,schema-tool"/>
 			<arg line="test"/>
-			<arg line="wbs.platform.schema.tool.SchemaTool"/>
+			<arg line="wbs.framework.schema.tool.SchemaTool"/>
 			<arg line="schemaCreate"/>
 		</java>
 

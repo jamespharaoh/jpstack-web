@@ -2,53 +2,106 @@ declare variable $project := //project;
 
 declare variable $mode external;
 
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee" version="2.4">
+<web-app
+	xmlns="http://java.sun.com/xml/ns/j2ee"
+	version="2.4">
 
-	<display-name>WBS console</display-name>
+	<display-name>{
+		'WBS console'
+	}</display-name>
 
 	<!-- context init params -->
 
 	<context-param>
-		<param-name>primaryProjectName</param-name>
-		<param-value>{ string ($project/@name) }</param-value>
+
+		<param-name>{
+			'primaryProjectName'
+		}</param-name>
+
+		<param-value>{
+			string ($project/@name)
+		}</param-value>
+
 	</context-param>
 
 	<context-param>
-		<param-name>primaryProjectPackageName</param-name>
-		<param-value>{ string ($project/@package) }</param-value>
+
+		<param-name>{
+			'primaryProjectPackageName'
+		}</param-name>
+
+		<param-value>{
+			string ($project/@package) }
+		</param-value>
+
 	</context-param>
 
 	<context-param>
-		<param-name>beanDefinitionOutputPath</param-name>
-		<param-value>../work/console-{$mode}-beans</param-value>
+
+		<param-name>{
+			'beanDefinitionOutputPath'
+		}</param-name>
+
+		<param-value>{
+			concat (
+				'../work/console-',
+				$mode,
+				'-beans'
+			)
+		}</param-value>
+
 	</context-param>
 
 	<context-param>
-		<param-name>layerNames</param-name>
-		<param-value>{ string-join ((
-			'data',
-			'entity',
-			'schema',
-			'sql',
-			'model',
-			'hibernate',
-			'object',
-			'logic',
-			'web',
-			'console',
-			if ($mode = 'test') then ('daemon') else ()
-		), ',') }</param-value>
+
+		<param-name>{
+			'layerNames'
+		}</param-name>
+
+		<param-value>{
+			string-join ((
+				'config',
+				'data',
+				'entity',
+				'schema',
+				'sql',
+				'model',
+				'hibernate',
+				'object',
+				'logic',
+				'web',
+				'console',
+				if ($mode = 'test') then (
+					'daemon'
+				) else ()
+			), ',')
+		}</param-value>
+
 	</context-param>
 
 	<context-param>
-		<param-name>configNames</param-name>
-		<param-value>{$mode},hibernate,console</param-value>
+
+		<param-name>{
+			'configNames'
+		}</param-name>
+
+		<param-value>{
+			concat (
+				$mode,
+				',hibernate,console'
+			)
+		}</param-value>
+
 	</context-param>
 
 	<!-- listeners -->
 
 	<listener>
-		<listener-class>wbs.platform.servlet.WbsServletListener</listener-class>
+
+		<listener-class>{
+			'wbs.platform.servlet.WbsServletListener'
+		}</listener-class>
+
 	</listener>
 
 	<!-- filters -->
@@ -68,7 +121,7 @@ declare variable $mode external;
 	</filter>
 
 	<filter>
-		<filter-name>authFilter</filter-name>
+		<filter-name>coreAuthFilter</filter-name>
 		<filter-class>wbs.framework.servlet.BeanFilterProxy</filter-class>
 	</filter>
 
@@ -85,7 +138,7 @@ declare variable $mode external;
 	</filter-mapping>
 
 	<filter-mapping>
-		<filter-name>authFilter</filter-name>
+		<filter-name>coreAuthFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 

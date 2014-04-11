@@ -95,6 +95,13 @@
 			rev="6.0"/>
 		-->
 
+		<!-- javassist -->
+
+		<dependency
+			org="javassist"
+			name="javassist"
+			rev="3.12.1.GA"/>
+
 		<!-- javax -->
 
 		<dependency

@@ -50,27 +50,34 @@ def create_xml \
 			project_mtime,
 		].max
 
-		return if target_mtime > max_mtime
+		return \
+			if target_mtime > max_mtime
 
 	end
 
 	puts target_path
 
-	temp = Tempfile.new "wbs-rebuild-"
+	temp =
+		Tempfile.new "wbs-rebuild-"
 
 	xqilla_args = [
 		"xqilla",
 		template_path,
 		"-i", project_path,
 		"-o", temp.path,
-	] + vars.map { |key, value| [ "-v", key, value ] }.flatten
+	] + vars.map {
+		|key, value|
+		[ "-v", key, value ]
+	}.flatten
 
-	xqilla_cmd = Shellwords.join xqilla_args
+	xqilla_cmd =
+		Shellwords.join xqilla_args
 
 	system xqilla_cmd \
 		or raise "Error #{xqilla_cmd}"
 
-	FileUtils.mkdir_p File.dirname target_path
+	FileUtils.mkdir_p \
+		File.dirname(target_path)
 
 	xmllint_args = [
 		"xmllint",
@@ -80,7 +87,8 @@ def create_xml \
 		target_path,
 	]
 
-	xmllint_cmd = Shellwords.join xmllint_args
+	xmllint_cmd =
+		Shellwords.join xmllint_args
 
 	system xmllint_cmd \
 		or raise "Error #{xmllint_cmd}"
@@ -151,6 +159,12 @@ global_elem.find("projects/project").each do
 		package_name,
 		"classpath",
 		".classpath"
+
+	create_xml \
+		project_name,
+		package_name,
+		"factorypath",
+		".factorypath"
 
 	create_xml \
 		project_name,

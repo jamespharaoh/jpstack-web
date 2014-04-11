@@ -9,6 +9,6 @@ java -jar \
 	-ivy "etc/ivy.xml" \
 	-retrieve "binaries/libraries/[artifact]-[type]-[revision].[ext]"
 
-#cd txt2-hades/lib
-#rm -f *
-#ln -s ../../binaries/libraries/* .
+cd lib
+rm -f *
+ln -s ../binaries/libraries/* .

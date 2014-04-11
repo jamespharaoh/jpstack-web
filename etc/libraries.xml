@@ -28,8 +28,8 @@
 	<library name="httpmime" type="jar" version="4.3.1" source="yes"/>
 	<library name="ivy" type="jar" version="2.2.0"/>
 	<library name="jansi" type="jar" version="1.6"/>
+	<library name="javassist" type="jar" version="3.12.1.GA" source="yes"/>
 	<library name="javassist" type="jar" version="3.15.0-GA"/>
-	<library name="javassist" type="jar" version="3.9.0.GA"/>
 	<library name="javax.inject" type="jar" version="1" source="yes"/>
 	<library name="jaxb-api" type="jar" version="2.2"/>
 	<library name="jaxb-impl" type="jar" version="2.1.12"/>

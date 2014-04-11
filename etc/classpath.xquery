@@ -39,7 +39,7 @@ declare variable $project := //project;
 			{ if ($library/@source = 'yes') then (
 				attribute sourcepath {
 					concat (
-						'/home/james/projects/txt2/binaries/libraries/',
+						'/home/james/projects/wbs/wbs-combined/binaries/libraries/',
 						$library/@name,
 						'-source-',
 						$library/@version,
@@ -51,6 +51,24 @@ declare variable $project := //project;
 		</classpathentry>
 
 	) }
+
+	{ if (not ($project/@name = 'wbs-framework')) then (
+
+		<classpathentry
+			kind="src"
+			path=".apt_generated">
+
+			<attributes>
+
+				<attribute
+					name="optional"
+					value="true"/>
+
+			</attributes>
+
+		</classpathentry>
+
+	) else () }
 
 	<classpathentry
 		kind="output"

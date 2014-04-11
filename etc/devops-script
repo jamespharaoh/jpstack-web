@@ -1,176 +1,358 @@
 #!/usr/bin/env ruby
 
-require "pp"
+module Wbs
 
-Dir.chdir "#{ENV["HOME"]}/projects/wbs"
+class DevopsScript
 
-def title message
-	return unless STDIN.tty?
-	puts "\e]0;#{message}\a"
-end
+	def main
 
-daemon_log = "/service/daemon/log/main/current"
-api_log = "/service/tomcat-api/log/main/current"
-console_log = "/service/tomcat-console/log/main/current"
-access_log = "/var/log/apache2/access.log"
+		read_config
 
-def ssh term, *cmd
+		setup
 
-	args = [
-		"ssh",
-		term,
-		"james@hades.apnuk.com",
-		cmd,
-	].flatten
+		process_command
 
-	system *args or raise "Error"
-
-end
-
-def log *logs
-
-	if STDIN.tty?
-		follow = [ "-F" ]
-		count = [ "-n", "1000" ]
-		term = [ "-t" ]
-	else
-		follow = []
-		count = [ "-n", "1000" ]
-		term = [ "-T" ]
 	end
 
-	if logs.size > 1
-		count = [ "-n", "0" ]
+	def process_command
+
+		command =
+			ARGV.shift
+
+		case command
+
+		when "sql"
+
+			title "#{@config_name} sql"
+
+			ssh \
+				"-t",
+				"psql #{@config_database["name"]}",
+				*ARGV
+
+		when "daemon-log"
+
+			title "#{@config_name} daemon log"
+
+			log @config_logs["daemon"]
+
+		when "api-log"
+
+			title "#{@config_name} api log"
+
+			log @config_logs["api"]
+
+		when "console-log"
+
+			title "#{@config_name} console log"
+
+			log @config_logs["console"]
+
+		when "all-log"
+
+			title "#{@config_name} all log"
+
+			log @config_logs.attributes.to_h.values
+
+		when "access-log"
+
+			title "#{@config_name} access log"
+
+			log @config_logs["access"]
+
+		when "git"
+
+			title "#{@config_name} git"
+
+			ssh \
+				"-t",
+				"cd #{}; git",
+				*ARGV
+
+		when "build"
+
+			title "#{@config_name} #{command}"
+
+			ssh \
+				"-t",
+				"cd #{@deployment_project_path}; ant",
+				command
+
+		when "console-auto"
+
+			title "#{@config_name} console auto"
+
+			ssh \
+				"-t",
+				[
+					"cd #{@deployment_project_path}",
+					"ant console-live",
+					"sudo svc -d #{@config_services["console"]}",
+					"sleep 1",
+					"sudo svc -u #{@config_services["console"]}",
+				].join(" && ")
+
+		when "api-auto"
+
+			title "#{@config_name} api auto"
+
+			ssh \
+				"-t",
+				[
+					"cd #{@deployment_project_path}",
+					"ant api-live",
+					"sudo svc -d #{@config_services["api"]}",
+					"sleep 1",
+					"sudo svc -u #{@config_services["api"]}",
+				].join(" && ")
+
+		when "daemon-auto"
+
+			title "#{@config_name} daemon auto"
+
+			ssh \
+				"-t",
+				[
+					"cd #{@deployment_project_path}",
+					"ant build",
+					"sudo svc -d #{@config_services["daemon"]}",
+					"sleep 1",
+					"sudo svc -u #{@config_services["daemon"]}",
+				].join(" && ")
+
+		when "clean"
+
+			title "#{@config_name} clean"
+
+			ssh \
+				"-t",
+				"rm -rf #{@deployment_path}/wbs-*/bin"
+
+		when "console-clean"
+
+			title "#{@config_name} console clean"
+
+			ssh \
+				"-t",
+				"rm -rf #{@deployment_path}/console-live"
+
+			;;
+
+		when "api-clean"
+
+			title "#{@config_name} api clean"
+
+			ssh \
+				"-t",
+				"rm -rf #{@deployment_path}/api-live"
+
+			;;
+
+		when "top"
+			title "#{@config_name} top"
+			ssh "-t", "top"
+
+		when "help", nil
+			puts ""
+			puts "Syntax:"
+			puts ""
+			puts "    #{@config_name} COMMAND ..."
+			puts ""
+			puts "Commands:"
+			puts ""
+			puts "    sql         Execute a psql command on the specified database"
+			puts "    *-log       Watch logs for the specified service(s)"
+			puts "    *-auto      Redeploy the specified service(s)"
+			puts ""
+
+		when "wip"
+
+			system_nofail \
+				"git add -A ."
+
+			tree_id = system_string_nofail \
+				"git write-tree"
+
+			commit_id = system_string_nofail \
+				"git commit-tree #{tree_id} -p HEAD -m wip"
+
+			system_nofail \
+				"git update-ref refs/heads/wip #{commit_id}"
+
+			system_nofail \
+				"git push origin +wip"
+
+			ssh "-t",
+				[
+					"cd #{@deployment_path}",
+					"git fetch",
+					"git checkout -B wip origin/wip",
+				].join("; ")
+
+		when "wip"
+
+			system_nofail \
+				"git push origin master"
+
+			ssh "-t",
+				[
+					"cd #{@depoyment_path}",
+					"git fetch",
+					"git checkout master",
+					"git rebase",
+				].join("; ")
+
+		else
+
+			STDERR.puts "Unknown command #{command}"
+
+			exit 1
+
+		end
+
 	end
 
-	ssh term, [
-		"tail",
-		"-s", "0.1",
-		count,
-		follow,
-		logs,
-		"|",
-		"tai64nlocal",
-		"|",
-		"cut -c12-19,30-",
-	]
-end
+	def read_config
 
-def system_string_nofail command
-	ret = `#{command}`
-	unless $?.to_i == 0
-		puts ret
-		exit 1
+		require "xml"
+
+		@config_name =
+			File.basename $0
+
+		@config_path =
+			"#{ENV["HOME"]}/.config/wbs/#{@config_name}.xml"
+
+		@config_document =
+			XML::Document.file @config_path
+
+		@config_root =
+			@config_document.root
+
+		@config_home =
+			@config_root.find_first "home"
+
+		@config_connection =
+			@config_root.find_first "connection"
+
+		# logs
+
+		@config_logs =
+			@config_root.find_first "logs"
+
+		# deployment
+
+		@config_deployment =
+			@config_root.find_first "deployment"
+
+		@deployment_path =
+			@config_deployment["path"]
+
+		@deployment_project =
+			@config_deployment["project"]
+
+		@deployment_project_path =
+			"#{@deployment_path}/#{@deployment_project}"
+
+		# database
+
+		@config_database =
+			@config_root.find_first "database"
+
+		# services
+
+		@config_services =
+			@config_root.find_first "services"
+
 	end
-	return ret.strip
-end
 
-def system_nofail command
-	system command
-	exit unless $?.to_i == 0
-end
+	def setup
 
-command = ARGV.shift
-case command
+		Dir.chdir \
+			@config_home["path"]
 
-	when "sql"
-		title "wbs sql"
-		ssh "-t", "psql txt2", *ARGV
+	end
 
-	when "daemon-log"
-		title "wbs daemon log"
-		log daemon_log
+	def title message
 
-	when "api-log"
-		title "wbs api log"
-		log api_log
+		return \
+			unless STDIN.tty?
 
-	when "console-log"
-		title "wbs console log"
-		log console_log
+		puts "\e]0;#{message}\a"
 
-	when "all-log"
-		title "wbs all log"
-		log daemon_log api_log console_log access_log
+	end
 
-	when "access-log"
-		title "wbs access log"
-		log access_log
+	def ssh term, *cmd
 
-	when "git"
-		title "wbs git"
-		ssh "-t", "cd wbs/wbs-apn; git", *ARGV
+		args = [
+			"ssh",
+			term,
+			"james@hades.apnuk.com",
+			cmd,
+		].flatten
 
-	when "build"
-		title "wbs #{command}"
-		ssh "-t", "cd wbs/wbs-apn; ant", command
+		system *args \
+			or raise "Error"
 
-	when /-auto$/
-		title "wbs #{command}"
-		ssh "-t", "cd wbs/wbs-apn; ant", command
+	end
 
-	when "clean"
-		title "wbs clean"
-		ssh "-t", "rm -rf wbs/wbs-*/bin"
-		;;
+	def log *logs
 
-	when "console-clean"
-		title "wbs clean"
-		ssh "-t", "rm -rf wbs/console-live"
-		;;
+		if STDIN.tty?
+			follow = [ "-F" ]
+			count = [ "-n", "1000" ]
+			term = [ "-t" ]
+		else
+			follow = []
+			count = [ "-n", "1000" ]
+			term = [ "-T" ]
+		end
 
-	when "api-clean"
-		title "wbs clean"
-		ssh "-t", "rm -rf wbs/api-live"
-		;;
+		if logs.size > 1
+			count = [ "-n", "0" ]
+		end
 
-	when "top"
-		title "wbs top"
-		ssh "-t", "top"
+		ssh term, [
+			"tail",
+			"-s", "0.1",
+			count,
+			follow,
+			logs,
+			"|",
+			"tai64nlocal",
+			"|",
+			"cut -c12-19,30-",
+		]
 
-	when "help", nil
-		puts ""
-		puts "Syntax:"
-		puts ""
-		puts "    $0 COMMAND ..."
-		puts ""
-		puts "Commands:"
-		puts ""
-		puts "    sql         Execute a psql command on the specified database"
-		puts "    *-log       Watch logs for the specified service(s)"
-		puts "    *-auto      Redeploy the specified service(s)"
-		puts ""
+	end
 
-	when "wip"
+	def system_string_nofail command
 
-		system_nofail \
-			"git add -A ."
+		ret =
+			`#{command}`
 
-		tree_id = system_string_nofail \
-			"git write-tree"
+		unless $?.to_i == 0
+			puts ret
+			exit 1
+		end
 
-		commit_id = system_string_nofail \
-			"git commit-tree #{tree_id} -p HEAD -m wip"
+		return ret.strip
 
-		system_nofail \
-			"git update-ref refs/heads/wip #{commit_id}"
+	end
 
-		system_nofail \
-			"git push origin +wip"
+	def system_nofail command
 
-		ssh "-t",
-			"cd wbs; git fetch; git checkout -B wip origin/wip"
+		system command
 
-	when "wip"
+		exit \
+			unless $?.to_i == 0
 
-		system_nofail \
-			"git push origin master"
+	end
 
-		ssh "-t",
-			"cd wbs; git fetch; git checkout master; git rebase"
+end # class
 
-	else
-		STDERR.puts "Unknown command #{command}"
-		exit 1
+end # module
 
-end
+devops_script =
+	Wbs::DevopsScript.new
+
+devops_script.main
