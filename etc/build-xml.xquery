@@ -655,13 +655,29 @@ declare variable $envs := ('test', 'live');
 
 			<database-init>
 
-				{ for $sql-schema
-					in $project/plugin/sql-scripts/sql-schema
+				{ for
+
+					$plugin in
+						$project/plugin,
+
+					$sql-schema in
+						$plugin/sql-scripts/sql-schema
+
 				return (
 
 					<script
 						name="{ concat (
-							'sql/',
+							'src/',
+							replace (
+								$project/@package,
+								'\.',
+								'/'),
+							'/',
+							replace (
+								$plugin/@package,
+								'\.',
+								'/'),
+							'/model/',
 							$sql-schema/@name,
 							'.sql'
 						) }"/>
@@ -685,13 +701,29 @@ declare variable $envs := ('test', 'live');
 
 			<database-init>
 
-				{ for $sql-data
-					in $project/plugin/sql-scripts/sql-data
+				{ for
+
+					$plugin in
+						$project/plugin,
+
+					$sql-data in
+						$plugin/sql-scripts/sql-data
+
 				return (
 
 					<script
 						name="{ concat (
-							'sql/',
+							'src/',
+							replace (
+								$project/@package,
+								'\.',
+								'/'),
+							'/',
+							replace (
+								$plugin/@package,
+								'\.',
+								'/'),
+							'/model/',
 							$sql-data/@name,
 							'.sql'
 						) }"/>
