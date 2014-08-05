@@ -115,22 +115,14 @@ declare variable $mode external;
 
 	<servlet>
 		<display-name>default</display-name>
-		<servlet-name>DefaultServlet</servlet-name>
-		<servlet-class>wbs.framework.web.PathHandlerServlet</servlet-class>
-		<init-param>
-			<param-name>pathHandler</param-name>
-			<param-value>rootPathHandler</param-value>
-		</init-param>
-		<init-param>
-			<param-name>exceptionHandler</param-name>
-			<param-value>exceptionHandler</param-value>
-		</init-param>
+		<servlet-name>pathHandlerServlet</servlet-name>
+		<servlet-class>wbs.framework.servlet.BeanServletProxy</servlet-class>
 	</servlet>
 
 	<!-- servlet mappings -->
 
 	<servlet-mapping>
-		<servlet-name>DefaultServlet</servlet-name>
+		<servlet-name>pathHandlerServlet</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
