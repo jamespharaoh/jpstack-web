@@ -144,6 +144,10 @@ class ChatRec
 	@SimpleField
 	String defaultBrandName = "Chat service";
 
+	@SimpleField (
+		nullable = true)
+	String timezone;
+
 	// other stuff
 
 	@SimpleField (nullable = true)

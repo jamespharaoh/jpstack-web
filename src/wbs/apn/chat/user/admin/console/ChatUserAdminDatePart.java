@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import wbs.apn.chat.core.console.ChatUserDateModeConsoleHelper;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserDateLogRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -20,6 +21,8 @@ public
 class ChatUserAdminDatePart
 	extends AbstractPagePart {
 
+	// dependencies
+
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
 
@@ -27,12 +30,19 @@ class ChatUserAdminDatePart
 	ChatUserDateModeConsoleHelper chatUserDateModeConsoleHelper;
 
 	@Inject
+	ChatUserLogic chatUserLogic;
+
+	@Inject
 	ConsoleObjectManager objectManager;
 
 	@Inject
 	TimeFormatter timeFormatter;
 
+	// state
+
 	ChatUserRec chatUser;
+
+	// implementation
 
 	@Override
 	public
@@ -176,7 +186,10 @@ class ChatUserAdminDatePart
 				"<td>%h</td>\n",
 				ifNull (
 					timeFormatter.instantToTimestampString (
-						dateToInstant (chatUserDateLogRec.getTimestamp ())),
+						chatUserLogic.timezone (
+							chatUser),
+						dateToInstant (
+							chatUserDateLogRec.getTimestamp ())),
 					"-"));
 
 			if (chatUserDateLogRec.getUser () != null) {

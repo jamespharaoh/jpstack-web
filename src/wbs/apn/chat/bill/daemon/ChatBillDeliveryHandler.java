@@ -1,18 +1,22 @@
 package wbs.apn.chat.bill.daemon;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.GregorianCalendar;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
+
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -74,8 +78,15 @@ class ChatBillDeliveryHandler
 
 		} else if (status.isBadType ()) {
 
-			if (today && (amount > 0))
-				chatUser.decDailyBilledAmount (amount);
+			if (today && (amount > 0)) {
+
+				chatUser
+
+					.setCreditDailyAmount (
+						+ chatUser.getCreditDailyAmount ()
+						- amount);
+
+			}
 
 			if (strict) {
 
@@ -166,28 +177,35 @@ class ChatBillDeliveryHandler
 
 		// work out if sent today
 
-		GregorianCalendar startOfDay =
-			new GregorianCalendar ();
+		DateTimeZone timeZone =
+			DateTimeZone.forID (
+				chatUser.getChatScheme ().getTimezone ());
 
-		startOfDay.set (Calendar.HOUR_OF_DAY, 0);
-		startOfDay.set (Calendar.MINUTE, 0);
-		startOfDay.set (Calendar.SECOND, 0);
+		Instant startOfDayTime =
+			DateTime
+				.now (timeZone)
+				.withTimeAtStartOfDay ()
+				.toInstant ();
 
-		GregorianCalendar messageSent =
-			new GregorianCalendar ();
-
-		messageSent.setTime (
-			message.getCreatedTime ());
+		Instant messageSentTime =
+			dateToInstant (
+				message.getCreatedTime ());
 
 		boolean sentToday =
-			messageSent.after (startOfDay);
+			messageSentTime.isAfter (
+				startOfDayTime);
 
 		// update last bill sent
 
-		if (sentToday
-				&& delivery.getNewMessageStatus ().isGoodType ()) {
+		if (
+			sentToday
+			&& delivery.getNewMessageStatus ().isGoodType ()
+		) {
 
-			chatUser.setLastBillSent (null);
+			chatUser
+
+				.setLastBillSent (
+				null);
 
 		}
 

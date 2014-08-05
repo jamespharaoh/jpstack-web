@@ -2,15 +2,18 @@ package wbs.apn.chat.help.console;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 
-import java.util.Calendar;
 import java.util.Collection;
 
 import javax.inject.Inject;
+
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
 
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.apn.chat.core.console.ChatConsoleLogic;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
@@ -47,6 +50,8 @@ class ChatHelpLogPendingSummaryPart
 
 	// state
 
+	DateTimeZone timezone;
+
 	ChatHelpLogRec chatHelpLog;
 	ChatUserRec chatUser;
 	Collection<ChatHelpLogRec> chatHelpLogs;
@@ -63,6 +68,13 @@ class ChatHelpLogPendingSummaryPart
 
 		chatUser =
 			chatHelpLog.getChatUser ();
+
+		ChatSchemeRec chatScheme =
+			chatUser.getChatScheme ();
+
+		timezone =
+			DateTimeZone.forID (
+				chatScheme.getTimezone ());
 
 		chatHelpLogs =
 			chatUser.getChatHelpLogs ();
@@ -205,24 +217,20 @@ class ChatHelpLogPendingSummaryPart
 			"<th>Our number</th>\n",
 			"<th>User</th>\n");
 
-		int dayNumber = 0;
+		LocalDate previousDate = null;
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		for (ChatHelpLogRec chatHelpLog
+				: chatHelpLogs) {
 
-		for (ChatHelpLogRec help : chatHelpLogs) {
+			LocalDate nextDate =
+				dateToInstant (chatHelpLog.getTimestamp ())
+					.toDateTime (timezone)
+					.toLocalDate ();
 
-			calendar.setTime (
-				help.getTimestamp ());
+			if (nextDate != previousDate) {
 
-			int newDayNumber =
-				+ (calendar.get (Calendar.YEAR) << 9)
-				+ calendar.get (Calendar.DAY_OF_YEAR);
-
-			if (newDayNumber != dayNumber) {
-
-				dayNumber =
-					newDayNumber;
+				previousDate =
+					nextDate;
 
 				printFormat (
 					"<tr class=\"sep\">\n",
@@ -231,7 +239,9 @@ class ChatHelpLogPendingSummaryPart
 
 					"<td colspan=\"5\">%h</td>\n",
 					timeFormatter.instantToDateStringLong (
-						dateToInstant (help.getTimestamp ())),
+						timezone,
+						dateToInstant (
+							chatHelpLog.getTimestamp ())),
 
 					"</tr>\n");
 
@@ -239,7 +249,7 @@ class ChatHelpLogPendingSummaryPart
 
 			String rowClass =
 				MessageConsoleStuff.classForMessageDirection (
-					help.getDirection ());
+					chatHelpLog.getDirection ());
 
 			printFormat (
 				"<tr class=\"%h\">\n",
@@ -247,22 +257,24 @@ class ChatHelpLogPendingSummaryPart
 
 				"<td style=\"background: %h\">&nbsp;</td>\n",
 				Html.genHtmlColor (
-					help.getOurNumber ()),
+					chatHelpLog.getOurNumber ()),
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimeString (
-					dateToInstant (help.getTimestamp())),
+					timezone,
+					dateToInstant (
+						chatHelpLog.getTimestamp ())),
 
 				"<td>%h</td>\n",
-				help.getText (),
+				chatHelpLog.getText (),
 
 				"<td>%h</td>\n",
-				help.getOurNumber (),
+				chatHelpLog.getOurNumber (),
 
 				"<td>%h</td>\n",
-				help.getUser () == null
+				chatHelpLog.getUser () == null
 					? ""
-					: help.getUser ().getUsername (),
+					: chatHelpLog.getUser ().getUsername (),
 
 				"</tr>\n");
 

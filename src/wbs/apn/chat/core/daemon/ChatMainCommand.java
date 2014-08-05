@@ -109,7 +109,7 @@ class ChatMainCommand
 	ServiceObjectHelper serviceHelper;
 
 	@Inject
-	Provider<ChatJoiner> joiner;
+	Provider<ChatJoiner> chatJoinerProvider;
 
 	// state
 
@@ -212,9 +212,13 @@ class ChatMainCommand
 
 		inboxLogic.inboxProcessed (
 			smsMessage,
-			serviceHelper.findByCode (chat, "default"),
-			chatUserLogic.getAffiliate (fromChatUser),
-			commandHelper.find (commandId));
+			serviceHelper.findByCode (
+				chat,
+				"default"),
+			chatUserLogic.getAffiliate (
+				fromChatUser),
+			commandHelper.find (
+				commandId));
 
 	}
 
@@ -263,21 +267,38 @@ class ChatMainCommand
 					: null;
 
 			ret.joiner =
-				joiner.get ()
-					.chatId (chat.getId ())
-					.joinType (ChatJoiner.convertJoinType (
+				chatJoinerProvider.get ()
+
+				.chatId (
+					chat.getId ())
+
+				.joinType (
+					ChatJoiner.convertJoinType (
 						chatSchemeKeyword.getJoinType ()))
-					.gender (chatSchemeKeyword.getJoinGender ())
-					.orient (chatSchemeKeyword.getJoinOrient ())
-					.chatAffiliateId (chatAffiliateId)
-					.chatSchemeId (commandChatScheme.getId ())
-					.confirmCharges (chatSchemeKeyword.getConfirmCharges ());
 
-			ret.rest = rest;
+				.gender (
+					chatSchemeKeyword.getJoinGender ())
 
-			ret.creditCheck = true;
+				.orient (
+					chatSchemeKeyword.getJoinOrient ())
+
+				.chatAffiliateId (
+					chatAffiliateId)
+
+				.chatSchemeId (
+					commandChatScheme.getId ())
+
+				.confirmCharges (
+					chatSchemeKeyword.getConfirmCharges ());
+
+			ret.rest =
+				rest;
+
+			ret.creditCheck =
+				true;
 
 			return ret;
+
 		}
 
 		if (chatSchemeKeyword.getCommand () != null) {
@@ -353,14 +374,26 @@ class ChatMainCommand
 					: null;
 
 			ret.joiner =
-				joiner.get ()
-					.chatId (chat.getId ())
-					.joinType (ChatJoiner.convertJoinType (
+				chatJoinerProvider.get ()
+
+				.chatId (
+					chat.getId ())
+
+				.joinType (
+					ChatJoiner.convertJoinType (
 						chatKeyword.getJoinType ()))
-					.gender (chatKeyword.getJoinGender ())
-					.orient (chatKeyword.getJoinOrient ())
-					.chatAffiliateId (chatAffiliateId)
-					.chatSchemeId (commandChatScheme.getId ());
+
+				.gender (
+					chatKeyword.getJoinGender ())
+
+				.orient (
+					chatKeyword.getJoinOrient ())
+
+				.chatAffiliateId (
+					chatAffiliateId)
+
+				.chatSchemeId (
+					commandChatScheme.getId ());
 
 			ret.rest = rest;
 
@@ -381,11 +414,14 @@ class ChatMainCommand
 			ret.externalCommandId =
 				chatKeyword.getCommand ().getId ();
 
-			ret.rest = rest;
+			ret.rest =
+				rest;
 
-			ret.creditCheck = false;
+			ret.creditCheck =
+				false;
 
 			return ret;
+
 		}
 
 		// this keyword does nothing
@@ -406,29 +442,30 @@ class ChatMainCommand
 			String keyword,
 			String rest) {
 
-		TryKeywordReturn ret;
+		TryKeywordReturn returnValue;
 
-		ret =
+		returnValue =
 			trySchemeKeyword (
 				commandId,
 				receivedMessage,
 				keyword,
 				rest);
 
-		if (ret != null)
-			return ret;
+		if (returnValue != null)
+			return returnValue;
 
-		ret =
+		returnValue =
 			tryChatKeyword (
 				commandId,
 				receivedMessage,
 				keyword,
 				rest);
 
-		if (ret != null)
-			return ret;
+		if (returnValue != null)
+			return returnValue;
 
 		return null;
+
 	}
 
 	@Override
@@ -614,6 +651,7 @@ class ChatMainCommand
 				transaction.commit ();
 
 				return null;
+
 			}
 
 			log.debug (
@@ -660,15 +698,22 @@ class ChatMainCommand
 					"message %d: no keyword found, existing user, joining",
 					receivedMessage.getMessageId ()));
 
-			ChatJoiner temp =
-				joiner.get ()
-					.chatId (chat.getId ())
-					.joinType (JoinType.chatSimple)
-					.chatSchemeId (commandChatScheme.getId ());
+			ChatJoiner joiner =
+				chatJoinerProvider.get ()
+
+				.chatId (
+					chat.getId ())
+
+				.joinType (
+					JoinType.chatSimple)
+
+				.chatSchemeId (
+					commandChatScheme.getId ());
 
 			transaction.commit ();
 
-			return temp.handle (receivedMessage);
+			return joiner.handle (
+				receivedMessage);
 
 		} else {
 
@@ -686,9 +731,13 @@ class ChatMainCommand
 
 			inboxLogic.inboxProcessed (
 				smsMessage,
-				serviceHelper.findByCode (chat, "default"),
-				chatUserLogic.getAffiliate (fromChatUser),
-				commandHelper.find (commandId));
+				serviceHelper.findByCode (
+					chat,
+					"default"),
+				chatUserLogic.getAffiliate (
+					fromChatUser),
+				commandHelper.find (
+					commandId));
 
 			transaction.commit ();
 

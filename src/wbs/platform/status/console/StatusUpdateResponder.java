@@ -63,6 +63,7 @@ class StatusUpdateResponder
 			stringFormat (
 				"updateTimestamp ('%j');\n",
 				timeFormatter.instantToTimestampString (
+					timeFormatter.defaultTimezone (),
 					Instant.now ())));
 
 		for (StatusLine statusLine

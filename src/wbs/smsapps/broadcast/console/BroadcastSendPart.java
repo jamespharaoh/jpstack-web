@@ -176,6 +176,7 @@ class BroadcastSendPart
 				" name=\"timestamp\"",
 				" value=\"%h\"",
 				timeFormatter.instantToTimestampString (
+					timeFormatter.defaultTimezone (),
 					Instant.now ()),
 				"></p>\n",
 

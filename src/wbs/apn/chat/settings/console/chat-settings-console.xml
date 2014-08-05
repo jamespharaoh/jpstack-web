@@ -208,6 +208,10 @@
 		<text-field
 			name="defaultBrandName"/>
 
+		<text-field
+			name="timezone"
+			nullable="yes"/>
+
 	</field-set>
 
 </console-module>

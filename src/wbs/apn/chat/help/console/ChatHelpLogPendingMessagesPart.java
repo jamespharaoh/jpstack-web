@@ -8,6 +8,8 @@ import javax.inject.Inject;
 
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.console.misc.TimeFormatter;
@@ -30,6 +32,9 @@ class ChatHelpLogPendingMessagesPart
 	ChatHelpLogConsoleHelper chatHelpLogHelper;
 
 	@Inject
+	ChatUserLogic chatUserLogic;
+
+	@Inject
 	MessageObjectHelper messageHelper;
 
 	@Inject
@@ -38,19 +43,30 @@ class ChatHelpLogPendingMessagesPart
 	@Inject
 	TimeFormatter timeFormatter;
 
+	// state
+
+	ChatHelpLogRec chatHelpLog;
+	ChatUserRec chatUser;
+	ChatRec chat;
+
 	List<MessageRec> messages;
+
+	// implementation
 
 	@Override
 	public
 	void prepare () {
 
-		ChatHelpLogRec chatHelpLog =
+		chatHelpLog =
 			chatHelpLogHelper.find (
 				requestContext.stuffInt (
 					"chatHelpLogId"));
 
-		ChatRec chat =
-			chatHelpLog.getChatUser ().getChat ();
+		chatUser =
+			chatHelpLog.getChatUser ();
+
+		chat =
+			chatUser.getChat ();
 
 		ServiceRec service =
 			serviceHelper.findByCode (
@@ -127,7 +143,10 @@ class ChatHelpLogPendingMessagesPart
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
-					dateToInstant (message.getCreatedTime ())),
+					chatUserLogic.timezone (
+						chatUser),
+					dateToInstant (
+						message.getCreatedTime ())),
 
 				"<td>%h</td>\n",
 				message.getCharge (),

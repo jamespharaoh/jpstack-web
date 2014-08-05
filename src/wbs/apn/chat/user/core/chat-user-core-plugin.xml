@@ -31,7 +31,6 @@
 	</layer>
 
 	<layer name="console">
-		<bean class="console.ChatUserBillPart"/>
 		<bean class="console.ChatUserConsoleConfig"/>
 		<bean class="console.ChatUserCreateAction"/>
 		<bean class="console.ChatUserCreatePart"/>

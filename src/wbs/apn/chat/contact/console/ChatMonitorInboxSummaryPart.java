@@ -3,14 +3,14 @@ package wbs.apn.chat.contact.console;
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +20,9 @@ import java.util.TimeZone;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
 
 import wbs.apn.chat.contact.model.ChatContactNoteObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactNoteRec;
@@ -34,11 +37,14 @@ import wbs.apn.chat.namednote.model.ChatNamedNoteObjectHelper;
 import wbs.apn.chat.namednote.model.ChatNamedNoteRec;
 import wbs.apn.chat.namednote.model.ChatNoteNameObjectHelper;
 import wbs.apn.chat.namednote.model.ChatNoteNameRec;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.utils.cal.CalDate;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.console.context.ConsoleContextScriptRef;
@@ -55,6 +61,8 @@ import com.google.common.collect.ImmutableSet;
 public
 class ChatMonitorInboxSummaryPart
 	extends AbstractPagePart {
+
+	// dependencies
 
 	@Inject
 	ChatContactNoteObjectHelper chatContactNoteHelper;
@@ -78,6 +86,9 @@ class ChatMonitorInboxSummaryPart
 	ChatUserAlarmObjectHelper chatUserAlarmHelper;
 
 	@Inject
+	Database database;
+
+	@Inject
 	ConsoleObjectManager objectManager;
 
 	@Inject
@@ -89,7 +100,11 @@ class ChatMonitorInboxSummaryPart
 	@Inject
 	TimeFormatter timeFormatter;
 
-	Date now;
+	// state
+
+	DateTimeZone timeZone;
+	Instant now;
+
 	ChatMonitorInboxRec monitorInbox;
 	ChatRec chat;
 	ChatUserRec userChatUser;
@@ -101,6 +116,8 @@ class ChatMonitorInboxSummaryPart
 
 	Map<Integer,ChatNamedNoteRec> userNamedNotes;
 	Map<Integer,ChatNamedNoteRec> monitorNamedNotes;
+
+	// implementation
 
 	final static
 	String timestampPattern =
@@ -142,7 +159,18 @@ class ChatMonitorInboxSummaryPart
 	public
 	void prepare () {
 
-		now = new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
+
+		ChatSchemeRec chatScheme =
+			userChatUser.getChatScheme ();
+
+		timeZone =
+			DateTimeZone.forID (
+				chatScheme.getTimezone ());
+
+		now =
+			transaction.now ();
 
 		monitorInbox =
 			chatMonitorInboxHelper.find (
@@ -503,14 +531,18 @@ class ChatMonitorInboxSummaryPart
 			CalDate.age (
 				TimeZone.getDefault (),
 				CalDate.forLocalDate (monitorChatUser.getDob ()),
-				CalDate.fromJava (now)),
+				CalDate.fromJava (
+					instantToDate (
+						now))),
 
 			"<td>%h (%h)</td>\n",
 			CalDate.forLocalDate (userChatUser.getDob ()),
 			CalDate.age (
 				TimeZone.getDefault (),
 				CalDate.forLocalDate (userChatUser.getDob ()),
-				CalDate.fromJava (now)),
+				CalDate.fromJava (
+					instantToDate (
+						now))),
 
 			"</tr>\n");
 	}
@@ -631,9 +663,11 @@ class ChatMonitorInboxSummaryPart
 
 	void goGeneralNotes () {
 
-		for (ChatContactNoteRec note : notes) {
+		for (ChatContactNoteRec note
+				: notes) {
 
-			StringBuilder noteInfo = new StringBuilder ();
+			StringBuilder noteInfo =
+				new StringBuilder ();
 
 			if (note.getConsoleUser () != null) {
 				noteInfo.append (note.getConsoleUser ().getUsername ());
@@ -646,6 +680,7 @@ class ChatMonitorInboxSummaryPart
 
 				noteInfo.append (
 					timeFormatter.instantToTimestampString (
+						timeZone,
 						dateToInstant (
 							note.getTimestamp ())));
 
@@ -768,10 +803,11 @@ class ChatMonitorInboxSummaryPart
 			requestContext.parameter ("alarmDate") != null
 				? requestContext.parameter ("alarmDate")
 				: timeFormatter.instantToDateStringShort (
-					dateToInstant (
-						alarm == null
-							? now
-							: alarm.getAlarmTime ())),
+					timeZone,
+					alarm == null
+						? now
+						: dateToInstant (
+							alarm.getAlarmTime ())),
 			">\n");
 
 		printFormat (
@@ -783,10 +819,11 @@ class ChatMonitorInboxSummaryPart
 			requestContext.parameter ("alarmTime") != null
 				? requestContext.parameter ("alarmTime")
 				: timeFormatter.instantToTimeString (
-					dateToInstant (
-						alarm == null
-							? now
-							: alarm.getAlarmTime ())),
+					timeZone,
+					alarm == null
+						? now
+						: dateToInstant (
+							alarm.getAlarmTime ())),
 			">\n");
 
 		printFormat (
@@ -834,7 +871,9 @@ class ChatMonitorInboxSummaryPart
 
 					">set for %h, %h</span>",
 					timeFormatter.instantToTimestampString (
-						dateToInstant (alarm.getAlarmTime ())),
+						timeZone,
+						dateToInstant (
+							alarm.getAlarmTime ())),
 					alarm.getSticky ()
 						? "sticky"
 						: "not sticky"));
@@ -863,33 +902,39 @@ class ChatMonitorInboxSummaryPart
 			"<th>User</th>\n",
 			"</tr>\n");
 
-		int dayNumber = 0;
-
-		Calendar calendar =
-			Calendar.getInstance ();
+		LocalDate previousDate = null;
 
 		for (ChatMessageRec chatMessage
 				: chatMessageHistory) {
 
-			// ignore unapproved allMessages
+			// ignore unapproved messages
 
-			if (chatMessage.getQueueItem () != null
-					&& in (chatMessage.getQueueItem ().getState (),
-						ChatMessageStatus.moderatorPending,
-						ChatMessageStatus.moderatorRejected))
+			if (
+				chatMessage.getQueueItem () != null
+				&& in (
+					chatMessage.getQueueItem ().getState (),
+					ChatMessageStatus.moderatorPending,
+					ChatMessageStatus.moderatorRejected)
+			) {
 				continue;
+			}
 
-			calendar.setTime (
-				chatMessage.getTimestamp ());
+			LocalDate newDate =
+				dateToInstant (
+					chatMessage.getTimestamp ())
+				.toDateTime (
+					timeZone)
+				.toLocalDate ();
 
-			int newDayNumber =
-				+ (calendar.get (Calendar.YEAR) << 9)
-				+ calendar.get (Calendar.DAY_OF_YEAR);
+			if (
+				previousDate == null
+				|| notEqual (
+					previousDate,
+					newDate)
+			) {
 
-			if (newDayNumber != dayNumber) {
-
-				dayNumber =
-					newDayNumber;
+				previousDate =
+					newDate;
 
 				printFormat (
 					"<tr class=\"sep\">\n");
@@ -899,7 +944,9 @@ class ChatMonitorInboxSummaryPart
 
 					"<td colspan=\"3\">%h</td>\n",
 					timeFormatter.instantToDateStringLong (
-						dateToInstant (chatMessage.getTimestamp ())));
+						timeZone,
+						dateToInstant (
+							chatMessage.getTimestamp ())));
 
 			}
 
@@ -915,7 +962,9 @@ class ChatMonitorInboxSummaryPart
 			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimeString (
-					dateToInstant (chatMessage.getTimestamp ())));
+					timeZone,
+					dateToInstant (
+						chatMessage.getTimestamp ())));
 
 			printFormat (
 				"<td>%h</td>\n",

@@ -2,6 +2,8 @@ package wbs.apn.chat.core.logic;
 
 import java.util.List;
 
+import org.joda.time.DateTimeZone;
+
 import wbs.apn.chat.contact.model.ChatMessageMethod;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -72,5 +74,8 @@ interface ChatMiscLogic {
 			ChatUserRec chatUser,
 			String name,
 			Integer threadId);
+
+	DateTimeZone timezone (
+			ChatRec chat);
 
 }

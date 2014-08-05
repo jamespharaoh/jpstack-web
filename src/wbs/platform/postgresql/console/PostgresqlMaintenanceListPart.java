@@ -134,6 +134,7 @@ class PostgresqlMaintenanceListPart
 					"<td>%h</td>\n",
 					ifNull (
 						timeFormatter.instantToTimestampString (
+							timeFormatter.defaultTimezone (),
 							dateToInstant (
 								postgresqlMaintenance.getLastRun ())),
 						"-"),

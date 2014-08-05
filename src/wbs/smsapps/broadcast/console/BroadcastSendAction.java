@@ -100,6 +100,7 @@ class BroadcastSendAction
 				myUser,
 				broadcast,
 				timeFormatter.instantToTimestampString (
+					timeFormatter.defaultTimezone (),
 					transaction.now ()));
 
 			eventLogic.createEvent (
@@ -134,6 +135,7 @@ class BroadcastSendAction
 
 				scheduledTime =
 					timeFormatter.timestampStringToInstant (
+						timeFormatter.defaultTimezone (),
 						requestContext.parameter ("timestamp"));
 
 			} catch (Exception exception) {
@@ -161,6 +163,7 @@ class BroadcastSendAction
 				myUser,
 				broadcast,
 				timeFormatter.instantToTimestampString (
+					timeFormatter.defaultTimezone (),
 					scheduledTime));
 
 			transaction.commit ();

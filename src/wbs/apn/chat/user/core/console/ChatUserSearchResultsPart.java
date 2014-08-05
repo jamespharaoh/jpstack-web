@@ -15,6 +15,7 @@ import javax.inject.Named;
 
 import wbs.apn.chat.core.console.ChatConsoleLogic;
 import wbs.apn.chat.core.console.ChatUserCreditModeConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
@@ -49,6 +50,9 @@ class ChatUserSearchResultsPart
 
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
+
+	@Inject
+	ChatUserLogic chatUserLogic;
 
 	@Inject
 	ConsoleManager consoleManager;
@@ -374,7 +378,10 @@ class ChatUserSearchResultsPart
 				"<td>%h</td>\n",
 				chatUser.getLastAction () != null
 					? timeFormatter.instantToDateStringShort (
-						dateToInstant (chatUser.getLastAction ()))
+						chatUserLogic.timezone (
+							chatUser),
+						dateToInstant (
+							chatUser.getLastAction ()))
 					: "-",
 
 				"<td style=\"text-align: right\">%h</td>\n",

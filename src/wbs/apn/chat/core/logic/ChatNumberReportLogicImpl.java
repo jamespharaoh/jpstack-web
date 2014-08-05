@@ -1,13 +1,18 @@
 package wbs.apn.chat.core.logic;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.sms.number.core.model.ChatUserNumberReportObjectHelper;
 import wbs.sms.number.core.model.ChatUserNumberReportRec;
 import wbs.sms.number.core.model.NumberRec;
@@ -18,41 +23,72 @@ public
 class ChatNumberReportLogicImpl
 	implements ChatNumberReportLogic {
 
+	// dependencies
+
 	@Inject
 	ChatUserNumberReportObjectHelper chatUserNumberReportHelper;
+
+	@Inject
+	Database database;
+
+	// implementation
 
 	@Override
 	public
 	boolean isNumberReportSuccessful (
 			NumberRec number) {
 
-		Calendar cal = new GregorianCalendar ();
-		cal.setTime (new Date ());
-		cal.add (Calendar.MONTH, -6);
-		Date sixMonthsAgo = cal.getTime ();
+		Transaction transaction =
+			database.currentTransaction ();
+
+		Instant sixMonthsAgo =
+			transaction
+				.now ()
+				.minus (Duration.standardDays (365 / 2));
 
 		ChatUserNumberReportRec numberReportRec =
 			chatUserNumberReportHelper.find (
 				number.getId ());
 
 		if (numberReportRec == null) {
+
 			// no DR yet for this number
-			log.debug ("REPORT NULL " + number.getNumber ());
+
+			log.debug (
+				"REPORT NULL " + number.getNumber ());
+
 			return true;
+
 		}
 
 		if (numberReportRec.getLastSuccess () != null) {
-			log.debug ("REPORT LAST SUCCESS "
-					+ numberReportRec.getLastSuccess () + " "
-					+ number.getNumber ());
-			return numberReportRec.getLastSuccess ().after (sixMonthsAgo);
+
+			log.debug (
+				stringFormat (
+					"REPORT LAST SUCCESS %s %s",
+					numberReportRec.getLastSuccess (),
+					number.getNumber ()));
+
+			return dateToInstant (
+					numberReportRec.getLastSuccess ())
+				.isAfter (
+					sixMonthsAgo);
+
 		}
 
 		if (numberReportRec.getFirstFailure () != null) {
-			log.debug ("REPORT FIRST FAILURE "
-					+ numberReportRec.getFirstFailure () + " "
-					+ number.getNumber ());
-			return numberReportRec.getFirstFailure ().after (sixMonthsAgo);
+
+			log.debug (
+				stringFormat (
+					"REPORT FIRST FAILURE %s %s",
+					numberReportRec.getFirstFailure (),
+					number.getNumber ()));
+
+			return dateToInstant (
+					numberReportRec.getFirstFailure ())
+				.isAfter (
+					sixMonthsAgo);
+
 		}
 
 		// shouldn't happen

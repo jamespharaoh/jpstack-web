@@ -1,24 +1,24 @@
 package wbs.apn.chat.graphs.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
-
 import java.awt.Color;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
 import org.joda.time.Interval;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.core.model.ChatStatsObjectHelper;
 import wbs.apn.chat.core.model.ChatStatsRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.graph.console.GraphScale;
 
@@ -27,8 +27,13 @@ public
 class ChatGraphsUsersImageResponder
 	extends GraphImageResponder {
 
+	// dependencies
+
 	@Inject
 	ChatObjectHelper chatHelper;
+
+	@Inject
+	ChatMiscLogic chatMiscLogic;
 
 	@Inject
 	ChatStatsObjectHelper chatStatsHelper;
@@ -36,9 +41,21 @@ class ChatGraphsUsersImageResponder
 	@Inject
 	ConsoleRequestContext requestContext;
 
+	@Inject
+	TimeFormatter timeFormatter;
+
+	// state
+
+	ChatRec chat;
+
 	List<ChatStatsRec> allChatStats;
 
-	long minTime, maxTime;
+	LocalDate date;
+	DateTimeZone timezone;
+	Instant minTime;
+	Instant maxTime;
+
+	// implementation
 
 	public
 	ChatGraphsUsersImageResponder () {
@@ -54,42 +71,49 @@ class ChatGraphsUsersImageResponder
 	protected
 	void prepareData () {
 
-		SimpleDateFormat dateFormat =
-			new SimpleDateFormat ("yyyy-MM-dd");
+		chat =
+			chatHelper.find (
+				requestContext.stuffInt (
+					"chatId"));
 
-		Date date1;
+		timezone =
+			chatMiscLogic.timezone (
+				chat);
 
 		try {
 
-			date1 =
-				dateFormat.parse (
-					requestContext.parameter ("date"));
+			date =
+				timeFormatter
+					.dateStringToLocalDate (
+						requestContext.parameter ("date"));
 
-		} catch (ParseException e) {
+			minTime =
+				date
+					.toDateTimeAtStartOfDay (timezone)
+					.toInstant ();
 
-			throw new RuntimeException ("Invalid date");
+			maxTime =
+				date
+					.plusDays (1)
+					.toDateTimeAtStartOfDay (timezone)
+					.toInstant ();
+
+		} catch (Exception exception) {
+
+			throw new RuntimeException (
+				"Invalid date");
 
 		}
-
-		minTime = date1.getTime ();
-		Calendar cal = Calendar.getInstance ();
-		cal.setTime (date1);
-		cal.add (Calendar.DATE, 1);
-		Date date2 = cal.getTime ();
-		maxTime = date2.getTime ();
-
-		ChatRec chat =
-			chatHelper.find (
-				requestContext.stuffInt ("chatId"));
 
 		allChatStats =
 			chatStatsHelper.findByTimestamp (
 				chat,
 				new Interval (
-					dateToInstant (date1),
-					dateToInstant (date2)));
+					minTime,
+					maxTime));
 
-		Collections.sort (allChatStats);
+		Collections.sort (
+			allChatStats);
 
 	}
 
@@ -115,26 +139,31 @@ class ChatGraphsUsersImageResponder
 	protected
 	void prepareImageShadingVertical () {
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		for (
+			int index = 1;
+			index <= 8;
+			index ++
+		) {
 
-		calendar.setTime (
-			new Date (minTime));
+			LocalTime time =
+				new LocalTime (
+					index * 3,
+					0,
+					0);
 
-		for (int i = 1; i <= 8; i ++) {
-
-			calendar.set (
-				Calendar.HOUR_OF_DAY,
-				i * 3);
-
-			Date date = calendar.getTime ();
+			Instant instant =
+				date
+					.toDateTime (
+						time,
+						timezone)
+					.toInstant ();
 
 			int x =
 				+ xOrigin
 				+ (int) (1
 					* (double) plotWidth
-					* (double) (date.getTime() - minTime)
-					/ (double) (maxTime - minTime));
+					* (double) (instant.getMillis () - minTime.getMillis ())
+					/ (double) (maxTime.getMillis () - minTime.getMillis ()));
 
 			graphics.setColor (
 				new Color (192, 192, 192));
@@ -147,7 +176,7 @@ class ChatGraphsUsersImageResponder
 
 			String string;
 
-			switch (i) {
+			switch (index) {
 
 			case 1:
 			case 5:
@@ -190,6 +219,7 @@ class ChatGraphsUsersImageResponder
 		int[] xPoints =
 			new int [allChatStats.size ()];
 
+
 		int[] yPoints =
 			new int [allChatStats.size ()];
 
@@ -202,9 +232,12 @@ class ChatGraphsUsersImageResponder
 				+ xOrigin
 				+ (int) (1
 					* (double) plotWidth
-					* (double) (chatStats.getTimestamp ().getTime () - minTime)
-					/ (double) (maxTime - minTime)
-				);
+					* (double) (
+						+ chatStats.getTimestamp ().getTime ()
+						- minTime.getMillis ())
+					/ (double) (
+						+ maxTime.getMillis ()
+						- minTime.getMillis ()));
 
 			yPoints [index] =
 				+ yOrigin

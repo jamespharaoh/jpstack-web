@@ -1,11 +1,12 @@
 package wbs.apn.chat.bill.logic;
 
-import java.util.Date;
+import org.joda.time.LocalDate;
 
 import wbs.apn.chat.bill.model.ChatUserSpendRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 
-public interface ChatCreditLogic {
+public
+interface ChatCreditLogic {
 
 	void userReceiveSpend (
 			ChatUserRec toUser,
@@ -38,12 +39,13 @@ public interface ChatCreditLogic {
 	 */
 	ChatUserSpendRec findOrCreateChatUserSpend (
 			ChatUserRec chatUser,
-			Date date);
+			LocalDate pdate);
 
 	/**
 	 * Returns true if the user should receive non-billed content.
 	 */
-	boolean userReceiveCheck (ChatUserRec chatUser);
+	boolean userReceiveCheck (
+			ChatUserRec chatUser);
 
 	boolean userSpendCheck (
 			ChatUserRec chatUser,
@@ -55,7 +57,8 @@ public interface ChatCreditLogic {
 			ChatUserRec chatUser,
 			boolean allowBlocked);
 
-	boolean userStrictCreditOk (ChatUserRec chatUser);
+	boolean userStrictCreditOk (
+			ChatUserRec chatUser);
 
 	/**
 	 * Bills the user by sending allMessages, if appropriate.
@@ -91,13 +94,6 @@ public interface ChatCreditLogic {
 	void userCreditHint (
 			ChatUserRec chatUser,
 			Integer threadId);
-
-	/**
-	 * Returns a Date representing 0000 hours today.
-	 *
-	 * @return the date
-	 */
-	Date today ();
 
 	void doRebill ();
 

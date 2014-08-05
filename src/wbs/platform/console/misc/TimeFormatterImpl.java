@@ -2,6 +2,8 @@ package wbs.platform.console.misc;
 
 import java.util.Locale;
 
+import lombok.NonNull;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
@@ -56,12 +58,11 @@ class TimeFormatterImpl
 	@Override
 	public
 	String instantToTimestampString (
-			Instant instant) {
-
-		if (instant == null)
-			return null;
+			@NonNull DateTimeZone timeZone,
+			@NonNull Instant instant) {
 
 		return timestampFormat
+			.withZone (timeZone)
 			.print (instant);
 
 	}
@@ -69,12 +70,11 @@ class TimeFormatterImpl
 	@Override
 	public
 	String instantToDateStringLong (
-			Instant instant) {
-
-		if (instant == null)
-			return null;
+			@NonNull DateTimeZone timeZone,
+			@NonNull Instant instant) {
 
 		return longDateFormat
+			.withZone (timeZone)
 			.print (instant);
 
 	}
@@ -82,12 +82,11 @@ class TimeFormatterImpl
 	@Override
 	public
 	String instantToTimeString (
-			Instant instant) {
-
-		if (instant == null)
-			return null;
+			@NonNull DateTimeZone timeZone,
+			@NonNull Instant instant) {
 
 		return timeFormat
+			.withZone (timeZone)
 			.print (instant);
 
 	}
@@ -95,12 +94,11 @@ class TimeFormatterImpl
 	@Override
 	public
 	String instantToDateStringShort (
-			Instant instant) {
-
-		if (instant == null)
-			return null;
+			@NonNull DateTimeZone timeZone,
+			@NonNull Instant instant) {
 
 		return shortDateFormat
+			.withZone (timeZone)
 			.print (instant);
 
 	}
@@ -108,10 +106,7 @@ class TimeFormatterImpl
 	@Override
 	public
 	String instantToHttpTimestampString (
-			Instant instant) {
-
-		if (instant == null)
-			return null;
+			@NonNull Instant instant) {
 
 		return httpTimestampFormat
 			.print (instant);
@@ -121,9 +116,11 @@ class TimeFormatterImpl
 	@Override
 	public
 	Instant timestampStringToInstant (
-			String string) {
+			@NonNull DateTimeZone timeZone,
+			@NonNull String string) {
 
 		return timestampFormat
+			.withZone (timeZone)
 			.parseDateTime (string)
 			.toInstant ();
 
@@ -132,10 +129,7 @@ class TimeFormatterImpl
 	@Override
 	public
 	String localDateToDateString (
-			LocalDate localDate) {
-
-		if (localDate == null)
-			return null;
+			@NonNull LocalDate localDate) {
 
 		return shortDateFormat.print (
 			localDate);
@@ -145,10 +139,7 @@ class TimeFormatterImpl
 	@Override
 	public
 	String dateTimeToTimestampTimezoneString (
-			DateTime dateTime) {
-
-		if (dateTime == null)
-			return null;
+			@NonNull DateTime dateTime) {
 
 		return timestampTimezoneFormat.print (
 			dateTime);
@@ -158,7 +149,7 @@ class TimeFormatterImpl
 	@Override
 	public
 	LocalDate dateStringToLocalDate (
-			String string) {
+			@NonNull String string) {
 
 		return shortDateFormat.parseLocalDate (
 			string);
@@ -168,10 +159,28 @@ class TimeFormatterImpl
 	@Override
 	public
 	DateTime timestampTimezoneToDateTime (
-			String string) {
+			@NonNull String string) {
 
 		return timestampTimezoneFormat.parseDateTime (
 			string);
+
+	}
+
+	@Override
+	public
+	DateTimeZone defaultTimezone () {
+
+		return DateTimeZone.getDefault ();
+
+	}
+
+	@Override
+	public
+	DateTimeZone timezone (
+			@NonNull String name) {
+
+		return DateTimeZone.forID (
+			name);
 
 	}
 

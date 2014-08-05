@@ -1,22 +1,30 @@
 package wbs.apn.chat.user.core.logic;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 import javax.inject.Inject;
+
+import lombok.NonNull;
+
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.bill.model.ChatUserCreditMode;
@@ -37,10 +45,13 @@ import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.email.logic.EmailLogic;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.media.logic.MediaLogic;
@@ -60,6 +71,8 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.number.core.logic.NumberLogic;
 
+import com.google.common.base.Optional;
+
 @SingletonComponent ("chatUserLogic")
 public
 class ChatUserLogicImpl
@@ -78,6 +91,9 @@ class ChatUserLogicImpl
 
 	@Inject
 	ChatUserImageObjectHelper chatUserImageHelper;
+
+	@Inject
+	Database database;
 
 	@Inject
 	EmailLogic emailLogic;
@@ -116,6 +132,9 @@ class ChatUserLogicImpl
 	SliceObjectHelper sliceHelper;
 
 	@Inject
+	TimeFormatter timeFormatter;
+
+	@Inject
 	WbsConfig wbsConfig;
 
 	// implementation
@@ -123,7 +142,7 @@ class ChatUserLogicImpl
 	@Override
 	public
 	AffiliateRec getAffiliate (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
 
 		if (chatUser.getChatAffiliate () != null) {
 
@@ -147,32 +166,42 @@ class ChatUserLogicImpl
 	@Override
 	public
 	Integer getAffiliateId (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
 
 		AffiliateRec affiliate =
-			getAffiliate (chatUser);
+			getAffiliate (
+				chatUser);
 
 		return affiliate != null ?
 			affiliate.getId () : null;
+
 	}
 
 	@Override
 	public
 	void setAffiliateId (
-			ReceivedMessage receivedMessage,
-			ChatUserRec chatUser) {
+			@NonNull ReceivedMessage receivedMessage,
+			@NonNull ChatUserRec chatUser) {
 
 		Integer affiliateId =
-			getAffiliateId (chatUser);
+			getAffiliateId (
+				chatUser);
 
-		if (affiliateId != null)
-			receivedMessage.setAffiliateId (affiliateId);
+		if (affiliateId != null) {
+
+			receivedMessage
+
+				.setAffiliateId (
+					affiliateId);
+
+		}
+
 	}
 
 	@Override
 	public
 	void logoff (
-			ChatUserRec chatUser,
+			@NonNull ChatUserRec chatUser,
 			boolean automatic) {
 
 		Date now =
@@ -180,7 +209,10 @@ class ChatUserLogicImpl
 
 		// log the user off
 
-		chatUser.setOnline (false);
+		chatUser
+
+			.setOnline (
+			false);
 
 		// reset delivery method to sms, except for iphone users
 
@@ -210,8 +242,9 @@ class ChatUserLogicImpl
 	}
 
 	@Override
-	public boolean deleted (
-			ChatUserRec chatUser) {
+	public
+	boolean deleted (
+			@NonNull ChatUserRec chatUser) {
 
 		return chatUser.getNumber () == null
 			&& chatUser.getDeliveryMethod () == ChatMessageMethod.sms;
@@ -221,74 +254,114 @@ class ChatUserLogicImpl
 	@Override
 	public
 	void scheduleAd (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		ChatRec chat =
 			chatUser.getChat ();
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		DateTimeZone timezone =
+			timezone (
+				chatUser);
 
-		// earliest we will send ad is from midnight tonight
+		LocalDate today =
+			transaction
+				.now ()
+				.toDateTime (timezone)
+				.toLocalDate ();
 
-		calendar.setTime (new Date ());
+		Instant midnightTonight =
+			today
+				.plusDays (1)
+				.toDateTimeAtStartOfDay ()
+				.toInstant ();
 
-		calendar.set (Calendar.HOUR_OF_DAY, 0);
-		calendar.set (Calendar.MINUTE, 0);
-		calendar.set (Calendar.SECOND, 0);
-		calendar.set (Calendar.MILLISECOND, 0);
+		// start with their last action (or last join) date
 
-		calendar.add (Calendar.DATE, 1);
-
-		Date midnight =
-			calendar.getTime ();
-
-		// start with their last action (or last join) time
+		LocalDate startDate;
 
 		if (chatUser.getLastJoin () != null) {
 
-			calendar.setTime (chatUser.getLastJoin ());
+			startDate =
+				dateToInstant (chatUser.getLastJoin ())
+					.toDateTime (timezone)
+					.toLocalDate ();
 
 		} else {
 
-			calendar.setTime (chatUser.getLastAction ());
+			startDate =
+				dateToInstant (chatUser.getLastAction ())
+					.toDateTime (timezone)
+					.toLocalDate ();
 
 		}
 
-		// randomise time of day
+		// pick a random time of day, from 10am to 8pm
 
-		calendar.set (
-			Calendar.HOUR_OF_DAY,
-			10 + random.nextInt (10));
+		LocalTime timeOfDay =
+			new LocalTime (
+				10 + random.nextInt (10),
+				random.nextInt (60),
+				random.nextInt (60));
 
 		// try and schedule first ad
 
-		calendar.add (
-			Calendar.SECOND,
-			chat.getAdTimeFirst ());
+		Instant firstAdTime =
+			startDate
+				.plusDays (chat.getAdTimeFirst () / 60 / 60 / 24)
+				.toDateTime (timeOfDay, timezone)
+				.toInstant ();
 
-		if (calendar.getTime ().getTime () > midnight.getTime ()) {
-			chatUser.setNextAd (calendar.getTime ());
+		if (firstAdTime.isAfter (
+				midnightTonight)) {
+
+			chatUser
+
+				.setNextAd (
+					instantToDate (
+						firstAdTime));
+
 			return;
+
 		}
 
 		// try and schedule subsequent ads
 
-		for (int i = 0; i < chat.getAdCount (); i++) {
+		for (
+			int index = 0;
+			index < chat.getAdCount ();
+			index ++
+		) {
 
-			calendar.add (
-				Calendar.SECOND,
-				chat.getAdTime ());
+			Instant nextAdTime =
+				startDate
+					.plusDays (chat.getAdTime () / 60 / 60 / 24 * index)
+					.toDateTime (timeOfDay, timezone)
+					.toInstant ();
 
-			if (calendar.getTime ().getTime () > midnight.getTime ()) {
-				chatUser.setNextAd (calendar.getTime ());
+			if (nextAdTime.isAfter (
+					midnightTonight)) {
+
+				chatUser
+
+					.setNextAd (
+						instantToDate (
+							nextAdTime));
+
 				return;
+
 			}
+
 		}
 
 		// no more ads!
 
-		chatUser.setNextAd (null);
+		chatUser
+
+			.setNextAd (
+				null);
 
 	}
 
@@ -307,14 +380,10 @@ class ChatUserLogicImpl
 	 */
 	@Override
 	public boolean compatible (
-			Gender gender1,
-			Orient orient1,
-			Gender gender2,
-			Orient orient2) {
-
-		if (gender1 == null || orient1 == null
-			|| gender2 == null || orient2 == null)
-			return false;
+			@NonNull Gender gender1,
+			@NonNull Orient orient1,
+			@NonNull Gender gender2,
+			@NonNull Orient orient2) {
 
 		if (gender1 == gender2) {
 
@@ -341,9 +410,10 @@ class ChatUserLogicImpl
 	 * @return true if they are
 	 */
 	@Override
-	public boolean compatible (
-			ChatUserRec user1,
-			ChatUserRec user2) {
+	public
+	boolean compatible (
+			@NonNull ChatUserRec user1,
+			@NonNull ChatUserRec user2) {
 
 		return compatible (
 			user1.getGender (),
@@ -358,9 +428,10 @@ class ChatUserLogicImpl
 	 * up to the first numToFind of them.
 	 */
 	@Override
-	public Collection<ChatUserRec> getNearestUsers (
-			ChatUserRec thisUser,
-			Collection<ChatUserRec> thoseUsers,
+	public
+	Collection<ChatUserRec> getNearestUsers (
+			@NonNull ChatUserRec thisUser,
+			@NonNull Collection<ChatUserRec> thoseUsers,
 			int numToFind) {
 
 		Collection<UserDistance> userDistances =
@@ -391,8 +462,8 @@ class ChatUserLogicImpl
 	@Override
 	public
 	List<UserDistance> getUserDistances (
-			ChatUserRec thisUser,
-			Collection<ChatUserRec> otherUsers) {
+			@NonNull ChatUserRec thisUser,
+			@NonNull Collection<ChatUserRec> otherUsers) {
 
 		// process the list
 
@@ -422,13 +493,15 @@ class ChatUserLogicImpl
 					.user (thatUser)
 					.miles (miles);
 
-			userDistances.add (userDistance);
+			userDistances.add (
+				userDistance);
 
 		}
 
 		// then sort the list
 
-		Collections.sort (userDistances);
+		Collections.sort (
+			userDistances);
 
 		return userDistances;
 
@@ -437,45 +510,48 @@ class ChatUserLogicImpl
 	@Override
 	public
 	void adultVerify (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		ChatRec chat =
 			chatUser.getChat ();
 
-		// mark as adult verified
+		// work out times
 
-		chatUser.setAdultVerified (true);
+		Instant nextAdultAdTime =
+			transaction
+				.now ()
+				.plus (Duration.standardSeconds (
+					chat.getAdultAdsTime ()));
 
-		// set next adult ad
+		Instant adultExpiryTime =
+			transaction
+				.now ()
+				.plus (Duration.standardDays (90));
 
-		Calendar cal1 =
-			Calendar.getInstance ();
+		// update chat user
 
-		cal1.add (
-			Calendar.SECOND,
-			chat.getAdultAdsTime ());
+		chatUser
 
-		chatUser.setNextAdultAd (
-			cal1.getTime ());
+			.setAdultVerified (
+				true)
 
-		// set next adult expiry
+			.setNextAdultAd (
+				instantToDate (
+					nextAdultAdTime))
 
-		Calendar cal2 =
-			new GregorianCalendar ();
-
-		cal2.add (
-			Calendar.MONTH,
-			3);
-
-		chatUser.setAdultExpiry (
-			cal2.getTime ());
+			.setAdultExpiry (
+				instantToDate (
+					adultExpiryTime));
 
 	}
 
 	@Override
 	public
 	void monitorCap (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
 
 		int number =
 			random.nextInt (100);
@@ -488,7 +564,7 @@ class ChatUserLogicImpl
 	@Override
 	public
 	ChatUserRec createChatMonitor (
-			ChatRec chat) {
+			@NonNull ChatRec chat) {
 
 		return objectManager.insert (
 			new ChatUserRec ()
@@ -512,8 +588,8 @@ class ChatUserLogicImpl
 	@Override
 	public
 	void creditModeChange (
-			ChatUserRec chatUser,
-			ChatUserCreditMode newMode) {
+			@NonNull ChatUserRec chatUser,
+			@NonNull ChatUserCreditMode newMode) {
 
 		if (chatUser.getCreditMode () == ChatUserCreditMode.prePay) {
 
@@ -543,12 +619,15 @@ class ChatUserLogicImpl
 	@Override
 	public
 	ChatUserImageRec setImage (
-			ChatUserRec chatUser,
-			ChatUserImageType type,
-			MediaRec smallMedia,
-			MediaRec fullMedia,
-			MessageRec message,
+			@NonNull ChatUserRec chatUser,
+			@NonNull ChatUserImageType type,
+			@NonNull MediaRec smallMedia,
+			@NonNull MediaRec fullMedia,
+			@NonNull MessageRec message,
 			boolean append) {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -558,14 +637,31 @@ class ChatUserLogicImpl
 		ChatUserImageRec chatUserImage =
 			chatUserImageHelper.insert (
 				new ChatUserImageRec ()
-					.setChatUser (chatUser)
-					.setMedia (smallMedia)
-					.setFullMedia (fullMedia)
-					.setTimestamp (new Date ())
-					.setMessage (message)
-					.setStatus (ChatUserInfoStatus.moderatorPending)
-					.setType (type)
-					.setAppend (append));
+
+			.setChatUser (
+				chatUser)
+
+			.setMedia (
+				smallMedia)
+
+			.setFullMedia (
+				fullMedia)
+
+			.setTimestamp (
+				instantToDate (
+					transaction.now ()))
+
+			.setMessage (
+				message)
+
+			.setStatus (
+				ChatUserInfoStatus.moderatorPending)
+
+			.setType (
+				type)
+
+			.setAppend (
+				append));
 
 		// create a queue item, if necessary
 
@@ -580,19 +676,22 @@ class ChatUserLogicImpl
 					chatUser.getPrettyName ());
 
 			chatUser
-				.setQueueItem (queueItem);
+
+				.setQueueItem (
+					queueItem);
 
 		}
 
 		return chatUserImage;
+
 	}
 
 	@Override
 	public
 	ChatUserImageRec setPhoto (
-			ChatUserRec chatUser,
-			MediaRec fullMedia,
-			MessageRec message,
+			@NonNull ChatUserRec chatUser,
+			@NonNull MediaRec fullMedia,
+			@NonNull MessageRec message,
 			boolean append) {
 
 		// load
@@ -636,9 +735,9 @@ class ChatUserLogicImpl
 
 	@Override
 	public ChatUserImageRec setPhoto (
-			ChatUserRec chatUser,
-			byte[] data,
-			MessageRec message,
+			@NonNull ChatUserRec chatUser,
+			@NonNull byte[] data,
+			@NonNull MessageRec message,
 			boolean append) {
 
 		// create media
@@ -665,8 +764,8 @@ class ChatUserLogicImpl
 	@Override
 	public
 	ChatUserImageRec setPhoto (
-			ChatUserRec chatUser,
-			MessageRec message,
+			@NonNull ChatUserRec chatUser,
+			@NonNull MessageRec message,
 			boolean append) {
 
 		MediaRec media =
@@ -686,14 +785,15 @@ class ChatUserLogicImpl
 	@Override
 	public
 	MediaRec findPhoto (
-			MessageRec message) {
+			@NonNull MessageRec message) {
 
 		// look for a valid jpeg or gif
 
 		for (MediaRec media
 				: message.getMedias ()) {
 
-			if (! in (media.getMediaType ().getMimeType (),
+			if (! in (
+					media.getMediaType ().getMimeType (),
 					"image/jpeg",
 					"image/gif"))
 				continue;
@@ -709,9 +809,9 @@ class ChatUserLogicImpl
 	@Override
 	public
 	void setVideo (
-			ChatUserRec chatUser,
-			MediaRec fullMedia,
-			MessageRec message,
+			@NonNull ChatUserRec chatUser,
+			@NonNull MediaRec fullMedia,
+			@NonNull MessageRec message,
 			boolean append) {
 
 		// resample
@@ -739,21 +839,29 @@ class ChatUserLogicImpl
 	@Override
 	public
 	void setVideo (
-			ChatUserRec chatUser,
-			byte[] data,
-			String filename,
-			String mimeType,
-			MessageRec message,
+			@NonNull ChatUserRec chatUser,
+			@NonNull byte[] data,
+			@NonNull Optional<String> filenameOptional,
+			@NonNull Optional<String> mimeTypeOptional,
+			@NonNull MessageRec message,
 			boolean append) {
 
 		// default mime type
 
-		if (mimeType == null)
-			mimeType = "application/octet-stream";
+		String mimeType =
+			mimeTypeOptional.or (
+				"application/octet-stream");
 
 		// default filename
 
-		if (filename == null) {
+		String filename;
+
+		if (filenameOptional.isPresent ()) {
+
+			filename =
+				filenameOptional.get ();
+
+		} else {
 
 			MediaTypeRec mediaType =
 				mediaTypeHelper.findByCode (
@@ -797,9 +905,9 @@ class ChatUserLogicImpl
 	@Override
 	public
 	void setAudio (
-			ChatUserRec chatUser,
-			byte[] data,
-			MessageRec message,
+			@NonNull ChatUserRec chatUser,
+			@NonNull byte[] data,
+			@NonNull MessageRec message,
 			boolean append) {
 
 		// resample
@@ -825,12 +933,12 @@ class ChatUserLogicImpl
 	@Override
 	public
 	void setImage (
-			ChatUserRec chatUser,
-			ChatUserImageType type,
-			byte[] data,
-			String filename,
-			String mimeType,
-			MessageRec message,
+			@NonNull ChatUserRec chatUser,
+			@NonNull ChatUserImageType type,
+			@NonNull byte[] data,
+			@NonNull String filename,
+			@NonNull String mimeType,
+			@NonNull MessageRec message,
 			boolean append) {
 
 		switch (type) {
@@ -850,8 +958,8 @@ class ChatUserLogicImpl
 			setVideo (
 				chatUser,
 				data,
-				filename,
-				mimeType,
+				Optional.of (filename),
+				Optional.of (mimeType),
 				null,
 				true);
 
@@ -882,8 +990,8 @@ class ChatUserLogicImpl
 	@Override
 	public
 	boolean setVideo (
-			ChatUserRec chatUser,
-			MessageRec message,
+			@NonNull ChatUserRec chatUser,
+			@NonNull MessageRec message,
 			boolean append) {
 
 		for (MediaRec media
@@ -910,9 +1018,9 @@ class ChatUserLogicImpl
 	@Override
 	public
 	boolean setPlace (
-			ChatUserRec chatUser,
-			String place,
-			MessageRec message) {
+			@NonNull ChatUserRec chatUser,
+			@NonNull String place,
+			@NonNull MessageRec message) {
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -1036,9 +1144,8 @@ class ChatUserLogicImpl
 	 */
 	@Override
 	public
-	boolean
-	gotDob (
-			ChatUserRec chatUser) {
+	boolean gotDob (
+			@NonNull ChatUserRec chatUser) {
 
 		return /*chatUser.getAdultVerified ()
 			|| chatUser.getAgeChecked ()
@@ -1061,22 +1168,40 @@ class ChatUserLogicImpl
 	@Override
 	public
 	boolean dobOk (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
 
-		if (chatUser.getAdultVerified ()
-				|| chatUser.getAgeChecked ())
+		Transaction transaction =
+			database.currentTransaction ();
+
+		DateTimeZone timezone =
+			timezone (
+				chatUser);
+
+		if (
+			chatUser.getAdultVerified ()
+			|| chatUser.getAgeChecked ()
+		) {
 			return true;
+		}
 
 		if (chatUser.getDob () == null)
 			return true;
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		Instant eighteenYearsAgo =
+			transaction
+				.now ()
+				.toDateTime (timezone)
+				.minusYears (18)
+				.toInstant ();
 
-		calendar.add (Calendar.YEAR, -18);
+		Instant dateOfBirth =
+			chatUser
+				.getDob ()
+				.toDateTimeAtStartOfDay (timezone)
+				.toInstant ();
 
-		return chatUser.getDob ().toDate ().getTime ()
-			<= calendar.getTime ().getTime ();
+		return dateOfBirth.isBefore (
+			eighteenYearsAgo);
 
 	}
 
@@ -1093,8 +1218,8 @@ class ChatUserLogicImpl
 	@Override
 	public
 	void setScheme (
-			ChatUserRec chatUser,
-			ChatSchemeRec chatScheme) {
+			@NonNull ChatUserRec chatUser,
+			@NonNull ChatSchemeRec chatScheme) {
 
 		// do nothing if already set
 
@@ -1157,8 +1282,8 @@ class ChatUserLogicImpl
 	@Override
 	public
 	void setAffiliate (
-			ChatUserRec chatUser,
-			ChatAffiliateRec chatAffiliate) {
+			@NonNull ChatUserRec chatUser,
+			@NonNull ChatAffiliateRec chatAffiliate) {
 
 		ChatSchemeRec chatScheme =
 			chatAffiliate.getChatScheme ();
@@ -1208,14 +1333,14 @@ class ChatUserLogicImpl
 	@Override
 	public
 	boolean valid (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
 
-		if (chatUser == null)
+		if (
+			chatUser.getType () == ChatUserType.user
+			&& chatUser.getNumber () == null
+		) {
 			return false;
-
-		if (chatUser.getType () == ChatUserType.user
-				&& chatUser.getNumber () == null)
-			return false;
+		}
 
 		return true;
 
@@ -1224,8 +1349,8 @@ class ChatUserLogicImpl
 	@Override
 	public
 	ChatUserImageRec chatUserPendingImage (
-			ChatUserRec chatUser,
-			ChatUserImageType type) {
+			@NonNull ChatUserRec chatUser,
+			@NonNull ChatUserImageType type) {
 
 		ChatUserImageRec ret = null;
 
@@ -1255,7 +1380,7 @@ class ChatUserLogicImpl
 	@Override
 	public
 	ChatUserImageType imageTypeForMode (
-			PendingMode mode) {
+			@NonNull PendingMode mode) {
 
 		switch (mode) {
 
@@ -1282,7 +1407,7 @@ class ChatUserLogicImpl
 	@Override
 	public
 	String getBrandName (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
 
 		ChatAffiliateRec chatAffiliate =
 			chatUser.getChatAffiliate ();
@@ -1298,6 +1423,19 @@ class ChatUserLogicImpl
 			chatUser.getChat ();
 
 		return chat.getDefaultBrandName ();
+
+	}
+
+	@Override
+	public
+	DateTimeZone timezone (
+			@NonNull ChatUserRec chatUser) {
+
+		ChatSchemeRec chatScheme =
+			chatUser.getChatScheme ();
+
+		return timeFormatter.timezone (
+			chatScheme.getTimezone ());
 
 	}
 

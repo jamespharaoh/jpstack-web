@@ -1,6 +1,7 @@
 package wbs.apn.chat.bill.hibernate;
 
-import java.util.Date;
+import org.hibernate.criterion.Restrictions;
+import org.joda.time.LocalDate;
 
 import wbs.apn.chat.bill.model.ChatUserSpendDao;
 import wbs.apn.chat.bill.model.ChatUserSpendRec;
@@ -16,23 +17,23 @@ class ChatUserSpendDaoHibernate
 	public
 	ChatUserSpendRec findByDate (
 			ChatUserRec chatUser,
-			Date date) {
+			LocalDate date) {
 
 		return findOne (
 			ChatUserSpendRec.class,
 
-			createQuery (
-				"FROM ChatUserSpendRec cus " +
-				"WHERE cus.chatUser = :chatUser " +
-				"AND cus.date = :date")
+			createCriteria (
+				ChatUserSpendRec.class)
 
-			.setEntity (
-				"chatUser",
-				chatUser)
+			.add (
+				Restrictions.eq (
+					"chatUser",
+					chatUser))
 
-			.setDate (
-				"date",
-				date)
+			.add (
+				Restrictions.eq (
+					"date",
+					date))
 
 			.list ());
 

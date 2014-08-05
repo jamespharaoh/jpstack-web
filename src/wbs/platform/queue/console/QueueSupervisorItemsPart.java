@@ -174,15 +174,21 @@ class QueueSupervisorItemsPart
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
-					dateToInstant (queueItem.getCreatedTime ())),
+					timeFormatter.defaultTimezone (),
+					dateToInstant (
+						queueItem.getCreatedTime ())),
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
-					dateToInstant (queueItem.getPendingTime ())),
+					timeFormatter.defaultTimezone (),
+					dateToInstant (
+						queueItem.getPendingTime ())),
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
-					dateToInstant (queueItem.getProcessedTime ())),
+					timeFormatter.defaultTimezone (),
+					dateToInstant (
+						queueItem.getProcessedTime ())),
 
 				"</tr>\n");
 

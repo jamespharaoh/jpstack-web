@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.joda.time.DateTimeZone;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.bill.model.ChatUserCreditMode;
@@ -23,6 +24,8 @@ import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.model.MediaRec;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
+
+import com.google.common.base.Optional;
 
 public
 interface ChatUserLogic {
@@ -153,8 +156,8 @@ interface ChatUserLogic {
 	void setVideo (
 			ChatUserRec chatUser,
 			byte[] data,
-			String filename,
-			String mimeType,
+			Optional<String> filename,
+			Optional<String> mimeType,
 			MessageRec message,
 			boolean append);
 
@@ -308,6 +311,9 @@ interface ChatUserLogic {
 			PendingMode mode);
 
 	String getBrandName (
+			ChatUserRec chatUser);
+
+	DateTimeZone timezone (
 			ChatUserRec chatUser);
 
 }

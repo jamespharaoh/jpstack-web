@@ -116,7 +116,9 @@ class ObjectEventsPart
 
 					"<td colspan=\"2\">%h</td>\n",
 					timeFormatter.instantToDateStringLong (
-						dateToInstant (event.getTimestamp ())),
+						timeFormatter.defaultTimezone (),
+						dateToInstant (
+							event.getTimestamp ())),
 
 					"</tr>\n");
 
@@ -181,7 +183,9 @@ class ObjectEventsPart
 				"<td>%s</td>\n",
 				Html.nbsp (Html.encode (
 					timeFormatter.instantToTimeString (
-						dateToInstant (event.getTimestamp ())))),
+						timeFormatter.defaultTimezone (),
+						dateToInstant (
+							event.getTimestamp ())))),
 
 				"<td>%s</td>\n",
 				text,

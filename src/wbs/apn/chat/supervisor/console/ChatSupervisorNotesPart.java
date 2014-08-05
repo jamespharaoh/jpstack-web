@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 import wbs.apn.chat.contact.model.ChatContactNoteObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactNoteRec;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.console.helper.ConsoleObjectManager;
@@ -23,6 +24,8 @@ public
 class ChatSupervisorNotesPart
 	extends AbstractPagePart {
 
+	// dependencies
+
 	@Inject
 	ChatConsoleHelper chatHelper;
 
@@ -30,14 +33,23 @@ class ChatSupervisorNotesPart
 	ChatContactNoteObjectHelper chatContactNoteHelper;
 
 	@Inject
+	ChatMiscLogic chatMiscLogic;
+
+	@Inject
 	ConsoleObjectManager consoleObjectManager;
 
 	@Inject
 	TimeFormatter timeFormatter;
 
+	// state
+
 	StatsPeriod statsPeriod;
 
+	ChatRec chat;
+
 	List<ChatContactNoteRec> chatContactNotes;
+
+	// implementation
 
 	@Override
 	public
@@ -47,7 +59,7 @@ class ChatSupervisorNotesPart
 			(StatsPeriod)
 			parameters.get ("statsPeriod");
 
-		ChatRec chat =
+		chat =
 			chatHelper.find (
 				requestContext.stuffInt ("chatId"));
 
@@ -108,7 +120,10 @@ class ChatSupervisorNotesPart
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
-					dateToInstant (chatContactNote.getTimestamp ())),
+					chatMiscLogic.timezone (
+						chat),
+					dateToInstant (
+						chatContactNote.getTimestamp ())),
 
 				"</tr>\n");
 

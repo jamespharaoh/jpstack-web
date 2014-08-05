@@ -1,13 +1,12 @@
 package wbs.apn.chat.bill.model;
 
-import java.util.Date;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.joda.time.LocalDate;
 
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.entity.annotations.CommonEntity;
@@ -38,7 +37,7 @@ class ChatUserSpendRec
 	ChatUserRec chatUser;
 
 	@IdentitySimpleField
-	Date date;
+	LocalDate date;
 
 	// data
 
@@ -109,7 +108,7 @@ class ChatUserSpendRec
 
 		ChatUserSpendRec findByDate (
 				ChatUserRec chatUser,
-				Date date);
+				LocalDate date);
 
 	}
 

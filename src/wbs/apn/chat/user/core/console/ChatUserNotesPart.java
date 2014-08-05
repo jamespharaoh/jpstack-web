@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserNoteObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserNoteRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -20,6 +21,8 @@ public
 class ChatUserNotesPart
 	extends AbstractPagePart {
 
+	// dependencies
+
 	@Inject
 	ConsoleObjectManager consoleObjectManager;
 
@@ -27,18 +30,27 @@ class ChatUserNotesPart
 	ChatUserObjectHelper chatUserHelper;
 
 	@Inject
+	ChatUserLogic chatUserLogic;
+
+	@Inject
 	ChatUserNoteObjectHelper chatUserNoteHelper;
 
 	@Inject
 	TimeFormatter timeFormatter;
 
+	// state
+
+	ChatUserRec chatUser;
+
 	List<ChatUserNoteRec> chatUserNotes;
+
+	// implementation
 
 	@Override
 	public
 	void prepare () {
 
-		ChatUserRec chatUser =
+		chatUser =
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
 
@@ -116,6 +128,8 @@ class ChatUserNotesPart
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
+					chatUserLogic.timezone (
+						chatUser),
 					chatUserNote.getTimestamp ()),
 
 				"<td>%h</td> ",

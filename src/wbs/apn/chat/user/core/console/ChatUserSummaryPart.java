@@ -15,6 +15,7 @@ import wbs.apn.chat.core.logic.ChatLogicHooks;
 import wbs.apn.chat.core.logic.ChatLogicHooks.ChatUserCharge;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.scheme.model.ChatSchemeChargesRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -41,6 +42,9 @@ class ChatUserSummaryPart
 
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
+
+	@Inject
+	ChatUserLogic chatUserLogic;
 
 	@Inject
 	CurrencyLogic currencyLogic;
@@ -201,7 +205,10 @@ class ChatUserSummaryPart
 				"<td>%h</td>\n",
 				chatUser.getFirstJoin () != null
 					? timeFormatter.instantToTimestampString (
-						dateToInstant (chatUser.getFirstJoin ()))
+						chatUserLogic.timezone (
+							chatUser),
+						dateToInstant (
+							chatUser.getFirstJoin ()))
 					: "-",
 
 				"</tr>\n");
@@ -214,7 +221,10 @@ class ChatUserSummaryPart
 				"<td>%h</td>\n",
 				chatUser.getLastJoin () != null
 					? timeFormatter.instantToTimestampString (
-						dateToInstant (chatUser.getLastJoin ()))
+						chatUserLogic.timezone (
+							chatUser),
+						dateToInstant (
+							chatUser.getLastJoin ()))
 					: "-",
 
 				"</tr>\n");
@@ -478,23 +488,21 @@ class ChatUserSummaryPart
 			*/
 
 			printFormat (
-				"<tr> <th>Daily Billed</th> <td>%s</td> <tr>\n",
+				"<tr>\n",
+				"<th>Daily Billed</th>\n",
+				"<td>%s</td>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getDailyBilledAmount ()));
+					chatUser.getCreditDailyAmount ()),
+				"<tr>\n");
 
 			printFormat (
 				"<tr>\n",
-
-				"<th>Last billing started at</th>\n",
-
+				"<th>Last bill date</th>\n",
 				"<td>%s</td>\n",
 				chatUser.getCreditDailyDate () != null
-					? timeFormatter.instantToTimestampString (
-						dateToInstant (
-							chatUser.getCreditDailyDate ().toDate ()))
+					? chatUser.getCreditDailyDate ().toString ()
 					: "-",
-
 				"</tr>\n");
 
 		}

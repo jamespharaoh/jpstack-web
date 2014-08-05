@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -34,6 +35,9 @@ class ChatBroadcastVerifyPart
 	ChatConsoleHelper chatHelper;
 
 	@Inject
+	ChatMiscLogic chatMiscLogic;
+
+	@Inject
 	ChatUserConsoleHelper chatUserHelper;
 
 	@Inject
@@ -43,7 +47,10 @@ class ChatBroadcastVerifyPart
 	TimeFormatter timeFormatter;
 
 	Map<String,String> params;
+
+	ChatRec chat;
 	ChatUserRec fromUser;
+
 	boolean search;
 
 	@Override
@@ -58,7 +65,7 @@ class ChatBroadcastVerifyPart
 		params =
 			paramsTemp;
 
-		ChatRec chat =
+		chat =
 			chatHelper.find (
 				requestContext.stuffInt ("chatId"));
 
@@ -284,7 +291,10 @@ class ChatBroadcastVerifyPart
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
-					dateToInstant (chatUser.getLastAction ())),
+					chatMiscLogic.timezone (
+						chat),
+					dateToInstant (
+						chatUser.getLastAction ())),
 
 				"<td>%h</td>\n",
 				chatUser.getGender (),

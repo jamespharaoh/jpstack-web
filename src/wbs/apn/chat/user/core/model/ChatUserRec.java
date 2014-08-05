@@ -510,41 +510,6 @@ class ChatUserRec
 	// --------------------------------- utility functions
 
 	public
-	int getDailyBilledAmount () {
-		return getCreditDailyAmount ();
-	}
-
-	public
-	ChatUserRec incDailyBilledAmount (
-			int amount) {
-
-		return setDailyBilledAmount (
-			getDailyBilledAmount () + amount);
-
-	}
-
-	public
-	ChatUserRec decDailyBilledAmount (
-			int amount) {
-
-		return setDailyBilledAmount (
-			getDailyBilledAmount () - amount);
-
-	}
-
-	public
-	ChatUserRec setDailyBilledAmount (
-			int amount) {
-
-		// TODO don't like this
-		if (amount < 0)
-			amount = 0;
-
-		return setCreditDailyAmount (amount);
-
-	}
-
-	public
 	ChatUserRec incCreditPending (
 			int amount) {
 

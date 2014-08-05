@@ -1,12 +1,11 @@
 package wbs.apn.chat.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 
@@ -18,7 +17,9 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.joda.time.Instant;
+import org.joda.time.Interval;
 
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.bill.model.ChatUserCreditMode;
@@ -444,38 +445,42 @@ class ChatDaemon
 	private
 	void checkCredit () {
 
-		log.debug ("Checking for all users with negative credit");
-
-		Calendar calendar =
-			new GregorianCalendar ();
-
-		calendar.setTime (
-			new Date ());
-
-		calendar.add (
-			Calendar.MONTH,
-			- 3);
-
-		Date date =
-			calendar.getTime ();
-
 		log.debug (
-			"Chat billing after " + date);
+			"Checking for all users with negative credit");
 
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly ();
 
+		Instant threeMonthsAgo =
+			transaction
+				.now ()
+				.minus (Duration.standardDays (90));
+
+		log.debug (
+			stringFormat (
+				"Chat billing after %s",
+				threeMonthsAgo));
+
 		List<ChatUserRec> users =
 			chatUserHelper.findWantingBill (
-				date);
+				instantToDate (
+					threeMonthsAgo));
 
 		transaction.close ();
 
-		log.debug ("Chat billing after " + users.size ());
+		log.debug (
+			stringFormat (
+				"Chat billing after %s",
+				users.size ()));
 
-		for (ChatUserRec chatUser : users)
-			doUserCredit (chatUser.getId ());
+		for (ChatUserRec chatUser
+				: users) {
+
+			doUserCredit (
+				chatUser.getId ());
+
+		}
 
 	}
 
@@ -1134,39 +1139,36 @@ class ChatDaemon
 
 	}
 
-	Date waitForFiveMinuteTime ()
+	Instant waitForFiveMinuteTime ()
 			throws InterruptedException {
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		DateTime startTime =
+			DateTime.now ();
 
-		calendar.set (
-			Calendar.MILLISECOND,
-			0);
-
-		calendar.set (
-			Calendar.SECOND,
-			0);
-
-		calendar.set (
-			Calendar.MINUTE,
-			+ calendar.get (Calendar.MINUTE)
-			- (calendar.get (Calendar.MINUTE) % 5)
-			+ 5);
-
-		Date nextTime =
-			calendar.getTime ();
+		Instant nextTime =
+			DateTime
+				.now ()
+				.withMillisOfSecond (0)
+				.withSecondOfMinute (0)
+				.withMinuteOfHour (
+					+ startTime.getMinuteOfHour ()
+					- startTime.getMinuteOfHour () % 5)
+				.plusMinutes (5)
+				.toInstant ();
 
 		for (;;) {
 
-			Date now = new Date();
+			Instant loopTime =
+				Instant.now ();
 
-			if (now.getTime () >= nextTime.getTime ())
+			if (loopTime.isAfter (nextTime))
 				return nextTime;
 
 			Thread.sleep (
-				+ nextTime.getTime ()
-				- now.getTime ());
+				new Interval (
+					loopTime,
+					nextTime
+				).toDurationMillis ());
 
 		}
 
@@ -1174,7 +1176,7 @@ class ChatDaemon
 	}
 
 	void doStats (
-			Date timestamp) {
+			Instant timestamp) {
 
 		// get list of chats
 
@@ -1187,13 +1189,19 @@ class ChatDaemon
 
 		transaction.close ();
 
-		for (ChatRec chat : chats)
-			doStats (timestamp, chat.getId ());
+		for (ChatRec chat
+				: chats) {
+
+			doStats (
+				timestamp,
+				chat.getId ());
+
+		}
 
 	}
 
 	void doStats (
-			Date timestamp,
+			Instant timestamp,
 			int chatId) {
 
 		@Cleanup
@@ -1217,26 +1225,49 @@ class ChatDaemon
 
 		chatStatsHelper.insert (
 			new ChatStatsRec ()
-				.setChat (chat)
-				.setTimestamp (timestamp)
-				.setNumUsers (numUsers)
-				.setNumMonitors (numMonitors));
+
+			.setChat (
+				chat)
+
+			.setTimestamp (
+				instantToDate (
+					timestamp))
+
+			.setNumUsers (
+				numUsers)
+
+			.setNumMonitors (
+				numMonitors));
 
 		transaction.commit ();
 
 	}
 
 	void statsLoop () {
+
 		while (true) {
-			Date timestamp;
+
+			Instant fiveMinuteTime;
+
 			try {
-				timestamp = waitForFiveMinuteTime();
-			} catch (InterruptedException e) {
+
+				fiveMinuteTime =
+					waitForFiveMinuteTime ();
+
+			} catch (InterruptedException exception) {
+
 				return;
+
 			}
-			log.debug("Doing stats");
-			doStats(timestamp);
+
+			log.debug (
+				"Doing stats");
+
+			doStats (
+				fiveMinuteTime);
+
 		}
+
 	}
 
 	void checkCreditModes () {

@@ -14,7 +14,11 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.DateTimeZone;
+
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.contact.model.ChatContactRec;
@@ -41,6 +45,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
+import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.queue.logic.QueueLogic;
@@ -63,6 +68,8 @@ import com.google.common.collect.ImmutableMap;
 public
 class ChatMiscLogicImpl
 	implements ChatMiscLogic {
+
+	// dependencies
 
 	@Inject
 	ChatCreditLogic chatCreditLogic;
@@ -125,30 +132,29 @@ class ChatMiscLogicImpl
 	ServiceObjectHelper serviceHelper;
 
 	@Inject
+	TimeFormatter timeFormatter;
+
+	// prototype dependencies
+
+	@Inject
 	Provider<MessageSender> messageSender;
 
-	/**
-	 * Gets all online monitors who are candidates for a random outbound message
-	 * (either in response to a "join" outbound or a "quiet" outbound).
-	 *
-	 * Monitors considered must have a picture, not be blocked, be compatible
-	 * and never previously sent a message to this user.
-	 *
-	 * @param thisUser
-	 *            User message is to be sent to
-	 * @return All online monitors who qualify.
-	 */
+	// implementation
+
 	@Override
-	public List<ChatUserRec> getOnlineMonitorsForOutbound (
+	public
+	List<ChatUserRec> getOnlineMonitorsForOutbound (
 			ChatUserRec thisUser) {
 
-		ChatRec chat = thisUser.getChat ();
+		ChatRec chat =
+			thisUser.getChat ();
 
 		Collection<ChatUserRec> onlineUsers =
 			chatUserHelper.findOnline (
 				chat);
 
-		List<ChatUserRec> ret = new ArrayList<ChatUserRec> ();
+		List<ChatUserRec> ret =
+			new ArrayList<ChatUserRec> ();
 
 		for (ChatUserRec chatUser : onlineUsers) {
 
@@ -662,6 +668,16 @@ class ChatMiscLogicImpl
 
 			.setServiceId (
 				service.getId ());
+
+	}
+
+	@Override
+	public
+	DateTimeZone timezone (
+			@NonNull ChatRec chat) {
+
+		return timeFormatter.timezone (
+			chat.getTimezone ());
 
 	}
 

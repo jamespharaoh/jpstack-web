@@ -1,14 +1,16 @@
 package wbs.apn.chat.contact.logic;
 
 import static wbs.framework.utils.etc.Misc.allOf;
+import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isoDate;
+import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +22,7 @@ import javax.inject.Inject;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
-import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.apn.chat.approval.model.ChatApprovalRegexpObjectHelper;
@@ -52,6 +54,8 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.integrations.jigsaw.api.JigsawApi;
 import wbs.integrations.urbanairship.logic.UrbanAirshipApi;
@@ -75,6 +79,8 @@ import com.google.common.collect.ImmutableSet;
 public
 class ChatMessageLogicImpl
 	implements ChatMessageLogic {
+
+	// dependencies
 
 	@Inject
 	ChatApprovalRegexpObjectHelper chatApprovalRegexpHelper;
@@ -116,6 +122,9 @@ class ChatMessageLogicImpl
 	CommandObjectHelper commandHelper;
 
 	@Inject
+	Database database;
+
+	@Inject
 	ExceptionLogic exceptionLogic;
 
 	@Inject
@@ -133,18 +142,8 @@ class ChatMessageLogicImpl
 	@Inject
 	UrbanAirshipApi urbanAirshipApi;
 
-	/**
-	 * Checks if the same message has been sent between the same users in the
-	 * last hour.
-	 *
-	 * @param fromUser
-	 *            from user
-	 * @param toUser
-	 *            to user
-	 * @param originalText
-	 *            original text of message
-	 * @return true if it is a dupe
-	 */
+	// implementation
+
 	@Override
 	public
 	boolean chatMessageIsRecentDupe (
@@ -152,44 +151,33 @@ class ChatMessageLogicImpl
 			ChatUserRec toUser,
 			TextRec originalText) {
 
-		Instant oneHourAgo =
-			DateTime.now ()
-				.minusHours (1)
-				.toInstant ();
+		Transaction transaction =
+			database.currentTransaction ();
 
-		Calendar cal =
-			Calendar.getInstance ();
-		cal.add (Calendar.HOUR, -1);
+		Instant oneHourAgo =
+			transaction.now ()
+				.minus (Duration.standardHours (1));
 
 		List<ChatMessageRec> dupes =
 			chatMessageHelper.search (
 				new ChatMessageSearch ()
-					.fromUserId (fromUser.getId ())
-					.toUserId (toUser.getId ())
-					.timestampAfter (oneHourAgo)
-					.originalTextId (originalText.getId ()));
+
+			.fromUserId (
+				fromUser.getId ())
+
+			.toUserId (
+				toUser.getId ())
+
+			.timestampAfter (
+				oneHourAgo)
+
+			.originalTextId (
+				originalText.getId ()));
 
 		return dupes.size () > 0;
 
 	}
 
-	/**
-	 * Sends a message from one user to another (or to a monitor). Checks if the
-	 * user is blocked and acts accordingly. Updates ChatUser message
-	 * sent/received stats. Creates/updates ChatUserContact entry. Sends the
-	 * message. Creates a history entry.
-	 *
-	 * @param fromUser
-	 *            the user the message is from
-	 * @param toUser
-	 *            the user the message is to
-	 * @param text
-	 *            the text of the message
-	 * @param threadId
-	 *            the thread id to associate with the message
-	 * @return true if the message was actually sent (and the user should
-	 *         therefore be charged)
-	 */
 	@Override
 	public
 	String chatMessageSendFromUser (
@@ -202,39 +190,52 @@ class ChatMessageLogicImpl
 
 		log.debug (
 			stringFormat (
-				"chatMessageSendFromUser (%s, %s, \"%s\", %d, %s, %s)",
-				objectManager.objectPath (fromUser, null, true),
-				objectManager.objectPath (toUser, null, true),
-				text.length () > 20 ? text.substring (0, 20) : text,
-				threadId,
-				source,
-				medias == null ? "null" : medias.size ()));
+				"chatMessageSendFromUser (%s)",
+				joinWithSeparator (
+					", ",
+					objectManager.objectPathMini (
+						fromUser),
+					objectManager.objectPathMini (
+						toUser),
+					stringFormat (
+						"\"%s\"",
+						text.length () > 20
+							? text.substring (0, 20)
+							: text),
+					threadId != null
+						? threadId.toString ()
+						: "null",
+					source.toString (),
+					medias != null
+						? Integer.toString (
+							medias.size ())
+						: "null")));
 
-		Calendar calendar =
-			Calendar.getInstance ();
-
-		Date now =
-			new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
 		ChatRec chat =
 			fromUser.getChat ();
 
 		// ignore messages from barred users
 
-		if (! chatCreditLogic.userSpendCheck (
+		if (
+			! chatCreditLogic.userSpendCheck (
 				fromUser,
 				true,
 				threadId,
-				false)) {
+				false)
+		) {
 
-			String message =
+			String errorMessage =
 				stringFormat (
 					"Ignoring message from barred user %s",
 					fromUser.getCode ());
 
-			log.info (message);
+			log.info (
+				errorMessage);
 
-			return message;
+			return errorMessage;
 
 		}
 
@@ -252,16 +253,18 @@ class ChatMessageLogicImpl
 					originalText))
 		) {
 
-			String message =
+			String errorMessage =
 				stringFormat (
 					"Ignoring duplicated message from %s to %s, threadId = %s",
 					fromUser.getCode (),
 					toUser.getCode (),
 					threadId);
 
-			log.info (message);
+			log.info (
+				errorMessage);
 
-			return message;
+			return errorMessage;
+
 		}
 
 		String message =
@@ -287,12 +290,19 @@ class ChatMessageLogicImpl
 		// update chat user stats
 
 		fromUser
-			.setLastSend (now)
-			.setLastAction (now);
+
+			.setLastSend (
+				instantToDate (
+					transaction.now ()))
+
+			.setLastAction (
+				instantToDate (
+					transaction.now ()));
 
 		// reschedule the next ad
 
-		chatUserLogic.scheduleAd (fromUser);
+		chatUserLogic.scheduleAd (
+			fromUser);
 
 		// clear an alarm if appropriate
 
@@ -305,8 +315,8 @@ class ChatMessageLogicImpl
 
 			alarm != null
 
-			&& alarm.getResetTime ().getTime ()
-				< now.getTime ()
+			&& dateToInstant (alarm.getResetTime ())
+				.isBefore (transaction.now ())
 
 			&& alarm.getSticky () == false
 
@@ -317,26 +327,34 @@ class ChatMessageLogicImpl
 
 			chatUserInitiationLogHelper.insert (
 				new ChatUserInitiationLogRec ()
-					.setChatUser (fromUser)
-					.setMonitorChatUser (toUser)
-					.setReason (ChatUserInitiationReason.alarmCancel)
-					.setTimestamp (now)
-					.setAlarmTime (alarm.getAlarmTime ()));
+
+				.setChatUser (
+					fromUser)
+
+				.setMonitorChatUser (
+					toUser)
+
+				.setReason (
+					ChatUserInitiationReason.alarmCancel)
+
+				.setTimestamp (
+					instantToDate (
+						transaction.now ()))
+
+				.setAlarmTime (
+					alarm.getAlarmTime ()));
 
 		}
 
 		// reschedule next outbound
 
-		calendar.setTime (
-			now);
-
-		calendar.add (
-			Calendar.SECOND,
-			fromUser.getChat ().getTimeQuietOutbound ());
-
 		fromUser
+
 			.setNextQuietOutbound (
-				calendar.getTime ());
+				instantToDate (
+					transaction.now ().plus (
+						Duration.standardSeconds (
+							fromUser.getChat ().getTimeQuietOutbound ()))));
 
 		// unschedule any join outbound
 
@@ -370,27 +388,44 @@ class ChatMessageLogicImpl
 		ChatMessageRec chatMessage =
 			objectManager.insert (
 				new ChatMessageRec ()
-					.setChat (fromUser.getChat ())
-					.setFromUser (fromUser)
-					.setToUser (toUser)
-					.setThreadId (threadId)
-					.setOriginalText (originalText)
-					.setStatus (
-						blocked
-							? ChatMessageStatus.blocked
-							: fromUser.getFirstJoin () == null
-								? ChatMessageStatus.signup
-								: ChatMessageStatus.sent)
-					.setSource (source)
-					.setMedias (
-						medias != null
-							? medias
-							: new ArrayList<MediaRec> ()));
+
+			.setChat (
+				fromUser.getChat ())
+
+			.setFromUser (
+				fromUser)
+
+			.setToUser (
+				toUser)
+
+			.setThreadId (
+				threadId)
+
+			.setOriginalText (
+				originalText)
+
+			.setStatus (
+				blocked
+					? ChatMessageStatus.blocked
+					: fromUser.getFirstJoin () == null
+						? ChatMessageStatus.signup
+						: ChatMessageStatus.sent)
+
+			.setSource (
+				source)
+
+			.setMedias (
+				medias != null
+					? medias
+					: new ArrayList<MediaRec> ()));
 
 		// check if we should actually send the message
 
 		if (chatMessage.getStatus () == ChatMessageStatus.sent) {
-			chatMessageSendFromUserPartTwo (chatMessage);
+
+			chatMessageSendFromUserPartTwo (
+				chatMessage);
+
 		}
 
 		// if necessary, send a join hint
@@ -401,9 +436,18 @@ class ChatMessageLogicImpl
 
 			&& ! fromUser.getOnline ()
 
-			&& (fromUser.getLastJoinHint () == null
-				|| fromUser.getLastJoinHint ().getTime () + 12 * 60 * 60 * 1000
-					< now.getTime ())
+			&& (
+
+				fromUser.getLastJoinHint () == null
+
+				|| dateToInstant (
+						fromUser.getLastJoinHint ())
+					.plus (
+						Duration.standardHours (12))
+					.isBefore (
+						transaction.now ())
+
+			)
 
 			&& source == ChatMessageMethod.sms
 
@@ -417,7 +461,11 @@ class ChatMessageLogicImpl
 				commandHelper.findByCode (chat, "help").getId (),
 				Collections.<String,String>emptyMap ());
 
-			fromUser.setLastJoinHint (now);
+			fromUser
+
+				.setLastJoinHint (
+					instantToDate (
+						transaction.now ()));
 
 		}
 
@@ -542,13 +590,17 @@ class ChatMessageLogicImpl
 			case clean:
 
 				chatMessage
-					.setStatus (ChatMessageStatus.sent);
+
+					.setStatus (
+						ChatMessageStatus.sent);
 
 				chatMessageDeliver (
 					chatMessage);
 
-				chatUserContact.setLastDeliveredMessageTime (
-					now);
+				chatUserContact
+
+					.setLastDeliveredMessageTime (
+						now);
 
 				break;
 
@@ -556,13 +608,17 @@ class ChatMessageLogicImpl
 			case auto:
 
 				chatMessage
-					.setStatus (ChatMessageStatus.autoEdited);
+
+					.setStatus (
+						ChatMessageStatus.autoEdited);
 
 				chatMessageDeliver (
 					chatMessage);
 
 				chatUserContact
-					.setLastDeliveredMessageTime (now);
+
+					.setLastDeliveredMessageTime (
+						now);
 
 				chatUserRejectionCountInc (
 					fromUser,
@@ -579,7 +635,9 @@ class ChatMessageLogicImpl
 			case manual:
 
 				chatMessage
-					.setStatus (ChatMessageStatus.moderatorPending);
+
+					.setStatus (
+						ChatMessageStatus.moderatorPending);
 
 				QueueItemRec queueItem =
 					queueLogic.createQueueItem (
@@ -590,10 +648,14 @@ class ChatMessageLogicImpl
 						chatMessage.getOriginalText ().getText ());
 
 				queueItem
-					.setPriority (-10);
+
+					.setPriority (
+						-10);
 
 				chatMessage
-					.setQueueItem (queueItem);
+
+					.setQueueItem (
+						queueItem);
 
 				break;
 
@@ -767,11 +829,15 @@ class ChatMessageLogicImpl
 		if (toUser.getLastDeliveryId () == null)
 			toUser.setLastDeliveryId (0);
 
-		toUser.setLastDeliveryId (
-			toUser.getLastDeliveryId () + 1);
+		toUser
 
-		chatMessage.setDeliveryId (
-			toUser.getLastDeliveryId ());
+			.setLastDeliveryId (
+				toUser.getLastDeliveryId () + 1);
+
+		chatMessage
+
+			.setDeliveryId (
+				toUser.getLastDeliveryId ());
 
 		// delegate as appropriate
 
@@ -829,17 +895,27 @@ class ChatMessageLogicImpl
 		List<ChatMessageRec> messages =
 			chatMessageHelper.search (
 				new ChatMessageSearch ()
-					.toUserId (toUser.getId ())
-					.method (ChatMessageMethod.iphone)
-					.statusIn (
-						ImmutableSet.<ChatMessageStatus>of (
-							ChatMessageStatus.sent,
-							ChatMessageStatus.moderatorApproved,
-							ChatMessageStatus.moderatorAutoEdited,
-							ChatMessageStatus.moderatorEdited))
-					.deliveryIdGreaterThan (toUser.getLastMessagePollId ())
-					.orderBy (ChatMessageSearch.Order.deliveryId));
 
+			.toUserId (
+				toUser.getId ())
+
+			.method (
+				ChatMessageMethod.iphone)
+
+			.statusIn (
+				ImmutableSet.<ChatMessageStatus>of (
+					ChatMessageStatus.sent,
+					ChatMessageStatus.moderatorApproved,
+					ChatMessageStatus.moderatorAutoEdited,
+					ChatMessageStatus.moderatorEdited))
+
+			.deliveryIdGreaterThan (
+				toUser.getLastMessagePollId ())
+
+			.orderBy (
+				ChatMessageSearch.Order.deliveryId)
+
+		);
 
 		@SuppressWarnings ("unused")
 		JigsawApi.PushRequest jigsawRequest =
@@ -878,9 +954,14 @@ class ChatMessageLogicImpl
 		boolean success = true;
 
 		long jigsawStart = System.nanoTime ();
+
 		try {
-			//jigsawApi.pushServer (jigsawRequest);
-		} catch (Exception e) {
+
+			//jigsawApi.pushServer (
+			//	jigsawRequest);
+
+		} catch (Exception exception) {
+
 			exceptionLogic.logException (
 				"unknown",
 				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
@@ -888,11 +969,13 @@ class ChatMessageLogicImpl
 				"JigsawApi.pushServer threw exception",
 				"Chat message id: " + chatMessage.getId () + "\n" +
 				"\n" +
-				ExceptionLogicImpl.throwableDump (e),
+				ExceptionLogicImpl.throwableDump (exception),
 
 				null,
 				false);
+
 			success = false;
+
 		}
 
 		long jigsawEnd =
@@ -980,9 +1063,12 @@ class ChatMessageLogicImpl
 			System.nanoTime ();
 
 		log.info (
-			"Call to urban airship (dev) took " + (urbanEnd - urbanStart) + "ns");
+			stringFormat (
+				"Call to urban airship (dev) took %sns",
+				urbanEnd - urbanStart));
 
 		return success;
+
 	}
 
 	@Override
@@ -1010,8 +1096,14 @@ class ChatMessageLogicImpl
 		chatMonitorInbox =
 			objectManager.insert (
 				new ChatMonitorInboxRec ()
-					.setMonitorChatUser (monitorChatUser)
-					.setUserChatUser (userChatUser));
+
+			.setMonitorChatUser (
+				monitorChatUser)
+
+			.setUserChatUser (
+				userChatUser)
+
+		);
 
 		// find chat user contact
 
@@ -1030,16 +1122,20 @@ class ChatMessageLogicImpl
 
 		String queueCode;
 
-		if (monitorGender == null
-				|| userGender == null) {
+		if (
+			monitorGender == null
+			|| userGender == null
+		) {
 
-			queueCode = "chat_unknown";
+			queueCode =
+				"chat_unknown";
 
 		} else {
 
 			String sexuality =
 				monitorGender == userGender
-					? "gay" : "straight";
+					? "gay"
+					: "straight";
 
 			String gender =
 				monitorGender.toString ();
@@ -1052,8 +1148,12 @@ class ChatMessageLogicImpl
 
 		}
 
-		if (alarm)
-			queueCode += "_alarm";
+		if (alarm) {
+
+			queueCode +=
+				"_alarm";
+
+		}
 
 		QueueRec queue =
 			queueLogic.findQueue (
@@ -1062,7 +1162,7 @@ class ChatMessageLogicImpl
 
 		// and create the queue item
 
-		QueueItemRec qi =
+		QueueItemRec queueItem =
 			queueLogic.createQueueItem (
 				queue,
 				chatUserContact,
@@ -1070,7 +1170,10 @@ class ChatMessageLogicImpl
 				userChatUser.getCode (),
 				"");
 
-		chatMonitorInbox.setQueueItem (qi);
+		chatMonitorInbox
+
+			.setQueueItem (
+				queueItem);
 
 		// and return
 
@@ -1079,7 +1182,8 @@ class ChatMessageLogicImpl
 	}
 
 	@Override
-	public boolean chatMessageDeliverViaSms (
+	public
+	boolean chatMessageDeliverViaSms (
 			ChatMessageRec chatMessage,
 			String text) {
 
@@ -1093,30 +1197,48 @@ class ChatMessageLogicImpl
 			toUser.getChat ();
 
 		List<String> stringParts;
+
 		try {
 
 			stringParts =
 				MessageSplitter.split (
 					text,
-					messageFromTemplates (fromUser));
+					messageFromTemplates (
+						fromUser));
 
 		} catch (IllegalArgumentException exception) {
 
-			log.error ("MessageSplitter.split threw exception: " + exception);
+			log.error (
+				stringFormat (
+					"MessageSplitter.split threw exception: %s",
+					exception));
 
 			exceptionLogic.logException (
 				"unknown",
 				"ChatReceivedHandler.sendUserMessage (...)",
 				"MessageSplitter.split (...) threw IllegalArgumentException",
 
-				"Error probably caused by illegal characters in message."
-					+ " Ignoring error.\n" +
-				"\n" +
-				"fromUser.id = " + fromUser.getId () + "\n" +
-				"toUser.id = " + toUser.getId () + "\n" +
-				"text = '" + text + "'\n" +
-				"\n" +
-				ExceptionLogicImpl.throwableDump (exception),
+				stringFormat (
+
+					"Error probably caused by illegal characters in message. ",
+					" Ignoring error.\n",
+
+					"\n",
+
+					"fromUser.id = %s\n",
+					fromUser.getId (),
+
+					"toUser.id = %s\n",
+					toUser.getId (),
+
+					"text = '%s'\n",
+					text,
+
+					"\n",
+
+					"%s",
+					ExceptionLogicImpl.throwableDump (
+						exception)),
 
 				null,
 				false);
@@ -1133,9 +1255,14 @@ class ChatMessageLogicImpl
 		List<TextRec> textParts =
 			new ArrayList<TextRec> ();
 
-		for (String part : stringParts)
+		for (String part
+				: stringParts) {
+
 			textParts.add (
-				textHelper.findOrCreate (part));
+				textHelper.findOrCreate (
+					part));
+
+		}
 
 		Integer threadId =
 			chatSendLogic.sendMessageMagic (

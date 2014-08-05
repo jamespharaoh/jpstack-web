@@ -5,26 +5,47 @@ import static wbs.framework.utils.etc.Misc.in;
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
-import wbs.platform.console.html.ObsoleteMonthField;
+import javax.inject.Inject;
+
+import org.joda.time.DateTimeConstants;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+import org.joda.time.YearMonth;
+
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.platform.graph.console.GraphScale;
 
 public abstract
 class MonthlyHistoGraphImageResponder
 	extends GraphImageResponder {
 
+	// dependencies
+
+	@Inject
+	ChatMiscLogic chatMiscLogic;
+
+	// state
+
 	protected
 	List<Integer> values =
-		new ArrayList<Integer>();
+		new ArrayList<Integer> ();
 
 	protected
-	Date minTime;
+	DateTimeZone timezone;
 
 	protected
-	Date maxTime;
+	YearMonth yearMonth;
+
+	protected
+	Instant minTime;
+
+	protected
+	Instant maxTime;
+
+	// implementation
 
 	public
 	MonthlyHistoGraphImageResponder (
@@ -41,43 +62,35 @@ class MonthlyHistoGraphImageResponder
 
 	protected abstract
 	void prepareData (
-			Date minTime,
-			Date maxTime);
+			Instant minTime,
+			Instant maxTime);
+
+	protected abstract
+	DateTimeZone timezone ();
 
 	@Override
 	protected
 	void prepareData () {
 
-		ObsoleteMonthField monthField =
-			ObsoleteMonthField.parse (requestContext.parameter ("month"));
+		timezone =
+			timezone ();
 
-		if (monthField.date == null)
-			throw new RuntimeException ();
+		yearMonth =
+			YearMonth.parse (
+				requestContext.parameter ("month"));
 
 		minTime =
-			monthField.date;
-
-		Calendar calendar =
-			Calendar.getInstance();
-
-		calendar.setTime (
-			monthField.date);
-
-		int month =
-			calendar.get (Calendar.MONTH);
-
-		while (calendar.get (Calendar.MONTH) == month) {
-
-			values.add (0);
-
-			calendar.add (
-				Calendar.DATE,
-				1);
-
-		}
+			yearMonth
+				.toLocalDate (1)
+				.toDateTimeAtStartOfDay (timezone)
+				.toInstant ();
 
 		maxTime =
-			calendar.getTime ();
+			yearMonth
+				.plusMonths (1)
+				.toLocalDate (1)
+				.toDateTimeAtStartOfDay (timezone)
+				.toInstant ();
 
 		prepareData (
 			minTime,
@@ -111,31 +124,35 @@ class MonthlyHistoGraphImageResponder
 
 		// draw dates
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		for (
+			int day = 0;
+			day < values.size ();
+			day ++
+		) {
 
-		calendar.setTime (minTime);
-
-		for (int i = 0; i < values.size (); i++) {
+			LocalDate date =
+				yearMonth.toLocalDate (
+					day + 1);
 
 			graphics.setColor (
-				in (calendar.get (Calendar.DAY_OF_WEEK),
-						Calendar.SUNDAY,
-						Calendar.SATURDAY)
+				in (
+						date.getDayOfWeek (),
+						DateTimeConstants.SATURDAY,
+						DateTimeConstants.SUNDAY)
 					? Color.red
 					: Color.black);
 
 			int x1 =
-				+ xBound (i)
+				+ xBound (day)
 				+ space
 				+ 1;
 
 			int x2 =
-				+ xBound (i + 1)
+				+ xBound (day + 1)
 				- space + 1;
 
 			String string =
-				Integer.toString (i + 1);
+				Integer.toString (day + 1);
 
 			int x =
 				(
@@ -149,10 +166,6 @@ class MonthlyHistoGraphImageResponder
 				x,
 				yOrigin + fontMetrics.getAscent ());
 
-			calendar.add (
-				Calendar.DATE,
-				1);
-
 		}
 
 		// draw weekends
@@ -160,21 +173,28 @@ class MonthlyHistoGraphImageResponder
 		graphics.setColor (
 			new Color (1.0F, 0.0F, 0.0F, 0.15F));
 
-		calendar.setTime (
-			minTime);
+		for (
+			int day = 0;
+			day < values.size ();
+			day ++
+		) {
 
-		for (int i = 0; i < values.size (); i++) {
+			LocalDate date =
+				yearMonth.toLocalDate (
+					day + 1);
 
-			if (in (
-					calendar.get (Calendar.DAY_OF_WEEK),
-					Calendar.SUNDAY,
-					Calendar.SATURDAY)) {
+			if (
+				in (
+					date.getDayOfWeek (),
+					DateTimeConstants.SATURDAY,
+					DateTimeConstants.SUNDAY)
+			) {
 
 				int x1 =
-					xBound (i);
+					xBound (day);
 
 				int x2 =
-					xBound (i + 1);
+					xBound (day + 1);
 
 				Rectangle2D rect =
 					new Rectangle2D.Float (
@@ -187,10 +207,6 @@ class MonthlyHistoGraphImageResponder
 					rect);
 
 			}
-
-			calendar.add (
-				Calendar.DATE,
-				1);
 
 		}
 

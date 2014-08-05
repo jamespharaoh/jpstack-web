@@ -12,11 +12,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
+
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.core.console.DayCounter;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -39,6 +43,9 @@ class ChatSupervisorConversationPart
 	ChatMessageObjectHelper chatMessageHelper;
 
 	@Inject
+	ChatMiscLogic chatMiscLogic;
+
+	@Inject
 	ChatUserConsoleHelper chatUserHelper;
 
 	@Inject
@@ -51,6 +58,8 @@ class ChatSupervisorConversationPart
 	TimeFormatter timeFormatter;
 
 	// state
+
+	DateTimeZone timeZone;
 
 	ChatRec chat;
 	ChatUserRec userChatUser;
@@ -104,6 +113,13 @@ class ChatSupervisorConversationPart
 					chat.getId ()));
 
 		}
+
+		ChatSchemeRec chatScheme =
+			userChatUser.getChatScheme ();
+
+		timeZone =
+			DateTimeZone.forID (
+				chatScheme.getTimezone ());
 
 		chatMessages =
 			new ArrayList<ChatMessageRec> ();
@@ -227,13 +243,26 @@ class ChatSupervisorConversationPart
 			"<th>Monitor</th>\n",
 			"</tr>\n");
 
-		DayCounter dayCounter =
-			new DayCounter ();
+		DateTimeZone timezone =
+			chatMiscLogic.timezone (
+				chat);
+
+		LocalDate previousDate = null;
 
 		for (ChatMessageRec chatMessage
 				: chatMessages) {
 
-			if (dayCounter.nextDate (chatMessage.getTimestamp ())) {
+			LocalDate nextDate =
+				dateToInstant (
+					chatMessage.getTimestamp ())
+				.toDateTime (
+					timezone)
+				.toLocalDate ();
+
+			if (
+				previousDate == null
+				|| nextDate != previousDate
+			) {
 
 				printFormat (
 					"<tr class=\"sep\">\n");
@@ -243,6 +272,7 @@ class ChatSupervisorConversationPart
 
 					"<td colspan=\"3\">%h</td>\n",
 					timeFormatter.instantToDateStringLong (
+						timeZone,
 						dateToInstant (
 							chatMessage.getTimestamp ())),
 
@@ -261,6 +291,7 @@ class ChatSupervisorConversationPart
 			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimeString (
+					timeZone,
 					dateToInstant (
 						chatMessage.getTimestamp ())));
 

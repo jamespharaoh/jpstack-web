@@ -1,13 +1,18 @@
 package wbs.apn.chat.affiliate.console;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.core.model.ChatObjectHelper;
@@ -77,23 +82,36 @@ class ChatAffiliateComparePart
 			chatHelper.find (
 				requestContext.stuffInt ("chatId"));
 
-		// workout start time
+		// work out first join time
 
-		Calendar cal =
-			Calendar.getInstance ();
+		DateTimeZone timeZone =
+			DateTimeZone.forID (
+				chat.getTimezone ());
 
-		cal.add (
-			Calendar.SECOND,
-			- timePeriodSeconds);
+		Instant firstJoinAfter =
+			DateTime
+				.now (
+					timeZone)
+				.minusSeconds (
+					timePeriodSeconds)
+				.toInstant ();
 
 		// get all relevant users
 
 		List<Integer> newUserIds =
 			chatUserHelper.searchIds (
 				ImmutableMap.<String,Object>builder ()
-					.put ("chatId", chat.getId ())
-					.put ("firstJoinAfter", cal.getTime ())
-					.build ());
+
+			.put (
+				"chatId",
+				chat.getId ())
+
+			.put (
+				"firstJoinAfter",
+				instantToDate (
+					firstJoinAfter))
+
+			.build ());
 
 		// count them grouping by affiliate
 

@@ -1,15 +1,13 @@
 package wbs.apn.chat.date.daemon;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.min;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -19,10 +17,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
+import org.joda.time.Duration;
+import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.model.ChatContactRec;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
@@ -49,6 +50,8 @@ public
 class ChatDateDaemon
 		extends AbstractDaemonService {
 
+	// dependencies
+
 	@Inject
 	ChatCreditLogic chatCreditLogic;
 
@@ -57,6 +60,9 @@ class ChatDateDaemon
 
 	@Inject
 	ChatInfoLogic chatInfoLogic;
+
+	@Inject
+	ChatMiscLogic chatMiscLogic;
 
 	@Inject
 	ChatUserObjectHelper chatUserHelper;
@@ -73,8 +79,12 @@ class ChatDateDaemon
 	@Inject
 	LocatorLogic locatorLogic;
 
+	// properties
+
 	@Getter @Setter
 	int datingSleepSeconds = 60 * 60; // one hour
+
+	// details
 
 	@Override
 	protected
@@ -175,7 +185,10 @@ class ChatDateDaemon
 			"Begin dating for " + chat.getCode ());
 
 		int hour =
-			getHour ();
+			transaction
+				.now ()
+				.toDateTime (chatMiscLogic.timezone (chat))
+				.getHourOfDay ();
 
 		LocalDate today =
 			LocalDate.now ();
@@ -278,7 +291,7 @@ class ChatDateDaemon
 					chatUser.getDateStartHour (),
 					chatUser.getDateEndHour ())) {
 
-				numHours++;
+				numHours ++;
 
 				log.debug ("Ignoring " + chatUser.getId () + " (time)");
 
@@ -288,7 +301,7 @@ class ChatDateDaemon
 
 			if (chatUser.getOnline ()) {
 
-				numOnline++;
+				numOnline ++;
 
 				log.info ("Ignoring " + chatUser.getId () + " (online)");
 
@@ -296,21 +309,26 @@ class ChatDateDaemon
 
 			}
 
-			if (chatUser.getDateDailyDate () != null
-					&& equal (chatUser.getDateDailyDate (), today)
-					&& chatUser.getDateDailyCount () < 1) {
+			if (
+				chatUser.getDateDailyDate () != null
+				&& equal (chatUser.getDateDailyDate (), today)
+				&& chatUser.getDateDailyCount () < 1
+			) {
 
-				numSent++;
+				numSent ++;
 
-				log.debug ("Ignoring " + chatUser.getId () + " (daily limit)");
+				log.debug (
+					"Ignoring " + chatUser.getId () + " (daily limit)");
 
 				continue;
 
 			}
 
-			log.debug ("Including " + chatUser.getId ());
+			log.debug (
+				"Including " + chatUser.getId ());
 
-			datingUserIds.add (chatUser.getId ());
+			datingUserIds.add (
+				chatUser.getId ());
 
 		}
 
@@ -366,12 +384,6 @@ class ChatDateDaemon
 				"Doing user %s",
 				thisUserId));
 
-		int hour =
-			getHour ();
-
-		LocalDate today =
-			LocalDate.now ();
-
 		boolean status = false;
 
 		@Cleanup
@@ -381,6 +393,21 @@ class ChatDateDaemon
 		ChatUserRec thisUser =
 			chatUserHelper.find (
 				thisUserId);
+
+		ChatRec chat =
+			thisUser.getChat ();
+
+		int hour =
+			transaction
+				.now ()
+				.toDateTime (chatMiscLogic.timezone (chat))
+				.getHourOfDay ();
+
+		LocalDate today =
+			transaction
+				.now ()
+				.toDateTime (chatMiscLogic.timezone (chat))
+				.toLocalDate ();
 
 		// inc the daily count thing as appropriate
 
@@ -615,6 +642,9 @@ class ChatDateDaemon
 			boolean reuseOldUsers,
 			DateUserStats dateUserStats) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		// check its not us
 
 		if (equal (thisUser.getId (), thatUserInfo.id))
@@ -660,34 +690,52 @@ class ChatDateDaemon
 
 			if (reuseOldUsers) {
 
-				GregorianCalendar compareDateC =
-					new GregorianCalendar ();
-
-				compareDateC.add (Calendar.DATE, -30);
-
-				Date compareDate =
-					compareDateC.getTime ();
+				Instant compareTime =
+					transaction
+						.now ()
+						.minus (Duration.standardDays (30));
 
 				if (sendPhoto) {
 
-					if (contact.getLastPicTime () != null
-							&& compareDate.before (contact.getLastPicTime ())) {
+					if (
+						contact.getLastPicTime () != null
+						&& compareTime.isBefore (
+							dateToInstant (
+								contact.getLastPicTime ()))
+					) {
 
-						dateUserStats.numAlreadySent++;
+						dateUserStats.numAlreadySent ++;
+
 						return null;
+
 					}
 
 				} else {
 
-					if ((contact.getLastPicTime () != null
-							&& compareDate.before (contact.getLastPicTime ()))
+					if (
 
-						|| (contact.getLastInfoTime () != null
-							&& compareDate.before (contact.getLastInfoTime ()))) {
+						(
+							contact.getLastPicTime () != null
+							&& compareTime.isBefore (
+								dateToInstant (
+									contact.getLastPicTime ()))
+						)
 
-						dateUserStats.numAlreadySent++;
+						|| (
+							contact.getLastInfoTime () != null
+							&& compareTime.isBefore (
+								dateToInstant (
+									contact.getLastInfoTime ()))
+						)
+
+					) {
+
+						dateUserStats.numAlreadySent ++;
+
 						return null;
+
 					}
+
 				}
 
 			} else {
@@ -696,8 +744,10 @@ class ChatDateDaemon
 
 					if (contact.getLastPicTime () != null) {
 
-						dateUserStats.numAlreadySent++;
+						dateUserStats.numAlreadySent ++;
+
 						return null;
+
 					}
 
 				} else {
@@ -825,14 +875,6 @@ class ChatDateDaemon
 			return false;
 
 		return true;
-
-	}
-
-	public
-	int getHour () {
-
-		return Calendar.getInstance ().get (
-			Calendar.HOUR_OF_DAY);
 
 	}
 

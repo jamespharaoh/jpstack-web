@@ -4,16 +4,18 @@ import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.spacify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.sum;
 
-import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
+
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -36,6 +38,9 @@ class ChatUserHistoryPart
 
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
+
+	@Inject
+	ChatUserLogic chatUserLogic;
 
 	@Inject
 	TimeFormatter timeFormatter;
@@ -101,10 +106,11 @@ class ChatUserHistoryPart
 			"<th>Monitor</th>\n",
 			"</tr>\n");
 
-		int dayNumber = 0;
+		DateTimeZone timezone =
+			chatUserLogic.timezone (
+				chatUser);
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		LocalDate previousDate = null;
 
 		for (ChatMessageRec chatMessage
 				: chatMessages) {
@@ -127,18 +133,15 @@ class ChatUserHistoryPart
 						otherUser.getName ())
 					: otherUser.getCode ();
 
-			calendar.setTime (
-				chatMessage.getTimestamp ());
+			LocalDate nextDate =
+				dateToInstant (chatMessage.getTimestamp ())
+					.toDateTime (timezone)
+					.toLocalDate ();
 
-			int newDayNumber =
-				sum (
-					calendar.get (Calendar.YEAR) << 9,
-					calendar.get (Calendar.DAY_OF_YEAR));
+			if (nextDate != previousDate) {
 
-			if (newDayNumber != dayNumber) {
-
-				dayNumber =
-					newDayNumber;
+				previousDate =
+					nextDate;
 
 				printFormat (
 					"<tr class=\"sep\">\n");
@@ -148,6 +151,8 @@ class ChatUserHistoryPart
 
 					"<td colspan=\"5\">%h</td>\n",
 					timeFormatter.instantToDateStringLong (
+						chatUserLogic.timezone (
+							chatUser),
 						dateToInstant (
 							chatMessage.getTimestamp ())),
 
@@ -181,7 +186,10 @@ class ChatUserHistoryPart
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimeString (
-					dateToInstant (chatMessage.getTimestamp ())),
+					chatUserLogic.timezone (
+						chatUser),
+					dateToInstant (
+						chatMessage.getTimestamp ())),
 
 				"<td>%s</td>\n",
 				Html.nbsp (

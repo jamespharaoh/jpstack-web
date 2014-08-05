@@ -81,6 +81,7 @@ class SubscriptionAdminSearchPart
 			stringFormat (
 				"document.getElementById ('active_date').value = '%j'",
 				timeFormatter.instantToTimestampString (
+					timeFormatter.defaultTimezone (),
 					Instant.now ())),
 			" value=\"now\"",
 			"></td>\n",

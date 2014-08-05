@@ -4,15 +4,19 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.joda.time.YearMonth;
+
 import wbs.platform.console.html.ObsoleteDateLinks;
-import wbs.platform.console.html.ObsoleteMonthField;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.console.request.EmptyFormData;
 
 @Accessors (fluent = true)
-public
-abstract class AbstractMonthlyGraphPart
+public abstract
+class AbstractMonthlyGraphPart
 	extends AbstractPagePart {
+
+	// dependencies
 
 	@Getter @Setter
 	String myLocalPart;
@@ -20,14 +24,19 @@ abstract class AbstractMonthlyGraphPart
 	@Getter @Setter
 	String imageLocalPart;
 
-	ObsoleteMonthField monthField;
+	// state
+
+	YearMonth yearMonth;
+
+	// implementation
 
 	@Override
 	public
 	void prepare () {
 
-		monthField = ObsoleteMonthField.parse (
-			requestContext.parameter ("month"));
+		yearMonth =
+			YearMonth.parse (
+				requestContext.parameter ("month"));
 	}
 
 	@Override
@@ -49,7 +58,7 @@ abstract class AbstractMonthlyGraphPart
 			" type=\"text\"",
 			" name=\"month\"",
 			" value=\"%h\"",
-			monthField.text,
+			yearMonth.toString (),
 			">",
 
 			"<input",
@@ -60,14 +69,14 @@ abstract class AbstractMonthlyGraphPart
 		printFormat (
 			"</form>\n");
 
-		if (monthField.date != null) {
+		if (yearMonth != null) {
 
 			ObsoleteDateLinks.monthlyBrowserParagraph (
 				out,
 				requestContext.resolveLocalUrl (
 					myLocalPart),
 				EmptyFormData.instance,
-				monthField.date);
+				yearMonth.toLocalDate (1).toDateTimeAtStartOfDay ().toDate ());
 
 			printFormat (
 				"<p>");
@@ -81,7 +90,7 @@ abstract class AbstractMonthlyGraphPart
 						"%s",
 						imageLocalPart,
 						"?month=%u",
-						monthField.text)),
+						yearMonth.toString ())),
 				">");
 
 			printFormat (

@@ -11,6 +11,7 @@ import javax.inject.Inject;
 
 import wbs.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.apn.chat.broadcast.model.ChatBroadcastRec;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -31,6 +32,9 @@ class ChatBroadcastListPart
 
 	@Inject
 	ChatObjectHelper chatHelper;
+
+	@Inject
+	ChatMiscLogic chatMiscLogic;
 
 	@Inject
 	CurrencyLogic currencyLogic;
@@ -95,7 +99,10 @@ class ChatBroadcastListPart
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
-					dateToInstant (chatBroadcast.getTimestamp ())),
+					chatMiscLogic.timezone (
+						chat),
+					dateToInstant (
+						chatBroadcast.getTimestamp ())),
 
 				"<td>%h</td>\n",
 				objectManager.objectPath (
@@ -143,9 +150,13 @@ class ChatBroadcastListPart
 				stringFormat (
 					"last action %s to %s",
 					timeFormatter.instantToTimestampString (
+						chatMiscLogic.timezone (
+							chat),
 						dateToInstant (
 							chatBroadcast.getSearchLastActionFrom ())),
 					timeFormatter.instantToTimestampString (
+						chatMiscLogic.timezone (
+							chat),
 						dateToInstant (
 							chatBroadcast.getSearchLastActionTo ()))));
 
@@ -155,6 +166,8 @@ class ChatBroadcastListPart
 				stringFormat (
 					"last action from %s",
 					timeFormatter.instantToTimestampString (
+						chatMiscLogic.timezone (
+							chat),
 						dateToInstant (
 							chatBroadcast.getSearchLastActionFrom ()))));
 
@@ -164,6 +177,8 @@ class ChatBroadcastListPart
 				stringFormat (
 					"last action to %s",
 					timeFormatter.instantToTimestampString (
+						chatMiscLogic.timezone (
+							chat),
 						dateToInstant (
 							chatBroadcast.getSearchLastActionTo ()))));
 

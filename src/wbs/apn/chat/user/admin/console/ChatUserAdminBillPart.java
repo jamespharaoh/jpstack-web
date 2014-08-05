@@ -3,23 +3,26 @@ package wbs.apn.chat.user.admin.console;
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
+import org.joda.time.LocalDate;
 
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.bill.model.ChatUserBillLogObjectHelper;
 import wbs.apn.chat.bill.model.ChatUserBillLogRec;
+import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.console.part.AbstractPagePart;
@@ -41,7 +44,13 @@ class ChatUserAdminBillPart
 	ChatUserConsoleHelper chatUserHelper;
 
 	@Inject
+	ChatUserLogic chatUserLogic;
+
+	@Inject
 	ConsoleObjectManager consoleObjectManager;
+
+	@Inject
+	Database database;
 
 	@Inject
 	TimeFormatter timeFormatter;
@@ -49,6 +58,7 @@ class ChatUserAdminBillPart
 	// state
 
 	ChatUserRec chatUser;
+	ChatRec chat;
 
 	List<ChatUserBillLogRec> todayBillLogs;
 	List<ChatUserBillLogRec> allBillLogs;
@@ -59,6 +69,9 @@ class ChatUserAdminBillPart
 	@Override
 	public
 	void prepare () {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		chatUser =
 			chatUserHelper.find (
@@ -72,48 +85,40 @@ class ChatUserAdminBillPart
 			return;
 		}
 
-		Calendar calendar =
-			new GregorianCalendar ();
+		DateTimeZone timezone =
+			chatUserLogic.timezone (
+				chatUser);
 
-		calendar.set (
-			Calendar.HOUR_OF_DAY,
-			0);
+		LocalDate today =
+			transaction
+				.now ()
+				.toDateTime (timezone)
+				.toLocalDate ();
 
-		calendar.set (
-			Calendar.MINUTE,
-			0);
+		Instant startTime =
+			today
+				.toDateTimeAtStartOfDay (timezone)
+				.toInstant ();
 
-		calendar.set (
-			Calendar.SECOND,
-			0);
-
-		calendar.set (
-			Calendar.MILLISECOND,
-			0);
-
-		Date from =
-			calendar.getTime ();
-
-		calendar.add (
-			Calendar.DATE,
-			1);
-
-		Date to =
-			calendar.getTime ();
+		Instant endTime =
+			today
+				.plusDays (1)
+				.toDateTimeAtStartOfDay (timezone)
+				.toInstant ();
 
 		todayBillLogs =
 			chatUserBillLogHelper.findByTimestamp (
 				chatUser,
 				new Interval (
-					dateToInstant (from),
-					dateToInstant (to)));
+					startTime,
+					endTime));
 
 		allBillLogs =
 			chatUserBillLogHelper.findByTimestamp (
 				chatUser,
 				new Interval (
 					new Instant (0),
-					dateToInstant (to)));
+					endTime));
 
 		billLimitReached =
 			chatCreditLogic.userBillLimitApplies (
@@ -207,11 +212,17 @@ class ChatUserAdminBillPart
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToDateStringShort (
-					dateToInstant (billLog.getTimestamp ())),
+					chatUserLogic.timezone (
+						chatUser),
+					dateToInstant (
+						billLog.getTimestamp ())),
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimeString (
-					dateToInstant (billLog.getTimestamp ())),
+					chatUserLogic.timezone (
+						chatUser),
+					dateToInstant (
+						billLog.getTimestamp ())),
 
 				"%s\n",
 				consoleObjectManager.tdForObject (

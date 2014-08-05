@@ -93,11 +93,13 @@ class PsychicHelpSummaryPart
 
 					"<td>%h</td>\n",
 					timeFormatter.instantToDateStringShort (
+						timeFormatter.defaultTimezone (),
 						dateToInstant (
 							helpRequest.getResponseTime ().toDate ())),
 
 					"<td>%h</td>\n",
 					timeFormatter.instantToTimeString (
+						timeFormatter.defaultTimezone (),
 						dateToInstant (
 							helpRequest.getResponseTime ().toDate ())),
 
@@ -117,11 +119,15 @@ class PsychicHelpSummaryPart
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToDateStringShort (
-					dateToInstant (helpRequest.getRequestTime ().toDate ())),
+					timeFormatter.defaultTimezone (),
+					dateToInstant (
+						helpRequest.getRequestTime ().toDate ())),
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimeString (
-					dateToInstant (helpRequest.getRequestTime ().toDate ())),
+					timeFormatter.defaultTimezone (),
+					dateToInstant (
+						helpRequest.getRequestTime ().toDate ())),
 
 				"<td>%h</td>\n",
 				helpRequest.getRequestText ().getText (),

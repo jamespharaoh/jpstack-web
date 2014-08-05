@@ -489,7 +489,9 @@ class ManualResponderRequestPendingSummaryPart
 					"<td>%s</td>\n",
 					ifNull (
 						timeFormatter.instantToTimestampString (
-							dateToInstant (oldReply.getTimestamp ())),
+							timeFormatter.defaultTimezone (),
+							dateToInstant (
+								oldReply.getTimestamp ())),
 						"-"));
 
 				printFormat (
@@ -513,7 +515,9 @@ class ManualResponderRequestPendingSummaryPart
 			printFormat (
 				"<td colspan=\"2\">%h</td>\n",
 				timeFormatter.instantToTimestampString (
-					dateToInstant (oldManualResponderRequest.getTimestamp ())));
+					timeFormatter.defaultTimezone (),
+					dateToInstant (
+						oldManualResponderRequest.getTimestamp ())));
 
 			printFormat (
 				"<td>%h</td>\n",

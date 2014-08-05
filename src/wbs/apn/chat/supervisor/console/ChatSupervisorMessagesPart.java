@@ -3,23 +3,24 @@ package wbs.apn.chat.supervisor.console;
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import org.joda.time.Instant;
 import org.joda.time.Interval;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.core.console.ChatConsoleLogic;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.html.ObsoleteDateField;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.user.model.UserObjectHelper;
@@ -29,6 +30,8 @@ import wbs.platform.user.model.UserRec;
 public
 class ChatSupervisorMessagesPart
 	extends AbstractPagePart {
+
+	// dependencies
 
 	@Inject
 	ChatConsoleLogic chatConsoleLogic;
@@ -40,24 +43,29 @@ class ChatSupervisorMessagesPart
 	ChatMessageObjectHelper chatMessageHelper;
 
 	@Inject
+	ChatMiscLogic chatMiscLogic;
+
+	@Inject
 	TimeFormatter timeFormatter;
 
 	@Inject
 	UserObjectHelper userHelper;
 
+	// state
+
+	ChatRec chat;
+
 	List<ChatMessageRec> chatMessages;
+
+	// implementation
 
 	@Override
 	public
 	void prepare () {
 
-		ChatRec chat =
+		chat =
 			chatHelper.find (
 				requestContext.stuffInt ("chatId"));
-
-		ObsoleteDateField dateField =
-			ObsoleteDateField.parse (
-				requestContext.parameter ("date"));
 
 		int hour =
 			Integer.parseInt (
@@ -67,25 +75,21 @@ class ChatSupervisorMessagesPart
 			Integer.parseInt (
 				requestContext.parameter ("user_id"));
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		LocalDate date =
+			LocalDate.parse (
+				requestContext.parameter ("date"));
 
-		calendar.setTime (
-			dateField.date);
+		Instant startTime =
+			date
+				.toDateTime (
+					new LocalTime (hour, 0, 0))
+				.toInstant ();
 
-		calendar.add (
-			Calendar.HOUR,
-			hour);
-
-		Date startTime =
-			calendar.getTime ();
-
-		calendar.add (
-			Calendar.HOUR,
-			1);
-
-		Date endTime =
-			calendar.getTime ();
+		Instant endTime =
+			date
+				.toDateTime (
+					new LocalTime (hour + 1, 0, 0))
+				.toInstant ();
 
 		UserRec senderUser =
 			userHelper.find (
@@ -96,8 +100,8 @@ class ChatSupervisorMessagesPart
 				chat,
 				senderUser,
 				new Interval (
-					dateToInstant (startTime),
-					dateToInstant (endTime)));
+					startTime,
+					endTime));
 
 		Collections.sort (
 			chatMessages);
@@ -144,7 +148,10 @@ class ChatSupervisorMessagesPart
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimeString (
-					dateToInstant (chatMessage.getTimestamp ())),
+					chatMiscLogic.timezone (
+						chat),
+					dateToInstant (
+						chatMessage.getTimestamp ())),
 
 				"<td>%h</td>\n",
 				chatMessage.getOriginalText ().getText (),

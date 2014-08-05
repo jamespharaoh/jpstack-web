@@ -4,13 +4,16 @@ import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Calendar;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
+
 import wbs.apn.chat.help.model.ChatHelpLogRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
@@ -23,14 +26,24 @@ public
 class ChatUserHelpPart
 	extends AbstractPagePart {
 
+	// dependencies
+
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
 
 	@Inject
+	ChatUserLogic chatUserLogic;
+
+	@Inject
 	TimeFormatter timeFormatter;
 
+	// state
+
 	ChatUserRec chatUser;
-	Set<ChatHelpLogRec> helps;
+
+	Set<ChatHelpLogRec> chatHelpLogs;
+
+	// implementation
 
 	@Override
 	public
@@ -40,7 +53,7 @@ class ChatUserHelpPart
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
 
-		helps =
+		chatHelpLogs =
 			new TreeSet<ChatHelpLogRec> (
 				chatUser.getChatHelpLogs ());
 
@@ -60,7 +73,7 @@ class ChatUserHelpPart
 				"top.frames['inbox'].location='%j';",
 				link));
 
-		if (helps.size () == 0) {
+		if (chatHelpLogs.size () == 0) {
 
 			printFormat (
 				"<p>No history to display.</p>\n");
@@ -81,24 +94,24 @@ class ChatUserHelpPart
 			"<th>User</th>\n",
 			"</tr>\n");
 
-		int dayNumber = 0;
+		LocalDate previousDate = null;
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		DateTimeZone timezone =
+			chatUserLogic.timezone (
+				chatUser);
 
-		for (ChatHelpLogRec help : helps) {
+		for (ChatHelpLogRec chatHelpLog
+				: chatHelpLogs) {
 
-			calendar.setTime (
-				help.getTimestamp ());
+			LocalDate nextDate =
+				dateToInstant (chatHelpLog.getTimestamp ())
+					.toDateTime (timezone)
+					.toLocalDate ();
 
-			int newDayNumber =
-				+ (calendar.get (Calendar.YEAR) << 9)
-				+ calendar.get (Calendar.DAY_OF_YEAR);
+			if (nextDate != previousDate) {
 
-			if (newDayNumber != dayNumber) {
-
-				dayNumber =
-					newDayNumber;
+				previousDate =
+					nextDate;
 
 				printFormat (
 					"<tr class=\"sep\">\n");
@@ -108,7 +121,10 @@ class ChatUserHelpPart
 
 					"<td colspan=\"5\">%h</td>\n",
 					timeFormatter.instantToDateStringLong (
-						dateToInstant (help.getTimestamp ())),
+						chatUserLogic.timezone (
+							chatUser),
+						dateToInstant (
+							chatHelpLog.getTimestamp ())),
 
 					"</tr>\n");
 
@@ -116,7 +132,7 @@ class ChatUserHelpPart
 
 			String rowClass =
 				MessageConsoleStuff.classForMessageDirection (
-					help.getDirection ());
+					chatHelpLog.getDirection ());
 
 			printFormat (
 				"<tr class=\"%h\">\n",
@@ -125,23 +141,26 @@ class ChatUserHelpPart
 				"<td style=\"background: %h\">&nbsp;</td>\n",
 				Html.genHtmlColor (
 					ifNull (
-						help.getOurNumber (),
+						chatHelpLog.getOurNumber (),
 						0)),
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimeString (
-					dateToInstant (help.getTimestamp ())),
+					chatUserLogic.timezone (
+						chatUser),
+					dateToInstant (
+						chatHelpLog.getTimestamp ())),
 
 				"<td>%h</td>\n",
-				help.getText (),
+				chatHelpLog.getText (),
 
 				"<td>%h</td>\n",
-				help.getOurNumber (),
+				chatHelpLog.getOurNumber (),
 
 				"<td>%h</td>\n",
-				help.getUser () == null
+				chatHelpLog.getUser () == null
 					? ""
-					: help.getUser ().getUsername (),
+					: chatHelpLog.getUser ().getUsername (),
 
 				"</tr>\n");
 

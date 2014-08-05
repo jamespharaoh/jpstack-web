@@ -2,9 +2,9 @@ package wbs.apn.chat.user.join.daemon;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -19,6 +19,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
+import org.joda.time.Duration;
+import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
@@ -165,7 +167,6 @@ class ChatJoiner {
 
 	boolean locatorEnabled = false;
 
-	Date now = new Date ();
 	ChatRec chat;
 	ChatUserRec chatUser;
 	MessageRec message;
@@ -914,8 +915,8 @@ class ChatJoiner {
 	private
 	boolean joinPart1 () {
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		Transaction transaction =
+			database.currentTransaction ();
 
 		// lookup stuff
 
@@ -989,21 +990,26 @@ class ChatJoiner {
 
 		if (chatUser.getLastJoin () == null) {
 
-			calendar.setTime (now);
-
-			calendar.add (
-				Calendar.MINUTE,
-				20);
+			Instant nextRegisterHelpTime =
+				transaction
+					.now ()
+					.plus (Duration.standardMinutes (20));
 
 			chatUser
-				.setNextRegisterHelp (calendar.getTime ());
+
+				.setNextRegisterHelp (
+					instantToDate (
+						nextRegisterHelpTime));
 
 		}
 
 		// set last action and schedule ad
 
 		chatUser
-			.setLastAction (now);
+
+			.setLastAction (
+				instantToDate (
+					transaction.now ()));
 
 		chatUserLogic.scheduleAd (
 			chatUser);
@@ -1025,17 +1031,14 @@ class ChatJoiner {
 	private
 	boolean joinPart2 () {
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		Transaction transaction =
+			database.currentTransaction ();
 
 		log.debug (
 			stringFormat (
-				"Checking location for %s",
-				objectManager.objectPath (
-					chatUser,
-					null,
-					false,
-					false)));
+				"Checking location for chat user %s",
+				objectManager.objectPathMini (
+					chatUser)));
 
 		// check we have a location of some sort
 
@@ -1044,12 +1047,9 @@ class ChatJoiner {
 
 		log.debug (
 			stringFormat (
-				"Location ok for %s (%s)",
-				objectManager.objectPath (
-					chatUser,
-					null,
-					false,
-					false),
+				"Location ok for chat user %s (%s)",
+				objectManager.objectPathMini (
+					chatUser),
 				chatUser.getLocLongLat ()));
 
 		// bring the user online if appropriate
@@ -1066,31 +1066,34 @@ class ChatJoiner {
 
 		// schedule next outbound message
 
-		calendar.setTime (now);
-
-		calendar.add (
-			Calendar.SECOND,
-			chat.getTimeQuietOutbound ());
+		Instant nextQuietOutboundTime =
+			transaction
+				.now ()
+				.plus (Duration.standardSeconds (
+					chat.getTimeQuietOutbound ()));
 
 		chatUser
-			.setNextQuietOutbound (calendar.getTime ());
+
+			.setNextQuietOutbound (
+				instantToDate (
+					nextQuietOutboundTime));
 
 		// schedule next join outbound message
 
-		calendar.setTime (now);
-
-		int timeToAdd =
-			+ chat.getTimeJoinOutboundMin ()
-			+ random.nextInt (
-				+ chat.getTimeJoinOutboundMax ()
-				- chat.getTimeJoinOutboundMin ());
-
-		calendar.add (
-			Calendar.SECOND,
-			timeToAdd);
+		Instant nextJoinOutboundTime =
+			transaction
+				.now ()
+				.plus (Duration.standardSeconds (
+					+ chat.getTimeJoinOutboundMin ()
+					+ random.nextInt (
+						+ chat.getTimeJoinOutboundMax ()
+						- chat.getTimeJoinOutboundMin ())));
 
 		chatUser
-			.setNextJoinOutbound (calendar.getTime ());
+
+			.setNextJoinOutbound (
+				instantToDate (
+					nextJoinOutboundTime));
 
 		// bring them into dating if appropriate
 
@@ -1112,8 +1115,9 @@ class ChatJoiner {
 				chatUser,
 				null,
 				message,
-				chatUser.getMainChatUserImage () != null ?
-					ChatUserDateMode.text : ChatUserDateMode.photo,
+				chatUser.getMainChatUserImage () != null
+					? ChatUserDateMode.text
+					: ChatUserDateMode.photo,
 				true);
 
 			if (chatUser.getDateDailyCount ()
@@ -1218,6 +1222,9 @@ class ChatJoiner {
 	private
 	boolean preLocator () {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		// always return false - this disables the LBS service
 
 		if (! locatorEnabled)
@@ -1225,15 +1232,28 @@ class ChatJoiner {
 
 		// if we have a location from within the last hour just use that
 
-		if (chatUser.getLocTime () != null
-				&& chatUser.getLocTime ().getTime ()
-					>= now.getTime () - 60 * 60 * 1000
-				&& chatUser.getLocLongLat () != null)
+		if (
+
+			chatUser.getLocTime () != null
+
+			&& chatUser.getLocTime ().getTime ()
+				>= transaction.now ().getMillis () - 60 * 60 * 1000
+
+			&& chatUser.getLocLongLat () != null
+
+		) {
+
 			return false;
+
+		}
 
 		// update the chat user's loc time now
 
-		chatUser.setLocTime (now);
+		chatUser
+
+			.setLocTime (
+				instantToDate (
+					transaction.now ()));
 
 		// get all the info to look up before closing the session
 
@@ -1281,6 +1301,9 @@ class ChatJoiner {
 	private
 	void postLocator () {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		// lookup stuff
 
 		chat =
@@ -1320,8 +1343,13 @@ class ChatJoiner {
 		if (locatedLongLat != null) {
 
 			chatUser
-				.setLocLongLat (locatedLongLat)
-				.setLocTime (now);
+
+				.setLocLongLat (
+					locatedLongLat)
+
+				.setLocTime (
+					instantToDate (
+						transaction.now ()));
 
 		}
 

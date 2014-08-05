@@ -129,11 +129,15 @@ class PsychicContactSummaryPart
 
 					"<td>%h</td>\n",
 					timeFormatter.instantToDateStringShort (
-						dateToInstant (request.getResponseTime ().toDate ())),
+						timeFormatter.defaultTimezone (),
+						dateToInstant (
+							request.getResponseTime ().toDate ())),
 
 					"<td>%h</td>\n",
 					timeFormatter.instantToDateStringShort (
-						dateToInstant (request.getResponseTime ().toDate ())),
+						timeFormatter.defaultTimezone (),
+						dateToInstant (
+							request.getResponseTime ().toDate ())),
 
 					"<td>%h</td>\n",
 					request.getResponseText ().getText (),
@@ -151,10 +155,12 @@ class PsychicContactSummaryPart
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToDateStringShort (
+					timeFormatter.defaultTimezone (),
 					request.getRequestTime ()),
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToDateStringShort (
+					timeFormatter.defaultTimezone (),
 					request.getRequestTime ()),
 
 				"<td>%h</td>\n",

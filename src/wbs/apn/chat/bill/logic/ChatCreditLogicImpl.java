@@ -1,20 +1,22 @@
 package wbs.apn.chat.bill.logic;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.sum;
 
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.extern.log4j.Log4j;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import wbs.apn.chat.bill.model.ChatNetworkObjectHelper;
@@ -36,6 +38,8 @@ import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -76,6 +80,9 @@ class ChatCreditLogicImpl
 	ChatUserLogic chatUserLogic;
 
 	@Inject
+	Database database;
+
+	@Inject
 	ServiceObjectHelper serviceHelper;
 
 	@Inject
@@ -97,16 +104,29 @@ class ChatCreditLogicImpl
 		if (toChatUser.getType () == ChatUserType.monitor)
 			return;
 
+		ChatSchemeRec chatScheme =
+			toChatUser.getChatScheme ();
+
 		ChatSchemeChargesRec chatSchemeCharges =
-			toChatUser.getChatScheme ().getCharges ();
+			chatScheme.getCharges ();
 
 		// iphone users are never charged
 
 		boolean free =
 			toChatUser.getDeliveryMethod () == ChatMessageMethod.iphone;
 
+		DateTimeZone timeZone =
+			DateTimeZone.forID (
+				chatScheme.getTimezone ());
+
+		LocalDate today =
+			LocalDate.now (
+				timeZone);
+
 		ChatUserSpendRec toChatUserSpend =
-			findOrCreateChatUserSpend (toChatUser, today ());
+			findOrCreateChatUserSpend (
+				toChatUser,
+				today);
 
 		toChatUserSpend.setReceivedMessageCount (
 			toChatUserSpend.getReceivedMessageCount ()
@@ -169,8 +189,11 @@ class ChatCreditLogicImpl
 			int imageProfileCount,
 			int videoProfileCount) {
 
+		ChatSchemeRec chatScheme =
+			chatUser.getChatScheme ();
+
 		ChatSchemeChargesRec chatSchemeCharges =
-			chatUser.getChatScheme ().getCharges ();
+			chatScheme.getCharges ();
 
 		// iphone users are never charged
 
@@ -179,10 +202,18 @@ class ChatCreditLogicImpl
 
 		// update the chat user spend
 
+		DateTimeZone timeZone =
+			DateTimeZone.forID (
+				chatScheme.getTimezone ());
+
+		LocalDate today =
+			LocalDate.now (
+				timeZone);
+
 		ChatUserSpendRec chatUserSpend =
 			findOrCreateChatUserSpend (
 				chatUser,
-				today ());
+				today);
 
 		chatUserSpend.setUserMessageCount (
 			chatUserSpend.getUserMessageCount ()
@@ -363,7 +394,7 @@ class ChatCreditLogicImpl
 	public
 	ChatUserSpendRec findOrCreateChatUserSpend (
 			ChatUserRec chatUser,
-			Date date) {
+			LocalDate date) {
 
 		ChatUserSpendRec chatUserSpend =
 			chatUserSpendHelper.findByDate (
@@ -375,8 +406,14 @@ class ChatCreditLogicImpl
 			chatUserSpend =
 				chatUserSpendHelper.insert (
 					new ChatUserSpendRec ()
-						.setChatUser (chatUser)
-						.setDate (date));
+
+				.setChatUser (
+					chatUser)
+
+				.setDate (
+					date)
+
+			);
 
 		}
 
@@ -617,15 +654,19 @@ class ChatCreditLogicImpl
 			ChatUserRec chatUser,
 			boolean retry) {
 
-		String chatUserPath =
-			objectManager.objectPath (
-				chatUser,
-				null,
-				true);
+		Transaction transaction =
+			database.currentTransaction ();
+
+		ChatSchemeRec chatScheme =
+			chatUser.getChatScheme ();
 
 		if (chatUser.getNumber () == null) {
 
-			log.warn ("Unable to bill user " + chatUser.getId () + " with no number");
+			log.warn (
+				stringFormat (
+					"Unable to bill chat user %s with no number",
+					objectManager.objectPathMini (
+						chatUser)));
 
 			return;
 
@@ -713,8 +754,10 @@ class ChatCreditLogicImpl
 
 			log.debug (
 				stringFormat (
-					"rejecting bill message for user %s due to daily limit",
-					chatUserPath));
+					"rejecting bill message for chat user %s due to daily ",
+					objectManager.objectPathMini (
+						chatUser),
+					"limit"));
 
 			return;
 
@@ -722,23 +765,22 @@ class ChatCreditLogicImpl
 
 		// work out start of day
 
-		GregorianCalendar startOfDay =
-			new GregorianCalendar ();
+		DateTimeZone timeZone =
+			DateTimeZone.forID (
+				chatScheme.getTimezone ());
 
-		startOfDay.set (Calendar.HOUR_OF_DAY, 0);
-		startOfDay.set (Calendar.MINUTE, 0);
-		startOfDay.set (Calendar.SECOND, 0);
-		startOfDay.set (Calendar.MILLISECOND, 0);
-
-		Date startOfDayDate =
-			startOfDay.getTime ();
+		Instant startOfToday =
+			transaction.now ()
+				.toDateTime (timeZone)
+				.withTimeAtStartOfDay ()
+				.toInstant ();
 
 		// check user hasnt been sent a bill today that wasn't successful
 
 		if (
 			chatUser.getLastBillSent () != null
-			&& ! chatUser.getLastBillSent ().before (
-				startOfDayDate)
+			&& ! dateToInstant (chatUser.getLastBillSent ()).isBefore (
+				startOfToday)
 		) {
 
 			log.info (
@@ -922,8 +964,9 @@ class ChatCreditLogicImpl
 
 		chatUser
 
-			.incDailyBilledAmount (
-				route.getOutCharge ());
+			.setCreditDailyAmount (
+				+ chatUser.getCreditDailyAmount ()
+				+ route.getOutCharge ());
 
 		/*
 		 * if (APPLY_BILL_LIMIT) { if
@@ -974,53 +1017,47 @@ class ChatCreditLogicImpl
 	boolean userBillLimitApplies (
 			ChatUserRec chatUser) {
 
-		ChatSchemeChargesRec charges =
-			chatUser.getChatScheme ().getCharges ();
-
-		if (! charges.getBillLimitEnabled ())
-			return false;
+		Transaction transaction =
+			database.currentTransaction ();
 
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();
 
+		ChatSchemeChargesRec charges =
+			chatScheme.getCharges ();
+
+		if (! charges.getBillLimitEnabled ())
+			return false;
+
 		// work out what day we're on
 
-		GregorianCalendar startOfDay =
-			new GregorianCalendar ();
+		DateTimeZone timeZone =
+			DateTimeZone.forID (
+				chatScheme.getTimezone ());
 
-		startOfDay.set (
-			Calendar.HOUR_OF_DAY,
-			0);
-
-		startOfDay.set (
-			Calendar.MINUTE,
-			0);
-
-		startOfDay.set (
-			Calendar.SECOND,
-			0);
-
-		startOfDay.set (
-			Calendar.MILLISECOND,
-			0);
-
-		Date startOfDayDate =
-			startOfDay.getTime ();
+		LocalDate today =
+			transaction.now ()
+				.toDateTime (timeZone)
+				.toLocalDate ();
 
 		// reset the limit on a new day
 
 		if (
+
 			chatUser.getCreditDailyDate () == null
-			|| chatUser.getCreditDailyDate ().toDate ().before (
-				startOfDayDate)
+
+			|| notEqual (
+				chatUser.getCreditDailyDate (),
+				today)
+
 		) {
 
 			chatUser
 
 				.setCreditDailyDate (
-					new LocalDate (startOfDayDate))
+					today)
 
-				.setDailyBilledAmount (
+				.setCreditDailyAmount (
 					0);
 
 		}
@@ -1034,7 +1071,7 @@ class ChatCreditLogicImpl
 			userBillLimitAmount (chatUser);
 
 		int newDailyBilledAmount =
-			+ chatUser.getDailyBilledAmount ()
+			+ chatUser.getCreditDailyAmount ()
 			+ routeCharge;
 
 		return newDailyBilledAmount > limit;
@@ -1152,38 +1189,6 @@ class ChatCreditLogicImpl
 					now);
 
 		}
-
-	}
-
-	/**
-	 * Returns a Date representing 0000 hours today.
-	 *
-	 * @return the date
-	 */
-	@Override
-	public
-	Date today () {
-
-		Calendar calendar =
-			Calendar.getInstance ();
-
-		calendar.set (
-			Calendar.HOUR,
-			0);
-
-		calendar.set (
-			Calendar.MINUTE,
-			0);
-
-		calendar.set (
-			Calendar.SECOND,
-			0);
-
-		calendar.set (
-			Calendar.MILLISECOND,
-			0);
-
-		return calendar.getTime ();
 
 	}
 
