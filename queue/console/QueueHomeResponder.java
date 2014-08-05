@@ -399,7 +399,9 @@ class QueueHomeResponder
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
-					dateToInstant (queueItem.getCreatedTime ())),
+					timeFormatter.defaultTimezone (),
+					dateToInstant (
+						queueItem.getCreatedTime ())),
 
 				"<td>%h</td>\n",
 				queueItem.getSource (),

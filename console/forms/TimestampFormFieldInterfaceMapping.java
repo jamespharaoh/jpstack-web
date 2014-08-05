@@ -46,6 +46,7 @@ class TimestampFormFieldInterfaceMapping<Container>
 		try {
 
 			return timeFormatter.timestampStringToInstant (
+				timeFormatter.defaultTimezone (),
 				interfaceValue);
 
 		} catch (IllegalArgumentException exception) {
@@ -71,6 +72,7 @@ class TimestampFormFieldInterfaceMapping<Container>
 			return null;
 
 		return timeFormatter.instantToTimestampString (
+			timeFormatter.defaultTimezone (),
 			genericValue);
 
 	}
