@@ -2,6 +2,33 @@ declare variable $project := //project;
 
 declare variable $envs := ('test', 'live');
 
+declare function local:plugin (
+	$project as element (project),
+	$project-plugin as element (plugin)
+) as element (plugin) {
+
+	document (
+		concat (
+			'../',
+			$project/@name,
+			'/src/',
+			replace (
+				$project/@package,
+				'\.',
+				'/'),
+			'/',
+			replace (
+				$project-plugin/@package,
+				'\.',
+				'/'),
+			'/',
+			$project-plugin/@name,
+			'-plugin.xml'
+		)
+	) / plugin
+
+};
+
 <project
 	name="{$project/@name}"
 	basedir="."
@@ -646,93 +673,95 @@ declare variable $envs := ('test', 'live');
 
 	<target name="just-sql-schema">
 
-		{ if ($project/plugin/sql-scripts/sql-schema) then (
+		<taskdef
+			name="database-init"
+			classname="wbs.framework.utils.ant.DatabaseInitTask"
+			classpathref="classpath"/>
 
-			<taskdef
-				name="database-init"
-				classname="wbs.framework.utils.ant.DatabaseInitTask"
-				classpathref="classpath"/>,
+		<database-init>
 
-			<database-init>
+			{ for
 
-				{ for
+				$project-plugin in
+					$project/plugin,
 
-					$plugin in
-						$project/plugin,
+				$plugin in
+					local:plugin (
+						$project,
+						$project-plugin),
 
-					$sql-schema in
-						$plugin/sql-scripts/sql-schema
+				$sql-schema in
+					$plugin/sql-scripts/sql-schema
 
-				return (
+			return (
 
-					<script
-						name="{ concat (
-							'src/',
-							replace (
-								$project/@package,
-								'\.',
-								'/'),
-							'/',
-							replace (
-								$plugin/@package,
-								'\.',
-								'/'),
-							'/model/',
-							$sql-schema/@name,
-							'.sql'
-						) }"/>
+				<script
+					name="{ concat (
+						'src/',
+						replace (
+							$project/@package,
+							'\.',
+							'/'),
+						'/',
+						replace (
+							$plugin/@package,
+							'\.',
+							'/'),
+						'/model/',
+						$sql-schema/@name,
+						'.sql'
+					) }"/>
 
-				) }
+			) }
 
-			</database-init>
-
-		) else () }
+		</database-init>
 
 	</target>
 
 	<target name="just-sql-data">
 
-		{ if ($project/plugin/sql-scripts/sql-data) then (
+		<taskdef
+			name="database-init"
+			classname="wbs.framework.utils.ant.DatabaseInitTask"
+			classpathref="classpath"/>
 
-			<taskdef
-				name="database-init"
-				classname="wbs.framework.utils.ant.DatabaseInitTask"
-				classpathref="classpath"/>,
+		<database-init>
 
-			<database-init>
+			{ for
 
-				{ for
+				$project-plugin in
+					$project/plugin,
 
-					$plugin in
-						$project/plugin,
+				$plugin in
+					local:plugin (
+						$project,
+						$project-plugin),
 
-					$sql-data in
-						$plugin/sql-scripts/sql-data
+				$sql-data in
+					$plugin/sql-scripts/sql-data
 
-				return (
+			return (
 
-					<script
-						name="{ concat (
-							'src/',
-							replace (
-								$project/@package,
-								'\.',
-								'/'),
-							'/',
-							replace (
-								$plugin/@package,
-								'\.',
-								'/'),
-							'/model/',
-							$sql-data/@name,
-							'.sql'
-						) }"/>
+				<script
+					name="{ concat (
+						'src/',
+						replace (
+							$project/@package,
+							'\.',
+							'/'),
+						'/',
+						replace (
+							$plugin/@package,
+							'\.',
+							'/'),
+						'/model/',
+						$sql-data/@name,
+						'.sql'
+					) }"/>
 
-				) }
+			) }
 
-			</database-init>
-
-		) else () }
+		</database-init>
 
 	</target>
 
