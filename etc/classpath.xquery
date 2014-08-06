@@ -2,13 +2,19 @@ declare variable $project := //project;
 
 <classpath>
 
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="test"/>
+	<classpathentry
+		kind="src"
+		path="src"/>
 
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry
+		kind="con"
+		path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 
-	{ for $depends-project
-		in $project/depends-projects/depends-project
+	{ for
+
+		$depends-project in
+			$project/depends-projects/depends-project
+
 	return (
 
 		<classpathentry
@@ -21,7 +27,11 @@ declare variable $project := //project;
 
 	) }
 
-	{ for $library in document ('libraries.xml') /libraries/library
+	{ for
+
+		$library in
+			document ('libraries.xml') /libraries/library
+
 	return (
 
 		<classpathentry
@@ -39,7 +49,8 @@ declare variable $project := //project;
 			{ if ($library/@source = 'yes') then (
 				attribute sourcepath {
 					concat (
-						'/home/james/projects/wbs/wbs-combined/binaries/libraries/',
+						'/home/james/projects/wbs/wbs-combined/binaries',
+						'/libraries/',
 						$library/@name,
 						'-source-',
 						$library/@version,
