@@ -209,8 +209,6 @@ global_elem.find("projects/project").each do
 
 	[
 		"test",
-		"api/files",
-		"console/files",
 	].each do
 		|dir|
 

@@ -1,36 +1,117 @@
-declare variable $project := //project;
+declare variable $my-project := //project;
 
 declare variable $envs := ('test', 'live');
+
+declare function local:project (
+	$depends-project as element (depends-project)
+) as element (project) {
+
+	document (
+		concat (
+			'../',
+			$depends-project/@name,
+			'/src/',
+			replace (
+				$depends-project/@package,
+				'\.',
+				'/'),
+			'/',
+			$depends-project/@name,
+			'-project.xml'
+		)
+	) / project
+
+};
 
 declare function local:plugin (
 	$project as element (project),
 	$project-plugin as element (plugin)
 ) as element (plugin) {
 
-	document (
-		concat (
-			'../',
-			$project/@name,
-			'/src/',
-			replace (
-				$project/@package,
-				'\.',
-				'/'),
-			'/',
-			replace (
-				$project-plugin/@package,
-				'\.',
-				'/'),
-			'/',
-			$project-plugin/@name,
-			'-plugin.xml'
-		)
-	) / plugin
+	let
+
+		$plugin :=
+			document (
+				concat (
+					'../',
+					$project/@name,
+					'/src/',
+					replace (
+						$project/@package,
+						'\.',
+						'/'),
+					'/',
+					replace (
+						$project-plugin/@package,
+						'\.',
+						'/'),
+					'/',
+					$project-plugin/@name,
+					'-plugin.xml'
+				)
+			) / plugin
+
+	return
+
+		element plugin {
+			$plugin/@*,
+			$plugin/*,
+			$project
+		}
 
 };
 
+declare variable $my-plugins :=
+	for
+
+		$my-project-plugin in
+			$my-project/plugin
+
+	return
+
+		local:plugin (
+			$my-project,
+			$my-project-plugin);
+
+declare variable $other-projects :=
+
+	for
+
+		$depends-project
+			in $my-project/depends-projects/depends-project
+
+	return
+
+		local:project (
+			$depends-project);
+
+declare variable $all-projects := (
+	$my-project,
+	$other-projects
+);
+
+declare variable $other-plugins :=
+	for
+
+		$project
+			in $other-projects,
+
+		$project-plugin
+			in $project/plugin
+
+	return
+
+		local:plugin (
+			$project,
+			$project-plugin);
+
+declare variable $all-plugins := (
+	$my-plugins,
+	$other-plugins
+);
+
 <project
-	name="{$project/@name}"
+	name="{$my-project/@name}"
 	basedir="."
 	default="build">
 
@@ -44,13 +125,17 @@ declare function local:plugin (
 			dir="../lib"
 			includes="*.jar"/>
 
-		{ for $depends-project in $project/depends-projects/depends-project
+		{ for
+
+			$project in
+				$all-projects
+
 		return (
 
 			<pathelement
 				path="{ concat (
 					'../',
-					$depends-project/@name,
+					$project/@name,
 					'/bin'
 				) }"/>
 
@@ -227,14 +312,17 @@ declare function local:plugin (
 
 	<target name="just-clean-deps">
 
-		{ for $depends-project
-			in $project/depends-projects/depends-project
+		{ for
+
+			$other-project
+				in $other-projects
+
 		return (
 
 			<ant
 				dir="{ concat (
 					'../',
-					$depends-project/@name
+					$other-project/@name
 				) }"
 				target="just-clean"/>
 
@@ -262,14 +350,17 @@ declare function local:plugin (
 
 	<target name="just-build-deps">
 
-		{ for $depends-project
-			in $project/depends-projects/depends-project
+		{ for
+
+			$other-project
+				in $other-projects
+
 		return (
 
 			<ant
 				dir="{ concat (
 					'../',
-					$depends-project/@name
+					$other-project/@name
 				) }"
 				target="just-build"/>
 
@@ -279,14 +370,17 @@ declare function local:plugin (
 
 	<target name="just-build-tests-deps">
 
-		{ for $depends-project
-			in $project/depends-projects/depends-project
+		{ for
+
+			$other-project
+				in $other-projects
+
 		return (
 
 			<ant
 				dir="{ concat (
 					'../',
-					$depends-project/@name
+					$other-project/@name
 				) }"
 				target="just-build-tests"/>
 
@@ -336,14 +430,17 @@ declare function local:plugin (
 
 	<target name="just-svn-up-deps">
 
-		{ for $depends-project
-			in $project/depends-projects/depends-project
+		{ for
+
+			$other-project
+				in $other-projects
+
 		return (
 
 			<ant
 				dir="{ concat (
 					'../',
-					$depends-project/@name
+					$other-project/@name
 				) }"
 				target="just-svn-up"/>
 
@@ -371,16 +468,32 @@ declare function local:plugin (
 			<mkdir dir="../console-{$env}/WEB-INF/classes"/>
 			<mkdir dir="../console-{$env}/WEB-INF/lib"/>
 
-			<copy todir="../console-{$env}">
+			<copy
+				todir="../console-{$env}"
+				failonerror="false"
+				quiet="true">
 
-				{ for $depends-project
-					in $project/depends-projects/depends-project
+				{ for
+
+					$plugin in
+						$all-plugins
+
 				return (
 
 					<fileset
 						dir="{ concat (
 							'../',
-							$depends-project/@name,
+							$plugin/project/@name,
+							'/src/',
+							replace (
+								$plugin/project/@package,
+								'\.',
+								'/'),
+							'/',
+							replace (
+								$plugin/@package,
+								'\.',
+								'/'),
 							'/console/files'
 						) }"/>
 
@@ -393,14 +506,17 @@ declare function local:plugin (
 
 			<copy todir="../console-{$env}/WEB-INF/classes">
 
-				{ for $depends-project
-					in $project/depends-projects/depends-project
+				{ for
+
+					$other-project
+						in $other-projects
+
 				return (
 
 					<fileset
 						dir="{ concat (
 							'../',
-							$depends-project/@name,
+							$other-project/@name,
 							'/bin'
 						) }"/>
 
@@ -509,16 +625,32 @@ declare function local:plugin (
 			<mkdir dir="../api-{$env}/WEB-INF/classes"/>
 			<mkdir dir="../api-{$env}/WEB-INF/lib"/>
 
-			<copy todir="../api-{$env}">
+			<copy
+				todir="../api-{$env}"
+				failonerror="false"
+				quiet="true">
 
-				{ for $depends-project
-					in $project/depends-projects/depends-project
+				{ for
+
+					$plugin in
+						$all-plugins
+
 				return (
 
 					<fileset
 						dir="{ concat (
 							'../',
-							$depends-project/@name,
+							$plugin/project/@name,
+							'/src/',
+							replace (
+								$plugin/project/@package,
+								'\.',
+								'/'),
+							'/',
+							replace (
+								$plugin/@package,
+								'\.',
+								'/'),
 							'/api/files'
 						) }"/>
 
@@ -530,14 +662,17 @@ declare function local:plugin (
 
 			<copy todir="../api-{$env}/WEB-INF/classes">
 
-				{ for $depends-project
-					in $project/depends-projects/depends-project
+				{ for
+
+					$other-project
+						in $other-projects
+
 				return (
 
 					<fileset
 						dir="{ concat (
 							'../',
-							$depends-project/@name,
+							$other-project/@name,
 							'/bin'
 						) }"/>
 
@@ -591,14 +726,17 @@ declare function local:plugin (
 
 		<javadoc destdir="javadoc" access="private" linksource="yes">
 
-			{ for $depends-project
-				in $project/depends-projects/depends-project
+			{ for
+
+				$other-project
+					in $other-projects
+
 			return (
 
 				<fileset
 					dir="{ concat (
 						'../',
-						$depends-project/@name,
+						$other-project/@name,
 						'/src'
 					) }"/>
 
@@ -639,14 +777,17 @@ declare function local:plugin (
 
 	<target name="just-sql-schema-deps">
 
-		{ for $depends-project
-			in $project/depends-projects/depends-project
+		{ for
+
+			$other-project
+				in $other-projects
+
 		return (
 
 			<ant
 				dir="{ concat (
 					'../',
-					$depends-project/@name
+					$other-project/@name
 				) }"
 				target="just-sql-schema"/>
 
@@ -656,14 +797,17 @@ declare function local:plugin (
 
 	<target name="just-sql-data-deps">
 
-		{ for $depends-project
-			in $project/depends-projects/depends-project
+		{ for
+
+			$other-project
+				in $other-projects
+
 		return (
 
 			<ant
 				dir="{ concat (
 					'../',
-					$depends-project/@name
+					$other-project/@name
 				) }"
 				target="just-sql-data"/>
 
@@ -682,16 +826,11 @@ declare function local:plugin (
 
 			{ for
 
-				$project-plugin in
-					$project/plugin,
-
-				$plugin in
-					local:plugin (
-						$project,
-						$project-plugin),
+				$my-plugin in
+					$my-plugins,
 
 				$sql-schema in
-					$plugin/sql-scripts/sql-schema
+					$my-plugin/sql-scripts/sql-schema
 
 			return (
 
@@ -699,12 +838,12 @@ declare function local:plugin (
 					name="{ concat (
 						'src/',
 						replace (
-							$project/@package,
+							$my-project/@package,
 							'\.',
 							'/'),
 						'/',
 						replace (
-							$plugin/@package,
+							$my-plugin/@package,
 							'\.',
 							'/'),
 						'/model/',
@@ -729,16 +868,11 @@ declare function local:plugin (
 
 			{ for
 
-				$project-plugin in
-					$project/plugin,
-
-				$plugin in
-					local:plugin (
-						$project,
-						$project-plugin),
+				$my-plugin in
+					$my-plugins,
 
 				$sql-data in
-					$plugin/sql-scripts/sql-data
+					$my-plugin/sql-scripts/sql-data
 
 			return (
 
@@ -746,12 +880,12 @@ declare function local:plugin (
 					name="{ concat (
 						'src/',
 						replace (
-							$project/@package,
+							$my-project/@package,
 							'\.',
 							'/'),
 						'/',
 						replace (
-							$plugin/@package,
+							$my-plugin/@package,
 							'\.',
 							'/'),
 						'/model/',
