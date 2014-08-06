@@ -470,8 +470,7 @@ declare variable $all-plugins := (
 
 			<copy
 				todir="../console-{$env}"
-				failonerror="false"
-				quiet="true">
+				failonerror="false">
 
 				{ for
 
@@ -627,8 +626,7 @@ declare variable $all-plugins := (
 
 			<copy
 				todir="../api-{$env}"
-				failonerror="false"
-				quiet="true">
+				failonerror="false">
 
 				{ for
 
