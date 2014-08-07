@@ -493,7 +493,15 @@ declare variable $all-plugins := (
 								$plugin/@package,
 								'\.',
 								'/'),
-							'/console/files'
+							if (
+								matches (
+									$plugin/@package,
+									'(^|\.)console($|\.)')
+							) then (
+								'/files'
+							) else (
+								'/console/files'
+							)
 						) }"/>
 
 				) }
