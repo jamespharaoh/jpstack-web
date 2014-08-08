@@ -286,7 +286,10 @@ class DevopsScript
 		args = [
 			"ssh",
 			term,
-			"james@hades.apnuk.com",
+			"%s@%s" % [
+				@config_connection["user"],
+				@config_connection["host"],
+			],
 			cmd,
 		].flatten
 

@@ -1,8 +1,8 @@
 <ivy-module version="2.0">
 
 	<info
-		organisation="txt2"
-		module="txt2-hades"/>
+		organisation="wbs"
+		module="wbs-combined"/>
 
 	<dependencies>
 

@@ -116,7 +116,10 @@ declare variable $all-plugins := (
 	default="build">
 
 	<property
-		file="build.properties"/>
+		environment="env"/>
+
+	<property
+		file="${{env.WBS_BUILD_PROPERTIES}}"/>
 
 	<path
 		id="classpath">
@@ -240,14 +243,6 @@ declare variable $all-plugins := (
 		name="javadoc-auto"
 		depends="{ string-join ((
 			'just-javadoc'
-		), ', ') }"/>
-
-	<target
-		name="cukes"
-		depends="{ string-join ((
-			'just-build-deps',
-			'just-build',
-			'just-cukes'
 		), ', ') }"/>
 
 	<target
@@ -719,7 +714,9 @@ declare variable $all-plugins := (
 		<exec
 			failonerror="false"
 			executable="dropdb">
-			<arg line="txt2-test"/>
+
+			<arg line="${{database.name}}"/>
+
 		</exec>
 
 	</target>
@@ -729,7 +726,9 @@ declare variable $all-plugins := (
 		<exec
 			failonerror="true"
 			executable="createdb">
-			<arg line="txt2-test"/>
+
+			<arg line="${{database.name}}"/>
+
 		</exec>
 
 	</target>
@@ -855,25 +854,6 @@ declare variable $all-plugins := (
 			) }
 
 		</database-init>
-
-	</target>
-
-	<target name="just-cukes">
-
-		<java
-			classname="cucumber.api.cli.Main"
-			fork="true"
-			failonerror="false"
-			resultproperty="cucumber.exitstatus">
-
-			<classpath refid="classpath"/>
-
-			<arg value="--glue"/>
-			<arg value="txt2.psychic.cuke"/>
-
-			<arg value="features"/>
-
-		</java>
 
 	</target>
 
