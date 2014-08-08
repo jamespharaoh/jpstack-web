@@ -167,15 +167,6 @@ declare variable $all-plugins := (
 		), ', ') }"/>
 
 	<target
-		name="build-tests"
-		depends="{ string-join ((
-			'just-build-deps',
-			'just-build',
-			'just-build-tests-deps',
-			'just-build-tests'
-		), ', ') }"/>
-
-	<target
 		name="console-live"
 		depends="{ string-join ((
 			'just-build-deps',
@@ -256,7 +247,6 @@ declare variable $all-plugins := (
 		depends="{ string-join ((
 			'just-build-deps',
 			'just-build',
-			'just-build-tests',
 			'just-cukes'
 		), ', ') }"/>
 
@@ -298,8 +288,6 @@ declare variable $all-plugins := (
 		depends="{ string-join ((
 			'just-build-deps',
 			'just-build',
-			'just-build-tests-deps',
-			'just-build-tests',
 			'just-db-drop',
 			'just-db-create',
 			'just-schema-create',
@@ -368,26 +356,6 @@ declare variable $all-plugins := (
 
 	</target>
 
-	<target name="just-build-tests-deps">
-
-		{ for
-
-			$other-project
-				in $other-projects
-
-		return (
-
-			<ant
-				dir="{ concat (
-					'../',
-					$other-project/@name
-				) }"
-				target="just-build-tests"/>
-
-		) }
-
-	</target>
-
 	<target name="just-build">
 
 		<mkdir dir="bin"/>
@@ -410,21 +378,6 @@ declare variable $all-plugins := (
 			<include name="META-INF/**/*"/>
 			<include name="log4j.properties"/>
 		</fileset></copy>
-
-	</target>
-
-	<target name="just-build-tests">
-
-		<javac destdir="bin" debug="on" includeantruntime="false">
-			<src path="test"/>
-			<classpath refid="classpath"/>
-		</javac>
-
-		<copy todir="bin">
-			<fileset dir="test">
-				<include name="**/*.xml"/>
-			</fileset>
-		</copy>
 
 	</target>
 
