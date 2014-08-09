@@ -8,6 +8,7 @@
 		<project name="wbs-integrations" package="wbs.integrations"/>
 		<project name="wbs-psychic" package="wbs.psychic"/>
 		<project name="wbs-sms" package="wbs.sms"/>
+		<project name="wbs-sms-apps" package="wbs.smsapps"/>
 		<project name="wbs-test" package="wbs.test"/>
 		<project name="wbs-internal" package="wbs.internal"/>
 	</projects>
