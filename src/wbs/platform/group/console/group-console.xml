@@ -1,0 +1,109 @@
+<console-module
+	name="group">
+
+	<console-helper-provider
+		object-name="group">
+
+		<priv-key
+			name="group.manage"
+			priv="manage"/>
+
+		<context-stuff
+			name="groupName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="group"
+		object-name="group">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-links-page
+				name="members"
+				links-field="users"
+				target-links-field="groups"
+				add-event-name="group_added"
+				remove-event-name="group_removed"
+				event-order="target-then-context"
+				target-signal="user_privs"
+				success-notice="Group membership updated"
+				fields="members"/>
+
+			<context-tab-action-page
+				name="privs"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="group">
+
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="group">
+
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="group">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+	</field-set>
+
+	<field-set
+		name="members"
+		object-name="user">
+
+		<parent-field/>
+		<code-field/>
+
+		<text-field
+			name="fullname"
+			label="Full name"/>
+
+		<description-field/>
+
+	</field-set>
+
+</console-module>

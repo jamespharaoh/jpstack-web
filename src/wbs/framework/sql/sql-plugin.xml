@@ -1,0 +1,9 @@
+<plugin
+	name="sql"
+	package="sql">
+
+	<layer name="sql">
+		<bean class="SqlLogicImpl"/>
+	</layer>
+
+</plugin>

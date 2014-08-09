@@ -1,0 +1,29 @@
+<plugin
+	name="dialogue"
+	package="dialogue">
+
+	<sql-scripts>
+		<sql-data name="dialogue-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="dialogueLocator"/>
+		<model name="dialogueMmsRoute"/>
+	</models>
+
+	<layer name="api">
+		<bean class="api.DialogueApiServletModule"/>
+		<bean class="api.DialogueMmsApiServletModule"/>
+		<bean class="api.DialogueResponder"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.DialogueMmsSender"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="dialogue"/>
+		<console-module name="dialogue-locator"/>
+	</console-modules>
+
+</plugin>

@@ -1,0 +1,23 @@
+<plugin
+	name="chat-info"
+	package="chat.user.info">
+
+	<sql-scripts>
+		<sql-data name="chat-info-data"/>
+		<sql-data name="chat-profile-data"/>
+	</sql-scripts>
+
+	<models>
+		<type name="chatUserInfoStatus"/>
+		<model name="chatProfileField"/>
+		<model name="chatProfileFieldValue"/>
+		<model name="chatUserInfo"/>
+		<model name="chatUserName"/>
+		<model name="chatUserProfileField"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.ChatInfoLogicImpl"/>
+	</layer>
+
+</plugin>

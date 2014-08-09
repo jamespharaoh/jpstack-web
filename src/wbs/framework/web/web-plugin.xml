@@ -1,0 +1,11 @@
+<plugin
+	name="web"
+	package="web">
+
+	<layer name="web">
+		<bean class="PathHandlerServlet"/>
+		<bean class="RequestContextImpl"/>
+		<bean class="ResponseFilter"/>
+	</layer>
+
+</plugin>

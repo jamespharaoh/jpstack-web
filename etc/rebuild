@@ -6,32 +6,20 @@ require "xml"
 
 ENV["XMLLINT_INDENT"] = "\t"
 
-global_doc = XML::Document.file "etc/global.xml"
-global_elem = global_doc.root
+$build_path = "wbs-build.xml"
+$build_doc = XML::Document.file $build_path
+$build_elem = $build_doc.root
 
 def create_xml \
 		project_name,
-		package_name,
 		template_name,
-		target,
+		target_path,
 		vars = {}
 
 	template_path =
 		"etc/#{template_name}.xquery"
 
-	project_path =
-		"%s/src/%s/%s-project.xml" % [
-			project_name,
-			package_name.gsub(".", "/"),
-			project_name,
-		]
-
-	target_path =
-		"%s/%s" % [
-			project_name,
-			target,
-		]
-
+=begin
 	if File.exist? target_path
 
 		template_mtime =
@@ -54,6 +42,7 @@ def create_xml \
 			if target_mtime > max_mtime
 
 	end
+=end
 
 	puts target_path
 
@@ -63,7 +52,7 @@ def create_xml \
 	xqilla_args = [
 		"xqilla",
 		template_path,
-		"-i", project_path,
+		"-i", $build_path,
 		"-o", temp.path,
 	] + vars.map {
 		|key, value|
@@ -142,78 +131,56 @@ File.open "etc/libraries.xml", "w" do
 
 end
 
-global_elem.find("projects/project").each do
-	|project_elem|
+project_name =
+	$build_elem["name"]
 
-	project_name = project_elem["name"]
-	package_name = project_elem["package"]
+create_xml \
+	project_name,
+	"build-xml",
+	"build.xml"
 
-	create_xml \
-		project_name,
-		package_name,
-		"build-xml",
-		"build.xml"
+create_xml \
+	project_name,
+	"classpath",
+	".classpath"
 
-	create_xml \
-		project_name,
-		package_name,
-		"classpath",
-		".classpath"
+create_xml \
+	project_name,
+	"factorypath",
+	".factorypath"
 
-	create_xml \
-		project_name,
-		package_name,
-		"factorypath",
-		".factorypath"
+create_xml \
+	project_name,
+	"project",
+	".project"
 
-	create_xml \
-		project_name,
-		package_name,
-		"project",
-		".project"
+create_xml \
+	project_name,
+	"console-web-xml",
+	"console/web-live.xml",
+	"mode" => "live"
 
-	create_xml \
-		project_name,
-		package_name,
-		"console-web-xml",
-		"console/web-live.xml",
-		"mode" => "live"
+create_xml \
+	project_name,
+	"console-web-xml",
+	"console/web-test.xml",
+	"mode" => "test"
 
-	create_xml \
-		project_name,
-		package_name,
-		"console-web-xml",
-		"console/web-test.xml",
-		"mode" => "test"
+create_xml \
+	project_name,
+	"api-web-xml",
+	"api/web-live.xml",
+	"mode" => "live"
 
-	create_xml \
-		project_name,
-		package_name,
-		"api-web-xml",
-		"api/web-live.xml",
-		"mode" => "live"
+create_xml \
+	project_name,
+	"api-web-xml",
+	"api/web-test.xml",
+	"mode" => "test"
 
-	create_xml \
-		project_name,
-		package_name,
-		"api-web-xml",
-		"api/web-test.xml",
-		"mode" => "test"
+create_xml \
+	project_name,
+	"server-xml",
+	"console/server-test.xml",
+	"mode" => "test"
 
-	create_xml \
-		project_name,
-		package_name,
-		"server-xml",
-		"console/server-test.xml",
-		"mode" => "test"
-
-	[
-		"test",
-	].each do
-		|dir|
-
-		FileUtils.mkdir_p "#{project_name}/#{dir}"
-
-	end
-
-end

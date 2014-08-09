@@ -1,0 +1,117 @@
+<console-module
+	name="ticketer">
+
+	<console-helper-provider
+		object-name="ticketer">
+
+		<priv-key
+			name="ticketer.manage"
+			priv="manage"/>
+
+		<priv-key
+			name="ticketer.messages"
+			priv="messages"/>
+
+		<priv-key
+			name="ticketer.stats"
+			priv="stats"/>
+
+		<context-stuff
+			name="ticketerName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="ticketer"
+		object-name="ticketer">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-sms-messages-page/>
+
+			<object-sms-stats-page/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="ticketer">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="ticketer">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<seconds-field
+			name="duration"/>
+
+		<text-area-field
+			name="text"/>
+
+		<object-field
+			name="route"
+			finder="route"/>
+
+		<text-field
+			name="number"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="ticketer">
+
+		<id-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<seconds-field
+			name="duration"/>
+
+		<text-area-field
+			name="text"/>
+
+		<object-field
+			name="route"
+			finder="route"/>
+
+		<text-field
+			name="number"/>
+
+	</field-set>
+
+</console-module>

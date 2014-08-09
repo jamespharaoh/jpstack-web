@@ -1,0 +1,75 @@
+<console-module
+	name="object-type">
+
+	<console-helper-provider
+		object-name="objectType"
+		view-delegate-field="root"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="objectTypeName"
+			field="description"/>
+
+		<priv-key
+			name="objectType.manage"
+			delegate="root"
+			priv="manage"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="objectType"
+		object-name="objectType">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="objectType">
+
+		<code-field/>
+		<description-field/>
+
+		<object-field
+			name="parentObjectType"
+			finder="objectType"/>
+
+		<integer-field
+			name="stature"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="objectType">
+
+		<id-field/>
+		<code-field/>
+		<description-field/>
+
+		<object-field
+			name="parentObjectType"
+			finder="objectType"/>
+
+		<integer-field
+			name="stature"/>
+
+	</field-set>
+
+</console-module>

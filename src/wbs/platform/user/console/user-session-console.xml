@@ -1,0 +1,72 @@
+<console-module
+	name="userSession">
+
+	<console-helper-provider
+		object-name="userSession"
+		view-delegate-field="user"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="userSessionName"
+			field="id"/>
+
+		<context-stuff
+			name="userId"
+			delegate="user"
+			field="id"/>
+
+		<run-post-processor
+			name="user"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="userSession"
+		object-name="userSession">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="userSession">
+
+		<id-field/>
+
+		<timestamp-field
+			name="startTime"/>
+
+		<timestamp-field
+			name="endTime"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="userSession">
+
+		<id-field/>
+		<parent-field/>
+
+		<timestamp-field
+			name="startTime"/>
+
+		<timestamp-field
+			name="endTime"/>
+
+	</field-set>
+
+</console-module>

@@ -1,0 +1,9 @@
+<plugin
+	name="builder"
+	package="builder">
+
+	<layer name="data">
+		<bean class="BuilderFactoryImpl"/>
+	</layer>
+
+</plugin>

@@ -1,0 +1,37 @@
+<console-module
+	name="psychic-help-request">
+
+	<console-helper-provider
+		object-name="psychicHelpRequest">
+
+		<context-stuff
+			name="psychicHelpRequestName"
+			field="id"/>
+
+		<context-stuff
+			name="psychicUserId"
+			delegate="psychicUser"
+			field="id"/>
+
+		<run-post-processor
+			name="psychicUser"/>
+
+	</console-helper-provider>
+
+	<extend-context
+		name="psychicUser.help"
+		base-name="psychicUser"
+		extension-point="psychicUser.help"
+		object-name="psychicUser">
+
+		<!--
+		<context-action-page
+			name="helpForm"/>
+
+		<context-tab-responder-page
+			name="help"/>
+		-->
+
+	</extend-context>
+
+</console-module>

@@ -1,0 +1,45 @@
+<plugin
+	name="forwarder"
+	package="forwarder">
+
+	<sql-scripts>
+		<sql-schema name="forwarder"/>
+		<sql-data name="forwarder-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="forwarder"/>
+		<model name="forwarderMessageIn"/>
+		<model name="forwarderMessageOut"/>
+		<model name="forwarderMessageOutReport"/>
+		<model name="forwarderRoute"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.ForwarderLogicImpl"/>
+	</layer>
+
+	<layer name="api">
+		<bean class="api.ForwarderApiLogicImpl"/>
+		<bean class="api.ForwarderApiModule"/>
+		<bean class="api.ForwarderInAction"/>
+		<bean class="api.ForwarderOutAction"/>
+		<bean class="api.ForwarderPeekExRequestDefConfig"/>
+		<bean class="api.ForwarderQueryExRequestDefConfig"/>
+		<bean class="api.ForwarderQueryExMessageChecker"/>
+		<bean class="api.ForwarderUnqueueExRpcHandler"/>
+		<bean class="api.ForwarderUnqueueExRequestDefConfig"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.ForwarderCommand"/>
+		<bean class="daemon.ForwarderDaemon"/>
+		<bean class="daemon.ForwarderDelivery"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="forwarder"/>
+		<console-module name="forwarder-route"/>
+	</console-modules>
+
+</plugin>

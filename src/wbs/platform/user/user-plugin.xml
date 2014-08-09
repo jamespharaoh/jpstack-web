@@ -1,0 +1,35 @@
+<plugin
+	name="user"
+	package="user">
+
+	<sql-scripts>
+		<sql-schema name="user"/>
+		<sql-data name="user-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="user"/>
+		<model name="userOnline"/>
+		<model name="userPriv"/>
+		<model name="userSession"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.UserLogicImpl"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.UserPasswordAction"/>
+		<bean class="console.UserPasswordPart"/>
+		<bean class="console.UserPrivsEditorAction"/>
+		<bean class="console.UserPrivsEditorPart"/>
+		<bean class="console.UserPrivsSummaryPart"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="user"/>
+		<console-module name="user-online"/>
+		<console-module name="user-session"/>
+	</console-modules>
+
+</plugin>

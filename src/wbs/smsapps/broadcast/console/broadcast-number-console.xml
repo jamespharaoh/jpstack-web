@@ -1,0 +1,65 @@
+<console-module
+	name="broacast-number">
+
+	<console-helper-provider
+		object-name="broadcastNumber"
+		view-delegate-field="grandparent"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="broadcastNumberName"
+			delegate="number"
+			field="number"/>
+
+		<context-stuff
+			name="broadcastId"
+			delegate="broadcast"
+			field="id"/>
+
+		<run-post-processor
+			name="broadcast"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="broadcastNumber"
+		object-name="broadcastNumber">
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="summary"
+		object-name="broadcastNumber">
+
+		<parent-field/>
+
+		<object-field
+			name="number"
+			finder="number"/>
+
+		<enum-field
+			name="state"
+			helper="broadcastNumberStateConsoleHelper"/>
+
+		<object-field
+			name="addedByUser"
+			finder="user"/>
+
+		<object-field
+			name="removedByUser"
+			finder="user"/>
+
+		<object-field
+			name="message"
+			finder="message"/>
+
+	</field-set>
+
+</console-module>

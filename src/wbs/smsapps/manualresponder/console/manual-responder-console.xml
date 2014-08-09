@@ -1,0 +1,148 @@
+<console-module
+	name="manual-responder">
+
+	<console-helper-provider
+		object-name="manualResponder">
+
+		<priv-key
+			name="manualResponder.manage"
+			priv="manage"/>
+
+		<priv-key
+			name="manualResponder.messages"
+			priv="messages"/>
+
+		<priv-key
+			name="manualResponder.stats"
+			priv="stats"/>
+
+		<context-stuff
+			name="manualResponderName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="manualResponder"
+		object-name="manualResponder">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<context-link
+				name="template"
+				link="manualResponderTemplate"
+				label="Templates"
+				priv-key="manualResponder.manage"/>
+
+			<context-link
+				name="request"
+				link="manualResponderRequest"
+				label="Requests"
+				priv-key="manualResponder.manage"/>
+
+			<object-sms-messages-page/>
+
+			<object-sms-stats-page/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="manualResponder">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="manualResponder">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<yes-no-field
+			name="canIgnore"/>
+
+		<yes-no-field
+			name="canSendMultiple"/>
+
+		<text-area-field
+			name="infoText"
+			label="Operator info (html)"/>
+
+		<yes-no-field
+			name="showDailyBillInfo"/>
+
+		<seconds-field
+			name="preferredQueueTime"/>
+
+		<object-field
+			name="unblockNumberList"
+			finder="numberList"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="manualResponder">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<yes-no-field
+			name="canIgnore"/>
+
+		<yes-no-field
+			name="canSendMultiple"/>
+
+		<text-area-field
+			name="infoText"
+			label="Operator info (html)"/>
+
+		<yes-no-field
+			name="showDailyBillInfo"/>
+
+		<seconds-field
+			name="preferredQueueTime"/>
+
+		<object-field
+			name="currency"
+			finder="currency"/>
+
+		<object-field
+			name="unblockNumberList"
+			finder="numberList"/>
+
+	</field-set>
+
+</console-module>

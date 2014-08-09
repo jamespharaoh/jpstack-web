@@ -1,0 +1,26 @@
+<console-module
+	name="txt-nation">
+
+	<simple-context
+		name="txtNation">
+
+		<priv-key
+			name="txtNation.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-link
+			name="network"
+			link="txtNationNetwork"
+			label="Networks"
+			priv-key="txtNation.manage"/>
+
+		<context-link
+			name="routeIn"
+			link="txtNationRouteIn"
+			label="Inbound routes"
+			priv-key="txtNation.manage"/>
+
+	</simple-context>
+
+</console-module>

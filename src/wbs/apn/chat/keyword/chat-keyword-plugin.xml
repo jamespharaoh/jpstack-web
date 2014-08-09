@@ -1,0 +1,14 @@
+<plugin
+	name="chat-keyword"
+	package="chat.keyword">
+
+	<models>
+		<type name="chatKeywordJoinType"/>
+		<model name="chatKeyword"/>
+	</models>
+
+	<console-modules>
+		<console-module name="chat-keyword"/>
+	</console-modules>
+
+</plugin>

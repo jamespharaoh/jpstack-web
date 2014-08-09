@@ -1,0 +1,17 @@
+<plugin
+	name="update-log"
+	package="updatelog">
+
+	<sql-scripts>
+		<sql-data name="update-log-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="updateLog"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.UpdateManager"/>
+	</layer>
+
+</plugin>

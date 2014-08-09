@@ -1,0 +1,22 @@
+<plugin
+	name="core"
+	package="core">
+
+	<layer name="console">
+		<bean class="console.CoreAuthAction"/>
+		<bean class="console.CoreAuthFilter"/>
+		<bean class="console.CoreFrameSetResponder"/>
+		<bean class="console.CoreHomeResponder"/>
+		<bean class="console.CoreLogoffAction"/>
+		<bean class="console.CoreLogonAction"/>
+		<bean class="console.CoreLogonResponder"/>
+		<bean class="console.CoreRedirectResponder"/>
+		<bean class="console.CoreSidebarMenuResponder"/>
+		<bean class="console.CoreTitledResponder"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="core"/>
+	</console-modules>
+
+</plugin>

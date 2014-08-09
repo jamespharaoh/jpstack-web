@@ -1,0 +1,135 @@
+<console-module
+	name="orderer">
+
+	<console-helper-provider
+		object-name="orderer">
+
+		<priv-key
+			name="orderer.manage"
+			priv="manage"/>
+
+		<priv-key
+			name="orderer.messages"
+			priv="messages"/>
+
+		<priv-key
+			name="orderer.stats"
+			priv="stats"/>
+
+		<context-stuff
+			name="ordererName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="orderer"
+		object-name="orderer">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-sms-messages-page/>
+
+			<object-sms-stats-page/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="orderer">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="orderer">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<object-field
+			name="billRoute"
+			finder="route"/>
+
+		<text-field
+			name="billNumber"/>
+
+		<text-field
+			name="billTemplate"/>
+
+		<yes-no-field
+			name="allowRepeat"/>
+
+		<text-field
+			name="emailAddress"/>
+
+		<text-field
+			name="emailSubject"/>
+
+		<text-field
+			name="emailTemplate"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="orderer">
+
+		<id-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<object-field
+			name="billRoute"
+			finder="route"/>
+
+		<text-field
+			name="billNumber"/>
+
+		<text-field
+			name="billTemplate"/>
+
+		<yes-no-field
+			name="allowRepeat"/>
+
+		<text-field
+			name="emailAddress"/>
+
+		<text-field
+			name="emailSubject"/>
+
+		<text-area-field
+			name="emailTemplate"/>
+
+	</field-set>
+
+</console-module>

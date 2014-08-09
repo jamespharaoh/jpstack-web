@@ -1,0 +1,28 @@
+<plugin
+	name="digital-select"
+	package="digitalselect">
+
+	<sql-scripts>
+		<sql-data name="digital-select-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="digitalSelectRouteOut"/>
+	</models>
+
+	<layer name="console">
+		<bean class="console.DigitalSelectRouteSummaryAdditionalPart"/>
+		<bean class="console.DigitalSelectRouteSummaryAdditionalPartFactory"/>
+	</layer>
+
+	<layer name="api">
+		<bean class="api.DigitalSelectApiServletModule"/>
+		<bean class="api.DigitalSelectRoutePathHandlerEntry"/>
+		<bean class="api.DigitalSelectRouteReportFile"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.DigitalSelectSender"/>
+	</layer>
+
+</plugin>

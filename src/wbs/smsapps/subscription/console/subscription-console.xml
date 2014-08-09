@@ -1,0 +1,795 @@
+<console-module
+	name="subscription">
+
+	<console-helper-provider
+		object-name="subscription">
+
+		<context-stuff
+			name="subscriptionName"
+			field="name"/>
+
+		<priv-key
+			name="subscription.manage"
+			priv="manage"/>
+
+		<priv-key
+			name="subscription.messages"
+			priv="messages"/>
+
+		<priv-key
+			name="subscription.stats"
+			priv="stats"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="subscription"
+		object-name="subscription">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<context-link
+				name="affiliate"
+				link="subscriptionAffiliate"
+				label="Affiliates"
+				priv-key="subscription.affiliate"/>
+
+			<object-sms-messages-page/>
+
+			<object-sms-stats-page/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="subscription">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="subscription">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<object-field
+			name="freeRoute"
+			finder="route"/>
+
+		<text-field
+			name="freeNumber"/>
+
+		<object-field
+			name="billedRoute"
+			finder="route"/>
+
+		<text-field
+			name="billedNumber"/>
+
+		<integer-field
+			name="numSubscribers"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="subscription">
+
+		<id-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<object-field
+			name="freeRoute"
+			finder="route"/>
+
+		<text-field
+			name="freeNumber"/>
+
+		<object-field
+			name="billedRoute"
+			finder="route"/>
+
+		<text-field
+			name="billedNumber"/>
+
+	</field-set>
+
+</console-module>
+<!--
+			.put ("subscription_response_subscribeSuccess",
+				messageSetFileBuilder.get ()
+					.objectLookup (subscriptionLookup)
+					.code ("subscription_subscribe_success")
+					.filename ("subscription_response_subscribeSuccess")
+					.viewPrivName ("subscription_manage")
+					.updatePrivName ("subscription_manage")
+					.tab ("subscription_response_subscribeSuccess")
+					.title ("Subscribe success")
+					.build ())
+
+			.put ("subscription_response_subscribeAlready",
+				messageSetFileBuilder.get ()
+					.objectLookup (subscriptionLookup)
+					.code ("subscription_subscribe_already")
+					.filename ("subscription_response_subscribeAlready")
+					.viewPrivName ("subscription_manage")
+					.updatePrivName ("subscription_manage")
+					.tab ("subscription_response_subscribeAlready")
+					.title ("Subscribed already")
+					.build ())
+
+			.put ("subscription_response_unsubscribeSuccess",
+				messageSetFileBuilder.get ()
+					.objectLookup (subscriptionLookup)
+					.code ("subscription_unsubscribe_success")
+					.filename ("subscription_response_unsubscribeSuccess")
+					.viewPrivName ("subscription_manage")
+					.updatePrivName ("subscription_manage")
+					.tab ("subscription_response_unsubscribeSuccess")
+					.title ("Unsubscribe success")
+					.build ())
+
+			.put ("subscription_response_unsubscribeAlready",
+				messageSetFileBuilder.get ()
+					.objectLookup (subscriptionLookup)
+					.code("subscription_unsubscribe_already")
+					.filename ("subscription_response_unsubscribeAlready")
+					.viewPrivName ("subscription_manage")
+					.updatePrivName ("subscription_manage")
+					.tab ("subscription_response_unsubscribeAlready")
+					.title ("Unsubscribed already")
+					.build ())
+
+	private class AdminAddAction extends ConsoleAction {
+
+		private AdminAddAction() {
+			super(adminAddResponder);
+		}
+
+		@Override
+		public Responder go(ConsoleRequestContext requestContext) {
+
+			int subscriptionId = requestContext.getStuffInt("subscriptionId");
+			int numAdded = 0, numNotAdded = 0;
+
+			Transaction transaction = database.rw();
+			try {
+
+				// lock subscription for atomicity
+				SubscriptionRec subscription = subscriptionDao
+						.findAndLockSubscriptionById(subscriptionId);
+				UserRec myUser = userDao.findUserById(requestContext.getUserId());
+
+				Integer subscriptionAffiliateId = requestContext
+						.getStuffInt("subscriptionAffiliateId");
+				SubscriptionAffiliateRec subscriptionAffiliate = subscriptionAffiliateId != null ? subscriptionDao
+						.findSubscriptionAffiliateById(subscriptionAffiliateId)
+						: null;
+
+				// check privs
+				if (!privChecker.can(subscription, "subscription_admin")) {
+					requestContext.addError("Access denied");
+					return adminAddResponder;
+				}
+
+				// process and check numbers
+				final List<String> numbers;
+				try {
+
+					numbers =
+						UkNumberFormat.splitUkNumberLines (
+							requestContext.parameter ("numbers"));
+
+				} catch (NumberFormatException e) {
+					requestContext.addError("Invalid mobile number");
+					return adminAddResponder;
+				}
+
+				// add numbers, counting true/false returns
+				for (String numberString : numbers) {
+
+					NumberRec number =
+						numberLogic.findOrCreateNumber (
+							numberString);
+
+					// check if it's already there
+					SubscriptionSubRec ss = subscriptionDao
+							.findSubscriptionSubActiveByNumber(subscription
+									.getId(), number.getId());
+					if (ss != null) {
+						numNotAdded++;
+						continue;
+					}
+
+					// create the sub
+					ss = new SubscriptionSubRec();
+					ss.setSubscription(subscription);
+					ss.setNumber(number);
+					ss.setStartedBy(myUser);
+					ss.setSubscriptionAffiliate(subscriptionAffiliate);
+					subscriptionDao.insertSubscriptionSub(ss);
+
+					numAdded++;
+					subscription.incNumSubscribers();
+					if (subscriptionAffiliate != null)
+						subscriptionAffiliate.incNumSubscribers();
+				}
+
+				transaction.commit();
+			} finally {
+				transaction.close();
+			}
+
+			if (numAdded > 0)
+				requestContext.addNotice(numAdded + " numbers added");
+			if (numNotAdded > 0)
+				requestContext.addWarning(numNotAdded
+						+ " numbers already subscribed or duplicated");
+			requestContext.setEmptyFormData();
+			return adminAddResponder;
+		}
+	}
+
+	private class AdminRemoveAction extends ConsoleAction {
+
+		private AdminRemoveAction() {
+			super(adminRemoveResponder);
+		}
+
+		@Override
+		public Responder go(ConsoleRequestContext requestContext) {
+
+			int numRemoved = 0, numNotRemoved = 0;
+			Transaction transaction = database.rw();
+			try {
+
+				// lock subscription for atomicity
+				SubscriptionRec subscription = subscriptionDao
+						.findAndLockSubscriptionById(requestContext
+								.getStuffInt("subscriptionId"));
+				UserRec myUser = userDao.findUserById(requestContext.getUserId());
+
+				Integer subscriptionAffiliateId = requestContext
+						.getStuffInt("subscriptionAffiliateId");
+				SubscriptionAffiliateRec subscriptionAffiliate = subscriptionAffiliateId != null ? subscriptionDao
+						.findSubscriptionAffiliateById(subscriptionAffiliateId)
+						: null;
+
+				// check privs
+				if (!privChecker.can (subscription, "admin")) {
+					requestContext.addError("Access denied");
+					return adminRemoveResponder;
+				}
+
+				final List<String> numbers;
+				try {
+					numbers = UkNumberFormat.splitUkNumberLines(requestContext
+							.parameter("numbers"));
+				} catch (NumberFormatException e) {
+					requestContext.addError("Invalid mobile number");
+					return adminRemoveResponder;
+				}
+
+				// add numbers, counting true/false returns
+				for (String numberString : numbers) {
+
+					NumberRec number =
+						numberLogic.findOrCreateNumber (
+							numberString);
+
+					// check if it's there
+					SubscriptionSubRec ss = subscriptionDao
+							.findSubscriptionSubActiveByNumber(subscription
+									.getId(), number.getId());
+					if (ss == null) {
+						numNotRemoved++;
+						continue;
+					}
+
+					// unsubscribe them
+					ss.setActive(false);
+					ss.setEnded(new Date());
+					ss.setEndedBy(myUser);
+					subscriptionDao.insertSubscriptionSub(ss);
+
+					numRemoved++;
+					subscription.decNumSubscribers();
+					if (subscriptionAffiliate != null)
+						subscriptionAffiliate.decNumSubscribers();
+				}
+
+				transaction.commit();
+			} finally {
+				transaction.close();
+			}
+
+			if (numRemoved > 0)
+				requestContext.addNotice(numRemoved + " numbers removed");
+			if (numNotRemoved > 0)
+				requestContext.addWarning(numNotRemoved + " numbers not subscribed");
+			requestContext.setEmptyFormData();
+			return adminRemoveResponder;
+		}
+	}
+
+	public class AdminAddPart extends AbstractPagePart {
+		@Override
+		public void goBodyStuff() {
+
+			String localName = requestContext.getStuffInt("subscriptionAffiliateId") != null ? "/subscriptionAffiliate_admin_add"
+					: "/subscription_admin_add";
+
+			pl("<form action=\"" + Html.encode(requestContext.localUrl(localName))
+					+ "\" method=\"post\">");
+
+			pl("<p>Numbers<br>");
+			pl("<textarea name=\"numbers\" cols=\"48\" rows=\"8\">"
+					+ Html.encode(ifNull(requestContext.getForm("numbers"), ""))
+					+ "</textarea></p>");
+
+			pl("<p><input type=\"submit\" value=\"add numbers\"/></p>");
+
+			pl("</form>");
+		}
+	}
+
+	public class AdminRemovePart extends AbstractPagePart {
+		@Override
+		public void goBodyStuff() {
+
+			String localName = requestContext.getStuffInt("subscriptionAffiliateId") != null ? "/subscriptionAffiliate_admin_remove"
+					: "/subscription_admin_remove";
+
+			pl("<form action=\"" + Html.encode(requestContext.localUrl(localName))
+					+ "\" method=\"post\">");
+
+			pl("<p>Numbers<br>");
+			pl("<textarea name=\"numbers\" cols=\"48\" rows=\"8\"></textarea></p>");
+
+			pl("<p><input type=\"submit\" value=\"remove numbers\"/></p>");
+
+			pl("</form>");
+		}
+	}
+
+	private final static Map<String,String> searchFormatOptions =
+		ImmutableMap.<String,String>builder ()
+			.put ("display", "Display report")
+			.put ("downloadNumbers", "Download number list")
+			.build ();
+
+	public class AdminSearchResultsPart extends AbstractPagePart {
+
+		private Integer subscriptionAffiliateId;
+		private List<SubscriptionSubRec> subs;
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public void prepare() {
+			subs = (List<SubscriptionSubRec>) requestContext
+					.request ("subscription_search_results");
+		}
+
+		@Override
+		public void goBodyStuff() {
+
+			pl("<table class=\"list\">");
+
+			pl("<tr>");
+			pl("<th>Number</th>");
+			if (subscriptionAffiliateId == null)
+				pl("<th>Affiliate</th>");
+			pl("<th>Active</th>");
+			pl("<th>Started</th>");
+			pl("<th>Started by</th>");
+			pl("<th>Ended</th>");
+			pl("<th>Ended by</th>");
+			pl("</tr>");
+
+			for (SubscriptionSubRec ss : subs) {
+				pl("<tr>");
+				pl("<td>" + Html.encode(ss.getNumber().getNumber()) + "</td>");
+
+				if (subscriptionAffiliateId == null)
+					pl(consoleObjectManager.tdForObject(requestContext, ss
+							.getSubscriptionAffiliate(), null, true, true));
+
+				pl("<td>" + Html.encode(ss.getActive() ? "yes" : "no")
+						+ "</td>");
+				pl("<td>"
+						+ Html.encode(ss.getStarted() != null ? requestContext
+								.formatTimestamp(ss.getStarted()) : "-")
+						+ "</td>");
+				pl("<td>"
+						+ Html.encode(ss.getStartedBy() != null ? ss
+								.getStartedBy().getUsername() : "-") + "</td>");
+				pl("<td>"
+						+ Html.encode(ss.getEnded() != null ? requestContext
+								.formatTimestamp(ss.getEnded()) : "-")
+						+ "</td>");
+				pl("<td>"
+						+ Html.encode(ss.getEndedBy() != null ? ss.getEndedBy()
+								.getUsername() : "-") + "</td>");
+				pl("</tr>");
+			}
+		}
+	}
+
+	public class SendListPendingPart extends SendListPart {
+		@Override
+		public void prepare() {
+			SubscriptionRec subscription = subscriptionDao
+					.findSubscriptionById(requestContext.getStuffInt("subscriptionId"));
+			sends = new TreeSet<SubscriptionSendRec>();
+			for (SubscriptionSendRec send : subscriptionDao
+					.findSubscriptionSendsBySubscription(subscription)) {
+				if (in(send.getStatus(), SubscriptionStatus.notSent,
+						SubscriptionStatus.scheduled))
+					sends.add(send);
+			}
+		}
+	}
+
+	public class SendListOldPart extends SendListPart {
+		@Override
+		public void prepare() {
+			SubscriptionRec subscription = subscriptionDao
+					.findSubscriptionById(requestContext.getStuffInt("subscriptionId"));
+			sends = new TreeSet<SubscriptionSendRec>();
+			for (SubscriptionSendRec send : subscriptionDao
+					.findSubscriptionSendsBySubscription(subscription)) {
+				if (in(send.getStatus(), SubscriptionStatus.cancelled,
+						SubscriptionStatus.sent,
+						SubscriptionStatus.sentAutomatically))
+					sends.add(send);
+			}
+		}
+	}
+
+	public class SendSummaryAction extends ConsoleAction {
+
+		public SendSummaryAction() {
+			super(sendSummaryResponder);
+		}
+
+		@Override
+		public Responder go(ConsoleRequestContext requestContext) {
+
+			if (requestContext.parameter ("sendNow") != null) {
+				Transaction transaction = database.rw();
+				try {
+					SubscriptionSendRec send = subscriptionDao
+							.findSubscriptionSendById(requestContext
+									.getStuffInt("subscriptionSendId"));
+					UserRec myUser = userDao.findUserById(requestContext.getUserId());
+
+					// check subscription send is in a valid state
+					if (send.getStatus() != SubscriptionStatus.notSent) {
+						requestContext.addError("Subscription send is not pending");
+						return null;
+					}
+
+					// check the template is set up right
+					TemplateVersionRec tv = send.getTemplate()
+							.getTemplateVersion();
+					if (tv.getBilledEnabled() == true
+							&& tv.getBilledMessage().equals("")) {
+						requestContext.addError("Billed message enabled but not supplied");
+						return null;
+					}
+					for (TemplatePartRec tp : tv.getTemplateParts()) {
+						if (tp.getMessage().equals("")) {
+							requestContext
+									.addError("Some template message is not supplied");
+							return null;
+						}
+					}
+
+					// send it
+					send.setSender(myUser);
+					send.setSentTime(new Date());
+					send.setStatus(SubscriptionStatus.sent);
+					subscriptionUtils.subscriptionSend(send);
+					transaction.commit();
+				} finally {
+					transaction.close();
+				}
+
+				requestContext.addNotice("Subscription send sent");
+				return null;
+			}
+
+			if (requestContext.parameter ("schedule") != null) {
+
+				// get the schedule for time
+				Date date = parseTimestamp(requestContext.parameter ("scheduleFor"));
+				if (date == null) {
+					requestContext
+							.addError("Please enter a timestamp to schedule for (eg "
+									+ requestContext.formatTimestamp(new Date()) + ")");
+					return null;
+				}
+
+				Transaction transaction = database.rw();
+				try {
+					SubscriptionSendRec send = subscriptionDao
+							.findSubscriptionSendById(requestContext
+									.getStuffInt("subscriptionSendId"));
+					UserRec myUser = userDao.findUserById(requestContext.getUserId());
+
+					// check the send is in a valid state
+					if (send.getStatus() != SubscriptionStatus.notSent) {
+						requestContext.addError("Subscription send is not pending");
+						return null;
+					}
+
+					// schedule it
+					send.setSender(myUser);
+					send.setScheduledTime(new Date());
+					send.setScheduledForTime(date);
+					send.setStatus(SubscriptionStatus.scheduled);
+					transaction.commit();
+				} finally {
+					transaction.close();
+				}
+
+				requestContext.addNotice("Subscription send scheduled");
+				return null;
+			}
+
+			if (requestContext.parameter ("cancel") != null) {
+				Transaction transaction = database.rw();
+				try {
+					SubscriptionSendRec send = subscriptionDao
+							.findSubscriptionSendById(requestContext
+									.getStuffInt("subscriptionSendId"));
+					UserRec myUser = userDao.findUserById(requestContext.getUserId());
+
+					// check the send is in a valid state
+					if (!in(send.getStatus(), SubscriptionStatus.notSent,
+							SubscriptionStatus.scheduled)) {
+						requestContext.addError("Subscription send is not pending");
+						return null;
+					}
+
+					// cancel it
+					send.setCanceller(myUser);
+					send.setCancelledTime(new Date());
+					send.setStatus(SubscriptionStatus.cancelled);
+
+					transaction.commit();
+				} finally {
+					transaction.close();
+				}
+
+				requestContext.addNotice("Subscription send cancelled");
+				return null;
+			}
+
+			throw new RuntimeException("");
+		}
+	}
+
+	private final Pattern timestampPattern = Pattern
+			.compile("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2}):(\\d{2})");
+
+	private Date parseTimestamp(String timestamp) {
+		Matcher matcher = timestampPattern.matcher(timestamp);
+		if (!matcher.matches())
+			return null;
+		Calendar cal = Calendar.getInstance();
+		cal.setLenient(false);
+		cal.set(Calendar.YEAR, Integer.parseInt(matcher.group(1)));
+		cal.set(Calendar.MONTH, Integer.parseInt(matcher.group(2)) - 1);
+		cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(matcher.group(3)));
+		cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(matcher.group(4)));
+		cal.set(Calendar.MINUTE, Integer.parseInt(matcher.group(5)));
+		cal.set(Calendar.SECOND, Integer.parseInt(matcher.group(6)));
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
+	}
+
+	private final static Set<ScriptRef> sendTemplatePartScriptRefs =
+		ImmutableSet.<ScriptRef>of (
+			new ContextScriptRef ("/js/DOM.js", "text/javascript"),
+			new ContextScriptRef ("/js/gsm.js", "text/javascript"));
+
+	public class SendTemplatePart extends AbstractPagePart {
+		private boolean editable;
+		private SubscriptionSendRec send;
+		private TemplateVersionRec tv;
+
+		@Override
+		public void prepare() {
+			send = subscriptionDao.findSubscriptionSendById(requestContext
+					.getStuffInt("subscriptionSendId"));
+			tv = send.getTemplate().getTemplateVersion();
+			editable = in(send.getStatus(), SubscriptionStatus.notSent,
+					SubscriptionStatus.scheduled);
+		}
+
+		@Override
+		public Set<ScriptRef> getScriptRefs () {
+			return sendTemplatePartScriptRefs;
+		}
+
+		@Override
+		public void goHeadStuff() {
+			if (!editable)
+				return;
+
+			pl("<script type=\"text/javascript\">");
+
+			pl("function billedEnabledChanged () {");
+			pl("  var billedEnabled = document.getElementById ('billedEnabled').value == 'true';");
+			pl("  if (billedEnabled) {");
+			pl("    try {");
+			pl("      document.getElementById ('billedMessageRow').style.display = 'table-row';");
+			pl("      document.getElementById ('billedMessageCharsRow').style.display = 'table-row';");
+			pl("    } catch (e) {");
+			pl("      document.getElementById ('billedMessageRow').style.display = 'block';");
+			pl("      document.getElementById ('billedMessageCharsRow').style.display = 'block';");
+			pl("    }");
+			pl("  } else {");
+			pl("      document.getElementById ('billedMessageRow').style.display = 'none';");
+			pl("      document.getElementById ('billedMessageCharsRow').style.display = 'none';");
+			pl("  }");
+			pl("}");
+
+			pl("var nextMessageId = " + tv.getTemplateParts().size() + ";");
+
+			pl("function addMessage () {");
+			pl("  var table = document.getElementById ('table');");
+			pl("  var row = table.insertRow (table.rows.length - 1);");
+			pl("  var cell = document.createElement ('th');");
+			pl("  cell.innerHTML = 'Message';");
+			pl("  row.appendChild (cell);");
+			pl("  cell = document.createElement ('td');");
+			pl("  cell.innerHTML = '<textarea name=\"message' + nextMessageId + '\" rows=\"4\" cols=\"48\"' +");
+			pl("    ' onkeyup=\"gsmCharCountMultiple (this, document.getElementById (\\'chars' + nextMessageId + '\\'))\"' +");
+			pl("    ' onfocus=\"gsmCharCountMultiple (this, document.getElementById (\\'chars' + nextMessageId + '\\'))\"' +");
+			pl("    '></textarea>';");
+			pl("  row.appendChild (cell);");
+			pl("  row = table.insertRow (table.rows.length - 1);");
+			pl("  cell = document.createElement ('th');");
+			pl("  cell.innerHTML = 'Chars';");
+			pl("  row.appendChild (cell);");
+			pl("  cell = document.createElement ('td');");
+			pl("  cell.innerHTML = '<span id=\"chars' + nextMessageId + '\">&nbsp;</span>';");
+			pl("  row.appendChild (cell);");
+			pl("  nextMessageId++;");
+			pl("}");
+
+			pl("function removeMessage () {");
+			pl("  if (nextMessageId == 0) return;");
+			pl("  var table = document.getElementById ('table');");
+			pl("  table.deleteRow (table.rows.length - 2);");
+			pl("  table.deleteRow (table.rows.length - 2);");
+			pl("  nextMessageId -= 1;");
+			pl("}");
+
+			pl("</script>");
+		}
+
+		@Override
+		public void goBodyStuff() {
+
+			if (editable)
+				pl("<form method=\"post\" action=\""
+						+ Html.encode(requestContext
+								.localUrl("/subscriptionSend_template"))
+						+ "\">");
+
+			pl("<table id=\"table\" class=\"details\" border=\"0\" cellspacing=\"1\">");
+
+			pl("<tr> <th>Send billed</th> <td>");
+			if (editable) {
+				pl("<select id=\"billedEnabled\" name=\"billedEnabled\" onchange=\"billedEnabledChanged ();\">");
+				pl(Html.option("false", "no", tv.getBilledEnabled() ? "true"
+						: "false"));
+				pl(Html.option("true", "yes", tv.getBilledEnabled() ? "true"
+						: "false"));
+				pl("</select>");
+			} else
+				pl(tv.getBilledEnabled() ? "yes" : "no");
+			pl("</td> </tr>");
+
+			if (editable || tv.getBilledEnabled()) {
+				pl("<tr id=\"billedMessageRow\"> <th>Billed message</th> <td>");
+				if (editable) {
+					pl("<textarea name=\"billedMessage\" rows=\"4\" cols=\"48\""
+							+ " onkeyup=\"gsmCharCountMultiple (this, document.getElementById ('billedMessageChars'))\""
+							+ " onfocus=\"gsmCharCountMultiple (this, document.getElementById ('billedMessageChars'))\""
+							+ ">"
+							+ Html.encode(tv.getBilledMessage())
+							+ "</textarea>");
+				} else
+					pl(Html.encode(tv.getBilledMessage()));
+				pl("</td> </tr>");
+			}
+
+			if (editable)
+				pl("<tr id=\"billedMessageCharsRow\"> <th>Chars</th> <td><span id=\"billedMessageChars\">&nbsp;</span></td> </tr>");
+
+			if (editable) {
+				pl("<tr> <th>Options</th> <td>");
+				pl("<input type=\"button\" onclick=\"addMessage ();\" value=\"add message\"/>");
+				pl("<input type=\"button\" onclick=\"removeMessage ();\" value=\"remove message\"/>");
+				pl("</td> </tr>");
+			}
+
+			int i = 0;
+			for (TemplatePartRec tp : tv.getTemplateParts()) {
+
+				pl("<tr> <th>Message</th> <td>");
+				if (editable) {
+					pl("<textarea name=\"message"
+							+ i
+							+ "\" rows=\"4\" cols=\"48\"'"
+							+ " onkeyup=\"gsmCharCountMultiple (this, document.getElementById ('chars"
+							+ i
+							+ "'))\""
+							+ " onfocus=\"gsmCharCountMultiple (this, document.getElementById ('chars"
+							+ i + "'))\"" + ">" + Html.encode(tp.getMessage())
+							+ "</textarea>");
+				} else
+					pl(Html.encode(tp.getMessage()));
+				pl("</td> </tr>");
+
+				if (editable)
+					pl("<tr> <th>Chars</th> <td><span id=\"chars" + i
+							+ "\">&nbsp;</span></td> </tr>");
+
+				i++;
+			}
+
+			if (editable) {
+				pl("<tr> <th>Action</th> <td>");
+				pl("<input type=\"submit\" value=\"save changes\"/>");
+				pl("</td> </tr>");
+			}
+
+			pl("</table>");
+
+			if (editable)
+				pl("</form>");
+
+			if (editable) {
+				pl("<script type=\"text/javascript\">");
+				pl("billedEnabledChanged ();");
+				pl("</script>");
+			}
+		}
+	}
+-->

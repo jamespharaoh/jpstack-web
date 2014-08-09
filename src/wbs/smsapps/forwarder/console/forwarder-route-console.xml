@@ -1,0 +1,105 @@
+<console-module
+	name="forwarder-route">
+
+	<console-helper-provider
+		object-name="forwarderRoute"
+		view-delegate-field="forwarder"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="forwarderRoute.manage"
+			delegate="forwarder"
+			priv="manage"/>
+
+		<context-stuff
+			name="forwarderRouteName"
+			field="name"/>
+
+		<context-stuff
+			name="forwarderId"
+			delegate="forwarder"
+			field="id"/>
+
+		<run-post-processor
+			name="forwarder"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="forwarderRoute"
+		object-name="forwarderRoute">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="forwarderRoute">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="forwarderRoute">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<object-field
+			name="router"
+			finder="router"/>
+
+		<text-field
+			name="number"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="forwarderRoute">
+
+		<id-field/>
+		<parent-field read-only="yes"/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<object-field
+			name="router"
+			finder="router"/>
+
+		<text-field
+			name="number"/>
+
+	</field-set>
+
+</console-module>

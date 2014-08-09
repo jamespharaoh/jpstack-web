@@ -1,0 +1,16 @@
+<plugin
+	name="schema"
+	package="schema">
+
+	<layer name="schema">
+		<bean class="helper.SchemaNamesHelperImpl"/>
+		<bean class="helper.SchemaTypesHelperImpl"/>
+	</layer>
+
+	<layer name="schema-tool">
+		<bean class="builder.SchemaFromModel"/>
+		<bean class="builder.SchemaTableFromModel"/>
+		<bean class="tool.SchemaToSqlImpl"/>
+	</layer>
+
+</plugin>

@@ -1,0 +1,21 @@
+<plugin
+	name="currency"
+	package="currency">
+
+	<sql-scripts>
+		<sql-data name="currency-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="currency"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.CurrencyLogicImpl"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="currency"/>
+	</console-modules>
+
+</plugin>

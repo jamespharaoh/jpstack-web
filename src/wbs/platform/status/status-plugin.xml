@@ -1,0 +1,15 @@
+<plugin
+	name="status"
+	package="status">
+
+	<layer name="console">
+		<bean class="console.StatusLineManager"/>
+		<bean class="console.StatusResponder"/>
+		<bean class="console.StatusUpdateResponder"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="status"/>
+	</console-modules>
+
+</plugin>

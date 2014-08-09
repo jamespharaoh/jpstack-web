@@ -1,0 +1,16 @@
+<plugin
+	name="console-object"
+	package="console.object">
+
+	<layer name="console">
+		<bean class="BabyObjectContext"/>
+		<bean class="ExtendContextBuilder"/>
+		<bean class="ExtendContextMetaBuilder"/>
+		<bean class="ExtendContextSpec"/>
+		<bean class="ObjectContext"/>
+		<bean class="ObjectContextBuilder"/>
+		<bean class="ObjectContextMetaBuilder"/>
+		<bean class="ObjectContextSpec"/>
+	</layer>
+
+</plugin>

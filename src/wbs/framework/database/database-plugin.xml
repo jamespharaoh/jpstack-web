@@ -1,0 +1,9 @@
+<plugin
+	name="database"
+	package="database">
+
+	<layer name="hibernate">
+		<bean class="TransactionCacheFactory"/>
+	</layer>
+
+</plugin>

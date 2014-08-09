@@ -37,7 +37,7 @@ declare variable $project := //project;
 		<classpathentry
 			kind="lib"
 			path="{ concat (
-				'../binaries/libraries/',
+				'binaries/libraries/',
 				$library/@name,
 				'-',
 				$library/@type,

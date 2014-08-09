@@ -1,0 +1,17 @@
+<plugin
+	name="chat-approval"
+	package="chat.approval">
+
+	<sql-scripts>
+		<sql-data name="chat-approval-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="chatApprovalRegexp"/>
+	</models>
+
+	<console-modules>
+		<console-module name="chat-approval"/>
+	</console-modules>
+
+</plugin>

@@ -1,0 +1,168 @@
+<console-module
+	name="broacast">
+
+	<console-helper-provider
+		object-name="broadcast"
+		view-delegate-field="parent"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="broadcastName"
+			field="id"/>
+
+		<context-stuff
+			name="broadcastConfigId"
+			delegate="broadcastConfig"
+			field="id"/>
+
+		<run-post-processor
+			name="broadcastConfig"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="broadcast"
+		object-name="broadcast">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				create-time="createdTime"
+				create-user="createdUser"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<context-tab-action-page
+				name="numbers"/>
+
+			<context-tab-action-page
+				name="send"/>
+
+			<object-sms-messages-page/>
+
+			<object-sms-stats-page/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="broadcast">
+
+		<index-field/>
+
+		<enum-field
+			name="state"
+			helper="broadcastStateConsoleHelper"/>
+
+		<object-field
+			name="createdUser"
+			label="Created by"
+			finder="user"/>
+
+		<timestamp-field
+			name="createdTime"
+			label="Created"/>
+
+		<timestamp-field
+			name="scheduledTime"
+			label="Scheduled"/>
+
+		<timestamp-field
+			name="sentTime"
+			label="Sent"/>
+
+		<integer-field
+			name="numTotal"
+			label="Numbers"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="broadcast">
+
+		<parent-field/>
+		<index-field/>
+
+		<enum-field
+			name="state"
+			helper="broadcastStateConsoleHelper"/>
+
+		<timestamp-field
+			name="createdTime"/>
+
+		<timestamp-field
+			name="scheduledTime"/>
+
+		<timestamp-field
+			name="sentTime"/>
+
+		<timestamp-field
+			name="cancelledTime"/>
+
+		<object-field
+			name="createdUser"
+			finder="user"/>
+
+		<object-field
+			name="sentUser"
+			finder="user"/>
+
+		<object-field
+			name="cancelledUser"
+			finder="user"/>
+
+		<integer-field
+			name="numTotal"/>
+
+		<integer-field
+			name="numAccepted"/>
+
+		<integer-field
+			name="numRejected"/>
+
+		<integer-field
+			name="numSent"/>
+
+		<integer-field
+			name="numRemoved"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="broadcast">
+
+		<script-ref
+			path="/js/gsm.js"/>
+
+		<id-field/>
+		<parent-field read-only="yes"/>
+		<index-field/>
+		<description-field/>
+
+		<text-field
+			name="messageOriginator"/>
+
+		<text-area-field
+			name="messageText"
+			char-count-function="gsmCharCountMultiple"/>
+
+	</field-set>
+
+</console-module>

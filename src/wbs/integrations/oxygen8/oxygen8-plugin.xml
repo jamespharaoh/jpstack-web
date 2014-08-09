@@ -1,0 +1,41 @@
+<plugin
+	name="oxygen8"
+	package="oxygen8">
+
+	<sql-scripts>
+		<sql-data name="oxygen8-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="oxygen8Config"/>
+		<model name="oxygen8Network"/>
+		<model name="oxygen8ReportCode"/>
+		<model name="oxygen8RouteIn"/>
+		<model name="oxygen8RouteOut"/>
+	</models>
+
+	<layer name="api">
+		<bean class="api.Oxygen8ApiServletModule"/>
+		<bean class="api.Oxygen8InboundFile"/>
+		<bean class="api.Oxygen8ReportFile"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.Oxygen8RouteSummaryAdditionalPart"/>
+		<bean class="console.Oxygen8RouteSummaryAdditionalPartFactory"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.Oxygen8Sender"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="oxygen8"/>
+		<console-module name="oxygen8-config"/>
+		<console-module name="oxygen8-network"/>
+		<console-module name="oxygen8-report-code"/>
+		<console-module name="oxygen8-route-in"/>
+		<console-module name="oxygen8-route-out"/>
+	</console-modules>
+
+</plugin>

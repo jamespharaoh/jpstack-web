@@ -1,0 +1,41 @@
+<console-module
+	name="chat-named-note">
+
+	<extend-object-context
+		name="chat.settings"
+		object-name="chat">
+
+		<object>
+
+			<!--
+			// note names
+
+			addContextTab (
+				"end",
+				tab (
+					"chat.settings.noteNames",
+					"Note names",
+					"chat.settings.noteNames"),
+				"chat.settings");
+
+			addContextFile (
+				"chat.settings.noteNames",
+				consoleFile.get ()
+					.getResponderName ("chatSettingsNoteNamesResponder")
+					.postActionName ("chatSettingsNoteNamesAction")
+					.privName ("chat.manage"),
+				"chat.settings");
+
+			addResponder (
+				"chatSettingsNoteNamesResponder",
+				tabContextResponder.get ()
+					.tab ("chat.settings.noteNames")
+					.title ("Chat service note names")
+					.pagePartName ("chatSettingsNoteNamesPart"));
+			-->
+
+		</object>
+
+	</extend-object-context>
+
+</console-module>

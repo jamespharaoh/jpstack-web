@@ -1,0 +1,9 @@
+<plugin
+	name="comshen"
+	package="comshen">
+
+	<layer name="api">
+		<bean class="api.ComshenApiServletModule"/>
+	</layer>
+
+</plugin>

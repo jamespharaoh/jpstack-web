@@ -1,0 +1,42 @@
+<plugin
+	name="manual-responder"
+	package="manualresponder">
+
+	<sql-scripts>
+		<sql-schema name="manual-responder"/>
+		<sql-data name="manual-responder-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="manualResponder"/>
+		<model name="manualResponderNumber"/>
+		<model name="manualResponderRequest"/>
+		<model name="manualResponderReply"/>
+		<model name="manualResponderTemplate"/>
+	</models>
+
+	<layer name="console">
+		<bean class="console.ManualResponderRequestPendingFormAction"/>
+		<bean class="console.ManualResponderRequestPendingFormResponder"/>
+		<bean class="console.ManualResponderRequestPendingNumberNoteUpdateAction"/>
+		<bean class="console.ManualResponderRequestPendingSummaryPart"/>
+		<bean class="console.ManualResponderQueueConsolePlugin"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.ManualResponderCommand"/>
+	</layer>
+
+	<layer name="logic">
+		<bean class="logic.ManualResponderLogicImpl"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="manual-responder"/>
+		<console-module name="manual-responder-number"/>
+		<console-module name="manual-responder-request"/>
+		<console-module name="manual-responder-request-pending"/>
+		<console-module name="manual-responder-template"/>
+	</console-modules>
+
+</plugin>

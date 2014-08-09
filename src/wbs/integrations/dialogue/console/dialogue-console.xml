@@ -1,0 +1,20 @@
+<console-module
+	name="dialogue">
+
+	<simple-context
+		name="dialogue">
+
+		<priv-key
+			name="dialogue.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-link
+			name="locator"
+			link="dialogueLocator"
+			label="Locators"
+			priv-key="dialogue.manage"/>
+
+	</simple-context>
+
+</console-module>

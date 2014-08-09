@@ -1,0 +1,17 @@
+<plugin
+	name="psychic-profile"
+	package="profile">
+
+	<models>
+		<model name="psychicProfile"/>
+	</models>
+
+	<layer name="daemon">
+		<bean class="daemon.PsychicSendToProfileCommand"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="psychic-profile"/>
+	</console-modules>
+
+</plugin>

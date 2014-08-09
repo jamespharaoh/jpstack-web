@@ -1,0 +1,15 @@
+<console-module
+	name="auto-responder-votes">
+
+	<extend-context
+		name="autoResponder.votes"
+		base-name="autoResponder"
+		extension-point="autoResponder.plugins"
+		object-name="autoResponder">
+
+		<context-tab-responder-page
+			name="votes"/>
+
+	</extend-context>
+
+</console-module>

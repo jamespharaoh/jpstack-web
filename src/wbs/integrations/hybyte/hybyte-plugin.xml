@@ -1,0 +1,23 @@
+<plugin
+	name="hybyte"
+	package="hybyte">
+
+	<sql-scripts>
+		<sql-data name="hybyte-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="hybyteNetwork"/>
+		<model name="hybyteRoute"/>
+		<model name="hybyteRouteOut"/>
+	</models>
+
+	<layer name="api">
+		<bean class="api.HybyteApiServletModule"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.HybyteSender"/>
+	</layer>
+
+</plugin>

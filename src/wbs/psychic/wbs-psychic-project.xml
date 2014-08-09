@@ -1,0 +1,57 @@
+<project
+	name="wbs-psychic"
+	package="wbs.psychic">
+
+	<plugin
+		name="psychic-affiliate"
+		package="affiliate"/>
+
+	<plugin
+		name="psychic-affiliate-group"
+		package="affiliategroup"/>
+
+	<plugin
+		name="psychic-bill"
+		package="bill"/>
+
+	<plugin
+		name="psychic-contact"
+		package="contact"/>
+
+	<plugin
+		name="psychic-core"
+		package="core"/>
+
+	<plugin
+		name="psychic-help"
+		package="help"/>
+
+	<plugin
+		name="psychic-keyword"
+		package="keyword"/>
+
+	<plugin
+		name="psychic-profile"
+		package="profile"/>
+
+	<plugin
+		name="psychic-request"
+		package="request"/>
+
+	<plugin
+		name="psychic-send"
+		package="send"/>
+
+	<plugin
+		name="psychic-template"
+		package="template"/>
+
+	<plugin
+		name="psychic-user-core"
+		package="user.core"/>
+
+	<plugin
+		name="psychic-user-admin"
+		package="user.admin"/>
+
+</project>

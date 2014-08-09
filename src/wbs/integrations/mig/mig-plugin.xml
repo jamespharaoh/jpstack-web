@@ -1,0 +1,15 @@
+<plugin
+	name="mig"
+	package="mig">
+
+	<sql-scripts>
+		<sql-data name="mig-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="migNetwork"/>
+		<model name="migRouteIn"/>
+		<model name="migRouteOut"/>
+	</models>
+
+</plugin>

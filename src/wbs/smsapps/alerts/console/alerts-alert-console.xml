@@ -1,0 +1,79 @@
+<console-module name="alerts-alert">
+
+	<console-helper-provider
+		 object-name="alertsAlert"
+		 view-delegate-field="alertsSettings">
+
+		<context-stuff
+			name="alertsAlertName"
+			field="index"/>
+
+		<context-stuff
+			name="alertsSettingsId"
+			delegate="alertsSettings"
+			field="id"/>
+
+		<run-post-processor
+			name="alertsSettings"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="alertsAlert"
+		object-name="alertsAlert">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary">
+
+			</object-summary-page>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="alertsAlert">
+
+		<index-field/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<integer-field
+			name="unclaimedItems"/>
+
+		<seconds-field
+			name="maximumDuration"/>
+
+		<integer-field
+			name="recipients"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="alertsAlert">
+
+		<id-field/>
+		<parent-field/>
+		<index-field/>
+
+		<timestamp-field name="timestamp"/>
+		<integer-field name="unclaimedItems"/>
+		<seconds-field name="maximumDuration"/>
+		<text-area-field name="text"/>
+		<integer-field name="recipients"/>
+
+	</field-set>
+
+</console-module>

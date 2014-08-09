@@ -1,0 +1,24 @@
+<plugin
+	name="psychic-help"
+	package="help">
+
+	<models>
+		<model name="psychicHelpRequest"/>
+	</models>
+
+	<layer name="console">
+		<bean class="console.PsychicHelpFormAction"/>
+		<bean class="console.PsychicHelpFormResponder"/>
+		<bean class="console.PsychicHelpQueueConsolePlugin"/>
+		<bean class="console.PsychicHelpSummaryPart"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.PsychicHelpCommandHandler"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="psychic-help-request"/>
+	</console-modules>
+
+</plugin>

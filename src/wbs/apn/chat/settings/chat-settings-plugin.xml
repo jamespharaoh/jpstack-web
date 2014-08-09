@@ -1,0 +1,17 @@
+<plugin
+	name="chat-settings"
+	package="chat.settings">
+
+	<layer name="console">
+		<bean class="console.ChatSettingsMonitorsAction"/>
+		<bean class="console.ChatSettingsMonitorsPart"/>
+		<bean class="console.ChatSettingsNoteNamesAction"/>
+		<bean class="console.ChatSettingsNoteNamesPart"/>
+		<bean class="console.ChatUserCodeFormFieldSpec"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-settings"/>
+	</console-modules>
+
+</plugin>

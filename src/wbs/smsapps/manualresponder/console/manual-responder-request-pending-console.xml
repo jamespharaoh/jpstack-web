@@ -1,0 +1,24 @@
+<console-module
+	name="manual-responder-request-pending">
+
+	<object-context
+		name="manualResponderRequest.pending"
+		bean-name="manualResponderRequestPending"
+		object-name="manualResponderRequest">
+
+		<object>
+
+			<context-tab-responder-page
+				name="summary"/>
+
+			<context-action-page
+				name="form"/>
+
+			<context-action
+				name="numberNoteUpdate"/>
+
+		</object>
+
+	</object-context>
+
+</console-module>

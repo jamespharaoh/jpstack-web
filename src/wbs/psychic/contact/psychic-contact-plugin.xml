@@ -1,0 +1,24 @@
+<plugin
+	name="psychic-contact"
+	package="contact">
+
+	<models>
+		<model name="psychicContact"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.PsychicContactLogicImpl"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.PsychicContactFormAction"/>
+		<bean class="console.PsychicContactFormResponder"/>
+		<bean class="console.PsychicContactQueueConsolePlugin"/>
+		<bean class="console.PsychicContactSummaryPart"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="psychic-contact"/>
+	</console-modules>
+
+</plugin>

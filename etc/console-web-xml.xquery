@@ -1,4 +1,4 @@
-declare variable $project := //project;
+declare variable $build := /wbs-build;
 
 declare variable $mode external;
 
@@ -15,38 +15,14 @@ declare variable $mode external;
 	<context-param>
 
 		<param-name>{
-			'primaryProjectName'
-		}</param-name>
-
-		<param-value>{
-			string ($project/@name)
-		}</param-value>
-
-	</context-param>
-
-	<context-param>
-
-		<param-name>{
-			'primaryProjectPackageName'
-		}</param-name>
-
-		<param-value>{
-			string ($project/@package) }
-		</param-value>
-
-	</context-param>
-
-	<context-param>
-
-		<param-name>{
 			'beanDefinitionOutputPath'
 		}</param-name>
 
 		<param-value>{
 			concat (
-				'../work/console-',
+				'work/',
 				$mode,
-				'-beans'
+				'/output/console-beans'
 			)
 		}</param-value>
 

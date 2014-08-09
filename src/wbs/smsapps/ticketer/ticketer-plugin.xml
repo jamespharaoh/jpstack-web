@@ -1,0 +1,26 @@
+<plugin
+	name="ticketer"
+	package="ticketer">
+
+	<sql-scripts>
+		<sql-data name="ticketer-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="ticketer"/>
+		<model name="ticketerTicket"/>
+	</models>
+
+	<layer name="api">
+		<bean class="api.TicketerApiServletModule"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.TicketerCommand"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="ticketer"/>
+	</console-modules>
+
+</plugin>

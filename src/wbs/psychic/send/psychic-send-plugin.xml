@@ -1,0 +1,9 @@
+<plugin
+	name="psychic-send"
+	package="send">
+
+	<layer name="hibernate">
+		<bean class="logic.PsychicSendLogicImpl"/>
+	</layer>
+
+</plugin>

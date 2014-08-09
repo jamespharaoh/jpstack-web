@@ -1,0 +1,13 @@
+<plugin
+	name="psychic-affiliate"
+	package="affiliate">
+
+	<models>
+		<model name="psychicAffiliate"/>
+	</models>
+
+	<console-modules>
+		<console-module name="psychic-affiliate"/>
+	</console-modules>
+
+</plugin>

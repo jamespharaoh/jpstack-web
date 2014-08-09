@@ -1,0 +1,241 @@
+<console-module
+	name="chat-supervisor">
+
+	<extend-context
+		name="chat.supervisor"
+		base-name="chat"
+		extension-point="chat.supervisor"
+		object-name="chat">
+
+		<supervisor-page
+			title="Chat service supervisor">
+
+			<condition
+				name="chatId"
+				stuff-key="chatId"/>
+
+			<sum-stats-aggregator
+				name="sum"/>
+
+			<data-set
+				name="messageUser"
+				provider="chatMessageUserStatsProvider"/>
+
+			<data-set
+				name="message"
+				provider="chatMessageStatsProvider"/>
+
+			<data-set
+				name="initiation"
+				provider="chatUserInitiationStatsProvider"/>
+
+			<user-stats-grouper
+				name="user"/>
+
+			<integer-stats-formatter
+				name="int"/>
+
+			<integer-stats-formatter
+				name="userMessages"
+				target-base="chat.supervisorMessages"
+				target-group-param="user_id"
+				target-step-param="hour">
+
+				<target-param
+					name="date"
+					value="{dateYmd}"/>
+
+			</integer-stats-formatter>
+
+			<!-- totals -->
+
+			<simple-stats-resolver
+				name="messagesSent"
+				aggregator="sum"
+				value="messagesSent"
+				data-set="message"/>
+
+			<simple-stats-resolver
+				name="messagesReceived"
+				aggregator="sum"
+				value="messagesReceived"
+				data-set="message"/>
+
+			<simple-stats-resolver
+				name="messagesMissed"
+				aggregator="sum"
+				value="messagesMissed"
+				data-set="message"/>
+
+			<simple-stats-resolver
+				name="charactersSent"
+				aggregator="sum"
+				value="charactersSent"
+				data-set="message"/>
+
+			<multiplication-stats-resolver
+				name="charactersSentPerMessage">
+				<operand resolver="charactersSent"/>
+				<operand resolver="messagesSent" power="-1"/>
+			</multiplication-stats-resolver>
+
+			<simple-stats-resolver
+				name="alarmsSet"
+				aggregator="sum"
+				value="alarmsSet"
+				data-set="initiation"/>
+
+			<multiplication-stats-resolver
+				name="alarmsPercent">
+				<operand value="100"/>
+				<operand resolver="alarmsSet"/>
+				<operand resolver="messagesSent" power="-1"/>
+			</multiplication-stats-resolver>
+
+			<!-- stats per user -->
+
+			<simple-stats-resolver
+				name="userMessagesSent"
+				aggregator="sum"
+				index="userId"
+				value="messagesSent"
+				data-set="messageUser"/>
+
+			<simple-stats-resolver
+				name="userAlarmsSet"
+				aggregator="sum"
+				index="userId"
+				value="alarmsSet"
+				data-set="initiation"/>
+
+			<multiplication-stats-resolver
+				name="userAlarmsPercent">
+				<operand value="100"/>
+				<operand resolver="userAlarmsSet"/>
+				<operand resolver="userMessagesSent" power="-1"/>
+			</multiplication-stats-resolver>
+
+			<simple-stats-resolver
+				name="userCharactersSent"
+				aggregator="sum"
+				index="userId"
+				value="charactersSent"
+				data-set="messageUser"/>
+
+			<multiplication-stats-resolver
+				name="userCharactersSentPerMessage">
+				<operand resolver="userCharactersSent"/>
+				<operand resolver="userMessagesSent" power="-1"/>
+			</multiplication-stats-resolver>
+
+			<simple-stats-resolver
+				name="userFinalMessages"
+				aggregator="sum"
+				index="userId"
+				value="finalMessagesSent"
+				data-set="messageUser"/>
+
+			<heading
+				label="Messages"/>
+
+			<table>
+
+				<heading
+					label="Messages"
+					group-label="Users"/>
+
+				<stats-group
+					grouper="user"
+					resolver="userMessagesSent"
+					formatter="userMessages"/>
+
+				<separator/>
+
+				<stats-total
+					label="Total in"
+					resolver="messagesReceived"
+					formatter="int"/>
+
+				<stats-total
+					label="Total out"
+					resolver="messagesSent"
+					formatter="int"/>
+
+				<stats-total
+					label="Missed"
+					resolver="messagesMissed"
+					formatter="int"/>
+
+				<separator/>
+
+				<heading
+					label="Alarms (percentage of messages)"
+					group-label="User"/>
+
+				<stats-group
+					grouper="user"
+					resolver="userAlarmsPercent"
+					formatter="int"/>
+
+				<separator/>
+
+				<stats-total
+					label="Overall"
+					resolver="alarmsPercent"
+					formatter="int"/>
+
+				<stats-total
+					label="Total"
+					resolver="alarmsSet"
+					formatter="int"/>
+
+				<separator/>
+
+				<heading
+					label="Message length (average)"
+					group-label="User"/>
+
+				<stats-group
+					grouper="user"
+					resolver="userCharactersSentPerMessage"
+					formatter="int"/>
+
+				<stats-total
+					label="Overall"
+					resolver="charactersSentPerMessage"
+					formatter="int"/>
+
+				<separator/>
+
+				<heading
+					label="Final messages"
+					group-label="User"/>
+
+				<stats-group
+					grouper="user"
+					resolver="userFinalMessages"
+					formatter="int"/>
+
+			</table>
+
+			<heading
+				label="Notes"/>
+
+			<simple-part
+				name="chatSupervisorNotesPart"/>
+
+		</supervisor-page>
+
+		<context-tab-page
+			name="supervisorMessages"
+			title="Chat service supervisor&#x2014;Messages"
+			hide-tab="yes"/>
+
+		<context-tab-page
+			name="supervisorConversation"
+			title="Chat service supervisor&#x2014;Conversation"
+			hide-tab="yes"/>
+
+	</extend-context>
+
+</console-module>

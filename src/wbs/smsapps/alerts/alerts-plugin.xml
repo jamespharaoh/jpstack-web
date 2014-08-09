@@ -1,0 +1,34 @@
+<plugin
+	name="alerts"
+	package="alerts">
+
+	<sql-scripts>
+		<sql-data name="alerts-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="alertsAlert"/>
+		<model name="alertsNumber"/>
+		<model name="alertsSettings"/>
+		<model name="alertsStatusCheck"/>
+		<model name="alertsSubject"/>
+	</models>
+
+	<layer name="console">
+		<bean class="console.AlertsSettingsNumbersAction"/>
+		<bean class="console.AlertsSettingsNumbersPart"/>
+		<bean class="console.AlertsSubjectsPart"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.AlertsDaemon"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="alerts-alert"/>
+		<console-module name="alerts-settings"/>
+		<console-module name="alerts-status-check"/>
+		<console-module name="alerts-subject"/>
+	</console-modules>
+
+</plugin>

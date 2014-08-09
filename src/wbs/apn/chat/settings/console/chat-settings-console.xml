@@ -1,0 +1,213 @@
+<console-module
+	name="chat-settings">
+
+	<extend-context
+		name="chat.settings"
+		base-name="chat"
+		extension-point="chat.settings"
+		object-name="chat">
+
+		<section
+			name="settings"
+			label="Settings">
+
+			<object-settings-page
+				short-name="general"
+				fields="settings-general"/>
+
+			<section
+				name="templates"
+				label="Templates">
+
+				<extension-point
+					name="chat.helpTemplates"/>
+
+				<context-link
+					name="ad"
+					link="chatAdTemplate"
+					label="Ads"
+					priv-key="chat.manage"/>
+
+				<context-link
+					name="approvalRegexp"
+					link="chatApprovalRegexp"
+					label="Approvals"
+					priv-key="chat.manage"/>
+
+			</section>
+
+			<context-link
+				name="scheme"
+				link="chatScheme"
+				label="Schemes"
+				priv-key="chat.manage"/>
+
+			<context-link
+				name="network"
+				link="chatNetwork"
+				label="Networks"
+				priv-key="chat.manage"/>
+
+			<context-link
+				name="keyword"
+				link="chatKeyword"
+				label="Keywords"
+				priv-key="chat.manage"/>
+
+			<context-tab-action-page
+				name="monitors"/>
+
+			<context-link
+				name="noteName"
+				link="chatNoteName"
+				label="Note names"
+				priv-key="chat.manage"/>
+
+		</section>
+
+	</extend-context>
+
+	<field-set
+		name="settings-general"
+		object-name="chat">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<seconds-field
+			name="timeLogoff"
+			label="Time to logoff"/>
+
+		<seconds-field
+			name="timeReceive"
+			label="Min info time after receive"/>
+
+		<seconds-field
+			name="timeSend"
+			label="Min info time after send"/>
+
+		<seconds-field
+			name="timeInfo"
+			label="Min info time after info"/>
+
+		<seconds-field
+			name="timeName"
+			label="Time between name hints"/>
+
+		<seconds-field
+			name="timeNameJoin"
+			label="Tme after join before name hint"/>
+
+		<seconds-field
+			name="timePicHint"
+			label="Time between pic hints"/>
+
+		<timestamp-field
+			name="lastMonitorSwap"
+			read-only="yes"/>
+
+		<seconds-field
+			name="timeMonitorSwap"
+			label="TIme between monitor swaps"/>
+
+		<object-field
+			name="locator"
+			finder="locator"/>
+
+		<seconds-field
+			name="timeJoinOutboundMin"
+			label="Min outbound time after join"/>
+
+		<seconds-field
+			name="timeJoinOutboundMax"
+			label="Max outbound time after join"/>
+
+		<seconds-field
+			name="timeQuietOutbound"
+			label="Quiet user outbound time"/>
+
+		<seconds-field
+			name="timeWebLogoff"
+			label="Web/iphone automatic logoff time"/>
+
+		<seconds-field
+			name="timeSignupTimeout"
+			label="Signup timeout"/>
+
+		<integer-field
+			name="minMonitorMessageLength"
+			label="Minimum monitor message length"/>
+
+		<chat-user-code-field
+			name="systemChatUser"
+			label="Chat user for system messages"/>
+
+		<yes-no-field
+			name="autoJoinChat"/>
+
+		<yes-no-field
+			name="autoJoinDate"
+			label="Auto join dating"/>
+
+		<yes-no-field
+			name="datingEnabled"
+			label="Dating sends enabled"/>
+
+		<seconds-field
+			name="maxAlarmTime"
+			label="Maximum alarm time"/>
+
+		<object-field
+			name="adultAdsChat"
+			label="Adult ads chat service"
+			finder="chat"/>
+
+		<seconds-field
+			name="adultAdsTime"/>
+
+		<seconds-field
+			name="adTimeFirst"
+			label="Automatic ad first time"/>
+
+		<seconds-field
+			name="adTime"
+			label="Automatic ad regular time"/>
+
+		<integer-field
+			name="adCount"
+			label="Automatic ad regular count"/>
+
+		<seconds-field
+			name="chatQueuePreferredTime"/>
+
+		<seconds-field
+			name="messageQueuePreferredTime"/>
+
+		<seconds-field
+			name="helpQueuePreferredTime"/>
+
+		<seconds-field
+			name="infoQueuePreferredTime"/>
+
+		<object-field
+			name="currency"
+			finder="currency"/>
+
+		<object-field
+			name="numberFormat"
+			finder="numberFormat"/>
+
+		<object-field
+			name="gazetteer"
+			finder="gazetteer"/>
+
+		<text-field
+			name="defaultBrandName"/>
+
+	</field-set>
+
+</console-module>

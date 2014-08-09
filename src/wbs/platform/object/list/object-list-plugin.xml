@@ -1,0 +1,12 @@
+<plugin
+	name="object-list"
+	package="object.list">
+
+	<layer name="console">
+		<bean class="ObjectListTabSpec"/>
+		<bean class="ObjectListPageBuilder"/>
+		<bean class="ObjectListPageSpec"/>
+		<bean class="ObjectListPart"/>
+	</layer>
+
+</plugin>

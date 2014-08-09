@@ -1,0 +1,22 @@
+<plugin
+	name="psychic-user-core"
+	package="user.core">
+
+	<models>
+		<model name="psychicUser"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.PsychicUserLogicImpl"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.PsychicBillModeHelper"/>
+		<bean class="console.PsychicUserNumberPlugin"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="psychic-user"/>
+	</console-modules>
+
+</plugin>

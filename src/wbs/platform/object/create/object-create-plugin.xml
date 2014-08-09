@@ -1,0 +1,12 @@
+<plugin
+	name="object-create"
+	package="object.create">
+
+	<layer name="console">
+		<bean class="ObjectCreateAction"/>
+		<bean class="ObjectCreatePageBuilder"/>
+		<bean class="ObjectCreatePageSpec"/>
+		<bean class="ObjectCreatePart"/>
+	</layer>
+
+</plugin>

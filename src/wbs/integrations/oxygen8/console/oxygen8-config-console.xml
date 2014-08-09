@@ -1,0 +1,61 @@
+<console-module
+	name="oxygen8-config">
+
+	<console-helper-provider
+		object-name="oxygen8Config"
+		view-delegate-field="root"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="oxygen8.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<priv-key
+			name="oxygen8Config.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="oxygen8ConfigName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="oxygen8Config"
+		object-name="oxygen8Config">
+
+		<list>
+
+			<object-list-page/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page/>
+
+			<object-settings-page/>
+
+			<context-link
+				name="network"
+				link="oxygen8Network"
+				label="Networks"
+				priv-key="oxygen8.manage"/>
+
+			<context-link
+				name="reportCode"
+				link="oxygen8ReportCode"
+				label="Report codes"
+				priv-key="oxygen8.manage"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+</console-module>

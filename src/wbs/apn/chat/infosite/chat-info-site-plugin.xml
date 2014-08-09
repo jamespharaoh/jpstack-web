@@ -1,0 +1,23 @@
+<plugin
+	name="chat-info-site"
+	package="chat.infosite">
+
+	<sql-scripts>
+		<sql-data name="chat-info-site-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="chatInfoSite"/>
+	</models>
+
+	<layer name="api">
+		<bean class="api.ChatInfoSiteApiModule"/>
+		<bean class="api.ChatInfoSiteExpiredResponder"/>
+		<bean class="api.ChatInfoSiteImageResponder"/>
+		<bean class="api.ChatInfoSiteMessageSentResponder"/>
+		<bean class="api.ChatInfoSiteRespondAction"/>
+		<bean class="api.ChatInfoSiteViewAction"/>
+		<bean class="api.ChatInfoSiteViewResponder"/>
+	</layer>
+
+</plugin>

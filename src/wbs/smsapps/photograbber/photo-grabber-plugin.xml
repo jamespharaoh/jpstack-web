@@ -1,0 +1,24 @@
+<plugin
+	name="photo-grabber"
+	package="photograbber">
+
+	<sql-scripts>
+		<sql-data name="photo-grabber-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="photoGrabber"/>
+		<model name="photoGrabberReissue"/>
+		<model name="photoGrabberRequest"/>
+	</models>
+
+	<layer name="daemon">
+		<bean class="daemon.PhotoGrabberCommand"/>
+		<bean class="daemon.PhotoGrabberDelivery"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="photo-grabber"/>
+	</console-modules>
+
+</plugin>

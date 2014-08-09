@@ -1,0 +1,72 @@
+<console-module
+	name="queue">
+
+	<console-helper-provider
+		object-name="queue">
+
+		<context-stuff
+			name="queueName"
+			field="id"/>
+
+		<priv-key
+			name="queue.manage"
+			delegate="parent"
+			priv="manage"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="queue"
+		object-name="queue">
+
+		<list>
+
+			<context-tab-page
+				name="listActive"
+				tab-label="Active"
+				title="Active queues"/>
+
+			<context-tab-action-page
+				name="users"
+				title="List active users"/>
+
+			<extension-point
+				name="queue.supervisor"/>
+
+			<context-responder-page
+				name="home"/>
+
+			<context-responder-page
+				name="filter"/>
+
+			<context-get-action
+				name="item"/>
+
+			<context-action
+				name="claim"/>
+
+			<context-action
+				name="unclaim"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="summary"
+		object-name="queue">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+
+	</field-set>
+
+</console-module>

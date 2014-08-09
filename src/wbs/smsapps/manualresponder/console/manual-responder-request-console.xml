@@ -1,0 +1,116 @@
+<console-module
+	name="manual-responder-request">
+
+	<console-helper-provider
+		object-name="manualResponderRequest"
+		view-delegate-field="manualResponder"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="manualResponderRequestName"
+			field="id"/>
+
+		<context-stuff
+			name="manualResponderId"
+			delegate="manualResponder"
+			field="id"/>
+
+		<run-post-processor
+			name="manualResponder"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="manualResponderRequest"
+		object-name="manualResponderRequest">
+
+		<list>
+
+			<object-search-page
+				search-fields="search"
+				results-fields="results"
+				priv-key="manualResponder.manage"
+				parent-id-key="manualResponderId"
+				parent-id-name="manualResponderId"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="search">
+
+		<text-field
+			name="numberLike"
+			label="Number"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="timestampAfter"
+			label="Time from"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="timestampBefore"
+			label="Time to"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="results"
+		object-name="manualResponderRequest">
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<object-field
+			name="number"
+			finder="number"/>
+
+		<delegate-field
+			delegate="message"
+			name="text"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="manualResponderRequest">
+
+		<parent-field/>
+
+		<object-field
+			name="message"
+			finder="message"/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<object-field
+			name="user"
+			finder="user"/>
+
+		<yes-no-field
+			name="pending"/>
+
+		<object-field
+			name="number"
+			finder="number"/>
+
+		<object-field
+			name="queueItem"
+			finder="queueItem"/>
+
+		<!-- TODO replies -->
+
+	</field-set>
+
+</console-module>

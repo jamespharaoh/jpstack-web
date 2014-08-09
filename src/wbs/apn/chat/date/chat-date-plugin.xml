@@ -1,0 +1,15 @@
+<plugin
+	name="chat-date"
+	package="chat.date">
+
+	<layer name="logic">
+		<bean class="logic.ChatDateLogicImpl"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.ChatDateCommand"/>
+		<bean class="daemon.ChatDateStopCommand"/>
+		<bean class="daemon.ChatDateDaemon"/>
+	</layer>
+
+</plugin>

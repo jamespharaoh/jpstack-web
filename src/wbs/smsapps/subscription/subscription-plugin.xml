@@ -1,0 +1,45 @@
+<plugin
+	name="subscription"
+	package="subscription">
+
+	<sql-scripts>
+		<sql-data name="subscription-data"/>
+		<sql-data name="subscription-sub-data"/>
+	</sql-scripts>
+
+	<models>
+		<type name="subscriptionStatus"/>
+		<model name="subscription"/>
+		<model name="subscriptionAffiliate"/>
+		<model name="subscriptionSend"/>
+		<model name="subscriptionSendNumber"/>
+		<model name="subscriptionSendPart"/>
+		<model name="subscriptionSub"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.SubscriptionLogic"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.SubscriptionAdminSearchNumbersResponder"/>
+		<bean class="console.SubscriptionAdminSearchPart"/>
+		<bean class="console.SubscriptionAdminSearchRequestHandler"/>
+		<bean class="console.SubscriptionNumberAdvice"/>
+		<bean class="console.SubscriptionNumberLinkProvider"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.SubscriptionDeliveryNoticeHandler"/>
+		<bean class="daemon.SubscriptionSendDaemon"/>
+		<bean class="daemon.SubscriptionSubscribeCommand"/>
+		<bean class="daemon.SubscriptionUnsubscribeCommand"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="subscription"/>
+		<console-module name="subscription-affiliate"/>
+		<console-module name="subscription-affiliate-admin"/>
+	</console-modules>
+
+</plugin>

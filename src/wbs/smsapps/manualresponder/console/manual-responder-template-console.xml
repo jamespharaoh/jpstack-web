@@ -1,0 +1,231 @@
+<console-module name="manual-responder-template">
+
+	<console-helper-provider
+		object-name="manualResponderTemplate"
+		view-delegate-field="manualResponder"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="manualResponderTemplateName"
+			field="name"/>
+
+		<context-stuff
+			name="manualResponderId"
+			delegate="manualResponder"
+			field="id"/>
+
+		<run-post-processor
+			name="manualResponder"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="manualResponderTemplate"
+		object-name="manualResponderTemplate">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"
+				priv-key="manualResponder.manage"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="manualResponderTemplate">
+
+		<name-field/>
+		<description-field/>
+
+		<object-field
+			name="router"
+			finder="router"/>
+
+		<yes-no-field
+			name="customisable"
+			label="Cust"/>
+
+		<integer-field
+			name="maximumMessages"
+			label="Max"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="manualResponderTemplate">
+
+		<name-field/>
+		<description-field/>
+
+		<object-field
+			name="router"
+			finder="router"/>
+
+		<text-field
+			name="number"/>
+
+		<text-area-field
+			name="defaultText"/>
+
+		<yes-no-field
+			name="customisable"/>
+
+		<object-field
+			name="replyKeywordSet"
+			finder="keywordSet"/>
+
+		<integer-field
+			name="maximumMessages"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="splitLong"/>
+
+		<yes-no-field
+			name="applyTemplates"/>
+
+		<text-area-field
+			name="singleTemplate"
+			nullable="yes"/>
+
+		<text-area-field
+			name="firstTemplate"
+			nullable="yes"/>
+
+		<text-area-field
+			name="middleTemplate"
+			nullable="yes"/>
+
+		<text-area-field
+			name="lastTemplate"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="manualResponderTemplate">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+
+		<object-field
+			name="router"
+			finder="router"/>
+
+		<text-field
+			name="number"/>
+
+		<text-area-field
+			name="defaultText"/>
+
+		<yes-no-field
+			name="customisable"/>
+
+		<object-field
+			name="replyKeywordSet"
+			finder="keywordSet"/>
+
+		<integer-field
+			name="maximumMessages"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="splitLong"/>
+
+		<yes-no-field
+			name="applyTemplates"/>
+
+		<text-area-field
+			name="singleTemplate"
+			nullable="yes"/>
+
+		<text-area-field
+			name="firstTemplate"
+			nullable="yes"/>
+
+		<text-area-field
+			name="middleTemplate"
+			nullable="yes"/>
+
+		<text-area-field
+			name="lastTemplate"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="manualResponderTemplate">
+
+		<id-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+
+		<object-field
+			name="router"
+			finder="router"/>
+
+		<text-field
+			name="number"/>
+
+		<text-area-field
+			name="defaultText"/>
+
+		<yes-no-field
+			name="customisable"/>
+
+		<object-field
+			name="replyKeywordSet"
+			finder="keywordSet"/>
+
+		<integer-field
+			name="maximumMessages"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="splitLong"/>
+
+		<yes-no-field
+			name="applyTemplates"/>
+
+		<text-area-field
+			name="singleTemplate"
+			nullable="yes"/>
+
+		<text-area-field
+			name="firstTemplate"
+			nullable="yes"/>
+
+		<text-area-field
+			name="middleTemplate"
+			nullable="yes"/>
+
+		<text-area-field
+			name="lastTemplate"
+			nullable="yes"/>
+
+	</field-set>
+
+</console-module>

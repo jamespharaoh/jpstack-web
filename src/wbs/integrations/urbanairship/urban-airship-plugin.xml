@@ -1,0 +1,9 @@
+<plugin
+	name="urban-airship"
+	package="urbanairship">
+
+	<layer name="logic">
+		<bean class="logic.UrbanAirshipApi"/>
+	</layer>
+
+</plugin>

@@ -1,0 +1,9 @@
+<plugin
+	name="unwired-plaza"
+	package="unwiredplaza">
+
+	<layer name="api">
+		<bean class="api.UnwiredPlazaApiServletModule"/>
+	</layer>
+
+</plugin>

@@ -1,0 +1,206 @@
+<console-module
+	name="forwarder">
+
+	<console-helper-provider
+		object-name="forwarder">
+
+		<priv-key
+			name="forwarder.manage"
+			priv="manage"/>
+
+		<priv-key
+			name="forwarder.messages"
+			priv="messages"/>
+
+		<priv-key
+			name="forwarder.stats"
+			priv="stats"/>
+
+		<context-stuff
+			name="forwarderName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="forwarder"
+		object-name="forwarder">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<context-link
+				name="route"
+				link="forwarderRoute"
+				label="Routes"
+				priv-key="forwarder.manage"/>
+
+			<object-sms-messages-page/>
+
+			<object-sms-stats-page/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="forwarder">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="forwarder">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<integer-field
+			name="maxReplies"/>
+
+		<integer-field
+			name="maxBillReplies"
+			label="Max billed replies"/>
+
+		<integer-field
+			name="maxFreeReplies"/>
+
+		<yes-no-field
+			name="allowNewSends"/>
+
+		<yes-no-field
+			name="allowNullOtherId"
+			label="Allow no id"/>
+
+		<text-field
+			name="password"/>
+
+		<text-field
+			name="url"
+			label="URL"/>
+
+		<text-field
+			name="urlParams"
+			label="URL params"/>
+
+		<yes-no-field
+			name="urlPost"
+			label="URL method"
+			yes-label="POST"
+			no-label="GET"/>
+
+		<integer-field
+			name="maxPri"
+			label="Max priority"/>
+
+		<integer-field
+			name="defaultPri"
+			label="Default priority"/>
+
+		<seconds-field
+			name="inboundTimeoutSecs"
+			label="Inbound message timeout"/>
+
+		<yes-no-field
+			name="reportEnabled"/>
+
+		<object-field
+			name="smsTracker"
+			label="SMS tracker"
+			finder="smsTracker"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="forwarder">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<integer-field
+			name="maxReplies"/>
+
+		<integer-field
+			name="maxBillReplies"
+			label="Max billed replies"/>
+
+		<integer-field
+			name="maxFreeReplies"/>
+
+		<yes-no-field
+			name="allowNewSends"/>
+
+		<yes-no-field
+			name="allowNullOtherId"
+			label="Allow no id"/>
+
+		<text-field
+			name="password"/>
+
+		<text-field
+			name="url"
+			label="URL"/>
+
+		<text-field
+			name="urlParams"
+			label="URL params"/>
+
+		<yes-no-field
+			name="urlPost"
+			label="URL method"
+			yes-label="POST"
+			no-label="GET"/>
+
+		<integer-field
+			name="maxPri"
+			label="Max priority"/>
+
+		<integer-field
+			name="defaultPri"
+			label="Default priority"/>
+
+		<seconds-field
+			name="inboundTimeoutSecs"
+			label="Inbound message timeout"/>
+
+		<yes-no-field
+			name="reportEnabled"/>
+
+		<object-field
+			name="smsTracker"
+			label="SMS tracker"
+			finder="smsTracker"/>
+
+	</field-set>
+
+</console-module>

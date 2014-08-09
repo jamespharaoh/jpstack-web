@@ -1,0 +1,23 @@
+<plugin
+	name="mediaburst"
+	package="mediaburst">
+
+	<sql-scripts>
+		<sql-data name="mediaburst-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="mediaburstProteusRouteOut"/>
+		<model name="mediaburstNetwork"/>
+	</models>
+
+	<layer name="api">
+		<bean class="api.MediaburstApiServletModule"/>
+		<bean class="api.MediaburstProteusApiServletModule"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.MediaburstProteusSender"/>
+	</layer>
+
+</plugin>

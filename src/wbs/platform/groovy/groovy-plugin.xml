@@ -1,0 +1,14 @@
+<plugin
+	name="groovy"
+	package="groovy">
+
+	<layer name="console">
+		<bean class="console.GroovyAction"/>
+		<bean class="console.GroovyResponder"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="groovy"/>
+	</console-modules>
+
+</plugin>

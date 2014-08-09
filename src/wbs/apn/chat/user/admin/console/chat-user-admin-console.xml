@@ -1,0 +1,73 @@
+<console-module
+	name="chat-user-admin">
+
+	<extend-context
+		name="chatUser.admin"
+		base-name="chatUser"
+		extension-point="chatUser.admin"
+		object-name="chatUser">
+
+		<section
+			name="admin"
+			label="Admin">
+
+			<context-tab-action-page
+				name="info"/>
+
+			<context-tab-action-page
+				name="name"/>
+
+			<context-tab-action-page
+				name="prefs"/>
+
+			<context-tab-action-page
+				name="dob"/>
+
+			<context-tab-action-page
+				name="barring"/>
+
+			<context-tab-action-page
+				name="credit"/>
+
+			<context-tab-action-page
+				name="creditMode"/>
+
+			<context-tab-action-page
+				name="date"/>
+
+			<context-tab-action-page
+				name="online"/>
+
+			<context-tab-action-page
+				name="bill"/>
+
+			<object-settings-page
+				short-name="other"
+				fields="settings"
+				priv-key="chat.userAdmin"/>
+
+			<context-tab-action-page
+				name="delete"/>
+
+		</section>
+
+	</extend-context>
+
+	<field-set
+		name="settings"
+		object-name="chatUser">
+
+		<yes-no-field
+			name="hiddenFromChatTube"/>
+
+		<yes-no-field
+			name="stealthMonitor"/>
+
+		<enum-field
+			name="imageMode"
+			nullable="yes"
+			helper="chatUserImageModeConsoleHelper"/>
+
+	</field-set>
+
+</console-module>

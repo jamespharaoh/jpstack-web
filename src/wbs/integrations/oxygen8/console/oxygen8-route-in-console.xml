@@ -1,0 +1,104 @@
+<console-module
+	name="oxygen8-route-in">
+
+	<console-helper-provider
+		object-name="oxygen8RouteIn"
+		view-delegate-field="root"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="oxygen8_manage"
+			delegate="root"
+			priv="manage"/>
+
+		<priv-key
+			name="oxygen8RouteIn_manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="oxygen8RouteInName"
+			delegate="route"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="oxygen8RouteIn"
+		object-name="oxygen8RouteIn">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="oxygen8RouteIn">
+
+		<parent-field/>
+
+		<object-field
+			name="oxygen8Config"
+			label="Config"
+			finder="oxygen8Config"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="oxygen8RouteIn">
+
+		<parent-field/>
+
+		<object-field
+			name="oxygen8Config"
+			finder="oxygen8Config"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="oxygen8RouteIn">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="oxygen8Config"
+			finder="oxygen8Config"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="oxygen8RouteIn">
+
+		<parent-field/>
+
+		<object-field
+			name="oxygen8Config"
+			finder="oxygen8Config"/>
+
+	</field-set>
+
+</console-module>

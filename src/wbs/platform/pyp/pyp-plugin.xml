@@ -1,0 +1,9 @@
+<plugin
+	name="pyp"
+	package="pyp">
+
+	<layer name="console">
+		<bean class="console.Pyp"/>
+	</layer>
+
+</plugin>

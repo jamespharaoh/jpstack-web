@@ -1,0 +1,9 @@
+<plugin
+	name="console-part"
+	package="console.part">
+
+	<layer name="console">
+		<bean class="NotFoundPart"/>
+	</layer>
+
+</plugin>

@@ -1,0 +1,16 @@
+<plugin
+	name="chat-named-note"
+	package="chat.namednote">
+
+	<sql-scripts>
+		<sql-schema name="chat-named-note"/>
+		<sql-data name="chat-named-note-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="chatNamedNote"/>
+		<model name="chatNamedNoteLog"/>
+		<model name="chatNoteName"/>
+	</models>
+
+</plugin>

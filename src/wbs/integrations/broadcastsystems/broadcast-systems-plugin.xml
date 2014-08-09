@@ -1,0 +1,23 @@
+<plugin
+	name="broadcast-systems"
+	package="broadcastsystems">
+
+	<sql-scripts>
+		<sql-data name="broadcast-systems-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="broadcastSystemsRouteOut"/>
+	</models>
+
+	<layer name="api">
+		<bean class="api.BroadcastSystemsApiServletModule"/>
+		<bean class="api.BroadcastSystemsReportFile"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.BroadcastSystemsSender1"/>
+		<bean class="daemon.BroadcastSystemsSender2"/>
+	</layer>
+
+</plugin>

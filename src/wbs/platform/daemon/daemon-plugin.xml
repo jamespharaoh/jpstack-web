@@ -1,0 +1,9 @@
+<plugin
+	name="daemon"
+	package="daemon">
+
+	<layer name="daemon">
+		<bean class="ThreadManager"/>
+	</layer>
+
+</plugin>

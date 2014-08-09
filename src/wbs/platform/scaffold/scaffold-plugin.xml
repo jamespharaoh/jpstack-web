@@ -1,0 +1,20 @@
+<plugin
+	name="scaffold"
+	package="scaffold">
+
+	<sql-scripts>
+		<sql-schema name="root"/>
+		<sql-schema name="slice"/>
+	</sql-scripts>
+
+	<models>
+		<model name="root"/>
+		<model name="slice"/>
+	</models>
+
+	<console-modules>
+		<console-module name="root"/>
+		<console-module name="slice"/>
+	</console-modules>
+
+</plugin>

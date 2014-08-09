@@ -1,0 +1,13 @@
+<plugin
+	name="object-criteria"
+	package="object.criteria">
+
+	<layer name="console">
+		<bean class="WhereDeletedCriteriaSpec"/>
+		<bean class="WhereNotDeletedCriteriaSpec"/>
+		<bean class="WhereNullCriteriaSpec"/>
+		<bean class="WhereNotNullCriteriaSpec"/>
+		<bean class="WhereICanManageCriteriaSpec"/>
+	</layer>
+
+</plugin>

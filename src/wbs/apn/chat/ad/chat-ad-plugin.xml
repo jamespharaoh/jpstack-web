@@ -1,0 +1,22 @@
+<plugin
+	name="chat-ad"
+	package="chat.ad">
+
+	<sql-scripts>
+		<sql-data name="chat-ad-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="chatAdTemplate"/>
+	</models>
+
+	<layer name="daemon">
+		<bean class="daemon.ChatAdDaemon"/>
+		<bean class="daemon.ChatAdultAdDaemon"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-ad"/>
+	</console-modules>
+
+</plugin>

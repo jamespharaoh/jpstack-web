@@ -1,0 +1,55 @@
+<console-module
+	name="manual-responder-number">
+
+	<console-helper-provider
+		object-name="manualResponderNumber"
+		view-delegate-field="manualResponder"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="manualResponderNumberName"
+			field="id"/>
+
+		<context-stuff
+			name="manualResponderId"
+			delegate="manualResponder"
+			field="id"/>
+
+		<run-post-processor
+			name="manualResponder"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="manualResponderNumber"
+		object-name="manualResponderNumber">
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="summary"
+		object-name="manualResponderNumber">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="number"
+			finder="number"/>
+
+		<text-area-field
+			name="notesText"
+			label="Notes"/>
+
+	</field-set>
+
+</console-module>

@@ -1,0 +1,14 @@
+<plugin
+	name="rpc"
+	package="rpc">
+
+	<layer name="api">
+		<bean class="php.PhpMapResponder"/>
+		<bean class="php.PhpRpcAction"/>
+		<bean class="php.PhpStringMapResponderFactory"/>
+		<bean class="xml.XmlResponder"/>
+		<bean class="xml.XmlRpcAction"/>
+		<bean class="xml.XmlRpcFile"/>
+	</layer>
+
+</plugin>

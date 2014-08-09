@@ -1,0 +1,72 @@
+<console-module
+	name="script-language">
+
+	<console-helper-provider
+		object-name="scriptLanguage"
+		view-delegate-field="parent">
+
+		<context-stuff
+			name="scriptLanguageName"
+			field="code"/>
+
+		<priv-key
+			name="scriptLanguage.manage"
+			delegate="parent"
+			priv="manage"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="scriptLanguage"
+		object-name="scriptLanguage">
+
+		<list>
+
+			<object-list-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="scriptLanguage">
+
+		<code-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="scriptLanguage">
+
+		<id-field/>
+		<code-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="scriptLanguage">
+
+		<id-field/>
+		<code-field read-only="yes"/>
+		<description-field/>
+
+	</field-set>
+
+</console-module>

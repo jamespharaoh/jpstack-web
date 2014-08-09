@@ -1,0 +1,52 @@
+package wbs.platform.object.list;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
+import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataChildren;
+import wbs.framework.data.annotations.DataClass;
+import wbs.platform.console.spec.ConsoleModuleData;
+import wbs.platform.object.criteria.CriteriaSpec;
+
+@Accessors (fluent = true)
+@Data
+@DataClass ("list-tab")
+@PrototypeComponent ("objectListTabSpec")
+@ConsoleModuleData
+public
+class ObjectListTabSpec {
+
+	// attributes
+
+	@DataAttribute
+	String name;
+
+	@DataAttribute (
+		required = true)
+	String label;
+
+	// children
+
+	@DataChildren (
+		direct = true)
+	List<CriteriaSpec> criterias =
+		new ArrayList<CriteriaSpec> ();
+
+	// utils
+
+	public
+	ObjectListTabSpec addCriteria (
+			CriteriaSpec criteria) {
+
+		criterias.add (
+			criteria);
+
+		return this;
+
+	}
+
+}

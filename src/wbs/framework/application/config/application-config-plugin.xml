@@ -1,0 +1,9 @@
+<plugin
+	name="application-config"
+	package="application.config">
+
+	<layer name="config">
+		<bean class="WbsConfigFactory"/>
+	</layer>
+
+</plugin>

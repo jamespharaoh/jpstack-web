@@ -1,0 +1,109 @@
+<console-module
+	name="dialogue-locator">
+
+	<console-helper-provider
+		object-name="dialogueLocator"
+		view-delegate-field="root"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="dialogueLocator.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="dialogueLocatorName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="dialogueLocator"
+		object-name="dialogueLocator">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="dialogueLocator">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="dialogueLocator">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<text-field
+			name="url"
+			label="URL"/>
+
+		<text-field
+			name="account"/>
+
+		<text-field
+			name="organiser"/>
+
+		<text-field
+			name="password"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="dialogueLocator">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<text-field
+			name="url"
+			label="URL"/>
+
+		<text-field
+			name="account"/>
+
+		<text-field
+			name="organiser"/>
+
+		<text-field
+			name="password"/>
+
+	</field-set>
+
+</console-module>

@@ -1,0 +1,12 @@
+<plugin
+	name="console-metamodule"
+	package="console.metamodule">
+
+	<layer name="console">
+		<bean class="ConsoleMetaManagerImpl"/>
+		<bean class="ConsoleMetaModuleBuilder"/>
+		<bean class="ConsoleMetaModuleImpl"/>
+		<bean class="ResolvedConsoleContextLink"/>
+	</layer>
+
+</plugin>

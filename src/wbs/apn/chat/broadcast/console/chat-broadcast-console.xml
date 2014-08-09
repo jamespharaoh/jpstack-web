@@ -1,0 +1,28 @@
+<console-module
+	name="chat-broadcast">
+
+	<extend-context
+		name="chat.broadcast"
+		base-name="chat"
+		extension-point="chat.broadcast"
+		object-name="chat">
+
+		<section
+			name="broadcast"
+			label="Broadcast">
+
+			<context-tab-responder-page
+				name="list"/>
+
+			<context-tab-action-page
+				name="send"/>
+
+			<context-tab-responder
+				name="verify"
+				tab="chat.broadcast.send"/>
+
+		</section>
+
+	</extend-context>
+
+</console-module>

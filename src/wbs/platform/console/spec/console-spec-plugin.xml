@@ -1,0 +1,10 @@
+<plugin
+	name="console-spec"
+	package="console.spec">
+
+	<layer name="console">
+		<bean class="ConsoleSpec"/>
+		<bean class="ConsoleSpecReader"/>
+	</layer>
+
+</plugin>

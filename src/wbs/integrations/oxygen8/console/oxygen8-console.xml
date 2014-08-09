@@ -1,0 +1,32 @@
+<console-module
+	name="oxygen8">
+
+	<simple-context
+		name="oxygen8">
+
+		<priv-key
+			name="oxygen8.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-link
+			name="config"
+			link="oxygen8Config"
+			label="Configs"
+			priv-key="oxygen8.manage"/>
+
+		<context-link
+			name="routeIn"
+			link="oxygen8RouteIn"
+			label="Inbound routes routes"
+			priv-key="oxygen8.manage"/>
+
+		<context-link
+			name="routeOut"
+			link="oxygen8RouteOut"
+			label="Outbound routes"
+			priv-key="oxygen8.manage"/>
+
+	</simple-context>
+
+</console-module>

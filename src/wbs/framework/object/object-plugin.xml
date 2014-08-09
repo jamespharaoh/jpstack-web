@@ -1,0 +1,11 @@
+<plugin
+	name="object"
+	package="object">
+
+	<layer name="object">
+		<bean class="ObjectHelperBuilder"/>
+		<bean class="ObjectHelperProviderManager"/>
+		<bean class="ObjectManagerImpl"/>
+	</layer>
+
+</plugin>

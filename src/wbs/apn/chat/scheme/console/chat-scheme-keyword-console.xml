@@ -1,0 +1,155 @@
+<console-module
+	name="chat-scheme-keyword">
+
+	<console-helper-provider
+		object-name="chatSchemeKeyword"
+		view-delegate-field="chatScheme">
+
+		<context-stuff
+			name="chatSchemeKeywordName"
+			field="keyword"/>
+
+		<context-stuff
+			name="chatSchemeId"
+			delegate="chatScheme"
+			field="id"/>
+
+		<priv-key
+			name="chatSchemeKeyword.manage"
+			delegate="chatScheme"
+			priv="manage"/>
+
+		<run-post-processor
+			name="chatScheme"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="chatSchemeKeyword"
+		object-name="chatSchemeKeyword">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="chatSchemeKeyword">
+
+		<code-field/>
+
+		<enum-field
+			name="joinType"
+			label="Type"
+			helper="chatKeywordJoinTypeConsoleHelper"/>
+
+		<enum-field
+			name="joinGender"
+			label="Gender"
+			helper="genderConsoleHelper"/>
+
+		<enum-field
+			name="joinOrient"
+			label="Orient"
+			helper="orientConsoleHelper"/>
+
+		<object-field
+			name="joinChatAffiliate"
+			label="Affiliate"
+			finder="chatAffiliate"/>
+
+		<object-field
+			name="command"
+			finder="command"/>
+
+		<yes-no-field
+			name="confirmCharges"
+			label="Charges"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="chatSchemeKeyword">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+
+		<enum-field
+			name="joinType"
+			helper="chatKeywordJoinTypeConsoleHelper"/>
+
+		<enum-field
+			name="joinGender"
+			helper="genderConsoleHelper"/>
+
+		<enum-field
+			name="joinOrient"
+			helper="orientConsoleHelper"/>
+
+		<object-field
+			name="joinChatAffiliate"
+			finder="chatAffiliate"
+			root-field="chatScheme"/>
+
+		<object-field
+			name="command"
+			finder="command"/>
+
+		<yes-no-field
+			name="confirmCharges"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="chatSchemeKeyword">
+
+		<id-field/>
+		<code-field/>
+
+		<enum-field
+			name="joinType"
+			helper="chatKeywordJoinTypeConsoleHelper"/>
+
+		<enum-field
+			name="joinGender"
+			helper="genderConsoleHelper"/>
+
+		<enum-field
+			name="joinOrient"
+			helper="orientConsoleHelper"/>
+
+		<object-field
+			name="joinChatAffiliate"
+			finder="chatAffiliate"
+			root-field="chatScheme"/>
+
+		<object-field
+			name="command"
+			finder="command"/>
+
+		<yes-no-field
+			name="confirmCharges"/>
+
+	</field-set>
+
+</console-module>

@@ -1,0 +1,21 @@
+<plugin
+	name="psychic-bill"
+	package="bill">
+
+	<models>
+		<type name="psychicBillMode"/>
+		<model name="psychicCharges"/>
+		<model name="psychicCreditLog"/>
+		<model name="psychicUserAccount"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.PsychicBillLogicImpl"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.PsychicBillDeliveryHandler"/>
+		<bean class="daemon.PsychicChargesCommand"/>
+	</layer>
+
+</plugin>

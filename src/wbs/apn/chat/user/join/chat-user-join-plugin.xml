@@ -1,0 +1,14 @@
+<plugin
+	name="chat-user-join"
+	package="chat.user.join">
+
+	<sql-scripts>
+		<sql-data name="chat-user-join-data"/>
+	</sql-scripts>
+
+	<layer name="daemon">
+		<bean class="daemon.ChatJoinCommand"/>
+		<bean class="daemon.ChatJoiner"/>
+	</layer>
+
+</plugin>

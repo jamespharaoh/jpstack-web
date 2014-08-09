@@ -1,0 +1,216 @@
+<console-module name="alerts-settings">
+
+	<console-helper-provider
+		object-name="alertsSettings">
+
+		<context-stuff
+			name="alertsSettingsName"
+			field="code"/>
+
+		<priv-key
+			name="alertsSettings.manage"
+			priv="manage"/>
+
+		<priv-key
+			name="alertsSettings.messages"
+			priv="messages"/>
+
+		<priv-key
+			name="alertsSettings.stats"
+			priv="stats"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="alertsSettings"
+		object-name="alertsSettings">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page>
+
+				<fields
+					fields="summary"/>
+
+				<heading
+					label="Subjects"/>
+
+				<bean-part
+					name="alertsSubjectsPart"/>
+
+			</object-summary-page>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<context-tab-action-page
+				name="numbers"/>
+
+			<context-link
+				name="alert"
+				link="alertsAlert"
+				label="Alerts"
+				priv-key="alertsSettings.manage"/>
+
+			<context-link
+				name="statusCheck"
+				link="alertsStatusCheck"
+				label="Status checks"
+				priv-key="alertsSettings.manage"/>
+
+			<object-sms-messages-page/>
+
+			<object-sms-stats-page/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="alertsSettings">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+		<yes-no-field
+			name="enabled"/>
+
+		<object-field
+			name="router"
+			finder="router"/>
+
+		<integer-field
+			name="maxItemsInQueue"
+			label="Items"/>
+
+		<seconds-field
+			name="maxDurationInQueue"
+			label="Duration"/>
+
+		<seconds-field
+			name="maxAlertFrequency"
+			label="Frequency"/>
+
+		<integer-field
+			name="startHour"
+			label="Start"/>
+
+		<integer-field
+			name="endHour"
+			label="End"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="alertsSettings">
+
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<yes-no-field
+			name="enabled"/>
+
+		<object-field
+			name="router"
+			finder="router"/>
+
+		<text-field
+			name="numFrom"/>
+
+		<text-area-field
+			name="template"/>
+
+		<integer-field
+			name="maxItemsInQueue"/>
+
+		<seconds-field
+			name="maxDurationInQueue"/>
+
+		<seconds-field
+			name="maxAlertFrequency"/>
+
+		<integer-field
+			name="startHour"/>
+
+		<integer-field
+			name="endHour"/>
+
+		<timestamp-field
+			name="lastAlert"/>
+
+		<integer-field
+			name="numAlerts"/>
+
+		<timestamp-field
+			name="lastStatusCheck"/>
+
+		<integer-field
+			name="numStatusChecks"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="alertsSettings">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<yes-no-field
+			name="enabled"/>
+
+		<object-field
+			name="router"
+			finder="router"/>
+
+		<text-field
+			name="numFrom"/>
+
+		<text-area-field
+			name="template"/>
+
+		<integer-field
+			name="maxItemsInQueue"/>
+
+		<seconds-field
+			name="maxDurationInQueue"/>
+
+		<seconds-field
+			name="maxAlertFrequency"/>
+
+		<integer-field
+			name="startHour"
+			nullable="yes"
+			min="0"
+			max="24"/>
+
+		<integer-field
+			name="endHour"
+			nullable="yes"
+			min="0"
+			max="24"/>
+
+	</field-set>
+
+</console-module>

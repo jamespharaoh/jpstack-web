@@ -1,0 +1,126 @@
+<console-module
+	name="oxygen8-report-code">
+
+	<console-helper-provider
+		object-name="oxygen8ReportCode"
+		view-delegate-field="root"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="oxygen8_manage"
+			delegate="root"
+			priv="manage"/>
+
+		<priv-key
+			name="oxygen8ReportCode_manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="oxygen8ReportCodeName"
+			field="code"/>
+
+		<context-stuff
+			name="oxygen8ConfigId"
+			delegate="oxygen8Config"
+			field="id"/>
+
+		<run-post-processor
+			name="oxygen8Config"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="oxygen8ReportCode"
+		object-name="oxygen8ReportCode">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"
+				create-priv-delegate="root"
+				create-priv-code="manage"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="oxygen8ReportCode">
+
+		<code-field/>
+		<description-field/>
+
+		<enum-field
+			name="messageStatus"
+			helper="messageStatusConsoleHelper"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="oxygen8ReportCode">
+
+		<code-field pattern=".+"/>
+		<description-field/>
+
+		<enum-field
+			name="messageStatus"
+			helper="messageStatusConsoleHelper"/>
+
+		<text-area-field
+			name="additionalInformation"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="oxygen8ReportCode">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<description-field/>
+
+		<enum-field
+			name="messageStatus"
+			helper="messageStatusConsoleHelper"/>
+
+		<text-area-field
+			name="additionalInformation"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="oxygen8ReportCode">
+
+		<code-field pattern=".+"/>
+		<description-field/>
+
+		<enum-field
+			name="messageStatus"
+			helper="messageStatusConsoleHelper"/>
+
+		<text-area-field
+			name="additionalInformation"/>
+
+	</field-set>
+
+</console-module>

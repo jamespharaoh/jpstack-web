@@ -1,0 +1,83 @@
+<console-module
+	name="slice">
+
+	<console-helper-provider
+		object-name="slice">
+
+		<priv-key
+			name="slice.manage"
+			priv="manage"/>
+
+		<context-stuff
+			name="sliceName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="slice"
+		object-name="slice">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="slice">
+
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="slice">
+
+		<id-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<text-field
+			name="adminEmail"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="slice">
+
+		<id-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<text-field
+			name="adminEmail"/>
+
+	</field-set>
+
+</console-module>

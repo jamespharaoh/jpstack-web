@@ -1,0 +1,9 @@
+<plugin
+	name="chat-api"
+	package="chat.api">
+
+	<layer name="api">
+		<bean class="ChatApiServletModule"/>
+	</layer>
+
+</plugin>

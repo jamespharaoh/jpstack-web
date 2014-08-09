@@ -1,0 +1,26 @@
+<plugin
+	name="auto-responder"
+	package="autoresponder">
+
+	<sql-scripts>
+		<sql-data name="auto-responder-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="autoResponder"/>
+	</models>
+
+	<layer name="console">
+		<bean class="console.AutoResponderVotesPart"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.AutoResponderCommand"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="auto-responder"/>
+		<console-module name="auto-responder-votes"/>
+	</console-modules>
+
+</plugin>

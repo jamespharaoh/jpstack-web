@@ -1,0 +1,23 @@
+<plugin
+	name="orderer"
+	package="orderer">
+
+	<sql-scripts>
+		<sql-data name="orderer-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="orderer"/>
+		<model name="ordererOrder"/>
+	</models>
+
+	<layer name="daemon">
+		<bean class="daemon.OrdererCommandTypeHandler"/>
+		<bean class="daemon.OrdererDeliveryNoticeHandler"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="orderer"/>
+	</console-modules>
+
+</plugin>

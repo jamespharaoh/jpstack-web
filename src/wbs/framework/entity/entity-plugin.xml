@@ -1,0 +1,10 @@
+<plugin
+	name="entity"
+	package="entity">
+
+	<layer name="entity">
+		<bean class="helper.EntityHelperImpl"/>
+		<bean class="model.ModelBuilder"/>
+	</layer>
+
+</plugin>

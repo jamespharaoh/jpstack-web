@@ -1,0 +1,185 @@
+<console-module
+	name="oxygen8-route-out">
+
+	<console-helper-provider
+		object-name="oxygen8RouteOut"
+		view-delegate-field="root"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="oxygen8.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<priv-key
+			name="oxygen8RouteOut.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="oxygen8RouteOutName"
+			delegate="route"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="oxygen8RouteOut"
+		object-name="oxygen8RouteOut">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="oxygen8RouteOut">
+
+		<parent-field/>
+
+		<object-field
+			name="oxygen8Config"
+			label="Config"
+			finder="oxygen8Config"/>
+
+		<text-field
+			name="shortcode"/>
+
+		<yes-no-field
+			name="premium"/>
+
+		<text-field
+			name="username"/>
+
+		<text-field
+			name="campaignId"/>
+
+		<yes-no-field
+			name="multipart"
+			label="Multi"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="oxygen8RouteOut">
+
+		<parent-field/>
+
+		<object-field
+			name="oxygen8Config"
+			finder="oxygen8Config"/>
+
+		<text-field
+			name="relayUrl"/>
+
+		<text-field
+			name="shortcode"/>
+
+		<yes-no-field
+			name="premium"/>
+
+		<text-field
+			name="username"/>
+
+		<text-field
+			name="password"/>
+
+		<text-field
+			name="campaignId"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="multipart"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="oxygen8RouteOut">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="oxygen8Config"
+			finder="oxygen8Config"/>
+
+		<text-field
+			name="relayUrl"/>
+
+		<text-field
+			name="shortcode"/>
+
+		<yes-no-field
+			name="premium"/>
+
+		<text-field
+			name="username"/>
+
+		<text-field
+			name="password"/>
+
+		<text-field
+			name="campaignId"/>
+
+		<yes-no-field
+			name="multipart"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="oxygen8RouteOut">
+
+		<parent-field/>
+
+		<object-field
+			name="oxygen8Config"
+			finder="oxygen8Config"/>
+
+		<text-field
+			name="relayUrl"/>
+
+		<text-field
+			name="shortcode"/>
+
+		<yes-no-field
+			name="premium"/>
+
+		<text-field
+			name="username"/>
+
+		<text-field
+			name="password"/>
+
+		<text-field
+			name="campaignId"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="multipart"/>
+
+	</field-set>
+
+</console-module>

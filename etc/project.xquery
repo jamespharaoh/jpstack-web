@@ -1,8 +1,8 @@
-declare variable $project := //project;
+declare variable $build := //wbs-build;
 
 <projectDescription>
 
-	<name>{ string ($project/@name) }</name>
+	<name>{ string ($build/@name) }</name>
 	<comment></comment>
 	<projects>
 	</projects>

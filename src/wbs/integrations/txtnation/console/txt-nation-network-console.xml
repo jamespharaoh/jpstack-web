@@ -1,0 +1,100 @@
+<console-module
+	name="txt-nation-network">
+
+	<console-helper-provider
+		object-name="txtNationNetwork"
+		view-delegate-field="root"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="txtNationNetworkName"
+			field="code"/>
+
+		<priv-key
+			name="txtNationNetwork.manage"
+			delegate="root"
+			priv="manage"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="txtNationNetwork"
+		object-name="txtNationNetwork">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="txtNationNetwork">
+
+		<code-field/>
+
+		<object-field
+			name="network"
+			finder="network"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="txtNationNetwork">
+
+		<code-field/>
+
+		<object-field
+			name="network"
+			finder="network"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="txtNationNetwork">
+
+		<id-field/>
+		<code-field/>
+		<deleted-field/>
+
+		<object-field
+			name="network"
+			finder="network"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="txtNationNetwork">
+
+		<id-field/>
+		<code-field/>
+		<deleted-field/>
+
+		<object-field
+			name="network"
+			finder="network"/>
+
+	</field-set>
+
+</console-module>

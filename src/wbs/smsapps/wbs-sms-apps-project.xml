@@ -1,0 +1,41 @@
+<project
+	name="wbs-sms-apps"
+	package="wbs.smsapps">
+
+	<plugin
+		name="alerts"
+		package="alerts"/>
+
+	<plugin
+		name="auto-responder"
+		package="autoresponder"/>
+
+	<plugin
+		name="broadcast"
+		package="broadcast"/>
+
+	<plugin
+		name="forwarder"
+		package="forwarder"/>
+
+	<plugin
+		name="manual-responder"
+		package="manualresponder"/>
+
+	<plugin
+		name="orderer"
+		package="orderer"/>
+
+	<plugin
+		name="photo-grabber"
+		package="photograbber"/>
+
+	<plugin
+		name="subscription"
+		package="subscription"/>
+
+	<plugin
+		name="ticketer"
+		package="ticketer"/>
+
+</project>

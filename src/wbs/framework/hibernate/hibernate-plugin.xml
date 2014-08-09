@@ -1,0 +1,9 @@
+<plugin
+	name="hibernate"
+	package="hibernate">
+
+	<layer name="hibernate">
+		<bean class="HibernateDatabase"/>
+	</layer>
+
+</plugin>

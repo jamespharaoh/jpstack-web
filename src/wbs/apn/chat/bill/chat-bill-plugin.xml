@@ -1,0 +1,33 @@
+<plugin
+	name="chat-bill"
+	package="chat.bill">
+
+	<sql-scripts>
+		<sql-data name="chat-bill-data"/>
+	</sql-scripts>
+
+	<models>
+		<type name="chatUserCreditMode"/>
+		<model name="chatDailyLimitLog"/>
+		<model name="chatNetwork"/>
+		<model name="chatUserBillLog"/>
+		<model name="chatUserCreditLimitLog"/>
+		<model name="chatUserCredit"/>
+		<model name="chatUserSpend"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.ChatCreditLogicImpl"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.ChatBillDeliveryHandler"/>
+		<bean class="daemon.ChatCheckCreditCommand"/>
+		<bean class="daemon.ChatSpendWarningDaemon"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-network"/>
+	</console-modules>
+
+</plugin>

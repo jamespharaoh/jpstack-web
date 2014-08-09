@@ -1,0 +1,29 @@
+<plugin
+	name="chat-user-image"
+	package="chat.user.image">
+
+	<models>
+		<type name="chatUserImageMode"/>
+		<type name="chatUserImageType"/>
+		<model name="chatUserImage"/>
+	</models>
+
+	<layer name="console">
+		<bean class="console.ChatUserImageHistoryPart"/>
+		<bean class="console.ChatUserImageListAction"/>
+		<bean class="console.ChatUserImageListPart"/>
+		<bean class="console.ChatUserImageModeConsoleHelper"/>
+		<bean class="console.ChatUserImageRemovePart"/>
+		<bean class="console.ChatUserImageRevertPart"/>
+		<bean class="console.ChatUserImageRotatePart"/>
+		<bean class="console.ChatUserImageUploadAction"/>
+		<bean class="console.ChatUserImageUploadPart"/>
+		<bean class="console.ChatUserImageViewPart"/>
+		<bean class="console.ChatUserImageZipResponder"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-user-image"/>
+	</console-modules>
+
+</plugin>

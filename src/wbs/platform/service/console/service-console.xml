@@ -1,0 +1,58 @@
+<console-module
+	name="service">
+
+	<console-helper-provider
+		object-name="service"
+		view-delegate-field="parent">
+
+		<context-stuff
+			name="serviceName"
+			field="id"/>
+
+		<priv-key
+			name="service.manage"
+			delegate="parent"
+			priv="manage"/>
+
+		<priv-key
+			name="service.messages"
+			delegate="parent"
+			priv="messages"/>
+
+		<priv-key
+			name="service.stats"
+			delegate="parent"
+			priv="stats"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="service"
+		object-name="service">
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-sms-messages-page/>
+
+			<object-sms-stats-page/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="summary"
+		object-name="service">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+
+	</field-set>
+
+</console-module>

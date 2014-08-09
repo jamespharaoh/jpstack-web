@@ -1,0 +1,139 @@
+<console-module
+	name="chat-affiliate">
+
+	<console-helper-provider
+		object-name="chatAffiliate">
+
+		<context-stuff
+			name="chatAffiliateName"
+			field="name"/>
+
+		<context-stuff
+			name="chatSchemeId"
+			delegate="chatScheme"
+			field="id"/>
+
+		<priv-key
+			name="chatAffiliate.manage"
+			priv="manage"/>
+
+		<priv-key
+			name="chatAffiliate.messages"
+			priv="messages"/>
+
+		<priv-key
+			name="chatAffiliate.stats"
+			priv="stats"/>
+
+		<run-post-processor
+			name="chatScheme"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="chatAffiliate"
+		object-name="chatAffiliate">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<context-tab-responder-page
+				name="compare"/>
+
+			<context-tab-action-page
+				name="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<section
+				name="keywords"
+				label="Keywords">
+
+				<context-tab-responder-page
+					name="list"/>
+
+				<context-tab-action-page
+					name="create"/>
+
+			</section>
+
+			<context-tab-responder-page
+				name="users"/>
+
+			<object-sms-messages-page/>
+
+			<object-sms-stats-page/>
+
+			<extension-point
+				name="chatAffiliate.graphs"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="chatAffiliate">
+
+		<delegate-field
+			delegate="chatScheme"
+			name="name"
+			label="Scheme"/>
+
+		<name-field/>
+		<description-field/>
+
+		<text-field
+			name="brandName"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="chatAffiliate">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<text-field
+			name="brandName"/>
+
+		<integer-field
+			name="numUsers"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="chatAffiliate">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<text-field
+			name="brandName"
+			nullable="yes"/>
+
+	</field-set>
+
+</console-module>

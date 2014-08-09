@@ -1,0 +1,23 @@
+<plugin
+	name="psychic-keyword"
+	package="keyword">
+
+	<models>
+		<type name="psychicKeywordType"/>
+		<model name="psychicKeyword"/>
+	</models>
+
+	<layer name="console">
+		<bean class="console.PsychicAffiliateFinder"/>
+		<bean class="console.PsychicKeywordTypeEnumHelper"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.PsychicShortcodeCommandHandler"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="psychic-keyword"/>
+	</console-modules>
+
+</plugin>

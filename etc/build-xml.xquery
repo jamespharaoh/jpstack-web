@@ -1,22 +1,20 @@
-declare variable $my-project := //project;
+declare variable $build := /wbs-build;
 
 declare variable $envs := ('test', 'live');
 
 declare function local:project (
-	$depends-project as element (depends-project)
+	$build-project as element (project)
 ) as element (project) {
 
 	document (
 		concat (
-			'../',
-			$depends-project/@name,
-			'/src/',
+			'../src/',
 			replace (
-				$depends-project/@package,
+				$build-project/@package,
 				'\.',
 				'/'),
 			'/',
-			$depends-project/@name,
+			$build-project/@name,
 			'-project.xml'
 		)
 	) / project
@@ -33,9 +31,7 @@ declare function local:plugin (
 		$plugin :=
 			document (
 				concat (
-					'../',
-					$project/@name,
-					'/src/',
+					'../src/',
 					replace (
 						$project/@package,
 						'\.',
@@ -61,40 +57,24 @@ declare function local:plugin (
 
 };
 
-declare variable $my-plugins :=
-	for
-
-		$my-project-plugin in
-			$my-project/plugin
-
-	return
-
-		local:plugin (
-			$my-project,
-			$my-project-plugin);
-
-declare variable $other-projects :=
+declare variable $all-projects :=
 
 	for
 
-		$depends-project
-			in $my-project/depends-projects/depends-project
+		$build-project
+			in $build/projects/project
 
 	return
 
 		local:project (
-			$depends-project);
+			$build-project);
 
-declare variable $all-projects := (
-	$my-project,
-	$other-projects
-);
 
-declare variable $other-plugins :=
+declare variable $all-plugins :=
 	for
 
 		$project
-			in $other-projects,
+			in $all-projects,
 
 		$project-plugin
 			in $project/plugin
@@ -105,13 +85,8 @@ declare variable $other-plugins :=
 			$project,
 			$project-plugin);
 
-declare variable $all-plugins := (
-	$my-plugins,
-	$other-plugins
-);
-
 <project
-	name="{$my-project/@name}"
+	name="{$build/@name}"
 	basedir="."
 	default="build">
 
@@ -125,54 +100,35 @@ declare variable $all-plugins := (
 		id="classpath">
 
 		<fileset
-			dir="../lib"
+			dir="lib"
 			includes="*.jar"/>
 
-		{ for
-
-			$project in
-				$all-projects
-
-		return (
-
-			<pathelement
-				path="{ concat (
-					'../',
-					$project/@name,
-					'/bin'
-				) }"/>
-
-		) }
-
-		<pathelement path="bin"/>
+		<pathelement
+			path="bin"/>
 
 	</path>
 
 	<target
 		name="svn-up"
 		depends="{ string-join ((
-			'just-svn-up-deps',
 			'just-svn-up'
 		), ', ') }"/>
 
 	<target
 		name="clean"
 		depends="{ string-join ((
-			'just-clean-deps',
 			'just-clean'
 		), ', ') }"/>
 
 	<target
 		name="build"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build'
 		), ', ') }"/>
 
 	<target
 		name="console-live"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build',
 			'just-console-live'
 		), ', ') }"/>
@@ -180,7 +136,6 @@ declare variable $all-plugins := (
 	<target
 		name="console-test"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build',
 			'just-console-test'
 		), ', ') }"/>
@@ -188,7 +143,6 @@ declare variable $all-plugins := (
 	<target
 		name="console-auto"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build',
 			'just-console-live',
 			'just-console-restart'
@@ -197,7 +151,6 @@ declare variable $all-plugins := (
 	<target
 		name="api-live"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build',
 			'just-api-live'
 		), ', ') }"/>
@@ -205,7 +158,6 @@ declare variable $all-plugins := (
 	<target
 		name="api-test"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build',
 			'just-api-test'
 		), ', ') }"/>
@@ -213,7 +165,6 @@ declare variable $all-plugins := (
 	<target
 		name="api-auto"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build',
 			'just-api-live',
 			'just-api-restart'
@@ -222,7 +173,6 @@ declare variable $all-plugins := (
 	<target
 		name="daemon-auto"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build',
 			'just-daemon-restart'
 		), ', ') }"/>
@@ -230,7 +180,6 @@ declare variable $all-plugins := (
 	<target
 		name="all-auto"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build',
 			'just-api-live',
 			'just-api-restart',
@@ -248,151 +197,82 @@ declare variable $all-plugins := (
 	<target
 		name="sql"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build',
 			'just-db-drop',
 			'just-db-create',
-			'just-sql-schema-deps',
 			'just-sql-schema',
-			'just-sql-data-deps',
 			'just-sql-data'
 		), ', ') }"/>
 
 	<target
 		name="sql-schema"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build',
 			'just-db-drop',
 			'just-db-create',
-			'just-sql-schema-deps',
 			'just-sql-schema'
 		), ', ') }"/>
 
 	<target
 		name="sql-data"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build',
-			'just-sql-data-deps',
 			'just-sql-data'
 		), ', ') }"/>
 
 	<target
 		name="fixtures"
 		depends="{ string-join ((
-			'just-build-deps',
 			'just-build',
 			'just-db-drop',
 			'just-db-create',
 			'just-schema-create',
-			'just-sql-schema-deps',
 			'just-sql-schema',
-			'just-sql-data-deps',
 			'just-sql-data',
 			'just-fixtures'
 		), ', ') }"/>
 
-	<target name="just-clean-deps">
-
-		{ for
-
-			$other-project
-				in $other-projects
-
-		return (
-
-			<ant
-				dir="{ concat (
-					'../',
-					$other-project/@name
-				) }"
-				target="just-clean"/>
-
-		) }
-
-	</target>
-
 	<target name="just-clean">
 		<delete dir="bin"/>
-		{ for $dir in (
-			for $env in $envs return (
-				concat ('../api-', $env),
-				concat ('../console-', $env),
-				concat ('../tomcat-', $env)
-			)
-		) return (
-			<delete includeemptydirs="true">
-				<fileset
-					dir="{$dir}"
-					includes="**/*"
-					erroronmissingdir="false"/>
-			</delete>
-		) }
-	</target>
-
-	<target name="just-build-deps">
-
-		{ for
-
-			$other-project
-				in $other-projects
-
-		return (
-
-			<ant
-				dir="{ concat (
-					'../',
-					$other-project/@name
-				) }"
-				target="just-build"/>
-
-		) }
-
+		<delete dir="work"/>
 	</target>
 
 	<target name="just-build">
 
 		<mkdir dir="bin"/>
 
+		<!-- compile framework first -->
+
 		<javac
 			destdir="bin"
 			debug="on"
-			includeantruntime="false">
+			includeantruntime="false"
+			srcdir="src"
+			includes="wbs/framework/**"
+			classpathref="classpath"/>
 
-			<src
-				path="src"/>
+		<copy todir="bin"><fileset dir="src">
+			<include name="META-INF/**/*"/>
+		</fileset></copy>
 
-			<classpath
-				refid="classpath"/>
+		<!-- then everything else -->
 
-		</javac>
+		<javac
+			destdir="bin"
+			debug="on"
+			includeantruntime="false"
+			srcdir="src"
+			excludes="wbs/framework/**"
+			classpathref="classpath"/>
 
 		<copy todir="bin"><fileset dir="src">
 			<include name="**/*.xml"/>
-			<include name="META-INF/**/*"/>
 			<include name="log4j.properties"/>
 		</fileset></copy>
 
-	</target>
-
-	<target name="just-svn-up-deps">
-
-		{ for
-
-			$other-project
-				in $other-projects
-
-		return (
-
-			<ant
-				dir="{ concat (
-					'../',
-					$other-project/@name
-				) }"
-				target="just-svn-up"/>
-
-		) }
+		<copy
+			file="wbs-build.xml"
+			todir="bin"/>
 
 	</target>
 
@@ -411,13 +291,13 @@ declare variable $all-plugins := (
 
 		<target name="just-console-{$env}">
 
-			<mkdir dir="../console-{$env}"/>
-			<mkdir dir="../console-{$env}/WEB-INF"/>
-			<mkdir dir="../console-{$env}/WEB-INF/classes"/>
-			<mkdir dir="../console-{$env}/WEB-INF/lib"/>
+			<mkdir dir="work/{$env}/console"/>
+			<mkdir dir="work/{$env}/console/WEB-INF"/>
+			<mkdir dir="work/{$env}/console/WEB-INF/classes"/>
+			<mkdir dir="work/{$env}/console/WEB-INF/lib"/>
 
 			<copy
-				todir="../console-{$env}"
+				todir="work/{$env}/console"
 				failonerror="false">
 
 				{ for
@@ -429,9 +309,7 @@ declare variable $all-plugins := (
 
 					<fileset
 						dir="{ concat (
-							'../',
-							$plugin/project/@name,
-							'/src/',
+							'src/',
 							replace (
 								$plugin/project/@package,
 								'\.',
@@ -459,35 +337,17 @@ declare variable $all-plugins := (
 
 			</copy>
 
-			<copy todir="../console-{$env}/WEB-INF/classes">
-
-				{ for
-
-					$other-project
-						in $other-projects
-
-				return (
-
-					<fileset
-						dir="{ concat (
-							'../',
-							$other-project/@name,
-							'/bin'
-						) }"/>
-
-				) }
-
+			<copy todir="work/{$env}/console/WEB-INF/classes">
 				<fileset dir="bin"/>
-
 			</copy>
 
-			<copy todir="../console-{$env}/WEB-INF/lib">
-				<fileset dir="../lib" excludes="servlet-api.jar"/>
+			<copy todir="work/{$env}/console/WEB-INF/lib">
+				<fileset dir="lib" excludes="servlet-api.jar"/>
 			</copy>
 
 			<copy
 				file="console/web-{$env}.xml"
-				tofile="../console-{$env}/WEB-INF/web.xml"/>
+				tofile="work/{$env}/console/WEB-INF/web.xml"/>
 
 		</target>,
 
@@ -497,72 +357,72 @@ declare variable $all-plugins := (
 
 			<!-- install tomcat -->
 
-			<mkdir dir="../temp"/>
+			<mkdir dir="temp"/>
 
 			<exec
 				failonerror="true"
-				dir="../temp"
+				dir="temp"
 				executable="tar">
 				<arg line="--extract"/>
 				<arg line="--file ../binaries/packages/apache-tomcat-6.0.37.tar.gz"/>
 			</exec>
 
 			<delete
-				dir="../tomcat-{$env}/**/*"/>
+				dir="work/{$env}/tomcat/**/*"/>
 
 			<move
-				file="../temp/apache-tomcat-6.0.37"
-				tofile="../tomcat-{$env}"/>
+				file="temp/apache-tomcat-6.0.37"
+				tofile="work/{$env}/tomcat"/>
 
-			<delete dir="../temp"/>
+			<delete dir="temp"/>
 
 			<!-- configure tomcat -->
 
 			<copy
 				file="console/server-{$env}.xml"
-				tofile="../tomcat-{$env}/conf/server.xml"/>
+				tofile="work/{$env}/tomcat/conf/server.xml"/>
 
 			<copy
-				file="../conf/tomcat-users.xml"
-				tofile="../tomcat-{$env}/conf/tomcat-users.xml"/>
+				file="conf/tomcat-users.xml"
+				tofile="work/{$env}/tomcat/conf/tomcat-users.xml"/>
 
 			<!-- deploy console -->
 
-			<delete dir="../tomcat-{$env}/apps/console/ROOT"/>
+			<delete dir="work/{$env}/tomcat/apps/console/ROOT"/>
 
-			<copy todir="../tomcat-{$env}/apps/console/ROOT">
-				<fileset dir="../console-{$env}"/>
+			<copy todir="work/{$env}/tomcat/apps/console/ROOT">
+				<fileset dir="work/{$env}/console"/>
 			</copy>
 
-			<copy todir="../tomcat-{$env}/apps/console/manager">
-				<fileset dir="../tomcat-{$env}/webapps/manager"/>
+			<copy todir="work/{$env}/tomcat/apps/console/manager">
+				<fileset dir="work/{$env}/tomcat/webapps/manager"/>
 			</copy>
 
-			<copy todir="../tomcat-{$env}/apps/console/host-manager">
-				<fileset dir="../tomcat-{$env}/webapps/host-manager"/>
+			<copy todir="work/{$env}/tomcat/apps/console/host-manager">
+				<fileset dir="work/{$env}/tomcat/webapps/host-manager"/>
 			</copy>
 
 			<!-- deploy api -->
 
-			<delete dir="../tomcat-{$env}/apps/api/ROOT"/>
+			<delete dir="work/{$env}/tomcat/apps/api/ROOT"/>
 
-			<copy todir="../tomcat-{$env}/apps/api/ROOT">
-				<fileset dir="../api-{$env}"/>
+			<copy todir="work/{$env}/tomcat/apps/api/ROOT">
+				<fileset dir="work/{$env}/api"/>
 			</copy>
 
-			<copy todir="../tomcat-{$env}/apps/api/manager">
-				<fileset dir="../tomcat-{$env}/webapps/manager"/>
+			<copy todir="work/{$env}/tomcat/apps/api/manager">
+				<fileset dir="work/{$env}/tomcat/webapps/manager"/>
 			</copy>
 
-			<copy todir="../tomcat-{$env}/apps/api/host-manager">
-				<fileset dir="../tomcat-{$env}/webapps/host-manager"/>
+			<copy todir="work/{$env}/tomcat/apps/api/host-manager">
+				<fileset dir="work/{$env}/tomcat/webapps/host-manager"/>
 			</copy>
 
 			<!-- start tomcat -->
 
 			<exec
 				failonerror="true"
-				executable="../tomcat-{$env}/bin/catalina.sh">
+				executable="work/{$env}/tomcat/bin/catalina.sh">
 				<arg line="run"/>
 			</exec>
 
@@ -575,13 +435,13 @@ declare variable $all-plugins := (
 
 		<target name="just-api-{$env}">
 
-			<mkdir dir="../api-{$env}"/>
-			<mkdir dir="../api-{$env}/WEB-INF"/>
-			<mkdir dir="../api-{$env}/WEB-INF/classes"/>
-			<mkdir dir="../api-{$env}/WEB-INF/lib"/>
+			<mkdir dir="work/{$env}/api"/>
+			<mkdir dir="work/{$env}/api/WEB-INF"/>
+			<mkdir dir="work/{$env}/api/WEB-INF/classes"/>
+			<mkdir dir="work/{$env}/api/WEB-INF/lib"/>
 
 			<copy
-				todir="../api-{$env}"
+				todir="work/{$env}/api"
 				failonerror="false">
 
 				{ for
@@ -593,9 +453,7 @@ declare variable $all-plugins := (
 
 					<fileset
 						dir="{ concat (
-							'../',
-							$plugin/project/@name,
-							'/src/',
+							'src/',
 							replace (
 								$plugin/project/@package,
 								'\.',
@@ -614,40 +472,22 @@ declare variable $all-plugins := (
 
 			</copy>
 
-			<copy todir="../api-{$env}/WEB-INF/classes">
-
-				{ for
-
-					$other-project
-						in $other-projects
-
-				return (
-
-					<fileset
-						dir="{ concat (
-							'../',
-							$other-project/@name,
-							'/bin'
-						) }"/>
-
-				) }
-
+			<copy todir="work/{$env}/api/WEB-INF/classes">
 				<fileset dir="bin"/>
-
 			</copy>
 
 			<copy
-				todir="../api-{$env}/WEB-INF/lib">
+				todir="work/{$env}/api/WEB-INF/lib">
 
 				<fileset
-					dir="../lib"
+					dir="lib"
 					excludes="servlet-api.jar"/>
 
 			</copy>
 
 			<copy
 				file="api/web-{$env}.xml"
-				tofile="../api-{$env}/WEB-INF/web.xml"/>
+				tofile="work/{$env}/api/WEB-INF/web.xml"/>
 
 		</target>
 
@@ -678,23 +518,10 @@ declare variable $all-plugins := (
 
 		<mkdir dir="javadoc"/>
 
-		<javadoc destdir="javadoc" access="private" linksource="yes">
-
-			{ for
-
-				$other-project
-					in $other-projects
-
-			return (
-
-				<fileset
-					dir="{ concat (
-						'../',
-						$other-project/@name,
-						'/src'
-					) }"/>
-
-			) }
+		<javadoc
+			destdir="javadoc"
+			access="private"
+			linksource="yes">
 
 			<fileset dir="src"/>
 
@@ -733,46 +560,6 @@ declare variable $all-plugins := (
 
 	</target>
 
-	<target name="just-sql-schema-deps">
-
-		{ for
-
-			$other-project
-				in $other-projects
-
-		return (
-
-			<ant
-				dir="{ concat (
-					'../',
-					$other-project/@name
-				) }"
-				target="just-sql-schema"/>
-
-		) }
-
-	</target>
-
-	<target name="just-sql-data-deps">
-
-		{ for
-
-			$other-project
-				in $other-projects
-
-		return (
-
-			<ant
-				dir="{ concat (
-					'../',
-					$other-project/@name
-				) }"
-				target="just-sql-data"/>
-
-		) }
-
-	</target>
-
 	<target name="just-sql-schema">
 
 		<taskdef
@@ -784,11 +571,14 @@ declare variable $all-plugins := (
 
 			{ for
 
-				$my-plugin in
-					$my-plugins,
+				$plugin in
+					$all-plugins,
+
+				$project in
+					$plugin/project,
 
 				$sql-schema in
-					$my-plugin/sql-scripts/sql-schema
+					$plugin/sql-scripts/sql-schema
 
 			return (
 
@@ -796,12 +586,12 @@ declare variable $all-plugins := (
 					name="{ concat (
 						'src/',
 						replace (
-							$my-project/@package,
+							$project/@package,
 							'\.',
 							'/'),
 						'/',
 						replace (
-							$my-plugin/@package,
+							$plugin/@package,
 							'\.',
 							'/'),
 						'/model/',
@@ -826,11 +616,14 @@ declare variable $all-plugins := (
 
 			{ for
 
-				$my-plugin in
-					$my-plugins,
+				$plugin in
+					$all-plugins,
+
+				$project in
+					$plugin/project,
 
 				$sql-data in
-					$my-plugin/sql-scripts/sql-data
+					$plugin/sql-scripts/sql-data
 
 			return (
 
@@ -838,12 +631,12 @@ declare variable $all-plugins := (
 					name="{ concat (
 						'src/',
 						replace (
-							$my-project/@package,
+							$project/@package,
 							'\.',
 							'/'),
 						'/',
 						replace (
-							$my-plugin/@package,
+							$plugin/@package,
 							'\.',
 							'/'),
 						'/model/',
@@ -860,7 +653,6 @@ declare variable $all-plugins := (
 	<target name="rebuild">
 
 		<exec
-			dir=".."
 			executable="etc/rebuild"
 			failonerror="true"/>
 
