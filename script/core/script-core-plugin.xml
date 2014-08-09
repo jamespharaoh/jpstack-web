@@ -1,0 +1,9 @@
+<plugin
+	name="script-core"
+	package="script.core">
+
+	<layer name="logic">
+		<bean class="logic.DiffLogicImpl"/>
+	</layer>
+
+</plugin>

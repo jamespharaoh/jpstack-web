@@ -1,0 +1,9 @@
+<plugin
+	name="hooks"
+	package="hooks">
+
+	<layer name="logic">
+		<bean class="logic.HooksManager"/>
+	</layer>
+
+</plugin>

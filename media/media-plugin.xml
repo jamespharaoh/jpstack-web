@@ -1,0 +1,35 @@
+<plugin
+	name="media"
+	package="media">
+
+	<sql-scripts>
+		<sql-schema name="content"/>
+		<sql-schema name="media"/>
+		<sql-data name="media-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="content"/>
+		<model name="media"/>
+		<model name="mediaType"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.MediaLogic"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.MediaAudioResponder"/>
+		<bean class="console.MediaConsoleConfig"/>
+		<bean class="console.MediaConsoleLogic"/>
+		<bean class="console.MediaImageResponder"/>
+		<bean class="console.MediaThumb100Responder"/>
+		<bean class="console.MediaThumb32Responder"/>
+		<bean class="console.MediaVideoResponder"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="media"/>
+	</console-modules>
+
+</plugin>

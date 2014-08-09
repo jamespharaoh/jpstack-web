@@ -1,0 +1,69 @@
+<console-module
+	name="userOnline">
+
+	<console-helper-provider
+		object-name="userOnline"
+		id-key="userId">
+
+		view-delegate-field="user"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="userOnlineName"
+			delegate="user"
+			field="username"/>
+
+		<run-post-processor
+			name="user"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="userOnline"
+		object-name="userOnline">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="userOnline">
+
+		<id-field/>
+
+		<text-field
+			name="sessionId"/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="userOnline">
+
+		<id-field/>
+
+		<text-field
+			name="sessionId"/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+	</field-set>
+
+</console-module>

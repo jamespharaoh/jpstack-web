@@ -1,0 +1,20 @@
+<plugin
+	name="menu"
+	package="menu">
+
+	<sql-scripts>
+		<sql-schema name="menu"/>
+		<sql-data name="menu-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="menu"/>
+		<model name="menuGroup"/>
+	</models>
+
+	<console-modules>
+		<console-module name="menu"/>
+		<console-module name="menu-group"/>
+	</console-modules>
+
+</plugin>

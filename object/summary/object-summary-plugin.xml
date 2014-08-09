@@ -1,0 +1,18 @@
+<plugin
+	name="object-summary"
+	package="object.summary">
+
+	<layer name="console">
+		<bean class="ObjectSummaryPageBuilder"/>
+		<bean class="ObjectSummaryPageSpec"/>
+		<bean class="ObjectSummaryPart"/>
+		<bean class="ObjectSummaryBeanPartBuilder"/>
+		<bean class="ObjectSummaryBeanPartSpec"/>
+		<bean class="ObjectSummaryFieldsBuilder"/>
+		<bean class="ObjectSummaryFieldsPart"/>
+		<bean class="ObjectSummaryFieldsSpec"/>
+		<bean class="ObjectSummaryHeadingBuilder"/>
+		<bean class="ObjectSummaryHeadingSpec"/>
+	</layer>
+
+</plugin>

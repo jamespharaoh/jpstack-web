@@ -1,0 +1,16 @@
+<plugin
+	name="reporting"
+	package="reporting">
+
+	<layer name="console">
+		<bean class="console.AdditionStatsResolver"/>
+		<bean class="console.IntegerStatsFormatter"/>
+		<bean class="console.MultiplicationStatsResolver"/>
+		<bean class="console.SimpleStatsResolver"/>
+		<bean class="console.StatsConsoleLogic"/>
+		<bean class="console.SumStatsAggregator"/>
+		<bean class="console.UnaryStatsGrouper"/>
+		<bean class="console.UserStatsGrouper"/>
+	</layer>
+
+</plugin>

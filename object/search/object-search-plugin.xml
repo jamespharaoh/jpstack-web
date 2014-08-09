@@ -1,0 +1,14 @@
+<plugin
+	name="object-search"
+	package="object.search">
+
+	<layer name="console">
+		<bean class="ObjectSearchGetAction"/>
+		<bean class="ObjectSearchPageBuilder"/>
+		<bean class="ObjectSearchPageSpec"/>
+		<bean class="ObjectSearchPart"/>
+		<bean class="ObjectSearchPostAction"/>
+		<bean class="ObjectSearchResultsPart"/>
+	</layer>
+
+</plugin>

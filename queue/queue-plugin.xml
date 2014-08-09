@@ -1,0 +1,56 @@
+<plugin
+	name="queue"
+	package="queue">
+
+	<sql-scripts>
+		<sql-schema name="queue"/>
+		<sql-data name="queue-data"/>
+	</sql-scripts>
+
+	<models>
+		<type name="queueItemState"/>
+		<type name="queueItemClaimStatus"/>
+		<model name="queue"/>
+		<model name="queueItem"/>
+		<model name="queueItemClaim"/>
+		<model name="queueSubject"/>
+		<model name="queueType"/>
+	</models>
+
+	<layer name="console">
+		<bean class="console.QueueClaimAction"/>
+		<bean class="console.QueueConsoleLogic"/>
+		<bean class="console.QueueFilterResponder"/>
+		<bean class="console.QueueHomeResponder"/>
+		<bean class="console.QueueItemAction"/>
+		<bean class="console.QueueItemClaimStatusConsoleHelper"/>
+		<bean class="console.QueueItemQueueStatsProvider"/>
+		<bean class="console.QueueItemsStatusLinePart"/>
+		<bean class="console.QueueItemStatusLine"/>
+		<bean class="console.QueueItemStateConsoleHelper"/>
+		<bean class="console.QueueItemUserStatsProvider"/>
+		<bean class="console.QueueListActivePart"/>
+		<bean class="console.QueueManager"/>
+		<bean class="console.QueueStatsGrouper"/>
+		<bean class="console.QueueSubjectSorter"/>
+		<bean class="console.QueueSupervisorItemsPart"/>
+		<bean class="console.QueueSupervisorStatsGrouperBuilder"/>
+		<bean class="console.QueueSupervisorStatsGrouperSpec"/>
+		<bean class="console.QueueUnclaimAction"/>
+		<bean class="console.QueueUsersAction"/>
+		<bean class="console.QueueUsersPart"/>
+	</layer>
+
+	<layer name="logic">
+		<bean class="logic.QueueLogicImpl"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="queue"/>
+		<console-module name="queue-item"/>
+		<console-module name="queue-item-claim"/>
+		<console-module name="queue-subject"/>
+		<console-module name="queue-supervisor"/>
+	</console-modules>
+
+</plugin>

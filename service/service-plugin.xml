@@ -1,0 +1,19 @@
+<plugin
+	name="service"
+	package="service">
+
+	<sql-scripts>
+		<sql-schema name="service"/>
+		<sql-data name="service-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="service"/>
+		<model name="serviceType"/>
+	</models>
+
+	<console-modules>
+		<console-module name="service"/>
+	</console-modules>
+
+</plugin>

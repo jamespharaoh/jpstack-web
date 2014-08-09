@@ -1,0 +1,34 @@
+<plugin
+	name="postgresql"
+	package="postgresql">
+
+	<sql-scripts>
+		<sql-schema name="postgresql"/>
+		<sql-schema name="postgresql-maintenance"/>
+		<sql-data name="postgresql-data"/>
+		<sql-data name="postgresql-maintenance-data"/>
+	</sql-scripts>
+
+	<models>
+		<type name="postgresqlMaintenanceFrequency"/>
+		<model name="postgresqlMaintenance"/>
+		<model name="postgresqlClass"/>
+		<model name="postgresqlStatActivity"/>
+	</models>
+
+	<layer name="daemon">
+		<bean class="daemon.PostgresqlMaintenanceDaemon"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.PostgresqlMaintenanceListPart"/>
+		<bean class="console.PostgresqlActivityPart"/>
+		<bean class="console.PostgresqlTablesPart"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="postgresql"/>
+		<console-module name="postgresql-maintenance"/>
+	</console-modules>
+
+</plugin>

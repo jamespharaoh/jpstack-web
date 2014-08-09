@@ -1,0 +1,32 @@
+<plugin
+	name="exception"
+	package="exception">
+
+	<sql-scripts>
+		<sql-schema name="exception"/>
+		<sql-data name="exception-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="exceptionLog"/>
+		<model name="exceptionLogType"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.ExceptionLogicImpl"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.ExceptionLogAlertsPart"/>
+		<bean class="console.ExceptionLogDetailsPart"/>
+		<bean class="console.ExceptionStatusLine"/>
+		<bean class="console.ExceptionStatusLinePart"/>
+		<bean class="console.NumExceptionsCache"/>
+		<bean class="console.NumFatalExceptionsCache"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="exception-log"/>
+	</console-modules>
+
+</plugin>

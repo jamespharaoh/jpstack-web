@@ -1,0 +1,23 @@
+<plugin
+	name="group"
+	package="group">
+
+	<sql-scripts>
+		<sql-schema name="group"/>
+		<sql-data name="group-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="group"/>
+	</models>
+
+	<layer name="console">
+		<bean class="console.GroupPrivsAction"/>
+		<bean class="console.GroupPrivsPart"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="group"/>
+	</console-modules>
+
+</plugin>

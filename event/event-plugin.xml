@@ -1,0 +1,27 @@
+<plugin
+	name="event"
+	package="event">
+
+	<sql-scripts>
+		<sql-schema name="event"/>
+		<sql-data name="event-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="event"/>
+		<model name="eventLink"/>
+		<model name="eventType"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.EventLogicImpl"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.EventConsoleLogic"/>
+		<bean class="console.ObjectEventsPageBuilder"/>
+		<bean class="console.ObjectEventsPageSpec"/>
+		<bean class="console.ObjectEventsPart"/>
+	</layer>
+
+</plugin>

@@ -1,0 +1,97 @@
+package wbs.platform.supervisor;
+
+import java.text.SimpleDateFormat;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
+import org.joda.time.DateTime;
+
+import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.platform.console.part.AbstractPagePart;
+import wbs.platform.reporting.console.StatsPeriod;
+
+@Accessors (fluent = true)
+@PrototypeComponent ("supervisorTableHeadingPart")
+public
+class SupervisorTableHeadingPart
+	extends AbstractPagePart {
+
+	// properties
+
+	@Getter @Setter
+	SupervisorTableHeadingSpec supervisorTableHeadingSpec;
+
+	// state
+
+	StatsPeriod statsPeriod;
+
+	// implementation
+
+	@Override
+	public
+	void prepare () {
+
+		statsPeriod =
+			(StatsPeriod)
+			parameters.get ("statsPeriod");
+
+	}
+
+	@Override
+	public
+	void goBodyStuff () {
+
+		// main heading
+
+		if (supervisorTableHeadingSpec.label () != null) {
+
+			printFormat (
+				"<tr>\n",
+
+				"<th colspan=\"%h\">%h</th>\n",
+				statsPeriod.size () + 1,
+				supervisorTableHeadingSpec.label (),
+
+				"</tr>\n");
+
+		}
+
+		// hours
+
+		printFormat (
+			"<tr>\n",
+			"<th>%h</th>\n",
+			supervisorTableHeadingSpec.groupLabel ());
+
+		DateTime hourStart =
+			statsPeriod
+				.startTime ()
+				.toDateTime ();
+
+		for (
+			int hour = 0;
+			hour < statsPeriod.size ();
+			hour ++
+		) {
+
+			printFormat (
+				"<th>%h</th>\n",
+				hourFormat.format (hourStart.toDate ()));
+
+			hourStart =
+				hourStart.plusHours (1);
+
+		}
+
+		printFormat (
+			"</tr>\n");
+
+	}
+
+	static
+	SimpleDateFormat hourFormat =
+		new SimpleDateFormat ("HH");
+
+}

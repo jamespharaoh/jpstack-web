@@ -1,0 +1,111 @@
+<console-module
+	name="queue-item">
+
+	<console-helper-provider
+		object-name="queueItem">
+
+		<context-stuff
+			name="queueItemName"
+			field="id"/>
+
+		<context-stuff
+			name="queueSubjectId"
+			delegate="queueSubject"
+			field="id"/>
+
+		<priv-key
+			name="queueItem.manage"
+			delegate="queueSubject.queue.parent"
+			priv="manage"/>
+
+		<run-post-processor
+			name="queueSubject"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="queueItem"
+		object-name="queueItem">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<context-link
+				name="claim"
+				link="queueItemClaim"
+				label="Claims"
+				priv-key="queueItem.manage"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="queueItem">
+
+		<index-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="queueItem">
+
+		<id-field/>
+		<parent-field/>
+
+		<integer-field
+			name="index"/>
+
+		<text-field
+			name="source"/>
+
+		<text-field
+			name="details"/>
+
+		<integer-field
+			name="refObjectId"/>
+
+		<object-field
+			name="processedUser"
+			finder="user"/>
+
+		<yes-no-field
+			name="processedByPreferredUser"/>
+
+		<integer-field
+			name="priority"/>
+
+		<enum-field
+			name="state"
+			helper="queueItemStateConsoleHelper"/>
+
+		<object-field
+			name="queueItemClaim"
+			finder="queueItemClaim"/>
+
+		<timestamp-field
+			name="createdTime"/>
+
+		<timestamp-field
+			name="pendingTime"/>
+
+		<timestamp-field
+			name="cancelledTime"/>
+
+		<timestamp-field
+			name="processedTime"/>
+
+	</field-set>
+
+</console-module>

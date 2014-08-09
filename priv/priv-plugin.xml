@@ -1,0 +1,25 @@
+<plugin
+	name="priv"
+	package="priv">
+
+	<sql-scripts>
+		<sql-schema name="priv"/>
+		<sql-data name="priv-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="priv"/>
+		<model name="privType"/>
+	</models>
+
+	<layer name="console">
+		<bean class="console.ObjectSummaryPrivPart"/>
+		<bean class="console.PrivCheckerImpl"/>
+		<bean class="console.PrivDataLoaderImpl"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="priv"/>
+	</console-modules>
+
+</plugin>

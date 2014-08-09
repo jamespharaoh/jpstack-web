@@ -1,0 +1,12 @@
+<plugin
+	name="object-link"
+	package="object.link">
+
+	<layer name="console">
+		<bean class="ObjectLinksAction"/>
+		<bean class="ObjectLinksPart"/>
+		<bean class="ObjectLinksPageBuilder"/>
+		<bean class="ObjectLinksPageSpec"/>
+	</layer>
+
+</plugin>

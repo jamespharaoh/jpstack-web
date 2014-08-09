@@ -1,0 +1,11 @@
+<plugin
+	name="console-module"
+	package="console.module">
+
+	<layer name="console">
+		<bean class="ConsoleManagerImpl"/>
+		<bean class="ConsoleModuleBuilder"/>
+		<bean class="ConsoleModuleImpl"/>
+	</layer>
+
+</plugin>
