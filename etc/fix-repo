@@ -9,6 +9,6 @@ touch etc/*.xquery
 etc/rebuild
 
 git add \
-	wbs-*/.project \
-	wbs-*/.classpath \
-	wbs-*/build.xml
+	.classpath \
+	.project \
+	build.xml

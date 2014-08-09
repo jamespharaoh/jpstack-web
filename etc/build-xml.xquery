@@ -251,9 +251,9 @@ declare variable $all-plugins :=
 			includes="wbs/framework/**"
 			classpathref="classpath"/>
 
-		<copy todir="bin"><fileset dir="src">
-			<include name="META-INF/**/*"/>
-		</fileset></copy>
+		<echo
+			file="bin/META-INF/services/javax.annotation.processing.Processor"
+			message="wbs.framework.object.ObjectHelperAnnotationProcessor"/>
 
 		<!-- then everything else -->
 
