@@ -418,21 +418,10 @@ withGit path =
 		Git.Libgit2.lgFactory
 		path
 
-paths = map Char8.pack [
-	"etc",
-	"src/wbs/apn",
-	"src/wbs/framework",
-	"src/wbs/integrations",
-	"src/wbs/platform",
-	"src/wbs/psychic",
-	"src/wbs/sms",
-	"src/wbs/smsapps" ]
-
 data GitLink = GitLink {
 	gitLinkName :: String,
-	gitLinkRemoteRepo :: String,
-	gitLinkRemoteBranch :: String,
-	gitLinkLocalBranch :: String,
+	gitLinkSource :: String,
+	gitLinkTarget :: String,
 	gitLinkPaths :: [String]
 }
 
@@ -448,21 +437,27 @@ readConfig = do
 	let atTag tag =
 		deep (isElem >>> hasName tag)
 
+	let getPaths =
+		atTag "path" >>> proc pathTag -> do
+
+			name <- getAttrValue "name" -< pathTag
+
+			returnA -< name
+
 	let getGitLink =
 		atTag "git-link" >>> proc gitLinkTag -> do
 
-		name <- getAttrValue "name" -< gitLinkTag
-		remoteRepo <- getAttrValue "remote-repo" -< gitLinkTag
-		remoteBranch <- getAttrValue "remote-branch" -< gitLinkTag
-		localBranch <- getAttrValue "local-branch" -< gitLinkTag
+			name <- getAttrValue "name" -< gitLinkTag
+			source <- getAttrValue "source" -< gitLinkTag
+			target <- getAttrValue "target" -< gitLinkTag
+			paths <- listA getPaths -< gitLinkTag
 
-		returnA -< GitLink {
-			gitLinkName = name,
-			gitLinkRemoteRepo = remoteRepo,
-			gitLinkRemoteBranch = remoteBranch,
-			gitLinkLocalBranch = localBranch,
-			gitLinkPaths = []
-		}
+			returnA -< GitLink {
+				gitLinkName = name,
+				gitLinkSource = source,
+				gitLinkTarget = target,
+				gitLinkPaths = paths
+			}
 
 	let getConfig =
 		atTag "wbs-build" >>> proc buildTag -> do
@@ -513,28 +508,40 @@ main = do
 		cacheRef <-
 			createCache
 
-		let masterName =
-			Text.pack "refs/heads/master"
+		let linkSource =
+			gitLinkSource gitLink
 
-		Just masterOidUntagged <-
-			Git.Reference.resolveReference masterName
+		sourceOidUntaggedMaybe <-
+			Git.Reference.resolveReference $
+				Text.pack linkSource
 
-		let masterOid =
-			Tagged masterOidUntagged
+		case sourceOidUntaggedMaybe of
 
-		masterCommit <-
-			loadCommit cacheRef masterOid
+			Nothing ->
+				error $ "error resolving source reference " ++ linkSource
 
-		reducedCommit <-
-			reduceCommit cacheRef paths masterCommit
+			Just sourceOidUntagged -> do
 
-		let reducedCommitOid =
-			Git.Types.commitOid reducedCommit
+				let sourceOid =
+					Tagged sourceOidUntagged
 
-		Git.Types.updateReference
-			(Text.pack $ gitLinkLocalBranch gitLink)
-			(Git.Types.RefObj (untag reducedCommitOid))
+				sourceCommit <-
+					loadCommit cacheRef sourceOid
 
-		return $ show $ untag reducedCommitOid
+				let paths =
+					map Char8.pack $
+						gitLinkPaths gitLink
+
+				reducedCommit <-
+					reduceCommit cacheRef paths sourceCommit
+
+				let reducedCommitOid =
+					Git.Types.commitOid reducedCommit
+
+				Git.Types.updateReference
+					(Text.pack $ gitLinkTarget gitLink)
+					(Git.Types.RefObj (untag reducedCommitOid))
+
+				return $ show $ untag reducedCommitOid
 
 	putStrLn name
