@@ -1,6 +1,7 @@
 #!/usr/bin/env runhaskell
 
 {-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Main where
 
@@ -189,13 +190,13 @@ reduceTree cacheRef paths tree = do
 		treeEntryMaybe <-
 			treeLookup cacheRef tree path
 
-		return (case treeEntryMaybe of
+		case treeEntryMaybe of
 
 			Nothing ->
-				Nothing
+				return Nothing
 
 			Just treeEntry ->
-				Just (path, treeEntry))
+				return $ Just (path, treeEntry)
 
 	filteredTreeEntriesTemp <-
 		mapM lookupOne paths
@@ -208,13 +209,22 @@ reduceTree cacheRef paths tree = do
 
 	return reducedTree
 
+type ExpansionsMap r =
+	Map.Map
+	(Git.Types.CommitOid r)
+	(Git.Types.Commit r)
+
 reduceCommit ::
 	(Git.Types.MonadGit r m, MonadIO m) =>
 	IORef.IORef (Cache r) ->
 	[Char8.ByteString] ->
+	ExpansionsMap r ->
 	Git.Types.Commit r ->
-	m (Git.Types.Commit r)
-reduceCommit cacheRef paths commit = do
+	m (Git.Types.Commit r, ExpansionsMap r)
+reduceCommit cacheRef paths expansions commit = do
+
+	let commitOid =
+		Git.Types.commitOid commit
 
 	fullTree <-
 		loadTree cacheRef $
@@ -232,8 +242,15 @@ reduceCommit cacheRef paths commit = do
 	parentCommits <-
 		mapM (loadCommit cacheRef) parentCommitOids
 
-	reducedParentCommits <-
-		mapM (reduceCommit cacheRef paths) parentCommits
+	reducedParentCommitsTemp <-
+		mapM (reduceCommit cacheRef paths expansions) parentCommits
+
+	let reducedParentCommits =
+		map fst reducedParentCommitsTemp
+
+	let expansions' =
+		foldl Map.union expansions $
+			map snd reducedParentCommitsTemp
 
 	let reduceToParent =
 
@@ -248,9 +265,9 @@ reduceCommit cacheRef paths commit = do
 				reducedParentTreeOid <-
 					Git.Types.treeOid reducedParentTree
 
-				return (if reducedParentTreeOid == reducedTreeOid
-					then Just oneReducedParentCommit
-					else Nothing)
+				if reducedParentTreeOid == reducedTreeOid
+					then return $ Just oneReducedParentCommit
+					else return Nothing
 
 			_ ->
 
@@ -262,7 +279,7 @@ reduceCommit cacheRef paths commit = do
 	case reducedMaybe of
 
 		Just reduced ->
-			return reduced
+			return (reduced, expansions')
 
 		_ -> do
 
@@ -281,9 +298,18 @@ reduceCommit cacheRef paths commit = do
 					(Git.Types.commitLog commit)
 					Nothing
 
-			-- liftIO $ putStrLn "finish"
+			let reducedCommitOid =
+				Git.Types.commitOid reducedCommit
 
-			return reducedCommit
+			let expansions'' =
+				if reducedCommitOid == commitOid
+				then expansions'
+				else Map.insert
+					reducedCommitOid
+					commit
+					expansions'
+
+			return (reducedCommit, expansions'')
 
 ---------- cache
 
@@ -309,17 +335,9 @@ data Cache r = Cache {
 createCache = do
 
 	liftIO $ IORef.newIORef Cache {
-
-		cacheCommits =
-			Map.empty,
-
-		cacheTrees =
-			Map.empty,
-
-		cacheBuiltTrees =
-			Map.empty
-
-	}
+		cacheCommits = Map.empty,
+		cacheTrees = Map.empty,
+		cacheBuiltTrees = Map.empty }
 
 loadCached ::
 	(Git.Types.MonadGit r m, MonadIO m, Ord k') =>
@@ -411,17 +429,13 @@ lookupBuiltTree cacheRef entries = do
 		cacheRef
 		entries
 
----------- main
-
-withGit path =
-	Git.Repository.withRepository
-		Git.Libgit2.lgFactory
-		path
+---------- config
 
 data GitLink = GitLink {
 	gitLinkName :: String,
 	gitLinkSource :: String,
 	gitLinkTarget :: String,
+	gitLinkLocal :: String,
 	gitLinkPaths :: [String]
 }
 
@@ -450,12 +464,15 @@ readConfig = do
 			name <- getAttrValue "name" -< gitLinkTag
 			source <- getAttrValue "source" -< gitLinkTag
 			target <- getAttrValue "target" -< gitLinkTag
+			local <- getAttrValue "local" -< gitLinkTag
+
 			paths <- listA getPaths -< gitLinkTag
 
 			returnA -< GitLink {
 				gitLinkName = name,
 				gitLinkSource = source,
 				gitLinkTarget = target,
+				gitLinkLocal = local,
 				gitLinkPaths = paths
 			}
 
@@ -469,20 +486,87 @@ readConfig = do
 				configGitLinks = gitLinks
 			}
 
---	deep (isElem >>> hasName "git-link") >>>
---		proc l -> do
-
---			name <- getAttrValue "link-name" -< l
---			remoteRepo <- getAttrValue "remote-repo" -< l
---			remoteBranch <- getAttrValue "remote-branch" -< l
---			localBranch <- getAttrValue "local-branch" -< l
-
---			paths <-
-
 	[ config ] <-
 		runX (parseXML "wbs-build.xml" >>> getConfig)
 
 	return config
+
+---------- main
+
+withGit path =
+	Git.Repository.withRepository
+		Git.Libgit2.lgFactory
+		path
+
+performReduction cacheRef paths referenceName = do
+
+	originalCommitOidUntaggedMaybe <-
+		Git.Reference.resolveReference $
+			Text.pack referenceName
+
+	case originalCommitOidUntaggedMaybe of
+
+		Nothing ->
+			error $ "error resolving reference " ++ referenceName
+
+		_ ->
+			return ()
+
+	let Just originalCommitOidUntagged =
+		originalCommitOidUntaggedMaybe
+
+	let originalCommitOid =
+		Tagged originalCommitOidUntagged
+
+	originalCommit <-
+		loadCommit cacheRef originalCommitOid
+
+	(reducedCommit, expansions) <-
+		reduceCommit cacheRef paths Map.empty originalCommit
+
+	return (originalCommit, reducedCommit, expansions)
+
+performRewrite cacheRef expansions originalCommit = do
+
+	let originalCommitOid =
+		Git.Types.commitOid originalCommit
+
+	case Map.lookup originalCommitOid expansions of
+
+		Just expandedCommit ->
+			return expandedCommit
+
+		Nothing -> do
+
+			let originalParentCommitOids =
+				Git.Types.commitParents originalCommit
+
+			originalParentCommits <-
+				mapM (loadCommit cacheRef) originalParentCommitOids
+
+			let originalParentCommitOids =
+				map Git.Types.commitOid originalParentCommits
+
+			rewrittenParentCommits <-
+				mapM (performRewrite cacheRef expansions) originalParentCommits
+
+			let rewrittenParentCommitOids =
+				map Git.Types.commitOid rewrittenParentCommits
+
+			if originalParentCommitOids == rewrittenParentCommitOids
+			then return originalCommit
+			else do
+
+				rewrittenCommit <-
+					Git.Types.createCommit
+						rewrittenParentCommitOids
+						(Git.Types.commitTree originalCommit)
+						(Git.Types.commitAuthor originalCommit)
+						(Git.Types.commitCommitter originalCommit)
+						(Git.Types.commitLog originalCommit)
+						Nothing
+
+				return rewrittenCommit
 
 main ::
 	IO ()
@@ -503,45 +587,91 @@ main = do
 			(\gitLink -> (gitLinkName gitLink) == gitLinkNameArg)
 			(configGitLinks config)
 
-	name <- withGit "." $ do
+	withGit "." $ do
 
 		cacheRef <-
 			createCache
 
-		let linkSource =
-			gitLinkSource gitLink
+		let paths =
+			map Char8.pack $
+				gitLinkPaths gitLink
 
-		sourceOidUntaggedMaybe <-
-			Git.Reference.resolveReference $
-				Text.pack linkSource
+		-- reduce local commit
 
-		case sourceOidUntaggedMaybe of
+		(originalLocalCommit, reducedLocalCommit, expansions) <-
+			performReduction
+				cacheRef
+				paths
+				(gitLinkLocal gitLink)
 
-			Nothing ->
-				error $ "error resolving source reference " ++ linkSource
+		let originalLocalCommitOid =
+			Git.Types.commitOid originalLocalCommit
 
-			Just sourceOidUntagged -> do
+		let reducedLocalCommitOid =
+			Git.Types.commitOid reducedLocalCommit
 
-				let sourceOid =
-					Tagged sourceOidUntagged
+		liftIO $ putStrLn $
+			"reduced local commit " ++
+			(show $ untag originalLocalCommitOid) ++ " " ++
+			"to " ++
+			(show $ untag reducedLocalCommitOid)
 
-				sourceCommit <-
-					loadCommit cacheRef sourceOid
+		-- reduce source commit
 
-				let paths =
-					map Char8.pack $
-						gitLinkPaths gitLink
+		(originalSourceCommit, reducedSourceCommit, _) <-
+			performReduction
+				cacheRef
+				paths
+				(gitLinkSource gitLink)
 
-				reducedCommit <-
-					reduceCommit cacheRef paths sourceCommit
+		let originalSourceCommitOid =
+			Git.Types.commitOid originalSourceCommit
 
-				let reducedCommitOid =
-					Git.Types.commitOid reducedCommit
+		let reducedSourceCommitOid =
+			Git.Types.commitOid reducedSourceCommit
 
-				Git.Types.updateReference
-					(Text.pack $ gitLinkTarget gitLink)
-					(Git.Types.RefObj (untag reducedCommitOid))
+		liftIO $ putStrLn $
+			"reduced source commit " ++
+			(show $ untag originalSourceCommitOid) ++ " " ++
+			"to " ++
+			(show $ untag reducedSourceCommitOid)
 
-				return $ show $ untag reducedCommitOid
+		-- debug print expansions
 
-	putStrLn name
+		let printSourceExpansion (fromCommitId, toCommit) = do
+
+			let toCommitId =
+				Git.Types.commitOid toCommit
+
+			liftIO $ putStrLn $
+				"from " ++ (show $ untag fromCommitId) ++ " " ++
+				"to " ++ (show $ untag toCommitId)
+
+			return ()
+
+		mapM printSourceExpansion $
+			Map.toAscList expansions
+
+		targetCommit <-
+			performRewrite
+				cacheRef
+				expansions
+				reducedSourceCommit
+
+		let targetCommitOid =
+			Git.Types.commitOid targetCommit
+
+		liftIO $ putStrLn $
+			"update " ++ (gitLinkTarget gitLink) ++ " " ++
+			"to " ++ (show $ untag targetCommitOid)
+
+		Git.Types.updateReference
+			(Text.pack $ gitLinkTarget gitLink)
+			(Git.Types.RefObj (untag targetCommitOid))
+
+--	liftIO $ mapM putStr [
+--		"source ",
+--		(show sourceOidUntagged),
+--		" -> ",
+--		(show $ untag reducedSourceCommitOid),
+--		"\n" ]
