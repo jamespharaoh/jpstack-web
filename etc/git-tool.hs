@@ -1,7 +1,6 @@
 #!/usr/bin/env runhaskell
 
 {-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Main where
 
@@ -34,15 +33,21 @@ type TreeEntries r =
 type CacheRef r =
 	IORef.IORef (Cache r)
 
-entriesToTree ::
+---------- tree building
+
+addEntriesToTree ::
 	(Git.Types.MonadGit r m, MonadIO m) =>
 	CacheRef r ->
+	Maybe (Git.Types.Tree r) ->
 	TreeEntries r ->
 	m (Git.Types.Tree r)
-entriesToTree cacheRef entries = do
+addEntriesToTree cacheRef originalTreeMaybe entries = do
 
 	let pathSplit path =
 		Split.splitOn "/" (Char8.unpack path)
+
+	treeBuilder <-
+		Git.Types.newTreeBuilder originalTreeMaybe
 
 	let entriesTemp =
 		foldl addEntry Map.empty entries
@@ -87,8 +92,32 @@ entriesToTree cacheRef entries = do
 
 		makeSubEntry (path, Right entries) = do
 
+			existingSubTreeEntryMaybe <-
+				Git.Types.mtbLookupEntry
+					treeBuilder
+					(Char8.pack path)
+
 			subTree <-
-				lookupBuiltTree cacheRef entries
+				case existingSubTreeEntryMaybe of
+
+				Just existingSubTreeEntry -> do
+
+					let existingSubTreeOid =
+						Tagged $ Git.Types.treeEntryToOid existingSubTreeEntry
+
+					existingSubTree <-
+						loadTree cacheRef existingSubTreeOid
+
+					addEntriesToTree
+						cacheRef
+						(Just existingSubTree)
+						entries
+
+				Nothing -> do
+
+					lookupBuiltTree
+						cacheRef
+						entries
 
 			subTreeOid <-
 				Git.Types.treeOid subTree
@@ -101,9 +130,6 @@ entriesToTree cacheRef entries = do
 
 	newEntries <-
 		mapM makeSubEntry (Map.toAscList entriesTemp)
-
-	treeBuilder <-
-		Git.Types.newTreeBuilder Nothing
 
 	let addEntry treeBuilder (path, entry) = do
 
@@ -123,6 +149,8 @@ entriesToTree cacheRef entries = do
 		loadTree cacheRef newTreeOid
 
 	return newTree
+
+---------- recursive tree lookup
 
 treeLookup ::
 	(Git.Types.MonadGit r m, MonadIO m) =>
@@ -174,13 +202,16 @@ treeLookup cacheRef tree path = do
 
 					treeLookup cacheRef subTree restOfPath
 
-reduceTree ::
+---------- reduction
+
+reduceTreeToEntries ::
 	(Git.Types.MonadGit r m, MonadIO m) =>
 	IORef.IORef (Cache r) ->
 	[Char8.ByteString] ->
 	Git.Types.Tree r ->
-	m (Git.Types.Tree r)
-reduceTree cacheRef paths tree = do
+	m (TreeEntries r)
+
+reduceTreeToEntries cacheRef paths tree = do
 
 	treeBuilder <-
 		Git.Types.newTreeBuilder (Just tree)
@@ -203,6 +234,19 @@ reduceTree cacheRef paths tree = do
 
 	let filteredTreeEntries =
 		Maybe.catMaybes filteredTreeEntriesTemp
+
+	return filteredTreeEntries
+
+reduceTree ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	IORef.IORef (Cache r) ->
+	[Char8.ByteString] ->
+	Git.Types.Tree r ->
+	m (Git.Types.Tree r)
+reduceTree cacheRef paths tree = do
+
+	filteredTreeEntries <-
+		reduceTreeToEntries cacheRef paths tree
 
 	reducedTree <-
 		lookupBuiltTree cacheRef filteredTreeEntries
@@ -425,9 +469,82 @@ lookupBuiltTree cacheRef entries = do
 		cacheBuiltTrees
 		(\cache map -> cache { cacheBuiltTrees = map })
 		(map (\(path, entry) -> (path, Git.Types.treeEntryToOid entry)))
-		(entriesToTree cacheRef)
+		(addEntriesToTree cacheRef Nothing)
 		cacheRef
 		entries
+
+---------- rewriting
+
+rewriteCommit cacheRef paths expansions originalCommit = do
+
+	let originalCommitOid =
+		Git.Types.commitOid originalCommit
+
+	case Map.lookup originalCommitOid expansions of
+
+		Just expandedCommit ->
+			return expandedCommit
+
+		Nothing -> do
+
+			let originalParentCommitOids =
+				Git.Types.commitParents originalCommit
+
+			originalParentCommits <-
+				mapM (loadCommit cacheRef) originalParentCommitOids
+
+			let originalParentCommitOids =
+				map Git.Types.commitOid originalParentCommits
+
+			rewrittenParentCommits <-
+				mapM (rewriteCommit cacheRef paths expansions)
+					originalParentCommits
+
+			let rewrittenParentCommitOids =
+				map Git.Types.commitOid rewrittenParentCommits
+
+			case rewrittenParentCommits of
+
+				[] ->
+
+					return originalCommit
+
+				(rewrittenParentCommit : _) -> do
+
+					-- TODO warn if we discard a parent?
+
+					let rewrittenParentTreeOid =
+						Git.Types.commitTree rewrittenParentCommit
+
+					rewrittenParentTree <-
+						loadTree cacheRef rewrittenParentTreeOid
+
+					originalTree <-
+						loadTree cacheRef $
+							Git.Types.commitTree originalCommit
+
+					filteredEntries <-
+						reduceTreeToEntries cacheRef paths originalTree
+
+					rewrittenTree <-
+						addEntriesToTree
+							cacheRef
+							(Just rewrittenParentTree)
+							filteredEntries
+
+					rewrittenTreeOid <-
+						Git.Types.treeOid rewrittenTree
+
+					rewrittenCommit <-
+						Git.Types.createCommit
+							rewrittenParentCommitOids
+							rewrittenTreeOid
+							(Git.Types.commitAuthor originalCommit)
+							(Git.Types.commitCommitter originalCommit)
+							(Git.Types.commitLog originalCommit)
+							Nothing
+
+					return rewrittenCommit
 
 ---------- config
 
@@ -507,7 +624,9 @@ performReduction cacheRef paths referenceName = do
 	case originalCommitOidUntaggedMaybe of
 
 		Nothing ->
-			error $ "error resolving reference " ++ referenceName
+			error $
+				"error resolving reference " ++
+				referenceName
 
 		_ ->
 			return ()
@@ -525,48 +644,6 @@ performReduction cacheRef paths referenceName = do
 		reduceCommit cacheRef paths Map.empty originalCommit
 
 	return (originalCommit, reducedCommit, expansions)
-
-performRewrite cacheRef expansions originalCommit = do
-
-	let originalCommitOid =
-		Git.Types.commitOid originalCommit
-
-	case Map.lookup originalCommitOid expansions of
-
-		Just expandedCommit ->
-			return expandedCommit
-
-		Nothing -> do
-
-			let originalParentCommitOids =
-				Git.Types.commitParents originalCommit
-
-			originalParentCommits <-
-				mapM (loadCommit cacheRef) originalParentCommitOids
-
-			let originalParentCommitOids =
-				map Git.Types.commitOid originalParentCommits
-
-			rewrittenParentCommits <-
-				mapM (performRewrite cacheRef expansions) originalParentCommits
-
-			let rewrittenParentCommitOids =
-				map Git.Types.commitOid rewrittenParentCommits
-
-			if originalParentCommitOids == rewrittenParentCommitOids
-			then return originalCommit
-			else do
-
-				rewrittenCommit <-
-					Git.Types.createCommit
-						rewrittenParentCommitOids
-						(Git.Types.commitTree originalCommit)
-						(Git.Types.commitAuthor originalCommit)
-						(Git.Types.commitCommitter originalCommit)
-						(Git.Types.commitLog originalCommit)
-						Nothing
-
-				return rewrittenCommit
 
 main ::
 	IO ()
@@ -636,42 +713,26 @@ main = do
 			"to " ++
 			(show $ untag reducedSourceCommitOid)
 
-		-- debug print expansions
-
-		let printSourceExpansion (fromCommitId, toCommit) = do
-
-			let toCommitId =
-				Git.Types.commitOid toCommit
-
-			liftIO $ putStrLn $
-				"from " ++ (show $ untag fromCommitId) ++ " " ++
-				"to " ++ (show $ untag toCommitId)
-
-			return ()
-
-		mapM printSourceExpansion $
-			Map.toAscList expansions
+		-- rewrite source to produce target
 
 		targetCommit <-
-			performRewrite
+			rewriteCommit
 				cacheRef
+				paths
 				expansions
 				reducedSourceCommit
 
 		let targetCommitOid =
 			Git.Types.commitOid targetCommit
 
-		liftIO $ putStrLn $
-			"update " ++ (gitLinkTarget gitLink) ++ " " ++
-			"to " ++ (show $ untag targetCommitOid)
-
 		Git.Types.updateReference
 			(Text.pack $ gitLinkTarget gitLink)
 			(Git.Types.RefObj (untag targetCommitOid))
 
---	liftIO $ mapM putStr [
---		"source ",
---		(show sourceOidUntagged),
---		" -> ",
---		(show $ untag reducedSourceCommitOid),
---		"\n" ]
+		liftIO $ putStrLn $
+			"rewritten to " ++
+			(show $ untag targetCommitOid) ++ " " ++
+			"and saved as " ++
+			(gitLinkTarget gitLink)
+
+		return ()
