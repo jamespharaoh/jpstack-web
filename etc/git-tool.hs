@@ -1,6 +1,7 @@
 #!/usr/bin/env runhaskell
 
 {-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module Main where
 
@@ -13,6 +14,7 @@ import qualified Data.List as List
 import qualified Data.List.Split as Split
 import qualified Data.Map.Strict as Map
 import qualified Data.Maybe as Maybe
+import qualified Data.Set as Set
 import           Data.Tagged
 import qualified Data.Text as Text
 
@@ -25,7 +27,7 @@ import qualified Git.Tree
 
 import qualified System.Environment as Environment
 
-import           Text.XML.HXT.Core
+import           Text.XML.HXT.Core hiding (Tree)
 
 type TreeEntries r =
 	[(Char8.ByteString, Git.Types.TreeEntry r)]
@@ -204,14 +206,14 @@ treeLookup cacheRef tree path = do
 
 ---------- reduction
 
-reduceTreeToEntries ::
+filterTreeToEntries ::
 	(Git.Types.MonadGit r m, MonadIO m) =>
 	IORef.IORef (Cache r) ->
 	[Char8.ByteString] ->
 	Git.Types.Tree r ->
 	m (TreeEntries r)
 
-reduceTreeToEntries cacheRef paths tree = do
+filterTreeToEntries cacheRef paths tree = do
 
 	treeBuilder <-
 		Git.Types.newTreeBuilder (Just tree)
@@ -237,123 +239,191 @@ reduceTreeToEntries cacheRef paths tree = do
 
 	return filteredTreeEntries
 
-reduceTree ::
+filterTree ::
 	(Git.Types.MonadGit r m, MonadIO m) =>
 	IORef.IORef (Cache r) ->
 	[Char8.ByteString] ->
 	Git.Types.Tree r ->
 	m (Git.Types.Tree r)
-reduceTree cacheRef paths tree = do
+filterTree cacheRef paths tree = do
 
 	filteredTreeEntries <-
-		reduceTreeToEntries cacheRef paths tree
+		filterTreeToEntries cacheRef paths tree
 
-	reducedTree <-
-		lookupBuiltTree cacheRef filteredTreeEntries
+	lookupBuiltTree cacheRef filteredTreeEntries
 
-	return reducedTree
+---------- fast forwards
+
+commitAndAncestors' ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	CacheRef r ->
+	CommitSet r ->
+	Commit r ->
+	m (CommitSet r)
+
+commitAndAncestors' cacheRef set commit = do
+
+	if commitSetMember commit set
+
+	then do
+
+		return set
+
+	else do
+
+		let set' =
+			commitSetInsert commit set
+
+		parents <-
+			commitParents cacheRef commit
+
+		foldM (commitAndAncestors' cacheRef) set' parents
+
+commitAndAncestors ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	CacheRef r ->
+	Commit r ->
+	m (CommitSet r)
+
+commitAndAncestors cacheRef commit =
+	commitAndAncestors' cacheRef commitSetEmpty commit
+
+eliminateFastForwards ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	CacheRef r ->
+	[Commit r] ->
+	m ([Commit r])
+
+eliminateFastForwards cacheRef [] =
+	return []
+
+eliminateFastForwards cacheRef [ oneCommit ] =
+	return [ oneCommit ]
+
+eliminateFastForwards cacheRef commits = do
+
+	listOfParentLists <-
+		mapM (commitParents cacheRef) commits
+
+	let listOfParentSets =
+		map commitSetFromList listOfParentLists
+
+	let combinedParents =
+		foldl commitSetUnion commitSetEmpty listOfParentSets
+
+	allAncestors <-
+		foldM
+			(commitAndAncestors' cacheRef)
+			commitSetEmpty
+			(commitSetElems combinedParents)
+
+	let shouldEliminate commit =
+		commitSetMember commit allAncestors
+
+	return $ filter (not . shouldEliminate) commits
 
 type ExpansionsMap r =
 	Map.Map
 	(Git.Types.CommitOid r)
 	(Git.Types.Commit r)
 
+--expandCommit cacheRef paths expansions commit = do
+
 reduceCommit ::
 	(Git.Types.MonadGit r m, MonadIO m) =>
-	IORef.IORef (Cache r) ->
+	CacheRef r ->
 	[Char8.ByteString] ->
 	ExpansionsMap r ->
-	Git.Types.Commit r ->
-	m (Git.Types.Commit r, ExpansionsMap r)
+	Commit r ->
+	m (Commit r, ExpansionsMap r)
+
 reduceCommit cacheRef paths expansions commit = do
 
-	let commitOid =
-		Git.Types.commitOid commit
+	-- reduce parents
 
-	fullTree <-
-		loadTree cacheRef $
-			Git.Types.commitTree commit
+	commitParentsTemp <-
+		commitParents cacheRef commit
 
-	reducedTree <-
-		reduceTree cacheRef paths fullTree
+	reducedTemp <-
+		mapM (reduceCommit cacheRef paths expansions)
+			commitParentsTemp
 
-	reducedTreeOid <-
-		Git.Types.treeOid reducedTree
+	let reducedParents =
+		map fst reducedTemp
 
-	let parentCommitOids =
-		Git.Types.commitParents commit
-
-	parentCommits <-
-		mapM (loadCommit cacheRef) parentCommitOids
-
-	reducedParentCommitsTemp <-
-		mapM (reduceCommit cacheRef paths expansions) parentCommits
-
-	let reducedParentCommits =
-		map fst reducedParentCommitsTemp
+	let parentExpansions =
+		map snd reducedTemp
 
 	let expansions' =
-		foldl Map.union expansions $
-			map snd reducedParentCommitsTemp
+		foldl Map.union expansions parentExpansions
 
-	let reduceToParent =
+	-- eliminate fast-forwards
 
-		case reducedParentCommits of
+	validParents <-
+		eliminateFastForwards cacheRef reducedParents
 
-			[oneReducedParentCommit] -> do
+	-- filter tree
 
-				reducedParentTree <-
-					loadTree cacheRef $
-						Git.Types.commitTree oneReducedParentCommit
+	originalTree <-
+		commitTree cacheRef commit
 
-				reducedParentTreeOid <-
-					Git.Types.treeOid reducedParentTree
+	filteredTree <-
+		filterTree cacheRef paths originalTree
 
-				if reducedParentTreeOid == reducedTreeOid
-					then return $ Just oneReducedParentCommit
-					else return Nothing
+	-- drop commits with no changes
+
+	dropCommitMaybe <- do
+
+		case validParents of
+
+			[ singleParent ] -> do
+
+				parentTree <-
+					commitTree cacheRef singleParent
+
+				parentTreeId <-
+					treeId parentTree
+
+				filteredTreeId <-
+					treeId filteredTree
+
+				if parentTreeId == filteredTreeId
+				then return $ Just singleParent
+				else return Nothing
 
 			_ ->
 
 				return Nothing
 
-	reducedMaybe <-
-		reduceToParent
+	case dropCommitMaybe of
 
-	case reducedMaybe of
+		Just dropCommit -> do
 
-		Just reduced ->
-			return (reduced, expansions')
+			return (dropCommit, expansions')
 
-		_ -> do
+		Nothing -> do
 
-			let reducedParentCommitIds =
-				map Git.Types.commitOid reducedParentCommits
+			filteredTreeId <-
+				treeId filteredTree
 
-			reducedTreeOid <-
-				Git.Types.treeOid reducedTree
-
-			reducedCommit <-
+			reduced <-
 				Git.Types.createCommit
-					reducedParentCommitIds
-					reducedTreeOid
+					(map commitId validParents)
+					filteredTreeId
 					(Git.Types.commitAuthor commit)
 					(Git.Types.commitCommitter commit)
 					(Git.Types.commitLog commit)
 					Nothing
 
-			let reducedCommitOid =
-				Git.Types.commitOid reducedCommit
-
 			let expansions'' =
-				if reducedCommitOid == commitOid
+				if (commitId reduced) == (commitId commit)
 				then expansions'
 				else Map.insert
-					reducedCommitOid
+					(commitId reduced)
 					commit
 					expansions'
 
-			return (reducedCommit, expansions'')
+			return (reduced, expansions'')
 
 ---------- cache
 
@@ -361,18 +431,23 @@ data Cache r = Cache {
 
 	cacheCommits ::
 		Map.Map
-		(Git.Types.CommitOid r)
-		(Git.Types.Commit r),
+		(CommitId r)
+		(Commit r),
 
 	cacheTrees ::
 		Map.Map
-		(Git.Types.TreeOid r)
-		(Git.Types.Tree r),
+		(TreeId r)
+		(Tree r),
 
 	cacheBuiltTrees ::
 		Map.Map
 		[(Char8.ByteString, Git.Types.Oid r)]
-		(Git.Types.Tree r)
+		(Tree r),
+
+	cacheParents ::
+		Map.Map
+		(CommitId r)
+		[Commit r]
 
 }
 
@@ -381,7 +456,8 @@ createCache = do
 	liftIO $ IORef.newIORef Cache {
 		cacheCommits = Map.empty,
 		cacheTrees = Map.empty,
-		cacheBuiltTrees = Map.empty }
+		cacheBuiltTrees = Map.empty,
+		cacheParents = Map.empty }
 
 loadCached ::
 	(Git.Types.MonadGit r m, MonadIO m, Ord k') =>
@@ -459,9 +535,9 @@ loadCommit cacheRef commitOid = do
 
 lookupBuiltTree ::
 	(Git.Types.MonadGit r m, MonadIO m) =>
-	IORef.IORef (Cache r) ->
+	CacheRef r ->
 	TreeEntries r ->
-	m (Git.Types.Tree r)
+	m (Tree r)
 
 lookupBuiltTree cacheRef entries = do
 
@@ -473,35 +549,147 @@ lookupBuiltTree cacheRef entries = do
 		cacheRef
 		entries
 
+commitParents ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	CacheRef r ->
+	Commit r ->
+	m ([Commit r])
+
+commitParents cacheRef commit = do
+
+	loadCached
+		cacheParents
+		(\cache map -> cache { cacheParents = map })
+		commitId
+		(\commit -> mapM (loadCommit cacheRef) $ Git.Types.commitParents commit)
+		cacheRef
+		commit
+
+---------- commit stuff
+
+type Commit r =
+	Git.Types.Commit r
+
+type CommitId r =
+	Git.Types.CommitOid r
+
+type CommitSet r =
+	Map.Map (CommitId r) (Commit r)
+
+-- commitId - returns the commit id for a commit
+
+commitId ::
+	Ord (CommitId r) =>
+	Commit r ->
+	CommitId r
+
+commitId commit =
+	Git.Types.commitOid commit
+
+-- commitTree - returns the tree for a commit
+
+commitTree ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	CacheRef r ->
+	Commit r ->
+	m (Tree r)
+
+commitTree cacheRef commit = do
+
+	let treeIdTemp =
+		Git.Types.commitTree commit
+
+	loadTree cacheRef treeIdTemp
+
+-- commitSetMember - tests if a commit is in a set
+
+commitSetMember ::
+	Ord (CommitId r) =>
+	Commit r ->
+	CommitSet r ->
+	Bool
+
+commitSetMember commit set =
+	Map.member (commitId commit) set
+
+-- commitSetEmpty - returns an empty commit set
+
+commitSetEmpty ::
+	CommitSet r
+
+commitSetEmpty =
+	Map.empty
+
+-- commitSetElems - get commits in commit set
+
+commitSetElems set =
+	Map.elems set
+
+-- commitSetInsert - insert a commit in a commit set
+
+commitSetInsert ::
+	Ord (CommitId r) =>
+	Commit r ->
+	CommitSet r ->
+	CommitSet r
+
+commitSetInsert commit set =
+	Map.insert (commitId commit) commit set
+
+-- commitSetFromList - create a commit set given a list
+
+commitSetFromList ::
+	Ord (CommitId r) =>
+	[Commit r] ->
+	CommitSet r
+
+commitSetFromList =
+	foldl (\set commit -> commitSetInsert commit set) commitSetEmpty
+
+-- commitSetUnion -
+
+commitSetUnion ::
+	Ord (CommitId r) =>
+	CommitSet r ->
+	CommitSet r ->
+	CommitSet r
+
+commitSetUnion left right =
+	Map.union left right
+
+---------- tree stuff
+
+type Tree r =
+	Git.Types.Tree r
+
+type TreeId r =
+	Git.Types.TreeOid r
+
+treeId ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	Tree r ->
+	m (TreeId r)
+
+treeId tree =
+	Git.Types.treeOid tree
+
 ---------- rewriting
 
 rewriteCommit cacheRef paths expansions originalCommit = do
 
-	let originalCommitOid =
-		Git.Types.commitOid originalCommit
-
-	case Map.lookup originalCommitOid expansions of
+	case Map.lookup (commitId originalCommit) expansions of
 
 		Just expandedCommit ->
 			return expandedCommit
 
 		Nothing -> do
 
-			let originalParentCommitOids =
-				Git.Types.commitParents originalCommit
-
 			originalParentCommits <-
-				mapM (loadCommit cacheRef) originalParentCommitOids
-
-			let originalParentCommitOids =
-				map Git.Types.commitOid originalParentCommits
+				commitParents cacheRef originalCommit
 
 			rewrittenParentCommits <-
 				mapM (rewriteCommit cacheRef paths expansions)
 					originalParentCommits
-
-			let rewrittenParentCommitOids =
-				map Git.Types.commitOid rewrittenParentCommits
 
 			case rewrittenParentCommits of
 
@@ -511,20 +699,21 @@ rewriteCommit cacheRef paths expansions originalCommit = do
 
 				(rewrittenParentCommit : _) -> do
 
-					-- TODO warn if we discard a parent?
+					-- TODO this is wrong...
 
-					let rewrittenParentTreeOid =
-						Git.Types.commitTree rewrittenParentCommit
+					-- if there are multiple parents we should resolve it
+					-- if one parent is a fast forward of another we can use that
+					-- otherwise... report an error
+					-- or there will be a problem!
 
 					rewrittenParentTree <-
-						loadTree cacheRef rewrittenParentTreeOid
+						commitTree cacheRef rewrittenParentCommit
 
 					originalTree <-
-						loadTree cacheRef $
-							Git.Types.commitTree originalCommit
+						commitTree cacheRef originalCommit
 
 					filteredEntries <-
-						reduceTreeToEntries cacheRef paths originalTree
+						filterTreeToEntries cacheRef paths originalTree
 
 					rewrittenTree <-
 						addEntriesToTree
@@ -537,7 +726,7 @@ rewriteCommit cacheRef paths expansions originalCommit = do
 
 					rewrittenCommit <-
 						Git.Types.createCommit
-							rewrittenParentCommitOids
+							(map commitId rewrittenParentCommits)
 							rewrittenTreeOid
 							(Git.Types.commitAuthor originalCommit)
 							(Git.Types.commitCommitter originalCommit)
