@@ -7,6 +7,7 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +29,14 @@ import wbs.framework.application.scaffold.BuildSpec;
 import wbs.framework.application.scaffold.PluginBeanSpec;
 import wbs.framework.application.scaffold.PluginConsoleModuleSpec;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
+import wbs.framework.application.scaffold.PluginDependenciesSpec;
+import wbs.framework.application.scaffold.PluginFixtureSpec;
 import wbs.framework.application.scaffold.PluginLayerSpec;
+import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginModelsSpec;
+import wbs.framework.application.scaffold.PluginPluginDependencySpec;
+import wbs.framework.application.scaffold.PluginProjectDependencySpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.application.scaffold.ProjectPluginSpec;
 import wbs.framework.application.scaffold.ProjectSpec;
@@ -73,6 +79,8 @@ class ApplicationContextBuilder {
 	String outputPath;
 
 	Map<String,ProjectSpec> projects;
+	List<PluginSpec> plugins;
+	PluginManager pluginManager;
 
 	Map<String,Object> singletonBeans =
 		new LinkedHashMap<String,Object> ();
@@ -100,6 +108,9 @@ class ApplicationContextBuilder {
 	ApplicationContext build () {
 
 		loadProjects ();
+		loadPlugins ();
+
+		createPluginManager ();
 
 		initContext ();
 
@@ -127,6 +138,7 @@ class ApplicationContextBuilder {
 		BuildSpec build =
 			(BuildSpec)
 			buildDataFromXml.readClasspath (
+				Collections.emptyList (),
 				buildPath);
 
 		DataFromXml projectDataFromXml =
@@ -156,6 +168,7 @@ class ApplicationContextBuilder {
 			ProjectSpec project =
 				(ProjectSpec)
 				projectDataFromXml.readClasspath (
+					Collections.emptyList (),
 					projectPath);
 
 			projectsBuilder.put (
@@ -167,20 +180,32 @@ class ApplicationContextBuilder {
 		projects =
 			projectsBuilder.build ();
 
+	}
+
+	private
+	void loadPlugins () {
+
+		ImmutableList.Builder<PluginSpec> pluginsBuilder =
+			ImmutableList.<PluginSpec>builder ();
+
 		DataFromXml pluginDataFromXml =
 			new DataFromXml ()
 				.registerBuilderClass (PluginSpec.class)
+				.registerBuilderClass (PluginDependenciesSpec.class)
+				.registerBuilderClass (PluginPluginDependencySpec.class)
+				.registerBuilderClass (PluginProjectDependencySpec.class)
 				.registerBuilderClass (PluginLayerSpec.class)
 				.registerBuilderClass (PluginBeanSpec.class)
 				.registerBuilderClass (PluginModelsSpec.class)
 				.registerBuilderClass (PluginCustomTypeSpec.class)
 				.registerBuilderClass (PluginModelSpec.class)
-				.registerBuilderClass (PluginConsoleModuleSpec.class);
+				.registerBuilderClass (PluginConsoleModuleSpec.class)
+				.registerBuilderClass (PluginFixtureSpec.class);
 
 		for (ProjectSpec project
 				: projects.values ()) {
 
-			ImmutableList.Builder<PluginSpec> pluginsBuilder =
+			ImmutableList.Builder<PluginSpec> projectPluginsBuilder =
 				ImmutableList.<PluginSpec>builder ();
 
 			for (ProjectPluginSpec projectPlugin
@@ -198,10 +223,15 @@ class ApplicationContextBuilder {
 				PluginSpec plugin =
 					(PluginSpec)
 					pluginDataFromXml.readClasspath (
+						ImmutableList.<Object>of (
+							project),
 						pluginPath);
 
 				plugin.project (
 					project);
+
+				projectPluginsBuilder.add (
+					plugin);
 
 				pluginsBuilder.add (
 					plugin);
@@ -209,9 +239,22 @@ class ApplicationContextBuilder {
 			}
 
 			project.plugins (
-				pluginsBuilder.build ());
+				projectPluginsBuilder.build ());
 
 		}
+
+		plugins =
+			pluginsBuilder.build ();
+
+	}
+
+	private
+	void createPluginManager () {
+
+		pluginManager =
+			new PluginManager.Builder ()
+				.plugins (plugins)
+				.build ();
 
 	}
 
@@ -266,6 +309,10 @@ class ApplicationContextBuilder {
 
 	private
 	int registerProjectBeans () {
+
+		applicationContext.registerSingleton (
+			"pluginManager",
+			pluginManager);
 
 		for (ProjectSpec project
 				: projects.values ()) {
@@ -382,6 +429,16 @@ class ApplicationContextBuilder {
 
 			errors +=
 				registerObjectLayerBeans (
+					plugin);
+
+		}
+
+		if (equal (
+				layerName,
+				"fixture")) {
+
+			errors +=
+				registerFixtureLayerBeans (
 					plugin);
 
 		}
@@ -554,6 +611,71 @@ class ApplicationContextBuilder {
 		);
 
 		return 0;
+
+	}
+
+	int registerFixtureLayerBeans (
+			@NonNull PluginSpec plugin)
+		throws Exception {
+
+		int errors = 0;
+
+		for (PluginFixtureSpec fixture
+				: plugin.fixtures ()) {
+
+			String fixtureProviderBeanName =
+				stringFormat (
+					"%sFixtureProvider",
+					fixture.name ());
+
+			String fixtureProviderClassName =
+				stringFormat (
+					"%s.%s.fixture.%sFixtureProvider",
+					plugin.project ().packageName (),
+					plugin.packageName (),
+					capitalise (
+						fixture.name ()));
+
+			Class<?> fixtureProviderClass;
+
+			try {
+
+				fixtureProviderClass =
+					Class.forName (
+						fixtureProviderClassName);
+
+			} catch (ClassNotFoundException exception) {
+
+				log.error (
+					stringFormat (
+						"Can't find fixture provider of type %s for ",
+						fixtureProviderClassName,
+						"fixture %s from %s/%s",
+						fixture.name (),
+						plugin.project ().name (),
+						plugin.name ()));
+
+				errors ++;
+
+				continue;
+
+			}
+
+			applicationContext.registerBeanDefinition (
+				new BeanDefinition ()
+
+				.name (
+					fixtureProviderBeanName)
+
+				.beanClass (
+					fixtureProviderClass)
+
+				.scope (
+					"prototype"));
+
+		}
+
+		return errors;
 
 	}
 

@@ -2,7 +2,8 @@ package wbs.platform.exception.model;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+
+import javax.inject.Inject;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,6 +16,7 @@ import wbs.framework.entity.annotations.EphemeralEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
+import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.Record;
 import wbs.platform.user.model.UserRec;
@@ -74,8 +76,36 @@ class ExceptionLogRec
 			(ExceptionLogRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (other.getId (), getId ())
+
+			.append (
+				other.getId (),
+				getId ())
+
 			.toComparison ();
+
+	}
+
+	// object hooks
+
+	public static
+	class ExceptionLogHooks
+		extends AbstractObjectHooks<ExceptionLogRec> {
+
+		@Inject
+		ExceptionLogDao exceptionLogDao;
+
+		@Override
+		public
+		List<Integer> searchIds (
+				Object searchObject) {
+
+			ExceptionLogSearch search =
+				(ExceptionLogSearch) searchObject;
+
+			return exceptionLogDao.searchIds (
+				search);
+
+		}
 
 	}
 
@@ -88,8 +118,8 @@ class ExceptionLogRec
 
 		int countWithAlertAndFatal ();
 
-		List<ExceptionLogRec> search (
-				Map<String,Object> params);
+		List<Integer> searchIds (
+				ExceptionLogSearch search);
 
 	}
 

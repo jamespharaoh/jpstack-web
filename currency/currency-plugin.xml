@@ -2,6 +2,13 @@
 	name="currency"
 	package="currency">
 
+	<dependencies>
+		<project name="wbs-platform">
+			<plugin name="menu"/>
+			<plugin name="platform-common"/>
+		</project>
+	</dependencies>
+
 	<sql-scripts>
 		<sql-data name="currency-data"/>
 	</sql-scripts>
@@ -13,6 +20,10 @@
 	<layer name="logic">
 		<bean class="logic.CurrencyLogicImpl"/>
 	</layer>
+
+	<fixtures>
+		<fixture name="currency"/>
+	</fixtures>
 
 	<console-modules>
 		<console-module name="currency"/>

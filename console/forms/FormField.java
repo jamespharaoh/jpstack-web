@@ -17,6 +17,8 @@ interface FormField<Container,Generic,Native,Interface> {
 
 	Boolean virtual ();
 
+	Boolean large ();
+
 	String name ();
 
 	String label ();

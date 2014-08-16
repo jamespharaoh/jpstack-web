@@ -28,6 +28,9 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	Boolean virtual = false;
 
 	@Getter @Setter
+	Boolean large = false;
+
+	@Getter @Setter
 	String name;
 
 	@Getter @Setter

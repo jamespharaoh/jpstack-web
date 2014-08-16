@@ -1,17 +1,18 @@
 package wbs.platform.exception.hibernate;
 
-import static wbs.framework.utils.etc.Misc.equal;
-
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.exception.model.ExceptionLogDao;
 import wbs.platform.exception.model.ExceptionLogRec;
+import wbs.platform.exception.model.ExceptionLogSearch;
+import wbs.platform.exception.model.ExceptionLogTypeRec;
+import wbs.platform.user.model.UserRec;
 
 public
 class ExceptionLogDaoHibernate
@@ -53,63 +54,91 @@ class ExceptionLogDaoHibernate
 
 	@Override
 	public
-	List<ExceptionLogRec> search (
-			Map<String,Object> params) {
+	List<Integer> searchIds (
+			ExceptionLogSearch search) {
 
 		Criteria criteria =
-			createCriteria (ExceptionLogRec.class);
+			createCriteria (
+				ExceptionLogRec.class);
 
-		for (Map.Entry<String,Object> entry
-				: params.entrySet ()) {
+		if (search.alert () != null) {
 
-			String key =
-				entry.getKey ();
+			criteria.add (
+				Restrictions.eq (
+					"alert",
+					search.alert ()));
 
-			Object value =
-				entry.getValue ();
+		}
 
-			if (key.equals ("alert")) {
+		if (search.fatal () != null) {
 
-				criteria.add (
-					Restrictions.eq (
-						"alert",
-						value));
+			criteria.add (
+				Restrictions.eq (
+					"fatal",
+					search.fatal ()));
 
-			} else if (equal (
-					key,
-					"limit")) {
+		}
 
-				criteria.setMaxResults (
-					(Integer)
-					value);
+		if (search.typeId () != null) {
 
-			} else if (key.equals ("orderBy")) {
+			ExceptionLogTypeRec type =
+				get (
+					ExceptionLogTypeRec.class,
+					search.typeId ());
 
-				if (equal (
-						value,
-						"timestampDesc")) {
+			criteria.add (
+				Restrictions.eq (
+					"type",
+					type));
 
-					criteria.addOrder (
-						Order.desc ("timestamp"));
+		}
 
-				} else {
+		if (search.userId () != null) {
 
-					throw new IllegalArgumentException (
-						"Cannot order by " + value);
+			UserRec user =
+				get (
+					UserRec.class,
+					search.userId ());
 
-				}
+			criteria.add (
+				Restrictions.eq (
+					"user",
+					user));
 
-			} else {
+		}
 
-				throw new IllegalArgumentException (
-					"Unknown search parameter: " + key);
+		if (search.order () != null) {
+
+			switch (search.order ()) {
+
+			case timestampDesc:
+
+				criteria.addOrder (
+					Order.desc (
+						"timestamp"));
+
+				break;
+
+			default:
+
+				throw new IllegalArgumentException ();
 
 			}
 
 		}
 
+		if (search.maxResults () != null) {
+
+			criteria.setMaxResults (
+				search.maxResults ());
+
+		}
+
+		criteria.setProjection (
+			Projections.id ());
+
 		return findMany (
-			ExceptionLogRec.class,
+			Integer.class,
 			criteria.list ());
 
 	}

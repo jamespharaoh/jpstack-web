@@ -3,6 +3,7 @@ package wbs.platform.console.html;
 import static wbs.framework.utils.etc.Misc.urlEncode;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -167,6 +168,40 @@ class ObsoleteDateLinks {
 			final LinkMaker linkMaker,
 			final SimpleDateFormat dateFormat) {
 
+		LinkWriter linkWriter =
+			new LinkWriter () {
+
+			@Override
+			public
+			void writeLink (
+					Date date,
+					String title) {
+
+				out.println("<a href=\""
+						+ Html.encode(makeLink(url, formData, dateFieldName,
+								dateFormat.format(date))) + "\">"
+						+ Html.encode(title) + "</a>");
+
+			}
+
+		};
+
+		linkMaker.makeLinks (
+			linkWriter,
+			date);
+
+	}
+
+	public static
+	void browserParagraph (
+			final PrintWriter out,
+			final String url,
+			final FormData formData,
+			final Date date,
+			final String dateFieldName,
+			final LinkMaker linkMaker,
+			final SimpleDateFormat dateFormat) {
+
 		out.println (
 			"<p class=\"links\">");
 
@@ -198,13 +233,13 @@ class ObsoleteDateLinks {
 	 * MonthField.dateFormat.
 	 */
 	public static
-	void monthlyBrowser (
+	void monthlyBrowserParagraph (
 			PrintWriter out,
 			String url,
 			FormData formData,
 			Date date) {
 
-		browser (
+		browserParagraph (
 			out,
 			url,
 			formData,
@@ -220,13 +255,13 @@ class ObsoleteDateLinks {
 	 * DateField.dateFormat.
 	 */
 	public static
-	void dailyBrowser (
+	void dailyBrowserParagraph (
 			PrintWriter out,
 			String url,
 			FormData formData,
 			Date date) {
 
-		browser (
+		browserParagraph (
 			out,
 			url,
 			formData,
@@ -234,6 +269,29 @@ class ObsoleteDateLinks {
 			"date",
 			dailyLinkMaker,
 			ObsoleteDateField.dateFormat);
+
+	}
+
+	public static
+	String dailyBrowserLinks (
+			String url,
+			FormData formData,
+			Date date) {
+
+		StringWriter stringWriter =
+			new StringWriter ();
+
+		browser (
+			new PrintWriter (
+				stringWriter),
+			url,
+			formData,
+			date,
+			"date",
+			dailyLinkMaker,
+			ObsoleteDateField.dateFormat);
+
+		return stringWriter.toString ();
 
 	}
 

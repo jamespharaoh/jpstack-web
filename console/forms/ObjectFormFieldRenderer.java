@@ -289,6 +289,11 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		if (equal (
 				param,
+				"null"))
+			return null;
+
+		if (equal (
+				param,
 				"unchanged"))
 			return null;
 

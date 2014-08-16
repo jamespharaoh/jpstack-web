@@ -45,6 +45,10 @@
 		<bean class="logic.QueueLogicImpl"/>
 	</layer>
 
+	<fixtures>
+		<fixture name="queue"/>
+	</fixtures>
+
 	<console-modules>
 		<console-module name="queue"/>
 		<console-module name="queue-item"/>

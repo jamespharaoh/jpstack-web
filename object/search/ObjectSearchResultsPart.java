@@ -55,6 +55,8 @@ class ObjectSearchResultsPart
 
 	Record<?> currentObject;
 	List<Record<?>> objects;
+	Integer totalObjects;
+	Integer pageNumber;
 	Integer pageCount;
 
 	// implementation
@@ -86,7 +88,10 @@ class ObjectSearchResultsPart
 			requestContext.session (
 				sessionKey + "Results");
 
-		Integer pageNumber =
+		totalObjects =
+			allObjectIds.size ();
+
+		pageNumber =
 			Integer.parseInt (
 				requestContext.parameter (
 					"page",
@@ -123,6 +128,7 @@ class ObjectSearchResultsPart
 	void goBodyStuff () {
 
 		goNewSearch ();
+		goTotalObjects ();
 		goPageNumbers ();
 		goSearchResults ();
 		goPageNumbers ();
@@ -146,6 +152,14 @@ class ObjectSearchResultsPart
 
 	}
 
+	void goTotalObjects () {
+
+		printFormat (
+			"<p>Search returned %h items</p>\n",
+			totalObjects);
+
+	}
+
 	void goPageNumbers () {
 
 		if (pageCount == 1)
@@ -164,6 +178,10 @@ class ObjectSearchResultsPart
 
 			printFormat (
 				"<a",
+				" class=\"%h\"",
+				page == pageNumber
+					? "selected"
+					: "",
 				" href=\"%h\"",
 				stringFormat (
 					"?page=%h",

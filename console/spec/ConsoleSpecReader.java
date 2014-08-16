@@ -11,6 +11,8 @@ import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataFromXml;
 
+import com.google.common.collect.ImmutableList;
+
 @Accessors (fluent = true)
 @SingletonComponent ("consoleSpecReader")
 public
@@ -47,6 +49,7 @@ class ConsoleSpecReader {
 		ConsoleSpec consoleSpec =
 			(ConsoleSpec)
 			dataFromXml.readClasspath (
+				ImmutableList.of (),
 				xmlResourceName);
 
 		return consoleSpec;

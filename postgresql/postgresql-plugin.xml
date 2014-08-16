@@ -26,6 +26,10 @@
 		<bean class="console.PostgresqlTablesPart"/>
 	</layer>
 
+	<fixtures>
+		<fixture name="postgresql"/>
+	</fixtures>
+
 	<console-modules>
 		<console-module name="postgresql"/>
 		<console-module name="postgresql-maintenance"/>

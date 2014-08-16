@@ -94,6 +94,7 @@
 		<id-field/>
 		<parent-field/>
 		<code-field/>
+		<deleted-field/>
 
 		<text-field
 			name="label"/>
@@ -111,8 +112,13 @@
 		object-name="menu">
 
 		<id-field/>
-		<parent-field/>
+
+		<parent-field
+			create-priv-delegate="root"
+			create-priv-code="manage"/>
+
 		<code-field/>
+		<deleted-field/>
 
 		<text-field
 			name="label"/>

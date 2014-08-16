@@ -1,5 +1,7 @@
 package wbs.platform.console.context;
 
+import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +48,14 @@ class ConsoleContextPrivLookup
 		}
 
 		return privKeys.isEmpty ();
+
+	}
+
+	public
+	String describe () {
+
+		return joinWithoutSeparator (
+			privKeys);
 
 	}
 

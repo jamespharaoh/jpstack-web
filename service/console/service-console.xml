@@ -35,10 +35,6 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-sms-messages-page/>
-
-			<object-sms-stats-page/>
-
 			<object-events-page/>
 
 		</object>

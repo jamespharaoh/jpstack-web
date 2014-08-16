@@ -2,6 +2,12 @@
 	name="object-core"
 	package="object.core">
 
+	<dependencies>
+		<project name="wbs-platform">
+			<plugin name="platform-common"/>
+		</project>
+	</dependencies>
+
 	<sql-scripts>
 		<sql-schema name="object-type"/>
 		<sql-data name="object-type-data"/>
@@ -14,6 +20,10 @@
 	<layer name="hibernate">
 		<bean class="hibernate.HibernateHelperProviderBuilder"/>
 	</layer>
+
+	<fixtures>
+		<fixture name="objectType"/>
+	</fixtures>
 
 	<console-modules>
 		<console-module name="object-type"/>

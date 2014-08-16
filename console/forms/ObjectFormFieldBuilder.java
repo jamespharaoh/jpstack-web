@@ -3,6 +3,7 @@ package wbs.platform.console.forms;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -108,8 +109,14 @@ class ObjectFormFieldBuilder {
 			consoleHelperRegistry.findByObjectName (
 				spec.finderName ());
 
-		if (entityFinder == null)
-			throw new RuntimeException ();
+		if (entityFinder == null) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Entity finder does not exist: %s",
+					spec.finderName ()));
+
+		}
 
 		String rootFieldName =
 			spec.rootFieldName ();

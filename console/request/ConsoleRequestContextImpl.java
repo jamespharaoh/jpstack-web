@@ -497,8 +497,9 @@ class ConsoleRequestContextImpl
 
 		String nameValue = name + "_" + value;
 
-		String onChangeStr = options != null ? (String) options.get("onChange")
-				: null;
+		String onChangeStr =
+			(String)
+			options.get ("onChange");
 
 		out.print("<td");
 		out.print(" id=\"" + Html.encode(nameValue + "_td") + "\"");

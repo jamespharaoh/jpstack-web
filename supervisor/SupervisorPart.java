@@ -231,7 +231,7 @@ class SupervisorPart
 		printFormat (
 			"</form>\n");
 
-		ObsoleteDateLinks.dailyBrowser (
+		ObsoleteDateLinks.dailyBrowserParagraph (
 			out,
 			localUrl,
 			requestContext.getFormData (),

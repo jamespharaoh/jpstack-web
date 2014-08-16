@@ -17,6 +17,8 @@ public
 class ExceptionStatusLine
 	implements StatusLine {
 
+	// dependencies
+
 	@Inject
 	ConsoleRequestContext requestContext;
 
@@ -32,11 +34,15 @@ class ExceptionStatusLine
 	@Inject
 	Provider<ExceptionStatusLinePart> exceptionStatusLinePart;
 
+	// details
+
 	@Override
 	public
 	String getName () {
 		return "exceptions";
 	}
+
+	// implementation
 
 	@Override
 	public
