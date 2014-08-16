@@ -43,6 +43,7 @@ addEntriesToTree ::
 	Maybe (Git.Types.Tree r) ->
 	TreeEntries r ->
 	m (Git.Types.Tree r)
+
 addEntriesToTree cacheRef originalTreeMaybe entries = do
 
 	let pathSplit path =
@@ -326,8 +327,6 @@ type ExpansionsMap r =
 	Map.Map
 	(Git.Types.CommitOid r)
 	(Git.Types.Commit r)
-
---expandCommit cacheRef paths expansions commit = do
 
 reduceCommit ::
 	(Git.Types.MonadGit r m, MonadIO m) =>
@@ -697,14 +696,7 @@ rewriteCommit cacheRef paths expansions originalCommit = do
 
 					return originalCommit
 
-				(rewrittenParentCommit : _) -> do
-
-					-- TODO this is wrong...
-
-					-- if there are multiple parents we should resolve it
-					-- if one parent is a fast forward of another we can use that
-					-- otherwise... report an error
-					-- or there will be a problem!
+				[ rewrittenParentCommit ] -> do
 
 					rewrittenParentTree <-
 						commitTree cacheRef rewrittenParentCommit

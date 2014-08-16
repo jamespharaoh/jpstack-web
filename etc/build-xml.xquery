@@ -104,7 +104,7 @@ declare variable $all-plugins :=
 			includes="*.jar"/>
 
 		<pathelement
-			path="bin"/>
+			path="work/bin"/>
 
 	</path>
 
@@ -123,27 +123,38 @@ declare variable $all-plugins :=
 	<target
 		name="build"
 		depends="{ string-join ((
-			'just-build'
+			'just-build-framework',
+			'just-build-rest'
+		), ', ') }"/>
+
+	<target
+		name="framework-jar"
+		depends="{ string-join ((
+			'just-build-framework',
+			'just-framework-jar'
 		), ', ') }"/>
 
 	<target
 		name="console-live"
 		depends="{ string-join ((
-			'just-build',
+			'just-build-framework',
+			'just-build-rest',
 			'just-console-live'
 		), ', ') }"/>
 
 	<target
 		name="console-test"
 		depends="{ string-join ((
-			'just-build',
+			'just-build-framework',
+			'just-build-rest',
 			'just-console-test'
 		), ', ') }"/>
 
 	<target
 		name="console-auto"
 		depends="{ string-join ((
-			'just-build',
+			'just-build-framework',
+			'just-build-rest',
 			'just-console-live',
 			'just-console-restart'
 		), ', ') }"/>
@@ -151,21 +162,24 @@ declare variable $all-plugins :=
 	<target
 		name="api-live"
 		depends="{ string-join ((
-			'just-build',
+			'just-build-framework',
+			'just-build-rest',
 			'just-api-live'
 		), ', ') }"/>
 
 	<target
 		name="api-test"
 		depends="{ string-join ((
-			'just-build',
+			'just-build-framework',
+			'just-build-rest',
 			'just-api-test'
 		), ', ') }"/>
 
 	<target
 		name="api-auto"
 		depends="{ string-join ((
-			'just-build',
+			'just-build-framework',
+			'just-build-rest',
 			'just-api-live',
 			'just-api-restart'
 		), ', ') }"/>
@@ -173,14 +187,16 @@ declare variable $all-plugins :=
 	<target
 		name="daemon-auto"
 		depends="{ string-join ((
-			'just-build',
+			'just-build-framework',
+			'just-build-rest',
 			'just-daemon-restart'
 		), ', ') }"/>
 
 	<target
 		name="all-auto"
 		depends="{ string-join ((
-			'just-build',
+			'just-build-framework',
+			'just-build-rest',
 			'just-api-live',
 			'just-api-restart',
 			'just-console-live',
@@ -197,7 +213,8 @@ declare variable $all-plugins :=
 	<target
 		name="sql"
 		depends="{ string-join ((
-			'just-build',
+			'just-build-framework',
+			'just-build-rest',
 			'just-db-drop',
 			'just-db-create',
 			'just-sql-schema',
@@ -207,7 +224,8 @@ declare variable $all-plugins :=
 	<target
 		name="sql-schema"
 		depends="{ string-join ((
-			'just-build',
+			'just-build-framework',
+			'just-build-rest',
 			'just-db-drop',
 			'just-db-create',
 			'just-sql-schema'
@@ -216,14 +234,16 @@ declare variable $all-plugins :=
 	<target
 		name="sql-data"
 		depends="{ string-join ((
-			'just-build',
+			'just-build-framework',
+			'just-build-rest',
 			'just-sql-data'
 		), ', ') }"/>
 
 	<target
 		name="fixtures"
 		depends="{ string-join ((
-			'just-build',
+			'just-build-framework',
+			'just-build-rest',
 			'just-db-drop',
 			'just-db-create',
 			'just-schema-create',
@@ -233,46 +253,66 @@ declare variable $all-plugins :=
 		), ', ') }"/>
 
 	<target name="just-clean">
-		<delete dir="bin"/>
 		<delete dir="work"/>
 	</target>
 
-	<target name="just-build">
+	<target name="just-build-framework">
 
-		<mkdir dir="bin"/>
-
-		<!-- compile framework first -->
+		<mkdir
+			dir="work/bin"/>
 
 		<javac
-			destdir="bin"
+			destdir="work/bin"
 			debug="on"
 			includeantruntime="false"
 			srcdir="src"
 			includes="wbs/framework/**"
 			classpathref="classpath"/>
 
+		<mkdir
+			dir="work/bin/META-INF/services"/>
+
 		<echo
-			file="bin/META-INF/services/javax.annotation.processing.Processor"
+			file="work/bin/META-INF/services/javax.annotation.processing.Processor"
 			message="wbs.framework.object.ObjectHelperAnnotationProcessor"/>
 
-		<!-- then everything else -->
+	</target>
+
+	<target name="just-framework-jar">
+
+		<jar
+			destfile="work/wbs-framework.jar"
+			basedir="work/bin">
+
+			<include
+				name="wbs/framework/**"/>
+
+			<service
+				type="javax.annotation.processing.Processor"
+				provider="wbs.framework.object.ObjectHelperAnnotationProcessor"/>
+
+		</jar>
+
+	</target>
+
+	<target name="just-build-rest">
 
 		<javac
-			destdir="bin"
+			destdir="work/bin"
 			debug="on"
 			includeantruntime="false"
 			srcdir="src"
 			excludes="wbs/framework/**"
 			classpathref="classpath"/>
 
-		<copy todir="bin"><fileset dir="src">
+		<copy todir="work/bin"><fileset dir="src">
 			<include name="**/*.xml"/>
 			<include name="log4j.properties"/>
 		</fileset></copy>
 
 		<copy
 			file="wbs-build.xml"
-			todir="bin"/>
+			todir="work/bin"/>
 
 	</target>
 
@@ -338,7 +378,7 @@ declare variable $all-plugins :=
 			</copy>
 
 			<copy todir="work/{$env}/console/WEB-INF/classes">
-				<fileset dir="bin"/>
+				<fileset dir="work/bin"/>
 			</copy>
 
 			<copy todir="work/{$env}/console/WEB-INF/lib">
@@ -473,7 +513,7 @@ declare variable $all-plugins :=
 			</copy>
 
 			<copy todir="work/{$env}/api/WEB-INF/classes">
-				<fileset dir="bin"/>
+				<fileset dir="work/bin"/>
 			</copy>
 
 			<copy
@@ -664,12 +704,27 @@ declare variable $all-plugins :=
 			classname="wbs.platform.application.tools.BeanRunner"
 			classpathref="classpath"
 			failonerror="true">
+
 			<arg line="wbs-test"/>
 			<arg line="wbs.test"/>
-			<arg line="config,data,entity,schema,sql,model,hibernate,object,logic"/>
+
+			<arg line="{ string-join ((
+				'config',
+				'data',
+				'entity',
+				'schema',
+				'sql',
+				'model',
+				'hibernate',
+				'object',
+				'logic',
+				'fixture'
+			), ',') }"/>
+
 			<arg line="test,hibernate"/>
-			<arg line="wbs.test.fixtures.TestFixtures"/>
+			<arg line="wbs.framework.fixtures.FixturesTool"/>
 			<arg line="createFixtures"/>
+
 		</java>
 
 	</target>

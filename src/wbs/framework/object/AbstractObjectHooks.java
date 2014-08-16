@@ -1,5 +1,7 @@
 package wbs.framework.object;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import java.util.List;
 
 import wbs.framework.record.Record;
@@ -15,6 +17,8 @@ class AbstractObjectHooks<RecordType extends Record<RecordType>>
 			ObjectHelper<?> parentHelper,
 			Record<?> parentObject) {
 
+		// do nothing
+
 	}
 
 	@Override
@@ -22,7 +26,10 @@ class AbstractObjectHooks<RecordType extends Record<RecordType>>
 	List<Integer> searchIds (
 			Object search) {
 
-		throw new UnsupportedOperationException ();
+		throw new UnsupportedOperationException (
+			stringFormat (
+				"%s.searchIds (...)",
+				getClass ().getSimpleName ()));
 
 	}
 
@@ -31,12 +38,16 @@ class AbstractObjectHooks<RecordType extends Record<RecordType>>
 	void beforeInsert (
 			RecordType object) {
 
+		// do nothing
+
 	}
 
 	@Override
 	public
 	void afterInsert (
 			RecordType object) {
+
+		// do nothing
 
 	}
 

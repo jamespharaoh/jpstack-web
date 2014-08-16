@@ -1623,6 +1623,7 @@ class ApplicationContext {
 		BeansSpec beans =
 			(BeansSpec)
 			dataFromXml.readClasspath (
+				Collections.emptyList (),
 				classpath);
 
 		beans.register (

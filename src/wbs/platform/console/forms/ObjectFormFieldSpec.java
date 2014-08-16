@@ -15,7 +15,8 @@ import wbs.platform.console.spec.ConsoleModuleData;
 public
 class ObjectFormFieldSpec {
 
-	@DataAttribute
+	@DataAttribute (
+		required = true)
 	String name;
 
 	@DataAttribute

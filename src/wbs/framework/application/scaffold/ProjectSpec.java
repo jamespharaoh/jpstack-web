@@ -6,6 +6,9 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
@@ -13,13 +16,17 @@ import wbs.framework.data.annotations.DataClass;
 @Accessors (fluent = true)
 @DataClass ("project")
 public
-class ProjectSpec {
+class ProjectSpec
+	implements Comparable<ProjectSpec> {
 
-	@DataAttribute
+	@DataAttribute (
+		required = true)
 	@Getter @Setter
 	String name;
 
-	@DataAttribute ("package")
+	@DataAttribute (
+		value = "package",
+		required = true)
 	@Getter @Setter
 	String packageName;
 
@@ -37,5 +44,20 @@ class ProjectSpec {
 
 	@Getter @Setter
 	List<PluginSpec> plugins;
+
+	@Override
+	public
+	int compareTo (
+			ProjectSpec other) {
+
+		return new CompareToBuilder ()
+
+			.append (
+				name (),
+				other.name ())
+
+			.toComparison ();
+
+	}
 
 }

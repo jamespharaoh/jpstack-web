@@ -10,19 +10,19 @@ declare variable $build := /wbs-build;
 
 	<factorypathentry
 		kind="WKSPJAR"
-		id="/wbs-combined/binaries/libraries/guava-bundle-16.0.1.jar"
+		id="/{$build/@name}/binaries/libraries/guava-bundle-16.0.1.jar"
 		enabled="true"
 		runInBatchMode="false"/>
 
 	<factorypathentry
 		kind="WKSPJAR"
-		id="/wbs-combined/binaries/libraries/joda-time-jar-2.3.jar"
+		id="/{$build/@name}/binaries/libraries/joda-time-jar-2.3.jar"
 		enabled="true"
 		runInBatchMode="false"/>
 
 	<factorypathentry
 		kind="WKSPJAR"
-		id="/wbs-combined/wbs-framework.jar"
+		id="/{$build/@name}/work/wbs-framework.jar"
 		enabled="true"
 		runInBatchMode="false"/>
 

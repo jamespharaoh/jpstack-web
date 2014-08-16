@@ -15,11 +15,13 @@ import wbs.framework.data.annotations.DataClass;
 public
 class PluginLayerSpec {
 
-	@DataAttribute (required = true)
+	@DataAttribute (
+		required = true)
 	@Getter @Setter
 	String name;
 
-	@DataChildren (direct = true)
+	@DataChildren (
+		direct = true)
 	@Getter @Setter
 	List<PluginBeanSpec> beans =
 		new ArrayList<PluginBeanSpec> ();

@@ -61,7 +61,7 @@ class ExceptionStatusLinePart
 			stringFormat (
 				"top.frames['main'].location='%j'",
 				requestContext.resolveApplicationUrl (
-					"/exceptionLogs/exceptionLog.alerts")),
+					"/exceptionLogs")),
 
 			">\n",
 			"<td id=\"excepCell\">-</td>\n",

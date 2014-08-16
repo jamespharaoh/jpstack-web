@@ -207,8 +207,14 @@ class TextAreaFormFieldBuilder {
 
 				readOnlyFormFieldProvider.get ()
 
-				.name (name)
-				.label (label)
+				.large (
+					true)
+
+				.name (
+					name)
+
+				.label (
+					label)
 
 				.accessor (
 					formFieldAccessor)
@@ -229,6 +235,9 @@ class TextAreaFormFieldBuilder {
 			formFieldSet.formFields ().add (
 
 				updatableFormFieldProvider.get ()
+
+				.large (
+					true)
 
 				.name (
 					name)

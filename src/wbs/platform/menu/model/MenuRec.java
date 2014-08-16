@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.framework.entity.annotations.CodeField;
+import wbs.framework.entity.annotations.DeletedField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.ParentField;
@@ -49,6 +50,10 @@ class MenuRec
 	@SimpleField
 	String target = "main";
 
+	@DeletedField
+	Boolean deleted =
+		false;
+
 	// compare to
 
 	@Override
@@ -60,8 +65,15 @@ class MenuRec
 			(MenuRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getMenuGroup (), other.getMenuGroup ())
-			.append (getCode (), other.getCode ())
+
+			.append (
+				getMenuGroup (),
+				other.getMenuGroup ())
+
+			.append (
+				getCode (),
+				other.getCode ())
+
 			.toComparison ();
 
 	}

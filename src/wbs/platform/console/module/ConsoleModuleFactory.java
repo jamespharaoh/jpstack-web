@@ -11,8 +11,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.context.BeanFactory;
 import wbs.framework.builder.Builder;
-import wbs.platform.console.spec.ConsoleSpec;
 import wbs.platform.console.spec.ConsoleSimpleBuilderContainer;
+import wbs.platform.console.spec.ConsoleSpec;
 
 @Accessors (fluent = true)
 public

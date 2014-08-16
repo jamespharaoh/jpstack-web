@@ -217,11 +217,17 @@ class ConsoleFile
 			ServletException,
 			IOException {
 
-		if (privLookup != null
-				&& ! privLookup.lookup (
-					consoleRequestContext.contextStuff ())) {
+		if (
 
-			throw new ForbiddenException ();
+			privLookup != null
+
+			&& ! privLookup.lookup (
+				consoleRequestContext.contextStuff ())
+
+		) {
+
+			throw new ForbiddenException (
+				privLookup.describe ());
 
 		}
 

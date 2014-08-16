@@ -48,19 +48,18 @@ class ParentFormFieldConstraintValidator<
 			Native nativeValue,
 			List<String> errors) {
 
-System.out.println ("ABOUT TO RESOLVE DELEGATE FROM " + nativeValue);
-System.out.println ("DELEGATE PATH IS " + createPrivDelegate);
 		Record<?> privDelegate =
 			createPrivDelegate != null
 				? objectManager.dereference (
 					nativeValue,
 					createPrivDelegate)
 				: nativeValue;
-System.out.println ("RESOLVED TO " + nativeValue);
 
-		if (! privChecker.can (
+		if (
+			! privChecker.can (
 				privDelegate,
-				createPrivCode)) {
+				createPrivCode)
+		) {
 
 			errors.add (
 				stringFormat (

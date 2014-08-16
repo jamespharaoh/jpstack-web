@@ -130,6 +130,26 @@ class SimpleFormFieldAccessor<Container,Native>
 		String effectiveName =
 			effectiveContainerAndName.getRight ();
 
+		// sanity check native type
+
+		if (
+
+			nativeValue != null
+
+			&& ! nativeClass.isInstance (
+				nativeValue)
+
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Field %s is %s, not %s",
+					name,
+					nativeClass.getSimpleName (),
+					nativeValue.getClass ().getSimpleName ()));
+
+		}
+
 		// set property
 
 		BeanLogic.setProperty (

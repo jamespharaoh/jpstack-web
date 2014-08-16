@@ -3,6 +3,10 @@
 	package="wbs.smsapps">
 
 	<plugin
+		name="sms-apps-common"
+		package="common"/>
+
+	<plugin
 		name="alerts"
 		package="alerts"/>
 

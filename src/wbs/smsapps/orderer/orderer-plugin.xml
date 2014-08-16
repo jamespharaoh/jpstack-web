@@ -2,6 +2,12 @@
 	name="orderer"
 	package="orderer">
 
+	<dependencies>
+		<project name="wbs-sms-apps">
+			<plugin name="sms-apps-common"/>
+		</project>
+	</dependencies>
+
 	<sql-scripts>
 		<sql-data name="orderer-data"/>
 	</sql-scripts>
@@ -15,6 +21,10 @@
 		<bean class="daemon.OrdererCommandTypeHandler"/>
 		<bean class="daemon.OrdererDeliveryNoticeHandler"/>
 	</layer>
+
+	<fixtures>
+		<fixture name="orderer"/>
+	</fixtures>
 
 	<console-modules>
 		<console-module name="orderer"/>

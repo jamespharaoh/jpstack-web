@@ -8,4 +8,6 @@ interface BooleanLookup {
 	boolean lookup (
 			ConsoleContextStuff contextStuff);
 
+	String describe ();
+
 }

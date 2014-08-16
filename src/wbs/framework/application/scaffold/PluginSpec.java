@@ -8,18 +8,24 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataChildrenIndex;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataIgnore;
+import wbs.framework.data.annotations.DataParent;
 
 @Accessors (fluent = true)
 @DataClass ("plugin")
 public
-class PluginSpec {
+class PluginSpec
+	implements Comparable<PluginSpec> {
 
+	@DataParent
 	@Getter @Setter
 	ProjectSpec project;
 
@@ -36,8 +42,18 @@ class PluginSpec {
 
 	@DataChild
 	@Getter @Setter
+	PluginDependenciesSpec dependencies =
+		new PluginDependenciesSpec ();
+
+	@DataChild
+	@Getter @Setter
 	PluginModelsSpec models =
 		new PluginModelsSpec ();
+
+	@DataChildren
+	@Getter @Setter
+	List<PluginFixtureSpec> fixtures =
+		new ArrayList<PluginFixtureSpec> ();
 
 	@DataIgnore
 	Object sqlScripts;
@@ -58,5 +74,24 @@ class PluginSpec {
 	@Getter @Setter
 	List<PluginConsoleModuleSpec> consoleModules =
 		new ArrayList<PluginConsoleModuleSpec> ();
+
+	@Override
+	public
+	int compareTo (
+			PluginSpec other) {
+
+		return new CompareToBuilder ()
+
+			.append (
+				project (),
+				other.project ())
+
+			.append (
+				name (),
+				other.name ())
+
+			.toComparison ();
+
+	}
 
 }

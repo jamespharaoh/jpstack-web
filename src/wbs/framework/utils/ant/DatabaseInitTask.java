@@ -37,6 +37,7 @@ class DatabaseInitTask
 
 	}
 
+	@Override
 	public
 	void init () {
 

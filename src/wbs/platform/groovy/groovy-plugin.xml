@@ -2,10 +2,20 @@
 	name="groovy"
 	package="groovy">
 
+	<dependencies>
+		<project name="wbs-platform">
+			<plugin name="platform-common"/>
+		</project>
+	</dependencies>
+
 	<layer name="console">
 		<bean class="console.GroovyAction"/>
 		<bean class="console.GroovyResponder"/>
 	</layer>
+
+	<fixtures>
+		<fixture name="groovy"/>
+	</fixtures>
 
 	<console-modules>
 		<console-module name="groovy"/>

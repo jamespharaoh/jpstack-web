@@ -62,7 +62,7 @@ abstract class AbstractMonthlyGraphPart
 
 		if (monthField.date != null) {
 
-			ObsoleteDateLinks.monthlyBrowser (
+			ObsoleteDateLinks.monthlyBrowserParagraph (
 				out,
 				requestContext.resolveLocalUrl (
 					myLocalPart),

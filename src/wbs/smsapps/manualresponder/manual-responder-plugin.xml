@@ -2,6 +2,12 @@
 	name="manual-responder"
 	package="manualresponder">
 
+	<dependencies>
+		<project name="wbs-sms-apps">
+			<plugin name="sms-apps-common"/>
+		</project>
+	</dependencies>
+
 	<sql-scripts>
 		<sql-schema name="manual-responder"/>
 		<sql-data name="manual-responder-data"/>
@@ -30,6 +36,10 @@
 	<layer name="logic">
 		<bean class="logic.ManualResponderLogicImpl"/>
 	</layer>
+
+	<fixtures>
+		<fixture name="manualResponder"/>
+	</fixtures>
 
 	<console-modules>
 		<console-module name="manual-responder"/>

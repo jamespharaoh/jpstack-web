@@ -2,6 +2,12 @@
 	name="auto-responder"
 	package="autoresponder">
 
+	<dependencies>
+		<project name="wbs-sms-apps">
+			<plugin name="sms-apps-common"/>
+		</project>
+	</dependencies>
+
 	<sql-scripts>
 		<sql-data name="auto-responder-data"/>
 	</sql-scripts>
@@ -17,6 +23,10 @@
 	<layer name="daemon">
 		<bean class="daemon.AutoResponderCommand"/>
 	</layer>
+
+	<fixtures>
+		<fixture name="autoResponder"/>
+	</fixtures>
 
 	<console-modules>
 		<console-module name="auto-responder"/>

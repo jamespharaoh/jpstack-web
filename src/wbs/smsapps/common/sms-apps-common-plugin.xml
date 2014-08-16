@@ -1,0 +1,9 @@
+<plugin
+	name="sms-apps-common"
+	package="common">
+
+	<fixtures>
+		<fixture name="smsAppsCommon"/>
+	</fixtures>
+
+</plugin>

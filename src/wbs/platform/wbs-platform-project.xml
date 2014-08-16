@@ -206,4 +206,8 @@
 		name="reporting"
 		package="reporting"/>
 
+	<plugin
+		name="platform-common"
+		package="common"/>
+
 </project>

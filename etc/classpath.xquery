@@ -1,4 +1,4 @@
-declare variable $project := //project;
+declare variable $build := /wbs-build;
 
 <classpath>
 
@@ -9,23 +9,6 @@ declare variable $project := //project;
 	<classpathentry
 		kind="con"
 		path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-
-	{ for
-
-		$depends-project in
-			$project/depends-projects/depends-project
-
-	return (
-
-		<classpathentry
-			combineaccessrules="false"
-			kind="src"
-			path="{ concat (
-				'/',
-				$depends-project/@name
-			) }"/>
-
-	) }
 
 	{ for
 
@@ -49,7 +32,9 @@ declare variable $project := //project;
 			{ if ($library/@source = 'yes') then (
 				attribute sourcepath {
 					concat (
-						'/home/james/projects/wbs/wbs-combined/binaries',
+						'/home/james/projects/wbs/',
+						$build/@name,
+						'/binaries',
 						'/libraries/',
 						$library/@name,
 						'-source-',
@@ -63,26 +48,22 @@ declare variable $project := //project;
 
 	) }
 
-	{ if (not ($project/@name = 'wbs-framework')) then (
+	<classpathentry
+		kind="src"
+		path="work/eclipse/generated">
 
-		<classpathentry
-			kind="src"
-			path=".apt_generated">
+		<attributes>
 
-			<attributes>
+			<attribute
+				name="optional"
+				value="true"/>
 
-				<attribute
-					name="optional"
-					value="true"/>
+		</attributes>
 
-			</attributes>
-
-		</classpathentry>
-
-	) else () }
+	</classpathentry>
 
 	<classpathentry
 		kind="output"
-		path=".bin"/>
+		path="work/eclipse/bin"/>
 
 </classpath>

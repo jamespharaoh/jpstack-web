@@ -613,6 +613,7 @@ class Html {
 
 	}
 
+	@SuppressWarnings ("null")
 	public static <Key>
 	String option (
 			Key value,

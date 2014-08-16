@@ -132,11 +132,20 @@ class TabbedResponder
 			myLayers.add (
 				myLayer1 =
 					new MyLayer ()
-						.title (tabContextLayer.title ())
-						.tabList (tabContextLayer.tabList ())
-						.tab (tabContextLayer.tab ()));
+
+					.title (
+						tabContextLayer.title ())
+
+					.tabList (
+						tabContextLayer.tabList ())
+
+					.tab (
+						tabContextLayer.tab ()));
 
 		}
+
+		if (myLayer1 == null)
+			throw new RuntimeException ();
 
 		myLayer1.tab (tab);
 

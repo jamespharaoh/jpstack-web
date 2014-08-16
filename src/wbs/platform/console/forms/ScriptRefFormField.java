@@ -19,6 +19,9 @@ class ScriptRefFormField
 	@Getter
 	Boolean virtual = true;
 
+	@Getter
+	Boolean large;
+
 	@Getter @Setter
 	Set<ScriptRef> scriptRefs;
 

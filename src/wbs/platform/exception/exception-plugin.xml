@@ -17,8 +17,6 @@
 	</layer>
 
 	<layer name="console">
-		<bean class="console.ExceptionLogAlertsPart"/>
-		<bean class="console.ExceptionLogDetailsPart"/>
 		<bean class="console.ExceptionStatusLine"/>
 		<bean class="console.ExceptionStatusLinePart"/>
 		<bean class="console.NumExceptionsCache"/>

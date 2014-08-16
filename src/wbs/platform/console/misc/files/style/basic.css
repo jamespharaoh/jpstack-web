@@ -104,7 +104,7 @@ h1, h2, h3, p { margin: 5px 0; }
 h1, h2 { background: navy; color: white; padding: 0.2ex 0.6ex; }
 h3 { background: navy; color: white; padding: 0.2ex 0.6ex; }
 
-p.links { margin: 0 0 5px 0; line-height: 1.5; }
+p.links { margin: 5px 0; line-height: 1.5; }
 p.links a { background: #eeeeee; color: black; padding: 0.2ex 0.6ex; text-decoration: none; }
 p.links a:hover, p.links a.selected { background: #bbbbbb; }
 

@@ -2,6 +2,12 @@
 	name="group"
 	package="group">
 
+	<dependencies>
+		<project name="wbs-platform">
+			<plugin name="platform-common"/>
+		</project>
+	</dependencies>
+
 	<sql-scripts>
 		<sql-schema name="group"/>
 		<sql-data name="group-data"/>
@@ -15,6 +21,10 @@
 		<bean class="console.GroupPrivsAction"/>
 		<bean class="console.GroupPrivsPart"/>
 	</layer>
+
+	<fixtures>
+		<fixture name="group"/>
+	</fixtures>
 
 	<console-modules>
 		<console-module name="group"/>

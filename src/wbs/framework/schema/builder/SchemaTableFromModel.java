@@ -386,6 +386,8 @@ class SchemaTableFromModel {
 				modelField.valueType ().getSimpleName (),
 				modelField.fullName ());
 
+			return;
+
 		}
 
 		schemaTable

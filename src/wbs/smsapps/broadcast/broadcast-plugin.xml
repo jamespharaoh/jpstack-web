@@ -2,6 +2,12 @@
 	name="broadcast"
 	package="broadcast">
 
+	<dependencies>
+		<project name="wbs-sms-apps">
+			<plugin name="sms-apps-common"/>
+		</project>
+	</dependencies>
+
 	<sql-scripts>
 		<sql-data name="broadcast-data"/>
 	</sql-scripts>
@@ -31,6 +37,10 @@
 	<layer name="logic">
 		<bean class="logic.BroadcastLogicImpl"/>
 	</layer>
+
+	<fixtures>
+		<fixture name="broadcast"/>
+	</fixtures>
 
 	<console-modules>
 		<console-module name="broadcast"/>

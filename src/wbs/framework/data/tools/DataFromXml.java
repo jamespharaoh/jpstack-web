@@ -233,6 +233,7 @@ class DataFromXml {
 
 	public
 	Object readClasspath (
+			List<Object> parents,
 			String filename) {
 
 		SAXReader saxReader =
@@ -265,8 +266,13 @@ class DataFromXml {
 		}
 
 		return new ElementBuilder ()
-			.element (document.getRootElement ())
-			.parents (Collections.emptyList ())
+
+			.element (
+				document.getRootElement ())
+
+			.parents (
+				parents)
+
 			.build ();
 
 	}
@@ -435,9 +441,10 @@ class DataFromXml {
 
 				throw new RuntimeException (
 					stringFormat (
-						"Don't undestand attribute %s on <%s>",
+						"Don't understand attribute %s on <%s>, using %s",
 						attributeName,
-						element.getName ()));
+						element.getName (),
+						object.getClass ().getSimpleName ()));
 
 			}
 
@@ -455,9 +462,10 @@ class DataFromXml {
 
 				throw new RuntimeException (
 					stringFormat (
-						"Don't undestand element <%s> in <%s>",
+						"Don't understand element <%s> in <%s>, using %s",
 						childElement.getName (),
-						element.getName ()));
+						element.getName (),
+						object.getClass ().getSimpleName ()));
 
 			}
 

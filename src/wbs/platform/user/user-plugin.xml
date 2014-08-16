@@ -26,6 +26,10 @@
 		<bean class="console.UserPrivsSummaryPart"/>
 	</layer>
 
+	<fixtures>
+		<fixture name="user"/>
+	</fixtures>
+
 	<console-modules>
 		<console-module name="user"/>
 		<console-module name="user-online"/>

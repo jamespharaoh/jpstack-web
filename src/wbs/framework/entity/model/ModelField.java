@@ -1,5 +1,8 @@
 package wbs.framework.entity.model;
 
+import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -19,8 +22,6 @@ import wbs.framework.data.annotations.DataChildrenIndex;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataName;
 import wbs.framework.data.annotations.DataParent;
-import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 @Accessors (fluent = true)
 @Data

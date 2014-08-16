@@ -12,6 +12,11 @@
 		<model name="slice"/>
 	</models>
 
+	<fixtures>
+		<fixture name="root"/>
+		<fixture name="slice"/>
+	</fixtures>
+
 	<console-modules>
 		<console-module name="root"/>
 		<console-module name="slice"/>

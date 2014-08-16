@@ -1,0 +1,9 @@
+<plugin
+	name="platform-common"
+	package="common">
+
+	<fixtures>
+		<fixture name="platformCommon"/>
+	</fixtures>
+
+</plugin>

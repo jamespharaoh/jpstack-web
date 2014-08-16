@@ -20,6 +20,8 @@ public
 class CoreSidebarMenuResponder
 	extends HtmlResponder {
 
+	// dependencies
+
 	@Inject
 	MenuGroupConsoleHelper menuGroupHelper;
 
@@ -31,6 +33,8 @@ class CoreSidebarMenuResponder
 
 	List<MenuGroupRec> menuGroups;
 
+	// implementation
+
 	@Override
 	protected
 	void prepare () {
@@ -38,7 +42,8 @@ class CoreSidebarMenuResponder
 		menuGroups =
 			menuGroupHelper.findAll ();
 
-		Collections.sort (menuGroups);
+		Collections.sort (
+			menuGroups);
 
 	}
 
@@ -59,6 +64,9 @@ class CoreSidebarMenuResponder
 
 			for (MenuRec menu
 					: menuGroup.getMenus ()) {
+
+				if (menu.getDeleted ())
+					continue;
 
 				if (! objectManager.canView (menu))
 					continue;

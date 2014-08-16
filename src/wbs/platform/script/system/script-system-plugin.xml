@@ -23,6 +23,10 @@
 		<bean class="console.SystemScriptStandaloneRequestHandler"/>
 	</layer>
 
+	<fixtures>
+		<fixture name="systemScript"/>
+	</fixtures>
+
 	<console-modules>
 		<console-module name="system-script"/>
 	</console-modules>

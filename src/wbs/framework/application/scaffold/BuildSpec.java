@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.data.annotations.DataIgnore;
 
 @Accessors (fluent = true)
 @DataClass ("wbs-build")
@@ -23,5 +24,8 @@ class BuildSpec {
 	@Getter @Setter
 	List<BuildProjectSpec> projects =
 		new ArrayList<BuildProjectSpec> ();
+
+	@DataIgnore
+	Object gitLinks = null;
 
 }
