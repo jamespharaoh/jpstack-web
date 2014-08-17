@@ -448,7 +448,10 @@ class HibernateHelperProviderBuilder {
 		public
 		Record<?> findByParentAndCode (
 				GlobalId parentGlobalId,
-				String code) {
+				String... codes) {
+
+			if (codes.length != 1)
+				throw new RuntimeException ();
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -486,7 +489,7 @@ class HibernateHelperProviderBuilder {
 
 					.setString (
 						"code",
-						code)
+						codes [0])
 
 					.list ();
 
@@ -515,15 +518,15 @@ class HibernateHelperProviderBuilder {
 
 						stringFormat (
 
-							"FROM %s %s ",
+							"FROM %s _%s ",
 							objectClass ().getSimpleName (),
 							objectName (),
 
-							"WHERE %s.%s.id = :parentId ",
+							"WHERE _%s.%s.id = :parentId ",
 							objectName (),
 							parentFieldName (),
 
-							"AND %s.%s = :code",
+							"AND _%s.%s = :code",
 							objectName (),
 							codeFieldName ()))
 
@@ -533,7 +536,7 @@ class HibernateHelperProviderBuilder {
 
 						.setString (
 							"code",
-							code)
+							codes [0])
 
 						.list ();
 
@@ -550,17 +553,17 @@ class HibernateHelperProviderBuilder {
 					session.createQuery (
 						stringFormat (
 
-							"FROM %s %s ",
+							"FROM %s _%s ",
 							objectClass ().getSimpleName (),
 							objectName (),
 
-							"WHERE %s.parentObjectType.id = :parentTypeId ",
+							"WHERE _%s.parentObjectType.id = :parentTypeId ",
 							objectName (),
 
-							"AND %s.parentObjectId = :parentId ",
+							"AND _%s.parentObjectId = :parentId ",
 							objectName (),
 
-							"AND %s.%s = :code",
+							"AND _%s.%s = :code",
 							objectName (),
 							codeFieldName ()))
 
@@ -574,7 +577,7 @@ class HibernateHelperProviderBuilder {
 
 					.setString (
 						"code",
-						code)
+						codes [0])
 
 					.list ();
 
@@ -590,10 +593,10 @@ class HibernateHelperProviderBuilder {
 
 		@Override
 		public
-		Record<?> findByParentAndCode (
+		Record<?> findByParentAndTypeAndCode (
 				GlobalId parentGlobalId,
 				String typeCode,
-				String code) {
+				String... codes) {
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -628,16 +631,16 @@ class HibernateHelperProviderBuilder {
 					session.createQuery (
 						stringFormat (
 
-							"FROM %s %s ",
+							"FROM %s _%s ",
 							objectClass ().getSimpleName (),
 							objectName (),
 
-							"WHERE %s.%s = :%s ",
+							"WHERE _%s.%s = :%s ",
 							objectName (),
 							typeCodeFieldName (),
 							typeCodeFieldName (),
 
-							"AND %s.%s = :%s",
+							"AND _%s.%s = :%s",
 							objectName (),
 							codeFieldName (),
 							codeFieldName ()))
@@ -648,7 +651,7 @@ class HibernateHelperProviderBuilder {
 
 					.setString (
 						codeFieldName (),
-						code)
+						codes [0])
 
 					.list ();
 
@@ -677,20 +680,20 @@ class HibernateHelperProviderBuilder {
 					session.createQuery (
 						stringFormat (
 
-							"FROM %s %s ",
+							"FROM %s _%s ",
 							objectClass ().getSimpleName (),
 							objectName (),
 
-							"WHERE %s.%s.id = :parentId ",
+							"WHERE _%s.%s.id = :parentId ",
 							objectName (),
 							parentFieldName (),
 
-							"AND %s.%s = :%s ",
+							"AND _%s.%s = :%s ",
 							objectName (),
 							typeCodeFieldName (),
 							typeCodeFieldName (),
 
-							"AND %s.%s = :%s",
+							"AND _%s.%s = :%s",
 							objectName (),
 							codeFieldName (),
 							codeFieldName ()))
@@ -705,7 +708,7 @@ class HibernateHelperProviderBuilder {
 
 					.setString (
 						codeFieldName (),
-						code)
+						codes [0])
 
 					.list ();
 
@@ -722,22 +725,22 @@ class HibernateHelperProviderBuilder {
 					session.createQuery (
 						stringFormat (
 
-							"FROM %s %s ",
+							"FROM %s _%s ",
 							objectClass ().getSimpleName (),
 							objectName (),
 
-							"WHERE %s.parentObjectType.id = :parentTypeId ",
+							"WHERE _%s.parentObjectType.id = :parentTypeId ",
 							objectName (),
 
-							"AND %s.parentObjectId = :parentId ",
+							"AND _%s.parentObjectId = :parentId ",
 							objectName (),
 
-							"AND %s.%s = :%s ",
+							"AND _%s.%s = :%s ",
 							objectName (),
 							typeCodeFieldName (),
 							typeCodeFieldName (),
 
-							"AND %s.%s = :code",
+							"AND _%s.%s = :code",
 							objectName (),
 							codeFieldName ()))
 
@@ -755,7 +758,7 @@ class HibernateHelperProviderBuilder {
 
 					.setString (
 						codeFieldName (),
-						code)
+						codes [0])
 
 					.list ();
 
@@ -835,11 +838,11 @@ class HibernateHelperProviderBuilder {
 				return session.createQuery (
 
 					stringFormat (
-						"FROM %s %s ",
+						"FROM %s _%s ",
 						objectClass ().getSimpleName (),
 						objectName (),
 
-						"WHERE %s.%s.id = :parentId",
+						"WHERE _%s.%s.id = :parentId",
 						objectName (),
 						parentFieldName ()))
 
@@ -855,14 +858,14 @@ class HibernateHelperProviderBuilder {
 
 					stringFormat (
 
-						"FROM %s %s ",
+						"FROM %s _%s ",
 						objectClass ().getSimpleName (),
 						objectName (),
 
-						"WHERE %s.parentObjectType.id = :parentTypeId ",
+						"WHERE _%s.parentObjectType.id = :parentTypeId ",
 						objectName (),
 
-						"AND %s.parentObjectId = :parentId",
+						"AND _%s.parentObjectId = :parentId",
 						objectName ()))
 
 					.setInteger (
@@ -1135,15 +1138,15 @@ class HibernateHelperProviderBuilder {
 
 					stringFormat (
 
-						"FROM %s %s ",
+						"FROM %s _%s ",
 						objectClass ().getSimpleName (),
 						objectName (),
 
-						"WHERE %s.%s.id = :parentId ",
+						"WHERE _%s.%s.id = :parentId ",
 						objectName (),
 						parentFieldName (),
 
-						"AND %s.%s = :%s",
+						"AND _%s.%s = :%s",
 						objectName (),
 						typeCodeFieldName (),
 						typeCodeFieldName ()))
@@ -1165,17 +1168,17 @@ class HibernateHelperProviderBuilder {
 
 					stringFormat (
 
-						"FROM %s %s ",
+						"FROM %s _%s ",
 						objectClass ().getSimpleName (),
 						objectName (),
 
-						"WHERE %s.parentObjectType.id = :parentTypeId ",
+						"WHERE _%s.parentObjectType.id = :parentTypeId ",
 						objectName (),
 
-						"AND %s.parentObjectId = :parentId",
+						"AND _%s.parentObjectId = :parentId",
 						objectName (),
 
-						"AND %s.%s = :%s",
+						"AND _%s.%s = :%s",
 						objectName (),
 						typeCodeFieldName (),
 						typeCodeFieldName ()))

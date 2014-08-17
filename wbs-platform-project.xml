@@ -119,6 +119,10 @@
 		package="menu"/>
 
 	<plugin
+		name="object-browse"
+		package="object.browse"/>
+
+	<plugin
 		name="object-create"
 		package="object.create"/>
 
