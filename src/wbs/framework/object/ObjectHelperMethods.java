@@ -72,21 +72,21 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 
 	RecordType findByCode (
 			Record<?> parent,
-			String code);
+			String... code);
 
 	RecordType findByCode (
 			GlobalId parentGlobalId,
-			String code);
+			String... code);
 
-	RecordType findByCode (
+	RecordType findByTypeAndCode (
 			Record<?> parent,
 			String typeCode,
-			String code);
+			String... code);
 
-	RecordType findByCode (
+	RecordType findByTypeAndCode (
 			GlobalId parentGlobalId,
 			String typeCode,
-			String code);
+			String... code);
 
 	List<RecordType> findAll ();
 

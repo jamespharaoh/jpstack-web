@@ -680,12 +680,12 @@ class ObjectHelperBuilder {
 			public
 			Record<?> findByCode (
 					GlobalId parentGlobalId,
-					String code) {
+					String... codes) {
 
 				return objectHelperProvider
 					.findByParentAndCode (
 						parentGlobalId,
-						code);
+						codes);
 
 			}
 
@@ -732,6 +732,17 @@ class ObjectHelperBuilder {
 			public
 			Record insert (
 					Record object) {
+
+				if (! objectClass ().isInstance (
+						object)) {
+
+					throw new ClassCastException (
+						stringFormat (
+							"Can't insert %s as %s",
+							object.getClass ().getSimpleName (),
+							objectClass ().getSimpleName ()));
+
+				}
 
 				objectHelperProvider.insert (
 					object);
@@ -1219,7 +1230,7 @@ class ObjectHelperBuilder {
 			public
 			Record findByCode (
 					Record parent,
-					String code) {
+					String... codes) {
 
 				ObjectHelper<?> parentHelper =
 					forObjectClass (parent.getClass ());
@@ -1231,16 +1242,16 @@ class ObjectHelperBuilder {
 
 				return findByCode (
 					parentGlobalId,
-					code);
+					codes);
 
 			}
 
 			@Override
 			public
-			Record findByCode (
+			Record findByTypeAndCode (
 					Record parent,
 					String typeCode,
-					String code) {
+					String... codes) {
 
 				ObjectHelper<?> parentHelper =
 					forObjectClass (parent.getClass ());
@@ -1250,10 +1261,10 @@ class ObjectHelperBuilder {
 						parentHelper.objectTypeId (),
 						parent.getId ());
 
-				return findByCode (
+				return findByTypeAndCode (
 					parentGlobalId,
 					typeCode,
-					code);
+					codes);
 
 			}
 
@@ -1292,15 +1303,15 @@ class ObjectHelperBuilder {
 
 			@Override
 			public
-			Record findByCode (
+			Record findByTypeAndCode (
 					GlobalId parentGlobalId,
 					String typeCode,
-					String code) {
+					String... codes) {
 
-				return objectHelperProvider.findByParentAndCode (
+				return objectHelperProvider.findByParentAndTypeAndCode (
 					parentGlobalId,
 					typeCode,
-					code);
+					codes);
 
 			}
 

@@ -19,31 +19,6 @@ def create_xml \
 	template_path =
 		"etc/#{template_name}.xquery"
 
-=begin
-	if File.exist? target_path
-
-		template_mtime =
-			File.mtime template_path
-
-		project_mtime =
-			File.mtime project_path
-
-		target_mtime =
-			File.mtime target_path
-
-		# TODO make this more clever
-
-		max_mtime = [
-			template_mtime,
-			project_mtime,
-		].max
-
-		return \
-			if target_mtime > max_mtime
-
-	end
-=end
-
 	puts target_path
 
 	temp =
@@ -133,11 +108,6 @@ end
 
 project_name =
 	$build_elem["name"]
-
-create_xml \
-	project_name,
-	"build-xml",
-	"build.xml"
 
 create_xml \
 	project_name,

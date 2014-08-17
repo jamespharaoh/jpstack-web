@@ -7,5 +7,13 @@ fix-whitespace \
 			-o -name '*.xml' \
 			-o -name '*.sql' \
 			-o -name '*.js' \
+			-type f
 	) \
-	etc/*
+	$(
+		find etc \
+			-type f
+	) \
+	$(
+		find build.xml wbs-build.xml \
+			-type f
+	)

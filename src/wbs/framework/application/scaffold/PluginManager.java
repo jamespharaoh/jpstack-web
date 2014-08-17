@@ -89,7 +89,7 @@ class PluginManager {
 
 					iterator.remove ();
 
-					log.info (
+					log.debug (
 						stringFormat (
 							"Resolved dependencies for plugin %s/%s",
 							plugin.project ().name (),

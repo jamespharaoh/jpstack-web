@@ -1,0 +1,11 @@
+<plugin
+	name="object-browse"
+	package="object.browse">
+
+	<layer name="console">
+		<bean class="ObjectBrowsePageBuilder"/>
+		<bean class="ObjectBrowsePageSpec"/>
+		<bean class="ObjectBrowsePart"/>
+	</layer>
+
+</plugin>

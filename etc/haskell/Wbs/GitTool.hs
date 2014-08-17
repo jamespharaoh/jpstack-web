@@ -1,9 +1,8 @@
 #!/usr/bin/env runhaskell
 
-{-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
 {-# LANGUAGE FlexibleContexts #-}
 
-module Main where
+module Wbs.GitTool where
 
 import           Control.Monad
 import           Control.Monad.IO.Class
@@ -18,7 +17,6 @@ import qualified Data.Set as Set
 import           Data.Tagged
 import qualified Data.Text as Text
 
--- import qualified Git
 import qualified Git.Libgit2
 import qualified Git.Reference
 import qualified Git.Repository
@@ -27,7 +25,7 @@ import qualified Git.Tree
 
 import qualified System.Environment as Environment
 
-import           Text.XML.HXT.Core hiding (Tree)
+import           Wbs.Config
 
 type TreeEntries r =
 	[(Char8.ByteString, Git.Types.TreeEntry r)]
@@ -727,68 +725,6 @@ rewriteCommit cacheRef paths expansions originalCommit = do
 
 					return rewrittenCommit
 
----------- config
-
-data GitLink = GitLink {
-	gitLinkName :: String,
-	gitLinkSource :: String,
-	gitLinkTarget :: String,
-	gitLinkLocal :: String,
-	gitLinkPaths :: [String]
-}
-
-data Config = Config {
-	configGitLinks :: [GitLink]
-}
-
-readConfig = do
-
-	let parseXML file =
-		readDocument [] file
-
-	let atTag tag =
-		deep (isElem >>> hasName tag)
-
-	let getPaths =
-		atTag "path" >>> proc pathTag -> do
-
-			name <- getAttrValue "name" -< pathTag
-
-			returnA -< name
-
-	let getGitLink =
-		atTag "git-link" >>> proc gitLinkTag -> do
-
-			name <- getAttrValue "name" -< gitLinkTag
-			source <- getAttrValue "source" -< gitLinkTag
-			target <- getAttrValue "target" -< gitLinkTag
-			local <- getAttrValue "local" -< gitLinkTag
-
-			paths <- listA getPaths -< gitLinkTag
-
-			returnA -< GitLink {
-				gitLinkName = name,
-				gitLinkSource = source,
-				gitLinkTarget = target,
-				gitLinkLocal = local,
-				gitLinkPaths = paths
-			}
-
-	let getConfig =
-		atTag "wbs-build" >>> proc buildTag -> do
-
-			gitLinksTag <- atTag "git-links" -< buildTag
-			gitLinks <- listA getGitLink -< gitLinksTag
-
-			returnA -< Config {
-				configGitLinks = gitLinks
-			}
-
-	[ config ] <-
-		runX (parseXML "wbs-build.xml" >>> getConfig)
-
-	return config
-
 ---------- main
 
 withGit path =
@@ -831,8 +767,8 @@ main ::
 
 main = do
 
-	config <-
-		readConfig
+	buildConfig <-
+		loadBuildConfig
 
 	arguments <-
 		Environment.getArgs
@@ -842,8 +778,8 @@ main = do
 
 	let Just gitLink =
 		List.find
-			(\gitLink -> (gitLinkName gitLink) == gitLinkNameArg)
-			(configGitLinks config)
+			(\gitLink -> (bglcName gitLink) == gitLinkNameArg)
+			(bcGitLinks buildConfig)
 
 	withGit "." $ do
 
@@ -852,7 +788,7 @@ main = do
 
 		let paths =
 			map Char8.pack $
-				gitLinkPaths gitLink
+				bglcPaths gitLink
 
 		-- reduce local commit
 
@@ -860,7 +796,7 @@ main = do
 			performReduction
 				cacheRef
 				paths
-				(gitLinkLocal gitLink)
+				(bglcLocal gitLink)
 
 		let originalLocalCommitOid =
 			Git.Types.commitOid originalLocalCommit
@@ -880,7 +816,7 @@ main = do
 			performReduction
 				cacheRef
 				paths
-				(gitLinkSource gitLink)
+				(bglcSource gitLink)
 
 		let originalSourceCommitOid =
 			Git.Types.commitOid originalSourceCommit
@@ -907,13 +843,13 @@ main = do
 			Git.Types.commitOid targetCommit
 
 		Git.Types.updateReference
-			(Text.pack $ gitLinkTarget gitLink)
+			(Text.pack $ bglcTarget gitLink)
 			(Git.Types.RefObj (untag targetCommitOid))
 
 		liftIO $ putStrLn $
 			"rewritten to " ++
 			(show $ untag targetCommitOid) ++ " " ++
 			"and saved as " ++
-			(gitLinkTarget gitLink)
+			(bglcTarget gitLink)
 
 		return ()
