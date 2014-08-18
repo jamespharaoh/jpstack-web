@@ -442,7 +442,7 @@ class ChatInfoLogicImpl
 		*/
 
 		ChatHelpTemplateRec linkTemplate =
-			chatHelpTemplateHelper.findByCode (
+			chatHelpTemplateHelper.findByTypeAndCode (
 				chat,
 				"system",
 				"info_site_link");

@@ -14,7 +14,7 @@ cd "$BASEDIR"
 
 # setup classpath
 
-CLASSPATH="$BASEDIR/bin"
+CLASSPATH="$BASEDIR/work/bin"
 
 for filename in binaries/libraries/*.jar; do
 	CLASSPATH="$CLASSPATH:$filename";

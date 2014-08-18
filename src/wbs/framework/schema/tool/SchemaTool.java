@@ -54,10 +54,17 @@ class SchemaTool {
 
 		Schema schema =
 			schemaFromModel.get ()
-				.taskLog (taskLog)
-				.enumTypes (schemaTypesHelper.enumTypes ())
-				.modelsByClass (entityHelper.modelsByClass ())
-				.build ();
+
+			.taskLog (
+				taskLog)
+
+			.enumTypes (
+				schemaTypesHelper.enumTypes ())
+
+			.modelsByClass (
+				entityHelper.modelsByClass ())
+
+			.build ();
 
 		if (taskLog.errors () > 0) {
 
@@ -79,9 +86,11 @@ class SchemaTool {
 
 		// write sql
 
-		@Cleanup Writer fileWriter =
+		@Cleanup
+		Writer fileWriter =
 			new FileWriter (
-				new File ("../work/schema.sql"));
+				new File (
+					"work/schema.sql"));
 
 		for (String sqlStatement
 				: sqlStatements) {

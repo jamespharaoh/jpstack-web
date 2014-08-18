@@ -275,15 +275,17 @@ class SessionFactoryBeanFactory
 		try {
 
 			FileUtils.deleteDirectory (
-				new File ("../work/hibernate"));
+				new File (
+					"work/hibernate"));
 
 			FileUtils.forceMkdir (
-				new File ("../work/hibernate"));
+				new File (
+					"work/hibernate"));
 
 		} catch (IOException exception) {
 
 			log.error (
-				"Error deleting contents of ../work/hibernate",
+				"Error deleting contents of work/hibernate",
 				exception);
 
 		}
@@ -469,7 +471,7 @@ class SessionFactoryBeanFactory
 		File outputFile =
 			new File (
 				stringFormat (
-					"../work/hibernate/%s.hbm.xml",
+					"work/hibernate/%s.hbm.xml",
 					model.objectClass ().getSimpleName ()));
 
 		try {

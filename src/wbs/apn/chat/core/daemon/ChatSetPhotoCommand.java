@@ -151,7 +151,7 @@ class ChatSetPhotoCommand
 		// try set photo
 
 		ChatUserImageRec chatUserImage =
-			chatUserLogic.setPhoto (
+			chatUserLogic.setPhotoFromMessage (
 				chatUser,
 				message,
 				false);

@@ -2,6 +2,7 @@ package wbs.apn.chat.user.core.console;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Set;
@@ -108,7 +109,11 @@ class ChatUserHelpPart
 					.toDateTime (timezone)
 					.toLocalDate ();
 
-			if (nextDate != previousDate) {
+			if (
+				notEqual (
+					nextDate,
+					previousDate)
+			) {
 
 				previousDate =
 					nextDate;

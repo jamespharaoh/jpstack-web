@@ -336,7 +336,7 @@ class ChatJoiner {
 	boolean updateUserPhoto () {
 
 		ChatUserImageRec chatUserImage =
-			chatUserLogic.setPhoto (
+			chatUserLogic.setPhotoFromMessage (
 				chatUser,
 				message,
 				false);
@@ -490,7 +490,8 @@ class ChatJoiner {
 				chatUserLogic.setPlace (
 					chatUser,
 					rest,
-					message);
+					Optional.of (
+						message));
 
 		}
 

@@ -9,8 +9,8 @@ function tomcat_api_is_running_1 {
 }
 
 function tomcat_api_is_running_2 {
-	$BASEDIR/wbs-apn/c/socktest localhost 8030 && \
-	$BASEDIR/wbs-apn/c/socktest localhost 8031
+	$BASEDIR/c/socktest localhost 8030 && \
+	$BASEDIR/c/socktest localhost 8031
 }
 
 function tomcat_api_start {

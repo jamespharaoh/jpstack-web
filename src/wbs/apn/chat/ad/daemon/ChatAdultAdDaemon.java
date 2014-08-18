@@ -243,7 +243,7 @@ class ChatAdultAdDaemon
 		}
 
 		ChatHelpTemplateRec template =
-			chatHelpTemplateHelper.findByCode (
+			chatHelpTemplateHelper.findByTypeAndCode (
 				chat,
 				"system",
 				templateCode);

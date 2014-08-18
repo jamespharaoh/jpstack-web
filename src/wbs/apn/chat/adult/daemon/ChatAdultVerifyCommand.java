@@ -166,11 +166,23 @@ class ChatAdultVerifyCommand
 
 			chatUserCreditHelper.insert (
 				new ChatUserCreditRec ()
-					.setChatUser (chatUser)
-					.setCreditAmount (credit)
-					.setBillAmount (0)
-					.setGift (true)
-					.setDetails ("adult verify"));
+
+				.setChatUser (
+					chatUser)
+
+				.setCreditAmount (
+					credit)
+
+				.setBillAmount (
+					0)
+
+				.setGift (
+					true)
+
+				.setDetails (
+					"adult verify")
+
+			);
 
 			chatUser
 

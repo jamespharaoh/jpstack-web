@@ -28,8 +28,7 @@ import wbs.sms.message.core.model.MessageRec;
 @CommonEntity
 public
 class ChatUserImageRec
-	implements
-		CommonRecord<ChatUserImageRec> {
+	implements CommonRecord<ChatUserImageRec> {
 
 	@GeneratedIdField
 	Integer id;

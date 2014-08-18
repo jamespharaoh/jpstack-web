@@ -29,7 +29,8 @@ class ChatInfoSiteViewAction
 	RequestContext requestContext;
 
 	@Override
-	protected Responder goApi () {
+	protected
+	Responder goApi () {
 
 		@Cleanup
 		Transaction transaction =

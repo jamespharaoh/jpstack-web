@@ -260,8 +260,9 @@ class ChatSupervisorConversationPart
 				.toLocalDate ();
 
 			if (
-				previousDate == null
-				|| nextDate != previousDate
+				notEqual (
+					nextDate,
+					previousDate)
 			) {
 
 				printFormat (

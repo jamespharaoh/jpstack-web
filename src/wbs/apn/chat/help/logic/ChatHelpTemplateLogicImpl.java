@@ -37,7 +37,7 @@ class ChatHelpTemplateLogicImpl
 		if (chatScheme != null) {
 
 			ChatHelpTemplateRec chatHelpTemplate =
-				chatHelpTemplateHelper.findByCode (
+				chatHelpTemplateHelper.findByTypeAndCode (
 					chat,
 					type,
 					stringFormat (
@@ -52,7 +52,7 @@ class ChatHelpTemplateLogicImpl
 
 		// try and find a general template
 
-		return chatHelpTemplateHelper.findByCode (
+		return chatHelpTemplateHelper.findByTypeAndCode (
 			chat,
 			type,
 			code);

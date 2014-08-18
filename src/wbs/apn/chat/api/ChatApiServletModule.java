@@ -109,9 +109,11 @@ import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.locator.model.EastNorth;
 import wbs.sms.locator.model.LongLat;
 import wbs.sms.locator.model.MercatorProjection;
+import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.logic.NumberLogic;
 import wbs.sms.number.core.model.NumberRec;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -1530,7 +1532,9 @@ class ChatApiServletModule
 				chatUserLogic.setPhoto (
 					chatUser,
 					image,
-					null,
+					Optional.<String>absent (),
+					Optional.<String>absent (),
+					Optional.<MessageRec>absent (),
 					false);
 
 			}
@@ -1538,32 +1542,54 @@ class ChatApiServletModule
 			if (email != null)
 				chatUser.setEmail (email);
 
-			if (jigsawApplicationIdentifier != null)
-				chatUser.setJigsawApplicationIdentifier (jigsawApplicationIdentifier);
+			if (jigsawApplicationIdentifier != null) {
 
-			if (jigsawToken != null)
-				chatUser.setJigsawToken (jigsawToken);
+				chatUser
+
+					.setJigsawApplicationIdentifier (
+						jigsawApplicationIdentifier);
+
+			}
+
+			if (jigsawToken != null) {
+
+				chatUser
+
+					.setJigsawToken (
+						jigsawToken);
+
+			}
 
 			if (profileFields != null) {
-				for (Map.Entry<String,String> ent : profileFields.entrySet ()) {
+
+				for (Map.Entry<String,String> profileFieldEntry
+						: profileFields.entrySet ()) {
 
 					// lookup field
-					ChatProfileFieldRec field = chat.getProfileFields ().get (ent.getKey ());
+
+					ChatProfileFieldRec field =
+						chat.getProfileFields ().get (
+							profileFieldEntry.getKey ());
+
 					if (field == null) {
+
 						throw new RpcException (
 							"chat-profile-response",
 							Rpc.stRequestInvalid,
 							"request-invalid",
-							"Profile field name not recognised: " + ent.getKey ());
+							stringFormat (
+								"Profile field name not recognised: %s",
+								profileFieldEntry.getKey ()));
+
 					}
 
 					// lookup value
 
 					ChatProfileFieldValueRec value =
 						field.getValues ()
-							.get (ent.getValue ());
+							.get (profileFieldEntry.getValue ());
 
-					if (! equal (ent.getValue (), "") && value == null) {
+					if (! equal (profileFieldEntry.getValue (), "") && value == null) {
 
 						throw new RpcException (
 							"chat-profile-response",
@@ -1571,9 +1597,9 @@ class ChatApiServletModule
 							"request-invalid",
 							stringFormat (
 								"Profile field value not recognised: %s, for ",
-								ent.getValue (),
+								profileFieldEntry.getValue (),
 								"field: %s",
-								ent.getKey ()));
+								profileFieldEntry.getKey ()));
 
 					}
 

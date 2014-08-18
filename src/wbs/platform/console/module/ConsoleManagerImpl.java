@@ -687,15 +687,17 @@ class ConsoleManagerImpl
 		try {
 
 			FileUtils.deleteDirectory (
-				new File ("../work/console/module"));
+				new File (
+					"work/console/module"));
 
 			FileUtils.forceMkdir (
-				new File ("../work/console/module"));
+				new File (
+					"work/console/module"));
 
 		} catch (IOException exception) {
 
 			log.error (
-				"Error deleting contents of ../work/console/module",
+				"Error deleting contents of work/console/module",
 				exception);
 
 		}
@@ -713,7 +715,7 @@ class ConsoleManagerImpl
 
 			String outputFileName =
 				stringFormat (
-					"../work/console/module/%s.xml",
+					"work/console/module/%s.xml",
 					camelToHyphen (
 						consoleModuleBeanName));
 

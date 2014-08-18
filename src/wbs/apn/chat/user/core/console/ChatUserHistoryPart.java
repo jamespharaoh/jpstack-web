@@ -2,6 +2,7 @@ package wbs.apn.chat.user.core.console;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.spacify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -56,7 +57,8 @@ class ChatUserHistoryPart
 
 		chatUser =
 			chatUserHelper.find (
-				requestContext.stuffInt ("chatUserId"));
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		int chatMessageCount =
 			chatMessageHelper.count (
@@ -92,7 +94,7 @@ class ChatUserHistoryPart
 
 	@Override
 	public
-	void goBodyStuff() {
+	void goBodyStuff () {
 
 		printFormat (
 			"<table class=\"list\">\n");
@@ -138,7 +140,10 @@ class ChatUserHistoryPart
 					.toDateTime (timezone)
 					.toLocalDate ();
 
-			if (nextDate != previousDate) {
+			if (
+				notEqual (
+					nextDate, previousDate)
+			) {
 
 				previousDate =
 					nextDate;

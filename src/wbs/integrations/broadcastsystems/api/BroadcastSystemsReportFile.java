@@ -91,6 +91,8 @@ class BroadcastSystemsReportFile
 			data.status = MessageStatus.undelivered;
 		} else if (equal (data.statusCode, "failed")) {
 			data.status = MessageStatus.undelivered;
+		} else if (equal (data.statusCode, "expired")) {
+			data.status = MessageStatus.undelivered;
 		} else {
 
 			throw new RuntimeException (

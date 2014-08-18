@@ -327,53 +327,80 @@ class ChatUserSearchResultsPart
 							"/%u",
 							chatUser.getId (),
 							"/chatUser.summary")),
-					false),
+					false));
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"<td>%h</td>\n",
-				chatUser.getCode (),
+				chatUser.getCode ());
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"%s\n",
 				chatConsoleLogic.tdsForChatUserTypeGenderOrientShort (
-					chatUser),
+					chatUser));
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getValueSinceEver ()),
+					chatUser.getValueSinceEver ()));
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCredit ()),
+					chatUser.getCredit ()));
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"%s\n",
 				chatUserCreditModeConsoleHelper.toTd (
-					chatUser.getCreditMode ()),
+					chatUser.getCreditMode ()));
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
 					sum (
 						+ chatUser.getCreditPending (),
-						+ chatUser.getCreditPendingStrict ())),
+						+ chatUser.getCreditPendingStrict ())));
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditSuccess ()),
+					chatUser.getCreditSuccess ()));
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditFailed ()),
+					chatUser.getCreditFailed ()));
 
-				// pw.println (ChatConsoleStuff.tdForCredit
-				// (cu.getCreditFailed () + cu.getCreditRevoked ()));
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"<td>%h</td>\n",
 				chatUser.getChatScheme () != null
 					? chatUser.getChatScheme ().getCode ()
-					: "-",
+					: "-");
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"<td>%h</td>\n",
 				chatUser.getLastAction () != null
@@ -382,19 +409,34 @@ class ChatUserSearchResultsPart
 							chatUser),
 						dateToInstant (
 							chatUser.getLastAction ()))
-					: "-",
+					: "-");
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"<td style=\"text-align: right\">%h</td>\n",
-				percentagerIterator.next (),
+				percentagerIterator.next ());
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"<td style=\"text-align: right\">%h</td>\n",
-				percentagerIterator.next (),
+				percentagerIterator.next ());
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"<td style=\"text-align: right\">%h</td>\n",
-				percentagerIterator.next (),
+				percentagerIterator.next ());
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"<td style=\"text-align: right\">%h</td>\n",
-				percentagerIterator.next (),
+				percentagerIterator.next ());
+
+			StringFormatter.printWriterFormat (
+				pageBuilder.writer (),
 
 				"</tr>\n");
 

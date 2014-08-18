@@ -56,7 +56,7 @@ class ChatInfoSiteViewResponder
 		}
 
 		infoSiteHelpTemplate =
-			chatHelpTemplateHelper.findByCode (
+			chatHelpTemplateHelper.findByTypeAndCode (
 				infoSite.getChatUser ().getChat (),
 				"system",
 				"info_site_help");

@@ -37,6 +37,9 @@
 			type="system"/>
 
 		<chat-help-template-context
+			type="web"/>
+
+		<chat-help-template-context
 			type="help"/>
 
 		<chat-help-template-context

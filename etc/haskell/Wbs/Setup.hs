@@ -62,20 +62,84 @@ writeBuildFile worldConfig = do
 
 	let makeComboTargets =
 		[
-			makeComboTarget "clean" [ "clean" ],
-			makeComboTarget "build" [ "build-framework", "build-rest" ],
-			makeComboTarget "framework-jar" [ "build-framework", "framework-jar" ],
-			makeComboTarget "console-live" [ "build-framework", "build-rest", "console-live" ],
-			makeComboTarget "console-test" [ "build-framework", "build-rest", "console-test" ],
-			makeComboTarget "console-auto" [ "build-framework", "build-rest", "console-live", "console-restart" ],
-			makeComboTarget "api-live" [ "build-framework", "build-rest", "api-live" ],
-			makeComboTarget "api-test" [ "build-framework", "build-rest", "api-test" ],
-			makeComboTarget "api-auto" [ "build-framework", "build-rest", "api-live", "api-restart" ],
-			makeComboTarget "daemon-auto" [ "build-framework", "build-rest", "daemon-restart" ],
-			makeComboTarget "all-auto" [ "build-framework", "build-rest", "api-live", "api-restart", "console-live", "console-restart", "daemon-restart" ],
-			makeComboTarget "javadoc" [ "javadoc" ],
-			makeComboTarget "fixtures" [ "build-framework", "build-rest", "db-drop", "db-create", "schema-create", "sql-schema", "sql-data", "fixtures" ],
-			makeComboTarget "tomcat-test" [ "build-framework", "build-rest", "console-test", "api-test", "tomcat-test" ]
+
+			makeComboTarget "clean" [
+				"clean" ],
+
+			makeComboTarget "build" [
+				"build-framework",
+				"build-rest" ],
+
+			makeComboTarget "framework-jar" [
+				"build-framework",
+				"framework-jar" ],
+
+			makeComboTarget "console-live" [
+				"build-framework",
+				"build-rest",
+				"console-live" ],
+
+			makeComboTarget "console-test" [
+				"build-framework",
+				"build-rest",
+				"console-test" ],
+
+			makeComboTarget "console-auto" [
+				"build-framework",
+				"build-rest",
+				"console-live",
+				"console-restart" ],
+
+			makeComboTarget "api-live" [
+				"build-framework",
+				"build-rest",
+				"api-live" ],
+
+			makeComboTarget "api-test" [
+				"build-framework",
+				"build-rest",
+				"api-test" ],
+
+			makeComboTarget "api-auto" [
+				"build-framework",
+				"build-rest",
+				"api-live",
+				"api-restart" ],
+
+			makeComboTarget "daemon-auto" [
+				"build-framework",
+				"build-rest",
+				"daemon-restart" ],
+
+			makeComboTarget "all-auto" [
+				"build-framework",
+				"build-rest",
+				"api-live",
+				"api-restart",
+				"console-live",
+				"console-restart",
+				"daemon-restart" ],
+
+			makeComboTarget "javadoc" [
+				"javadoc" ],
+
+			makeComboTarget "fixtures" [
+				"build-framework",
+				"build-rest",
+				"db-drop",
+				"db-create",
+				"schema-create",
+				"sql-schema",
+				"sql-data",
+				"fixtures" ],
+
+			makeComboTarget "tomcat-test" [
+				"build-framework",
+				"build-rest",
+				"console-test",
+				"api-test",
+				"tomcat-test" ]
+
 		]
 
 	let makeSimpleTarget name elems =
@@ -105,7 +169,7 @@ writeBuildFile worldConfig = do
 	let makeCleanTargets =
 		[
 			makeSimpleTarget "clean" [
-				makeDeleteDir "work"
+				makeDeleteDir "work/bin"
 			]
 		]
 
@@ -256,7 +320,7 @@ writeBuildFile worldConfig = do
 			],
 
 			makeCopyFileToFile
-				("console/web-" ++ env ++ ".xml")
+				(name ++ "/web-" ++ env ++ ".xml")
 				(workDir ++ "/WEB-INF/web.xml")
 
 		]
@@ -273,13 +337,13 @@ writeBuildFile worldConfig = do
 
 	let makeExec exec elems =
 		mkelem "exec" [
-			sattr "failonerror" "true",
+			sattr "failonerror" "false",
 			sattr "executable" exec
 		] elems
 
 	let makeExecNoFail exec elems =
 		mkelem "exec" [
-			sattr "failonerror" "false",
+			sattr "failonerror" "true",
 			sattr "executable" exec
 		] elems
 
@@ -396,11 +460,21 @@ writeBuildFile worldConfig = do
 					sattr "linksource" "yes"
 				] [
 					makeFilesetDir "src" [],
-					mkelem "classpath" [ sattr "refid" "classpath" ] [],
-					mkelem "link" [ sattr "href" "http://java.sun.com/j2se/1.6.0/docs/api" ] [],
-					mkelem "link" [ sattr "href" "http://logging.apache.org/log4j/docs/api" ] [],
-					mkelem "link" [ sattr "href" "http://www.hibernate.org/hib_docs/v3/api" ] [],
-					mkelem "link" [ sattr "href" "http://www.xom.nu/apidocs" ] []
+					mkelem "classpath" [
+						sattr "refid" "classpath"
+					] [],
+					mkelem "link" [
+						sattr "href" "http://java.sun.com/j2se/1.6.0/docs/api"
+					] [],
+					mkelem "link" [
+						sattr "href" "http://logging.apache.org/log4j/docs/api"
+					] [],
+					mkelem "link" [
+						sattr "href" "http://www.hibernate.org/hib_docs/v3/api"
+					] [],
+					mkelem "link" [
+						sattr "href" "http://www.xom.nu/apidocs"
+					] []
 				]
 
 			]
@@ -464,7 +538,8 @@ writeBuildFile worldConfig = do
 			makeSimpleTarget "schema-create" [
 
 				mkelem "java" [
-					sattr "classname" "wbs.platform.application.tools.BeanRunner",
+					sattr "classname"
+						"wbs.platform.application.tools.BeanRunner",
 					sattr "classpathref" "classpath",
 					sattr "failonerror" "true"
 				] [
@@ -484,13 +559,15 @@ writeBuildFile worldConfig = do
 			makeSimpleTarget "fixtures" [
 
 				mkelem "java" [
-					sattr "classname" "wbs.platform.application.tools.BeanRunner",
+					sattr "classname"
+						"wbs.platform.application.tools.BeanRunner",
 					sattr "classpathref" "classpath",
 					sattr "failonerror" "true"
 				] [
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
-					makeArgValue "config,data,entity,schema,sql,model,hibernate,object,logic,fixture",
+					makeArgValue ("config,data,entity,schema,sql,model," ++
+						"hibernate,object,logic,fixture"),
 					makeArgValue "test,hibernate",
 					makeArgValue "wbs.framework.fixtures.FixturesTool",
 					makeArgValue "createFixtures"

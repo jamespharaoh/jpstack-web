@@ -162,13 +162,6 @@ class ChatMonitorInboxSummaryPart
 		Transaction transaction =
 			database.currentTransaction ();
 
-		ChatSchemeRec chatScheme =
-			userChatUser.getChatScheme ();
-
-		timeZone =
-			DateTimeZone.forID (
-				chatScheme.getTimezone ());
-
 		now =
 			transaction.now ();
 
@@ -181,6 +174,13 @@ class ChatMonitorInboxSummaryPart
 
 		userChatUser =
 			monitorInbox.getUserChatUser ();
+
+		ChatSchemeRec chatScheme =
+			userChatUser.getChatScheme ();
+
+		timeZone =
+			DateTimeZone.forID (
+				chatScheme.getTimezone ());
 
 		chat =
 			userChatUser.getChat ();

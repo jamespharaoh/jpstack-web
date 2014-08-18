@@ -80,4 +80,10 @@ interface ChatSendLogic {
 			ChatUserRec chatUser,
 			Map<String,String> params);
 
+	String renderTemplate (
+			ChatUserRec chatUser,
+			String templateTypeCode,
+			String templateCode,
+			Map<String,String> suppliedParams);
+
 }

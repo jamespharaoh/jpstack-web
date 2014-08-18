@@ -127,22 +127,24 @@ interface ChatUserLogic {
 			ChatUserImageType type,
 			MediaRec smallMedia,
 			MediaRec fullMedia,
-			MessageRec message,
+			Optional<MessageRec> message,
 			boolean append);
 
 	ChatUserImageRec setPhoto (
 			ChatUserRec chatUser,
 			MediaRec fullMedia,
-			MessageRec message,
+			Optional<MessageRec> message,
 			boolean append);
 
 	ChatUserImageRec setPhoto (
 			ChatUserRec chatUser,
 			byte[] data,
-			MessageRec message,
+			Optional<String> filename,
+			Optional<String> mimeType,
+			Optional<MessageRec> message,
 			boolean append);
 
-	ChatUserImageRec setPhoto (
+	ChatUserImageRec setPhotoFromMessage (
 			ChatUserRec chatUser,
 			MessageRec message,
 			boolean append);
@@ -173,7 +175,7 @@ interface ChatUserLogic {
 			byte[] data,
 			String filename,
 			String mimeType,
-			MessageRec message,
+			Optional<MessageRec> message,
 			boolean append);
 
 	boolean setVideo (
@@ -184,7 +186,7 @@ interface ChatUserLogic {
 	boolean setPlace (
 			ChatUserRec chatUser,
 			String place,
-			MessageRec message);
+			Optional<MessageRec> message);
 
 	/**
 	 * Checks if a given user has attempted one of the three methods of age

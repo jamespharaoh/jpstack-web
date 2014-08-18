@@ -62,13 +62,13 @@ class ChatHelpLogicImpl
 		// load templates
 
 		ChatHelpTemplateRec singleTemplate =
-			chatHelpTemplateHelper.findByCode (
+			chatHelpTemplateHelper.findByTypeAndCode (
 				chat,
 				"system",
 				"help_single");
 
 		ChatHelpTemplateRec multipleTemplate =
-			chatHelpTemplateHelper.findByCode (
+			chatHelpTemplateHelper.findByTypeAndCode (
 				chat,
 				"system",
 				"help_multiple");

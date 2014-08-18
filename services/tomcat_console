@@ -9,8 +9,8 @@ function tomcat_console_is_running_1 {
 }
 
 function tomcat_console_is_running_2 {
-	$BASEDIR/wbs-apn/c/socktest localhost 8010 && \
-	$BASEDIR/wbs-apn/c/socktest localhost 8012
+	$BASEDIR/c/socktest localhost 8010 && \
+	$BASEDIR/c/socktest localhost 8012
 }
 
 function tomcat_console_start {

@@ -648,4 +648,35 @@ class ChatSendLogicImpl
 
 	}
 
+	@Override
+	public
+	String renderTemplate (
+			@NonNull ChatUserRec chatUser,
+			@NonNull String templateTypeCode,
+			@NonNull String templateCode,
+			@NonNull Map<String,String> suppliedParams) {
+
+		Map<String,String> allParams =
+			addDefaultParams (
+				chatUser,
+				suppliedParams);
+
+		ChatHelpTemplateRec template =
+			chatTemplateLogic.findChatHelpTemplate (
+				chatUser,
+				templateTypeCode,
+				templateCode);
+
+		String originalText =
+			template.getText ();
+
+		String finalText =
+			MapStringSubstituter.substitute (
+				originalText,
+				allParams);
+
+		return finalText;
+
+	}
+
 }

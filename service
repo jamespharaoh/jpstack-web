@@ -65,12 +65,12 @@ SERVICE="$1"
 COMMAND="$2"
 
 # get base dir
-BASEDIR=$(dirname $0)/..
+BASEDIR=$(dirname $0)
 echo $BASEDIR
 # include the SERVICE
 [ "$SERVICE" == "$(basename "$SERVICE")" ] || die "dodgy service $1"
-[ -f "$BASEDIR/wbs-apn/services/$SERVICE" ] || die "unknown service $1"
-. "$BASEDIR/wbs-apn/services/$SERVICE"
+[ -f "$BASEDIR/services/$SERVICE" ] || die "unknown service $1"
+. "$BASEDIR/services/$SERVICE"
 
 # run the command
 case "$COMMAND" in

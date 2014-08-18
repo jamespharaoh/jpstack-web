@@ -34,9 +34,9 @@ import wbs.platform.media.model.MediaRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
-@PrototypeComponent ("chatUserImageUploadAction")
+@PrototypeComponent ("chatUserImageUploadPostAction")
 public
-class ChatUserImageUploadAction
+class ChatUserImageUploadPostAction
 	extends ConsoleAction {
 
 	@Inject

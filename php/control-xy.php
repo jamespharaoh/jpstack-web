@@ -3,7 +3,7 @@
 function find_services () {
 
 	$services = array ();
-	$dir = opendir ("/home/james/wbs/wbs-apn/services");
+	$dir = opendir ("/home/james/wbs/services");
 
 	while ($file = readdir ($dir)) {
 
@@ -24,7 +24,7 @@ function find_services () {
 function get_status ($service) {
 
 	exec (
-		"/home/james/wbs/wbs-apn/service $service status",
+		"/home/james/wbs/service $service status",
 		$output,
 		$status);
 
@@ -37,7 +37,7 @@ function send_command ($service, $command) {
 	global $messages;
 
 	exec (
-		"sh -c \"/home/james/wbs/wbs-apn/service $service $command >/dev/null 2>&1 &\"",
+		"sh -c \"/home/james/wbs/service $service $command >/dev/null 2>&1 &\"",
 		$output,
 		$status);
 

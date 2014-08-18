@@ -418,6 +418,9 @@ class ChatUserRec
 	@SimpleField
 	Integer numSpendWarnings = 0;
 
+	@SimpleField
+	Integer numImageUploadTokens = 0;
+
 	// --------------------------------- other
 
 	@SimpleField (

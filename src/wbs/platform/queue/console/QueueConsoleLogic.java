@@ -74,7 +74,7 @@ class QueueConsoleLogic {
 		// create queue item claim
 
 		QueueItemClaimRec queueItemClaim =
-			queueItemHelper.insert (
+			queueItemClaimHelper.insert (
 				new QueueItemClaimRec ()
 					.setQueueItem (queueItem)
 					.setUser (user)

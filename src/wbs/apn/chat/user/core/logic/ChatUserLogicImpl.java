@@ -623,7 +623,7 @@ class ChatUserLogicImpl
 			@NonNull ChatUserImageType type,
 			@NonNull MediaRec smallMedia,
 			@NonNull MediaRec fullMedia,
-			@NonNull MessageRec message,
+			@NonNull Optional<MessageRec> message,
 			boolean append) {
 
 		Transaction transaction =
@@ -652,7 +652,7 @@ class ChatUserLogicImpl
 					transaction.now ()))
 
 			.setMessage (
-				message)
+				message.orNull ())
 
 			.setStatus (
 				ChatUserInfoStatus.moderatorPending)
@@ -691,7 +691,7 @@ class ChatUserLogicImpl
 	ChatUserImageRec setPhoto (
 			@NonNull ChatUserRec chatUser,
 			@NonNull MediaRec fullMedia,
-			@NonNull MessageRec message,
+			@NonNull Optional<MessageRec> message,
 			boolean append) {
 
 		// load
@@ -703,17 +703,24 @@ class ChatUserLogicImpl
 			fullMedia.getMediaType ().getMimeType ();
 
 		BufferedImage fullImage =
-			mediaLogic.readImage (fullData, fullMimeType);
+			mediaLogic.readImage (
+				fullData,
+				fullMimeType);
 
 		// resample
 
 		BufferedImage smallImage =
-			mediaLogic.resampleImage (fullImage, 320, 240);
+			mediaLogic.resampleImage (
+				fullImage,
+				320,
+				240);
 
 		// save
 
 		byte[] smallData =
-			mediaLogic.writeJpeg (smallImage, 0.6f);
+			mediaLogic.writeJpeg (
+				smallImage,
+				0.6f);
 
 		MediaRec smallMedia =
 			mediaLogic.createMediaFromImage (
@@ -734,21 +741,26 @@ class ChatUserLogicImpl
 	}
 
 	@Override
-	public ChatUserImageRec setPhoto (
+	public
+	ChatUserImageRec setPhoto (
 			@NonNull ChatUserRec chatUser,
 			@NonNull byte[] data,
-			@NonNull MessageRec message,
+			@NonNull Optional<String> filenameOptional,
+			@NonNull Optional<String> mimeType,
+			@NonNull Optional<MessageRec> message,
 			boolean append) {
 
 		// create media
 
 		String filename =
-			chatUser.getCode () + ".jpg";
+			filenameOptional.or (
+				chatUser.getCode () + ".jpg");
 
 		MediaRec fullMedia =
 			mediaLogic.createMediaFromImage (
 				data,
-				"image/jpeg",
+				mimeType.or (
+					"image/jpeg"),
 				filename);
 
 		// and delegate
@@ -763,13 +775,14 @@ class ChatUserLogicImpl
 
 	@Override
 	public
-	ChatUserImageRec setPhoto (
+	ChatUserImageRec setPhotoFromMessage (
 			@NonNull ChatUserRec chatUser,
 			@NonNull MessageRec message,
 			boolean append) {
 
 		MediaRec media =
-			findPhoto (message);
+			findPhoto (
+				message);
 
 		if (media == null)
 			return null;
@@ -777,7 +790,8 @@ class ChatUserLogicImpl
 		return setPhoto (
 			chatUser,
 			media,
-			message,
+			Optional.of (
+				message),
 			append);
 
 	}
@@ -831,7 +845,8 @@ class ChatUserLogicImpl
 			ChatUserImageType.video,
 			newMedia,
 			fullMedia,
-			message,
+			Optional.of (
+				message),
 			append);
 
 	}
@@ -893,13 +908,16 @@ class ChatUserLogicImpl
 				chatUser.getCode () + ".3gp");
 
 		// and delegate
+
 		setImage (
 			chatUser,
 			ChatUserImageType.video,
 			newMedia,
 			fullMedia,
-			message,
+			Optional.of (
+				message),
 			append);
+
 	}
 
 	@Override
@@ -925,7 +943,8 @@ class ChatUserLogicImpl
 			ChatUserImageType.audio,
 			newMedia,
 			null,
-			message,
+			Optional.of (
+				message),
 			append);
 
 	}
@@ -938,7 +957,7 @@ class ChatUserLogicImpl
 			@NonNull byte[] data,
 			@NonNull String filename,
 			@NonNull String mimeType,
-			@NonNull MessageRec message,
+			@NonNull Optional<MessageRec> message,
 			boolean append) {
 
 		switch (type) {
@@ -948,7 +967,11 @@ class ChatUserLogicImpl
 			setPhoto (
 				chatUser,
 				data,
-				null,
+				Optional.of (
+					filename),
+				Optional.of (
+					mimeType),
+				message,
 				true);
 
 			break;
@@ -1020,7 +1043,7 @@ class ChatUserLogicImpl
 	boolean setPlace (
 			@NonNull ChatUserRec chatUser,
 			@NonNull String place,
-			@NonNull MessageRec message) {
+			@NonNull Optional<MessageRec> message) {
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -1077,16 +1100,16 @@ class ChatUserLogicImpl
 							chatUser.getCode (),
 
 							"Message: %s\n",
-							message != null
-								? message.getId ()
+							message.isPresent ()
+								? message.get ().getId ()
 								: "(via api)",
 
 							"Location: %s\n",
 							place,
 
 							"Timestamp: %s\n",
-							message != null
-								? message.getCreatedTime ()
+							message.isPresent ()
+								? message.get ().getCreatedTime ()
 								: "(via api)"));
 
 				} catch (Exception exception) {
@@ -1436,8 +1459,18 @@ class ChatUserLogicImpl
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();
 
+		if (chatScheme != null) {
+
+			return timeFormatter.timezone (
+				chatScheme.getTimezone ());
+
+		}
+
+		ChatRec chat =
+			chatUser.getChat ();
+
 		return timeFormatter.timezone (
-			chatScheme.getTimezone ());
+			chat.getTimezone ());
 
 	}
 

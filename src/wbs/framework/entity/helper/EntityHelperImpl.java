@@ -153,15 +153,17 @@ class EntityHelperImpl
 		try {
 
 			FileUtils.deleteDirectory (
-				new File ("../work/model"));
+				new File (
+					"work/model"));
 
 			FileUtils.forceMkdir (
-				new File ("../work/model"));
+				new File (
+					"work/model"));
 
 		} catch (IOException exception) {
 
 			log.error (
-				"Error deleting contents of ../work/model",
+				"Error deleting contents of work/model",
 				exception);
 
 		}
@@ -203,7 +205,7 @@ class EntityHelperImpl
 
 			String outputFilename =
 				stringFormat (
-					"../work/model/%s.xml",
+					"work/model/%s.xml",
 					camelToHyphen (model.objectName ()));
 
 			try {

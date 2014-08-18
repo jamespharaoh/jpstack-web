@@ -869,10 +869,14 @@ class ChatUserPendingFormAction
 			message =
 				chatSendLogic.sendMessageMmsFree (
 					chatUser,
-					null,
+					Optional.<Integer>absent (),
 					messageParam,
-					commandHelper.findByCode (chat, mode.commandCode ()),
-					serviceHelper.findByCode (chat, "system"));
+					commandHelper.findByCode (
+						chat,
+						mode.commandCode ()),
+					serviceHelper.findByCode (
+						chat,
+						"system"));
 
 		}
 
@@ -885,12 +889,16 @@ class ChatUserPendingFormAction
 			message,
 			chatMessage,
 			messageParam,
-			commandHelper.findByCode (chat, mode.commandCode ()));
+			commandHelper.findByCode (
+				chat,
+				mode.commandCode ()));
 
 		// clear queue item
 
 		Responder responder =
-			updateQueueItem (chatUser, myUser);
+			updateQueueItem (
+				chatUser,
+				myUser);
 
 		// wrap up
 
@@ -912,16 +920,24 @@ class ChatUserPendingFormAction
 			ChatUserRec chatUser,
 			UserRec myUser) {
 
-		if (moreToApprove (chatUser))
-			return responder ("chatUserPendingFormResponder");
+		if (moreToApprove (chatUser)) {
+
+			return responder (
+				"chatUserPendingFormResponder");
+
+		}
 
 		queueLogic.processQueueItem (
 			chatUser.getQueueItem (),
 			myUser);
 
-		chatUser.setQueueItem (null);
+		chatUser
 
-		return responder ("queueHomeResponder");
+			.setQueueItem (
+				null);
+
+		return responder (
+			"queueHomeResponder");
 
 	}
 

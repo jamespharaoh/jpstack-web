@@ -21,7 +21,7 @@
   <target name="fixtures" depends="just-build-framework, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-fixtures"/>
   <target name="tomcat-test" depends="just-build-framework, just-build-rest, just-console-test, just-api-test, just-tomcat-test"/>
   <target name="just-clean">
-    <delete dir="work"/>
+    <delete dir="work/bin"/>
   </target>
   <target name="just-build-framework">
     <mkdir dir="work/bin"/>
@@ -395,7 +395,7 @@
         <exclude name="service-api.jar"/>
       </fileset>
     </copy>
-    <copy file="console/web-live.xml" tofile="work/live/api/WEB-INF/web.xml"/>
+    <copy file="api/web-live.xml" tofile="work/live/api/WEB-INF/web.xml"/>
   </target>
   <target name="just-tomcat-live">
     <mkdir dir="temp"/>
@@ -427,7 +427,7 @@
     <copy todir="work/live/tomcat/apps/api/host-manager">
       <fileset dir="work/live/tomcat/webapps/host-manager"/>
     </copy>
-    <exec failonerror="true" executable="work/live/tomcat/bin/catalina.sh">
+    <exec failonerror="false" executable="work/live/tomcat/bin/catalina.sh">
       <arg line="run"/>
     </exec>
   </target>
@@ -781,7 +781,7 @@
         <exclude name="service-api.jar"/>
       </fileset>
     </copy>
-    <copy file="console/web-test.xml" tofile="work/test/api/WEB-INF/web.xml"/>
+    <copy file="api/web-test.xml" tofile="work/test/api/WEB-INF/web.xml"/>
   </target>
   <target name="just-tomcat-test">
     <mkdir dir="temp"/>
@@ -813,24 +813,24 @@
     <copy todir="work/test/tomcat/apps/api/host-manager">
       <fileset dir="work/test/tomcat/webapps/host-manager"/>
     </copy>
-    <exec failonerror="true" executable="work/test/tomcat/bin/catalina.sh">
+    <exec failonerror="false" executable="work/test/tomcat/bin/catalina.sh">
       <arg line="run"/>
     </exec>
   </target>
   <target name="just-api-restart">
-    <exec failonerror="true" executable="./service">
+    <exec failonerror="false" executable="./service">
       <arg value="tomcat_api"/>
       <arg value="restart"/>
     </exec>
   </target>
   <target name="just-console-restart">
-    <exec failonerror="true" executable="./service">
+    <exec failonerror="false" executable="./service">
       <arg value="tomcat_console"/>
       <arg value="restart"/>
     </exec>
   </target>
   <target name="just-daemon-restart">
-    <exec failonerror="true" executable="./service">
+    <exec failonerror="false" executable="./service">
       <arg value="daemon"/>
       <arg value="restart"/>
     </exec>
@@ -847,12 +847,12 @@
     </javadoc>
   </target>
   <target name="just-db-drop">
-    <exec failonerror="true" executable="dropdb">
+    <exec failonerror="false" executable="dropdb">
       <arg line="${database.name}"/>
     </exec>
   </target>
   <target name="just-db-create">
-    <exec failonerror="false" executable="createdb">
+    <exec failonerror="true" executable="createdb">
       <arg line="${database.name}"/>
     </exec>
   </target>
@@ -909,6 +909,7 @@
       <script name="src/wbs/apn/chat/affiliate/model/chat-affiliate-users-summary.sql"/>
       <script name="src/wbs/apn/chat/broadcast/model/chat-broadcast.sql"/>
       <script name="src/wbs/apn/chat/contact/model/chat-message.sql"/>
+      <script name="src/wbs/apn/chat/user/image/model/chat-user-image.sql"/>
       <script name="src/wbs/apn/chat/namednote/model/chat-named-note.sql"/>
       <script name="src/wbs/apn/chat/user/core/model/chat-user.sql"/>
       <script name="src/wbs/apn/chat/user/core/model/chat-user-session.sql"/>
@@ -986,6 +987,7 @@
       <script name="src/wbs/apn/chat/broadcast/model/chat-broadcast-data.sql"/>
       <script name="src/wbs/apn/chat/contact/model/chat-contact-data.sql"/>
       <script name="src/wbs/apn/chat/help/model/chat-help-data.sql"/>
+      <script name="src/wbs/apn/chat/user/image/model/chat-user-image-data.sql"/>
       <script name="src/wbs/apn/chat/user/info/model/chat-info-data.sql"/>
       <script name="src/wbs/apn/chat/user/info/model/chat-profile-data.sql"/>
       <script name="src/wbs/apn/chat/infosite/model/chat-info-site-data.sql"/>

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd $BASEDIR/wbs-apn
+cd $BASEDIR
 
 daemon_start_timeout=5
 daemon_stop_timeout=5
