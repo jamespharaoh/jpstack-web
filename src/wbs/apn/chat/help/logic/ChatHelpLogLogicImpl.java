@@ -85,18 +85,35 @@ class ChatHelpLogLogicImpl
 
 		return objectManager.insert (
 			new ChatHelpLogRec ()
-				.setChatUser (chatUser)
-				.setReplyTo (replyTo)
-				.setUser (user)
-				.setMessage (message)
-				.setChatMessage (chatMessage)
-				.setText (text)
-				.setCommand (command)
-				.setOurNumber (
-					message != null
-						? message.getNumFrom ()
-						: null)
-				.setDirection (MessageDirection.out));
+
+			.setChatUser (
+				chatUser)
+
+			.setReplyTo (
+				replyTo)
+
+			.setUser (
+				user)
+
+			.setMessage (
+				message)
+
+			.setChatMessage (
+				chatMessage)
+
+			.setText (
+				text)
+
+			.setCommand (
+				command)
+
+			.setOurNumber (
+				message.getNumFrom ())
+
+			.setDirection (
+				MessageDirection.out)
+
+		);
 
 	}
 

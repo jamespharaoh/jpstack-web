@@ -1,6 +1,7 @@
 package wbs.smsapps.forwarder.logic;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -731,7 +732,9 @@ class ForwarderLogicImpl
 
 	}
 
-	private ForwarderMessageOutRec findExistingForwarderMessageOut (
+	@SuppressWarnings ("null")
+	private
+	ForwarderMessageOutRec findExistingForwarderMessageOut (
 			ForwarderRec forwarder,
 			ForwarderMessageInRec forwarderMessageIn,
 			String messageText,
@@ -768,21 +771,70 @@ class ForwarderLogicImpl
 					message.getId ())
 				: null;
 
-		if (! equal (forwarderMessaeOut.getForwarderMessageIn (), forwarderMessageIn)
-				|| ! equal (message.getNumFrom (), numFrom)
-				|| ! equal (message.getNumTo (), numTo)
-				|| ! equal (forwarderMessaeOut.getForwarderRoute (), route)
-				|| ! equal (message.getPri (), priority)
-				|| (url == null && (!equal(message.getMessageType().getCode(), "sms") || !equal(
-						message.getText().getText(), messageText)))
-				|| (url != null && (!equal(message.getMessageType().getCode(),
+		if (
+
+			notEqual (
+				forwarderMessaeOut.getForwarderMessageIn (),
+				forwarderMessageIn)
+
+			|| notEqual (
+				message.getNumFrom (),
+				numFrom)
+
+			|| notEqual (
+				message.getNumTo (),
+				numTo)
+
+			|| notEqual (
+				forwarderMessaeOut.getForwarderRoute (),
+				route)
+
+			|| notEqual (
+				message.getPri (),
+				priority)
+
+			|| (
+
+				url == null
+
+				&& (
+					notEqual (
+						message.getMessageType ().getCode (),
+						"sms")
+					|| notEqual (
+						message.getText ().getText (),
+						messageText)
+				)
+
+			) || (
+
+				url != null
+
+				&& (
+
+					notEqual (
+						message.getMessageType ().getCode (),
 						"wap_push")
-						|| !equal(wapPushMessage.getTextText().getText(), messageText) || !equal(wapPushMessage
-						.getUrlText().getText(), url))))
+
+					|| notEqual (
+						wapPushMessage.getTextText ().getText (),
+						messageText)
+
+					|| notEqual (
+						wapPushMessage.getUrlText ().getText (),
+						url)
+
+				)
+
+			)
+
+		) {
 
 			throw new ForwarderSendClientIdException (
 				"Client message ID reused: " + otherId + " forwarder "
 				+ forwarder.getId ());
+
+		}
 
 		// return
 

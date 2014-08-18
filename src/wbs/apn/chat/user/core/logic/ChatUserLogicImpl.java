@@ -1085,7 +1085,9 @@ class ChatUserLogicImpl
 							place,
 
 							"Timestamp: %s\n",
-							message.getCreatedTime ()));
+							message != null
+								? message.getCreatedTime ()
+								: "(via api)"));
 
 				} catch (Exception exception) {
 

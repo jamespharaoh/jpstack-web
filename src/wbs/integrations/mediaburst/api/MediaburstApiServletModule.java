@@ -2,7 +2,6 @@ package wbs.integrations.mediaburst.api;
 
 import static wbs.framework.utils.etc.Misc.fromHex;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
-import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -249,8 +248,7 @@ class MediaburstApiServletModule
 			ConcatenatedInformationElement concatenatedInformationElement;
 
 			if (
-				isNotNull (
-					userDataHeader)
+				userDataHeader != null
 			) {
 
 				concatenatedInformationElement =
