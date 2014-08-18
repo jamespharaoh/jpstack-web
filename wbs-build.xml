@@ -1,0 +1,65 @@
+<wbs-build
+	name="wbs-hades">
+
+	<projects>
+
+		<!-- core -->
+
+		<project
+			name="wbs-framework"
+			package="wbs.framework"/>
+
+		<project
+			name="wbs-platform"
+			package="wbs.platform"/>
+
+		<!-- extensions -->
+
+		<project
+			name="wbs-sms"
+			package="wbs.sms"/>
+
+		<!-- applications -->
+
+		<project
+			name="wbs-sms-apps"
+			package="wbs.smsapps"/>
+
+		<project
+			name="wbs-psychic"
+			package="wbs.psychic"/>
+
+		<project
+			name="wbs-apn"
+			package="wbs.apn"/>
+
+		<!-- integrations -->
+
+		<project
+			name="wbs-integrations"
+			package="wbs.integrations"/>
+
+	</projects>
+
+	<git-links>
+
+		<git-link
+			name="wbs-combined"
+			source="refs/remotes/wbs-combined/master"
+			local="refs/heads/master"
+			target="refs/heads/wbs-combined">
+
+			<path name="etc"/>
+			<path name="src/wbs/apn"/>
+			<path name="src/wbs/framework"/>
+			<path name="src/wbs/integrations"/>
+			<path name="src/wbs/platform"/>
+			<path name="src/wbs/psychic"/>
+			<path name="src/wbs/sms"/>
+			<path name="src/wbs/smsapps"/>
+
+		</git-link>
+
+	</git-links>
+
+</wbs-build>

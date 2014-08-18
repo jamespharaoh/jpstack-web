@@ -1,0 +1,27 @@
+#!/bin/sh
+
+tomcat_console_start_timeout=60
+tomcat_console_stop_timeout=15
+tomcat_console_kill_timeout=5
+
+function tomcat_console_is_running_1 {
+	ps ax | grep Dcatalina.base=/home/james/tomcat/console | grep -v grep >/dev/null
+}
+
+function tomcat_console_is_running_2 {
+	$BASEDIR/wbs-apn/c/socktest localhost 8010 && \
+	$BASEDIR/wbs-apn/c/socktest localhost 8012
+}
+
+function tomcat_console_start {
+	unset DISPLAY
+	sudo svc -u /service/tomcat-console
+}
+
+function tomcat_console_stop {
+	sudo svc -d /service/tomcat-console
+}
+
+function tomcat_console_kill {
+	kill -kill $(ps ax | grep Dcatalina.base=/home/james/tomcat/console | grep -v grep | cut -d' ' -f1)
+}

@@ -1,0 +1,28 @@
+#!/bin/sh
+
+cd $BASEDIR/wbs-apn
+
+daemon_start_timeout=5
+daemon_stop_timeout=5
+daemon_kill_timeout=5
+
+function daemon_is_running_1 {
+	ps ax | grep wbs.platform.daemon.DaemonRunner | grep -v grep >/dev/null
+}
+
+function daemon_is_running_2 {
+	true
+}
+
+function daemon_start {
+	unset DISPLAY
+	sudo svc -u /service/daemon
+}
+
+function daemon_stop {
+	sudo svc -d /service/daemon
+}
+
+function daemon_kill {
+	kill -kill $(cat daemon.pid)
+}

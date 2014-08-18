@@ -1,0 +1,15 @@
+/RemoteSystemsTempFiles
+/binaries
+/conf
+/env*
+/.bin
+/bin
+/api-*
+/console-*
+/tomcat-*
+/work
+/.apt_generated
+/wbs-framework.jar
+/c/modeminit
+/c/socktest
+/work

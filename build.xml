@@ -1,0 +1,1028 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="wbs-hades" basedir="." default="build">
+  <property environment="env"/>
+  <property file="${env.WBS_BUILD_PROPERTIES}"/>
+  <path id="classpath">
+    <fileset dir="lib" includes="*.jar"/>
+    <pathelement path="work/bin"/>
+  </path>
+  <target name="clean" depends="just-clean"/>
+  <target name="build" depends="just-build-framework, just-build-rest"/>
+  <target name="framework-jar" depends="just-build-framework, just-framework-jar"/>
+  <target name="console-live" depends="just-build-framework, just-build-rest, just-console-live"/>
+  <target name="console-test" depends="just-build-framework, just-build-rest, just-console-test"/>
+  <target name="console-auto" depends="just-build-framework, just-build-rest, just-console-live, just-console-restart"/>
+  <target name="api-live" depends="just-build-framework, just-build-rest, just-api-live"/>
+  <target name="api-test" depends="just-build-framework, just-build-rest, just-api-test"/>
+  <target name="api-auto" depends="just-build-framework, just-build-rest, just-api-live, just-api-restart"/>
+  <target name="daemon-auto" depends="just-build-framework, just-build-rest, just-daemon-restart"/>
+  <target name="all-auto" depends="just-build-framework, just-build-rest, just-api-live, just-api-restart, just-console-live, just-console-restart, just-daemon-restart"/>
+  <target name="javadoc" depends="just-javadoc"/>
+  <target name="fixtures" depends="just-build-framework, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-fixtures"/>
+  <target name="tomcat-test" depends="just-build-framework, just-build-rest, just-console-test, just-api-test, just-tomcat-test"/>
+  <target name="just-clean">
+    <delete dir="work"/>
+  </target>
+  <target name="just-build-framework">
+    <mkdir dir="work/bin"/>
+    <javac destdir="work/bin" debug="on" includeantruntime="false" srcdir="src" classpathref="classpath" includes="wbs/framework/**"/>
+    <mkdir dir="work/bin/META-INF/services"/>
+    <echo file="work/bin/META-INF/services/javax.annotation.processing.Processor" message="wbs.framework.object.ObjectHelperAnnotationProcessor"/>
+  </target>
+  <target name="just-framework-jar">
+    <jar destfile="work/wbs-framework.jar" basedir="work/bin">
+      <include name="wbs/framework/**"/>
+      <service type="javax.annotation.processing.Processor" provider="wbs.framework.object.ObjectHelperAnnotationProcessor"/>
+    </jar>
+  </target>
+  <target name="just-build-rest">
+    <javac destdir="work/bin" debug="on" includeantruntime="false" srcdir="src" classpathref="classpath" excludes="wbs/framework/**"/>
+    <copy todir="work/bin">
+      <fileset dir="src">
+        <include name="**/*.xml"/>
+        <include name="log4j.properties"/>
+      </fileset>
+    </copy>
+    <copy file="wbs-build.xml" todir="work/bin"/>
+  </target>
+  <target name="just-console-live">
+    <mkdir dir="work/live/console"/>
+    <mkdir dir="work/live/console/WEB-INF"/>
+    <mkdir dir="work/live/console/WEB-INF/classes"/>
+    <mkdir dir="work/live/console/WEB-INF/lib"/>
+    <copy todir="work/live/console" failonerror="false">
+      <fileset dir="src/wbs/framework/activitymanager/console/files"/>
+      <fileset dir="src/wbs/framework/builder/console/files"/>
+      <fileset dir="src/wbs/framework/database/console/files"/>
+      <fileset dir="src/wbs/framework/entity/console/files"/>
+      <fileset dir="src/wbs/framework/hibernate/console/files"/>
+      <fileset dir="src/wbs/framework/object/console/files"/>
+      <fileset dir="src/wbs/framework/schema/console/files"/>
+      <fileset dir="src/wbs/framework/sql/console/files"/>
+      <fileset dir="src/wbs/framework/web/console/files"/>
+      <fileset dir="src/wbs/framework/application/config/console/files"/>
+      <fileset dir="src/wbs/platform/object/core/console/files"/>
+      <fileset dir="src/wbs/platform/currency/console/files"/>
+      <fileset dir="src/wbs/platform/affiliate/console/files"/>
+      <fileset dir="src/wbs/platform/console/helper/files"/>
+      <fileset dir="src/wbs/platform/console/forms/files"/>
+      <fileset dir="src/wbs/platform/status/console/files"/>
+      <fileset dir="src/wbs/platform/console/request/files"/>
+      <fileset dir="src/wbs/platform/core/console/files"/>
+      <fileset dir="src/wbs/platform/console/responder/files"/>
+      <fileset dir="src/wbs/platform/console/part/files"/>
+      <fileset dir="src/wbs/platform/console/misc/files"/>
+      <fileset dir="src/wbs/platform/console/tab/files"/>
+      <fileset dir="src/wbs/platform/console/context/files"/>
+      <fileset dir="src/wbs/platform/console/combo/files"/>
+      <fileset dir="src/wbs/platform/console/spec/files"/>
+      <fileset dir="src/wbs/platform/console/object/files"/>
+      <fileset dir="src/wbs/platform/console/metamodule/files"/>
+      <fileset dir="src/wbs/platform/hooks/console/files"/>
+      <fileset dir="src/wbs/platform/object/criteria/console/files"/>
+      <fileset dir="src/wbs/platform/object/link/console/files"/>
+      <fileset dir="src/wbs/platform/object/summary/console/files"/>
+      <fileset dir="src/wbs/platform/console/html/files"/>
+      <fileset dir="src/wbs/platform/event/console/files"/>
+      <fileset dir="src/wbs/platform/exception/console/files"/>
+      <fileset dir="src/wbs/platform/groovy/console/files"/>
+      <fileset dir="src/wbs/platform/group/console/files"/>
+      <fileset dir="src/wbs/platform/lock/console/files"/>
+      <fileset dir="src/wbs/platform/media/console/files"/>
+      <fileset dir="src/wbs/platform/menu/console/files"/>
+      <fileset dir="src/wbs/platform/object/browse/console/files"/>
+      <fileset dir="src/wbs/platform/object/create/console/files"/>
+      <fileset dir="src/wbs/platform/object/list/console/files"/>
+      <fileset dir="src/wbs/platform/object/search/console/files"/>
+      <fileset dir="src/wbs/platform/object/settings/console/files"/>
+      <fileset dir="src/wbs/platform/priv/console/files"/>
+      <fileset dir="src/wbs/platform/pyp/console/files"/>
+      <fileset dir="src/wbs/platform/supervisor/console/files"/>
+      <fileset dir="src/wbs/platform/queue/console/files"/>
+      <fileset dir="src/wbs/platform/scaffold/console/files"/>
+      <fileset dir="src/wbs/platform/script/language/console/files"/>
+      <fileset dir="src/wbs/platform/script/system/console/files"/>
+      <fileset dir="src/wbs/platform/script/core/console/files"/>
+      <fileset dir="src/wbs/platform/service/console/files"/>
+      <fileset dir="src/wbs/platform/text/console/files"/>
+      <fileset dir="src/wbs/platform/user/console/files"/>
+      <fileset dir="src/wbs/platform/console/module/files"/>
+      <fileset dir="src/wbs/platform/updatelog/console/files"/>
+      <fileset dir="src/wbs/platform/postgresql/console/files"/>
+      <fileset dir="src/wbs/platform/daemon/console/files"/>
+      <fileset dir="src/wbs/platform/rpc/console/files"/>
+      <fileset dir="src/wbs/platform/api/console/files"/>
+      <fileset dir="src/wbs/platform/reporting/console/files"/>
+      <fileset dir="src/wbs/platform/common/console/files"/>
+      <fileset dir="src/wbs/sms/common/console/files"/>
+      <fileset dir="src/wbs/sms/gsm/console/files"/>
+      <fileset dir="src/wbs/sms/network/console/files"/>
+      <fileset dir="src/wbs/sms/number/core/console/files"/>
+      <fileset dir="src/wbs/sms/number/lookup/console/files"/>
+      <fileset dir="src/wbs/sms/number/format/console/files"/>
+      <fileset dir="src/wbs/sms/route/core/console/files"/>
+      <fileset dir="src/wbs/sms/gazetteer/console/files"/>
+      <fileset dir="src/wbs/sms/command/console/files"/>
+      <fileset dir="src/wbs/sms/message/delivery/console/files"/>
+      <fileset dir="src/wbs/sms/route/http/console/files"/>
+      <fileset dir="src/wbs/sms/message/inbox/console/files"/>
+      <fileset dir="src/wbs/sms/keyword/console/files"/>
+      <fileset dir="src/wbs/sms/locator/console/files"/>
+      <fileset dir="src/wbs/sms/magicnumber/console/files"/>
+      <fileset dir="src/wbs/sms/message/batch/console/files"/>
+      <fileset dir="src/wbs/sms/message/core/console/files"/>
+      <fileset dir="src/wbs/sms/object/messages/console/files"/>
+      <fileset dir="src/wbs/sms/message/report/console/files"/>
+      <fileset dir="src/wbs/sms/messageset/console/files"/>
+      <fileset dir="src/wbs/sms/message/stats/console/files"/>
+      <fileset dir="src/wbs/sms/message/status/console/files"/>
+      <fileset dir="src/wbs/sms/message/ticker/console/files"/>
+      <fileset dir="src/wbs/sms/number/blacklist/console/files"/>
+      <fileset dir="src/wbs/sms/object/stats/console/files"/>
+      <fileset dir="src/wbs/sms/message/outbox/console/files"/>
+      <fileset dir="src/wbs/sms/modempoll/console/files"/>
+      <fileset dir="src/wbs/sms/number/list/console/files"/>
+      <fileset dir="src/wbs/sms/route/router/console/files"/>
+      <fileset dir="src/wbs/sms/route/sender/console/files"/>
+      <fileset dir="src/wbs/sms/route/test/console/files"/>
+      <fileset dir="src/wbs/sms/route/tester/console/files"/>
+      <fileset dir="src/wbs/sms/smpp/console/files"/>
+      <fileset dir="src/wbs/sms/template/console/files"/>
+      <fileset dir="src/wbs/sms/tracker/console/files"/>
+      <fileset dir="src/wbs/sms/message/wap/console/files"/>
+      <fileset dir="src/wbs/smsapps/common/console/files"/>
+      <fileset dir="src/wbs/smsapps/alerts/console/files"/>
+      <fileset dir="src/wbs/smsapps/autoresponder/console/files"/>
+      <fileset dir="src/wbs/smsapps/broadcast/console/files"/>
+      <fileset dir="src/wbs/smsapps/forwarder/console/files"/>
+      <fileset dir="src/wbs/smsapps/manualresponder/console/files"/>
+      <fileset dir="src/wbs/smsapps/orderer/console/files"/>
+      <fileset dir="src/wbs/smsapps/photograbber/console/files"/>
+      <fileset dir="src/wbs/smsapps/subscription/console/files"/>
+      <fileset dir="src/wbs/smsapps/ticketer/console/files"/>
+      <fileset dir="src/wbs/psychic/affiliate/console/files"/>
+      <fileset dir="src/wbs/psychic/affiliategroup/console/files"/>
+      <fileset dir="src/wbs/psychic/bill/console/files"/>
+      <fileset dir="src/wbs/psychic/contact/console/files"/>
+      <fileset dir="src/wbs/psychic/core/console/files"/>
+      <fileset dir="src/wbs/psychic/help/console/files"/>
+      <fileset dir="src/wbs/psychic/keyword/console/files"/>
+      <fileset dir="src/wbs/psychic/profile/console/files"/>
+      <fileset dir="src/wbs/psychic/request/console/files"/>
+      <fileset dir="src/wbs/psychic/send/console/files"/>
+      <fileset dir="src/wbs/psychic/template/console/files"/>
+      <fileset dir="src/wbs/psychic/user/core/console/files"/>
+      <fileset dir="src/wbs/psychic/user/admin/console/files"/>
+      <fileset dir="src/wbs/apn/chat/core/console/files"/>
+      <fileset dir="src/wbs/apn/chat/ad/console/files"/>
+      <fileset dir="src/wbs/apn/chat/adult/console/files"/>
+      <fileset dir="src/wbs/apn/chat/affiliate/console/files"/>
+      <fileset dir="src/wbs/apn/chat/api/console/files"/>
+      <fileset dir="src/wbs/apn/chat/approval/console/files"/>
+      <fileset dir="src/wbs/apn/chat/bill/console/files"/>
+      <fileset dir="src/wbs/apn/chat/broadcast/console/files"/>
+      <fileset dir="src/wbs/apn/chat/contact/console/files"/>
+      <fileset dir="src/wbs/apn/chat/date/console/files"/>
+      <fileset dir="src/wbs/apn/chat/graphs/console/files"/>
+      <fileset dir="src/wbs/apn/chat/help/console/files"/>
+      <fileset dir="src/wbs/apn/chat/user/image/console/files"/>
+      <fileset dir="src/wbs/apn/chat/user/info/console/files"/>
+      <fileset dir="src/wbs/apn/chat/infosite/console/files"/>
+      <fileset dir="src/wbs/apn/chat/user/join/console/files"/>
+      <fileset dir="src/wbs/apn/chat/keyword/console/files"/>
+      <fileset dir="src/wbs/apn/chat/namednote/console/files"/>
+      <fileset dir="src/wbs/apn/chat/scheme/console/files"/>
+      <fileset dir="src/wbs/apn/chat/settings/console/files"/>
+      <fileset dir="src/wbs/apn/chat/supervisor/console/files"/>
+      <fileset dir="src/wbs/apn/chat/user/core/console/files"/>
+      <fileset dir="src/wbs/apn/chat/user/admin/console/files"/>
+      <fileset dir="src/wbs/apn/chat/user/pending/console/files"/>
+      <fileset dir="src/wbs/apn/chat/tv/core/console/files"/>
+      <fileset dir="src/wbs/apn/chat/tv/moderation/console/files"/>
+      <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
+      <fileset dir="src/wbs/integrations/comshen/console/files"/>
+      <fileset dir="src/wbs/integrations/dialogue/console/files"/>
+      <fileset dir="src/wbs/integrations/digitalselect/console/files"/>
+      <fileset dir="src/wbs/integrations/hybyte/console/files"/>
+      <fileset dir="src/wbs/integrations/mediaburst/console/files"/>
+      <fileset dir="src/wbs/integrations/mig/console/files"/>
+      <fileset dir="src/wbs/integrations/oxygen8/console/files"/>
+      <fileset dir="src/wbs/integrations/txtnation/console/files"/>
+      <fileset dir="src/wbs/integrations/unwiredplaza/console/files"/>
+      <fileset dir="src/wbs/integrations/urbanairship/console/files"/>
+    </copy>
+    <copy todir="work/live/console/WEB-INF/classes">
+      <fileset dir="work/bin"/>
+    </copy>
+    <copy todir="work/live/console/WEB-INF/lib">
+      <fileset dir="lib">
+        <exclude name="service-api.jar"/>
+      </fileset>
+    </copy>
+    <copy file="console/web-live.xml" tofile="work/live/console/WEB-INF/web.xml"/>
+  </target>
+  <target name="just-api-live">
+    <mkdir dir="work/live/api"/>
+    <mkdir dir="work/live/api/WEB-INF"/>
+    <mkdir dir="work/live/api/WEB-INF/classes"/>
+    <mkdir dir="work/live/api/WEB-INF/lib"/>
+    <copy todir="work/live/api" failonerror="false">
+      <fileset dir="src/wbs/framework/activitymanager/api/files"/>
+      <fileset dir="src/wbs/framework/builder/api/files"/>
+      <fileset dir="src/wbs/framework/database/api/files"/>
+      <fileset dir="src/wbs/framework/entity/api/files"/>
+      <fileset dir="src/wbs/framework/hibernate/api/files"/>
+      <fileset dir="src/wbs/framework/object/api/files"/>
+      <fileset dir="src/wbs/framework/schema/api/files"/>
+      <fileset dir="src/wbs/framework/sql/api/files"/>
+      <fileset dir="src/wbs/framework/web/api/files"/>
+      <fileset dir="src/wbs/framework/application/config/api/files"/>
+      <fileset dir="src/wbs/platform/object/core/api/files"/>
+      <fileset dir="src/wbs/platform/currency/api/files"/>
+      <fileset dir="src/wbs/platform/affiliate/api/files"/>
+      <fileset dir="src/wbs/platform/console/helper/api/files"/>
+      <fileset dir="src/wbs/platform/console/forms/api/files"/>
+      <fileset dir="src/wbs/platform/status/api/files"/>
+      <fileset dir="src/wbs/platform/console/request/api/files"/>
+      <fileset dir="src/wbs/platform/core/api/files"/>
+      <fileset dir="src/wbs/platform/console/responder/api/files"/>
+      <fileset dir="src/wbs/platform/console/part/api/files"/>
+      <fileset dir="src/wbs/platform/console/misc/api/files"/>
+      <fileset dir="src/wbs/platform/console/tab/api/files"/>
+      <fileset dir="src/wbs/platform/console/context/api/files"/>
+      <fileset dir="src/wbs/platform/console/combo/api/files"/>
+      <fileset dir="src/wbs/platform/console/spec/api/files"/>
+      <fileset dir="src/wbs/platform/console/object/api/files"/>
+      <fileset dir="src/wbs/platform/console/metamodule/api/files"/>
+      <fileset dir="src/wbs/platform/hooks/api/files"/>
+      <fileset dir="src/wbs/platform/object/criteria/api/files"/>
+      <fileset dir="src/wbs/platform/object/link/api/files"/>
+      <fileset dir="src/wbs/platform/object/summary/api/files"/>
+      <fileset dir="src/wbs/platform/console/html/api/files"/>
+      <fileset dir="src/wbs/platform/event/api/files"/>
+      <fileset dir="src/wbs/platform/exception/api/files"/>
+      <fileset dir="src/wbs/platform/groovy/api/files"/>
+      <fileset dir="src/wbs/platform/group/api/files"/>
+      <fileset dir="src/wbs/platform/lock/api/files"/>
+      <fileset dir="src/wbs/platform/media/api/files"/>
+      <fileset dir="src/wbs/platform/menu/api/files"/>
+      <fileset dir="src/wbs/platform/object/browse/api/files"/>
+      <fileset dir="src/wbs/platform/object/create/api/files"/>
+      <fileset dir="src/wbs/platform/object/list/api/files"/>
+      <fileset dir="src/wbs/platform/object/search/api/files"/>
+      <fileset dir="src/wbs/platform/object/settings/api/files"/>
+      <fileset dir="src/wbs/platform/priv/api/files"/>
+      <fileset dir="src/wbs/platform/pyp/api/files"/>
+      <fileset dir="src/wbs/platform/supervisor/api/files"/>
+      <fileset dir="src/wbs/platform/queue/api/files"/>
+      <fileset dir="src/wbs/platform/scaffold/api/files"/>
+      <fileset dir="src/wbs/platform/script/language/api/files"/>
+      <fileset dir="src/wbs/platform/script/system/api/files"/>
+      <fileset dir="src/wbs/platform/script/core/api/files"/>
+      <fileset dir="src/wbs/platform/service/api/files"/>
+      <fileset dir="src/wbs/platform/text/api/files"/>
+      <fileset dir="src/wbs/platform/user/api/files"/>
+      <fileset dir="src/wbs/platform/console/module/api/files"/>
+      <fileset dir="src/wbs/platform/updatelog/api/files"/>
+      <fileset dir="src/wbs/platform/postgresql/api/files"/>
+      <fileset dir="src/wbs/platform/daemon/api/files"/>
+      <fileset dir="src/wbs/platform/rpc/api/files"/>
+      <fileset dir="src/wbs/platform/api/api/files"/>
+      <fileset dir="src/wbs/platform/reporting/api/files"/>
+      <fileset dir="src/wbs/platform/common/api/files"/>
+      <fileset dir="src/wbs/sms/common/api/files"/>
+      <fileset dir="src/wbs/sms/gsm/api/files"/>
+      <fileset dir="src/wbs/sms/network/api/files"/>
+      <fileset dir="src/wbs/sms/number/core/api/files"/>
+      <fileset dir="src/wbs/sms/number/lookup/api/files"/>
+      <fileset dir="src/wbs/sms/number/format/api/files"/>
+      <fileset dir="src/wbs/sms/route/core/api/files"/>
+      <fileset dir="src/wbs/sms/gazetteer/api/files"/>
+      <fileset dir="src/wbs/sms/command/api/files"/>
+      <fileset dir="src/wbs/sms/message/delivery/api/files"/>
+      <fileset dir="src/wbs/sms/route/http/api/files"/>
+      <fileset dir="src/wbs/sms/message/inbox/api/files"/>
+      <fileset dir="src/wbs/sms/keyword/api/files"/>
+      <fileset dir="src/wbs/sms/locator/api/files"/>
+      <fileset dir="src/wbs/sms/magicnumber/api/files"/>
+      <fileset dir="src/wbs/sms/message/batch/api/files"/>
+      <fileset dir="src/wbs/sms/message/core/api/files"/>
+      <fileset dir="src/wbs/sms/object/messages/api/files"/>
+      <fileset dir="src/wbs/sms/message/report/api/files"/>
+      <fileset dir="src/wbs/sms/messageset/api/files"/>
+      <fileset dir="src/wbs/sms/message/stats/api/files"/>
+      <fileset dir="src/wbs/sms/message/status/api/files"/>
+      <fileset dir="src/wbs/sms/message/ticker/api/files"/>
+      <fileset dir="src/wbs/sms/number/blacklist/api/files"/>
+      <fileset dir="src/wbs/sms/object/stats/api/files"/>
+      <fileset dir="src/wbs/sms/message/outbox/api/files"/>
+      <fileset dir="src/wbs/sms/modempoll/api/files"/>
+      <fileset dir="src/wbs/sms/number/list/api/files"/>
+      <fileset dir="src/wbs/sms/route/router/api/files"/>
+      <fileset dir="src/wbs/sms/route/sender/api/files"/>
+      <fileset dir="src/wbs/sms/route/test/api/files"/>
+      <fileset dir="src/wbs/sms/route/tester/api/files"/>
+      <fileset dir="src/wbs/sms/smpp/api/files"/>
+      <fileset dir="src/wbs/sms/template/api/files"/>
+      <fileset dir="src/wbs/sms/tracker/api/files"/>
+      <fileset dir="src/wbs/sms/message/wap/api/files"/>
+      <fileset dir="src/wbs/smsapps/common/api/files"/>
+      <fileset dir="src/wbs/smsapps/alerts/api/files"/>
+      <fileset dir="src/wbs/smsapps/autoresponder/api/files"/>
+      <fileset dir="src/wbs/smsapps/broadcast/api/files"/>
+      <fileset dir="src/wbs/smsapps/forwarder/api/files"/>
+      <fileset dir="src/wbs/smsapps/manualresponder/api/files"/>
+      <fileset dir="src/wbs/smsapps/orderer/api/files"/>
+      <fileset dir="src/wbs/smsapps/photograbber/api/files"/>
+      <fileset dir="src/wbs/smsapps/subscription/api/files"/>
+      <fileset dir="src/wbs/smsapps/ticketer/api/files"/>
+      <fileset dir="src/wbs/psychic/affiliate/api/files"/>
+      <fileset dir="src/wbs/psychic/affiliategroup/api/files"/>
+      <fileset dir="src/wbs/psychic/bill/api/files"/>
+      <fileset dir="src/wbs/psychic/contact/api/files"/>
+      <fileset dir="src/wbs/psychic/core/api/files"/>
+      <fileset dir="src/wbs/psychic/help/api/files"/>
+      <fileset dir="src/wbs/psychic/keyword/api/files"/>
+      <fileset dir="src/wbs/psychic/profile/api/files"/>
+      <fileset dir="src/wbs/psychic/request/api/files"/>
+      <fileset dir="src/wbs/psychic/send/api/files"/>
+      <fileset dir="src/wbs/psychic/template/api/files"/>
+      <fileset dir="src/wbs/psychic/user/core/api/files"/>
+      <fileset dir="src/wbs/psychic/user/admin/api/files"/>
+      <fileset dir="src/wbs/apn/chat/core/api/files"/>
+      <fileset dir="src/wbs/apn/chat/ad/api/files"/>
+      <fileset dir="src/wbs/apn/chat/adult/api/files"/>
+      <fileset dir="src/wbs/apn/chat/affiliate/api/files"/>
+      <fileset dir="src/wbs/apn/chat/api/api/files"/>
+      <fileset dir="src/wbs/apn/chat/approval/api/files"/>
+      <fileset dir="src/wbs/apn/chat/bill/api/files"/>
+      <fileset dir="src/wbs/apn/chat/broadcast/api/files"/>
+      <fileset dir="src/wbs/apn/chat/contact/api/files"/>
+      <fileset dir="src/wbs/apn/chat/date/api/files"/>
+      <fileset dir="src/wbs/apn/chat/graphs/api/files"/>
+      <fileset dir="src/wbs/apn/chat/help/api/files"/>
+      <fileset dir="src/wbs/apn/chat/user/image/api/files"/>
+      <fileset dir="src/wbs/apn/chat/user/info/api/files"/>
+      <fileset dir="src/wbs/apn/chat/infosite/api/files"/>
+      <fileset dir="src/wbs/apn/chat/user/join/api/files"/>
+      <fileset dir="src/wbs/apn/chat/keyword/api/files"/>
+      <fileset dir="src/wbs/apn/chat/namednote/api/files"/>
+      <fileset dir="src/wbs/apn/chat/scheme/api/files"/>
+      <fileset dir="src/wbs/apn/chat/settings/api/files"/>
+      <fileset dir="src/wbs/apn/chat/supervisor/api/files"/>
+      <fileset dir="src/wbs/apn/chat/user/core/api/files"/>
+      <fileset dir="src/wbs/apn/chat/user/admin/api/files"/>
+      <fileset dir="src/wbs/apn/chat/user/pending/api/files"/>
+      <fileset dir="src/wbs/apn/chat/tv/core/api/files"/>
+      <fileset dir="src/wbs/apn/chat/tv/moderation/api/files"/>
+      <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
+      <fileset dir="src/wbs/integrations/comshen/api/files"/>
+      <fileset dir="src/wbs/integrations/dialogue/api/files"/>
+      <fileset dir="src/wbs/integrations/digitalselect/api/files"/>
+      <fileset dir="src/wbs/integrations/hybyte/api/files"/>
+      <fileset dir="src/wbs/integrations/mediaburst/api/files"/>
+      <fileset dir="src/wbs/integrations/mig/api/files"/>
+      <fileset dir="src/wbs/integrations/oxygen8/api/files"/>
+      <fileset dir="src/wbs/integrations/txtnation/api/files"/>
+      <fileset dir="src/wbs/integrations/unwiredplaza/api/files"/>
+      <fileset dir="src/wbs/integrations/urbanairship/api/files"/>
+    </copy>
+    <copy todir="work/live/api/WEB-INF/classes">
+      <fileset dir="work/bin"/>
+    </copy>
+    <copy todir="work/live/api/WEB-INF/lib">
+      <fileset dir="lib">
+        <exclude name="service-api.jar"/>
+      </fileset>
+    </copy>
+    <copy file="console/web-live.xml" tofile="work/live/api/WEB-INF/web.xml"/>
+  </target>
+  <target name="just-tomcat-live">
+    <mkdir dir="temp"/>
+    <exec failonerror="true" dir="temp" executable="tar">
+      <arg line="--extract"/>
+      <arg line="--file ../binaries/packages/apache-tomcat-6.0.37.tar.gz"/>
+    </exec>
+    <delete dir="work/live/tomcat/**"/>
+    <move file="temp/apache-tomcat-6.0.37" tofile="work/live/tomcat"/>
+    <copy file="console/server-live.xml" tofile="work/live/tomcat/conf/server.xml"/>
+    <copy file="conf/tomcat-users.xml" tofile="work/live/tomcat/conf/tomcat-users.xml"/>
+    <delete dir="work/live/tomcat/apps/console/ROOT"/>
+    <copy todir="work/live/tomcat/apps/console/ROOT">
+      <fileset dir="work/live/console"/>
+    </copy>
+    <copy todir="work/live/tomcat/apps/console/manager">
+      <fileset dir="work/live/tomcat/webapps/manager"/>
+    </copy>
+    <copy todir="work/live/tomcat/apps/console/host-manager">
+      <fileset dir="work/live/tomcat/webapps/host-manager"/>
+    </copy>
+    <delete dir="work/live/tomcat/apps/api/ROOT"/>
+    <copy todir="work/live/tomcat/apps/api/ROOT">
+      <fileset dir="work/live/api"/>
+    </copy>
+    <copy todir="work/live/tomcat/apps/api/manager">
+      <fileset dir="work/live/tomcat/webapps/manager"/>
+    </copy>
+    <copy todir="work/live/tomcat/apps/api/host-manager">
+      <fileset dir="work/live/tomcat/webapps/host-manager"/>
+    </copy>
+    <exec failonerror="true" executable="work/live/tomcat/bin/catalina.sh">
+      <arg line="run"/>
+    </exec>
+  </target>
+  <target name="just-console-test">
+    <mkdir dir="work/test/console"/>
+    <mkdir dir="work/test/console/WEB-INF"/>
+    <mkdir dir="work/test/console/WEB-INF/classes"/>
+    <mkdir dir="work/test/console/WEB-INF/lib"/>
+    <copy todir="work/test/console" failonerror="false">
+      <fileset dir="src/wbs/framework/activitymanager/console/files"/>
+      <fileset dir="src/wbs/framework/builder/console/files"/>
+      <fileset dir="src/wbs/framework/database/console/files"/>
+      <fileset dir="src/wbs/framework/entity/console/files"/>
+      <fileset dir="src/wbs/framework/hibernate/console/files"/>
+      <fileset dir="src/wbs/framework/object/console/files"/>
+      <fileset dir="src/wbs/framework/schema/console/files"/>
+      <fileset dir="src/wbs/framework/sql/console/files"/>
+      <fileset dir="src/wbs/framework/web/console/files"/>
+      <fileset dir="src/wbs/framework/application/config/console/files"/>
+      <fileset dir="src/wbs/platform/object/core/console/files"/>
+      <fileset dir="src/wbs/platform/currency/console/files"/>
+      <fileset dir="src/wbs/platform/affiliate/console/files"/>
+      <fileset dir="src/wbs/platform/console/helper/files"/>
+      <fileset dir="src/wbs/platform/console/forms/files"/>
+      <fileset dir="src/wbs/platform/status/console/files"/>
+      <fileset dir="src/wbs/platform/console/request/files"/>
+      <fileset dir="src/wbs/platform/core/console/files"/>
+      <fileset dir="src/wbs/platform/console/responder/files"/>
+      <fileset dir="src/wbs/platform/console/part/files"/>
+      <fileset dir="src/wbs/platform/console/misc/files"/>
+      <fileset dir="src/wbs/platform/console/tab/files"/>
+      <fileset dir="src/wbs/platform/console/context/files"/>
+      <fileset dir="src/wbs/platform/console/combo/files"/>
+      <fileset dir="src/wbs/platform/console/spec/files"/>
+      <fileset dir="src/wbs/platform/console/object/files"/>
+      <fileset dir="src/wbs/platform/console/metamodule/files"/>
+      <fileset dir="src/wbs/platform/hooks/console/files"/>
+      <fileset dir="src/wbs/platform/object/criteria/console/files"/>
+      <fileset dir="src/wbs/platform/object/link/console/files"/>
+      <fileset dir="src/wbs/platform/object/summary/console/files"/>
+      <fileset dir="src/wbs/platform/console/html/files"/>
+      <fileset dir="src/wbs/platform/event/console/files"/>
+      <fileset dir="src/wbs/platform/exception/console/files"/>
+      <fileset dir="src/wbs/platform/groovy/console/files"/>
+      <fileset dir="src/wbs/platform/group/console/files"/>
+      <fileset dir="src/wbs/platform/lock/console/files"/>
+      <fileset dir="src/wbs/platform/media/console/files"/>
+      <fileset dir="src/wbs/platform/menu/console/files"/>
+      <fileset dir="src/wbs/platform/object/browse/console/files"/>
+      <fileset dir="src/wbs/platform/object/create/console/files"/>
+      <fileset dir="src/wbs/platform/object/list/console/files"/>
+      <fileset dir="src/wbs/platform/object/search/console/files"/>
+      <fileset dir="src/wbs/platform/object/settings/console/files"/>
+      <fileset dir="src/wbs/platform/priv/console/files"/>
+      <fileset dir="src/wbs/platform/pyp/console/files"/>
+      <fileset dir="src/wbs/platform/supervisor/console/files"/>
+      <fileset dir="src/wbs/platform/queue/console/files"/>
+      <fileset dir="src/wbs/platform/scaffold/console/files"/>
+      <fileset dir="src/wbs/platform/script/language/console/files"/>
+      <fileset dir="src/wbs/platform/script/system/console/files"/>
+      <fileset dir="src/wbs/platform/script/core/console/files"/>
+      <fileset dir="src/wbs/platform/service/console/files"/>
+      <fileset dir="src/wbs/platform/text/console/files"/>
+      <fileset dir="src/wbs/platform/user/console/files"/>
+      <fileset dir="src/wbs/platform/console/module/files"/>
+      <fileset dir="src/wbs/platform/updatelog/console/files"/>
+      <fileset dir="src/wbs/platform/postgresql/console/files"/>
+      <fileset dir="src/wbs/platform/daemon/console/files"/>
+      <fileset dir="src/wbs/platform/rpc/console/files"/>
+      <fileset dir="src/wbs/platform/api/console/files"/>
+      <fileset dir="src/wbs/platform/reporting/console/files"/>
+      <fileset dir="src/wbs/platform/common/console/files"/>
+      <fileset dir="src/wbs/sms/common/console/files"/>
+      <fileset dir="src/wbs/sms/gsm/console/files"/>
+      <fileset dir="src/wbs/sms/network/console/files"/>
+      <fileset dir="src/wbs/sms/number/core/console/files"/>
+      <fileset dir="src/wbs/sms/number/lookup/console/files"/>
+      <fileset dir="src/wbs/sms/number/format/console/files"/>
+      <fileset dir="src/wbs/sms/route/core/console/files"/>
+      <fileset dir="src/wbs/sms/gazetteer/console/files"/>
+      <fileset dir="src/wbs/sms/command/console/files"/>
+      <fileset dir="src/wbs/sms/message/delivery/console/files"/>
+      <fileset dir="src/wbs/sms/route/http/console/files"/>
+      <fileset dir="src/wbs/sms/message/inbox/console/files"/>
+      <fileset dir="src/wbs/sms/keyword/console/files"/>
+      <fileset dir="src/wbs/sms/locator/console/files"/>
+      <fileset dir="src/wbs/sms/magicnumber/console/files"/>
+      <fileset dir="src/wbs/sms/message/batch/console/files"/>
+      <fileset dir="src/wbs/sms/message/core/console/files"/>
+      <fileset dir="src/wbs/sms/object/messages/console/files"/>
+      <fileset dir="src/wbs/sms/message/report/console/files"/>
+      <fileset dir="src/wbs/sms/messageset/console/files"/>
+      <fileset dir="src/wbs/sms/message/stats/console/files"/>
+      <fileset dir="src/wbs/sms/message/status/console/files"/>
+      <fileset dir="src/wbs/sms/message/ticker/console/files"/>
+      <fileset dir="src/wbs/sms/number/blacklist/console/files"/>
+      <fileset dir="src/wbs/sms/object/stats/console/files"/>
+      <fileset dir="src/wbs/sms/message/outbox/console/files"/>
+      <fileset dir="src/wbs/sms/modempoll/console/files"/>
+      <fileset dir="src/wbs/sms/number/list/console/files"/>
+      <fileset dir="src/wbs/sms/route/router/console/files"/>
+      <fileset dir="src/wbs/sms/route/sender/console/files"/>
+      <fileset dir="src/wbs/sms/route/test/console/files"/>
+      <fileset dir="src/wbs/sms/route/tester/console/files"/>
+      <fileset dir="src/wbs/sms/smpp/console/files"/>
+      <fileset dir="src/wbs/sms/template/console/files"/>
+      <fileset dir="src/wbs/sms/tracker/console/files"/>
+      <fileset dir="src/wbs/sms/message/wap/console/files"/>
+      <fileset dir="src/wbs/smsapps/common/console/files"/>
+      <fileset dir="src/wbs/smsapps/alerts/console/files"/>
+      <fileset dir="src/wbs/smsapps/autoresponder/console/files"/>
+      <fileset dir="src/wbs/smsapps/broadcast/console/files"/>
+      <fileset dir="src/wbs/smsapps/forwarder/console/files"/>
+      <fileset dir="src/wbs/smsapps/manualresponder/console/files"/>
+      <fileset dir="src/wbs/smsapps/orderer/console/files"/>
+      <fileset dir="src/wbs/smsapps/photograbber/console/files"/>
+      <fileset dir="src/wbs/smsapps/subscription/console/files"/>
+      <fileset dir="src/wbs/smsapps/ticketer/console/files"/>
+      <fileset dir="src/wbs/psychic/affiliate/console/files"/>
+      <fileset dir="src/wbs/psychic/affiliategroup/console/files"/>
+      <fileset dir="src/wbs/psychic/bill/console/files"/>
+      <fileset dir="src/wbs/psychic/contact/console/files"/>
+      <fileset dir="src/wbs/psychic/core/console/files"/>
+      <fileset dir="src/wbs/psychic/help/console/files"/>
+      <fileset dir="src/wbs/psychic/keyword/console/files"/>
+      <fileset dir="src/wbs/psychic/profile/console/files"/>
+      <fileset dir="src/wbs/psychic/request/console/files"/>
+      <fileset dir="src/wbs/psychic/send/console/files"/>
+      <fileset dir="src/wbs/psychic/template/console/files"/>
+      <fileset dir="src/wbs/psychic/user/core/console/files"/>
+      <fileset dir="src/wbs/psychic/user/admin/console/files"/>
+      <fileset dir="src/wbs/apn/chat/core/console/files"/>
+      <fileset dir="src/wbs/apn/chat/ad/console/files"/>
+      <fileset dir="src/wbs/apn/chat/adult/console/files"/>
+      <fileset dir="src/wbs/apn/chat/affiliate/console/files"/>
+      <fileset dir="src/wbs/apn/chat/api/console/files"/>
+      <fileset dir="src/wbs/apn/chat/approval/console/files"/>
+      <fileset dir="src/wbs/apn/chat/bill/console/files"/>
+      <fileset dir="src/wbs/apn/chat/broadcast/console/files"/>
+      <fileset dir="src/wbs/apn/chat/contact/console/files"/>
+      <fileset dir="src/wbs/apn/chat/date/console/files"/>
+      <fileset dir="src/wbs/apn/chat/graphs/console/files"/>
+      <fileset dir="src/wbs/apn/chat/help/console/files"/>
+      <fileset dir="src/wbs/apn/chat/user/image/console/files"/>
+      <fileset dir="src/wbs/apn/chat/user/info/console/files"/>
+      <fileset dir="src/wbs/apn/chat/infosite/console/files"/>
+      <fileset dir="src/wbs/apn/chat/user/join/console/files"/>
+      <fileset dir="src/wbs/apn/chat/keyword/console/files"/>
+      <fileset dir="src/wbs/apn/chat/namednote/console/files"/>
+      <fileset dir="src/wbs/apn/chat/scheme/console/files"/>
+      <fileset dir="src/wbs/apn/chat/settings/console/files"/>
+      <fileset dir="src/wbs/apn/chat/supervisor/console/files"/>
+      <fileset dir="src/wbs/apn/chat/user/core/console/files"/>
+      <fileset dir="src/wbs/apn/chat/user/admin/console/files"/>
+      <fileset dir="src/wbs/apn/chat/user/pending/console/files"/>
+      <fileset dir="src/wbs/apn/chat/tv/core/console/files"/>
+      <fileset dir="src/wbs/apn/chat/tv/moderation/console/files"/>
+      <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
+      <fileset dir="src/wbs/integrations/comshen/console/files"/>
+      <fileset dir="src/wbs/integrations/dialogue/console/files"/>
+      <fileset dir="src/wbs/integrations/digitalselect/console/files"/>
+      <fileset dir="src/wbs/integrations/hybyte/console/files"/>
+      <fileset dir="src/wbs/integrations/mediaburst/console/files"/>
+      <fileset dir="src/wbs/integrations/mig/console/files"/>
+      <fileset dir="src/wbs/integrations/oxygen8/console/files"/>
+      <fileset dir="src/wbs/integrations/txtnation/console/files"/>
+      <fileset dir="src/wbs/integrations/unwiredplaza/console/files"/>
+      <fileset dir="src/wbs/integrations/urbanairship/console/files"/>
+    </copy>
+    <copy todir="work/test/console/WEB-INF/classes">
+      <fileset dir="work/bin"/>
+    </copy>
+    <copy todir="work/test/console/WEB-INF/lib">
+      <fileset dir="lib">
+        <exclude name="service-api.jar"/>
+      </fileset>
+    </copy>
+    <copy file="console/web-test.xml" tofile="work/test/console/WEB-INF/web.xml"/>
+  </target>
+  <target name="just-api-test">
+    <mkdir dir="work/test/api"/>
+    <mkdir dir="work/test/api/WEB-INF"/>
+    <mkdir dir="work/test/api/WEB-INF/classes"/>
+    <mkdir dir="work/test/api/WEB-INF/lib"/>
+    <copy todir="work/test/api" failonerror="false">
+      <fileset dir="src/wbs/framework/activitymanager/api/files"/>
+      <fileset dir="src/wbs/framework/builder/api/files"/>
+      <fileset dir="src/wbs/framework/database/api/files"/>
+      <fileset dir="src/wbs/framework/entity/api/files"/>
+      <fileset dir="src/wbs/framework/hibernate/api/files"/>
+      <fileset dir="src/wbs/framework/object/api/files"/>
+      <fileset dir="src/wbs/framework/schema/api/files"/>
+      <fileset dir="src/wbs/framework/sql/api/files"/>
+      <fileset dir="src/wbs/framework/web/api/files"/>
+      <fileset dir="src/wbs/framework/application/config/api/files"/>
+      <fileset dir="src/wbs/platform/object/core/api/files"/>
+      <fileset dir="src/wbs/platform/currency/api/files"/>
+      <fileset dir="src/wbs/platform/affiliate/api/files"/>
+      <fileset dir="src/wbs/platform/console/helper/api/files"/>
+      <fileset dir="src/wbs/platform/console/forms/api/files"/>
+      <fileset dir="src/wbs/platform/status/api/files"/>
+      <fileset dir="src/wbs/platform/console/request/api/files"/>
+      <fileset dir="src/wbs/platform/core/api/files"/>
+      <fileset dir="src/wbs/platform/console/responder/api/files"/>
+      <fileset dir="src/wbs/platform/console/part/api/files"/>
+      <fileset dir="src/wbs/platform/console/misc/api/files"/>
+      <fileset dir="src/wbs/platform/console/tab/api/files"/>
+      <fileset dir="src/wbs/platform/console/context/api/files"/>
+      <fileset dir="src/wbs/platform/console/combo/api/files"/>
+      <fileset dir="src/wbs/platform/console/spec/api/files"/>
+      <fileset dir="src/wbs/platform/console/object/api/files"/>
+      <fileset dir="src/wbs/platform/console/metamodule/api/files"/>
+      <fileset dir="src/wbs/platform/hooks/api/files"/>
+      <fileset dir="src/wbs/platform/object/criteria/api/files"/>
+      <fileset dir="src/wbs/platform/object/link/api/files"/>
+      <fileset dir="src/wbs/platform/object/summary/api/files"/>
+      <fileset dir="src/wbs/platform/console/html/api/files"/>
+      <fileset dir="src/wbs/platform/event/api/files"/>
+      <fileset dir="src/wbs/platform/exception/api/files"/>
+      <fileset dir="src/wbs/platform/groovy/api/files"/>
+      <fileset dir="src/wbs/platform/group/api/files"/>
+      <fileset dir="src/wbs/platform/lock/api/files"/>
+      <fileset dir="src/wbs/platform/media/api/files"/>
+      <fileset dir="src/wbs/platform/menu/api/files"/>
+      <fileset dir="src/wbs/platform/object/browse/api/files"/>
+      <fileset dir="src/wbs/platform/object/create/api/files"/>
+      <fileset dir="src/wbs/platform/object/list/api/files"/>
+      <fileset dir="src/wbs/platform/object/search/api/files"/>
+      <fileset dir="src/wbs/platform/object/settings/api/files"/>
+      <fileset dir="src/wbs/platform/priv/api/files"/>
+      <fileset dir="src/wbs/platform/pyp/api/files"/>
+      <fileset dir="src/wbs/platform/supervisor/api/files"/>
+      <fileset dir="src/wbs/platform/queue/api/files"/>
+      <fileset dir="src/wbs/platform/scaffold/api/files"/>
+      <fileset dir="src/wbs/platform/script/language/api/files"/>
+      <fileset dir="src/wbs/platform/script/system/api/files"/>
+      <fileset dir="src/wbs/platform/script/core/api/files"/>
+      <fileset dir="src/wbs/platform/service/api/files"/>
+      <fileset dir="src/wbs/platform/text/api/files"/>
+      <fileset dir="src/wbs/platform/user/api/files"/>
+      <fileset dir="src/wbs/platform/console/module/api/files"/>
+      <fileset dir="src/wbs/platform/updatelog/api/files"/>
+      <fileset dir="src/wbs/platform/postgresql/api/files"/>
+      <fileset dir="src/wbs/platform/daemon/api/files"/>
+      <fileset dir="src/wbs/platform/rpc/api/files"/>
+      <fileset dir="src/wbs/platform/api/api/files"/>
+      <fileset dir="src/wbs/platform/reporting/api/files"/>
+      <fileset dir="src/wbs/platform/common/api/files"/>
+      <fileset dir="src/wbs/sms/common/api/files"/>
+      <fileset dir="src/wbs/sms/gsm/api/files"/>
+      <fileset dir="src/wbs/sms/network/api/files"/>
+      <fileset dir="src/wbs/sms/number/core/api/files"/>
+      <fileset dir="src/wbs/sms/number/lookup/api/files"/>
+      <fileset dir="src/wbs/sms/number/format/api/files"/>
+      <fileset dir="src/wbs/sms/route/core/api/files"/>
+      <fileset dir="src/wbs/sms/gazetteer/api/files"/>
+      <fileset dir="src/wbs/sms/command/api/files"/>
+      <fileset dir="src/wbs/sms/message/delivery/api/files"/>
+      <fileset dir="src/wbs/sms/route/http/api/files"/>
+      <fileset dir="src/wbs/sms/message/inbox/api/files"/>
+      <fileset dir="src/wbs/sms/keyword/api/files"/>
+      <fileset dir="src/wbs/sms/locator/api/files"/>
+      <fileset dir="src/wbs/sms/magicnumber/api/files"/>
+      <fileset dir="src/wbs/sms/message/batch/api/files"/>
+      <fileset dir="src/wbs/sms/message/core/api/files"/>
+      <fileset dir="src/wbs/sms/object/messages/api/files"/>
+      <fileset dir="src/wbs/sms/message/report/api/files"/>
+      <fileset dir="src/wbs/sms/messageset/api/files"/>
+      <fileset dir="src/wbs/sms/message/stats/api/files"/>
+      <fileset dir="src/wbs/sms/message/status/api/files"/>
+      <fileset dir="src/wbs/sms/message/ticker/api/files"/>
+      <fileset dir="src/wbs/sms/number/blacklist/api/files"/>
+      <fileset dir="src/wbs/sms/object/stats/api/files"/>
+      <fileset dir="src/wbs/sms/message/outbox/api/files"/>
+      <fileset dir="src/wbs/sms/modempoll/api/files"/>
+      <fileset dir="src/wbs/sms/number/list/api/files"/>
+      <fileset dir="src/wbs/sms/route/router/api/files"/>
+      <fileset dir="src/wbs/sms/route/sender/api/files"/>
+      <fileset dir="src/wbs/sms/route/test/api/files"/>
+      <fileset dir="src/wbs/sms/route/tester/api/files"/>
+      <fileset dir="src/wbs/sms/smpp/api/files"/>
+      <fileset dir="src/wbs/sms/template/api/files"/>
+      <fileset dir="src/wbs/sms/tracker/api/files"/>
+      <fileset dir="src/wbs/sms/message/wap/api/files"/>
+      <fileset dir="src/wbs/smsapps/common/api/files"/>
+      <fileset dir="src/wbs/smsapps/alerts/api/files"/>
+      <fileset dir="src/wbs/smsapps/autoresponder/api/files"/>
+      <fileset dir="src/wbs/smsapps/broadcast/api/files"/>
+      <fileset dir="src/wbs/smsapps/forwarder/api/files"/>
+      <fileset dir="src/wbs/smsapps/manualresponder/api/files"/>
+      <fileset dir="src/wbs/smsapps/orderer/api/files"/>
+      <fileset dir="src/wbs/smsapps/photograbber/api/files"/>
+      <fileset dir="src/wbs/smsapps/subscription/api/files"/>
+      <fileset dir="src/wbs/smsapps/ticketer/api/files"/>
+      <fileset dir="src/wbs/psychic/affiliate/api/files"/>
+      <fileset dir="src/wbs/psychic/affiliategroup/api/files"/>
+      <fileset dir="src/wbs/psychic/bill/api/files"/>
+      <fileset dir="src/wbs/psychic/contact/api/files"/>
+      <fileset dir="src/wbs/psychic/core/api/files"/>
+      <fileset dir="src/wbs/psychic/help/api/files"/>
+      <fileset dir="src/wbs/psychic/keyword/api/files"/>
+      <fileset dir="src/wbs/psychic/profile/api/files"/>
+      <fileset dir="src/wbs/psychic/request/api/files"/>
+      <fileset dir="src/wbs/psychic/send/api/files"/>
+      <fileset dir="src/wbs/psychic/template/api/files"/>
+      <fileset dir="src/wbs/psychic/user/core/api/files"/>
+      <fileset dir="src/wbs/psychic/user/admin/api/files"/>
+      <fileset dir="src/wbs/apn/chat/core/api/files"/>
+      <fileset dir="src/wbs/apn/chat/ad/api/files"/>
+      <fileset dir="src/wbs/apn/chat/adult/api/files"/>
+      <fileset dir="src/wbs/apn/chat/affiliate/api/files"/>
+      <fileset dir="src/wbs/apn/chat/api/api/files"/>
+      <fileset dir="src/wbs/apn/chat/approval/api/files"/>
+      <fileset dir="src/wbs/apn/chat/bill/api/files"/>
+      <fileset dir="src/wbs/apn/chat/broadcast/api/files"/>
+      <fileset dir="src/wbs/apn/chat/contact/api/files"/>
+      <fileset dir="src/wbs/apn/chat/date/api/files"/>
+      <fileset dir="src/wbs/apn/chat/graphs/api/files"/>
+      <fileset dir="src/wbs/apn/chat/help/api/files"/>
+      <fileset dir="src/wbs/apn/chat/user/image/api/files"/>
+      <fileset dir="src/wbs/apn/chat/user/info/api/files"/>
+      <fileset dir="src/wbs/apn/chat/infosite/api/files"/>
+      <fileset dir="src/wbs/apn/chat/user/join/api/files"/>
+      <fileset dir="src/wbs/apn/chat/keyword/api/files"/>
+      <fileset dir="src/wbs/apn/chat/namednote/api/files"/>
+      <fileset dir="src/wbs/apn/chat/scheme/api/files"/>
+      <fileset dir="src/wbs/apn/chat/settings/api/files"/>
+      <fileset dir="src/wbs/apn/chat/supervisor/api/files"/>
+      <fileset dir="src/wbs/apn/chat/user/core/api/files"/>
+      <fileset dir="src/wbs/apn/chat/user/admin/api/files"/>
+      <fileset dir="src/wbs/apn/chat/user/pending/api/files"/>
+      <fileset dir="src/wbs/apn/chat/tv/core/api/files"/>
+      <fileset dir="src/wbs/apn/chat/tv/moderation/api/files"/>
+      <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
+      <fileset dir="src/wbs/integrations/comshen/api/files"/>
+      <fileset dir="src/wbs/integrations/dialogue/api/files"/>
+      <fileset dir="src/wbs/integrations/digitalselect/api/files"/>
+      <fileset dir="src/wbs/integrations/hybyte/api/files"/>
+      <fileset dir="src/wbs/integrations/mediaburst/api/files"/>
+      <fileset dir="src/wbs/integrations/mig/api/files"/>
+      <fileset dir="src/wbs/integrations/oxygen8/api/files"/>
+      <fileset dir="src/wbs/integrations/txtnation/api/files"/>
+      <fileset dir="src/wbs/integrations/unwiredplaza/api/files"/>
+      <fileset dir="src/wbs/integrations/urbanairship/api/files"/>
+    </copy>
+    <copy todir="work/test/api/WEB-INF/classes">
+      <fileset dir="work/bin"/>
+    </copy>
+    <copy todir="work/test/api/WEB-INF/lib">
+      <fileset dir="lib">
+        <exclude name="service-api.jar"/>
+      </fileset>
+    </copy>
+    <copy file="console/web-test.xml" tofile="work/test/api/WEB-INF/web.xml"/>
+  </target>
+  <target name="just-tomcat-test">
+    <mkdir dir="temp"/>
+    <exec failonerror="true" dir="temp" executable="tar">
+      <arg line="--extract"/>
+      <arg line="--file ../binaries/packages/apache-tomcat-6.0.37.tar.gz"/>
+    </exec>
+    <delete dir="work/test/tomcat/**"/>
+    <move file="temp/apache-tomcat-6.0.37" tofile="work/test/tomcat"/>
+    <copy file="console/server-test.xml" tofile="work/test/tomcat/conf/server.xml"/>
+    <copy file="conf/tomcat-users.xml" tofile="work/test/tomcat/conf/tomcat-users.xml"/>
+    <delete dir="work/test/tomcat/apps/console/ROOT"/>
+    <copy todir="work/test/tomcat/apps/console/ROOT">
+      <fileset dir="work/test/console"/>
+    </copy>
+    <copy todir="work/test/tomcat/apps/console/manager">
+      <fileset dir="work/test/tomcat/webapps/manager"/>
+    </copy>
+    <copy todir="work/test/tomcat/apps/console/host-manager">
+      <fileset dir="work/test/tomcat/webapps/host-manager"/>
+    </copy>
+    <delete dir="work/test/tomcat/apps/api/ROOT"/>
+    <copy todir="work/test/tomcat/apps/api/ROOT">
+      <fileset dir="work/test/api"/>
+    </copy>
+    <copy todir="work/test/tomcat/apps/api/manager">
+      <fileset dir="work/test/tomcat/webapps/manager"/>
+    </copy>
+    <copy todir="work/test/tomcat/apps/api/host-manager">
+      <fileset dir="work/test/tomcat/webapps/host-manager"/>
+    </copy>
+    <exec failonerror="true" executable="work/test/tomcat/bin/catalina.sh">
+      <arg line="run"/>
+    </exec>
+  </target>
+  <target name="just-api-restart">
+    <exec failonerror="true" executable="./service">
+      <arg value="tomcat_api"/>
+      <arg value="restart"/>
+    </exec>
+  </target>
+  <target name="just-console-restart">
+    <exec failonerror="true" executable="./service">
+      <arg value="tomcat_console"/>
+      <arg value="restart"/>
+    </exec>
+  </target>
+  <target name="just-daemon-restart">
+    <exec failonerror="true" executable="./service">
+      <arg value="daemon"/>
+      <arg value="restart"/>
+    </exec>
+  </target>
+  <target name="just-javadoc">
+    <mkdir dir="javadoc"/>
+    <javadoc destdir="javadoc" access="private" linksource="yes">
+      <fileset dir="src"/>
+      <classpath refid="classpath"/>
+      <link href="http://java.sun.com/j2se/1.6.0/docs/api"/>
+      <link href="http://logging.apache.org/log4j/docs/api"/>
+      <link href="http://www.hibernate.org/hib_docs/v3/api"/>
+      <link href="http://www.xom.nu/apidocs"/>
+    </javadoc>
+  </target>
+  <target name="just-db-drop">
+    <exec failonerror="true" executable="dropdb">
+      <arg line="${database.name}"/>
+    </exec>
+  </target>
+  <target name="just-db-create">
+    <exec failonerror="false" executable="createdb">
+      <arg line="${database.name}"/>
+    </exec>
+  </target>
+  <target name="just-sql-schema">
+    <taskdef name="database-init" classname="wbs.framework.utils.ant.DatabaseInitTask" classpathref="classpath"/>
+    <database-init>
+      <script name="src/wbs/platform/object/core/model/object-type.sql"/>
+      <script name="src/wbs/platform/affiliate/model/affiliate.sql"/>
+      <script name="src/wbs/platform/event/model/event.sql"/>
+      <script name="src/wbs/platform/exception/model/exception.sql"/>
+      <script name="src/wbs/platform/group/model/group.sql"/>
+      <script name="src/wbs/platform/lock/model/lock.sql"/>
+      <script name="src/wbs/platform/media/model/content.sql"/>
+      <script name="src/wbs/platform/media/model/media.sql"/>
+      <script name="src/wbs/platform/menu/model/menu.sql"/>
+      <script name="src/wbs/platform/priv/model/priv.sql"/>
+      <script name="src/wbs/platform/queue/model/queue.sql"/>
+      <script name="src/wbs/platform/scaffold/model/root.sql"/>
+      <script name="src/wbs/platform/scaffold/model/slice.sql"/>
+      <script name="src/wbs/platform/script/language/model/script-language.sql"/>
+      <script name="src/wbs/platform/script/system/model/system-script.sql"/>
+      <script name="src/wbs/platform/service/model/service.sql"/>
+      <script name="src/wbs/platform/text/model/text.sql"/>
+      <script name="src/wbs/platform/user/model/user.sql"/>
+      <script name="src/wbs/platform/postgresql/model/postgresql.sql"/>
+      <script name="src/wbs/platform/postgresql/model/postgresql-maintenance.sql"/>
+      <script name="src/wbs/sms/network/model/network.sql"/>
+      <script name="src/wbs/sms/number/core/model/number.sql"/>
+      <script name="src/wbs/sms/number/lookup/model/number-lookup.sql"/>
+      <script name="src/wbs/sms/route/core/model/route.sql"/>
+      <script name="src/wbs/sms/command/model/command.sql"/>
+      <script name="src/wbs/sms/message/delivery/model/delivery.sql"/>
+      <script name="src/wbs/sms/keyword/model/keyword-set-fallback.sql"/>
+      <script name="src/wbs/sms/magicnumber/model/magic-number.sql"/>
+      <script name="src/wbs/sms/message/batch/model/batch.sql"/>
+      <script name="src/wbs/sms/message/core/model/message.sql"/>
+      <script name="src/wbs/sms/message/core/model/message-media.sql"/>
+      <script name="src/wbs/sms/message/core/model/message-type.sql"/>
+      <script name="src/wbs/sms/messageset/model/message-set.sql"/>
+      <script name="src/wbs/sms/message/stats/model/message-stats.sql"/>
+      <script name="src/wbs/sms/number/blacklist/model/blacklist.sql"/>
+      <script name="src/wbs/sms/message/outbox/model/outbox.sql"/>
+      <script name="src/wbs/sms/number/list/model/number-list.sql"/>
+      <script name="src/wbs/sms/route/router/model/router.sql"/>
+      <script name="src/wbs/sms/route/sender/model/sender.sql"/>
+      <script name="src/wbs/sms/route/tester/model/route-tester.sql"/>
+      <script name="src/wbs/sms/template/model/template.sql"/>
+      <script name="src/wbs/sms/tracker/model/sms-simple-tracker.sql"/>
+      <script name="src/wbs/sms/tracker/model/sms-tracker.sql"/>
+      <script name="src/wbs/smsapps/forwarder/model/forwarder.sql"/>
+      <script name="src/wbs/smsapps/manualresponder/model/manual-responder.sql"/>
+      <script name="src/wbs/psychic/template/model/psychic-template.sql"/>
+      <script name="src/wbs/apn/chat/core/model/chat-stats.sql"/>
+      <script name="src/wbs/apn/chat/affiliate/model/chat-affiliate-users-summary.sql"/>
+      <script name="src/wbs/apn/chat/broadcast/model/chat-broadcast.sql"/>
+      <script name="src/wbs/apn/chat/contact/model/chat-message.sql"/>
+      <script name="src/wbs/apn/chat/namednote/model/chat-named-note.sql"/>
+      <script name="src/wbs/apn/chat/user/core/model/chat-user.sql"/>
+      <script name="src/wbs/apn/chat/user/core/model/chat-user-session.sql"/>
+      <script name="src/wbs/apn/chat/user/core/model/chat-users-summary.sql"/>
+      <script name="src/wbs/integrations/txtnation/model/txt-nation.sql"/>
+    </database-init>
+  </target>
+  <target name="just-sql-data">
+    <taskdef name="database-init" classname="wbs.framework.utils.ant.DatabaseInitTask" classpathref="classpath"/>
+    <database-init>
+      <script name="src/wbs/platform/object/core/model/object-type-data.sql"/>
+      <script name="src/wbs/platform/currency/model/currency-data.sql"/>
+      <script name="src/wbs/platform/affiliate/model/affiliate-data.sql"/>
+      <script name="src/wbs/platform/event/model/event-data.sql"/>
+      <script name="src/wbs/platform/exception/model/exception-data.sql"/>
+      <script name="src/wbs/platform/group/model/group-data.sql"/>
+      <script name="src/wbs/platform/lock/model/lock-data.sql"/>
+      <script name="src/wbs/platform/media/model/media-data.sql"/>
+      <script name="src/wbs/platform/menu/model/menu-data.sql"/>
+      <script name="src/wbs/platform/priv/model/priv-data.sql"/>
+      <script name="src/wbs/platform/queue/model/queue-data.sql"/>
+      <script name="src/wbs/platform/script/language/model/script-language-data.sql"/>
+      <script name="src/wbs/platform/script/system/model/system-script-data.sql"/>
+      <script name="src/wbs/platform/service/model/service-data.sql"/>
+      <script name="src/wbs/platform/user/model/user-data.sql"/>
+      <script name="src/wbs/platform/updatelog/model/update-log-data.sql"/>
+      <script name="src/wbs/platform/postgresql/model/postgresql-data.sql"/>
+      <script name="src/wbs/platform/postgresql/model/postgresql-maintenance-data.sql"/>
+      <script name="src/wbs/sms/network/model/network-data.sql"/>
+      <script name="src/wbs/sms/number/core/model/number-data.sql"/>
+      <script name="src/wbs/sms/number/lookup/model/number-lookup-data.sql"/>
+      <script name="src/wbs/sms/number/format/model/number-format-data.sql"/>
+      <script name="src/wbs/sms/route/core/model/route-data.sql"/>
+      <script name="src/wbs/sms/gazetteer/model/gazetteer-data.sql"/>
+      <script name="src/wbs/sms/command/model/command-data.sql"/>
+      <script name="src/wbs/sms/message/delivery/model/delivery-data.sql"/>
+      <script name="src/wbs/sms/route/http/model/http-route-data.sql"/>
+      <script name="src/wbs/sms/message/inbox/model/inbox-data.sql"/>
+      <script name="src/wbs/sms/keyword/model/keyword-data.sql"/>
+      <script name="src/wbs/sms/locator/model/locator-data.sql"/>
+      <script name="src/wbs/sms/magicnumber/model/magic-number-data.sql"/>
+      <script name="src/wbs/sms/message/batch/model/batch-data.sql"/>
+      <script name="src/wbs/sms/message/core/model/message-data.sql"/>
+      <script name="src/wbs/sms/messageset/model/message-set-data.sql"/>
+      <script name="src/wbs/sms/message/stats/model/message-stats-data.sql"/>
+      <script name="src/wbs/sms/message/outbox/model/outbox-data.sql"/>
+      <script name="src/wbs/sms/modempoll/model/modem-poll-data.sql"/>
+      <script name="src/wbs/sms/number/list/model/number-list-data.sql"/>
+      <script name="src/wbs/sms/route/router/model/router-data.sql"/>
+      <script name="src/wbs/sms/route/sender/model/sender-data.sql"/>
+      <script name="src/wbs/sms/route/tester/model/route-tester-data.sql"/>
+      <script name="src/wbs/sms/smpp/model/smpp-data.sql"/>
+      <script name="src/wbs/sms/template/model/template-data.sql"/>
+      <script name="src/wbs/sms/tracker/model/sms-tracker-data.sql"/>
+      <script name="src/wbs/sms/tracker/model/sms-simple-tracker-data.sql"/>
+      <script name="src/wbs/sms/message/wap/model/wap-push-data.sql"/>
+      <script name="src/wbs/smsapps/alerts/model/alerts-data.sql"/>
+      <script name="src/wbs/smsapps/autoresponder/model/auto-responder-data.sql"/>
+      <script name="src/wbs/smsapps/broadcast/model/broadcast-data.sql"/>
+      <script name="src/wbs/smsapps/forwarder/model/forwarder-data.sql"/>
+      <script name="src/wbs/smsapps/manualresponder/model/manual-responder-data.sql"/>
+      <script name="src/wbs/smsapps/orderer/model/orderer-data.sql"/>
+      <script name="src/wbs/smsapps/photograbber/model/photo-grabber-data.sql"/>
+      <script name="src/wbs/smsapps/subscription/model/subscription-data.sql"/>
+      <script name="src/wbs/smsapps/subscription/model/subscription-sub-data.sql"/>
+      <script name="src/wbs/smsapps/ticketer/model/ticketer-data.sql"/>
+      <script name="src/wbs/psychic/core/model/psychic-data.sql"/>
+      <script name="src/wbs/psychic/template/model/psychic-template-data.sql"/>
+      <script name="src/wbs/apn/chat/core/model/chat-data.sql"/>
+      <script name="src/wbs/apn/chat/ad/model/chat-ad-data.sql"/>
+      <script name="src/wbs/apn/chat/affiliate/model/chat-affiliate-data.sql"/>
+      <script name="src/wbs/apn/chat/affiliate/model/chat-affiliate-users-summary-data.sql"/>
+      <script name="src/wbs/apn/chat/approval/model/chat-approval-data.sql"/>
+      <script name="src/wbs/apn/chat/bill/model/chat-bill-data.sql"/>
+      <script name="src/wbs/apn/chat/broadcast/model/chat-broadcast-data.sql"/>
+      <script name="src/wbs/apn/chat/contact/model/chat-contact-data.sql"/>
+      <script name="src/wbs/apn/chat/help/model/chat-help-data.sql"/>
+      <script name="src/wbs/apn/chat/user/info/model/chat-info-data.sql"/>
+      <script name="src/wbs/apn/chat/user/info/model/chat-profile-data.sql"/>
+      <script name="src/wbs/apn/chat/infosite/model/chat-info-site-data.sql"/>
+      <script name="src/wbs/apn/chat/user/join/model/chat-user-join-data.sql"/>
+      <script name="src/wbs/apn/chat/namednote/model/chat-named-note-data.sql"/>
+      <script name="src/wbs/apn/chat/scheme/model/chat-scheme-data.sql"/>
+      <script name="src/wbs/apn/chat/user/core/model/chat-user-data.sql"/>
+      <script name="src/wbs/apn/chat/user/core/model/chat-users-summary-data.sql"/>
+      <script name="src/wbs/apn/chat/tv/core/model/chat-tv-data.sql"/>
+      <script name="src/wbs/integrations/broadcastsystems/model/broadcast-systems-data.sql"/>
+      <script name="src/wbs/integrations/dialogue/model/dialogue-data.sql"/>
+      <script name="src/wbs/integrations/digitalselect/model/digital-select-data.sql"/>
+      <script name="src/wbs/integrations/hybyte/model/hybyte-data.sql"/>
+      <script name="src/wbs/integrations/mediaburst/model/mediaburst-data.sql"/>
+      <script name="src/wbs/integrations/mig/model/mig-data.sql"/>
+      <script name="src/wbs/integrations/oxygen8/model/oxygen8-data.sql"/>
+      <script name="src/wbs/integrations/txtnation/model/txt-nation-data.sql"/>
+    </database-init>
+  </target>
+  <target name="just-schema-create">
+    <java classname="wbs.platform.application.tools.BeanRunner" classpathref="classpath" failonerror="true">
+      <arg value="wbs-test"/>
+      <arg value="wbs.test"/>
+      <arg value="config,data,entity,schema,sql,schema-tool"/>
+      <arg value="test"/>
+      <arg value="wbs.framework.schema.tool.SchemaTool"/>
+      <arg value="schemaCreate"/>
+    </java>
+  </target>
+  <target name="just-fixtures">
+    <java classname="wbs.platform.application.tools.BeanRunner" classpathref="classpath" failonerror="true">
+      <arg value="wbs-test"/>
+      <arg value="wbs.test"/>
+      <arg value="config,data,entity,schema,sql,model,hibernate,object,logic,fixture"/>
+      <arg value="test,hibernate"/>
+      <arg value="wbs.framework.fixtures.FixturesTool"/>
+      <arg value="createFixtures"/>
+    </java>
+  </target>
+</project>

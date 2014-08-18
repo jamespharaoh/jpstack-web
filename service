@@ -1,0 +1,119 @@
+#!/bin/sh
+
+function service_start {
+	local SERVICE=$1
+	local TEMP="${SERVICE}_start_timeout"
+	local ABORT_TIME=$(($SECONDS + ${!TEMP}))
+
+	echo "Starting $SERVICE"
+
+	# try and start the SERVICE
+	${SERVICE}_start
+
+	# wait for it to start
+	while (($SECONDS < $ABORT_TIME)); do
+		if ${SERVICE}_is_running_1 && ${SERVICE}_is_running_2; then return 0; fi
+		sleep 0.4
+	done
+	${SERVICE}_is_running_1 && ${SERVICE}_is_running_2
+}
+
+function service_stop {
+	local SERVICE="$1"
+	local TEMP="${SERVICE}_stop_timeout"
+	local ABORT_TIME=$(($SECONDS + ${!TEMP}))
+
+	echo "Stopping $SERVICE"
+
+	# try and stop the SERVICE
+	${SERVICE}_stop
+
+	# wait for it to stop
+	while (($SECONDS < $ABORT_TIME)); do
+		if ! ${SERVICE}_is_running_1; then return 0; fi
+		sleep 0.4
+	done
+	! ${SERVICE}_is_running_1
+}
+
+function service_kill {
+	local SERVICE=$1
+	local TEMP="${SERVICE}_kill_timeout"
+	local ABORT_TIME=$(($SECONDS + ${!TEMP}))
+
+	echo "Killing $SERVICE"
+
+	# try and kill the SERVICE
+	${SERVICE}_kill
+
+	# wait for it to die
+	while (($SECONDS < $ABORT_TIME)); do
+		if ! ${SERVICE}_is_running_1; then return 0; fi
+		sleep 0.4
+	done
+	! ${SERVICE}_is_running_1
+}
+
+function die {
+	echo "ERROR $1"
+	exit 1
+}
+
+# check syntax
+[ $# -eq 2 ] || die "syntax error (try $0 <service> <command>)"
+SERVICE="$1"
+COMMAND="$2"
+
+# get base dir
+BASEDIR=$(dirname $0)/..
+echo $BASEDIR
+# include the SERVICE
+[ "$SERVICE" == "$(basename "$SERVICE")" ] || die "dodgy service $1"
+[ -f "$BASEDIR/wbs-apn/services/$SERVICE" ] || die "unknown service $1"
+. "$BASEDIR/wbs-apn/services/$SERVICE"
+
+# run the command
+case "$COMMAND" in
+
+	start)
+		${SERVICE}_is_running_1 && die "already running"
+		if service_start $SERVICE; then exit 0; fi
+		die "start failed"
+		;;
+
+	stop)
+		${SERVICE}_is_running_1 || die "not running"
+		if service_stop $SERVICE; then exit 0; fi
+		if service_kill $SERVICE; then exit 0; fi
+		die "stop failed"
+		;;
+
+	restart)
+		# stop
+		if ${SERVICE}_is_running_1; then
+			if ! service_stop $SERVICE; then
+				if ! service_kill $SERVICE; then die "stop failed"; fi
+			fi
+		fi
+		# start
+		if ! service_start $SERVICE; then die "start failed"; fi
+		exit 0
+		;;
+
+	status)
+		if ! ${SERVICE}_is_running_1; then
+			echo "not running"
+			exit 1
+		elif ${SERVICE}_is_running_2; then
+			echo "running"
+			exit 0
+		else
+			echo "partially running"
+			exit 2
+		fi
+		;;
+
+	*)
+		die "bad syntax"
+
+esac
