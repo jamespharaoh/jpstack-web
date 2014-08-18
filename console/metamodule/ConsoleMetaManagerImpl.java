@@ -65,15 +65,17 @@ class ConsoleMetaManagerImpl
 		try {
 
 			FileUtils.deleteDirectory (
-				new File ("../work/console/meta-module"));
+				new File (
+					"work/console/meta-module"));
 
 			FileUtils.forceMkdir (
-				new File ("../work/console/meta-module"));
+				new File (
+					"work/console/meta-module"));
 
 		} catch (IOException exception) {
 
 			log.error (
-				"Error deleting contents of ../work/console/meta-module",
+				"Error deleting contents of work/console/meta-module",
 				exception);
 
 		}
@@ -143,7 +145,7 @@ class ConsoleMetaManagerImpl
 
 			String outputFileName =
 				stringFormat (
-					"../work/console/meta-module/%s.xml",
+					"work/console/meta-module/%s.xml",
 					camelToHyphen (
 						consoleMetaModuleName));
 
