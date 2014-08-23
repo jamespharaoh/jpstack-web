@@ -109,11 +109,12 @@ parseXML file =
 atTag tag =
 	getChildren >>> isElem >>> hasName tag
 
+optTag tag =
+	atTag tag `orElse` mkelem "tag" [] []
+
 getAttrArray elemName attrName =
-	atTag elemName >>> proc parent -> do
-
+	listA $ atTag elemName >>> proc parent -> do
 		name <- getAttrValue attrName -< parent
-
 		returnA -< name
 
 -------------------- loadBuildConfig
@@ -142,7 +143,7 @@ loadBuildConfig = do
 			target <- getAttrValue "target" -< gitLinkTag
 			local <- getAttrValue "local" -< gitLinkTag
 
-			paths <- listA $ getAttrArray "path" "name" -< gitLinkTag
+			paths <- getAttrArray "path" "name" -< gitLinkTag
 
 			returnA -< BuildGitLinkConfig {
 				bglcName = name,
@@ -235,40 +236,19 @@ loadPluginConfig buildConfig projectConfig projectPluginConfig = do
 	let getPluginConfig =
 		atTag "plugin" >>> proc pluginTag -> do
 
-			name <-
-				getAttrValue "name" -< pluginTag
+			name <- getAttrValue "name" -< pluginTag
+			package <- getAttrValue "package" -< pluginTag
 
-			package <-
-				getAttrValue "package" -< pluginTag
+			sqlScriptsTag <- optTag "sql-scripts" -< pluginTag
+			sqlSchemas <- getAttrArray "sql-schema" "name" -< sqlScriptsTag
+			sqlDatas <- getAttrArray "sql-data" "name" -< sqlScriptsTag
 
-			sqlScriptsTags <- listA $
-				atTag "sql-scripts" -< pluginTag
-
-			case sqlScriptsTags of
-
-				[ sqlScriptsTag ] -> do
-
-					sqlSchemas <- listA $
-						getAttrArray "sql-schema" "name" -< sqlScriptsTag
-
-					sqlDatas <- listA $
-						getAttrArray "sql-data" "name" -< sqlScriptsTag
-
-					returnA -< PluginConfig {
-						plcName = name,
-						plcPackage = package,
-						plcSqlSchemas = sqlSchemas,
-						plcSqlDatas = sqlDatas
-					}
-
-				_ -> do
-
-					returnA -< PluginConfig {
-						plcName = name,
-						plcPackage = package,
-						plcSqlSchemas = [],
-						plcSqlDatas = []
-					}
+			returnA -< PluginConfig {
+				plcName = name,
+				plcPackage = package,
+				plcSqlSchemas = sqlSchemas,
+				plcSqlDatas = sqlDatas
+			}
 
 	let pluginConfigPath =
 		"src/" ++

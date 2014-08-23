@@ -99,3 +99,10 @@ SELECT priv_type_insert (
 	'Create manual responders',
 	'Create new manual responders in this slice',
 	true);
+
+SELECT priv_type_insert (
+	'manual_responder',
+	'number',
+	'View phone numbers',
+	'View phone numbers for this manual responder',
+	true);

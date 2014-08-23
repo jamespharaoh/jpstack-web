@@ -106,6 +106,10 @@
 			name="unblockNumberList"
 			finder="numberList"/>
 
+		<object-field
+			name="smsCustomerManager"
+			finder="smsCustomerManager"/>
+
 	</field-set>
 
 	<field-set
@@ -142,6 +146,10 @@
 		<object-field
 			name="unblockNumberList"
 			finder="numberList"/>
+
+		<object-field
+			name="smsCustomerManager"
+			finder="smsCustomerManager"/>
 
 	</field-set>
 

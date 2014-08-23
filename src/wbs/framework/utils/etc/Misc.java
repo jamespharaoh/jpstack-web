@@ -1212,8 +1212,12 @@ class Misc {
 	}
 
 	private static final
-	char[] tokenSymbols =
+	char[] lowercaseLetters =
 		new char [26];
+
+	private static final
+	char[] digits =
+		new char [10];
 
 	static {
 
@@ -1223,8 +1227,19 @@ class Misc {
 			index ++
 		) {
 
-			tokenSymbols [index] =
+			lowercaseLetters [index] =
 				(char) ('a' + index);
+
+		}
+
+		for (
+			int index = 0;
+			index < 10;
+			index ++
+		) {
+
+			digits [index] =
+				(char) ('0' + index);
 
 		}
 
@@ -1235,24 +1250,46 @@ class Misc {
 		new Random ();
 
 	public static
-	String genToken () {
+	String genRandom (
+			char[] allSymbols,
+			int requiredLength) {
 
-		char[] buf =
-			new char [10];
+		char[] buffer =
+			new char [requiredLength];
 
 		for (
-			int i = 0;
-			i < buf.length;
-			i ++
+			int index = 0;
+			index < buffer.length;
+			index ++
 		) {
 
-			buf [i] =
-				tokenSymbols [
-					random.nextInt (tokenSymbols.length)];
+			buffer [index] =
+				allSymbols [
+					random.nextInt (
+						allSymbols.length)];
 
 		}
 
-		return new String (buf);
+		return new String (
+			buffer);
+
+	}
+
+	public static
+	String generateTenCharacterToken () {
+
+		return genRandom (
+			lowercaseLetters,
+			10);
+
+	}
+
+	public static
+	String generateSixDigitCode () {
+
+		return genRandom (
+			digits,
+			6);
 
 	}
 

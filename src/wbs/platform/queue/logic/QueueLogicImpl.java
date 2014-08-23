@@ -375,8 +375,24 @@ class QueueLogicImpl
 			+ queueSubject.getTotalItems ()
 			- queueSubject.getActiveItems ();
 
-		if (queueItem.getIndex () != currentItemIndex)
-			throw new IllegalStateException ();
+		if (queueItem.getIndex () != currentItemIndex) {
+
+			throw new IllegalStateException (
+				stringFormat (
+					"Cannot process queue item %s ",
+					queueItem.getId (),
+					"with index %s ",
+					queueItem.getIndex (),
+					"for queue subject %s ",
+					queueSubject.getId (),
+					"whose total is %s ",
+					queueSubject.getTotalItems (),
+					"and active is %s, ",
+					queueSubject.getActiveItems (),
+					"implying a current item index of %s",
+					currentItemIndex));
+
+		}
 
 		if (queueItem.getState () != QueueItemState.claimed) {
 

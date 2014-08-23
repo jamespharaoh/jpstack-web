@@ -75,9 +75,11 @@
 			name="number"
 			finder="number"/>
 
+		<!--
 		<delegate-field
 			delegate="message"
 			name="text"/>
+		-->
 
 	</field-set>
 

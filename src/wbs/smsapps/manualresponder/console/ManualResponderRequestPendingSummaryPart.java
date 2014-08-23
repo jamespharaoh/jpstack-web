@@ -30,8 +30,10 @@ import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
+import wbs.sms.customer.model.SmsCustomerRec;
 import wbs.sms.message.core.model.MessageDirection;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
@@ -75,6 +77,9 @@ class ManualResponderRequestPendingSummaryPart
 	MessageObjectHelper messageHelper;
 
 	@Inject
+	PrivChecker privChecker;
+
+	@Inject
 	RouterLogic routerLogic;
 
 	@Inject
@@ -89,6 +94,7 @@ class ManualResponderRequestPendingSummaryPart
 	ManualResponderNumberRec manualResponderNumber;
 	ManualResponderRec manualResponder;
 
+	SmsCustomerRec smsCustomer;
 	NumberRec number;
 	NetworkRec network;
 
@@ -126,7 +132,8 @@ class ManualResponderRequestPendingSummaryPart
 
 		manualResponderRequest =
 			manualResponderRequestHelper.find (
-				requestContext.stuffInt ("manualResponderRequestId"));
+				requestContext.stuffInt (
+					"manualResponderRequestId"));
 
 		manualResponder =
 			manualResponderRequest.getManualResponder ();
@@ -141,6 +148,11 @@ class ManualResponderRequestPendingSummaryPart
 			manualResponderNumberHelper.find (
 				manualResponder,
 				number);
+
+		smsCustomer =
+			manualResponderNumber != null
+				? manualResponderNumber.getSmsCustomer ()
+				: null;
 
 		// get routes
 
@@ -185,16 +197,31 @@ class ManualResponderRequestPendingSummaryPart
 			int total = 0;
 			int thisService = 0;
 
+			MessageSearch messageSearch =
+				new MessageSearch ()
+
+				.numberId (
+					number.getId ())
+
+				.routeId (
+					route.getId ())
+
+				.createdTimeAfter (
+					startOfToday.toDate ())
+
+				.direction (
+					MessageDirection.out);
+
+			List<MessageRec> messages =
+				messageHelper.search (
+					messageSearch);
+
 			for (MessageRec message
-					: messageHelper.search (
-						new MessageSearch ()
-							.numberId (number.getId ())
-							.routeId (route.getId ())
-							.createdTimeAfter (startOfToday.toDate ())
-							.direction (MessageDirection.out))) {
+					: messages) {
 
 				if (
-					in (message.getStatus (),
+					in (
+						message.getStatus (),
 						MessageStatus.undelivered,
 						MessageStatus.cancelled,
 						MessageStatus.reportTimedOut)
@@ -288,6 +315,8 @@ class ManualResponderRequestPendingSummaryPart
 
 		goOperatorInfo ();
 
+		goWelcomeHistory ();
+
 		goRequestHistory ();
 
 	}
@@ -322,13 +351,19 @@ class ManualResponderRequestPendingSummaryPart
 			manualResponder.getDescription (),
 			"</tr>\n");
 
-		printFormat (
-			"<tr>\n",
-			"<th>Number</th>\n",
-			"%s\n",
-			objectManager.tdForObjectMiniLink (
-				number),
-			"</tr>\n");
+		if (privChecker.can (
+				manualResponder,
+				"number")) {
+
+			printFormat (
+				"<tr>\n",
+				"<th>Number</th>\n",
+				"%s\n",
+				objectManager.tdForObjectMiniLink (
+					number),
+				"</tr>\n");
+
+		}
 
 		printFormat (
 			"<tr>\n",
@@ -447,6 +482,47 @@ class ManualResponderRequestPendingSummaryPart
 		printFormat (
 			"%s\n",
 			manualResponder.getInfoText ().getText ());
+
+	}
+
+	void goWelcomeHistory () {
+
+		if (smsCustomer == null)
+			return;
+
+		if (
+			smsCustomer.getWelcomeMessage () == null
+			&& smsCustomer.getWarningMessage () == null
+		) {
+			return;
+		}
+
+		printFormat (
+			"<h2>Customer messages</h2>\n");
+
+		if (smsCustomer.getWelcomeMessage () != null) {
+
+			printFormat (
+				"<p>Welcome message: %h (sent %h)</p>\n",
+				smsCustomer.getWelcomeMessage ().getText ().getText (),
+				timeFormatter.instantToTimestampString (
+					timeFormatter.defaultTimezone (),
+					dateToInstant (
+						smsCustomer.getWelcomeMessage ().getCreatedTime ())));
+
+		}
+
+		if (smsCustomer.getWarningMessage () != null) {
+
+			printFormat (
+				"<p>Warning message: %h (sent %h)</p>\n",
+				smsCustomer.getWarningMessage ().getText ().getText (),
+				timeFormatter.instantToTimestampString (
+					timeFormatter.defaultTimezone (),
+					dateToInstant (
+						smsCustomer.getWarningMessage ().getCreatedTime ())));
+
+		}
 
 	}
 

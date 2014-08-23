@@ -18,6 +18,9 @@ import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
+import wbs.sms.customer.logic.SmsCustomerLogic;
+import wbs.sms.customer.model.SmsCustomerObjectHelper;
+import wbs.sms.customer.model.SmsCustomerRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
@@ -26,6 +29,8 @@ import wbs.sms.number.list.logic.NumberListLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
+
+import com.google.common.base.Optional;
 
 @PrototypeComponent ("manualResponderCommand")
 public
@@ -57,6 +62,12 @@ class ManualResponderCommand
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
+
+	@Inject
+	SmsCustomerObjectHelper smsCustomerHelper;
+
+	@Inject
+	SmsCustomerLogic smsCustomerLogic;
 
 	// details
 
@@ -120,26 +131,59 @@ class ManualResponderCommand
 
 		}
 
+		// hook into customer manager
+
+		if (manualResponder.getSmsCustomerManager () != null) {
+
+			SmsCustomerRec customer =
+				smsCustomerHelper.findOrCreate (
+					manualResponder.getSmsCustomerManager (),
+					message.getNumber ());
+
+			smsCustomerLogic.newCustomer (
+				customer,
+				Optional.of (
+					message.getThreadId ()));
+
+		}
+
 		// save the request
 
 		ManualResponderRequestRec request =
 			manualResponderRequestHelper.insert (
 				new ManualResponderRequestRec ()
-					.setManualResponder (manualResponder)
-					.setMessage (message)
-					.setTimestamp (new Date ())
-					.setPending (true)
-					.setNumber (message.getNumber ()));
+
+			.setManualResponder (
+				manualResponder)
+
+			.setMessage (
+				message)
+
+			.setTimestamp (
+				new Date ())
+
+			.setPending (
+				true)
+
+			.setNumber (
+				message.getNumber ())
+
+		);
 
 		QueueItemRec queueItem =
 			queueLogic.createQueueItem (
-				queueLogic.findQueue (manualResponder, "default"),
+				queueLogic.findQueue (
+					manualResponder,
+					"default"),
 				message.getNumber (),
 				request,
 				message.getNumFrom (),
 				message.getText ().getText ());
 
-		request.setQueueItem (queueItem);
+		request
+
+			.setQueueItem (
+				queueItem);
 
 		transaction.commit ();
 

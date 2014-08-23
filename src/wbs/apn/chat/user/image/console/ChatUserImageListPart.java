@@ -145,7 +145,8 @@ class ChatUserImageListPart
 				"<a href=\"%h\">%s</a>",
 				requestContext.resolveLocalUrl (
 					stringFormat (
-						"/chatUser.image.view",
+						"/chatUser.%u.view",
+						type.toString (),
 						"?chatUserImageId=%u",
 						chatUserImage.getId ())),
 				chatUserImage.getMedia () == null

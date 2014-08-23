@@ -1,7 +1,4 @@
-package wbs.smsapps.manualresponder.model;
-
-import java.util.HashSet;
-import java.util.Set;
+package wbs.sms.customer.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,7 +8,6 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.framework.entity.annotations.CodeField;
-import wbs.framework.entity.annotations.CollectionField;
 import wbs.framework.entity.annotations.DeletedField;
 import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
@@ -22,11 +18,8 @@ import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
-import wbs.platform.currency.model.CurrencyRec;
-import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.text.model.TextRec;
-import wbs.sms.customer.model.SmsCustomerManagerRec;
-import wbs.sms.number.list.model.NumberListRec;
+import wbs.sms.route.router.model.RouterRec;
 
 @Accessors (chain = true)
 @Data
@@ -34,8 +27,8 @@ import wbs.sms.number.list.model.NumberListRec;
 @ToString (of = "id")
 @MajorEntity
 public
-class ManualResponderRec
-	implements MajorRecord<ManualResponderRec> {
+class SmsCustomerTemplateRec
+	implements MajorRecord<SmsCustomerTemplateRec> {
 
 	// id
 
@@ -45,7 +38,7 @@ class ManualResponderRec
 	// identity
 
 	@ParentField
-	SliceRec slice;
+	SmsCustomerManagerRec smsCustomerManager;
 
 	@CodeField
 	String code;
@@ -56,62 +49,37 @@ class ManualResponderRec
 	String name;
 
 	@DescriptionField
-	String description = "";
+	String description;
 
 	@DeletedField
 	Boolean deleted = false;
 
-	// settings
-
-	@SimpleField
-	Boolean canIgnore = false;
-
-	@SimpleField
-	Boolean canSendMultiple = false;
+	// state
 
 	@ReferenceField (
 		nullable = true)
-	TextRec infoText;
+	RouterRec router;
 
 	@SimpleField
-	Boolean showDailyBillInfo = false;
+	String number;
 
-	@SimpleField
-	Integer preferredQueueTime = 0;
-
-	@ReferenceField (
-		nullable = true)
-	CurrencyRec currency;
-
-	@ReferenceField (
-		nullable = true)
-	NumberListRec unblockNumberList;
-
-	@ReferenceField (
-		nullable = true)
-	SmsCustomerManagerRec smsCustomerManager;
-
-	// children
-
-	@CollectionField
-	Set<ManualResponderTemplateRec> templates =
-		new HashSet<ManualResponderTemplateRec> ();
+	@ReferenceField
+	TextRec text;
 
 	// compare to
 
-	@Override
 	public
 	int compareTo (
-			Record<ManualResponderRec> otherRecord) {
+			Record<SmsCustomerTemplateRec> otherRecord) {
 
-		ManualResponderRec other =
-			(ManualResponderRec) otherRecord;
+		SmsCustomerTemplateRec other =
+			(SmsCustomerTemplateRec) otherRecord;
 
 		return new CompareToBuilder ()
 
 			.append (
-				getSlice (),
-				other.getSlice ())
+				getSmsCustomerManager (),
+				other.getSmsCustomerManager ())
 
 			.append (
 				getCode (),

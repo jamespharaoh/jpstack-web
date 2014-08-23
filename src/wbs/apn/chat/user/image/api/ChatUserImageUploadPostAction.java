@@ -1,16 +1,20 @@
 package wbs.apn.chat.user.image.api;
 
+import static wbs.framework.utils.etc.Misc.generateTenCharacterToken;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.io.FileOutputStream;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.IOUtils;
 
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.image.model.ChatUserImageType;
@@ -27,6 +31,7 @@ import wbs.sms.message.core.model.MessageRec;
 
 import com.google.common.base.Optional;
 
+@Log4j
 @PrototypeComponent ("chatUserImageUploadPostAction")
 public
 class ChatUserImageUploadPostAction
@@ -132,12 +137,43 @@ class ChatUserImageUploadPostAction
 
 			}
 
+			if (log.isDebugEnabled ()) {
+
+				try {
+
+					String filename =
+						stringFormat (
+							"/tmp/%s",
+							generateTenCharacterToken ());
+
+					IOUtils.write (
+						fileItem.get (),
+						new FileOutputStream (
+							filename));
+
+					log.debug (
+						stringFormat (
+							"Written %s bytes to temporary file %s",
+							fileItem.get ().length,
+							filename));
+
+				} catch (Exception exception) {
+
+					log.debug (
+						"Error writing image data to debug file",
+						exception);
+
+				}
+
+			}
+
 			chatUserLogic.setImage (
 				imageUploadToken.getChatUser (),
 				ChatUserImageType.image,
 				fileItem.get (),
 				fileItem.getName (),
-				fileItem.getContentType (),
+				/*fileItem.getContentType (),*/
+				"image/jpeg",
 				Optional.<MessageRec>absent (),
 				false);
 

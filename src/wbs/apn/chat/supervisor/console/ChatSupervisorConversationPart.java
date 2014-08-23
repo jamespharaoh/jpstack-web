@@ -281,6 +281,9 @@ class ChatSupervisorConversationPart
 
 					"</tr>\n");
 
+				previousDate =
+					nextDate;
+
 			}
 
 			printFormat (

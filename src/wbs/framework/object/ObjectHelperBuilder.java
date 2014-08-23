@@ -1026,6 +1026,16 @@ class ObjectHelperBuilder {
 						objectHelperProvider.getParentId (
 							object);
 
+					if (parentObjectId == null) {
+
+						throw new RuntimeException (
+							stringFormat (
+								"Failed to get parent id of %s with id %s",
+								objectHelperProvider.objectName (),
+								object.getId ()));
+
+					}
+
 					ObjectHelperProvider parentHelperProvider =
 						objectHelperProviderManager.forObjectTypeId (
 							parentObjectType.getId ());

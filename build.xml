@@ -150,6 +150,7 @@
       <fileset dir="src/wbs/sms/template/console/files"/>
       <fileset dir="src/wbs/sms/tracker/console/files"/>
       <fileset dir="src/wbs/sms/message/wap/console/files"/>
+      <fileset dir="src/wbs/sms/customer/console/files"/>
       <fileset dir="src/wbs/smsapps/common/console/files"/>
       <fileset dir="src/wbs/smsapps/alerts/console/files"/>
       <fileset dir="src/wbs/smsapps/autoresponder/console/files"/>
@@ -326,6 +327,7 @@
       <fileset dir="src/wbs/sms/template/api/files"/>
       <fileset dir="src/wbs/sms/tracker/api/files"/>
       <fileset dir="src/wbs/sms/message/wap/api/files"/>
+      <fileset dir="src/wbs/sms/customer/api/files"/>
       <fileset dir="src/wbs/smsapps/common/api/files"/>
       <fileset dir="src/wbs/smsapps/alerts/api/files"/>
       <fileset dir="src/wbs/smsapps/autoresponder/api/files"/>
@@ -536,6 +538,7 @@
       <fileset dir="src/wbs/sms/template/console/files"/>
       <fileset dir="src/wbs/sms/tracker/console/files"/>
       <fileset dir="src/wbs/sms/message/wap/console/files"/>
+      <fileset dir="src/wbs/sms/customer/console/files"/>
       <fileset dir="src/wbs/smsapps/common/console/files"/>
       <fileset dir="src/wbs/smsapps/alerts/console/files"/>
       <fileset dir="src/wbs/smsapps/autoresponder/console/files"/>
@@ -712,6 +715,7 @@
       <fileset dir="src/wbs/sms/template/api/files"/>
       <fileset dir="src/wbs/sms/tracker/api/files"/>
       <fileset dir="src/wbs/sms/message/wap/api/files"/>
+      <fileset dir="src/wbs/sms/customer/api/files"/>
       <fileset dir="src/wbs/smsapps/common/api/files"/>
       <fileset dir="src/wbs/smsapps/alerts/api/files"/>
       <fileset dir="src/wbs/smsapps/autoresponder/api/files"/>
@@ -902,6 +906,7 @@
       <script name="src/wbs/sms/template/model/template.sql"/>
       <script name="src/wbs/sms/tracker/model/sms-simple-tracker.sql"/>
       <script name="src/wbs/sms/tracker/model/sms-tracker.sql"/>
+      <script name="src/wbs/sms/customer/model/sms-customer.sql"/>
       <script name="src/wbs/smsapps/forwarder/model/forwarder.sql"/>
       <script name="src/wbs/smsapps/manualresponder/model/manual-responder.sql"/>
       <script name="src/wbs/psychic/template/model/psychic-template.sql"/>
@@ -966,6 +971,7 @@
       <script name="src/wbs/sms/tracker/model/sms-tracker-data.sql"/>
       <script name="src/wbs/sms/tracker/model/sms-simple-tracker-data.sql"/>
       <script name="src/wbs/sms/message/wap/model/wap-push-data.sql"/>
+      <script name="src/wbs/sms/customer/model/sms-customer-data.sql"/>
       <script name="src/wbs/smsapps/alerts/model/alerts-data.sql"/>
       <script name="src/wbs/smsapps/autoresponder/model/auto-responder-data.sql"/>
       <script name="src/wbs/smsapps/broadcast/model/broadcast-data.sql"/>

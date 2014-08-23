@@ -153,16 +153,29 @@ class ChatPhotoCommand
 				3,
 				message.getThreadId ());
 
-		} else if (! chatUserLogic.valid (photoUser)) {
+		} else if (
+
+			photoUser == null
+
+			|| ! chatUserLogic.valid (
+				photoUser)
+
+		) {
 
 			// send no such user error
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				"request_photo_error",
-				commandHelper.findByCode (chat, "magic"),
-				commandHelper.findByCode (chat, "help").getId (),
+				commandHelper.findByCode (
+					chat,
+					"magic"),
+				commandHelper.findByCode (
+					chat,
+					"help"
+				).getId (),
 				Collections.<String,String>emptyMap ());
 
 		} else if (photoUser.getMainChatUserImage () == null) {
@@ -171,10 +184,16 @@ class ChatPhotoCommand
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				"no_photo_error",
-				commandHelper.findByCode (chat, "magic"),
-				commandHelper.findByCode (chat, "help").getId (),
+				commandHelper.findByCode (
+					chat,
+					"magic"),
+				commandHelper.findByCode (
+					chat,
+					"help"
+				).getId (),
 				Collections.<String,String>emptyMap ());
 
 		} else {

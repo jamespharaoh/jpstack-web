@@ -11,7 +11,7 @@ import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserEditReason;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.apn.chat.user.image.model.ChatUserImageObjectHelper;
+import wbs.apn.chat.user.info.model.ChatUserInfoObjectHelper;
 import wbs.apn.chat.user.info.model.ChatUserInfoRec;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -41,7 +41,7 @@ class ChatUserAdminInfoAction
 	ChatUserConsoleHelper chatUserHelper;
 
 	@Inject
-	ChatUserImageObjectHelper chatUserImageHelper;
+	ChatUserInfoObjectHelper chatUserInfoHelper;
 
 	@Inject
 	CommandObjectHelper commandHelper;
@@ -137,7 +137,7 @@ class ChatUserAdminInfoAction
 		if (newInfoText != oldInfoText) {
 
 			ChatUserInfoRec chatUserInfo =
-				chatUserImageHelper.insert (
+				chatUserInfoHelper.insert (
 					new ChatUserInfoRec ()
 
 				.setChatUser (

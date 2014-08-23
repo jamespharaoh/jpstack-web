@@ -15,6 +15,7 @@ import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.platform.text.model.TextRec;
+import wbs.sms.customer.model.SmsCustomerRec;
 import wbs.sms.number.core.model.NumberRec;
 
 @Accessors (chain = true)
@@ -39,6 +40,12 @@ class ManualResponderNumberRec
 	@IdentityReferenceField
 	NumberRec number;
 
+	// details
+
+	@ReferenceField (
+		nullable = true)
+	SmsCustomerRec smsCustomer;
+
 	// settings
 
 	@ReferenceField
@@ -55,8 +62,15 @@ class ManualResponderNumberRec
 			(ManualResponderNumberRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getManualResponder (), other.getManualResponder ())
-			.append (getNumber (), other.getNumber ())
+
+			.append (
+				getManualResponder (),
+				other.getManualResponder ())
+
+			.append (
+				getNumber (),
+				other.getNumber ())
+
 			.toComparison ();
 
 	}

@@ -124,7 +124,7 @@ class ChatUserImageUploadCommand
 		// generate token and url
 
 		String token =
-			Misc.genToken ();
+			Misc.generateTenCharacterToken ();
 
 		String url =
 			stringFormat (
