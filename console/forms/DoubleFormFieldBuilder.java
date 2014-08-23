@@ -152,7 +152,12 @@ class DoubleFormFieldBuilder {
 				label)
 
 			.size (
-				FormField.defaultSize);
+				FormField.defaultSize)
+
+			.nullable (
+				ifNull (
+					spec.nullable (),
+					false));
 
 		// update hook
 

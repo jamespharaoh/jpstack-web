@@ -62,3 +62,118 @@ BEGIN
 END;
 
 $$ LANGUAGE 'plpgsql';
+
+-- service_create_missing
+
+CREATE OR REPLACE FUNCTION service_create_missing (
+	text,
+	text,
+	bool
+) RETURNS void AS $$
+DECLARE
+
+	the_object_type_code_like ALIAS FOR $1;
+	the_service_type_code_like ALIAS FOR $2;
+	the_actually_create ALIAS FOR $3;
+
+	the_object_type record;
+	the_service_type record;
+
+	has_shown_object_type bool;
+	has_shown_service_type bool;
+
+	the_record record;
+
+	the_count int;
+
+BEGIN
+
+	RAISE NOTICE 'Creating missing services for all objects';
+
+	the_count := 0;
+
+	FOR the_object_type IN
+		SELECT * FROM object_type
+		WHERE the_object_type_code_like IS NULL
+		OR code LIKE the_object_type_code_like
+		ORDER BY code
+	LOOP
+
+		has_shown_object_type := false;
+
+		FOR the_service_type IN
+			SELECT *
+			FROM service_type
+			WHERE parent_object_type_id = the_object_type.id
+			AND (
+				the_service_type_code_like IS NULL
+				OR code LIKE the_service_type_code_like
+			)
+			ORDER BY code
+		LOOP
+
+			has_shown_service_type := false;
+
+			FOR the_record IN EXECUTE
+				'SELECT parent.* ' ||
+				'FROM ' || quote_ident (the_object_type.code) || ' parent ' ||
+				'LEFT JOIN service ' ||
+				'ON service.type_id = ' || the_service_type.id || ' ' ||
+				'AND service.code = ' || quote_literal (the_service_type.code) || ' ' ||
+				'AND service.parent_object_type_id = ' || the_service_type.parent_object_type_id || ' ' ||
+				'AND service.parent_object_id = parent.id ' ||
+				'WHERE service.id IS NULL'
+			LOOP
+
+				IF NOT has_shown_object_type THEN
+
+					RAISE NOTICE
+						'- Object type %',
+						the_object_type.code;
+
+					has_shown_object_type := true;
+
+				END IF;
+
+				IF NOT has_shown_service_type THEN
+
+					RAISE NOTICE
+						'  - service type %',
+						the_service_type.code;
+					has_shown_service_type := true;
+
+				END IF;
+
+				RAISE NOTICE
+					'    - Object % (%)', the_record.code,
+					the_record.id;
+
+				IF the_actually_create THEN
+
+					INSERT INTO service (
+						type_id,
+						parent_object_type_id,
+						parent_object_id,
+						code)
+					SELECT
+						the_service_type.id,
+						the_object_type.id,
+						the_record.id,
+						the_service_type.code;
+
+				END IF;
+
+				the_count := the_count + 1;
+
+			END LOOP;
+
+		END LOOP;
+
+	END LOOP;
+
+	RAISE NOTICE
+		'Created % missing services',
+		the_count;
+
+END;
+$$ LANGUAGE plpgsql;

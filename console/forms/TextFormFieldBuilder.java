@@ -161,10 +161,18 @@ class TextFormFieldBuilder {
 
 		FormFieldRenderer renderer =
 			textFormFieldRendererProvider.get ()
-				.name (name)
-				.label (label)
-				.nullable (nullable)
-				.size (size);
+
+			.name (
+				name)
+
+			.label (
+				label)
+
+			.nullable (
+				nullable)
+
+			.size (
+				size);
 
 		// update hook
 

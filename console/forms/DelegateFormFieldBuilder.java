@@ -1,5 +1,6 @@
 package wbs.platform.console.forms;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 
 import javax.inject.Inject;
@@ -122,7 +123,12 @@ class DelegateFormFieldBuilder {
 				label)
 
 			.size (
-				FormField.defaultSize);
+				FormField.defaultSize)
+
+			.nullable (
+				ifNull (
+					spec.nullable (),
+					false));
 
 		// field
 

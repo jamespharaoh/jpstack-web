@@ -99,8 +99,12 @@ class SecondsFormFieldBuilder {
 
 		FormFieldAccessor accessor =
 			simpleFormFieldAccessorProvider.get ()
-				.name (name)
-				.nativeClass (Integer.class);
+
+			.name (
+				name)
+
+			.nativeClass (
+				Integer.class);
 
 		FormFieldConstraintValidator constraintValidator =
 			nullFormFieldConstraintValidatorProvider.get ();
@@ -111,10 +115,18 @@ class SecondsFormFieldBuilder {
 
 		FormFieldRenderer renderer =
 			textFormFieldRendererProvider.get ()
-				.name (name)
-				.label (label)
-				.nullable (nullable)
-				.size (FormField.defaultSize);
+
+			.name (
+				name)
+
+			.label (
+				label)
+
+			.nullable (
+				nullable)
+
+			.size (
+				FormField.defaultSize);
 
 		// field
 

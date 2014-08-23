@@ -1,5 +1,6 @@
 package wbs.platform.console.forms;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.PrintWriter;
@@ -157,8 +158,22 @@ class TextFormFieldRenderer<Container>
 	String formToInterface (
 			List<String> errors) {
 
-		return requestContext.parameter (
-			name ());
+		String formValue =
+			formValue ();
+
+		if (
+
+			nullable ()
+
+			&& equal (
+				formValue,
+				"")
+
+		) {
+			return null;
+		}
+
+		return formValue;
 
 	}
 

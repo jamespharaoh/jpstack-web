@@ -27,6 +27,7 @@ import javax.imageio.stream.ImageInputStreamImpl;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.GlobalId;
@@ -725,6 +726,13 @@ class MediaLogic {
 					ImageIO.getImageReadersByMIMEType (
 						mimeType))) {
 
+			log.debug (
+				stringFormat (
+					"Attempt to read image of type %s with %s bytes with %s",
+					mimeType,
+					data.length,
+					imageReader.toString ()));
+
 			imageReader.setInput (
 				new ByteArrayImageInputStream (data));
 
@@ -744,6 +752,12 @@ class MediaLogic {
 			}
 
 		}
+
+		log.warn (
+			stringFormat (
+				"Exhausted options to read image of type %s with %s bytes",
+				mimeType,
+				data.length));
 
 		return null;
 
@@ -846,7 +860,7 @@ class MediaLogic {
 
 	public
 	BufferedImage resampleImage (
-			BufferedImage image,
+			@NonNull BufferedImage image,
 			int maxWidth,
 			int maxHeight) {
 

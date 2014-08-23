@@ -40,6 +40,9 @@ class TimestampFormFieldInterfaceMapping<Container>
 			String interfaceValue,
 			List<String> errors) {
 
+		if (interfaceValue == null)
+			return null;
+
 		if (interfaceValue.isEmpty ())
 			return null;
 

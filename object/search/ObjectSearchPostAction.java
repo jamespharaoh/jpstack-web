@@ -194,7 +194,7 @@ class ObjectSearchPostAction
 
 			ConsoleContextType targetContextType =
 				consoleManager.contextType (
-					consoleHelper.objectName (),
+					consoleHelper.objectName () + "+",
 					true);
 
 			ConsoleContext targetContext =
