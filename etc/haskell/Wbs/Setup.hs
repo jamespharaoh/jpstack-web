@@ -4,9 +4,10 @@
 -- - output eclipse configs
 -- - output web configs
 
-{-# LANGUAGE Arrows, NoMonomorphismRestriction #-}
+{-# LANGUAGE Arrows #-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
 
-module Wbs.Setup where
+module Main where
 
 import Data.List
 import Data.String.Utils (replace)

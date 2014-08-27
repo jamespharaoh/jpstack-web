@@ -13,3 +13,8 @@
 /c/modeminit
 /c/socktest
 /work
+
+# cabal
+/.cabal-sandbox
+/cabal.sandbox.config
+/dist

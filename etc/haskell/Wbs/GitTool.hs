@@ -1,16 +1,20 @@
 #!/usr/bin/env runhaskell
 
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE RankNTypes #-}
 
-module Wbs.GitTool where
+module Main where
 
+import           Control.Arrow
+import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 
 import qualified Data.ByteString.Char8 as Char8
 import qualified Data.IORef as IORef
 import qualified Data.List as List
-import qualified Data.List.Split as Split
+import qualified Data.List.Utils as List.Utils
 import qualified Data.Map.Strict as Map
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
@@ -27,11 +31,262 @@ import qualified System.Environment as Environment
 
 import           Wbs.Config
 
+---------- data types
+
 type TreeEntries r =
 	[(Char8.ByteString, Git.Types.TreeEntry r)]
 
 type CacheRef r =
 	IORef.IORef (Cache r)
+
+type Tree r =
+	Git.Types.Tree r
+
+type TreeId r =
+	Git.Types.TreeOid r
+
+type Commit r =
+	Git.Types.Commit r
+
+type CommitId r =
+	Git.Types.CommitOid r
+
+type CommitSet r =
+	Map.Map (CommitId r) (Commit r)
+
+data Cache r = Cache {
+
+	_cacheCommits ::
+		Map.Map
+		(CommitId r)
+		(Commit r),
+
+	_cacheTrees ::
+		Map.Map
+		(TreeId r)
+		(Tree r),
+
+	_cacheBuiltTrees ::
+		Map.Map
+		[(Char8.ByteString, Git.Types.Oid r)]
+		(Tree r),
+
+	_cacheParents ::
+		Map.Map
+		(CommitId r)
+		[Commit r]
+
+}
+
+makeLenses ''Cache
+
+---------- tree stuff
+
+treeId ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	Tree r ->
+	m (TreeId r)
+
+treeId tree =
+	Git.Types.treeOid tree
+
+---------- commit stuff
+
+-- commitId - returns the commit id for a commit
+
+commitId ::
+	Ord (CommitId r) =>
+	Commit r ->
+	CommitId r
+
+commitId commit =
+	Git.Types.commitOid commit
+
+-- commitTree - returns the tree for a commit
+
+commitTree ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	CacheRef r ->
+	Commit r ->
+	m (Tree r)
+
+commitTree cacheRef commit = do
+
+	let treeIdTemp =
+		Git.Types.commitTree commit
+
+	loadTree cacheRef treeIdTemp
+
+-- commitSetMember - tests if a commit is in a set
+
+commitSetMember ::
+	Ord (CommitId r) =>
+	Commit r ->
+	CommitSet r ->
+	Bool
+
+commitSetMember commit set =
+	Map.member (commitId commit) set
+
+-- commitSetEmpty - returns an empty commit set
+
+commitSetEmpty ::
+	CommitSet r
+
+commitSetEmpty =
+	Map.empty
+
+-- commitSetElems - get commits in commit set
+
+commitSetElems set =
+	Map.elems set
+
+-- commitSetInsert - insert a commit in a commit set
+
+commitSetInsert ::
+	Ord (CommitId r) =>
+	Commit r ->
+	CommitSet r ->
+	CommitSet r
+
+commitSetInsert commit set =
+	Map.insert (commitId commit) commit set
+
+-- commitSetFromList - create a commit set given a list
+
+commitSetFromList ::
+	Ord (CommitId r) =>
+	[Commit r] ->
+	CommitSet r
+
+commitSetFromList =
+	foldl (\set commit -> commitSetInsert commit set) commitSetEmpty
+
+-- commitSetUnion -
+
+commitSetUnion ::
+	Ord (CommitId r) =>
+	CommitSet r ->
+	CommitSet r ->
+	CommitSet r
+
+commitSetUnion left right =
+	Map.union left right
+
+---------- cache
+
+createCache ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	m (CacheRef r)
+
+createCache = do
+
+	liftIO $ IORef.newIORef Cache {
+		_cacheCommits = Map.empty,
+		_cacheTrees = Map.empty,
+		_cacheBuiltTrees = Map.empty,
+		_cacheParents = Map.empty }
+
+loadCached ::
+	(Git.Types.MonadGit r m, MonadIO m, Ord k') =>
+	Lens' (Cache r) (Map.Map k' a) ->
+	(k -> k') ->
+	(k -> m a) ->
+	IORef.IORef (Cache r) ->
+	k ->
+	m (a)
+
+loadCached lens mungeKey lookup cacheRef id = do
+
+	cache <-
+		liftIO $ IORef.readIORef cacheRef
+
+	let map =
+		view lens cache
+
+	let maybeValue =
+		Map.lookup (mungeKey id) map
+
+	case maybeValue of
+
+		Just value -> do
+
+			return value
+
+		Nothing -> do
+
+			value <-
+				lookup id
+
+			let map' =
+				Map.insert (mungeKey id) value map
+
+			let cache' =
+				set lens map' cache
+
+			liftIO $ IORef.writeIORef cacheRef cache'
+
+			return value
+
+loadTree ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	IORef.IORef (Cache r) ->
+	Git.Types.TreeOid r ->
+	m (Git.Types.Tree r)
+
+loadTree cacheRef treeOid =
+
+	loadCached
+		cacheTrees
+		id
+		Git.Types.lookupTree
+		cacheRef
+		treeOid
+
+loadCommit ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	IORef.IORef (Cache r) ->
+	Git.Types.CommitOid r ->
+	m (Git.Types.Commit r)
+
+loadCommit cacheRef commitOid =
+
+	loadCached
+		cacheCommits
+		id
+		Git.Types.lookupCommit
+		cacheRef
+		commitOid
+
+lookupBuiltTree ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	CacheRef r ->
+	TreeEntries r ->
+	m (Tree r)
+
+lookupBuiltTree cacheRef entries =
+
+	loadCached
+		cacheBuiltTrees
+		(map $ second Git.Types.treeEntryToOid)
+		(addEntriesToTree cacheRef Nothing)
+		cacheRef
+		entries
+
+commitParents ::
+	(Git.Types.MonadGit r m, MonadIO m) =>
+	CacheRef r ->
+	Commit r ->
+	m ([Commit r])
+
+commitParents cacheRef commit =
+
+	loadCached
+		cacheParents
+		commitId
+		(\commit -> mapM (loadCommit cacheRef) $ Git.Types.commitParents commit)
+		cacheRef
+		commit
 
 ---------- tree building
 
@@ -45,7 +300,7 @@ addEntriesToTree ::
 addEntriesToTree cacheRef originalTreeMaybe entries = do
 
 	let pathSplit path =
-		Split.splitOn "/" (Char8.unpack path)
+		List.Utils.split "/" (Char8.unpack path)
 
 	treeBuilder <-
 		Git.Types.newTreeBuilder originalTreeMaybe
@@ -166,7 +421,7 @@ treeLookup cacheRef tree path = do
 		Git.Types.newTreeBuilder (Just tree)
 
 	let pathParts =
-		Split.splitOn "/" (Char8.unpack path)
+		List.Utils.split "/" (Char8.unpack path)
 
 	case pathParts of
 
@@ -244,6 +499,7 @@ filterTree ::
 	[Char8.ByteString] ->
 	Git.Types.Tree r ->
 	m (Git.Types.Tree r)
+
 filterTree cacheRef paths tree = do
 
 	filteredTreeEntries <-
@@ -421,254 +677,6 @@ reduceCommit cacheRef paths expansions commit = do
 					expansions'
 
 			return (reduced, expansions'')
-
----------- cache
-
-data Cache r = Cache {
-
-	cacheCommits ::
-		Map.Map
-		(CommitId r)
-		(Commit r),
-
-	cacheTrees ::
-		Map.Map
-		(TreeId r)
-		(Tree r),
-
-	cacheBuiltTrees ::
-		Map.Map
-		[(Char8.ByteString, Git.Types.Oid r)]
-		(Tree r),
-
-	cacheParents ::
-		Map.Map
-		(CommitId r)
-		[Commit r]
-
-}
-
-createCache = do
-
-	liftIO $ IORef.newIORef Cache {
-		cacheCommits = Map.empty,
-		cacheTrees = Map.empty,
-		cacheBuiltTrees = Map.empty,
-		cacheParents = Map.empty }
-
-loadCached ::
-	(Git.Types.MonadGit r m, MonadIO m, Ord k') =>
-	(Cache r -> Map.Map k' a) ->
-	(Cache r -> Map.Map k' a -> Cache r) ->
-	(k -> k') ->
-	(k -> m a) ->
-	IORef.IORef (Cache r) ->
-	k ->
-	m (a)
-
-loadCached getMap setMap mungeKey lookup cacheRef id = do
-
-	cache <-
-		liftIO $ IORef.readIORef cacheRef
-
-	let map =
-		getMap cache
-
-	let maybeValue =
-		Map.lookup (mungeKey id) map
-
-	case maybeValue of
-
-		Just value -> do
-
-			return value
-
-		Nothing -> do
-
-			value <-
-				lookup id
-
-			let map' =
-				Map.insert (mungeKey id) value map
-
-			let cache' =
-				setMap cache map'
-
-			liftIO $ IORef.writeIORef cacheRef cache'
-
-			return value
-
-loadTree ::
-	(Git.Types.MonadGit r m, MonadIO m) =>
-	IORef.IORef (Cache r) ->
-	Git.Types.TreeOid r ->
-	m (Git.Types.Tree r)
-
-loadTree cacheRef treeOid = do
-
-	loadCached
-		cacheTrees
-		(\cache map -> cache { cacheTrees = map })
-		id
-		Git.Types.lookupTree
-		cacheRef
-		treeOid
-
-loadCommit ::
-	(Git.Types.MonadGit r m, MonadIO m) =>
-	IORef.IORef (Cache r) ->
-	Git.Types.CommitOid r ->
-	m (Git.Types.Commit r)
-
-loadCommit cacheRef commitOid = do
-
-	loadCached
-		cacheCommits
-		(\cache map -> cache { cacheCommits = map })
-		id
-		Git.Types.lookupCommit
-		cacheRef
-		commitOid
-
-lookupBuiltTree ::
-	(Git.Types.MonadGit r m, MonadIO m) =>
-	CacheRef r ->
-	TreeEntries r ->
-	m (Tree r)
-
-lookupBuiltTree cacheRef entries = do
-
-	loadCached
-		cacheBuiltTrees
-		(\cache map -> cache { cacheBuiltTrees = map })
-		(map (\(path, entry) -> (path, Git.Types.treeEntryToOid entry)))
-		(addEntriesToTree cacheRef Nothing)
-		cacheRef
-		entries
-
-commitParents ::
-	(Git.Types.MonadGit r m, MonadIO m) =>
-	CacheRef r ->
-	Commit r ->
-	m ([Commit r])
-
-commitParents cacheRef commit = do
-
-	loadCached
-		cacheParents
-		(\cache map -> cache { cacheParents = map })
-		commitId
-		(\commit -> mapM (loadCommit cacheRef) $ Git.Types.commitParents commit)
-		cacheRef
-		commit
-
----------- commit stuff
-
-type Commit r =
-	Git.Types.Commit r
-
-type CommitId r =
-	Git.Types.CommitOid r
-
-type CommitSet r =
-	Map.Map (CommitId r) (Commit r)
-
--- commitId - returns the commit id for a commit
-
-commitId ::
-	Ord (CommitId r) =>
-	Commit r ->
-	CommitId r
-
-commitId commit =
-	Git.Types.commitOid commit
-
--- commitTree - returns the tree for a commit
-
-commitTree ::
-	(Git.Types.MonadGit r m, MonadIO m) =>
-	CacheRef r ->
-	Commit r ->
-	m (Tree r)
-
-commitTree cacheRef commit = do
-
-	let treeIdTemp =
-		Git.Types.commitTree commit
-
-	loadTree cacheRef treeIdTemp
-
--- commitSetMember - tests if a commit is in a set
-
-commitSetMember ::
-	Ord (CommitId r) =>
-	Commit r ->
-	CommitSet r ->
-	Bool
-
-commitSetMember commit set =
-	Map.member (commitId commit) set
-
--- commitSetEmpty - returns an empty commit set
-
-commitSetEmpty ::
-	CommitSet r
-
-commitSetEmpty =
-	Map.empty
-
--- commitSetElems - get commits in commit set
-
-commitSetElems set =
-	Map.elems set
-
--- commitSetInsert - insert a commit in a commit set
-
-commitSetInsert ::
-	Ord (CommitId r) =>
-	Commit r ->
-	CommitSet r ->
-	CommitSet r
-
-commitSetInsert commit set =
-	Map.insert (commitId commit) commit set
-
--- commitSetFromList - create a commit set given a list
-
-commitSetFromList ::
-	Ord (CommitId r) =>
-	[Commit r] ->
-	CommitSet r
-
-commitSetFromList =
-	foldl (\set commit -> commitSetInsert commit set) commitSetEmpty
-
--- commitSetUnion -
-
-commitSetUnion ::
-	Ord (CommitId r) =>
-	CommitSet r ->
-	CommitSet r ->
-	CommitSet r
-
-commitSetUnion left right =
-	Map.union left right
-
----------- tree stuff
-
-type Tree r =
-	Git.Types.Tree r
-
-type TreeId r =
-	Git.Types.TreeOid r
-
-treeId ::
-	(Git.Types.MonadGit r m, MonadIO m) =>
-	Tree r ->
-	m (TreeId r)
-
-treeId tree =
-	Git.Types.treeOid tree
 
 ---------- rewriting
 
