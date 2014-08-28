@@ -1,11 +1,13 @@
 package wbs.platform.user.logic;
 
 import static wbs.framework.utils.etc.Misc.hashSha1;
+import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.util.Date;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.GlobalId;
 import wbs.platform.scaffold.model.SliceObjectHelper;
@@ -41,39 +43,56 @@ class UserLogicImpl
 	@Override
 	public
 	void userLogon (
-			UserRec user,
-			String sessionId) {
+			@NonNull UserRec user,
+			@NonNull String sessionId) {
 
 		Date now =
 			new Date ();
 
 		// end any existing session
 
-		userLogoff (user);
+		userLogoff (
+			user);
 
 		// start the session log
 
 		UserSessionRec session =
 			userSessionHelper.insert (
 				new UserSessionRec ()
-					.setUser (user)
-					.setStartTime (now));
+
+			.setUser (
+				user)
+
+			.setStartTime (
+				now)
+
+		);
 
 		// go online
 
 		userOnlineHelper.insert (
 			new UserOnlineRec ()
-				.setUser (user)
-				.setSessionId (sessionId)
-				.setTimestamp (now)
-				.setUserSession (session));
+
+			.setUser (
+				user)
+
+			.setSessionId (
+				sessionId)
+
+			.setTimestamp (
+				now)
+
+			.setUserSession (
+				session)
+
+		);
 
 	}
 
 	@Override
 	public
 	void userLogoff (
-			UserRec user) {
+			@NonNull UserRec user) {
 
 		UserOnlineRec userOnline =
 			userOnlineHelper.find (
@@ -104,10 +123,10 @@ class UserLogicImpl
 	@Override
 	public
 	Integer userLogonTry (
-			String sliceCode,
-			String username,
-			String password,
-			String sessionId) {
+			@NonNull String sliceCode,
+			@NonNull String username,
+			@NonNull String password,
+			@NonNull String sessionId) {
 
 		// lookup the user
 
@@ -116,7 +135,7 @@ class UserLogicImpl
 				GlobalId.root,
 				sliceCode);
 
-		if (sliceCode == null)
+		if (slice == null)
 			return null;
 
 		UserRec user =
@@ -129,10 +148,19 @@ class UserLogicImpl
 
 		// check password
 
-		if (user.getPassword () == null
-				|| ! user.getPassword ().equals (hashSha1 (password)))
+		if (
+
+			user.getPassword () == null
+
+			|| notEqual (
+				user.getPassword (),
+				hashSha1 (password))
+
+		) {
 
 			return null;
+
+		}
 
 		// update user (bring online)
 

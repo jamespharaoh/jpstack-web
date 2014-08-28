@@ -679,8 +679,8 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Record<?> findByCode (
-					GlobalId parentGlobalId,
-					String... codes) {
+					@NonNull GlobalId parentGlobalId,
+					@NonNull String... codes) {
 
 				return objectHelperProvider
 					.findByParentAndCode (
@@ -711,8 +711,8 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			List findByParentAndType (
-					Record parent,
-					String typeCode) {
+					@NonNull Record parent,
+					@NonNull String typeCode) {
 
 				ObjectHelper<?> parentHelper =
 					forObjectClass (parent.getClass ());
@@ -731,7 +731,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Record insert (
-					Record object) {
+					@NonNull Record object) {
 
 				if (! objectClass ().isInstance (
 						object)) {
@@ -767,8 +767,8 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			void setParent (
-					Record object,
-					Record parent) {
+					@NonNull Record object,
+					@NonNull Record parent) {
 
 				objectHelperProvider.setParent (
 					object,
@@ -779,7 +779,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			String getName (
-					Record object) {
+					@NonNull Record object) {
 
 				return objectHelperProvider.getName (
 					object);
@@ -789,7 +789,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			String getTypeCode (
-					Record object) {
+					@NonNull Record object) {
 
 				return objectHelperProvider
 					.getTypeCode (object);
@@ -799,7 +799,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			String getCode (
-					Record object) {
+					@NonNull Record object) {
 
 				return objectHelperProvider
 					.getCode (object);
@@ -809,7 +809,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			String getDescription (
-					Record object) {
+					@NonNull Record object) {
 
 				return objectHelperProvider
 					.getDescription (object);
@@ -819,7 +819,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Record getParentObjectType (
-					Record object) {
+					@NonNull Record object) {
 
 				return objectHelperProvider
 					.getParentType (object);
@@ -829,7 +829,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Integer getParentTypeId (
-					Record object) {
+					@NonNull Record object) {
 
 				if (! objectClass ().isInstance (object))
 					throw new IllegalArgumentException ();
@@ -849,7 +849,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Integer getParentId (
-					Record object) {
+					@NonNull Record object) {
 
 				if (! objectClass ().isInstance (object))
 					throw new IllegalArgumentException ();
@@ -915,7 +915,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			List<Record<?>> search (
-					Object search) {
+					@NonNull Object search) {
 
 				List<Integer> objectIds =
 					objectHelperProvider.searchIds (
@@ -940,7 +940,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			List<Integer> searchIds (
-					Object search) {
+					@NonNull Object search) {
 
 				return objectHelperProvider.searchIds (
 					search);
@@ -950,7 +950,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			EphemeralRecord remove (
-					EphemeralRecord object) {
+					@NonNull EphemeralRecord object) {
 
 				return objectHelperProvider.remove (
 					object);
@@ -976,7 +976,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			GlobalId getParentGlobalId (
-					Record object) {
+					@NonNull Record object) {
 
 				if (root ())
 					return null;
@@ -990,7 +990,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Record getParent (
-					Record object) {
+					@NonNull Record object) {
 
 				if (objectHelperProvider.root ())
 					return null;
@@ -1063,7 +1063,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			List findByParent (
-					Record parent) {
+					@NonNull Record parent) {
 
 				ObjectHelper<?> parentHelper =
 					forObjectClass (
@@ -1078,7 +1078,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			GlobalId getGlobalId (
-					Record object) {
+					@NonNull Record object) {
 
 				return new GlobalId (
 					objectTypeId,
@@ -1089,8 +1089,8 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			List getChildren (
-					Record object,
-					Class childClass) {
+					@NonNull Record object,
+					@NonNull Class childClass) {
 
 				ObjectHelperProvider childHelperProvider =
 					objectHelperProviderManager.forObjectClass (
@@ -1108,7 +1108,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			List getMinorChildren (
-					Record object) {
+					@NonNull Record object) {
 
 				List<Record<?>> children =
 					new ArrayList<Record<?>> ();
@@ -1140,7 +1140,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			List getChildren (
-					Record object) {
+					@NonNull Record object) {
 
 				List<Record<?>> children =
 					new ArrayList<Record<?>> ();
@@ -1172,7 +1172,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			boolean getDeleted (
-					Record object,
+					@NonNull Record object,
 					boolean checkParents) {
 
 				Record currentObject =
@@ -1239,11 +1239,12 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Record findByCode (
-					Record parent,
-					String... codes) {
+					@NonNull Record parent,
+					@NonNull String... codes) {
 
 				ObjectHelper<?> parentHelper =
-					forObjectClass (parent.getClass ());
+					forObjectClass (
+						parent.getClass ());
 
 				GlobalId parentGlobalId =
 					new GlobalId (
@@ -1259,9 +1260,9 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Record findByTypeAndCode (
-					Record parent,
-					String typeCode,
-					String... codes) {
+					@NonNull Record parent,
+					@NonNull String typeCode,
+					@NonNull String... codes) {
 
 				ObjectHelper<?> parentHelper =
 					forObjectClass (parent.getClass ());
@@ -1314,9 +1315,9 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Record findByTypeAndCode (
-					GlobalId parentGlobalId,
-					String typeCode,
-					String... codes) {
+					@NonNull GlobalId parentGlobalId,
+					@NonNull String typeCode,
+					@NonNull String... codes) {
 
 				return objectHelperProvider.findByParentAndTypeAndCode (
 					parentGlobalId,
@@ -1328,8 +1329,8 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			List findByParentAndType (
-					GlobalId parentGlobalId,
-					String typeCode) {
+					@NonNull GlobalId parentGlobalId,
+					@NonNull String typeCode) {
 
 				return objectHelperProvider.findAllByParentAndType (
 					parentGlobalId,
@@ -1350,7 +1351,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Record lock (
-					Record object) {
+					@NonNull Record object) {
 
 				return objectHelperProvider.lock (
 					object);
