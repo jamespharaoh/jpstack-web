@@ -94,7 +94,18 @@ class ChatUserPendingFormAction
 	@Override
 	protected
 	Responder backupResponder () {
-		return null;
+
+		@Cleanup
+		Transaction transaction =
+			database.beginReadWrite ();
+
+		ChatUserRec chatUser =
+			chatUserHelper.find (
+				requestContext.stuffInt ("chatUserId"));
+
+		return nextResponder (
+			chatUser);
+
 	}
 
 	@Override
@@ -190,7 +201,8 @@ class ChatUserPendingFormAction
 			requestContext.addError (
 				"No name to approve");
 
-			return nextResponder (chatUser);
+			return nextResponder (
+				chatUser);
 
 		}
 
@@ -279,7 +291,8 @@ class ChatUserPendingFormAction
 			requestContext.addError (
 				"No info to approve");
 
-			return nextResponder (chatUser);
+			return nextResponder (
+				chatUser);
 
 		}
 
@@ -382,7 +395,8 @@ class ChatUserPendingFormAction
 					"No %s to approve",
 					mode));
 
-			return nextResponder (chatUser);
+			return nextResponder (
+				chatUser);
 
 		}
 
@@ -512,7 +526,8 @@ class ChatUserPendingFormAction
 			requestContext.addError (
 				"No name to approve");
 
-			return nextResponder (chatUser);
+			return nextResponder (
+				chatUser);
 
 		}
 
@@ -796,8 +811,13 @@ class ChatUserPendingFormAction
 		// checks involving database
 
 		if (chatUserImage == null) {
-			requestContext.addError ("No photo to approve");
-			return nextResponder (chatUser);
+
+			requestContext.addError (
+				"No photo to approve");
+
+			return nextResponder (
+				chatUser);
+
 		}
 
 		if (chatUserImage.getStatus ()
@@ -807,9 +827,15 @@ class ChatUserPendingFormAction
 		// update image
 
 		chatUserImage
-			.setStatus (ChatUserInfoStatus.moderatorRejected)
-			.setModerationTime (new Date ())
-			.setModerator (myUser);
+
+			.setStatus (
+				ChatUserInfoStatus.moderatorRejected)
+
+			.setModerationTime (
+				new Date ())
+
+			.setModerator (
+				myUser);
 
 		// send message
 

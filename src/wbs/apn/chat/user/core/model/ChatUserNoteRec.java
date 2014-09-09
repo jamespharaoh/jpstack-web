@@ -30,11 +30,19 @@ public
 class ChatUserNoteRec
 	implements CommonRecord<ChatUserNoteRec> {
 
+	// id
+
 	@GeneratedIdField
 	Integer id;
 
+	// identity
+
 	@ParentField
 	ChatUserRec chatUser;
+
+	// TODO index
+
+	// details
 
 	@SimpleField (
 		hibernateTypeHelper = PersistentInstantAsTimestamp.class)
@@ -45,6 +53,8 @@ class ChatUserNoteRec
 
 	@ReferenceField
 	TextRec text;
+
+	// compare to
 
 	@Override
 	public

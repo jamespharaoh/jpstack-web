@@ -68,7 +68,19 @@ class ConsoleAction
 			if (responder != null)
 				return responder;
 
-			return backupResponder ();
+			Responder backupResponder =
+				backupResponder ();
+
+			if (backupResponder == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"%s.backupResponder () returned null",
+						getClass ().getSimpleName ()));
+
+			}
+
+			return backupResponder;
 
 		} catch (Exception exception) {
 

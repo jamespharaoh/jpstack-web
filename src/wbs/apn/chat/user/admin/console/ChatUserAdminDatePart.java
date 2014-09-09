@@ -181,16 +181,17 @@ class ChatUserAdminDatePart
 				: chatUser.getChatUserDateLogs ()) {
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
-				ifNull (
-					timeFormatter.instantToTimestampString (
+				chatUserDateLogRec.getTimestamp () != null
+					? timeFormatter.instantToTimestampString (
 						chatUserLogic.timezone (
 							chatUser),
 						dateToInstant (
-							chatUserDateLogRec.getTimestamp ())),
-					"-"));
+							chatUserDateLogRec.getTimestamp ()))
+					: "-");
 
 			if (chatUserDateLogRec.getUser () != null) {
 
