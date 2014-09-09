@@ -13,6 +13,8 @@ import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
+import wbs.platform.console.context.ConsoleContext;
+import wbs.platform.console.context.ConsoleContextType;
 import wbs.platform.console.forms.FormFieldLogic;
 import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.helper.ConsoleHelper;
@@ -51,13 +53,19 @@ class ObjectSearchResultsPart
 	@Getter @Setter
 	Integer itemsPerPage;
 
+	@Getter @Setter
+	String targetContextTypeName;
+
 	// state
 
 	Record<?> currentObject;
 	List<Record<?>> objects;
 	Integer totalObjects;
+
 	Integer pageNumber;
 	Integer pageCount;
+
+	ConsoleContext targetContext;
 
 	// implementation
 
@@ -120,6 +128,24 @@ class ObjectSearchResultsPart
 					objectId));
 
 		}
+
+		// other stuff
+
+		prepareTargetContext ();
+
+	}
+
+	void prepareTargetContext () {
+
+		ConsoleContextType targetContextType =
+			consoleManager.contextType (
+				targetContextTypeName,
+				true);
+
+		targetContext =
+			consoleManager.relatedContext (
+				requestContext.consoleContext (),
+				targetContextType);
 
 	}
 
@@ -221,7 +247,12 @@ class ObjectSearchResultsPart
 				"%s",
 				Html.magicTr (
 					requestContext.resolveContextUrl (
-						consoleHelper.getDefaultContextPath (object)),
+						stringFormat (
+							"%s",
+							targetContext.pathPrefix (),
+							"/%s",
+							consoleHelper.getPathId (
+								object))),
 					object == currentObject));
 
 			formFieldLogic.outputTableCells (

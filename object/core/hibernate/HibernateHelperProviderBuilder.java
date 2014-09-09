@@ -448,10 +448,7 @@ class HibernateHelperProviderBuilder {
 		public
 		Record<?> findByParentAndCode (
 				GlobalId parentGlobalId,
-				String... codes) {
-
-			if (codes.length != 1)
-				throw new RuntimeException ();
+				String code) {
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -489,7 +486,7 @@ class HibernateHelperProviderBuilder {
 
 					.setString (
 						"code",
-						codes [0])
+						code)
 
 					.list ();
 
@@ -536,7 +533,7 @@ class HibernateHelperProviderBuilder {
 
 						.setString (
 							"code",
-							codes [0])
+							code)
 
 						.list ();
 
@@ -577,7 +574,151 @@ class HibernateHelperProviderBuilder {
 
 					.setString (
 						"code",
-						codes [0])
+						code)
+
+					.list ();
+
+				if (list.isEmpty ())
+					return null;
+
+				return (Record<?>)
+					list.get (0);
+
+			}
+
+		}
+
+		@Override
+		public
+		Record<?> findByParentAndIndex (
+				GlobalId parentGlobalId,
+				Integer index) {
+
+			Session session =
+				hibernateDatabase.currentSession ();
+
+			if (typeCodeExists ()) {
+
+				throw new UnsupportedOperationException (
+					stringFormat (
+						"Object type %s must be looked up by type code",
+						getClass ().getSimpleName ()));
+
+			}
+
+			if (parentTypeIsFixed ()
+					&& parentClass () == RootRec.class) {
+
+				if (! equal (
+						parentGlobalId,
+						GlobalId.root)) {
+
+					throw new IllegalArgumentException (
+						stringFormat (
+							"Invalid parent global id %s for rooted object in %s.%s",
+							parentGlobalId,
+							getClass ().getSimpleName (),
+							"findChildByCode"));
+
+				}
+
+				List<?> list =
+
+					session.createQuery (
+						"FROM " + objectClass ().getName () + " ob " +
+						"WHERE ob."	+ indexFieldName () + " = :index")
+
+					.setInteger (
+						"index",
+						index)
+
+					.list ();
+
+				if (list.isEmpty ())
+					return null;
+
+				return (Record<?>) list.get (0);
+
+			} else if (parentTypeIsFixed ()) {
+
+				/*
+				if (parentGlobalId.getTypeId ()
+						!= parentObjectHelperProvider ().objectTypeId ()) {
+
+					throw new IllegalArgumentException (sf (
+						"Invalid parent type id %s for %s (should be %s)",
+						parentGlobalId.getTypeId (),
+						objectClass ().getSimpleName (),
+						parentObjectHelperProvider ().objectTypeId ()));
+
+				}
+				*/
+
+				List<Record<?>> list =
+					session.createQuery (
+
+						stringFormat (
+
+							"FROM %s _%s ",
+							objectClass ().getSimpleName (),
+							objectName (),
+
+							"WHERE _%s.%s.id = :parentId ",
+							objectName (),
+							parentFieldName (),
+
+							"AND _%s.%s = :index",
+							objectName (),
+							indexFieldName ()))
+
+						.setInteger (
+							"parentId",
+							parentGlobalId.objectId ())
+
+						.setInteger (
+							"index",
+							index)
+
+						.list ();
+
+				if (list.isEmpty ())
+					return null;
+
+				return (Record<?>)
+					list.get (0);
+
+			} else {
+
+				List<?> list =
+
+					session.createQuery (
+						stringFormat (
+
+							"FROM %s _%s ",
+							objectClass ().getSimpleName (),
+							objectName (),
+
+							"WHERE _%s.parentObjectType.id = :parentTypeId ",
+							objectName (),
+
+							"AND _%s.parentObjectId = :parentId ",
+							objectName (),
+
+							"AND _%s.%s = :index",
+							objectName (),
+							indexFieldName ()))
+
+					.setInteger (
+						"parentTypeId",
+						parentGlobalId.typeId ())
+
+					.setInteger (
+						"parentId",
+						parentGlobalId.objectId ())
+
+					.setInteger (
+						"index",
+						index)
 
 					.list ();
 
@@ -596,7 +737,7 @@ class HibernateHelperProviderBuilder {
 		Record<?> findByParentAndTypeAndCode (
 				GlobalId parentGlobalId,
 				String typeCode,
-				String... codes) {
+				String code) {
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -651,7 +792,7 @@ class HibernateHelperProviderBuilder {
 
 					.setString (
 						codeFieldName (),
-						codes [0])
+						code)
 
 					.list ();
 
@@ -708,7 +849,7 @@ class HibernateHelperProviderBuilder {
 
 					.setString (
 						codeFieldName (),
-						codes [0])
+						code)
 
 					.list ();
 
@@ -758,7 +899,7 @@ class HibernateHelperProviderBuilder {
 
 					.setString (
 						codeFieldName (),
-						codes [0])
+						code)
 
 					.list ();
 
