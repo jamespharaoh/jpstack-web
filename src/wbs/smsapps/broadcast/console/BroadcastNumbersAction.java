@@ -200,12 +200,20 @@ class BroadcastNumbersAction
 				case accepted:
 
 					broadcastNumber
-						.setState (BroadcastNumberState.removed)
-						.setRemovedByUser (myUser);
+
+						.setState (
+							BroadcastNumberState.removed)
+
+						.setRemovedByUser (
+							myUser);
 
 					broadcast
-						.setNumAccepted (broadcast.getNumAccepted () - 1)
-						.setNumRemoved (broadcast.getNumRemoved () + 1);
+
+						.setNumAccepted (
+							broadcast.getNumAccepted () - 1)
+
+						.setNumRemoved (
+							broadcast.getNumRemoved () + 1);
 
 					numRemoved ++;
 
@@ -214,12 +222,20 @@ class BroadcastNumbersAction
 				case rejected:
 
 					broadcastNumber
-						.setState (BroadcastNumberState.removed)
-						.setRemovedByUser (myUser);
+
+						.setState (
+							BroadcastNumberState.removed)
+
+						.setRemovedByUser (
+							myUser);
 
 					broadcast
-						.setNumRejected (broadcast.getNumRejected () - 1)
-						.setNumRemoved (broadcast.getNumRemoved () + 1);
+
+						.setNumRejected (
+							broadcast.getNumRejected () - 1)
+
+						.setNumRemoved (
+							broadcast.getNumRemoved () + 1);
 
 					numRemoved ++;
 

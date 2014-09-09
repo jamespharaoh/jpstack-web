@@ -34,6 +34,8 @@ import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.sms.customer.model.SmsCustomerRec;
+import wbs.sms.customer.model.SmsCustomerSessionObjectHelper;
+import wbs.sms.customer.model.SmsCustomerSessionRec;
 import wbs.sms.message.core.model.MessageDirection;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
@@ -86,6 +88,9 @@ class ManualResponderRequestPendingSummaryPart
 	ServiceObjectHelper serviceHelper;
 
 	@Inject
+	SmsCustomerSessionObjectHelper smsCustomerSessionHelper;
+
+	@Inject
 	TimeFormatter timeFormatter;
 
 	// state
@@ -95,6 +100,8 @@ class ManualResponderRequestPendingSummaryPart
 	ManualResponderRec manualResponder;
 
 	SmsCustomerRec smsCustomer;
+	SmsCustomerSessionRec smsCustomerSession;
+
 	NumberRec number;
 	NetworkRec network;
 
@@ -152,6 +159,14 @@ class ManualResponderRequestPendingSummaryPart
 		smsCustomer =
 			manualResponderNumber != null
 				? manualResponderNumber.getSmsCustomer ()
+				: null;
+
+		smsCustomerSession =
+			smsCustomer != null
+			&& smsCustomer.getNumSessions () > 0
+				? smsCustomerSessionHelper.findByIndex (
+					smsCustomer,
+					smsCustomer.getNumSessions () - 1)
 				: null;
 
 		// get routes
@@ -315,7 +330,7 @@ class ManualResponderRequestPendingSummaryPart
 
 		goOperatorInfo ();
 
-		goWelcomeHistory ();
+		goSessionDetails ();
 
 		goRequestHistory ();
 
@@ -458,11 +473,12 @@ class ManualResponderRequestPendingSummaryPart
 				manualResponderRequest.getNumber ().getId ()),
 			" class=\"mrNumberNoteEditable\"",
 			">%s</p>\n",
-			Html.newlineToBr (Html.encode (
-				manualResponderNumber != null &&
-				manualResponderNumber.getNotesText () != null
-					? manualResponderNumber.getNotesText ().getText ()
-					: "")));
+			Html.newlineToBr (
+				Html.encode (
+					manualResponderNumber != null &&
+					manualResponderNumber.getNotesText () != null
+						? manualResponderNumber.getNotesText ().getText ()
+						: "")));
 
 	}
 
@@ -485,44 +501,88 @@ class ManualResponderRequestPendingSummaryPart
 
 	}
 
-	void goWelcomeHistory () {
+	void goSessionDetails () {
 
-		if (smsCustomer == null)
+		if (smsCustomerSession == null)
 			return;
 
 		if (
-			smsCustomer.getWelcomeMessage () == null
-			&& smsCustomer.getWarningMessage () == null
+			smsCustomerSession.getWelcomeMessage () == null
+			&& smsCustomerSession.getWarningMessage () == null
 		) {
 			return;
 		}
 
 		printFormat (
-			"<h2>Customer messages</h2>\n");
+			"<h2>Customer session</h2>\n");
 
-		if (smsCustomer.getWelcomeMessage () != null) {
+		printFormat (
+			"<table class=\"details\">\n");
+
+		printFormat (
+			"<tr>\n",
+			"<th>Start time</th>\n",
+			"<td>%h</td>\n",
+			timeFormatter.instantToTimestampString (
+				timeFormatter.defaultTimezone (),
+				smsCustomerSession.getStartTime ()),
+			"</tr>\n");
+
+		if (smsCustomerSession.getEndTime () != null) {
 
 			printFormat (
-				"<p>Welcome message: %h (sent %h)</p>\n",
-				smsCustomer.getWelcomeMessage ().getText ().getText (),
+				"<tr>\n",
+				"<th>End time</th>\n",
+				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
 					timeFormatter.defaultTimezone (),
-					dateToInstant (
-						smsCustomer.getWelcomeMessage ().getCreatedTime ())));
+					smsCustomerSession.getStartTime ()),
+				"</tr>\n");
 
 		}
 
-		if (smsCustomer.getWarningMessage () != null) {
+		if (smsCustomerSession.getWelcomeMessage () != null) {
 
 			printFormat (
-				"<p>Warning message: %h (sent %h)</p>\n",
-				smsCustomer.getWarningMessage ().getText ().getText (),
+				"<tr>\n",
+				"<th>Welcome message</th>\n",
+				"<td>%h (sent %h)</td>\n",
+				smsCustomerSession
+					.getWelcomeMessage ()
+					.getText ()
+					.getText (),
 				timeFormatter.instantToTimestampString (
 					timeFormatter.defaultTimezone (),
 					dateToInstant (
-						smsCustomer.getWarningMessage ().getCreatedTime ())));
+						smsCustomerSession
+							.getWelcomeMessage ()
+							.getCreatedTime ())),
+				"</tr>\n");
 
 		}
+
+		if (smsCustomerSession.getWarningMessage () != null) {
+
+			printFormat (
+				"<tr>\n",
+				"<th>Warning message</th>\n",
+				"<td>%h (sent %h)</td>\n",
+				smsCustomerSession
+					.getWarningMessage ()
+					.getText ()
+					.getText (),
+				timeFormatter.instantToTimestampString (
+					timeFormatter.defaultTimezone (),
+					dateToInstant (
+						smsCustomerSession
+							.getWarningMessage ()
+							.getCreatedTime ())),
+				"</tr>\n");
+
+		}
+
+		printFormat (
+			"</table>\n");
 
 	}
 
@@ -597,7 +657,10 @@ class ManualResponderRequestPendingSummaryPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				oldManualResponderRequest.getMessage ().getText ().getText ());
+				oldManualResponderRequest
+					.getMessage ()
+					.getText ()
+					.getText ());
 
 			printFormat (
 				"<td>%h</td>\n",

@@ -298,7 +298,9 @@ class ObjectSearchPageBuilder {
 							consoleHelper.friendlyName ())))
 
 				.pagePartFactory (
-					searchPartFactory));
+					searchPartFactory)
+
+		);
 
 	}
 
@@ -325,7 +327,12 @@ class ObjectSearchPageBuilder {
 						resultsFormFieldset)
 
 					.itemsPerPage (
-						itemsPerPage);
+						itemsPerPage)
+
+					.targetContextTypeName (
+						consoleHelper.objectName () + "+")
+
+				;
 
 			}
 

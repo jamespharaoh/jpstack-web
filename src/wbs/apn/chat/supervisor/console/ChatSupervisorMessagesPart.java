@@ -8,7 +8,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.joda.time.Instant;
+import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -79,17 +79,12 @@ class ChatSupervisorMessagesPart
 			LocalDate.parse (
 				requestContext.parameter ("date"));
 
-		Instant startTime =
-			date
-				.toDateTime (
-					new LocalTime (hour, 0, 0))
-				.toInstant ();
+		DateTime startTime =
+			date.toDateTime (
+				new LocalTime (hour, 0, 0));
 
-		Instant endTime =
-			date
-				.toDateTime (
-					new LocalTime (hour + 1, 0, 0))
-				.toInstant ();
+		DateTime endTime =
+			startTime.plusHours (1);
 
 		UserRec senderUser =
 			userHelper.find (

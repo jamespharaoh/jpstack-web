@@ -140,7 +140,7 @@ class ManualResponderCommand
 					manualResponder.getSmsCustomerManager (),
 					message.getNumber ());
 
-			smsCustomerLogic.newCustomer (
+			smsCustomerLogic.sessionStart (
 				customer,
 				Optional.of (
 					message.getThreadId ()));

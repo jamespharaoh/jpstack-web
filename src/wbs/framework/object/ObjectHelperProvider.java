@@ -65,12 +65,16 @@ interface ObjectHelperProvider {
 
 	Record<?> findByParentAndCode (
 			GlobalId parentGlobalId,
-			String... codes);
+			String code);
+
+	Record<?> findByParentAndIndex (
+			GlobalId parentGlobalId,
+			Integer index);
 
 	Record<?> findByParentAndTypeAndCode (
 			GlobalId parentGlobalId,
 			String typeCode,
-			String... codes);
+			String code);
 
 	List<Record<?>> findAll ();
 

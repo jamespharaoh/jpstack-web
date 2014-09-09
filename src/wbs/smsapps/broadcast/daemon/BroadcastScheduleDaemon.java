@@ -15,6 +15,7 @@ import wbs.framework.database.Transaction;
 import wbs.platform.daemon.SleepingDaemonService;
 import wbs.platform.event.logic.EventLogic;
 import wbs.smsapps.broadcast.model.BroadcastConfigRec;
+import wbs.smsapps.broadcast.model.BroadcastNumberObjectHelper;
 import wbs.smsapps.broadcast.model.BroadcastObjectHelper;
 import wbs.smsapps.broadcast.model.BroadcastRec;
 import wbs.smsapps.broadcast.model.BroadcastState;
@@ -24,6 +25,9 @@ import wbs.smsapps.broadcast.model.BroadcastState;
 public
 class BroadcastScheduleDaemon
 	extends SleepingDaemonService {
+
+	@Inject
+	BroadcastNumberObjectHelper broadcastNumberHelper;
 
 	@Inject
 	BroadcastObjectHelper broadcastHelper;
@@ -79,7 +83,8 @@ class BroadcastScheduleDaemon
 		for (Integer broadcastId
 				: broadcastIds) {
 
-			runBroadcast (broadcastId);
+			runBroadcast (
+				broadcastId);
 
 		}
 
@@ -127,11 +132,15 @@ class BroadcastScheduleDaemon
 				broadcast));
 
 		broadcast
-			.setState (BroadcastState.sending);
+
+			.setState (
+				BroadcastState.sending);
 
 		broadcastConfig
+
 			.setNumScheduled (
 				broadcastConfig.getNumScheduled () - 1)
+
 			.setNumSending (
 				broadcastConfig.getNumSending () + 1);
 

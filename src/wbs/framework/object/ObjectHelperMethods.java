@@ -88,6 +88,10 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 			String typeCode,
 			String... code);
 
+	RecordType findByIndex (
+			Record<?> parent,
+			Integer index);
+
 	List<RecordType> findAll ();
 
 	List<RecordType> findByParent (

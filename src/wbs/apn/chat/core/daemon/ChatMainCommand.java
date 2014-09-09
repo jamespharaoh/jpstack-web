@@ -395,11 +395,14 @@ class ChatMainCommand
 				.chatSchemeId (
 					commandChatScheme.getId ());
 
-			ret.rest = rest;
+			ret.rest =
+				rest;
 
-			ret.creditCheck = ! chatKeyword.getNoCreditCheck ();
+			ret.creditCheck =
+				! chatKeyword.getNoCreditCheck ();
 
 			return ret;
+
 		}
 
 		if (chatKeyword.getCommand () != null) {
@@ -719,8 +722,9 @@ class ChatMainCommand
 
 			log.debug (
 				stringFormat (
-					"message %d: no keyword found, existing user, sent to help",
-					receivedMessage.getMessageId ()));
+					"message %d: ",
+					receivedMessage.getMessageId (),
+					"no keyword found, existing user, sent to help"));
 
 			chatHelpLogLogic.createChatHelpLogIn (
 				fromChatUser,
@@ -751,10 +755,12 @@ class ChatMainCommand
 
 	public static
 	class TryKeywordReturn {
+
 		ChatJoiner joiner;
 		Integer externalCommandId;
 		String rest;
 		boolean creditCheck;
+
 	}
 
 }

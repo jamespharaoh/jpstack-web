@@ -682,10 +682,34 @@ class ObjectHelperBuilder {
 					@NonNull GlobalId parentGlobalId,
 					@NonNull String... codes) {
 
-				return objectHelperProvider
-					.findByParentAndCode (
-						parentGlobalId,
-						codes);
+				if (codes.length != 1)
+					throw new IllegalArgumentException (
+						"codes");
+
+				return objectHelperProvider.findByParentAndCode (
+					parentGlobalId,
+					codes [0]);
+
+			}
+
+			@Override
+			public
+			Record findByIndex (
+					@NonNull Record parent,
+					@NonNull Integer index) {
+
+				ObjectHelper<?> parentHelper =
+					forObjectClass (
+						parent.getClass ());
+
+				GlobalId parentGlobalId =
+					new GlobalId (
+						parentHelper.objectTypeId (),
+						parent.getId ());
+
+				return objectHelperProvider.findByParentAndIndex (
+					parentGlobalId,
+					index);
 
 			}
 
@@ -1319,10 +1343,14 @@ class ObjectHelperBuilder {
 					@NonNull String typeCode,
 					@NonNull String... codes) {
 
+				if (codes.length != 1)
+					throw new IllegalArgumentException (
+						"codes");
+
 				return objectHelperProvider.findByParentAndTypeAndCode (
 					parentGlobalId,
 					typeCode,
-					codes);
+					codes [0]);
 
 			}
 

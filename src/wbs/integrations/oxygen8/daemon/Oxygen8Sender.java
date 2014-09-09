@@ -109,6 +109,15 @@ class Oxygen8Sender
 				state.oxygen8RouteOut.getOxygen8Config (),
 				state.message.getNumber ().getNetwork ());
 
+		if (state.oxygen8Network == null) {
+
+			throw tempFailure (
+				stringFormat (
+					"Oxygen8 network not found for %s",
+					state.message.getNumber ().getNetwork ().getId ()));
+
+		}
+
 		// load lazy stuff
 
 		state.message.getText ().getText ();
@@ -124,9 +133,11 @@ class Oxygen8Sender
 
 		// pick a handler
 
-		if (equal (
+		if (
+			equal (
 				state.message.getMessageType ().getCode (),
-				"sms")) {
+				"sms")
+		) {
 
 			// nothing to do
 
@@ -140,6 +151,7 @@ class Oxygen8Sender
 		}
 
 		return state;
+
 	}
 
 	@Override
@@ -198,10 +210,12 @@ class Oxygen8Sender
 			state.oxygen8RouteOut.getRelayUrl ();
 
 		URL url =
-			new URL (urlString);
+			new URL (
+				urlString);
 
 		state.urlConn =
-			(HttpURLConnection) url.openConnection ();
+			(HttpURLConnection)
+			url.openConnection ();
 
 		// set basic params
 

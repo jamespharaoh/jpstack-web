@@ -18,6 +18,7 @@ import wbs.sms.message.batch.model.BatchObjectHelper;
 import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.number.lookup.logic.NumberLookupManager;
 import wbs.sms.route.router.logic.RouterLogic;
 import wbs.smsapps.broadcast.model.BroadcastConfigRec;
 import wbs.smsapps.broadcast.model.BroadcastNumberObjectHelper;
@@ -48,6 +49,9 @@ class BroadcastSendDaemon
 
 	@Inject
 	EventLogic eventLogic;
+
+	@Inject
+	NumberLookupManager numberLookupManager;
 
 	@Inject
 	RouterLogic routerLogic;
@@ -134,6 +138,16 @@ class BroadcastSendDaemon
 				broadcast,
 				100);
 
+		ServiceRec defaultService =
+			serviceHelper.findByCode (
+				broadcastConfig,
+				"default");
+
+		BatchRec broadcastBatch =
+			batchHelper.findByCode (
+				broadcast,
+				"broadcast");
+
 		for (BroadcastNumberRec broadcastNumber
 				: broadcastNumbers) {
 
@@ -141,61 +155,101 @@ class BroadcastSendDaemon
 					!= BroadcastNumberState.accepted)
 				throw new RuntimeException ();
 
-			ServiceRec defaultService =
-				serviceHelper.findByCode (
-					broadcastConfig,
-					"default");
+			// check the block list again
 
-			BatchRec broadcastBatch =
-				batchHelper.findByCode (
-					broadcast,
-					"broadcast");
+			boolean reject =
+				broadcastConfig.getBlockNumberLookup () != null
+					? numberLookupManager.lookupNumber (
+						broadcastConfig.getBlockNumberLookup (),
+						broadcastNumber.getNumber ())
+					: false;
 
-			MessageRec message =
-				messageSender.get ()
+			if (reject) {
 
-				.batch (
-					broadcastBatch)
+				// mark the number as rejected
 
-				.messageString (
-					broadcast.getMessageText ())
+				broadcastNumber
 
-				.number (
-					broadcastNumber.getNumber ())
+					.setState (
+						BroadcastNumberState.rejected);
 
-				.numFrom (
-					broadcast.getMessageOriginator ())
+				broadcast
 
-				.routerResolve (
-					broadcastConfig.getRouter ())
+					.setNumAccepted (
+						broadcast.getNumAccepted () - 1)
 
-				.service (
-					defaultService)
+					.setNumRejected (
+						broadcast.getNumRejected () + 1);
 
-				.user (
-					broadcast.getSentUser ())
+			} else {
 
-				.send ();
+				// send the message
 
-			broadcastNumber
-				.setState (BroadcastNumberState.sent)
-				.setMessage (message);
+				MessageRec message =
+					messageSender.get ()
 
-			broadcast
-				.setNumAccepted (broadcast.getNumAccepted () - 1)
-				.setNumSent (broadcast.getNumSent () + 1);
+					.batch (
+						broadcastBatch)
+
+					.messageString (
+						broadcast.getMessageText ())
+
+					.number (
+						broadcastNumber.getNumber ())
+
+					.numFrom (
+						broadcast.getMessageOriginator ())
+
+					.routerResolve (
+						broadcastConfig.getRouter ())
+
+					.service (
+						defaultService)
+
+					.user (
+						broadcast.getSentUser ())
+
+					.send ();
+
+				// mark the number as sent
+
+				broadcastNumber
+
+					.setState (
+						BroadcastNumberState.sent)
+
+					.setMessage (
+						message);
+
+				broadcast
+
+					.setNumAccepted (
+						broadcast.getNumAccepted () - 1)
+
+					.setNumSent (
+						broadcast.getNumSent () + 1);
+
+			}
 
 		}
+
+		// mark the broadcast as sent when appropriate
 
 		if (broadcast.getNumAccepted () == 0) {
 
 			broadcast
-				.setState (BroadcastState.sent)
-				.setSentTime (transaction.now ());
+
+				.setState (
+					BroadcastState.sent)
+
+				.setSentTime (
+					transaction.now ());
 
 			broadcastConfig
+
 				.setNumSending (
 					broadcastConfig.getNumSending () - 1)
+
 				.setNumSent (
 					broadcastConfig.getNumSent () + 1);
 
