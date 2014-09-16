@@ -44,7 +44,8 @@
 	</object-context>
 
 	<field-set
-		name="search">
+		name="search"
+		class="wbs.platform.exception.model.ExceptionLogSearch">
 
 		<yes-no-field
 			name="alert"

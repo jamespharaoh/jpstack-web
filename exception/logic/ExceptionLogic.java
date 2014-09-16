@@ -3,7 +3,7 @@ package wbs.platform.exception.logic;
 public
 interface ExceptionLogic {
 
-	void logException (
+	void logSimple (
 			String typeCode,
 			String source,
 			String summary,
@@ -11,14 +11,14 @@ interface ExceptionLogic {
 			Integer userId,
 			boolean fatal);
 
-	void logException (
+	void logThrowable (
 			String typeCode,
 			String source,
 			Throwable throwable,
 			Integer userId,
 			boolean fatal);
 
-	void logException (
+	void logThrowableWithSummary (
 			String typeCode,
 			String source,
 			String summary,

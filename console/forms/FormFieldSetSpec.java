@@ -32,8 +32,13 @@ class FormFieldSetSpec {
 
 	// attributes
 
-	@DataAttribute
+	@DataAttribute (
+		required = true)
 	String name;
+
+	@DataAttribute (
+		value = "class")
+	String className;
 
 	@DataAttribute
 	String objectName;

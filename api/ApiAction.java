@@ -55,7 +55,7 @@ abstract class ApiAction
 						? requestContext.pathInfo ()
 						: "");
 
-			exceptionLogic.logException (
+			exceptionLogic.logThrowable (
 				"webapi",
 				path,
 				exception,

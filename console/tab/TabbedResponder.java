@@ -166,7 +166,7 @@ class TabbedResponder
 							? requestContext.pathInfo ()
 							: "");
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowable (
 					"console",
 					path,
 					exception,

@@ -281,8 +281,7 @@ class ObjectLinksPageBuilder {
 			spec.successNotice ();
 
 		formFieldSet =
-			consoleModuleBuilder.buildFormFieldSet (
-				spec.consoleSpec (),
+			consoleModule.formFieldSets ().get (
 				spec.fieldsName ());
 
 	}

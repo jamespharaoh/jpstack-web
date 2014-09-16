@@ -207,7 +207,7 @@ class PostgresqlMaintenanceDaemon
 
 				} catch (Exception exception) {
 
-					exceptionLogic.logException (
+					exceptionLogic.logThrowable (
 						"daemon",
 						getClass ().getSimpleName (),
 						exception,
@@ -220,7 +220,7 @@ class PostgresqlMaintenanceDaemon
 
 		} catch (Exception exception) {
 
-			exceptionLogic.logException (
+			exceptionLogic.logThrowable (
 				"daemon",
 				getClass ().getSimpleName (),
 				exception,

@@ -15,7 +15,7 @@ import lombok.extern.log4j.Log4j;
  * AffiliateObjectHelper class for those wishing to implement DaemonService.
  */
 @Log4j
-public
+public abstract
 class AbstractDaemonService {
 
 	private
@@ -44,12 +44,8 @@ class AbstractDaemonService {
 	void deinit () {
 	}
 
-	protected
-	String getThreadName () {
-
-		return null;
-
-	}
+	protected abstract
+	String getThreadName ();
 
 	/**
 	 * Should be called for each thread created so that stopService can manage

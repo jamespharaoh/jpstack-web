@@ -1,8 +1,6 @@
 package wbs.platform.console.module;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +20,6 @@ import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.forms.FormFieldSetSpec;
 import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.helper.ConsoleHelperRegistry;
-import wbs.platform.console.spec.ConsoleSpec;
 
 @SingletonComponent ("consoleModuleBuilder")
 public
@@ -103,134 +100,6 @@ class ConsoleModuleBuilder
 
 	}
 
-	public
-	FormFieldSet buildFormFieldSet (
-			ConsoleSpec consoleSpec,
-			String fieldSetName,
-			Class<?> containerClass,
-			@NonNull List<Object> formFieldSpecs) {
-
-		FormFieldBuilderContext formFieldBuilderContext =
-			new FormFieldBuilderContextImpl ()
-				.containerClass (containerClass);
-
-		FormFieldSet formFieldSet =
-			new FormFieldSet ();
-
-		builder.descend (
-			formFieldBuilderContext,
-			formFieldSpecs,
-			formFieldSet);
-
-		String fullFieldSetName =
-			stringFormat (
-				"%s.%s",
-				consoleSpec.name (),
-				fieldSetName);
-
-		for (FormField<?,?,?,?> formField
-				: formFieldSet.formFields ()) {
-
-			formField.init (
-				fullFieldSetName);
-
-		}
-
-		return formFieldSet;
-
-	}
-
-	public
-	FormFieldSet buildFormFieldSet (
-			@NonNull ConsoleSpec consoleSpec,
-			@NonNull String fieldSetName) {
-
-		String fullFieldSetName =
-			stringFormat (
-				"%s.%s",
-				consoleSpec.name (),
-				fieldSetName);
-
-		for (Object builder
-				: consoleSpec.builders ()) {
-
-			if (! (builder instanceof FormFieldSetSpec))
-				continue;
-
-			FormFieldSetSpec formFieldSetSpec =
-				(FormFieldSetSpec) builder;
-
-			if (! equal (
-					formFieldSetSpec.name (),
-					fieldSetName))
-				continue;
-
-			ConsoleHelper<?> consoleHelper =
-				consoleHelperRegistry.findByObjectName (
-					formFieldSetSpec.objectName ());
-
-			if (consoleHelper == null) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"No console helper for %s for fields %s of %s",
-						formFieldSetSpec.objectName (),
-						fieldSetName,
-						consoleSpec.name ()));
-
-			}
-
-			return buildFormFieldSet (
-				consoleHelper,
-				fullFieldSetName,
-				formFieldSetSpec.formFieldSpecs ());
-
-		}
-
-		throw new RuntimeException (
-			stringFormat (
-				"Form field set %s not found in %s",
-				fieldSetName,
-				consoleSpec.name ()));
-
-	}
-
-	public
-	FormFieldSet buildFormFieldSet (
-			@NonNull Class<?> containerClass,
-			@NonNull ConsoleSpec consoleSpec,
-			@NonNull String name) {
-
-		for (Object builder
-				: consoleSpec.builders ()) {
-
-			if (! (builder instanceof FormFieldSetSpec))
-				continue;
-
-			FormFieldSetSpec formFieldSetSpec =
-				(FormFieldSetSpec) builder;
-
-			if (! equal (
-					formFieldSetSpec.name (),
-					name))
-				continue;
-
-			return buildFormFieldSet (
-				consoleSpec,
-				formFieldSetSpec.name (),
-				containerClass,
-				formFieldSetSpec.formFieldSpecs ());
-
-		}
-
-		throw new RuntimeException (
-			stringFormat (
-				"Form field set %s not found in %s",
-				name,
-				consoleSpec.name ()));
-
-	}
-
 	// builder
 
 	@Override
@@ -240,9 +109,37 @@ class ConsoleModuleBuilder
 			List<?> childObjects,
 			Object targetObject) {
 
+		List<Object> firstPass =
+			new ArrayList<Object> ();
+
+		List<Object> secondPass =
+			new ArrayList<Object> ();
+
+		for (Object childObject
+				: childObjects) {
+
+			if (childObject instanceof FormFieldSetSpec) {
+
+				firstPass.add (
+					childObject);
+
+			} else {
+
+				secondPass.add (
+					childObject);
+
+			}
+
+		}
+
 		builder.descend (
 			parentObject,
-			childObjects,
+			firstPass,
+			targetObject);
+
+		builder.descend (
+			parentObject,
+			secondPass,
 			targetObject);
 
 	}

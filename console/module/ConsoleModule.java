@@ -10,6 +10,7 @@ import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
 import wbs.platform.console.context.ConsoleContext;
 import wbs.platform.console.context.ConsoleContextType;
+import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.tab.ConsoleContextTab;
 import wbs.platform.console.tab.ContextTabPlacement;
 
@@ -30,5 +31,7 @@ interface ConsoleModule
 	Map<String,List<String>> contextFilesByContextType ();
 
 	Map<String,Provider<Responder>> responders ();
+
+	Map<String,FormFieldSet> formFieldSets ();
 
 }

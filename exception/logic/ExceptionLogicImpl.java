@@ -44,7 +44,7 @@ class ExceptionLogicImpl
 
 	@Override
 	public
-	void logException (
+	void logSimple (
 			String typeCode,
 			String source,
 			String summary,
@@ -74,7 +74,7 @@ class ExceptionLogicImpl
 
 	@Override
 	public
-	void logException (
+	void logThrowable (
 			String typeCode,
 			String source,
 			Throwable throwable,
@@ -103,7 +103,7 @@ class ExceptionLogicImpl
 
 	@Override
 	public
-	void logException (
+	void logThrowableWithSummary (
 			String typeCode,
 			String source,
 			String summary,

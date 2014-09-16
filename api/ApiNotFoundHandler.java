@@ -54,7 +54,7 @@ class ApiNotFoundHandler
 						? requestContext.pathInfo ()
 						: "");
 
-			exceptionLogic.logException (
+			exceptionLogic.logSimple (
 				"console",
 				path,
 				"Not found",

@@ -388,14 +388,11 @@ class ObjectSearchPageBuilder {
 		}
 
 		searchFormFieldSet =
-			consoleModuleBuilder.buildFormFieldSet (
-				searchClass,
-				spec.consoleSpec (),
+			consoleModule.formFieldSets ().get (
 				spec.searchFieldsName ());
 
 		resultsFormFieldset =
-			consoleModuleBuilder.buildFormFieldSet (
-				spec.consoleSpec (),
+			consoleModule.formFieldSets ().get (
 				spec.resultsFieldsName ());
 
 		privKey =

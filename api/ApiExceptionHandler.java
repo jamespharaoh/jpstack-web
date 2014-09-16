@@ -73,7 +73,7 @@ class ApiExceptionHandler
 
 			}
 
-			exceptionLogic.logException (
+			exceptionLogic.logSimple (
 				"webapi",
 				requestContext.requestUri (),
 				ExceptionLogicImpl.throwableSummary (throwable),

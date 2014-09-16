@@ -79,8 +79,20 @@ class ConsoleHelperRegistry {
 	ConsoleHelper<?> findByObjectName (
 			String objectName) {
 
-		return byObjectName.get (
-			objectName);
+		ConsoleHelper<?> consoleHelper =
+			byObjectName.get (
+				objectName);
+
+		if (consoleHelper == null) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"No console helper for %s",
+					objectName));
+
+		}
+
+		return consoleHelper;
 
 	}
 

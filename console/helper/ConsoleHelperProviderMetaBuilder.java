@@ -88,9 +88,16 @@ class ConsoleHelperProviderMetaBuilder {
 		}
 
 		genericConsoleHelperProviderProvider.get ()
-			.consoleHelperProviderSpec (consoleHelperProviderSpec)
-			.objectHelper (objectHelper)
-			.consoleHelperClass (consoleHelperClass)
+
+			.consoleHelperProviderSpec (
+				consoleHelperProviderSpec)
+
+			.objectHelper (
+				objectHelper)
+
+			.consoleHelperClass (
+				consoleHelperClass)
+
 			.init ();
 
 	}

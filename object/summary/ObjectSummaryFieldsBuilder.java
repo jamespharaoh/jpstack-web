@@ -46,8 +46,7 @@ class ObjectSummaryFieldsBuilder {
 			Builder builder) {
 
 		objectSummaryPageBuilder.addFieldsPart (
-			consoleModuleBuilder.buildFormFieldSet (
-				objectSummaryFieldsSpec.consoleModule (),
+			objectSummaryPageBuilder.consoleModule.formFieldSets ().get (
 				objectSummaryFieldsSpec.fieldsName ()));
 
 	}
