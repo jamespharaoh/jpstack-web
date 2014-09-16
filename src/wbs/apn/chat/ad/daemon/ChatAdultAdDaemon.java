@@ -71,6 +71,12 @@ class ChatAdultAdDaemon
 
 	@Override
 	protected
+	String getThreadName () {
+		return "ChatAdultAd";
+	}
+
+	@Override
+	protected
 	int getDelayMs () {
 		return 60 * 1000;
 	}
@@ -116,7 +122,7 @@ class ChatAdultAdDaemon
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowable (
 					"daemon",
 					"ChatAdDaemon",
 					exception,

@@ -509,6 +509,12 @@ class ForwarderDaemon
 
 	@Override
 	protected
+	String getThreadName () {
+		throw new UnsupportedOperationException ();
+	}
+
+	@Override
+	protected
 	void createThreads () {
 
 		// main thread

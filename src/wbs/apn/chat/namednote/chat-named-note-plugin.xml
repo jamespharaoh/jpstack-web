@@ -13,4 +13,13 @@
 		<model name="chatNoteName"/>
 	</models>
 
+	<layer name="console">
+		<bean class="console.ChatNoteNamesAction"/>
+		<bean class="console.ChatNoteNamesPart"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-note-name"/>
+	</console-modules>
+
 </plugin>

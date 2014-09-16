@@ -16,7 +16,6 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.platform.console.annotations.ConsoleMetaModuleBuilderHandler;
-import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.metamodule.ConsoleMetaModuleImpl;
 
 import com.google.common.collect.ImmutableList;
@@ -47,8 +46,6 @@ class ConsoleContextSectionMetaBuilder {
 	ConsoleMetaModuleImpl consoleMetaModule;
 
 	// state
-
-	ConsoleHelper<?> consoleHelper;
 
 	String structuralName;
 	String namePart;

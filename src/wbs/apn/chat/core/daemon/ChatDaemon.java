@@ -3,7 +3,6 @@ package wbs.apn.chat.core.daemon;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -29,10 +28,7 @@ import wbs.apn.chat.contact.model.ChatMessageMethod;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.contact.model.ChatMessageStatus;
-import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
-import wbs.apn.chat.contact.model.ChatUserInitiationLogRec;
-import wbs.apn.chat.contact.model.ChatUserInitiationReason;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
@@ -41,13 +37,9 @@ import wbs.apn.chat.core.model.ChatStatsRec;
 import wbs.apn.chat.date.logic.ChatDateLogic;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
@@ -66,8 +58,7 @@ class ChatDaemon
 	extends AbstractDaemonService {
 
 	@Inject
-	ChatCreditLogic
-	chatCreditLogic;
+	ChatCreditLogic chatCreditLogic;
 
 	@Inject
 	ChatDateLogic chatDateLogic;
@@ -92,9 +83,6 @@ class ChatDaemon
 
 	@Inject
 	ChatStatsObjectHelper chatStatsHelper;
-
-	@Inject
-	ChatUserAlarmObjectHelper chatUserAlarmHelper;
 
 	@Inject
 	ChatUserObjectHelper chatUserHelper;
@@ -131,6 +119,12 @@ class ChatDaemon
 	 */
 	public
 	ChatDaemon () {
+	}
+
+	@Override
+	protected
+	String getThreadName () {
+		throw new UnsupportedOperationException ();
 	}
 
 	/**
@@ -172,18 +166,6 @@ class ChatDaemon
 			public
 			void run () {
 				creditLoop ();
-			}
-
-		});
-
-		createThread (
-			"ChatE",
-			new Runnable () {
-
-			@Override
-			public
-			void run () {
-				quickLoop ();
 			}
 
 		});
@@ -635,303 +617,6 @@ class ChatDaemon
 
 	}
 
-	void doMonitorSwap (
-			int chatId,
-			Gender gender,
-			Orient orient) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		ChatRec chat =
-			chatHelper.find (
-				chatId);
-
-		chat.setLastMonitorSwap (new Date ());
-
-		// fetch all appropriate monitors
-
-		List<ChatUserRec> allMonitors =
-			chatUserHelper.find (
-				chat,
-				ChatUserType.monitor,
-				orient,
-				gender);
-
-		// now sort into online and offline ones
-
-		List<ChatUserRec> onlineMonitors =
-			new ArrayList<ChatUserRec> ();
-
-		List<ChatUserRec> offlineMonitors =
-			new ArrayList<ChatUserRec> ();
-
-		for (ChatUserRec monitor : allMonitors) {
-
-			if (monitor.getOnline ()) {
-				onlineMonitors.add (monitor);
-			} else {
-				offlineMonitors.add (monitor);
-			}
-
-		}
-
-		if (onlineMonitors.size () == 0
-				|| offlineMonitors.size () == 0)
-			return;
-
-		// pick a random monitor to take offline
-
-		ChatUserRec monitor =
-			onlineMonitors.get (
-				random.nextInt (onlineMonitors.size ()));
-
-		monitor.setOnline (false);
-
-		String tookOff =
-			monitor.getCode ();
-
-		// pick a random monitor to bring online
-
-		monitor =
-			offlineMonitors.get (
-				random.nextInt (offlineMonitors.size ()));
-
-		monitor.setOnline (true);
-
-		String putOn =
-			monitor.getCode ();
-
-		log.info (
-			stringFormat (
-				"Swapping %s %s monitor %s for %s",
-				orient, gender,
-				tookOff,
-				putOn));
-
-		transaction.commit ();
-
-	}
-
-	void checkMonitorSwap () {
-
-		log.debug ("Rotating monitors");
-
-		// get list of chats
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly ();
-
-		List<ChatRec> chats =
-			chatHelper.findAll ();
-
-		transaction.close ();
-
-		// then call doMonitorSwap for any whose time has come
-
-		Date now =
-			new Date ();
-
-		for (ChatRec chat : chats) {
-
-			if (chat.getLastMonitorSwap () == null
-				|| chat.getLastMonitorSwap ().getTime ()
-						+ chat.getTimeMonitorSwap () * 1000
-					< now.getTime ()) {
-
-				doMonitorSwap (chat.getId (), Gender.male, Orient.gay);
-				doMonitorSwap (chat.getId (), Gender.female, Orient.gay);
-				doMonitorSwap (chat.getId (), Gender.male, Orient.straight);
-				doMonitorSwap (chat.getId (), Gender.female, Orient.straight);
-				doMonitorSwap (chat.getId (), Gender.male, Orient.bi);
-				doMonitorSwap (chat.getId (), Gender.female, Orient.bi);
-
-			}
-
-		}
-
-	}
-
-	void checkJoinOutbounds () {
-
-		// get a list of users who are past their outbound timestamp
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly ();
-
-		List<ChatUserRec> chatUsers =
-			chatUserHelper.findWantingJoinOutbound ();
-
-		transaction.close ();
-
-		// then do each one
-		for (ChatUserRec chatUser : chatUsers)
-			doChatUserJoinOutbound (chatUser.getId ());
-
-	}
-
-	void checkAlarmOutbounds () {
-
-		// get a list of alarms which are ready to go off
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly ();
-
-		List<ChatUserAlarmRec> alarms =
-			chatUserAlarmHelper.findPending ();
-
-		transaction.close ();
-
-		// then do each one
-
-		for (ChatUserAlarmRec alarm : alarms)
-			doChatUserAlarmOutbound (alarm.getId ());
-
-	}
-
-	void doChatUserAlarmOutbound (
-			int alarmId) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		// find the alarm and stuff
-
-		ChatUserAlarmRec alarm =
-			chatUserAlarmHelper.find (
-				alarmId);
-
-		ChatUserRec user =
-			alarm.getChatUser ();
-
-		ChatUserRec monitor =
-			alarm.getMonitorChatUser ();
-
-		// delete the alarm
-
-		chatUserAlarmHelper.remove (
-			alarm);
-
-		// check whether to ignore this alarm
-
-		boolean ignore =
-
-			user.getBarred ()
-
-			|| user.getCreditMode () == ChatUserCreditMode.barred
-
-			|| user.getBlockAll ()
-
-			|| ! chatCreditLogic.userSpendCheck (
-				user,
-				false,
-				null,
-				false);
-
-		ChatUserInitiationReason reason =
-			ignore
-				? ChatUserInitiationReason.alarmIgnore
-				: ChatUserInitiationReason.alarm;
-
-		// create or update the cmi
-
-		if (! ignore) {
-
-			ChatMonitorInboxRec chatMonitorInbox =
-				chatMessageLogic.findOrCreateChatMonitorInbox (
-					monitor,
-					user,
-					true);
-
-			chatMonitorInbox
-				.setOutbound (true);
-
-		}
-
-		// create a log
-
-		chatUserInitiationLogHelper.insert (
-			new ChatUserInitiationLogRec ()
-				.setChatUser (user)
-				.setMonitorChatUser (monitor)
-				.setReason (reason)
-				.setTimestamp (new Date ())
-				.setAlarmTime (alarm.getAlarmTime ()));
-
-		// and commit
-
-		transaction.commit ();
-
-	}
-
-	void doChatUserJoinOutbound (
-			int chatUserId) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		// find the user
-
-		ChatUserRec user =
-			chatUserHelper.find (
-				chatUserId);
-
-		// check and clear the outbound message flag
-
-		if (user.getNextJoinOutbound() == null
-				|| new Date ().getTime ()
-					< user.getNextJoinOutbound ().getTime ()) {
-
-			return;
-
-		}
-
-		user.setNextJoinOutbound (null);
-
-		// find a monitor
-
-		ChatUserRec monitor =
-			chatMiscLogic.getOnlineMonitorForOutbound (
-				user);
-
-		if (monitor == null) {
-
-			transaction.commit ();
-
-			return;
-
-		}
-
-		// create or update the cmi
-
-		ChatMonitorInboxRec chatMonitorInbox =
-			chatMessageLogic.findOrCreateChatMonitorInbox (
-				monitor,
-				user,
-				true);
-
-		chatMonitorInbox
-			.setOutbound (true);
-
-		// create a log
-
-		chatUserInitiationLogHelper.insert (
-			new ChatUserInitiationLogRec ()
-				.setChatUser (user)
-				.setMonitorChatUser (monitor)
-				.setReason (ChatUserInitiationReason.joinUser)
-				.setTimestamp (new Date ()));
-
-		transaction.commit ();
-
-	}
-
 	void checkSignupTimeout () {
 
 		@Cleanup
@@ -988,9 +673,6 @@ class ChatDaemon
 				prof.lap ("logoff");
 				checkOnline ();
 
-				prof.lap ("swapping monitors");
-				checkMonitorSwap ();
-
 				prof.lap ("credit modes");
 				checkCreditModes ();
 
@@ -1004,7 +686,7 @@ class ChatDaemon
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowable (
 					"daemon",
 					"Chat daemon",
 					exception,
@@ -1025,57 +707,6 @@ class ChatDaemon
 
 				return;
 
-			}
-
-		}
-
-	}
-
-	void quickLoop () {
-
-		// sleep for a random time to stagger different threads
-		try {
-			Thread.sleep (quickSleepSeconds * random.nextInt (1000));
-		} catch (InterruptedException e) {
-			return;
-		}
-
-		while (true) {
-
-			ProfileLogger prof =
-				new ProfileLogger (log, "Cycle quick");
-
-			try {
-
-				//prof.lap ("outbounds");
-				//checkOutbounds ();
-
-				prof.lap ("join outbounds");
-				checkJoinOutbounds ();
-
-				prof.lap ("alarm outbounds");
-				checkAlarmOutbounds ();
-
-				prof.end ();
-
-			} catch (Exception exception) {
-
-				exceptionLogic.logException (
-					"daemon",
-					"Chat daemon",
-					exception,
-					null,
-					false);
-
-				prof.error (exception);
-			}
-
-			// then sleep for a fixed period
-
-			try {
-				Thread.sleep (quickSleepSeconds * 1000);
-			} catch (InterruptedException e) {
-				return;
 			}
 
 		}
@@ -1114,7 +745,7 @@ class ChatDaemon
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowable (
 					"daemon",
 					"Chat daemon",
 					exception,

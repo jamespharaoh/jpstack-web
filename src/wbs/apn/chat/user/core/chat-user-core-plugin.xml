@@ -49,6 +49,9 @@
 	</layer>
 
 	<layer name="daemon">
+		<bean class="daemon.ChatMonitorSwapDaemon"/>
+		<bean class="daemon.ChatUserAlarmDaemon"/>
+		<bean class="daemon.ChatUserJoinOutboundDaemon"/>
 		<bean class="daemon.ChatUserQuietDaemon"/>
 	</layer>
 

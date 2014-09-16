@@ -69,7 +69,7 @@ class SleepingDaemonService
 					generalErrorSummary (),
 					exception);
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowableWithSummary (
 					"daemon",
 					generalErrorSource (),
 					generalErrorSummary (),

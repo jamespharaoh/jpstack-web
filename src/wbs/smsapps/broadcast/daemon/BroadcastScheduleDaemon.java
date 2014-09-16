@@ -40,6 +40,12 @@ class BroadcastScheduleDaemon
 
 	@Override
 	protected
+	String getThreadName () {
+		return "BroadcastSchedule";
+	}
+
+	@Override
+	protected
 	int getDelayMs () {
 		return 5000;
 	}

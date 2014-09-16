@@ -1293,6 +1293,19 @@ class Misc {
 
 	}
 
+	public static <Type>
+	Type pickRandom (
+			Random random,
+			Type[] options) {
+
+		int index =
+			random.nextInt (
+				options.length);
+
+		return options [index];
+
+	}
+
 	public static
 	String joinWithSeparator (
 		String separator,

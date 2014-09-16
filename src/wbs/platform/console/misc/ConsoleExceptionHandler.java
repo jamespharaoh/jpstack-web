@@ -84,7 +84,7 @@ class ConsoleExceptionHandler
 
 		try {
 
-			exceptionLogic.logException (
+			exceptionLogic.logThrowable (
 				"console",
 				stringFormat (
 					"%s %s",

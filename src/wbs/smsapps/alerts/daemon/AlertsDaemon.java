@@ -91,6 +91,12 @@ class AlertsDaemon
 
 	@Override
 	protected
+	String getThreadName () {
+		return "Alerts";
+	}
+
+	@Override
+	protected
 	int getDelayMs () {
 		return 20 * 1000;
 	}
@@ -170,7 +176,7 @@ class AlertsDaemon
 						alertsSettingsId),
 					exception);
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowable (
 					"daemon",
 					"alerts daemon " + alertsSettingsId,
 					exception,

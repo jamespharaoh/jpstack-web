@@ -53,7 +53,7 @@ class WebApiManager {
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowable (
 					"webapi",
 					requestContext.requestUri (),
 					exception,

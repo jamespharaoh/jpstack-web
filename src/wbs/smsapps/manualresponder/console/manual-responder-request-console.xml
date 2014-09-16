@@ -45,7 +45,8 @@
 	</object-context>
 
 	<field-set
-		name="search">
+		name="search"
+		class="wbs.smsapps.manualresponder.model.ManualResponderRequestSearch">
 
 		<text-field
 			name="numberLike"

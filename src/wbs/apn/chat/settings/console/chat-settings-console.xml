@@ -57,11 +57,8 @@
 			<context-tab-action-page
 				name="monitors"/>
 
-			<context-link
-				name="noteName"
-				link="chatNoteName"
-				label="Note names"
-				priv-key="chat.manage"/>
+			<extension-point
+				name="chat.noteName"/>
 
 		</section>
 

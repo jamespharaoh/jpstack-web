@@ -17,8 +17,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.platform.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.platform.console.context.ConsoleContextMetaBuilderContainer;
 import wbs.platform.console.context.ConsoleContextRootExtensionPoint;
-import wbs.platform.console.helper.ConsoleHelper;
-import wbs.platform.console.helper.ConsoleHelperRegistry;
 import wbs.platform.console.metamodule.ConsoleMetaModuleImpl;
 
 import com.google.common.collect.ImmutableList;
@@ -27,11 +25,6 @@ import com.google.common.collect.ImmutableList;
 @ConsoleMetaModuleBuilderHandler
 public
 class ObjectContextMetaBuilder {
-
-	// dependencies
-
-	@Inject
-	ConsoleHelperRegistry consoleHelperRegistry;
 
 	// prototype dependencies
 
@@ -50,8 +43,6 @@ class ObjectContextMetaBuilder {
 	ConsoleMetaModuleImpl metaModule;
 
 	// state
-
-	ConsoleHelper<?> consoleHelper;
 
 	String contextName;
 	String beanName;
@@ -145,10 +136,6 @@ class ObjectContextMetaBuilder {
 
 		contextName =
 			spec.name ();
-
-		consoleHelper =
-			consoleHelperRegistry.findByObjectName (
-				spec.objectName ());
 
 		beanName =
 			ifNull (

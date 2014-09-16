@@ -51,6 +51,12 @@ class ChatSpendWarningDaemon
 
 	@Override
 	protected
+	String getThreadName () {
+		return "ChatSpendWarn";
+	}
+
+	@Override
+	protected
 	int getDelayMs () {
 		return 60 * 1000;
 	}
@@ -97,7 +103,7 @@ class ChatSpendWarningDaemon
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowable (
 					"daemon",
 					"ChatSpendWarningDaemon",
 					exception,

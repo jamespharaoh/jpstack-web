@@ -345,7 +345,7 @@ class TicketerApiServletModule
 
 			} catch (RuntimeException exception) {
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowable (
 					"webapi",
 					requestContext.requestUri (),
 					exception,

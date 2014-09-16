@@ -1114,7 +1114,7 @@ class ChatUserLogicImpl
 
 				} catch (Exception exception) {
 
-					exceptionLogic.logException (
+					exceptionLogic.logThrowable (
 						"logic",
 						"ChatUserLogic.setPlace",
 						exception,

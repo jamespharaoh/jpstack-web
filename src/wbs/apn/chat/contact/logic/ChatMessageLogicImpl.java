@@ -962,7 +962,7 @@ class ChatMessageLogicImpl
 
 		} catch (Exception exception) {
 
-			exceptionLogic.logException (
+			exceptionLogic.logSimple (
 				"unknown",
 				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
 
@@ -1008,7 +1008,7 @@ class ChatMessageLogicImpl
 
 		} catch (Exception exception) {
 
-			exceptionLogic.logException (
+			exceptionLogic.logSimple (
 				"unknown",
 				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
 
@@ -1043,7 +1043,7 @@ class ChatMessageLogicImpl
 
 		} catch (Exception exception) {
 
-			exceptionLogic.logException (
+			exceptionLogic.logSimple (
 				"unknown",
 				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
 
@@ -1213,7 +1213,7 @@ class ChatMessageLogicImpl
 					"MessageSplitter.split threw exception: %s",
 					exception));
 
-			exceptionLogic.logException (
+			exceptionLogic.logSimple (
 				"unknown",
 				"ChatReceivedHandler.sendUserMessage (...)",
 				"MessageSplitter.split (...) threw IllegalArgumentException",

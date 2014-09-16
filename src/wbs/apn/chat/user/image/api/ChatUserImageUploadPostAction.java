@@ -206,7 +206,7 @@ class ChatUserImageUploadPostAction
 
 			// log exception
 
-			exceptionLogic.logException (
+			exceptionLogic.logThrowable (
 				"webapi",
 				requestContext.requestPath (),
 				exception,

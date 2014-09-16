@@ -1,4 +1,4 @@
-package wbs.apn.chat.settings.console;
+package wbs.apn.chat.namednote.console;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -13,9 +13,9 @@ import wbs.apn.chat.namednote.model.ChatNoteNameRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.console.part.AbstractPagePart;
 
-@PrototypeComponent ("chatSettingsNoteNamesPart")
+@PrototypeComponent ("chatNoteNamesPart")
 public
-class ChatSettingsNoteNamesPart
+class ChatNoteNamesPart
 	extends AbstractPagePart {
 
 	@Inject
@@ -70,23 +70,22 @@ class ChatSettingsNoteNamesPart
 				: noteNames) {
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
-				"<td>%s</td>\n",
+			printFormat (
+				"<td><input",
+				" type=\"text\"",
+				" name=\"noteName%d\"",
+				noteName.getId (),
+				" value=\"%h\"",
+				requestContext.getForm (
+					stringFormat (
+						"noteName%d",
+						noteName.getId ()),
+					noteName.getName ()),
+				"></td>\n");
 
-				stringFormat (
-					"<input",
-					" type=\"text\"",
-					" name=\"noteName%d\"",
-					noteName.getId (),
-					" value=\"%h\"",
-					requestContext.getForm (
-						stringFormat (
-							"noteName%d",
-							noteName.getId ()),
-						noteName.getName ())),
-					">",
-
+			printFormat (
 				"<td>%s</td>\n",
 
 				stringFormat (

@@ -119,7 +119,7 @@ class ChatDateDaemon
 
 			} catch (RuntimeException exception) {
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowable (
 					"daemon",
 					"Chat daemon dating",
 					exception,
@@ -363,7 +363,7 @@ class ChatDateDaemon
 
 			} catch (Exception e) {
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowable (
 					"daemon",
 					"Chat daemon dating",
 					e,

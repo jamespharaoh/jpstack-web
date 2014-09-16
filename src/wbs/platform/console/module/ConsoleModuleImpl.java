@@ -23,6 +23,7 @@ import wbs.framework.web.Responder;
 import wbs.framework.web.WebFile;
 import wbs.platform.console.context.ConsoleContext;
 import wbs.platform.console.context.ConsoleContextType;
+import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.tab.ConsoleContextTab;
 import wbs.platform.console.tab.ContextTabPlacement;
 import wbs.platform.console.tab.TabContextResponder;
@@ -98,6 +99,11 @@ class ConsoleModuleImpl
 	@Getter @Setter
 	Map<String,WebFile> files =
 		new LinkedHashMap<String,WebFile> ();
+
+	@DataChildren
+	@Getter @Setter
+	Map<String,FormFieldSet> formFieldSets =
+		new LinkedHashMap<String,FormFieldSet> ();
 
 	// utils
 
@@ -288,6 +294,27 @@ class ConsoleModuleImpl
 						"+" + newLocationName));
 
 		}
+
+	}
+
+	public
+	void addFormFieldSet (
+			@NonNull String name,
+			@NonNull FormFieldSet formFieldSet) {
+
+		if (formFieldSets.containsKey (
+				name)) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Duplicated form field set name: %s",
+					name));
+
+		}
+
+		formFieldSets.put (
+			name,
+			formFieldSet);
 
 	}
 

@@ -26,6 +26,7 @@
 		<bean class="EnumFormFieldBuilder"/>
 		<bean class="EnumFormFieldRenderer"/>
 		<bean class="EnumFormFieldSpec"/>
+		<bean class="FormFieldSetBuilder"/>
 		<bean class="FormFieldSetSpec"/>
 		<bean class="FormFieldLogic"/>
 		<bean class="IdFormFieldBuilder"/>

@@ -68,6 +68,12 @@ class BroadcastSendDaemon
 
 	@Override
 	protected
+	String getThreadName () {
+		return "BroadcastSend";
+	}
+
+	@Override
+	protected
 	int getDelayMs () {
 		return 5000;
 	}

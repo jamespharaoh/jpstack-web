@@ -195,7 +195,7 @@ class ChatInfoLogicImpl
 
 			log.error ("MessageSplitter.split threw exception: " + e);
 
-			exceptionLogic.logException (
+			exceptionLogic.logSimple (
 				"unknown",
 				"chatLogic.sendUserInfo (...)",
 

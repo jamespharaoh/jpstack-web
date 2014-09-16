@@ -28,14 +28,22 @@ public
 class ChatNamedNoteLogRec
 	implements CommonRecord<ChatNamedNoteLogRec> {
 
+	// id
+
 	@GeneratedIdField
 	Integer id;
+
+	// identity
 
 	@ParentField
 	ChatNamedNoteRec chatNamedNote;
 
 	@ReferenceField
 	UserRec user;
+
+	// TODO index
+
+	// details
 
 	@SimpleField (
 		hibernateTypeHelper = PersistentDateTime.class,
@@ -44,6 +52,8 @@ class ChatNamedNoteLogRec
 
 	@ReferenceField
 	TextRec text;
+
+	// compare to
 
 	@Override
 	public

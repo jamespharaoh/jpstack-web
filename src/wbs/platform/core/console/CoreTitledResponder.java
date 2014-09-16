@@ -82,7 +82,7 @@ class CoreTitledResponder
 							? requestContext.pathInfo ()
 							: "");
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowable (
 					"console",
 					path,
 					exception,

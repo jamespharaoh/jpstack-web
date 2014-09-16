@@ -1,4 +1,4 @@
-package wbs.apn.chat.settings.console;
+package wbs.apn.chat.namednote.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -21,9 +21,9 @@ import wbs.framework.web.Responder;
 import wbs.platform.console.action.ConsoleAction;
 import wbs.platform.console.request.ConsoleRequestContext;
 
-@PrototypeComponent ("chatSettingsNoteNamesAction")
+@PrototypeComponent ("chatNoteNamesAction")
 public
-class ChatSettingsNoteNamesAction
+class ChatNoteNamesAction
 	extends ConsoleAction {
 
 	@Inject
@@ -41,7 +41,7 @@ class ChatSettingsNoteNamesAction
 	@Override
 	public
 	Responder backupResponder () {
-		return responder ("chatSettingsNoteNamesResponder");
+		return responder ("chatNoteNamesResponder");
 	}
 
 	@Override

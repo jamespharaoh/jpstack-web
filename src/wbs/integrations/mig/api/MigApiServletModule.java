@@ -234,7 +234,7 @@ class MigApiServletModule
 
 			} catch (Exception e) {
 
-				exceptionLogic.logException (
+				exceptionLogic.logSimple (
 					"webapi",
 					requestContext.requestUri (),
 					ExceptionLogicImpl.throwableSummary (e),
@@ -444,7 +444,7 @@ class MigApiServletModule
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logException (
+				exceptionLogic.logSimple (
 					"webapi",
 					requestContext.requestUri (),
 					ExceptionLogicImpl.throwableSummary (exception),

@@ -8,8 +8,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
@@ -21,27 +19,27 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.object.ObjectManager;
 import wbs.platform.daemon.SleepingDaemonService;
 import wbs.platform.exception.logic.ExceptionLogic;
 
-@Log4j
-@SingletonComponent ("chatUserQuietDaemon")
+@SingletonComponent ("chatUserJoinOutboundDaemon")
 public
-class ChatUserQuietDaemon
+class ChatUserJoinOutboundDaemon
 	extends SleepingDaemonService {
 
-	@Inject
-	ChatMiscLogic chatLogic;
+	// dependencies
 
 	@Inject
 	ChatMessageLogic chatMessageLogic;
 
 	@Inject
-	ChatUserInitiationLogObjectHelper chatUserInitiationLogHelper;
+	ChatMiscLogic chatMiscLogic;
 
 	@Inject
 	ChatUserObjectHelper chatUserHelper;
+
+	@Inject
+	ChatUserInitiationLogObjectHelper chatUserInitiationLogHelper;
 
 	@Inject
 	Database database;
@@ -49,63 +47,66 @@ class ChatUserQuietDaemon
 	@Inject
 	ExceptionLogic exceptionLogic;
 
-	@Inject
-	ObjectManager objectManager;
+	// details
 
 	@Override
 	protected
 	String getThreadName () {
-		return "ChatUserQuiet";
+		return "ChatUserJoinOut";
 	}
 
 	@Override
 	protected
 	int getDelayMs () {
-		return 60 * 1000;
+		return 10 * 1000;
 	}
 
 	@Override
 	protected
 	String generalErrorSource () {
-		return "chat user quiet daemon";
+		return "chat user join outbound daemon";
 	}
 
 	@Override
 	protected
 	String generalErrorSummary () {
-		return "error checking for quiet chat users to send a message to";
+		return "error checking for chat user join outbounds";
 	}
+
+	// implementation
 
 	@Override
 	protected
 	void runOnce () {
 
-		log.debug ("Looking for quiet users");
+		// get a list of users who are past their outbound timestamp
 
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly ();
 
-		// get a list of users who are past their outbound timestamp
-
 		List<ChatUserRec> chatUsers =
-			chatUserHelper.findWantingQuietOutbound ();
+			chatUserHelper.findWantingJoinOutbound ();
 
 		transaction.close ();
 
 		// then do each one
 
-		for (ChatUserRec chatUser : chatUsers) {
+		for (ChatUserRec chatUser
+				: chatUsers) {
 
 			try {
 
-				doUser (chatUser.getId ());
+				doChatUserJoinOutbound (
+					chatUser.getId ());
 
 			} catch (Exception exception) {
 
 				exceptionLogic.logThrowable (
 					"daemon",
-					"Chat daemon",
+					stringFormat (
+						"chat user ",
+						chatUser.getId ()),
 					exception,
 					null,
 					false);
@@ -116,8 +117,7 @@ class ChatUserQuietDaemon
 
 	}
 
-	private
-	void doUser (
+	void doChatUserJoinOutbound (
 			int chatUserId) {
 
 		@Cleanup
@@ -130,82 +130,33 @@ class ChatUserQuietDaemon
 			chatUserHelper.find (
 				chatUserId);
 
-		String userPath =
-			objectManager.objectPath (user);
-
 		// check and clear the outbound message flag
 
-		if (user.getNextQuietOutbound () == null
+		if (user.getNextJoinOutbound() == null
 				|| new Date ().getTime ()
-					< user.getNextQuietOutbound ().getTime ())
-			return;
-
-		user.setNextQuietOutbound (null);
-
-		// check if they have been barred
-
-		if (user.getBarred ()) {
-
-			log.info (
-				stringFormat (
-					"Skipping quiet alarm for %s: barred",
-					userPath));
-
-			transaction.commit ();
-
-			return;
-		}
-
-		if (user.getCreditMode () == ChatUserCreditMode.barred) {
-
-			log.info (
-				stringFormat (
-					"Skipping quiet alarm for %s: barred",
-					userPath));
-
-			transaction.commit ();
+					< user.getNextJoinOutbound ().getTime ()) {
 
 			return;
 
 		}
 
-		// check if they are a "good" user
-
-		if (user.getCreditSuccess () < 300) {
-
-			log.info (
-				stringFormat (
-					"Skipping quiet alarm for %s: low credit success",
-					userPath));
-
-			transaction.commit ();
-
-			return;
-		}
+		user.setNextJoinOutbound (null);
 
 		// find a monitor
 
 		ChatUserRec monitor =
-			chatLogic.getOnlineMonitorForOutbound (
+			chatMiscLogic.getOnlineMonitorForOutbound (
 				user);
 
 		if (monitor == null) {
 
-			log.info (
-				stringFormat (
-					"Skipping quiet alarm for %s: no available monitor",
-					userPath));
-
 			transaction.commit ();
 
 			return;
+
 		}
 
-		String monitorPath =
-			objectManager.objectPath (
-				monitor);
-
-		// create or update the inbox
+		// create or update the cmi
 
 		ChatMonitorInboxRec chatMonitorInbox =
 			chatMessageLogic.findOrCreateChatMonitorInbox (
@@ -213,7 +164,8 @@ class ChatUserQuietDaemon
 				user,
 				true);
 
-		chatMonitorInbox.setOutbound (true);
+		chatMonitorInbox
+			.setOutbound (true);
 
 		// create a log
 
@@ -227,18 +179,12 @@ class ChatUserQuietDaemon
 				monitor)
 
 			.setReason (
-				ChatUserInitiationReason.quietUser)
+				ChatUserInitiationReason.joinUser)
 
 			.setTimestamp (
-				new Date ()));
+				new Date ())
 
-		// and return
-
-		log.info (
-			stringFormat (
-				"Setting quiet alarm for %s with %s",
-				userPath,
-				monitorPath));
+		);
 
 		transaction.commit ();
 

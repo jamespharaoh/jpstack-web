@@ -182,10 +182,11 @@ class ContextTabActionPageBuilder {
 		title =
 			ifNull (
 				spec.title (),
-				stringFormat (
-					"%s %s",
-					container.friendlyName (),
-					camelToSpaces (name)));
+				capitalise (
+					stringFormat (
+						"%s %s",
+						container.friendlyName (),
+						camelToSpaces (name))));
 
 		pagePartName =
 			ifNull (

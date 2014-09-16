@@ -81,7 +81,7 @@ class ThreadManager
 
 			try {
 
-				exceptionLogic.logException (
+				exceptionLogic.logThrowable (
 					"daemon",
 					stringFormat (
 						"Daemon thread %s",

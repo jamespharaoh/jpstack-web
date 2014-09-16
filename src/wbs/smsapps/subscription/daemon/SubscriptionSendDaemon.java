@@ -32,6 +32,12 @@ class SubscriptionSendDaemon
 
 	@Override
 	protected
+	String getThreadName () {
+		return "SubscriptionSend";
+	}
+
+	@Override
+	protected
 	void runService () {
 
 		while (true) {

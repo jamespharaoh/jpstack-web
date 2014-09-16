@@ -1,0 +1,15 @@
+<console-module
+	name="chat-named-note">
+
+	<extend-context
+		name="chat.namedNote"
+		base-name="chat.settings"
+		extension-point="chat.noteName"
+		object-name="chat">
+
+		<context-tab-action-page
+			name="noteNames"/>
+
+	</extend-context>
+
+</console-module>

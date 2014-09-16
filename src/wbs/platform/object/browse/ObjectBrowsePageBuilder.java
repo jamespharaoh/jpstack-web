@@ -205,8 +205,7 @@ class ObjectBrowsePageBuilder {
 
 		formFieldSet =
 			spec.fieldsName () != null
-				? consoleModuleBuilder.buildFormFieldSet (
-					spec.consoleSpec (),
+				? consoleModule.formFieldSets ().get (
 					spec.fieldsName ())
 				: defaultFields ();
 

@@ -459,7 +459,7 @@ logger.error ("Got item");
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logException (
+				exceptionLogic.logSimple (
 					"webapi",
 					requestContext.requestUri (),
 					ExceptionLogicImpl.throwableSummary (exception),

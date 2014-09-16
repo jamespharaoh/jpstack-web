@@ -223,7 +223,7 @@ class HybyteApiServletModule
 
 				}
 
-				exceptionLogic.logException (
+				exceptionLogic.logSimple (
 					"webapi",
 					requestContext.requestUri (),
 					ExceptionLogicImpl.throwableSummary (exception),

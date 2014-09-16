@@ -234,7 +234,7 @@ class BroadcastSystemsSender1
 						"Success response did not match: [%s]",
 						responseString));
 
-				exceptionLogic.logException (
+				exceptionLogic.logSimple (
 					"unknown",
 					stringFormat (
 						"message %s",
@@ -262,7 +262,7 @@ class BroadcastSystemsSender1
 						"Failure response did not match: [%s]",
 						responseString));
 
-				exceptionLogic.logException (
+				exceptionLogic.logSimple (
 					"unknown",
 					stringFormat (
 						"message %s",
