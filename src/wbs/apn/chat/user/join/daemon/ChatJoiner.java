@@ -307,7 +307,10 @@ class ChatJoiner {
 
 		if (dateOfBirth != null) {
 
-			chatUser.setDob (dateOfBirth);
+			chatUser
+
+				.setDob (
+					dateOfBirth);
 
 		} else {
 

@@ -1202,12 +1202,8 @@ class ChatUserLogicImpl
 			timezone (
 				chatUser);
 
-		if (
-			chatUser.getAdultVerified ()
-			|| chatUser.getAgeChecked ()
-		) {
+		if (chatUser.getAgeChecked ())
 			return true;
-		}
 
 		if (chatUser.getDob () == null)
 			return true;

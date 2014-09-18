@@ -114,7 +114,8 @@ class ChatUserAdminDobAction
 
 		transaction.commit ();
 
-		requestContext.addNotice ("Chat user date of birth updated");
+		requestContext.addNotice (
+			"Chat user date of birth updated");
 
 		return null;
 
