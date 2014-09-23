@@ -104,6 +104,9 @@ class ChatUserRec
 	@SimpleField
 	Boolean chargesConfirmed = false;
 
+	@SimpleField
+	Boolean joinWarningSent = false;
+
 	// --------------------------------- prefs and info
 
 	@SimpleField (

@@ -162,6 +162,7 @@ class ChatMainCommand
 				commandHelper.find (commandId));
 
 			return;
+
 		}
 
 		log.debug (
@@ -696,27 +697,66 @@ class ChatMainCommand
 
 		if (fromChatUser.getLastJoin () == null) {
 
-			log.debug (
-				stringFormat (
-					"message %d: no keyword found, existing user, joining",
-					receivedMessage.getMessageId ()));
+			if (chat.getErrorOnUnrecognised ()) {
 
-			ChatJoiner joiner =
-				chatJoinerProvider.get ()
+				log.debug (
+					stringFormat (
+						"message %d: no keyword found, new user, sending error",
+						receivedMessage.getMessageId ()));
 
-				.chatId (
-					chat.getId ())
+				chatHelpLogLogic.createChatHelpLogIn (
+					fromChatUser,
+					smsMessage,
+					receivedMessage.getRest (),
+					null,
+					false);
 
-				.joinType (
-					JoinType.chatSimple)
+				chatSendLogic.sendSystemRbFree (
+					fromChatUser,
+					Optional.of (
+						smsMessage.getThreadId ()),
+					"keyword_error",
+					Collections.<String,String>emptyMap ());
 
-				.chatSchemeId (
-					commandChatScheme.getId ());
+				inboxLogic.inboxProcessed (
+					smsMessage,
+					serviceHelper.findByCode (
+						chat,
+						"default"),
+					chatUserLogic.getAffiliate (
+						fromChatUser),
+					commandHelper.find (
+						commandId));
 
-			transaction.commit ();
+				transaction.commit ();
 
-			return joiner.handle (
-				receivedMessage);
+				return null;
+
+			} else {
+
+				log.debug (
+					stringFormat (
+						"message %d: no keyword found, new user, joining",
+						receivedMessage.getMessageId ()));
+
+				ChatJoiner joiner =
+					chatJoinerProvider.get ()
+
+					.chatId (
+						chat.getId ())
+
+					.joinType (
+						JoinType.chatSimple)
+
+					.chatSchemeId (
+						commandChatScheme.getId ());
+
+				transaction.commit ();
+
+				return joiner.handle (
+					receivedMessage);
+
+			}
 
 		} else {
 

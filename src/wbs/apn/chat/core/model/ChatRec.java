@@ -184,6 +184,12 @@ class ChatRec
 	@SimpleField
 	Boolean datingEnabled = false;
 
+	@SimpleField
+	Boolean joinWarningEnabled = false;
+
+	@SimpleField
+	Boolean errorOnUnrecognised = false;
+
 	// ad settings
 
 	@SimpleField

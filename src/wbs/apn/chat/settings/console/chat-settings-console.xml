@@ -154,6 +154,13 @@
 			name="datingEnabled"
 			label="Dating sends enabled"/>
 
+		<yes-no-field
+			name="joinWarningEnabled"/>
+
+		<yes-no-field
+			name="errorOnUnrecognised"
+			label="Error on unrecognised keyword"/>
+
 		<seconds-field
 			name="maxAlarmTime"
 			label="Maximum alarm time"/>

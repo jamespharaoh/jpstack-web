@@ -355,6 +355,7 @@ class ChatJoiner {
 					"date_set_photo"));
 
 			return false;
+
 		}
 
 		return true;
@@ -624,6 +625,28 @@ class ChatJoiner {
 				true);
 
 			return false;
+
+		}
+
+		// send join warning
+
+		if (
+			chat.getJoinWarningEnabled ()
+			&& ! chatUser.getJoinWarningSent ()
+		) {
+
+			sendMagicSystem (
+				"join_warning",
+				chatUser.getChatScheme (),
+				joinTypeIsChat (joinType)
+					? "chat_dob"
+					: "date_dob",
+				Collections.<String,String>emptyMap ());
+
+			chatUser
+
+				.setJoinWarningSent (
+					true);
 
 		}
 
