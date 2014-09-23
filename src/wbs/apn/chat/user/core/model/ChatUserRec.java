@@ -308,7 +308,7 @@ class ChatUserRec
 	Integer creditBought = 0;
 
 	@SimpleField
-	ChatUserCreditMode creditMode = ChatUserCreditMode.strict;
+	ChatUserCreditMode creditMode;
 
 	@SimpleField
 	Integer userMessageCount = 0;
@@ -742,8 +742,6 @@ class ChatUserRec
 		List<ChatUserRec> findOnline (
 				ChatUserType type);
 
-		List<ChatUserRec> findWantingStrict ();
-
 		List<ChatUserRec> findWantingBill (
 				Date date);
 
@@ -948,7 +946,10 @@ class ChatUserRec
 					generateCode (chat))
 
 				.setDeliveryMethod (
-					ChatMessageMethod.sms);
+					ChatMessageMethod.sms)
+
+				.setCreditMode (
+					ChatUserCreditMode.strict);
 
 			chatUserLogic.monitorCap (
 				chatUser);

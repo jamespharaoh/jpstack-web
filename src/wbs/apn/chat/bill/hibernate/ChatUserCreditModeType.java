@@ -17,7 +17,6 @@ class ChatUserCreditModeType
 		sqlType (Types.INTEGER);
 		enumClass (ChatUserCreditMode.class);
 
-		add (0, ChatUserCreditMode.normal);
 		add (1, ChatUserCreditMode.strict);
 		add (2, ChatUserCreditMode.prePay);
 		add (3, ChatUserCreditMode.barred);

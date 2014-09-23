@@ -549,9 +549,6 @@ class ChatCreditLogicImpl
 
 		switch (chatUser.getCreditMode ()) {
 
-		case normal:
-			return true;
-
 		case strict:
 			return userStrictCreditOk (chatUser);
 
@@ -711,15 +708,15 @@ class ChatCreditLogicImpl
 
 		}
 
-		// check they are on normal or strict billing
+		// check they are on strict billing
 
-		if (chatUser.getCreditMode () != ChatUserCreditMode.normal
-				&& chatUser.getCreditMode () != ChatUserCreditMode.strict) {
+		if (chatUser.getCreditMode () != ChatUserCreditMode.strict) {
 
 			log.debug (
 				stringFormat (
-					"Ignoring credit request for %s as their credit mode is %s",
+					"Ignoring credit request for %s ",
 					chatUser.getId (),
+					"as their credit mode is %s",
 					chatUser.getCreditMode ()));
 
 			return;

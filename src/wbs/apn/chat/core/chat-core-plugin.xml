@@ -30,7 +30,6 @@
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.ChatDaemon"/>
 		<bean class="daemon.ChatDaemonConfig"/>
 		<bean class="daemon.ChatBlockAllCommand"/>
 		<bean class="daemon.ChatLogoffCommand"/>

@@ -23,6 +23,7 @@
 	<layer name="daemon">
 		<bean class="daemon.ChatBillDeliveryHandler"/>
 		<bean class="daemon.ChatCheckCreditCommand"/>
+		<bean class="daemon.ChatCreditDaemon"/>
 		<bean class="daemon.ChatSpendWarningDaemon"/>
 	</layer>
 

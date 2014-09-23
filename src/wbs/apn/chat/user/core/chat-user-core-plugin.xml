@@ -52,6 +52,7 @@
 		<bean class="daemon.ChatMonitorSwapDaemon"/>
 		<bean class="daemon.ChatUserAlarmDaemon"/>
 		<bean class="daemon.ChatUserJoinOutboundDaemon"/>
+		<bean class="daemon.ChatUserOnlineDaemon"/>
 		<bean class="daemon.ChatUserQuietDaemon"/>
 	</layer>
 

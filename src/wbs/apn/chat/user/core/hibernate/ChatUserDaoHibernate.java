@@ -97,28 +97,6 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findWantingStrict () {
-
-		return findMany (
-			ChatUserRec.class,
-
-			createQuery (
-				"FROM ChatUserRec cu " +
-				"WHERE cu.creditFailed >= cu.chatScheme.charges.creditLimit " +
-				"AND cu.creditSuccess < cu.creditFailed * 2 " +
-				"AND cu.creditMode = :creditMode")
-
-			.setParameter (
-				"creditMode",
-				ChatUserCreditMode.normal,
-				ChatUserCreditModeType.INSTANCE)
-
-			.list ());
-
-	}
-
-	@Override
-	public
 	List<ChatUserRec> findWantingBill (
 			Date date) {
 
@@ -129,7 +107,7 @@ class ChatUserDaoHibernate
 				"FROM ChatUserRec cu " +
 				"WHERE cu.type = :type " +
 				"AND cu.credit < 0 " +
-				"AND cu.creditMode IN (:creditMode1, :creditMode2) " +
+				"AND cu.creditMode = :creditModeStrict " +
 				"AND cu.lastAction >= :date " +
 				"AND cu.credit + cu.creditRevoked < 0")
 
@@ -139,12 +117,7 @@ class ChatUserDaoHibernate
 				ChatUserTypeType.INSTANCE)
 
 			.setParameter (
-				"creditMode1",
-				ChatUserCreditMode.normal,
-				ChatUserCreditModeType.INSTANCE)
-
-			.setParameter (
-				"creditMode2",
+				"creditModeStrict",
 				ChatUserCreditMode.strict,
 				ChatUserCreditModeType.INSTANCE)
 

@@ -13,7 +13,6 @@ class ChatUserCreditModeConsoleHelper
 
 		enumClass (ChatUserCreditMode.class);
 
-		add (ChatUserCreditMode.normal, "normal");
 		add (ChatUserCreditMode.strict, "strict");
 		add (ChatUserCreditMode.prePay, "pre-pay");
 		add (ChatUserCreditMode.barred, "barred");

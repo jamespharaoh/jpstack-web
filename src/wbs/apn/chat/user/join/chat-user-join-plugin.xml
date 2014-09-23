@@ -8,6 +8,7 @@
 
 	<layer name="daemon">
 		<bean class="daemon.ChatJoinCommand"/>
+		<bean class="daemon.ChatJoinTimeoutDaemon"/>
 		<bean class="daemon.ChatJoiner"/>
 	</layer>
 
