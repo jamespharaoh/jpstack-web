@@ -427,6 +427,11 @@ class ChatBroadcastSendAction
 						requestContext.canContext ("chat.manage"),
 						(Boolean) params.get ("includeBlocked"));
 
+				boolean includeOptedOut =
+					allOf (
+						requestContext.canContext ("chat.manage"),
+						(Boolean) params.get ("includeOptedOut"));
+
 				for (Integer chatUserId
 						: allChatUserIds) {
 
@@ -437,23 +442,43 @@ class ChatBroadcastSendAction
 					// exclude incomplete users
 
 					if (chatUser.getFirstJoin () == null) {
-						removedNumbers++;
+
+						removedNumbers ++;
+
 						continue;
+
 					}
 
 					// exclude blocked users, unless operator includes them
 
 					if (chatUser.getBlockAll ()
 							&& ! includeBlocked) {
-						removedNumbers++;
+
+						removedNumbers ++;
+
 						continue;
+
+					}
+
+					// exclude opted out users, unless operator includes them
+
+					if (chatUser.getBroadcastOptOut ()
+							&& ! includeOptedOut) {
+
+						removedNumbers ++;
+
+						continue;
+
 					}
 
 					// exclude barred users
 
 					if (chatUser.getBarred ()) {
-						removedNumbers++;
+
+						removedNumbers ++;
+
 						continue;
+
 					}
 
 					// perform a credit check
@@ -464,8 +489,10 @@ class ChatBroadcastSendAction
 							null,
 							true)) {
 
-						removedNumbers++;
+						removedNumbers ++;
+
 						continue;
+
 					}
 
 					// otherwise, include
@@ -475,9 +502,12 @@ class ChatBroadcastSendAction
 
 					// don't use too much memory
 
-					if (++loop1 % 128 == 0) {
+					if (++ loop1 % 128 == 0) {
+
 						database.flush ();
+
 						database.clear ();
+
 					}
 
 				}
@@ -694,7 +724,10 @@ class ChatBroadcastSendAction
 				chatBroadcast
 
 					.setIncludeBlocked (
-						includeBlocked);
+						includeBlocked)
+
+					.setIncludeOptedOut (
+						includeOptedOut);
 
 				chatBroadcastHelper.insert (
 					chatBroadcast);
@@ -871,6 +904,11 @@ class ChatBroadcastSendAction
 
 		.put (
 			"includeBlocked",
+			new CheckboxParamChecker (
+				"Internal error"))
+
+		.put (
+			"includeOptedOut",
 			new CheckboxParamChecker (
 				"Internal error"))
 

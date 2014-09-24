@@ -97,6 +97,9 @@ class ChatBroadcastRec
 	@SimpleField
 	Boolean includeBlocked;
 
+	@SimpleField
+	Boolean includeOptedOut;
+
 	// compare to
 
 	@Override
@@ -112,6 +115,10 @@ class ChatBroadcastRec
 			.append (
 				other.getTimestamp (),
 				getTimestamp ())
+
+			.append (
+				other.getId (),
+				getId ())
 
 			.toComparison ();
 

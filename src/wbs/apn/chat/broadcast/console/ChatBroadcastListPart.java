@@ -83,6 +83,7 @@ class ChatBroadcastListPart
 			"<th>Count</th>\n",
 			"<th>Search</th>\n",
 			"<th>Blocked</th>\n",
+			"<th>Opt out</th>\n",
 			"</tr>\n");
 
 		for (ChatBroadcastRec chatBroadcast
@@ -125,6 +126,11 @@ class ChatBroadcastListPart
 
 				"<td>%h</td>\n",
 				chatBroadcast.getIncludeBlocked ()
+					? "yes"
+					: "no",
+
+				"<td>%h</td>\n",
+				chatBroadcast.getIncludeOptedOut ()
 					? "yes"
 					: "no",
 

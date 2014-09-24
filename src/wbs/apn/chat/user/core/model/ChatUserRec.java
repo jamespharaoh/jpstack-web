@@ -107,6 +107,9 @@ class ChatUserRec
 	@SimpleField
 	Boolean joinWarningSent = false;
 
+	@SimpleField
+	Boolean broadcastOptOut = false;
+
 	// --------------------------------- prefs and info
 
 	@SimpleField (

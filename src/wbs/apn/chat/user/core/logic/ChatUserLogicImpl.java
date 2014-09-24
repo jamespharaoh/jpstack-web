@@ -415,6 +415,17 @@ class ChatUserLogicImpl
 			@NonNull ChatUserRec user1,
 			@NonNull ChatUserRec user2) {
 
+		if (
+
+			user1.getGender () == null
+			|| user1.getOrient () == null
+			|| user2.getGender () == null
+			|| user2.getOrient () == null
+
+		) {
+			return false;
+		}
+
 		return compatible (
 			user1.getGender (),
 			user1.getOrient (),
@@ -490,8 +501,12 @@ class ChatUserLogicImpl
 
 			UserDistance userDistance =
 				new UserDistance ()
-					.user (thatUser)
-					.miles (miles);
+
+				.user (
+					thatUser)
+
+				.miles (
+					miles);
 
 			userDistances.add (
 				userDistance);

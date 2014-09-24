@@ -68,6 +68,9 @@
 			nullable="yes"
 			helper="chatUserImageModeConsoleHelper"/>
 
+		<yes-no-field
+			name="broadcastOptOut"/>
+
 	</field-set>
 
 </console-module>

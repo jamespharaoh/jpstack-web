@@ -12,6 +12,7 @@ import java.util.Random;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
@@ -246,6 +247,7 @@ class ChatInfoLogicImpl
 			Integer threadId) {
 
 		// ignore deleted users
+
 		if (thisUser.getNumber () == null)
 			return 0;
 
@@ -255,19 +257,25 @@ class ChatInfoLogicImpl
 		Date cutoffTime =
 			new Date (now.getTime () - 7 * 24 * 60 * 60 * 1000);
 
-		Collection<ChatUserRec> otherUsers = getNearbyOnlineUsersForInfo (
-			thisUser,
-			cutoffTime,
-			numToSend);
+		Collection<ChatUserRec> otherUsers =
+			getNearbyOnlineUsersForInfo (
+				thisUser,
+				cutoffTime,
+				numToSend);
 
-		for (ChatUserRec otherUser : otherUsers)
+		for (ChatUserRec otherUser
+				: otherUsers) {
+
 			sendUserInfo (
 				thisUser,
 				otherUser,
 				threadId,
 				false);
 
+		}
+
 		return otherUsers.size ();
+
 	}
 
 	@Override
@@ -906,7 +914,9 @@ class ChatInfoLogicImpl
 			int numToFind) {
 
 		Collection<ChatUserRec> chatUsers =
-			getOnlineUsersForInfo (thisUser, cutoffTime);
+			getOnlineUsersForInfo (
+				thisUser,
+				cutoffTime);
 
 		return chatUserLogic.getNearestUsers (
 			thisUser,
@@ -970,8 +980,8 @@ class ChatInfoLogicImpl
 	 */
 	private
 	Collection<ChatUserRec> getOnlineUsersForInfo (
-			ChatUserRec thisUser,
-			Date cutoffTime) {
+			@NonNull ChatUserRec thisUser,
+			@NonNull Date cutoffTime) {
 
 		ChatRec chat =
 			thisUser.getChat ();
@@ -997,10 +1007,15 @@ class ChatInfoLogicImpl
 
 			// if we aren't suitable gender/orients for each other skip it
 
-			if (! chatUserLogic.compatible (
+			if (
+				! chatUserLogic.compatible (
 					thisUser,
-					chatUser))
+					chatUser)
+			) {
+
 				continue;
+
+			}
 
 			// ignore users we have had an info, message or pic from recently
 

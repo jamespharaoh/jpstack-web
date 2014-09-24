@@ -275,6 +275,18 @@ class ChatBroadcastSendPart
 				" for=\"includeBlockedCheckbox\"",
 				">include blocked users</label></p>");
 
+			printFormat (
+				"<p><input",
+				" type=\"checkbox\"",
+				" name=\"includeOptedOut\"",
+				" id=\"includeOptedOutCheckbox\"",
+				params.get ("includeOptedOut") != null
+					? " checked"
+					: "",
+				"><label",
+				" for=\"includeOptedOutCheckbox\"",
+				">include opted out users</label></p>");
+
 		}
 
 		printFormat (
