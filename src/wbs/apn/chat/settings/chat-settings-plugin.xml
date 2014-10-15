@@ -5,8 +5,6 @@
 	<layer name="console">
 		<bean class="console.ChatSettingsMonitorsAction"/>
 		<bean class="console.ChatSettingsMonitorsPart"/>
-		<bean class="console.ChatSettingsNoteNamesAction"/>
-		<bean class="console.ChatSettingsNoteNamesPart"/>
 		<bean class="console.ChatUserCodeFormFieldSpec"/>
 	</layer>
 
