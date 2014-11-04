@@ -59,7 +59,11 @@ class UserOnlineRec
 			(UserOnlineRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getUser (), other.getUser ())
+
+			.append (
+				getUser (),
+				other.getUser ())
+
 			.toComparison ();
 
 	}

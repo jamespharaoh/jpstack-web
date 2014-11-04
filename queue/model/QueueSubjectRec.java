@@ -87,8 +87,15 @@ class QueueSubjectRec
 			(QueueSubjectRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getQueue (), other.getQueue ())
-			.append (getObjectId (), other.getObjectId ())
+
+			.append (
+				getQueue (),
+				other.getQueue ())
+
+			.append (
+				getObjectId (),
+				other.getObjectId ())
+
 			.toComparison ();
 
 	}

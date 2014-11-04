@@ -105,9 +105,19 @@ class QueueItemRec
 			(QueueItemRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getQueueSubject (), other.getQueueSubject ())
-			.append (getIndex (), other.getIndex ())
-			.append (getId (), other.getId ()) // old items, remove
+
+			.append (
+				getQueueSubject (),
+				other.getQueueSubject ())
+
+			.append (
+				getIndex (),
+				other.getIndex ())
+
+			.append (
+				getId (),
+				other.getId ()) // old items, remove
+
 			.toComparison ();
 
 	}
