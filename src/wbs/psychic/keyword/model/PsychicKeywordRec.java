@@ -59,8 +59,15 @@ class PsychicKeywordRec
 			(PsychicKeywordRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getPsychic (), other.getPsychic ())
-			.append (getKeyword (), other.getKeyword ())
+
+			.append (
+				getPsychic (),
+				other.getPsychic ())
+
+			.append (
+				getKeyword (),
+				other.getKeyword ())
+
 			.toComparison ();
 
 	}

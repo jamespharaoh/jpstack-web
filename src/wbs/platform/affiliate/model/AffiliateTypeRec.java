@@ -56,8 +56,15 @@ class AffiliateTypeRec
 			(AffiliateTypeRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getParentObjectType (), other.getParentObjectType ())
-			.append (getCode (), other.getCode ())
+
+			.append (
+				getParentObjectType (),
+				other.getParentObjectType ())
+
+			.append (
+				getCode (),
+				other.getCode ())
+
 			.toComparison ();
 
 	}

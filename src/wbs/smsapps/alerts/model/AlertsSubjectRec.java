@@ -50,8 +50,15 @@ class AlertsSubjectRec
 			(AlertsSubjectRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getAlertsSettings (), other.getAlertsSettings ())
-			.append (getId (), other.getId ())
+
+			.append (
+				getAlertsSettings (),
+				other.getAlertsSettings ())
+
+			.append (
+				getId (),
+				other.getId ())
+
 			.toComparison ();
 
 	}

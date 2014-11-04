@@ -72,9 +72,19 @@ class QueueItemClaimRec
 			(QueueItemClaimRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (other.getQueueItem (), getQueueItem ())
-			.append (other.getStartTime (), getStartTime ())
-			.append (other.getId (), getId ())
+
+			.append (
+				other.getQueueItem (),
+				getQueueItem ())
+
+			.append (
+				other.getStartTime (),
+				getStartTime ())
+
+			.append (
+				other.getId (),
+				getId ())
+
 			.toComparison ();
 
 	}

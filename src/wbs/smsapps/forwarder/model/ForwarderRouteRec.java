@@ -73,8 +73,15 @@ class ForwarderRouteRec
 			(ForwarderRouteRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getForwarder (), other.getForwarder ())
-			.append (getCode (), other.getCode ())
+
+			.append (
+				getForwarder (),
+				other.getForwarder ())
+
+			.append (
+				getCode (),
+				other.getCode ())
+
 			.toComparison ();
 
 	}

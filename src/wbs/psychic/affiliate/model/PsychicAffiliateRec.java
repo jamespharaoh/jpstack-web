@@ -75,8 +75,15 @@ class PsychicAffiliateRec
 			(PsychicAffiliateRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getPsychicAffiliateGroup (), other.getPsychicAffiliateGroup ())
-			.append (getCode (), other.getCode ())
+
+			.append (
+				getPsychicAffiliateGroup (),
+				other.getPsychicAffiliateGroup ())
+
+			.append (
+				getCode (),
+				other.getCode ())
+
 			.toComparison ();
 
 	}

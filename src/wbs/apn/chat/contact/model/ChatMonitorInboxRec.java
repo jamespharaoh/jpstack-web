@@ -59,10 +59,23 @@ class ChatMonitorInboxRec
 			(ChatMonitorInboxRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getMonitorChatUser (), other.getMonitorChatUser ())
-			.append (getUserChatUser (), other.getUserChatUser ())
-			.append (other.getTimestamp (), getTimestamp ())
-			.append (other.getId (), getId ())
+
+			.append (
+				getMonitorChatUser (),
+				other.getMonitorChatUser ())
+
+			.append (
+				getUserChatUser (),
+				other.getUserChatUser ())
+
+			.append (
+				other.getTimestamp (),
+				getTimestamp ())
+
+			.append (
+				other.getId (),
+				getId ())
+
 			.toComparison ();
 
 	}

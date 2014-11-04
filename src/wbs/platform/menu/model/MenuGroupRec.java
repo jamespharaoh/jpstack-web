@@ -62,8 +62,15 @@ class MenuGroupRec
 			(MenuGroupRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getOrder (), other.getOrder ())
-			.append (getLabel (), other.getLabel ())
+
+			.append (
+				getOrder (),
+				other.getOrder ())
+
+			.append (
+				getLabel (),
+				other.getLabel ())
+
 			.toComparison ();
 
 	}

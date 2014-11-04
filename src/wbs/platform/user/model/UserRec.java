@@ -97,8 +97,15 @@ class UserRec
 			(UserRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getSlice (), other.getSlice ())
-			.append (getUsername (), other.getUsername ())
+
+			.append (
+				getSlice (),
+				other.getSlice ())
+
+			.append (
+				getUsername (),
+				other.getUsername ())
+
 			.toComparison ();
 
 	}

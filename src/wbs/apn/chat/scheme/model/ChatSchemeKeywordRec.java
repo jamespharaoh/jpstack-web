@@ -79,8 +79,15 @@ class ChatSchemeKeywordRec
 			(ChatSchemeKeywordRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getChatScheme (), other.getChatScheme ())
-			.append (getKeyword (), other.getKeyword ())
+
+			.append (
+				getChatScheme (),
+				other.getChatScheme ())
+
+			.append (
+				getKeyword (),
+				other.getKeyword ())
+
 			.toComparison ();
 
 	}

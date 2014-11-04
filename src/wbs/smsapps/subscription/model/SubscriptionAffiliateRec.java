@@ -67,8 +67,15 @@ class SubscriptionAffiliateRec
 			(SubscriptionAffiliateRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getSubscription (), other.getSubscription ())
-			.append (getCode (), other.getCode ())
+
+			.append (
+				getSubscription (),
+				other.getSubscription ())
+
+			.append (
+				getCode (),
+				other.getCode ())
+
 			.toComparison ();
 
 	}

@@ -105,8 +105,15 @@ class ChatContactRec
 			(ChatContactRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getFromUser (), other.getFromUser ())
-			.append (getToUser (), other.getToUser ())
+
+			.append (
+				getFromUser (),
+				other.getFromUser ())
+
+			.append (
+				getToUser (),
+				other.getToUser ())
+
 			.toComparison ();
 
 	}

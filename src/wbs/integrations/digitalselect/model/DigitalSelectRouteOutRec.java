@@ -51,7 +51,11 @@ class DigitalSelectRouteOutRec
 			(DigitalSelectRouteOutRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getRoute (), other.getRoute ())
+
+			.append (
+				getRoute (),
+				other.getRoute ())
+
 			.toComparison ();
 
 	}

@@ -75,8 +75,15 @@ class BroadcastNumberRec
 			(BroadcastNumberRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getBroadcast (), other.getBroadcast ())
-			.append (getNumber (), other.getNumber ())
+
+			.append (
+				getBroadcast (),
+				other.getBroadcast ())
+
+			.append (
+				getNumber (),
+				other.getNumber ())
+
 			.toComparison ();
 
 	}

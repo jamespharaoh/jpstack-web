@@ -132,9 +132,19 @@ class ChatMessageRec
 			(ChatMessageRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getChat (), other.getChat ())
-			.append (other.getTimestamp (), getTimestamp ())
-			.append (other.getId (), getId ())
+
+			.append (
+				getChat (),
+				other.getChat ())
+
+			.append (
+				other.getTimestamp (),
+				getTimestamp ())
+
+			.append (
+				other.getId (),
+				getId ())
+
 			.toComparison ();
 
 	}

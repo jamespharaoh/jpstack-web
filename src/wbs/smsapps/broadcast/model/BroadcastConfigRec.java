@@ -106,8 +106,15 @@ class BroadcastConfigRec
 			(BroadcastConfigRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getSlice (), other.getSlice ())
-			.append (getCode (), other.getCode ())
+
+			.append (
+				getSlice (),
+				other.getSlice ())
+
+			.append (
+				getCode (),
+				other.getCode ())
+
 			.toComparison ();
 
 	}

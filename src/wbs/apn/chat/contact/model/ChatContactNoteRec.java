@@ -65,10 +65,23 @@ class ChatContactNoteRec
 			(ChatContactNoteRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getUser (), other.getUser ())
-			.append (getMonitor (), other.getMonitor ())
-			.append (other.getTimestamp (), getTimestamp ())
-			.append (other.getId (), getId ())
+
+			.append (
+				getUser (),
+				other.getUser ())
+
+			.append (
+				getMonitor (),
+				other.getMonitor ())
+
+			.append (
+				other.getTimestamp (),
+				getTimestamp ())
+
+			.append (
+				other.getId (),
+				getId ())
+
 			.toComparison ();
 
 	}

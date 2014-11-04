@@ -56,7 +56,11 @@ class PsychicChargesRec
 			(PsychicChargesRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getPsychic (), other.getPsychic ())
+
+			.append (
+				getPsychic (),
+				other.getPsychic ())
+
 			.toComparison ();
 
 	}

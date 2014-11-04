@@ -57,9 +57,19 @@ class UserSessionRec
 			(UserSessionRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getUser (), other.getUser ())
-			.append (other.getStartTime (), getStartTime ())
-			.append (other.getId (), getId ())
+
+			.append (
+				getUser (),
+				other.getUser ())
+
+			.append (
+				other.getStartTime (),
+				getStartTime ())
+
+			.append (
+				other.getId (),
+				getId ())
+
 			.toComparison ();
 
 	}

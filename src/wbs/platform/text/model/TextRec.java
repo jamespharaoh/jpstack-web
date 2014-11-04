@@ -58,7 +58,11 @@ class TextRec
 			(TextRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getText (), other.getText ())
+
+			.append (
+				getText (),
+				other.getText ())
+
 			.toComparison ();
 
 	}

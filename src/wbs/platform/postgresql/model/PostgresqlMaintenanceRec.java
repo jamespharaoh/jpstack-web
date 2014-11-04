@@ -67,10 +67,23 @@ class PostgresqlMaintenanceRec
 			(PostgresqlMaintenanceRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getFrequency (), other.getFrequency ())
-			.append (getSequence (), other.getSequence ())
-			.append (getCommand (), other.getCommand ())
-			.append (getId (), other.getId ())
+
+			.append (
+				getFrequency (),
+				other.getFrequency ())
+
+			.append (
+				getSequence (),
+				other.getSequence ())
+
+			.append (
+				getCommand (),
+				other.getCommand ())
+
+			.append (
+				getId (),
+				other.getId ())
+
 			.toComparison ();
 
 	}

@@ -76,8 +76,15 @@ class AlertsStatusCheckRec
 			(AlertsStatusCheckRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getAlertsSettings (), other.getAlertsSettings ())
-			.append (other.getIndex (), getIndex ())
+
+			.append (
+				getAlertsSettings (),
+				other.getAlertsSettings ())
+
+			.append (
+				other.getIndex (),
+				getIndex ())
+
 			.toComparison ();
 
 	}

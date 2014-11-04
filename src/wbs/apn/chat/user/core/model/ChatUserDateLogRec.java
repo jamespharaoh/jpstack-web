@@ -76,9 +76,15 @@ class ChatUserDateLogRec
 			(ChatUserDateLogRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getChatUser (), other.getChatUser ())
-			.append (other.getTimestamp (), getTimestamp ())
-			.append (other.getId (), getId ())
+
+			.append (
+				other.getTimestamp (),
+				getTimestamp ())
+
+			.append (
+				other.getId (),
+				getId ())
+
 			.toComparison ();
 
 	}

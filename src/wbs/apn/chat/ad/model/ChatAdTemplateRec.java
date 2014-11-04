@@ -60,8 +60,15 @@ class ChatAdTemplateRec
 			(ChatAdTemplateRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getChat (), other.getChat ())
-			.append (getId (), other.getId ())
+
+			.append (
+				getChat (),
+				other.getChat ())
+
+			.append (
+				getId (),
+				other.getId ())
+
 			.toComparison ();
 
 	}

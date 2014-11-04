@@ -58,8 +58,15 @@ class PsychicProfileRec
 			(PsychicProfileRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getPsychic (), other.getPsychic ())
-			.append (getCode (), other.getCode ())
+
+			.append (
+				getPsychic (),
+				other.getPsychic ())
+
+			.append (
+				getCode (),
+				other.getCode ())
+
 			.toComparison ();
 
 	}

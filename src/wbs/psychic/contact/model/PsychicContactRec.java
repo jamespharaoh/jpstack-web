@@ -92,8 +92,15 @@ class PsychicContactRec
 			(PsychicContactRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getPsychicUser (), other.getPsychicUser ())
-			.append (getPsychicProfile (), other.getPsychicProfile ())
+
+			.append (
+				getPsychicUser (),
+				other.getPsychicUser ())
+
+			.append (
+				getPsychicProfile (),
+				other.getPsychicProfile ())
+
 			.toComparison ();
 
 	}

@@ -85,8 +85,15 @@ class SubscriptionSubRec
 			(SubscriptionSubRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (other.getStarted (), getStarted ())
-			.append (other.getId (), getId ())
+
+			.append (
+				other.getStarted (),
+				getStarted ())
+
+			.append (
+				other.getId (),
+				getId ())
+
 			.toComparison ();
 
 	}

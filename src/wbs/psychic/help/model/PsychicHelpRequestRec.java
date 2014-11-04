@@ -81,8 +81,15 @@ class PsychicHelpRequestRec
 			(PsychicHelpRequestRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getPsychicUser (), other.getPsychicUser ())
-			.append (getIndex (), other.getIndex ())
+
+			.append (
+				other.getRequestTime (),
+				getRequestTime ())
+
+			.append (
+				other.getId (),
+				getId ())
+
 			.toComparison ();
 
 	}

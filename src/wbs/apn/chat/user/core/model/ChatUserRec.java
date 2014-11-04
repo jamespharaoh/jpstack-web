@@ -609,8 +609,15 @@ class ChatUserRec
 			(ChatUserRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getChat (), other.getChat ())
-			.append (getCode (), other.getCode ())
+
+			.append (
+				getChat (),
+				other.getChat ())
+
+			.append (
+				getCode (),
+				other.getCode ())
+
 			.toComparison ();
 
 	}

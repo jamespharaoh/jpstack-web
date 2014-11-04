@@ -80,8 +80,15 @@ class PsychicRequestRec
 			(PsychicRequestRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getPsychicContact (), other.getPsychicContact ())
-			.append (getIndex (), other.getIndex ())
+
+			.append (
+				getPsychicContact (),
+				other.getPsychicContact ())
+
+			.append (
+				getIndex (),
+				other.getIndex ())
+
 			.toComparison ();
 
 	}

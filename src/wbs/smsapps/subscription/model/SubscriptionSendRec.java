@@ -110,9 +110,15 @@ class SubscriptionSendRec
 			(SubscriptionSendRec) otherRecord;
 
 		return new CompareToBuilder ()
-			.append (getSubscription (), other.getSubscription ())
-			.append (other.getTimestamp (), getTimestamp ())
-			.append (other.getId (), getId ())
+
+			.append (
+				other.getTimestamp (),
+				getTimestamp ())
+
+			.append (
+				other.getId (),
+				getId ())
+
 			.toComparison ();
 
 	}
