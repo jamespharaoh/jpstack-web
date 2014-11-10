@@ -204,15 +204,15 @@ class ChatUserLogicImpl
 			@NonNull ChatUserRec chatUser,
 			boolean automatic) {
 
-		Date now =
-			new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
 		// log the user off
 
 		chatUser
 
 			.setOnline (
-			false);
+				false);
 
 		// reset delivery method to sms, except for iphone users
 
@@ -222,8 +222,14 @@ class ChatUserLogicImpl
 		boolean token =
 			chatUser.getJigsawToken () != null;
 
-		if (! (iphone && token))
-			chatUser.setDeliveryMethod (ChatMessageMethod.sms);
+		if (! (iphone && token)) {
+
+			chatUser
+
+				.setDeliveryMethod (
+					ChatMessageMethod.sms);
+
+		}
 
 		// finish their session
 
@@ -234,8 +240,12 @@ class ChatUserLogicImpl
 				continue;
 
 			chatUserSession
-				.setEndTime (now)
-				.setAutomatic (automatic);
+
+				.setEndTime (
+					transaction.timestamp ())
+
+				.setAutomatic (
+					automatic);
 
 		}
 

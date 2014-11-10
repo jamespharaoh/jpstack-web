@@ -161,9 +161,19 @@
 			name="errorOnUnrecognised"
 			label="Error on unrecognised keyword"/>
 
+		<yes-no-field
+			name="sendWarningFromShortcode"/>
+
+		<yes-no-field
+			name="sendDobRequestFromShortcode"/>
+
 		<seconds-field
 			name="maxAlarmTime"
 			label="Maximum alarm time"/>
+
+		<integer-field
+			name="sessionInfoLimit"
+			label="Maximum profiles per chat session"/>
 
 		<object-field
 			name="adultAdsChat"

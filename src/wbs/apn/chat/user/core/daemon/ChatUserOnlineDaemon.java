@@ -200,6 +200,29 @@ class ChatUserOnlineDaemon
 
 		}
 
+		// see if they need logging off due to the session limit
+
+		if (
+			chatUser.getSessionInfoRemain () != null
+			&& chatUser.getSessionInfoRemain () <= 0
+		) {
+
+			log.info (
+				stringFormat (
+					"Logging off %s user %s due to session info limit",
+					chatUser.getDeliveryMethod (),
+					chatUser.getCode ()));
+
+			chatUserLogic.logoff (
+				chatUser,
+				true);
+
+			transaction.commit ();
+
+			return;
+
+		}
+
 		// below here is just for sms users
 
 		if (chatUser.getDeliveryMethod () != ChatMessageMethod.sms)
@@ -227,25 +250,38 @@ class ChatUserOnlineDaemon
 
 		if (
 
-			(chatUser.getLastSend () == null
+			(
+				chatUser.getLastSend () == null
 				|| chatUser.getLastSend ().getTime ()
 						+ chat.getTimeSend () * 1000
-					< timestamp.getTime ())
+					< timestamp.getTime ()
+			)
 
-			&& (chatUser.getLastReceive () == null
+			&& (
+				chatUser.getLastReceive () == null
 				|| chatUser.getLastReceive ().getTime ()
 						+ chat.getTimeReceive () * 1000
-					< timestamp.getTime ())
+					< timestamp.getTime ()
+			)
 
-			&& (chatUser.getLastInfo () == null
+			&& (
+				chatUser.getLastInfo () == null
 				|| chatUser.getLastInfo ().getTime ()
 						+ chat.getTimeInfo () * 1000
-					< timestamp.getTime ())
+					< timestamp.getTime ()
+			)
 
-			&& (chatUser.getLastPic () == null
+			&& (
+				chatUser.getLastPic () == null
 				|| chatUser.getLastPic ().getTime ()
 						+ chat.getTimeInfo () * 1000
-					< timestamp.getTime ())
+					< timestamp.getTime ()
+			)
+
+			&& (
+				chatUser.getSessionInfoRemain () == null
+				|| chatUser.getSessionInfoRemain () > 1
+			)
 
 		) {
 
@@ -255,10 +291,20 @@ class ChatUserOnlineDaemon
 					objectManager.objectPathMini (
 						chatUser)));
 
-			chatInfoLogic.sendUserInfos (
-				chatUser,
-				1,
-				null);
+			int numSent =
+				chatInfoLogic.sendUserInfos (
+					chatUser,
+					1,
+					null);
+
+			if (chatUser.getSessionInfoRemain () != null) {
+
+				chatUser
+
+					.setSessionInfoRemain (
+						chatUser.getSessionInfoRemain () - numSent);
+
+			}
 
 		}
 

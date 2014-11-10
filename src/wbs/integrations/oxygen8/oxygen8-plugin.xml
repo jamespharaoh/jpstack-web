@@ -17,6 +17,8 @@
 	<layer name="api">
 		<bean class="api.Oxygen8ApiServletModule"/>
 		<bean class="api.Oxygen8InboundFile"/>
+		<bean class="api.Oxygen8InboundMmsAction"/>
+		<bean class="api.Oxygen8InboundSmsAction"/>
 		<bean class="api.Oxygen8ReportFile"/>
 	</layer>
 

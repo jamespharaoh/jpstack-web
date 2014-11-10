@@ -635,13 +635,23 @@ class ChatJoiner {
 			&& ! chatUser.getJoinWarningSent ()
 		) {
 
-			sendMagicSystem (
-				"join_warning",
-				chatUser.getChatScheme (),
-				joinTypeIsChat (joinType)
-					? "chat_dob"
-					: "date_dob",
-				Collections.<String,String>emptyMap ());
+			if (chat.getSendWarningFromShortcode ()) {
+
+				chatSendLogic.sendSystemRbFree (
+					chatUser,
+					Optional.of (message.getThreadId ()),
+					"join_warning",
+					Collections.<String,String>emptyMap ());
+
+			} else {
+
+				sendMagicSystem (
+					"join_warning",
+					chatUser.getChatScheme (),
+					"help",
+					Collections.<String,String>emptyMap ());
+
+			}
 
 			chatUser
 
@@ -654,13 +664,32 @@ class ChatJoiner {
 
 		if (! chatUserLogic.gotDob (chatUser)) {
 
-			sendMagicSystem (
-				"dob_request",
-				chatUser.getChatScheme (),
-				joinTypeIsChat (joinType)
-					? "chat_dob"
-					: "date_dob",
-				Collections.<String,String>emptyMap ());
+			if (chat.getSendDobRequestFromShortcode ()) {
+
+				chatSendLogic.sendSystemRbFree (
+					chatUser,
+					Optional.of (message.getThreadId ()),
+					"dob_request",
+					Collections.<String,String>emptyMap ());
+
+				chatUser
+
+					.setNextJoinType (
+						joinTypeIsChat (joinType)
+							? ChatKeywordJoinType.chatDob
+							: ChatKeywordJoinType.dateDob);
+
+			} else {
+
+				sendMagicSystem (
+					"dob_request",
+					chatUser.getChatScheme (),
+					joinTypeIsChat (joinType)
+						? "chat_dob"
+						: "date_dob",
+					Collections.<String,String>emptyMap ());
+
+			}
 
 			return false;
 
@@ -1157,16 +1186,32 @@ class ChatJoiner {
 
 		}
 
+		// set session info remain
+
+		if (
+			joinType == JoinType.chatNext
+			&& chat.getSessionInfoLimit () != null
+		) {
+
+			chatUser
+
+				.setSessionInfoRemain (
+					chat.getSessionInfoLimit ());
+
+		}
+
 		// send them the next users or pictures or whatever
 
 		switch (joinType) {
 
 		case chatPics:
 
-			if (0 == chatInfoLogic.sendUserPics (
+			if (
+				0 == chatInfoLogic.sendUserPics (
 					chatUser,
 					3,
-					message.getThreadId ())) {
+					message.getThreadId ())
+			) {
 
 				sendMagicSystem (
 					"more_photos_error",
@@ -1180,10 +1225,12 @@ class ChatJoiner {
 
 		case chatVideos:
 
-			if (0 == chatInfoLogic.sendUserVideos (
+			if (
+				0 == chatInfoLogic.sendUserVideos (
 					chatUser,
 					3,
-					message.getThreadId ())) {
+					message.getThreadId ())
+			) {
 
 				sendMagicSystem (
 					"more_videos_error",
@@ -1197,11 +1244,24 @@ class ChatJoiner {
 
 		case chatNext:
 
-			if (0 == chatInfoLogic.sendUserInfos (
-						chatUser,
-						2,
-						message.getThreadId ())
-					&& joinType == JoinType.chatNext) {
+			int numSent =
+				chatInfoLogic.sendUserInfos (
+					chatUser,
+					2,
+					message.getThreadId ());
+
+			if (numSent > 1) {
+
+				if (chatUser.getSessionInfoRemain () != null) {
+
+					chatUser
+
+						.setSessionInfoRemain (
+							chatUser.getSessionInfoRemain () - numSent);
+
+				}
+
+			} else {
 
 				sendMagicSystem (
 					"more_error",
@@ -1214,6 +1274,7 @@ class ChatJoiner {
 			break;
 
 		default:
+
 			// do nothing
 
 		}
@@ -1306,6 +1367,7 @@ class ChatJoiner {
 	void doLocator () {
 
 		// do the location lookup
+
 		try {
 
 			locatedLongLat =

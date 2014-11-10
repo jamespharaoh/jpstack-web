@@ -1,5 +1,6 @@
 package wbs.apn.chat.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -10,6 +11,9 @@ import javax.inject.Provider;
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.LocalDate;
+
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
@@ -17,6 +21,7 @@ import wbs.apn.chat.contact.model.ChatMessageMethod;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.logic.ChatHelpLogLogic;
 import wbs.apn.chat.help.logic.ChatHelpLogic;
+import wbs.apn.chat.keyword.model.ChatKeywordJoinType;
 import wbs.apn.chat.keyword.model.ChatKeywordObjectHelper;
 import wbs.apn.chat.keyword.model.ChatKeywordRec;
 import wbs.apn.chat.scheme.model.ChatSchemeKeywordObjectHelper;
@@ -35,6 +40,7 @@ import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.sms.command.logic.CommandLogic;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
+import wbs.sms.core.logic.DateFinder;
 import wbs.sms.core.logic.KeywordFinder;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
@@ -472,6 +478,38 @@ class ChatMainCommand
 
 	}
 
+	boolean checkDob (
+			int commandId,
+			@NonNull ReceivedMessage receivedMessage,
+			@NonNull ChatUserRec chatUser) {
+
+		if (
+			! in (
+				chatUser.getNextJoinType (),
+				ChatKeywordJoinType.chatDob,
+				ChatKeywordJoinType.dateDob)
+		) {
+			return false;
+		}
+
+		LocalDate dateOfBirth =
+			DateFinder.find (
+				receivedMessage.getRest (),
+				1915);
+
+		if (dateOfBirth == null) {
+			return false;
+		}
+
+		chatUser
+
+			.setDob (
+				dateOfBirth);
+
+		return true;
+
+	}
+
 	@Override
 	public
 	Status handle (
@@ -527,6 +565,22 @@ class ChatMainCommand
 
 		if (smsMessage.getRoute ().getInboundImpliesAdult ())
 			chatUserLogic.adultVerify (fromChatUser);
+
+		// look for a date of birth
+
+		boolean gotDob =
+			checkDob (
+				commandId,
+				receivedMessage,
+				fromChatUser);
+
+		if (gotDob) {
+
+			transaction.commit ();
+
+			return null;
+
+		}
 
 		// look for a keyword
 

@@ -171,6 +171,10 @@ class ChatRec
 	@SimpleField
 	Integer maxAlarmTime = 0;
 
+	@SimpleField (
+		nullable = true)
+	Integer sessionInfoLimit;
+
 	// adult service ads
 
 	@ReferenceField (nullable = true)
@@ -189,6 +193,12 @@ class ChatRec
 
 	@SimpleField
 	Boolean errorOnUnrecognised = false;
+
+	@SimpleField
+	Boolean sendWarningFromShortcode = false;
+
+	@SimpleField
+	Boolean sendDobRequestFromShortcode = false;
 
 	// ad settings
 

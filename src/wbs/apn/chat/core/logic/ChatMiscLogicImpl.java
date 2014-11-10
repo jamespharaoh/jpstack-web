@@ -411,12 +411,18 @@ class ChatMiscLogicImpl
 		// lookup location for web users
 
 		if (
+
 			deliveryMethod == ChatMessageMethod.web
+
 			&& (
+
 				chatUser.getLocTime () == null
+
 				|| chatUser.getLocTime ().getTime ()
 					< System.currentTimeMillis () - 1000 * 60 * 60
+
 			)
+
 		) {
 
 			final int chatUserId =

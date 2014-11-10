@@ -368,6 +368,10 @@ class ChatUserRec
 		nullable = true)
 	String jigsawToken;
 
+	@SimpleField (
+		nullable = true)
+	Integer sessionInfoRemain;
+
 	// --------------------------------- dating stuff
 
 	@SimpleField
