@@ -8,16 +8,24 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wbs.framework.data.annotations.DataChildren;
+import wbs.framework.data.annotations.DataClass;
 import wbs.platform.console.html.ScriptRef;
 
 @Accessors (fluent = true)
 @SuppressWarnings ({ "rawtypes", "unchecked" })
+@DataClass ("form-field-set")
 public
 class FormFieldSet {
 
+	// properties
+
+	@DataChildren
 	@Getter @Setter
 	List<FormField> formFields =
 		new ArrayList<FormField> ();
+
+	// utility methods
 
 	public
 	Set<ScriptRef> scriptRefs () {

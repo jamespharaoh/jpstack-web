@@ -13,6 +13,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataChildren;
+import wbs.framework.data.annotations.DataClass;
 import wbs.framework.web.AbstractFile;
 import wbs.framework.web.Action;
 import wbs.framework.web.ForbiddenException;
@@ -25,6 +28,7 @@ import wbs.platform.console.request.ConsoleRequestContext;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleFile")
+@DataClass ("console-file")
 public
 class ConsoleFile
 	extends AbstractFile {
@@ -46,18 +50,24 @@ class ConsoleFile
 
 	// properties
 
+	@DataAttribute
 	@Getter @Setter
 	RequestHandler getHandler;
 
+	@DataAttribute
 	@Getter @Setter
 	RequestHandler postHandler;
 
+	@DataAttribute
 	@Getter @Setter
 	BooleanLookup privLookup;
 
+	@DataChildren
 	@Getter @Setter
 	Map<String,Object> requestParams =
 		new LinkedHashMap<String,Object> ();
+
+	// utility methods
 
 	public
 	ConsoleFile getHandlerName (
@@ -209,6 +219,8 @@ class ConsoleFile
 		return this;
 
 	}
+
+	// implementation
 
 	@Override
 	public

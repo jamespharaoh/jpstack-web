@@ -12,17 +12,22 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataClass;
 import wbs.framework.web.Responder;
 import wbs.platform.console.part.PagePart;
 import wbs.platform.console.request.ConsoleRequestContext;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("tabContextResponder")
+@DataClass ("tab-context-responder")
 public
 class TabContextResponder
 	implements
 		Provider<Responder>,
 		Responder {
+
+	// dependencies
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -33,14 +38,21 @@ class TabContextResponder
 	@Inject
 	Provider<TabbedResponder> tabbedPage;
 
+	// properties
+
+	@DataAttribute
 	@Getter @Setter
 	Object tab;
 
+	@DataAttribute
 	@Getter @Setter
 	String title;
 
+	@DataAttribute
 	@Getter @Setter
 	Provider<PagePart> pagePartFactory;
+
+	// utility methods
 
 	public
 	TabContextResponder pagePartName (
