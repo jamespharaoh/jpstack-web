@@ -24,7 +24,6 @@ import wbs.platform.console.context.ConsoleContextType;
 import wbs.platform.console.context.SimpleConsoleContext;
 import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.module.ConsoleModuleImpl;
-import wbs.platform.console.object.BabyObjectContext;
 import wbs.platform.console.object.ObjectContext;
 import wbs.platform.console.tab.ConsoleContextTab;
 import wbs.platform.object.create.ObjectCreatePageSpec;
@@ -50,7 +49,7 @@ class ChatHelpTemplateContextBuilder {
 	// prototype dependences
 
 	@Inject
-	Provider<BabyObjectContext> babyObjectContextProvider;
+	Provider<SimpleConsoleContext> simpleConsoleContextProvider;
 
 	@Inject
 	Provider<ConsoleContextTab> contextTabProvider;
@@ -69,9 +68,6 @@ class ChatHelpTemplateContextBuilder {
 
 	@Inject
 	Provider<ObjectSettingsPageSpec> objectSettingsPageSpecProvider;
-
-	@Inject
-	Provider<SimpleConsoleContext> simpleContextProvider;
 
 	// builder
 
@@ -218,7 +214,7 @@ class ChatHelpTemplateContextBuilder {
 	void buildContexts () {
 
 		consoleModule.addContext (
-			babyObjectContextProvider.get ()
+			simpleConsoleContextProvider.get ()
 
 			.name (
 				contextNamePlural)

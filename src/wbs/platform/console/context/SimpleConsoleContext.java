@@ -14,6 +14,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.record.GlobalId;
 import wbs.framework.web.WebFile;
@@ -67,6 +68,11 @@ class SimpleConsoleContext
 	@Getter @Setter
 	String postProcessorName;
 
+	@DataChildren
+	@Getter @Setter
+	Map<String,Object> stuff =
+		new LinkedHashMap<String,Object> ();
+
 	// state
 
 	@Getter @Setter
@@ -94,9 +100,30 @@ class SimpleConsoleContext
 
 	@Override
 	public
+	String localPathForStuff (
+			ConsoleContextStuff stuff) {
+
+		if (parentContext () != null) {
+
+			return parentContext ().localPathForStuff (
+				stuff);
+
+		} else {
+
+			return super.localPathForStuff (
+				stuff);
+
+		}
+
+	}
+
+	@Override
+	public
 	void initContext (
 			PathSupply pathParts,
 			ConsoleContextStuff contextStuff) {
+
+		// set privs
 
 		for (PrivKeySpec privKeySpec
 				: privKeySpecs) {
@@ -117,12 +144,54 @@ class SimpleConsoleContext
 
 		}
 
-		if (postProcessorName () == null)
-			return;
+		// set stuff
 
-		consoleManager.get ().runPostProcessors (
-			postProcessorName (),
+		if (stuff () != null) {
+
+			for (Map.Entry<String,? extends Object> ent
+					: stuff ().entrySet ()) {
+
+				contextStuff.set (
+					ent.getKey (),
+					ent.getValue ());
+
+			}
+
+		}
+
+		// run hook
+
+		postInitHook (
 			contextStuff);
+
+		// initialise parent
+
+		ConsoleContext parentContext =
+			parentContext ();
+
+		if (parentContext != null) {
+
+			parentContext.initContext (
+				pathParts,
+				contextStuff);
+
+		}
+
+		// run post processors
+
+		if (postProcessorName () != null) {
+
+			consoleManager.get ().runPostProcessors (
+				postProcessorName (),
+				contextStuff);
+
+		}
+
+	}
+
+	protected
+	void postInitHook (
+			ConsoleContextStuff contextStuff) {
 
 	}
 

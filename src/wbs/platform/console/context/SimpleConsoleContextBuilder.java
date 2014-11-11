@@ -3,8 +3,8 @@ package wbs.platform.console.context;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -20,11 +20,14 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.helper.PrivKeySpec;
+import wbs.platform.console.metamodule.ConsoleMetaManager;
+import wbs.platform.console.metamodule.ResolvedConsoleContextLink;
 import wbs.platform.console.module.ConsoleModuleImpl;
 import wbs.platform.console.object.ObjectContext;
 import wbs.platform.console.spec.ConsoleSimpleBuilderContainer;
 import wbs.platform.console.tab.ConsoleContextTab;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 @PrototypeComponent ("simpleConsoleContextBuilder")
@@ -36,6 +39,9 @@ class SimpleConsoleContextBuilder {
 
 	@Inject
 	ApplicationContext applicationContext;
+
+	@Inject
+	ConsoleMetaManager consoleMetaManager;
 
 	@Inject
 	ConsoleObjectManager objectManager;
@@ -74,6 +80,8 @@ class SimpleConsoleContextBuilder {
 	String typeName;
 	String title;
 
+	List<PrivKeySpec> privKeySpecs;
+
 	// build
 
 	@BuildMethod
@@ -84,7 +92,22 @@ class SimpleConsoleContextBuilder {
 		setDefaults ();
 
 		buildContextType ();
-		buildContext ();
+		buildSimpleContext ();
+
+		List<ResolvedConsoleContextLink> resolvedContextLinks =
+			consoleMetaManager.resolveContextLink (
+				name);
+
+		for (ResolvedConsoleContextLink resolvedContextLink
+				: resolvedContextLinks) {
+
+			buildResolvedContexts (
+				resolvedContextLink);
+
+			buildResolvedTabs (
+				resolvedContextLink);
+
+		}
 
 		ConsoleContextBuilderContainer nextBuilderContainer =
 			new ConsoleContextBuilderContainerImpl ()
@@ -131,22 +154,7 @@ class SimpleConsoleContextBuilder {
 
 	}
 
-	void buildContext () {
-
-		// TODO fix this
-
-		List<PrivKeySpec> privKeySpecs =
-			new ArrayList<PrivKeySpec> ();
-
-		for (Object object
-				: Iterables.filter (
-					simpleContextSpec.children (),
-					PrivKeySpec.class)) {
-
-			privKeySpecs.add (
-				(PrivKeySpec) object);
-
-		}
+	void buildSimpleContext () {
 
 		consoleModule.addContext (
 			simpleContext.get ()
@@ -167,7 +175,76 @@ class SimpleConsoleContextBuilder {
 				title)
 
 			.privKeySpecs (
-				privKeySpecs));
+				privKeySpecs)
+
+		);
+
+	}
+
+	void buildResolvedContexts (
+			ResolvedConsoleContextLink resolvedContextLink) {
+
+		for (String parentContextName
+				: resolvedContextLink.parentContextNames ()) {
+
+			String resolvedContextName =
+				stringFormat (
+					"%s.%s",
+					parentContextName,
+					resolvedContextLink.localName ());
+
+			consoleModule.addContext (
+				simpleContext.get ()
+
+				.name (
+					resolvedContextName)
+
+				.typeName (
+					contextTypeName)
+
+				.pathPrefix (
+					"/" + resolvedContextName)
+
+				.global (
+					true)
+
+				.title (
+					title)
+
+				.privKeySpecs (
+					privKeySpecs)
+
+				.parentContextName (
+					parentContextName)
+
+				.parentContextTabName (
+					resolvedContextLink.tabName ()));
+
+		}
+
+	}
+
+	void buildResolvedTabs (
+			ResolvedConsoleContextLink resolvedConsoleContextLink) {
+
+		consoleModule.addContextTab (
+			resolvedConsoleContextLink.tabLocation (),
+
+			contextTab.get ()
+
+				.name (
+					resolvedConsoleContextLink.tabName ())
+
+				.defaultLabel (
+					resolvedConsoleContextLink.tabLabel ())
+
+				.privKeys (
+					resolvedConsoleContextLink.tabPrivKey ())
+
+				.localFile (
+					"type:" + name),
+
+			resolvedConsoleContextLink.tabContextTypeNames ());
 
 	}
 
@@ -196,6 +273,14 @@ class SimpleConsoleContextBuilder {
 				capitalise (
 					camelToSpaces (
 						structuralName)));
+
+		// TODO fix this
+
+		privKeySpecs =
+			ImmutableList.<PrivKeySpec>copyOf (
+				Iterables.filter (
+					simpleContextSpec.children (),
+					PrivKeySpec.class));
 
 	}
 

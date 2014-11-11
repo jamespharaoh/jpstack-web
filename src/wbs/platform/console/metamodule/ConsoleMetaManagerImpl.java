@@ -323,11 +323,6 @@ class ConsoleMetaManagerImpl
 					.tabPrivKey (
 						contextLink.privKey ())
 
-					.tabFile (
-						stringFormat (
-							"type:%s",
-							contextLink.linkName () + "s"))
-
 					.tabContextTypeNames (
 						resolvedExtensionPoint.contextTypeNames ())
 

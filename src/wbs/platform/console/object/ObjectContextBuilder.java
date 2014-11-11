@@ -58,7 +58,7 @@ class ObjectContextBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<BabyObjectContext> babyObjectContext;
+	Provider<SimpleConsoleContext> simpleConsoleContextProvider;
 
 	@Inject
 	Provider<ConsoleContextTab> contextTab;
@@ -112,12 +112,12 @@ class ObjectContextBuilder {
 
 		buildContextTypes ();
 
+		buildSimpleContexts ();
+		buildSimpleTabs ();
+
 		List<ResolvedConsoleContextLink> resolvedContextLinks =
 			consoleMetaManager.resolveContextLink (
 				name);
-
-		buildSimpleContexts ();
-		buildSimpleTabs ();
 
 		for (ResolvedConsoleContextLink resolvedContextLink
 				: resolvedContextLinks) {
@@ -129,8 +129,6 @@ class ObjectContextBuilder {
 				resolvedContextLink);
 
 		}
-
-		buildLinkTabs ();
 
 		ConsoleContextBuilderContainer listContainer =
 			new ConsoleContextBuilderContainerImpl ()
@@ -320,6 +318,23 @@ class ObjectContextBuilder {
 
 			ImmutableList.<String>of ());
 
+		consoleModule.addContextTab (
+			"end",
+
+			contextTab.get ()
+
+				.name (
+					stringFormat (
+						"%s",
+						name,
+						":link"))
+
+				.defaultLabel (
+					capitalise (
+						consoleHelper.friendlyName ())),
+
+			Collections.<String>emptyList ());
+
 	}
 
 	void buildResolvedContexts (
@@ -335,7 +350,7 @@ class ObjectContextBuilder {
 					resolvedContextLink.localName ());
 
 			consoleModule.addContext (
-				babyObjectContext.get ()
+				simpleConsoleContextProvider.get ()
 
 				.name (
 					resolvedContextName + "s")
@@ -416,31 +431,9 @@ class ObjectContextBuilder {
 					resolvedConsoleContextLink.tabPrivKey ())
 
 				.localFile (
-					resolvedConsoleContextLink.tabFile ()),
+					"type:" + name + "s"),
 
 			resolvedConsoleContextLink.tabContextTypeNames ());
-
-	}
-
-	public
-	void buildLinkTabs () {
-
-		consoleModule.addContextTab (
-			"end",
-
-			contextTab.get ()
-
-				.name (
-					stringFormat (
-						"%s",
-						name,
-						":link"))
-
-				.defaultLabel (
-					capitalise (
-						consoleHelper.friendlyName ())),
-
-			Collections.<String>emptyList ());
 
 	}
 
