@@ -79,7 +79,8 @@ class ObjectContextMetaBuilder {
 
 			.parentContextNames (
 				ImmutableList.<String>of (
-					contextName + "s")));
+					contextName + "s",
+					contextName)));
 
 		metaModule.addExtensionPoint (
 			rootExtensionPointProvider.get ()
@@ -96,7 +97,8 @@ class ObjectContextMetaBuilder {
 
 			.parentContextNames (
 				ImmutableList.<String>of (
-					contextName)));
+					contextName,
+					"link:" + contextName)));
 
 		// descend
 
