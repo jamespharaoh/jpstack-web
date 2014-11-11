@@ -81,9 +81,11 @@ class ConsoleContextSectionBuilder {
 
 		buildContextTypes ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildContexts (
 				resolvedExtensionPoint);
@@ -189,39 +191,6 @@ class ConsoleContextSectionBuilder {
 
 				.parentContextName (
 					parentContextName)
-
-				.parentContextTabName (
-					tabName)
-
-				.stuff (
-					stuffMap));
-
-			consoleModule.addContext (
-				babyObjectContextProvider.get ()
-
-				.name (
-					stringFormat (
-						"link:%s.%s",
-						parentContextName,
-						spec.name ()))
-
-				.typeName (
-					contextTypeName)
-
-				.pathPrefix (
-					stringFormat (
-						"/%s.%s",
-						parentContextName,
-						spec.name ()))
-
-				.global (
-					false)
-
-				.title (
-					label)
-
-				.parentContextName (
-					"link:" + parentContextName)
 
 				.parentContextTabName (
 					tabName)

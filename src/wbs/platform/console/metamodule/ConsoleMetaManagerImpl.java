@@ -197,14 +197,14 @@ class ConsoleMetaManagerImpl
 					.parentContextNames (
 						ImmutableList.<String>builder ()
 
-							.addAll (
-								extensionPoint.parentContextNames ())
+						.addAll (
+							extensionPoint.parentContextNames ())
 
-							.addAll (
-								parentContextNames (
-									extensionPoint.contextLinkNames ()))
+						.addAll (
+							parentContextNames (
+								extensionPoint.contextLinkNames ()))
 
-							.build ())
+						.build ())
 
 					.contextTypeNames (
 						extensionPoint.contextTypeNames ())
@@ -214,9 +214,11 @@ class ConsoleMetaManagerImpl
 
 			} else if (extensionPoint.nested ()) {
 
-				if (equal (
+				if (
+					equal (
 						extensionPoint.name (),
-						extensionPoint.parentExtensionPointName ())) {
+						extensionPoint.parentExtensionPointName ())
+				) {
 
 					throw new RuntimeException (
 						stringFormat (

@@ -394,68 +394,6 @@ class ObjectContextBuilder {
 				.parentContextTabName (
 					resolvedContextLink.tabName ()));
 
-			// links
-
-			consoleModule.addContext (
-				babyObjectContext.get ()
-
-				.name (
-					"link:" + resolvedContextName + "s")
-
-				.typeName (
-					name + "s")
-
-				.pathPrefix (
-					"/" + resolvedContextName + "s")
-
-				.global (
-					false)
-
-				.title (capitalise (
-					consoleHelper.shortNamePlural ()))
-
-				.parentContextName (
-					"link:" + parentContextName)
-
-				.parentContextTabName (
-					resolvedContextLink.tabName ()));
-
-			consoleModule.addContext (
-				objectContext.get ()
-
-				.name (
-					"link:" + resolvedContextName)
-
-				.typeName (
-					name + "+")
-
-				.pathPrefix (
-					"/" + resolvedContextName)
-
-				.global (
-					false)
-
-				.title (
-					objectTitle)
-
-				.requestIdKey (
-					consoleHelper.idKey ())
-
-				.objectLookup (
-					consoleHelper)
-
-				.postProcessorName (
-					consoleHelper.objectName ())
-
-				.cryptor (
-					cryptor)
-
-				.parentContextName (
-					"link:" + parentContextName)
-
-				.parentContextTabName (
-					resolvedContextLink.tabName ()));
-
 		}
 
 	}
