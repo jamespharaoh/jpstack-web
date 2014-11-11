@@ -13,11 +13,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataClass;
 import wbs.framework.record.PermanentRecord;
 import wbs.platform.console.html.ScriptRef;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("updatableFormField")
+@DataClass ("updatable-form-field")
 public
 class UpdatableFormField<Container,Generic,Native,Interface>
 	implements FormField<Container,Generic,Native,Interface> {
@@ -27,12 +30,15 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	@Getter
 	Boolean virtual = false;
 
+	@DataAttribute
 	@Getter @Setter
 	Boolean large = false;
 
+	@DataAttribute
 	@Getter @Setter
 	String name;
 
+	@DataAttribute
 	@Getter @Setter
 	String label;
 
