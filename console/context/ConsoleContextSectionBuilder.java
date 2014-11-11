@@ -21,7 +21,6 @@ import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.metamodule.ConsoleMetaManager;
 import wbs.platform.console.module.ConsoleModuleImpl;
-import wbs.platform.console.object.BabyObjectContext;
 import wbs.platform.console.tab.ConsoleContextTab;
 
 import com.google.common.collect.Iterables;
@@ -39,13 +38,13 @@ class ConsoleContextSectionBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<BabyObjectContext> babyObjectContextProvider;
-
-	@Inject
 	Provider<ConsoleContextTab> contextTabProvider;
 
 	@Inject
 	Provider<ConsoleContextType> contextTypeProvider;
+
+	@Inject
+	Provider<SimpleConsoleContext> simpleConsoleContextProvider;
 
 	// builder
 
@@ -166,7 +165,7 @@ class ConsoleContextSectionBuilder {
 				: resolvedExtensionPoint.parentContextNames ()) {
 
 			consoleModule.addContext (
-				babyObjectContextProvider.get ()
+				simpleConsoleContextProvider.get ()
 
 				.name (
 					stringFormat (
