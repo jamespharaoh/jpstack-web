@@ -45,7 +45,7 @@ class Oxygen8InboundFile
 
 		if (
 			equal (
-				requestContext.parameter (
+				requestContext.header (
 					"X-Mms-Message-Type"),
 				"MO_MMS")
 		) {

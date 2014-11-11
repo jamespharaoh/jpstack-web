@@ -15,11 +15,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.joda.time.Instant;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -105,7 +101,8 @@ class Oxygen8InboundMmsAction
 	protected
 	Responder goApi () {
 
-		processRequest ();
+		processRequestHeaders ();
+		processRequestBody ();
 
 		updateDatabase ();
 
@@ -113,8 +110,7 @@ class Oxygen8InboundMmsAction
 
 	}
 
-	@SneakyThrows (FileUploadException.class)
-	void processRequest () {
+	void processRequestHeaders () {
 
 		routeId =
 			requestContext.requestInt ("routeId");
@@ -122,7 +118,7 @@ class Oxygen8InboundMmsAction
 		// message id
 
 		mmsMessageId =
-			requestContext.parameter ("mmsMessageId");
+			requestContext.header ("mmsMessageId");
 
 		if (mmsMessageId == null)
 			throw new RuntimeException ();
@@ -133,7 +129,7 @@ class Oxygen8InboundMmsAction
 		// message type
 
 		mmsMessageType =
-			requestContext.parameter ("mmsMessageType");
+			requestContext.header ("mmsMessageType");
 
 		if (mmsMessageType == null)
 			throw new RuntimeException ();
@@ -144,7 +140,7 @@ class Oxygen8InboundMmsAction
 		// sender address
 
 		mmsSenderAddress =
-			requestContext.parameter ("mmsSenderAddress");
+			requestContext.header ("mmsSenderAddress");
 
 		if (mmsSenderAddress == null)
 			throw new RuntimeException ();
@@ -155,7 +151,7 @@ class Oxygen8InboundMmsAction
 		// recipient address
 
 		mmsRecipientAddress =
-			requestContext.parameter ("mmsRecipientAddress");
+			requestContext.header ("mmsRecipientAddress");
 
 		if (mmsRecipientAddress == null)
 			throw new RuntimeException ();
@@ -166,12 +162,12 @@ class Oxygen8InboundMmsAction
 		// subject
 
 		mmsSubject =
-			requestContext.parameter ("mmsSubject");
+			requestContext.header ("mmsSubject");
 
 		// date
 
 		String mmsDateParam =
-			requestContext.parameter ("mmsDate");
+			requestContext.header ("mmsDate");
 
 		if (mmsDateParam == null)
 			throw new RuntimeException ();
@@ -182,34 +178,20 @@ class Oxygen8InboundMmsAction
 		// network
 
 		mmsNetwork =
-			requestContext.parameter ("mmsNetwork");
+			requestContext.header ("mmsNetwork");
 
 		if (mmsNetwork == null)
 			throw new RuntimeException ();
 
-		// attachments
+	}
 
-		ServletRequestContext fileUploadContext =
-			requestContext.getFileUploadServletRequestContext ();
-
-		if (! FileUploadBase.isMultipartContent (
-				fileUploadContext))
-			throw new RuntimeException ();
-
-		DiskFileItemFactory fileItemFactory =
-			new DiskFileItemFactory ();
-
-		ServletFileUpload fileUpload =
-			new ServletFileUpload (fileItemFactory);
-
-		List<FileItem> fileItems =
-			fileUpload.parseRequest (
-				requestContext.request ());
+	@SneakyThrows (FileUploadException.class)
+	void processRequestBody () {
 
 		int errorCount = 0;
 
 		for (FileItem fileItem
-				: fileItems) {
+				: requestContext.fileItems ()) {
 
 			log.error (
 				stringFormat (
@@ -299,6 +281,10 @@ class Oxygen8InboundMmsAction
 			medias,
 			null,
 			mmsSubject);
+
+		// commit transaction
+
+		transaction.commit ();
 
 	}
 

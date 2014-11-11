@@ -1,5 +1,6 @@
 package wbs.platform.api;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.inject.Inject;
@@ -13,12 +14,21 @@ public
 class ApiErrorResponder
 	implements Responder {
 
+	// dependencies
+
 	@Inject
 	RequestContext requestContext;
 
+	// implementation
+
 	@Override
 	public
-	void execute () {
+	void execute ()
+		throws IOException {
+
+		requestContext.sendError (
+			500,
+			"Internal error");
 
 		PrintWriter out =
 			requestContext.writer ();
