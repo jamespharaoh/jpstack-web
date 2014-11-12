@@ -112,76 +112,145 @@ class Oxygen8InboundMmsAction
 
 	void processRequestHeaders () {
 
+		List<String> errors =
+			new ArrayList<String> ();
+
+		// route id
+
 		routeId =
 			requestContext.requestInt ("routeId");
 
 		// message id
 
 		mmsMessageId =
-			requestContext.header ("mmsMessageId");
+			requestContext.header ("X-Mms-Message-Id");
 
-		if (mmsMessageId == null)
-			throw new RuntimeException ();
+		if (mmsMessageId == null) {
 
-		if (mmsMessageId.length () != 32)
-			throw new RuntimeException ();
+			errors.add (
+				"Required header missing: X-Mms-Message-Id");
+
+		} else if (mmsMessageId.length () != 32) {
+
+			errors.add (
+				stringFormat (
+					"Header expected to be 32 characters but was %s: ",
+					mmsMessageId.length (),
+					"X-Mms-Message-Id"));
+
+		}
 
 		// message type
 
 		mmsMessageType =
-			requestContext.header ("mmsMessageType");
+			requestContext.header ("X-Mms-Message-Type");
 
-		if (mmsMessageType == null)
-			throw new RuntimeException ();
+		if (mmsMessageType == null) {
 
-		if (! equal (mmsMessageType, "MO_MMS"))
-			throw new RuntimeException ();
+			errors.add (
+				"Required header missing: X-Mms-Message-Type");
+
+		} else if (! equal (mmsMessageType, "MO_MMS")) {
+
+			errors.add (
+				stringFormat (
+					"Header expected to equal 'MO_MMS' but was '%s': ",
+					mmsMessageType,
+					"X-Mms-Message-Type"));
+
+		}
 
 		// sender address
 
 		mmsSenderAddress =
-			requestContext.header ("mmsSenderAddress");
+			requestContext.header ("X-Mms-Sender-Address");
 
-		if (mmsSenderAddress == null)
-			throw new RuntimeException ();
+		if (mmsSenderAddress == null) {
 
-		if (mmsSenderAddress.isEmpty ())
-			throw new RuntimeException ();
+			errors.add (
+				"Required header missing: X-Mms-Sender-Address");
+
+		} else if (mmsSenderAddress.isEmpty ()) {
+
+			errors.add (
+				"Required header empty: X-Mms-Sender-Address");
+
+		}
 
 		// recipient address
 
 		mmsRecipientAddress =
-			requestContext.header ("mmsRecipientAddress");
+			requestContext.header ("X-Mms-Recipient-Address");
 
-		if (mmsRecipientAddress == null)
-			throw new RuntimeException ();
+		if (mmsRecipientAddress == null) {
 
-		if (mmsRecipientAddress.isEmpty ())
-			throw new RuntimeException ();
+			errors.add (
+				"Required header missing: X-Mms-Recipient-Address");
+
+		} else if (mmsRecipientAddress.isEmpty ()) {
+
+			errors.add (
+				"Required header empty: X-Mms-Recipient-Address");
+
+		}
 
 		// subject
 
 		mmsSubject =
-			requestContext.header ("mmsSubject");
+			requestContext.header ("X-Mms-Subject");
 
 		// date
 
 		String mmsDateParam =
-			requestContext.header ("mmsDate");
+			requestContext.header ("X-Mms-Date");
 
-		if (mmsDateParam == null)
-			throw new RuntimeException ();
+		if (mmsDateParam == null) {
 
-		mmsDate =
-			Instant.parse (mmsDateParam);
+			errors.add (
+				"Required header missing: X-Mms-Date");
+
+		} else {
+
+			try {
+
+				mmsDate =
+					Instant.parse (mmsDateParam);
+
+			} catch (Exception exception) {
+
+				errors.add (
+					"Error parsing header: X-Mms-Date");
+
+			}
+
+		}
 
 		// network
 
 		mmsNetwork =
-			requestContext.header ("mmsNetwork");
+			requestContext.header ("X-Mms-Network");
 
-		if (mmsNetwork == null)
-			throw new RuntimeException ();
+		if (mmsNetwork == null) {
+
+			errors.add (
+				"Required header missing: X-Mms-Network");
+
+		}
+
+		// errors
+
+		if (! errors.isEmpty ()) {
+
+			for (String error : errors) {
+				log.error (error);
+			}
+
+			throw new RuntimeException (
+				stringFormat (
+					"Aborting due to %s errors logged parsing request headers",
+					errors.size ()));
+
+		}
 
 	}
 
