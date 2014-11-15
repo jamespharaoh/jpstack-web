@@ -15,13 +15,13 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.MediaLogic"/>
+		<bean class="logic.MediaLogicImpl"/>
 	</layer>
 
 	<layer name="console">
 		<bean class="console.MediaAudioResponder"/>
 		<bean class="console.MediaConsoleConfig"/>
-		<bean class="console.MediaConsoleLogic"/>
+		<bean class="console.MediaConsoleLogicImpl"/>
 		<bean class="console.MediaImageResponder"/>
 		<bean class="console.MediaThumb100Responder"/>
 		<bean class="console.MediaThumb32Responder"/>
