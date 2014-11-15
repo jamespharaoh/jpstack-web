@@ -6,6 +6,8 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -29,6 +31,7 @@ import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInRec;
 import wbs.platform.api.ApiAction;
+import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
@@ -53,6 +56,9 @@ class Oxygen8InboundMmsAction
 
 	@Inject
 	InboxLogic inboxLogic;
+
+	@Inject
+	MediaLogic mediaLogic;
 
 	@Inject
 	MessageTypeObjectHelper messageTypeHelper;
@@ -262,12 +268,53 @@ class Oxygen8InboundMmsAction
 		for (FileItem fileItem
 				: requestContext.fileItems ()) {
 
-			log.error (
-				stringFormat (
-					"Attachment with name %s ",
+			Matcher matcher =
+				contentTypePattern.matcher (
+					fileItem.getContentType ());
+
+			if (! matcher.matches ()) {
+
+				log.error (
+					stringFormat (
+						"Invalid content type: %s",
+						fileItem.getContentType ()));
+
+				errorCount ++;
+
+				continue;
+
+			}
+
+			String type =
+				matcher.group (1);
+
+			String charset =
+				matcher.group (2);
+
+			medias.add (
+				mediaLogic.createMedia (
+					fileItem.get (),
+					type,
 					fileItem.getName (),
-					"had content type %s",
-					fileItem.getContentType ()));
+					charset));
+
+			if (
+
+				messageString == null
+
+				&& mediaLogic.isText (
+					type)
+
+				&& fileItem.getString () != null
+
+				&& ! fileItem.getString ().isEmpty ()
+
+			) {
+
+				messageString =
+					fileItem.getString ();
+
+			}
 
 			errorCount ++;
 
@@ -276,8 +323,14 @@ class Oxygen8InboundMmsAction
 		if (messageString == null)
 			messageString = "";
 
-		if (errorCount > 0)
-			throw new RuntimeException ();
+		if (errorCount > 0) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Aborting due to %s errors",
+					errorCount));
+
+		}
 
 	}
 
@@ -363,5 +416,10 @@ class Oxygen8InboundMmsAction
 			.text ("success");
 
 	}
+
+	public final static
+	Pattern contentTypePattern =
+		Pattern.compile (
+			"(\\S+); charset=(\\S+)");
 
 }
