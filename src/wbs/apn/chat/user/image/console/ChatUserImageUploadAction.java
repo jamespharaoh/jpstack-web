@@ -16,6 +16,7 @@ import org.apache.commons.fileupload.RequestContext;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
+import org.apache.commons.io.IOUtils;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -119,7 +120,7 @@ class ChatUserImageUploadAction
 				item.getContentType ();
 
 			byte[] data =
-				mediaLogic.inputStreamToByteArray (
+				IOUtils.toByteArray (
 					item.getInputStream ());
 
 			String resultType;
@@ -127,7 +128,10 @@ class ChatUserImageUploadAction
 
 			ChatUserImageType imageOrVideo;
 
-			if (MediaLogic.videoTypes.contains (contentType)) {
+			if (
+				mediaLogic.isVideo (
+					contentType)
+			) {
 
 				// resample the video
 

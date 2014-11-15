@@ -249,9 +249,12 @@ class ChatApiServletModule
 			if (format != null
 					&& ! equal (format, "orig")) {
 
-				if (MediaLogic.videoTypes.contains (mimeType)) {
+				if (mediaLogic.isVideo (mimeType)) {
 
-					if (MediaLogic.ffmpegProfiles.containsKey (format)) {
+					if (
+						mediaLogic.videoProfileNames ().contains (
+							format)
+					) {
 
 						data =
 							mediaLogic.videoConvert (

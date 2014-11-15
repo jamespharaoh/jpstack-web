@@ -1045,9 +1045,12 @@ class ChatUserLogicImpl
 		for (MediaRec media
 				: message.getMedias ()) {
 
-			if (! MediaLogic.videoTypes.contains (
-					media.getMediaType ().getMimeType ()))
+			if (
+				! mediaLogic.isVideo (
+					media.getMediaType ().getMimeType ())
+			) {
 				continue;
+			}
 
 			setVideo (
 				chatUser,

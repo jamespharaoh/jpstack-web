@@ -30,6 +30,9 @@ import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.media.console.MediaConsoleLogic;
+import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -76,6 +79,12 @@ class ManualResponderRequestPendingSummaryPart
 	ManualResponderRequestObjectHelper manualResponderRequestHelper;
 
 	@Inject
+	MediaConsoleLogic mediaConsoleLogic;
+
+	@Inject
+	MediaLogic mediaLogic;
+
+	@Inject
 	MessageObjectHelper messageHelper;
 
 	@Inject
@@ -102,11 +111,14 @@ class ManualResponderRequestPendingSummaryPart
 	SmsCustomerRec smsCustomer;
 	SmsCustomerSessionRec smsCustomerSession;
 
+	MessageRec message;
 	NumberRec number;
 	NetworkRec network;
 
 	List<ManualResponderRequestRec> oldManualResponderRequests;
 	List<RouteBillInfo> routeBillInfos;
+
+	// details
 
 	@Override
 	public
@@ -133,6 +145,8 @@ class ManualResponderRequestPendingSummaryPart
 
 	}
 
+	// implementation
+
 	@Override
 	public
 	void prepare () {
@@ -144,6 +158,9 @@ class ManualResponderRequestPendingSummaryPart
 
 		manualResponder =
 			manualResponderRequest.getManualResponder ();
+
+		message =
+			manualResponderRequest.getMessage ();
 
 		number =
 			manualResponderRequest.getNumber ();
@@ -393,7 +410,7 @@ class ManualResponderRequestPendingSummaryPart
 			"<th>Message</th>\n",
 			"%s\n",
 			objectManager.tdForObject (
-				manualResponderRequest.getMessage (),
+				message,
 				null,
 				true,
 				true),
@@ -403,8 +420,53 @@ class ManualResponderRequestPendingSummaryPart
 			"<tr>\n",
 			"<th>Message text</th>\n",
 			"<td class=\"bigger\">%h</td>\n",
-			manualResponderRequest.getMessage ().getText ().getText (),
+			message.getText ().getText (),
 			"</tr>\n");
+
+		for (
+			MediaRec media
+				: message.getMedias ()
+		) {
+
+			if (
+				mediaLogic.isText (
+					media)
+			) {
+
+				printFormat (
+					"<tr>\n",
+					"<th>Text media</th>\n",
+					"<td>%h</td>\n",
+					mediaConsoleLogic.mediaContent (
+						media),
+					"</tr>\n");
+
+			} else if (
+				mediaLogic.isImage (
+					media)
+			) {
+
+				printFormat (
+					"<tr>\n",
+					"<th>Image media</th>\n",
+					"<td><a href=\"%h\">%s</a></td>\n",
+					mediaConsoleLogic.mediaUrl (
+						media),
+					mediaConsoleLogic.mediaThumb100 (
+						media),
+					"</tr>\n");
+
+			} else {
+
+				printFormat (
+					"<tr>\n",
+					"<th>Media</th>\n",
+					"<td>(unsupported media type)</td>\n",
+					"</tr>\n");
+
+			}
+
+		}
 
 		printFormat (
 			"</table>\n");
@@ -601,6 +663,7 @@ class ManualResponderRequestPendingSummaryPart
 			"<tr>\n",
 			"<th colspan=\"2\">Timestamp</th>\n",
 			"<th>Message</th>\n",
+			"<th>Media</th>\n",
 			"<th>User</th>\n",
 			"</tr>\n");
 
@@ -635,6 +698,9 @@ class ManualResponderRequestPendingSummaryPart
 					oldReply.getText ().getText ());
 
 				printFormat (
+					"<td></td>\n");
+
+				printFormat (
 					"<td>%h</td>\n",
 					oldReply.getUser ().getUsername ());
 
@@ -661,6 +727,31 @@ class ManualResponderRequestPendingSummaryPart
 					.getMessage ()
 					.getText ()
 					.getText ());
+
+			printFormat (
+				"<td>\n");
+
+			for (
+				MediaRec media
+					: oldManualResponderRequest.getMessage ().getMedias ()
+			) {
+
+				if (
+					mediaLogic.isImage (
+						media)
+				) {
+
+					printFormat (
+						"%s\n",
+						mediaConsoleLogic.mediaThumb32 (
+							media));
+
+				}
+
+			}
+
+			printFormat (
+				"</td>\n");
 
 			printFormat (
 				"<td>%h</td>\n",

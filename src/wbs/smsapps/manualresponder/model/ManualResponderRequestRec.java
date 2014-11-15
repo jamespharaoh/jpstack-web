@@ -36,11 +36,20 @@ public
 class ManualResponderRequestRec
 	implements CommonRecord<ManualResponderRequestRec> {
 
+	// id
+
 	@GeneratedIdField
 	Integer id;
 
+	// identity
+
 	@ParentField
 	ManualResponderRec manualResponder;
+
+	// TODO parent should be mr-number
+	// TODO add index
+
+	// details
 
 	@ReferenceField
 	MessageRec message;
@@ -52,15 +61,19 @@ class ManualResponderRequestRec
 		nullable = true)
 	UserRec user;
 
-	@SimpleField
-	Boolean pending;
-
 	@ReferenceField
 	NumberRec number;
+
+	// state
+
+	@SimpleField
+	Boolean pending;
 
 	@ReferenceField (
 		nullable = true)
 	QueueItemRec queueItem;
+
+	// children
 
 	@CollectionField
 	Set<ManualResponderReplyRec> replies;
