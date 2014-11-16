@@ -75,7 +75,7 @@ class CoreLogonResponder
 			"<td><input",
 			" type=\"text\"",
 			" name=\"slice\"",
-			" value=\"%h\"\"",
+			" value=\"%h\"",
 			requestContext.parameter (
 				"slice",
 				wbsConfig.defaultSlice ()),
