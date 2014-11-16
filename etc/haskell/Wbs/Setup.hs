@@ -170,7 +170,8 @@ writeBuildFile worldConfig = do
 	let makeCleanTargets =
 		[
 			makeSimpleTarget "clean" [
-				makeDeleteDir "work/bin"
+				makeDeleteDir "work/bin",
+				makeDeleteDir "work/test"
 			]
 		]
 
