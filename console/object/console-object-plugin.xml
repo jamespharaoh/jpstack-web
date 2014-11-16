@@ -3,7 +3,6 @@
 	package="console.object">
 
 	<layer name="console">
-		<bean class="BabyObjectContext"/>
 		<bean class="ExtendContextBuilder"/>
 		<bean class="ExtendContextMetaBuilder"/>
 		<bean class="ExtendContextSpec"/>
