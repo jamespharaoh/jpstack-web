@@ -32,7 +32,7 @@ declare variable $build := /wbs-build;
 			{ if ($library/@source = 'yes') then (
 				attribute sourcepath {
 					concat (
-						'/home/james/projects/wbs/',
+						'/home/vagrant/',
 						$build/@name,
 						'/binaries',
 						'/libraries/',
