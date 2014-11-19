@@ -963,23 +963,34 @@ class ApplicationContextBuilder {
 
 				applicationContext.registerBeanDefinition (
 					new BeanDefinition ()
-						.name (method.getName ())
-						.beanClass (method.getReturnType ())
-						.scope ("singleton")
-						.factoryClass (MethodBeanFactory.class)
 
-						.addReferenceProperty (
-							"factoryBean",
-							beanName)
+					.name (
+						method.getName ())
 
-						.addValueProperty (
-							"factoryMethodName",
-							method.getName ()));
+					.beanClass (
+						method.getReturnType ())
+
+					.scope (
+						"singleton")
+
+					.factoryClass (
+						MethodBeanFactory.class)
+
+					.addReferenceProperty (
+						"factoryBean",
+						beanName)
+
+					.addValueProperty (
+						"factoryMethodName",
+						method.getName ())
+
+				);
 
 			}
 
 			PrototypeComponent prototypeComponentAnnotation =
-				method.getAnnotation (PrototypeComponent.class);
+				method.getAnnotation (
+					PrototypeComponent.class);
 
 			if (prototypeComponentAnnotation != null) {
 
