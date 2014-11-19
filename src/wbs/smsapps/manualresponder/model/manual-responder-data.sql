@@ -68,6 +68,12 @@ SELECT object_type_insert (
 	'manual_responder',
 	3);
 
+SELECT object_type_insert (
+	'manual_responder_report',
+	'manual responder report',
+	'manual_responder_request',
+	3);
+
 SELECT queue_type_insert (
 	'manual_responder',
 	'default',

@@ -10,6 +10,7 @@
 
 	<sql-scripts>
 		<sql-schema name="manual-responder"/>
+		<sql-schema name="manual-responder-report"/>
 		<sql-data name="manual-responder-data"/>
 	</sql-scripts>
 
@@ -19,6 +20,7 @@
 		<model name="manualResponderRequest"/>
 		<model name="manualResponderReply"/>
 		<model name="manualResponderTemplate"/>
+		<model name="manualResponderReport"/>
 	</models>
 
 	<layer name="console">
@@ -27,6 +29,8 @@
 		<bean class="console.ManualResponderRequestPendingNumberNoteUpdateAction"/>
 		<bean class="console.ManualResponderRequestPendingSummaryPart"/>
 		<bean class="console.ManualResponderQueueConsolePlugin"/>
+		<bean class="console.ManualResponderReportSimplePart"/>
+
 	</layer>
 
 	<layer name="daemon">
@@ -39,6 +43,7 @@
 
 	<fixtures>
 		<fixture name="manualResponder"/>
+		<fixture name="manualResponderReport"/>
 	</fixtures>
 
 	<console-modules>
@@ -47,6 +52,7 @@
 		<console-module name="manual-responder-request"/>
 		<console-module name="manual-responder-request-pending"/>
 		<console-module name="manual-responder-template"/>
+		<console-module name="manual-responder-report" />
 	</console-modules>
 
 </plugin>

@@ -1,0 +1,58 @@
+<console-module
+	name="manual-responder-report">
+
+	<console-helper-provider
+		object-name="manualResponderReport"
+		view-delegate-field="manualResponder"
+		view-delegate-priv-code="manage"
+		id-key="manualResponderRequestId">
+
+		<context-stuff
+			name="manualResponderRequestId"
+			field="id"/>
+
+		<run-post-processor
+			name="manualResponderRequest"/>
+
+	</console-helper-provider>
+
+	<simple-context
+		name="manualResponderReport">
+
+		<context-tab-page
+			name="simple"
+			title="Simple"/>
+
+	</simple-context>
+
+	<field-set
+		name="simpleReportSearch"
+		class="wbs.smsapps.manualresponder.console.ManualResponderReportSimplePart$SearchForm">
+
+		<timestamp-from-field
+			name="start"/>
+
+		<timestamp-to-field
+			name="end"/>
+
+	</field-set>
+
+	<field-set
+		name="simpleReportResults"
+		object-name="manualResponderReport">
+
+		<object-field
+			name="manualResponderRequest"
+			label="Request"
+			finder="manualResponderRequest"/>
+
+		<object-field
+			name="user"
+			finder="user"/>
+
+		<integer-field
+			name="num"/>
+
+	</field-set>
+
+</console-module>

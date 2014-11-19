@@ -1,6 +1,5 @@
 package wbs.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.parseTimeAfter;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -87,12 +86,11 @@ class ChatMonitorInboxAlarmAction
 
 				// TODO this is wrong, surely?
 				alarmTime =
-					dateToInstant (
-						parseTimeAfter (
-							stringFormat (
-								"%s %s",
-								requestContext.parameter ("alarmDate"),
-								requestContext.parameter ("alarmTime"))));
+					parseTimeAfter (
+						stringFormat (
+							"%s %s",
+							requestContext.parameter ("alarmDate"),
+							requestContext.parameter ("alarmTime")));
 
 			} catch (TimeFormatException exception) {
 

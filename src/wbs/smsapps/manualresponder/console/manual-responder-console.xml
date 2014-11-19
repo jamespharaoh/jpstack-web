@@ -16,6 +16,7 @@
 			name="manualResponder.stats"
 			priv="stats"/>
 
+
 		<context-stuff
 			name="manualResponderName"
 			field="name"/>
@@ -33,6 +34,25 @@
 
 			<object-create-page/>
 
+			<!--
+			<section
+				name="report"
+				label="Reports">
+
+				<context-tab-page
+					name="simple"
+					title="Simple"
+					/>
+
+			</section>
+			-->
+
+			<context-link
+				name="report"
+				link="manualResponderReport"
+				label="Reports"
+				priv-key="manualResponder.manage"/>
+
 		</list>
 
 		<object>
@@ -43,11 +63,13 @@
 			<object-settings-page
 				fields="settings"/>
 
+
 			<context-link
 				name="template"
 				link="manualResponderTemplate"
 				label="Templates"
 				priv-key="manualResponder.manage"/>
+
 
 			<context-link
 				name="request"

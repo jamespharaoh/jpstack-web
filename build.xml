@@ -910,6 +910,7 @@
       <script name="src/wbs/sms/customer/model/sms-customer.sql"/>
       <script name="src/wbs/smsapps/forwarder/model/forwarder.sql"/>
       <script name="src/wbs/smsapps/manualresponder/model/manual-responder.sql"/>
+      <script name="src/wbs/smsapps/manualresponder/model/manual-responder-report.sql"/>
       <script name="src/wbs/psychic/template/model/psychic-template.sql"/>
       <script name="src/wbs/apn/chat/core/model/chat-stats.sql"/>
       <script name="src/wbs/apn/chat/affiliate/model/chat-affiliate-users-summary.sql"/>

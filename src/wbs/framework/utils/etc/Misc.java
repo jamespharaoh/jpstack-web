@@ -33,6 +33,7 @@ import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.joda.time.Instant;
 
 import com.google.common.collect.ImmutableList;
@@ -610,26 +611,40 @@ class Misc {
 	}
 
 	private static
-	Pattern[] datePatterns = {
-		Pattern.compile ("([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])"),
-		Pattern.compile ("([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3]):([0-5][0-9])"),
-		Pattern.compile ("([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3])"),
-		Pattern.compile ("([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])"),
-		Pattern.compile ("([0-9]{4})-(0?[1-9]|1[0-2])"),
-		Pattern.compile ("([0-9]{4})"),
-		Pattern.compile("")
-	};
+	List<Pattern> datePatterns =
+		ImmutableList.<Pattern>of (
+			Pattern.compile (
+				"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) " +
+				"([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])"),
+			Pattern.compile (
+				"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) " +
+				"([01][0-9]|2[0-3]):([0-5][0-9])"),
+			Pattern.compile (
+				"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) " +
+				"([01][0-9]|2[0-3])"),
+			Pattern.compile (
+				"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])"),
+			Pattern.compile (
+				"([0-9]{4})-(0?[1-9]|1[0-2])"),
+			Pattern.compile (
+				"([0-9]{4})"),
+			Pattern.compile (
+				""));
 
 	public static
-	Date parseTimeAfter (
+	Instant parseTimeAfter (
 			String string) {
 
-		int year = 0, month = 1, date = 1, hour = 0, minute = 0, second = 0;
+		int year = 0, month = 1, date = 1;
+		int hour = 0, minute = 0, second = 0;
 
-		for (int i = 0; i < datePatterns.length; i++) {
+		for (
+			Pattern datePattern
+				: datePatterns
+		) {
 
 			Matcher matcher =
-				datePatterns[i].matcher (string);
+				datePattern.matcher (string);
 
 			if (! matcher.matches ())
 				continue;
@@ -637,26 +652,56 @@ class Misc {
 			int groupCount =
 				matcher.groupCount ();
 
-			if (groupCount >= 1)
-				year = Integer.parseInt (matcher.group (1));
+			if (groupCount >= 1) {
 
-			if (groupCount >= 2)
-				month = Integer.parseInt (matcher.group (2)) - 1;
+				year =
+					Integer.parseInt (
+						matcher.group (1));
 
-			if (groupCount >= 3)
-				date = Integer.parseInt (matcher.group (3));
+			}
 
-			if (groupCount >= 4)
-				hour = Integer.parseInt (matcher.group (4));
+			if (groupCount >= 2) {
 
-			if (groupCount >= 5)
-				minute = Integer.parseInt (matcher.group (5));
+				month =
+					Integer.parseInt (
+						matcher.group (2));
 
-			if (groupCount >= 6)
-				second = Integer.parseInt (matcher.group (6));
+			}
 
-			Calendar calendar =
-				new GregorianCalendar (
+			if (groupCount >= 3) {
+
+				date =
+					Integer.parseInt (
+						matcher.group (3));
+
+			}
+
+			if (groupCount >= 4) {
+
+				hour =
+					Integer.parseInt (
+						matcher.group (4));
+
+			}
+
+			if (groupCount >= 5) {
+
+				minute =
+					Integer.parseInt (
+						matcher.group (5));
+
+			}
+
+			if (groupCount >= 6) {
+
+				second =
+					Integer.parseInt (
+						matcher.group (6));
+
+			}
+
+			DateTime dateTime =
+				new DateTime (
 					year,
 					month,
 					date,
@@ -664,7 +709,7 @@ class Misc {
 					minute,
 					second);
 
-			return calendar.getTime ();
+			return dateTime.toInstant ();
 
 		}
 
@@ -674,15 +719,19 @@ class Misc {
 	}
 
 	public static
-	Date parseTimeBefore (
+	Instant parseTimeBefore (
 			String string) {
 
-		int year = 0, month = 1, date = 1, hour = 0, minute = 0, second = 0;
+		int year = 0, month = 1, date = 1;
+		int hour = 0, minute = 0, second = 0;
 
-		for (int i = 0; i < datePatterns.length; i++) {
+		for (
+			Pattern datePattern
+				: datePatterns
+		) {
 
 			Matcher matcher =
-				datePatterns [i].matcher (string);
+				datePattern.matcher (string);
 
 			if (! matcher.matches ())
 				continue;
@@ -690,26 +739,56 @@ class Misc {
 			int groupCount =
 				matcher.groupCount ();
 
-			if (groupCount >= 1)
-				year = Integer.parseInt (matcher.group (1));
+			if (groupCount >= 1) {
 
-			if (groupCount >= 2)
-				month = Integer.parseInt (matcher.group (2)) - 1;
+				year =
+					Integer.parseInt (
+						matcher.group (1));
 
-			if (groupCount >= 3)
-				date = Integer.parseInt (matcher.group (3));
+			}
 
-			if (groupCount >= 4)
-				hour = Integer.parseInt (matcher.group (4));
+			if (groupCount >= 2) {
 
-			if (groupCount >= 5)
-				minute = Integer.parseInt (matcher.group (5));
+				month =
+					Integer.parseInt (
+						matcher.group (2));
 
-			if (groupCount >= 6)
-				second = Integer.parseInt (matcher.group (6));
+			}
 
-			Calendar calendar =
-				new GregorianCalendar (
+			if (groupCount >= 3) {
+
+				date =
+					Integer.parseInt (
+						matcher.group (3));
+
+			}
+
+			if (groupCount >= 4) {
+
+				hour =
+					Integer.parseInt (
+						matcher.group (4));
+
+			}
+
+			if (groupCount >= 5) {
+
+				minute =
+					Integer.parseInt (
+						matcher.group (5));
+
+			}
+
+			if (groupCount >= 6) {
+
+				second =
+					Integer.parseInt (
+						matcher.group (6));
+
+			}
+
+			DateTime dateTime =
+				new DateTime (
 					year,
 					month,
 					date,
@@ -717,28 +796,48 @@ class Misc {
 					minute,
 					second);
 
-			if (groupCount == 0)
-				calendar.add (Calendar.YEAR, 10000);
+			if (groupCount == 0) {
 
-			else if (groupCount == 1)
-				calendar.add (Calendar.YEAR, 1);
+				dateTime =
+					dateTime.plusYears (10000);
 
-			else if (groupCount == 2)
-				calendar.add (Calendar.MONTH, 1);
+			} else if (groupCount == 1) {
 
-			else if (groupCount == 3)
-				calendar.add (Calendar.DATE, 1);
+				dateTime =
+					dateTime.plusYears (1);
 
-			else if (groupCount == 4)
-				calendar.add (Calendar.HOUR, 1);
+			} else if (groupCount == 2) {
 
-			else if (groupCount == 5)
-				calendar.add (Calendar.MINUTE, 1);
+				dateTime =
+					dateTime.plusMonths (1);
 
-			else
-				calendar.add (Calendar.SECOND, 1);
+			} else if (groupCount == 3) {
 
-			return calendar.getTime ();
+				dateTime =
+					dateTime.plusDays (1);
+
+			} else if (groupCount == 4) {
+
+				dateTime =
+					dateTime.plusHours (1);
+
+			} else if (groupCount == 5) {
+
+				dateTime =
+					dateTime.plusMinutes (1);
+
+			} else if (groupCount == 6) {
+
+				dateTime =
+					dateTime.plusSeconds (1);
+
+			} else {
+
+				throw new RuntimeException ();
+
+			}
+
+			return dateTime.toInstant ();
 
 		}
 

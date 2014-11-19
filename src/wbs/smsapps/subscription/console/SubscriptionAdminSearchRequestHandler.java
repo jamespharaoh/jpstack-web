@@ -1,5 +1,6 @@
 package wbs.smsapps.subscription.console;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.parseTimeAfter;
 import static wbs.framework.utils.etc.Misc.parseTimeBefore;
@@ -131,38 +132,50 @@ class SubscriptionAdminSearchRequestHandler
 			if (activeDateString != null) {
 
 				activeDateFrom =
-					parseTimeAfter (activeDateString);
+					instantToDate (
+						parseTimeAfter (
+							activeDateString));
 
 				activeDateTo =
-					parseTimeBefore (activeDateString);
+					instantToDate (
+						parseTimeBefore (
+							activeDateString));
 
 			}
 
 			if (startedFromString != null) {
 
 				startedFrom =
-					parseTimeAfter (startedFromString);
+					instantToDate (
+						parseTimeAfter (
+							startedFromString));
 
 			}
 
 			if (startedToString != null) {
 
 				startedTo =
-					parseTimeBefore (startedToString);
+					instantToDate (
+						parseTimeBefore (
+							startedToString));
 
 			}
 
 			if (endedFromString != null) {
 
 				endedFrom =
-					parseTimeAfter (endedFromString);
+					instantToDate (
+						parseTimeAfter (
+							endedFromString));
 
 			}
 
 			if (endedToString != null) {
 
 				endedTo =
-					parseTimeBefore (endedToString);
+					instantToDate (
+						parseTimeBefore (
+							endedToString));
 
 			}
 

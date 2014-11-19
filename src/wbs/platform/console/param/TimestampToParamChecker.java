@@ -4,6 +4,7 @@
 package wbs.platform.console.param;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.parseTimeBefore;
 
 import java.util.Date;
@@ -48,8 +49,9 @@ class TimestampToParamChecker
 
 		try {
 
-			return parseTimeBefore (
-				param);
+			return instantToDate (
+				parseTimeBefore (
+					param));
 
 		} catch (TimeFormatException exception) {
 
