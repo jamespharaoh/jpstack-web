@@ -161,8 +161,10 @@ class ApplicationContext {
 
 		}
 
-		if (! beanClass.isAssignableFrom (
-				beanDefinition.beanClass ())) {
+		if (
+			! beanClass.isAssignableFrom (
+				beanDefinition.beanClass ())
+		) {
 
 			throw new NoSuchBeanException (
 				stringFormat (
@@ -215,8 +217,10 @@ class ApplicationContext {
 			beanDefinitionsWithAnnotationBuilder =
 				ImmutableList.<BeanDefinition>builder ();
 
-		for (BeanDefinition beanDefinition
-				: beanDefinitions) {
+		for (
+			BeanDefinition beanDefinition
+				: beanDefinitions
+		) {
 
 			Annotation annotation =
 				beanDefinition.beanClass ().getAnnotation (annotationClass);
@@ -244,9 +248,11 @@ class ApplicationContext {
 			return instantiateBean (
 				beanDefinition);
 
-		} else if (equal (
+		} else if (
+			equal (
 				beanDefinition.scope (),
-				"singleton")) {
+				"singleton")
+		) {
 
 			Object bean =
 				singletonBeans.get (
@@ -255,8 +261,10 @@ class ApplicationContext {
 			if (bean != null)
 				return bean;
 
-			if (singletonBeansInCreation.contains (
-					beanDefinition.name ())) {
+			if (
+				singletonBeansInCreation.contains (
+					beanDefinition.name ())
+			) {
 
 				throw new RuntimeException (
 					stringFormat (
@@ -268,8 +276,10 @@ class ApplicationContext {
 
 			}
 
-			if (singletonBeansFailed.contains (
-					beanDefinition.name ())) {
+			if (
+				singletonBeansFailed.contains (
+					beanDefinition.name ())
+			) {
 
 				throw new RuntimeException (
 					stringFormat (
@@ -410,8 +420,10 @@ class ApplicationContext {
 			BeanDefinition beanDefinition,
 			Object bean) {
 
-		for (Map.Entry<String,Object> entry
-				: beanDefinition.valueProperties ().entrySet ()) {
+		for (
+			Map.Entry<String,Object> entry
+				: beanDefinition.valueProperties ().entrySet ()
+		) {
 
 			log.debug (
 				stringFormat (
@@ -433,8 +445,10 @@ class ApplicationContext {
 			BeanDefinition beanDefinition,
 			Object bean) {
 
-		for (Map.Entry<String,String> entry
-				: beanDefinition.referenceProperties ().entrySet ()) {
+		for (
+			Map.Entry<String,String> entry
+				: beanDefinition.referenceProperties ().entrySet ()
+		) {
 
 			log.debug (
 				stringFormat (
@@ -476,8 +490,10 @@ class ApplicationContext {
 			List<Pair<BeanDefinition,Object>> targetBeans =
 				new ArrayList<Pair<BeanDefinition,Object>> ();
 
-			for (String targetBeanDefinitionName
-					: injectedProperty.targetBeanNames ()) {
+			for (
+				String targetBeanDefinitionName
+					: injectedProperty.targetBeanNames ()
+			) {
 
 				BeanDefinition targetBeanDefinition =
 					beanDefinitionsByName.get (
@@ -517,8 +533,10 @@ class ApplicationContext {
 				Map<Class<?>,Object> beanClassMap =
 					new LinkedHashMap<Class<?>,Object> ();
 
-				for (Pair<BeanDefinition,Object> pair
-						: targetBeans) {
+				for (
+					Pair<BeanDefinition,Object> pair
+						: targetBeans
+				) {
 
 					beanClassMap.put (
 						pair.getLeft ().beanClass (),
@@ -535,8 +553,10 @@ class ApplicationContext {
 				Map<String,Object> beanNameMap =
 					new LinkedHashMap<String,Object> ();
 
-				for (Pair<BeanDefinition,Object> pair
-						: targetBeans) {
+				for (
+					Pair<BeanDefinition,Object> pair
+						: targetBeans
+				) {
 
 					beanNameMap.put (
 						pair.getLeft ().name (),
@@ -710,8 +730,10 @@ class ApplicationContext {
 
 		}
 
-		if (! Modifier.isPublic (
-				constructor.getModifiers ())) {
+		if (
+			! Modifier.isPublic (
+				constructor.getModifiers ())
+		) {
 
 			throw new RuntimeException (
 				stringFormat (
@@ -786,8 +808,10 @@ class ApplicationContext {
 
 		if (! beanDefinition.hide ()) {
 
-			for (Annotation annotation
-					: beanDefinition.beanClass ().getDeclaredAnnotations ()) {
+			for (
+				Annotation annotation
+					: beanDefinition.beanClass ().getDeclaredAnnotations ()
+			) {
 
 				Qualifier qualifierAnnotation =
 					annotation
@@ -842,8 +866,10 @@ class ApplicationContext {
 			Set<Class<?>> beanClasses,
 			BeanDefinition beanDefinition) {
 
-		for (Class<?> beanClass
-				: beanClasses) {
+		for (
+			Class<?> beanClass
+				: beanClasses
+		) {
 
 			Map<String,BeanDefinition> beanDefinitionsForClass =
 				index.get (
@@ -902,8 +928,10 @@ class ApplicationContext {
 
 		// work out dependencies
 
-		for (BeanDefinition beanDefinition
-				: beanDefinitions) {
+		for (
+			BeanDefinition beanDefinition
+				: beanDefinitions
+		) {
 
 			errors +=
 				initBeanDefinition (
@@ -913,14 +941,20 @@ class ApplicationContext {
 
 		// check dependencies exist
 
-		for (BeanDefinition beanDefinition
-				: beanDefinitions) {
+		for (
+			BeanDefinition beanDefinition
+				: beanDefinitions
+		) {
 
-			for (String dependency
-					: beanDefinition.orderedDependencies ()) {
+			for (
+				String dependency
+					: beanDefinition.orderedDependencies ()
+			) {
 
-				if (! beanDefinitionsByName.containsKey (
-						dependency)) {
+				if (
+					! beanDefinitionsByName.containsKey (
+						dependency)
+				) {
 
 					log.error (
 						stringFormat (
@@ -952,13 +986,17 @@ class ApplicationContext {
 			ListIterator<BeanDefinition> unorderedBeanDefinitionIterator =
 				unorderedBeanDefinitions.listIterator ();
 
-			OUTER: while (unorderedBeanDefinitionIterator.hasNext ()) {
+			OUTER: while (
+				unorderedBeanDefinitionIterator.hasNext ()
+			) {
 
 				BeanDefinition beanDefinition =
 					unorderedBeanDefinitionIterator.next ();
 
-				for (String targetBeanDefinitionName
-						: beanDefinition.orderedDependencies ()) {
+				for (
+					String targetBeanDefinitionName
+						: beanDefinition.orderedDependencies ()
+				) {
 
 					if (! beanDefinitionsByName.containsKey (
 							targetBeanDefinitionName))
@@ -983,8 +1021,10 @@ class ApplicationContext {
 
 			if (! madeProgress) {
 
-				for (BeanDefinition beanDefinition
-						: unorderedBeanDefinitions) {
+				for (
+					BeanDefinition beanDefinition
+						: unorderedBeanDefinitions
+				) {
 
 					List<String> unresolvedDependencyNames =
 						new ArrayList<String> (
@@ -1031,13 +1071,18 @@ class ApplicationContext {
 
 		// instantiate singletons
 
-		for (BeanDefinition beanDefinition
-				: beanDefinitions) {
+		for (
+			BeanDefinition beanDefinition
+				: beanDefinitions
+		) {
 
-			if (! equal (
+			if (
+				! equal (
 					beanDefinition.scope (),
-					"singleton"))
+					"singleton")
+			) {
 				continue;
+			}
 
 			getBean (
 				beanDefinition.name (),
@@ -1063,8 +1108,10 @@ class ApplicationContext {
 		beanDefinition.orderedDependencies ().addAll (
 			beanDefinition.referenceProperties ().values ());
 
-		for (Field field
-				: FieldUtils.getAllFields (instantiateClass)) {
+		for (
+			Field field
+				: FieldUtils.getAllFields (instantiateClass)
+		) {
 
 			Inject injectAnnotation =
 				field.getAnnotation (Inject.class);
@@ -1397,11 +1444,17 @@ class ApplicationContext {
 
 				log.error (
 					stringFormat (
-						"Found %s candidate beans of type %s for %s.%s",
+						"Found %s ",
 						targetBeanDefinitions.size (),
+						"candidate beans of type %s ",
 						injectedProperty.targetType (),
+						"for %s.%s: ",
 						beanDefinition.name (),
-						field.getName ()));
+						field.getName (),
+						"%s",
+						joinWithSeparator (
+							", ",
+							targetBeanDefinitions.keySet ())));
 
 				return 1;
 

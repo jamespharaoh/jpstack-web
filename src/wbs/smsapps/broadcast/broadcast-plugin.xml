@@ -36,6 +36,7 @@
 
 	<layer name="logic">
 		<bean class="logic.BroadcastLogicImpl"/>
+		<bean class="logic.BroadcastSendHelper"/>
 	</layer>
 
 	<fixtures>

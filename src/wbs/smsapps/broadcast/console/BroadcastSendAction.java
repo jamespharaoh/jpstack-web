@@ -275,6 +275,7 @@ class BroadcastSendAction
 					"Broadcast cancelled after being partially sent");
 
 				return null;
+
 			}
 
 		}

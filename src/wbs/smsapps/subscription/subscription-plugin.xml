@@ -42,4 +42,8 @@
 		<console-module name="subscription-affiliate-admin"/>
 	</console-modules>
 
+	<fixtures>
+		<fixture name="subscription"/>
+	</fixtures>
+
 </plugin>
