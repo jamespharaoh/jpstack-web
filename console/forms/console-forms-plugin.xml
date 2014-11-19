@@ -78,10 +78,16 @@
 		<bean class="TimestampFormFieldBuilder"/>
 		<bean class="TimestampFormFieldInterfaceMapping"/>
 		<bean class="TimestampFormFieldSpec"/>
+		<bean class="TimestampFromFormFieldBuilder"/>
+		<bean class="TimestampFromFormFieldInterfaceMapping"/>
+		<bean class="TimestampFromFormFieldSpec"/>
 		<bean class="TimestampTimezoneFormFieldBuilder"/>
 		<bean class="TimestampTimezoneFormFieldInterfaceMapping"/>
 		<bean class="TimestampTimezoneFormFieldSpec"/>
 		<bean class="TimestampTimezonePairFormFieldNativeMapping"/>
+		<bean class="TimestampToFormFieldBuilder"/>
+		<bean class="TimestampToFormFieldInterfaceMapping"/>
+		<bean class="TimestampToFormFieldSpec"/>
 		<bean class="UpdatableFormField"/>
 		<bean class="YesNoFormFieldBuilder"/>
 		<bean class="YesNoFormFieldRenderer"/>
