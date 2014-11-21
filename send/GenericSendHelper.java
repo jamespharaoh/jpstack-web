@@ -37,21 +37,31 @@ interface GenericSendHelper<
 			Service service,
 			Job job);
 
-	boolean isScheduled (
+	boolean jobScheduled (
 			Service service,
 			Job job);
 
-	boolean isSending (
+	boolean jobSending (
 			Service service,
 			Job job);
 
-	boolean isConfigured (
+	boolean jobConfigured (
 			Service service,
 			Job job);
 
 	void sendStart (
 			Service service,
 			Job job);
+
+	boolean verifyItem (
+			Service service,
+			Job job,
+			Item item);
+
+	void rejectItem (
+			Service service,
+			Job job,
+			Item item);
 
 	void sendItem (
 			Service service,

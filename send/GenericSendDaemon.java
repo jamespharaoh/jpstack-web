@@ -129,7 +129,7 @@ class GenericSendDaemon<
 				job);
 
 		if (
-			! helper ().isSending (
+			! helper ().jobSending (
 				service,
 				job)
 		) {
@@ -137,7 +137,7 @@ class GenericSendDaemon<
 		}
 
 		if (
-			! helper ().isConfigured (
+			! helper ().jobConfigured (
 				service,
 				job)
 		) {
@@ -169,10 +169,33 @@ class GenericSendDaemon<
 					: items
 			) {
 
-				helper ().sendItem (
-					service,
-					job,
-					item);
+				// verify the item
+
+				boolean itemVerified =
+					helper ().verifyItem (
+						service,
+						job,
+						item);
+
+				if (itemVerified) {
+
+					// send item
+
+					helper ().sendItem (
+						service,
+						job,
+						item);
+
+				} else {
+
+					// reject it
+
+					helper ().rejectItem (
+						service,
+						job,
+						item);
+
+				}
 
 			}
 

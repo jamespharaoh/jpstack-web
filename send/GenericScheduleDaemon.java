@@ -137,7 +137,7 @@ class GenericScheduleDaemon<
 		// check state is still "scheduled"
 
 		if (
-			! helper ().isScheduled (
+			! helper ().jobScheduled (
 				service,
 				job)
 		) {

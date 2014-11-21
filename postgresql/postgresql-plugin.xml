@@ -10,7 +10,7 @@
 	</sql-scripts>
 
 	<models>
-		<type name="postgresqlMaintenanceFrequency"/>
+		<custom-type name="postgresqlMaintenanceFrequency"/>
 		<model name="postgresqlMaintenance"/>
 		<model name="postgresqlClass"/>
 		<model name="postgresqlStatActivity"/>

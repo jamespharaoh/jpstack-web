@@ -30,6 +30,7 @@ import wbs.framework.application.scaffold.PluginBeanSpec;
 import wbs.framework.application.scaffold.PluginConsoleModuleSpec;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
 import wbs.framework.application.scaffold.PluginDependenciesSpec;
+import wbs.framework.application.scaffold.PluginEnumTypeSpec;
 import wbs.framework.application.scaffold.PluginFixtureSpec;
 import wbs.framework.application.scaffold.PluginLayerSpec;
 import wbs.framework.application.scaffold.PluginManager;
@@ -45,6 +46,8 @@ import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.object.ObjectHelperFactory;
 import wbs.framework.object.ObjectHelperProvider;
 import wbs.platform.console.helper.ConsoleHelperFactory;
+import wbs.platform.console.helper.EnumConsoleHelper;
+import wbs.platform.console.helper.EnumConsoleHelperFactory;
 import wbs.platform.console.metamodule.ConsoleMetaModule;
 import wbs.platform.console.metamodule.ConsoleMetaModuleFactory;
 import wbs.platform.console.module.ConsoleModule;
@@ -190,26 +193,32 @@ class ApplicationContextBuilder {
 
 		DataFromXml pluginDataFromXml =
 			new DataFromXml ()
-				.registerBuilderClass (PluginSpec.class)
-				.registerBuilderClass (PluginDependenciesSpec.class)
-				.registerBuilderClass (PluginPluginDependencySpec.class)
-				.registerBuilderClass (PluginProjectDependencySpec.class)
-				.registerBuilderClass (PluginLayerSpec.class)
-				.registerBuilderClass (PluginBeanSpec.class)
-				.registerBuilderClass (PluginModelsSpec.class)
-				.registerBuilderClass (PluginCustomTypeSpec.class)
-				.registerBuilderClass (PluginModelSpec.class)
-				.registerBuilderClass (PluginConsoleModuleSpec.class)
-				.registerBuilderClass (PluginFixtureSpec.class);
+				.registerBuilderClasses (
+					PluginBeanSpec.class,
+					PluginConsoleModuleSpec.class,
+					PluginCustomTypeSpec.class,
+					PluginDependenciesSpec.class,
+					PluginEnumTypeSpec.class,
+					PluginFixtureSpec.class,
+					PluginLayerSpec.class,
+					PluginModelSpec.class,
+					PluginModelsSpec.class,
+					PluginPluginDependencySpec.class,
+					PluginProjectDependencySpec.class,
+					PluginSpec.class);
 
-		for (ProjectSpec project
-				: projects.values ()) {
+		for (
+			ProjectSpec project
+				: projects.values ()
+		) {
 
 			ImmutableList.Builder<PluginSpec> projectPluginsBuilder =
 				ImmutableList.<PluginSpec>builder ();
 
-			for (ProjectPluginSpec projectPlugin
-					: project.projectPlugins ()) {
+			for (
+				ProjectPluginSpec projectPlugin
+					: project.projectPlugins ()
+			) {
 
 				String pluginPath =
 					stringFormat (
@@ -821,6 +830,17 @@ class ApplicationContextBuilder {
 
 		}
 
+		for (
+			PluginEnumTypeSpec enumType
+				: plugin.models ().enumTypes ()
+		) {
+
+			errors +=
+				registerEnumConsoleHelper (
+					enumType);
+
+		}
+
 		return errors;
 
 	}
@@ -1379,6 +1399,66 @@ class ApplicationContextBuilder {
 			.addValueProperty (
 				"consoleHelperClass",
 				consoleHelperClass)
+
+		);
+
+		return 0;
+
+	}
+
+	int registerEnumConsoleHelper (
+			@NonNull PluginEnumTypeSpec enumType)
+		throws Exception {
+
+		String enumClassName =
+			stringFormat (
+				"%s.%s.model.%s",
+				enumType.plugin ().project ().packageName (),
+				enumType.plugin ().packageName (),
+				capitalise (enumType.name ()));
+
+		Class<?> enumClass;
+
+		try {
+
+			enumClass =
+				Class.forName (
+					enumClassName);
+
+		} catch (ClassNotFoundException exception) {
+
+			log.error (
+				stringFormat (
+					"No such class %s",
+					enumClassName));
+
+			return 1;
+
+		}
+
+		String enumConsoleHelperBeanName =
+			stringFormat (
+				"%sConsoleHelper",
+				enumType.name ());
+
+		applicationContext.registerBeanDefinition (
+			new BeanDefinition ()
+
+			.name (
+				enumConsoleHelperBeanName)
+
+			.beanClass (
+				EnumConsoleHelper.class)
+
+			.factoryClass (
+				EnumConsoleHelperFactory.class)
+
+			.scope (
+				"singleton")
+
+			.addValueProperty (
+				"enumClass",
+				enumClass)
 
 		);
 
