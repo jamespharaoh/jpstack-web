@@ -27,10 +27,17 @@ class PluginModelsSpec {
 
 	@DataChildren (
 		direct = true,
-		childElement = "type")
+		childElement = "custom-type")
 	@Getter @Setter
-	List<PluginCustomTypeSpec> types =
+	List<PluginCustomTypeSpec> customTypes =
 		new ArrayList<PluginCustomTypeSpec> ();
+
+	@DataChildren (
+		direct = true,
+		childElement = "enum-type")
+	@Getter @Setter
+	List<PluginEnumTypeSpec> enumTypes =
+		new ArrayList<PluginEnumTypeSpec> ();
 
 	@DataChildren (
 		direct = true,

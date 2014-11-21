@@ -8,7 +8,7 @@
 	</sql-scripts>
 
 	<models>
-		<type name="chatUserInfoStatus"/>
+		<custom-type name="chatUserInfoStatus"/>
 		<model name="chatProfileField"/>
 		<model name="chatProfileFieldValue"/>
 		<model name="chatUserInfo"/>

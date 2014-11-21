@@ -8,9 +8,9 @@
 	</sql-scripts>
 
 	<models>
-		<type name="chatMessageMethod"/>
-		<type name="chatMessageStatus"/>
-		<type name="chatUserInitiationReason"/>
+		<custom-type name="chatMessageMethod"/>
+		<custom-type name="chatMessageStatus"/>
+		<custom-type name="chatUserInitiationReason"/>
 		<model name="chatBlock"/>
 		<model name="chatContact"/>
 		<model name="chatContactNote"/>

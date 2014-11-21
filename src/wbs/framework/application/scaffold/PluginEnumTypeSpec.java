@@ -9,9 +9,9 @@ import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataParent;
 
 @Accessors (fluent = true)
-@DataClass ("custom-type")
+@DataClass ("enum-type")
 public
-class PluginCustomTypeSpec {
+class PluginEnumTypeSpec {
 
 	/*
 	@DataAncestor

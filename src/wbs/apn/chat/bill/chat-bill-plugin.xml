@@ -7,7 +7,7 @@
 	</sql-scripts>
 
 	<models>
-		<type name="chatUserCreditMode"/>
+		<custom-type name="chatUserCreditMode"/>
 		<model name="chatDailyLimitLog"/>
 		<model name="chatNetwork"/>
 		<model name="chatUserBillLog"/>

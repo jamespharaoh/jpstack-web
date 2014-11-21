@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -43,6 +44,7 @@ import org.joda.time.Seconds;
 
 import wbs.framework.application.context.BeanFactory;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
+import wbs.framework.application.scaffold.PluginEnumTypeSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.application.scaffold.ProjectSpec;
 import wbs.framework.entity.helper.EntityHelper;
@@ -81,6 +83,9 @@ class SessionFactoryBeanFactory
 	Map<Class<?>,String> customTypes =
 		new HashMap<Class<?>,String> ();
 
+	Set<Class<?>> enumTypes =
+		new HashSet<Class<?>> ();
+
 	int errorTypes = 0;
 	int classErrors = 0;
 	int errorClasses = 0;
@@ -104,11 +109,23 @@ class SessionFactoryBeanFactory
 				if (plugin.models () == null)
 					continue;
 
-				for (PluginCustomTypeSpec customType
-						: plugin.models ().types ()) {
+				for (
+					PluginCustomTypeSpec customType
+						: plugin.models ().customTypes ()
+				) {
 
 					initCustomType (
 						customType);
+
+				}
+
+				for (
+					PluginEnumTypeSpec enumType
+						: plugin.models ().enumTypes ()
+				) {
+
+					initEnumType (
+						enumType);
 
 				}
 
@@ -194,6 +211,50 @@ class SessionFactoryBeanFactory
 		customTypes.put (
 			objectClass,
 			helperClassName);
+
+	}
+
+	void initEnumType (
+			@NonNull PluginEnumTypeSpec enumType) {
+
+		String enumClassName =
+			stringFormat (
+				"%s.%s.model.%s",
+				enumType.plugin ().project ().packageName (),
+				enumType.plugin ().packageName (),
+				capitalise (enumType.name ()));
+
+		Class<?> enumClass = null;
+
+		try {
+
+			enumClass =
+				Class.forName (enumClassName);
+
+		} catch (ClassNotFoundException exception) {
+
+			log.error (
+				stringFormat (
+					"Enum class not found: %s",
+					enumClassName));
+
+			errorTypes ++;
+
+			return;
+
+		}
+
+		if (enumTypes.contains (enumClass)) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Enum class specified multiple times: %s",
+					enumClass.getName ()));
+
+		}
+
+		enumTypes.add (
+			enumClass);
 
 	}
 
@@ -638,15 +699,56 @@ class SessionFactoryBeanFactory
 
 		// type
 
-		String customType =
-			ifNull (
-				modelField.hibernateTypeHelper (),
-				customTypes.get (modelField.valueType ()));
-
-		if (customType != null) {
+		if (
+			modelField.hibernateTypeHelper () != null
+		) {
 
 			propertyElement
-				.addAttribute ("type", customType);
+
+				.addAttribute (
+					"type",
+					modelField.hibernateTypeHelper ());
+
+		} else if (
+			customTypes.containsKey (
+				modelField.valueType ())
+		) {
+
+			propertyElement
+
+				.addAttribute (
+					"type",
+					customTypes.get (
+						modelField.valueType ()));
+
+
+		} else if (
+			enumTypes.contains (
+				modelField.valueType ())
+		) {
+
+			Element typeElement =
+
+				propertyElement
+
+					.addElement (
+						"type")
+
+					.addAttribute (
+						"name",
+						"wbs.framework.hibernate.HibernateEnumType");
+
+			typeElement
+
+				.addElement (
+					"param")
+
+				.addAttribute (
+					"name",
+					"enumClass")
+
+				.addText (
+					modelField.valueType ().getName ());
 
 		}
 

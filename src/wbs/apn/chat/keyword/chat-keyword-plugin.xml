@@ -3,7 +3,7 @@
 	package="chat.keyword">
 
 	<models>
-		<type name="chatKeywordJoinType"/>
+		<custom-type name="chatKeywordJoinType"/>
 		<model name="chatKeyword"/>
 	</models>
 

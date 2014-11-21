@@ -107,7 +107,7 @@ class EnumConsoleHelper<E extends Enum<E>> {
 	}
 
 	protected
-	void auto () {
+	EnumConsoleHelper<E> auto () {
 
 		for (E value
 				: enumClass.getEnumConstants ()) {
@@ -118,6 +118,8 @@ class EnumConsoleHelper<E extends Enum<E>> {
 					value.name ()));
 
 		}
+
+		return this;
 
 	}
 

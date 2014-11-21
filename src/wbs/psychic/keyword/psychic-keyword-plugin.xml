@@ -3,7 +3,7 @@
 	package="keyword">
 
 	<models>
-		<type name="psychicKeywordType"/>
+		<custom-type name="psychicKeywordType"/>
 		<model name="psychicKeyword"/>
 	</models>
 

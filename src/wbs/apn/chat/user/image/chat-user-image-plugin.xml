@@ -8,8 +8,8 @@
 	</sql-scripts>
 
 	<models>
-		<type name="chatUserImageMode"/>
-		<type name="chatUserImageType"/>
+		<custom-type name="chatUserImageMode"/>
+		<custom-type name="chatUserImageType"/>
 		<model name="chatUserImage"/>
 		<model name="chatUserImageUploadToken"/>
 	</models>

@@ -11,11 +11,11 @@
 	</sql-scripts>
 
 	<models>
-		<type name="chatUserDateMode"/>
-		<type name="chatUserEditReason"/>
-		<type name="chatUserType"/>
-		<type name="gender"/>
-		<type name="orient"/>
+		<custom-type name="chatUserDateMode"/>
+		<custom-type name="chatUserEditReason"/>
+		<custom-type name="chatUserType"/>
+		<custom-type name="gender"/>
+		<custom-type name="orient"/>
 		<model name="chatBadUser"/>
 		<model name="chatUser"/>
 		<model name="chatUserAlarm"/>

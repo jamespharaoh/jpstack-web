@@ -8,8 +8,8 @@
 	</sql-scripts>
 
 	<models>
-		<type name="queueItemState"/>
-		<type name="queueItemClaimStatus"/>
+		<custom-type name="queueItemState"/>
+		<custom-type name="queueItemClaimStatus"/>
 		<model name="queue"/>
 		<model name="queueItem"/>
 		<model name="queueItemClaim"/>

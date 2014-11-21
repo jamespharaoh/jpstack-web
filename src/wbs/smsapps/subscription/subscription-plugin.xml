@@ -8,7 +8,7 @@
 	</sql-scripts>
 
 	<models>
-		<type name="subscriptionStatus"/>
+		<custom-type name="subscriptionStatus"/>
 		<model name="subscription"/>
 		<model name="subscriptionAffiliate"/>
 		<model name="subscriptionSend"/>

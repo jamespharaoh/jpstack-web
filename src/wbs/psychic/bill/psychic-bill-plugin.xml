@@ -3,7 +3,7 @@
 	package="bill">
 
 	<models>
-		<type name="psychicBillMode"/>
+		<custom-type name="psychicBillMode"/>
 		<model name="psychicCharges"/>
 		<model name="psychicCreditLog"/>
 		<model name="psychicUserAccount"/>

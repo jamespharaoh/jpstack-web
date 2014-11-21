@@ -92,9 +92,7 @@ class BroadcastSendHelper
 
 	public
 	List<BroadcastRec> findSendingJobs () {
-
 		return broadcastHelper.findSending ();
-
 	}
 
 	public
@@ -136,7 +134,7 @@ class BroadcastSendHelper
 	}
 
 	public
-	boolean isScheduled (
+	boolean jobScheduled (
 			BroadcastConfigRec broadcastConfig,
 			BroadcastRec broadcast) {
 
@@ -147,7 +145,7 @@ class BroadcastSendHelper
 
 
 	public
-	boolean isSending (
+	boolean jobSending (
 			BroadcastConfigRec broadcastConfig,
 			BroadcastRec broadcast) {
 
@@ -157,7 +155,7 @@ class BroadcastSendHelper
 	}
 
 	public
-	boolean isConfigured (
+	boolean jobConfigured (
 			BroadcastConfigRec broadcastConfig,
 			BroadcastRec broadcast) {
 
@@ -173,6 +171,17 @@ class BroadcastSendHelper
 			BroadcastConfigRec broadcastConfig,
 			BroadcastRec broadcast) {
 
+		// sanity check
+
+		if (
+			broadcast.getState ()
+				!= BroadcastState.scheduled
+		) {
+			throw new IllegalStateException ();
+		}
+
+		// update broadcast
+
 		broadcast
 
 			.setState (
@@ -186,9 +195,70 @@ class BroadcastSendHelper
 			.setNumSending (
 				broadcastConfig.getNumSending () + 1);
 
+		// create event
+
 		eventLogic.createEvent (
 			"broadcast_send_begun",
 			broadcast);
+
+	}
+
+	public
+	boolean verifyItem (
+			BroadcastConfigRec broadcastConfig,
+			BroadcastRec broadcast,
+			BroadcastNumberRec broadcastNumber) {
+
+		// check if block list configured
+
+		if (broadcastConfig.getBlockNumberLookup () == null)
+			return true;
+
+		// reject numbers on block list
+
+		if (
+			numberLookupManager.lookupNumber (
+				broadcastConfig.getBlockNumberLookup (),
+				broadcastNumber.getNumber ())
+		) {
+			return false;
+		}
+
+		// accept otherwise
+
+		return true;
+
+	}
+
+	public
+	void rejectItem (
+			BroadcastConfigRec broadcastConfig,
+			BroadcastRec broadcast,
+			BroadcastNumberRec broadcastNumber) {
+
+		// sanity check
+
+		if (
+			broadcastNumber.getState ()
+				!= BroadcastNumberState.accepted
+		) {
+			throw new IllegalStateException ();
+		}
+
+		// update number
+
+		broadcastNumber
+
+			.setState (
+				BroadcastNumberState.rejected);
+
+		broadcast
+
+			.setNumAccepted (
+				broadcast.getNumAccepted () - 1)
+
+			.setNumRejected (
+				broadcast.getNumRejected () + 1);
 
 	}
 
@@ -197,6 +267,17 @@ class BroadcastSendHelper
 			BroadcastConfigRec broadcastConfig,
 			BroadcastRec broadcast,
 			BroadcastNumberRec broadcastNumber) {
+
+		// sanity check
+
+		if (
+			broadcastNumber.getState ()
+				!= BroadcastNumberState.accepted
+		) {
+			throw new IllegalStateException ();
+		}
+
+		// send the message
 
 		ServiceRec defaultService =
 			serviceHelper.findByCode (
@@ -207,47 +288,6 @@ class BroadcastSendHelper
 			batchHelper.findByCode (
 				broadcast,
 				"broadcast");
-
-		// sanity check
-
-		if (broadcastNumber.getState ()
-				!= BroadcastNumberState.accepted) {
-
-			throw new RuntimeException ();
-
-		}
-
-		// check the block list again
-
-		boolean reject =
-			broadcastConfig.getBlockNumberLookup () != null
-				? numberLookupManager.lookupNumber (
-					broadcastConfig.getBlockNumberLookup (),
-					broadcastNumber.getNumber ())
-				: false;
-
-		if (reject) {
-
-			// mark the number as rejected
-
-			broadcastNumber
-
-				.setState (
-					BroadcastNumberState.rejected);
-
-			broadcast
-
-				.setNumAccepted (
-					broadcast.getNumAccepted () - 1)
-
-				.setNumRejected (
-					broadcast.getNumRejected () + 1);
-
-			return;
-
-		}
-
-		// send the message
 
 		MessageRec message =
 			messageSenderProvider.get ()
@@ -303,6 +343,14 @@ class BroadcastSendHelper
 		Transaction transaction =
 			database.currentTransaction ();
 
+		// sanity check
+
+		if (broadcast.getNumAccepted () != 0) {
+			throw new IllegalStateException ();
+		}
+
+		// update broadcast
+
 		broadcast
 
 			.setState (
@@ -318,6 +366,8 @@ class BroadcastSendHelper
 
 			.setNumSent (
 				broadcastConfig.getNumSent () + 1);
+
+		// create event
 
 		eventLogic.createEvent (
 			"broadcast_send_completed",

@@ -13,8 +13,8 @@
 	</sql-scripts>
 
 	<models>
-		<type name="broadcastNumberState"/>
-		<type name="broadcastState"/>
+		<enum-type name="broadcastNumberState"/>
+		<enum-type name="broadcastState"/>
 		<model name="broadcast"/>
 		<model name="broadcastConfig"/>
 		<model name="broadcastNumber"/>
@@ -23,10 +23,8 @@
 	<layer name="console">
 		<bean class="console.BroadcastNumbersAction"/>
 		<bean class="console.BroadcastNumbersPart"/>
-		<bean class="console.BroadcastNumberStateConsoleHelper"/>
 		<bean class="console.BroadcastSendAction"/>
 		<bean class="console.BroadcastSendPart"/>
-		<bean class="console.BroadcastStateConsoleHelper"/>
 	</layer>
 
 	<layer name="daemon">

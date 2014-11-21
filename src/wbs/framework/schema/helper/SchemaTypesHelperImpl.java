@@ -23,6 +23,7 @@ import org.joda.time.LocalDate;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
+import wbs.framework.application.scaffold.PluginEnumTypeSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.application.scaffold.ProjectSpec;
 import wbs.framework.hibernate.EnumUserType;
@@ -68,26 +69,48 @@ class SchemaTypesHelperImpl
 		ImmutableMap.Builder<String,List<String>> enumTypesBuilder =
 			ImmutableMap.<String,List<String>>builder ();
 
-		for (Map.Entry<Class<?>,String> entry
-				: builtinFieldTypeNames.entrySet ()) {
+		for (
+			Map.Entry<Class<?>,String> entry
+				: builtinFieldTypeNames.entrySet ()
+		) {
 
 			fieldTypeNamesBuilder.put (
 				entry.getKey (),
-				ImmutableList.<String>of (entry.getValue ()));
+				ImmutableList.<String>of (
+					entry.getValue ()));
 
 		}
 
-		for (ProjectSpec project
-				: projects) {
+		for (
+			ProjectSpec project
+				: projects
+		) {
 
-			for (PluginSpec plugin
-					: project.plugins ()) {
+			for (
+				PluginSpec plugin
+					: project.plugins ()
+			) {
 
 				if (plugin.models () == null)
 					continue;
 
-				for (PluginCustomTypeSpec customType
-						: plugin.models ().types ()) {
+				for (
+					PluginEnumTypeSpec enumType
+						: plugin.models ().enumTypes ()
+				) {
+
+					initEnumType (
+						taskLog,
+						fieldTypeNamesBuilder,
+						enumTypesBuilder,
+						enumType);
+
+				}
+
+				for (
+					PluginCustomTypeSpec customType
+						: plugin.models ().customTypes ()
+				) {
 
 					initCustomType (
 						taskLog,
@@ -115,6 +138,82 @@ class SchemaTypesHelperImpl
 
 		enumTypes =
 			enumTypesBuilder.build ();
+
+	}
+
+	@SuppressWarnings ({ "unchecked", "rawtypes" })
+	void initEnumType (
+			TaskLog taskLog,
+			ImmutableMap.Builder<Class<?>,List<String>> fieldTypeNamesBuilder,
+			ImmutableMap.Builder<String,List<String>> enumTypesBuilder,
+			PluginEnumTypeSpec enumType) {
+
+		String enumClassName =
+			stringFormat (
+				"%s.%s.model.%s",
+				enumType.plugin ().project ().packageName (),
+				enumType.plugin ().packageName (),
+				capitalise (enumType.name ()));
+
+		Class enumClass;
+
+		try {
+
+			enumClass =
+				Class.forName (
+					enumClassName);
+
+		} catch (ClassNotFoundException exception) {
+
+			taskLog.error (
+				"No such class %s",
+				enumClassName);
+
+			return;
+
+		}
+
+		EnumUserType enumUserType =
+			new EnumUserType ()
+
+			.sqlType (
+				1111)
+
+			.enumClass (
+				enumClass)
+
+			.auto (
+				String.class);
+
+		String typeName =
+			camelToUnderscore (
+				enumClass.getSimpleName ());
+
+		fieldTypeNamesBuilder.put (
+			enumClass,
+			ImmutableList.<String>of (
+				typeName));
+
+		if (enumUserType.sqlType () == 1111) {
+
+			ImmutableList.Builder<String> enumValuesBuilder =
+				ImmutableList.<String>builder ();
+
+			for (
+				Object enumValue
+					: enumUserType.databaseValues ()
+			) {
+
+				enumValuesBuilder.add (
+					(String) enumValue);
+
+			}
+
+			enumTypesBuilder.put (
+				typeName,
+				enumValuesBuilder.build ());
+
+		}
 
 	}
 
@@ -248,8 +347,10 @@ class SchemaTypesHelperImpl
 			ImmutableList.Builder<String> typeNamesBuilder =
 				ImmutableList.<String>builder ();
 
-			for (Type propertyType
-					: compositeUserType.getPropertyTypes ()) {
+			for (
+				Type propertyType
+					: compositeUserType.getPropertyTypes ()
+			) {
 
 				String typeName =
 					builtinFieldTypeNames.get (

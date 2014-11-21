@@ -7,58 +7,50 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.Set;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.usertype.ParameterizedType;
 import org.hibernate.usertype.UserType;
 
 import wbs.framework.utils.ReversableMap;
 
-@Accessors (fluent = true)
 public
-class EnumUserType<DatabaseType,JavaType extends Enum<?>>
-	implements UserType {
-
-	@Getter @Setter
-	int sqlType;
-
-	@Getter @Setter
-	Class<JavaType> enumClass;
+class HibernateEnumType<EnumType extends Enum<?>>
+	implements
+		ParameterizedType,
+		UserType {
 
 	private
-	ReversableMap<DatabaseType,JavaType> keyToEnumMap =
-		ReversableMap.<DatabaseType,JavaType>makeHashed ();
+	Class<EnumType> enumClass;
+
+	private
+	ReversableMap<String,EnumType> keyToEnumMap =
+		ReversableMap.<String,EnumType>makeHashed ();
 
 	public
-	EnumUserType () {
+	HibernateEnumType () {
 	}
 
 	public
-	Set<DatabaseType> databaseValues () {
-
+	Set<String> databaseValues () {
 		return keyToEnumMap.keySet ();
-
 	}
 
 	public
-	Set<JavaType> javaValues () {
-
+	Set<EnumType> javaValues () {
 		return keyToEnumMap.valueSet ();
-
 	}
 
 	public
 	void add (
-			DatabaseType databaseValue,
-			JavaType javaValue) {
+			String databaseValue,
+			EnumType enumValue) {
 
 		keyToEnumMap.put (
 			databaseValue,
-			javaValue);
+			enumValue);
 
 	}
 
@@ -105,7 +97,7 @@ class EnumUserType<DatabaseType,JavaType extends Enum<?>>
 		if (resultSet.wasNull ())
 			return null;
 
-		JavaType ret =
+		EnumType ret =
 			keyToEnumMap.get (key);
 
 		if (ret == null) {
@@ -143,7 +135,7 @@ class EnumUserType<DatabaseType,JavaType extends Enum<?>>
 
 			statement.setNull (
 				index,
-				sqlType);
+				1111);
 
 			return;
 
@@ -154,12 +146,12 @@ class EnumUserType<DatabaseType,JavaType extends Enum<?>>
 				enumClass.cast (value));
 
 		if (key == null)
-			throw new RuntimeException();
+			throw new RuntimeException ();
 
 		statement.setObject (
 			index,
 			key,
-			sqlType);
+			1111);
 
 	}
 
@@ -176,7 +168,7 @@ class EnumUserType<DatabaseType,JavaType extends Enum<?>>
 	int[] sqlTypes () {
 
 		return new int [] {
-			sqlType
+			1111
 		};
 
 	}
@@ -217,27 +209,52 @@ class EnumUserType<DatabaseType,JavaType extends Enum<?>>
 			Object value) {
 
 		return keyToEnumMap
-			.getKey (enumClass.cast (value))
+
+			.getKey (
+				enumClass.cast (
+					value))
+
 			.hashCode ();
 
 	}
 
 	public
-	EnumUserType<DatabaseType,JavaType> auto (
-			Class<DatabaseType> databaseClass) {
+	void setParameterValues (
+			Properties parameters) {
 
-		for (JavaType value
-				: enumClass.getEnumConstants ()) {
+		String enumClassName =
+			parameters.getProperty (
+				"enumClass");
 
-			add (
-				databaseClass.cast (
-					camelToUnderscore (
-						value.name ())),
-				value);
+		try {
+
+			@SuppressWarnings ("unchecked")
+			Class<EnumType> enumClassTemp =
+				(Class<EnumType>)
+				Class.forName (
+					enumClassName);
+
+			enumClass =
+				enumClassTemp;
+
+		} catch (ClassNotFoundException exception) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Enum class not found: %s",
+					enumClassName));
 
 		}
 
-		return this;
+		for (EnumType enumValue
+				: enumClass.getEnumConstants ()) {
+
+			add (
+				camelToUnderscore (
+					enumValue.name ()),
+				enumValue);
+
+		}
 
 	}
 
