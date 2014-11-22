@@ -1,6 +1,7 @@
 package wbs.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 
 import java.util.Date;
 
@@ -174,30 +175,42 @@ class ChatMessagePendingFormAction
 		// update the chat message
 
 		chatMessage
-			.setModerator (myUser)
-			.setModeratorTimestamp (transaction.timestamp ());
 
-		if (equal (messageParam,
-				chatMessage
-					.getOriginalText ()
-					.getText ())) {
+			.setModerator (
+				myUser)
+
+			.setModeratorTimestamp (
+				instantToDate (
+					transaction.now ()));
+
+		if (
+			equal (
+				messageParam,
+				chatMessage.getOriginalText ().getText ())
+		) {
 
 			// original message was approved
 
 			chatMessage
-				.setStatus (ChatMessageStatus.moderatorApproved)
-				.setEditedText (chatMessage.getOriginalText ());
 
-		} else if (equal (
+				.setStatus (
+					ChatMessageStatus.moderatorApproved)
+
+				.setEditedText (
+					chatMessage.getOriginalText ());
+
+		} else if (
+			equal (
 				messageParam,
-				chatMessage
-					.getEditedText ()
-					.getText ())) {
+				chatMessage.getEditedText ().getText ())
+		) {
 
 			// automatically edited message was accepted
 
 			chatMessage
-				.setStatus (ChatMessageStatus.moderatorAutoEdited);
+
+				.setStatus (
+					ChatMessageStatus.moderatorAutoEdited);
 
 			chatMessageLogic.chatUserRejectionCountInc (
 				chatMessage.getFromUser (),

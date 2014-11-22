@@ -1,5 +1,7 @@
 package wbs.apn.chat.user.admin.console;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import javax.inject.Inject;
 
 import lombok.Cleanup;
@@ -87,10 +89,19 @@ class ChatUserAdminOnlineAction
 			} else {
 
 				if (chatUser.getType () == ChatUserType.monitor) {
-					chatUser.setOnline (true);
+
+					chatUser
+
+						.setOnline (
+							true);
+
 				} else {
 
-					chatUser.setLastAction (transaction.timestamp ());
+					chatUser
+
+						.setLastAction (
+							instantToDate (
+								transaction.now ()));
 
 					chatMiscLogic.userJoin (
 						chatUser,
@@ -100,7 +111,8 @@ class ChatUserAdminOnlineAction
 
 				}
 
-				notice = userType + " brought online";
+				notice =
+					userType + " brought online";
 
 				eventLogic.createEvent (
 					"chat_user_online",
@@ -124,7 +136,8 @@ class ChatUserAdminOnlineAction
 
 				}
 
-				notice = userType + " taken offline";
+				notice =
+					userType + " taken offline";
 
 				eventLogic.createEvent (
 					"chat_user_offline",
@@ -133,7 +146,8 @@ class ChatUserAdminOnlineAction
 
 			} else {
 
-				notice = userType + " already offline";
+				notice =
+					userType + " already offline";
 
 			}
 

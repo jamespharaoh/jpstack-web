@@ -1,5 +1,6 @@
 package wbs.apn.chat.adult.daemon;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -139,7 +140,7 @@ class ChatAdultExpiryDaemon
 		// make sure adult expiry time is in past
 
 		if (
-			transaction.timestamp ().getTime ()
+			instantToDate (transaction.now ()).getTime ()
 				< chatUser.getAdultExpiry ().getTime ()
 		) {
 

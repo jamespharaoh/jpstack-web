@@ -1,5 +1,6 @@
 package wbs.apn.chat.user.image.console;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.rethrow;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -240,15 +241,37 @@ class ChatUserImageUploadAction
 			ChatUserImageRec chatUserImage =
 				chatUserImageHelper.insert (
 					new ChatUserImageRec ()
-						.setChatUser (chatUser)
-						.setMedia (media)
-						.setFullMedia (media)
-						.setStatus (ChatUserInfoStatus.console)
-						.setTimestamp (transaction.timestamp ())
-						.setModerator (myUser)
-						.setModerationTime (transaction.timestamp ())
-						.setType (imageOrVideo)
-						.setIndex (list.size ()));
+
+				.setChatUser (
+					chatUser)
+
+				.setMedia (
+					media)
+
+				.setFullMedia (
+					media)
+
+				.setStatus (
+					ChatUserInfoStatus.console)
+
+				.setTimestamp (
+					instantToDate (
+						transaction.now ()))
+
+				.setModerator (
+					myUser)
+
+				.setModerationTime (
+					instantToDate (
+						transaction.now ()))
+
+				.setType (
+					imageOrVideo)
+
+				.setIndex (
+					list.size ())
+
+			);
 
 			list.add (chatUserImage);
 

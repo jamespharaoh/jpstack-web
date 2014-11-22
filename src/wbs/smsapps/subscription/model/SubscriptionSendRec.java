@@ -9,6 +9,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.joda.time.Instant;
 
 import wbs.framework.entity.annotations.CollectionField;
 import wbs.framework.entity.annotations.CommonEntity;
@@ -128,7 +129,8 @@ class SubscriptionSendRec
 	public static
 	interface SubscriptionSendDaoMethods {
 
-		SubscriptionSendRec findDue ();
+		SubscriptionSendRec findDue (
+				Instant now);
 
 	}
 

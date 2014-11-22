@@ -1,6 +1,6 @@
 package wbs.smsapps.subscription.daemon;
 
-import java.util.Date;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 
 import javax.inject.Inject;
 
@@ -69,18 +69,25 @@ class SubscriptionSendDaemon
 				database.beginReadWrite ();
 
 			SubscriptionSendRec send =
-				subscriptionSendHelper.findDue ();
+				subscriptionSendHelper.findDue (
+					transaction.now ());
 
 			if (send == null)
 				return;
 
 			send
-				.setStatus (SubscriptionStatus.sentAutomatically)
-				.setSentTime (new Date ());
 
-			subscriptionUtils.subscriptionSend (send);
+				.setStatus (
+					SubscriptionStatus.sentAutomatically)
 
-			transaction.commit();
+				.setSentTime (
+					instantToDate (
+						transaction.now ()));
+
+			subscriptionUtils.subscriptionSend (
+				send);
+
+			transaction.commit ();
 
 		}
 

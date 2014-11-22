@@ -1,6 +1,9 @@
 package wbs.smsapps.subscription.hibernate;
 
-import java.util.Date;
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
+import org.hibernate.criterion.Restrictions;
+import org.joda.time.Instant;
 
 import wbs.framework.hibernate.HibernateDao;
 import wbs.smsapps.subscription.model.SubscriptionSendDao;
@@ -14,22 +17,25 @@ class SubscriptionSendDaoHibernate
 
 	@Override
 	public
-	SubscriptionSendRec findDue () {
+	SubscriptionSendRec findDue (
+			Instant now) {
 
 		return findOne (
 			SubscriptionSendRec.class,
 
-			createQuery (
-				"FROM SubscriptionSendRec ss " +
-				"WHERE ss.status = :status " +
-					"AND ss.scheduledForTime < :date")
+			createCriteria (
+				SubscriptionSendRec.class,
+				"_subscriptionSend")
 
-			.setParameter (
-				"status",
-				SubscriptionStatus.scheduled,
-				SubscriptionStatusType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"_subscriptionSend.status",
+					SubscriptionStatus.scheduled))
 
-			.setTimestamp ("date", new Date ())
+			.add (
+				Restrictions.le (
+					"_subscriptionSend.scheduledForTime",
+					instantToDate (now)))
 
 			.setMaxResults (1)
 

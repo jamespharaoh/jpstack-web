@@ -1,5 +1,6 @@
 package wbs.apn.chat.contact.console;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -231,19 +232,33 @@ class ChatMonitorInboxFormAction
 					monitorChatUser,
 					userChatUser);
 
-			if (chatContact.getLastDeliveredMessageTime () == null
-					&& ! monitorChatUser.getStealthMonitor ())
-				chatMessage.setMonitorWarning (true);
+			if (
+				chatContact.getLastDeliveredMessageTime () == null
+				&& ! monitorChatUser.getStealthMonitor ()
+			) {
 
-			chatContact.setLastDeliveredMessageTime (
-				transaction.timestamp ());
+				chatMessage
+
+					.setMonitorWarning (
+						true);
+
+			}
+
+			chatContact
+
+				.setLastDeliveredMessageTime (
+					instantToDate (
+						transaction.now ()));
 
 			// update chat user stats
 
 			if (! (blocked || deleted)) {
 
-				userChatUser.setLastReceive (
-					transaction.timestamp ());
+				userChatUser
+
+					.setLastReceive (
+						instantToDate (
+							transaction.now ()));
 
 			}
 
@@ -269,7 +284,10 @@ class ChatMonitorInboxFormAction
 			// update monitor last action
 
 			monitorChatUser
-				.setLastAction (transaction.timestamp ());
+
+				.setLastAction (
+					instantToDate (
+						transaction.now ()));
 
 			// create a note
 
@@ -277,12 +295,27 @@ class ChatMonitorInboxFormAction
 
 				objectManager.insert (
 					new ChatContactNoteRec ()
-						.setUser (userChatUser)
-						.setMonitor (monitorChatUser)
-						.setNotes (text)
-						.setTimestamp (transaction.timestamp ())
-						.setConsoleUser (myUser)
-						.setChat (userChatUser.getChat ()));
+
+					.setUser (
+						userChatUser)
+
+					.setMonitor (
+						monitorChatUser)
+
+					.setNotes (
+						text)
+
+					.setTimestamp (
+						instantToDate (
+							transaction.now ()))
+
+					.setConsoleUser (
+						myUser)
+
+					.setChat (
+						userChatUser.getChat ())
+
+				);
 
 			}
 

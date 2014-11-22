@@ -1,7 +1,5 @@
 package wbs.framework.database;
 
-import java.util.Date;
-
 import org.joda.time.Instant;
 
 public
@@ -24,8 +22,6 @@ interface Transaction {
 	void commit ();
 
 	void close ();
-
-	Date timestamp ();
 
 	Instant now ();
 

@@ -1,7 +1,8 @@
 package wbs.smsapps.forwarder.daemon;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.Collection;
-import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -122,21 +123,40 @@ class ForwarderDelivery
 			ForwarderMessageOutReportRec forwarderMessageOutReport =
 				forwarderMessageOutReportHelper.insert (
 					new ForwarderMessageOutReportRec ()
-						.setForwarderMessageOut (forwarderMessageOut)
-						.setIndex (forwarderMessageOut.getReportIndexNext ())
-						.setOldMessageStatus (delivery.getOldMessageStatus ())
-						.setNewMessageStatus (delivery.getNewMessageStatus ())
-						.setCreatedTime (transaction.timestamp ()));
+
+				.setForwarderMessageOut (
+					forwarderMessageOut)
+
+				.setIndex (
+					forwarderMessageOut.getReportIndexNext ())
+
+				.setOldMessageStatus (
+					delivery.getOldMessageStatus ())
+
+				.setNewMessageStatus (
+					delivery.getNewMessageStatus ())
+
+				.setCreatedTime (
+					instantToDate (
+						transaction.now ()))
+
+			);
 
 			// update the forwarder message out
 
 			if (forwarderMessageOut.getReportIndexPending () == null) {
 
 				forwarderMessageOut
+
 					.setReportIndexPending (
 						forwarderMessageOutReport.getIndex ())
-					.setReportRetryTime (new Date ())
-					.setReportTries (0);
+
+					.setReportRetryTime (
+						instantToDate (
+							transaction.now ()))
+
+					.setReportTries (
+						0);
 
 			}
 

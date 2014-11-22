@@ -454,7 +454,8 @@ class ChatMiscLogicImpl
 							longLat)
 
 						.setLocTime (
-							transaction.timestamp ());
+							instantToDate (
+								transaction.now ()));
 
 					transaction.commit ();
 
@@ -605,7 +606,8 @@ class ChatMiscLogicImpl
 				chatUser)
 
 			.setCreationTime (
-				transaction.timestamp ())
+				instantToDate (
+					transaction.now ()))
 
 			.setOriginalName (
 				name)
@@ -621,10 +623,13 @@ class ChatMiscLogicImpl
 
 		);
 
-		chatUser.getChatUserNames ().add (chatUserName);
+		chatUser.getChatUserNames ().add (
+			chatUserName);
 
 		chatUser
-			.setNewChatUserName (chatUserName);
+
+			.setNewChatUserName (
+				chatUserName);
 
 		// create the queue item
 

@@ -1,6 +1,7 @@
 package wbs.apn.chat.broadcast.console;
 
 import static wbs.framework.utils.etc.Misc.allOf;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -620,7 +621,8 @@ class ChatBroadcastSendAction
 						myUser)
 
 					.setTimestamp (
-						transaction.timestamp ())
+						instantToDate (
+							transaction.now ()))
 
 					.setChatUser (
 						fromChatUser)

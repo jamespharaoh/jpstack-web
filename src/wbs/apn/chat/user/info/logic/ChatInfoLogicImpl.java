@@ -1,5 +1,6 @@
 package wbs.apn.chat.user.info.logic;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -1252,7 +1253,8 @@ class ChatInfoLogicImpl
 				chatUser)
 
 			.setCreationTime (
-				transaction.timestamp ())
+				instantToDate (
+					transaction.now ()))
 
 			.setOriginalText (
 				newInfoText)

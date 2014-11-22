@@ -1,5 +1,6 @@
 package wbs.apn.chat.user.admin.console;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
@@ -144,7 +145,8 @@ class ChatUserAdminInfoAction
 					chatUser)
 
 				.setCreationTime (
-					transaction.timestamp ())
+					instantToDate (
+						transaction.now ()))
 
 				.setOriginalText (
 					oldInfoText)
@@ -164,7 +166,9 @@ class ChatUserAdminInfoAction
 			);
 
 			chatUser
-				.setInfoText (newInfoText);
+
+				.setInfoText (
+					newInfoText);
 
 			chatUser.getChatUserInfos ().add (
 				chatUserInfo);

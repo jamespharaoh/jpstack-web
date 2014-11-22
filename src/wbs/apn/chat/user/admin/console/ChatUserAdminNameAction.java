@@ -1,5 +1,6 @@
 package wbs.apn.chat.user.admin.console;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
@@ -112,7 +113,8 @@ class ChatUserAdminNameAction
 					chatUser)
 
 				.setCreationTime (
-					transaction.timestamp ())
+					instantToDate (
+						transaction.now ()))
 
 				.setOriginalName (
 					chatUser.getName ())
@@ -131,11 +133,13 @@ class ChatUserAdminNameAction
 
 			);
 
-			chatUser.getChatUserNames ()
-				.add (chatUserName);
+			chatUser.getChatUserNames ().add (
+				chatUserName);
 
 			chatUser
-				.setName (name);
+
+				.setName (
+					name);
 
 		}
 

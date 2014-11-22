@@ -171,7 +171,7 @@ class ChatUserOnlineDaemon
 		// see if they need logging off after the web logoff time
 
 		long webLogoffTime =
-			+ transaction.timestamp ().getTime ()
+			+ transaction.now ().getMillis ()
 			- chat.getTimeWebLogoff () * 1000;
 
 		if (

@@ -2,6 +2,7 @@ package wbs.apn.chat.user.pending.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -234,7 +235,8 @@ class ChatUserPendingFormAction
 					: ChatUserInfoStatus.moderatorEdited)
 
 			.setModerationTime (
-				transaction.timestamp ())
+				instantToDate (
+					transaction.now ()))
 
 			.setEditedName (
 				requestContext.parameter ("name"));
@@ -428,7 +430,8 @@ class ChatUserPendingFormAction
 				ChatUserInfoStatus.moderatorApproved)
 
 			.setModerationTime (
-				transaction.timestamp ())
+				instantToDate (
+					transaction.now ()))
 
 			.setIndex (
 				list.size ())
@@ -696,10 +699,15 @@ class ChatUserPendingFormAction
 
 		ChatMessageRec chatMessage = null;
 
-		if (in (chatUser.getDeliveryMethod (),
-					ChatMessageMethod.iphone,
-					ChatMessageMethod.web)
-				&& chat.getSystemChatUser () != null) {
+		if (
+
+			in (chatUser.getDeliveryMethod (),
+				ChatMessageMethod.iphone,
+				ChatMessageMethod.web)
+
+			&& chat.getSystemChatUser () != null
+
+		) {
 
 			TextRec messageText =
 				textHelper.findOrCreate (messageParam);
@@ -842,10 +850,15 @@ class ChatUserPendingFormAction
 		MessageRec message = null;
 		ChatMessageRec chatMessage = null;
 
-		if (in (chatUser.getDeliveryMethod (),
-					ChatMessageMethod.iphone,
-					ChatMessageMethod.web)
-				&& chat.getSystemChatUser () != null) {
+		if (
+
+			in (chatUser.getDeliveryMethod (),
+				ChatMessageMethod.iphone,
+				ChatMessageMethod.web)
+
+			&& chat.getSystemChatUser () != null
+
+		) {
 
 			// iphone/web
 

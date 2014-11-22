@@ -1,5 +1,6 @@
 package wbs.apn.chat.contact.console;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -89,12 +90,25 @@ class ChatMonitorInboxAddNoteAction
 
 			objectManager.insert (
 				new ChatContactNoteRec ()
-					.setChat (chat)
-					.setUser (userChatUser)
-					.setMonitor (monitorChatUser)
-					.setNotes (newNote)
-					.setTimestamp (transaction.timestamp ())
-					.setConsoleUser (myUser));
+
+				.setChat (
+					chat)
+
+				.setUser (
+					userChatUser)
+
+				.setMonitor (
+					monitorChatUser)
+
+				.setNotes (
+					newNote)
+
+				.setTimestamp (
+					instantToDate (
+						transaction.now ()))
+
+				.setConsoleUser (
+					myUser));
 
 		}
 

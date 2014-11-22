@@ -1,5 +1,7 @@
 package wbs.apn.chat.user.admin.console;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -122,8 +124,10 @@ class ChatUserAdminBillAction
 		boolean canBypassDailyAdminBillLimit =
 			requestContext.canContext ("chat.manage");
 
-		if (dailyAdminBillLimitReached
-				&& ! canBypassDailyAdminBillLimit) {
+		if (
+			dailyAdminBillLimitReached
+			&& ! canBypassDailyAdminBillLimit
+		) {
 
 			requestContext.addError (
 				"Daily admin bill limit reached");
@@ -140,9 +144,18 @@ class ChatUserAdminBillAction
 
 		chatUserBillLogHelper.insert (
 			new ChatUserBillLogRec ()
-				.setChatUser (chatUser)
-				.setTimestamp (transaction.timestamp ())
-				.setUser (myUser));
+
+			.setChatUser (
+				chatUser)
+
+			.setTimestamp (
+				instantToDate (
+					transaction.now ()))
+
+			.setUser (
+				myUser)
+
+		);
 
 		transaction.commit ();
 

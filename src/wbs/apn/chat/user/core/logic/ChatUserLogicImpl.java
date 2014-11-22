@@ -233,8 +233,10 @@ class ChatUserLogicImpl
 
 		// finish their session
 
-		for (ChatUserSessionRec chatUserSession
-				: chatUser.getChatUserSessions ()) {
+		for (
+			ChatUserSessionRec chatUserSession
+				: chatUser.getChatUserSessions ()
+		) {
 
 			if (chatUserSession.getEndTime () != null)
 				continue;
@@ -242,7 +244,8 @@ class ChatUserLogicImpl
 			chatUserSession
 
 				.setEndTime (
-					transaction.timestamp ())
+					instantToDate (
+						transaction.now ()))
 
 				.setAutomatic (
 					automatic);

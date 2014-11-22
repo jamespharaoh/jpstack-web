@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.allOf;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -15,7 +16,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -35,6 +35,7 @@ import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.http.HttpStatus;
+import org.joda.time.Instant;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
@@ -2328,7 +2329,8 @@ class ChatApiServletModule
 
 			// do it
 
-			doIt (transaction.timestamp ());
+			doIt (
+				transaction.now ());
 
 			// commit
 
@@ -2361,8 +2363,9 @@ class ChatApiServletModule
 			deviceType = (DeviceType) params.get ("device-type");
 		}
 
-		private void doIt (
-				Date timestamp) {
+		private
+		void doIt (
+				Instant now) {
 
 			ChatRec chat =
 				chatHelper.find (chatId);
@@ -2464,7 +2467,11 @@ class ChatApiServletModule
 			}
 
 			// update the last message poll
-			chatUser.setLastMessagePoll (timestamp);
+
+			chatUser
+
+				.setLastMessagePoll (
+					instantToDate (now));
 
 			// update the last poll message id
 
@@ -2473,8 +2480,12 @@ class ChatApiServletModule
 				List<ChatMessageRec> chatMessages =
 					chatMessageHelper.search (
 						new ChatMessageSearch ()
-							.toUserId (chatUser.getId ())
-							.deliveryId (gotDeliveryId));
+
+					.toUserId (
+						chatUser.getId ())
+
+					.deliveryId (
+						gotDeliveryId));
 
 				if (chatMessages.isEmpty ()
 						|| chatMessages.get (0).getToUser () != chatUser) {
