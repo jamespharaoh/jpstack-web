@@ -26,7 +26,7 @@ import wbs.sms.message.wap.model.WapPushMessageObjectHelper;
 import wbs.sms.message.wap.model.WapPushMessageRec;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
-import wbs.sms.number.core.logic.NumberLogic;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
@@ -63,7 +63,7 @@ class ForwarderLogicImpl
 	NetworkObjectHelper networkHelper;
 
 	@Inject
-	NumberLogic numberLogic;
+	NumberObjectHelper numberHelper;
 
 	@Inject
 	RouterLogic routerLogic;
@@ -476,7 +476,7 @@ class ForwarderLogicImpl
 			if (work.template.forwarder.getSmsTracker() != null) {
 
 				part.numToNumber =
-					numberLogic.findOrCreateNumber (
+					numberHelper.findOrCreate (
 						part.numTo);
 
 				if (! smsTrackerManager.canSend (
@@ -864,7 +864,8 @@ class ForwarderLogicImpl
 		// lookup some stuff
 
 		NumberRec number =
-			numberLogic.findOrCreateNumber (numto);
+			numberHelper.findOrCreate (
+				numto);
 
 		if (threadId == null && fmIn != null)
 			threadId = fmIn.getMessage().getThreadId();

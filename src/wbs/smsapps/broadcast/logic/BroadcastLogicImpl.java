@@ -7,7 +7,7 @@ import javax.inject.Inject;
 import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.user.model.UserRec;
-import wbs.sms.number.core.logic.NumberLogic;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.number.lookup.logic.NumberLookupManager;
 import wbs.smsapps.broadcast.model.BroadcastConfigRec;
@@ -27,7 +27,7 @@ class BroadcastLogicImpl
 	BroadcastNumberObjectHelper broadcastNumberHelper;
 
 	@Inject
-	NumberLogic numberLogic;
+	NumberObjectHelper numberHelper;
 
 	@Inject
 	NumberLookupManager numberLookupManager;
@@ -52,7 +52,7 @@ class BroadcastLogicImpl
 		for (String numberString : numbers) {
 
 			NumberRec numberRecord =
-				numberLogic.findOrCreateNumber (
+				numberHelper.findOrCreate (
 					numberString);
 
 			BroadcastNumberRec broadcastNumber =

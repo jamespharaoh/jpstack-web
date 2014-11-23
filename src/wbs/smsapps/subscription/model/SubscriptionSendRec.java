@@ -92,7 +92,7 @@ class SubscriptionSendRec
 	// state
 
 	@SimpleField
-	SubscriptionStatus status;
+	SubscriptionSendState state;
 
 	// children
 
@@ -129,7 +129,9 @@ class SubscriptionSendRec
 	public static
 	interface SubscriptionSendDaoMethods {
 
-		SubscriptionSendRec findDue (
+		List<SubscriptionSendRec> findSending ();
+
+		List<SubscriptionSendRec> findScheduled (
 				Instant now);
 
 	}

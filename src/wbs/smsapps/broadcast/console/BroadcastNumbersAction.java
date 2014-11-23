@@ -19,7 +19,7 @@ import wbs.platform.event.logic.EventLogic;
 import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
-import wbs.sms.number.core.logic.NumberLogic;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
@@ -61,7 +61,7 @@ class BroadcastNumbersAction
 	NumberListNumberConsoleHelper numberListNumberHelper;
 
 	@Inject
-	NumberLogic numberLogic;
+	NumberObjectHelper numberHelper;
 
 	@Inject
 	PrivChecker privChecker;
@@ -173,7 +173,7 @@ class BroadcastNumbersAction
 			for (String numberString : numbers) {
 
 				NumberRec numberRecord =
-					numberLogic.findOrCreateNumber (
+					numberHelper.findOrCreate (
 						numberString);
 
 				BroadcastNumberRec broadcastNumber =

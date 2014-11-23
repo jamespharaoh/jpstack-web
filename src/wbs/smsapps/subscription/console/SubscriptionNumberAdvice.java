@@ -27,36 +27,40 @@ class SubscriptionNumberAdvice
 	SubscriptionNumberLinkProvider provider;
 
 	@Getter @Setter
-	SubscriptionSubRec sub;
+	SubscriptionSubRec subscriptionSub;
 
 	@Override
 	public
 	NumberRec getNumber () {
-		return sub.getNumber ();
+		return subscriptionSub.getSubscriptionNumber ().getNumber ();
 	}
 
 	@Override
 	public
 	Boolean getActive () {
-		return sub.getActive ();
+		return subscriptionSub.getActive ();
 	}
 
 	@Override
 	public
 	Date getStartTime () {
-		return sub.getStarted ();
+		return subscriptionSub.getStarted ();
 	}
 
 	@Override
 	public
 	Date getEndTime () {
-		return sub.getEnded ();
+		return subscriptionSub.getEnded ();
 	}
 
 	@Override
 	public
 	Record<?> getParentObject () {
-		return sub.getSubscription ();
+
+		return subscriptionSub
+			.getSubscriptionNumber ()
+			.getSubscription ();
+
 	}
 
 	@Override
@@ -76,7 +80,9 @@ class SubscriptionNumberAdvice
 	boolean canView () {
 
 		return privChecker.can (
-			sub.getSubscription (),
+			subscriptionSub
+				.getSubscriptionNumber ()
+				.getSubscription (),
 			"manage",
 			"admin");
 

@@ -817,7 +817,7 @@ class ChatUserRec
 	class ChatUserObjectHelperImplementation
 		implements ChatUserObjectHelperMethods {
 
-		// dependncies
+		// dependencies
 
 		@Inject
 		Random random;

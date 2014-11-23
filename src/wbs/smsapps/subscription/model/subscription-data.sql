@@ -7,10 +7,28 @@ SELECT object_type_insert (
 	1);
 
 SELECT object_type_insert (
+	'subscription_keyword',
+	'subscription keyword',
+	'subscription',
+	4);
+
+SELECT object_type_insert (
+	'subscription_list',
+	'subscription list',
+	'subscription',
+	1);
+
+SELECT object_type_insert (
 	'subscription_affiliate',
 	'subscription affiliate',
 	'subscription',
 	1);
+
+SELECT object_type_insert (
+	'subscription_number',
+	'subscription number',
+	'subscription',
+	3);
 
 SELECT object_type_insert (
 	'subscription_send',
@@ -51,6 +69,11 @@ SELECT command_type_insert (
 
 SELECT service_type_insert (
 	'subscription',
+	'default',
+	'Default');
+
+SELECT service_type_insert (
+	'subscription_list',
 	'default',
 	'Default');
 
@@ -110,7 +133,28 @@ SELECT priv_type_insert (
 	'subscription',
 	'messages',
 	'View message history',
-	'View message histroy for this subscription',
+	'View message history for this subscription',
+	true);
+
+SELECT priv_type_insert (
+	'subscription_list',
+	'manage',
+	'Full control',
+	'Full control of this subscription list',
+	true);
+
+SELECT priv_type_insert (
+	'subscription_list',
+	'stats',
+	'View message stats',
+	'View message stats for this subscription list',
+	true);
+
+SELECT priv_type_insert (
+	'subscription_list',
+	'messages',
+	'View message history',
+	'View message history for this subscription list',
 	true);
 
 SELECT priv_type_insert (

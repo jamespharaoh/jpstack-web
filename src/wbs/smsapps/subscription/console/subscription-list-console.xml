@@ -1,16 +1,25 @@
 <console-module
-	name="subscription-affiliate">
+	name="subscription-list">
 
 	<console-helper-provider
-		object-name="subscriptionAffiliate">
+		object-name="subscriptionList"
+		view-delegate-field="subscription"
+		view-delegate-priv-code="manage">
 
 		<priv-key
-			name="subscriptionAffiliate.manage"
-			delegate="subscription"
+			name="subscriptionList.manage"
 			priv="manage"/>
 
+		<priv-key
+			name="subscriptionList.messages"
+			priv="messages"/>
+
+		<priv-key
+			name="subscriptionList.stats"
+			priv="stats"/>
+
 		<context-stuff
-			name="subscriptionAffiliateName"
+			name="subscriptionListName"
 			field="name"/>
 
 		<context-stuff
@@ -24,8 +33,8 @@
 	</console-helper-provider>
 
 	<object-context
-		name="subscriptionAffiliate"
-		object-name="subscriptionAffiliate">
+		name="subscriptionList"
+		object-name="subscriptionList">
 
 		<list>
 
@@ -56,19 +65,16 @@
 
 	<field-set
 		name="list"
-		object-name="subscriptionAffiliate">
+		object-name="subscriptionList">
 
 		<name-field/>
 		<description-field/>
-
-		<integer-field
-			name="numSubscribers"/>
 
 	</field-set>
 
 	<field-set
 		name="summary"
-		object-name="subscriptionAffiliate">
+		object-name="subscriptionList">
 
 		<id-field/>
 		<parent-field/>
@@ -77,14 +83,11 @@
 		<description-field/>
 		<deleted-field/>
 
-		<integer-field
-			name="numSubscribers"/>
-
 	</field-set>
 
 	<field-set
 		name="settings"
-		object-name="subscriptionAffiliate">
+		object-name="subscriptionList">
 
 		<id-field/>
 		<parent-field read-only="yes"/>

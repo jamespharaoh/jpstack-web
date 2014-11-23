@@ -111,7 +111,7 @@ import wbs.sms.locator.model.EastNorth;
 import wbs.sms.locator.model.LongLat;
 import wbs.sms.locator.model.MercatorProjection;
 import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.number.core.logic.NumberLogic;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 
 import com.google.common.base.Optional;
@@ -179,7 +179,7 @@ class ChatApiServletModule
 	MediaLogic mediaLogic;
 
 	@Inject
-	NumberLogic numberLogic;
+	NumberObjectHelper numberHelper;
 
 	@Inject
 	ObjectManager objectManager;
@@ -193,6 +193,8 @@ class ChatApiServletModule
 	@Inject
 	@Named
 	MercatorProjection ukNationalGrid;
+
+	// prototype dependencies
 
 	@Inject
 	Provider<ApiFile> apiFile;
@@ -692,7 +694,7 @@ class ChatApiServletModule
 						chatId);
 
 				NumberRec numberRec =
-					numberLogic.findOrCreateNumber (
+					numberHelper.findOrCreate (
 						number);
 
 				myUser =
@@ -1402,7 +1404,7 @@ class ChatApiServletModule
 					chatId);
 
 			NumberRec numberRec =
-				numberLogic.findOrCreateNumber (
+				numberHelper.findOrCreate (
 					number);
 
 			chatUser =
@@ -1972,7 +1974,8 @@ class ChatApiServletModule
 				chatHelper.find (chatId);
 
 			NumberRec numberRec =
-				numberLogic.findOrCreateNumber (number);
+				numberHelper.findOrCreate (
+					number);
 
 			chatUser =
 				chatUserHelper.find (
@@ -2149,7 +2152,8 @@ class ChatApiServletModule
 				chatHelper.find (chatId);
 
 			NumberRec numberRec =
-				numberLogic.findOrCreateNumber (number);
+				numberHelper.findOrCreate (
+					number);
 
 			ChatUserRec fromUser =
 				chatUserHelper.findOrCreate (
@@ -2371,7 +2375,8 @@ class ChatApiServletModule
 				chatHelper.find (chatId);
 
 			NumberRec numberRec =
-				numberLogic.findOrCreateNumber (number);
+				numberHelper.findOrCreate (
+					number);
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
@@ -2714,7 +2719,8 @@ class ChatApiServletModule
 					chatId);
 
 			NumberRec numberRec =
-				numberLogic.findOrCreateNumber (number);
+				numberHelper.findOrCreate (
+					number);
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
@@ -3073,7 +3079,7 @@ class ChatApiServletModule
 					chatId);
 
 			NumberRec numberRec =
-				numberLogic.findOrCreateNumber (
+				numberHelper.findOrCreate (
 					number);
 
 			ChatUserRec chatUser =

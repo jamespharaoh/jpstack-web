@@ -1,5 +1,7 @@
 package wbs.smsapps.subscription.model;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -14,7 +16,6 @@ import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.number.core.model.NumberRec;
 
 @Accessors (chain = true)
 @Data
@@ -25,14 +26,20 @@ public
 class SubscriptionSendNumberRec
 	implements CommonRecord<SubscriptionSendNumberRec> {
 
+	// id
+
 	@GeneratedIdField
 	Integer id;
+
+	// identity
 
 	@ReferenceField
 	SubscriptionSendRec subscriptionSend;
 
 	@ReferenceField
-	NumberRec number;
+	SubscriptionSubRec subscriptionSub;
+
+	// details
 
 	@SimpleField
 	Integer threadId;
@@ -40,8 +47,12 @@ class SubscriptionSendNumberRec
 	@ReferenceField
 	MessageRec billedMessage;
 
+	// state
+
 	@SimpleField
-	Boolean sent;
+	SubscriptionSendNumberState state;
+
+	// compare to
 
 	@Override
 	public
@@ -58,10 +69,21 @@ class SubscriptionSendNumberRec
 				other.getSubscriptionSend ())
 
 			.append (
-				getNumber (),
-				other.getNumber ())
+				getSubscriptionSub (),
+				other.getSubscriptionSub ())
 
 			.toComparison ();
+
+	}
+
+	// dao methods
+
+	public static
+	interface SubscriptionSendNumberDaoMethods {
+
+		List<SubscriptionSendNumberRec> findAcceptedLimit (
+				SubscriptionSendRec subscriptionSend,
+				int maxResults);
 
 	}
 

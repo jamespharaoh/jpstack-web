@@ -55,7 +55,7 @@ class ChatUserOnlineDaemon
 	protected
 	int getDelayMs () {
 
-		return 30;
+		return 30 * 1000;
 
 	}
 

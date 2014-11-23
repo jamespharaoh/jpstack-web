@@ -27,6 +27,8 @@ import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.subscription.logic.SubscriptionLogic;
 import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
+import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelper;
+import wbs.smsapps.subscription.model.SubscriptionNumberRec;
 import wbs.smsapps.subscription.model.SubscriptionObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionRec;
 import wbs.smsapps.subscription.model.SubscriptionSubObjectHelper;
@@ -36,6 +38,8 @@ import wbs.smsapps.subscription.model.SubscriptionSubRec;
 public
 class SubscriptionSubscribeCommand
 	implements CommandHandler {
+
+	// dependencies
 
 	@Inject
 	AffiliateObjectHelper affiliateHelper;
@@ -62,10 +66,15 @@ class SubscriptionSubscribeCommand
 	SubscriptionObjectHelper subscriptionHelper;
 
 	@Inject
+	SubscriptionNumberObjectHelper subscriptionNumberHelper;
+
+	@Inject
 	SubscriptionSubObjectHelper subscriptionSubHelper;
 
 	@Inject
 	SubscriptionLogic subscriptionLogic;
+
+	// details
 
 	@Override
 	public
@@ -194,15 +203,31 @@ class SubscriptionSubscribeCommand
 
 			}
 
+			// find or create subscription number
+
+			SubscriptionNumberRec subscriptionNumber =
+				subscriptionNumberHelper.findOrCreate (
+					subscription,
+					number);
+
 			// ok subscribe them
 
 			subscriptionSubHelper.insert (
 				new SubscriptionSubRec ()
-					.setSubscription (subscription)
-					.setNumber (number)
-					.setActive (true)
-					.setStarted (new Date ())
-					.setSubscriptionAffiliate (subscriptionAffiliate));
+
+				.setSubscriptionNumber (
+					subscriptionNumber)
+
+				.setActive (
+					true)
+
+				.setStarted (
+					new Date ())
+
+				.setSubscriptionAffiliate (
+					subscriptionAffiliate)
+
+			);
 
 			// update the counter
 

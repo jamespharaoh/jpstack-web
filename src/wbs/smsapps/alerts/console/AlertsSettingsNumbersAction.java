@@ -22,7 +22,7 @@ import wbs.platform.event.logic.EventLogic;
 import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
-import wbs.sms.number.core.logic.NumberLogic;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.alerts.model.AlertsNumberRec;
 import wbs.smsapps.alerts.model.AlertsSettingsObjectHelper;
@@ -33,11 +33,10 @@ public
 class AlertsSettingsNumbersAction
 	extends ConsoleAction {
 
-	@Inject
-	AlertsSettingsObjectHelper alertsSettingsHelper;
+	// dependencies
 
 	@Inject
-	ConsoleRequestContext requestContext;
+	AlertsSettingsObjectHelper alertsSettingsHelper;
 
 	@Inject
 	Database database;
@@ -46,7 +45,7 @@ class AlertsSettingsNumbersAction
 	EventLogic eventLogic;
 
 	@Inject
-	NumberLogic numberLogic;
+	NumberObjectHelper numberHelper;
 
 	@Inject
 	ObjectManager objectManager;
@@ -55,13 +54,20 @@ class AlertsSettingsNumbersAction
 	PrivChecker privChecker;
 
 	@Inject
+	ConsoleRequestContext requestContext;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
 	Responder backupResponder () {
 		return responder ("alertsSettingsNumbersResponder");
 	}
+
+	// implementation
 
 	@Override
 	protected
@@ -165,7 +171,8 @@ class AlertsSettingsNumbersAction
 					newNumber)) {
 
 				NumberRec numberRec =
-					numberLogic.findOrCreateNumber (newNumber);
+					numberHelper.findOrCreate (
+						newNumber);
 
 				alertsNumber.setNumber (numberRec);
 
@@ -248,7 +255,7 @@ class AlertsSettingsNumbersAction
 		if (requestContext.getForm ("add_new") != null) {
 
 			NumberRec numberRec =
-				numberLogic.findOrCreateNumber (
+				numberHelper.findOrCreate (
 					requestContext.getForm ("number_new"));
 
 			AlertsNumberRec alertsNumber =

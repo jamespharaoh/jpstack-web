@@ -1,0 +1,162 @@
+<console-module
+	name="subscription-number">
+
+	<console-helper-provider
+		object-name="subscriptionNumber">
+
+		<priv-key
+			name="subscriptionNumber.manage"
+			delegate="subscription"
+			priv="manage"/>
+
+		<context-stuff
+			name="subscriptionNumberName"
+			field="id"/>
+
+		<context-stuff
+			name="subscriptionId"
+			delegate="subscription"
+			field="id"/>
+
+		<run-post-processor
+			name="subscription"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="subscriptionNumber"
+		object-name="subscriptionNumber">
+
+		<list>
+
+			<context-tab-page
+				name="overview"/>
+
+			<object-search-page
+				search-fields="search"
+				results-fields="results"
+				priv-key="subscription.manage"
+				parent-id-key="subscriptionId"
+				parent-id-name="subscriptionId"/>
+
+			<context-tab-action-page
+				name="addRemove"
+				tab-label="Add/remove"
+				title="Subscription number add/remove"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="search"
+		class="wbs.smsapps.subscription.model.SubscriptionNumberSearch">
+
+		<text-field
+			name="numberLike"
+			label="Number"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="active"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="joinedAfter"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="joinedBefore"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="results"
+		object-name="subscriptionNumber">
+
+		<object-field
+			name="number"
+			finder="number"/>
+
+		<yes-no-field
+			name="active"/>
+
+		<timestamp-field
+			name="firstJoin"/>
+
+		<object-field
+			name="subscriptionList"
+			label="List"
+			finder="subscriptionList"/>
+
+		<object-field
+			name="subscriptionAffiliate"
+			label="Affiliate"
+			finder="subscriptionAffiliate"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="subscriptionNumber">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="number"
+			finder="number"/>
+
+		<yes-no-field
+			name="active"/>
+
+		<timestamp-field
+			name="firstJoin"/>
+
+		<timestamp-field
+			name="lastJoin"/>
+
+		<object-field
+			name="subscripionList"
+			finder="subscriptionList"/>
+
+		<object-field
+			name="subscriptionAffiliate"
+			finder="subscriptionAffiliate"/>
+
+	</field-set>
+
+	<field-set
+		name="addRemoveForm"
+		class="wbs.smsapps.subscription.console.SubscriptionNumberAddRemoveForm">
+
+		<object-field
+			name="numberFormat"
+			finder="numberFormat"/>
+
+		<object-field
+			name="subscriptionAffiliate"
+			label="Affiliate"
+			finder="subscriptionAffiliate"/>
+
+		<object-field
+			name="subscriptionList"
+			label="List"
+			finder="subscriptionList"/>
+
+		<text-area-field
+			name="numbers"/>
+
+	</field-set>
+
+</console-module>

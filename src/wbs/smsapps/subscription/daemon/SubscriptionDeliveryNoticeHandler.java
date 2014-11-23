@@ -11,18 +11,11 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.platform.service.model.ServiceRec;
-import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.sms.message.outbox.logic.MessageSender;
-import wbs.sms.template.model.TemplatePartRec;
-import wbs.sms.template.model.TemplateVersionRec;
-import wbs.smsapps.subscription.model.SubscriptionRec;
 import wbs.smsapps.subscription.model.SubscriptionSendNumberObjectHelper;
-import wbs.smsapps.subscription.model.SubscriptionSendNumberRec;
-import wbs.smsapps.subscription.model.SubscriptionSendRec;
 
 @PrototypeComponent ("subscriptionDeliveryNoticeHandler")
 public
@@ -73,6 +66,7 @@ class SubscriptionDeliveryNoticeHandler
 			deliveryHelper.find (
 				deliveryId);
 
+		/*
 		MessageRec message =
 			delivery.getMessage ();
 
@@ -96,8 +90,10 @@ class SubscriptionDeliveryNoticeHandler
 
 		// send the free messages if appropriate
 
-		if (delivery.getNewMessageStatus ().isGoodType ()
-				&& ! subscriptionSendNumber.getSent ()) {
+		if (
+			delivery.getNewMessageStatus ().isGoodType ()
+			&& subscriptionSendNumber.getState ()
+				!= SubscriptionSendState.) {
 
 			for (TemplatePartRec templatePart
 					: tv.getTemplateParts ()) {
@@ -117,6 +113,7 @@ class SubscriptionDeliveryNoticeHandler
 			subscriptionSendNumber.setSent (true);
 
 		}
+		*/
 
 		// delete the dnq
 

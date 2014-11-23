@@ -8,6 +8,8 @@ import javax.inject.Inject;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.ConsoleResponder;
+import wbs.sms.number.core.model.NumberRec;
+import wbs.smsapps.subscription.model.SubscriptionNumberRec;
 import wbs.smsapps.subscription.model.SubscriptionSubRec;
 
 @PrototypeComponent ("subscriptionAdminSearchNumbersResponder")
@@ -52,11 +54,19 @@ class SubscriptionAdminSearchNumbersResponder
 		PrintWriter out =
 			requestContext.writer ();
 
-		for (SubscriptionSubRec subscriptionSub
-				: subscriptionSubs) {
+		for (
+			SubscriptionSubRec subscriptionSub
+				: subscriptionSubs
+		) {
+
+			SubscriptionNumberRec subscriptionNumber =
+				subscriptionSub.getSubscriptionNumber ();
+
+			NumberRec number =
+				subscriptionNumber.getNumber ();
 
 			out.println (
-				subscriptionSub.getNumber ().getNumber ());
+				number.getNumber ());
 
 		}
 
