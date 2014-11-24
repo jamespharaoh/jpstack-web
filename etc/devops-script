@@ -126,7 +126,7 @@ class DevopsScript
 
 			ssh \
 				"-t",
-				"rm -rf #{@deployment_path}/wbs-*/bin"
+				"rm -rf #{@deployment_path}/work/bin"
 
 		when "console-clean"
 
@@ -134,7 +134,7 @@ class DevopsScript
 
 			ssh \
 				"-t",
-				"rm -rf #{@deployment_path}/console-live"
+				"rm -rf #{@deployment_path}/work/console"
 
 			;;
 
@@ -144,7 +144,7 @@ class DevopsScript
 
 			ssh \
 				"-t",
-				"rm -rf #{@deployment_path}/api-live"
+				"rm -rf #{@deployment_path}/work/api"
 
 			;;
 
