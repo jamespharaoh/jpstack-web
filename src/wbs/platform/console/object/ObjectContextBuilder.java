@@ -3,6 +3,7 @@ package wbs.platform.console.object;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.maybeList;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -340,14 +341,26 @@ class ObjectContextBuilder {
 	void buildResolvedContexts (
 			ResolvedConsoleContextLink resolvedContextLink) {
 
-		for (String parentContextName
-				: resolvedContextLink.parentContextNames ()) {
+		for (
+			String parentContextName
+				: resolvedContextLink.parentContextNames ()
+		) {
 
 			String resolvedContextName =
 				stringFormat (
 					"%s.%s",
 					parentContextName,
 					resolvedContextLink.localName ());
+
+			boolean global =
+				! resolvedContextName.startsWith ("link:");
+
+			String resolvedPathPrefix =
+				joinWithoutSeparator (
+					"/",
+					global
+						? resolvedContextName.substring (5)
+						: resolvedContextName);
 
 			consoleModule.addContext (
 				simpleConsoleContextProvider.get ()
@@ -359,13 +372,14 @@ class ObjectContextBuilder {
 					name + "s")
 
 				.pathPrefix (
-					"/" + resolvedContextName + "s")
+					resolvedPathPrefix + "s")
 
 				.global (
-					true)
+					global)
 
-				.title (capitalise (
-					consoleHelper.shortNamePlural ()))
+				.title (
+					capitalise (
+						consoleHelper.shortNamePlural ()))
 
 				.parentContextName (
 					parentContextName)
@@ -383,10 +397,10 @@ class ObjectContextBuilder {
 					name + "+")
 
 				.pathPrefix (
-					"/" + resolvedContextName)
+					resolvedPathPrefix)
 
 				.global (
-					true)
+					global)
 
 				.title (
 					objectTitle)

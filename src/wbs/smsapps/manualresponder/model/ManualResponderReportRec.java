@@ -55,6 +55,9 @@ class ManualResponderReportRec
 	@SimpleField
 	Integer num;
 
+	@SimpleField
+	String timestring;
+
 	// compare to
 
 	@Override

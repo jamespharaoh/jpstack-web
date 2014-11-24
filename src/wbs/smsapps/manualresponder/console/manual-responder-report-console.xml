@@ -23,6 +23,9 @@
 			name="simple"
 			title="Simple"/>
 
+		<context-responder-page
+		    name="simpleCsv"/>
+
 	</simple-context>
 
 	<field-set
@@ -46,12 +49,41 @@
 			label="Request"
 			finder="manualResponderRequest"/>
 
+		<text-field
+		    name="timestring"
+		    label="Timestamp"/>
+
 		<object-field
 			name="user"
 			finder="user"/>
 
 		<integer-field
-			name="num"/>
+			name="num"
+			label="Messages"/>
+
+	</field-set>
+
+	<field-set
+		name="simpleReportCsv"
+		object-name="manualResponderReport">
+
+		 <delegate-field
+			delegate="manualResponder"
+			name="code"
+			label="Service"/>
+
+		<text-field
+			name="timestring"
+			label="Timestamp"/>
+
+		<delegate-field
+			delegate="user"
+			name="username"
+			label="User"/>
+
+		<integer-field
+			name="num"
+			label="Messages"/>
 
 	</field-set>
 

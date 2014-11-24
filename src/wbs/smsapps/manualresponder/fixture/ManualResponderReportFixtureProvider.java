@@ -10,6 +10,14 @@ import wbs.framework.record.GlobalId;
 import wbs.platform.user.model.UserRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.queue.model.QueueItemObjectHelper;
+import wbs.platform.queue.model.QueueItemRec;
+import wbs.platform.queue.model.QueueItemState;
+import wbs.platform.queue.model.QueueObjectHelper;
+import wbs.platform.queue.model.QueueRec;
+import wbs.platform.queue.model.QueueSubjectObjectHelper;
+import wbs.platform.queue.model.QueueSubjectRec;
+import wbs.platform.queue.model.QueueTypeObjectHelper;
+import wbs.platform.queue.model.QueueTypeRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
@@ -37,6 +45,14 @@ import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.sms.message.batch.model.BatchObjectHelper;
 import wbs.sms.message.core.model.MessageTypeRec;
 import wbs.sms.message.core.model.MessageTypeObjectHelper;
+
+
+
+
+
+
+
+
 
 
 
@@ -97,6 +113,17 @@ class ManualResponderReportFixtureProvider
 	@Inject
 	MessageTypeObjectHelper messageTypeHelper;
 	// implementation
+
+	@Inject
+	QueueObjectHelper queueHelper;
+
+	@Inject
+	QueueTypeObjectHelper queueTypeHelper;
+
+	@Inject
+	QueueSubjectObjectHelper queueSubjectHelper;
+	@Inject
+	QueueItemObjectHelper queueItemHelper;
 
 	@Override
 	public
@@ -160,6 +187,9 @@ class ManualResponderReportFixtureProvider
 					.setDescription("JFMagazin_Service_Description"));
 		*/
 
+
+
+
 		TextRec textExample =
 			textHelper.insert(
 				new TextRec()
@@ -174,9 +204,6 @@ class ManualResponderReportFixtureProvider
 				.setName("routeText")
 				.setDescription("RouteTextDescription")
 				);
-
-		//OutboxRec outbox =
-		//		outboxHelper.find (0);
 
 
 		AffiliateRec affiliate =
@@ -197,7 +224,7 @@ class ManualResponderReportFixtureProvider
 					.setText(textExample)
 					.setNumFrom("999999999")
 					.setNumTo("00000000000")
-					.setDirection(MessageDirection.in)
+					.setDirection(MessageDirection.out)
 					.setStatus(MessageStatus.pending)
 					.setNumber(numberExample)
 					.setRoute(route)
@@ -210,6 +237,43 @@ class ManualResponderReportFixtureProvider
 					.setCreatedTime(new Date())
 					.setCharge(1)
 					);
+		QueueRec queue = queueHelper.find(1);
+
+		@SuppressWarnings("unused")
+		QueueTypeRec queuetye = this.queueTypeHelper.find(1);
+
+		QueueSubjectRec queueSubject =
+				queueSubjectHelper.insert (
+					new QueueSubjectRec ()
+						.setQueue (queue)
+						.setObjectId (127));
+
+		QueueItemRec queueItem =
+				queueItemHelper.insert (
+					new QueueItemRec ()
+
+						.setQueueSubject (queueSubject)
+						.setIndex (queueSubject.getTotalItems ())
+
+						.setQueue (queue)
+
+						.setSource ("source_exammplee")
+						.setDetails ("details_example")
+						.setRefObjectId (127)
+
+						.setState (QueueItemState.pending)
+
+						.setCreatedTime (new Date())
+						.setPendingTime (new Date())
+						.setProcessedUser(dumieUser1));
+
+			// update queue subject
+
+			queueSubject.setTotalItems (
+				queueSubject.getTotalItems () + 1);
+
+			queueSubject.setActiveItems (
+				queueSubject.getActiveItems () + 1);
 
 		@SuppressWarnings("unused")
 		ManualResponderRequestRec manualResponderRequest =
@@ -222,6 +286,7 @@ class ManualResponderReportFixtureProvider
 					.setUser(dumieUser1)
 					.setPending(true)
 					.setNumber(numberExample)
+					.setQueueItem(queueItem)
 					);
 
 

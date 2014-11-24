@@ -1452,11 +1452,11 @@ class ConsoleManagerImpl
 				contextStuff.substitutePlaceholders (
 					localFile));
 
-		} else if (localFile.startsWith ("type:")) {
+		} else if (localFile.startsWith ("link:")) {
 
 			String targetContextTypeName =
 				localFile.substring (
-					"type:".length ());
+					"link:".length ());
 
 			ConsoleContextType targetContextType =
 				contextType (

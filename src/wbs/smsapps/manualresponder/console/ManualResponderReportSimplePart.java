@@ -13,8 +13,11 @@ import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.web.UrlParams;
 import wbs.platform.console.forms.FormFieldLogic;
 import wbs.platform.console.forms.FormFieldSet;
+import wbs.platform.console.misc.TimeFormatter;
+import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.module.ConsoleModule;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.smsapps.manualresponder.model.ManualResponderReportObjectHelper;
@@ -36,6 +39,12 @@ class ManualResponderReportSimplePart
 	@Inject
 	ManualResponderReportObjectHelper manualResponderReportHelper;
 
+	@Inject
+	ConsoleManager consoleManager;
+
+	@Inject
+	TimeFormatter timeFormatter;
+
 	// state
 
 	FormFieldSet searchFormFieldSet;
@@ -44,12 +53,14 @@ class ManualResponderReportSimplePart
 	SearchForm searchForm;
 
 	List<ManualResponderReportRec> reports;
+	String outputTypeParam;
 
 	// implementation
 
 	@Override
 	public
 	void prepare () {
+
 
 		searchFormFieldSet =
 			manualResponderReportConsoleModule.formFieldSets ().get (
@@ -122,34 +133,66 @@ class ManualResponderReportSimplePart
 		printFormat (
 			"</form>\n");
 
-		// results
+		UrlParams urlParams =
+			new UrlParams ()
+
+			.set (
+				"start",
+				timeFormatter.instantToTimestampString  (
+					timeFormatter.defaultTimezone (),
+					searchForm.start ()))
+
+			.set (
+				"end",
+				timeFormatter.instantToTimestampString  (
+					timeFormatter.defaultTimezone (),
+					searchForm.end ()));
+
+
+		printFormat (
+			"<p><a",
+			" href=\"%h\"",
+			urlParams.toUrl (
+				requestContext.resolveLocalUrl (
+					"/manualResponderReport.simpleCsv")),
+			">Download CSV File</a></p>\n");
 
 		printFormat (
 			"<table class=\"list\">\n");
 
 		formFieldLogic.outputTableHeadings (
-			out,
-			resultsFormFieldSet);
+				out,
+				resultsFormFieldSet);
 
-		for (ManualResponderReportRec report
-				: reports) {
+		for (
+			ManualResponderReportRec report
+				: reports
+		) {
 
 			printFormat (
 				"<tr>\n");
+				formFieldLogic.outputTableCells (
+					out,
+			        resultsFormFieldSet,
+			        report,
+				   true);
 
-			formFieldLogic.outputTableCells (
-				out,
-				resultsFormFieldSet,
-				report,
-				true);
-
-			printFormat (
-				"</tr>\n");
+		    printFormat (
+			    "</tr>\n");
 
 		}
 
-		printFormat (
+
+	 	printFormat (
 			"</table>\n");
+
+		printFormat (
+			"<p><a",
+			" href=\"%h\"",
+			urlParams.toUrl (
+				requestContext.resolveLocalUrl (
+					"/manualResponderReport.simpleCsv")),
+			">Download CSV File</a></p>\n");
 
 	}
 

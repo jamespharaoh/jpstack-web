@@ -6,16 +6,16 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 public
 class UrlParams {
 
 	private final
 	Map<String,List<String>> params =
-		new TreeMap<String,List<String>> ();
+		new LinkedHashMap<String,List<String>> ();
 
 	public
 	UrlParams () {
@@ -25,8 +25,10 @@ class UrlParams {
 	UrlParams (
 			UrlParams oldUrlParams) {
 
-		for (Map.Entry<String,List<String>> entry
-				: oldUrlParams.params.entrySet ()) {
+		for (
+			Map.Entry<String,List<String>> entry
+				: oldUrlParams.params.entrySet ()
+		) {
 
 			String name =
 				entry.getKey ();
@@ -192,7 +194,7 @@ class UrlParams {
 			String charset)
 		throws UnsupportedEncodingException {
 
-		StringBuilder sb =
+		StringBuilder stringBuilder =
 			new StringBuilder ();
 
 		boolean first = true;
@@ -209,16 +211,16 @@ class UrlParams {
 			for (String value : values) {
 
 				if (! first)
-					sb.append ('&');
+					stringBuilder.append ('&');
 
-				sb.append (
+				stringBuilder.append (
 					URLEncoder.encode (
 						name,
 						charset));
 
-				sb.append ('=');
+				stringBuilder.append ('=');
 
-				sb.append (
+				stringBuilder.append (
 					URLEncoder.encode (
 						value,
 						charset));
@@ -229,7 +231,7 @@ class UrlParams {
 
 		}
 
-		return sb.toString ();
+		return stringBuilder.toString ();
 
 	}
 

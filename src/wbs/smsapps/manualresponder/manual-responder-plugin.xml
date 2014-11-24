@@ -30,6 +30,7 @@
 		<bean class="console.ManualResponderRequestPendingSummaryPart"/>
 		<bean class="console.ManualResponderQueueConsolePlugin"/>
 		<bean class="console.ManualResponderReportSimplePart"/>
+		<bean class="console.ManualResponderReportSimpleCsvResponder"/>
 
 	</layer>
 

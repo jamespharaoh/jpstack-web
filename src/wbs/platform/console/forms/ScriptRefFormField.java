@@ -88,4 +88,14 @@ class ScriptRefFormField
 
 	}
 
+	@Override
+	public
+	void renderCsvRow (
+			PrintWriter out,
+			Object object) {
+
+		throw new UnsupportedOperationException ();
+
+	}
+
 }

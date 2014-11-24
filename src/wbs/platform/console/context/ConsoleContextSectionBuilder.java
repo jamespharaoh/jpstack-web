@@ -255,7 +255,7 @@ class ConsoleContextSectionBuilder {
 
 		tabTarget =
 			stringFormat (
-				"type:%s",
+				"link:%s",
 				contextTypeName);
 
 	}
