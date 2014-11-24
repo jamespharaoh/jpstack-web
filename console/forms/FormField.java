@@ -37,6 +37,10 @@ interface FormField<Container,Generic,Native,Interface> {
 			PrintWriter out,
 			Container object);
 
+	void renderCsvRow (
+			PrintWriter out,
+			Container object);
+
 	void update (
 			Container container,
 			UpdateResult<Generic,Native> updateResult);
@@ -66,5 +70,7 @@ interface FormField<Container,Generic,Native,Interface> {
 		List<String> errors;
 
 	}
+
+
 
 }

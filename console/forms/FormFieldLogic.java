@@ -3,6 +3,7 @@ package wbs.platform.console.forms;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -138,6 +139,36 @@ class FormFieldLogic {
 	}
 
 	public
+	void outputCsvHeadings (
+			PrintWriter out,
+			FormFieldSet formFieldSet) {
+
+		boolean first = true;
+
+		for (
+			FormField formField
+				: formFieldSet.formFields ()
+		) {
+
+			if (! first)
+				out.write (",");
+
+			out.write ("\"");
+
+			out.write (
+				formField.label ().replace ("\"", "\"\""));
+
+			out.write ("\"");
+
+			first = false;
+
+		}
+
+		out.write ("\n");
+
+	}
+
+	public
 	void outputFormRows (
 			PrintWriter out,
 			FormFieldSet formFieldSet,
@@ -156,6 +187,40 @@ class FormFieldLogic {
 		}
 
 	}
+
+	public
+	void outputCsvRow (
+			PrintWriter out,
+			FormFieldSet formFieldSet,
+			Object object)
+		throws IOException {
+
+		boolean first = true;
+
+		for (
+			FormField formField
+				: formFieldSet.formFields ()
+		) {
+
+			if (formField.virtual ())
+				continue;
+
+			if (! first) {
+				out.write (",");
+			}
+
+			formField.renderCsvRow (
+				out,
+				object);
+
+			first = false;
+
+		}
+
+		out.write ("\n");
+
+	}
+
 
 	public
 	void outputTableCells (

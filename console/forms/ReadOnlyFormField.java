@@ -130,6 +130,39 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 
 	@Override
 	public
+	void renderCsvRow (
+			PrintWriter out,
+			Container container) {
+
+		Native nativeValue =
+			accessor.read (
+				container);
+
+		Generic genericValue =
+			nativeMapping.nativeToGeneric (
+				nativeValue);
+
+		Interface interfaceValue =
+			interfaceMapping.genericToInterface (
+				container,
+				genericValue);
+
+		String stringValue =
+			interfaceValue.toString ();
+
+		out.write (
+			"\"");
+
+		out.write (
+			stringValue.replace ("\"", "\"\""));
+
+		out.write (
+			"\"");
+
+	}
+
+	@Override
+	public
 	void update (
 			Container container,
 			UpdateResult<Generic,Native> updateResult) {
@@ -153,5 +186,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			String objectType) {
 
 	}
+
+
 
 }

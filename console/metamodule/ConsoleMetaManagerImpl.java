@@ -249,14 +249,20 @@ class ConsoleMetaManagerImpl
 		ImmutableList.Builder<String> parentContextNamesBuilder =
 			ImmutableList.<String>builder ();
 
-		for (String contextLinkName
-				: contextLinkNames) {
+		for (
+			String contextLinkName
+				: contextLinkNames
+		) {
 
-			for (ResolvedConsoleContextLink resolvedContextLink
-					: resolveContextLink (contextLinkName)) {
+			for (
+				ResolvedConsoleContextLink resolvedContextLink
+					: resolveContextLink (contextLinkName)
+			) {
 
-				for (String parentContextName
-						: resolvedContextLink.parentContextNames ()) {
+				for (
+					String parentContextName
+						: resolvedContextLink.parentContextNames ()
+				) {
 
 					parentContextNamesBuilder.add (
 						stringFormat (
@@ -287,12 +293,16 @@ class ConsoleMetaManagerImpl
 				contextLinks.get (contextLinkName),
 				Collections.<ConsoleContextLink>emptyList ());
 
-		for (ConsoleContextLink contextLink
-				: contextLinksForName) {
+		for (
+			ConsoleContextLink contextLink
+				: contextLinksForName
+		) {
 
-			for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+			for (
+				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: resolveExtensionPoint (
-						contextLink.extensionPointName ())) {
+						contextLink.extensionPointName ())
+			) {
 
 				// generate
 

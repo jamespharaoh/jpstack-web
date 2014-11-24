@@ -242,7 +242,7 @@ class SimpleConsoleContextBuilder {
 					resolvedConsoleContextLink.tabPrivKey ())
 
 				.localFile (
-					"type:" + name),
+					"link:" + name),
 
 			resolvedConsoleContextLink.tabContextTypeNames ());
 
