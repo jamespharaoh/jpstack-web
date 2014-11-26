@@ -1207,10 +1207,13 @@ class ConsoleManagerImpl
 			String link =
 				pathParts.next ();
 
-			if (! equal (
+			if (
+				! equal (
 					link,
-					"-"))
+					"-")
+			) {
 				throw new RuntimeException ();
+			}
 
 			requestContext.foreignContextPath (
 				pathParts.used ());
@@ -1452,11 +1455,11 @@ class ConsoleManagerImpl
 				contextStuff.substitutePlaceholders (
 					localFile));
 
-		} else if (localFile.startsWith ("link:")) {
+		} else if (localFile.startsWith ("type:")) {
 
 			String targetContextTypeName =
 				localFile.substring (
-					"link:".length ());
+					"type:".length ());
 
 			ConsoleContextType targetContextType =
 				contextType (

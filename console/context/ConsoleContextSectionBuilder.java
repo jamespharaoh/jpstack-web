@@ -3,6 +3,7 @@ package wbs.platform.console.context;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.HashMap;
@@ -164,6 +165,22 @@ class ConsoleContextSectionBuilder {
 		for (String parentContextName
 				: resolvedExtensionPoint.parentContextNames ()) {
 
+				String resolvedContextName =
+					stringFormat (
+						"%s.%s",
+						parentContextName,
+						spec.name ());
+
+				boolean link =
+					resolvedContextName.startsWith ("link:");
+
+				String resolvedPathPrefix =
+					joinWithoutSeparator (
+						"/",
+						link
+							? resolvedContextName.substring (5)
+							: resolvedContextName);
+
 			consoleModule.addContext (
 				simpleConsoleContextProvider.get ()
 
@@ -177,13 +194,10 @@ class ConsoleContextSectionBuilder {
 					contextTypeName)
 
 				.pathPrefix (
-					stringFormat (
-						"/%s.%s",
-						parentContextName,
-						spec.name ()))
+					resolvedPathPrefix)
 
 				.global (
-					true)
+					! link)
 
 				.title (
 					label)
@@ -255,7 +269,7 @@ class ConsoleContextSectionBuilder {
 
 		tabTarget =
 			stringFormat (
-				"link:%s",
+				"type:%s",
 				contextTypeName);
 
 	}
