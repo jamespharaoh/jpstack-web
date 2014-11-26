@@ -352,13 +352,13 @@ class ObjectContextBuilder {
 					parentContextName,
 					resolvedContextLink.localName ());
 
-			boolean global =
-				! resolvedContextName.startsWith ("link:");
+			boolean link =
+				resolvedContextName.startsWith ("link:");
 
 			String resolvedPathPrefix =
 				joinWithoutSeparator (
 					"/",
-					global
+					link
 						? resolvedContextName.substring (5)
 						: resolvedContextName);
 
@@ -375,7 +375,7 @@ class ObjectContextBuilder {
 					resolvedPathPrefix + "s")
 
 				.global (
-					global)
+					! link)
 
 				.title (
 					capitalise (
@@ -400,7 +400,7 @@ class ObjectContextBuilder {
 					resolvedPathPrefix)
 
 				.global (
-					global)
+					! link)
 
 				.title (
 					objectTitle)
