@@ -149,10 +149,12 @@ class ConsoleModuleImpl
 
 			tabPlacements.add (
 				new ContextTabPlacement ()
-					.tabLocation (
-						tabLocation)
-					.tabName (
-						tab.name ()));
+
+				.tabLocation (
+					tabLocation)
+
+				.tabName (
+					tab.name ()));
 
 		}
 
