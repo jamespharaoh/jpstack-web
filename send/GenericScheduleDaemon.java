@@ -10,8 +10,8 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
+import org.apache.log4j.Logger;
 import org.joda.time.Instant;
 
 import wbs.framework.database.Database;
@@ -20,7 +20,6 @@ import wbs.framework.record.Record;
 import wbs.platform.daemon.SleepingDaemonService;
 
 @Accessors (fluent = true)
-@Log4j
 public abstract
 class GenericScheduleDaemon<
 	Service extends Record<Service>,
@@ -38,6 +37,9 @@ class GenericScheduleDaemon<
 
 	protected abstract
 	GenericSendHelper<Service,Job,Item> helper ();
+
+	protected abstract
+	Logger log ();
 
 	// details
 
@@ -82,7 +84,7 @@ class GenericScheduleDaemon<
 	protected
 	void runOnce () {
 
-		log.debug (
+		log ().debug (
 			stringFormat (
 				"Looking for scheduled broadcasts to send"));
 
@@ -142,7 +144,7 @@ class GenericScheduleDaemon<
 				job)
 		) {
 
-			log.debug (
+			log ().debug (
 				stringFormat (
 					"Not sending %s because it is not scheduled",
 					job));
@@ -159,11 +161,11 @@ class GenericScheduleDaemon<
 				job);
 
 		if (
-			scheduledTime.isBefore (
+			scheduledTime.isAfter (
 				transaction.now ())
 		) {
 
-			log.debug (
+			log ().warn (
 				stringFormat (
 					"Not sending %s because it is scheduled in the future",
 					job));
@@ -174,7 +176,7 @@ class GenericScheduleDaemon<
 
 		// move to sending state
 
-		log.info (
+		log ().info (
 			stringFormat (
 				"Sending %s",
 				job));
