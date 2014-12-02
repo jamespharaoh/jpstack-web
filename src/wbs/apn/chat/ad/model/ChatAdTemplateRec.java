@@ -37,16 +37,13 @@ class ChatAdTemplateRec
 
 	// settings
 
-	@ReferenceField (
-		nullable = true)
+	@ReferenceField
 	TextRec genericText;
 
-	@ReferenceField (
-		nullable = true)
+	@ReferenceField
 	TextRec gayMaleText;
 
-	@ReferenceField (
-		nullable = true)
+	@ReferenceField
 	TextRec gayFemaleText;
 
 	// compare to

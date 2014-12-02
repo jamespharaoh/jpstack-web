@@ -34,7 +34,8 @@
 			<object-list-page
 				fields="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				fields="create"/>
 
 		</list>
 
@@ -50,6 +51,23 @@
 	<field-set
 		name="list"
 		object-name="chatAdTemplate">
+
+		<text-field
+			name="genericText"/>
+
+		<text-field
+			name="gayMaleText"/>
+
+		<text-field
+			name="gayFemaleText"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="chatAdTemplate">
+
+		<parent-field/>
 
 		<text-field
 			name="genericText"/>
