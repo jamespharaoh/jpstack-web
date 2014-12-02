@@ -75,6 +75,8 @@ import com.google.common.base.Optional;
 public
 class ChatJoiner {
 
+	// dependencies
+
 	@Inject
 	ChatAffiliateObjectHelper chatAffiliateHelper;
 
@@ -144,6 +146,8 @@ class ChatJoiner {
 	@Inject
 	ServiceObjectHelper serviceHelper;
 
+	// properties
+
 	@Getter @Setter
 	Integer chatId;
 
@@ -167,6 +171,8 @@ class ChatJoiner {
 
 	boolean locatorEnabled = false;
 
+	// state
+
 	ChatRec chat;
 	ChatUserRec chatUser;
 	MessageRec message;
@@ -177,6 +183,8 @@ class ChatJoiner {
 	boolean gotPlace;
 	int locatorId, numberId, serviceId, affiliateId; // locator input
 	LongLat locatedLongLat; // locator output
+
+	// implementation
 
 	protected
 	void sendMagicSystem (
@@ -628,38 +636,6 @@ class ChatJoiner {
 
 		}
 
-		// send join warning
-
-		if (
-			chat.getJoinWarningEnabled ()
-			&& ! chatUser.getJoinWarningSent ()
-		) {
-
-			if (chat.getSendWarningFromShortcode ()) {
-
-				chatSendLogic.sendSystemRbFree (
-					chatUser,
-					Optional.of (message.getThreadId ()),
-					"join_warning",
-					Collections.<String,String>emptyMap ());
-
-			} else {
-
-				sendMagicSystem (
-					"join_warning",
-					chatUser.getChatScheme (),
-					"help",
-					Collections.<String,String>emptyMap ());
-
-			}
-
-			chatUser
-
-				.setJoinWarningSent (
-					true);
-
-		}
-
 		// check age
 
 		if (! chatUserLogic.gotDob (chatUser)) {
@@ -704,6 +680,38 @@ class ChatJoiner {
 				Collections.<String,String>emptyMap ());
 
 			return false;
+
+		}
+
+		// send join warning
+
+		if (
+			chat.getJoinWarningEnabled ()
+			&& ! chatUser.getJoinWarningSent ()
+		) {
+
+			if (chat.getSendWarningFromShortcode ()) {
+
+				chatSendLogic.sendSystemRbFree (
+					chatUser,
+					Optional.of (message.getThreadId ()),
+					"join_warning",
+					Collections.<String,String>emptyMap ());
+
+			} else {
+
+				sendMagicSystem (
+					"join_warning",
+					chatUser.getChatScheme (),
+					"help",
+					Collections.<String,String>emptyMap ());
+
+			}
+
+			chatUser
+
+				.setJoinWarningSent (
+					true);
 
 		}
 
