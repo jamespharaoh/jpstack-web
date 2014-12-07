@@ -23,6 +23,7 @@
 
 	<layer name="logic">
 		<bean class="logic.SubscriptionLogicImpl"/>
+		<bean class="logic.SubscriptionSendHelper"/>
 	</layer>
 
 	<layer name="console">
@@ -38,6 +39,8 @@
 
 	<layer name="daemon">
 		<bean class="daemon.SubscriptionDeliveryNoticeHandler"/>
+		<bean class="daemon.SubscriptionScheduleDaemon"/>
+		<bean class="daemon.SubscriptionSendDaemon"/>
 		<bean class="daemon.SubscriptionSubscribeCommand"/>
 		<bean class="daemon.SubscriptionUnsubscribeCommand"/>
 	</layer>
