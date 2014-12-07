@@ -43,7 +43,7 @@ class BroadcastScheduleDaemon
 	}
 
 	@Override
-	protected 
+	protected
 	Logger log () {
 		return log;
 	}

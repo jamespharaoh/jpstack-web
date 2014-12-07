@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.console.part.AbstractPagePart;
 
@@ -54,6 +55,17 @@ class ChatUserAdminOnlinePart
 
 			printFormat (
 				"<p>This user is offline</p>\n");
+
+			if (
+				chatUser.getType () == ChatUserType.user
+				&& chatUser.getFirstJoin () == null
+			) {
+
+				printFormat (
+					"<p>This user has never been online before, please don't ",
+					"bring them online unless you are sure!</p>\n");
+
+			}
 
 			printFormat (
 				"<p><input",
