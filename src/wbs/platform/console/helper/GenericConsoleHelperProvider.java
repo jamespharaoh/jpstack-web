@@ -282,14 +282,16 @@ class GenericConsoleHelperProvider
 
 			Record<?> privObject =
 				privKeySpec.delegateName () != null
-					? objectManager.dereference (
+					? (Record) objectManager.dereference (
 						object,
 						privKeySpec.delegateName ())
 					: object;
 
-			if (privChecker.can (
+			if (
+				privChecker.can (
 					privObject,
-					privKeySpec.privName ())) {
+					privKeySpec.privName ())
+			) {
 
 				contextStuff.grant (
 					privKeySpec.name ());
@@ -300,8 +302,10 @@ class GenericConsoleHelperProvider
 
 		// run chained post processors
 
-		for (RunPostProcessorSpec runPostProcessorSpec
-				: consoleHelperProviderSpec.runPostProcessors ()) {
+		for (
+			RunPostProcessorSpec runPostProcessorSpec
+				: consoleHelperProviderSpec.runPostProcessors ()
+		) {
 
 			consoleManager.get ().runPostProcessors (
 				runPostProcessorSpec.name (),
@@ -411,20 +415,25 @@ class GenericConsoleHelperProvider
 
 		if (viewPrivKeySpecs != null) {
 
-			for (PrivKeySpec privKeySpec
-					: viewPrivKeySpecs) {
+			for (
+				PrivKeySpec privKeySpec
+					: viewPrivKeySpecs
+			) {
 
 				Record privObject =
 					privKeySpec.delegateName () != null
-						? objectManager.dereference (
+						? (Record) objectManager.dereference (
 							object,
 							privKeySpec.delegateName ())
 						: object;
 
-				if (privChecker.get ().can (
+				if (
+					privChecker.get ().can (
 						privObject,
-						privKeySpec.privName ()))
+						privKeySpec.privName ())
+				) {
 					return true;
+				}
 
 			}
 
@@ -435,6 +444,7 @@ class GenericConsoleHelperProvider
 		if (viewDelegateField != null) {
 
 			Record<?> delegate =
+				(Record)
 				objectManager.dereference (
 					object,
 					viewDelegateField);

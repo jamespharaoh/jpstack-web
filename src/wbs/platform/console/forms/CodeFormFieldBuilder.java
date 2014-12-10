@@ -2,6 +2,7 @@ package wbs.platform.console.forms;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.regex.Pattern;
 
@@ -16,6 +17,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.console.helper.ConsoleHelper;
+import wbs.platform.console.helper.ConsoleObjectManager;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("codeFormFieldBuilder")
@@ -23,27 +25,24 @@ import wbs.platform.console.helper.ConsoleHelper;
 public
 class CodeFormFieldBuilder {
 
-	// prototype dependencies
+	// dependencies
 
 	@Inject
-	Provider<CodeFormFieldValueValidator>
-	codeFormFieldValueValidatorProvider;
+	ConsoleObjectManager objectManager;
+
+	// prototype dependencies
 
 	@Inject
 	Provider<CodeFormFieldConstraintValidator>
 	codeFormFieldValueConstraintValidatorProvider;
 
 	@Inject
-	Provider<ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	Provider<CodeFormFieldValueValidator>
+	codeFormFieldValueValidatorProvider;
 
 	@Inject
-	Provider<SimpleFormFieldUpdateHook>
-	simpleEventFormFieldUpdateHookProvider;
-
-	@Inject
-	Provider<UpdatableFormField>
-	updatableFormFieldProvider;
+	Provider<DelegateFormFieldAccessor>
+	delegateFormFieldAccessorProvider;
 
 	@Inject
 	Provider<IdentityFormFieldInterfaceMapping>
@@ -54,12 +53,24 @@ class CodeFormFieldBuilder {
 	identityFormFieldNativeMappingProvider;
 
 	@Inject
-	Provider<SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	Provider<ReadOnlyFormField>
+	readOnlyFormFieldProvider;
+
+	@Inject
+	Provider<SimpleFormFieldUpdateHook>
+	simpleEventFormFieldUpdateHookProvider;
+
+	@Inject
+	Provider<SpecialFormFieldAccessor>
+	specialFormFieldAccessorProvider;
 
 	@Inject
 	Provider<TextFormFieldRenderer>
 	textFormFieldRendererProvider;
+
+	@Inject
+	Provider<UpdatableFormField>
+	updatableFormFieldProvider;
 
 	// builder
 
@@ -85,17 +96,42 @@ class CodeFormFieldBuilder {
 		String name =
 			ifNull (
 				spec.name (),
-				consoleHelper.codeFieldName ());
+				spec.delegate () == null
+					? consoleHelper.codeFieldName ()
+					: null,
+				"code");
+
+		String fullName =
+			spec.delegate () == null
+				? name
+				: stringFormat (
+					"%s.%s",
+					spec.delegate (),
+					name);
 
 		String label =
 			ifNull (
 				spec.label (),
-				capitalise (consoleHelper.codeLabel ()));
+				spec.delegate () == null
+					? capitalise (
+						consoleHelper.codeLabel ())
+					: null,
+				"Code");
+
+		if (
+			spec.delegate () != null
+			&& spec.readOnly () != null
+			&& spec.readOnly () == false
+		) {
+			throw new RuntimeException ();
+		}
 
 		Boolean readOnly =
 			ifNull (
 				spec.readOnly (),
-				! consoleHelper.nameIsCode ());
+				spec.delegate () != null ? true : null,
+				consoleHelper.nameIsCode (),
+				false);
 
 		Pattern pattern =
 			spec.pattern () != null
@@ -105,13 +141,26 @@ class CodeFormFieldBuilder {
 		// accessor
 
 		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+			specialFormFieldAccessorProvider.get ()
 
-			.name (
-				name)
+			.specialName (
+				"code")
 
 			.nativeClass (
 				String.class);
+
+		if (spec.delegate () != null) {
+
+			accessor =
+				delegateFormFieldAccessorProvider.get ()
+
+				.path (
+					spec.delegate ())
+
+				.delegateFormFieldAccessor (
+					accessor);
+
+		}
 
 		// native mapping
 
@@ -142,7 +191,7 @@ class CodeFormFieldBuilder {
 			textFormFieldRendererProvider.get ()
 
 			.name (
-				name)
+				fullName)
 
 			.label (
 				label)
@@ -170,7 +219,7 @@ class CodeFormFieldBuilder {
 				readOnlyFormFieldProvider.get ()
 
 				.name (
-					name)
+					fullName)
 
 				.label (
 					label)

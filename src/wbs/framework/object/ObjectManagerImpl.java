@@ -24,6 +24,8 @@ import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 
+import com.google.common.base.Optional;
+
 @Accessors (fluent = true)
 @SingletonComponent ("objectManager")
 public
@@ -606,8 +608,8 @@ class ObjectManagerImpl
 
 	@Override
 	public
-	Record<?> dereference (
-			Record<?> object,
+	Object dereference (
+			Object object,
 			String path) {
 
 		List<String> pathParts =
@@ -615,39 +617,51 @@ class ObjectManagerImpl
 				path,
 				"\\.");
 
-		for (String pathPart
-				: pathParts) {
+		for (
+			String pathPart
+				: pathParts
+		) {
 
-			if (equal (
+			if (
+				equal (
 					pathPart,
-					"parent")) {
+					"parent")
+			) {
 
 				object =
 					getParent (
-						object);
+						(Record<?>) object);
 
-			} else if (equal (
+			} else if (
+				equal (
 					pathPart,
-					"grandparent")) {
+					"grandparent")
+			) {
 
 				object =
 					getParent (
 					getParent (
+						(Record<?>)
 						object));
 
-			} else if (equal (
+			} else if (
+				equal (
 					pathPart,
-					"greatgrandparent")) {
+					"greatgrandparent")
+			) {
 
 				object =
 					getParent (
 					getParent (
 					getParent (
+						(Record<?>)
 						object)));
 
-			} else if (equal (
+			} else if (
+				equal (
 					pathPart,
-					"root")) {
+					"root")
+			) {
 
 				object =
 					rootHelper.find (0);
@@ -665,6 +679,104 @@ class ObjectManagerImpl
 		}
 
 		return object;
+
+	}
+
+	Optional<Class<?>> parentType (
+			@NonNull Optional<Class<?>> objectClass) {
+
+		if (! objectClass.isPresent ())
+			return Optional.absent ();
+
+		ObjectHelper<?> objectHelper =
+			objectHelperForClass (
+				objectClass.get ());
+
+		if (! objectHelper.parentTypeIsFixed ())
+			return Optional.absent ();
+
+		return Optional.<Class<?>>of (
+			objectHelper.parentClass ());
+
+	}
+
+	public
+	Optional<Class<?>> dereferenceType (
+			@NonNull Optional<Class<?>> objectClass,
+			@NonNull Optional<String> path) {
+
+		if (! path.isPresent ())
+			return objectClass;
+
+		List<String> pathParts =
+			split (
+				path.get (),
+				"\\.");
+
+		for (
+			String pathPart
+				: pathParts
+		) {
+
+			if (! objectClass.isPresent ())
+				return Optional.absent ();
+
+			if (
+				equal (
+					pathPart,
+					"parent")
+			) {
+
+				objectClass =
+					parentType (
+						objectClass);
+
+			} else if (
+				equal (
+					pathPart,
+					"grandparent")
+			) {
+
+				objectClass =
+					parentType (
+					parentType (
+						objectClass));
+
+			} else if (
+				equal (
+					pathPart,
+					"greatgrandparent")
+			) {
+
+				objectClass =
+					parentType (
+					parentType (
+					parentType (
+						objectClass)));
+
+			} else if (
+				equal (
+					pathPart,
+					"root")
+			) {
+
+				objectClass =
+					Optional.<Class<?>>of (
+						rootHelper.objectClass ());
+
+			} else {
+
+				objectClass =
+					Optional.<Class<?>>of (
+						BeanLogic.propertyClass (
+							objectClass,
+							pathPart));
+
+			}
+
+		}
+
+		return objectClass;
 
 	}
 

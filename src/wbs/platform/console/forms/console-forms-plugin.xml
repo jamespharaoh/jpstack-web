@@ -3,7 +3,6 @@
 	package="console.forms">
 
 	<layer name="console">
-		<bean class="ChainFormFieldAccessor"/>
 		<bean class="CodeFormFieldBuilder"/>
 		<bean class="CodeFormFieldConstraintValidator"/>
 		<bean class="CodeFormFieldSpec"/>
@@ -13,8 +12,7 @@
 		<bean class="CurrencyFormFieldSpec"/>
 		<bean class="DateFormFieldNativeMapping"/>
 		<bean class="DateFormFieldSpec"/>
-		<bean class="DelegateFormFieldBuilder"/>
-		<bean class="DelegateFormFieldSpec"/>
+		<bean class="DelegateFormFieldAccessor"/>
 		<bean class="DeletedFormFieldBuilder"/>
 		<bean class="DeletedFormFieldSpec"/>
 		<bean class="DescriptionFormFieldBuilder"/>
@@ -68,6 +66,7 @@
 		<bean class="SecondsFormFieldSpec"/>
 		<bean class="SimpleFormFieldAccessor"/>
 		<bean class="SimpleFormFieldUpdateHook"/>
+		<bean class="SpecialFormFieldAccessor"/>
 		<bean class="TextAreaFormFieldBuilder"/>
 		<bean class="TextAreaFormFieldRenderer"/>
 		<bean class="TextAreaFormFieldSpec"/>

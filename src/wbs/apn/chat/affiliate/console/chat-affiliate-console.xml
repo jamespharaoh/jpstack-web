@@ -87,9 +87,8 @@
 		name="list"
 		object-name="chatAffiliate">
 
-		<delegate-field
+		<name-field
 			delegate="chatScheme"
-			name="name"
 			label="Scheme"/>
 
 		<name-field/>

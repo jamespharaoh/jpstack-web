@@ -1,22 +1,34 @@
 package wbs.platform.console.forms;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
+
+import javax.inject.Inject;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.entity.model.ModelField;
+import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
+import wbs.platform.console.helper.ConsoleHelper;
+import wbs.platform.console.helper.ConsoleObjectManager;
 
 @Accessors (fluent = true)
-@PrototypeComponent ("simpleFormFieldAccessor")
+@PrototypeComponent ("specialFormFieldAccessor")
 public
-class SimpleFormFieldAccessor<Container,Native>
+class SpecialFormFieldAccessor<Container extends Record<?>,Native>
 	implements FormFieldAccessor<Container,Native> {
+
+	// dependencies
+
+	@Inject
+	ConsoleObjectManager objectManager;
 
 	// properties
 
 	@Getter @Setter
-	String name;
+	String specialName;
 
 	@Getter @Setter
 	Class<? extends Native> nativeClass;
@@ -27,6 +39,23 @@ class SimpleFormFieldAccessor<Container,Native>
 	public
 	Native read (
 			Container container) {
+
+		// get field name
+
+		ConsoleHelper<?> consoleHelper =
+			objectManager.getConsoleObjectHelper (
+				container);
+
+		ModelField modelField =
+			(ModelField)
+			BeanLogic.get (
+				consoleHelper,
+				stringFormat (
+					"%sField",
+					specialName));
+
+		String name =
+			modelField.name ();
 
 		// get native object
 
@@ -68,6 +97,23 @@ class SimpleFormFieldAccessor<Container,Native>
 	void write (
 			Container container,
 			Native nativeValue) {
+
+		// get field name
+
+		ConsoleHelper<?> consoleHelper =
+			objectManager.getConsoleObjectHelper (
+				container);
+
+		ModelField modelField =
+			(ModelField)
+			BeanLogic.get (
+				consoleHelper,
+				stringFormat (
+					"%sField",
+					specialName));
+
+		String name =
+			modelField.name ();
 
 		// sanity check native type
 

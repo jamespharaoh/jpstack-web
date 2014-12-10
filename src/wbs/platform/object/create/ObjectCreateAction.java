@@ -158,7 +158,7 @@ class ObjectCreateAction
 
 			Record<?> createDelegate =
 				createPrivDelegate != null
-					? objectManager.dereference (
+					? (Record<?>) objectManager.dereference (
 						parent,
 						createPrivDelegate)
 					: parent;

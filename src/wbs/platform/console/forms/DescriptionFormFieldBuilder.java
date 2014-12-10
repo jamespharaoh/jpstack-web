@@ -2,6 +2,7 @@ package wbs.platform.console.forms;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -24,12 +25,8 @@ class DescriptionFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<SimpleFormFieldUpdateHook>
-	simpleFormFieldUpdateHookProvider;
-
-	@Inject
-	Provider<UpdatableFormField>
-	updatableFormFieldProvider;
+	Provider<DelegateFormFieldAccessor>
+	delegateFormFieldAccessorProvider;
 
 	@Inject
 	Provider<IdentityFormFieldInterfaceMapping>
@@ -52,12 +49,20 @@ class DescriptionFormFieldBuilder {
 	readOnlyFormFieldProvider;
 
 	@Inject
-	Provider<SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	Provider<SimpleFormFieldUpdateHook>
+	simpleFormFieldUpdateHookProvider;
+
+	@Inject
+	Provider<SpecialFormFieldAccessor>
+	specialFormFieldAccessorProvider;
 
 	@Inject
 	Provider<TextFormFieldRenderer>
 	textFormFieldRendererProvider;
+
+	@Inject
+	Provider<UpdatableFormField>
+	updatableFormFieldProvider;
 
 	// builder
 
@@ -85,26 +90,59 @@ class DescriptionFormFieldBuilder {
 				spec.name (),
 				consoleHelper.descriptionFieldName ());
 
+		String fullName =
+			spec.delegate () != null
+				? stringFormat (
+					"%s.%s",
+					spec.delegate (),
+					name)
+				: name;
+
 		String label =
 			ifNull (
 				spec.label (),
-				capitalise (consoleHelper.descriptionLabel ()));
+				capitalise (
+					consoleHelper.descriptionLabel ()));
+
+		if (
+			spec.delegate () != null
+			&& spec.readOnly () != null
+			&& spec.readOnly () == false
+		) {
+			throw new RuntimeException ();
+		}
 
 		Boolean readOnly =
 			ifNull (
 				spec.readOnly (),
+				spec.delegate () != null
+					? true
+					: null,
 				false);
 
 		// accessor
 
 		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+			specialFormFieldAccessorProvider.get ()
 
-			.name (
-				name)
+			.specialName (
+				"description")
 
 			.nativeClass (
 				String.class);
+
+		if (spec.delegate () != null) {
+
+			accessor =
+				delegateFormFieldAccessorProvider.get ()
+
+				.path (
+					spec.delegate ())
+
+				.delegateFormFieldAccessor (
+					accessor);
+
+		}
 
 		// native mapping
 
@@ -128,7 +166,9 @@ class DescriptionFormFieldBuilder {
 
 		FormFieldUpdateHook updateHook =
 			simpleFormFieldUpdateHookProvider.get ()
-				.name (name);
+
+			.name (
+				fullName);
 
 		// renderer
 
@@ -136,7 +176,7 @@ class DescriptionFormFieldBuilder {
 			textFormFieldRendererProvider.get ()
 
 			.name (
-				name)
+				fullName)
 
 			.label (
 				label)
@@ -156,7 +196,7 @@ class DescriptionFormFieldBuilder {
 				readOnlyFormFieldProvider.get ()
 
 				.name (
-					name)
+					fullName)
 
 				.label (
 					label)

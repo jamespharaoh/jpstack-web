@@ -21,7 +21,6 @@ import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.console.context.ConsoleContextBuilderContainer;
 import wbs.platform.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.platform.console.forms.CodeFormFieldSpec;
-import wbs.platform.console.forms.DelegateFormFieldSpec;
 import wbs.platform.console.forms.DescriptionFormFieldSpec;
 import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.forms.NameFormFieldSpec;
@@ -249,10 +248,15 @@ class ObjectListPageBuilder {
 				&& consoleHelper.parentClass () == SliceRec.class) {
 
 			formFieldSpecs.add (
-				new DelegateFormFieldSpec ()
-					.delegate ("slice")
-					.name ("description")
-					.label ("Slice"));
+				new DescriptionFormFieldSpec ()
+
+				.delegate (
+					"slice")
+
+				.label (
+					"Slice")
+
+			);
 
 		}
 

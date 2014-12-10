@@ -9,7 +9,10 @@ import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 
-public interface ObjectManagerMethods {
+import com.google.common.base.Optional;
+
+public
+interface ObjectManagerMethods {
 
 	// navigation
 
@@ -119,9 +122,13 @@ public interface ObjectManagerMethods {
 			Record<?> root,
 			boolean mini);
 
-	Record<?> dereference (
-			Record<?> object,
+	Object dereference (
+			Object object,
 			String path);
+
+	Optional<Class<?>> dereferenceType (
+			Optional<Class<?>> objectClass,
+			Optional<String> path);
 
 	// object helpers
 

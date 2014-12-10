@@ -98,18 +98,16 @@
 		name="simpleReportCsv"
 		object-name="manualResponderReport">
 
-		 <delegate-field
+		 <code-field
 			delegate="manualResponder"
-			name="code"
 			label="Service"/>
 
 		<text-field
 			name="timestring"
 			label="Timestamp"/>
 
-		<delegate-field
+		<code-field
 			delegate="user"
-			name="username"
 			label="User"/>
 
 		<integer-field
