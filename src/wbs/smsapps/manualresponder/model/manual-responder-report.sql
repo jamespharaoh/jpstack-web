@@ -6,7 +6,7 @@ AS SELECT
 	req.id AS manual_responder_request_id,
 	mr.id AS manual_responder_id,
 	u.id AS user_id,
-	to_char (req.timestamp, 'YYYY-MM-DD HH:MM:SS') AS timestring,
+	to_char (req.timestamp, 'YYYY-MM-DD HH24:MI:SS') AS timestring,
 
 	(
 		SELECT count (*)

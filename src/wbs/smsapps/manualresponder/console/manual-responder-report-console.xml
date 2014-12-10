@@ -26,6 +26,20 @@
 		<context-responder-page
 		    name="simpleCsv"/>
 
+		<context-tab-page
+			name="service"
+			title="Service"/>
+
+		<context-responder-page
+		    name="serviceCsv"/>
+
+		<context-tab-page
+			name="operator"
+			title="Operator"/>
+
+		<context-responder-page
+		    name="operatorCsv"/>
+
 	</simple-context>
 
 	<field-set
@@ -51,7 +65,7 @@
 
 		<text-field
 		    name="timestring"
-		    label="Timestamp"/>
+		    label="TimeStamp" />
 
 		<object-field
 			name="user"
@@ -62,6 +76,23 @@
 			label="Messages"/>
 
 	</field-set>
+
+	<!--
+	<field-set
+		name="serviceReportResults"
+		object-name="wbs.smsapps.manualresponder.console.ManualResponderReportServicePart$ServiceCountForm">
+
+		<text-field
+		    name="service"
+		    label="Service" />
+
+
+		<integer-field
+			name="num"
+			label="Count"/>
+
+	</field-set>
+	-->
 
 	<field-set
 		name="simpleReportCsv"

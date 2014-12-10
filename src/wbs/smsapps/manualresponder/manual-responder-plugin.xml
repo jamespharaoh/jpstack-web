@@ -31,7 +31,10 @@
 		<bean class="console.ManualResponderQueueConsolePlugin"/>
 		<bean class="console.ManualResponderReportSimplePart"/>
 		<bean class="console.ManualResponderReportSimpleCsvResponder"/>
-
+		<bean class="console.ManualResponderReportServicePart"/>
+		<bean class="console.ManualResponderReportServiceCsvResponder"/>
+		<bean class="console.ManualResponderReportOperatorPart"/>
+		<bean class="console.ManualResponderReportOperatorCsvResponder"/>
 	</layer>
 
 	<layer name="daemon">

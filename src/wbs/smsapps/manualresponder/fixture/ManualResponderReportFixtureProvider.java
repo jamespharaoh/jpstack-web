@@ -146,14 +146,14 @@ class ManualResponderReportFixtureProvider
 						.setActive (true)
 						.setSlice (testSlice));
 
-		/*UserRec dumieUser2=
+		UserRec dumieUser2=
 				userHelper.insert (
 					new UserRec ()
 						.setUsername ("dumieUser2")
 						.setPassword ("qUqP5cyxm6YcTAhz05Hph5gvu9M=")
 						.setActive (true)
 						.setSlice (testSlice));
-						*/
+
 
 		NetworkRec networkBlue = networkHelper.findByCode (
 							root,
@@ -176,16 +176,15 @@ class ManualResponderReportFixtureProvider
 					.setCode("ECAService")
 					.setDescription("ECA_Service_Description"));
 
-		/*ManualResponderRec manualResponder2 =
-			manualResponderHelper.insert(
-				new ManualResponderRec()
-					.setSlice(sliceHelper.findByCode (
-						GlobalId.root,
-						"test"))
-					.setName ("JFService")
-					.setCode("JFService")
-					.setDescription("JFMagazin_Service_Description"));
-		*/
+		ManualResponderRec manualResponder2 =
+				manualResponderHelper.insert(
+					new ManualResponderRec()
+
+						.setSlice(testSlice)
+						.setName ("ECAService2")
+						.setCode("ECAService2")
+						.setDescription("ECA_Service2_Description"));
+
 
 
 
@@ -237,6 +236,50 @@ class ManualResponderReportFixtureProvider
 					.setCreatedTime(new Date())
 					.setCharge(1)
 					);
+
+		MessageRec message2 =
+				messageHelper.insert(
+					new MessageRec()
+						.setThreadId(2)
+						.setText(textExample)
+						.setNumFrom("999999992")
+						.setNumTo("00000000002")
+						.setDirection(MessageDirection.out)
+						.setStatus(MessageStatus.pending)
+						.setNumber(numberExample)
+						.setRoute(route)
+						.setService(serviceHelper.findByCode(manualResponder,"default"))
+						.setNetwork(networkBlue)
+						.setBatch(batchHelper.find(0))   //
+						.setAffiliate(affiliate) //
+						.setDate(new LocalDate())
+						.setMessageType(messageType)
+						.setCreatedTime(new Date())
+						.setCharge(1)
+						);
+
+		MessageRec message3 =
+				messageHelper.insert(
+					new MessageRec()
+						.setThreadId(3)
+						.setText(textExample)
+						.setNumFrom("999999993")
+						.setNumTo("00000000003")
+						.setDirection(MessageDirection.out)
+						.setStatus(MessageStatus.pending)
+						.setNumber(numberExample)
+						.setRoute(route)
+						.setService(serviceHelper.findByCode(manualResponder,"default"))
+						.setNetwork(networkBlue)
+						.setBatch(batchHelper.find(0))   //
+						.setAffiliate(affiliate) //
+						.setDate(new LocalDate())
+						.setMessageType(messageType)
+						.setCreatedTime(new Date())
+						.setCharge(1)
+						);
+
+
 		QueueRec queue = queueHelper.find(1);
 
 		@SuppressWarnings("unused")
@@ -275,6 +318,34 @@ class ManualResponderReportFixtureProvider
 			queueSubject.setActiveItems (
 				queueSubject.getActiveItems () + 1);
 
+
+			QueueItemRec queueItem2 =
+					queueItemHelper.insert (
+						new QueueItemRec ()
+
+							.setQueueSubject (queueSubject)
+							.setIndex (queueSubject.getTotalItems ())
+
+							.setQueue (queue)
+
+							.setSource ("source_exammplee")
+							.setDetails ("details_example")
+							.setRefObjectId (127)
+
+							.setState (QueueItemState.pending)
+
+							.setCreatedTime (new Date())
+							.setPendingTime (new Date())
+							.setProcessedUser(dumieUser2));
+
+				// update queue subject
+
+				queueSubject.setTotalItems (
+					queueSubject.getTotalItems () + 1);
+
+				queueSubject.setActiveItems (
+					queueSubject.getActiveItems () + 1);
+
 		@SuppressWarnings("unused")
 		ManualResponderRequestRec manualResponderRequest =
 			manualResponderRequestHelper.insert(
@@ -288,6 +359,36 @@ class ManualResponderReportFixtureProvider
 					.setNumber(numberExample)
 					.setQueueItem(queueItem)
 					);
+
+
+		@SuppressWarnings("unused")
+		ManualResponderRequestRec manualResponderRequest2 =
+			manualResponderRequestHelper.insert(
+				new ManualResponderRequestRec()
+
+					.setManualResponder(manualResponder)
+					.setMessage(message2)
+					.setTimestamp(new Date())
+					.setUser(dumieUser1)
+					.setPending(true)
+					.setNumber(numberExample)
+					.setQueueItem(queueItem)
+					);
+
+		@SuppressWarnings("unused")
+		ManualResponderRequestRec manualResponderRequest3 =
+			manualResponderRequestHelper.insert(
+				new ManualResponderRequestRec()
+
+					.setManualResponder(manualResponder2)
+					.setMessage(message3)
+					.setTimestamp(new Date())
+					.setUser(dumieUser2)
+					.setPending(true)
+					.setNumber(numberExample)
+					.setQueueItem(queueItem2)
+					);
+
 
 
 	}
