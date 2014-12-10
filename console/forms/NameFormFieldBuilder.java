@@ -2,6 +2,7 @@ package wbs.platform.console.forms;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -24,16 +25,24 @@ class NameFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<NameFormFieldUpdateHook>
-	nameFormFieldUpdateHookProvider;
+	Provider<DelegateFormFieldAccessor>
+	delegateFormFieldAccessorProvider;
 
 	@Inject
 	Provider<IdentityFormFieldInterfaceMapping>
 	identityFormFieldInterfaceMappingProvider;
 
 	@Inject
+	Provider<NameFormFieldAccessor>
+	nameFormFieldAccessorProvider;
+
+	@Inject
 	Provider<IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
+
+	@Inject
+	Provider<NameFormFieldUpdateHook>
+	nameFormFieldUpdateHookProvider;
 
 	@Inject
 	Provider<NameFormFieldConstraintValidator>
@@ -46,10 +55,6 @@ class NameFormFieldBuilder {
 	@Inject
 	Provider<ReadOnlyFormField>
 	readOnlyFormFieldProvider;
-
-	@Inject
-	Provider<NameFormFieldAccessor>
-	nameFormFieldAccessorProvider;
 
 	@Inject
 	Provider<TextFormFieldRenderer>
@@ -83,16 +88,42 @@ class NameFormFieldBuilder {
 		String name =
 			ifNull (
 				spec.name (),
-				consoleHelper.nameFieldName ());
+				spec.delegate () == null
+					? consoleHelper.nameFieldName ()
+					: null,
+				"name");
+
+		String fullName =
+			spec.delegate () != null
+				? stringFormat (
+					"%s.%s",
+					spec.delegate (),
+					name)
+				: name;
 
 		String label =
 			ifNull (
 				spec.label (),
-				capitalise (consoleHelper.nameLabel ()));
+				spec.delegate () == null
+					? capitalise (
+						consoleHelper.nameLabel ())
+					: null,
+				"Name");
+
+		if (
+			spec.delegate () != null
+			&& spec.readOnly () != null
+			&& spec.readOnly () == false
+		) {
+			throw new RuntimeException ();
+		}
 
 		Boolean readOnly =
 			ifNull (
 				spec.readOnly (),
+				spec.delegate () != null
+					? true
+					: null,
 				false);
 
 		// accessor
@@ -102,6 +133,19 @@ class NameFormFieldBuilder {
 
 			.consoleHelper (
 				consoleHelper);
+
+		if (spec.delegate () != null) {
+
+			accessor =
+				delegateFormFieldAccessorProvider.get ()
+
+				.path (
+					spec.delegate ())
+
+				.delegateFormFieldAccessor (
+					accessor);
+
+		}
 
 		// native mapping
 
@@ -132,7 +176,7 @@ class NameFormFieldBuilder {
 			textFormFieldRendererProvider.get ()
 
 			.name (
-				name)
+				fullName)
 
 			.label (
 				label)
@@ -157,7 +201,7 @@ class NameFormFieldBuilder {
 				readOnlyFormFieldProvider.get ()
 
 				.name (
-					name)
+					fullName)
 
 				.label (
 					label)
@@ -183,7 +227,7 @@ class NameFormFieldBuilder {
 				updatableFormFieldProvider.get ()
 
 				.name (
-					name)
+					fullName)
 
 				.label (
 					label)

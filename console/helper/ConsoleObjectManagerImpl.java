@@ -24,6 +24,8 @@ import wbs.framework.utils.etc.Html;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.text.model.TextRec;
 
+import com.google.common.base.Optional;
+
 /**
  * Performs console-relevant operations on DataObjects such as resolving names
  * and checking privs. At the back end this delegates to ObjectHelper objects
@@ -738,12 +740,23 @@ class ConsoleObjectManagerImpl
 
 	@Override
 	public
-	Record<?> dereference (
-			Record<?> object,
+	Object dereference (
+			Object object,
 			String path) {
 
 		return objectManager.dereference (
 			object,
+			path);
+
+	}
+
+	public
+	Optional<Class<?>> dereferenceType (
+			Optional<Class<?>> objectClass,
+			Optional<String> path) {
+
+		return objectManager.dereferenceType (
+			objectClass,
 			path);
 
 	}

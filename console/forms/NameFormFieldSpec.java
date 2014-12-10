@@ -19,6 +19,9 @@ class NameFormFieldSpec {
 	String name;
 
 	@DataAttribute
+	String delegate;
+
+	@DataAttribute
 	String label;
 
 	@DataAttribute

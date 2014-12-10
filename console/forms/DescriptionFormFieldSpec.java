@@ -22,6 +22,9 @@ class DescriptionFormFieldSpec {
 	String name;
 
 	@DataAttribute
+	String delegate;
+
+	@DataAttribute
 	Integer size;
 
 	@DataAttribute

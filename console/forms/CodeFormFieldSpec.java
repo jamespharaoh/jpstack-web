@@ -22,6 +22,9 @@ class CodeFormFieldSpec {
 	String name;
 
 	@DataAttribute
+	String delegate;
+
+	@DataAttribute
 	Integer size;
 
 	@DataAttribute
