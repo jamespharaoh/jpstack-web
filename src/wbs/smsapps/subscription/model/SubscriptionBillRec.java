@@ -1,4 +1,4 @@
-package wbs.sms.template.model;
+package wbs.smsapps.subscription.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -7,24 +7,24 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
+import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.IndexField;
-import wbs.framework.entity.annotations.MinorEntity;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.record.MinorRecord;
+import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
-import wbs.sms.route.router.model.RouterRec;
+import wbs.sms.message.core.model.MessageRec;
 
 @Accessors (chain = true)
 @Data
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id")
-@MinorEntity
+@CommonEntity
 public
-class TemplatePartRec
-	implements MinorRecord<TemplatePartRec> {
+class SubscriptionBillRec
+	implements CommonRecord<SubscriptionBillRec> {
 
 	// id
 
@@ -34,41 +34,48 @@ class TemplatePartRec
 	// identity
 
 	@ParentField
-	TemplateVersionRec templateVersion;
+	SubscriptionNumberRec subscriptionNumber;
 
 	@IndexField
 	Integer index;
 
-	// settings
+	// details
 
 	@ReferenceField
-	RouterRec router;
+	MessageRec message;
+
+	// times
 
 	@SimpleField
-	String number = "";
+	Integer createdTime;
+
+	@SimpleField (
+		nullable = true)
+	Integer deliveredTime;
+
+	// state
 
 	@SimpleField
-	String message = "";
+	SubscriptionBillState state;
 
 	// compare to
 
-	@Override
 	public
 	int compareTo (
-			Record<TemplatePartRec> otherRecord) {
+			Record<SubscriptionBillRec> otherRecord) {
 
-		TemplatePartRec other =
-			(TemplatePartRec) otherRecord;
+		SubscriptionBillRec other =
+			(SubscriptionBillRec) otherRecord;
 
 		return new CompareToBuilder ()
 
 			.append (
-				getTemplateVersion (),
-				other.getTemplateVersion ())
+				other.getCreatedTime (),
+				getCreatedTime ())
 
 			.append (
-				getIndex (),
-				other.getIndex ())
+				other.getId (),
+				getId ())
 
 			.toComparison ();
 

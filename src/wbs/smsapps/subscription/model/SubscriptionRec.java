@@ -23,7 +23,9 @@ import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
 import wbs.platform.scaffold.model.SliceRec;
+import wbs.platform.text.model.TextRec;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.sms.route.router.model.RouterRec;
 
 @Accessors (chain = true)
 @Data
@@ -62,20 +64,49 @@ class SubscriptionRec
 
 	@ReferenceField (
 		nullable = true)
-	RouteRec freeRoute;
+	RouteRec billedRoute;
 
-	@SimpleField
-	String freeNumber = "";
+	@SimpleField (
+		nullable = true)
+	String billedNumber;
 
 	@ReferenceField (
 		nullable = true)
-	RouteRec billedRoute;
+	TextRec billedMessage;
 
-	@SimpleField
-	String billedNumber = "";
+	@ReferenceField (
+		nullable = true)
+	RouterRec freeRouter;
+
+	@SimpleField (
+		nullable = true)
+	String freeNumber = "";
+
+	@SimpleField (
+		nullable = true)
+	Integer creditsPerBill;
+
+	@SimpleField (
+		nullable = true)
+	Integer debitsPerSend;
+
+	// messages
+
+	@ReferenceField (
+		nullable = true)
+	TextRec subscribeMessageText;
+
+	@ReferenceField (
+		nullable = true)
+	TextRec unsubscribeMessageText;
+
+	// statistics
 
 	@SimpleField
 	Integer numSubscribers = 0;
+
+	@SimpleField
+	Integer numSendsTotal = 0;
 
 	// children
 

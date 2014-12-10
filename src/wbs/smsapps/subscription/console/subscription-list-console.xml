@@ -41,7 +41,8 @@
 			<object-list-page
 				fields="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				fields="create"/>
 
 		</list>
 
@@ -65,6 +66,15 @@
 
 	<field-set
 		name="list"
+		object-name="subscriptionList">
+
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="create"
 		object-name="subscriptionList">
 
 		<name-field/>

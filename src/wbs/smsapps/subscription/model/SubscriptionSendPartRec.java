@@ -9,7 +9,8 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.framework.entity.annotations.EphemeralEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
-import wbs.framework.entity.annotations.ReferenceField;
+import wbs.framework.entity.annotations.IdentityReferenceField;
+import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.Record;
@@ -23,20 +24,25 @@ public
 class SubscriptionSendPartRec
 	implements EphemeralRecord<SubscriptionSendPartRec> {
 
+	// id
+
 	@GeneratedIdField
 	Integer id;
 
-	@ReferenceField
+	// identity
+
+	@ParentField
 	SubscriptionSendRec subscriptionSend;
 
-	@SimpleField
-	Integer i;
+	@IdentityReferenceField
+	SubscriptionListRec subscriptionList;
+
+	// details
 
 	@SimpleField
 	String text;
 
-	@SimpleField
-	Boolean bill;
+	// compare to
 
 	@Override
 	public
@@ -53,8 +59,8 @@ class SubscriptionSendPartRec
 				other.getSubscriptionSend ())
 
 			.append (
-				getI (),
-				other.getI ())
+				getSubscriptionList (),
+				other.getSubscriptionList ())
 
 			.toComparison ();
 

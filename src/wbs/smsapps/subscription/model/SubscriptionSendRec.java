@@ -1,6 +1,5 @@
 package wbs.smsapps.subscription.model;
 
-import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
@@ -13,14 +12,17 @@ import org.joda.time.Instant;
 
 import wbs.framework.entity.annotations.CollectionField;
 import wbs.framework.entity.annotations.CommonEntity;
+import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
+import wbs.framework.entity.annotations.IndexField;
+import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
+import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.message.batch.model.BatchRec;
-import wbs.sms.template.model.TemplateRec;
 
 @Accessors (chain = true)
 @Data
@@ -38,66 +40,80 @@ class SubscriptionSendRec
 
 	// identity
 
-	@ReferenceField
+	@ParentField
 	SubscriptionRec subscription;
 
-	// TODO?
+	@IndexField
+	Integer index;
 
 	// details
 
-	@SimpleField
-	Date timestamp = new Date ();
+	@DescriptionField
+	String description;
 
-	@ReferenceField
-	TemplateRec template;
-
-	@ReferenceField
-	UserRec user;
-
-	@ReferenceField
-	UserRec creatorUser;
-
-	@ReferenceField
-	UserRec senderUser;
-
-	@ReferenceField
-	UserRec cancellerUser;
-
-	@ReferenceField
+	@ReferenceField (
+		nullable = true)
 	BatchRec batch;
 
-	@SimpleField
-	Date createdTime;
+	// settings
+
+	/*
+	@ReferenceField
+	TemplateRec template;
+	*/
+
+	// users
+
+	@ReferenceField
+	UserRec createdUser;
+
+	@ReferenceField (
+		nullable = true)
+	UserRec sentUser;
+
+	@ReferenceField (
+		nullable = true)
+	UserRec cancelledUser;
+
+	// times
 
 	@SimpleField
-	Date sentTime;
+	Instant createdTime;
 
-	@SimpleField
-	Date cancelledTime;
+	@SimpleField (
+		nullable = true)
+	Instant sentTime;
 
-	@SimpleField
-	Date scheduledTime;
+	@SimpleField (
+		nullable = true)
+	Instant cancelledTime;
 
-	@SimpleField
-	Date scheduledForTime;
+	@SimpleField (
+		nullable = true)
+	Instant scheduledTime;
+
+	@SimpleField (
+		nullable = true)
+	Instant scheduledForTime;
 
 	// statistics
 
 	@SimpleField
-	Integer numParts;
+	Integer numParts = 0;
 
 	@SimpleField
-	Integer numRecipients;
+	Integer numRecipients = 0;
 
 	// state
 
 	@SimpleField
-	SubscriptionSendState state;
+	SubscriptionSendState state =
+		SubscriptionSendState.notSent;
 
 	// children
 
 	@CollectionField (
-		index = "i")
+		index = "index")
 	List<SubscriptionSendPartRec> parts;
 
 	// compare to
@@ -113,8 +129,8 @@ class SubscriptionSendRec
 		return new CompareToBuilder ()
 
 			.append (
-				other.getTimestamp (),
-				getTimestamp ())
+				other.getCreatedTime (),
+				getCreatedTime ())
 
 			.append (
 				other.getId (),
@@ -133,6 +149,50 @@ class SubscriptionSendRec
 
 		List<SubscriptionSendRec> findScheduled (
 				Instant now);
+
+	}
+
+	// object hooks
+
+	public static
+	class SubscriptionSendHooks
+		extends AbstractObjectHooks<SubscriptionSendRec> {
+
+		// implementation
+
+		@Override
+		public
+		void beforeInsert (
+				SubscriptionSendRec subscriptionSend) {
+
+			SubscriptionRec subscription =
+				subscriptionSend.getSubscription ();
+
+			// set index
+
+			subscriptionSend
+
+				.setIndex (
+					subscription.getNumSendsTotal ());
+
+		}
+
+		@Override
+		public
+		void afterInsert (
+				SubscriptionSendRec subscriptionSend) {
+
+			SubscriptionRec subscription =
+				subscriptionSend.getSubscription ();
+
+			// update parent counts
+
+			subscription
+
+				.setNumSendsTotal (
+					subscription.getNumSendsTotal () + 1);
+
+		}
 
 	}
 

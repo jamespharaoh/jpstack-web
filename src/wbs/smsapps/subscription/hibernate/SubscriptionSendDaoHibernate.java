@@ -1,7 +1,5 @@
 package wbs.smsapps.subscription.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.List;
 
 import org.hibernate.criterion.Restrictions;
@@ -56,7 +54,7 @@ class SubscriptionSendDaoHibernate
 			.add (
 				Restrictions.le (
 					"_subscriptionSend.scheduledForTime",
-					instantToDate (now)))
+					now))
 
 			.list ());
 

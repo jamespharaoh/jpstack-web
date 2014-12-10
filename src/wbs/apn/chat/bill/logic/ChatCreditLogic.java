@@ -72,15 +72,19 @@ interface ChatCreditLogic {
 	 * @param retry
 	 *            if true then revoked credit will be retried also
 	 */
-	void userBill (ChatUserRec chatUser, boolean retry);
+	void userBill (
+			ChatUserRec chatUser,
+			boolean retry);
 
 	void userBillReal (
 			ChatUserRec chatUser,
 			boolean updateRevoked);
 
-	int userBillLimitAmount (ChatUserRec chatUser);
+	int userBillLimitAmount (
+			ChatUserRec chatUser);
 
-	boolean userBillLimitApplies (ChatUserRec chatUser);
+	boolean userBillLimitApplies (
+			ChatUserRec chatUser);
 
 	/**
 	 * Sends a credit hint to a chat user, unless they are barred or blocked or

@@ -1,8 +1,6 @@
 package wbs.smsapps.subscription.logic;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNull;
 
 import java.util.List;
@@ -16,20 +14,14 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHelper;
-import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.send.GenericSendHelper;
 import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.text.model.TextRec;
 import wbs.sms.message.batch.model.BatchObjectHelper;
 import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.batch.model.BatchSubjectObjectHelper;
 import wbs.sms.message.batch.model.BatchSubjectRec;
-import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.logic.MessageSender;
-import wbs.sms.template.model.TemplatePartRec;
-import wbs.sms.template.model.TemplateVersionRec;
 import wbs.smsapps.subscription.model.SubscriptionObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionRec;
 import wbs.smsapps.subscription.model.SubscriptionSendNumberObjectHelper;
@@ -149,8 +141,7 @@ class SubscriptionSendHelper
 			SubscriptionRec subscription,
 			SubscriptionSendRec subscriptionSend) {
 
-		return dateToInstant (
-			subscriptionSend.getScheduledForTime ());
+		return subscriptionSend.getScheduledForTime ();
 
 	}
 
@@ -221,8 +212,7 @@ class SubscriptionSendHelper
 				SubscriptionSendState.sending)
 
 			.setSentTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setBatch (
 				batch);
@@ -282,6 +272,7 @@ class SubscriptionSendHelper
 			SubscriptionSendRec subscriptionSend,
 			SubscriptionSendNumberRec subscriptionSendNumber) {
 
+		/*
 		TemplateVersionRec templateVersion =
 			subscriptionSend.getTemplate ().getTemplateVersion ();
 
@@ -403,6 +394,7 @@ class SubscriptionSendHelper
 			}
 
 		}
+		*/
 
 	}
 

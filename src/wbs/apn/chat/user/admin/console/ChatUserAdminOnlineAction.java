@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 import lombok.Cleanup;
 import wbs.apn.chat.contact.model.ChatMessageMethod;
@@ -12,7 +11,6 @@ import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -30,9 +28,6 @@ class ChatUserAdminOnlineAction
 	extends ConsoleAction {
 
 	// dependencies
-
-	@Inject
-	Provider<ChatJoiner> chatJoinerProvider;
 
 	@Inject
 	ChatMiscLogic chatMiscLogic;

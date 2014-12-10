@@ -167,6 +167,9 @@
 		<yes-no-field
 			name="sendDobRequestFromShortcode"/>
 
+		<yes-no-field
+			name="billDuringJoin"/>
+
 		<seconds-field
 			name="maxAlarmTime"
 			label="Maximum alarm time"/>

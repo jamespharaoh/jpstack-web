@@ -2,7 +2,9 @@
 	name="subscription-number">
 
 	<console-helper-provider
-		object-name="subscriptionNumber">
+		object-name="subscriptionNumber"
+		view-delegate-field="parent"
+		view-delegate-priv-code="manage">
 
 		<priv-key
 			name="subscriptionNumber.manage"
@@ -127,7 +129,7 @@
 			name="lastJoin"/>
 
 		<object-field
-			name="subscripionList"
+			name="subscriptionList"
 			finder="subscriptionList"/>
 
 		<object-field

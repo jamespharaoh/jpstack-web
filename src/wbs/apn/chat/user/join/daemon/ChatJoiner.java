@@ -708,6 +708,14 @@ class ChatJoiner {
 
 			}
 
+			if (chat.getBillDuringJoin ()) {
+
+				chatCreditLogic.userBillReal (
+					chatUser,
+					false);
+
+			}
+
 			chatUser
 
 				.setJoinWarningSent (

@@ -34,7 +34,8 @@
 			<object-list-page
 				fields="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				fields="create"/>
 
 		</list>
 
@@ -72,6 +73,25 @@
 	</field-set>
 
 	<field-set
+		name="create"
+		object-name="subscriptionKeyword">
+
+		<code-field/>
+		<description-field/>
+
+		<object-field
+			name="subscriptionList"
+			label="List"
+			finder="subscriptionList"/>
+
+		<object-field
+			name="subscriptionAffiliate"
+			label="Affiliate"
+			finder="subscriptionAffiliate"/>
+
+	</field-set>
+
+	<field-set
 		name="summary"
 		object-name="subscriptionKeyword">
 
@@ -79,6 +99,7 @@
 		<parent-field/>
 		<code-field/>
 		<description-field/>
+		<deleted-field/>
 
 		<object-field
 			name="subscriptionList"
@@ -100,6 +121,7 @@
 		<parent-field read-only="yes"/>
 		<code-field/>
 		<description-field/>
+		<deleted-field/>
 
 		<object-field
 			name="subscriptionList"

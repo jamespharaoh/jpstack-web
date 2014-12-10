@@ -164,7 +164,8 @@ writeBuildFile worldConfig = do
 			sattr "debug" "on",
 			sattr "includeantruntime" "false",
 			sattr "srcdir" "src",
-			sattr "classpathref" "classpath"
+			sattr "classpathref" "classpath",
+			sattr "encoding" "utf8"
 		] ++ attrs) []
 
 	let makeCleanTargets =

@@ -32,7 +32,8 @@
 			<object-list-page
 				fields="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				fields="create"/>
 
 		</list>
 
@@ -63,6 +64,15 @@
 
 		<integer-field
 			name="numSubscribers"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="subscriptionAffiliate">
+
+		<name-field/>
+		<description-field/>
 
 	</field-set>
 

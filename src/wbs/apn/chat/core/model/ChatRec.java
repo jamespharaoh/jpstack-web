@@ -200,6 +200,9 @@ class ChatRec
 	@SimpleField
 	Boolean sendDobRequestFromShortcode = false;
 
+	@SimpleField
+	Boolean billDuringJoin = false;
+
 	// ad settings
 
 	@SimpleField

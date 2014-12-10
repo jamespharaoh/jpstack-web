@@ -10,7 +10,7 @@ SELECT object_type_insert (
 	'subscription_keyword',
 	'subscription keyword',
 	'subscription',
-	4);
+	1);
 
 SELECT object_type_insert (
 	'subscription_list',
@@ -46,6 +46,12 @@ SELECT object_type_insert (
 	'subscription_send_number',
 	'subscription send number',
 	'subscription_send',
+	3);
+
+SELECT object_type_insert (
+	'subscription_bill',
+	'subscription bill',
+	'subscription_number',
 	3);
 
 ---------------------------------------- INSERT command_type
@@ -199,13 +205,6 @@ SELECT batch_type_insert (
 	'send',
 	'Subscription send',
 	'subscription_send');
-
---------------------------------------- INSERT template_type
-
-SELECT template_type_insert (
-	'subscription_send',
-	'default',
-	'Messages to send');
 
 --------------------------------------- INSERT delivery_type
 

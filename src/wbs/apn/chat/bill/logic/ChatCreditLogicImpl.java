@@ -634,7 +634,7 @@ class ChatCreditLogicImpl
 	}
 
 	/**
-	 * Bills the user by sending allMessages, if appropriate.
+	 * Bills the user by sending messages, if appropriate.
 	 *
 	 * The retry parameter indicates we can retry revoked credit. This is only
 	 * set when something has happened which prevents users who are not being
@@ -914,20 +914,16 @@ class ChatCreditLogicImpl
 		String message =
 			chatHelpTemplate.getText ();
 
-		// TODO Mediaburst switchover - remove once O2 catches up
-		// Hard coded route switch for mediaburst change-over, put back to
-		// normal when O2 switchover is complete
-		// Network ID 4 is O2 network ID
-		// route ID 68 is new 88211 route, 33 is old 88211 route
-		// route ID 69 is new 84469 route, 41 is old 84469 route
-
 		// and send it
 
 		ServiceRec billService =
-			serviceHelper.findByCode (chat, "bill");
+			serviceHelper.findByCode (
+				chat,
+				"bill");
 
 		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (chatUser);
+			chatUserLogic.getAffiliate (
+				chatUser);
 
 		messageSender.get ()
 
@@ -964,12 +960,6 @@ class ChatCreditLogicImpl
 			.setCreditDailyAmount (
 				+ chatUser.getCreditDailyAmount ()
 				+ route.getOutCharge ());
-
-		/*
-		 * if (APPLY_BILL_LIMIT) { if
-		 * (chatUser.getDailyBilledStart().before(testDate)) {
-		 * chatUser.setDailyBilledStart(new GregorianCalendar()); } }
-		 */
 
 		chatUser
 

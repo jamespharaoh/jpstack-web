@@ -67,6 +67,12 @@
 				label="Numbers"
 				priv-key="subscription.manage"/>
 
+			<context-link
+				name="send"
+				link="subscriptionSend"
+				label="Sends"
+				priv-key="subscription.manage"/>
+
 			<object-sms-messages-page/>
 
 			<object-sms-stats-page/>
@@ -98,12 +104,7 @@
 		<description-field/>
 		<deleted-field/>
 
-		<object-field
-			name="freeRoute"
-			finder="route"/>
-
-		<text-field
-			name="freeNumber"/>
+		<!-- settings -->
 
 		<object-field
 			name="billedRoute"
@@ -111,6 +112,30 @@
 
 		<text-field
 			name="billedNumber"/>
+
+		<text-area-field
+			name="billedMessage"/>
+
+		<object-field
+			name="freeRouter"
+			finder="router"/>
+
+		<text-field
+			name="freeNumber"/>
+
+		<integer-field
+			name="creditsPerBill"/>
+
+		<integer-field
+			name="debitsPerSend"/>
+
+		<text-area-field
+			name="subscribeMessageText"/>
+
+		<text-area-field
+			name="unsubscribeMessageText"/>
+
+		<!-- statistics -->
 
 		<integer-field
 			name="numSubscribers"/>
@@ -128,18 +153,34 @@
 		<deleted-field/>
 
 		<object-field
-			name="freeRoute"
-			finder="route"/>
+			name="billedRoute"
+			finder="route"
+			nullable="yes"/>
 
 		<text-field
-			name="freeNumber"/>
+			name="billedNumber"
+			nullable="yes"/>
+
+		<text-area-field
+			name="billedMessage"
+			nullable="yes"/>
 
 		<object-field
-			name="billedRoute"
-			finder="route"/>
+			name="freeRouter"
+			finder="router"
+			nullable="yes"/>
 
 		<text-field
-			name="billedNumber"/>
+			name="freeNumber"
+			nullable="yes"/>
+
+		<integer-field
+			name="creditsPerBill"
+			nullable="yes"/>
+
+		<integer-field
+			name="debitsPerSend"
+			nullable="yes"/>
 
 	</field-set>
 

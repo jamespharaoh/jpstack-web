@@ -26,7 +26,7 @@
   </target>
   <target name="just-build-framework">
     <mkdir dir="work/bin"/>
-    <javac destdir="work/bin" debug="on" includeantruntime="false" srcdir="src" classpathref="classpath" includes="wbs/framework/**"/>
+    <javac destdir="work/bin" debug="on" includeantruntime="false" srcdir="src" classpathref="classpath" encoding="utf8" includes="wbs/framework/**"/>
     <mkdir dir="work/bin/META-INF/services"/>
     <echo file="work/bin/META-INF/services/javax.annotation.processing.Processor" message="wbs.framework.object.ObjectHelperAnnotationProcessor"/>
   </target>
@@ -37,7 +37,7 @@
     </jar>
   </target>
   <target name="just-build-rest">
-    <javac destdir="work/bin" debug="on" includeantruntime="false" srcdir="src" classpathref="classpath" excludes="wbs/framework/**"/>
+    <javac destdir="work/bin" debug="on" includeantruntime="false" srcdir="src" classpathref="classpath" encoding="utf8" excludes="wbs/framework/**"/>
     <copy todir="work/bin">
       <fileset dir="src">
         <include name="**/*.xml"/>
@@ -104,7 +104,6 @@
       <fileset dir="src/wbs/platform/script/language/console/files"/>
       <fileset dir="src/wbs/platform/script/system/console/files"/>
       <fileset dir="src/wbs/platform/script/core/console/files"/>
-      <fileset dir="src/wbs/platform/send/console/files"/>
       <fileset dir="src/wbs/platform/service/console/files"/>
       <fileset dir="src/wbs/platform/text/console/files"/>
       <fileset dir="src/wbs/platform/user/console/files"/>
@@ -149,7 +148,6 @@
       <fileset dir="src/wbs/sms/route/test/console/files"/>
       <fileset dir="src/wbs/sms/route/tester/console/files"/>
       <fileset dir="src/wbs/sms/smpp/console/files"/>
-      <fileset dir="src/wbs/sms/template/console/files"/>
       <fileset dir="src/wbs/sms/tracker/console/files"/>
       <fileset dir="src/wbs/sms/message/wap/console/files"/>
       <fileset dir="src/wbs/sms/customer/console/files"/>
@@ -282,7 +280,6 @@
       <fileset dir="src/wbs/platform/script/language/api/files"/>
       <fileset dir="src/wbs/platform/script/system/api/files"/>
       <fileset dir="src/wbs/platform/script/core/api/files"/>
-      <fileset dir="src/wbs/platform/send/api/files"/>
       <fileset dir="src/wbs/platform/service/api/files"/>
       <fileset dir="src/wbs/platform/text/api/files"/>
       <fileset dir="src/wbs/platform/user/api/files"/>
@@ -327,7 +324,6 @@
       <fileset dir="src/wbs/sms/route/test/api/files"/>
       <fileset dir="src/wbs/sms/route/tester/api/files"/>
       <fileset dir="src/wbs/sms/smpp/api/files"/>
-      <fileset dir="src/wbs/sms/template/api/files"/>
       <fileset dir="src/wbs/sms/tracker/api/files"/>
       <fileset dir="src/wbs/sms/message/wap/api/files"/>
       <fileset dir="src/wbs/sms/customer/api/files"/>
@@ -494,7 +490,6 @@
       <fileset dir="src/wbs/platform/script/language/console/files"/>
       <fileset dir="src/wbs/platform/script/system/console/files"/>
       <fileset dir="src/wbs/platform/script/core/console/files"/>
-      <fileset dir="src/wbs/platform/send/console/files"/>
       <fileset dir="src/wbs/platform/service/console/files"/>
       <fileset dir="src/wbs/platform/text/console/files"/>
       <fileset dir="src/wbs/platform/user/console/files"/>
@@ -539,7 +534,6 @@
       <fileset dir="src/wbs/sms/route/test/console/files"/>
       <fileset dir="src/wbs/sms/route/tester/console/files"/>
       <fileset dir="src/wbs/sms/smpp/console/files"/>
-      <fileset dir="src/wbs/sms/template/console/files"/>
       <fileset dir="src/wbs/sms/tracker/console/files"/>
       <fileset dir="src/wbs/sms/message/wap/console/files"/>
       <fileset dir="src/wbs/sms/customer/console/files"/>
@@ -672,7 +666,6 @@
       <fileset dir="src/wbs/platform/script/language/api/files"/>
       <fileset dir="src/wbs/platform/script/system/api/files"/>
       <fileset dir="src/wbs/platform/script/core/api/files"/>
-      <fileset dir="src/wbs/platform/send/api/files"/>
       <fileset dir="src/wbs/platform/service/api/files"/>
       <fileset dir="src/wbs/platform/text/api/files"/>
       <fileset dir="src/wbs/platform/user/api/files"/>
@@ -717,7 +710,6 @@
       <fileset dir="src/wbs/sms/route/test/api/files"/>
       <fileset dir="src/wbs/sms/route/tester/api/files"/>
       <fileset dir="src/wbs/sms/smpp/api/files"/>
-      <fileset dir="src/wbs/sms/template/api/files"/>
       <fileset dir="src/wbs/sms/tracker/api/files"/>
       <fileset dir="src/wbs/sms/message/wap/api/files"/>
       <fileset dir="src/wbs/sms/customer/api/files"/>
@@ -908,7 +900,6 @@
       <script name="src/wbs/sms/route/router/model/router.sql"/>
       <script name="src/wbs/sms/route/sender/model/sender.sql"/>
       <script name="src/wbs/sms/route/tester/model/route-tester.sql"/>
-      <script name="src/wbs/sms/template/model/template.sql"/>
       <script name="src/wbs/sms/tracker/model/sms-simple-tracker.sql"/>
       <script name="src/wbs/sms/tracker/model/sms-tracker.sql"/>
       <script name="src/wbs/sms/customer/model/sms-customer.sql"/>
@@ -973,7 +964,6 @@
       <script name="src/wbs/sms/route/sender/model/sender-data.sql"/>
       <script name="src/wbs/sms/route/tester/model/route-tester-data.sql"/>
       <script name="src/wbs/sms/smpp/model/smpp-data.sql"/>
-      <script name="src/wbs/sms/template/model/template-data.sql"/>
       <script name="src/wbs/sms/tracker/model/sms-tracker-data.sql"/>
       <script name="src/wbs/sms/tracker/model/sms-simple-tracker-data.sql"/>
       <script name="src/wbs/sms/message/wap/model/wap-push-data.sql"/>

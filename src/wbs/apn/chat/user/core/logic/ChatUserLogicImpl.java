@@ -1000,7 +1000,7 @@ class ChatUserLogicImpl
 				Optional.of (
 					mimeType),
 				message,
-				true);
+				append);
 
 			break;
 
@@ -1012,7 +1012,7 @@ class ChatUserLogicImpl
 				Optional.of (filename),
 				Optional.of (mimeType),
 				null,
-				true);
+				append);
 
 			break;
 
@@ -1022,7 +1022,7 @@ class ChatUserLogicImpl
 				chatUser,
 				data,
 				null,
-				true);
+				append);
 
 			break;
 
