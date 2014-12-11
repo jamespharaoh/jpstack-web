@@ -6,14 +6,6 @@ import java.util.Map;
 public
 interface ModelMethods {
 
-	Class<?> objectClass ();
-	String objectName ();
-	String objectTypeCode ();
-
-	String tableName ();
-	Boolean create ();
-	Boolean mutable ();
-
 	ModelField idField ();
 	ModelField parentField ();
 	ModelField parentTypeField ();

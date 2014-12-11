@@ -11,8 +11,8 @@ interface ConsoleHelper<ObjectType extends Record<ObjectType>>
 	extends
 		ConsoleHelperMethods<ObjectType>,
 		EntityFinder<ObjectType>,
-		ModelMethods,
 		ObjectHelperMethods<ObjectType>,
-		ObjectLookup<ObjectType> {
+		ObjectLookup<ObjectType>,
+		ModelMethods {
 
 }
