@@ -10,6 +10,9 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.experimental.Accessors;
+
+import org.apache.log4j.Logger;
+
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.Record;
@@ -30,6 +33,9 @@ class GenericSendDaemon<
 	Database database;
 
 	// hooks
+
+	protected abstract
+	Logger log ();
 
 	protected abstract
 	GenericSendHelper<Service,Job,Item> helper ();
@@ -83,6 +89,10 @@ class GenericSendDaemon<
 		Transaction transaction =
 			database.beginReadOnly ();
 
+		log ().debug (
+			stringFormat (
+				"Looking for jobs in sending state"));
+
 		List<Job> jobs =
 			helper ().findSendingJobs ();
 
@@ -116,6 +126,11 @@ class GenericSendDaemon<
 	void runJob (
 			int jobId) {
 
+		log ().debug (
+			stringFormat (
+				"Performing send for %s",
+				jobId));
+
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite ();
@@ -133,7 +148,14 @@ class GenericSendDaemon<
 				service,
 				job)
 		) {
+
+			log ().debug (
+				stringFormat (
+					"Not sending job %s",
+					jobId));
+
 			return;
+
 		}
 
 		if (
@@ -141,7 +163,14 @@ class GenericSendDaemon<
 				service,
 				job)
 		) {
+
+			log ().warn (
+				stringFormat (
+					"Not configured job %s",
+					jobId));
+
 			return;
+
 		}
 
 		List<Item> items =
@@ -155,6 +184,11 @@ class GenericSendDaemon<
 		) {
 
 			// handle completion
+
+			log ().debug (
+				stringFormat (
+					"Triggering completion for job %s",
+					jobId));
 
 			helper ().sendComplete (
 				service,
@@ -179,6 +213,11 @@ class GenericSendDaemon<
 
 				if (itemVerified) {
 
+					log ().debug (
+						stringFormat (
+							"Sending item %s",
+							item.getId ()));
+
 					// send item
 
 					helper ().sendItem (
@@ -187,6 +226,11 @@ class GenericSendDaemon<
 						item);
 
 				} else {
+
+					log ().debug (
+						stringFormat (
+							"Rejecting item %s",
+							item.getId ()));
 
 					// reject it
 
@@ -204,6 +248,11 @@ class GenericSendDaemon<
 		// commit transaction
 
 		transaction.commit ();
+
+		log ().debug (
+			stringFormat (
+				"Finished send for job %s",
+				jobId));
 
 	}
 

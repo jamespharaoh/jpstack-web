@@ -56,7 +56,7 @@ class ObjectSettingsPart
 	Set<ScriptRef> scriptRefs () {
 
 		Set<ScriptRef> scriptRefs =
-			new HashSet<ScriptRef>();
+			new HashSet<ScriptRef> ();
 
 		scriptRefs.addAll (
 			formFieldSet.scriptRefs ());
