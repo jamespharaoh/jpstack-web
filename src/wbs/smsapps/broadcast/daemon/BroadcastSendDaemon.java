@@ -2,6 +2,10 @@ package wbs.smsapps.broadcast.daemon;
 
 import javax.inject.Inject;
 
+import lombok.extern.log4j.Log4j;
+
+import org.apache.log4j.Logger;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.send.GenericSendDaemon;
 import wbs.platform.send.GenericSendHelper;
@@ -10,6 +14,7 @@ import wbs.smsapps.broadcast.model.BroadcastConfigRec;
 import wbs.smsapps.broadcast.model.BroadcastNumberRec;
 import wbs.smsapps.broadcast.model.BroadcastRec;
 
+@Log4j
 @SingletonComponent ("broadcastSendDaemon")
 public
 class BroadcastSendDaemon
@@ -36,6 +41,14 @@ class BroadcastSendDaemon
 	> helper () {
 
 		return broadcastSendHelper;
+
+	}
+
+	@Override
+	protected
+	Logger log () {
+
+		return log;
 
 	}
 

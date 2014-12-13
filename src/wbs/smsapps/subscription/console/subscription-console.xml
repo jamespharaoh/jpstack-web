@@ -40,42 +40,61 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"/>
+			<section
+				name="settings"
+				label="Settings">
 
-			<context-link
-				name="keyword"
-				link="subscriptionKeyword"
-				label="Keywords"
-				priv-key="subscription.manage"/>
+				<object-settings-page
+					short-name="general"
+					fields="settings"/>
 
-			<context-link
-				name="list"
-				link="subscriptionList"
-				label="Lists"
-				priv-key="subscription.manage"/>
+				<context-link
+					name="keyword"
+					link="subscriptionKeyword"
+					label="Keywords"
+					priv-key="subscription.manage"/>
 
-			<context-link
-				name="affiliate"
-				link="subscriptionAffiliate"
-				label="Affiliates"
-				priv-key="subscription.affiliate"/>
+				<context-link
+					name="list"
+					link="subscriptionList"
+					label="Lists"
+					priv-key="subscription.manage"/>
 
-			<context-link
-				name="number"
-				link="subscriptionNumber"
-				label="Numbers"
-				priv-key="subscription.manage"/>
+				<context-link
+					name="affiliate"
+					link="subscriptionAffiliate"
+					label="Affiliates"
+					priv-key="subscription.affiliate"/>
 
-			<context-link
-				name="send"
-				link="subscriptionSend"
-				label="Sends"
-				priv-key="subscription.manage"/>
+			</section>
 
-			<object-sms-messages-page/>
+			<section
+				name="admin"
+				label="Admin">
 
-			<object-sms-stats-page/>
+				<context-link
+					name="number"
+					link="subscriptionNumber"
+					label="Numbers"
+					priv-key="subscription.manage"/>
+
+				<context-link
+					name="send"
+					link="subscriptionSend"
+					label="Sends"
+					priv-key="subscription.manage"/>
+
+			</section>
+
+			<section
+				name="reporting"
+				label="Reporting">
+
+				<object-sms-messages-page/>
+
+				<object-sms-stats-page/>
+
+			</section>
 
 			<object-events-page/>
 

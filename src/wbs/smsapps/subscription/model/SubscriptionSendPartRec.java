@@ -7,13 +7,15 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
+import wbs.framework.entity.annotations.DeletedField;
 import wbs.framework.entity.annotations.EphemeralEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.IdentityReferenceField;
 import wbs.framework.entity.annotations.ParentField;
-import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.record.EphemeralRecord;
+import wbs.framework.entity.annotations.ReferenceField;
+import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
+import wbs.platform.text.model.TextRec;
 
 @Accessors (chain = true)
 @Data
@@ -22,7 +24,7 @@ import wbs.framework.record.Record;
 @EphemeralEntity
 public
 class SubscriptionSendPartRec
-	implements EphemeralRecord<SubscriptionSendPartRec> {
+	implements MinorRecord<SubscriptionSendPartRec> {
 
 	// id
 
@@ -39,8 +41,13 @@ class SubscriptionSendPartRec
 
 	// details
 
-	@SimpleField
-	String text;
+	@DeletedField
+	Boolean deleted = false;
+
+	// settings
+
+	@ReferenceField
+	TextRec text;
 
 	// compare to
 

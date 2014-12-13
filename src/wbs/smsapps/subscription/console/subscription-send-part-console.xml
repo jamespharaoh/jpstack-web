@@ -1,0 +1,113 @@
+<console-module
+	name="subscription-send-part">
+
+	<console-helper-provider
+		object-name="subscriptionSendPart"
+		view-delegate-field="grandparent"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="subscriptionSendPart.manage"
+			delegate="grandparent"
+			priv="manage"/>
+
+		<context-stuff
+			name="subscriptionSendPartName"
+			delegate="subscriptionList"
+			field="name"/>
+
+		<context-stuff
+			name="subscriptionSendId"
+			delegate="subscriptionSend"
+			field="id"/>
+
+		<run-post-processor
+			name="subscriptionSend"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="subscriptionSendPart"
+		object-name="subscriptionSendPart">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"
+				create-priv-delegate="grandparent"
+				create-priv-code="manager"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="subscriptionSendPart">
+
+		<object-field
+			name="subscriptionList"
+			finder="subscriptionList"/>
+
+		<text-area-field
+			name="text"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="subscriptionSendPart">
+
+		<object-field
+			name="subscriptionList"
+			finder="subscriptionList"/>
+
+		<text-area-field
+			name="text"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="subscriptionSendPart">
+
+		<id-field/>
+		<parent-field/>
+		<deleted-field/>
+
+		<object-field
+			name="subscriptionList"
+			finder="subscriptionList"/>
+
+		<text-area-field
+			name="text"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="subscriptionSendPart">
+
+		<deleted-field/>
+
+		<text-area-field
+			name="text"/>
+
+	</field-set>
+
+</console-module>

@@ -1,0 +1,82 @@
+<console-module
+	name="subscription-send-number">
+
+	<console-helper-provider
+		object-name="subscriptionSendNumber"
+		view-delegate-field="grandparent"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="subscriptionSendNumber.manage"
+			delegate="grandparent"
+			priv="manage"/>
+
+		<context-stuff
+			name="subscriptionSendNumberName"
+			delegate="number"
+			field="number"/>
+
+		<context-stuff
+			name="subscriptionSendId"
+			delegate="subscriptionSend"
+			field="id"/>
+
+		<run-post-processor
+			name="subscriptionSend"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="subscriptionSendNumber"
+		object-name="subscriptionSendNumber">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="subscriptionSendNumber">
+
+		<object-field
+			name="number"
+			finder="number"/>
+
+		<enum-field
+			name="state"
+			helper="subscriptionSendNumberStateConsoleHelper"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="subscriptionSendNumber">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="number"
+			finder="number"/>
+
+		<enum-field
+			name="state"
+			helper="subscriptionSendNumberStateConsoleHelper"/>
+
+	</field-set>
+
+</console-module>

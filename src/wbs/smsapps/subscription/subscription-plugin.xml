@@ -37,6 +37,8 @@
 		<bean class="console.SubscriptionNumberAdvice"/>
 		<bean class="console.SubscriptionNumberLinkProvider"/>
 		<bean class="console.SubscriptionNumberOverviewPart"/>
+		<bean class="console.SubscriptionSendControlAction"/>
+		<bean class="console.SubscriptionSendControlPart"/>
 	</layer>
 
 	<layer name="daemon">
@@ -54,6 +56,8 @@
 		<console-module name="subscription-list"/>
 		<console-module name="subscription-number"/>
 		<console-module name="subscription-send"/>
+		<console-module name="subscription-send-number"/>
+		<console-module name="subscription-send-part"/>
 	</console-modules>
 
 	<fixtures>

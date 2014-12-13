@@ -11,11 +11,14 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
+import wbs.framework.entity.annotations.IdentityReferenceField;
+import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.sms.message.core.model.MessageRec;
+import wbs.sms.number.core.model.NumberRec;
 
 @Accessors (chain = true)
 @Data
@@ -33,13 +36,16 @@ class SubscriptionSendNumberRec
 
 	// identity
 
-	@ReferenceField
+	@ParentField
 	SubscriptionSendRec subscriptionSend;
+
+	@IdentityReferenceField
+	NumberRec number;
+
+	// details
 
 	@ReferenceField
 	SubscriptionSubRec subscriptionSub;
-
-	// details
 
 	@SimpleField
 	Integer threadId;

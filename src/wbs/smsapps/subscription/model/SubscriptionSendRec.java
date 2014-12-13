@@ -99,9 +99,6 @@ class SubscriptionSendRec
 	// statistics
 
 	@SimpleField
-	Integer numParts = 0;
-
-	@SimpleField
 	Integer numRecipients = 0;
 
 	// state
