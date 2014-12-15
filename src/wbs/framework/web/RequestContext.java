@@ -20,7 +20,8 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.log4j.Logger;
 
-public interface RequestContext {
+public
+interface RequestContext {
 
 	HttpServletRequest request ();
 
@@ -143,6 +144,10 @@ public interface RequestContext {
 	boolean isMultipart ();
 
 	List<FileItem> fileItems ()
+		throws FileUploadException;
+
+	FileItem fileItem (
+			 String name)
 		throws FileUploadException;
 
 	String header (

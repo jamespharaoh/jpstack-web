@@ -3,6 +3,7 @@ package wbs.framework.web;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -543,6 +544,33 @@ class RequestContextImpl
 				request ());
 
 		return fileItems;
+
+	}
+
+	@Override
+	public
+	FileItem fileItem (
+			String fieldName)
+		throws FileUploadException {
+
+		for (
+			FileItem fileItem
+				: fileItems ()
+		) {
+
+			if (
+				notEqual (
+					fileItem.getFieldName (),
+					fieldName)
+			) {
+				continue;
+			}
+
+			return fileItem;
+
+		}
+
+		return null;
 
 	}
 

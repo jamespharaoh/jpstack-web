@@ -98,6 +98,11 @@ class ChatUserImageListPart
 		printFormat (
 			"<form",
 			" method=\"post\"",
+			" action=\"%h\"",
+			requestContext.resolveLocalUrl (
+				stringFormat (
+					"/chatUser.%s.list",
+					type.name ())),
 			">\n");
 
 		printFormat (
@@ -125,8 +130,10 @@ class ChatUserImageListPart
 
 		int index = 0;
 
-		for (ChatUserImageRec chatUserImage
-				: chatUserImages) {
+		for (
+			ChatUserImageRec chatUserImage
+				: chatUserImages
+		) {
 
 			printFormat (
 				"<tr>\n",

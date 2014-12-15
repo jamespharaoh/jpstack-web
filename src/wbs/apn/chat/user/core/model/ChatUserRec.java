@@ -984,8 +984,14 @@ class ChatUserRec
 
 			// set free mode for some numbers
 
-			if (number.getFree ())
-				chatUser.setCreditMode (ChatUserCreditMode.free);
+			if (number.getFree ()) {
+
+				chatUser
+
+					.setCreditMode (
+						ChatUserCreditMode.free);
+
+			}
 
 			chatUserHelper.insert (
 				chatUser);

@@ -510,6 +510,11 @@ class ChatCreditLogicImpl
 				"userCreditOk (%s)",
 				chatUser.getId ()));
 
+		// monitors always pass
+
+		if (chatUser.getType () == ChatUserType.monitor)
+			return ChatCreditCheckResult.monitor;
+
 		// deleted users always fail
 
 		if (chatUser.getNumber () == null)

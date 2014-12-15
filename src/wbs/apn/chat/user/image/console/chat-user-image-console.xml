@@ -57,4 +57,17 @@
 
 	</extend-context>
 
+	<field-set
+		name="uploadForm"
+		class="wbs.apn.chat.user.image.console.ChatUserImageUploadForm">
+
+		<upload-field
+			name="upload"
+			label="File to upload"/>
+
+		<yes-no-field
+			name="setAsPrimary"/>
+
+	</field-set>
+
 </console-module>

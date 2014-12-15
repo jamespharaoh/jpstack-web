@@ -88,6 +88,9 @@
 		<bean class="TimestampToFormFieldInterfaceMapping"/>
 		<bean class="TimestampToFormFieldSpec"/>
 		<bean class="UpdatableFormField"/>
+		<bean class="UploadFormFieldBuilder"/>
+		<bean class="UploadFormFieldRenderer"/>
+		<bean class="UploadFormFieldSpec"/>
 		<bean class="YesNoFormFieldBuilder"/>
 		<bean class="YesNoFormFieldRenderer"/>
 		<bean class="YesNoFormFieldSpec"/>

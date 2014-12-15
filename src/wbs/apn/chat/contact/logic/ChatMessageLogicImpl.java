@@ -269,14 +269,15 @@ class ChatMessageLogicImpl
 
 		}
 
-		String message =
+		String logMessage =
 			stringFormat (
 				"Sending user message from %s to %s: %s",
 				fromUser.getCode (),
 				toUser.getCode (),
 				text);
 
-		log.info (message);
+		log.info (
+			logMessage);
 
 		// check if the message should be blocked
 
@@ -291,7 +292,7 @@ class ChatMessageLogicImpl
 
 		boolean blocked =
 			chatBlock != null
-			|| toCreditCheckResult.passed ();
+			|| toCreditCheckResult.failed ();
 
 		// update chat user stats
 

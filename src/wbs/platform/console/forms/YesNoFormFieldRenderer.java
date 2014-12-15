@@ -11,7 +11,12 @@ import javax.inject.Inject;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.console.request.ConsoleRequestContext;
 
@@ -190,10 +195,50 @@ class YesNoFormFieldRenderer<Container>
 	}
 
 	@Override
+	@SneakyThrows (FileUploadException.class)
 	public
 	boolean formValuePresent () {
 
-		return requestContext.parameter (name ()) != null;
+		if (requestContext.isMultipart ()) {
+
+			FileItem fileItem =
+				requestContext.fileItem (
+					name ());
+
+			return fileItem != null;
+
+		} else {
+
+			String parameterValue =
+				requestContext.parameter (
+					name ());
+
+			return parameterValue != null;
+
+		}
+
+	}
+
+	@SneakyThrows (FileUploadException.class)
+	String formValue () {
+
+		if (requestContext.isMultipart ()) {
+
+			FileItem fileItem =
+				requestContext.fileItem (
+					name ());
+
+			return fileItem.getString ();
+
+		} else {
+
+			String parameterValue =
+				requestContext.parameter (
+					name ());
+
+			return parameterValue;
+
+		}
 
 	}
 
@@ -203,8 +248,7 @@ class YesNoFormFieldRenderer<Container>
 			List<String> errors) {
 
 		String formValue =
-			requestContext.parameter (
-				name ());
+			formValue ();
 
 		return stringToBoolean (
 			formValue);
