@@ -11,6 +11,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
+import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.core.logic.ChatLogicHooks;
 import wbs.apn.chat.core.logic.ChatLogicHooks.ChatUserCharge;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
@@ -33,6 +35,9 @@ class ChatUserSummaryPart
 	extends AbstractPagePart {
 
 	// dependencies
+
+	@Inject
+	ChatCreditLogic chatCreditLogic;
 
 	@Inject
 	ChatLogicHooks chatHooks;
@@ -64,6 +69,7 @@ class ChatUserSummaryPart
 	// state
 
 	ChatUserRec chatUser;
+	ChatCreditCheckResult creditCheckResult;
 
 	List<ChatLogicHooks.ChatUserCharge>
 		internalChatUserCharges,
@@ -78,6 +84,10 @@ class ChatUserSummaryPart
 		chatUser =
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
+
+		creditCheckResult =
+			chatCreditLogic.userCreditCheck (
+				chatUser);
 
 		internalChatUserCharges =
 			new ArrayList<ChatLogicHooks.ChatUserCharge> ();
@@ -402,15 +412,21 @@ class ChatUserSummaryPart
 				"<tr> <th>Credit mode</th> <td>%h</td> </tr>\n",
 				chatUser.getCreditMode ());
 
-			// "<tr> <th>Credit pending</th> <td>%s</td> </tr>\n",
-			// ChatConsoleStuff.credit (chatUser.getCreditPending
-			// ()),
+			printFormat (
+				"<tr>\n",
+				"<th>Credit check</th>\n",
+				"<td>%h</td>\n",
+				creditCheckResult.details (),
+				"</tr>\n");
 
 			printFormat (
-				"<tr> <th>Credit pending strict</th> <td>%s</td> </tr>\n",
+				"<tr>\n",
+				"<th>Credit pending strict</th>\n",
+				"<td>%s</td>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditPendingStrict ()));
+					chatUser.getCreditPendingStrict ()),
+				"</tr>\n");
 
 			printFormat (
 				"<tr> <th>Credit success</th> <td>%s</td> </tr>\n",
@@ -418,25 +434,11 @@ class ChatUserSummaryPart
 					chatUser.getChat ().getCurrency (),
 					chatUser.getCreditSuccess ()));
 
-			// "<tr> <th>Credit failed no retry</th> <td>%s</td>
-			// </tr>\n",
-			// ChatConsoleStuff.credit (chatUser.getCreditFailed
-			// ()),
-
 			printFormat (
 				"<tr> <th>Credit awaiting retry</th> <td>%s</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
 					chatUser.getCreditRevoked ()));
-
-			// "<tr> <th>Credit already retried</th> <td>%s</td>
-			// </tr>\n",
-			// ChatConsoleStuff.credit (chatUser.getCreditRetried
-			// ()),
-
-			// "<tr> <th>Credit no reports</th> <td>%s</td>
-			// </tr>\n",
-			// ChatConsoleStuff.credit (chatUser.getCreditSent ()),
 
 			printFormat (
 				"<tr> <th>Free usage</th> <td>%s</td> </tr>\n",
@@ -476,16 +478,6 @@ class ChatUserSummaryPart
 
 			printFormat (
 				"<tr class=\"sep\">\n");
-
-			/*
-			pf ("<tr> <th>Credit owed</th> <td>%s</td> </tr>\n",
-				ChatConsoleStuff.credit (
-					chatUser.getCreditPendingStrict ()
-						+ chatUser.getCreditRevoked ()
-						- chatUser.getCredit ()));
-
-			pf ("<tr class=\"sep\">\n");
-			*/
 
 			printFormat (
 				"<tr>\n",

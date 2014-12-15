@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.NonNull;
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.core.model.ChatRec;
@@ -118,11 +119,13 @@ class ChatPhotoCommand
 
 		// send barred users to help
 
-		if (! chatCreditLogic.userSpendCheck (
+		ChatCreditCheckResult creditCheckResult =
+			chatCreditLogic.userSpendCreditCheck (
 				chatUser,
 				true,
-				message.getThreadId (),
-				false)) {
+				message.getThreadId ());
+
+		if (creditCheckResult.failed ()) {
 
 			chatHelpLogLogic.createChatHelpLogIn (
 				chatUser,
@@ -134,6 +137,7 @@ class ChatPhotoCommand
 			transaction.commit ();
 
 			return null;
+
 		}
 
 		String text =

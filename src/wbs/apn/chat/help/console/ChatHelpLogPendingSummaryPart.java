@@ -10,8 +10,8 @@ import javax.inject.Inject;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
-import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.apn.chat.core.console.ChatConsoleLogic;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
@@ -187,19 +187,18 @@ class ChatHelpLogPendingSummaryPart
 
 			"</tr>\n");
 
-		if (chatUser.getCreditMode () == ChatUserCreditMode.strict) {
+		ChatCreditCheckResult creditCheckResult =
+			chatCreditLogic.userCreditCheck (
+				chatUser);
 
-			printFormat (
-				"<tr>\n",
+		printFormat (
+			"<tr>\n",
+			"<th>Credit check</th>\n",
 
-				"<th>Temp barred</th>\n",
+			"<td>%h</td>\n",
+			creditCheckResult.details (),
 
-				"<td>%h</td>\n",
-				chatCreditLogic.userStrictCreditOk (chatUser) ? "no" : "yes",
-
-				"</tr>\n");
-
-		}
+			"</tr>\n");
 
 		printFormat (
 			"</table>\n");

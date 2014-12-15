@@ -27,6 +27,7 @@ import org.joda.time.Instant;
 
 import wbs.apn.chat.approval.model.ChatApprovalRegexpObjectHelper;
 import wbs.apn.chat.approval.model.ChatApprovalRegexpRec;
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.model.ChatBlockObjectHelper;
 import wbs.apn.chat.contact.model.ChatBlockRec;
@@ -219,18 +220,19 @@ class ChatMessageLogicImpl
 
 		// ignore messages from barred users
 
-		if (
-			! chatCreditLogic.userSpendCheck (
+		ChatCreditCheckResult fromCreditCheckResult =
+			chatCreditLogic.userSpendCreditCheck (
 				fromUser,
 				true,
-				threadId,
-				false)
-		) {
+				threadId);
+
+		if (fromCreditCheckResult.failed ()) {
 
 			String errorMessage =
 				stringFormat (
-					"Ignoring message from barred user %s",
-					fromUser.getCode ());
+					"Ignoring message from barred user %s (%s)",
+					fromUser.getCode (),
+					fromCreditCheckResult.details ());
 
 			log.info (
 				errorMessage);
@@ -283,9 +285,13 @@ class ChatMessageLogicImpl
 				toUser,
 				fromUser);
 
+		ChatCreditCheckResult toCreditCheckResult =
+			chatCreditLogic.userCreditCheck (
+				toUser);
+
 		boolean blocked =
 			chatBlock != null
-			|| ! chatCreditLogic.userReceiveCheck (toUser);
+			|| toCreditCheckResult.passed ();
 
 		// update chat user stats
 

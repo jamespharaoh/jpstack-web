@@ -1,7 +1,5 @@
 package wbs.apn.chat.bill.model;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -22,6 +20,8 @@ import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.Record;
 import wbs.sms.network.model.NetworkRec;
+
+import com.google.common.base.Optional;
 
 @Accessors (chain = true)
 @Data
@@ -82,7 +82,7 @@ class ChatNetworkRec
 	public static
 	interface ChatNetworkObjectHelperMethods {
 
-		ChatNetworkRec forUserRequired (
+		Optional<ChatNetworkRec> forUser (
 			ChatUserRec chatUser);
 
 	}
@@ -98,7 +98,7 @@ class ChatNetworkRec
 
 		@Override
 		public
-		ChatNetworkRec forUserRequired (
+		Optional<ChatNetworkRec> forUser (
 				ChatUserRec chatUser) {
 
 			ChatNetworkRec chatNetwork =
@@ -106,17 +106,8 @@ class ChatNetworkRec
 					chatUser.getChat (),
 					chatUser.getNumber ().getNetwork ());
 
-			if (chatNetwork == null) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"No chat network for %s (%s)",
-						chatUser,
-						chatUser.getNumber ().getNetwork ()));
-
-			}
-
-			return chatNetwork;
+			return Optional.fromNullable (
+				chatNetwork);
 
 		}
 

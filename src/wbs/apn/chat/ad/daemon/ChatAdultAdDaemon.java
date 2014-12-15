@@ -10,6 +10,7 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.model.ChatHelpTemplateObjectHelper;
@@ -196,15 +197,26 @@ class ChatAdultAdDaemon
 
 		}
 
-		if (! chatCreditLogic.userCreditOk (chatUser, false)) {
+		ChatCreditCheckResult creditCheckResult =
+			chatCreditLogic.userCreditCheck (
+				chatUser);
+
+		if (creditCheckResult.failed ()) {
 
 			log.info (
 				stringFormat (
-					"Skipping adult ad to %s (failed credit check)",
-					objectManager.objectPath (chatUser)));
+					"Skipping adult ad to %s (%s)",
+					objectManager.objectPath (
+						chatUser),
+					creditCheckResult.details ()));
 
-			chatUser.setNextAdultAd (null);
+			chatUser
+
+				.setNextAdultAd (
+					null);
+
 			transaction.commit ();
+
 			return;
 
 		}

@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 import wbs.apn.chat.ad.model.ChatAdTemplateRec;
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
@@ -184,26 +185,19 @@ class ChatAdDaemon
 
 		// do a credit and number check
 
-		if (chatUser.getNumber () == null) {
+		ChatCreditCheckResult creditCheckResult =
+			chatCreditLogic.userCreditCheck (
+				chatUser);
+
+		if (
+			creditCheckResult.failed ()
+		) {
 
 			log.info (
 				stringFormat (
-					"Skipping ad to %s (no number)",
-					objectManager.objectPath (chatUser)));
-
-		} else if (chatUser.getNumber ().getNetwork ().getId () == 0) {
-
-			log.info (
-				stringFormat (
-					"Skipping ad to %s (network unknown)",
-					objectManager.objectPath (chatUser)));
-
-		} else if (! chatCreditLogic.userCreditOk (chatUser, false)) {
-
-			log.info (
-				stringFormat (
-					"Skipping ad to %s (failed credit check)",
-					objectManager.objectPath (chatUser)));
+					"Skipping ad to %s (%s)",
+					objectManager.objectPath (chatUser),
+					creditCheckResult.details ()));
 
 		} else if (chatUser.getFirstJoin () == null) {
 

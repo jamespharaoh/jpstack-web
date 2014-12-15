@@ -420,41 +420,19 @@ class ChatCreditLogicImpl
 		return chatUserSpend;
 	}
 
-	/**
-	 * Returns true if the user should receive non-billed content.
-	 */
 	@Override
 	public
-	boolean userReceiveCheck (
-			ChatUserRec chatUser) {
-
-		if (chatUser.getBlockAll ())
-			return false;
-
-		if (chatUser.getType () == ChatUserType.monitor)
-			return true;
-
-		return userCreditOk (
-			chatUser,
-			false);
-
-	}
-
-	@Override
-	public
-	boolean userSpendCheck (
+	ChatCreditCheckResult userSpendCreditCheck (
 			ChatUserRec chatUser,
 			boolean userActed,
-			Integer threadId,
-			boolean allowBlocked) {
+			Integer threadId) {
 
 		log.debug (
 			stringFormat (
-				"userSpendCheck (%s, %s, %s, %s)",
+				"userSpendCheck (%s, %s, %s)",
 				chatUser.getId (),
 				userActed ? "yes" : "no",
-				threadId,
-				allowBlocked));
+				threadId));
 
 		// if user acted then clear block and send pending bill
 
@@ -473,93 +451,98 @@ class ChatCreditLogicImpl
 
 		// check their credit
 
-		if (
-			userCreditOk (
-				chatUser,
-				allowBlocked)
-		) {
+		ChatCreditCheckResult creditCheckResult =
+			userCreditCheck (
+				chatUser);
 
-			// credit ok, clear any credit hint
+		// if credit ok, clear credit hint
+
+		if (creditCheckResult.passed ()) {
 
 			chatUser
 
 				.setLastCreditHint (
 					null);
 
-			// and return success
+		}
 
-			return true;
+		// if credit bad, and acted, send credit hint
 
-		} else {
+		if (
+			creditCheckResult.failed ()
+			&& userActed
+		) {
 
-			// credit bad, if they acted send them a hint
+			userCreditHint (
+				chatUser,
+				threadId);
 
-			if (userActed)
+		}
 
-				userCreditHint (
-					chatUser,
-					threadId);
+		// if credit bad, log them off and cancel ad
 
-			// log them off
+		if (creditCheckResult.failed ()) {
 
 			chatUserLogic.logoff (
 				chatUser,
 				threadId == null);
 
-			// unschedule any ad
+			chatUser
 
-			chatUser.setNextAd (null);
-
-			// and return failure
-
-			return false;
+				.setNextAd (
+					null);
 
 		}
+
+		// return
+
+		return creditCheckResult;
 
 	}
 
 	@Override
 	public
-	boolean userCreditOk (
-			ChatUserRec chatUser,
-			boolean allowBlocked) {
+	ChatCreditCheckResult userCreditCheck (
+			ChatUserRec chatUser) {
 
 		log.debug (
 			stringFormat (
-				"userCreditOk (%s, %s)",
-				chatUser.getId (),
-				allowBlocked ? "true" : "false"));
+				"userCreditOk (%s)",
+				chatUser.getId ()));
 
 		// deleted users always fail
 
 		if (chatUser.getNumber () == null)
-			return false;
+			return ChatCreditCheckResult.failedNoNumber;
 
 		// blocked users fail unless the caller disables this check
 
-		if (chatUser.getBlockAll () && ! allowBlocked)
-			return false;
+		if (chatUser.getBlockAll ())
+			return ChatCreditCheckResult.failedBlocked;
 
 		// barred users always fail
 
 		if (chatUser.getBarred ())
-			return false;
+			return ChatCreditCheckResult.failedBarred;
 
 		// further checks based on credit mode
 
 		switch (chatUser.getCreditMode ()) {
 
 		case strict:
-			return userStrictCreditOk (chatUser);
+			return userCreditCheckStrict (
+				chatUser);
 
 		case prePay:
-			return userPrepayCreditOk (chatUser);
+			return userCreditCheckPrepay (
+				chatUser);
 
 		case barred:
-			return false;
+			return ChatCreditCheckResult.failedBarred;
 
 		case free:
-			return true;
+			return ChatCreditCheckResult.passedFree;
+
 		}
 
 		throw new RuntimeException ();
@@ -568,7 +551,7 @@ class ChatCreditLogicImpl
 
 	@Override
 	public
-	boolean userStrictCreditOk (
+	ChatCreditCheckResult userCreditCheckStrict (
 			ChatUserRec chatUser) {
 
 		// sanity check
@@ -579,19 +562,25 @@ class ChatCreditLogicImpl
 		// check network
 
 		if (chatUser.getNumber ().getNetwork ().getId () == 0)
-			return false;
+			return ChatCreditCheckResult.failedNoNetwork;
 
-		ChatNetworkRec chatNetwork =
-			chatNetworkHelper.forUserRequired (
+		Optional<ChatNetworkRec> chatNetworkOptional =
+			chatNetworkHelper.forUser (
 				chatUser);
 
+		if (! chatNetworkOptional.isPresent ())
+			return ChatCreditCheckResult.failedInvalidNetwork;
+
+		ChatNetworkRec chatNetwork =
+			chatNetworkOptional.get ();
+
 		if (! chatNetwork.getAllowReverseBill ())
-			return false;
+			return ChatCreditCheckResult.failedReverseBillDisabledForNetwork;
 
 		// can't check credit without a scheme
 
 		if (chatUser.getChatScheme () == null)
-			return true;
+			return ChatCreditCheckResult.failedNoChatScheme;
 
 		// check credit
 
@@ -602,12 +591,17 @@ class ChatCreditLogicImpl
 		ChatSchemeChargesRec charges =
 			chatUser.getChatScheme ().getCharges ();
 
-		return effectiveCredit >= - charges.getCreditLimit ()
-				&& effectiveCredit >= - chatUser.getCreditLimit ();
+		boolean passed =
+			effectiveCredit >= - charges.getCreditLimit ()
+			&& effectiveCredit >= - chatUser.getCreditLimit ();
+
+		return passed
+			? ChatCreditCheckResult.passedStrict
+			: ChatCreditCheckResult.failedStrict;
 
 	}
 
-	boolean userPrepayCreditOk (
+	ChatCreditCheckResult userCreditCheckPrepay (
 			ChatUserRec chatUser) {
 
 		// sanity check
@@ -618,18 +612,29 @@ class ChatCreditLogicImpl
 		// check network
 
 		if (chatUser.getNumber ().getNetwork ().getId () == 0)
-			return false;
+			return ChatCreditCheckResult.failedNoNetwork;
 
-		ChatNetworkRec chatNetwork =
-			chatNetworkHelper.forUserRequired (
+		Optional<ChatNetworkRec> chatNetworkOptional =
+			chatNetworkHelper.forUser (
 				chatUser);
 
+		if (! chatNetworkOptional.isPresent ())
+			return ChatCreditCheckResult.failedInvalidNetwork;
+
+		ChatNetworkRec chatNetwork =
+			chatNetworkOptional.get ();
+
 		if (! chatNetwork.getAllowPrePay ())
-			return false;
+			return ChatCreditCheckResult.failedPrepayDisabledForNetwork;
 
 		// check prepay credit
 
-		return chatUser.getCredit () >= 0;
+		boolean passed =
+			chatUser.getCredit () >= 0;
+
+		return passed
+			? ChatCreditCheckResult.passedPrepay
+			: ChatCreditCheckResult.failedPrepay;
 
 	}
 
@@ -1088,15 +1093,32 @@ class ChatCreditLogicImpl
 		if (chatUser.getBlockAll ())
 			return;
 
-		if (chatUser.getLastCreditHint () == null
-				|| chatUser.getLastCreditHint ().getTime ()
-					< now.getTime () - 1000 * 60 * 60 * 24) {
+		if (
+			chatUser.getLastCreditHint () == null
+			|| chatUser.getLastCreditHint ().getTime ()
+				< now.getTime () - 1000 * 60 * 60 * 24
+		) {
 
 			// send message as appropriate
 
-			ChatNetworkRec chatNetwork =
-				chatNetworkHelper.forUserRequired (
+			Optional<ChatNetworkRec> chatNetworkOptional =
+				chatNetworkHelper.forUser (
 					chatUser);
+
+			if (! chatNetworkOptional.isPresent ()) {
+
+				log.warn (
+					stringFormat (
+						"Not sending credit hint to %s ",
+						chatUser.getId (),
+						"because no network settings found"));
+
+				return;
+
+			}
+
+			ChatNetworkRec chatNetwork =
+				chatNetworkOptional.get ();
 
 			if (
 				equal (

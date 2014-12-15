@@ -39,6 +39,7 @@ import org.joda.time.Instant;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.bill.model.ChatUserCreditObjectHelper;
 import wbs.apn.chat.bill.model.ChatUserCreditRec;
@@ -2176,18 +2177,24 @@ class ChatApiServletModule
 
 			// check if the user is barred through credit
 
-			if (! chatCreditLogic.userSpendCheck (
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
 					fromUser,
 					true,
-					null,
-					false))
+					null);
+
+			if (creditCheckResult.failed ()) {
 
 				throw new RpcException (
 					Rpc.rpcError (
 						"chat-message-send-response",
 						stCredit,
 						"credit",
-						"This profile has been barred due to billing problems"));
+						stringFormat (
+							"This profile has failed the credit check: %s",
+							creditCheckResult.details ())));
+
+			}
 
 			// check the age has been set up
 
@@ -2400,11 +2407,13 @@ class ChatApiServletModule
 
 			if (ignoreCredit == null || ! ignoreCredit) {
 
-				if (! chatCreditLogic.userSpendCheck (
+				ChatCreditCheckResult creditCheckResult =
+					chatCreditLogic.userSpendCreditCheck (
 						chatUser,
 						true,
-						null,
-						false)) {
+						null);
+
+				if (creditCheckResult.failed ()) {
 
 					throw new RpcException (
 						Rpc.rpcError (

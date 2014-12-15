@@ -41,23 +41,15 @@ interface ChatCreditLogic {
 			ChatUserRec chatUser,
 			LocalDate pdate);
 
-	/**
-	 * Returns true if the user should receive non-billed content.
-	 */
-	boolean userReceiveCheck (
-			ChatUserRec chatUser);
-
-	boolean userSpendCheck (
+	ChatCreditCheckResult userSpendCreditCheck (
 			ChatUserRec chatUser,
 			boolean userActed,
-			Integer threadId,
-			boolean allowBlocked);
+			Integer threadId);
 
-	boolean userCreditOk (
-			ChatUserRec chatUser,
-			boolean allowBlocked);
+	ChatCreditCheckResult userCreditCheck (
+			ChatUserRec chatUser);
 
-	boolean userStrictCreditOk (
+	ChatCreditCheckResult userCreditCheckStrict (
 			ChatUserRec chatUser);
 
 	/**

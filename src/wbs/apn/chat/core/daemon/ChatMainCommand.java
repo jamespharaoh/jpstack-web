@@ -9,11 +9,14 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import lombok.Data;
 import lombok.NonNull;
+import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import org.joda.time.LocalDate;
 
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
@@ -334,8 +337,7 @@ class ChatMainCommand
 			stringFormat (
 				"message %d: chat scheme keyword \"%s\" does nothing",
 				receivedMessage.getMessageId (),
-				keyword,
-				chatSchemeKeyword.getJoinType ()));
+				keyword));
 
 		return null;
 
@@ -347,7 +349,8 @@ class ChatMainCommand
 			String keyword,
 			String rest) {
 
-		TryKeywordReturn ret = new TryKeywordReturn ();
+		TryKeywordReturn ret =
+			new TryKeywordReturn ();
 
 		ChatKeywordRec chatKeyword =
 			chatKeywordHelper.findByCode (
@@ -478,7 +481,7 @@ class ChatMainCommand
 
 	}
 
-	boolean checkDob (
+	TryKeywordReturn tryDob (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage,
 			@NonNull ChatUserRec chatUser) {
@@ -489,7 +492,7 @@ class ChatMainCommand
 				ChatKeywordJoinType.chatDob,
 				ChatKeywordJoinType.dateDob)
 		) {
-			return false;
+			return null;
 		}
 
 		LocalDate dateOfBirth =
@@ -498,15 +501,25 @@ class ChatMainCommand
 				1915);
 
 		if (dateOfBirth == null) {
-			return false;
+			return null;
 		}
 
-		chatUser
+		ChatJoiner joiner =
+			chatJoinerProvider.get ()
 
-			.setDob (
-				dateOfBirth);
+			.chatId (
+				chat.getId ())
 
-		return true;
+			.joinType (
+				JoinType.chatSimple)
+
+			.chatSchemeId (
+				commandChatScheme.getId ());
+
+		return new TryKeywordReturn ()
+
+			.joiner (
+				joiner);
 
 	}
 
@@ -563,22 +576,10 @@ class ChatMainCommand
 			fromChatUser,
 			commandChatScheme);
 
-		if (smsMessage.getRoute ().getInboundImpliesAdult ())
-			chatUserLogic.adultVerify (fromChatUser);
+		if (smsMessage.getRoute ().getInboundImpliesAdult ()) {
 
-		// look for a date of birth
-
-		boolean gotDob =
-			checkDob (
-				commandId,
-				receivedMessage,
+			chatUserLogic.adultVerify (
 				fromChatUser);
-
-		if (gotDob) {
-
-			transaction.commit ();
-
-			return null;
 
 		}
 
@@ -586,9 +587,11 @@ class ChatMainCommand
 
 		TryKeywordReturn ret = null;
 
-		for (KeywordFinder.Match match
+		for (
+			KeywordFinder.Match match
 				: KeywordFinder.find (
-					receivedMessage.getRest ())) {
+					receivedMessage.getRest ())
+		) {
 
 			String keyword =
 				match.simpleKeyword ();
@@ -629,9 +632,23 @@ class ChatMainCommand
 
 		}
 
+		// look for a date of birth
+
+		if (ret == null) {
+
+			ret = tryDob (
+				commandId,
+				receivedMessage,
+				fromChatUser);
+
+		}
+
 		// handle command keywords
 
-		if (ret != null && ret.externalCommandId != null) {
+		if (
+			ret != null
+			&& ret.externalCommandId != null
+		) {
 
 			log.debug (
 				stringFormat (
@@ -682,11 +699,13 @@ class ChatMainCommand
 
 			}
 
-			if (! chatCreditLogic.userSpendCheck (
-				fromChatUser,
-				true,
-				smsMessage.getThreadId (),
-				false)) {
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
+					fromChatUser,
+					true,
+					smsMessage.getThreadId ());
+
+			if (creditCheckResult.failed ()) {
 
 				log.debug (
 					stringFormat (
@@ -847,6 +866,8 @@ class ChatMainCommand
 
 	// data structures
 
+	@Accessors (fluent = true)
+	@Data
 	public static
 	class TryKeywordReturn {
 

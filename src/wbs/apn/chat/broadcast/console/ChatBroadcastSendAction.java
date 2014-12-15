@@ -15,6 +15,7 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.apn.chat.broadcast.model.ChatBroadcastRec;
@@ -484,11 +485,16 @@ class ChatBroadcastSendAction
 
 					// perform a credit check
 
-					if (! chatCreditLogic.userSpendCheck (
+					ChatCreditCheckResult creditCheckResult =
+						chatCreditLogic.userSpendCreditCheck (
 							chatUser,
 							false,
-							null,
-							true)) {
+							null);
+
+					if (
+						creditCheckResult.failed ()
+						&& creditCheckResult != ChatCreditCheckResult.failedBlocked
+					) {
 
 						removedNumbers ++;
 

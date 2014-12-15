@@ -24,6 +24,7 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
@@ -617,13 +618,13 @@ class ChatJoiner {
 
 		// check credit
 
-		if (
-			! chatCreditLogic.userSpendCheck (
+		ChatCreditCheckResult creditCheckResult =
+			chatCreditLogic.userSpendCreditCheck (
 				chatUser,
 				true,
-				message.getThreadId (),
-				false)
-		) {
+				message.getThreadId ());
+
+		if (creditCheckResult.failed ()) {
 
 			chatHelpLogLogic.createChatHelpLogIn (
 				chatUser,
@@ -1040,11 +1041,13 @@ class ChatJoiner {
 
 		// make sure the user can join
 
-		if (! chatCreditLogic.userSpendCheck (
+		ChatCreditCheckResult creditCheckResult =
+			chatCreditLogic.userSpendCreditCheck (
 				chatUser,
 				true,
-				message.getThreadId (),
-				false)) {
+				message.getThreadId ());
+
+		if (creditCheckResult.failed ()) {
 
 			chatHelpLogLogic.createChatHelpLogIn (
 				chatUser,

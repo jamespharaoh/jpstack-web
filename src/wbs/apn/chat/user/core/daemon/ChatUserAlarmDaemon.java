@@ -8,8 +8,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
-import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
@@ -145,19 +145,14 @@ class ChatUserAlarmDaemon
 
 		// check whether to ignore this alarm
 
-		boolean ignore =
-
-			user.getBarred ()
-
-			|| user.getCreditMode () == ChatUserCreditMode.barred
-
-			|| user.getBlockAll ()
-
-			|| ! chatCreditLogic.userSpendCheck (
+		ChatCreditCheckResult creditCheckResult =
+			chatCreditLogic.userSpendCreditCheck (
 				user,
 				false,
-				null,
-				false);
+				null);
+
+		boolean ignore =
+			creditCheckResult.failed ();
 
 		ChatUserInitiationReason reason =
 			ignore

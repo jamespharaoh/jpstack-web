@@ -21,6 +21,7 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.model.ChatContactRec;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
@@ -213,7 +214,10 @@ class ChatDateDaemon
 
 		// put all valid dating users into otherUserInfos
 
-		for (ChatUserRec chatUser : datingUsers) {
+		for (
+			ChatUserRec chatUser
+				: datingUsers
+		) {
 
 			if (chatUser.getNumber () == null)
 				continue;
@@ -221,12 +225,13 @@ class ChatDateDaemon
 			if (chatUser.getNumber ().getNetwork ().getId () == 0)
 				continue;
 
-			if (! chatCreditLogic.userSpendCheck (
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
 					chatUser,
 					false,
-					null,
-					false))
+					null);
 
+			if (creditCheckResult.failed ())
 				continue;
 
 			otherUserInfos.add (
@@ -239,9 +244,16 @@ class ChatDateDaemon
 		Collection<Integer> monitorIds =
 			chatUserHelper.searchIds (
 				ImmutableMap.<String,Object>builder ()
-					.put ("chatId", chatId)
-					.put ("type", ChatUserType.monitor)
-					.build ());
+
+			.put (
+				"chatId",
+				chatId)
+
+			.put (
+				"type",
+				ChatUserType.monitor)
+
+			.build ());
 
 		for (Integer chatUserId : monitorIds) {
 
@@ -269,31 +281,41 @@ class ChatDateDaemon
 
 			numUsers++;
 
-			if (! chatCreditLogic.userSpendCheck (
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
 					chatUser,
 					false,
-					null,
-					false)) {
+					null);
 
-				numCredit++;
+			if (creditCheckResult.failed ()) {
+
+				numCredit ++;
 
 				log.info (
 					stringFormat (
-						"Ignoring %s (credit)",
-						chatUser));
+						"Ignoring %s ",
+						chatUser,
+						"(%s)",
+						creditCheckResult.details ()));
 
 				continue;
 
 			}
 
-			if (! checkHours (
+			if (
+				! checkHours (
 					hour,
 					chatUser.getDateStartHour (),
-					chatUser.getDateEndHour ())) {
+					chatUser.getDateEndHour ())
+			) {
 
 				numHours ++;
 
-				log.debug ("Ignoring " + chatUser.getId () + " (time)");
+				log.debug (
+					stringFormat (
+						"Ignoring %s ",
+						chatUser.getId (),
+						"(time)"));
 
 				continue;
 
@@ -450,13 +472,20 @@ class ChatDateDaemon
 			return false;
 		}
 
-		if (! chatCreditLogic.userSpendCheck (
+		ChatCreditCheckResult creditCheckResult =
+			chatCreditLogic.userSpendCreditCheck (
 				thisUser,
 				false,
-				null,
-				false)) {
+				null);
 
-			log.debug ("Ignoring " + thisUserId + " (spend check failed)");
+		if (creditCheckResult.failed ()) {
+
+			log.debug (
+				stringFormat (
+					"Ignoring %s ",
+					thisUserId,
+					"(%s)",
+					creditCheckResult.details ()));
 
 			return false;
 
