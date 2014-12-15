@@ -13,6 +13,8 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 import org.joda.time.Instant;
 
 import wbs.framework.record.Record;
@@ -264,5 +266,14 @@ interface ConsoleRequestContext {
 
 	ConsoleRequestContext changedContextPath (
 			String path);
+
+	boolean isMultipart ();
+
+	List<FileItem> fileItems ()
+		throws FileUploadException;
+
+	FileItem fileItem (
+			 String name)
+		throws FileUploadException;
 
 }

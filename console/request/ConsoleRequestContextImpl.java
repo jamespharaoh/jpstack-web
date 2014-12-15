@@ -29,6 +29,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 import org.joda.time.Instant;
 
 import wbs.framework.application.annotations.ProxiedRequestComponent;
@@ -1268,6 +1270,31 @@ class ConsoleRequestContextImpl
 
 		return requestContext.resolveApplicationUrl (
 			applicationUrl);
+
+	}
+
+	public
+	boolean isMultipart () {
+
+		return requestContext.isMultipart ();
+
+	}
+
+	public
+	List<FileItem> fileItems ()
+		throws FileUploadException {
+
+		return requestContext.fileItems ();
+
+	}
+
+	public
+	FileItem fileItem (
+			String name)
+		throws FileUploadException {
+
+		return requestContext.fileItem (
+			name);
 
 	}
 
