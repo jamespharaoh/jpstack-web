@@ -16,15 +16,11 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.PermanentRecord;
 import wbs.platform.console.forms.FormField.UpdateResult;
 import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.user.model.UserObjectHelper;
 
 @SingletonComponent ("fieldsLogic")
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 public
 class FormFieldLogic {
-
-	@Inject
-	UserObjectHelper userHelper;
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -37,15 +33,19 @@ class FormFieldLogic {
 		UpdateResultSet updateResultSet =
 			new UpdateResultSet ();
 
-		for (FormField formField
-				: formFieldSet.formFields ()) {
+		for (
+			FormField formField
+				: formFieldSet.formFields ()
+		) {
 
 			if (formField.virtual ())
 				continue;
 
 			UpdateResult updateResult =
 				new UpdateResult ()
-					.formField (formField);
+
+				.formField (
+					formField);
 
 			formField.update (
 				container,
@@ -71,8 +71,10 @@ class FormFieldLogic {
 	void reportErrors (
 			UpdateResultSet updateResultSet) {
 
-		for (UpdateResult<?,?> updateResult
-				: updateResultSet.updateResults ()) {
+		for (
+			UpdateResult<?,?> updateResult
+				: updateResultSet.updateResults ()
+		) {
 
 			if (
 				isNull (
@@ -81,8 +83,10 @@ class FormFieldLogic {
 				continue;
 			}
 
-			for (String error
-					: updateResult.errors ()) {
+			for (
+				String error
+					: updateResult.errors ()
+			) {
 
 				requestContext.addError (
 					error);
@@ -101,8 +105,10 @@ class FormFieldLogic {
 			Object objectRef,
 			String objectType) {
 
-		for (UpdateResult updateResult
-				: updateResultSet.updateResults ()) {
+		for (
+			UpdateResult updateResult
+				: updateResultSet.updateResults ()
+		) {
 
 			if (! updateResult.updated ())
 				continue;
@@ -126,8 +132,10 @@ class FormFieldLogic {
 			PrintWriter out,
 			FormFieldSet formFieldSet) {
 
-		for (FormField formField
-				: formFieldSet.formFields ()) {
+		for (
+			FormField formField
+				: formFieldSet.formFields ()
+		) {
 
 			out.print (
 				stringFormat (
@@ -174,8 +182,10 @@ class FormFieldLogic {
 			FormFieldSet formFieldSet,
 			Object object) {
 
-		for (FormField formField
-				: formFieldSet.formFields ()) {
+		for (
+			FormField formField
+				: formFieldSet.formFields ()
+		) {
 
 			if (formField.virtual ())
 				continue;
@@ -229,8 +239,10 @@ class FormFieldLogic {
 			Object object,
 			boolean links) {
 
-		for (FormField formField
-				: formFieldSet.formFields ()) {
+		for (
+			FormField formField
+				: formFieldSet.formFields ()
+		) {
 
 			formField.renderTableCell (
 				out,
