@@ -130,7 +130,7 @@ class CodeFormFieldBuilder {
 			ifNull (
 				spec.readOnly (),
 				spec.delegate () != null ? true : null,
-				consoleHelper.nameIsCode (),
+				! consoleHelper.nameIsCode (),
 				false);
 
 		Pattern pattern =
