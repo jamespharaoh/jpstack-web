@@ -20,14 +20,14 @@ import wbs.platform.console.action.ConsoleAction;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.text.web.TextResponder;
-import wbs.test.simulator.model.SimEventObjectHelper;
-import wbs.test.simulator.model.SimEventRec;
+import wbs.test.simulator.model.SimulatorEventObjectHelper;
+import wbs.test.simulator.model.SimulatorEventRec;
 
 import com.google.common.collect.ImmutableMap;
 
-@PrototypeComponent ("simulatorPollAction")
+@PrototypeComponent ("simulatorSessionPollAction")
 public
-class SimulatorPollAction
+class SimulatorSessionPollAction
 	extends ConsoleAction {
 
 	@Inject
@@ -37,7 +37,7 @@ class SimulatorPollAction
 	Database database;
 
 	@Inject
-	SimEventObjectHelper simEventHelper;
+	SimulatorEventObjectHelper simulatorEventHelper;
 
 	@Inject
 	TimeFormatter timeFormatter;
@@ -65,8 +65,8 @@ class SimulatorPollAction
 		Transaction transaction =
 			database.beginReadOnly ();
 
-		List<SimEventRec> events =
-			simEventHelper.findAfterLimit (
+		List<SimulatorEventRec> events =
+			simulatorEventHelper.findAfterLimit (
 				lastId,
 				limit);
 
@@ -75,7 +75,7 @@ class SimulatorPollAction
 		List<Object> ret =
 			new ArrayList<Object> ();
 
-		for (SimEventRec event : events) {
+		for (SimulatorEventRec event : events) {
 
 			Object eventData =
 				JSONValue.parse (event.getData ());

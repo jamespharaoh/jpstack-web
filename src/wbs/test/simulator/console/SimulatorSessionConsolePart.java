@@ -19,9 +19,9 @@ import wbs.sms.route.core.model.RouteRec;
 
 import com.google.common.collect.ImmutableSet;
 
-@PrototypeComponent ("simulatorConsolePart")
+@PrototypeComponent ("simulatorSessionConsolePart")
 public
-class SimulatorConsolePart
+class SimulatorSessionConsolePart
 	extends AbstractPagePart {
 
 	// dependencies
@@ -72,8 +72,10 @@ class SimulatorConsolePart
 	public
 	void prepare () {
 
-		for (RouteRec route
-				: routeHelper.findAll ()) {
+		for (
+			RouteRec route
+				: routeHelper.findAll ()
+		) {
 
 			routeOptions.put (
 				route.getId ().toString (),
@@ -81,8 +83,10 @@ class SimulatorConsolePart
 
 		}
 
-		for (NetworkRec network
-				: networkHelper.findAll ()) {
+		for (
+			NetworkRec network
+				: networkHelper.findAll ()
+		) {
 
 			networkOptions.put (
 				network.getId ().toString (),
@@ -110,7 +114,15 @@ class SimulatorConsolePart
 	void goBodyStuff () {
 
 		printFormat (
-			"<div class=\"simulator\">\n");
+			"<div",
+			" class=\"simulator\"",
+			" data-create-event-url=\"%h\"",
+			requestContext.resolveLocalUrl (
+				"/simulatorSession.createEvent"),
+			" data-poll-url=\"%h\"",
+			requestContext.resolveLocalUrl (
+				"/simulatorSession.poll"),
+			">\n");
 
 		controls ();
 		eventsList ();

@@ -2,10 +2,6 @@
 	name="chat-scheme"
 	package="chat.scheme">
 
-	<sql-scripts>
-		<sql-data name="chat-scheme-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="chatScheme"/>
 		<model name="chatSchemeCharges"/>

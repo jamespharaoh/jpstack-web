@@ -1,11 +1,16 @@
 package wbs.framework.schema.tool;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Writer;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +22,7 @@ import javax.sql.DataSource;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.entity.helper.EntityHelper;
+import wbs.framework.entity.model.Model;
 import wbs.framework.logging.TaskLog;
 import wbs.framework.schema.builder.SchemaFromModel;
 import wbs.framework.schema.helper.SchemaTypesHelper;
@@ -25,6 +31,8 @@ import wbs.framework.schema.model.Schema;
 @Log4j
 public
 class SchemaTool {
+
+	// dependencies
 
 	@Inject
 	DataSource dataSource;
@@ -41,18 +49,33 @@ class SchemaTool {
 	@Inject
 	Provider<SchemaFromModel> schemaFromModel;
 
+	// state
+
+	TaskLog taskLog;
+	Schema schema;
+	List<String> sqlStatements;
+
+	// implementation
+
 	public
 	void schemaCreate (
 			List<String> args)
 		throws Exception {
 
-		TaskLog taskLog =
+		taskLog =
 			new TaskLog ()
 				.log (log);
 
-		// create schema
+		createSchema ();
+		createSql ();
+		executeSql ();
+		createObjectTypes ();
 
-		Schema schema =
+	}
+
+	void createSchema () {
+
+		schema =
 			schemaFromModel.get ()
 
 			.taskLog (
@@ -75,9 +98,12 @@ class SchemaTool {
 
 		}
 
-		// create sql
+	}
 
-		List<String> sqlStatements =
+	void createSql ()
+		throws IOException {
+
+		sqlStatements =
 			new ArrayList<String> ();
 
 		schemaToSql.forSchema (
@@ -92,15 +118,25 @@ class SchemaTool {
 				new File (
 					"work/schema.sql"));
 
-		for (String sqlStatement
-				: sqlStatements) {
+		for (
+			String sqlStatement
+				: sqlStatements
+		) {
 
-			fileWriter.write (sqlStatement);
-			fileWriter.write (";\n");
+			fileWriter.write (
+				sqlStatement);
+
+			fileWriter.write (
+				";\n");
 
 		}
 
 		fileWriter.close ();
+
+	}
+
+	void executeSql ()
+		throws SQLException {
 
 		// execute sql
 
@@ -121,8 +157,10 @@ class SchemaTool {
 
 		int errors = 0;
 
-		for (String sqlStatement
-				: sqlStatements) {
+		for (
+			String sqlStatement
+				: sqlStatements
+		) {
 
 			try {
 
@@ -179,6 +217,86 @@ class SchemaTool {
 		log.info (
 			stringFormat (
 				"Schema created successfully"));
+
+		connection.close ();
+
+	}
+
+	void createObjectTypes ()
+		throws SQLException {
+
+		@Cleanup
+		Connection connection =
+			dataSource.getConnection ();
+
+		connection.setAutoCommit (
+			false);
+
+		@Cleanup
+		PreparedStatement nextObjectTypeIdStatement =
+			connection.prepareStatement (
+				stringFormat (
+					"SELECT ",
+						"nextval ('object_type_id_seq')"));
+
+		@Cleanup
+		PreparedStatement insertObjectTypeStatement =
+			connection.prepareStatement (
+				stringFormat (
+					"INSERT INTO object_type (",
+						"id, ",
+						"code) ",
+					"VALUES (",
+						"?, ",
+						"?)"));
+
+		log.info (
+			"Creating object types");
+
+		for (
+			Model model
+				: entityHelper.models ()
+		) {
+
+			int objectTypeId;
+
+			if (
+				equal (
+					model.objectTypeCode (),
+					"root")
+			) {
+
+				objectTypeId = 0;
+
+			} else {
+
+				ResultSet objectTypeIdResultSet =
+					nextObjectTypeIdStatement.executeQuery ();
+
+				objectTypeIdResultSet.next ();
+
+				objectTypeId =
+					objectTypeIdResultSet.getInt (
+						1);
+
+			}
+
+			insertObjectTypeStatement.setInt (
+				1,
+				objectTypeId);
+
+			insertObjectTypeStatement.setString (
+				2,
+				model.objectTypeCode ());
+
+			insertObjectTypeStatement.executeUpdate ();
+
+		}
+
+		connection.commit ();
+
+		log.info (
+			"Object types created successfully");
 
 		connection.close ();
 

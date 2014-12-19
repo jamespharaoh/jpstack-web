@@ -8,11 +8,11 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.jadira.usertype.dateandtime.joda.PersistentInstantAsTimestamp;
 import org.joda.time.Instant;
 
 import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
+import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
@@ -23,18 +23,22 @@ import wbs.framework.record.Record;
 @ToString (of = "id")
 @CommonEntity
 public
-class SimEventRec
-	implements CommonRecord<SimEventRec> {
+class SimulatorEventRec
+	implements CommonRecord<SimulatorEventRec> {
 
 	// id
 
 	@GeneratedIdField
 	Integer id;
 
+	// identity
+
+	@ParentField
+	SimulatorSessionRec simulatorSession;
+
 	// details
 
-	@SimpleField (
-		hibernateTypeHelper = PersistentInstantAsTimestamp.class)
+	@SimpleField
 	Instant timestamp;
 
 	@SimpleField
@@ -48,10 +52,10 @@ class SimEventRec
 	@Override
 	public
 	int compareTo (
-			Record<SimEventRec> otherRecord) {
+			Record<SimulatorEventRec> otherRecord) {
 
-		SimEventRec other =
-			(SimEventRec) otherRecord;
+		SimulatorEventRec other =
+			(SimulatorEventRec) otherRecord;
 
 		return new CompareToBuilder ()
 
@@ -70,9 +74,9 @@ class SimEventRec
 	// dao methods
 
 	public static
-	interface SimEventDaoMethods {
+	interface SimulatorEventDaoMethods {
 
-		List<SimEventRec> findAfterLimit (
+		List<SimulatorEventRec> findAfterLimit (
 				int afterId,
 				int maxResults);
 

@@ -1,10 +1,3 @@
-
-SELECT object_type_insert (
-	'group',
-	'group',
-	'slice',
-	1);
-
 SELECT priv_type_insert (
 	'slice',
 	'group_create',

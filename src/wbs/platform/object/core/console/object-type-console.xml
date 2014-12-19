@@ -43,15 +43,8 @@
 		name="list"
 		object-name="objectType">
 
+		<id-field/>
 		<code-field/>
-		<description-field/>
-
-		<object-field
-			name="parentObjectType"
-			finder="objectType"/>
-
-		<integer-field
-			name="stature"/>
 
 	</field-set>
 
@@ -61,14 +54,6 @@
 
 		<id-field/>
 		<code-field/>
-		<description-field/>
-
-		<object-field
-			name="parentObjectType"
-			finder="objectType"/>
-
-		<integer-field
-			name="stature"/>
 
 	</field-set>
 

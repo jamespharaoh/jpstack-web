@@ -1,6 +1,4 @@
-package wbs.platform.object.core.model;
-
-import java.util.List;
+package wbs.test.simulator.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,11 +8,15 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.framework.entity.annotations.CodeField;
+import wbs.framework.entity.annotations.DeletedField;
+import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
-import wbs.framework.object.ObjectTypeEntry;
+import wbs.framework.entity.annotations.NameField;
+import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
+import wbs.platform.scaffold.model.SliceRec;
 
 @Accessors (chain = true)
 @Data
@@ -22,10 +24,8 @@ import wbs.framework.record.Record;
 @ToString (of = "id")
 @MajorEntity
 public
-class ObjectTypeRec
-	implements
-		MajorRecord<ObjectTypeRec>,
-		ObjectTypeEntry {
+class SimulatorRec
+	implements MajorRecord<SimulatorRec> {
 
 	// id
 
@@ -34,41 +34,43 @@ class ObjectTypeRec
 
 	// identity
 
+	@ParentField
+	SliceRec slice;
+
 	@CodeField
 	String code;
 
+	// details
+
+	@NameField
+	String name;
+
+	@DescriptionField
+	String description;
+
+	@DeletedField
+	Boolean deleted = false;
+
 	// compare to
 
-	@Override
 	public
 	int compareTo (
-			Record<ObjectTypeRec> otherRecord) {
+			Record<SimulatorRec> otherRecord) {
 
-		ObjectTypeRec other =
-			(ObjectTypeRec) otherRecord;
+		SimulatorRec other =
+			(SimulatorRec) otherRecord;
 
 		return new CompareToBuilder ()
+
+			.append (
+				getSlice (),
+				other.getSlice ())
 
 			.append (
 				getCode (),
 				other.getCode ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ObjectTypeDaoMethods {
-
-		ObjectTypeRec findById (
-				int id);
-
-		ObjectTypeRec findByCode (
-				String code);
-
-		List<ObjectTypeRec> findAll ();
 
 	}
 

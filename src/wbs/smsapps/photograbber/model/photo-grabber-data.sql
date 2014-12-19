@@ -1,22 +1,3 @@
-
-SELECT object_type_insert (
-	'photo_grabber',
-	'photo grabber',
-	'slice',
-	1);
-
-SELECT object_type_insert (
-	'photo_grabber_request',
-	'photo grabber request',
-	'photo_grabber',
-	3);
-
-SELECT object_type_insert (
-	'photo_grabber_reissue',
-	'photo grabber reissue',
-	'photo_grabber_request',
-	3);
-
 SELECT priv_type_insert (
 	'photo_grabber',
 	'manage',

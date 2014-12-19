@@ -1,16 +1,3 @@
-
-SELECT object_type_insert (
-	'psychic_template_type',
-	'psychic template type',
-	'root',
-	2);
-
-SELECT object_type_insert (
-	'psychic_template',
-	'psychic template',
-	'psychic',
-	2);
-
 SELECT psychic_template_type_insert (
 	'charges',
 	'Confirm charges',

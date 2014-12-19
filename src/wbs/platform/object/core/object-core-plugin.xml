@@ -10,7 +10,6 @@
 
 	<sql-scripts>
 		<sql-schema name="object-type"/>
-		<sql-data name="object-type-data"/>
 	</sql-scripts>
 
 	<models>

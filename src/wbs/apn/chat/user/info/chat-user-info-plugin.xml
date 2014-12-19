@@ -2,11 +2,6 @@
 	name="chat-info"
 	package="chat.user.info">
 
-	<sql-scripts>
-		<sql-data name="chat-info-data"/>
-		<sql-data name="chat-profile-data"/>
-	</sql-scripts>
-
 	<models>
 		<custom-type name="chatUserInfoStatus"/>
 		<model name="chatProfileField"/>

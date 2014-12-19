@@ -1,102 +1,9 @@
-
-SELECT object_type_insert (
-	'chat',
-	'chat',
-	'slice',
-	1);
-
-SELECT object_type_insert (
-	'chat_stats',
-	'chat stats',
-	'chat',
-	3);
-
-SELECT object_type_insert (
-	'chat_place',
-	'chat place',
-	'chat',
-	4);
-
-SELECT object_type_insert (
-	'chat_place_name',
-	'chat place name',
-	'chat_place',
-	4);
-
 SELECT priv_type_insert (
 	'chat',
 	'supervisor',
 	'Supervisor',
 	'View supervisor reports',
 	true);
-
-SELECT object_type_insert (
-	'chat_scheme',
-	'chat scheme',
-	'chat',
-	1);
-
-SELECT object_type_insert (
-	'chat_scheme_charges',
-	'chat scheme charges',
-	'chat_scheme',
-	2);
-
-SELECT object_type_insert (
-	'chat_scheme_keyword',
-	'chat scheme keyword',
-	'chat_scheme',
-	4);
-
-SELECT object_type_insert (
-	'chat_user',
-	'chat user',
-	'chat',
-	3);
-
-SELECT object_type_insert (
-	'chat_contact',
-	'chat contact',
-	'chat',
-	3);
-
-SELECT object_type_insert (
-	'chat_contact_note',
-	'chat contact note',
-	'chat_contact',
-	4);
-
-SELECT object_type_insert (
-	'chat_message',
-	'chat message',
-	'chat',
-	3);
-
-SELECT object_type_insert (
-	'chat_help_log',
-	'chat help log',
-	'chat_user',
-	3);
-
-SELECT object_type_insert (
-	'chat_help_template',
-	'chat help template',
-	'chat',
-	4);
-
-SELECT object_type_insert (
-	'chat_monitor_inbox',
-	'chat monitor inbox',
-	'chat_contact',
-	4);
-
-SELECT object_type_insert (
-	'chat_keyword',
-	'chat keyword',
-	'chat',
-	4);
-
----------------------------------------- INSERT priv_type
 
 SELECT priv_type_insert (
 	'chat',
@@ -120,22 +27,16 @@ SELECT priv_type_insert (
 	'View message history for a chat scheme',
 	true);
 
----------------------------------------- INSERT batch_type
-
 SELECT batch_type_insert (
 	'chat',
 	'broadcast',
 	'Broadcast',
 	'chat');
 
----------------------------------------- INSERT service_type
-
 SELECT service_type_insert (
 	'chat',
 	'broadcast',
 	'Broadcast messages to large numbers of users');
-
----------------------------------------- INSERT event_type
 
 SELECT event_type_insert (
 	'chat_user_auto_strict',
@@ -190,8 +91,6 @@ SELECT event_type_insert (
 	'chat_user_offline',
 	'%0 took %1 offline');
 
----------------------------------------- INSERT delivery_type
-
 SELECT delivery_type_insert (
 	'chat_bill',
 	'Chat bill');
@@ -208,14 +107,10 @@ SELECT delivery_type_insert (
 	'chat_adult_join',
 	'Chat adult verification and join');
 
--- chat scheme
-
 SELECT affiliate_type_insert (
 	'chat_scheme',
 	'default',
 	'Chat scheme');
-
----------------------------------------- INSERT service
 
 SELECT service_type_insert (
 	'chat',

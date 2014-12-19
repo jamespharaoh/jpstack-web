@@ -6,8 +6,6 @@
 		<sql-schema name="chat-user"/>
 		<sql-schema name="chat-user-session"/>
 		<sql-schema name="chat-users-summary"/>
-		<sql-data name="chat-user-data"/>
-		<sql-data name="chat-users-summary-data"/>
 	</sql-scripts>
 
 	<models>

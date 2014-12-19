@@ -1,12 +1,3 @@
-
--- chat affiliate
-
-SELECT object_type_insert (
-	'chat_affiliate',
-	'chat affiliate',
-	'chat_scheme',
-	1);
-
 SELECT priv_type_insert (
 	'chat_affiliate',
 	'manage',
@@ -32,8 +23,6 @@ SELECT affiliate_type_insert (
 	'chat_affiliate',
 	'default',
 	'Chat affiliate');
-
--- chat scheme
 
 SELECT priv_type_insert (
 	'chat_scheme',

@@ -35,14 +35,6 @@ RETURNS int AS $$
 	END;
 $$ LANGUAGE 'plpgsql';
 
----------------------------------------- INSERT object_type
-
-SELECT object_type_insert (
-	'text',
-	'text',
-	'root',
-	3);
-
 ---------------------------------------- FUNCTION atom
 
 CREATE OR REPLACE FUNCTION atom (int) RETURNS text AS $$

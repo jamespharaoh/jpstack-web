@@ -1,16 +1,3 @@
-
-SELECT object_type_insert (
-	'ticketer',
-	'ticketer',
-	'slice',
-	1);
-
-SELECT object_type_insert (
-	'ticketer_ticket',
-	'ticketer ticket',
-	'ticketer',
-	3);
-
 SELECT priv_type_insert (
 	'ticketer',
 	'manage',

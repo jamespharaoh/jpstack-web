@@ -2,10 +2,6 @@
 	name="chat-approval"
 	package="chat.approval">
 
-	<sql-scripts>
-		<sql-data name="chat-approval-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="chatApprovalRegexp"/>
 	</models>

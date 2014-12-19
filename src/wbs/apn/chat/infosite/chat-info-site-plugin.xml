@@ -4,7 +4,6 @@
 
 	<sql-scripts>
 		<sql-schame name="chat-info-site"/>
-		<sql-data name="chat-info-site-data"/>
 	</sql-scripts>
 
 	<models>

@@ -15,8 +15,8 @@ import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteRec;
-import wbs.test.simulator.model.SimEventObjectHelper;
-import wbs.test.simulator.model.SimEventRec;
+import wbs.test.simulator.model.SimulatorEventObjectHelper;
+import wbs.test.simulator.model.SimulatorEventRec;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -34,7 +34,7 @@ class SimulatorSender
 	MessageObjectHelper messageHelper;
 
 	@Inject
-	SimEventObjectHelper simEventHelper;
+	SimulatorEventObjectHelper simulatorEventHelper;
 
 	// details
 
@@ -113,9 +113,9 @@ class SimulatorSender
 
 		// create event
 
-		SimEventRec event =
-			simEventHelper.insert (
-				new SimEventRec ()
+		SimulatorEventRec event =
+			simulatorEventHelper.insert (
+				new SimulatorEventRec ()
 					.setType ("message_out")
 					.setTimestamp (transaction.now ())
 					.setData (JSONValue.toJSONString (data)));

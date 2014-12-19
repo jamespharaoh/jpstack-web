@@ -33,15 +33,19 @@ import wbs.sms.network.console.NetworkConsoleHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
 import wbs.sms.route.core.model.RouteRec;
-import wbs.test.simulator.model.SimEventObjectHelper;
-import wbs.test.simulator.model.SimEventRec;
+import wbs.test.simulator.model.SimulatorEventObjectHelper;
+import wbs.test.simulator.model.SimulatorEventRec;
+import wbs.test.simulator.model.SimulatorSessionObjectHelper;
+import wbs.test.simulator.model.SimulatorSessionRec;
 
 import com.google.common.collect.ImmutableMap;
 
-@PrototypeComponent ("simulatorCreateEventAction")
+@PrototypeComponent ("simulatorSessionCreateEventAction")
 public
-class SimulatorCreateEventAction
+class SimulatorSessionCreateEventAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -68,7 +72,10 @@ class SimulatorCreateEventAction
 	RouteConsoleHelper routeHelper;
 
 	@Inject
-	SimEventObjectHelper simEventHelper;
+	SimulatorEventObjectHelper simulatorEventHelper;
+
+	@Inject
+	SimulatorSessionObjectHelper simulatorSessionHelper;
 
 	@Inject
 	SliceConsoleHelper sliceHelper;
@@ -78,6 +85,8 @@ class SimulatorCreateEventAction
 
 	@Inject
 	Provider<TextResponder> textResponder;
+
+	// details
 
 	@Override
 	protected
@@ -107,6 +116,11 @@ class SimulatorCreateEventAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite ();
+
+		SimulatorSessionRec simulatorSession =
+			simulatorSessionHelper.find (
+				requestContext.stuffInt (
+					"simulatorSessionId"));
 
 		String numFrom =
 			requestContext.getForm ("numFrom");
@@ -219,11 +233,20 @@ class SimulatorCreateEventAction
 
 		// create event
 
-		simEventHelper.insert (
-			new SimEventRec ()
-				.setType ("message_in")
-				.setTimestamp (transaction.now ())
-				.setData (JSONValue.toJSONString (data)));
+		simulatorEventHelper.insert (
+			new SimulatorEventRec ()
+
+			.setSimulatorSession (
+				simulatorSession)
+
+			.setType (
+				"message_in")
+
+			.setTimestamp (
+				transaction.now ())
+
+			.setData (
+				JSONValue.toJSONString (data)));
 
 		// done
 
@@ -239,6 +262,11 @@ class SimulatorCreateEventAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite ();
+
+		SimulatorSessionRec simulatorSession =
+			simulatorSessionHelper.find (
+				requestContext.stuffInt (
+					"simulatorSessionId"));
 
 		Integer messageId =
 			toInteger (requestContext.getForm ("messageId"));
@@ -269,11 +297,20 @@ class SimulatorCreateEventAction
 
 		// create event
 
-		simEventHelper.insert (
-			new SimEventRec ()
-				.setType ("delivery_report")
-				.setTimestamp (transaction.now ())
-				.setData (JSONValue.toJSONString (data)));
+		simulatorEventHelper.insert (
+			new SimulatorEventRec ()
+
+			.setSimulatorSession (
+				simulatorSession)
+
+			.setType (
+				"delivery_report")
+
+			.setTimestamp (
+				transaction.now ())
+
+			.setData (
+				JSONValue.toJSONString (data)));
 
 		// done
 

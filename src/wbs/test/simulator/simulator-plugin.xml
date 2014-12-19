@@ -9,19 +9,21 @@
 	</dependencies>
 
 	<sql-scripts>
-		<sql-data name="sim-data"/>
+		<sql-data name="simulator-data"/>
 	</sql-scripts>
 
 	<models>
-		<model name="simEvent"/>
+		<model name="simulator"/>
+		<model name="simulatorEvent"/>
+		<model name="simulatorSession"/>
 	</models>
 
 	<layer name="console">
-		<bean class="console.SimulatorConsolePart"/>
-		<bean class="console.SimulatorCreateEventAction"/>
-		<bean class="console.SimulatorPollAction"/>
 		<bean class="console.SimulatorRouteSummaryAdditionalPart"/>
 		<bean class="console.SimulatorRouteSummaryAdditionalPartFactory"/>
+		<bean class="console.SimulatorSessionConsolePart"/>
+		<bean class="console.SimulatorSessionCreateEventAction"/>
+		<bean class="console.SimulatorSessionPollAction"/>
 	</layer>
 
 	<layer name="daemon">
@@ -34,6 +36,7 @@
 
 	<console-modules>
 		<console-module name="simulator"/>
+		<console-module name="simulator-session"/>
 	</console-modules>
 
 </plugin>

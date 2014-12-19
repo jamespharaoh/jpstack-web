@@ -2,10 +2,6 @@
 	name="update-log"
 	package="updatelog">
 
-	<sql-scripts>
-		<sql-data name="update-log-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="updateLog"/>
 	</models>

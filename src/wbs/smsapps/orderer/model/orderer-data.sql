@@ -1,16 +1,3 @@
-
-SELECT object_type_insert (
-	'orderer',
-	'orderer',
-	'slice',
-	1);
-
-SELECT object_type_insert (
-	'orderer_order',
-	'orderer order',
-	'orderer',
-	3);
-
 SELECT priv_type_insert (
 	'orderer',
 	'manage',

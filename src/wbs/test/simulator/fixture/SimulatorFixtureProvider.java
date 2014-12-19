@@ -47,7 +47,7 @@ class SimulatorFixtureProvider
 				"Simulator")
 
 			.setPath (
-				"/simulator")
+				"/simulators")
 
 		);
 

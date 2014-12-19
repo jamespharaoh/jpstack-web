@@ -1,12 +1,3 @@
-
--- broadcast config
-
-SELECT object_type_insert (
-	'broadcast_config',
-	'broadcast config',
-	'slice',
-	1);
-
 SELECT priv_type_insert (
 	'broadcast_config',
 	'manage',
@@ -32,14 +23,6 @@ SELECT service_type_insert (
 	'broadcast_config',
 	'default',
 	'Default');
-
--- broadcast
-
-SELECT object_type_insert (
-	'broadcast',
-	'broadcast',
-	'broadcast_config',
-	3);
 
 SELECT event_type_insert (
 	'broadcast_numbers_added',
@@ -68,16 +51,6 @@ SELECT event_type_insert (
 SELECT event_type_insert (
 	'broadcast_send_completed',
 	'%0 completed sending');
-
--- broadcast number
-
-SELECT object_type_insert (
-	'broadcast_number',
-	'broadcast number',
-	'broadcast',
-	3);
-
--- batch
 
 SELECT batch_type_insert (
 	'broadcast_config',

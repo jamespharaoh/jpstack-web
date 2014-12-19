@@ -4,7 +4,6 @@
 
 	<sql-scripts>
 		<sql-data name="subscription-data"/>
-		<sql-data name="subscription-sub-data"/>
 	</sql-scripts>
 
 	<models>

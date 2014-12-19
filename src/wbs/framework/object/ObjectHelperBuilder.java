@@ -32,8 +32,11 @@ import wbs.framework.application.context.NoSuchBeanException;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.model.ModelMethods;
+import wbs.framework.record.CommonRecord;
 import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.GlobalId;
+import wbs.framework.record.MajorRecord;
+import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
 
 import com.google.common.collect.ImmutableList;
@@ -248,8 +251,6 @@ class ObjectHelperBuilder {
 		@Getter @Setter
 		ObjectHelperProvider objectHelperProvider;
 
-		Integer stature;
-
 		String objectTypeCode;
 		Integer objectTypeId;
 
@@ -278,9 +279,6 @@ class ObjectHelperBuilder {
 			ObjectTypeEntry objectType =
 				objectTypeRegistry.findByCode (
 					objectHelperProvider.objectTypeCode ());
-
-			stature =
-				objectType.getStature ();
 
 			objectTypeCode =
 				objectType.getCode ();
@@ -646,25 +644,29 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			boolean major () {
-				return stature == 1;
+				return MajorRecord.class.isAssignableFrom (
+					objectClass ());
 			}
 
 			@Override
 			public
 			boolean minor () {
-				return stature == 2;
+				return MinorRecord.class.isAssignableFrom (
+					objectClass ());
 			}
 
 			@Override
 			public
 			boolean ephemeral () {
-				return stature == 4;
+				return EphemeralRecord.class.isAssignableFrom (
+					objectClass ());
 			}
 
 			@Override
 			public
 			boolean common () {
-				return stature == 3;
+				return CommonRecord.class.isAssignableFrom (
+					objectClass ());
 			}
 
 			@Override

@@ -1,61 +1,3 @@
----------------------------------------- INSERT object_type
-
-SELECT object_type_insert (
-	'subscription',
-	'subscription',
-	'slice',
-	1);
-
-SELECT object_type_insert (
-	'subscription_keyword',
-	'subscription keyword',
-	'subscription',
-	1);
-
-SELECT object_type_insert (
-	'subscription_list',
-	'subscription list',
-	'subscription',
-	1);
-
-SELECT object_type_insert (
-	'subscription_affiliate',
-	'subscription affiliate',
-	'subscription',
-	1);
-
-SELECT object_type_insert (
-	'subscription_number',
-	'subscription number',
-	'subscription',
-	3);
-
-SELECT object_type_insert (
-	'subscription_send',
-	'subscription send',
-	'subscription',
-	3);
-
-SELECT object_type_insert (
-	'subscription_send_part',
-	'subscription send part',
-	'subscription_send',
-	2);
-
-SELECT object_type_insert (
-	'subscription_send_number',
-	'subscription send number',
-	'subscription_send',
-	3);
-
-SELECT object_type_insert (
-	'subscription_bill',
-	'subscription bill',
-	'subscription_number',
-	3);
-
----------------------------------------- INSERT command_type
-
 SELECT command_type_insert (
 	'subscription',
 	'subscribe',
@@ -81,8 +23,6 @@ SELECT command_type_insert (
 	'subscribe',
 	'Subscribe');
 
----------------------------------------- INSERT service_type
-
 SELECT service_type_insert (
 	'subscription',
 	'default',
@@ -92,8 +32,6 @@ SELECT service_type_insert (
 	'subscription_list',
 	'default',
 	'Default');
-
----------------------------------------- INSERT messageset_type
 
 SELECT message_set_type_insert (
 	'subscription',
@@ -114,8 +52,6 @@ SELECT message_set_type_insert (
 	'subscription',
 	'unsubscribe_already',
 	'Unsubscription failed because already unsubscribed');
-
----------------------------------------- INSERT priv_type
 
 SELECT priv_type_insert (
 	'subscription',
@@ -208,28 +144,20 @@ SELECT priv_type_insert (
 	'List all subscriptions in this slice',
 	true);
 
----------------------------------------- INSERT batch_type
-
 SELECT batch_type_insert (
 	'subscription',
 	'send',
 	'Subscription send',
 	'subscription_send');
 
---------------------------------------- INSERT delivery_type
-
 SELECT delivery_type_insert (
 	'subscription',
 	'Subscription');
-
----------------------------------------- INSERT affiliate_type
 
 SELECT affiliate_type_insert (
 	'subscription_affiliate',
 	'default',
 	'Default');
-
----------------------------------------- INSERT event_type
 
 SELECT event_type_insert (
 	'subscription_send_scheduled',

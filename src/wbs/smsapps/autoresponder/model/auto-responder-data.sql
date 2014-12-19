@@ -1,10 +1,3 @@
-
-SELECT object_type_insert (
-	'auto_responder',
-	'auto responder',
-	'slice',
-	1);
-
 SELECT priv_type_insert (
 	'auto_responder',
 	'manage',

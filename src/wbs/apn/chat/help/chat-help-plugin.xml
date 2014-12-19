@@ -2,10 +2,6 @@
 	name="chat-help"
 	package="chat.help">
 
-	<sql-scripts>
-		<sql-data name="chat-help-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="chatHelpLog"/>
 		<model name="chatHelpTemplate"/>

@@ -4,6 +4,12 @@ $(function () {
 
 		var simulator = $(this);
 
+		var createEventUrl =
+			simulator.data ("create-event-url");
+
+		var pollUrl =
+			simulator.data ("poll-url");
+
 		var networkSelect =
 			simulator.find (".networkSelect");
 
@@ -28,7 +34,7 @@ $(function () {
 				},
 				dataType: "json",
 				type: "POST",
-				url: "/simulator/simulator.createEvent"
+				url: createEventUrl
 			});
 
 		}
@@ -48,7 +54,7 @@ $(function () {
 				},
 				dataType: "json",
 				type: "GET",
-				url: "/simulator/simulator.poll"
+				url: pollUrl
 			})
 
 			.done (function (events) {
@@ -129,7 +135,7 @@ $(function () {
 										},
 										dataType: "json",
 										type: "POST",
-										url: "/simulator/simulator.createEvent"
+										url: createEventUrl
 									});
 								}))
 
@@ -145,7 +151,7 @@ $(function () {
 										},
 										dataType: "json",
 										type: "POST",
-										url: "/simulator/simulator.createEvent"
+										url: createEventUrl
 									});
 								}));
 					}

@@ -2,10 +2,6 @@
 	name="chat-ad"
 	package="chat.ad">
 
-	<sql-scripts>
-		<sql-data name="chat-ad-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="chatAdTemplate"/>
 	</models>

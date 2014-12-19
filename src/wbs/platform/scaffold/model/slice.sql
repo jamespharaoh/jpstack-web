@@ -1,11 +1,3 @@
----------------------------------------- TABLE slice
-
-SELECT object_type_insert (
-	'slice',
-	'slice',
-	'root',
-	1);
-
 SELECT priv_type_insert (
 	'slice',
 	'manage',
