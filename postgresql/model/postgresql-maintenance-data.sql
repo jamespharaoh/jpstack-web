@@ -1,9 +1,3 @@
-SELECT object_type_insert (
-	'postgresql_maintenance',
-	'postgresql maintenance',
-	null,
-	4);
-
 DELETE FROM postgresql_maintenance
 WHERE frequency = 'm';
 

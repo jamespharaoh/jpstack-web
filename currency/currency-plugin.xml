@@ -9,10 +9,6 @@
 		</project>
 	</dependencies>
 
-	<sql-scripts>
-		<sql-data name="currency-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="currency"/>
 	</models>

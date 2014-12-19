@@ -1,16 +1,3 @@
-
-SELECT object_type_insert (
-	'exception_log_type',
-	'exception log type',
-	'root',
-	3);
-
-SELECT object_type_insert (
-	'exception_log',
-	'exception log',
-	'root',
-	4);
-
 INSERT INTO exception_type (
 	id,
 	code,

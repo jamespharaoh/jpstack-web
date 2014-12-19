@@ -4,7 +4,6 @@
 
 	<sql-scripts>
 		<sql-schema name="priv"/>
-		<sql-data name="priv-data"/>
 	</sql-scripts>
 
 	<models>

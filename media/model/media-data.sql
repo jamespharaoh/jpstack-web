@@ -1,24 +1,3 @@
-
-SELECT object_type_insert (
-	'media_type',
-	'media type',
-	'root',
-	1);
-
-SELECT object_type_insert (
-	'media',
-	'media',
-	'root',
-	3);
-
-SELECT object_type_insert (
-	'content',
-	'content',
-	'root',
-	3);
-
--- INSERT media_type
-
 SELECT media_type_insert ('text/plain', 'Plain text', 'txt');
 
 SELECT media_type_insert ('image/jpeg', 'JPEG image', 'jpg');

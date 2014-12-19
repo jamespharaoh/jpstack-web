@@ -1,22 +1,3 @@
-
-SELECT object_type_insert (
-	'event_type',
-	'event type',
-	'root',
-	1);
-
-SELECT object_type_insert (
-	'event',
-	'event',
-	'root',
-	3);
-
-SELECT object_type_insert (
-	'event_link',
-	'event link',
-	'event',
-	2);
-
 SELECT event_type_insert (
 	'object_created',
 	'%0 created %1 in %2');

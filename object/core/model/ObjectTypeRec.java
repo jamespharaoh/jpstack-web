@@ -10,11 +10,8 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.framework.entity.annotations.CodeField;
-import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
-import wbs.framework.entity.annotations.ReferenceField;
-import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.ObjectTypeEntry;
 import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
@@ -39,18 +36,6 @@ class ObjectTypeRec
 
 	@CodeField
 	String code;
-
-	// details
-
-	@DescriptionField
-	String description;
-
-	@ReferenceField (
-		nullable = true)
-	ObjectTypeRec parentObjectType;
-
-	@SimpleField
-	Integer stature;
 
 	// compare to
 
