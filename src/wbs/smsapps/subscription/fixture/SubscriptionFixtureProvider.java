@@ -11,6 +11,11 @@ import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuObjectHelper;
 import wbs.platform.menu.model.MenuRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.keyword.model.KeywordObjectHelper;
+import wbs.sms.keyword.model.KeywordRec;
+import wbs.sms.keyword.model.KeywordSetObjectHelper;
+import wbs.sms.keyword.model.KeywordSetRec;
 import wbs.smsapps.subscription.model.SubscriptionAffiliateObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
 import wbs.smsapps.subscription.model.SubscriptionKeywordObjectHelper;
@@ -26,6 +31,15 @@ class SubscriptionFixtureProvider
 	implements FixtureProvider {
 
 	// dependencies
+
+	@Inject
+	CommandObjectHelper commandHelper;
+
+	@Inject
+	KeywordObjectHelper keywordHelper;
+
+	@Inject
+	KeywordSetObjectHelper keywordSetHelper;
 
 	@Inject
 	MenuGroupObjectHelper menuGroupHelper;
@@ -90,6 +104,50 @@ class SubscriptionFixtureProvider
 
 			.setDescription (
 				"Test subscription")
+
+		);
+
+		KeywordSetRec inboundKeywordSet =
+			keywordSetHelper.findByCode (
+				GlobalId.root,
+				"test",
+				"inbound");
+
+		keywordHelper.insert (
+			new KeywordRec ()
+
+			.setKeywordSet (
+				inboundKeywordSet)
+
+			.setKeyword (
+				"sub")
+
+			.setDescription (
+				"Subscription subscribe")
+
+			.setCommand (
+				commandHelper.findByCode (
+					subscription,
+					"subscribe"))
+
+		);
+
+		keywordHelper.insert (
+			new KeywordRec ()
+
+			.setKeywordSet (
+				inboundKeywordSet)
+
+			.setKeyword (
+				"unsub")
+
+			.setDescription (
+				"Subscription unsubscribe")
+
+			.setCommand (
+				commandHelper.findByCode (
+					subscription,
+					"unsubscribe"))
 
 		);
 

@@ -9,6 +9,7 @@ import static wbs.framework.utils.etc.Misc.sum;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -42,8 +43,11 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.misc.MapStringSubstituter;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
+import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.text.model.TextRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -83,10 +87,13 @@ class ChatCreditLogicImpl
 	Database database;
 
 	@Inject
+	ObjectManager objectManager;
+
+	@Inject
 	ServiceObjectHelper serviceHelper;
 
 	@Inject
-	ObjectManager objectManager;
+	TextObjectHelper textHelper;
 
 	// prototype dependencies
 
@@ -921,8 +928,24 @@ class ChatCreditLogicImpl
 				"system",
 				"billed_message");
 
-		String message =
+		// substitute the params
+
+		String originalText =
 			chatHelpTemplate.getText ();
+
+		Map<String,String> allParams =
+			chatSendLogic.addDefaultParams (
+				chatUser,
+				Collections.<String,String>emptyMap ());
+
+		String finalText =
+			MapStringSubstituter.substitute (
+				originalText,
+				allParams);
+
+		TextRec text =
+			textHelper.findOrCreate (
+				finalText);
 
 		// and send it
 
@@ -940,8 +963,8 @@ class ChatCreditLogicImpl
 			.number (
 				chatUser.getNumber ())
 
-			.messageString (
-				message)
+			.messageText (
+				text)
 
 			.numFrom (
 				chatScheme.getRbNumber ())

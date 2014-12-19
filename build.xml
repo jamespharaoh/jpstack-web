@@ -211,6 +211,8 @@
       <fileset dir="src/wbs/integrations/txtnation/console/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/console/files"/>
       <fileset dir="src/wbs/integrations/urbanairship/console/files"/>
+      <fileset dir="src/wbs/test/simulator/console/files"/>
+      <fileset dir="src/wbs/test/common/console/files"/>
     </copy>
     <copy todir="work/live/console/WEB-INF/classes">
       <fileset dir="work/bin"/>
@@ -387,6 +389,8 @@
       <fileset dir="src/wbs/integrations/txtnation/api/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/api/files"/>
       <fileset dir="src/wbs/integrations/urbanairship/api/files"/>
+      <fileset dir="src/wbs/test/simulator/api/files"/>
+      <fileset dir="src/wbs/test/common/api/files"/>
     </copy>
     <copy todir="work/live/api/WEB-INF/classes">
       <fileset dir="work/bin"/>
@@ -597,6 +601,8 @@
       <fileset dir="src/wbs/integrations/txtnation/console/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/console/files"/>
       <fileset dir="src/wbs/integrations/urbanairship/console/files"/>
+      <fileset dir="src/wbs/test/simulator/console/files"/>
+      <fileset dir="src/wbs/test/common/console/files"/>
     </copy>
     <copy todir="work/test/console/WEB-INF/classes">
       <fileset dir="work/bin"/>
@@ -773,6 +779,8 @@
       <fileset dir="src/wbs/integrations/txtnation/api/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/api/files"/>
       <fileset dir="src/wbs/integrations/urbanairship/api/files"/>
+      <fileset dir="src/wbs/test/simulator/api/files"/>
+      <fileset dir="src/wbs/test/common/api/files"/>
     </copy>
     <copy todir="work/test/api/WEB-INF/classes">
       <fileset dir="work/bin"/>
@@ -1007,6 +1015,7 @@
       <script name="src/wbs/integrations/mig/model/mig-data.sql"/>
       <script name="src/wbs/integrations/oxygen8/model/oxygen8-data.sql"/>
       <script name="src/wbs/integrations/txtnation/model/txt-nation-data.sql"/>
+      <script name="src/wbs/test/simulator/model/sim-data.sql"/>
     </database-init>
   </target>
   <target name="just-schema-create">

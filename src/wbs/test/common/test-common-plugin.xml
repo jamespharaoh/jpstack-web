@@ -1,0 +1,9 @@
+<plugin
+	name="test-common"
+	package="common">
+
+	<fixtures>
+		<fixture name="testCommon"/>
+	</fixtures>
+
+</plugin>

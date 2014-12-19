@@ -125,8 +125,12 @@ class ObjectFormFieldBuilder {
 
 		FormFieldAccessor accessor =
 			simpleFormFieldAccessorProvider.get ()
-				.name (name)
-				.nativeClass (Record.class);
+
+			.name (
+				name)
+
+			.nativeClass (
+				Record.class);
 
 		FormFieldNativeMapping nativeMapping =
 			identityFormFieldNativeMappingProvider.get ();
@@ -142,11 +146,21 @@ class ObjectFormFieldBuilder {
 
 		FormFieldRenderer renderer =
 			objectFormFieldRendererProvider.get ()
-				.name (name)
-				.label (label)
-				.nullable (nullable)
-				.rootFieldName (rootFieldName)
-				.entityFinder (entityFinder);
+
+			.name (
+				name)
+
+			.label (
+				label)
+
+			.nullable (
+				nullable)
+
+			.rootFieldName (
+				rootFieldName)
+
+			.entityFinder (
+				entityFinder);
 
 		FormFieldUpdateHook updateHook =
 			simpleFormFieldUpdateHookProvider.get ()

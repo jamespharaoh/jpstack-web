@@ -1,0 +1,39 @@
+<plugin
+	name="simulator"
+	package="simulator">
+
+	<dependencies>
+		<project name="wbs-test">
+			<plugin name="test-common"/>
+		</project>
+	</dependencies>
+
+	<sql-scripts>
+		<sql-data name="sim-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="simEvent"/>
+	</models>
+
+	<layer name="console">
+		<bean class="console.SimulatorConsolePart"/>
+		<bean class="console.SimulatorCreateEventAction"/>
+		<bean class="console.SimulatorPollAction"/>
+		<bean class="console.SimulatorRouteSummaryAdditionalPart"/>
+		<bean class="console.SimulatorRouteSummaryAdditionalPartFactory"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.SimulatorSender"/>
+	</layer>
+
+	<fixtures>
+		<fixture name="simulator"/>
+	</fixtures>
+
+	<console-modules>
+		<console-module name="simulator"/>
+	</console-modules>
+
+</plugin>

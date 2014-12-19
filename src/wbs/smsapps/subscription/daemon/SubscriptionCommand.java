@@ -1,9 +1,5 @@
 package wbs.smsapps.subscription.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
-
-import java.util.Date;
-
 import javax.inject.Inject;
 
 import lombok.Cleanup;
@@ -14,29 +10,25 @@ import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
-import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
-import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.messageset.logic.MessageSetLogic;
-import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.subscription.logic.SubscriptionLogic;
 import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
+import wbs.smsapps.subscription.model.SubscriptionKeywordRec;
+import wbs.smsapps.subscription.model.SubscriptionListRec;
 import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelper;
-import wbs.smsapps.subscription.model.SubscriptionNumberRec;
 import wbs.smsapps.subscription.model.SubscriptionObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionRec;
 import wbs.smsapps.subscription.model.SubscriptionSubObjectHelper;
-import wbs.smsapps.subscription.model.SubscriptionSubRec;
 
-@PrototypeComponent ("subscriptionSubscribeCommand")
+@PrototypeComponent ("subscriptionCommand")
 public
-class SubscriptionSubscribeCommand
+class SubscriptionCommand
 	implements CommandHandler {
 
 	// dependencies
@@ -74,6 +66,15 @@ class SubscriptionSubscribeCommand
 	@Inject
 	SubscriptionLogic subscriptionLogic;
 
+	// state
+
+	CommandRec command;
+
+	SubscriptionRec subscription;
+	SubscriptionAffiliateRec subscriptionAffiliate;
+	SubscriptionKeywordRec subscriptionKeyword;
+	SubscriptionListRec subscriptionList;
+
 	// details
 
 	@Override
@@ -81,11 +82,19 @@ class SubscriptionSubscribeCommand
 	String[] getCommandTypes () {
 
 		return new String [] {
+
 			"subscription.subscribe",
-			"subscription_affiliate.subscribe"
+			"subscription_affiliate.subscribe",
+			"subscription_keyword.subscribe",
+			"subscription_list.subscribe",
+
+			"subscription.unsubscribe"
+
 		};
 
 	}
+
+	// implementation
 
 	@Override
 	public
@@ -97,17 +106,10 @@ class SubscriptionSubscribeCommand
 		Transaction transaction =
 			database.beginReadWrite ();
 
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+		findCommand (
+			commandId);
 
-		Record<?> commandParent =
-			objectManager.getParent (
-				command);
-
-		SubscriptionRec subscription;
-		SubscriptionAffiliateRec subscriptionAffiliate;
-
+		/*
 		String parentObjectTypeCode =
 			command.getParentObjectType ().getCode ();
 
@@ -263,6 +265,178 @@ class SubscriptionSubscribeCommand
 		transaction.commit ();
 
 		return Status.processed;
+
+	}
+
+	@Override
+	public
+	Status handle (
+			int commandId,
+			@NonNull ReceivedMessage receivedMessage) {
+
+		@Cleanup
+		Transaction transaction =
+			database.beginReadWrite ();
+
+		CommandRec command =
+			commandHelper.find (
+				commandId);
+
+		SubscriptionRec subscription =
+			(SubscriptionRec) (Object)
+			objectManager.getParent (
+				command);
+
+		MessageRec message =
+			messageHelper.find (
+				receivedMessage.getMessageId ());
+
+		// lock the subscription to prevent concurrent updates
+
+		subscriptionHelper.lock (
+			subscription);
+
+		// set service on received message
+
+		receivedMessage.setServiceId (
+			serviceHelper.findByCode (subscription, "default").getId ());
+
+		// check for a pre-existing subscription
+
+		SubscriptionSubRec subscriptionSub =
+			subscriptionSubHelper.findActive (
+				subscription,
+				message.getNumber ());
+
+		// if there was one...
+
+		if (subscriptionSub != null) {
+
+			SubscriptionAffiliateRec subscriptionAffiliate =
+				subscriptionSub.getSubscriptionAffiliate ();
+
+			AffiliateRec affiliate =
+				subscriptionAffiliate != null
+					? affiliateHelper.findByCode (
+						subscriptionAffiliate,
+						"default")
+					: null;
+
+			if (affiliate != null) {
+
+				receivedMessage.setAffiliateId (
+					affiliate.getId ());
+
+			}
+
+			// unsubscribe them
+
+			subscriptionSub
+				.setActive (false)
+				.setEnded (new Date ());
+
+			// update the counter
+
+			subscription.decNumSubscribers ();
+
+			if (subscriptionAffiliate != null) {
+
+				subscriptionAffiliate
+					.setNumSubscribers (
+						subscriptionAffiliate.getNumSubscribers () - 1);
+
+			}
+
+			// and send whatever messages
+
+			messageSetLogic.sendMessageSet (
+				messageSetLogic.findMessageSet (
+					subscription,
+					"subscription_unsubscribe_success"),
+				message.getThreadId (),
+				message.getNumber (),
+				serviceHelper.findByCode (
+					subscription,
+					"default"),
+				affiliate);
+
+		} else {
+
+			// they aren't subscribed, just send messages
+
+			messageSetLogic.sendMessageSet (
+				messageSetLogic.findMessageSet (
+					subscription,
+					"subscription_unsubscribe_already"),
+				message.getThreadId (),
+				message.getNumber (),
+				serviceHelper.findByCode (
+					subscription,
+					"default"));
+
+		}
+		*/
+
+		transaction.commit ();
+
+		return CommandHandler.Status.processed;
+
+	}
+
+	void findCommand (
+			int commandId) {
+
+		commandHelper.find (
+			commandId);
+
+		Record<?> commandParent =
+			objectManager.getParent (
+				command);
+
+		if (((Object) commandParent) instanceof SubscriptionRec) {
+
+			subscription =
+				(SubscriptionRec)
+				(Object)
+				commandParent;
+
+		}
+
+		if (((Object) commandParent) instanceof SubscriptionAffiliateRec) {
+
+			subscriptionAffiliate =
+				(SubscriptionAffiliateRec)
+				(Object)
+				commandParent;
+
+			subscription =
+				subscriptionAffiliate.getSubscription ();
+
+		}
+
+		if (((Object) commandParent) instanceof SubscriptionKeywordRec) {
+
+			subscriptionKeyword =
+				(SubscriptionKeywordRec)
+				(Object)
+				commandParent;
+
+			subscription =
+				subscriptionKeyword.getSubscription ();
+
+		}
+
+		if (((Object) commandParent) instanceof SubscriptionListRec) {
+
+			subscriptionList =
+				(SubscriptionListRec)
+				(Object)
+				commandParent;
+
+			subscription =
+				subscriptionList.getSubscription ();
+
+		}
 
 	}
 

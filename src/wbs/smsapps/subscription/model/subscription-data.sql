@@ -71,6 +71,16 @@ SELECT command_type_insert (
 	'subscribe',
 	'Subscribe');
 
+SELECT command_type_insert (
+	'subscription_keyword',
+	'subscribe',
+	'Subscribe');
+
+SELECT command_type_insert (
+	'subscription_list',
+	'subscribe',
+	'Subscribe');
+
 ---------------------------------------- INSERT service_type
 
 SELECT service_type_insert (

@@ -9,6 +9,7 @@
 
 	<models>
 		<enum-type name="subscriptionBillState"/>
+		<enum-type name="subscriptionKeywordType"/>
 		<enum-type name="subscriptionSendState"/>
 		<enum-type name="subscriptionSendNumberState"/>
 		<model name="subscription"/>
@@ -45,8 +46,7 @@
 		<bean class="daemon.SubscriptionDeliveryNoticeHandler"/>
 		<bean class="daemon.SubscriptionScheduleDaemon"/>
 		<bean class="daemon.SubscriptionSendDaemon"/>
-		<bean class="daemon.SubscriptionSubscribeCommand"/>
-		<bean class="daemon.SubscriptionUnsubscribeCommand"/>
+		<bean class="daemon.SubscriptionCommand"/>
 	</layer>
 
 	<console-modules>

@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -255,8 +256,6 @@ class ObjectHelperBuilder {
 		String parentTypeCode;
 		Integer parentTypeId;
 
-		ObjectHelperProvider parentHelperProvider;
-
 		ObjectHelperMethodsImplementation coreImplementation;
 
 		ObjectHelper<?> objectHelper;
@@ -289,8 +288,10 @@ class ObjectHelperBuilder {
 			objectTypeId =
 				objectType.getId ();
 
-			if (objectHelperProvider.parentTypeIsFixed ()
-					&& ! objectHelperProvider.root ()) {
+			if (
+				objectHelperProvider.parentTypeIsFixed ()
+				&& ! objectHelperProvider.root ()
+			) {
 
 				ObjectHelperProvider parentHelperProvider =
 					objectHelperProviderManager.forObjectClass (
@@ -679,16 +680,44 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Record<?> findByCode (
-					@NonNull GlobalId parentGlobalId,
+					@NonNull GlobalId ancestorGlobalId,
 					@NonNull String... codes) {
 
-				if (codes.length != 1)
-					throw new IllegalArgumentException (
-						"codes");
+				if (codes.length == 1) {
 
-				return objectHelperProvider.findByParentAndCode (
-					parentGlobalId,
-					codes [0]);
+					return objectHelperProvider.findByParentAndCode (
+						ancestorGlobalId,
+						codes [0]);
+
+				}
+
+				if (codes.length > 1) {
+
+					ObjectHelper<?> parentHelper =
+						forObjectClass (
+							parentClass ());
+
+					Record<?> parent =
+						parentHelper.findByCode (
+							ancestorGlobalId,
+							Arrays.copyOfRange (
+								codes,
+								0,
+								codes.length - 1));
+
+					GlobalId parentGlobalId =
+						new GlobalId (
+							parentHelper.objectTypeId (),
+							parent.getId ());
+
+					return objectHelperProvider.findByParentAndCode (
+						parentGlobalId,
+						codes [1]);
+
+				}
+
+				throw new IllegalArgumentException (
+					"codes");
 
 			}
 
@@ -1073,7 +1102,7 @@ class ObjectHelperBuilder {
 						throw new RuntimeException (
 							stringFormat (
 								"Can't find %s with id %s",
-								parentHelperProvider ().objectName (),
+								parentHelperProvider.objectName (),
 								parentObjectId));
 
 					}

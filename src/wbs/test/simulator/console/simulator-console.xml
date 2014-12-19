@@ -1,0 +1,18 @@
+<console-module
+	name="simulator">
+
+	<simple-context
+		name="simulator">
+
+		<context-tab-responder-page
+			name="console"/>
+
+		<context-action
+			name="createEvent"/>
+
+		<context-get-action
+			name="poll"/>
+
+	</simple-context>
+
+</console-module>

@@ -14,6 +14,7 @@ import wbs.framework.entity.annotations.EphemeralEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
+import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
 
@@ -48,6 +49,10 @@ class SubscriptionKeywordRec
 	Boolean deleted = false;
 
 	// settings
+
+	@SimpleField (
+		nullable = true)
+	SubscriptionKeywordType type;
 
 	@ReferenceField (
 		nullable = true)
