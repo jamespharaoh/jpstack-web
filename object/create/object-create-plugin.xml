@@ -1,6 +1,6 @@
 <plugin
 	name="object-create"
-	package="object.create">
+	package="wbs.platform.object.create">
 
 	<layer name="console">
 		<bean class="ObjectCreateAction"/>

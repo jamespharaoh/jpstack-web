@@ -1,6 +1,6 @@
 <plugin
 	name="console-misc"
-	package="console.misc">
+	package="wbs.platform.console.misc">
 
 	<layer name="logic">
 		<bean class="IntervalFormatterImpl"/>

@@ -1,6 +1,6 @@
 <plugin
 	name="object-settings"
-	package="object.settings">
+	package="wbs.platform.object.settings">
 
 	<layer name="console">
 		<bean class="ObjectRemoveAction"/>

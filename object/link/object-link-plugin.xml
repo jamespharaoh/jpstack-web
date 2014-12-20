@@ -1,6 +1,6 @@
 <plugin
 	name="object-link"
-	package="object.link">
+	package="wbs.platform.object.link">
 
 	<layer name="console">
 		<bean class="ObjectLinksAction"/>

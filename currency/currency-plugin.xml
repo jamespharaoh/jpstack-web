@@ -1,13 +1,11 @@
 <plugin
 	name="currency"
-	package="currency">
+	package="wbs.platform.currency">
 
-	<dependencies>
-		<project name="wbs-platform">
-			<plugin name="menu"/>
-			<plugin name="platform-common"/>
-		</project>
-	</dependencies>
+	<plugin-dependencies>
+		<plugin-dependency name="menu"/>
+		<plugin-dependency name="platform-common"/>
+	</plugin-dependencies>
 
 	<models>
 		<model name="currency"/>

@@ -1,6 +1,6 @@
 <plugin
 	name="text"
-	package="text">
+	package="wbs.platform.text">
 
 	<sql-scripts>
 		<sql-schema name="text"/>

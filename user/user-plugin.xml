@@ -1,6 +1,6 @@
 <plugin
 	name="user"
-	package="user">
+	package="wbs.platform.user">
 
 	<sql-scripts>
 		<sql-schema name="user"/>

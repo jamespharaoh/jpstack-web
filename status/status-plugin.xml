@@ -1,6 +1,6 @@
 <plugin
 	name="status"
-	package="status">
+	package="wbs.platform.status">
 
 	<layer name="console">
 		<bean class="console.StatusLineManager"/>

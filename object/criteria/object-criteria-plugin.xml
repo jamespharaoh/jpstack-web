@@ -1,6 +1,6 @@
 <plugin
 	name="object-criteria"
-	package="object.criteria">
+	package="wbs.platform.object.criteria">
 
 	<layer name="console">
 		<bean class="WhereDeletedCriteriaSpec"/>

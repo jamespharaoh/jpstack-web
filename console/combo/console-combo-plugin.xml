@@ -1,6 +1,6 @@
 <plugin
 	name="console-combo"
-	package="console.combo">
+	package="wbs.platform.console.combo">
 
 	<layer name="console">
 		<bean class="ContextActionPageBuilder"/>

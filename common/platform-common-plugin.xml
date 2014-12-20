@@ -1,6 +1,6 @@
 <plugin
 	name="platform-common"
-	package="common">
+	package="wbs.platform.common">
 
 	<fixtures>
 		<fixture name="platformCommon"/>

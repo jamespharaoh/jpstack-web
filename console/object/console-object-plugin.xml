@@ -1,6 +1,6 @@
 <plugin
 	name="console-object"
-	package="console.object">
+	package="wbs.platform.console.object">
 
 	<layer name="console">
 		<bean class="ExtendContextBuilder"/>

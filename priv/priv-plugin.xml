@@ -1,6 +1,6 @@
 <plugin
 	name="priv"
-	package="priv">
+	package="wbs.platform.priv">
 
 	<sql-scripts>
 		<sql-schema name="priv"/>

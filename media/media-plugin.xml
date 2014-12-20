@@ -1,6 +1,6 @@
 <plugin
 	name="media"
-	package="media">
+	package="wbs.platform.media">
 
 	<sql-scripts>
 		<sql-schema name="content"/>

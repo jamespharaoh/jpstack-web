@@ -24,23 +24,19 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.application.context.BeanDefinition;
 import wbs.framework.application.context.MethodBeanFactory;
-import wbs.framework.application.scaffold.BuildProjectSpec;
+import wbs.framework.application.scaffold.BuildPluginSpec;
 import wbs.framework.application.scaffold.BuildSpec;
 import wbs.framework.application.scaffold.PluginBeanSpec;
 import wbs.framework.application.scaffold.PluginConsoleModuleSpec;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
-import wbs.framework.application.scaffold.PluginDependenciesSpec;
+import wbs.framework.application.scaffold.PluginDependencySpec;
 import wbs.framework.application.scaffold.PluginEnumTypeSpec;
 import wbs.framework.application.scaffold.PluginFixtureSpec;
 import wbs.framework.application.scaffold.PluginLayerSpec;
 import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginModelsSpec;
-import wbs.framework.application.scaffold.PluginPluginDependencySpec;
-import wbs.framework.application.scaffold.PluginProjectDependencySpec;
 import wbs.framework.application.scaffold.PluginSpec;
-import wbs.framework.application.scaffold.ProjectPluginSpec;
-import wbs.framework.application.scaffold.ProjectSpec;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.object.ObjectHelperFactory;
@@ -57,7 +53,6 @@ import wbs.platform.console.spec.ConsoleSpec;
 import wbs.platform.object.core.hibernate.ObjectHelperProviderFactory;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @Accessors (fluent = true)
 @Log4j
@@ -81,7 +76,6 @@ class ApplicationContextBuilder {
 	@Getter @Setter
 	String outputPath;
 
-	Map<String,ProjectSpec> projects;
 	List<PluginSpec> plugins;
 	PluginManager pluginManager;
 
@@ -110,7 +104,6 @@ class ApplicationContextBuilder {
 	public
 	ApplicationContext build () {
 
-		loadProjects ();
 		loadPlugins ();
 
 		createPluginManager ();
@@ -122,21 +115,17 @@ class ApplicationContextBuilder {
 	}
 
 	private
-	void loadProjects ()
-		throws Exception {
+	void loadPlugins () {
 
 		String buildPath =
 			"/wbs-build.xml";
 
-		log.info (
-			stringFormat (
-				"Loading build config from %s",
-				buildPath));
-
 		DataFromXml buildDataFromXml =
 			new DataFromXml ()
-				.registerBuilderClass (BuildSpec.class)
-				.registerBuilderClass (BuildProjectSpec.class);
+
+			.registerBuilderClasses (
+				BuildSpec.class,
+				BuildPluginSpec.class);
 
 		BuildSpec build =
 			(BuildSpec)
@@ -144,111 +133,45 @@ class ApplicationContextBuilder {
 				Collections.emptyList (),
 				buildPath);
 
-		DataFromXml projectDataFromXml =
-			new DataFromXml ()
-				.registerBuilderClass (ProjectSpec.class)
-				.registerBuilderClass (ProjectPluginSpec.class);
-
-		ImmutableMap.Builder<String,ProjectSpec> projectsBuilder =
-			ImmutableMap.<String,ProjectSpec>builder ();
-
-		for (BuildProjectSpec buildProjectSpec
-				: build.projects ()) {
-
-			log.info (
-				stringFormat (
-					"Loading project %s from %s",
-					buildProjectSpec.projectName (),
-					buildProjectSpec.projectPackageName ()));
-
-			String projectPath =
-				stringFormat (
-					"/%s",
-					buildProjectSpec.projectPackageName ().replace (".", "/"),
-					"/%s-project.xml",
-					buildProjectSpec.projectName ());
-
-			ProjectSpec project =
-				(ProjectSpec)
-				projectDataFromXml.readClasspath (
-					Collections.emptyList (),
-					projectPath);
-
-			projectsBuilder.put (
-				buildProjectSpec.projectName (),
-				project);
-
-		}
-
-		projects =
-			projectsBuilder.build ();
-
-	}
-
-	private
-	void loadPlugins () {
-
 		ImmutableList.Builder<PluginSpec> pluginsBuilder =
 			ImmutableList.<PluginSpec>builder ();
 
 		DataFromXml pluginDataFromXml =
 			new DataFromXml ()
-				.registerBuilderClasses (
-					PluginBeanSpec.class,
-					PluginConsoleModuleSpec.class,
-					PluginCustomTypeSpec.class,
-					PluginDependenciesSpec.class,
-					PluginEnumTypeSpec.class,
-					PluginFixtureSpec.class,
-					PluginLayerSpec.class,
-					PluginModelSpec.class,
-					PluginModelsSpec.class,
-					PluginPluginDependencySpec.class,
-					PluginProjectDependencySpec.class,
-					PluginSpec.class);
+
+			.registerBuilderClasses (
+				PluginBeanSpec.class,
+				PluginConsoleModuleSpec.class,
+				PluginCustomTypeSpec.class,
+				PluginEnumTypeSpec.class,
+				PluginFixtureSpec.class,
+				PluginLayerSpec.class,
+				PluginModelSpec.class,
+				PluginModelsSpec.class,
+				PluginDependencySpec.class,
+				PluginSpec.class);
 
 		for (
-			ProjectSpec project
-				: projects.values ()
+			BuildPluginSpec buildPlugin
+				: build.plugins ()
 		) {
 
-			ImmutableList.Builder<PluginSpec> projectPluginsBuilder =
-				ImmutableList.<PluginSpec>builder ();
+			String pluginPath =
+				stringFormat (
+					"/%s",
+					buildPlugin.packageName ().replace (".", "/"),
+					"/%s-plugin.xml",
+					buildPlugin.name ());
 
-			for (
-				ProjectPluginSpec projectPlugin
-					: project.projectPlugins ()
-			) {
+			PluginSpec plugin =
+				(PluginSpec)
+				pluginDataFromXml.readClasspath (
+					ImmutableList.<Object>of (
+						build),
+					pluginPath);
 
-				String pluginPath =
-					stringFormat (
-						"/%s",
-						project.packageName ().replace (".", "/"),
-						"/%s",
-						projectPlugin.packageName ().replace (".", "/"),
-						"/%s-plugin.xml",
-						projectPlugin.name ());
-
-				PluginSpec plugin =
-					(PluginSpec)
-					pluginDataFromXml.readClasspath (
-						ImmutableList.<Object>of (
-							project),
-						pluginPath);
-
-				plugin.project (
-					project);
-
-				projectPluginsBuilder.add (
-					plugin);
-
-				pluginsBuilder.add (
-					plugin);
-
-			}
-
-			project.plugins (
-				projectPluginsBuilder.build ());
+			pluginsBuilder.add (
+				plugin);
 
 		}
 
@@ -265,6 +188,10 @@ class ApplicationContextBuilder {
 				.plugins (plugins)
 				.build ();
 
+		addSingletonBean (
+			"pluginManager",
+			pluginManager);
+
 	}
 
 	private
@@ -274,9 +201,6 @@ class ApplicationContextBuilder {
 		int errors = 0;
 
 		createApplicationContext ();
-
-		errors +=
-			registerProjectBeans ();
 
 		errors +=
 			registerLayerBeans ();
@@ -317,56 +241,30 @@ class ApplicationContextBuilder {
 	}
 
 	private
-	int registerProjectBeans () {
-
-		applicationContext.registerSingleton (
-			"pluginManager",
-			pluginManager);
-
-		for (ProjectSpec project
-				: projects.values ()) {
-
-			String projectBeanName =
-				stringFormat (
-					"%sProjectSpec",
-					hyphenToCamel (project.name ()));
-
-			applicationContext.registerSingleton (
-				projectBeanName,
-				project);
-
-		}
-
-		return 0;
-
-	}
-
-	private
 	int registerLayerBeans ()
 		throws Exception {
 
 		int errors = 0;
 
-		for (String layerName
-				: layerNames) {
+		for (
+			String layerName
+				: layerNames
+		) {
 
 			log.info (
 				stringFormat (
 					"Loading beans for layer %s",
 					layerName));
 
-			for (ProjectSpec project
-					: projects.values ()) {
+			for (
+				PluginSpec plugin
+					: plugins
+			) {
 
-				for (PluginSpec plugin
-						: project.plugins ()) {
-
-					errors +=
-						registerLayerBeans (
-							plugin,
-							layerName);
-
-				}
+				errors +=
+					registerLayerBeans (
+						plugin,
+						layerName);
 
 			}
 
@@ -457,40 +355,35 @@ class ApplicationContextBuilder {
 	}
 
 	int registerConsoleModule (
-			@NonNull PluginConsoleModuleSpec projectConsoleSpec) {
+			@NonNull PluginConsoleModuleSpec pluginConsoleModuleSpec) {
 
 		String xmlResourceName =
 			stringFormat (
-				"/%s/%s/console/%s-console.xml",
-				projectConsoleSpec
-					.plugin ()
-					.project ()
-					.packageName ()
-					.replace (".", "/"),
-				projectConsoleSpec
+				"/%s/console/%s-console.xml",
+				pluginConsoleModuleSpec
 					.plugin ()
 					.packageName ()
 					.replace (".", "/"),
-				projectConsoleSpec
+				pluginConsoleModuleSpec
 					.name ());
 
 		String consoleSpecBeanName =
 			stringFormat (
 				"%sSpec",
 				hyphenToCamel (
-					projectConsoleSpec.name ()));
+					pluginConsoleModuleSpec.name ()));
 
 		String consoleModuleBeanName =
 			stringFormat (
 				"%sConsoleModule",
 				hyphenToCamel (
-					projectConsoleSpec.name ()));
+					pluginConsoleModuleSpec.name ()));
 
 		String consoleMetaModuleBeanName =
 			stringFormat (
 				"%sConsoleMetaModule",
 				hyphenToCamel (
-					projectConsoleSpec.name ()));
+					pluginConsoleModuleSpec.name ()));
 
 		/*
 		for (ConsoleHelperProviderSpec consoleHelperProviderSpec
@@ -629,8 +522,10 @@ class ApplicationContextBuilder {
 
 		int errors = 0;
 
-		for (PluginFixtureSpec fixture
-				: plugin.fixtures ()) {
+		for (
+			PluginFixtureSpec fixture
+				: plugin.fixtures ()
+		) {
 
 			String fixtureProviderBeanName =
 				stringFormat (
@@ -639,8 +534,7 @@ class ApplicationContextBuilder {
 
 			String fixtureProviderClassName =
 				stringFormat (
-					"%s.%s.fixture.%sFixtureProvider",
-					plugin.project ().packageName (),
+					"%s.fixture.%sFixtureProvider",
 					plugin.packageName (),
 					capitalise (
 						fixture.name ()));
@@ -657,11 +551,11 @@ class ApplicationContextBuilder {
 
 				log.error (
 					stringFormat (
-						"Can't find fixture provider of type %s for ",
+						"Can't find fixture provider of type %s ",
 						fixtureProviderClassName,
-						"fixture %s from %s/%s",
+						"for fixture %s ",
 						fixture.name (),
-						plugin.project ().name (),
+						"from %s",
 						plugin.name ()));
 
 				errors ++;
@@ -857,8 +751,7 @@ class ApplicationContextBuilder {
 
 		String beanClassName =
 			stringFormat (
-				"%s.%s.%s",
-				beanSpec.plugin ().project ().packageName (),
+				"%s.%s",
 				beanSpec.plugin ().packageName (),
 				beanSpec.className ());
 
@@ -874,9 +767,8 @@ class ApplicationContextBuilder {
 
 			log.error (
 				stringFormat (
-					"No such class %s in %s.%s.%s.%s",
+					"No such class %s in %s.%s.%s",
 					beanClassName,
-					beanSpec.plugin ().project ().name (),
 					beanSpec.plugin ().name (),
 					beanSpec.layer ().name (),
 					beanSpec.className ()));
@@ -1056,8 +948,7 @@ class ApplicationContextBuilder {
 
 		String objectHooksClassName =
 			stringFormat (
-				"%s.%s.model.%sRec$%sHooks",
-				model.plugin ().project ().packageName (),
+				"%s.model.%sRec$%sHooks",
 				model.plugin ().packageName (),
 				capitalise (model.name ()),
 				capitalise (model.name ()));
@@ -1102,8 +993,7 @@ class ApplicationContextBuilder {
 
 		String objectHelperClassName =
 			stringFormat (
-				"%s.%s.model.%sObjectHelper",
-				model.plugin ().project ().packageName (),
+				"%s.model.%sObjectHelper",
 				model.plugin ().packageName (),
 				capitalise (model.name ()));
 
@@ -1140,8 +1030,7 @@ class ApplicationContextBuilder {
 
 		String objectHelperImplementationClassName =
 			stringFormat (
-				"%s.%s.model.%sRec$%sObjectHelperImplementation",
-				model.plugin ().project ().packageName (),
+				"%s.model.%sRec$%sObjectHelperImplementation",
 				model.plugin ().packageName (),
 				capitalise (model.name ()),
 				capitalise (model.name ()));
@@ -1178,20 +1067,19 @@ class ApplicationContextBuilder {
 	}
 
 	int registerDaoHibernate (
-			@NonNull PluginModelSpec projectModelSpec)
+			@NonNull PluginModelSpec pluginModelSpec)
 		throws Exception {
 
 		String daoBeanName =
 			stringFormat (
 				"%sDao",
-				projectModelSpec.name ());
+				pluginModelSpec.name ());
 
 		String daoClassName =
 			stringFormat (
-				"%s.%s.model.%sDao",
-				projectModelSpec.plugin ().project ().packageName (),
-				projectModelSpec.plugin ().packageName (),
-				capitalise (projectModelSpec.name ()));
+				"%s.model.%sDao",
+				pluginModelSpec.plugin ().packageName (),
+				capitalise (pluginModelSpec.name ()));
 
 		try {
 
@@ -1206,10 +1094,9 @@ class ApplicationContextBuilder {
 
 		String daoHibernateClassName =
 			stringFormat (
-				"%s.%s.hibernate.%sDaoHibernate",
-				projectModelSpec.plugin ().project ().packageName (),
-				projectModelSpec.plugin ().packageName (),
-				capitalise (projectModelSpec.name ()));
+				"%s.hibernate.%sDaoHibernate",
+				pluginModelSpec.plugin ().packageName (),
+				capitalise (pluginModelSpec.name ()));
 
 		Class<?> daoHibernateClass;
 
@@ -1348,8 +1235,7 @@ class ApplicationContextBuilder {
 
 		String consoleHelperClassName =
 			stringFormat (
-				"%s.%s.console.%sConsoleHelper",
-				model.plugin ().project ().packageName (),
+				"%s.console.%sConsoleHelper",
 				model.plugin ().packageName (),
 				capitalise (model.name ()));
 
@@ -1412,8 +1298,7 @@ class ApplicationContextBuilder {
 
 		String enumClassName =
 			stringFormat (
-				"%s.%s.model.%s",
-				enumType.plugin ().project ().packageName (),
+				"%s.model.%s",
 				enumType.plugin ().packageName (),
 				capitalise (enumType.name ()));
 

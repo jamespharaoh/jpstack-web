@@ -1,6 +1,6 @@
 <plugin
 	name="console-helper"
-	package="console.helper">
+	package="wbs.platform.console.helper">
 
 	<layer name="console">
 		<bean class="ConsoleObjectManagerImpl"/>

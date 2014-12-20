@@ -1,6 +1,6 @@
 <plugin
 	name="scaffold"
-	package="scaffold">
+	package="wbs.platform.scaffold">
 
 	<sql-scripts>
 		<sql-schema name="root"/>

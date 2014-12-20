@@ -1,6 +1,6 @@
 <plugin
 	name="object-search"
-	package="object.search">
+	package="wbs.platform.object.search">
 
 	<layer name="console">
 		<bean class="ObjectSearchGetAction"/>

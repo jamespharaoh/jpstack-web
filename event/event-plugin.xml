@@ -1,6 +1,6 @@
 <plugin
 	name="event"
-	package="event">
+	package="wbs.platform.event">
 
 	<sql-scripts>
 		<sql-schema name="event"/>
