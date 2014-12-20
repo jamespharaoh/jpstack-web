@@ -1,6 +1,6 @@
 <plugin
 	name="chat-broadcast"
-	package="chat.broadcast">
+	package="wbs.apn.chat.broadcast">
 
 	<sql-scripts>
 		<sql-schema name="chat-broadcast"/>

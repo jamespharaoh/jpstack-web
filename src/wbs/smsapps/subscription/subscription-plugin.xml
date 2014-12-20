@@ -1,6 +1,6 @@
 <plugin
 	name="subscription"
-	package="subscription">
+	package="wbs.smsapps.subscription">
 
 	<sql-scripts>
 		<sql-data name="subscription-data"/>

@@ -1,6 +1,6 @@
 <plugin
 	name="txt-nation"
-	package="txtnation">
+	package="wbs.integrations.txtnation">
 
 	<sql-scripts>
 		<sql-schema name="txt-nation"/>

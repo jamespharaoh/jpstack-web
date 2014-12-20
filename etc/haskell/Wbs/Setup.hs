@@ -25,8 +25,8 @@ writeBuildFile worldConfig = do
 	let buildConfig =
 		wcBuild worldConfig
 
-	let projectsAndPlugins =
-		wcProjectsAndPlugins worldConfig
+	let plugins =
+		wcPlugins worldConfig
 
 	let makeProperties =
 		[
@@ -267,10 +267,8 @@ writeBuildFile worldConfig = do
 		]
 
 
-	let pluginDir projectConfig pluginConfig =
+	let pluginDir pluginConfig =
 		"src/" ++
-		(replace "." "/" $ prcPackage projectConfig) ++
-		"/" ++
 		(replace "." "/" $ plcPackage pluginConfig)
 
 	let makeWebTarget name env = let
@@ -278,24 +276,22 @@ writeBuildFile worldConfig = do
 		workDir =
 			"work/" ++ env ++ "/" ++ name
 
-		pluginDir (projectConfig, pluginConfig) =
+		pluginDir pluginConfig =
 			"src/" ++
-			(replace "." "/" $ prcPackage projectConfig) ++
-			"/" ++
 			(replace "." "/" $ plcPackage pluginConfig)
 
-		makeWebFileset projectAndPlugin = let
+		makeWebFileset plugin = let
 
 			thisPluginDir =
-				pluginDir projectAndPlugin
+				pluginDir plugin
 
 			in makeFilesetDir (
 				if isInfixOf ("/" ++ name ++ "/") thisPluginDir
 				then (
-					(pluginDir projectAndPlugin) ++
+					(pluginDir plugin) ++
 					"/files"
 				) else (
-					(pluginDir projectAndPlugin) ++
+					(pluginDir plugin) ++
 					"/" ++
 					name ++
 					"/files"
@@ -310,7 +306,7 @@ writeBuildFile worldConfig = do
 			makeMkdir $ workDir ++ "/WEB-INF/lib",
 
 			makeCopyToDirNofail workDir $
-				map makeWebFileset projectsAndPlugins,
+				map makeWebFileset plugins,
 
 			makeCopyToDir (workDir ++ "/WEB-INF/classes") [
 				makeFilesetDir "work/bin" []
@@ -502,13 +498,11 @@ writeBuildFile worldConfig = do
 			sattr "name" name
 		] []
 
-	let makeSqlScripts getter suffix (projectConfig, pluginConfig) =
+	let makeSqlScripts getter suffix pluginConfig =
 		map makeOne (getter pluginConfig)
 		where makeOne scriptName =
 			makeScriptName $
 				"src/" ++
-				(replace "." "/" $ prcPackage projectConfig) ++
-				"/" ++
 				(replace "." "/" $ plcPackage pluginConfig) ++
 				"/model/" ++
 				scriptName ++
@@ -525,8 +519,7 @@ writeBuildFile worldConfig = do
 			] [],
 
 			mkelem "database-init" [] $
-				concat $
-					map (makeSqlScripts getter suffix) projectsAndPlugins
+				(concat . map (makeSqlScripts getter suffix)) plugins
 
 		]
 

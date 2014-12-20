@@ -1,6 +1,6 @@
 <plugin
 	name="chat-scheme"
-	package="chat.scheme">
+	package="wbs.apn.chat.scheme">
 
 	<models>
 		<model name="chatScheme"/>

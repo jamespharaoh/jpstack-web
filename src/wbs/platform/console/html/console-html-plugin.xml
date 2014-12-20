@@ -1,6 +1,6 @@
 <plugin
 	name="console-html"
-	package="console.html">
+	package="wbs.platform.console.html">
 
 	<layer name="console">
 		<bean class="SelectBuilder"/>

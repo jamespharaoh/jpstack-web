@@ -1,6 +1,6 @@
 <plugin
 	name="reporting"
-	package="reporting">
+	package="wbs.platform.reporting">
 
 	<layer name="console">
 		<bean class="console.AdditionStatsResolver"/>

@@ -11,9 +11,9 @@ import           Text.XML.HXT.Core
 
 -------------------- records
 
-data BuildProjectConfig =
+data BuildPluginConfig =
 
-	BuildProjectConfig {
+	BuildPluginConfig {
 		bpcName :: String,
 		bpcPackage :: String
 	}
@@ -32,23 +32,8 @@ data BuildConfig =
 
 	BuildConfig {
 		bcName :: String,
-		bcProjects :: [ BuildProjectConfig ],
+		bcPlugins :: [ BuildPluginConfig ],
 		bcGitLinks :: [ BuildGitLinkConfig ]
-	}
-
-data ProjectPluginConfig =
-
-	ProjectPluginConfig {
-		ppcName :: String,
-		ppcPackage :: String
-	}
-
-data ProjectConfig =
-
-	ProjectConfig {
-		prcName :: String,
-		prcPackage :: String,
-		prcPlugins :: [ ProjectPluginConfig ]
 	}
 
 data PluginConfig =
@@ -60,45 +45,11 @@ data PluginConfig =
 		plcSqlDatas :: [ String ]
 	}
 
-{-
-<plugin
-	name="menu"
-	package="menu">
-
-	<dependencies>
-		<project name="wbs-platform">
-			<plugin name="platform-common"/>
-		</project>
-	</dependencies>
-
-	<sql-scripts>
-		<sql-schema name="menu"/>
-		<sql-data name="menu-data"/>
-	</sql-scripts>
-
-	<models>
-		<model name="menu"/>
-		<model name="menuGroup"/>
-	</models>
-
-	<fixtures>
-		<fixture name="menu"/>
-	</fixtures>
-
-	<console-modules>
-		<console-module name="menu"/>
-		<console-module name="menu-group"/>
-	</console-modules>
-
-</plugin>
--}
-
 data WorldConfig =
 
 	WorldConfig {
 		wcBuild :: BuildConfig,
-		wcProjects :: [ ProjectConfig ],
-		wcProjectsAndPlugins :: [ (ProjectConfig, PluginConfig) ]
+		wcPlugins :: [ PluginConfig ]
 	}
 
 -------------------- misc
@@ -124,13 +75,13 @@ loadBuildConfig ::
 
 loadBuildConfig = do
 
-	let getProjects =
-		atTag "project" >>> proc projectTag -> do
+	let getPlugins =
+		atTag "plugin" >>> proc pluginTag -> do
 
-			name <- getAttrValue "name" -< projectTag
-			package <- getAttrValue "package" -< projectTag
+			name <- getAttrValue "name" -< pluginTag
+			package <- getAttrValue "package" -< pluginTag
 
-			returnA -< BuildProjectConfig {
+			returnA -< BuildPluginConfig {
 				bpcName = name,
 				bpcPackage = package
 			}
@@ -158,15 +109,15 @@ loadBuildConfig = do
 
 			name <- getAttrValue "name" -< buildTag
 
-			projectsTag <- atTag "projects" -< buildTag
-			projects <- listA getProjects -< projectsTag
+			pluginsTag <- atTag "plugins" -< buildTag
+			plugins <- listA getPlugins -< pluginsTag
 
 			gitLinksTag <- atTag "git-links" -< buildTag
 			gitLinks <- listA getGitLink -< gitLinksTag
 
 			returnA -< BuildConfig {
 				bcName = name,
-				bcProjects = projects,
+				bcPlugins = plugins,
 				bcGitLinks = gitLinks
 			}
 
@@ -175,63 +126,14 @@ loadBuildConfig = do
 
 	return buildConfig
 
--------------------- loadProjectConfig
-
-loadProjectConfig ::
-	BuildConfig ->
-	BuildProjectConfig ->
-	IO (ProjectConfig)
-
-loadProjectConfig buildConfig buildProjectConfig = do
-
-	let getPlugins =
-		atTag "plugin" >>> proc pluginTag -> do
-
-			name <- getAttrValue "name" -< pluginTag
-			package <- getAttrValue "package" -< pluginTag
-
-			returnA -< ProjectPluginConfig {
-				ppcName = name,
-				ppcPackage = package
-			}
-
-	let getConfig =
-		atTag "project" >>> proc projectTag -> do
-
-			name <- getAttrValue "name" -< projectTag
-			package <- getAttrValue "package" -< projectTag
-
-			plugins <- listA getPlugins -< projectTag
-
-			returnA -< ProjectConfig {
-				prcName = name,
-				prcPackage = package,
-				prcPlugins = plugins
-			}
-
-	let projectConfigPath =
-		"src/" ++
-		(replace "." "/" $ bpcPackage buildProjectConfig) ++
-		"/" ++
-		(bpcName buildProjectConfig) ++
-		"-project.xml"
-
-	putStrLn projectConfigPath
-
-	[ projectConfig ] <-
-		runX (parseXML projectConfigPath >>> getConfig)
-
-	return projectConfig
-
 -------------------- loadPluginConfig
 
 loadPluginConfig ::
 	BuildConfig ->
-	ProjectConfig ->
-	ProjectPluginConfig ->
+	BuildPluginConfig ->
 	IO (PluginConfig)
 
-loadPluginConfig buildConfig projectConfig projectPluginConfig = do
+loadPluginConfig buildConfig buildPluginConfig = do
 
 	let getPluginConfig =
 		atTag "plugin" >>> proc pluginTag -> do
@@ -252,11 +154,9 @@ loadPluginConfig buildConfig projectConfig projectPluginConfig = do
 
 	let pluginConfigPath =
 		"src/" ++
-		(replace "." "/" $ prcPackage projectConfig) ++
+		(replace "." "/" $ bpcPackage buildPluginConfig) ++
 		"/" ++
-		(replace "." "/" $ ppcPackage projectPluginConfig) ++
-		"/" ++
-		(ppcName projectPluginConfig) ++
+		(bpcName buildPluginConfig) ++
 		"-plugin.xml"
 
 	[ pluginConfig ] <-
@@ -276,30 +176,13 @@ loadWorld = do
 	buildConfig <-
 		loadBuildConfig
 
-	-- load project configs
-
-	projectConfigs <-
-		mapM (loadProjectConfig buildConfig) $ bcProjects buildConfig
-
 	-- load plugin configs
 
-	let loadPlugin' (projectConfig, projectPluginConfig) = do
-
-		pluginConfig <-
-			loadPluginConfig buildConfig projectConfig projectPluginConfig
-
-		return (projectConfig, pluginConfig)
-
-	let projectWithPlugins projectConfig =
-		zip (repeat projectConfig) (prcPlugins projectConfig)
-
-	projectsAndPlugins <-
-		mapM loadPlugin' $
-			concat $
-				map projectWithPlugins projectConfigs
+	pluginConfigs <-
+		mapM (loadPluginConfig buildConfig) $
+			bcPlugins buildConfig
 
 	return WorldConfig {
 		wcBuild = buildConfig,
-		wcProjects = projectConfigs,
-		wcProjectsAndPlugins = projectsAndPlugins
+		wcPlugins = pluginConfigs
 	}

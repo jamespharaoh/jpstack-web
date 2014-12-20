@@ -105,6 +105,9 @@ class ChatUserLogicImpl
 	GazetteerEntryObjectHelper gazetteerEntryHelper;
 
 	@Inject
+	KeywordFinder keywordFinder;
+
+	@Inject
 	LocatorLogic locatorLogic;
 
 	@Inject
@@ -1083,8 +1086,10 @@ class ChatUserLogicImpl
 
 		GazetteerEntryRec gazetteerEntry = null;
 
-		for (KeywordFinder.Match match
-				: KeywordFinder.find (place)) {
+		for (
+			KeywordFinder.Match match
+				: keywordFinder.find (place)
+		) {
 
 			gazetteerEntry =
 				gazetteerEntryHelper.findByCode (

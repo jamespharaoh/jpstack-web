@@ -1,6 +1,6 @@
 <plugin
 	name="oxygen8"
-	package="oxygen8">
+	package="wbs.integrations.oxygen8">
 
 	<sql-scripts>
 		<sql-data name="oxygen8-data"/>

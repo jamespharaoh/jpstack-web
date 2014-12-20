@@ -1,6 +1,6 @@
 <plugin
 	name="object"
-	package="object">
+	package="wbs.framework.object">
 
 	<layer name="object">
 		<bean class="ObjectHelperBuilder"/>

@@ -1,6 +1,6 @@
 <plugin
 	name="script-system"
-	package="script.system">
+	package="wbs.platform.script.system">
 
 	<sql-scripts>
 		<sql-schema name="system-script"/>

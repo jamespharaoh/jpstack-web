@@ -1,11 +1,14 @@
 package wbs.apn.chat.user.core.console;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+
+import org.joda.time.Instant;
 
 import wbs.apn.chat.user.core.model.ChatUserDao;
 import wbs.apn.chat.user.core.model.ChatUserDateMode;
@@ -68,7 +71,10 @@ class ChatUserNumberLinkProvider
 		List<Link> advices =
 			new ArrayList<Link> ();
 
-		for (Integer chatUserId : chatUserIds) {
+		for (
+			Integer chatUserId
+				: chatUserIds
+		) {
 
 			final ChatUserRec chatUser =
 				chatUserHelper.find (
@@ -97,13 +103,14 @@ class ChatUserNumberLinkProvider
 
 				@Override
 				public
-				Date getStartTime () {
-					return chatUser.getFirstJoin ();
+				Instant getStartTime () {
+					return dateToInstant (
+						chatUser.getFirstJoin ());
 				}
 
 				@Override
 				public
-				Date getEndTime () {
+				Instant getEndTime () {
 					return null;
 				}
 
@@ -165,13 +172,14 @@ class ChatUserNumberLinkProvider
 
 					@Override
 					public
-					Date getStartTime () {
-						return chatUser.getLastJoin ();
+					Instant getStartTime () {
+						return dateToInstant (
+							chatUser.getLastJoin ());
 					}
 
 					@Override
 					public
-					Date getEndTime () {
+					Instant getEndTime () {
 						return null;
 					}
 
@@ -235,13 +243,14 @@ class ChatUserNumberLinkProvider
 
 					@Override
 					public
-					Date getStartTime () {
-						return chatUser.getLastJoin ();
+					Instant getStartTime () {
+						return dateToInstant (
+							chatUser.getLastJoin ());
 					}
 
 					@Override
 					public
-					Date getEndTime () {
+					Instant getEndTime () {
 						return null;
 					}
 

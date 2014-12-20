@@ -1,6 +1,6 @@
 <plugin
 	name="api"
-	package="api">
+	package="wbs.platform.api">
 
 	<layer name="api">
 		<bean class="ApiErrorResponder"/>

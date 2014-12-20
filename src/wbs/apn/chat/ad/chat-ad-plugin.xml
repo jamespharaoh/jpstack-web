@@ -1,6 +1,6 @@
 <plugin
 	name="chat-ad"
-	package="chat.ad">
+	package="wbs.apn.chat.ad">
 
 	<models>
 		<model name="chatAdTemplate"/>

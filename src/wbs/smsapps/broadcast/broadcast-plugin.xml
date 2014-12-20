@@ -1,12 +1,10 @@
 <plugin
 	name="broadcast"
-	package="broadcast">
+	package="wbs.smsapps.broadcast">
 
-	<dependencies>
-		<project name="wbs-sms-apps">
-			<plugin name="sms-apps-common"/>
-		</project>
-	</dependencies>
+	<plugin-dependencies>
+		<plugin-dependency name="sms-apps-common"/>
+	</plugin-dependencies>
 
 	<sql-scripts>
 		<sql-data name="broadcast-data"/>

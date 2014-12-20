@@ -1,6 +1,6 @@
 <plugin
 	name="postgresql"
-	package="postgresql">
+	package="wbs.platform.postgresql">
 
 	<sql-scripts>
 		<sql-schema name="postgresql"/>

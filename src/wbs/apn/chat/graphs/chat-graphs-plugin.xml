@@ -1,6 +1,6 @@
 <plugin
 	name="chat-graphs"
-	package="chat.graphs">
+	package="wbs.apn.chat.graphs">
 
 	<layer name="console">
 		<bean class="console.ChatGraphsDailyUsersImageResponder"/>

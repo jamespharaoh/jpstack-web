@@ -1,6 +1,6 @@
 <plugin
 	name="console-metamodule"
-	package="console.metamodule">
+	package="wbs.platform.console.metamodule">
 
 	<layer name="console">
 		<bean class="ConsoleMetaManagerImpl"/>

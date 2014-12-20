@@ -1,6 +1,6 @@
 <plugin
 	name="lock"
-	package="lock">
+	package="wbs.platform.lock">
 
 	<sql-scripts>
 		<sql-schema name="lock"/>

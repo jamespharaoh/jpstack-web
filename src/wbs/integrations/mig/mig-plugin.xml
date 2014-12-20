@@ -1,6 +1,6 @@
 <plugin
 	name="mig"
-	package="mig">
+	package="wbs.integrations.mig">
 
 	<models>
 		<model name="migNetwork"/>

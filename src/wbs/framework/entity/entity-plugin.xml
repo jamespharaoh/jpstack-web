@@ -1,6 +1,6 @@
 <plugin
 	name="entity"
-	package="entity">
+	package="wbs.framework.entity">
 
 	<layer name="entity">
 		<bean class="helper.EntityHelperImpl"/>

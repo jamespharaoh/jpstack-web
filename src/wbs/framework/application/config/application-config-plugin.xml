@@ -1,6 +1,6 @@
 <plugin
 	name="application-config"
-	package="application.config">
+	package="wbs.framework.application.config">
 
 	<layer name="config">
 		<bean class="WbsConfigFactory"/>

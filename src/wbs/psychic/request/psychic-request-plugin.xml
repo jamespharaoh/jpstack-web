@@ -1,9 +1,0 @@
-<plugin
-	name="psychic-request"
-	package="request">
-
-	<models>
-		<model name="psychicRequest"/>
-	</models>
-
-</plugin>

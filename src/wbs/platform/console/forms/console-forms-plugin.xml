@@ -1,6 +1,6 @@
 <plugin
 	name="console-forms"
-	package="console.forms">
+	package="wbs.platform.console.forms">
 
 	<layer name="console">
 		<bean class="CodeFormFieldBuilder"/>

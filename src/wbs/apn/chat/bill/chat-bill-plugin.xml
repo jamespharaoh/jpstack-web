@@ -1,6 +1,6 @@
 <plugin
 	name="chat-bill"
-	package="chat.bill">
+	package="wbs.apn.chat.bill">
 
 	<sql-scripts>
 		<sql-data name="chat-bill-data"/>

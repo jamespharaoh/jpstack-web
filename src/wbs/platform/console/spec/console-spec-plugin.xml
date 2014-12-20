@@ -1,6 +1,6 @@
 <plugin
 	name="console-spec"
-	package="console.spec">
+	package="wbs.platform.console.spec">
 
 	<layer name="console">
 		<bean class="ConsoleSpec"/>

@@ -1,6 +1,6 @@
 <plugin
 	name="ticketer"
-	package="ticketer">
+	package="wbs.smsapps.ticketer">
 
 	<sql-scripts>
 		<sql-data name="ticketer-data"/>

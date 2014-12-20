@@ -1,6 +1,6 @@
 <plugin
 	name="digital-select"
-	package="digitalselect">
+	package="wbs.integrations.digitalselect">
 
 	<sql-scripts>
 		<sql-data name="digital-select-data"/>

@@ -1,6 +1,6 @@
 <plugin
 	name="chat-approval"
-	package="chat.approval">
+	package="wbs.apn.chat.approval">
 
 	<models>
 		<model name="chatApprovalRegexp"/>

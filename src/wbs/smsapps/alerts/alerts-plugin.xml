@@ -1,6 +1,6 @@
 <plugin
 	name="alerts"
-	package="alerts">
+	package="wbs.smsapps.alerts">
 
 	<sql-scripts>
 		<sql-data name="alerts-data"/>

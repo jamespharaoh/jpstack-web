@@ -71,6 +71,9 @@
 		<name-field/>
 		<description-field/>
 
+		<integer-field
+			name="numSubscribers"/>
+
 	</field-set>
 
 	<field-set
@@ -92,6 +95,9 @@
 		<name-field/>
 		<description-field/>
 		<deleted-field/>
+
+		<integer-field
+			name="numSubscribers"/>
 
 	</field-set>
 

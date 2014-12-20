@@ -43,6 +43,9 @@ class ChatMagicCommand
 	Database database;
 
 	@Inject
+	KeywordFinder keywordFinder;
+
+	@Inject
 	ObjectManager objectManager;
 
 	// details
@@ -83,8 +86,10 @@ class ChatMagicCommand
 
 		// look for a single keyword
 
-		for (KeywordFinder.Match match
-				: KeywordFinder.find (rest)) {
+		for (
+			KeywordFinder.Match match
+				: keywordFinder.find (rest)
+		) {
 
 			if (! rest.isEmpty ())
 				continue;

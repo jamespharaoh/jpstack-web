@@ -1,6 +1,6 @@
 <plugin
 	name="chat-date"
-	package="chat.date">
+	package="wbs.apn.chat.date">
 
 	<layer name="logic">
 		<bean class="logic.ChatDateLogicImpl"/>

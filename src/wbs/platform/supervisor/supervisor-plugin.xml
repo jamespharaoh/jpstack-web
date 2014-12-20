@@ -1,6 +1,6 @@
 <plugin
 	name="supervisor"
-	package="supervisor">
+	package="wbs.platform.supervisor">
 
 	<layer name="console">
 		<bean class="SupervisorAdditionOperandSpec"/>

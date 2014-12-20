@@ -1,6 +1,6 @@
 <plugin
 	name="object-browse"
-	package="object.browse">
+	package="wbs.platform.object.browse">
 
 	<layer name="console">
 		<bean class="ObjectBrowsePageBuilder"/>

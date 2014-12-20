@@ -1,6 +1,6 @@
 <plugin
 	name="console-tab"
-	package="console.tab">
+	package="wbs.platform.console.tab">
 
 	<layer name="console">
 		<bean class="ConsoleContextTab"/>

@@ -1,6 +1,6 @@
 <plugin
 	name="hibernate"
-	package="hibernate">
+	package="wbs.framework.hibernate">
 
 	<layer name="hibernate">
 		<bean class="HibernateDatabase"/>

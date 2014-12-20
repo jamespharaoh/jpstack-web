@@ -1,6 +1,6 @@
 <plugin
 	name="chat-settings"
-	package="chat.settings">
+	package="wbs.apn.chat.settings">
 
 	<layer name="console">
 		<bean class="console.ChatSettingsMonitorsAction"/>

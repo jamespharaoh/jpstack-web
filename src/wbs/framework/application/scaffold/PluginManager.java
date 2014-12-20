@@ -1,6 +1,5 @@
 package wbs.framework.application.scaffold;
 
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -82,17 +81,13 @@ class PluginManager {
 						plugin);
 
 					donePluginNames.add (
-						joinWithSeparator (
-							".",
-							plugin.project ().name (),
-							plugin.name ()));
+						plugin.name ());
 
 					iterator.remove ();
 
 					log.debug (
 						stringFormat (
-							"Resolved dependencies for plugin %s/%s",
-							plugin.project ().name (),
+							"Resolved dependencies for plugin %s",
 							plugin.name ()));
 
 					continue OUTER;
@@ -110,8 +105,7 @@ class PluginManager {
 
 					log.error (
 						stringFormat (
-							"Unable to resolve dependencies for plugin %s/%s",
-							plugin.project ().name (),
+							"Unable to resolve dependencies for plugin %s",
 							plugin.name ()));
 
 				}
@@ -133,23 +127,14 @@ class PluginManager {
 		boolean pluginDependenciesSatisfied (
 				PluginSpec plugin) {
 
-			for (PluginProjectDependencySpec projectDependency
-					: plugin.dependencies ().projects ()) {
+			for (
+				PluginDependencySpec pluginDependency
+					: plugin.pluginDependencies ()
+			) {
 
-				for (PluginPluginDependencySpec pluginDependency
-						: projectDependency.plugins ()) {
-
-					String dependencyName =
-						joinWithSeparator (
-							".",
-							projectDependency.name (),
-							pluginDependency.name ());
-
-					if (! donePluginNames.contains (
-							dependencyName))
-						return false;
-
-				}
+				if (! donePluginNames.contains (
+						pluginDependency.name ()))
+					return false;
 
 			}
 

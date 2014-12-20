@@ -94,6 +94,9 @@ class ChatChatCommand
 	Database database;
 
 	@Inject
+	KeywordFinder keywordFinder;
+
+	@Inject
 	MessageObjectHelper messageHelper;
 
 	@Inject
@@ -415,8 +418,10 @@ class ChatChatCommand
 
 		// look for keywords to interpret
 
-		for (KeywordFinder.Match match
-				: KeywordFinder.find (rest)) {
+		for (
+			KeywordFinder.Match match
+				: keywordFinder.find (rest)
+		) {
 
 			if (! rest.isEmpty ())
 				continue;

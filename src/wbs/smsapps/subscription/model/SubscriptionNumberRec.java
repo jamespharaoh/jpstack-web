@@ -51,7 +51,7 @@ class SubscriptionNumberRec
 	// state
 
 	@SimpleField
-	Boolean active;
+	Boolean active = false;
 
 	@ReferenceField (
 		nullable = true)
@@ -175,9 +175,6 @@ class SubscriptionNumberRec
 
 				.setNumber (
 					number)
-
-				.setActive (
-					false)
 
 			);
 

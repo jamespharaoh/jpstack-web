@@ -1,6 +1,6 @@
 <plugin
 	name="mediaburst"
-	package="mediaburst">
+	package="wbs.integrations.mediaburst">
 
 	<sql-scripts>
 		<sql-data name="mediaburst-data"/>

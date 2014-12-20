@@ -1,6 +1,6 @@
 <plugin
 	name="chat-help"
-	package="chat.help">
+	package="wbs.apn.chat.help">
 
 	<models>
 		<model name="chatHelpLog"/>

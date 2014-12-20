@@ -46,6 +46,8 @@ class SchemaTool {
 	@Inject
 	SchemaTypesHelper schemaTypesHelper;
 
+	// prototype dependencies
+
 	@Inject
 	Provider<SchemaFromModel> schemaFromModel;
 

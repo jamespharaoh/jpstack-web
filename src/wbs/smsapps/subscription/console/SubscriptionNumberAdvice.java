@@ -1,12 +1,13 @@
 package wbs.smsapps.subscription.console;
 
-import java.util.Date;
-
 import javax.inject.Inject;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Instant;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.platform.priv.console.PrivChecker;
@@ -43,13 +44,13 @@ class SubscriptionNumberAdvice
 
 	@Override
 	public
-	Date getStartTime () {
+	Instant getStartTime () {
 		return subscriptionSub.getStarted ();
 	}
 
 	@Override
 	public
-	Date getEndTime () {
+	Instant getEndTime () {
 		return subscriptionSub.getEnded ();
 	}
 

@@ -1,6 +1,6 @@
 <plugin
 	name="console-part"
-	package="console.part">
+	package="wbs.platform.console.part">
 
 	<layer name="console">
 		<bean class="NotFoundPart"/>

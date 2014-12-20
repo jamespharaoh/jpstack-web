@@ -1,6 +1,6 @@
 <plugin
 	name="update-log"
-	package="updatelog">
+	package="wbs.platform.updatelog">
 
 	<models>
 		<model name="updateLog"/>

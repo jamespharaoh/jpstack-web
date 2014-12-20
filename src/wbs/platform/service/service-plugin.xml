@@ -1,6 +1,6 @@
 <plugin
 	name="service"
-	package="service">
+	package="wbs.platform.service">
 
 	<sql-scripts>
 		<sql-schema name="service"/>

@@ -1,6 +1,6 @@
 <plugin
 	name="object-list"
-	package="object.list">
+	package="wbs.platform.object.list">
 
 	<layer name="console">
 		<bean class="ObjectListTabSpec"/>

@@ -1,6 +1,6 @@
 <plugin
 	name="rpc"
-	package="rpc">
+	package="wbs.platform.rpc">
 
 	<layer name="api">
 		<bean class="php.PhpMapResponder"/>

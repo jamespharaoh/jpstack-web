@@ -31,10 +31,14 @@ import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.report.logic.ReportLogic;
 import wbs.sms.network.console.NetworkConsoleHelper;
 import wbs.sms.network.model.NetworkRec;
+import wbs.sms.number.core.console.NumberConsoleHelper;
+import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.test.simulator.model.SimulatorEventObjectHelper;
 import wbs.test.simulator.model.SimulatorEventRec;
+import wbs.test.simulator.model.SimulatorSessionNumberObjectHelper;
+import wbs.test.simulator.model.SimulatorSessionNumberRec;
 import wbs.test.simulator.model.SimulatorSessionObjectHelper;
 import wbs.test.simulator.model.SimulatorSessionRec;
 
@@ -60,6 +64,9 @@ class SimulatorSessionCreateEventAction
 	NetworkConsoleHelper networkHelper;
 
 	@Inject
+	NumberConsoleHelper numberHelper;
+
+	@Inject
 	ObjectManager objectManager;
 
 	@Inject
@@ -76,6 +83,9 @@ class SimulatorSessionCreateEventAction
 
 	@Inject
 	SimulatorSessionObjectHelper simulatorSessionHelper;
+
+	@Inject
+	SimulatorSessionNumberObjectHelper simulatorSessionNumberHelper;
 
 	@Inject
 	SliceConsoleHelper sliceHelper;
@@ -247,6 +257,21 @@ class SimulatorSessionCreateEventAction
 
 			.setData (
 				JSONValue.toJSONString (data)));
+
+		// associate number with session
+
+		NumberRec number =
+			numberHelper.findOrCreate (
+				numFrom);
+
+		SimulatorSessionNumberRec simulatorSessionNumber =
+			simulatorSessionNumberHelper.findOrCreate (
+				number);
+
+		simulatorSessionNumber
+
+			.setSimulatorSession (
+				simulatorSession);
 
 		// done
 

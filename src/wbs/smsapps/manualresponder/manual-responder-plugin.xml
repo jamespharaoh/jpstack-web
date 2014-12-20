@@ -1,12 +1,11 @@
 <plugin
 	name="manual-responder"
-	package="manualresponder">
+	package="wbs.smsapps.manualresponder">
 
-	<dependencies>
-		<project name="wbs-sms-apps">
-			<plugin name="sms-apps-common"/>
-		</project>
-	</dependencies>
+	<plugin-dependencies>
+		<plugin-dependency name="network"/>
+		<plugin-dependency name="sms-apps-common"/>
+	</plugin-dependencies>
 
 	<sql-scripts>
 		<sql-schema name="manual-responder"/>

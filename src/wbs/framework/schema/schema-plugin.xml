@@ -1,6 +1,6 @@
 <plugin
 	name="schema"
-	package="schema">
+	package="wbs.framework.schema">
 
 	<layer name="schema">
 		<bean class="helper.SchemaNamesHelperImpl"/>

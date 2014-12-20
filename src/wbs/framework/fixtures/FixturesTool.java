@@ -57,15 +57,13 @@ class FixturesTool {
 
 				log.info (
 					stringFormat (
-						"Creating fixture %s from %s/%s",
+						"Creating fixture %s from %s",
 						fixture.name (),
-						plugin.project ().name (),
 						plugin.name ()));
 
 				String fixtureProviderClassName =
 					stringFormat (
-						"%s.%s.fixture.%sFixtureProvider",
-						plugin.project ().packageName (),
+						"%s.fixture.%sFixtureProvider",
 						plugin.packageName (),
 						capitalise (
 							fixture.name ()));
@@ -84,8 +82,9 @@ class FixturesTool {
 						stringFormat (
 							"Can't find fixture provider of type %s for ",
 							fixtureProviderClassName,
-							"fixture %s from %s/%s",
-							plugin.project ().name (),
+							"fixture %s ",
+							fixture.name (),
+							"from %s",
 							plugin.name ()));
 
 				}
@@ -107,9 +106,8 @@ class FixturesTool {
 
 					throw new RuntimeException (
 						stringFormat (
-							"Error creating fixture %s from %s/%s",
+							"Error creating fixture %s from %s",
 							fixture.name (),
-							plugin.project ().name (),
 							plugin.name ()),
 						exception);
 

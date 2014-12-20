@@ -45,8 +45,8 @@ import org.joda.time.Seconds;
 import wbs.framework.application.context.BeanFactory;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
 import wbs.framework.application.scaffold.PluginEnumTypeSpec;
+import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.application.scaffold.PluginSpec;
-import wbs.framework.application.scaffold.ProjectSpec;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
@@ -62,6 +62,8 @@ public
 class SessionFactoryBeanFactory
 	implements BeanFactory {
 
+	// implementation
+
 	@Inject
 	EntityHelper entityHelper;
 
@@ -72,13 +74,17 @@ class SessionFactoryBeanFactory
 	SchemaNamesHelperImpl sqlEntityNames;
 
 	@Inject
-	List<ProjectSpec> projects;
+	PluginManager pluginManager;
+
+	// properties
 
 	@Getter @Setter
 	Properties hibernateProperties;
 
 	@Getter @Setter
 	DataSource dataSource;
+
+	// state
 
 	Map<Class<?>,String> customTypes =
 		new HashMap<Class<?>,String> ();
@@ -90,6 +96,8 @@ class SessionFactoryBeanFactory
 	int classErrors = 0;
 	int errorClasses = 0;
 
+	// implementation
+
 	void initCustomTypes () {
 
 		customTypes.put (
@@ -100,34 +108,31 @@ class SessionFactoryBeanFactory
 			Instant.class,
 			"org.jadira.usertype.dateandtime.joda.PersistentInstantAsString");
 
-		for (ProjectSpec project
-				: projects) {
+		for (
+			PluginSpec plugin
+				: pluginManager.plugins ()
+		) {
 
-			for (PluginSpec plugin
-					: project.plugins ()) {
+			if (plugin.models () == null)
+				continue;
 
-				if (plugin.models () == null)
-					continue;
+			for (
+				PluginCustomTypeSpec customType
+					: plugin.models ().customTypes ()
+			) {
 
-				for (
-					PluginCustomTypeSpec customType
-						: plugin.models ().customTypes ()
-				) {
+				initCustomType (
+					customType);
 
-					initCustomType (
-						customType);
+			}
 
-				}
+			for (
+				PluginEnumTypeSpec enumType
+					: plugin.models ().enumTypes ()
+			) {
 
-				for (
-					PluginEnumTypeSpec enumType
-						: plugin.models ().enumTypes ()
-				) {
-
-					initEnumType (
-						enumType);
-
-				}
+				initEnumType (
+					enumType);
 
 			}
 
@@ -155,8 +160,7 @@ class SessionFactoryBeanFactory
 
 		String className =
 			stringFormat (
-				"%s.%s.model.%s",
-				type.plugin ().project ().packageName (),
+				"%s.model.%s",
 				type.plugin ().packageName (),
 				capitalise (type.name ()));
 
@@ -178,8 +182,7 @@ class SessionFactoryBeanFactory
 
 		String helperClassName =
 			stringFormat (
-				"%s.%s.hibernate.%sType",
-				type.plugin ().project ().packageName (),
+				"%s.hibernate.%sType",
 				type.plugin ().packageName (),
 				capitalise (type.name ()));
 
@@ -219,8 +222,7 @@ class SessionFactoryBeanFactory
 
 		String enumClassName =
 			stringFormat (
-				"%s.%s.model.%s",
-				enumType.plugin ().project ().packageName (),
+				"%s.model.%s",
 				enumType.plugin ().packageName (),
 				capitalise (enumType.name ()));
 

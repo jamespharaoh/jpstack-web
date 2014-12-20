@@ -52,7 +52,7 @@
     <mkdir dir="work/live/console/WEB-INF/classes"/>
     <mkdir dir="work/live/console/WEB-INF/lib"/>
     <copy todir="work/live/console" failonerror="false">
-      <fileset dir="src/wbs/framework/activitymanager/console/files"/>
+      <fileset dir="src/activitymanager/console/files"/>
       <fileset dir="src/wbs/framework/builder/console/files"/>
       <fileset dir="src/wbs/framework/database/console/files"/>
       <fileset dir="src/wbs/framework/entity/console/files"/>
@@ -60,7 +60,7 @@
       <fileset dir="src/wbs/framework/object/console/files"/>
       <fileset dir="src/wbs/framework/schema/console/files"/>
       <fileset dir="src/wbs/framework/sql/console/files"/>
-      <fileset dir="src/wbs/framework/web/console/files"/>
+      <fileset dir="src/web/console/files"/>
       <fileset dir="src/wbs/framework/application/config/console/files"/>
       <fileset dir="src/wbs/platform/object/core/console/files"/>
       <fileset dir="src/wbs/platform/currency/console/files"/>
@@ -115,7 +115,7 @@
       <fileset dir="src/wbs/platform/api/console/files"/>
       <fileset dir="src/wbs/platform/reporting/console/files"/>
       <fileset dir="src/wbs/platform/common/console/files"/>
-      <fileset dir="src/wbs/sms/common/console/files"/>
+      <fileset dir="src/wbs/sms/core/console/files"/>
       <fileset dir="src/wbs/sms/gsm/console/files"/>
       <fileset dir="src/wbs/sms/network/console/files"/>
       <fileset dir="src/wbs/sms/number/core/console/files"/>
@@ -161,19 +161,6 @@
       <fileset dir="src/wbs/smsapps/photograbber/console/files"/>
       <fileset dir="src/wbs/smsapps/subscription/console/files"/>
       <fileset dir="src/wbs/smsapps/ticketer/console/files"/>
-      <fileset dir="src/wbs/psychic/affiliate/console/files"/>
-      <fileset dir="src/wbs/psychic/affiliategroup/console/files"/>
-      <fileset dir="src/wbs/psychic/bill/console/files"/>
-      <fileset dir="src/wbs/psychic/contact/console/files"/>
-      <fileset dir="src/wbs/psychic/core/console/files"/>
-      <fileset dir="src/wbs/psychic/help/console/files"/>
-      <fileset dir="src/wbs/psychic/keyword/console/files"/>
-      <fileset dir="src/wbs/psychic/profile/console/files"/>
-      <fileset dir="src/wbs/psychic/request/console/files"/>
-      <fileset dir="src/wbs/psychic/send/console/files"/>
-      <fileset dir="src/wbs/psychic/template/console/files"/>
-      <fileset dir="src/wbs/psychic/user/core/console/files"/>
-      <fileset dir="src/wbs/psychic/user/admin/console/files"/>
       <fileset dir="src/wbs/apn/chat/core/console/files"/>
       <fileset dir="src/wbs/apn/chat/ad/console/files"/>
       <fileset dir="src/wbs/apn/chat/adult/console/files"/>
@@ -198,8 +185,6 @@
       <fileset dir="src/wbs/apn/chat/user/core/console/files"/>
       <fileset dir="src/wbs/apn/chat/user/admin/console/files"/>
       <fileset dir="src/wbs/apn/chat/user/pending/console/files"/>
-      <fileset dir="src/wbs/apn/chat/tv/core/console/files"/>
-      <fileset dir="src/wbs/apn/chat/tv/moderation/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
       <fileset dir="src/wbs/integrations/dialogue/console/files"/>
@@ -230,7 +215,7 @@
     <mkdir dir="work/live/api/WEB-INF/classes"/>
     <mkdir dir="work/live/api/WEB-INF/lib"/>
     <copy todir="work/live/api" failonerror="false">
-      <fileset dir="src/wbs/framework/activitymanager/api/files"/>
+      <fileset dir="src/activitymanager/api/files"/>
       <fileset dir="src/wbs/framework/builder/api/files"/>
       <fileset dir="src/wbs/framework/database/api/files"/>
       <fileset dir="src/wbs/framework/entity/api/files"/>
@@ -238,7 +223,7 @@
       <fileset dir="src/wbs/framework/object/api/files"/>
       <fileset dir="src/wbs/framework/schema/api/files"/>
       <fileset dir="src/wbs/framework/sql/api/files"/>
-      <fileset dir="src/wbs/framework/web/api/files"/>
+      <fileset dir="src/web/api/files"/>
       <fileset dir="src/wbs/framework/application/config/api/files"/>
       <fileset dir="src/wbs/platform/object/core/api/files"/>
       <fileset dir="src/wbs/platform/currency/api/files"/>
@@ -293,7 +278,7 @@
       <fileset dir="src/wbs/platform/api/api/files"/>
       <fileset dir="src/wbs/platform/reporting/api/files"/>
       <fileset dir="src/wbs/platform/common/api/files"/>
-      <fileset dir="src/wbs/sms/common/api/files"/>
+      <fileset dir="src/wbs/sms/core/api/files"/>
       <fileset dir="src/wbs/sms/gsm/api/files"/>
       <fileset dir="src/wbs/sms/network/api/files"/>
       <fileset dir="src/wbs/sms/number/core/api/files"/>
@@ -339,19 +324,6 @@
       <fileset dir="src/wbs/smsapps/photograbber/api/files"/>
       <fileset dir="src/wbs/smsapps/subscription/api/files"/>
       <fileset dir="src/wbs/smsapps/ticketer/api/files"/>
-      <fileset dir="src/wbs/psychic/affiliate/api/files"/>
-      <fileset dir="src/wbs/psychic/affiliategroup/api/files"/>
-      <fileset dir="src/wbs/psychic/bill/api/files"/>
-      <fileset dir="src/wbs/psychic/contact/api/files"/>
-      <fileset dir="src/wbs/psychic/core/api/files"/>
-      <fileset dir="src/wbs/psychic/help/api/files"/>
-      <fileset dir="src/wbs/psychic/keyword/api/files"/>
-      <fileset dir="src/wbs/psychic/profile/api/files"/>
-      <fileset dir="src/wbs/psychic/request/api/files"/>
-      <fileset dir="src/wbs/psychic/send/api/files"/>
-      <fileset dir="src/wbs/psychic/template/api/files"/>
-      <fileset dir="src/wbs/psychic/user/core/api/files"/>
-      <fileset dir="src/wbs/psychic/user/admin/api/files"/>
       <fileset dir="src/wbs/apn/chat/core/api/files"/>
       <fileset dir="src/wbs/apn/chat/ad/api/files"/>
       <fileset dir="src/wbs/apn/chat/adult/api/files"/>
@@ -376,8 +348,6 @@
       <fileset dir="src/wbs/apn/chat/user/core/api/files"/>
       <fileset dir="src/wbs/apn/chat/user/admin/api/files"/>
       <fileset dir="src/wbs/apn/chat/user/pending/api/files"/>
-      <fileset dir="src/wbs/apn/chat/tv/core/api/files"/>
-      <fileset dir="src/wbs/apn/chat/tv/moderation/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
       <fileset dir="src/wbs/integrations/dialogue/api/files"/>
@@ -442,7 +412,7 @@
     <mkdir dir="work/test/console/WEB-INF/classes"/>
     <mkdir dir="work/test/console/WEB-INF/lib"/>
     <copy todir="work/test/console" failonerror="false">
-      <fileset dir="src/wbs/framework/activitymanager/console/files"/>
+      <fileset dir="src/activitymanager/console/files"/>
       <fileset dir="src/wbs/framework/builder/console/files"/>
       <fileset dir="src/wbs/framework/database/console/files"/>
       <fileset dir="src/wbs/framework/entity/console/files"/>
@@ -450,7 +420,7 @@
       <fileset dir="src/wbs/framework/object/console/files"/>
       <fileset dir="src/wbs/framework/schema/console/files"/>
       <fileset dir="src/wbs/framework/sql/console/files"/>
-      <fileset dir="src/wbs/framework/web/console/files"/>
+      <fileset dir="src/web/console/files"/>
       <fileset dir="src/wbs/framework/application/config/console/files"/>
       <fileset dir="src/wbs/platform/object/core/console/files"/>
       <fileset dir="src/wbs/platform/currency/console/files"/>
@@ -505,7 +475,7 @@
       <fileset dir="src/wbs/platform/api/console/files"/>
       <fileset dir="src/wbs/platform/reporting/console/files"/>
       <fileset dir="src/wbs/platform/common/console/files"/>
-      <fileset dir="src/wbs/sms/common/console/files"/>
+      <fileset dir="src/wbs/sms/core/console/files"/>
       <fileset dir="src/wbs/sms/gsm/console/files"/>
       <fileset dir="src/wbs/sms/network/console/files"/>
       <fileset dir="src/wbs/sms/number/core/console/files"/>
@@ -551,19 +521,6 @@
       <fileset dir="src/wbs/smsapps/photograbber/console/files"/>
       <fileset dir="src/wbs/smsapps/subscription/console/files"/>
       <fileset dir="src/wbs/smsapps/ticketer/console/files"/>
-      <fileset dir="src/wbs/psychic/affiliate/console/files"/>
-      <fileset dir="src/wbs/psychic/affiliategroup/console/files"/>
-      <fileset dir="src/wbs/psychic/bill/console/files"/>
-      <fileset dir="src/wbs/psychic/contact/console/files"/>
-      <fileset dir="src/wbs/psychic/core/console/files"/>
-      <fileset dir="src/wbs/psychic/help/console/files"/>
-      <fileset dir="src/wbs/psychic/keyword/console/files"/>
-      <fileset dir="src/wbs/psychic/profile/console/files"/>
-      <fileset dir="src/wbs/psychic/request/console/files"/>
-      <fileset dir="src/wbs/psychic/send/console/files"/>
-      <fileset dir="src/wbs/psychic/template/console/files"/>
-      <fileset dir="src/wbs/psychic/user/core/console/files"/>
-      <fileset dir="src/wbs/psychic/user/admin/console/files"/>
       <fileset dir="src/wbs/apn/chat/core/console/files"/>
       <fileset dir="src/wbs/apn/chat/ad/console/files"/>
       <fileset dir="src/wbs/apn/chat/adult/console/files"/>
@@ -588,8 +545,6 @@
       <fileset dir="src/wbs/apn/chat/user/core/console/files"/>
       <fileset dir="src/wbs/apn/chat/user/admin/console/files"/>
       <fileset dir="src/wbs/apn/chat/user/pending/console/files"/>
-      <fileset dir="src/wbs/apn/chat/tv/core/console/files"/>
-      <fileset dir="src/wbs/apn/chat/tv/moderation/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
       <fileset dir="src/wbs/integrations/dialogue/console/files"/>
@@ -620,7 +575,7 @@
     <mkdir dir="work/test/api/WEB-INF/classes"/>
     <mkdir dir="work/test/api/WEB-INF/lib"/>
     <copy todir="work/test/api" failonerror="false">
-      <fileset dir="src/wbs/framework/activitymanager/api/files"/>
+      <fileset dir="src/activitymanager/api/files"/>
       <fileset dir="src/wbs/framework/builder/api/files"/>
       <fileset dir="src/wbs/framework/database/api/files"/>
       <fileset dir="src/wbs/framework/entity/api/files"/>
@@ -628,7 +583,7 @@
       <fileset dir="src/wbs/framework/object/api/files"/>
       <fileset dir="src/wbs/framework/schema/api/files"/>
       <fileset dir="src/wbs/framework/sql/api/files"/>
-      <fileset dir="src/wbs/framework/web/api/files"/>
+      <fileset dir="src/web/api/files"/>
       <fileset dir="src/wbs/framework/application/config/api/files"/>
       <fileset dir="src/wbs/platform/object/core/api/files"/>
       <fileset dir="src/wbs/platform/currency/api/files"/>
@@ -683,7 +638,7 @@
       <fileset dir="src/wbs/platform/api/api/files"/>
       <fileset dir="src/wbs/platform/reporting/api/files"/>
       <fileset dir="src/wbs/platform/common/api/files"/>
-      <fileset dir="src/wbs/sms/common/api/files"/>
+      <fileset dir="src/wbs/sms/core/api/files"/>
       <fileset dir="src/wbs/sms/gsm/api/files"/>
       <fileset dir="src/wbs/sms/network/api/files"/>
       <fileset dir="src/wbs/sms/number/core/api/files"/>
@@ -729,19 +684,6 @@
       <fileset dir="src/wbs/smsapps/photograbber/api/files"/>
       <fileset dir="src/wbs/smsapps/subscription/api/files"/>
       <fileset dir="src/wbs/smsapps/ticketer/api/files"/>
-      <fileset dir="src/wbs/psychic/affiliate/api/files"/>
-      <fileset dir="src/wbs/psychic/affiliategroup/api/files"/>
-      <fileset dir="src/wbs/psychic/bill/api/files"/>
-      <fileset dir="src/wbs/psychic/contact/api/files"/>
-      <fileset dir="src/wbs/psychic/core/api/files"/>
-      <fileset dir="src/wbs/psychic/help/api/files"/>
-      <fileset dir="src/wbs/psychic/keyword/api/files"/>
-      <fileset dir="src/wbs/psychic/profile/api/files"/>
-      <fileset dir="src/wbs/psychic/request/api/files"/>
-      <fileset dir="src/wbs/psychic/send/api/files"/>
-      <fileset dir="src/wbs/psychic/template/api/files"/>
-      <fileset dir="src/wbs/psychic/user/core/api/files"/>
-      <fileset dir="src/wbs/psychic/user/admin/api/files"/>
       <fileset dir="src/wbs/apn/chat/core/api/files"/>
       <fileset dir="src/wbs/apn/chat/ad/api/files"/>
       <fileset dir="src/wbs/apn/chat/adult/api/files"/>
@@ -766,8 +708,6 @@
       <fileset dir="src/wbs/apn/chat/user/core/api/files"/>
       <fileset dir="src/wbs/apn/chat/user/admin/api/files"/>
       <fileset dir="src/wbs/apn/chat/user/pending/api/files"/>
-      <fileset dir="src/wbs/apn/chat/tv/core/api/files"/>
-      <fileset dir="src/wbs/apn/chat/tv/moderation/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
       <fileset dir="src/wbs/integrations/dialogue/api/files"/>
@@ -913,7 +853,6 @@
       <script name="src/wbs/smsapps/forwarder/model/forwarder.sql"/>
       <script name="src/wbs/smsapps/manualresponder/model/manual-responder.sql"/>
       <script name="src/wbs/smsapps/manualresponder/model/manual-responder-report.sql"/>
-      <script name="src/wbs/psychic/template/model/psychic-template.sql"/>
       <script name="src/wbs/apn/chat/core/model/chat-stats.sql"/>
       <script name="src/wbs/apn/chat/affiliate/model/chat-affiliate-users-summary.sql"/>
       <script name="src/wbs/apn/chat/broadcast/model/chat-broadcast.sql"/>
@@ -966,13 +905,10 @@
       <script name="src/wbs/smsapps/photograbber/model/photo-grabber-data.sql"/>
       <script name="src/wbs/smsapps/subscription/model/subscription-data.sql"/>
       <script name="src/wbs/smsapps/ticketer/model/ticketer-data.sql"/>
-      <script name="src/wbs/psychic/core/model/psychic-data.sql"/>
-      <script name="src/wbs/psychic/template/model/psychic-template-data.sql"/>
       <script name="src/wbs/apn/chat/core/model/chat-data.sql"/>
       <script name="src/wbs/apn/chat/affiliate/model/chat-affiliate-data.sql"/>
       <script name="src/wbs/apn/chat/bill/model/chat-bill-data.sql"/>
       <script name="src/wbs/apn/chat/user/image/model/chat-user-image-data.sql"/>
-      <script name="src/wbs/apn/chat/tv/core/model/chat-tv-data.sql"/>
       <script name="src/wbs/integrations/broadcastsystems/model/broadcast-systems-data.sql"/>
       <script name="src/wbs/integrations/dialogue/model/dialogue-data.sql"/>
       <script name="src/wbs/integrations/digitalselect/model/digital-select-data.sql"/>

@@ -751,9 +751,19 @@ class DataFromXml {
 				Field field,
 				DataChildren dataChildrenAnnotation) {
 
-			if (! dataChildrenAnnotation.direct ()
-					&& ! dataChildrenAnnotation.childElement ().isEmpty ())
-				throw new RuntimeException ();
+			if (
+				! dataChildrenAnnotation.direct ()
+				&& ! dataChildrenAnnotation.childElement ().isEmpty ()
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Don't specify childElement for indirect children, at ",
+						"%s.%s",
+						field.getDeclaringClass ().getSimpleName (),
+						field.getName ()));
+
+			}
 
 			// find the element which contains the children
 

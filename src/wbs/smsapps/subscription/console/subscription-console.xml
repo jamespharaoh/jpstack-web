@@ -201,6 +201,12 @@
 			name="debitsPerSend"
 			nullable="yes"/>
 
+		<text-area-field
+			name="subscribeMessageText"/>
+
+		<text-area-field
+			name="unsubscribeMessageText"/>
+
 	</field-set>
 
 </console-module>

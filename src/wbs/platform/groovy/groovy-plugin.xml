@@ -1,12 +1,10 @@
 <plugin
 	name="groovy"
-	package="groovy">
+	package="wbs.platform.groovy">
 
-	<dependencies>
-		<project name="wbs-platform">
-			<plugin name="platform-common"/>
-		</project>
-	</dependencies>
+	<plugin-dependencies>
+		<plugin-dependency name="platform-common"/>
+	</plugin-dependencies>
 
 	<layer name="console">
 		<bean class="console.GroovyAction"/>

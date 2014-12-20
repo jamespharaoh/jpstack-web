@@ -1,6 +1,6 @@
 <plugin
 	name="sms-apps-common"
-	package="common">
+	package="wbs.smsapps.common">
 
 	<fixtures>
 		<fixture name="smsAppsCommon"/>

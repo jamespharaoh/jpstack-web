@@ -1,6 +1,6 @@
 <plugin
 	name="daemon"
-	package="daemon">
+	package="wbs.platform.daemon">
 
 	<layer name="daemon">
 		<bean class="ThreadManager"/>

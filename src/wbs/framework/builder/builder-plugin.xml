@@ -1,6 +1,6 @@
 <plugin
 	name="builder"
-	package="builder">
+	package="wbs.framework.builder">
 
 	<layer name="data">
 		<bean class="BuilderFactoryImpl"/>

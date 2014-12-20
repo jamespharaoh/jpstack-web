@@ -1,6 +1,6 @@
 <plugin
 	name="test-common"
-	package="common">
+	package="wbs.test.common">
 
 	<fixtures>
 		<fixture name="testCommon"/>

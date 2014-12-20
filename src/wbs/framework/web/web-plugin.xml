@@ -1,6 +1,6 @@
 <plugin
 	name="web"
-	package="web">
+	package="wbs.framework.web">
 
 	<layer name="web">
 		<bean class="PathHandlerServlet"/>

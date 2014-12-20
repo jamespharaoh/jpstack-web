@@ -1,6 +1,6 @@
 <plugin
 	name="forwarder"
-	package="forwarder">
+	package="wbs.smsapps.forwarder">
 
 	<sql-scripts>
 		<sql-schema name="forwarder"/>

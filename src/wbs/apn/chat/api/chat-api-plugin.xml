@@ -1,6 +1,6 @@
 <plugin
 	name="chat-api"
-	package="chat.api">
+	package="wbs.apn.chat.api">
 
 	<layer name="api">
 		<bean class="ChatApiServletModule"/>

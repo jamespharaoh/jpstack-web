@@ -20,9 +20,9 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.io.FileUtils;
 
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
-import wbs.framework.application.scaffold.ProjectSpec;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelBuilder;
@@ -37,11 +37,17 @@ public
 class EntityHelperImpl
 	implements EntityHelper {
 
+	// dependencies
+
 	@Inject
-	List<ProjectSpec> projects;
+	PluginManager pluginManager;
+
+	// prototype dependencies
 
 	@Inject
 	Provider<ModelBuilder> modelBuilder;
+
+	// properties
 
 	@Getter
 	List<String> entityClassNames;
@@ -74,26 +80,24 @@ class EntityHelperImpl
 		ImmutableList.Builder<String> entityClassNamesBuilder =
 			ImmutableList.<String>builder ();
 
-		for (ProjectSpec project
-				: projects) {
+		for (
+			PluginSpec plugin
+				: pluginManager.plugins ()
+		) {
 
-			for (PluginSpec plugin
-					: project.plugins ()) {
+			if (plugin.models () == null)
+				continue;
 
-				if (plugin.models () == null)
-					continue;
+			for (
+				PluginModelSpec model
+					: plugin.models ().models ()
+			) {
 
-				for (PluginModelSpec model
-						: plugin.models ().models ()) {
-
-					entityClassNamesBuilder.add (
-						stringFormat (
-							"%s.%s.model.%sRec",
-							model.plugin ().project ().packageName (),
-							model.plugin ().packageName (),
-							capitalise (model.name ())));
-
-				}
+				entityClassNamesBuilder.add (
+					stringFormat (
+						"%s.model.%sRec",
+						model.plugin ().packageName (),
+						capitalise (model.name ())));
 
 			}
 

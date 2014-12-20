@@ -1,6 +1,6 @@
 <plugin
 	name="chat-user-image"
-	package="chat.user.image">
+	package="wbs.apn.chat.user.image">
 
 	<sql-scripts>
 		<sql-schema name="chat-user-image"/>

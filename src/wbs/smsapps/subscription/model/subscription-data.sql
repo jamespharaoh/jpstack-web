@@ -33,26 +33,6 @@ SELECT service_type_insert (
 	'default',
 	'Default');
 
-SELECT message_set_type_insert (
-	'subscription',
-	'subscribe_success',
-	'Subscribe successful');
-
-SELECT message_set_type_insert (
-	'subscription',
-	'subscribe_already',
-	'Subscription failed because already subscribed');
-
-SELECT message_set_type_insert (
-	'subscription',
-	'unsubscribe_success',
-	'Unsubscribe successful');
-
-SELECT message_set_type_insert (
-	'subscription',
-	'unsubscribe_already',
-	'Unsubscription failed because already unsubscribed');
-
 SELECT priv_type_insert (
 	'subscription',
 	'manage',
@@ -178,3 +158,11 @@ SELECT event_type_insert (
 SELECT event_type_insert (
 	'subscription_send_completed',
 	'%0 completed sending');
+
+SELECT event_type_insert (
+	'subscription_number_affiliate',
+	'Assign %0 to %1 due to %2');
+
+SELECT event_type_insert (
+	'subscription_number_subscribe',
+	'Subscribed %0 to %1 due to %2');

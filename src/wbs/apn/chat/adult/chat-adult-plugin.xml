@@ -1,6 +1,6 @@
 <plugin
 	name="chat-adult"
-	package="chat.adult">
+	package="wbs.apn.chat.adult">
 
 	<layer name="daemon">
 		<bean class="daemon.ChatAdultDeliveryHandler"/>

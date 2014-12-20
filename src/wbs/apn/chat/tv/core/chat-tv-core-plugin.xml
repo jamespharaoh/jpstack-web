@@ -1,6 +1,6 @@
 <plugin
 	name="chat-tv-core"
-	package="chat.tv.core">
+	package="wbs.apn.chat.tv.core">
 
 	<sql-scripts>
 		<sql-data name="chat-tv-data"/>

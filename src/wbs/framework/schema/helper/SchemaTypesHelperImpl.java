@@ -24,8 +24,8 @@ import org.joda.time.LocalDate;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
 import wbs.framework.application.scaffold.PluginEnumTypeSpec;
+import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.application.scaffold.PluginSpec;
-import wbs.framework.application.scaffold.ProjectSpec;
 import wbs.framework.hibernate.EnumUserType;
 import wbs.framework.logging.TaskLog;
 
@@ -39,17 +39,23 @@ public
 class SchemaTypesHelperImpl
 	implements SchemaTypesHelper {
 
+	// dependencies
+
 	@Inject
 	SchemaNamesHelper schemaNamesHelper;
 
 	@Inject
-	List<ProjectSpec> projects;
+	PluginManager pluginManager;
+
+	// properties
 
 	@Getter
 	Map<Class<?>,List<String>> fieldTypeNames;
 
 	@Getter
 	Map<String,List<String>> enumTypes;
+
+	// implementation
 
 	@PostConstruct
 	public
@@ -82,43 +88,36 @@ class SchemaTypesHelperImpl
 		}
 
 		for (
-			ProjectSpec project
-				: projects
+			PluginSpec plugin
+				: pluginManager.plugins ()
 		) {
 
+			if (plugin.models () == null)
+				continue;
+
 			for (
-				PluginSpec plugin
-					: project.plugins ()
+				PluginEnumTypeSpec enumType
+					: plugin.models ().enumTypes ()
 			) {
 
-				if (plugin.models () == null)
-					continue;
+				initEnumType (
+					taskLog,
+					fieldTypeNamesBuilder,
+					enumTypesBuilder,
+					enumType);
 
-				for (
-					PluginEnumTypeSpec enumType
-						: plugin.models ().enumTypes ()
-				) {
+			}
 
-					initEnumType (
-						taskLog,
-						fieldTypeNamesBuilder,
-						enumTypesBuilder,
-						enumType);
+			for (
+				PluginCustomTypeSpec customType
+					: plugin.models ().customTypes ()
+			) {
 
-				}
-
-				for (
-					PluginCustomTypeSpec customType
-						: plugin.models ().customTypes ()
-				) {
-
-					initCustomType (
-						taskLog,
-						fieldTypeNamesBuilder,
-						enumTypesBuilder,
-						customType);
-
-				}
+				initCustomType (
+					taskLog,
+					fieldTypeNamesBuilder,
+					enumTypesBuilder,
+					customType);
 
 			}
 
@@ -150,8 +149,7 @@ class SchemaTypesHelperImpl
 
 		String enumClassName =
 			stringFormat (
-				"%s.%s.model.%s",
-				enumType.plugin ().project ().packageName (),
+				"%s.model.%s",
 				enumType.plugin ().packageName (),
 				capitalise (enumType.name ()));
 
@@ -225,8 +223,7 @@ class SchemaTypesHelperImpl
 
 		String className =
 			stringFormat (
-				"%s.%s.model.%s",
-				customType.plugin ().project ().packageName (),
+				"%s.model.%s",
 				customType.plugin ().packageName (),
 				capitalise (customType.name ()));
 
@@ -247,8 +244,7 @@ class SchemaTypesHelperImpl
 
 		String helperClassName =
 			stringFormat (
-				"%s.%s.hibernate.%sType",
-				customType.plugin ().project ().packageName (),
+				"%s.hibernate.%sType",
 				customType.plugin ().packageName (),
 				capitalise (customType.name ()));
 

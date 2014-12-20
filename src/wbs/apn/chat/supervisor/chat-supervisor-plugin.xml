@@ -1,6 +1,6 @@
 <plugin
 	name="chat-supervisor"
-	package="chat.supervisor">
+	package="wbs.apn.chat.supervisor">
 
 	<layer name="console">
 		<bean class="console.ChatMessageStatsProvider"/>

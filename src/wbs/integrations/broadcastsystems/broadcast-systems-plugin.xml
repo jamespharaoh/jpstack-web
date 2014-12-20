@@ -1,6 +1,6 @@
 <plugin
 	name="broadcast-systems"
-	package="broadcastsystems">
+	package="wbs.integrations.broadcastsystems">
 
 	<sql-scripts>
 		<sql-data name="broadcast-systems-data"/>

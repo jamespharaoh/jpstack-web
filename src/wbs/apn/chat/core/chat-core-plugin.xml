@@ -1,6 +1,6 @@
 <plugin
 	name="chat-core"
-	package="chat.core">
+	package="wbs.apn.chat.core">
 
 	<sql-scripts>
 		<sql-schema name="chat-stats"/>

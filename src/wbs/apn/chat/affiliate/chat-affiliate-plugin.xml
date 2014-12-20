@@ -1,6 +1,6 @@
 <plugin
 	name="chat-affiliate"
-	package="chat.affiliate">
+	package="wbs.apn.chat.affiliate">
 
 	<sql-scripts>
 		<sql-schema name="chat-affiliate-users-summary"/>

@@ -1,6 +1,6 @@
 <plugin
 	name="chat-info-site"
-	package="chat.infosite">
+	package="wbs.apn.chat.infosite">
 
 	<sql-scripts>
 		<sql-schame name="chat-info-site"/>

@@ -1,6 +1,6 @@
 <plugin
 	name="chat-tv-moderation"
-	package="chat.tv.moderation">
+	package="wbs.apn.chat.tv.moderation">
 
 	<layer name="console">
 		<bean class="console.ChatTvModerationFormAction"/>

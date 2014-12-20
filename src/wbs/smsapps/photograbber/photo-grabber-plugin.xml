@@ -1,6 +1,6 @@
 <plugin
 	name="photo-grabber"
-	package="photograbber">
+	package="wbs.smsapps.photograbber">
 
 	<sql-scripts>
 		<sql-data name="photo-grabber-data"/>

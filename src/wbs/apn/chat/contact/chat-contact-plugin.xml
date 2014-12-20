@@ -1,6 +1,6 @@
 <plugin
 	name="chat-contact"
-	package="chat.contact">
+	package="wbs.apn.chat.contact">
 
 	<sql-scripts>
 		<sql-schema name="chat-message"/>

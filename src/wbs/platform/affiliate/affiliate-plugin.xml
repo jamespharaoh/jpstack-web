@@ -1,6 +1,6 @@
 <plugin
 	name="affiliate"
-	package="affiliate">
+	package="wbs.platform.affiliate">
 
 	<sql-scripts>
 		<sql-schema name="affiliate"/>

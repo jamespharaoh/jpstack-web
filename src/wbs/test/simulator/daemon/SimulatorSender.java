@@ -17,6 +17,9 @@ import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.test.simulator.model.SimulatorEventObjectHelper;
 import wbs.test.simulator.model.SimulatorEventRec;
+import wbs.test.simulator.model.SimulatorSessionNumberObjectHelper;
+import wbs.test.simulator.model.SimulatorSessionNumberRec;
+import wbs.test.simulator.model.SimulatorSessionObjectHelper;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -35,6 +38,12 @@ class SimulatorSender
 
 	@Inject
 	SimulatorEventObjectHelper simulatorEventHelper;
+
+	@Inject
+	SimulatorSessionObjectHelper simulatorSessionHelper;
+
+	@Inject
+	SimulatorSessionNumberObjectHelper simulatorSessionNumberHelper;
 
 	// details
 
@@ -85,40 +94,62 @@ class SimulatorSender
 		Object data =
 			ImmutableMap.<String,Object>builder ()
 
-				.put (
-					"message",
-					ImmutableMap.<String,Object>builder ()
-						.put ("id", message.getId ())
-						.put ("numFrom", message.getNumFrom ())
-						.put ("numTo", message.getNumTo ())
-						.put ("text", message.getText ().getText ())
-						.build ())
+			.put (
+				"message",
+				ImmutableMap.<String,Object>builder ()
+					.put ("id", message.getId ())
+					.put ("numFrom", message.getNumFrom ())
+					.put ("numTo", message.getNumTo ())
+					.put ("text", message.getText ().getText ())
+					.build ())
 
-				.put (
-					"route",
-					ImmutableMap.<String,Object>builder ()
-						.put ("id", route.getId ())
-						.put ("code", route.getCode ())
-						.put ("outCharge", route.getOutCharge ())
-						.build ())
+			.put (
+				"route",
+				ImmutableMap.<String,Object>builder ()
+					.put ("id", route.getId ())
+					.put ("code", route.getCode ())
+					.put ("outCharge", route.getOutCharge ())
+					.build ())
 
-				.put (
-					"network",
-					ImmutableMap.<String,Object>builder ()
-						.put ("id", network.getId ())
-						.put ("code", network.getCode ())
-						.build ())
+			.put (
+				"network",
+				ImmutableMap.<String,Object>builder ()
+					.put ("id", network.getId ())
+					.put ("code", network.getCode ())
+					.build ())
 
-				.build ();
+			.build ();
+
+		// lookup session
+
+		SimulatorSessionNumberRec simulatorSessionNumber =
+			simulatorSessionNumberHelper.find (
+				message.getNumber ().getId ());
+
+		if (simulatorSessionNumber == null) {
+
+			throw permFailure (
+				"No session for number");
+
+		}
 
 		// create event
 
 		SimulatorEventRec event =
 			simulatorEventHelper.insert (
 				new SimulatorEventRec ()
-					.setType ("message_out")
-					.setTimestamp (transaction.now ())
-					.setData (JSONValue.toJSONString (data)));
+
+			.setSimulatorSession (
+				simulatorSessionNumber.getSimulatorSession ())
+
+			.setType (
+				"message_out")
+
+			.setTimestamp (
+				transaction.now ())
+
+			.setData (
+				JSONValue.toJSONString (data)));
 
 
 		// finish up

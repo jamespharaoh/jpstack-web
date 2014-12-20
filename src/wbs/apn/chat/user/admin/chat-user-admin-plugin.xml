@@ -1,6 +1,6 @@
 <plugin
 	name="chat-user-admin"
-	package="chat.user.admin">
+	package="wbs.apn.chat.user.admin">
 
 	<layer name="console">
 		<bean class="console.ChatUserAdminBarringAction"/>

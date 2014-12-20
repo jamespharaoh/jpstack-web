@@ -1,6 +1,5 @@
 package wbs.smsapps.subscription.model;
 
-import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
@@ -9,6 +8,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.joda.time.Instant;
 
 import wbs.framework.entity.annotations.EphemeralEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
@@ -63,11 +63,11 @@ class SubscriptionSubRec
 
 	@SimpleField (
 		nullable = true)
-	Date started;
+	Instant started;
 
 	@SimpleField (
 		nullable = true)
-	Date ended;
+	Instant ended;
 
 	@ReferenceField (
 		nullable = true)

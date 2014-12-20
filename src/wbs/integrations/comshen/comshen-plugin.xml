@@ -1,6 +1,6 @@
 <plugin
 	name="comshen"
-	package="comshen">
+	package="wbs.integrations.comshen">
 
 	<layer name="api">
 		<bean class="api.ComshenApiServletModule"/>

@@ -1,51 +1,607 @@
 <wbs-build
 	name="wbs-hades">
 
-	<projects>
+	<plugins>
 
-		<!-- core -->
+		<!-- framework -->
 
-		<project
-			name="wbs-framework"
-			package="wbs.framework"/>
+		<plugin
+			name="activity-manager"
+			package="wbs.framework.activitymanager"/>
 
-		<project
-			name="wbs-platform"
-			package="wbs.platform"/>
+		<plugin
+			name="builder"
+			package="wbs.framework.builder"/>
 
-		<!-- extensions -->
+		<plugin
+			name="database"
+			package="wbs.framework.database"/>
 
-		<project
-			name="wbs-sms"
-			package="wbs.sms"/>
+		<plugin
+			name="entity"
+			package="wbs.framework.entity"/>
 
-		<!-- applications -->
+		<plugin
+			name="hibernate"
+			package="wbs.framework.hibernate"/>
 
-		<project
-			name="wbs-sms-apps"
-			package="wbs.smsapps"/>
+		<plugin
+			name="object"
+			package="wbs.framework.object"/>
 
-		<project
-			name="wbs-psychic"
-			package="wbs.psychic"/>
+		<plugin
+			name="schema"
+			package="wbs.framework.schema"/>
 
-		<project
-			name="wbs-apn"
-			package="wbs.apn"/>
+		<plugin
+			name="sql"
+			package="wbs.framework.sql"/>
+
+		<plugin
+			name="web"
+			package="wbs.framework.web"/>
+
+		<plugin
+			name="application-config"
+			package="wbs.framework.application.config"/>
+
+		<!-- platform -->
+
+		<plugin
+			name="object-core"
+			package="wbs.platform.object.core"/>
+
+		<plugin
+			name="currency"
+			package="wbs.platform.currency"/>
+
+		<plugin
+			name="affiliate"
+			package="wbs.platform.affiliate"/>
+
+		<plugin
+			name="console-helper"
+			package="wbs.platform.console.helper"/>
+
+		<plugin
+			name="console-forms"
+			package="wbs.platform.console.forms"/>
+
+		<plugin
+			name="status"
+			package="wbs.platform.status"/>
+
+		<plugin
+			name="console-request"
+			package="wbs.platform.console.request"/>
+
+		<plugin
+			name="core"
+			package="wbs.platform.core"/>
+
+		<plugin
+			name="console-responder"
+			package="wbs.platform.console.responder"/>
+
+		<plugin
+			name="console-part"
+			package="wbs.platform.console.part"/>
+
+		<plugin
+			name="console-misc"
+			package="wbs.platform.console.misc"/>
+
+		<plugin
+			name="console-tab"
+			package="wbs.platform.console.tab"/>
+
+		<plugin
+			name="console-context"
+			package="wbs.platform.console.context"/>
+
+		<plugin
+			name="console-combo"
+			package="wbs.platform.console.combo"/>
+
+		<plugin
+			name="console-spec"
+			package="wbs.platform.console.spec"/>
+
+		<plugin
+			name="console-object"
+			package="wbs.platform.console.object"/>
+
+		<plugin
+			name="console-metamodule"
+			package="wbs.platform.console.metamodule"/>
+
+		<plugin
+			name="hooks"
+			package="wbs.platform.hooks"/>
+
+		<plugin
+			name="object-criteria"
+			package="wbs.platform.object.criteria"/>
+
+		<plugin
+			name="object-link"
+			package="wbs.platform.object.link"/>
+
+		<plugin
+			name="object-summary"
+			package="wbs.platform.object.summary"/>
+
+		<plugin
+			name="console-html"
+			package="wbs.platform.console.html"/>
+
+		<plugin
+			name="event"
+			package="wbs.platform.event"/>
+
+		<plugin
+			name="exception"
+			package="wbs.platform.exception"/>
+
+		<plugin
+			name="groovy"
+			package="wbs.platform.groovy"/>
+
+		<plugin
+			name="group"
+			package="wbs.platform.group"/>
+
+		<plugin
+			name="lock"
+			package="wbs.platform.lock"/>
+
+		<plugin
+			name="media"
+			package="wbs.platform.media"/>
+
+		<plugin
+			name="menu"
+			package="wbs.platform.menu"/>
+
+		<plugin
+			name="object-browse"
+			package="wbs.platform.object.browse"/>
+
+		<plugin
+			name="object-create"
+			package="wbs.platform.object.create"/>
+
+		<plugin
+			name="object-list"
+			package="wbs.platform.object.list"/>
+
+		<plugin
+			name="object-search"
+			package="wbs.platform.object.search"/>
+
+		<plugin
+			name="object-settings"
+			package="wbs.platform.object.settings"/>
+
+		<plugin
+			name="priv"
+			package="wbs.platform.priv"/>
+
+		<plugin
+			name="pyp"
+			package="wbs.platform.pyp"/>
+
+		<plugin
+			name="supervisor"
+			package="wbs.platform.supervisor"/>
+
+		<plugin
+			name="queue"
+			package="wbs.platform.queue"/>
+
+		<plugin
+			name="scaffold"
+			package="wbs.platform.scaffold"/>
+
+		<plugin
+			name="script-language"
+			package="wbs.platform.script.language"/>
+
+		<plugin
+			name="script-system"
+			package="wbs.platform.script.system"/>
+
+		<plugin
+			name="script-core"
+			package="wbs.platform.script.core"/>
+
+		<plugin
+			name="service"
+			package="wbs.platform.service"/>
+
+		<plugin
+			name="text"
+			package="wbs.platform.text"/>
+
+		<plugin
+			name="user"
+			package="wbs.platform.user"/>
+
+		<plugin
+			name="console-module"
+			package="wbs.platform.console.module"/>
+
+		<plugin
+			name="update-log"
+			package="wbs.platform.updatelog"/>
+
+		<plugin
+			name="postgresql"
+			package="wbs.platform.postgresql"/>
+
+		<plugin
+			name="daemon"
+			package="wbs.platform.daemon"/>
+
+		<plugin
+			name="rpc"
+			package="wbs.platform.rpc"/>
+
+		<plugin
+			name="api"
+			package="wbs.platform.api"/>
+
+		<plugin
+			name="reporting"
+			package="wbs.platform.reporting"/>
+
+		<plugin
+			name="platform-common"
+			package="wbs.platform.common"/>
+
+		<!-- sms -->
+
+		<plugin
+			name="sms-core"
+			package="wbs.sms.core"/>
+
+		<plugin
+			name="gsm"
+			package="wbs.sms.gsm"/>
+
+		<plugin
+			name="network"
+			package="wbs.sms.network"/>
+
+		<plugin
+			name="number-core"
+			package="wbs.sms.number.core"/>
+
+		<plugin
+			name="number-lookup"
+			package="wbs.sms.number.lookup"/>
+
+		<plugin
+			name="number-format"
+			package="wbs.sms.number.format"/>
+
+		<plugin
+			name="route-core"
+			package="wbs.sms.route.core"/>
+
+		<plugin
+			name="gazetteer"
+			package="wbs.sms.gazetteer"/>
+
+		<plugin
+			name="command"
+			package="wbs.sms.command"/>
+
+		<plugin
+			name="message-delivery"
+			package="wbs.sms.message.delivery"/>
+
+		<plugin
+			name="route-http"
+			package="wbs.sms.route.http"/>
+
+		<plugin
+			name="message-inbox"
+			package="wbs.sms.message.inbox"/>
+
+		<plugin
+			name="keyword"
+			package="wbs.sms.keyword"/>
+
+		<plugin
+			name="locator"
+			package="wbs.sms.locator"/>
+
+		<plugin
+			name="magic-number"
+			package="wbs.sms.magicnumber"/>
+
+		<plugin
+			name="message-batch"
+			package="wbs.sms.message.batch"/>
+
+		<plugin
+			name="message-core"
+			package="wbs.sms.message.core"/>
+
+		<plugin
+			name="object-messages"
+			package="wbs.sms.object.messages"/>
+
+		<plugin
+			name="message-report"
+			package="wbs.sms.message.report"/>
+
+		<plugin
+			name="message-set"
+			package="wbs.sms.messageset"/>
+
+		<plugin
+			name="message-stats"
+			package="wbs.sms.message.stats"/>
+
+		<plugin
+			name="message-status"
+			package="wbs.sms.message.status"/>
+
+		<plugin
+			name="message-ticker"
+			package="wbs.sms.message.ticker"/>
+
+		<plugin
+			name="number-blacklist"
+			package="wbs.sms.number.blacklist"/>
+
+		<plugin
+			name="object-stats"
+			package="wbs.sms.object.stats"/>
+
+		<plugin
+			name="message-outbox"
+			package="wbs.sms.message.outbox"/>
+
+		<plugin
+			name="modem-poll"
+			package="wbs.sms.modempoll"/>
+
+		<plugin
+			name="number-list"
+			package="wbs.sms.number.list"/>
+
+		<plugin
+			name="route-router"
+			package="wbs.sms.route.router"/>
+
+		<plugin
+			name="route-sender"
+			package="wbs.sms.route.sender"/>
+
+		<plugin
+			name="route-test"
+			package="wbs.sms.route.test"/>
+
+		<plugin
+			name="route-tester"
+			package="wbs.sms.route.tester"/>
+
+		<plugin
+			name="smpp"
+			package="wbs.sms.smpp"/>
+
+		<plugin
+			name="tracker"
+			package="wbs.sms.tracker"/>
+
+		<plugin
+			name="wap-push"
+			package="wbs.sms.message.wap"/>
+
+		<plugin
+			name="sms-customer"
+			package="wbs.sms.customer"/>
+
+		<!-- sms apps -->
+
+		<plugin
+			name="sms-apps-common"
+			package="wbs.smsapps.common"/>
+
+		<plugin
+			name="alerts"
+			package="wbs.smsapps.alerts"/>
+
+		<plugin
+			name="auto-responder"
+			package="wbs.smsapps.autoresponder"/>
+
+		<plugin
+			name="broadcast"
+			package="wbs.smsapps.broadcast"/>
+
+		<plugin
+			name="forwarder"
+			package="wbs.smsapps.forwarder"/>
+
+		<plugin
+			name="manual-responder"
+			package="wbs.smsapps.manualresponder"/>
+
+		<plugin
+			name="orderer"
+			package="wbs.smsapps.orderer"/>
+
+		<plugin
+			name="photo-grabber"
+			package="wbs.smsapps.photograbber"/>
+
+		<plugin
+			name="subscription"
+			package="wbs.smsapps.subscription"/>
+
+		<plugin
+			name="ticketer"
+			package="wbs.smsapps.ticketer"/>
+
+		<!-- chat -->
+
+		<plugin
+			name="chat-core"
+			package="wbs.apn.chat.core"/>
+
+		<plugin
+			name="chat-ad"
+			package="wbs.apn.chat.ad"/>
+
+		<plugin
+			name="chat-adult"
+			package="wbs.apn.chat.adult"/>
+
+		<plugin
+			name="chat-affiliate"
+			package="wbs.apn.chat.affiliate"/>
+
+		<plugin
+			name="chat-api"
+			package="wbs.apn.chat.api"/>
+
+		<plugin
+			name="chat-approval"
+			package="wbs.apn.chat.approval"/>
+
+		<plugin
+			name="chat-bill"
+			package="wbs.apn.chat.bill"/>
+
+		<plugin
+			name="chat-broadcast"
+			package="wbs.apn.chat.broadcast"/>
+
+		<plugin
+			name="chat-contact"
+			package="wbs.apn.chat.contact"/>
+
+		<plugin
+			name="chat-date"
+			package="wbs.apn.chat.date"/>
+
+		<plugin
+			name="chat-graphs"
+			package="wbs.apn.chat.graphs"/>
+
+		<plugin
+			name="chat-help"
+			package="wbs.apn.chat.help"/>
+
+		<plugin
+			name="chat-user-image"
+			package="wbs.apn.chat.user.image"/>
+
+		<plugin
+			name="chat-user-info"
+			package="wbs.apn.chat.user.info"/>
+
+		<plugin
+			name="chat-info-site"
+			package="wbs.apn.chat.infosite"/>
+
+		<plugin
+			name="chat-user-join"
+			package="wbs.apn.chat.user.join"/>
+
+		<plugin
+			name="chat-keyword"
+			package="wbs.apn.chat.keyword"/>
+
+		<plugin
+			name="chat-named-note"
+			package="wbs.apn.chat.namednote"/>
+
+		<plugin
+			name="chat-scheme"
+			package="wbs.apn.chat.scheme"/>
+
+		<plugin
+			name="chat-settings"
+			package="wbs.apn.chat.settings"/>
+
+		<plugin
+			name="chat-supervisor"
+			package="wbs.apn.chat.supervisor"/>
+
+		<plugin
+			name="chat-user-core"
+			package="wbs.apn.chat.user.core"/>
+
+		<plugin
+			name="chat-user-admin"
+			package="wbs.apn.chat.user.admin"/>
+
+		<plugin
+			name="chat-user-pending"
+			package="wbs.apn.chat.user.pending"/>
 
 		<!-- integrations -->
 
-		<project
-			name="wbs-integrations"
-			package="wbs.integrations"/>
+		<plugin
+			name="broadcast-systems"
+			package="wbs.integrations.broadcastsystems"/>
+
+		<plugin
+			name="comshen"
+			package="wbs.integrations.comshen"/>
+
+		<plugin
+			name="dialogue"
+			package="wbs.integrations.dialogue"/>
+
+		<plugin
+			name="digital-select"
+			package="wbs.integrations.digitalselect"/>
+
+		<plugin
+			name="hybyte"
+			package="wbs.integrations.hybyte"/>
+
+		<plugin
+			name="mediaburst"
+			package="wbs.integrations.mediaburst"/>
+
+		<plugin
+			name="mig"
+			package="wbs.integrations.mig"/>
+
+		<plugin
+			name="oxygen8"
+			package="wbs.integrations.oxygen8"/>
+
+		<plugin
+			name="txt-nation"
+			package="wbs.integrations.txtnation"/>
+
+		<plugin
+			name="unwired-plaza"
+			package="wbs.integrations.unwiredplaza"/>
+
+		<plugin
+			name="urban-airship"
+			package="wbs.integrations.urbanairship"/>
 
 		<!-- test -->
 
-		<project
-			name="wbs-test"
-			package="wbs.test"/>
+		<plugin
+			name="simulator"
+			package="wbs.test.simulator"/>
 
-	</projects>
+		<plugin
+			name="test-common"
+			package="wbs.test.common"/>
+
+	</plugins>
 
 	<git-links>
 

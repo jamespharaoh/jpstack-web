@@ -12,12 +12,6 @@ import wbs.framework.data.annotations.DataParent;
 public
 class PluginConsoleModuleSpec {
 
-	/*
-	@DataAncestor
-	@Getter @Setter
-	ProjectSpec project;
-	*/
-
 	@DataParent
 	@Getter @Setter
 	PluginSpec plugin;

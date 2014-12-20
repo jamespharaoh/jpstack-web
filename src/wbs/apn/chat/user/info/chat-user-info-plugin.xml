@@ -1,6 +1,6 @@
 <plugin
 	name="chat-info"
-	package="chat.user.info">
+	package="wbs.apn.chat.user.info">
 
 	<models>
 		<custom-type name="chatUserInfoStatus"/>

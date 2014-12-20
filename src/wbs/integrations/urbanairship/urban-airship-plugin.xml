@@ -1,6 +1,6 @@
 <plugin
 	name="urban-airship"
-	package="urbanairship">
+	package="wbs.integrations.urbanairship">
 
 	<layer name="logic">
 		<bean class="logic.UrbanAirshipApi"/>

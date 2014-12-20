@@ -1,6 +1,6 @@
 <plugin
 	name="object-summary"
-	package="object.summary">
+	package="wbs.platform.object.summary">
 
 	<layer name="console">
 		<bean class="ObjectSummaryPageBuilder"/>

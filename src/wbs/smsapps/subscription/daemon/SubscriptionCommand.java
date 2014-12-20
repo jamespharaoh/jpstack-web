@@ -1,6 +1,14 @@
 package wbs.smsapps.subscription.daemon;
 
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
+import java.util.List;
+
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.NonNull;
@@ -10,21 +18,30 @@ import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
+import wbs.platform.event.logic.EventLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
+import wbs.sms.core.logic.KeywordFinder;
 import wbs.sms.message.core.model.MessageObjectHelper;
+import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
+import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.messageset.logic.MessageSetLogic;
+import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.subscription.logic.SubscriptionLogic;
 import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
+import wbs.smsapps.subscription.model.SubscriptionKeywordObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionKeywordRec;
 import wbs.smsapps.subscription.model.SubscriptionListRec;
 import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelper;
+import wbs.smsapps.subscription.model.SubscriptionNumberRec;
 import wbs.smsapps.subscription.model.SubscriptionObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionRec;
 import wbs.smsapps.subscription.model.SubscriptionSubObjectHelper;
+import wbs.smsapps.subscription.model.SubscriptionSubRec;
 
 @PrototypeComponent ("subscriptionCommand")
 public
@@ -43,6 +60,15 @@ class SubscriptionCommand
 	Database database;
 
 	@Inject
+	EventLogic eventLogic;
+
+	@Inject
+	InboxLogic inboxLogic;
+
+	@Inject
+	KeywordFinder keywordFinder;
+
+	@Inject
 	MessageObjectHelper messageHelper;
 
 	@Inject
@@ -53,6 +79,9 @@ class SubscriptionCommand
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
+
+	@Inject
+	SubscriptionKeywordObjectHelper subscriptionKeywordHelper;
 
 	@Inject
 	SubscriptionObjectHelper subscriptionHelper;
@@ -66,14 +95,25 @@ class SubscriptionCommand
 	@Inject
 	SubscriptionLogic subscriptionLogic;
 
+	// prototype dependencies
+
+	@Inject
+	Provider<MessageSender> messageSenderProvider;
+
 	// state
 
+	ReceivedMessage receivedMessage;
 	CommandRec command;
+	MessageRec message;
+	NumberRec number;
 
 	SubscriptionRec subscription;
 	SubscriptionAffiliateRec subscriptionAffiliate;
 	SubscriptionKeywordRec subscriptionKeyword;
 	SubscriptionListRec subscriptionList;
+
+	SubscriptionNumberRec subscriptionNumber;
+	SubscriptionSubRec subscriptionSub;
 
 	// details
 
@@ -102,6 +142,9 @@ class SubscriptionCommand
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
+		this.receivedMessage =
+			receivedMessage;
+
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite ();
@@ -109,285 +152,296 @@ class SubscriptionCommand
 		findCommand (
 			commandId);
 
-		/*
-		String parentObjectTypeCode =
-			command.getParentObjectType ().getCode ();
+		message =
+			messageHelper.find (
+				receivedMessage.getMessageId ());
 
-		if ((Object) commandParent instanceof SubscriptionRec) {
+		number =
+			message.getNumber ();
 
-			subscription =
-				(SubscriptionRec) (Object)
-				commandParent;
+		subscriptionNumber =
+			subscriptionNumberHelper.findOrCreate (
+				subscription,
+				number);
 
-			subscriptionAffiliate =
-				null;
+		if (
+			equal (
+				command.getCode (),
+				"subscribe")
+		) {
 
-		} else if (equal (
-				parentObjectTypeCode,
-				"subscription_affiliate")) {
+			doSubscribe (
+				transaction);
 
-			subscriptionAffiliate =
-				(SubscriptionAffiliateRec) (Object)
-				commandParent;
+		} else if (
+			equal (
+				command.getCode (),
+				"unsubscribe")
+		) {
 
-			subscription =
-				subscriptionAffiliate.getSubscription ();
+			doUnsubscribe (
+				transaction);
 
 		} else {
 
 			throw new RuntimeException (
-				commandParent.getClass ().getName ());
+				stringFormat (
+					"Illegal command code: %s",
+					command.getCode ()));
 
 		}
 
-		MessageRec message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+		transaction.commit ();
 
-		NumberRec number =
-			message.getNumber ();
+		return null;
 
-		// lock the subscription to prevent concurrent updates
+	}
 
-		subscriptionHelper.lock (
-			subscription);
+	void matchKeyword () {
 
-		// set service on received message
+		List<KeywordFinder.Match> keywordMatches =
+			keywordFinder.find (
+				receivedMessage.getRest ());
 
-		receivedMessage.setServiceId (
-			serviceHelper.findByCode (subscription, "default").getId ());
+		for (
+			KeywordFinder.Match keywordMatch
+				: keywordMatches
+		) {
 
-		// check for a pre-existing subscription
-
-		SubscriptionSubRec subscriptionSub =
-			subscriptionSubHelper.findActive (
-				subscription,
-				number);
-
-		// if there was one send the "already subscribed" message set
-
-		if (subscriptionSub != null) {
-
-			AffiliateRec affiliate =
-				subscriptionLogic.getAffiliateForSubscriptionSub (
-					subscriptionSub);
-
-			if (affiliate != null)
-				receivedMessage.setAffiliateId (
-					affiliate.getId ());
-
-			messageSetLogic.sendMessageSet (
-				messageSetLogic.findMessageSet (
+			SubscriptionKeywordRec subscriptionKeyword =
+				subscriptionKeywordHelper.findByCode (
 					subscription,
-					"subscription_subscribe_already"),
-				message.getThreadId (),
-				number,
-				serviceHelper.findByCode (
-					subscription,
-					"default"),
-				affiliate);
+					keywordMatch.simpleKeyword ());
 
-		} else {
+			subscriptionAffiliate =
+				ifNull (
+					subscriptionAffiliate,
+					subscriptionKeyword.getSubscriptionAffiliate ());
 
-			// look up the affiliate
+			subscriptionList =
+				ifNull (
+					subscriptionList,
+					subscriptionKeyword.getSubscriptionList ());
 
-			AffiliateRec affiliate =
-				subscriptionAffiliate != null
-					? affiliateHelper.findByCode (
-						subscriptionAffiliate,
-						"default")
-					: null;
+		}
 
-			if (affiliate != null) {
+	}
 
-				receivedMessage.setAffiliateId (
-					affiliate.getId ());
+	void doSubscribe (
+			Transaction transaction) {
+
+		matchKeyword ();
+
+		// set affiliate
+
+		if (
+			subscriptionAffiliate != null
+			&& subscriptionNumber.getSubscriptionAffiliate () == null
+		) {
+
+			subscriptionNumber
+
+				.setSubscriptionAffiliate (
+					subscriptionAffiliate);
+
+			eventLogic.createEvent (
+				"subscription_number_affiliate",
+				subscriptionNumber,
+				subscriptionAffiliate,
+				message);
+
+		}
+
+		// subscribe
+
+		SubscriptionSubRec activeSubscriptionSub =
+			subscriptionNumber.getActiveSubscriptionSub ();
+
+		if (
+
+			activeSubscriptionSub == null
+
+			|| notEqual (
+				activeSubscriptionSub.getSubscriptionList (),
+				subscriptionList)
+
+		) {
+
+			if (activeSubscriptionSub != null) {
+
+				// remove old sub
+
+				activeSubscriptionSub
+
+					.setActive (
+						false)
+
+					.setEndedThreadId (
+						message.getThreadId ())
+
+					.setEnded (
+						transaction.now ());
+
+				// update stats
+
+				subscription
+
+					.setNumSubscribers (
+						subscription.getNumSubscribers () - 1);
+
+				SubscriptionAffiliateRec activeSubscriptionAffiliate =
+					activeSubscriptionSub.getSubscriptionAffiliate ();
+
+				activeSubscriptionAffiliate
+
+					.setNumSubscribers (
+						activeSubscriptionAffiliate.getNumSubscribers () - 1);
+
+				SubscriptionListRec activeSubscriptionList =
+					activeSubscriptionSub.getSubscriptionList ();
+
+				activeSubscriptionList
+
+					.setNumSubscribers (
+						activeSubscriptionList.getNumSubscribers () - 1);
 
 			}
 
-			// find or create subscription number
+			// create new sub
 
-			SubscriptionNumberRec subscriptionNumber =
-				subscriptionNumberHelper.findOrCreate (
-					subscription,
-					number);
-
-			// ok subscribe them
-
-			subscriptionSubHelper.insert (
-				new SubscriptionSubRec ()
+			SubscriptionSubRec newSubscriptionSub =
+				subscriptionSubHelper.insert (
+					new SubscriptionSubRec ()
 
 				.setSubscriptionNumber (
 					subscriptionNumber)
 
-				.setActive (
-					true)
+				.setIndex (
+					subscriptionNumber.getNumSubs ())
 
-				.setStarted (
-					new Date ())
+				.setSubscriptionList (
+					subscriptionList)
 
 				.setSubscriptionAffiliate (
 					subscriptionAffiliate)
 
+				.setStartedThreadId (
+					message.getThreadId ())
+
+				.setStarted (
+					transaction.now ())
+
+				.setActive (
+					true)
+
 			);
 
-			// update the counter
+			// update number
+
+			subscriptionNumber
+
+				.setActive (
+					true)
+
+				.setActiveSubscriptionSub (
+					newSubscriptionSub)
+
+				.setSubscriptionList (
+					subscriptionList)
+
+				.setFirstJoin (
+					ifNull (
+						subscriptionNumber.getFirstJoin (),
+						transaction.now ()))
+
+				.setLastJoin (
+					transaction.now ())
+
+				.setNumSubs (
+					subscriptionNumber.getNumSubs () + 1);
+
+			// update stats
 
 			subscription
-				.incNumSubscribers ();
 
-			if (subscriptionAffiliate != null) {
+				.setNumSubscribers (
+					subscription.getNumSubscribers () + 1);
 
-				subscriptionAffiliate
-					.setNumSubscribers (
-						subscriptionAffiliate.getNumSubscribers () + 1);
+			subscriptionList
 
-			}
+				.setNumSubscribers (
+					subscriptionList.getNumSubscribers () + 1);
 
-			// and send whatever messages
+			subscriptionAffiliate
 
-			ServiceRec defaultService =
-				serviceHelper.findByCode (
-					subscription,
-					"default");
+				.setNumSubscribers (
+					subscriptionAffiliate.getNumSubscribers () + 1);
 
-			messageSetLogic.sendMessageSet (
-				messageSetLogic.findMessageSet (
-					subscription,
-					"subscription_subscribe_success"),
-				message.getThreadId (),
-				number,
-				defaultService,
-				affiliate);
+			// create event
+
+			eventLogic.createEvent (
+				"subscription_number_subscribe",
+				subscriptionNumber,
+				subscriptionList,
+				message);
 
 		}
 
-		transaction.commit ();
+		// send response
 
-		return Status.processed;
+		MessageRec response =
+			messageSenderProvider.get ()
+
+			.threadId (
+				message.getThreadId ())
+
+			.number (
+				message.getNumber ())
+
+			.messageText (
+				subscription.getSubscribeMessageText ())
+
+			.numFrom (
+				subscription.getFreeNumber ())
+
+			.routerResolve (
+				subscription.getFreeRouter ())
+
+			.service (
+				serviceHelper.findByCode (
+					subscriptionList,
+					"default"))
+
+			.affiliate (
+				affiliateHelper.findByCode (
+					subscriptionAffiliate,
+					"default"))
+
+			.send ();
+
+		// process message
+
+		inboxLogic.inboxProcessed (
+			message,
+			response.getService (),
+			response.getAffiliate (),
+			command);
 
 	}
 
-	@Override
-	public
-	Status handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
+	void doUnsubscribe (
+			Transaction transaction) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
-
-		SubscriptionRec subscription =
-			(SubscriptionRec) (Object)
-			objectManager.getParent (
-				command);
-
-		MessageRec message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
-
-		// lock the subscription to prevent concurrent updates
-
-		subscriptionHelper.lock (
-			subscription);
-
-		// set service on received message
-
-		receivedMessage.setServiceId (
-			serviceHelper.findByCode (subscription, "default").getId ());
-
-		// check for a pre-existing subscription
-
-		SubscriptionSubRec subscriptionSub =
-			subscriptionSubHelper.findActive (
-				subscription,
-				message.getNumber ());
-
-		// if there was one...
-
-		if (subscriptionSub != null) {
-
-			SubscriptionAffiliateRec subscriptionAffiliate =
-				subscriptionSub.getSubscriptionAffiliate ();
-
-			AffiliateRec affiliate =
-				subscriptionAffiliate != null
-					? affiliateHelper.findByCode (
-						subscriptionAffiliate,
-						"default")
-					: null;
-
-			if (affiliate != null) {
-
-				receivedMessage.setAffiliateId (
-					affiliate.getId ());
-
-			}
-
-			// unsubscribe them
-
-			subscriptionSub
-				.setActive (false)
-				.setEnded (new Date ());
-
-			// update the counter
-
-			subscription.decNumSubscribers ();
-
-			if (subscriptionAffiliate != null) {
-
-				subscriptionAffiliate
-					.setNumSubscribers (
-						subscriptionAffiliate.getNumSubscribers () - 1);
-
-			}
-
-			// and send whatever messages
-
-			messageSetLogic.sendMessageSet (
-				messageSetLogic.findMessageSet (
-					subscription,
-					"subscription_unsubscribe_success"),
-				message.getThreadId (),
-				message.getNumber (),
-				serviceHelper.findByCode (
-					subscription,
-					"default"),
-				affiliate);
-
-		} else {
-
-			// they aren't subscribed, just send messages
-
-			messageSetLogic.sendMessageSet (
-				messageSetLogic.findMessageSet (
-					subscription,
-					"subscription_unsubscribe_already"),
-				message.getThreadId (),
-				message.getNumber (),
-				serviceHelper.findByCode (
-					subscription,
-					"default"));
-
-		}
-		*/
-
-		transaction.commit ();
-
-		return CommandHandler.Status.processed;
+		throw new RuntimeException ("TODO");
 
 	}
 
 	void findCommand (
 			int commandId) {
 
-		commandHelper.find (
-			commandId);
+		command =
+			commandHelper.find (
+				commandId);
 
 		Record<?> commandParent =
 			objectManager.getParent (

@@ -1,6 +1,6 @@
 <plugin
 	name="dialogue"
-	package="dialogue">
+	package="wbs.integrations.dialogue">
 
 	<sql-scripts>
 		<sql-data name="dialogue-data"/>

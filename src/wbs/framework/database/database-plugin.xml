@@ -1,6 +1,6 @@
 <plugin
 	name="database"
-	package="database">
+	package="wbs.framework.database">
 
 	<layer name="hibernate">
 		<bean class="TransactionCacheFactory"/>

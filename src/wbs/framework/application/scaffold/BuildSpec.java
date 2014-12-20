@@ -22,8 +22,8 @@ class BuildSpec {
 
 	@DataChildren
 	@Getter @Setter
-	List<BuildProjectSpec> projects =
-		new ArrayList<BuildProjectSpec> ();
+	List<BuildPluginSpec> plugins =
+		new ArrayList<BuildPluginSpec> ();
 
 	@DataIgnore
 	Object gitLinks = null;

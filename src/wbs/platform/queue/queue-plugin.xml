@@ -1,6 +1,6 @@
 <plugin
 	name="queue"
-	package="queue">
+	package="wbs.platform.queue">
 
 	<sql-scripts>
 		<sql-schema name="queue"/>

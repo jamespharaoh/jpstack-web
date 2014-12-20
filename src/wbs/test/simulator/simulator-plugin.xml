@@ -1,12 +1,10 @@
 <plugin
 	name="simulator"
-	package="simulator">
+	package="wbs.test.simulator">
 
-	<dependencies>
-		<project name="wbs-test">
-			<plugin name="test-common"/>
-		</project>
-	</dependencies>
+	<plugin-dependencies>
+		<plugin-dependency name="test-common"/>
+	</plugin-dependencies>
 
 	<sql-scripts>
 		<sql-data name="simulator-data"/>
@@ -16,6 +14,7 @@
 		<model name="simulator"/>
 		<model name="simulatorEvent"/>
 		<model name="simulatorSession"/>
+		<model name="simulatorSessionNumber"/>
 	</models>
 
 	<layer name="console">

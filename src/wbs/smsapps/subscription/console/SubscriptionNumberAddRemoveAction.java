@@ -1,7 +1,6 @@
 package wbs.smsapps.subscription.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -26,6 +25,8 @@ import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
+import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
+import wbs.smsapps.subscription.model.SubscriptionListRec;
 import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionNumberRec;
 import wbs.smsapps.subscription.model.SubscriptionObjectHelper;
@@ -166,13 +167,19 @@ class SubscriptionNumberAddRemoveAction
 						subscription,
 						number);
 
-				if (subscriptionNumber.getActive ()) {
+				if (subscriptionNumber.getActiveSubscriptionSub () != null) {
 
 					numAlreadyAdded ++;
 
 					continue;
 
 				}
+
+				SubscriptionAffiliateRec newSubscriptionAffiliate =
+					addRemoveForm.subscriptionAffiliate ();
+
+				SubscriptionListRec newSubscriptionList =
+					addRemoveForm.subscriptionList ();
 
 				SubscriptionSubRec subscriptionSub =
 					subscriptionSubHelper.insert (
@@ -185,14 +192,13 @@ class SubscriptionNumberAddRemoveAction
 						subscriptionNumber.getNumSubs ())
 
 					.setSubscriptionList (
-						addRemoveForm.subscriptionList ())
+						newSubscriptionList)
 
 					.setSubscriptionAffiliate (
-						addRemoveForm.subscriptionAffiliate ())
+						newSubscriptionAffiliate)
 
 					.setStarted (
-						instantToDate (
-							transaction.now ()))
+						transaction.now ())
 
 					.setStartedBy (
 						myUser)
@@ -222,6 +228,16 @@ class SubscriptionNumberAddRemoveAction
 
 					.setNumSubscribers (
 						subscription.getNumSubscribers () + 1);
+
+				newSubscriptionAffiliate
+
+					.setNumSubscribers (
+						newSubscriptionAffiliate.getNumSubscribers () + 1);
+
+				newSubscriptionList
+
+					.setNumSubscribers (
+						newSubscriptionList.getNumSubscribers () + 1);
 
 				numAdded ++;
 
@@ -267,7 +283,7 @@ class SubscriptionNumberAddRemoveAction
 						subscription,
 						number);
 
-				if (! subscriptionNumber.getActive ()) {
+				if (subscriptionNumber.getActiveSubscriptionSub () == null) {
 
 					numAlreadyRemoved ++;
 
@@ -275,11 +291,19 @@ class SubscriptionNumberAddRemoveAction
 
 				}
 
-				subscriptionNumber.getActiveSubscriptionSub ()
+				SubscriptionSubRec activeSubscriptionSub =
+					subscriptionNumber.getActiveSubscriptionSub ();
+
+				SubscriptionListRec activeSubscriptionList =
+					activeSubscriptionSub.getSubscriptionList ();
+
+				SubscriptionAffiliateRec activeSubscriptionAffiliate =
+					activeSubscriptionSub.getSubscriptionAffiliate ();
+
+				activeSubscriptionSub
 
 					.setEnded (
-						instantToDate (
-							transaction.now ()))
+						transaction.now ())
 
 					.setEndedBy (
 						myUser);
@@ -296,6 +320,16 @@ class SubscriptionNumberAddRemoveAction
 
 					.setNumSubscribers (
 						subscription.getNumSubscribers () - 1);
+
+				activeSubscriptionAffiliate
+
+					.setNumSubscribers (
+						activeSubscriptionAffiliate.getNumSubscribers () - 1);
+
+				activeSubscriptionList
+
+					.setNumSubscribers (
+						activeSubscriptionList.getNumSubscribers () - 1);
 
 				numRemoved ++;
 

@@ -1,6 +1,6 @@
 <plugin
 	name="chat-user-pending"
-	package="chat.user.pending">
+	package="wbs.apn.chat.user.pending">
 
 	<layer name="console">
 		<bean class="console.ChatUserPendingFormAction"/>

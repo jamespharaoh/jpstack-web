@@ -27,7 +27,7 @@ class PluginSpec
 
 	@DataParent
 	@Getter @Setter
-	ProjectSpec project;
+	BuildSpec build;
 
 	@DataAttribute (
 		required = true)
@@ -40,10 +40,10 @@ class PluginSpec
 	@Getter @Setter
 	String packageName;
 
-	@DataChild
+	@DataChildren
 	@Getter @Setter
-	PluginDependenciesSpec dependencies =
-		new PluginDependenciesSpec ();
+	List<PluginDependencySpec> pluginDependencies =
+		new ArrayList<PluginDependencySpec> ();
 
 	@DataChild
 	@Getter @Setter
@@ -81,10 +81,6 @@ class PluginSpec
 			PluginSpec other) {
 
 		return new CompareToBuilder ()
-
-			.append (
-				project (),
-				other.project ())
 
 			.append (
 				name (),

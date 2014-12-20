@@ -1,6 +1,6 @@
 <plugin
 	name="hybyte"
-	package="hybyte">
+	package="wbs.integrations.hybyte">
 
 	<sql-scripts>
 		<sql-data name="hybyte-data"/>

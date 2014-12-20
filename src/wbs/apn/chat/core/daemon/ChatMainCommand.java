@@ -112,6 +112,9 @@ class ChatMainCommand
 	Database database;
 
 	@Inject
+	KeywordFinder keywordFinder;
+
+	@Inject
 	MessageObjectHelper messageHelper;
 
 	@Inject
@@ -589,7 +592,7 @@ class ChatMainCommand
 
 		for (
 			KeywordFinder.Match match
-				: KeywordFinder.find (
+				: keywordFinder.find (
 					receivedMessage.getRest ())
 		) {
 
