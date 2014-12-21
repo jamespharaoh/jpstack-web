@@ -47,11 +47,9 @@ class SubscriptionSendNumberRec
 	@ReferenceField
 	SubscriptionSubRec subscriptionSub;
 
-	@SimpleField
-	Integer threadId;
-
-	@ReferenceField
-	MessageRec billedMessage;
+	@ReferenceField (
+		nullable = true)
+	MessageRec message;
 
 	// state
 
@@ -87,7 +85,7 @@ class SubscriptionSendNumberRec
 	public static
 	interface SubscriptionSendNumberDaoMethods {
 
-		List<SubscriptionSendNumberRec> findAcceptedLimit (
+		List<SubscriptionSendNumberRec> findQueuedLimit (
 				SubscriptionSendRec subscriptionSend,
 				int maxResults);
 

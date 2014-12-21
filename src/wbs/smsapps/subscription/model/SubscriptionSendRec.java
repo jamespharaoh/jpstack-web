@@ -1,6 +1,7 @@
 package wbs.smsapps.subscription.model;
 
 import java.util.List;
+import java.util.Map;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -112,6 +113,10 @@ class SubscriptionSendRec
 	@CollectionField (
 		index = "index")
 	List<SubscriptionSendPartRec> parts;
+
+	@CollectionField (
+		index = "subscription_list_id")
+	Map<Integer,SubscriptionSendPartRec> partsByList;
 
 	// compare to
 

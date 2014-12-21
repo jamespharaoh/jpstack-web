@@ -570,7 +570,9 @@ class ChatBroadcastSendAction
 					"perform send");
 
 				BatchSubjectRec batchSubject =
-					batchLogic.batchSubject (chat, "broadcast");
+					batchLogic.batchSubject (
+						chat,
+						"broadcast");
 
 				BatchRec batch =
 					objectManager.insert (

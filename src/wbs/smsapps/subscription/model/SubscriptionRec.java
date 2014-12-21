@@ -110,13 +110,18 @@ class SubscriptionRec
 
 	// children
 
-	@CollectionField
-	Set<SubscriptionSubRec> subscriptionSubs =
-		new LinkedHashSet<SubscriptionSubRec> ();
+	@CollectionField (
+		where = "active")
+	Set<SubscriptionNumberRec> activeSubscriptionNumbers =
+		new LinkedHashSet<SubscriptionNumberRec> ();
 
 	@CollectionField
 	Set<SubscriptionAffiliateRec> subscriptionAffiliates =
 		new LinkedHashSet<SubscriptionAffiliateRec> ();
+
+	@CollectionField
+	Set<SubscriptionListRec> subscriptionLists =
+		new LinkedHashSet<SubscriptionListRec> ();
 
 	// TODO remove these
 

@@ -77,6 +77,20 @@
 		<index-field/>
 		<description-field/>
 
+		<object-field
+			name="createdUser"
+			finder="user"/>
+
+		<timestamp-field
+			name="createdTime"/>
+
+		<integer-field
+			name="numRecipients"/>
+
+		<enum-field
+			name="state"
+			helper="subscriptionSendStateConsoleHelper"/>
+
 	</field-set>
 
 	<field-set

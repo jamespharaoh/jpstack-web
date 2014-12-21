@@ -1,12 +1,23 @@
 package wbs.smsapps.subscription.logic;
 
-import wbs.platform.affiliate.model.AffiliateRec;
-import wbs.smsapps.subscription.model.SubscriptionSubRec;
+import org.joda.time.Instant;
+
+import wbs.platform.user.model.UserRec;
+import wbs.smsapps.subscription.model.SubscriptionSendNumberRec;
+import wbs.smsapps.subscription.model.SubscriptionSendRec;
 
 public
 interface SubscriptionLogic {
 
-	AffiliateRec getAffiliateForSubscriptionSub (
-			SubscriptionSubRec subscriptionSub);
+	void sendNow (
+			SubscriptionSendNumberRec subscriptionSendNumber);
+
+	void sendLater (
+			SubscriptionSendNumberRec subscriptionSendNumber);
+
+	void scheduleSend (
+			SubscriptionSendRec subscriptionSend,
+			Instant scheduleForTime,
+			UserRec user);
 
 }

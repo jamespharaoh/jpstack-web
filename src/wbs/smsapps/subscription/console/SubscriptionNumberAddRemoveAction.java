@@ -160,7 +160,10 @@ class SubscriptionNumberAddRemoveAction
 			int numAdded = 0;
 			int numAlreadyAdded = 0;
 
-			for (NumberRec number : numbers) {
+			for (
+				NumberRec number
+					: numbers
+			) {
 
 				SubscriptionNumberRec subscriptionNumber =
 					subscriptionNumberHelper.findOrCreate (
@@ -176,7 +179,9 @@ class SubscriptionNumberAddRemoveAction
 				}
 
 				SubscriptionAffiliateRec newSubscriptionAffiliate =
-					addRemoveForm.subscriptionAffiliate ();
+					ifNull (
+						subscriptionNumber.getSubscriptionAffiliate (),
+						addRemoveForm.subscriptionAffiliate ());
 
 				SubscriptionListRec newSubscriptionList =
 					addRemoveForm.subscriptionList ();

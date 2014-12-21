@@ -73,5 +73,15 @@ class SubscriptionSendPartRec
 
 	}
 
+	// dao methods
+
+	public static
+	interface SubscriptionSendPartDaoMethods {
+
+		SubscriptionSendPartRec find (
+				SubscriptionSendRec subscriptionSend,
+				SubscriptionListRec subscriptionList);
+
+	}
 
 }

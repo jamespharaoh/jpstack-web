@@ -1,7 +1,5 @@
 package wbs.smsapps.subscription.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -19,7 +17,6 @@ import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.Record;
 import wbs.platform.user.model.UserRec;
-import wbs.sms.number.core.model.NumberRec;
 
 @Accessors (chain = true)
 @Data
@@ -106,18 +103,5 @@ class SubscriptionSubRec
 
 	}
 
-	// dao methods
-
-	public static
-	interface SubscriptionSubDaoMethods {
-
-		SubscriptionSubRec findActive (
-				SubscriptionRec subscription,
-				NumberRec number);
-
-		List<SubscriptionSubRec> findActive (
-				SubscriptionRec subscription);
-
-	}
 
 }

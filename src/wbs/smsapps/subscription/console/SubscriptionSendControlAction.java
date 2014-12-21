@@ -19,6 +19,8 @@ import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
+import wbs.smsapps.subscription.logic.SubscriptionLogic;
+import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionSendRec;
 import wbs.smsapps.subscription.model.SubscriptionSendState;
 
@@ -30,9 +32,6 @@ class SubscriptionSendControlAction
 	// dependencies
 
 	@Inject
-	SubscriptionSendConsoleHelper subscriptionSendHelper;
-
-	@Inject
 	Database database;
 
 	@Inject
@@ -40,6 +39,15 @@ class SubscriptionSendControlAction
 
 	@Inject
 	ConsoleRequestContext requestContext;
+
+	@Inject
+	SubscriptionLogic subscriptionLogic;
+
+	@Inject
+	SubscriptionNumberObjectHelper subscriptionNumberHelper;
+
+	@Inject
+	SubscriptionSendConsoleHelper subscriptionSendHelper;
 
 	@Inject
 	TimeFormatter timeFormatter;
@@ -96,39 +104,15 @@ class SubscriptionSendControlAction
 
 			}
 
-			subscriptionSend
-
-				.setSentUser (
-					myUser)
-
-				.setScheduledTime (
-					transaction.now ())
-
-				.setScheduledForTime (
-					transaction.now ())
-
-				.setSentTime (
-					transaction.now ())
-
-				.setState (
-					SubscriptionSendState.sending);
-
-			eventLogic.createEvent (
-				"subscription_send_scheduled",
-				myUser,
+			subscriptionLogic.scheduleSend (
 				subscriptionSend,
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
-					transaction.now ()));
-
-			eventLogic.createEvent (
-				"subscription_send_begun",
-				subscriptionSend);
+				transaction.now (),
+				myUser);
 
 			transaction.commit ();
 
 			requestContext.addNotice (
-				"Subscription send is now sending");
+				"Subscription send scheduled for now");
 
 			return null;
 
@@ -170,27 +154,10 @@ class SubscriptionSendControlAction
 
 			}
 
-			subscriptionSend
-
-				.setSentUser (
-					myUser)
-
-				.setScheduledTime (
-					transaction.now ())
-
-				.setScheduledForTime (
-					scheduledTime)
-
-				.setState (
-					SubscriptionSendState.scheduled);
-
-			eventLogic.createEvent (
-				"subscription_send_scheduled",
-				myUser,
+			subscriptionLogic.scheduleSend (
 				subscriptionSend,
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
-					scheduledTime));
+				scheduledTime,
+				myUser);
 
 			transaction.commit ();
 

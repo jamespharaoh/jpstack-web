@@ -120,8 +120,10 @@ class ObjectSearchResultsPart
 		objects =
 			new ArrayList<Record<?>> ();
 
-		for (Integer objectId
-				: pageObjectIds) {
+		for (
+			Integer objectId
+				: pageObjectIds
+		) {
 
 			objects.add (
 				consoleHelper.find (
@@ -237,11 +239,34 @@ class ObjectSearchResultsPart
 		printFormat (
 			"</tr>\n");
 
-		for (Record<?> object
-				: objects) {
+		for (
+			Record<?> object
+				: objects
+		) {
 
-			if (! consoleHelper.canView (object))
+			if (object == null) {
+
+				printFormat (
+					"<td",
+					" colspan=\"%h\"",
+					formFieldSet.formFields ().size (),
+					">(deleted)</td>\n");
+
 				continue;
+
+			}
+
+			if (! consoleHelper.canView (object)) {
+
+				printFormat (
+					"<td",
+					" colspan=\"%h\"",
+					formFieldSet.formFields ().size (),
+					">(resricted)</td>\n");
+
+				continue;
+
+			}
 
 			printFormat (
 				"%s",

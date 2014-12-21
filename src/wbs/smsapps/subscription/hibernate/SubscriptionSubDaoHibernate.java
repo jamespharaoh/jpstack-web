@@ -1,18 +1,14 @@
 package wbs.smsapps.subscription.hibernate;
 
-import java.util.List;
-
 import wbs.framework.hibernate.HibernateDao;
-import wbs.sms.number.core.model.NumberRec;
-import wbs.smsapps.subscription.model.SubscriptionRec;
 import wbs.smsapps.subscription.model.SubscriptionSubDao;
-import wbs.smsapps.subscription.model.SubscriptionSubRec;
 
 public
 class SubscriptionSubDaoHibernate
 	extends HibernateDao
 	implements SubscriptionSubDao {
 
+	/*
 	@Override
 	public
 	SubscriptionSubRec findActive (
@@ -22,19 +18,24 @@ class SubscriptionSubDaoHibernate
 		return findOne (
 			SubscriptionSubRec.class,
 
-			createQuery (
-				"FROM SubscriptionSubRec ss " +
-				"WHERE ss.subscription = :subscription " +
-					"AND ss.number = :number " +
-					"AND ss.active = true")
+			createCriteria (
+				SubscriptionSubRec.class,
+				"_subscriptionSub")
 
-			.setEntity (
-				"subscription",
-				subscription)
+			.add (
+				Restrictions.eq (
+					"_subscriptionSub.subscription",
+					subscription))
 
-			.setEntity (
-				"number",
-				number)
+			.add (
+				Restrictions.eq (
+					"_subscriptionSub.number",
+					number))
+
+			.add (
+				Restrictions.eq (
+					"_subscriptionSub.active",
+					true))
 
 			.list ());
 
@@ -48,17 +49,23 @@ class SubscriptionSubDaoHibernate
 		return findMany (
 			SubscriptionSubRec.class,
 
-			createQuery (
-				"FROM SubscriptionSubRec ss " +
-				"WHERE ss.subscription = :subscription " +
-					"AND ss.active = true")
+			createCriteria (
+				SubscriptionSubRec.class,
+				"_subscriptionSub")
 
-			.setEntity (
-				"subscription",
-				subscription)
+			.add (
+				Restrictions.eq (
+					"_subscriptionSub.subscription",
+					subscription))
+
+			.add (
+				Restrictions.eq (
+					"_subscriptionSub.active",
+					true))
 
 			.list ());
 
 	}
+	*/
 
 }

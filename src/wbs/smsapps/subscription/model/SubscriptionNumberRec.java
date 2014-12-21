@@ -48,15 +48,6 @@ class SubscriptionNumberRec
 	@IdentityReferenceField
 	NumberRec number;
 
-	// state
-
-	@SimpleField
-	Boolean active = false;
-
-	@ReferenceField (
-		nullable = true)
-	SubscriptionSubRec activeSubscriptionSub;
-
 	// details
 
 	@SimpleField (
@@ -77,6 +68,29 @@ class SubscriptionNumberRec
 
 	@SimpleField
 	Integer numSubs = 0;
+
+	@SimpleField
+	Integer numBills = 0;
+
+	@SimpleField
+	Integer balance = 0;
+
+	// state
+
+	@SimpleField
+	Boolean active = false;
+
+	@ReferenceField (
+		nullable = true)
+	SubscriptionSubRec activeSubscriptionSub;
+
+	@ReferenceField (
+		nullable = true)
+	SubscriptionBillRec pendingSubscriptionBill;
+
+	@ReferenceField (
+		nullable = true)
+	SubscriptionSendNumberRec pendingSubscriptionSendNumber;
 
 	// children
 

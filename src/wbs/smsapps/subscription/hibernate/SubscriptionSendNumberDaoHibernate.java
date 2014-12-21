@@ -16,7 +16,7 @@ class SubscriptionSendNumberDaoHibernate
 	implements SubscriptionSendNumberDao {
 
 	public
-	List<SubscriptionSendNumberRec> findAcceptedLimit (
+	List<SubscriptionSendNumberRec> findQueuedLimit (
 			SubscriptionSendRec subscriptionSend,
 			int maxResults) {
 
@@ -35,7 +35,7 @@ class SubscriptionSendNumberDaoHibernate
 			.add (
 				Restrictions.eq (
 					"_subscriptionSendNumber.state",
-					SubscriptionSendNumberState.accepted))
+					SubscriptionSendNumberState.queued))
 
 			.setMaxResults (
 				maxResults)

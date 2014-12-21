@@ -6,6 +6,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.joda.time.Instant;
 
 import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
@@ -47,11 +48,11 @@ class SubscriptionBillRec
 	// times
 
 	@SimpleField
-	Integer createdTime;
+	Instant createdTime;
 
 	@SimpleField (
 		nullable = true)
-	Integer deliveredTime;
+	Instant deliveredTime;
 
 	// state
 

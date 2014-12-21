@@ -14,20 +14,29 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHelper;
+import wbs.platform.affiliate.model.AffiliateObjectHelper;
+import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.send.GenericSendHelper;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
+import wbs.sms.message.batch.logic.BatchLogic;
 import wbs.sms.message.batch.model.BatchObjectHelper;
 import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.batch.model.BatchSubjectObjectHelper;
 import wbs.sms.message.batch.model.BatchSubjectRec;
 import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.smsapps.subscription.model.SubscriptionBillObjectHelper;
+import wbs.smsapps.subscription.model.SubscriptionListRec;
+import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelper;
+import wbs.smsapps.subscription.model.SubscriptionNumberRec;
 import wbs.smsapps.subscription.model.SubscriptionObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionRec;
 import wbs.smsapps.subscription.model.SubscriptionSendNumberObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionSendNumberRec;
 import wbs.smsapps.subscription.model.SubscriptionSendNumberState;
 import wbs.smsapps.subscription.model.SubscriptionSendObjectHelper;
+import wbs.smsapps.subscription.model.SubscriptionSendPartObjectHelper;
+import wbs.smsapps.subscription.model.SubscriptionSendPartRec;
 import wbs.smsapps.subscription.model.SubscriptionSendRec;
 import wbs.smsapps.subscription.model.SubscriptionSendState;
 import wbs.smsapps.subscription.model.SubscriptionSubObjectHelper;
@@ -46,7 +55,13 @@ class SubscriptionSendHelper
 	// dependencies
 
 	@Inject
+	AffiliateObjectHelper affiliateHelper;
+
+	@Inject
 	BatchObjectHelper batchHelper;
+
+	@Inject
+	BatchLogic batchLogic;
 
 	@Inject
 	BatchSubjectObjectHelper batchSubjectHelper;
@@ -55,7 +70,13 @@ class SubscriptionSendHelper
 	Database database;
 
 	@Inject
+	ObjectTypeObjectHelper objectTypeHelper;
+
+	@Inject
 	ServiceObjectHelper serviceHelper;
+
+	@Inject
+	SubscriptionBillObjectHelper subscriptionBillHelper;
 
 	@Inject
 	SubscriptionLogic subscriptionLogic;
@@ -64,10 +85,16 @@ class SubscriptionSendHelper
 	SubscriptionObjectHelper subscriptionHelper;
 
 	@Inject
+	SubscriptionNumberObjectHelper subscriptionNumberHelper;
+
+	@Inject
 	SubscriptionSendObjectHelper subscriptionSendHelper;
 
 	@Inject
 	SubscriptionSendNumberObjectHelper subscriptionSendNumberHelper;
+
+	@Inject
+	SubscriptionSendPartObjectHelper subscriptionSendPartHelper;
 
 	@Inject
 	SubscriptionSubObjectHelper subscriptionSubHelper;
@@ -122,7 +149,7 @@ class SubscriptionSendHelper
 			SubscriptionSendRec subscriptionSend,
 			int maxResults) {
 
-		return subscriptionSendNumberHelper.findAcceptedLimit (
+		return subscriptionSendNumberHelper.findQueuedLimit (
 			subscriptionSend,
 			maxResults);
 
@@ -172,9 +199,12 @@ class SubscriptionSendHelper
 			SubscriptionRec subscription,
 			SubscriptionSendRec subscriptionSend) {
 
-		if (isNull (
-				subscription.getBilledRoute ()))
+		if (
+			isNull (
+				subscription.getBilledRoute ())
+		) {
 			return false;
+		}
 
 		return true;
 
@@ -191,7 +221,7 @@ class SubscriptionSendHelper
 		// create a batch
 
 		BatchSubjectRec batchSubject =
-			batchSubjectHelper.findByCode (
+			batchLogic.batchSubject (
 				subscription,
 				"send");
 
@@ -199,8 +229,18 @@ class SubscriptionSendHelper
 			batchHelper.insert (
 				new BatchRec ()
 
+			.setParentObjectType (
+				objectTypeHelper.find (
+					subscriptionSendHelper.objectTypeId ()))
+
+			.setParentObjectId (
+				subscriptionSend.getId ())
+
 			.setSubject (
 				batchSubject)
+
+			.setCode (
+				batchSubject.getCode ())
 
 		);
 
@@ -219,14 +259,23 @@ class SubscriptionSendHelper
 
 		// create send numbers
 
-		List<SubscriptionSubRec> subscriptionSubs =
-			subscriptionSubHelper.findActive (
-				subscription);
-
 		for (
-			SubscriptionSubRec subscriptionSub
-				: subscriptionSubs
+			SubscriptionNumberRec subscriptionNumber
+				: subscription.getActiveSubscriptionNumbers ()
 		) {
+
+			SubscriptionSubRec subscriptionSub =
+				subscriptionNumber.getActiveSubscriptionSub ();
+
+			SubscriptionListRec subscriptionList =
+				subscriptionSub.getSubscriptionList ();
+
+			SubscriptionSendPartRec subscriptionSendPart =
+				subscriptionSend.getPartsByList ().get (
+					subscriptionList.getId ());
+
+			if (subscriptionSendPart == null)
+				continue;
 
 			subscriptionSendNumberHelper.insert (
 				new SubscriptionSendNumberRec ()
@@ -234,11 +283,14 @@ class SubscriptionSendHelper
 				.setSubscriptionSend (
 					subscriptionSend)
 
+				.setNumber (
+					subscriptionNumber.getNumber ())
+
 				.setSubscriptionSub (
-					subscriptionSub)
+					subscriptionNumber.getActiveSubscriptionSub ())
 
 				.setState (
-					SubscriptionSendNumberState.accepted)
+					SubscriptionSendNumberState.queued)
 
 			);
 
@@ -272,129 +324,28 @@ class SubscriptionSendHelper
 			SubscriptionSendRec subscriptionSend,
 			SubscriptionSendNumberRec subscriptionSendNumber) {
 
-		/*
-		TemplateVersionRec templateVersion =
-			subscriptionSend.getTemplate ().getTemplateVersion ();
-
-		TextRec billedMessageText =
-			templateVersion.getBilledEnabled ()
-				? textHelper.findOrCreate (
-					templateVersion.getBilledMessage ())
-				: null;
-
 		SubscriptionSubRec subscriptionSub =
 			subscriptionSendNumber.getSubscriptionSub ();
 
-		ServiceRec defaultService =
-			serviceHelper.findByCode (
-				subscription,
-				"default");
+		SubscriptionNumberRec subscriptionNumber =
+			subscriptionSub.getSubscriptionNumber ();
 
-		AffiliateRec affiliate =
-			subscriptionLogic.getAffiliateForSubscriptionSub (
-				subscriptionSub);
+		if (
 
-		if (templateVersion.getBilledEnabled ()) {
+			subscriptionNumber.getBalance ()
+				>= subscription.getDebitsPerSend ()
 
-			// send the billed message
+		) {
 
-			MessageRec message =
-				messageSenderProvider.get ()
-
-				.number (
-					subscriptionSub
-						.getSubscriptionNumber ()
-						.getNumber ())
-
-				.messageText (
-					billedMessageText)
-
-				.numFrom (
-					subscription.getBilledNumber ())
-
-				.route (
-					subscription.getBilledRoute ())
-
-				.service (
-					defaultService)
-
-				.batch (
-					subscriptionSend.getBatch ())
-
-				.affiliate (
-					affiliate)
-
-				.deliveryTypeCode (
-					"subscription")
-
-				.ref (
-					subscriptionSendNumber.getId ())
-
-				.send ();
-
-			subscriptionSendNumber
-
-				.setBilledMessage (
-					message)
-
-				.setThreadId (
-					message.getThreadId ())
-
-				.setState (
-					SubscriptionSendNumberState.halfSent);
+			subscriptionLogic.sendNow (
+				subscriptionSendNumber);
 
 		} else {
 
-			// send the free messages
-
-			for (
-				TemplatePartRec templatePart
-					: templateVersion.getTemplateParts ()
-			) {
-
-				MessageRec message =
-					messageSenderProvider.get ()
-
-					.threadId (
-						subscriptionSendNumber.getThreadId ())
-
-					.number (
-						subscriptionSub
-							.getSubscriptionNumber ()
-							.getNumber ())
-
-					.messageString (
-						templatePart.getMessage ())
-
-					.numFrom (
-						subscription.getFreeNumber ())
-
-					.route (
-						subscription.getFreeRoute ())
-
-					.service (
-						defaultService)
-
-					.batch (
-						subscriptionSend.getBatch ())
-
-					.affiliate (
-						affiliate)
-
-					.send ();
-
-				subscriptionSendNumber
-
-					.setThreadId (
-						message.getThreadId ())
-
-					.setState (
-						SubscriptionSendNumberState.sent);
-
-			}
+			subscriptionLogic.sendLater (
+				subscriptionSendNumber);
 
 		}
-		*/
 
 	}
 
