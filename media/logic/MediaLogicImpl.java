@@ -1076,6 +1076,33 @@ class MediaLogicImpl
 	}
 
 	public
+	boolean isApplication (
+			String mimeType) {
+
+		return applicationTypes.contains (
+			mimeType);
+
+	}
+
+	public
+	boolean isApplication (
+			MediaTypeRec mediaType) {
+
+		return isApplication (
+			mediaType.getMimeType ());
+
+	}
+
+	public
+	boolean isApplication (
+			MediaRec media) {
+
+		return isApplication (
+			media.getMediaType ());
+
+	}
+
+	public
 	boolean isAudio (
 			String mimeType) {
 
@@ -1203,7 +1230,11 @@ class MediaLogicImpl
 	public final static
 	Set<String> textTypes =
 		ImmutableSet.<String>of (
-			"text/plain",
+			"text/plain");
+
+	public final static
+	Set<String> applicationTypes =
+		ImmutableSet.<String>of (
 			"application/smil");
 
 	public final static

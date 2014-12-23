@@ -1,14 +1,14 @@
 package wbs.platform.console.html;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.urlEncode;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
-import wbs.framework.utils.etc.Html;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormatter;
+
 import wbs.platform.console.request.FormData;
 
 /**
@@ -57,7 +57,7 @@ class ObsoleteDateLinks {
 
 		void makeLinks (
 				LinkWriter linkWriter,
-				Date date);
+				LocalDate date);
 
 	}
 
@@ -68,7 +68,7 @@ class ObsoleteDateLinks {
 	interface LinkWriter {
 
 		void writeLink (
-				Date date,
+				LocalDate date,
 				String title);
 
 	}
@@ -85,26 +85,23 @@ class ObsoleteDateLinks {
 		public
 		void makeLinks (
 				LinkWriter linkWriter,
-				Date date) {
+				LocalDate date) {
 
-			Calendar calendar =
-				Calendar.getInstance ();
+			linkWriter.writeLink (
+				date.minusYears (1),
+				"Prev year");
 
-			calendar.setTime(date);
-			calendar.add(Calendar.YEAR, -1);
-			linkWriter.writeLink(calendar.getTime(), "Prev year");
+			linkWriter.writeLink (
+				date.minusMonths (1),
+				"Prev month");
 
-			calendar.setTime(date);
-			calendar.add(Calendar.MONTH, -1);
-			linkWriter.writeLink(calendar.getTime(), "Prev month");
+			linkWriter.writeLink (
+				date.plusMonths (1),
+				"Next month");
 
-			calendar.setTime(date);
-			calendar.add(Calendar.MONTH, 1);
-			linkWriter.writeLink(calendar.getTime(), "Next month");
-
-			calendar.setTime(date);
-			calendar.add(Calendar.YEAR, 1);
-			linkWriter.writeLink(calendar.getTime(), "Next year");
+			linkWriter.writeLink (
+				date.plusYears (1),
+				"Next year");
 
 		}
 
@@ -122,33 +119,31 @@ class ObsoleteDateLinks {
 		public
 		void makeLinks (
 				LinkWriter linkWriter,
-				Date date) {
+				LocalDate date) {
 
-			Calendar cal = Calendar.getInstance();
+			linkWriter.writeLink (
+				date.minusMonths (1),
+				"Prev month");
 
-			cal.setTime(date);
-			cal.add(Calendar.MONTH, -1);
-			linkWriter.writeLink(cal.getTime(), "Prev month");
+			linkWriter.writeLink (
+				date.minusWeeks (1),
+				"Prev week");
 
-			cal.setTime(date);
-			cal.add(Calendar.DATE, -7);
-			linkWriter.writeLink(cal.getTime(), "Prev week");
+			linkWriter.writeLink (
+				date.minusDays (1),
+				"Prev day");
 
-			cal.setTime(date);
-			cal.add(Calendar.DATE, -1);
-			linkWriter.writeLink(cal.getTime(), "Prev day");
+			linkWriter.writeLink (
+				date.plusDays (1),
+				"Next day");
 
-			cal.setTime(date);
-			cal.add(Calendar.DATE, 1);
-			linkWriter.writeLink(cal.getTime(), "Next day");
+			linkWriter.writeLink (
+				date.plusWeeks (1),
+				"Next week");
 
-			cal.setTime(date);
-			cal.add(Calendar.DATE, 7);
-			linkWriter.writeLink(cal.getTime(), "Next week");
-
-			cal.setTime(date);
-			cal.add(Calendar.MONTH, 1);
-			linkWriter.writeLink(cal.getTime(), "Next month");
+			linkWriter.writeLink (
+				date.plusMonths (1),
+				"Next month");
 
 		}
 
@@ -163,10 +158,10 @@ class ObsoleteDateLinks {
 			final PrintWriter out,
 			final String url,
 			final FormData formData,
-			final Date date,
+			final LocalDate date,
 			final String dateFieldName,
 			final LinkMaker linkMaker,
-			final SimpleDateFormat dateFormat) {
+			final DateTimeFormatter dateFormatter) {
 
 		LinkWriter linkWriter =
 			new LinkWriter () {
@@ -174,13 +169,20 @@ class ObsoleteDateLinks {
 			@Override
 			public
 			void writeLink (
-					Date date,
+					LocalDate date,
 					String title) {
 
-				out.println("<a href=\""
-						+ Html.encode(makeLink(url, formData, dateFieldName,
-								dateFormat.format(date))) + "\">"
-						+ Html.encode(title) + "</a>");
+				out.println (
+					stringFormat (
+						"<a",
+						" href=\"%h\"",
+						makeLink (
+							url,
+							formData,
+							dateFieldName,
+							dateFormatter.print (date)),
+						">%h</a>\n",
+						title));
 
 			}
 
@@ -197,10 +199,10 @@ class ObsoleteDateLinks {
 			final PrintWriter out,
 			final String url,
 			final FormData formData,
-			final Date date,
+			final LocalDate date,
 			final String dateFieldName,
 			final LinkMaker linkMaker,
-			final SimpleDateFormat dateFormat) {
+			final DateTimeFormatter dateFormatter) {
 
 		out.println (
 			"<p class=\"links\">");
@@ -211,19 +213,28 @@ class ObsoleteDateLinks {
 			@Override
 			public
 			void writeLink (
-					Date date,
+					LocalDate date,
 					String title) {
 
-				out.println("<a href=\""
-						+ Html.encode(makeLink(url, formData, dateFieldName,
-								dateFormat.format(date))) + "\">"
-						+ Html.encode(title) + "</a>");
+				out.println (
+					stringFormat (
+						"<a",
+						" href=\"%h\"",
+						makeLink (
+							url,
+							formData,
+							dateFieldName,
+							dateFormatter.print (date)),
+						">%h</a>\n",
+						title));
 
 			}
 
 		};
 
-		linkMaker.makeLinks(linkWriter, date);
+		linkMaker.makeLinks (
+			linkWriter,
+			date);
 
 		out.println("</p>");
 	}
@@ -237,7 +248,7 @@ class ObsoleteDateLinks {
 			PrintWriter out,
 			String url,
 			FormData formData,
-			Date date) {
+			LocalDate date) {
 
 		browserParagraph (
 			out,
@@ -246,7 +257,7 @@ class ObsoleteDateLinks {
 			date,
 			"month",
 			monthlyLinkMaker,
-			ObsoleteMonthField.dateFormat);
+			ObsoleteMonthField.dateFormatter);
 
 	}
 
@@ -259,7 +270,7 @@ class ObsoleteDateLinks {
 			PrintWriter out,
 			String url,
 			FormData formData,
-			Date date) {
+			LocalDate date) {
 
 		browserParagraph (
 			out,
@@ -268,7 +279,7 @@ class ObsoleteDateLinks {
 			date,
 			"date",
 			dailyLinkMaker,
-			ObsoleteDateField.dateFormat);
+			ObsoleteDateField.dateFormatter);
 
 	}
 
@@ -276,7 +287,7 @@ class ObsoleteDateLinks {
 	String dailyBrowserLinks (
 			String url,
 			FormData formData,
-			Date date) {
+			LocalDate date) {
 
 		StringWriter stringWriter =
 			new StringWriter ();
@@ -289,7 +300,7 @@ class ObsoleteDateLinks {
 			date,
 			"date",
 			dailyLinkMaker,
-			ObsoleteDateField.dateFormat);
+			ObsoleteDateField.dateFormatter);
 
 		return stringWriter.toString ();
 

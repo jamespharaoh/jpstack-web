@@ -2,9 +2,10 @@ package wbs.platform.media.console;
 
 import static wbs.framework.utils.etc.Misc.bytesToString;
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -14,6 +15,7 @@ import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 @SingletonComponent ("mediaConsoleLogic")
 public
@@ -41,10 +43,7 @@ class MediaConsoleLogicImpl
 	String mediaUrl (
 			MediaRec media) {
 
-		if (
-			in (media.getMediaType ().getMimeType (),
-				"image/jpeg")
-		) {
+		if (mediaLogic.isImage (media)) {
 
 			return stringFormat (
 				"%s",
@@ -448,5 +447,11 @@ class MediaConsoleLogicImpl
 		}
 
 	}
+
+	Map<String,String> iconNames =
+		ImmutableMap.<String,String>builder ()
+			.put ("text/plain", "txt.png")
+			.put ("application/smil", "xml6.png")
+			.build ();
 
 }
