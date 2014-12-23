@@ -1,6 +1,5 @@
 package wbs.platform.supervisor;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -78,12 +77,14 @@ class SupervisorPart
 		}
 
 		Instant startTime =
-			dateToInstant (dateField.date);
+			dateField.date
+				.toDateTimeAtStartOfDay ()
+				.toInstant ();
 
 		Instant endTime =
-			startTime
-				.toDateTime ()
+			dateField.date
 				.plusDays (1)
+				.toDateTimeAtStartOfDay ()
 				.toInstant ();
 
 		// create stats period

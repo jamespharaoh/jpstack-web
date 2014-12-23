@@ -1,10 +1,12 @@
 package wbs.platform.console.html;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public
 class ObsoleteMonthField {
@@ -14,21 +16,24 @@ class ObsoleteMonthField {
 		Pattern.compile ("([0-9]{4})-([0-9]{2})");
 
 	public final static
-	SimpleDateFormat dateFormat =
-		new SimpleDateFormat ("yyyy-MM");
+	DateTimeFormatter dateFormatter =
+		DateTimeFormat.forPattern ("yyyy-MM");
 
 	public final
-	Date date;
+	LocalDate date;
 
 	public final
 	String text;
 
 	private
 	ObsoleteMonthField (
-			Date newDate) {
+			LocalDate newDate) {
 
-		date = newDate;
-		text = dateFormat.format (date);
+		date =
+			newDate;
+
+		text =
+			dateFormatter.print (date);
 
 	}
 
@@ -52,13 +57,8 @@ class ObsoleteMonthField {
 
 		if (input == null || input.equals ("")) {
 
-			calendar.set (Calendar.HOUR_OF_DAY, 0);
-			calendar.set (Calendar.MINUTE, 0);
-			calendar.set (Calendar.SECOND, 0);
-			calendar.set (Calendar.MILLISECOND, 0);
-
 			return new ObsoleteMonthField (
-				calendar.getTime ());
+				LocalDate.now ());
 
 		}
 
@@ -83,16 +83,13 @@ class ObsoleteMonthField {
 			Integer.valueOf (matcher.group (2)) - 1);
 
 		return new ObsoleteMonthField (
-			calendar.getTime ());
+			new LocalDate (
+				Integer.valueOf (
+					matcher.group (1)),
+				Integer.valueOf (
+					matcher.group (2)),
+				1));
 
 	}
 
-	public static
-	String format (
-			Date date) {
-
-		return dateFormat.format (
-			date);
-
-	}
 }

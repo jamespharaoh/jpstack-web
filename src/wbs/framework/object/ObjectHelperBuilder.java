@@ -1095,6 +1095,18 @@ class ObjectHelperBuilder {
 						objectHelperProviderManager.forObjectTypeId (
 							parentObjectType.getId ());
 
+					if (parentHelperProvider == null) {
+
+						throw new RuntimeException (
+							stringFormat (
+								"No object helper provider for %s, ",
+								parentObjectType.getId (),
+								"parent of %s (%s)",
+								objectHelperProvider.objectName (),
+								object.getId ()));
+
+					}
+
 					Record parent =
 						parentHelperProvider.find (
 							parentObjectId);

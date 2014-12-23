@@ -2,13 +2,12 @@ package wbs.platform.queue.console;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
 
+import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -68,25 +67,10 @@ class QueueSupervisorItemsPart
 		user =
 			userHelper.find (userId);
 
-		Calendar calendar =
-			Calendar.getInstance ();
-
-		calendar.setTime (
-			dateField.date);
-
-		calendar.add (
-			Calendar.HOUR,
-			hour);
-
-		Date startTime =
-			calendar.getTime ();
-
-		calendar.add (
-			Calendar.HOUR,
-			1);
-
-		Date endTime =
-			calendar.getTime ();
+		DateTime startTime =
+			dateField.date
+				.toDateTimeAtStartOfDay ()
+				.plusHours (hour);
 
 		queueItems =
 			new TreeSet<QueueItemRec> (
@@ -96,8 +80,8 @@ class QueueSupervisorItemsPart
 			queueItemHelper.findByProcessedTime (
 				user,
 				new Interval (
-					dateToInstant (startTime),
-					dateToInstant (endTime))));
+					startTime,
+					startTime.plusHours (1))));
 
 	}
 

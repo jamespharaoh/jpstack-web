@@ -27,7 +27,6 @@ import wbs.framework.record.GlobalId;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
-import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInRec;
 import wbs.platform.api.ApiAction;
@@ -39,6 +38,7 @@ import wbs.platform.text.web.TextResponder;
 import wbs.sms.message.core.model.MessageTypeObjectHelper;
 import wbs.sms.message.core.model.MessageTypeRec;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
@@ -62,6 +62,9 @@ class Oxygen8InboundMmsAction
 
 	@Inject
 	MessageTypeObjectHelper messageTypeHelper;
+
+	@Inject
+	NetworkObjectHelper networkHelper;
 
 	@Inject
 	Oxygen8NetworkObjectHelper oxygen8NetworkHelper;
@@ -107,10 +110,16 @@ class Oxygen8InboundMmsAction
 	protected
 	Responder goApi () {
 
+		@Cleanup
+		Transaction transaction =
+			database.beginReadWrite ();
+
 		processRequestHeaders ();
 		processRequestBody ();
 
 		updateDatabase ();
+
+		transaction.commit ();
 
 		return createResponse ();
 
@@ -265,8 +274,16 @@ class Oxygen8InboundMmsAction
 
 		int errorCount = 0;
 
+System.out.println ("FILES");
 		for (FileItem fileItem
 				: requestContext.fileItems ()) {
+
+System.out.println (
+	stringFormat (
+		"FILE ITEM: %s, %s, %s",
+		fileItem.getName (),
+		fileItem.getContentType (),
+		fileItem.getFieldName ()));
 
 			Matcher matcher =
 				contentTypePattern.matcher (
@@ -316,8 +333,6 @@ class Oxygen8InboundMmsAction
 
 			}
 
-			errorCount ++;
-
 		}
 
 		if (messageString == null)
@@ -335,10 +350,6 @@ class Oxygen8InboundMmsAction
 	}
 
 	void updateDatabase () {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
 
 		// lookup route
 
@@ -374,16 +385,27 @@ class Oxygen8InboundMmsAction
 
 		// lookup network
 
+		/*
 		Oxygen8NetworkRec oxygen8Network =
 			oxygen8NetworkHelper.findByChannel (
 				oxygen8RouteIn.getOxygen8Config (),
 				mmsNetwork);
 
-		if (oxygen8Network == null)
-			throw new RuntimeException ();
+		if (oxygen8Network == null) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"No oxygen8 network for channel: %s",
+					mmsNetwork));
+
+		}
 
 		NetworkRec network =
 			oxygen8Network.getNetwork ();
+		*/
+
+		NetworkRec network =
+			networkHelper.find (0);
 
 		// insert message
 
@@ -403,10 +425,6 @@ class Oxygen8InboundMmsAction
 			medias,
 			null,
 			mmsSubject);
-
-		// commit transaction
-
-		transaction.commit ();
 
 	}
 

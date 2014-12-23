@@ -1,12 +1,12 @@
 package wbs.platform.console.html;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// TODO this should use JodaTime
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 public
 class ObsoleteDateField {
 
@@ -16,22 +16,26 @@ class ObsoleteDateField {
 			"([0-9]{4})-([0-9]{2})-([0-9]{2})");
 
 	public final static
-	SimpleDateFormat dateFormat =
-		new SimpleDateFormat (
+	DateTimeFormatter dateFormatter =
+		DateTimeFormat.forPattern (
 			"yyyy-MM-dd");
 
 	public final
-	Date date;
+	LocalDate date;
 
 	public final
 	String text;
 
 	private
 	ObsoleteDateField (
-			Date newDate) {
+			LocalDate newDate) {
 
-		date = newDate;
-		text = dateFormat.format (date);
+		date =
+			newDate;
+
+		text =
+			dateFormatter.print (
+				date);
 
 	}
 
@@ -48,20 +52,15 @@ class ObsoleteDateField {
 	ObsoleteDateField parse (
 			String input) {
 
-		Calendar calendar =
-			Calendar.getInstance ();
-
 		// if there is no input, use the present date
 
-		if (input == null || input.equals ("")) {
-
-			calendar.set (Calendar.HOUR_OF_DAY, 0);
-			calendar.set (Calendar.MINUTE, 0);
-			calendar.set (Calendar.SECOND, 0);
-			calendar.set (Calendar.MILLISECOND, 0);
+		if (
+			input == null
+			|| input.equals ("")
+		) {
 
 			return new ObsoleteDateField (
-				calendar.getTime ());
+				LocalDate.now ());
 
 		}
 
@@ -75,31 +74,14 @@ class ObsoleteDateField {
 
 		// ok, set the calendar with the given date and return that
 
-		calendar.clear ();
-
-		calendar.set (
-			Calendar.YEAR,
-			Integer.valueOf (matcher.group (1)));
-
-		calendar.set (
-			Calendar.MONTH,
-			Integer.valueOf (matcher.group (2)) - 1);
-
-		calendar.set (
-			Calendar.DATE,
-			Integer.valueOf (matcher.group (3)));
-
 		return new ObsoleteDateField (
-			calendar.getTime ());
-
-	}
-
-	public static
-	String format (
-			Date date) {
-
-		return dateFormat.format (
-			date);
+			new LocalDate (
+				Integer.valueOf (
+					matcher.group (1)),
+				Integer.valueOf (
+					matcher.group (2)),
+				Integer.valueOf (
+					matcher.group (3))));
 
 	}
 

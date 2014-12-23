@@ -1,5 +1,6 @@
 package wbs.smsapps.autoresponder.console;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.simplify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -104,9 +105,16 @@ class AutoResponderVotesPart
 
 		MessageSearch messageSearch =
 			new MessageSearch ()
-				.serviceId (autoResponderService.getId ())
-				.createdTimeAfter (calendar.getTime ())
-				.direction (MessageDirection.in);
+
+			.serviceId (
+				autoResponderService.getId ())
+
+			.createdTimeAfter (
+				dateToInstant (
+					calendar.getTime ()))
+
+			.direction (
+				MessageDirection.in);
 
 		List<MessageRec> messages =
 			messageHelper.search (

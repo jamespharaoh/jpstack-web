@@ -239,7 +239,8 @@ class ManualResponderRequestPendingSummaryPart
 					route.getId ())
 
 				.createdTimeAfter (
-					startOfToday.toDate ())
+					dateToInstant (
+						startOfToday.toDate ()))
 
 				.direction (
 					MessageDirection.out);

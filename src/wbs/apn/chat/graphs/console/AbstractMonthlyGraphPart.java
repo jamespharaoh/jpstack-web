@@ -76,7 +76,7 @@ class AbstractMonthlyGraphPart
 				requestContext.resolveLocalUrl (
 					myLocalPart),
 				EmptyFormData.instance,
-				yearMonth.toLocalDate (1).toDateTimeAtStartOfDay ().toDate ());
+				yearMonth.toLocalDate (1));
 
 			printFormat (
 				"<p>");

@@ -105,6 +105,15 @@ interface MediaLogic {
 	BufferedImage videoFrame (
 			byte[] data);
 
+	boolean isApplication (
+			String mimeType);
+
+	boolean isApplication (
+			MediaTypeRec mediaType);
+
+	boolean isApplication (
+			MediaRec media);
+
 	boolean isAudio (
 			String mimeType);
 
