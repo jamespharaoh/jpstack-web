@@ -32,6 +32,9 @@
 				name="image"/>
 
 			<context-responder-page
+				name="imageScale"/>
+
+			<context-responder-page
 				name="thumb100"/>
 
 			<context-responder-page

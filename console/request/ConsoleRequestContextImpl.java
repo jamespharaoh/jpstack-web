@@ -1273,6 +1273,7 @@ class ConsoleRequestContextImpl
 
 	}
 
+	@Override
 	public
 	boolean isMultipart () {
 
@@ -1280,6 +1281,7 @@ class ConsoleRequestContextImpl
 
 	}
 
+	@Override
 	public
 	List<FileItem> fileItems ()
 		throws FileUploadException {
@@ -1288,6 +1290,7 @@ class ConsoleRequestContextImpl
 
 	}
 
+	@Override
 	public
 	FileItem fileItem (
 			String name)

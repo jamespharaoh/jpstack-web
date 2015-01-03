@@ -14,6 +14,8 @@ public abstract
 class AbstractMediaImageResponder
 	extends ConsoleResponder {
 
+	// dependencies
+
 	@Inject
 	ConsoleRequestContext requestContext;
 
@@ -23,11 +25,12 @@ class AbstractMediaImageResponder
 	@Inject
 	MediaLogic mediaLogic;
 
-	private
-	byte[] data;
+	// state
 
-	private
+	byte[] data;
 	String mimeType;
+
+	// hooks
 
 	protected abstract
 	byte[] getData (
@@ -37,21 +40,27 @@ class AbstractMediaImageResponder
 	String getMimeType (
 			MediaRec media);
 
+	// implementation
+
 	@Override
 	protected
 	void prepare () {
 
 		int mediaId =
-			requestContext.stuffInt ("mediaId");
+			requestContext.stuffInt (
+				"mediaId");
 
 		MediaRec media =
-			mediaHelper.find (mediaId);
+			mediaHelper.find (
+				mediaId);
 
 		data =
-			getData (media);
+			getData (
+				media);
 
 		mimeType =
-			getMimeType (media);
+			getMimeType (
+				media);
 
 		transform ();
 
@@ -61,7 +70,8 @@ class AbstractMediaImageResponder
 	void transform () {
 
 		String rotate =
-			requestContext.parameter ("rotate");
+			requestContext.parameter (
+				"rotate");
 
 		if ("90".equals (rotate)) {
 
@@ -107,7 +117,8 @@ class AbstractMediaImageResponder
 
 		requestContext.setHeader (
 			"Content-Length",
-			Integer.toString (data.length));
+			Integer.toString (
+				data.length));
 
 	}
 
@@ -115,8 +126,8 @@ class AbstractMediaImageResponder
 	protected void goContent ()
 		throws IOException {
 
-		requestContext.outputStream ()
-			.write (data);
+		requestContext.outputStream ().write (
+			data);
 
 	}
 

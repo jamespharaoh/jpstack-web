@@ -298,6 +298,7 @@ class MediaLogicImpl
 
 			.build ();
 
+	@Override
 	public
 	ContentRec findOrCreateContent (
 			byte[] data) {
@@ -336,6 +337,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	MediaRec createMedia (
 			byte[] data,
@@ -352,9 +354,9 @@ class MediaLogicImpl
 
 		}
 
-		if (textTypes.contains (mimeType)) {
+		if (textualTypes.contains (mimeType)) {
 
-			return createTextMedia (
+			return createTextualMedia (
 				data,
 				mimeType,
 				filename,
@@ -381,6 +383,7 @@ class MediaLogicImpl
 	private final static
 	String defaultMimeType = "image/jpeg";
 
+	@Override
 	public
 	MediaRec createMediaFromImage (
 			BufferedImage image,
@@ -411,6 +414,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	MediaRec createMediaFromImage (
 			byte[] data,
@@ -430,6 +434,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	MediaRec createMediaWithThumbnail (
 			byte[] data,
@@ -490,6 +495,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	MediaRec createMediaWithThumbnail (
 			byte[] data,
@@ -529,7 +535,9 @@ class MediaLogicImpl
 
 	}
 
-	public MediaRec createMediaFromVideo (
+	@Override
+	public
+	MediaRec createMediaFromVideo (
 			byte[] data,
 			String mimeType,
 			String filename) {
@@ -542,6 +550,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	MediaRec createMediaFromAudio (
 			byte[] data,
@@ -561,6 +570,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	MediaTypeRec findMediaTypeRequired (
 			String mimeType) {
@@ -581,8 +591,9 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
-	MediaRec createTextMedia (
+	MediaRec createTextualMedia (
 			byte[] data,
 			String mimeType,
 			String filename,
@@ -609,6 +620,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	MediaRec createTextMedia (
 			String text,
@@ -708,6 +720,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	BufferedImage readImage (
 			byte[] data,
@@ -755,6 +768,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	byte[] writeImage (
 			BufferedImage image,
@@ -792,6 +806,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	byte[] writeJpeg (
 			BufferedImage image,
@@ -840,6 +855,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	BufferedImage getImage (
 			MediaRec media) {
@@ -850,6 +866,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	BufferedImage resampleImage (
 			@NonNull BufferedImage image,
@@ -931,6 +948,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	BufferedImage rotateImage90 (
 			BufferedImage image) {
@@ -963,6 +981,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	BufferedImage rotateImage180 (
 			BufferedImage image) {
@@ -995,6 +1014,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	BufferedImage rotateImage270 (
 			BufferedImage image) {
@@ -1027,6 +1047,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	byte[] videoConvert (
 			String profileName,
@@ -1044,6 +1065,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	byte[] videoFrameBytes (
 			byte[] data) {
@@ -1065,6 +1087,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	BufferedImage videoFrame (
 			byte[] data) {
@@ -1075,6 +1098,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isApplication (
 			String mimeType) {
@@ -1084,6 +1108,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isApplication (
 			MediaTypeRec mediaType) {
@@ -1093,6 +1118,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isApplication (
 			MediaRec media) {
@@ -1102,6 +1128,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isAudio (
 			String mimeType) {
@@ -1111,6 +1138,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isAudio (
 			MediaTypeRec mediaType) {
@@ -1120,6 +1148,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isAudio (
 			MediaRec media) {
@@ -1129,6 +1158,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isImage (
 			String mimeType) {
@@ -1138,6 +1168,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isImage (
 			MediaTypeRec mediaType) {
@@ -1147,6 +1178,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isImage (
 			MediaRec media) {
@@ -1156,6 +1188,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isText (
 			String mimeType) {
@@ -1165,6 +1198,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isText (
 			MediaTypeRec mediaType) {
@@ -1174,6 +1208,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isText (
 			MediaRec media) {
@@ -1183,6 +1218,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isVideo (
 			String mimeType) {
@@ -1192,6 +1228,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isVideo (
 			MediaTypeRec mediaType) {
@@ -1201,6 +1238,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	boolean isVideo (
 			MediaRec media) {
@@ -1210,6 +1248,7 @@ class MediaLogicImpl
 
 	}
 
+	@Override
 	public
 	Set<String> videoProfileNames () {
 
@@ -1248,5 +1287,11 @@ class MediaLogicImpl
 	Set<String> audioTypes =
 		ImmutableSet.<String>of (
 			"audio/mpeg");
+
+	public final static
+	Set<String>textualTypes =
+		ImmutableSet.<String>of (
+			"text/plain",
+			"application/smil");
 
 }

@@ -51,6 +51,7 @@ class ConsoleContextPrivLookup
 
 	}
 
+	@Override
 	public
 	String describe () {
 

@@ -23,6 +23,7 @@
 		<bean class="console.MediaConsoleConfig"/>
 		<bean class="console.MediaConsoleLogicImpl"/>
 		<bean class="console.MediaImageResponder"/>
+		<bean class="console.MediaImageScaleResponder"/>
 		<bean class="console.MediaThumb100Responder"/>
 		<bean class="console.MediaThumb32Responder"/>
 		<bean class="console.MediaVideoResponder"/>
