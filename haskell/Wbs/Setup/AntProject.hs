@@ -7,14 +7,11 @@ import Text.XML.HXT.Core
 
 import Wbs.Config
 
-writeBuildFile :: WorldConfig -> IO ()
-writeBuildFile worldConfig = do
+writeBuildFile :: World -> IO ()
+writeBuildFile world = do
 
-	let buildConfig =
-		wcBuild worldConfig
-
-	let plugins =
-		wcPlugins worldConfig
+	let buildConfig = wldBuild world
+	let plugins = wldPlugins world
 
 	let makeProperties =
 		[
@@ -257,7 +254,7 @@ writeBuildFile worldConfig = do
 
 	let pluginDir pluginConfig =
 		"src/" ++
-		(replace "." "/" $ plcPackage pluginConfig)
+		(replace "." "/" $ plgPackage pluginConfig)
 
 	let makeWebTarget name env = let
 
@@ -266,7 +263,7 @@ writeBuildFile worldConfig = do
 
 		pluginDir pluginConfig =
 			"src/" ++
-			(replace "." "/" $ plcPackage pluginConfig)
+			(replace "." "/" $ plgPackage pluginConfig)
 
 		makeWebFileset plugin = let
 
@@ -491,7 +488,7 @@ writeBuildFile worldConfig = do
 		where makeOne scriptName =
 			makeScriptName $
 				"src/" ++
-				(replace "." "/" $ plcPackage pluginConfig) ++
+				(replace "." "/" $ plgPackage pluginConfig) ++
 				"/model/" ++
 				scriptName ++
 				suffix ++
@@ -513,8 +510,8 @@ writeBuildFile worldConfig = do
 
 	let makeSqlTargets =
 		[
-			makeSqlTarget "sql-schema" plcSqlSchemas "",
-			makeSqlTarget "sql-data" plcSqlDatas ""
+			makeSqlTarget "sql-schema" plgSqlSchemas "",
+			makeSqlTarget "sql-data" plgSqlDatas ""
 		]
 
 	let makeSchemaTargets =
@@ -563,7 +560,7 @@ writeBuildFile worldConfig = do
 	let makeProject =
 		root [] [
 			mkelem "project" [
-				sattr "name" $ bcName buildConfig,
+				sattr "name" $ bldName buildConfig,
 				sattr "basedir" ".",
 				sattr "default" "build"
 			] (

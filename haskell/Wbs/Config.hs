@@ -11,34 +11,34 @@ import           Text.XML.HXT.Core
 
 -------------------- records
 
-data BuildPluginConfig =
-	BuildPluginConfig {
-		bpcName :: String,
-		bpcPackage :: String
+data BuildPlugin =
+	BuildPlugin {
+		bplName :: String,
+		bplPackage :: String
 	}
 
-data BuildGitLinkConfig =
-	BuildGitLinkConfig {
-		bglcName :: String,
-		bglcSource :: String,
-		bglcLocal :: String,
-		bglcTarget :: String,
-		bglcPaths :: [ String ]
+data BuildGitLink =
+	BuildGitLink {
+		bglName :: String,
+		bglSource :: String,
+		bglLocal :: String,
+		bglTarget :: String,
+		bglPaths :: [ String ]
 	}
 
-data BuildConfig =
-	BuildConfig {
-		bcName :: String,
-		bcPlugins :: [ BuildPluginConfig ],
-		bcGitLinks :: [ BuildGitLinkConfig ]
+data Build =
+	Build {
+		bldName :: String,
+		bldPlugins :: [ BuildPlugin ],
+		bldGitLinks :: [ BuildGitLink ]
 	}
 
-data PluginConfig =
-	PluginConfig {
-		plcName :: String,
-		plcPackage :: String,
-		plcSqlSchemas :: [ String ],
-		plcSqlDatas :: [ String ]
+data Plugin =
+	Plugin {
+		plgName :: String,
+		plgPackage :: String,
+		plgSqlSchemas :: [ String ],
+		plgSqlDatas :: [ String ]
 	}
 
 data Library =
@@ -49,11 +49,11 @@ data Library =
 		libSource :: Bool
 	}
 
-data WorldConfig =
-	WorldConfig {
-		wcBuild :: BuildConfig,
-		wcPlugins :: [ PluginConfig ],
-		wcLibraries :: [ Library ]
+data World =
+	World {
+		wldBuild :: Build,
+		wldPlugins :: [ Plugin ],
+		wldLibraries :: [ Library ]
 	}
 
 -------------------- misc
@@ -76,19 +76,19 @@ getAttrArray elemName attrName =
 		name <- getAttrValue attrName -< parent
 		returnA -< name
 
--------------------- loadBuildConfig
+-------------------- loadBuild
 
-loadBuildConfig :: IO (BuildConfig)
-loadBuildConfig = do
+loadBuild :: IO (Build)
+loadBuild = do
 
 	let getPlugins = atTag "plugin" >>> proc pluginTag -> do
 
 		name <- getAttrValue "name" -< pluginTag
 		package <- getAttrValue "package" -< pluginTag
 
-		returnA -< BuildPluginConfig {
-			bpcName = name,
-			bpcPackage = package
+		returnA -< BuildPlugin {
+			bplName = name,
+			bplPackage = package
 		}
 
 	let getGitLink = atTag "git-link" >>> proc gitLinkTag -> do
@@ -100,15 +100,15 @@ loadBuildConfig = do
 
 		paths <- getAttrArray "path" "name" -< gitLinkTag
 
-		returnA -< BuildGitLinkConfig {
-			bglcName = name,
-			bglcSource = source,
-			bglcTarget = target,
-			bglcLocal = local,
-			bglcPaths = paths
+		returnA -< BuildGitLink {
+			bglName = name,
+			bglSource = source,
+			bglTarget = target,
+			bglLocal = local,
+			bglPaths = paths
 		}
 
-	let getBuildConfig = atTag "wbs-build" >>> proc buildTag -> do
+	let getBuild = atTag "wbs-build" >>> proc buildTag -> do
 
 		name <- getAttrValue "name" -< buildTag
 
@@ -118,23 +118,23 @@ loadBuildConfig = do
 		gitLinksTag <- atTag "git-links" -< buildTag
 		gitLinks <- listA getGitLink -< gitLinksTag
 
-		returnA -< BuildConfig {
-			bcName = name,
-			bcPlugins = plugins,
-			bcGitLinks = gitLinks
+		returnA -< Build {
+			bldName = name,
+			bldPlugins = plugins,
+			bldGitLinks = gitLinks
 		}
 
-	[ buildConfig ] <-
-		runX (parseXML "wbs-build.xml" >>> getBuildConfig)
+	[ build ] <-
+		runX (parseXML "wbs-build.xml" >>> getBuild)
 
-	return buildConfig
+	return build
 
--------------------- loadPluginConfig
+-------------------- loadPlugin
 
-loadPluginConfig :: BuildConfig -> BuildPluginConfig -> IO PluginConfig
-loadPluginConfig buildConfig buildPluginConfig = do
+loadPlugin :: Build -> BuildPlugin -> IO Plugin
+loadPlugin build buildPlugin = do
 
-	let getPluginConfig = atTag "plugin" >>> proc pluginTag -> do
+	let getPlugin = atTag "plugin" >>> proc pluginTag -> do
 
 		name <- getAttrValue "name" -< pluginTag
 		package <- getAttrValue "package" -< pluginTag
@@ -143,24 +143,24 @@ loadPluginConfig buildConfig buildPluginConfig = do
 		sqlSchemas <- getAttrArray "sql-schema" "name" -< sqlScriptsTag
 		sqlDatas <- getAttrArray "sql-data" "name" -< sqlScriptsTag
 
-		returnA -< PluginConfig {
-			plcName = name,
-			plcPackage = package,
-			plcSqlSchemas = sqlSchemas,
-			plcSqlDatas = sqlDatas
+		returnA -< Plugin {
+			plgName = name,
+			plgPackage = package,
+			plgSqlSchemas = sqlSchemas,
+			plgSqlDatas = sqlDatas
 		}
 
-	let pluginConfigPath =
+	let pluginPath =
 		"src/" ++
-		(replace "." "/" $ bpcPackage buildPluginConfig) ++
+		(replace "." "/" $ bplPackage buildPlugin) ++
 		"/" ++
-		(bpcName buildPluginConfig) ++
+		(bplName buildPlugin) ++
 		"-plugin.xml"
 
-	[ pluginConfig ] <-
-		runX (parseXML pluginConfigPath >>> getPluginConfig)
+	[ plugin ] <-
+		runX (parseXML pluginPath >>> getPlugin)
 
-	return pluginConfig
+	return plugin
 
 -------------------- loadLibraries
 
@@ -189,19 +189,19 @@ loadLibraries = do
 
 -------------------- loadWorld
 
-loadWorld :: IO WorldConfig
+loadWorld :: IO World
 loadWorld = do
 
-	buildConfig <- loadBuildConfig
+	build <- loadBuild
 
-	pluginConfigs <-
-		mapM (loadPluginConfig buildConfig) $
-			bcPlugins buildConfig
+	plugins <-
+		mapM (loadPlugin build) $
+			bldPlugins build
 
 	libraries <- loadLibraries
 
-	return WorldConfig {
-		wcBuild = buildConfig,
-		wcPlugins = pluginConfigs,
-		wcLibraries = libraries
+	return World {
+		wldBuild = build,
+		wldPlugins = plugins,
+		wldLibraries = libraries
 	}

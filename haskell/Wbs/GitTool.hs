@@ -770,33 +770,24 @@ performReduction cacheRef paths referenceName = do
 
 	return (originalCommit, reducedCommit, expansions)
 
-main ::
-	IO ()
-
+main :: IO ()
 main = do
 
-	buildConfig <-
-		loadBuildConfig
+	buildConfig <- loadBuild
+	arguments <- Environment.getArgs
 
-	arguments <-
-		Environment.getArgs
-
-	let [ gitLinkNameArg ] =
-		arguments
+	let [ gitLinkNameArg ] = arguments
 
 	let Just gitLink =
 		List.find
-			(\gitLink -> (bglcName gitLink) == gitLinkNameArg)
-			(bcGitLinks buildConfig)
+			(\gitLink -> (bglName gitLink) == gitLinkNameArg)
+			(bldGitLinks buildConfig)
 
 	withGit "." $ do
 
-		cacheRef <-
-			createCache
+		cacheRef <- createCache
 
-		let paths =
-			map Char8.pack $
-				bglcPaths gitLink
+		let paths = map Char8.pack $ bglPaths gitLink
 
 		-- reduce local commit
 
@@ -804,7 +795,7 @@ main = do
 			performReduction
 				cacheRef
 				paths
-				(bglcLocal gitLink)
+				(bglLocal gitLink)
 
 		let originalLocalCommitOid =
 			Git.Types.commitOid originalLocalCommit
@@ -824,7 +815,7 @@ main = do
 			performReduction
 				cacheRef
 				paths
-				(bglcSource gitLink)
+				(bglSource gitLink)
 
 		let originalSourceCommitOid =
 			Git.Types.commitOid originalSourceCommit
@@ -851,13 +842,13 @@ main = do
 			Git.Types.commitOid targetCommit
 
 		Git.Types.updateReference
-			(Text.pack $ bglcTarget gitLink)
+			(Text.pack $ bglTarget gitLink)
 			(Git.Types.RefObj (untag targetCommitOid))
 
 		liftIO $ putStrLn $
 			"rewritten to " ++
 			(show $ untag targetCommitOid) ++ " " ++
 			"and saved as " ++
-			(bglcTarget gitLink)
+			(bglTarget gitLink)
 
 		return ()

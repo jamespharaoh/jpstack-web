@@ -7,11 +7,11 @@ import Text.XML.HXT.Core
 
 import Wbs.Config
 
-writeClasspath :: WorldConfig -> IO ()
+writeClasspath :: World -> IO ()
 writeClasspath world = do
 
-	let build = wcBuild world
-	let libraries = wcLibraries world
+	let build = wldBuild world
+	let libraries = wldLibraries world
 
 	let makeOriginalSrcEntry =
 		mkelem "classpathentry" [
@@ -48,7 +48,7 @@ writeClasspath world = do
 
 			sourcePath = concat [
 				"/home/vagrant/",
-				bcName build,
+				bldName build,
 				"/bnaries/libraries/",
 				libName library,
 				"-source-",

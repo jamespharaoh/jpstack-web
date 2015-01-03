@@ -7,14 +7,14 @@ import Text.XML.HXT.Core
 
 import Wbs.Config
 
-writeProject :: WorldConfig -> IO ()
+writeProject :: World -> IO ()
 writeProject world = do
 
-	let build = wcBuild world
+	let build = wldBuild world
 
 	let telem name value = mkelem name [] [ txt value ]
 
-	let makeName = telem "name" $ bcName build
+	let makeName = telem "name" $ bldName build
 	let makeComment = telem "comment" ""
 	let makeProjects = eelem "projects"
 

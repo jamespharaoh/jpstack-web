@@ -7,10 +7,10 @@ import Text.XML.HXT.Core
 
 import Wbs.Config
 
-writeFactorypath :: WorldConfig -> IO ()
+writeFactorypath :: World -> IO ()
 writeFactorypath world = do
 
-	let build = wcBuild world
+	let build = wldBuild world
 
 	let makeEntry kind id =
 		mkelem "factorypathentry" [
@@ -26,21 +26,21 @@ writeFactorypath world = do
 	let makeGuavaEntry =
 		makeEntry "WKSPJAR" $ concat [
 			"/",
-			bcName build,
+			bldName build,
 			"/binaries/libraries/guava-bundle-16.0.1.jar"
 		]
 
 	let makeJodaTimeEntry =
 		makeEntry "WKSPJAR" $ concat [
 			"/",
-			bcName build,
+			bldName build,
 			"/binaries/libraries/joda-time-jar-2.3.jar"
 		]
 
 	let makeWbsFrameworkEntry =
 		makeEntry "WKSPJAR" $ concat [
 			"/",
-			bcName build,
+			bldName build,
 			"/work/wbs-framework.jar"
 		]
 
