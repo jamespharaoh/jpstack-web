@@ -105,7 +105,6 @@ File.open "etc/libraries.xml", "w" do
 
 end
 
-
 create_xml \
 	"console-web-xml",
 	"console/web-live.xml",
