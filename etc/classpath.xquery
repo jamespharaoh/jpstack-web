@@ -8,7 +8,7 @@ declare variable $build := /wbs-build;
 
 	<classpathentry
 		kind="con"
-		path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+		path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-6-openjdk-amd64"/>
 
 	{ for
 

@@ -9,10 +9,12 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
+import wbs.platform.media.model.MediaTypeRec;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -39,6 +41,7 @@ class MediaConsoleLogicImpl
 
 	// implementation
 
+	@Override
 	public
 	String mediaUrl (
 			MediaRec media) {
@@ -61,6 +64,7 @@ class MediaConsoleLogicImpl
 
 	}
 
+	@Override
 	public
 	String mediaContent (
 			MediaRec media,
@@ -255,6 +259,7 @@ class MediaConsoleLogicImpl
 
 	}
 
+	@Override
 	public
 	String mediaContent (
 			MediaRec media) {
@@ -265,6 +270,65 @@ class MediaConsoleLogicImpl
 
 	}
 
+	@Override
+	public
+	String mediaUrlScaled (
+			@NonNull MediaRec media,
+			@NonNull Integer width,
+			@NonNull Integer height) {
+
+		MediaTypeRec mediaType =
+			media.getMediaType ();
+
+		if (! mediaLogic.isImage (media)) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Unable to created scaled url for %s",
+					mediaType.getMimeType ()));
+
+		}
+
+		return stringFormat (
+			"%s",
+			mediaHelper.getDefaultContextPath (
+				media),
+			"/media.imageScale",
+			"?width=%u",
+			width,
+			"&height=%u",
+			height);
+
+	}
+
+	@Override
+	public
+	String mediaContentScaled (
+			@NonNull MediaRec media,
+			@NonNull Integer width,
+			@NonNull Integer height) {
+
+		MediaTypeRec mediaType =
+			media.getMediaType ();
+
+		if (! mediaLogic.isImage (media)) {
+
+			return stringFormat (
+				"(unable to display %s)",
+				mediaType.getMimeType ());
+
+		}
+
+		return stringFormat (
+			"<img src=\"%h\">",
+			mediaUrlScaled (
+				media,
+				width,
+				height));
+
+	}
+
+	@Override
 	public
 	String mediaThumb100 (
 			MediaRec media,
@@ -318,6 +382,7 @@ class MediaConsoleLogicImpl
 
 	}
 
+	@Override
 	public
 	String mediaThumb100 (
 			MediaRec media) {
@@ -328,6 +393,7 @@ class MediaConsoleLogicImpl
 
 	}
 
+	@Override
 	public
 	String mediaThumb100OrText (
 			MediaRec media) {
@@ -353,6 +419,7 @@ class MediaConsoleLogicImpl
 
 	}
 
+	@Override
 	public
 	String mediaThumb100Rot90 (
 			MediaRec media) {
@@ -385,6 +452,7 @@ class MediaConsoleLogicImpl
 
 	}
 
+	@Override
 	public
 	String mediaThumb32Url (
 			MediaRec media) {
@@ -416,6 +484,7 @@ class MediaConsoleLogicImpl
 
 	}
 
+	@Override
 	public
 	String mediaThumb32 (
 			MediaRec media) {
@@ -425,6 +494,7 @@ class MediaConsoleLogicImpl
 
 	}
 
+	@Override
 	public
 	String mediaThumb32OrText (
 			MediaRec media) {

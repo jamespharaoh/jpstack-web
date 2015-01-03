@@ -68,21 +68,25 @@ class BroadcastSendHelper
 
 	// details
 
+	@Override
 	public
 	String name () {
 		return "broadcast";
 	}
 
+	@Override
 	public
 	String itemNamePlural () {
 		return "broadcasts";
 	}
 
+	@Override
 	public
 	ObjectHelper<BroadcastRec> jobHelper () {
 		return broadcastHelper;
 	}
 
+	@Override
 	public
 	ObjectHelper<BroadcastNumberRec> itemHelper () {
 		return broadcastNumberHelper;
@@ -90,11 +94,13 @@ class BroadcastSendHelper
 
 	// implementation
 
+	@Override
 	public
 	List<BroadcastRec> findSendingJobs () {
 		return broadcastHelper.findSending ();
 	}
 
+	@Override
 	public
 	List<BroadcastRec> findScheduledJobs (
 			Instant now) {
@@ -104,6 +110,7 @@ class BroadcastSendHelper
 
 	}
 
+	@Override
 	public
 	List<BroadcastNumberRec> findItemsLimit (
 			BroadcastConfigRec broadcastConfig,
@@ -116,6 +123,7 @@ class BroadcastSendHelper
 
 	}
 
+	@Override
 	public
 	BroadcastConfigRec getService (
 			BroadcastRec broadcast) {
@@ -124,6 +132,7 @@ class BroadcastSendHelper
 
 	}
 
+	@Override
 	public
 	Instant getScheduledTime (
 			BroadcastConfigRec service,
@@ -133,6 +142,7 @@ class BroadcastSendHelper
 
 	}
 
+	@Override
 	public
 	boolean jobScheduled (
 			BroadcastConfigRec broadcastConfig,
@@ -144,6 +154,7 @@ class BroadcastSendHelper
 	}
 
 
+	@Override
 	public
 	boolean jobSending (
 			BroadcastConfigRec broadcastConfig,
@@ -154,6 +165,7 @@ class BroadcastSendHelper
 
 	}
 
+	@Override
 	public
 	boolean jobConfigured (
 			BroadcastConfigRec broadcastConfig,
@@ -166,6 +178,7 @@ class BroadcastSendHelper
 
 	}
 
+	@Override
 	public
 	void sendStart (
 			BroadcastConfigRec broadcastConfig,
@@ -203,6 +216,7 @@ class BroadcastSendHelper
 
 	}
 
+	@Override
 	public
 	boolean verifyItem (
 			BroadcastConfigRec broadcastConfig,
@@ -230,6 +244,7 @@ class BroadcastSendHelper
 
 	}
 
+	@Override
 	public
 	void rejectItem (
 			BroadcastConfigRec broadcastConfig,
@@ -262,6 +277,7 @@ class BroadcastSendHelper
 
 	}
 
+	@Override
 	public
 	void sendItem (
 			BroadcastConfigRec broadcastConfig,
@@ -335,6 +351,7 @@ class BroadcastSendHelper
 
 	}
 
+	@Override
 	public
 	void sendComplete (
 			BroadcastConfigRec broadcastConfig,

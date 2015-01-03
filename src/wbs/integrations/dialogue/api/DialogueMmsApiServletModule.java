@@ -64,7 +64,7 @@ class DialogueMmsApiServletModule
 	InboxLogic inboxLogic;
 
 	@Inject
-	MediaLogic mediaUtils;
+	MediaLogic mediaLogic;
 
 	@Inject
 	MessageObjectHelper messageHelper;
@@ -160,16 +160,23 @@ class DialogueMmsApiServletModule
 					matcher.group (2);
 
 				medias.add (
-					mediaUtils.createMedia (
+					mediaLogic.createMedia (
 						item.get (),
 						type,
 						item.getName (),
 						charset));
 
-				if (text == null
-						&& equal (type, "text/plain"))
+				if (
+					text == null
+					&& equal (type, "text/plain")
+				) {
+
 					text =
-						nullIf (item.getString (), "");
+						nullIf (
+							item.getString (),
+							"");
+
+				}
 
 			}
 

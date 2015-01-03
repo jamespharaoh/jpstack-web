@@ -13,9 +13,14 @@ public
 class ObjectIdFormFieldNativeMapping
 	implements FormFieldNativeMapping<Record<?>,Integer> {
 
+	// properties
+
 	@Getter @Setter
 	ConsoleHelper<?> consoleHelper;
 
+	// implementation
+
+	@Override
 	public
 	Record<?> nativeToGeneric (
 			Integer nativeValue) {
@@ -34,6 +39,7 @@ class ObjectIdFormFieldNativeMapping
 
 	}
 
+	@Override
 	public
 	Integer genericToNative (
 			Record<?> genericValue) {

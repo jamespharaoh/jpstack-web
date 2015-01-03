@@ -218,6 +218,7 @@ class HibernateEnumType<EnumType extends Enum<?>>
 
 	}
 
+	@Override
 	public
 	void setParameterValues (
 			Properties parameters) {

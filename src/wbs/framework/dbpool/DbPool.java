@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -427,14 +426,6 @@ class DbPool
 			}
 
 		}
-
-	}
-
-	public
-	java.util.logging.Logger getParentLogger ()
-			throws SQLFeatureNotSupportedException {
-
-		throw new SQLFeatureNotSupportedException ();
 
 	}
 

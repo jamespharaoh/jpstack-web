@@ -45,6 +45,7 @@ class SimulatorSessionNumberRec
 
 	// compare to
 
+	@Override
 	public
 	int compareTo (
 			Record<SimulatorSessionNumberRec> otherRecord) {

@@ -101,6 +101,7 @@ class SubscriptionNumberRec
 
 	// compare to
 
+	@Override
 	public
 	int compareTo (
 			Record<SubscriptionNumberRec> otherRecord) {
@@ -161,6 +162,7 @@ class SubscriptionNumberRec
 
 		// implementation
 
+		@Override
 		public
 		SubscriptionNumberRec findOrCreate (
 				SubscriptionRec subscription,

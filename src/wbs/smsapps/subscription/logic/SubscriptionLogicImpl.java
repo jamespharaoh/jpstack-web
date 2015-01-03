@@ -71,6 +71,7 @@ class SubscriptionLogicImpl
 
 	// implementation
 
+	@Override
 	public
 	void sendNow (
 			SubscriptionSendNumberRec subscriptionSendNumber) {
@@ -166,6 +167,7 @@ class SubscriptionLogicImpl
 				- subscription.getDebitsPerSend ());
 	}
 
+	@Override
 	public
 	void sendLater (
 			SubscriptionSendNumberRec subscriptionSendNumber) {

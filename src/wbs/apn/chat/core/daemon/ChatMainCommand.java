@@ -514,7 +514,7 @@ class ChatMainCommand
 				chat.getId ())
 
 			.joinType (
-				JoinType.chatSimple)
+				JoinType.chatDob)
 
 			.chatSchemeId (
 				commandChatScheme.getId ());

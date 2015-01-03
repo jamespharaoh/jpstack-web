@@ -10,9 +10,14 @@ public
 class EnumConsoleHelperFactory<EnumType extends Enum<EnumType>>
 	implements BeanFactory {
 
+	// properties
+
 	@Getter @Setter
 	Class<EnumType> enumClass;
 
+	// implementation
+
+	@Override
 	public
 	Object instantiate () {
 

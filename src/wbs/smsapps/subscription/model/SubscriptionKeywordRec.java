@@ -64,6 +64,7 @@ class SubscriptionKeywordRec
 
 	// compare to
 
+	@Override
 	public
 	int compareTo (
 			Record<SubscriptionKeywordRec> otherRecord) {

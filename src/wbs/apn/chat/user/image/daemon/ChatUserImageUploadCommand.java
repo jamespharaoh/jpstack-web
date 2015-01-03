@@ -73,6 +73,7 @@ class ChatUserImageUploadCommand
 
 	// details
 
+	@Override
 	public
 	String[] getCommandTypes () {
 
@@ -84,6 +85,7 @@ class ChatUserImageUploadCommand
 
 	// implementation
 
+	@Override
 	public
 	Status handle (
 			int commandId,

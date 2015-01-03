@@ -15,6 +15,7 @@ class SubscriptionSendDaoHibernate
 	extends HibernateDao
 	implements SubscriptionSendDao {
 
+	@Override
 	public
 	List<SubscriptionSendRec> findSending () {
 

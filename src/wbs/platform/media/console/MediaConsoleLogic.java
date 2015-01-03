@@ -8,12 +8,22 @@ interface MediaConsoleLogic {
 	String mediaUrl (
 			MediaRec media);
 
+	String mediaUrlScaled (
+			MediaRec media,
+			Integer width,
+			Integer height);
+
 	String mediaContent (
 			MediaRec media,
 			String rotate);
 
 	String mediaContent (
 			MediaRec media);
+
+	String mediaContentScaled (
+			MediaRec media,
+			Integer width,
+			Integer height);
 
 	String mediaThumb100 (
 			MediaRec media,

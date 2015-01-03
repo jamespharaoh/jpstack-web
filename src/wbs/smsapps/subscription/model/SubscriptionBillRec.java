@@ -61,6 +61,7 @@ class SubscriptionBillRec
 
 	// compare to
 
+	@Override
 	public
 	int compareTo (
 			Record<SubscriptionBillRec> otherRecord) {

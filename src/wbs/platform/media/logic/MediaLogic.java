@@ -55,7 +55,7 @@ interface MediaLogic {
 	MediaTypeRec findMediaTypeRequired (
 			String mimeType);
 
-	MediaRec createTextMedia (
+	MediaRec createTextualMedia (
 			byte[] data,
 			String mimeType,
 			String filename,

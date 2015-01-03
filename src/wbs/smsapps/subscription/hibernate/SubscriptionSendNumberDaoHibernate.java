@@ -15,6 +15,7 @@ class SubscriptionSendNumberDaoHibernate
 	extends HibernateDao
 	implements SubscriptionSendNumberDao {
 
+	@Override
 	public
 	List<SubscriptionSendNumberRec> findQueuedLimit (
 			SubscriptionSendRec subscriptionSend,

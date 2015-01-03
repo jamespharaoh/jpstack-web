@@ -451,8 +451,10 @@ class ManualResponderRequestPendingSummaryPart
 					"<tr>\n",
 					"<th>Image media</th>\n",
 					"<td><a href=\"%h\">%s</a></td>\n",
-					mediaConsoleLogic.mediaUrl (
-						media),
+					mediaConsoleLogic.mediaUrlScaled (
+						media,
+						600,
+						600),
 					mediaConsoleLogic.mediaThumb100 (
 						media),
 					"</tr>\n");

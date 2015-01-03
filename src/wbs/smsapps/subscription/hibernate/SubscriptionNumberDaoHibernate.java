@@ -21,6 +21,7 @@ class SubscriptionNumberDaoHibernate
 	extends HibernateDao
 	implements SubscriptionNumberDao {
 
+	@Override
 	public
 	SubscriptionNumberRec find (
 			@NonNull SubscriptionRec subscription,
@@ -47,6 +48,7 @@ class SubscriptionNumberDaoHibernate
 
 	}
 
+	@Override
 	public
 	List<Integer> searchIds (
 			@NonNull SubscriptionNumberSearch search) {

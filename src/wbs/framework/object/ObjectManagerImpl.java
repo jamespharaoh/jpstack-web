@@ -700,6 +700,7 @@ class ObjectManagerImpl
 
 	}
 
+	@Override
 	public
 	Optional<Class<?>> dereferenceType (
 			@NonNull Optional<Class<?>> objectClass,

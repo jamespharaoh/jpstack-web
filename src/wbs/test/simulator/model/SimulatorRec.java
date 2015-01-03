@@ -53,6 +53,7 @@ class SimulatorRec
 
 	// compare to
 
+	@Override
 	public
 	int compareTo (
 			Record<SimulatorRec> otherRecord) {

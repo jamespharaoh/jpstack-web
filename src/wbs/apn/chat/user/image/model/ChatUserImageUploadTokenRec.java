@@ -122,6 +122,7 @@ class ChatUserImageUploadTokenRec
 
 	// compare to
 
+	@Override
 	public
 	int compareTo (
 			Record<ChatUserImageUploadTokenRec> otherRecord) {

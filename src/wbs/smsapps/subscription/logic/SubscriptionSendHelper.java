@@ -109,31 +109,37 @@ class SubscriptionSendHelper
 
 	// details
 
+	@Override
 	public
-	String name() {
+	String name () {
 		return "subscription";
 	}
 
+	@Override
 	public
 	String itemNamePlural () {
 		return "subscription numbers";
 	}
 
+	@Override
 	public
 	ObjectHelper<SubscriptionSendRec> jobHelper () {
 		return subscriptionSendHelper;
 	}
 
+	@Override
 	public
 	ObjectHelper<SubscriptionSendNumberRec> itemHelper () {
 		return subscriptionSendNumberHelper;
 	}
 
+	@Override
 	public
 	List<SubscriptionSendRec> findSendingJobs () {
 		return subscriptionSendHelper.findSending ();
 	}
 
+	@Override
 	public
 	List<SubscriptionSendRec> findScheduledJobs (
 			Instant now) {
@@ -143,6 +149,7 @@ class SubscriptionSendHelper
 
 	}
 
+	@Override
 	public
 	List<SubscriptionSendNumberRec> findItemsLimit (
 			SubscriptionRec subscription,
@@ -155,6 +162,7 @@ class SubscriptionSendHelper
 
 	}
 
+	@Override
 	public
 	SubscriptionRec getService (
 			SubscriptionSendRec subscriptionSend) {
@@ -163,6 +171,7 @@ class SubscriptionSendHelper
 
 	}
 
+	@Override
 	public
 	Instant getScheduledTime (
 			SubscriptionRec subscription,
@@ -172,6 +181,7 @@ class SubscriptionSendHelper
 
 	}
 
+	@Override
 	public
 	boolean jobScheduled (
 			SubscriptionRec subscription,
@@ -183,6 +193,7 @@ class SubscriptionSendHelper
 
 	}
 
+	@Override
 	public
 	boolean jobSending (
 			SubscriptionRec subscription,
@@ -194,6 +205,7 @@ class SubscriptionSendHelper
 
 	}
 
+	@Override
 	public
 	boolean jobConfigured (
 			SubscriptionRec subscription,
@@ -210,6 +222,7 @@ class SubscriptionSendHelper
 
 	}
 
+	@Override
 	public
 	void sendStart (
 			SubscriptionRec subscription,
@@ -298,6 +311,7 @@ class SubscriptionSendHelper
 
 	}
 
+	@Override
 	public
 	boolean verifyItem (
 			SubscriptionRec subscription,
@@ -308,6 +322,7 @@ class SubscriptionSendHelper
 
 	}
 
+	@Override
 	public
 	void rejectItem (
 			SubscriptionRec subscription,
@@ -318,6 +333,7 @@ class SubscriptionSendHelper
 
 	}
 
+	@Override
 	public
 	void sendItem (
 			SubscriptionRec subscription,
@@ -349,6 +365,7 @@ class SubscriptionSendHelper
 
 	}
 
+	@Override
 	public
 	void sendComplete (
 			SubscriptionRec subscription,

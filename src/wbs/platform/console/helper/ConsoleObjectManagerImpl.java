@@ -750,6 +750,7 @@ class ConsoleObjectManagerImpl
 
 	}
 
+	@Override
 	public
 	Optional<Class<?>> dereferenceType (
 			Optional<Class<?>> objectClass,
