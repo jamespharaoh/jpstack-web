@@ -111,16 +111,6 @@ project_name =
 
 create_xml \
 	project_name,
-	"factorypath",
-	".factorypath"
-
-create_xml \
-	project_name,
-	"project",
-	".project"
-
-create_xml \
-	project_name,
 	"console-web-xml",
 	"console/web-live.xml",
 	"mode" => "live"

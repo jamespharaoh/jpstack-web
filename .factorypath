@@ -1,7 +1,8 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <factorypath>
-	<factorypathentry kind="PLUGIN" id="org.eclipse.jst.ws.annotations.core" enabled="true" runInBatchMode="false"/>
-	<factorypathentry kind="WKSPJAR" id="/wbs-hades/binaries/libraries/guava-bundle-16.0.1.jar" enabled="true" runInBatchMode="false"/>
-	<factorypathentry kind="WKSPJAR" id="/wbs-hades/binaries/libraries/joda-time-jar-2.3.jar" enabled="true" runInBatchMode="false"/>
-	<factorypathentry kind="WKSPJAR" id="/wbs-hades/work/wbs-framework.jar" enabled="true" runInBatchMode="false"/>
+  <factorypathentry kind="PLUGIN" id="org.eclipse.jst.ws.annotations.core" enabled="true" runInBatchMode="false"/>
+  <factorypathentry kind="WKSPJAR" id="/wbs-hades/binaries/libraries/guava-bundle-16.0.1.jar" enabled="true" runInBatchMode="false"/>
+  <factorypathentry kind="WKSPJAR" id="/wbs-hades/binaries/libraries/joda-time-jar-2.3.jar" enabled="true" runInBatchMode="false"/>
+  <factorypathentry kind="WKSPJAR" id="/wbs-hades/work/wbs-framework.jar" enabled="true" runInBatchMode="false"/>
 </factorypath>
+
