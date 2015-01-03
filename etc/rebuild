@@ -11,7 +11,6 @@ $build_doc = XML::Document.file $build_path
 $build_elem = $build_doc.root
 
 def create_xml \
-		project_name,
 		template_name,
 		target_path,
 		vars = {}
@@ -106,35 +105,28 @@ File.open "etc/libraries.xml", "w" do
 
 end
 
-project_name =
-	$build_elem["name"]
 
 create_xml \
-	project_name,
 	"console-web-xml",
 	"console/web-live.xml",
 	"mode" => "live"
 
 create_xml \
-	project_name,
 	"console-web-xml",
 	"console/web-test.xml",
 	"mode" => "test"
 
 create_xml \
-	project_name,
 	"api-web-xml",
 	"api/web-live.xml",
 	"mode" => "live"
 
 create_xml \
-	project_name,
 	"api-web-xml",
 	"api/web-test.xml",
 	"mode" => "test"
 
 create_xml \
-	project_name,
 	"server-xml",
 	"console/server-test.xml",
 	"mode" => "test"
