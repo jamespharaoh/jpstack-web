@@ -31,19 +31,24 @@ class ObsoleteDateLinks {
 		StringBuilder stringBuilder =
 			new StringBuilder ();
 
-		stringBuilder.append(url);
-		stringBuilder.append("?");
+		stringBuilder.append (url);
+		stringBuilder.append ("?");
+
 		for (FormData.Entry entry : formData) {
-			if (entry.getName().equals(field))
+
+			if (entry.getName ().equals (field))
 				continue;
-			stringBuilder.append(urlEncode(entry.getName()));
-			stringBuilder.append('=');
-			stringBuilder.append(urlEncode(entry.getValue()));
-			stringBuilder.append('&');
+
+			stringBuilder.append (urlEncode (entry.getName ()));
+			stringBuilder.append ('=');
+			stringBuilder.append (urlEncode (entry.getValue ()));
+			stringBuilder.append ('&');
+
 		}
-		stringBuilder.append(urlEncode(field));
-		stringBuilder.append('=');
-		stringBuilder.append(urlEncode(value));
+
+		stringBuilder.append (urlEncode (field));
+		stringBuilder.append ('=');
+		stringBuilder.append (urlEncode (value));
 
 		return stringBuilder.toString ();
 
