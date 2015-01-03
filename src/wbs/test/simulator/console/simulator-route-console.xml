@@ -1,0 +1,110 @@
+<console-module
+	name="simulator-route">
+
+	<console-helper-provider
+		object-name="simulatorRoute"
+		view-delegate-field="simulator"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="simulatorRoute.manage"
+			delegate="parent"
+			priv="manage"/>
+
+		<context-stuff
+			name="simulatorRouteName"
+			field="prefix"/>
+
+		<context-stuff
+			name="simulatorId"
+			delegate="simulator"
+			field="id"/>
+
+		<run-post-processor
+			name="simulator"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="simulatorRoute"
+		object-name="simulatorRoute">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="simulatorRoute">
+
+		<code-field/>
+		<description-field/>
+
+		<object-field
+			name="route"
+			finder="route"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="simulatorRoute">
+
+		<code-field/>
+		<description-field/>
+
+		<object-field
+			name="route"
+			finder="route"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="simulatorRoute">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<description-field/>
+
+		<object-field
+			name="route"
+			finder="route"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="simulatorRoute">
+
+		<code-field/>
+		<description-field/>
+
+		<object-field
+			name="route"
+			finder="route"/>
+
+	</field-set>
+
+</console-module>

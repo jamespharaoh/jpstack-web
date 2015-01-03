@@ -33,8 +33,21 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"/>
+			<section
+				name="settings"
+				label="Settings">
+
+				<object-settings-page
+					short-name="general"
+					fields="settings"/>
+
+				<context-link
+					name="route"
+					link="simulatorRoute"
+					label="Routes"
+					priv-key="simulator.manage"/>
+
+			</section>
 
 			<context-link
 				name="session"

@@ -13,6 +13,7 @@
 	<models>
 		<model name="simulator"/>
 		<model name="simulatorEvent"/>
+		<model name="simulatorRoute"/>
 		<model name="simulatorSession"/>
 		<model name="simulatorSessionNumber"/>
 	</models>
@@ -35,6 +36,7 @@
 
 	<console-modules>
 		<console-module name="simulator"/>
+		<console-module name="simulator-route"/>
 		<console-module name="simulator-session"/>
 	</console-modules>
 

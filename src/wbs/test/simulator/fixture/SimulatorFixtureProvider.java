@@ -14,6 +14,8 @@ import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.sender.model.SenderObjectHelper;
 import wbs.test.simulator.model.SimulatorObjectHelper;
 import wbs.test.simulator.model.SimulatorRec;
+import wbs.test.simulator.model.SimulatorRouteObjectHelper;
+import wbs.test.simulator.model.SimulatorRouteRec;
 
 @PrototypeComponent ("simulatorFixtureProvider")
 public
@@ -36,6 +38,9 @@ class SimulatorFixtureProvider
 
 	@Inject
 	SimulatorObjectHelper simulatorHelper;
+
+	@Inject
+	SimulatorRouteObjectHelper simulatorRouteHelper;
 
 	@Inject
 	SliceObjectHelper sliceHelper;
@@ -65,34 +70,11 @@ class SimulatorFixtureProvider
 
 		);
 
-		RouteRec freeRoute =
-			routeHelper.findByCode (
-				GlobalId.root,
-				"test",
-				"free");
+		// simulator
 
-		freeRoute
-
-			.setSender (
-				senderHelper.findByCode (
-					GlobalId.root,
-					"simulator"));
-
-		RouteRec billRoute =
-			routeHelper.findByCode (
-				GlobalId.root,
-				"test",
-				"bill");
-
-		billRoute
-
-			.setSender (
-				senderHelper.findByCode (
-					GlobalId.root,
-					"simulator"));
-
-		simulatorHelper.insert (
-			new SimulatorRec ()
+		SimulatorRec simulator =
+			simulatorHelper.insert (
+				new SimulatorRec ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -107,6 +89,88 @@ class SimulatorFixtureProvider
 
 			.setDescription (
 				"Test")
+
+		);
+
+		// free route
+
+		RouteRec freeRoute =
+			routeHelper.findByCode (
+				GlobalId.root,
+				"test",
+				"free");
+
+		freeRoute
+
+			.setSender (
+				senderHelper.findByCode (
+					GlobalId.root,
+					"simulator"));
+
+		// bill route
+
+		RouteRec billRoute =
+			routeHelper.findByCode (
+				GlobalId.root,
+				"test",
+				"bill");
+
+		billRoute
+
+			.setSender (
+				senderHelper.findByCode (
+					GlobalId.root,
+					"simulator"));
+
+		// magic route
+
+		/*
+		RouteRec magicRoute =
+			routeHelper.findByCode (
+				GlobalId.root,
+				"test",
+				"magic");
+
+		simulatorRouteHelper.insert (
+			new SimulatorRouteRec ()
+
+			.setSimulator (
+				simulator)
+
+			.setPrefix (
+				"magic")
+
+			.setDescription (
+				"Magic")
+
+			.setRoute (
+				magicRoute)
+
+		);
+		*/
+
+		// inbound route
+
+		RouteRec inboundRoute =
+			routeHelper.findByCode (
+				GlobalId.root,
+				"test",
+				"inbound");
+
+		simulatorRouteHelper.insert (
+			new SimulatorRouteRec ()
+
+			.setSimulator (
+				simulator)
+
+			.setPrefix (
+				"inbound")
+
+			.setDescription (
+				"Inbound")
+
+			.setRoute (
+				inboundRoute)
 
 		);
 

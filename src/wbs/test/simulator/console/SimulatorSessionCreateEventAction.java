@@ -1,5 +1,6 @@
 package wbs.test.simulator.console;
 
+import static wbs.framework.utils.etc.Misc.doesNotStartWith;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.toBoolean;
@@ -21,8 +22,6 @@ import wbs.platform.console.action.ConsoleAction;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.console.SliceConsoleHelper;
-import wbs.platform.scaffold.model.RootRec;
-import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
 import wbs.sms.message.core.model.MessageRec;
@@ -37,11 +36,14 @@ import wbs.sms.route.core.console.RouteConsoleHelper;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.test.simulator.model.SimulatorEventObjectHelper;
 import wbs.test.simulator.model.SimulatorEventRec;
+import wbs.test.simulator.model.SimulatorRec;
+import wbs.test.simulator.model.SimulatorRouteRec;
 import wbs.test.simulator.model.SimulatorSessionNumberObjectHelper;
 import wbs.test.simulator.model.SimulatorSessionNumberRec;
 import wbs.test.simulator.model.SimulatorSessionObjectHelper;
 import wbs.test.simulator.model.SimulatorSessionRec;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 @PrototypeComponent ("simulatorSessionCreateEventAction")
@@ -132,6 +134,9 @@ class SimulatorSessionCreateEventAction
 				requestContext.stuffInt (
 					"simulatorSessionId"));
 
+		SimulatorRec simulator =
+			simulatorSession.getSimulator ();
+
 		String numFrom =
 			requestContext.getForm ("numFrom");
 
@@ -166,45 +171,20 @@ class SimulatorSessionCreateEventAction
 
 		// work out route
 
-		RootRec root =
-			rootHelper.find (0);
+		Optional<RouteRec> routeOption =
+			resolveRoute (
+				simulator,
+				numTo);
 
-		SliceRec testSlice =
-			sliceHelper.findByCode (
-				root,
-				"test");
+		if (! routeOption.isPresent ()) {
 
-		RouteRec route = null;
-
-		if (numTo.startsWith ("magic")) {
-
-			route =
-				routeHelper.findByCode (
-					testSlice,
-					"psychic_magic");
+			throw new RuntimeException (
+				"No route configured for that number");
 
 		}
 
-		if (numTo.equals ("ps100")) {
-
-			route =
-				routeHelper.findByCode (
-					testSlice,
-					"psychic_1_00");
-
-		}
-
-		if (numTo.equals ("inbound")) {
-
-			route =
-				routeHelper.findByCode (
-					testSlice,
-					"inbound");
-
-		}
-
-		if (route == null)
-			throw new NullPointerException ("ERROR");
+		RouteRec route =
+			routeOption.get ();
 
 		// insert inbox
 
@@ -343,6 +323,32 @@ class SimulatorSessionCreateEventAction
 
 		return textResponder.get ()
 			.text ("ok");
+
+	}
+
+	Optional<RouteRec> resolveRoute (
+			SimulatorRec simulator,
+			String number) {
+
+		for (
+			SimulatorRouteRec simulatorRoute
+				: simulator.getSimulatorRoutes ()
+		) {
+
+			if (
+				doesNotStartWith (
+					number,
+					simulatorRoute.getPrefix ())
+			) {
+				continue;
+			}
+
+			return Optional.of (
+				simulatorRoute.getRoute ());
+
+		}
+
+		return Optional.absent ();
 
 	}
 
