@@ -3,23 +3,21 @@
 module Wbs.Config where
 
 import           Control.Monad (foldM)
+import           Control.Monad.IO.Class (liftIO)
 
 import           Data.String.Utils (replace)
-import           Data.Maybe
 
 import           Text.XML.HXT.Core
 
 -------------------- records
 
 data BuildPluginConfig =
-
 	BuildPluginConfig {
 		bpcName :: String,
 		bpcPackage :: String
 	}
 
 data BuildGitLinkConfig =
-
 	BuildGitLinkConfig {
 		bglcName :: String,
 		bglcSource :: String,
@@ -29,7 +27,6 @@ data BuildGitLinkConfig =
 	}
 
 data BuildConfig =
-
 	BuildConfig {
 		bcName :: String,
 		bcPlugins :: [ BuildPluginConfig ],
@@ -37,7 +34,6 @@ data BuildConfig =
 	}
 
 data PluginConfig =
-
 	PluginConfig {
 		plcName :: String,
 		plcPackage :: String,
@@ -45,23 +41,35 @@ data PluginConfig =
 		plcSqlDatas :: [ String ]
 	}
 
-data WorldConfig =
+data Library =
+	Library {
+		libName :: String,
+		libType :: String,
+		libVersion :: String,
+		libSource :: Bool
+	}
 
+data WorldConfig =
 	WorldConfig {
 		wcBuild :: BuildConfig,
-		wcPlugins :: [ PluginConfig ]
+		wcPlugins :: [ PluginConfig ],
+		wcLibraries :: [ Library ]
 	}
 
 -------------------- misc
 
-parseXML file =
-	readDocument [] file
+parseXML file = readDocument [] file
+atTag tag = getChildren >>> isElem >>> hasName tag
+optTag tag = atTag tag `orElse` mkelem "tag" [] []
 
-atTag tag =
-	getChildren >>> isElem >>> hasName tag
+boolFromStr :: String -> [Bool]
+boolFromStr "yes" = [True]
+boolFromStr "no" = [False]
+boolFromStr "" = []
+boolFromStr _ = error "Invalid bool"
 
-optTag tag =
-	atTag tag `orElse` mkelem "tag" [] []
+attrStr = getAttrValue
+attrBool x = attrStr x >>> arrL boolFromStr
 
 getAttrArray elemName attrName =
 	listA $ atTag elemName >>> proc parent -> do
@@ -70,56 +78,51 @@ getAttrArray elemName attrName =
 
 -------------------- loadBuildConfig
 
-loadBuildConfig ::
-	IO (BuildConfig)
-
+loadBuildConfig :: IO (BuildConfig)
 loadBuildConfig = do
 
-	let getPlugins =
-		atTag "plugin" >>> proc pluginTag -> do
+	let getPlugins = atTag "plugin" >>> proc pluginTag -> do
 
-			name <- getAttrValue "name" -< pluginTag
-			package <- getAttrValue "package" -< pluginTag
+		name <- getAttrValue "name" -< pluginTag
+		package <- getAttrValue "package" -< pluginTag
 
-			returnA -< BuildPluginConfig {
-				bpcName = name,
-				bpcPackage = package
-			}
+		returnA -< BuildPluginConfig {
+			bpcName = name,
+			bpcPackage = package
+		}
 
-	let getGitLink =
-		atTag "git-link" >>> proc gitLinkTag -> do
+	let getGitLink = atTag "git-link" >>> proc gitLinkTag -> do
 
-			name <- getAttrValue "name" -< gitLinkTag
-			source <- getAttrValue "source" -< gitLinkTag
-			target <- getAttrValue "target" -< gitLinkTag
-			local <- getAttrValue "local" -< gitLinkTag
+		name <- getAttrValue "name" -< gitLinkTag
+		source <- getAttrValue "source" -< gitLinkTag
+		target <- getAttrValue "target" -< gitLinkTag
+		local <- getAttrValue "local" -< gitLinkTag
 
-			paths <- getAttrArray "path" "name" -< gitLinkTag
+		paths <- getAttrArray "path" "name" -< gitLinkTag
 
-			returnA -< BuildGitLinkConfig {
-				bglcName = name,
-				bglcSource = source,
-				bglcTarget = target,
-				bglcLocal = local,
-				bglcPaths = paths
-			}
+		returnA -< BuildGitLinkConfig {
+			bglcName = name,
+			bglcSource = source,
+			bglcTarget = target,
+			bglcLocal = local,
+			bglcPaths = paths
+		}
 
-	let getBuildConfig =
-		atTag "wbs-build" >>> proc buildTag -> do
+	let getBuildConfig = atTag "wbs-build" >>> proc buildTag -> do
 
-			name <- getAttrValue "name" -< buildTag
+		name <- getAttrValue "name" -< buildTag
 
-			pluginsTag <- atTag "plugins" -< buildTag
-			plugins <- listA getPlugins -< pluginsTag
+		pluginsTag <- atTag "plugins" -< buildTag
+		plugins <- listA getPlugins -< pluginsTag
 
-			gitLinksTag <- atTag "git-links" -< buildTag
-			gitLinks <- listA getGitLink -< gitLinksTag
+		gitLinksTag <- atTag "git-links" -< buildTag
+		gitLinks <- listA getGitLink -< gitLinksTag
 
-			returnA -< BuildConfig {
-				bcName = name,
-				bcPlugins = plugins,
-				bcGitLinks = gitLinks
-			}
+		returnA -< BuildConfig {
+			bcName = name,
+			bcPlugins = plugins,
+			bcGitLinks = gitLinks
+		}
 
 	[ buildConfig ] <-
 		runX (parseXML "wbs-build.xml" >>> getBuildConfig)
@@ -128,29 +131,24 @@ loadBuildConfig = do
 
 -------------------- loadPluginConfig
 
-loadPluginConfig ::
-	BuildConfig ->
-	BuildPluginConfig ->
-	IO (PluginConfig)
-
+loadPluginConfig :: BuildConfig -> BuildPluginConfig -> IO PluginConfig
 loadPluginConfig buildConfig buildPluginConfig = do
 
-	let getPluginConfig =
-		atTag "plugin" >>> proc pluginTag -> do
+	let getPluginConfig = atTag "plugin" >>> proc pluginTag -> do
 
-			name <- getAttrValue "name" -< pluginTag
-			package <- getAttrValue "package" -< pluginTag
+		name <- getAttrValue "name" -< pluginTag
+		package <- getAttrValue "package" -< pluginTag
 
-			sqlScriptsTag <- optTag "sql-scripts" -< pluginTag
-			sqlSchemas <- getAttrArray "sql-schema" "name" -< sqlScriptsTag
-			sqlDatas <- getAttrArray "sql-data" "name" -< sqlScriptsTag
+		sqlScriptsTag <- optTag "sql-scripts" -< pluginTag
+		sqlSchemas <- getAttrArray "sql-schema" "name" -< sqlScriptsTag
+		sqlDatas <- getAttrArray "sql-data" "name" -< sqlScriptsTag
 
-			returnA -< PluginConfig {
-				plcName = name,
-				plcPackage = package,
-				plcSqlSchemas = sqlSchemas,
-				plcSqlDatas = sqlDatas
-			}
+		returnA -< PluginConfig {
+			plcName = name,
+			plcPackage = package,
+			plcSqlSchemas = sqlSchemas,
+			plcSqlDatas = sqlDatas
+		}
 
 	let pluginConfigPath =
 		"src/" ++
@@ -164,25 +162,46 @@ loadPluginConfig buildConfig buildPluginConfig = do
 
 	return pluginConfig
 
+-------------------- loadLibraries
+
+loadLibraries :: IO [Library]
+loadLibraries = do
+
+	let getLibraries =
+		atTag "libraries" >>>
+		atTag "library" >>> proc libraryTag -> do
+
+			name <- attrStr "name" -< libraryTag
+			type_ <- attrStr "type" -< libraryTag
+			version <- attrStr "version" -< libraryTag
+			source <- attrBool "source" `withDefault` False -< libraryTag
+
+			returnA -< Library {
+				libName = name,
+				libType = type_,
+				libVersion = version,
+				libSource = source
+			}
+
+	let librariesPath = "etc/libraries.xml"
+
+	runX (parseXML librariesPath >>> getLibraries)
+
 -------------------- loadWorld
 
-loadWorld ::
-	IO (WorldConfig)
-
+loadWorld :: IO WorldConfig
 loadWorld = do
 
-	-- load build config
-
-	buildConfig <-
-		loadBuildConfig
-
-	-- load plugin configs
+	buildConfig <- loadBuildConfig
 
 	pluginConfigs <-
 		mapM (loadPluginConfig buildConfig) $
 			bcPlugins buildConfig
 
+	libraries <- loadLibraries
+
 	return WorldConfig {
 		wcBuild = buildConfig,
-		wcPlugins = pluginConfigs
+		wcPlugins = pluginConfigs,
+		wcLibraries = libraries
 	}

@@ -60,7 +60,7 @@
       <fileset dir="src/wbs/framework/object/console/files"/>
       <fileset dir="src/wbs/framework/schema/console/files"/>
       <fileset dir="src/wbs/framework/sql/console/files"/>
-      <fileset dir="src/web/console/files"/>
+      <fileset dir="src/wbs/framework/web/console/files"/>
       <fileset dir="src/wbs/framework/application/config/console/files"/>
       <fileset dir="src/wbs/platform/object/core/console/files"/>
       <fileset dir="src/wbs/platform/currency/console/files"/>
@@ -223,7 +223,7 @@
       <fileset dir="src/wbs/framework/object/api/files"/>
       <fileset dir="src/wbs/framework/schema/api/files"/>
       <fileset dir="src/wbs/framework/sql/api/files"/>
-      <fileset dir="src/web/api/files"/>
+      <fileset dir="src/wbs/framework/web/api/files"/>
       <fileset dir="src/wbs/framework/application/config/api/files"/>
       <fileset dir="src/wbs/platform/object/core/api/files"/>
       <fileset dir="src/wbs/platform/currency/api/files"/>
@@ -420,7 +420,7 @@
       <fileset dir="src/wbs/framework/object/console/files"/>
       <fileset dir="src/wbs/framework/schema/console/files"/>
       <fileset dir="src/wbs/framework/sql/console/files"/>
-      <fileset dir="src/web/console/files"/>
+      <fileset dir="src/wbs/framework/web/console/files"/>
       <fileset dir="src/wbs/framework/application/config/console/files"/>
       <fileset dir="src/wbs/platform/object/core/console/files"/>
       <fileset dir="src/wbs/platform/currency/console/files"/>
@@ -583,7 +583,7 @@
       <fileset dir="src/wbs/framework/object/api/files"/>
       <fileset dir="src/wbs/framework/schema/api/files"/>
       <fileset dir="src/wbs/framework/sql/api/files"/>
-      <fileset dir="src/web/api/files"/>
+      <fileset dir="src/wbs/framework/web/api/files"/>
       <fileset dir="src/wbs/framework/application/config/api/files"/>
       <fileset dir="src/wbs/platform/object/core/api/files"/>
       <fileset dir="src/wbs/platform/currency/api/files"/>

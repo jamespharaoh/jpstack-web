@@ -111,11 +111,6 @@ project_name =
 
 create_xml \
 	project_name,
-	"classpath",
-	".classpath"
-
-create_xml \
-	project_name,
 	"factorypath",
 	".factorypath"
 

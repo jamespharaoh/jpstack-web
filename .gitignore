@@ -1,20 +1,18 @@
 /RemoteSystemsTempFiles
-/binaries
+/binaries/
 /conf
 /env*
-/.bin
-/bin
-/api-*
-/console-*
-/tomcat-*
-/work
+/.bin/
+/bin/
+/work/
 /.apt_generated
 /wbs-framework.jar
 /c/modeminit
 /c/socktest
 /work
+/.Trash-*/
 
 # cabal
-/.cabal-sandbox
+/.cabal-sandbox/
 /cabal.sandbox.config
-/dist
+/dist/
