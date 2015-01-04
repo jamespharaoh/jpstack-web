@@ -136,6 +136,9 @@
 			name="subscriptionAffiliate"
 			finder="subscriptionAffiliate"/>
 
+		<integer-field
+			name="balance"/>
+
 	</field-set>
 
 	<field-set

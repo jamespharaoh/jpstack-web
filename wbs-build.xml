@@ -545,6 +545,12 @@
 			name="chat-user-pending"
 			package="wbs.apn.chat.user.pending"/>
 
+		<!-- im chat -->
+
+		<plugin
+			name="im-chat-core"
+			package="wbs.imchat.core"/>
+
 		<!-- integrations -->
 
 		<plugin

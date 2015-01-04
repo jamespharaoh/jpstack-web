@@ -420,6 +420,17 @@ class Misc {
 
 	}
 
+	public static <T>
+	boolean notIn (
+			T left,
+			T... rights) {
+
+		return ! in (
+			left,
+			rights);
+
+	}
+
 	public static
 	Date dateAddMs (
 			Date date,

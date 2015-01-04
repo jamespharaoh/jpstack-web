@@ -163,14 +163,15 @@ class DoubleFormFieldBuilder {
 
 		FormFieldUpdateHook updateHook =
 			simpleFormFieldUpdateHookProvider.get ()
-				.name (name);
+
+			.name (
+				name);
 
 		// fields
 
 		if (! readOnly) {
 
 			formFieldSet.formFields ().add (
-
 				updatableFormFieldProvider.get ()
 
 				.name (
@@ -205,7 +206,6 @@ class DoubleFormFieldBuilder {
 		} else {
 
 			formFieldSet.formFields ().add (
-
 				readOnlyFormFieldProvider.get ()
 
 				.name (

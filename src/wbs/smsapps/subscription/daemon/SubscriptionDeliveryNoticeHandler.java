@@ -1,5 +1,7 @@
 package wbs.smsapps.subscription.daemon;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
+
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -11,11 +13,17 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.sms.message.outbox.logic.MessageSender;
-import wbs.smsapps.subscription.model.SubscriptionSendNumberObjectHelper;
+import wbs.smsapps.subscription.logic.SubscriptionLogic;
+import wbs.smsapps.subscription.model.SubscriptionBillObjectHelper;
+import wbs.smsapps.subscription.model.SubscriptionBillRec;
+import wbs.smsapps.subscription.model.SubscriptionBillState;
+import wbs.smsapps.subscription.model.SubscriptionNumberRec;
+import wbs.smsapps.subscription.model.SubscriptionRec;
 
 @PrototypeComponent ("subscriptionDeliveryNoticeHandler")
 public
@@ -34,7 +42,12 @@ class SubscriptionDeliveryNoticeHandler
 	ServiceObjectHelper serviceHelper;
 
 	@Inject
-	SubscriptionSendNumberObjectHelper subscriptionSendNumberHelper;
+	SubscriptionBillObjectHelper subscriptionBillHelper;
+
+	@Inject
+	SubscriptionLogic subscriptionLogic;
+
+	// prototype dependencies
 
 	@Inject
 	Provider<MessageSender> messageSender;
@@ -66,56 +79,76 @@ class SubscriptionDeliveryNoticeHandler
 			deliveryHelper.find (
 				deliveryId);
 
-		/*
 		MessageRec message =
 			delivery.getMessage ();
 
-		SubscriptionSendNumberRec subscriptionSendNumber =
-			subscriptionSendNumberHelper.find (
+		SubscriptionBillRec subscriptionBill =
+			subscriptionBillHelper.find (
 				message.getRef ());
 
-		SubscriptionSendRec subscriptionSend =
-			subscriptionSendNumber.getSubscriptionSend ();
+		SubscriptionNumberRec subscriptionNumber =
+			subscriptionBill.getSubscriptionNumber ();
 
 		SubscriptionRec subscription =
-			subscriptionSend.getSubscription ();
-
-		TemplateVersionRec tv =
-			subscriptionSend.getTemplate ().getTemplateVersion ();
-
-		ServiceRec defaultService =
-			serviceHelper.findByCode (
-				subscription,
-				"default");
-
-		// send the free messages if appropriate
+			subscriptionNumber.getSubscription ();
 
 		if (
-			delivery.getNewMessageStatus ().isGoodType ()
-			&& subscriptionSendNumber.getState ()
-				!= SubscriptionSendState.) {
+			subscriptionBill.getState () == SubscriptionBillState.pending
+			&& delivery.getNewMessageStatus ().isBadType ()
+		) {
 
-			for (TemplatePartRec templatePart
-					: tv.getTemplateParts ()) {
+			// delivery failure
 
-				messageSender.get ()
-					.threadId (subscriptionSendNumber.getThreadId ())
-					.number (subscriptionSendNumber.getNumber ())
-					.messageString (templatePart.getMessage ())
-					.numFrom (subscription.getFreeNumber ())
-					.route (subscription.getFreeRoute ())
-					.service (defaultService)
-					.batch (subscriptionSend.getBatch ())
-					.send ();
+			subscriptionBill
+
+				.setState (
+					SubscriptionBillState.failed);
+
+		} else if (
+			subscriptionBill.getState () != SubscriptionBillState.delivered
+			&& delivery.getNewMessageStatus ().isGoodType ()
+		) {
+
+			// delivery success
+
+			subscriptionBill
+
+				.setState (
+					SubscriptionBillState.delivered)
+
+				.setDeliveredTime (
+					transaction.now ());
+
+			subscriptionNumber
+
+				.setBalance (
+					subscriptionNumber.getBalance ()
+					+ subscription.getCreditsPerBill ());
+
+			// send pending
+
+			if (
+
+				subscriptionNumber.getBalance ()
+					> subscription.getDebitsPerSend ()
+
+				&& isNotNull (
+					subscriptionNumber.getPendingSubscriptionSendNumber ())
+
+			) {
+
+				subscriptionLogic.sendNow (
+					subscriptionNumber.getPendingSubscriptionSendNumber ());
 
 			}
 
-			subscriptionSendNumber.setSent (true);
+		} else {
+
+			// nothing to do
 
 		}
-		*/
 
-		// delete the dnq
+		// clean up
 
 		deliveryHelper.remove (
 			delivery);

@@ -192,7 +192,6 @@ class DescriptionFormFieldBuilder {
 		if (readOnly) {
 
 			formFieldSet.formFields ().add (
-
 				readOnlyFormFieldProvider.get ()
 
 				.name (
@@ -218,7 +217,6 @@ class DescriptionFormFieldBuilder {
 		} else {
 
 			formFieldSet.formFields ().add (
-
 				updatableFormFieldProvider.get ()
 
 				.name (

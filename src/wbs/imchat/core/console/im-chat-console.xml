@@ -1,0 +1,97 @@
+<console-module
+	name="im-chat">
+
+	<console-helper-provider
+		object-name="imChat">
+
+		<context-stuff
+			name="imChatName"
+			field="name"/>
+
+		<context-stuff
+			name="sliceId"
+			delegate="slice"
+			field="id"/>
+
+		<priv-key
+			name="imChat.manage"
+			priv="manage"/>
+
+		<run-post-processor
+			name="slice"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="imChat"
+		object-name="imChat">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="imChat">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="imChat">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="imChat">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="imChat">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+	</field-set>
+
+</console-module>

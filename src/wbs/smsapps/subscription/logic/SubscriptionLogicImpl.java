@@ -1,6 +1,7 @@
 package wbs.smsapps.subscription.logic;
 
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.notIn;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -104,9 +105,10 @@ class SubscriptionLogicImpl
 		// sanity check
 
 		if (
-			notEqual (
+			notIn (
 				subscriptionSendNumber.getState (),
-				SubscriptionSendNumberState.queued)
+				SubscriptionSendNumberState.queued,
+				SubscriptionSendNumberState.pendingBill)
 		) {
 			throw new IllegalStateException ();
 		}
@@ -248,6 +250,24 @@ class SubscriptionLogicImpl
 
 			// send bill
 
+			SubscriptionBillRec subscriptionBill =
+				subscriptionBillHelper.insert (
+					new SubscriptionBillRec ()
+
+				.setSubscriptionNumber (
+					subscriptionNumber)
+
+				.setIndex (
+					subscriptionNumber.getNumBills ())
+
+				.setCreatedTime (
+					transaction.now ())
+
+				.setState (
+					SubscriptionBillState.pending)
+
+			);
+
 			MessageRec billedMessage =
 				messageSenderProvider.get ()
 
@@ -277,30 +297,14 @@ class SubscriptionLogicImpl
 					"subscription")
 
 				.ref (
-					subscriptionSendNumber.getId ())
+					subscriptionBill.getId ())
 
 				.send ();
 
-			SubscriptionBillRec subscriptionBill =
-				subscriptionBillHelper.insert (
-					new SubscriptionBillRec ()
-
-				.setSubscriptionNumber (
-					subscriptionNumber)
-
-				.setIndex (
-					subscriptionNumber.getNumBills ())
+			subscriptionBill
 
 				.setMessage (
-					billedMessage)
-
-				.setCreatedTime (
-					transaction.now ())
-
-				.setState (
-					SubscriptionBillState.pending)
-
-			);
+					billedMessage);
 
 			// update state
 

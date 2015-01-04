@@ -120,8 +120,12 @@ class TextFormFieldBuilder {
 
 			accessor =
 				simpleFormFieldAccessorProvider.get ()
-					.name (name)
-					.nativeClass (String.class);
+
+				.name (
+					name)
+
+				.nativeClass (
+					String.class);
 
 			nativeMapping =
 				identityFormFieldNativeMappingProvider.get ();
@@ -130,8 +134,12 @@ class TextFormFieldBuilder {
 
 			accessor =
 				simpleFormFieldAccessorProvider.get ()
-					.name (name)
-					.nativeClass (TextRec.class);
+
+				.name (
+					name)
+
+				.nativeClass (
+					TextRec.class);
 
 			nativeMapping =
 				textFormFieldNativeMappingProvider.get ();
@@ -185,11 +193,13 @@ class TextFormFieldBuilder {
 		if (readOnly) {
 
 			formFieldSet.formFields ().add (
-
 				readOnlyFormFieldProvider.get ()
 
-				.name (name)
-				.label (label)
+				.name (
+					name)
+
+				.label (
+					label)
 
 				.accessor (
 					accessor)
@@ -208,7 +218,6 @@ class TextFormFieldBuilder {
 		} else {
 
 			formFieldSet.formFields ().add (
-
 				updatableFormFieldProvider.get ()
 
 				.name (

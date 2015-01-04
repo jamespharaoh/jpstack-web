@@ -42,7 +42,8 @@ class SubscriptionBillRec
 
 	// details
 
-	@ReferenceField
+	@ReferenceField (
+		nullable = true)
 	MessageRec message;
 
 	// times

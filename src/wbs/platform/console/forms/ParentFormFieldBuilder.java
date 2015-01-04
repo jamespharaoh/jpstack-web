@@ -197,7 +197,6 @@ class ParentFormFieldBuilder {
 			// read only field
 
 			formFieldSet.formFields ().add (
-
 				updatableFormFieldProvider.get ()
 
 				.name (
@@ -236,7 +235,6 @@ class ParentFormFieldBuilder {
 				throw new RuntimeException ();
 
 			formFieldSet.formFields ().add (
-
 				readOnlyFormFieldProvider.get ()
 
 				.name (
