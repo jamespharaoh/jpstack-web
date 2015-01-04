@@ -10,7 +10,7 @@ import qualified Text.Blaze.Html5.Attributes as Attr
 
 import qualified Text.Blaze.Html.Renderer.Text as Renderer
 
-import qualified Wbs.NodeLang                as NodeLang
+import qualified Wbs.TagLang                 as TagLang
 
 renderPage :: Html5.Html
 renderPage = Html5.docTypeHtml $ do
@@ -41,7 +41,8 @@ main = do
 
 	-- read input
 	putStrLn "Loading data"
-	file <- NodeLang.parseFile "input"
+	file <- TagLang.parseFile "input"
+	print file
 
 	-- render page to abstract form
 	putStrLn "Generating page"
