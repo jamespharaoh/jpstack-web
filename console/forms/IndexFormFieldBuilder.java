@@ -115,7 +115,6 @@ class IndexFormFieldBuilder {
 		// field
 
 		formFieldSet.formFields ().add (
-
 			readOnlyFormFieldProvider.get ()
 
 			.name (

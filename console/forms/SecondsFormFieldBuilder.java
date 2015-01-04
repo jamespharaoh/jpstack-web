@@ -133,11 +133,13 @@ class SecondsFormFieldBuilder {
 		if (! readOnly) {
 
 			formFieldSet.formFields ().add (
-
 				updatableFormFieldProvider.get ()
 
-				.name (name)
-				.label (label)
+				.name (
+					name)
+
+				.label (
+					label)
 
 				.accessor (
 					accessor)
@@ -166,11 +168,13 @@ class SecondsFormFieldBuilder {
 		} else {
 
 			formFieldSet.formFields ().add (
-
 				readOnlyFormFieldProvider.get ()
 
-				.name (name)
-				.label (label)
+				.name (
+					name)
+
+				.label (
+					label)
 
 				.accessor (
 					accessor)
