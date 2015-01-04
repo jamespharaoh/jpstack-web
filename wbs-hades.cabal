@@ -57,11 +57,12 @@ executable wbs-analyse
   default-language: Haskell2010
 
 executable wbs-documentation
-  main-is: Wbs/Documentation.hs
+  main-is: Wbs/Docs/Main.hs
   build-depends:
-    base >=4.7,
+    base,
     blaze-html,
     clay,
+    containers,
     hxt >=9.3,
     language-java >= 0.2,
     MissingH >=1.2,
