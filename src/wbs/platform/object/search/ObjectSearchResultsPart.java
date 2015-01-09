@@ -173,6 +173,12 @@ class ObjectSearchResultsPart
 			" type=\"submit\"",
 			" name=\"new-search\"",
 			" value=\"new search\"",
+			">\n",
+
+			"<input",
+			" type=\"submit\"",
+			" name=\"repeat-search\"",
+			" value=\"repeat search\"",
 			"></p>\n");
 
 		printFormat (

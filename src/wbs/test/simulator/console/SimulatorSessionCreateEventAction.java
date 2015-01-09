@@ -3,6 +3,7 @@ package wbs.test.simulator.console;
 import static wbs.framework.utils.etc.Misc.doesNotStartWith;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toBoolean;
 import static wbs.framework.utils.etc.Misc.toInteger;
 
@@ -23,7 +24,6 @@ import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.console.SliceConsoleHelper;
 import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.text.web.TextResponder;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.InboxLogic;
@@ -96,7 +96,7 @@ class SimulatorSessionCreateEventAction
 	TextObjectHelper textHelper;
 
 	@Inject
-	Provider<TextResponder> textResponder;
+	Provider<JsonResponder> jsonResponder;
 
 	// details
 
@@ -110,16 +110,40 @@ class SimulatorSessionCreateEventAction
 	protected
 	Responder goReal () {
 
-		String type =
-			requestContext.getForm ("type");
+		try {
 
-		if (equal (type, "sendMessage"))
-			return sendMessage ();
+			String type =
+				requestContext.getForm ("type");
+	
+			if (equal (type, "sendMessage"))
+				return sendMessage ();
+	
+			if (equal (type, "deliveryReport"))
+				return deliveryReport ();
+	
+			throw new AjaxException (
+				stringFormat (
+					"Invalid event type: %s",
+					type));
 
-		if (equal (type, "deliveryReport"))
-			return deliveryReport ();
+		} catch (AjaxException error) {
 
-		throw new RuntimeException ();
+			return jsonResponder.get ()
+				.value (
+					ImmutableMap.<Object,Object>builder ()
+						.put ("success", false)
+						.put ("error", error.message)
+						.build ());
+
+		} catch (RuntimeException error) {
+
+			return jsonResponder.get ()
+				.value (
+					ImmutableMap.<Object,Object>builder ()
+						.put ("success", false)
+						.put ("error", "internal error")
+						.build ());
+		}
 
 	}
 
@@ -178,7 +202,7 @@ class SimulatorSessionCreateEventAction
 
 		if (! routeOption.isPresent ()) {
 
-			throw new RuntimeException (
+			throw new AjaxException (
 				"No route configured for that number");
 
 		}
@@ -257,8 +281,11 @@ class SimulatorSessionCreateEventAction
 
 		transaction.commit ();
 
-		return textResponder.get ()
-			.text ("ok");
+		return jsonResponder.get ()
+			.value (
+				ImmutableMap.<Object,Object>builder ()
+					.put ("success", true)
+					.build ());
 
 	}
 
@@ -321,8 +348,11 @@ class SimulatorSessionCreateEventAction
 
 		transaction.commit ();
 
-		return textResponder.get ()
-			.text ("ok");
+		return jsonResponder.get ()
+			.value (
+				ImmutableMap.<Object,Object>builder ()
+					.put ("success", true)
+					.build ());
 
 	}
 
@@ -349,6 +379,21 @@ class SimulatorSessionCreateEventAction
 		}
 
 		return Optional.absent ();
+
+	}
+
+	static
+	class AjaxException
+		extends RuntimeException {
+
+		String message;
+
+		AjaxException (
+				String message) {
+
+			this.message = message;
+
+		}
 
 	}
 
