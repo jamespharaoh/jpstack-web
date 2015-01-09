@@ -9,5 +9,9 @@ interface ManualResponderLogic {
 	int maximumMessageLength (
 			ManualResponderRequestRec request,
 			ManualResponderTemplateRec template);
+	
+	int minimumMessageLength (
+			ManualResponderRequestRec request,
+			ManualResponderTemplateRec template);
 
 }

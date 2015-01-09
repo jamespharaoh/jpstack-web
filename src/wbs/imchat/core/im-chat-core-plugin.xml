@@ -4,6 +4,7 @@
 
 	<plugin-dependencies>
 		<plugin-dependency name="sms-apps-common"/>
+		<plugin-dependency name="scaffold"/>
 	</plugin-dependencies>
 
 	<sql-scripts>
@@ -12,6 +13,11 @@
 
 	<models>
 		<model name="imChat"/>
+		<model name="imChatCustomer"/>
+		<!--
+		<model name="imChatConversation"/>
+		<model name="imChatMessage"/>
+		-->
 	</models>
 
 	<fixtures>
@@ -20,6 +26,7 @@
 
 	<console-modules>
 		<console-module name="im-chat"/>
+		<console-module name="im-chat-customer"/>
 	</console-modules>
 
 </plugin>

@@ -1,0 +1,91 @@
+<console-module
+	name="im-chat-customer">
+
+	<console-helper-provider
+		object-name="imChatCustomer"
+		view-delegate-field="imChat"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="imChatCustomerId"
+			field="id"/>
+			
+		<context-stuff
+			name="imChatCustomerName"
+			field="code"/>
+
+		<context-stuff
+			name="imChatId"
+			delegate="imChat"
+			field="id"/>
+
+		<run-post-processor
+			name="imChat"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="imChatCustomer"
+		object-name="imChatCustomer">
+
+		<list>
+			
+			<object-search-page
+				search-fields="search"
+				results-fields="results"
+				priv-key="imChat.manage"
+				parent-id-key="imChatId"
+				parent-id-name="imChatId"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"
+				priv-key="imChat.manage"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="search"
+		class="wbs.imchat.core.model.ImChatCustomerSearch">
+
+		<text-field
+			name="code"
+			nullable="yes"/>
+	</field-set>
+
+	<field-set
+		name="results"
+		object-name="imChatCustomer">
+
+		<code-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="imChatCustomer">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="imChatCustomer">
+
+		<id-field/>
+		<code-field/>
+
+	</field-set>
+
+</console-module>

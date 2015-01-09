@@ -62,5 +62,48 @@ class ManualResponderLogicImpl
 		return maxLength;
 
 	}
+	
+	@Override
+	public
+	int minimumMessageLength (
+			ManualResponderRequestRec request,
+			ManualResponderTemplateRec template) {
+
+		boolean shortMessageParts =
+			request
+				.getNumber ()
+				.getNetwork ()
+				.getShortMultipartMessages ();
+
+		int maxLengthPerMultipartMessage =
+			shortMessageParts
+				? 134
+				: 153;
+
+		int minLength = maxLengthPerMultipartMessage * template.getMinimumMessageParts();
+		
+		// added length of fixed string
+
+		if (
+			template.getApplyTemplates ()
+		) {
+
+			String fixedText =
+				template.getSingleTemplate ().replaceAll (
+					"\\{message\\}",
+					"");
+
+			int fixedLength =
+				Gsm.length (
+					fixedText);
+
+			minLength +=
+				fixedLength;
+
+		}
+
+		return minLength;
+
+	}
 
 }
