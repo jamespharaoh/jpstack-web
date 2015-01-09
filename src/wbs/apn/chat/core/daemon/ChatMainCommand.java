@@ -490,6 +490,12 @@ class ChatMainCommand
 			@NonNull ChatUserRec chatUser) {
 
 		if (
+			chatUser.getFirstJoin () != null
+		) {
+			return null;
+		}
+
+		if (
 			! in (
 				chatUser.getNextJoinType (),
 				ChatKeywordJoinType.chatDob,
@@ -522,7 +528,10 @@ class ChatMainCommand
 		return new TryKeywordReturn ()
 
 			.joiner (
-				joiner);
+				joiner)
+
+			.rest (
+				receivedMessage.getRest ());
 
 	}
 
@@ -586,64 +595,64 @@ class ChatMainCommand
 
 		}
 
-		// look for a keyword
+		// look for a date of birth
 
 		TryKeywordReturn ret = null;
 
-		for (
-			KeywordFinder.Match match
-				: keywordFinder.find (
-					receivedMessage.getRest ())
-		) {
+		ret = tryDob (
+			commandId,
+			receivedMessage,
+			fromChatUser);
 
-			String keyword =
-				match.simpleKeyword ();
-
-			log.debug (
-				stringFormat (
-					"message %d: trying keyword \"%s\"",
-					receivedMessage.getMessageId (),
-					keyword));
-
-			// check if the keyword is a 6-digit number
-
-			if (keyword.matches ("\\d{6}")) {
-
-				doCode (
-					commandId,
-					receivedMessage,
-					keyword,
-					match.rest ());
-
-				transaction.commit ();
-
-				return null;
-
-			}
-
-			// check if it's a chat keyword
-
-			ret =
-				tryKeyword (
-					commandId,
-					receivedMessage,
-					keyword,
-					match.rest ());
-
-			if (ret != null)
-				break;
-
-		}
-
-		// look for a date of birth
+		// look for a keyword
 
 		if (ret == null) {
 
-			ret = tryDob (
-				commandId,
-				receivedMessage,
-				fromChatUser);
+			for (
+				KeywordFinder.Match match
+					: keywordFinder.find (
+						receivedMessage.getRest ())
+			) {
+	
+				String keyword =
+					match.simpleKeyword ();
+	
+				log.debug (
+					stringFormat (
+						"message %d: trying keyword \"%s\"",
+						receivedMessage.getMessageId (),
+						keyword));
+	
+				// check if the keyword is a 6-digit number
+	
+				if (keyword.matches ("\\d{6}")) {
+	
+					doCode (
+						commandId,
+						receivedMessage,
+						keyword,
+						match.rest ());
+	
+					transaction.commit ();
+	
+					return null;
+	
+				}
+	
+				// check if it's a chat keyword
+	
+				ret =
+					tryKeyword (
+						commandId,
+						receivedMessage,
+						keyword,
+						match.rest ());
+	
+				if (ret != null)
+					break;
 
+			}
+	
 		}
 
 		// handle command keywords
