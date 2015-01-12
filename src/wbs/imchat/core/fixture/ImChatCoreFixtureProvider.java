@@ -7,8 +7,12 @@ import javax.inject.Inject;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
+import wbs.imchat.core.model.ImChatConversationObjectHelper;
+import wbs.imchat.core.model.ImChatConversationRec;
 import wbs.imchat.core.model.ImChatCustomerObjectHelper;
 import wbs.imchat.core.model.ImChatCustomerRec;
+import wbs.imchat.core.model.ImChatMessageObjectHelper;
+import wbs.imchat.core.model.ImChatMessageRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
 import wbs.imchat.core.model.ImChatRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
@@ -34,6 +38,12 @@ class ImChatCoreFixtureProvider
 	
 	@Inject
 	ImChatCustomerObjectHelper imChatCustomerHelper;
+	
+	@Inject
+	ImChatConversationObjectHelper imChatConversationHelper;
+	
+	@Inject
+	ImChatMessageObjectHelper imChatMessageHelper;
 	
 	@Inject
 	SliceObjectHelper sliceHelper;
@@ -72,13 +82,29 @@ class ImChatCoreFixtureProvider
 					
 		imChatHelper.insert (imchat);
 		
-		imChatCustomerHelper.insert(
-				new ImChatCustomerRec ()
+		String code = generateCode();
+		ImChatCustomerRec imchatcustomer = new ImChatCustomerRec ()
 
-				.setImChat(imChatHelper.findByCode(imchat, "im_chat"))
+			.setImChat(imChatHelper.findByCode(imchat, "im_chat"))	
+			.setCode(code);
 		
-				.setCode(generateCode()) 			
-		);
+		imChatCustomerHelper.insert(imchatcustomer);
+		
+		ImChatConversationRec imchatconversation = new ImChatConversationRec ()
+
+			.setImChatCustomer(imChatCustomerHelper.findByCode(imchatcustomer, code))	
+			.setIndex(imchatcustomer.getNumConversations());
+	
+		imchatcustomer.setNumConversations(imchatcustomer.getNumConversations() + 1);
+		imChatConversationHelper.insert(imchatconversation);
+		
+		ImChatMessageRec imchatmessage = new ImChatMessageRec ()
+
+			.setImChatConversation(imchatconversation)	
+			.setIndex(imchatconversation.getNumMessages());
+	
+		imchatconversation.setNumMessages(imchatconversation.getNumMessages() + 1);
+		imChatMessageHelper.insert(imchatmessage);
 
 	}
 	

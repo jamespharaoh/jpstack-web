@@ -14,6 +14,7 @@ import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.ParentField;
+import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
@@ -39,6 +40,11 @@ public class ImChatCustomerRec
 	
 	@CodeField
 	String code;
+	
+	//statistics
+	
+	@SimpleField
+	Integer numConversations = 0;
 	
 	// dao methods
 

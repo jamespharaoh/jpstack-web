@@ -14,10 +14,9 @@
 	<models>
 		<model name="imChat"/>
 		<model name="imChatCustomer"/>
-		<!--
 		<model name="imChatConversation"/>
 		<model name="imChatMessage"/>
-		-->
+
 	</models>
 
 	<fixtures>
@@ -27,6 +26,8 @@
 	<console-modules>
 		<console-module name="im-chat"/>
 		<console-module name="im-chat-customer"/>
+		<console-module name="im-chat-conversation"/>
+		<console-module name="im-chat-message"/>
 	</console-modules>
 
 </plugin>

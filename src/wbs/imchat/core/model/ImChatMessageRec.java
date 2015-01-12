@@ -1,5 +1,7 @@
 package wbs.imchat.core.model;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -21,19 +23,34 @@ public class ImChatMessageRec
 
 	// identity
 
-		@GeneratedIdField
-		Integer id;
+	@GeneratedIdField
+	Integer id;
 
-		@ParentField
-		ImChatConversationRec imChatConversation;
+	@ParentField
+	ImChatConversationRec imChatConversation;
+	
+	@IndexField (
+		counter = "numMessages")
+	Integer index;
+	
+	@Override
+	public int compareTo(Record<ImChatMessageRec> otherRecord) {
 		
-		@IndexField
-		String index;
+		ImChatMessageRec other =
+				(ImChatMessageRec) otherRecord;
 		
-		@Override
-		public int compareTo(Record<ImChatMessageRec> o) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+		return new CompareToBuilder ()
+
+		.append (
+			getImChatConversation (),
+			other.getImChatConversation ())
+
+		.append (
+			getIndex (),
+			other.getIndex ())
+
+		.toComparison ();
+		
+	}
 
 }
