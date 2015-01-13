@@ -726,7 +726,10 @@ class ChatJoiner {
 
 		// check charges confirmed
 
-		if (! chatUser.getChargesConfirmed ()) {
+		if (
+			chat.getConfirmCharges ()
+			&& ! chatUser.getChargesConfirmed ()
+		) {
 
 			sendMagicSystem (
 				"charges_request",

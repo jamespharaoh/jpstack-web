@@ -203,6 +203,9 @@ class ChatRec
 	@SimpleField
 	Boolean billDuringJoin = false;
 
+	@SimpleField
+	Boolean confirmCharges = true;
+
 	// ad settings
 
 	@SimpleField

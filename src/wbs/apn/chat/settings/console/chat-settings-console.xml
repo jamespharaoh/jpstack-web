@@ -170,6 +170,9 @@
 		<yes-no-field
 			name="billDuringJoin"/>
 
+		<yes-no-field
+			name="confirmCharges"/>
+
 		<seconds-field
 			name="maxAlarmTime"
 			label="Maximum alarm time"/>
