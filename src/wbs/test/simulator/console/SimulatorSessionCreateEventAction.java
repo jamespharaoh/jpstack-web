@@ -114,13 +114,13 @@ class SimulatorSessionCreateEventAction
 
 			String type =
 				requestContext.getForm ("type");
-	
+
 			if (equal (type, "sendMessage"))
 				return sendMessage ();
-	
+
 			if (equal (type, "deliveryReport"))
 				return deliveryReport ();
-	
+
 			throw new AjaxException (
 				stringFormat (
 					"Invalid event type: %s",
