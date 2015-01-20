@@ -19,9 +19,9 @@ import wbs.platform.console.context.ConsoleContextBuilderContainerImpl;
 import wbs.platform.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.helper.ConsoleHelperRegistry;
-import wbs.platform.console.metamodule.ConsoleMetaManager;
+import wbs.platform.console.module.ConsoleMetaManager;
 import wbs.platform.console.module.ConsoleModuleImpl;
-import wbs.platform.console.spec.ConsoleSimpleBuilderContainer;
+import wbs.platform.console.module.SimpleConsoleBuilderContainer;
 
 @Log4j
 @PrototypeComponent ("extendContextBuilder")
@@ -40,7 +40,7 @@ class ExtendContextBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleSimpleBuilderContainer container;
+	SimpleConsoleBuilderContainer container;
 
 	@BuilderSource
 	ExtendContextSpec spec;

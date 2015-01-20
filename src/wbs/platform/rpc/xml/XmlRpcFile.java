@@ -12,7 +12,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.framework.web.WebFile;
-import wbs.platform.api.WebApiAction;
+import wbs.platform.api.mvc.WebApiAction;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("xmlRpcFile")

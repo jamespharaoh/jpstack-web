@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.context.BeanFactory;
 import wbs.framework.object.ObjectHelper;
-import wbs.platform.console.metamodule.ConsoleMetaManager;
+import wbs.platform.console.module.ConsoleMetaManager;
 
 @Accessors (fluent = true)
 @Log4j

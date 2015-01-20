@@ -13,7 +13,7 @@ import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataInitMethod;
 import wbs.platform.console.context.ConsoleContextStuffSpec;
-import wbs.platform.console.spec.ConsoleModuleData;
+import wbs.platform.console.module.ConsoleModuleData;
 
 @Accessors (fluent = true)
 @Data

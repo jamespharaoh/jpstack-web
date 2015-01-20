@@ -18,7 +18,7 @@ import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInRec;
-import wbs.platform.api.ApiAction;
+import wbs.platform.api.mvc.ApiAction;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
 import wbs.sms.message.inbox.logic.InboxLogic;

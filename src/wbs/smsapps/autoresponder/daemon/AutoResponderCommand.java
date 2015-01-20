@@ -138,7 +138,7 @@ class AutoResponderCommand
 		}
 
 		// process inbox
-		
+
 		inboxLogic.inboxProcessed (
 			message,
 			defaultService,

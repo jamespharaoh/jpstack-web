@@ -11,7 +11,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.api.ApiAction;
+import wbs.platform.api.mvc.ApiAction;
 
 @PrototypeComponent ("chatUserImageUploadViewAction")
 public

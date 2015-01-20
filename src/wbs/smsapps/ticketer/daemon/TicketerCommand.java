@@ -139,7 +139,7 @@ class TicketerCommand
 				.setMessage (messageOut));
 
 		// process inbox
-		
+
 		inboxLogic.inboxProcessed (
 			messageIn,
 			defaultService,

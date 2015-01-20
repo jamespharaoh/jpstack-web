@@ -187,7 +187,7 @@ class OrdererCommandTypeHandler
 
 			.route (
 				orderer.getBillRoute ())
-				
+
 			.service (
 				defaultService)
 

@@ -1,0 +1,11 @@
+<api-module name="im-chat">
+
+	<resource name="im-chat">
+
+		<resource name="test">
+			<post-action name="test"/>
+		</resource>
+
+	</resource>
+
+</api-module>

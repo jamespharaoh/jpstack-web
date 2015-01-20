@@ -66,7 +66,6 @@
 
 	</Service>
 
-	{ if (false ()) then (
 	<Service name="api">
 
 		<Executor
@@ -107,6 +106,5 @@
 		</Engine>
 
 	</Service>
-	) else () }
 
 </Server>

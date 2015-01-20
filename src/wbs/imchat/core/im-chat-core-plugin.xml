@@ -18,6 +18,10 @@
 		<fixture name="imChatCore"/>
 	</fixtures>
 
+	<api-modules>
+		<api-module name="im-chat"/>
+	</api-modules>
+
 	<console-modules>
 		<console-module name="im-chat"/>
 	</console-modules>

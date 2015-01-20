@@ -31,7 +31,7 @@ import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.utils.cal.CalDate;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.api.WebApiAction;
+import wbs.platform.api.mvc.WebApiAction;
 import wbs.platform.rpc.core.Rpc;
 import wbs.platform.rpc.core.RpcDefinition;
 import wbs.platform.rpc.core.RpcException;

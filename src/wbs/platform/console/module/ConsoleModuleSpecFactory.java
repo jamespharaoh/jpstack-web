@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.context.BeanFactory;
-import wbs.platform.console.spec.ConsoleSpecReader;
 
 @Accessors (fluent = true)
 public
@@ -16,7 +15,7 @@ class ConsoleModuleSpecFactory
 	implements BeanFactory {
 
 	@Inject
-	ConsoleSpecReader consoleSpecReader;
+	ConsoleModuleSpecReader consoleSpecReader;
 
 	@Getter @Setter
 	String xmlResourceName;

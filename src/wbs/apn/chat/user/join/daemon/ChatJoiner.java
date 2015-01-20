@@ -802,7 +802,7 @@ class ChatJoiner {
 
 	}
 
-	public 
+	public
 	void handle (
 			ReceivedMessage receivedMessage) {
 

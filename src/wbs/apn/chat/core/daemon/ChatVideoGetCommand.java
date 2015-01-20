@@ -296,7 +296,7 @@ class ChatVideoGetCommand
 		}
 
 		// process inbox
-		
+
 		inboxLogic.inboxProcessed (
 			message,
 			null,
