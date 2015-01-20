@@ -35,6 +35,7 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
+import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.outbox.logic.MessageSender;
 
 import com.google.common.base.Optional;
@@ -43,6 +44,8 @@ import com.google.common.base.Optional;
 public
 class ChatVideoGetCommand
 	implements CommandHandler {
+
+	// dependencies
 
 	@Inject
 	ChatHelpLogic chatHelpLogic;
@@ -75,6 +78,9 @@ class ChatVideoGetCommand
 	Database database;
 
 	@Inject
+	InboxLogic inboxLogic;
+
+	@Inject
 	MessageObjectHelper messageHelper;
 
 	@Inject
@@ -86,6 +92,8 @@ class ChatVideoGetCommand
 	@Inject
 	Provider<MessageSender> messageSender;
 
+	// details
+
 	@Override
 	public
 	String[] getCommandTypes () {
@@ -96,9 +104,11 @@ class ChatVideoGetCommand
 
 	}
 
+	// implementation
+
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -119,24 +129,22 @@ class ChatVideoGetCommand
 			objectManager.getParent (
 				command);
 
+		ServiceRec defaultService =
+			serviceHelper.findByCode (
+				chat,
+				"default");
+
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
 				chat,
 				message);
 
+		AffiliateRec affiliate =
+			chatUserLogic.getAffiliate (
+				chatUser);
+
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();
-
-		// set received message stuff
-
-		chatUserLogic.setAffiliateId (
-			receivedMessage,
-			chatUser);
-
-		chatLogic.setServiceId (
-			receivedMessage,
-			chat,
-			"default");
 
 		// send barred users to help
 
@@ -155,9 +163,15 @@ class ChatVideoGetCommand
 				null,
 				true);
 
+			inboxLogic.inboxProcessed (
+				message,
+				defaultService,
+				affiliate,
+				command);
+
 			transaction.commit ();
 
-			return Status.processed;
+			return;
 
 		}
 
@@ -213,8 +227,16 @@ class ChatVideoGetCommand
 					"video_not_found",
 					Collections.<String,String>emptyMap ());
 
+				inboxLogic.inboxProcessed (
+					message,
+					defaultService,
+					affiliate,
+					command);
+
 				transaction.commit ();
-				return Status.processed;
+
+				return;
+
 			}
 
 			// send the reply
@@ -229,15 +251,6 @@ class ChatVideoGetCommand
 				chatInfoLogic.chatUserBlurbMedia (
 					chatUser,
 					otherUser));
-
-			ServiceRec defaultService =
-				serviceHelper.findByCode (
-					chat,
-					"default");
-
-			AffiliateRec affiliate =
-				chatUserLogic.getAffiliate (
-					chatUser);
 
 			messageSender.get ()
 
@@ -282,9 +295,15 @@ class ChatVideoGetCommand
 
 		}
 
-		transaction.commit ();
+		// process inbox
+		
+		inboxLogic.inboxProcessed (
+			message,
+			null,
+			null,
+			null);
 
-		return Status.processed;
+		transaction.commit ();
 
 	}
 

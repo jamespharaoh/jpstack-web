@@ -20,12 +20,16 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
+import wbs.sms.message.inbox.logic.InboxLogic;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -34,6 +38,8 @@ import com.google.common.collect.ImmutableSet;
 public
 class ChatDateCommand
 	implements CommandHandler {
+
+	// dependencies
 
 	@Inject
 	ChatDateLogic chatDateLogic;
@@ -57,10 +63,18 @@ class ChatDateCommand
 	Database database;
 
 	@Inject
+	InboxLogic inboxLogic;
+
+	@Inject
 	MessageObjectHelper messageHelper;
 
 	@Inject
 	ObjectManager objectManager;
+
+	@Inject
+	ServiceObjectHelper serviceHelper;
+
+	// details
 
 	@Override
 	public
@@ -74,9 +88,11 @@ class ChatDateCommand
 
 	}
 
+	// implementation
+
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -93,6 +109,11 @@ class ChatDateCommand
 			objectManager.getParent (
 				command);
 
+		ServiceRec defaultService =
+			serviceHelper.findByCode (
+				chat,
+				"default");
+
 		MessageRec message =
 			messageHelper.find (
 				receivedMessage.getMessageId ());
@@ -101,6 +122,10 @@ class ChatDateCommand
 			chatUserHelper.findOrCreate (
 				chat,
 				message);
+
+		AffiliateRec affiliate =
+			chatUserLogic.getAffiliate (
+				chatUser);
 
 		// work out date mode
 
@@ -111,17 +136,6 @@ class ChatDateCommand
 		ChatUserDateMode dateMode =
 			dateModeByCommandCode.get (
 				command.getCode ());
-
-		// set received message stuff
-
-		chatUserLogic.setAffiliateId (
-			receivedMessage,
-			chatUser);
-
-		chatMiscLogic.setServiceId (
-			receivedMessage,
-			chat,
-			"default");
 
 		// do join
 
@@ -146,9 +160,17 @@ class ChatDateCommand
 				dateMode,
 				true);
 
+			// process inbox
+
+			inboxLogic.inboxProcessed (
+				message,
+				defaultService,
+				affiliate,
+				command);
+
 			transaction.commit ();
 
-			return Status.processed;
+			return;
 
 		}
 
@@ -176,9 +198,17 @@ class ChatDateCommand
 				dateMode,
 				true);
 
+			// process inbox
+
+			inboxLogic.inboxProcessed (
+				message,
+				null,
+				null,
+				null);
+
 			transaction.commit ();
 
-			return Status.processed;
+			return;
 
 		}
 
@@ -191,9 +221,15 @@ class ChatDateCommand
 			command,
 			true);
 
-		transaction.commit ();
+		// process inbox
 
-		return Status.processed;
+		inboxLogic.inboxProcessed (
+			message,
+			null,
+			null,
+			null);
+
+		transaction.commit ();
 
 	}
 

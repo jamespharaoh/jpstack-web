@@ -19,6 +19,7 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
+import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.smsapps.ticketer.model.TicketerRec;
 import wbs.smsapps.ticketer.model.TicketerTicketObjectHelper;
@@ -29,6 +30,8 @@ public
 class TicketerCommand
 	implements CommandHandler {
 
+	// dependencies
+
 	@Inject
 	CommandObjectHelper commandHelper;
 
@@ -37,6 +40,9 @@ class TicketerCommand
 
 	@Inject
 	Database database;
+
+	@Inject
+	InboxLogic inboxLogic;
 
 	@Inject
 	MessageObjectHelper messageHelper;
@@ -53,6 +59,8 @@ class TicketerCommand
 	@Inject
 	Provider<MessageSender> messageSender;
 
+	// details
+
 	@Override
 	public
 	String[] getCommandTypes () {
@@ -63,9 +71,11 @@ class TicketerCommand
 
 	}
 
+	// implementation
+
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -88,9 +98,6 @@ class TicketerCommand
 			serviceHelper.findByCode (
 				ticketer,
 				"default");
-
-		receivedMessage.setServiceId (
-			defaultService.getId ());
 
 		// load message and stuff
 
@@ -131,9 +138,15 @@ class TicketerCommand
 				.setTicket (ticket)
 				.setMessage (messageOut));
 
-		transaction.commit ();
+		// process inbox
+		
+		inboxLogic.inboxProcessed (
+			messageIn,
+			defaultService,
+			null,
+			command);
 
-		return Status.processed;
+		transaction.commit ();
 
 	}
 

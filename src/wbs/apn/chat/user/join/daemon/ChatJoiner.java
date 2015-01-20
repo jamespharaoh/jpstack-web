@@ -1,6 +1,5 @@
 package wbs.apn.chat.user.join.daemon;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -58,15 +57,13 @@ import wbs.framework.record.Record;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.core.logic.DateFinder;
-import wbs.sms.locator.logic.LocatorManager;
-import wbs.sms.locator.model.LongLat;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
-import wbs.sms.message.inbox.daemon.CommandHandler.Status;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.daemon.ReceivedMessageImpl;
+import wbs.sms.message.inbox.logic.InboxLogic;
 
 import com.google.common.base.Optional;
 
@@ -133,7 +130,7 @@ class ChatJoiner {
 	DeliveryObjectHelper deliveryHelper;
 
 	@Inject
-	LocatorManager locatorManager;
+	InboxLogic inboxLogic;
 
 	@Inject
 	MessageObjectHelper messageHelper;
@@ -170,8 +167,6 @@ class ChatJoiner {
 	@Getter @Setter
 	boolean confirmCharges;
 
-	boolean locatorEnabled = false;
-
 	// state
 
 	ChatRec chat;
@@ -182,8 +177,6 @@ class ChatJoiner {
 	DeliveryRec delivery;
 	String rest;
 	boolean gotPlace;
-	int locatorId, numberId, serviceId, affiliateId; // locator input
-	LongLat locatedLongLat; // locator output
 
 	// implementation
 
@@ -519,13 +512,6 @@ class ChatJoiner {
 
 		}
 
-		if (chatUser.getChatAffiliate () != null) {
-
-			receivedMessage.setAffiliateId (
-				chatUserLogic.getAffiliateId (chatUser));
-
-		}
-
 		// set the chat user's scheme if appropriate
 
 		if (chatSchemeId != null) {
@@ -563,37 +549,6 @@ class ChatJoiner {
 	 */
 	private
 	boolean checkBeforeJoin () {
-
-		// check adult verification
-		// if (js.receivedMessage != null
-		// && (eq (chatSchemeId, 17)
-		// || eq (js.chatUser.getChatScheme ().getId (), 17))
-		// && js.chatUser.getNumber ().getNetwork ().getId () == 4
-		// && js.message.getRoute ().getId () == 41
-		// && ! js.chatUser.getAdultVerified ()) {
-		//
-		// smsUtils.sendMessage (
-		// js.message.getId (),
-		// js.message.getNumber (),
-		// "This message confirms your number is adult verified. Thankyou.",
-		// "84469",
-		// smsDao.findRouteById (58),
-		// js.chat.getService (),
-		// null,
-		// js.chatUser.getAffiliate (),
-		// smsDao.findDeliveryNoticeTypeByCode ("chat_adult"),
-		// js.chatUser.getId (),
-		// null,
-		// null,
-		// true,
-		// null,
-		// null, null, null);
-		// js.chatUser.setNextJoinType (
-		// joinTypeIsChat (joinType)?
-		// ChatKeywordJoinType.chatSimple :
-		// ChatKeywordJoinType.dateSimple);
-		// return false;
-		// }
 
 		// check network
 
@@ -811,11 +766,13 @@ class ChatJoiner {
 		}
 
 		return true;
+
 	}
 
 	boolean checkLocation () {
 
 		// if we have a location that's fine
+
 		if (chatUser.getLocLongLat () != null)
 			return true;
 
@@ -834,18 +791,19 @@ class ChatJoiner {
 	}
 
 	public
-	Status handle (
+	void handle (
 			ReceivedMessage receivedMessage,
 			String rest) {
 
-		return handle (
+		handle (
 			new ReceivedMessageImpl (
 				receivedMessage,
 				rest));
 
 	}
 
-	public Status handle (
+	public 
+	void handle (
 			ReceivedMessage receivedMessage) {
 
 		// save stuff
@@ -855,7 +813,7 @@ class ChatJoiner {
 
 		// delegate to realSend
 
-		return realSend ();
+		realSend ();
 
 	}
 
@@ -874,117 +832,35 @@ class ChatJoiner {
 	 * Multi-purpose join command.
 	 */
 	public
-	Status realSend () {
+	void realSend () {
 
-		// TODO this could be much simpler
+		@Cleanup
+		Transaction transaction1 =
+			database.beginReadWrite ();
 
-		if (! in (
-				joinType,
-				JoinType.chatLocation,
-				JoinType.dateLocation)) {
+		// do part one
 
-			@Cleanup
-			Transaction transaction1 =
-				database.beginReadWrite ();
-
-			// do part one
-
-			if (! joinPart1 ()) {
-
-				if (delivery != null) {
-
-					deliveryHelper.remove (
-						delivery);
-
-				}
-
-				transaction1.commit ();
-
-				return Status.processed;
-
-			}
-
-			// if preLocator fails just do part two in the same
-			// transaction
-
-			if (! preLocator ()) {
-
-				joinPart2 ();
-
-				if (delivery != null) {
-
-					deliveryHelper.remove (
-						delivery);
-
-				}
-
-				transaction1.commit ();
-
-				return Status.processed;
-			}
-
-			transaction1.commit ();
-
-			// then do the location lookup (this takes a while so we do it
-			// outside a transaction
-
-			doLocator ();
-
-			// do part two in a separate transaction
-
-			@Cleanup
-			Transaction transaction2 =
-				database.beginReadWrite ();
-
-			postLocator ();
-
+		if (joinPart1 ()) {
 			joinPart2 ();
+		}
 
-			if (delivery != null) {
+		if (delivery != null) {
 
-				deliveryHelper.remove (
-					delivery);
-
-			}
-
-			transaction2.commit ();
-
-		} else {
-
-			// just do the whole join in one transaction
-
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite ();
-
-			if (! joinPart1 ()) {
-
-				if (delivery != null) {
-
-					deliveryHelper.remove (
-						delivery);
-
-				}
-
-				transaction.commit ();
-
-				return Status.processed;
-			}
-
-			joinPart2 ();
-
-			if (delivery != null) {
-
-				deliveryHelper.remove (
-					delivery);
-
-			}
-
-			transaction.commit ();
+			deliveryHelper.remove (
+				delivery);
 
 		}
 
-		return Status.processed;
+		inboxLogic.inboxProcessed (
+			message,
+			serviceHelper.findByCode (
+				chat,
+				"default"),
+			chatUserLogic.getAffiliate (
+				chatUser),
+			null);
+
+		transaction1.commit ();
 
 	}
 
@@ -1024,21 +900,6 @@ class ChatJoiner {
 				chatUserHelper.findOrCreate (
 					chat,
 					delivery.getMessage ());
-
-		}
-
-		// update received message stuff
-
-		if (receivedMessage != null) {
-
-			receivedMessage.setServiceId (
-				serviceHelper.findByCode (chat, "default").getId ());
-
-			Integer affiliateId =
-				chatUserLogic.getAffiliateId (chatUser);
-
-			if (affiliateId != null)
-				receivedMessage.setAffiliateId (affiliateId);
 
 		}
 
@@ -1326,143 +1187,6 @@ class ChatJoiner {
 			chatUser);
 
 		return true;
-
-	}
-
-	private
-	boolean preLocator () {
-
-		Transaction transaction =
-			database.currentTransaction ();
-
-		// always return false - this disables the LBS service
-
-		if (! locatorEnabled)
-			return false;
-
-		// if we have a location from within the last hour just use that
-
-		if (
-
-			chatUser.getLocTime () != null
-
-			&& chatUser.getLocTime ().getTime ()
-				>= transaction.now ().getMillis () - 60 * 60 * 1000
-
-			&& chatUser.getLocLongLat () != null
-
-		) {
-
-			return false;
-
-		}
-
-		// update the chat user's loc time now
-
-		chatUser
-
-			.setLocTime (
-				instantToDate (
-					transaction.now ()));
-
-		// get all the info to look up before closing the session
-
-		locatorId =
-			chat.getLocator ().getId ();
-
-		numberId =
-			message.getNumber ().getId ();
-
-		serviceId =
-			serviceHelper.findByCode (chat, "default").getId ();
-
-		affiliateId =
-			ifNull (
-				chatUserLogic.getAffiliateId (chatUser),
-				0);
-
-		return true;
-
-	}
-
-	private
-	void doLocator () {
-
-		// do the location lookup
-
-		try {
-
-			locatedLongLat =
-				locatorManager.locate (
-					locatorId,
-					numberId,
-					serviceId,
-					affiliateId);
-
-		} catch (Throwable exception) {
-
-			log.error (
-				"Locator failed",
-				exception);
-
-		}
-
-	}
-
-	private
-	void postLocator () {
-
-		Transaction transaction =
-			database.currentTransaction ();
-
-		// lookup stuff
-
-		chat =
-			chatHelper.find (
-				chatId);
-
-		if (receivedMessage != null) {
-
-			message =
-				messageHelper.find (
-					receivedMessage.getMessageId ());
-
-			chatUser =
-				chatUserHelper.findOrCreate (
-					chat,
-					message);
-
-		} else {
-
-			delivery =
-				deliveryHelper.find (
-					deliveryId);
-
-			message =
-				messageHelper.find (
-					delivery.getMessage ().getThreadId ());
-
-			chatUser =
-				chatUserHelper.findOrCreate (
-					chat,
-					delivery.getMessage ());
-
-		}
-
-		// update the user if appropriate
-
-		if (locatedLongLat != null) {
-
-			chatUser
-
-				.setLocLongLat (
-					locatedLongLat)
-
-				.setLocTime (
-					instantToDate (
-						transaction.now ()));
-
-		}
 
 	}
 

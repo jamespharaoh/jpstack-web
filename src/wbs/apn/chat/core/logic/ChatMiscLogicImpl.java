@@ -44,20 +44,17 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.Record;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.locator.logic.LocatorManager;
 import wbs.sms.locator.model.LongLat;
 import wbs.sms.magicnumber.logic.MagicNumberLogic;
 import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.outbox.logic.MessageSender;
 
 import com.google.common.base.Optional;
@@ -281,8 +278,10 @@ class ChatMiscLogicImpl
 
 		// join chat
 
-		if (chat.getAutoJoinChat ()
-				&& ! chatUser.getOnline ()) {
+		if (
+			chat.getAutoJoinChat ()
+			&& ! chatUser.getOnline ()
+		) {
 
 			userJoin (
 				chatUser,
@@ -294,15 +293,18 @@ class ChatMiscLogicImpl
 
 		// join date
 
-		if (chat.getAutoJoinDate ()
-				&& chatUser.getDateMode () == ChatUserDateMode.none) {
+		if (
+			chat.getAutoJoinDate ()
+			&& chatUser.getDateMode () == ChatUserDateMode.none
+		) {
 
 			chatDateLogic.userDateStuff (
 				chatUser,
 				null,
 				message,
-				chatUser.getMainChatUserImage () != null ?
-					ChatUserDateMode.photo : ChatUserDateMode.text,
+				chatUser.getMainChatUserImage () != null
+					? ChatUserDateMode.photo
+					: ChatUserDateMode.text,
 				true);
 
 		}
@@ -660,25 +662,6 @@ class ChatMiscLogicImpl
 				ImmutableMap.<String,String>builder ()
 					.put ("newName", name)
 					.build ());
-
-	}
-
-	@Override
-	public
-	void setServiceId (
-			ReceivedMessage receivedMessage,
-			Record<?> object,
-			String code) {
-
-		ServiceRec service =
-			serviceHelper.findByCode (
-				object,
-				code);
-
-		receivedMessage
-
-			.setServiceId (
-				service.getId ());
 
 	}
 

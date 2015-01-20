@@ -537,7 +537,7 @@ class ChatMainCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -635,7 +635,7 @@ class ChatMainCommand
 
 					transaction.commit ();
 
-					return null;
+					return;
 
 				}
 
@@ -669,7 +669,7 @@ class ChatMainCommand
 
 			transaction.commit ();
 
-			return commandManager.handle (
+			commandManager.handle (
 				ret.externalCommandId,
 				receivedMessage,
 				ret.rest);
@@ -707,7 +707,7 @@ class ChatMainCommand
 
 				transaction.commit ();
 
-				return null;
+				return;
 
 			}
 
@@ -739,7 +739,7 @@ class ChatMainCommand
 
 				transaction.commit ();
 
-				return null;
+				return;
 
 			}
 
@@ -763,16 +763,20 @@ class ChatMainCommand
 
 			if (ret.externalCommandId != null) {
 
-				return commandManager.handle (
+				commandManager.handle (
 					ret.externalCommandId,
 					receivedMessage,
 					ret.rest);
 
+				return;
+
 			} else {
 
-				return ret.joiner.handle (
+				ret.joiner.handle (
 					receivedMessage,
 					ret.rest);
+
+				return;
 
 			}
 
@@ -815,7 +819,7 @@ class ChatMainCommand
 
 				transaction.commit ();
 
-				return null;
+				return;
 
 			} else {
 
@@ -838,8 +842,10 @@ class ChatMainCommand
 
 				transaction.commit ();
 
-				return joiner.handle (
+				joiner.handle (
 					receivedMessage);
+
+				return;
 
 			}
 
@@ -870,7 +876,7 @@ class ChatMainCommand
 
 			transaction.commit ();
 
-			return null;
+			return;
 
 		}
 

@@ -14,6 +14,7 @@ import wbs.framework.object.ObjectManager;
 import wbs.platform.email.logic.EmailLogic;
 import wbs.platform.lock.logic.LockLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
@@ -21,6 +22,7 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.model.DeliveryDao;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
+import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.orderer.model.OrdererOrderObjectHelper;
@@ -31,6 +33,8 @@ import wbs.smsapps.orderer.model.OrdererRec;
 public
 class OrdererCommandTypeHandler
 	implements CommandHandler {
+
+	// dependencies
 
 	@Inject
 	CommandObjectHelper commandHelper;
@@ -48,6 +52,9 @@ class OrdererCommandTypeHandler
 	EmailLogic emailUtils;
 
 	@Inject
+	InboxLogic inboxLogic;
+
+	@Inject
 	MessageObjectHelper messageHelper;
 
 	@Inject
@@ -62,6 +69,8 @@ class OrdererCommandTypeHandler
 	@Inject
 	Provider<MessageSender> messageSender;
 
+	// details
+
 	@Override
 	public
 	String[] getCommandTypes () {
@@ -72,9 +81,11 @@ class OrdererCommandTypeHandler
 
 	}
 
+	// implementation
+
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -90,6 +101,11 @@ class OrdererCommandTypeHandler
 			(OrdererRec) (Object)
 			objectManager.getParent (
 				command);
+
+		ServiceRec defaultService =
+			serviceHelper.findByCode (
+				orderer,
+				"default");
 
 		MessageRec message =
 			messageHelper.find (
@@ -120,9 +136,15 @@ class OrdererCommandTypeHandler
 
 			if (! ordererOrders.isEmpty ()) {
 
+				inboxLogic.inboxProcessed (
+					message,
+					null,
+					null,
+					command);
+
 				transaction.commit ();
 
-				return Status.processed;
+				return;
 
 			}
 
@@ -133,30 +155,62 @@ class OrdererCommandTypeHandler
 		OrdererOrderRec order =
 			ordererOrderHelper.insert (
 				new OrdererOrderRec ()
-					.setOrderer (orderer)
-					.setNumber (number)
-					.setReceivedMessage (message)
-					.setText (receivedMessage.getRest ()));
+
+			.setOrderer (
+				orderer)
+
+			.setNumber (
+				number)
+
+			.setReceivedMessage (
+				message)
+
+			.setText (
+				receivedMessage.getRest ()));
 
 		// send the billed message
 
 		MessageRec billedMessage =
 			messageSender.get ()
-				.threadId (message.getThreadId ())
-				.number (number)
-				.messageString (orderer.getBillTemplate ())
-				.numFrom (orderer.getBillNumber ())
-				.route (orderer.getBillRoute ())
-				.serviceLookup (orderer, "default")
-				.deliveryTypeCode ("orderer")
-				.ref (order.getId ())
-				.send ();
 
-		order.setBilledMessage (billedMessage);
+			.threadId (
+				message.getThreadId ())
+
+			.number (
+				number)
+
+			.messageString (
+				orderer.getBillTemplate ())
+
+			.numFrom (
+				orderer.getBillNumber ())
+
+			.route (
+				orderer.getBillRoute ())
+				
+			.service (
+				defaultService)
+
+			.deliveryTypeCode (
+				"orderer")
+
+			.ref (
+				order.getId ())
+
+			.send ();
+
+		order
+
+			.setBilledMessage (
+				billedMessage);
+
+		inboxLogic.inboxProcessed (
+			message,
+			defaultService,
+			null,
+			command);
 
 		transaction.commit ();
-
-		return Status.processed;
 
 	}
 

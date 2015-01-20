@@ -26,6 +26,7 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
+import wbs.sms.message.inbox.logic.InboxLogic;
 
 @PrototypeComponent ("chatDateStopCommand")
 public
@@ -56,6 +57,9 @@ class ChatDateStopCommand
 	Database database;
 
 	@Inject
+	InboxLogic inboxLogic;
+
+	@Inject
 	MessageObjectHelper messageHelper;
 
 	@Inject
@@ -77,7 +81,7 @@ class ChatDateStopCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -118,14 +122,6 @@ class ChatDateStopCommand
 				chat,
 				message);
 
-		// update received message
-
-		receivedMessage.setServiceId (
-			serviceHelper.findByCode (chat, "default").getId ());
-
-		receivedMessage.setAffiliateId (
-			chatUserLogic.getAffiliateId (chatUser));
-
 		// update dating mode
 
 		chatDateLogic.userDateStuff (
@@ -144,9 +140,19 @@ class ChatDateStopCommand
 			command,
 			false);
 
+		// process inbox
+
+		inboxLogic.inboxProcessed (
+			message,
+			serviceHelper.findByCode (
+				chat,
+				"default"),
+			chatUserLogic.getAffiliate (
+				chatUser),
+			command);
+
 		transaction.commit ();
 
-		return Status.processed;
 	}
 
 }

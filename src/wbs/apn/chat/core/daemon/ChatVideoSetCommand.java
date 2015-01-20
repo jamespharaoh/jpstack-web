@@ -17,12 +17,16 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
+import wbs.sms.message.inbox.logic.InboxLogic;
 
 import com.google.common.base.Optional;
 
@@ -30,6 +34,8 @@ import com.google.common.base.Optional;
 public
 class ChatVideoSetCommand
 	implements CommandHandler {
+
+	// dependencies
 
 	@Inject
 	ChatHelpLogLogic chatHelpLogLogic;
@@ -53,10 +59,18 @@ class ChatVideoSetCommand
 	Database database;
 
 	@Inject
+	InboxLogic inboxLogic;
+
+	@Inject
 	MessageObjectHelper messageHelper;
 
 	@Inject
 	ObjectManager objectManager;
+
+	@Inject
+	ServiceObjectHelper serviceHelper;
+
+	// details
 
 	@Override
 	public String[] getCommandTypes () {
@@ -67,9 +81,11 @@ class ChatVideoSetCommand
 
 	}
 
+	// implementation
+
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -86,6 +102,11 @@ class ChatVideoSetCommand
 			objectManager.getParent (
 				command);
 
+		ServiceRec defaultService =
+			serviceHelper.findByCode (
+				chat,
+				"default");
+
 		MessageRec message =
 			messageHelper.find (
 				receivedMessage.getMessageId ());
@@ -95,16 +116,9 @@ class ChatVideoSetCommand
 				chat,
 				message);
 
-		// set received message stuff
-
-		chatUserLogic.setAffiliateId (
-			receivedMessage,
-			chatUser);
-
-		chatMiscLogic.setServiceId (
-			receivedMessage,
-			chat,
-			"default");
+		AffiliateRec affiliate =
+			chatUserLogic.getAffiliate (
+				chatUser);
 
 		// log request
 
@@ -146,11 +160,17 @@ class ChatVideoSetCommand
 
 		}
 
+		// process inbox
+
+		inboxLogic.inboxProcessed (
+			message,
+			defaultService,
+			affiliate,
+			command);
+
 		// and return
 
 		transaction.commit ();
-
-		return Status.processed;
 
 	}
 

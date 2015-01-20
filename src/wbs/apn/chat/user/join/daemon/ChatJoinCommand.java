@@ -87,7 +87,7 @@ class ChatJoinCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -121,12 +121,14 @@ class ChatJoinCommand
 				commandCodeToOrient.get (
 					command.getCode ());
 
-			return chatJoiner.get ()
+			chatJoiner.get ()
 				.chatId (chat.getId ())
 				.joinType (joinType)
 				.gender (gender)
 				.orient (orient)
 				.handle (receivedMessage);
+
+			return;
 
 		}
 
@@ -144,11 +146,13 @@ class ChatJoinCommand
 			if (joinType == null)
 				throw new RuntimeException ();
 
-			return chatJoiner.get ()
+			chatJoiner.get ()
 				.chatId (chat.getId ())
 				.chatSchemeId (chatScheme.getId ())
 				.joinType (joinType)
 				.handle (receivedMessage);
+
+			return;
 
 		}
 
@@ -169,12 +173,14 @@ class ChatJoinCommand
 			if (joinType == null)
 				throw new RuntimeException ();
 
-			return chatJoiner.get ()
+			chatJoiner.get ()
 				.chatId (chat.getId ())
 				.joinType (joinType)
 				.chatAffiliateId (chatAffiliate.getId ())
 				.chatSchemeId (chatScheme.getId ())
 				.handle (receivedMessage);
+
+			return;
 
 		}
 

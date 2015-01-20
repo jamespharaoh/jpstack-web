@@ -73,7 +73,7 @@ class ChatBlockAllCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -143,8 +143,6 @@ class ChatBlockAllCommand
 			message);
 
 		transaction.commit ();
-
-		return null;
 
 	}
 
