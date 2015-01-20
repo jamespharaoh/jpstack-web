@@ -1,11 +1,11 @@
 package wbs.platform.console.context;
 
 import wbs.platform.console.helper.ConsoleHelper;
-import wbs.platform.console.spec.ConsoleSimpleBuilderContainer;
+import wbs.platform.console.module.SimpleConsoleBuilderContainer;
 
 public
 interface ConsoleContextBuilderContainer
-	extends ConsoleSimpleBuilderContainer {
+	extends SimpleConsoleBuilderContainer {
 
 	String structuralName ();
 

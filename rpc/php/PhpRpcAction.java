@@ -24,7 +24,7 @@ import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.utils.cal.CalDate;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.api.WebApiAction;
+import wbs.platform.api.mvc.WebApiAction;
 import wbs.platform.php.PhpEntity;
 import wbs.platform.php.PhpFormatter;
 import wbs.platform.php.PhpUnserializeException;

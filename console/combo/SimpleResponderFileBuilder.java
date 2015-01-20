@@ -16,8 +16,8 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.module.ConsoleModuleImpl;
+import wbs.platform.console.module.SimpleConsoleBuilderContainer;
 import wbs.platform.console.responder.ConsoleFile;
-import wbs.platform.console.spec.ConsoleSimpleBuilderContainer;
 
 @PrototypeComponent ("simpleResponderFileBuilder")
 @ConsoleModuleBuilderHandler
@@ -32,7 +32,7 @@ class SimpleResponderFileBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleSimpleBuilderContainer simpleContainerSpec;
+	SimpleConsoleBuilderContainer simpleContainerSpec;
 
 	@BuilderSource
 	SimpleResponderFileSpec simpleResponderFileSpec;

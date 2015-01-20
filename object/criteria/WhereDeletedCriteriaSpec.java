@@ -6,7 +6,7 @@ import wbs.framework.data.annotations.DataClass;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.platform.console.helper.ConsoleHelper;
-import wbs.platform.console.spec.ConsoleModuleData;
+import wbs.platform.console.module.ConsoleModuleData;
 
 @Accessors (fluent = true)
 @DataClass ("where-deleted")

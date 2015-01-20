@@ -6,8 +6,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
-import wbs.platform.console.spec.ConsoleModuleData;
-import wbs.platform.console.spec.ConsoleSpec;
+import wbs.platform.console.module.ConsoleModuleData;
+import wbs.platform.console.module.ConsoleModuleSpec;
 
 @Accessors (fluent = true)
 @Data
@@ -20,7 +20,7 @@ class ContextTabResponderSpec {
 	// tree attributes
 
 	@DataAncestor
-	ConsoleSpec consoleSpec;
+	ConsoleModuleSpec consoleSpec;
 
 	// attributes
 
