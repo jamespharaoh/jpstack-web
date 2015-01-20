@@ -3,6 +3,7 @@ package wbs.platform.console.forms;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -24,20 +25,16 @@ class DoubleFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
+	Provider<DelegateFormFieldAccessor>
+	delegateFormFieldAccessorProvider;
+
+	@Inject
 	Provider<DoubleFormFieldInterfaceMapping>
 	doubleFormFieldInterfaceMappingProvider;
 
 	@Inject
-	Provider<ReadOnlyFormField>
-	readOnlyFormFieldProvider;
-
-	@Inject
-	Provider<SimpleFormFieldUpdateHook>
-	simpleFormFieldUpdateHookProvider;
-
-	@Inject
-	Provider<UpdatableFormField>
-	updatableFormFieldProvider;
+	Provider<DoubleFormFieldValueValidator>
+	doubleFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<IdentityFormFieldNativeMapping>
@@ -48,16 +45,24 @@ class DoubleFormFieldBuilder {
 	nullFormFieldValueConstraintValidatorProvider;
 
 	@Inject
-	Provider<DoubleFormFieldValueValidator>
-	doubleFormFieldValueValidatorProvider;
+	Provider<ReadOnlyFormField>
+	readOnlyFormFieldProvider;
 
 	@Inject
 	Provider<SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
 	@Inject
+	Provider<SimpleFormFieldUpdateHook>
+	simpleFormFieldUpdateHookProvider;
+
+	@Inject
 	Provider<TextFormFieldRenderer>
 	textFormFieldRendererProvider;
+
+	@Inject
+	Provider<UpdatableFormField>
+	updatableFormFieldProvider;
 
 	// builder
 
@@ -79,6 +84,14 @@ class DoubleFormFieldBuilder {
 
 		String name =
 			spec.name ();
+
+		String fullName =
+			spec.delegate () == null
+				? name
+				: stringFormat (
+					"%s.%s",
+					spec.delegate (),
+					name);
 
 		String label =
 			ifNull (
@@ -110,6 +123,19 @@ class DoubleFormFieldBuilder {
 
 			.nativeClass (
 				Double.class);
+
+		if (spec.delegate () != null) {
+
+			accessor =
+				delegateFormFieldAccessorProvider.get ()
+
+				.path (
+					spec.delegate ())
+
+				.delegateFormFieldAccessor (
+					accessor);
+
+		}
 
 		// native mapping
 
@@ -146,7 +172,7 @@ class DoubleFormFieldBuilder {
 			textFormFieldRendererProvider.get ()
 
 			.name (
-				name)
+				fullName)
 
 			.label (
 				label)
@@ -175,7 +201,7 @@ class DoubleFormFieldBuilder {
 				updatableFormFieldProvider.get ()
 
 				.name (
-					name)
+					fullName)
 
 				.label (
 					label)
@@ -209,7 +235,7 @@ class DoubleFormFieldBuilder {
 				readOnlyFormFieldProvider.get ()
 
 				.name (
-					name)
+					fullName)
 
 				.label (
 					label)
