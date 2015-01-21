@@ -5,11 +5,10 @@
 /.bin/
 /bin/
 /work/
-/.apt_generated
+/.apt_generated/
 /wbs-framework.jar
 /c/modeminit
 /c/socktest
-/work
 /.Trash-*/
 
 # cabal

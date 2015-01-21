@@ -24,8 +24,8 @@ import wbs.platform.console.context.ConsoleContextPrivLookup;
 import wbs.platform.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.lookup.BooleanLookup;
-import wbs.platform.console.metamodule.ConsoleMetaManager;
-import wbs.platform.console.metamodule.ConsoleMetaModuleImpl;
+import wbs.platform.console.module.ConsoleMetaManager;
+import wbs.platform.console.module.ConsoleMetaModuleImpl;
 import wbs.platform.console.module.ConsoleModuleImpl;
 import wbs.platform.console.part.PagePart;
 import wbs.platform.console.responder.ConsoleFile;
@@ -186,7 +186,7 @@ class ObjectSmsMessageSetPageBuilder {
 
 			@Override
 			public
-			Responder go ()
+			Responder handle ()
 				throws ServletException {
 
 				Action action =
@@ -194,7 +194,7 @@ class ObjectSmsMessageSetPageBuilder {
 						.lookup (canViewLookup)
 						.normalResponder (responder);
 
-				return action.go ();
+				return action.handle ();
 
 			}
 
@@ -205,7 +205,7 @@ class ObjectSmsMessageSetPageBuilder {
 
 			@Override
 			public
-			Responder go ()
+			Responder handle ()
 				throws ServletException {
 
 				Action action =
@@ -214,7 +214,7 @@ class ObjectSmsMessageSetPageBuilder {
 						.messageSetFinder (messageSetFinder)
 						.privLookup (canUpdateLookup);
 
-				return action.go ();
+				return action.handle ();
 
 			}
 

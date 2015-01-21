@@ -401,7 +401,14 @@ class Oxygen8Sender
 			String responseLines[] =
 				responseString.split ("\n");
 
-			if (
+			if (responseLines.length != 3) {
+
+				throw tempFailure (
+					stringFormat (
+						"Invalid response: %s",
+						responseString));
+
+			} else if (
 				equal (
 					responseLines [0],
 					"101")
@@ -409,13 +416,15 @@ class Oxygen8Sender
 
 				return responseLines [2].split (",");
 
-			}
+			} else {
 
-			throw tempFailure (
-				stringFormat (
-					"Error %s: %s",
-					responseLines [0],
-					responseLines [1]));
+				throw tempFailure (
+					stringFormat (
+						"Error %s: %s",
+						responseLines [0],
+						responseLines [1]));
+
+			}
 
 		}
 

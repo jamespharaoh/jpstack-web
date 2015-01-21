@@ -9,9 +9,7 @@ import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
-import wbs.framework.record.Record;
 import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 
 public
 interface ChatMiscLogic {
@@ -60,11 +58,6 @@ interface ChatMiscLogic {
 			Gender gender,
 			Orient orient,
 			int target);
-
-	void setServiceId (
-			ReceivedMessage receivedMessage,
-			Record<?> object,
-			String code);
 
 	void userAutoJoin (
 			ChatUserRec chatUser,

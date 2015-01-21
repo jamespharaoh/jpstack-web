@@ -32,19 +32,19 @@ class ImChatCoreFixtureProvider
 
 	@Inject
 	MenuObjectHelper menuHelper;
-	
+
 	@Inject
 	ImChatObjectHelper imChatHelper;
-	
+
 	@Inject
 	ImChatCustomerObjectHelper imChatCustomerHelper;
-	
+
 	@Inject
 	ImChatConversationObjectHelper imChatConversationHelper;
-	
+
 	@Inject
 	ImChatMessageObjectHelper imChatMessageHelper;
-	
+
 	@Inject
 	SliceObjectHelper sliceHelper;
 
@@ -68,52 +68,52 @@ class ImChatCoreFixtureProvider
 
 				.setPath (
 					"/imChats");
-		
+
 		menuHelper.insert (menu);
-		
+
 		ImChatRec imchat = new ImChatRec ()
 
 			.setSlice(sliceHelper.findByCode(GlobalId.root, "test"))
-	
+
 			.setCode("im_chat")
-			
+
 			.setName("im_chat")
-			.setDescription("im_chat"); 
-					
+			.setDescription("im_chat");
+
 		imChatHelper.insert (imchat);
-		
+
 		String code = generateCode();
 		ImChatCustomerRec imchatcustomer = new ImChatCustomerRec ()
 
-			.setImChat(imChatHelper.findByCode(imchat, "im_chat"))	
+			.setImChat(imChatHelper.findByCode(imchat, "im_chat"))
 			.setCode(code);
-		
+
 		imChatCustomerHelper.insert(imchatcustomer);
-		
+
 		ImChatConversationRec imchatconversation = new ImChatConversationRec ()
 
-			.setImChatCustomer(imChatCustomerHelper.findByCode(imchatcustomer, code))	
+			.setImChatCustomer(imChatCustomerHelper.findByCode(imchatcustomer, code))
 			.setIndex(imchatcustomer.getNumConversations());
-	
+
 		imchatcustomer.setNumConversations(imchatcustomer.getNumConversations() + 1);
 		imChatConversationHelper.insert(imchatconversation);
-		
+
 		ImChatMessageRec imchatmessage = new ImChatMessageRec ()
 
-			.setImChatConversation(imchatconversation)	
+			.setImChatConversation(imchatconversation)
 			.setIndex(imchatconversation.getNumMessages());
-	
+
 		imchatconversation.setNumMessages(imchatconversation.getNumMessages() + 1);
 		imChatMessageHelper.insert(imchatmessage);
 
 	}
-	
+
 	public
 	String generateCode () {
 
 		int code;
 		Random random = new Random();
-		
+
 		code = random.nextInt (90000000) + 10000000;
 
 		return Integer.toString (code);

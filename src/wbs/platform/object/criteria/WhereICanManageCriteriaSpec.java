@@ -7,7 +7,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.record.Record;
 import wbs.platform.console.helper.ConsoleHelper;
-import wbs.platform.console.spec.ConsoleModuleData;
+import wbs.platform.console.module.ConsoleModuleData;
 import wbs.platform.priv.console.PrivChecker;
 
 @Accessors (fluent = true)

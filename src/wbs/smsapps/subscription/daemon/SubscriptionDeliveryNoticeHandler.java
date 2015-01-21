@@ -1,5 +1,6 @@
 package wbs.smsapps.subscription.daemon;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import java.util.Arrays;
@@ -104,6 +105,19 @@ class SubscriptionDeliveryNoticeHandler
 				.setState (
 					SubscriptionBillState.failed);
 
+			if (
+				equal (
+					subscriptionNumber.getPendingSubscriptionBill (),
+					subscriptionBill)
+			) {
+
+				subscriptionNumber
+
+					.setPendingSubscriptionBill (
+						null);
+
+			}
+
 		} else if (
 			subscriptionBill.getState () != SubscriptionBillState.delivered
 			&& delivery.getNewMessageStatus ().isGoodType ()
@@ -124,6 +138,19 @@ class SubscriptionDeliveryNoticeHandler
 				.setBalance (
 					subscriptionNumber.getBalance ()
 					+ subscription.getCreditsPerBill ());
+
+			if (
+				equal (
+					subscriptionNumber.getPendingSubscriptionBill (),
+					subscriptionBill)
+			) {
+
+				subscriptionNumber
+
+					.setPendingSubscriptionBill (
+						null);
+
+			}
 
 			// send pending
 

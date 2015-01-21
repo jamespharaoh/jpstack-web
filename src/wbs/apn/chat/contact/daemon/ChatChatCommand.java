@@ -28,6 +28,7 @@ import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
@@ -110,12 +111,11 @@ class ChatChatCommand
 
 	// state
 
-	Status status;
-
 	CommandRec thisCommand;
 	ChatRec chat;
 	MessageRec message;
 	ChatUserRec fromChatUser;
+	AffiliateRec affiliate;
 	ChatUserRec toChatUser;
 
 	// details
@@ -321,11 +321,9 @@ class ChatChatCommand
 					rest,
 					0);
 
-			status =
-				commandManager.handle (
-					chatKeyword.getCommand ().getId (),
-					newMessage);
-
+			commandManager.handle (
+				chatKeyword.getCommand ().getId (),
+				newMessage);
 
 			return true;
 
@@ -365,8 +363,8 @@ class ChatChatCommand
 
 		transaction.commit ();
 
-		status =
-			joiner.handle (receivedMessage);
+		joiner.handle (
+			receivedMessage);
 
 		return true;
 
@@ -374,7 +372,7 @@ class ChatChatCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -399,19 +397,23 @@ class ChatChatCommand
 				chat,
 				message);
 
+		affiliate =
+			chatUserLogic.getAffiliate (
+				fromChatUser);
+
 		toChatUser =
 			chatUserHelper.find (
 				receivedMessage.getRef ());
 
 		// treat as join if the user has no affiliate
 
-		if (tryJoin (
+		if (
+			tryJoin (
 				transaction,
-				receivedMessage))
-			return status;
-
-		receivedMessage.setAffiliateId (
-			chatUserLogic.getAffiliateId (fromChatUser));
+				receivedMessage)
+		) {
+			return;
+		}
 
 		String rest =
 			receivedMessage.getRest ();
@@ -426,13 +428,15 @@ class ChatChatCommand
 			if (! rest.isEmpty ())
 				continue;
 
-			if (checkKeyword (
-				transaction,
-				receivedMessage,
-				match.simpleKeyword (),
-				""))
-
-				return status;
+			if (
+				checkKeyword (
+					transaction,
+					receivedMessage,
+					match.simpleKeyword (),
+					"")
+			) {
+				return;
+			}
 
 		}
 
@@ -443,8 +447,10 @@ class ChatChatCommand
 				transaction,
 				receivedMessage)
 		) {
-			return status;
+			return;
 		}
+
+		// error
 
 		throw new RuntimeException ();
 

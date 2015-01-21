@@ -13,7 +13,7 @@ import wbs.framework.web.RegexpPathHandler;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
-import wbs.platform.api.ApiFile;
+import wbs.platform.api.mvc.ApiFile;
 
 import com.google.common.collect.ImmutableMap;
 

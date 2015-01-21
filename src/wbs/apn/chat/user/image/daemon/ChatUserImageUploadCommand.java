@@ -87,7 +87,7 @@ class ChatUserImageUploadCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			ReceivedMessage receivedMessage) {
 
@@ -205,7 +205,7 @@ class ChatUserImageUploadCommand
 
 		transaction.commit ();
 
-		return null;
+		return;
 
 	}
 

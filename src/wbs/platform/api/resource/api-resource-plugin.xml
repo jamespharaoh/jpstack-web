@@ -1,0 +1,13 @@
+<plugin
+	name="api-resource"
+	package="wbs.platform.api.resource">
+
+	<layer name="api">
+		<bean class="ApiPostActionBuilder"/>
+		<bean class="ApiPostActionSpec"/>
+		<bean class="ApiResource"/>
+		<bean class="ApiResourceBuilder"/>
+		<bean class="ApiResourceSpec"/>
+	</layer>
+
+</plugin>

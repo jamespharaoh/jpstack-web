@@ -3,6 +3,7 @@
 	package="wbs.framework.web">
 
 	<layer name="web">
+		<bean class="ActionRequestHandler"/>
 		<bean class="PathHandlerServlet"/>
 		<bean class="RequestContextImpl"/>
 		<bean class="ResponseFilter"/>

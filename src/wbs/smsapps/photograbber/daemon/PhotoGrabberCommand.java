@@ -41,6 +41,7 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
+import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.smsapps.photograbber.model.PhotoGrabberRec;
@@ -53,6 +54,8 @@ public
 class PhotoGrabberCommand
 	implements CommandHandler {
 
+	// dependencies
+
 	@Inject
 	CommandObjectHelper commandHelper;
 
@@ -61,6 +64,9 @@ class PhotoGrabberCommand
 
 	@Inject
 	Database database;
+
+	@Inject
+	InboxLogic inboxLogic;
 
 	@Inject
 	MediaLogic mediaUtils;
@@ -83,6 +89,8 @@ class PhotoGrabberCommand
 	@Inject
 	Provider<MessageSender> messageSender;
 
+	// details
+
 	@Override
 	public String[] getCommandTypes () {
 
@@ -92,9 +100,11 @@ class PhotoGrabberCommand
 
 	}
 
+	// implementation
+
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -122,9 +132,6 @@ class PhotoGrabberCommand
 			serviceHelper.findByCode (
 				photoGrabber,
 				"default");
-
-		receivedMessage.setServiceId (
-			defaultService.getId ());
 
 		PhotoGrabberRequestRec photoGrabberRequest =
 			new PhotoGrabberRequestRec ()
@@ -179,9 +186,13 @@ class PhotoGrabberCommand
 				message.getNumber (),
 				serviceHelper.findByCode (photoGrabber, "default"));
 
-			transaction.commit ();
+			inboxLogic.inboxProcessed (
+				message,
+				defaultService,
+				null,
+				command);
 
-			return Status.processed;
+			transaction.commit ();
 
 		}
 
@@ -218,9 +229,15 @@ class PhotoGrabberCommand
 				message.getNumber (),
 				serviceHelper.findByCode (photoGrabber, "default"));
 
-			transaction.commit();
+			inboxLogic.inboxProcessed (
+				message,
+				defaultService,
+				null,
+				command);
 
-			return Status.processed;
+			transaction.commit ();
+
+			return;
 
 		}
 
@@ -259,9 +276,13 @@ class PhotoGrabberCommand
 		photoGrabberRequestHelper.insert (
 			photoGrabberRequest);
 
-		transaction.commit ();
+		inboxLogic.inboxProcessed (
+			message,
+			defaultService,
+			null,
+			command);
 
-		return Status.processed;
+		transaction.commit ();
 
 	}
 

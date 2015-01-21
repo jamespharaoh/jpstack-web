@@ -42,20 +42,6 @@ SELECT priv_type_insert (
 
 SELECT priv_type_insert (
 	'subscription',
-	'admin',
-	'Admin tasks',
-	'Perform administrative tasks on this subscription',
-	true);
-
-SELECT priv_type_insert (
-	'subscription',
-	'subscription_send',
-	'Send to subscription',
-	'Send messages to users who are subscribed to this subscription',
-	true);
-
-SELECT priv_type_insert (
-	'subscription',
 	'stats',
 	'View message stats',
 	'View message stats for this subscription',

@@ -12,7 +12,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.web.PathHandler;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.console.module.ConsoleModuleImpl;
-import wbs.platform.console.spec.ConsoleSimpleBuilderContainer;
+import wbs.platform.console.module.SimpleConsoleBuilderContainer;
 
 @PrototypeComponent ("simplePathBuilder")
 @ConsoleModuleBuilderHandler
@@ -27,7 +27,7 @@ class SimplePathBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleSimpleBuilderContainer simpleContainerSpec;
+	SimpleConsoleBuilderContainer simpleContainerSpec;
 
 	@BuilderSource
 	SimplePathSpec simplePathSpec;

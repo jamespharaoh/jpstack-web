@@ -19,11 +19,20 @@ public abstract
 class AbstractFile
 	implements WebFile {
 
+	// dependencies
+
 	@Inject
 	ApplicationContext applicationContext;
 
 	@Inject
 	RequestContext requestContext;
+
+	// prototype dependencies
+
+	@Inject
+	Provider<ActionRequestHandler> actionRequestHandlerProvider;
+
+	// extension points
 
 	public abstract
 	RequestHandler getHandler ();
@@ -172,40 +181,6 @@ class AbstractFile
 			}
 
 		};
-
-	}
-
-	public
-	RequestHandler actionToRequestHandler (
-			Action action) {
-
-		return new ActionRequestHandler (
-			action);
-
-	}
-
-	public
-	RequestHandler actionNameToRequestHandler (
-			final String actionName) {
-
-		return actionToRequestHandler (
-			new Action () {
-
-			@Override
-			public
-			Responder go ()
-				throws ServletException {
-
-				Action action =
-					applicationContext.getBean (
-						actionName,
-						Action.class);
-
-				return action.go ();
-
-			}
-
-		});
 
 	}
 

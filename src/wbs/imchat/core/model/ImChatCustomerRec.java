@@ -29,7 +29,7 @@ import wbs.imchat.core.model.ImChatCustomerSearch;
 @MajorEntity
 public class ImChatCustomerRec
 	implements CommonRecord<ImChatCustomerRec>{
-	
+
 	// identity
 
 	@GeneratedIdField
@@ -37,15 +37,15 @@ public class ImChatCustomerRec
 
 	@ParentField
 	ImChatRec imChat;
-	
+
 	@CodeField
 	String code;
-	
+
 	//statistics
-	
+
 	@SimpleField
 	Integer numConversations = 0;
-	
+
 	// dao methods
 
 	public static
@@ -55,7 +55,7 @@ public class ImChatCustomerRec
 				ImChatCustomerSearch imChatCustomerSearch);
 
 	}
-	
+
 	// object hooks
 
 	public static
@@ -81,13 +81,13 @@ public class ImChatCustomerRec
 		}
 
 	}
-	
+
 	@Override
 	public int compareTo(Record<ImChatCustomerRec> otherRecord) {
-		
+
 		ImChatCustomerRec other =
 				(ImChatCustomerRec) otherRecord;
-		
+
 		return new CompareToBuilder ()
 
 		.append (
@@ -99,7 +99,7 @@ public class ImChatCustomerRec
 			other.getCode ())
 
 		.toComparison ();
-		
+
 	}
-	
+
 }

@@ -104,16 +104,8 @@
 			package="wbs.platform.console.combo"/>
 
 		<plugin
-			name="console-spec"
-			package="wbs.platform.console.spec"/>
-
-		<plugin
 			name="console-object"
 			package="wbs.platform.console.object"/>
-
-		<plugin
-			name="console-metamodule"
-			package="wbs.platform.console.metamodule"/>
 
 		<plugin
 			name="hooks"
@@ -248,8 +240,16 @@
 			package="wbs.platform.rpc"/>
 
 		<plugin
-			name="api"
-			package="wbs.platform.api"/>
+			name="api-module"
+			package="wbs.platform.api.module"/>
+
+		<plugin
+			name="api-mvc"
+			package="wbs.platform.api.mvc"/>
+
+		<plugin
+			name="api-resource"
+			package="wbs.platform.api.resource"/>
 
 		<plugin
 			name="reporting"

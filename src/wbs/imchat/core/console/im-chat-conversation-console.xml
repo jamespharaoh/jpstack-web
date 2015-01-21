@@ -9,11 +9,11 @@
 		<context-stuff
 			name="imChatConversationId"
 			field="id"/>
-			
+
 		<context-stuff
 			name="imChatConversationName"
 			field="index"/>
-			
+
 		<context-stuff
 			name="imChatCustomerId"
 			delegate="imChatCustomer"
@@ -29,7 +29,7 @@
 		object-name="imChatConversation">
 
 		<list>
-			
+
 			<object-list-page
 				fields="list"/>
 
@@ -43,13 +43,13 @@
 			<object-settings-page
 				fields="settings"
 				priv-key="imChatCustomer.imChat.manage"/>
-				
+
 			<context-link
 				name="message"
 				link="imChatMessage"
 				label="Messages"
 				priv-key="imChatCustomer.imChat.manage"/>
-	
+
 		</object>
 
 	</object-context>

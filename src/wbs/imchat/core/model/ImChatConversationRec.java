@@ -21,7 +21,7 @@ import wbs.framework.record.Record;
 @MajorEntity
 public class ImChatConversationRec
 	implements CommonRecord<ImChatConversationRec>{
-	
+
 	// identity
 
 	@GeneratedIdField
@@ -29,22 +29,22 @@ public class ImChatConversationRec
 
 	@ParentField
 	ImChatCustomerRec imChatCustomer;
-	
+
 	@IndexField (
 		counter = "numConversations")
 	Integer index;
-	
+
 	//statistics
-	
+
 	@SimpleField
 	Integer numMessages = 0;
-	
+
 	@Override
 	public int compareTo(Record<ImChatConversationRec> otherRecord) {
-		
+
 		ImChatConversationRec other =
 				(ImChatConversationRec) otherRecord;
-		
+
 		return new CompareToBuilder ()
 
 		.append (
@@ -56,7 +56,7 @@ public class ImChatConversationRec
 			other.getIndex ())
 
 		.toComparison ();
-		
+
 	}
 
 }

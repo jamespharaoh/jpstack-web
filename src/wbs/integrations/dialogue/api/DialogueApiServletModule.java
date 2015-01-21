@@ -34,7 +34,7 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
-import wbs.platform.api.ApiFile;
+import wbs.platform.api.mvc.ApiFile;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.gsm.ConcatenatedInformationElement;
 import wbs.sms.gsm.UserDataHeader;
@@ -347,7 +347,7 @@ class DialogueApiServletModule
 		new Action () {
 
 		@Override
-		public Responder go ()
+		public Responder handle ()
 			throws ServletException {
 
 			String idParam =

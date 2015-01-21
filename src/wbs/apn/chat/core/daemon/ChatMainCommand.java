@@ -490,6 +490,12 @@ class ChatMainCommand
 			@NonNull ChatUserRec chatUser) {
 
 		if (
+			chatUser.getFirstJoin () != null
+		) {
+			return null;
+		}
+
+		if (
 			! in (
 				chatUser.getNextJoinType (),
 				ChatKeywordJoinType.chatDob,
@@ -522,13 +528,16 @@ class ChatMainCommand
 		return new TryKeywordReturn ()
 
 			.joiner (
-				joiner);
+				joiner)
+
+			.rest (
+				receivedMessage.getRest ());
 
 	}
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -586,63 +595,63 @@ class ChatMainCommand
 
 		}
 
-		// look for a keyword
+		// look for a date of birth
 
 		TryKeywordReturn ret = null;
 
-		for (
-			KeywordFinder.Match match
-				: keywordFinder.find (
-					receivedMessage.getRest ())
-		) {
+		ret = tryDob (
+			commandId,
+			receivedMessage,
+			fromChatUser);
 
-			String keyword =
-				match.simpleKeyword ();
-
-			log.debug (
-				stringFormat (
-					"message %d: trying keyword \"%s\"",
-					receivedMessage.getMessageId (),
-					keyword));
-
-			// check if the keyword is a 6-digit number
-
-			if (keyword.matches ("\\d{6}")) {
-
-				doCode (
-					commandId,
-					receivedMessage,
-					keyword,
-					match.rest ());
-
-				transaction.commit ();
-
-				return null;
-
-			}
-
-			// check if it's a chat keyword
-
-			ret =
-				tryKeyword (
-					commandId,
-					receivedMessage,
-					keyword,
-					match.rest ());
-
-			if (ret != null)
-				break;
-
-		}
-
-		// look for a date of birth
+		// look for a keyword
 
 		if (ret == null) {
 
-			ret = tryDob (
-				commandId,
-				receivedMessage,
-				fromChatUser);
+			for (
+				KeywordFinder.Match match
+					: keywordFinder.find (
+						receivedMessage.getRest ())
+			) {
+
+				String keyword =
+					match.simpleKeyword ();
+
+				log.debug (
+					stringFormat (
+						"message %d: trying keyword \"%s\"",
+						receivedMessage.getMessageId (),
+						keyword));
+
+				// check if the keyword is a 6-digit number
+
+				if (keyword.matches ("\\d{6}")) {
+
+					doCode (
+						commandId,
+						receivedMessage,
+						keyword,
+						match.rest ());
+
+					transaction.commit ();
+
+					return;
+
+				}
+
+				// check if it's a chat keyword
+
+				ret =
+					tryKeyword (
+						commandId,
+						receivedMessage,
+						keyword,
+						match.rest ());
+
+				if (ret != null)
+					break;
+
+			}
 
 		}
 
@@ -660,7 +669,7 @@ class ChatMainCommand
 
 			transaction.commit ();
 
-			return commandManager.handle (
+			commandManager.handle (
 				ret.externalCommandId,
 				receivedMessage,
 				ret.rest);
@@ -698,7 +707,7 @@ class ChatMainCommand
 
 				transaction.commit ();
 
-				return null;
+				return;
 
 			}
 
@@ -730,7 +739,7 @@ class ChatMainCommand
 
 				transaction.commit ();
 
-				return null;
+				return;
 
 			}
 
@@ -754,16 +763,20 @@ class ChatMainCommand
 
 			if (ret.externalCommandId != null) {
 
-				return commandManager.handle (
+				commandManager.handle (
 					ret.externalCommandId,
 					receivedMessage,
 					ret.rest);
 
+				return;
+
 			} else {
 
-				return ret.joiner.handle (
+				ret.joiner.handle (
 					receivedMessage,
 					ret.rest);
+
+				return;
 
 			}
 
@@ -806,7 +819,7 @@ class ChatMainCommand
 
 				transaction.commit ();
 
-				return null;
+				return;
 
 			} else {
 
@@ -829,8 +842,10 @@ class ChatMainCommand
 
 				transaction.commit ();
 
-				return joiner.handle (
+				joiner.handle (
 					receivedMessage);
+
+				return;
 
 			}
 
@@ -861,7 +876,7 @@ class ChatMainCommand
 
 			transaction.commit ();
 
-			return null;
+			return;
 
 		}
 

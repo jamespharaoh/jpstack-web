@@ -10,12 +10,14 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
+import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
@@ -42,6 +44,9 @@ class ForwarderCommand
 	ForwarderObjectHelper forwarderHelper;
 
 	@Inject
+	InboxLogic inboxLogic;
+
+	@Inject
 	MessageObjectHelper messageHelper;
 
 	@Inject
@@ -66,7 +71,7 @@ class ForwarderCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -86,8 +91,10 @@ class ForwarderCommand
 			messageHelper.find (
 				receivedMessage.getMessageId ());
 
-		receivedMessage.setServiceId (
-			serviceHelper.findByCode (forwarder, "default").getId ());
+		ServiceRec defaultService =
+			serviceHelper.findByCode (
+				forwarder,
+				"default");
 
 		forwarderMessageInHelper.insert (
 			new ForwarderMessageInRec ()
@@ -101,13 +108,19 @@ class ForwarderCommand
 			messageSetLogic.findMessageSet (forwarder, "forwarder"),
 			message.getThreadId (),
 			message.getNumber (),
-			serviceHelper.findByCode (forwarder, "default"));
+			defaultService);
+
+		// process inbox
+
+		inboxLogic.inboxProcessed (
+			message,
+			defaultService,
+			null,
+			command);
 
 		// return
 
 		transaction.commit ();
-
-		return CommandHandler.Status.processed;
 
 	}
 

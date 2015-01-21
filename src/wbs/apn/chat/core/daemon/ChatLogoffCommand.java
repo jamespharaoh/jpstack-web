@@ -79,7 +79,7 @@ class ChatLogoffCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -132,7 +132,8 @@ class ChatLogoffCommand
 
 			transaction.commit ();
 
-			return null;
+			return;
+
 		}
 
 		// log the user off
@@ -143,8 +144,6 @@ class ChatLogoffCommand
 			false);
 
 		transaction.commit ();
-
-		return null;
 
 	}
 

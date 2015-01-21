@@ -64,7 +64,7 @@ class ChatMagicCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -110,7 +110,7 @@ class ChatMagicCommand
 						receivedMessage,
 						"");
 
-				return commandManager.handle (
+				commandManager.handle (
 					chatKeyword.getCommand ().getId (),
 					newMessage);
 
@@ -122,7 +122,7 @@ class ChatMagicCommand
 
 		// use the default command
 
-		return commandManager.handle (
+		commandManager.handle (
 			receivedMessage.getRef (),
 			receivedMessage);
 

@@ -340,7 +340,7 @@ class ManualResponderRequestPendingFormAction
 					manualResponderLogic.maximumMessageLength (
 						request,
 						template);
-				
+
 				int minLength =
 					manualResponderLogic.minimumMessageLength (
 						request,
@@ -362,7 +362,7 @@ class ManualResponderRequestPendingFormAction
 					return null;
 
 				}
-				
+
 				if (actualLength < minLength) {
 
 					requestContext.addError (

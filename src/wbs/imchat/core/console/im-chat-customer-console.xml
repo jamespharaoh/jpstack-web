@@ -9,7 +9,7 @@
 		<context-stuff
 			name="imChatCustomerId"
 			field="id"/>
-			
+
 		<context-stuff
 			name="imChatCustomerName"
 			field="code"/>
@@ -29,7 +29,7 @@
 		object-name="imChatCustomer">
 
 		<list>
-			
+
 			<object-search-page
 				search-fields="search"
 				results-fields="results"
@@ -47,7 +47,7 @@
 			<object-settings-page
 				fields="settings"
 				priv-key="imChat.manage"/>
-				
+
 			<context-link
 				name="conversation"
 				link="imChatConversation"

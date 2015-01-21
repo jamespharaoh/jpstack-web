@@ -11,8 +11,8 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.console.module.ConsoleModuleImpl;
+import wbs.platform.console.module.SimpleConsoleBuilderContainer;
 import wbs.platform.console.responder.ConsoleFile;
-import wbs.platform.console.spec.ConsoleSimpleBuilderContainer;
 
 @PrototypeComponent ("simpleFileBuilder")
 @ConsoleModuleBuilderHandler
@@ -27,7 +27,7 @@ class SimpleFileBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleSimpleBuilderContainer simpleContainerSpec;
+	SimpleConsoleBuilderContainer simpleContainerSpec;
 
 	@BuilderSource
 	SimpleFileSpec simpleFileSpec;

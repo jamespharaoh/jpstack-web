@@ -26,6 +26,7 @@ import wbs.framework.application.context.BeanDefinition;
 import wbs.framework.application.context.MethodBeanFactory;
 import wbs.framework.application.scaffold.BuildPluginSpec;
 import wbs.framework.application.scaffold.BuildSpec;
+import wbs.framework.application.scaffold.PluginApiModuleSpec;
 import wbs.framework.application.scaffold.PluginBeanSpec;
 import wbs.framework.application.scaffold.PluginConsoleModuleSpec;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
@@ -41,15 +42,19 @@ import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.object.ObjectHelperFactory;
 import wbs.framework.object.ObjectHelperProvider;
+import wbs.platform.api.module.ApiModule;
+import wbs.platform.api.module.ApiModuleFactory;
+import wbs.platform.api.module.ApiModuleSpec;
+import wbs.platform.api.module.ApiModuleSpecFactory;
 import wbs.platform.console.helper.ConsoleHelperFactory;
 import wbs.platform.console.helper.EnumConsoleHelper;
 import wbs.platform.console.helper.EnumConsoleHelperFactory;
-import wbs.platform.console.metamodule.ConsoleMetaModule;
-import wbs.platform.console.metamodule.ConsoleMetaModuleFactory;
+import wbs.platform.console.module.ConsoleMetaModule;
+import wbs.platform.console.module.ConsoleMetaModuleFactory;
 import wbs.platform.console.module.ConsoleModule;
 import wbs.platform.console.module.ConsoleModuleFactory;
+import wbs.platform.console.module.ConsoleModuleSpec;
 import wbs.platform.console.module.ConsoleModuleSpecFactory;
-import wbs.platform.console.spec.ConsoleSpec;
 import wbs.platform.object.core.hibernate.ObjectHelperProviderFactory;
 
 import com.google.common.collect.ImmutableList;
@@ -140,6 +145,7 @@ class ApplicationContextBuilder {
 			new DataFromXml ()
 
 			.registerBuilderClasses (
+				PluginApiModuleSpec.class,
 				PluginBeanSpec.class,
 				PluginConsoleModuleSpec.class,
 				PluginCustomTypeSpec.class,
@@ -297,6 +303,25 @@ class ApplicationContextBuilder {
 
 		}
 
+		if (equal (layerName, "api")) {
+
+			errors +=
+				registerApiLayerBeans (
+					plugin);
+
+			for (
+				PluginApiModuleSpec apiModule
+					: plugin.apiModules ()
+			) {
+
+				errors +=
+					registerApiModule (
+						apiModule);
+
+			}
+
+		}
+
 		if (equal (layerName, "console")) {
 
 			errors +=
@@ -311,12 +336,6 @@ class ApplicationContextBuilder {
 						consoleModule);
 
 			}
-
-			/*
-			registerMissingConsoleHelperProviders (
-				plugin,
-				consoleHelperProviderObjectNames);
-			*/
 
 		}
 
@@ -354,6 +373,77 @@ class ApplicationContextBuilder {
 
 	}
 
+	int registerApiModule (
+			@NonNull PluginApiModuleSpec pluginApiModuleSpec) {
+
+		String xmlResourceName =
+			stringFormat (
+				"/%s/api/%s-api.xml",
+				pluginApiModuleSpec
+					.plugin ()
+					.packageName ()
+					.replace (".", "/"),
+				pluginApiModuleSpec
+					.name ());
+
+		String apiModuleSpecBeanName =
+			stringFormat (
+				"%sApiModuleSpec",
+				hyphenToCamel (
+					pluginApiModuleSpec.name ()));
+
+		String apiModuleBeanName =
+			stringFormat (
+				"%sApiModule",
+				hyphenToCamel (
+					pluginApiModuleSpec.name ()));
+
+		applicationContext.registerBeanDefinition (
+			new BeanDefinition ()
+
+			.name (
+				apiModuleSpecBeanName)
+
+			.beanClass (
+				ApiModuleSpec.class)
+
+			.scope (
+				"singleton")
+
+			.factoryClass (
+				ApiModuleSpecFactory.class)
+
+			.addValueProperty (
+				"xmlResourceName",
+				xmlResourceName)
+
+		);
+
+		applicationContext.registerBeanDefinition (
+			new BeanDefinition ()
+
+			.name (
+				apiModuleBeanName)
+
+			.beanClass (
+				ApiModule.class)
+
+			.scope (
+				"singleton")
+
+			.factoryClass (
+				ApiModuleFactory.class)
+
+			.addReferenceProperty (
+				"apiModuleSpec",
+				apiModuleSpecBeanName)
+
+		);
+
+		return 0;
+
+	}
+
 	int registerConsoleModule (
 			@NonNull PluginConsoleModuleSpec pluginConsoleModuleSpec) {
 
@@ -369,7 +459,7 @@ class ApplicationContextBuilder {
 
 		String consoleSpecBeanName =
 			stringFormat (
-				"%sSpec",
+				"%sConsoleModuleSpec",
 				hyphenToCamel (
 					pluginConsoleModuleSpec.name ()));
 
@@ -385,70 +475,6 @@ class ApplicationContextBuilder {
 				hyphenToCamel (
 					pluginConsoleModuleSpec.name ()));
 
-		/*
-		for (ConsoleHelperProviderSpec consoleHelperProviderSpec
-				: consoleModuleMiniSpec.consoleHelperProviders ()) {
-
-			if (consoleHelperProviderObjectNames.contains (
-					consoleHelperProviderSpec.objectName ()))
-				throw new RuntimeException ();
-
-			consoleHelperProviderObjectNames.add (
-				consoleHelperProviderSpec.objectName ());
-
-			String objectHelperBeanName =
-				sf ("%sObjectHelper",
-					consoleHelperProviderSpec.objectName ());
-
-			String consoleHelperProviderBeanName =
-				sf ("%sConsoleHelperProvider",
-					consoleHelperProviderSpec.objectName ());
-
-			String consoleHelperClassName =
-				sf ("%s.%s.console.%sConsoleHelper",
-					consoleModule.project ().packageName (),
-					consoleModule.plugin ().packageName (),
-					capitalise (consoleHelperProviderSpec.objectName ()));
-
-			Class<?> consoleHelperClass;
-
-			try {
-
-				consoleHelperClass =
-					Class.forName (
-						consoleHelperClassName);
-
-			} catch (ClassNotFoundException exception) {
-
-				log.error (sf (
-					"Console helper class %s not found",
-					consoleHelperClassName));
-
-				return 1;
-
-			}
-
-			applicationContext.registerBeanDefinition (
-				new BeanDefinition ()
-					.name (consoleHelperProviderBeanName)
-					.beanClass (GenericConsoleHelperProvider.class)
-					.scope ("singleton")
-
-					.addValueProperty (
-						"consoleHelperProviderSpec",
-						consoleHelperProviderSpec)
-
-					.addReferenceProperty (
-						"objectHelper",
-						objectHelperBeanName)
-
-					.addValueProperty (
-						"consoleHelperClass",
-						consoleHelperClass));
-
-		}
-		*/
-
 		applicationContext.registerBeanDefinition (
 			new BeanDefinition ()
 
@@ -456,7 +482,7 @@ class ApplicationContextBuilder {
 				consoleSpecBeanName)
 
 			.beanClass (
-				ConsoleSpec.class)
+				ConsoleModuleSpec.class)
 
 			.scope (
 				"singleton")
@@ -703,6 +729,16 @@ class ApplicationContextBuilder {
 
 	}
 
+	int registerApiLayerBeans (
+			@NonNull PluginSpec plugin)
+		throws Exception {
+
+		int errors = 0;
+
+		return errors;
+
+	}
+
 	int registerConsoleLayerBeans (
 			@NonNull PluginSpec plugin)
 		throws Exception {
@@ -711,12 +747,6 @@ class ApplicationContextBuilder {
 
 		for (PluginModelSpec model
 				: plugin.models ().models ()) {
-
-			/*
-			errors +=
-				registerConsoleHelperProvider (
-					model);
-			*/
 
 			errors +=
 				registerConsoleHelper (

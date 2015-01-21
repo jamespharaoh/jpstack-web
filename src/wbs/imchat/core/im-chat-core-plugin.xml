@@ -23,6 +23,14 @@
 		<fixture name="imChatCore"/>
 	</fixtures>
 
+	<layer name="api">
+		<bean class="api.ImChatTestAction"/>
+	</layer>
+
+	<api-modules>
+		<api-module name="im-chat"/>
+	</api-modules>
+
 	<console-modules>
 		<console-module name="im-chat"/>
 		<console-module name="im-chat-customer"/>

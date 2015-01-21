@@ -243,7 +243,7 @@ class CodeFormFieldBuilder {
 				updatableFormFieldProvider.get ()
 
 				.name (
-					name)
+					fullName)
 
 				.label (
 					label)

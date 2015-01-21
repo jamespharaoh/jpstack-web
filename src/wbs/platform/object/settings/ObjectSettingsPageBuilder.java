@@ -31,8 +31,8 @@ import wbs.platform.console.forms.IdFormFieldSpec;
 import wbs.platform.console.forms.NameFormFieldSpec;
 import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.helper.ConsoleHelperRegistry;
-import wbs.platform.console.metamodule.ConsoleMetaManager;
 import wbs.platform.console.module.ConsoleManager;
+import wbs.platform.console.module.ConsoleMetaManager;
 import wbs.platform.console.module.ConsoleModuleBuilder;
 import wbs.platform.console.module.ConsoleModuleImpl;
 import wbs.platform.console.part.PagePart;
@@ -165,7 +165,7 @@ class ObjectSettingsPageBuilder {
 
 			@Override
 			public
-			Responder go ()
+			Responder handle ()
 				throws ServletException {
 
 				Action settingsAction;
@@ -228,7 +228,7 @@ class ObjectSettingsPageBuilder {
 
 				}
 
-				return settingsAction.go ();
+				return settingsAction.handle ();
 
 			}
 
@@ -263,7 +263,7 @@ class ObjectSettingsPageBuilder {
 
 				@Override
 				public
-				Responder go ()
+				Responder handle ()
 					throws ServletException {
 
 					Action removeAction;
@@ -294,7 +294,7 @@ class ObjectSettingsPageBuilder {
 						.editPrivKey (
 							privKey);
 
-					return removeAction.go ();
+					return removeAction.handle ();
 
 				}
 

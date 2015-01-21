@@ -70,7 +70,7 @@
 		name="create"
 		object-name="simulatorRoute">
 
-		<code-field/>
+		<code-field pattern="^[0-9a-z]+$"/>
 		<description-field/>
 
 		<object-field
@@ -98,7 +98,7 @@
 		name="settings"
 		object-name="simulatorRoute">
 
-		<code-field/>
+		<code-field pattern="^[0-9a-z]+$"/>
 		<description-field/>
 
 		<object-field

@@ -67,7 +67,7 @@ class ChatTvToScreenCommand
 
 	@Override
 	public
-	CommandHandler.Status handle (
+	void handle (
 			int commandId,
 			ReceivedMessage receivedMessage) {
 

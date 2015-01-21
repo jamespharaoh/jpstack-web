@@ -36,6 +36,8 @@ class ConsoleModuleBuilder
 	@Inject
 	Provider<BuilderFactory> builderFactoryProvider;
 
+	// collection dependencies
+
 	@Inject
 	@ConsoleModuleBuilderHandler
 	Map<Class<?>,Provider<Object>> consoleModuleBuilders;

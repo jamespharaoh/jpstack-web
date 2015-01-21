@@ -23,7 +23,6 @@ import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.model.MediaRec;
 import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 
 import com.google.common.base.Optional;
 
@@ -34,10 +33,6 @@ interface ChatUserLogic {
 			ChatUserRec chatUser);
 
 	Integer getAffiliateId (
-			ChatUserRec chatUser);
-
-	void setAffiliateId (
-			ReceivedMessage receivedMessage,
 			ChatUserRec chatUser);
 
 	void logoff (
