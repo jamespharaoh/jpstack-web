@@ -45,14 +45,13 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"/>
-
 			<context-link
 				name="conversation"
 				link="imChatConversation"
 				label="Conversations"
 				priv-key="imChatCustomer.manage"/>
+
+			<object-events-page/>
 
 		</object>
 
@@ -65,6 +64,7 @@
 		<text-field
 			name="code"
 			nullable="yes"/>
+
 	</field-set>
 
 	<field-set
@@ -81,15 +81,6 @@
 
 		<id-field/>
 		<parent-field/>
-		<code-field/>
-
-	</field-set>
-
-	<field-set
-		name="settings"
-		object-name="imChatCustomer">
-
-		<id-field/>
 		<code-field/>
 
 	</field-set>
