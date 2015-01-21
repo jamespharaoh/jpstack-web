@@ -83,7 +83,7 @@ class ApiResourceBuilder {
 
 			.existingBeanNamePrefix (
 				container.existingBeanNamePrefix ())
-			
+
 			.resourceName (
 				resourceName);
 

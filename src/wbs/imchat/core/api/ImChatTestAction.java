@@ -7,12 +7,12 @@ import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 
 @PrototypeComponent ("imChatTestAction")
-public 
+public
 class ImChatTestAction
 	implements Action {
 
 	@Override
-	public 
+	public
 	Responder handle ()
 		throws ServletException {
 

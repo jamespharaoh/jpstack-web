@@ -44,6 +44,12 @@
 			<object-settings-page
 				fields="settings"/>
 
+			<context-link
+				name="customer"
+				link="imChatCustomer"
+				label="Customers"
+				priv-key="imChat.manage"/>
+
 			<object-events-page/>
 
 		</object>

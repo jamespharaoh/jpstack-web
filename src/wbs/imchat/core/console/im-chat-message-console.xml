@@ -1,0 +1,75 @@
+<console-module
+	name="im-chat-message">
+
+	<console-helper-provider
+		object-name="imChatMessage"
+		view-delegate-field="greatgrandparent"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="imChatMessageId"
+			field="id"/>
+
+		<context-stuff
+			name="imChatConversationId"
+			delegate="imChatConversation"
+			field="id"/>
+
+		<run-post-processor
+			name="imChatConversation"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="imChatMessage"
+		object-name="imChatMessage">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"
+				priv-key="imChatConversation.imChatCustomer.imChat.manage"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="imChatMessage">
+
+		<parent-field/>
+		<index-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="imChatMessage">
+
+		<id-field/>
+		<parent-field/>
+		<index-field/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="imChatMessage">
+
+		<id-field/>
+		<index-field/>
+
+	</field-set>
+
+</console-module>

@@ -29,7 +29,7 @@ class ActionRequestHandler
 	Provider<Action> actionProvider;
 
 	// utils
-	
+
 	public
 	ActionRequestHandler action (
 			final Action action) {
@@ -38,7 +38,7 @@ class ActionRequestHandler
 			new Provider<Action> () {
 
 			@Override
-			public 
+			public
 			Action get () {
 				return action;
 			}

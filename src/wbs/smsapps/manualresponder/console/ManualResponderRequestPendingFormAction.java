@@ -297,9 +297,17 @@ class ManualResponderRequestPendingFormAction
 					messageString,
 					messageSplitterTemplates);
 
-			// enforce maximum message counts
+			// enforce minimum and maximum message counts
 
-			if (messageParts.size () > template.getMaximumMessages ()) {
+			if (
+
+				messageParts.size ()
+					> template.getMaximumMessages ()
+
+				|| messageParts.size ()
+					< template.getMinimumMessageParts ()
+
+			) {
 
 				requestContext.addError (
 					stringFormat (
@@ -314,9 +322,7 @@ class ManualResponderRequestPendingFormAction
 
 			// don't split message, apply template if enabled
 
-			if (
-				template.getApplyTemplates ()
-			) {
+			if (template.getApplyTemplates ()) {
 
 				messageParts =
 					Collections.singletonList (
@@ -332,12 +338,17 @@ class ManualResponderRequestPendingFormAction
 
 			}
 
-			// enforce max length
+			// enforce max and min length
 
 			if (messageParam != null) {
 
 				int maxLength =
 					manualResponderLogic.maximumMessageLength (
+						request,
+						template);
+
+				int minLength =
+					manualResponderLogic.minimumMessageLength (
 						request,
 						template);
 
@@ -353,6 +364,19 @@ class ManualResponderRequestPendingFormAction
 							actualLength,
 							"limit is %s",
 							maxLength));
+
+					return null;
+
+				}
+
+				if (actualLength < minLength) {
+
+					requestContext.addError (
+						stringFormat (
+							"Message is too short, contains %s chars, ",
+							actualLength,
+							"limit is %s",
+							minLength));
 
 					return null;
 

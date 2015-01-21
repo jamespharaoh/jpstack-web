@@ -66,6 +66,10 @@
 			name="maximumMessages"
 			label="Max"/>
 
+		<integer-field
+			name="minimumMessageParts"
+			label="MinParts"/>
+
 	</field-set>
 
 	<field-set
@@ -94,6 +98,10 @@
 
 		<integer-field
 			name="maximumMessages"
+			nullable="yes"/>
+
+		<integer-field
+			name="minimumMessageParts"
 			nullable="yes"/>
 
 		<yes-no-field
@@ -151,6 +159,10 @@
 			name="maximumMessages"
 			nullable="yes"/>
 
+		<integer-field
+			name="minimumMessageParts"
+			nullable="yes"/>
+
 		<yes-no-field
 			name="splitLong"/>
 
@@ -203,6 +215,10 @@
 
 		<integer-field
 			name="maximumMessages"
+			nullable="yes"/>
+
+		<integer-field
+			name="minimumMessageParts"
 			nullable="yes"/>
 
 		<yes-no-field

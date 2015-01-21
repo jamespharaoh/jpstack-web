@@ -73,6 +73,9 @@ class ManualResponderTemplateRec
 	Integer maximumMessages;
 
 	@SimpleField
+	Integer minimumMessageParts;
+
+	@SimpleField
 	Boolean splitLong = false;
 
 	@SimpleField
