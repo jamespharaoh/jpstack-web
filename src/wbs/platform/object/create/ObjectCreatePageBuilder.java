@@ -152,7 +152,7 @@ class ObjectCreatePageBuilder {
 
 			@Override
 			public
-			Responder go ()
+			Responder handle ()
 				throws ServletException {
 
 				return objectCreateAction.get ()
@@ -187,7 +187,7 @@ class ObjectCreatePageBuilder {
 					.createUserFieldName (
 						createUserFieldName)
 
-					.go ();
+					.handle ();
 
 			}
 

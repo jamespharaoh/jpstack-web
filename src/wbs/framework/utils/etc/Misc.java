@@ -1426,10 +1426,15 @@ class Misc {
 		StringBuilder ret =
 			new StringBuilder ();
 
+		boolean first = true;
+
 		for (String part : parts) {
 
-			if (ret.length () > 0)
+			if (first) {
+				first = false;
+			} else {
 				ret.append (separator);
+			}
 
 			ret.append (prefix);
 			ret.append (part);

@@ -57,7 +57,7 @@ class ConsoleAction
 
 	@Override
 	public final
-	Responder go ()
+	Responder handle ()
 		throws ServletException {
 
 		try {

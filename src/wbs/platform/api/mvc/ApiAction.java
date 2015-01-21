@@ -38,7 +38,7 @@ abstract class ApiAction
 
 	@Override
 	public final
-	Responder go () {
+	Responder handle () {
 
 		try {
 

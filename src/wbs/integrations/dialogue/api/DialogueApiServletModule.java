@@ -347,7 +347,7 @@ class DialogueApiServletModule
 		new Action () {
 
 		@Override
-		public Responder go ()
+		public Responder handle ()
 			throws ServletException {
 
 			String idParam =

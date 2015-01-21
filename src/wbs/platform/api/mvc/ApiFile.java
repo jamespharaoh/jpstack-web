@@ -34,6 +34,11 @@ class ApiFile
 	@Inject
 	WebApiManager webApiManager;
 
+	// prototype dependencies
+
+	@Inject
+	Provider<ActionRequestHandler> actionRequestHandlerProvider;
+
 	// properties
 
 	@Getter @Setter
@@ -53,7 +58,8 @@ class ApiFile
 			Action action) {
 
 		return getHandler (
-			actionToRequestHandler (action));
+			actionRequestHandlerProvider.get ()
+				.action (action));
 
 	}
 
@@ -62,7 +68,8 @@ class ApiFile
 			String actionName) {
 
 		return getHandler (
-			actionNameToRequestHandler (actionName));
+			actionRequestHandlerProvider.get ()
+				.actionName (actionName));
 
 	}
 
@@ -127,7 +134,8 @@ class ApiFile
 			Action action) {
 
 		return postHandler (
-			new ActionRequestHandler (action));
+			actionRequestHandlerProvider.get ()
+				.action (action));
 
 	}
 
@@ -140,7 +148,7 @@ class ApiFile
 
 				@Override
 				public
-				Responder go ()
+				Responder handle ()
 					throws ServletException {
 
 					Action action =
@@ -148,7 +156,7 @@ class ApiFile
 							beanName,
 							Action.class);
 
-					return action.go ();
+					return action.handle ();
 
 				}
 

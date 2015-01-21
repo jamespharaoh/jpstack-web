@@ -14,4 +14,6 @@ class SimpleApiBuilderContainerImplementation
 	String newBeanNamePrefix;
 	String existingBeanNamePrefix;
 
+	String resourceName;
+
 }
