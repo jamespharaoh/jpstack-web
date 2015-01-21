@@ -5,6 +5,7 @@
 	<layer name="api">
 		<bean class="ApiPostActionBuilder"/>
 		<bean class="ApiPostActionSpec"/>
+		<bean class="ApiResource"/>
 		<bean class="ApiResourceBuilder"/>
 		<bean class="ApiResourceSpec"/>
 	</layer>

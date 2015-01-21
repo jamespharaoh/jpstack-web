@@ -165,7 +165,7 @@ class ObjectSettingsPageBuilder {
 
 			@Override
 			public
-			Responder go ()
+			Responder handle ()
 				throws ServletException {
 
 				Action settingsAction;
@@ -228,7 +228,7 @@ class ObjectSettingsPageBuilder {
 
 				}
 
-				return settingsAction.go ();
+				return settingsAction.handle ();
 
 			}
 
@@ -263,7 +263,7 @@ class ObjectSettingsPageBuilder {
 
 				@Override
 				public
-				Responder go ()
+				Responder handle ()
 					throws ServletException {
 
 					Action removeAction;
@@ -294,7 +294,7 @@ class ObjectSettingsPageBuilder {
 						.editPrivKey (
 							privKey);
 
-					return removeAction.go ();
+					return removeAction.handle ();
 
 				}
 

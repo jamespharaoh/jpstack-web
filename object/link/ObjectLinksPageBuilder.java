@@ -145,7 +145,7 @@ class ObjectLinksPageBuilder {
 
 			@Override
 			public
-			Responder go ()
+			Responder handle ()
 				throws ServletException {
 
 				return objectLinksAction.get ()
@@ -160,7 +160,7 @@ class ObjectLinksPageBuilder {
 					.contextUpdateSignalName (updateSignalName)
 					.targetUpdateSignalName (targetUpdateSignalName)
 					.successNotice (successNotice)
-					.go ();
+					.handle ();
 
 			}
 
