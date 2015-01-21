@@ -299,7 +299,15 @@ class ManualResponderRequestPendingFormAction
 
 			// enforce minimum and maximum message counts
 
-			if (messageParts.size () > template.getMaximumMessages () || messageParts.size() < template.getMinimumMessageParts()) {
+			if (
+
+				messageParts.size ()
+					> template.getMaximumMessages ()
+
+				|| messageParts.size ()
+					< template.getMinimumMessageParts ()
+
+			) {
 
 				requestContext.addError (
 					stringFormat (
@@ -314,9 +322,7 @@ class ManualResponderRequestPendingFormAction
 
 			// don't split message, apply template if enabled
 
-			if (
-				template.getApplyTemplates ()
-			) {
+			if (template.getApplyTemplates ()) {
 
 				messageParts =
 					Collections.singletonList (

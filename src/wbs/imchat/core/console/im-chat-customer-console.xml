@@ -6,9 +6,10 @@
 		view-delegate-field="imChat"
 		view-delegate-priv-code="manage">
 
-		<context-stuff
-			name="imChatCustomerId"
-			field="id"/>
+		<priv-key
+			name="imChatCustomer.manage"
+			delegate="imChat"
+			priv="manage"/>
 
 		<context-stuff
 			name="imChatCustomerName"
@@ -45,8 +46,7 @@
 				fields="summary"/>
 
 			<object-settings-page
-				fields="settings"
-				priv-key="imChat.manage"/>
+				fields="settings"/>
 
 			<context-link
 				name="conversation"

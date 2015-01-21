@@ -1,11 +1,12 @@
 package wbs.imchat.core.model;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.IndexField;
 import wbs.framework.entity.annotations.MajorEntity;
@@ -22,10 +23,12 @@ import wbs.framework.record.Record;
 public class ImChatConversationRec
 	implements CommonRecord<ImChatConversationRec>{
 
-	// identity
+	// id
 
 	@GeneratedIdField
 	Integer id;
+
+	// identity
 
 	@ParentField
 	ImChatCustomerRec imChatCustomer;
@@ -34,28 +37,32 @@ public class ImChatConversationRec
 		counter = "numConversations")
 	Integer index;
 
-	//statistics
+	// statistics
 
 	@SimpleField
 	Integer numMessages = 0;
 
+	// compare to
+
 	@Override
-	public int compareTo(Record<ImChatConversationRec> otherRecord) {
+	public
+	int compareTo (
+			Record<ImChatConversationRec> otherRecord) {
 
 		ImChatConversationRec other =
-				(ImChatConversationRec) otherRecord;
+			(ImChatConversationRec) otherRecord;
 
 		return new CompareToBuilder ()
 
-		.append (
-			getImChatCustomer (),
-			other.getImChatCustomer ())
+			.append (
+				getImChatCustomer (),
+				other.getImChatCustomer ())
 
-		.append (
-			getIndex (),
-			other.getIndex ())
+			.append (
+				getIndex (),
+				other.getIndex ())
 
-		.toComparison ();
+			.toComparison ();
 
 	}
 
