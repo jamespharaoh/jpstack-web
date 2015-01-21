@@ -3,6 +3,7 @@ package wbs.platform.console.forms;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -68,7 +69,7 @@ class TextFormFieldBuilder {
 	// builder
 
 	@BuilderParent
-	FormFieldBuilderContext formFieldBuilderContext;
+	FormFieldBuilderContext context;
 
 	@BuilderSource
 	TextFormFieldSpec textFormFieldSpec;
@@ -110,7 +111,7 @@ class TextFormFieldBuilder {
 
 		Class<?> propertyClass =
 			BeanLogic.propertyClass (
-				formFieldBuilderContext.containerClass (),
+				context.containerClass (),
 				name);
 
 		FormFieldAccessor accessor;
@@ -146,7 +147,12 @@ class TextFormFieldBuilder {
 
 		} else {
 
-			throw new RuntimeException ();
+			throw new RuntimeException (
+					stringFormat (
+						"Don't know how to map %s as text for %s.%s",
+						propertyClass,
+						context.containerClass (),
+						name));
 
 		}
 

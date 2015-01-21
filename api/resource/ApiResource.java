@@ -19,7 +19,7 @@ import wbs.framework.web.WebFile;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("apiResource")
-public 
+public
 class ApiResource
 	implements WebFile {
 
@@ -68,7 +68,7 @@ class ApiResource
 	}
 
 	@Override
-	public 
+	public
 	void doGet ()
 		throws
 			ServletException,
@@ -76,11 +76,11 @@ class ApiResource
 
 		handleGeneric (
 			Method.get);
-		
+
 	}
 
 	@Override
-	public 
+	public
 	void doPost ()
 		throws
 			ServletException,
@@ -92,7 +92,7 @@ class ApiResource
 	}
 
 	@Override
-	public 
+	public
 	void doOptions ()
 		throws
 			ServletException,
@@ -100,7 +100,7 @@ class ApiResource
 
 		handleGeneric (
 			Method.get);
-		
+
 	}
 
 	// data types

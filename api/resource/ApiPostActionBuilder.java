@@ -32,7 +32,7 @@ class ApiPostActionBuilder {
 	ApplicationContext applicationContext;
 
 	// prototype dependencies
-	
+
 	@Inject
 	Provider<ActionRequestHandler> actionRequestHandlerProvider;
 
