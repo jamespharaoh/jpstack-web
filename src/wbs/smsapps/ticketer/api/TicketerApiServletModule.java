@@ -333,7 +333,7 @@ class TicketerApiServletModule
 
 		@Override
 		public
-		Responder go () {
+		Responder handle () {
 
 			try {
 

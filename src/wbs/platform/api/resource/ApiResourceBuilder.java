@@ -1,5 +1,7 @@
 package wbs.platform.api.resource;
 
+import static wbs.framework.utils.etc.Misc.joinWithSeparator;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -38,6 +40,8 @@ class ApiResourceBuilder {
 
 	// state
 
+	String resourceName;
+
 	SimpleApiBuilderContainer childContainer;
 
 	// build
@@ -60,6 +64,13 @@ class ApiResourceBuilder {
 	// implementation
 
 	void setDefaults () {
+
+		resourceName =
+			joinWithSeparator (
+				"/",
+				container.resourceName (),
+				spec.name ());
+
 	}
 
 	void initContainers () {
@@ -68,11 +79,13 @@ class ApiResourceBuilder {
 			simpleApiBuilderContainerImplementation.get ()
 
 			.newBeanNamePrefix (
-				"newBeanNamePrefix")
+				container.newBeanNamePrefix ())
 
 			.existingBeanNamePrefix (
-				"existingBeanNamePrefix");
-
+				container.existingBeanNamePrefix ())
+			
+			.resourceName (
+				resourceName);
 
 	}
 

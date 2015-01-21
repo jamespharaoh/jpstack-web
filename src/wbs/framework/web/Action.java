@@ -6,9 +6,10 @@ import javax.servlet.ServletException;
  * A WebAction does something in response to a request and returns an
  * appropriate "Responder" to send the response.
  */
-public interface Action {
+public 
+interface Action {
 
-	Responder go ()
+	Responder handle ()
 		throws ServletException;
 
 }

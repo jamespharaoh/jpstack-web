@@ -165,7 +165,7 @@ class ObjectSearchPageBuilder {
 
 			@Override
 			public
-			Responder go ()
+			Responder handle ()
 				throws ServletException {
 
 				return objectSearchGetAction.get ()
@@ -179,7 +179,7 @@ class ObjectSearchPageBuilder {
 					.sessionKey (
 						sessionKey)
 
-					.go ();
+					.handle ();
 
 			}
 
@@ -194,7 +194,7 @@ class ObjectSearchPageBuilder {
 
 			@Override
 			public
-			Responder go ()
+			Responder handle ()
 				throws ServletException {
 
 				return objectSearchPostAction.get ()
@@ -223,7 +223,7 @@ class ObjectSearchPageBuilder {
 					.fileName (
 						fileName)
 
-					.go ();
+					.handle ();
 
 			}
 

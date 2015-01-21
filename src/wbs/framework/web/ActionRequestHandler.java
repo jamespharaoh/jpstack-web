@@ -2,22 +2,65 @@ package wbs.framework.web;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.servlet.ServletException;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.context.ApplicationContext;
+
+@Accessors (fluent = true)
+@PrototypeComponent ("actionRequestHandler")
 public
 class ActionRequestHandler
 	implements RequestHandler {
 
-	Action action;
+	// dependencies
 
+	@Inject
+	ApplicationContext applicationContext;
+
+	// properties
+
+	@Getter @Setter
+	Provider<Action> actionProvider;
+
+	// utils
+	
 	public
-	ActionRequestHandler (
-			Action newAction) {
+	ActionRequestHandler action (
+			final Action action) {
 
-		action =
-			newAction;
+		actionProvider =
+			new Provider<Action> () {
+
+			@Override
+			public 
+			Action get () {
+				return action;
+			}
+
+		};
+
+		return this;
 
 	}
+
+	public
+	ActionRequestHandler actionName (
+			String actionName) {
+
+		return actionProvider (
+			applicationContext.getBeanProvider (
+				actionName,
+				Action.class));
+
+	}
+
+	// implementation
 
 	@Override
 	public
@@ -26,8 +69,11 @@ class ActionRequestHandler
 			ServletException,
 			IOException {
 
+		Action action =
+			actionProvider.get ();
+
 		Responder responder =
-			action.go ();
+			action.handle ();
 
 		if (responder == null)
 			throw new NullPointerException ();

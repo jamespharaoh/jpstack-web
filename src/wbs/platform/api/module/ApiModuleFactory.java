@@ -75,6 +75,12 @@ class ApiModuleFactory
 
 		}
 
+		@Override
+		public
+		String resourceName () {
+			return "";
+		}
+
 	};
 
 }

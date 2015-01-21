@@ -4,7 +4,8 @@ public
 interface SimpleApiBuilderContainer {
 
 	String newBeanNamePrefix ();
-
 	String existingBeanNamePrefix ();
+
+	String resourceName ();
 
 }
