@@ -53,10 +53,10 @@ class PaypalAccountRec
 	Boolean deleted = false;
 	
 	@SimpleField
-	String serviceEndPoint = "service endpoint"; 
+	String serviceEndpoint = "service endpoint"; 
 	
 	@SimpleField
-	String clientID = "client id";
+	String clientId = "client id";
 	
 	@SimpleField
 	String clientSecret = "client secret";
@@ -80,6 +80,18 @@ class PaypalAccountRec
 			.append (
 				getCode (),
 				other.getCode ())
+				
+			.append (
+				getCode (),
+				other.getServiceEndpoint ())
+				
+			.append (
+				getCode (),
+				other.getClientId ())
+				
+			.append (
+				getCode (),
+				other.getClientSecret ())
 
 			.toComparison ();
 

@@ -22,4 +22,5 @@
 	<console-modules>
 		<console-module name="paypal-account"/>
 	</console-modules>
+	
 </plugin>

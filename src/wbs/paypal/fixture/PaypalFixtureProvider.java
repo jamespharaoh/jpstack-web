@@ -49,13 +49,13 @@ class PaypalFixtureProvider
 						"facility"))
 
 				.setCode (
-					"paypal")
+					"paypal_account")
 
 				.setLabel (
-					"Paypal")
+					"Paypal Account")
 
 				.setPath (
-					"/paypal");
+					"/paypalAccounts");
 		
 		menuHelper.insert (menu);
 		

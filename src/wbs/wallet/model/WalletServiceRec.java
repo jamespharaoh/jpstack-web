@@ -9,8 +9,10 @@ import lombok.experimental.Accessors;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
+import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
+import wbs.platform.scaffold.model.SliceRec;
 
 @Accessors (chain = true)
 @Data
@@ -20,10 +22,15 @@ import wbs.framework.record.Record;
 public class WalletServiceRec
 	implements CommonRecord<WalletServiceRec>{
 	
-	// identity
+	// id
 
 	@GeneratedIdField
 	Integer id;
+	
+	// identity
+	
+	@ParentField
+	SliceRec slice;
 	
 	@CodeField
 	String code;
@@ -39,7 +46,11 @@ public class WalletServiceRec
 		.append (
 				getCode (),
 				other.getCode ())
-		
+				
+		.append (
+				getSlice (),
+				other.getSlice ())
+				
 		.toComparison ();
 		
 	}
