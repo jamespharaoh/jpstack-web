@@ -7,17 +7,18 @@
 		<plugin-dependency name="scaffold"/>
 	</plugin-dependencies>
 	
+	<sql-scripts>
+		<sql-data name="paypal-data"/>
+	</sql-scripts>
+	
 	<models>
 		<model name="paypalAccount"/>
-		<model name="walletService"/>
-		<model name="wallet"/>
-
 	</models>
 	
 	<fixtures>
 		<fixture name="paypal"/>
 	</fixtures>
-	
+
 	<console-modules>
 		<console-module name="paypal-account"/>
 	</console-modules>

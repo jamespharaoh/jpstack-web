@@ -2,7 +2,7 @@
 	name="paypal-account">
 
 	<console-helper-provider
-		object-name="paypal-account">
+		object-name="paypalAccount">
 
 		<context-stuff
 			name="paypalAccountName"
