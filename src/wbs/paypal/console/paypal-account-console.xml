@@ -1,0 +1,97 @@
+<console-module
+	name="paypal-account">
+
+	<console-helper-provider
+		object-name="paypal-account">
+
+		<context-stuff
+			name="paypalAccountName"
+			field="name"/>
+
+		<context-stuff
+			name="sliceId"
+			delegate="slice"
+			field="id"/>
+
+		<priv-key
+			name="paypalAccount.manage"
+			priv="manage"/>
+
+		<run-post-processor
+			name="slice"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="paypalAccount"
+		object-name="paypalAccount">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+			
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="paypalAccount">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="paypalAccount">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="paypalAccount">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="paypalAccount">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+	</field-set>
+
+</console-module>

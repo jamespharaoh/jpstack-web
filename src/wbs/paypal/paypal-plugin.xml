@@ -1,0 +1,24 @@
+<plugin
+	name="paypal"
+	package="wbs.paypal">
+
+	<plugin-dependencies>
+		<plugin-dependency name="sms-apps-common"/>
+		<plugin-dependency name="scaffold"/>
+	</plugin-dependencies>
+	
+	<models>
+		<model name="paypalAccount"/>
+		<model name="walletService"/>
+		<model name="wallet"/>
+
+	</models>
+	
+	<fixtures>
+		<fixture name="paypal"/>
+	</fixtures>
+	
+	<console-modules>
+		<console-module name="paypal-account"/>
+	</console-modules>
+</plugin>

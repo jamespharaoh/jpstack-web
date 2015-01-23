@@ -1,3 +1,5 @@
+
+
 package wbs.imchat.core.fixture;
 
 import java.util.Random;
@@ -32,79 +34,114 @@ class ImChatCoreFixtureProvider
 
 	@Inject
 	MenuObjectHelper menuHelper;
-	
+
 	@Inject
 	ImChatObjectHelper imChatHelper;
-	
+
 	@Inject
 	ImChatCustomerObjectHelper imChatCustomerHelper;
-	
+
 	@Inject
 	ImChatConversationObjectHelper imChatConversationHelper;
-	
+
 	@Inject
 	ImChatMessageObjectHelper imChatMessageHelper;
-	
+
 	@Inject
 	SliceObjectHelper sliceHelper;
 
 	// implementation
+	
+	@Inject
+	Random random;
 
 	@Override
 	public
 	void createFixtures () {
 
-		MenuRec menu = new MenuRec()
-				.setMenuGroup (
-						menuGroupHelper.findByCode (
-						GlobalId.root,
-						"facility"))
+		menuHelper.insert (
+			new MenuRec ()
 
-				.setCode (
-					"im_chat")
+			.setMenuGroup (
+				menuGroupHelper.findByCode (
+				GlobalId.root,
+				"facility"))
 
-				.setLabel (
-					"IM Chat")
+			.setCode (
+				"im_chat")
 
-				.setPath (
-					"/imChats");
-		
-		menuHelper.insert (menu);
-		
-		ImChatRec imchat = new ImChatRec ()
+			.setLabel (
+				"IM Chat")
 
-			.setSlice(sliceHelper.findByCode(GlobalId.root, "test"))
-	
-			.setCode("im_chat")
-			
-			.setName("im_chat")
-			.setDescription("im_chat"); 
-					
-		imChatHelper.insert (imchat);
-		
-		String code = generateCode();
-		ImChatCustomerRec imchatcustomer = new ImChatCustomerRec ()
+			.setPath (
+				"/imChats")
 
-			.setImChat(imChatHelper.findByCode(imchat, "im_chat"))	
-			.setCode(code);
-		
-		imChatCustomerHelper.insert(imchatcustomer);
-		
-		ImChatConversationRec imchatconversation = new ImChatConversationRec ()
+		);
 
-			.setImChatCustomer(imChatCustomerHelper.findByCode(imchatcustomer, code))	
-			.setIndex(imchatcustomer.getNumConversations());
-	
-		imchatcustomer.setNumConversations(imchatcustomer.getNumConversations() + 1);
-		imChatConversationHelper.insert(imchatconversation);
-		
-		ImChatMessageRec imchatmessage = new ImChatMessageRec ()
+		ImChatRec imChat =
+			imChatHelper.insert (
+				new ImChatRec ()
 
-			.setImChatConversation(imchatconversation)	
-			.setIndex(imchatconversation.getNumMessages());
-	
-		imchatconversation.setNumMessages(imchatconversation.getNumMessages() + 1);
-		imChatMessageHelper.insert(imchatmessage);
+			.setSlice (
+				sliceHelper.findByCode (
+					GlobalId.root,
+					"test"))
+
+			.setCode (
+				"im_chat")
+
+			.setName (
+				"im_chat")
+
+			.setDescription (
+				"im_chat")
+
+		);
+
+		ImChatCustomerRec imChatCustomer =
+			imChatCustomerHelper.insert (
+				new ImChatCustomerRec ()
+
+			.setImChat (
+				imChat)
+
+			.setCode (
+				generateCode ())
+
+		);
+
+		ImChatConversationRec imChatConversation =
+			imChatConversationHelper.insert (
+				new ImChatConversationRec ()
+
+			.setImChatCustomer (
+				imChatCustomer)
+
+			.setIndex (
+				imChatCustomer.getNumConversations ())
+
+		);
+
+		imChatCustomer
+
+			.setNumConversations (
+				imChatCustomer.getNumConversations () + 1);
+
+		imChatMessageHelper.insert (
+			new ImChatMessageRec ()
+
+			.setImChatConversation (
+				imChatConversation)
+
+			.setIndex (
+				imChatConversation.getNumMessages ())
+
+		);
+
+		imChatConversation
+
+			.setNumMessages (
+				imChatConversation.getNumMessages () + 1);
 
 	}
 	
@@ -112,7 +149,6 @@ class ImChatCoreFixtureProvider
 	String generateCode () {
 
 		int code;
-		Random random = new Random();
 		
 		code = random.nextInt (90000000) + 10000000;
 
@@ -121,3 +157,4 @@ class ImChatCoreFixtureProvider
 	}
 
 }
+
