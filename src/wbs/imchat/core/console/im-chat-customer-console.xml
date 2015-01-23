@@ -6,10 +6,11 @@
 		view-delegate-field="imChat"
 		view-delegate-priv-code="manage">
 
-		<context-stuff
-			name="imChatCustomerId"
-			field="id"/>
-			
+		<priv-key
+			name="imChatCustomer.manage"
+			delegate="imChat"
+			priv="manage"/>
+
 		<context-stuff
 			name="imChatCustomerName"
 			field="code"/>
@@ -29,7 +30,7 @@
 		object-name="imChatCustomer">
 
 		<list>
-			
+
 			<object-search-page
 				search-fields="search"
 				results-fields="results"
@@ -44,15 +45,13 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"
-				priv-key="imChat.manage"/>
-				
 			<context-link
 				name="conversation"
 				link="imChatConversation"
 				label="Conversations"
 				priv-key="imChatCustomer.manage"/>
+
+			<object-events-page/>
 
 		</object>
 
@@ -65,6 +64,7 @@
 		<text-field
 			name="code"
 			nullable="yes"/>
+
 	</field-set>
 
 	<field-set
@@ -81,15 +81,6 @@
 
 		<id-field/>
 		<parent-field/>
-		<code-field/>
-
-	</field-set>
-
-	<field-set
-		name="settings"
-		object-name="imChatCustomer">
-
-		<id-field/>
 		<code-field/>
 
 	</field-set>

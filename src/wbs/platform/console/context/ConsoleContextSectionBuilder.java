@@ -20,7 +20,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.console.helper.ConsoleHelper;
-import wbs.platform.console.metamodule.ConsoleMetaManager;
+import wbs.platform.console.module.ConsoleMetaManager;
 import wbs.platform.console.module.ConsoleModuleImpl;
 import wbs.platform.console.tab.ConsoleContextTab;
 

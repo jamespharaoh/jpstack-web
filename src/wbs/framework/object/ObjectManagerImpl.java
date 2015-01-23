@@ -669,7 +669,6 @@ class ObjectManagerImpl
 			} else {
 
 				object =
-					(Record<?>)
 					BeanLogic.getProperty (
 						object,
 						pathPart);

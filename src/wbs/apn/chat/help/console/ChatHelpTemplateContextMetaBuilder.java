@@ -14,7 +14,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.platform.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.platform.console.context.ConsoleContextMetaBuilderContainer;
 import wbs.platform.console.context.ConsoleContextRootExtensionPoint;
-import wbs.platform.console.metamodule.ConsoleMetaModuleImpl;
+import wbs.platform.console.module.ConsoleMetaModuleImpl;
 
 import com.google.common.collect.ImmutableList;
 

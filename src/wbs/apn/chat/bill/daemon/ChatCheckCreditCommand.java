@@ -88,7 +88,7 @@ class ChatCheckCreditCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -141,7 +141,7 @@ class ChatCheckCreditCommand
 
 			transaction.commit ();
 
-			return null;
+			return;
 
 		}
 
@@ -163,8 +163,6 @@ class ChatCheckCreditCommand
 				.build ());
 
 		transaction.commit ();
-
-		return null;
 
 	}
 

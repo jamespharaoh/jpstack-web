@@ -25,6 +25,8 @@ public
 class PluginSpec
 	implements Comparable<PluginSpec> {
 
+	// attributes
+
 	@DataParent
 	@Getter @Setter
 	BuildSpec build;
@@ -72,8 +74,15 @@ class PluginSpec
 
 	@DataChildren
 	@Getter @Setter
+	List<PluginApiModuleSpec> apiModules =
+		new ArrayList<PluginApiModuleSpec> ();
+
+	@DataChildren
+	@Getter @Setter
 	List<PluginConsoleModuleSpec> consoleModules =
 		new ArrayList<PluginConsoleModuleSpec> ();
+
+	// implementation
 
 	@Override
 	public

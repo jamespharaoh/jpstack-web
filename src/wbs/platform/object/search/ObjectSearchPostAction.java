@@ -99,7 +99,7 @@ class ObjectSearchPostAction
 	Responder goReal ()
 		throws ServletException {
 
-		// handle "new search" button
+		// handle new/repeat search buttons
 
 		if (requestContext.parameter ("new-search") != null) {
 
@@ -112,6 +112,14 @@ class ObjectSearchPostAction
 				.targetUrl (
 					requestContext.resolveLocalUrl (
 						"/" + fileName));
+
+		}
+
+		if (requestContext.parameter ("repeat-search") != null) {
+
+			requestContext.session (
+				sessionKey + "Results",
+				null);
 
 		}
 

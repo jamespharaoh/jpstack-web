@@ -18,6 +18,7 @@ import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.web.AbstractFile;
 import wbs.framework.web.Action;
+import wbs.framework.web.ActionRequestHandler;
 import wbs.framework.web.ForbiddenException;
 import wbs.framework.web.RequestHandler;
 import wbs.framework.web.Responder;
@@ -44,6 +45,9 @@ class ConsoleFile
 	Provider<ConsoleManager> consoleManagerProvider;
 
 	// prototype dependencies
+
+	@Inject
+	Provider<ActionRequestHandler> actionRequestHandlerProvider;
 
 	@Inject
 	Provider<ConsoleContextPrivLookup> contextPrivLookup;
@@ -136,8 +140,8 @@ class ConsoleFile
 			Action action) {
 
 		return getHandler (
-			actionToRequestHandler (
-				action));
+			actionRequestHandlerProvider.get ()
+				.action (action));
 
 	}
 
@@ -149,8 +153,8 @@ class ConsoleFile
 			return this;
 
 		return getHandler (
-			actionNameToRequestHandler (
-				name));
+			actionRequestHandlerProvider.get ()
+				.actionName (name));
 
 	}
 
@@ -169,8 +173,8 @@ class ConsoleFile
 			Action action) {
 
 		return postHandler (
-			actionToRequestHandler (
-				action));
+			actionRequestHandlerProvider.get ()
+				.action (action));
 
 	}
 
@@ -182,8 +186,8 @@ class ConsoleFile
 			return this;
 
 		return postHandler (
-			actionNameToRequestHandler (
-				actionName));
+			actionRequestHandlerProvider.get ()
+				.actionName (actionName));
 
 	}
 

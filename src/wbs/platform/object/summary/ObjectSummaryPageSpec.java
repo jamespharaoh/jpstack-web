@@ -10,8 +10,8 @@ import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
-import wbs.platform.console.spec.ConsoleModuleData;
-import wbs.platform.console.spec.ConsoleSpec;
+import wbs.platform.console.module.ConsoleModuleData;
+import wbs.platform.console.module.ConsoleModuleSpec;
 
 @Accessors (fluent = true)
 @Data
@@ -24,7 +24,7 @@ class ObjectSummaryPageSpec {
 	// attributes
 
 	@DataAncestor
-	ConsoleSpec consoleSpec;
+	ConsoleModuleSpec consoleSpec;
 
 	@DataAttribute ("fields")
 	String fieldsName;

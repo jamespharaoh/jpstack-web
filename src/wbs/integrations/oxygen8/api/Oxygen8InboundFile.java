@@ -61,7 +61,7 @@ class Oxygen8InboundFile
 		}
 
 		Responder responder =
-			action.go ();
+			action.handle ();
 
 		responder.execute ();
 

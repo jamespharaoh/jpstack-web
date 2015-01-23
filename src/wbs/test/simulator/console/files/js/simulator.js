@@ -35,6 +35,14 @@ $(function () {
 				dataType: "json",
 				type: "POST",
 				url: createEventUrl
+			}).success (function (data) {
+				if (data.success) {
+					// do something here?
+				} else {
+					alert ('Error: ' + data.error);
+				}
+			}).error (function () {
+				alert ('Error communicating with server');
 			});
 
 		}

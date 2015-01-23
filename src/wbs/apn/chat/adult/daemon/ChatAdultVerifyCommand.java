@@ -91,7 +91,7 @@ class ChatAdultVerifyCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -134,7 +134,7 @@ class ChatAdultVerifyCommand
 
 			transaction.commit ();
 
-			return null;
+			return;
 
 		}
 
@@ -206,7 +206,7 @@ class ChatAdultVerifyCommand
 
 		transaction.commit ();
 
-		return null;
+		return;
 
 	}
 

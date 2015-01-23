@@ -76,9 +76,7 @@
       <fileset dir="src/wbs/platform/console/tab/files"/>
       <fileset dir="src/wbs/platform/console/context/files"/>
       <fileset dir="src/wbs/platform/console/combo/files"/>
-      <fileset dir="src/wbs/platform/console/spec/files"/>
       <fileset dir="src/wbs/platform/console/object/files"/>
-      <fileset dir="src/wbs/platform/console/metamodule/files"/>
       <fileset dir="src/wbs/platform/hooks/console/files"/>
       <fileset dir="src/wbs/platform/object/criteria/console/files"/>
       <fileset dir="src/wbs/platform/object/link/console/files"/>
@@ -112,7 +110,8 @@
       <fileset dir="src/wbs/platform/postgresql/console/files"/>
       <fileset dir="src/wbs/platform/daemon/console/files"/>
       <fileset dir="src/wbs/platform/rpc/console/files"/>
-      <fileset dir="src/wbs/platform/api/console/files"/>
+      <fileset dir="src/wbs/platform/api/mvc/console/files"/>
+      <fileset dir="src/wbs/platform/api/module/console/files"/>
       <fileset dir="src/wbs/platform/reporting/console/files"/>
       <fileset dir="src/wbs/platform/common/console/files"/>
       <fileset dir="src/wbs/sms/core/console/files"/>
@@ -241,9 +240,7 @@
       <fileset dir="src/wbs/platform/console/tab/api/files"/>
       <fileset dir="src/wbs/platform/console/context/api/files"/>
       <fileset dir="src/wbs/platform/console/combo/api/files"/>
-      <fileset dir="src/wbs/platform/console/spec/api/files"/>
       <fileset dir="src/wbs/platform/console/object/api/files"/>
-      <fileset dir="src/wbs/platform/console/metamodule/api/files"/>
       <fileset dir="src/wbs/platform/hooks/api/files"/>
       <fileset dir="src/wbs/platform/object/criteria/api/files"/>
       <fileset dir="src/wbs/platform/object/link/api/files"/>
@@ -277,7 +274,8 @@
       <fileset dir="src/wbs/platform/postgresql/api/files"/>
       <fileset dir="src/wbs/platform/daemon/api/files"/>
       <fileset dir="src/wbs/platform/rpc/api/files"/>
-      <fileset dir="src/wbs/platform/api/api/files"/>
+      <fileset dir="src/wbs/platform/api/mvc/files"/>
+      <fileset dir="src/wbs/platform/api/module/files"/>
       <fileset dir="src/wbs/platform/reporting/api/files"/>
       <fileset dir="src/wbs/platform/common/api/files"/>
       <fileset dir="src/wbs/sms/core/api/files"/>
@@ -440,9 +438,7 @@
       <fileset dir="src/wbs/platform/console/tab/files"/>
       <fileset dir="src/wbs/platform/console/context/files"/>
       <fileset dir="src/wbs/platform/console/combo/files"/>
-      <fileset dir="src/wbs/platform/console/spec/files"/>
       <fileset dir="src/wbs/platform/console/object/files"/>
-      <fileset dir="src/wbs/platform/console/metamodule/files"/>
       <fileset dir="src/wbs/platform/hooks/console/files"/>
       <fileset dir="src/wbs/platform/object/criteria/console/files"/>
       <fileset dir="src/wbs/platform/object/link/console/files"/>
@@ -476,7 +472,8 @@
       <fileset dir="src/wbs/platform/postgresql/console/files"/>
       <fileset dir="src/wbs/platform/daemon/console/files"/>
       <fileset dir="src/wbs/platform/rpc/console/files"/>
-      <fileset dir="src/wbs/platform/api/console/files"/>
+      <fileset dir="src/wbs/platform/api/mvc/console/files"/>
+      <fileset dir="src/wbs/platform/api/module/console/files"/>
       <fileset dir="src/wbs/platform/reporting/console/files"/>
       <fileset dir="src/wbs/platform/common/console/files"/>
       <fileset dir="src/wbs/sms/core/console/files"/>
@@ -605,9 +602,7 @@
       <fileset dir="src/wbs/platform/console/tab/api/files"/>
       <fileset dir="src/wbs/platform/console/context/api/files"/>
       <fileset dir="src/wbs/platform/console/combo/api/files"/>
-      <fileset dir="src/wbs/platform/console/spec/api/files"/>
       <fileset dir="src/wbs/platform/console/object/api/files"/>
-      <fileset dir="src/wbs/platform/console/metamodule/api/files"/>
       <fileset dir="src/wbs/platform/hooks/api/files"/>
       <fileset dir="src/wbs/platform/object/criteria/api/files"/>
       <fileset dir="src/wbs/platform/object/link/api/files"/>
@@ -641,7 +636,8 @@
       <fileset dir="src/wbs/platform/postgresql/api/files"/>
       <fileset dir="src/wbs/platform/daemon/api/files"/>
       <fileset dir="src/wbs/platform/rpc/api/files"/>
-      <fileset dir="src/wbs/platform/api/api/files"/>
+      <fileset dir="src/wbs/platform/api/mvc/files"/>
+      <fileset dir="src/wbs/platform/api/module/files"/>
       <fileset dir="src/wbs/platform/reporting/api/files"/>
       <fileset dir="src/wbs/platform/common/api/files"/>
       <fileset dir="src/wbs/sms/core/api/files"/>

@@ -20,11 +20,11 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.helper.PrivKeySpec;
-import wbs.platform.console.metamodule.ConsoleMetaManager;
-import wbs.platform.console.metamodule.ResolvedConsoleContextLink;
+import wbs.platform.console.module.ConsoleMetaManager;
 import wbs.platform.console.module.ConsoleModuleImpl;
+import wbs.platform.console.module.SimpleConsoleBuilderContainer;
+import wbs.platform.console.module.ResolvedConsoleContextLink;
 import wbs.platform.console.object.ObjectContext;
-import wbs.platform.console.spec.ConsoleSimpleBuilderContainer;
 import wbs.platform.console.tab.ConsoleContextTab;
 
 import com.google.common.collect.ImmutableList;
@@ -63,7 +63,7 @@ class SimpleConsoleContextBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleSimpleBuilderContainer simpleContainerSpec;
+	SimpleConsoleBuilderContainer simpleContainerSpec;
 
 	@BuilderSource
 	SimpleConsoleContextSpec simpleContextSpec;

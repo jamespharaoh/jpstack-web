@@ -23,7 +23,7 @@ import wbs.platform.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.metamodule.ConsoleMetaManager;
+import wbs.platform.console.module.ConsoleMetaManager;
 import wbs.platform.console.module.ConsoleModuleBuilder;
 import wbs.platform.console.module.ConsoleModuleImpl;
 import wbs.platform.console.part.PagePart;
@@ -145,7 +145,7 @@ class ObjectLinksPageBuilder {
 
 			@Override
 			public
-			Responder go ()
+			Responder handle ()
 				throws ServletException {
 
 				return objectLinksAction.get ()
@@ -160,7 +160,7 @@ class ObjectLinksPageBuilder {
 					.contextUpdateSignalName (updateSignalName)
 					.targetUpdateSignalName (targetUpdateSignalName)
 					.successNotice (successNotice)
-					.go ();
+					.handle ();
 
 			}
 

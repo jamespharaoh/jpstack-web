@@ -65,7 +65,7 @@
 		<integer-field
 			name="maximumMessages"
 			label="Max"/>
-			
+
 		<integer-field
 			name="minimumMessageParts"
 			label="MinParts"/>
@@ -99,7 +99,7 @@
 		<integer-field
 			name="maximumMessages"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="minimumMessageParts"
 			nullable="yes"/>
@@ -158,7 +158,7 @@
 		<integer-field
 			name="maximumMessages"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="minimumMessageParts"
 			nullable="yes"/>
@@ -216,7 +216,7 @@
 		<integer-field
 			name="maximumMessages"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="minimumMessageParts"
 			nullable="yes"/>

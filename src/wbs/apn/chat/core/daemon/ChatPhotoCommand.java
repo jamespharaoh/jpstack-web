@@ -83,7 +83,7 @@ class ChatPhotoCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -136,7 +136,7 @@ class ChatPhotoCommand
 
 			transaction.commit ();
 
-			return null;
+			return;
 
 		}
 
@@ -213,8 +213,6 @@ class ChatPhotoCommand
 		}
 
 		transaction.commit ();
-
-		return null;
 
 	}
 

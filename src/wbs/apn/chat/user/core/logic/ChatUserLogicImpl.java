@@ -68,7 +68,6 @@ import wbs.sms.gazetteer.model.GazetteerEntryObjectHelper;
 import wbs.sms.gazetteer.model.GazetteerEntryRec;
 import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.number.core.logic.NumberLogic;
 
 import com.google.common.base.Optional;
@@ -177,27 +176,6 @@ class ChatUserLogicImpl
 
 		return affiliate != null ?
 			affiliate.getId () : null;
-
-	}
-
-	@Override
-	public
-	void setAffiliateId (
-			@NonNull ReceivedMessage receivedMessage,
-			@NonNull ChatUserRec chatUser) {
-
-		Integer affiliateId =
-			getAffiliateId (
-				chatUser);
-
-		if (affiliateId != null) {
-
-			receivedMessage
-
-				.setAffiliateId (
-					affiliateId);
-
-		}
 
 	}
 

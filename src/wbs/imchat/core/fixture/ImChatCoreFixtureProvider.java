@@ -1,8 +1,4 @@
-
-
 package wbs.imchat.core.fixture;
-
-import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -51,9 +47,6 @@ class ImChatCoreFixtureProvider
 	SliceObjectHelper sliceHelper;
 
 	// implementation
-	
-	@Inject
-	Random random;
 
 	@Override
 	public
@@ -106,7 +99,7 @@ class ImChatCoreFixtureProvider
 				imChat)
 
 			.setCode (
-				generateCode ())
+				imChatCustomerHelper.generateCode ())
 
 		);
 
@@ -144,17 +137,7 @@ class ImChatCoreFixtureProvider
 				imChatConversation.getNumMessages () + 1);
 
 	}
-	
-	public
-	String generateCode () {
-
-		int code;
-		
-		code = random.nextInt (90000000) + 10000000;
-
-		return Integer.toString (code);
-
-	}
 
 }
+
 

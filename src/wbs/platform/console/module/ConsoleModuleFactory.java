@@ -11,8 +11,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.context.BeanFactory;
 import wbs.framework.builder.Builder;
-import wbs.platform.console.spec.ConsoleSimpleBuilderContainer;
-import wbs.platform.console.spec.ConsoleSpec;
 
 @Accessors (fluent = true)
 public
@@ -33,7 +31,7 @@ class ConsoleModuleFactory
 	// properties
 
 	@Getter @Setter
-	ConsoleSpec consoleSpec;
+	ConsoleModuleSpec consoleSpec;
 
 	// implementation
 
@@ -56,8 +54,8 @@ class ConsoleModuleFactory
 	// simple container
 
 	public
-	ConsoleSimpleBuilderContainer simpleContainerSpec =
-		new ConsoleSimpleBuilderContainer () {
+	SimpleConsoleBuilderContainer simpleContainerSpec =
+		new SimpleConsoleBuilderContainer () {
 
 		@Override
 		public

@@ -18,6 +18,7 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
+import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.sms.messageset.model.MessageSetRec;
 import wbs.sms.number.list.logic.NumberListLogic;
@@ -42,6 +43,9 @@ class AutoResponderCommand
 
 	@Inject
 	EmailLogic emailLogic;
+
+	@Inject
+	InboxLogic inboxLogic;
 
 	@Inject
 	MessageObjectHelper messageHelper;
@@ -69,7 +73,7 @@ class AutoResponderCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -93,9 +97,6 @@ class AutoResponderCommand
 			serviceHelper.findByCode (
 				autoResponder,
 				"default");
-
-		receivedMessage.setServiceId (
-			defaultService.getId ());
 
 		// send message set
 
@@ -136,11 +137,17 @@ class AutoResponderCommand
 
 		}
 
+		// process inbox
+
+		inboxLogic.inboxProcessed (
+			message,
+			defaultService,
+			null,
+			null);
+
 		// finish up
 
 		transaction.commit ();
-
-		return Status.processed;
 
 	}
 

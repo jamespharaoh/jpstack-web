@@ -79,7 +79,7 @@ class ChatNameCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			ReceivedMessage receivedMessage) {
 
@@ -146,7 +146,7 @@ class ChatNameCommand
 
 			transaction.commit ();
 
-			return null;
+			return;
 
 		}
 
@@ -174,8 +174,6 @@ class ChatNameCommand
 		}
 
 		transaction.commit ();
-
-		return null;
 
 	}
 

@@ -25,6 +25,7 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.ReceivedMessage;
+import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.number.list.logic.NumberListLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
@@ -44,6 +45,9 @@ class ManualResponderCommand
 
 	@Inject
 	Database database;
+
+	@Inject
+	InboxLogic inboxLogic;
 
 	@Inject
 	MessageObjectHelper messageHelper;
@@ -85,7 +89,7 @@ class ManualResponderCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -112,9 +116,6 @@ class ManualResponderCommand
 			serviceHelper.findByCode (
 				manualResponder,
 				"default");
-
-		receivedMessage.setServiceId (
-			defaultService.getId ());
 
 		// remove from number list
 
@@ -185,9 +186,13 @@ class ManualResponderCommand
 			.setQueueItem (
 				queueItem);
 
-		transaction.commit ();
+		inboxLogic.inboxProcessed (
+			message,
+			defaultService,
+			null,
+			command);
 
-		return Status.processed;
+		transaction.commit ();
 
 	}
 

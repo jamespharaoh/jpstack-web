@@ -16,7 +16,7 @@ import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.helper.ConsoleHelperRegistry;
 import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.module.ConsoleModuleImpl;
-import wbs.platform.console.spec.ConsoleSimpleBuilderContainer;
+import wbs.platform.console.module.SimpleConsoleBuilderContainer;
 
 @PrototypeComponent ("formFieldSetBuilder")
 @ConsoleModuleBuilderHandler
@@ -34,7 +34,7 @@ class FormFieldSetBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleSimpleBuilderContainer container;
+	SimpleConsoleBuilderContainer container;
 
 	@BuilderSource
 	FormFieldSetSpec spec;

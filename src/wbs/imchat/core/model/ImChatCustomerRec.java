@@ -1,15 +1,17 @@
 package wbs.imchat.core.model;
 
 import java.util.List;
+import java.util.Random;
 
 import javax.inject.Inject;
-
-import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
@@ -18,9 +20,6 @@ import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
-import wbs.imchat.core.model.ImChatCustomerDao;
-import wbs.imchat.core.model.ImChatCustomerRec;
-import wbs.imchat.core.model.ImChatCustomerSearch;
 
 @Accessors (chain = true)
 @Data
@@ -29,7 +28,7 @@ import wbs.imchat.core.model.ImChatCustomerSearch;
 @MajorEntity
 public class ImChatCustomerRec
 	implements CommonRecord<ImChatCustomerRec>{
-	
+
 	// identity
 
 	@GeneratedIdField
@@ -37,15 +36,52 @@ public class ImChatCustomerRec
 
 	@ParentField
 	ImChatRec imChat;
-	
+
 	@CodeField
 	String code;
-	
-	//statistics
-	
+
+	// statistics
+
 	@SimpleField
 	Integer numConversations = 0;
-	
+
+	// object helper methods
+
+	public
+	interface ImChatCustomerObjectHelperMethods {
+
+		String generateCode ();
+
+	}
+
+	// object helper implementation
+
+	public static
+	class ImChatCustomerObjectHelperImplementation
+		implements ImChatCustomerObjectHelperMethods {
+
+		// dependencies
+
+		@Inject
+		Random random;
+
+		// implementation
+
+		@Override
+		public
+		String generateCode () {
+
+			int intCode =
+				+ random.nextInt (90000000)
+				+ 10000000;
+
+			return Integer.toString (
+				intCode);
+
+		}
+
+	}
+
 	// dao methods
 
 	public static
@@ -55,7 +91,7 @@ public class ImChatCustomerRec
 				ImChatCustomerSearch imChatCustomerSearch);
 
 	}
-	
+
 	// object hooks
 
 	public static
@@ -81,25 +117,29 @@ public class ImChatCustomerRec
 		}
 
 	}
-	
+
+	// compare to
+
 	@Override
-	public int compareTo(Record<ImChatCustomerRec> otherRecord) {
-		
+	public
+	int compareTo (
+			Record<ImChatCustomerRec> otherRecord) {
+
 		ImChatCustomerRec other =
-				(ImChatCustomerRec) otherRecord;
-		
+			(ImChatCustomerRec) otherRecord;
+
 		return new CompareToBuilder ()
 
-		.append (
-			getImChat (),
-			other.getImChat ())
+			.append (
+				getImChat (),
+				other.getImChat ())
 
-		.append (
-			getCode (),
-			other.getCode ())
+			.append (
+				getCode (),
+				other.getCode ())
 
-		.toComparison ();
-		
+			.toComparison ();
+
 	}
-	
+
 }

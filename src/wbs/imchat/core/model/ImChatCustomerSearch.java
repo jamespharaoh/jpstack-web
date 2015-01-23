@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode
 @ToString
-public 
+public
 class ImChatCustomerSearch {
 
 	Integer imChatId;
@@ -22,5 +22,5 @@ class ImChatCustomerSearch {
 	enum Order {
 		timestampDesc
 	}
-	
+
 }

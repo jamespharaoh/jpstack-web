@@ -26,7 +26,7 @@ import wbs.framework.record.Record;
 import wbs.platform.console.context.ConsoleContextStuff;
 import wbs.platform.console.forms.EntityFinder;
 import wbs.platform.console.lookup.ObjectLookup;
-import wbs.platform.console.metamodule.ConsoleMetaManager;
+import wbs.platform.console.module.ConsoleMetaManager;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleHelperBuilder")

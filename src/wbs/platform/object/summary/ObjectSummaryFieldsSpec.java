@@ -7,8 +7,8 @@ import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataParent;
-import wbs.platform.console.spec.ConsoleModuleData;
-import wbs.platform.console.spec.ConsoleSpec;
+import wbs.platform.console.module.ConsoleModuleData;
+import wbs.platform.console.module.ConsoleModuleSpec;
 
 @Accessors (fluent = true)
 @Data
@@ -21,7 +21,7 @@ class ObjectSummaryFieldsSpec {
 	// tree attributes
 
 	@DataAncestor
-	ConsoleSpec consoleModule;
+	ConsoleModuleSpec consoleModule;
 
 	@DataParent
 	ObjectSummaryPageSpec objectSummaryPageSpec;

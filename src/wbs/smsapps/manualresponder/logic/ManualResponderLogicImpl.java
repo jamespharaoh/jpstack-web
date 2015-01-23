@@ -62,7 +62,7 @@ class ManualResponderLogicImpl
 		return maxLength;
 
 	}
-	
+
 	@Override
 	public
 	int minimumMessageLength (
@@ -81,7 +81,7 @@ class ManualResponderLogicImpl
 				: 153;
 
 		int minLength = maxLengthPerMultipartMessage * template.getMinimumMessageParts();
-		
+
 		// added length of fixed string
 
 		if (

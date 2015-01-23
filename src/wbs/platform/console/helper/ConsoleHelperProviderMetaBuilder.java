@@ -20,7 +20,7 @@ import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.platform.console.context.ConsoleContextMetaBuilderContainer;
-import wbs.platform.console.metamodule.ConsoleMetaModuleImpl;
+import wbs.platform.console.module.ConsoleMetaModuleImpl;
 
 @PrototypeComponent ("consoleHelperProviderMetaBuilder")
 @ConsoleMetaModuleBuilderHandler

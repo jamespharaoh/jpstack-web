@@ -138,7 +138,7 @@ class SubscriptionCommand
 
 	@Override
 	public
-	Status handle (
+	void handle (
 			int commandId,
 			@NonNull ReceivedMessage receivedMessage) {
 
@@ -192,8 +192,6 @@ class SubscriptionCommand
 		}
 
 		transaction.commit ();
-
-		return null;
 
 	}
 
