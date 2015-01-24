@@ -57,8 +57,7 @@ class ConsoleAction
 
 	@Override
 	public final
-	Responder handle ()
-		throws ServletException {
+	Responder handle () {
 
 		try {
 
@@ -140,8 +139,7 @@ class ConsoleAction
 	}
 
 	Responder handleException (
-			Throwable throwable)
-		throws ServletException {
+			Throwable throwable) {
 
 		// if we have no backup page just die
 
@@ -167,9 +165,6 @@ class ConsoleAction
 
 			if (throwable instanceof RuntimeException)
 				throw (RuntimeException) throwable;
-
-			if (throwable instanceof ServletException)
-				throw (ServletException) throwable;
 
 			throw new RuntimeException (throwable);
 

@@ -6,7 +6,6 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.servlet.ServletException;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -145,8 +144,7 @@ class ObjectLinksPageBuilder {
 
 			@Override
 			public
-			Responder handle ()
-				throws ServletException {
+			Responder handle () {
 
 				return objectLinksAction.get ()
 					.responderName (responderName)

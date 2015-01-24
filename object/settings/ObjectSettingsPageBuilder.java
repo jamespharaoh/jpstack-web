@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.servlet.ServletException;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -121,9 +120,11 @@ class ObjectSettingsPageBuilder {
 		buildAction ();
 		buildResponder ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildTab (
 				resolvedExtensionPoint);
@@ -165,8 +166,7 @@ class ObjectSettingsPageBuilder {
 
 			@Override
 			public
-			Responder handle ()
-				throws ServletException {
+			Responder handle () {
 
 				Action settingsAction;
 
@@ -263,8 +263,7 @@ class ObjectSettingsPageBuilder {
 
 				@Override
 				public
-				Responder handle ()
-					throws ServletException {
+				Responder handle () {
 
 					Action removeAction;
 

@@ -8,7 +8,6 @@ import java.util.Collections;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.servlet.ServletException;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -165,8 +164,7 @@ class ObjectSearchPageBuilder {
 
 			@Override
 			public
-			Responder handle ()
-				throws ServletException {
+			Responder handle () {
 
 				return objectSearchGetAction.get ()
 
@@ -194,8 +192,7 @@ class ObjectSearchPageBuilder {
 
 			@Override
 			public
-			Responder handle ()
-				throws ServletException {
+			Responder handle () {
 
 				return objectSearchPostAction.get ()
 
