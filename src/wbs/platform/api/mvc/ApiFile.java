@@ -146,21 +146,20 @@ class ApiFile
 		return postAction (
 			new Action () {
 
-				@Override
-				public
-				Responder handle ()
-					throws ServletException {
+			@Override
+			public
+			Responder handle () {
 
-					Action action =
-						applicationContext.getBean (
-							beanName,
-							Action.class);
+				Action action =
+					applicationContext.getBean (
+						beanName,
+						Action.class);
 
-					return action.handle ();
+				return action.handle ();
 
-				}
+			}
 
-			});
+		});
 
 	}
 

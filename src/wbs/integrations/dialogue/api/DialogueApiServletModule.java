@@ -347,8 +347,8 @@ class DialogueApiServletModule
 		new Action () {
 
 		@Override
-		public Responder handle ()
-			throws ServletException {
+		public
+		Responder handle () {
 
 			String idParam =
 				requestContext.parameter ("X-E3-ID");
@@ -414,11 +414,15 @@ class DialogueApiServletModule
 
 			MessageStatus newMessageStatus = null;
 
-			if (deliveryReportParam != null
-					&& submissionReportParam != null)
+			if (
+				deliveryReportParam != null
+				&& submissionReportParam != null
+			) {
 
-				throw new ServletException (
+				throw new RuntimeException (
 					"Got both delivery and submission reports!");
+
+			}
 
 			Integer statusCode = null;
 			if (deliveryReportParam != null) {
