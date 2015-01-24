@@ -23,11 +23,15 @@ public
 class ApiExceptionHandler
 	implements WebExceptionHandler {
 
+	// dependencies
+
 	@Inject
 	ExceptionLogic exceptionLogic;
 
 	@Inject
 	RequestContext requestContext;
+
+	// implementation
 
 	@Override
 	public
@@ -41,9 +45,9 @@ class ApiExceptionHandler
 
 		log.error (
 			stringFormat (
-				"Request generated exception: %s: %s",
+				"Error at %s",
 				requestContext.requestUri (),
-				throwable.getMessage ()));
+				throwable));
 
 		// make an exception log of this calamity
 
