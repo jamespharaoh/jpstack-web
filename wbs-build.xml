@@ -551,6 +551,12 @@
 			name="im-chat-core"
 			package="wbs.imchat.core"/>
 
+		<!-- paypal -->
+
+		<plugin
+			name="paypal"
+			package="wbs.paypal"/>
+
 		<!-- integrations -->
 
 		<plugin
