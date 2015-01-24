@@ -1,11 +1,12 @@
 package wbs.wallet.model;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
@@ -19,40 +20,45 @@ import wbs.platform.scaffold.model.SliceRec;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public class WalletServiceRec
-	implements CommonRecord<WalletServiceRec>{
-	
+public
+class WalletServiceRec
+	implements CommonRecord<WalletServiceRec> {
+
 	// id
 
 	@GeneratedIdField
 	Integer id;
-	
+
 	// identity
-	
+
 	@ParentField
 	SliceRec slice;
-	
+
 	@CodeField
 	String code;
 
+	// compare to
+
 	@Override
-	public int compareTo(Record<WalletServiceRec> otherRecord) {
-		
+	public
+	int compareTo (
+			Record<WalletServiceRec> otherRecord) {
+
 		WalletServiceRec other =
-				(WalletServiceRec) otherRecord;
-		
+			(WalletServiceRec) otherRecord;
+
 		return new CompareToBuilder ()
-		
-		.append (
+
+			.append (
 				getCode (),
 				other.getCode ())
-				
-		.append (
+
+			.append (
 				getSlice (),
 				other.getSlice ())
-				
-		.toComparison ();
-		
+
+			.toComparison ();
+
 	}
-	
+
 }

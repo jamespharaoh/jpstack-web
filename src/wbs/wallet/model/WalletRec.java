@@ -18,38 +18,45 @@ import wbs.framework.record.Record;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public class WalletRec
-	implements CommonRecord<WalletRec>{
-	
-	// identity
+public
+class WalletRec
+	implements CommonRecord<WalletRec> {
+
+	// id
 
 	@GeneratedIdField
 	Integer id;
-	
+
+	// identity
+
 	@ParentField
 	WalletServiceRec walletServiceRec;
-	
+
 	@CodeField
 	String code;
 
+	// compare to
+
 	@Override
-	public int compareTo(Record<WalletRec> otherRecord) {
-		
+	public
+	int compareTo (
+			Record<WalletRec> otherRecord) {
+
 		WalletRec other =
-				(WalletRec) otherRecord;
-		
+			(WalletRec) otherRecord;
+
 		return new CompareToBuilder ()
-		
-		.append (
+
+			.append (
 				getWalletServiceRec (),
 				other.getWalletServiceRec ())
-				
-		.append (
+
+			.append (
 				getCode (),
 				other.getCode ())
 
-		.toComparison ();
-		
+			.toComparison ();
+
 	}
-	
+
 }

@@ -349,7 +349,7 @@
       <fileset dir="src/wbs/apn/chat/user/admin/api/files"/>
       <fileset dir="src/wbs/apn/chat/user/pending/api/files"/>
       <fileset dir="src/wbs/imchat/core/api/files"/>
-      <fileset dir="src/wbs/paypal/api/files"/>   	
+      <fileset dir="src/wbs/paypal/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
       <fileset dir="src/wbs/integrations/dialogue/api/files"/>

@@ -1,7 +1,5 @@
 package wbs.paypal.fixture;
 
-import java.util.Random;
-
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -26,60 +24,56 @@ class PaypalFixtureProvider
 
 	@Inject
 	MenuObjectHelper menuHelper;
-	
+
 	@Inject
 	PaypalAccountObjectHelper paypalAccountHelper;
-	
+
 	@Inject
 	SliceObjectHelper sliceHelper;
 
 	// implementation
-	
-	@Inject
-	Random random;
 
 	@Override
 	public
 	void createFixtures () {
 
-		MenuRec menu = new MenuRec()
-				.setMenuGroup (
-						menuGroupHelper.findByCode (
-						GlobalId.root,
-						"facility"))
+		menuHelper.insert (
+			new MenuRec ()
 
-				.setCode (
-					"paypal_account")
+			.setMenuGroup (
+				menuGroupHelper.findByCode (
+					GlobalId.root,
+					"facility"))
 
-				.setLabel (
-					"Paypal Account")
+			.setCode (
+				"paypal_account")
 
-				.setPath (
-					"/paypalAccounts");
-		
-		menuHelper.insert (menu);
-		
-		PaypalAccountRec paypalAccount = new PaypalAccountRec ()
+			.setLabel (
+				"Paypal Account")
 
-			.setSlice(sliceHelper.findByCode(GlobalId.root, "test"))
-	
-			.setCode("paypalAccount")
-			
-			.setName("paypalAccount")
-			.setDescription("paypalAccount"); 
-					
-		paypalAccountHelper.insert (paypalAccount);
+			.setPath (
+				"/paypalAccounts")
 
-	}
-	
-	public
-	String generateCode () {
+		);
 
-		int code;
-		
-		code = random.nextInt (90000000) + 10000000;
+		paypalAccountHelper.insert (
+			new PaypalAccountRec ()
 
-		return Integer.toString (code);
+			.setSlice (
+				sliceHelper.findByCode (
+					GlobalId.root,
+					"test"))
+
+			.setCode (
+				"paypalAccount")
+
+			.setName (
+				"paypalAccount")
+
+			.setDescription (
+				"paypalAccount")
+
+		);
 
 	}
 

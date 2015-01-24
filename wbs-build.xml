@@ -557,6 +557,12 @@
 			name="paypal"
 			package="wbs.paypal"/>
 
+		<!-- paypal -->
+
+		<plugin
+			name="paypal"
+			package="wbs.paypal"/>
+
 		<!-- integrations -->
 
 		<plugin

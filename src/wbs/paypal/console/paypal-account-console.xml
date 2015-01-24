@@ -45,7 +45,7 @@
 				fields="settings"/>
 
 			<object-events-page/>
-			
+
 		</object>
 
 	</object-context>
@@ -79,7 +79,8 @@
 		<code-field/>
 		<name-field/>
 		<description-field/>
-		<deleted-field/>		
+		<deleted-field/>
+
 		<text-field
 			name="serviceEndpoint"
 			nullable="yes"/>
@@ -87,7 +88,7 @@
 		<text-field
 			name="clientId"
 			nullable="yes"/>
-			
+
 		<text-field
 			name="clientSecret"
 			nullable="yes"/>
@@ -102,6 +103,18 @@
 		<name-field/>
 		<description-field/>
 		<deleted-field/>
+
+		<text-field
+			name="serviceEndpoint"
+			nullable="yes"/>
+
+		<text-field
+			name="clientId"
+			nullable="yes"/>
+
+		<text-field
+			name="clientSecret"
+			nullable="yes"/>
 
 	</field-set>
 

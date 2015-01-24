@@ -6,15 +6,15 @@
 		<plugin-dependency name="sms-apps-common"/>
 		<plugin-dependency name="scaffold"/>
 	</plugin-dependencies>
-	
+
 	<sql-scripts>
 		<sql-data name="paypal-data"/>
 	</sql-scripts>
-	
+
 	<models>
 		<model name="paypalAccount"/>
 	</models>
-	
+
 	<fixtures>
 		<fixture name="paypal"/>
 	</fixtures>
@@ -22,5 +22,5 @@
 	<console-modules>
 		<console-module name="paypal-account"/>
 	</console-modules>
-	
+
 </plugin>
