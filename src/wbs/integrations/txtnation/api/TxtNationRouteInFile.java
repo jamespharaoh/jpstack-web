@@ -4,11 +4,15 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.PrintWriter;
+import java.util.Collections;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Instant;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -17,10 +21,14 @@ import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.RequestContext;
 import wbs.integrations.txtnation.model.TxtNationRouteInObjectHelper;
 import wbs.integrations.txtnation.model.TxtNationRouteInRec;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
+
+import com.google.common.base.Optional;
 
 @Log4j
 @SingletonComponent ("txtNationRouteInFile")
@@ -170,17 +178,16 @@ class TxtNationRouteInFile
 		// store message
 
 		inboxLogic.inboxInsert (
-			idParam,
-			textHelper.findOrCreate (
-				messageParam),
+			Optional.of (idParam),
+			textHelper.findOrCreate (messageParam),
 			numberFrom,
 			numberTo,
 			txtNationRouteIn.getRoute (),
-			null,
-			null,
-			null,
-			null,
-			null);
+			Optional.<NetworkRec>absent (),
+			Optional.<Instant>absent (),
+			Collections.<MediaRec>emptyList (),
+			Optional.<String>absent (),
+			Optional.<String>absent ());
 
 		// commit
 
@@ -193,7 +200,6 @@ class TxtNationRouteInFile
 
 		StringFormatter.printWriterFormat (
 			out,
-
 			"OK\n");
 
 	}

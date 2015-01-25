@@ -4,11 +4,12 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
+import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.email.logic.EmailLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -17,14 +18,18 @@ import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.sms.messageset.model.MessageSetRec;
 import wbs.sms.number.list.logic.NumberListLogic;
 import wbs.smsapps.autoresponder.model.AutoResponderObjectHelper;
 import wbs.smsapps.autoresponder.model.AutoResponderRec;
 
+import com.google.common.base.Optional;
+
+@Accessors (fluent = true)
 @PrototypeComponent ("autoResponderCommand")
 public
 class AutoResponderCommand
@@ -59,6 +64,20 @@ class AutoResponderCommand
 	@Inject
 	ServiceObjectHelper serviceHelper;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
 	// details
 
 	@Override
@@ -73,21 +92,10 @@ class AutoResponderCommand
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
+	InboxAttemptRec handle () {
 
 		MessageRec message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+			inbox.getMessage ();
 
 		AutoResponderRec autoResponder =
 			autoResponderHelper.find (
@@ -139,15 +147,11 @@ class AutoResponderCommand
 
 		// process inbox
 
-		inboxLogic.inboxProcessed (
+		return inboxLogic.inboxProcessed (
 			message,
-			defaultService,
-			null,
-			null);
-
-		// finish up
-
-		transaction.commit ();
+			Optional.of (defaultService),
+			Optional.<AffiliateRec>absent (),
+			command);
 
 	}
 

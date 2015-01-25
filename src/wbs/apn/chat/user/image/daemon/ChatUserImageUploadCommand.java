@@ -4,7 +4,9 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import org.joda.time.Duration;
 
@@ -28,12 +30,14 @@ import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+@Accessors (fluent = true)
 @PrototypeComponent ("chatUserImageUploadCommand")
 public
 class ChatUserImageUploadCommand
@@ -71,6 +75,20 @@ class ChatUserImageUploadCommand
 	@Inject
 	ServiceObjectHelper serviceHelper;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
 	// details
 
 	@Override
@@ -87,21 +105,13 @@ class ChatUserImageUploadCommand
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			ReceivedMessage receivedMessage) {
+	InboxAttemptRec handle () {
 
-		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+			database.currentTransaction ();
 
 		MessageRec messageIn =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		ChatRec chat =
 			(ChatRec)
@@ -195,17 +205,12 @@ class ChatUserImageUploadCommand
 
 		// process inbox
 
-		inboxLogic.inboxProcessed (
+		return inboxLogic.inboxProcessed (
 			messageIn,
-			defaultService,
-			affiliate,
+			Optional.of (defaultService),
+			Optional.of (affiliate),
 			command);
 
-		// commit transaction and return
-
-		transaction.commit ();
-
-		return;
 
 	}
 

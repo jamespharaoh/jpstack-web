@@ -2,8 +2,9 @@ package wbs.apn.chat.core.daemon;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
@@ -12,7 +13,6 @@ import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
@@ -20,9 +20,13 @@ import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
+import com.google.common.base.Optional;
+
+@Accessors (fluent = true)
 @PrototypeComponent ("chatBlockAllCommand")
 public
 class ChatBlockAllCommand
@@ -57,6 +61,20 @@ class ChatBlockAllCommand
 	@Inject
 	ServiceObjectHelper serviceHelper;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
 	// details
 
 	@Override
@@ -73,19 +91,9 @@ class ChatBlockAllCommand
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
+	InboxAttemptRec handle () {
 
 		// start transaction
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
 
 		ChatRec chat =
 			chatHelper.find (
@@ -97,21 +105,12 @@ class ChatBlockAllCommand
 				"default");
 
 		MessageRec message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
 				chat,
 				message);
-
-		// process inbox
-
-		inboxLogic.inboxProcessed (
-			message,
-			defaultService,
-			chatUserLogic.getAffiliate (chatUser),
-			commandHelper.find (commandId));
 
 		// send barred users to help
 
@@ -142,7 +141,16 @@ class ChatBlockAllCommand
 			chatUser,
 			message);
 
-		transaction.commit ();
+		// process inbox
+
+		return inboxLogic.inboxProcessed (
+			message,
+			Optional.of (
+				defaultService),
+			Optional.of (
+				chatUserLogic.getAffiliate (
+					chatUser)),
+			command);
 
 	}
 

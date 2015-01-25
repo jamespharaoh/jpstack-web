@@ -2,24 +2,27 @@ package wbs.apn.chat.core.daemon;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.keyword.model.ChatKeywordObjectHelper;
 import wbs.apn.chat.keyword.model.ChatKeywordRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.KeywordFinder;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.CommandManager;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
-import wbs.sms.message.inbox.daemon.ReceivedMessageImpl;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
+import com.google.common.base.Optional;
+
+@Accessors (fluent = true)
 @PrototypeComponent ("chatMagicCommand")
 public
 class ChatMagicCommand
@@ -48,6 +51,20 @@ class ChatMagicCommand
 	@Inject
 	ObjectManager objectManager;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
 	// details
 
 	@Override
@@ -64,25 +81,12 @@ class ChatMagicCommand
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+	InboxAttemptRec handle () {
 
 		ChatRec chat =
 			(ChatRec) (Object)
 			objectManager.getParent (
 				command);
-
-		String rest =
-			receivedMessage.getRest ();
 
 		// look for a single keyword
 
@@ -99,32 +103,33 @@ class ChatMagicCommand
 					chat,
 					match.simpleKeyword ());
 
-			if (chatKeyword != null
-					&& chatKeyword.getGlobal ()
-					&& chatKeyword.getCommand () != null) {
+			if (
+				chatKeyword != null
+				&& chatKeyword.getGlobal ()
+				&& chatKeyword.getCommand () != null
+			) {
 
-				transaction.commit ();
-
-				ReceivedMessage newMessage =
-					new ReceivedMessageImpl (
-						receivedMessage,
-						"");
-
-				commandManager.handle (
-					chatKeyword.getCommand ().getId (),
-					newMessage);
+				return commandManager.handle (
+					inbox,
+					chatKeyword.getCommand (),
+					Optional.<Integer>absent (),
+					"");
 
 			}
 
 		}
 
-		transaction.commit ();
-
 		// use the default command
 
-		commandManager.handle (
-			receivedMessage.getRef (),
-			receivedMessage);
+		CommandRec defaultCommand =
+			commandHelper.find (
+				commandRef.get ());
+
+		return commandManager.handle (
+			inbox,
+			defaultCommand,
+			Optional.<Integer>absent (),
+			rest);
 
 	}
 

@@ -4,8 +4,9 @@ import java.util.Collections;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
@@ -17,23 +18,28 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
 import com.google.common.base.Optional;
 
+@Accessors (fluent = true)
 @PrototypeComponent ("chatPhotoCommand")
 public
 class ChatPhotoCommand
 	implements CommandHandler {
+
+	// dependencies
 
 	@Inject
 	ChatCreditLogic chatCreditLogic;
@@ -71,6 +77,22 @@ class ChatPhotoCommand
 	@Inject
 	ServiceObjectHelper serviceHelper;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
+	// details
+
 	@Override
 	public
 	String[] getCommandTypes () {
@@ -81,41 +103,33 @@ class ChatPhotoCommand
 
 	}
 
+	// implementation
+
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+	InboxAttemptRec handle () {
 
 		ChatRec chat =
 			(ChatRec) (Object)
 			objectManager.getParent (
 				command);
 
+		ServiceRec defaultService =
+			serviceHelper.findByCode (
+				chat,
+				"default");
+
 		MessageRec message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
 				chat,
 				message);
 
-		// process inbox
-
-		inboxLogic.inboxProcessed (
-			message,
-			serviceHelper.findByCode (chat, "default"),
-			chatUserLogic.getAffiliate (chatUser),
-			commandHelper.find (commandId));
+		AffiliateRec affiliate =
+			chatUserLogic.getAffiliate (
+				chatUser);
 
 		// send barred users to help
 
@@ -130,89 +144,93 @@ class ChatPhotoCommand
 			chatHelpLogLogic.createChatHelpLogIn (
 				chatUser,
 				message,
-				receivedMessage.getRest (),
+				rest,
 				null,
 				true);
 
-			transaction.commit ();
-
-			return;
-
-		}
-
-		String text =
-			receivedMessage.getRest ().trim ();
-
-		ChatUserRec photoUser =
-			chatUserHelper.findByCode (
-				chat,
-				text);
-
-		if (text.length () == 0) {
-
-			// just send any three users
-
-			chatInfoLogic.sendUserPics (
-				chatUser,
-				3,
-				message.getThreadId ());
-
-		} else if (
-
-			photoUser == null
-
-			|| ! chatUserLogic.valid (
-				photoUser)
-
-		) {
-
-			// send no such user error
-
-			chatSendLogic.sendSystemMagic (
-				chatUser,
-				Optional.of (
-					message.getThreadId ()),
-				"request_photo_error",
-				commandHelper.findByCode (
-					chat,
-					"magic"),
-				commandHelper.findByCode (
-					chat,
-					"help"
-				).getId (),
-				Collections.<String,String>emptyMap ());
-
-		} else if (photoUser.getMainChatUserImage () == null) {
-
-			// send no such photo error
-
-			chatSendLogic.sendSystemMagic (
-				chatUser,
-				Optional.of (
-					message.getThreadId ()),
-				"no_photo_error",
-				commandHelper.findByCode (
-					chat,
-					"magic"),
-				commandHelper.findByCode (
-					chat,
-					"help"
-				).getId (),
-				Collections.<String,String>emptyMap ());
-
 		} else {
 
-			// send pics
+			String text =
+				rest.trim ();
 
-			chatInfoLogic.sendRequestedUserPicandOtherUserPics (
-				chatUser,
-				photoUser,
-				2,
-				message.getThreadId ());
+			ChatUserRec photoUser =
+				chatUserHelper.findByCode (
+					chat,
+					text);
+
+			if (text.length () == 0) {
+
+				// just send any three users
+
+				chatInfoLogic.sendUserPics (
+					chatUser,
+					3,
+					message.getThreadId ());
+
+			} else if (
+
+				photoUser == null
+
+				|| ! chatUserLogic.valid (
+					photoUser)
+
+			) {
+
+				// send no such user error
+
+				chatSendLogic.sendSystemMagic (
+					chatUser,
+					Optional.of (
+						message.getThreadId ()),
+					"request_photo_error",
+					commandHelper.findByCode (
+						chat,
+						"magic"),
+					commandHelper.findByCode (
+						chat,
+						"help"
+					).getId (),
+					Collections.<String,String>emptyMap ());
+
+			} else if (photoUser.getMainChatUserImage () == null) {
+
+				// send no such photo error
+
+				chatSendLogic.sendSystemMagic (
+					chatUser,
+					Optional.of (
+						message.getThreadId ()),
+					"no_photo_error",
+					commandHelper.findByCode (
+						chat,
+						"magic"),
+					commandHelper.findByCode (
+						chat,
+						"help"
+					).getId (),
+					Collections.<String,String>emptyMap ());
+
+			} else {
+
+				// send pics
+
+				chatInfoLogic.sendRequestedUserPicandOtherUserPics (
+					chatUser,
+					photoUser,
+					2,
+					message.getThreadId ());
+
+			}
 
 		}
 
-		transaction.commit ();
+		// process inbox
+
+		return inboxLogic.inboxProcessed (
+			message,
+			Optional.of (defaultService),
+			Optional.of (affiliate),
+			command);
 
 	}
 

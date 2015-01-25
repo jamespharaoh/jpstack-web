@@ -4,8 +4,9 @@ import static wbs.framework.utils.etc.Misc.equal;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.date.logic.ChatDateLogic;
 import wbs.apn.chat.help.logic.ChatHelpLogLogic;
@@ -17,7 +18,6 @@ import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
@@ -25,9 +25,13 @@ import wbs.sms.command.model.CommandTypeRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
+import com.google.common.base.Optional;
+
+@Accessors (fluent = true)
 @PrototypeComponent ("chatDateStopCommand")
 public
 class ChatDateStopCommand
@@ -65,6 +69,20 @@ class ChatDateStopCommand
 	@Inject
 	ServiceObjectHelper serviceHelper;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
 	// details
 
 	@Override
@@ -81,25 +99,18 @@ class ChatDateStopCommand
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+	InboxAttemptRec handle () {
 
 		CommandTypeRec commandType =
 			command.getCommandType ();
 
-		if (! equal (
+		if (
+			! equal (
 				commandType.getCode (),
-				"date_stop"))
+				"date_stop")
+		) {
 			throw new RuntimeException ();
+		}
 
 		if (! equal (
 				commandType.getParentObjectType ().getCode (),
@@ -114,8 +125,7 @@ class ChatDateStopCommand
 			chatScheme.getChat ();
 
 		MessageRec message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
@@ -136,22 +146,22 @@ class ChatDateStopCommand
 		chatHelpLogLogic.createChatHelpLogIn (
 			chatUser,
 			message,
-			receivedMessage.getRest (),
+			rest,
 			command,
 			false);
 
 		// process inbox
 
-		inboxLogic.inboxProcessed (
+		return inboxLogic.inboxProcessed (
 			message,
-			serviceHelper.findByCode (
-				chat,
-				"default"),
-			chatUserLogic.getAffiliate (
-				chatUser),
+			Optional.of (
+				serviceHelper.findByCode (
+					chat,
+					"default")),
+			Optional.of (
+				chatUserLogic.getAffiliate (
+					chatUser)),
 			command);
-
-		transaction.commit ();
 
 	}
 

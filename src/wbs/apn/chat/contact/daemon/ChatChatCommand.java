@@ -5,8 +5,9 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
@@ -27,7 +28,6 @@ import wbs.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -41,12 +41,13 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.CommandManager;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
-import wbs.sms.message.inbox.daemon.ReceivedMessageImpl;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
 import com.google.common.base.Optional;
 
+@Accessors (fluent = true)
 @Log4j
 @PrototypeComponent ("chatChatCommand")
 public
@@ -106,12 +107,27 @@ class ChatChatCommand
 	@Inject
 	TextObjectHelper textHelper;
 
+	// prototype dependencies
+
 	@Inject
-	Provider<ChatJoiner> joiner;
+	Provider<ChatJoiner> chatJoinerProvider;
+
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
 
 	// state
 
-	CommandRec thisCommand;
 	ChatRec chat;
 	MessageRec message;
 	ChatUserRec fromChatUser;
@@ -132,23 +148,12 @@ class ChatChatCommand
 
 	// implementation
 
-	private
-	boolean doBlock (
-			Transaction transaction,
-			ReceivedMessage receivedMessage) {
-
-		// process inbox
+	InboxAttemptRec doBlock () {
 
 		ServiceRec defaultService =
 			serviceHelper.findByCode (
 				chat,
 				"default");
-
-		inboxLogic.inboxProcessed (
-			message,
-			defaultService,
-			chatUserLogic.getAffiliate (fromChatUser),
-			thisCommand);
 
 		// create the chatblock, if it doesn't already exist
 
@@ -197,14 +202,20 @@ class ChatChatCommand
 			systemService,
 			helpCommand.getId ());
 
-		transaction.commit ();
+		// process inbox
 
-		return true;
+		return inboxLogic.inboxProcessed (
+			message,
+			Optional.of (
+				defaultService),
+			Optional.of (
+				chatUserLogic.getAffiliate (
+					fromChatUser)),
+			command);
 
 	}
 
-	private
-	boolean doInfo () {
+	InboxAttemptRec doInfo () {
 
 		// TODO why is there no code here?
 
@@ -212,54 +223,41 @@ class ChatChatCommand
 
 	}
 
-	private
-	boolean doChat (
-			Transaction transaction,
-			ReceivedMessage receivedMessage) {
-
-		if (toChatUser == null) {
-
-			log.warn (
-				stringFormat (
-					"Message %d ignored as recipient user id %d does not exist",
-					message.getId (),
-					receivedMessage.getRef ()));
-
-			ServiceRec defaultService =
-				serviceHelper.findByCode (
-					chat,
-					"default");
-
-			inboxLogic.inboxProcessed (
-				message,
-				defaultService,
-				chatUserLogic.getAffiliate (fromChatUser),
-				thisCommand);
-
-			transaction.commit ();
-
-			return true;
-
-		}
-
-		// process inbox
+	InboxAttemptRec doChat () {
 
 		ServiceRec defaultService =
 			serviceHelper.findByCode (
 				chat,
 				"default");
 
-		inboxLogic.inboxProcessed (
-			message,
-			defaultService,
-			chatUserLogic.getAffiliate (fromChatUser),
-			thisCommand);
+		if (toChatUser == null) {
+
+			log.warn (
+				stringFormat (
+					"Message %d ",
+					inbox.getId (),
+					"ignored as recipient user id %d ",
+					commandRef.get (),
+					"does not exist"));
+
+			return inboxLogic.inboxProcessed (
+				message,
+				Optional.of (
+					defaultService),
+				Optional.of (
+					chatUserLogic.getAffiliate (
+						fromChatUser)),
+				command);
+
+		}
+
+		// process inbox
 
 		String rejected =
 			chatMessageLogic.chatMessageSendFromUser (
 				fromChatUser,
 				toChatUser,
-				receivedMessage.getRest (),
+				rest,
 				message.getThreadId (),
 				ChatMessageMethod.sms,
 				null);
@@ -277,16 +275,20 @@ class ChatChatCommand
 
 		}
 
-		transaction.commit ();
+		// process inbox
 
-		return true;
+		return inboxLogic.inboxProcessed (
+			message,
+			Optional.of (
+				defaultService),
+			Optional.of (
+				chatUserLogic.getAffiliate (
+					fromChatUser)),
+			command);
 
 	}
 
-	private
-	boolean checkKeyword (
-			Transaction transaction,
-			ReceivedMessage receivedMessage,
+	Optional<InboxAttemptRec> checkKeyword (
 			String keyword,
 			String rest) {
 
@@ -296,50 +298,44 @@ class ChatChatCommand
 				Gsm.toSimpleAlpha (keyword));
 
 		if (chatKeyword == null)
-			return false;
+			return Optional.<InboxAttemptRec>absent ();
 
 		if (chatKeyword.getChatBlock ()) {
 
-			return doBlock (
-				transaction,
-				receivedMessage);
+			return Optional.of (
+				doBlock ());
 
 		}
 
-		if (chatKeyword.getChatInfo ())
-			return doInfo ();
+		if (chatKeyword.getChatInfo ()) {
 
-		if (chatKeyword.getGlobal ()
-			&& chatKeyword.getCommand () != null) {
-
-			transaction.commit ();
-
-			ReceivedMessage newMessage =
-				new ReceivedMessageImpl (
-					receivedMessage,
-					receivedMessage.getMessageId (),
-					rest,
-					0);
-
-			commandManager.handle (
-				chatKeyword.getCommand ().getId (),
-				newMessage);
-
-			return true;
+			return Optional.of (
+				doInfo ());
 
 		}
 
-		return false;
+		if (
+			chatKeyword.getGlobal ()
+			&& chatKeyword.getCommand () != null
+		) {
+
+			return Optional.of (
+				commandManager.handle (
+					inbox,
+					chatKeyword.getCommand (),
+					Optional.<Integer>absent (),
+					rest));
+
+		}
+
+		return Optional.<InboxAttemptRec>absent ();
 
 	}
 
-	private
-	boolean tryJoin (
-			Transaction transaction,
-			ReceivedMessage receivedMessage) {
+	Optional<InboxAttemptRec> tryJoin () {
 
 		if (chatUserLogic.getAffiliateId (fromChatUser) != null)
-			return false;
+			return Optional.<InboxAttemptRec>absent ();
 
 		// TODO the scheme is set randomly here
 
@@ -355,42 +351,35 @@ class ChatChatCommand
 		ChatSchemeRec chatScheme =
 			chat.getChatSchemes ().iterator ().next ();
 
-		ChatJoiner joiner =
-			this.joiner.get ()
-				.chatId (chat.getId ())
-				.joinType (JoinType.chatSimple)
-				.chatSchemeId (chatScheme.getId ());
+		return Optional.of (
+			chatJoinerProvider.get ()
 
-		transaction.commit ();
+			.chatId (
+				chat.getId ())
 
-		joiner.handle (
-			receivedMessage);
+			.joinType (
+				JoinType.chatSimple)
 
-		return true;
+			.chatSchemeId (
+				chatScheme.getId ())
+
+			.handleInbox (
+				command)
+
+		);
 
 	}
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		thisCommand =
-			commandHelper.find (
-				commandId);
+	InboxAttemptRec handle () {
 
 		chat =
 			chatHelper.find (
-				thisCommand.getParentObjectId ());
+				command.getParentObjectId ());
 
 		message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		fromChatUser =
 			chatUserHelper.findOrCreate (
@@ -403,56 +392,40 @@ class ChatChatCommand
 
 		toChatUser =
 			chatUserHelper.find (
-				receivedMessage.getRef ());
+				commandRef.get ());
 
 		// treat as join if the user has no affiliate
 
-		if (
-			tryJoin (
-				transaction,
-				receivedMessage)
-		) {
-			return;
-		}
+		Optional<InboxAttemptRec> joinInboxAttempt =
+			tryJoin ();
 
-		String rest =
-			receivedMessage.getRest ();
+		if (joinInboxAttempt.isPresent ())
+			return joinInboxAttempt.get ();
 
 		// look for keywords to interpret
 
 		for (
 			KeywordFinder.Match match
-				: keywordFinder.find (rest)
+				: keywordFinder.find (
+					rest)
 		) {
 
-			if (! rest.isEmpty ())
+			if (! match.rest ().isEmpty ())
 				continue;
 
-			if (
+			Optional<InboxAttemptRec> keywordInboxAttempt =
 				checkKeyword (
-					transaction,
-					receivedMessage,
 					match.simpleKeyword (),
-					"")
-			) {
-				return;
-			}
+					"");
+
+			if (keywordInboxAttempt.isPresent ())
+				return keywordInboxAttempt.get ();
 
 		}
 
 		// send the message to the other user
 
-		if (
-			doChat (
-				transaction,
-				receivedMessage)
-		) {
-			return;
-		}
-
-		// error
-
-		throw new RuntimeException ();
+		return doChat ();
 
 	}
 

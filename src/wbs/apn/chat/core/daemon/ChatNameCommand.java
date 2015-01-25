@@ -2,7 +2,9 @@ package wbs.apn.chat.core.daemon;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
@@ -14,23 +16,28 @@ import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
 import com.google.common.base.Optional;
 
+@Accessors (fluent = true)
 @PrototypeComponent ("chatNameCommand")
 public
 class ChatNameCommand
 	implements CommandHandler {
+
+	// dependencies
 
 	@Inject
 	ChatCreditLogic chatCreditLogic;
@@ -68,8 +75,25 @@ class ChatNameCommand
 	@Inject
 	ServiceObjectHelper serviceHelper;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
+	// details
+
 	@Override
-	public String[] getCommandTypes () {
+	public
+	String[] getCommandTypes () {
 
 		return new String [] {
 			"chat.name"
@@ -77,38 +101,36 @@ class ChatNameCommand
 
 	}
 
+	// implementation
+
 	@Override
 	public
-	void handle (
-			int commandId,
-			ReceivedMessage receivedMessage) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
+	InboxAttemptRec handle () {
 
 		String newName =
-			receivedMessage
-				.getRest ()
-				.replaceAll ("\\s*$", "");
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+			rest.replaceAll ("\\s*$", "");
 
 		ChatRec chat =
 			(ChatRec) (Object)
 			objectManager.getParent (
 				command);
 
+		ServiceRec defaultService =
+			serviceHelper.findByCode (
+				chat,
+				"default");
+
 		MessageRec message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
 				chat,
 				message);
+
+		AffiliateRec affiliate =
+			chatUserLogic.getAffiliate (
+				chatUser);
 
 		// limit name
 
@@ -118,14 +140,6 @@ class ChatNameCommand
 				newName.substring (0, 16);
 
 		}
-
-		// process inbox
-
-		inboxLogic.inboxProcessed (
-			message,
-			serviceHelper.findByCode (chat, "default"),
-			chatUserLogic.getAffiliate (chatUser),
-			commandHelper.find (commandId));
 
 		// make sure the user can send
 
@@ -140,17 +154,11 @@ class ChatNameCommand
 			chatHelpLogLogic.createChatHelpLogIn (
 				chatUser,
 				message,
-				receivedMessage.getRest (),
+				rest,
 				null,
 				true);
 
-			transaction.commit ();
-
-			return;
-
-		}
-
-		if (newName.length () > 0) {
+		} else if (newName.length () > 0) {
 
 			// set name
 
@@ -173,7 +181,13 @@ class ChatNameCommand
 
 		}
 
-		transaction.commit ();
+		// process inbox
+
+		return inboxLogic.inboxProcessed (
+			message,
+			Optional.of (defaultService),
+			Optional.of (affiliate),
+			command);
 
 	}
 

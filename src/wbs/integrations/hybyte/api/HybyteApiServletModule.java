@@ -6,6 +6,7 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -21,6 +22,7 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.joda.time.Instant;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
@@ -39,11 +41,13 @@ import wbs.integrations.hybyte.model.HybyteRouteOutRec;
 import wbs.integrations.hybyte.model.HybyteRouteRec;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.exception.logic.ExceptionLogicImpl;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.InboxMultipartLogic;
 import wbs.sms.message.report.logic.ReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.message.report.model.MessageReportCodeRec;
@@ -51,6 +55,7 @@ import wbs.sms.message.report.model.MessageReportCodeType;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 @Log4j
@@ -59,7 +64,7 @@ public
 class HybyteApiServletModule
 	implements ServletModule {
 
-	// ============================================================= properties
+	// dependencies
 
 	@Inject
 	Database database;
@@ -78,6 +83,9 @@ class HybyteApiServletModule
 
 	@Inject
 	InboxLogic inboxLogic;
+
+	@Inject
+	InboxMultipartLogic inboxMultipartLogic;
 
 	@Inject
 	MessageReportCodeObjectHelper messageReportCodeHelper;
@@ -154,7 +162,7 @@ class HybyteApiServletModule
 
 					// insert multipart message
 
-					inboxLogic.insertInboxMultipart (
+					inboxMultipartLogic.insertInboxMultipart (
 						hybyteRoute.getRoute (),
 						inRequestResult.multipartId,
 						inRequestResult.multipartMaxSeg,
@@ -176,20 +184,21 @@ class HybyteApiServletModule
 
 					MessageRec message =
 						inboxLogic.inboxInsert (
-						inRequestResult.uuid,
-						textHelper.findOrCreate (inRequestResult.message),
-						numberFormatLogic.parse (
-							hybyteRoute.getNumberFormat (),
-							inRequestResult.from),
-						numberFormatLogic.parse (
-							hybyteRoute.getNumberFormat (),
-							inRequestResult.to),
-						hybyteRoute.getRoute (),
-						network,
-						null,
-						null,
-						null,
-						null);
+							Optional.of (inRequestResult.uuid),
+							textHelper.findOrCreate (
+								inRequestResult.message),
+							numberFormatLogic.parse (
+								hybyteRoute.getNumberFormat (),
+								inRequestResult.from),
+							numberFormatLogic.parse (
+								hybyteRoute.getNumberFormat (),
+								inRequestResult.to),
+							hybyteRoute.getRoute (),
+							Optional.of (network),
+							Optional.<Instant>absent (),
+							Collections.<MediaRec>emptyList (),
+							Optional.<String>absent (),
+							Optional.<String>absent ());
 
 					// output a message
 

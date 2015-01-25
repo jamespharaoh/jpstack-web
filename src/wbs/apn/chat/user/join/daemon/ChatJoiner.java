@@ -5,13 +5,11 @@ import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 import java.util.Random;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -54,16 +52,19 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
+import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
+import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.DateFinder;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
-import wbs.sms.message.inbox.daemon.ReceivedMessageImpl;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
 
 import com.google.common.base.Optional;
 
@@ -144,6 +145,9 @@ class ChatJoiner {
 	@Inject
 	ServiceObjectHelper serviceHelper;
 
+	@Inject
+	TextObjectHelper textHelper;
+
 	// properties
 
 	@Getter @Setter
@@ -165,17 +169,20 @@ class ChatJoiner {
 	Integer chatSchemeId;
 
 	@Getter @Setter
-	boolean confirmCharges;
+	Boolean confirmCharges;
+
+	@Getter @Setter
+	MessageRec message;
+
+	@Getter @Setter
+	String rest;
 
 	// state
 
 	ChatRec chat;
 	ChatUserRec chatUser;
-	MessageRec message;
-	ReceivedMessage receivedMessage;
 	Integer deliveryId;
 	DeliveryRec delivery;
-	String rest;
 	boolean gotPlace;
 
 	// implementation
@@ -189,7 +196,8 @@ class ChatJoiner {
 
 		chatSendLogic.sendSystemMagic (
 			chatUser,
-			Optional.of (message.getThreadId ()),
+			Optional.of (
+				message.getThreadId ()),
 			templateCode,
 			commandHelper.findByCode (
 				chat,
@@ -302,6 +310,9 @@ class ChatJoiner {
 	protected
 	void updateUserDob () {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		LocalDate dateOfBirth =
 			DateFinder.find (
 				rest,
@@ -326,10 +337,12 @@ class ChatJoiner {
 					message)
 
 				.setTimestamp (
-					new Date ())
+					instantToDate (
+						transaction.now ()))
 
 				.setFailingText (
-					message.getText ())
+					textHelper.findOrCreate (
+						rest))
 
 			);
 
@@ -350,7 +363,8 @@ class ChatJoiner {
 
 			chatSendLogic.sendSystemMmsFree (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				"photo_error",
 				commandHelper.findByCode (
 					chatUser.getChatAffiliate (),
@@ -431,11 +445,13 @@ class ChatJoiner {
 		// check age
 
 		if (
-			in (joinType,
+
+			in (
+				joinType,
 				JoinType.chatAge)
-			&& ChatPatterns.yes.matcher (
-				receivedMessage.getRest ()
-			).find ()
+
+			&& ChatPatterns.yes.matcher (rest).find ()
+
 		) {
 
 			chatUser
@@ -448,12 +464,14 @@ class ChatJoiner {
 		// confirm charges
 
 		if (
-			in (joinType,
+
+			in (
+				joinType,
 				JoinType.chatCharges,
 				JoinType.dateCharges)
-			&& ChatPatterns.yes.matcher (
-				receivedMessage.getRest ()
-			).find ()
+
+			&& ChatPatterns.yes.matcher (rest).find ()
+
 		) {
 
 			chatUser
@@ -557,7 +575,7 @@ class ChatJoiner {
 			chatHelpLogLogic.createChatHelpLogIn (
 				chatUser,
 				message,
-				receivedMessage.getRest (),
+				rest,
 				null,
 				true);
 
@@ -584,7 +602,7 @@ class ChatJoiner {
 			chatHelpLogLogic.createChatHelpLogIn (
 				chatUser,
 				message,
-				receivedMessage.getRest (),
+				rest,
 				null,
 				true);
 
@@ -600,7 +618,8 @@ class ChatJoiner {
 
 				chatSendLogic.sendSystemRbFree (
 					chatUser,
-					Optional.of (message.getThreadId ()),
+					Optional.of (
+						message.getThreadId ()),
 					"dob_request",
 					Collections.<String,String>emptyMap ());
 
@@ -650,7 +669,8 @@ class ChatJoiner {
 
 				chatSendLogic.sendSystemRbFree (
 					chatUser,
-					Optional.of (message.getThreadId ()),
+					Optional.of (
+						message.getThreadId ()),
 					"join_warning",
 					Collections.<String,String>emptyMap ());
 
@@ -790,77 +810,39 @@ class ChatJoiner {
 
 	}
 
-	public
-	void handle (
-			ReceivedMessage receivedMessage,
-			String rest) {
-
-		handle (
-			new ReceivedMessageImpl (
-				receivedMessage,
-				rest));
-
-	}
-
-	public
-	void handle (
-			ReceivedMessage receivedMessage) {
-
-		// save stuff
-
-		this.receivedMessage = receivedMessage;
-		this.rest = receivedMessage.getRest ();
-
-		// delegate to realSend
-
-		realSend ();
-
-	}
-
-	public
-	void delivery (
-			Integer deliveryIdId) {
-
-		this.deliveryId =
-			deliveryIdId;
-
-		realSend ();
-
-	}
-
 	/**
 	 * Multi-purpose join command.
 	 */
 	public
-	void realSend () {
+	void handle () {
 
-		@Cleanup
-		Transaction transaction1 =
-			database.beginReadWrite ();
+		if (! joinPart1 ())
+			return;
 
-		// do part one
+		joinPart2 ();
 
-		if (joinPart1 ()) {
-			joinPart2 ();
-		}
+	}
 
-		if (delivery != null) {
+	public
+	InboxAttemptRec handleInbox (
+			@NonNull CommandRec command) {
 
-			deliveryHelper.remove (
-				delivery);
+		handle ();
 
-		}
-
-		inboxLogic.inboxProcessed (
-			message,
+		ServiceRec defaultService =
 			serviceHelper.findByCode (
 				chat,
-				"default"),
-			chatUserLogic.getAffiliate (
-				chatUser),
-			null);
+				"default");
 
-		transaction1.commit ();
+		AffiliateRec affiliate =
+			chatUserLogic.getAffiliate (
+				chatUser);
+
+		return inboxLogic.inboxProcessed (
+			message,
+			Optional.of (defaultService),
+			Optional.of (affiliate),
+			command);
 
 	}
 
@@ -875,33 +857,10 @@ class ChatJoiner {
 		chat =
 			chatHelper.find (chatId);
 
-		if (receivedMessage != null) {
-
-			message =
-				messageHelper.find (
-					receivedMessage.getMessageId ());
-
-			chatUser =
-				chatUserHelper.findOrCreate (
-					chat,
-					message);
-
-		} else {
-
-			delivery =
-				deliveryHelper.find (
-					deliveryId);
-
-			message =
-				messageHelper.find (
-					delivery.getMessage ().getThreadId ());
-
-			chatUser =
-				chatUserHelper.findOrCreate (
-					chat,
-					delivery.getMessage ());
-
-		}
+		chatUser =
+			chatUserHelper.findOrCreate (
+				chat,
+				message);
 
 		// make sure the user can join
 
@@ -916,7 +875,7 @@ class ChatJoiner {
 			chatHelpLogLogic.createChatHelpLogIn (
 				chatUser,
 				message,
-				receivedMessage.getRest (),
+				rest,
 				null,
 				true);
 

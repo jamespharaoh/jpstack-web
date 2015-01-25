@@ -5,12 +5,13 @@ import java.util.Random;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
@@ -18,13 +19,17 @@ import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.smsapps.ticketer.model.TicketerRec;
 import wbs.smsapps.ticketer.model.TicketerTicketObjectHelper;
 import wbs.smsapps.ticketer.model.TicketerTicketRec;
 
+import com.google.common.base.Optional;
+
+@Accessors (fluent = true)
 @PrototypeComponent ("ticketerCommand")
 public
 class TicketerCommand
@@ -59,6 +64,20 @@ class TicketerCommand
 	@Inject
 	Provider<MessageSender> messageSender;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
 	// details
 
 	@Override
@@ -75,17 +94,7 @@ class TicketerCommand
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+	InboxAttemptRec handle () {
 
 		TicketerRec ticketer =
 			(TicketerRec) (Object)
@@ -102,8 +111,7 @@ class TicketerCommand
 		// load message and stuff
 
 		MessageRec messageIn =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		// work out ticket and message text
 
@@ -133,20 +141,28 @@ class TicketerCommand
 
 		ticketerTicketHelper.insert (
 			new TicketerTicketRec ()
-				.setTicketer (ticketer)
-				.setNumber (messageIn.getNumber ())
-				.setTicket (ticket)
-				.setMessage (messageOut));
+
+			.setTicketer (
+				ticketer)
+
+			.setNumber (
+				messageIn.getNumber ())
+
+			.setTicket (
+				ticket)
+
+			.setMessage (
+				messageOut)
+
+		);
 
 		// process inbox
 
-		inboxLogic.inboxProcessed (
+		return inboxLogic.inboxProcessed (
 			messageIn,
-			defaultService,
-			null,
+			Optional.of (defaultService),
+			Optional.<AffiliateRec>absent (),
 			command);
-
-		transaction.commit ();
 
 	}
 

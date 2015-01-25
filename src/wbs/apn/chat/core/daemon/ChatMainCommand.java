@@ -8,9 +8,9 @@ import java.util.Collections;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
@@ -38,7 +38,6 @@ import wbs.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.sms.command.logic.CommandLogic;
 import wbs.sms.command.model.CommandObjectHelper;
@@ -49,8 +48,9 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.CommandManager;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
 import com.google.common.base.Optional;
 
@@ -58,6 +58,7 @@ import com.google.common.base.Optional;
  * MainCommandHandler takes input from the main chat interface, looking for
  * keywords or box numbers and forwarding to the appropriate command.
  */
+@Accessors (fluent = true)
 @Log4j
 @PrototypeComponent ("chatMainCommand")
 public
@@ -123,9 +124,22 @@ class ChatMainCommand
 	@Inject
 	Provider<ChatJoiner> chatJoinerProvider;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
 	// state
 
-	CommandRec mainCommand;
 	ChatSchemeRec commandChatScheme;
 	ChatRec chat;
 	MessageRec smsMessage;
@@ -145,11 +159,9 @@ class ChatMainCommand
 
 	// implementation
 
-	void doCode (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage,
-			String code,
-			String rest) {
+	InboxAttemptRec doCode (
+			@NonNull String code,
+			@NonNull String rest) {
 
 		ChatUserRec toUser =
 			chatUserHelper.findByCode (
@@ -164,23 +176,26 @@ class ChatMainCommand
 			log.debug (
 				stringFormat (
 					"message %d: ignoring invalid user code %s",
-					receivedMessage.getMessageId (),
+					inbox.getId (),
 					code));
 
-			inboxLogic.inboxProcessed (
+			return inboxLogic.inboxProcessed (
 				smsMessage,
-				serviceHelper.findByCode (chat, "default"),
-				chatUserLogic.getAffiliate (fromChatUser),
-				commandHelper.find (commandId));
-
-			return;
+				Optional.of (
+					serviceHelper.findByCode (
+						chat,
+						"default")),
+				Optional.of (
+					chatUserLogic.getAffiliate (
+						fromChatUser)),
+				command);
 
 		}
 
 		log.debug (
 			stringFormat (
 				"message %d: message to user %s",
-				receivedMessage.getMessageId (),
+				inbox.getId (),
 				toUser.getId ()));
 
 		chatMessageLogic.chatMessageSendFromUser (
@@ -223,15 +238,16 @@ class ChatMainCommand
 
 		}
 
-		inboxLogic.inboxProcessed (
+		return inboxLogic.inboxProcessed (
 			smsMessage,
-			serviceHelper.findByCode (
-				chat,
-				"default"),
-			chatUserLogic.getAffiliate (
-				fromChatUser),
-			commandHelper.find (
-				commandId));
+			Optional.of (
+				serviceHelper.findByCode (
+					chat,
+					"default")),
+			Optional.of (
+				chatUserLogic.getAffiliate (
+					fromChatUser)),
+			command);
 
 	}
 
@@ -239,14 +255,9 @@ class ChatMainCommand
 	 * Tries to find a ChatSchemeKeyword to handle this message. Returns an
 	 * appropriate CommandHandler if so, otherwise returns null.
 	 */
-	TryKeywordReturn trySchemeKeyword (
-			int commandId,
-			ReceivedMessage receivedMessage,
-			String keyword,
-			String rest) {
-
-		TryKeywordReturn ret =
-			new TryKeywordReturn ();
+	Optional<InboxAttemptRec> trySchemeKeyword (
+			@NonNull String keyword,
+			@NonNull String rest) {
 
 		ChatSchemeKeywordRec chatSchemeKeyword =
 			chatSchemeKeywordHelper.findByCode (
@@ -258,10 +269,10 @@ class ChatMainCommand
 			log.debug (
 				stringFormat (
 					"message %d: no chat scheme keyword \"%s\"",
-					receivedMessage.getMessageId (),
+					inbox.getId (),
 					keyword));
 
-			return null;
+			return Optional.<InboxAttemptRec>absent ();
 
 		}
 
@@ -270,16 +281,22 @@ class ChatMainCommand
 			log.debug (
 				stringFormat (
 					"message %d: chat scheme keyword \"%s\" is join type %s",
-					receivedMessage.getMessageId (),
+					inbox.getId (),
 					keyword,
 					chatSchemeKeyword.getJoinType ()));
+
+			Optional<InboxAttemptRec> inboxAttempt =
+				performCreditCheck ();
+
+			if (inboxAttempt.isPresent ())
+				return inboxAttempt;
 
 			Integer chatAffiliateId =
 				chatSchemeKeyword.getJoinChatAffiliate () != null
 					? chatSchemeKeyword.getJoinChatAffiliate ().getId ()
 					: null;
 
-			ret.joiner =
+			return Optional.of (
 				chatJoinerProvider.get ()
 
 				.chatId (
@@ -302,15 +319,15 @@ class ChatMainCommand
 					commandChatScheme.getId ())
 
 				.confirmCharges (
-					chatSchemeKeyword.getConfirmCharges ());
+					chatSchemeKeyword.getConfirmCharges ())
 
-			ret.rest =
-				rest;
+				.rest (
+					rest)
 
-			ret.creditCheck =
-				true;
+				.handleInbox (
+					command)
 
-			return ret;
+			);
 
 		}
 
@@ -318,19 +335,25 @@ class ChatMainCommand
 
 			log.debug (
 				stringFormat (
-					"message %d: chat scheme keyword \"%s\" is command %s",
-					receivedMessage.getMessageId (),
+					"message %d: ",
+					inbox.getId (),
+					"chat scheme keyword \"%s\" ",
 					keyword,
+					"is command %s",
 					chatSchemeKeyword.getCommand ().getId ()));
 
-			ret.externalCommandId =
-				chatSchemeKeyword.getCommand ().getId ();
+			Optional<InboxAttemptRec> inboxAttempt =
+				performCreditCheck ();
 
-			ret.rest = rest;
+			if (inboxAttempt.isPresent ())
+				return inboxAttempt;
 
-			ret.creditCheck = true;
-
-			return ret;
+			return Optional.of (
+				commandManager.handle (
+					inbox,
+					chatSchemeKeyword.getCommand (),
+					Optional.<Integer>absent (),
+					rest));
 
 		}
 
@@ -339,21 +362,16 @@ class ChatMainCommand
 		log.warn (
 			stringFormat (
 				"message %d: chat scheme keyword \"%s\" does nothing",
-				receivedMessage.getMessageId (),
+				inbox.getId (),
 				keyword));
 
-		return null;
+		return Optional.<InboxAttemptRec>absent ();
 
 	}
 
-	TryKeywordReturn tryChatKeyword (
-			int commandId,
-			ReceivedMessage receivedMessage,
-			String keyword,
-			String rest) {
-
-		TryKeywordReturn ret =
-			new TryKeywordReturn ();
+	Optional<InboxAttemptRec> tryChatKeyword (
+			@NonNull String keyword,
+			@NonNull String rest) {
 
 		ChatKeywordRec chatKeyword =
 			chatKeywordHelper.findByCode (
@@ -365,10 +383,10 @@ class ChatMainCommand
 			log.debug (
 				stringFormat (
 					"message %d: no chat keyword \"%s\"",
-					receivedMessage.getMessageId (),
+					inbox.getId (),
 					keyword));
 
-			return null;
+			return Optional.<InboxAttemptRec>absent ();
 
 		}
 
@@ -376,9 +394,11 @@ class ChatMainCommand
 
 			log.debug (
 				stringFormat (
-					"message %d: chat keyword \"%s\" is join type %s",
-					receivedMessage.getMessageId (),
+					"message %d: ",
+					inbox.getId (),
+					"chat keyword \"%s\" ",
 					keyword,
+					"is join type %s",
 					chatKeyword.getJoinType ()));
 
 			Integer chatAffiliateId =
@@ -386,7 +406,17 @@ class ChatMainCommand
 					? chatKeyword.getJoinChatAffiliate ().getId ()
 					: null;
 
-			ret.joiner =
+			if (! chatKeyword.getNoCreditCheck ()) {
+
+				Optional<InboxAttemptRec> inboxAttempt =
+					performCreditCheck ();
+
+				if (inboxAttempt.isPresent ())
+					return inboxAttempt;
+
+			}
+
+			return Optional.of (
 				chatJoinerProvider.get ()
 
 				.chatId (
@@ -406,15 +436,15 @@ class ChatMainCommand
 					chatAffiliateId)
 
 				.chatSchemeId (
-					commandChatScheme.getId ());
+					commandChatScheme.getId ())
 
-			ret.rest =
-				rest;
+				.rest (
+					rest)
 
-			ret.creditCheck =
-				! chatKeyword.getNoCreditCheck ();
+				.handleInbox (
+					command)
 
-			return ret;
+			);
 
 		}
 
@@ -423,20 +453,16 @@ class ChatMainCommand
 			log.debug (
 				stringFormat (
 					"message %d: chat keyword \"%s\" is command %d",
-					receivedMessage.getMessageId (),
+					inbox.getId (),
 					keyword,
 					chatKeyword.getCommand ().getId ()));
 
-			ret.externalCommandId =
-				chatKeyword.getCommand ().getId ();
-
-			ret.rest =
-				rest;
-
-			ret.creditCheck =
-				false;
-
-			return ret;
+			return Optional.of (
+				commandManager.handle (
+					inbox,
+					chatKeyword.getCommand (),
+					Optional.<Integer>absent (),
+					rest));
 
 		}
 
@@ -444,76 +470,63 @@ class ChatMainCommand
 
 		log.warn (
 			stringFormat (
-				"message %d: chat keyword \"%s\" does nothing",
-				receivedMessage.getMessageId (),
-				keyword));
+				"message %d: ",
+				inbox.getId (),
+				"chat keyword \"%s\" ",
+				keyword,
+				"does nothing"));
 
-		return null;
+		return Optional.<InboxAttemptRec>absent ();
 
 	}
 
-	TryKeywordReturn tryKeyword (
-			int commandId,
-			ReceivedMessage receivedMessage,
-			String keyword,
-			String rest) {
+	Optional<InboxAttemptRec> tryKeyword (
+			@NonNull String keyword,
+			@NonNull String rest) {
 
-		TryKeywordReturn returnValue;
-
-		returnValue =
+		Optional<InboxAttemptRec> schemeKeywordInboxAttempt =
 			trySchemeKeyword (
-				commandId,
-				receivedMessage,
 				keyword,
 				rest);
 
-		if (returnValue != null)
-			return returnValue;
+		if (schemeKeywordInboxAttempt.isPresent ())
+			return schemeKeywordInboxAttempt;
 
-		returnValue =
+		Optional<InboxAttemptRec> chatKeywordInboxAttempt =
 			tryChatKeyword (
-				commandId,
-				receivedMessage,
 				keyword,
 				rest);
 
-		if (returnValue != null)
-			return returnValue;
+		if (chatKeywordInboxAttempt.isPresent ())
+			return chatKeywordInboxAttempt;
 
-		return null;
+		return Optional.<InboxAttemptRec>absent ();
 
 	}
 
-	TryKeywordReturn tryDob (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage,
-			@NonNull ChatUserRec chatUser) {
+	Optional<InboxAttemptRec> tryDob () {
 
-		if (
-			chatUser.getFirstJoin () != null
-		) {
-			return null;
-		}
+		if (fromChatUser.getFirstJoin () != null)
+			return Optional.<InboxAttemptRec>absent ();
 
 		if (
 			! in (
-				chatUser.getNextJoinType (),
+				fromChatUser.getNextJoinType (),
 				ChatKeywordJoinType.chatDob,
 				ChatKeywordJoinType.dateDob)
 		) {
-			return null;
+			return Optional.<InboxAttemptRec>absent ();
 		}
 
 		LocalDate dateOfBirth =
 			DateFinder.find (
-				receivedMessage.getRest (),
+				rest,
 				1915);
 
-		if (dateOfBirth == null) {
-			return null;
-		}
+		if (dateOfBirth == null)
+			return Optional.<InboxAttemptRec>absent ();
 
-		ChatJoiner joiner =
+		return Optional.of (
 			chatJoinerProvider.get ()
 
 			.chatId (
@@ -523,47 +536,33 @@ class ChatMainCommand
 				JoinType.chatDob)
 
 			.chatSchemeId (
-				commandChatScheme.getId ());
+				commandChatScheme.getId ())
 
-		return new TryKeywordReturn ()
+			.handleInbox (
+				command)
 
-			.joiner (
-				joiner)
-
-			.rest (
-				receivedMessage.getRest ());
+		);
 
 	}
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
+	InboxAttemptRec handle () {
 
 		log.debug (
 			stringFormat (
 				"message %d: begin processing",
-				receivedMessage.getMessageId ()));
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		mainCommand =
-			commandHelper.find (
-				commandId);
+				inbox.getId ()));
 
 		commandChatScheme =
 			chatSchemeHelper.find (
-				mainCommand.getParentObjectId ());
+				command.getParentObjectId ());
 
 		chat =
 			commandChatScheme.getChat ();
 
 		smsMessage =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		fromChatUser =
 			chatUserHelper.findOrCreate (
@@ -573,14 +572,14 @@ class ChatMainCommand
 		log.debug (
 			stringFormat (
 				"message %d: full text \"%s\"",
-				receivedMessage.getMessageId (),
+				inbox.getId (),
 				smsMessage.getText ().getText ()));
 
 		log.debug (
 			stringFormat (
 				"message %d: rest \"%s\"",
-				receivedMessage.getMessageId (),
-				receivedMessage.getRest ()));
+				inbox.getId (),
+				rest));
 
 		// set chat scheme and adult verify
 
@@ -597,188 +596,45 @@ class ChatMainCommand
 
 		// look for a date of birth
 
-		TryKeywordReturn ret = null;
+		Optional<InboxAttemptRec> dobInboxAttempt =
+			tryDob ();
 
-		ret = tryDob (
-			commandId,
-			receivedMessage,
-			fromChatUser);
+		if (dobInboxAttempt.isPresent ())
+			return dobInboxAttempt.get ();
 
 		// look for a keyword
 
-		if (ret == null) {
-
-			for (
-				KeywordFinder.Match match
-					: keywordFinder.find (
-						receivedMessage.getRest ())
-			) {
-
-				String keyword =
-					match.simpleKeyword ();
-
-				log.debug (
-					stringFormat (
-						"message %d: trying keyword \"%s\"",
-						receivedMessage.getMessageId (),
-						keyword));
-
-				// check if the keyword is a 6-digit number
-
-				if (keyword.matches ("\\d{6}")) {
-
-					doCode (
-						commandId,
-						receivedMessage,
-						keyword,
-						match.rest ());
-
-					transaction.commit ();
-
-					return;
-
-				}
-
-				// check if it's a chat keyword
-
-				ret =
-					tryKeyword (
-						commandId,
-						receivedMessage,
-						keyword,
-						match.rest ());
-
-				if (ret != null)
-					break;
-
-			}
-
-		}
-
-		// handle command keywords
-
-		if (
-			ret != null
-			&& ret.externalCommandId != null
+		for (
+			KeywordFinder.Match match
+				: keywordFinder.find (
+					rest)
 		) {
 
 			log.debug (
 				stringFormat (
-					"message %d: external keyword found, handing off",
-					receivedMessage.getMessageId ()));
+					"message %d: trying keyword \"%s\"",
+					inbox.getId (),
+					match.simpleKeyword ()));
 
-			transaction.commit ();
+			// check if the keyword is a 6-digit number
 
-			commandManager.handle (
-				ret.externalCommandId,
-				receivedMessage,
-				ret.rest);
+			if (match.simpleKeyword ().matches ("\\d{6}")) {
 
-		}
-
-		// send barred users to help
-
-		boolean performCreditCheck =
-			ret != null
-				? ret.creditCheck
-				: true;
-
-		if (performCreditCheck) {
-
-			log.debug (
-				stringFormat (
-					"message %d: performing credit check",
-					receivedMessage.getMessageId ()));
-
-			if (fromChatUser.getNumber ().getNetwork ().getId () == 0) {
-
-				log.debug (
-					stringFormat (
-						"message %d: network unknown, ignoring",
-						receivedMessage.getMessageId ()));
-
-				inboxLogic.inboxNotProcessed (
-					smsMessage,
-					serviceHelper.findByCode (chat, "default"),
-					chatUserLogic.getAffiliate (fromChatUser),
-					mainCommand,
-					stringFormat (
-						"network unknown"));
-
-				transaction.commit ();
-
-				return;
+				return doCode (
+					match.simpleKeyword (),
+					match.rest ());
 
 			}
 
-			ChatCreditCheckResult creditCheckResult =
-				chatCreditLogic.userSpendCreditCheck (
-					fromChatUser,
-					true,
-					smsMessage.getThreadId ());
+			// check if it's a chat keyword
 
-			if (creditCheckResult.failed ()) {
+			Optional<InboxAttemptRec> keywordInboxAttempt =
+				tryKeyword (
+					match.simpleKeyword (),
+					match.rest ());
 
-				log.debug (
-					stringFormat (
-						"message %d: credit check failed, sending to help",
-						receivedMessage.getMessageId ()));
-
-				chatHelpLogLogic.createChatHelpLogIn (
-					fromChatUser,
-					smsMessage,
-					receivedMessage.getRest (),
-					null,
-					true);
-
-				inboxLogic.inboxProcessed (
-					smsMessage,
-					serviceHelper.findByCode (chat, "default"),
-					chatUserLogic.getAffiliate (fromChatUser),
-					commandHelper.find (commandId));
-
-				transaction.commit ();
-
-				return;
-
-			}
-
-			log.debug (
-				stringFormat (
-					"message %d: not performing credit check",
-					receivedMessage.getMessageId ()));
-
-		}
-
-		// handle keywords
-
-		if (ret != null) {
-
-			log.debug (
-				stringFormat (
-					"message %d: chat keyword found, handing off",
-					receivedMessage.getMessageId ()));
-
-			transaction.commit ();
-
-			if (ret.externalCommandId != null) {
-
-				commandManager.handle (
-					ret.externalCommandId,
-					receivedMessage,
-					ret.rest);
-
-				return;
-
-			} else {
-
-				ret.joiner.handle (
-					receivedMessage,
-					ret.rest);
-
-				return;
-
-			}
+			if (keywordInboxAttempt.isPresent ())
+				return keywordInboxAttempt.get ();
 
 		}
 
@@ -790,13 +646,14 @@ class ChatMainCommand
 
 				log.debug (
 					stringFormat (
-						"message %d: no keyword found, new user, sending error",
-						receivedMessage.getMessageId ()));
+						"message %d: ",
+						inbox.getId (),
+						"no keyword found, new user, sending error"));
 
 				chatHelpLogLogic.createChatHelpLogIn (
 					fromChatUser,
 					smsMessage,
-					receivedMessage.getRest (),
+					rest,
 					null,
 					false);
 
@@ -807,29 +664,26 @@ class ChatMainCommand
 					"keyword_error",
 					Collections.<String,String>emptyMap ());
 
-				inboxLogic.inboxProcessed (
+				return inboxLogic.inboxProcessed (
 					smsMessage,
-					serviceHelper.findByCode (
-						chat,
-						"default"),
-					chatUserLogic.getAffiliate (
-						fromChatUser),
-					commandHelper.find (
-						commandId));
-
-				transaction.commit ();
-
-				return;
+					Optional.of (
+						serviceHelper.findByCode (
+							chat,
+							"default")),
+					Optional.of (
+						chatUserLogic.getAffiliate (
+							fromChatUser)),
+					command);
 
 			} else {
 
 				log.debug (
 					stringFormat (
-						"message %d: no keyword found, new user, joining",
-						receivedMessage.getMessageId ()));
+						"message %d: ",
+						inbox.getId (),
+						"no keyword found, new user, joining"));
 
-				ChatJoiner joiner =
-					chatJoinerProvider.get ()
+				return chatJoinerProvider.get ()
 
 					.chatId (
 						chat.getId ())
@@ -838,14 +692,13 @@ class ChatMainCommand
 						JoinType.chatSimple)
 
 					.chatSchemeId (
-						commandChatScheme.getId ());
+						commandChatScheme.getId ())
 
-				transaction.commit ();
+					.rest (
+						rest)
 
-				joiner.handle (
-					receivedMessage);
-
-				return;
+					.handleInbox (
+						command);
 
 			}
 
@@ -854,45 +707,104 @@ class ChatMainCommand
 			log.debug (
 				stringFormat (
 					"message %d: ",
-					receivedMessage.getMessageId (),
+					inbox.getId (),
 					"no keyword found, existing user, sent to help"));
 
 			chatHelpLogLogic.createChatHelpLogIn (
 				fromChatUser,
 				smsMessage,
-				receivedMessage.getRest (),
+				rest,
 				null,
 				true);
 
-			inboxLogic.inboxProcessed (
+			return inboxLogic.inboxProcessed (
 				smsMessage,
-				serviceHelper.findByCode (
-					chat,
-					"default"),
-				chatUserLogic.getAffiliate (
-					fromChatUser),
-				commandHelper.find (
-					commandId));
-
-			transaction.commit ();
-
-			return;
+				Optional.of (
+					serviceHelper.findByCode (
+						chat,
+						"default")),
+				Optional.of (
+					chatUserLogic.getAffiliate (
+						fromChatUser)),
+				command);
 
 		}
 
 	}
 
-	// data structures
+	Optional<InboxAttemptRec> performCreditCheck () {
 
-	@Accessors (fluent = true)
-	@Data
-	public static
-	class TryKeywordReturn {
+		log.debug (
+			stringFormat (
+				"message %d: performing credit check",
+				inbox.getId ()));
 
-		ChatJoiner joiner;
-		Integer externalCommandId;
-		String rest;
-		boolean creditCheck;
+		if (fromChatUser.getNumber ().getNetwork ().getId () == 0) {
+
+			log.debug (
+				stringFormat (
+					"message %d: network unknown, ignoring",
+					inbox.getId ()));
+
+			return Optional.of (
+				inboxLogic.inboxNotProcessed (
+					smsMessage,
+					Optional.of (
+						serviceHelper.findByCode (
+							chat,
+							"default")),
+					Optional.of (
+						chatUserLogic.getAffiliate (
+							fromChatUser)),
+					Optional.of (
+						command),
+					stringFormat (
+						"network unknown")));
+
+		}
+
+		ChatCreditCheckResult creditCheckResult =
+			chatCreditLogic.userSpendCreditCheck (
+				fromChatUser,
+				true,
+				smsMessage.getThreadId ());
+
+		if (creditCheckResult.failed ()) {
+
+			log.debug (
+				stringFormat (
+					"message %d: ",
+					inbox.getId (),
+					"credit check failed, sending to help"));
+
+			chatHelpLogLogic.createChatHelpLogIn (
+				fromChatUser,
+				smsMessage,
+				rest,
+				null,
+				true);
+
+			return Optional.of (
+				inboxLogic.inboxProcessed (
+					smsMessage,
+					Optional.of (
+						serviceHelper.findByCode (
+							chat,
+							"default")),
+					Optional.of (
+						chatUserLogic.getAffiliate (
+							fromChatUser)),
+					command));
+
+		}
+
+		log.debug (
+			stringFormat (
+				"message %d: ",
+				inbox.getId (),
+				"not performing credit check"));
+
+		return Optional.<InboxAttemptRec>absent ();
 
 	}
 
