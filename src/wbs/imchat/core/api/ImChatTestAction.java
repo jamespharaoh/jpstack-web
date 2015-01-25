@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import lombok.SneakyThrows;
 
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -31,7 +32,8 @@ class ImChatTestAction
 	public
 	Responder handle () {
 
-		Object jsonValue =
+		JSONObject jsonValue =
+			(JSONObject)
 			JSONValue.parse (
 				requestContext.reader ());
 

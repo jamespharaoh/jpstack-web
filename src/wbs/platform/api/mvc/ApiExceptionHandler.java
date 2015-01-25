@@ -46,8 +46,8 @@ class ApiExceptionHandler
 		log.error (
 			stringFormat (
 				"Error at %s",
-				requestContext.requestUri (),
-				throwable));
+				requestContext.requestUri ()),
+			throwable);
 
 		// make an exception log of this calamity
 
@@ -63,15 +63,25 @@ class ApiExceptionHandler
 				"\n\nHTTP INFO\n\n");
 
 			stringBuilder.append (
-				"METHOD = " + requestContext.method () + "\n\n");
+				stringFormat (
+					"METHOD = %s\n\n",
+					requestContext.method ()));
 
-			for (Map.Entry<String,List<String>> entry
-					: requestContext.parameterMap ().entrySet ()) {
+			for (
+				Map.Entry<String,List<String>> entry
+					: requestContext.parameterMap ().entrySet ()
+			) {
 
-				for (String value : entry.getValue ()) {
+				for (
+					String value
+						: entry.getValue ()
+				) {
 
 					stringBuilder.append (
-						entry.getKey () + " = \"" + value + "\"\n");
+						stringFormat (
+							"%s = \"%s\"\n",
+							entry.getKey (),
+							value));
 
 				}
 

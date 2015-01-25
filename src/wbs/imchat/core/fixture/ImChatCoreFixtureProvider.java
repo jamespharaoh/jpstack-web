@@ -52,13 +52,15 @@ class ImChatCoreFixtureProvider
 	public
 	void createFixtures () {
 
+		// menu
+
 		menuHelper.insert (
 			new MenuRec ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
-				GlobalId.root,
-				"facility"))
+					GlobalId.root,
+					"facility"))
 
 			.setCode (
 				"im_chat")
@@ -71,6 +73,8 @@ class ImChatCoreFixtureProvider
 
 		);
 
+		// im chat
+
 		ImChatRec imChat =
 			imChatHelper.insert (
 				new ImChatRec ()
@@ -81,15 +85,17 @@ class ImChatCoreFixtureProvider
 					"test"))
 
 			.setCode (
-				"im_chat")
+				"test")
 
 			.setName (
-				"im_chat")
+				"Test")
 
 			.setDescription (
-				"im_chat")
+				"Test IM chat")
 
 		);
+
+		// im chat customer
 
 		ImChatCustomerRec imChatCustomer =
 			imChatCustomerHelper.insert (
@@ -102,6 +108,8 @@ class ImChatCoreFixtureProvider
 				imChatCustomerHelper.generateCode ())
 
 		);
+
+		// im chat conversation
 
 		ImChatConversationRec imChatConversation =
 			imChatConversationHelper.insert (
@@ -119,6 +127,8 @@ class ImChatCoreFixtureProvider
 
 			.setNumConversations (
 				imChatCustomer.getNumConversations () + 1);
+
+		// im chat message
 
 		imChatMessageHelper.insert (
 			new ImChatMessageRec ()

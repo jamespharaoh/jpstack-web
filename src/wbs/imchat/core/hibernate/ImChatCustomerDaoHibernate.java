@@ -12,9 +12,10 @@ import wbs.imchat.core.model.ImChatCustomerDao;
 import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatCustomerSearch;
 
-public class ImChatCustomerDaoHibernate
-extends HibernateDao
-implements ImChatCustomerDao {
+public
+class ImChatCustomerDaoHibernate
+	extends HibernateDao
+	implements ImChatCustomerDao {
 
 	@Override
 	public
@@ -22,14 +23,16 @@ implements ImChatCustomerDao {
 			ImChatCustomerSearch imChatCustomerSearch) {
 
 		Criteria criteria =
+
 			createCriteria (
 				ImChatCustomerRec.class,
 				"_imChatCustomer")
+
 			.createAlias (
 				"_imChatCustomer.imChat",
 				"_imChat");
 
-		if (imChatCustomerSearch.getImChatId() != null) {
+		if (imChatCustomerSearch.getImChatId () != null) {
 
 			criteria.add (
 				Restrictions.eq (
@@ -38,7 +41,7 @@ implements ImChatCustomerDao {
 
 		}
 
-		if (imChatCustomerSearch.getCode() != null) {
+		if (imChatCustomerSearch.getCode () != null) {
 
 			criteria.add (
 				Restrictions.eq (

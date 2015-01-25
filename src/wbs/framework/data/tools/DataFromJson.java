@@ -3,6 +3,9 @@ package wbs.framework.data.tools;
 import java.lang.reflect.Field;
 
 import lombok.SneakyThrows;
+
+import org.json.simple.JSONObject;
+
 import wbs.framework.data.annotations.DataAttribute;
 
 public
@@ -15,7 +18,7 @@ class DataFromJson {
 	public <Data>
 	Data fromJson (
 			Class<Data> dataClass,
-			Object jsonValue) {
+			JSONObject jsonValue) {
 
 		Data dataValue =
 			dataClass.newInstance ();
@@ -32,8 +35,15 @@ class DataFromJson {
 			if (dataAttribute == null)
 				continue;
 
-			System.out.println (
-				"ATTR: " + field.getName ());
+			field.setAccessible (true);
+
+			Object fieldValue =
+				jsonValue.get (
+					field.getName ());
+
+			field.set (
+				dataValue,
+				fieldValue);
 
 		}
 

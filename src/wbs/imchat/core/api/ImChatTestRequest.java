@@ -15,6 +15,6 @@ class ImChatTestRequest {
 	String hello;
 
 	@DataAttribute
-	Integer world;
+	Long world;
 
 }
