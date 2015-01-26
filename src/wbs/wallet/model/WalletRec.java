@@ -1,5 +1,9 @@
 package wbs.wallet.model;
 
+import java.util.Random;
+
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import lombok.Data;
@@ -34,6 +38,42 @@ class WalletRec
 
 	@CodeField
 	String code;
+	
+	// object helper methods
+
+	public
+	interface WalletObjectHelperMethods {
+
+		String generateCode ();
+
+	}
+	
+	// object helper implementation
+	public static
+	class WalletObjectHelperImplementation
+		implements WalletObjectHelperMethods {
+
+		// dependencies
+
+		@Inject
+		Random random;
+
+		// implementation
+
+		@Override
+		public
+		String generateCode () {
+
+			int intCode =
+				+ random.nextInt (90000000)
+				+ 10000000;
+
+			return Integer.toString (
+				intCode);
+
+		}
+
+	}
 
 	// compare to
 

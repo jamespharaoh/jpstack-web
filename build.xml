@@ -186,6 +186,7 @@
       <fileset dir="src/wbs/apn/chat/user/pending/console/files"/>
       <fileset dir="src/wbs/imchat/core/console/files"/>
       <fileset dir="src/wbs/paypal/console/files"/>
+      <fileset dir="src/wbs/wallet/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
       <fileset dir="src/wbs/integrations/dialogue/console/files"/>
@@ -350,6 +351,7 @@
       <fileset dir="src/wbs/apn/chat/user/pending/api/files"/>
       <fileset dir="src/wbs/imchat/core/api/files"/>
       <fileset dir="src/wbs/paypal/api/files"/>
+      <fileset dir="src/wbs/wallet/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
       <fileset dir="src/wbs/integrations/dialogue/api/files"/>
@@ -548,6 +550,7 @@
       <fileset dir="src/wbs/apn/chat/user/pending/console/files"/>
       <fileset dir="src/wbs/imchat/core/console/files"/>
       <fileset dir="src/wbs/paypal/console/files"/>
+      <fileset dir="src/wbs/wallet/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
       <fileset dir="src/wbs/integrations/dialogue/console/files"/>
@@ -712,6 +715,7 @@
       <fileset dir="src/wbs/apn/chat/user/pending/api/files"/>
       <fileset dir="src/wbs/imchat/core/api/files"/>
       <fileset dir="src/wbs/paypal/api/files"/>
+      <fileset dir="src/wbs/wallet/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
       <fileset dir="src/wbs/integrations/dialogue/api/files"/>
@@ -915,6 +919,7 @@
       <script name="src/wbs/apn/chat/user/image/model/chat-user-image-data.sql"/>
       <script name="src/wbs/imchat/core/model/im-chat-core-data.sql"/>
       <script name="src/wbs/paypal/model/paypal-data.sql"/>
+      <script name="src/wbs/wallet/model/wallet-data.sql"/>
       <script name="src/wbs/integrations/broadcastsystems/model/broadcast-systems-data.sql"/>
       <script name="src/wbs/integrations/dialogue/model/dialogue-data.sql"/>
       <script name="src/wbs/integrations/digitalselect/model/digital-select-data.sql"/>
