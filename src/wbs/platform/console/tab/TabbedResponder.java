@@ -26,6 +26,7 @@ import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.exception.logic.ExceptionLogicImpl;
 import wbs.platform.priv.console.PrivChecker;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 @Accessors (fluent = true)
@@ -170,7 +171,8 @@ class TabbedResponder
 					"console",
 					path,
 					exception,
-					requestContext.userId (),
+					Optional.fromNullable (
+						requestContext.userId ()),
 					false);
 
 				// and remember we had a problem
