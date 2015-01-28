@@ -98,9 +98,6 @@ class ApiResource
 			ServletException,
 			IOException {
 
-		handleGeneric (
-			Method.get);
-
 	}
 
 	// data types

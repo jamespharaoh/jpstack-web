@@ -871,6 +871,7 @@
       <script name="src/wbs/apn/chat/user/core/model/chat-user.sql"/>
       <script name="src/wbs/apn/chat/user/core/model/chat-user-session.sql"/>
       <script name="src/wbs/apn/chat/user/core/model/chat-users-summary.sql"/>
+      <script name="src/wbs/imchat/core/model/im-chat-core.sql"/>
       <script name="src/wbs/integrations/txtnation/model/txt-nation.sql"/>
     </database-init>
   </target>

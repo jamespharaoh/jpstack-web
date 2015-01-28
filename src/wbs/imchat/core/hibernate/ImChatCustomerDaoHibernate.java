@@ -11,11 +11,39 @@ import wbs.framework.hibernate.HibernateDao;
 import wbs.imchat.core.model.ImChatCustomerDao;
 import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatCustomerSearch;
+import wbs.imchat.core.model.ImChatRec;
 
 public
 class ImChatCustomerDaoHibernate
 	extends HibernateDao
 	implements ImChatCustomerDao {
+
+	@Override
+	public
+	ImChatCustomerRec findByEmail (
+			ImChatRec imChat,
+			String email) {
+
+		return findOne (
+			ImChatCustomerRec.class,
+
+			createCriteria (
+				ImChatCustomerRec.class,
+				"_imChatCustomer")
+
+			.add (
+				Restrictions.eq (
+					"_imChatCustomer.imChat",
+					imChat))
+
+			.add (
+				Restrictions.eq (
+					"_imChatCustomer.email",
+					email))
+
+			.list ());
+
+	}
 
 	@Override
 	public

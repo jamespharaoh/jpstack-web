@@ -1,9 +1,25 @@
 <api-module name="im-chat">
 
 	<resource name="im-chat">
-		<resource name="test">
-			<post-action name="test"/>
-		</resource>
+		<variable name="imChatId">
+
+			<resource name="customer">
+				<post-action name="customerCreate"/>
+			</resource>
+
+			<resource name="session">
+				<post-action name="sessionStart"/>
+			</resource>
+
+			<resource name="profiles">
+				<get-action name="profileList"/>
+			</resource>
+
+			<resource name="conversation">
+				<post-action name="conversationStart"/>
+			</resource>
+
+		</variable>
 	</resource>
 
 </api-module>

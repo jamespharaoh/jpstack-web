@@ -6,11 +6,13 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.joda.time.Instant;
 
+import wbs.framework.entity.annotations.CodeField;
+import wbs.framework.entity.annotations.DeletedField;
+import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
-import wbs.framework.entity.annotations.IndexField;
 import wbs.framework.entity.annotations.MajorEntity;
+import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
@@ -22,8 +24,8 @@ import wbs.framework.record.Record;
 @ToString (of = "id" )
 @MajorEntity
 public
-class ImChatConversationRec
-	implements CommonRecord<ImChatConversationRec>{
+class ImChatProfileRec
+	implements CommonRecord<ImChatProfileRec> {
 
 	// id
 
@@ -33,39 +35,49 @@ class ImChatConversationRec
 	// identity
 
 	@ParentField
-	ImChatCustomerRec imChatCustomer;
+	ImChatRec imChat;
 
-	@IndexField (
-		counter = "numConversations")
-	Integer index;
+	@CodeField
+	String code;
 
-	// statistics
+	// details
+
+	@NameField
+	String name;
+
+	@DescriptionField
+	String description;
+
+	@DeletedField
+	Boolean deleted = false;
+
+	// public profile
 
 	@SimpleField
-	Integer numMessages = 0;
+	String publicName;
 
 	@SimpleField
-	Instant startTime;
+	String publicDescription;
 
 	// compare to
 
 	@Override
 	public
 	int compareTo (
-			Record<ImChatConversationRec> otherRecord) {
+			Record<ImChatProfileRec> otherRecord) {
 
-		ImChatConversationRec other =
-			(ImChatConversationRec) otherRecord;
+		ImChatProfileRec other =
+			(ImChatProfileRec) otherRecord;
 
 		return new CompareToBuilder ()
 
 			.append (
-				getImChatCustomer (),
-				other.getImChatCustomer ())
+				getImChat (),
+				other.getImChat ())
 
 			.append (
-				getIndex (),
-				other.getIndex ())
+				getCode (),
+				other.getCode ())
 
 			.toComparison ();
 

@@ -41,6 +41,14 @@ class ImChatCustomerRec
 	@CodeField
 	String code;
 
+	// details
+
+	@SimpleField
+	String email;
+
+	@SimpleField
+	String password;
+
 	// statistics
 
 	@SimpleField
@@ -87,6 +95,10 @@ class ImChatCustomerRec
 
 	public
 	interface ImChatCustomerDaoMethods {
+
+		ImChatCustomerRec findByEmail (
+				ImChatRec imChat,
+				String email);
 
 		List<Integer> searchIds (
 				ImChatCustomerSearch imChatCustomerSearch);
