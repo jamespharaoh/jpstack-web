@@ -10,6 +10,8 @@ import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.exception.logic.ExceptionLogic;
 
+import com.google.common.base.Optional;
+
 @Log4j
 @SingletonComponent ("threadManager")
 public
@@ -87,7 +89,7 @@ class ThreadManager
 						"Daemon thread %s",
 						getName ()),
 					throwable,
-					null,
+					Optional.<Integer>absent (),
 					fatal);
 
 			} catch (Throwable exception) {
