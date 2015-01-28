@@ -22,6 +22,8 @@ import wbs.framework.database.Transaction;
 import wbs.platform.daemon.SleepingDaemonService;
 import wbs.platform.exception.logic.ExceptionLogic;
 
+import com.google.common.base.Optional;
+
 @SingletonComponent ("chatUserJoinOutboundDaemon")
 public
 class ChatUserJoinOutboundDaemon
@@ -108,7 +110,7 @@ class ChatUserJoinOutboundDaemon
 						"chat user ",
 						chatUser.getId ()),
 					exception,
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 			}

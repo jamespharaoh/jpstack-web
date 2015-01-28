@@ -169,7 +169,7 @@ class ChatVideoGetCommand
 				true);
 
 			return inboxLogic.inboxProcessed (
-				message,
+				inbox,
 				Optional.of (defaultService),
 				Optional.of (affiliate),
 				command);
@@ -229,7 +229,7 @@ class ChatVideoGetCommand
 					Collections.<String,String>emptyMap ());
 
 				return inboxLogic.inboxProcessed (
-					message,
+					inbox,
 					Optional.of (defaultService),
 					Optional.of (affiliate),
 					command);
@@ -295,7 +295,7 @@ class ChatVideoGetCommand
 		// process inbox
 
 		return inboxLogic.inboxProcessed (
-			message,
+			inbox,
 			Optional.of (defaultService),
 			Optional.of (affiliate),
 			command);

@@ -148,7 +148,7 @@ class AutoResponderCommand
 		// process inbox
 
 		return inboxLogic.inboxProcessed (
-			message,
+			inbox,
 			Optional.of (defaultService),
 			Optional.<AffiliateRec>absent (),
 			command);

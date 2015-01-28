@@ -10,6 +10,8 @@ import wbs.framework.web.RequestHandler;
 import wbs.framework.web.Responder;
 import wbs.platform.exception.logic.ExceptionLogic;
 
+import com.google.common.base.Optional;
+
 @SingletonComponent ("webApiManager")
 public
 class WebApiManager {
@@ -57,7 +59,7 @@ class WebApiManager {
 					"webapi",
 					requestContext.requestUri (),
 					exception,
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 			}

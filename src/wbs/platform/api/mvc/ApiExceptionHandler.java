@@ -17,6 +17,8 @@ import wbs.framework.web.WebExceptionHandler;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.exception.logic.ExceptionLogicImpl;
 
+import com.google.common.base.Optional;
+
 @Log4j
 @SingletonComponent ("exceptionHandler")
 public
@@ -92,7 +94,7 @@ class ApiExceptionHandler
 				requestContext.requestUri (),
 				ExceptionLogicImpl.throwableSummary (throwable),
 				stringBuilder.toString (),
-				null,
+				Optional.<Integer>absent (),
 				false);
 
 		} catch (RuntimeException exception) {

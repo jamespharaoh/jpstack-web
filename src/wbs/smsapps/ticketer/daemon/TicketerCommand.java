@@ -159,7 +159,7 @@ class TicketerCommand
 		// process inbox
 
 		return inboxLogic.inboxProcessed (
-			messageIn,
+			inbox,
 			Optional.of (defaultService),
 			Optional.<AffiliateRec>absent (),
 			command);

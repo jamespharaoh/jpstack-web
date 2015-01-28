@@ -153,6 +153,9 @@ class ChatJoinCommand
 				.orient (
 					orient)
 
+				.inbox (
+					inbox)
+
 				.rest (
 					rest)
 
@@ -185,6 +188,9 @@ class ChatJoinCommand
 
 				.joinType (
 					joinType)
+
+				.inbox (
+					inbox)
 
 				.rest (
 					rest)
@@ -224,6 +230,9 @@ class ChatJoinCommand
 
 				.chatSchemeId (
 					chatScheme.getId ())
+
+				.inbox (
+					inbox)
 
 				.rest (
 					rest)

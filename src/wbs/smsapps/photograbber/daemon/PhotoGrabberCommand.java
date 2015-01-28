@@ -199,7 +199,7 @@ class PhotoGrabberCommand
 				defaultService);
 
 			return inboxLogic.inboxProcessed (
-				message,
+				inbox,
 				Optional.of (defaultService),
 				Optional.<AffiliateRec>absent (),
 				command);
@@ -233,7 +233,7 @@ class PhotoGrabberCommand
 				defaultService);
 
 			return inboxLogic.inboxProcessed (
-				message,
+				inbox,
 				Optional.of (defaultService),
 				Optional.<AffiliateRec>absent (),
 				command);
@@ -261,22 +261,40 @@ class PhotoGrabberCommand
 
 		MessageRec billedMessage =
 			messageSender.get ()
-				.threadId (message.getThreadId ())
-				.number (message.getNumber ())
-				.messageString (text)
-				.numFrom (photoGrabber.getBillNumber ())
-				.route (photoGrabber.getBillRoute ())
-				.service (serviceHelper.findByCode (photoGrabber, "default"))
-				.deliveryTypeCode ("photo_grabber")
-				.send ();
 
-		photoGrabberRequest.setBilledMessage (billedMessage);
+			.threadId (
+				message.getThreadId ())
+
+			.number (
+				message.getNumber ())
+
+			.messageString (
+				text)
+
+			.numFrom (
+				photoGrabber.getBillNumber ())
+
+			.route (
+				photoGrabber.getBillRoute ())
+
+			.service (
+				serviceHelper.findByCode (photoGrabber, "default"))
+
+			.deliveryTypeCode (
+				"photo_grabber")
+
+			.send ();
+
+		photoGrabberRequest
+
+			.setBilledMessage (
+				billedMessage);
 
 		photoGrabberRequestHelper.insert (
 			photoGrabberRequest);
 
 		return inboxLogic.inboxProcessed (
-			message,
+			inbox,
 			Optional.of (defaultService),
 			Optional.<AffiliateRec>absent (),
 			command);

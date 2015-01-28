@@ -180,7 +180,7 @@ class ChatMainCommand
 					code));
 
 			return inboxLogic.inboxProcessed (
-				smsMessage,
+				inbox,
 				Optional.of (
 					serviceHelper.findByCode (
 						chat,
@@ -239,7 +239,7 @@ class ChatMainCommand
 		}
 
 		return inboxLogic.inboxProcessed (
-			smsMessage,
+			inbox,
 			Optional.of (
 				serviceHelper.findByCode (
 					chat,
@@ -320,6 +320,9 @@ class ChatMainCommand
 
 				.confirmCharges (
 					chatSchemeKeyword.getConfirmCharges ())
+
+				.inbox (
+					inbox)
 
 				.rest (
 					rest)
@@ -438,6 +441,9 @@ class ChatMainCommand
 				.chatSchemeId (
 					commandChatScheme.getId ())
 
+				.inbox (
+					inbox)
+
 				.rest (
 					rest)
 
@@ -537,6 +543,9 @@ class ChatMainCommand
 
 			.chatSchemeId (
 				commandChatScheme.getId ())
+
+			.inbox (
+				inbox)
 
 			.handleInbox (
 				command)
@@ -665,7 +674,7 @@ class ChatMainCommand
 					Collections.<String,String>emptyMap ());
 
 				return inboxLogic.inboxProcessed (
-					smsMessage,
+					inbox,
 					Optional.of (
 						serviceHelper.findByCode (
 							chat,
@@ -694,6 +703,9 @@ class ChatMainCommand
 					.chatSchemeId (
 						commandChatScheme.getId ())
 
+					.inbox (
+						inbox)
+
 					.rest (
 						rest)
 
@@ -718,7 +730,7 @@ class ChatMainCommand
 				true);
 
 			return inboxLogic.inboxProcessed (
-				smsMessage,
+				inbox,
 				Optional.of (
 					serviceHelper.findByCode (
 						chat,
@@ -748,7 +760,7 @@ class ChatMainCommand
 
 			return Optional.of (
 				inboxLogic.inboxNotProcessed (
-					smsMessage,
+					inbox,
 					Optional.of (
 						serviceHelper.findByCode (
 							chat,
@@ -786,7 +798,7 @@ class ChatMainCommand
 
 			return Optional.of (
 				inboxLogic.inboxProcessed (
-					smsMessage,
+					inbox,
 					Optional.of (
 						serviceHelper.findByCode (
 							chat,

@@ -25,6 +25,8 @@ import wbs.framework.object.ObjectManager;
 import wbs.platform.daemon.SleepingDaemonService;
 import wbs.platform.exception.logic.ExceptionLogic;
 
+import com.google.common.base.Optional;
+
 @Log4j
 @SingletonComponent ("chatUserQuietDaemon")
 public
@@ -107,7 +109,7 @@ class ChatUserQuietDaemon
 					"daemon",
 					"Chat daemon",
 					exception,
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 			}

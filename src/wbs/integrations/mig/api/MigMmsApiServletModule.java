@@ -466,7 +466,7 @@ logger.error ("Got item");
 					requestContext.requestUri (),
 					ExceptionLogicImpl.throwableSummary (exception),
 					getException (exception, requestContext),
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 				PrintWriter out =

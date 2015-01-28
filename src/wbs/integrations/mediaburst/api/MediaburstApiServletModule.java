@@ -318,7 +318,7 @@ class MediaburstApiServletModule
 					numFromParam,
 					numToParam,
 					route,
-					Optional.of (network),
+					Optional.fromNullable (network),
 					Optional.<Instant>absent (),
 					Collections.<MediaRec>emptyList (),
 					Optional.<String>absent (),

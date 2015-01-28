@@ -132,7 +132,7 @@ class ChatAdultVerifyCommand
 		if (chatUser.getChatScheme () == null) {
 
 			return inboxLogic.inboxNotProcessed (
-				message,
+				inbox,
 				Optional.of (defaultService),
 				Optional.of (affiliate),
 				Optional.of (command),
@@ -201,7 +201,7 @@ class ChatAdultVerifyCommand
 		// process inbox
 
 		return inboxLogic.inboxProcessed (
-			message,
+			inbox,
 			Optional.of (defaultService),
 			Optional.of (affiliate),
 			command);

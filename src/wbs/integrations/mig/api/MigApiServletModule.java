@@ -247,7 +247,7 @@ class MigApiServletModule
 					requestContext.requestUri (),
 					ExceptionLogicImpl.throwableSummary (e),
 					getException (e, requestContext),
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 				PrintWriter out =
@@ -459,7 +459,7 @@ class MigApiServletModule
 					getException (
 						exception,
 						requestContext),
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 				PrintWriter out =

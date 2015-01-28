@@ -18,7 +18,9 @@ import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
+import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.command.model.CommandTypeRec;
@@ -124,6 +126,11 @@ class ChatDateStopCommand
 		ChatRec chat =
 			chatScheme.getChat ();
 
+		ServiceRec defaultService =
+			serviceHelper.findByCode (
+				chat,
+				"default");
+
 		MessageRec message =
 			inbox.getMessage ();
 
@@ -131,6 +138,10 @@ class ChatDateStopCommand
 			chatUserHelper.findOrCreate (
 				chat,
 				message);
+
+		AffiliateRec affiliate =
+			chatUserLogic.getAffiliate (
+				chatUser);
 
 		// update dating mode
 
@@ -153,14 +164,9 @@ class ChatDateStopCommand
 		// process inbox
 
 		return inboxLogic.inboxProcessed (
-			message,
-			Optional.of (
-				serviceHelper.findByCode (
-					chat,
-					"default")),
-			Optional.of (
-				chatUserLogic.getAffiliate (
-					chatUser)),
+			inbox,
+			Optional.of (defaultService),
+			Optional.of (affiliate),
 			command);
 
 	}

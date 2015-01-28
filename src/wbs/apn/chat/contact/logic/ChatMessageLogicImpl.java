@@ -978,7 +978,7 @@ class ChatMessageLogicImpl
 				"\n" +
 				ExceptionLogicImpl.throwableDump (exception),
 
-				null,
+				Optional.<Integer>absent (),
 				false);
 
 			success = false;
@@ -1024,7 +1024,7 @@ class ChatMessageLogicImpl
 				"\n" +
 				ExceptionLogicImpl.throwableDump (exception),
 
-				null,
+				Optional.<Integer>absent (),
 				false);
 
 			success = false;
@@ -1059,7 +1059,7 @@ class ChatMessageLogicImpl
 				"\n" +
 				ExceptionLogicImpl.throwableDump (exception),
 
-				null,
+				Optional.<Integer>absent (),
 				false);
 
 			success = false;
@@ -1247,7 +1247,7 @@ class ChatMessageLogicImpl
 					ExceptionLogicImpl.throwableDump (
 						exception)),
 
-				null,
+				Optional.<Integer>absent (),
 				false);
 
 			return false;

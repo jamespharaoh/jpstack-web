@@ -193,7 +193,7 @@ class ManualResponderCommand
 				queueItem);
 
 		return inboxLogic.inboxProcessed (
-			message,
+			inbox,
 			Optional.of (defaultService),
 			Optional.<AffiliateRec>absent (),
 			command);

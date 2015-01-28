@@ -165,7 +165,7 @@ class ChatDateCommand
 			// process inbox
 
 			return inboxLogic.inboxProcessed (
-				message,
+				inbox,
 				Optional.of (defaultService),
 				Optional.of (affiliate),
 				command);
@@ -201,7 +201,7 @@ class ChatDateCommand
 			// process inbox
 
 			return inboxLogic.inboxProcessed (
-				message,
+				inbox,
 				Optional.<ServiceRec>absent (),
 				Optional.<AffiliateRec>absent (),
 				command);
@@ -220,7 +220,7 @@ class ChatDateCommand
 		// process inbox
 
 		return inboxLogic.inboxProcessed (
-			message,
+			inbox,
 			Optional.<ServiceRec>absent (),
 			Optional.<AffiliateRec>absent (),
 			command);

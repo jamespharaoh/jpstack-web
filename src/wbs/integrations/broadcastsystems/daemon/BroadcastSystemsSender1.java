@@ -27,6 +27,8 @@ import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
 
+import com.google.common.base.Optional;
+
 @Log4j
 @SingletonComponent ("broadcastSystemsSender1")
 public
@@ -241,7 +243,7 @@ class BroadcastSystemsSender1
 						state.messageId),
 					"Success response did not match",
 					responseString,
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 				return null;
@@ -269,7 +271,7 @@ class BroadcastSystemsSender1
 						state.messageId),
 					"Failure response did not match",
 					responseString,
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 				throw tempFailure (

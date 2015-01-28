@@ -227,7 +227,7 @@ class ChatPhotoCommand
 		// process inbox
 
 		return inboxLogic.inboxProcessed (
-			message,
+			inbox,
 			Optional.of (defaultService),
 			Optional.of (affiliate),
 			command);

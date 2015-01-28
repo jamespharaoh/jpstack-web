@@ -421,7 +421,7 @@ class SubscriptionCommand
 		// process message
 
 		return inboxLogic.inboxProcessed (
-			message,
+			inbox,
 			Optional.of (response.getService ()),
 			Optional.of (response.getAffiliate ()),
 			command);

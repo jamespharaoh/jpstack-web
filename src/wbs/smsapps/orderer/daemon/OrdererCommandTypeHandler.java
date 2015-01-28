@@ -145,7 +145,7 @@ class OrdererCommandTypeHandler
 			if (! ordererOrders.isEmpty ()) {
 
 				return inboxLogic.inboxProcessed (
-					message,
+					inbox,
 					Optional.of (defaultService),
 					Optional.<AffiliateRec>absent (),
 					command);
@@ -211,7 +211,7 @@ class OrdererCommandTypeHandler
 				billedMessage);
 
 		return inboxLogic.inboxProcessed (
-			message,
+			inbox,
 			Optional.of (defaultService),
 			Optional.<AffiliateRec>absent (),
 			command);

@@ -65,6 +65,7 @@ import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
 import com.google.common.base.Optional;
 
@@ -169,16 +170,17 @@ class ChatJoiner {
 	Integer chatSchemeId;
 
 	@Getter @Setter
-	Boolean confirmCharges;
+	Boolean confirmCharges = false;
 
 	@Getter @Setter
-	MessageRec message;
+	InboxRec inbox;
 
 	@Getter @Setter
 	String rest;
 
 	// state
 
+	MessageRec message;
 	ChatRec chat;
 	ChatUserRec chatUser;
 	Integer deliveryId;
@@ -839,7 +841,7 @@ class ChatJoiner {
 				chatUser);
 
 		return inboxLogic.inboxProcessed (
-			message,
+			inbox,
 			Optional.of (defaultService),
 			Optional.of (affiliate),
 			command);
@@ -853,6 +855,11 @@ class ChatJoiner {
 			database.currentTransaction ();
 
 		// lookup stuff
+
+		message =
+			inbox != null
+				? inbox.getMessage ()
+				: null;
 
 		chat =
 			chatHelper.find (chatId);

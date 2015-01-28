@@ -147,7 +147,7 @@ class ChatLogoffCommand
 				true);
 
 			return inboxLogic.inboxProcessed (
-				message,
+				inbox,
 				Optional.of (defaultService),
 				Optional.of (affiliate),
 				command);
@@ -162,7 +162,7 @@ class ChatLogoffCommand
 			false);
 
 		return inboxLogic.inboxProcessed (
-			message,
+			inbox,
 			Optional.of (defaultService),
 			Optional.of (affiliate),
 			command);

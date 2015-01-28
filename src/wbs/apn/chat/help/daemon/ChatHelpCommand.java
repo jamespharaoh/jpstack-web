@@ -143,7 +143,7 @@ class ChatHelpCommand
 				true);
 
 			return inboxLogic.inboxProcessed (
-				message,
+				inbox,
 				Optional.of (defaultService),
 				Optional.of (affiliate),
 				command);
@@ -156,8 +156,7 @@ class ChatHelpCommand
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (
-					message.getThreadId ()),
+				Optional.of (message.getThreadId ()),
 				"help_error",
 				commandHelper.findByCode (
 					chat,
@@ -186,7 +185,7 @@ class ChatHelpCommand
 		// process inbox
 
 		return inboxLogic.inboxProcessed (
-			message,
+			inbox,
 			Optional.of (defaultService),
 			Optional.of (affiliate),
 			command);

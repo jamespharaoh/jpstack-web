@@ -206,7 +206,7 @@ class ChatUserImageUploadCommand
 		// process inbox
 
 		return inboxLogic.inboxProcessed (
-			messageIn,
+			inbox,
 			Optional.of (defaultService),
 			Optional.of (affiliate),
 			command);

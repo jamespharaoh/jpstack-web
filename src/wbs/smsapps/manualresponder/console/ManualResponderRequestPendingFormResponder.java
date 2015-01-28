@@ -6,6 +6,8 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -19,6 +21,7 @@ import wbs.platform.console.responder.HtmlResponder;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.priv.console.PrivChecker;
 import wbs.sms.gsm.Gsm;
+import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberObjectHelper;
@@ -60,6 +63,7 @@ class ManualResponderRequestPendingFormResponder
 
 	ManualResponderRequestRec manualResponderRequest;
 	ManualResponderRec manualResponder;
+	NumberRec number;
 	Set<ManualResponderTemplateRec> manualResponderTemplates;
 	String summaryUrl;
 
@@ -106,14 +110,74 @@ class ManualResponderRequestPendingFormResponder
 		manualResponder =
 			manualResponderRequest.getManualResponder ();
 
+		number =
+			manualResponderRequest.getNumber ();
+
 		manualResponderTemplates =
 			new TreeSet<ManualResponderTemplateRec> ();
 
-		for (ManualResponderTemplateRec manualResponderTemplate
-				: manualResponder.getTemplates ()) {
+		for (
+			ManualResponderTemplateRec manualResponderTemplate
+				: manualResponder.getTemplates ()
+		) {
 
 			if (manualResponderTemplate.getRouter () == null)
 				continue;
+
+			if (manualResponderTemplate.getRules () != null) {
+
+				String rules =
+					manualResponderTemplate.getRules ();
+
+				Pattern networkIsRulesPattern =
+					Pattern.compile (
+						"^network is ([0-9]+)$");
+
+				Matcher networkIsRulesMatcher =
+					networkIsRulesPattern.matcher (
+						rules);
+
+				if (networkIsRulesMatcher.matches ()) {
+
+					int networkId =
+						Integer.parseInt (
+							networkIsRulesMatcher.group (1));
+
+					if (number.getNetwork ().getId () != networkId)
+						continue;
+
+				}
+
+				Pattern networkIsNotRulesPattern =
+					Pattern.compile (
+						"^network is not ([0-9]+)$");
+
+				Matcher networkIsNotRulesMatcher =
+					networkIsNotRulesPattern.matcher (
+						rules);
+
+				if (networkIsNotRulesMatcher.matches ()) {
+
+					int networkId =
+						Integer.parseInt (
+							networkIsNotRulesMatcher.group (1));
+
+					if (number.getNetwork ().getId () == networkId)
+						continue;
+
+				}
+
+				if (
+					! networkIsRulesMatcher.matches ()
+					&& ! networkIsNotRulesMatcher.matches ()
+				) {
+
+					throw new RuntimeException (
+						"Invalid rules");
+
+				}
+
+			}
 
 			manualResponderTemplates.add (
 				manualResponderTemplate);

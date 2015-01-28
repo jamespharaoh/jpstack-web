@@ -237,7 +237,7 @@ class HybyteApiServletModule
 					requestContext.requestUri (),
 					ExceptionLogicImpl.throwableSummary (exception),
 					stringBuilder.toString (),
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 			}

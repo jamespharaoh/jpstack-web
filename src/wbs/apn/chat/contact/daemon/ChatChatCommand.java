@@ -205,12 +205,9 @@ class ChatChatCommand
 		// process inbox
 
 		return inboxLogic.inboxProcessed (
-			message,
-			Optional.of (
-				defaultService),
-			Optional.of (
-				chatUserLogic.getAffiliate (
-					fromChatUser)),
+			inbox,
+			Optional.of (defaultService),
+			Optional.of (affiliate),
 			command);
 
 	}
@@ -241,12 +238,9 @@ class ChatChatCommand
 					"does not exist"));
 
 			return inboxLogic.inboxProcessed (
-				message,
-				Optional.of (
-					defaultService),
-				Optional.of (
-					chatUserLogic.getAffiliate (
-						fromChatUser)),
+				inbox,
+				Optional.of (defaultService),
+				Optional.of (affiliate),
 				command);
 
 		}
@@ -278,12 +272,9 @@ class ChatChatCommand
 		// process inbox
 
 		return inboxLogic.inboxProcessed (
-			message,
-			Optional.of (
-				defaultService),
-			Optional.of (
-				chatUserLogic.getAffiliate (
-					fromChatUser)),
+			inbox,
+			Optional.of (defaultService),
+			Optional.of (affiliate),
 			command);
 
 	}
