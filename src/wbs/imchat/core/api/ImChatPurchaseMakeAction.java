@@ -19,16 +19,19 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.imchat.core.model.ImChatCustomerObjectHelper;
 import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
+import wbs.imchat.core.model.ImChatPricePointObjectHelper;
+import wbs.imchat.core.model.ImChatPricePointRec;
+import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
+import wbs.imchat.core.model.ImChatPurchaseRec;
 import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
 
-@PrototypeComponent ("imChatCustomerCreateAction")
+@PrototypeComponent ("imChatPurchaseMakeAction")
 public
-class ImChatCustomerCreateAction
+class ImChatPurchaseMakeAction
 	implements Action {
 
 	// dependencies
@@ -37,10 +40,13 @@ class ImChatCustomerCreateAction
 	Database database;
 
 	@Inject
-	ImChatCustomerObjectHelper imChatCustomerHelper;
+	ImChatObjectHelper imChatHelper;
 
 	@Inject
-	ImChatObjectHelper imChatHelper;
+	ImChatPricePointObjectHelper imChatPricePointHelper;
+
+	@Inject
+	ImChatPurchaseObjectHelper imChatPurchaseHelper;
 
 	@Inject
 	ImChatSessionObjectHelper imChatSessionHelper;
@@ -70,9 +76,9 @@ class ImChatCustomerCreateAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatCustomerCreateRequest createRequest =
+		ImChatPurchaseMakeRequest purchaseRequest =
 			dataFromJson.fromJson (
-				ImChatCustomerCreateRequest.class,
+				ImChatPurchaseMakeRequest.class,
 				jsonValue);
 
 		// begin transaction
@@ -88,71 +94,104 @@ class ImChatCustomerCreateAction
 					requestContext.request (
 						"imChatId")));
 
-		// check for existing
+		// lookup session and customer
 
-		ImChatCustomerRec existingCustomer =
-			imChatCustomerHelper.findByEmail (
-				imChat,
-				createRequest.email ());
+		ImChatSessionRec session =
+			imChatSessionHelper.findBySecret (
+				purchaseRequest.sessionSecret ());
 
-		if (existingCustomer != null) {
+		if (
+			session == null
+			|| ! session.getActive ()
+		) {
 
 			ImChatFailure failureResponse =
 				new ImChatFailure ()
 
 				.reason (
-					"email-already-exists")
+					"session-invalid")
 
 				.message (
-					"A customer with that email address already exists");
+					"The session secret is invalid or the session is no " +
+					"longer active");
 
 			return jsonResponderProvider.get ()
 				.value (failureResponse);
 
 		}
 
-		// create new
+		ImChatCustomerRec customer =
+			session.getImChatCustomer ();
 
-		ImChatCustomerRec newCustomer =
-			imChatCustomerHelper.insert (
-				new ImChatCustomerRec ()
+		// lookup price point
 
-			.setImChat (
-				imChat)
+		ImChatPricePointRec pricePoint =
+			imChatPricePointHelper.find (
+				(int) (long)
+				purchaseRequest.pricePointId ());
 
-			.setCode (
-				imChatCustomerHelper.generateCode ())
+		if (
+			pricePoint == null
+			|| pricePoint.getImChat () != imChat
+			|| pricePoint.getDeleted ()
+		) {
 
-			.setEmail (
-				createRequest.email ())
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
 
-			.setPassword (
-				createRequest.password ())
+				.reason (
+					"price-point-invalid")
 
-		);
+				.message (
+					"The price point id is invalid");
 
-		// create session
+			return jsonResponderProvider.get ()
+				.value (failureResponse);
 
-		ImChatSessionRec session =
-			imChatSessionHelper.insert (
-				new ImChatSessionRec ()
+		}
+
+		// create purchase
+
+		imChatPurchaseHelper.insert (
+			new ImChatPurchaseRec ()
 
 			.setImChatCustomer (
-				newCustomer)
+				customer)
 
-			.setSecret (
-				imChatSessionHelper.generateSecret ())
+			.setIndex (
+				customer.getNumPurchases ())
 
-			.setActive (
-				true)
+			.setImChatPricePoint (
+				pricePoint)
 
-			.setStartTime (
-				transaction.now ())
+			.setPrice (
+				pricePoint.getPrice ())
 
-			.setUpdateTime (
+			.setValue (
+				pricePoint.getValue ())
+
+			.setOldBalance (
+				customer.getBalance ())
+
+			.setNewBalance (
+				+ customer.getBalance ()
+				+ pricePoint.getValue ())
+
+			.setTimestamp (
 				transaction.now ())
 
 		);
+
+		// update customer
+
+		customer
+
+			.setNumPurchases (
+				customer.getNumPurchases () + 1)
+
+			.setBalance (
+				+ customer.getBalance ()
+				+ pricePoint.getValue ());
 
 		// create response
 
@@ -166,13 +205,13 @@ class ImChatCustomerCreateAction
 				new ImChatCustomerData ()
 
 				.id (
-					newCustomer.getId ())
+					customer.getId ())
 
 				.code (
-					newCustomer.getCode ())
+					customer.getCode ())
 
 				.balance (
-					newCustomer.getBalance ())
+					customer.getBalance ())
 
 			);
 

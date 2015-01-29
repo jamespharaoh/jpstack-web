@@ -54,6 +54,14 @@ class ImChatCustomerRec
 	@SimpleField
 	Integer numConversations = 0;
 
+	@SimpleField
+	Integer numPurchases = 0;
+
+	// state
+
+	@SimpleField
+	Integer balance = 0;
+
 	// object helper methods
 
 	public

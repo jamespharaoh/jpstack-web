@@ -16,9 +16,12 @@ import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatMessageObjectHelper;
 import wbs.imchat.core.model.ImChatMessageRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
+import wbs.imchat.core.model.ImChatPricePointObjectHelper;
+import wbs.imchat.core.model.ImChatPricePointRec;
 import wbs.imchat.core.model.ImChatProfileObjectHelper;
 import wbs.imchat.core.model.ImChatProfileRec;
 import wbs.imchat.core.model.ImChatRec;
+import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuObjectHelper;
 import wbs.platform.menu.model.MenuRec;
@@ -30,6 +33,9 @@ class ImChatCoreFixtureProvider
 	implements FixtureProvider {
 
 	// dependencies
+
+	@Inject
+	CurrencyObjectHelper currencyHelper;
 
 	@Inject
 	Database database;
@@ -51,6 +57,9 @@ class ImChatCoreFixtureProvider
 
 	@Inject
 	ImChatMessageObjectHelper imChatMessageHelper;
+
+	@Inject
+	ImChatPricePointObjectHelper imChatPricePointHelper;
 
 	@Inject
 	ImChatProfileObjectHelper imChatProfileHelper;
@@ -107,6 +116,36 @@ class ImChatCoreFixtureProvider
 
 			.setDescription (
 				"Test IM chat")
+
+			.setCurrency (
+				currencyHelper.findByCode (
+					GlobalId.root,
+					"gbp"))
+
+		);
+
+		// im chat price point
+
+		imChatPricePointHelper.insert (
+			new ImChatPricePointRec ()
+
+			.setImChat (
+				imChat)
+
+			.setCode (
+				"20_for_10")
+
+			.setName (
+				"£20 for £10")
+
+			.setDescription (
+				"£20 for £10")
+
+			.setPrice (
+				1000)
+
+			.setValue (
+				20000)
 
 		);
 

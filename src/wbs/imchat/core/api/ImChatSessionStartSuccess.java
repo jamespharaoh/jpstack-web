@@ -15,9 +15,9 @@ class ImChatSessionStartSuccess {
 	String status = "success";
 
 	@DataAttribute
-	String customerCode;
+	String sessionSecret;
 
 	@DataAttribute
-	String sessionSecret;
+	ImChatCustomerData customer;
 
 }

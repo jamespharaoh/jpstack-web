@@ -16,16 +16,20 @@ import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.imchat.core.model.ImChatObjectHelper;
-import wbs.imchat.core.model.ImChatProfileObjectHelper;
-import wbs.imchat.core.model.ImChatProfileRec;
+import wbs.imchat.core.model.ImChatPricePointObjectHelper;
+import wbs.imchat.core.model.ImChatPricePointRec;
 import wbs.imchat.core.model.ImChatRec;
+import wbs.platform.currency.logic.CurrencyLogic;
 
-@PrototypeComponent ("imChatProfileListAction")
+@PrototypeComponent ("imChatPricePointListAction")
 public
-class ImChatProfileListAction
+class ImChatPricePointListAction
 	implements Action {
 
 	// dependencies
+
+	@Inject
+	CurrencyLogic currencyLogic;
 
 	@Inject
 	Database database;
@@ -34,7 +38,7 @@ class ImChatProfileListAction
 	ImChatObjectHelper imChatHelper;
 
 	@Inject
-	ImChatProfileObjectHelper imChatProfileHelper;
+	ImChatPricePointObjectHelper imChatPricePointHelper;
 
 	@Inject
 	RequestContext requestContext;
@@ -63,49 +67,53 @@ class ImChatProfileListAction
 					requestContext.request (
 						"imChatId")));
 
-		// retrieve profiles
+		// retrieve price points
 
-		List<ImChatProfileRec> profiles =
-			imChatProfileHelper.findByParent (
+		List<ImChatPricePointRec> pricePoints =
+			imChatPricePointHelper.findByParent (
 				imChat);
 
 		Collections.sort (
-			profiles);
+			pricePoints);
 
 		// create response
 
-		List<ImChatProfileData> profileDatas =
-			new ArrayList<ImChatProfileData> ();
+		List<ImChatPricePointData> pricePointDatas =
+			new ArrayList<ImChatPricePointData> ();
 
 		for (
-			ImChatProfileRec profile
-				: profiles
+			ImChatPricePointRec pricePoint
+				: pricePoints
 		) {
 
-			if (profile.getDeleted ())
+			if (pricePoint.getDeleted ())
 				continue;
 
-			profileDatas.add (
-				new ImChatProfileData ()
+			pricePointDatas.add (
+				new ImChatPricePointData ()
 
 				.id (
-					profile.getId ())
+					pricePoint.getId ())
 
 				.name (
-					profile.getPublicName ())
+					pricePoint.getName ())
 
-				.description (
-					profile.getPublicDescription ())
+				.price (
+					currencyLogic.formatText (
+						imChat.getCurrency (),
+						pricePoint.getPrice ()))
 
-				.imageLink (
-					"TODO")
+				.value (
+					currencyLogic.formatText (
+						imChat.getCurrency (),
+						pricePoint.getValue ()))
 
 			);
 
 		}
 
 		return jsonResponderProvider.get ()
-			.value (profileDatas);
+			.value (pricePointDatas);
 
 	}
 

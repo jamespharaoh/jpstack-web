@@ -14,11 +14,9 @@ import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
-import wbs.framework.entity.annotations.ReferenceField;
-import wbs.framework.record.MajorRecord;
+import wbs.framework.entity.annotations.SimpleField;
+import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
-import wbs.platform.currency.model.CurrencyRec;
-import wbs.platform.scaffold.model.SliceRec;
 
 @Accessors (chain = true)
 @Data
@@ -26,8 +24,8 @@ import wbs.platform.scaffold.model.SliceRec;
 @ToString (of = "id" )
 @MajorEntity
 public
-class ImChatRec
-	implements MajorRecord<ImChatRec> {
+class ImChatPricePointRec
+	implements CommonRecord<ImChatPricePointRec> {
 
 	// id
 
@@ -37,7 +35,7 @@ class ImChatRec
 	// identity
 
 	@ParentField
-	SliceRec slice;
+	ImChatRec imChat;
 
 	@CodeField
 	String code;
@@ -55,25 +53,27 @@ class ImChatRec
 
 	// settings
 
-	@ReferenceField (
-		nullable = true)
-	CurrencyRec currency;
+	@SimpleField
+	Integer price;
+
+	@SimpleField
+	Integer value;
 
 	// compare to
 
 	@Override
 	public
 	int compareTo (
-			Record<ImChatRec> otherRecord) {
+			Record<ImChatPricePointRec> otherRecord) {
 
-		ImChatRec other =
-			(ImChatRec) otherRecord;
+		ImChatPricePointRec other =
+			(ImChatPricePointRec) otherRecord;
 
 		return new CompareToBuilder ()
 
 			.append (
-				getSlice (),
-				other.getSlice ())
+				getImChat (),
+				other.getImChat ())
 
 			.append (
 				getCode (),

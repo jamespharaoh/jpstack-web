@@ -163,11 +163,22 @@ class ImChatSessionStartAction
 		ImChatSessionStartSuccess successResponse =
 			new ImChatSessionStartSuccess ()
 
-			.customerCode (
-				customer.getCode ())
-
 			.sessionSecret (
-				session.getSecret ());
+				session.getSecret ())
+
+			.customer (
+				new ImChatCustomerData ()
+
+				.id (
+					customer.getId ())
+
+				.code (
+					customer.getCode ())
+
+				.balance (
+					customer.getBalance ())
+
+			);
 
 		// commit and return
 

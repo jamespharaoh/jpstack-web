@@ -17,7 +17,9 @@
 		<model name="imChatCustomer"/>
 		<model name="imChatConversation"/>
 		<model name="imChatMessage"/>
+		<model name="imChatPricePoint"/>
 		<model name="imChatProfile"/>
+		<model name="imChatPurchase"/>
 		<model name="imChatSession"/>
 	</models>
 
@@ -27,9 +29,12 @@
 
 	<layer name="api">
 		<bean class="api.ImChatConversationStartAction"/>
+		<bean class="api.ImChatCustomerAction"/>
 		<bean class="api.ImChatCustomerCreateAction"/>
 		<bean class="api.ImChatSessionStartAction"/>
+		<bean class="api.ImChatPricePointListAction"/>
 		<bean class="api.ImChatProfileListAction"/>
+		<bean class="api.ImChatPurchaseMakeAction"/>
 	</layer>
 
 	<api-modules>

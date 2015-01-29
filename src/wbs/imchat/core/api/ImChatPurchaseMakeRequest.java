@@ -9,15 +9,12 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass
 public
-class ImChatCustomerCreateSuccess {
-
-	@DataAttribute
-	String status = "success";
+class ImChatPurchaseMakeRequest {
 
 	@DataAttribute
 	String sessionSecret;
 
 	@DataAttribute
-	ImChatCustomerData customer;
+	Long pricePointId;
 
 }

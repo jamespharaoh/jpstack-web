@@ -1,9 +1,5 @@
 package wbs.imchat.core.api;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -15,14 +11,15 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
+import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
-import wbs.imchat.core.model.ImChatProfileObjectHelper;
-import wbs.imchat.core.model.ImChatProfileRec;
 import wbs.imchat.core.model.ImChatRec;
+import wbs.imchat.core.model.ImChatSessionObjectHelper;
+import wbs.imchat.core.model.ImChatSessionRec;
 
-@PrototypeComponent ("imChatProfileListAction")
+@PrototypeComponent ("imChatCustomerAction")
 public
-class ImChatProfileListAction
+class ImChatCustomerAction
 	implements Action {
 
 	// dependencies
@@ -34,7 +31,7 @@ class ImChatProfileListAction
 	ImChatObjectHelper imChatHelper;
 
 	@Inject
-	ImChatProfileObjectHelper imChatProfileHelper;
+	ImChatSessionObjectHelper imChatSessionHelper;
 
 	@Inject
 	RequestContext requestContext;
@@ -63,49 +60,41 @@ class ImChatProfileListAction
 					requestContext.request (
 						"imChatId")));
 
-		// retrieve profiles
+		// lookup session
 
-		List<ImChatProfileRec> profiles =
-			imChatProfileHelper.findByParent (
-				imChat);
+		ImChatSessionRec session =
+			imChatSessionHelper.findBySecret (
+				requestContext.header ("x-session-secret"));
 
-		Collections.sort (
-			profiles);
-
-		// create response
-
-		List<ImChatProfileData> profileDatas =
-			new ArrayList<ImChatProfileData> ();
-
-		for (
-			ImChatProfileRec profile
-				: profiles
+		if (
+			session == null
+			|| session.getImChatCustomer ().getImChat () != imChat
+			|| ! session.getActive ()
 		) {
 
-			if (profile.getDeleted ())
-				continue;
-
-			profileDatas.add (
-				new ImChatProfileData ()
-
-				.id (
-					profile.getId ())
-
-				.name (
-					profile.getPublicName ())
-
-				.description (
-					profile.getPublicDescription ())
-
-				.imageLink (
-					"TODO")
-
-			);
+			throw new RuntimeException ();
 
 		}
 
+		ImChatCustomerRec customer =
+			session.getImChatCustomer ();
+
+		// create response
+
+		ImChatCustomerData customerData =
+			new ImChatCustomerData ()
+
+			.id (
+				customer.getId ())
+
+			.code (
+				customer.getCode ())
+
+			.balance (
+				customer.getBalance ());
+
 		return jsonResponderProvider.get ()
-			.value (profileDatas);
+			.value (customerData);
 
 	}
 

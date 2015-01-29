@@ -2,6 +2,7 @@ package wbs.framework.data.tools;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
 
 import lombok.SneakyThrows;
 import wbs.framework.data.annotations.DataAttribute;
@@ -9,6 +10,7 @@ import wbs.framework.data.annotations.DataClass;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 public
 class DataToJson {
@@ -23,7 +25,11 @@ class DataToJson {
 		Class<?> dataClass =
 			dataValue.getClass ();
 
-		if (dataValue instanceof List) {
+		if (simpleClasses.contains (dataValue.getClass ())) {
+
+			return dataValue;
+
+		} else if (dataValue instanceof List) {
 
 			List<?> dataList =
 				(List<?>) dataValue;
@@ -75,7 +81,7 @@ class DataToJson {
 
 				jsonValueBuilder.put (
 					field.getName (),
-					fieldValue);
+					toJson (fieldValue));
 
 			}
 
@@ -84,5 +90,13 @@ class DataToJson {
 		}
 
 	}
+
+	// data
+
+	Set<Class<?>> simpleClasses =
+		ImmutableSet.<Class<?>>builder ()
+			.add (String.class)
+			.add (Integer.class)
+			.build ();
 
 }
