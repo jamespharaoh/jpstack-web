@@ -11,10 +11,39 @@ import wbs.framework.hibernate.HibernateDao;
 import wbs.imchat.core.model.ImChatCustomerDao;
 import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatCustomerSearch;
+import wbs.imchat.core.model.ImChatRec;
 
-public class ImChatCustomerDaoHibernate
-extends HibernateDao
-implements ImChatCustomerDao {
+public
+class ImChatCustomerDaoHibernate
+	extends HibernateDao
+	implements ImChatCustomerDao {
+
+	@Override
+	public
+	ImChatCustomerRec findByEmail (
+			ImChatRec imChat,
+			String email) {
+
+		return findOne (
+			ImChatCustomerRec.class,
+
+			createCriteria (
+				ImChatCustomerRec.class,
+				"_imChatCustomer")
+
+			.add (
+				Restrictions.eq (
+					"_imChatCustomer.imChat",
+					imChat))
+
+			.add (
+				Restrictions.eq (
+					"_imChatCustomer.email",
+					email))
+
+			.list ());
+
+	}
 
 	@Override
 	public
@@ -22,14 +51,16 @@ implements ImChatCustomerDao {
 			ImChatCustomerSearch imChatCustomerSearch) {
 
 		Criteria criteria =
+
 			createCriteria (
 				ImChatCustomerRec.class,
 				"_imChatCustomer")
+
 			.createAlias (
 				"_imChatCustomer.imChat",
 				"_imChat");
 
-		if (imChatCustomerSearch.getImChatId() != null) {
+		if (imChatCustomerSearch.getImChatId () != null) {
 
 			criteria.add (
 				Restrictions.eq (
@@ -38,7 +69,7 @@ implements ImChatCustomerDao {
 
 		}
 
-		if (imChatCustomerSearch.getCode() != null) {
+		if (imChatCustomerSearch.getCode () != null) {
 
 			criteria.add (
 				Restrictions.eq (

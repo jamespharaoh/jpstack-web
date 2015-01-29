@@ -49,7 +49,7 @@ class PaypalFixtureProvider
 				"paypal_account")
 
 			.setLabel (
-				"Paypal Account")
+				"Paypal accounts")
 
 			.setPath (
 				"/paypalAccounts")
@@ -65,13 +65,13 @@ class PaypalFixtureProvider
 					"test"))
 
 			.setCode (
-				"paypalAccount")
+				"test")
 
 			.setName (
-				"paypalAccount")
+				"Test")
 
 			.setDescription (
-				"paypalAccount")
+				"Test paypal account")
 
 		);
 

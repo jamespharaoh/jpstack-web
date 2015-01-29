@@ -21,6 +21,7 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.joda.time.Instant;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
@@ -35,11 +36,13 @@ import wbs.framework.web.Responder;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
 import wbs.platform.api.mvc.ApiFile;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.gsm.ConcatenatedInformationElement;
 import wbs.sms.gsm.UserDataHeader;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.InboxMultipartLogic;
 import wbs.sms.message.report.logic.ReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.message.report.model.MessageReportCodeRec;
@@ -49,6 +52,7 @@ import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 @Log4j
@@ -57,11 +61,16 @@ public
 class DialogueApiServletModule
 	implements ServletModule {
 
+	// dependencies
+
 	@Inject
 	Database database;
 
 	@Inject
 	InboxLogic inboxLogic;
+
+	@Inject
+	InboxMultipartLogic inboxMultipartLogic;
 
 	@Inject
 	MessageReportCodeObjectHelper messageReportCodeHelper;
@@ -81,8 +90,13 @@ class DialogueApiServletModule
 	@Inject
 	TextObjectHelper textHelper;
 
+	// prototype dependencies
+
 	@Inject
 	Provider<ApiFile> apiFile;
+
+	@Inject
+	Provider<DialogueResponder> dialogueResponderProvider;
 
 	// =============================================================== networks
 
@@ -294,7 +308,7 @@ class DialogueApiServletModule
 
 				// insert a part message
 
-				inboxLogic.insertInboxMultipart (
+				inboxMultipartLogic.insertInboxMultipart (
 					route,
 					concat.getRef (),
 					concat.getSeqMax (),
@@ -311,16 +325,16 @@ class DialogueApiServletModule
 				// insert a message
 
 				inboxLogic.inboxInsert (
-					idParam,
+					Optional.of (idParam),
 					textHelper.findOrCreate (message),
 					numFromParam,
 					numToParam,
 					route,
-					network,
-					null,
-					null,
-					null,
-					null);
+					Optional.of (network),
+					Optional.<Instant>absent (),
+					Collections.<MediaRec>emptyList (),
+					Optional.<String>absent (),
+					Optional.<String>absent ());
 
 			}
 
@@ -337,13 +351,8 @@ class DialogueApiServletModule
 
 	};
 
-	// ===================================================== dialogue responder
-
-	@Inject Provider<DialogueResponder> dialogueResponder;
-
-	// ================================================================ actions
-
-	private final Action reportAction =
+	private final
+	Action reportAction =
 		new Action () {
 
 		@Override
@@ -387,7 +396,7 @@ class DialogueApiServletModule
 						"Ignoring dialogue report with no user key, X-E3-ID=%s",
 						idParam));
 
-				return dialogueResponder
+				return dialogueResponderProvider
 					.get ();
 
 			}
@@ -451,7 +460,7 @@ class DialogueApiServletModule
 				log.error (
 					"Unrecognised report for " + messageId);
 
-				return dialogueResponder
+				return dialogueResponderProvider
 					.get ();
 
 			}
@@ -481,7 +490,7 @@ class DialogueApiServletModule
 
 			transaction.commit ();
 
-			return dialogueResponder
+			return dialogueResponderProvider
 				.get ();
 
 		}
@@ -533,13 +542,17 @@ class DialogueApiServletModule
 		new Entry ("/route/(\\d+)(/[^/]+)") {
 
 		@Override
-		protected WebFile handle (
+		protected
+		WebFile handle (
 				Matcher matcher) {
 
-			requestContext.request ("route_id",
-				Integer.parseInt (matcher.group (1)));
+			requestContext.request (
+				"route_id",
+				Integer.parseInt (
+					matcher.group (1)));
 
-			return routeFiles.get (matcher.group (2));
+			return routeFiles.get (
+				matcher.group (2));
 
 		}
 
@@ -563,9 +576,7 @@ class DialogueApiServletModule
 	@Override
 	public
 	Map<String,WebFile> files () {
-
 		return Collections.emptyMap ();
-
 	}
 
 }

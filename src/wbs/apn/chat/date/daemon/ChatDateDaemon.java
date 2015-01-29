@@ -43,6 +43,7 @@ import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.locator.model.LongLat;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 @Log4j
@@ -124,7 +125,7 @@ class ChatDateDaemon
 					"daemon",
 					"Chat daemon dating",
 					exception,
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 			}
@@ -383,18 +384,19 @@ class ChatDateDaemon
 				if (count >= max)
 					break;
 
-			} catch (Exception e) {
+			} catch (Exception exception) {
 
 				exceptionLogic.logThrowable (
 					"daemon",
 					"Chat daemon dating",
-					e,
-					null,
+					exception,
+					Optional.<Integer>absent (),
 					false);
 			}
 		}
 
 		log.info ("Dating done " + count);
+
 	}
 
 	boolean doUser (

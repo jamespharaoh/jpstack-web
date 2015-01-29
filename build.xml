@@ -110,8 +110,9 @@
       <fileset dir="src/wbs/platform/postgresql/console/files"/>
       <fileset dir="src/wbs/platform/daemon/console/files"/>
       <fileset dir="src/wbs/platform/rpc/console/files"/>
-      <fileset dir="src/wbs/platform/api/mvc/console/files"/>
       <fileset dir="src/wbs/platform/api/module/console/files"/>
+      <fileset dir="src/wbs/platform/api/mvc/console/files"/>
+      <fileset dir="src/wbs/platform/api/resource/console/files"/>
       <fileset dir="src/wbs/platform/reporting/console/files"/>
       <fileset dir="src/wbs/platform/common/console/files"/>
       <fileset dir="src/wbs/sms/core/console/files"/>
@@ -275,8 +276,9 @@
       <fileset dir="src/wbs/platform/postgresql/api/files"/>
       <fileset dir="src/wbs/platform/daemon/api/files"/>
       <fileset dir="src/wbs/platform/rpc/api/files"/>
-      <fileset dir="src/wbs/platform/api/mvc/files"/>
       <fileset dir="src/wbs/platform/api/module/files"/>
+      <fileset dir="src/wbs/platform/api/mvc/files"/>
+      <fileset dir="src/wbs/platform/api/resource/files"/>
       <fileset dir="src/wbs/platform/reporting/api/files"/>
       <fileset dir="src/wbs/platform/common/api/files"/>
       <fileset dir="src/wbs/sms/core/api/files"/>
@@ -474,8 +476,9 @@
       <fileset dir="src/wbs/platform/postgresql/console/files"/>
       <fileset dir="src/wbs/platform/daemon/console/files"/>
       <fileset dir="src/wbs/platform/rpc/console/files"/>
-      <fileset dir="src/wbs/platform/api/mvc/console/files"/>
       <fileset dir="src/wbs/platform/api/module/console/files"/>
+      <fileset dir="src/wbs/platform/api/mvc/console/files"/>
+      <fileset dir="src/wbs/platform/api/resource/console/files"/>
       <fileset dir="src/wbs/platform/reporting/console/files"/>
       <fileset dir="src/wbs/platform/common/console/files"/>
       <fileset dir="src/wbs/sms/core/console/files"/>
@@ -639,8 +642,9 @@
       <fileset dir="src/wbs/platform/postgresql/api/files"/>
       <fileset dir="src/wbs/platform/daemon/api/files"/>
       <fileset dir="src/wbs/platform/rpc/api/files"/>
-      <fileset dir="src/wbs/platform/api/mvc/files"/>
       <fileset dir="src/wbs/platform/api/module/files"/>
+      <fileset dir="src/wbs/platform/api/mvc/files"/>
+      <fileset dir="src/wbs/platform/api/resource/files"/>
       <fileset dir="src/wbs/platform/reporting/api/files"/>
       <fileset dir="src/wbs/platform/common/api/files"/>
       <fileset dir="src/wbs/sms/core/api/files"/>
@@ -842,6 +846,7 @@
       <script name="src/wbs/sms/route/core/model/route.sql"/>
       <script name="src/wbs/sms/command/model/command.sql"/>
       <script name="src/wbs/sms/message/delivery/model/delivery.sql"/>
+      <script name="src/wbs/sms/message/inbox/model/sms-inbox.sql"/>
       <script name="src/wbs/sms/keyword/model/keyword-set-fallback.sql"/>
       <script name="src/wbs/sms/magicnumber/model/magic-number.sql"/>
       <script name="src/wbs/sms/message/batch/model/batch.sql"/>
@@ -870,6 +875,7 @@
       <script name="src/wbs/apn/chat/user/core/model/chat-user.sql"/>
       <script name="src/wbs/apn/chat/user/core/model/chat-user-session.sql"/>
       <script name="src/wbs/apn/chat/user/core/model/chat-users-summary.sql"/>
+      <script name="src/wbs/imchat/core/model/im-chat-core.sql"/>
       <script name="src/wbs/integrations/txtnation/model/txt-nation.sql"/>
     </database-init>
   </target>
@@ -892,7 +898,7 @@
       <script name="src/wbs/sms/number/core/model/number-data.sql"/>
       <script name="src/wbs/sms/route/core/model/route-data.sql"/>
       <script name="src/wbs/sms/gazetteer/model/gazetteer-data.sql"/>
-      <script name="src/wbs/sms/message/inbox/model/inbox-data.sql"/>
+      <script name="src/wbs/sms/message/inbox/model/sms-inbox-data.sql"/>
       <script name="src/wbs/sms/keyword/model/keyword-data.sql"/>
       <script name="src/wbs/sms/magicnumber/model/magic-number-data.sql"/>
       <script name="src/wbs/sms/message/batch/model/batch-data.sql"/>

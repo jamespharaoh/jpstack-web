@@ -107,7 +107,7 @@ class ChatSpendWarningDaemon
 					"daemon",
 					"ChatSpendWarningDaemon",
 					exception,
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 			}

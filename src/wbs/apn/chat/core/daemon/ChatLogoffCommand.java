@@ -2,8 +2,9 @@ package wbs.apn.chat.core.daemon;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
@@ -15,21 +16,28 @@ import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
+import com.google.common.base.Optional;
+
+@Accessors (fluent = true)
 @PrototypeComponent ("chatLogoffCommand")
 public
 class ChatLogoffCommand
 	implements CommandHandler {
+
+	// dependencies
 
 	@Inject
 	ChatCreditLogic chatCreditLogic;
@@ -67,6 +75,22 @@ class ChatLogoffCommand
 	@Inject
 	ServiceObjectHelper serviceHelper;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
+	// details
+
 	@Override
 	public
 	String[] getCommandTypes () {
@@ -77,41 +101,33 @@ class ChatLogoffCommand
 
 	}
 
+	// implementation
+
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+	InboxAttemptRec handle () {
 
 		ChatRec chat =
 			(ChatRec) (Object)
 			objectManager.getParent (
 				command);
 
+		ServiceRec defaultService =
+			serviceHelper.findByCode (
+				chat,
+				"default");
+
 		MessageRec message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
 				chat,
 				message);
 
-		// process inbox
-
-		inboxLogic.inboxProcessed (
-			message,
-			serviceHelper.findByCode (chat, "default"),
-			chatUserLogic.getAffiliate (chatUser),
-			commandHelper.find (commandId));
+		AffiliateRec affiliate =
+			chatUserLogic.getAffiliate (
+				chatUser);
 
 		// send barred users to help
 
@@ -126,13 +142,15 @@ class ChatLogoffCommand
 			chatHelpLogLogic.createChatHelpLogIn (
 				chatUser,
 				message,
-				receivedMessage.getRest (),
+				rest,
 				null,
 				true);
 
-			transaction.commit ();
-
-			return;
+			return inboxLogic.inboxProcessed (
+				inbox,
+				Optional.of (defaultService),
+				Optional.of (affiliate),
+				command);
 
 		}
 
@@ -143,7 +161,11 @@ class ChatLogoffCommand
 			message.getThreadId (),
 			false);
 
-		transaction.commit ();
+		return inboxLogic.inboxProcessed (
+			inbox,
+			Optional.of (defaultService),
+			Optional.of (affiliate),
+			command);
 
 	}
 

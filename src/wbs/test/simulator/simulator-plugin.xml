@@ -19,7 +19,6 @@
 	</models>
 
 	<layer name="console">
-		<bean class="console.JsonResponder"/>
 		<bean class="console.SimulatorRouteSummaryAdditionalPart"/>
 		<bean class="console.SimulatorRouteSummaryAdditionalPartFactory"/>
 		<bean class="console.SimulatorSessionConsolePart"/>

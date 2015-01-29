@@ -1,11 +1,12 @@
 package wbs.imchat.core.model;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.DeletedField;
 import wbs.framework.entity.annotations.DescriptionField;
@@ -13,8 +14,10 @@ import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
+import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
+import wbs.platform.currency.model.CurrencyRec;
 import wbs.platform.scaffold.model.SliceRec;
 
 @Accessors (chain = true)
@@ -49,6 +52,12 @@ class ImChatRec
 
 	@DeletedField
 	Boolean deleted = false;
+
+	// settings
+
+	@ReferenceField (
+		nullable = true)
+	CurrencyRec currency;
 
 	// compare to
 

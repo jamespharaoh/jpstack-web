@@ -26,8 +26,9 @@ import wbs.framework.record.Record;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public class ImChatCustomerRec
-	implements CommonRecord<ImChatCustomerRec>{
+public
+class ImChatCustomerRec
+	implements CommonRecord<ImChatCustomerRec> {
 
 	// identity
 
@@ -40,10 +41,26 @@ public class ImChatCustomerRec
 	@CodeField
 	String code;
 
+	// details
+
+	@SimpleField
+	String email;
+
+	@SimpleField
+	String password;
+
 	// statistics
 
 	@SimpleField
 	Integer numConversations = 0;
+
+	@SimpleField
+	Integer numPurchases = 0;
+
+	// state
+
+	@SimpleField
+	Integer balance = 0;
 
 	// object helper methods
 
@@ -84,8 +101,12 @@ public class ImChatCustomerRec
 
 	// dao methods
 
-	public static
+	public
 	interface ImChatCustomerDaoMethods {
+
+		ImChatCustomerRec findByEmail (
+				ImChatRec imChat,
+				String email);
 
 		List<Integer> searchIds (
 				ImChatCustomerSearch imChatCustomerSearch);
@@ -103,6 +124,8 @@ public class ImChatCustomerRec
 		@Inject
 		ImChatCustomerDao imChatCustomerDao;
 
+		// implementation
+
 		@Override
 		public
 		List<Integer> searchIds (
@@ -112,7 +135,7 @@ public class ImChatCustomerRec
 				(ImChatCustomerSearch) search;
 
 			return imChatCustomerDao.searchIds (
-					imChatCustomerSearch);
+				imChatCustomerSearch);
 
 		}
 

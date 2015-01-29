@@ -1,8 +1,12 @@
 package wbs.imchat.core.fixture;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.imchat.core.model.ImChatConversationObjectHelper;
@@ -12,7 +16,12 @@ import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatMessageObjectHelper;
 import wbs.imchat.core.model.ImChatMessageRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
+import wbs.imchat.core.model.ImChatPricePointObjectHelper;
+import wbs.imchat.core.model.ImChatPricePointRec;
+import wbs.imchat.core.model.ImChatProfileObjectHelper;
+import wbs.imchat.core.model.ImChatProfileRec;
 import wbs.imchat.core.model.ImChatRec;
+import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuObjectHelper;
 import wbs.platform.menu.model.MenuRec;
@@ -24,6 +33,12 @@ class ImChatCoreFixtureProvider
 	implements FixtureProvider {
 
 	// dependencies
+
+	@Inject
+	CurrencyObjectHelper currencyHelper;
+
+	@Inject
+	Database database;
 
 	@Inject
 	MenuGroupObjectHelper menuGroupHelper;
@@ -44,6 +59,12 @@ class ImChatCoreFixtureProvider
 	ImChatMessageObjectHelper imChatMessageHelper;
 
 	@Inject
+	ImChatPricePointObjectHelper imChatPricePointHelper;
+
+	@Inject
+	ImChatProfileObjectHelper imChatProfileHelper;
+
+	@Inject
 	SliceObjectHelper sliceHelper;
 
 	// implementation
@@ -52,13 +73,18 @@ class ImChatCoreFixtureProvider
 	public
 	void createFixtures () {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
+		// menu
+
 		menuHelper.insert (
 			new MenuRec ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
-				GlobalId.root,
-				"facility"))
+					GlobalId.root,
+					"facility"))
 
 			.setCode (
 				"im_chat")
@@ -71,6 +97,8 @@ class ImChatCoreFixtureProvider
 
 		);
 
+		// im chat
+
 		ImChatRec imChat =
 			imChatHelper.insert (
 				new ImChatRec ()
@@ -81,15 +109,90 @@ class ImChatCoreFixtureProvider
 					"test"))
 
 			.setCode (
-				"im_chat")
+				"test")
 
 			.setName (
-				"im_chat")
+				"Test")
 
 			.setDescription (
-				"im_chat")
+				"Test IM chat")
+
+			.setCurrency (
+				currencyHelper.findByCode (
+					GlobalId.root,
+					"gbp"))
 
 		);
+
+		// im chat price point
+
+		imChatPricePointHelper.insert (
+			new ImChatPricePointRec ()
+
+			.setImChat (
+				imChat)
+
+			.setCode (
+				"20_for_10")
+
+			.setName (
+				"£20 for £10")
+
+			.setDescription (
+				"£20 for £10")
+
+			.setPrice (
+				1000)
+
+			.setValue (
+				20000)
+
+		);
+
+		// im chat profile
+
+		for (
+			int index = 0;
+			index < 10;
+			index ++
+		) {
+
+			imChatProfileHelper.insert (
+				new ImChatProfileRec ()
+
+				.setImChat (
+					imChat)
+
+				.setCode (
+					stringFormat (
+						"profile_%s",
+						index))
+
+				.setName (
+					stringFormat (
+						"Profile %s",
+						index))
+
+				.setDescription (
+					stringFormat (
+						"Test IM chat profile %s",
+						index))
+
+				.setPublicName (
+					stringFormat (
+						"Profile %s",
+						index))
+
+				.setPublicDescription (
+					stringFormat (
+						"Test IM chat profile %s",
+						index))
+
+			);
+
+		}
+
+		// im chat customer
 
 		ImChatCustomerRec imChatCustomer =
 			imChatCustomerHelper.insert (
@@ -101,7 +204,15 @@ class ImChatCoreFixtureProvider
 			.setCode (
 				imChatCustomerHelper.generateCode ())
 
+			.setEmail (
+				"test@example.com")
+
+			.setPassword (
+				"topsecret")
+
 		);
+
+		// im chat conversation
 
 		ImChatConversationRec imChatConversation =
 			imChatConversationHelper.insert (
@@ -113,12 +224,17 @@ class ImChatCoreFixtureProvider
 			.setIndex (
 				imChatCustomer.getNumConversations ())
 
+			.setStartTime (
+				transaction.now ())
+
 		);
 
 		imChatCustomer
 
 			.setNumConversations (
 				imChatCustomer.getNumConversations () + 1);
+
+		// im chat message
 
 		imChatMessageHelper.insert (
 			new ImChatMessageRec ()

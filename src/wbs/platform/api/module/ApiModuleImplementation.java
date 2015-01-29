@@ -1,5 +1,6 @@
 package wbs.platform.api.module;
 
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import wbs.framework.web.RequestHandler;
 import wbs.framework.web.WebFile;
 import wbs.platform.api.resource.ApiResource;
 import wbs.platform.api.resource.ApiResource.Method;
+import wbs.platform.api.resource.ApiVariable;
 
 @Accessors (fluent = true)
 @DataClass ("api-module")
@@ -41,10 +43,15 @@ class ApiModuleImplementation
 	// dependencies
 
 	@Inject
+	ApplicationContext applicationContext;
+
+	// prototype dependencies
+
+	@Inject
 	Provider<ApiResource> apiResourceProvider;
 
 	@Inject
-	ApplicationContext applicationContext;
+	Provider<ApiVariable> apiVariableProvider;
 
 	// properties
 
@@ -60,11 +67,14 @@ class ApiModuleImplementation
 
 	// state
 
-	Set<String> resourceNames =
+	Set<String> terminalResourceNames =
 		new HashSet<String> ();
 
 	Map<Pair<String,Method>,RequestHandler> requestHandlers =
 		new HashMap<Pair<String,Method>,RequestHandler> ();
+
+	Map<String,String> variableResources =
+		new HashMap<String,String> ();
 
 	// lifecycle
 
@@ -72,19 +82,19 @@ class ApiModuleImplementation
 	public
 	void init () {
 
-		List<String> resourceNamesList =
+		// create files from terminal resource names
+
+		List<String> terminalResourceNamesList =
 			new ArrayList<String> (
-				resourceNames);
+				terminalResourceNames);
 
 		Collections.sort (
-			resourceNamesList);
+			terminalResourceNamesList);
 
 		for (
-			String resourceName :
-				resourceNamesList
+			String terminalResourceName :
+				terminalResourceNamesList
 		) {
-
-			System.out.println ("RESOURCE " + resourceName);
 
 			ApiResource resource =
 				apiResourceProvider.get ();
@@ -96,7 +106,7 @@ class ApiModuleImplementation
 
 				Pair<String,Method> key =
 					Pair.of (
-						resourceName,
+						terminalResourceName,
 						method);
 
 				RequestHandler requestHandler =
@@ -113,8 +123,44 @@ class ApiModuleImplementation
 			}
 
 			files.put (
-				resourceName,
+				terminalResourceName,
 				resource);
+
+		}
+
+		// create path handlers from variable resources
+
+		List<String> variableResourceNamesList =
+			new ArrayList<String> (
+				variableResources.keySet ());
+
+		Collections.sort (
+			variableResourceNamesList);
+
+		for (
+			String variableResourceName :
+				variableResourceNamesList
+		) {
+
+			String variableName =
+				variableResources.get (
+					variableResourceName);
+
+			System.out.println (
+				"VARIABLE " + variableResourceName + " = " + variableName);
+
+			ApiVariable variable =
+				apiVariableProvider.get ()
+
+				.resourceName (
+					variableResourceName)
+
+				.variableName (
+					variableName);
+
+			paths.put (
+				variableResourceName,
+				variable);
 
 		}
 
@@ -144,12 +190,46 @@ class ApiModuleImplementation
 
 		}
 
-		resourceNames.add (
+		terminalResourceNames.add (
 			resourceName);
 
 		requestHandlers.put (
 			key,
 			requestHandler);
+
+	}
+
+	public
+	void addVariable (
+			String resourceName,
+			String variableName) {
+
+		if (
+			variableResources.containsKey (
+				resourceName)
+		) {
+
+			String existingVariableName =
+				variableResources.get (
+					resourceName);
+
+			if (
+				notEqual (
+					variableName,
+					existingVariableName)
+			) {
+
+				throw new RuntimeException ();
+
+			}
+
+		} else {
+
+			variableResources.put (
+				resourceName,
+				variableName);
+
+		}
 
 	}
 

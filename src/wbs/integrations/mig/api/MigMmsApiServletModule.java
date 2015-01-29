@@ -21,6 +21,7 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.MultipartStream;
+import org.joda.time.Instant;
 
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -42,6 +43,7 @@ import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 @Log4j
@@ -396,17 +398,17 @@ logger.error ("Got item");
 					requestContext.requestInt ("routeId"));
 
 			inboxLogic.inboxInsert (
-				guid,
+				Optional.of (guid),
 				textHelper.findOrCreate (
 					getText (subject, medias)),
 				sender,
 				recipient,
 				route,
-				network,
-				null,
+				Optional.of (network),
+				Optional.<Instant>absent (),
 				medias,
-				null,
-				subject);
+				Optional.<String>absent (),
+				Optional.of (subject));
 
 			transaction.commit ();
 
@@ -464,7 +466,7 @@ logger.error ("Got item");
 					requestContext.requestUri (),
 					ExceptionLogicImpl.throwableSummary (exception),
 					getException (exception, requestContext),
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 				PrintWriter out =

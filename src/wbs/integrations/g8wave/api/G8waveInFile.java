@@ -2,22 +2,29 @@ package wbs.integrations.g8wave.api;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
+
+import org.joda.time.Instant;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.WebFile;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
+import com.google.common.base.Optional;
 
 @PrototypeComponent ("g8waveInFile")
 public
@@ -83,11 +90,13 @@ class G8waveInFile
 		String messageParam =
 			requestContext.parameter ("message");
 
-		if (numFromParam == null
-				|| numToParam == null
-				|| messageParam == null)
-
+		if (
+			numFromParam == null
+			|| numToParam == null
+			|| messageParam == null
+		) {
 			throw new ServletException ("Parameter not supplied");
+		}
 
 		Integer networkId = null;
 
@@ -126,16 +135,16 @@ class G8waveInFile
 		// insert the message
 
 		inboxLogic.inboxInsert (
-			null,
+			Optional.<String>absent (),
 			textHelper.findOrCreate (messageParam),
 			numFromParam,
 			numToParam,
 			route,
-			network,
-			null,
-			null,
-			null,
-			null);
+			Optional.fromNullable (network),
+			Optional.<Instant>absent (),
+			Collections.<MediaRec>emptyList (),
+			Optional.<String>absent (),
+			Optional.<String>absent ());
 
 		transaction.commit ();
 

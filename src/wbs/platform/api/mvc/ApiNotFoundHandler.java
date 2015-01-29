@@ -14,6 +14,8 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.WebNotFoundHandler;
 import wbs.platform.exception.logic.ExceptionLogic;
 
+import com.google.common.base.Optional;
+
 @Log4j
 @SingletonComponent ("apiNotFoundHandler")
 public
@@ -59,7 +61,7 @@ class ApiNotFoundHandler
 				path,
 				"Not found",
 				"The specified path was not found",
-				null,
+				Optional.<Integer>absent (),
 				false);
 
 		} catch (RuntimeException exception) {

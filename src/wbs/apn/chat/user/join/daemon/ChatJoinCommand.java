@@ -5,8 +5,9 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
@@ -15,19 +16,24 @@ import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
+import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+@Accessors (fluent = true)
 @PrototypeComponent ("chatJoinCommand")
 public
 class ChatJoinCommand
 	implements CommandHandler {
+
+	// dependencies
 
 	@Inject
 	CommandObjectHelper commandHelper;
@@ -36,10 +42,31 @@ class ChatJoinCommand
 	Database database;
 
 	@Inject
-	ObjectManager objectManager;
+	InboxLogic inboxLogic;
 
 	@Inject
-	Provider<ChatJoiner> chatJoiner;
+	ObjectManager objectManager;
+
+	// prototype dependencies
+
+	@Inject
+	Provider<ChatJoiner> chatJoinerProvider;
+
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
+	// details
 
 	@Override
 	public
@@ -87,16 +114,7 @@ class ChatJoinCommand
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly ();
-
-		CommandRec command =
-			commandHelper.find (commandId);
+	InboxAttemptRec handle () {
 
 		Object parent =
 			objectManager.getParent (command);
@@ -121,14 +139,28 @@ class ChatJoinCommand
 				commandCodeToOrient.get (
 					command.getCode ());
 
-			chatJoiner.get ()
-				.chatId (chat.getId ())
-				.joinType (joinType)
-				.gender (gender)
-				.orient (orient)
-				.handle (receivedMessage);
+			return chatJoinerProvider.get ()
 
-			return;
+				.chatId (
+					chat.getId ())
+
+				.joinType (
+					joinType)
+
+				.gender (
+					gender)
+
+				.orient (
+					orient)
+
+				.inbox (
+					inbox)
+
+				.rest (
+					rest)
+
+				.handleInbox (
+					command);
 
 		}
 
@@ -146,13 +178,25 @@ class ChatJoinCommand
 			if (joinType == null)
 				throw new RuntimeException ();
 
-			chatJoiner.get ()
-				.chatId (chat.getId ())
-				.chatSchemeId (chatScheme.getId ())
-				.joinType (joinType)
-				.handle (receivedMessage);
+			return chatJoinerProvider.get ()
 
-			return;
+				.chatId (
+					chat.getId ())
+
+				.chatSchemeId (
+					chatScheme.getId ())
+
+				.joinType (
+					joinType)
+
+				.inbox (
+					inbox)
+
+				.rest (
+					rest)
+
+				.handleInbox (
+					command);
 
 		}
 
@@ -173,14 +217,28 @@ class ChatJoinCommand
 			if (joinType == null)
 				throw new RuntimeException ();
 
-			chatJoiner.get ()
-				.chatId (chat.getId ())
-				.joinType (joinType)
-				.chatAffiliateId (chatAffiliate.getId ())
-				.chatSchemeId (chatScheme.getId ())
-				.handle (receivedMessage);
+			return chatJoinerProvider.get ()
 
-			return;
+				.chatId (
+					chat.getId ())
+
+				.joinType (
+					joinType)
+
+				.chatAffiliateId (
+					chatAffiliate.getId ())
+
+				.chatSchemeId (
+					chatScheme.getId ())
+
+				.inbox (
+					inbox)
+
+				.rest (
+					rest)
+
+				.handleInbox (
+					command);
 
 		}
 

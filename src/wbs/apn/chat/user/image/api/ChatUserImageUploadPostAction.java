@@ -210,7 +210,7 @@ class ChatUserImageUploadPostAction
 				"webapi",
 				requestContext.requestPath (),
 				exception,
-				null,
+				Optional.<Integer>absent (),
 				false);
 
 			// start new transaction

@@ -4,8 +4,9 @@ import java.util.Collections;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatRec;
@@ -15,7 +16,6 @@ import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -25,11 +25,13 @@ import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
 import com.google.common.base.Optional;
 
+@Accessors (fluent = true)
 @PrototypeComponent ("chatVideoSetCommand")
 public
 class ChatVideoSetCommand
@@ -70,6 +72,20 @@ class ChatVideoSetCommand
 	@Inject
 	ServiceObjectHelper serviceHelper;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
 	// details
 
 	@Override
@@ -85,17 +101,7 @@ class ChatVideoSetCommand
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+	InboxAttemptRec handle () {
 
 		ChatRec chat =
 			(ChatRec) (Object)
@@ -108,8 +114,7 @@ class ChatVideoSetCommand
 				"default");
 
 		MessageRec message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
@@ -125,7 +130,7 @@ class ChatVideoSetCommand
 		chatHelpLogLogic.createChatHelpLogIn (
 			chatUser,
 			message,
-			receivedMessage.getRest (),
+			rest,
 			command,
 			false);
 
@@ -162,15 +167,11 @@ class ChatVideoSetCommand
 
 		// process inbox
 
-		inboxLogic.inboxProcessed (
-			message,
-			defaultService,
-			affiliate,
+		return inboxLogic.inboxProcessed (
+			inbox,
+			Optional.of (defaultService),
+			Optional.of (affiliate),
 			command);
-
-		// and return
-
-		transaction.commit ();
 
 	}
 

@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.hibernate.JDBCException;
@@ -24,11 +25,15 @@ import wbs.platform.exception.model.ExceptionLogTypeRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
+import com.google.common.base.Optional;
+
 @SingletonComponent ("exceptionLogic")
 @Log4j
 public
 class ExceptionLogicImpl
 	implements ExceptionLogic {
+
+	// dependencies
 
 	@Inject
 	Database database;
@@ -42,15 +47,17 @@ class ExceptionLogicImpl
 	@Inject
 	UserObjectHelper userHelper;
 
+	// implementation
+
 	@Override
 	public
 	void logSimple (
-			String typeCode,
-			String source,
-			String summary,
-			String dump,
-			Integer userId,
-			boolean fatal) {
+			@NonNull String typeCode,
+			@NonNull String source,
+			@NonNull String summary,
+			@NonNull String dump,
+			@NonNull Optional<Integer> userId,
+			@NonNull Boolean fatal) {
 
 		try {
 
@@ -75,11 +82,11 @@ class ExceptionLogicImpl
 	@Override
 	public
 	void logThrowable (
-			String typeCode,
-			String source,
-			Throwable throwable,
-			Integer userId,
-			boolean fatal) {
+			@NonNull String typeCode,
+			@NonNull String source,
+			@NonNull Throwable throwable,
+			@NonNull Optional<Integer> userId,
+			@NonNull Boolean fatal) {
 
 		try {
 
@@ -104,12 +111,12 @@ class ExceptionLogicImpl
 	@Override
 	public
 	void logThrowableWithSummary (
-			String typeCode,
-			String source,
-			String summary,
-			Throwable throwable,
-			Integer userId,
-			boolean fatal) {
+			@NonNull String typeCode,
+			@NonNull String source,
+			@NonNull String summary,
+			@NonNull Throwable throwable,
+			@NonNull Optional<Integer> userId,
+			@NonNull Boolean fatal) {
 
 		try {
 
@@ -131,14 +138,13 @@ class ExceptionLogicImpl
 
 	}
 
-	private
 	void realLogException (
-			String typeCode,
-			String source,
-			String summary,
-			String dump,
-			Integer userId,
-			boolean fatal) {
+			@NonNull String typeCode,
+			@NonNull String source,
+			@NonNull String summary,
+			@NonNull String dump,
+			@NonNull Optional<Integer> userId,
+			@NonNull Boolean fatal) {
 
 		@Cleanup
 		Transaction transaction =
@@ -163,20 +169,34 @@ class ExceptionLogicImpl
 		// lookup user
 
 		UserRec user =
-			userId != null
-				? userHelper.find (userId)
+			userId.isPresent ()
+				? userHelper.find (userId.get ())
 				: null;
 
 		// create exception log
 
 		exceptionLogHelper.insert (
 			new ExceptionLogRec ()
-				.setType (exceptionLogType)
-				.setSource (source)
-				.setSummary (summary)
-				.setUser (user)
-				.setDump (dump)
-				.setFatal (fatal));
+
+			.setType (
+				exceptionLogType)
+
+			.setSource (
+				source)
+
+			.setSummary (
+				summary)
+
+			.setUser (
+				user)
+
+			.setDump (
+				dump)
+
+			.setFatal (
+				fatal)
+
+		);
 
 		transaction.commit ();
 
@@ -184,7 +204,7 @@ class ExceptionLogicImpl
 
 	public static
 	String throwableStackTrace (
-			Throwable throwable) {
+			@NonNull Throwable throwable) {
 
 		StringWriter stringWriter =
 			new StringWriter ();
@@ -203,23 +223,23 @@ class ExceptionLogicImpl
 
 	public static
 	String throwableSummary (
-			Throwable throwable) {
+			@NonNull Throwable throwable) {
 
-		StringBuffer buf =
-			new StringBuffer ();
+		StringBuilder stringBuilder =
+			new StringBuilder ();
 
-		while (true) {
+		for (;;) {
 
-			buf.append (
+			stringBuilder.append (
 				throwable.toString ());
 
 			throwable =
 				throwable.getCause ();
 
 			if (throwable == null)
-				return buf.toString ();
+				return stringBuilder.toString ();
 
-			buf.append ("\n");
+			stringBuilder.append ("\n");
 
 		}
 
@@ -227,7 +247,7 @@ class ExceptionLogicImpl
 
 	public static
 	String throwableDump (
-			Throwable throwable) {
+			@NonNull Throwable throwable) {
 
 		StringWriter stringWriter =
 			new StringWriter ();
@@ -247,8 +267,8 @@ class ExceptionLogicImpl
 
 	private static
 	void writeThrowable (
-			Throwable throwable,
-			PrintWriter printWriter) {
+			@NonNull Throwable throwable,
+			@NonNull PrintWriter printWriter) {
 
 		throwable.printStackTrace (
 			printWriter);
@@ -284,8 +304,8 @@ class ExceptionLogicImpl
 
 	private static
 	void writeSqlException (
-			SQLException sqlException,
-			PrintWriter out) {
+			@NonNull SQLException sqlException,
+			@NonNull PrintWriter out) {
 
 		out.write ("\nSQL EXCEPTION:\n\n");
 

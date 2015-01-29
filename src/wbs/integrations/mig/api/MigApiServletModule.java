@@ -2,6 +2,7 @@ package wbs.integrations.mig.api;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,9 @@ import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Instant;
+
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.AbstractWebFile;
@@ -25,6 +29,7 @@ import wbs.integrations.mig.model.MigRouteInObjectHelper;
 import wbs.integrations.mig.model.MigRouteInRec;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.exception.logic.ExceptionLogicImpl;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
 import wbs.sms.message.core.logic.MessageLogic;
@@ -43,6 +48,7 @@ import wbs.sms.number.core.model.ChatUserNumberReportRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 @Log4j
@@ -213,16 +219,18 @@ class MigApiServletModule
 
 				MessageRec message =
 					inboxLogic.inboxInsert (
-						messageID,
+						Optional.of (messageID),
 						textHelper.findOrCreate (body),
 						oadc,
 						destAddress,
 						route,
-						migRouteIn.getSetNetwork () ? network : null,
-						null,
-						null,
-						avStatus,
-						null);
+						migRouteIn.getSetNetwork ()
+							? Optional.of (network)
+							: Optional.<NetworkRec>absent (),
+						Optional.<Instant>absent (),
+						Collections.<MediaRec>emptyList (),
+						Optional.of (avStatus),
+						Optional.<String>absent ());
 
 				transaction.commit ();
 
@@ -239,7 +247,7 @@ class MigApiServletModule
 					requestContext.requestUri (),
 					ExceptionLogicImpl.throwableSummary (e),
 					getException (e, requestContext),
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 				PrintWriter out =
@@ -451,7 +459,7 @@ class MigApiServletModule
 					getException (
 						exception,
 						requestContext),
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 				PrintWriter out =

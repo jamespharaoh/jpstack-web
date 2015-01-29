@@ -24,6 +24,7 @@ import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.database.TransactionView;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -189,7 +190,8 @@ class HibernateDatabase
 	@Override
 	public
 	Transaction currentTransaction () {
-		return currentTransactionReal ();
+		return new TransactionView (
+			currentTransactionReal ());
 	}
 
 	private

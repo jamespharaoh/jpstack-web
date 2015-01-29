@@ -209,7 +209,7 @@ class ChatInfoLogicImpl
 				"\n" +
 				ExceptionLogicImpl.throwableDump (e),
 
-				null,
+				Optional.<Integer>absent (),
 				false);
 
 			return;

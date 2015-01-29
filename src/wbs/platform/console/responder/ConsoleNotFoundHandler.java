@@ -8,6 +8,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
+import com.google.common.base.Optional;
+
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.web.WebNotFoundHandler;
@@ -86,7 +88,8 @@ class ConsoleNotFoundHandler
 				path,
 				"Not found",
 				"The specified path was not found",
-				requestContext.userId (),
+				Optional.fromNullable (
+					requestContext.userId ()),
 				false);
 
 		} catch (RuntimeException exception) {

@@ -31,6 +31,8 @@ import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 
+import com.google.common.base.Optional;
+
 @Log4j
 @SingletonComponent ("chatAdultAdDaemon")
 public
@@ -127,7 +129,7 @@ class ChatAdultAdDaemon
 					"daemon",
 					"ChatAdDaemon",
 					exception,
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 			}

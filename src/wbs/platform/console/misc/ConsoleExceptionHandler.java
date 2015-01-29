@@ -24,6 +24,8 @@ import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.exception.logic.ExceptionLogicImpl;
 import wbs.platform.priv.console.PrivChecker;
 
+import com.google.common.base.Optional;
+
 @Log4j
 @SingletonComponent ("exceptionHandler")
 public
@@ -91,7 +93,8 @@ class ConsoleExceptionHandler
 					requestContext.method (),
 					requestContext.requestUri ()),
 				throwable,
-				requestContext.userId (),
+				Optional.fromNullable (
+					requestContext.userId ()),
 				false);
 
 		} catch (RuntimeException localException) {
@@ -130,14 +133,16 @@ class ConsoleExceptionHandler
 					"<form method=\"%h\">\n",
 					requestContext.method ());
 
-				for (Map.Entry<String,List<String>> ent
-						: requestContext.parameterMap ().entrySet ()) {
+				for (
+					Map.Entry<String,List<String>> entry
+						: requestContext.parameterMap ().entrySet ()
+				) {
 
 					String name =
-						ent.getKey ();
+						entry.getKey ();
 
 					List<String> values =
-						ent.getValue ();
+						entry.getValue ();
 
 					if (equal (name, "__repost"))
 						continue;

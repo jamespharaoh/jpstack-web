@@ -1,5 +1,6 @@
 package wbs.integrations.dialogue.api;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.nullIf;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -24,6 +25,7 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
+import org.joda.time.Instant;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
@@ -45,8 +47,11 @@ import wbs.sms.message.report.logic.ReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.message.report.model.MessageReportCodeRec;
 import wbs.sms.message.report.model.MessageReportCodeType;
+import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
+import wbs.sms.route.core.model.RouteRec;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 @Log4j
@@ -183,19 +188,40 @@ class DialogueMmsApiServletModule
 			if (text == null)
 				text = "";
 
+			String mmsMessageId =
+				requestContext.header ("x-mms-message-id");
+
+			String mmsSenderAddress =
+				requestContext.header ("x-mms-sender-address");
+
+			String mmsRecipientAddress =
+				requestContext.header ("x-mms-recipient-address");
+
+			RouteRec route =
+				routeHelper.find (
+					requestContext.requestInt ("routeId"));
+
+			Instant mmsDate =
+				dateToInstant (
+					getDateFormat ().parse (
+						requestContext.header ("x-mms-date")));
+
+			String mmsSubject =
+				requestContext.header ("x-mms-subject");
+
 			// insert into inbox
 
 			inboxLogic.inboxInsert (
-				requestContext.header ("x-mms-message-id"), // otherId
-				textHelper.findOrCreate (text), // text
-				requestContext.header ("x-mms-sender-address"), // numFrom
-				requestContext.header ("x-mms-recipient-address"), // numTo
-				routeHelper.find (requestContext.requestInt ("routeId")), // routeId
-				null, //smsDao.findNetworkById (networks.get (requestContext.getHeader ("x-mms-network"))), // network
-				getDateFormat ().parse (requestContext.header ("x-mms-date")), // networkTime
-				medias, // medias
-				null, // avStatus
-				requestContext.header ("x-mms-subject")); // subject
+				Optional.of (mmsMessageId),
+				textHelper.findOrCreate (text),
+				mmsSenderAddress,
+				mmsRecipientAddress,
+				route,
+				Optional.<NetworkRec>absent (),
+				Optional.of (mmsDate),
+				medias,
+				Optional.<String>absent (),
+				Optional.of (mmsSubject));
 
 			transaction.commit ();
 
