@@ -49,6 +49,18 @@
 				link="imChatCustomer"
 				label="Customers"
 				priv-key="imChat.manage"/>
+				
+			<context-link
+				name="price-point"
+				link="imChatPricePoint"
+				label="Price Points"
+				priv-key="imChat.manage"/>
+				
+			<context-link
+				name="profile"
+				link="imChatProfile"
+				label="Profiles"
+				priv-key="imChat.manage"/>
 
 			<object-events-page/>
 

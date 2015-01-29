@@ -20,7 +20,11 @@ import wbs.imchat.core.model.ImChatPricePointObjectHelper;
 import wbs.imchat.core.model.ImChatPricePointRec;
 import wbs.imchat.core.model.ImChatProfileObjectHelper;
 import wbs.imchat.core.model.ImChatProfileRec;
+import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
+import wbs.imchat.core.model.ImChatPurchaseRec;
 import wbs.imchat.core.model.ImChatRec;
+import wbs.imchat.core.model.ImChatSessionObjectHelper;
+import wbs.imchat.core.model.ImChatSessionRec;
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuObjectHelper;
@@ -63,6 +67,12 @@ class ImChatCoreFixtureProvider
 
 	@Inject
 	ImChatProfileObjectHelper imChatProfileHelper;
+	
+	@Inject
+	ImChatSessionObjectHelper imChatSessionHelper;
+	
+	@Inject
+	ImChatPurchaseObjectHelper imChatPurchaseHelper;
 
 	@Inject
 	SliceObjectHelper sliceHelper;
@@ -125,7 +135,7 @@ class ImChatCoreFixtureProvider
 		);
 
 		// im chat price point
-
+		ImChatPricePointRec imChatPricePoint =
 		imChatPricePointHelper.insert (
 			new ImChatPricePointRec ()
 
@@ -228,11 +238,72 @@ class ImChatCoreFixtureProvider
 				transaction.now ())
 
 		);
-
+		
 		imChatCustomer
 
-			.setNumConversations (
-				imChatCustomer.getNumConversations () + 1);
+		.setNumConversations (
+			imChatCustomer.getNumConversations () + 1);
+		
+		
+		// im chat session
+
+			imChatSessionHelper.insert (
+				new ImChatSessionRec ()
+
+			.setImChatCustomer (
+				imChatCustomer)
+
+			.setSecret (
+				imChatSessionHelper.generateSecret ())
+
+			.setStartTime (
+				transaction.now ())
+				
+			.setUpdateTime (
+				transaction.now ())
+				
+			.setEndTime (
+				transaction.now ())
+				
+			.setActive (true)
+
+		);
+			
+		// im chat purchase
+
+			imChatPurchaseHelper.insert (
+				new ImChatPurchaseRec ()
+
+			.setImChatCustomer (
+				imChatCustomer)
+
+			.setIndex (
+				imChatCustomer.getNumPurchases ())
+				
+			.setImChatPricePoint (
+					imChatPricePoint)	
+
+			.setPrice (
+				10)
+				
+			.setValue (
+				10)
+				
+			.setOldBalance (
+				1)
+				
+			.setNewBalance (
+				2)
+				
+			.setTimestamp (
+				transaction.now ())
+
+		);
+			
+		imChatCustomer
+
+		.setNumPurchases (
+			imChatCustomer.getNumPurchases () + 1);
 
 		// im chat message
 

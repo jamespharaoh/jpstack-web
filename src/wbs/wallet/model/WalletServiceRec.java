@@ -17,7 +17,6 @@ import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
-import wbs.imchat.core.model.ImChatCustomerRec.ImChatCustomerObjectHelperMethods;
 import wbs.platform.scaffold.model.SliceRec;
 
 @Accessors (chain = true)

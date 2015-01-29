@@ -50,6 +50,18 @@
 				link="imChatConversation"
 				label="Conversations"
 				priv-key="imChatCustomer.manage"/>
+				
+			<context-link
+				name="session"
+				link="imChatSession"
+				label="Sessions"
+				priv-key="imChatSession.manage"/>
+				
+			<context-link
+				name="purchase"
+				link="imChatPurchase"
+				label="Purchases"
+				priv-key="imChatPurchase.manage"/>
 
 			<object-events-page/>
 
