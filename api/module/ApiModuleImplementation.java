@@ -146,9 +146,6 @@ class ApiModuleImplementation
 				variableResources.get (
 					variableResourceName);
 
-			System.out.println (
-				"VARIABLE " + variableResourceName + " = " + variableName);
-
 			ApiVariable variable =
 				apiVariableProvider.get ()
 
