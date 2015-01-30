@@ -550,7 +550,7 @@
 		<plugin
 			name="im-chat-core"
 			package="wbs.imchat.core"/>
-			
+
 		<!-- paypal -->
 
 		<plugin

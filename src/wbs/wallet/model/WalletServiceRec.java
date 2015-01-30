@@ -40,7 +40,7 @@ class WalletServiceRec
 
 	@CodeField
 	String code;
-	
+
 	// object helper methods
 
 	public
@@ -49,7 +49,7 @@ class WalletServiceRec
 		String generateCode ();
 
 	}
-	
+
 	// object helper implementation
 
 	public static

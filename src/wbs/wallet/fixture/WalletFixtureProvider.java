@@ -29,7 +29,7 @@ class WalletFixtureProvider
 
 	@Inject
 	WalletObjectHelper walletHelper;
-	
+
 	@Inject
 	WalletServiceObjectHelper walletServiceHelper;
 

@@ -38,7 +38,7 @@ class WalletRec
 
 	@CodeField
 	String code;
-	
+
 	// object helper methods
 
 	public
@@ -47,7 +47,7 @@ class WalletRec
 		String generateCode ();
 
 	}
-	
+
 	// object helper implementation
 	public static
 	class WalletObjectHelperImplementation

@@ -36,7 +36,7 @@ class ImChatMessageRec
 	@IndexField (
 		counter = "numMessages")
 	Integer index;
-	
+
 	@SimpleField
 	String messageText;
 

@@ -91,16 +91,16 @@ class ImChatMessageCreateAction
 		ImChatMessageRec newMessage =
 			imChatMessageHelper.insert (
 				new ImChatMessageRec ()
-	
+
 				.setImChatConversation (
 					imChatConversation)
-	
+
 				.setIndex (
 					imChatConversation.getNumMessages ())
-			
+
 				.setMessageText(
 					createRequest.messageText())
-					
+
 			);
 
 		imChatConversation
@@ -120,10 +120,10 @@ class ImChatMessageCreateAction
 
 				.index (
 					newMessage.getIndex ())
-					
+
 				.messageText (
 					newMessage.getMessageText ())
-					
+
 			);
 
 		// commit and return

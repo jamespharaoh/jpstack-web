@@ -67,10 +67,10 @@ class ImChatCoreFixtureProvider
 
 	@Inject
 	ImChatProfileObjectHelper imChatProfileHelper;
-	
+
 	@Inject
 	ImChatSessionObjectHelper imChatSessionHelper;
-	
+
 	@Inject
 	ImChatPurchaseObjectHelper imChatPurchaseHelper;
 
@@ -235,13 +235,13 @@ class ImChatCoreFixtureProvider
 				transaction.now ())
 
 		);
-		
+
 		imChatCustomer
 
 		.setNumConversations (
 			imChatCustomer.getNumConversations () + 1);
-		
-		
+
+
 		// im chat session
 			imChatSessionHelper.insert (
 				new ImChatSessionRec ()
@@ -254,17 +254,17 @@ class ImChatCoreFixtureProvider
 
 			.setStartTime (
 				transaction.now ())
-				
+
 			.setUpdateTime (
 				transaction.now ())
-				
+
 			.setEndTime (
 				transaction.now ())
-				
+
 			.setActive (true)
 
 		);
-			
+
 		// im chat purchase
 			imChatPurchaseHelper.insert (
 				new ImChatPurchaseRec ()
@@ -274,27 +274,27 @@ class ImChatCoreFixtureProvider
 
 			.setIndex (
 				imChatCustomer.getNumPurchases ())
-				
+
 			.setImChatPricePoint (
-					imChatPricePoint)	
+					imChatPricePoint)
 
 			.setPrice (
 				10)
-				
+
 			.setValue (
 				10)
-				
+
 			.setOldBalance (
 				1)
-				
+
 			.setNewBalance (
 				2)
-				
+
 			.setTimestamp (
 				transaction.now ())
 
 		);
-			
+
 		imChatCustomer
 
 		.setNumPurchases (
@@ -309,7 +309,7 @@ class ImChatCoreFixtureProvider
 
 			.setIndex (
 				imChatConversation.getNumMessages ())
-				
+
 			.setMessageText(
 					"Text message.")
 

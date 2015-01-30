@@ -16,7 +16,7 @@ class ImChatMessageData {
 
 	@DataAttribute
 	Integer index;
-	
+
 	@DataAttribute
 	String messageText;
 

@@ -70,7 +70,7 @@
 		<id-field/>
 		<parent-field/>
 		<code-field/>
-		
+
 		<text-field
 			name="publicName"
 			nullable="yes"/>

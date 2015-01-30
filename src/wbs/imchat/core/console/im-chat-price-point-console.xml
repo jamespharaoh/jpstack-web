@@ -70,7 +70,7 @@
 		<id-field/>
 		<parent-field/>
 		<code-field/>
-		
+
 		<integer-field
 			name="price"
 			nullable="yes"/>
