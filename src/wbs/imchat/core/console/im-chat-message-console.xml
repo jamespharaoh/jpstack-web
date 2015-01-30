@@ -9,6 +9,10 @@
 		<context-stuff
 			name="imChatMessageId"
 			field="id"/>
+			
+		<context-stuff
+			name="imChatMessageName"
+			field="id"/>
 
 		<context-stuff
 			name="imChatConversationId"
@@ -60,6 +64,9 @@
 		<id-field/>
 		<parent-field/>
 		<index-field/>
+		<text-field
+			name="messageText"
+			nullable="yes"/>
 
 	</field-set>
 

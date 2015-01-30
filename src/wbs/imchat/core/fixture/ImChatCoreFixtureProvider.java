@@ -87,7 +87,6 @@ class ImChatCoreFixtureProvider
 			database.currentTransaction ();
 
 		// menu
-
 		menuHelper.insert (
 			new MenuRec ()
 
@@ -203,7 +202,6 @@ class ImChatCoreFixtureProvider
 		}
 
 		// im chat customer
-
 		ImChatCustomerRec imChatCustomer =
 			imChatCustomerHelper.insert (
 				new ImChatCustomerRec ()
@@ -223,7 +221,6 @@ class ImChatCoreFixtureProvider
 		);
 
 		// im chat conversation
-
 		ImChatConversationRec imChatConversation =
 			imChatConversationHelper.insert (
 				new ImChatConversationRec ()
@@ -246,7 +243,6 @@ class ImChatCoreFixtureProvider
 		
 		
 		// im chat session
-
 			imChatSessionHelper.insert (
 				new ImChatSessionRec ()
 
@@ -270,7 +266,6 @@ class ImChatCoreFixtureProvider
 		);
 			
 		// im chat purchase
-
 			imChatPurchaseHelper.insert (
 				new ImChatPurchaseRec ()
 
@@ -306,7 +301,6 @@ class ImChatCoreFixtureProvider
 			imChatCustomer.getNumPurchases () + 1);
 
 		// im chat message
-
 		imChatMessageHelper.insert (
 			new ImChatMessageRec ()
 
@@ -315,6 +309,9 @@ class ImChatCoreFixtureProvider
 
 			.setIndex (
 				imChatConversation.getNumMessages ())
+				
+			.setMessageText(
+					"Text message.")
 
 		);
 
