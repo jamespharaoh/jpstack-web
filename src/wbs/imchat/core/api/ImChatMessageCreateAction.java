@@ -22,12 +22,7 @@ import wbs.framework.web.Responder;
 import wbs.imchat.core.model.ImChatConversationObjectHelper;
 import wbs.imchat.core.model.ImChatConversationRec;
 import wbs.imchat.core.model.ImChatCustomerObjectHelper;
-import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatMessageRec;
-import wbs.imchat.core.model.ImChatObjectHelper;
-import wbs.imchat.core.model.ImChatRec;
-import wbs.imchat.core.model.ImChatSessionObjectHelper;
-import wbs.imchat.core.model.ImChatSessionRec;
 
 @PrototypeComponent ("imChatMessageCreateAction")
 public
@@ -40,11 +35,13 @@ class ImChatMessageCreateAction
 	Database database;
 
 	@Inject
+	ImChatApiLogic imChatApiLogic;
+
+	@Inject
 	ImChatCustomerObjectHelper imChatMessageHelper;
 
 	@Inject
 	ImChatConversationObjectHelper imChatConversationHelper;
-
 
 	@Inject
 	RequestContext requestContext;
@@ -65,6 +62,7 @@ class ImChatMessageCreateAction
 			new DataFromJson ();
 
 		// decode request
+
 		JSONObject jsonValue =
 			(JSONObject)
 			JSONValue.parse (
@@ -76,6 +74,7 @@ class ImChatMessageCreateAction
 				jsonValue);
 
 		// begin transaction
+
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite ();
@@ -88,20 +87,21 @@ class ImChatMessageCreateAction
 						"imChatConversationId")));
 
 		// new chat message
+
 		ImChatMessageRec newMessage =
 			imChatMessageHelper.insert (
 				new ImChatMessageRec ()
 
-				.setImChatConversation (
-					imChatConversation)
+			.setImChatConversation (
+				imChatConversation)
 
-				.setIndex (
-					imChatConversation.getNumMessages ())
+			.setIndex (
+				imChatConversation.getNumMessages ())
 
-				.setMessageText(
-					createRequest.messageText())
+			.setMessageText(
+				createRequest.messageText())
 
-			);
+		);
 
 		imChatConversation
 
@@ -109,24 +109,16 @@ class ImChatMessageCreateAction
 				imChatConversation.getNumMessages () + 1);
 
 		// create response
+
 		ImChatMessageCreateSuccess successResponse =
 			new ImChatMessageCreateSuccess ()
 
 			.message (
-				new ImChatMessageData ()
-
-				.id (
-					newMessage.getId ())
-
-				.index (
-					newMessage.getIndex ())
-
-				.messageText (
-					newMessage.getMessageText ())
-
-			);
+				imChatApiLogic.messageData (
+					newMessage));
 
 		// commit and return
+
 		transaction.commit ();
 
 		return jsonResponderProvider.get ()

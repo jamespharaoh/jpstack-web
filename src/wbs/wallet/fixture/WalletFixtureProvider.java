@@ -43,48 +43,49 @@ class WalletFixtureProvider
 	void createFixtures () {
 
 		menuHelper.insert (
-				new MenuRec ()
+			new MenuRec ()
 
-				.setMenuGroup (
-					menuGroupHelper.findByCode (
+			.setMenuGroup (
+				menuGroupHelper.findByCode (
 					GlobalId.root,
 					"facility"))
 
-				.setCode (
-					"wallet_service")
+			.setCode (
+				"wallet_service")
 
-				.setLabel (
-					"Wallet Service")
+			.setLabel (
+				"Wallet Service")
 
-				.setPath (
-					"/walletServices")
+			.setPath (
+				"/walletServices")
 
-			);
+		);
 
-			WalletServiceRec walletService =
-					walletServiceHelper.insert (
-					new WalletServiceRec ()
+		WalletServiceRec walletService =
+			walletServiceHelper.insert (
+				new WalletServiceRec ()
 
-				.setSlice (
-					sliceHelper.findByCode (
-						GlobalId.root,
-						"test"))
+			.setSlice (
+				sliceHelper.findByCode (
+					GlobalId.root,
+					"test"))
 
-				.setCode (
-						walletServiceHelper.generateCode ())
+			.setCode (
+					walletServiceHelper.generateCode ())
 
-			);
+		);
 
-			walletHelper.insert (
-					new WalletRec ()
+		walletHelper.insert (
+			new WalletRec ()
 
-				.setWalletServiceRec (
-						walletService)
+			.setWalletServiceRec (
+				walletService)
 
-				.setCode (
-						walletHelper.generateCode ())
+			.setCode (
+				walletHelper.generateCode ())
 
-			);
+		);
+	
 	}
 
 }

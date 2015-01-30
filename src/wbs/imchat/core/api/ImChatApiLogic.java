@@ -2,6 +2,7 @@ package wbs.imchat.core.api;
 
 import wbs.imchat.core.model.ImChatConversationRec;
 import wbs.imchat.core.model.ImChatCustomerRec;
+import wbs.imchat.core.model.ImChatMessageRec;
 import wbs.imchat.core.model.ImChatPricePointRec;
 import wbs.imchat.core.model.ImChatProfileRec;
 
@@ -19,5 +20,8 @@ interface ImChatApiLogic {
 
 	ImChatConversationData conversationData (
 			ImChatConversationRec conversation);
+
+	ImChatMessageData messageData (
+			ImChatMessageRec message);
 
 }

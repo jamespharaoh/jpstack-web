@@ -87,6 +87,7 @@ class ImChatCoreFixtureProvider
 			database.currentTransaction ();
 
 		// menu
+
 		menuHelper.insert (
 			new MenuRec ()
 
@@ -134,9 +135,10 @@ class ImChatCoreFixtureProvider
 		);
 
 		// im chat price point
+
 		ImChatPricePointRec imChatPricePoint =
-		imChatPricePointHelper.insert (
-			new ImChatPricePointRec ()
+			imChatPricePointHelper.insert (
+				new ImChatPricePointRec ()
 
 			.setImChat (
 				imChat)
@@ -202,6 +204,7 @@ class ImChatCoreFixtureProvider
 		}
 
 		// im chat customer
+
 		ImChatCustomerRec imChatCustomer =
 			imChatCustomerHelper.insert (
 				new ImChatCustomerRec ()
@@ -221,6 +224,7 @@ class ImChatCoreFixtureProvider
 		);
 
 		// im chat conversation
+
 		ImChatConversationRec imChatConversation =
 			imChatConversationHelper.insert (
 				new ImChatConversationRec ()
@@ -238,13 +242,13 @@ class ImChatCoreFixtureProvider
 
 		imChatCustomer
 
-		.setNumConversations (
-			imChatCustomer.getNumConversations () + 1);
-
+			.setNumConversations (
+				imChatCustomer.getNumConversations () + 1);
 
 		// im chat session
-			imChatSessionHelper.insert (
-				new ImChatSessionRec ()
+
+		imChatSessionHelper.insert (
+			new ImChatSessionRec ()
 
 			.setImChatCustomer (
 				imChatCustomer)
@@ -261,13 +265,15 @@ class ImChatCoreFixtureProvider
 			.setEndTime (
 				transaction.now ())
 
-			.setActive (true)
+			.setActive (
+				true)
 
 		);
 
 		// im chat purchase
-			imChatPurchaseHelper.insert (
-				new ImChatPurchaseRec ()
+
+		imChatPurchaseHelper.insert (
+			new ImChatPurchaseRec ()
 
 			.setImChatCustomer (
 				imChatCustomer)
@@ -297,10 +303,11 @@ class ImChatCoreFixtureProvider
 
 		imChatCustomer
 
-		.setNumPurchases (
-			imChatCustomer.getNumPurchases () + 1);
+			.setNumPurchases (
+				imChatCustomer.getNumPurchases () + 1);
 
 		// im chat message
+
 		imChatMessageHelper.insert (
 			new ImChatMessageRec ()
 
@@ -310,7 +317,7 @@ class ImChatCoreFixtureProvider
 			.setIndex (
 				imChatConversation.getNumMessages ())
 
-			.setMessageText(
+			.setMessageText (
 					"Text message.")
 
 		);
@@ -323,5 +330,3 @@ class ImChatCoreFixtureProvider
 	}
 
 }
-
-
