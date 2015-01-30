@@ -547,6 +547,9 @@ class ChatMainCommand
 			.inbox (
 				inbox)
 
+			.rest (
+				rest)
+
 			.handleInbox (
 				command)
 

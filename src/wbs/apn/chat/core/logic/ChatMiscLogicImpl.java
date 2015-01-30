@@ -245,8 +245,13 @@ class ChatMiscLogicImpl
 
 		// block all allMessages and ads
 
-		chatUser.setBlockAll (true);
-		chatUser.setNextAd (null);
+		chatUser
+
+			.setBlockAll (
+				true)
+
+			.setNextAd (
+				null);
 
 		// turn off dating
 
@@ -259,11 +264,15 @@ class ChatMiscLogicImpl
 
 		// send message
 
-		chatSendLogic.sendSystemRbFree (
-			chatUser,
-			Optional.<Integer>absent (),
-			"block_all_confirm",
-			Collections.<String,String>emptyMap ());
+		if (chatUser.getChatScheme () != null) {
+
+			chatSendLogic.sendSystemRbFree (
+				chatUser,
+				Optional.<Integer>absent (),
+				"block_all_confirm",
+				Collections.<String,String>emptyMap ());
+
+		}
 
 	}
 

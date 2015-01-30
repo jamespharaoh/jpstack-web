@@ -147,7 +147,7 @@ class ChatBlockAllCommand
 		return inboxLogic.inboxProcessed (
 			inbox,
 			Optional.of (defaultService),
-			Optional.of (affiliate),
+			Optional.fromNullable (affiliate),
 			command);
 
 	}
