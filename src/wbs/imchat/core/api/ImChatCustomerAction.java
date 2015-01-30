@@ -28,6 +28,9 @@ class ImChatCustomerAction
 	Database database;
 
 	@Inject
+	ImChatApiLogic imChatApiLogic;
+
+	@Inject
 	ImChatObjectHelper imChatHelper;
 
 	@Inject
@@ -82,16 +85,8 @@ class ImChatCustomerAction
 		// create response
 
 		ImChatCustomerData customerData =
-			new ImChatCustomerData ()
-
-			.id (
-				customer.getId ())
-
-			.code (
-				customer.getCode ())
-
-			.balance (
-				customer.getBalance ());
+			imChatApiLogic.customerData (
+				customer);
 
 		return jsonResponderProvider.get ()
 			.value (customerData);

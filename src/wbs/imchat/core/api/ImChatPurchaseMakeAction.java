@@ -40,6 +40,9 @@ class ImChatPurchaseMakeAction
 	Database database;
 
 	@Inject
+	ImChatApiLogic imChatApiLogic;
+
+	@Inject
 	ImChatObjectHelper imChatHelper;
 
 	@Inject
@@ -202,18 +205,8 @@ class ImChatPurchaseMakeAction
 				session.getSecret ())
 
 			.customer (
-				new ImChatCustomerData ()
-
-				.id (
-					customer.getId ())
-
-				.code (
-					customer.getCode ())
-
-				.balance (
-					customer.getBalance ())
-
-			);
+				imChatApiLogic.customerData (
+					customer));
 
 		// commit and return
 

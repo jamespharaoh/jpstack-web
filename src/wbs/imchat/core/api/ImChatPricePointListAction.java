@@ -35,6 +35,9 @@ class ImChatPricePointListAction
 	Database database;
 
 	@Inject
+	ImChatApiLogic imChatApiLogic;
+
+	@Inject
 	ImChatObjectHelper imChatHelper;
 
 	@Inject
@@ -90,25 +93,8 @@ class ImChatPricePointListAction
 				continue;
 
 			pricePointDatas.add (
-				new ImChatPricePointData ()
-
-				.id (
-					pricePoint.getId ())
-
-				.name (
-					pricePoint.getName ())
-
-				.price (
-					currencyLogic.formatText (
-						imChat.getCurrency (),
-						pricePoint.getPrice ()))
-
-				.value (
-					currencyLogic.formatText (
-						imChat.getCurrency (),
-						pricePoint.getValue ()))
-
-			);
+				imChatApiLogic.pricePointData (
+					pricePoint));
 
 		}
 

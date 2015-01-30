@@ -432,7 +432,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		Record<?> find (
-				int id) {
+				long id) {
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -440,7 +440,7 @@ class HibernateHelperProviderBuilder {
 			return (Record<?>)
 				session.get (
 					objectClass (),
-					id);
+					(int) id);
 
 		}
 

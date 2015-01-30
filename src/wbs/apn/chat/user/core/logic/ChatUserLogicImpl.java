@@ -1132,7 +1132,7 @@ class ChatUserLogicImpl
 						"logic",
 						"ChatUserLogic.setPlace",
 						exception,
-						null,
+						Optional.<Integer>absent (),
 						false);
 
 				}

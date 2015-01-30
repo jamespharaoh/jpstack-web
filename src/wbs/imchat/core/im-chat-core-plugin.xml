@@ -28,6 +28,7 @@
 	</fixtures>
 
 	<layer name="api">
+		<bean class="api.ImChatApiLogicImplementation"/>
 		<bean class="api.ImChatConversationStartAction"/>
 		<bean class="api.ImChatCustomerAction"/>
 		<bean class="api.ImChatCustomerCreateAction"/>

@@ -61,7 +61,7 @@ interface ObjectHelperProvider {
 	// database
 
 	Record<?> find (
-			int id);
+			long id);
 
 	Record<?> findByParentAndCode (
 			GlobalId parentGlobalId,

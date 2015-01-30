@@ -41,6 +41,9 @@ class ImChatConversationStartAction
 	Database database;
 
 	@Inject
+	ImChatApiLogic imChatApiLogic;
+
+	@Inject
 	ImChatConversationObjectHelper imChatConversationHelper;
 
 	@Inject
@@ -165,6 +168,9 @@ class ImChatConversationStartAction
 			.setIndex (
 				customer.getNumConversations ())
 
+			.setStartTime (
+				transaction.now ())
+
 		);
 
 		// update customer
@@ -179,8 +185,17 @@ class ImChatConversationStartAction
 		ImChatConversationStartSuccess successResponse =
 			new ImChatConversationStartSuccess ()
 
-			.conversationId (
-				conversation.getId ());
+			.customer (
+				imChatApiLogic.customerData (
+					customer))
+
+			.profile (
+				imChatApiLogic.profileData (
+					profile))
+
+			.conversation (
+				imChatApiLogic.conversationData (
+					conversation));
 
 		// commit and return
 

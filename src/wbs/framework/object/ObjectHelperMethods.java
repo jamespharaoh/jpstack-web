@@ -68,7 +68,7 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	// data access
 
 	RecordType find (
-			int id);
+			long id);
 
 	RecordType findByCode (
 			Record<?> parent,

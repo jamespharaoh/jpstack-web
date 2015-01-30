@@ -9,12 +9,9 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass
 public
-class ImChatConversationStartRequest {
+class ImChatConversationData {
 
 	@DataAttribute
-	String sessionSecret;
-
-	@DataAttribute
-	Long profileId;
+	Integer id;
 
 }

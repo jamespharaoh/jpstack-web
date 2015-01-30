@@ -95,7 +95,7 @@ class Oxygen8InboundMmsAction
 	String mmsMessageType;
 	String mmsSenderAddress;
 	String mmsRecipientAddress;
-	String mmsSubject;
+	Optional<String> mmsSubject;
 	Instant mmsDate;
 	String mmsNetwork;
 
@@ -213,7 +213,8 @@ class Oxygen8InboundMmsAction
 		// subject
 
 		mmsSubject =
-			requestContext.header ("X-Mms-Subject");
+			Optional.fromNullable (
+				requestContext.header ("X-Mms-Subject"));
 
 		// date
 
@@ -275,16 +276,8 @@ class Oxygen8InboundMmsAction
 
 		int errorCount = 0;
 
-System.out.println ("FILES");
 		for (FileItem fileItem
 				: requestContext.fileItems ()) {
-
-System.out.println (
-	stringFormat (
-		"FILE ITEM: %s, %s, %s",
-		fileItem.getName (),
-		fileItem.getContentType (),
-		fileItem.getFieldName ()));
 
 			Matcher matcher =
 				contentTypePattern.matcher (
@@ -424,7 +417,7 @@ System.out.println (
 			Optional.of (mmsDate),
 			medias,
 			Optional.<String>absent (),
-			Optional.of (mmsSubject));
+			mmsSubject);
 
 	}
 

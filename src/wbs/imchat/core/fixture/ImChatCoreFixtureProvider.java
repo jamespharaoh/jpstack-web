@@ -154,7 +154,7 @@ class ImChatCoreFixtureProvider
 				1000)
 
 			.setValue (
-				20000)
+				2000)
 
 		);
 
