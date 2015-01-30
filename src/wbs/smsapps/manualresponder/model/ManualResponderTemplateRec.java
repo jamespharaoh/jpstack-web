@@ -97,6 +97,10 @@ class ManualResponderTemplateRec
 		nullable = true)
 	String lastTemplate;
 
+	@SimpleField (
+		nullable = true)
+	String rules;
+
 	// compare to
 
 	@Override

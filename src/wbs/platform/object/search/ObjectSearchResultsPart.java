@@ -253,10 +253,12 @@ class ObjectSearchResultsPart
 			if (object == null) {
 
 				printFormat (
+					"<tr>\n",
 					"<td",
 					" colspan=\"%h\"",
 					formFieldSet.formFields ().size (),
-					">(deleted)</td>\n");
+					">(deleted)</td>\n",
+					"</tr>\n");
 
 				continue;
 
@@ -265,10 +267,12 @@ class ObjectSearchResultsPart
 			if (! consoleHelper.canView (object)) {
 
 				printFormat (
+					"<tr>\n",
 					"<td",
 					" colspan=\"%h\"",
 					formFieldSet.formFields ().size (),
-					">(resricted)</td>\n");
+					">(resricted)</td>\n",
+					"</tr>\n");
 
 				continue;
 

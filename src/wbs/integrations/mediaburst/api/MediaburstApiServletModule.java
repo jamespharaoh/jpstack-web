@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -16,7 +17,11 @@ import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Instant;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -26,6 +31,7 @@ import wbs.framework.web.RegexpPathHandler;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.sms.core.logic.NoSuchMessageException;
@@ -34,6 +40,7 @@ import wbs.sms.gsm.UserDataHeader;
 import wbs.sms.message.core.logic.InvalidMessageStateException;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.InboxMultipartLogic;
 import wbs.sms.message.report.logic.ReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.message.report.model.MessageReportCodeRec;
@@ -43,6 +50,7 @@ import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -52,11 +60,16 @@ public
 class MediaburstApiServletModule
 	implements ServletModule {
 
+	// dependencies
+
 	@Inject
 	Database database;
 
 	@Inject
 	InboxLogic inboxLogic;
+
+	@Inject
+	InboxMultipartLogic inboxMultipartLogic;
 
 	@Inject
 	MessageReportCodeObjectHelper messageReportCodeHelper;
@@ -75,6 +88,8 @@ class MediaburstApiServletModule
 
 	@Inject
 	TextObjectHelper textHelper;
+
+	// implementation
 
 	public static
 	String hexToUnicode (
@@ -112,37 +127,51 @@ class MediaburstApiServletModule
 	}
 
 	String testContent (
-			String messageParam) {
+			@NonNull String messageParam) {
 
 		try {
 
-			byte[] bytes = messageParam.getBytes();
+			byte[] bytes =
+				messageParam.getBytes ();
+
 			boolean zeroBytes = false;
-			for (int i = 0; i < bytes.length; i++) {
-				if ((int) bytes[i] == 0) {
-					zeroBytes = true;
-					break;
-				}
+
+			for (int i = 0; i < bytes.length; i ++) {
+
+				if ((int) bytes [i] != 0)
+					continue;
+
+				zeroBytes = true;
+
+				break;
+
 			}
 
-			if (!zeroBytes) {
+			if (! zeroBytes)
 				return messageParam;
-			}
 
 			// convert
-			StringBuffer sb = new StringBuffer();
-			for (int i = 0; i < bytes.length; i++) {
-				if ((int) bytes[i] != 0) {
-					sb.append(Integer.toHexString(bytes[i]));
-				}
-			}
-			messageParam = sb.toString();
-			messageParam = hexToUnicode(messageParam);
-		} catch (Exception e) {
-			throw new RuntimeException (e);
-		}
 
-		return messageParam;
+			StringBuilder stringBuilder =
+				new StringBuilder ();
+
+			for (int i = 0; i < bytes.length; i ++) {
+
+				if ((int) bytes [i] != 0) {
+
+					stringBuilder.append (
+						Integer.toHexString (bytes [i]));
+
+				}
+
+			}
+
+			return hexToUnicode (
+				stringBuilder.toString ());
+
+		} catch (Exception exception) {
+			throw new RuntimeException (exception);
+		}
 
 	}
 
@@ -269,7 +298,7 @@ class MediaburstApiServletModule
 
 			if (concatenatedInformationElement != null) {
 
-				inboxLogic.insertInboxMultipart (
+				inboxMultipartLogic.insertInboxMultipart (
 					route,
 					concatenatedInformationElement.getRef (),
 					concatenatedInformationElement.getSeqMax (),
@@ -284,16 +313,16 @@ class MediaburstApiServletModule
 			} else {
 
 				inboxLogic.inboxInsert (
-					msgIdParam,
+					Optional.of (msgIdParam),
 					messageText,
 					numFromParam,
 					numToParam,
 					route,
-					network,
-					null,
-					null,
-					null,
-					null);
+					Optional.fromNullable (network),
+					Optional.<Instant>absent (),
+					Collections.<MediaRec>emptyList (),
+					Optional.<String>absent (),
+					Optional.<String>absent ());
 
 			}
 
@@ -436,8 +465,6 @@ class MediaburstApiServletModule
 		}
 
 	};
-
-	// ============================================================ entries
 
 	final
 	RegexpPathHandler.Entry routeEntry =

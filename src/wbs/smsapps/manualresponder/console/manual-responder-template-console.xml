@@ -185,6 +185,10 @@
 			name="lastTemplate"
 			nullable="yes"/>
 
+		<text-field
+			name="rules"
+			nullable="yes"/>
+
 	</field-set>
 
 	<field-set
@@ -241,6 +245,10 @@
 
 		<text-area-field
 			name="lastTemplate"
+			nullable="yes"/>
+
+		<text-field
+			name="rules"
 			nullable="yes"/>
 
 	</field-set>

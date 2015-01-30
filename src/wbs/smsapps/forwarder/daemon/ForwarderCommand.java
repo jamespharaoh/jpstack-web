@@ -1,14 +1,16 @@
 package wbs.smsapps.forwarder.daemon;
 
-import java.util.Date;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
@@ -16,14 +18,18 @@ import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
 import wbs.smsapps.forwarder.model.ForwarderObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderRec;
 
+import com.google.common.base.Optional;
+
+@Accessors (fluent = true)
 @SingletonComponent ("forwarderCommand")
 public
 class ForwarderCommand
@@ -55,6 +61,20 @@ class ForwarderCommand
 	@Inject
 	ServiceObjectHelper serviceHelper;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
 	// details
 
 	@Override
@@ -71,25 +91,17 @@ class ForwarderCommand
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
+	InboxAttemptRec handle () {
 
-		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+			database.currentTransaction ();
 
 		ForwarderRec forwarder =
 			forwarderHelper.find (
 				command.getParentObjectId ());
 
 		MessageRec message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		ServiceRec defaultService =
 			serviceHelper.findByCode (
@@ -98,29 +110,40 @@ class ForwarderCommand
 
 		forwarderMessageInHelper.insert (
 			new ForwarderMessageInRec ()
-				.setForwarder (forwarder)
-				.setNumber (message.getNumber ())
-				.setMessage (message)
-				.setSendQueue (forwarder.getUrl ().length () > 0)
-				.setRetryTime (new Date ()));
+
+			.setForwarder (
+				forwarder)
+
+			.setNumber (
+				message.getNumber ())
+
+			.setMessage (
+				message)
+
+			.setSendQueue (
+				forwarder.getUrl ().length () > 0)
+
+			.setRetryTime (
+				instantToDate (
+					transaction.now ()))
+
+		);
 
 		messageSetLogic.sendMessageSet (
-			messageSetLogic.findMessageSet (forwarder, "forwarder"),
+			messageSetLogic.findMessageSet (
+				forwarder,
+				"forwarder"),
 			message.getThreadId (),
 			message.getNumber (),
 			defaultService);
 
 		// process inbox
 
-		inboxLogic.inboxProcessed (
-			message,
-			defaultService,
-			null,
+		return inboxLogic.inboxProcessed (
+			inbox,
+			Optional.of (defaultService),
+			Optional.<AffiliateRec>absent (),
 			command);
-
-		// return
-
-		transaction.commit ();
 
 	}
 

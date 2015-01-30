@@ -7,8 +7,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
@@ -23,7 +24,6 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.model.MediaRec;
@@ -34,12 +34,14 @@ import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 
 import com.google.common.base.Optional;
 
+@Accessors (fluent = true)
 @PrototypeComponent ("chatVideoGetCommand")
 public
 class ChatVideoGetCommand
@@ -92,6 +94,20 @@ class ChatVideoGetCommand
 	@Inject
 	Provider<MessageSender> messageSender;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
 	// details
 
 	@Override
@@ -108,21 +124,10 @@ class ChatVideoGetCommand
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
+	InboxAttemptRec handle () {
 
 		MessageRec message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+			inbox.getMessage ();
 
 		ChatRec chat =
 			(ChatRec) (Object)
@@ -159,19 +164,15 @@ class ChatVideoGetCommand
 			chatHelpLogLogic.createChatHelpLogIn (
 				chatUser,
 				message,
-				receivedMessage.getRest (),
+				rest,
 				null,
 				true);
 
-			inboxLogic.inboxProcessed (
-				message,
-				defaultService,
-				affiliate,
+			return inboxLogic.inboxProcessed (
+				inbox,
+				Optional.of (defaultService),
+				Optional.of (affiliate),
 				command);
-
-			transaction.commit ();
-
-			return;
 
 		}
 
@@ -180,12 +181,12 @@ class ChatVideoGetCommand
 		chatHelpLogLogic.createChatHelpLogIn (
 			chatUser,
 			message,
-			receivedMessage.getRest (),
+			rest,
 			command,
 			false);
 
 		String text =
-			receivedMessage.getRest ().trim ();
+			rest.trim ();
 
 		if (text.length () == 0) {
 
@@ -227,15 +228,11 @@ class ChatVideoGetCommand
 					"video_not_found",
 					Collections.<String,String>emptyMap ());
 
-				inboxLogic.inboxProcessed (
-					message,
-					defaultService,
-					affiliate,
+				return inboxLogic.inboxProcessed (
+					inbox,
+					Optional.of (defaultService),
+					Optional.of (affiliate),
 					command);
-
-				transaction.commit ();
-
-				return;
 
 			}
 
@@ -297,13 +294,11 @@ class ChatVideoGetCommand
 
 		// process inbox
 
-		inboxLogic.inboxProcessed (
-			message,
-			null,
-			null,
-			null);
-
-		transaction.commit ();
+		return inboxLogic.inboxProcessed (
+			inbox,
+			Optional.of (defaultService),
+			Optional.of (affiliate),
+			command);
 
 	}
 

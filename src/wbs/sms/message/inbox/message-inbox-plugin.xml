@@ -3,17 +3,21 @@
 	package="wbs.sms.message.inbox">
 
 	<sql-scripts>
-		<sql-data name="inbox-data"/>
+		<sql-schema name="sms-inbox"/>
+		<sql-data name="sms-inbox-data"/>
 	</sql-scripts>
 
 	<models>
+		<enum-type name="inboxState"/>
 		<model name="inbox"/>
+		<model name="inboxAttempt"/>
 		<model name="inboxMultipartBuffer"/>
 		<model name="inboxMultipartLog"/>
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.InboxLogicImpl"/>
+		<bean class="logic.InboxLogicImplementation"/>
+		<bean class="logic.InboxMultipartLogicImplementation"/>
 	</layer>
 
 	<layer name="console">

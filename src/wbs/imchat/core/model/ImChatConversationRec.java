@@ -6,6 +6,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.joda.time.Instant;
 
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.IndexField;
@@ -20,7 +21,8 @@ import wbs.framework.record.Record;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public class ImChatConversationRec
+public
+class ImChatConversationRec
 	implements CommonRecord<ImChatConversationRec>{
 
 	// id
@@ -41,6 +43,9 @@ public class ImChatConversationRec
 
 	@SimpleField
 	Integer numMessages = 0;
+
+	@SimpleField
+	Instant startTime;
 
 	// compare to
 

@@ -80,7 +80,8 @@ class ManualResponderLogicImpl
 				? 134
 				: 153;
 
-		int minLength = maxLengthPerMultipartMessage * template.getMinimumMessageParts();
+		int minLength =
+			maxLengthPerMultipartMessage * template.getMinimumMessageParts ();
 
 		// added length of fixed string
 

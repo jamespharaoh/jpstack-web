@@ -34,6 +34,7 @@ import wbs.smsapps.ticketer.model.TicketerRec;
 import wbs.smsapps.ticketer.model.TicketerTicketObjectHelper;
 import wbs.smsapps.ticketer.model.TicketerTicketRec;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 @SingletonComponent ("ticketerApiServletModule")
@@ -349,7 +350,7 @@ class TicketerApiServletModule
 					"webapi",
 					requestContext.requestUri (),
 					exception,
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 				requestContext.status (500);

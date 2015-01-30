@@ -18,20 +18,26 @@ public
 class MessageInboxSummaryPart
 	extends AbstractPagePart {
 
+	// dependencies
+
 	@Inject
 	InboxObjectHelper inboxHelper;
 
 	@Inject
 	TimeFormatter timeFormatter;
 
-	List<InboxRec> list;
+	// state
+
+	List<InboxRec> inboxes;
+
+	// implementation
 
 	@Override
 	public
 	void prepare () {
 
-		list =
-			inboxHelper.findAllLimit (
+		inboxes =
+			inboxHelper.findPendingLimit (
 				1000);
 
 	}
@@ -51,57 +57,95 @@ class MessageInboxSummaryPart
 			"<th>ID</th>\n",
 			"<th>From</th>\n",
 			"<th>To</th>\n",
-			"<th>Time</th>\n",
+			"<th>Created</th>\n",
+			"<th>Tries</th>\n",
 			"<th>Route</th>\n",
 			"<th>Actions</th>\n",
 			"</tr>\n");
 
-		for (InboxRec inbox : list) {
+		for (
+			InboxRec inbox
+				: inboxes
+		) {
+
+			printFormat (
+				"<tr class=\"sep\">\n",
+				"</tr>\n");
 
 			MessageRec message =
 				inbox.getMessage ();
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
-				message.getId (),
+				message.getId ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				message.getNumFrom (),
+				message.getNumFrom ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				message.getNumTo (),
+				message.getNumTo ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
 					timeFormatter.defaultTimezone (),
 					dateToInstant (
-						message.getCreatedTime ())),
+						message.getCreatedTime ())));
 
+			printFormat (
 				"<td>%h</td>\n",
-				message.getRoute ().getCode (),
+				inbox.getNumAttempts ());
 
-				"<td rowspan=\"2\">\n",
+			printFormat (
+				"<td>%h</td>\n",
+				message.getRoute ().getCode ());
 
-				"<input",
+			printFormat (
+				"<td",
+				" rowspan=\"%h\"",
+				inbox.getStatusMessage () != null ? 3 : 2,
+				"><input",
 				" type=\"submit\"",
 				" name=\"ignore_%h\"",
 				message.getId (),
 				" value=\"cancel\"",
-				">\n",
-
-				"</td>\n",
-
-				"</tr>\n");
+				"></td>\n");
 
 			printFormat (
-				"<tr>\n",
-
-				"<td colspan=\"5\">%h</td>\n",
-				message.getText ().getText (),
-
 				"</tr>\n");
+
+			// message text
+
+			printFormat (
+				"<tr>\n");
+
+			printFormat (
+				"<td colspan=\"6\">%h</td>\n",
+				message.getText ().getText ());
+
+			printFormat (
+				"</tr>\n");
+
+			// status message
+
+			if (inbox.getStatusMessage () != null) {
+
+				printFormat (
+					"<tr>\n");
+
+				printFormat (
+					"<td colspan=\"6\">%h</td>\n",
+					inbox.getStatusMessage ());
+
+				printFormat (
+					"</tr>\n");
+
+			}
 
 		}
 

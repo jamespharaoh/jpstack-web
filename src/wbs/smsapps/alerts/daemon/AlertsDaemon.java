@@ -48,6 +48,8 @@ import wbs.smsapps.alerts.model.AlertsStatusCheckObjectHelper;
 import wbs.smsapps.alerts.model.AlertsStatusCheckRec;
 import wbs.smsapps.alerts.model.AlertsSubjectRec;
 
+import com.google.common.base.Optional;
+
 @Log4j
 @SingletonComponent ("alertsDaemon")
 public
@@ -180,7 +182,7 @@ class AlertsDaemon
 					"daemon",
 					"alerts daemon " + alertsSettingsId,
 					exception,
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 			}

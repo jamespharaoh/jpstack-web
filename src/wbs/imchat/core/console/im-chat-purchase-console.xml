@@ -1,0 +1,95 @@
+<console-module
+	name="im-chat-purchase">
+
+	<console-helper-provider
+		object-name="imChatPurchase"
+		view-delegate-field="grandparent"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="imChatPurchase.manage"
+			delegate="imChatCustomer.imChat"
+			priv="manage"/>
+
+		<context-stuff
+			name="imChatPurchaseName"
+			field="index"/>
+
+		<context-stuff
+			name="imChatCustomerId"
+			delegate="imChatCustomer"
+			field="id"/>
+
+		<run-post-processor
+			name="imChatCustomer"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="imChatPurchase"
+		object-name="imChatPurchase">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="imChatPurchase">
+
+		<parent-field/>
+		<index-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="imChatPurchase">
+
+		<id-field/>
+		<parent-field/>
+		<index-field/>
+		
+		<integer-field
+			name="price"
+			nullable="yes"/>
+			
+		<integer-field
+			name="value"
+			nullable="yes"/>
+			
+		<integer-field
+			name="oldBalance"
+			nullable="yes"/>
+			
+		<integer-field
+			name="newBalance"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="imChatPurchase">
+
+		<id-field/>
+		<index-field/>
+
+	</field-set>
+
+</console-module>

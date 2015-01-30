@@ -48,7 +48,7 @@ class ChatAdultDeliveryHandler
 	DeliveryObjectHelper deliveryHelper;
 
 	@Inject
-	Provider<ChatJoiner> joiner;
+	Provider<ChatJoiner> joinerProvider;
 
 	@Override
 	public
@@ -158,12 +158,20 @@ class ChatAdultDeliveryHandler
 		int chatId =
 			chatUser.getChat ().getId ();
 
-		transaction.close ();
+		joinerProvider.get ()
 
-		joiner.get ()
-			.chatId (chatId)
-			.joinType (joinType)
-			.delivery (deliveryId);
+			.chatId (
+				chatId)
+
+			.joinType (
+				joinType)
+
+			.handle ();
+
+		deliveryHelper.remove (
+			delivery);
+
+		transaction.commit ();
 
 	}
 

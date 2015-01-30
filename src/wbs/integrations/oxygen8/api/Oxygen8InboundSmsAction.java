@@ -2,12 +2,15 @@ package wbs.integrations.oxygen8.api;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Date;
+import java.util.Collections;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+
+import org.joda.time.Instant;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -19,11 +22,14 @@ import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInRec;
 import wbs.platform.api.mvc.ApiAction;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
 import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
+import com.google.common.base.Optional;
 
 @PrototypeComponent ("oxygen8InboundSmsAction")
 public
@@ -167,16 +173,16 @@ class Oxygen8InboundSmsAction
 		}
 
 		inboxLogic.inboxInsert (
-			reference,
+			Optional.of (reference),
 			textHelper.findOrCreate (content),
 			msisdn,
 			shortcode,
 			route,
-			oxygen8Network.getNetwork (),
-			new Date (dateReceived),
-			null,
-			null,
-			null);
+			Optional.of (oxygen8Network.getNetwork ()),
+			Optional.of (new Instant (dateReceived)),
+			Collections.<MediaRec>emptyList (),
+			Optional.<String>absent (),
+			Optional.<String>absent ());
 
 		transaction.commit ();
 

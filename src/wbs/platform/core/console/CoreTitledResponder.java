@@ -20,6 +20,8 @@ import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.exception.logic.ExceptionLogicImpl;
 import wbs.platform.priv.console.PrivChecker;
 
+import com.google.common.base.Optional;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("coreTitledResponder")
 public
@@ -86,7 +88,8 @@ class CoreTitledResponder
 					"console",
 					path,
 					exception,
-					requestContext.userId (),
+					Optional.fromNullable (
+						requestContext.userId ()),
 					false);
 
 				// and remember we had a problem

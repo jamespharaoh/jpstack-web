@@ -19,6 +19,8 @@ import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.exception.logic.ExceptionLogic;
 
+import com.google.common.base.Optional;
+
 @Log4j
 public abstract
 class ConsoleAction
@@ -156,7 +158,8 @@ class ConsoleAction
 				"console",
 				requestContext.requestPath (),
 				exceptionFromBackupResponder,
-				requestContext.userId (),
+				Optional.fromNullable (
+					requestContext.userId ()),
 				false);
 
 		}
@@ -182,7 +185,8 @@ class ConsoleAction
 			"console",
 			requestContext.requestPath (),
 			throwable,
-			requestContext.userId (),
+			Optional.fromNullable (
+				requestContext.userId ()),
 			false);
 
 		// give the user an error message

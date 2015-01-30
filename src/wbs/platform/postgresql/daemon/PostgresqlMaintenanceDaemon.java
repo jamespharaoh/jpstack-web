@@ -25,6 +25,8 @@ import wbs.platform.daemon.AbstractDaemonService;
 import wbs.platform.daemon.ThreadManager;
 import wbs.platform.exception.logic.ExceptionLogic;
 
+import com.google.common.base.Optional;
+
 @Log4j
 @SingletonComponent ("pgMaint")
 public
@@ -211,7 +213,7 @@ class PostgresqlMaintenanceDaemon
 						"daemon",
 						getClass ().getSimpleName (),
 						exception,
-						null,
+						Optional.<Integer>absent (),
 						false);
 
 				}
@@ -224,7 +226,7 @@ class PostgresqlMaintenanceDaemon
 				"daemon",
 				getClass ().getSimpleName (),
 				exception,
-				null,
+				Optional.<Integer>absent (),
 				false);
 
 		}

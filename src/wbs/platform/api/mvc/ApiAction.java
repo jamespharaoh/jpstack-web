@@ -11,6 +11,8 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.exception.logic.ExceptionLogic;
 
+import com.google.common.base.Optional;
+
 public
 abstract class ApiAction
 	implements Action {
@@ -59,7 +61,7 @@ abstract class ApiAction
 				"webapi",
 				path,
 				exception,
-				null,
+				Optional.<Integer>absent (),
 				false);
 
 			// and show a simple error page

@@ -8,6 +8,8 @@ import org.apache.log4j.Logger;
 
 import wbs.platform.exception.logic.ExceptionLogic;
 
+import com.google.common.base.Optional;
+
 abstract public
 class SleepingDaemonService
 	extends AbstractDaemonService {
@@ -74,7 +76,7 @@ class SleepingDaemonService
 					generalErrorSource (),
 					generalErrorSummary (),
 					exception,
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 			}

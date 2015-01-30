@@ -556,6 +556,21 @@
 		<plugin
 			name="paypal"
 			package="wbs.paypal"/>
+<<<<<<< HEAD
+
+||||||| merged common ancestors
+
+		<!-- paypal -->
+
+		<plugin
+			name="paypal"
+			package="wbs.paypal"/>
+
+		<!-- wallet -->
+
+		<plugin
+			name="wallet"
+			package="wbs.wallet"/>
 
 		<!-- integrations -->
 

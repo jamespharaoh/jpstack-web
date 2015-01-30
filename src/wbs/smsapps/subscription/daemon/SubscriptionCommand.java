@@ -5,13 +5,12 @@ import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -26,8 +25,9 @@ import wbs.sms.core.logic.KeywordFinder;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.sms.number.core.model.NumberRec;
@@ -43,6 +43,9 @@ import wbs.smsapps.subscription.model.SubscriptionRec;
 import wbs.smsapps.subscription.model.SubscriptionSubObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionSubRec;
 
+import com.google.common.base.Optional;
+
+@Accessors (fluent = true)
 @PrototypeComponent ("subscriptionCommand")
 public
 class SubscriptionCommand
@@ -100,10 +103,24 @@ class SubscriptionCommand
 	@Inject
 	Provider<MessageSender> messageSenderProvider;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
 	// state
 
-	ReceivedMessage receivedMessage;
-	CommandRec command;
+	Transaction transaction;
+
 	MessageRec message;
 	NumberRec number;
 
@@ -138,23 +155,15 @@ class SubscriptionCommand
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
+	InboxAttemptRec handle () {
 
-		this.receivedMessage =
-			receivedMessage;
+		transaction =
+			database.currentTransaction ();
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		findCommand (
-			commandId);
+		findCommand ();
 
 		message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		number =
 			message.getNumber ();
@@ -170,8 +179,7 @@ class SubscriptionCommand
 				"subscribe")
 		) {
 
-			doSubscribe (
-				transaction);
+			return doSubscribe ();
 
 		} else if (
 			equal (
@@ -179,8 +187,7 @@ class SubscriptionCommand
 				"unsubscribe")
 		) {
 
-			doUnsubscribe (
-				transaction);
+			return doUnsubscribe ();
 
 		} else {
 
@@ -191,19 +198,14 @@ class SubscriptionCommand
 
 		}
 
-		transaction.commit ();
-
 	}
 
 	void matchKeyword () {
 
-		List<KeywordFinder.Match> keywordMatches =
-			keywordFinder.find (
-				receivedMessage.getRest ());
-
 		for (
 			KeywordFinder.Match keywordMatch
-				: keywordMatches
+				: keywordFinder.find (
+					rest)
 		) {
 
 			SubscriptionKeywordRec subscriptionKeyword =
@@ -225,8 +227,7 @@ class SubscriptionCommand
 
 	}
 
-	void doSubscribe (
-			Transaction transaction) {
+	InboxAttemptRec doSubscribe () {
 
 		matchKeyword ();
 
@@ -419,27 +420,21 @@ class SubscriptionCommand
 
 		// process message
 
-		inboxLogic.inboxProcessed (
-			message,
-			response.getService (),
-			response.getAffiliate (),
+		return inboxLogic.inboxProcessed (
+			inbox,
+			Optional.of (response.getService ()),
+			Optional.of (response.getAffiliate ()),
 			command);
 
 	}
 
-	void doUnsubscribe (
-			Transaction transaction) {
+	InboxAttemptRec doUnsubscribe () {
 
 		throw new RuntimeException ("TODO");
 
 	}
 
-	void findCommand (
-			int commandId) {
-
-		command =
-			commandHelper.find (
-				commandId);
+	void findCommand () {
 
 		Record<?> commandParent =
 			objectManager.getParent (

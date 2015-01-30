@@ -7,20 +7,25 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toBoolean;
 import static wbs.framework.utils.etc.Misc.toInteger;
 
+import java.util.Collections;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
 
+import org.joda.time.Instant;
 import org.json.simple.JSONValue;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.web.JsonResponder;
 import wbs.framework.web.Responder;
 import wbs.platform.console.action.ConsoleAction;
 import wbs.platform.console.request.ConsoleRequestContext;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.console.SliceConsoleHelper;
 import wbs.platform.text.model.TextObjectHelper;
@@ -214,16 +219,16 @@ class SimulatorSessionCreateEventAction
 
 		MessageRec message =
 			inboxLogic.inboxInsert (
-				null,
+				Optional.<String>absent (),
 				textHelper.findOrCreate (messageText),
 				numFrom,
 				numTo,
 				route,
-				network,
-				null,
-				null,
-				null,
-				null);
+				Optional.of (network),
+				Optional.<Instant>absent (),
+				Collections.<MediaRec>emptyList (),
+				Optional.<String>absent (),
+				Optional.<String>absent ());
 
 		// create event data
 

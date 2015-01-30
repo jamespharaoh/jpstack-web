@@ -1,7 +1,6 @@
 package wbs.integrations.oxygen8.api;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -42,6 +41,8 @@ import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
+import com.google.common.base.Optional;
 
 @Log4j
 @PrototypeComponent ("oxygen8InboundMmsAction")
@@ -414,17 +415,16 @@ System.out.println (
 				messageString);
 
 		inboxLogic.inboxInsert (
-			mmsMessageId,
+			Optional.of (mmsMessageId),
 			messageText,
 			mmsSenderAddress,
 			mmsRecipientAddress,
 			route,
-			network,
-			instantToDate (
-				mmsDate),
+			Optional.of (network),
+			Optional.of (mmsDate),
 			medias,
-			null,
-			mmsSubject);
+			Optional.<String>absent (),
+			Optional.of (mmsSubject));
 
 	}
 

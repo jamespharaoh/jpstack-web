@@ -19,8 +19,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import lombok.Cleanup;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import org.xml.sax.Attributes;
@@ -29,8 +31,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -40,14 +42,18 @@ import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.ReceivedMessage;
 import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.smsapps.photograbber.model.PhotoGrabberRec;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestObjectHelper;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestRec;
 
+import com.google.common.base.Optional;
+
+@Accessors (fluent = true)
 @Log4j
 @PrototypeComponent ("photoGrabberCommand")
 public
@@ -69,7 +75,7 @@ class PhotoGrabberCommand
 	InboxLogic inboxLogic;
 
 	@Inject
-	MediaLogic mediaUtils;
+	MediaLogic mediaLogic;
 
 	@Inject
 	MessageObjectHelper messageHelper;
@@ -89,10 +95,25 @@ class PhotoGrabberCommand
 	@Inject
 	Provider<MessageSender> messageSender;
 
+	// properties
+
+	@Getter @Setter
+	InboxRec inbox;
+
+	@Getter @Setter
+	CommandRec command;
+
+	@Getter @Setter
+	Optional<Integer> commandRef;
+
+	@Getter @Setter
+	String rest;
+
 	// details
 
 	@Override
-	public String[] getCommandTypes () {
+	public
+	String[] getCommandTypes () {
 
 		return new String [] {
 			"photo_grabber.photo_grabber"
@@ -104,17 +125,7 @@ class PhotoGrabberCommand
 
 	@Override
 	public
-	void handle (
-			int commandId,
-			@NonNull ReceivedMessage receivedMessage) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite ();
-
-		CommandRec command =
-			commandHelper.find (
-				commandId);
+	InboxAttemptRec handle () {
 
 		PhotoGrabberRec photoGrabber =
 			(PhotoGrabberRec) (Object)
@@ -122,11 +133,10 @@ class PhotoGrabberCommand
 				command);
 
 		String mediaRef =
-			receivedMessage.getRest ().trim ();
+			rest.trim ();
 
 		MessageRec message =
-			messageHelper.find (
-				receivedMessage.getMessageId ());
+			inbox.getMessage ();
 
 		ServiceRec defaultService =
 			serviceHelper.findByCode (
@@ -173,7 +183,9 @@ class PhotoGrabberCommand
 					+ message.getId() + ")");
 
 			photoGrabberRequest
-				.setFound (false);
+
+				.setFound (
+					false);
 
 			photoGrabberRequestHelper.insert (
 				photoGrabberRequest);
@@ -184,31 +196,22 @@ class PhotoGrabberCommand
 					"photo_grabber_not_found"),
 				message.getThreadId (),
 				message.getNumber (),
-				serviceHelper.findByCode (photoGrabber, "default"));
+				defaultService);
 
-			inboxLogic.inboxProcessed (
-				message,
-				defaultService,
-				null,
+			return inboxLogic.inboxProcessed (
+				inbox,
+				Optional.of (defaultService),
+				Optional.<AffiliateRec>absent (),
 				command);
 
-			transaction.commit ();
-
 		}
 
-		MediaRec media;
-		try {
-
-			media =
-				fetchMedia (
-					mediaUrl,
-					photoGrabber.getJpeg (),
-					photoGrabber.getJpegWidth (),
-					photoGrabber.getJpegHeight ());
-
-		} catch (IOException e) {
-			throw new RuntimeException (e);
-		}
+		MediaRec media =
+			fetchMedia (
+				mediaUrl,
+				photoGrabber.getJpeg (),
+				photoGrabber.getJpegWidth (),
+				photoGrabber.getJpegHeight ());
 
 		if (media == null) {
 
@@ -227,17 +230,13 @@ class PhotoGrabberCommand
 					"photo_grabber_not_found"),
 				message.getThreadId (),
 				message.getNumber (),
-				serviceHelper.findByCode (photoGrabber, "default"));
+				defaultService);
 
-			inboxLogic.inboxProcessed (
-				message,
-				defaultService,
-				null,
+			return inboxLogic.inboxProcessed (
+				inbox,
+				Optional.of (defaultService),
+				Optional.<AffiliateRec>absent (),
 				command);
-
-			transaction.commit ();
-
-			return;
 
 		}
 
@@ -262,42 +261,57 @@ class PhotoGrabberCommand
 
 		MessageRec billedMessage =
 			messageSender.get ()
-				.threadId (message.getThreadId ())
-				.number (message.getNumber ())
-				.messageString (text)
-				.numFrom (photoGrabber.getBillNumber ())
-				.route (photoGrabber.getBillRoute ())
-				.service (serviceHelper.findByCode (photoGrabber, "default"))
-				.deliveryTypeCode ("photo_grabber")
-				.send ();
 
-		photoGrabberRequest.setBilledMessage (billedMessage);
+			.threadId (
+				message.getThreadId ())
+
+			.number (
+				message.getNumber ())
+
+			.messageString (
+				text)
+
+			.numFrom (
+				photoGrabber.getBillNumber ())
+
+			.route (
+				photoGrabber.getBillRoute ())
+
+			.service (
+				serviceHelper.findByCode (photoGrabber, "default"))
+
+			.deliveryTypeCode (
+				"photo_grabber")
+
+			.send ();
+
+		photoGrabberRequest
+
+			.setBilledMessage (
+				billedMessage);
 
 		photoGrabberRequestHelper.insert (
 			photoGrabberRequest);
 
-		inboxLogic.inboxProcessed (
-			message,
-			defaultService,
-			null,
+		return inboxLogic.inboxProcessed (
+			inbox,
+			Optional.of (defaultService),
+			Optional.<AffiliateRec>absent (),
 			command);
-
-		transaction.commit ();
 
 	}
 
-	private
+	@SneakyThrows (IOException.class)
 	MediaRec fetchMedia (
 			String url,
 			boolean jpeg,
 			int jpegWidth,
-			int jpegHeight)
-		throws IOException {
+			int jpegHeight) {
 
 		byte[] data =
 			fetchUrlData (url);
 
-		return mediaUtils.createMediaFromImage (
+		return mediaLogic.createMediaFromImage (
 			data,
 			"image/jpeg",
 			null);

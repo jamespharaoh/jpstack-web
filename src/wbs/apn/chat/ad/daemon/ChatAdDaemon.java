@@ -145,7 +145,7 @@ class ChatAdDaemon
 					"daemon",
 					"ChatAdDaemon",
 					exception,
-					null,
+					Optional.<Integer>absent (),
 					false);
 
 			}
