@@ -557,6 +557,12 @@
 			name="paypal"
 			package="wbs.paypal"/>
 
+		<!-- wallet -->
+
+		<plugin
+			name="wallet"
+			package="wbs.wallet"/>
+
 		<!-- integrations -->
 
 		<plugin

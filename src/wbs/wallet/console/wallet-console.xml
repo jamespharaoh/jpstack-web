@@ -1,32 +1,28 @@
 <console-module
-	name="im-chat-message">
+	name="wallet">
 
 	<console-helper-provider
-		object-name="imChatMessage"
-		view-delegate-field="greatgrandparent"
+		object-name="wallet"
+		view-delegate-field="parent"
 		view-delegate-priv-code="manage">
 
 		<context-stuff
-			name="imChatMessageId"
+			name="walletId"
 			field="id"/>
 
 		<context-stuff
-			name="imChatMessageName"
-			field="id"/>
-
-		<context-stuff
-			name="imChatConversationId"
-			delegate="imChatConversation"
+			name="walletServiceId"
+			delegate="walletService"
 			field="id"/>
 
 		<run-post-processor
-			name="imChatConversation"/>
+			name="walletService"/>
 
 	</console-helper-provider>
 
 	<object-context
-		name="imChatMessage"
-		object-name="imChatMessage">
+		name="wallet"
+		object-name="wallet">
 
 		<list>
 
@@ -42,7 +38,7 @@
 
 			<object-settings-page
 				fields="settings"
-				priv-key="imChatConversation.imChatCustomer.imChat.manage"/>
+				priv-key="walletService.manage"/>
 
 		</object>
 
@@ -50,32 +46,29 @@
 
 	<field-set
 		name="list"
-		object-name="imChatMessage">
+		object-name="wallet">
 
 		<parent-field/>
-		<index-field/>
+		<code-field/>
 
 	</field-set>
 
 	<field-set
 		name="summary"
-		object-name="imChatMessage">
+		object-name="wallet">
 
 		<id-field/>
 		<parent-field/>
-		<index-field/>
-		<text-field
-			name="messageText"
-			nullable="yes"/>
+		<code-field/>
 
 	</field-set>
 
 	<field-set
 		name="settings"
-		object-name="imChatMessage">
+		object-name="wallet">
 
 		<id-field/>
-		<index-field/>
+		<code-field/>
 
 	</field-set>
 

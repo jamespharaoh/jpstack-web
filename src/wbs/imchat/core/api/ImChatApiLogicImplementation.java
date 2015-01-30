@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.imchat.core.model.ImChatConversationRec;
 import wbs.imchat.core.model.ImChatCustomerRec;
+import wbs.imchat.core.model.ImChatMessageRec;
 import wbs.imchat.core.model.ImChatPricePointRec;
 import wbs.imchat.core.model.ImChatProfileRec;
 import wbs.imchat.core.model.ImChatRec;
@@ -98,6 +99,24 @@ class ImChatApiLogicImplementation
 
 			.id (
 				conversation.getId ());
+
+	}
+
+	@Override
+	public
+	ImChatMessageData messageData (
+			ImChatMessageRec message) {
+
+		return new ImChatMessageData ()
+
+			.id (
+				message.getId ())
+
+			.index (
+				message.getIndex ())
+
+			.messageText (
+				message.getMessageText ());
 
 	}
 

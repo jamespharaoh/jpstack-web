@@ -47,6 +47,10 @@
 		<console-module name="im-chat-customer"/>
 		<console-module name="im-chat-conversation"/>
 		<console-module name="im-chat-message"/>
+		<console-module name="im-chat-price-point"/>
+		<console-module name="im-chat-profile"/>
+		<console-module name="im-chat-session"/>
+		<console-module name="im-chat-purchase"/>
 	</console-modules>
 
 </plugin>

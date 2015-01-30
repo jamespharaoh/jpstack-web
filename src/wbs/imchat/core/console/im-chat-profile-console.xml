@@ -1,0 +1,84 @@
+<console-module
+	name="im-chat-profile">
+
+	<console-helper-provider
+		object-name="imChatProfile"
+		view-delegate-field="imChat"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="imChatProfile.manage"
+			delegate="imChat"
+			priv="manage"/>
+
+		<context-stuff
+			name="imChatProfileName"
+			field="code"/>
+
+		<context-stuff
+			name="imChatId"
+			delegate="imChat"
+			field="id"/>
+
+		<run-post-processor
+			name="imChat"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="imChatProfile"
+		object-name="imChatProfile">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="imChatProfile">
+
+		<parent-field/>
+		<code-field/>
+
+	</field-set>
+
+	<field-set
+		name="results"
+		object-name="imChatProfile">
+
+		<code-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="imChatProfile">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+
+		<text-field
+			name="publicName"
+			nullable="yes"/>
+
+		<text-field
+			name="publicDescription"
+			nullable="yes"/>
+
+	</field-set>
+
+</console-module>
