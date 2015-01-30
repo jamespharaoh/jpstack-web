@@ -62,9 +62,6 @@ class ApiVariable
 		String variableValue =
 			localPathMatcher.group (1);
 
-		System.out.println (
-			"VARIABLE " + variableName + " = " + variableValue);
-
 		requestContext.request (
 			variableName,
 			variableValue);
@@ -82,9 +79,6 @@ class ApiVariable
 				variableName,
 				"%s",
 				localPathRest);
-
-		System.out.println (
-			"NEXT: " + pathNext);
 
 		DelegatingPathHandler delegatingPathHandler =
 			delegatingPathHandlerProvider.get ();

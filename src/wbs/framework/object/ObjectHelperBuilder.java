@@ -672,7 +672,7 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Record<?> find (
-					int id) {
+					long id) {
 
 				return objectHelperProvider
 					.find (id);

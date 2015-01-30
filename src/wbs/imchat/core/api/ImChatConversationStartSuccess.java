@@ -15,6 +15,12 @@ class ImChatConversationStartSuccess {
 	String status = "success";
 
 	@DataAttribute
-	Integer conversationId;
+	ImChatCustomerData customer;
+
+	@DataAttribute
+	ImChatProfileData profile;
+
+	@DataAttribute
+	ImChatConversationData conversation;
 
 }
