@@ -230,10 +230,10 @@ class ChatBroadcastListPart
 					"total spend %s to %s",
 					currencyLogic.formatText (
 						chatBroadcast.getChat ().getCurrency (),
-						chatBroadcast.getSearchSpendMin ()),
+						Long.valueOf(chatBroadcast.getSearchSpendMin ())),
 					currencyLogic.formatText (
 						chatBroadcast.getChat ().getCurrency (),
-						chatBroadcast.getSearchSpendMax ())));
+						Long.valueOf(chatBroadcast.getSearchSpendMax ()))));
 
 		} else if (chatBroadcast.getSearchSpendMin () != null) {
 
@@ -242,7 +242,7 @@ class ChatBroadcastListPart
 					"total spend at least %s",
 					currencyLogic.formatText (
 						chatBroadcast.getChat ().getCurrency (),
-						chatBroadcast.getSearchSpendMin ())));
+						Long.valueOf(chatBroadcast.getSearchSpendMin ()))));
 
 		} else if (chatBroadcast.getSearchSpendMax () != null) {
 
@@ -251,7 +251,7 @@ class ChatBroadcastListPart
 					"total spend at most %s",
 					currencyLogic.formatText (
 						chatBroadcast.getChat ().getCurrency (),
-						chatBroadcast.getSearchSpendMax ())));
+						Long.valueOf(chatBroadcast.getSearchSpendMax ()))));
 
 		}
 

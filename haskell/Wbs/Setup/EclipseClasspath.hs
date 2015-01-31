@@ -49,7 +49,7 @@ writeClasspath world = do
 			sourcePath = concat [
 				"/home/vagrant/",
 				bldName build,
-				"/bnaries/libraries/",
+				"/binaries/libraries/",
 				libName library,
 				"-source-",
 				libVersion library,

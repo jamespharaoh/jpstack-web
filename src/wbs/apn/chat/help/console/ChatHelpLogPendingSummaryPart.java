@@ -163,7 +163,7 @@ class ChatHelpLogPendingSummaryPart
 			"<td>%s</td>\n",
 			currencyLogic.formatHtml (
 				chatUser.getChat ().getCurrency (),
-				chatUser.getCredit ()),
+				Long.valueOf(chatUser.getCredit ())),
 
 			"</tr>\n");
 

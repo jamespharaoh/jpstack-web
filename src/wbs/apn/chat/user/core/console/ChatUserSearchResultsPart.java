@@ -348,7 +348,7 @@ class ChatUserSearchResultsPart
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getValueSinceEver ()));
+					Long.valueOf(chatUser.getValueSinceEver ())));
 
 			StringFormatter.printWriterFormat (
 				pageBuilder.writer (),
@@ -356,7 +356,7 @@ class ChatUserSearchResultsPart
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCredit ()));
+					Long.valueOf(chatUser.getCredit ())));
 
 			StringFormatter.printWriterFormat (
 				pageBuilder.writer (),
@@ -371,9 +371,9 @@ class ChatUserSearchResultsPart
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					sum (
+					Long.valueOf(sum (
 						+ chatUser.getCreditPending (),
-						+ chatUser.getCreditPendingStrict ())));
+						+ chatUser.getCreditPendingStrict ()))));
 
 			StringFormatter.printWriterFormat (
 				pageBuilder.writer (),
@@ -381,7 +381,7 @@ class ChatUserSearchResultsPart
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditSuccess ()));
+					Long.valueOf(chatUser.getCreditSuccess ())));
 
 			StringFormatter.printWriterFormat (
 				pageBuilder.writer (),
@@ -389,7 +389,7 @@ class ChatUserSearchResultsPart
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditFailed ()));
+					Long.valueOf(chatUser.getCreditFailed ())));
 
 			StringFormatter.printWriterFormat (
 				pageBuilder.writer (),

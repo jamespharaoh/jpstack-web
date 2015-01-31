@@ -75,11 +75,12 @@ class ForwarderDelivery
 
 		// unhold / cancel next message(s) if required
 
-		if (forwarderMessageOut.getNextForwarderMessageOut () != null
-				&& forwarderMessageOut
-						.getNextForwarderMessageOut ()
-						.getMessage ()
-						.getStatus ()
+		if (
+			forwarderMessageOut.getNextForwarderMessageOut () != null
+			&& forwarderMessageOut
+				.getNextForwarderMessageOut ()
+				.getMessage ()
+				.getStatus ()
 					== MessageStatus.held) {
 
 			if (delivery.getNewMessageStatus ().isGoodType ()) {

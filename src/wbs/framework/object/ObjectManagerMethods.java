@@ -98,6 +98,10 @@ interface ObjectManagerMethods {
 	String objectPathMini (
 			Record<?> dataObject);
 
+	String objectPathMini (
+			Record<?> dataObject,
+			Record<?> root);
+
 	String objectPath (
 			Record<?> dataObject,
 			Record<?> root);

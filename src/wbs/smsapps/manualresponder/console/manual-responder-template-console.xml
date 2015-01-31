@@ -108,6 +108,9 @@
 			name="splitLong"/>
 
 		<yes-no-field
+			name="sequenceParts"/>
+
+		<yes-no-field
 			name="applyTemplates"/>
 
 		<text-area-field
@@ -165,6 +168,9 @@
 
 		<yes-no-field
 			name="splitLong"/>
+
+		<yes-no-field
+			name="sequenceParts"/>
 
 		<yes-no-field
 			name="applyTemplates"/>
@@ -227,6 +233,9 @@
 
 		<yes-no-field
 			name="splitLong"/>
+
+		<yes-no-field
+			name="sequenceParts"/>
 
 		<yes-no-field
 			name="applyTemplates"/>

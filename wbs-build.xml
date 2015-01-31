@@ -498,20 +498,8 @@
 			package="wbs.apn.chat.help"/>
 
 		<plugin
-			name="chat-user-image"
-			package="wbs.apn.chat.user.image"/>
-
-		<plugin
-			name="chat-user-info"
-			package="wbs.apn.chat.user.info"/>
-
-		<plugin
 			name="chat-info-site"
 			package="wbs.apn.chat.infosite"/>
-
-		<plugin
-			name="chat-user-join"
-			package="wbs.apn.chat.user.join"/>
 
 		<plugin
 			name="chat-keyword"
@@ -520,6 +508,10 @@
 		<plugin
 			name="chat-named-note"
 			package="wbs.apn.chat.namednote"/>
+
+		<plugin
+			name="chat-report"
+			package="wbs.apn.chat.report"/>
 
 		<plugin
 			name="chat-scheme"
@@ -534,12 +526,24 @@
 			package="wbs.apn.chat.supervisor"/>
 
 		<plugin
+			name="chat-user-admin"
+			package="wbs.apn.chat.user.admin"/>
+
+		<plugin
 			name="chat-user-core"
 			package="wbs.apn.chat.user.core"/>
 
 		<plugin
-			name="chat-user-admin"
-			package="wbs.apn.chat.user.admin"/>
+			name="chat-user-image"
+			package="wbs.apn.chat.user.image"/>
+
+		<plugin
+			name="chat-user-info"
+			package="wbs.apn.chat.user.info"/>
+
+		<plugin
+			name="chat-user-join"
+			package="wbs.apn.chat.user.join"/>
 
 		<plugin
 			name="chat-user-pending"

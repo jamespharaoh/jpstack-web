@@ -7,17 +7,17 @@ interface CurrencyLogic {
 
 	String formatText (
 			CurrencyRec currency,
-			int amount);
+			Long amount);
 
 	String formatHtml (
 			CurrencyRec currency,
-			int amountRaw);
+			Long amountRaw);
 
 	String formatHtmlTd (
 			CurrencyRec currency,
-			int credit);
+			Long credit);
 
-	int parseText (
+	Long parseText (
 			CurrencyRec currency,
 			String text);
 

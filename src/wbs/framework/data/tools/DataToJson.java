@@ -1,7 +1,10 @@
 package wbs.framework.data.tools;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import lombok.SneakyThrows;
@@ -49,14 +52,42 @@ class DataToJson {
 
 			return jsonListBuilder.build ();
 
+		} else if (dataValue instanceof Map) {
+
+			Map<?,?> dataMap =
+				(Map<?,?>) dataValue;
+
+			ImmutableMap.Builder<String,Object> jsonMapBuilder =
+				ImmutableMap.<String,Object>builder ();
+
+			for (
+				Map.Entry<?,?> dataMapEntry
+					: dataMap.entrySet ()
+			) {
+
+				jsonMapBuilder.put (
+					(String) dataMapEntry.getKey (),
+					toJson (dataMapEntry.getValue ()));
+
+			}
+
+			return jsonMapBuilder.build ();
+
 		} else {
 
 			DataClass dataClassAnnotation =
 				dataClass.getAnnotation (
 					DataClass.class);
 
-			if (dataClassAnnotation == null)
-				throw new RuntimeException ();
+			if (dataClassAnnotation == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Don't know how to convert %s ",
+						dataClass.getSimpleName (),
+						"to JSON"));
+
+			}
 
 			ImmutableMap.Builder<String,Object> jsonValueBuilder =
 				ImmutableMap.<String,Object>builder ();
@@ -95,8 +126,12 @@ class DataToJson {
 
 	Set<Class<?>> simpleClasses =
 		ImmutableSet.<Class<?>>builder ()
-			.add (String.class)
+			.add (Boolean.class)
+			.add (Double.class)
+			.add (Float.class)
 			.add (Integer.class)
+			.add (Long.class)
+			.add (String.class)
 			.build ();
 
 }

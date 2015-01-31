@@ -10,6 +10,8 @@
 		<custom-type name="chatUserCreditMode"/>
 		<model name="chatDailyLimitLog"/>
 		<model name="chatNetwork"/>
+		<model name="chatRoute"/>
+		<model name="chatRouteNetwork"/>
 		<model name="chatUserBillLog"/>
 		<model name="chatUserCreditLimitLog"/>
 		<model name="chatUserCredit"/>
@@ -29,6 +31,8 @@
 
 	<console-modules>
 		<console-module name="chat-network"/>
+		<console-module name="chat-route"/>
+		<console-module name="chat-route-network"/>
 	</console-modules>
 
 </plugin>

@@ -10,6 +10,8 @@
 	<models>
 		<model name="chat"/>
 		<model name="chatStats"/>
+		<model name="chatReport" />
+		<model name="chatMonthCost"/>
 	</models>
 
 	<layer name="logic">
@@ -44,6 +46,7 @@
 
 	<console-modules>
 		<console-module name="chat"/>
+		<console-module name="chat-month-cost"/>
 	</console-modules>
 
 </plugin>

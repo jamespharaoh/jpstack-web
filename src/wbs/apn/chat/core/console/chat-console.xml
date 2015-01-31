@@ -112,6 +112,12 @@
 			<extension-point
 				name="chat.supervisor"/>
 
+			<context-link
+				name="report"
+				link="chatReport"
+				label="Reports"
+				priv-key="chat.manage"/>
+
 			<extension-point
 				name="chat.graphs"/>
 

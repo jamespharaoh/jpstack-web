@@ -298,21 +298,21 @@ class ChatUserSummaryPart
 				"<tr> <th>User messages</th> <td>%s (%h)</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getUserMessageCharge ()),
+					Long.valueOf(chatUser.getUserMessageCharge ())),
 				chatUser.getUserMessageCount ());
 
 			printFormat (
 				"<tr> <th>Monitor messages</th> <td>%s (%h)</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getMonitorMessageCharge ()),
+					Long.valueOf(chatUser.getMonitorMessageCharge ())),
 				chatUser.getMonitorMessageCount ());
 
 			printFormat (
 				"<tr> <th>Text profile</th> <td>%s (%h)</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getTextProfileCharge ()),
+					Long.valueOf(chatUser.getTextProfileCharge ())),
 				chatUser.getTextProfileCount ());
 
 			printFormat (
@@ -321,7 +321,7 @@ class ChatUserSummaryPart
 				"<td>%s (%h)</td>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getImageProfileCharge ()),
+					Long.valueOf(chatUser.getImageProfileCharge ())),
 				chatUser.getImageProfileCount (),
 				"</tr>\n");
 
@@ -329,7 +329,7 @@ class ChatUserSummaryPart
 				"<tr> <th>Video profile</th> <td>%s (%h)</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getVideoProfileCharge ()),
+					Long.valueOf(chatUser.getVideoProfileCharge ())),
 				chatUser.getVideoProfileCount ());
 
 			printFormat (
@@ -339,7 +339,7 @@ class ChatUserSummaryPart
 				"<td>%s (%h)</td>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getReceivedMessageCharge ()),
+					Long.valueOf(chatUser.getReceivedMessageCharge ())),
 				chatUser.getReceivedMessageCount (),
 
 				"</tr>\n");
@@ -355,7 +355,7 @@ class ChatUserSummaryPart
 					chatUserCharge.name,
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
-						chatUserCharge.charge),
+						Long.valueOf(chatUserCharge.charge)),
 					chatUserCharge.count,
 
 					"</tr>\n");
@@ -369,7 +369,7 @@ class ChatUserSummaryPart
 				"<td>%s</td>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getValueSinceEver ()),
+					Long.valueOf(chatUser.getValueSinceEver ())),
 
 				"</tr>\n");
 
@@ -387,7 +387,7 @@ class ChatUserSummaryPart
 					chatUserCharge.name,
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
-						chatUserCharge.charge),
+						Long.valueOf(chatUserCharge.charge)),
 					chatUserCharge.count);
 
 				total += chatUserCharge.charge;
@@ -397,7 +397,7 @@ class ChatUserSummaryPart
 				"<tr> <th>Grand total</th> <td>%s</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					total));
+					Long.valueOf(total)));
 
 			printFormat (
 				"<tr class=\"sep\">\n");
@@ -406,7 +406,7 @@ class ChatUserSummaryPart
 				"<tr> <th>Credit</th> <td>%s</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCredit ()));
+					Long.valueOf(chatUser.getCredit ())));
 
 			printFormat (
 				"<tr> <th>Credit mode</th> <td>%h</td> </tr>\n",
@@ -425,32 +425,32 @@ class ChatUserSummaryPart
 				"<td>%s</td>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditPendingStrict ()),
+					Long.valueOf(chatUser.getCreditPendingStrict ())),
 				"</tr>\n");
 
 			printFormat (
 				"<tr> <th>Credit success</th> <td>%s</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditSuccess ()));
+					Long.valueOf(chatUser.getCreditSuccess ())));
 
 			printFormat (
 				"<tr> <th>Credit awaiting retry</th> <td>%s</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditRevoked ()));
+					Long.valueOf(chatUser.getCreditRevoked ())));
 
 			printFormat (
 				"<tr> <th>Free usage</th> <td>%s</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditAdded ()));
+					Long.valueOf(chatUser.getCreditAdded ())));
 
 			printFormat (
 				"<tr> <th>Credit bought/given</th> <td>%s</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditBought ()));
+					Long.valueOf(chatUser.getCreditBought ())));
 
 			printFormat (
 				"<tr>\n",
@@ -465,14 +465,14 @@ class ChatUserSummaryPart
 						"%s (%s)",
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
-							charges.getCreditLimit ()),
+							Long.valueOf(charges.getCreditLimit ())),
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
-							chatUser.getCreditLimit ()))
+							Long.valueOf(chatUser.getCreditLimit ())))
 
 					: currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
-						chatUser.getCreditLimit ()),
+						Long.valueOf(chatUser.getCreditLimit ())),
 
 				"</tr>\n");
 
@@ -485,7 +485,7 @@ class ChatUserSummaryPart
 				"<td>%s</td>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					chatUser.getCreditDailyAmount ()),
+					Long.valueOf(chatUser.getCreditDailyAmount ())),
 				"<tr>\n");
 
 			printFormat (

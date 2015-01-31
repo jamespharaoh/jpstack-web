@@ -88,7 +88,7 @@ class ChatUserAdminCreditPart
 			"<td>%s</td>\n",
 			currencyLogic.formatHtml (
 				chatUser.getChat ().getCurrency (),
-				chatUser.getCredit ()),
+				Long.valueOf(chatUser.getCredit ())),
 			"</tr>\n");
 
 		printFormat (
@@ -190,12 +190,12 @@ class ChatUserAdminCreditPart
 					"<td>%s</td>\n",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
-						chatUserCredit.getCreditAmount ()),
+						Long.valueOf(chatUserCredit.getCreditAmount ())),
 
 					"<td>%s</td>\n",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
-						chatUserCredit.getBillAmount ()),
+						Long.valueOf(chatUserCredit.getBillAmount ())),
 
 					"<td>%h</td>\n",
 					 chatUserCredit.getDetails (),

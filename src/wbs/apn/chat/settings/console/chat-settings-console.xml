@@ -49,9 +49,21 @@
 				priv-key="chat.manage"/>
 
 			<context-link
+				name="route"
+				link="chatRoute"
+				label="Routes"
+				priv-key="chat.manage"/>
+
+			<context-link
 				name="keyword"
 				link="chatKeyword"
 				label="Keywords"
+				priv-key="chat.manage"/>
+
+			<context-link
+				name="monthCost"
+				link="chatMonthCost"
+				label="StaffCost"
 				priv-key="chat.manage"/>
 
 			<context-tab-action-page

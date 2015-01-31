@@ -1,0 +1,154 @@
+<console-module
+	name="chat-route">
+
+	<console-helper-provider
+		object-name="chatRoute"
+		view-delegate-field="chat"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="chatRouteName"
+			delegate="route"
+			field="name"/>
+
+		<context-stuff
+			name="chatId"
+			delegate="chat"
+			field="id"/>
+
+		<priv-key
+			name="chatRoute.manage"
+			delegate="chat"
+			priv="manage"/>
+
+		<run-post-processor
+			name="chat"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="chatRoute"
+		object-name="chatRoute">
+
+		<list>
+
+	`		<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<context-link
+				name="network"
+				link="chatRouteNetwork"
+				label="Networks"
+				priv-key="chat.manage"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="chatRoute">
+
+		<object-field
+			name="route"
+			finder="route"/>
+
+		<integer-field
+			name="mmsCost"/>
+
+		<integer-field
+			name="smsCost"/>
+
+		<integer-field
+			name="inRev"/>
+
+		<integer-field
+			name="outRev"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="chatRoute">
+
+		<object-field
+			name="route"
+			finder="route"/>
+
+		<integer-field
+			name="mmsCost"/>
+
+		<integer-field
+			name="smsCost"/>
+
+		<integer-field
+			name="inRev"/>
+
+		<integer-field
+			name="outRev"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="chatRoute">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="route"
+			finder="route"/>
+
+		<integer-field
+			name="mmsCost"/>
+
+		<integer-field
+			name="smsCost"/>
+
+		<integer-field
+			name="inRev"/>
+
+		<integer-field
+			name="outRev"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="chatRoute">
+
+		<id-field/>
+
+		<object-field
+			name="route"
+			finder="route"/>
+
+		<integer-field
+			name="mmsCost"/>
+
+		<integer-field
+			name="smsCost"/>
+
+		<integer-field
+			name="inRev"/>
+
+		<integer-field
+			name="outRev"/>
+
+	</field-set>
+
+</console-module>

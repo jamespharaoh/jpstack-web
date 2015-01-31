@@ -1,0 +1,121 @@
+<console-module
+	name="chat-route-network">
+
+	<console-helper-provider
+		object-name="chatRouteNetwork"
+		view-delegate-field="chatRoute.chat"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="chatRouteNetworkName"
+			delegate="network"
+			field="name"/>
+
+		<context-stuff
+			name="chatRouteId"
+			delegate="chatRoute"
+			field="id"/>
+
+		<priv-key
+			name="chatRouteNetwork.manage"
+			delegate="chatRoute.chat"
+			priv="manage"/>
+
+		<run-post-processor
+			name="chatRoute"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="chatRouteNetwork"
+		object-name="chatRouteNetwork">
+
+		<list>
+
+	`		<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"
+				create-priv-delegate="parent"
+				create-priv-code="manage"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="chatRouteNetwork">
+
+		<object-field
+			name="chatRoute"
+			finder="chatRoute"/>
+
+		<object-field
+			name="network"
+			finder="network"/>
+
+		<integer-field
+			name="outRev"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="chatRouteNetwork">
+
+		<parent-field/>
+
+		<object-field
+			name="network"
+			finder="network"/>
+
+		<integer-field
+			name="outRev"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="chatRouteNetwork">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="network"
+			finder="network"/>
+
+		<integer-field
+			name="outRev"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="chatRouteNetwork">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="network"
+			finder="network"/>
+
+		<integer-field
+			name="outRev"/>
+
+	</field-set>
+
+</console-module>

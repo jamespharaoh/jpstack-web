@@ -28,8 +28,8 @@ class IndexFormFieldBuilder {
 	readOnlyFormFieldProvider;
 
 	@Inject
-	Provider<IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	Provider<IntegerFormFieldNativeMapping>
+	integerFormFieldNativeMappingProvider;
 
 	@Inject
 	Provider<IntegerFormFieldInterfaceMapping>
@@ -88,7 +88,7 @@ class IndexFormFieldBuilder {
 		// native mapping
 
 		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+			integerFormFieldNativeMappingProvider.get ();
 
 		// interface mapping
 
