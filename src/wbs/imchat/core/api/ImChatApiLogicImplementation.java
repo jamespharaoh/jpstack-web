@@ -42,12 +42,12 @@ class ImChatApiLogicImplementation
 			.price (
 				currencyLogic.formatText (
 					imChat.getCurrency (),
-					pricePoint.getPrice ()))
+					(long) pricePoint.getPrice ()))
 
 			.value (
 				currencyLogic.formatText (
 					imChat.getCurrency (),
-					pricePoint.getValue ()));
+					(long) pricePoint.getValue ()));
 
 	}
 

@@ -765,10 +765,22 @@ class ConsoleObjectManagerImpl
 	@Override
 	public
 	String objectPathMini (
-			Record<?> dataObject) {
+			Record<?> object) {
 
 		return objectManager.objectPathMini (
-			dataObject);
+			object);
+
+	}
+
+	@Override
+	public
+	String objectPathMini (
+			Record<?> object,
+			Record<?> root) {
+
+		return objectManager.objectPathMini (
+			object,
+			root);
 
 	}
 

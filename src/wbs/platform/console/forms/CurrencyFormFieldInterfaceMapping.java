@@ -17,7 +17,7 @@ import wbs.platform.currency.model.CurrencyRec;
 @PrototypeComponent ("currencyFormFieldInterfaceMapping")
 public
 class CurrencyFormFieldInterfaceMapping<Container extends Record<?>>
-	implements FormFieldInterfaceMapping<Container,Integer,String> {
+	implements FormFieldInterfaceMapping<Container,Long,String> {
 
 	// dependencies
 
@@ -36,7 +36,7 @@ class CurrencyFormFieldInterfaceMapping<Container extends Record<?>>
 
 	@Override
 	public
-	Integer interfaceToGeneric (
+	Long interfaceToGeneric (
 			Container container,
 			String interfaceValue,
 			List<String> errors) {
@@ -62,7 +62,7 @@ class CurrencyFormFieldInterfaceMapping<Container extends Record<?>>
 
 		} else {
 
-			return Integer.parseInt (
+			return Long.parseLong (
 				interfaceValue);
 
 		}
@@ -73,7 +73,7 @@ class CurrencyFormFieldInterfaceMapping<Container extends Record<?>>
 	public
 	String genericToInterface (
 			Container container,
-			Integer genericValue) {
+			Long genericValue) {
 
 		if (genericValue == null)
 			return null;
@@ -93,7 +93,7 @@ class CurrencyFormFieldInterfaceMapping<Container extends Record<?>>
 
 		} else {
 
-			return Integer.toString (
+			return Long.toString (
 				genericValue);
 
 		}

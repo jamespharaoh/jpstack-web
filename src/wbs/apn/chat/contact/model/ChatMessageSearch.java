@@ -23,6 +23,8 @@ class ChatMessageSearch {
 	Instant timestampAfter;
 	Instant timestampBefore;
 
+	Boolean hasSender;
+
 	Integer idGreaterThan;
 
 	Integer deliveryId;

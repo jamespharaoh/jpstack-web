@@ -499,7 +499,7 @@ class ManualResponderRequestPendingFormResponder
 				route.getOutCharge () > 0
 					? currencyLogic.formatText (
 						route.getCurrency (),
-						route.getOutCharge ())
+						Long.valueOf(route.getOutCharge ()))
 					: "-");
 
 			if (

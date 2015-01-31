@@ -103,12 +103,12 @@ class ChatAffiliateRec
 
 	// dao methods
 
-	public static
-	interface ChatAffiliateDaoMethods {
+		public static
+		interface ChatAffiliateDaoMethods {
 
-		List<ChatAffiliateRec> find (
-				ChatRec chat);
+			List<ChatAffiliateRec> find (
+					ChatRec chat);
 
-	}
+		}
 
 }

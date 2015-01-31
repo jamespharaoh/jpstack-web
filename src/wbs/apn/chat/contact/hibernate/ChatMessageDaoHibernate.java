@@ -205,7 +205,7 @@ class ChatMessageDaoHibernate
 	List<ChatMessageRec> search (
 			ChatMessageSearch search) {
 
-		Criteria crit =
+		Criteria criteria =
 			createCriteria (ChatMessageRec.class)
 				.createAlias ("chat", "_chat")
 				.createAlias ("fromUser", "_fromUser")
@@ -214,7 +214,7 @@ class ChatMessageDaoHibernate
 
 		if (search.chatId () != null) {
 
-			crit.add (
+			criteria.add (
 				Restrictions.eq (
 					"_chat.id",
 					search.chatId ()));
@@ -223,7 +223,7 @@ class ChatMessageDaoHibernate
 
 		if (search.fromUserId () != null) {
 
-			crit.add (
+			criteria.add (
 				Restrictions.eq (
 					"_fromUser.id",
 					search.fromUserId ()));
@@ -232,7 +232,7 @@ class ChatMessageDaoHibernate
 
 		if (search.toUserId () != null) {
 
-			crit.add (
+			criteria.add (
 				Restrictions.eq (
 					"_toUser.id",
 					search.toUserId ()));
@@ -241,7 +241,7 @@ class ChatMessageDaoHibernate
 
 		if (search.originalTextId () != null) {
 
-			crit.add (
+			criteria.add (
 				Restrictions.eq (
 					"_originalText.id",
 					search.originalTextId ()));
@@ -250,7 +250,7 @@ class ChatMessageDaoHibernate
 
 		if (search.timestampAfter () != null) {
 
-			crit.add (
+			criteria.add (
 				Restrictions.ge (
 					"timestamp",
 					search.timestampAfter ().toDate ()));
@@ -259,16 +259,34 @@ class ChatMessageDaoHibernate
 
 		if (search.timestampBefore () != null) {
 
-			crit.add (
+			criteria.add (
 				Restrictions.lt (
 					"timestamp",
 					search.timestampBefore ().toDate ()));
 
 		}
 
+		if (search.hasSender () != null) {
+
+			if (search.hasSender ()) {
+
+				criteria.add (
+					Restrictions.isNotNull (
+						"sender.id"));
+
+			} else {
+
+				criteria.add (
+					Restrictions.isNull (
+						"sender.id"));
+
+			}
+
+		}
+
 		if (search.idGreaterThan () != null) {
 
-			crit.add (
+			criteria.add (
 				Restrictions.gt (
 					"id",
 					search.idGreaterThan ()));
@@ -277,7 +295,7 @@ class ChatMessageDaoHibernate
 
 		if (search.deliveryId () != null) {
 
-			crit.add (
+			criteria.add (
 				Restrictions.eq (
 					"deliveryId",
 					search.deliveryId ()));
@@ -286,7 +304,7 @@ class ChatMessageDaoHibernate
 
 		if (search.deliveryIdGreaterThan () != null) {
 
-			crit.add (
+			criteria.add (
 				Restrictions.gt (
 					"deliveryId",
 					search.deliveryIdGreaterThan ()));
@@ -295,17 +313,19 @@ class ChatMessageDaoHibernate
 
 		if (search.method () != null) {
 
-			crit.add (
+			criteria.add (
 				Restrictions.eq (
 					"method",
 					search.method ()));
 
 		}
 
-		if (search.statusIn () != null
-				&& ! search.statusIn ().isEmpty ()) {
+		if (
+			search.statusIn () != null
+			&& ! search.statusIn ().isEmpty ()
+		) {
 
-			crit.add (
+			criteria.add (
 				Restrictions.in (
 					"status",
 					search.statusIn ()));
@@ -318,7 +338,7 @@ class ChatMessageDaoHibernate
 
 			case deliveryId:
 
-				crit.addOrder (
+				criteria.addOrder (
 					Order.asc ("deliveryId"));
 
 				break;
@@ -329,7 +349,7 @@ class ChatMessageDaoHibernate
 
 		return findMany (
 			ChatMessageRec.class,
-			crit.list ());
+			criteria.list ());
 
 	}
 

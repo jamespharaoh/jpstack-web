@@ -13,21 +13,21 @@ import wbs.framework.application.annotations.PrototypeComponent;
 @PrototypeComponent ("integerFormFieldValueValidator")
 public
 class IntegerFormFieldValueValidator
-	implements FormFieldValueValidator<Integer> {
+	implements FormFieldValueValidator<Long> {
 
 	@Getter @Setter
 	String label;
 
 	@Getter @Setter
-	Integer minimum;
+	Long minimum;
 
 	@Getter @Setter
-	Integer maximum;
+	Long maximum;
 
 	@Override
 	public
 	void validate (
-			Integer genericValue,
+			Long genericValue,
 			List<String> errors) {
 
 		if (genericValue == null)

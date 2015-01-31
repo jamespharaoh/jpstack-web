@@ -169,6 +169,20 @@ class ObjectManagerImpl
 
 	@Override
 	public
+	String objectPathMini (
+			Record<?> object,
+			Record<?> root) {
+
+		return objectPath (
+			object,
+			root,
+			true,
+			false);
+
+	}
+
+	@Override
+	public
 	String objectPath (
 			Record<?> dataObject,
 			Record<?> root) {

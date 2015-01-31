@@ -75,6 +75,25 @@ class ManualResponderFixtureProvider
 			.setPath (
 				"/manualResponders"));
 
+
+
+			menuHelper.insert (
+					new MenuRec ()
+
+					.setMenuGroup (
+							facilityMenuGroup)
+
+					.setCode (
+						"chat")
+
+					.setLabel (
+						"Chat")
+
+					.setPath (
+						"/chats")
+
+				);
+
 		ManualResponderRec manualResponder =
 			manualResponderHelper.insert (
 				new ManualResponderRec ()

@@ -1,0 +1,123 @@
+<console-module
+	name="chat-month-cost">
+
+	<console-helper-provider
+		object-name="chatMonthCost"
+		view-delegate-field="chat"
+		view-delegate-priv-code="manage"
+		id-key="id">
+
+		 <context-stuff
+			name="chatId"
+			delegate="chat"
+			field="id"/>
+
+		<context-stuff
+			name="chatMonthCostName"
+			field="id"/>
+
+		<priv-key
+			name="chatMonthCost.manage"
+			delegate="chat"
+			priv="manage"/>
+
+		<run-post-processor
+			name="chat"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="chatMonthCost"
+		object-name="chatMonthCost">
+
+		<list>
+
+	`		<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="chatMonthCost">
+
+		<object-field
+			name="chat"
+			finder="chat"/>
+
+		<code-field
+		    name="yearMonth"
+			pattern="^\d{4}-\d{2}$"/>
+
+		<integer-field
+			name="staffCost"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="chatMonthCost">
+
+		<object-field
+			name="chat"
+			finder="chat"/>
+
+		<code-field
+		    name="yearMonth"
+			pattern="^\d{4}-\d{2}$"/>
+
+		<integer-field
+			name="staffCost"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="chatMonthCost">
+
+		<object-field
+			name="chat"
+			finder="chat"/>
+
+		<code-field
+		    name="yearMonth"
+			pattern="^\d{4}-\d{2}$"/>
+
+		<integer-field
+			name="staffCost"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="chatMonthCost">
+
+		<object-field
+			name="chat"
+			finder="chat"/>
+
+		<code-field
+		    name="yearMonth"
+			pattern="^\d{4}-\d{2}$"/>
+
+		<integer-field
+			name="staffCost"/>
+
+	</field-set>
+
+</console-module>

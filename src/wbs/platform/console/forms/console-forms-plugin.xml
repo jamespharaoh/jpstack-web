@@ -35,6 +35,7 @@
 		<bean class="IndexFormFieldSpec"/>
 		<bean class="IntegerFormFieldBuilder"/>
 		<bean class="IntegerFormFieldInterfaceMapping"/>
+		<bean class="IntegerFormFieldNativeMapping"/>
 		<bean class="IntegerFormFieldSpec"/>
 		<bean class="IntegerFormFieldValueValidator"/>
 		<bean class="NameFormFieldAccessor"/>

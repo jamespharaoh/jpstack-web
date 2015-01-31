@@ -45,8 +45,10 @@
 		<text-field
 			name="command"/>
 
+		<!--
 		<integer-field
 			name="frequency"/>
+		-->
 
 		<integer-field
 			name="sequence"/>

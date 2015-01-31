@@ -2,6 +2,7 @@ package wbs.apn.chat.core.model;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -15,6 +16,7 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.apn.chat.ad.model.ChatAdTemplateRec;
+import wbs.apn.chat.bill.model.ChatRouteRec;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.apn.chat.keyword.model.ChatKeywordRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
@@ -257,6 +259,11 @@ class ChatRec
 		index = "code")
 	Map<String,ChatProfileFieldRec> profileFields =
 		new TreeMap<String,ChatProfileFieldRec> ();
+
+	@CollectionField (
+		index = "route_id")
+	Map<Integer,ChatRouteRec> chatRoutes =
+		new LinkedHashMap<Integer,ChatRouteRec> ();
 
 	// compare to
 

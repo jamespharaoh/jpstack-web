@@ -350,12 +350,12 @@ class BeanLogic {
 			Class<?> objectClass,
 			String propertyName) {
 
-		Method setter =
-			getPropertySetter (
+		Method getter =
+			getPropertyGetter (
 				objectClass,
 				propertyName);
 
-		return setter.getParameterTypes () [0];
+		return getter.getReturnType ();
 
 	}
 

@@ -509,12 +509,12 @@ class ManualResponderRequestPendingSummaryPart
 				"<td>%s</td>\n",
 				currencyLogic.formatHtml (
 					manualResponder.getCurrency (),
-					routeBillInfo.total ()),
+					Long.valueOf(routeBillInfo.total ())),
 
 				"<td>%s</td>\n",
 				currencyLogic.formatHtml (
 					manualResponder.getCurrency (),
-					routeBillInfo.thisService ()),
+					Long.valueOf(routeBillInfo.thisService ())),
 
 				"</tr>\n");
 

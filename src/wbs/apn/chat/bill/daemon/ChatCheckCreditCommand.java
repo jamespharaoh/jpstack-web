@@ -156,7 +156,7 @@ class ChatCheckCreditCommand
 		String creditString =
 			currencyLogic.formatText (
 				chat.getCurrency (),
-				chatUser.getCredit ());
+				Long.valueOf(chatUser.getCredit ()));
 
 		chatSendLogic.sendSystemRbFree (
 			chatUser,

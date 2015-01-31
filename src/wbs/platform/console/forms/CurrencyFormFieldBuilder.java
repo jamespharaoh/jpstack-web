@@ -3,6 +3,7 @@ package wbs.platform.console.forms;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -13,6 +14,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.utils.etc.BeanLogic;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -50,6 +52,14 @@ class CurrencyFormFieldBuilder {
 	@Inject
 	Provider<SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
+
+	@Inject
+	Provider<IntegerFormFieldInterfaceMapping>
+	integerFormFieldInterfaceMappingProvider;
+
+	@Inject
+	Provider<IntegerFormFieldNativeMapping>
+	integerFormFieldNativeMappingProvider;
 
 	@Inject
 	Provider<CurrencyFormFieldInterfaceMapping>
@@ -92,15 +102,20 @@ class CurrencyFormFieldBuilder {
 				spec.readOnly (),
 				false);
 
-		Integer minimum =
+		Long minimum =
 			ifNull (
 				spec.minimum (),
-				Integer.MIN_VALUE);
+				Long.MIN_VALUE);
 
-		Integer maximum =
+		Long maximum =
 			ifNull (
 				spec.maximum (),
-				Integer.MAX_VALUE);
+				Long.MAX_VALUE);
+
+		Class<?> propertyClass =
+				BeanLogic.propertyClass (
+					context.containerClass (),
+					name);
 
 		// accessor
 
@@ -111,12 +126,33 @@ class CurrencyFormFieldBuilder {
 				name)
 
 			.nativeClass (
-				Integer.class);
+				propertyClass);
 
 		// native mapping
 
-		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+		FormFieldNativeMapping nativeMapping ;
+
+
+		if (propertyClass == Integer.class) {
+
+			nativeMapping =
+				integerFormFieldNativeMappingProvider.get ();
+
+		} else if (propertyClass == Long.class) {
+
+			nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
+
+		} else {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Don't know how to map %s as integer for %s.%s",
+					propertyClass,
+					context.containerClass (),
+					name));
+
+		}
 
 		// value validator
 

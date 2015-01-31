@@ -677,6 +677,13 @@ class DataFromXml {
 					field.getName (),
 					Integer.parseInt (attributeValue));
 
+			} else if (field.getType () == Long.class) {
+
+				BeanLogic.set (
+					object,
+					field.getName (),
+					Long.parseLong (attributeValue));
+
 			} else if (field.getType () == Boolean.class) {
 
 				BeanLogic.set (
@@ -701,8 +708,11 @@ class DataFromXml {
 
 				throw new RuntimeException (
 					stringFormat (
-						"Don't know how to map attribute to %s",
-						field.getType ().getName ()));
+						"Don't know how to map attribute to %s ",
+						field.getType ().getName (),
+						"at %s.%s",
+						object.getClass ().getSimpleName (),
+						field.getName ()));
 
 			}
 

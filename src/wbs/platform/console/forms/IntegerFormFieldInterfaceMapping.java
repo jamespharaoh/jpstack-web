@@ -7,11 +7,11 @@ import wbs.framework.application.annotations.PrototypeComponent;
 @PrototypeComponent ("integerFormFieldInterfaceMapping")
 public
 class IntegerFormFieldInterfaceMapping<Container>
-	implements FormFieldInterfaceMapping<Container,Integer,String> {
+	implements FormFieldInterfaceMapping<Container,Long,String> {
 
 	@Override
 	public
-	Integer interfaceToGeneric (
+	Long interfaceToGeneric (
 			Container container,
 			String interfaceValue,
 			List<String> errors) {
@@ -22,7 +22,7 @@ class IntegerFormFieldInterfaceMapping<Container>
 		if (interfaceValue.isEmpty ())
 			return null;
 
-		return Integer.parseInt (
+		return Long.parseLong (
 			interfaceValue);
 
 	}
@@ -31,12 +31,12 @@ class IntegerFormFieldInterfaceMapping<Container>
 	public
 	String genericToInterface (
 			Container container,
-			Integer genericValue) {
+			Long genericValue) {
 
 		if (genericValue == null)
 			return null;
 
-		return Integer.toString (
+		return Long.toString (
 			genericValue);
 
 	}
