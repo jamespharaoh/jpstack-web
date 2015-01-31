@@ -19,7 +19,7 @@ class CurrencyLogicImpl
 	public
 	String formatText (
 			@NonNull CurrencyRec currency,
-			int amount) {
+			Long amount) {
 
 		StringBuilder stringBuilder =
 			new StringBuilder ();
@@ -35,7 +35,7 @@ class CurrencyLogicImpl
 
 		if (currency.getDivisions () == 100) {
 
-			int remainder =
+			Long remainder =
 				Math.abs (amount % 100);
 
 			if (remainder == 0) {
@@ -75,7 +75,7 @@ class CurrencyLogicImpl
 	public
 	String formatHtml (
 			@NonNull CurrencyRec currency,
-			int amountRaw) {
+			Long amountRaw) {
 
 		String amountString =
 			formatText (
@@ -98,7 +98,7 @@ class CurrencyLogicImpl
 	public
 	String formatHtmlTd (
 			@NonNull CurrencyRec currency,
-			int credit) {
+			Long credit) {
 
 		return stringFormat (
 			"<td style=\"text-align: right\">%s</td>",
@@ -110,7 +110,7 @@ class CurrencyLogicImpl
 
 	@Override
 	public
-	int parseText (
+	Long parseText (
 			CurrencyRec currency,
 			String text) {
 
@@ -166,12 +166,12 @@ class CurrencyLogicImpl
 
 		// return the result
 
-		int units =
-			Integer.parseInt (
+		Long units =
+			Long.parseLong (
 				matcher.group (1));
 
-		int subDivisions =
-			Integer.parseInt (
+		Long subDivisions =
+			Long.parseLong (
 				matcher.group (2));
 
 		return

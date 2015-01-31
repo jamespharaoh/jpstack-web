@@ -26,8 +26,8 @@ class IdFormFieldBuilder {
 	readOnlyFormFieldProvider;
 
 	@Inject
-	Provider<IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	Provider<IntegerFormFieldNativeMapping>
+	integerFormFieldNativeMappingProvider;
 
 	@Inject
 	Provider<SimpleFormFieldAccessor>
@@ -83,7 +83,7 @@ class IdFormFieldBuilder {
 		// native mapping
 
 		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+			integerFormFieldNativeMappingProvider.get ();
 
 		// interface mapping
 
