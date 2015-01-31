@@ -64,3 +64,7 @@ SELECT priv_type_insert (
 	'View phone numbers',
 	'View phone numbers for this manual responder',
 	true);
+
+SELECT delivery_type_insert (
+	'manual_responder',
+	'default');

@@ -3,7 +3,6 @@ package wbs.smsapps.manualresponder.console;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -30,7 +29,6 @@ import wbs.sms.command.model.CommandRec;
 import wbs.sms.gsm.Gsm;
 import wbs.sms.gsm.MessageSplitter;
 import wbs.sms.keyword.logic.KeywordLogic;
-import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.smsapps.manualresponder.logic.ManualResponderLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
@@ -386,15 +384,36 @@ class ManualResponderRequestPendingFormAction
 
 		}
 
+		// create reply
+
+		ManualResponderReplyRec reply =
+			manualResponderReplyHelper.insert (
+				new ManualResponderReplyRec ()
+
+			.setManualResponderRequest (
+				request)
+
+			.setUser (
+				myUser)
+
+			.setText (
+				messageText)
+
+			.setTimestamp (
+				transaction.now ().toDate ())
+
+		);
+
 		// send messages
 
-		List<MessageRec> messages =
-			new ArrayList<MessageRec> ();
+		boolean first = true;
 
-		for (String messagePart
-				: messageParts) {
+		for (
+			String messagePart
+				: messageParts
+		) {
 
-			messages.add (
+			reply.getMessages ().add (
 				messageSender.get ()
 
 				.threadId (
@@ -419,33 +438,23 @@ class ManualResponderRequestPendingFormAction
 				.user (
 					myUser)
 
+				.deliveryTypeCode (
+					"manual_responder")
+
+				.ref (
+					reply.getId ())
+
+				.sendNow (
+					first
+					|| ! template.getSequenceParts ())
+
 				.send ()
 
 			);
 
+			first = false;
+
 		}
-
-		// create reply
-
-		manualResponderReplyHelper.insert (
-			new ManualResponderReplyRec ()
-
-			.setManualResponderRequest (
-				request)
-
-			.setUser (
-				myUser)
-
-			.setText (
-				messageText)
-
-			.setTimestamp (
-				transaction.now ().toDate ())
-
-			.setMessages (
-				messages)
-
-		);
 
 		if (manualResponder.getCanSendMultiple ()) {
 

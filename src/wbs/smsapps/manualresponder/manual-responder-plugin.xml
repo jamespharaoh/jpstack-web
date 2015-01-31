@@ -38,6 +38,7 @@
 
 	<layer name="daemon">
 		<bean class="daemon.ManualResponderCommand"/>
+		<bean class="daemon.ManualResponderDelivery"/>
 	</layer>
 
 	<layer name="logic">
@@ -46,7 +47,6 @@
 
 	<fixtures>
 		<fixture name="manualResponder"/>
-		<fixture name="manualResponderReport"/>
 	</fixtures>
 
 	<console-modules>

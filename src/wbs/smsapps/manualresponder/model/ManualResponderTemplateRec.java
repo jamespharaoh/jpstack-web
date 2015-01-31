@@ -79,6 +79,9 @@ class ManualResponderTemplateRec
 	Boolean splitLong = false;
 
 	@SimpleField
+	Boolean sequenceParts = false;
+
+	@SimpleField
 	Boolean applyTemplates = false;
 
 	@SimpleField (
