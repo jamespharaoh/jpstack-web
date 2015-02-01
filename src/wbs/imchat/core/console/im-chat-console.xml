@@ -99,6 +99,13 @@
 		<description-field/>
 		<deleted-field/>
 
+		<object-field
+			name="currency"
+			finder="currency"/>
+
+		<seconds-field
+			name="preferredQueueTime"/>
+
 	</field-set>
 
 	<field-set
@@ -109,6 +116,13 @@
 		<name-field/>
 		<description-field/>
 		<deleted-field/>
+
+		<object-field
+			name="currency"
+			finder="currency"/>
+
+		<seconds-field
+			name="preferredQueueTime"/>
 
 	</field-set>
 
