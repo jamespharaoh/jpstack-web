@@ -1,4 +1,3 @@
-
 SELECT priv_type_insert (
 	'manual_responder',
 	'manage',

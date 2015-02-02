@@ -32,10 +32,17 @@
 		<bean class="api.ImChatConversationStartAction"/>
 		<bean class="api.ImChatCustomerAction"/>
 		<bean class="api.ImChatCustomerCreateAction"/>
+		<bean class="api.ImChatMessageSendAction"/>
 		<bean class="api.ImChatSessionStartAction"/>
 		<bean class="api.ImChatPricePointListAction"/>
 		<bean class="api.ImChatProfileListAction"/>
 		<bean class="api.ImChatPurchaseMakeAction"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.ImChatQueueConsole"/>
+		<bean class="console.ImChatMessageReplyAction"/>
+		<bean class="console.ImChatMessageReplyResponder"/>
 	</layer>
 
 	<api-modules>

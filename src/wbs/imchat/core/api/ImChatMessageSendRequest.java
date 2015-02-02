@@ -9,7 +9,13 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass
 public
-class ImChatMessageCreateRequest {
+class ImChatMessageSendRequest {
+
+	@DataAttribute
+	String sessionSecret;
+
+	@DataAttribute
+	Long conversationId;
 
 	@DataAttribute
 	String messageText;
