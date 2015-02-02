@@ -29,6 +29,7 @@ import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
 import wbs.platform.queue.logic.QueueLogic;
+import wbs.platform.queue.model.QueueItemRec;
 
 @PrototypeComponent ("imChatMessageSendAction")
 public
@@ -168,14 +169,19 @@ class ImChatMessageSendAction
 
 		// create queue item
 
-		queueLogic.createQueueItem (
-			queueLogic.findQueue (
-				imChat,
-				"reply"),
-			conversation,
-			message,
-			customer.getCode (),
-			message.getMessageText ());
+		QueueItemRec queueItem =
+			queueLogic.createQueueItem (
+				queueLogic.findQueue (
+					imChat,
+					"reply"),
+				conversation,
+				message,
+				customer.getCode (),
+				message.getMessageText ());
+		
+		// add queue item to message
+		
+		message.setQueueItem(queueItem);
 
 		// create response
 

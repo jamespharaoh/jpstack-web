@@ -41,8 +41,8 @@
 
 	<layer name="console">
 		<bean class="console.ImChatQueueConsole"/>
-		<bean class="console.ImChatMessageReplyAction"/>
-		<bean class="console.ImChatMessageReplyResponder"/>
+		<bean class="console.ImChatMessagePendingFormAction"/>
+		<bean class="console.ImChatMessagePendingFormResponder"/>
 	</layer>
 
 	<api-modules>
@@ -54,6 +54,7 @@
 		<console-module name="im-chat-customer"/>
 		<console-module name="im-chat-conversation"/>
 		<console-module name="im-chat-message"/>
+		<console-module name="im-chat-message-pending"/>
 		<console-module name="im-chat-price-point"/>
 		<console-module name="im-chat-profile"/>
 		<console-module name="im-chat-session"/>
