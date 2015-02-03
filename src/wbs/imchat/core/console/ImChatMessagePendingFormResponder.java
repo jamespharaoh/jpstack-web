@@ -43,7 +43,30 @@ class ImChatMessagePendingFormResponder
 					"/imChatMessage.pending",
 					"/%u",
 					imChatMessage.getId (),
-					"/imChatMessage.pending.summary"));
+					"/imChatMessage.pending.history"));
+
+	}
+	
+	@Override
+	public
+	void goHeadStuff () {
+
+		super.goHeadStuff ();
+		
+		
+
+		printFormat (
+			"<script language=\"JavaScript\">\n");
+
+		
+		printFormat (
+			"top.show_inbox (true);\n",
+			"top.frames ['main'].location = 'about:blank';\n",
+			"window.setTimeout (function () { top.frames ['main'].location = '%j' }, 1);\n",
+			summaryUrl);
+
+		printFormat (
+			"</script>\n");
 
 	}
 

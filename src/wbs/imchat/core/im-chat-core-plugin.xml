@@ -32,7 +32,8 @@
 		<bean class="api.ImChatConversationStartAction"/>
 		<bean class="api.ImChatCustomerAction"/>
 		<bean class="api.ImChatCustomerCreateAction"/>
-		<bean class="api.ImChatMessageSendAction"/>
+		<bean class="api.ImChatMessageSendAction"/>		
+		<bean class="api.ImChatMessageListAction"/>
 		<bean class="api.ImChatSessionStartAction"/>
 		<bean class="api.ImChatPricePointListAction"/>
 		<bean class="api.ImChatProfileListAction"/>
@@ -43,6 +44,7 @@
 		<bean class="console.ImChatQueueConsole"/>
 		<bean class="console.ImChatMessagePendingFormAction"/>
 		<bean class="console.ImChatMessagePendingFormResponder"/>
+		<bean class="console.ImChatMessagePendingHistoryPart"/>
 	</layer>
 
 	<api-modules>
