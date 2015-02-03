@@ -319,6 +319,8 @@ class ImChatCoreFixtureProvider
 
 			.setMessageText (
 					"Text message.")
+					
+			.setQueueItem(null)
 
 		);
 
