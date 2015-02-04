@@ -1,6 +1,11 @@
 package wbs.imchat.core.console;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
+
+import com.google.common.collect.Lists;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.console.part.AbstractPagePart;
@@ -45,7 +50,16 @@ public class ImChatMessagePendingHistoryPart
 	void goBodyStuff () {
 		
 		
-		for (ImChatMessageRec message : imChatConversation.getImChatMessages()) {			
+		// retrieve messages
+
+		List<ImChatMessageRec> messages =
+			new ArrayList<ImChatMessageRec> (
+				imChatConversation.getImChatMessages());
+
+		Lists.reverse (
+			messages);
+		
+		for (ImChatMessageRec message : messages) {			
 			
 			printFormat (
 					"<p>%s</p>\n",

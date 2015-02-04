@@ -1,14 +1,16 @@
 package wbs.imchat.core.api;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+
+import com.google.common.collect.Lists;
 
 import lombok.Cleanup;
 import lombok.SneakyThrows;
@@ -116,9 +118,13 @@ class ImChatMessageListAction
 		
 		// retrieve messages
 
-		Set<ImChatMessageRec> messages =
-				imChatConversation.getImChatMessages();
+		List<ImChatMessageRec> messages =
+			new ArrayList<ImChatMessageRec> (
+				imChatConversation.getImChatMessages());
 
+		Lists.reverse (
+			messages);
+		
 		// create response
 
 		ImChatMessageListSuccess messageListSuccessResponse

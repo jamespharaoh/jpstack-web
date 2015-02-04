@@ -43,7 +43,8 @@ class ImChatConversationRec
 		counter = "numConversations")
 	Integer index;
 	
-	@CollectionField
+	@CollectionField (
+		orderBy = "index")
 	Set<ImChatMessageRec> imChatMessages =
 		new TreeSet<ImChatMessageRec> ();
 
