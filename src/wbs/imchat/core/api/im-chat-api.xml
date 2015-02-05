@@ -38,6 +38,10 @@
 		<resource name="message-list">
 			<post-action name="messageList"/>
 		</resource>
+		
+		<resource name="forgot-password">
+			<post-action name="forgotPassword"/>
+		</resource>
 
 	</variable>
 	</resource>
