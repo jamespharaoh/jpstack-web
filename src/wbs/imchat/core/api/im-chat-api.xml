@@ -42,6 +42,10 @@
 		<resource name="forgot-password">
 			<post-action name="forgotPassword"/>
 		</resource>
+		
+		<resource name="change-password">
+			<post-action name="changePassword"/>
+		</resource>
 
 	</variable>
 	</resource>

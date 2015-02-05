@@ -31,7 +31,6 @@ import wbs.imchat.core.model.ImChatCustomerObjectHelper;
 import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
 import wbs.imchat.core.model.ImChatRec;
-import wbs.imchat.core.model.ImChatSessionObjectHelper;
 
 @PrototypeComponent ("imChatForgotPasswordAction")
 public 
@@ -51,9 +50,6 @@ class ImChatForgotPasswordAction
 
 	@Inject
 	ImChatObjectHelper imChatHelper;
-
-	@Inject
-	ImChatSessionObjectHelper imChatSessionHelper;
 
 	@Inject
 	RequestContext requestContext;
