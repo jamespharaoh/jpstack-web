@@ -35,6 +35,7 @@
 		<bean class="api.ImChatMessageSendAction"/>		
 		<bean class="api.ImChatMessageListAction"/>
 		<bean class="api.ImChatSessionStartAction"/>
+		<bean class="api.ImChatSessionLoadAction"/>
 		<bean class="api.ImChatPricePointListAction"/>
 		<bean class="api.ImChatProfileListAction"/>
 		<bean class="api.ImChatPurchaseMakeAction"/>

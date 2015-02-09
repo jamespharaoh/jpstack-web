@@ -35,6 +35,10 @@
 			<post-action name="sessionStart"/>
 		</resource>
 		
+		<resource name="session-load">
+			<post-action name="sessionLoad"/>
+		</resource>
+		
 		<resource name="message-list">
 			<post-action name="messageList"/>
 		</resource>
