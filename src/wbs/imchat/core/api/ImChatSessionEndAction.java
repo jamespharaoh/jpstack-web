@@ -19,14 +19,12 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.imchat.core.model.ImChatCustomerObjectHelper;
-import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
 
-@PrototypeComponent ("imChatSessionLoadAction")
+@PrototypeComponent ("imChatSessionEndAction")
 public 
-class ImChatSessionLoadAction
+class ImChatSessionEndAction	
 	implements Action {
 	
 	// dependencies
@@ -36,9 +34,6 @@ class ImChatSessionLoadAction
 
 	@Inject
 	ImChatApiLogic imChatApiLogic;
-
-	@Inject
-	ImChatCustomerObjectHelper imChatCustomerHelper;
 
 	@Inject
 	ImChatSessionObjectHelper imChatSessionHelper;
@@ -68,9 +63,9 @@ class ImChatSessionLoadAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatSessionLoadRequest sessionLoadRequest =
+		ImChatSessionEndRequest sessionEndRequest =
 			dataFromJson.fromJson (
-				ImChatSessionLoadRequest.class,
+				ImChatSessionEndRequest.class,
 				jsonValue);
 
 		// begin transaction
@@ -83,7 +78,7 @@ class ImChatSessionLoadAction
 
 		ImChatSessionRec session =
 				imChatSessionHelper.findBySecret (
-						sessionLoadRequest.sessionSecret ());
+						sessionEndRequest.sessionSecret ());
 
 		if (
 			session == null
@@ -105,19 +100,14 @@ class ImChatSessionLoadAction
 
 		}
 
-		// get customer and conversation
-		
-		ImChatCustomerRec imChatCustomer =
-				session.getImChatCustomer();
+		// delete session
+
+		imChatSessionHelper.remove(session);
 		
 		// create response
 
-		ImChatSessionLoadSuccess successResponse =
-			new ImChatSessionLoadSuccess ()
-
-			.customer (
-				imChatApiLogic.customerData (
-					imChatCustomer));
+		ImChatSessionEndSuccess successResponse =
+			new ImChatSessionEndSuccess ();
 
 		// commit and return
 
