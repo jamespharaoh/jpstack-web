@@ -2,6 +2,8 @@ package wbs.imchat.core.model;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 
@@ -13,6 +15,7 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.framework.entity.annotations.CodeField;
+import wbs.framework.entity.annotations.CollectionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.ParentField;
@@ -48,6 +51,11 @@ class ImChatCustomerRec
 
 	@SimpleField
 	String password;
+
+	@CollectionField (
+			orderBy = "index")
+		Set<ImChatPurchaseRec> imChatPurchases =
+			new TreeSet<ImChatPurchaseRec> ();
 
 	// statistics
 

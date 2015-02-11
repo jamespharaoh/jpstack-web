@@ -318,7 +318,10 @@ class ImChatCoreFixtureProvider
 				imChatConversation.getNumMessages ())
 
 			.setMessageText (
-					"Text message.")
+				"Text message.")
+
+			.setQueueItem (
+				null)
 
 		);
 

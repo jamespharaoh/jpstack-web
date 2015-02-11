@@ -1,5 +1,8 @@
 package wbs.imchat.core.model;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -8,6 +11,7 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.Instant;
 
+import wbs.framework.entity.annotations.CollectionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.IndexField;
 import wbs.framework.entity.annotations.MajorEntity;
@@ -38,6 +42,11 @@ class ImChatConversationRec
 	@IndexField (
 		counter = "numConversations")
 	Integer index;
+
+	@CollectionField (
+		orderBy = "index")
+	Set<ImChatMessageRec> imChatMessages =
+		new TreeSet<ImChatMessageRec> ();
 
 	// statistics
 

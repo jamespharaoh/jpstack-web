@@ -33,16 +33,23 @@
 		<bean class="api.ImChatCustomerAction"/>
 		<bean class="api.ImChatCustomerCreateAction"/>
 		<bean class="api.ImChatMessageSendAction"/>
+		<bean class="api.ImChatMessageListAction"/>
 		<bean class="api.ImChatSessionStartAction"/>
+		<bean class="api.ImChatSessionLoadAction"/>
+		<bean class="api.ImChatSessionEndAction"/>
 		<bean class="api.ImChatPricePointListAction"/>
 		<bean class="api.ImChatProfileListAction"/>
 		<bean class="api.ImChatPurchaseMakeAction"/>
+		<bean class="api.ImChatPurchaseHistoryAction"/>
+		<bean class="api.ImChatForgotPasswordAction"/>
+		<bean class="api.ImChatChangePasswordAction"/>
 	</layer>
 
 	<layer name="console">
 		<bean class="console.ImChatQueueConsole"/>
-		<bean class="console.ImChatMessageReplyAction"/>
-		<bean class="console.ImChatMessageReplyResponder"/>
+		<bean class="console.ImChatMessagePendingFormAction"/>
+		<bean class="console.ImChatMessagePendingFormResponder"/>
+		<bean class="console.ImChatMessagePendingHistoryPart"/>
 	</layer>
 
 	<api-modules>
@@ -54,6 +61,7 @@
 		<console-module name="im-chat-customer"/>
 		<console-module name="im-chat-conversation"/>
 		<console-module name="im-chat-message"/>
+		<console-module name="im-chat-message-pending"/>
 		<console-module name="im-chat-price-point"/>
 		<console-module name="im-chat-profile"/>
 		<console-module name="im-chat-session"/>

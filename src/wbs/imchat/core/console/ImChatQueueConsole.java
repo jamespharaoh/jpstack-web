@@ -40,7 +40,7 @@ class ImChatQueueConsole
 
 		ConsoleContext targetContext =
 			consoleManager.context (
-				"imChatMessage",
+				"imChatMessage.pending",
 				true);
 
 		consoleManager.changeContext (
@@ -48,7 +48,7 @@ class ImChatQueueConsole
 			"/" + queueItem.getRefObjectId ());
 
 		return responder (
-			"imChatMessageReplyResponder"
+			"imChatMessagePendingFormResponder"
 		).get ();
 
 	}

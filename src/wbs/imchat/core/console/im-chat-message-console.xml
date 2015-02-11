@@ -40,9 +40,6 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<context-action-page
-				name="reply"/>
-
 			<object-settings-page
 				fields="settings"
 				priv-key="imChatConversation.imChatCustomer.imChat.manage"/>
@@ -70,6 +67,9 @@
 		<text-field
 			name="messageText"
 			nullable="yes"/>
+
+		<yes-no-field
+			name="pending"/>
 
 	</field-set>
 
