@@ -122,17 +122,15 @@ class ImChatForgotPasswordAction
 
 		// generate new password
 
-		String newPassword = generateRandomString();
+		String newPassword =
+			generatePassword (12);
 
 		// update customer password
 
-		imChatCustomerHelper.insert (
-			imChatcustomer
+		imChatcustomer
 
 			.setPassword (
-				newPassword)
-
-		);
+				newPassword);
 
 		// send new password via mail
 
@@ -168,15 +166,24 @@ class ImChatForgotPasswordAction
 
 	}
 
-	protected String generateRandomString() {
-        String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        StringBuilder pass = new StringBuilder();
-        while (pass.length() < 18) {
-            int index = (int) (random.nextFloat() * chars.length());
-            pass.append(chars.charAt(index));
+	String generatePassword (
+			int length) {
+
+        String chars = "abcdefghijklmnopqrstuvwxyz";
+
+        StringBuilder stringBuilder =
+        	new StringBuilder ();
+
+		for (int i = 0; i < length; i ++) {
+
+            stringBuilder.append (
+            	chars.charAt (
+            		random.nextInt (
+            			chars.length ())));
+
         }
-        String password = pass.toString();
-        return password;
+
+        return stringBuilder.toString ();
 
     }
 

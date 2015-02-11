@@ -77,8 +77,8 @@ class ImChatSessionEndAction
 		// lookup session
 
 		ImChatSessionRec session =
-				imChatSessionHelper.findBySecret (
-						sessionEndRequest.sessionSecret ());
+			imChatSessionHelper.findBySecret (
+				sessionEndRequest.sessionSecret ());
 
 		if (
 			session == null
@@ -100,9 +100,15 @@ class ImChatSessionEndAction
 
 		}
 
-		// delete session
+		// update session
 
-		imChatSessionHelper.remove(session);
+		session
+
+			.setActive (
+				false)
+
+			.setEndTime (
+				transaction.now ());
 
 		// create response
 
@@ -117,4 +123,5 @@ class ImChatSessionEndAction
 			.value (successResponse);
 
 	}
+
 }

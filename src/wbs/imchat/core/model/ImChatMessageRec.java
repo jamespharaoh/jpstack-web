@@ -1,11 +1,12 @@
 package wbs.imchat.core.model;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.IndexField;
 import wbs.framework.entity.annotations.MajorEntity;
@@ -43,7 +44,7 @@ class ImChatMessageRec
 	String messageText;
 
 	@ReferenceField (
-			nullable = true)
+		nullable = true)
 	QueueItemRec queueItem;
 
 	// compare to

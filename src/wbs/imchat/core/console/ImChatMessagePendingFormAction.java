@@ -7,6 +7,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
+import wbs.imchat.core.model.ImChatConversationRec;
 import wbs.imchat.core.model.ImChatMessageObjectHelper;
 import wbs.imchat.core.model.ImChatMessageRec;
 import wbs.platform.console.action.ConsoleAction;
@@ -54,23 +55,8 @@ class ImChatMessagePendingFormAction
 	public
 	Responder goReal () {
 
-		int imChatMessageId =
-				Integer.parseInt (
-					requestContext.parameter ("message_id"));
-
 		String messageText =
-				requestContext.parameter ("reply");
-
-		return goSend (
-				imChatMessageId,
-				messageText);
-
-
-	}
-
-	Responder goSend (
-			int imChatMessageId,
-			String messageText) {
+			requestContext.parameter ("reply");
 
 		// begin transaction
 
@@ -81,16 +67,18 @@ class ImChatMessagePendingFormAction
 		// find user
 
 		UserRec myUser =
-				userHelper.find (
-					requestContext.userId ());
+			userHelper.find (
+				requestContext.userId ());
 
 		// find message
 
 		ImChatMessageRec imChatMessage =
-				imChatMessageHelper.find (
-						imChatMessageId);
+			imChatMessageHelper.find (
+				requestContext.stuffInt (
+					"imChatMessageId"));
 
-		int numMessages = imChatMessage.getImChatConversation().getNumMessages();
+		ImChatConversationRec conversation =
+			imChatMessage.getImChatConversation ();
 
 		// create reply
 
@@ -98,23 +86,28 @@ class ImChatMessagePendingFormAction
 			new ImChatMessageRec ()
 
 			.setImChatConversation (
-				imChatMessage.getImChatConversation())
+				conversation)
 
 			.setIndex (
-					numMessages)
+				conversation.getNumMessages ())
 
-			.setMessageText(messageText)
+			.setMessageText (
+				messageText)
+
 		);
 
 		// update conversation
 
-		imChatMessage.getImChatConversation().setNumMessages(
-				numMessages + 1);
+		conversation
+
+			.setNumMessages (
+				conversation.getNumMessages () + 1);
 
 		// remove queue item
 
 		queueLogic.processQueueItem (
-			imChatMessage.getQueueItem (), myUser);
+			imChatMessage.getQueueItem (),
+			myUser);
 
 		// done
 

@@ -82,8 +82,8 @@ class ImChatSessionLoadAction
 		// lookup session
 
 		ImChatSessionRec session =
-				imChatSessionHelper.findBySecret (
-						sessionLoadRequest.sessionSecret ());
+			imChatSessionHelper.findBySecret (
+				sessionLoadRequest.sessionSecret ());
 
 		if (
 			session == null
@@ -108,7 +108,7 @@ class ImChatSessionLoadAction
 		// get customer and conversation
 
 		ImChatCustomerRec imChatCustomer =
-				session.getImChatCustomer();
+			session.getImChatCustomer ();
 
 		// create response
 
@@ -127,4 +127,5 @@ class ImChatSessionLoadAction
 			.value (successResponse);
 
 	}
+
 }

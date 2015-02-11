@@ -15,17 +15,23 @@ public
 class ImChatMessagePendingFormResponder
 	extends HtmlResponder {
 
-	@Inject
-	PrivChecker privChecker;
-
-	ImChatMessageRec imChatMessage;
+	// dependencies
 
 	@Inject
 	ImChatMessageObjectHelper imChatMessageHelper;
 
+	@Inject
+	PrivChecker privChecker;
+
+	// state
+
+	ImChatMessageRec imChatMessage;
+
 	String summaryUrl;
 
 	boolean manager;
+
+	// implementation
 
 	@Override
 	protected
@@ -53,11 +59,8 @@ class ImChatMessagePendingFormResponder
 
 		super.goHeadStuff ();
 
-
-
 		printFormat (
 			"<script language=\"JavaScript\">\n");
-
 
 		printFormat (
 			"top.show_inbox (true);\n",
@@ -98,7 +101,6 @@ class ImChatMessagePendingFormResponder
 
 			"</p>\n");
 
-
 		printFormat (
 			"<form",
 			" action=\"%h\"",
@@ -112,26 +114,18 @@ class ImChatMessagePendingFormResponder
 			">\n");
 
 		printFormat (
-				"<input",
-				" type=\"text\"",
-				" name=\"reply\"",
-				" value=\"Write your reply\"",
-				">");
+			"<input",
+			" type=\"text\"",
+			" name=\"reply\"",
+			" value=\"Write your reply\"",
+			">");
 
 		printFormat (
-				"<input",
-				" type=\"hidden\"",
-				" name=\"message_id\"",
-				" value=\"%h\"",
-				imChatMessage.getId(),
-				">");
-
-		printFormat (
-				"<input",
-				" type=\"submit\"",
-				" name=\"send\"",
-				" value=\"Send\"",
-				">");
+			"<input",
+			" type=\"submit\"",
+			" name=\"send\"",
+			" value=\"Send\"",
+			">");
 
 		printFormat (
 			"</form>\n");

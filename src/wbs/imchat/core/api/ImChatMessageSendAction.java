@@ -181,7 +181,10 @@ class ImChatMessageSendAction
 
 		// add queue item to message
 
-		message.setQueueItem(queueItem);
+		message
+
+			.setQueueItem (
+				queueItem);
 
 		// create response
 

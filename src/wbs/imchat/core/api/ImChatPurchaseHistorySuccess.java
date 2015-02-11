@@ -21,6 +21,7 @@ class ImChatPurchaseHistorySuccess {
 	Integer balance;
 
 	@DataAttribute
-	List<ImChatPurchaseData> purchases = new ArrayList<ImChatPurchaseData> ();
+	List<ImChatPurchaseData> purchases =
+		new ArrayList<ImChatPurchaseData> ();
 
 }

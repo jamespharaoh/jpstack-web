@@ -17,7 +17,7 @@ import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.record.EphemeralRecord;
+import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 
 @Accessors (chain = true)
@@ -27,7 +27,7 @@ import wbs.framework.record.Record;
 @MajorEntity
 public
 class ImChatSessionRec
-	implements EphemeralRecord<ImChatSessionRec> {
+	implements CommonRecord<ImChatSessionRec> {
 
 	// id
 

@@ -5,67 +5,72 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import com.google.common.collect.Lists;
-
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.part.AbstractPagePart;
-import wbs.platform.priv.console.PrivChecker;
-import wbs.imchat.core.console.ImChatMessagePendingHistoryPart;
 import wbs.imchat.core.model.ImChatConversationRec;
 import wbs.imchat.core.model.ImChatMessageObjectHelper;
 import wbs.imchat.core.model.ImChatMessageRec;
+import wbs.platform.console.part.AbstractPagePart;
+import wbs.platform.priv.console.PrivChecker;
+
+import com.google.common.collect.Lists;
 
 @PrototypeComponent ("imChatMessagePendingHistoryPart")
-public class ImChatMessagePendingHistoryPart
+public
+class ImChatMessagePendingHistoryPart
 	extends AbstractPagePart {
+
+	// dependencies
+
+	@Inject
+	ImChatMessageObjectHelper imChatMessageHelper;
 
 	@Inject
 	PrivChecker privChecker;
+
+	// state
 
 	ImChatMessageRec imChatMessage;
 
 	ImChatConversationRec imChatConversation;
 
-	@Inject
-	ImChatMessageObjectHelper imChatMessageHelper;
-
 	// implementation
 
-		@Override
-		public
-		void prepare () {
+	@Override
+	public
+	void prepare () {
 
-			imChatMessage =
-					imChatMessageHelper.find (
-						requestContext.stuffInt ("imChatMessageId"));
+		imChatMessage =
+			imChatMessageHelper.find (
+				requestContext.stuffInt ("imChatMessageId"));
 
-			imChatConversation = imChatMessage.getImChatConversation();
+		imChatConversation =
+			imChatMessage.getImChatConversation ();
 
-
-		}
-
+	}
 
 	@Override
 	public
 	void goBodyStuff () {
 
-
 		// retrieve messages
 
 		List<ImChatMessageRec> messages =
 			new ArrayList<ImChatMessageRec> (
-				imChatConversation.getImChatMessages());
+				imChatConversation.getImChatMessages ());
 
 		Lists.reverse (
 			messages);
 
-		for (ImChatMessageRec message : messages) {
+		for (
+			ImChatMessageRec message
+				: messages
+		) {
 
 			printFormat (
-					"<p>%s</p>\n",
-					message.getMessageText());
-		}
+				"<p>%s</p>\n",
+				message.getMessageText ());
 
+		}
 
 	}
 

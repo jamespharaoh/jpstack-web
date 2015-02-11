@@ -118,8 +118,6 @@ class ImChatApiLogicImplementation
 			.messageText (
 				message.getMessageText ());
 
-
-
 	}
 
 }

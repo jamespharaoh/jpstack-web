@@ -13,8 +13,6 @@ import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import com.google.common.collect.Lists;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
@@ -27,39 +25,45 @@ import wbs.imchat.core.model.ImChatCustomerObjectHelper;
 import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
 import wbs.imchat.core.model.ImChatPurchaseRec;
+import wbs.platform.console.misc.TimeFormatter;
+
+import com.google.common.collect.Lists;
 
 @PrototypeComponent ("imChatPurchaseHistoryAction")
 public
 class ImChatPurchaseHistoryAction
 	implements Action {
 
-// dependencies
+	// dependencies
 
-@Inject
-Database database;
+	@Inject
+	Database database;
 
-@Inject
-ImChatCustomerObjectHelper imChatCustomerHelper;
+	@Inject
+	ImChatCustomerObjectHelper imChatCustomerHelper;
 
-@Inject
-ImChatPurchaseObjectHelper imChatPurchaseHelper;
+	@Inject
+	ImChatPurchaseObjectHelper imChatPurchaseHelper;
 
-@Inject
-RequestContext requestContext;
+	@Inject
+	RequestContext requestContext;
 
-// prototype dependencies
+	@Inject
+	TimeFormatter timeFormatter;
 
-@Inject
-Provider<JsonResponder> jsonResponderProvider;
+	// prototype dependencies
 
-// implementation
+	@Inject
+	Provider<JsonResponder> jsonResponderProvider;
 
-@Override
-@SneakyThrows (IOException.class)
-public
-Responder handle () {
+	// implementation
 
-	DataFromJson dataFromJson =
+	@Override
+	@SneakyThrows (IOException.class)
+	public
+	Responder handle () {
+
+		DataFromJson dataFromJson =
 			new DataFromJson ();
 
 		// decode request
@@ -74,55 +78,56 @@ Responder handle () {
 					ImChatPurchaseHistoryRequest.class,
 				jsonValue);
 
-	// begin transaction
+		// begin transaction
 
-	@Cleanup
-	Transaction transaction =
-		database.beginReadOnly ();
+		@Cleanup
+		Transaction transaction =
+			database.beginReadOnly ();
 
-	// find customer
+		// find customer
 
-	ImChatCustomerRec customer =
-			imChatCustomerHelper.find(
-					purchaseHistoryRequest.customerId());
+		ImChatCustomerRec customer =
+			imChatCustomerHelper.find (
+				purchaseHistoryRequest.customerId ());
 
-	if (customer == null) {
+		if (customer == null) {
 
-		ImChatFailure failureResponse =
-			new ImChatFailure ()
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
 
-			.reason (
-				"customer-invalid")
+				.reason (
+					"customer-invalid")
 
-			.message (
-				"The customer id is invalid or the customer does " +
-				"not exist.");
+				.message (
+					"The customer id is invalid or the customer does " +
+					"not exist.");
 
-		return jsonResponderProvider.get ()
-			.value (failureResponse);
+			return jsonResponderProvider.get ()
+				.value (failureResponse);
 
-	}
+		}
 
-	// retrieve purchases
+		// retrieve purchases
 
-	List<ImChatPurchaseRec> purchases =
-		new ArrayList<ImChatPurchaseRec> (
-				customer.getImChatPurchases());
+		List<ImChatPurchaseRec> purchases =
+			new ArrayList<ImChatPurchaseRec> (
+				customer.getImChatPurchases ());
 
-	Lists.reverse (
-		purchases);
+		Lists.reverse (
+			purchases);
 
-	// create response
+		// create response
 
-	ImChatPurchaseHistorySuccess purchaseHistoryResponse
-		= new ImChatPurchaseHistorySuccess();
+		ImChatPurchaseHistorySuccess purchaseHistoryResponse =
+			new ImChatPurchaseHistorySuccess ()
 
-	purchaseHistoryResponse.balance = customer.getBalance();
+			.balance (
+				customer.getBalance ());
 
-	for (
+		for (
 			ImChatPurchaseRec purchase
-			: purchases
-	) {
+				: purchases
+		) {
 
 		purchaseHistoryResponse.purchases.add (
 			new ImChatPurchaseData ()
@@ -134,7 +139,10 @@ Responder handle () {
 				purchase.getValue ())
 
 			.timestamp (
-				purchase.getTimestamp().toString())
+				timeFormatter.instantToTimestampString (
+					timeFormatter.defaultTimezone (),
+					purchase.getTimestamp ()))
+
 		);
 
 	}

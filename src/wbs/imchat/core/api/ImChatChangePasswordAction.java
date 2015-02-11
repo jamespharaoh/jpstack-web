@@ -1,5 +1,7 @@
 package wbs.imchat.core.api;
 
+import static wbs.framework.utils.etc.Misc.notEqual;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -31,122 +33,124 @@ class ImChatChangePasswordAction
 
 	// dependencies
 
-		@Inject
-		Database database;
+	@Inject
+	Database database;
 
-		@Inject
-		ImChatApiLogic imChatApiLogic;
+	@Inject
+	ImChatApiLogic imChatApiLogic;
 
-		@Inject
-		ImChatCustomerObjectHelper imChatCustomerHelper;
+	@Inject
+	ImChatCustomerObjectHelper imChatCustomerHelper;
 
-		@Inject
-		ImChatSessionObjectHelper imChatSessionHelper;
+	@Inject
+	ImChatSessionObjectHelper imChatSessionHelper;
 
-		@Inject
-		RequestContext requestContext;
+	@Inject
+	RequestContext requestContext;
 
-		// prototype dependencies
+	// prototype dependencies
 
-		@Inject
-		Provider<JsonResponder> jsonResponderProvider;
+	@Inject
+	Provider<JsonResponder> jsonResponderProvider;
 
-		// implementation
+	// implementation
 
-		@Override
-		@SneakyThrows (IOException.class)
-		public
-		Responder handle () {
+	@Override
+	@SneakyThrows (IOException.class)
+	public
+	Responder handle () {
 
-			DataFromJson dataFromJson =
-				new DataFromJson ();
+		DataFromJson dataFromJson =
+			new DataFromJson ();
 
-			// decode request
+		// decode request
 
-			JSONObject jsonValue =
-				(JSONObject)
-				JSONValue.parse (
-					requestContext.reader ());
+		JSONObject jsonValue =
+			(JSONObject)
+			JSONValue.parse (
+				requestContext.reader ());
 
-			ImChatChangePasswordRequest changePasswordRequest =
-				dataFromJson.fromJson (
-					ImChatChangePasswordRequest.class,
-					jsonValue);
+		ImChatChangePasswordRequest changePasswordRequest =
+			dataFromJson.fromJson (
+				ImChatChangePasswordRequest.class,
+				jsonValue);
 
-			// begin transaction
+		// begin transaction
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite ();
+		@Cleanup
+		Transaction transaction =
+			database.beginReadWrite ();
 
-			// lookup session
+		// lookup session
 
-			ImChatSessionRec session =
-					imChatSessionHelper.findBySecret (
-						changePasswordRequest.sessionSecret ());
+		ImChatSessionRec session =
+			imChatSessionHelper.findBySecret (
+				changePasswordRequest.sessionSecret ());
 
-			if (
-				session == null
-				|| ! session.getActive ()
-			) {
+		if (
+			session == null
+			|| ! session.getActive ()
+		) {
 
-				ImChatFailure failureResponse =
-					new ImChatFailure ()
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
 
-					.reason (
-						"session-invalid")
+				.reason (
+					"session-invalid")
 
-					.message (
-						"The session secret is invalid or the session is no " +
-						"longer active");
+				.message (
+					"The session secret is invalid or the session is no " +
+					"longer active");
+
+			return jsonResponderProvider.get ()
+				.value (failureResponse);
+
+		}
+
+		// check current password
+
+		ImChatCustomerRec imChatcustomer =
+			session.getImChatCustomer ();
+
+		if (
+			notEqual (
+				changePasswordRequest.currentPassword (),
+				imChatcustomer.getPassword ())
+		) {
+
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
+
+				.reason (
+					"incorrect-password")
+
+				.message (
+					"The specified password is incorrect.");
 
 				return jsonResponderProvider.get ()
 					.value (failureResponse);
 
-			}
-
-			// check current password
-
-			ImChatCustomerRec imChatcustomer =
-					session.getImChatCustomer();
-
-			if (!changePasswordRequest.currentPassword.equals(imChatcustomer.getPassword())) {
-
-				ImChatFailure failureResponse =
-						new ImChatFailure ()
-
-						.reason (
-							"incorrect-password")
-
-						.message (
-							"The specified password is incorrect.");
-
-					return jsonResponderProvider.get ()
-						.value (failureResponse);
-
-			}
-
-			// update customer password
-
-			imChatCustomerHelper.insert (
-				imChatcustomer
-
-				.setPassword (
-						changePasswordRequest.newPassword)
-
-			);
-
-			// create response
-
-			ImChatForgotPasswordSuccess successResponse =
-				new ImChatForgotPasswordSuccess ();
-
-			// commit and return
-
-			transaction.commit ();
-
-			return jsonResponderProvider.get ()
-				.value (successResponse);
-
 		}
+
+		// update customer password
+
+		imChatcustomer
+
+			.setPassword (
+				changePasswordRequest.newPassword);
+
+		// create response
+
+		ImChatForgotPasswordSuccess successResponse =
+			new ImChatForgotPasswordSuccess ();
+
+		// commit and return
+
+		transaction.commit ();
+
+		return jsonResponderProvider.get ()
+			.value (successResponse);
+
+	}
+
 }
