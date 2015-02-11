@@ -34,12 +34,19 @@
 			<object-list-page
 				fields="list"/>
 
+			<object-create-page
+				fields="create"/>
+
 		</list>
 
 		<object>
 
 			<object-summary-page
 				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
 			<object-events-page/>
 
 		</object>
@@ -50,16 +57,25 @@
 		name="list"
 		object-name="imChatProfile">
 
-		<parent-field/>
-		<code-field/>
+		<name-field/>
+		<description-field/>
 
 	</field-set>
 
 	<field-set
-		name="results"
+		name="create"
 		object-name="imChatProfile">
 
-		<code-field/>
+		<name-field/>
+		<description-field/>
+
+		<text-field
+			name="publicName"
+			nullable="yes"/>
+
+		<text-field
+			name="publicDescription"
+			nullable="yes"/>
 
 	</field-set>
 
@@ -70,6 +86,27 @@
 		<id-field/>
 		<parent-field/>
 		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<text-field
+			name="publicName"
+			nullable="yes"/>
+
+		<text-field
+			name="publicDescription"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="imChatProfile">
+
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
 
 		<text-field
 			name="publicName"

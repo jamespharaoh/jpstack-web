@@ -34,12 +34,19 @@
 			<object-list-page
 				fields="list"/>
 
+			<object-create-page
+				fields="create"/>
+
 		</list>
 
 		<object>
 
 			<object-summary-page
 				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
 			<object-events-page/>
 
 		</object>
@@ -50,8 +57,27 @@
 		name="list"
 		object-name="imChatPricePoint">
 
-		<parent-field/>
-		<code-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="imChatPricePoint">
+
+		<name-field/>
+		<description-field/>
+
+		<currency-field
+			name="price"
+			currency="imChat.currency"
+			nullable="yes"/>
+
+		<currency-field
+			name="value"
+			currency="imChat.currency"
+			nullable="yes"/>
 
 	</field-set>
 
@@ -70,13 +96,38 @@
 		<id-field/>
 		<parent-field/>
 		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
 
-		<integer-field
+		<currency-field
 			name="price"
+			currency="imChat.currency"
 			nullable="yes"/>
 
-		<integer-field
+		<currency-field
 			name="value"
+			currency="imChat.currency"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="imChatPricePoint">
+
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<currency-field
+			name="price"
+			currency="imChat.currency"
+			nullable="yes"/>
+
+		<currency-field
+			name="value"
+			currency="imChat.currency"
 			nullable="yes"/>
 
 	</field-set>
