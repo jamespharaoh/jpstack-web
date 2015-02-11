@@ -38,11 +38,7 @@ declare variable $mode external;
 		}</param-name>
 
 		<param-value>{
-			concat (
-				'work/api-',
-				$mode,
-				'-beans'
-			)
+			'work/api/bean-definitions'
 		}</param-value>
 
 	</context-param>

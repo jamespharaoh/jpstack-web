@@ -84,17 +84,27 @@ class WbsServletListener
 
 		applicationContext =
 			new ApplicationContextBuilder ()
-				.primaryProjectName (primaryProjectName)
-				.primaryProjectPackageName (primaryProjectPackageName)
-				.layerNames (layerNames)
-				.configNames (configNames)
-				.outputPath (beanDefinitionOutputPath)
 
-				.addSingletonBean (
-					"servletContext",
-					event.getServletContext ())
+			.primaryProjectName (
+				primaryProjectName)
 
-				.build ();
+			.primaryProjectPackageName (
+				primaryProjectPackageName)
+
+			.layerNames (
+				layerNames)
+
+			.configNames (
+				configNames)
+
+			.outputPath (
+				beanDefinitionOutputPath)
+
+			.addSingletonBean (
+				"servletContext",
+				event.getServletContext ())
+
+			.build ();
 
 		servletContext.setAttribute (
 			"wbs-application-context",

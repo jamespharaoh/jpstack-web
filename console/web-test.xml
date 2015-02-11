@@ -4,7 +4,7 @@
 	<!-- context init params -->
 	<context-param>
 		<param-name>beanDefinitionOutputPath</param-name>
-		<param-value>work/test/output/console-beans</param-value>
+		<param-value>work/console/bean-definitions</param-value>
 	</context-param>
 	<context-param>
 		<param-name>layerNames</param-name>
