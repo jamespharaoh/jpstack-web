@@ -7,13 +7,12 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.Cleanup;
+import lombok.SneakyThrows;
+
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import com.google.common.collect.Lists;
-
-import lombok.Cleanup;
-import lombok.SneakyThrows;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
@@ -28,6 +27,8 @@ import wbs.imchat.core.model.ImChatMessageObjectHelper;
 import wbs.imchat.core.model.ImChatMessageRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
+
+import com.google.common.collect.Lists;
 
 @PrototypeComponent ("imChatMessageListAction")
 public
@@ -64,19 +65,19 @@ class ImChatMessageListAction
 	Responder handle () {
 
 		DataFromJson dataFromJson =
-				new DataFromJson ();
+			new DataFromJson ();
 
-			// decode request
+		// decode request
 
-			JSONObject jsonValue =
-				(JSONObject)
-				JSONValue.parse (
-					requestContext.reader ());
+		JSONObject jsonValue =
+			(JSONObject)
+			JSONValue.parse (
+				requestContext.reader ());
 
-			ImChatMessageListRequest startRequest =
-				dataFromJson.fromJson (
-					ImChatMessageListRequest.class,
-					jsonValue);
+		ImChatMessageListRequest startRequest =
+			dataFromJson.fromJson (
+				ImChatMessageListRequest.class,
+				jsonValue);
 
 		// begin transaction
 
@@ -87,8 +88,8 @@ class ImChatMessageListAction
 		// lookup session
 
 		ImChatSessionRec session =
-				imChatSessionHelper.findBySecret (
-					startRequest.sessionSecret ());
+			imChatSessionHelper.findBySecret (
+				startRequest.sessionSecret ());
 
 		if (
 			session == null
@@ -114,24 +115,24 @@ class ImChatMessageListAction
 
 		ImChatConversationRec imChatConversation =
 			imChatConversationHelper.find (
-					startRequest.conversationId ());
+				startRequest.conversationId ());
 
 		// retrieve messages
 
 		List<ImChatMessageRec> messages =
 			new ArrayList<ImChatMessageRec> (
-				imChatConversation.getImChatMessages());
+				imChatConversation.getImChatMessages ());
 
 		Lists.reverse (
 			messages);
 
 		// create response
 
-		ImChatMessageListSuccess messageListSuccessResponse
-			= new ImChatMessageListSuccess();
+		ImChatMessageListSuccess messageListSuccessResponse =
+			new ImChatMessageListSuccess ();
 
 		for (
-				ImChatMessageRec message
+			ImChatMessageRec message
 				: messages
 		) {
 
@@ -146,6 +147,7 @@ class ImChatMessageListAction
 
 				.messageText (
 					message.getMessageText ())
+
 			);
 
 		}
