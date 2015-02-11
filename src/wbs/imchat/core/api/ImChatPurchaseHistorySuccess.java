@@ -11,16 +11,16 @@ import wbs.framework.data.annotations.DataClass;
 @Accessors (fluent = true)
 @Data
 @DataClass
-public 
+public
 class ImChatPurchaseHistorySuccess {
 
 	@DataAttribute
 	String status = "success";
-	
+
 	@DataAttribute
 	Integer balance;
 
 	@DataAttribute
 	List<ImChatPurchaseData> purchases = new ArrayList<ImChatPurchaseData> ();
-	
+
 }

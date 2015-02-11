@@ -41,7 +41,7 @@ class ImChatMessageListAction
 
 	@Inject
 	ImChatConversationObjectHelper imChatConversationHelper;
-	
+
 	@Inject
 	ImChatSessionObjectHelper imChatSessionHelper;
 
@@ -62,7 +62,7 @@ class ImChatMessageListAction
 	@SneakyThrows (IOException.class)
 	public
 	Responder handle () {
-		
+
 		DataFromJson dataFromJson =
 				new DataFromJson ();
 
@@ -83,7 +83,7 @@ class ImChatMessageListAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly ();
-		
+
 		// lookup session
 
 		ImChatSessionRec session =
@@ -111,11 +111,11 @@ class ImChatMessageListAction
 		}
 
 		// find conversation
-		
+
 		ImChatConversationRec imChatConversation =
 			imChatConversationHelper.find (
 					startRequest.conversationId ());
-		
+
 		// retrieve messages
 
 		List<ImChatMessageRec> messages =
@@ -124,7 +124,7 @@ class ImChatMessageListAction
 
 		Lists.reverse (
 			messages);
-		
+
 		// create response
 
 		ImChatMessageListSuccess messageListSuccessResponse
@@ -149,7 +149,7 @@ class ImChatMessageListAction
 			);
 
 		}
-		
+
 		return jsonResponderProvider.get ()
 			.value (messageListSuccessResponse);
 

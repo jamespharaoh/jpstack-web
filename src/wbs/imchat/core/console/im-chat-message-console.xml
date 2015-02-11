@@ -67,7 +67,7 @@
 		<text-field
 			name="messageText"
 			nullable="yes"/>
-			
+
 		<yes-no-field
 			name="pending"/>
 

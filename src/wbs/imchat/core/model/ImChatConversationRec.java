@@ -42,7 +42,7 @@ class ImChatConversationRec
 	@IndexField (
 		counter = "numConversations")
 	Integer index;
-	
+
 	@CollectionField (
 		orderBy = "index")
 	Set<ImChatMessageRec> imChatMessages =

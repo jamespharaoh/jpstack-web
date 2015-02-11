@@ -33,10 +33,10 @@ import wbs.imchat.core.model.ImChatObjectHelper;
 import wbs.imchat.core.model.ImChatRec;
 
 @PrototypeComponent ("imChatForgotPasswordAction")
-public 
+public
 class ImChatForgotPasswordAction
 	implements Action {
-	
+
 	// dependencies
 
 	@Inject
@@ -53,7 +53,7 @@ class ImChatForgotPasswordAction
 
 	@Inject
 	RequestContext requestContext;
-	
+
 	@Inject
 	Random random;
 
@@ -61,7 +61,7 @@ class ImChatForgotPasswordAction
 
 	@Inject
 	Provider<JsonResponder> jsonResponderProvider;
-	
+
 	// implementation
 
 	@Override
@@ -121,9 +121,9 @@ class ImChatForgotPasswordAction
 		}
 
 		// generate new password
-		
+
 		String newPassword = generateRandomString();
-		
+
 		// update customer password
 
 		imChatCustomerHelper.insert (
@@ -133,7 +133,7 @@ class ImChatForgotPasswordAction
 				newPassword)
 
 		);
-		
+
 		// send new password via mail
 
         String to = forgotPasswordRequest.email ();
@@ -142,7 +142,7 @@ class ImChatForgotPasswordAction
         Properties properties = System.getProperties();
         properties.setProperty("mail.smtp.host", host);
         Session session = Session.getDefaultInstance(properties);
-		try{		
+		try{
 		     MimeMessage message = new MimeMessage(session);
 		     message.setFrom(new InternetAddress(from));
 		     message.addRecipient(Message.RecipientType.TO,
@@ -167,7 +167,7 @@ class ImChatForgotPasswordAction
 			.value (successResponse);
 
 	}
-	
+
 	protected String generateRandomString() {
         String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
         StringBuilder pass = new StringBuilder();

@@ -178,9 +178,9 @@ class ImChatMessageSendAction
 				message,
 				customer.getCode (),
 				message.getMessageText ());
-		
+
 		// add queue item to message
-		
+
 		message.setQueueItem(queueItem);
 
 		// create response

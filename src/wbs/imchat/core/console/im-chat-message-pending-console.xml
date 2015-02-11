@@ -7,7 +7,7 @@
 		object-name="imChatMessage">
 
 		<object>
-		
+
 			<context-tab-responder-page
 				name="history"/>
 

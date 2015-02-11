@@ -32,7 +32,7 @@
 		<bean class="api.ImChatConversationStartAction"/>
 		<bean class="api.ImChatCustomerAction"/>
 		<bean class="api.ImChatCustomerCreateAction"/>
-		<bean class="api.ImChatMessageSendAction"/>		
+		<bean class="api.ImChatMessageSendAction"/>
 		<bean class="api.ImChatMessageListAction"/>
 		<bean class="api.ImChatSessionStartAction"/>
 		<bean class="api.ImChatSessionLoadAction"/>

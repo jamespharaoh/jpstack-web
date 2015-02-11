@@ -14,19 +14,19 @@ import wbs.platform.priv.console.PrivChecker;
 public
 class ImChatMessagePendingFormResponder
 	extends HtmlResponder {
-	
+
 	@Inject
 	PrivChecker privChecker;
-	
+
 	ImChatMessageRec imChatMessage;
-	
-	@Inject 
+
+	@Inject
 	ImChatMessageObjectHelper imChatMessageHelper;
-	
+
 	String summaryUrl;
-	
+
 	boolean manager;
-	
+
 	@Override
 	protected
 	void prepare () {
@@ -46,19 +46,19 @@ class ImChatMessagePendingFormResponder
 					"/imChatMessage.pending.history"));
 
 	}
-	
+
 	@Override
 	public
 	void goHeadStuff () {
 
 		super.goHeadStuff ();
-		
-		
+
+
 
 		printFormat (
 			"<script language=\"JavaScript\">\n");
 
-		
+
 		printFormat (
 			"top.show_inbox (true);\n",
 			"top.frames ['main'].location = 'about:blank';\n",
@@ -117,7 +117,7 @@ class ImChatMessagePendingFormResponder
 				" name=\"reply\"",
 				" value=\"Write your reply\"",
 				">");
-		
+
 		printFormat (
 				"<input",
 				" type=\"hidden\"",
@@ -125,7 +125,7 @@ class ImChatMessagePendingFormResponder
 				" value=\"%h\"",
 				imChatMessage.getId(),
 				">");
-		
+
 		printFormat (
 				"<input",
 				" type=\"submit\"",

@@ -41,11 +41,11 @@ class ImChatMessageRec
 
 	@SimpleField
 	String messageText;
-	
+
 	@ReferenceField (
 			nullable = true)
 	QueueItemRec queueItem;
-	
+
 	// compare to
 
 	@Override

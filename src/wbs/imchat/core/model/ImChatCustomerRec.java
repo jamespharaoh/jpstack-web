@@ -56,7 +56,7 @@ class ImChatCustomerRec
 			orderBy = "index")
 		Set<ImChatPurchaseRec> imChatPurchases =
 			new TreeSet<ImChatPurchaseRec> ();
-	
+
 	// statistics
 
 	@SimpleField

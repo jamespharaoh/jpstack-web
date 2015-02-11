@@ -30,10 +30,10 @@ class ImChatMessagePendingFormAction
 
 	@Inject
 	ImChatMessageObjectHelper imChatMessageHelper;
-	
+
 	@Inject
 	QueueLogic queueLogic;
-	
+
 	@Inject
 	UserObjectHelper userHelper;
 
@@ -57,7 +57,7 @@ class ImChatMessagePendingFormAction
 		int imChatMessageId =
 				Integer.parseInt (
 					requestContext.parameter ("message_id"));
-		
+
 		String messageText =
 				requestContext.parameter ("reply");
 
@@ -76,24 +76,24 @@ class ImChatMessagePendingFormAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();		
-		
+			database.beginReadWrite ();
+
 		// find user
-		
+
 		UserRec myUser =
 				userHelper.find (
 					requestContext.userId ());
 
 		// find message
-		
+
 		ImChatMessageRec imChatMessage =
 				imChatMessageHelper.find (
 						imChatMessageId);
-		
+
 		int numMessages = imChatMessage.getImChatConversation().getNumMessages();
 
 		// create reply
-		
+
 		imChatMessageHelper.insert (
 			new ImChatMessageRec ()
 
@@ -101,21 +101,21 @@ class ImChatMessagePendingFormAction
 				imChatMessage.getImChatConversation())
 
 			.setIndex (
-					numMessages) 
+					numMessages)
 
 			.setMessageText(messageText)
 		);
-		
+
 		// update conversation
-		
+
 		imChatMessage.getImChatConversation().setNumMessages(
 				numMessages + 1);
-		
+
 		// remove queue item
 
 		queueLogic.processQueueItem (
 			imChatMessage.getQueueItem (), myUser);
-			
+
 		// done
 
 		transaction.commit ();

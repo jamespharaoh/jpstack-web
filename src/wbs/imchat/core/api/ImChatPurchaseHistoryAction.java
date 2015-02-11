@@ -29,7 +29,7 @@ import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
 import wbs.imchat.core.model.ImChatPurchaseRec;
 
 @PrototypeComponent ("imChatPurchaseHistoryAction")
-public 
+public
 class ImChatPurchaseHistoryAction
 	implements Action {
 
@@ -58,7 +58,7 @@ Provider<JsonResponder> jsonResponderProvider;
 @SneakyThrows (IOException.class)
 public
 Responder handle () {
-	
+
 	DataFromJson dataFromJson =
 			new DataFromJson ();
 
@@ -79,7 +79,7 @@ Responder handle () {
 	@Cleanup
 	Transaction transaction =
 		database.beginReadOnly ();
-	
+
 	// find customer
 
 	ImChatCustomerRec customer =
@@ -111,14 +111,14 @@ Responder handle () {
 
 	Lists.reverse (
 		purchases);
-	
+
 	// create response
 
 	ImChatPurchaseHistorySuccess purchaseHistoryResponse
 		= new ImChatPurchaseHistorySuccess();
 
 	purchaseHistoryResponse.balance = customer.getBalance();
-	
+
 	for (
 			ImChatPurchaseRec purchase
 			: purchases
@@ -138,7 +138,7 @@ Responder handle () {
 		);
 
 	}
-	
+
 	return jsonResponderProvider.get ()
 		.value (purchaseHistoryResponse);
 

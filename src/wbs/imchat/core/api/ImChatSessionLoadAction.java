@@ -25,10 +25,10 @@ import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
 
 @PrototypeComponent ("imChatSessionLoadAction")
-public 
+public
 class ImChatSessionLoadAction
 	implements Action {
-	
+
 	// dependencies
 
 	@Inject
@@ -45,12 +45,12 @@ class ImChatSessionLoadAction
 
 	@Inject
 	RequestContext requestContext;
-	
+
 	// prototype dependencies
 
 	@Inject
 	Provider<JsonResponder> jsonResponderProvider;
-	
+
 	// implementation
 
 	@Override
@@ -78,7 +78,7 @@ class ImChatSessionLoadAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite ();
-	
+
 		// lookup session
 
 		ImChatSessionRec session =
@@ -106,10 +106,10 @@ class ImChatSessionLoadAction
 		}
 
 		// get customer and conversation
-		
+
 		ImChatCustomerRec imChatCustomer =
 				session.getImChatCustomer();
-		
+
 		// create response
 
 		ImChatSessionLoadSuccess successResponse =

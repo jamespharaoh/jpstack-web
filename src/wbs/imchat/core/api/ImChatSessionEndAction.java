@@ -23,10 +23,10 @@ import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
 
 @PrototypeComponent ("imChatSessionEndAction")
-public 
-class ImChatSessionEndAction	
+public
+class ImChatSessionEndAction
 	implements Action {
-	
+
 	// dependencies
 
 	@Inject
@@ -40,12 +40,12 @@ class ImChatSessionEndAction
 
 	@Inject
 	RequestContext requestContext;
-	
+
 	// prototype dependencies
 
 	@Inject
 	Provider<JsonResponder> jsonResponderProvider;
-	
+
 	// implementation
 
 	@Override
@@ -73,7 +73,7 @@ class ImChatSessionEndAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite ();
-	
+
 		// lookup session
 
 		ImChatSessionRec session =
@@ -103,7 +103,7 @@ class ImChatSessionEndAction
 		// delete session
 
 		imChatSessionHelper.remove(session);
-		
+
 		// create response
 
 		ImChatSessionEndSuccess successResponse =

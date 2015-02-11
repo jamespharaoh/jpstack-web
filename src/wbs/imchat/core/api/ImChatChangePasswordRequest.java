@@ -8,15 +8,15 @@ import wbs.framework.data.annotations.DataClass;
 @Accessors (fluent = true)
 @Data
 @DataClass
-public 
+public
 class ImChatChangePasswordRequest {
-	
+
 	@DataAttribute
 	String sessionSecret;
-	
+
 	@DataAttribute
 	String currentPassword;
-	
+
 	@DataAttribute
 	String newPassword;
 

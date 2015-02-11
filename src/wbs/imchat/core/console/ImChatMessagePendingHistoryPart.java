@@ -16,19 +16,19 @@ import wbs.imchat.core.model.ImChatMessageObjectHelper;
 import wbs.imchat.core.model.ImChatMessageRec;
 
 @PrototypeComponent ("imChatMessagePendingHistoryPart")
-public class ImChatMessagePendingHistoryPart 
-	extends AbstractPagePart {		
-	
+public class ImChatMessagePendingHistoryPart
+	extends AbstractPagePart {
+
 	@Inject
 	PrivChecker privChecker;
-	
+
 	ImChatMessageRec imChatMessage;
-	
+
 	ImChatConversationRec imChatConversation;
-	
-	@Inject 
+
+	@Inject
 	ImChatMessageObjectHelper imChatMessageHelper;
-	
+
 	// implementation
 
 		@Override
@@ -38,9 +38,9 @@ public class ImChatMessagePendingHistoryPart
 			imChatMessage =
 					imChatMessageHelper.find (
 						requestContext.stuffInt ("imChatMessageId"));
-			
-			imChatConversation = imChatMessage.getImChatConversation();	
-			
+
+			imChatConversation = imChatMessage.getImChatConversation();
+
 
 		}
 
@@ -48,8 +48,8 @@ public class ImChatMessagePendingHistoryPart
 	@Override
 	public
 	void goBodyStuff () {
-		
-		
+
+
 		// retrieve messages
 
 		List<ImChatMessageRec> messages =
@@ -58,14 +58,14 @@ public class ImChatMessagePendingHistoryPart
 
 		Lists.reverse (
 			messages);
-		
-		for (ImChatMessageRec message : messages) {			
-			
+
+		for (ImChatMessageRec message : messages) {
+
 			printFormat (
 					"<p>%s</p>\n",
-					message.getMessageText());		
+					message.getMessageText());
 		}
-		
+
 
 	}
 

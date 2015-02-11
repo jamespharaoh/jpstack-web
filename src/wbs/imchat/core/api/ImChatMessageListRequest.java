@@ -9,7 +9,7 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass
 public class ImChatMessageListRequest {
-	
+
 	@DataAttribute
 	String sessionSecret;
 

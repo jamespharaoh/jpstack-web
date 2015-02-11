@@ -25,10 +25,10 @@ import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
 
 @PrototypeComponent ("imChatChangePasswordAction")
-public 
+public
 class ImChatChangePasswordAction
 	implements Action {
-	
+
 	// dependencies
 
 		@Inject
@@ -45,12 +45,12 @@ class ImChatChangePasswordAction
 
 		@Inject
 		RequestContext requestContext;
-		
+
 		// prototype dependencies
 
 		@Inject
 		Provider<JsonResponder> jsonResponderProvider;
-		
+
 		// implementation
 
 		@Override
@@ -78,7 +78,7 @@ class ImChatChangePasswordAction
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite ();
-		
+
 			// lookup session
 
 			ImChatSessionRec session =
@@ -106,12 +106,12 @@ class ImChatChangePasswordAction
 			}
 
 			// check current password
-			
+
 			ImChatCustomerRec imChatcustomer =
 					session.getImChatCustomer();
-			
+
 			if (!changePasswordRequest.currentPassword.equals(imChatcustomer.getPassword())) {
-				
+
 				ImChatFailure failureResponse =
 						new ImChatFailure ()
 
@@ -122,10 +122,10 @@ class ImChatChangePasswordAction
 							"The specified password is incorrect.");
 
 					return jsonResponderProvider.get ()
-						.value (failureResponse);				
-				
+						.value (failureResponse);
+
 			}
-			
+
 			// update customer password
 
 			imChatCustomerHelper.insert (
@@ -135,7 +135,7 @@ class ImChatChangePasswordAction
 						changePasswordRequest.newPassword)
 
 			);
-			
+
 			// create response
 
 			ImChatForgotPasswordSuccess successResponse =
