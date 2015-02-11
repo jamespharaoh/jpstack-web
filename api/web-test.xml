@@ -8,7 +8,7 @@
 	</context-param>
 	<context-param>
 		<param-name>beanDefinitionOutputPath</param-name>
-		<param-value>work/api-test-beans</param-value>
+		<param-value>work/api/bean-definitions</param-value>
 	</context-param>
 	<context-param>
 		<param-name>layerNames</param-name>
