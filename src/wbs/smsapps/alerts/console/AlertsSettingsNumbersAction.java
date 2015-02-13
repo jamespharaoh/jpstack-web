@@ -28,6 +28,8 @@ import wbs.smsapps.alerts.model.AlertsNumberRec;
 import wbs.smsapps.alerts.model.AlertsSettingsObjectHelper;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
 
+import com.google.common.collect.ImmutableSet;
+
 @PrototypeComponent ("alertsSettingsNumbersAction")
 public
 class AlertsSettingsNumbersAction
@@ -305,9 +307,10 @@ class AlertsSettingsNumbersAction
 			notices.add ("Added new number");
 
 			requestContext.hideFormData (
-				"name_new",
-				"number_new",
-				"enabled_new");
+				ImmutableSet.<String>of (
+					"name_new",
+					"number_new",
+					"enabled_new"));
 
 		}
 

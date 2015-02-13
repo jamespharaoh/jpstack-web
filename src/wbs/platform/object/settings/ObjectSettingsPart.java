@@ -98,8 +98,12 @@ class ObjectSettingsPart
 			printFormat (
 				"<form",
 				" method=\"post\"",
-				" action=\"%s\"",
+				" action=\"%h\"",
 				requestContext.resolveLocalUrl (localName),
+				" enctype=\"%h\"",
+				formFieldSet.fileUpload ()
+					? "multipart/form-data"
+					: "application/x-www-form-urlencoded",
 				">\n");
 
 		}

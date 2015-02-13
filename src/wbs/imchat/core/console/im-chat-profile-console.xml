@@ -91,12 +91,13 @@
 		<deleted-field/>
 
 		<text-field
-			name="publicName"
-			nullable="yes"/>
+			name="publicName"/>
 
 		<text-field
-			name="publicDescription"
-			nullable="yes"/>
+			name="publicDescription"/>
+
+		<image-field
+			name="profileImage"/>
 
 	</field-set>
 
@@ -114,6 +115,10 @@
 
 		<text-field
 			name="publicDescription"
+			nullable="yes"/>
+
+		<image-field
+			name="profileImage"
 			nullable="yes"/>
 
 	</field-set>

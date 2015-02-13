@@ -139,13 +139,21 @@ class FormFieldSetBuilder {
 				spec.consoleModule ().name (),
 				spec.name ());
 
-		for (FormField<?,?,?,?> formField
-				: formFieldSet.formFields ()) {
+		for (
+			FormField<?,?,?,?> formField
+				: formFieldSet.formFields ()
+		) {
 
 			formField.init (
 				fullName);
 
+			if (formField.fileUpload ())
+				formFieldSet.fileUpload (true);
+
 		}
+
+		if (formFieldSet.fileUpload () == null)
+			formFieldSet.fileUpload (false);
 
 		consoleModule.addFormFieldSet (
 			spec.name (),

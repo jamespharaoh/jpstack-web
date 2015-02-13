@@ -1,15 +1,14 @@
 package wbs.platform.console.html;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.urlEncode;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Map;
 
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormatter;
-
-import wbs.platform.console.request.FormData;
 
 /**
  * Useful stuff for making sets of links to different dates in html.
@@ -24,31 +23,44 @@ class ObsoleteDateLinks {
 	public static
 	String makeLink (
 			String url,
-			FormData formData,
+			Map<String,String> formData,
 			String field,
 			String value) {
 
 		StringBuilder stringBuilder =
 			new StringBuilder ();
 
-		stringBuilder.append (url);
-		stringBuilder.append ("?");
+		stringBuilder.append (
+			stringFormat (
+				"%s?",
+				url));
 
-		for (FormData.Entry entry : formData) {
+		for (
+			Map.Entry<String,String> entry
+				: formData.entrySet ()
+		) {
 
-			if (entry.getName ().equals (field))
+			if (
+				equal (
+					entry.getKey (),
+					field)
+			) {
 				continue;
+			}
 
-			stringBuilder.append (urlEncode (entry.getName ()));
-			stringBuilder.append ('=');
-			stringBuilder.append (urlEncode (entry.getValue ()));
-			stringBuilder.append ('&');
+			stringBuilder.append (
+				stringFormat (
+					"%u=%u&",
+					entry.getKey (),
+					entry.getValue ()));
 
 		}
 
-		stringBuilder.append (urlEncode (field));
-		stringBuilder.append ('=');
-		stringBuilder.append (urlEncode (value));
+		stringBuilder.append (
+			stringFormat (
+				"%u=%u",
+				field,
+				value));
 
 		return stringBuilder.toString ();
 
@@ -162,7 +174,7 @@ class ObsoleteDateLinks {
 	void browser (
 			final PrintWriter out,
 			final String url,
-			final FormData formData,
+			final Map<String,String> formData,
 			final LocalDate date,
 			final String dateFieldName,
 			final LinkMaker linkMaker,
@@ -203,7 +215,7 @@ class ObsoleteDateLinks {
 	void browserParagraph (
 			final PrintWriter out,
 			final String url,
-			final FormData formData,
+			final Map<String,String> formData,
 			final LocalDate date,
 			final String dateFieldName,
 			final LinkMaker linkMaker,
@@ -252,7 +264,7 @@ class ObsoleteDateLinks {
 	void monthlyBrowserParagraph (
 			PrintWriter out,
 			String url,
-			FormData formData,
+			Map<String,String> formData,
 			LocalDate date) {
 
 		browserParagraph (
@@ -274,7 +286,7 @@ class ObsoleteDateLinks {
 	void dailyBrowserParagraph (
 			PrintWriter out,
 			String url,
-			FormData formData,
+			Map<String,String> formData,
 			LocalDate date) {
 
 		browserParagraph (
@@ -291,7 +303,7 @@ class ObsoleteDateLinks {
 	public static
 	String dailyBrowserLinks (
 			String url,
-			FormData formData,
+			Map<String,String> formData,
 			LocalDate date) {
 
 		StringWriter stringWriter =

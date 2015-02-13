@@ -105,4 +105,5 @@ class ChatUserImageRec
 			.toComparison ();
 
 	}
+
 }

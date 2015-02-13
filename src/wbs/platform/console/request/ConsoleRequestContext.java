@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
@@ -14,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.joda.time.Instant;
 
 import wbs.framework.record.Record;
@@ -32,7 +32,6 @@ interface ConsoleRequestContext {
 		Pattern.compile ("^[a-z0-9_]+$");
 
 	HttpServletRequest request ();
-
 	HttpServletResponse response ();
 
 	Object request (
@@ -92,7 +91,7 @@ interface ConsoleRequestContext {
 	List<String> getParameterValues (
 			String name);
 
-	FormData requestFormData ();
+	Map<String,String> requestFormData ();
 
 	String magicTdCheck (
 			String name,
@@ -160,11 +159,11 @@ interface ConsoleRequestContext {
 			Object value);
 
 	void formData (
-			FormData newFormData);
+			Map<String,String> newFormData);
 
 	void setEmptyFormData ();
 
-	FormData getFormData ();
+	Map<String,String> getFormData ();
 
 	String getForm (
 			String key);
@@ -202,7 +201,7 @@ interface ConsoleRequestContext {
 			List<String> notices);
 
 	void hideFormData (
-			String... keys);
+			Set<String> keys);
 
 	String pathInfo ();
 
@@ -269,11 +268,12 @@ interface ConsoleRequestContext {
 
 	boolean isMultipart ();
 
-	List<FileItem> fileItems ()
-		throws FileUploadException;
+	List<FileItem> fileItems ();
 
-	FileItem fileItem (
-			 String name)
-		throws FileUploadException;
+	FileItem fileItemFile (
+			 String name);
+
+	String fileItemField (
+			 String name);
 
 }
