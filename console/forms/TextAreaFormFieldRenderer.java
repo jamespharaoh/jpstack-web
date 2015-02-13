@@ -50,6 +50,11 @@ class TextAreaFormFieldRenderer<Container>
 	@Getter @Setter
 	String charCountData;
 
+	// details
+
+	@Getter
+	boolean fileUpload = false;
+
 	// implementation
 
 	@Override
