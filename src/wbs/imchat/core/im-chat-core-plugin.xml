@@ -40,6 +40,7 @@
 		<bean class="api.ImChatPricePointListAction"/>
 		<bean class="api.ImChatProfileListAction"/>
 		<bean class="api.ImChatPurchaseMakeAction"/>
+		<bean class="api.ImChatPurchaseStartAction"/>
 		<bean class="api.ImChatPurchaseHistoryAction"/>
 		<bean class="api.ImChatForgotPasswordAction"/>
 		<bean class="api.ImChatChangePasswordAction"/>

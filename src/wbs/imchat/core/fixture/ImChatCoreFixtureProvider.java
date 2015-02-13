@@ -283,6 +283,8 @@ class ImChatCoreFixtureProvider
 
 			.setImChatPricePoint (
 					imChatPricePoint)
+				
+			.setPaypalPayment(null)
 
 			.setPrice (
 				10)

@@ -17,6 +17,7 @@
 	<library name="dom4j" type="jar" version="1.6.1"/>
 	<library name="gpars" type="jar" version="1.0.0"/>
 	<library name="groovy" type="jar" version="2.1.8" source="yes"/>
+	<library name="gson" type="jar" version="2.2.2"/>
 	<library name="guava" type="bundle" version="16.0.1" source="yes"/>
 	<library name="hamcrest-core" type="jar" version="1.1"/>
 	<library name="hibernate-commons-annotations" type="jar" version="4.0.2.Final" source="yes"/>
@@ -50,9 +51,12 @@
 	<library name="log4j" type="bundle" version="1.2.17" source="yes"/>
 	<library name="lombok" type="jar" version="1.12.2" source="yes"/>
 	<library name="mail" type="jar" version="1.4.3"/>
+	<library name="merchantsdk" type="jar" version="2.13.117" source="yes"/>
+	<library name="paypal-core" type="jar" version="1.6.6" source="yes"/>
+	<library name="permissionssdk" type="jar" version="2.5.109" source="yes"/>
 	<library name="portlet-api" type="jar" version="1.0"/>
 	<library name="postgresql" type="jar" version="9.1-901.jdbc4" source="yes"/>
-	<library name="servlet-api" type="jar" version="2.4"/>
+	<library name="servlet-api" type="jar" version="2.5"/>
 	<library name="slf4j-api" type="jar" version="1.6.1"/>
 	<library name="usertype.jodatime" type="jar" version="2.0.1" source="yes"/>
 	<library name="usertype.spi" type="jar" version="2.0.1"/>

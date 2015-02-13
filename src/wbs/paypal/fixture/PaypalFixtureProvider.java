@@ -27,6 +27,9 @@ class PaypalFixtureProvider
 
 	@Inject
 	PaypalAccountObjectHelper paypalAccountHelper;
+	
+	@Inject
+	PaypalPaymentObjectHelper paypalPaymentHelper;
 
 	@Inject
 	SliceObjectHelper sliceHelper;
