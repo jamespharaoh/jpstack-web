@@ -9,14 +9,15 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass
 public
-class ImChatPurchaseStartSuccess {
+class ImChatPurchaseGetConfirmationRequest {
 
 	@DataAttribute
-	String status = "success";
+	String sessionSecret;
 
 	@DataAttribute
-	String redirectURL;
+	String purchaseToken;
 
 	@DataAttribute
-	ImChatCustomerData customer;
+	String paypalToken;
+
 }

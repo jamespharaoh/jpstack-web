@@ -14,16 +14,17 @@ import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import urn.ebay.api.PayPalAPI.DoExpressCheckoutPaymentReq;
+import urn.ebay.api.PayPalAPI.DoExpressCheckoutPaymentRequestType;
+import urn.ebay.api.PayPalAPI.DoExpressCheckoutPaymentResponseType;
 import urn.ebay.api.PayPalAPI.PayPalAPIInterfaceServiceService;
-import urn.ebay.api.PayPalAPI.SetExpressCheckoutReq;
-import urn.ebay.api.PayPalAPI.SetExpressCheckoutRequestType;
-import urn.ebay.api.PayPalAPI.SetExpressCheckoutResponseType;
 import urn.ebay.apis.CoreComponentTypes.BasicAmountType;
 import urn.ebay.apis.eBLBaseComponents.CurrencyCodeType;
+import urn.ebay.apis.eBLBaseComponents.DoExpressCheckoutPaymentRequestDetailsType;
 import urn.ebay.apis.eBLBaseComponents.ErrorType;
 import urn.ebay.apis.eBLBaseComponents.PaymentActionCodeType;
 import urn.ebay.apis.eBLBaseComponents.PaymentDetailsType;
-import urn.ebay.apis.eBLBaseComponents.SetExpressCheckoutRequestDetailsType;
+import urn.ebay.apis.eBLBaseComponents.PaymentInfoType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
@@ -35,18 +36,16 @@ import wbs.framework.web.Responder;
 import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
 import wbs.imchat.core.model.ImChatPricePointObjectHelper;
-import wbs.imchat.core.model.ImChatPricePointRec;
 import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
-import wbs.imchat.core.model.ImChatPurchaseRec;
-import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
 import wbs.paypal.model.PaypalPaymentObjectHelper;
 import wbs.paypal.model.PaypalPaymentRec;
 
-@PrototypeComponent ("imChatPurchaseStartAction")
+
+@PrototypeComponent ("imChatPurchaseConfirmAction")
 public
-class ImChatPurchaseStartAction
+class ImChatPurchaseConfirmAction
 	implements Action {
 
 	// dependencies
@@ -67,10 +66,10 @@ class ImChatPurchaseStartAction
 	ImChatPurchaseObjectHelper imChatPurchaseHelper;
 
 	@Inject
-	PaypalPaymentObjectHelper paypalPaymentHelper;
+	ImChatSessionObjectHelper imChatSessionHelper;
 
 	@Inject
-	ImChatSessionObjectHelper imChatSessionHelper;
+	PaypalPaymentObjectHelper paypalPaymentHelper;
 
 	@Inject
 	RequestContext requestContext;
@@ -97,9 +96,9 @@ class ImChatPurchaseStartAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatPurchaseMakeRequest purchaseRequest =
+		ImChatPurchaseConfirmRequest purchaseRequest =
 			dataFromJson.fromJson (
-				ImChatPurchaseMakeRequest.class,
+					ImChatPurchaseConfirmRequest.class,
 				jsonValue);
 
 		// begin transaction
@@ -107,13 +106,6 @@ class ImChatPurchaseStartAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite ();
-
-		ImChatRec imChat =
-			imChatHelper.find (
-				Integer.parseInt (
-					(String)
-					requestContext.request (
-						"imChatId")));
 
 		// lookup session and customer
 
@@ -141,97 +133,79 @@ class ImChatPurchaseStartAction
 
 		}
 
-		// get customer
-
 		ImChatCustomerRec customer =
-				session.getImChatCustomer ();
+				session.getImChatCustomer();
 
-		// lookup price point
-
-		ImChatPricePointRec pricePoint =
-			imChatPricePointHelper.find (
-				(int) (long)
-				purchaseRequest.pricePointId ());
-
-		if (
-			pricePoint == null
-			|| pricePoint.getImChat () != imChat
-			|| pricePoint.getDeleted ()
-		) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"price-point-invalid")
-
-				.message (
-					"The price point id is invalid");
-
-			return jsonResponderProvider.get ()
-				.value (failureResponse);
-
-		}
-
-		// create paypal payment and purchase
-
-		String token = paypalPaymentHelper.generateToken();
+		// lookup paypal payment
 
 		PaypalPaymentRec paypalPayment =
-				paypalPaymentHelper.insert (
-					new PaypalPaymentRec()
+				paypalPaymentHelper.findByToken (
+					purchaseRequest.purchaseToken ());
 
-					.setPaypalAccount(
-							customer.getImChat().getPaypalAccount())
+		if (
+				paypalPayment == null
+				|| !paypalPayment.getStatus().equals("pending")
+			) {
 
-					.setValue(pricePoint.getValue ())
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
 
-					.setToken(token)
+					.reason (
+						"payment-invalid")
 
-					.setStatus("started")
-				);
+					.message (
+						"The payment is invalid or the payment is no " +
+						"longer pending (status: "+paypalPayment.getStatus()+").");
 
-		imChatPurchaseHelper.insert (
-			new ImChatPurchaseRec ()
+				return jsonResponderProvider.get ()
+					.value (failureResponse);
 
-			.setImChatCustomer (
-				customer)
+			}
 
-			.setIndex (
-				customer.getNumPurchases ())
+		// confirm payment and obtain payerId
 
-			.setImChatPricePoint (
-				pricePoint)
+		String checkoutStatus = doExpressCheckout(purchaseRequest.paypalToken (), purchaseRequest.payerId (), paypalPayment.getValue ().toString() + ".0");
 
-			.setPrice (
-				pricePoint.getPrice ())
+		if (
+				!checkoutStatus.contains("Success")
+			) {
 
-			.setValue (
-				pricePoint.getValue ())
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
 
-			.setOldBalance (
-				customer.getBalance ())
+					.reason (
+						"payment-invalid")
 
-			.setNewBalance (
+					.message (
+						"The payment is invalid or the payment was " +
+						"not confirmed." + checkoutStatus);
+
+				return jsonResponderProvider.get ()
+					.value (failureResponse);
+
+			}
+
+		// update payment status
+
+		paypalPaymentHelper.insert (
+				paypalPayment.setStatus("confirmed")
+			);
+
+		// update customer
+
+		customer
+
+			.setNumPurchases (
+				customer.getNumPurchases () + 1)
+
+			.setBalance (
 				+ customer.getBalance ()
-				+ pricePoint.getValue ())
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setPaypalPayment(paypalPayment)
-
-		);
-
-		String redirectURL = setExpressCheckout(pricePoint.getValue ().toString() + ".0", token);
+				+ paypalPayment.getValue ());
 
 		// create response
 
-		ImChatPurchaseStartSuccess successResponse =
-			new ImChatPurchaseStartSuccess ()
-
-			.redirectURL (
-				redirectURL)
+		ImChatPurchaseConfirmSuccess successResponse =
+			new ImChatPurchaseConfirmSuccess ()
 
 			.customer (
 				imChatApiLogic.customerData (
@@ -246,13 +220,17 @@ class ImChatPurchaseStartAction
 
 	}
 
-	//Calls Paypal API and returns an access token
+	public String doExpressCheckout(String paypalToken, String payerId, String amount) {
 
-	public String setExpressCheckout(String amount, String token) {
+		// DoExpressCheckoutPaymentReq
 
-		SetExpressCheckoutRequestDetailsType setExpressCheckoutRequestDetails = new SetExpressCheckoutRequestDetailsType();
-		setExpressCheckoutRequestDetails.setReturnURL("http://chat.dev.wbsoft.co/test.html#payment=pending&token="+token);
-		setExpressCheckoutRequestDetails.setCancelURL("http://chat.dev.wbsoft.co/test.html#payment=error&token="+token);
+		DoExpressCheckoutPaymentReq doExpressCheckoutPaymentReq = new DoExpressCheckoutPaymentReq();
+		DoExpressCheckoutPaymentRequestDetailsType doExpressCheckoutPaymentRequestDetails = new DoExpressCheckoutPaymentRequestDetailsType();
+
+		// Set the token and payerId
+
+		doExpressCheckoutPaymentRequestDetails.setToken(paypalToken);
+		doExpressCheckoutPaymentRequestDetails.setPayerID(payerId);
 
 		// Payment Information
 
@@ -267,56 +245,64 @@ class ImChatPurchaseStartAction
 
 		paymentDetails.setNotifyURL("http://chat.dev.wbsoft.co/test.html#payment=finished");
 		paymentDetailsList.add(paymentDetails);
-		setExpressCheckoutRequestDetails.setPaymentDetails(paymentDetailsList);
+		doExpressCheckoutPaymentRequestDetails.setPaymentDetails(paymentDetailsList);
 
-		// Express checkout
-
-		SetExpressCheckoutReq setExpressCheckoutReq = new SetExpressCheckoutReq();
-		SetExpressCheckoutRequestType setExpressCheckoutRequest = new SetExpressCheckoutRequestType(setExpressCheckoutRequestDetails);
-		setExpressCheckoutReq.setSetExpressCheckoutRequest(setExpressCheckoutRequest);
-
+		DoExpressCheckoutPaymentRequestType doExpressCheckoutPaymentRequest = new DoExpressCheckoutPaymentRequestType(doExpressCheckoutPaymentRequestDetails);
+		doExpressCheckoutPaymentReq.setDoExpressCheckoutPaymentRequest(doExpressCheckoutPaymentRequest);
 		// Creating service wrapper object
 
 		PayPalAPIInterfaceServiceService service = null;
-
 		try {
 
 			service = new PayPalAPIInterfaceServiceService("conf/sdk_conf.properties");
 
 		} catch (IOException e) {
 
-			return "Error properties:" + e;
+			return "Error Message : " + e.getMessage();
 
 		}
 
-		SetExpressCheckoutResponseType setExpressCheckoutResponse = null;
-
+		DoExpressCheckoutPaymentResponseType doExpressCheckoutPaymentResponse = null;
 		try {
+
 			// Making API call
 
-			setExpressCheckoutResponse = service.setExpressCheckout(setExpressCheckoutReq);
+			doExpressCheckoutPaymentResponse = service.doExpressCheckoutPayment(doExpressCheckoutPaymentReq);
 
 		} catch (Exception e) {
-
-			return "Error api call:" + e;
-
+			return "Error Message : " + e.getMessage();
 		}
 
 		// Accessing response parameters
 
-		if (setExpressCheckoutResponse.getAck().getValue().equalsIgnoreCase("success")) {
+		if (doExpressCheckoutPaymentResponse.getAck().getValue().equalsIgnoreCase("success")) {
 
-			return "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=" + setExpressCheckoutResponse.getToken();
+			String details = "";
 
+			if (doExpressCheckoutPaymentResponse.getDoExpressCheckoutPaymentResponseDetails().getPaymentInfo() != null) {
+
+				Iterator<PaymentInfoType> paymentInfoIterator = doExpressCheckoutPaymentResponse.getDoExpressCheckoutPaymentResponseDetails().getPaymentInfo().iterator();
+
+
+				while (paymentInfoIterator.hasNext()) {
+					PaymentInfoType paymentInfo = paymentInfoIterator.next();
+
+					details = details + "Transaction ID : "	+ paymentInfo.getTransactionID() + "\n";
+				}
+			}
+
+			return "Success \n" + details;
 		}
+
 		else {
 
 			String errores = "";
-			for(Iterator<ErrorType> iter = setExpressCheckoutResponse.getErrors().iterator(); iter.hasNext() ; ) {
+			for(Iterator<ErrorType> iter = doExpressCheckoutPaymentResponse.getErrors().iterator(); iter.hasNext() ; ) {
 				   errores = errores + (iter.next()).getLongMessage() + "   \n";
 			}
 			return "Error api response \n" + errores;
-
 		}
+
 	}
+
 }

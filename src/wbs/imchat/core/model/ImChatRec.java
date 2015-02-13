@@ -18,6 +18,7 @@ import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
+import wbs.paypal.model.PaypalAccountRec;
 import wbs.platform.currency.model.CurrencyRec;
 import wbs.platform.scaffold.model.SliceRec;
 
@@ -55,6 +56,9 @@ class ImChatRec
 	Boolean deleted = false;
 
 	// settings
+
+	@ReferenceField
+	PaypalAccountRec paypalAccount;
 
 	@ReferenceField (
 		nullable = true)

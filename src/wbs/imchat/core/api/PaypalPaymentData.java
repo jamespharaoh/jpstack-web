@@ -8,15 +8,12 @@ import wbs.framework.data.annotations.DataClass;
 @Accessors (fluent = true)
 @Data
 @DataClass
-public
-class ImChatPurchaseStartSuccess {
+public class PaypalPaymentData {
 
 	@DataAttribute
-	String status = "success";
+	Integer id;
 
 	@DataAttribute
-	String redirectURL;
+	String status;
 
-	@DataAttribute
-	ImChatCustomerData customer;
 }

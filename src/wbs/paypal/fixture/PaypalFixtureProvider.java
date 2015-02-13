@@ -27,7 +27,7 @@ class PaypalFixtureProvider
 
 	@Inject
 	PaypalAccountObjectHelper paypalAccountHelper;
-	
+
 	//@Inject
 	//PaypalPaymentObjectHelper paypalPaymentHelper;
 
@@ -59,7 +59,7 @@ class PaypalFixtureProvider
 
 		);
 
-		paypalAccountHelper.insert (
+		/*paypalAccountHelper.insert (
 			new PaypalAccountRec ()
 
 			.setSlice (
@@ -76,7 +76,7 @@ class PaypalFixtureProvider
 			.setDescription (
 				"Test paypal account")
 
-		);
+		);*/
 
 	}
 

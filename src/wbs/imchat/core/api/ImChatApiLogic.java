@@ -5,6 +5,7 @@ import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatMessageRec;
 import wbs.imchat.core.model.ImChatPricePointRec;
 import wbs.imchat.core.model.ImChatProfileRec;
+import wbs.paypal.model.PaypalPaymentRec;
 
 public
 interface ImChatApiLogic {
@@ -23,5 +24,8 @@ interface ImChatApiLogic {
 
 	ImChatMessageData messageData (
 			ImChatMessageRec message);
+
+	PaypalPaymentData paypalPaymentData (
+			PaypalPaymentRec paypalPayment);
 
 }

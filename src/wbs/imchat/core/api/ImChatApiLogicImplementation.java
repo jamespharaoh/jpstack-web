@@ -9,6 +9,7 @@ import wbs.imchat.core.model.ImChatMessageRec;
 import wbs.imchat.core.model.ImChatPricePointRec;
 import wbs.imchat.core.model.ImChatProfileRec;
 import wbs.imchat.core.model.ImChatRec;
+import wbs.paypal.model.PaypalPaymentRec;
 import wbs.platform.currency.logic.CurrencyLogic;
 
 @SingletonComponent ("imChatApiLogic")
@@ -117,6 +118,21 @@ class ImChatApiLogicImplementation
 
 			.messageText (
 				message.getMessageText ());
+
+	}
+
+	@Override
+	public
+	PaypalPaymentData paypalPaymentData (
+			PaypalPaymentRec paypalPayment) {
+
+		return new PaypalPaymentData ()
+
+			.id (
+					paypalPayment.getId ())
+
+			.status (
+					paypalPayment.getStatus ());
 
 	}
 
