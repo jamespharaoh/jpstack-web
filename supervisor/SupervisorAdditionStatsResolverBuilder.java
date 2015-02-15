@@ -28,13 +28,13 @@ class SupervisorAdditionStatsResolverBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec container;
 
 	@BuilderSource
-	SupervisorAdditionStatsResolverSpec supervisorAdditionStatsResolverSpec;
+	SupervisorAdditionStatsResolverSpec spec;
 
 	@BuilderTarget
-	SupervisorPageBuilder supervisorPageBuilder;
+	SupervisorConfigBuilder supervisorConfigBuilder;
 
 	// build
 
@@ -44,23 +44,25 @@ class SupervisorAdditionStatsResolverBuilder {
 			Builder builder) {
 
 		String name =
-			supervisorAdditionStatsResolverSpec.name ();
+			spec.name ();
 
 		List<SupervisorAdditionOperandSpec> operandSpecs =
-			supervisorAdditionStatsResolverSpec.operandSpecs ();
+			spec.operandSpecs ();
 
 		AdditionStatsResolver additionStatsResolver =
 			this.additionStatsResolver.get ();
 
-		for (SupervisorAdditionOperandSpec operandSpec
-				: operandSpecs) {
+		for (
+			SupervisorAdditionOperandSpec operandSpec
+				: operandSpecs
+		) {
 
 			StatsResolver resolver = null;
 
 			if (operandSpec.resolverName () != null) {
 
 				resolver =
-					supervisorPageBuilder.statsResolversByName ().get (
+					supervisorConfigBuilder.statsResolversByName ().get (
 						operandSpec.resolverName ());
 
 				if (resolver == null) {
@@ -81,7 +83,7 @@ class SupervisorAdditionStatsResolverBuilder {
 
 		}
 
-		supervisorPageBuilder.statsResolversByName ().put (
+		supervisorConfigBuilder.statsResolversByName ().put (
 			name,
 			additionStatsResolver);
 

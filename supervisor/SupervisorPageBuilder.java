@@ -5,16 +5,9 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
@@ -27,17 +20,13 @@ import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.console.context.ConsoleContextBuilderContainer;
 import wbs.platform.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.platform.console.helper.ConsoleHelper;
+import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.module.ConsoleMetaManager;
 import wbs.platform.console.module.ConsoleModuleImpl;
 import wbs.platform.console.part.PagePart;
 import wbs.platform.console.responder.ConsoleFile;
 import wbs.platform.console.tab.ConsoleContextTab;
 import wbs.platform.console.tab.TabContextResponder;
-import wbs.platform.reporting.console.StatsAggregator;
-import wbs.platform.reporting.console.StatsFormatter;
-import wbs.platform.reporting.console.StatsGrouper;
-import wbs.platform.reporting.console.StatsProvider;
-import wbs.platform.reporting.console.StatsResolver;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorPageBuilder")
@@ -52,6 +41,11 @@ class SupervisorPageBuilder {
 
 	@Inject
 	ConsoleMetaManager consoleMetaManager;
+
+	// indirect dependencies
+
+	@Inject
+	Provider<ConsoleManager> consoleManagerProvider;
 
 	// prototype dependencies
 
@@ -92,30 +86,6 @@ class SupervisorPageBuilder {
 
 	Provider<PagePart> pagePartFactory;
 
-	@Getter @Setter
-	Map<String,StatsProvider> statsProvidersByName =
-		new LinkedHashMap<String,StatsProvider> ();
-
-	@Getter @Setter
-	Map<String,StatsAggregator> statsAggregatorsByName =
-		new LinkedHashMap<String,StatsAggregator> ();
-
-	@Getter @Setter
-	Map<String,StatsFormatter> statsFormattersByName =
-		new LinkedHashMap<String,StatsFormatter> ();
-
-	@Getter @Setter
-	Map<String,StatsGrouper> statsGroupersByName =
-		new LinkedHashMap<String,StatsGrouper> ();
-
-	@Getter @Setter
-	Map<String,StatsResolver> statsResolversByName =
-		new LinkedHashMap<String,StatsResolver> ();
-
-	@Getter @Setter
-	List<Provider<PagePart>> pagePartFactories =
-		new ArrayList<Provider<PagePart>> ();
-
 	// build
 
 	@BuildMethod
@@ -125,14 +95,11 @@ class SupervisorPageBuilder {
 
 		setDefaults ();
 
-		builder.descend (
-			spec,
-			spec.builders (),
-			this);
-
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildContextTab (
 				resolvedExtensionPoint);
@@ -180,9 +147,25 @@ class SupervisorPageBuilder {
 			public
 			PagePart get () {
 
+				ConsoleManager consoleManager =
+					consoleManagerProvider.get ();
+
+				SupervisorConfig supervisorConfig =
+					consoleManager.supervisorConfig (
+						spec.configName ());
+
+				if (supervisorConfig == null) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"No such supervisor config: %s",
+							spec.configName ()));
+
+				}
+
 				return supervisorPart.get ()
-					.supervisorPageSpec (spec)
-					.pagePartFactories (pagePartFactories);
+					.fileName (spec.fileName ())
+					.supervisorConfig (supervisorConfig);
 
 			}
 
@@ -192,6 +175,7 @@ class SupervisorPageBuilder {
 
 	void buildResponder () {
 
+System.out.println ("BUILD: " + responderName);
 		consoleModule.addResponder (
 			responderName,
 			tabContextResponder.get ()

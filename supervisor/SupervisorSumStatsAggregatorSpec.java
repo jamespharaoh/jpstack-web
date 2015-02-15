@@ -17,7 +17,7 @@ public
 class SupervisorSumStatsAggregatorSpec {
 
 	@DataParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec supervisorConfigSpec;
 
 	@DataAttribute
 	String name;

@@ -30,8 +30,13 @@
 				name="users"
 				title="List active users"/>
 
-			<extension-point
-				name="queue.supervisor"/>
+			<supervisor-page
+				title="Queue supervisor"
+				config="apn"/>
+
+			<context-tab-page
+				name="supervisorItems"
+				hide-tab="yes"/>
 
 			<context-responder-page
 				name="home"/>

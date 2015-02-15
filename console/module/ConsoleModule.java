@@ -13,6 +13,7 @@ import wbs.platform.console.context.ConsoleContextType;
 import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.tab.ConsoleContextTab;
 import wbs.platform.console.tab.ContextTabPlacement;
+import wbs.platform.supervisor.SupervisorConfig;
 
 public
 interface ConsoleModule
@@ -33,5 +34,7 @@ interface ConsoleModule
 	Map<String,Provider<Responder>> responders ();
 
 	Map<String,FormFieldSet> formFieldSets ();
+
+	Map<String,SupervisorConfig> supervisorConfigs ();
 
 }

@@ -21,7 +21,7 @@ public
 class SupervisorAdditionStatsResolverSpec {
 
 	@DataParent
-	SupervisorPageSpec supervisorPage;
+	SupervisorConfigSpec supervisorConfig;
 
 	@DataAttribute
 	String name;
