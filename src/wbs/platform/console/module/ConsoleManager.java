@@ -7,6 +7,7 @@ import wbs.platform.console.context.ConsoleContext;
 import wbs.platform.console.context.ConsoleContextStuff;
 import wbs.platform.console.context.ConsoleContextType;
 import wbs.platform.console.tab.ConsoleContextTab;
+import wbs.platform.supervisor.SupervisorConfig;
 
 public
 interface ConsoleManager {
@@ -52,5 +53,8 @@ interface ConsoleManager {
 	ConsoleContext relatedContext (
 			ConsoleContext sourceContext,
 			ConsoleContextType targetContextType);
+
+	SupervisorConfig supervisorConfig (
+			String name);
 
 }

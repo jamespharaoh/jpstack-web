@@ -21,7 +21,7 @@ class SupervisorSimplePartSpec {
 	// tree attributes
 
 	@DataParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec supervisorConfig;
 
 	// attributes
 

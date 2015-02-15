@@ -22,19 +22,21 @@ import wbs.platform.reporting.console.StatsResolver;
 public
 class SupervisorMultiplicationStatsResolverBuilder {
 
+	// dependencies
+
 	@Inject
 	Provider<MultiplicationStatsResolver> multiplicationStatsResolver;
 
 	// builder
 
 	@BuilderParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec container;
 
 	@BuilderSource
-	SupervisorMultiplicationStatsResolverSpec supervisorMultiplicationStatsResolverSpec;
+	SupervisorMultiplicationStatsResolverSpec spec;
 
 	@BuilderTarget
-	SupervisorPageBuilder supervisorPageBuilder;
+	SupervisorConfigBuilder supervisorConfigBuilder;
 
 	// build
 
@@ -44,23 +46,25 @@ class SupervisorMultiplicationStatsResolverBuilder {
 			Builder builder) {
 
 		String name =
-			supervisorMultiplicationStatsResolverSpec.name ();
+			spec.name ();
 
 		List<SupervisorMultiplicationOperandSpec> operandSpecs =
-			supervisorMultiplicationStatsResolverSpec.operandSpecs ();
+			spec.operandSpecs ();
 
 		MultiplicationStatsResolver multiplicationStatsResolver =
 			this.multiplicationStatsResolver.get ();
 
-		for (SupervisorMultiplicationOperandSpec operandSpec
-				: operandSpecs) {
+		for (
+			SupervisorMultiplicationOperandSpec operandSpec
+				: operandSpecs
+		) {
 
 			StatsResolver resolver = null;
 
 			if (operandSpec.resolverName () != null) {
 
 				resolver =
-					supervisorPageBuilder.statsResolversByName ().get (
+					supervisorConfigBuilder.statsResolversByName ().get (
 						operandSpec.resolverName ());
 
 				if (resolver == null) {
@@ -82,7 +86,7 @@ class SupervisorMultiplicationStatsResolverBuilder {
 
 		}
 
-		supervisorPageBuilder.statsResolversByName ().put (
+		supervisorConfigBuilder.statsResolversByName ().put (
 			name,
 			multiplicationStatsResolver);
 

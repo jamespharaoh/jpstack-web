@@ -28,13 +28,13 @@ class SupervisorSimplePartBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec container;
 
 	@BuilderSource
-	SupervisorSimplePartSpec supervisorSimplePartSpec;
+	SupervisorSimplePartSpec spec;
 
 	@BuilderTarget
-	SupervisorPageBuilder supervisorPageBuilder;
+	SupervisorConfigBuilder supervisorConfigBuilder;
 
 	// implementation
 
@@ -44,14 +44,14 @@ class SupervisorSimplePartBuilder {
 			Builder builder) {
 
 		String beanName =
-			supervisorSimplePartSpec.beanName ();
+			spec.beanName ();
 
 		Provider<PagePart> pagePartFactory =
 			applicationContext.getBeanProvider (
 				beanName,
 				PagePart.class);
 
-		supervisorPageBuilder.pagePartFactories () .add  (
+		supervisorConfigBuilder.pagePartFactories () .add  (
 			pagePartFactory);
 
 	}

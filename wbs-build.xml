@@ -447,7 +447,11 @@
 			name="ticketer"
 			package="wbs.smsapps.ticketer"/>
 
-		<!-- chat -->
+		<!-- apn -->
+
+		<plugin
+			name="apn-misc"
+			package="wbs.apn.misc"/>
 
 		<plugin
 			name="chat-core"

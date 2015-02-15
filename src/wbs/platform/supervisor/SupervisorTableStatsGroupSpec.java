@@ -17,7 +17,7 @@ public
 class SupervisorTableStatsGroupSpec {
 
 	@DataAncestor
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec supervisorConfigSpec;
 
 	@DataAttribute (
 		value = "grouper",

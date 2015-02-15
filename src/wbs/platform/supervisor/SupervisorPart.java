@@ -36,17 +36,23 @@ public
 class SupervisorPart
 	extends AbstractPagePart {
 
+	// dependencies
+
 	@Inject
 	ApplicationContext applicationContext;
 
 	@Inject
 	StatsConsoleLogic statsConsoleLogic;
 
-	@Getter @Setter
-	SupervisorPageSpec supervisorPageSpec;
+	// properties
 
 	@Getter @Setter
-	List<Provider<PagePart>> pagePartFactories;
+	String fileName;
+
+	@Getter @Setter
+	SupervisorConfig supervisorConfig;
+
+	// state
 
 	ObsoleteDateField dateField;
 
@@ -56,6 +62,8 @@ class SupervisorPart
 
 	List<PagePart> pageParts =
 		Collections.emptyList ();
+
+	// implementation
 
 	@Override
 	public
@@ -100,8 +108,10 @@ class SupervisorPart
 		ImmutableMap.Builder<String,Object> conditionsBuilder =
 			ImmutableMap.<String,Object>builder ();
 
-		for (Object object
-				: supervisorPageSpec.builders ()) {
+		for (
+			Object object
+				: supervisorConfig.spec ().builders ()
+		) {
 
 			if (! (object instanceof SupervisorConditionSpec))
 				continue;
@@ -124,8 +134,10 @@ class SupervisorPart
 		ImmutableMap.Builder<String,StatsDataSet> dataSetsBuilder =
 			ImmutableMap.<String,StatsDataSet>builder ();
 
-		for (Object object
-				: supervisorPageSpec.builders ()) {
+		for (
+			Object object
+				: supervisorConfig.spec ().builders ()
+		) {
 
 			if (! (object instanceof SupervisorDataSetSpec))
 				continue;
@@ -163,8 +175,10 @@ class SupervisorPart
 		ImmutableList.Builder<PagePart> pagePartsBuilder =
 			ImmutableList.<PagePart>builder ();
 
-		for (Provider<PagePart> pagePartFactory
-				: pagePartFactories) {
+		for (
+			Provider<PagePart> pagePartFactory
+				: supervisorConfig.pagePartFactories ()
+		) {
 
 			PagePart pagePart =
 				pagePartFactory.get ();
@@ -188,8 +202,10 @@ class SupervisorPart
 	public
 	void goHeadStuff () {
 
-		for (PagePart pagePart
-				: pageParts) {
+		for (
+			PagePart pagePart
+				: pageParts
+		) {
 
 			pagePart.goHeadStuff ();
 
@@ -205,7 +221,7 @@ class SupervisorPart
 			requestContext.resolveLocalUrl (
 				stringFormat (
 					"/%s",
-					supervisorPageSpec.fileName ()));
+					fileName ()));
 
 		printFormat (
 			"<form",
@@ -240,8 +256,10 @@ class SupervisorPart
 
 		// page parts
 
-		for (PagePart pagePart
-				: pageParts) {
+		for (
+			PagePart pagePart
+				: pageParts
+		) {
 
 			pagePart.goBodyStuff ();
 
