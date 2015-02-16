@@ -1,5 +1,7 @@
 package wbs.platform.email.logic;
 
+import java.util.Properties;
+
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -39,19 +41,12 @@ class EmailLogic {
 
 		try {
 
+	        Properties properties = System.getProperties();
+	        properties.setProperty("mail.smtp.host", smtpHostname);
+			
 			Session session =
 				Session.getDefaultInstance (
-					System.getProperties (),
-					null);
-
-			Transport transport =
-				session.getTransport ("smtp");
-
-			transport.connect (
-				smtpHostname,
-				smtpPort,
-				smtpUsername,
-				smtpPassword);
+						properties);
 
 			MimeMessage mimeMessage =
 				new MimeMessage (session);

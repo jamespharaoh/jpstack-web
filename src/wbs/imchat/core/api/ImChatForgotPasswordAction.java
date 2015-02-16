@@ -31,6 +31,7 @@ import wbs.imchat.core.model.ImChatCustomerObjectHelper;
 import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
 import wbs.imchat.core.model.ImChatRec;
+import wbs.platform.email.logic.EmailLogic;
 
 @PrototypeComponent ("imChatForgotPasswordAction")
 public
@@ -56,6 +57,9 @@ class ImChatForgotPasswordAction
 
 	@Inject
 	Random random;
+	
+	@Inject
+	EmailLogic email;
 
 	// prototype dependencies
 
@@ -133,24 +137,10 @@ class ImChatForgotPasswordAction
 				newPassword);
 
 		// send new password via mail
-
-        String to = forgotPasswordRequest.email ();
-        String from = "services@wellbehavedsoftware.com";
-        String host = "wellbehavedsoftware.com";
-        Properties properties = System.getProperties();
-        properties.setProperty("mail.smtp.host", host);
-        Session session = Session.getDefaultInstance(properties);
-		try{
-		     MimeMessage message = new MimeMessage(session);
-		     message.setFrom(new InternetAddress(from));
-		     message.addRecipient(Message.RecipientType.TO,
-		                              new InternetAddress(to));
-		     message.setSubject("Chat-app new password");
-		     message.setText("Your new password for chat-app is: " + newPassword + ".");
-		     Transport.send(message);
-		}catch (MessagingException mex) {
-		     mex.printStackTrace();
-		}
+		
+		email.smtpHostname("wellbehavedsoftware.com");
+		email.fromAddress("services@wellbehavedsoftware.com");		
+		email.sendEmail(forgotPasswordRequest.email (), "Chat-app new password", "Your new password for chat-app is: " + newPassword + ".");
 
 		// create response
 
