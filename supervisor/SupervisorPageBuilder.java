@@ -147,25 +147,9 @@ class SupervisorPageBuilder {
 			public
 			PagePart get () {
 
-				ConsoleManager consoleManager =
-					consoleManagerProvider.get ();
-
-				SupervisorConfig supervisorConfig =
-					consoleManager.supervisorConfig (
-						spec.configName ());
-
-				if (supervisorConfig == null) {
-
-					throw new RuntimeException (
-						stringFormat (
-							"No such supervisor config: %s",
-							spec.configName ()));
-
-				}
-
 				return supervisorPart.get ()
 					.fileName (spec.fileName ())
-					.supervisorConfig (supervisorConfig);
+					.supervisorConfigName (spec.configName ());
 
 			}
 
@@ -175,7 +159,6 @@ class SupervisorPageBuilder {
 
 	void buildResponder () {
 
-System.out.println ("BUILD: " + responderName);
 		consoleModule.addResponder (
 			responderName,
 			tabContextResponder.get ()

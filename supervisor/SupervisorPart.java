@@ -19,13 +19,18 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.platform.console.html.ObsoleteDateField;
 import wbs.platform.console.html.ObsoleteDateLinks;
+import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.console.part.PagePart;
+import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.reporting.console.StatsConsoleLogic;
 import wbs.platform.reporting.console.StatsDataSet;
 import wbs.platform.reporting.console.StatsGranularity;
 import wbs.platform.reporting.console.StatsPeriod;
 import wbs.platform.reporting.console.StatsProvider;
+import wbs.platform.scaffold.model.SliceRec;
+import wbs.platform.user.model.UserObjectHelper;
+import wbs.platform.user.model.UserRec;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -42,7 +47,16 @@ class SupervisorPart
 	ApplicationContext applicationContext;
 
 	@Inject
+	ConsoleManager consoleManager;
+
+	@Inject
+	ConsoleRequestContext requestContext;
+
+	@Inject
 	StatsConsoleLogic statsConsoleLogic;
+
+	@Inject
+	UserObjectHelper userHelper;
 
 	// properties
 
@@ -50,14 +64,21 @@ class SupervisorPart
 	String fileName;
 
 	@Getter @Setter
-	SupervisorConfig supervisorConfig;
+	String supervisorConfigName;
 
 	// state
 
+	List<String> supervisorConfigNames;
+	SupervisorConfig supervisorConfig;
+
 	ObsoleteDateField dateField;
+
+	Instant startTime;
+	Instant endTime;
 
 	StatsPeriod statsPeriod;
 
+	Map<String,Object> statsConditions;
 	Map<String,StatsDataSet> statsDataSets;
 
 	List<PagePart> pageParts =
@@ -69,7 +90,75 @@ class SupervisorPart
 	public
 	void prepare () {
 
-		// interpret date
+		prepareSupervisorConfig ();
+		prepareDate ();
+
+		if (supervisorConfig != null) {
+
+			createStatsPeriod ();
+			createStatsConditions ();
+			createStatsDataSets ();
+
+			createPageParts ();
+
+		}
+
+	}
+
+	void prepareSupervisorConfig () {
+
+		if (supervisorConfigName == null) {
+
+			UserRec myUser =
+				userHelper.find (
+					requestContext.userId ());
+
+			SliceRec slice =
+				myUser.getSlice ();
+
+			supervisorConfigNames =
+				slice.getSupervisorConfigNames () != null
+					? ImmutableList.<String>copyOf (
+						slice.getSupervisorConfigNames ().split (","))
+					: Collections.<String>emptyList ();
+
+			supervisorConfigName =
+				requestContext.parameter (
+					"config",
+					supervisorConfigNames.isEmpty ()
+						? null
+						: supervisorConfigNames.get (0));
+
+			if (
+				supervisorConfigName != null
+				&& ! supervisorConfigNames.contains (
+					supervisorConfigName)
+			) {
+				throw new RuntimeException ();
+			}
+
+		}
+
+		if (supervisorConfigName != null) {
+
+			supervisorConfig =
+				consoleManager.supervisorConfig (
+					supervisorConfigName);
+
+			if (supervisorConfig == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Supervisor config not found: %s",
+						supervisorConfigName));
+
+			}
+
+		}
+
+	}
+
+	void prepareDate () {
 
 		dateField =
 			ObsoleteDateField.parse (
@@ -84,18 +173,20 @@ class SupervisorPart
 
 		}
 
-		Instant startTime =
+		startTime =
 			dateField.date
 				.toDateTimeAtStartOfDay ()
 				.toInstant ();
 
-		Instant endTime =
+		endTime =
 			dateField.date
 				.plusDays (1)
 				.toDateTimeAtStartOfDay ()
 				.toInstant ();
 
-		// create stats period
+	}
+
+	void createStatsPeriod () {
 
 		statsPeriod =
 			statsConsoleLogic.createStatsPeriod (
@@ -103,7 +194,9 @@ class SupervisorPart
 				startTime,
 				endTime);
 
-		// create conditions
+	}
+
+	void createStatsConditions () {
 
 		ImmutableMap.Builder<String,Object> conditionsBuilder =
 			ImmutableMap.<String,Object>builder ();
@@ -126,10 +219,12 @@ class SupervisorPart
 
 		}
 
-		Map<String,Object> conditions =
+		statsConditions =
 			conditionsBuilder.build ();
 
-		// retrieve data sets
+	}
+
+	void createStatsDataSets () {
 
 		ImmutableMap.Builder<String,StatsDataSet> dataSetsBuilder =
 			ImmutableMap.<String,StatsDataSet>builder ();
@@ -153,7 +248,7 @@ class SupervisorPart
 			StatsDataSet statsDataSet =
 				statsProvider.getStats (
 					statsPeriod,
-					conditions);
+					statsConditions);
 
 			dataSetsBuilder.put (
 				supervisorDataSetSpec.name (),
@@ -164,7 +259,9 @@ class SupervisorPart
 		statsDataSets =
 			dataSetsBuilder.build ();
 
-		// setup page parts
+	}
+
+	void createPageParts () {
 
 		Map<String,Object> partParameters =
 			ImmutableMap.<String,Object>builder ()
@@ -222,6 +319,42 @@ class SupervisorPart
 				stringFormat (
 					"/%s",
 					fileName ()));
+
+		if (supervisorConfigNames.size () > 1) {
+
+			printFormat (
+				"<p",
+				" class=\"links\"",
+				">\n");
+
+			for (
+				String oneSupervisorConfigName
+					: supervisorConfigNames
+			)  {
+
+				printFormat (
+					"<a",
+					" class=\"%h\"",
+					oneSupervisorConfigName == supervisorConfigName
+						? "selected"
+						: "",
+					" href=\"%h\"",
+					stringFormat (
+						"%s",
+						localUrl,
+						"?config=%u",
+						oneSupervisorConfigName,
+						"&date=%u",
+						dateField.text),
+					">%h</a>\n",
+					oneSupervisorConfigName);
+
+			}
+
+			printFormat (
+				"</p>\n");
+
+		}
 
 		printFormat (
 			"<form",

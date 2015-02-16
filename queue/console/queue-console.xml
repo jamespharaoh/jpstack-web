@@ -31,8 +31,7 @@
 				title="List active users"/>
 
 			<supervisor-page
-				title="Queue supervisor"
-				config="apn"/>
+				title="Queue supervisor"/>
 
 			<context-tab-page
 				name="supervisorItems"

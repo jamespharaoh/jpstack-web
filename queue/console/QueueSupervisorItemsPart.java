@@ -95,7 +95,6 @@ class QueueSupervisorItemsPart
 		printFormat (
 			"<tr>\n",
 			"<th>User</th>\n",
-
 			"%s\n",
 			objectManager.tdForObject (
 				user,
@@ -120,8 +119,10 @@ class QueueSupervisorItemsPart
 			"<th>Processed</th>\n",
 			"</tr>\n");
 
-		for (QueueItemRec queueItem
-				: queueItems) {
+		for (
+			QueueItemRec queueItem
+				: queueItems
+		) {
 
 			QueueRec queue =
 				queueItem.getQueueSubject () != null

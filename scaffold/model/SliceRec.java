@@ -53,6 +53,10 @@ class SliceRec
 		nullable = true)
 	String adminEmail;
 
+	@SimpleField (
+		nullable = true)
+	String supervisorConfigNames;
+
 	// compare to
 
 	@Override
