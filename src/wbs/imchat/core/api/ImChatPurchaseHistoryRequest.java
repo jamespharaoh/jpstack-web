@@ -12,6 +12,6 @@ public
 class ImChatPurchaseHistoryRequest {
 
 	@DataAttribute
-	Long customerId;
+	String sessionSecret;
 
 }

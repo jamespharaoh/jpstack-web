@@ -25,6 +25,8 @@ import wbs.imchat.core.model.ImChatCustomerObjectHelper;
 import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
 import wbs.imchat.core.model.ImChatPurchaseRec;
+import wbs.imchat.core.model.ImChatSessionObjectHelper;
+import wbs.imchat.core.model.ImChatSessionRec;
 import wbs.platform.console.misc.TimeFormatter;
 
 import com.google.common.collect.Lists;
@@ -38,12 +40,18 @@ class ImChatPurchaseHistoryAction
 
 	@Inject
 	Database database;
+	
+	@Inject
+	ImChatApiLogic imChatApiLogic;
 
 	@Inject
 	ImChatCustomerObjectHelper imChatCustomerHelper;
 
 	@Inject
 	ImChatPurchaseObjectHelper imChatPurchaseHelper;
+	
+	@Inject
+	ImChatSessionObjectHelper imChatSessionHelper;
 
 	@Inject
 	RequestContext requestContext;
@@ -84,28 +92,35 @@ class ImChatPurchaseHistoryAction
 		Transaction transaction =
 			database.beginReadOnly ();
 
-		// find customer
+		// lookup session and customer
 
-		ImChatCustomerRec customer =
-			imChatCustomerHelper.find (
-				purchaseHistoryRequest.customerId ());
+		ImChatSessionRec session =
+				imChatSessionHelper.findBySecret (
+						purchaseHistoryRequest.sessionSecret ());
 
-		if (customer == null) {
+		if (
+			session == null
+			|| ! session.getActive ()
+		) {
 
 			ImChatFailure failureResponse =
 				new ImChatFailure ()
 
 				.reason (
-					"customer-invalid")
+					"session-invalid")
 
 				.message (
-					"The customer id is invalid or the customer does " +
-					"not exist.");
+					"The session secret is invalid or the session is no " +
+					"longer active");
 
 			return jsonResponderProvider.get ()
 				.value (failureResponse);
 
 		}
+
+		ImChatCustomerRec customer =
+				session.getImChatCustomer();
+
 
 		// retrieve purchases
 
@@ -120,9 +135,10 @@ class ImChatPurchaseHistoryAction
 
 		ImChatPurchaseHistorySuccess purchaseHistoryResponse =
 			new ImChatPurchaseHistorySuccess ()
-
-			.balance (
-				customer.getBalance ());
+		
+			.customer (
+				imChatApiLogic.customerData (
+					customer));
 
 		for (
 			ImChatPurchaseRec purchase

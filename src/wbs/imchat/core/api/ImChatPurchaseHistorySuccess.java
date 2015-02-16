@@ -18,7 +18,7 @@ class ImChatPurchaseHistorySuccess {
 	String status = "success";
 
 	@DataAttribute
-	Integer balance;
+	ImChatCustomerData customer;
 
 	@DataAttribute
 	List<ImChatPurchaseData> purchases =
