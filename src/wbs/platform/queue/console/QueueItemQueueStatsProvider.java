@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -41,6 +42,11 @@ class QueueItemQueueStatsProvider
 	@Inject
 	QueueItemObjectHelper queueItemHelper;
 
+	// prototype dependencies
+
+	@Inject
+	Provider<QueueStatsFilter> queueStatsFilterProvider;
+
 	// implementation
 
 	@Override
@@ -71,18 +77,28 @@ class QueueItemQueueStatsProvider
 
 		// retrieve queue items
 
+		QueueStatsFilter queueStatsFilter =
+			queueStatsFilterProvider.get ();
+
+		queueStatsFilter.conditions (
+			conditions);
+
 		List<QueueItemRec> createdQueueItems =
-			queueItemHelper.findByCreatedTime (
-				statsPeriod.toInterval ());
+			queueStatsFilter.filterQueueItems (
+				queueItemHelper.findByCreatedTime (
+					statsPeriod.toInterval ()));
 
 		List<QueueItemRec> processedQueueItems =
-			queueItemHelper.findByProcessedTime (
-				statsPeriod.toInterval ());
+			queueStatsFilter.filterQueueItems (
+				queueItemHelper.findByProcessedTime (
+					statsPeriod.toInterval ()));
 
 		// aggregate created items
 
-		for (QueueItemRec queueItem
-				: createdQueueItems) {
+		for (
+			QueueItemRec queueItem
+				: createdQueueItems
+		) {
 
 			QueueSubjectRec queueSubject =
 				queueItem.getQueueSubject ();
@@ -140,8 +156,10 @@ class QueueItemQueueStatsProvider
 
 		// aggregate processed items
 
-		for (QueueItemRec queueItem
-				: processedQueueItems) {
+		for (
+			QueueItemRec queueItem
+				: processedQueueItems
+		) {
 
 			QueueSubjectRec queueSubject =
 				queueItem.getQueueSubject ();

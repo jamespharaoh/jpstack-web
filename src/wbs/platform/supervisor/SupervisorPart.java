@@ -1,5 +1,6 @@
 package wbs.platform.supervisor;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -64,11 +65,13 @@ class SupervisorPart
 	String fileName;
 
 	@Getter @Setter
-	String supervisorConfigName;
+	String fixedSupervisorConfigName;
 
 	// state
 
 	List<String> supervisorConfigNames;
+
+	String selectedSupervisorConfigName;
 	SupervisorConfig supervisorConfig;
 
 	ObsoleteDateField dateField;
@@ -107,7 +110,16 @@ class SupervisorPart
 
 	void prepareSupervisorConfig () {
 
-		if (supervisorConfigName == null) {
+		if (fixedSupervisorConfigName != null) {
+
+			selectedSupervisorConfigName =
+				fixedSupervisorConfigName;
+
+			supervisorConfigNames =
+				Collections.singletonList (
+					fixedSupervisorConfigName);
+
+		} else {
 
 			UserRec myUser =
 				userHelper.find (
@@ -122,7 +134,7 @@ class SupervisorPart
 						slice.getSupervisorConfigNames ().split (","))
 					: Collections.<String>emptyList ();
 
-			supervisorConfigName =
+			selectedSupervisorConfigName =
 				requestContext.parameter (
 					"config",
 					supervisorConfigNames.isEmpty ()
@@ -130,27 +142,30 @@ class SupervisorPart
 						: supervisorConfigNames.get (0));
 
 			if (
-				supervisorConfigName != null
+
+				selectedSupervisorConfigName != null
+
 				&& ! supervisorConfigNames.contains (
-					supervisorConfigName)
+					selectedSupervisorConfigName)
+
 			) {
 				throw new RuntimeException ();
 			}
 
 		}
 
-		if (supervisorConfigName != null) {
+		if (selectedSupervisorConfigName != null) {
 
 			supervisorConfig =
 				consoleManager.supervisorConfig (
-					supervisorConfigName);
+					selectedSupervisorConfigName);
 
 			if (supervisorConfig == null) {
 
 				throw new RuntimeException (
 					stringFormat (
 						"Supervisor config not found: %s",
-						supervisorConfigName));
+						selectedSupervisorConfigName));
 
 			}
 
@@ -206,16 +221,29 @@ class SupervisorPart
 				: supervisorConfig.spec ().builders ()
 		) {
 
-			if (! (object instanceof SupervisorConditionSpec))
-				continue;
+			if (object instanceof SupervisorConditionSpec) {
 
-			SupervisorConditionSpec supervisorConditionSpec =
-				(SupervisorConditionSpec) object;
+				SupervisorConditionSpec supervisorConditionSpec =
+					(SupervisorConditionSpec) object;
 
-			conditionsBuilder.put (
-				supervisorConditionSpec.name (),
-				requestContext.stuff (
-					supervisorConditionSpec.stuffKey ()));
+				conditionsBuilder.put (
+					supervisorConditionSpec.name (),
+					requestContext.stuff (
+						supervisorConditionSpec.stuffKey ()));
+
+			}
+
+			if (object instanceof SupervisorIntegerConditionSpec) {
+
+				SupervisorIntegerConditionSpec supervisorIntegerConditionSpec =
+					(SupervisorIntegerConditionSpec) object;
+
+				conditionsBuilder.put (
+					supervisorIntegerConditionSpec.name (),
+					Integer.parseInt (
+						supervisorIntegerConditionSpec.value ()));
+
+			}
 
 		}
 
@@ -335,7 +363,9 @@ class SupervisorPart
 				printFormat (
 					"<a",
 					" class=\"%h\"",
-					oneSupervisorConfigName == supervisorConfigName
+					equal (
+							oneSupervisorConfigName,
+							selectedSupervisorConfigName)
 						? "selected"
 						: "",
 					" href=\"%h\"",

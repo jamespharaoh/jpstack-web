@@ -4,6 +4,10 @@
 	<supervisor-config
 		name="apn">
 
+		<integer-condition
+			name="sliceId"
+			value="1"/>
+
 		<!-- aggregators -->
 
 		<sum-stats-aggregator

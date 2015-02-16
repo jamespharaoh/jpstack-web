@@ -4,6 +4,10 @@
 	<supervisor-config
 		name="all-star">
 
+		<integer-condition
+			name="sliceId"
+			value="8"/>
+
 		<!-- aggregators -->
 
 		<sum-stats-aggregator
