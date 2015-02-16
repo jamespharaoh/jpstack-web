@@ -553,6 +553,12 @@
 			name="chat-user-pending"
 			package="wbs.apn.chat.user.pending"/>
 
+		<!-- all star psychic -->
+
+		<plugin
+			name="all-star-misc"
+			package="wbs.clients.allstar.misc"/>
+
 		<!-- im chat -->
 
 		<plugin
