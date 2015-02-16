@@ -148,8 +148,12 @@ class SupervisorPageBuilder {
 			PagePart get () {
 
 				return supervisorPart.get ()
-					.fileName (spec.fileName ())
-					.supervisorConfigName (spec.configName ());
+
+					.fileName (
+						spec.fileName ())
+
+					.fixedSupervisorConfigName (
+						spec.configName ());
 
 			}
 
