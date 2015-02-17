@@ -3,7 +3,6 @@ package wbs.smsapps.forwarder.api;
 import static wbs.framework.utils.etc.Misc.isInt;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -74,18 +73,18 @@ class ForwarderOutAction
 			String myId = null;
 			Integer pri = null;
 
-			for (Enumeration<String> en =
-					requestContext.parameterNames ();
-				en.hasMoreElements ();
+			for (
+				Map.Entry<String,List<String>> parameterEntry
+					: requestContext.parameterMap ().entrySet ()
 			) {
 
 				String paramName =
-					(String) en.nextElement ();
+					parameterEntry.getKey ();
 
-				String[] values =
-					requestContext.parameterValues (paramName);
+				List<String> values =
+					parameterEntry.getValue ();
 
-				if (values.length > 1) {
+				if (values.size () > 1) {
 
 					throw new ReportableException (
 						stringFormat (
@@ -94,7 +93,8 @@ class ForwarderOutAction
 
 				}
 
-				String value = values [0];
+				String value =
+					values.get (0);
 
 				if (paramName.equals ("code")) {
 					code = value;
@@ -164,15 +164,6 @@ class ForwarderOutAction
 				} else {
 
 					throw new ReportableException ("Invalid parameter: " + paramName);
-
-				}
-
-				if (values.length > 1) {
-
-					throw new ReportableException (
-						stringFormat (
-							"Parameter %s specified more than once",
-							paramName));
 
 				}
 

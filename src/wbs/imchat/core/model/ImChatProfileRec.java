@@ -14,9 +14,11 @@ import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
+import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
+import wbs.platform.media.model.MediaRec;
 
 @Accessors (chain = true)
 @Data
@@ -58,6 +60,10 @@ class ImChatProfileRec
 
 	@SimpleField
 	String publicDescription;
+
+	@ReferenceField (
+		nullable = true)
+	MediaRec profileImage;
 
 	// compare to
 

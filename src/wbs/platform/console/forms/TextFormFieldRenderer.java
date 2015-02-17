@@ -39,6 +39,11 @@ class TextFormFieldRenderer<Container>
 	@Getter @Setter
 	Integer size;
 
+	// details
+
+	@Getter
+	boolean fileUpload = false;
+
 	// implementation
 
 	@Override

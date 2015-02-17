@@ -17,7 +17,7 @@ public
 class SupervisorSimpleStatsResolverSpec {
 
 	@DataParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec supervisorConfigSpec;
 
 	@DataAttribute
 	String name;

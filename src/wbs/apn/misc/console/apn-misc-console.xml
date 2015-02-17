@@ -1,0 +1,219 @@
+<console-module
+	name="apn-misc">
+
+	<supervisor-config
+		name="apn">
+
+		<integer-condition
+			name="sliceId"
+			value="1"/>
+
+		<!-- aggregators -->
+
+		<sum-stats-aggregator
+			name="sum"/>
+
+		<!-- data sets -->
+
+		<data-set
+			name="queueItemByUser"
+			provider="queueItemUserStatsProvider"/>
+
+		<data-set
+			name="queueItemByQueue"
+			provider="queueItemQueueStatsProvider"/>
+
+		<!-- TODO doesn't belong here -->
+
+		<data-set
+			name="chatMessageUser"
+			provider="chatMessageUserStatsProvider"/>
+
+		<!-- groupers -->
+
+		<queue-stats-grouper
+			name="queue"/>
+
+		<user-stats-grouper
+			name="user"/>
+
+		<!-- formatters -->
+
+		<integer-stats-formatter
+			name="integer"/>
+
+		<integer-stats-formatter
+			name="userQueueItems"
+			target-base="queue.supervisorItems"
+			target-group-param="userId"
+			target-step-param="hour">
+
+			<target-param
+				name="date"
+				value="{dateYmd}"/>
+
+		</integer-stats-formatter>
+
+		<!-- resolvers -->
+
+		<!-- per queue -->
+
+		<simple-stats-resolver
+			name="queueNumProcessed"
+			aggregator="sum"
+			data-set="queueItemByQueue"
+			index="queueId"
+			value="numProcessed"/>
+
+		<!-- per user -->
+
+		<simple-stats-resolver
+			name="userNumProcessed"
+			aggregator="sum"
+			data-set="queueItemByUser"
+			index="userId"
+			value="numProcessed"/>
+
+		<!-- totals -->
+
+		<simple-stats-resolver
+			name="totalCreated"
+			aggregator="sum"
+			data-set="queueItemByQueue"
+			value="numCreated"/>
+
+		<simple-stats-resolver
+			name="totalProcessed"
+			aggregator="sum"
+			data-set="queueItemByUser"
+			value="numProcessed"/>
+
+		<addition-stats-resolver
+			name="totalDifference">
+			<operand resolver="totalCreated"/>
+			<operand resolver="totalProcessed" coefficient="-1"/>
+		</addition-stats-resolver>
+
+		<simple-stats-resolver
+			name="totalPreferred"
+			aggregator="sum"
+			data-set="queueItemByQueue"
+			value="numPreferred"/>
+
+		<multiplication-stats-resolver
+			name="totalPreferredPercent">
+			<operand value="100"/>
+			<operand resolver="totalPreferred"/>
+			<operand resolver="totalProcessed" power="-1"/>
+		</multiplication-stats-resolver>
+
+		<!-- TODO doesn't belong here -->
+
+		<simple-stats-resolver
+			name="chatMessagesLengthPerUser"
+			aggregator="sum"
+			index="userId"
+			value="charactersSent"
+			data-set="chatMessageUser"/>
+
+		<simple-stats-resolver
+			name="chatMessagesSentPerUser"
+			aggregator="sum"
+			index="userId"
+			value="messagesSent"
+			data-set="chatMessageUser"/>
+
+		<multiplication-stats-resolver
+			name="chatMessagesAverageLengthPerUser">
+			<operand resolver="chatMessagesLengthPerUser"/>
+			<operand resolver="chatMessagesSentPerUser" power="-1"/>
+		</multiplication-stats-resolver>
+
+		<simple-stats-resolver
+			name="chatMessagesLength"
+			aggregator="sum"
+			value="charactersSent"
+			data-set="chatMessageUser"/>
+
+		<simple-stats-resolver
+			name="chatMessagesSent"
+			aggregator="sum"
+			value="messagesSent"
+			data-set="chatMessageUser"/>
+
+		<multiplication-stats-resolver
+			name="chatMessagesAverageLength">
+			<operand resolver="chatMessagesLength"/>
+			<operand resolver="chatMessagesSent" power="-1"/>
+		</multiplication-stats-resolver>
+
+		<!-- content -->
+
+		<table>
+
+			<heading
+				group-label="Queue"/>
+
+			<stats-group
+				grouper="queue"
+				resolver="queueNumProcessed"
+				formatter="integer"/>
+
+			<separator/>
+
+			<heading
+				group-label="User"/>
+
+			<stats-group
+				grouper="user"
+				resolver="userNumProcessed"
+				formatter="userQueueItems"/>
+
+			<separator/>
+
+			<heading
+				group-label="Totals"/>
+
+			<stats-total
+				label="Total in"
+				resolver="totalCreated"
+				formatter="integer"/>
+
+			<stats-total
+				label="Total out"
+				resolver="totalProcessed"
+				formatter="integer"/>
+
+			<stats-total
+				label="Difference"
+				resolver="totalDifference"
+				formatter="integer"/>
+
+			<stats-total
+				label="Preferred %"
+				resolver="totalPreferredPercent"
+				formatter="integer"/>
+
+			<!-- TODO doesn't belong here -->
+
+			<separator/>
+
+			<heading
+				label="Chat message length (average)"
+				group-label="User"/>
+
+			<stats-group
+				grouper="user"
+				resolver="chatMessagesAverageLengthPerUser"
+				formatter="integer"/>
+
+			<stats-total
+				label="Overall"
+				resolver="chatMessagesAverageLength"
+				formatter="integer"/>
+
+		</table>
+
+	</supervisor-config>
+
+</console-module>

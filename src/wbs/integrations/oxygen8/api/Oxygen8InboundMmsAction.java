@@ -12,11 +12,9 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.joda.time.Instant;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -271,13 +269,14 @@ class Oxygen8InboundMmsAction
 
 	}
 
-	@SneakyThrows (FileUploadException.class)
 	void processRequestBody () {
 
 		int errorCount = 0;
 
-		for (FileItem fileItem
-				: requestContext.fileItems ()) {
+		for (
+			FileItem fileItem
+				: requestContext.fileItems ()
+		) {
 
 			Matcher matcher =
 				contentTypePattern.matcher (

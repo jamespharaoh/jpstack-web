@@ -55,8 +55,10 @@ class ConsoleModuleBuilder
 		BuilderFactory builderFactory =
 			builderFactoryProvider.get ();
 
-		for (Map.Entry<Class<?>,Provider<Object>> entry
-				: consoleModuleBuilders.entrySet ()) {
+		for (
+			Map.Entry<Class<?>,Provider<Object>> entry
+				: consoleModuleBuilders.entrySet ()
+		) {
 
 			builderFactory.addBuilder (
 				entry.getKey (),
@@ -79,8 +81,12 @@ class ConsoleModuleBuilder
 
 		FormFieldBuilderContext formFieldBuilderContext =
 			new FormFieldBuilderContextImpl ()
-				.containerClass (consoleHelper.objectClass ())
-				.consoleHelper (consoleHelper);
+
+			.containerClass (
+				consoleHelper.objectClass ())
+
+			.consoleHelper (
+				consoleHelper);
 
 		FormFieldSet formFieldSet =
 			new FormFieldSet ();
@@ -90,8 +96,10 @@ class ConsoleModuleBuilder
 			formFieldSpecs,
 			formFieldSet);
 
-		for (FormField<?,?,?,?> formField
-				: formFieldSet.formFields ()) {
+		for (
+			FormField<?,?,?,?> formField
+				: formFieldSet.formFields ()
+		) {
 
 			formField.init (
 				fieldSetName);
@@ -117,8 +125,10 @@ class ConsoleModuleBuilder
 		List<Object> secondPass =
 			new ArrayList<Object> ();
 
-		for (Object childObject
-				: childObjects) {
+		for (
+			Object childObject
+				: childObjects
+		) {
 
 			if (childObject instanceof FormFieldSetSpec) {
 

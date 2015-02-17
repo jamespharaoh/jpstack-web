@@ -43,6 +43,11 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	@Getter @Setter
 	EnumConsoleHelper<Interface> enumConsoleHelper;
 
+	// details
+
+	@Getter
+	boolean fileUpload = false;
+
 	// implementation
 
 	@Override

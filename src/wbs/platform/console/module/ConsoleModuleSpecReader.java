@@ -31,8 +31,10 @@ class ConsoleModuleSpecReader {
 		dataFromXml =
 			new DataFromXml ();
 
-		for (Map.Entry<Class<?>,Provider<ConsoleModuleSpec>> entry
-				: consoleModuleSpecProviders.entrySet ()) {
+		for (
+			Map.Entry<Class<?>,Provider<ConsoleModuleSpec>> entry
+				: consoleModuleSpecProviders.entrySet ()
+		) {
 
 			dataFromXml.registerBuilder (
 				entry.getKey (),

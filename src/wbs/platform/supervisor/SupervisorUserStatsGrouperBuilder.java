@@ -23,13 +23,13 @@ class SupervisorUserStatsGrouperBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec container;
 
 	@BuilderSource
-	SupervisorUserStatsGrouperSpec supervisorUserStatsGrouperSpec;
+	SupervisorUserStatsGrouperSpec spec;
 
 	@BuilderTarget
-	SupervisorPageBuilder supervisorPageBuilder;
+	SupervisorConfigBuilder supervisorConfigBuilder;
 
 	// build
 
@@ -39,9 +39,9 @@ class SupervisorUserStatsGrouperBuilder {
 			Builder builder) {
 
 		String name =
-			supervisorUserStatsGrouperSpec.name ();
+			spec.name ();
 
-		supervisorPageBuilder.statsGroupersByName ().put (
+		supervisorConfigBuilder.statsGroupersByName ().put (
 			name,
 			userStatsGrouper.get ());
 

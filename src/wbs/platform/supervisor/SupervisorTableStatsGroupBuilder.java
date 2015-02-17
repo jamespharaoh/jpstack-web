@@ -28,10 +28,10 @@ class SupervisorTableStatsGroupBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorTablePartSpec supervisorTablePartSpec;
+	SupervisorTablePartSpec container;
 
 	@BuilderSource
-	SupervisorTableStatsGroupSpec supervisorTableStatsGroupSpec;
+	SupervisorTableStatsGroupSpec spec;
 
 	@BuilderTarget
 	SupervisorTablePartBuilder supervisorTablePartBuilder;
@@ -49,45 +49,45 @@ class SupervisorTableStatsGroupBuilder {
 	void build (
 			Builder builder) {
 
-		SupervisorPageBuilder supervisorPageBuilder =
-			supervisorTablePartBuilder.supervisorPageBuilder;
+		SupervisorConfigBuilder supervisorConfigBuilder =
+			supervisorTablePartBuilder.supervisorConfigBuilder;
 
 		statsGrouper =
-			supervisorPageBuilder.statsGroupersByName ().get (
-				supervisorTableStatsGroupSpec.grouperName ());
+			supervisorConfigBuilder.statsGroupersByName ().get (
+				spec.grouperName ());
 
 		if (statsGrouper == null) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Stats grouper %s does not exist",
-					supervisorTableStatsGroupSpec.grouperName ()));
+					spec.grouperName ()));
 
 		}
 
 		statsResolver =
-			supervisorPageBuilder.statsResolversByName ().get (
-				supervisorTableStatsGroupSpec.resolverName ());
+			supervisorConfigBuilder.statsResolversByName ().get (
+				spec.resolverName ());
 
 		if (statsResolver == null) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Stats resolver %s does not exist",
-					supervisorTableStatsGroupSpec.resolverName ()));
+					spec.resolverName ()));
 
 		}
 
 		statsFormatter =
-			supervisorPageBuilder.statsFormattersByName ().get (
-				supervisorTableStatsGroupSpec.formatterName ());
+			supervisorConfigBuilder.statsFormattersByName ().get (
+				spec.formatterName ());
 
 		if (statsFormatter == null) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Stats formatter %s does not exist",
-					supervisorTableStatsGroupSpec.formatterName ()));
+					spec.formatterName ()));
 
 		}
 

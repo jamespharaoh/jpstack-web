@@ -447,7 +447,11 @@
 			name="ticketer"
 			package="wbs.smsapps.ticketer"/>
 
-		<!-- chat -->
+		<!-- apn -->
+
+		<plugin
+			name="apn-misc"
+			package="wbs.apn.misc"/>
 
 		<plugin
 			name="chat-core"
@@ -548,6 +552,12 @@
 		<plugin
 			name="chat-user-pending"
 			package="wbs.apn.chat.user.pending"/>
+
+		<!-- all star psychic -->
+
+		<plugin
+			name="all-star-misc"
+			package="wbs.clients.allstar.misc"/>
 
 		<!-- im chat -->
 

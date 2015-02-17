@@ -10,8 +10,8 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.platform.supervisor.SupervisorPageBuilder;
-import wbs.platform.supervisor.SupervisorPageSpec;
+import wbs.platform.supervisor.SupervisorConfigBuilder;
+import wbs.platform.supervisor.SupervisorConfigSpec;
 
 @PrototypeComponent ("queueSupervisorStatsGrouperBuilder")
 @ConsoleModuleBuilderHandler
@@ -26,13 +26,13 @@ class QueueSupervisorStatsGrouperBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec container;
 
 	@BuilderSource
-	QueueSupervisorStatsGrouperSpec queueSupervisorStatsGrouperSpec;
+	QueueSupervisorStatsGrouperSpec spec;
 
 	@BuilderTarget
-	SupervisorPageBuilder supervisorPageBuilder;
+	SupervisorConfigBuilder supervisorConfigBuilder;
 
 	// build
 
@@ -42,9 +42,9 @@ class QueueSupervisorStatsGrouperBuilder {
 			Builder builder) {
 
 		String name =
-			queueSupervisorStatsGrouperSpec.name ();
+			spec.name ();
 
-		supervisorPageBuilder.statsGroupersByName ().put (
+		supervisorConfigBuilder.statsGroupersByName ().put (
 			name,
 			queueStatsGrouper.get ());
 
