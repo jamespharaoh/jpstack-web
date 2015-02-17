@@ -7,9 +7,12 @@
 		<bean class="SupervisorAdditionStatsResolverBuilder"/>
 		<bean class="SupervisorAdditionStatsResolverSpec"/>
 		<bean class="SupervisorConditionSpec"/>
+		<bean class="SupervisorConfigBuilder"/>
+		<bean class="SupervisorConfigSpec"/>
 		<bean class="SupervisorDataSetSpec"/>
 		<bean class="SupervisorHeadingPartBuilder"/>
 		<bean class="SupervisorHeadingPartSpec"/>
+		<bean class="SupervisorIntegerConditionSpec"/>
 		<bean class="SupervisorIntegerStatsFormatterBuilder"/>
 		<bean class="SupervisorIntegerStatsFormatterSpec"/>
 		<bean class="SupervisorMultiplicationOperandSpec"/>

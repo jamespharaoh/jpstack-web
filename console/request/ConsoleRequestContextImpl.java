@@ -13,11 +13,11 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -30,7 +30,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.joda.time.Instant;
 
 import wbs.framework.application.annotations.ProxiedRequestComponent;
@@ -44,6 +43,10 @@ import wbs.platform.console.tab.Tab;
 import wbs.platform.console.tab.TabContext;
 import wbs.platform.console.tab.TabList;
 import wbs.platform.priv.console.PrivDataLoader;
+
+import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 /**
  * Extends RequestContext to provide loads of extra functionality useful in all
@@ -346,10 +349,9 @@ class ConsoleRequestContextImpl
 
 	@Override
 	public
-	FormData requestFormData () {
+	Map<String,String> requestFormData () {
 
-		return new RequestFormData (
-			requestContext.request ());
+		return parameterMapSimple ();
 
 	}
 
@@ -768,7 +770,7 @@ class ConsoleRequestContextImpl
 	@Override
 	public
 	void formData (
-			@NonNull FormData newFormData) {
+			@NonNull Map<String,String> newFormData) {
 
 		request (
 			"formData",
@@ -782,16 +784,17 @@ class ConsoleRequestContextImpl
 
 		request (
 			"formData",
-			EmptyFormData.instance);
+			Collections.<String,String>emptyMap ());
 
 	}
 
 	@Override
 	public
-	FormData getFormData () {
+	Map<String,String> getFormData () {
 
-		FormData formData =
-			(FormData)
+		@SuppressWarnings ("unchecked")
+		Map<String,String> formData =
+			(Map<String,String>)
 			request ("formData");
 
 		if (formData != null)
@@ -820,118 +823,6 @@ class ConsoleRequestContextImpl
 		return ifNull (
 			getFormData ().get (key),
 			def);
-
-	}
-
-	static
-	class RequestFormData
-		implements FormData {
-
-		HttpServletRequest request;
-
-		static
-		class MyIterator
-			implements Iterator<Entry> {
-
-			Iterator<Map.Entry<String, String[]>> mapIterator;
-			String name;
-			String[] values;
-			int i;
-
-			MyIterator (
-					Iterator<Map.Entry<String,String[]>> newMapIterator) {
-
-				mapIterator =
-					newMapIterator;
-
-			}
-
-			@Override
-			public boolean hasNext() {
-				return values != null || mapIterator.hasNext();
-			}
-
-			@Override
-			public
-			Entry next () {
-
-				if (values == null) {
-
-					Map.Entry<String,String[]> mapEntry =
-						mapIterator.next ();
-
-					name =
-						mapEntry.getKey ();
-
-					values =
-						mapEntry.getValue ();
-
-					i = 0;
-
-				}
-
-				String thisValue =
-					values [i ++];
-
-				if (i == values.length)
-					values = null;
-
-				return new SimpleEntry (
-					name,
-					thisValue);
-
-			}
-
-			@Override
-			public
-			void remove () {
-
-				throw new UnsupportedOperationException ();
-
-			}
-
-		};
-
-		private
-		RequestFormData (
-				HttpServletRequest request) {
-
-			this.request =
-				request;
-
-		}
-
-		@Override
-		public
-		boolean contains (
-				String name) {
-
-			return isNotNull (
-				request.getParameter (name));
-
-		}
-
-		@Override
-		public
-		String get (
-				String name) {
-
-			return request.getParameter (name);
-
-		}
-
-		@Override
-		@SuppressWarnings ("unchecked")
-		public
-		Iterator<Entry> iterator () {
-
-			return new MyIterator (
-				request
-					.getParameterMap ()
-					.entrySet ()
-					.iterator ());
-
-		}
 
 	}
 
@@ -1053,13 +944,13 @@ class ConsoleRequestContextImpl
 	@Override
 	public
 	void hideFormData (
-			@NonNull String... keys) {
+			@NonNull Set<String> keys) {
 
 		formData (
-			new HideFormData (
-				getFormData (),
-				new HashSet<String> (
-					Arrays.asList (keys))));
+			ImmutableMap.<String,String>copyOf (
+				Maps.filterKeys (
+					getFormData (),
+					Predicates.in (keys))));
 
 	}
 
@@ -1283,8 +1174,7 @@ class ConsoleRequestContextImpl
 
 	@Override
 	public
-	List<FileItem> fileItems ()
-		throws FileUploadException {
+	List<FileItem> fileItems () {
 
 		return requestContext.fileItems ();
 
@@ -1292,11 +1182,20 @@ class ConsoleRequestContextImpl
 
 	@Override
 	public
-	FileItem fileItem (
-			String name)
-		throws FileUploadException {
+	FileItem fileItemFile (
+			String name) {
 
-		return requestContext.fileItem (
+		return requestContext.fileItemFile (
+			name);
+
+	}
+
+	@Override
+	public
+	String fileItemField (
+			String name) {
+
+		return requestContext.fileItemField (
 			name);
 
 	}

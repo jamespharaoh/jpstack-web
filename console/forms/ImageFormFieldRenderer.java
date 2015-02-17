@@ -1,5 +1,6 @@
 package wbs.platform.console.forms;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -18,14 +19,23 @@ import org.apache.commons.io.IOUtils;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.console.request.ConsoleRequestContext;
+import wbs.platform.media.console.MediaConsoleLogic;
+import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.model.MediaRec;
 
-@PrototypeComponent ("uploadFormFieldRenderer")
+@PrototypeComponent ("imageFormFieldRenderer")
 @Accessors (fluent = true)
 public
-class UploadFormFieldRenderer<Container>
-	implements FormFieldRenderer<Container,FileUpload> {
+class ImageFormFieldRenderer<Container>
+	implements FormFieldRenderer<Container,MediaRec> {
 
 	// dependencies
+
+	@Inject
+	MediaConsoleLogic mediaConsoleLogic;
+
+	@Inject
+	MediaLogic mediaLogic;
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -41,6 +51,9 @@ class UploadFormFieldRenderer<Container>
 	@Getter @Setter
 	Integer size;
 
+	@Getter @Setter
+	Boolean nullable;
+
 	// details
 
 	@Getter
@@ -53,7 +66,7 @@ class UploadFormFieldRenderer<Container>
 	void renderTableCell (
 			PrintWriter out,
 			Container container,
-			FileUpload interfaceValue,
+			MediaRec interfaceValue,
 			boolean link) {
 
 		out.write (
@@ -71,7 +84,7 @@ class UploadFormFieldRenderer<Container>
 	void renderTableRow (
 			PrintWriter out,
 			Container container,
-			FileUpload interfaceValue,
+			MediaRec interfaceValue,
 			boolean link) {
 
 		out.write (
@@ -97,7 +110,7 @@ class UploadFormFieldRenderer<Container>
 	void renderFormRow (
 			PrintWriter out,
 			Container container,
-			FileUpload interfaceValue) {
+			MediaRec interfaceValue) {
 
 		out.write (
 			stringFormat (
@@ -123,7 +136,19 @@ class UploadFormFieldRenderer<Container>
 	void renderFormInput (
 			PrintWriter out,
 			Container container,
-			FileUpload interfaceValue) {
+			MediaRec interfaceValue) {
+
+		if (interfaceValue != null) {
+
+			out.write (
+				stringFormat (
+					"%s<br>\n",
+					interfaceToHtml (
+						container,
+						interfaceValue,
+						true)));
+
+		}
 
 		out.write (
 			stringFormat (
@@ -137,7 +162,23 @@ class UploadFormFieldRenderer<Container>
 				formValuePresent ()
 					? formValue ()
 					: interfaceValue,
-				">\n"));
+				"><br>\n"));
+
+		if (
+			interfaceValue != null
+			&& nullable ()
+		) {
+
+			out.write (
+				stringFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"%h-remove\"",
+					name (),
+					" value=\"remove image\"",
+					">\n"));
+
+		}
 
 	}
 
@@ -145,41 +186,68 @@ class UploadFormFieldRenderer<Container>
 	public
 	boolean formValuePresent () {
 
+		if (
+			isNotNull (
+				requestContext.getForm (
+					stringFormat (
+						"%s-remove",
+						name ())))
+		) {
+			return true;
+		}
+
+		if (! requestContext.isMultipart ())
+			return false;
+
 		FileItem fileItem =
 			requestContext.fileItemFile (
 				name ());
 
-		return fileItem != null;
+		return fileItem != null
+			&& fileItem.getSize () > 0;
 
 	}
 
-	@SneakyThrows (IOException.class)
-	FileUpload formValue () {
+	@SneakyThrows ({
+		IOException.class
+	})
+	MediaRec formValue () {
+
+		if (
+			isNotNull (
+				requestContext.getForm (
+					stringFormat (
+						"%s-remove",
+						name ())))
+		) {
+			return null;
+		}
 
 		FileItem fileItem =
 			requestContext.fileItemFile (
 				name ());
 
-		if (fileItem == null)
-			return null;
+		if (
+			fileItem == null
+			|| fileItem.getSize () == 0
+		) {
+			throw new IllegalStateException ();
+		}
 
 		byte[] data =
 			IOUtils.toByteArray (
 				fileItem.getInputStream ());
 
-		return new FileUpload ()
-
-			.name (
-				fileItem.getName ())
-
-			.data (
-				data);
+		return mediaLogic.createMediaFromImage (
+			data,
+			"image/jpeg",
+			fileItem.getName ());
 
 	}
 
 	@Override
 	public
-	FileUpload formToInterface (
+	MediaRec formToInterface (
 			List<String> errors) {
 
 		return formValue ();
@@ -190,16 +258,19 @@ class UploadFormFieldRenderer<Container>
 	public
 	String interfaceToHtml (
 			Container container,
-			FileUpload interfaceValue,
+			MediaRec interfaceValue,
 			boolean link) {
 
 		if (interfaceValue == null)
 			return "";
 
 		return stringFormat (
+			"%s<br>\n",
+			mediaConsoleLogic.mediaThumb100 (
+				interfaceValue),
 			"%h (%h bytes)",
-			interfaceValue.name (),
-			interfaceValue.data ().length);
+			interfaceValue.getFilename (),
+			interfaceValue.getContent ().getData ().length);
 
 	}
 

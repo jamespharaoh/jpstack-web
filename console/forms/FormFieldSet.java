@@ -8,6 +8,7 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.platform.console.html.ScriptRef;
@@ -19,6 +20,10 @@ public
 class FormFieldSet {
 
 	// properties
+
+	@DataAttribute
+	@Getter @Setter
+	Boolean fileUpload;
 
 	@DataChildren
 	@Getter @Setter

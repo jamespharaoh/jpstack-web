@@ -59,6 +59,12 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 
 	@Override
 	public
+	Boolean fileUpload () {
+		return renderer.fileUpload ();
+	}
+
+	@Override
+	public
 	void init (
 			String fieldSetName) {
 

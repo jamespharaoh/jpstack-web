@@ -34,6 +34,12 @@ class ScriptRefFormField
 
 	@Override
 	public
+	Boolean fileUpload () {
+		return false;
+	}
+
+	@Override
+	public
 	String name () {
 		return null;
 	}

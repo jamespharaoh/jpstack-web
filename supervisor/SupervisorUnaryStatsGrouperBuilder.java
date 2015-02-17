@@ -23,13 +23,13 @@ class SupervisorUnaryStatsGrouperBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec container;
 
 	@BuilderSource
-	SupervisorUnaryStatsGrouperSpec supervisorUnaryStatsGrouperSpec;
+	SupervisorUnaryStatsGrouperSpec spec;
 
 	@BuilderTarget
-	SupervisorPageBuilder supervisorPageBuilder;
+	SupervisorConfigBuilder supervisorConfigBuilder;
 
 	// build
 
@@ -39,12 +39,12 @@ class SupervisorUnaryStatsGrouperBuilder {
 			Builder builder) {
 
 		String name =
-			supervisorUnaryStatsGrouperSpec.name ();
+			spec.name ();
 
 		String label =
-			supervisorUnaryStatsGrouperSpec.label ();
+			spec.label ();
 
-		supervisorPageBuilder.statsGroupersByName ().put (
+		supervisorConfigBuilder.statsGroupersByName ().put (
 			name,
 			unaryStatsGrouper.get ()
 				.label (label));

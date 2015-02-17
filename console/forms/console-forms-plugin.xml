@@ -31,6 +31,9 @@
 		<bean class="IdFormFieldSpec"/>
 		<bean class="IdentityFormFieldInterfaceMapping"/>
 		<bean class="IdentityFormFieldNativeMapping"/>
+		<bean class="ImageFormFieldBuilder"/>
+		<bean class="ImageFormFieldRenderer"/>
+		<bean class="ImageFormFieldSpec"/>
 		<bean class="IndexFormFieldBuilder"/>
 		<bean class="IndexFormFieldSpec"/>
 		<bean class="IntegerFormFieldBuilder"/>

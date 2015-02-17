@@ -15,12 +15,11 @@ interface FormField<Container,Generic,Native,Interface> {
 	final static
 	int defaultSize = 48;
 
+	Boolean fileUpload ();
 	Boolean virtual ();
-
 	Boolean large ();
 
 	String name ();
-
 	String label ();
 
 	Set<ScriptRef> scriptRefs ();

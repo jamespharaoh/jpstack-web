@@ -25,13 +25,13 @@ class SupervisorIntegerStatsFormatterBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec container;
 
 	@BuilderSource
-	SupervisorIntegerStatsFormatterSpec supervisorIntegerStatsFormatterSpec;
+	SupervisorIntegerStatsFormatterSpec spec;
 
 	@BuilderTarget
-	SupervisorPageBuilder supervisorPageBuilder;
+	SupervisorConfigBuilder supervisorConfigBuilder;
 
 	// build
 
@@ -41,21 +41,21 @@ class SupervisorIntegerStatsFormatterBuilder {
 			Builder builder) {
 
 		String name =
-			supervisorIntegerStatsFormatterSpec.name ();
+			spec.name ();
 
 		String targetBase =
-			supervisorIntegerStatsFormatterSpec.targetBase ();
+			spec.targetBase ();
 
 		String targetGroupParamName =
-			supervisorIntegerStatsFormatterSpec.targetGroupParamName ();
+			spec.targetGroupParamName ();
 
 		String targetStepParamName =
-			supervisorIntegerStatsFormatterSpec.targetStepParamName ();
+			spec.targetStepParamName ();
 
 		Map<String,String> targetParams =
-			supervisorIntegerStatsFormatterSpec.targetParams ();
+			spec.targetParams ();
 
-		supervisorPageBuilder.statsFormattersByName.put (
+		supervisorConfigBuilder.statsFormattersByName.put (
 			name,
 			integerStatsFormatter.get ()
 				.targetBase (targetBase)

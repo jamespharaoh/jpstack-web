@@ -20,19 +20,21 @@ import wbs.platform.text.console.TextPart;
 public
 class SupervisorHeadingPartBuilder {
 
+	// dependencies
+
 	@Inject
 	Provider<TextPart> textPart;
 
 	// builder
 
 	@BuilderParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec supervisorConfigSpec;
 
 	@BuilderSource
 	SupervisorHeadingPartSpec supervisorHeadingPartSpec;
 
 	@BuilderTarget
-	SupervisorPageBuilder supervisorPageBuilder;
+	SupervisorConfigBuilder supervisorConfigBuilder;
 
 	// state
 
@@ -68,7 +70,7 @@ class SupervisorHeadingPartBuilder {
 
 		};
 
-		supervisorPageBuilder.pagePartFactories ().add (
+		supervisorConfigBuilder.pagePartFactories ().add (
 			pagePartFactory);
 
 	}

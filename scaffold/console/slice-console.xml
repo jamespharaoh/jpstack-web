@@ -63,6 +63,9 @@
 		<text-field
 			name="adminEmail"/>
 
+		<text-field
+			name="supervisorConfigNames"/>
+
 	</field-set>
 
 	<field-set
@@ -77,6 +80,10 @@
 
 		<text-field
 			name="adminEmail"/>
+
+		<text-field
+			name="supervisorConfigNames"
+			nullable="yes"/>
 
 	</field-set>
 
