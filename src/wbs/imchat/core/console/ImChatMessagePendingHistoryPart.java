@@ -61,17 +61,41 @@ class ImChatMessagePendingHistoryPart
 		Lists.reverse (
 			messages);
 
+		printFormat ("<table class=\"list\" style=\"width:100\">");
+		printFormat (
+				"<tr>",
+				"	<th>Timestamp</th>",
+				"	<th>Sender</th>",
+				"	<th>Message</th>",
+				"</tr>");
+		
 		for (
 			ImChatMessageRec message
 				: messages
 		) {
 
+			String sender;
+			
+			switch (message.getType()) {
+	            case 0:  sender = "Operator";
+	                     break;
+	            case 1:  sender = imChatConversation.getImChatCustomer().getEmail();
+	                     break;
+	            default: sender = "Invalid sender";
+	                     break;
+			}
+			
+			
 			printFormat (
-				"<p>%s</p>\n",
-				message.getMessageText ());
+					"<tr>",
+					"	<td>"+message.getTime().toString()+"</td>",
+					"	<td>"+sender+"</td>",
+					"	<td>"+message.getMessageText ()+"</td>",
+					"</tr>");
 
 		}
+		
+		printFormat ("</table>");
 
 	}
-
 }

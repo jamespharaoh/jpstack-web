@@ -2,6 +2,8 @@ package wbs.imchat.core.fixture;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.Date;
+
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -244,6 +246,8 @@ class ImChatCoreFixtureProvider
 					stringFormat (
 						"Test IM chat profile %s",
 						index))
+						
+				.setProfileImage(null)
 
 			);
 
@@ -367,6 +371,10 @@ class ImChatCoreFixtureProvider
 
 			.setMessageText (
 				"Text message.")
+				
+			.setType(1)
+			
+			.setTime(new Date())
 
 			.setQueueItem (
 				null)

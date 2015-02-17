@@ -1,6 +1,7 @@
 package wbs.imchat.core.api;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -156,6 +157,10 @@ class ImChatMessageSendAction
 
 			.setIndex (
 				conversation.getNumMessages ())
+				
+			.setType(1)
+			
+			.setTime(new Date())
 
 			.setMessageText (
 				messageSendRequest.messageText ())

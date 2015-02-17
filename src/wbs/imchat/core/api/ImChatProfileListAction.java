@@ -19,6 +19,8 @@ import wbs.imchat.core.model.ImChatObjectHelper;
 import wbs.imchat.core.model.ImChatProfileObjectHelper;
 import wbs.imchat.core.model.ImChatProfileRec;
 import wbs.imchat.core.model.ImChatRec;
+import wbs.platform.media.model.ContentRec;
+import wbs.platform.media.model.MediaRec;
 
 @PrototypeComponent ("imChatProfileListAction")
 public
@@ -84,6 +86,23 @@ class ImChatProfileListAction
 
 			if (profile.getDeleted ())
 				continue;
+			
+			MediaRec image = profile.getProfileImage();
+			
+			String image_url = "no-image";
+			
+			if (image != null) {
+				ContentRec content = image.getContent();
+				
+				Integer hash = Math.abs(content.getHash());
+				
+				image_url = 
+					"/im-chat-media/" + 
+					image.getId().toString() + 
+					"/" + 
+					hash.toString() +
+					"/original.jpg";
+			}
 
 			profileDatas.add (
 				new ImChatProfileData ()
@@ -98,7 +117,7 @@ class ImChatProfileListAction
 					profile.getPublicDescription ())
 
 				.imageLink (
-					"TODO")
+					image_url)
 
 			);
 

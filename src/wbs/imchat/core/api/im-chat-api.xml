@@ -26,7 +26,7 @@
 		<resource name="profile-list">
 			<get-action name="profileList"/>
 		</resource>
-
+		
 		<resource name="purchase-make">
 			<post-action name="purchaseMake"/>
 		</resource>
@@ -74,4 +74,16 @@
 	</variable>
 	</resource>
 
+	<resource name="im-chat-media">
+	<variable name="mediaId">
+	<variable name="mediaContentHash">
+
+		<resource name="original.jpg">
+			<get-action name="mediaOriginalJpeg"/>
+		</resource>
+
+	</variable>
+	</variable>
+	</resource>
+		
 </api-module>

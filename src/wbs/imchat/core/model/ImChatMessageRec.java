@@ -1,5 +1,7 @@
 package wbs.imchat.core.model;
 
+import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -42,6 +44,12 @@ class ImChatMessageRec
 
 	@SimpleField
 	String messageText;
+	
+	@SimpleField
+	Integer type;
+	
+	@SimpleField
+	Date time;
 
 	@ReferenceField (
 		nullable = true)

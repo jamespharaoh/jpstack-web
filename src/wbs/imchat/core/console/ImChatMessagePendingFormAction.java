@@ -1,5 +1,7 @@
 package wbs.imchat.core.console;
 
+import java.util.Date;
+
 import javax.inject.Inject;
 
 import lombok.Cleanup;
@@ -90,6 +92,10 @@ class ImChatMessagePendingFormAction
 
 			.setIndex (
 				conversation.getNumMessages ())
+			
+			.setType(0)
+			
+			.setTime(new Date())
 
 			.setMessageText (
 				messageText)
