@@ -9,6 +9,7 @@ import wbs.imchat.core.model.ImChatMessageRec;
 import wbs.imchat.core.model.ImChatPricePointRec;
 import wbs.imchat.core.model.ImChatProfileRec;
 import wbs.imchat.core.model.ImChatRec;
+import wbs.paypal.api.PaypalPaymentData;
 import wbs.paypal.model.PaypalPaymentRec;
 import wbs.platform.currency.logic.CurrencyLogic;
 

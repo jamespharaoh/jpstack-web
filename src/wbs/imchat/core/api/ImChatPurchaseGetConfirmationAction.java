@@ -2,6 +2,7 @@ package wbs.imchat.core.api;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -24,8 +25,11 @@ import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
 import wbs.imchat.core.model.ImChatPricePointObjectHelper;
 import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
+import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
+import wbs.paypal.api.PaypalApiLogic;
+import wbs.paypal.model.PaypalAccountRec;
 import wbs.paypal.model.PaypalPaymentObjectHelper;
 import wbs.paypal.model.PaypalPaymentRec;
 import urn.ebay.api.PayPalAPI.GetExpressCheckoutDetailsReq;
@@ -46,6 +50,9 @@ class ImChatPurchaseGetConfirmationAction
 
 	@Inject
 	ImChatApiLogic imChatApiLogic;
+	
+	@Inject
+	PaypalApiLogic paypalApiLogic;
 
 	@Inject
 	ImChatObjectHelper imChatHelper;
@@ -97,6 +104,13 @@ class ImChatPurchaseGetConfirmationAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite ();
+		
+		ImChatRec imChat =
+			imChatHelper.find (
+				Integer.parseInt (
+					(String)
+					requestContext.request (
+						"imChatId")));
 
 		// lookup session and customer
 
@@ -154,8 +168,15 @@ class ImChatPurchaseGetConfirmationAction
 			}
 
 		// confirm payment and obtain payerId
+		
+		PaypalAccountRec paypalAccount =
+				imChat.getPaypalAccount();
+			
+			Properties expressCheckoutProperties = 
+					paypalApiLogic.paypalAccountData(paypalAccount)
+						.generateProperties();		
 
-		String payerId = getExpressCheckout(purchaseRequest.paypalToken ());
+		String payerId = getExpressCheckout(purchaseRequest.paypalToken (), expressCheckoutProperties);
 
 		// update payment status
 
@@ -190,7 +211,7 @@ class ImChatPurchaseGetConfirmationAction
 
 	}
 
-	public String getExpressCheckout(String paypalToken) {
+	public String getExpressCheckout(String paypalToken, Properties expressCheckoutProperties) {
 
 		// GetExpressCheckoutDetailsReq
 
@@ -203,15 +224,7 @@ class ImChatPurchaseGetConfirmationAction
 
 		PayPalAPIInterfaceServiceService service = null;
 
-		try {
-
-			service = new PayPalAPIInterfaceServiceService("conf/sdk_conf.properties");
-
-		} catch (IOException e) {
-
-			return "Error Message : " + e.getMessage();
-
-		}
+		service = new PayPalAPIInterfaceServiceService(expressCheckoutProperties);
 
 		GetExpressCheckoutDetailsResponseType getExpressCheckoutDetailsResponse = null;
 

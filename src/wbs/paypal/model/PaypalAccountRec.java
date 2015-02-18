@@ -54,15 +54,43 @@ class PaypalAccountRec
 
 	@SimpleField (
 		nullable = true)
-	String serviceEndpoint;
+	String username;
 
 	@SimpleField (
 		nullable = true)
-	String clientId;
+	String password;
 
 	@SimpleField (
 		nullable = true)
-	String clientSecret;
+	String signature;
+	
+	@SimpleField (
+		nullable = true)
+	String apiId;
+	
+	@SimpleField (
+		nullable = true)
+	String serviceEndpointPaypalApi;
+	
+	@SimpleField (
+		nullable = true)
+	String serviceEndpointPaypalApiAa;
+	
+	@SimpleField (
+		nullable = true)
+	String serviceEndpointPermissions;
+	
+	@SimpleField (
+		nullable = true)
+	String serviceEndpointAdaptivePayments;
+	
+	@SimpleField (
+		nullable = true)
+	String serviceEndpointAdaptiveAccounts;
+	
+	@SimpleField (
+		nullable = true)
+	String serviceEndpointInvoice;
 
 	// compare to
 

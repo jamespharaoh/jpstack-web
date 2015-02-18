@@ -9,10 +9,9 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.imchat.core.model.ImChatConversationRec;
 import wbs.imchat.core.model.ImChatMessageObjectHelper;
 import wbs.imchat.core.model.ImChatMessageRec;
+import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.priv.console.PrivChecker;
-
-import com.google.common.collect.Lists;
 
 @PrototypeComponent ("imChatMessagePendingHistoryPart")
 public
@@ -23,6 +22,9 @@ class ImChatMessagePendingHistoryPart
 
 	@Inject
 	ImChatMessageObjectHelper imChatMessageHelper;
+	
+	@Inject
+	ConsoleObjectManager objectManager;
 
 	@Inject
 	PrivChecker privChecker;
@@ -58,9 +60,6 @@ class ImChatMessagePendingHistoryPart
 			new ArrayList<ImChatMessageRec> (
 				imChatConversation.getImChatMessages ());
 
-		Lists.reverse (
-			messages);
-
 		printFormat ("<table class=\"list\" style=\"width:100\">");
 		printFormat (
 				"<tr>",
@@ -84,15 +83,15 @@ class ImChatMessagePendingHistoryPart
 	            default: sender = "Invalid sender";
 	                     break;
 			}
-			
+
 			
 			printFormat (
 					"<tr>",
-					"	<td>"+message.getTime().toString()+"</td>",
-					"	<td>"+sender+"</td>",
-					"	<td>"+message.getMessageText ()+"</td>",
+					"	<td>%s</td>", message.getTime().toString(),
+					"	<td>%s</td>", sender,
+					"	<td>%s</td>", message.getMessageText (),
 					"</tr>");
-
+			
 		}
 		
 		printFormat ("</table>");

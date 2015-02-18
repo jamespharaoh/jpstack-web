@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -41,6 +42,8 @@ import wbs.imchat.core.model.ImChatPurchaseRec;
 import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
+import wbs.paypal.api.PaypalApiLogic;
+import wbs.paypal.model.PaypalAccountRec;
 import wbs.paypal.model.PaypalPaymentObjectHelper;
 import wbs.paypal.model.PaypalPaymentRec;
 
@@ -56,6 +59,9 @@ class ImChatPurchaseStartAction
 
 	@Inject
 	ImChatApiLogic imChatApiLogic;
+	
+	@Inject
+	PaypalApiLogic paypalApiLogic;
 
 	@Inject
 	ImChatObjectHelper imChatHelper;
@@ -114,7 +120,7 @@ class ImChatPurchaseStartAction
 					(String)
 					requestContext.request (
 						"imChatId")));
-
+		
 		// lookup session and customer
 
 		ImChatSessionRec session =
@@ -173,8 +179,13 @@ class ImChatPurchaseStartAction
 
 		}
 
+		// get paypal account
+		
+		PaypalAccountRec paypalAccount =
+				imChat.getPaypalAccount();
+		
 		// create paypal payment and purchase
-
+		
 		String token = paypalPaymentHelper.generateToken();
 
 		PaypalPaymentRec paypalPayment =
@@ -182,7 +193,7 @@ class ImChatPurchaseStartAction
 					new PaypalPaymentRec()
 
 					.setPaypalAccount(
-							customer.getImChat().getPaypalAccount())
+							paypalAccount)
 
 					.setValue(pricePoint.getValue ())
 
@@ -222,8 +233,14 @@ class ImChatPurchaseStartAction
 			.setPaypalPayment(paypalPayment)
 
 		);
+		
+		// create properties needed for the call
+		
+		Properties expressCheckoutProperties = 
+			paypalApiLogic.paypalAccountData(paypalAccount)
+				.generateProperties();		
 
-		String redirectURL = setExpressCheckout(pricePoint.getValue ().toString() + ".0", token);
+		String redirectURL = setExpressCheckout(pricePoint.getValue ().toString() + ".0", token, expressCheckoutProperties);
 
 		// create response
 
@@ -248,7 +265,7 @@ class ImChatPurchaseStartAction
 
 	//Calls Paypal API and returns an access token
 
-	public String setExpressCheckout(String amount, String token) {
+	public String setExpressCheckout(String amount, String token, Properties expressCheckoutProperties) {
 
 		SetExpressCheckoutRequestDetailsType setExpressCheckoutRequestDetails = new SetExpressCheckoutRequestDetailsType();
 		setExpressCheckoutRequestDetails.setReturnURL("http://chat.dev.wbsoft.co/test.html#payment=pending&token="+token);
@@ -279,15 +296,7 @@ class ImChatPurchaseStartAction
 
 		PayPalAPIInterfaceServiceService service = null;
 
-		try {
-
-			service = new PayPalAPIInterfaceServiceService("conf/sdk_conf.properties");
-
-		} catch (IOException e) {
-
-			return "Error properties:" + e;
-
-		}
+		service = new PayPalAPIInterfaceServiceService(expressCheckoutProperties);
 
 		SetExpressCheckoutResponseType setExpressCheckoutResponse = null;
 

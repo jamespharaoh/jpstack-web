@@ -80,18 +80,46 @@
 		<name-field/>
 		<description-field/>
 		<deleted-field/>
-
+		
 		<text-field
-			name="serviceEndpoint"
+			name="username"
 			nullable="yes"/>
-
+			
 		<text-field
-			name="clientId"
+			name="password"
 			nullable="yes"/>
-
+			
 		<text-field
-			name="clientSecret"
+			name="signature"
 			nullable="yes"/>
+			
+		<text-field
+			name="apiId"
+			nullable="yes"/>
+			
+		<text-field
+			name="serviceEndpointPaypalApi"
+			nullable="yes"/>
+			
+		<text-field
+			name="serviceEndpointPaypalApiAa"
+			nullable="yes"/>
+			
+		<text-field
+			name="serviceEndpointPermissions"
+			nullable="yes"/>
+			
+		<text-field
+			name="serviceEndpointAdaptivePayments"
+			nullable="yes"/>
+			
+		<text-field
+			name="serviceEndpointAdaptiveAccounts"
+			nullable="yes"/>
+			
+		<text-field
+			name="serviceEndpointInvoice"
+			nullable="yes"/>			
 
 	</field-set>
 
@@ -103,18 +131,46 @@
 		<name-field/>
 		<description-field/>
 		<deleted-field/>
-
+		
 		<text-field
-			name="serviceEndpoint"
+			name="username"
 			nullable="yes"/>
-
+			
 		<text-field
-			name="clientId"
+			name="password"
 			nullable="yes"/>
-
+			
 		<text-field
-			name="clientSecret"
+			name="signature"
 			nullable="yes"/>
+			
+		<text-field
+			name="apiId"
+			nullable="yes"/>
+			
+		<text-field
+			name="serviceEndpointPaypalApi"
+			nullable="yes"/>
+			
+		<text-field
+			name="serviceEndpointPaypalApiAa"
+			nullable="yes"/>
+			
+		<text-field
+			name="serviceEndpointPermissions"
+			nullable="yes"/>
+			
+		<text-field
+			name="serviceEndpointAdaptivePayments"
+			nullable="yes"/>
+			
+		<text-field
+			name="serviceEndpointAdaptiveAccounts"
+			nullable="yes"/>
+			
+		<text-field
+			name="serviceEndpointInvoice"
+			nullable="yes"/>	
 
 	</field-set>
 

@@ -1,17 +1,10 @@
 package wbs.imchat.core.api;
 
 import java.io.IOException;
-import java.util.Properties;
 import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 import lombok.Cleanup;
 import lombok.SneakyThrows;

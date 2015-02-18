@@ -1,4 +1,4 @@
-package wbs.imchat.core.api;
+package wbs.paypal.api;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

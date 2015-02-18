@@ -19,6 +19,10 @@
 	<fixtures>
 		<fixture name="paypal"/>
 	</fixtures>
+	
+	<layer name="api">
+		<bean class="api.PaypalApiLogicImplementation"/>
+	</layer>
 
 	<console-modules>
 		<console-module name="paypal-account"/>
