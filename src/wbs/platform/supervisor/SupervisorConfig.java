@@ -15,6 +15,7 @@ public
 class SupervisorConfig {
 
 	String name;
+	String label;
 
 	SupervisorConfigSpec spec;
 

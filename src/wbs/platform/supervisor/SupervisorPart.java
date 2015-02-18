@@ -35,6 +35,7 @@ import wbs.platform.user.model.UserRec;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorPart")
@@ -70,6 +71,7 @@ class SupervisorPart
 	// state
 
 	List<String> supervisorConfigNames;
+	List<SupervisorConfig> supervisorConfigs;
 
 	String selectedSupervisorConfigName;
 	SupervisorConfig supervisorConfig;
@@ -133,6 +135,35 @@ class SupervisorPart
 					? ImmutableList.<String>copyOf (
 						slice.getSupervisorConfigNames ().split (","))
 					: Collections.<String>emptyList ();
+
+			ImmutableList.Builder<SupervisorConfig> supervisorConfigsBuilder =
+				ImmutableList.<SupervisorConfig>builder ();
+
+			for (
+				String supervisorConfigName
+					: supervisorConfigNames
+			) {
+
+				SupervisorConfig supervisorConfig =
+					consoleManager.supervisorConfig (
+						supervisorConfigName);
+
+				if (supervisorConfig == null) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"No such supervisor config: %s",
+							supervisorConfigName));
+
+				}
+
+				supervisorConfigsBuilder.add (
+					supervisorConfig);
+
+			}
+
+			supervisorConfigs =
+				supervisorConfigsBuilder.build ();
 
 			selectedSupervisorConfigName =
 				requestContext.parameter (
@@ -235,13 +266,25 @@ class SupervisorPart
 
 			if (object instanceof SupervisorIntegerConditionSpec) {
 
-				SupervisorIntegerConditionSpec supervisorIntegerConditionSpec =
+				SupervisorIntegerConditionSpec integerConditionSpec =
 					(SupervisorIntegerConditionSpec) object;
 
 				conditionsBuilder.put (
-					supervisorIntegerConditionSpec.name (),
+					integerConditionSpec.name (),
 					Integer.parseInt (
-						supervisorIntegerConditionSpec.value ()));
+						integerConditionSpec.value ()));
+
+			}
+
+			if (object instanceof SupervisorIntegerInConditionSpec) {
+
+				SupervisorIntegerInConditionSpec integerInConditionSpec =
+					(SupervisorIntegerInConditionSpec) object;
+
+				conditionsBuilder.put (
+					integerInConditionSpec.name (),
+					ImmutableSet.copyOf (
+						integerInConditionSpec.values ()));
 
 			}
 
@@ -356,15 +399,15 @@ class SupervisorPart
 				">\n");
 
 			for (
-				String oneSupervisorConfigName
-					: supervisorConfigNames
+				SupervisorConfig oneSupervisorConfig
+					: supervisorConfigs
 			)  {
 
 				printFormat (
 					"<a",
 					" class=\"%h\"",
 					equal (
-							oneSupervisorConfigName,
+							oneSupervisorConfig.name (),
 							selectedSupervisorConfigName)
 						? "selected"
 						: "",
@@ -373,11 +416,11 @@ class SupervisorPart
 						"%s",
 						localUrl,
 						"?config=%u",
-						oneSupervisorConfigName,
+						oneSupervisorConfig.name (),
 						"&date=%u",
 						dateField.text),
 					">%h</a>\n",
-					oneSupervisorConfigName);
+					oneSupervisorConfig.label ());
 
 			}
 

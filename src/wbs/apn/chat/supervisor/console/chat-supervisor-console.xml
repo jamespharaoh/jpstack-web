@@ -24,7 +24,8 @@
 	</extend-context>
 
 	<supervisor-config
-		name="chat">
+		name="chat"
+		label="Chat">
 
 		<condition
 			name="chatId"

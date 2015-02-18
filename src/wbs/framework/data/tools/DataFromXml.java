@@ -15,6 +15,8 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -878,20 +880,57 @@ class DataFromXml {
 							entryKey,
 							entryValue));
 
-				} else if (field.getType () == List.class
-						&& ! dataChildrenAnnotation.valueAttribute ().isEmpty ()) {
+				} else if (
+					field.getType () == List.class
+					&& ! dataChildrenAnnotation.valueAttribute ().isEmpty ()
+				) {
 
-					String value =
+					Type genericType =
+						field.getGenericType ();
+
+					Class<?> itemClass;
+
+					if (genericType instanceof ParameterizedType) {
+
+						ParameterizedType parameterizedType =
+							(ParameterizedType) genericType;
+
+						itemClass =
+							(Class<?>)
+							parameterizedType.getActualTypeArguments () [0];
+
+					} else {
+
+						itemClass = null;
+
+					}
+
+					String stringValue =
 						childElement.attributeValue (
 							dataChildrenAnnotation.valueAttribute ());
 
-					if (value == null) {
+					if (stringValue == null) {
 
 						throw new RuntimeException (
 							stringFormat (
 								"No attribute %s on <%s>",
 								dataChildrenAnnotation.valueAttribute (),
 								childElement.getName ()));
+
+					}
+
+					Object value;
+
+					if (itemClass == Integer.class) {
+
+						value =
+							Integer.parseInt (
+								stringValue);
+
+					} else {
+
+						value =
+							stringValue;
 
 					}
 

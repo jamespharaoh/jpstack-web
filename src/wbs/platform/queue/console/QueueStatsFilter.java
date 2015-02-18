@@ -11,11 +11,13 @@ import javax.inject.Inject;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.queue.model.QueueItemRec;
+import wbs.platform.queue.model.QueueObjectHelper;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("queueStatsFilter")
 public
@@ -27,11 +29,15 @@ class QueueStatsFilter {
 	ObjectManager objectManager;
 
 	@Inject
+	QueueObjectHelper queueHelper;
+
+	@Inject
 	SliceObjectHelper sliceHelper;
 
 	// state
 
 	Optional<SliceRec> slice;
+	Optional<Set<QueueRec>> queues;
 
 	Set<QueueRec> includeQueues =
 		new HashSet<QueueRec> ();
@@ -57,6 +63,38 @@ class QueueStatsFilter {
 
 			slice =
 				Optional.<SliceRec>absent ();
+
+		}
+
+		if (conditions.containsKey ("queueId")) {
+
+			ImmutableSet.Builder<QueueRec> queuesBuilder =
+				ImmutableSet.<QueueRec>builder ();
+
+			Set<?> queueIds =
+				(Set<?>)
+				conditions.get ("queueId");
+
+			for (
+				Object queueId
+					: queueIds
+			) {
+
+				queuesBuilder.add (
+					queueHelper.find (
+						(Integer)
+						queueId));
+
+			}
+
+			queues =
+				Optional.<Set<QueueRec>>of (
+					queuesBuilder.build ());
+
+		} else {
+
+			queues =
+				Optional.<Set<QueueRec>>absent ();
 
 		}
 
@@ -89,6 +127,17 @@ class QueueStatsFilter {
 			&& ! objectManager.isParent (
 				queue,
 				slice.get ())
+
+		) {
+			exclude = true;
+		}
+
+		if (
+
+			queues.isPresent ()
+
+			&& ! queues.get ().contains (
+				queue)
 
 		) {
 			exclude = true;

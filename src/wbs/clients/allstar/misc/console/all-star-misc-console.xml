@@ -2,7 +2,8 @@
 	name="all-star-misc">
 
 	<supervisor-config
-		name="all-star">
+		name="all-star"
+		label="All Star">
 
 		<integer-condition
 			name="sliceId"
