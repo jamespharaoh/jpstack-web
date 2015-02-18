@@ -1,11 +1,13 @@
 package wbs.platform.exception.logic;
 
+import wbs.platform.exception.model.ExceptionLogRec;
+
 import com.google.common.base.Optional;
 
 public
 interface ExceptionLogic {
 
-	void logSimple (
+	ExceptionLogRec logSimple (
 			String typeCode,
 			String source,
 			String summary,
@@ -13,14 +15,14 @@ interface ExceptionLogic {
 			Optional<Integer> userId,
 			Boolean fatal);
 
-	void logThrowable (
+	ExceptionLogRec logThrowable (
 			String typeCode,
 			String source,
 			Throwable throwable,
 			Optional<Integer> userId,
 			Boolean fatal);
 
-	void logThrowableWithSummary (
+	ExceptionLogRec logThrowableWithSummary (
 			String typeCode,
 			String source,
 			String summary,

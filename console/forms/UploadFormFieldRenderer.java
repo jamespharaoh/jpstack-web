@@ -145,6 +145,9 @@ class UploadFormFieldRenderer<Container>
 	public
 	boolean formValuePresent () {
 
+		if (! requestContext.isMultipart ())
+			return false;
+
 		FileItem fileItem =
 			requestContext.fileItemFile (
 				name ());
