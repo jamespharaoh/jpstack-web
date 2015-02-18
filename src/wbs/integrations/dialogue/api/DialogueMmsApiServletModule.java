@@ -24,7 +24,6 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.joda.time.Instant;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -123,7 +122,6 @@ class DialogueMmsApiServletModule
 
 		@Override
 		@SneakyThrows ({
-			FileUploadException.class,
 			ParseException.class
 		})
 		public
@@ -148,8 +146,10 @@ class DialogueMmsApiServletModule
 			List<MediaRec> medias =
 				new ArrayList<MediaRec> ();
 
-			for (FileItem item
-					: requestContext.fileItems ()) {
+			for (
+				FileItem item
+					: requestContext.fileItems ()
+			) {
 
 				Matcher matcher =
 					contentTypePattern.matcher (

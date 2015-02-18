@@ -30,13 +30,13 @@ class SupervisorTablePartBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec container;
 
 	@BuilderSource
-	SupervisorTablePartSpec supervisorTablePartSpec;
+	SupervisorTablePartSpec spec;
 
 	@BuilderTarget
-	SupervisorPageBuilder supervisorPageBuilder;
+	SupervisorConfigBuilder supervisorConfigBuilder;
 
 	// state
 
@@ -66,12 +66,12 @@ class SupervisorTablePartBuilder {
 
 		};
 
-		supervisorPageBuilder.pagePartFactories ()
+		supervisorConfigBuilder.pagePartFactories ()
 			.add (pagePartFactory);
 
 		builder.descend (
-			supervisorTablePartSpec,
-			supervisorTablePartSpec.builders (),
+			spec,
+			spec.builders (),
 			this);
 
 	}

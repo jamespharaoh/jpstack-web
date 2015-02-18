@@ -7,7 +7,7 @@ import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataParent;
 import wbs.platform.console.module.ConsoleModuleData;
-import wbs.platform.supervisor.SupervisorPageSpec;
+import wbs.platform.supervisor.SupervisorConfigSpec;
 
 @Accessors (fluent = true)
 @Data
@@ -18,7 +18,7 @@ public
 class QueueSupervisorStatsGrouperSpec {
 
 	@DataParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec supervisorConfigSpec;
 
 	@DataAttribute (required = true)
 	String name;

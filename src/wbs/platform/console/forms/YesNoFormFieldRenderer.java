@@ -11,12 +11,7 @@ import javax.inject.Inject;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.console.request.ConsoleRequestContext;
 
@@ -47,6 +42,13 @@ class YesNoFormFieldRenderer<Container>
 
 	@Getter @Setter
 	String noLabel;
+
+	// details
+
+	@Getter
+	boolean fileUpload = false;
+
+	// implementation
 
 	@Override
 	public
@@ -195,50 +197,24 @@ class YesNoFormFieldRenderer<Container>
 	}
 
 	@Override
-	@SneakyThrows (FileUploadException.class)
 	public
 	boolean formValuePresent () {
 
-		if (requestContext.isMultipart ()) {
+		String parameterValue =
+			requestContext.parameter (
+				name ());
 
-			FileItem fileItem =
-				requestContext.fileItem (
-					name ());
-
-			return fileItem != null;
-
-		} else {
-
-			String parameterValue =
-				requestContext.parameter (
-					name ());
-
-			return parameterValue != null;
-
-		}
+		return parameterValue != null;
 
 	}
 
-	@SneakyThrows (FileUploadException.class)
 	String formValue () {
 
-		if (requestContext.isMultipart ()) {
+		String parameterValue =
+			requestContext.parameter (
+				name ());
 
-			FileItem fileItem =
-				requestContext.fileItem (
-					name ());
-
-			return fileItem.getString ();
-
-		} else {
-
-			String parameterValue =
-				requestContext.parameter (
-					name ());
-
-			return parameterValue;
-
-		}
+		return parameterValue;
 
 	}
 

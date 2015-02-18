@@ -1043,6 +1043,9 @@ class ChatCreditLogicImpl
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();
 
+		if (chatUser.getChatScheme () == null)
+			return false;
+
 		ChatSchemeChargesRec charges =
 			chatScheme.getCharges ();
 

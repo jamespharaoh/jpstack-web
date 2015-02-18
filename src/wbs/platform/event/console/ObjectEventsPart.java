@@ -24,6 +24,8 @@ import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.event.model.EventLinkObjectHelper;
 import wbs.platform.event.model.EventLinkRec;
 import wbs.platform.event.model.EventRec;
+import wbs.platform.media.console.MediaConsoleLogic;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextRec;
 
 @Accessors (fluent = true)
@@ -40,6 +42,9 @@ class ObjectEventsPart
 
 	@Inject
 	ConsoleObjectManager objectManager;
+
+	@Inject
+	MediaConsoleLogic mediaConsoleLogic;
 
 	@Inject
 	TimeFormatter timeFormatter;
@@ -265,6 +270,22 @@ class ObjectEventsPart
 				stringFormat (
 					"\"%s\"",
 					((TextRec) object).getText ()));
+
+		}
+
+		if (object instanceof MediaRec) {
+
+			MediaRec media =
+				(MediaRec) object;
+
+			return stringFormat (
+				"<a ",
+				"href=\"%h\"",
+				objectManager.localLink (
+					media),
+				">%s</a>",
+				mediaConsoleLogic.mediaThumb32 (
+					media));
 
 		}
 

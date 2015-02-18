@@ -23,13 +23,13 @@ class SupervisorSumStatsAggregatorBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec container;
 
 	@BuilderSource
-	SupervisorSumStatsAggregatorSpec supervisorSumStatsAggregatorSpec;
+	SupervisorSumStatsAggregatorSpec spec;
 
 	@BuilderTarget
-	SupervisorPageBuilder supervisorPageBuilder;
+	SupervisorConfigBuilder supervisorConfigBuilder;
 
 	// build
 
@@ -39,9 +39,9 @@ class SupervisorSumStatsAggregatorBuilder {
 			Builder builer) {
 
 		String name =
-			supervisorSumStatsAggregatorSpec.name ();
+			spec.name ();
 
-		supervisorPageBuilder.statsAggregatorsByName.put (
+		supervisorConfigBuilder.statsAggregatorsByName.put (
 			name,
 			sumStatsAggregator.get ());
 

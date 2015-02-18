@@ -6,6 +6,8 @@ import java.util.List;
 public
 interface FormFieldRenderer<Container,Interface> {
 
+	boolean fileUpload ();
+
 	void renderTableCell (
 			PrintWriter out,
 			Container container,

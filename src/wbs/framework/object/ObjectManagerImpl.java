@@ -577,7 +577,7 @@ class ObjectManagerImpl
 		Record<?> foundParent =
 			firstParent (
 				object,
-				Collections.singleton (object));
+				Collections.singleton (parent));
 
 		return foundParent != null;
 

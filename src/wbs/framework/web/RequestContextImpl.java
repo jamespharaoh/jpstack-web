@@ -3,7 +3,6 @@ package wbs.framework.web;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -11,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -105,7 +103,18 @@ class RequestContextImpl
 	String parameter (
 			String key) {
 
-		return request ().getParameter (key);
+		if (
+			isMultipart ()
+			&& fileItemFields ().containsKey (key)
+		) {
+
+			return fileItemFields ().get (key);
+
+		} else {
+
+			return request ().getParameter (key);
+
+		}
 
 	}
 
@@ -143,8 +152,39 @@ class RequestContextImpl
 		ImmutableMap.Builder<String,List<String>> parameterMapBuilder =
 			ImmutableMap.<String,List<String>>builder ();
 
-		for (Object entryObject
-				: request ().getParameterMap ().entrySet ()) {
+		if (isMultipart ()) {
+
+			for (
+				Map.Entry<String,String> fileItemFieldEntry
+					: fileItemFields.entrySet ()
+			) {
+
+				String[] requestValues =
+					request ().getParameterValues (
+						fileItemFieldEntry.getKey ());
+
+				parameterMapBuilder.put (
+					fileItemFieldEntry.getKey (),
+					ImmutableList.<String>builder ()
+
+						.add (
+							fileItemFieldEntry.getValue ())
+
+						.add (
+							requestValues != null
+								? requestValues
+								: new String [] {})
+
+						.build ());
+
+			}
+
+		}
+
+		for (
+			Object entryObject
+				: request ().getParameterMap ().entrySet ()
+		) {
 
 			Map.Entry<?,?> entry =
 				(Map.Entry<?,?>) entryObject;
@@ -154,6 +194,17 @@ class RequestContextImpl
 
 			String[] parameterValuesArray =
 				(String[]) entry.getValue ();
+
+			if (
+
+				isMultipart ()
+
+				&& fileItemFields.containsKey (
+					parameterName)
+
+			) {
+				continue;
+			}
 
 			List<String> parameterValues =
 				ImmutableList.<String>copyOf (
@@ -177,21 +228,19 @@ class RequestContextImpl
 		Map<String,String> ret =
 			new HashMap<String,String> ();
 
-		for (Map.Entry<String,List<String>> ent
-				: parameterMap ().entrySet ())
+		for (
+			Map.Entry<String,List<String>> ent
+				: parameterMap ().entrySet ()
+		) {
+
 			ret.put (
 				ent.getKey (),
 				ent.getValue ().get (0));
 
+		}
+
 		return ret;
 
-	}
-
-	@Override
-	@SuppressWarnings ("unchecked")
-	public
-	Enumeration<String> parameterNames () {
-		return request ().getParameterNames ();
 	}
 
 	@Override
@@ -523,25 +572,18 @@ class RequestContextImpl
 	}
 
 	List<FileItem> fileItems;
+	Map<String,FileItem> fileItemFiles;
+	Map<String,String> fileItemFields;
 
 	@Override
 	public
-	List<FileItem> fileItems ()
-		throws FileUploadException {
+	List<FileItem> fileItems () {
 
 		if (! isMultipart ())
-			return Collections.<FileItem>emptyList ();
+			throw new IllegalStateException ();
 
-		if (fileItems != null)
-			return fileItems;
-
-		ServletFileUpload fileUpload =
-			new ServletFileUpload (
-				new DiskFileItemFactory ());
-
-		fileItems =
-			fileUpload.parseRequest (
-				request ());
+		if (fileItems == null)
+			processFileItems ();
 
 		return fileItems;
 
@@ -549,28 +591,102 @@ class RequestContextImpl
 
 	@Override
 	public
-	FileItem fileItem (
-			String fieldName)
-		throws FileUploadException {
+	Map<String,FileItem> fileItemFiles () {
+
+		if (! isMultipart ())
+			throw new IllegalStateException ();
+
+		if (fileItems == null)
+			processFileItems ();
+
+		return fileItemFiles;
+
+	}
+
+	@Override
+	public
+	Map<String,String> fileItemFields () {
+
+		if (! isMultipart ())
+			throw new IllegalStateException ();
+
+		if (fileItems == null)
+			processFileItems ();
+
+		return fileItemFields;
+
+	}
+
+	@SneakyThrows (FileUploadException.class)
+	void processFileItems () {
+
+		if (fileItems != null)
+			throw new IllegalStateException ();
+
+		ServletFileUpload fileUpload =
+			new ServletFileUpload (
+				new DiskFileItemFactory ());
+
+		List<FileItem> fileItemsTemp =
+			ImmutableList.<FileItem>copyOf (
+				fileUpload.parseRequest (
+					request ()));
+
+		ImmutableMap.Builder<String,FileItem> fileItemFilesBuilder =
+			ImmutableMap.<String,FileItem>builder ();
+
+		ImmutableMap.Builder<String,String> fileItemFieldsBuilder =
+			ImmutableMap.<String,String>builder ();
 
 		for (
 			FileItem fileItem
-				: fileItems ()
+				: fileItemsTemp
 		) {
 
-			if (
-				notEqual (
-					fileItem.getFieldName (),
-					fieldName)
-			) {
-				continue;
-			}
+			if (fileItem.isFormField ()) {
 
-			return fileItem;
+				fileItemFieldsBuilder.put (
+					fileItem.getFieldName (),
+					fileItem.getString ());
+
+			} else {
+
+				fileItemFilesBuilder.put (
+					fileItem.getFieldName (),
+					fileItem);
+
+			}
 
 		}
 
-		return null;
+		fileItemFiles =
+			fileItemFilesBuilder.build ();
+
+		fileItemFields =
+			fileItemFieldsBuilder.build ();
+
+		fileItems =
+			fileItemsTemp;
+
+	}
+
+	@Override
+	public
+	FileItem fileItemFile (
+			String fieldName) {
+
+		return fileItemFiles ().get (
+			fieldName);
+
+	}
+
+	@Override
+	public
+	String fileItemField (
+			String fieldName) {
+
+		return fileItemFields ().get (
+			fieldName);
 
 	}
 
@@ -632,8 +748,10 @@ class RequestContextImpl
 
 		// output params
 
-		for (Map.Entry<String,List<String>> entry
-				: parameterMap ().entrySet ()) {
+		for (
+			Map.Entry<String,List<String>> entry
+				: parameterMap ().entrySet ()
+		) {
 
 			for (String value
 					: entry.getValue ()) {
@@ -650,26 +768,17 @@ class RequestContextImpl
 
 		// output files
 
-		if (doFiles) {
+		if (doFiles && isMultipart ()) {
 
-			try {
+			for (FileItem fileItem
+					: fileItems ()) {
 
-				for (FileItem fileItem
-						: fileItems ()) {
-
-					logger.debug (
-						stringFormat (
-							"FILE: %s = %s (%s)",
-							fileItem.getFieldName (),
-							fileItem.getContentType (),
-							fileItem.getSize ()));
-
-				}
-
-			} catch (FileUploadException exception) {
-
-				throw new RuntimeException (
-					exception);
+				logger.debug (
+					stringFormat (
+						"FILE: %s = %s (%s)",
+						fileItem.getFieldName (),
+						fileItem.getContentType (),
+						fileItem.getSize ()));
 
 			}
 

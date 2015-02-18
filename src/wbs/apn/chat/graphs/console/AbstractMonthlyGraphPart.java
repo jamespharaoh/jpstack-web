@@ -1,6 +1,9 @@
 package wbs.apn.chat.graphs.console;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
+
+import java.util.Collections;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -9,7 +12,6 @@ import org.joda.time.YearMonth;
 
 import wbs.platform.console.html.ObsoleteDateLinks;
 import wbs.platform.console.part.AbstractPagePart;
-import wbs.platform.console.request.EmptyFormData;
 
 @Accessors (fluent = true)
 public abstract
@@ -75,7 +77,7 @@ class AbstractMonthlyGraphPart
 				out,
 				requestContext.resolveLocalUrl (
 					myLocalPart),
-				EmptyFormData.instance,
+				Collections.<String,String>emptyMap (),
 				yearMonth.toLocalDate (1));
 
 			printFormat (

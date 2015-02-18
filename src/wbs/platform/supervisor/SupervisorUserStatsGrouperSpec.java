@@ -17,7 +17,7 @@ public
 class SupervisorUserStatsGrouperSpec {
 
 	@DataParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec supervisorConfigSpec;
 
 	@DataAttribute (required = true)
 	String name;

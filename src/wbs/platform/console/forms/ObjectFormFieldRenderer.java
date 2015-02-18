@@ -52,6 +52,11 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Getter @Setter
 	EntityFinder<Interface> entityFinder;
 
+	// details
+
+	@Getter
+	boolean fileUpload = false;
+
 	// implementation
 
 	@Override
@@ -287,15 +292,21 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		if (param == null)
 			return null;
 
-		if (equal (
+		if (
+			equal (
 				param,
-				"null"))
+				"null")
+		) {
 			return null;
+		}
 
-		if (equal (
+		if (
+			equal (
 				param,
-				"unchanged"))
-			return null;
+				"unchanged")
+		) {
+			throw new IllegalStateException ();
+		}
 
 		Integer objectId =
 			Integer.parseInt (

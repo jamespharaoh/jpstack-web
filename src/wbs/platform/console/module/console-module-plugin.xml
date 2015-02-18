@@ -3,7 +3,7 @@
 	package="wbs.platform.console.module">
 
 	<layer name="console">
-		<bean class="ConsoleManagerImpl"/>
+		<bean class="ConsoleManagerImplementation"/>
 		<bean class="ConsoleMetaManagerImpl"/>
 		<bean class="ConsoleMetaModuleBuilder"/>
 		<bean class="ConsoleMetaModuleImpl"/>

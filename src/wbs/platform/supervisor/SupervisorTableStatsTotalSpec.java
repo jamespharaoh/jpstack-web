@@ -17,7 +17,7 @@ public
 class SupervisorTableStatsTotalSpec {
 
 	@DataAncestor
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec supervisorConfigSpec;
 
 	@DataAttribute (required = true)
 	String label;

@@ -20,7 +20,7 @@ public
 class SupervisorTablePartSpec {
 
 	@DataParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec supervisorConfig;
 
 	@DataChildren (direct = true)
 	List<Object> builders =

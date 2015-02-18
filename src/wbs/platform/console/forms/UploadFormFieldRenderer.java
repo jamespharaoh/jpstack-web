@@ -14,7 +14,6 @@ import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.IOUtils;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -41,6 +40,11 @@ class UploadFormFieldRenderer<Container>
 
 	@Getter @Setter
 	Integer size;
+
+	// details
+
+	@Getter
+	boolean fileUpload = true;
 
 	// implementation
 
@@ -138,26 +142,22 @@ class UploadFormFieldRenderer<Container>
 	}
 
 	@Override
-	@SneakyThrows (FileUploadException.class)
 	public
 	boolean formValuePresent () {
 
 		FileItem fileItem =
-			requestContext.fileItem (
+			requestContext.fileItemFile (
 				name ());
 
 		return fileItem != null;
 
 	}
 
-	@SneakyThrows ({
-		FileUploadException.class,
-		IOException.class
-	})
+	@SneakyThrows (IOException.class)
 	FileUpload formValue () {
 
 		FileItem fileItem =
-			requestContext.fileItem (
+			requestContext.fileItemFile (
 				name ());
 
 		if (fileItem == null)

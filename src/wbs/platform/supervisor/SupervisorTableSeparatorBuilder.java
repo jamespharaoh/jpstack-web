@@ -30,10 +30,10 @@ class SupervisorTableSeparatorBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec container;
 
 	@BuilderSource
-	SupervisorTableSeparatorSpec supervisorTableSeparatorSpec;
+	SupervisorTableSeparatorSpec spec;
 
 	@BuilderTarget
 	SupervisorTablePartBuilder supervisorTablePartBuilder;

@@ -17,7 +17,7 @@ public
 class SupervisorHeadingPartSpec {
 
 	@DataParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec supervisorConfigSpec;
 
 	@DataAttribute (required = true)
 	String label;

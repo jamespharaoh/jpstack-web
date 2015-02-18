@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.log4j.Logger;
 
@@ -58,8 +56,6 @@ interface RequestContext {
 	Map<String,List<String>> parameterMap ();
 
 	Map<String,String> parameterMapSimple ();
-
-	Enumeration<String> parameterNames ();
 
 	boolean parameterOn (
 			String key);
@@ -143,12 +139,16 @@ interface RequestContext {
 
 	boolean isMultipart ();
 
-	List<FileItem> fileItems ()
-		throws FileUploadException;
+	List<FileItem> fileItems ();
 
-	FileItem fileItem (
-			 String name)
-		throws FileUploadException;
+	Map<String,FileItem> fileItemFiles ();
+	Map<String,String> fileItemFields ();
+
+	FileItem fileItemFile (
+			 String name);
+
+	String fileItemField (
+			 String name);
 
 	String header (
 			String name);
