@@ -285,11 +285,15 @@ class ChatMainCommand
 					keyword,
 					chatSchemeKeyword.getJoinType ()));
 
-			Optional<InboxAttemptRec> inboxAttempt =
-				performCreditCheck ();
+			if (! chatSchemeKeyword.getNoCreditCheck ()) {
 
-			if (inboxAttempt.isPresent ())
-				return inboxAttempt;
+				Optional<InboxAttemptRec> inboxAttempt =
+					performCreditCheck ();
+
+				if (inboxAttempt.isPresent ())
+					return inboxAttempt;
+
+			}
 
 			Integer chatAffiliateId =
 				chatSchemeKeyword.getJoinChatAffiliate () != null
@@ -345,11 +349,15 @@ class ChatMainCommand
 					"is command %s",
 					chatSchemeKeyword.getCommand ().getId ()));
 
-			Optional<InboxAttemptRec> inboxAttempt =
-				performCreditCheck ();
+			if (! chatSchemeKeyword.getNoCreditCheck ()) {
 
-			if (inboxAttempt.isPresent ())
-				return inboxAttempt;
+				Optional<InboxAttemptRec> inboxAttempt =
+					performCreditCheck ();
+
+				if (inboxAttempt.isPresent ())
+					return inboxAttempt;
+
+			}
 
 			return Optional.of (
 				commandManager.handle (

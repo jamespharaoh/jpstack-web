@@ -75,13 +75,16 @@
 			label="Affiliate"
 			finder="chatAffiliate"/>
 
+		<yes-no-field
+			name="confirmCharges"
+			label="Charges"/>
+
 		<object-field
 			name="command"
 			finder="command"/>
 
 		<yes-no-field
-			name="confirmCharges"
-			label="Charges"/>
+			name="noCreditCheck"/>
 
 	</field-set>
 
@@ -110,12 +113,15 @@
 			finder="chatAffiliate"
 			root-field="chatScheme"/>
 
+		<yes-no-field
+			name="confirmCharges"/>
+
 		<object-field
 			name="command"
 			finder="command"/>
 
 		<yes-no-field
-			name="confirmCharges"/>
+			name="noCreditCheck"/>
 
 	</field-set>
 
@@ -143,12 +149,15 @@
 			finder="chatAffiliate"
 			root-field="chatScheme"/>
 
+		<yes-no-field
+			name="confirmCharges"/>
+
 		<object-field
 			name="command"
 			finder="command"/>
 
 		<yes-no-field
-			name="confirmCharges"/>
+			name="noCreditCheck"/>
 
 	</field-set>
 

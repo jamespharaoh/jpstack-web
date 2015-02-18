@@ -68,6 +68,9 @@ class ChatSchemeKeywordRec
 	@SimpleField
 	Boolean confirmCharges = false;
 
+	@SimpleField
+	Boolean noCreditCheck = false;
+
 	// compare to
 
 	@Override
