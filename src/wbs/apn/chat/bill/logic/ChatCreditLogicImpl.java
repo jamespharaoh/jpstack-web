@@ -478,6 +478,7 @@ class ChatCreditLogicImpl
 		if (
 			creditCheckResult.failed ()
 			&& userActed
+			&& chatUser.getFirstJoin () != null
 		) {
 
 			userCreditHint (

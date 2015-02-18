@@ -380,6 +380,31 @@ class ChatJoiner {
 
 	}
 
+	void setAffiliateAndScheme () {
+
+		// set affiliate
+
+		if (chatAffiliateId != null) {
+
+			chatUserLogic.setAffiliate (
+				chatUser,
+				chatAffiliateHelper.find (
+					chatAffiliateId));
+
+		}
+
+		// set the chat user's scheme if appropriate
+
+		if (chatSchemeId != null) {
+
+			chatUserLogic.setScheme (
+				chatUser,
+				chatSchemeHelper.find (chatSchemeId));
+
+		}
+
+	}
+
 	/**
 	 * Save the appropriate information in this user.
 	 */
@@ -518,27 +543,6 @@ class ChatJoiner {
 					rest,
 					Optional.of (
 						message));
-
-		}
-
-		// set affiliate
-
-		if (chatAffiliateId != null) {
-
-			chatUserLogic.setAffiliate (
-				chatUser,
-				chatAffiliateHelper.find (
-					chatAffiliateId));
-
-		}
-
-		// set the chat user's scheme if appropriate
-
-		if (chatSchemeId != null) {
-
-			chatUserLogic.setScheme (
-				chatUser,
-				chatSchemeHelper.find (chatSchemeId));
 
 		}
 
@@ -864,10 +868,14 @@ class ChatJoiner {
 		chat =
 			chatHelper.find (chatId);
 
+		// create chat user
+
 		chatUser =
 			chatUserHelper.findOrCreate (
 				chat,
 				message);
+
+		setAffiliateAndScheme ();
 
 		// make sure the user can join
 
