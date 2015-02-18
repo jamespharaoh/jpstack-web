@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -24,6 +25,7 @@ import wbs.platform.reporting.console.StatsDatum;
 import wbs.platform.reporting.console.StatsGranularity;
 import wbs.platform.reporting.console.StatsPeriod;
 import wbs.platform.reporting.console.StatsProvider;
+import wbs.platform.scaffold.model.SliceObjectHelper;
 
 @SingletonComponent ("queueItemUserStatsProvider")
 public
@@ -40,6 +42,14 @@ class QueueItemUserStatsProvider
 
 	@Inject
 	QueueItemObjectHelper queueItemHelper;
+
+	@Inject
+	SliceObjectHelper sliceHelper;
+
+	// prototype dependencies
+
+	@Inject
+	Provider<QueueStatsFilter> queueStatsFilterProvider;
 
 	// implementation
 
@@ -62,14 +72,23 @@ class QueueItemUserStatsProvider
 
 		// retrieve queue items
 
+		QueueStatsFilter queueStatsFilter =
+			queueStatsFilterProvider.get ();
+
+		queueStatsFilter.conditions (
+			conditions);
+
 		List<QueueItemRec> queueItems =
-			queueItemHelper.findByProcessedTime (
-				statsPeriod.toInterval ());
+			queueStatsFilter.filterQueueItems (
+				queueItemHelper.findByProcessedTime (
+					statsPeriod.toInterval ()));
 
 		// aggregate stats
 
-		for (QueueItemRec queueItem
-				: queueItems) {
+		for (
+			QueueItemRec queueItem
+				: queueItems
+		) {
 
 			QueueSubjectRec queueSubject =
 				queueItem.getQueueSubject ();

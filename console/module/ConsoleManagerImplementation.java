@@ -51,11 +51,12 @@ import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.tab.ConsoleContextTab;
 import wbs.platform.console.tab.ContextTabPlacement;
+import wbs.platform.supervisor.SupervisorConfig;
 
 @Log4j
-@SingletonComponent ("consoleManagerImpl")
+@SingletonComponent ("consoleManager")
 public
-class ConsoleManagerImpl
+class ConsoleManagerImplementation
 	implements
 		ConsoleManager,
 		ServletModule {
@@ -83,19 +84,19 @@ class ConsoleManagerImpl
 	// state
 
 	Map<String,ConsoleContextType> contextTypesByName =
-		new HashMap<String,ConsoleContextType>();
+		new HashMap<String,ConsoleContextType> ();
 
 	Map<String,ConsoleContext> consoleContextsByName =
-		new HashMap<String,ConsoleContext>();
+		new HashMap<String,ConsoleContext> ();
 
 	List<ConsoleContext> consoleContexts =
 		new ArrayList<ConsoleContext> ();
 
 	Map<String,ConsoleContextTab> contextTabs =
-		new HashMap<String,ConsoleContextTab>();
+		new HashMap<String,ConsoleContextTab> ();
 
 	Map<String,WebFile> contextFiles =
-		new HashMap<String,WebFile>();
+		new HashMap<String,WebFile> ();
 
 	Map<String,Provider<Responder>> responders =
 		new HashMap<String,Provider<Responder>> ();
@@ -105,6 +106,9 @@ class ConsoleManagerImpl
 
 	Map<String,List<ConsoleContext>> contextsWithoutParentByType =
 		new HashMap<String,List<ConsoleContext>> ();
+
+	Map<String,SupervisorConfig> supervisorConfigs =
+		new HashMap<String,SupervisorConfig> ();
 
 	// implementation
 
@@ -171,22 +175,66 @@ class ConsoleManagerImpl
 	public
 	void init () {
 
-		int errorCount = 0;
+		int errors = 0;
 
 		dumpData ();
 
 		// find responders
 
-		errorCount +=
+		errors +=
 			findResponders ();
 
-		// get all context types
+		errors +=
+			collectContextTypes ();
+
+		errors +=
+			collectContextTabs ();
+
+		errors +=
+			addTabsToContextTypes ();
+
+		errors +=
+			collectContextFiles ();
+
+		errors +=
+			collectContextTypeFiles ();
+
+		errors +=
+			resolveContextTabs ();
+
+		errors +=
+			collectConsoleContexts ();
+
+		errors +=
+			collectContextsByParentType ();
+
+		errors +=
+			collectSupervisorConfigs ();
+
+		// abandon if we encountered errors
+
+		if (errors != 0) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"%s initialising context manager",
+					pluralise (errors, "error")));
+
+		}
+
+	}
+
+	int collectContextTypes () {
+
+		int errors = 0;
 
 		Map<String,String> beanNamesByContextTypeName =
 			new HashMap<String,String> ();
 
-		for (Map.Entry<String,ConsoleModule> ent
-				: consoleModules.entrySet ()) {
+		for (
+			Map.Entry<String,ConsoleModule> ent
+				: consoleModules.entrySet ()
+		) {
 
 			String beanName =
 				ent.getKey ();
@@ -194,8 +242,10 @@ class ConsoleManagerImpl
 			ConsoleModule consoleModule =
 				ent.getValue ();
 
-			for (ConsoleContextType contextType
-					: consoleModule.contextTypes ()) {
+			for (
+				ConsoleContextType contextType
+					: consoleModule.contextTypes ()
+			) {
 
 				if (contextTypesByName.containsKey (contextType.name ())) {
 
@@ -207,7 +257,7 @@ class ConsoleManagerImpl
 							beanNamesByContextTypeName.get (
 								contextType.name ())));
 
-					errorCount ++;
+					errors ++;
 
 					continue;
 
@@ -231,10 +281,18 @@ class ConsoleManagerImpl
 
 		}
 
-		// get all context tabs
+		return errors;
 
-		for (Map.Entry<String,ConsoleModule> consoleModuleEntry
-				: consoleModules.entrySet ()) {
+	}
+
+	int collectContextTabs () {
+
+		int errors = 0;
+
+		for (
+			Map.Entry<String,ConsoleModule> consoleModuleEntry
+				: consoleModules.entrySet ()
+		) {
 
 			String consoleModuleName =
 				consoleModuleEntry.getKey ();
@@ -242,8 +300,10 @@ class ConsoleManagerImpl
 			ConsoleModule consoleModule =
 				consoleModuleEntry.getValue ();
 
-			for (ConsoleContextTab contextTab
-					: consoleModule.tabs ()) {
+			for (
+				ConsoleContextTab contextTab
+					: consoleModule.tabs ()
+			) {
 
 				if (contextTabs.containsKey (
 						contextTab.name ())) {
@@ -254,7 +314,7 @@ class ConsoleManagerImpl
 							contextTab.name (),
 							consoleModuleName));
 
-					errorCount++;
+					errors ++;
 
 					continue;
 
@@ -274,16 +334,24 @@ class ConsoleManagerImpl
 
 		}
 
-		// add tabs to context types
+		return errors;
 
-		for (Map.Entry<String,ConsoleModule> ent1
-				: consoleModules.entrySet ()) {
+	}
+
+	int addTabsToContextTypes () {
+
+		int errors = 0;
+
+		for (
+			Map.Entry<String,ConsoleModule> entry
+				: consoleModules.entrySet ()
+		) {
 
 			String consoleModuleName =
-				ent1.getKey ();
+				entry.getKey ();
 
 			ConsoleModule consoleModule =
-				ent1.getValue ();
+				entry.getValue ();
 
 			for (
 				Map.Entry<String,List<ContextTabPlacement>> tabPlacementsEntry
@@ -307,8 +375,10 @@ class ConsoleManagerImpl
 					List<String> contextTabNames =
 						new ArrayList<String> ();
 
-					for (ContextTabPlacement tabPlacement
-							: tabPlacements) {
+					for (
+						ContextTabPlacement tabPlacement
+							: tabPlacements
+					) {
 
 						contextTabNames.add (
 							stringFormat (
@@ -329,14 +399,16 @@ class ConsoleManagerImpl
 							"in %s",
 							consoleModuleName));
 
-					errorCount ++;
+					errors ++;
 
 					continue;
 
 				}
 
-				for (ContextTabPlacement tabPlacement
-						: tabPlacements) {
+				for (
+					ContextTabPlacement tabPlacement
+						: tabPlacements
+				) {
 
 					String contextTabName =
 						tabPlacement.tabName ();
@@ -352,7 +424,7 @@ class ConsoleManagerImpl
 								"Unknown tab " + contextTabName +
 								" referenced from " + consoleModuleName);
 
-							errorCount ++;
+							errors ++;
 
 							continue;
 
@@ -369,10 +441,18 @@ class ConsoleManagerImpl
 
 		}
 
-		// get context files
+		return errors;
 
-		for (Map.Entry<String,ConsoleModule> consoleModuleEntry
-				: consoleModules.entrySet ()) {
+	}
+
+	int collectContextFiles () {
+
+		int errors = 0;
+
+		for (
+			Map.Entry<String,ConsoleModule> consoleModuleEntry
+				: consoleModules.entrySet ()
+		) {
 
 			String consoleModuleName =
 				consoleModuleEntry.getKey ();
@@ -380,8 +460,10 @@ class ConsoleManagerImpl
 			ConsoleModule consoleModule =
 				consoleModuleEntry.getValue ();
 
-			for (Map.Entry<String,? extends WebFile> contextFileEntry
-					: consoleModule.contextFiles ().entrySet ()) {
+			for (
+				Map.Entry<String,? extends WebFile> contextFileEntry
+					: consoleModule.contextFiles ().entrySet ()
+			) {
 
 				String contextFileName =
 					contextFileEntry.getKey ();
@@ -397,7 +479,7 @@ class ConsoleManagerImpl
 							"Duplicated context file: %s",
 							contextFileName));
 
-					errorCount ++;
+					errors ++;
 
 					continue;
 
@@ -417,10 +499,18 @@ class ConsoleManagerImpl
 
 		}
 
-		// add files to context types
+		return errors;
 
-		for (Map.Entry<String,ConsoleModule> consoleModuleEntry
-				: consoleModules.entrySet ()) {
+	}
+
+	int collectContextTypeFiles () {
+
+		int errors = 0;
+
+		for (
+			Map.Entry<String,ConsoleModule> consoleModuleEntry
+				: consoleModules.entrySet ()
+		) {
 
 			String consoleModuleName =
 				consoleModuleEntry.getKey ();
@@ -433,7 +523,8 @@ class ConsoleManagerImpl
 				contextFilesByContextTypeEntry
 					: consoleModule
 						.contextFilesByContextType ()
-						.entrySet ()) {
+						.entrySet ()
+			) {
 
 				String contextTypeName =
 					contextFilesByContextTypeEntry.getKey ();
@@ -453,7 +544,7 @@ class ConsoleManagerImpl
 							"%s",
 							consoleModuleName));
 
-					errorCount ++;
+					errors ++;
 
 					continue;
 
@@ -462,8 +553,10 @@ class ConsoleManagerImpl
 				Map<String,WebFile> typeContextFiles =
 					contextType.files ();
 
-				for (String contextFileName
-						: contextFileNames) {
+				for (
+					String contextFileName
+						: contextFileNames
+				) {
 
 					WebFile contextFile =
 						contextFiles.get (contextFileName);
@@ -477,7 +570,7 @@ class ConsoleManagerImpl
 								"%s",
 								contextTypeName));
 
-						errorCount ++;
+						errors ++;
 
 						continue;
 
@@ -493,12 +586,18 @@ class ConsoleManagerImpl
 
 		}
 
-		// resolve context tabs in all context types
+		return errors;
 
-		int contextTypeResolveTabsErrors = 0;
+	}
 
-		for (ConsoleContextType contextType
-				: contextTypesByName.values ()) {
+	int resolveContextTabs () {
+
+		int errors = 0;
+
+		for (
+			ConsoleContextType contextType
+				: contextTypesByName.values ()
+		) {
 
 			try {
 
@@ -507,15 +606,17 @@ class ConsoleManagerImpl
 
 			} catch (Exception exception) {
 
-				contextTypeResolveTabsErrors ++;
+				errors ++;
 
 				log.info (
 					stringFormat (
 						"Dumping context type tab specification for %s",
 						contextType.name ()));
 
-				for (ContextTabPlacement tabPlacement
-						: contextType.tabPlacements ()) {
+				for (
+					ContextTabPlacement tabPlacement
+						: contextType.tabPlacements ()
+				) {
 
 					log.info (
 						stringFormat (
@@ -529,19 +630,18 @@ class ConsoleManagerImpl
 
 		}
 
-		if (contextTypeResolveTabsErrors > 0) {
+		return errors;
 
-			throw new RuntimeException (
-				stringFormat (
-					"Aborting due to unresolvable tabs in %s context types",
-					contextTypeResolveTabsErrors));
+	}
 
-		}
+	int collectConsoleContexts () {
 
-		// get and set up all contexts
+		int errors = 0;
 
-		for (Map.Entry<String,ConsoleModule> consoleModuleEntry
-				: consoleModules.entrySet ()) {
+		for (
+			Map.Entry<String,ConsoleModule> consoleModuleEntry
+				: consoleModules.entrySet ()
+		) {
 
 			String consoleModuleName =
 				consoleModuleEntry.getKey ();
@@ -549,8 +649,10 @@ class ConsoleManagerImpl
 			ConsoleModule consoleModule =
 				consoleModuleEntry.getValue ();
 
-			for (ConsoleContext consoleContext
-					: consoleModule.contexts ()) {
+			for (
+				ConsoleContext consoleContext
+					: consoleModule.contexts ()
+			) {
 
 				if (consoleContextsByName.containsKey (
 						consoleContext.name ())) {
@@ -560,7 +662,7 @@ class ConsoleManagerImpl
 							"Duplicated context name: %s",
 							consoleContext.name ()));
 
-					errorCount ++;
+					errors ++;
 
 					continue;
 
@@ -583,7 +685,7 @@ class ConsoleManagerImpl
 							" in %s",
 							consoleModuleName));
 
-					errorCount ++;
+					errors ++;
 
 					continue;
 
@@ -616,8 +718,16 @@ class ConsoleManagerImpl
 		Collections.sort (
 			consoleContexts);
 
-		for (ConsoleContext context
-				: consoleContexts) {
+		return errors;
+
+	}
+
+	int collectContextsByParentType () {
+
+		for (
+			ConsoleContext context
+				: consoleContexts
+		) {
 
 			if (context.parentContextName () != null) {
 
@@ -667,16 +777,61 @@ class ConsoleManagerImpl
 
 		}
 
-		// abandon if we encountered errors
+		return 0;
 
-		if (errorCount != 0) {
+	}
 
-			throw new RuntimeException (
-				stringFormat (
-					"%s initialising context manager",
-					pluralise (errorCount, "error")));
+	int collectSupervisorConfigs () {
+
+		int errors = 0;
+
+		for (
+			Map.Entry<String,ConsoleModule> consoleModuleEntry
+				: consoleModules.entrySet ()
+		) {
+
+			String consoleModuleName =
+				consoleModuleEntry.getKey ();
+
+			ConsoleModule consoleModule =
+				consoleModuleEntry.getValue ();
+
+			for (
+				Map.Entry<String,SupervisorConfig> entry
+					: consoleModule.supervisorConfigs ().entrySet ()
+			) {
+
+				String supervisorConfigName =
+					entry.getKey ();
+
+				SupervisorConfig supervisorConfig =
+					entry.getValue ();
+
+				if (
+					supervisorConfigs.containsKey (
+						supervisorConfigName)
+				) {
+
+					log.error (
+						stringFormat (
+							"Duplicated supervisor config name %s ",
+							supervisorConfigName,
+							" in console module %s",
+							consoleModuleName));
+
+					errors ++;
+
+				}
+
+				supervisorConfigs.put (
+					supervisorConfigName,
+					supervisorConfig);
+
+			}
 
 		}
+
+		return errors;
 
 	}
 
@@ -742,8 +897,10 @@ class ConsoleManagerImpl
 
 		int errors = 0;
 
-		for (Map.Entry<String,ConsoleModule> consoleModuleEntry
-			: consoleModules.entrySet ()) {
+		for (
+			Map.Entry<String,ConsoleModule> consoleModuleEntry
+				: consoleModules.entrySet ()
+		) {
 
 			String consoleModuleName =
 				consoleModuleEntry.getKey ();
@@ -756,14 +913,18 @@ class ConsoleManagerImpl
 					"Collecting responders from console module %s",
 					consoleModuleName));
 
-			for (Map.Entry<String,Provider<Responder>> responderEntry
-					: consoleModule.responders ().entrySet ()) {
+			for (
+				Map.Entry<String,Provider<Responder>> responderEntry
+					: consoleModule.responders ().entrySet ()
+			) {
 
 				String responderName =
 					responderEntry.getKey ();
 
-				if (responderName == null
-						|| responderName.isEmpty ()) {
+				if (
+					responderName == null
+					|| responderName.isEmpty ()
+				) {
 
 					log.error (
 						stringFormat (
@@ -1600,6 +1761,16 @@ class ConsoleManagerImpl
 				targetContext.name ()));
 
 		return targetContext;
+
+	}
+
+	@Override
+	public
+	SupervisorConfig supervisorConfig (
+			String name) {
+
+		return supervisorConfigs.get (
+			name);
 
 	}
 

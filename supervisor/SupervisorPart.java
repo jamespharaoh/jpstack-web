@@ -1,5 +1,6 @@
 package wbs.platform.supervisor;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -19,16 +20,22 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.platform.console.html.ObsoleteDateField;
 import wbs.platform.console.html.ObsoleteDateLinks;
+import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.console.part.PagePart;
+import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.reporting.console.StatsConsoleLogic;
 import wbs.platform.reporting.console.StatsDataSet;
 import wbs.platform.reporting.console.StatsGranularity;
 import wbs.platform.reporting.console.StatsPeriod;
 import wbs.platform.reporting.console.StatsProvider;
+import wbs.platform.scaffold.model.SliceRec;
+import wbs.platform.user.model.UserObjectHelper;
+import wbs.platform.user.model.UserRec;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorPart")
@@ -36,32 +43,168 @@ public
 class SupervisorPart
 	extends AbstractPagePart {
 
+	// dependencies
+
 	@Inject
 	ApplicationContext applicationContext;
 
 	@Inject
+	ConsoleManager consoleManager;
+
+	@Inject
+	ConsoleRequestContext requestContext;
+
+	@Inject
 	StatsConsoleLogic statsConsoleLogic;
 
-	@Getter @Setter
-	SupervisorPageSpec supervisorPageSpec;
+	@Inject
+	UserObjectHelper userHelper;
+
+	// properties
 
 	@Getter @Setter
-	List<Provider<PagePart>> pagePartFactories;
+	String fileName;
+
+	@Getter @Setter
+	String fixedSupervisorConfigName;
+
+	// state
+
+	List<String> supervisorConfigNames;
+	List<SupervisorConfig> supervisorConfigs;
+
+	String selectedSupervisorConfigName;
+	SupervisorConfig supervisorConfig;
 
 	ObsoleteDateField dateField;
 
+	Instant startTime;
+	Instant endTime;
+
 	StatsPeriod statsPeriod;
 
+	Map<String,Object> statsConditions;
 	Map<String,StatsDataSet> statsDataSets;
 
 	List<PagePart> pageParts =
 		Collections.emptyList ();
 
+	// implementation
+
 	@Override
 	public
 	void prepare () {
 
-		// interpret date
+		prepareSupervisorConfig ();
+		prepareDate ();
+
+		if (supervisorConfig != null) {
+
+			createStatsPeriod ();
+			createStatsConditions ();
+			createStatsDataSets ();
+
+			createPageParts ();
+
+		}
+
+	}
+
+	void prepareSupervisorConfig () {
+
+		if (fixedSupervisorConfigName != null) {
+
+			selectedSupervisorConfigName =
+				fixedSupervisorConfigName;
+
+			supervisorConfigNames =
+				Collections.singletonList (
+					fixedSupervisorConfigName);
+
+		} else {
+
+			UserRec myUser =
+				userHelper.find (
+					requestContext.userId ());
+
+			SliceRec slice =
+				myUser.getSlice ();
+
+			supervisorConfigNames =
+				slice.getSupervisorConfigNames () != null
+					? ImmutableList.<String>copyOf (
+						slice.getSupervisorConfigNames ().split (","))
+					: Collections.<String>emptyList ();
+
+			ImmutableList.Builder<SupervisorConfig> supervisorConfigsBuilder =
+				ImmutableList.<SupervisorConfig>builder ();
+
+			for (
+				String supervisorConfigName
+					: supervisorConfigNames
+			) {
+
+				SupervisorConfig supervisorConfig =
+					consoleManager.supervisorConfig (
+						supervisorConfigName);
+
+				if (supervisorConfig == null) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"No such supervisor config: %s",
+							supervisorConfigName));
+
+				}
+
+				supervisorConfigsBuilder.add (
+					supervisorConfig);
+
+			}
+
+			supervisorConfigs =
+				supervisorConfigsBuilder.build ();
+
+			selectedSupervisorConfigName =
+				requestContext.parameter (
+					"config",
+					supervisorConfigNames.isEmpty ()
+						? null
+						: supervisorConfigNames.get (0));
+
+			if (
+
+				selectedSupervisorConfigName != null
+
+				&& ! supervisorConfigNames.contains (
+					selectedSupervisorConfigName)
+
+			) {
+				throw new RuntimeException ();
+			}
+
+		}
+
+		if (selectedSupervisorConfigName != null) {
+
+			supervisorConfig =
+				consoleManager.supervisorConfig (
+					selectedSupervisorConfigName);
+
+			if (supervisorConfig == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Supervisor config not found: %s",
+						selectedSupervisorConfigName));
+
+			}
+
+		}
+
+	}
+
+	void prepareDate () {
 
 		dateField =
 			ObsoleteDateField.parse (
@@ -76,18 +219,20 @@ class SupervisorPart
 
 		}
 
-		Instant startTime =
+		startTime =
 			dateField.date
 				.toDateTimeAtStartOfDay ()
 				.toInstant ();
 
-		Instant endTime =
+		endTime =
 			dateField.date
 				.plusDays (1)
 				.toDateTimeAtStartOfDay ()
 				.toInstant ();
 
-		// create stats period
+	}
+
+	void createStatsPeriod () {
 
 		statsPeriod =
 			statsConsoleLogic.createStatsPeriod (
@@ -95,37 +240,70 @@ class SupervisorPart
 				startTime,
 				endTime);
 
-		// create conditions
+	}
+
+	void createStatsConditions () {
 
 		ImmutableMap.Builder<String,Object> conditionsBuilder =
 			ImmutableMap.<String,Object>builder ();
 
-		for (Object object
-				: supervisorPageSpec.builders ()) {
+		for (
+			Object object
+				: supervisorConfig.spec ().builders ()
+		) {
 
-			if (! (object instanceof SupervisorConditionSpec))
-				continue;
+			if (object instanceof SupervisorConditionSpec) {
 
-			SupervisorConditionSpec supervisorConditionSpec =
-				(SupervisorConditionSpec) object;
+				SupervisorConditionSpec supervisorConditionSpec =
+					(SupervisorConditionSpec) object;
 
-			conditionsBuilder.put (
-				supervisorConditionSpec.name (),
-				requestContext.stuff (
-					supervisorConditionSpec.stuffKey ()));
+				conditionsBuilder.put (
+					supervisorConditionSpec.name (),
+					requestContext.stuff (
+						supervisorConditionSpec.stuffKey ()));
+
+			}
+
+			if (object instanceof SupervisorIntegerConditionSpec) {
+
+				SupervisorIntegerConditionSpec integerConditionSpec =
+					(SupervisorIntegerConditionSpec) object;
+
+				conditionsBuilder.put (
+					integerConditionSpec.name (),
+					Integer.parseInt (
+						integerConditionSpec.value ()));
+
+			}
+
+			if (object instanceof SupervisorIntegerInConditionSpec) {
+
+				SupervisorIntegerInConditionSpec integerInConditionSpec =
+					(SupervisorIntegerInConditionSpec) object;
+
+				conditionsBuilder.put (
+					integerInConditionSpec.name (),
+					ImmutableSet.copyOf (
+						integerInConditionSpec.values ()));
+
+			}
 
 		}
 
-		Map<String,Object> conditions =
+		statsConditions =
 			conditionsBuilder.build ();
 
-		// retrieve data sets
+	}
+
+	void createStatsDataSets () {
 
 		ImmutableMap.Builder<String,StatsDataSet> dataSetsBuilder =
 			ImmutableMap.<String,StatsDataSet>builder ();
 
-		for (Object object
-				: supervisorPageSpec.builders ()) {
+		for (
+			Object object
+				: supervisorConfig.spec ().builders ()
+		) {
 
 			if (! (object instanceof SupervisorDataSetSpec))
 				continue;
@@ -141,7 +319,7 @@ class SupervisorPart
 			StatsDataSet statsDataSet =
 				statsProvider.getStats (
 					statsPeriod,
-					conditions);
+					statsConditions);
 
 			dataSetsBuilder.put (
 				supervisorDataSetSpec.name (),
@@ -152,7 +330,9 @@ class SupervisorPart
 		statsDataSets =
 			dataSetsBuilder.build ();
 
-		// setup page parts
+	}
+
+	void createPageParts () {
 
 		Map<String,Object> partParameters =
 			ImmutableMap.<String,Object>builder ()
@@ -163,8 +343,10 @@ class SupervisorPart
 		ImmutableList.Builder<PagePart> pagePartsBuilder =
 			ImmutableList.<PagePart>builder ();
 
-		for (Provider<PagePart> pagePartFactory
-				: pagePartFactories) {
+		for (
+			Provider<PagePart> pagePartFactory
+				: supervisorConfig.pagePartFactories ()
+		) {
 
 			PagePart pagePart =
 				pagePartFactory.get ();
@@ -188,8 +370,10 @@ class SupervisorPart
 	public
 	void goHeadStuff () {
 
-		for (PagePart pagePart
-				: pageParts) {
+		for (
+			PagePart pagePart
+				: pageParts
+		) {
 
 			pagePart.goHeadStuff ();
 
@@ -205,7 +389,45 @@ class SupervisorPart
 			requestContext.resolveLocalUrl (
 				stringFormat (
 					"/%s",
-					supervisorPageSpec.fileName ()));
+					fileName ()));
+
+		if (supervisorConfigNames.size () > 1) {
+
+			printFormat (
+				"<p",
+				" class=\"links\"",
+				">\n");
+
+			for (
+				SupervisorConfig oneSupervisorConfig
+					: supervisorConfigs
+			)  {
+
+				printFormat (
+					"<a",
+					" class=\"%h\"",
+					equal (
+							oneSupervisorConfig.name (),
+							selectedSupervisorConfigName)
+						? "selected"
+						: "",
+					" href=\"%h\"",
+					stringFormat (
+						"%s",
+						localUrl,
+						"?config=%u",
+						oneSupervisorConfig.name (),
+						"&date=%u",
+						dateField.text),
+					">%h</a>\n",
+					oneSupervisorConfig.label ());
+
+			}
+
+			printFormat (
+				"</p>\n");
+
+		}
 
 		printFormat (
 			"<form",
@@ -240,8 +462,10 @@ class SupervisorPart
 
 		// page parts
 
-		for (PagePart pagePart
-				: pageParts) {
+		for (
+			PagePart pagePart
+				: pageParts
+		) {
 
 			pagePart.goBodyStuff ();
 

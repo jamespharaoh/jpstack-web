@@ -1,25 +1,35 @@
 package wbs.platform.supervisor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
-import wbs.framework.data.annotations.DataParent;
 import wbs.platform.console.module.ConsoleModuleData;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("user-stats-grouper")
-@PrototypeComponent ("supervisorUserStatsGrouperSpec")
+@DataClass ("supervisor-config")
+@PrototypeComponent ("supervisorConfigSpec")
 @ConsoleModuleData
 public
-class SupervisorUserStatsGrouperSpec {
+class SupervisorConfigSpec {
 
-	@DataParent
-	SupervisorConfigSpec supervisorConfigSpec;
-
-	@DataAttribute (required = true)
+	@DataAttribute (
+		required = true)
 	String name;
+
+	@DataAttribute (
+		required = true)
+	String label;
+
+	@DataChildren (
+		direct = true)
+	List<Object> builders =
+		new ArrayList<Object> ();
 
 }

@@ -21,7 +21,7 @@ public
 class SupervisorIntegerStatsFormatterSpec {
 
 	@DataParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec supervisorConfigSpec;
 
 	@DataAttribute (required = true)
 	String name;

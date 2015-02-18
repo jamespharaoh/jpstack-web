@@ -23,6 +23,8 @@ import wbs.platform.reporting.console.UnaryStatsGrouper;
 public
 class SupervisorTableStatsTotalBuilder {
 
+	// dependencies
+
 	@Inject
 	Provider<SupervisorTableStatsGroupPart> supervisorTableStatsGroupPart;
 
@@ -32,10 +34,10 @@ class SupervisorTableStatsTotalBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorTablePartSpec supervisorTablePartSpec;
+	SupervisorTablePartSpec container;
 
 	@BuilderSource
-	SupervisorTableStatsTotalSpec supervisorTableStatsTotalSpec;
+	SupervisorTableStatsTotalSpec spec;
 
 	@BuilderTarget
 	SupervisorTablePartBuilder supervisorTablePartBuilder;
@@ -53,39 +55,39 @@ class SupervisorTableStatsTotalBuilder {
 	void build (
 			Builder builder) {
 
-		SupervisorPageBuilder supervisorPageBuilder =
-			supervisorTablePartBuilder.supervisorPageBuilder;
+		SupervisorConfigBuilder supervisorConfigBuilder =
+			supervisorTablePartBuilder.supervisorConfigBuilder;
 
 		String label =
-			supervisorTableStatsTotalSpec.label ();
+			spec.label ();
 
 		statsGrouper =
 			unaryStatsGrouper.get ()
 				.label (label);
 
 		statsResolver =
-			supervisorPageBuilder.statsResolversByName ().get (
-				supervisorTableStatsTotalSpec.resolverName ());
+			supervisorConfigBuilder.statsResolversByName ().get (
+				spec.resolverName ());
 
 		if (statsResolver == null) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Stats resolver %s does not exist",
-					supervisorTableStatsTotalSpec.resolverName ()));
+					spec.resolverName ()));
 
 		}
 
 		statsFormatter =
-			supervisorPageBuilder.statsFormattersByName ().get (
-				supervisorTableStatsTotalSpec.formatterName ());
+			supervisorConfigBuilder.statsFormattersByName ().get (
+				spec.formatterName ());
 
 		if (statsFormatter == null) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Stats formatter %s does not exist",
-					supervisorTableStatsTotalSpec.formatterName ()));
+					spec.formatterName ()));
 
 		}
 

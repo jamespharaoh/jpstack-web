@@ -26,13 +26,13 @@ class SupervisorSimpleStatsResolverBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorPageSpec supervisorPageSpec;
+	SupervisorConfigSpec container;
 
 	@BuilderSource
-	SupervisorSimpleStatsResolverSpec supervisorSimpleStatsResolverSpec;
+	SupervisorSimpleStatsResolverSpec spec;
 
 	@BuilderTarget
-	SupervisorPageBuilder supervisorPageBuilder;
+	SupervisorConfigBuilder supervisorConfigBuilder;
 
 	// build
 
@@ -42,19 +42,19 @@ class SupervisorSimpleStatsResolverBuilder {
 			Builder builder) {
 
 		String name =
-			supervisorSimpleStatsResolverSpec.name ();
+			spec.name ();
 
 		String aggregatorName =
-			supervisorSimpleStatsResolverSpec.aggregatorName ();
+			spec.aggregatorName ();
 
 		String indexName =
-			supervisorSimpleStatsResolverSpec.indexName ();
+			spec.indexName ();
 
 		String valueName =
-			supervisorSimpleStatsResolverSpec.valueName ();
+			spec.valueName ();
 
 		String dataSetName =
-			supervisorSimpleStatsResolverSpec.dataSetName();
+			spec.dataSetName();
 
 		/*
 		StatsDataSet dataSet =
@@ -71,7 +71,7 @@ class SupervisorSimpleStatsResolverBuilder {
 		*/
 
 		StatsAggregator statsAggregator =
-			supervisorPageBuilder.statsAggregatorsByName.get (
+			supervisorConfigBuilder.statsAggregatorsByName.get (
 				aggregatorName);
 
 		if (statsAggregator == null) {
@@ -83,7 +83,7 @@ class SupervisorSimpleStatsResolverBuilder {
 
 		}
 
-		supervisorPageBuilder.statsResolversByName.put (
+		supervisorConfigBuilder.statsResolversByName.put (
 
 			name,
 

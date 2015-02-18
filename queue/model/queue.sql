@@ -187,7 +187,7 @@ BEGIN
 						'AND queue.parent_object_id = parent.id ' ||
 				'WHERE queue.id IS NULL'
 
- 			LOOP
+			LOOP
 
 				IF NOT has_shown_object_type THEN
 
@@ -220,11 +220,11 @@ BEGIN
 						parent_object_type_id,
 						parent_object_id,
 						code)
-	            	VALUES (
-	            		the_queue_type.id,
-	            		the_object_type.id,
-	            		the_record.id,
-	            		the_queue_type.code);
+					VALUES (
+						the_queue_type.id,
+						the_object_type.id,
+						the_record.id,
+						the_queue_type.code);
 
 				END IF;
 

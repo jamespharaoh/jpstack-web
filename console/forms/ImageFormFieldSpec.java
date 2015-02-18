@@ -1,25 +1,28 @@
-package wbs.platform.supervisor;
+package wbs.platform.console.forms;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
-import wbs.framework.data.annotations.DataParent;
 import wbs.platform.console.module.ConsoleModuleData;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("user-stats-grouper")
-@PrototypeComponent ("supervisorUserStatsGrouperSpec")
+@DataClass ("image-field")
+@PrototypeComponent ("imageFormFieldSpec")
 @ConsoleModuleData
 public
-class SupervisorUserStatsGrouperSpec {
+class ImageFormFieldSpec {
 
-	@DataParent
-	SupervisorConfigSpec supervisorConfigSpec;
-
-	@DataAttribute (required = true)
+	@DataAttribute (
+		required = true)
 	String name;
+
+	@DataAttribute
+	String label;
+
+	@DataAttribute
+	Boolean nullable;
 
 }

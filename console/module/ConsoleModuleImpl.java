@@ -27,6 +27,7 @@ import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.tab.ConsoleContextTab;
 import wbs.platform.console.tab.ContextTabPlacement;
 import wbs.platform.console.tab.TabContextResponder;
+import wbs.platform.supervisor.SupervisorConfig;
 
 @Accessors (fluent = true)
 @DataClass ("console-module")
@@ -104,6 +105,11 @@ class ConsoleModuleImpl
 	@Getter @Setter
 	Map<String,FormFieldSet> formFieldSets =
 		new LinkedHashMap<String,FormFieldSet> ();
+
+	@DataChildren
+	@Getter @Setter
+	Map<String,SupervisorConfig> supervisorConfigs =
+		new LinkedHashMap<String,SupervisorConfig> ();
 
 	// utils
 
@@ -317,6 +323,25 @@ class ConsoleModuleImpl
 		formFieldSets.put (
 			name,
 			formFieldSet);
+
+	}
+
+	public
+	void addSupervisorConfig (
+			SupervisorConfig supervisorConfig) {
+
+		if (
+			supervisorConfigs.containsKey (
+				supervisorConfig.name ())
+		) {
+
+			throw new RuntimeException ();
+
+		}
+
+		supervisorConfigs.put (
+			supervisorConfig.name (),
+			supervisorConfig);
 
 	}
 

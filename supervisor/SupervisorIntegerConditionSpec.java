@@ -10,16 +10,21 @@ import wbs.platform.console.module.ConsoleModuleData;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("user-stats-grouper")
-@PrototypeComponent ("supervisorUserStatsGrouperSpec")
+@DataClass ("integer-condition")
+@PrototypeComponent ("supervisorIntegerConditionSpec")
 @ConsoleModuleData
 public
-class SupervisorUserStatsGrouperSpec {
+class SupervisorIntegerConditionSpec {
 
 	@DataParent
-	SupervisorConfigSpec supervisorConfigSpec;
+	SupervisorConfigSpec supervisorConfig;
 
-	@DataAttribute (required = true)
+	@DataAttribute (
+		required = true)
 	String name;
+
+	@DataAttribute (
+		required = true)
+	String value;
 
 }
