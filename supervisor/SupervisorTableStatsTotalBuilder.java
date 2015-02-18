@@ -23,6 +23,8 @@ import wbs.platform.reporting.console.UnaryStatsGrouper;
 public
 class SupervisorTableStatsTotalBuilder {
 
+	// dependencies
+
 	@Inject
 	Provider<SupervisorTableStatsGroupPart> supervisorTableStatsGroupPart;
 

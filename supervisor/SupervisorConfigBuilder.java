@@ -84,6 +84,7 @@ class SupervisorConfigBuilder {
 		consoleModule.addSupervisorConfig (
 			new SupervisorConfig ()
 				.name (spec.name ())
+				.label (spec.label ())
 				.spec (spec)
 				.pagePartFactories (pagePartFactories));
 
