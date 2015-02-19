@@ -46,10 +46,10 @@ class ImChatMessageRec
 	String messageText;
 	
 	@SimpleField
-	Integer type;
+	String sender;
 	
 	@SimpleField
-	Date time;
+	String time;
 
 	@ReferenceField (
 		nullable = true)

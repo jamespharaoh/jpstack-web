@@ -93,9 +93,9 @@ class ImChatMessagePendingFormAction
 			.setIndex (
 				conversation.getNumMessages ())
 			
-			.setType(0)
+			.setSender("Operator")
 			
-			.setTime(new Date())
+			.setTime(new Date().toString())
 
 			.setMessageText (
 				messageText)

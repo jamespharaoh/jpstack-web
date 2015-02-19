@@ -158,9 +158,9 @@ class ImChatMessageSendAction
 			.setIndex (
 				conversation.getNumMessages ())
 				
-			.setType(1)
+			.setSender(conversation.getImChatCustomer().getEmail())
 			
-			.setTime(new Date())
+			.setTime(new Date().toString())
 
 			.setMessageText (
 				messageSendRequest.messageText ())

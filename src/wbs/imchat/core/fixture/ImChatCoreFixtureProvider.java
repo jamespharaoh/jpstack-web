@@ -372,9 +372,9 @@ class ImChatCoreFixtureProvider
 			.setMessageText (
 				"Text message.")
 				
-			.setType(1)
+			.setSender("Test sender")
 			
-			.setTime(new Date())
+			.setTime(new Date().toString())
 
 			.setQueueItem (
 				null)
