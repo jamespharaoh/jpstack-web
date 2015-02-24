@@ -17,6 +17,56 @@ class CurrencyLogicImpl
 
 	@Override
 	public
+	String formatSimple (
+			@NonNull CurrencyRec currency,
+			Long amount) {
+
+		StringBuilder stringBuilder =
+			new StringBuilder ();
+
+		stringBuilder.append (
+			amount / currency.getDivisions ());
+
+		stringBuilder.append (
+			".");
+
+		if (currency.getDivisions () == 100) {
+
+			Long remainder =
+				Math.abs (amount % 100);
+
+			if (remainder == 0) {
+
+				stringBuilder.append (
+					"00");
+
+			} else if (remainder < 10) {
+
+				stringBuilder.append (
+					"0");
+
+				stringBuilder.append (
+					remainder);
+
+			} else {
+
+				stringBuilder.append (
+					remainder);
+
+			}
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
+
+		return stringBuilder.toString ();
+
+	}
+
+	@Override
+	public
 	String formatText (
 			@NonNull CurrencyRec currency,
 			Long amount) {
