@@ -6,8 +6,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.google.common.collect.Lists;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.imchat.core.model.ImChatConversationRec;
 import wbs.imchat.core.model.ImChatCustomerRec;
@@ -19,6 +17,8 @@ import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.module.ConsoleModule;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.priv.console.PrivChecker;
+
+import com.google.common.collect.Lists;
 
 @PrototypeComponent ("imChatMessagePendingHistoryPart")
 public
@@ -70,6 +70,7 @@ class ImChatMessagePendingHistoryPart
 		goSummary ();
 
 		goHistory ();
+
 	}
 
 	void goHistory () {
@@ -81,7 +82,7 @@ class ImChatMessagePendingHistoryPart
 				"messageFields");
 
 		printFormat (
-				"<h3>Conversation history</h3>\n");
+			"<h3>Conversation history</h3>\n");
 
 		// retrieve messages
 
@@ -89,13 +90,14 @@ class ImChatMessagePendingHistoryPart
 			new ArrayList<ImChatMessageRec> (
 				imChatConversation.getImChatMessages ());
 
-		List <ImChatMessageRec> reverseMessages
-			= Lists.reverse(messages);
+		List <ImChatMessageRec> reverseMessages =
+			Lists.reverse (
+				messages);
 
 		// create message table
 
 		printFormat (
-				"<table class=\"list\">\n");
+			"<table class=\"list\">\n");
 
 		// header
 
@@ -141,26 +143,27 @@ class ImChatMessagePendingHistoryPart
 	void goSummary () {
 
 		ImChatCustomerRec imChatCustomer =
-			imChatConversation.getImChatCustomer();
+			imChatConversation.getImChatCustomer ();
 
-		FormFieldSet tableFieldSet;
-
-		tableFieldSet =
+		FormFieldSet tableFieldSet =
 			imChatMessagePendingConsoleModule.formFieldSets ().get (
 				"customerFields");
 
 		printFormat (
-				"<h3>Customer summary</h3>\n");
+			"<h3>Customer summary</h3>\n");
 
-			printFormat ("<table class=\"list\">");
+		printFormat (
+			"<table class=\"list\">\n");
 
 		formFieldLogic.outputTableRows (
-				out,
-				tableFieldSet,
-				imChatCustomer,
-				true);
+			out,
+			tableFieldSet,
+			imChatCustomer,
+			true);
 
-		printFormat ("</table>");
+		printFormat (
+			"</table>\n");
 
 	}
+
 }

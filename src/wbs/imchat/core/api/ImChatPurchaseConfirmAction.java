@@ -29,12 +29,12 @@ import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
 import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
-import wbs.paypal.logic.PaypalApi;
-import wbs.paypal.logic.PaypalLogic;
-import wbs.paypal.model.PaypalAccountRec;
-import wbs.paypal.model.PaypalPaymentObjectHelper;
-import wbs.paypal.model.PaypalPaymentRec;
-import wbs.paypal.model.PaypalPaymentState;
+import wbs.integrations.paypal.logic.PaypalApi;
+import wbs.integrations.paypal.logic.PaypalLogic;
+import wbs.integrations.paypal.model.PaypalAccountRec;
+import wbs.integrations.paypal.model.PaypalPaymentObjectHelper;
+import wbs.integrations.paypal.model.PaypalPaymentRec;
+import wbs.integrations.paypal.model.PaypalPaymentState;
 
 @PrototypeComponent ("imChatPurchaseConfirmAction")
 public

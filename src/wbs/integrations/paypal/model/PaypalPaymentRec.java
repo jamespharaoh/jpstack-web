@@ -1,4 +1,4 @@
-package wbs.paypal.model;
+package wbs.integrations.paypal.model;
 
 import java.util.Random;
 

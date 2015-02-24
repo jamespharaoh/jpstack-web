@@ -27,10 +27,6 @@
 			<get-action name="profileList"/>
 		</resource>
 
-		<resource name="purchase-make">
-			<post-action name="purchaseMake"/>
-		</resource>
-
 		<resource name="purchase-start">
 			<post-action name="purchaseStart"/>
 		</resource>

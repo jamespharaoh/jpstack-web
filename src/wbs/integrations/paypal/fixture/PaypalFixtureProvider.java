@@ -1,11 +1,11 @@
-package wbs.paypal.fixture;
+package wbs.integrations.paypal.fixture;
 
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
-import wbs.paypal.model.PaypalAccountObjectHelper;
+import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuObjectHelper;
 import wbs.platform.menu.model.MenuRec;

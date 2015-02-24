@@ -16,7 +16,7 @@ import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
-import wbs.paypal.model.PaypalPaymentRec;
+import wbs.integrations.paypal.model.PaypalPaymentRec;
 
 @Accessors (chain = true)
 @Data

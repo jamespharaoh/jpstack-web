@@ -1,6 +1,6 @@
 <plugin
 	name="paypal"
-	package="wbs.paypal">
+	package="wbs.integrations.paypal">
 
 	<plugin-dependencies>
 		<plugin-dependency name="sms-apps-common"/>
@@ -12,6 +12,7 @@
 	</sql-scripts>
 
 	<models>
+		<enum-type name="paypalPaymentState"/>
 		<model name="paypalAccount"/>
 		<model name="paypalPayment"/>
 	</models>
@@ -20,8 +21,9 @@
 		<fixture name="paypal"/>
 	</fixtures>
 
-	<layer name="api">
-		<bean class="api.PaypalApiLogicImplementation"/>
+	<layer name="logic">
+		<bean class="logic.PaypalApiImplementation"/>
+		<bean class="logic.PaypalLogicImplementation"/>
 	</layer>
 
 	<console-modules>

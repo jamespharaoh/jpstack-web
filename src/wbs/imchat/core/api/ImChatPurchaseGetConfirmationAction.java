@@ -1,8 +1,5 @@
 package wbs.imchat.core.api;
 
-import static wbs.framework.utils.etc.Misc.equalIgnoreCase;
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -11,16 +8,10 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import urn.ebay.api.PayPalAPI.GetExpressCheckoutDetailsReq;
-import urn.ebay.api.PayPalAPI.GetExpressCheckoutDetailsRequestType;
-import urn.ebay.api.PayPalAPI.GetExpressCheckoutDetailsResponseType;
-import urn.ebay.api.PayPalAPI.PayPalAPIInterfaceServiceService;
-import urn.ebay.apis.eBLBaseComponents.ErrorType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
@@ -36,15 +27,15 @@ import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
 import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
-import wbs.paypal.logic.PaypalLogic;
-import wbs.paypal.model.PaypalAccountRec;
-import wbs.paypal.model.PaypalPaymentObjectHelper;
-import wbs.paypal.model.PaypalPaymentRec;
-import wbs.paypal.model.PaypalPaymentState;
+import wbs.integrations.paypal.logic.PaypalApi;
+import wbs.integrations.paypal.logic.PaypalLogic;
+import wbs.integrations.paypal.model.PaypalAccountRec;
+import wbs.integrations.paypal.model.PaypalPaymentObjectHelper;
+import wbs.integrations.paypal.model.PaypalPaymentRec;
+import wbs.integrations.paypal.model.PaypalPaymentState;
 
 import com.google.common.base.Optional;
 
-@Log4j
 @PrototypeComponent ("imChatPurchaseGetConfirmationAction")
 public
 class ImChatPurchaseGetConfirmationAction
@@ -59,7 +50,10 @@ class ImChatPurchaseGetConfirmationAction
 	ImChatApiLogic imChatApiLogic;
 
 	@Inject
-	PaypalLogic paypalApiLogic;
+	PaypalApi paypalApi;
+
+	@Inject
+	PaypalLogic paypalLogic;
 
 	@Inject
 	ImChatObjectHelper imChatHelper;
@@ -180,11 +174,11 @@ class ImChatPurchaseGetConfirmationAction
 			imChat.getPaypalAccount ();
 
 		Map<String,String> expressCheckoutProperties =
-			paypalApiLogic.expressCheckoutProperties (
+			paypalLogic.expressCheckoutProperties (
 				paypalAccount);
 
 		Optional<String> payerId =
-			getExpressCheckout (
+			paypalApi.getExpressCheckout (
 				purchaseRequest.paypalToken (),
 				expressCheckoutProperties);
 
@@ -219,67 +213,6 @@ class ImChatPurchaseGetConfirmationAction
 
 		return jsonResponderProvider.get ()
 			.value (successResponse);
-
-	}
-
-	@SneakyThrows (Exception.class)
-	public
-	Optional<String> getExpressCheckout (
-			String paypalToken,
-			Map<String,String> expressCheckoutProperties) {
-
-		// GetExpressCheckoutDetailsReq
-
-		GetExpressCheckoutDetailsReq detailsRequest =
-			new GetExpressCheckoutDetailsReq ();
-
-		GetExpressCheckoutDetailsRequestType detailsRequestType =
-			new GetExpressCheckoutDetailsRequestType (
-				paypalToken);
-
-		detailsRequest.setGetExpressCheckoutDetailsRequest (
-			detailsRequestType);
-
-		// Creating service wrapper object
-
-		PayPalAPIInterfaceServiceService service =
-			new PayPalAPIInterfaceServiceService (
-				expressCheckoutProperties);
-
-		GetExpressCheckoutDetailsResponseType responseType =
-			service.getExpressCheckoutDetails (
-				detailsRequest);
-
-		// Accessing response parameters
-
-		if (
-			equalIgnoreCase (
-				responseType.getAck ().getValue (),
-				"success")
-		) {
-
-			return Optional.of (
-				responseType.getGetExpressCheckoutDetailsResponseDetails ()
-					.getPayerInfo ()
-					.getPayerID ());
-
-		} else {
-
-			for (
-				ErrorType error
-					: responseType.getErrors ()
-			) {
-
-				log.error (
-					stringFormat (
-						"Paypal error: %s",
-						error.getLongMessage ()));
-
-			}
-
-			return Optional.absent ();
-
-		}
 
 	}
 

@@ -1,12 +1,13 @@
-package wbs.paypal.hibernate;
+package wbs.integrations.paypal.hibernate;
 
 import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.hibernate.HibernateDao;
-import wbs.paypal.model.PaypalPaymentDao;
-import wbs.paypal.model.PaypalPaymentRec;
+import wbs.integrations.paypal.model.PaypalPaymentDao;
+import wbs.integrations.paypal.model.PaypalPaymentRec;
 
-public class PaypalPaymentDaoHibernate
+public
+class PaypalPaymentDaoHibernate
 	extends HibernateDao
 	implements PaypalPaymentDao {
 

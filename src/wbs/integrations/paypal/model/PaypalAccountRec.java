@@ -1,4 +1,4 @@
-package wbs.paypal.model;
+package wbs.integrations.paypal.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

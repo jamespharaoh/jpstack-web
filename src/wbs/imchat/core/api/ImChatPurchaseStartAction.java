@@ -1,7 +1,5 @@
 package wbs.imchat.core.api;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -31,12 +29,12 @@ import wbs.imchat.core.model.ImChatPurchaseRec;
 import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
-import wbs.paypal.logic.PaypalApi;
-import wbs.paypal.logic.PaypalLogic;
-import wbs.paypal.model.PaypalAccountRec;
-import wbs.paypal.model.PaypalPaymentObjectHelper;
-import wbs.paypal.model.PaypalPaymentRec;
-import wbs.paypal.model.PaypalPaymentState;
+import wbs.integrations.paypal.logic.PaypalApi;
+import wbs.integrations.paypal.logic.PaypalLogic;
+import wbs.integrations.paypal.model.PaypalAccountRec;
+import wbs.integrations.paypal.model.PaypalPaymentObjectHelper;
+import wbs.integrations.paypal.model.PaypalPaymentRec;
+import wbs.integrations.paypal.model.PaypalPaymentState;
 import wbs.platform.currency.logic.CurrencyLogic;
 
 import com.google.common.base.Optional;
@@ -103,9 +101,9 @@ class ImChatPurchaseStartAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatPurchaseMakeRequest purchaseRequest =
+		ImChatPurchaseStartRequest purchaseRequest =
 			dataFromJson.fromJson (
-				ImChatPurchaseMakeRequest.class,
+				ImChatPurchaseStartRequest.class,
 				jsonValue);
 
 		// begin transaction
@@ -240,6 +238,13 @@ class ImChatPurchaseStartAction
 
 		);
 
+		// update customer
+
+		customer
+
+			.setNumPurchases (
+				customer.getNumPurchases () + 1);
+
 		// create properties needed for the call
 
 		Map<String,String> expressCheckoutProperties =
@@ -251,15 +256,11 @@ class ImChatPurchaseStartAction
 				currencyLogic.formatSimple (
 					imChat.getCurrency (),
 					(long) pricePoint.getValue ()),
-				stringFormat (
-					"http://chat.dev.wbsoft.co/test.html",
-					"#payment=pending",
-					"&token=%u",
+				purchaseRequest.successUrl ().replace (
+					"{token}",
 					token),
-				stringFormat (
-					"http://chat.dev.wbsoft.co/test.html",
-					"#payment=error",
-					"&token=%u",
+				purchaseRequest.failureUrl ().replace (
+					"{token}",
 					token),
 				expressCheckoutProperties);
 

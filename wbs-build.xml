@@ -565,12 +565,6 @@
 			name="im-chat-core"
 			package="wbs.imchat.core"/>
 
-		<!-- paypal -->
-
-		<plugin
-			name="paypal"
-			package="wbs.paypal"/>
-
 		<!-- wallet -->
 
 		<plugin
@@ -610,6 +604,10 @@
 		<plugin
 			name="oxygen8"
 			package="wbs.integrations.oxygen8"/>
+
+		<plugin
+			name="paypal"
+			package="wbs.integrations.paypal"/>
 
 		<plugin
 			name="txt-nation"

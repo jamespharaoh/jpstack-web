@@ -1,4 +1,4 @@
-package wbs.paypal.logic;
+package wbs.integrations.paypal.logic;
 
 import static wbs.framework.utils.etc.Misc.equalIgnoreCase;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -13,6 +13,9 @@ import lombok.extern.log4j.Log4j;
 import urn.ebay.api.PayPalAPI.DoExpressCheckoutPaymentReq;
 import urn.ebay.api.PayPalAPI.DoExpressCheckoutPaymentRequestType;
 import urn.ebay.api.PayPalAPI.DoExpressCheckoutPaymentResponseType;
+import urn.ebay.api.PayPalAPI.GetExpressCheckoutDetailsReq;
+import urn.ebay.api.PayPalAPI.GetExpressCheckoutDetailsRequestType;
+import urn.ebay.api.PayPalAPI.GetExpressCheckoutDetailsResponseType;
 import urn.ebay.api.PayPalAPI.PayPalAPIInterfaceServiceService;
 import urn.ebay.api.PayPalAPI.SetExpressCheckoutReq;
 import urn.ebay.api.PayPalAPI.SetExpressCheckoutRequestType;
@@ -122,6 +125,68 @@ class PaypalApiImplementation
 			for (
 				ErrorType error
 					: response.getErrors ()
+			) {
+
+				log.error (
+					stringFormat (
+						"Paypal error: %s",
+						error.getLongMessage ()));
+
+			}
+
+			return Optional.absent ();
+
+		}
+
+	}
+
+	@Override
+	@SneakyThrows (Exception.class)
+	public
+	Optional<String> getExpressCheckout (
+			String paypalToken,
+			Map<String,String> expressCheckoutProperties) {
+
+		// GetExpressCheckoutDetailsReq
+
+		GetExpressCheckoutDetailsReq detailsRequest =
+			new GetExpressCheckoutDetailsReq ();
+
+		GetExpressCheckoutDetailsRequestType detailsRequestType =
+			new GetExpressCheckoutDetailsRequestType (
+				paypalToken);
+
+		detailsRequest.setGetExpressCheckoutDetailsRequest (
+			detailsRequestType);
+
+		// Creating service wrapper object
+
+		PayPalAPIInterfaceServiceService service =
+			new PayPalAPIInterfaceServiceService (
+				expressCheckoutProperties);
+
+		GetExpressCheckoutDetailsResponseType responseType =
+			service.getExpressCheckoutDetails (
+				detailsRequest);
+
+		// Accessing response parameters
+
+		if (
+			equalIgnoreCase (
+				responseType.getAck ().getValue (),
+				"success")
+		) {
+
+			return Optional.of (
+				responseType.getGetExpressCheckoutDetailsResponseDetails ()
+					.getPayerInfo ()
+					.getPayerID ());
+
+		} else {
+
+			for (
+				ErrorType error
+					: responseType.getErrors ()
 			) {
 
 				log.error (

@@ -40,7 +40,6 @@
 		<bean class="api.ImChatPricePointListAction"/>
 		<bean class="api.ImChatProfileListAction"/>
 		<bean class="api.ImChatMediaOriginalJpegAction"/>
-		<bean class="api.ImChatPurchaseMakeAction"/>
 		<bean class="api.ImChatPurchaseStartAction"/>
 		<bean class="api.ImChatPurchaseGetConfirmationAction"/>
 		<bean class="api.ImChatPurchaseConfirmAction"/>

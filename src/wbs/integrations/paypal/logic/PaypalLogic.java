@@ -1,8 +1,8 @@
-package wbs.paypal.logic;
+package wbs.integrations.paypal.logic;
 
 import java.util.Map;
 
-import wbs.paypal.model.PaypalAccountRec;
+import wbs.integrations.paypal.model.PaypalAccountRec;
 
 public
 interface PaypalLogic {

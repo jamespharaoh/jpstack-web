@@ -1,4 +1,4 @@
-package wbs.paypal.logic;
+package wbs.integrations.paypal.logic;
 
 import java.util.Map;
 
@@ -11,6 +11,10 @@ interface PaypalApi {
 			String amount,
 			String returnUrl,
 			String cancelUrl,
+			Map<String,String> expressCheckoutProperties);
+
+	Optional<String> getExpressCheckout (
+			String paypalToken,
 			Map<String,String> expressCheckoutProperties);
 
 	Boolean doExpressCheckout (

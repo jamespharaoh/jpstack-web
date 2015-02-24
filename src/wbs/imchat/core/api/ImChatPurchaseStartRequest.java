@@ -17,4 +17,10 @@ class ImChatPurchaseStartRequest {
 	@DataAttribute
 	Long pricePointId;
 
+	@DataAttribute
+	String successUrl;
+
+	@DataAttribute
+	String failureUrl;
+
 }
