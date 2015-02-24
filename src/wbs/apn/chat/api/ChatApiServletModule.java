@@ -2535,6 +2535,7 @@ class ChatApiServletModule
 						.statusIn (
 							ImmutableSet.<ChatMessageStatus>of (
 								ChatMessageStatus.sent,
+								ChatMessageStatus.broadcast,
 								ChatMessageStatus.moderatorApproved,
 								ChatMessageStatus.moderatorAutoEdited,
 								ChatMessageStatus.moderatorEdited))

@@ -25,7 +25,8 @@
 
 	<supervisor-config
 		name="chat"
-		label="Chat">
+		label="Chat"
+		offset-hours="7">
 
 		<condition
 			name="chatId"

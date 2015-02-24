@@ -39,4 +39,7 @@ class IntegerFormFieldSpec {
 	@DataAttribute
 	Integer size;
 
+	@DataAttribute
+	Boolean blankIfZero;
+
 }

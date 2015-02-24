@@ -4,6 +4,7 @@ public
 enum ChatMessageStatus {
 
 	sent,
+	broadcast,
 	blocked,
 	autoEdited,
 	moderatorPending,

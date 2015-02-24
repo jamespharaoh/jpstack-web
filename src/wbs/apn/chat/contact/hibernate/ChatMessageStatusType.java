@@ -28,6 +28,7 @@ class ChatMessageStatusType
 		add (8, ChatMessageStatus.signup);
 		add (9, ChatMessageStatus.signupReplaced);
 		add (10, ChatMessageStatus.signupTimeout);
+		add (11, ChatMessageStatus.broadcast);
 
 	}
 

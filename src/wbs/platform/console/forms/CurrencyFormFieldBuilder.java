@@ -113,9 +113,14 @@ class CurrencyFormFieldBuilder {
 				Long.MAX_VALUE);
 
 		Class<?> propertyClass =
-				BeanLogic.propertyClass (
-					context.containerClass (),
-					name);
+			BeanLogic.propertyClass (
+				context.containerClass (),
+				name);
+
+		Boolean blankIfZero =
+			ifNull (
+				spec.blankIfZero (),
+				false);
 
 		// accessor
 
@@ -179,7 +184,10 @@ class CurrencyFormFieldBuilder {
 			currencyFormFieldInterfaceMappingProvider.get ()
 
 			.currencyPath (
-				spec.currencyPath ());
+				spec.currencyPath ())
+
+			.blankIfZero (
+				blankIfZero);
 
 		// renderer
 
@@ -198,7 +206,10 @@ class CurrencyFormFieldBuilder {
 			.nullable (
 				ifNull (
 					spec.nullable (),
-					false));
+					false))
+
+			.align (
+				TextFormFieldRenderer.Align.right);
 
 		// update hook
 

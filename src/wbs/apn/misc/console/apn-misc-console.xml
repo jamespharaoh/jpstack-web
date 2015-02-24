@@ -3,7 +3,8 @@
 
 	<supervisor-config
 		name="apn-default"
-		label="APN default">
+		label="APN default"
+		offset-hours="7">
 
 		<integer-condition
 			name="sliceId"
@@ -232,7 +233,8 @@
 
 	<supervisor-config
 		name="apn-all"
-		label="APN All">
+		label="APN All"
+		offset-hours="7">
 
 		<integer-condition
 			name="sliceId"

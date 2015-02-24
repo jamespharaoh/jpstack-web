@@ -39,6 +39,9 @@ class TextFormFieldRenderer<Container>
 	@Getter @Setter
 	Integer size;
 
+	@Getter @Setter
+	Align align;
+
 	// details
 
 	@Getter
@@ -56,7 +59,16 @@ class TextFormFieldRenderer<Container>
 
 		out.write (
 			stringFormat (
-				"<td>%s</td>\n",
+				"<td",
+
+				"%s",
+				align != null
+					? stringFormat (
+						" style=\"text-align: %h\"",
+						align.toString ())
+					: "",
+
+				">%s</td>\n",
 				interfaceToHtml (
 					container,
 					interfaceValue,
@@ -193,6 +205,15 @@ class TextFormFieldRenderer<Container>
 			"%h",
 			interfaceValue);
 
+	}
+
+	// data
+
+	public static
+	enum Align {
+		left,
+		center,
+		right;
 	}
 
 }

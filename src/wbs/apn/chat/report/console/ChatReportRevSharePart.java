@@ -17,6 +17,7 @@ import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
 import wbs.apn.chat.affiliate.console.ChatAffiliateConsoleHelper;
+import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.bill.console.ChatRouteConsoleHelper;
 import wbs.apn.chat.bill.console.ChatUserCreditConsoleHelper;
 import wbs.apn.chat.bill.model.ChatRouteNetworkRec;
@@ -31,13 +32,13 @@ import wbs.apn.chat.core.model.ChatMonthCostRec;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.report.model.ChatReportRevShareRec;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.hibernate.HibernateDatabase;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.Record;
 import wbs.platform.affiliate.console.AffiliateConsoleHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.console.forms.FormFieldLogic;
@@ -47,6 +48,7 @@ import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.module.ConsoleModule;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.console.request.ConsoleRequestContext;
+import wbs.platform.scaffold.model.RootRec;
 import wbs.platform.service.model.ServiceRec;
 import wbs.sms.message.stats.console.MessageStatsConsoleHelper;
 import wbs.sms.message.stats.model.MessageStats;
@@ -527,23 +529,80 @@ class ChatReportRevSharePart
 		if (existingReport != null)
 			return existingReport;
 
-		Record<?> affiliateParent =
+		Object affiliateParent =
 			objectManager.getParent (
 				affiliate);
 
-		ChatReportRevShareRec newReport =
-			new ChatReportRevShareRec ()
+		ChatReportRevShareRec newReport;
 
-			.setAffiliate (
-				affiliate)
+		if (affiliateParent instanceof ChatAffiliateRec) {
 
-			.setPath (
-				objectManager.objectPathMini (
-					affiliateParent,
-					chat))
+			ChatAffiliateRec chatAffiliate =
+				(ChatAffiliateRec)
+				affiliateParent;
 
-			.setCurrency (
-				chat.getCurrency ());
+			newReport =
+				new ChatReportRevShareRec ()
+
+				.setAffiliate (
+					affiliate)
+
+				.setPath (
+					objectManager.objectPathMini (
+						chatAffiliate,
+						chat))
+
+				.setDescription (
+					chatAffiliate.getDescription ())
+
+				.setCurrency (
+					chat.getCurrency ());
+
+		} else if (affiliateParent instanceof ChatSchemeRec) {
+
+			ChatSchemeRec chatScheme =
+				(ChatSchemeRec)
+				affiliateParent;
+
+			newReport =
+				new ChatReportRevShareRec ()
+
+				.setAffiliate (
+					affiliate)
+
+				.setPath (
+					objectManager.objectPathMini (
+						chatScheme,
+						chat))
+
+				.setDescription (
+					chatScheme.getDescription ())
+
+				.setCurrency (
+					chat.getCurrency ());
+
+		} else if (affiliateParent instanceof RootRec) {
+
+			newReport =
+				new ChatReportRevShareRec ()
+
+				.setAffiliate (
+					affiliate)
+
+				.setPath (
+					"system")
+
+				.setDescription (
+					"")
+
+				.setCurrency (
+					chat.getCurrency ());
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 		chatReportsByAffiliate.put (
 			affiliate,
