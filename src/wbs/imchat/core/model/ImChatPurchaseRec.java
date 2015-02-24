@@ -16,6 +16,7 @@ import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
+import wbs.integrations.paypal.model.PaypalPaymentRec;
 
 @Accessors (chain = true)
 @Data
@@ -58,6 +59,10 @@ class ImChatPurchaseRec
 
 	@SimpleField
 	Instant timestamp;
+
+	@ReferenceField(
+			nullable = true)
+	PaypalPaymentRec paypalPayment;
 
 	// compare to
 

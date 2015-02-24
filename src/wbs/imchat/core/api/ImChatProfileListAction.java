@@ -1,5 +1,7 @@
 package wbs.imchat.core.api;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +11,7 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Action;
@@ -19,6 +22,8 @@ import wbs.imchat.core.model.ImChatObjectHelper;
 import wbs.imchat.core.model.ImChatProfileObjectHelper;
 import wbs.imchat.core.model.ImChatProfileRec;
 import wbs.imchat.core.model.ImChatRec;
+import wbs.platform.media.model.ContentRec;
+import wbs.platform.media.model.MediaRec;
 
 @PrototypeComponent ("imChatProfileListAction")
 public
@@ -38,6 +43,9 @@ class ImChatProfileListAction
 
 	@Inject
 	RequestContext requestContext;
+
+	@Inject
+	WbsConfig wbsConfig;
 
 	// prototype dependencies
 
@@ -85,6 +93,36 @@ class ImChatProfileListAction
 			if (profile.getDeleted ())
 				continue;
 
+			MediaRec image =
+				profile.getProfileImage ();
+
+			String imageUrl;
+
+			if (image == null) {
+
+				imageUrl = "no-image";
+
+			} else {
+
+				ContentRec content =
+					image.getContent ();
+
+				Integer hash =
+					Math.abs (
+						content.getHash ());
+
+				imageUrl =
+					stringFormat (
+						"%s",
+						wbsConfig.apiUrl (),
+						"/im-chat-media/%u",
+						image.getId (),
+						"/%u",
+						hash,
+						"/original.jpg");
+
+			}
+
 			profileDatas.add (
 				new ImChatProfileData ()
 
@@ -98,7 +136,7 @@ class ImChatProfileListAction
 					profile.getPublicDescription ())
 
 				.imageLink (
-					"TODO")
+					imageUrl)
 
 			);
 

@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.imchat.core.model.ImChatConversationRec;
+import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatMessageObjectHelper;
 import wbs.imchat.core.model.ImChatMessageRec;
+import wbs.platform.console.forms.FormFieldLogic;
+import wbs.platform.console.forms.FormFieldSet;
+import wbs.platform.console.helper.ConsoleObjectManager;
+import wbs.platform.console.module.ConsoleModule;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.priv.console.PrivChecker;
 
@@ -20,6 +26,15 @@ class ImChatMessagePendingHistoryPart
 	extends AbstractPagePart {
 
 	// dependencies
+
+	@Inject
+	FormFieldLogic formFieldLogic;
+
+	@Inject
+	ConsoleObjectManager objectManager;
+
+	@Inject @Named
+	ConsoleModule imChatMessagePendingConsoleModule;
 
 	@Inject
 	ImChatMessageObjectHelper imChatMessageHelper;
@@ -52,25 +67,102 @@ class ImChatMessagePendingHistoryPart
 	public
 	void goBodyStuff () {
 
+		goSummary ();
+
+		goHistory ();
+
+	}
+
+	void goHistory () {
+
+		FormFieldSet tableFieldSet;
+
+		tableFieldSet =
+			imChatMessagePendingConsoleModule.formFieldSets ().get (
+				"messageFields");
+
+		printFormat (
+			"<h3>Conversation history</h3>\n");
+
 		// retrieve messages
 
 		List<ImChatMessageRec> messages =
 			new ArrayList<ImChatMessageRec> (
 				imChatConversation.getImChatMessages ());
 
-		Lists.reverse (
-			messages);
+		List <ImChatMessageRec> reverseMessages =
+			Lists.reverse (
+				messages);
+
+		// create message table
+
+		printFormat (
+			"<table class=\"list\">\n");
+
+		// header
+
+		printFormat (
+			"<tr>");
+
+		formFieldLogic.outputTableHeadings (
+			out,
+			tableFieldSet);
+
+		printFormat (
+			"</tr>\n");
+
+		// row
 
 		for (
 			ImChatMessageRec message
-				: messages
+				: reverseMessages
 		) {
 
 			printFormat (
-				"<p>%s</p>\n",
-				message.getMessageText ());
+				"<tr>\n");
+
+			formFieldLogic.outputTableCells (
+				out,
+				tableFieldSet,
+				message,
+				true);
+
+		    printFormat (
+			    "</tr>\n");
 
 		}
+
+		printFormat (
+			"<tr>\n");
+
+		printFormat (
+			"</table>\n");
+
+	}
+
+	void goSummary () {
+
+		ImChatCustomerRec imChatCustomer =
+			imChatConversation.getImChatCustomer ();
+
+		FormFieldSet tableFieldSet =
+			imChatMessagePendingConsoleModule.formFieldSets ().get (
+				"customerFields");
+
+		printFormat (
+			"<h3>Customer summary</h3>\n");
+
+		printFormat (
+			"<table class=\"list\">\n");
+
+		formFieldLogic.outputTableRows (
+			out,
+			tableFieldSet,
+			imChatCustomer,
+			true);
+
+		printFormat (
+			"</table>\n");
 
 	}
 

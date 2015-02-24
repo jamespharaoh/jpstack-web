@@ -1,6 +1,7 @@
 package wbs.imchat.core.api;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -28,19 +29,37 @@ import wbs.imchat.core.model.ImChatPurchaseRec;
 import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
+import wbs.integrations.paypal.logic.PaypalApi;
+import wbs.integrations.paypal.logic.PaypalLogic;
+import wbs.integrations.paypal.model.PaypalAccountRec;
+import wbs.integrations.paypal.model.PaypalPaymentObjectHelper;
+import wbs.integrations.paypal.model.PaypalPaymentRec;
+import wbs.integrations.paypal.model.PaypalPaymentState;
+import wbs.platform.currency.logic.CurrencyLogic;
 
-@PrototypeComponent ("imChatPurchaseMakeAction")
+import com.google.common.base.Optional;
+
+@PrototypeComponent ("imChatPurchaseStartAction")
 public
-class ImChatPurchaseMakeAction
+class ImChatPurchaseStartAction
 	implements Action {
 
 	// dependencies
+
+	@Inject
+	CurrencyLogic currencyLogic;
 
 	@Inject
 	Database database;
 
 	@Inject
 	ImChatApiLogic imChatApiLogic;
+
+	@Inject
+	PaypalApi paypalApi;
+
+	@Inject
+	PaypalLogic paypalLogic;
 
 	@Inject
 	ImChatObjectHelper imChatHelper;
@@ -50,6 +69,9 @@ class ImChatPurchaseMakeAction
 
 	@Inject
 	ImChatPurchaseObjectHelper imChatPurchaseHelper;
+
+	@Inject
+	PaypalPaymentObjectHelper paypalPaymentHelper;
 
 	@Inject
 	ImChatSessionObjectHelper imChatSessionHelper;
@@ -79,9 +101,9 @@ class ImChatPurchaseMakeAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatPurchaseMakeRequest purchaseRequest =
+		ImChatPurchaseStartRequest purchaseRequest =
 			dataFromJson.fromJson (
-				ImChatPurchaseMakeRequest.class,
+				ImChatPurchaseStartRequest.class,
 				jsonValue);
 
 		// begin transaction
@@ -123,8 +145,10 @@ class ImChatPurchaseMakeAction
 
 		}
 
+		// get customer
+
 		ImChatCustomerRec customer =
-			session.getImChatCustomer ();
+				session.getImChatCustomer ();
 
 		// lookup price point
 
@@ -153,7 +177,33 @@ class ImChatPurchaseMakeAction
 
 		}
 
-		// create purchase
+		// get paypal account
+
+		PaypalAccountRec paypalAccount =
+				imChat.getPaypalAccount();
+
+		// create paypal payment and purchase
+
+		String token =
+			paypalPaymentHelper.generateToken ();
+
+		PaypalPaymentRec paypalPayment =
+			paypalPaymentHelper.insert (
+				new PaypalPaymentRec ()
+
+			.setPaypalAccount(
+				paypalAccount)
+
+			.setValue (
+				pricePoint.getValue ())
+
+			.setToken (
+				token)
+
+			.setState (
+				PaypalPaymentState.started)
+
+		);
 
 		imChatPurchaseHelper.insert (
 			new ImChatPurchaseRec ()
@@ -183,6 +233,9 @@ class ImChatPurchaseMakeAction
 			.setTimestamp (
 				transaction.now ())
 
+			.setPaypalPayment (
+				paypalPayment)
+
 		);
 
 		// update customer
@@ -190,19 +243,34 @@ class ImChatPurchaseMakeAction
 		customer
 
 			.setNumPurchases (
-				customer.getNumPurchases () + 1)
+				customer.getNumPurchases () + 1);
 
-			.setBalance (
-				+ customer.getBalance ()
-				+ pricePoint.getValue ());
+		// create properties needed for the call
+
+		Map<String,String> expressCheckoutProperties =
+			paypalLogic.expressCheckoutProperties (
+				paypalAccount);
+
+		Optional<String> redirectUrl =
+			paypalApi.setExpressCheckout (
+				currencyLogic.formatSimple (
+					imChat.getCurrency (),
+					(long) pricePoint.getValue ()),
+				purchaseRequest.successUrl ().replace (
+					"{token}",
+					token),
+				purchaseRequest.failureUrl ().replace (
+					"{token}",
+					token),
+				expressCheckoutProperties);
 
 		// create response
 
-		ImChatCustomerCreateSuccess successResponse =
-			new ImChatCustomerCreateSuccess ()
+		ImChatPurchaseStartSuccess successResponse =
+			new ImChatPurchaseStartSuccess ()
 
-			.sessionSecret (
-				session.getSecret ())
+			.redirectUrl (
+				redirectUrl.get ())
 
 			.customer (
 				imChatApiLogic.customerData (

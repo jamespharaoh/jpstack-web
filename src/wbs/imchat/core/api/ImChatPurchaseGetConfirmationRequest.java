@@ -9,12 +9,15 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass
 public
-class ImChatPurchaseMakeRequest {
+class ImChatPurchaseGetConfirmationRequest {
 
 	@DataAttribute
 	String sessionSecret;
 
 	@DataAttribute
-	Long pricePointId;
+	String purchaseToken;
+
+	@DataAttribute
+	String paypalToken;
 
 }

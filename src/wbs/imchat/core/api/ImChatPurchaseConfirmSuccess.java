@@ -1,8 +1,5 @@
 package wbs.imchat.core.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
 import wbs.framework.data.annotations.DataAttribute;
@@ -12,16 +9,12 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass
 public
-class ImChatPurchaseHistorySuccess {
+class ImChatPurchaseConfirmSuccess {
 
 	@DataAttribute
 	String status = "success";
 
 	@DataAttribute
 	ImChatCustomerData customer;
-
-	@DataAttribute
-	List<ImChatPurchaseData> purchases =
-		new ArrayList<ImChatPurchaseData> ();
 
 }

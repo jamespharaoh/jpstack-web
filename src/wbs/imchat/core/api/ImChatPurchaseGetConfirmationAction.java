@@ -1,7 +1,7 @@
 package wbs.imchat.core.api;
 
 import java.io.IOException;
-import java.util.Date;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -20,21 +20,25 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.imchat.core.model.ImChatConversationObjectHelper;
-import wbs.imchat.core.model.ImChatConversationRec;
 import wbs.imchat.core.model.ImChatCustomerRec;
-import wbs.imchat.core.model.ImChatMessageObjectHelper;
-import wbs.imchat.core.model.ImChatMessageRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
+import wbs.imchat.core.model.ImChatPricePointObjectHelper;
+import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
 import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
-import wbs.platform.queue.logic.QueueLogic;
-import wbs.platform.queue.model.QueueItemRec;
+import wbs.integrations.paypal.logic.PaypalApi;
+import wbs.integrations.paypal.logic.PaypalLogic;
+import wbs.integrations.paypal.model.PaypalAccountRec;
+import wbs.integrations.paypal.model.PaypalPaymentObjectHelper;
+import wbs.integrations.paypal.model.PaypalPaymentRec;
+import wbs.integrations.paypal.model.PaypalPaymentState;
 
-@PrototypeComponent ("imChatMessageSendAction")
+import com.google.common.base.Optional;
+
+@PrototypeComponent ("imChatPurchaseGetConfirmationAction")
 public
-class ImChatMessageSendAction
+class ImChatPurchaseGetConfirmationAction
 	implements Action {
 
 	// dependencies
@@ -46,19 +50,25 @@ class ImChatMessageSendAction
 	ImChatApiLogic imChatApiLogic;
 
 	@Inject
-	ImChatConversationObjectHelper imChatConversationHelper;
+	PaypalApi paypalApi;
+
+	@Inject
+	PaypalLogic paypalLogic;
 
 	@Inject
 	ImChatObjectHelper imChatHelper;
 
 	@Inject
-	ImChatMessageObjectHelper imChatMessageHelper;
+	ImChatPricePointObjectHelper imChatPricePointHelper;
+
+	@Inject
+	ImChatPurchaseObjectHelper imChatPurchaseHelper;
 
 	@Inject
 	ImChatSessionObjectHelper imChatSessionHelper;
 
 	@Inject
-	QueueLogic queueLogic;
+	PaypalPaymentObjectHelper paypalPaymentHelper;
 
 	@Inject
 	RequestContext requestContext;
@@ -85,9 +95,9 @@ class ImChatMessageSendAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatMessageSendRequest messageSendRequest =
+		ImChatPurchaseGetConfirmationRequest purchaseRequest =
 			dataFromJson.fromJson (
-				ImChatMessageSendRequest.class,
+				ImChatPurchaseGetConfirmationRequest.class,
 				jsonValue);
 
 		// begin transaction
@@ -103,11 +113,11 @@ class ImChatMessageSendAction
 					requestContext.request (
 						"imChatId")));
 
-		// lookup session
+		// lookup session and customer
 
 		ImChatSessionRec session =
 			imChatSessionHelper.findBySecret (
-				messageSendRequest.sessionSecret ());
+				purchaseRequest.sessionSecret ());
 
 		if (
 			session == null
@@ -129,76 +139,73 @@ class ImChatMessageSendAction
 
 		}
 
-		// lookup customer
-
 		ImChatCustomerRec customer =
-			session.getImChatCustomer ();
+			session.getImChatCustomer();
 
-		if (customer.getImChat () != imChat)
+		// lookup paypal payment
+
+		PaypalPaymentRec paypalPayment =
+			paypalPaymentHelper.findByToken (
+				purchaseRequest.purchaseToken ());
+
+		if (paypalPayment == null)
 			throw new RuntimeException ();
 
-		// lookup converation
 
-		ImChatConversationRec conversation =
-			imChatConversationHelper.find (
-				messageSendRequest.conversationId ());
+		if (paypalPayment.getState () != PaypalPaymentState.started) {
 
-		if (conversation.getImChatCustomer () != customer)
-			throw new RuntimeException ();
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
 
-		// create chat message
+				.reason (
+					"payment-invalid")
 
-		ImChatMessageRec message =
-			imChatMessageHelper.insert (
-				new ImChatMessageRec ()
+				.message (
+					"The payment is not in the right state");
 
-			.setImChatConversation (
-				conversation)
+			return jsonResponderProvider.get ()
+				.value (failureResponse);
 
-			.setIndex (
-				conversation.getNumMessages ())
+		}
 
-			.setSender(conversation.getImChatCustomer().getEmail())
+		// confirm payment and obtain payerId
 
-			.setTime(new Date().toString())
+		PaypalAccountRec paypalAccount =
+			imChat.getPaypalAccount ();
 
-			.setMessageText (
-				messageSendRequest.messageText ())
+		Map<String,String> expressCheckoutProperties =
+			paypalLogic.expressCheckoutProperties (
+				paypalAccount);
 
-		);
+		Optional<String> payerId =
+			paypalApi.getExpressCheckout (
+				purchaseRequest.paypalToken (),
+				expressCheckoutProperties);
 
-		conversation
+		// update payment status
 
-			.setNumMessages (
-				conversation.getNumMessages () + 1);
+		paypalPayment
 
-		// create queue item
-
-		QueueItemRec queueItem =
-			queueLogic.createQueueItem (
-				queueLogic.findQueue (
-					imChat,
-					"reply"),
-				conversation,
-				message,
-				customer.getCode (),
-				message.getMessageText ());
-
-		// add queue item to message
-
-		message
-
-			.setQueueItem (
-				queueItem);
+			.setState (
+				PaypalPaymentState.pending);
 
 		// create response
 
-		ImChatMessageSendSuccess successResponse =
-			new ImChatMessageSendSuccess ()
+		ImChatPurchaseGetConfirmationSuccess successResponse =
+			new ImChatPurchaseGetConfirmationSuccess ()
 
-			.message (
-				imChatApiLogic.messageData (
-					message));
+			.purchaseToken(
+				purchaseRequest.purchaseToken ())
+
+			.paypalToken (
+				purchaseRequest.paypalToken ())
+
+			.payerId (
+				payerId.get ())
+
+			.customer (
+				imChatApiLogic.customerData (
+					customer));
 
 		// commit and return
 
