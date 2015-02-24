@@ -2,12 +2,21 @@ package wbs.platform.console.forms;
 
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 
+@Accessors (fluent = true)
 @PrototypeComponent ("integerFormFieldInterfaceMapping")
 public
 class IntegerFormFieldInterfaceMapping<Container>
 	implements FormFieldInterfaceMapping<Container,Long,String> {
+
+	// properties
+
+	@Getter @Setter
+	Boolean blankIfZero = false;
 
 	@Override
 	public
@@ -35,6 +44,9 @@ class IntegerFormFieldInterfaceMapping<Container>
 
 		if (genericValue == null)
 			return null;
+
+		if (genericValue == 0 && blankIfZero)
+			return "";
 
 		return Long.toString (
 			genericValue);

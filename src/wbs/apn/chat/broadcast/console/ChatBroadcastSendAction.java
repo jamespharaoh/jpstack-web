@@ -799,7 +799,7 @@ class ChatBroadcastSendAction
 							text)
 
 						.setStatus (
-							ChatMessageStatus.sent)
+							ChatMessageStatus.broadcast)
 
 						.setSender (
 							myUser)

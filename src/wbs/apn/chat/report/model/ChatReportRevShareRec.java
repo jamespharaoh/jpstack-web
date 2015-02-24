@@ -37,34 +37,15 @@ class ChatReportRevShareRec
 	Long mmsCostNum = 0L;
 	Long creditRev = 0L;
 	Long joiners = 0L;
-	Long lbs = 0L;
 	Long staffCost = 0L;
 
-	static final long lbsRate = 750;
-
-	public Long getLbsWRate() {
-		return lbs*lbsRate;
-	}
-
 	public Long getTotal(){
-		return outRev + inRev + creditRev - smsCost - mmsCost - lbs* lbsRate;
+		return outRev + inRev + creditRev - smsCost - mmsCost;
 	}
 
-	public Long getTotalDiv2(){
-		return (getTotal()/2);
-	}
-	public Long getTotalDiv2_p(){
-		return (getTotal()/200);
-	}
 	public Long getTotal_p(){
 		return (getTotal()/100);
 	}
-
-
-	public Long getLbsWRate_p() {
-		return lbs*lbsRate/100;
-	}
-
 
 	public Long getCreditRev_p() {
 		return creditRev/100;

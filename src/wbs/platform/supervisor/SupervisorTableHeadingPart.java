@@ -51,7 +51,7 @@ class SupervisorTableHeadingPart
 				"<tr>\n",
 
 				"<th colspan=\"%h\">%h</th>\n",
-				statsPeriod.size () + 1,
+				statsPeriod.size () + 2,
 				supervisorTableHeadingSpec.label (),
 
 				"</tr>\n");
@@ -84,6 +84,9 @@ class SupervisorTableHeadingPart
 				hourStart.plusHours (1);
 
 		}
+
+		printFormat (
+			"<th>Total</th>\n");
 
 		printFormat (
 			"</tr>\n");

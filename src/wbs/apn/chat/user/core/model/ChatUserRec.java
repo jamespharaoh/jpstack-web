@@ -872,8 +872,10 @@ class ChatUserRec
 
 				// check number
 
-				if (! chatNumberReportLogic.isNumberReportSuccessful (number)
-						&& number.getArchiveDate () == null) {
+				if (
+					! chatNumberReportLogic.isNumberReportSuccessful (number)
+					&& number.getArchiveDate () == null
+				) {
 
 					log.debug (
 						stringFormat (
