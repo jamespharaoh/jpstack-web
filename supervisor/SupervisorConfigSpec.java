@@ -27,6 +27,9 @@ class SupervisorConfigSpec {
 		required = true)
 	String label;
 
+	@DataAttribute
+	Integer offsetHours;
+
 	@DataChildren (
 		direct = true)
 	List<Object> builders =

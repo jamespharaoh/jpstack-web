@@ -1,6 +1,7 @@
 package wbs.platform.supervisor;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -222,12 +223,20 @@ class SupervisorPart
 		startTime =
 			dateField.date
 				.toDateTimeAtStartOfDay ()
+				.plusHours (
+					ifNull (
+						supervisorConfig.spec ().offsetHours (),
+						0))
 				.toInstant ();
 
 		endTime =
 			dateField.date
 				.plusDays (1)
 				.toDateTimeAtStartOfDay ()
+				.plusHours (
+					ifNull (
+						supervisorConfig.spec ().offsetHours (),
+						0))
 				.toInstant ();
 
 	}

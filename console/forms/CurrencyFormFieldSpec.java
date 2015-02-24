@@ -44,4 +44,7 @@ class CurrencyFormFieldSpec {
 		required = true)
 	String currencyPath;
 
+	@DataAttribute
+	Boolean blankIfZero;
+
 }

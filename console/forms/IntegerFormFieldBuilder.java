@@ -109,9 +109,14 @@ class IntegerFormFieldBuilder {
 				Long.MAX_VALUE);
 
 		Class<?> propertyClass =
-				BeanLogic.propertyClass (
-					context.containerClass (),
-					name);
+			BeanLogic.propertyClass (
+				context.containerClass (),
+				name);
+
+		Boolean blankIfZero =
+			ifNull (
+				spec.blankIfZero (),
+				false);
 
 		// accessor
 
@@ -171,7 +176,10 @@ class IntegerFormFieldBuilder {
 		// interface mapping
 
 		FormFieldInterfaceMapping interfaceMapping =
-			integerFormFieldInterfaceMappingProvider.get ();
+			integerFormFieldInterfaceMappingProvider.get ()
+
+			.blankIfZero (
+				blankIfZero);
 
 		// renderer
 
@@ -190,7 +198,10 @@ class IntegerFormFieldBuilder {
 			.nullable (
 				ifNull (
 					spec.nullable (),
-					false));
+					false))
+
+			.align (
+				TextFormFieldRenderer.Align.right);
 
 		// update hook
 

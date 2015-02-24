@@ -8,4 +8,8 @@ interface StatsFormatter {
 			int step,
 			Object value);
 
+	String formatTotal (
+			Object group,
+			Object value);
+
 }

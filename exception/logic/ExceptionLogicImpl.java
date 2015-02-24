@@ -51,7 +51,7 @@ class ExceptionLogicImpl
 
 	@Override
 	public
-	void logSimple (
+	ExceptionLogRec logSimple (
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull String summary,
@@ -61,7 +61,7 @@ class ExceptionLogicImpl
 
 		try {
 
-			realLogException (
+			return realLogException (
 				typeCode,
 				source,
 				summary,
@@ -75,13 +75,15 @@ class ExceptionLogicImpl
 				"Unable to exception",
 				exception);
 
+			return null;
+
 		}
 
 	}
 
 	@Override
 	public
-	void logThrowable (
+	ExceptionLogRec logThrowable (
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull Throwable throwable,
@@ -90,7 +92,7 @@ class ExceptionLogicImpl
 
 		try {
 
-			realLogException (
+			return realLogException (
 				typeCode,
 				source,
 				throwableSummary (throwable),
@@ -104,13 +106,15 @@ class ExceptionLogicImpl
 				"Unable to log exception",
 				exception);
 
+			return null;
+
 		}
 
 	}
 
 	@Override
 	public
-	void logThrowableWithSummary (
+	ExceptionLogRec logThrowableWithSummary (
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull String summary,
@@ -120,7 +124,7 @@ class ExceptionLogicImpl
 
 		try {
 
-			realLogException (
+			return realLogException (
 				typeCode,
 				source,
 				summary + "\n" + throwableSummary (throwable),
@@ -134,11 +138,13 @@ class ExceptionLogicImpl
 				"Unable to log exception",
 				exception);
 
+			return null;
+
 		}
 
 	}
 
-	void realLogException (
+	ExceptionLogRec realLogException (
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull String summary,
@@ -175,8 +181,9 @@ class ExceptionLogicImpl
 
 		// create exception log
 
-		exceptionLogHelper.insert (
-			new ExceptionLogRec ()
+		ExceptionLogRec exceptionLog =
+			exceptionLogHelper.insert (
+				new ExceptionLogRec ()
 
 			.setType (
 				exceptionLogType)
@@ -199,6 +206,8 @@ class ExceptionLogicImpl
 		);
 
 		transaction.commit ();
+
+		return exceptionLog;
 
 	}
 

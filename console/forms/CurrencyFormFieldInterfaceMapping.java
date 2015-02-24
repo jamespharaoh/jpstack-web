@@ -32,6 +32,9 @@ class CurrencyFormFieldInterfaceMapping<Container extends Record<?>>
 	@Getter @Setter
 	String currencyPath;
 
+	@Getter @Setter
+	Boolean blankIfZero = false;
+
 	// implementation
 
 	@Override
@@ -84,6 +87,9 @@ class CurrencyFormFieldInterfaceMapping<Container extends Record<?>>
 			objectManager.dereference (
 				container,
 				currencyPath);
+
+		if (genericValue == 0 && blankIfZero)
+			return "";
 
 		if (currency != null) {
 
