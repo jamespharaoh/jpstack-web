@@ -18,4 +18,52 @@
 
 	</object-context>
 
+	<field-set
+		name="customerFields"
+		object-name="imChatCustomer">
+
+		<integer-field
+			name="id"
+			label="Id"/>
+
+		<text-field
+		    name="email"
+		    label="eMail" />
+
+		<integer-field
+			name="numConversations"
+			label="Conversations"/>
+
+		<integer-field
+			name="balance"
+			label="Balance"/>
+
+	</field-set>
+
+	<field-set
+		name="messageFields"
+		object-name="imChatMessage">
+
+		<integer-field
+			name="id"
+			label="Id"/>
+
+		<object-field
+			name="imChatConversation"
+			finder="imChatConversation"/>
+
+		<text-field
+			name="sender"
+			label="Sender"/>
+
+		<text-field
+			name="time"
+			label="Date"/>
+
+		<text-field
+		    name="messageText"
+		    label="Message"/>
+
+	</field-set>
+
 </console-module>

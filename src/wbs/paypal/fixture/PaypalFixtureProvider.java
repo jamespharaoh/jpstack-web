@@ -6,7 +6,6 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.paypal.model.PaypalAccountObjectHelper;
-import wbs.paypal.model.PaypalAccountRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuObjectHelper;
 import wbs.platform.menu.model.MenuRec;
@@ -27,7 +26,7 @@ class PaypalFixtureProvider
 
 	@Inject
 	PaypalAccountObjectHelper paypalAccountHelper;
-	
+
 	//@Inject
 	//PaypalPaymentObjectHelper paypalPaymentHelper;
 
@@ -59,7 +58,7 @@ class PaypalFixtureProvider
 
 		);
 
-		paypalAccountHelper.insert (
+		/*paypalAccountHelper.insert (
 			new PaypalAccountRec ()
 
 			.setSlice (
@@ -76,7 +75,7 @@ class PaypalFixtureProvider
 			.setDescription (
 				"Test paypal account")
 
-		);
+		);*/
 
 	}
 

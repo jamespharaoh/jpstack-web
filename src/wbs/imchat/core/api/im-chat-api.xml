@@ -30,11 +30,19 @@
 		<resource name="purchase-make">
 			<post-action name="purchaseMake"/>
 		</resource>
-		
+
 		<resource name="purchase-start">
 			<post-action name="purchaseStart"/>
 		</resource>
-		
+
+		<resource name="purchase-get-confirmation">
+			<post-action name="purchaseGetConfirmation"/>
+		</resource>
+
+		<resource name="purchase-confirm">
+			<post-action name="purchaseConfirm"/>
+		</resource>
+
 		<resource name="purchase-history">
 			<post-action name="purchaseHistory"/>
 		</resource>
@@ -63,6 +71,18 @@
 			<post-action name="changePassword"/>
 		</resource>
 
+	</variable>
+	</resource>
+
+	<resource name="im-chat-media">
+	<variable name="mediaId">
+	<variable name="mediaContentHash">
+
+		<resource name="original.jpg">
+			<get-action name="mediaOriginalJpeg"/>
+		</resource>
+
+	</variable>
 	</variable>
 	</resource>
 

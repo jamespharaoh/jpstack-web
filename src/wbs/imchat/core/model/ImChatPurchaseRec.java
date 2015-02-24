@@ -44,10 +44,6 @@ class ImChatPurchaseRec
 
 	@ReferenceField
 	ImChatPricePointRec imChatPricePoint;
-	
-	@ReferenceField(
-			nullable = true)
-	PaypalPaymentRec paypalPayment;
 
 	@SimpleField
 	Integer price;
@@ -63,6 +59,10 @@ class ImChatPurchaseRec
 
 	@SimpleField
 	Instant timestamp;
+
+	@ReferenceField(
+			nullable = true)
+	PaypalPaymentRec paypalPayment;
 
 	// compare to
 

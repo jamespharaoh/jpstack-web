@@ -25,9 +25,7 @@ import wbs.framework.web.Responder;
 import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
 import wbs.imchat.core.model.ImChatPricePointObjectHelper;
-import wbs.imchat.core.model.ImChatPricePointRec;
 import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
-import wbs.imchat.core.model.ImChatPurchaseRec;
 import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
@@ -37,19 +35,13 @@ import wbs.paypal.model.PaypalAccountRec;
 import wbs.paypal.model.PaypalPaymentObjectHelper;
 import wbs.paypal.model.PaypalPaymentRec;
 import wbs.paypal.model.PaypalPaymentState;
-import wbs.platform.currency.logic.CurrencyLogic;
 
-import com.google.common.base.Optional;
-
-@PrototypeComponent ("imChatPurchaseStartAction")
+@PrototypeComponent ("imChatPurchaseConfirmAction")
 public
-class ImChatPurchaseStartAction
+class ImChatPurchaseConfirmAction
 	implements Action {
 
 	// dependencies
-
-	@Inject
-	CurrencyLogic currencyLogic;
 
 	@Inject
 	Database database;
@@ -73,10 +65,10 @@ class ImChatPurchaseStartAction
 	ImChatPurchaseObjectHelper imChatPurchaseHelper;
 
 	@Inject
-	PaypalPaymentObjectHelper paypalPaymentHelper;
+	ImChatSessionObjectHelper imChatSessionHelper;
 
 	@Inject
-	ImChatSessionObjectHelper imChatSessionHelper;
+	PaypalPaymentObjectHelper paypalPaymentHelper;
 
 	@Inject
 	RequestContext requestContext;
@@ -103,9 +95,9 @@ class ImChatPurchaseStartAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatPurchaseMakeRequest purchaseRequest =
+		ImChatPurchaseConfirmRequest purchaseRequest =
 			dataFromJson.fromJson (
-				ImChatPurchaseMakeRequest.class,
+					ImChatPurchaseConfirmRequest.class,
 				jsonValue);
 
 		// begin transaction
@@ -147,129 +139,89 @@ class ImChatPurchaseStartAction
 
 		}
 
-		// get customer
-
 		ImChatCustomerRec customer =
-				session.getImChatCustomer ();
+			session.getImChatCustomer ();
 
-		// lookup price point
+		// lookup paypal payment
 
-		ImChatPricePointRec pricePoint =
-			imChatPricePointHelper.find (
-				(int) (long)
-				purchaseRequest.pricePointId ());
+		PaypalPaymentRec paypalPayment =
+			paypalPaymentHelper.findByToken (
+				purchaseRequest.purchaseToken ());
 
-		if (
-			pricePoint == null
-			|| pricePoint.getImChat () != imChat
-			|| pricePoint.getDeleted ()
-		) {
+		if (paypalPayment == null)
+			throw new RuntimeException ();
+
+		if (paypalPayment.getState () != PaypalPaymentState.pending) {
 
 			ImChatFailure failureResponse =
 				new ImChatFailure ()
 
 				.reason (
-					"price-point-invalid")
+					"payment-invalid")
 
 				.message (
-					"The price point id is invalid");
+					stringFormat (
+						"The payment is no longer pending"));
 
 			return jsonResponderProvider.get ()
 				.value (failureResponse);
 
 		}
 
-		// get paypal account
+		// confirm payment and obtain payerId
 
 		PaypalAccountRec paypalAccount =
-				imChat.getPaypalAccount();
-
-		// create paypal payment and purchase
-
-		String token =
-			paypalPaymentHelper.generateToken ();
-
-		PaypalPaymentRec paypalPayment =
-			paypalPaymentHelper.insert (
-				new PaypalPaymentRec ()
-
-			.setPaypalAccount(
-				paypalAccount)
-
-			.setValue (
-				pricePoint.getValue ())
-
-			.setToken (
-				token)
-
-			.setState (
-				PaypalPaymentState.started)
-
-		);
-
-		imChatPurchaseHelper.insert (
-			new ImChatPurchaseRec ()
-
-			.setImChatCustomer (
-				customer)
-
-			.setIndex (
-				customer.getNumPurchases ())
-
-			.setImChatPricePoint (
-				pricePoint)
-
-			.setPrice (
-				pricePoint.getPrice ())
-
-			.setValue (
-				pricePoint.getValue ())
-
-			.setOldBalance (
-				customer.getBalance ())
-
-			.setNewBalance (
-				+ customer.getBalance ()
-				+ pricePoint.getValue ())
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setPaypalPayment (
-				paypalPayment)
-
-		);
-
-		// create properties needed for the call
+			imChat.getPaypalAccount();
 
 		Map<String,String> expressCheckoutProperties =
 			paypalLogic.expressCheckoutProperties (
 				paypalAccount);
 
-		Optional<String> redirectUrl =
-			paypalApi.setExpressCheckout (
-				currencyLogic.formatSimple (
-					imChat.getCurrency (),
-					(long) pricePoint.getValue ()),
-				stringFormat (
-					"http://chat.dev.wbsoft.co/test.html",
-					"#payment=pending",
-					"&token=%u",
-					token),
-				stringFormat (
-					"http://chat.dev.wbsoft.co/test.html",
-					"#payment=error",
-					"&token=%u",
-					token),
+		Boolean checkoutSuccess =
+			paypalApi.doExpressCheckout (
+				purchaseRequest.paypalToken (),
+				purchaseRequest.payerId (),
+				paypalPayment.getValue ().toString () + ".0",
 				expressCheckoutProperties);
+
+		if (! checkoutSuccess) {
+
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
+
+				.reason (
+					"payment-invalid")
+
+				.message (
+					"The payment failed");
+
+			return jsonResponderProvider.get ()
+				.value (failureResponse);
+
+		}
+
+		// update payment status
+
+		paypalPayment
+
+			.setState (
+				PaypalPaymentState.confirmed);
+
+		// update customer
+
+		customer
+
+			.setNumPurchases (
+				customer.getNumPurchases () + 1)
+
+			.setBalance (
+				+ customer.getBalance ()
+				+ paypalPayment.getValue ());
 
 		// create response
 
-		ImChatPurchaseStartSuccess successResponse =
-			new ImChatPurchaseStartSuccess ()
-
-			.redirectUrl (
-				redirectUrl.get ())
+		ImChatPurchaseConfirmSuccess successResponse =
+			new ImChatPurchaseConfirmSuccess ()
 
 			.customer (
 				imChatApiLogic.customerData (
