@@ -180,39 +180,39 @@ class ImChatPurchaseStartAction
 		// get paypal account
 
 		PaypalAccountRec paypalAccount =
-				imChat.getPaypalAccount();
+			imChat.getPaypalAccount ();
 
-		// create paypal payment and purchase
-
-		String token =
-			paypalPaymentHelper.generateToken ();
+		// create paypal payment
 
 		PaypalPaymentRec paypalPayment =
 			paypalPaymentHelper.insert (
 				new PaypalPaymentRec ()
 
-			.setPaypalAccount(
+			.setPaypalAccount (
 				paypalAccount)
 
 			.setValue (
 				pricePoint.getValue ())
-
-			.setToken (
-				token)
 
 			.setState (
 				PaypalPaymentState.started)
 
 		);
 
-		imChatPurchaseHelper.insert (
-			new ImChatPurchaseRec ()
+		// create purchase
+
+		ImChatPurchaseRec purchase =
+			imChatPurchaseHelper.insert (
+				new ImChatPurchaseRec ()
 
 			.setImChatCustomer (
 				customer)
 
 			.setIndex (
 				customer.getNumPurchases ())
+
+			.setToken (
+				imChatPurchaseHelper.generateToken ())
 
 			.setImChatPricePoint (
 				pricePoint)
@@ -223,14 +223,7 @@ class ImChatPurchaseStartAction
 			.setValue (
 				pricePoint.getValue ())
 
-			.setOldBalance (
-				customer.getBalance ())
-
-			.setNewBalance (
-				+ customer.getBalance ()
-				+ pricePoint.getValue ())
-
-			.setTimestamp (
+			.setCreatedTime (
 				transaction.now ())
 
 			.setPaypalPayment (
@@ -245,7 +238,7 @@ class ImChatPurchaseStartAction
 			.setNumPurchases (
 				customer.getNumPurchases () + 1);
 
-		// create properties needed for the call
+		// update paypal
 
 		Map<String,String> expressCheckoutProperties =
 			paypalLogic.expressCheckoutProperties (
@@ -258,10 +251,10 @@ class ImChatPurchaseStartAction
 					(long) pricePoint.getValue ()),
 				purchaseRequest.successUrl ().replace (
 					"{token}",
-					token),
+					purchase.getToken ()),
 				purchaseRequest.failureUrl ().replace (
 					"{token}",
-					token),
+					purchase.getToken ()),
 				expressCheckoutProperties);
 
 		// create response

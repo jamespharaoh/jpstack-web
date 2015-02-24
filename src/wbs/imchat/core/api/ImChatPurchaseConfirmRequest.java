@@ -15,12 +15,6 @@ class ImChatPurchaseConfirmRequest {
 	String sessionSecret;
 
 	@DataAttribute
-	String purchaseToken;
-
-	@DataAttribute
-	String paypalToken;
-
-	@DataAttribute
-	String payerId;
+	Long purchaseId;
 
 }

@@ -78,7 +78,9 @@ class StatsConsoleLogic {
 				out.write (
 					formatter.format (
 						group,
-						step,
+						Integer.toString (
+							step +
+							period.offset ()),
 						combinedValue));
 
 			}
@@ -104,13 +106,15 @@ class StatsConsoleLogic {
 	StatsPeriod createStatsPeriod (
 			StatsGranularity granularity,
 			Instant startTime,
-			Instant endTime) {
+			Instant endTime,
+			Integer offset) {
 
 		StatsPeriod ret =
 			new StatsPeriod ()
 				.granularity (granularity)
 				.startTime (startTime)
-				.endTime (endTime);
+				.endTime (endTime)
+				.offset (offset);
 
 		for (
 			DateTime hour = startTime.toDateTime ();

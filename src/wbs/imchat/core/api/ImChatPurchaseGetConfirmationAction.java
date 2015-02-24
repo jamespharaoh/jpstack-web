@@ -24,6 +24,7 @@ import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
 import wbs.imchat.core.model.ImChatPricePointObjectHelper;
 import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
+import wbs.imchat.core.model.ImChatPurchaseRec;
 import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
@@ -113,44 +114,48 @@ class ImChatPurchaseGetConfirmationAction
 					requestContext.request (
 						"imChatId")));
 
-		// lookup session and customer
+		// lookup purchase
 
-		ImChatSessionRec session =
-			imChatSessionHelper.findBySecret (
-				purchaseRequest.sessionSecret ());
+		ImChatPurchaseRec purchase =
+			imChatPurchaseHelper.findByToken (
+				purchaseRequest.token ());
 
-		if (
-			session == null
-			|| ! session.getActive ()
-		) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"session-invalid")
-
-				.message (
-					"The session secret is invalid or the session is no " +
-					"longer active");
-
-			return jsonResponderProvider.get ()
-				.value (failureResponse);
-
-		}
+		if (purchase == null)
+			throw new RuntimeException ();
 
 		ImChatCustomerRec customer =
-			session.getImChatCustomer();
+			purchase.getImChatCustomer ();
+
+		// create session
+
+		ImChatSessionRec session =
+			imChatSessionHelper.insert (
+				new ImChatSessionRec ()
+
+			.setImChatCustomer (
+				customer)
+
+			.setSecret (
+				imChatSessionHelper.generateSecret ())
+
+			.setActive (
+				true)
+
+			.setStartTime (
+				transaction.now ())
+
+			.setUpdateTime (
+				transaction.now ())
+
+		);
 
 		// lookup paypal payment
 
 		PaypalPaymentRec paypalPayment =
-			paypalPaymentHelper.findByToken (
-				purchaseRequest.purchaseToken ());
+			purchase.getPaypalPayment ();
 
 		if (paypalPayment == null)
 			throw new RuntimeException ();
-
 
 		if (paypalPayment.getState () != PaypalPaymentState.started) {
 
@@ -186,6 +191,12 @@ class ImChatPurchaseGetConfirmationAction
 
 		paypalPayment
 
+			.setPaypalToken (
+				purchaseRequest.paypalToken ())
+
+			.setPaypalPayerId (
+				payerId.get ())
+
 			.setState (
 				PaypalPaymentState.pending);
 
@@ -194,18 +205,15 @@ class ImChatPurchaseGetConfirmationAction
 		ImChatPurchaseGetConfirmationSuccess successResponse =
 			new ImChatPurchaseGetConfirmationSuccess ()
 
-			.purchaseToken(
-				purchaseRequest.purchaseToken ())
-
-			.paypalToken (
-				purchaseRequest.paypalToken ())
-
-			.payerId (
-				payerId.get ())
+			.sessionSecret (
+				session.getSecret ())
 
 			.customer (
 				imChatApiLogic.customerData (
-					customer));
+					customer))
+
+			.purchaseId (
+				purchase.getId ());
 
 		// commit and return
 

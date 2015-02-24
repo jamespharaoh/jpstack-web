@@ -340,16 +340,11 @@ class ImChatCoreFixtureProvider
 			.setValue (
 				10)
 
-			.setOldBalance (
-				1)
-
-			.setNewBalance (
-				2)
-
-			.setTimestamp (
+			.setCreatedTime (
 				transaction.now ())
 
-			.setPaypalPayment(null)
+			.setPaypalPayment (
+				null)
 
 		);
 

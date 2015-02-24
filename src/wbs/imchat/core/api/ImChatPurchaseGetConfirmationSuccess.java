@@ -15,15 +15,12 @@ class ImChatPurchaseGetConfirmationSuccess {
 	String status = "success";
 
 	@DataAttribute
-	String purchaseToken;
-
-	@DataAttribute
-	String paypalToken;
-
-	@DataAttribute
-	String payerId;
+	String sessionSecret;
 
 	@DataAttribute
 	ImChatCustomerData customer;
+
+	@DataAttribute
+	Integer purchaseId;
 
 }

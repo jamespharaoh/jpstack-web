@@ -146,7 +146,7 @@ class ImChatPurchaseHistoryAction
 		) {
 
 		purchaseHistoryResponse.purchases.add (
-			new ImChatPurchaseData ()
+			new ImChatPurchaseHistoryData ()
 
 			.price (
 				purchase.getPrice ())
@@ -157,7 +157,7 @@ class ImChatPurchaseHistoryAction
 			.timestamp (
 				timeFormatter.instantToTimestampString (
 					timeFormatter.defaultTimezone (),
-					purchase.getTimestamp ()))
+					purchase.getCreatedTime ()))
 
 		);
 

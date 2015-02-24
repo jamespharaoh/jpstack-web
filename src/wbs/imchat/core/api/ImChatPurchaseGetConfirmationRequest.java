@@ -12,10 +12,7 @@ public
 class ImChatPurchaseGetConfirmationRequest {
 
 	@DataAttribute
-	String sessionSecret;
-
-	@DataAttribute
-	String purchaseToken;
+	String token;
 
 	@DataAttribute
 	String paypalToken;

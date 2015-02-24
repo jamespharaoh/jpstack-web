@@ -1,7 +1,5 @@
 package wbs.imchat.core.api;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -26,6 +24,7 @@ import wbs.imchat.core.model.ImChatCustomerRec;
 import wbs.imchat.core.model.ImChatObjectHelper;
 import wbs.imchat.core.model.ImChatPricePointObjectHelper;
 import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
+import wbs.imchat.core.model.ImChatPurchaseRec;
 import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
@@ -35,6 +34,7 @@ import wbs.integrations.paypal.model.PaypalAccountRec;
 import wbs.integrations.paypal.model.PaypalPaymentObjectHelper;
 import wbs.integrations.paypal.model.PaypalPaymentRec;
 import wbs.integrations.paypal.model.PaypalPaymentState;
+import wbs.platform.currency.logic.CurrencyLogic;
 
 @PrototypeComponent ("imChatPurchaseConfirmAction")
 public
@@ -42,6 +42,9 @@ class ImChatPurchaseConfirmAction
 	implements Action {
 
 	// dependencies
+
+	@Inject
+	CurrencyLogic currencyLogic;
 
 	@Inject
 	Database database;
@@ -97,7 +100,7 @@ class ImChatPurchaseConfirmAction
 
 		ImChatPurchaseConfirmRequest purchaseRequest =
 			dataFromJson.fromJson (
-					ImChatPurchaseConfirmRequest.class,
+				ImChatPurchaseConfirmRequest.class,
 				jsonValue);
 
 		// begin transaction
@@ -142,11 +145,34 @@ class ImChatPurchaseConfirmAction
 		ImChatCustomerRec customer =
 			session.getImChatCustomer ();
 
+		// lookup purchase
+
+		ImChatPurchaseRec purchase =
+			imChatPurchaseHelper.find (
+				purchaseRequest.purchaseId ());
+
+		if (
+			purchase == null
+			|| purchase.getImChatCustomer () != customer
+		) {
+
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
+
+				.reason (
+					"purchase-invalid")
+
+				.message (
+					"The purchase id is not valid");
+
+			return jsonResponderProvider.get ()
+				.value (failureResponse);
+		}
+
 		// lookup paypal payment
 
 		PaypalPaymentRec paypalPayment =
-			paypalPaymentHelper.findByToken (
-				purchaseRequest.purchaseToken ());
+			purchase.getPaypalPayment ();
 
 		if (paypalPayment == null)
 			throw new RuntimeException ();
@@ -157,11 +183,10 @@ class ImChatPurchaseConfirmAction
 				new ImChatFailure ()
 
 				.reason (
-					"payment-invalid")
+					"purchase-invalid")
 
 				.message (
-					stringFormat (
-						"The payment is no longer pending"));
+					"The purchase id is not valid");
 
 			return jsonResponderProvider.get ()
 				.value (failureResponse);
@@ -171,7 +196,7 @@ class ImChatPurchaseConfirmAction
 		// confirm payment and obtain payerId
 
 		PaypalAccountRec paypalAccount =
-			imChat.getPaypalAccount();
+			imChat.getPaypalAccount ();
 
 		Map<String,String> expressCheckoutProperties =
 			paypalLogic.expressCheckoutProperties (
@@ -179,9 +204,11 @@ class ImChatPurchaseConfirmAction
 
 		Boolean checkoutSuccess =
 			paypalApi.doExpressCheckout (
-				purchaseRequest.paypalToken (),
-				purchaseRequest.payerId (),
-				paypalPayment.getValue ().toString () + ".0",
+				paypalPayment.getPaypalToken (),
+				paypalPayment.getPaypalPayerId (),
+				currencyLogic.formatSimple (
+					imChat.getCurrency (),
+					(long) paypalPayment.getValue ()),
 				expressCheckoutProperties);
 
 		if (! checkoutSuccess) {
@@ -207,16 +234,20 @@ class ImChatPurchaseConfirmAction
 			.setState (
 				PaypalPaymentState.confirmed);
 
+		// update purchase
+
+		purchase
+
+			.setCompletedTime (
+				transaction.now ());
+
 		// update customer
 
 		customer
 
-			.setNumPurchases (
-				customer.getNumPurchases () + 1)
-
 			.setBalance (
 				+ customer.getBalance ()
-				+ paypalPayment.getValue ());
+				+ purchase.getValue ());
 
 		// create response
 

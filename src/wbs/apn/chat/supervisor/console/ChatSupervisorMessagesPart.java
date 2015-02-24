@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
@@ -80,8 +79,7 @@ class ChatSupervisorMessagesPart
 				requestContext.parameter ("date"));
 
 		DateTime startTime =
-			date.toDateTime (
-				new LocalTime (hour, 0, 0));
+			date.toDateTimeAtStartOfDay ().plusHours (hour);
 
 		DateTime endTime =
 			startTime.plusHours (1);

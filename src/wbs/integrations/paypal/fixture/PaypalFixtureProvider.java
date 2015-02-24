@@ -45,7 +45,7 @@ class PaypalFixtureProvider
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
 					GlobalId.root,
-					"facility"))
+					"integration"))
 
 			.setCode (
 				"paypal_account")

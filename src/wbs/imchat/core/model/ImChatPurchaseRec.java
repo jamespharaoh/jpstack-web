@@ -1,5 +1,9 @@
 package wbs.imchat.core.model;
 
+import java.util.Random;
+
+import javax.inject.Inject;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -52,17 +56,23 @@ class ImChatPurchaseRec
 	Integer value;
 
 	@SimpleField
-	Integer oldBalance;
+	Instant createdTime;
 
-	@SimpleField
-	Integer newBalance;
+	@SimpleField (
+		nullable = true)
+	Instant completedTime;
 
-	@SimpleField
-	Instant timestamp;
+	@SimpleField (
+		nullable = true)
+	Instant cancelledTime;
 
-	@ReferenceField(
-			nullable = true)
+	@ReferenceField (
+		nullable = true)
 	PaypalPaymentRec paypalPayment;
+
+	@SimpleField (
+		nullable = true)
+	String token;
 
 	// compare to
 
@@ -77,14 +87,73 @@ class ImChatPurchaseRec
 		return new CompareToBuilder ()
 
 			.append (
-				other.getTimestamp (),
-				getTimestamp ())
+				other.getCreatedTime (),
+				getCreatedTime ())
 
 			.append (
 				other.getId (),
 				getId ())
 
 			.toComparison ();
+
+	}
+
+	// dao methods
+
+	public
+	interface ImChatPurchaseDaoMethods {
+
+		ImChatPurchaseRec findByToken (
+				String token);
+
+	}
+
+	// object helper methods
+
+	public
+	interface ImChatPurchaseObjectHelperMethods {
+
+		String generateToken ();
+
+	}
+
+	// object helper implementation
+
+	public static
+	class ImChatPurchaseObjectHelperImplementation
+		implements ImChatPurchaseObjectHelperMethods {
+
+		// dependencies
+
+		@Inject
+		Random random;
+
+		// implementation
+
+		@Override
+		public
+		String generateToken () {
+
+			StringBuilder stringBuilder =
+				new StringBuilder ();
+
+			for (int i = 0; i < 20; i ++) {
+
+				stringBuilder.append (
+					tokenChars.charAt (
+						random.nextInt (
+							tokenChars.length ())));
+
+			}
+
+			return stringBuilder.toString ();
+
+		}
+
+		// data
+
+		public static
+		String tokenChars = "abcdefghijklmnopqrstuvwxyz";
 
 	}
 

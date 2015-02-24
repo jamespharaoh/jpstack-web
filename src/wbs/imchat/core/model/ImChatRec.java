@@ -57,15 +57,16 @@ class ImChatRec
 
 	// settings
 
-	@ReferenceField
-	PaypalAccountRec paypalAccount;
-
 	@ReferenceField (
 		nullable = true)
 	CurrencyRec currency;
 
 	@SimpleField
 	Integer preferredQueueTime = 0;
+
+	@ReferenceField (
+		nullable = true)
+	PaypalAccountRec paypalAccount;
 
 	// compare to
 

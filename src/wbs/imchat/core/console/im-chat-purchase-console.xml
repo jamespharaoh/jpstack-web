@@ -41,9 +41,6 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"/>
-
 		</object>
 
 	</object-context>
@@ -65,30 +62,30 @@
 		<parent-field/>
 		<index-field/>
 
-		<integer-field
+		<object-field
+			name="imChatPricePoint"
+			finder="imChatPricePoint"/>
+
+		<currency-field
 			name="price"
-			nullable="yes"/>
+			currency="imChatCustomer.imChat.currency"/>
 
-		<integer-field
+		<currency-field
 			name="value"
-			nullable="yes"/>
+			currency="imChatCustomer.imChat.currency"/>
 
-		<integer-field
-			name="oldBalance"
-			nullable="yes"/>
+		<timestamp-field
+			name="createdTime"/>
 
-		<integer-field
-			name="newBalance"
-			nullable="yes"/>
+		<timestamp-field
+			name="completedTime"/>
 
-	</field-set>
+		<timestamp-field
+			name="cancelledTime"/>
 
-	<field-set
-		name="settings"
-		object-name="imChatPurchase">
-
-		<id-field/>
-		<index-field/>
+		<object-field
+			name="paypalPayment"
+			finder="paypalPayment"/>
 
 	</field-set>
 

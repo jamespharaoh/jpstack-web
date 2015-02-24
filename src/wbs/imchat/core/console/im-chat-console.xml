@@ -106,6 +106,10 @@
 		<seconds-field
 			name="preferredQueueTime"/>
 
+		<object-field
+			name="paypalAccount"
+			finder="paypalAccount"/>
+
 	</field-set>
 
 	<field-set
@@ -119,10 +123,17 @@
 
 		<object-field
 			name="currency"
-			finder="currency"/>
+			finder="currency"
+			nullable="yes"/>
 
 		<seconds-field
-			name="preferredQueueTime"/>
+			name="preferredQueueTime"
+			nullable="yes"/>
+
+		<object-field
+			name="paypalAccount"
+			finder="paypalAccount"
+			nullable="yes"/>
 
 	</field-set>
 
