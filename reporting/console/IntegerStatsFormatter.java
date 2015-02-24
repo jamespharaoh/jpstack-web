@@ -120,4 +120,22 @@ class IntegerStatsFormatter
 
 	}
 
+	@Override
+	public
+	String formatTotal (
+			Object group,
+			Object value) {
+
+		Integer intValue =
+			(Integer) value;
+
+		if (intValue == null || intValue == 0)
+			return "<td></td>";
+
+		return stringFormat (
+			"<td style=\"text-align: right\">%h</td>\n",
+			intValue);
+
+	}
+
 }

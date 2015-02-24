@@ -1,7 +1,6 @@
 package wbs.platform.reporting.console;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -55,13 +54,13 @@ class AdditionStatsResolver
 
 	@Override
 	public
-	Map<Pair<Object,Instant>,Object> resolve (
+	ResolvedStats resolve (
 			Map<String,StatsDataSet> dataSetsByName,
 			StatsPeriod period,
 			Set<Object> groups) {
 
-		List<Map<Pair<Object,Instant>,Object>> operandDatas =
-			new ArrayList<Map<Pair<Object,Instant>,Object>> (
+		List<ResolvedStats> operandsResolved =
+			new ArrayList<ResolvedStats> (
 				operands.size ());
 
 		for (
@@ -74,23 +73,20 @@ class AdditionStatsResolver
 				operands.get (operandIndex);
 
 			if (operand.resolver == null) {
-				operandDatas.add (null);
+				operandsResolved.add (null);
 				continue;
 			}
 
-			Map<Pair<Object,Instant>,Object> operandData =
+			operandsResolved.add (
 				operand.resolver.resolve (
 					dataSetsByName,
 					period,
-					groups);
-
-			operandDatas.add (
-				operandData);
+					groups));
 
 		}
 
-		Map<Pair<Object,Instant>,Object> ret =
-			new HashMap<Pair<Object,Instant>,Object> ();
+		ResolvedStats ret =
+			new ResolvedStats ();
 
 		for (Object group : groups) {
 
@@ -117,12 +113,12 @@ class AdditionStatsResolver
 
 					if (operand.resolver != null) {
 
-						Map<Pair<Object,Instant>,Object> operandData =
-							operandDatas.get (operandIndex);
+						ResolvedStats operandResolved =
+							operandsResolved.get (operandIndex);
 
 						Integer resolverValue =
 							(Integer)
-							operandData.get (key);
+							operandResolved.steps ().get (key);
 
 						if (resolverValue == null)
 							continue;
@@ -137,12 +133,55 @@ class AdditionStatsResolver
 
 				}
 
-				ret.put (
+				ret.steps ().put (
 					key,
 					totalValue);
 
 			}
 
+			{
+
+				int totalValue = 0;
+
+				for (
+					int operandIndex = 0;
+					operandIndex < operands.size ();
+					operandIndex ++
+				) {
+
+					Operand operand =
+						operands.get (operandIndex);
+
+					int operandValue =
+						operand.coefficient;
+
+					if (operand.resolver != null) {
+
+						ResolvedStats operandResolved =
+							operandsResolved.get (operandIndex);
+
+						Integer resolverValue =
+							(Integer)
+							operandResolved.totals ().get (group);
+
+						if (resolverValue == null)
+							continue;
+
+						operandValue *=
+							resolverValue;
+
+					}
+
+					totalValue +=
+						operandValue;
+
+				}
+
+				ret.totals ().put (
+					group,
+					totalValue);
+
+			}
 		}
 
 		return ret;

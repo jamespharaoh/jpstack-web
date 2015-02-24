@@ -1,7 +1,6 @@
 package wbs.platform.reporting.console;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -55,13 +54,13 @@ class MultiplicationStatsResolver
 
 	@Override
 	public
-	Map<Pair<Object,Instant>,Object> resolve (
+	ResolvedStats resolve (
 			Map<String,StatsDataSet> dataSetsByName,
 			StatsPeriod period,
 			Set<Object> groups) {
 
-		List<Map<Pair<Object,Instant>,Object>> operandDatas =
-			new ArrayList<Map<Pair<Object,Instant>,Object>> (
+		List<ResolvedStats> operandsResolved =
+			new ArrayList<ResolvedStats> (
 				operands.size ());
 
 		for (
@@ -74,23 +73,20 @@ class MultiplicationStatsResolver
 				operands.get (operandIndex);
 
 			if (operand.resolver == null) {
-				operandDatas.add (null);
+				operandsResolved.add (null);
 				continue;
 			}
 
-			Map<Pair<Object,Instant>,Object> operandData =
+			operandsResolved.add (
 				operand.resolver.resolve (
 					dataSetsByName,
 					period,
-					groups);
-
-			operandDatas.add (
-				operandData);
+					groups));
 
 		}
 
-		Map<Pair<Object,Instant>,Object> ret =
-			new HashMap<Pair<Object,Instant>,Object> ();
+		ResolvedStats ret =
+			new ResolvedStats ();
 
 		for (Object group : groups) {
 
@@ -119,12 +115,12 @@ class MultiplicationStatsResolver
 
 					if (operand.resolver != null) {
 
-						Map<Pair<Object,Instant>,Object> operandData =
-							operandDatas.get (operandIndex);
+						ResolvedStats operandResolved =
+							operandsResolved.get (operandIndex);
 
 						Integer resolverValue =
 							(Integer)
-							operandData.get (key);
+							operandResolved.steps ().get (key);
 
 						if (resolverValue == null)
 							continue OUTER;
@@ -145,8 +141,59 @@ class MultiplicationStatsResolver
 
 				}
 
-				ret.put (
+				ret.steps ().put (
 					key,
+					numerator / denominator);
+
+			}
+
+			{
+
+				int numerator = 1;
+				int denominator = 1;
+
+				for (
+					int operandIndex = 0;
+					operandIndex < operands.size ();
+					operandIndex ++
+				) {
+
+					Operand operand =
+						operands.get (operandIndex);
+
+					int value =
+						operand.value;
+
+					if (operand.resolver != null) {
+
+						ResolvedStats operandResolved =
+							operandsResolved.get (operandIndex);
+
+						Integer resolverValue =
+							(Integer)
+							operandResolved.totals ().get (group);
+
+						if (resolverValue == null)
+							break;
+
+						if (resolverValue == 0)
+							break;
+
+						value *=
+							resolverValue;
+
+					}
+
+					for (int i = 0; i < operand.power; i++)
+						numerator *= value;
+
+					for (int i = operand.power; i < 0; i ++)
+						denominator *= value;
+
+				}
+
+				ret.totals ().put (
+					group,
 					numerator / denominator);
 
 			}

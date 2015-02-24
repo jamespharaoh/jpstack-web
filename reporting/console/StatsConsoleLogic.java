@@ -12,7 +12,6 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
 
@@ -39,7 +38,7 @@ class StatsConsoleLogic {
 				dataSetsByName,
 				grouper);
 
-		Map<Pair<Object,Instant>,Object> aggregatedValues =
+		ResolvedStats resolved =
 			resolver.resolve (
 				dataSetsByName,
 				period,
@@ -50,8 +49,10 @@ class StatsConsoleLogic {
 
 		// output
 
-		for (Object group
-				: sortedGroups) {
+		for (
+			Object group
+				: sortedGroups
+		) {
 
 			out.write (
 				stringFormat (
@@ -69,7 +70,7 @@ class StatsConsoleLogic {
 			) {
 
 				Object combinedValue =
-					aggregatedValues.get (
+					resolved.steps ().get (
 						new ImmutablePair<Object,Instant> (
 							group,
 							period.step (step)));
@@ -82,6 +83,15 @@ class StatsConsoleLogic {
 
 			}
 
+			Object totalValue =
+				resolved.totals ().get (
+					group);
+
+			out.write (
+				formatter.formatTotal (
+					group,
+					totalValue));
+
 			out.write (
 				stringFormat (
 					"</tr>\n"));
@@ -90,7 +100,8 @@ class StatsConsoleLogic {
 
 	}
 
-	public StatsPeriod createStatsPeriod (
+	public
+	StatsPeriod createStatsPeriod (
 			StatsGranularity granularity,
 			Instant startTime,
 			Instant endTime) {

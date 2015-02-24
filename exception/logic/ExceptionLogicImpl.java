@@ -181,7 +181,7 @@ class ExceptionLogicImpl
 
 		// create exception log
 
-		ExceptionLogRec exceptionLog =		
+		ExceptionLogRec exceptionLog =
 			exceptionLogHelper.insert (
 				new ExceptionLogRec ()
 

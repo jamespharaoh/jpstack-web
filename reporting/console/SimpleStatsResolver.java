@@ -61,7 +61,7 @@ class SimpleStatsResolver
 
 	@Override
 	public
-	Map<Pair<Object,Instant>,Object> resolve (
+	ResolvedStats resolve (
 			Map<String,StatsDataSet> dataSetsByName,
 			StatsPeriod period,
 			Set<Object> groups) {
@@ -72,25 +72,34 @@ class SimpleStatsResolver
 		if (dataSet == null)
 			throw new RuntimeException ();
 
-		Map<Pair<Object,Instant>,List<Object>> unaggregatedValues =
+		Map<Pair<Object,Instant>,List<Object>> unaggregatedSteps =
 			new HashMap<Pair<Object,Instant>,List<Object>> ();
+
+		Map<Object,List<Object>> unaggregatedTotals =
+			new HashMap<Object,List<Object>> ();
 
 		for (Object group : groups) {
 
 			for (Instant step : period.steps ()) {
 
-				unaggregatedValues.put (
-					new ImmutablePair<Object,Instant> (
+				unaggregatedSteps.put (
+ 					new ImmutablePair<Object,Instant> (
 						group,
 						step),
 					new ArrayList<Object> ());
 
 			}
 
+			unaggregatedTotals.put (
+				group,
+				new ArrayList<Object> ());
+
 		}
 
-		for (StatsDatum datum
-				: dataSet.data ()) {
+		for (
+			StatsDatum datum
+				: dataSet.data ()
+		) {
 
 			Object indexValue =
 				indexName != null
@@ -102,16 +111,28 @@ class SimpleStatsResolver
 					indexValue,
 					datum.startTime ());
 
-			List<Object> values =
-				unaggregatedValues.get (key);
+			List<Object> stepValues =
+				unaggregatedSteps.get (key);
 
-			if (values == null) {
+			if (stepValues == null) {
 
 				throw new RuntimeException (
 					stringFormat (
 						"Unexpected data for %s/%s",
 						indexValue,
 						datum.startTime ()));
+
+			}
+
+			List<Object> totalValues =
+				unaggregatedTotals.get (indexValue);
+
+			if (totalValues == null) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Unexpected data for %s",
+						indexValue));
 
 			}
 
@@ -127,20 +148,36 @@ class SimpleStatsResolver
 
 			}
 
-			values.add (
+			stepValues.add (
+				value);
+
+			totalValues.add (
 				value);
 
 		}
 
 		// perform aggregation
 
-		Map<Pair<Object,Instant>,Object> aggregatedValues =
-			new HashMap<Pair<Object,Instant>,Object> ();
+		ResolvedStats ret =
+			new ResolvedStats ();
 
-		for (Map.Entry<Pair<Object,Instant>,List<Object>> entry
-				: unaggregatedValues.entrySet ()) {
+		for (
+			Map.Entry<Pair<Object,Instant>,List<Object>> entry
+				: unaggregatedSteps.entrySet ()
+		) {
 
-			aggregatedValues.put (
+			ret.steps ().put (
+				entry.getKey (),
+				aggregator.aggregate (entry.getValue ()));
+
+		}
+
+		for (
+			Map.Entry<Object,List<Object>> entry
+				: unaggregatedTotals.entrySet ()
+		) {
+
+			ret.totals ().put (
 				entry.getKey (),
 				aggregator.aggregate (entry.getValue ()));
 
@@ -148,7 +185,7 @@ class SimpleStatsResolver
 
 		// return
 
-		return aggregatedValues;
+		return ret;
 
 	}
 
