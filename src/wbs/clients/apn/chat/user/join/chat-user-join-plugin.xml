@@ -1,0 +1,11 @@
+<plugin
+	name="chat-user-join"
+	package="wbs.clients.apn.chat.user.join">
+
+	<layer name="daemon">
+		<bean class="daemon.ChatJoinCommand"/>
+		<bean class="daemon.ChatJoinTimeoutDaemon"/>
+		<bean class="daemon.ChatJoiner"/>
+	</layer>
+
+</plugin>

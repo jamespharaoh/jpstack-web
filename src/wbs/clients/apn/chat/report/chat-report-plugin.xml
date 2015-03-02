@@ -1,0 +1,13 @@
+<plugin
+	name="chat-report"
+	package="wbs.clients.apn.chat.report">
+
+	<layer name="console">
+		<bean class="console.ChatReportRevSharePart"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-report"/>
+	</console-modules>
+
+</plugin>

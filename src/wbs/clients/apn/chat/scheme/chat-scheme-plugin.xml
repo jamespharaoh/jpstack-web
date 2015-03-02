@@ -1,0 +1,17 @@
+<plugin
+	name="chat-scheme"
+	package="wbs.clients.apn.chat.scheme">
+
+	<models>
+		<model name="chatScheme"/>
+		<model name="chatSchemeCharges"/>
+		<model name="chatSchemeKeyword"/>
+		<model name="chatSchemeMap"/>
+	</models>
+
+	<console-modules>
+		<console-module name="chat-scheme"/>
+		<console-module name="chat-scheme-keyword"/>
+	</console-modules>
+
+</plugin>

@@ -1,0 +1,49 @@
+<plugin
+	name="chat-user-image"
+	package="wbs.clients.apn.chat.user.image">
+
+	<sql-scripts>
+		<sql-schema name="chat-user-image"/>
+		<sql-data name="chat-user-image-data"/>
+	</sql-scripts>
+
+	<models>
+		<custom-type name="chatUserImageMode"/>
+		<custom-type name="chatUserImageType"/>
+		<model name="chatUserImage"/>
+		<model name="chatUserImageUploadToken"/>
+	</models>
+
+	<layer name="api">
+		<bean class="api.ChatUserImageApiModule"/>
+		<bean class="api.ChatUserImageUploadViewAction"/>
+		<bean class="api.ChatUserImageUploadPostAction"/>
+		<bean class="api.ChatUserImageUploadFormPage"/>
+		<bean class="api.ChatUserImageUploadErrorPage"/>
+		<bean class="api.ChatUserImageUploadSuccessPage"/>
+		<bean class="api.ChatUserImageUploadExpiredPage"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.ChatUserImageHistoryPart"/>
+		<bean class="console.ChatUserImageListAction"/>
+		<bean class="console.ChatUserImageListPart"/>
+		<bean class="console.ChatUserImageModeConsoleHelper"/>
+		<bean class="console.ChatUserImageRemovePart"/>
+		<bean class="console.ChatUserImageRevertPart"/>
+		<bean class="console.ChatUserImageRotatePart"/>
+		<bean class="console.ChatUserImageUploadAction"/>
+		<bean class="console.ChatUserImageUploadPart"/>
+		<bean class="console.ChatUserImageViewPart"/>
+		<bean class="console.ChatUserImageZipResponder"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.ChatUserImageUploadCommand"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-user-image"/>
+	</console-modules>
+
+</plugin>

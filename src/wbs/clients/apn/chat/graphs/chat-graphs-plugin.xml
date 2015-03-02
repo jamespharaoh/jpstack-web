@@ -1,0 +1,18 @@
+<plugin
+	name="chat-graphs"
+	package="wbs.clients.apn.chat.graphs">
+
+	<layer name="console">
+		<bean class="console.ChatGraphsDailyUsersImageResponder"/>
+		<bean class="console.ChatGraphsDailyUsersPart"/>
+		<bean class="console.ChatGraphsJoinersImageResponder"/>
+		<bean class="console.ChatGraphsJoinersPart"/>
+		<bean class="console.ChatGraphsUsersImageResponder"/>
+		<bean class="console.ChatGraphsUsersPart"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-graphs"/>
+	</console-modules>
+
+</plugin>

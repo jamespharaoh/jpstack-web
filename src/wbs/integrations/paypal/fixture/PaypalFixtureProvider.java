@@ -33,9 +33,6 @@ class PaypalFixtureProvider
 	@Inject
 	PaypalAccountObjectHelper paypalAccountHelper;
 
-	//@Inject
-	//PaypalPaymentObjectHelper paypalPaymentHelper;
-
 	@Inject
 	SliceObjectHelper sliceHelper;
 
@@ -84,15 +81,10 @@ class PaypalFixtureProvider
 				dataFromXml.readFilename (
 					"conf/test-accounts.xml");
 
-System.out.println ("COUNT: " + testAccounts.accounts ().size ());
-
 			for (
 				TestAccountSpec testAccount
 					: testAccounts.accounts ()
 			) {
-
-				System.out.println ("TYPE: " + testAccount.type ());
-				System.out.println ("NAME: " + testAccount.name ());
 
 				if (! equal (testAccount.type (), "paypal"))
 					continue;
