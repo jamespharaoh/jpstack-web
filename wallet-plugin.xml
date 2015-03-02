@@ -1,0 +1,28 @@
+<plugin
+	name="wallet"
+	package="wbs.wallet">
+
+	<plugin-dependencies>
+		<plugin-dependency name="sms-apps-common"/>
+		<plugin-dependency name="scaffold"/>
+	</plugin-dependencies>
+
+	<sql-scripts>
+		<sql-data name="wallet-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="walletService"/>
+		<model name="wallet"/>
+	</models>
+
+	<fixtures>
+		<fixture name="wallet"/>
+	</fixtures>
+
+	<console-modules>
+		<console-module name="wallet-service"/>
+		<console-module name="wallet"/>
+	</console-modules>
+
+</plugin>
