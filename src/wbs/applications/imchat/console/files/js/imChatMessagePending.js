@@ -1,32 +1,114 @@
 $(function () {
 
-	$("#templates .template").click (function () {
+	$("#templates .template").each (function () {
 
-		// disable others
+		var template = this;
 
-		$("#templates .template").removeClass ("selected");
+		var selectTemplate = function () {
 
-		$("#templates .template-radio").prop ("checked", false);
+			// disable others
 
-		$("#templates .template-text").hide ();
+			$("#templates .template").removeClass ("selected");
 
-		$("#templates .template-submit").prop ("disabled", true);
+			$("#templates .template-radio").prop ("checked", false);
 
-		// enable this
+			$("#templates .template-text").hide ();
+			$("#templates .template-chars").hide ();
 
-		$(this).addClass ("selected");
+			$("#templates .template-submit").prop ("disabled", true);
 
-		$(this).find (".template-radio").prop ("checked", true);
+			// enable this
 
-		$(this).find (".template-text").show ().focus ();
+			$(template).addClass ("selected");
 
-		$(this).find (".template-text").css ("width",
-			+ $(this).find (".template-text").parent ().innerWidth ()
-			+ $(this).find (".template-text").innerWidth ()
-			- $(this).find (".template-text").outerWidth ()
-			- 10);
+			$(template).find (".template-radio").prop ("checked", true);
 
-		$(this).find (".template-submit").prop ("disabled", false);
+			$(template).find (".template-text").show ().focus ();
+
+			$(template).find (".template-text").css ("width",
+				+ $(template).find (".template-text").parent ().innerWidth ()
+				+ $(template).find (".template-text").innerWidth ()
+				- $(template).find (".template-text").outerWidth ()
+				- 10);
+
+			$(template).find (".template-chars").show ();
+
+			$(template).find (".template-submit").prop ("disabled", false);
+
+			updateCharCount ();
+
+		});
+
+		var updateCharCount = function () {
+
+			var text = $(template).find (".template-text").val ();
+			var length = text.length;
+
+			var charCountText = [
+				String (length),
+				" characters",
+			].join ("");
+
+			var minimum = $(template).data ("minimum");
+			var maximum = $(template).data ("maximum");
+
+			var error = false;
+
+			if (typeof minimum === "number" && length < minimum) {
+
+				charCountText += [
+					", minimum is ",
+					minimum,
+					", type ",
+					minimum - length,
+					" more characters",
+				].join ("");
+
+				error = true;
+
+			} else if (typeof maximum === "number") {
+
+				if (length < maximum) {
+
+					charCountText += [
+						", maximum is ",
+						maximum,
+						", you have ",
+						maximum - length,
+						" characters remaining",
+					].join ("");
+
+				} else {
+
+					charCountText += [
+						", maximum is ",
+						maximum,
+						", remove ",
+						length - maximum,
+						" characters",
+					].join ("");
+
+					error = true;
+
+				}
+
+			}
+
+			$(template).find (".template-chars").text (charCountText);
+
+			if (error) {
+				$(template).find (".template-chars").addClass ("error");
+			} else {
+				$(template).find (".template-chars").removeClass ("error");
+			}
+
+		};
+
+		$(template).click (selectTemplate);
+
+		$(template).find (".template-text").keyup (updateCharCount);
+		$(template).find (".template-text").keydown (updateCharCount);
+		$(template).find (".template-text").change (updateCharCount);
 
 	});
 

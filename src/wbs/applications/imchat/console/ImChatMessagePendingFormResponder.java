@@ -136,6 +136,16 @@ class ImChatMessagePendingFormResponder
 		printFormat (
 			"</script>\n");
 
+		printFormat (
+			"<style type=\"text/css\">\n",
+			"  .template-chars.error {\n",
+			"    background-color: darkred;\n",
+			"    color: white;\n",
+			"    padding-left: 10px;\n",
+			"    padding-right: 10px;\n",
+			"  }\n",
+			"</style>\n");
+
 	}
 
 	@Override
@@ -222,6 +232,10 @@ class ImChatMessagePendingFormResponder
 			"<tr",
 			" class=\"template\"",
 			" data-template=\"bill\"",
+			" data-minimum=\"%h\"",
+			imChat.getBillMessageMinChars (),
+			" data-maximum=\"%h\"",
+			imChat.getBillMessageMaxChars (),
 			">\n");
 
 		printFormat (
@@ -244,12 +258,17 @@ class ImChatMessagePendingFormResponder
 			" style=\"width: 100%%\"",
 			"><textarea",
 			" class=\"template-text\"",
+			" name=\"message-bill\"",
 			" rows=\"3\"",
 			" cols=\"48\"",
 			" style=\"display: none\"",
-			">%h</textarea></td>\n",
+			">%h</textarea><br>\n",
 			requestContext.parameter (
-				"billedMessage"));
+				"message-bill"),
+			"<span",
+			" class=\"template-chars\"",
+			" style=\"display: none\"",
+			"></span></td>\n");
 
 		printFormat (
 			"<td><input",
@@ -271,6 +290,10 @@ class ImChatMessagePendingFormResponder
 			"<tr",
 			" class=\"template\"",
 			" data-template=\"free\"",
+			" data-minimum=\"%h\"",
+			imChat.getFreeMessageMinChars (),
+			" data-maximum=\"%h\"",
+			imChat.getFreeMessageMaxChars (),
 			">\n");
 
 		printFormat (
@@ -290,12 +313,18 @@ class ImChatMessagePendingFormResponder
 			" style=\"width: 100%%\"",
 			"><textarea",
 			" class=\"template-text\"",
+			" name=\"message-free\"",
 			" rows=\"3\"",
 			" cols=\"48\"",
 			" style=\"display: none\"",
-			">%h</textarea></td>\n",
+			">%h</textarea><br>\n",
 			requestContext.parameter (
-				"freeMessage"));
+				"message-free"),
+			"<span",
+			" class=\"template-chars\"",
+			" style=\"display: none\"",
+			"></span></td>\n");
+
 
 		printFormat (
 			"<td><input",
