@@ -3,8 +3,9 @@
 	package="wbs.imchat.core">
 
 	<plugin-dependencies>
-		<plugin-dependency name="sms-apps-common"/>
+		<plugin-dependency name="paypal"/>
 		<plugin-dependency name="scaffold"/>
+		<plugin-dependency name="sms-apps-common"/>
 	</plugin-dependencies>
 
 	<sql-scripts>

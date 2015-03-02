@@ -66,7 +66,7 @@ class PaypalAccountRec
 
 	@SimpleField (
 		nullable = true)
-	String apiId;
+	String appId;
 
 	@SimpleField (
 		nullable = true)

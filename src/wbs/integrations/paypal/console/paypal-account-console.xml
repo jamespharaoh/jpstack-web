@@ -94,7 +94,7 @@
 			nullable="yes"/>
 
 		<text-field
-			name="apiId"
+			name="appId"
 			nullable="yes"/>
 
 		<text-field
@@ -145,7 +145,7 @@
 			nullable="yes"/>
 
 		<text-field
-			name="apiId"
+			name="appId"
 			nullable="yes"/>
 
 		<text-field

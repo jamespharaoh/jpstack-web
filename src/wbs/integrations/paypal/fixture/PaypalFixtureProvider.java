@@ -1,11 +1,17 @@
 package wbs.integrations.paypal.fixture;
 
+import static wbs.framework.utils.etc.Misc.equal;
+
+import java.io.File;
+
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
+import wbs.integrations.paypal.model.PaypalAccountRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuObjectHelper;
 import wbs.platform.menu.model.MenuRec;
@@ -48,34 +54,106 @@ class PaypalFixtureProvider
 					"integration"))
 
 			.setCode (
-				"paypal_account")
+				"paypal")
 
 			.setLabel (
-				"Paypal accounts")
+				"Paypal")
 
 			.setPath (
 				"/paypalAccounts")
 
 		);
 
-		/*paypalAccountHelper.insert (
-			new PaypalAccountRec ()
+		File testAccountsFile =
+			new File ("conf/test-accounts.xml");
 
-			.setSlice (
-				sliceHelper.findByCode (
-					GlobalId.root,
-					"test"))
+		if (! testAccountsFile.exists ())
+			throw new RuntimeException ("ABC");
 
-			.setCode (
-				"test")
+		if (testAccountsFile.exists ()) {
 
-			.setName (
-				"Test")
+			DataFromXml dataFromXml =
+				new DataFromXml ()
 
-			.setDescription (
-				"Test paypal account")
+				.registerBuilderClasses (
+					TestAccountsSpec.class,
+					TestAccountSpec.class);
 
-		);*/
+			TestAccountsSpec testAccounts =
+				(TestAccountsSpec)
+				dataFromXml.readFilename (
+					"conf/test-accounts.xml");
+
+System.out.println ("COUNT: " + testAccounts.accounts ().size ());
+
+			for (
+				TestAccountSpec testAccount
+					: testAccounts.accounts ()
+			) {
+
+				System.out.println ("TYPE: " + testAccount.type ());
+				System.out.println ("NAME: " + testAccount.name ());
+
+				if (! equal (testAccount.type (), "paypal"))
+					continue;
+
+				if (! equal (testAccount.name (), "wbs-sandbox"))
+					continue;
+
+				paypalAccountHelper.insert (
+					new PaypalAccountRec ()
+
+					.setSlice (
+						sliceHelper.findByCode (
+							GlobalId.root,
+							"test"))
+
+					.setCode (
+						"wbs_sandbox")
+
+					.setName (
+						"WBS Sandbox")
+
+					.setDescription (
+						"Test paypal account")
+
+					.setUsername (
+						testAccount.params ().get ("username"))
+
+					.setPassword (
+						testAccount.params ().get ("password"))
+
+					.setSignature (
+						testAccount.params ().get ("signature"))
+
+					.setAppId (
+						testAccount.params ().get ("app-id"))
+
+					.setServiceEndpointPaypalApi (
+						"https://api-3t.sandbox.paypal.com/2.0")
+
+					.setServiceEndpointPaypalApiAa (
+						"https://api-3t.sandbox.paypal.com/2.0")
+
+					.setServiceEndpointPermissions (
+						"https://svcs.sandbox.paypal.com/")
+
+					.setServiceEndpointAdaptivePayments (
+						"https://svcs.sandbox.paypal.com/")
+
+					.setServiceEndpointAdaptiveAccounts (
+						"https://svcs.sandbox.paypal.com/")
+
+					.setServiceEndpointInvoice (
+						"https://svcs.sandbox.paypal.com/")
+
+				);
+
+				break;
+
+			}
+
+		}
 
 	}
 

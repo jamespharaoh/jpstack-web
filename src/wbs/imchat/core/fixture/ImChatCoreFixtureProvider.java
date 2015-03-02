@@ -28,7 +28,6 @@ import wbs.imchat.core.model.ImChatRec;
 import wbs.imchat.core.model.ImChatSessionObjectHelper;
 import wbs.imchat.core.model.ImChatSessionRec;
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
-import wbs.integrations.paypal.model.PaypalAccountRec;
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuObjectHelper;
@@ -114,26 +113,6 @@ class ImChatCoreFixtureProvider
 
 		);
 
-		PaypalAccountRec paypalAccount =
-			paypalAccountHelper.insert (
-
-			new PaypalAccountRec ()
-
-				.setSlice (
-					sliceHelper.findByCode (
-						GlobalId.root,
-						"test"))
-
-				.setCode (
-					"imchat_paypal_acc")
-
-				.setName (
-					"Im Chat Paypal Account")
-
-				.setDescription (
-					"Test paypal account")
-			);
-
 		// im chat
 
 		ImChatRec imChat =
@@ -154,7 +133,11 @@ class ImChatCoreFixtureProvider
 			.setDescription (
 				"Test IM chat")
 
-			.setPaypalAccount (paypalAccount)
+			.setPaypalAccount (
+				paypalAccountHelper.findByCode (
+					GlobalId.root,
+					"test",
+					"test"))
 
 			.setCurrency (
 				currencyHelper.findByCode (
@@ -162,25 +145,6 @@ class ImChatCoreFixtureProvider
 					"gbp"))
 
 		);
-
-		paypalAccountHelper.insert (
-				new PaypalAccountRec ()
-
-				.setSlice (
-					sliceHelper.findByCode (
-						GlobalId.root,
-						"test"))
-
-				.setCode (
-					"test")
-
-				.setName (
-					"Test")
-
-				.setDescription (
-					"Test paypal account")
-
-			);
 
 		// im chat price point
 

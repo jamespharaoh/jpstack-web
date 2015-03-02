@@ -53,7 +53,7 @@ class PaypalLogicImplementation
 
 			.put (
 				"acct1.AppId",
-				paypalAccount.getApiId ())
+				paypalAccount.getAppId ())
 
 			.build ();
 

@@ -50,7 +50,6 @@
   <classpathentry kind="lib" path="binaries/libraries/jsr305-jar-1.3.9.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/jta-jar-1.1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/jta-source-1.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/junit-jar-4.10.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/jython-jar-2.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/log4j-bundle-1.2.17.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/log4j-source-1.2.17.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/lombok-jar-1.12.2.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/lombok-source-1.12.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/mail-jar-1.4.3.jar"/>

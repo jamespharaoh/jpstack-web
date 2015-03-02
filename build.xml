@@ -95,13 +95,9 @@
       <fileset dir="src/wbs/platform/object/search/console/files"/>
       <fileset dir="src/wbs/platform/object/settings/console/files"/>
       <fileset dir="src/wbs/platform/priv/console/files"/>
-      <fileset dir="src/wbs/platform/pyp/console/files"/>
       <fileset dir="src/wbs/platform/supervisor/console/files"/>
       <fileset dir="src/wbs/platform/queue/console/files"/>
       <fileset dir="src/wbs/platform/scaffold/console/files"/>
-      <fileset dir="src/wbs/platform/script/language/console/files"/>
-      <fileset dir="src/wbs/platform/script/system/console/files"/>
-      <fileset dir="src/wbs/platform/script/core/console/files"/>
       <fileset dir="src/wbs/platform/service/console/files"/>
       <fileset dir="src/wbs/platform/text/console/files"/>
       <fileset dir="src/wbs/platform/user/console/files"/>
@@ -190,6 +186,7 @@
       <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
       <fileset dir="src/wbs/imchat/core/console/files"/>
       <fileset dir="src/wbs/wallet/console/files"/>
+      <fileset dir="src/wbs/integrations/common/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
       <fileset dir="src/wbs/integrations/dialogue/console/files"/>
@@ -264,13 +261,9 @@
       <fileset dir="src/wbs/platform/object/search/api/files"/>
       <fileset dir="src/wbs/platform/object/settings/api/files"/>
       <fileset dir="src/wbs/platform/priv/api/files"/>
-      <fileset dir="src/wbs/platform/pyp/api/files"/>
       <fileset dir="src/wbs/platform/supervisor/api/files"/>
       <fileset dir="src/wbs/platform/queue/api/files"/>
       <fileset dir="src/wbs/platform/scaffold/api/files"/>
-      <fileset dir="src/wbs/platform/script/language/api/files"/>
-      <fileset dir="src/wbs/platform/script/system/api/files"/>
-      <fileset dir="src/wbs/platform/script/core/api/files"/>
       <fileset dir="src/wbs/platform/service/api/files"/>
       <fileset dir="src/wbs/platform/text/api/files"/>
       <fileset dir="src/wbs/platform/user/api/files"/>
@@ -359,6 +352,7 @@
       <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
       <fileset dir="src/wbs/imchat/core/api/files"/>
       <fileset dir="src/wbs/wallet/api/files"/>
+      <fileset dir="src/wbs/integrations/common/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
       <fileset dir="src/wbs/integrations/dialogue/api/files"/>
@@ -467,13 +461,9 @@
       <fileset dir="src/wbs/platform/object/search/console/files"/>
       <fileset dir="src/wbs/platform/object/settings/console/files"/>
       <fileset dir="src/wbs/platform/priv/console/files"/>
-      <fileset dir="src/wbs/platform/pyp/console/files"/>
       <fileset dir="src/wbs/platform/supervisor/console/files"/>
       <fileset dir="src/wbs/platform/queue/console/files"/>
       <fileset dir="src/wbs/platform/scaffold/console/files"/>
-      <fileset dir="src/wbs/platform/script/language/console/files"/>
-      <fileset dir="src/wbs/platform/script/system/console/files"/>
-      <fileset dir="src/wbs/platform/script/core/console/files"/>
       <fileset dir="src/wbs/platform/service/console/files"/>
       <fileset dir="src/wbs/platform/text/console/files"/>
       <fileset dir="src/wbs/platform/user/console/files"/>
@@ -562,6 +552,7 @@
       <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
       <fileset dir="src/wbs/imchat/core/console/files"/>
       <fileset dir="src/wbs/wallet/console/files"/>
+      <fileset dir="src/wbs/integrations/common/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
       <fileset dir="src/wbs/integrations/dialogue/console/files"/>
@@ -636,13 +627,9 @@
       <fileset dir="src/wbs/platform/object/search/api/files"/>
       <fileset dir="src/wbs/platform/object/settings/api/files"/>
       <fileset dir="src/wbs/platform/priv/api/files"/>
-      <fileset dir="src/wbs/platform/pyp/api/files"/>
       <fileset dir="src/wbs/platform/supervisor/api/files"/>
       <fileset dir="src/wbs/platform/queue/api/files"/>
       <fileset dir="src/wbs/platform/scaffold/api/files"/>
-      <fileset dir="src/wbs/platform/script/language/api/files"/>
-      <fileset dir="src/wbs/platform/script/system/api/files"/>
-      <fileset dir="src/wbs/platform/script/core/api/files"/>
       <fileset dir="src/wbs/platform/service/api/files"/>
       <fileset dir="src/wbs/platform/text/api/files"/>
       <fileset dir="src/wbs/platform/user/api/files"/>
@@ -731,6 +718,7 @@
       <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
       <fileset dir="src/wbs/imchat/core/api/files"/>
       <fileset dir="src/wbs/wallet/api/files"/>
+      <fileset dir="src/wbs/integrations/common/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
       <fileset dir="src/wbs/integrations/dialogue/api/files"/>
@@ -845,8 +833,6 @@
       <script name="src/wbs/platform/queue/model/queue.sql"/>
       <script name="src/wbs/platform/scaffold/model/root.sql"/>
       <script name="src/wbs/platform/scaffold/model/slice.sql"/>
-      <script name="src/wbs/platform/script/language/model/script-language.sql"/>
-      <script name="src/wbs/platform/script/system/model/system-script.sql"/>
       <script name="src/wbs/platform/service/model/service.sql"/>
       <script name="src/wbs/platform/text/model/text.sql"/>
       <script name="src/wbs/platform/user/model/user.sql"/>
@@ -901,8 +887,6 @@
       <script name="src/wbs/platform/media/model/media-data.sql"/>
       <script name="src/wbs/platform/menu/model/menu-data.sql"/>
       <script name="src/wbs/platform/queue/model/queue-data.sql"/>
-      <script name="src/wbs/platform/script/language/model/script-language-data.sql"/>
-      <script name="src/wbs/platform/script/system/model/system-script-data.sql"/>
       <script name="src/wbs/platform/service/model/service-data.sql"/>
       <script name="src/wbs/platform/user/model/user-data.sql"/>
       <script name="src/wbs/platform/postgresql/model/postgresql-maintenance-data.sql"/>

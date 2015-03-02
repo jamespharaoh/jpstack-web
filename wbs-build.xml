@@ -179,11 +179,7 @@
 			name="priv"
 			package="wbs.platform.priv"/>
 
-		<plugin
-			name="pyp"
-			package="wbs.platform.pyp"/>
-
-		<plugin
+i		<plugin
 			name="supervisor"
 			package="wbs.platform.supervisor"/>
 
@@ -194,18 +190,6 @@
 		<plugin
 			name="scaffold"
 			package="wbs.platform.scaffold"/>
-
-		<plugin
-			name="script-language"
-			package="wbs.platform.script.language"/>
-
-		<plugin
-			name="script-system"
-			package="wbs.platform.script.system"/>
-
-		<plugin
-			name="script-core"
-			package="wbs.platform.script.core"/>
 
 		<plugin
 			name="service"
@@ -572,6 +556,10 @@
 			package="wbs.wallet"/>
 
 		<!-- integrations -->
+
+		<plugin
+			name="integrations-common"
+			package="wbs.integrations.common"/>
 
 		<plugin
 			name="broadcast-systems"
