@@ -61,7 +61,6 @@ class ManualResponderReportSimplePart
 	public
 	void prepare () {
 
-
 		searchFormFieldSet =
 			manualResponderReportConsoleModule.formFieldSets ().get (
 				"simpleReportSearch");
@@ -171,7 +170,7 @@ class ManualResponderReportSimplePart
 
 			printFormat (
 				"<tr>\n");
-				formFieldLogic.outputTableCells (
+				formFieldLogic.outputTableCellsList (
 					out,
 			        resultsFormFieldSet,
 			        report,

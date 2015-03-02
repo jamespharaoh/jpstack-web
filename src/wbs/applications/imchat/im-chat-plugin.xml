@@ -1,6 +1,6 @@
 <plugin
-	name="im-chat-core"
-	package="wbs.imchat.core">
+	name="im-chat"
+	package="wbs.applications.imchat">
 
 	<plugin-dependencies>
 		<plugin-dependency name="paypal"/>
@@ -22,6 +22,7 @@
 		<model name="imChatProfile"/>
 		<model name="imChatPurchase"/>
 		<model name="imChatSession"/>
+		<model name="imChatTemplate"/>
 	</models>
 
 	<fixtures>
@@ -62,14 +63,15 @@
 
 	<console-modules>
 		<console-module name="im-chat"/>
-		<console-module name="im-chat-customer"/>
 		<console-module name="im-chat-conversation"/>
+		<console-module name="im-chat-customer"/>
 		<console-module name="im-chat-message"/>
 		<console-module name="im-chat-message-pending"/>
 		<console-module name="im-chat-price-point"/>
 		<console-module name="im-chat-profile"/>
-		<console-module name="im-chat-session"/>
 		<console-module name="im-chat-purchase"/>
+		<console-module name="im-chat-session"/>
+		<console-module name="im-chat-template"/>
 	</console-modules>
 
 </plugin>

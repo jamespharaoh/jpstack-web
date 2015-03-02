@@ -135,7 +135,7 @@ class ObjectLinksPart
 			printFormat (
 				"<tr>\n");
 
-			formFieldLogic.outputTableCells (
+			formFieldLogic.outputTableCellsList (
 				out,
 				formFieldSet,
 				targetObject,

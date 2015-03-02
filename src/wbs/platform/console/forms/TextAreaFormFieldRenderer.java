@@ -59,7 +59,25 @@ class TextAreaFormFieldRenderer<Container>
 
 	@Override
 	public
-	void renderTableCell (
+	void renderTableCellList (
+			PrintWriter out,
+			Container container,
+			String interfaceValue,
+			boolean link) {
+
+		out.write (
+			stringFormat (
+				"<td>%s</td>\n",
+				interfaceToHtml (
+					container,
+					interfaceValue,
+					link)));
+
+	}
+
+	@Override
+	public
+	void renderTableCellProperties (
 			PrintWriter out,
 			Container container,
 			String interfaceValue,
@@ -103,7 +121,7 @@ class TextAreaFormFieldRenderer<Container>
 				"<th>%h</th>\n",
 				label ()));
 
-		renderTableCell (
+		renderTableCellProperties (
 			out,
 			container,
 			interfaceValue,

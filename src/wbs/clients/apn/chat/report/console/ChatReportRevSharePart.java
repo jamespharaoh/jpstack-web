@@ -733,7 +733,7 @@ class ChatReportRevSharePart
 			printFormat (
 				"<tr>\n");
 
-			formFieldLogic.outputTableCells (
+			formFieldLogic.outputTableCellsList (
 				out,
 			    resultsFields,
 				chatReport,
@@ -751,7 +751,7 @@ class ChatReportRevSharePart
 
 		printFormat (
 			"<tr>\n");
-			formFieldLogic.outputTableCells (
+			formFieldLogic.outputTableCellsList (
 				out,
 				resultsFields,
 				totalReport,

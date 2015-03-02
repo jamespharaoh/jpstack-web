@@ -52,7 +52,24 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 
 	@Override
 	public
-	void renderTableCell (
+	void renderTableCellList (
+			PrintWriter out,
+			Container container,
+			Interface interfaceValue,
+			boolean link) {
+
+		out.write (
+			stringFormat (
+				"<td>%h</td>\n",
+				camelToSpaces (
+					toStringNull (
+						interfaceValue))));
+
+	}
+
+	@Override
+	public
+	void renderTableCellProperties (
 			PrintWriter out,
 			Container container,
 			Interface interfaceValue,
@@ -81,7 +98,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 				"<th>%h</th>\n",
 				label ()));
 
-		renderTableCell (
+		renderTableCellProperties (
 			out,
 			container,
 			interfaceValue,

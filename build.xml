@@ -157,7 +157,7 @@
       <fileset dir="src/wbs/smsapps/photograbber/console/files"/>
       <fileset dir="src/wbs/smsapps/subscription/console/files"/>
       <fileset dir="src/wbs/smsapps/ticketer/console/files"/>
-      <fileset dir="src/wbs/apn/misc/console/files"/>
+      <fileset dir="src/wbs/clients/apn/misc/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/core/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/ad/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/adult/console/files"/>
@@ -184,7 +184,7 @@
       <fileset dir="src/wbs/clients/apn/chat/user/join/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/user/pending/console/files"/>
       <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
-      <fileset dir="src/wbs/imchat/core/console/files"/>
+      <fileset dir="src/wbs/applications/imchat/console/files"/>
       <fileset dir="src/wbs/wallet/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
@@ -323,7 +323,7 @@
       <fileset dir="src/wbs/smsapps/photograbber/api/files"/>
       <fileset dir="src/wbs/smsapps/subscription/api/files"/>
       <fileset dir="src/wbs/smsapps/ticketer/api/files"/>
-      <fileset dir="src/wbs/apn/misc/api/files"/>
+      <fileset dir="src/wbs/clients/apn/misc/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/core/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/ad/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/adult/api/files"/>
@@ -350,7 +350,7 @@
       <fileset dir="src/wbs/clients/apn/chat/user/join/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/user/pending/api/files"/>
       <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
-      <fileset dir="src/wbs/imchat/core/api/files"/>
+      <fileset dir="src/wbs/applications/imchat/api/files"/>
       <fileset dir="src/wbs/wallet/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
@@ -523,7 +523,7 @@
       <fileset dir="src/wbs/smsapps/photograbber/console/files"/>
       <fileset dir="src/wbs/smsapps/subscription/console/files"/>
       <fileset dir="src/wbs/smsapps/ticketer/console/files"/>
-      <fileset dir="src/wbs/apn/misc/console/files"/>
+      <fileset dir="src/wbs/clients/apn/misc/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/core/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/ad/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/adult/console/files"/>
@@ -550,7 +550,7 @@
       <fileset dir="src/wbs/clients/apn/chat/user/join/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/user/pending/console/files"/>
       <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
-      <fileset dir="src/wbs/imchat/core/console/files"/>
+      <fileset dir="src/wbs/applications/imchat/console/files"/>
       <fileset dir="src/wbs/wallet/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
@@ -689,7 +689,7 @@
       <fileset dir="src/wbs/smsapps/photograbber/api/files"/>
       <fileset dir="src/wbs/smsapps/subscription/api/files"/>
       <fileset dir="src/wbs/smsapps/ticketer/api/files"/>
-      <fileset dir="src/wbs/apn/misc/api/files"/>
+      <fileset dir="src/wbs/clients/apn/misc/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/core/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/ad/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/adult/api/files"/>
@@ -716,7 +716,7 @@
       <fileset dir="src/wbs/clients/apn/chat/user/join/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/user/pending/api/files"/>
       <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
-      <fileset dir="src/wbs/imchat/core/api/files"/>
+      <fileset dir="src/wbs/applications/imchat/api/files"/>
       <fileset dir="src/wbs/wallet/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
@@ -873,7 +873,7 @@
       <script name="src/wbs/clients/apn/chat/user/core/model/chat-user-session.sql"/>
       <script name="src/wbs/clients/apn/chat/user/core/model/chat-users-summary.sql"/>
       <script name="src/wbs/clients/apn/chat/user/image/model/chat-user-image.sql"/>
-      <script name="src/wbs/imchat/core/model/im-chat-core.sql"/>
+      <script name="src/wbs/applications/imchat/model/im-chat-core.sql"/>
       <script name="src/wbs/integrations/txtnation/model/txt-nation.sql"/>
     </database-init>
   </target>
@@ -919,7 +919,7 @@
       <script name="src/wbs/clients/apn/chat/affiliate/model/chat-affiliate-data.sql"/>
       <script name="src/wbs/clients/apn/chat/bill/model/chat-bill-data.sql"/>
       <script name="src/wbs/clients/apn/chat/user/image/model/chat-user-image-data.sql"/>
-      <script name="src/wbs/imchat/core/model/im-chat-core-data.sql"/>
+      <script name="src/wbs/applications/imchat/model/im-chat-core-data.sql"/>
       <script name="src/wbs/wallet/model/wallet-data.sql"/>
       <script name="src/wbs/integrations/broadcastsystems/model/broadcast-systems-data.sql"/>
       <script name="src/wbs/integrations/dialogue/model/dialogue-data.sql"/>
