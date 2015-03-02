@@ -1,9 +1,0 @@
-<plugin
-	name="script-core"
-	package="wbs.platform.script.core">
-
-	<layer name="logic">
-		<bean class="logic.DiffLogicImpl"/>
-	</layer>
-
-</plugin>
