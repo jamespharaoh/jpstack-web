@@ -52,7 +52,18 @@ class ScriptRefFormField
 
 	@Override
 	public
-	void renderTableCell (
+	void renderTableCellList (
+			PrintWriter out,
+			Object object,
+			boolean link) {
+
+		throw new UnsupportedOperationException ();
+
+	}
+
+	@Override
+	public
+	void renderTableCellProperties (
 			PrintWriter out,
 			Object object,
 			boolean link) {
