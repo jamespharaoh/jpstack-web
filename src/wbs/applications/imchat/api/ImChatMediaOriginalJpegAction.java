@@ -1,5 +1,7 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.notEqual;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -11,6 +13,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
+import wbs.framework.web.PageNotFoundException;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.media.model.ContentRec;
@@ -31,15 +34,18 @@ class ImChatMediaOriginalJpegAction
 	ImChatObjectHelper imChatHelper;
 
 	@Inject
-	MediaObjectHelper mediaHelper;
+	ImChatProfileObjectHelper imChatProfileHelper;
 
 	@Inject
-	ImChatProfileObjectHelper imChatProfileHelper;
+	MediaObjectHelper mediaHelper;
 
 	@Inject
 	RequestContext requestContext;
 
 	// prototype dependencies
+
+	@Inject
+	Provider<ImChatMediaResponder> imChatMediaResponderProvider;
 
 	@Inject
 	Provider<JsonResponder> jsonResponderProvider;
@@ -65,48 +71,37 @@ class ImChatMediaOriginalJpegAction
 					requestContext.request (
 						"mediaId")));
 
+		if (media == null) {
+			throw new PageNotFoundException ();
+		}
+
 		// check content hash
 
 		ContentRec content =
-			media.getContent();
+			media.getContent ();
 
 		Integer hash =
-			Math.abs(content.getHash());
+			Math.abs (
+				content.getHash ());
 
 		if (
-				!hash.toString()
-					.equals(requestContext.request (
-						"mediaContentHash"))
-			) {
-
-				ImChatFailure failureResponse =
-					new ImChatFailure ()
-
-					.reason (
-						"content hash does not match")
-
-					.message (
-						"The specified content hash is invalid.");
-
-				return jsonResponderProvider.get ()
-					.value (failureResponse);
-
-			}
+			notEqual (
+				hash.toString (),
+				requestContext.request (
+					"mediaContentHash"))
+		) {
+			throw new PageNotFoundException ();
+		}
 
 		// create response
 
-		ImChatMediaOriginalJpegSuccess successResponse =
-				new ImChatMediaOriginalJpegSuccess ()
+		return imChatMediaResponderProvider.get ()
 
-				.data (
-					content.getData())
+			.data (
+				content.getData ())
 
-				.mimeType (
-					media.getMediaType()
-						.getMimeType());
-
-		return jsonResponderProvider.get ()
-			.value (successResponse);
+			.contentType (
+				media.getMediaType ().getMimeType ());
 
 	}
 

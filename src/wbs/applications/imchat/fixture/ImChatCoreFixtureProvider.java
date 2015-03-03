@@ -2,7 +2,13 @@ package wbs.applications.imchat.fixture;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.io.FileInputStream;
+
 import javax.inject.Inject;
+
+import lombok.SneakyThrows;
+
+import org.apache.commons.io.IOUtils;
 
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
@@ -29,6 +35,8 @@ import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
 import wbs.platform.currency.model.CurrencyObjectHelper;
+import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuObjectHelper;
 import wbs.platform.menu.model.MenuRec;
@@ -75,6 +83,9 @@ class ImChatCoreFixtureProvider
 	ImChatTemplateObjectHelper imChatTemplateHelper;
 
 	@Inject
+	MediaLogic mediaLogic;
+
+	@Inject
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@Inject
@@ -89,6 +100,7 @@ class ImChatCoreFixtureProvider
 	// implementation
 
 	@Override
+	@SneakyThrows (Exception.class)
 	public
 	void createFixtures () {
 
@@ -236,6 +248,20 @@ class ImChatCoreFixtureProvider
 
 		// im chat profile
 
+		MediaRec dougalMedia =
+			mediaLogic.createMediaFromImage (
+				IOUtils.toByteArray (
+					new FileInputStream ("binaries/test/dougal.jpg")),
+				"image/jpeg",
+				"dougal.jpg");
+
+		MediaRec ermintrudeMedia =
+			mediaLogic.createMediaFromImage (
+				IOUtils.toByteArray (
+					new FileInputStream ("binaries/test/ermintrude.jpg")),
+				"image/jpeg",
+				"ermintrude.jpg");
+
 		for (
 			int index = 0;
 			index < 10;
@@ -274,7 +300,9 @@ class ImChatCoreFixtureProvider
 						index))
 
 				.setProfileImage (
-					null)
+					index % 2 == 0
+						? dougalMedia
+						: ermintrudeMedia)
 
 			);
 
