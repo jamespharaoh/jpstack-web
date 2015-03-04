@@ -61,7 +61,46 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 	@Override
 	public
-	void renderTableCell (
+	void renderTableCellList (
+			PrintWriter out,
+			Container container,
+			Interface interfaceValue,
+			boolean link) {
+
+		// work out root
+
+		Record<?> root;
+
+		if (rootFieldName != null) {
+
+			root =
+				(Record<?>)
+				BeanLogic.getProperty (
+					container,
+					rootFieldName);
+
+		} else {
+
+			root = null;
+
+		}
+
+		// write table cell
+
+		out.write (
+			stringFormat (
+				"%s\n",
+				objectManager.tdForObject (
+					interfaceValue,
+					root,
+					true,
+					link)));
+
+	}
+
+	@Override
+	public
+	void renderTableCellProperties (
 			PrintWriter out,
 			Container container,
 			Interface interfaceValue,
@@ -112,7 +151,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 				"<th>%h</th>\n",
 				label ()));
 
-		renderTableCell (
+		renderTableCellProperties (
 			out,
 			container,
 			interfaceValue,

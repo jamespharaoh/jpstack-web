@@ -8,7 +8,13 @@ interface FormFieldRenderer<Container,Interface> {
 
 	boolean fileUpload ();
 
-	void renderTableCell (
+	void renderTableCellProperties (
+			PrintWriter out,
+			Container container,
+			Interface interfaceValue,
+			boolean link);
+
+	void renderTableCellList (
 			PrintWriter out,
 			Container container,
 			Interface interfaceValue,

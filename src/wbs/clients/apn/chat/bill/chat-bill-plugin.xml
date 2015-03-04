@@ -1,0 +1,38 @@
+<plugin
+	name="chat-bill"
+	package="wbs.clients.apn.chat.bill">
+
+	<sql-scripts>
+		<sql-data name="chat-bill-data"/>
+	</sql-scripts>
+
+	<models>
+		<custom-type name="chatUserCreditMode"/>
+		<model name="chatDailyLimitLog"/>
+		<model name="chatNetwork"/>
+		<model name="chatRoute"/>
+		<model name="chatRouteNetwork"/>
+		<model name="chatUserBillLog"/>
+		<model name="chatUserCreditLimitLog"/>
+		<model name="chatUserCredit"/>
+		<model name="chatUserSpend"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.ChatCreditLogicImpl"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.ChatBillDeliveryHandler"/>
+		<bean class="daemon.ChatCheckCreditCommand"/>
+		<bean class="daemon.ChatCreditDaemon"/>
+		<bean class="daemon.ChatSpendWarningDaemon"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-network"/>
+		<console-module name="chat-route"/>
+		<console-module name="chat-route-network"/>
+	</console-modules>
+
+</plugin>

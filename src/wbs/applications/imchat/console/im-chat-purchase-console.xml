@@ -1,0 +1,92 @@
+<console-module
+	name="im-chat-purchase">
+
+	<console-helper-provider
+		object-name="imChatPurchase"
+		view-delegate-field="grandparent"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="imChatPurchase.manage"
+			delegate="imChatCustomer.imChat"
+			priv="manage"/>
+
+		<context-stuff
+			name="imChatPurchaseName"
+			field="index"/>
+
+		<context-stuff
+			name="imChatCustomerId"
+			delegate="imChatCustomer"
+			field="id"/>
+
+		<run-post-processor
+			name="imChatCustomer"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="imChatPurchase"
+		object-name="imChatPurchase">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="imChatPurchase">
+
+		<parent-field/>
+		<index-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="imChatPurchase">
+
+		<id-field/>
+		<parent-field/>
+		<index-field/>
+
+		<object-field
+			name="imChatPricePoint"
+			finder="imChatPricePoint"/>
+
+		<currency-field
+			name="price"
+			currency="imChatCustomer.imChat.currency"/>
+
+		<currency-field
+			name="value"
+			currency="imChatCustomer.imChat.currency"/>
+
+		<timestamp-field
+			name="createdTime"/>
+
+		<timestamp-field
+			name="completedTime"/>
+
+		<timestamp-field
+			name="cancelledTime"/>
+
+		<object-field
+			name="paypalPayment"
+			finder="paypalPayment"/>
+
+	</field-set>
+
+</console-module>

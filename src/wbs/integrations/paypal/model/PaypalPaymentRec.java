@@ -1,9 +1,5 @@
 package wbs.integrations.paypal.model;
 
-import java.util.Random;
-
-import javax.inject.Inject;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -17,6 +13,7 @@ import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
+import wbs.integrations.paypal.model.PaypalPaymentRec;
 
 @Accessors (chain = true)
 @Data
@@ -37,14 +34,29 @@ class PaypalPaymentRec
 	@ParentField
 	PaypalAccountRec paypalAccount;
 
+	// TODO ?
+
+	// details
+
 	@SimpleField
 	Integer value;
+
+	@SimpleField (
+		nullable = true)
+	String paypalToken;
+
+	@SimpleField (
+		nullable = true)
+	String paypalPayerId;
+
+	// state
 
 	@SimpleField
 	PaypalPaymentState state;
 
-	@SimpleField
-	String token;
+	@ReferenceField(
+			nullable = true)
+	PaypalPaymentRec paypalPayment;
 
 	// compare to
 
@@ -63,65 +75,6 @@ class PaypalPaymentRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public
-	interface PaypalPaymentDaoMethods {
-
-		PaypalPaymentRec findByToken (
-				String token);
-
-	}
-
-	// object helper methods
-
-	public
-	interface PaypalPaymentObjectHelperMethods {
-
-		String generateToken ();
-
-	}
-
-	// object helper implementation
-
-	public static
-	class PaypalPaymentObjectHelperImplementation
-		implements PaypalPaymentObjectHelperMethods {
-
-		// dependencies
-
-		@Inject
-		Random random;
-
-		// implementation
-
-		@Override
-		public
-		String generateToken () {
-
-			StringBuilder stringBuilder =
-				new StringBuilder ();
-
-			for (int i = 0; i < 20; i ++) {
-
-				stringBuilder.append (
-					chars.charAt (
-						random.nextInt (
-							chars.length ())));
-
-			}
-
-			return stringBuilder.toString ();
-
-		}
-
-		// data
-
-		public static
-		String chars = "abcdefghijklmnopqrstuvwxyz0123456789";
 
 	}
 

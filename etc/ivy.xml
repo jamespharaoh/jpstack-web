@@ -137,13 +137,6 @@
 			name="json-simple"
 			rev="1.1.1"/>
 
-		<!-- jython -->
-
-		<dependency
-			org="jython"
-			name="jython"
-			rev="2.1"/>
-
 		<!-- log4j -->
 
 		<dependency
@@ -181,35 +174,6 @@
 			org="postgresql"
 			name="postgresql"
 			rev="9.1-901.jdbc4"/>
-
-		<!-- spring -->
-
-		<!--
-		<dependency
-			org="org.springframework"
-			name="spring-context"
-			rev="3.2.4.RELEASE"/>
-
-		<dependency
-			org="org.springframework"
-			name="spring-jdbc"
-			rev="3.2.4.RELEASE"/>
-
-		<dependency
-			org="org.springframework"
-			name="spring-orm"
-			rev="3.2.4.RELEASE"/>
-
-		<dependency
-			org="org.springframework"
-			name="spring-web"
-			rev="3.2.4.RELEASE"/>
-
-		<dependency
-			org="com.caucho"
-			name="hessian"
-			rev="4.0.33"/>
-		-->
 
 		<!-- usertype -->
 

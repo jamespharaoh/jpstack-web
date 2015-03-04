@@ -1,0 +1,11 @@
+<plugin
+	name="chat-adult"
+	package="wbs.clients.apn.chat.adult">
+
+	<layer name="daemon">
+		<bean class="daemon.ChatAdultDeliveryHandler"/>
+		<bean class="daemon.ChatAdultExpiryDaemon"/>
+		<bean class="daemon.ChatAdultVerifyCommand"/>
+	</layer>
+
+</plugin>

@@ -290,7 +290,7 @@ class ObjectSearchResultsPart
 								object))),
 					object == currentObject));
 
-			formFieldLogic.outputTableCells (
+			formFieldLogic.outputTableCellsList (
 				out,
 				formFieldSet,
 				object,

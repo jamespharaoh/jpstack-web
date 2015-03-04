@@ -1,0 +1,61 @@
+<console-module
+	name="im-chat-message-pending">
+
+	<object-context
+		name="imChatMessage.pending"
+		bean-name="imChatMessagePending"
+		object-name="imChatMessage">
+
+		<object>
+
+			<context-tab-responder-page
+				name="history"/>
+
+			<context-action-page
+				name="form"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="customerFields"
+		object-name="imChatCustomer">
+
+		<code-field/>
+
+		<text-field
+		    name="email"/>
+
+		<integer-field
+			name="numConversations"/>
+
+		<currency-field
+			name="balance"
+			currency="imChat.currency"/>
+
+	</field-set>
+
+	<field-set
+		name="messageFields"
+		object-name="imChatMessage">
+
+		<object-field
+			name="senderUser"
+			label="User"
+			finder="user"/>
+
+		<text-field
+		    name="messageText"
+		    label="Message"/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<currency-field
+			name="price"
+			currency="imChatConversation.imChatCustomer.imChat.currency"/>
+
+	</field-set>
+
+</console-module>

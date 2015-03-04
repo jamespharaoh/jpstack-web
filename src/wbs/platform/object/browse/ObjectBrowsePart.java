@@ -262,7 +262,7 @@ class ObjectBrowsePart
 					targetUrl,
 					isCurrentObject));
 
-			formFieldLogic.outputTableCells (
+			formFieldLogic.outputTableCellsList (
 				out,
 				formFieldSet,
 				object,

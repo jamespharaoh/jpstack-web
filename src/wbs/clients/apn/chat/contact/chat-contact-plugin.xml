@@ -1,0 +1,50 @@
+<plugin
+	name="chat-contact"
+	package="wbs.clients.apn.chat.contact">
+
+	<sql-scripts>
+		<sql-schema name="chat-message"/>
+	</sql-scripts>
+
+	<models>
+		<custom-type name="chatMessageMethod"/>
+		<custom-type name="chatMessageStatus"/>
+		<custom-type name="chatUserInitiationReason"/>
+		<model name="chatBlock"/>
+		<model name="chatContact"/>
+		<model name="chatContactNote"/>
+		<model name="chatMessage"/>
+		<model name="chatMonitorInbox"/>
+		<model name="chatUserInitiationLog"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.ChatMessageLogicImpl"/>
+		<bean class="logic.ChatSendLogicImpl"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.ChatMessagePendingFormAction"/>
+		<bean class="console.ChatMessagePendingFormResponder"/>
+		<bean class="console.ChatMessageQueueConsolePlugin"/>
+		<bean class="console.ChatMonitorInboxAddNoteAction"/>
+		<bean class="console.ChatMonitorInboxAlarmAction"/>
+		<bean class="console.ChatMonitorInboxNamedNoteUpdateAction"/>
+		<bean class="console.ChatMonitorInboxFormAction"/>
+		<bean class="console.ChatMonitorInboxFormResponder"/>
+		<bean class="console.ChatMonitorInboxQueueConsolePlugin"/>
+		<bean class="console.ChatMonitorInboxSummaryPart"/>
+		<bean class="console.ChatMonitorInboxUpdateNoteAction"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.ChatChatCommand"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-message"/>
+		<console-module name="chat-monitor-inbox"/>
+		<console-module name="chat-message-pending"/>
+	</console-modules>
+
+</plugin>

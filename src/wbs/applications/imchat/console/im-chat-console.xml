@@ -1,0 +1,203 @@
+<console-module
+	name="im-chat">
+
+	<console-helper-provider
+		object-name="imChat">
+
+		<context-stuff
+			name="imChatName"
+			field="name"/>
+
+		<context-stuff
+			name="sliceId"
+			delegate="slice"
+			field="id"/>
+
+		<priv-key
+			name="imChat.manage"
+			priv="manage"/>
+
+		<run-post-processor
+			name="slice"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="imChat"
+		object-name="imChat">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<section
+				name="settings"
+				label="Settings">
+
+				<object-settings-page
+					fields="settings"
+					short-name="general"/>
+
+				<context-link
+					name="template"
+					link="imChatTemplate"
+					label="Templates"
+					priv-key="imChat.manage"/>
+
+				<context-link
+					name="price-point"
+					link="imChatPricePoint"
+					label="Price Points"
+					priv-key="imChat.manage"/>
+
+				<context-link
+					name="profile"
+					link="imChatProfile"
+					label="Profiles"
+					priv-key="imChat.manage"/>
+
+			</section>
+
+			<section
+				name="admin"
+				label="Admin">
+
+				<context-link
+					name="customer"
+					link="imChatCustomer"
+					label="Customers"
+					priv-key="imChat.manage"/>
+
+			</section>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="imChat">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="imChat">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="imChat">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<object-field
+			name="currency"
+			finder="currency"/>
+
+		<seconds-field
+			name="preferredQueueTime"/>
+
+		<object-field
+			name="paypalAccount"
+			finder="paypalAccount"/>
+
+		<currency-field
+			name="messageCost"
+			currency="currency"/>
+
+		<integer-field
+			name="freeMessageLimit"/>
+
+		<integer-field
+			name="billMessageMinChars"/>
+
+		<integer-field
+			name="billMessageMaxChars"/>
+
+		<integer-field
+			name="freeMessageMinChars"/>
+
+		<integer-field
+			name="freeMessageMaxChars"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="imChat">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<object-field
+			name="currency"
+			finder="currency"
+			nullable="yes"/>
+
+		<seconds-field
+			name="preferredQueueTime"
+			nullable="yes"/>
+
+		<object-field
+			name="paypalAccount"
+			finder="paypalAccount"
+			nullable="yes"/>
+
+		<currency-field
+			name="messageCost"
+			currency="currency"
+			nullable="yes"/>
+
+		<integer-field
+			name="freeMessageLimit"
+			nullable="yes"/>
+
+		<integer-field
+			name="billMessageMinChars"
+			nullable="yes"/>
+
+		<integer-field
+			name="billMessageMaxChars"
+			nullable="yes"/>
+
+		<integer-field
+			name="freeMessageMinChars"
+			nullable="yes"/>
+
+		<integer-field
+			name="freeMessageMaxChars"
+			nullable="yes"/>
+
+	</field-set>
+
+</console-module>

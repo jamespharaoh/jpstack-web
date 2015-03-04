@@ -231,9 +231,8 @@ class FormFieldLogic {
 
 	}
 
-
 	public
-	void outputTableCells (
+	void outputTableCellsList (
 			PrintWriter out,
 			FormFieldSet formFieldSet,
 			Object object,
@@ -244,7 +243,7 @@ class FormFieldLogic {
 				: formFieldSet.formFields ()
 		) {
 
-			formField.renderTableCell (
+			formField.renderTableCellList (
 				out,
 				object,
 				links);
@@ -269,7 +268,7 @@ class FormFieldLogic {
 					"<th>%h</th>\n",
 					formField.label ()));
 
-			formField.renderTableCell (
+			formField.renderTableCellProperties (
 				out,
 				object,
 				true);

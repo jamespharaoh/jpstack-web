@@ -90,6 +90,7 @@
 			nullable="yes"/>
 
 		<text-field
+<<<<<<< HEAD:src/wbs/integrations/paypal/console/paypal-account-console.xml
 			name="signature"
 			nullable="yes"/>
 
@@ -119,6 +120,39 @@
 
 		<text-field
 			name="serviceEndpointInvoice"
+||||||| merged common ancestors
+			name="clientSecret"
+=======
+			name="signature"
+			nullable="yes"/>
+
+		<text-field
+			name="appId"
+			nullable="yes"/>
+
+		<text-field
+			name="serviceEndpointPaypalApi"
+			nullable="yes"/>
+
+		<text-field
+			name="serviceEndpointPaypalApiAa"
+			nullable="yes"/>
+
+		<text-field
+			name="serviceEndpointPermissions"
+			nullable="yes"/>
+
+		<text-field
+			name="serviceEndpointAdaptivePayments"
+			nullable="yes"/>
+
+		<text-field
+			name="serviceEndpointAdaptiveAccounts"
+			nullable="yes"/>
+
+		<text-field
+			name="serviceEndpointInvoice"
+>>>>>>> master:src/wbs/integrations/paypal/console/paypal-account-console.xml
 			nullable="yes"/>
 
 	</field-set>
@@ -133,6 +167,7 @@
 		<deleted-field/>
 
 		<text-field
+<<<<<<< HEAD:src/wbs/integrations/paypal/console/paypal-account-console.xml
 			name="username"
 			nullable="yes"/>
 
@@ -162,6 +197,39 @@
 
 		<text-field
 			name="serviceEndpointAdaptivePayments"
+||||||| merged common ancestors
+			name="serviceEndpoint"
+=======
+			name="username"
+			nullable="yes"/>
+
+		<text-field
+			name="password"
+			nullable="yes"/>
+
+		<text-field
+			name="signature"
+			nullable="yes"/>
+
+		<text-field
+			name="appId"
+			nullable="yes"/>
+
+		<text-field
+			name="serviceEndpointPaypalApi"
+			nullable="yes"/>
+
+		<text-field
+			name="serviceEndpointPaypalApiAa"
+			nullable="yes"/>
+
+		<text-field
+			name="serviceEndpointPermissions"
+			nullable="yes"/>
+
+		<text-field
+			name="serviceEndpointAdaptivePayments"
+>>>>>>> master:src/wbs/integrations/paypal/console/paypal-account-console.xml
 			nullable="yes"/>
 
 		<text-field

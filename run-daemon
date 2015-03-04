@@ -16,7 +16,7 @@ cd "$BASEDIR"
 
 CLASSPATH="$BASEDIR/work/bin"
 
-for filename in binaries/libraries/*.jar; do
+for filename in lib/*.jar; do
 	CLASSPATH="$CLASSPATH:$filename";
 done
 

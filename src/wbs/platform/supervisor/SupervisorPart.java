@@ -247,7 +247,10 @@ class SupervisorPart
 			statsConsoleLogic.createStatsPeriod (
 				StatsGranularity.hour,
 				startTime,
-				endTime);
+				endTime,
+				ifNull (
+					supervisorConfig.spec ().offsetHours (),
+					0));
 
 	}
 

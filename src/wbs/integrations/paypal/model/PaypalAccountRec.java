@@ -62,6 +62,7 @@ class PaypalAccountRec
 
 	@SimpleField (
 		nullable = true)
+<<<<<<< HEAD:src/wbs/integrations/paypal/model/PaypalAccountRec.java
 	String signature;
 
 	@SimpleField (
@@ -91,6 +92,39 @@ class PaypalAccountRec
 	@SimpleField (
 		nullable = true)
 	String serviceEndpointInvoice;
+||||||| merged common ancestors
+	String clientSecret;
+=======
+	String signature;
+
+	@SimpleField (
+		nullable = true)
+	String appId;
+
+	@SimpleField (
+		nullable = true)
+	String serviceEndpointPaypalApi;
+
+	@SimpleField (
+		nullable = true)
+	String serviceEndpointPaypalApiAa;
+
+	@SimpleField (
+		nullable = true)
+	String serviceEndpointPermissions;
+
+	@SimpleField (
+		nullable = true)
+	String serviceEndpointAdaptivePayments;
+
+	@SimpleField (
+		nullable = true)
+	String serviceEndpointAdaptiveAccounts;
+
+	@SimpleField (
+		nullable = true)
+	String serviceEndpointInvoice;
+>>>>>>> master:src/wbs/integrations/paypal/model/PaypalAccountRec.java
 
 	// compare to
 

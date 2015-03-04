@@ -21,6 +21,8 @@ class StatsPeriod {
 	Instant startTime;
 	Instant endTime;
 
+	Integer offset;
+
 	List<Instant> steps =
 		new ArrayList<Instant> ();
 

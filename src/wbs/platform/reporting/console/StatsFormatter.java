@@ -5,7 +5,7 @@ interface StatsFormatter {
 
 	String format (
 			Object group,
-			int step,
+			String step,
 			Object value);
 
 	String formatTotal (

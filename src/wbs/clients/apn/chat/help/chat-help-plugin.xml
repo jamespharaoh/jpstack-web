@@ -1,0 +1,38 @@
+<plugin
+	name="chat-help"
+	package="wbs.clients.apn.chat.help">
+
+	<models>
+		<model name="chatHelpLog"/>
+		<model name="chatHelpTemplate"/>
+		<model name="chatHint"/>
+		<model name="chatHintLog"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.ChatHelpLogicImpl"/>
+		<bean class="logic.ChatHelpLogLogicImpl"/>
+		<bean class="logic.ChatHelpTemplateLogicImpl"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.ChatHelpLogPendingFormAction"/>
+		<bean class="console.ChatHelpLogPendingFormResponder"/>
+		<bean class="console.ChatHelpLogPendingMessagesPart"/>
+		<bean class="console.ChatHelpLogPendingSummaryPart"/>
+		<bean class="console.ChatHelpQueueConsolePlugin"/>
+		<bean class="console.ChatHelpTemplateContextBuilder"/>
+		<bean class="console.ChatHelpTemplateContextMetaBuilder"/>
+		<bean class="console.ChatHelpTemplateContextSpec"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.ChatHelpCommand"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-help-log"/>
+		<console-module name="chat-help-template"/>
+	</console-modules>
+
+</plugin>

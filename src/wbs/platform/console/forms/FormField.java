@@ -27,7 +27,12 @@ interface FormField<Container,Generic,Native,Interface> {
 	void init (
 			String fieldSetName);
 
-	void renderTableCell (
+	void renderTableCellList (
+			PrintWriter out,
+			Container object,
+			boolean link);
+
+	void renderTableCellProperties (
 			PrintWriter out,
 			Container object,
 			boolean link);

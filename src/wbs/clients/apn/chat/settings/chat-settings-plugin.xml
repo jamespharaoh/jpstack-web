@@ -1,0 +1,15 @@
+<plugin
+	name="chat-settings"
+	package="wbs.clients.apn.chat.settings">
+
+	<layer name="console">
+		<bean class="console.ChatSettingsMonitorsAction"/>
+		<bean class="console.ChatSettingsMonitorsPart"/>
+		<bean class="console.ChatUserCodeFormFieldSpec"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-settings"/>
+	</console-modules>
+
+</plugin>

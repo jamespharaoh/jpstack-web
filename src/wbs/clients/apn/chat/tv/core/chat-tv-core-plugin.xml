@@ -1,0 +1,40 @@
+<plugin
+	name="chat-tv-core"
+	package="wbs.clients.apn.chat.tv.core">
+
+	<sql-scripts>
+		<sql-data name="chat-tv-data"/>
+	</sql-scripts>
+
+	<models>
+		<enum-type name="chatTvMessageStatus"/>
+		<model name="chatTv"/>
+		<model name="chatTvCarousel"/>
+		<model name="chatTvMessage"/>
+		<model name="chatTvModeration"/>
+		<model name="chatTvOutbox"/>
+		<model name="chatTvPicUploaded"/>
+		<model name="chatTvScheme"/>
+		<model name="chatTvUser"/>
+		<model name="chatTvUserSpend"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.ChatTvLogicImpl"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.ChatTvPostAction"/>
+		<bean class="console.ChatTvPostPart"/>
+		<bean class="console.ChatTvSchemeListPart"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.ChatTvToScreenCommand"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="chat-tv"/>
+	</console-modules>
+
+</plugin>

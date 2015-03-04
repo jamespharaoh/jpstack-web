@@ -1,0 +1,18 @@
+<plugin
+	name="chat-info"
+	package="wbs.clients.apn.chat.user.info">
+
+	<models>
+		<custom-type name="chatUserInfoStatus"/>
+		<model name="chatProfileField"/>
+		<model name="chatProfileFieldValue"/>
+		<model name="chatUserInfo"/>
+		<model name="chatUserName"/>
+		<model name="chatUserProfileField"/>
+	</models>
+
+	<layer name="logic">
+		<bean class="logic.ChatInfoLogicImpl"/>
+	</layer>
+
+</plugin>

@@ -1,9 +1,0 @@
-<plugin
-	name="pyp"
-	package="wbs.platform.pyp">
-
-	<layer name="console">
-		<bean class="console.Pyp"/>
-	</layer>
-
-</plugin>
