@@ -24,8 +24,12 @@ public
 class IntegerStatsFormatter
 	implements StatsFormatter {
 
+	// dependencies
+
 	@Inject
 	ConsoleRequestContext requestContext;
+
+	// properties
 
 	@Getter @Setter
 	String targetBase;
@@ -39,6 +43,8 @@ class IntegerStatsFormatter
 	@Getter @Setter
 	Map<String,String> targetParams =
 		new LinkedHashMap<String,String> ();
+
+	// implementation
 
 	public
 	IntegerStatsFormatter addTargetParam (
@@ -57,7 +63,7 @@ class IntegerStatsFormatter
 	public
 	String format (
 			Object group,
-			int step,
+			String step,
 			Object value) {
 
 		Integer intValue =

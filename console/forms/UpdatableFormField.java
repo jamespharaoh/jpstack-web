@@ -104,7 +104,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 
 	@Override
 	public
-	void renderTableCell (
+	void renderTableCellList (
 			PrintWriter out,
 			Container container,
 			boolean link) {
@@ -122,7 +122,35 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 				container,
 				genericValue);
 
-		renderer.renderTableCell (
+		renderer.renderTableCellList (
+			out,
+			container,
+			interfaceValue,
+			link);
+
+	}
+
+	@Override
+	public
+	void renderTableCellProperties (
+			PrintWriter out,
+			Container container,
+			boolean link) {
+
+		Native nativeValue =
+			accessor.read (
+				container);
+
+		Generic genericValue =
+			nativeMapping.nativeToGeneric (
+				nativeValue);
+
+		Interface interfaceValue =
+			interfaceMapping.genericToInterface (
+				container,
+				genericValue);
+
+		renderer.renderTableCellProperties (
 			out,
 			container,
 			interfaceValue,
