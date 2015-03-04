@@ -61,9 +61,6 @@ class ImChatRec
 
 	// settings
 
-	@ReferenceField
-	PaypalAccountRec paypalAccount;
-
 	@ReferenceField (
 		nullable = true)
 	CurrencyRec currency;

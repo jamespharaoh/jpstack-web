@@ -27,20 +27,6 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-<<<<<<< HEAD:src/wbs/imchat/core/api/ImChatPurchaseHistoryAction.java
-import wbs.imchat.core.model.ImChatCustomerObjectHelper;
-import wbs.imchat.core.model.ImChatCustomerRec;
-import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
-import wbs.imchat.core.model.ImChatPurchaseRec;
-import wbs.imchat.core.model.ImChatSessionObjectHelper;
-import wbs.imchat.core.model.ImChatSessionRec;
-||||||| merged common ancestors
-import wbs.imchat.core.model.ImChatCustomerObjectHelper;
-import wbs.imchat.core.model.ImChatCustomerRec;
-import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
-import wbs.imchat.core.model.ImChatPurchaseRec;
-=======
->>>>>>> master:src/wbs/applications/imchat/api/ImChatPurchaseHistoryAction.java
 import wbs.platform.console.misc.TimeFormatter;
 
 import com.google.common.collect.Lists;

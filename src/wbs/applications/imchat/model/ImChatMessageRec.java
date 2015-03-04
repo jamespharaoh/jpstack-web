@@ -47,12 +47,6 @@ class ImChatMessageRec
 	@SimpleField
 	String messageText;
 
-	@SimpleField
-	String sender;
-
-	@SimpleField
-	String time;
-
 	@ReferenceField (
 		nullable = true)
 	UserRec senderUser;

@@ -1,7 +1,5 @@
 package wbs.applications.imchat.console;
 
-import java.util.Date;
-
 import javax.inject.Inject;
 
 import lombok.Cleanup;
@@ -93,21 +91,13 @@ class ImChatMessagePendingFormAction
 			.setIndex (
 				conversation.getNumMessages ())
 
-<<<<<<< HEAD:src/wbs/imchat/core/console/ImChatMessagePendingFormAction.java
-			.setSender("Operator")
-
-			.setTime(new Date().toString())
-
-||||||| merged common ancestors
-=======
 			.setSenderUser (
 				myUser)
 
 			.setTimestamp (
 				transaction.now ())
 
->>>>>>> master:src/wbs/applications/imchat/console/ImChatMessagePendingFormAction.java
-			.setMessageText (
+				.setMessageText (
 				messageText)
 
 		);

@@ -2,8 +2,6 @@ package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,22 +22,8 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-<<<<<<< HEAD:src/wbs/imchat/core/api/ImChatProfileListAction.java
-import wbs.imchat.core.model.ImChatObjectHelper;
-import wbs.imchat.core.model.ImChatProfileObjectHelper;
-import wbs.imchat.core.model.ImChatProfileRec;
-import wbs.imchat.core.model.ImChatRec;
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaRec;
-||||||| merged common ancestors
-import wbs.imchat.core.model.ImChatObjectHelper;
-import wbs.imchat.core.model.ImChatProfileObjectHelper;
-import wbs.imchat.core.model.ImChatProfileRec;
-import wbs.imchat.core.model.ImChatRec;
-=======
-import wbs.platform.media.model.ContentRec;
-import wbs.platform.media.model.MediaRec;
->>>>>>> master:src/wbs/applications/imchat/api/ImChatProfileListAction.java
 
 @PrototypeComponent ("imChatProfileListAction")
 public

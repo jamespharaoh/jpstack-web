@@ -158,17 +158,9 @@ class ImChatMessageSendAction
 			.setIndex (
 				conversation.getNumMessages ())
 
-<<<<<<< HEAD:src/wbs/imchat/core/api/ImChatMessageSendAction.java
-			.setSender(conversation.getImChatCustomer().getEmail())
-
-			.setTime(new Date().toString())
-
-||||||| merged common ancestors
-=======
 			.setTimestamp (
 				transaction.now ())
 
->>>>>>> master:src/wbs/applications/imchat/api/ImChatMessageSendAction.java
 			.setMessageText (
 				messageSendRequest.messageText ())
 

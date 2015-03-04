@@ -24,20 +24,7 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-<<<<<<< HEAD:src/wbs/imchat/core/api/ImChatForgotPasswordAction.java
-import wbs.imchat.core.model.ImChatCustomerObjectHelper;
-import wbs.imchat.core.model.ImChatCustomerRec;
-import wbs.imchat.core.model.ImChatObjectHelper;
-import wbs.imchat.core.model.ImChatRec;
 import wbs.platform.email.logic.EmailLogic;
-||||||| merged common ancestors
-import wbs.imchat.core.model.ImChatCustomerObjectHelper;
-import wbs.imchat.core.model.ImChatCustomerRec;
-import wbs.imchat.core.model.ImChatObjectHelper;
-import wbs.imchat.core.model.ImChatRec;
-=======
-import wbs.platform.email.logic.EmailLogic;
->>>>>>> master:src/wbs/applications/imchat/api/ImChatForgotPasswordAction.java
 
 @PrototypeComponent ("imChatForgotPasswordAction")
 public

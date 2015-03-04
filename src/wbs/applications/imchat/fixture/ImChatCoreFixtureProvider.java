@@ -2,14 +2,10 @@ package wbs.applications.imchat.fixture;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-<<<<<<< HEAD:src/wbs/imchat/core/fixture/ImChatCoreFixtureProvider.java
 import java.util.Date;
 
-||||||| merged common ancestors
-=======
 import java.io.FileInputStream;
 
->>>>>>> master:src/wbs/applications/imchat/fixture/ImChatCoreFixtureProvider.java
 import javax.inject.Inject;
 
 import lombok.SneakyThrows;
@@ -39,45 +35,8 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
-<<<<<<< HEAD:src/wbs/imchat/core/fixture/ImChatCoreFixtureProvider.java
-import wbs.imchat.core.model.ImChatConversationObjectHelper;
-import wbs.imchat.core.model.ImChatConversationRec;
-import wbs.imchat.core.model.ImChatCustomerObjectHelper;
-import wbs.imchat.core.model.ImChatCustomerRec;
-import wbs.imchat.core.model.ImChatMessageObjectHelper;
-import wbs.imchat.core.model.ImChatMessageRec;
-import wbs.imchat.core.model.ImChatObjectHelper;
-import wbs.imchat.core.model.ImChatPricePointObjectHelper;
-import wbs.imchat.core.model.ImChatPricePointRec;
-import wbs.imchat.core.model.ImChatProfileObjectHelper;
-import wbs.imchat.core.model.ImChatProfileRec;
-import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
-import wbs.imchat.core.model.ImChatPurchaseRec;
-import wbs.imchat.core.model.ImChatRec;
-import wbs.imchat.core.model.ImChatSessionObjectHelper;
-import wbs.imchat.core.model.ImChatSessionRec;
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
 import wbs.integrations.paypal.model.PaypalAccountRec;
-||||||| merged common ancestors
-import wbs.imchat.core.model.ImChatConversationObjectHelper;
-import wbs.imchat.core.model.ImChatConversationRec;
-import wbs.imchat.core.model.ImChatCustomerObjectHelper;
-import wbs.imchat.core.model.ImChatCustomerRec;
-import wbs.imchat.core.model.ImChatMessageObjectHelper;
-import wbs.imchat.core.model.ImChatMessageRec;
-import wbs.imchat.core.model.ImChatObjectHelper;
-import wbs.imchat.core.model.ImChatPricePointObjectHelper;
-import wbs.imchat.core.model.ImChatPricePointRec;
-import wbs.imchat.core.model.ImChatProfileObjectHelper;
-import wbs.imchat.core.model.ImChatProfileRec;
-import wbs.imchat.core.model.ImChatPurchaseObjectHelper;
-import wbs.imchat.core.model.ImChatPurchaseRec;
-import wbs.imchat.core.model.ImChatRec;
-import wbs.imchat.core.model.ImChatSessionObjectHelper;
-import wbs.imchat.core.model.ImChatSessionRec;
-=======
-import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
->>>>>>> master:src/wbs/applications/imchat/fixture/ImChatCoreFixtureProvider.java
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
@@ -95,9 +54,6 @@ class ImChatCoreFixtureProvider
 
 	@Inject
 	CurrencyObjectHelper currencyHelper;
-
-	@Inject
-	PaypalAccountObjectHelper paypalAccountHelper;
 
 	@Inject
 	Database database;
@@ -215,18 +171,12 @@ class ImChatCoreFixtureProvider
 			.setDescription (
 				"Test IM chat")
 
-<<<<<<< HEAD:src/wbs/imchat/core/fixture/ImChatCoreFixtureProvider.java
-			.setPaypalAccount (paypalAccount)
-
-||||||| merged common ancestors
-=======
 			.setPaypalAccount (
 				paypalAccountHelper.findByCode (
 					GlobalId.root,
 					"test",
 					"wbs_sandbox"))
 
->>>>>>> master:src/wbs/applications/imchat/fixture/ImChatCoreFixtureProvider.java
 			.setCurrency (
 				currencyHelper.findByCode (
 					GlobalId.root,
@@ -391,17 +341,10 @@ class ImChatCoreFixtureProvider
 						"Test IM chat profile %s",
 						index))
 
-<<<<<<< HEAD:src/wbs/imchat/core/fixture/ImChatCoreFixtureProvider.java
-				.setProfileImage(null)
-
-||||||| merged common ancestors
-=======
 				.setProfileImage (
 					index % 2 == 0
 						? dougalMedia
 						: ermintrudeMedia)
-
->>>>>>> master:src/wbs/applications/imchat/fixture/ImChatCoreFixtureProvider.java
 			);
 
 		}
@@ -496,15 +439,9 @@ class ImChatCoreFixtureProvider
 			.setCreatedTime (
 				transaction.now ())
 
-<<<<<<< HEAD:src/wbs/imchat/core/fixture/ImChatCoreFixtureProvider.java
-			.setPaypalPayment(null)
-
-||||||| merged common ancestors
-=======
 			.setPaypalPayment (
 				null)
 
->>>>>>> master:src/wbs/applications/imchat/fixture/ImChatCoreFixtureProvider.java
 		);
 
 		imChatCustomer
@@ -526,17 +463,9 @@ class ImChatCoreFixtureProvider
 			.setMessageText (
 				"Text message.")
 
-<<<<<<< HEAD:src/wbs/imchat/core/fixture/ImChatCoreFixtureProvider.java
-			.setSender("Test sender")
-
-			.setTime(new Date().toString())
-
-||||||| merged common ancestors
-=======
 			.setTimestamp (
 				transaction.now ())
 
->>>>>>> master:src/wbs/applications/imchat/fixture/ImChatCoreFixtureProvider.java
 			.setQueueItem (
 				null)
 

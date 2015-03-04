@@ -184,8 +184,6 @@
       <fileset dir="src/wbs/clients/apn/chat/user/join/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/user/pending/console/files"/>
       <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
-      <fileset dir="src/wbs/imchat/core/console/files"/>
-      <fileset dir="src/wbs/paypal/console/files"/>
       <fileset dir="src/wbs/applications/imchat/console/files"/>
       <fileset dir="src/wbs/wallet/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
@@ -352,8 +350,6 @@
       <fileset dir="src/wbs/clients/apn/chat/user/join/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/user/pending/api/files"/>
       <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
-      <fileset dir="src/wbs/imchat/core/api/files"/>
-      <fileset dir="src/wbs/paypal/api/files"/>
       <fileset dir="src/wbs/applications/imchat/api/files"/>
       <fileset dir="src/wbs/wallet/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
@@ -554,8 +550,6 @@
       <fileset dir="src/wbs/clients/apn/chat/user/join/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/user/pending/console/files"/>
       <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
-      <fileset dir="src/wbs/imchat/core/console/files"/>
-      <fileset dir="src/wbs/paypal/console/files"/>
       <fileset dir="src/wbs/applications/imchat/console/files"/>
       <fileset dir="src/wbs/wallet/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
@@ -722,8 +716,6 @@
       <fileset dir="src/wbs/clients/apn/chat/user/join/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/user/pending/api/files"/>
       <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
-      <fileset dir="src/wbs/imchat/core/api/files"/>
-      <fileset dir="src/wbs/paypal/api/files"/>
       <fileset dir="src/wbs/applications/imchat/api/files"/>
       <fileset dir="src/wbs/wallet/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
@@ -923,12 +915,6 @@
       <script name="src/wbs/smsapps/photograbber/model/photo-grabber-data.sql"/>
       <script name="src/wbs/smsapps/subscription/model/subscription-data.sql"/>
       <script name="src/wbs/smsapps/ticketer/model/ticketer-data.sql"/>
-      <script name="src/wbs/apn/chat/core/model/chat-data.sql"/>
-      <script name="src/wbs/apn/chat/affiliate/model/chat-affiliate-data.sql"/>
-      <script name="src/wbs/apn/chat/bill/model/chat-bill-data.sql"/>
-      <script name="src/wbs/apn/chat/user/image/model/chat-user-image-data.sql"/>
-      <script name="src/wbs/imchat/core/model/im-chat-core-data.sql"/>
-      <script name="src/wbs/paypal/model/paypal-data.sql"/>
       <script name="src/wbs/clients/apn/chat/core/model/chat-data.sql"/>
       <script name="src/wbs/clients/apn/chat/affiliate/model/chat-affiliate-data.sql"/>
       <script name="src/wbs/clients/apn/chat/bill/model/chat-bill-data.sql"/>
