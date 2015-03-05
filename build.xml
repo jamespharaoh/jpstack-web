@@ -186,6 +186,7 @@
       <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
       <fileset dir="src/wbs/applications/imchat/console/files"/>
       <fileset dir="src/wbs/wallet/console/files"/>
+      <fileset dir="src/wbs/ticket/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
@@ -352,6 +353,7 @@
       <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
       <fileset dir="src/wbs/applications/imchat/api/files"/>
       <fileset dir="src/wbs/wallet/api/files"/>
+      <fileset dir="src/wbs/ticket/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
@@ -552,6 +554,7 @@
       <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
       <fileset dir="src/wbs/applications/imchat/console/files"/>
       <fileset dir="src/wbs/wallet/console/files"/>
+      <fileset dir="src/wbs/ticket/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
@@ -718,6 +721,7 @@
       <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
       <fileset dir="src/wbs/applications/imchat/api/files"/>
       <fileset dir="src/wbs/wallet/api/files"/>
+      <fileset dir="src/wbs/ticket/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
@@ -921,6 +925,7 @@
       <script name="src/wbs/clients/apn/chat/user/image/model/chat-user-image-data.sql"/>
       <script name="src/wbs/applications/imchat/model/im-chat-core-data.sql"/>
       <script name="src/wbs/wallet/model/wallet-data.sql"/>
+      <script name="src/wbs/ticket/model/ticket-data.sql"/>
       <script name="src/wbs/integrations/broadcastsystems/model/broadcast-systems-data.sql"/>
       <script name="src/wbs/integrations/dialogue/model/dialogue-data.sql"/>
       <script name="src/wbs/integrations/digitalselect/model/digital-select-data.sql"/>

@@ -554,6 +554,10 @@ i		<plugin
 		<plugin
 			name="wallet"
 			package="wbs.services.wallet"/>
+			
+		<plugin
+			name="ticket"
+			package="wbs.services.ticket"/>
 
 		<!-- integrations -->
 
