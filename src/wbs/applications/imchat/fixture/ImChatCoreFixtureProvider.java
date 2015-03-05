@@ -2,8 +2,6 @@ package wbs.applications.imchat.fixture;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Date;
-
 import java.io.FileInputStream;
 
 import javax.inject.Inject;
@@ -131,8 +129,7 @@ class ImChatCoreFixtureProvider
 
 		);
 
-		PaypalAccountRec paypalAccount =
-			paypalAccountHelper.insert (
+		paypalAccountHelper.insert (
 
 			new PaypalAccountRec ()
 

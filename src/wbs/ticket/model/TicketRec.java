@@ -45,11 +45,6 @@ public class TicketRec
 
 	// details
 	
-	@CollectionField (
-			orderBy = "index")
-		Set<TicketNoteRec> ticketNotes =
-			new TreeSet<TicketNoteRec> ();
-	
 	@SimpleField (
 			nullable = true)
 	TicketStateRec ticketState;
@@ -58,10 +53,23 @@ public class TicketRec
 			nullable = true)
 	Instant nextActionDate;
 	
+	@CollectionField (
+			orderBy = "index")
+		Set<TicketNoteRec> ticketNotes =
+			new TreeSet<TicketNoteRec> ();
+	
+	@CollectionField (
+			orderBy = "index")
+		Set<TicketFieldRec> ticketFields =
+			new TreeSet<TicketFieldRec> ();
+	
 	// statistics
 
 	@SimpleField
 	Integer numNotes = 0;
+	
+	@SimpleField
+	Integer numFields = 0;
 	
 	// object helper methods
 	

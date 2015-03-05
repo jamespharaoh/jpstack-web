@@ -1,14 +1,13 @@
 package wbs.ticket.model;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
-import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.GeneratedIdField;
+import wbs.framework.entity.annotations.IndexField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
@@ -19,37 +18,45 @@ import wbs.framework.record.Record;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public class TicketStateRec
-	implements CommonRecord<TicketStateRec> {
-		
+public class TicketFieldRec 
+	implements CommonRecord<TicketFieldRec> {
+	
 	// id
 	
 	@GeneratedIdField
 	Integer id;
 	
-	@CodeField
-	String code;
+	@IndexField (
+		counter = "numFields")
+	Integer index;
 	
 	// details
 	
 	@SimpleField
-	String state;
+	String type;
+	
+	@SimpleField (
+			nullable = true)
+	String objectType;
+	
+	@SimpleField
+	boolean required;
 	
 	// compare to
 	
 	@Override
 	public
 	int compareTo (
-			Record<TicketStateRec> otherRecord) {
+			Record<TicketFieldRec> otherRecord) {
 	
-		TicketStateRec other =
-			(TicketStateRec) otherRecord;
+		TicketFieldRec other =
+			(TicketFieldRec) otherRecord;
 	
 		return new CompareToBuilder ()
 	
 			.append (
-				getCode (),
-				other.getCode ())
+				getIndex (),
+				other.getIndex ())
 	
 			.toComparison ();
 	

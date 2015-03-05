@@ -1,7 +1,6 @@
 package wbs.applications.imchat.api;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
