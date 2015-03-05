@@ -1,0 +1,30 @@
+<plugin
+	name="ticket"
+	package="wbs.ticket">
+
+	<plugin-dependencies>
+		<plugin-dependency name="sms-apps-common"/>
+		<plugin-dependency name="scaffold"/>
+	</plugin-dependencies>
+
+	<sql-scripts>
+		<sql-data name="ticket-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="ticketManager"/>
+		<model name="ticket"/>
+		<model name="ticketNote"/>
+	</models>
+
+	<fixtures>
+		<fixture name="ticket"/>
+	</fixtures>
+
+	<console-modules>
+		<console-module name="ticket-manager"/>
+		<console-module name="ticket"/>
+		<console-module name="ticket-note"/>
+	</console-modules>
+
+</plugin>
