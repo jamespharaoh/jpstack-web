@@ -7,7 +7,10 @@
 	</sql-scripts>
 
 	<models>
+		<enum-type name="chatBroadcastNumberState"/>
+		<enum-type name="chatBroadcastState"/>
 		<model name="chatBroadcast"/>
+		<model name="chatBroadcastNumber"/>
 	</models>
 
 	<layer name="console">
@@ -15,6 +18,10 @@
 		<bean class="console.ChatBroadcastSendAction"/>
 		<bean class="console.ChatBroadcastSendPart"/>
 		<bean class="console.ChatBroadcastVerifyPart"/>
+	</layer>
+
+	<layer name="logic">
+		<bean class="logic.ChatBroadcastLogicImplementation"/>
 	</layer>
 
 	<console-modules>

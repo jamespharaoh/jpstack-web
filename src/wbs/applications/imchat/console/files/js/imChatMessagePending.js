@@ -37,7 +37,7 @@ $(function () {
 
 			updateCharCount ();
 
-		});
+		};
 
 		var updateCharCount = function () {
 

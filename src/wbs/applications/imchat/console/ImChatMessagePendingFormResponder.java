@@ -228,6 +228,9 @@ class ImChatMessagePendingFormResponder
 
 	void doBilled () {
 
+		if (customer.getBalance () < imChat.getMessageCost ())
+			return;
+
 		printFormat (
 			"<tr",
 			" class=\"template\"",
@@ -243,7 +246,7 @@ class ImChatMessagePendingFormResponder
 			" id=\"radio-template-bill\"",
 			" class=\"template-radio\"",
 			" type=\"radio\"",
-			" name=\"radio-template\"",
+			" name=\"template\"",
 			" value=\"bill\"",
 			"></td>\n");
 
@@ -301,7 +304,7 @@ class ImChatMessagePendingFormResponder
 			" id=\"radio-template-free\"",
 			" class=\"template-radio\"",
 			" type=\"radio\"",
-			" name=\"radio-template\"",
+			" name=\"template\"",
 			" value=\"free\"",
 			"></td>\n");
 
@@ -356,7 +359,7 @@ class ImChatMessagePendingFormResponder
 			template.getId (),
 			" class=\"template-radio\"",
 			" type=\"radio\"",
-			" name=\"radio-template\"",
+			" name=\"template\"",
 			" value=\"%h\"",
 			template.getId (),
 			"></td>\n");

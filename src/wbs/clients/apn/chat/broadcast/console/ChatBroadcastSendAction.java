@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.broadcast.console;
 
 import static wbs.framework.utils.etc.Misc.allOf;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -15,17 +14,17 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
-import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
+import wbs.clients.apn.chat.broadcast.logic.ChatBroadcastLogic;
+import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberObjectHelper;
+import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberRec;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastRec;
+import wbs.clients.apn.chat.broadcast.model.ChatBroadcastState;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
-import wbs.clients.apn.chat.contact.model.ChatMessageRec;
-import wbs.clients.apn.chat.contact.model.ChatMessageStatus;
 import wbs.clients.apn.chat.core.daemon.ProfileLogger;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
-import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserDao;
@@ -51,7 +50,6 @@ import wbs.platform.console.param.TimestampToParamChecker;
 import wbs.platform.console.param.YesNoParamChecker;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.service.console.ServiceConsoleHelper;
-import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.model.UserObjectHelper;
@@ -60,6 +58,7 @@ import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.gsm.Gsm;
 import wbs.sms.magicnumber.logic.MagicNumberLogic;
 import wbs.sms.message.batch.logic.BatchLogic;
+import wbs.sms.message.batch.model.BatchObjectHelper;
 import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.batch.model.BatchSubjectRec;
 import wbs.sms.number.core.console.NumberConsoleHelper;
@@ -79,10 +78,19 @@ class ChatBroadcastSendAction
 	// dependencies
 
 	@Inject
+	BatchObjectHelper batchHelper;
+
+	@Inject
 	BatchLogic batchLogic;
 
 	@Inject
 	ChatBroadcastObjectHelper chatBroadcastHelper;
+
+	@Inject
+	ChatBroadcastLogic chatBroadcastLogic;
+
+	@Inject
+	ChatBroadcastNumberObjectHelper chatBroadcastNumberHelper;
 
 	@Inject
 	ChatCreditLogic chatCreditLogic;
@@ -393,7 +401,8 @@ class ChatBroadcastSendAction
 							if (chatUser == null)
 								continue;
 
-							allChatUserIds.add (chatUser.getId ());
+							allChatUserIds.add (
+								chatUser.getId ());
 
 							if (++ loop0 % 128 == 0) {
 								database.flush ();
@@ -434,78 +443,23 @@ class ChatBroadcastSendAction
 						requestContext.canContext ("chat.manage"),
 						(Boolean) params.get ("includeOptedOut"));
 
-				for (Integer chatUserId
-						: allChatUserIds) {
+				for (
+					Integer chatUserId
+						: allChatUserIds
+				) {
 
 					ChatUserRec chatUser =
 						chatUserHelper.find (
 							chatUserId);
 
-					// exclude incomplete users
-
-					if (chatUser.getFirstJoin () == null) {
-
-						removedNumbers ++;
-
-						continue;
-
-					}
-
-					// exclude blocked users, unless operator includes them
-
-					if (chatUser.getBlockAll ()
-							&& ! includeBlocked) {
-
-						removedNumbers ++;
-
-						continue;
-
-					}
-
-					// exclude opted out users, unless operator includes them
-
-					if (chatUser.getBroadcastOptOut ()
-							&& ! includeOptedOut) {
-
-						removedNumbers ++;
-
-						continue;
-
-					}
-
-					// exclude barred users
-
-					if (chatUser.getBarred ()) {
-
-						removedNumbers ++;
-
-						continue;
-
-					}
-
-					// perform a credit check
-
-					ChatCreditCheckResult creditCheckResult =
-						chatCreditLogic.userSpendCreditCheck (
-							chatUser,
-							false,
-							null);
-
 					if (
-						creditCheckResult.failed ()
-						&& creditCheckResult != ChatCreditCheckResult.failedBlocked
+						! chatBroadcastLogic.canSendToUser (
+							chatUser,
+							includeBlocked,
+							includeOptedOut)
 					) {
-
-						removedNumbers ++;
-
 						continue;
-
 					}
-
-					// otherwise, include
-
-					remainingChatUserIds.add (
-						chatUser.getId ());
 
 					// don't use too much memory
 
@@ -574,9 +528,8 @@ class ChatBroadcastSendAction
 						chat,
 						"broadcast");
 
-				BatchRec batch =
-					objectManager.insert (
-						new BatchRec ()
+				batchHelper.insert (
+					new BatchRec ()
 
 					.setSubject (
 						batchSubject)
@@ -625,12 +578,20 @@ class ChatBroadcastSendAction
 					.setChat (
 						chat)
 
-					.setUser (
+					.setState (
+						ChatBroadcastState.sending)
+
+					.setCreatedUser (
 						myUser)
 
-					.setTimestamp (
-						instantToDate (
-							transaction.now ()))
+					.setSentUser (
+						myUser)
+
+					.setCreatedTime (
+						transaction.now ())
+
+					.setSentTime (
+						transaction.now ())
 
 					.setChatUser (
 						fromChatUser)
@@ -638,10 +599,7 @@ class ChatBroadcastSendAction
 					.setText (
 						text)
 
-					.setBatch (
-						batch)
-
-					.setNumberCount (
+					.setNumAccepted (
 						remainingChatUserIds.size ())
 
 					.setSearch (
@@ -744,65 +702,25 @@ class ChatBroadcastSendAction
 
 				int loop3 = 0;
 
-				for (Integer toChatUserId
-						: remainingChatUserIds) {
+				for (
+					Integer toChatUserId
+						: remainingChatUserIds
+				) {
 
 					ChatUserRec toChatUser =
 						chatUserHelper.find (
 							toChatUserId);
 
-					ChatSchemeRec chatScheme =
-						toChatUser.getChatScheme ();
-
 					// record this number in the broadcast
 
-					chatBroadcast.getNumbers ().add (
-						toChatUser.getNumber ());
+					chatBroadcastNumberHelper.insert (
+						new ChatBroadcastNumberRec ()
 
-					// send the message
+						.setChatBroadcast (
+							chatBroadcast)
 
-					ServiceRec broadcastService =
-						serviceHelper.findByCode (
-							chat,
-							"broadcast");
-
-					magicNumberLogic.sendMessage (
-						chatScheme.getMagicNumberSet (),
-						toChatUser.getNumber (),
-						commandHelper.findByCode (chat, "chat"),
-						fromChatUser.getId (),
-						null,
-						text,
-						chatScheme.getMagicRouter (),
-						broadcastService,
-						batch,
-						chatUserLogic.getAffiliate (toChatUser));
-
-					// create chat message
-
-					objectManager.insert (
-						new ChatMessageRec ()
-
-						.setChat (
-							chat)
-
-						.setFromUser (
-							fromChatUser)
-
-						.setToUser (
+						.setChatUser (
 							toChatUser)
-
-						.setOriginalText (
-							text)
-
-						.setEditedText (
-							text)
-
-						.setStatus (
-							ChatMessageStatus.broadcast)
-
-						.setSender (
-							myUser)
 
 					);
 

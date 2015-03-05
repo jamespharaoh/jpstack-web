@@ -233,6 +233,17 @@ class ChatRec
 	@SimpleField
 	Integer infoQueuePreferredTime = 0;
 
+	// broadcast statistics
+
+	@SimpleField
+	Integer numChatBroadcastScheduled = 0;
+
+	@SimpleField
+	Integer numChatBroadcastSending = 0;
+
+	@SimpleField
+	Integer numChatBroadcastSent = 0;
+
 	// related objects
 
 	@CollectionField (

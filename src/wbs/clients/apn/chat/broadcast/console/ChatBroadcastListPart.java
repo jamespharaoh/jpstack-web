@@ -93,17 +93,14 @@ class ChatBroadcastListPart
 				"<tr>\n",
 
 				"<td>%h</td>\n",
-				objectManager.objectPath (
-					chatBroadcast.getUser (),
-					null,
-					true),
+				objectManager.objectPathMini (
+					chatBroadcast.getCreatedUser ()),
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
 					chatMiscLogic.timezone (
 						chat),
-					dateToInstant (
-						chatBroadcast.getTimestamp ())),
+					chatBroadcast.getCreatedTime ()),
 
 				"<td>%h</td>\n",
 				objectManager.objectPath (
@@ -115,7 +112,8 @@ class ChatBroadcastListPart
 				chatBroadcast.getText ().getText (),
 
 				"<td>%h</td>\n",
-				chatBroadcast.getNumberCount (),
+				+ chatBroadcast.getNumAccepted ()
+				+ chatBroadcast.getNumSent (),
 
 				"<td>%h</td>\n",
 				chatBroadcast.getSearch ()

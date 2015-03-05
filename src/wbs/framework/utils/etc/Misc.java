@@ -145,7 +145,8 @@ class Misc {
 
 	}
 
-	public static Integer toInteger (
+	public static
+	Integer toInteger (
 			String string) {
 
 		if (string == null)
@@ -278,18 +279,32 @@ class Misc {
 				" ").trim();
 	}
 
-	public static RuntimeException rethrow(Throwable t) {
-		if (t instanceof Error)
-			throw (Error) t;
-		if (t instanceof RuntimeException)
-			throw (RuntimeException) t;
-		throw new RuntimeException(t);
+	public static
+	RuntimeException rethrow (
+			Throwable throwable) {
+
+		if (throwable instanceof Error) {
+			throw (Error) throwable;
+		}
+
+		if (throwable instanceof RuntimeException) {
+			throw (RuntimeException) throwable;
+		}
+
+		throw new RuntimeException (
+			throwable);
+
 	}
 
-	public static String implode(String glue,
+	public static
+	String implode (
+			String glue,
 			Collection<? extends Object> pieces) {
+
 		boolean first = true;
+
 		StringBuffer sb = new StringBuffer();
+
 		for (Object piece : pieces) {
 			if (first)
 				first = false;

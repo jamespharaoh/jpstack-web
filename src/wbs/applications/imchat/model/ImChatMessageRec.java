@@ -58,6 +58,14 @@ class ImChatMessageRec
 		nullable = true)
 	Integer price;
 
+	@ReferenceField (
+		nullable = true)
+	ImChatTemplateRec imChatTemplate;
+
+	@ReferenceField (
+		nullable = true)
+	ImChatMessageRec partnerImChatMessage;
+
 	// state
 
 	@ReferenceField (
