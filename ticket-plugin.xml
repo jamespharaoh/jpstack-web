@@ -15,6 +15,9 @@
 		<model name="ticketManager"/>
 		<model name="ticket"/>
 		<model name="ticketNote"/>
+		<model name="ticketFieldType"/>
+		<model name="ticketFieldValue"/>
+		<model name="ticketState"/>
 	</models>
 
 	<fixtures>
