@@ -18,6 +18,9 @@ class ImChatCustomerData {
 	String code;
 
 	@DataAttribute
+	String email;
+
+	@DataAttribute
 	Integer balance;
 
 }

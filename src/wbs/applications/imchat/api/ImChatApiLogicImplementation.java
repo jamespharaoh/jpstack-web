@@ -85,6 +85,9 @@ class ImChatApiLogicImplementation
 			.code (
 				customer.getCode ())
 
+			.email (
+				customer.getEmail ())
+
 			.balance (
 				customer.getBalance ());
 
@@ -98,7 +101,11 @@ class ImChatApiLogicImplementation
 		return new ImChatConversationData ()
 
 			.id (
-				conversation.getId ());
+				conversation.getId ())
+
+			.profile (
+				profileData (
+					conversation.getImChatProfile ()));
 
 	}
 
@@ -115,8 +122,16 @@ class ImChatApiLogicImplementation
 			.index (
 				message.getIndex ())
 
-			.messageText (
-				message.getMessageText ());
+			.sender (
+				message.getSenderUser () != null
+					? "operator"
+					: "customer")
+
+			.message (
+				message.getMessageText ())
+
+			.timestamp (
+				message.getTimestamp ().getMillis ());
 
 	}
 

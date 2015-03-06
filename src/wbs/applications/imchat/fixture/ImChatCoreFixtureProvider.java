@@ -3,6 +3,8 @@ package wbs.applications.imchat.fixture;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -262,14 +264,18 @@ class ImChatCoreFixtureProvider
 				"image/jpeg",
 				"ermintrude.jpg");
 
+		List<ImChatProfileRec> profiles =
+			new ArrayList<ImChatProfileRec> ();
+
 		for (
 			int index = 0;
 			index < 10;
 			index ++
 		) {
 
-			imChatProfileHelper.insert (
-				new ImChatProfileRec ()
+			profiles.add (
+				imChatProfileHelper.insert (
+					new ImChatProfileRec ()
 
 				.setImChat (
 					imChat)
@@ -304,7 +310,7 @@ class ImChatCoreFixtureProvider
 						? dougalMedia
 						: ermintrudeMedia)
 
-			);
+			));
 
 		}
 
@@ -339,6 +345,9 @@ class ImChatCoreFixtureProvider
 
 			.setIndex (
 				imChatCustomer.getNumConversations ())
+
+			.setImChatProfile (
+				profiles.get (0))
 
 			.setStartTime (
 				transaction.now ())

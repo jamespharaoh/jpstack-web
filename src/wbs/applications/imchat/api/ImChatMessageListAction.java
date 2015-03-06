@@ -15,6 +15,7 @@ import org.json.simple.JSONValue;
 
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
+import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageObjectHelper;
 import wbs.applications.imchat.model.ImChatMessageRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
@@ -39,6 +40,9 @@ class ImChatMessageListAction
 
 	@Inject
 	Database database;
+
+	@Inject
+	ImChatApiLogic imChatApiLogic;
 
 	@Inject
 	ImChatConversationObjectHelper imChatConversationHelper;
@@ -74,7 +78,7 @@ class ImChatMessageListAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatMessageListRequest startRequest =
+		ImChatMessageListRequest messageListRequest =
 			dataFromJson.fromJson (
 				ImChatMessageListRequest.class,
 				jsonValue);
@@ -89,7 +93,7 @@ class ImChatMessageListAction
 
 		ImChatSessionRec session =
 			imChatSessionHelper.findBySecret (
-				startRequest.sessionSecret ());
+				messageListRequest.sessionSecret ());
 
 		if (
 			session == null
@@ -113,15 +117,18 @@ class ImChatMessageListAction
 
 		// find conversation
 
-		ImChatConversationRec imChatConversation =
+		ImChatConversationRec conversation =
 			imChatConversationHelper.find (
-				startRequest.conversationId ());
+				messageListRequest.conversationId ());
+
+		ImChatCustomerRec customer =
+			conversation.getImChatCustomer ();
 
 		// retrieve messages
 
 		List<ImChatMessageRec> messages =
 			new ArrayList<ImChatMessageRec> (
-				imChatConversation.getImChatMessages ());
+				conversation.getImChatMessages ());
 
 		Lists.reverse (
 			messages);
@@ -129,7 +136,15 @@ class ImChatMessageListAction
 		// create response
 
 		ImChatMessageListSuccess messageListSuccessResponse =
-			new ImChatMessageListSuccess ();
+			new ImChatMessageListSuccess ()
+
+			.customer (
+				imChatApiLogic.customerData (
+					customer))
+
+			.conversation (
+				imChatApiLogic.conversationData (
+					conversation));
 
 		for (
 			ImChatMessageRec message
@@ -137,18 +152,8 @@ class ImChatMessageListAction
 		) {
 
 			messageListSuccessResponse.messages.add (
-				new ImChatMessageData ()
-
-				.id (
-					message.getId ())
-
-				.index (
-					message.getIndex ())
-
-				.messageText (
-					message.getMessageText ())
-
-			);
+				imChatApiLogic.messageData (
+					message));
 
 		}
 

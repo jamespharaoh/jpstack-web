@@ -14,4 +14,7 @@ class ImChatConversationData {
 	@DataAttribute
 	Integer id;
 
+	@DataAttribute
+	ImChatProfileData profile;
+
 }

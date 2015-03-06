@@ -165,6 +165,9 @@ class ImChatConversationStartAction
 			.setImChatCustomer (
 				customer)
 
+			.setImChatProfile (
+				profile)
+
 			.setIndex (
 				customer.getNumConversations ())
 
