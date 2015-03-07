@@ -18,7 +18,7 @@ import wbs.platform.currency.model.CurrencyRec;
 @ToString
 public
 class ChatReportRevShareRec
-    implements CommonRecord<ChatReportRevShareRec> {
+	implements CommonRecord<ChatReportRevShareRec> {
 
 	Integer id;
 	AffiliateRec affiliate;

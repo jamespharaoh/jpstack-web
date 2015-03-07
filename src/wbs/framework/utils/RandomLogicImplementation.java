@@ -47,21 +47,21 @@ class RandomLogicImplementation
 			String chars,
 			int length) {
 
-        StringBuilder stringBuilder =
-        	new StringBuilder ();
+		StringBuilder stringBuilder =
+			new StringBuilder ();
 
 		for (int i = 0; i < length; i ++) {
 
-            stringBuilder.append (
-            	chars.charAt (
-            		randomInteger (
-            			chars.length ())));
+			stringBuilder.append (
+				chars.charAt (
+					randomInteger (
+						chars.length ())));
 
-        }
+		}
 
-        return stringBuilder.toString ();
+		return stringBuilder.toString ();
 
-    }
+	}
 
 	@Override
 	public
@@ -69,10 +69,10 @@ class RandomLogicImplementation
 			int length) {
 
 		return generateString (
-        	"abcdefghijklmnopqrstuvwxyz",
-        	length);
+			"abcdefghijklmnopqrstuvwxyz",
+			length);
 
-    }
+	}
 
 	@Override
 	public
@@ -80,10 +80,10 @@ class RandomLogicImplementation
 			int length) {
 
 		return generateString (
-        	"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-        	length);
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+			length);
 
-    }
+	}
 
 	@Override
 	public
@@ -91,8 +91,8 @@ class RandomLogicImplementation
 			int length) {
 
 		return generateString (
-        	"0123456789",
-        	length);
+			"0123456789",
+			length);
 
 	}
 

@@ -614,7 +614,7 @@ class ChatReportRevSharePart
 
 	void addChatMessages () {
 
-        ChatMonthCostRec chatMonthCost =
+		ChatMonthCostRec chatMonthCost =
 			chatMonthCostHelper.findByCode (
 				chat,
 				form.month ());
