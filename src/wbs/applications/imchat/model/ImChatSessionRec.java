@@ -1,9 +1,5 @@
 package wbs.applications.imchat.model;
 
-import java.util.Random;
-
-import javax.inject.Inject;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -90,55 +86,6 @@ class ImChatSessionRec
 
 		ImChatSessionRec findBySecret (
 				String secret);
-
-	}
-
-	// object helper methods
-
-	public
-	interface ImChatSessionObjectHelperMethods {
-
-		String generateSecret ();
-
-	}
-
-	// object helper implementation
-
-	public static
-	class ImChatSessionObjectHelperImplementation
-		implements ImChatSessionObjectHelperMethods {
-
-		// dependencies
-
-		@Inject
-		Random random;
-
-		// implementation
-
-		@Override
-		public
-		String generateSecret () {
-
-			StringBuilder stringBuilder =
-				new StringBuilder ();
-
-			for (int i = 0; i < 20; i ++) {
-
-				stringBuilder.append (
-					chars.charAt (
-						random.nextInt (
-							chars.length ())));
-
-			}
-
-			return stringBuilder.toString ();
-
-		}
-
-		// data
-
-		public static
-		String chars = "abcdefghijklmnopqrstuvwxyz";
 
 	}
 

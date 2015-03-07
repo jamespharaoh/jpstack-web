@@ -1,9 +1,5 @@
 package wbs.wallet.model;
 
-import java.util.Random;
-
-import javax.inject.Inject;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,8 +8,11 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.framework.entity.annotations.CodeField;
+import wbs.framework.entity.annotations.DeletedField;
+import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
+import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
@@ -41,42 +40,16 @@ class WalletServiceRec
 	@CodeField
 	String code;
 
-	// object helper methods
+	// details
 
-	public
-	interface WalletServiceObjectHelperMethods {
+	@NameField
+	String name;
 
-		String generateCode ();
+	@DescriptionField
+	String description;
 
-	}
-
-	// object helper implementation
-
-	public static
-	class WalletServiceObjectHelperImplementation
-		implements WalletServiceObjectHelperMethods {
-
-		// dependencies
-
-		@Inject
-		Random random;
-
-		// implementation
-
-		@Override
-		public
-		String generateCode () {
-
-			int intCode =
-				+ random.nextInt (90000000)
-				+ 10000000;
-
-			return Integer.toString (
-				intCode);
-
-		}
-
-	}
+	@DeletedField
+	Boolean deleted = false;
 
 	// compare to
 

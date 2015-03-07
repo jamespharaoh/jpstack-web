@@ -522,9 +522,6 @@ class TestFixtures {
 		log.info (
 			"Creating manual responder fixtures");
 
-		Random random =
-			new Random ();
-
 		Instant now =
 			Instant.now ();
 
@@ -616,25 +613,11 @@ class TestFixtures {
 
 	}
 
-	<ObjectType extends Record<?>>
-	ObjectType pickOne (
-			List<ObjectType> options,
-			Random random) {
-
-		int choice =
-			random.nextInt (options.size ());
-
-		return options.get (
-			choice * choice / options.size ());
-
-	}
-
 	Instant pastInstant (
-			Instant now,
-			Random random) {
+			Instant now) {
 
 		int choice =
-			random.nextInt (1000);
+			randomLogic.randomInteger (1000);
 
 		return now.minus (
 			choice * choice);

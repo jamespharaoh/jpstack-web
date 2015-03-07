@@ -1,0 +1,9 @@
+<plugin
+	name="utils"
+	package="wbs.framework.utils">
+
+	<layer name="utils">
+		<bean class="RandomLogicImplementation"/>
+	</layer>
+
+</plugin>

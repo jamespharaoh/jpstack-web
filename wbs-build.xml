@@ -38,6 +38,10 @@
 			package="wbs.framework.sql"/>
 
 		<plugin
+			name="utils"
+			package="wbs.framework.utils"/>
+
+		<plugin
 			name="web"
 			package="wbs.framework.web"/>
 

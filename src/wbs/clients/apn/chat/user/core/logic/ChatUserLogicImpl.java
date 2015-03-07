@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -49,6 +48,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.console.misc.TimeFormatter;
@@ -125,7 +125,7 @@ class ChatUserLogicImpl
 	QueueLogic queueLogic;
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
@@ -296,9 +296,9 @@ class ChatUserLogicImpl
 
 		LocalTime timeOfDay =
 			new LocalTime (
-				10 + random.nextInt (10),
-				random.nextInt (60),
-				random.nextInt (60));
+				10 + randomLogic.randomInteger (10),
+				randomLogic.randomInteger (60),
+				randomLogic.randomInteger (60));
 
 		// try and schedule first ad
 
@@ -563,7 +563,7 @@ class ChatUserLogicImpl
 			@NonNull ChatUserRec chatUser) {
 
 		int number =
-			random.nextInt (100);
+			randomLogic.randomInteger (100);
 
 		if (number < 10)
 			chatUser.setMonitorCap (number);
@@ -585,7 +585,9 @@ class ChatUserLogicImpl
 				ChatUserType.monitor)
 
 			.setCode (
-				chatUserHelper.generateCode (chat)));
+				randomLogic.generateNumericNoZero (6))
+
+		);
 
 	}
 

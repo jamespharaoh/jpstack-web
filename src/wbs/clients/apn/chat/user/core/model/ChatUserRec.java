@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -51,6 +50,7 @@ import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.text.model.TextRec;
 import wbs.sms.locator.model.LongLat;
@@ -807,9 +807,6 @@ class ChatUserRec
 				ChatRec chat,
 				NumberRec number);
 
-		String generateCode (
-				ChatRec chat);
-
 	}
 
 	// object helper implementation
@@ -821,7 +818,7 @@ class ChatUserRec
 		// dependencies
 
 		@Inject
-		Random random;
+		RandomLogic randomLogic;
 
 		// indirect dependencies
 
@@ -960,7 +957,7 @@ class ChatUserRec
 					ChatUserType.user)
 
 				.setCode (
-					generateCode (chat))
+					randomLogic.generateNumericNoZero (6))
 
 				.setDeliveryMethod (
 					ChatMessageMethod.sms)
@@ -1000,35 +997,6 @@ class ChatUserRec
 				chatUser);
 
 			return chatUser;
-
-		}
-
-		@Override
-		public
-		String generateCode (
-				ChatRec chat) {
-
-			ChatUserObjectHelper chatUserHelper =
-				chatUserHelperProvider.get ();
-
-			int code;
-
-			while (true) {
-
-				code =
-					random.nextInt (900000) + 100000;
-
-				ChatUserRec chatUser =
-					chatUserHelper.findByCode (
-						chat,
-						Integer.toString (code));
-
-				if (chatUser == null)
-					break;
-
-			}
-
-			return Integer.toString (code);
 
 		}
 

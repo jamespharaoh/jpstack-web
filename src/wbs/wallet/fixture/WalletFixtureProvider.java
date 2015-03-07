@@ -5,6 +5,7 @@ import javax.inject.Inject;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuObjectHelper;
 import wbs.platform.menu.model.MenuRec;
@@ -28,13 +29,16 @@ class WalletFixtureProvider
 	MenuObjectHelper menuHelper;
 
 	@Inject
+	RandomLogic randomLogic;
+
+	@Inject
+	SliceObjectHelper sliceHelper;
+
+	@Inject
 	WalletObjectHelper walletHelper;
 
 	@Inject
 	WalletServiceObjectHelper walletServiceHelper;
-
-	@Inject
-	SliceObjectHelper sliceHelper;
 
 	// implementation
 
@@ -71,7 +75,13 @@ class WalletFixtureProvider
 					"test"))
 
 			.setCode (
-					walletServiceHelper.generateCode ())
+				"test_wallet_service")
+
+			.setName (
+				"Test wallet service")
+
+			.setDescription (
+				"Test wallet service")
 
 		);
 
@@ -82,7 +92,7 @@ class WalletFixtureProvider
 				walletService)
 
 			.setCode (
-				walletHelper.generateCode ())
+				randomLogic.generateNumericNoZero (8))
 
 		);
 

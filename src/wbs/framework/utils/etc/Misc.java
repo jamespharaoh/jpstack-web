@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1367,67 +1366,6 @@ class Misc {
 				(char) ('0' + index);
 
 		}
-
-	}
-
-	private static final
-	Random random =
-		new Random ();
-
-	public static
-	String genRandom (
-			char[] allSymbols,
-			int requiredLength) {
-
-		char[] buffer =
-			new char [requiredLength];
-
-		for (
-			int index = 0;
-			index < buffer.length;
-			index ++
-		) {
-
-			buffer [index] =
-				allSymbols [
-					random.nextInt (
-						allSymbols.length)];
-
-		}
-
-		return new String (
-			buffer);
-
-	}
-
-	public static
-	String generateTenCharacterToken () {
-
-		return genRandom (
-			lowercaseLetters,
-			10);
-
-	}
-
-	public static
-	String generateSixDigitCode () {
-
-		return genRandom (
-			digits,
-			6);
-
-	}
-
-	public static <Type>
-	Type pickRandom (
-			Random random,
-			Type[] options) {
-
-		int index =
-			random.nextInt (
-				options.length);
-
-		return options [index];
 
 	}
 

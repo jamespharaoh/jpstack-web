@@ -1,7 +1,8 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import java.io.IOException;
-import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -20,6 +21,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
@@ -37,6 +39,9 @@ class ImChatForgotPasswordAction
 	Database database;
 
 	@Inject
+	EmailLogic emailLogic;
+
+	@Inject
 	ImChatApiLogic imChatApiLogic;
 
 	@Inject
@@ -49,10 +54,7 @@ class ImChatForgotPasswordAction
 	RequestContext requestContext;
 
 	@Inject
-	Random random;
-
-	@Inject
-	EmailLogic email;
+	RandomLogic randomLogic;
 
 	// prototype dependencies
 
@@ -120,7 +122,7 @@ class ImChatForgotPasswordAction
 		// generate new password
 
 		String newPassword =
-			generatePassword (12);
+			randomLogic.generateLowercase (12);
 
 		// update customer password
 
@@ -131,9 +133,14 @@ class ImChatForgotPasswordAction
 
 		// send new password via mail
 
-		email.smtpHostname("wellbehavedsoftware.com");
-		email.fromAddress("services@wellbehavedsoftware.com");
-		email.sendEmail(forgotPasswordRequest.email (), "Chat-app new password", "Your new password for chat-app is: " + newPassword + ".");
+		emailLogic.sendEmail (
+			forgotPasswordRequest.email (),
+			"Chat-app new password",
+			stringFormat (
+				"Please log on with your new password:\n",
+				"\n",
+				"%s\n",
+				newPassword));
 
 		// create response
 
@@ -148,26 +155,5 @@ class ImChatForgotPasswordAction
 			.value (successResponse);
 
 	}
-
-	String generatePassword (
-			int length) {
-
-        String chars = "abcdefghijklmnopqrstuvwxyz";
-
-        StringBuilder stringBuilder =
-        	new StringBuilder ();
-
-		for (int i = 0; i < length; i ++) {
-
-            stringBuilder.append (
-            	chars.charAt (
-            		random.nextInt (
-            			chars.length ())));
-
-        }
-
-        return stringBuilder.toString ();
-
-    }
 
 }

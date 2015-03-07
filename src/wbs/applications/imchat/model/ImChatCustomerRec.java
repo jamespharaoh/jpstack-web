@@ -1,7 +1,6 @@
 package wbs.applications.imchat.model;
 
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -69,43 +68,6 @@ class ImChatCustomerRec
 
 	@SimpleField
 	Integer balance = 0;
-
-	// object helper methods
-
-	public
-	interface ImChatCustomerObjectHelperMethods {
-
-		String generateCode ();
-
-	}
-
-	// object helper implementation
-
-	public static
-	class ImChatCustomerObjectHelperImplementation
-		implements ImChatCustomerObjectHelperMethods {
-
-		// dependencies
-
-		@Inject
-		Random random;
-
-		// implementation
-
-		@Override
-		public
-		String generateCode () {
-
-			int intCode =
-				+ random.nextInt (90000000)
-				+ 10000000;
-
-			return Integer.toString (
-				intCode);
-
-		}
-
-	}
 
 	// dao methods
 

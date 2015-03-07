@@ -119,7 +119,8 @@ class UrbanAirshipApi {
 
 			// make call
 
-			@Cleanup CloseableHttpClient httpClient =
+			@Cleanup
+			CloseableHttpClient httpClient =
 				HttpClientBuilder.create ()
 					.build ();
 

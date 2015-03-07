@@ -23,6 +23,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
@@ -49,6 +50,9 @@ class ImChatCustomerCreateAction
 
 	@Inject
 	ImChatSessionObjectHelper imChatSessionHelper;
+
+	@Inject
+	RandomLogic randomLogic;
 
 	@Inject
 	RequestContext requestContext;
@@ -166,7 +170,7 @@ class ImChatCustomerCreateAction
 				imChat)
 
 			.setCode (
-				imChatCustomerHelper.generateCode ())
+				randomLogic.generateNumericNoZero (8))
 
 			.setEmail (
 				createRequest.email ())
@@ -186,7 +190,7 @@ class ImChatCustomerCreateAction
 				newCustomer)
 
 			.setSecret (
-				imChatSessionHelper.generateSecret ())
+				randomLogic.generateLowercase (20))
 
 			.setActive (
 				true)

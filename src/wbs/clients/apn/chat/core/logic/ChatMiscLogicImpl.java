@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -44,6 +43,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.media.logic.MediaLogic;
@@ -123,7 +123,7 @@ class ChatMiscLogicImpl
 	QueueLogic queueLogic;
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
@@ -574,23 +574,28 @@ class ChatMiscLogicImpl
 				&& offlineMonitors.size () > 0) {
 
 			ChatUserRec monitor =
-				offlineMonitors.remove (
-					random.nextInt (offlineMonitors.size ()));
+				randomLogic.sample (
+					offlineMonitors);
 
 			monitor.setOnline (true);
+
 			onlineMonitors.add (monitor);
+
 		}
 
 		// take monitors offline
+
 		while (onlineMonitors.size () > target) {
 
 			ChatUserRec monitor =
-				onlineMonitors.remove (
-					random.nextInt (onlineMonitors.size ()));
+				randomLogic.sample (
+					onlineMonitors);
 
 			monitor.setOnline (false);
 			offlineMonitors.add (monitor);
+
 		}
+
 	}
 
 	@Override

@@ -11,7 +11,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
-import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -32,6 +31,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
@@ -66,9 +66,6 @@ class PhotoGrabberCommand
 	CommandObjectHelper commandHelper;
 
 	@Inject
-	ServiceObjectHelper serviceHelper;
-
-	@Inject
 	Database database;
 
 	@Inject
@@ -81,6 +78,9 @@ class PhotoGrabberCommand
 	MessageObjectHelper messageHelper;
 
 	@Inject
+	Provider<MessageSender> messageSender;
+
+	@Inject
 	MessageSetLogic messageSetLogic;
 
 	@Inject
@@ -90,10 +90,10 @@ class PhotoGrabberCommand
 	PhotoGrabberRequestObjectHelper photoGrabberRequestHelper;
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
 
 	@Inject
-	Provider<MessageSender> messageSender;
+	ServiceObjectHelper serviceHelper;
 
 	// properties
 
@@ -252,7 +252,7 @@ class PhotoGrabberCommand
 				media)
 
 			.setCode (
-				generateCode (8));
+				randomLogic.generateUppercase (8));
 
 		String text =
 			photoGrabber.getBillTemplate ().replaceAll (
@@ -278,7 +278,7 @@ class PhotoGrabberCommand
 				photoGrabber.getBillRoute ())
 
 			.service (
-				serviceHelper.findByCode (photoGrabber, "default"))
+				defaultService)
 
 			.deliveryTypeCode (
 				"photo_grabber")
@@ -667,35 +667,5 @@ class PhotoGrabberCommand
 		}
 
 	}
-
-	String generateCode (
-			int length) {
-
-		char[] chars =
-			new char [length];
-
-		for (
-			int i = 0;
-			i < length;
-			i ++
-		) {
-
-			chars [i] =
-				codeChars.charAt (
-					random.nextInt (
-						codeChars.length ()));
-
-		}
-
-		return new String (
-			chars);
-
-	}
-
-	// data
-
-	static final
-	String codeChars =
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 }

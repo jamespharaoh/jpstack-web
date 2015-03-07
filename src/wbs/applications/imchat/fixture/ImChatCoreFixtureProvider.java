@@ -35,6 +35,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
+import wbs.framework.utils.RandomLogic;
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.media.logic.MediaLogic;
@@ -95,6 +96,9 @@ class ImChatCoreFixtureProvider
 
 	@Inject
 	PaypalAccountObjectHelper paypalAccountHelper;
+
+	@Inject
+	RandomLogic randomLogic;
 
 	@Inject
 	SliceObjectHelper sliceHelper;
@@ -194,19 +198,19 @@ class ImChatCoreFixtureProvider
 				imChat)
 
 			.setCode (
-				"20_for_10")
+				"6_for_6")
 
 			.setName (
-				"£20 for £10")
+				"£6 for £6")
 
 			.setDescription (
-				"£20 for £10")
+				"£6 for £6")
 
 			.setPrice (
-				1000)
+				600)
 
 			.setValue (
-				2000)
+				600)
 
 		);
 
@@ -324,7 +328,7 @@ class ImChatCoreFixtureProvider
 				imChat)
 
 			.setCode (
-				imChatCustomerHelper.generateCode ())
+				randomLogic.generateNumericNoZero (8))
 
 			.setEmail (
 				"test@example.com")
@@ -368,7 +372,7 @@ class ImChatCoreFixtureProvider
 				imChatCustomer)
 
 			.setSecret (
-				imChatSessionHelper.generateSecret ())
+				randomLogic.generateLowercase (20))
 
 			.setStartTime (
 				transaction.now ())

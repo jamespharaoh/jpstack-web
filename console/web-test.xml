@@ -8,7 +8,7 @@
 	</context-param>
 	<context-param>
 		<param-name>layerNames</param-name>
-		<param-value>config,data,entity,schema,sql,model,hibernate,object,logic,web,console,daemon</param-value>
+		<param-value>utils,config,data,entity,schema,sql,model,hibernate,object,logic,web,console,daemon</param-value>
 	</context-param>
 	<context-param>
 		<param-name>configNames</param-name>

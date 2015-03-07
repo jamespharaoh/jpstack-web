@@ -32,6 +32,7 @@ declare variable $mode external;
 
 		<param-value>{
 			string-join ((
+				'utils',
 				'config',
 				'data',
 				'entity',

@@ -5,7 +5,6 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -27,6 +26,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -67,9 +67,6 @@ class ChatAdDaemon
 	CommandObjectHelper commandHelper;
 
 	@Inject
-	ServiceObjectHelper serviceHelper;
-
-	@Inject
 	Database database;
 
 	@Inject
@@ -79,7 +76,10 @@ class ChatAdDaemon
 	ObjectManager objectManager;
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
+
+	@Inject
+	ServiceObjectHelper serviceHelper;
 
 	@Inject
 	TextObjectHelper textHelper;
@@ -234,7 +234,8 @@ class ChatAdDaemon
 			while (! adTemplates.isEmpty ()) {
 
 				int templateNumber =
-					random.nextInt (adTemplates.size ());
+					randomLogic.randomInteger (
+						adTemplates.size ());
 
 				ChatAdTemplateRec chatAdTemplate =
 					adTemplates.get (templateNumber);
