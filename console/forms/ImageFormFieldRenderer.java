@@ -72,7 +72,7 @@ class ImageFormFieldRenderer<Container>
 		out.write (
 			stringFormat (
 				"<td>%s</td>\n",
-				interfaceToHtml (
+				interfaceToHtmlSimple (
 					container,
 					interfaceValue,
 					link)));
@@ -84,16 +84,14 @@ class ImageFormFieldRenderer<Container>
 	void renderTableCellProperties (
 			PrintWriter out,
 			Container container,
-			MediaRec interfaceValue,
-			boolean link) {
+			MediaRec interfaceValue) {
 
 		out.write (
 			stringFormat (
 				"<td>%s</td>\n",
-				interfaceToHtml (
+				interfaceToHtmlComplex (
 					container,
-					interfaceValue,
-					link)));
+					interfaceValue)));
 
 	}
 
@@ -102,8 +100,7 @@ class ImageFormFieldRenderer<Container>
 	void renderTableRow (
 			PrintWriter out,
 			Container container,
-			MediaRec interfaceValue,
-			boolean link) {
+			MediaRec interfaceValue) {
 
 		out.write (
 			stringFormat (
@@ -114,8 +111,7 @@ class ImageFormFieldRenderer<Container>
 		renderTableCellProperties (
 			out,
 			container,
-			interfaceValue,
-			link);
+			interfaceValue);
 
 		out.write (
 			stringFormat (
@@ -161,10 +157,9 @@ class ImageFormFieldRenderer<Container>
 			out.write (
 				stringFormat (
 					"%s<br>\n",
-					interfaceToHtml (
+					interfaceToHtmlComplex (
 						container,
-						interfaceValue,
-						true)));
+						interfaceValue)));
 
 		}
 
@@ -274,10 +269,28 @@ class ImageFormFieldRenderer<Container>
 
 	@Override
 	public
-	String interfaceToHtml (
+	String interfaceToHtmlSimple (
 			Container container,
 			MediaRec interfaceValue,
 			boolean link) {
+
+		if (interfaceValue == null)
+			return "";
+
+		return stringFormat (
+			"%s\n",
+			mediaConsoleLogic.mediaThumb32 (
+				interfaceValue),
+			"%h",
+			interfaceValue.getFilename ());
+
+	}
+
+	@Override
+	public
+	String interfaceToHtmlComplex (
+			Container container,
+			MediaRec interfaceValue) {
 
 		if (interfaceValue == null)
 			return "";

@@ -59,7 +59,7 @@ class UploadFormFieldRenderer<Container>
 		out.write (
 			stringFormat (
 				"<td>%s</td>\n",
-				interfaceToHtml (
+				interfaceToHtmlSimple (
 					container,
 					interfaceValue,
 					link)));
@@ -71,16 +71,14 @@ class UploadFormFieldRenderer<Container>
 	void renderTableCellProperties (
 			PrintWriter out,
 			Container container,
-			FileUpload interfaceValue,
-			boolean link) {
+			FileUpload interfaceValue) {
 
 		out.write (
 			stringFormat (
 				"<td>%s</td>\n",
-				interfaceToHtml (
+				interfaceToHtmlComplex (
 					container,
-					interfaceValue,
-					link)));
+					interfaceValue)));
 
 	}
 
@@ -89,8 +87,7 @@ class UploadFormFieldRenderer<Container>
 	void renderTableRow (
 			PrintWriter out,
 			Container container,
-			FileUpload interfaceValue,
-			boolean link) {
+			FileUpload interfaceValue) {
 
 		out.write (
 			stringFormat (
@@ -101,8 +98,7 @@ class UploadFormFieldRenderer<Container>
 		renderTableCellProperties (
 			out,
 			container,
-			interfaceValue,
-			link);
+			interfaceValue);
 
 		out.write (
 			stringFormat (
@@ -209,7 +205,7 @@ class UploadFormFieldRenderer<Container>
 
 	@Override
 	public
-	String interfaceToHtml (
+	String interfaceToHtmlSimple (
 			Container container,
 			FileUpload interfaceValue,
 			boolean link) {
@@ -221,6 +217,19 @@ class UploadFormFieldRenderer<Container>
 			"%h (%h bytes)",
 			interfaceValue.name (),
 			interfaceValue.data ().length);
+
+	}
+
+	@Override
+	public
+	String interfaceToHtmlComplex (
+			Container container,
+			FileUpload interfaceValue) {
+
+		return interfaceToHtmlSimple (
+			container,
+			interfaceValue,
+			true);
 
 	}
 

@@ -11,8 +11,7 @@ interface FormFieldRenderer<Container,Interface> {
 	void renderTableCellProperties (
 			PrintWriter out,
 			Container container,
-			Interface interfaceValue,
-			boolean link);
+			Interface interfaceValue);
 
 	void renderTableCellList (
 			PrintWriter out,
@@ -23,8 +22,7 @@ interface FormFieldRenderer<Container,Interface> {
 	void renderTableRow (
 			PrintWriter out,
 			Container container,
-			Interface interfaceValue,
-			boolean link);
+			Interface interfaceValue);
 
 	void renderFormRow (
 			PrintWriter out,
@@ -41,9 +39,13 @@ interface FormFieldRenderer<Container,Interface> {
 	Interface formToInterface (
 			List<String> errors);
 
-	String interfaceToHtml (
+	String interfaceToHtmlSimple (
 			Container container,
 			Interface interfaceValue,
 			boolean link);
+
+	String interfaceToHtmlComplex (
+			Container container,
+			Interface interfaceValue);
 
 }
