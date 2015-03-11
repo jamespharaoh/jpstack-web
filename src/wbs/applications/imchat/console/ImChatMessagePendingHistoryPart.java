@@ -162,8 +162,7 @@ class ImChatMessagePendingHistoryPart
 		formFieldLogic.outputTableRows (
 			out,
 			customerFields,
-			imChatCustomer,
-			true);
+			imChatCustomer);
 
 		printFormat (
 			"</table>\n");

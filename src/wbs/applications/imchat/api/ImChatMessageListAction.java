@@ -1,7 +1,6 @@
 package wbs.applications.imchat.api;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -29,7 +28,7 @@ import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("imChatMessageListAction")
 public
@@ -78,7 +77,7 @@ class ImChatMessageListAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatMessageListRequest messageListRequest =
+		ImChatMessageListRequest request =
 			dataFromJson.fromJson (
 				ImChatMessageListRequest.class,
 				jsonValue);
@@ -93,7 +92,7 @@ class ImChatMessageListAction
 
 		ImChatSessionRec session =
 			imChatSessionHelper.findBySecret (
-				messageListRequest.sessionSecret ());
+				request.sessionSecret ());
 
 		if (
 			session == null
@@ -123,16 +122,19 @@ class ImChatMessageListAction
 		ImChatConversationRec conversation =
 			imChatConversationHelper.findByIndex (
 				customer,
-				messageListRequest.conversationIndex ());
+				request.conversationIndex ());
 
 		// retrieve messages
 
-		List<ImChatMessageRec> messages =
-			new ArrayList<ImChatMessageRec> (
+		List<ImChatMessageRec> allMessages =
+			ImmutableList.copyOf (
 				conversation.getImChatMessages ());
 
-		Lists.reverse (
-			messages);
+		List<ImChatMessageRec> newMessages =
+			ImmutableList.copyOf (
+				allMessages.subList (
+					request.messageIndex (),
+					allMessages.size ()));
 
 		// create response
 
@@ -149,7 +151,7 @@ class ImChatMessageListAction
 
 		for (
 			ImChatMessageRec message
-				: messages
+				: newMessages
 		) {
 
 			messageListSuccessResponse.messages.add (

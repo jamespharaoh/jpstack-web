@@ -112,8 +112,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	public
 	void renderTableCellProperties (
 			PrintWriter out,
-			Container container,
-			boolean link) {
+			Container container) {
 
 		Native nativeValue =
 			accessor.read (
@@ -131,8 +130,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 		renderer.renderTableCellProperties (
 			out,
 			container,
-			interfaceValue,
-			link);
+			interfaceValue);
 
 	}
 
@@ -158,8 +156,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 		renderer.renderTableRow (
 			out,
 			container,
-			interfaceValue,
-			false);
+			interfaceValue);
 
 	}
 

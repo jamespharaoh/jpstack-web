@@ -49,8 +49,16 @@
 		name="list"
 		object-name="imChatPurchase">
 
-		<parent-field/>
 		<index-field/>
+
+		<object-field
+			name="imChatPricePoint"
+			label="Price point"
+			finder="imChatPricePoint"/>
+
+		<timestamp-field
+			name="createdTime"
+			label="Created"/>
 
 	</field-set>
 

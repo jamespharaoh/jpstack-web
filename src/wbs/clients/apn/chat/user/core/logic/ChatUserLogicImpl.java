@@ -48,11 +48,11 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
+import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.email.logic.EmailLogic;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
@@ -1095,6 +1095,7 @@ class ChatUserLogicImpl
 				try {
 
 					emailLogic.sendEmail (
+						wbsConfig.defaultEmailAddress (),
 						slice.getAdminEmail (),
 						stringFormat (
 							"Chat user %s location not recognised: %s",

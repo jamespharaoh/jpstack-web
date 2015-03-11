@@ -6,4 +6,8 @@
 		<bean class="RandomLogicImplementation"/>
 	</layer>
 
+	<layer name="logic">
+		<bean class="EmailLogicImplementation"/>
+	</layer>
+
 </plugin>

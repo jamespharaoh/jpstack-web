@@ -17,4 +17,7 @@ class ImChatMessageListRequest {
 	@DataAttribute
 	Integer conversationIndex;
 
+	@DataAttribute
+	Integer messageIndex;
+
 }

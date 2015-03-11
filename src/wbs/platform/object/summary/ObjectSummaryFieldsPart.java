@@ -58,8 +58,7 @@ class ObjectSummaryFieldsPart
 		formFieldLogic.outputTableRows (
 			out,
 			formFieldSet,
-			object,
-			true);
+			object);
 
 		printFormat (
 			"</table>\n");

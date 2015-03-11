@@ -8,9 +8,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
+import wbs.framework.utils.EmailLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
-import wbs.platform.email.logic.EmailLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.sms.command.model.CommandObjectHelper;
@@ -63,6 +64,9 @@ class AutoResponderCommand
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
+
+	@Inject
+	WbsConfig wbsConfig;
 
 	// properties
 
@@ -125,6 +129,7 @@ class AutoResponderCommand
 				&& autoResponder.getEmailAddress ().length () > 0) {
 
 			emailLogic.sendEmail (
+				wbsConfig.defaultEmailAddress (),
 				autoResponder.getEmailAddress (),
 				"Auto responder " + autoResponder.getDescription (),
 				message.getText ().getText ());

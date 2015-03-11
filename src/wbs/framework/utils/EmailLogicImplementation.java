@@ -1,7 +1,8 @@
-package wbs.platform.email.logic;
+package wbs.framework.utils;
 
 import java.util.Properties;
 
+import javax.inject.Inject;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -10,39 +11,39 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
+import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.config.WbsConfig;
 
+@SingletonComponent ("emailLogic")
 @Accessors (fluent = true)
 public
-class EmailLogic {
+class EmailLogicImplementation
+	implements EmailLogic {
 
-	@Getter @Setter
-	String smtpHostname;
+	// dependencies
 
-	@Getter @Setter
-	int smtpPort = 25;
+	@Inject
+	WbsConfig wbsConfig;
 
-	@Getter @Setter
-	String smtpUsername;
+	// implementation
 
-	@Getter @Setter
-	String smtpPassword;
-
-	@Getter @Setter
-	String fromAddress;
-
+	@Override
 	public
 	void sendEmail (
+			String fromAddress,
 			String toAddresses,
 			String subjectText,
 			String messageText) {
 
 		try {
 
-	        Properties properties = System.getProperties();
-	        properties.setProperty("mail.smtp.host", smtpHostname);
+	        Properties properties =
+	        	System.getProperties ();
+
+	        properties.setProperty (
+	        	"mail.smtp.host",
+	        	wbsConfig.smtpHostname ());
 
 			Session session =
 				Session.getDefaultInstance (

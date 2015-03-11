@@ -18,15 +18,16 @@ import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.email.logic.EmailLogic;
 
 @PrototypeComponent ("imChatForgotPasswordAction")
 public
@@ -55,6 +56,9 @@ class ImChatForgotPasswordAction
 
 	@Inject
 	RandomLogic randomLogic;
+
+	@Inject
+	WbsConfig wbsConfig;
 
 	// prototype dependencies
 
@@ -109,10 +113,10 @@ class ImChatForgotPasswordAction
 				new ImChatFailure ()
 
 				.reason (
-					"email-does-not-exists")
+					"email-invalid")
 
 				.message (
-					"The specified customer does not exist.");
+					"There is no customer with the email address specified");
 
 			return jsonResponderProvider.get ()
 				.value (failureResponse);
@@ -134,6 +138,7 @@ class ImChatForgotPasswordAction
 		// send new password via mail
 
 		emailLogic.sendEmail (
+			wbsConfig.defaultEmailAddress (),
 			forgotPasswordRequest.email (),
 			"Chat-app new password",
 			stringFormat (

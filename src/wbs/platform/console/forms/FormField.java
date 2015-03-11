@@ -34,8 +34,7 @@ interface FormField<Container,Generic,Native,Interface> {
 
 	void renderTableCellProperties (
 			PrintWriter out,
-			Container object,
-			boolean link);
+			Container object);
 
 	void renderFormRow (
 			PrintWriter out,

@@ -110,7 +110,7 @@ class ImChatSessionStartAction
 				new ImChatFailure ()
 
 				.reason (
-					"customer-does-not-exist")
+					"email-invalid")
 
 				.message (
 					"No customer with that email address exists");
@@ -132,7 +132,7 @@ class ImChatSessionStartAction
 				new ImChatFailure ()
 
 				.reason (
-					"password-incorrect")
+					"password-invalid")
 
 				.message (
 					"The supplied password is not correct");

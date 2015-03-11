@@ -121,3 +121,7 @@ SELECT number_lookup_type_insert (
 	'chat',
 	'block_all',
 	'Numbers which have requested an end to all services');
+
+SELECT event_type_insert (
+	'chat_broadcast_send_completed',
+	'%0 completed sending');
