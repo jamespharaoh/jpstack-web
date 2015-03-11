@@ -115,14 +115,15 @@ class ImChatMessageListAction
 
 		}
 
+		ImChatCustomerRec customer =
+			session.getImChatCustomer ();
+
 		// find conversation
 
 		ImChatConversationRec conversation =
-			imChatConversationHelper.find (
-				messageListRequest.conversationId ());
-
-		ImChatCustomerRec customer =
-			conversation.getImChatCustomer ();
+			imChatConversationHelper.findByIndex (
+				customer,
+				messageListRequest.conversationIndex ());
 
 		// retrieve messages
 

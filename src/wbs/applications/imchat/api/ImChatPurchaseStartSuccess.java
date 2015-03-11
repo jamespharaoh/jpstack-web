@@ -19,4 +19,5 @@ class ImChatPurchaseStartSuccess {
 
 	@DataAttribute
 	ImChatCustomerData customer;
+
 }

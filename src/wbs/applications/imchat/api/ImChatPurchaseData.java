@@ -4,23 +4,21 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.entity.annotations.SimpleField;
 
 @Accessors (fluent = true)
 @Data
 @DataClass
 public
-class ImChatPurchaseGetConfirmationSuccess {
+class ImChatPurchaseData {
 
 	@DataAttribute
-	String status = "success";
+	String token;
 
-	@DataAttribute
-	String sessionSecret;
+	@SimpleField
+	Integer price;
 
-	@DataAttribute
-	ImChatCustomerData customer;
-
-	@DataAttribute
-	ImChatPurchaseData purchase;
+	@SimpleField
+	Integer value;
 
 }

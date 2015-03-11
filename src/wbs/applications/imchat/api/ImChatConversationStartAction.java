@@ -133,8 +133,9 @@ class ImChatConversationStartAction
 		// lookup profile
 
 		ImChatProfileRec profile =
-			imChatProfileHelper.find (
-				startRequest.profileId ());
+			imChatProfileHelper.findByCode (
+				imChat,
+				startRequest.profileCode ());
 
 		if (
 			profile == null

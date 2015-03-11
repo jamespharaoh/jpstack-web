@@ -12,16 +12,13 @@ public
 class ImChatMessageData {
 
 	@DataAttribute
-	Integer id;
-
-	@DataAttribute
 	Integer index;
 
 	@DataAttribute
 	String sender;
 
 	@DataAttribute
-	String message;
+	String messageText;
 
 	@DataAttribute
 	Long timestamp;

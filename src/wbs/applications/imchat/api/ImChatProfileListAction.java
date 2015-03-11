@@ -126,8 +126,8 @@ class ImChatProfileListAction
 			profileDatas.add (
 				new ImChatProfileData ()
 
-				.id (
-					profile.getId ())
+				.code (
+					profile.getCode ())
 
 				.name (
 					profile.getPublicName ())

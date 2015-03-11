@@ -148,8 +148,8 @@ class ImChatPurchaseConfirmAction
 		// lookup purchase
 
 		ImChatPurchaseRec purchase =
-			imChatPurchaseHelper.find (
-				purchaseRequest.purchaseId ());
+			imChatPurchaseHelper.findByToken (
+				purchaseRequest.purchaseToken ());
 
 		if (
 			purchase == null
@@ -167,6 +167,7 @@ class ImChatPurchaseConfirmAction
 
 			return jsonResponderProvider.get ()
 				.value (failureResponse);
+
 		}
 
 		// lookup paypal payment

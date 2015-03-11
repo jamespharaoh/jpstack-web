@@ -216,8 +216,9 @@ class ImChatPurchaseGetConfirmationAction
 				imChatApiLogic.customerData (
 					customer))
 
-			.purchaseId (
-				purchase.getId ());
+			.purchase (
+				imChatApiLogic.purchaseData (
+					purchase));
 
 		// commit and return
 

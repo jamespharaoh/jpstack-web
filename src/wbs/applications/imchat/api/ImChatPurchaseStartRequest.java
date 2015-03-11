@@ -15,7 +15,7 @@ class ImChatPurchaseStartRequest {
 	String sessionSecret;
 
 	@DataAttribute
-	Long pricePointId;
+	String pricePointCode;
 
 	@DataAttribute
 	String successUrl;

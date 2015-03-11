@@ -157,9 +157,9 @@ class ImChatPurchaseStartAction
 		// lookup price point
 
 		ImChatPricePointRec pricePoint =
-			imChatPricePointHelper.find (
-				(int) (long)
-				purchaseRequest.pricePointId ());
+			imChatPricePointHelper.findByCode (
+				imChat,
+				purchaseRequest.pricePointCode ());
 
 		if (
 			pricePoint == null

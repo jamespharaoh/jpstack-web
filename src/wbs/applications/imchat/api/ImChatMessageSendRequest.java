@@ -15,7 +15,7 @@ class ImChatMessageSendRequest {
 	String sessionSecret;
 
 	@DataAttribute
-	Long conversationId;
+	Integer conversationIndex;
 
 	@DataAttribute
 	String messageText;

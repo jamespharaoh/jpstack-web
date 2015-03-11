@@ -12,9 +12,6 @@ public
 class ImChatCustomerData {
 
 	@DataAttribute
-	Integer id;
-
-	@DataAttribute
 	String code;
 
 	@DataAttribute

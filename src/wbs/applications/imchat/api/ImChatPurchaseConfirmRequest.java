@@ -15,6 +15,6 @@ class ImChatPurchaseConfirmRequest {
 	String sessionSecret;
 
 	@DataAttribute
-	Long purchaseId;
+	String purchaseToken;
 
 }
