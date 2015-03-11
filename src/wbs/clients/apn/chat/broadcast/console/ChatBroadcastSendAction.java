@@ -18,6 +18,7 @@ import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.broadcast.logic.ChatBroadcastLogic;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberObjectHelper;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberRec;
+import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberState;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastRec;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastState;
@@ -202,6 +203,8 @@ class ChatBroadcastSendAction
 			boolean send =
 				requestContext.getForm ("send") != null;
 
+System.out.println ("VERIFY: " + (verify? "yes": "no"));
+System.out.println ("SEND: " + (send? "yes": "no"));
 			if (verify || send) {
 
 				// verify params
@@ -385,6 +388,7 @@ class ChatBroadcastSendAction
 						for (String number
 								: allNumbers) {
 
+System.out.println ("NUMBER:"+number);
 							NumberRec numberRec =
 								numberHelper.findByCode (
 									GlobalId.root,
@@ -393,6 +397,7 @@ class ChatBroadcastSendAction
 							if (numberRec == null)
 								continue;
 
+System.out.println ("a");
 							ChatUserRec chatUser =
 								chatUserHelper.find (
 									chat,
@@ -400,6 +405,7 @@ class ChatBroadcastSendAction
 
 							if (chatUser == null)
 								continue;
+System.out.println ("b");
 
 							allChatUserIds.add (
 								chatUser.getId ());
@@ -448,6 +454,7 @@ class ChatBroadcastSendAction
 						: allChatUserIds
 				) {
 
+System.out.println ("ID:"+chatUserId);
 					ChatUserRec chatUser =
 						chatUserHelper.find (
 							chatUserId);
@@ -458,8 +465,13 @@ class ChatBroadcastSendAction
 							includeBlocked,
 							includeOptedOut)
 					) {
+System.out.println ("skip");
 						continue;
 					}
+System.out.println ("include");
+
+					remainingChatUserIds.add (
+						chatUserId);
 
 					// don't use too much memory
 
@@ -721,6 +733,12 @@ class ChatBroadcastSendAction
 
 						.setChatUser (
 							toChatUser)
+
+						.setState (
+							ChatBroadcastNumberState.accepted)
+
+ 						.setAddedByUser (
+ 							myUser)
 
 					);
 

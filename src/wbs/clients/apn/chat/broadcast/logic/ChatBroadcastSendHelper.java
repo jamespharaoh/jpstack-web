@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.broadcast.logic;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -411,7 +413,14 @@ class ChatBroadcastSendHelper
 		// sanity check
 
 		if (chatBroadcast.getNumAccepted () != 0) {
-			throw new IllegalStateException ();
+
+			throw new IllegalStateException (
+				stringFormat (
+					"Unable to complete send to chat broadcast %s ",
+					chatBroadcast.getId (),
+					"with %s numbers accepted",
+					chatBroadcast.getNumAccepted ()));
+
 		}
 
 		// update broadcast

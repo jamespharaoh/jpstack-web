@@ -33,7 +33,7 @@ exec java $JAVA_OPTS \
 	wbs.platform.application.tools.BeanRunner \
 	wbs-apn \
 	wbs.apn \
-	config,data,entity,schema,sql,model,hibernate,object,logic,daemon \
+	utils,config,data,entity,schema,sql,model,hibernate,object,logic,daemon \
 	hades,hibernate \
 	wbs.platform.daemon.DaemonRunner \
 	runDaemon
