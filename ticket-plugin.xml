@@ -27,6 +27,7 @@
 	<console-modules>
 		<console-module name="ticket-manager"/>
 		<console-module name="ticket"/>
+		<console-module name="ticket-field-type"/>
 		<console-module name="ticket-note"/>
 	</console-modules>
 
