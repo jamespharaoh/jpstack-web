@@ -1,17 +1,17 @@
 <console-module
-	name="ticket">
+	name="ticket-field-type">
 
 	<console-helper-provider
-		object-name="ticket"
+		object-name="ticketFieldType"
 		view-delegate-field="parent"
 		view-delegate-priv-code="manage">
 		
 		<context-stuff
-			name="ticketName"
-			field="id"/>
+			name="ticketFieldTypeName"
+			field="name"/>
 
 		<context-stuff
-			name="ticketId"
+			name="ticketFieldTypeId"
 			field="id"/>
 
 		<context-stuff
@@ -25,8 +25,8 @@
 	</console-helper-provider>
 
 	<object-context
-		name="ticket"
-		object-name="ticket">
+		name="ticketFieldType"
+		object-name="ticketFieldType">
 
 		<list>
 
@@ -46,18 +46,6 @@
 			<object-settings-page
 				fields="settings"/>
 
-			<context-link
-				name="ticketNote"
-				link="ticketNote"
-				label="Ticket Notes"
-				priv-key="ticket.ticketManager.manage"/>
-				
-			<context-link
-				name="ticketFieldValue"
-				link="ticketFieldValue"
-				label="Ticket Field Values"
-				priv-key="ticket.ticketManager.manage"/>
-
 			<object-events-page/>
 
 		</object>
@@ -66,56 +54,75 @@
 
 	<field-set
 		name="list"
-		object-name="ticket">
+		object-name="ticketFieldType">
 
-		<parent-field/>
+		<text-field
+			name="name"/>
 
 	</field-set>
 
 	<field-set
 		name="create"
-		object-name="ticket">
+		object-name="ticketFieldType">
 		
 		<parent-field/>
 		
-		<timestamp-field
-			name="nextActionDate"/>
-			
-		<object-field
-			name="ticketState"
-			finder="ticketState"/>
+		<text-field
+			name="name"/>
+		
+		<yes-no-field
+			name="required"/>
 
+		<text-field
+			name="type"/>
+			
+		<text-field
+			name="objectType"
+			nullable="yes"/>
+			
 	</field-set>
 
 	<field-set
 		name="summary"
-		object-name="ticket">
+		object-name="ticketFieldType">
 
 		<id-field/>
 		<parent-field/>
 		<code-field/>
 		
-		<timestamp-field
-			name="nextActionDate"/>
+		<text-field
+			name="name"/>		
+		
+		<yes-no-field
+			name="required"/>
+
+		<text-field
+			name="type"/>
 			
-		<object-field
-			name="ticketState"
-			finder="ticketState"/>
+		<text-field
+			name="objectType"
+			nullable="yes"/>
 
 	</field-set>
 
 	<field-set
 		name="settings"
-		object-name="ticket">
+		object-name="ticketFieldType">
 
 		<parent-field/>
 		
-		<timestamp-field
-			name="nextActionDate"/>
+		<text-field
+			name="name"/>
+		
+		<yes-no-field
+			name="required"/>
+
+		<text-field
+			name="type"/>
 			
-		<object-field
-			name="ticketState"
-			finder="ticketState"/>
+		<text-field
+			name="objectType"
+			nullable="yes"/>
 
 	</field-set>
 

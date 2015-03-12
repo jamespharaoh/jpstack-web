@@ -53,6 +53,12 @@
 				link="ticket"
 				label="Tickets"
 				priv-key="ticketManager.manage"/>
+				
+			<context-link
+				name="ticketFieldType"
+				link="ticketFieldType"
+				label="Ticket field types"
+				priv-key="ticketManager.manage"/>
 
 			<object-events-page/>
 

@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.Instant;
@@ -13,6 +14,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.CollectionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
@@ -20,6 +22,7 @@ import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
+import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 
@@ -107,6 +110,30 @@ public class TicketRec
 	
 		}
 	
+	}
+	
+	// object hooks
+
+	public static
+	class TicketHooks
+		extends AbstractObjectHooks<TicketRec> {
+
+		@Inject
+		Provider<TicketObjectHelper> ticketHelper;
+
+		@Inject
+		Database database;
+
+		@Override
+		public
+		void beforeInsert (
+				TicketRec ticket) {
+
+			ticket.setCode(ticketHelper.get()
+					.generateCode());
+
+		}
+
 	}
 	
 	// compare to

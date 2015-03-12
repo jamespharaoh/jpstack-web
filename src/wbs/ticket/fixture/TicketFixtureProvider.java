@@ -9,6 +9,8 @@ import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuObjectHelper;
 import wbs.platform.menu.model.MenuRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.ticket.model.TicketFieldTypeObjectHelper;
+import wbs.ticket.model.TicketFieldTypeRec;
 import wbs.ticket.model.TicketManagerObjectHelper;
 import wbs.ticket.model.TicketManagerRec;
 import wbs.ticket.model.TicketNoteObjectHelper;
@@ -33,6 +35,9 @@ public class TicketFixtureProvider
 	
 	@Inject
 	TicketObjectHelper ticketHelper;
+	
+	@Inject
+	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
 	
 	@Inject
 	TicketNoteObjectHelper ticketNoteHelper;
@@ -90,6 +95,59 @@ public class TicketFixtureProvider
 				ticketHelper.generateCode ())
 	
 		);
+	
+		ticketFieldTypeHelper.insert (
+				new TicketFieldTypeRec ()
+	
+			.setTicketManager (
+				ticketManager)
+	
+			.setCode (
+				ticketFieldTypeHelper.generateCode ())
+				
+			.setName("Number")
+			
+			.setType("number")
+			
+			.setRequired(true)			
+	
+		);
+		
+		ticketFieldTypeHelper.insert (
+				new TicketFieldTypeRec ()
+	
+			.setTicketManager (
+				ticketManager)
+	
+			.setCode (
+				ticketFieldTypeHelper.generateCode ())
+				
+			.setName("User")
+			
+			.setType("object")
+			
+			.setObjectType("ImChatCustomerRec")
+			
+			.setRequired(true)			
+	
+		);	
+		
+		ticketFieldTypeHelper.insert (
+				new TicketFieldTypeRec ()
+	
+			.setTicketManager (
+				ticketManager)
+	
+			.setCode (
+				ticketFieldTypeHelper.generateCode ())
+				
+			.setName("Text")
+			
+			.setType("string")
+			
+			.setRequired(true)			
+	
+		);	
 		
 		ticketNoteHelper.insert (
 			new TicketNoteRec ()

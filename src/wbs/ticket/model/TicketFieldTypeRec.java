@@ -3,6 +3,7 @@ package wbs.ticket.model;
 import java.util.Random;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
@@ -10,13 +11,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
+import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
+import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
-import wbs.ticket.model.TicketRec.TicketObjectHelperMethods;
 
 @Accessors (chain = true)
 @Data
@@ -34,7 +37,16 @@ public class TicketFieldTypeRec
 	@CodeField
 	String code;
 	
+	@ParentField
+	TicketManagerRec ticketManager;
+	
 	// details
+	
+	@SimpleField
+	String name;
+	
+	@SimpleField
+	Boolean required;
 	
 	@SimpleField
 	String type;
@@ -42,9 +54,6 @@ public class TicketFieldTypeRec
 	@SimpleField (
 			nullable = true)
 	String objectType;
-	
-	@SimpleField
-	Boolean required;
 	
 	// object helper methods
 	
@@ -59,7 +68,7 @@ public class TicketFieldTypeRec
 	
 	public static
 	class TicketFieldTypeObjectHelperImplementation
-		implements TicketObjectHelperMethods {
+		implements TicketFieldTypeObjectHelperMethods {
 	
 		// dependencies
 	
@@ -81,6 +90,30 @@ public class TicketFieldTypeRec
 	
 		}
 	
+	}
+	
+	// object hooks
+
+	public static
+	class TicketFieldTypeHooks
+		extends AbstractObjectHooks<TicketFieldTypeRec> {
+
+		@Inject
+		Provider<TicketFieldTypeObjectHelper>  ticketFieldTypeHelper;
+
+		@Inject
+		Database database;
+
+		@Override
+		public
+		void beforeInsert (
+				TicketFieldTypeRec ticketFieldType) {
+
+			ticketFieldType.setCode(ticketFieldTypeHelper.get()
+					.generateCode());
+
+		}
+
 	}
 	
 	
