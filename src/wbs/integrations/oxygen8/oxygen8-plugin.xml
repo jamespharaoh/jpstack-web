@@ -8,6 +8,7 @@
 
 	<models>
 		<model name="oxygen8Config"/>
+		<model name="oxygen8InboundLog"/>
 		<model name="oxygen8Network"/>
 		<model name="oxygen8ReportCode"/>
 		<model name="oxygen8RouteIn"/>
@@ -34,6 +35,7 @@
 	<console-modules>
 		<console-module name="oxygen8"/>
 		<console-module name="oxygen8-config"/>
+		<console-module name="oxygen8-inbound-log"/>
 		<console-module name="oxygen8-network"/>
 		<console-module name="oxygen8-report-code"/>
 		<console-module name="oxygen8-route-in"/>

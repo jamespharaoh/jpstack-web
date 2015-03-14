@@ -45,6 +45,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.console.misc.TimeFormatter;
+import wbs.platform.event.logic.EventLogic;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.queue.logic.QueueLogic;
@@ -52,6 +53,8 @@ import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.locator.logic.LocatorManager;
+import wbs.sms.locator.model.LocatorObjectHelper;
+import wbs.sms.locator.model.LocatorRec;
 import wbs.sms.locator.model.LongLat;
 import wbs.sms.magicnumber.logic.MagicNumberLogic;
 import wbs.sms.message.core.model.MessageRec;
@@ -105,7 +108,13 @@ class ChatMiscLogicImpl
 	Database database;
 
 	@Inject
+	EventLogic eventLogic;
+
+	@Inject
 	ExceptionLogic exceptionLogic;
+
+	@Inject
+	LocatorObjectHelper locatorHelper;
 
 	@Inject
 	LocatorManager locatorManager;
@@ -439,6 +448,9 @@ class ChatMiscLogicImpl
 			final int chatUserId =
 				chatUser.getId ();
 
+			final int locatorId =
+				chat.getLocator ().getId ();
+
 			locatorManager.locate (
 				chat.getLocator ().getId (),
 				chatUser.getNumber ().getId (),
@@ -467,6 +479,17 @@ class ChatMiscLogicImpl
 						.setLocTime (
 							instantToDate (
 								transaction.now ()));
+
+					LocatorRec locator =
+						locatorHelper.find (
+							locatorId);
+
+					eventLogic.createEvent (
+						"chat_user_location_locator",
+						chatUser,
+						longLat.getLongitude (),
+						longLat.getLatitude (),
+						locator);
 
 					transaction.commit ();
 

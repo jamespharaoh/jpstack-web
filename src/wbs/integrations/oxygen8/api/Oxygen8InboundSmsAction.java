@@ -3,6 +3,8 @@ package wbs.integrations.oxygen8.api;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -17,11 +19,14 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.integrations.oxygen8.model.Oxygen8ConfigRec;
+import wbs.integrations.oxygen8.model.Oxygen8InboundLogObjectHelper;
+import wbs.integrations.oxygen8.model.Oxygen8InboundLogRec;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInRec;
 import wbs.platform.api.mvc.ApiAction;
+import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
@@ -42,7 +47,13 @@ class Oxygen8InboundSmsAction
 	Database database;
 
 	@Inject
+	ExceptionLogic exceptionLogic;
+
+	@Inject
 	InboxLogic inboxLogic;
+
+	@Inject
+	Oxygen8InboundLogObjectHelper oxygen8InboundLogHelper;
 
 	@Inject
 	Oxygen8NetworkObjectHelper oxygen8NetworkHelper;
@@ -66,6 +77,9 @@ class Oxygen8InboundSmsAction
 
 	// state
 
+	StringBuilder debugLog =
+		new StringBuilder ();
+
 	int routeId;
 
 	String channel;
@@ -84,11 +98,129 @@ class Oxygen8InboundSmsAction
 	protected
 	Responder goApi () {
 
-		processRequest ();
+		try {
 
-		updateDatabase ();
+			logRequest ();
 
-		return createResponse ();
+			processRequest ();
+
+			updateDatabase ();
+
+			return createResponse ();
+
+		} catch (RuntimeException exception) {
+
+			logFailure (
+				exception);
+
+			throw exception;
+
+		} finally {
+
+			storeLog ();
+
+		}
+
+	}
+
+	void logRequest () {
+
+		// output
+
+		debugLog.append (
+			stringFormat (
+				"%s %s\n",
+				requestContext.method (),
+				requestContext.requestUri ()));
+
+		// output headers
+
+		for (
+			Map.Entry<String,List<String>> headerEntry
+				: requestContext.headerMap ().entrySet ()
+		) {
+
+			for (
+				String headerValue
+					: headerEntry.getValue ()
+			) {
+
+				debugLog.append (
+					stringFormat (
+						"%s = %s\n",
+						headerEntry.getKey (),
+						headerValue));
+
+			}
+
+		}
+
+		debugLog.append (
+			stringFormat (
+				"\n"));
+
+		// output params
+
+		for (
+			Map.Entry<String,List<String>> parameterEntry
+				: requestContext.parameterMap ().entrySet ()
+		) {
+
+			for (
+				String parameterValue
+					: parameterEntry.getValue ()
+			) {
+
+				debugLog.append (
+					stringFormat (
+						"%s = %s\n",
+						parameterEntry.getKey (),
+						parameterValue));
+
+			}
+
+		}
+
+		debugLog.append (
+			stringFormat (
+				"\n"));
+
+	}
+
+	void logFailure (
+			Throwable exception) {
+
+		debugLog.append (
+			stringFormat (
+				"*** THREW EXCEPTION ***\n",
+				"\n"));
+
+		debugLog.append (
+			stringFormat (
+				"%s\n",
+				exceptionLogic.throwableDump (
+					exception)));
+
+	}
+
+	void storeLog () {
+
+		@Cleanup
+		Transaction transaction =
+			database.beginReadWrite ();
+
+		oxygen8InboundLogHelper.insert (
+			new Oxygen8InboundLogRec ()
+
+			.setTimestamp (
+				transaction.now ())
+
+			.setDetails (
+				debugLog.toString ())
+
+		);
+
+		transaction.commit ();
 
 	}
 

@@ -699,6 +699,62 @@ class RequestContextImpl
 
 	}
 
+	Map<String,List<String>> headerMap;
+
+	@Override
+	public
+	Map<String,List<String>> headerMap () {
+
+		if (headerMap != null)
+			return headerMap;
+
+		ImmutableMap.Builder<String,List<String>> headerMapBuilder =
+			ImmutableMap.<String,List<String>>builder ();
+
+		Enumeration<?> headerNamesEnumeration =
+			request ().getHeaderNames ();
+
+		while (
+			headerNamesEnumeration.hasMoreElements ()
+		) {
+
+			String headerName =
+				(String)
+				headerNamesEnumeration.nextElement ();
+
+			Enumeration<?> headerValuesEnumeration =
+				request ().getHeaders (
+					headerName);
+
+			ImmutableList.Builder<String> headerValuesBuilder =
+				ImmutableList.<String>builder ();
+
+			while (
+				headerValuesEnumeration.hasMoreElements ()
+			) {
+
+				String headerValue =
+					(String)
+					headerValuesEnumeration.nextElement ();
+
+				headerValuesBuilder.add (
+					headerValue);
+
+			}
+
+			headerMapBuilder.put (
+				headerName,
+				headerValuesBuilder.build ());
+
+		}
+
+		headerMap =
+			headerMapBuilder.build ();
+
+		return headerMap;
+
+	}
+
 	@Override
 	public
 	void debugDump (

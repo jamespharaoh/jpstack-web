@@ -140,10 +140,6 @@
 			package="wbs.platform.exception"/>
 
 		<plugin
-			name="groovy"
-			package="wbs.platform.groovy"/>
-
-		<plugin
 			name="group"
 			package="wbs.platform.group"/>
 

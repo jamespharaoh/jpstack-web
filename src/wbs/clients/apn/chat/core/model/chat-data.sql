@@ -125,3 +125,19 @@ SELECT number_lookup_type_insert (
 SELECT event_type_insert (
 	'chat_broadcast_send_completed',
 	'%0 completed sending');
+
+SELECT event_type_insert (
+	'chat_user_location_api',
+	'Location for %0 set to (%1,%2) via API');
+
+SELECT event_type_insert (
+	'chat_user_place_message',
+	'Location for %0 set to %1 (%2,%3) by %4');
+
+SELECT event_type_insert (
+	'chat_user_place_api',
+	'Location for %0 set to %1 (%2,%3) by API');
+
+SELECT event_type_insert (
+	'chat_user_location_locator',
+	'Location for %0 set to (%1,%2) via %3');

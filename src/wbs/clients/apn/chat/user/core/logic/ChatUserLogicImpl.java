@@ -53,6 +53,7 @@ import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.console.misc.TimeFormatter;
+import wbs.platform.event.logic.EventLogic;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
@@ -96,6 +97,9 @@ class ChatUserLogicImpl
 
 	@Inject
 	EmailLogic emailLogic;
+
+	@Inject
+	EventLogic eventLogic;
 
 	@Inject
 	ExceptionLogic exceptionLogic;
@@ -1161,6 +1165,29 @@ class ChatUserLogicImpl
 
 			.setLocTime (
 				new Date ());
+
+		// create event
+
+		if (message.isPresent ()) {
+
+			eventLogic.createEvent (
+				"chat_user_place_message",
+				chatUser,
+				gazetteerEntry,
+				gazetteerEntry.getLongLat ().getLongitude (),
+				gazetteerEntry.getLongLat ().getLatitude (),
+				message.get ());
+
+		} else {
+
+			eventLogic.createEvent (
+				"chat_user_place_api",
+				chatUser,
+				gazetteerEntry,
+				gazetteerEntry.getLongLat ().getLongitude (),
+				gazetteerEntry.getLongLat ().getLatitude ());
+
+		}
 
 		return true;
 

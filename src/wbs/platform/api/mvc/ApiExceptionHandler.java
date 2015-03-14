@@ -15,7 +15,6 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.WebExceptionHandler;
 import wbs.platform.exception.logic.ExceptionLogic;
-import wbs.platform.exception.logic.ExceptionLogicImpl;
 
 import com.google.common.base.Optional;
 
@@ -59,7 +58,8 @@ class ApiExceptionHandler
 				new StringBuilder ();
 
 			stringBuilder.append (
-				ExceptionLogicImpl.throwableDump (throwable));
+				exceptionLogic.throwableDump (
+					throwable));
 
 			stringBuilder.append (
 				"\n\nHTTP INFO\n\n");
@@ -92,7 +92,8 @@ class ApiExceptionHandler
 			exceptionLogic.logSimple (
 				"webapi",
 				requestContext.requestUri (),
-				ExceptionLogicImpl.throwableSummary (throwable),
+				exceptionLogic.throwableSummary (
+					throwable),
 				stringBuilder.toString (),
 				Optional.<Integer>absent (),
 				false);

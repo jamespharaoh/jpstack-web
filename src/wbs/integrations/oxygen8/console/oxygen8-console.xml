@@ -15,17 +15,35 @@
 			label="Configs"
 			priv-key="oxygen8.manage"/>
 
-		<context-link
-			name="routeIn"
-			link="oxygen8RouteIn"
-			label="Inbound routes routes"
-			priv-key="oxygen8.manage"/>
+		<section
+			name="route"
+			label="Routes">
 
-		<context-link
-			name="routeOut"
-			link="oxygen8RouteOut"
-			label="Outbound routes"
-			priv-key="oxygen8.manage"/>
+			<context-link
+				name="in"
+				link="oxygen8RouteIn"
+				label="Inbound routes routes"
+				priv-key="oxygen8.manage"/>
+
+			<context-link
+				name="out"
+				link="oxygen8RouteOut"
+				label="Outbound routes"
+				priv-key="oxygen8.manage"/>
+
+		</section>
+
+		<section
+			name="log"
+			label="Logs">
+
+			<context-link
+				name="Inbound"
+				link="oxygen8InboundLog"
+				label="Inbound"
+				priv-key="oxygen8.manage"/>
+
+		</section>
 
 	</simple-context>
 

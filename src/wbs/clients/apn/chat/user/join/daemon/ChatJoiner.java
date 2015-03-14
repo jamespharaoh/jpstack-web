@@ -53,6 +53,7 @@ import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.event.logic.EventLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
@@ -130,6 +131,9 @@ class ChatJoiner {
 
 	@Inject
 	DeliveryObjectHelper deliveryHelper;
+
+	@Inject
+	EventLogic eventLogic;
 
 	@Inject
 	InboxLogic inboxLogic;

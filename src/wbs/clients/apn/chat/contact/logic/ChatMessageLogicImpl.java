@@ -61,7 +61,6 @@ import wbs.framework.object.ObjectManager;
 import wbs.integrations.jigsaw.api.JigsawApi;
 import wbs.integrations.urbanairship.logic.UrbanAirshipApi;
 import wbs.platform.exception.logic.ExceptionLogic;
-import wbs.platform.exception.logic.ExceptionLogicImpl;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -976,7 +975,8 @@ class ChatMessageLogicImpl
 				"JigsawApi.pushServer threw exception",
 				"Chat message id: " + chatMessage.getId () + "\n" +
 				"\n" +
-				ExceptionLogicImpl.throwableDump (exception),
+				exceptionLogic.throwableDump (
+					exception),
 
 				Optional.<Integer>absent (),
 				false);
@@ -1022,7 +1022,8 @@ class ChatMessageLogicImpl
 				"JigsawApi.pushServer threw exception",
 				"Chat message id: " + chatMessage.getId () + "\n" +
 				"\n" +
-				ExceptionLogicImpl.throwableDump (exception),
+				exceptionLogic.throwableDump (
+					exception),
 
 				Optional.<Integer>absent (),
 				false);
@@ -1057,7 +1058,8 @@ class ChatMessageLogicImpl
 				"JigsawApi.pushServer threw exception",
 				"Chat message id: " + chatMessage.getId () + "\n" +
 				"\n" +
-				ExceptionLogicImpl.throwableDump (exception),
+				exceptionLogic.throwableDump (
+					exception),
 
 				Optional.<Integer>absent (),
 				false);
@@ -1244,7 +1246,7 @@ class ChatMessageLogicImpl
 					"\n",
 
 					"%s",
-					ExceptionLogicImpl.throwableDump (
+					exceptionLogic.throwableDump (
 						exception)),
 
 				Optional.<Integer>absent (),

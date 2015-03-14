@@ -85,6 +85,7 @@ import wbs.framework.web.WebFile;
 import wbs.platform.api.mvc.ApiFile;
 import wbs.platform.api.mvc.WebApiAction;
 import wbs.platform.api.mvc.WebApiManager;
+import wbs.platform.event.logic.EventLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
@@ -169,6 +170,9 @@ class ChatApiServletModule
 
 	@Inject
 	Database database;
+
+	@Inject
+	EventLogic eventLogic;
 
 	@Inject
 	LocatorLogic locatorLogic;
@@ -1490,10 +1494,12 @@ class ChatApiServletModule
 
 			if (location != null) {
 
-				if (! chatUserLogic.setPlace (
+				if (
+					! chatUserLogic.setPlace (
 						chatUser,
 						location,
-						null)) {
+						Optional.<MessageRec>absent ())
+				) {
 
 					errorCodes.add ("location-invalid");
 
@@ -1503,11 +1509,21 @@ class ChatApiServletModule
 
 			}
 
-			if (longitude != null
-					&& latitude != null) {
+			if (
+				longitude != null
+				&& latitude != null
+			) {
 
 				chatUser.setLocLongLat (
-					new LongLat (longitude, latitude));
+					new LongLat (
+						longitude,
+						latitude));
+
+				eventLogic.createEvent (
+					"chat_user_location_api",
+					chatUser,
+					longitude,
+					latitude);
 
 			} else if (longitude != null || latitude != null) {
 

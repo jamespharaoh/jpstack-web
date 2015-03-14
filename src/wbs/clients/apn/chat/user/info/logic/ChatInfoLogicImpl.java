@@ -42,7 +42,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.exception.logic.ExceptionLogic;
-import wbs.platform.exception.logic.ExceptionLogicImpl;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.queue.logic.QueueLogic;
@@ -194,9 +193,9 @@ class ChatInfoLogicImpl
 					otherUser.getInfoText ().getText (),
 					templates);
 
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException exception) {
 
-			log.error ("MessageSplitter.split threw exception: " + e);
+			log.error ("MessageSplitter.split threw exception: " + exception);
 
 			exceptionLogic.logSimple (
 				"unknown",
@@ -208,7 +207,8 @@ class ChatInfoLogicImpl
 				"thisUser.id = " + thisUser.getId () + "\n" +
 				"otherUser.id = " + otherUser.getId () + "\n" +
 				"\n" +
-				ExceptionLogicImpl.throwableDump (e),
+				exceptionLogic.throwableDump (
+					exception),
 
 				Optional.<Integer>absent (),
 				false);

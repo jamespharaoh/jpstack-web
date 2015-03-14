@@ -1,0 +1,72 @@
+<console-module
+	name="oxygen8-inbound-log">
+
+	<console-helper-provider
+		object-name="oxygen8InboundLog"
+		view-delegate-field="root"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="oxygen8InboundLog.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="oxygen8InboundLogName"
+			field="id"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="oxygen8InboundLog"
+		object-name="oxygen8InboundLog">
+
+		<list>
+
+			<object-search-page
+				search-fields="search"
+				results-fields="results"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="search"
+		class="wbs.integrations.oxygen8.model.Oxygen8InboundLogRec$Oxygen8InboundLogSearch">
+
+	</field-set>
+
+	<field-set
+		name="results"
+		object-name="oxygen8InboundLog">
+
+		<id-field/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="oxygen8InboundLog">
+
+		<id-field/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<text-area-field
+			name="details"/>
+
+	</field-set>
+
+</console-module>

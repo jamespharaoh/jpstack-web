@@ -23,7 +23,6 @@ import wbs.platform.console.part.PagePart;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.HtmlResponder;
 import wbs.platform.exception.logic.ExceptionLogic;
-import wbs.platform.exception.logic.ExceptionLogicImpl;
 import wbs.platform.priv.console.PrivChecker;
 
 import com.google.common.base.Optional;
@@ -298,7 +297,8 @@ class TabbedResponder
 
 				printFormat (
 					"<p><pre>%h</pre></p>\n",
-					ExceptionLogicImpl.throwableDump (pagePartThrew));
+					exceptionLogic.throwableDump (
+						pagePartThrew));
 
 			}
 

@@ -126,7 +126,7 @@ class ConsoleContextSectionBuilder {
 				"end")
 
 			.friendlyName (
-				consoleHelper.friendlyName ());
+				container.friendlyName ());
 
 		builder.descend (
 			nextContextBuilderContainer,
@@ -151,10 +151,12 @@ class ConsoleContextSectionBuilder {
 		Map<String,Object> stuffMap =
 			new HashMap<String,Object> ();
 
-		for (ConsoleContextStuffSpec contextStuffSpec
+		for (
+			ConsoleContextStuffSpec contextStuffSpec
 				: Iterables.filter (
 					spec.children (),
-					ConsoleContextStuffSpec.class)) {
+					ConsoleContextStuffSpec.class)
+		) {
 
 			stuffMap.put (
 				contextStuffSpec.name (),
@@ -162,8 +164,10 @@ class ConsoleContextSectionBuilder {
 
 		}
 
-		for (String parentContextName
-				: resolvedExtensionPoint.parentContextNames ()) {
+		for (
+			String parentContextName
+				: resolvedExtensionPoint.parentContextNames ()
+		) {
 
 				String resolvedContextName =
 					stringFormat (

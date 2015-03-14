@@ -85,7 +85,6 @@
       <fileset dir="src/wbs/platform/console/html/files"/>
       <fileset dir="src/wbs/platform/event/console/files"/>
       <fileset dir="src/wbs/platform/exception/console/files"/>
-      <fileset dir="src/wbs/platform/groovy/console/files"/>
       <fileset dir="src/wbs/platform/group/console/files"/>
       <fileset dir="src/wbs/platform/lock/console/files"/>
       <fileset dir="src/wbs/platform/media/console/files"/>
@@ -252,7 +251,6 @@
       <fileset dir="src/wbs/platform/console/html/api/files"/>
       <fileset dir="src/wbs/platform/event/api/files"/>
       <fileset dir="src/wbs/platform/exception/api/files"/>
-      <fileset dir="src/wbs/platform/groovy/api/files"/>
       <fileset dir="src/wbs/platform/group/api/files"/>
       <fileset dir="src/wbs/platform/lock/api/files"/>
       <fileset dir="src/wbs/platform/media/api/files"/>
@@ -453,7 +451,6 @@
       <fileset dir="src/wbs/platform/console/html/files"/>
       <fileset dir="src/wbs/platform/event/console/files"/>
       <fileset dir="src/wbs/platform/exception/console/files"/>
-      <fileset dir="src/wbs/platform/groovy/console/files"/>
       <fileset dir="src/wbs/platform/group/console/files"/>
       <fileset dir="src/wbs/platform/lock/console/files"/>
       <fileset dir="src/wbs/platform/media/console/files"/>
@@ -620,7 +617,6 @@
       <fileset dir="src/wbs/platform/console/html/api/files"/>
       <fileset dir="src/wbs/platform/event/api/files"/>
       <fileset dir="src/wbs/platform/exception/api/files"/>
-      <fileset dir="src/wbs/platform/groovy/api/files"/>
       <fileset dir="src/wbs/platform/group/api/files"/>
       <fileset dir="src/wbs/platform/lock/api/files"/>
       <fileset dir="src/wbs/platform/media/api/files"/>
