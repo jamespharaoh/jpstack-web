@@ -1,3 +1,10 @@
+CREATE INDEX exception_timestamp
+ON exception (timestamp, id);
+
+CREATE INDEX exception_alert_timestamp
+ON exception (timestamp, id)
+WHERE alert;
+
 ---------------------------------------------------------- TABLE exception_type
 
 CREATE OR REPLACE FUNCTION exception_type (text) RETURNS int AS '
@@ -22,7 +29,6 @@ RETURNS int AS $$
 	SELECT currval ('exception_type_id_seq')::int;
 
 $$ LANGUAGE SQL;
-
 
 ---------------------------------------- FUNCTION exception_clear_alerts
 

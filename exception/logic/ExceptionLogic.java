@@ -30,4 +30,10 @@ interface ExceptionLogic {
 			Optional<Integer> userId,
 			Boolean fatal);
 
+	String throwableSummary (
+			Throwable throwable);
+
+	String throwableDump (
+			Throwable throwable);
+
 }

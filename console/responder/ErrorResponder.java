@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.exception.logic.ExceptionLogicImpl;
+import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.priv.console.PrivChecker;
 
 @Accessors (fluent = true)
@@ -17,19 +17,18 @@ public
 class ErrorResponder
 	extends HtmlResponder {
 
+	// dependencies
+
 	@Inject
-	ConsoleRequestContext requestContext;
+	ExceptionLogic exceptionLogic;
 
 	@Inject
 	PrivChecker privChecker;
 
-	public final static
-	String defaultTitle =
-		"Internal error.";
+	@Inject
+	ConsoleRequestContext requestContext;
 
-	public final static
-	String defaultMessage =
-		"This page cannot be displayed, due to an internal error.";
+	// properties
 
 	@Getter @Setter
 	Throwable exception;
@@ -39,6 +38,8 @@ class ErrorResponder
 
 	@Getter @Setter
 	String message = defaultMessage;
+
+	// implementation
 
 	@Override
 	public
@@ -67,10 +68,21 @@ class ErrorResponder
 
 			printFormat (
 				"<p><pre>%h</pre></p>\n",
-				ExceptionLogicImpl.throwableDump(exception));
+				exceptionLogic.throwableDump (
+					exception));
 
 		}
 
 	}
+
+	// data
+
+	public final static
+	String defaultTitle =
+		"Internal error.";
+
+	public final static
+	String defaultMessage =
+		"This page cannot be displayed, due to an internal error.";
 
 }

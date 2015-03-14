@@ -230,7 +230,8 @@ class ExceptionLogicImpl
 
 	}
 
-	public static
+	@Override
+	public
 	String throwableSummary (
 			@NonNull Throwable throwable) {
 
@@ -254,7 +255,8 @@ class ExceptionLogicImpl
 
 	}
 
-	public static
+	@Override
+	public
 	String throwableDump (
 			@NonNull Throwable throwable) {
 
