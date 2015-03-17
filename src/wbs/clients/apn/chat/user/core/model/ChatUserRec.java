@@ -149,22 +149,22 @@ class ChatUserRec
 	QueueItemRec queueItem;
 
 	@SimpleField (
-		columns = { "loc_longitude", "loc_latitude" },
+		columns = { "location_longitude", "location_latitude" },
 		nullable = true)
-	LongLat locLongLat;
+	LongLat locationLongLat;
 
 	@SimpleField (
 		nullable = true)
-	Date locTime;
+	Date locationTime;
 
 	@SimpleField (
 		nullable = true)
-	String locPlace;
+	String locationPlace;
 
 	@SimpleField (
-		columns = { "loc_place_longitude", "loc_place_latitude" },
+		columns = { "location_place_longitude", "location_place_latitude" },
 		nullable = true)
-	LongLat locPlaceLongLat;
+	LongLat locationPlaceLongLat;
 
 	@SimpleField (
 		nullable = true)

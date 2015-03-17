@@ -795,8 +795,10 @@ class ChatDateDaemon
 
 		// check distance
 
-		if (thisUser.getLocLongLat () == null
-				|| thatUserInfo.longLat == null) {
+		if (
+			thisUser.getLocationLongLat () == null
+			|| thatUserInfo.longLat == null
+		) {
 
 			dateUserStats.numNoLocation++;
 
@@ -806,7 +808,7 @@ class ChatDateDaemon
 
 		int miles = (int)
 			locatorLogic.distanceMiles (
-				thisUser.getLocLongLat (),
+				thisUser.getLocationLongLat (),
 				thatUserInfo.longLat);
 
 		if (miles > thisUser.getDateRadius ()) {
@@ -853,7 +855,7 @@ class ChatDateDaemon
 				ChatUserRec chatUser) {
 
 			id = chatUser.getId ();
-			longLat = chatUser.getLocLongLat ();
+			longLat = chatUser.getLocationLongLat ();
 			photo = ! chatUser.getChatUserImageList ().isEmpty ();
 			gender = chatUser.getGender ();
 			orient = chatUser.getOrient ();

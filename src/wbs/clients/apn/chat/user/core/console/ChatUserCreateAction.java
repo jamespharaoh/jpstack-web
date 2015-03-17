@@ -207,13 +207,13 @@ class ChatUserCreateAction
 			.setInfoText (
 				textHelper.findOrCreate (info))
 
-			.setLocPlace (
+			.setLocationPlace (
 				postcode)
 
-			.setLocPlaceLongLat (
+			.setLocationPlaceLongLat (
 				gazetteerEntry.getLongLat ())
 
-			.setLocLongLat (
+			.setLocationLongLat (
 				gazetteerEntry.getLongLat ())
 
 			.setGender (

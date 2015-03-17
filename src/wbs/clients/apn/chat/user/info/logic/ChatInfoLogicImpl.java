@@ -165,8 +165,8 @@ class ChatInfoLogicImpl
 
 		int miles =
 			(int) locatorLogic.distanceMiles (
-				thisUser.getLocLongLat (),
-				otherUser.getLocLongLat ());
+				thisUser.getLocationLongLat (),
+				otherUser.getLocationLongLat ());
 
 		// construct message parts
 

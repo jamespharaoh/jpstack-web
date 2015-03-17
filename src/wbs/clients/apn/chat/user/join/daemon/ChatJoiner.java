@@ -803,7 +803,7 @@ class ChatJoiner {
 
 		// if we have a location that's fine
 
-		if (chatUser.getLocLongLat () != null)
+		if (chatUser.getLocationLongLat () != null)
 			return true;
 
 		// otherwise, send an error
@@ -967,7 +967,7 @@ class ChatJoiner {
 				"Location ok for chat user %s (%s)",
 				objectManager.objectPathMini (
 					chatUser),
-				chatUser.getLocLongLat ()));
+				chatUser.getLocationLongLat ()));
 
 		// bring the user online if appropriate
 

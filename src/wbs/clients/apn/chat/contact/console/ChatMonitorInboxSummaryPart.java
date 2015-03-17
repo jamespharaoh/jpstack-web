@@ -502,18 +502,18 @@ class ChatMonitorInboxSummaryPart
 			"<th>Location</th>\n",
 
 			"<td>%s</td>\n",
-			monitorChatUser.getLocLongLat() != null
+			monitorChatUser.getLocationLongLat() != null
 				? gazetteerLogic.findNearestCanonicalEntry (
 						monitorChatUser.getChat ().getGazetteer (),
-						monitorChatUser.getLocLongLat ()
+						monitorChatUser.getLocationLongLat ()
 					).getName ()
 				: "-",
 
 			"<td>%s</td>\n",
-			userChatUser.getLocLongLat() != null
+			userChatUser.getLocationLongLat() != null
 				? gazetteerLogic.findNearestCanonicalEntry (
 						userChatUser.getChat ().getGazetteer (),
-						userChatUser.getLocLongLat ()
+						userChatUser.getLocationLongLat ()
 					).getName ()
 				: "-",
 

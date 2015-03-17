@@ -482,18 +482,18 @@ class ChatUserLogicImpl
 		for (ChatUserRec thatUser
 				: otherUsers) {
 
-			if (thisUser.getLocLongLat () == null)
+			if (thisUser.getLocationLongLat () == null)
 				break;
 
-			if (thatUser.getLocLongLat () == null)
+			if (thatUser.getLocationLongLat () == null)
 				continue;
 
 			// work out the distance
 
 			double miles =
 				locatorLogic.distanceMiles (
-					thisUser.getLocLongLat (),
-					thatUser.getLocLongLat ());
+					thisUser.getLocationLongLat (),
+					thatUser.getLocationLongLat ());
 
 			// and add them to the list
 
@@ -1154,16 +1154,16 @@ class ChatUserLogicImpl
 
 		chatUser
 
-			.setLocPlace (
+			.setLocationPlace (
 				gazetteerEntry.getName ())
 
-			.setLocPlaceLongLat (
+			.setLocationPlaceLongLat (
 				gazetteerEntry.getLongLat ())
 
-			.setLocLongLat (
+			.setLocationLongLat (
 				gazetteerEntry.getLongLat ())
 
-			.setLocTime (
+			.setLocationTime (
 				new Date ());
 
 		// create event

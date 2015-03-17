@@ -615,7 +615,7 @@ class ChatUserDaoHibernate
 
 				crit.add (
 					Restrictions.eq (
-						"_chatuser.locPlace",
+						"_chatuser.locationPlace",
 						value));
 
 			} else if (equal (key, "orient")) {
@@ -872,7 +872,7 @@ class ChatUserDaoHibernate
 				"WHERE cu.dateMode != :dateModeNone " +
 					"AND cu.gender IS NOT NULL " +
 					"AND cu.orient IS NOT NULL " +
-					"AND cu.locLongLat IS NOT NULL " +
+					"AND cu.locationLongLat IS NOT NULL " +
 					"AND cu.chat = :chat")
 
 			.setParameter (

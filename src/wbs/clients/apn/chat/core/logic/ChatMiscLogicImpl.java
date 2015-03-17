@@ -436,9 +436,9 @@ class ChatMiscLogicImpl
 
 			&& (
 
-				chatUser.getLocTime () == null
+				chatUser.getLocationTime () == null
 
-				|| chatUser.getLocTime ().getTime ()
+				|| chatUser.getLocationTime ().getTime ()
 					< System.currentTimeMillis () - 1000 * 60 * 60
 
 			)
@@ -473,10 +473,10 @@ class ChatMiscLogicImpl
 
 					chatUser
 
-						.setLocLongLat (
+						.setLocationLongLat (
 							longLat)
 
-						.setLocTime (
+						.setLocationTime (
 							instantToDate (
 								transaction.now ()));
 

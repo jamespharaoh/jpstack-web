@@ -721,7 +721,7 @@ class ChatApiServletModule
 
 			LongLat myLongLat =
 				myUser != null
-					? myUser.getLocLongLat ()
+					? myUser.getLocationLongLat ()
 					: null;
 
 			// find users
@@ -963,15 +963,15 @@ class ChatApiServletModule
 				time =
 					time0;
 
-				if (user.getLocLongLat () != null) {
+				if (user.getLocationLongLat () != null) {
 
 					LongLat longLat =
-						user.getLocLongLat ();
+						user.getLocationLongLat ();
 
 					EastNorth eastNorth =
 						locatorLogic.longLatToEastNorth (
 							osgb,
-							user.getLocLongLat ());
+							user.getLocationLongLat ());
 
 					profile.add (
 
@@ -1514,7 +1514,7 @@ class ChatApiServletModule
 				&& latitude != null
 			) {
 
-				chatUser.setLocLongLat (
+				chatUser.setLocationLongLat (
 					new LongLat (
 						longitude,
 						latitude));
@@ -1790,20 +1790,19 @@ class ChatApiServletModule
 
 			}
 
-			if (chatUser.getLocPlace () != null) {
+			if (chatUser.getLocationPlace () != null) {
 
 				profile.add (
 					Rpc.rpcElem (
 						"location",
-						chatUser
-							.getLocPlace ()));
+						chatUser.getLocationPlace ()));
 
 			}
 
-			if (chatUser.getLocPlaceLongLat () != null) {
+			if (chatUser.getLocationPlaceLongLat () != null) {
 
 				LongLat longLat =
-					chatUser.getLocPlaceLongLat ();
+					chatUser.getLocationPlaceLongLat ();
 
 				EastNorth eastNorth =
 					locatorLogic.longLatToEastNorth (

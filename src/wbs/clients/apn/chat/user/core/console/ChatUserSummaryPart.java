@@ -193,10 +193,10 @@ class ChatUserSummaryPart
 			"<tr>\n",
 			"<th>Location</th>\n",
 			"<td>%s</td>\n",
-			chatUser.getLocLongLat () != null
+			chatUser.getLocationLongLat () != null
 				? gazetteerLogic.findNearestCanonicalEntry (
 						chatUser.getChat ().getGazetteer (),
-						chatUser.getLocLongLat ()
+						chatUser.getLocationLongLat ()
 					).getName ()
 				: "-",
 			"</tr>\n");

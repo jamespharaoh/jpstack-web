@@ -220,10 +220,10 @@ class ChatSupervisorConversationPart
 			"<th>Location</th>\n",
 
 			"<td>%h</td>\n",
-			monitorChatUser.getLocPlace (),
+			monitorChatUser.getLocationPlace (),
 
 			"<td>%h</td>\n",
-			userChatUser.getLocPlace (),
+			userChatUser.getLocationPlace (),
 
 			"</tr>\n");
 

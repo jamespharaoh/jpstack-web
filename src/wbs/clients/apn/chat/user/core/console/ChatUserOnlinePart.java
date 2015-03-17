@@ -183,12 +183,12 @@ class ChatUserOnlinePart
 
 			String placeName = "-";
 
-			if (chatUser.getLocLongLat () != null) {
+			if (chatUser.getLocationLongLat () != null) {
 
 				GazetteerEntryRec gazetteerEntry =
 					gazetteerLogic.findNearestCanonicalEntry (
 						chatUser.getChat ().getGazetteer (),
-						chatUser.getLocLongLat ());
+						chatUser.getLocationLongLat ());
 
 				placeName =
 					gazetteerEntry.getName ();
