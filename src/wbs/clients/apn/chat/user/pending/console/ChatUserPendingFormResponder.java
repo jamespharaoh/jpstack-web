@@ -146,8 +146,9 @@ class ChatUserPendingFormResponder
 
 	@Override
 	public
-	void goHeadStuff() {
-		super.goHeadStuff();
+	void goHeadStuff () {
+
+		super.goHeadStuff ();
 
 		printFormat (
 			"<script language=\"JavaScript\">\n");

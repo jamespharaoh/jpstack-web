@@ -19,6 +19,8 @@ public
 class ChatUserPendingSummaryPart
 	extends AbstractPagePart {
 
+	// dependencies
+
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
 
@@ -28,7 +30,11 @@ class ChatUserPendingSummaryPart
 	@Inject
 	MediaConsoleLogic mediaConsoleLogic;
 
+	// state
+
 	ChatUserRec chatUser;
+
+	// implementation
 
 	@Override
 	public
