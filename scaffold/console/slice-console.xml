@@ -66,6 +66,9 @@
 		<text-field
 			name="supervisorConfigNames"/>
 
+		<text-area-field
+			name="filter"/>
+
 	</field-set>
 
 	<field-set
@@ -83,6 +86,10 @@
 
 		<text-field
 			name="supervisorConfigNames"
+			nullable="yes"/>
+
+		<text-area-field
+			name="filter"
 			nullable="yes"/>
 
 	</field-set>
