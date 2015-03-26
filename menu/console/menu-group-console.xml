@@ -57,7 +57,7 @@
 
 		<parent-field/>
 		<name-field/>
-		<descripton-field/>
+		<description-field/>
 
 		<text-field
 			name="label"/>
