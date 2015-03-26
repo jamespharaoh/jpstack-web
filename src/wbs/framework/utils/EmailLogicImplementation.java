@@ -38,12 +38,12 @@ class EmailLogicImplementation
 
 		try {
 
-	        Properties properties =
-	        	System.getProperties ();
+			Properties properties =
+				System.getProperties ();
 
-	        properties.setProperty (
-	        	"mail.smtp.host",
-	        	wbsConfig.smtpHostname ());
+			properties.setProperty (
+				"mail.smtp.host",
+				wbsConfig.smtpHostname ());
 
 			Session session =
 				Session.getDefaultInstance (

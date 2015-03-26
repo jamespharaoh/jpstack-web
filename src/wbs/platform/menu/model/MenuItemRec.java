@@ -9,8 +9,10 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.DeletedField;
+import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
+import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.MajorRecord;
@@ -22,8 +24,8 @@ import wbs.framework.record.Record;
 @ToString (of = "id")
 @MajorEntity
 public
-class MenuRec
-	implements MajorRecord<MenuRec> {
+class MenuItemRec
+	implements MajorRecord<MenuItemRec> {
 
 	// id
 
@@ -32,8 +34,7 @@ class MenuRec
 
 	// identity
 
-	@ParentField (
-		column = "group_id")
+	@ParentField
 	MenuGroupRec menuGroup;
 
 	@CodeField
@@ -41,28 +42,35 @@ class MenuRec
 
 	// details
 
-	@SimpleField
-	String label = "";
+	@NameField
+	String name;
 
-	@SimpleField
-	String path = "";
-
-	@SimpleField
-	String target = "main";
+	@DescriptionField
+	String description;
 
 	@DeletedField
-	Boolean deleted =
-		false;
+	Boolean deleted = false;
+
+	// settings
+
+	@SimpleField
+	String label;
+
+	@SimpleField
+	String targetPath;
+
+	@SimpleField
+	String targetFrame;
 
 	// compare to
 
 	@Override
 	public
 	int compareTo (
-			Record<MenuRec> otherRecord) {
+			Record<MenuItemRec> otherRecord) {
 
-		MenuRec other =
-			(MenuRec) otherRecord;
+		MenuItemRec other =
+			(MenuItemRec) otherRecord;
 
 		return new CompareToBuilder ()
 

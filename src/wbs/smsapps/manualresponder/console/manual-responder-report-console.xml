@@ -24,21 +24,21 @@
 			title="Simple"/>
 
 		<context-responder-page
-		    name="simpleCsv"/>
+			name="simpleCsv"/>
 
 		<context-tab-page
 			name="service"
 			title="Service"/>
 
 		<context-responder-page
-		    name="serviceCsv"/>
+			name="serviceCsv"/>
 
 		<context-tab-page
 			name="operator"
 			title="Operator"/>
 
 		<context-responder-page
-		    name="operatorCsv"/>
+			name="operatorCsv"/>
 
 	</simple-context>
 
@@ -64,8 +64,8 @@
 			finder="manualResponderRequest"/>
 
 		<text-field
-		    name="timestring"
-		    label="TimeStamp" />
+			name="timestring"
+			label="TimeStamp" />
 
 		<object-field
 			name="user"
@@ -83,8 +83,8 @@
 		object-name="wbs.smsapps.manualresponder.console.ManualResponderReportServicePart$ServiceCountForm">
 
 		<text-field
-		    name="service"
-		    label="Service" />
+			name="service"
+			label="Service" />
 
 
 		<integer-field

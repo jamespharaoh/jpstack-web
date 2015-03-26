@@ -1,6 +1,6 @@
 #!/bin/bash
 
-fix-whitespace \
+fix-whitespace-aggressive \
 	$(
 		find src \
 			-name '*.java' \
@@ -14,6 +14,6 @@ fix-whitespace \
 			-type f
 	) \
 	$(
-		find build.xml wbs-build.xml \
+		find wbs-build.xml \
 			-type f
 	)

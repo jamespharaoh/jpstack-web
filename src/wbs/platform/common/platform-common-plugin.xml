@@ -2,6 +2,11 @@
 	name="platform-common"
 	package="wbs.platform.common">
 
+	<plugin-dependencies>
+		<plugin-dependency name="scaffold"/>
+		<plugin-dependency name="menu"/>
+	</plugin-dependencies>
+
 	<fixtures>
 		<fixture name="platformCommon"/>
 	</fixtures>

@@ -28,7 +28,7 @@
 	</field-set>
 
 	<field-set
-	    name="simpleReportResults"
+		name="simpleReportResults"
 		class="wbs.clients.apn.chat.report.model.ChatReportRevShareRec">
 
 		<text-field

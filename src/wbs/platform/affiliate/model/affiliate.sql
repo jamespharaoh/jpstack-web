@@ -75,80 +75,109 @@ $$ LANGUAGE 'plpgsql';
 
 -- affiliate_create_missing
 
-CREATE OR REPLACE FUNCTION affiliate_create_missing (text, text, bool) RETURNS void AS $$
-  DECLARE
+CREATE OR REPLACE FUNCTION affiliate_create_missing (
+	text,
+	text,
+	bool
+) RETURNS void AS $$
+DECLARE
 
-    the_object_type_code_like ALIAS FOR $1;
-    the_affiliate_type_code_like ALIAS FOR $2;
-    the_actually_create ALIAS FOR $3;
+	the_object_type_code_like ALIAS FOR $1;
+	the_affiliate_type_code_like ALIAS FOR $2;
+	the_actually_create ALIAS FOR $3;
 
-    the_object_type record;
-    the_affiliate_type record;
+	the_object_type record;
+	the_affiliate_type record;
 
-    has_shown_object_type bool;
-    has_shown_affiliate_type bool;
+	has_shown_object_type bool;
+	has_shown_affiliate_type bool;
 
-    the_record record;
+	the_record record;
 
-    the_count int;
+	the_count int;
 
-  BEGIN
+BEGIN
 
-    RAISE NOTICE 'Creating missing affiliates for all objects';
-    the_count := 0;
+	RAISE NOTICE 'Creating missing affiliates for all objects';
+	the_count := 0;
 
-    FOR the_object_type IN
-      SELECT * FROM object_type
-        WHERE the_object_type_code_like IS NULL
-          OR code LIKE the_object_type_code_like
-        ORDER BY code
-    LOOP
-      has_shown_object_type := false;
+	FOR the_object_type IN
 
-      FOR the_affiliate_type IN
-        SELECT * FROM affiliate_type
-          WHERE parent_object_type_id = the_object_type.id
-            AND (the_affiliate_type_code_like IS NULL
-              OR code LIKE the_affiliate_type_code_like)
-          ORDER BY code
-      LOOP
-        has_shown_affiliate_type := false;
+		SELECT * FROM object_type
+		WHERE the_object_type_code_like IS NULL
+			OR code LIKE the_object_type_code_like
+		ORDER BY code
 
-        FOR the_record IN EXECUTE
-          'SELECT parent.* ' ||
-          'FROM ' || quote_ident (the_object_type.code) || ' parent ' ||
-          'LEFT JOIN affiliate ' ||
-            'ON affiliate.type_id = ' || the_affiliate_type.id || ' ' ||
-              'AND affiliate.my_code = ' || quote_literal (the_affiliate_type.code) || ' ' ||
-              'AND affiliate.parent_object_type_id = ' || the_affiliate_type.parent_object_type_id || ' ' ||
-              'AND affiliate.parent_object_id = parent.id ' ||
-          'WHERE affiliate.id IS NULL'
-        LOOP
+	LOOP
 
-          IF NOT has_shown_object_type THEN
-            RAISE NOTICE '- Object type %', the_object_type.code;
-            has_shown_object_type := true;
-          END IF;
+		has_shown_object_type := false;
 
-          IF NOT has_shown_affiliate_type THEN
-            RAISE NOTICE '  - affiliate type %', the_affiliate_type.code;
-            has_shown_affiliate_type := true;
-          END IF;
+		FOR the_affiliate_type IN
 
-          RAISE NOTICE '    - Object % (%)', the_record.code, the_record.id;
+			SELECT * FROM affiliate_type
+			WHERE parent_object_type_id = the_object_type.id
+				AND (the_affiliate_type_code_like IS NULL
+					OR code LIKE the_affiliate_type_code_like)
+			ORDER BY code
 
-          IF the_actually_create THEN
-            INSERT INTO affiliate (type_id, parent_object_type_id, parent_object_id, my_code)
-            SELECT the_affiliate_type.id, the_object_type.id, the_record.id, the_affiliate_type.code;
-          END IF;
+		LOOP
 
-          the_count := the_count + 1;
-        END LOOP;
+			has_shown_affiliate_type := false;
 
-      END LOOP;
+			FOR the_record IN EXECUTE
 
-    END LOOP;
+				'SELECT parent.* ' ||
+				'FROM ' || quote_ident (the_object_type.code) || ' parent ' ||
+				'LEFT JOIN affiliate ' ||
+					'ON affiliate.type_id = ' || the_affiliate_type.id || ' ' ||
+						'AND affiliate.my_code = ' || quote_literal (the_affiliate_type.code) || ' ' ||
+						'AND affiliate.parent_object_type_id = ' || the_affiliate_type.parent_object_type_id || ' ' ||
+						'AND affiliate.parent_object_id = parent.id ' ||
+				'WHERE affiliate.id IS NULL'
 
-    RAISE NOTICE 'Created % missing affiliates', the_count;
-  END;
+			LOOP
+
+				IF NOT has_shown_object_type THEN
+
+					RAISE NOTICE
+						'- Object type %',
+						the_object_type.code;
+						has_shown_object_type := true;
+
+				END IF;
+
+				IF NOT has_shown_affiliate_type THEN
+
+					RAISE NOTICE
+						'  - affiliate type %',
+						the_affiliate_type.code;
+						has_shown_affiliate_type := true;
+
+				END IF;
+
+				RAISE NOTICE
+					'    - Object % (%)',
+					the_record.code,
+					the_record.id;
+
+				IF the_actually_create THEN
+
+					INSERT INTO affiliate (type_id, parent_object_type_id, parent_object_id, my_code)
+					SELECT the_affiliate_type.id, the_object_type.id, the_record.id, the_affiliate_type.code;
+
+				END IF;
+
+				the_count := the_count + 1;
+
+			END LOOP;
+
+		END LOOP;
+
+	END LOOP;
+
+	RAISE NOTICE
+		'Created % missing affiliates',
+		the_count;
+
+END;
 $$ LANGUAGE plpgsql;

@@ -41,8 +41,8 @@ import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuObjectHelper;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemObjectHelper;
+import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 
 @PrototypeComponent ("imChatCoreFixtureProvider")
@@ -92,7 +92,7 @@ class ImChatCoreFixtureProvider
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@Inject
-	MenuObjectHelper menuHelper;
+	MenuItemObjectHelper menuItemHelper;
 
 	@Inject
 	PaypalAccountObjectHelper paypalAccountHelper;
@@ -115,22 +115,32 @@ class ImChatCoreFixtureProvider
 
 		// menu
 
-		menuHelper.insert (
-			new MenuRec ()
+		menuItemHelper.insert (
+			new MenuItemRec ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
 					GlobalId.root,
+					"test",
 					"facility"))
 
 			.setCode (
 				"im_chat")
 
+			.setName (
+				"IM Chat")
+
+			.setDescription (
+				"Instant message chat service")
+
 			.setLabel (
 				"IM Chat")
 
-			.setPath (
+			.setTargetPath (
 				"/imChats")
+
+			.setTargetFrame (
+				"main")
 
 		);
 

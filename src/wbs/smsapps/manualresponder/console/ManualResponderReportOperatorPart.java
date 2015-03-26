@@ -224,7 +224,7 @@ class ManualResponderReportOperatorPart
 					"%s\n",
 					objectManager.tdForObjectMiniLink (
 						//manualResponderHelper.find(service)));
-			            userHelper.find (user)));
+						userHelper.find (user)));
 
 			/*
 			printFormat (
@@ -238,8 +238,8 @@ class ManualResponderReportOperatorPart
 					users.indexOf (user)
 				).toString ());
 
-		    printFormat (
-			    "</tr>\n");
+			printFormat (
+				"</tr>\n");
 
 		}
 

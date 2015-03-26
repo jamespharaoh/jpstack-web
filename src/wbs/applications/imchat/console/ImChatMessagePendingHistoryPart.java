@@ -135,8 +135,8 @@ class ImChatMessagePendingHistoryPart
 				message,
 				true);
 
-		    printFormat (
-			    "</tr>\n");
+			printFormat (
+				"</tr>\n");
 
 		}
 

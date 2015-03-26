@@ -4,10 +4,8 @@ import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
-import wbs.framework.record.GlobalId;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuObjectHelper;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemObjectHelper;
 
 @PrototypeComponent ("menuFixtureProvider")
 public
@@ -20,30 +18,13 @@ class MenuFixtureProvider
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@Inject
-	MenuObjectHelper menuHelper;
+	MenuItemObjectHelper menuItemHelper;
 
 	// implementation
 
 	@Override
 	public
 	void createFixtures () {
-
-		menuHelper.insert (
-			new MenuRec ()
-
-			.setMenuGroup (
-				menuGroupHelper.findByCode (
-					GlobalId.root,
-					"system"))
-
-			.setCode (
-				"menu_group")
-
-			.setLabel (
-				"Menu groups")
-
-			.setPath (
-				"/menuGroups"));
 
 	}
 

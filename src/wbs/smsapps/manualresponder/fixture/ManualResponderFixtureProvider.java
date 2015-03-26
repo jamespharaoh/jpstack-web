@@ -7,9 +7,8 @@ import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuGroupRec;
-import wbs.platform.menu.model.MenuObjectHelper;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemObjectHelper;
+import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.keyword.model.KeywordObjectHelper;
@@ -44,7 +43,7 @@ class ManualResponderFixtureProvider
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@Inject
-	MenuObjectHelper menuHelper;
+	MenuItemObjectHelper menuItemHelper;
 
 	@Inject
 	SliceObjectHelper sliceHelper;
@@ -55,44 +54,63 @@ class ManualResponderFixtureProvider
 	public
 	void createFixtures () {
 
-		MenuGroupRec facilityMenuGroup =
-			menuGroupHelper.findByCode (
-				GlobalId.root,
-				"facility");
-
-		menuHelper.insert (
-			new MenuRec ()
+		menuItemHelper.insert (
+			new MenuItemRec ()
 
 			.setMenuGroup (
-				facilityMenuGroup)
+				menuGroupHelper.findByCode (
+					GlobalId.root,
+					"test",
+					"facility"))
 
 			.setCode (
 				"manual_responder")
 
+			.setName (
+				"Manual responder")
+
+			.setDescription (
+				"Manual responder services")
+
 			.setLabel (
 				"Manual responder")
 
-			.setPath (
-				"/manualResponders"));
+			.setTargetPath (
+				"/manualResponders")
 
+			.setTargetFrame (
+				"main")
 
+		);
 
-			menuHelper.insert (
-					new MenuRec ()
+		menuItemHelper.insert (
+			new MenuItemRec ()
 
-					.setMenuGroup (
-							facilityMenuGroup)
+			.setMenuGroup (
+				menuGroupHelper.findByCode (
+					GlobalId.root,
+					"test",
+					"facility"))
 
-					.setCode (
-						"chat")
+			.setCode (
+				"chat")
 
-					.setLabel (
-						"Chat")
+			.setName (
+				"Chat")
 
-					.setPath (
-						"/chats")
+			.setDescription (
+				"APN SMS chat service")
 
-				);
+			.setLabel (
+				"Chat")
+
+			.setTargetPath (
+				"/chats")
+
+			.setTargetFrame (
+				"main")
+
+		);
 
 		ManualResponderRec manualResponder =
 			manualResponderHelper.insert (

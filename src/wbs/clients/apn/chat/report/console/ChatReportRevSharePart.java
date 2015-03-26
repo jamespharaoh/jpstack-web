@@ -283,7 +283,7 @@ class ChatReportRevSharePart
 
 				if (! errorRoutes.contains (route.getId ())) {
 
-				    errorRoutes.add (
+					errorRoutes.add (
 						route.getId ());
 
 					consoleRequestContext.addError (
@@ -735,12 +735,12 @@ class ChatReportRevSharePart
 
 			formFieldLogic.outputTableCellsList (
 				out,
-			    resultsFields,
+				resultsFields,
 				chatReport,
 				true);
 
-		    printFormat (
-			    "</tr>\n");
+			printFormat (
+				"</tr>\n");
 
 		}
 

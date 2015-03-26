@@ -581,7 +581,7 @@ class ChatApiServletModule
 		stLoggedOut = 0x5108,
 		stSendAmountCountMismatch = 0x5109;
 
-	// ============================================================ profiles rpc handler
+	// =================================================== profiles rpc handler
 
 	private final static
 	RpcDefinition profilesRequestDef =
@@ -1108,7 +1108,7 @@ class ChatApiServletModule
 
 	}
 
-	// ============================================================ media rpc handler
+	// ====================================================== media rpc handler
 
 	private final static
 	RpcDefinition mediaRequestDef =
@@ -1236,7 +1236,7 @@ class ChatApiServletModule
 
 	}
 
-	// ============================================================ profile rpc handler
+	// ==================================================== profile rpc handler
 
 	private final static RpcDefinition profileRequestDef =
 		Rpc.rpcDefinition ("chat-profile-request", RpcType.rStructure,
@@ -2297,7 +2297,7 @@ class ChatApiServletModule
 		}
 	}
 
-	// ============================================================ message poll rpc handler
+	// =============================================== message poll rpc handler
 
 	final static
 	RpcDefinition messagePollRequestDef =
@@ -2612,7 +2612,7 @@ class ChatApiServletModule
 		}
 	}
 
-	// ============================================================ image update rpc handler
+	// =============================================== image update rpc handler
 
 	private final static
 	RpcDefinition imageUpdateRequestDef =
@@ -3001,7 +3001,7 @@ class ChatApiServletModule
 
 	}
 
-	// ============================================================ credit rpc handler
+	// ===================================================== credit rpc handler
 
 	private final static
 	RpcDefinition creditRequestDef =

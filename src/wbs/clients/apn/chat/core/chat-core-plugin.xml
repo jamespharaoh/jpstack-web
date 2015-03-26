@@ -2,6 +2,10 @@
 	name="chat-core"
 	package="wbs.clients.apn.chat.core">
 
+	<plugin-dependencies>
+		<plugin-dependency name="sms-apps-common"/>
+	</plugin-dependencies>
+
 	<sql-scripts>
 		<sql-schema name="chat-stats"/>
 		<sql-data name="chat-data"/>
