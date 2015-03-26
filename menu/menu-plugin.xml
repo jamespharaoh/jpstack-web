@@ -3,7 +3,7 @@
 	package="wbs.platform.menu">
 
 	<plugin-dependencies>
-		<plugin-dependency name="platform-common"/>
+
 	</plugin-dependencies>
 
 	<sql-scripts>
@@ -12,8 +12,8 @@
 	</sql-scripts>
 
 	<models>
-		<model name="menu"/>
 		<model name="menuGroup"/>
+		<model name="menuItem"/>
 	</models>
 
 	<fixtures>
@@ -21,8 +21,8 @@
 	</fixtures>
 
 	<console-modules>
-		<console-module name="menu"/>
 		<console-module name="menu-group"/>
+		<console-module name="menu-item"/>
 	</console-modules>
 
 </plugin>

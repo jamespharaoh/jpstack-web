@@ -7,6 +7,7 @@
 		<plugin-dependency name="platform-common"/>
 	</plugin-dependencies>
 
+
 	<models>
 		<model name="currency"/>
 	</models>

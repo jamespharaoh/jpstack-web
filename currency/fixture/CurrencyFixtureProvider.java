@@ -8,8 +8,8 @@ import wbs.framework.record.GlobalId;
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.currency.model.CurrencyRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuObjectHelper;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemObjectHelper;
+import wbs.platform.menu.model.MenuItemRec;
 
 @PrototypeComponent ("currencyFixtureProvider")
 public
@@ -25,7 +25,7 @@ class CurrencyFixtureProvider
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@Inject
-	MenuObjectHelper menuHelper;
+	MenuItemObjectHelper menuItemHelper;
 
 	// implementation
 
@@ -33,22 +33,32 @@ class CurrencyFixtureProvider
 	public
 	void createFixtures () {
 
-		menuHelper.insert (
-			new MenuRec ()
+		menuItemHelper.insert (
+			new MenuItemRec ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
 					GlobalId.root,
+					"test",
 					"system"))
 
 			.setCode (
 				"currency")
 
+			.setName (
+				"Currency")
+
+			.setDescription (
+				"")
+
 			.setLabel (
 				"Currencies")
 
-			.setPath (
+			.setTargetPath (
 				"/currencys")
+
+			.setTargetFrame (
+				"main")
 
 		);
 

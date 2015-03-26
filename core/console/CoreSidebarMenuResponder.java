@@ -13,7 +13,9 @@ import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.HtmlResponder;
 import wbs.platform.menu.console.MenuGroupConsoleHelper;
 import wbs.platform.menu.model.MenuGroupRec;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemRec;
+import wbs.platform.user.model.UserObjectHelper;
+import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("coreSidebarMenuResponder")
 public
@@ -31,6 +33,11 @@ class CoreSidebarMenuResponder
 	@Inject
 	ConsoleRequestContext requestContext;
 
+	@Inject
+	UserObjectHelper userHelper;
+
+	// state
+
 	List<MenuGroupRec> menuGroups;
 
 	// implementation
@@ -39,8 +46,13 @@ class CoreSidebarMenuResponder
 	protected
 	void prepare () {
 
+		UserRec currentUser =
+			userHelper.find (
+				requestContext.userId ());
+
 		menuGroups =
-			menuGroupHelper.findAll ();
+			menuGroupHelper.findByParent (
+				currentUser.getSlice ());
 
 		Collections.sort (
 			menuGroups);
@@ -52,18 +64,25 @@ class CoreSidebarMenuResponder
 	void goBodyStuff () {
 
 		printFormat (
-			"<table class=\"menu\" width=\"100%%\">\n");
+			"<table",
+			" class=\"menu\"",
+			" width=\"100%%\"",
+			">\n");
 
 		ABSwap abSwap =
 			new ABSwap ();
 
-		for (MenuGroupRec menuGroup
-				: menuGroups) {
+		for (
+			MenuGroupRec menuGroup
+				: menuGroups
+		) {
 
 			boolean doneGroup = false;
 
-			for (MenuRec menu
-					: menuGroup.getMenus ()) {
+			for (
+				MenuItemRec menu
+					: menuGroup.getMenus ()
+			) {
 
 				if (menu.getDeleted ())
 					continue;
@@ -88,9 +107,9 @@ class CoreSidebarMenuResponder
 					"%s\n",
 					Html.magicTr (
 						requestContext.resolveApplicationUrl (
-							menu.getPath ()),
+							menu.getTargetPath ()),
 						false,
-						menu.getTarget (),
+						menu.getTargetFrame (),
 						null,
 						null,
 						abSwap),
