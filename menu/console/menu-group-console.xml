@@ -40,9 +40,9 @@
 				fields="settings"/>
 
 			<context-link
-				name="menu"
-				link="menu"
-				label="Menus"
+				name="item"
+				link="menuItem"
+				label="Items"
 				priv-key="menuGroup.manage"/>
 
 			<object-events-page/>
