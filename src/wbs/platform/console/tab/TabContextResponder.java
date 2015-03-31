@@ -103,11 +103,14 @@ class TabContextResponder
 
 		pagePartFactory =
 			new Provider<PagePart> () {
-				@Override
-				public PagePart get () {
-					return pagePart;
-				}
-			};
+
+			@Override
+			public
+			PagePart get () {
+				return pagePart;
+			}
+
+		};
 
 	}
 
@@ -115,6 +118,13 @@ class TabContextResponder
 	public
 	void execute ()
 		throws IOException {
+
+		if (pagePartFactory == null) {
+
+			throw new NullPointerException (
+				"pagePartFactory");
+
+		}
 
 		tabbedPage.get ()
 

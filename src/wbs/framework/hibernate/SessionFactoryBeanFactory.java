@@ -383,8 +383,10 @@ class SessionFactoryBeanFactory
 	void loadXmlConfigurationReal (
 			@NonNull Configuration config) {
 
-		for (Model model
-				: entityHelper.models ()) {
+		for (
+			Model model
+				: entityHelper.models ()
+		) {
 
 			configureModel (
 				config,
@@ -420,30 +422,54 @@ class SessionFactoryBeanFactory
 
 		Element hibernateMappingElement =
 			document
-				.addElement ("hibernate-mapping", namespace)
-				.addAttribute (
-					QName.get ("schemaLocation", "xsi", "xsi-ns"),
-					"http://www.hibernate.org/xsd/hibernate-mapping " +
-					"classpath://org/hibernate/hibernate-mapping-4.0.xsd")
-				.addAttribute (
-					"package",
-					model.objectClass ().getPackage ().getName ());
+
+			.addElement (
+				"hibernate-mapping",
+				namespace)
+
+			.addAttribute (
+				QName.get ("schemaLocation", "xsi", "xsi-ns"),
+				"http://www.hibernate.org/xsd/hibernate-mapping " +
+				"classpath://org/hibernate/hibernate-mapping-4.0.xsd")
+
+			.addAttribute (
+				"package",
+				model.objectClass ().getPackage ().getName ());
 
 		Element classElement =
 			hibernateMappingElement
-				.addElement ("class")
-				.addAttribute ("name", model.objectClass ().getSimpleName ())
-				.addAttribute ("table", tableNameSql)
-				.addAttribute ("lazy", "true");
 
-		if (! model.mutable ())
+			.addElement (
+				"class")
+
+			.addAttribute (
+				"name",
+				model.objectClass ().getSimpleName ())
+
+			.addAttribute (
+				"table",
+				tableNameSql)
+
+			.addAttribute (
+				"lazy",
+				"true");
+
+		if (! model.mutable ()) {
+
 			classElement
-				.addAttribute ("mutable", "false");
+
+				.addAttribute (
+					"mutable",
+					"false");
+
+		}
 
 		// add fields
 
-		for (ModelField modelField
-				: model.fields ()) {
+		for (
+			ModelField modelField
+				: model.fields ()
+		) {
 
 			if (modelField.generatedId ()) {
 
@@ -600,13 +626,26 @@ class SessionFactoryBeanFactory
 
 		Element idElement =
 			classElement
-				.addElement ("id")
-				.addAttribute ("name", modelField.name ())
-				.addAttribute ("column", idColumnSql);
+
+			.addElement (
+				"id")
+
+			.addAttribute (
+				"name",
+				modelField.name ())
+
+			.addAttribute (
+				"column",
+				idColumnSql);
 
 		idElement
-			.addElement ("generator")
-			.addAttribute ("class", "assigned");
+
+			.addElement (
+				"generator")
+
+			.addAttribute (
+				"class",
+				"assigned");
 
 	}
 
@@ -664,9 +703,17 @@ class SessionFactoryBeanFactory
 
 		Element idElement =
 			classElement
-				.addElement ("id")
-				.addAttribute ("name", "id")
-				.addAttribute ("column", "id");
+
+			.addElement (
+				"id")
+
+			.addAttribute (
+				"name",
+				"id")
+
+			.addAttribute (
+				"column",
+				"id");
 
 		String sequenceNameSql =
 			sqlLogic.quoteIdentifier (
@@ -674,18 +721,37 @@ class SessionFactoryBeanFactory
 
 		Element generatorElement =
 			idElement
-				.addElement ("generator")
-				.addAttribute ("class", "sequence");
+
+			.addElement (
+				"generator")
+
+			.addAttribute (
+				"class",
+				"sequence");
 
 		generatorElement
-			.addElement ("param")
-			.addAttribute ("name", "sequence")
-			.addText (sequenceNameSql);
+
+			.addElement (
+				"param")
+
+			.addAttribute (
+				"name",
+				"sequence")
+
+			.addText (
+				sequenceNameSql);
 
 		generatorElement
-			.addElement ("param")
-			.addAttribute ("name", "increment")
-			.addText ("100");
+
+			.addElement (
+				"param")
+
+			.addAttribute (
+				"name",
+				"increment")
+
+			.addText (
+				"100");
 
 	}
 
@@ -696,8 +762,13 @@ class SessionFactoryBeanFactory
 
 		Element propertyElement =
 			classElement
-				.addElement ("property")
-				.addAttribute ("name", modelField.name ());
+
+			.addElement (
+				"property")
+
+			.addAttribute (
+				"name",
+				modelField.name ());
 
 		// type
 
@@ -730,15 +801,14 @@ class SessionFactoryBeanFactory
 		) {
 
 			Element typeElement =
-
 				propertyElement
 
-					.addElement (
-						"type")
+				.addElement (
+					"type")
 
-					.addAttribute (
-						"name",
-						"wbs.framework.hibernate.HibernateEnumType");
+				.addAttribute (
+					"name",
+					"wbs.framework.hibernate.HibernateEnumType");
 
 			typeElement
 
@@ -763,20 +833,30 @@ class SessionFactoryBeanFactory
 					modelField.columnName ());
 
 			propertyElement
-				.addAttribute ("column", columnNameSql);
+
+				.addAttribute (
+					"column",
+					columnNameSql);
 
 		} else {
 
-			for (String columnName
-					: modelField.columnNames ()) {
+			for (
+				String columnName
+					: modelField.columnNames ()
+			) {
 
 				String columnNameSql =
 					sqlLogic.quoteIdentifier (
 						columnName);
 
 				propertyElement
-					.addElement ("column")
-					.addAttribute ("name", columnNameSql);
+
+					.addElement (
+						"column")
+
+					.addAttribute (
+						"name",
+						columnNameSql);
 
 			}
 
@@ -791,15 +871,23 @@ class SessionFactoryBeanFactory
 
 		Element manyToOneElement =
 			classElement
-				.addElement ("many-to-one")
-				.addAttribute ("name", modelField.name ());
+
+			.addElement (
+				"many-to-one")
+
+			.addAttribute (
+				"name",
+				modelField.name ());
 
 		String columnName =
 			sqlLogic.quoteIdentifier (
 				modelField.columnName ());
 
 		manyToOneElement
-			.addAttribute ("column", columnName);
+
+			.addAttribute (
+				"column",
+				columnName);
 
 	}
 
@@ -809,9 +897,17 @@ class SessionFactoryBeanFactory
 			Element classElement) {
 
 		classElement
-			.addElement ("one-to-one")
-			.addAttribute ("name", modelField.name ());
-//			.addAttribute ("constrained", "true");
+
+			.addElement (
+				"one-to-one")
+
+			.addAttribute (
+				"name",
+				modelField.name ());
+
+//			.addAttribute (
+//				"constrained",
+//				"true");
 
 	}
 
@@ -830,21 +926,35 @@ class SessionFactoryBeanFactory
 
 			Element setElement =
 				classElement
-					.addElement ("set")
-					.addAttribute ("name", modelField.name ())
-					.addAttribute ("lazy", "true");
+
+				.addElement (
+					"set")
+
+				.addAttribute (
+					"name",
+					modelField.name ())
+
+				.addAttribute (
+					"lazy",
+					"true");
 
 			if (modelField.orderBy () != null) {
 
 				setElement
-					.addAttribute ("order-by", modelField.orderBy ());
+
+					.addAttribute (
+						"order-by",
+						modelField.orderBy ());
 
 			}
 
 			if (modelField.where () != null) {
 
 				setElement
-					.addAttribute ("where", modelField.where ());
+
+					.addAttribute (
+						"where",
+						modelField.where ());
 
 			}
 
@@ -858,8 +968,13 @@ class SessionFactoryBeanFactory
 							model.objectClass ())));
 
 			setElement
-				.addElement ("key")
-				.addAttribute ("column", keyColumnSql);
+
+				.addElement (
+					"key")
+
+				.addAttribute (
+					"column",
+					keyColumnSql);
 
 			// value
 
@@ -876,9 +991,17 @@ class SessionFactoryBeanFactory
 					basicTypes.get (referencedClass);
 
 				setElement
-					.addElement ("element")
-					.addAttribute ("column", elementColumnSql)
-					.addAttribute ("type", elementType);
+
+					.addElement (
+						"element")
+
+					.addAttribute (
+						"column",
+						elementColumnSql)
+
+					.addAttribute (
+						"type",
+						elementType);
 
 			} else {
 
@@ -886,8 +1009,13 @@ class SessionFactoryBeanFactory
 					throw new RuntimeException ();
 
 				setElement
-					.addElement ("one-to-many")
-					.addAttribute ("class", referencedClass.getName ());
+
+					.addElement (
+						"one-to-many")
+
+					.addAttribute (
+						"class",
+						referencedClass.getName ());
 
 			}
 
@@ -903,21 +1031,35 @@ class SessionFactoryBeanFactory
 
 			Element listElement =
 				classElement
-					.addElement ("list")
-					.addAttribute ("name", modelField.name ())
-					.addAttribute ("lazy", "true");
+
+				.addElement (
+					"list")
+
+				.addAttribute (
+					"name",
+					modelField.name ())
+
+				.addAttribute (
+					"lazy",
+					"true");
 
 			if (modelField.orderBy () != null) {
 
 				listElement
-					.addAttribute ("order-by", modelField.orderBy ());
+
+					.addAttribute (
+						"order-by",
+						modelField.orderBy ());
 
 			}
 
 			if (modelField.where () != null) {
 
 				listElement
-					.addAttribute ("where", modelField.where ());
+
+					.addAttribute (
+						"where",
+						modelField.where ());
 
 			}
 
@@ -931,8 +1073,13 @@ class SessionFactoryBeanFactory
 							model.objectClass ())));
 
 			listElement
-				.addElement ("key")
-				.addAttribute ("column", keyColumnSql);
+
+				.addElement (
+					"key")
+
+				.addAttribute (
+					"column",
+					keyColumnSql);
 
 			// list index
 
@@ -954,8 +1101,13 @@ class SessionFactoryBeanFactory
 					modelField.index ());
 
 			listElement
-				.addElement ("list-index")
-				.addAttribute ("column", indexColumnSql);
+
+				.addElement (
+					"list-index")
+
+				.addAttribute (
+					"column",
+					indexColumnSql);
 
 			// value
 
@@ -971,9 +1123,17 @@ class SessionFactoryBeanFactory
 					basicTypes.get (referencedClass);
 
 				listElement
-					.addElement ("element")
-					.addAttribute ("column", elementColumnSql)
-					.addAttribute ("type", elementType);
+
+					.addElement (
+						"element")
+
+					.addAttribute (
+						"column",
+						elementColumnSql)
+
+					.addAttribute (
+						"type",
+						elementType);
 
 			} else {
 
@@ -1001,9 +1161,17 @@ class SessionFactoryBeanFactory
 
 			Element mapElement =
 				classElement
-					.addElement ("map")
-					.addAttribute ("name", modelField.name ())
-					.addAttribute ("lazy", "true");
+
+				.addElement (
+					"map")
+
+				.addAttribute (
+					"name",
+					modelField.name ())
+
+				.addAttribute (
+					"lazy",
+					"true");
 
 			// key
 
@@ -1015,8 +1183,13 @@ class SessionFactoryBeanFactory
 							model.objectClass ())));
 
 			mapElement
-				.addElement ("key")
-				.addAttribute ("column", keyColumnSql);
+
+				.addElement (
+					"key")
+
+				.addAttribute (
+					"column",
+					keyColumnSql);
 
 			// map key
 
@@ -1042,9 +1215,17 @@ class SessionFactoryBeanFactory
 			}
 
 			mapElement
-				.addElement ("map-key")
-				.addAttribute ("column", indexColumnSql)
-				.addAttribute ("type", indexType);
+
+				.addElement (
+					"map-key")
+
+				.addAttribute (
+					"column",
+					indexColumnSql)
+
+				.addAttribute (
+					"type",
+					indexType);
 
 			// value
 
@@ -1052,8 +1233,13 @@ class SessionFactoryBeanFactory
 				throw new RuntimeException ();
 
 			mapElement
-				.addElement ("one-to-many")
-				.addAttribute ("class", referencedClass.getName ());
+
+				.addElement (
+					"one-to-many")
+
+				.addAttribute (
+					"class",
+					referencedClass.getName ());
 
 		} else {
 
@@ -1086,15 +1272,29 @@ class SessionFactoryBeanFactory
 
 			Element setElement =
 				classElement
-					.addElement ("set")
-					.addAttribute ("name", modelField.name ())
-					.addAttribute ("table", modelField.table ())
-					.addAttribute ("lazy", "true");
+
+				.addElement (
+					"set")
+
+				.addAttribute (
+					"name",
+					modelField.name ())
+
+				.addAttribute (
+					"table",
+					modelField.table ())
+
+				.addAttribute (
+					"lazy",
+					"true");
 
 			if (modelField.where () != null) {
 
 				setElement
-					.addAttribute ("where", modelField.where ());
+
+					.addAttribute (
+						"where",
+						modelField.where ());
 
 			}
 
@@ -1108,8 +1308,13 @@ class SessionFactoryBeanFactory
 							model.objectClass ())));
 
 			setElement
-				.addElement ("key")
-				.addAttribute ("column", keyColumnSql);
+
+				.addElement (
+					"key")
+
+				.addAttribute (
+					"column",
+					keyColumnSql);
 
 			if (modelField.element () != null) {
 
@@ -1133,9 +1338,17 @@ class SessionFactoryBeanFactory
 					basicTypes.get (referencedClass);
 
 				setElement
-					.addElement ("element")
-					.addAttribute ("column", elementColumnSql)
-					.addAttribute ("type", elementType);
+
+					.addElement (
+						"element")
+
+					.addAttribute (
+						"column",
+						elementColumnSql)
+
+					.addAttribute (
+						"type",
+						elementType);
 
 			} else {
 
@@ -1147,9 +1360,17 @@ class SessionFactoryBeanFactory
 						sqlEntityNames.idColumnName (referencedClass));
 
 				setElement
-					.addElement ("many-to-many")
-					.addAttribute ("column", manyToManyColumnSql)
-					.addAttribute ("class", referencedClass.getName ());
+
+					.addElement (
+						"many-to-many")
+
+					.addAttribute (
+						"column",
+						manyToManyColumnSql)
+
+					.addAttribute (
+						"class",
+						referencedClass.getName ());
 
 			}
 
@@ -1165,15 +1386,29 @@ class SessionFactoryBeanFactory
 
 			Element listElement =
 				classElement
-					.addElement ("list")
-					.addAttribute ("name", modelField.name ())
-					.addAttribute ("table", modelField.table ())
-					.addAttribute ("lazy", "true");
+
+				.addElement (
+					"list")
+
+				.addAttribute (
+					"name",
+					modelField.name ())
+
+				.addAttribute (
+					"table",
+					modelField.table ())
+
+				.addAttribute (
+					"lazy",
+					"true");
 
 			if (modelField.where () != null) {
 
 				listElement
-					.addAttribute ("where", modelField.where ());
+
+					.addAttribute (
+						"where",
+						modelField.where ());
 
 			}
 
@@ -1185,8 +1420,13 @@ class SessionFactoryBeanFactory
 						model.objectClass ()));
 
 			listElement
-				.addElement ("key")
-				.addAttribute ("column", keyColumnSql);
+
+				.addElement (
+					"key")
+
+				.addAttribute (
+					"column",
+					keyColumnSql);
 
 			// list index
 
@@ -1196,8 +1436,13 @@ class SessionFactoryBeanFactory
 					sqlLogic.quoteIdentifier (modelField.index ());
 
 				listElement
-					.addElement ("list-index")
-					.addAttribute ("column", indexColumnSql);
+
+					.addElement (
+						"list-index")
+
+					.addAttribute (
+						"column",
+						indexColumnSql);
 
 			}
 
@@ -1211,9 +1456,17 @@ class SessionFactoryBeanFactory
 					sqlEntityNames.idColumnName (referencedClass));
 
 			listElement
-				.addElement ("many-to-many")
-				.addAttribute ("column", manyToManyColumnSql)
-				.addAttribute ("class", referencedClass.getName ());
+
+				.addElement (
+					"many-to-many")
+
+				.addAttribute (
+					"column",
+					manyToManyColumnSql)
+
+				.addAttribute (
+					"class",
+					referencedClass.getName ());
 
 		} else {
 
@@ -1236,12 +1489,22 @@ class SessionFactoryBeanFactory
 
 		Element compositeIdElement =
 			classElement
-				.addElement ("composite-id")
-				.addAttribute ("name", modelField.name ())
-				.addAttribute ("class", modelField.valueType ().getName ());
 
-		for (ModelField compositeIdModelField
-				: modelField.fields ()) {
+			.addElement (
+				"composite-id")
+
+			.addAttribute (
+				"name",
+				modelField.name ())
+
+			.addAttribute (
+				"class",
+				modelField.valueType ().getName ());
+
+		for (
+			ModelField compositeIdModelField
+				: modelField.fields ()
+		) {
 
 			if (compositeIdModelField.reference ()) {
 
@@ -1250,9 +1513,17 @@ class SessionFactoryBeanFactory
 						compositeIdModelField.columnName ());
 
 				compositeIdElement
-					.addElement ("key-many-to-one")
-					.addAttribute ("name", compositeIdModelField.name ())
-					.addAttribute ("column", columnSql);
+
+					.addElement (
+						"key-many-to-one")
+
+					.addAttribute (
+						"name",
+						compositeIdModelField.name ())
+
+					.addAttribute (
+						"column",
+						columnSql);
 
 			} else if (compositeIdModelField.value ()) {
 
@@ -1262,16 +1533,30 @@ class SessionFactoryBeanFactory
 
 				Element keyPropertyElement =
 					compositeIdElement
-						.addElement ("key-property")
-						.addAttribute ("name", compositeIdModelField.name ())
-						.addAttribute ("column", columnSql);
+
+					.addElement (
+						"key-property")
+
+					.addAttribute (
+						"name",
+						compositeIdModelField.name ())
+
+					.addAttribute (
+						"column",
+						columnSql);
 
 				String customType =
 					customTypes.get (compositeIdModelField.valueType ());
 
-				if (customType != null)
+				if (customType != null) {
+
 					keyPropertyElement
-						.addAttribute ("type", customType);
+
+						.addAttribute (
+							"type",
+							customType);
+
+				}
 
 			}
 
@@ -1286,12 +1571,22 @@ class SessionFactoryBeanFactory
 
 		Element componentElement =
 			classElement
-				.addElement ("component")
-				.addAttribute ("name", modelField.name ())
-				.addAttribute ("class", modelField.valueType ().getName ());
 
-		for (ModelField componentModelField
-				: modelField.fields ()) {
+			.addElement (
+				"component")
+
+			.addAttribute (
+				"name",
+				modelField.name ())
+
+			.addAttribute (
+				"class",
+				modelField.valueType ().getName ());
+
+		for (
+			ModelField componentModelField
+				: modelField.fields ()
+		) {
 
 			if (componentModelField.value ()) {
 

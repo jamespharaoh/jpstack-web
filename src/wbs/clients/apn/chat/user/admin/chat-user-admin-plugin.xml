@@ -19,6 +19,7 @@
 		<bean class="console.ChatUserAdminDobPart"/>
 		<bean class="console.ChatUserAdminInfoAction"/>
 		<bean class="console.ChatUserAdminInfoPart"/>
+		<bean class="console.ChatUserAdminLocationFormActionHelper"/>
 		<bean class="console.ChatUserAdminNameAction"/>
 		<bean class="console.ChatUserAdminNamePart"/>
 		<bean class="console.ChatUserAdminOnlineAction"/>

@@ -95,17 +95,21 @@ class HibernateDatabase
 			currentTransactionStackLocal.get ();
 
 		HibernateTransaction currentTransaction =
-			currentTransactionStack.size () > 0 ?
-				currentTransactionStack.get (
+			currentTransactionStack.size () > 0
+				? currentTransactionStack.get (
 					currentTransactionStack.size () - 1)
 				: null;
 
 		// join an existing transaction
 
-		if (currentTransaction != null
-				&& canJoin
-				&& (! readWrite
-					|| ! currentTransaction.isReadWrite)) {
+		if (
+			currentTransaction != null
+			&& canJoin
+			&& (
+				! readWrite
+				|| ! currentTransaction.isReadWrite
+			)
+		) {
 
 			HibernateTransaction newTransaction =
 				new HibernateTransaction (
@@ -190,8 +194,10 @@ class HibernateDatabase
 	@Override
 	public
 	Transaction currentTransaction () {
+
 		return new TransactionView (
 			currentTransactionReal ());
+
 	}
 
 	private
@@ -528,10 +534,10 @@ class HibernateDatabase
 	public
 	void flush () {
 
-		Session sess =
+		Session session =
 			currentSession ();
 
-		sess.flush ();
+		session.flush ();
 
 	}
 
@@ -539,10 +545,10 @@ class HibernateDatabase
 	public
 	void clear () {
 
-		Session sess =
+		Session session =
 			currentSession ();
 
-		sess.clear ();
+		session.clear ();
 
 	}
 

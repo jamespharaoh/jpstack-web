@@ -154,6 +154,11 @@ class ChatUserRec
 	LongLat locationLongLat;
 
 	@SimpleField (
+		columns = { "location_backup_longitude", "location_backup_latitude" },
+		nullable = true)
+	LongLat locationBackupLongLat;
+
+	@SimpleField (
 		nullable = true)
 	Date locationTime;
 

@@ -1152,6 +1152,10 @@ class ChatUserLogicImpl
 
 		// update the user
 
+		if (gazetteerEntry.getLongLat () == null) {
+			throw new NullPointerException ();
+		}
+
 		chatUser
 
 			.setLocationPlace (
@@ -1161,6 +1165,9 @@ class ChatUserLogicImpl
 				gazetteerEntry.getLongLat ())
 
 			.setLocationLongLat (
+				gazetteerEntry.getLongLat ())
+
+			.setLocationBackupLongLat (
 				gazetteerEntry.getLongLat ())
 
 			.setLocationTime (
@@ -1174,8 +1181,8 @@ class ChatUserLogicImpl
 				"chat_user_place_message",
 				chatUser,
 				gazetteerEntry,
-				gazetteerEntry.getLongLat ().getLongitude (),
-				gazetteerEntry.getLongLat ().getLatitude (),
+				gazetteerEntry.getLongLat ().longitude (),
+				gazetteerEntry.getLongLat ().latitude (),
 				message.get ());
 
 		} else {
@@ -1184,8 +1191,8 @@ class ChatUserLogicImpl
 				"chat_user_place_api",
 				chatUser,
 				gazetteerEntry,
-				gazetteerEntry.getLongLat ().getLongitude (),
-				gazetteerEntry.getLongLat ().getLatitude ());
+				gazetteerEntry.getLongLat ().longitude (),
+				gazetteerEntry.getLongLat ().latitude ());
 
 		}
 

@@ -42,6 +42,20 @@
 		name="search"
 		class="wbs.integrations.oxygen8.model.Oxygen8InboundLogRec$Oxygen8InboundLogSearch">
 
+		<object-field
+			name="routeId"
+			label="Route"
+			finder="route"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="timestampAfter"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="timestampBefore"
+			nullable="yes"/>
+
 	</field-set>
 
 	<field-set

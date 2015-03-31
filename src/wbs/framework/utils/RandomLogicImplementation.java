@@ -125,6 +125,13 @@ class RandomLogicImplementation
 	Type sample (
 			List<Type> options) {
 
+		if (options.isEmpty ()) {
+
+			throw new IllegalArgumentException (
+				"Options cannot be empty");
+
+		}
+
 		int index =
 			randomInteger (
 				options.size ());

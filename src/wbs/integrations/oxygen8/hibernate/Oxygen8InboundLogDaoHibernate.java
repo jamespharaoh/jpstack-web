@@ -5,6 +5,7 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.hibernate.HibernateDao;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogDao;
@@ -21,11 +22,43 @@ class Oxygen8InboundLogDaoHibernate
 	@Override
 	public
 	List<Integer> searchIds (
-			Oxygen8InboundLogSearch oxygen8InboundLogSearch) {
+			Oxygen8InboundLogSearch search) {
 
 		Criteria criteria =
 			createCriteria (
-				Oxygen8InboundLogRec.class);
+				Oxygen8InboundLogRec.class,
+				"_oxygen8InboundLog");
+
+		// restrict by route
+
+		if (search.getRouteId () != null) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_oxygen8InboundLog.route.id",
+					search.getRouteId ()));
+
+		}
+
+		// restrict by timestamp
+
+		if (search.getTimestampAfter () != null) {
+
+			criteria.add (
+				Restrictions.ge (
+					"_oxygen8InboundLog.timestamp",
+					search.getTimestampAfter ()));
+
+		}
+
+		if (search.getTimestampBefore () != null) {
+
+			criteria.add (
+				Restrictions.lt (
+					"_oxygen8InboundLog.timestamp",
+					search.getTimestampBefore ()));
+
+		}
 
 		// add default order
 

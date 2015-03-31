@@ -6,6 +6,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.ABSwap;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.console.helper.ConsoleObjectManager;
@@ -14,8 +15,8 @@ import wbs.platform.console.responder.HtmlResponder;
 import wbs.platform.menu.console.MenuGroupConsoleHelper;
 import wbs.platform.menu.model.MenuGroupRec;
 import wbs.platform.menu.model.MenuItemRec;
+import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("coreSidebarMenuResponder")
 public
@@ -34,6 +35,9 @@ class CoreSidebarMenuResponder
 	ConsoleRequestContext requestContext;
 
 	@Inject
+	SliceObjectHelper sliceHelper;
+
+	@Inject
 	UserObjectHelper userHelper;
 
 	// state
@@ -46,6 +50,7 @@ class CoreSidebarMenuResponder
 	protected
 	void prepare () {
 
+		/*
 		UserRec currentUser =
 			userHelper.find (
 				requestContext.userId ());
@@ -53,6 +58,13 @@ class CoreSidebarMenuResponder
 		menuGroups =
 			menuGroupHelper.findByParent (
 				currentUser.getSlice ());
+		*/
+
+		menuGroups =
+			menuGroupHelper.findByParent (
+				sliceHelper.findByCode (
+					GlobalId.root,
+					"apn"));
 
 		Collections.sort (
 			menuGroups);

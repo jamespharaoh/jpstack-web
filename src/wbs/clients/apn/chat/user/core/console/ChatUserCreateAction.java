@@ -198,6 +198,10 @@ class ChatUserCreateAction
 
 		// create monitor
 
+		if (gazetteerEntry.getLongLat () == null) {
+			throw new NullPointerException ();
+		}
+
 		ChatUserRec chatUser =
 			chatUserLogic.createChatMonitor (chat)
 
@@ -214,6 +218,9 @@ class ChatUserCreateAction
 				gazetteerEntry.getLongLat ())
 
 			.setLocationLongLat (
+				gazetteerEntry.getLongLat ())
+
+			.setLocationBackupLongLat (
 				gazetteerEntry.getLongLat ())
 
 			.setGender (

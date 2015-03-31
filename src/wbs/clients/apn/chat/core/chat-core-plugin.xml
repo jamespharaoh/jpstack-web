@@ -3,7 +3,9 @@
 	package="wbs.clients.apn.chat.core">
 
 	<plugin-dependencies>
+		<plugin-dependency name="network"/>
 		<plugin-dependency name="sms-apps-common"/>
+		<plugin-dependency name="user"/>
 	</plugin-dependencies>
 
 	<sql-scripts>
@@ -52,5 +54,9 @@
 		<console-module name="chat"/>
 		<console-module name="chat-month-cost"/>
 	</console-modules>
+
+	<fixtures>
+		<fixture name="chatCore"/>
+	</fixtures>
 
 </plugin>

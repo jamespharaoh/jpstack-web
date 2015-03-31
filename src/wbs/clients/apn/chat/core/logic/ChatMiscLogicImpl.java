@@ -471,9 +471,16 @@ class ChatMiscLogicImpl
 						chatUserHelper.find (
 							chatUserId);
 
+					if (longLat == null) {
+						throw new NullPointerException ();
+					}
+
 					chatUser
 
 						.setLocationLongLat (
+							longLat)
+
+						.setLocationBackupLongLat (
 							longLat)
 
 						.setLocationTime (
@@ -487,8 +494,8 @@ class ChatMiscLogicImpl
 					eventLogic.createEvent (
 						"chat_user_location_locator",
 						chatUser,
-						longLat.getLongitude (),
-						longLat.getLatitude (),
+						longLat.longitude (),
+						longLat.latitude (),
 						locator);
 
 					transaction.commit ();

@@ -977,11 +977,11 @@ class ChatApiServletModule
 
 						Rpc.rpcElem (
 							"longitude",
-							longLat.getLongitude ()),
+							longLat.longitude ()),
 
 						Rpc.rpcElem (
 							"latitude",
-							longLat.getLatitude ()),
+							longLat.latitude ()),
 
 						Rpc.rpcElem (
 							"easting",
@@ -1514,10 +1514,17 @@ class ChatApiServletModule
 				&& latitude != null
 			) {
 
-				chatUser.setLocationLongLat (
-					new LongLat (
-						longitude,
-						latitude));
+				chatUser
+
+					.setLocationLongLat (
+						new LongLat (
+							longitude,
+							latitude))
+
+					.setLocationBackupLongLat (
+						new LongLat (
+							longitude,
+							latitude));
 
 				eventLogic.createEvent (
 					"chat_user_location_api",
@@ -1525,7 +1532,10 @@ class ChatApiServletModule
 					longitude,
 					latitude);
 
-			} else if (longitude != null || latitude != null) {
+			} else if (
+				longitude != null
+				|| latitude != null
+			) {
 
 				throw new RpcException (
 					Rpc.rpcError (
@@ -1813,11 +1823,11 @@ class ChatApiServletModule
 
 					Rpc.rpcElem (
 						"longitude",
-						longLat.getLongitude ()),
+						longLat.longitude ()),
 
 					Rpc.rpcElem (
 						"latitude",
-						longLat.getLatitude ()),
+						longLat.latitude ()),
 
 					Rpc.rpcElem (
 						"easting",

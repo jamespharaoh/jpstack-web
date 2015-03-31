@@ -83,35 +83,6 @@ class ManualResponderFixtureProvider
 
 		);
 
-		menuItemHelper.insert (
-			new MenuItemRec ()
-
-			.setMenuGroup (
-				menuGroupHelper.findByCode (
-					GlobalId.root,
-					"test",
-					"facility"))
-
-			.setCode (
-				"chat")
-
-			.setName (
-				"Chat")
-
-			.setDescription (
-				"APN SMS chat service")
-
-			.setLabel (
-				"Chat")
-
-			.setTargetPath (
-				"/chats")
-
-			.setTargetFrame (
-				"main")
-
-		);
-
 		ManualResponderRec manualResponder =
 			manualResponderHelper.insert (
 				new ManualResponderRec ()

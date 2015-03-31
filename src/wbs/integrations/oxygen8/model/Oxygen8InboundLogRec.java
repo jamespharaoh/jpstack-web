@@ -14,10 +14,12 @@ import org.joda.time.Instant;
 
 import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
+import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
+import wbs.sms.route.core.model.RouteRec;
 
 @Accessors (chain = true)
 @Data
@@ -34,6 +36,12 @@ class Oxygen8InboundLogRec
 	Integer id;
 
 	// details
+
+	@ReferenceField
+	RouteRec route;
+
+	@SimpleField
+	Oxygen8InboundLogType type;
 
 	@SimpleField
 	Instant timestamp;
@@ -111,6 +119,11 @@ class Oxygen8InboundLogRec
 	@ToString
 	public static
 	class Oxygen8InboundLogSearch {
+
+		Instant timestampAfter;
+		Instant timestampBefore;
+
+		Integer routeId;
 
 	}
 

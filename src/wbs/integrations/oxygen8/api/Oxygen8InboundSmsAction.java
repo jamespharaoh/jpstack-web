@@ -21,6 +21,7 @@ import wbs.framework.web.Responder;
 import wbs.integrations.oxygen8.model.Oxygen8ConfigRec;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogRec;
+import wbs.integrations.oxygen8.model.Oxygen8InboundLogType;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInObjectHelper;
@@ -211,6 +212,14 @@ class Oxygen8InboundSmsAction
 
 		oxygen8InboundLogHelper.insert (
 			new Oxygen8InboundLogRec ()
+
+			.setRoute (
+				routeHelper.find (
+					requestContext.requestInt (
+						"routeId")))
+
+			.setType (
+				Oxygen8InboundLogType.smsMessage)
 
 			.setTimestamp (
 				transaction.now ())

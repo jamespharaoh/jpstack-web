@@ -1,4 +1,4 @@
-package wbs.sms.message.stats.fixture;
+package wbs.integrations.oxygen8.fixture;
 
 import javax.inject.Inject;
 
@@ -9,9 +9,9 @@ import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.menu.model.MenuItemRec;
 
-@PrototypeComponent ("messageStatsFixtureProvider")
+@PrototypeComponent ("oxygen8FixtureProvider")
 public
-class MessageStatsFixtureProvider
+class Oxygen8FixtureProvider
 	implements FixtureProvider {
 
 	// dependencies
@@ -35,22 +35,22 @@ class MessageStatsFixtureProvider
 				menuGroupHelper.findByCode (
 					GlobalId.root,
 					"test",
-					"sms"))
+					"integration"))
 
 			.setCode (
-				"sms_stats")
+				"oxygen8")
 
 			.setName (
-				"SMS Stats")
+				"Oxygen8")
 
 			.setDescription (
-				"View SMS message stats")
+				"")
 
 			.setLabel (
-				"SMS Stats")
+				"Oxygen8")
 
 			.setTargetPath (
-				"/stats")
+				"/oxygen8")
 
 			.setTargetFrame (
 				"main")

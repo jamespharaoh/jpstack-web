@@ -5,8 +5,8 @@
 		object-name="menuItem">
 
 		<context-stuff
-			name="menuName"
-			field="code"/>
+			name="menuItemName"
+			field="name"/>
 
 		<context-stuff
 			name="menuGroupId"
@@ -14,8 +14,8 @@
 			field="id"/>
 
 		<priv-key
-			name="menu.manage"
-			delegate="grandparent"
+			name="menuItem.manage"
+			delegate="parent"
 			priv="manage"/>
 
 		<run-post-processor
@@ -34,7 +34,7 @@
 
 			<object-create-page
 				fields="create"
-				create-priv-delegate="root"
+				create-priv-delegate="parent"
 				create-priv-code="manage"/>
 
 		</list>
