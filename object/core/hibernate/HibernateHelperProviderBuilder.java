@@ -105,6 +105,9 @@ class HibernateHelperProviderBuilder {
 
 		@Getter @Setter
 		ObjectHelperProvider parentObjectHelperProvider;
+		
+		@Getter @Setter
+		boolean dynamic;
 
 		@Override
 		public
@@ -1356,6 +1359,20 @@ class HibernateHelperProviderBuilder {
 
 			return object;
 
+		}
+
+		@Override
+		public
+		boolean getDynamic() {
+			return dynamic;
+		}
+		
+		@Override
+		public
+		void setDynamic(
+				boolean dyn) {
+			dynamic =
+				dyn;
 		}
 
 	}

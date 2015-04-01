@@ -26,6 +26,7 @@ import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.object.criteria.CriteriaSpec;
 import wbs.platform.priv.console.PrivChecker;
+import wbs.ticket.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectListPart")
@@ -62,13 +63,18 @@ class ObjectListPart
 	Map<String,ObjectListTabSpec> listTabSpecs;
 
 	@Getter @Setter
-	FormFieldSet formFieldSet;
+	FieldsProvider formFieldsProvider;
 
 	@Getter @Setter
 	String targetContextTypeName;
+	
+	@Getter @Setter
+	boolean dynamic;
 
 	// state
 
+	FormFieldSet formFieldSet;
+	
 	ObjectListTabSpec currentListTabSpec;
 	Record<?> currentObject;
 
@@ -76,19 +82,29 @@ class ObjectListPart
 	List<Record<?>> selectedObjects;
 
 	ConsoleContext targetContext;
+	Record<?> parent;
 
 	// implementation
 
 	@Override
 	public
 	void prepare () {
-
+		
 		prepareTabSpec ();
 		prepareCurrentObject ();
 		prepareAllObjects ();
 		prepareSelectedObjects ();
 		prepareTargetContext ();
+		prepareFieldSet ();
 
+
+	}
+	
+	void prepareFieldSet () {
+		
+		formFieldSet = formFieldsProvider.getFields(
+			parent);
+	
 	}
 
 	void prepareTabSpec () {
@@ -136,6 +152,9 @@ class ObjectListPart
 
 		if (parentId != null) {
 
+			parent = parentHelper.find(
+					parentId);
+			
 			GlobalId parentGlobalId =
 				new GlobalId (
 					parentHelper.objectTypeId (),
