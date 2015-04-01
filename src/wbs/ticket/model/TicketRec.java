@@ -1,5 +1,6 @@
 package wbs.ticket.model;
 
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -14,6 +15,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import wbs.applications.imchat.model.ImChatCustomerSearch;
 import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.CollectionField;
@@ -133,7 +135,7 @@ public class TicketRec
 					.generateCode());
 
 		}
-
+		
 	}
 	
 	// compare to

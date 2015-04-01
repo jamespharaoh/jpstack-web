@@ -162,7 +162,7 @@ public class TicketFixtureProvider
 		
 		ticket
 			.setNumNotes (
-					ticket.getNumNotes () + 1);
+				ticket.getNumNotes () + 1);
 	
 	}
 

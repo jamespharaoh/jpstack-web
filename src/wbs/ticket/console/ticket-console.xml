@@ -31,7 +31,7 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				fields-provider="ticketListFieldsProvider"/>
 
 			<object-create-page
 				fields="create"/>
@@ -63,60 +63,5 @@
 		</object>
 
 	</object-context>
-
-	<field-set
-		name="list"
-		object-name="ticket">
-
-		<parent-field/>
-
-	</field-set>
-
-	<field-set
-		name="create"
-		object-name="ticket">
-		
-		<parent-field/>
-		
-		<timestamp-field
-			name="nextActionDate"/>
-			
-		<object-field
-			name="ticketState"
-			finder="ticketState"/>
-
-	</field-set>
-
-	<field-set
-		name="summary"
-		object-name="ticket">
-
-		<id-field/>
-		<parent-field/>
-		<code-field/>
-		
-		<timestamp-field
-			name="nextActionDate"/>
-			
-		<object-field
-			name="ticketState"
-			finder="ticketState"/>
-
-	</field-set>
-
-	<field-set
-		name="settings"
-		object-name="ticket">
-
-		<parent-field/>
-		
-		<timestamp-field
-			name="nextActionDate"/>
-			
-		<object-field
-			name="ticketState"
-			finder="ticketState"/>
-
-	</field-set>
 
 </console-module>

@@ -15,7 +15,7 @@ import wbs.ticket.model.TicketObjectHelper;
 
 
 
-public class TicketCreatePart 
+public class TicketCreateConsole 
 	extends AbstractPagePart {
 	
 	// dependencies

@@ -23,6 +23,10 @@
 	<fixtures>
 		<fixture name="ticket"/>
 	</fixtures>
+	
+	<layer name="console">
+		<bean class="console.TicketFieldsProvider"/>
+	</layer>
 
 	<console-modules>
 		<console-module name="ticket-manager"/>

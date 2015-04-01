@@ -78,6 +78,8 @@ class ObjectHelperBuilder {
 
 	@Getter
 	boolean ready = false;
+	
+	boolean dynamic;
 
 	@PostConstruct
 	public
@@ -1427,6 +1429,20 @@ class ObjectHelperBuilder {
 				return objectHelperProvider.lock (
 					object);
 
+			}
+			
+			@Override
+			public
+			boolean getDynamic() {
+				return dynamic;
+			}
+			
+			@Override
+			public
+			void setDynamic(
+					boolean dyn) {
+				dynamic =
+					dyn;
 			}
 
 		}

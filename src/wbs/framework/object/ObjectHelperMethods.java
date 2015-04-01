@@ -180,5 +180,10 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	void setParent (
 			Record<?> object,
 			Record<?> parent);
+	
+	boolean getDynamic();
+	
+	void setDynamic(
+			boolean dyn);
 
 }

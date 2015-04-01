@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -36,6 +37,8 @@ import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
 import wbs.platform.object.criteria.WhereICanManageCriteriaSpec;
 import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
 import wbs.platform.scaffold.model.SliceRec;
+import wbs.ticket.console.FieldsProvider;
+import wbs.ticket.console.StaticFieldsProvider;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -45,6 +48,9 @@ public
 class ObjectListPageBuilder {
 
 	// dependencies
+	
+	@Inject
+	ApplicationContext applicationContext;
 
 	@Inject
 	ConsoleModuleBuilder consoleModuleBuilder;
@@ -94,8 +100,11 @@ class ObjectListPageBuilder {
 	ConsoleHelper<?> consoleHelper;
 
 	String typeCode;
+	
+	boolean dynamic;
 
-	FormFieldSet formFieldSet;
+	FieldsProvider fieldsProvider;
+	
 	Map<String,ObjectListTabSpec> listTabsByName;
 
 	// build
@@ -186,13 +195,16 @@ class ObjectListPageBuilder {
 					.listTabSpecs (
 						listTabsByName)
 
-					.formFieldSet (
-						formFieldSet)
+					.formFieldsProvider (
+						fieldsProvider)
 
 					.targetContextTypeName (
 						ifNull (
 							spec.targetContextTypeName (),
-							consoleHelper.objectName () + "+"));
+							consoleHelper.objectName () + "+"))
+							
+					.dynamic(
+						dynamic);
 
 			}
 
@@ -222,12 +234,44 @@ class ObjectListPageBuilder {
 
 		typeCode =
 			spec.typeCode ();
+		
+		dynamic =
+			spec.dynamic();
+		
+		// if a provider name is provided
+		
+		if (spec.fieldsProviderName () != null) {
 
-		formFieldSet =
-			spec.fieldsName () != null
-				? consoleModule.formFieldSets ().get (
-					spec.fieldsName ())
-				: defaultFields ();
+			fieldsProvider = 
+					applicationContext.getBean (
+							spec.fieldsProviderName (),
+							FieldsProvider.class);
+		
+		} 
+		
+		// if a field name is provided
+		
+		else if (spec.fieldsName() != null) {
+			
+			fieldsProvider =
+				new StaticFieldsProvider ()
+					.setFields (
+						consoleModule.formFieldSets ().get (
+							spec.fieldsName ()));
+			
+		} 
+		
+		// if nothing is provided
+		
+		else {
+
+			fieldsProvider =
+				new StaticFieldsProvider ()
+					.setFields (
+						defaultFields());
+
+		}
+
 
 		listTabsByName =
 			spec.listTabsByName () != null
