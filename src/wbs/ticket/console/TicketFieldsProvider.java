@@ -77,7 +77,7 @@ class TicketFieldsProvider
 			else if (ticketFieldType.getType().equals("number")) {
 				
 				formFieldSpecs
-					.add(new TextFormFieldSpec()
+					.add(new IntegerFormFieldSpec()
 				
 						.name("value")
 					
@@ -87,7 +87,7 @@ class TicketFieldsProvider
 			else if (ticketFieldType.getType().equals("boolean")) {
 				
 				formFieldSpecs
-					.add(new TextFormFieldSpec()
+					.add(new YesNoFormFieldSpec()
 				
 						.name("value")
 					
@@ -97,7 +97,7 @@ class TicketFieldsProvider
 			else if (ticketFieldType.getType().equals("object")) {
 				
 				formFieldSpecs
-					.add(new TextFormFieldSpec()
+					.add(new ObjectFormFieldSpec()
 				
 						.name("value")
 					
