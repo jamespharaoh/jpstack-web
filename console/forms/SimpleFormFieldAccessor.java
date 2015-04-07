@@ -19,6 +19,9 @@ class SimpleFormFieldAccessor<Container,Native>
 	String name;
 
 	@Getter @Setter
+	Boolean dynamic;
+	
+	@Getter @Setter
 	Class<? extends Native> nativeClass;
 
 	// implementation
@@ -26,14 +29,21 @@ class SimpleFormFieldAccessor<Container,Native>
 	@Override
 	public
 	Native read (
-			Container container) {
+		Container container) {
 
 		// get native object
-
-		Object nativeObject =
-			BeanLogic.getProperty (
-				container,
-				name);
+		Object nativeObject;
+		if (!dynamic) {
+			 nativeObject =
+				BeanLogic.getProperty (
+					container,
+					name);
+		}
+		else {
+			// TODO
+			nativeObject = 
+					null;
+		}
 
 		// special case for null
 

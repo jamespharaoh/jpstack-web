@@ -39,9 +39,6 @@ class ObjectListPageSpec {
 	@DataAttribute ("target-context-type")
 	String targetContextTypeName;
 	
-	@DataAttribute
-	boolean dynamic;
-
 	// children
 
 	@DataChildren (

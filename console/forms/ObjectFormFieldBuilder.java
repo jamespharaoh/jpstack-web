@@ -104,6 +104,11 @@ class ObjectFormFieldBuilder {
 			ifNull (
 				spec.readOnly (),
 				false);
+		
+		Boolean dynamic =
+			ifNull (
+				spec.dynamic(),
+				false);
 
 		EntityFinder<?> entityFinder =
 			consoleHelperRegistry.findByObjectName (
@@ -128,6 +133,9 @@ class ObjectFormFieldBuilder {
 
 			.name (
 				name)
+				
+			.dynamic (
+				dynamic)
 
 			.nativeClass (
 				Record.class);

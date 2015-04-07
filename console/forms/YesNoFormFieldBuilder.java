@@ -104,12 +104,18 @@ class YesNoFormFieldBuilder {
 			ifNull (
 				spec.noLabel (),
 				"no");
+		
+		Boolean dynamic =
+			ifNull (
+				spec.dynamic(),
+				false);
 
 		// field components
 
 		FormFieldAccessor accessor =
 			simpleFormFieldAccessorProvider.get ()
 				.name (name)
+				.dynamic (dynamic)
 				.nativeClass (Boolean.class);
 
 		FormFieldNativeMapping nativeMapping =
