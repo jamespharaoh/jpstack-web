@@ -201,11 +201,7 @@ class ObjectListPageBuilder {
 					.targetContextTypeName (
 						ifNull (
 							spec.targetContextTypeName (),
-							consoleHelper.objectName () + "+"))
-							
-					.dynamic(
-						dynamic);
-
+							consoleHelper.objectName () + "+"));
 			}
 
 		};
@@ -234,9 +230,6 @@ class ObjectListPageBuilder {
 
 		typeCode =
 			spec.typeCode ();
-		
-		dynamic =
-			spec.dynamic();
 		
 		// if a provider name is provided
 		

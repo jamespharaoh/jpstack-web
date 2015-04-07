@@ -1,6 +1,7 @@
 package wbs.ticket.console;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.Misc.underscoreToCamel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +21,10 @@ import wbs.platform.console.forms.YesNoFormFieldSpec;
 import wbs.platform.console.module.ConsoleModuleBuilder;
 import wbs.ticket.model.TicketFieldTypeObjectHelper;
 import wbs.ticket.model.TicketFieldTypeRec;
+import wbs.ticket.model.TicketFieldTypeType;
 import wbs.ticket.model.TicketManagerRec;
 
-@PrototypeComponent ("ticketListFieldsProvider")
+@PrototypeComponent ("ticketFieldsProvider")
 public 
 class TicketFieldsProvider 
 	implements FieldsProvider {
@@ -37,7 +39,7 @@ class TicketFieldsProvider
 	TicketFieldTypeConsoleHelper ticketFieldTypeConsoleHelper;
 	
 	@Inject
-	TicketFieldValueConsoleHelper ticketFieldValueConsoleHelper;
+	TicketConsoleHelper ticketConsoleHelper;
 	
 	FormFieldSet formFields;
 	
@@ -46,7 +48,7 @@ class TicketFieldsProvider
 	@Override
 	public 
 	FormFieldSet getFields(Record<?> parent) {
-		
+			
 		// retrieve existing ticket field types
 		
 		TicketManagerRec ticketManager =
@@ -62,61 +64,57 @@ class TicketFieldsProvider
 		
 		for (TicketFieldTypeRec ticketFieldType : ticketFieldTypes) {
 			
-			
-			if (ticketFieldType.getType().equals("string")) {
+			if (ticketFieldType.getType().equals(TicketFieldTypeType.string)) {
 				
 	
 				formFieldSpecs
 					.add(new TextFormFieldSpec()
 				
-						.name("value")
-					
-						.label("value"));
+						.name(ticketFieldType.getCode ())					
+						.label(ticketFieldType.getName ())
+						.dynamic (true));
 				
 			} 
-			else if (ticketFieldType.getType().equals("number")) {
+			else if (ticketFieldType.getType().equals(TicketFieldTypeType.number)) {
 				
 				formFieldSpecs
 					.add(new IntegerFormFieldSpec()
 				
-						.name("value")
-					
-						.label("value"));
+						.name(ticketFieldType.getCode ())					
+						.label(ticketFieldType.getName ())
+						.dynamic (true));
 				
 			} 
-			else if (ticketFieldType.getType().equals("boolean")) {
+			else if (ticketFieldType.getType().equals(TicketFieldTypeType.bool)) {
 				
 				formFieldSpecs
 					.add(new YesNoFormFieldSpec()
 				
-						.name("value")
-					
-						.label("value"));
+						.name(ticketFieldType.getCode ())					
+						.label(ticketFieldType.getName ())
+						.dynamic (true));
 				
 			} 
-			else if (ticketFieldType.getType().equals("object")) {
+			else if (ticketFieldType.getType().equals(TicketFieldTypeType.object)) {
 				
 				formFieldSpecs
 					.add(new ObjectFormFieldSpec()
 				
-						.name("value")
-					
-						.label("value"));
+						.name(ticketFieldType.getCode ())					
+						.label(ticketFieldType.getName ())
+						.finderName(underscoreToCamel(ticketFieldType.getObjectType().getCode()))
+						.dynamic (true));
 				
-			} 
-			else {
-				
-			}
-		    
+			} 		    
 		}
 		
 		String fieldSetName =
 			stringFormat (
 				"%s.list",
-				ticketFieldValueConsoleHelper.objectName());
+				ticketConsoleHelper.objectName());
 
 		return consoleModuleBuilder.buildFormFieldSet (
-			ticketFieldValueConsoleHelper,
+			ticketConsoleHelper,
 			fieldSetName,
 			formFieldSpecs);
 	
@@ -138,22 +136,21 @@ class TicketFieldsProvider
 		
 	}
 
-	@SingletonComponent(value = "ticketFieldsProviderConfig")
+	@SingletonComponent("ticketFieldsProviderConfig")
 	public static
 	class Config {
 
 		@Inject
 		Provider<TicketFieldsProvider> ticketFieldsProvider;
 		
-		@PrototypeComponent ("ticketListFieldProvider")
+		@PrototypeComponent ("ticketListFieldsProvider")
 		public
-		FieldsProvider ticketListFieldProvider () {
+		FieldsProvider ticketListFieldsProvider () {
 
 			return ticketFieldsProvider.get ()
 				.setMode ("list");
 
-		}
-		
+		}		
 
 	}
 	

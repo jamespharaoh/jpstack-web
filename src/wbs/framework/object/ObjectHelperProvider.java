@@ -126,10 +126,14 @@ interface ObjectHelperProvider {
 	boolean getDeleted (
 			Record<?> object);
 	
-	boolean getDynamic();
+	boolean getDynamic (
+			Record<?> object,
+			String name);
 	
-	void setDynamic(
-			boolean dyn);
+	void setDynamic (
+			Record<?> object,
+			String name,
+			Object value);
 
 	// hooks
 

@@ -8,9 +8,11 @@ import wbs.framework.record.GlobalId;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuObjectHelper;
 import wbs.platform.menu.model.MenuRec;
+import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.ticket.model.TicketFieldTypeObjectHelper;
 import wbs.ticket.model.TicketFieldTypeRec;
+import wbs.ticket.model.TicketFieldTypeType;
 import wbs.ticket.model.TicketManagerObjectHelper;
 import wbs.ticket.model.TicketManagerRec;
 import wbs.ticket.model.TicketNoteObjectHelper;
@@ -41,6 +43,9 @@ public class TicketFixtureProvider
 	
 	@Inject
 	TicketNoteObjectHelper ticketNoteHelper;
+	
+	@Inject
+	ObjectTypeObjectHelper objectTypeHelper;
 	
 	@Inject
 	SliceObjectHelper sliceHelper;
@@ -107,7 +112,7 @@ public class TicketFixtureProvider
 				
 			.setName("Number")
 			
-			.setType("number")
+			.setType(TicketFieldTypeType.number)
 			
 			.setRequired(true)			
 	
@@ -124,10 +129,13 @@ public class TicketFixtureProvider
 				
 			.setName("User")
 			
-			.setType("object")
+			.setType(TicketFieldTypeType.object)
 			
-			.setObjectType("ImChatCustomerRec")
-			
+			.setObjectType(
+				objectTypeHelper.findByCode (
+					GlobalId.root,
+					"user"))
+				
 			.setRequired(true)			
 	
 		);	
@@ -143,7 +151,7 @@ public class TicketFixtureProvider
 				
 			.setName("Text")
 			
-			.setType("string")
+			.setType(TicketFieldTypeType.string)
 			
 			.setRequired(true)			
 	

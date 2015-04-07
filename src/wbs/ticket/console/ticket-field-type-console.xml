@@ -73,12 +73,14 @@
 		<yes-no-field
 			name="required"/>
 
-		<text-field
-			name="type"/>
-			
-		<text-field
+		<enum-field
+			name="type"
+			nullable="no"
+			helper="ticketFieldTypeTypeConsoleHelper"/>
+					
+		<object-field
 			name="objectType"
-			nullable="yes"/>
+			finder="objectType"/>
 			
 	</field-set>
 
@@ -96,12 +98,14 @@
 		<yes-no-field
 			name="required"/>
 
-		<text-field
-			name="type"/>
+		<enum-field
+			name="type"
+			nullable="no"
+			helper="ticketFieldTypeTypeConsoleHelper"/>
 			
-		<text-field
+		<object-field
 			name="objectType"
-			nullable="yes"/>
+			finder="objectType"/>
 
 	</field-set>
 
@@ -117,12 +121,14 @@
 		<yes-no-field
 			name="required"/>
 
-		<text-field
-			name="type"/>
+		<enum-field
+			name="type"
+			nullable="no"
+			helper="ticketFieldTypeTypeConsoleHelper"/>
 			
-		<text-field
+		<object-field
 			name="objectType"
-			nullable="yes"/>
+			finder="objectType"/>
 
 	</field-set>
 

@@ -1,15 +1,16 @@
 package wbs.ticket.model;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import wbs.framework.entity.annotations.GeneratedIdField;
-import wbs.framework.entity.annotations.IndexField;
+import wbs.framework.entity.annotations.IdentityReferenceField;
 import wbs.framework.entity.annotations.MajorEntity;
-import wbs.framework.entity.annotations.ReferenceField;
+import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
@@ -22,21 +23,30 @@ import wbs.framework.record.Record;
 public class TicketFieldValueRec  
 	implements CommonRecord<TicketFieldValueRec> {
 	
-	// id
+		// id
 	
 		@GeneratedIdField
 		Integer id;
 		
-		@IndexField
-		Integer index;
+		@ParentField
+		TicketRec ticket;
+		
+		@IdentityReferenceField
+		TicketFieldTypeRec ticketFieldType;
 		
 		// details
 		
-		@SimpleField
-		String value;
+		@SimpleField (
+			nullable = true)
+		String stringValue;
+
+		@SimpleField (
+			nullable = true)
+		Integer integerValue;
 		
-		@ReferenceField
-		TicketFieldTypeRec ticketTypeField;
+		@SimpleField (
+				nullable = true)
+		Boolean booleanValue;
 		
 		// compare to
 		
@@ -51,8 +61,8 @@ public class TicketFieldValueRec
 			return new CompareToBuilder ()
 		
 				.append (
-					getIndex (),
-					other.getIndex ())
+					getId (),
+					other.getId ())
 		
 				.toComparison ();
 		

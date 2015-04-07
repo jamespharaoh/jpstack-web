@@ -1363,16 +1363,25 @@ class HibernateHelperProviderBuilder {
 
 		@Override
 		public
-		boolean getDynamic() {
-			return dynamic;
+		boolean getDynamic (
+				Record<?> object,
+				String name) {
+			
+			//TODO
+			
+			return false;
 		}
-		
+
 		@Override
 		public
-		void setDynamic(
-				boolean dyn) {
-			dynamic =
-				dyn;
+		void setDynamic (
+				Record<?> object,
+				String name,
+				Object value) {
+			
+			//TODO
+			
+			
 		}
 
 	}

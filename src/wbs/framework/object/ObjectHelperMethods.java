@@ -181,9 +181,13 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 			Record<?> object,
 			Record<?> parent);
 	
-	boolean getDynamic();
+	boolean getDynamic (
+			Record<?> object,
+			String name);
 	
-	void setDynamic(
-			boolean dyn);
+	void setDynamic (
+			Record<?> object,
+			String name,
+			Object value);
 
 }

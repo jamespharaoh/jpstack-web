@@ -1432,17 +1432,23 @@ class ObjectHelperBuilder {
 			}
 			
 			@Override
-			public
-			boolean getDynamic() {
-				return dynamic;
+			public 
+			boolean getDynamic (
+				Record object, 
+				String name) {
+				
+				// TODO Auto-generated method stub
+				return false;
 			}
-			
+
 			@Override
-			public
-			void setDynamic(
-					boolean dyn) {
-				dynamic =
-					dyn;
+			public 
+			void setDynamic (
+				Record object, 
+				String name, 
+				Object value) {
+
+				
 			}
 
 		}

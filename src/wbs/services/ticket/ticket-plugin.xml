@@ -16,6 +16,7 @@
 		<model name="ticket"/>
 		<model name="ticketNote"/>
 		<model name="ticketFieldType"/>
+		<enum-type name="ticketFieldTypeType"/>
 		<model name="ticketFieldValue"/>
 		<model name="ticketState"/>
 	</models>
@@ -26,6 +27,7 @@
 	
 	<layer name="console">
 		<bean class="console.TicketFieldsProvider"/>
+		<bean class="console.TicketFieldsProvider$Config"/>
 	</layer>
 
 	<console-modules>

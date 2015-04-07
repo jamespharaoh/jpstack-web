@@ -68,9 +68,6 @@ class ObjectListPart
 	@Getter @Setter
 	String targetContextTypeName;
 	
-	@Getter @Setter
-	boolean dynamic;
-
 	// state
 
 	FormFieldSet formFieldSet;
