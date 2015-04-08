@@ -57,6 +57,7 @@ import wbs.platform.event.logic.EventLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.DateFinder;
@@ -545,8 +546,8 @@ class ChatJoiner {
 				chatUserLogic.setPlace (
 					chatUser,
 					rest,
-					Optional.of (
-						message));
+					Optional.of (message),
+					Optional.<UserRec>absent ());
 
 		}
 
@@ -781,8 +782,10 @@ class ChatJoiner {
 
 		// check info
 
-		if (chatUser.getInfoText () == null
-				&& chatUser.getNewChatUserInfo () == null) {
+		if (
+			chatUser.getInfoText () == null
+			&& chatUser.getNewChatUserInfo () == null
+		) {
 
 			sendMagicSystem (
 				"info_request",
@@ -793,6 +796,7 @@ class ChatJoiner {
 				Collections.<String,String>emptyMap ());
 
 			return false;
+
 		}
 
 		return true;

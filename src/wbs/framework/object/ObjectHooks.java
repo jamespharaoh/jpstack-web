@@ -21,4 +21,7 @@ interface ObjectHooks<RecordType extends Record<RecordType>> {
 	void afterInsert (
 			RecordType object);
 
+	void beforeUpdate (
+			RecordType object);
+
 }

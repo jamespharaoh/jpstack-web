@@ -604,10 +604,12 @@ class ChatUserRec
 	public
 	String getPrettyName () {
 
-		if (getName () == null)
+		if (getName () == null) {
 			return getCode ();
-		else
+		} else {
 			return getCode () + " " + getName ();
+		}
+
 	}
 
 	@Override
@@ -718,25 +720,37 @@ class ChatUserRec
 
 		if (otherGender == Gender.male) {
 
-			if (getGender () == Gender.male
-					&& getOrient () == Orient.gay)
+			if (
+				getGender () == Gender.male
+				&& getOrient () == Orient.gay
+			) {
 				return true;
+			}
 
-			if (getGender () == Gender.female
-					&& getOrient () == Orient.straight)
+			if (
+				getGender () == Gender.female
+				&& getOrient () == Orient.straight
+			) {
 				return true;
+			}
 
 		}
 
 		if (otherGender == Gender.female) {
 
-			if (getGender () == Gender.female
-					&& getOrient () == Orient.gay)
+			if (
+				getGender () == Gender.female
+				&& getOrient () == Orient.gay
+			) {
 				return true;
+			}
 
-			if (getGender () == Gender.male
-					&& getOrient () == Orient.straight)
+			if (
+				getGender () == Gender.male
+				&& getOrient () == Orient.straight
+			) {
 				return true;
+			}
 
 		}
 
@@ -1031,6 +1045,16 @@ class ChatUserRec
 
 			return chatUserDao.searchIds (
 				chatUserSearch);
+
+		}
+
+		@Override
+		public
+		void beforeUpdate (
+				ChatUserRec object) {
+
+			System.out.println (
+				"BEFORE UPDATE " + object);
 
 		}
 

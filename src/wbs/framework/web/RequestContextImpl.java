@@ -366,8 +366,13 @@ class RequestContextImpl
 
 	@Override
 	@SneakyThrows (IOException.class)
-	public PrintWriter writer () {
+	public
+	PrintWriter writer () {
+
+		response ().setCharacterEncoding ("utf-8");
+
 		return response ().getWriter ();
+
 	}
 
 	@Override

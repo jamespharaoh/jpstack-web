@@ -81,9 +81,8 @@ class ContextFormActionAction<FormState>
 
 		Optional<Responder> responder =
 			formActionHelper.processFormSubmission (
+				transaction,
 				formState);
-
-		transaction.commit ();
 
 		return responder.orNull ();
 

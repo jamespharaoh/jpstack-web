@@ -66,6 +66,7 @@ $(function () {
 				parentObjectCode: row.data ("parent-object-code"),
 				queueTypeCode: row.data ("queue-type-code"),
 				queueCode: row.data ("queue-code"),
+				sliceCode: row.data ("slice-code"),
 				row: row,
 				oldestTimestamp: row.data ("oldest-timestamp"),
 				oldestString: row.find (".queueItemOldest").text (),
@@ -200,7 +201,8 @@ $(function () {
 			"parentObjectTypeCode",
 			"parentObjectCode",
 			"queueTypeCode",
-			"queueCode"
+			"queueCode",
+			"sliceCode"
 		], function (i, field) {
 
 			if (! option [field])

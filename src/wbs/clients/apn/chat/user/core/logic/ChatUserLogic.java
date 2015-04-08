@@ -22,6 +22,7 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.model.MediaRec;
+import wbs.platform.user.model.UserRec;
 import wbs.sms.message.core.model.MessageRec;
 
 import com.google.common.base.Optional;
@@ -181,7 +182,8 @@ interface ChatUserLogic {
 	boolean setPlace (
 			ChatUserRec chatUser,
 			String place,
-			Optional<MessageRec> message);
+			Optional<MessageRec> message,
+			Optional<UserRec> user);
 
 	/**
 	 * Checks if a given user has attempted one of the three methods of age

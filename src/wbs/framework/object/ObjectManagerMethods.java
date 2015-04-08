@@ -42,6 +42,12 @@ interface ObjectManagerMethods {
 	String getObjectTypeCode (
 			Record<?> object);
 
+	public
+	abstract <ObjectType extends Record<ObjectType>>
+	Optional<ObjectType> getAncestor (
+			Class<ObjectType> ancestorClass,
+			Record<?> object);
+
 	// data access
 
 	Record<?> findObject (

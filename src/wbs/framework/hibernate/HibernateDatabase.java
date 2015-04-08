@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -41,6 +42,11 @@ class HibernateDatabase
 
 	@Inject
 	SessionFactory sessionFactory;
+
+	// prototype dependencies
+
+	@Inject
+	Provider<HibernateInterceptor> hibernateInterceptorProvider;
 
 	// properties
 
@@ -292,10 +298,17 @@ class HibernateDatabase
 				stringFormat (
 					"BEGIN %d %s",
 					id,
-					isReadWrite ? "rw" : "ro"));
+					isReadWrite
+						? "rw"
+						: "ro"));
 
 			session =
-				sessionFactory.openSession ();
+				sessionFactory.withOptions ()
+
+				.interceptor (
+					hibernateInterceptorProvider.get ())
+
+				.openSession ();
 
 			hibernateTransaction =
 				session.beginTransaction ();

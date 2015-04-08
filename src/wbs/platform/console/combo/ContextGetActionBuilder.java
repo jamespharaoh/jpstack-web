@@ -94,7 +94,6 @@ class ContextGetActionBuilder {
 					container.pathPrefix (),
 					name));
 
-
 		actionName =
 			ifNull (
 				spec.actionName (),

@@ -64,6 +64,7 @@ import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.user.model.UserRec;
 import wbs.sms.core.logic.KeywordFinder;
 import wbs.sms.gazetteer.model.GazetteerEntryObjectHelper;
 import wbs.sms.gazetteer.model.GazetteerEntryRec;
@@ -1061,7 +1062,15 @@ class ChatUserLogicImpl
 	boolean setPlace (
 			@NonNull ChatUserRec chatUser,
 			@NonNull String place,
-			@NonNull Optional<MessageRec> message) {
+			@NonNull Optional<MessageRec> message,
+			@NonNull Optional<UserRec> user) {
+
+		if (
+			message.isPresent ()
+			&& user.isPresent ()
+		) {
+			throw new IllegalArgumentException ();
+		}
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -1184,6 +1193,16 @@ class ChatUserLogicImpl
 				gazetteerEntry.getLongLat ().longitude (),
 				gazetteerEntry.getLongLat ().latitude (),
 				message.get ());
+
+		} else if (user.isPresent ()) {
+
+			eventLogic.createEvent (
+				"chat_user_place_user",
+				chatUser,
+				gazetteerEntry,
+				gazetteerEntry.getLongLat ().longitude (),
+				gazetteerEntry.getLongLat ().latitude (),
+				user.get ());
 
 		} else {
 

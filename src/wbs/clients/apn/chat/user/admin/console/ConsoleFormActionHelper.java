@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
+import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 
 import com.google.common.base.Optional;
@@ -13,6 +14,7 @@ interface ConsoleFormActionHelper<FormState> {
 			FormState formState);
 
 	Optional<Responder> processFormSubmission (
+			Transaction transaction,
 			FormState formState);
 
 }

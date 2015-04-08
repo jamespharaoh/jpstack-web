@@ -108,6 +108,7 @@ import wbs.platform.rpc.php.PhpRpcAction;
 import wbs.platform.rpc.web.ReusableRpcHandler;
 import wbs.platform.rpc.xml.XmlRpcAction;
 import wbs.platform.rpc.xml.XmlRpcFile;
+import wbs.platform.user.model.UserRec;
 import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.locator.model.EastNorth;
 import wbs.sms.locator.model.LongLat;
@@ -1498,7 +1499,8 @@ class ChatApiServletModule
 					! chatUserLogic.setPlace (
 						chatUser,
 						location,
-						Optional.<MessageRec>absent ())
+						Optional.<MessageRec>absent (),
+						Optional.<UserRec>absent ())
 				) {
 
 					errorCodes.add ("location-invalid");

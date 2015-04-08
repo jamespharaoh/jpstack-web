@@ -39,7 +39,7 @@
   <classpathentry kind="lib" path="binaries/libraries/jta-jar-1.1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/jta-source-1.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/junit-jar-4.10.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/log4j-bundle-1.2.17.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/log4j-source-1.2.17.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/lombok-jar-1.12.2.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/lombok-source-1.12.2.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/lombok-jar-1.16.2.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/lombok-source-1.16.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/mail-jar-1.4.3.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/merchantsdk-jar-2.13.117.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/merchantsdk-source-2.13.117.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/paypal-core-jar-1.6.6.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/paypal-core-source-1.6.6.jar"/>

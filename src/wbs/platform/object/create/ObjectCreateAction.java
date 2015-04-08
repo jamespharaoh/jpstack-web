@@ -130,7 +130,6 @@ class ObjectCreateAction
 	protected
 	Responder goReal () {
 
-		// TODO should be in an init method somewhere
 		parentHelper =
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());

@@ -36,7 +36,7 @@
 	<library name="jta" type="jar" version="1.1" source="yes"/>
 	<library name="junit" type="jar" version="4.10"/>
 	<library name="log4j" type="bundle" version="1.2.17" source="yes"/>
-	<library name="lombok" type="jar" version="1.12.2" source="yes"/>
+	<library name="lombok" type="jar" version="1.16.2" source="yes"/>
 	<library name="mail" type="jar" version="1.4.3"/>
 	<library name="merchantsdk" type="jar" version="2.13.117" source="yes"/>
 	<library name="paypal-core" type="jar" version="1.6.6" source="yes"/>

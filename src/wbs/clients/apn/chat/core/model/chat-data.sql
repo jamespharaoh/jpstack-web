@@ -135,6 +135,10 @@ SELECT event_type_insert (
 	'Location for %0 set to %1 (%2,%3) by %4');
 
 SELECT event_type_insert (
+	'chat_user_place_user',
+	'Location for %0 set to %1 (%2,%3) by %4');
+
+SELECT event_type_insert (
 	'chat_user_place_api',
 	'Location for %0 set to %1 (%2,%3) by API');
 

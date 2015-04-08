@@ -51,4 +51,13 @@ class AbstractObjectHooks<RecordType extends Record<RecordType>>
 
 	}
 
+	@Override
+	public
+	void beforeUpdate (
+			RecordType object) {
+
+		// do nothing
+
+	}
+
 }

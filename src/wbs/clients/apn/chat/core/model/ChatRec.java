@@ -116,10 +116,12 @@ class ChatRec
 	@SimpleField
 	Boolean autoAdultVerify = false;
 
-	@SimpleField (nullable = true)
+	@SimpleField (
+		nullable = true)
 	Gender gender;
 
-	@SimpleField (nullable = true)
+	@SimpleField (
+		nullable = true)
 	Orient orient;
 
 	@SimpleField

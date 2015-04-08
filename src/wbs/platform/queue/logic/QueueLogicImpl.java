@@ -151,7 +151,6 @@ class QueueLogicImpl
 				queueHelper.insert (
 					new QueueRec ()
 						.setCode (code)
-						.setDescription (queueType.getDescription ())
 						.setQueueType (queueType)
 						.setParentObjectType (parentType)
 						.setParentObjectId (parent.getId ()));
@@ -194,31 +193,48 @@ class QueueLogicImpl
 			queueItemHelper.insert (
 				new QueueItemRec ()
 
-					.setQueueSubject (queueSubject)
-					.setIndex (queueSubject.getTotalItems ())
+			.setQueueSubject (
+				queueSubject)
 
-					.setQueue (queue)
+			.setIndex (
+				queueSubject.getTotalItems ())
 
-					.setSource (source)
-					.setDetails (details)
-					.setRefObjectId (refObject.getId ())
+			.setQueue (
+				queue)
 
-					.setState (waiting
-						? QueueItemState.waiting
-						: QueueItemState.pending)
+			.setSource (
+				source)
 
-					.setCreatedTime (now)
-					.setPendingTime (waiting
-						? null
-						: now));
+			.setDetails (
+				details)
+
+			.setRefObjectId (
+				refObject.getId ())
+
+			.setState (
+				waiting
+					? QueueItemState.waiting
+					: QueueItemState.pending)
+
+			.setCreatedTime (
+				now)
+
+			.setPendingTime (
+				waiting
+					? null
+					: now)
+
+		);
 
 		// update queue subject
 
-		queueSubject.setTotalItems (
-			queueSubject.getTotalItems () + 1);
+		queueSubject
 
-		queueSubject.setActiveItems (
-			queueSubject.getActiveItems () + 1);
+			.setTotalItems (
+				queueSubject.getTotalItems () + 1)
+
+			.setActiveItems (
+				queueSubject.getActiveItems () + 1);
 
 		// and return
 
