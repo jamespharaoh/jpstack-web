@@ -30,7 +30,8 @@ class MenuItemRec
 
 	// id
 
-	@GeneratedIdField
+	@GeneratedIdField (
+		sequence = "menu_id_seq")
 	Integer id;
 
 	// identity

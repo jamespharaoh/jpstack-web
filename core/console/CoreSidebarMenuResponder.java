@@ -1,5 +1,7 @@
 package wbs.platform.core.console;
 
+import static wbs.framework.utils.etc.Misc.notEqual;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -16,7 +18,9 @@ import wbs.platform.menu.console.MenuGroupConsoleHelper;
 import wbs.platform.menu.model.MenuGroupRec;
 import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserObjectHelper;
+import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("coreSidebarMenuResponder")
 public
@@ -50,21 +54,38 @@ class CoreSidebarMenuResponder
 	protected
 	void prepare () {
 
-		/*
 		UserRec currentUser =
 			userHelper.find (
 				requestContext.userId ());
 
-		menuGroups =
-			menuGroupHelper.findByParent (
-				currentUser.getSlice ());
-		*/
+		SliceRec apnSlice =
+			sliceHelper.findByCode (
+				GlobalId.root,
+				"apn");
 
-		menuGroups =
-			menuGroupHelper.findByParent (
-				sliceHelper.findByCode (
-					GlobalId.root,
-					"apn"));
+		if (
+
+			apnSlice != null
+
+			&& notEqual (
+				currentUser.getUsername (),
+				"stuart_test")
+
+		) {
+
+			menuGroups =
+				menuGroupHelper.findByParent (
+					sliceHelper.findByCode (
+						GlobalId.root,
+						"apn"));
+
+		} else {
+
+			menuGroups =
+				menuGroupHelper.findByParent (
+					currentUser.getSlice ());
+
+		}
 
 		Collections.sort (
 			menuGroups);

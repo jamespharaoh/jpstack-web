@@ -784,4 +784,17 @@ class ConsoleObjectManagerImpl
 
 	}
 
+	@Override
+	public
+	<ObjectType extends Record<ObjectType>>
+	Optional<ObjectType> getAncestor (
+			Class<ObjectType> ancestorClass,
+			Record<?> object) {
+
+		return objectManager.getAncestor (
+			ancestorClass,
+			object);
+
+	}
+
 }
