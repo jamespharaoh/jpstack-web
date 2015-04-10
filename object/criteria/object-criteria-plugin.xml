@@ -8,6 +8,7 @@
 		<bean class="WhereNullCriteriaSpec"/>
 		<bean class="WhereNotNullCriteriaSpec"/>
 		<bean class="WhereICanManageCriteriaSpec"/>
+		<bean class="WhereInCriteriaSpec"/>
 	</layer>
 
 </plugin>

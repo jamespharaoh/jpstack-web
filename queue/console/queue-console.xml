@@ -59,6 +59,12 @@
 			<object-summary-page
 				fields="summary"/>
 
+			<context-link
+				name="item"
+				link="queueItem"
+				label="Items"
+				priv-key="queue.manage"/>
+
 		</object>
 
 	</object-context>
