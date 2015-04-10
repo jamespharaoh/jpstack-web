@@ -139,11 +139,8 @@ class QueueUsersPart
 
 			printFormat (
 				"%s\n",
-				objectManager.tdForObject (
-					userData.user,
-					null,
-					true,
-					true));
+				objectManager.tdForObjectMiniLink (
+					userData.user));
 
 			printFormat (
 				"<td align=\"right\">%s</td>\n",

@@ -43,11 +43,8 @@ class UserStatsGrouper
 			userHelper.find (
 				(Integer) group);
 
-		return consoleObjectManager.tdForObject (
-			user,
-			null,
-			true,
-			true);
+		return consoleObjectManager.tdForObjectMiniLink (
+			user);
 
 	}
 
