@@ -215,7 +215,8 @@ class TicketerApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			SliceRec slice =
 				sliceHelper.findByCode (

@@ -54,7 +54,8 @@ class ImChatCustomerAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		ImChatRec imChat =
 			imChatHelper.find (

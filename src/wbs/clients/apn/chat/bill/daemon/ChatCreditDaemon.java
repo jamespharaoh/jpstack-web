@@ -80,7 +80,8 @@ class ChatCreditDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (
@@ -103,7 +104,8 @@ class ChatCreditDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		Instant threeMonthsAgo =
 			transaction

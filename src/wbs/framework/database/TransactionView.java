@@ -90,4 +90,14 @@ class TransactionView
 
 	}
 
+	@Override
+	public
+	boolean contains (
+			Object object) {
+
+		return realTransaction.contains (
+			object);
+
+	}
+
 }

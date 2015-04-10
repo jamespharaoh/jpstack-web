@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -118,8 +119,9 @@ class ActivityManagerImplementation
 	@Override
 	public synchronized
 	ActiveTask start (
-			String taskName,
-			Map<String,Object> parameters) {
+			@NonNull String taskName,
+			@NonNull Object owner,
+			@NonNull Map<String,Object> parameters) {
 
 		log.debug (
 			stringFormat (
@@ -131,6 +133,9 @@ class ActivityManagerImplementation
 
 			.taskId (
 				nextTaskId ++)
+
+			.owner (
+				owner)
 
 			.taskName (
 				taskName)
@@ -205,8 +210,10 @@ class ActivityManagerImplementation
 		log.info (
 			"Begin active task dump");
 
-		for (Task task
-				: activeTasks.values ()) {
+		for (
+			Task task
+				: activeTasks.values ()
+		) {
 
 			log.info (
 				joinWithSeparator (
@@ -215,6 +222,10 @@ class ActivityManagerImplementation
 					stringFormat (
 						"id=%s",
 						task.taskId ()),
+
+					stringFormat (
+						"owner=%s",
+						task.owner ().getClass ().getName ()),
 
 					stringFormat (
 						"name=%s",

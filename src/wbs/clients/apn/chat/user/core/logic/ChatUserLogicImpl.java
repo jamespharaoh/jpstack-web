@@ -1165,6 +1165,25 @@ class ChatUserLogicImpl
 			throw new NullPointerException ();
 		}
 
+		{
+
+			Transaction transaction =
+				database.currentTransaction ();
+
+			if (
+				! transaction.contains (
+					chatUser)
+			) {
+
+				throw new IllegalStateException (
+					stringFormat (
+						"Chat user %s not in transaction",
+						chatUser.getId ()));
+
+			}
+
+		}
+
 		chatUser
 
 			.setLocationPlace (

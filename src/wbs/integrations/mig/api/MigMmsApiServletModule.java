@@ -348,7 +348,8 @@ logger.error ("Got item");
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			requestContext.debugDump (
 				log,
@@ -442,7 +443,8 @@ logger.error ("Got item");
 				false);
 
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			try {
 

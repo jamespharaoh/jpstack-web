@@ -119,7 +119,8 @@ class HybyteApiServletModule
 
 				@Cleanup
 				Transaction transaction =
-					database.beginReadWrite ();
+					database.beginReadWrite (
+						this);
 
 				// get ids
 
@@ -338,7 +339,8 @@ class HybyteApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get route
 

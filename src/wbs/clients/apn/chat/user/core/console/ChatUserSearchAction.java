@@ -312,7 +312,8 @@ class ChatUserSearchAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		List<Integer> chatUserIds =
 			chatUserHelper.searchIds (

@@ -18,6 +18,7 @@ public
 class Task {
 
 	long taskId;
+	Object owner;
 	String taskName;
 
 	String hostname;

@@ -87,7 +87,8 @@ class ChatAdultExpiryDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		List<ChatUserRec> chatUsers =
 			chatUserHelper.findAdultExpiryLimit (
@@ -110,7 +111,8 @@ class ChatAdultExpiryDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (

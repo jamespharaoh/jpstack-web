@@ -142,13 +142,16 @@ class ChatDateDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		List<Integer> chatIds =
 			new ArrayList<Integer> ();
 
-		for (ChatRec chat
-				: chatHelper.findAll ()) {
+		for (
+			ChatRec chat
+				: chatHelper.findAll ()
+		) {
 
 			chatIds.add (
 				chat.getId ());
@@ -169,7 +172,8 @@ class ChatDateDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		ChatRec chat =
 			chatHelper.find (chatId);
@@ -412,7 +416,8 @@ class ChatDateDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatUserRec thisUser =
 			chatUserHelper.find (

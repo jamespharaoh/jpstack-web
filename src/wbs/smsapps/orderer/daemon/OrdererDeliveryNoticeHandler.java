@@ -68,7 +68,8 @@ class OrdererDeliveryNoticeHandler
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		DeliveryRec delivery =
 			deliveryHelper.find (

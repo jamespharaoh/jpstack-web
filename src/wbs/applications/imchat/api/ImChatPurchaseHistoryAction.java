@@ -90,7 +90,8 @@ class ImChatPurchaseHistoryAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		// lookup session and customer
 

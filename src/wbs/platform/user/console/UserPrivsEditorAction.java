@@ -67,7 +67,8 @@ class UserPrivsEditorAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		UserRec myUser =
 			userHelper.find (

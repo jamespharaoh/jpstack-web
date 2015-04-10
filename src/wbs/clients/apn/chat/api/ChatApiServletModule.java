@@ -234,7 +234,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadOnly ();
+				database.beginReadOnly (
+					this);
 
 			MediaRec media =
 				mediaHelper.find (
@@ -637,7 +638,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadOnly ();
+				database.beginReadOnly (
+					this);
 
 			// get params
 
@@ -1145,7 +1147,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadOnly ();
+				database.beginReadOnly (
+					this);
 
 			// get params
 
@@ -1311,7 +1314,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get params
 
@@ -1937,7 +1941,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get params
 
@@ -2122,7 +2127,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get params
 
@@ -2347,7 +2353,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get params
 
@@ -2685,7 +2692,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get params
 
@@ -3052,7 +3060,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get params
 

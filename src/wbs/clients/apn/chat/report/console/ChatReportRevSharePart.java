@@ -638,8 +638,10 @@ class ChatReportRevSharePart
 		);
 
 		long staffCostPerMessage =
-			chatMonthCost.getStaffCost ()
-			/ chatMessages.size ();
+			chatMessages.isEmpty ()
+				? 0
+				: chatMonthCost.getStaffCost ()
+					/ chatMessages.size ();
 
 		for (
 			ChatMessageRec chatMessage

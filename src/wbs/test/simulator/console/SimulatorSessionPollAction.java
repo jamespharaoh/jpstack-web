@@ -63,7 +63,8 @@ class SimulatorSessionPollAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		List<SimulatorEventRec> events =
 			simulatorEventHelper.findAfterLimit (

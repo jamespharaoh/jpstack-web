@@ -235,7 +235,8 @@ System.out.println ("SEND: " + (send? "yes": "no"));
 
 				@Cleanup
 				Transaction transaction =
-					database.beginReadWrite ();
+					database.beginReadWrite (
+						this);
 
 				ChatRec chat =
 					chatHelper.find (

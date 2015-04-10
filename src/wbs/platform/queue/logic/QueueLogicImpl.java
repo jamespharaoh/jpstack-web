@@ -1,13 +1,14 @@
 package wbs.platform.queue.logic;
 
-import static wbs.framework.utils.etc.Misc.disallowNulls;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Date;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.object.ObjectHelper;
@@ -180,9 +181,13 @@ class QueueLogicImpl
 
 		// sanity check
 
-		if (objectManager.getObjectTypeId (refObject)
-				!= queueType.getRefObjectType ().getId ())
+		if (
+			notEqual (
+				objectManager.getObjectTypeId (refObject),
+				queueType.getRefObjectType ().getId ())
+		) {
 			throw new IllegalArgumentException ();
+		}
 
 		// create the queue item
 
@@ -339,14 +344,22 @@ class QueueLogicImpl
 		// update the queue item
 
 		queueItem
-			.setState (QueueItemState.cancelled)
-			.setCancelledTime (now)
-			.setQueueItemClaim (null);
+
+			.setState (
+				QueueItemState.cancelled)
+
+			.setCancelledTime (
+				now)
+
+			.setQueueItemClaim (
+				null);
 
 		// update the queue subject
 
 		queueSubject
-			.setActiveItems (queueSubject.getActiveItems () - 1);
+
+			.setActiveItems (
+				queueSubject.getActiveItems () - 1);
 
 		// activate next queue item (if any)
 
@@ -365,8 +378,12 @@ class QueueLogicImpl
 				throw new IllegalStateException ();
 
 			nextQueueItem
-				.setState (QueueItemState.pending)
-				.setPendingTime (now);
+
+				.setState (
+					QueueItemState.pending)
+
+				.setPendingTime (
+					now);
 
 		}
 
@@ -375,15 +392,14 @@ class QueueLogicImpl
 	@Override
 	public
 	void processQueueItem (
-			QueueItemRec queueItem,
-			UserRec user) {
-
-		disallowNulls (queueItem, user);
+			@NonNull QueueItemRec queueItem,
+			@NonNull UserRec user) {
 
 		QueueSubjectRec queueSubject =
 			queueItem.getQueueSubject ();
 
-		Date now = new Date ();
+		Date now =
+			new Date ();
 
 		// sanity checks
 

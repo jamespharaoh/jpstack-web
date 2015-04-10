@@ -93,7 +93,8 @@ class ChatUserAdminBarringAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// lookup database stuff
 

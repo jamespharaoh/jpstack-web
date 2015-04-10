@@ -56,7 +56,8 @@ class ChatNoteNamesAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatRec chat =
 			chatHelper.find (

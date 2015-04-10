@@ -44,6 +44,7 @@ class WbsServlet
 		ActiveTask activeTask =
 			activityManager.start (
 				"web request",
+				this,
 				ImmutableMap.<String,Object>builder ()
 					.build ());
 

@@ -56,7 +56,8 @@ class ChatUserNotesAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		UserRec user =
 			userHelper.find (

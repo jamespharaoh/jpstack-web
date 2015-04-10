@@ -86,7 +86,8 @@ class ImChatMessageListAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		// lookup session
 

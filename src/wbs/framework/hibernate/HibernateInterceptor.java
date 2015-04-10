@@ -9,12 +9,15 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.extern.log4j.Log4j;
+
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.type.Type;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 
+@Log4j
 @PrototypeComponent ("hibernateInterceptor")
 public
 class HibernateInterceptor
@@ -62,64 +65,75 @@ class HibernateInterceptor
 			String[] propertyNames,
 			Type[] types) {
 
-		if (
-			chatUserClass.isInstance (
-				entity)
-		) {
+		try {
 
-			System.out.println (
-				stringFormat (
-					"--- CHAT USER %s ---",
-					id));
-
-			for (
-				int propertyIndex = 0;
-				propertyIndex < propertyNames.length;
-				propertyIndex ++
+			if (
+				chatUserClass.isInstance (
+					entity)
 			) {
-
-				String propertyName =
-					propertyNames [propertyIndex];
-
-				if (
-					notIn (
-						propertyName,
-						"locationLongLat",
-						"locationBackupLongLat",
-						"locationTime",
-						"locationPlace",
-						"locationPlaceLongLat")
-				) {
-					continue;
-				}
-
-				Object currentValue =
-					currentState [propertyIndex];
-
-				Object previousValue =
-					previousState [propertyIndex];
 
 				System.out.println (
 					stringFormat (
-						"%s: %s -> %s",
-						propertyName,
-						previousValue != null
-							? previousValue
-							: "null",
-						currentValue != null
-							? currentValue
-							: "null"));
+						"--- CHAT USER %s ---",
+						id));
+
+				for (
+					int propertyIndex = 0;
+					propertyIndex < propertyNames.length;
+					propertyIndex ++
+				) {
+
+					String propertyName =
+						propertyNames [propertyIndex];
+
+					if (
+						notIn (
+							propertyName,
+							"locationLongLat",
+							"locationBackupLongLat",
+							"locationTime",
+							"locationPlace",
+							"locationPlaceLongLat")
+					) {
+						continue;
+					}
+
+					Object currentValue =
+						currentState [propertyIndex];
+
+					Object previousValue =
+						previousState [propertyIndex];
+
+					System.out.println (
+						stringFormat (
+							"%s: %s -> %s",
+							propertyName,
+							previousValue != null
+								? previousValue
+								: "null",
+							currentValue != null
+								? currentValue
+								: "null"));
+
+				}
+
+				System.out.println (
+					stringFormat (
+						"--- CHAT USER %s ---",
+						id));
 
 			}
 
-			System.out.println (
-				stringFormat (
-					"--- CHAT USER %s ---",
-					id));
+			return false;
+
+		} catch (Exception exception) {
+
+			log.error (
+				exception);
+
+			return false;
 
 		}
-
-		return false;
 
 	}
 

@@ -3,11 +3,17 @@ package wbs.framework.database;
 public
 interface Database {
 
-	Transaction beginReadWrite ();
-	Transaction beginReadOnly ();
-	Transaction beginReadOnlyJoin ();
+	Transaction beginReadWrite (
+			Object owner);
+
+	Transaction beginReadOnly (
+			Object owner);
+
+	Transaction beginReadOnlyJoin (
+			Object owner);
 
 	Transaction beginTransaction (
+			Object owner,
 			boolean readWrite,
 			boolean canJoin,
 			boolean canCreateNew,

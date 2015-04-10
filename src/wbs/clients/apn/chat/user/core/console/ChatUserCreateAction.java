@@ -176,7 +176,8 @@ class ChatUserCreateAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// get database objects
 

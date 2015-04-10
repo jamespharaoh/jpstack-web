@@ -30,6 +30,9 @@ interface Transaction {
 	void refresh (
 			Object object);
 
+	boolean contains (
+			Object object);
+
 	void setMeta (
 			String key,
 			Object value);

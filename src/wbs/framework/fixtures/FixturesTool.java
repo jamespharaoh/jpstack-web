@@ -47,13 +47,18 @@ class FixturesTool {
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
-		for (PluginSpec plugin
-				: pluginManager.plugins ()) {
+		for (
+			PluginSpec plugin
+				: pluginManager.plugins ()
+		) {
 
-			for (PluginFixtureSpec fixture
-					: plugin.fixtures ()) {
+			for (
+				PluginFixtureSpec fixture
+					: plugin.fixtures ()
+			) {
 
 				log.info (
 					stringFormat (

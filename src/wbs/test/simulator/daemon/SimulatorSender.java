@@ -77,7 +77,8 @@ class SimulatorSender
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		MessageRec message =
 			messageHelper.find (

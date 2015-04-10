@@ -74,7 +74,8 @@ class CoreAuthFilter
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		onlineSessionIdsByUserId =
 			new HashMap<Integer,String> ();

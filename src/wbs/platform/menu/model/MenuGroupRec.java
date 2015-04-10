@@ -66,8 +66,7 @@ class MenuGroupRec
 	// children
 
 	@CollectionField (
-		orderBy = "label",
-		key = "group_id")
+		orderBy = "label")
 	Set<MenuItemRec> menus;
 
 	// compare to

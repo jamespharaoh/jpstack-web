@@ -576,20 +576,6 @@ class Misc {
 	}
 
 	public static
-	void disallowNulls (
-			Object... objects) {
-
-		for (Object object
-				: objects) {
-
-			if (object == null)
-				throw new NullPointerException ();
-
-		}
-
-	}
-
-	public static
 	String prettyHour (
 			int hour) {
 

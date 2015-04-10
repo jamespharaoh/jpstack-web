@@ -86,7 +86,8 @@ class ChatUserQuietDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		// get a list of users who are past their outbound timestamp
 
@@ -124,7 +125,8 @@ class ChatUserQuietDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// find the user
 

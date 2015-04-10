@@ -52,10 +52,13 @@ class ObjectHelperProviderManager {
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
-		for (Map.Entry<String,ObjectHelperProvider> entry
-				: objectHelperProvidersByBeanName.entrySet ()) {
+		for (
+			Map.Entry<String,ObjectHelperProvider> entry
+				: objectHelperProvidersByBeanName.entrySet ()
+		) {
 
 			String beanName =
 				entry.getKey ();

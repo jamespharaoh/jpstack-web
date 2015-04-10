@@ -60,7 +60,8 @@ class ImChatMediaOriginalJpegAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		// retrieve media data
 

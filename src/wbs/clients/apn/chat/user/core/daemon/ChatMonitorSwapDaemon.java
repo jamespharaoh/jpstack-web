@@ -85,7 +85,8 @@ class ChatMonitorSwapDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		List<ChatRec> chats =
 			chatHelper.findAll ();
@@ -154,7 +155,8 @@ class ChatMonitorSwapDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatRec chat =
 			chatHelper.find (

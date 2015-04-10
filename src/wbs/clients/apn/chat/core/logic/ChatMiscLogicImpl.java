@@ -465,7 +465,8 @@ class ChatMiscLogicImpl
 
 					@Cleanup
 					Transaction transaction =
-						database.beginReadWrite ();
+						database.beginReadWrite (
+							this);
 
 					ChatUserRec chatUser =
 						chatUserHelper.find (
@@ -473,6 +474,22 @@ class ChatMiscLogicImpl
 
 					if (longLat == null) {
 						throw new NullPointerException ();
+					}
+
+					{
+
+						if (
+							! transaction.contains (
+								chatUser)
+						) {
+
+							throw new IllegalStateException (
+								stringFormat (
+									"Chat user %s not in transaction",
+									chatUser.getId ()));
+
+						}
+
 					}
 
 					chatUser

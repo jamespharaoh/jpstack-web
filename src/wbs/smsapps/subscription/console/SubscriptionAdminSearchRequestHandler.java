@@ -220,7 +220,8 @@ class SubscriptionAdminSearchRequestHandler
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		searchMap.put (
 			"subscriptionId",

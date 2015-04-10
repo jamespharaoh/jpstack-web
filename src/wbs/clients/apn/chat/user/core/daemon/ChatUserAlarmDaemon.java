@@ -87,7 +87,8 @@ class ChatUserAlarmDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		List<ChatUserAlarmRec> alarms =
 			chatUserAlarmHelper.findPending ();
@@ -126,7 +127,8 @@ class ChatUserAlarmDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// find the alarm and stuff
 

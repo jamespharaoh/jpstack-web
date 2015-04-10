@@ -65,7 +65,8 @@ class ChatUserImageUploadPostAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatUserImageUploadTokenRec imageUploadToken =
 			chatUserImageUploadTokenHelper.findByToken (
@@ -220,7 +221,8 @@ class ChatUserImageUploadPostAction
 
 			@Cleanup
 			Transaction errorTransaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// update token
 

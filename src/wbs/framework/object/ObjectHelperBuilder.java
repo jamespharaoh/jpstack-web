@@ -89,10 +89,13 @@ class ObjectHelperBuilder {
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
-		for (ObjectHelperProvider objectHelperProvider
-				: objectHelperProviderManager.list ()) {
+		for (
+			ObjectHelperProvider objectHelperProvider
+				: objectHelperProviderManager.list ()
+		) {
 
 			ObjectHelper<?> objectHelper =
 				new Builder ()
