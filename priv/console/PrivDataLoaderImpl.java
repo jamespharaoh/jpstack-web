@@ -177,7 +177,8 @@ class PrivDataLoaderImpl
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadOnlyJoin ();
+				database.beginReadOnlyJoin (
+					this);
 
 			// start timer
 
@@ -455,8 +456,10 @@ class PrivDataLoaderImpl
 			UserData newData =
 				new UserData ();
 
-			@Cleanup Transaction transaction =
-				database.beginReadOnly ();
+			@Cleanup
+			Transaction transaction =
+				database.beginReadOnly (
+					this);
 
 			// start timer
 

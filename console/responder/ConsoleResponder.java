@@ -42,7 +42,8 @@ class ConsoleResponder
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		setup ();
 		prepare ();

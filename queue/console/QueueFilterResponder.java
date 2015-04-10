@@ -61,7 +61,8 @@ class QueueFilterResponder
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		UserRec myUser =
 			userHelper.find (

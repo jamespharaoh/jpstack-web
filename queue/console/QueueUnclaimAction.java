@@ -55,7 +55,8 @@ class QueueUnclaimAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		QueueItemRec queueItem =
 			queueItemHelper.find (queueItemId);

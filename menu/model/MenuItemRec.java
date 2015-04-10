@@ -22,22 +22,19 @@ import wbs.framework.record.Record;
 @Data
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id")
-@MajorEntity (
-	table = "menu")
+@MajorEntity
 public
 class MenuItemRec
 	implements MajorRecord<MenuItemRec> {
 
 	// id
 
-	@GeneratedIdField (
-		sequence = "menu_id_seq")
+	@GeneratedIdField
 	Integer id;
 
 	// identity
 
-	@ParentField (
-		column = "group_id")
+	@ParentField
 	MenuGroupRec menuGroup;
 
 	@CodeField
@@ -59,12 +56,10 @@ class MenuItemRec
 	@SimpleField
 	String label;
 
-	@SimpleField (
-		column = "path")
+	@SimpleField
 	String targetPath;
 
-	@SimpleField (
-		column = "target")
+	@SimpleField
 	String targetFrame;
 
 	// compare to

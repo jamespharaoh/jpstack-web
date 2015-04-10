@@ -65,7 +65,8 @@ class ContextFormActionAction<FormState>
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		formActionHelper.updatePassiveFormState (
 			formState);

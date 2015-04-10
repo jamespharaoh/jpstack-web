@@ -95,7 +95,8 @@ class ObjectSettingsAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		Record<?> object =
 			(Record<?>)

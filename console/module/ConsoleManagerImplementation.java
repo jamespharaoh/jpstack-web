@@ -1,7 +1,6 @@
 package wbs.platform.console.module;
 
 import static wbs.framework.utils.etc.Misc.camelToHyphen;
-import static wbs.framework.utils.etc.Misc.disallowNulls;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
@@ -1111,7 +1110,8 @@ class ConsoleManagerImplementation
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		context.initContext (
 			pathParts,
@@ -1163,12 +1163,10 @@ class ConsoleManagerImplementation
 
 		private
 		ContextPathHandler (
-				ConsoleContext newContext) {
+				@NonNull ConsoleContext newContext) {
 
-			disallowNulls (
-				newContext);
-
-			consoleContext = newContext;
+			consoleContext =
+				newContext;
 
 		}
 
@@ -1199,7 +1197,8 @@ class ConsoleManagerImplementation
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		PathSupply pathParts =
 			pathParts (path);

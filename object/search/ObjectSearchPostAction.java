@@ -127,7 +127,8 @@ class ObjectSearchPostAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		Object search =
 			requestContext.session (
