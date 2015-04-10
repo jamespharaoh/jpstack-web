@@ -90,11 +90,8 @@ class ChatUserAdminDeletePart
 			"<tr>\n",
 			"<th>Number</th>\n",
 			"%s\n",
-			consoleObjectManager.tdForObject (
-				chatUser.getOldNumber (),
-				null,
-				true,
-				true),
+			consoleObjectManager.tdForObjectMiniLink (
+				chatUser.getOldNumber ()),
 			"</tr>\n");
 
 		printFormat (

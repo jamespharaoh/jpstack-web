@@ -96,11 +96,8 @@ class QueueSupervisorItemsPart
 			"<tr>\n",
 			"<th>User</th>\n",
 			"%s\n",
-			objectManager.tdForObject (
-				user,
-				null,
-				true,
-				true),
+			objectManager.tdForObjectMiniLink (
+				user),
 			"</tr>\n");
 
 		printFormat (
@@ -137,25 +134,18 @@ class QueueSupervisorItemsPart
 				"<tr>\n",
 
 				"%s\n",
-				objectManager.tdForObject (
-					parent,
-					null,
-					false,
-					true),
+				objectManager.tdForObjectLink (
+					parent),
 
 				"%s\n",
-				objectManager.tdForObject (
+				objectManager.tdForObjectMiniLink (
 					queue,
-					parent,
-					true,
-					true),
+					parent),
 
 				"%s\n",
-				objectManager.tdForObject (
+				objectManager.tdForObjectMiniLink (
 					queueItem,
-					queue,
-					true,
-					true),
+					queue),
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (

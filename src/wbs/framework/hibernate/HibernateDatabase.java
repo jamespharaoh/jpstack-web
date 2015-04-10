@@ -543,10 +543,19 @@ class HibernateDatabase
 		@Override
 		public
 		void refresh (
-				Object object) {
+				Object... objects) {
 
-			session.refresh (
-				object);
+			session.flush ();
+
+			for (
+				Object object
+					: objects
+			) {
+
+				session.refresh (
+					object);
+
+			}
 
 		}
 
@@ -597,10 +606,20 @@ class HibernateDatabase
 		@Override
 		public
 		boolean contains (
-				Object object) {
+				Object... objects) {
 
-			return session.contains (
-				object);
+			for (
+				Object object
+					: objects
+			) {
+
+				if (! session.contains (object)) {
+					return false;
+				}
+
+			}
+
+			return true;
 
 		}
 

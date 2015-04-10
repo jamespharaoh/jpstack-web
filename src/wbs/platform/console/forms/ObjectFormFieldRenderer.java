@@ -94,7 +94,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 					interfaceValue,
 					root,
 					true,
-					link)));
+					link,
+					1)));
 
 	}
 
@@ -132,7 +133,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 					interfaceValue,
 					root,
 					true,
-					true)));
+					true,
+					1)));
 
 	}
 
@@ -387,7 +389,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			interfaceValue,
 			root,
 			true,
-			link);
+			link,
+			1);
 
 	}
 

@@ -981,8 +981,16 @@ class ChatUserRec
 				.setDeliveryMethod (
 					ChatMessageMethod.sms)
 
+				.setGender (
+					chat.getGender ())
+
+				.setOrient (
+					chat.getOrient ())
+
 				.setCreditMode (
-					ChatUserCreditMode.strict);
+					number.getFree ()
+						? ChatUserCreditMode.free
+						: ChatUserCreditMode.strict);
 
 			chatUserLogic.monitorCap (
 				chatUser);
@@ -990,25 +998,10 @@ class ChatUserRec
 			// set adult verify on some services
 			// TODO this should probably not be here
 
-			if (chat.getAutoAdultVerify ())
-				chatUserLogic.adultVerify (chatUser);
+			if (chat.getAutoAdultVerify ()) {
 
-			// set gender and orient
-
-			if (chat.getGender () != null)
-				chatUser.setGender (chat.getGender ());
-
-			if (chat.getOrient () != null)
-				chatUser.setOrient (chat.getOrient ());
-
-			// set free mode for some numbers
-
-			if (number.getFree ()) {
-
-				chatUser
-
-					.setCreditMode (
-						ChatUserCreditMode.free);
+				chatUserLogic.adultVerify (
+					chatUser);
 
 			}
 

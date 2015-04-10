@@ -44,11 +44,8 @@ class QueueStatsGrouper
 			queueHelper.find (
 				(Integer) group);
 
-		return consoleObjectManager.tdForObject (
-			queue,
-			null,
-			true,
-			true);
+		return consoleObjectManager.tdForObjectMiniLink (
+			queue);
 
 	}
 

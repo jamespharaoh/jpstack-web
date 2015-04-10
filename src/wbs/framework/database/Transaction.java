@@ -28,10 +28,10 @@ interface Transaction {
 	void flush ();
 
 	void refresh (
-			Object object);
+			Object... objects);
 
 	boolean contains (
-			Object object);
+			Object... objects);
 
 	void setMeta (
 			String key,

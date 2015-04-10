@@ -136,11 +136,8 @@ class ChatUserNotesPart
 				chatUserNote.getText ().getText (),
 
 				"%s",
-				consoleObjectManager.tdForObject (
-					chatUserNote.getUser (),
-					null,
-					true,
-					true),
+				consoleObjectManager.tdForObjectMiniLink (
+					chatUserNote.getUser ()),
 
 				"</tr>\n");
 		}

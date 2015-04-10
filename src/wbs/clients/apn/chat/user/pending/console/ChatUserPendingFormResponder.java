@@ -19,12 +19,14 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.console.context.ConsoleContextScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.HtmlResponder;
 import wbs.platform.media.console.MediaConsoleLogic;
+import wbs.platform.priv.console.PrivChecker;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -43,6 +45,9 @@ class ChatUserPendingFormResponder
 
 	@Inject
 	ChatUserLogic chatUserLogic;
+
+	@Inject
+	PrivChecker privChecker;
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -230,15 +235,6 @@ class ChatUserPendingFormResponder
 
 		requestContext.flushNotices (out);
 
-		if (mode == PendingMode.none) {
-
-			printFormat (
-				"<p>No info to approve</p>\n");
-
-			return;
-
-		}
-
 		printFormat (
 			"<form",
 			" method=\"post\"",
@@ -253,381 +249,405 @@ class ChatUserPendingFormResponder
 
 			">");
 
-		printFormat (
-
-			"<table class=\"list\">\n");
-
-		printFormat (
-
-			"<tr>\n",
-
-			"<th>User</th>\n",
-
-			"<td>%h</td>\n",
-			stringFormat (
-				"%s/%s",
-				chatUser.getChat ().getCode (),
-				chatUser.getCode ()),
-
-			"</tr>\n");
-
-		printFormat (
-
-			"<tr>\n",
-
-			"<th>Options</th>\n",
-
-			"<td><input",
-			" type=\"button\"",
-			" value=\"approve\"",
-			" onclick=\"showPhoto ()\"",
-			">",
-
-			"<input",
-			" type=\"button\"",
-			" value=\"reject\"",
-			" onclick=\"showReject ()\"",
-			"></td>\n",
-
-			"</tr>\n");
-
-		switch (mode) {
-
-		case name:
+		if (mode == PendingMode.none) {
 
 			printFormat (
-				"<tr id=\"photoRow\">\n",
-				"<th>Name</th>\n",
-
-				"<td><textarea",
-				" name=\"name\"",
-				" rows=\"4\"",
-				" cols=\"48\"",
-				">%h</textarea></td>\n",
-				chatUser
-					.getNewChatUserName ()
-					.getOriginalName (),
-
-				"</tr>\n");
-
-			break;
-
-		case info:
-
-			printFormat (
-				"<tr id=\"photoRow\">\n",
-
-				"<th>Info</th>\n",
-
-				"<td><textarea",
-				" name=\"info\"",
-				" rows=\"4\"",
-				" cols=\"48\"",
-				">%h</textarea></td>\n",
-				chatUser
-					.getNewChatUserInfo ()
-					.getOriginalText ()
-					.getText (),
-
-				"</tr>\n");
-
-			break;
-
-		case image:
-
-			ChatUserImageRec image =
-				chatUserLogic.chatUserPendingImage (
-					chatUser,
-					ChatUserImageType.image);
-
-			printFormat (
-				"<tr id=\"photoRow\">\n",
-				"<th>Photo</th>\n",
-
-				"<td>%s</td>\n",
-				mediaConsoleLogic.mediaThumb100 (
-					image.getMedia ()),
-
-				"</tr>\n");
-
-			break;
-
-		case video:
-
-			ChatUserImageRec video =
-				chatUserLogic.chatUserPendingImage (
-					chatUser,
-					ChatUserImageType.video);
-
-			printFormat (
-				"<tr id=\"photoRow\">\n",
-				"<th>Video</th>\n",
-
-				"<td>%s</td>\n",
-				mediaConsoleLogic.mediaThumb100 (
-					video.getMedia ()),
-
-				"</tr>\n");
-
-			break;
-
-		case audio:
-
-			printFormat (
-				"<tr id=\"photoRow\">\n",
-				"<th>Audio</th>\n",
-
-				"<td>(audio)</td>\n",
-
-				"</tr>\n");
-
-			break;
-
-		default:
-			// do nothing
-
-		}
-
-		if (
-			in (
-				mode,
-				PendingMode.image,
-				PendingMode.video,
-				PendingMode.audio)
-		) {
-
-			ChatUserImageRec chatUserImage =
-				chatUserLogic.chatUserPendingImage (
-					chatUser,
-					chatUserLogic.imageTypeForMode (mode));
-
-			printFormat (
-				"<tr id=\"classificationRow\">\n",
-				"<th>Classification</th>\n",
-
-				"<td><select name=\"classification\">\n",
-
-				"%s\n",
-				Html.option (
-					"primary",
-					"primary",
-					requestContext.getForm ("classification")));
+				"<p>No info to approve</p>\n");
 
 			if (
-				chatUserImage.getAppend ()
-				|| equal (
-					chatUser.getChat ().getCode (),
-					"adult")
+				privChecker.can (
+					GlobalId.root,
+					"manage")
 			) {
 
 				printFormat (
-					"%s\n",
-					Html.option (
-						"secondary",
-						"secondary",
-						requestContext.getForm ("classification")));
+					"<p><input",
+					" type=\"submit\"",
+					" name=\"chatUserDismiss\"",
+					" value=\"dismiss queue item\"",
+					"></p>\n");
+
+			}
+
+		} else {
+
+			printFormat (
+
+				"<table class=\"list\">\n");
+
+			printFormat (
+
+				"<tr>\n",
+
+				"<th>User</th>\n",
+
+				"<td>%h</td>\n",
+				stringFormat (
+					"%s/%s",
+					chatUser.getChat ().getCode (),
+					chatUser.getCode ()),
+
+				"</tr>\n");
+
+			printFormat (
+
+				"<tr>\n",
+
+				"<th>Options</th>\n",
+
+				"<td><input",
+				" type=\"button\"",
+				" value=\"approve\"",
+				" onclick=\"showPhoto ()\"",
+				">",
+
+				"<input",
+				" type=\"button\"",
+				" value=\"reject\"",
+				" onclick=\"showReject ()\"",
+				"></td>\n",
+
+				"</tr>\n");
+
+			switch (mode) {
+
+			case name:
+
+				printFormat (
+					"<tr id=\"photoRow\">\n",
+					"<th>Name</th>\n",
+
+					"<td><textarea",
+					" name=\"name\"",
+					" rows=\"4\"",
+					" cols=\"48\"",
+					">%h</textarea></td>\n",
+					chatUser
+						.getNewChatUserName ()
+						.getOriginalName (),
+
+					"</tr>\n");
+
+				break;
+
+			case info:
+
+				printFormat (
+					"<tr id=\"photoRow\">\n",
+
+					"<th>Info</th>\n",
+
+					"<td><textarea",
+					" name=\"info\"",
+					" rows=\"4\"",
+					" cols=\"48\"",
+					">%h</textarea></td>\n",
+					chatUser
+						.getNewChatUserInfo ()
+						.getOriginalText ()
+						.getText (),
+
+					"</tr>\n");
+
+				break;
+
+			case image:
+
+				ChatUserImageRec image =
+					chatUserLogic.chatUserPendingImage (
+						chatUser,
+						ChatUserImageType.image);
+
+				printFormat (
+					"<tr id=\"photoRow\">\n",
+					"<th>Photo</th>\n",
+
+					"<td>%s</td>\n",
+					mediaConsoleLogic.mediaThumb100 (
+						image.getMedia ()),
+
+					"</tr>\n");
+
+				break;
+
+			case video:
+
+				ChatUserImageRec video =
+					chatUserLogic.chatUserPendingImage (
+						chatUser,
+						ChatUserImageType.video);
+
+				printFormat (
+					"<tr id=\"photoRow\">\n",
+					"<th>Video</th>\n",
+
+					"<td>%s</td>\n",
+					mediaConsoleLogic.mediaThumb100 (
+						video.getMedia ()),
+
+					"</tr>\n");
+
+				break;
+
+			case audio:
+
+				printFormat (
+					"<tr id=\"photoRow\">\n",
+					"<th>Audio</th>\n",
+
+					"<td>(audio)</td>\n",
+
+					"</tr>\n");
+
+				break;
+
+			default:
+				// do nothing
 
 			}
 
 			if (
-				chatUserImage.getAppend ()
+				in (
+					mode,
+					PendingMode.image,
+					PendingMode.video,
+					PendingMode.audio)
 			) {
 
+				ChatUserImageRec chatUserImage =
+					chatUserLogic.chatUserPendingImage (
+						chatUser,
+						chatUserLogic.imageTypeForMode (mode));
+
 				printFormat (
+					"<tr id=\"classificationRow\">\n",
+					"<th>Classification</th>\n",
+
+					"<td><select name=\"classification\">\n",
+
 					"%s\n",
 					Html.option (
-						"landscape",
-						"landscape",
+						"primary",
+						"primary",
 						requestContext.getForm ("classification")));
+
+				if (
+					chatUserImage.getAppend ()
+					|| equal (
+						chatUser.getChat ().getCode (),
+						"adult")
+				) {
+
+					printFormat (
+						"%s\n",
+						Html.option (
+							"secondary",
+							"secondary",
+							requestContext.getForm ("classification")));
+
+				}
+
+				if (
+					chatUserImage.getAppend ()
+				) {
+
+					printFormat (
+						"%s\n",
+						Html.option (
+							"landscape",
+							"landscape",
+							requestContext.getForm ("classification")));
+
+				}
+
+				printFormat (
+					"</select>\n",
+					"</td>\n",
+					"</tr>\n");
+
+			}
+
+			printFormat (
+
+				"<tr",
+				" id=\"templateRow\"",
+				" style=\"display: none\">\n",
+
+				"<th>Template</th>\n",
+
+				"<td><select",
+				" id=\"templateId\"",
+				">\n",
+
+				"<option>\n");
+
+			for (ChatHelpTemplateRec chatelpTemplate
+					: chatHelpTemplates) {
+
+				printFormat (
+					"<option",
+					" value=\"%h\"",
+					chatelpTemplate.getId (),
+					">%h</option>\n",
+					chatelpTemplate.getCode ());
 
 			}
 
 			printFormat (
 				"</select>\n",
-				"</td>\n",
+
+				"<input",
+				" type=\"button\"",
+				" onclick=\"useTemplate ()\"",
+				" value=\"ok\"",
+				"></td>\n",
+
 				"</tr>\n");
 
-		}
-
-		printFormat (
-
-			"<tr",
-			" id=\"templateRow\"",
-			" style=\"display: none\">\n",
-
-			"<th>Template</th>\n",
-
-			"<td><select",
-			" id=\"templateId\"",
-			">\n",
-
-			"<option>\n");
-
-		for (ChatHelpTemplateRec chatelpTemplate
-				: chatHelpTemplates) {
-
 			printFormat (
-				"<option",
-				" value=\"%h\"",
-				chatelpTemplate.getId (),
-				">%h</option>\n",
-				chatelpTemplate.getCode ());
-
-		}
-
-		printFormat (
-			"</select>\n",
-
-			"<input",
-			" type=\"button\"",
-			" onclick=\"useTemplate ()\"",
-			" value=\"ok\"",
-			"></td>\n",
-
-			"</tr>\n");
-
-		printFormat (
-			"<tr",
-			" id=\"messageRow\"",
-			" style=\"display: none\"",
-			">\n",
-
-			"<th>Message</th>\n",
-
-			"<td><textarea",
-			" id=\"message\"",
-			" name=\"message\"",
-			" rows=\"4\"",
-			" cols=\"48\"",
-			"></textarea></td>\n",
-
-			"</tr>\n");
-
-		printFormat (
-			"<tr>\n",
-			"<th>Actions</th>\n",
-			"<td>");
-
-		switch (mode) {
-
-		case name:
-
-			printFormat (
-
-				"<input",
-				" id=\"approveButton\"",
-				" type=\"submit\"",
-				" name=\"chatUserNameApprove\"",
-				" value=\"approve name\"",
+				"<tr",
+				" id=\"messageRow\"",
+				" style=\"display: none\"",
 				">\n",
 
-				"<input",
-				" id=\"rejectButton\"",
-				" style=\"display: none\"",
-				" type=\"submit\"",
-				" name=\"chatUserNameReject\"",
-				"value=\"reject name and send warning\"",
-				">\n");
+				"<th>Message</th>\n",
 
-			break;
+				"<td><textarea",
+				" id=\"message\"",
+				" name=\"message\"",
+				" rows=\"4\"",
+				" cols=\"48\"",
+				"></textarea></td>\n",
 
-		case info:
-
-			printFormat (
-
-				"<input",
-				" id=\"approveButton\"",
-				" type=\"submit\"",
-				" name=\"chatUserInfoApprove\"",
-				" value=\"approve info\"",
-				">\n",
-
-				"<input",
-				" id=\"rejectButton\"",
-				" style=\"display: none\"",
-				" type=\"submit\"",
-				" name=\"chatUserInfoReject\"",
-				" value=\"reject info and send warning\"",
-				">\n");
-
-			break;
-
-		case image:
+				"</tr>\n");
 
 			printFormat (
+				"<tr>\n",
+				"<th>Actions</th>\n",
+				"<td>");
 
-				"<input",
-				" id=\"approveButton\"",
-				" type=\"submit\"",
-				" name=\"chatUserImageApprove\"",
-				" value=\"approve photo\"",
-				">\n",
+			switch (mode) {
 
-				"<input",
-				" id=\"rejectButton\"",
-				" style=\"display: none\"",
-				" type=\"submit\"",
-				" name=\"chatUserImageReject\"",
-				" value=\"reject photo and send warning\"",
-				">\n");
+			case name:
 
-			break;
+				printFormat (
 
-		case video:
+					"<input",
+					" id=\"approveButton\"",
+					" type=\"submit\"",
+					" name=\"chatUserNameApprove\"",
+					" value=\"approve name\"",
+					">\n",
+
+					"<input",
+					" id=\"rejectButton\"",
+					" style=\"display: none\"",
+					" type=\"submit\"",
+					" name=\"chatUserNameReject\"",
+					"value=\"reject name and send warning\"",
+					">\n");
+
+				break;
+
+			case info:
+
+				printFormat (
+
+					"<input",
+					" id=\"approveButton\"",
+					" type=\"submit\"",
+					" name=\"chatUserInfoApprove\"",
+					" value=\"approve info\"",
+					">\n",
+
+					"<input",
+					" id=\"rejectButton\"",
+					" style=\"display: none\"",
+					" type=\"submit\"",
+					" name=\"chatUserInfoReject\"",
+					" value=\"reject info and send warning\"",
+					">\n");
+
+				break;
+
+			case image:
+
+				printFormat (
+
+					"<input",
+					" id=\"approveButton\"",
+					" type=\"submit\"",
+					" name=\"chatUserImageApprove\"",
+					" value=\"approve photo\"",
+					">\n",
+
+					"<input",
+					" id=\"rejectButton\"",
+					" style=\"display: none\"",
+					" type=\"submit\"",
+					" name=\"chatUserImageReject\"",
+					" value=\"reject photo and send warning\"",
+					">\n");
+
+				break;
+
+			case video:
+
+				printFormat (
+
+					"<input",
+					" id=\"approveButton\"",
+					" type=\"submit\"",
+					" name=\"chatUserVideoApprove\"",
+					" value=\"approve video\"",
+					">\n",
+
+					"<input",
+					" id=\"rejectButton\"",
+					" style=\"display: none\"",
+					" type=\"submit\"",
+					" name=\"chatUserVideoReject\"",
+					" value=\"reject video and send warning\"",
+					">\n");
+
+				break;
+
+			case audio:
+
+				printFormat (
+
+					"<input",
+					" id=\"approveButton\"",
+					" type=\"submit\"",
+					" name=\"chatUserAudioApprove\"",
+					" value=\"approve audio\"",
+					">\n",
+
+					"<input",
+					" id=\"rejectButton\"",
+					" style=\"display: none\"",
+					" type=\"submit\"",
+					" name=\"chatUserAudioReject\"",
+					" value=\"reject audio and send warning\"",
+					">\n");
+
+				break;
+
+			default:
+
+				// do nothing
+
+			}
 
 			printFormat (
+				"</td>\n",
 
-				"<input",
-				" id=\"approveButton\"",
-				" type=\"submit\"",
-				" name=\"chatUserVideoApprove\"",
-				" value=\"approve video\"",
-				">\n",
-
-				"<input",
-				" id=\"rejectButton\"",
-				" style=\"display: none\"",
-				" type=\"submit\"",
-				" name=\"chatUserVideoReject\"",
-				" value=\"reject video and send warning\"",
-				">\n");
-
-			break;
-
-		case audio:
+				"</tr>\n");
 
 			printFormat (
-
-				"<input",
-				" id=\"approveButton\"",
-				" type=\"submit\"",
-				" name=\"chatUserAudioApprove\"",
-				" value=\"approve audio\"",
-				">\n",
-
-				"<input",
-				" id=\"rejectButton\"",
-				" style=\"display: none\"",
-				" type=\"submit\"",
-				" name=\"chatUserAudioReject\"",
-				" value=\"reject audio and send warning\"",
-				">\n");
-
-			break;
-
-		default:
-
-			// do nothing
+				"</table>\n");
 
 		}
-
-		printFormat (
-			"</td>\n",
-
-			"</tr>\n");
-
-		printFormat (
-			"</table>\n");
 
 		printFormat (
 			"</form>\n");

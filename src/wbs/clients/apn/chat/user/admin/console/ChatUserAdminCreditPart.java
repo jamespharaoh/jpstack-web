@@ -201,11 +201,8 @@ class ChatUserAdminCreditPart
 					 chatUserCredit.getDetails (),
 
 					"%s\n",
-					consoleObjectManager.tdForObject (
-						chatUserCredit.getUser (),
-						null,
-						true,
-						true),
+					consoleObjectManager.tdForObjectMiniLink (
+						chatUserCredit.getUser ()),
 
 					"</tr>\n");
 

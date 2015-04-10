@@ -1679,8 +1679,6 @@ class ChatApiServletModule
 
 					}
 
-					transaction.flush ();
-
 					transaction.refresh (chatUser);
 
 				}
@@ -2813,15 +2811,22 @@ class ChatApiServletModule
 				}
 
 				// perform the deletions
+
 				int i = 0;
+
 				for (ChatUserImageRec image : images) {
+
 					if (chatUser.getMainChatUserImageByType (type) == image)
 						chatUser.setMainChatUserImageByType (type, null);
+
 					image.setIndex (requestImageIds.contains (image.getId ()) ? null : i++);
+
 				}
-				transaction.flush ();
+
 				transaction.refresh (chatUser);
+
 				images = chatUser.getChatUserImageListByType (type);
+
 			}
 
 			// reorder images
@@ -2879,8 +2884,6 @@ class ChatApiServletModule
 
 				}
 
-				transaction.flush ();
-
 				transaction.refresh (chatUser);
 
 				images =
@@ -2906,7 +2909,6 @@ class ChatApiServletModule
 
 				}
 
-				transaction.flush ();
 				transaction.refresh (chatUser);
 
 				images =

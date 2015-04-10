@@ -15,6 +15,7 @@ import org.hibernate.EmptyInterceptor;
 import org.hibernate.type.Type;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 
 @Log4j
@@ -27,6 +28,9 @@ class HibernateInterceptor
 
 	@Inject
 	Provider<ObjectManager> objectManagerProvider;
+
+	@Inject
+	Provider<HibernateDatabase> hibernateDatabaseProvider;
 
 	// state
 
@@ -67,15 +71,27 @@ class HibernateInterceptor
 
 		try {
 
+			HibernateDatabase hibernateDatabase =
+				hibernateDatabaseProvider.get ();
+
+			Transaction currentTransaction =
+				hibernateDatabase.currentTransaction ();
+
 			if (
 				chatUserClass.isInstance (
 					entity)
 			) {
 
-				System.out.println (
+				String header =
 					stringFormat (
-						"--- CHAT USER %s ---",
-						id));
+						"--- CHAT USER %s (%s) [tx %s] ---",
+						id,
+						System.identityHashCode (
+							entity),
+						currentTransaction.getId ());
+
+				System.out.println (
+					header);
 
 				for (
 					int propertyIndex = 0;
@@ -118,9 +134,7 @@ class HibernateInterceptor
 				}
 
 				System.out.println (
-					stringFormat (
-						"--- CHAT USER %s ---",
-						id));
+					header);
 
 			}
 

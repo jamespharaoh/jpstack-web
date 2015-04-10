@@ -93,11 +93,9 @@ class ChatHelpLogPendingSummaryPart
 			"<tr>\n",
 			"<th>User</th>\n",
 			"%s\n",
-			objectManager.tdForObject (
+			objectManager.tdForObjectMiniLink (
 				chatUser,
-				chatUser.getChat (),
-				true,
-				true),
+				chatUser.getChat ()),
 			"</tr>\n");
 
 		printFormat (

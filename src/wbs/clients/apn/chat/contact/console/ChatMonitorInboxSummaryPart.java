@@ -426,18 +426,14 @@ class ChatMonitorInboxSummaryPart
 			"<th>User number</th>\n",
 
 			"%s",
-			objectManager.tdForObject (
+			objectManager.tdForObjectMiniLink (
 				monitorChatUser,
-				chat,
-				true,
-				true),
+				chat),
 
 			"%s",
-			objectManager.tdForObject (
+			objectManager.tdForObjectMiniLink (
 				userChatUser,
-				chat,
-				true,
-				true),
+				chat),
 
 			"</tr>\n");
 
