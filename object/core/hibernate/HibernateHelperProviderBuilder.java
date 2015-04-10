@@ -1363,13 +1363,14 @@ class HibernateHelperProviderBuilder {
 
 		@Override
 		public
-		boolean getDynamic (
+		Object getDynamic (
 				Record<?> object,
 				String name) {
 			
-			//TODO
-			
-			return false;
+			 return objectHooks.getDynamic(
+					 object, 
+					 name);
+
 		}
 
 		@Override
@@ -1379,8 +1380,10 @@ class HibernateHelperProviderBuilder {
 				String name,
 				Object value) {
 			
-			//TODO
-			
+			objectHooks.setDynamic (
+				object, 
+				name, 
+				value);			
 			
 		}
 

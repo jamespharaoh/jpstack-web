@@ -17,6 +17,7 @@ import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.scaffold.model.RootObjectHelper;
+import wbs.ticket.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCreatePart")
@@ -51,6 +52,9 @@ class ObjectCreatePart
 
 	@Getter @Setter
 	String localFile;
+	
+	@Getter @Setter
+	FieldsProvider formFieldsProvider;
 
 	// state
 
@@ -63,12 +67,18 @@ class ObjectCreatePart
 	Record<?> object;
 
 	// implementation
-
+	
 	@Override
 	public
 	void prepare () {
 
 		prepareParents ();
+		
+		// if a field provider was provided
+		
+		if (formFieldsProvider != null) {
+			prepareFieldSet();
+		}
 
 		// create dummy instance
 
@@ -91,7 +101,7 @@ class ObjectCreatePart
 	}
 
 	void prepareParents () {
-
+		
 		parentHelper =
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
@@ -149,7 +159,13 @@ class ObjectCreatePart
 			parentHelper.findAll ();
 
 	}
-
+	
+	void prepareFieldSet () {
+		
+		formFieldSet = formFieldsProvider.getFields(
+			parent);
+	
+	}
 
 	@Override
 	public
