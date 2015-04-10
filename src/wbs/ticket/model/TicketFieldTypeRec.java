@@ -103,7 +103,7 @@ public class TicketFieldTypeRec
 		extends AbstractObjectHooks<TicketFieldTypeRec> {
 
 		@Inject
-		Provider<TicketFieldTypeObjectHelper>  ticketFieldTypeHelper;
+		Provider<TicketFieldTypeObjectHelper> ticketFieldTypeHelper;
 
 		@Inject
 		Database database;

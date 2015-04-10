@@ -21,7 +21,7 @@ interface ObjectHooks<RecordType extends Record<RecordType>> {
 	void afterInsert (
 			RecordType object);
 	
-	boolean getDynamic (
+	Object getDynamic (
 			Record<?> object,
 			String name);
 	

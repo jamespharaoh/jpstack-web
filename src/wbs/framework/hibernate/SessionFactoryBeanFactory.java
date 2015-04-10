@@ -434,6 +434,7 @@ class SessionFactoryBeanFactory
 				.addElement ("class")
 				.addAttribute ("name", model.objectClass ().getSimpleName ())
 				.addAttribute ("table", tableNameSql)
+				.addAttribute ("cascade", "save-update")
 				.addAttribute ("lazy", "true");
 
 		if (! model.mutable ())
@@ -832,6 +833,7 @@ class SessionFactoryBeanFactory
 				classElement
 					.addElement ("set")
 					.addAttribute ("name", modelField.name ())
+					.addAttribute ("cascade", "save-update")
 					.addAttribute ("lazy", "true");
 
 			if (modelField.orderBy () != null) {
@@ -905,6 +907,7 @@ class SessionFactoryBeanFactory
 				classElement
 					.addElement ("list")
 					.addAttribute ("name", modelField.name ())
+					.addAttribute ("cascade", "save-update")
 					.addAttribute ("lazy", "true");
 
 			if (modelField.orderBy () != null) {
@@ -1003,6 +1006,7 @@ class SessionFactoryBeanFactory
 				classElement
 					.addElement ("map")
 					.addAttribute ("name", modelField.name ())
+					.addAttribute ("cascade", "save-update")
 					.addAttribute ("lazy", "true");
 
 			// key
@@ -1089,6 +1093,7 @@ class SessionFactoryBeanFactory
 					.addElement ("set")
 					.addAttribute ("name", modelField.name ())
 					.addAttribute ("table", modelField.table ())
+					.addAttribute ("cascade", "save-update")
 					.addAttribute ("lazy", "true");
 
 			if (modelField.where () != null) {
@@ -1168,6 +1173,7 @@ class SessionFactoryBeanFactory
 					.addElement ("list")
 					.addAttribute ("name", modelField.name ())
 					.addAttribute ("table", modelField.table ())
+					.addAttribute ("cascade", "save-update")
 					.addAttribute ("lazy", "true");
 
 			if (modelField.where () != null) {

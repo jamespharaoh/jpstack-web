@@ -29,12 +29,12 @@
 		object-name="ticket">
 
 		<list>
-
+		
 			<object-list-page
 				fields-provider="ticketListFieldsProvider"/>
 
 			<object-create-page
-				fields="create"/>
+				fields-provider="ticketCreateFieldsProvider"/>
 
 		</list>
 

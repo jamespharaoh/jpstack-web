@@ -13,6 +13,8 @@ import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.ticket.model.TicketFieldTypeObjectHelper;
 import wbs.ticket.model.TicketFieldTypeRec;
 import wbs.ticket.model.TicketFieldTypeType;
+import wbs.ticket.model.TicketFieldValueObjectHelper;
+import wbs.ticket.model.TicketFieldValueRec;
 import wbs.ticket.model.TicketManagerObjectHelper;
 import wbs.ticket.model.TicketManagerRec;
 import wbs.ticket.model.TicketNoteObjectHelper;
@@ -40,6 +42,9 @@ public class TicketFixtureProvider
 	
 	@Inject
 	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
+	
+	@Inject
+	TicketFieldValueObjectHelper ticketFieldValueHelper;
 	
 	@Inject
 	TicketNoteObjectHelper ticketNoteHelper;
@@ -100,71 +105,108 @@ public class TicketFixtureProvider
 				ticketHelper.generateCode ())
 	
 		);
+		
+		TicketFieldTypeRec booleanType =
+				ticketFieldTypeHelper.insert (
+						new TicketFieldTypeRec ()
+			
+					.setTicketManager (
+						ticketManager)
+			
+					.setCode (
+						ticketFieldTypeHelper.generateCode ())
+						
+					.setName("Read")
+					
+					.setType(TicketFieldTypeType.bool)
+					
+					.setRequired(true)			
+			
+		);	
 	
-		ticketFieldTypeHelper.insert (
-				new TicketFieldTypeRec ()
-	
-			.setTicketManager (
-				ticketManager)
-	
-			.setCode (
-				ticketFieldTypeHelper.generateCode ())
+		TicketFieldTypeRec numberType =
+			ticketFieldTypeHelper.insert (
+					new TicketFieldTypeRec ()
+		
+				.setTicketManager (
+					ticketManager)
+		
+				.setCode (
+					ticketFieldTypeHelper.generateCode ())
+					
+				.setName("Number")
 				
-			.setName("Number")
-			
-			.setType(TicketFieldTypeType.number)
-			
-			.setRequired(true)			
-	
+				.setType(TicketFieldTypeType.number)
+				
+				.setRequired(true)			
+		
 		);
 		
-		ticketFieldTypeHelper.insert (
+		TicketFieldTypeRec stringType =
+			ticketFieldTypeHelper.insert (
 				new TicketFieldTypeRec ()
-	
-			.setTicketManager (
-				ticketManager)
-	
-			.setCode (
-				ticketFieldTypeHelper.generateCode ())
-				
-			.setName("User")
-			
-			.setType(TicketFieldTypeType.object)
-			
-			.setObjectType(
-				objectTypeHelper.findByCode (
-					GlobalId.root,
-					"user"))
-				
-			.setRequired(true)			
-	
-		);	
 		
-		ticketFieldTypeHelper.insert (
-				new TicketFieldTypeRec ()
-	
-			.setTicketManager (
-				ticketManager)
-	
-			.setCode (
-				ticketFieldTypeHelper.generateCode ())
-				
-			.setName("Text")
-			
-			.setType(TicketFieldTypeType.string)
-			
-			.setRequired(true)			
-	
-		);	
+				.setTicketManager (
+					ticketManager)
 		
+				.setCode (
+					ticketFieldTypeHelper.generateCode ())
+					
+				.setName("Text")
+				
+				.setType(TicketFieldTypeType.string)
+				
+				.setRequired(true)			
+		
+			);	
+		
+		ticketFieldValueHelper.insert(
+			new TicketFieldValueRec ()
+				
+				.setTicket (
+					ticket)
+		
+				.setTicketFieldType (
+					numberType)
+					
+				.setIntegerValue(10)
+				
+		);
+		
+		ticketFieldValueHelper.insert(
+			new TicketFieldValueRec ()
+					
+				.setTicket (
+					ticket)
+		
+				.setTicketFieldType (
+					stringType)
+					
+				.setStringValue("Value")
+				
+		);
+		
+		ticketFieldValueHelper.insert(
+				new TicketFieldValueRec ()
+						
+					.setTicket (
+						ticket)
+			
+					.setTicketFieldType (
+						booleanType)
+						
+					.setBooleanValue(true)
+					
+			);
+			
 		ticketNoteHelper.insert (
 			new TicketNoteRec ()
 
-		.setTicket (
-			ticket)
-
-		.setIndex (
-			ticket.getNumNotes ())
+				.setTicket (
+					ticket)
+		
+				.setIndex (
+					ticket.getNumNotes ())
 	
 		);
 		

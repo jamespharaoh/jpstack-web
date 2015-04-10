@@ -53,13 +53,14 @@ class AbstractObjectHooks<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	boolean getDynamic (
+	Object getDynamic (
 			Record<?> object,
 			String name) {
 		
-		//TODO
-		
-		return false;
+		throw new UnsupportedOperationException (
+				stringFormat (
+					"%s.getDynamic (...)",
+					getClass ().getSimpleName ()));
 	}
 
 	@Override
@@ -69,8 +70,7 @@ class AbstractObjectHooks<RecordType extends Record<RecordType>>
 			String name,
 			Object value) {
 		
-		//TODO
-		
+		// do nothing		
 		
 	}
 

@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -34,6 +35,7 @@ import wbs.platform.console.part.PagePart;
 import wbs.platform.console.responder.ConsoleFile;
 import wbs.platform.console.tab.ConsoleContextTab;
 import wbs.platform.console.tab.TabContextResponder;
+import wbs.ticket.console.FieldsProvider;
 
 @PrototypeComponent ("objectCreatePageBuilder")
 @ConsoleModuleBuilderHandler
@@ -41,6 +43,9 @@ public
 class ObjectCreatePageBuilder {
 
 	// dependences
+	
+	@Inject
+	ApplicationContext applicationContext;
 
 	@Inject
 	ConsoleMetaManager consoleMetaManager;
@@ -86,6 +91,7 @@ class ObjectCreatePageBuilder {
 	String responderName;
 	String targetContextTypeName;
 	String targetResponderName;
+	FieldsProvider fieldsProvider;
 	FormFieldSet formFieldSet;
 	String createTimeFieldName;
 	String createUserFieldName;
@@ -178,6 +184,9 @@ class ObjectCreatePageBuilder {
 
 					.formFieldSet (
 						formFieldSet)
+						
+					.formFieldsProvider (
+						fieldsProvider)
 
 					.createTimeFieldName (
 						createTimeFieldName)
@@ -226,6 +235,9 @@ class ObjectCreatePageBuilder {
 
 					.formFieldSet (
 						formFieldSet)
+						
+					.formFieldsProvider (
+						fieldsProvider)
 
 					.parentPrivCode (
 						createPrivCode)
@@ -256,7 +268,7 @@ class ObjectCreatePageBuilder {
 	}
 
 	void setDefaults () {
-
+		
 		consoleHelper =
 			container.consoleHelper ();
 
@@ -311,6 +323,23 @@ class ObjectCreatePageBuilder {
 				? consoleModule.formFieldSets ().get (
 					spec.fieldsName ())
 				: defaultFields ();
+			
+		// if a provider name is provided
+
+		if (spec.fieldsProviderName () != null) {
+
+			fieldsProvider = 
+					applicationContext.getBean (
+							spec.fieldsProviderName (),
+							FieldsProvider.class);		
+		} 
+		
+		else {
+			
+			fieldsProvider =
+				null;
+			
+		}
 
 		createTimeFieldName =
 			spec.createTimeFieldName ();

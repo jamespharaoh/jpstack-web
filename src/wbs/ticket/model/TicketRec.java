@@ -7,13 +7,17 @@ import java.util.TreeSet;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.joda.time.Instant;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.hibernate.TransientObjectException;
+import org.joda.time.Instant;
+
+import com.google.common.collect.Ordering;
+
 import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.CollectionField;
@@ -65,7 +69,8 @@ public class TicketRec
 	@CollectionField (
 			orderBy = "index")
 		Set<TicketFieldValueRec> ticketFieldValues =
-			new TreeSet<TicketFieldValueRec> ();
+			new TreeSet<TicketFieldValueRec> (
+				Ordering.arbitrary ());
 	
 	// statistics
 
@@ -120,6 +125,12 @@ public class TicketRec
 
 		@Inject
 		Provider<TicketObjectHelper> ticketHelper;
+		
+		@Inject
+		Provider<TicketFieldTypeObjectHelper> ticketFieldTypeHelper;		
+		
+		@Inject
+		Provider<TicketFieldValueObjectHelper> ticketFieldValueHelper;	
 
 		@Inject
 		Database database;
@@ -136,14 +147,57 @@ public class TicketRec
 		
 		@Override
 		public
-		boolean getDynamic (
+		Object getDynamic (
 				Record<?> object,
 				String name) {
 			
-			//TODO
+			TicketRec ticket = (TicketRec) object;
 			
-			return false;
+			//Find the ticket field type
 			
+			TicketFieldTypeRec ticketFieldType =			
+				ticketFieldTypeHelper.get().findByCode(
+						ticket.getTicketManager(), 
+						name);
+
+			try {
+				
+				//Find the ticket fueld value
+				
+				TicketFieldValueRec ticketFieldValue =
+						ticketHelper.get().findTicketFieldValue(
+							ticket,
+							ticketFieldType);	
+				
+				if (ticketFieldValue == null) { return null; }
+				
+				switch( ticketFieldType.getType() ) {
+				
+					case string:
+						return ticketFieldValue.getStringValue();
+						
+					case number:
+						return ticketFieldValue.getIntegerValue();
+						
+					case bool:
+						return ticketFieldValue.getBooleanValue();
+						
+					case object:
+						throw new RuntimeException ("TODO");
+						
+					default:
+						throw new RuntimeException ();
+			
+				}
+
+			} catch (TransientObjectException exception) {
+
+				// object not yet saved so fields will all be null
+				
+				return null;
+
+			}
+				
 		}
 
 		@Override
@@ -152,11 +206,123 @@ public class TicketRec
 				Record<?> object,
 				String name,
 				Object value) {
+				
+			TicketRec ticket = (TicketRec) object;
 			
-			//TODO
+			//Find the ticket field type
+			
+			TicketFieldTypeRec ticketFieldType =			
+				ticketFieldTypeHelper.get().findByCode(
+						ticket.getTicketManager(), 
+						name);			
+			
+			TicketFieldValueRec ticketFieldValue;
+			
+			try {
+				ticketFieldValue = 
+					ticketHelper.get().findTicketFieldValue(
+						ticket,
+						ticketFieldType);	
+			}
+			catch (Exception e) {
+				ticketFieldValue =
+					null;
+			}
+			
+			// if the value object does not exist, a new one is created
+			
+			if (ticketFieldValue == null) {
+
+				switch( ticketFieldType.getType() ) {
+					case string:
+					
+						ticketFieldValue = new TicketFieldValueRec()
+							.setStringValue((String)value.toString())
+							.setTicket(ticket)
+							.setTicketFieldType(ticketFieldType);
+						break;
+						
+					case number:
+			
+						ticketFieldValue = new TicketFieldValueRec()
+							.setIntegerValue((Integer)value)
+							.setTicket(ticket)
+							.setTicketFieldType(ticketFieldType);
+						break;
+						
+					case bool:
+					
+						ticketFieldValue = new TicketFieldValueRec()
+							.setBooleanValue((Boolean)value)
+							.setTicket(ticket)
+							.setTicketFieldType(ticketFieldType);
+						break;
+						
+					case object:
+						throw new RuntimeException ("TODO");
+						
+					default:
+						throw new RuntimeException ();
+				
+				}
+				
+			}
+			
+			// if the value object exists, it is updated
+			
+			else {
+			
+				switch( ticketFieldType.getType() ) {
+					case string:
+						
+						ticketFieldValue
+							.setStringValue((String)value)
+							.setTicket(ticket)
+							.setTicketFieldType(ticketFieldType);
+						break;
+						
+					case number:
+						ticketFieldValue
+							.setIntegerValue((Integer)value)
+							.setTicket(ticket)
+							.setTicketFieldType(ticketFieldType);
+						break;
+						
+					case bool:
+						ticketFieldValue
+							.setBooleanValue((Boolean)value)
+							.setTicket(ticket)
+							.setTicketFieldType(ticketFieldType);
+						break;
+						
+					case object:
+						throw new RuntimeException ("TODO");
+						
+					default:
+						throw new RuntimeException ();
+					
+				}
+				
+			}
+			
+			System.out.println("SIZE:"+ticket.getTicketFieldValues ().size());
+			
+			ticket.getTicketFieldValues ().add (
+					ticketFieldValue);
 			
 		}
 		
+	}
+	
+	// dao methods
+
+	public static
+	interface TicketDaoMethods {
+
+		TicketFieldValueRec findTicketFieldValue (
+				TicketRec ticket,
+				TicketFieldTypeRec ticketFieldType);
+
 	}
 	
 	// compare to

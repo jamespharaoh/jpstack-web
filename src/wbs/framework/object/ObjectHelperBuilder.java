@@ -435,40 +435,48 @@ class ObjectHelperBuilder {
 				Class<?> declaringClass =
 					method.getDeclaringClass ();
 
-				if (declaringClass == ObjectHelperMethods.class) {
+				try {
+				
+					if (declaringClass == ObjectHelperMethods.class) {
+	
+						return method.invoke (
+							coreImplementation,
+							arguments);
+	
+					} else if (declaringClass == ModelMethods.class) {
+	
+						return method.invoke (
+							objectHelperProvider.model (),
+							arguments);
+	
+					} else if (declaringClass == extraInterface) {
+	
+						return method.invoke (
+							extraImplementation,
+							arguments);
+	
+					} else if (declaringClass == daoMethodsInterface) {
+	
+						return method.invoke (
+							daoImplementation,
+							arguments);
+	
+					} else {
+	
+						throw new RuntimeException (
+							stringFormat (
+								"Don't know how to handle %s.%s",
+								declaringClass.getName (),
+								method.getName ()));
+	
+					}
 
-					return method.invoke (
-						coreImplementation,
-						arguments);
+				} catch (InvocationTargetException exception) {
 
-				} else if (declaringClass == ModelMethods.class) {
-
-					return method.invoke (
-						objectHelperProvider.model (),
-						arguments);
-
-				} else if (declaringClass == extraInterface) {
-
-					return method.invoke (
-						extraImplementation,
-						arguments);
-
-				} else if (declaringClass == daoMethodsInterface) {
-
-					return method.invoke (
-						daoImplementation,
-						arguments);
-
-				} else {
-
-					throw new RuntimeException (
-						stringFormat (
-							"Don't know how to handle %s.%s",
-							declaringClass.getName (),
-							method.getName ()));
+					throw exception.getTargetException ();
 
 				}
-
+		
 			}
 
 		}
@@ -1433,12 +1441,14 @@ class ObjectHelperBuilder {
 			
 			@Override
 			public 
-			boolean getDynamic (
+			Object getDynamic (
 				Record object, 
 				String name) {
 				
-				// TODO Auto-generated method stub
-				return false;
+				return objectHelperProvider.getDynamic (
+					object,
+					name);
+
 			}
 
 			@Override
@@ -1448,6 +1458,10 @@ class ObjectHelperBuilder {
 				String name, 
 				Object value) {
 
+				objectHelperProvider.setDynamic (
+					object, 
+					name, 
+					value);
 				
 			}
 

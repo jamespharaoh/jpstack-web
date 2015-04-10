@@ -126,7 +126,7 @@ interface ObjectHelperProvider {
 	boolean getDeleted (
 			Record<?> object);
 	
-	boolean getDynamic (
+	Object getDynamic (
 			Record<?> object,
 			String name);
 	

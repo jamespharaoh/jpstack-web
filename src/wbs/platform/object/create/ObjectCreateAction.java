@@ -34,6 +34,7 @@ import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+import wbs.ticket.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCreateAction")
@@ -107,7 +108,10 @@ class ObjectCreateAction
 
 	@Getter @Setter
 	String createUserFieldName;
-
+	
+	@Getter @Setter
+	FieldsProvider formFieldsProvider;
+	
 	// state
 
 	ConsoleHelper<?> parentHelper;
@@ -204,7 +208,11 @@ class ObjectCreateAction
 		}
 
 		// perform updates
-
+		
+		if (formFieldsProvider != null) {
+			prepareFieldSet();
+		}
+		
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
 				formFieldSet,
@@ -380,6 +388,13 @@ class ObjectCreateAction
 
 		}
 
+	}
+	
+	void prepareFieldSet () {
+		
+		formFieldSet = formFieldsProvider.getFields(
+			parent);
+	
 	}
 
 }

@@ -100,8 +100,6 @@ class ObjectListPageBuilder {
 	ConsoleHelper<?> consoleHelper;
 
 	String typeCode;
-	
-	boolean dynamic;
 
 	FieldsProvider fieldsProvider;
 	

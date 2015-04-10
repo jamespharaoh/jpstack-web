@@ -65,18 +65,16 @@ class TicketFieldsProvider
 		for (TicketFieldTypeRec ticketFieldType : ticketFieldTypes) {
 			
 			if (ticketFieldType.getType().equals(TicketFieldTypeType.string)) {
-				
-	
+
 				formFieldSpecs
 					.add(new TextFormFieldSpec()
-				
 						.name(ticketFieldType.getCode ())					
 						.label(ticketFieldType.getName ())
 						.dynamic (true));
 				
 			} 
 			else if (ticketFieldType.getType().equals(TicketFieldTypeType.number)) {
-				
+			
 				formFieldSpecs
 					.add(new IntegerFormFieldSpec()
 				
@@ -86,7 +84,7 @@ class TicketFieldsProvider
 				
 			} 
 			else if (ticketFieldType.getType().equals(TicketFieldTypeType.bool)) {
-				
+		
 				formFieldSpecs
 					.add(new YesNoFormFieldSpec()
 				
@@ -96,7 +94,7 @@ class TicketFieldsProvider
 				
 			} 
 			else if (ticketFieldType.getType().equals(TicketFieldTypeType.object)) {
-				
+			
 				formFieldSpecs
 					.add(new ObjectFormFieldSpec()
 				
@@ -110,9 +108,10 @@ class TicketFieldsProvider
 		
 		String fieldSetName =
 			stringFormat (
-				"%s.list",
-				ticketConsoleHelper.objectName());
-
+				"%s.%s",
+				ticketConsoleHelper.objectName(), 
+				mode);
+		
 		return consoleModuleBuilder.buildFormFieldSet (
 			ticketConsoleHelper,
 			fieldSetName,
@@ -150,7 +149,16 @@ class TicketFieldsProvider
 			return ticketFieldsProvider.get ()
 				.setMode ("list");
 
-		}		
+		}
+		
+		@PrototypeComponent ("ticketCreateFieldsProvider")
+		public
+		FieldsProvider ticketCreateFieldsProvider () {
+
+			return ticketFieldsProvider.get ()
+				.setMode ("create");
+
+		}	
 
 	}
 	
