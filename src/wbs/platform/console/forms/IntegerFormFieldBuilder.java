@@ -88,6 +88,14 @@ class IntegerFormFieldBuilder {
 		String name =
 			spec.name ();
 
+		String fullName =
+			spec.delegate () == null
+				? name
+				: stringFormat (
+					"%s.%s",
+					spec.delegate (),
+					name);
+
 		String label =
 			ifNull (
 				spec.label (),
@@ -187,7 +195,7 @@ class IntegerFormFieldBuilder {
 			textFormFieldRendererProvider.get ()
 
 			.name (
-				name)
+				fullName)
 
 			.label (
 				label)
@@ -219,7 +227,7 @@ class IntegerFormFieldBuilder {
 				updatableFormFieldProvider.get ()
 
 				.name (
-					name)
+					fullName)
 
 				.label (
 					label)
@@ -253,7 +261,7 @@ class IntegerFormFieldBuilder {
 				readOnlyFormFieldProvider.get ()
 
 				.name (
-					name)
+					fullName)
 
 				.label (
 					label)

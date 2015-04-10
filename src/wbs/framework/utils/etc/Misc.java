@@ -434,6 +434,31 @@ class Misc {
 
 	}
 
+	public static
+	<Type>
+	boolean in (
+			Type left,
+			Collection<Type> rights) {
+
+		for (
+			Type right
+				: rights
+		) {
+
+			if (
+				equal (
+					left,
+					right)
+			) {
+				return true;
+			}
+
+		}
+
+		return false;
+
+	}
+
 	public static <T>
 	boolean notIn (
 			T left,
