@@ -66,8 +66,7 @@ public class TicketRec
 		Set<TicketNoteRec> ticketNotes =
 			new TreeSet<TicketNoteRec> ();
 	
-	@CollectionField (
-			orderBy = "index")
+	@CollectionField
 		Set<TicketFieldValueRec> ticketFieldValues =
 			new TreeSet<TicketFieldValueRec> (
 				Ordering.arbitrary ());
@@ -207,7 +206,8 @@ public class TicketRec
 				String name,
 				Object value) {
 				
-			TicketRec ticket = (TicketRec) object;
+			TicketRec ticket = 
+				(TicketRec) object;
 			
 			//Find the ticket field type
 			
@@ -232,81 +232,39 @@ public class TicketRec
 			// if the value object does not exist, a new one is created
 			
 			if (ticketFieldValue == null) {
-
-				switch( ticketFieldType.getType() ) {
-					case string:
-					
-						ticketFieldValue = new TicketFieldValueRec()
-							.setStringValue((String)value.toString())
-							.setTicket(ticket)
-							.setTicketFieldType(ticketFieldType);
-						break;
-						
-					case number:
-			
-						ticketFieldValue = new TicketFieldValueRec()
-							.setIntegerValue((Integer)value)
-							.setTicket(ticket)
-							.setTicketFieldType(ticketFieldType);
-						break;
-						
-					case bool:
-					
-						ticketFieldValue = new TicketFieldValueRec()
-							.setBooleanValue((Boolean)value)
-							.setTicket(ticket)
-							.setTicketFieldType(ticketFieldType);
-						break;
-						
-					case object:
-						throw new RuntimeException ("TODO");
-						
-					default:
-						throw new RuntimeException ();
-				
-				}
-				
+				ticketFieldValue = new TicketFieldValueRec();
 			}
 			
-			// if the value object exists, it is updated
-			
-			else {
-			
-				switch( ticketFieldType.getType() ) {
-					case string:
-						
-						ticketFieldValue
-							.setStringValue((String)value)
-							.setTicket(ticket)
-							.setTicketFieldType(ticketFieldType);
-						break;
-						
-					case number:
-						ticketFieldValue
-							.setIntegerValue((Integer)value)
-							.setTicket(ticket)
-							.setTicketFieldType(ticketFieldType);
-						break;
-						
-					case bool:
-						ticketFieldValue
-							.setBooleanValue((Boolean)value)
-							.setTicket(ticket)
-							.setTicketFieldType(ticketFieldType);
-						break;
-						
-					case object:
-						throw new RuntimeException ("TODO");
-						
-					default:
-						throw new RuntimeException ();
+			switch( ticketFieldType.getType() ) {
+				case string:					
+					ticketFieldValue
+						.setStringValue((String)value)
+						.setTicket(ticket)
+						.setTicketFieldType(ticketFieldType);
+					break;
 					
-				}
-				
-			}
+				case number:
+					ticketFieldValue
+						.setIntegerValue((Integer)value)
+						.setTicket(ticket)
+						.setTicketFieldType(ticketFieldType);
+					break;
+					
+				case bool:
+					ticketFieldValue
+						.setBooleanValue((Boolean)value)
+						.setTicket(ticket)
+						.setTicketFieldType(ticketFieldType);
+					break;
+					
+				case object:
+					throw new RuntimeException ("TODO");
+					
+				default:
+					throw new RuntimeException ();
 			
-			System.out.println("SIZE:"+ticket.getTicketFieldValues ().size());
-			
+			}		
+					
 			ticket.getTicketFieldValues ().add (
 					ticketFieldValue);
 			

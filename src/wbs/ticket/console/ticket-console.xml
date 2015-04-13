@@ -40,11 +40,9 @@
 
 		<object>
 
-			<object-summary-page
-				fields="summary"/>
-
 			<object-settings-page
-				fields="settings"/>
+				fields-provider="ticketSettingsFieldsProvider"
+				priv-key="ticketManager.manage"/>
 
 			<context-link
 				name="ticketNote"

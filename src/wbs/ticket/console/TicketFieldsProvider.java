@@ -158,6 +158,15 @@ class TicketFieldsProvider
 			return ticketFieldsProvider.get ()
 				.setMode ("create");
 
+		}
+		
+		@PrototypeComponent ("ticketSettingsFieldsProvider")
+		public
+		FieldsProvider ticketSettingsFieldsProvider () {
+
+			return ticketFieldsProvider.get ()
+				.setMode ("settings");
+
 		}	
 
 	}
