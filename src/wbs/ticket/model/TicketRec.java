@@ -27,8 +27,10 @@ import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.AbstractObjectHooks;
+import wbs.framework.object.ObjectManager;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
+import wbs.platform.object.core.model.ObjectTypeRec;
 
 @Accessors (chain = true)
 @Data
@@ -126,11 +128,14 @@ public class TicketRec
 		Provider<TicketObjectHelper> ticketHelper;
 		
 		@Inject
-		Provider<TicketFieldTypeObjectHelper> ticketFieldTypeHelper;		
+		Provider<TicketFieldTypeObjectHelper> ticketFieldTypeHelper;	
 		
 		@Inject
 		Provider<TicketFieldValueObjectHelper> ticketFieldValueHelper;	
-
+		
+		@Inject
+		Provider<ObjectManager> objectManager;
+				
 		@Inject
 		Database database;
 
@@ -181,8 +186,18 @@ public class TicketRec
 					case bool:
 						return ticketFieldValue.getBooleanValue();
 						
-					case object:
-						throw new RuntimeException ("TODO");
+					case object:						
+						ObjectTypeRec objectType =
+							ticketFieldType.getObjectType();
+						
+						Integer objectId =
+							ticketFieldValue.getIntegerValue();
+						
+						Object obj = objectManager.get()
+							.objectHelperForTypeId(objectType.getId())
+								.find(objectId);
+						
+						return obj;
 						
 					default:
 						throw new RuntimeException ();
@@ -232,33 +247,30 @@ public class TicketRec
 			// if the value object does not exist, a new one is created
 			
 			if (ticketFieldValue == null) {
-				ticketFieldValue = new TicketFieldValueRec();
+				ticketFieldValue = new TicketFieldValueRec()					
+					.setTicket(ticket)
+					.setTicketFieldType(ticketFieldType);
 			}
 			
 			switch( ticketFieldType.getType() ) {
 				case string:					
-					ticketFieldValue
-						.setStringValue((String)value)
-						.setTicket(ticket)
-						.setTicketFieldType(ticketFieldType);
+					ticketFieldValue.setStringValue((String)value);
 					break;
 					
 				case number:
-					ticketFieldValue
-						.setIntegerValue((Integer)value)
-						.setTicket(ticket)
-						.setTicketFieldType(ticketFieldType);
+					ticketFieldValue.setIntegerValue((Integer)value);
 					break;
 					
 				case bool:
-					ticketFieldValue
-						.setBooleanValue((Boolean)value)
-						.setTicket(ticket)
-						.setTicketFieldType(ticketFieldType);
+					ticketFieldValue.setBooleanValue((Boolean)value);
 					break;
 					
-				case object:
-					throw new RuntimeException ("TODO");
+				case object:					
+					Integer objectId = 
+						((Record<?>) value).getId();
+					
+					ticketFieldValue.setIntegerValue(objectId);
+					break;
 					
 				default:
 					throw new RuntimeException ();

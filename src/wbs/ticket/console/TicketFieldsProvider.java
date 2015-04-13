@@ -21,7 +21,6 @@ import wbs.platform.console.forms.YesNoFormFieldSpec;
 import wbs.platform.console.module.ConsoleModuleBuilder;
 import wbs.ticket.model.TicketFieldTypeObjectHelper;
 import wbs.ticket.model.TicketFieldTypeRec;
-import wbs.ticket.model.TicketFieldTypeType;
 import wbs.ticket.model.TicketManagerRec;
 
 @PrototypeComponent ("ticketFieldsProvider")
@@ -63,47 +62,46 @@ class TicketFieldsProvider
 				new ArrayList<Object> ();
 		
 		for (TicketFieldTypeRec ticketFieldType : ticketFieldTypes) {
+					
+			switch( ticketFieldType.getType() ) {
+				case string:					
+					formFieldSpecs
+						.add(new TextFormFieldSpec()
+							.name(ticketFieldType.getCode ())					
+							.label(ticketFieldType.getName ())
+							.dynamic (true));
+					break;
+					
+				case number:
+					formFieldSpecs
+						.add(new IntegerFormFieldSpec()				
+							.name(ticketFieldType.getCode ())					
+							.label(ticketFieldType.getName ())
+							.dynamic (true));
+					break;
+					
+				case bool:
+					formFieldSpecs
+						.add(new YesNoFormFieldSpec()				
+							.name(ticketFieldType.getCode ())					
+							.label(ticketFieldType.getName ())
+							.dynamic (true));
+					break;
+					
+				case object:					
+					formFieldSpecs
+						.add(new ObjectFormFieldSpec()				
+							.name(ticketFieldType.getCode ())					
+							.label(ticketFieldType.getName ())
+							.finderName(underscoreToCamel(ticketFieldType.getObjectType().getCode()))
+							.dynamic (true));
+					break;
+					
+				default:
+					throw new RuntimeException ();
 			
-			if (ticketFieldType.getType().equals(TicketFieldTypeType.string)) {
-
-				formFieldSpecs
-					.add(new TextFormFieldSpec()
-						.name(ticketFieldType.getCode ())					
-						.label(ticketFieldType.getName ())
-						.dynamic (true));
-				
-			} 
-			else if (ticketFieldType.getType().equals(TicketFieldTypeType.number)) {
-			
-				formFieldSpecs
-					.add(new IntegerFormFieldSpec()
-				
-						.name(ticketFieldType.getCode ())					
-						.label(ticketFieldType.getName ())
-						.dynamic (true));
-				
-			} 
-			else if (ticketFieldType.getType().equals(TicketFieldTypeType.bool)) {
-		
-				formFieldSpecs
-					.add(new YesNoFormFieldSpec()
-				
-						.name(ticketFieldType.getCode ())					
-						.label(ticketFieldType.getName ())
-						.dynamic (true));
-				
-			} 
-			else if (ticketFieldType.getType().equals(TicketFieldTypeType.object)) {
-			
-				formFieldSpecs
-					.add(new ObjectFormFieldSpec()
-				
-						.name(ticketFieldType.getCode ())					
-						.label(ticketFieldType.getName ())
-						.finderName(underscoreToCamel(ticketFieldType.getObjectType().getCode()))
-						.dynamic (true));
-				
-			} 		    
+			}
+    
 		}
 		
 		String fieldSetName =
