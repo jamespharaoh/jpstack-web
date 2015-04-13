@@ -24,7 +24,7 @@ class ObjectSummaryPart
 
 	@Getter @Setter
 	List<Provider<PagePart>> partFactories;
-
+	
 	List<PagePart> parts;
 
 	@Override
