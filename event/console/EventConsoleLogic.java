@@ -71,7 +71,8 @@ class EventConsoleLogic {
 
 				@Cleanup
 				Transaction transaction =
-					database.beginReadOnly ();
+					database.beginReadOnly (
+						this);
 
 				PermanentRecord<?> object =
 					(PermanentRecord<?>)

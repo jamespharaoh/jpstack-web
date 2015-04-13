@@ -47,6 +47,10 @@ class SliceRec
 	@DeletedField
 	Boolean deleted = false;
 
+	@SimpleField (
+		nullable = true)
+	String filter;
+
 	// settings
 
 	@SimpleField (

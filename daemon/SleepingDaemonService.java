@@ -1,11 +1,10 @@
 package wbs.platform.daemon;
 
-import java.util.Random;
-
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.exception.logic.ExceptionLogic;
 
 import com.google.common.base.Optional;
@@ -14,11 +13,13 @@ abstract public
 class SleepingDaemonService
 	extends AbstractDaemonService {
 
+	// dependencies
+
 	@Inject
 	ExceptionLogic exceptionLogic;
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
 
 	// hooks to override
 
@@ -43,7 +44,8 @@ class SleepingDaemonService
 		// work out initial delay
 
 		int delay =
-			random.nextInt (getDelayMs ());
+			randomLogic.randomInteger (
+				getDelayMs ());
 
 		while (true) {
 
@@ -84,9 +86,11 @@ class SleepingDaemonService
 			// work out next delay
 
 			delay =
-				getDelayMs ()
-					+ random.nextInt (getDelayMs () / 2)
-					- random.nextInt (getDelayMs () / 2);
+				+ getDelayMs ()
+				+ randomLogic.randomInteger (
+					getDelayMs () / 2)
+				- randomLogic.randomInteger (
+					getDelayMs () / 2);
 
 		}
 

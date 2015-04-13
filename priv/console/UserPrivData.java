@@ -112,9 +112,12 @@ class UserPrivData {
 			sharedData.objectDatasByObjectId
 				.get (parentObjectId);
 
-		if (objectData == null)
+		if (objectData == null) {
+
 			throw new UnknownObjectException (
 				parentObjectId.toString ());
+
+		}
 
 		// check manage priv
 

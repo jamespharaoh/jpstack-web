@@ -362,25 +362,50 @@ class ObjectSearchPageBuilder {
 
 		String searchClassName =
 			stringFormat (
-				"%s.%sSearch",
+				"%s.%sRec$%sSearch",
 				consoleHelper
 					.objectClass ()
 					.getPackage ()
 					.getName (),
+				capitalise (
+					consoleHelper.objectName ()),
 				capitalise (
 					consoleHelper.objectName ()));
 
 		try {
 
 			searchClass =
-				Class.forName (searchClassName);
+				Class.forName (
+					searchClassName);
 
 		} catch (ClassNotFoundException exception) {
 
-			throw new RuntimeException (
+			// TODO change all to nested classes, remove the following
+
+			String alternateSearchClassName =
 				stringFormat (
-					"Search class not found: %s",
-					searchClassName));
+					"%s.%sSearch",
+					consoleHelper
+						.objectClass ()
+						.getPackage ()
+						.getName (),
+					capitalise (
+						consoleHelper.objectName ()));
+
+			try {
+
+				searchClass =
+					Class.forName (
+						alternateSearchClassName);
+
+			} catch (ClassNotFoundException secondException) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Search class not found: %s",
+						searchClassName));
+
+			}
 
 		}
 

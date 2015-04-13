@@ -1,6 +1,7 @@
 package wbs.platform.priv.console;
 
-public interface PrivDataLoader {
+public
+interface PrivDataLoader {
 
 	void refresh ();
 

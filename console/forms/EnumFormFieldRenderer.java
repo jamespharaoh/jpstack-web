@@ -72,8 +72,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	void renderTableCellProperties (
 			PrintWriter out,
 			Container container,
-			Interface interfaceValue,
-			boolean link) {
+			Interface interfaceValue) {
 
 		out.write (
 			stringFormat (
@@ -89,8 +88,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	void renderTableRow (
 			PrintWriter out,
 			Container container,
-			Interface interfaceValue,
-			boolean link) {
+			Interface interfaceValue) {
 
 		out.write (
 			stringFormat (
@@ -101,8 +99,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 		renderTableCellProperties (
 			out,
 			container,
-			interfaceValue,
-			link);
+			interfaceValue);
 
 		out.write (
 			stringFormat (
@@ -205,7 +202,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 
 	@Override
 	public
-	String interfaceToHtml (
+	String interfaceToHtmlSimple (
 			Container container,
 			Interface interfaceValue,
 			boolean link) {
@@ -213,6 +210,19 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 		return stringFormat (
 			"%h",
 			interfaceValue.toString ());
+
+	}
+
+	@Override
+	public
+	String interfaceToHtmlComplex (
+			Container container,
+			Interface interfaceValue) {
+
+		return interfaceToHtmlSimple (
+			container,
+			interfaceValue,
+			true);
 
 	}
 

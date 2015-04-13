@@ -259,8 +259,10 @@ class UpdateManager {
 			String table,
 			int ref) {
 
-		@Cleanup Transaction transaction =
-			database.beginReadOnly ();
+		@Cleanup
+		Transaction transaction =
+			database.beginReadOnly (
+				this);
 
 		refreshMaster ();
 

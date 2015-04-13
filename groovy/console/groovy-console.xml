@@ -1,8 +1,0 @@
-<console-module
-	name="groovy">
-
-	<simple-action-page
-		path="/groovy"
-		name=""/>
-
-</console-module>

@@ -73,7 +73,8 @@ class QueueUsersAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// load stuff
 

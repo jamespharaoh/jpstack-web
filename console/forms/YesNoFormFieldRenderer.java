@@ -61,7 +61,7 @@ class YesNoFormFieldRenderer<Container>
 		out.write (
 			stringFormat (
 				"<td>%s</td>\n",
-				interfaceToHtml (
+				interfaceToHtmlSimple (
 					container,
 					interfaceValue,
 					link)));
@@ -73,16 +73,14 @@ class YesNoFormFieldRenderer<Container>
 	void renderTableCellProperties (
 			PrintWriter out,
 			Container container,
-			Boolean interfaceValue,
-			boolean link) {
+			Boolean interfaceValue) {
 
 		out.write (
 			stringFormat (
 				"<td>%s</td>\n",
-				interfaceToHtml (
+				interfaceToHtmlComplex (
 					container,
-					interfaceValue,
-					link)));
+					interfaceValue)));
 
 	}
 
@@ -91,8 +89,7 @@ class YesNoFormFieldRenderer<Container>
 	void renderTableRow (
 			PrintWriter out,
 			Container container,
-			Boolean interfaceValue,
-			boolean link) {
+			Boolean interfaceValue) {
 
 		out.write (
 			stringFormat (
@@ -103,8 +100,7 @@ class YesNoFormFieldRenderer<Container>
 		renderTableCellProperties (
 			out,
 			container,
-			interfaceValue,
-			link);
+			interfaceValue);
 
 		out.write (
 			stringFormat (
@@ -251,7 +247,7 @@ class YesNoFormFieldRenderer<Container>
 
 	@Override
 	public
-	String interfaceToHtml (
+	String interfaceToHtmlSimple (
 			Container container,
 			Boolean genericValue,
 			boolean link) {
@@ -263,6 +259,19 @@ class YesNoFormFieldRenderer<Container>
 				yesLabel (),
 				noLabel (),
 				"-"));
+
+	}
+
+	@Override
+	public
+	String interfaceToHtmlComplex (
+			Container container,
+			Boolean genericValue) {
+
+		return interfaceToHtmlSimple (
+			container,
+			genericValue,
+			true);
 
 	}
 

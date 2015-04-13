@@ -68,7 +68,7 @@ class TextAreaFormFieldRenderer<Container>
 		out.write (
 			stringFormat (
 				"<td>%s</td>\n",
-				interfaceToHtml (
+				interfaceToHtmlSimple (
 					container,
 					interfaceValue,
 					link)));
@@ -80,16 +80,14 @@ class TextAreaFormFieldRenderer<Container>
 	void renderTableCellProperties (
 			PrintWriter out,
 			Container container,
-			String interfaceValue,
-			boolean link) {
+			String interfaceValue) {
 
 		out.write (
 			stringFormat (
 				"<td>%s</td>\n",
-				interfaceToHtml (
+				interfaceToHtmlComplex (
 					container,
-					interfaceValue,
-					link)));
+					interfaceValue)));
 
 	}
 
@@ -98,8 +96,7 @@ class TextAreaFormFieldRenderer<Container>
 	void renderTableRow (
 			PrintWriter out,
 			Container container,
-			String interfaceValue,
-			boolean link) {
+			String interfaceValue) {
 
 		List<String> errors =
 			new ArrayList<String> ();
@@ -124,8 +121,7 @@ class TextAreaFormFieldRenderer<Container>
 		renderTableCellProperties (
 			out,
 			container,
-			interfaceValue,
-			link);
+			interfaceValue);
 
 		out.write (
 			stringFormat (
@@ -243,7 +239,7 @@ class TextAreaFormFieldRenderer<Container>
 
 	@Override
 	public
-	String interfaceToHtml (
+	String interfaceToHtmlSimple (
 			Container container,
 			String interfaceValue,
 			boolean link) {
@@ -252,6 +248,19 @@ class TextAreaFormFieldRenderer<Container>
 			stringFormat (
 				"%h",
 				interfaceValue));
+
+	}
+
+	@Override
+	public
+	String interfaceToHtmlComplex (
+			Container container,
+			String interfaceValue) {
+
+		return interfaceToHtmlSimple (
+			container,
+			interfaceValue,
+			true);
 
 	}
 

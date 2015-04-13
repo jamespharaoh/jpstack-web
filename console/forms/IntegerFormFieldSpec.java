@@ -25,6 +25,9 @@ class IntegerFormFieldSpec {
 	boolean dynamic;
 
 	@DataAttribute
+	String delegate;
+
+	@DataAttribute
 	String label;
 
 	@DataAttribute

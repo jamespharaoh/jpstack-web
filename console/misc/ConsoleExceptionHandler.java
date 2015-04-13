@@ -21,7 +21,6 @@ import wbs.framework.web.WebExceptionHandler;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.ErrorResponder;
 import wbs.platform.exception.logic.ExceptionLogic;
-import wbs.platform.exception.logic.ExceptionLogicImpl;
 import wbs.platform.priv.console.PrivChecker;
 
 import com.google.common.base.Optional;
@@ -177,7 +176,8 @@ class ConsoleExceptionHandler
 
 					printFormat (
 						"<p><pre>%h</pre></p>\n",
-						ExceptionLogicImpl.throwableDump (throwable));
+						exceptionLogic.throwableDump (
+							throwable));
 
 				}
 

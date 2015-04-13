@@ -1,11 +1,14 @@
 package wbs.platform.core.console;
 
+import static wbs.framework.utils.etc.Misc.notEqual;
+
 import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.ABSwap;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.console.helper.ConsoleObjectManager;
@@ -13,7 +16,11 @@ import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.HtmlResponder;
 import wbs.platform.menu.console.MenuGroupConsoleHelper;
 import wbs.platform.menu.model.MenuGroupRec;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemRec;
+import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.scaffold.model.SliceRec;
+import wbs.platform.user.model.UserObjectHelper;
+import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("coreSidebarMenuResponder")
 public
@@ -31,6 +38,14 @@ class CoreSidebarMenuResponder
 	@Inject
 	ConsoleRequestContext requestContext;
 
+	@Inject
+	SliceObjectHelper sliceHelper;
+
+	@Inject
+	UserObjectHelper userHelper;
+
+	// state
+
 	List<MenuGroupRec> menuGroups;
 
 	// implementation
@@ -39,8 +54,38 @@ class CoreSidebarMenuResponder
 	protected
 	void prepare () {
 
-		menuGroups =
-			menuGroupHelper.findAll ();
+		UserRec currentUser =
+			userHelper.find (
+				requestContext.userId ());
+
+		SliceRec apnSlice =
+			sliceHelper.findByCode (
+				GlobalId.root,
+				"apn");
+
+		if (
+
+			apnSlice != null
+
+			&& notEqual (
+				currentUser.getUsername (),
+				"stuart_test")
+
+		) {
+
+			menuGroups =
+				menuGroupHelper.findByParent (
+					sliceHelper.findByCode (
+						GlobalId.root,
+						"apn"));
+
+		} else {
+
+			menuGroups =
+				menuGroupHelper.findByParent (
+					currentUser.getSlice ());
+
+		}
 
 		Collections.sort (
 			menuGroups);
@@ -52,18 +97,25 @@ class CoreSidebarMenuResponder
 	void goBodyStuff () {
 
 		printFormat (
-			"<table class=\"menu\" width=\"100%%\">\n");
+			"<table",
+			" class=\"menu\"",
+			" width=\"100%%\"",
+			">\n");
 
 		ABSwap abSwap =
 			new ABSwap ();
 
-		for (MenuGroupRec menuGroup
-				: menuGroups) {
+		for (
+			MenuGroupRec menuGroup
+				: menuGroups
+		) {
 
 			boolean doneGroup = false;
 
-			for (MenuRec menu
-					: menuGroup.getMenus ()) {
+			for (
+				MenuItemRec menu
+					: menuGroup.getMenus ()
+			) {
 
 				if (menu.getDeleted ())
 					continue;
@@ -88,9 +140,9 @@ class CoreSidebarMenuResponder
 					"%s\n",
 					Html.magicTr (
 						requestContext.resolveApplicationUrl (
-							menu.getPath ()),
+							menu.getTargetPath ()),
 						false,
-						menu.getTarget (),
+						menu.getTargetFrame (),
 						null,
 						null,
 						abSwap),

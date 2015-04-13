@@ -1,29 +1,45 @@
 package wbs.platform.queue.console;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.joinWithSeparator;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.inject.Inject;
 
-import org.apache.commons.io.IOUtils;
 import org.joda.time.Instant;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.Responder;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.console.request.ConsoleRequestContext;
+import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.scaffold.model.SliceRec;
+import wbs.platform.user.model.UserObjectHelper;
+import wbs.platform.user.model.UserRec;
+import lombok.Cleanup;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 
 @PrototypeComponent ("queueFilterResponder")
 public
 class QueueFilterResponder
-	implements Responder {
+	implements  Responder {
 
 	@Inject
 	ConsoleRequestContext requestContext;
 
 	@Inject
 	TimeFormatter timeFormatter;
+
+	@Inject
+	SliceObjectHelper sliceHelper;
+
+	@Inject
+	UserObjectHelper userHelper;
+
+	@Inject
+	Database database;
 
 	@Override
 	public
@@ -43,17 +59,35 @@ class QueueFilterResponder
 			timeFormatter.instantToHttpTimestampString (
 				Instant.now ()));
 
-		InputStream inputStream =
-			requestContext.getResourceAsStream (
-				"/queue-filter.yml");
+		@Cleanup
+		Transaction transaction =
+			database.beginReadOnly (
+				this);
 
-		OutputStream outputStream =
-			requestContext.outputStream ();
+		UserRec myUser =
+			userHelper.find (
+				requestContext.userId ());
 
-		IOUtils.copy (
-			inputStream,
-			outputStream);
+		SliceRec currentSlice =
+			myUser.getSlice ();
+
+		String filter =
+			ifNull (
+				currentSlice.getFilter (),
+				defaultFilter);
+
+		requestContext.outputStream ().write (
+			filter.getBytes ());
 
 	}
+
+	final static
+	String defaultFilter =
+		joinWithSeparator (
+			"\n",
+			"---",
+			"- name: No Filter",
+			"  options:",
+			"    - name: All");
 
 }

@@ -7,6 +7,14 @@
 			name="queueSubjectName"
 			field="id"/>
 
+		<context-stuff
+			name="queueId"
+			delegate="queue"
+			field="id"/>
+
+		<run-post-processor
+			name="queue"/>
+
 		<!--
 		<priv-key
 			name="queueSubject.manage"

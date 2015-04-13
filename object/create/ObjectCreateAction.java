@@ -134,7 +134,6 @@ class ObjectCreateAction
 	protected
 	Responder goReal () {
 
-		// TODO should be in an init method somewhere
 		parentHelper =
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
@@ -143,7 +142,8 @@ class ObjectCreateAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		UserRec myUser =
 			userHelper.find (

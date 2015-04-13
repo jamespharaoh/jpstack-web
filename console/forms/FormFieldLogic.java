@@ -256,8 +256,7 @@ class FormFieldLogic {
 	void outputTableRows (
 			PrintWriter out,
 			FormFieldSet formFieldSet,
-			Object object,
-			boolean links) {
+			Object object) {
 
 		for (FormField formField
 				: formFieldSet.formFields ()) {
@@ -270,8 +269,7 @@ class FormFieldLogic {
 
 			formField.renderTableCellProperties (
 				out,
-				object,
-				true);
+				object);
 
 			out.print (
 				stringFormat (

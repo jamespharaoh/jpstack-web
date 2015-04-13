@@ -6,8 +6,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuObjectHelper;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemObjectHelper;
+import wbs.platform.menu.model.MenuItemRec;
 
 @PrototypeComponent ("queueFixtureProvider")
 public
@@ -20,7 +20,7 @@ class QueueFixtureProvider
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@Inject
-	MenuObjectHelper menuHelper;
+	MenuItemObjectHelper menuItemHelper;
 
 	// implementation
 
@@ -28,26 +28,35 @@ class QueueFixtureProvider
 	public
 	void createFixtures () {
 
-		menuHelper.insert (
-			new MenuRec ()
+		menuItemHelper.insert (
+			new MenuItemRec ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
 					GlobalId.root,
+					"test",
 					"system"))
 
 			.setCode (
 				"queue")
 
-			.setLabel (
-				"Queues")
+			.setName (
+				"Queue")
 
-			.setPath (
+			.setDescription (
+				"")
+
+			.setLabel (
+				"Queue")
+
+			.setTargetPath (
 				"/queues")
+
+			.setTargetFrame (
+				"main")
 
 		);
 
 	}
-
 
 }

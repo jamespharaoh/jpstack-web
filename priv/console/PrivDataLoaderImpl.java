@@ -177,7 +177,8 @@ class PrivDataLoaderImpl
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadOnlyJoin ();
+				database.beginReadOnlyJoin (
+					this);
 
 			// start timer
 
@@ -193,19 +194,32 @@ class PrivDataLoaderImpl
 			List<PrivRec> privs =
 				new ArrayList<PrivRec> ();
 
-			for (PrivRec priv
-					: privHelper.findAll ()) {
+			for (
+				PrivRec priv
+					: privHelper.findAll ()
+			) {
 
-				//try {
+				try {
 
 					objectManager.getParent (
 						priv);
 
-					privs.add (priv);
+					privs.add (
+						priv);
 
-				//} catch (ObjectHelperNotFoundException e) {
-					// ignore
-				//}
+				} catch (Exception exception) {
+
+					log.warn (
+						stringFormat (
+							"Error getting parent for priv %s: ",
+							priv.getId (),
+							"type %s, ",
+							priv.getParentObjectType ().getCode (),
+							"id %s",
+							priv.getParentObjectId ()),
+						exception);
+
+				}
 
 			}
 
@@ -243,8 +257,10 @@ class PrivDataLoaderImpl
 			Collection<ObjectTypeRec> objectTypes =
 				objectTypeHelper.findAll ();
 
-			for (ObjectTypeRec objectType
-					: objectTypes) {
+			for (
+				ObjectTypeRec objectType
+					: objectTypes
+			) {
 
 				try {
 
@@ -267,24 +283,16 @@ class PrivDataLoaderImpl
 
 			// do chainedPrivIds and managePrivIds
 
-			for (PrivRec priv : privHelper.findAll ()) {
+			for (
+				PrivRec priv
+					: privs
+			) {
+
+				Record<?> parent =
+					objectManager.getParent (
+						priv);
 
 				try {
-
-					Record<?> parent =
-						objectManager.getParent (
-							priv);
-
-					if (parent == null) {
-
-						log.warn (
-							stringFormat (
-								"No parent for %s, ignoring",
-								priv));
-
-						continue;
-
-					}
 
 					// do chainedPrivIds
 
@@ -448,8 +456,10 @@ class PrivDataLoaderImpl
 			UserData newData =
 				new UserData ();
 
-			@Cleanup Transaction transaction =
-				database.beginReadOnly ();
+			@Cleanup
+			Transaction transaction =
+				database.beginReadOnly (
+					this);
 
 			// start timer
 
