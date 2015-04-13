@@ -6,8 +6,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuObjectHelper;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemObjectHelper;
+import wbs.platform.menu.model.MenuItemRec;
 
 @PrototypeComponent ("autoResponderFixtureProvider")
 public
@@ -17,7 +17,7 @@ class AutoResponderFixtureProvider
 	// dependencies
 
 	@Inject
-	MenuObjectHelper menuHelper;
+	MenuItemObjectHelper menuItemHelper;
 
 	@Inject
 	MenuGroupObjectHelper menuGroupHelper;
@@ -28,22 +28,32 @@ class AutoResponderFixtureProvider
 	public
 	void createFixtures () {
 
-		menuHelper.insert (
-			new MenuRec ()
+		menuItemHelper.insert (
+			new MenuItemRec ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
 					GlobalId.root,
+					"test",
 					"facility"))
 
 			.setCode (
 				"auto_responder")
 
+			.setName (
+				"Auto responder")
+
+			.setDescription (
+				"")
+
 			.setLabel (
 				"Auto responder")
 
-			.setPath (
-				"/autoResponders"));
+			.setTargetPath (
+				"/autoResponders")
+
+			.setTargetFrame (
+				"main"));
 
 	}
 

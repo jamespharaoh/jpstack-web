@@ -40,7 +40,6 @@ import wbs.integrations.hybyte.model.HybyteRouteOutObjectHelper;
 import wbs.integrations.hybyte.model.HybyteRouteOutRec;
 import wbs.integrations.hybyte.model.HybyteRouteRec;
 import wbs.platform.exception.logic.ExceptionLogic;
-import wbs.platform.exception.logic.ExceptionLogicImpl;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
@@ -120,7 +119,8 @@ class HybyteApiServletModule
 
 				@Cleanup
 				Transaction transaction =
-					database.beginReadWrite ();
+					database.beginReadWrite (
+						this);
 
 				// get ids
 
@@ -215,7 +215,7 @@ class HybyteApiServletModule
 					new StringBuilder ();
 
 				stringBuilder.append (
-					ExceptionLogicImpl.throwableDump (
+					exceptionLogic.throwableDump (
 						exception));
 
 				if (xmlDocument != null) {
@@ -235,7 +235,8 @@ class HybyteApiServletModule
 				exceptionLogic.logSimple (
 					"webapi",
 					requestContext.requestUri (),
-					ExceptionLogicImpl.throwableSummary (exception),
+					exceptionLogic.throwableSummary (
+						exception),
 					stringBuilder.toString (),
 					Optional.<Integer>absent (),
 					false);
@@ -338,7 +339,8 @@ class HybyteApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get route
 

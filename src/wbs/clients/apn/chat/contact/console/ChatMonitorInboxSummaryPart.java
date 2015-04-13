@@ -426,18 +426,14 @@ class ChatMonitorInboxSummaryPart
 			"<th>User number</th>\n",
 
 			"%s",
-			objectManager.tdForObject (
+			objectManager.tdForObjectMiniLink (
 				monitorChatUser,
-				chat,
-				true,
-				true),
+				chat),
 
 			"%s",
-			objectManager.tdForObject (
+			objectManager.tdForObjectMiniLink (
 				userChatUser,
-				chat,
-				true,
-				true),
+				chat),
 
 			"</tr>\n");
 
@@ -502,18 +498,18 @@ class ChatMonitorInboxSummaryPart
 			"<th>Location</th>\n",
 
 			"<td>%s</td>\n",
-			monitorChatUser.getLocLongLat() != null
+			monitorChatUser.getLocationLongLat() != null
 				? gazetteerLogic.findNearestCanonicalEntry (
 						monitorChatUser.getChat ().getGazetteer (),
-						monitorChatUser.getLocLongLat ()
+						monitorChatUser.getLocationLongLat ()
 					).getName ()
 				: "-",
 
 			"<td>%s</td>\n",
-			userChatUser.getLocLongLat() != null
+			userChatUser.getLocationLongLat() != null
 				? gazetteerLogic.findNearestCanonicalEntry (
 						userChatUser.getChat ().getGazetteer (),
-						userChatUser.getLocLongLat ()
+						userChatUser.getLocationLongLat ()
 					).getName ()
 				: "-",
 

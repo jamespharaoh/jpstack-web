@@ -205,7 +205,8 @@ class ServiceRec
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadOnly ();
+				database.beginReadOnly (
+					this);
 
 			List<ObjectTypeRec> objectTypes =
 				objectTypeDao.findAll ();

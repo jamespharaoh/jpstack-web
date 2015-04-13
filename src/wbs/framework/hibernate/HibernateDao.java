@@ -141,11 +141,15 @@ class HibernateDao {
 
 	}
 
-	protected <Record> Record refresh (
+	protected
+	<Record>
+	Record refresh (
 			Record object) {
 
 		Session session =
 			database.currentSession ();
+
+		session.flush ();
 
 		session.refresh (
 			object);
@@ -154,12 +158,16 @@ class HibernateDao {
 
 	}
 
-	protected <Record> Record refresh (
+	protected
+	<Record>
+	Record refresh (
 			Record object,
 			LockOptions lockOptions) {
 
 		Session session =
 			database.currentSession ();
+
+		session.flush ();
 
 		session.refresh (
 			object,

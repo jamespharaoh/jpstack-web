@@ -6,12 +6,10 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuObjectHelper;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemObjectHelper;
+import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.priv.model.PrivObjectHelper;
 import wbs.platform.priv.model.PrivRec;
-import wbs.platform.scaffold.model.RootObjectHelper;
-import wbs.platform.scaffold.model.RootRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserObjectHelper;
@@ -30,13 +28,10 @@ class UserFixtureProvider
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@Inject
-	MenuObjectHelper menuHelper;
+	MenuItemObjectHelper menuItemHelper;
 
 	@Inject
 	PrivObjectHelper privHelper;
-
-	@Inject
-	RootObjectHelper rootHelper;
 
 	@Inject
 	SliceObjectHelper sliceHelper;
@@ -53,17 +48,14 @@ class UserFixtureProvider
 	public
 	void createFixtures () {
 
-		RootRec root =
-			rootHelper.find (0);
-
 		PrivRec rootManagePriv =
 			privHelper.findByCode (
-				root,
+				GlobalId.root,
 				"manage");
 
 		SliceRec testSlice =
 			sliceHelper.findByCode (
-				root,
+				GlobalId.root,
 				"test");
 
 		for (
@@ -88,22 +80,32 @@ class UserFixtureProvider
 
 		}
 
-		menuHelper.insert (
-			new MenuRec ()
+		menuItemHelper.insert (
+			new MenuItemRec ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
 					GlobalId.root,
+					"test",
 					"system"))
 
 			.setCode (
 				"user")
 
+			.setName (
+				"User")
+
+			.setDescription (
+				"")
+
 			.setLabel (
 				"Users")
 
-			.setPath (
+			.setTargetPath (
 				"/users")
+
+			.setTargetFrame (
+				"main")
 
 		);
 

@@ -62,7 +62,8 @@ class ImChatProfileListAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		ImChatRec imChat =
 			imChatHelper.find (
@@ -126,8 +127,8 @@ class ImChatProfileListAction
 			profileDatas.add (
 				new ImChatProfileData ()
 
-				.id (
-					profile.getId ())
+				.code (
+					profile.getCode ())
 
 				.name (
 					profile.getPublicName ())

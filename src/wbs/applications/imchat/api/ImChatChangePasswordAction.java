@@ -79,7 +79,8 @@ class ImChatChangePasswordAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// lookup session
 

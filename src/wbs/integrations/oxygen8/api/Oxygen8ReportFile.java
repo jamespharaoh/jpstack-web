@@ -90,7 +90,8 @@ class Oxygen8ReportFile
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		Oxygen8RouteOutRec routeOut =
 			oxygen8RouteOutCodeHelper.find (

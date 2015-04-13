@@ -29,9 +29,11 @@ import wbs.platform.queue.model.QueueItemClaimRec;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
+import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("queueHomeResponder")
@@ -223,7 +225,10 @@ class QueueHomeResponder
 				"</tr>\n");
 		}
 
-		for (QueueInfo queueInfo : queueInfos) {
+		for (
+			QueueInfo queueInfo
+				: queueInfos
+		) {
 
 			if (queueInfo.availableItems () == 0)
 				continue;
@@ -235,21 +240,40 @@ class QueueHomeResponder
 				objectManager.getParent (
 					queue);
 
+			Optional<SliceRec> slice =
+				objectManager.getAncestor (
+					SliceRec.class,
+					queue);
+
 			printFormat (
 				"<tr",
 				" class=\"queueItemRow\"",
+
 				" style=\"%h\"",
-				queueOptionsEnabled ? "display:none" : "",
+				queueOptionsEnabled
+					? "display:none"
+					: "",
+
 				" data-parent-object-type-code=\"%h\"",
 				objectManager.getObjectTypeCode (parent),
+
 				" data-parent-object-code=\"%h\"",
 				objectManager.getCode (parent),
+
 				" data-queue-type-code=\"%h\"",
 				queue.getQueueType ().getCode (),
+
 				" data-queue-code=\"%h\"",
 				queue.getCode (),
+
+				" data-slice-code=\"%h\"",
+				slice != null
+					? slice.get ().getCode ()
+					: "",
+
 				" data-oldest-timestamp=\"%h\"",
 				queueInfo.oldestAvailable (),
+
 				">\n");
 
 			printFormat (

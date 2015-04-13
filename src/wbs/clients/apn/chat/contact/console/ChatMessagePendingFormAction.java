@@ -113,7 +113,8 @@ class ChatMessagePendingFormAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// get database objects
 
@@ -317,7 +318,8 @@ class ChatMessagePendingFormAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// get database objects
 

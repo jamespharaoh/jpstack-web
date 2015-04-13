@@ -13,6 +13,7 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.framework.entity.annotations.CollectionField;
+import wbs.framework.entity.annotations.DeletedField;
 import wbs.framework.entity.annotations.EphemeralEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.IdentityReferenceField;
@@ -43,6 +44,11 @@ class ChatRouteRec
 
 	@IdentityReferenceField
 	RouteRec route;
+
+	// details
+
+	@DeletedField
+	Boolean deleted = false;
 
 	// settings
 

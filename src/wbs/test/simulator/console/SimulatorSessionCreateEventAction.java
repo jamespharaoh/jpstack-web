@@ -156,7 +156,8 @@ class SimulatorSessionCreateEventAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		SimulatorSessionRec simulatorSession =
 			simulatorSessionHelper.find (
@@ -298,7 +299,8 @@ class SimulatorSessionCreateEventAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		SimulatorSessionRec simulatorSession =
 			simulatorSessionHelper.find (

@@ -5,6 +5,7 @@ import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;
 import wbs.applications.imchat.model.ImChatPricePointRec;
 import wbs.applications.imchat.model.ImChatProfileRec;
+import wbs.applications.imchat.model.ImChatPurchaseRec;
 
 public
 interface ImChatApiLogic {
@@ -23,5 +24,8 @@ interface ImChatApiLogic {
 
 	ImChatMessageData messageData (
 			ImChatMessageRec message);
+
+	ImChatPurchaseData purchaseData (
+			ImChatPurchaseRec purchase);
 
 }

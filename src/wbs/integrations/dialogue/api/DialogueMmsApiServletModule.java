@@ -132,7 +132,8 @@ class DialogueMmsApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			requestContext.debugDump (log);
 
@@ -246,7 +247,8 @@ class DialogueMmsApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			if (requestContext.parameterMap ().size () == 0)
 				return;

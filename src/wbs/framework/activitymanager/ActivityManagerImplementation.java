@@ -7,12 +7,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Random;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -23,6 +23,7 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.utils.RandomLogic;
 
 @Log4j
 @SingletonComponent ("activityManager")
@@ -33,7 +34,7 @@ class ActivityManagerImplementation
 	// dependencies
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
 
 	// properties
 
@@ -61,7 +62,7 @@ class ActivityManagerImplementation
 				"Initialising"));
 
 		nextTaskId =
-			random.nextInt (
+			randomLogic.randomInteger (
 				Integer.MAX_VALUE
 			) << 32;
 
@@ -118,8 +119,9 @@ class ActivityManagerImplementation
 	@Override
 	public synchronized
 	ActiveTask start (
-			String taskName,
-			Map<String,Object> parameters) {
+			@NonNull String taskName,
+			@NonNull Object owner,
+			@NonNull Map<String,Object> parameters) {
 
 		log.debug (
 			stringFormat (
@@ -131,6 +133,9 @@ class ActivityManagerImplementation
 
 			.taskId (
 				nextTaskId ++)
+
+			.owner (
+				owner)
 
 			.taskName (
 				taskName)
@@ -205,8 +210,10 @@ class ActivityManagerImplementation
 		log.info (
 			"Begin active task dump");
 
-		for (Task task
-				: activeTasks.values ()) {
+		for (
+			Task task
+				: activeTasks.values ()
+		) {
 
 			log.info (
 				joinWithSeparator (
@@ -215,6 +222,10 @@ class ActivityManagerImplementation
 					stringFormat (
 						"id=%s",
 						task.taskId ()),
+
+					stringFormat (
+						"owner=%s",
+						task.owner ().getClass ().getName ()),
 
 					stringFormat (
 						"name=%s",

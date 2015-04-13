@@ -2,6 +2,10 @@
 	name="queue"
 	package="wbs.platform.queue">
 
+	<plugin-dependencies>
+		<plugin-dependency name="platform-common"/>
+	</plugin-dependencies>
+
 	<sql-scripts>
 		<sql-schema name="queue"/>
 		<sql-data name="queue-data"/>

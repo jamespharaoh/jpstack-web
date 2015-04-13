@@ -65,6 +65,7 @@ class ChatBroadcastListPart
 				chat,
 				0,
 				100);
+
 	}
 
 	@Override
@@ -86,54 +87,63 @@ class ChatBroadcastListPart
 			"<th>Opt out</th>\n",
 			"</tr>\n");
 
-		for (ChatBroadcastRec chatBroadcast
-				: broadcasts) {
+		for (
+			ChatBroadcastRec chatBroadcast
+				: broadcasts
+		) {
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
-				objectManager.objectPath (
-					chatBroadcast.getUser (),
-					null,
-					true),
+				objectManager.objectPathMini (
+					chatBroadcast.getCreatedUser ()));
 
+			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
 					chatMiscLogic.timezone (
 						chat),
-					dateToInstant (
-						chatBroadcast.getTimestamp ())),
+					chatBroadcast.getCreatedTime ()));
 
+			printFormat (
 				"<td>%h</td>\n",
 				objectManager.objectPath (
 					chatBroadcast.getChatUser (),
 					chat,
-					true),
+					true));
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatBroadcast.getText ().getText (),
+				chatBroadcast.getText ().getText ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatBroadcast.getNumberCount (),
+				+ chatBroadcast.getNumAccepted ()
+				+ chatBroadcast.getNumSent ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatBroadcast.getSearch ()
 					? joinWithSeparator (
 						", ",
 						getSearchParams (chatBroadcast))
-					: "manual number selection",
+					: "manual number selection");
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatBroadcast.getIncludeBlocked ()
 					? "yes"
-					: "no",
+					: "no");
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatBroadcast.getIncludeOptedOut ()
 					? "yes"
-					: "no",
+					: "no");
 
+			printFormat (
 				"</td>\n");
 
 		}

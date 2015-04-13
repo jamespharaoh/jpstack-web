@@ -86,7 +86,8 @@ class AlertsSettingsNumbersAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		UserRec myUser =
 			userHelper.find (
@@ -103,8 +104,10 @@ class AlertsSettingsNumbersAction
 		int numEnabled = 0;
 		int numDisabled = 0;
 
-		for (AlertsNumberRec alertsNumber
-				: alertsSettings.getAlertsNumbers ()) {
+		for (
+			AlertsNumberRec alertsNumber
+				: alertsSettings.getAlertsNumbers ()
+		) {
 
 			// delete
 

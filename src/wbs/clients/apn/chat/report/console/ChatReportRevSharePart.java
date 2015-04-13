@@ -283,7 +283,7 @@ class ChatReportRevSharePart
 
 				if (! errorRoutes.contains (route.getId ())) {
 
-				    errorRoutes.add (
+					errorRoutes.add (
 						route.getId ());
 
 					consoleRequestContext.addError (
@@ -614,7 +614,7 @@ class ChatReportRevSharePart
 
 	void addChatMessages () {
 
-        ChatMonthCostRec chatMonthCost =
+		ChatMonthCostRec chatMonthCost =
 			chatMonthCostHelper.findByCode (
 				chat,
 				form.month ());
@@ -638,8 +638,10 @@ class ChatReportRevSharePart
 		);
 
 		long staffCostPerMessage =
-			chatMonthCost.getStaffCost ()
-			/ chatMessages.size ();
+			chatMessages.isEmpty ()
+				? 0
+				: chatMonthCost.getStaffCost ()
+					/ chatMessages.size ();
 
 		for (
 			ChatMessageRec chatMessage
@@ -735,12 +737,12 @@ class ChatReportRevSharePart
 
 			formFieldLogic.outputTableCellsList (
 				out,
-			    resultsFields,
+				resultsFields,
 				chatReport,
 				true);
 
-		    printFormat (
-			    "</tr>\n");
+			printFormat (
+				"</tr>\n");
 
 		}
 

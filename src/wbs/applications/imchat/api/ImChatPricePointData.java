@@ -12,7 +12,7 @@ public
 class ImChatPricePointData {
 
 	@DataAttribute
-	Integer id;
+	String code;
 
 	@DataAttribute
 	String name;

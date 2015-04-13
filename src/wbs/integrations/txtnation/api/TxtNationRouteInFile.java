@@ -100,7 +100,8 @@ class TxtNationRouteInFile
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		TxtNationRouteInRec txtNationRouteIn =
 			txtNationRouteInHelper.find (

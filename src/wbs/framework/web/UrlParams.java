@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.NonNull;
+
 public
 class UrlParams {
 
@@ -23,7 +25,7 @@ class UrlParams {
 
 	public
 	UrlParams (
-			UrlParams oldUrlParams) {
+			@NonNull UrlParams oldUrlParams) {
 
 		for (
 			Map.Entry<String,List<String>> entry
@@ -46,7 +48,7 @@ class UrlParams {
 
 	public
 	UrlParams add (
-			String name,
+			@NonNull String name,
 			String value) {
 
 		if (value == null)
@@ -74,7 +76,7 @@ class UrlParams {
 
 	public
 	UrlParams set (
-			String name,
+			@NonNull String name,
 			Object value) {
 
 		if (value == null) {
@@ -101,10 +103,12 @@ class UrlParams {
 
 	public
 	UrlParams set (
-			Map<String,String> values) {
+			@NonNull Map<String,String> values) {
 
-		for (Map.Entry<String,String> entry
-				: values.entrySet ()) {
+		for (
+			Map.Entry<String,String> entry
+				: values.entrySet ()
+		) {
 
 			set (
 				entry.getKey (),
@@ -127,8 +131,8 @@ class UrlParams {
 
 	public
 	String toUrl (
-			String base,
-			String charset)
+			@NonNull String base,
+			@NonNull String charset)
 		throws UnsupportedEncodingException {
 
 		StringBuilder stringBuilder =
@@ -173,7 +177,7 @@ class UrlParams {
 
 	public
 	String toUrl (
-			String base) {
+			@NonNull String base) {
 
 		try {
 
@@ -190,8 +194,9 @@ class UrlParams {
 
 	}
 
-	public String toString (
-			String charset)
+	public
+	String toString (
+			@NonNull String charset)
 		throws UnsupportedEncodingException {
 
 		StringBuilder stringBuilder =
@@ -199,8 +204,10 @@ class UrlParams {
 
 		boolean first = true;
 
-		for (Map.Entry<String,List<String>> entry
-				: params.entrySet ()) {
+		for (
+			Map.Entry<String,List<String>> entry
+				: params.entrySet ()
+		) {
 
 			String name =
 				entry.getKey ();
@@ -236,15 +243,16 @@ class UrlParams {
 	}
 
 	@Override
-	public String toString () {
+	public
+	String toString () {
 
 		try {
 
 			return toString ("utf-8");
 
-		} catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException exception) {
 
-			throw new RuntimeException (e);
+			throw new RuntimeException (exception);
 
 		}
 
@@ -252,10 +260,12 @@ class UrlParams {
 
 	public
 	void printHidden (
-			PrintWriter out) {
+			@NonNull PrintWriter out) {
 
-		for (Map.Entry<String,List<String>> entry
-				: params.entrySet ()) {
+		for (
+			Map.Entry<String,List<String>> entry
+				: params.entrySet ()
+			) {
 
 			String name =
 				entry.getKey ();

@@ -8,12 +8,16 @@ import wbs.framework.data.annotations.DataClass;
 @Accessors (fluent = true)
 @Data
 @DataClass
-public class ImChatMessageListRequest {
+public
+class ImChatMessageListRequest {
 
 	@DataAttribute
 	String sessionSecret;
 
 	@DataAttribute
-	Long conversationId;
+	Integer conversationIndex;
+
+	@DataAttribute
+	Integer messageIndex;
 
 }

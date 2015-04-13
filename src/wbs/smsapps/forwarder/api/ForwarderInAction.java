@@ -44,7 +44,8 @@ class ForwarderInAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		try {
 
@@ -60,9 +61,11 @@ class ForwarderInAction
 			String action =
 				requestContext.parameter ("action");
 
-			if (code == null
-					|| password == null
-					|| action == null) {
+			if (
+				code == null
+				|| password == null
+				|| action == null
+			) {
 
 				throw new ReportableException (
 					"Invalid parameters supplied");

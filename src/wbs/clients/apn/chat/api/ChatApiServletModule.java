@@ -85,6 +85,7 @@ import wbs.framework.web.WebFile;
 import wbs.platform.api.mvc.ApiFile;
 import wbs.platform.api.mvc.WebApiAction;
 import wbs.platform.api.mvc.WebApiManager;
+import wbs.platform.event.logic.EventLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
@@ -107,6 +108,7 @@ import wbs.platform.rpc.php.PhpRpcAction;
 import wbs.platform.rpc.web.ReusableRpcHandler;
 import wbs.platform.rpc.xml.XmlRpcAction;
 import wbs.platform.rpc.xml.XmlRpcFile;
+import wbs.platform.user.model.UserRec;
 import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.locator.model.EastNorth;
 import wbs.sms.locator.model.LongLat;
@@ -171,6 +173,9 @@ class ChatApiServletModule
 	Database database;
 
 	@Inject
+	EventLogic eventLogic;
+
+	@Inject
 	LocatorLogic locatorLogic;
 
 	@Inject
@@ -229,7 +234,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadOnly ();
+				database.beginReadOnly (
+					this);
 
 			MediaRec media =
 				mediaHelper.find (
@@ -577,7 +583,7 @@ class ChatApiServletModule
 		stLoggedOut = 0x5108,
 		stSendAmountCountMismatch = 0x5109;
 
-	// ============================================================ profiles rpc handler
+	// =================================================== profiles rpc handler
 
 	private final static
 	RpcDefinition profilesRequestDef =
@@ -632,7 +638,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadOnly ();
+				database.beginReadOnly (
+					this);
 
 			// get params
 
@@ -717,7 +724,7 @@ class ChatApiServletModule
 
 			LongLat myLongLat =
 				myUser != null
-					? myUser.getLocLongLat ()
+					? myUser.getLocationLongLat ()
 					: null;
 
 			// find users
@@ -959,25 +966,25 @@ class ChatApiServletModule
 				time =
 					time0;
 
-				if (user.getLocLongLat () != null) {
+				if (user.getLocationLongLat () != null) {
 
 					LongLat longLat =
-						user.getLocLongLat ();
+						user.getLocationLongLat ();
 
 					EastNorth eastNorth =
 						locatorLogic.longLatToEastNorth (
 							osgb,
-							user.getLocLongLat ());
+							user.getLocationLongLat ());
 
 					profile.add (
 
 						Rpc.rpcElem (
 							"longitude",
-							longLat.getLongitude ()),
+							longLat.longitude ()),
 
 						Rpc.rpcElem (
 							"latitude",
-							longLat.getLatitude ()),
+							longLat.latitude ()),
 
 						Rpc.rpcElem (
 							"easting",
@@ -1104,7 +1111,7 @@ class ChatApiServletModule
 
 	}
 
-	// ============================================================ media rpc handler
+	// ====================================================== media rpc handler
 
 	private final static
 	RpcDefinition mediaRequestDef =
@@ -1140,7 +1147,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadOnly ();
+				database.beginReadOnly (
+					this);
 
 			// get params
 
@@ -1232,7 +1240,7 @@ class ChatApiServletModule
 
 	}
 
-	// ============================================================ profile rpc handler
+	// ==================================================== profile rpc handler
 
 	private final static RpcDefinition profileRequestDef =
 		Rpc.rpcDefinition ("chat-profile-request", RpcType.rStructure,
@@ -1306,7 +1314,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get params
 
@@ -1490,10 +1499,13 @@ class ChatApiServletModule
 
 			if (location != null) {
 
-				if (! chatUserLogic.setPlace (
+				if (
+					! chatUserLogic.setPlace (
 						chatUser,
 						location,
-						null)) {
+						Optional.<MessageRec>absent (),
+						Optional.<UserRec>absent ())
+				) {
 
 					errorCodes.add ("location-invalid");
 
@@ -1503,13 +1515,33 @@ class ChatApiServletModule
 
 			}
 
-			if (longitude != null
-					&& latitude != null) {
+			if (
+				longitude != null
+				&& latitude != null
+			) {
 
-				chatUser.setLocLongLat (
-					new LongLat (longitude, latitude));
+				chatUser
 
-			} else if (longitude != null || latitude != null) {
+					.setLocationLongLat (
+						new LongLat (
+							longitude,
+							latitude))
+
+					.setLocationBackupLongLat (
+						new LongLat (
+							longitude,
+							latitude));
+
+				eventLogic.createEvent (
+					"chat_user_location_api",
+					chatUser,
+					longitude,
+					latitude);
+
+			} else if (
+				longitude != null
+				|| latitude != null
+			) {
 
 				throw new RpcException (
 					Rpc.rpcError (
@@ -1647,8 +1679,6 @@ class ChatApiServletModule
 
 					}
 
-					transaction.flush ();
-
 					transaction.refresh (chatUser);
 
 				}
@@ -1774,20 +1804,19 @@ class ChatApiServletModule
 
 			}
 
-			if (chatUser.getLocPlace () != null) {
+			if (chatUser.getLocationPlace () != null) {
 
 				profile.add (
 					Rpc.rpcElem (
 						"location",
-						chatUser
-							.getLocPlace ()));
+						chatUser.getLocationPlace ()));
 
 			}
 
-			if (chatUser.getLocPlaceLongLat () != null) {
+			if (chatUser.getLocationPlaceLongLat () != null) {
 
 				LongLat longLat =
-					chatUser.getLocPlaceLongLat ();
+					chatUser.getLocationPlaceLongLat ();
 
 				EastNorth eastNorth =
 					locatorLogic.longLatToEastNorth (
@@ -1798,11 +1827,11 @@ class ChatApiServletModule
 
 					Rpc.rpcElem (
 						"longitude",
-						longLat.getLongitude ()),
+						longLat.longitude ()),
 
 					Rpc.rpcElem (
 						"latitude",
-						longLat.getLatitude ()),
+						longLat.latitude ()),
 
 					Rpc.rpcElem (
 						"easting",
@@ -1910,7 +1939,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get params
 
@@ -2095,7 +2125,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get params
 
@@ -2282,7 +2313,7 @@ class ChatApiServletModule
 		}
 	}
 
-	// ============================================================ message poll rpc handler
+	// =============================================== message poll rpc handler
 
 	final static
 	RpcDefinition messagePollRequestDef =
@@ -2320,7 +2351,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get params
 
@@ -2597,7 +2629,7 @@ class ChatApiServletModule
 		}
 	}
 
-	// ============================================================ image update rpc handler
+	// =============================================== image update rpc handler
 
 	private final static
 	RpcDefinition imageUpdateRequestDef =
@@ -2658,7 +2690,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get params
 
@@ -2778,15 +2811,22 @@ class ChatApiServletModule
 				}
 
 				// perform the deletions
+
 				int i = 0;
+
 				for (ChatUserImageRec image : images) {
+
 					if (chatUser.getMainChatUserImageByType (type) == image)
 						chatUser.setMainChatUserImageByType (type, null);
+
 					image.setIndex (requestImageIds.contains (image.getId ()) ? null : i++);
+
 				}
-				transaction.flush ();
+
 				transaction.refresh (chatUser);
+
 				images = chatUser.getChatUserImageListByType (type);
+
 			}
 
 			// reorder images
@@ -2844,8 +2884,6 @@ class ChatApiServletModule
 
 				}
 
-				transaction.flush ();
-
 				transaction.refresh (chatUser);
 
 				images =
@@ -2871,7 +2909,6 @@ class ChatApiServletModule
 
 				}
 
-				transaction.flush ();
 				transaction.refresh (chatUser);
 
 				images =
@@ -2986,7 +3023,7 @@ class ChatApiServletModule
 
 	}
 
-	// ============================================================ credit rpc handler
+	// ===================================================== credit rpc handler
 
 	private final static
 	RpcDefinition creditRequestDef =
@@ -3025,7 +3062,8 @@ class ChatApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// get params
 

@@ -1,7 +1,5 @@
 package wbs.ticket.model;
 
-import java.util.Random;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -23,6 +21,7 @@ import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.object.core.model.ObjectTypeRec;
 
 @Accessors (chain = true)
@@ -59,43 +58,6 @@ public class TicketFieldTypeRec
 			nullable = true)
 	ObjectTypeRec objectType;
 	
-	// object helper methods
-	
-	public
-	interface TicketFieldTypeObjectHelperMethods {
-	
-		String generateCode ();
-	
-	}
-	
-	// object helper implementation
-	
-	public static
-	class TicketFieldTypeObjectHelperImplementation
-		implements TicketFieldTypeObjectHelperMethods {
-	
-		// dependencies
-	
-		@Inject
-		Random random;
-	
-		// implementation
-	
-		@Override
-		public
-		String generateCode () {
-	
-			int intCode =
-				+ random.nextInt (90000000)
-				+ 10000000;
-	
-			return Integer.toString (
-				intCode);
-	
-		}
-	
-	}
-	
 	// object hooks
 
 	public static
@@ -107,14 +69,17 @@ public class TicketFieldTypeRec
 
 		@Inject
 		Database database;
+		
+		@Inject
+		RandomLogic randomLogic;
 
 		@Override
 		public
 		void beforeInsert (
 				TicketFieldTypeRec ticketFieldType) {
 			
-			ticketFieldType.setCode(ticketFieldTypeHelper.get()
-					.generateCode());
+			ticketFieldType.setCode (
+					randomLogic.generateNumericNoZero (8));
 
 		}
 

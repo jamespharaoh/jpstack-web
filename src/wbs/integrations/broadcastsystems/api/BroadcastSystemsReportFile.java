@@ -109,7 +109,8 @@ class BroadcastSystemsReportFile
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		MessageReportCodeRec reportCode =
 			messageReportCodeHelper.findOrCreate (

@@ -12,7 +12,7 @@ public
 class ImChatProfileData {
 
 	@DataAttribute
-	Integer id;
+	String code;
 
 	@DataAttribute
 	String name;

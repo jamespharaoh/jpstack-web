@@ -142,13 +142,16 @@ class ChatDateDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		List<Integer> chatIds =
 			new ArrayList<Integer> ();
 
-		for (ChatRec chat
-				: chatHelper.findAll ()) {
+		for (
+			ChatRec chat
+				: chatHelper.findAll ()
+		) {
 
 			chatIds.add (
 				chat.getId ());
@@ -169,7 +172,8 @@ class ChatDateDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		ChatRec chat =
 			chatHelper.find (chatId);
@@ -412,7 +416,8 @@ class ChatDateDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatUserRec thisUser =
 			chatUserHelper.find (
@@ -795,8 +800,10 @@ class ChatDateDaemon
 
 		// check distance
 
-		if (thisUser.getLocLongLat () == null
-				|| thatUserInfo.longLat == null) {
+		if (
+			thisUser.getLocationLongLat () == null
+			|| thatUserInfo.longLat == null
+		) {
 
 			dateUserStats.numNoLocation++;
 
@@ -806,7 +813,7 @@ class ChatDateDaemon
 
 		int miles = (int)
 			locatorLogic.distanceMiles (
-				thisUser.getLocLongLat (),
+				thisUser.getLocationLongLat (),
 				thatUserInfo.longLat);
 
 		if (miles > thisUser.getDateRadius ()) {
@@ -853,7 +860,7 @@ class ChatDateDaemon
 				ChatUserRec chatUser) {
 
 			id = chatUser.getId ();
-			longLat = chatUser.getLocLongLat ();
+			longLat = chatUser.getLocationLongLat ();
 			photo = ! chatUser.getChatUserImageList ().isEmpty ();
 			gender = chatUser.getGender ();
 			orient = chatUser.getOrient ();

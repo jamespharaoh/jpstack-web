@@ -1,6 +1,5 @@
 package wbs.ticket.model;
 
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -21,8 +20,10 @@ import com.google.common.collect.Ordering;
 import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.CollectionField;
+import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
+import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
@@ -30,6 +31,7 @@ import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.object.core.model.ObjectTypeRec;
 
 @Accessors (chain = true)
@@ -81,43 +83,6 @@ public class TicketRec
 	@SimpleField
 	Integer numFields = 0;
 	
-	// object helper methods
-	
-	public
-	interface TicketObjectHelperMethods {
-	
-		String generateCode ();
-	
-	}
-	
-	// object helper implementation
-	
-	public static
-	class TicketObjectHelperImplementation
-		implements TicketObjectHelperMethods {
-	
-		// dependencies
-	
-		@Inject
-		Random random;
-	
-		// implementation
-	
-		@Override
-		public
-		String generateCode () {
-	
-			int intCode =
-				+ random.nextInt (90000000)
-				+ 10000000;
-	
-			return Integer.toString (
-				intCode);
-	
-		}
-	
-	}
-	
 	// object hooks
 
 	public static
@@ -138,14 +103,17 @@ public class TicketRec
 				
 		@Inject
 		Database database;
+		
+		@Inject
+		RandomLogic randomLogic;
 
 		@Override
 		public
 		void beforeInsert (
 				TicketRec ticket) {
 
-			ticket.setCode(ticketHelper.get()
-					.generateCode());
+			ticket.setCode (
+				randomLogic.generateNumericNoZero (8));
 
 		}
 		
@@ -276,6 +244,9 @@ public class TicketRec
 					throw new RuntimeException ();
 			
 			}		
+			
+			ticket.setNumFields (
+				ticket.getNumFields() + 1);
 					
 			ticket.getTicketFieldValues ().add (
 					ticketFieldValue);

@@ -85,7 +85,8 @@ class ChatUserJoinOutboundDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		List<ChatUserRec> chatUsers =
 			chatUserHelper.findWantingJoinOutbound ();
@@ -124,7 +125,8 @@ class ChatUserJoinOutboundDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// find the user
 

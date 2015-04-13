@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -44,7 +43,9 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.console.misc.TimeFormatter;
+import wbs.platform.event.logic.EventLogic;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.queue.logic.QueueLogic;
@@ -52,6 +53,8 @@ import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.locator.logic.LocatorManager;
+import wbs.sms.locator.model.LocatorObjectHelper;
+import wbs.sms.locator.model.LocatorRec;
 import wbs.sms.locator.model.LongLat;
 import wbs.sms.magicnumber.logic.MagicNumberLogic;
 import wbs.sms.message.core.model.MessageRec;
@@ -105,7 +108,13 @@ class ChatMiscLogicImpl
 	Database database;
 
 	@Inject
+	EventLogic eventLogic;
+
+	@Inject
 	ExceptionLogic exceptionLogic;
+
+	@Inject
+	LocatorObjectHelper locatorHelper;
 
 	@Inject
 	LocatorManager locatorManager;
@@ -123,7 +132,7 @@ class ChatMiscLogicImpl
 	QueueLogic queueLogic;
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
@@ -427,9 +436,9 @@ class ChatMiscLogicImpl
 
 			&& (
 
-				chatUser.getLocTime () == null
+				chatUser.getLocationTime () == null
 
-				|| chatUser.getLocTime ().getTime ()
+				|| chatUser.getLocationTime ().getTime ()
 					< System.currentTimeMillis () - 1000 * 60 * 60
 
 			)
@@ -438,6 +447,9 @@ class ChatMiscLogicImpl
 
 			final int chatUserId =
 				chatUser.getId ();
+
+			final int locatorId =
+				chat.getLocator ().getId ();
 
 			locatorManager.locate (
 				chat.getLocator ().getId (),
@@ -453,20 +465,55 @@ class ChatMiscLogicImpl
 
 					@Cleanup
 					Transaction transaction =
-						database.beginReadWrite ();
+						database.beginReadWrite (
+							this);
 
 					ChatUserRec chatUser =
 						chatUserHelper.find (
 							chatUserId);
 
+					if (longLat == null) {
+						throw new NullPointerException ();
+					}
+
+					{
+
+						if (
+							! transaction.contains (
+								chatUser)
+						) {
+
+							throw new IllegalStateException (
+								stringFormat (
+									"Chat user %s not in transaction",
+									chatUser.getId ()));
+
+						}
+
+					}
+
 					chatUser
 
-						.setLocLongLat (
+						.setLocationLongLat (
 							longLat)
 
-						.setLocTime (
+						.setLocationBackupLongLat (
+							longLat)
+
+						.setLocationTime (
 							instantToDate (
 								transaction.now ()));
+
+					LocatorRec locator =
+						locatorHelper.find (
+							locatorId);
+
+					eventLogic.createEvent (
+						"chat_user_location_locator",
+						chatUser,
+						longLat.longitude (),
+						longLat.latitude (),
+						locator);
 
 					transaction.commit ();
 
@@ -574,23 +621,28 @@ class ChatMiscLogicImpl
 				&& offlineMonitors.size () > 0) {
 
 			ChatUserRec monitor =
-				offlineMonitors.remove (
-					random.nextInt (offlineMonitors.size ()));
+				randomLogic.sample (
+					offlineMonitors);
 
 			monitor.setOnline (true);
+
 			onlineMonitors.add (monitor);
+
 		}
 
 		// take monitors offline
+
 		while (onlineMonitors.size () > target) {
 
 			ChatUserRec monitor =
-				onlineMonitors.remove (
-					random.nextInt (onlineMonitors.size ()));
+				randomLogic.sample (
+					onlineMonitors);
 
 			monitor.setOnline (false);
 			offlineMonitors.add (monitor);
+
 		}
+
 	}
 
 	@Override

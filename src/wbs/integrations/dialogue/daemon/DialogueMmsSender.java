@@ -7,9 +7,7 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -17,8 +15,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -121,20 +127,27 @@ class DialogueMmsSender
 					"Sending %s",
 					dialogueMmsOutbox.outbox.getMessage ().getId ()));
 
-			InputStream inputStream =
-				doRequest (dialogueMmsOutbox);
+			@Cleanup
+			CloseableHttpResponse httpResponse =
+				doRequest (
+					dialogueMmsOutbox);
 
-			return doResponse(inputStream);
+			return doResponse (
+				httpResponse);
 
-		} catch (IOException e) {
+		} catch (IOException exception) {
 
-			throw tempFailure("Got IO error: " + e.getMessage());
+			throw tempFailure (
+				stringFormat (
+					"Got IO error: %s",
+					exception.getMessage ()));
 
 		}
 
 	}
 
-	private InputStream doRequest (
+	private
+	CloseableHttpResponse doRequest (
 			DialogueMmsOutbox dialogueMmsOutbox)
 		throws
 			SendFailureException,
@@ -143,35 +156,43 @@ class DialogueMmsSender
 		MessageRec smsMessage =
 			dialogueMmsOutbox.outbox.getMessage ();
 
-		ClientHttpRequest httpRequest =
-			new ClientHttpRequest (
-				new URL (dialogueMmsOutbox.dialogueMmsRoute.getUrl ()));
+		@Cleanup
+		CloseableHttpClient httpClient =
+			HttpClientBuilder.create ()
+				.build ();
 
-		httpRequest.setParameter (
+		HttpPost post =
+			new HttpPost (
+				dialogueMmsOutbox.dialogueMmsRoute.getUrl ());
+
+		MultipartEntityBuilder multipartEntityBuilder =
+			MultipartEntityBuilder.create ();
+
+		multipartEntityBuilder.addTextBody (
 			"X-Mms-Account",
 			dialogueMmsOutbox.dialogueMmsRoute.getAccount ());
 
-		httpRequest.setParameter (
+		multipartEntityBuilder.addTextBody (
 			"X-Mms-Username",
 			dialogueMmsOutbox.dialogueMmsRoute.getUsername ());
 
-		httpRequest.setParameter (
+		multipartEntityBuilder.addTextBody (
 			"X-Mms-Password",
 			dialogueMmsOutbox.dialogueMmsRoute.getPassword ());
 
-		httpRequest.setParameter (
+		multipartEntityBuilder.addTextBody (
 			"X-Mms-Recipient-Addresses",
 			smsMessage.getNumTo ());
 
-		httpRequest.setParameter (
+		multipartEntityBuilder.addTextBody (
 			"X-Mms-Originating-Address",
 			smsMessage.getNumFrom ());
 
-		httpRequest.setParameter (
+		multipartEntityBuilder.addTextBody (
 			"X-Mms-User-Tag",
 			dialogueMmsOutbox.dialogueMmsRoute.getAccount ());
 
-		httpRequest.setParameter (
+		multipartEntityBuilder.addTextBody (
 			"X-Mms-User-Key",
 			Integer.toString (
 				smsMessage.getId ()));
@@ -179,13 +200,13 @@ class DialogueMmsSender
 		if (isNotNull (
 				smsMessage.getSubjectText ())) {
 
-			httpRequest.setParameter (
+			multipartEntityBuilder.addTextBody (
 				"X-Mms-Subject",
 				smsMessage.getSubjectText ().getText ());
 
 		}
 
-		httpRequest.setParameter (
+		multipartEntityBuilder.addTextBody (
 			"X-Mms-Delivery-Report",
 			smsMessage.getRoute ().getDeliveryReports ()
 				? "Y"
@@ -195,14 +216,181 @@ class DialogueMmsSender
 
 			// TODO what?
 
-			httpRequest.setParameter (
+			multipartEntityBuilder.addTextBody (
 				"X-Mms-Reply-Path",
 				stringFormat (
 					"%s",
 					wbsConfig.apiUrl (),
-					"/dialogueMMS/route/16/report"));
+					"/dialogueMMS/route",
+					"/%u",
+					smsMessage.getRoute ().getId (),
+					"/report"));
 
 		}
+
+		String smilString =
+			createSmil (
+				dialogueMmsOutbox);
+
+		log.info (
+			stringFormat (
+				"SMIL: %s",
+				smilString));
+
+		multipartEntityBuilder.addBinaryBody (
+			"filename",
+			smilString.getBytes (),
+			ContentType.create (
+				"application/smil",
+				"utf-8"),
+			"ordering.smi");
+
+		for (
+			MediaRec media
+				: dialogueMmsOutbox.outbox.getMessage ().getMedias ()
+		) {
+
+			String contentType =
+				media.getMediaType ().getMimeType ();
+
+			if (media.getEncoding() != null) {
+
+				contentType =
+					stringFormat (
+						"%s; charset=%s",
+						contentType,
+						media.getEncoding ());
+
+			}
+
+			multipartEntityBuilder.addBinaryBody (
+				"filename",
+				media.getContent ().getData (),
+				ContentType.create (
+					contentType),
+				ifNull (
+					media.getFilename (),
+					"file.jpg"));
+
+		}
+
+		post.setEntity (
+			multipartEntityBuilder.build ());
+
+		return httpClient.execute (
+			post);
+
+	}
+
+	String doResponse (
+			HttpResponse response)
+		throws
+			IOException,
+			SendFailureException {
+
+		MyHandler handler =
+			new MyHandler ();
+
+		try {
+
+			BufferedReader bufferedReader =
+				new BufferedReader (
+					new InputStreamReader (
+						response.getEntity ().getContent ()));
+
+			StringBuilder stringBuilder =
+				new StringBuilder ();
+
+			String line;
+
+			while ((line = bufferedReader.readLine ()) != null) {
+
+				stringBuilder.append (
+					line);
+
+			}
+
+			log.info (
+				stringFormat (
+					"Response: %s",
+					stringBuilder.toString ()));
+
+			ByteArrayInputStream byteArrayInputStream =
+				new ByteArrayInputStream (
+					stringBuilder.toString ().getBytes ("UTF-8"));
+
+			SAXParserFactory saxParserFactory =
+				SAXParserFactory.newInstance ();
+
+			SAXParser saxParser =
+				saxParserFactory.newSAXParser ();
+
+			saxParser.parse (
+				byteArrayInputStream,
+				handler);
+
+		} catch (ParserConfigurationException exception) {
+
+			throw new RuntimeException (
+				exception);
+
+		} catch (SAXException exception) {
+
+			return null;
+
+		}
+
+		if (handler.statusCode == null) {
+
+			log.error (
+				"Invalid XML received: no MessageStatusCode");
+
+			throw tempFailure (
+				"Invalid XML received: no MessageStatusCode");
+
+		}
+		if (handler.statusText == null) {
+
+			log.error (
+				"Invalid XML received: no MessageStatusText");
+
+			throw tempFailure (
+				"Invalid XML received: no MessageStatusText");
+
+		}
+
+		if (!handler.statusCode.equals("00")
+				|| !handler.messageStatusCode.equals("00")) {
+
+			throw permFailure("Error: " + handler.statusCode + " "
+					+ handler.messageStatusCode + " (" + handler.statusText
+					+ ")");
+		}
+
+		if (handler.messageId == null) {
+
+			log.error("Invalid XML received: no MessageId");
+
+			throw tempFailure("Invalid XML received: no MessageId");
+
+		}
+
+		return handler.messageId;
+
+	}
+
+	enum HandlerState {
+		start,
+		message,
+		results,
+		messageId,
+		messageStatusCode,
+		messageStatusText,
+		end;
+	};
+
+	String createSmil (
+			DialogueMmsOutbox dialogueMmsOutbox) {
 
 		StringBuilder smilStringBuilder =
 			new StringBuilder ();
@@ -301,156 +489,9 @@ class DialogueMmsSender
 		smilStringBuilder.append (
 			"</body></smil>");
 
-		String smilString =
-			smilStringBuilder.toString ();
-
-		log.info (
-			stringFormat (
-				"SMIL: %s",
-				smilString));
-
-		httpRequest.setParameter (
-			"filename",
-			"ordering.smi",
-			new ByteArrayInputStream (smilString.getBytes ()),
-			"application/smil; charset=utf-8");
-
-		for (MediaRec media
-				: dialogueMmsOutbox.outbox.getMessage ().getMedias ()) {
-
-			String contentType =
-				media.getMediaType ().getMimeType ();
-
-			if (media.getEncoding() != null) {
-
-				contentType =
-					stringFormat (
-						"%s; charset=%s",
-						contentType,
-						media.getEncoding ());
-
-			}
-
-			httpRequest.setParameter (
-				"filename",
-				ifNull (
-					media.getFilename (),
-					"file.jpg"),
-				new ByteArrayInputStream (
-					media.getContent ().getData ()),
-				contentType);
-
-		}
-
-		return httpRequest.post ();
+		return smilStringBuilder.toString ();
 
 	}
-
-	String doResponse (
-			InputStream inputStream)
-		throws
-			IOException,
-			SendFailureException {
-
-		MyHandler handler =
-			new MyHandler ();
-
-		try {
-
-			BufferedReader bufferedReader =
-				new BufferedReader (
-					new InputStreamReader (inputStream));
-
-			StringBuilder stringBuilder =
-				new StringBuilder ();
-
-			String line;
-
-			while ((line = bufferedReader.readLine ()) != null) {
-
-				stringBuilder.append (
-					line);
-
-			}
-
-			log.info (
-				stringFormat (
-					"Response: %s",
-					stringBuilder.toString ()));
-
-			ByteArrayInputStream byteArrayInputStream =
-				new ByteArrayInputStream (
-					stringBuilder.toString ().getBytes ("UTF-8"));
-
-			SAXParserFactory saxParserFactory =
-				SAXParserFactory.newInstance ();
-
-			SAXParser saxParser =
-				saxParserFactory.newSAXParser ();
-
-			saxParser.parse (
-				byteArrayInputStream,
-				handler);
-
-		} catch (ParserConfigurationException exception) {
-
-			throw new RuntimeException (
-				exception);
-
-		} catch (SAXException exception) {
-
-			return null;
-
-		}
-
-		if (handler.statusCode == null) {
-
-			log.error (
-				"Invalid XML received: no MessageStatusCode");
-
-			throw tempFailure (
-				"Invalid XML received: no MessageStatusCode");
-
-		}
-		if (handler.statusText == null) {
-
-			log.error (
-				"Invalid XML received: no MessageStatusText");
-
-			throw tempFailure (
-				"Invalid XML received: no MessageStatusText");
-
-		}
-
-		if (!handler.statusCode.equals("00")
-				|| !handler.messageStatusCode.equals("00")) {
-
-			throw permFailure("Error: " + handler.statusCode + " "
-					+ handler.messageStatusCode + " (" + handler.statusText
-					+ ")");
-		}
-
-		if (handler.messageId == null) {
-
-			log.error("Invalid XML received: no MessageId");
-
-			throw tempFailure("Invalid XML received: no MessageId");
-
-		}
-
-		return handler.messageId;
-
-	}
-
-	enum HandlerState {
-		start,
-		message,
-		results,
-		messageId,
-		messageStatusCode,
-		messageStatusText,
-		end;
-	};
 
 	static
 	class MyHandler

@@ -225,11 +225,8 @@ class ChatUserAdminBillPart
 						billLog.getTimestamp ())),
 
 				"%s\n",
-				consoleObjectManager.tdForObject (
-					billLog.getUser (),
-					null,
-					true,
-					true),
+				consoleObjectManager.tdForObjectMiniLink (
+					billLog.getUser ()),
 
 				"</tr>\n");
 

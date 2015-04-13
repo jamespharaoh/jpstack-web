@@ -60,6 +60,7 @@
       <fileset dir="src/wbs/framework/object/console/files"/>
       <fileset dir="src/wbs/framework/schema/console/files"/>
       <fileset dir="src/wbs/framework/sql/console/files"/>
+      <fileset dir="src/wbs/framework/utils/console/files"/>
       <fileset dir="src/wbs/framework/web/console/files"/>
       <fileset dir="src/wbs/framework/application/config/console/files"/>
       <fileset dir="src/wbs/platform/object/core/console/files"/>
@@ -84,7 +85,6 @@
       <fileset dir="src/wbs/platform/console/html/files"/>
       <fileset dir="src/wbs/platform/event/console/files"/>
       <fileset dir="src/wbs/platform/exception/console/files"/>
-      <fileset dir="src/wbs/platform/groovy/console/files"/>
       <fileset dir="src/wbs/platform/group/console/files"/>
       <fileset dir="src/wbs/platform/lock/console/files"/>
       <fileset dir="src/wbs/platform/media/console/files"/>
@@ -227,6 +227,7 @@
       <fileset dir="src/wbs/framework/object/api/files"/>
       <fileset dir="src/wbs/framework/schema/api/files"/>
       <fileset dir="src/wbs/framework/sql/api/files"/>
+      <fileset dir="src/wbs/framework/utils/api/files"/>
       <fileset dir="src/wbs/framework/web/api/files"/>
       <fileset dir="src/wbs/framework/application/config/api/files"/>
       <fileset dir="src/wbs/platform/object/core/api/files"/>
@@ -251,7 +252,6 @@
       <fileset dir="src/wbs/platform/console/html/api/files"/>
       <fileset dir="src/wbs/platform/event/api/files"/>
       <fileset dir="src/wbs/platform/exception/api/files"/>
-      <fileset dir="src/wbs/platform/groovy/api/files"/>
       <fileset dir="src/wbs/platform/group/api/files"/>
       <fileset dir="src/wbs/platform/lock/api/files"/>
       <fileset dir="src/wbs/platform/media/api/files"/>
@@ -428,6 +428,7 @@
       <fileset dir="src/wbs/framework/object/console/files"/>
       <fileset dir="src/wbs/framework/schema/console/files"/>
       <fileset dir="src/wbs/framework/sql/console/files"/>
+      <fileset dir="src/wbs/framework/utils/console/files"/>
       <fileset dir="src/wbs/framework/web/console/files"/>
       <fileset dir="src/wbs/framework/application/config/console/files"/>
       <fileset dir="src/wbs/platform/object/core/console/files"/>
@@ -452,7 +453,6 @@
       <fileset dir="src/wbs/platform/console/html/files"/>
       <fileset dir="src/wbs/platform/event/console/files"/>
       <fileset dir="src/wbs/platform/exception/console/files"/>
-      <fileset dir="src/wbs/platform/groovy/console/files"/>
       <fileset dir="src/wbs/platform/group/console/files"/>
       <fileset dir="src/wbs/platform/lock/console/files"/>
       <fileset dir="src/wbs/platform/media/console/files"/>
@@ -595,6 +595,7 @@
       <fileset dir="src/wbs/framework/object/api/files"/>
       <fileset dir="src/wbs/framework/schema/api/files"/>
       <fileset dir="src/wbs/framework/sql/api/files"/>
+      <fileset dir="src/wbs/framework/utils/api/files"/>
       <fileset dir="src/wbs/framework/web/api/files"/>
       <fileset dir="src/wbs/framework/application/config/api/files"/>
       <fileset dir="src/wbs/platform/object/core/api/files"/>
@@ -619,7 +620,6 @@
       <fileset dir="src/wbs/platform/console/html/api/files"/>
       <fileset dir="src/wbs/platform/event/api/files"/>
       <fileset dir="src/wbs/platform/exception/api/files"/>
-      <fileset dir="src/wbs/platform/groovy/api/files"/>
       <fileset dir="src/wbs/platform/group/api/files"/>
       <fileset dir="src/wbs/platform/lock/api/files"/>
       <fileset dir="src/wbs/platform/media/api/files"/>
@@ -940,7 +940,7 @@
     <java classname="wbs.platform.application.tools.BeanRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
-      <arg value="config,data,entity,schema,sql,schema-tool"/>
+      <arg value="utils,config,data,entity,schema,sql,schema-tool"/>
       <arg value="test"/>
       <arg value="wbs.framework.schema.tool.SchemaTool"/>
       <arg value="schemaCreate"/>
@@ -950,7 +950,7 @@
     <java classname="wbs.platform.application.tools.BeanRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
-      <arg value="config,data,entity,schema,sql,model,hibernate,object,logic,fixture"/>
+      <arg value="utils,config,data,entity,schema,sql,model,hibernate,object,logic,fixture"/>
       <arg value="test,hibernate"/>
       <arg value="wbs.framework.fixtures.FixturesTool"/>
       <arg value="createFixtures"/>

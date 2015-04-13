@@ -144,7 +144,8 @@ class ChatMonitorInboxFormAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatMonitorInboxRec chatMonitorInbox =
 			chatMonitorInboxHelper.find (

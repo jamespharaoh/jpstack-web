@@ -25,6 +25,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
@@ -56,12 +57,6 @@ class ImChatPurchaseStartAction
 	ImChatApiLogic imChatApiLogic;
 
 	@Inject
-	PaypalApi paypalApi;
-
-	@Inject
-	PaypalLogic paypalLogic;
-
-	@Inject
 	ImChatObjectHelper imChatHelper;
 
 	@Inject
@@ -71,10 +66,19 @@ class ImChatPurchaseStartAction
 	ImChatPurchaseObjectHelper imChatPurchaseHelper;
 
 	@Inject
+	ImChatSessionObjectHelper imChatSessionHelper;
+
+	@Inject
+	PaypalApi paypalApi;
+
+	@Inject
+	PaypalLogic paypalLogic;
+
+	@Inject
 	PaypalPaymentObjectHelper paypalPaymentHelper;
 
 	@Inject
-	ImChatSessionObjectHelper imChatSessionHelper;
+	RandomLogic randomLogic;
 
 	@Inject
 	RequestContext requestContext;
@@ -110,7 +114,8 @@ class ImChatPurchaseStartAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ImChatRec imChat =
 			imChatHelper.find (
@@ -153,9 +158,9 @@ class ImChatPurchaseStartAction
 		// lookup price point
 
 		ImChatPricePointRec pricePoint =
-			imChatPricePointHelper.find (
-				(int) (long)
-				purchaseRequest.pricePointId ());
+			imChatPricePointHelper.findByCode (
+				imChat,
+				purchaseRequest.pricePointCode ());
 
 		if (
 			pricePoint == null
@@ -212,7 +217,7 @@ class ImChatPurchaseStartAction
 				customer.getNumPurchases ())
 
 			.setToken (
-				imChatPurchaseHelper.generateToken ())
+				randomLogic.generateLowercase (20))
 
 			.setImChatPricePoint (
 				pricePoint)

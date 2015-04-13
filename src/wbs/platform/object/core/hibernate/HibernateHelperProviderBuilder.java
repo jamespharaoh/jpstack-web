@@ -1353,6 +1353,8 @@ class HibernateHelperProviderBuilder {
 			Session session =
 				hibernateDatabase.currentSession ();
 
+			session.flush ();
+
 			session.refresh (
 				object,
 				LockOptions.UPGRADE);

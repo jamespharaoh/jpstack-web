@@ -169,20 +169,8 @@ class ConsoleObjectManagerImpl
 			Record<?> object,
 			Record<?> assumedRoot,
 			boolean mini,
-			boolean link) {
-
-		if (log.isDebugEnabled ()) {
-
-			log.debug (
-				stringFormat (
-					"tdForObject (requestContext, %s, slice, mini)",
-					objectManager.objectPath (
-						object,
-						null,
-						false,
-						false)));
-
-		}
+			boolean link,
+			int colspan) {
 
 		if (object == null)
 			return "<td>-</td>";
@@ -209,7 +197,7 @@ class ConsoleObjectManagerImpl
 						requestContext.resolveLocalUrl (
 							objectHelper.getDefaultLocalPath (object)),
 						"main",
-						1),
+						colspan),
 					"%h</td>",
 					path));
 
@@ -235,7 +223,114 @@ class ConsoleObjectManagerImpl
 			object,
 			null,
 			true,
-			true);
+			true,
+			1);
+
+	}
+
+	@Override
+	public
+	String tdForObjectMiniLink (
+			Record<?> object,
+			Record<?> assumedRoot) {
+
+		return tdForObject (
+			object,
+			assumedRoot,
+			true,
+			true,
+			1);
+
+	}
+
+	@Override
+	public
+	String tdForObjectMiniLink (
+			Record<?> object,
+			int colspan) {
+
+		return tdForObject (
+			object,
+			null,
+			true,
+			true,
+			colspan);
+
+	}
+
+	@Override
+	public
+	String tdForObjectMiniLink (
+			Record<?> object,
+			Record<?> assumedRoot,
+			int colspan) {
+
+		return tdForObject (
+			object,
+			assumedRoot,
+			true,
+			true,
+			colspan);
+
+	}
+
+	@Override
+	public
+	String tdForObjectLink (
+			Record<?> object) {
+
+		return tdForObject (
+			object,
+			null,
+			false,
+			true,
+			1);
+
+	}
+
+	@Override
+	public
+	String tdForObjectLink (
+			Record<?> object,
+			Record<?> assumedRoot) {
+
+		return tdForObject (
+			object,
+			assumedRoot,
+			false,
+			true,
+			1);
+
+	}
+
+	@Override
+	public
+	String tdForObjectLink (
+			Record<?> object,
+			int colspan) {
+
+		return tdForObject (
+			object,
+			null,
+			false,
+			true,
+			colspan);
+
+	}
+
+	@Override
+	public
+	String tdForObjectLink (
+			Record<?> object,
+			Record<?> assumedRoot,
+			int colspan) {
+
+		return tdForObject (
+			object,
+			assumedRoot,
+			false,
+			true,
+			colspan);
 
 	}
 
@@ -781,6 +876,19 @@ class ConsoleObjectManagerImpl
 		return objectManager.objectPathMini (
 			object,
 			root);
+
+	}
+
+	@Override
+	public
+	<ObjectType extends Record<ObjectType>>
+	Optional<ObjectType> getAncestor (
+			Class<ObjectType> ancestorClass,
+			Record<?> object) {
+
+		return objectManager.getAncestor (
+			ancestorClass,
+			object);
 
 	}
 

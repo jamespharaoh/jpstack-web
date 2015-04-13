@@ -9,6 +9,8 @@
 		<bean class="ContextActionSpec"/>
 		<bean class="ContextFileBuilder"/>
 		<bean class="ContextFileSpec"/>
+		<bean class="ContextFormActionAction"/>
+		<bean class="ContextFormActionPart"/>
 		<bean class="ContextGetActionBuilder"/>
 		<bean class="ContextGetActionSpec"/>
 		<bean class="ContextRequestHandlerBuilder"/>
@@ -21,6 +23,8 @@
 		<bean class="ContextTabResponderSpec"/>
 		<bean class="ContextTabActionPageBuilder"/>
 		<bean class="ContextTabActionPageSpec"/>
+		<bean class="ContextTabFormActionPageBuilder"/>
+		<bean class="ContextTabFormActionPageSpec"/>
 		<bean class="ContextTabPageBuilder"/>
 		<bean class="ContextTabPageSpec"/>
 		<bean class="SimpleActionPageBuilder"/>

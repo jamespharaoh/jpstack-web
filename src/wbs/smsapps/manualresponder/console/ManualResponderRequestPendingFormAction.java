@@ -139,7 +139,8 @@ class ManualResponderRequestPendingFormAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ManualResponderRequestRec manualResponderRequest =
 			manualResponderRequestHelper.find (
@@ -196,7 +197,8 @@ class ManualResponderRequestPendingFormAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ManualResponderRequestRec request =
 			manualResponderRequestHelper.find (

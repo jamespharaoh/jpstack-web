@@ -2,6 +2,10 @@
 	name="forwarder"
 	package="wbs.smsapps.forwarder">
 
+	<plugin-dependencies>
+		<plugin-dependency name="sms-apps-common"/>
+	</plugin-dependencies>
+
 	<sql-scripts>
 		<sql-schema name="forwarder"/>
 		<sql-data name="forwarder-data"/>

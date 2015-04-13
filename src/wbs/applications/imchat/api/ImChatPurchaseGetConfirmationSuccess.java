@@ -21,6 +21,6 @@ class ImChatPurchaseGetConfirmationSuccess {
 	ImChatCustomerData customer;
 
 	@DataAttribute
-	Integer purchaseId;
+	ImChatPurchaseData purchase;
 
 }

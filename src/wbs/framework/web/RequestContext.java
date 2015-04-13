@@ -117,6 +117,8 @@ interface RequestContext {
 	void status (
 			int status);
 
+	Map<String,List<String>> headerMap ();
+
 	void setHeader (
 			String name,
 			String value);

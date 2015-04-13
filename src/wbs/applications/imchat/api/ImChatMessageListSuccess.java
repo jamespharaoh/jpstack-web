@@ -17,6 +17,13 @@ public class ImChatMessageListSuccess {
 	String status = "success";
 
 	@DataAttribute
-	List<ImChatMessageData> messages = new ArrayList<ImChatMessageData> ();
+	ImChatCustomerData customer;
+
+	@DataAttribute
+	ImChatConversationData conversation;
+
+	@DataAttribute
+	List<ImChatMessageData> messages =
+		new ArrayList<ImChatMessageData> ();
 
 }

@@ -7,9 +7,10 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.platform.email.logic.EmailLogic;
+import wbs.framework.utils.EmailLogic;
 import wbs.platform.misc.MapStringSubstituter;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
@@ -26,6 +27,8 @@ public
 class OrdererDeliveryNoticeHandler
 	implements DeliveryHandler {
 
+	// dependencies
+
 	@Inject
 	Database database;
 
@@ -38,6 +41,11 @@ class OrdererDeliveryNoticeHandler
 	@Inject
 	OrdererOrderObjectHelper ordererOrderHelper;
 
+	@Inject
+	WbsConfig wbsConfig;
+
+	// details
+
 	@Override
 	public
 	Collection<String> getDeliveryTypeCodes () {
@@ -46,6 +54,8 @@ class OrdererDeliveryNoticeHandler
 			"orderer");
 
 	}
+
+	// implementation
 
 	@Override
 	public
@@ -58,7 +68,8 @@ class OrdererDeliveryNoticeHandler
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		DeliveryRec delivery =
 			deliveryHelper.find (
@@ -112,6 +123,7 @@ class OrdererDeliveryNoticeHandler
 		// send the email
 
 		emailLogic.sendEmail (
+			wbsConfig.defaultEmailAddress (),
 			orderer.getEmailAddress (),
 			orderer.getEmailSubject (),
 			emailBody);

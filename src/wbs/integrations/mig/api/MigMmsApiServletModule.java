@@ -33,7 +33,6 @@ import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
 import wbs.integrations.mig.logic.MigLogic;
 import wbs.platform.exception.logic.ExceptionLogic;
-import wbs.platform.exception.logic.ExceptionLogicImpl;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
@@ -86,7 +85,8 @@ class MigMmsApiServletModule
 			new StringBuilder ();
 
 		stringBuilder.append (
-			ExceptionLogicImpl.throwableDump (throwable));
+			exceptionLogic.throwableDump (
+				throwable));
 
 		stringBuilder.append (
 			"\n\nHTTP INFO\n\n");
@@ -348,7 +348,8 @@ logger.error ("Got item");
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			requestContext.debugDump (
 				log,
@@ -442,7 +443,8 @@ logger.error ("Got item");
 				false);
 
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			try {
 
@@ -464,8 +466,11 @@ logger.error ("Got item");
 				exceptionLogic.logSimple (
 					"webapi",
 					requestContext.requestUri (),
-					ExceptionLogicImpl.throwableSummary (exception),
-					getException (exception, requestContext),
+					exceptionLogic.throwableSummary (
+						exception),
+					getException (
+						exception,
+						requestContext),
 					Optional.<Integer>absent (),
 					false);
 

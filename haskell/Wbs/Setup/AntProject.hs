@@ -526,7 +526,7 @@ writeBuildFile world = do
 				] [
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
-					makeArgValue "config,data,entity,schema,sql,schema-tool",
+					makeArgValue "utils,config,data,entity,schema,sql,schema-tool",
 					makeArgValue "test",
 					makeArgValue "wbs.framework.schema.tool.SchemaTool",
 					makeArgValue "schemaCreate"
@@ -547,8 +547,8 @@ writeBuildFile world = do
 				] [
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
-					makeArgValue ("config,data,entity,schema,sql,model," ++
-						"hibernate,object,logic,fixture"),
+					makeArgValue ("utils,config,data,entity,schema,sql," ++
+						"model,hibernate,object,logic,fixture"),
 					makeArgValue "test,hibernate",
 					makeArgValue "wbs.framework.fixtures.FixturesTool",
 					makeArgValue "createFixtures"

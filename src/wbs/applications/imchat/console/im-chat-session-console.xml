@@ -41,9 +41,6 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"/>
-
 		</object>
 
 	</object-context>
@@ -52,8 +49,22 @@
 		name="list"
 		object-name="imChatSession">
 
-		<parent-field/>
 		<code-field/>
+
+		<timestamp-field
+			name="startTime"
+			label="Start"/>
+
+		<timestamp-field
+			name="updateTime"
+			label="Update"/>
+
+		<timestamp-field
+			name="endTime"
+			label="End"/>
+
+		<yes-no-field
+			name="active"/>
 
 	</field-set>
 
@@ -65,14 +76,20 @@
 		<parent-field/>
 		<code-field/>
 
-	</field-set>
+		<timestamp-field
+			name="startTime"
+			label="Start"/>
 
-	<field-set
-		name="settings"
-		object-name="imChatSession">
+		<timestamp-field
+			name="updateTime"
+			label="Update"/>
 
-		<id-field/>
-		<code-field/>
+		<timestamp-field
+			name="endTime"
+			label="End"/>
+
+		<yes-no-field
+			name="active"/>
 
 	</field-set>
 

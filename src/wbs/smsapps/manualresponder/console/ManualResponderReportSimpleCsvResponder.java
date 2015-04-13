@@ -129,8 +129,8 @@ class ManualResponderReportSimpleCsvResponder
 
 			formFieldLogic.outputCsvRow (
 				out,
-		        resultsFormFieldSet,
-		        report);
+				resultsFormFieldSet,
+				report);
 
 		}
 

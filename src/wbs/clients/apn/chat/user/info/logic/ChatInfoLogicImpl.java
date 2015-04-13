@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -40,9 +39,9 @@ import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.exception.logic.ExceptionLogic;
-import wbs.platform.exception.logic.ExceptionLogicImpl;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.queue.logic.QueueLogic;
@@ -59,6 +58,7 @@ import wbs.sms.magicnumber.model.MagicNumberRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 @Log4j
 @SingletonComponent ("chatInfoLogic")
@@ -115,7 +115,7 @@ class ChatInfoLogicImpl
 	QueueLogic queueLogic;
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
@@ -165,8 +165,8 @@ class ChatInfoLogicImpl
 
 		int miles =
 			(int) locatorLogic.distanceMiles (
-				thisUser.getLocLongLat (),
-				otherUser.getLocLongLat ());
+				thisUser.getLocationLongLat (),
+				otherUser.getLocationLongLat ());
 
 		// construct message parts
 
@@ -193,9 +193,9 @@ class ChatInfoLogicImpl
 					otherUser.getInfoText ().getText (),
 					templates);
 
-		} catch (IllegalArgumentException e) {
+		} catch (IllegalArgumentException exception) {
 
-			log.error ("MessageSplitter.split threw exception: " + e);
+			log.error ("MessageSplitter.split threw exception: " + exception);
 
 			exceptionLogic.logSimple (
 				"unknown",
@@ -207,7 +207,8 @@ class ChatInfoLogicImpl
 				"thisUser.id = " + thisUser.getId () + "\n" +
 				"otherUser.id = " + otherUser.getId () + "\n" +
 				"\n" +
-				ExceptionLogicImpl.throwableDump (e),
+				exceptionLogic.throwableDump (
+					exception),
 
 				Optional.<Integer>absent (),
 				false);
@@ -374,39 +375,33 @@ class ChatInfoLogicImpl
 		// create info site
 
 		ChatInfoSiteRec chatInfoSite =
-			new ChatInfoSiteRec ()
-				.setChatUser (thisUser)
-				.setCreateTime (Instant.now ())
-				.setNumViews (0)
-				.setNumExpired (0);
+			chatInfoSiteHelper.insert (
+				new ChatInfoSiteRec ()
 
-		// expires in 48 hours
+			.setChatUser (
+				thisUser)
 
-		chatInfoSite.setExpireTime (
-			Instant.now ().plus (
-				Duration.standardHours (48)));
+			.setCreateTime (
+				Instant.now ())
 
-		// random 20-character token
+			.setNumViews (
+				0)
 
-		StringBuilder token =
-			new StringBuilder (20);
+			.setNumExpired (
+				0)
 
-		for (int i = 0; i < 10; i++)
-			token.append ((char) ('a' + random.nextInt (26)));
+			.setExpireTime (
+				Instant.now ().plus (
+					Duration.standardHours (48)))
 
-		chatInfoSite
-			.setToken (token.toString ());
+			.setToken (
+				randomLogic.generateLowercase (10))
 
-		// other users
+			.setOtherChatUsers (
+				ImmutableList.copyOf (
+					otherUsers))
 
-		chatInfoSite
-			.getOtherChatUsers ().addAll (
-				otherUsers);
-
-		// save it
-
-		chatInfoSiteHelper.insert (
-			chatInfoSite);
+		);
 
 		// update user charge and stats
 

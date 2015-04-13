@@ -41,9 +41,6 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"/>
-
 			<context-link
 				name="message"
 				link="imChatMessage"
@@ -58,8 +55,19 @@
 		name="list"
 		object-name="imChatConversation">
 
-		<parent-field/>
 		<index-field/>
+
+		<object-field
+			name="imChatProfile"
+			label="Profile"
+			finder="imChatProfile"/>
+
+		<integer-field
+			name="numMessages"
+			label="Messages"/>
+
+		<timestamp-field
+			name="startTime"/>
 
 	</field-set>
 
@@ -71,14 +79,19 @@
 		<parent-field/>
 		<index-field/>
 
-	</field-set>
+		<object-field
+			name="imChatProfile"
+			label="Profile"
+			finder="imChatProfile"/>
 
-	<field-set
-		name="settings"
-		object-name="imChatConversation">
+		<integer-field
+			name="numMessages"/>
 
-		<id-field/>
-		<index-field/>
+		<timestamp-field
+			name="startTime"/>
+
+		<integer-field
+			name="freeMessages"/>
 
 	</field-set>
 

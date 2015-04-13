@@ -193,10 +193,10 @@ class ChatUserSummaryPart
 			"<tr>\n",
 			"<th>Location</th>\n",
 			"<td>%s</td>\n",
-			chatUser.getLocLongLat () != null
+			chatUser.getLocationLongLat () != null
 				? gazetteerLogic.findNearestCanonicalEntry (
 						chatUser.getChat ().getGazetteer (),
-						chatUser.getLocLongLat ()
+						chatUser.getLocationLongLat ()
 					).getName ()
 				: "-",
 			"</tr>\n");
@@ -252,28 +252,27 @@ class ChatUserSummaryPart
 				"<tr class=\"sep\">\n");
 
 			printFormat (
-				"<tr> <th>Number</th> %s </tr>\n",
-				objectManager.tdForObject (
-					chatUser.getOldNumber (),
-					null,
-					true,
-					true));
+				"<tr>\n",
+				"<th>Number</th>\n",
+				"%s\n",
+				objectManager.tdForObjectMiniLink (
+					chatUser.getOldNumber ()),
+				"</tr>\n");
 
 			printFormat (
-				"<tr> <th>Scheme</th> %s </tr>\n",
-				objectManager.tdForObject (
+				"<tr>\n",
+				"<th>Scheme</th>\n",
+				"%s\n",
+				objectManager.tdForObjectMiniLink (
 					chatUser.getChatScheme (),
-					chatUser.getChat (),
-					true,
-					true));
+					chatUser.getChat ()),
+				"</tr>\n");
 
 			printFormat (
 				"<tr> <th>Affiliate</th> %s </tr>\n",
-				objectManager.tdForObject (
+				objectManager.tdForObjectMiniLink (
 					chatUser.getChatAffiliate (),
-					chatUser.getChatScheme (),
-					true,
-					true));
+					chatUser.getChatScheme ()));
 
 			// "<tr> <th>Block all</th> <td>%h</td> </tr>\n",
 			// chatUser.getBlockAll ()? "yes" : "no",

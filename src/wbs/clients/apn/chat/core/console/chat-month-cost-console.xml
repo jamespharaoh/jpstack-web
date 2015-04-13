@@ -7,7 +7,7 @@
 		view-delegate-priv-code="manage"
 		id-key="id">
 
-		 <context-stuff
+		<context-stuff
 			name="chatId"
 			delegate="chat"
 			field="id"/>
@@ -61,7 +61,7 @@
 			finder="chat"/>
 
 		<code-field
-		    name="yearMonth"
+			name="yearMonth"
 			pattern="^\d{4}-\d{2}$"/>
 
 		<integer-field
@@ -78,7 +78,7 @@
 			finder="chat"/>
 
 		<code-field
-		    name="yearMonth"
+			name="yearMonth"
 			pattern="^\d{4}-\d{2}$"/>
 
 		<integer-field
@@ -95,7 +95,7 @@
 			finder="chat"/>
 
 		<code-field
-		    name="yearMonth"
+			name="yearMonth"
 			pattern="^\d{4}-\d{2}$"/>
 
 		<integer-field
@@ -112,7 +112,7 @@
 			finder="chat"/>
 
 		<code-field
-		    name="yearMonth"
+			name="yearMonth"
 			pattern="^\d{4}-\d{2}$"/>
 
 		<integer-field

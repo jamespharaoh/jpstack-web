@@ -7,6 +7,7 @@ interface ActivityManager {
 
 	ActiveTask start (
 			String taskName,
+			Object owner,
 			Map<String,Object> parameters);
 
 }

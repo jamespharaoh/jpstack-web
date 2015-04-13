@@ -59,7 +59,8 @@ class QueueClaimAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		QueueRec queue =
 			queueHelper.find (

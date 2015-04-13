@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -42,6 +43,11 @@ class HibernateDatabase
 	@Inject
 	SessionFactory sessionFactory;
 
+	// prototype dependencies
+
+	@Inject
+	Provider<HibernateInterceptor> hibernateInterceptorProvider;
+
 	// properties
 
 	@Getter @Setter
@@ -68,6 +74,7 @@ class HibernateDatabase
 	@Override
 	public
 	Transaction beginTransaction (
+			Object owner,
 			boolean readWrite,
 			boolean canJoin,
 			boolean canCreateNew,
@@ -76,16 +83,41 @@ class HibernateDatabase
 		ActiveTask activeTask =
 			activityManager.start (
 				"transaction",
+				owner,
 				ImmutableMap.<String,Object>builder ()
 					.build ());
+
+		try {
+
+			return beginTransactionReal (
+				activeTask,
+				readWrite,
+				canJoin,
+				canCreateNew,
+				makeCurrent);
+
+		} catch (RuntimeException exception) {
+
+			throw activeTask.fail (
+				exception);
+
+		}
+
+	}
+
+	Transaction beginTransactionReal (
+			ActiveTask activeTask,
+			boolean readWrite,
+			boolean canJoin,
+			boolean canCreateNew,
+			boolean makeCurrent) {
 
 		// check args
 
 		if (! canCreateNew && ! canJoin) {
 
-			throw activeTask.fail (
-				new IllegalArgumentException (
-					"Must specify one of canCreateNew or canJoin"));
+			throw new IllegalArgumentException (
+				"Must specify one of canCreateNew or canJoin");
 
 		}
 
@@ -95,17 +127,21 @@ class HibernateDatabase
 			currentTransactionStackLocal.get ();
 
 		HibernateTransaction currentTransaction =
-			currentTransactionStack.size () > 0 ?
-				currentTransactionStack.get (
+			currentTransactionStack.size () > 0
+				? currentTransactionStack.get (
 					currentTransactionStack.size () - 1)
 				: null;
 
 		// join an existing transaction
 
-		if (currentTransaction != null
-				&& canJoin
-				&& (! readWrite
-					|| ! currentTransaction.isReadWrite)) {
+		if (
+			currentTransaction != null
+			&& canJoin
+			&& (
+				! readWrite
+				|| ! currentTransaction.isReadWrite
+			)
+		) {
 
 			HibernateTransaction newTransaction =
 				new HibernateTransaction (
@@ -145,17 +181,18 @@ class HibernateDatabase
 
 		// throw an appropriate error
 
-		throw activeTask.fail (
-			new RuntimeException (
-				"Unable to begin transaction"));
+		throw new RuntimeException (
+			"Unable to begin transaction");
 
 	}
 
 	@Override
 	public
-	Transaction beginReadWrite () {
+	Transaction beginReadWrite (
+			Object owner) {
 
 		return beginTransaction (
+			owner,
 			true,
 			false,
 			true,
@@ -165,9 +202,11 @@ class HibernateDatabase
 
 	@Override
 	public
-	Transaction beginReadOnly () {
+	Transaction beginReadOnly (
+			Object owner) {
 
 		return beginTransaction (
+			owner,
 			false,
 			true,
 			true,
@@ -177,9 +216,11 @@ class HibernateDatabase
 
 	@Override
 	public
-	Transaction beginReadOnlyJoin () {
+	Transaction beginReadOnlyJoin (
+			Object owner) {
 
 		return beginTransaction (
+			owner,
 			false,
 			false,
 			true,
@@ -190,8 +231,10 @@ class HibernateDatabase
 	@Override
 	public
 	Transaction currentTransaction () {
+
 		return new TransactionView (
 			currentTransactionReal ());
+
 	}
 
 	private
@@ -286,10 +329,17 @@ class HibernateDatabase
 				stringFormat (
 					"BEGIN %d %s",
 					id,
-					isReadWrite ? "rw" : "ro"));
+					isReadWrite
+						? "rw"
+						: "ro"));
 
 			session =
-				sessionFactory.openSession ();
+				sessionFactory.withOptions ()
+
+				.interceptor (
+					hibernateInterceptorProvider.get ())
+
+				.openSession ();
 
 			hibernateTransaction =
 				session.beginTransaction ();
@@ -399,12 +449,33 @@ class HibernateDatabase
 
 				// always close the session
 
-				if (session != null)
-					session.close ();
+				try {
+
+					if (session != null) {
+						session.close ();
+					}
+
+				} catch (Exception exception) {
+
+					log.fatal (
+						"Error closing session",
+						exception);
+
+				}
 
 				// always close the active task
 
-				activeTask.close ();
+				try {
+
+					activeTask.close ();
+
+				} catch (Exception exception) {
+
+					log.fatal (
+						"Error closing active task",
+						exception);
+
+				}
 
 			}
 
@@ -415,13 +486,14 @@ class HibernateDatabase
 
 			if (closed) {
 
-				throw new RuntimeException (
+				throw new IllegalStateException (
 					"Transaction has been closed");
 
 			}
 
-			if (realTransaction != null)
+			if (realTransaction != null) {
 				return realTransaction.getSession ();
+			}
 
 			return session;
 
@@ -471,10 +543,19 @@ class HibernateDatabase
 		@Override
 		public
 		void refresh (
-				Object object) {
+				Object... objects) {
 
-			session.refresh (
-				object);
+			session.flush ();
+
+			for (
+				Object object
+					: objects
+			) {
+
+				session.refresh (
+					object);
+
+			}
 
 		}
 
@@ -522,16 +603,36 @@ class HibernateDatabase
 
 		}
 
+		@Override
+		public
+		boolean contains (
+				Object... objects) {
+
+			for (
+				Object object
+					: objects
+			) {
+
+				if (! session.contains (object)) {
+					return false;
+				}
+
+			}
+
+			return true;
+
+		}
+
 	}
 
 	@Override
 	public
 	void flush () {
 
-		Session sess =
+		Session session =
 			currentSession ();
 
-		sess.flush ();
+		session.flush ();
 
 	}
 
@@ -539,10 +640,10 @@ class HibernateDatabase
 	public
 	void clear () {
 
-		Session sess =
+		Session session =
 			currentSession ();
 
-		sess.clear ();
+		session.clear ();
 
 	}
 

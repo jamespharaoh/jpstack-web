@@ -30,4 +30,7 @@ interface ObjectHooks<RecordType extends Record<RecordType>> {
 			String name,
 			Object value);
 
+	void beforeUpdate (
+			RecordType object);
+
 }

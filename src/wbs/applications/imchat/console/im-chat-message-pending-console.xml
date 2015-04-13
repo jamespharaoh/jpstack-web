@@ -25,7 +25,7 @@
 		<code-field/>
 
 		<text-field
-		    name="email"/>
+			name="email"/>
 
 		<integer-field
 			name="numConversations"/>
@@ -46,8 +46,8 @@
 			finder="user"/>
 
 		<text-field
-		    name="messageText"
-		    label="Message"/>
+			name="messageText"
+			label="Message"/>
 
 		<timestamp-field
 			name="timestamp"/>

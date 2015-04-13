@@ -19,7 +19,6 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.CollectionField;
-import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MinorEntity;
 import wbs.framework.entity.annotations.ParentIdField;
@@ -61,9 +60,6 @@ class QueueRec
 
 	@TypeField
 	QueueTypeRec queueType;
-
-	@DescriptionField
-	String description;
 
 	// children
 
@@ -128,13 +124,16 @@ class QueueRec
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadOnly ();
+				database.beginReadOnly (
+					this);
 
 			List<ObjectTypeRec> objectTypes =
 				objectTypeDao.findAll ();
 
-			for (ObjectTypeRec objectType
-					: objectTypes) {
+			for (
+				ObjectTypeRec objectType
+					: objectTypes
+			) {
 
 				List<QueueTypeRec> queueTypes =
 					queueTypeDao.findByParentObjectType (
@@ -169,16 +168,27 @@ class QueueRec
 				queueTypeDao.findByParentObjectType (
 					parentType);
 
-			for (QueueTypeRec queueType
-					: queueTypes) {
+			for (
+				QueueTypeRec queueType
+					: queueTypes
+			) {
 
 				queueHelper.insert (
 					new QueueRec ()
-						.setQueueType (queueType)
-						.setCode (queueType.getCode ())
-						.setDescription (queueType.getDescription ())
-						.setParentObjectType (parentType)
-						.setParentObjectId (parent.getId ()));
+
+					.setQueueType (
+						queueType)
+
+					.setCode (
+						queueType.getCode ())
+
+					.setParentObjectType (
+						parentType)
+
+					.setParentObjectId (
+						parent.getId ())
+
+				);
 
 
 			}

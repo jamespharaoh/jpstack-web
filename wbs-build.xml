@@ -38,6 +38,10 @@
 			package="wbs.framework.sql"/>
 
 		<plugin
+			name="utils"
+			package="wbs.framework.utils"/>
+
+		<plugin
 			name="web"
 			package="wbs.framework.web"/>
 
@@ -134,10 +138,6 @@
 		<plugin
 			name="exception"
 			package="wbs.platform.exception"/>
-
-		<plugin
-			name="groovy"
-			package="wbs.platform.groovy"/>
 
 		<plugin
 			name="group"

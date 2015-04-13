@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.image.api;
 
-import static wbs.framework.utils.etc.Misc.generateTenCharacterToken;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -23,6 +22,7 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.api.mvc.ApiAction;
@@ -52,6 +52,9 @@ class ChatUserImageUploadPostAction
 	ExceptionLogic exceptionLogic;
 
 	@Inject
+	RandomLogic randomLogic;
+
+	@Inject
 	RequestContext requestContext;
 
 	// implementation
@@ -62,7 +65,8 @@ class ChatUserImageUploadPostAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatUserImageUploadTokenRec imageUploadToken =
 			chatUserImageUploadTokenHelper.findByToken (
@@ -144,7 +148,7 @@ class ChatUserImageUploadPostAction
 					String filename =
 						stringFormat (
 							"/tmp/%s",
-							generateTenCharacterToken ());
+							randomLogic.generateLowercase (10));
 
 					IOUtils.write (
 						fileItem.get (),
@@ -217,7 +221,8 @@ class ChatUserImageUploadPostAction
 
 			@Cleanup
 			Transaction errorTransaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// update token
 

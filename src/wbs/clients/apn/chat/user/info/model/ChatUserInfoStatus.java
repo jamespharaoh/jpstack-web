@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.user.info.model;
 
-public enum ChatUserInfoStatus {
+public
+enum ChatUserInfoStatus {
 
 	set,
 	autoEdited,

@@ -84,7 +84,8 @@ class ComshenApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			int routeId =
 				requestContext.requestInt ("routeId");

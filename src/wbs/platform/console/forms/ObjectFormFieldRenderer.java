@@ -94,7 +94,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 					interfaceValue,
 					root,
 					true,
-					link)));
+					link,
+					1)));
 
 	}
 
@@ -103,8 +104,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	void renderTableCellProperties (
 			PrintWriter out,
 			Container container,
-			Interface interfaceValue,
-			boolean link) {
+			Interface interfaceValue) {
 
 		// work out root
 
@@ -133,7 +133,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 					interfaceValue,
 					root,
 					true,
-					link)));
+					true,
+					1)));
 
 	}
 
@@ -142,8 +143,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	void renderTableRow (
 			PrintWriter out,
 			Container container,
-			Interface interfaceValue,
-			boolean link) {
+			Interface interfaceValue) {
 
 		out.print (
 			stringFormat (
@@ -154,8 +154,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		renderTableCellProperties (
 			out,
 			container,
-			interfaceValue,
-			link);
+			interfaceValue);
 
 		out.print (
 			stringFormat (
@@ -361,7 +360,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 	@Override
 	public
-	String interfaceToHtml (
+	String interfaceToHtmlSimple (
 			Container container,
 			Interface interfaceValue,
 			boolean link) {
@@ -390,7 +389,21 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			interfaceValue,
 			root,
 			true,
-			link);
+			link,
+			1);
+
+	}
+
+	@Override
+	public
+	String interfaceToHtmlComplex (
+			Container container,
+			Interface interfaceValue) {
+
+		return interfaceToHtmlSimple (
+			container,
+			interfaceValue,
+			true);
 
 	}
 

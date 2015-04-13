@@ -156,11 +156,8 @@ class ChatUserAdminNamePart
 					chatUserName.getEditReason ()),
 
 				"%s\n",
-				objectManager.tdForObject (
-					chatUserName.getModerator (),
-					null,
-					true,
-					true),
+				objectManager.tdForObjectMiniLink (
+					chatUserName.getModerator ()),
 
 				"</tr>\n");
 

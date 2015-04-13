@@ -65,8 +65,7 @@ class ScriptRefFormField
 	public
 	void renderTableCellProperties (
 			PrintWriter out,
-			Object object,
-			boolean link) {
+			Object object) {
 
 		throw new UnsupportedOperationException ();
 

@@ -41,6 +41,12 @@
 			<context-tab-action-page
 				name="bill"/>
 
+			<context-tab-form-action-page
+				name="location"
+				fields="location-form"
+				help-text="Set a new location for this chat user"
+				submit-label="set location"/>
+
 			<object-settings-page
 				short-name="other"
 				fields="settings"
@@ -52,6 +58,28 @@
 		</section>
 
 	</extend-context>
+
+	<field-set
+		name="location-form"
+		class="wbs.clients.apn.chat.user.admin.console.ChatUserAdminLocationFormActionHelper$ChatUserAdminLocationForm">
+
+		<text-field
+			name="currentLocationName"
+			read-only="yes"/>
+
+		<double-field
+			name="currentLocationLatitude"
+			read-only="yes"/>
+
+		<double-field
+			name="currentLocationLongitude"
+			read-only="yes"/>
+
+		<text-field
+			name="newLocationName"
+			nullable="yes"/>
+
+	</field-set>
 
 	<field-set
 		name="settings"

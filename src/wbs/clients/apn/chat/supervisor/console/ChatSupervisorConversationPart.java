@@ -158,18 +158,14 @@ class ChatSupervisorConversationPart
 			"<th>User number</th>\n",
 
 			"%s\n",
-			objectManager.tdForObject (
+			objectManager.tdForObjectMiniLink (
 				monitorChatUser,
-				chat,
-				true,
-				true),
+				chat),
 
 			"%s\n",
-			objectManager.tdForObject (
+			objectManager.tdForObjectMiniLink (
 				userChatUser,
-				chat,
-				true,
-				true),
+				chat),
 
 			"</tr>\n");
 
@@ -220,10 +216,10 @@ class ChatSupervisorConversationPart
 			"<th>Location</th>\n",
 
 			"<td>%h</td>\n",
-			monitorChatUser.getLocPlace (),
+			monitorChatUser.getLocationPlace (),
 
 			"<td>%h</td>\n",
-			userChatUser.getLocPlace (),
+			userChatUser.getLocationPlace (),
 
 			"</tr>\n");
 

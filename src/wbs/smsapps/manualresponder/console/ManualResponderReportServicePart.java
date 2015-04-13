@@ -275,8 +275,8 @@ class ManualResponderReportServicePart
 					services.indexOf (service)
 				).toString ());
 
-		    printFormat (
-			    "</tr>\n");
+			printFormat (
+				"</tr>\n");
 
 		}
 

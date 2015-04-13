@@ -15,6 +15,6 @@ class ImChatConversationStartRequest {
 	String sessionSecret;
 
 	@DataAttribute
-	Long profileId;
+	String profileCode;
 
 }

@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -145,7 +144,8 @@ class Misc {
 
 	}
 
-	public static Integer toInteger (
+	public static
+	Integer toInteger (
 			String string) {
 
 		if (string == null)
@@ -278,18 +278,32 @@ class Misc {
 				" ").trim();
 	}
 
-	public static RuntimeException rethrow(Throwable t) {
-		if (t instanceof Error)
-			throw (Error) t;
-		if (t instanceof RuntimeException)
-			throw (RuntimeException) t;
-		throw new RuntimeException(t);
+	public static
+	RuntimeException rethrow (
+			Throwable throwable) {
+
+		if (throwable instanceof Error) {
+			throw (Error) throwable;
+		}
+
+		if (throwable instanceof RuntimeException) {
+			throw (RuntimeException) throwable;
+		}
+
+		throw new RuntimeException (
+			throwable);
+
 	}
 
-	public static String implode(String glue,
+	public static
+	String implode (
+			String glue,
 			Collection<? extends Object> pieces) {
+
 		boolean first = true;
+
 		StringBuffer sb = new StringBuffer();
+
 		for (Object piece : pieces) {
 			if (first)
 				first = false;
@@ -413,6 +427,31 @@ class Misc {
 					left,
 					right))
 				return true;
+
+		}
+
+		return false;
+
+	}
+
+	public static
+	<Type>
+	boolean in (
+			Type left,
+			Collection<Type> rights) {
+
+		for (
+			Type right
+				: rights
+		) {
+
+			if (
+				equal (
+					left,
+					right)
+			) {
+				return true;
+			}
 
 		}
 
@@ -558,20 +597,6 @@ class Misc {
 
 		return Character.toLowerCase (string.charAt (0))
 			+ string.substring (1);
-
-	}
-
-	public static
-	void disallowNulls (
-			Object... objects) {
-
-		for (Object object
-				: objects) {
-
-			if (object == null)
-				throw new NullPointerException ();
-
-		}
 
 	}
 
@@ -1352,67 +1377,6 @@ class Misc {
 				(char) ('0' + index);
 
 		}
-
-	}
-
-	private static final
-	Random random =
-		new Random ();
-
-	public static
-	String genRandom (
-			char[] allSymbols,
-			int requiredLength) {
-
-		char[] buffer =
-			new char [requiredLength];
-
-		for (
-			int index = 0;
-			index < buffer.length;
-			index ++
-		) {
-
-			buffer [index] =
-				allSymbols [
-					random.nextInt (
-						allSymbols.length)];
-
-		}
-
-		return new String (
-			buffer);
-
-	}
-
-	public static
-	String generateTenCharacterToken () {
-
-		return genRandom (
-			lowercaseLetters,
-			10);
-
-	}
-
-	public static
-	String generateSixDigitCode () {
-
-		return genRandom (
-			digits,
-			6);
-
-	}
-
-	public static <Type>
-	Type pickRandom (
-			Random random,
-			Type[] options) {
-
-		int index =
-			random.nextInt (
-				options.length);
-
-		return options [index];
 
 	}
 

@@ -101,7 +101,8 @@ class ChatAffiliateKeywordsCreateAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatAffiliateRec chatAffiliate =
 			chatAffiliateHelper.find (

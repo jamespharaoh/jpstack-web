@@ -33,6 +33,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Qualifier;
 
+import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -44,6 +45,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import wbs.framework.application.context.EasyReadWriteLock.HeldLock;
 import wbs.framework.application.context.InjectedProperty.CollectionType;
 import wbs.framework.application.xml.BeansBeanSpec;
 import wbs.framework.application.xml.BeansPropertiesPropertySpec;
@@ -120,11 +122,18 @@ class ApplicationContext {
 	List<String> requestBeanNames =
 		new ArrayList<String> ();
 
-	public synchronized
+	EasyReadWriteLock lock =
+		EasyReadWriteLock.instantiate ();
+
+	public
 	<BeanType>
 	BeanType getBean (
 			String beanName,
 			Class<BeanType> beanClass) {
+
+		@Cleanup
+		HeldLock heldLock =
+			lock.read ();
 
 		BeanDefinition beanDefinition =
 			beanDefinitionsByName.get (beanName);
@@ -143,11 +152,15 @@ class ApplicationContext {
 
 	}
 
-	public synchronized
+	public
 	<BeanType>
 	Provider<BeanType> getBeanProvider (
 			String beanName,
 			Class<BeanType> beanClass) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		BeanDefinition beanDefinition =
 			beanDefinitionsByName.get (beanName);
@@ -185,8 +198,12 @@ class ApplicationContext {
 
 	}
 
-	public synchronized
+	public
 	Map<String,Object> getAllSingletonBeans () {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		Map<String,Object> map =
 			new HashMap<String,Object> ();
@@ -209,9 +226,13 @@ class ApplicationContext {
 
 	}
 
-	public synchronized
+	public
 	List<BeanDefinition> getBeanDefinitionsWithAnnotation (
 			Class<? extends Annotation> annotationClass) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		ImmutableList.Builder<BeanDefinition>
 			beanDefinitionsWithAnnotationBuilder =
@@ -237,9 +258,13 @@ class ApplicationContext {
 
 	}
 
-	private synchronized
+	private
 	Object getBean (
 			BeanDefinition beanDefinition) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		if (equal (
 				beanDefinition.scope (),
@@ -326,9 +351,13 @@ class ApplicationContext {
 	}
 
 	@SneakyThrows (Exception.class)
-	public synchronized
+	public
 	Object instantiateBean (
 			BeanDefinition beanDefinition) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		log.debug (
 			stringFormat (
@@ -415,10 +444,14 @@ class ApplicationContext {
 
 	}
 
-	private synchronized
+	private
 	void setBeanValueProperties (
 			BeanDefinition beanDefinition,
 			Object bean) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		for (
 			Map.Entry<String,Object> entry
@@ -440,10 +473,14 @@ class ApplicationContext {
 
 	}
 
-	private synchronized
+	private
 	void setBeanReferenceProperties (
 			BeanDefinition beanDefinition,
 			Object bean) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		for (
 			Map.Entry<String,String> entry
@@ -470,11 +507,15 @@ class ApplicationContext {
 
 	}
 
-	private synchronized
+	private
 	void setBeanInjectedProperties (
 			BeanDefinition beanDefinition,
 			Object bean)
 		throws Exception {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		for (InjectedProperty injectedProperty
 				: beanDefinition.injectedProperties ()) {
@@ -628,9 +669,13 @@ class ApplicationContext {
 
 	}
 
-	public synchronized
+	public
 	ApplicationContext registerBeanDefinition (
 			BeanDefinition beanDefinition) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.write ();
 
 		// sanity check
 
@@ -866,6 +911,10 @@ class ApplicationContext {
 			Set<Class<?>> beanClasses,
 			BeanDefinition beanDefinition) {
 
+		@Cleanup
+		HeldLock heldlock =
+			lock.write ();
+
 		for (
 			Class<?> beanClass
 				: beanClasses
@@ -898,6 +947,10 @@ class ApplicationContext {
 			Annotation annotation,
 			BeanDefinition beanDefinition) {
 
+		@Cleanup
+		HeldLock heldlock =
+			lock.write ();
+
 		List<BeanDefinition> beanDefinitionsForQualifier =
 			index.get (annotation);
 
@@ -915,8 +968,12 @@ class ApplicationContext {
 
 	}
 
-	public synchronized
+	public
 	ApplicationContext init () {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.write ();
 
 		int errors = 0;
 
@@ -1094,9 +1151,13 @@ class ApplicationContext {
 
 	}
 
-	public synchronized
+	public
 	int initBeanDefinition (
 			BeanDefinition beanDefinition) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		int errors = 0;
 
@@ -1197,11 +1258,15 @@ class ApplicationContext {
 
 	}
 
-	private synchronized
+	private
 	int initInjectedFieldByName (
 			BeanDefinition beanDefinition,
 			Named namedAnnotation,
 			Field field) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		// TODO merge this
 
@@ -1253,11 +1318,15 @@ class ApplicationContext {
 
 	}
 
-	private synchronized
+	private
 	int initInjectedPropertyField (
 			BeanDefinition beanDefinition,
 			Field field,
 			InjectedProperty injectedProperty) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		Type fieldType =
 			field.getGenericType ();
@@ -1398,11 +1467,15 @@ class ApplicationContext {
 
 	}
 
-	private synchronized
+	private
 	int initInjectedPropertyTargetByClass (
 			BeanDefinition beanDefinition,
 			Field field,
 			InjectedProperty injectedProperty) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		// lookup target beans
 
@@ -1486,11 +1559,15 @@ class ApplicationContext {
 
 	}
 
-	private synchronized
+	private
 	int initInjectedPropertyTargetByQualifier (
 			BeanDefinition beanDefinition,
 			Annotation qualifier,
 			InjectedProperty injectedProperty) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		// lookup target beans
 
@@ -1569,9 +1646,13 @@ class ApplicationContext {
 
 	}
 
-	public synchronized
+	public
 	void outputBeanDefinitions (
 			String outputPath) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		try {
 
@@ -1620,10 +1701,14 @@ class ApplicationContext {
 
 	}
 
-	public synchronized
+	public
 	ApplicationContext registerSingleton (
 			String beanName,
 			Object object) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.write ();
 
 		registerBeanDefinition (
 			new BeanDefinition ()
@@ -1648,9 +1733,13 @@ class ApplicationContext {
 
 	}
 
-	public synchronized
+	public
 	ApplicationContext registerXmlClasspath (
 			String classpath) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.write ();
 
 		DataFromXml dataFromXml =
 			new DataFromXml ()
@@ -1686,9 +1775,13 @@ class ApplicationContext {
 
 	}
 
-	public synchronized
+	public
 	ApplicationContext registerXmlFilename (
 			String filename) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.write ();
 
 		DataFromXml dataFromXml =
 			new DataFromXml ()
@@ -1722,8 +1815,12 @@ class ApplicationContext {
 
 	}
 
-	public synchronized
+	public
 	ApplicationContext close () {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.write ();
 
 		// TODO
 
@@ -1734,6 +1831,10 @@ class ApplicationContext {
 	public
 	Provider<?> getBeanProvider (
 			final BeanDefinition beanDefinition) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		return new Provider<Object> () {
 
@@ -1748,10 +1849,14 @@ class ApplicationContext {
 	}
 
 	@SneakyThrows (Exception.class)
-	public synchronized
+	public
 	<BeanType>
 	BeanType injectDependencies (
 			BeanType bean) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
 
 		BeanDefinition beanDefinition =
 			new BeanDefinition ()

@@ -44,7 +44,8 @@ class ChatInfoSiteRespondAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatInfoSiteRec infoSite =
 			chatInfoSiteHelper.find (

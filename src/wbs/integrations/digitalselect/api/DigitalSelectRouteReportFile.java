@@ -89,7 +89,8 @@ class DigitalSelectRouteReportFile
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		DigitalSelectRouteOutRec digitalSelectRouteOut =
 			digitalSelectRouteOutHelper.find (

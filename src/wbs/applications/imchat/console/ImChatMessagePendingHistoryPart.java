@@ -135,8 +135,8 @@ class ImChatMessagePendingHistoryPart
 				message,
 				true);
 
-		    printFormat (
-			    "</tr>\n");
+			printFormat (
+				"</tr>\n");
 
 		}
 
@@ -162,8 +162,7 @@ class ImChatMessagePendingHistoryPart
 		formFieldLogic.outputTableRows (
 			out,
 			customerFields,
-			imChatCustomer,
-			true);
+			imChatCustomer);
 
 		printFormat (
 			"</table>\n");

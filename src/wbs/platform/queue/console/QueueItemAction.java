@@ -44,7 +44,8 @@ class QueueItemAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		QueueItemRec queueItem =
 			queueItemHelper.find (queueItemId);

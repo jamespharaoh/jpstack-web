@@ -111,7 +111,8 @@ class Oxygen8InboundMmsAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		processRequestHeaders ();
 		processRequestBody ();

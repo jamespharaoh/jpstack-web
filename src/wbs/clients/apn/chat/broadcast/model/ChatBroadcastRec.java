@@ -1,9 +1,7 @@
 package wbs.clients.apn.chat.broadcast.model;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,6 +9,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.joda.time.Instant;
 
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -18,7 +17,6 @@ import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
-import wbs.framework.entity.annotations.LinkField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
@@ -26,8 +24,6 @@ import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.model.UserRec;
-import wbs.sms.message.batch.model.BatchRec;
-import wbs.sms.number.core.model.NumberRec;
 
 @Accessors (chain = true)
 @Data
@@ -38,17 +34,19 @@ public
 class ChatBroadcastRec
 	implements CommonRecord<ChatBroadcastRec> {
 
+	// id
+
 	@GeneratedIdField
 	Integer id;
+
+	// identity
 
 	@ParentField
 	ChatRec chat;
 
-	@ReferenceField
-	UserRec user;
+	// TODO index
 
-	@SimpleField
-	Date timestamp;
+	// details
 
 	@ReferenceField
 	ChatUserRec chatUser;
@@ -56,16 +54,57 @@ class ChatBroadcastRec
 	@ReferenceField
 	TextRec text;
 
-	@ReferenceField
-	BatchRec batch;
+	// state
 
 	@SimpleField
-	Integer numberCount;
+	ChatBroadcastState state =
+		ChatBroadcastState.unsent;
 
-	@LinkField (
-		table = "chat_broadcast_number")
-	Set<NumberRec> numbers =
-		new HashSet<NumberRec> ();
+	// various timestamps
+
+	@SimpleField
+	Instant createdTime;
+
+	@SimpleField (
+		nullable = true)
+	Instant scheduledTime;
+
+	@SimpleField (
+		nullable = true)
+	Instant sentTime;
+
+	@SimpleField (
+		nullable = true)
+	Instant cancelledTime;
+
+	// various involved users
+
+	@ReferenceField
+	UserRec createdUser;
+
+	@ReferenceField (
+		nullable = true)
+	UserRec sentUser;
+
+	@ReferenceField (
+		nullable = true)
+	UserRec cancelledUser;
+
+	// statistics about numbers
+
+	@SimpleField
+	Integer numRemoved = 0;
+
+	@SimpleField
+	Integer numAccepted = 0;
+
+	@SimpleField
+	Integer numRejected = 0;
+
+	@SimpleField
+	Integer numSent = 0;
+
+	// search details
 
 	@SimpleField
 	Boolean search;
@@ -113,8 +152,8 @@ class ChatBroadcastRec
 		return new CompareToBuilder ()
 
 			.append (
-				other.getTimestamp (),
-				getTimestamp ())
+				other.getCreatedTime (),
+				getCreatedTime ())
 
 			.append (
 				other.getId (),
@@ -133,6 +172,11 @@ class ChatBroadcastRec
 				ChatRec chat,
 				int firstResult,
 				int maxResults);
+
+		List<ChatBroadcastRec> findSending ();
+
+		List<ChatBroadcastRec> findScheduled (
+				Instant now);
 
 	}
 

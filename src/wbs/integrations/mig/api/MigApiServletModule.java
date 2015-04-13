@@ -28,7 +28,6 @@ import wbs.integrations.mig.logic.MigLogic;
 import wbs.integrations.mig.model.MigRouteInObjectHelper;
 import wbs.integrations.mig.model.MigRouteInRec;
 import wbs.platform.exception.logic.ExceptionLogic;
-import wbs.platform.exception.logic.ExceptionLogicImpl;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
@@ -106,7 +105,8 @@ class MigApiServletModule
 			new StringBuilder ();
 
 		stringBuilder.append (
-			ExceptionLogicImpl.throwableDump (throwable));
+			exceptionLogic.throwableDump (
+				throwable));
 
 		stringBuilder.append (
 			"\n\nHTTP INFO\n\n");
@@ -163,7 +163,8 @@ class MigApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			try {
 
@@ -240,13 +241,14 @@ class MigApiServletModule
 
 				log.debug ("Response 000 " + message.getId ());
 
-			} catch (Exception e) {
+			} catch (Exception exception) {
 
 				exceptionLogic.logSimple (
 					"webapi",
 					requestContext.requestUri (),
-					ExceptionLogicImpl.throwableSummary (e),
-					getException (e, requestContext),
+					exceptionLogic.throwableSummary (
+						exception),
+					getException (exception, requestContext),
 					Optional.<Integer>absent (),
 					false);
 
@@ -287,7 +289,8 @@ class MigApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			try {
 
@@ -455,7 +458,8 @@ class MigApiServletModule
 				exceptionLogic.logSimple (
 					"webapi",
 					requestContext.requestUri (),
-					ExceptionLogicImpl.throwableSummary (exception),
+					exceptionLogic.throwableSummary (
+						exception),
 					getException (
 						exception,
 						requestContext),

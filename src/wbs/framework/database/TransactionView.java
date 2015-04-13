@@ -51,10 +51,10 @@ class TransactionView
 	@Override
 	public
 	void refresh (
-			Object object) {
+			Object... objects) {
 
 		realTransaction.refresh (
-			object);
+			objects);
 
 	}
 
@@ -86,6 +86,16 @@ class TransactionView
 			Object... objects) {
 
 		realTransaction.fetch (
+			objects);
+
+	}
+
+	@Override
+	public
+	boolean contains (
+			Object... objects) {
+
+		return realTransaction.contains (
 			objects);
 
 	}

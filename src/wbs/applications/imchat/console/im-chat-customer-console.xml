@@ -85,6 +85,21 @@
 
 		<code-field/>
 
+		<text-field
+			name="email"/>
+
+		<integer-field
+			name="numConversations"
+			label="Convs"/>
+
+		<integer-field
+			name="numPurchases"
+			label="Purchs"/>
+
+		<currency-field
+			name="balance"
+			currency="imChat.currency"/>
+
 	</field-set>
 
 	<field-set
@@ -94,6 +109,19 @@
 		<id-field/>
 		<parent-field/>
 		<code-field/>
+
+		<text-field
+			name="email"/>
+
+		<integer-field
+			name="numConversations"/>
+
+		<integer-field
+			name="numPurchases"/>
+
+		<currency-field
+			name="balance"
+			currency="imChat.currency"/>
 
 	</field-set>
 

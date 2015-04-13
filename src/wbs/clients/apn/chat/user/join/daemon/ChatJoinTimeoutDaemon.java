@@ -77,10 +77,13 @@ class ChatJoinTimeoutDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
-		for (ChatRec chat
-				: chatHelper.findAll ()) {
+		for (
+			ChatRec chat
+				: chatHelper.findAll ()
+		) {
 
 			Instant createdTime =
 				DateTime.now ()
@@ -93,8 +96,10 @@ class ChatJoinTimeoutDaemon
 					chat,
 					createdTime);
 
-			for (ChatMessageRec message
-					: messages) {
+			for (
+				ChatMessageRec message
+					: messages
+			) {
 
 				message.setStatus (
 					ChatMessageStatus.signupTimeout);

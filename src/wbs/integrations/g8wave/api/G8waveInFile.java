@@ -69,7 +69,8 @@ class G8waveInFile
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// get request stuff
 

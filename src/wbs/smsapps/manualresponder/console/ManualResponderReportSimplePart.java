@@ -172,12 +172,12 @@ class ManualResponderReportSimplePart
 				"<tr>\n");
 				formFieldLogic.outputTableCellsList (
 					out,
-			        resultsFormFieldSet,
-			        report,
+					resultsFormFieldSet,
+					report,
 				   true);
 
-		    printFormat (
-			    "</tr>\n");
+			printFormat (
+				"</tr>\n");
 
 		}
 

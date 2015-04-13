@@ -6,20 +6,12 @@
   <classpathentry kind="lib" path="binaries/libraries/ant-jar-1.9.2.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/ant-source-1.9.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/ant-launcher-jar-1.9.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/antlr-jar-2.7.7.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/asm-analysis-jar-4.0.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/asm-commons-jar-4.0.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/asm-jar-4.0.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/asm-tree-jar-4.0.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/asm-util-jar-4.0.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/commons-cli-jar-1.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/commons-codec-jar-1.6.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/commons-fileupload-jar-1.3.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/commons-fileupload-source-1.3.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/commons-io-jar-2.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/commons-lang3-jar-3.2.1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/commons-lang3-source-3.2.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/commons-logging-jar-1.1.3.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/dom4j-jar-1.6.1.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/gpars-jar-1.0.0.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/groovy-jar-2.1.8.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/groovy-source-2.1.8.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/gson-jar-2.2.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/guava-bundle-16.0.1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/guava-source-16.0.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/hamcrest-core-jar-1.1.jar"/>
@@ -30,8 +22,6 @@
   <classpathentry kind="lib" path="binaries/libraries/httpclient-jar-4.3.1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/httpclient-source-4.3.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/httpcore-jar-4.3.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/httpmime-jar-4.3.1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/httpmime-source-4.3.1.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/ivy-jar-2.2.0.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/jansi-jar-1.6.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/javassist-jar-3.12.1.GA.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/javassist-source-3.12.1.GA.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/javassist-jar-3.15.0-GA.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/javax.inject-jar-1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/javax.inject-source-1.jar"/>
@@ -41,17 +31,15 @@
   <classpathentry kind="lib" path="binaries/libraries/jboss-logging-jar-3.1.0.GA.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/jboss-transaction-api_1.1_spec-jar-1.0.1.Final.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/jboss-transaction-api_1.1_spec-source-1.0.1.Final.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/jdom-jar-1.0.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/jline-jar-1.0.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/joda-convert-jar-1.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/joda-time-jar-2.3.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/joda-time-source-2.3.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/json-simple-bundle-1.1.1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/json-simple-source-1.1.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/jsoup-jar-1.5.2.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/jsr166y-jar-1.7.0.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/jsr305-jar-1.3.9.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/jta-jar-1.1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/jta-source-1.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/junit-jar-4.10.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/log4j-bundle-1.2.17.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/log4j-source-1.2.17.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/lombok-jar-1.12.2.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/lombok-source-1.12.2.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/lombok-jar-1.16.2.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/lombok-source-1.16.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/mail-jar-1.4.3.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/merchantsdk-jar-2.13.117.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/merchantsdk-source-2.13.117.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/paypal-core-jar-1.6.6.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/paypal-core-source-1.6.6.jar"/>
@@ -66,9 +54,7 @@
   <classpathentry kind="lib" path="binaries/libraries/xalan-jar-2.7.0.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/xercesImpl-jar-2.6.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/xmlParserAPIs-jar-2.6.2.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/xmlpull-jar-1.1.3.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/xom-jar-1.1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/xom-source-1.1.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/xstream-jar-1.4.2.jar"/>
   <classpathentry kind="src" path="work/eclipse/generated">
     <attributes>
       <attribute name="optional" value="true"/>

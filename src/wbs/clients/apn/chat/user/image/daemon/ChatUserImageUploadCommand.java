@@ -21,7 +21,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.etc.Misc;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -71,6 +71,9 @@ class ChatUserImageUploadCommand
 
 	@Inject
 	ObjectManager objectManager;
+
+	@Inject
+	RandomLogic randomLogic;
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
@@ -136,7 +139,7 @@ class ChatUserImageUploadCommand
 		// generate token and url
 
 		String token =
-			Misc.generateTenCharacterToken ();
+			randomLogic.generateLowercase (10);
 
 		String url =
 			stringFormat (

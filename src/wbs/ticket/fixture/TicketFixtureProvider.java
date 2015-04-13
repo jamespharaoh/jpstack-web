@@ -5,9 +5,10 @@ import javax.inject.Inject;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuObjectHelper;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemObjectHelper;
+import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.ticket.model.TicketFieldTypeObjectHelper;
@@ -32,7 +33,7 @@ public class TicketFixtureProvider
 	MenuGroupObjectHelper menuGroupHelper;
 	
 	@Inject
-	MenuObjectHelper menuHelper;
+	MenuItemObjectHelper menuHelper;
 	
 	@Inject
 	TicketManagerObjectHelper ticketManagerHelper;
@@ -55,6 +56,9 @@ public class TicketFixtureProvider
 	@Inject
 	SliceObjectHelper sliceHelper;
 	
+	@Inject
+	RandomLogic randomLogic;
+	
 	// implementation
 	
 	@Override
@@ -62,21 +66,34 @@ public class TicketFixtureProvider
 	void createFixtures () {
 	
 		menuHelper.insert (
-			new MenuRec ()
+			new MenuItemRec ()
 	
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
 					GlobalId.root,
+					"test",
 					"facility"))
 	
 			.setCode (
 				"ticket_manager")
+				
+			.setName (
+				"Ticket Manager Chat")
+
+			.setDescription (
+				"Ticket manager description")
 	
 			.setLabel (
 				"Ticket Manager")
 	
-			.setPath (
+			.setTargetPath (
 				"/ticketManagers")
+				
+			.setLabel (
+				"Ticket Manager")
+
+			.setTargetFrame (
+				"main")
 	
 		);
 	
@@ -90,7 +107,13 @@ public class TicketFixtureProvider
 					"test"))
 	
 			.setCode (
-					ticketManagerHelper.generateCode ())
+				"ticket_manager")
+			
+			.setName (
+				"My ticket manager")
+			
+			.setDescription (
+				"Ticket manager description")
 	
 		);
 		
@@ -102,7 +125,7 @@ public class TicketFixtureProvider
 				ticketManager)
 	
 			.setCode (
-				ticketHelper.generateCode ())
+				randomLogic.generateNumericNoZero (8))
 	
 		);
 		
@@ -114,7 +137,7 @@ public class TicketFixtureProvider
 						ticketManager)
 			
 					.setCode (
-						ticketFieldTypeHelper.generateCode ())
+						randomLogic.generateNumericNoZero (8))
 						
 					.setName("Read")
 					
@@ -132,7 +155,7 @@ public class TicketFixtureProvider
 					ticketManager)
 		
 				.setCode (
-					ticketFieldTypeHelper.generateCode ())
+					randomLogic.generateNumericNoZero (8))
 					
 				.setName("Number")
 				
@@ -150,7 +173,7 @@ public class TicketFixtureProvider
 					ticketManager)
 		
 				.setCode (
-					ticketFieldTypeHelper.generateCode ())
+					randomLogic.generateNumericNoZero (8))
 					
 				.setName("Text")
 				

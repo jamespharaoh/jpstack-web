@@ -93,7 +93,8 @@ class ImChatMessageSendAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ImChatRec imChat =
 			imChatHelper.find (
@@ -139,8 +140,9 @@ class ImChatMessageSendAction
 		// lookup converation
 
 		ImChatConversationRec conversation =
-			imChatConversationHelper.find (
-				messageSendRequest.conversationId ());
+			imChatConversationHelper.findByIndex (
+				customer,
+				messageSendRequest.conversationIndex ());
 
 		if (conversation.getImChatCustomer () != customer)
 			throw new RuntimeException ();

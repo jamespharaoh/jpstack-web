@@ -1,12 +1,10 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
-import static wbs.framework.utils.etc.Misc.pickRandom;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -22,6 +20,7 @@ import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
 import wbs.platform.exception.logic.ExceptionLogic;
 
@@ -48,7 +47,7 @@ class ChatMonitorSwapDaemon
 	ExceptionLogic exceptionLogic;
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
 
 	// details
 
@@ -86,7 +85,8 @@ class ChatMonitorSwapDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		List<ChatRec> chats =
 			chatHelper.findAll ();
@@ -108,11 +108,9 @@ class ChatMonitorSwapDaemon
 
 				doMonitorSwap (
 					chat.getId (),
-					pickRandom (
-						random,
+					randomLogic.sample (
 						Gender.values ()),
-					pickRandom (
-						random,
+					randomLogic.sample (
 						Orient.values ()));
 
 			}
@@ -157,7 +155,8 @@ class ChatMonitorSwapDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatRec chat =
 			chatHelper.find (
@@ -185,8 +184,10 @@ class ChatMonitorSwapDaemon
 		List<ChatUserRec> offlineMonitors =
 			new ArrayList<ChatUserRec> ();
 
-		for (ChatUserRec monitor
-				: allMonitors) {
+		for (
+			ChatUserRec monitor
+				: allMonitors
+		) {
 
 			if (monitor.getOnline ()) {
 
@@ -209,8 +210,8 @@ class ChatMonitorSwapDaemon
 		// pick a random monitor to take offline
 
 		ChatUserRec monitor =
-			onlineMonitors.get (
-				random.nextInt (onlineMonitors.size ()));
+			randomLogic.sample (
+				onlineMonitors);
 
 		monitor
 
@@ -223,9 +224,8 @@ class ChatMonitorSwapDaemon
 		// pick a random monitor to bring online
 
 		monitor =
-			offlineMonitors.get (
-				random.nextInt (
-					offlineMonitors.size ()));
+			randomLogic.sample (
+				offlineMonitors);
 
 		monitor
 

@@ -18,7 +18,8 @@ class WbsConnectionProvider
 	ThreadLocal<DataSource> dataSourceThreadLocal =
 		new ThreadLocal<DataSource> ();
 
-	public WbsConnectionProvider () {
+	public
+	WbsConnectionProvider () {
 
 		dataSource =
 			dataSourceThreadLocal.get ();
@@ -27,7 +28,8 @@ class WbsConnectionProvider
 
 	}
 
-	public static void setDataSource (
+	public static
+	void setDataSource (
 			DataSource dataSource) {
 
 		if (dataSourceThreadLocal.get () != null)
@@ -40,7 +42,8 @@ class WbsConnectionProvider
 
 	@Override
 	@SuppressWarnings ("rawtypes")
-	public boolean isUnwrappableAs (
+	public
+	boolean isUnwrappableAs (
 			Class clazz) {
 
 		return false;
@@ -48,7 +51,8 @@ class WbsConnectionProvider
 	}
 
 	@Override
-	public <T> T unwrap (
+	public <T>
+	T unwrap (
 			Class<T> arg0) {
 
 		throw new UnsupportedOperationException ();

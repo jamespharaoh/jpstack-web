@@ -87,7 +87,8 @@ class GenericSendDaemon<
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		log ().debug (
 			stringFormat (
@@ -133,7 +134,8 @@ class GenericSendDaemon<
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		Job job =
 			helper ().jobHelper ().find (

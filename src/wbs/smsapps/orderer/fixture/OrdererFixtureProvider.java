@@ -6,9 +6,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuGroupRec;
-import wbs.platform.menu.model.MenuObjectHelper;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemObjectHelper;
+import wbs.platform.menu.model.MenuItemRec;
 
 @PrototypeComponent ("ordererFixtureProvider")
 public
@@ -21,7 +20,7 @@ class OrdererFixtureProvider
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@Inject
-	MenuObjectHelper menuHelper;
+	MenuItemObjectHelper menuItemHelper;
 
 	// implementation
 
@@ -29,25 +28,32 @@ class OrdererFixtureProvider
 	public
 	void createFixtures () {
 
-		MenuGroupRec facilityMenuGroup =
-			menuGroupHelper.findByCode (
-				GlobalId.root,
-				"facility");
-
-		menuHelper.insert (
-			new MenuRec ()
+		menuItemHelper.insert (
+			new MenuItemRec ()
 
 			.setMenuGroup (
-				facilityMenuGroup)
+				menuGroupHelper.findByCode (
+					GlobalId.root,
+					"test",
+					"facility"))
 
 			.setCode (
 				"orderer")
 
+			.setName (
+				"Orderer")
+
+			.setDescription (
+				"Place order by SMS service")
+
 			.setLabel (
 				"Orderer")
 
-			.setPath (
+			.setTargetPath (
 				"/orderers")
+
+			.setTargetFrame (
+				"main")
 
 		);
 

@@ -7,6 +7,7 @@ import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;
 import wbs.applications.imchat.model.ImChatPricePointRec;
 import wbs.applications.imchat.model.ImChatProfileRec;
+import wbs.applications.imchat.model.ImChatPurchaseRec;
 import wbs.applications.imchat.model.ImChatRec;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -33,8 +34,8 @@ class ImChatApiLogicImplementation
 
 		return new ImChatPricePointData ()
 
-			.id (
-				pricePoint.getId ())
+			.code (
+				pricePoint.getCode ())
 
 			.name (
 				pricePoint.getName ())
@@ -58,8 +59,8 @@ class ImChatApiLogicImplementation
 
 		return new ImChatProfileData ()
 
-			.id (
-				profile.getId ())
+			.code (
+				profile.getCode ())
 
 			.name (
 				profile.getPublicName ())
@@ -79,11 +80,11 @@ class ImChatApiLogicImplementation
 
 		return new ImChatCustomerData ()
 
-			.id (
-				customer.getId ())
-
 			.code (
 				customer.getCode ())
+
+			.email (
+				customer.getEmail ())
 
 			.balance (
 				customer.getBalance ());
@@ -97,8 +98,12 @@ class ImChatApiLogicImplementation
 
 		return new ImChatConversationData ()
 
-			.id (
-				conversation.getId ());
+			.index (
+				conversation.getIndex ())
+
+			.profile (
+				profileData (
+					conversation.getImChatProfile ()));
 
 	}
 
@@ -109,14 +114,37 @@ class ImChatApiLogicImplementation
 
 		return new ImChatMessageData ()
 
-			.id (
-				message.getId ())
-
 			.index (
 				message.getIndex ())
 
+			.sender (
+				message.getSenderUser () != null
+					? "operator"
+					: "customer")
+
 			.messageText (
-				message.getMessageText ());
+				message.getMessageText ())
+
+			.timestamp (
+				message.getTimestamp ().getMillis ());
+
+	}
+
+	@Override
+	public
+	ImChatPurchaseData purchaseData (
+			ImChatPurchaseRec purchase) {
+
+		return new ImChatPurchaseData ()
+
+			.token (
+				purchase.getToken ())
+
+			.price (
+				purchase.getPrice ())
+
+			.value (
+				purchase.getValue ());
 
 	}
 

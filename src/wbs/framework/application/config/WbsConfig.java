@@ -46,6 +46,26 @@ class WbsConfig {
 		required = true)
 	String defaultSlice;
 
+	@DataAttribute (
+		required = true)
+	String smtpHostname;
+
+	@DataAttribute (
+		required = true)
+	Integer smtpPort;
+
+	@DataAttribute (
+		required = true)
+	String smtpUsername;
+
+	@DataAttribute (
+		required = true)
+	String smtpPassword;
+
+	@DataAttribute (
+		required = true)
+	String defaultEmailAddress;
+
 	// implementation
 
 	public static

@@ -30,13 +30,6 @@
 			name="commons-lang3"
 			rev="3.2.1"/>
 
-		<!-- groovy -->
-
-		<dependency
-			org="org.codehaus.groovy"
-			name="groovy"
-			rev="2.1.8"/>
-
 		<!-- guava -->
 
 		<dependency
@@ -149,7 +142,7 @@
 		<dependency
 			org="org.projectlombok"
 			name="lombok"
-			rev="1.12.2"/>
+			rev="1.16.2"/>
 
 		<!-- paypal -->
 

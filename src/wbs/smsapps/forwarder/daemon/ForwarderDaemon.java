@@ -74,7 +74,8 @@ class ForwarderDaemon
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadOnly ();
+				database.beginReadOnly (
+					this);
 
 			// get the list
 
@@ -412,7 +413,8 @@ class ForwarderDaemon
 
 					@Cleanup
 					Transaction transaction =
-						database.beginReadWrite ();
+						database.beginReadWrite (
+							this);
 
 					forwarderMessageIn =
 						forwarderMessageInHelper.find (
@@ -433,7 +435,8 @@ class ForwarderDaemon
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			doResult (
 				forwarderMessageIn.getId (),

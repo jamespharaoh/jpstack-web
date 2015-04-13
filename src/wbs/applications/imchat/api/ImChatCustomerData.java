@@ -12,10 +12,10 @@ public
 class ImChatCustomerData {
 
 	@DataAttribute
-	Integer id;
+	String code;
 
 	@DataAttribute
-	String code;
+	String email;
 
 	@DataAttribute
 	Integer balance;

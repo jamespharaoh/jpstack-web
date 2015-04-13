@@ -53,6 +53,8 @@ public
 class ChatUserPendingFormAction
 	extends ConsoleAction {
 
+	// dependencies
+
 	@Inject
 	ChatHelpLogLogic chatHelpLogLogic;
 
@@ -92,13 +94,16 @@ class ChatUserPendingFormAction
 	@Inject
 	UserObjectHelper userHelper;
 
+	// details
+
 	@Override
 	protected
 	Responder backupResponder () {
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (
@@ -109,14 +114,16 @@ class ChatUserPendingFormAction
 
 	}
 
+	// implementation
+
 	@Override
 	protected
 	Responder goReal () {
 
 		// delegate appropriately
 
-		if (requestContext.parameter ("unqueue") != null)
-			return goUnqueue ();
+		if (requestContext.parameter ("chatUserDismiss") != null)
+			return goDismiss ();
 
 		if (requestContext.parameter ("chatUserNameApprove") != null)
 			return goApproveName ();
@@ -148,16 +155,18 @@ class ChatUserPendingFormAction
 		if (requestContext.parameter ("chatUserAudioReject") != null)
 			return goRejectImage (PendingMode.audio);
 
-		throw new RuntimeException("Invalid parameters");
+		throw new RuntimeException (
+			"Invalid parameters");
 
 	}
 
 	private
-	Responder goUnqueue () {
+	Responder goDismiss () {
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (
@@ -183,7 +192,8 @@ class ChatUserPendingFormAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// get database objects
 
@@ -274,7 +284,8 @@ class ChatUserPendingFormAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// get database objects
 
@@ -371,7 +382,8 @@ class ChatUserPendingFormAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// get database objects
 
@@ -512,7 +524,8 @@ class ChatUserPendingFormAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// get database objects
 
@@ -606,7 +619,8 @@ class ChatUserPendingFormAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// get database objects
 
@@ -798,7 +812,8 @@ class ChatUserPendingFormAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (

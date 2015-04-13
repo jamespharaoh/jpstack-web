@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.core.logic;
 
-import lombok.Delegate;
+import lombok.experimental.Delegate;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.hooks.logic.HooksProxyImpl;
 

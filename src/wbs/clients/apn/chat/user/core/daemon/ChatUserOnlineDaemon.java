@@ -93,7 +93,8 @@ class ChatUserOnlineDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		List<ChatUserRec> onlineUsers =
 			chatUserHelper.findOnline (
@@ -119,7 +120,8 @@ class ChatUserOnlineDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (chatUserId);

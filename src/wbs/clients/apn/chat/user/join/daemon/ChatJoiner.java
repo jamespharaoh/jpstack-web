@@ -6,7 +6,6 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -52,10 +51,13 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.event.logic.EventLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.DateFinder;
@@ -132,6 +134,9 @@ class ChatJoiner {
 	DeliveryObjectHelper deliveryHelper;
 
 	@Inject
+	EventLogic eventLogic;
+
+	@Inject
 	InboxLogic inboxLogic;
 
 	@Inject
@@ -141,7 +146,7 @@ class ChatJoiner {
 	ObjectManager objectManager;
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
@@ -180,6 +185,9 @@ class ChatJoiner {
 
 	// state
 
+	State state =
+		State.created;
+
 	MessageRec message;
 	ChatRec chat;
 	ChatUserRec chatUser;
@@ -189,7 +197,7 @@ class ChatJoiner {
 
 	// implementation
 
-	protected
+	private
 	void sendMagicSystem (
 			String templateCode,
 			Record<?> commandParent,
@@ -216,7 +224,7 @@ class ChatJoiner {
 	 * Checks the message for user prefs and updates the user's details with
 	 * them.
 	 */
-	protected
+	private
 	void updateUserPrefs () {
 
 		boolean gay =
@@ -251,7 +259,7 @@ class ChatJoiner {
 
 	}
 
-	protected
+	private
 	void updateUserGender () {
 
 		boolean male =
@@ -268,7 +276,7 @@ class ChatJoiner {
 
 	}
 
-	protected
+	private
 	void updateUserGenderOther () {
 
 		if (chatUser.getGender () == null)
@@ -285,31 +293,38 @@ class ChatJoiner {
 
 		if (male && ! female && ! both) {
 
-			chatUser.setOrient (
-				chatUser.getGender () == Gender.male
-					? Orient.gay
-					: Orient.straight);
+			chatUser
+
+				.setOrient (
+					chatUser.getGender () == Gender.male
+						? Orient.gay
+						: Orient.straight);
 
 		}
 
 		if (! male && female && ! both) {
 
-			chatUser.setOrient (
-				chatUser.getGender () == Gender.male
-					? Orient.straight
-					: Orient.gay);
+			chatUser
+
+				.setOrient (
+					chatUser.getGender () == Gender.male
+						? Orient.straight
+						: Orient.gay);
 
 		}
 
 		if ((male && female) || both) {
 
-			chatUser.setOrient (Orient.bi);
+			chatUser
+
+				.setOrient (
+					Orient.bi);
 
 		}
 
 	}
 
-	protected
+	private
 	void updateUserDob () {
 
 		Transaction transaction =
@@ -352,7 +367,7 @@ class ChatJoiner {
 
 	}
 
-	protected
+	private
 	boolean updateUserPhoto () {
 
 		ChatUserImageRec chatUserImage =
@@ -380,6 +395,7 @@ class ChatJoiner {
 
 	}
 
+	private
 	void setAffiliateAndScheme () {
 
 		// set affiliate
@@ -408,7 +424,7 @@ class ChatJoiner {
 	/**
 	 * Save the appropriate information in this user.
 	 */
-	protected
+	private
 	boolean updateUser () {
 
 		if (gender != null)
@@ -541,8 +557,8 @@ class ChatJoiner {
 				chatUserLogic.setPlace (
 					chatUser,
 					rest,
-					Optional.of (
-						message));
+					Optional.of (message),
+					Optional.<UserRec>absent ());
 
 		}
 
@@ -777,8 +793,10 @@ class ChatJoiner {
 
 		// check info
 
-		if (chatUser.getInfoText () == null
-				&& chatUser.getNewChatUserInfo () == null) {
+		if (
+			chatUser.getInfoText () == null
+			&& chatUser.getNewChatUserInfo () == null
+		) {
 
 			sendMagicSystem (
 				"info_request",
@@ -789,17 +807,19 @@ class ChatJoiner {
 				Collections.<String,String>emptyMap ());
 
 			return false;
+
 		}
 
 		return true;
 
 	}
 
+	private
 	boolean checkLocation () {
 
 		// if we have a location that's fine
 
-		if (chatUser.getLocLongLat () != null)
+		if (chatUser.getLocationLongLat () != null)
 			return true;
 
 		// otherwise, send an error
@@ -816,11 +836,8 @@ class ChatJoiner {
 
 	}
 
-	/**
-	 * Multi-purpose join command.
-	 */
-	public
-	void handle () {
+	private
+	void handleReal () {
 
 		if (! joinPart1 ())
 			return;
@@ -829,11 +846,46 @@ class ChatJoiner {
 
 	}
 
+	private
+	void handleWithState () {
+
+		if (state != State.created) {
+
+			throw new IllegalStateException (
+				state.toString ());
+
+		}
+
+		try {
+
+			state = State.inProgress;
+
+			handleReal ();
+
+			state = State.completed;
+
+		} finally {
+
+			if (state == State.inProgress) {
+				state = State.error;
+			}
+
+		}
+
+	}
+
+	public
+	void handleSimple () {
+
+		handleWithState ();
+
+	}
+
 	public
 	InboxAttemptRec handleInbox (
 			@NonNull CommandRec command) {
 
-		handle ();
+		handleWithState ();
 
 		ServiceRec defaultService =
 			serviceHelper.findByCode (
@@ -963,7 +1015,7 @@ class ChatJoiner {
 				"Location ok for chat user %s (%s)",
 				objectManager.objectPathMini (
 					chatUser),
-				chatUser.getLocLongLat ()));
+				chatUser.getLocationLongLat ()));
 
 		// bring the user online if appropriate
 
@@ -998,7 +1050,7 @@ class ChatJoiner {
 				.now ()
 				.plus (Duration.standardSeconds (
 					+ chat.getTimeJoinOutboundMin ()
-					+ random.nextInt (
+					+ randomLogic.randomInteger (
 						+ chat.getTimeJoinOutboundMax ()
 						- chat.getTimeJoinOutboundMin ())));
 
@@ -1261,6 +1313,16 @@ class ChatJoiner {
 						chatKeywordJoinType));
 
 		}
+
+	}
+
+	private static
+	enum State {
+
+		created,
+		inProgress,
+		completed,
+		error;
 
 	}
 

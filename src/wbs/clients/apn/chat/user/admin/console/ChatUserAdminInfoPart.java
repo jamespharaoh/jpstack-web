@@ -198,11 +198,8 @@ class ChatUserAdminInfoPart
 
 				chatUserInfo.getModerator () == null
 					? "-"
-					: objectManager.tdForObject (
-						chatUserInfo.getModerator (),
-						null,
-						true,
-						true),
+					: objectManager.tdForObjectMiniLink (
+						chatUserInfo.getModerator ()),
 
 				"</tr>\n");
 

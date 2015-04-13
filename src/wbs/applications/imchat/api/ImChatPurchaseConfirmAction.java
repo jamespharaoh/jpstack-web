@@ -107,7 +107,8 @@ class ImChatPurchaseConfirmAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ImChatRec imChat =
 			imChatHelper.find (
@@ -148,8 +149,8 @@ class ImChatPurchaseConfirmAction
 		// lookup purchase
 
 		ImChatPurchaseRec purchase =
-			imChatPurchaseHelper.find (
-				purchaseRequest.purchaseId ());
+			imChatPurchaseHelper.findByToken (
+				purchaseRequest.purchaseToken ());
 
 		if (
 			purchase == null
@@ -167,6 +168,7 @@ class ImChatPurchaseConfirmAction
 
 			return jsonResponderProvider.get ()
 				.value (failureResponse);
+
 		}
 
 		// lookup paypal payment

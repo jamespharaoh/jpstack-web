@@ -5,9 +5,10 @@ import javax.inject.Inject;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuObjectHelper;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemObjectHelper;
+import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.wallet.model.WalletObjectHelper;
 import wbs.wallet.model.WalletRec;
@@ -25,7 +26,13 @@ class WalletFixtureProvider
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@Inject
-	MenuObjectHelper menuHelper;
+	MenuItemObjectHelper menuItemHelper;
+
+	@Inject
+	RandomLogic randomLogic;
+
+	@Inject
+	SliceObjectHelper sliceHelper;
 
 	@Inject
 	WalletObjectHelper walletHelper;
@@ -33,31 +40,38 @@ class WalletFixtureProvider
 	@Inject
 	WalletServiceObjectHelper walletServiceHelper;
 
-	@Inject
-	SliceObjectHelper sliceHelper;
-
 	// implementation
 
 	@Override
 	public
 	void createFixtures () {
 
-		menuHelper.insert (
-			new MenuRec ()
+		menuItemHelper.insert (
+			new MenuItemRec ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
 					GlobalId.root,
+					"test",
 					"facility"))
 
 			.setCode (
 				"wallet_service")
 
+			.setName (
+				"Wallet service")
+
+			.setDescription (
+				"")
+
 			.setLabel (
 				"Wallet Service")
 
-			.setPath (
+			.setTargetPath (
 				"/walletServices")
+
+			.setTargetFrame (
+				"main")
 
 		);
 
@@ -71,7 +85,13 @@ class WalletFixtureProvider
 					"test"))
 
 			.setCode (
-					walletServiceHelper.generateCode ())
+				"test_wallet_service")
+
+			.setName (
+				"Test wallet service")
+
+			.setDescription (
+				"Test wallet service")
 
 		);
 
@@ -82,7 +102,7 @@ class WalletFixtureProvider
 				walletService)
 
 			.setCode (
-				walletHelper.generateCode ())
+				randomLogic.generateNumericNoZero (8))
 
 		);
 

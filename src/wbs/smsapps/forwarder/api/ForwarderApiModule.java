@@ -349,7 +349,8 @@ class ForwarderApiModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// authenticate
 
@@ -688,7 +689,8 @@ class ForwarderApiModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// authenticate
 
@@ -1483,7 +1485,8 @@ class ForwarderApiModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// authenticate
 
@@ -1818,7 +1821,8 @@ class ForwarderApiModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadOnly ();
+				database.beginReadOnly (
+					this);
 
 			// authenticate
 

@@ -1,7 +1,5 @@
 package wbs.smsapps.ticketer.daemon;
 
-import java.util.Random;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -11,6 +9,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -41,9 +40,6 @@ class TicketerCommand
 	CommandObjectHelper commandHelper;
 
 	@Inject
-	ServiceObjectHelper serviceHelper;
-
-	@Inject
 	Database database;
 
 	@Inject
@@ -53,16 +49,19 @@ class TicketerCommand
 	MessageObjectHelper messageHelper;
 
 	@Inject
+	Provider<MessageSender> messageSender;
+
+	@Inject
 	ObjectManager objectManager;
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
+
+	@Inject
+	ServiceObjectHelper serviceHelper;
 
 	@Inject
 	TicketerTicketObjectHelper ticketerTicketHelper;
-
-	@Inject
-	Provider<MessageSender> messageSender;
 
 	// properties
 
@@ -116,9 +115,7 @@ class TicketerCommand
 		// work out ticket and message text
 
 		String ticket =
-			generateTicket (
-				ticketChars,
-				8);
+			randomLogic.generateUppercase (8);
 
 		String messageText =
 			ticketer.getText ().replaceAll (
@@ -129,13 +126,26 @@ class TicketerCommand
 
 		MessageRec messageOut =
 			messageSender.get ()
-				.threadId (messageIn.getThreadId ())
-				.number (messageIn.getNumber ())
-				.messageString (messageText)
-				.numFrom (ticketer.getNumber ())
-				.route (ticketer.getRoute ())
-				.service (serviceHelper.findByCode (ticketer, "default"))
-				.send ();
+
+			.threadId (
+				messageIn.getThreadId ())
+
+			.number (
+				messageIn.getNumber ())
+
+			.messageString (
+				messageText)
+
+			.numFrom (
+				ticketer.getNumber ())
+
+			.route (
+				ticketer.getRoute ())
+
+			.service (
+				defaultService)
+
+			.send ();
 
 		// create ticketer ticket entry
 
@@ -163,35 +173,6 @@ class TicketerCommand
 			Optional.of (defaultService),
 			Optional.<AffiliateRec>absent (),
 			command);
-
-	}
-
-	private static final
-	String ticketChars =
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-	private
-	String generateTicket (
-			String sourceChars,
-			int length) {
-
-		char[] chars =
-			new char [length];
-
-		for (
-			int position = 0;
-			position < length;
-			position++
-		) {
-
-			chars [position] =
-				sourceChars.charAt (
-					random.nextInt (
-						sourceChars.length ()));
-
-		}
-
-		return new String (chars);
 
 	}
 

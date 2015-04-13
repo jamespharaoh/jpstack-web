@@ -12,21 +12,40 @@
 
 		<integer-in-condition
 			name="queueId">
+
+			<!-- uk -->
+
 			<item value="46"/>
 			<item value="47"/>
 			<item value="48"/>
 			<item value="49"/>
-			<item value="233"/>
+			<item value="232"/>
+			<item value="235"/>
+			<item value="238"/>
+			<item value="241"/>
+
+			<!-- adult -->
+
 			<item value="215"/>
 			<item value="216"/>
 			<item value="218"/>
 			<item value="219"/>
 			<item value="230"/>
+			<item value="233"/>
 			<item value="239"/>
-			<item value="232"/>
 			<item value="236"/>
-			<item value="235"/>
-			<item value="241"/>
+
+			<!-- australia -->
+
+			<item value="475"/>
+			<item value="478"/>
+			<item value="479"/>
+			<item value="480"/>
+			<item value="481"/>
+			<item value="482"/>
+			<item value="483"/>
+			<item value="484"/>
+
 		</integer-in-condition>
 
 		<!-- aggregators -->

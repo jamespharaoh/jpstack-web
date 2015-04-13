@@ -370,11 +370,8 @@ class ManualResponderRequestPendingSummaryPart
 			"<tr>\n",
 			"<th>Manual responder</th>\n",
 			"%s\n",
-			objectManager.tdForObject (
-				manualResponder,
-				null,
-				true,
-				true),
+			objectManager.tdForObjectMiniLink (
+				manualResponder),
 			"</tr>\n");
 
 		printFormat (
@@ -410,11 +407,8 @@ class ManualResponderRequestPendingSummaryPart
 			"<tr>\n",
 			"<th>Message</th>\n",
 			"%s\n",
-			objectManager.tdForObject (
-				message,
-				null,
-				true,
-				true),
+			objectManager.tdForObjectMiniLink (
+				message),
 			"</tr>\n");
 
 		printFormat (

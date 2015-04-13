@@ -92,7 +92,8 @@ class ImChatConversationStartAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ImChatRec imChat =
 			imChatHelper.find (
@@ -133,8 +134,9 @@ class ImChatConversationStartAction
 		// lookup profile
 
 		ImChatProfileRec profile =
-			imChatProfileHelper.find (
-				startRequest.profileId ());
+			imChatProfileHelper.findByCode (
+				imChat,
+				startRequest.profileCode ());
 
 		if (
 			profile == null
@@ -164,6 +166,9 @@ class ImChatConversationStartAction
 
 			.setImChatCustomer (
 				customer)
+
+			.setImChatProfile (
+				profile)
 
 			.setIndex (
 				customer.getNumConversations ())

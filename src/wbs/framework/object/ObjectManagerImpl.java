@@ -794,4 +794,47 @@ class ObjectManagerImpl
 
 	}
 
+	@Override
+	public
+	<ObjectType extends Record<ObjectType>>
+	Optional<ObjectType> getAncestor (
+			Class<ObjectType> ancestorClass,
+			Record<?> object) {
+
+		for (;;) {
+
+			// return if we found it
+
+			if (
+				ancestorClass.isInstance (
+					object)
+			) {
+
+				return Optional.<ObjectType>of (
+					ancestorClass.cast (
+						object));
+
+			}
+
+			// stop at root
+
+			if (
+				rootHelper.objectClass ().isInstance (
+					object)
+			) {
+
+				return Optional.absent ();
+
+			}
+
+			// iterate via parent
+
+			object =
+				getParent (
+					object);
+
+		}
+
+	}
+
 }

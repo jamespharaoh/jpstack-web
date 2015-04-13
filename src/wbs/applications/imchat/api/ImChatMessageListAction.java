@@ -1,7 +1,6 @@
 package wbs.applications.imchat.api;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -15,6 +14,7 @@ import org.json.simple.JSONValue;
 
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
+import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageObjectHelper;
 import wbs.applications.imchat.model.ImChatMessageRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
@@ -28,7 +28,7 @@ import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("imChatMessageListAction")
 public
@@ -39,6 +39,9 @@ class ImChatMessageListAction
 
 	@Inject
 	Database database;
+
+	@Inject
+	ImChatApiLogic imChatApiLogic;
 
 	@Inject
 	ImChatConversationObjectHelper imChatConversationHelper;
@@ -74,7 +77,7 @@ class ImChatMessageListAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatMessageListRequest startRequest =
+		ImChatMessageListRequest request =
 			dataFromJson.fromJson (
 				ImChatMessageListRequest.class,
 				jsonValue);
@@ -83,13 +86,14 @@ class ImChatMessageListAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		// lookup session
 
 		ImChatSessionRec session =
 			imChatSessionHelper.findBySecret (
-				startRequest.sessionSecret ());
+				request.sessionSecret ());
 
 		if (
 			session == null
@@ -111,44 +115,49 @@ class ImChatMessageListAction
 
 		}
 
+		ImChatCustomerRec customer =
+			session.getImChatCustomer ();
+
 		// find conversation
 
-		ImChatConversationRec imChatConversation =
-			imChatConversationHelper.find (
-				startRequest.conversationId ());
+		ImChatConversationRec conversation =
+			imChatConversationHelper.findByIndex (
+				customer,
+				request.conversationIndex ());
 
 		// retrieve messages
 
-		List<ImChatMessageRec> messages =
-			new ArrayList<ImChatMessageRec> (
-				imChatConversation.getImChatMessages ());
+		List<ImChatMessageRec> allMessages =
+			ImmutableList.copyOf (
+				conversation.getImChatMessages ());
 
-		Lists.reverse (
-			messages);
+		List<ImChatMessageRec> newMessages =
+			ImmutableList.copyOf (
+				allMessages.subList (
+					request.messageIndex (),
+					allMessages.size ()));
 
 		// create response
 
 		ImChatMessageListSuccess messageListSuccessResponse =
-			new ImChatMessageListSuccess ();
+			new ImChatMessageListSuccess ()
+
+			.customer (
+				imChatApiLogic.customerData (
+					customer))
+
+			.conversation (
+				imChatApiLogic.conversationData (
+					conversation));
 
 		for (
 			ImChatMessageRec message
-				: messages
+				: newMessages
 		) {
 
 			messageListSuccessResponse.messages.add (
-				new ImChatMessageData ()
-
-				.id (
-					message.getId ())
-
-				.index (
-					message.getIndex ())
-
-				.messageText (
-					message.getMessageText ())
-
-			);
+				imChatApiLogic.messageData (
+					message));
 
 		}
 

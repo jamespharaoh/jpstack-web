@@ -107,16 +107,8 @@ class QueueItemRec
 		return new CompareToBuilder ()
 
 			.append (
-				getQueueSubject (),
-				other.getQueueSubject ())
-
-			.append (
-				getIndex (),
-				other.getIndex ())
-
-			.append (
-				getId (),
-				other.getId ()) // old items, remove
+				other.getId (),
+				getId ())
 
 			.toComparison ();
 

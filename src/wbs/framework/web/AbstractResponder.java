@@ -53,7 +53,8 @@ class AbstractResponder
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		setup ();
 

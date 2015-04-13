@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -49,10 +48,12 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
+import wbs.framework.utils.EmailLogic;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.email.logic.EmailLogic;
+import wbs.platform.event.logic.EventLogic;
 import wbs.platform.exception.logic.ExceptionLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
@@ -63,6 +64,7 @@ import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.user.model.UserRec;
 import wbs.sms.core.logic.KeywordFinder;
 import wbs.sms.gazetteer.model.GazetteerEntryObjectHelper;
 import wbs.sms.gazetteer.model.GazetteerEntryRec;
@@ -98,6 +100,9 @@ class ChatUserLogicImpl
 	EmailLogic emailLogic;
 
 	@Inject
+	EventLogic eventLogic;
+
+	@Inject
 	ExceptionLogic exceptionLogic;
 
 	@Inject
@@ -125,7 +130,7 @@ class ChatUserLogicImpl
 	QueueLogic queueLogic;
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
@@ -296,9 +301,9 @@ class ChatUserLogicImpl
 
 		LocalTime timeOfDay =
 			new LocalTime (
-				10 + random.nextInt (10),
-				random.nextInt (60),
-				random.nextInt (60));
+				10 + randomLogic.randomInteger (10),
+				randomLogic.randomInteger (60),
+				randomLogic.randomInteger (60));
 
 		// try and schedule first ad
 
@@ -478,18 +483,18 @@ class ChatUserLogicImpl
 		for (ChatUserRec thatUser
 				: otherUsers) {
 
-			if (thisUser.getLocLongLat () == null)
+			if (thisUser.getLocationLongLat () == null)
 				break;
 
-			if (thatUser.getLocLongLat () == null)
+			if (thatUser.getLocationLongLat () == null)
 				continue;
 
 			// work out the distance
 
 			double miles =
 				locatorLogic.distanceMiles (
-					thisUser.getLocLongLat (),
-					thatUser.getLocLongLat ());
+					thisUser.getLocationLongLat (),
+					thatUser.getLocationLongLat ());
 
 			// and add them to the list
 
@@ -563,7 +568,7 @@ class ChatUserLogicImpl
 			@NonNull ChatUserRec chatUser) {
 
 		int number =
-			random.nextInt (100);
+			randomLogic.randomInteger (100);
 
 		if (number < 10)
 			chatUser.setMonitorCap (number);
@@ -585,7 +590,9 @@ class ChatUserLogicImpl
 				ChatUserType.monitor)
 
 			.setCode (
-				chatUserHelper.generateCode (chat)));
+				randomLogic.generateNumericNoZero (6))
+
+		);
 
 	}
 
@@ -1055,7 +1062,15 @@ class ChatUserLogicImpl
 	boolean setPlace (
 			@NonNull ChatUserRec chatUser,
 			@NonNull String place,
-			@NonNull Optional<MessageRec> message) {
+			@NonNull Optional<MessageRec> message,
+			@NonNull Optional<UserRec> user) {
+
+		if (
+			message.isPresent ()
+			&& user.isPresent ()
+		) {
+			throw new IllegalArgumentException ();
+		}
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -1093,6 +1108,7 @@ class ChatUserLogicImpl
 				try {
 
 					emailLogic.sendEmail (
+						wbsConfig.defaultEmailAddress (),
 						slice.getAdminEmail (),
 						stringFormat (
 							"Chat user %s location not recognised: %s",
@@ -1145,19 +1161,78 @@ class ChatUserLogicImpl
 
 		// update the user
 
+		if (gazetteerEntry.getLongLat () == null) {
+			throw new NullPointerException ();
+		}
+
+		{
+
+			Transaction transaction =
+				database.currentTransaction ();
+
+			if (
+				! transaction.contains (
+					chatUser)
+			) {
+
+				throw new IllegalStateException (
+					stringFormat (
+						"Chat user %s not in transaction",
+						chatUser.getId ()));
+
+			}
+
+		}
+
 		chatUser
 
-			.setLocPlace (
+			.setLocationPlace (
 				gazetteerEntry.getName ())
 
-			.setLocPlaceLongLat (
+			.setLocationPlaceLongLat (
 				gazetteerEntry.getLongLat ())
 
-			.setLocLongLat (
+			.setLocationLongLat (
 				gazetteerEntry.getLongLat ())
 
-			.setLocTime (
+			.setLocationBackupLongLat (
+				gazetteerEntry.getLongLat ())
+
+			.setLocationTime (
 				new Date ());
+
+		// create event
+
+		if (message.isPresent ()) {
+
+			eventLogic.createEvent (
+				"chat_user_place_message",
+				chatUser,
+				gazetteerEntry,
+				gazetteerEntry.getLongLat ().longitude (),
+				gazetteerEntry.getLongLat ().latitude (),
+				message.get ());
+
+		} else if (user.isPresent ()) {
+
+			eventLogic.createEvent (
+				"chat_user_place_user",
+				chatUser,
+				gazetteerEntry,
+				gazetteerEntry.getLongLat ().longitude (),
+				gazetteerEntry.getLongLat ().latitude (),
+				user.get ());
+
+		} else {
+
+			eventLogic.createEvent (
+				"chat_user_place_api",
+				chatUser,
+				gazetteerEntry,
+				gazetteerEntry.getLongLat ().longitude (),
+				gazetteerEntry.getLongLat ().latitude ());
+
+		}
 
 		return true;
 

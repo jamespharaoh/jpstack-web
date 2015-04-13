@@ -123,7 +123,8 @@ class AlertsDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadOnly ();
+			database.beginReadOnly (
+				this);
 
 		List<AlertsSettingsRec> alertsSettingss =
 			alertsSettingsHelper.findAll ();
@@ -204,7 +205,8 @@ class AlertsDaemon
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		AlertsSettingsRec alertsSettings =
 			alertsSettingsHelper.find (

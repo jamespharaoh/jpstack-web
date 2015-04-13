@@ -1,13 +1,14 @@
 package wbs.platform.queue.logic;
 
-import static wbs.framework.utils.etc.Misc.disallowNulls;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Date;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.object.ObjectHelper;
@@ -151,7 +152,6 @@ class QueueLogicImpl
 				queueHelper.insert (
 					new QueueRec ()
 						.setCode (code)
-						.setDescription (queueType.getDescription ())
 						.setQueueType (queueType)
 						.setParentObjectType (parentType)
 						.setParentObjectId (parent.getId ()));
@@ -181,9 +181,13 @@ class QueueLogicImpl
 
 		// sanity check
 
-		if (objectManager.getObjectTypeId (refObject)
-				!= queueType.getRefObjectType ().getId ())
+		if (
+			notEqual (
+				objectManager.getObjectTypeId (refObject),
+				queueType.getRefObjectType ().getId ())
+		) {
 			throw new IllegalArgumentException ();
+		}
 
 		// create the queue item
 
@@ -194,31 +198,48 @@ class QueueLogicImpl
 			queueItemHelper.insert (
 				new QueueItemRec ()
 
-					.setQueueSubject (queueSubject)
-					.setIndex (queueSubject.getTotalItems ())
+			.setQueueSubject (
+				queueSubject)
 
-					.setQueue (queue)
+			.setIndex (
+				queueSubject.getTotalItems ())
 
-					.setSource (source)
-					.setDetails (details)
-					.setRefObjectId (refObject.getId ())
+			.setQueue (
+				queue)
 
-					.setState (waiting
-						? QueueItemState.waiting
-						: QueueItemState.pending)
+			.setSource (
+				source)
 
-					.setCreatedTime (now)
-					.setPendingTime (waiting
-						? null
-						: now));
+			.setDetails (
+				details)
+
+			.setRefObjectId (
+				refObject.getId ())
+
+			.setState (
+				waiting
+					? QueueItemState.waiting
+					: QueueItemState.pending)
+
+			.setCreatedTime (
+				now)
+
+			.setPendingTime (
+				waiting
+					? null
+					: now)
+
+		);
 
 		// update queue subject
 
-		queueSubject.setTotalItems (
-			queueSubject.getTotalItems () + 1);
+		queueSubject
 
-		queueSubject.setActiveItems (
-			queueSubject.getActiveItems () + 1);
+			.setTotalItems (
+				queueSubject.getTotalItems () + 1)
+
+			.setActiveItems (
+				queueSubject.getActiveItems () + 1);
 
 		// and return
 
@@ -323,14 +344,22 @@ class QueueLogicImpl
 		// update the queue item
 
 		queueItem
-			.setState (QueueItemState.cancelled)
-			.setCancelledTime (now)
-			.setQueueItemClaim (null);
+
+			.setState (
+				QueueItemState.cancelled)
+
+			.setCancelledTime (
+				now)
+
+			.setQueueItemClaim (
+				null);
 
 		// update the queue subject
 
 		queueSubject
-			.setActiveItems (queueSubject.getActiveItems () - 1);
+
+			.setActiveItems (
+				queueSubject.getActiveItems () - 1);
 
 		// activate next queue item (if any)
 
@@ -349,8 +378,12 @@ class QueueLogicImpl
 				throw new IllegalStateException ();
 
 			nextQueueItem
-				.setState (QueueItemState.pending)
-				.setPendingTime (now);
+
+				.setState (
+					QueueItemState.pending)
+
+				.setPendingTime (
+					now);
 
 		}
 
@@ -359,15 +392,14 @@ class QueueLogicImpl
 	@Override
 	public
 	void processQueueItem (
-			QueueItemRec queueItem,
-			UserRec user) {
-
-		disallowNulls (queueItem, user);
+			@NonNull QueueItemRec queueItem,
+			@NonNull UserRec user) {
 
 		QueueSubjectRec queueSubject =
 			queueItem.getQueueSubject ();
 
-		Date now = new Date ();
+		Date now =
+			new Date ();
 
 		// sanity checks
 

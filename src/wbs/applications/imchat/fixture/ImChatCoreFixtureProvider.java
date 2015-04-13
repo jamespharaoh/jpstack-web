@@ -3,6 +3,8 @@ package wbs.applications.imchat.fixture;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -33,14 +35,15 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
+import wbs.framework.utils.RandomLogic;
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
 import wbs.integrations.paypal.model.PaypalAccountRec;
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuObjectHelper;
-import wbs.platform.menu.model.MenuRec;
+import wbs.platform.menu.model.MenuItemObjectHelper;
+import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 
 @PrototypeComponent ("imChatCoreFixtureProvider")
@@ -90,10 +93,13 @@ class ImChatCoreFixtureProvider
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@Inject
-	MenuObjectHelper menuHelper;
+	MenuItemObjectHelper menuItemHelper;
 
 	@Inject
 	PaypalAccountObjectHelper paypalAccountHelper;
+
+	@Inject
+	RandomLogic randomLogic;
 
 	@Inject
 	SliceObjectHelper sliceHelper;
@@ -110,22 +116,32 @@ class ImChatCoreFixtureProvider
 
 		// menu
 
-		menuHelper.insert (
-			new MenuRec ()
+		menuItemHelper.insert (
+			new MenuItemRec ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
 					GlobalId.root,
+					"test",
 					"facility"))
 
 			.setCode (
 				"im_chat")
 
+			.setName (
+				"IM Chat")
+
+			.setDescription (
+				"Instant message chat service")
+
 			.setLabel (
 				"IM Chat")
 
-			.setPath (
+			.setTargetPath (
 				"/imChats")
+
+			.setTargetFrame (
+				"main")
 
 		);
 
@@ -231,19 +247,19 @@ class ImChatCoreFixtureProvider
 				imChat)
 
 			.setCode (
-				"20_for_10")
+				"6_for_6")
 
 			.setName (
-				"£20 for £10")
+				"£6 for £6")
 
 			.setDescription (
-				"£20 for £10")
+				"£6 for £6")
 
 			.setPrice (
-				1000)
+				600)
 
 			.setValue (
-				2000)
+				600)
 
 		);
 
@@ -301,14 +317,18 @@ class ImChatCoreFixtureProvider
 				"image/jpeg",
 				"ermintrude.jpg");
 
+		List<ImChatProfileRec> profiles =
+			new ArrayList<ImChatProfileRec> ();
+
 		for (
 			int index = 0;
 			index < 10;
 			index ++
 		) {
 
-			imChatProfileHelper.insert (
-				new ImChatProfileRec ()
+			profiles.add (
+				imChatProfileHelper.insert (
+					new ImChatProfileRec ()
 
 				.setImChat (
 					imChat)
@@ -342,7 +362,7 @@ class ImChatCoreFixtureProvider
 					index % 2 == 0
 						? dougalMedia
 						: ermintrudeMedia)
-			);
+			));
 
 		}
 
@@ -356,7 +376,7 @@ class ImChatCoreFixtureProvider
 				imChat)
 
 			.setCode (
-				imChatCustomerHelper.generateCode ())
+				randomLogic.generateNumericNoZero (8))
 
 			.setEmail (
 				"test@example.com")
@@ -378,6 +398,9 @@ class ImChatCoreFixtureProvider
 			.setIndex (
 				imChatCustomer.getNumConversations ())
 
+			.setImChatProfile (
+				profiles.get (0))
+
 			.setStartTime (
 				transaction.now ())
 
@@ -397,7 +420,7 @@ class ImChatCoreFixtureProvider
 				imChatCustomer)
 
 			.setSecret (
-				imChatSessionHelper.generateSecret ())
+				randomLogic.generateLowercase (20))
 
 			.setStartTime (
 				transaction.now ())

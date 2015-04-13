@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.user.pending.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 
@@ -11,6 +10,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.media.console.MediaConsoleLogic;
 
@@ -19,6 +19,8 @@ public
 class ChatUserPendingSummaryPart
 	extends AbstractPagePart {
 
+	// dependencies
+
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
 
@@ -26,9 +28,16 @@ class ChatUserPendingSummaryPart
 	ChatUserLogic chatUserLogic;
 
 	@Inject
+	ConsoleObjectManager consoleObjectManager;
+
+	@Inject
 	MediaConsoleLogic mediaConsoleLogic;
 
+	// state
+
 	ChatUserRec chatUser;
+
+	// implementation
 
 	@Override
 	public
@@ -56,11 +65,10 @@ class ChatUserPendingSummaryPart
 		printFormat (
 			"<tr>\n",
 			"<th>User</th>\n",
-			"<td colspan=\"2\">%h</td>\n",
-			stringFormat (
-				"%s/%s",
-				chatUser.getChat ().getCode (),
-				chatUser.getCode ()),
+			"%s\n",
+			consoleObjectManager.tdForObjectMiniLink (
+				chatUser,
+				2),
 			"</tr>\n");
 
 		// name
@@ -68,8 +76,10 @@ class ChatUserPendingSummaryPart
 		printFormat (
 			"<tr>\n",
 			"<th>Name</th>\n",
-			"<td colspan=\"2\">%s</td>\n",
-			ifNull (chatUser.getName (), "(none)"),
+			"<td colspan=\"2\">%h</td>\n",
+			ifNull (
+				chatUser.getName (),
+				"(none)"),
 			"</tr>\n");
 
 		// info

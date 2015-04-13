@@ -7,14 +7,27 @@
 	</sql-scripts>
 
 	<models>
+		<enum-type name="chatBroadcastNumberState"/>
+		<enum-type name="chatBroadcastState"/>
 		<model name="chatBroadcast"/>
+		<model name="chatBroadcastNumber"/>
 	</models>
+
+	<layer name="daemon">
+		<bean class="daemon.ChatBroadcastScheduleDaemon"/>
+		<bean class="daemon.ChatBroadcastSendDaemon"/>
+	</layer>
 
 	<layer name="console">
 		<bean class="console.ChatBroadcastListPart"/>
 		<bean class="console.ChatBroadcastSendAction"/>
 		<bean class="console.ChatBroadcastSendPart"/>
 		<bean class="console.ChatBroadcastVerifyPart"/>
+	</layer>
+
+	<layer name="logic">
+		<bean class="logic.ChatBroadcastLogicImplementation"/>
+		<bean class="logic.ChatBroadcastSendHelper"/>
 	</layer>
 
 	<console-modules>

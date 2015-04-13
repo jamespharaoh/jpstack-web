@@ -68,7 +68,8 @@ class ForwarderUnqueueExRpcHandler
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// authenticate
 

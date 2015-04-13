@@ -134,8 +134,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	public
 	void renderTableCellProperties (
 			PrintWriter out,
-			Container container,
-			boolean link) {
+			Container container) {
 
 		Native nativeValue =
 			accessor.read (
@@ -153,8 +152,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		renderer.renderTableCellProperties (
 			out,
 			container,
-			interfaceValue,
-			link);
+			interfaceValue);
 
 	}
 

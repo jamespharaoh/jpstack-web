@@ -59,7 +59,8 @@ class ForwarderDelivery
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// get the delivery
 

@@ -32,6 +32,8 @@ public
 class ChatAdultDeliveryHandler
 	implements DeliveryHandler {
 
+	// dependencies
+
 	@Inject
 	ChatSendLogic chatSendLogic;
 
@@ -47,8 +49,12 @@ class ChatAdultDeliveryHandler
 	@Inject
 	DeliveryObjectHelper deliveryHelper;
 
+	// prototype dependencies
+
 	@Inject
 	Provider<ChatJoiner> joinerProvider;
+
+	// implementation
 
 	@Override
 	public
@@ -58,7 +64,8 @@ class ChatAdultDeliveryHandler
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		DeliveryRec delivery =
 			deliveryHelper.find (
@@ -99,8 +106,10 @@ class ChatAdultDeliveryHandler
 
 		// ensure we are going to a successful delivery
 
-		if (delivery.getOldMessageStatus ().isGoodType ()
-				|| ! delivery.getNewMessageStatus ().isGoodType ()) {
+		if (
+			delivery.getOldMessageStatus ().isGoodType ()
+			|| ! delivery.getNewMessageStatus ().isGoodType ()
+		) {
 
 			deliveryHelper.remove (
 				delivery);
@@ -166,7 +175,7 @@ class ChatAdultDeliveryHandler
 			.joinType (
 				joinType)
 
-			.handle ();
+			.handleSimple ();
 
 		deliveryHelper.remove (
 			delivery);

@@ -74,11 +74,8 @@ class AlertsSubjectsPart
 				alertsSubject.getObjectType ().getCode (),
 
 				"%s\n",
-				objectManager.tdForObject (
-					object,
-					null,
-					true,
-					true),
+				objectManager.tdForObjectMiniLink (
+					object),
 
 				"<td>%h</td>\n",
 				alertsSubject.getInclude () ? "yes" : "no",

@@ -197,21 +197,15 @@ class ChatUserAdminDatePart
 
 				printFormat (
 					"%s\n",
-					objectManager.tdForObject (
-						chatUserDateLogRec.getUser (),
-						null,
-						true,
-						true));
+					objectManager.tdForObjectMiniLink (
+						chatUserDateLogRec.getUser ()));
 
 			} else if (chatUserDateLogRec.getMessage() != null) {
 
 				printFormat (
 					"%s\n",
-					objectManager.tdForObject (
-						chatUserDateLogRec.getMessage (),
-						null,
-						true,
-						true));
+					objectManager.tdForObjectMiniLink (
+						chatUserDateLogRec.getMessage ()));
 
 			} else {
 

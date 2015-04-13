@@ -178,7 +178,8 @@ class ChatUserImageUploadAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (

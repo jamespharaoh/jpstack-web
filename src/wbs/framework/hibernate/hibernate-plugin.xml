@@ -4,6 +4,7 @@
 
 	<layer name="hibernate">
 		<bean class="HibernateDatabase"/>
+		<bean class="HibernateInterceptor"/>
 	</layer>
 
 </plugin>

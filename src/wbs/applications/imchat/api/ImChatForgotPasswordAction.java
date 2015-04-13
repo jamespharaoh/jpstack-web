@@ -1,7 +1,8 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import java.io.IOException;
-import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -17,14 +18,16 @@ import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.EmailLogic;
+import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.email.logic.EmailLogic;
 
 @PrototypeComponent ("imChatForgotPasswordAction")
 public
@@ -35,6 +38,9 @@ class ImChatForgotPasswordAction
 
 	@Inject
 	Database database;
+
+	@Inject
+	EmailLogic emailLogic;
 
 	@Inject
 	ImChatApiLogic imChatApiLogic;
@@ -49,10 +55,10 @@ class ImChatForgotPasswordAction
 	RequestContext requestContext;
 
 	@Inject
-	Random random;
+	RandomLogic randomLogic;
 
 	@Inject
-	EmailLogic email;
+	WbsConfig wbsConfig;
 
 	// prototype dependencies
 
@@ -85,7 +91,8 @@ class ImChatForgotPasswordAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		ImChatRec imChat =
 			imChatHelper.find (
@@ -107,10 +114,10 @@ class ImChatForgotPasswordAction
 				new ImChatFailure ()
 
 				.reason (
-					"email-does-not-exists")
+					"email-invalid")
 
 				.message (
-					"The specified customer does not exist.");
+					"There is no customer with the email address specified");
 
 			return jsonResponderProvider.get ()
 				.value (failureResponse);
@@ -120,7 +127,7 @@ class ImChatForgotPasswordAction
 		// generate new password
 
 		String newPassword =
-			generatePassword (12);
+			randomLogic.generateLowercase (12);
 
 		// update customer password
 
@@ -131,9 +138,15 @@ class ImChatForgotPasswordAction
 
 		// send new password via mail
 
-		email.smtpHostname("wellbehavedsoftware.com");
-		email.fromAddress("services@wellbehavedsoftware.com");
-		email.sendEmail(forgotPasswordRequest.email (), "Chat-app new password", "Your new password for chat-app is: " + newPassword + ".");
+		emailLogic.sendEmail (
+			wbsConfig.defaultEmailAddress (),
+			forgotPasswordRequest.email (),
+			"Chat-app new password",
+			stringFormat (
+				"Please log on with your new password:\n",
+				"\n",
+				"%s\n",
+				newPassword));
 
 		// create response
 
@@ -148,26 +161,5 @@ class ImChatForgotPasswordAction
 			.value (successResponse);
 
 	}
-
-	String generatePassword (
-			int length) {
-
-        String chars = "abcdefghijklmnopqrstuvwxyz";
-
-        StringBuilder stringBuilder =
-        	new StringBuilder ();
-
-		for (int i = 0; i < length; i ++) {
-
-            stringBuilder.append (
-            	chars.charAt (
-            		random.nextInt (
-            			chars.length ())));
-
-        }
-
-        return stringBuilder.toString ();
-
-    }
 
 }

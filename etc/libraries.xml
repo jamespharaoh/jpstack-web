@@ -3,20 +3,12 @@
 	<library name="ant" type="jar" version="1.9.2" source="yes"/>
 	<library name="ant-launcher" type="jar" version="1.9.2"/>
 	<library name="antlr" type="jar" version="2.7.7"/>
-	<library name="asm-analysis" type="jar" version="4.0"/>
-	<library name="asm-commons" type="jar" version="4.0"/>
-	<library name="asm" type="jar" version="4.0"/>
-	<library name="asm-tree" type="jar" version="4.0"/>
-	<library name="asm-util" type="jar" version="4.0"/>
-	<library name="commons-cli" type="jar" version="1.2"/>
 	<library name="commons-codec" type="jar" version="1.6"/>
 	<library name="commons-fileupload" type="jar" version="1.3" source="yes"/>
 	<library name="commons-io" type="jar" version="2.2"/>
 	<library name="commons-lang3" type="jar" version="3.2.1" source="yes"/>
 	<library name="commons-logging" type="jar" version="1.1.3"/>
 	<library name="dom4j" type="jar" version="1.6.1"/>
-	<library name="gpars" type="jar" version="1.0.0"/>
-	<library name="groovy" type="jar" version="2.1.8" source="yes"/>
 	<library name="gson" type="jar" version="2.2.2"/>
 	<library name="guava" type="bundle" version="16.0.1" source="yes"/>
 	<library name="hamcrest-core" type="jar" version="1.1"/>
@@ -27,8 +19,6 @@
 	<library name="httpclient" type="jar" version="4.3.1" source="yes"/>
 	<library name="httpcore" type="jar" version="4.3"/>
 	<library name="httpmime" type="jar" version="4.3.1" source="yes"/>
-	<library name="ivy" type="jar" version="2.2.0"/>
-	<library name="jansi" type="jar" version="1.6"/>
 	<library name="javassist" type="jar" version="3.12.1.GA" source="yes"/>
 	<library name="javassist" type="jar" version="3.15.0-GA"/>
 	<library name="javax.inject" type="jar" version="1" source="yes"/>
@@ -38,17 +28,15 @@
 	<library name="jboss-logging" type="jar" version="3.1.0.GA"/>
 	<library name="jboss-transaction-api_1.1_spec" type="jar" version="1.0.1.Final" source="yes"/>
 	<library name="jdom" type="jar" version="1.0"/>
-	<library name="jline" type="jar" version="1.0"/>
 	<library name="joda-convert" type="jar" version="1.2"/>
 	<library name="joda-time" type="jar" version="2.3" source="yes"/>
 	<library name="json-simple" type="bundle" version="1.1.1" source="yes"/>
 	<library name="jsoup" type="jar" version="1.5.2"/>
-	<library name="jsr166y" type="jar" version="1.7.0"/>
 	<library name="jsr305" type="jar" version="1.3.9"/>
 	<library name="jta" type="jar" version="1.1" source="yes"/>
 	<library name="junit" type="jar" version="4.10"/>
 	<library name="log4j" type="bundle" version="1.2.17" source="yes"/>
-	<library name="lombok" type="jar" version="1.12.2" source="yes"/>
+	<library name="lombok" type="jar" version="1.16.2" source="yes"/>
 	<library name="mail" type="jar" version="1.4.3"/>
 	<library name="merchantsdk" type="jar" version="2.13.117" source="yes"/>
 	<library name="paypal-core" type="jar" version="1.6.6" source="yes"/>
@@ -63,7 +51,5 @@
 	<library name="xalan" type="jar" version="2.7.0"/>
 	<library name="xercesImpl" type="jar" version="2.6.2"/>
 	<library name="xmlParserAPIs" type="jar" version="2.6.2"/>
-	<library name="xmlpull" type="jar" version="1.1.3.1"/>
 	<library name="xom" type="jar" version="1.1" source="yes"/>
-	<library name="xstream" type="jar" version="1.4.2"/>
 </libraries>

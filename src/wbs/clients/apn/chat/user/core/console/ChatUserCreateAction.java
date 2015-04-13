@@ -176,7 +176,8 @@ class ChatUserCreateAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// get database objects
 
@@ -198,6 +199,10 @@ class ChatUserCreateAction
 
 		// create monitor
 
+		if (gazetteerEntry.getLongLat () == null) {
+			throw new NullPointerException ();
+		}
+
 		ChatUserRec chatUser =
 			chatUserLogic.createChatMonitor (chat)
 
@@ -207,13 +212,16 @@ class ChatUserCreateAction
 			.setInfoText (
 				textHelper.findOrCreate (info))
 
-			.setLocPlace (
+			.setLocationPlace (
 				postcode)
 
-			.setLocPlaceLongLat (
+			.setLocationPlaceLongLat (
 				gazetteerEntry.getLongLat ())
 
-			.setLocLongLat (
+			.setLocationLongLat (
+				gazetteerEntry.getLongLat ())
+
+			.setLocationBackupLongLat (
 				gazetteerEntry.getLongLat ())
 
 			.setGender (

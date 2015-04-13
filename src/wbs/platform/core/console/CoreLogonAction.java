@@ -1,12 +1,12 @@
 package wbs.platform.core.console;
 
-import static wbs.framework.utils.etc.Misc.disallowNulls;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -53,21 +53,19 @@ class CoreLogonAction
 
 		// get params
 
+		@NonNull
 		String slice =
 			requestContext.parameter ("slice");
 
+		@NonNull
 		String username =
 			requestContext.parameter ("username");
 
+		@NonNull
 		String password =
 			requestContext.parameter ("password");
 
 		// check we got the right params
-
-		disallowNulls (
-			slice,
-			username,
-			password);
 
 		if (in ("",
 				slice,
@@ -77,7 +75,8 @@ class CoreLogonAction
 
 		@Cleanup
 		Transaction transaction =
-			database.beginReadWrite ();
+			database.beginReadWrite (
+				this);
 
 		// attempt logon
 

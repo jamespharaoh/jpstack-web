@@ -287,7 +287,8 @@ class DialogueApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			RouteRec route =
 				routeHelper.find (routeId);
@@ -467,7 +468,8 @@ class DialogueApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			Integer statusType = null;
 			Integer reason = null;

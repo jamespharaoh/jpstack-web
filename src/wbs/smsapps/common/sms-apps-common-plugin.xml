@@ -2,6 +2,10 @@
 	name="sms-apps-common"
 	package="wbs.smsapps.common">
 
+	<plugin-dependencies>
+		<plugin-dependency name="platform-common"/>
+	</plugin-dependencies>
+
 	<fixtures>
 		<fixture name="smsAppsCommon"/>
 	</fixtures>

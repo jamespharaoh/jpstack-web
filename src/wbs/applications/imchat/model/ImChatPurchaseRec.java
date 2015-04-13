@@ -1,9 +1,5 @@
 package wbs.applications.imchat.model;
 
-import java.util.Random;
-
-import javax.inject.Inject;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -105,55 +101,6 @@ class ImChatPurchaseRec
 
 		ImChatPurchaseRec findByToken (
 				String token);
-
-	}
-
-	// object helper methods
-
-	public
-	interface ImChatPurchaseObjectHelperMethods {
-
-		String generateToken ();
-
-	}
-
-	// object helper implementation
-
-	public static
-	class ImChatPurchaseObjectHelperImplementation
-		implements ImChatPurchaseObjectHelperMethods {
-
-		// dependencies
-
-		@Inject
-		Random random;
-
-		// implementation
-
-		@Override
-		public
-		String generateToken () {
-
-			StringBuilder stringBuilder =
-				new StringBuilder ();
-
-			for (int i = 0; i < 20; i ++) {
-
-				stringBuilder.append (
-					tokenChars.charAt (
-						random.nextInt (
-							tokenChars.length ())));
-
-			}
-
-			return stringBuilder.toString ();
-
-		}
-
-		// data
-
-		public static
-		String tokenChars = "abcdefghijklmnopqrstuvwxyz";
 
 	}
 

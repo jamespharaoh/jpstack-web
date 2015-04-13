@@ -46,6 +46,8 @@ class ChatUserHistoryPart
 	@Inject
 	TimeFormatter timeFormatter;
 
+	// state
+
 	ChatUserRec chatUser;
 	List<ChatMessageRec> chatMessages;
 
@@ -78,17 +80,6 @@ class ChatUserHistoryPart
 					chatMessages.size ()));
 
 		}
-
-	}
-
-	// TODO move this somewhere
-	public
-	String genHtmlColor (
-			String source) {
-
-		return String.format (
-			"#%06x",
-			source.hashCode () & 0x00ffffff);
 
 	}
 
@@ -171,16 +162,16 @@ class ChatUserHistoryPart
 					: "message-out";
 
 			String color =
-				genHtmlColor (
+				Html.genHtmlColor (
 					fromUser.getCode ().compareTo (toUser.getCode ()) < 0
 
-						? joinWithoutSeparator (
-							fromUser.getCode (),
-							toUser.getCode ())
+					? joinWithoutSeparator (
+						fromUser.getCode (),
+						toUser.getCode ())
 
-						: joinWithoutSeparator (
-							toUser.getCode (),
-							fromUser.getCode ()));
+					: joinWithoutSeparator (
+						toUser.getCode (),
+						fromUser.getCode ()));
 
 			printFormat (
 				"<tr class=\"%h\">\n",

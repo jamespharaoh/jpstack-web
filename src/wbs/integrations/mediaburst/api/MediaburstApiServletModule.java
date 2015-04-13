@@ -191,7 +191,8 @@ class MediaburstApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			// debugging
 
@@ -369,7 +370,8 @@ class MediaburstApiServletModule
 
 			@Cleanup
 			Transaction transaction =
-				database.beginReadWrite ();
+				database.beginReadWrite (
+					this);
 
 			RouteRec route =
 				routeHelper.find (

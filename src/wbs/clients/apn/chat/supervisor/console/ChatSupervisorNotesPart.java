@@ -98,25 +98,18 @@ class ChatSupervisorNotesPart
 				chatContactNote.getNotes (),
 
 				"%s\n",
-				consoleObjectManager.tdForObject (
+				consoleObjectManager.tdForObjectMiniLink (
 					chatContactNote.getUser (),
-					chatContactNote.getUser ().getChat (),
-					true,
-					true),
+					chatContactNote.getUser ().getChat ()),
 
 				"%s\n",
-				consoleObjectManager.tdForObject (
+				consoleObjectManager.tdForObjectMiniLink (
 					chatContactNote.getMonitor (),
-					chatContactNote.getMonitor ().getChat (),
-					true,
-					true),
+					chatContactNote.getMonitor ().getChat ()),
 
 				"%s\n",
-				consoleObjectManager.tdForObject (
-					chatContactNote.getConsoleUser (),
-					null,
-					true,
-					true),
+				consoleObjectManager.tdForObjectMiniLink (
+					chatContactNote.getConsoleUser ()),
 
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (

@@ -24,6 +24,8 @@ public
 class ChatHelpLogPendingFormResponder
 	extends HtmlResponder {
 
+	// dependencies
+
 	@Inject
 	ChatHelpLogConsoleHelper chatHelpLogHelper;
 
@@ -36,8 +38,12 @@ class ChatHelpLogPendingFormResponder
 	@Inject
 	PrivChecker privChecker;
 
+	// state
+
 	ChatHelpLogRec chatHelpLog;
 	List<ChatHelpTemplateRec> chatHelpTemplates;
+
+	// details
 
 	@Override
 	protected
@@ -59,6 +65,8 @@ class ChatHelpLogPendingFormResponder
 			.build ();
 
 	}
+
+	// implementation
 
 	@Override
 	public
@@ -99,8 +107,10 @@ class ChatHelpLogPendingFormResponder
 
 			"var helpTemplates = new Array ();\n");
 
-		for (ChatHelpTemplateRec chatHelpTemplate
-				: chatHelpTemplates) {
+		for (
+			ChatHelpTemplateRec chatHelpTemplate
+				: chatHelpTemplates
+		) {
 
 			printFormat (
 				"helpTemplates [%s] = '%j';\n",

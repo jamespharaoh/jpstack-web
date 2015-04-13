@@ -2,17 +2,28 @@
 	name="oxygen8"
 	package="wbs.integrations.oxygen8">
 
+	<plugin-dependencies>
+		<plugin-dependency name="integrations-common"/>
+		<plugin-dependency name="scaffold"/>
+	</plugin-dependencies>
+
 	<sql-scripts>
 		<sql-data name="oxygen8-data"/>
 	</sql-scripts>
 
 	<models>
+		<enum-type name="oxygen8InboundLogType"/>
 		<model name="oxygen8Config"/>
+		<model name="oxygen8InboundLog"/>
 		<model name="oxygen8Network"/>
 		<model name="oxygen8ReportCode"/>
 		<model name="oxygen8RouteIn"/>
 		<model name="oxygen8RouteOut"/>
 	</models>
+
+	<fixtures>
+		<fixture name="oxygen8"/>
+	</fixtures>
 
 	<layer name="api">
 		<bean class="api.Oxygen8ApiServletModule"/>
@@ -34,6 +45,7 @@
 	<console-modules>
 		<console-module name="oxygen8"/>
 		<console-module name="oxygen8-config"/>
+		<console-module name="oxygen8-inbound-log"/>
 		<console-module name="oxygen8-network"/>
 		<console-module name="oxygen8-report-code"/>
 		<console-module name="oxygen8-route-in"/>
