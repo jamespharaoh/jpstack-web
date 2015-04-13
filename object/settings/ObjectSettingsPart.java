@@ -12,9 +12,13 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.platform.console.forms.FormFieldLogic;
 import wbs.platform.console.forms.FormFieldSet;
+import wbs.platform.console.helper.ConsoleHelper;
+import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.lookup.ObjectLookup;
 import wbs.platform.console.part.AbstractPagePart;
+import wbs.platform.scaffold.model.RootObjectHelper;
+import wbs.ticket.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsPart")
@@ -23,14 +27,23 @@ class ObjectSettingsPart
 	extends AbstractPagePart {
 
 	// dependencies
+	
+	@Inject
+	ConsoleObjectManager objectManager;
 
 	@Inject
 	FormFieldLogic formFieldLogic;
+	
+	@Inject
+	RootObjectHelper rootHelper;
 
 	// properties
 
 	@Getter @Setter
 	ObjectLookup<?> objectLookup;
+	
+	@Getter @Setter
+	ConsoleHelper<?> consoleHelper;
 
 	@Getter @Setter
 	String editPrivKey;
@@ -43,10 +56,14 @@ class ObjectSettingsPart
 
 	@Getter @Setter
 	String removeLocalName;
+	
+	@Getter @Setter
+	FieldsProvider formFieldsProvider;
 
 	// state
 
 	Record<?> object;
+	Record<?> parent;
 	boolean canEdit;
 
 	// implementation
@@ -76,8 +93,54 @@ class ObjectSettingsPart
 
 		canEdit =
 			editPrivKey != null
-				&& requestContext.canContext (editPrivKey);
+				&& requestContext.canContext (editPrivKey);		
+		
+		if (formFieldsProvider != null) {		
+			prepareParent();
+			prepareFieldSet();
+		}
 
+
+	}
+	
+	void prepareParent () {
+			
+		ConsoleHelper<?> parentHelper =
+			objectManager.getConsoleObjectHelper (
+				consoleHelper.parentClass ());
+			
+		if (parentHelper.root ()) {
+
+			parent =
+				rootHelper.find (0);
+
+			return;
+
+		}
+
+		Integer parentId =
+			requestContext.stuffInt (
+				parentHelper.idKey ());
+
+		if (parentId != null) {
+
+			// use specific parent
+
+			parent =
+				parentHelper.find (
+					parentId);
+
+			return;
+
+		}
+		
+	}
+	
+	void prepareFieldSet() {
+		
+		formFieldSet = formFieldsProvider.getFields(
+				parent);
+		
 	}
 
 	@Override
@@ -92,8 +155,18 @@ class ObjectSettingsPart
 	@Override
 	public
 	void goBodyStuff () {
-
+		
 		if (canEdit) {
+			
+			String enctype = "application/x-www-form-urlencoded";
+			try {
+				if (formFieldSet.fileUpload ()) {
+					enctype = "multipart/form-data";
+				}
+			}
+			catch (Exception e) {
+				enctype = "application/x-www-form-urlencoded";
+			}
 
 			printFormat (
 				"<form",
@@ -101,9 +174,7 @@ class ObjectSettingsPart
 				" action=\"%h\"",
 				requestContext.resolveLocalUrl (localName),
 				" enctype=\"%h\"",
-				formFieldSet.fileUpload ()
-					? "multipart/form-data"
-					: "application/x-www-form-urlencoded",
+				enctype,
 				">\n");
 
 		}
