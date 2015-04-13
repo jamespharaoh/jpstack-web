@@ -39,6 +39,10 @@
 		</list>
 
 		<object>
+		
+			<object-summary-page
+				fields-provider="ticketSummaryFieldsProvider"
+				priv-key="ticketManager.manage"/>
 
 			<object-settings-page
 				fields-provider="ticketSettingsFieldsProvider"

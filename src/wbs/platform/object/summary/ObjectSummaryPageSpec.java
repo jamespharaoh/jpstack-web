@@ -28,6 +28,9 @@ class ObjectSummaryPageSpec {
 
 	@DataAttribute ("fields")
 	String fieldsName;
+	
+	@DataAttribute ("fields-provider")
+	String fieldsProviderName;
 
 	@DataAttribute
 	String privKey;

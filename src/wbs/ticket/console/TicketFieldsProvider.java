@@ -165,7 +165,16 @@ class TicketFieldsProvider
 			return ticketFieldsProvider.get ()
 				.setMode ("settings");
 
-		}	
+		}
+		
+		@PrototypeComponent ("ticketSummaryFieldsProvider")
+		public
+		FieldsProvider ticketSummaryFieldsProvider () {
+
+			return ticketFieldsProvider.get ()
+				.setMode ("summary");
+
+		}
 
 	}
 	
