@@ -58,6 +58,9 @@ public class TicketFieldTypeRec
 			nullable = true)
 	ObjectTypeRec objectType;
 	
+	@SimpleField
+	Boolean visible;
+	
 	// object hooks
 
 	public static

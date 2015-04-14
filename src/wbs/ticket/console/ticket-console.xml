@@ -51,15 +51,9 @@
 			<context-link
 				name="ticketNote"
 				link="ticketNote"
-				label="Ticket Notes"
+				label="Notes"
 				priv-key="ticket.ticketManager.manage"/>
 				
-			<context-link
-				name="ticketFieldValue"
-				link="ticketFieldValue"
-				label="Ticket Field Values"
-				priv-key="ticket.ticketManager.manage"/>
-
 			<object-events-page/>
 
 		</object>

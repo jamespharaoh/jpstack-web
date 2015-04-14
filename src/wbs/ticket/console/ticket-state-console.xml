@@ -44,7 +44,8 @@
 				fields="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
+				fields="settings"
+				priv-key="ticketManager.manage"/>
 
 			<object-events-page/>
 

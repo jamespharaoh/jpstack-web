@@ -62,6 +62,8 @@ class TicketFieldsProvider
 				new ArrayList<Object> ();
 		
 		for (TicketFieldTypeRec ticketFieldType : ticketFieldTypes) {
+			
+			if (mode == "list" && !ticketFieldType.getVisible()) { continue; }
 					
 			switch( ticketFieldType.getType() ) {
 				case string:					

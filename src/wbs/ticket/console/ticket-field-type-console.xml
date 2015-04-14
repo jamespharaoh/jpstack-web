@@ -44,8 +44,9 @@
 				fields="summary"/>
 
 			<object-settings-page
-				fields="settings"/>
-
+				fields="settings"
+				priv-key="ticketManager.manage"/>
+				
 			<object-events-page/>
 
 		</object>
@@ -80,6 +81,9 @@
 			name="objectType"
 			finder="objectType"/>
 			
+		<yes-no-field
+			name="visible"/>
+			
 	</field-set>
 
 	<field-set
@@ -103,6 +107,9 @@
 		<object-field
 			name="objectType"
 			finder="objectType"/>
+			
+		<yes-no-field
+			name="visible"/>
 
 	</field-set>
 
@@ -125,6 +132,9 @@
 		<object-field
 			name="objectType"
 			finder="objectType"/>
+			
+		<yes-no-field
+			name="visible"/>
 
 	</field-set>
 

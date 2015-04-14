@@ -45,25 +45,32 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"/>
+			<section
+				name="settings"
+				label="Settings">
+
+				<object-settings-page
+					short-name="general"
+					fields="settings"/>
+
+				<context-link
+					name="ticketState"
+					link="ticketState"
+					label="States"
+					priv-key="ticketManager.manage"/>
+					
+				<context-link
+					name="ticketFieldType"
+					link="ticketFieldType"
+					label="Field types"
+					priv-key="ticketManager.manage"/>
+
+			</section>
 
 			<context-link
 				name="ticket"
 				link="ticket"
 				label="Tickets"
-				priv-key="ticketManager.manage"/>
-				
-			<context-link
-				name="ticketState"
-				link="ticketState"
-				label="Ticket states"
-				priv-key="ticketManager.manage"/>
-				
-			<context-link
-				name="ticketFieldType"
-				link="ticketFieldType"
-				label="Ticket field types"
 				priv-key="ticketManager.manage"/>
 
 			<object-events-page/>

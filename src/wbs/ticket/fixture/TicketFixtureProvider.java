@@ -169,6 +169,8 @@ public class TicketFixtureProvider
 					.setType(TicketFieldTypeType.bool)
 					
 					.setRequired(true)			
+					
+					.setVisible(true)		
 			
 		);	
 	
@@ -186,7 +188,9 @@ public class TicketFixtureProvider
 				
 				.setType(TicketFieldTypeType.number)
 				
-				.setRequired(true)			
+				.setRequired(true)	
+				
+				.setVisible(true)		
 		
 		);
 		
@@ -204,7 +208,9 @@ public class TicketFixtureProvider
 				
 				.setType(TicketFieldTypeType.string)
 				
-				.setRequired(true)			
+				.setRequired(true)	
+				
+				.setVisible(true)		
 		
 			);	
 		
