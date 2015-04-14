@@ -79,7 +79,7 @@ public class TicketFieldTypeRec
 				TicketFieldTypeRec ticketFieldType) {
 			
 			ticketFieldType.setCode (
-					randomLogic.generateNumericNoZero (8));
+					ticketFieldType.getName().toLowerCase());
 
 		}
 

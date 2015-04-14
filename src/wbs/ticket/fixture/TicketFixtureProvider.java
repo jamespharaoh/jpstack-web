@@ -135,11 +135,11 @@ public class TicketFixtureProvider
 			
 					.setTicketManager (
 						ticketManager)
-			
-					.setCode (
-						randomLogic.generateNumericNoZero (8))
 						
 					.setName("Read")
+					
+					.setCode (
+						"read")
 					
 					.setType(TicketFieldTypeType.bool)
 					
@@ -153,11 +153,11 @@ public class TicketFixtureProvider
 		
 				.setTicketManager (
 					ticketManager)
-		
-				.setCode (
-					randomLogic.generateNumericNoZero (8))
-					
+						
 				.setName("Number")
+				
+				.setCode (
+					"number")
 				
 				.setType(TicketFieldTypeType.number)
 				
@@ -171,11 +171,11 @@ public class TicketFixtureProvider
 		
 				.setTicketManager (
 					ticketManager)
-		
-				.setCode (
-					randomLogic.generateNumericNoZero (8))
-					
+						
 				.setName("Text")
+				
+				.setCode (
+					"text")
 				
 				.setType(TicketFieldTypeType.string)
 				
