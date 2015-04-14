@@ -55,6 +55,12 @@
 				priv-key="ticketManager.manage"/>
 				
 			<context-link
+				name="ticketState"
+				link="ticketState"
+				label="Ticket states"
+				priv-key="ticketManager.manage"/>
+				
+			<context-link
 				name="ticketFieldType"
 				link="ticketFieldType"
 				label="Ticket field types"

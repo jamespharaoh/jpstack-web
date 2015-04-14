@@ -47,7 +47,7 @@
 			<object-settings-page
 				fields-provider="ticketSettingsFieldsProvider"
 				priv-key="ticketManager.manage"/>
-
+				
 			<context-link
 				name="ticketNote"
 				link="ticketNote"

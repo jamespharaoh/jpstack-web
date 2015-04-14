@@ -104,6 +104,15 @@ class TicketFieldsProvider
     
 		}
 		
+		// adding the state field
+		
+		formFieldSpecs
+			.add(new ObjectFormFieldSpec()				
+				.name("ticketState")					
+				.label("State")
+				.finderName("ticketState")
+				.dynamic (false));
+		
 		String fieldSetName =
 			stringFormat (
 				"%s.%s",

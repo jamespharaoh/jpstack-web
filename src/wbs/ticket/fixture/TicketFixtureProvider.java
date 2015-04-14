@@ -22,6 +22,9 @@ import wbs.ticket.model.TicketNoteObjectHelper;
 import wbs.ticket.model.TicketNoteRec;
 import wbs.ticket.model.TicketObjectHelper;
 import wbs.ticket.model.TicketRec;
+import wbs.ticket.model.TicketStateObjectHelper;
+import wbs.ticket.model.TicketStateRec;
+import wbs.ticket.model.TicketStateState;
 
 @PrototypeComponent ("ticketFixtureProvider")
 public class TicketFixtureProvider
@@ -49,6 +52,9 @@ public class TicketFixtureProvider
 	
 	@Inject
 	TicketNoteObjectHelper ticketNoteHelper;
+	
+	@Inject
+	TicketStateObjectHelper ticketStateHelper;
 	
 	@Inject
 	ObjectTypeObjectHelper objectTypeHelper;
@@ -117,6 +123,22 @@ public class TicketFixtureProvider
 	
 		);
 		
+		TicketStateRec submittedState =
+			ticketStateHelper.insert (
+				new TicketStateRec ()
+		
+				.setTicketManager (
+					ticketManager)
+						
+				.setName("Submitted")
+				
+				.setCode (
+					"submitted")
+				
+				.setState(TicketStateState.submitted)	
+			
+		);
+				
 		TicketRec ticket =
 			ticketHelper.insert (
 				new TicketRec ()
@@ -126,6 +148,9 @@ public class TicketFixtureProvider
 	
 			.setCode (
 				randomLogic.generateNumericNoZero (8))
+				
+			.setTicketState(
+				submittedState)
 	
 		);
 		
@@ -236,6 +261,7 @@ public class TicketFixtureProvider
 		ticket
 			.setNumNotes (
 				ticket.getNumNotes () + 1);
+		
 	
 	}
 

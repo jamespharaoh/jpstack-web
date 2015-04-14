@@ -57,8 +57,7 @@ public class TicketRec
 
 	// details
 	
-	@ReferenceField (
-			nullable = true)
+	@ReferenceField
 	TicketStateRec ticketState;
 	
 	@SimpleField (
