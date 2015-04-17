@@ -1,6 +1,6 @@
 <plugin
-	name="ticket"
-	package="wbs.ticket">
+	name="ticket-core"
+	package="wbs.services.ticket.core">
 
 	<plugin-dependencies>
 		<plugin-dependency name="sms-apps-common"/>
