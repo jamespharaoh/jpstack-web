@@ -57,6 +57,7 @@ import wbs.sms.locator.model.LongLat;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.logic.NumberLogic;
 import wbs.sms.number.core.model.NumberRec;
+import wbs.ticket.model.TicketManagerRec;
 
 @Log4j
 @Accessors (chain = true)
@@ -450,7 +451,7 @@ class ChatUserRec
 	ChatUserImageMode imageMode = ChatUserImageMode.link;
 
 	// --------------------------------- related objects
-
+	
 	@CollectionField (
 		key = "to_user_id",
 		index = "from_user_id")

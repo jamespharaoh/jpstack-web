@@ -2,8 +2,11 @@ package wbs.ticket.fixture;
 
 import javax.inject.Inject;
 
+import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
@@ -58,6 +61,9 @@ public class TicketFixtureProvider
 	
 	@Inject
 	ObjectTypeObjectHelper objectTypeHelper;
+	
+	@Inject
+	ObjectManager objectManager;
 	
 	@Inject
 	SliceObjectHelper sliceHelper;
@@ -212,6 +218,32 @@ public class TicketFixtureProvider
 				
 				.setVisible(true)		
 		
+			);
+				
+
+		TicketFieldTypeRec chatUserType =
+			ticketFieldTypeHelper.insert (
+				new TicketFieldTypeRec ()
+		
+				.setTicketManager (
+					ticketManager)
+						
+				.setName("chat_user")
+				
+				.setCode (
+					"chat_user")
+				
+				.setType(TicketFieldTypeType.object)
+				
+				.setObjectType(
+					objectTypeHelper.findById (
+						objectManager.objectHelperForClass (
+							ChatUserRec.class).objectTypeId()))
+				
+				.setRequired(true)	
+				
+				.setVisible(true)		
+		
 			);	
 		
 		ticketFieldValueHelper.insert(
@@ -241,17 +273,30 @@ public class TicketFixtureProvider
 		);
 		
 		ticketFieldValueHelper.insert(
-				new TicketFieldValueRec ()
-						
-					.setTicket (
-						ticket)
-			
-					.setTicketFieldType (
-						booleanType)
-						
-					.setBooleanValue(true)
+			new TicketFieldValueRec ()
 					
-			);
+				.setTicket (
+					ticket)
+		
+				.setTicketFieldType (
+					booleanType)
+					
+				.setBooleanValue(true)
+				
+		);
+		
+		ticketFieldValueHelper.insert(
+			new TicketFieldValueRec ()
+					
+				.setTicket (
+					ticket)
+		
+				.setTicketFieldType (
+					chatUserType)
+					
+				.setIntegerValue(1)
+				
+		);
 			
 		ticketNoteHelper.insert (
 			new TicketNoteRec ()

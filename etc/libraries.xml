@@ -2,54 +2,154 @@
 	<library name="activation" type="jar" version="1.1"/>
 	<library name="ant" type="jar" version="1.9.2" source="yes"/>
 	<library name="ant-launcher" type="jar" version="1.9.2"/>
+	<library name="antlr" type="jar" version="2.7.5H3"/>
 	<library name="antlr" type="jar" version="2.7.7"/>
+	<library name="aopalliance" type="jar" version="1.0"/>
+	<library name="asm-analysis" type="jar" version="4.0"/>
+	<library name="asm-commons" type="jar" version="4.0"/>
+	<library name="asm" type="jar" version="3.1"/>
+	<library name="asm" type="jar" version="4.0"/>
+	<library name="asm-tree" type="jar" version="4.0"/>
+	<library name="asm-util" type="jar" version="4.0"/>
+	<library name="aspectjweaver" type="jar" version="1.7.2"/>
+	<library name="backport-util-concurrent" type="jar" version="3.0"/>
+	<library name="bsh" type="jar" version="2.0b4"/>
+	<library name="c3p0" type="jar" version="0.9.1.2"/>
+	<library name="cglib" type="jar" version="2.2"/>
+	<library name="classmate" type="bundle" version="0.5.2"/>
+	<library name="commons-cli" type="jar" version="1.2"/>
 	<library name="commons-codec" type="jar" version="1.6"/>
+	<library name="commons-collections" type="jar" version="3.1"/>
+	<library name="commons-collections" type="jar" version="3.2"/>
 	<library name="commons-fileupload" type="jar" version="1.3" source="yes"/>
-	<library name="commons-io" type="jar" version="2.2"/>
+	<library name="commons-httpclient" type="jar" version="3.1"/>
+	<library name="commons-io" type="jar" version="2.2" source="yes"/>
+	<library name="commons-lang" type="jar" version="2.1"/>
+	<library name="commons-lang3" type="jar" version="3.1" source="yes"/>
 	<library name="commons-lang3" type="jar" version="3.2.1" source="yes"/>
 	<library name="commons-logging" type="jar" version="1.1.3"/>
+	<library name="commons-pool" type="jar" version="1.3"/>
+	<library name="derby" type="jar" version="10.5.3.0_1"/>
+	<library name="derbyclient" type="jar" version="10.5.3.0_1"/>
 	<library name="dom4j" type="jar" version="1.6.1"/>
+	<library name="ehcache" type="jar" version="1.1"/>
+	<library name="ejb-api" type="jar" version="3.0"/>
+	<library name="ejb3-persistence" type="jar" version="1.0.2.GA"/>
+	<library name="el-api" type="jar" version="1.0"/>
+	<library name="geronimo-jms_1.1_spec" type="jar" version="1.1"/>
+	<library name="geronimo-jpa_3.0_spec" type="jar" version="1.0"/>
+	<library name="geronimo-jta_1.1_spec" type="jar" version="1.1"/>
+	<library name="gpars" type="jar" version="1.0.0"/>
+	<library name="groovy-all" type="jar" version="1.8.8"/>
+	<library name="groovy" type="jar" version="2.1.8" source="yes"/>
 	<library name="gson" type="jar" version="2.2.2"/>
+	<library name="guava" type="bundle" version="15.0" source="yes"/>
 	<library name="guava" type="bundle" version="16.0.1" source="yes"/>
+	<library name="h2" type="jar" version="1.0.71"/>
 	<library name="hamcrest-core" type="jar" version="1.1"/>
+	<library name="hessian" type="jar" version="4.0.33" source="yes"/>
+	<library name="hibernate-commons-annotations" type="jar" version="3.2.0.Final"/>
 	<library name="hibernate-commons-annotations" type="jar" version="4.0.2.Final" source="yes"/>
+	<library name="hibernate-core" type="jar" version="4.0.0.Beta2" source="yes"/>
 	<library name="hibernate-core" type="jar" version="4.2.6.Final" source="yes"/>
+	<library name="hibernate" type="jar" version="3.0.5"/>
 	<library name="hibernate-jpa-2.0-api" type="jar" version="1.0.1.Final"/>
 	<library name="hibernate-validator" type="jar" version="4.2.0.Final" source="yes"/>
+	<library name="hibernate-validator" type="jar" version="4.3.0.Final"/>
+	<library name="hsqldb" type="jar" version="1.8.0.10"/>
 	<library name="httpclient" type="jar" version="4.3.1" source="yes"/>
 	<library name="httpcore" type="jar" version="4.3"/>
 	<library name="httpmime" type="jar" version="4.3.1" source="yes"/>
+	<library name="ibatis-sqlmap" type="jar" version="2.3.4.726"/>
+	<library name="ivy" type="jar" version="2.2.0"/>
+	<library name="jackson-annotations" type="jar" version="2.0.1"/>
+	<library name="jackson-core-asl" type="jar" version="1.4.2"/>
+	<library name="jackson-core" type="bundle" version="2.0.1"/>
+	<library name="jackson-databind" type="bundle" version="2.0.1"/>
+	<library name="jackson-mapper-asl" type="jar" version="1.4.2"/>
+	<library name="jandex" type="jar" version="1.0.0.Beta7"/>
+	<library name="jansi" type="jar" version="1.6"/>
+	<library name="javaee-api" type="jar" version="5.0-2"/>
+	<library name="javassist" type="bundle" version="3.17.1-GA"/>
+	<library name="javassist" type="jar" version="3.12.0.GA"/>
 	<library name="javassist" type="jar" version="3.12.1.GA" source="yes"/>
 	<library name="javassist" type="jar" version="3.15.0-GA"/>
+	<library name="javassist" type="jar" version="3.9.0.GA"/>
 	<library name="javax.inject" type="jar" version="1" source="yes"/>
+	<library name="javax.servlet-api" type="jar" version="3.0.1"/>
 	<library name="jaxb-api" type="jar" version="2.2"/>
 	<library name="jaxb-impl" type="jar" version="2.1.12"/>
 	<library name="jaxen" type="jar" version="1.1-beta-8"/>
+	<library name="jaxrpc-api" type="jar" version="1.1"/>
+	<library name="jboss-logging" type="jar" version="3.1.0.CR2"/>
 	<library name="jboss-logging" type="jar" version="3.1.0.GA"/>
 	<library name="jboss-transaction-api_1.1_spec" type="jar" version="1.0.1.Final" source="yes"/>
+	<library name="jdo-api" type="jar" version="3.0"/>
 	<library name="jdom" type="jar" version="1.0"/>
+	<library name="jetty-continuation" type="jar" version="8.1.5.v20120716"/>
+	<library name="jetty-http" type="jar" version="8.1.5.v20120716"/>
+	<library name="jetty-io" type="jar" version="8.1.5.v20120716"/>
+	<library name="jetty-security" type="jar" version="8.1.5.v20120716"/>
+	<library name="jetty-server" type="jar" version="8.1.5.v20120716"/>
+	<library name="jetty-servlet" type="jar" version="8.1.5.v20120716"/>
+	<library name="jetty-util" type="jar" version="8.1.5.v20120716"/>
+	<library name="jline" type="jar" version="1.0"/>
 	<library name="joda-convert" type="jar" version="1.2"/>
+	<library name="joda-time" type="jar" version="2.1"/>
 	<library name="joda-time" type="jar" version="2.3" source="yes"/>
+	<library name="jruby" type="jar" version="1.6.5.1"/>
+	<library name="jsf-api" type="jar" version="1.2_08"/>
 	<library name="json-simple" type="bundle" version="1.1.1" source="yes"/>
 	<library name="jsoup" type="jar" version="1.5.2"/>
+	<library name="jsp-api" type="jar" version="2.1"/>
+	<library name="jsr166y" type="jar" version="1.7.0"/>
 	<library name="jsr305" type="jar" version="1.3.9"/>
 	<library name="jta" type="jar" version="1.1" source="yes"/>
 	<library name="junit" type="jar" version="4.10"/>
+	<library name="jython" type="jar" version="2.1"/>
 	<library name="log4j" type="bundle" version="1.2.17" source="yes"/>
+	<library name="lombok" type="jar" version="1.12.2" source="yes"/>
 	<library name="lombok" type="jar" version="1.16.2" source="yes"/>
 	<library name="mail" type="jar" version="1.4.3"/>
 	<library name="merchantsdk" type="jar" version="2.13.117" source="yes"/>
+	<library name="openjpa" type="jar" version="1.1.0"/>
 	<library name="paypal-core" type="jar" version="1.6.6" source="yes"/>
 	<library name="permissionssdk" type="jar" version="2.5.109" source="yes"/>
+	<library name="persistence-api" type="jar" version="1.0"/>
 	<library name="portlet-api" type="jar" version="1.0"/>
+	<library name="portlet-api" type="jar" version="2.0"/>
 	<library name="postgresql" type="jar" version="9.1-901.jdbc4" source="yes"/>
+	<library name="rome" type="jar" version="1.0"/>
+	<library name="saaj-api" type="jar" version="1.3"/>
+	<library name="serp" type="jar" version="1.13.1"/>
+	<library name="servlet-api" type="jar" version="2.4"/>
 	<library name="servlet-api" type="jar" version="2.5"/>
 	<library name="slf4j-api" type="jar" version="1.6.1"/>
+	<library name="spring-aop" type="jar" version="3.2.4.RELEASE"/>
+	<library name="spring-beans" type="jar" version="3.2.4.RELEASE"/>
+	<library name="spring-context" type="jar" version="3.2.4.RELEASE" source="yes"/>
+	<library name="spring-core" type="jar" version="3.2.4.RELEASE"/>
+	<library name="spring-dao" type="jar" version="1.2.9"/>
+	<library name="spring-expression" type="jar" version="3.2.4.RELEASE"/>
+	<library name="spring-hibernate" type="jar" version="1.2.9"/>
+	<library name="spring-instrument" type="jar" version="3.2.4.RELEASE"/>
+	<library name="spring-jdbc" type="jar" version="3.2.4.RELEASE" source="yes"/>
+	<library name="spring-orm" type="jar" version="1.2.9"/>
+	<library name="spring-orm" type="jar" version="3.2.4.RELEASE" source="yes"/>
+	<library name="spring-oxm" type="jar" version="3.2.4.RELEASE"/>
+	<library name="spring-tx" type="jar" version="3.2.4.RELEASE"/>
+	<library name="spring-web" type="jar" version="3.2.4.RELEASE" source="yes"/>
+	<library name="spring-webmvc" type="jar" version="1.2.9"/>
+	<library name="standard" type="jar" version="1.1.2"/>
+	<library name="toplink-essentials" type="jar" version="2.0-41b"/>
+	<library name="transaction-api" type="jar" version="1.1"/>
 	<library name="usertype.jodatime" type="jar" version="2.0.1" source="yes"/>
 	<library name="usertype.spi" type="jar" version="2.0.1"/>
 	<library name="validation-api" type="jar" version="1.0.0.GA"/>
 	<library name="xalan" type="jar" version="2.7.0"/>
 	<library name="xercesImpl" type="jar" version="2.6.2"/>
 	<library name="xmlParserAPIs" type="jar" version="2.6.2"/>
+	<library name="xmlpull" type="jar" version="1.1.3.1"/>
 	<library name="xom" type="jar" version="1.1" source="yes"/>
+	<library name="xstream" type="jar" version="1.4.2"/>
 </libraries>

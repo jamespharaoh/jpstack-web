@@ -639,6 +639,14 @@ class ObjectManagerImpl
 			if (
 				equal (
 					pathPart,
+					"this")
+			) {
+
+				// same object
+
+			} else if (
+				equal (
+					pathPart,
 					"parent")
 			) {
 

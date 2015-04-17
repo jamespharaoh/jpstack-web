@@ -166,6 +166,10 @@
 		<plugin
 			name="object-list"
 			package="wbs.platform.object.list"/>
+			
+		<plugin
+			name="object-ticket-create"
+			package="wbs.platform.object.ticket"/>
 
 		<plugin
 			name="object-search"

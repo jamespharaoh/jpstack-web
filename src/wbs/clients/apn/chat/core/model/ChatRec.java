@@ -41,6 +41,7 @@ import wbs.platform.scaffold.model.SliceRec;
 import wbs.sms.gazetteer.model.GazetteerRec;
 import wbs.sms.locator.model.LocatorRec;
 import wbs.sms.number.format.model.NumberFormatRec;
+import wbs.ticket.model.TicketManagerRec;
 
 @Accessors (chain = true)
 @Data
@@ -171,7 +172,7 @@ class ChatRec
 
 	@ReferenceField (nullable = true)
 	ChatUserRec systemChatUser;
-
+	
 	@SimpleField
 	Integer maxAlarmTime = 0;
 
@@ -247,6 +248,9 @@ class ChatRec
 	Integer numChatBroadcastSent = 0;
 
 	// related objects
+	
+	@ReferenceField (nullable = true)
+	TicketManagerRec ticketManager;
 
 	@CollectionField (
 		index = "keyword",

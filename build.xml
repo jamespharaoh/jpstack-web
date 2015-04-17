@@ -92,6 +92,7 @@
       <fileset dir="src/wbs/platform/object/browse/console/files"/>
       <fileset dir="src/wbs/platform/object/create/console/files"/>
       <fileset dir="src/wbs/platform/object/list/console/files"/>
+      <fileset dir="src/wbs/platform/object/ticket/console/files"/>
       <fileset dir="src/wbs/platform/object/search/console/files"/>
       <fileset dir="src/wbs/platform/object/settings/console/files"/>
       <fileset dir="src/wbs/platform/priv/console/files"/>
@@ -259,6 +260,7 @@
       <fileset dir="src/wbs/platform/object/browse/api/files"/>
       <fileset dir="src/wbs/platform/object/create/api/files"/>
       <fileset dir="src/wbs/platform/object/list/api/files"/>
+      <fileset dir="src/wbs/platform/object/ticket/api/files"/>
       <fileset dir="src/wbs/platform/object/search/api/files"/>
       <fileset dir="src/wbs/platform/object/settings/api/files"/>
       <fileset dir="src/wbs/platform/priv/api/files"/>
@@ -460,6 +462,7 @@
       <fileset dir="src/wbs/platform/object/browse/console/files"/>
       <fileset dir="src/wbs/platform/object/create/console/files"/>
       <fileset dir="src/wbs/platform/object/list/console/files"/>
+      <fileset dir="src/wbs/platform/object/ticket/console/files"/>
       <fileset dir="src/wbs/platform/object/search/console/files"/>
       <fileset dir="src/wbs/platform/object/settings/console/files"/>
       <fileset dir="src/wbs/platform/priv/console/files"/>
@@ -627,6 +630,7 @@
       <fileset dir="src/wbs/platform/object/browse/api/files"/>
       <fileset dir="src/wbs/platform/object/create/api/files"/>
       <fileset dir="src/wbs/platform/object/list/api/files"/>
+      <fileset dir="src/wbs/platform/object/ticket/api/files"/>
       <fileset dir="src/wbs/platform/object/search/api/files"/>
       <fileset dir="src/wbs/platform/object/settings/api/files"/>
       <fileset dir="src/wbs/platform/priv/api/files"/>

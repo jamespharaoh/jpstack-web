@@ -1,6 +1,8 @@
 package wbs.ticket.model;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
@@ -15,15 +17,11 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.hibernate.TransientObjectException;
 import org.joda.time.Instant;
 
-import com.google.common.collect.Ordering;
-
 import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.CollectionField;
-import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
-import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
@@ -33,6 +31,8 @@ import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.object.core.model.ObjectTypeRec;
+
+import com.google.common.collect.Ordering;
 
 @Accessors (chain = true)
 @Data
@@ -69,9 +69,10 @@ public class TicketRec
 		Set<TicketNoteRec> ticketNotes =
 			new TreeSet<TicketNoteRec> ();
 	
-	@CollectionField
-		Set<TicketFieldValueRec> ticketFieldValues =
-			new TreeSet<TicketFieldValueRec> (
+	@CollectionField (
+			index = "ticket_field_type_id")
+		Map<Integer,TicketFieldValueRec> ticketFieldValues =
+			new TreeMap<Integer,TicketFieldValueRec> (
 				Ordering.arbitrary ());
 	
 	// statistics
@@ -122,7 +123,8 @@ public class TicketRec
 				Record<?> object,
 				String name) {
 			
-			TicketRec ticket = (TicketRec) object;
+			TicketRec ticket = 
+				(TicketRec) object;
 			
 			//Find the ticket field type
 			
@@ -136,9 +138,13 @@ public class TicketRec
 				//Find the ticket fueld value
 				
 				TicketFieldValueRec ticketFieldValue =
+					ticket.getTicketFieldValues().get( 
+						ticketFieldType.getId());
+				
+				/*TicketFieldValueRec ticketFieldValue =
 						ticketHelper.get().findTicketFieldValue(
 							ticket,
-							ticketFieldType);	
+							ticketFieldType);*/	
 				
 				if (ticketFieldValue == null) { return null; }
 				
@@ -247,8 +253,9 @@ public class TicketRec
 			ticket.setNumFields (
 				ticket.getNumFields() + 1);
 					
-			ticket.getTicketFieldValues ().add (
-					ticketFieldValue);
+			ticket.getTicketFieldValues ().put (
+				ticketFieldType.getId(), 
+				ticketFieldValue);
 			
 		}
 		
