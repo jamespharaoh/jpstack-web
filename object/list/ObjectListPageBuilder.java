@@ -37,8 +37,8 @@ import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
 import wbs.platform.object.criteria.WhereICanManageCriteriaSpec;
 import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
 import wbs.platform.scaffold.model.SliceRec;
-import wbs.ticket.console.FieldsProvider;
-import wbs.ticket.console.StaticFieldsProvider;
+import wbs.services.ticket.core.console.FieldsProvider;
+import wbs.services.ticket.core.console.StaticFieldsProvider;
 
 import com.google.common.collect.ImmutableMap;
 

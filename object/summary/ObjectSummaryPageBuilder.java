@@ -38,7 +38,7 @@ import wbs.platform.console.responder.ConsoleFile;
 import wbs.platform.console.tab.ConsoleContextTab;
 import wbs.platform.console.tab.TabContextResponder;
 import wbs.platform.text.console.TextPart;
-import wbs.ticket.console.FieldsProvider;
+import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryPageBuilder")

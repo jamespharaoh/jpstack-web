@@ -139,10 +139,6 @@
 		package="object.settings"/>
 		
 	<plugin
-		name="object-ticket-create"
-		package="object.ticket"/>
-
-	<plugin
 		name="priv"
 		package="priv"/>
 

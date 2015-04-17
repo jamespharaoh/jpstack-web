@@ -25,7 +25,7 @@ import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.lookup.ObjectLookup;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.scaffold.model.RootObjectHelper;
-import wbs.ticket.console.FieldsProvider;
+import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsAction")

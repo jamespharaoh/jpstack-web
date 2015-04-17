@@ -39,7 +39,7 @@ import wbs.platform.console.part.PagePart;
 import wbs.platform.console.responder.ConsoleFile;
 import wbs.platform.console.tab.ConsoleContextTab;
 import wbs.platform.console.tab.TabContextResponder;
-import wbs.ticket.console.FieldsProvider;
+import wbs.services.ticket.core.console.FieldsProvider;
 
 @PrototypeComponent ("objectSettingsPageBuilder")
 @ConsoleModuleBuilderHandler
