@@ -1,6 +1,6 @@
 <plugin
 	name="object-ticket-create"
-	package="wbs.platform.object.ticket">
+	package="wbs.services.ticket.create">
 
 	<layer name="console">
 		<bean class="ObjectTicketCreatePageSpec"/>

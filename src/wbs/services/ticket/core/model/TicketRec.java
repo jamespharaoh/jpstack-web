@@ -1,4 +1,4 @@
-package wbs.ticket.model;
+package wbs.services.ticket.core.model;
 
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +31,9 @@ import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.object.core.model.ObjectTypeRec;
+import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
+import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
+import wbs.services.ticket.core.model.TicketObjectHelper;
 
 import com.google.common.collect.Ordering;
 
@@ -130,8 +133,8 @@ public class TicketRec
 			
 			TicketFieldTypeRec ticketFieldType =			
 				ticketFieldTypeHelper.get().findByCode(
-						ticket.getTicketManager(), 
-						name);
+					ticket.getTicketManager(), 
+					name);
 
 			try {
 				
@@ -207,10 +210,14 @@ public class TicketRec
 			TicketFieldValueRec ticketFieldValue;
 			
 			try {
-				ticketFieldValue = 
+				/*ticketFieldValue = 
 					ticketHelper.get().findTicketFieldValue(
 						ticket,
-						ticketFieldType);	
+						ticketFieldType);	*/				
+				
+				 ticketFieldValue =
+					ticket.getTicketFieldValues().get( 
+						ticketFieldType.getId());
 			}
 			catch (Exception e) {
 				ticketFieldValue =

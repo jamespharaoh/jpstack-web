@@ -38,10 +38,10 @@ import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
 import wbs.platform.currency.model.CurrencyRec;
 import wbs.platform.scaffold.model.SliceRec;
+import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.sms.gazetteer.model.GazetteerRec;
 import wbs.sms.locator.model.LocatorRec;
 import wbs.sms.number.format.model.NumberFormatRec;
-import wbs.ticket.model.TicketManagerRec;
 
 @Accessors (chain = true)
 @Data

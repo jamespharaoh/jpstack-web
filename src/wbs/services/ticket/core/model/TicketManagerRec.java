@@ -1,4 +1,4 @@
-package wbs.ticket.model;
+package wbs.services.ticket.core.model;
 
 import java.util.Set;
 import java.util.TreeSet;

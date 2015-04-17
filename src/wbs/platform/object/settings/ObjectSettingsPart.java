@@ -18,7 +18,7 @@ import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.lookup.ObjectLookup;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.scaffold.model.RootObjectHelper;
-import wbs.ticket.console.FieldsProvider;
+import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsPart")

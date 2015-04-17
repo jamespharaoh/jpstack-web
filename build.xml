@@ -92,7 +92,7 @@
       <fileset dir="src/wbs/platform/object/browse/console/files"/>
       <fileset dir="src/wbs/platform/object/create/console/files"/>
       <fileset dir="src/wbs/platform/object/list/console/files"/>
-      <fileset dir="src/wbs/platform/object/ticket/console/files"/>
+      <fileset dir="src/wbs/services/ticket/create/console/files"/>
       <fileset dir="src/wbs/platform/object/search/console/files"/>
       <fileset dir="src/wbs/platform/object/settings/console/files"/>
       <fileset dir="src/wbs/platform/priv/console/files"/>
@@ -187,7 +187,7 @@
       <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
       <fileset dir="src/wbs/applications/imchat/console/files"/>
       <fileset dir="src/wbs/wallet/console/files"/>
-      <fileset dir="src/wbs/ticket/console/files"/>
+      <fileset dir="src/wbs/services/ticket/core/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
@@ -260,7 +260,7 @@
       <fileset dir="src/wbs/platform/object/browse/api/files"/>
       <fileset dir="src/wbs/platform/object/create/api/files"/>
       <fileset dir="src/wbs/platform/object/list/api/files"/>
-      <fileset dir="src/wbs/platform/object/ticket/api/files"/>
+      <fileset dir="src/wbs/services/ticket/create/api/files"/>
       <fileset dir="src/wbs/platform/object/search/api/files"/>
       <fileset dir="src/wbs/platform/object/settings/api/files"/>
       <fileset dir="src/wbs/platform/priv/api/files"/>
@@ -355,7 +355,7 @@
       <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
       <fileset dir="src/wbs/applications/imchat/api/files"/>
       <fileset dir="src/wbs/wallet/api/files"/>
-      <fileset dir="src/wbs/ticket/api/files"/>
+      <fileset dir="src/wbs/services/ticket/core/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
@@ -462,7 +462,7 @@
       <fileset dir="src/wbs/platform/object/browse/console/files"/>
       <fileset dir="src/wbs/platform/object/create/console/files"/>
       <fileset dir="src/wbs/platform/object/list/console/files"/>
-      <fileset dir="src/wbs/platform/object/ticket/console/files"/>
+      <fileset dir="src/wbs/services/ticket/create/console/files"/>
       <fileset dir="src/wbs/platform/object/search/console/files"/>
       <fileset dir="src/wbs/platform/object/settings/console/files"/>
       <fileset dir="src/wbs/platform/priv/console/files"/>
@@ -557,7 +557,7 @@
       <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
       <fileset dir="src/wbs/applications/imchat/console/files"/>
       <fileset dir="src/wbs/wallet/console/files"/>
-      <fileset dir="src/wbs/ticket/console/files"/>
+      <fileset dir="src/wbs/services/ticket/core/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
@@ -630,7 +630,7 @@
       <fileset dir="src/wbs/platform/object/browse/api/files"/>
       <fileset dir="src/wbs/platform/object/create/api/files"/>
       <fileset dir="src/wbs/platform/object/list/api/files"/>
-      <fileset dir="src/wbs/platform/object/ticket/api/files"/>
+      <fileset dir="src/wbs/services/ticket/create/api/files"/>
       <fileset dir="src/wbs/platform/object/search/api/files"/>
       <fileset dir="src/wbs/platform/object/settings/api/files"/>
       <fileset dir="src/wbs/platform/priv/api/files"/>
@@ -725,7 +725,7 @@
       <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
       <fileset dir="src/wbs/applications/imchat/api/files"/>
       <fileset dir="src/wbs/wallet/api/files"/>
-      <fileset dir="src/wbs/ticket/api/files"/>
+      <fileset dir="src/wbs/services/ticket/core/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
@@ -929,7 +929,7 @@
       <script name="src/wbs/clients/apn/chat/user/image/model/chat-user-image-data.sql"/>
       <script name="src/wbs/applications/imchat/model/im-chat-core-data.sql"/>
       <script name="src/wbs/wallet/model/wallet-data.sql"/>
-      <script name="src/wbs/ticket/model/ticket-data.sql"/>
+      <script name="src/wbs/services/ticket/core/model/ticket-data.sql"/>
       <script name="src/wbs/integrations/broadcastsystems/model/broadcast-systems-data.sql"/>
       <script name="src/wbs/integrations/dialogue/model/dialogue-data.sql"/>
       <script name="src/wbs/integrations/digitalselect/model/digital-select-data.sql"/>

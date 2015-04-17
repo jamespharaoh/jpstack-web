@@ -1,4 +1,4 @@
-package wbs.ticket.model;
+package wbs.services.ticket.core.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

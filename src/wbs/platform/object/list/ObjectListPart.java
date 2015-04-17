@@ -26,7 +26,7 @@ import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.object.criteria.CriteriaSpec;
 import wbs.platform.priv.console.PrivChecker;
-import wbs.ticket.console.FieldsProvider;
+import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectListPart")

@@ -1,4 +1,4 @@
-package wbs.ticket.console;
+package wbs.services.ticket.core.console;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.underscoreToCamel;
@@ -19,9 +19,11 @@ import wbs.platform.console.forms.ObjectFormFieldSpec;
 import wbs.platform.console.forms.TextFormFieldSpec;
 import wbs.platform.console.forms.YesNoFormFieldSpec;
 import wbs.platform.console.module.ConsoleModuleBuilder;
-import wbs.ticket.model.TicketFieldTypeObjectHelper;
-import wbs.ticket.model.TicketFieldTypeRec;
-import wbs.ticket.model.TicketManagerRec;
+import wbs.services.ticket.core.model.TicketFieldTypeRec;
+import wbs.services.ticket.core.model.TicketManagerRec;
+import wbs.services.ticket.core.console.TicketConsoleHelper;
+import wbs.services.ticket.core.console.TicketFieldTypeConsoleHelper;
+import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 
 @PrototypeComponent ("ticketFieldsProvider")
 public 

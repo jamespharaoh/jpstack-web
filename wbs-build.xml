@@ -169,7 +169,7 @@
 			
 		<plugin
 			name="object-ticket-create"
-			package="wbs.platform.object.ticket"/>
+			package="wbs.services.ticket.create"/>
 
 		<plugin
 			name="object-search"
@@ -560,8 +560,8 @@ i		<plugin
 			package="wbs.services.wallet"/>
 			
 		<plugin
-			name="ticket"
-			package="wbs.services.ticket"/>
+			name="ticket-core"
+			package="wbs.services.ticket.core"/>
 
 		<!-- integrations -->
 

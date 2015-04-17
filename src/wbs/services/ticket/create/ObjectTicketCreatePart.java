@@ -1,11 +1,6 @@
-package wbs.platform.object.ticket;
+package wbs.services.ticket.create;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -13,27 +8,20 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
-import wbs.framework.utils.etc.Html;
-import wbs.platform.console.context.ConsoleContext;
-import wbs.platform.console.context.ConsoleContextType;
 import wbs.platform.console.forms.FormFieldLogic;
 import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.part.AbstractPagePart;
-import wbs.platform.object.list.ObjectListPart;
-import wbs.platform.priv.console.PrivChecker;
-import wbs.platform.scaffold.model.RootObjectHelper;
-import wbs.ticket.console.FieldsProvider;
-import wbs.ticket.model.TicketFieldTypeObjectHelper;
-import wbs.ticket.model.TicketFieldTypeRec;
-import wbs.ticket.model.TicketFieldValueObjectHelper;
-import wbs.ticket.model.TicketFieldValueRec;
-import wbs.ticket.model.TicketManagerRec;
-import wbs.ticket.model.TicketRec;
+import wbs.services.ticket.core.console.FieldsProvider;
+import wbs.services.ticket.core.model.TicketFieldTypeRec;
+import wbs.services.ticket.core.model.TicketFieldValueRec;
+import wbs.services.ticket.core.model.TicketManagerRec;
+import wbs.services.ticket.core.model.TicketRec;
+import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
+import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectTicketCreatePart")
@@ -120,7 +108,7 @@ class ObjectTicketCreatePart
 			if (ticketFieldType == null) {
 				throw new RuntimeException ("Field type does not exist");
 			}
-			
+					
 			TicketFieldValueRec ticketFieldValue =
 				new TicketFieldValueRec ()				
 			
@@ -212,8 +200,7 @@ class ObjectTicketCreatePart
 		printFormat (
 			"<p><input",
 			" type=\"submit\"",
-			" value=\"create %h\"",
-			consoleHelper.shortName (),
+			" value=\"create ticket\"",
 			"></p>\n");
 
 		printFormat (

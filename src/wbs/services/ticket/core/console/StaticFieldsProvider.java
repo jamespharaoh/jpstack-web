@@ -1,4 +1,4 @@
-package wbs.ticket.console;
+package wbs.services.ticket.core.console;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;

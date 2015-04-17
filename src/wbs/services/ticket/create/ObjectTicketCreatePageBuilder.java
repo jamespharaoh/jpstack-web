@@ -1,4 +1,4 @@
-package wbs.platform.object.ticket;
+package wbs.services.ticket.create;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
@@ -6,7 +6,6 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -18,7 +17,6 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.framework.record.GlobalId;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
@@ -36,11 +34,8 @@ import wbs.platform.console.tab.TabContextResponder;
 import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
 import wbs.platform.object.criteria.WhereICanManageCriteriaSpec;
 import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
-import wbs.ticket.console.FieldsProvider;
-import wbs.ticket.model.TicketManagerObjectHelper;
-import wbs.ticket.model.TicketManagerRec;
-
-import com.google.common.collect.ImmutableMap;
+import wbs.services.ticket.core.console.FieldsProvider;
+import wbs.services.ticket.core.model.TicketManagerObjectHelper;
 
 @PrototypeComponent ("objectTicketCreatePageBuilder")
 @ConsoleModuleBuilderHandler

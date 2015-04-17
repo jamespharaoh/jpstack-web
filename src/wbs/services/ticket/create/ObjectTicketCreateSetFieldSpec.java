@@ -1,4 +1,4 @@
-package wbs.platform.object.ticket;
+package wbs.services.ticket.create;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

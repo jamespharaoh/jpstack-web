@@ -1,8 +1,7 @@
-package wbs.platform.object.ticket;
+package wbs.services.ticket.create;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.toInteger;
 
 import java.util.List;
 
@@ -20,8 +19,6 @@ import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
 import wbs.platform.console.action.ConsoleAction;
-import wbs.platform.console.context.ConsoleContext;
-import wbs.platform.console.context.ConsoleContextType;
 import wbs.platform.console.forms.FormFieldLogic;
 import wbs.platform.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.platform.console.forms.FormFieldSet;
@@ -36,12 +33,12 @@ import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
-import wbs.ticket.console.FieldsProvider;
-import wbs.ticket.model.TicketFieldTypeObjectHelper;
-import wbs.ticket.model.TicketFieldTypeRec;
-import wbs.ticket.model.TicketFieldValueRec;
-import wbs.ticket.model.TicketManagerRec;
-import wbs.ticket.model.TicketRec;
+import wbs.services.ticket.core.console.FieldsProvider;
+import wbs.services.ticket.core.model.TicketFieldTypeRec;
+import wbs.services.ticket.core.model.TicketFieldValueRec;
+import wbs.services.ticket.core.model.TicketManagerRec;
+import wbs.services.ticket.core.model.TicketRec;
+import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectTicketCreateAction")
@@ -210,6 +207,70 @@ class ObjectTicketCreateAction
 		TicketRec ticket =
 			new TicketRec ()			
 				.setTicketManager(ticketManager);
+		
+		for (ObjectTicketCreateSetFieldSpec ticketFieldSpec
+				: ticketFieldSpecs) {
+
+			TicketFieldTypeRec ticketFieldType
+				= ticketFieldTypeHelper.findByCode (
+					ticketManager, 
+					ticketFieldSpec.fieldTypeCode());
+			
+			if (ticketFieldType == null) {
+				throw new RuntimeException ("Field type does not exist");
+			}
+					
+			TicketFieldValueRec ticketFieldValue =
+				new TicketFieldValueRec ()				
+			
+					.setTicket(ticket)
+					.setTicketFieldType(ticketFieldType);
+					
+			switch( ticketFieldType.getType() ) {
+				case string:					
+					ticketFieldValue.setStringValue (
+						(String)objectManager.dereference (
+							contextObject,
+							ticketFieldSpec.valuePath()));
+					break;
+					
+				case number:
+					ticketFieldValue.setIntegerValue(
+						(Integer)objectManager.dereference (
+							contextObject,
+							ticketFieldSpec.valuePath()));
+					break;
+					
+				case bool:
+					ticketFieldValue.setBooleanValue(
+						(Boolean)objectManager.dereference (
+							contextObject,
+							ticketFieldSpec.valuePath()));
+					break;
+					
+				case object:
+					
+					Integer objectId = 
+						((Record<?>) objectManager.dereference (
+							contextObject,
+							ticketFieldSpec.valuePath())).getId();
+							
+					ticketFieldValue.setIntegerValue(objectId);
+					break;
+					
+				default:
+					throw new RuntimeException ();
+			
+			}		
+			
+			ticket.setNumFields (
+				ticket.getNumFields() + 1);
+					
+			ticket.getTicketFieldValues ().put (
+					ticketFieldType.getId (),
+					ticketFieldValue);
+	
+		}
 		
 		// set type code
 	

@@ -47,7 +47,7 @@ import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.model.RouterRec;
 import wbs.sms.route.sender.model.SenderObjectHelper;
-import wbs.ticket.model.TicketManagerObjectHelper;
+import wbs.services.ticket.core.model.TicketManagerObjectHelper;
 
 @PrototypeComponent ("chatCoreFixtureProvider")
 public

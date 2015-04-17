@@ -1,4 +1,4 @@
-package wbs.platform.object.ticket;
+package wbs.services.ticket.create;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;

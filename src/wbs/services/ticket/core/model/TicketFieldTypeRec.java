@@ -1,4 +1,4 @@
-package wbs.ticket.model;
+package wbs.services.ticket.core.model;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -23,6 +23,7 @@ import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.object.core.model.ObjectTypeRec;
+import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 
 @Accessors (chain = true)
 @Data

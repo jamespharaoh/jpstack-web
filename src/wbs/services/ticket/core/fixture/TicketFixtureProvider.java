@@ -1,8 +1,7 @@
-package wbs.ticket.fixture;
+package wbs.services.ticket.core.fixture;
 
 import javax.inject.Inject;
 
-import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
@@ -14,20 +13,20 @@ import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
-import wbs.ticket.model.TicketFieldTypeObjectHelper;
-import wbs.ticket.model.TicketFieldTypeRec;
-import wbs.ticket.model.TicketFieldTypeType;
-import wbs.ticket.model.TicketFieldValueObjectHelper;
-import wbs.ticket.model.TicketFieldValueRec;
-import wbs.ticket.model.TicketManagerObjectHelper;
-import wbs.ticket.model.TicketManagerRec;
-import wbs.ticket.model.TicketNoteObjectHelper;
-import wbs.ticket.model.TicketNoteRec;
-import wbs.ticket.model.TicketObjectHelper;
-import wbs.ticket.model.TicketRec;
-import wbs.ticket.model.TicketStateObjectHelper;
-import wbs.ticket.model.TicketStateRec;
-import wbs.ticket.model.TicketStateState;
+import wbs.services.ticket.core.model.TicketFieldTypeRec;
+import wbs.services.ticket.core.model.TicketFieldTypeType;
+import wbs.services.ticket.core.model.TicketFieldValueRec;
+import wbs.services.ticket.core.model.TicketManagerRec;
+import wbs.services.ticket.core.model.TicketNoteRec;
+import wbs.services.ticket.core.model.TicketRec;
+import wbs.services.ticket.core.model.TicketStateRec;
+import wbs.services.ticket.core.model.TicketStateState;
+import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
+import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
+import wbs.services.ticket.core.model.TicketManagerObjectHelper;
+import wbs.services.ticket.core.model.TicketNoteObjectHelper;
+import wbs.services.ticket.core.model.TicketObjectHelper;
+import wbs.services.ticket.core.model.TicketStateObjectHelper;
 
 @PrototypeComponent ("ticketFixtureProvider")
 public class TicketFixtureProvider
