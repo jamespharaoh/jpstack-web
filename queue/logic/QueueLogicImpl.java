@@ -71,8 +71,8 @@ class QueueLogicImpl
 	@Override
 	public
 	QueueRec findQueue (
-			Record<?> parentObject,
-			String code) {
+			@NonNull Record<?> parentObject,
+			@NonNull String code) {
 
 		QueueRec queue =
 			queueHelper.findByCode (
@@ -95,9 +95,9 @@ class QueueLogicImpl
 	@Override
 	public
 	QueueRec findOrCreateQueue (
-			Record<?> parent,
-			String queueTypeCode,
-			String code) {
+			@NonNull Record<?> parent,
+			@NonNull String queueTypeCode,
+			@NonNull String code) {
 
 		ObjectHelper<?> parentHelper =
 			objectManager.objectHelperForObject (
@@ -165,10 +165,10 @@ class QueueLogicImpl
 	@Override
 	public
 	QueueItemRec createQueueItem (
-			QueueSubjectRec queueSubject,
-			Record<?> refObject,
-			String source,
-			String details) {
+			@NonNull QueueSubjectRec queueSubject,
+			@NonNull Record<?> refObject,
+			@NonNull String source,
+			@NonNull String details) {
 
 		Date now =
 			new Date ();
@@ -249,11 +249,11 @@ class QueueLogicImpl
 
 	@Override
 	public QueueItemRec createQueueItem (
-			QueueRec queue,
-			Record<?> subjectObject,
-			Record<?> refObject,
-			String source,
-			String details) {
+			@NonNull QueueRec queue,
+			@NonNull Record<?> subjectObject,
+			@NonNull Record<?> refObject,
+			@NonNull String source,
+			@NonNull String details) {
 
 		QueueSubjectRec queueSubject =
 			findOrCreateQueueSubject (
@@ -271,8 +271,8 @@ class QueueLogicImpl
 	@Override
 	public
 	QueueSubjectRec findOrCreateQueueSubject (
-			QueueRec queue,
-			Record<?> object) {
+			@NonNull QueueRec queue,
+			@NonNull Record<?> object) {
 
 		QueueTypeRec queueType =
 			queue.getQueueType ();
@@ -308,7 +308,7 @@ class QueueLogicImpl
 	@Override
 	public
 	void cancelQueueItem (
-			QueueItemRec queueItem) {
+			@NonNull QueueItemRec queueItem) {
 
 		QueueSubjectRec queueSubject =
 			queueItem.getQueueSubject ();
