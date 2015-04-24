@@ -1,0 +1,57 @@
+<console-module
+	name="ticket-pending-console">
+
+	<object-context
+		name="ticket.pending"
+		bean-name="ticketPending"
+		object-name="ticket">
+
+		<object>
+
+			<context-tab-responder-page
+				name="history"/>
+
+			<context-action-page
+				name="form"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="ticketFields"
+		object-name="ticket">
+
+		<code-field/>
+
+		<integer-field
+			name="numNotes"/>
+			
+		<integer-field
+			name="numFields"/>
+			
+		<object-field
+			name="ticketState"
+			label="State"
+			finder="ticketState"/>
+
+	</field-set>
+
+	<field-set
+		name="ticketStateFields"
+		object-name="ticketState">
+
+		<name-field/>
+		
+		<yes-no-field
+			name="showInQueue"/>
+
+		<integer-field
+			name="minimum"/>
+			
+		<integer-field
+			name="maximum"/>
+
+	</field-set>
+
+</console-module>

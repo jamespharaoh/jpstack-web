@@ -1,5 +1,6 @@
 package wbs.services.ticket.core.model;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -53,6 +54,12 @@ public class TicketManagerRec
 			orderBy = "id")
 		Set<TicketFieldTypeRec> ticketFieldTypes =
 			new TreeSet<TicketFieldTypeRec> ();
+	
+	// children
+
+	@CollectionField
+	Set<TicketTemplateRec> templates =
+		new LinkedHashSet<TicketTemplateRec> ();
 	
 	// compare to
 	
