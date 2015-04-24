@@ -22,8 +22,8 @@ import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.helper.PrivKeySpec;
 import wbs.platform.console.module.ConsoleMetaManager;
 import wbs.platform.console.module.ConsoleModuleImpl;
-import wbs.platform.console.module.SimpleConsoleBuilderContainer;
 import wbs.platform.console.module.ResolvedConsoleContextLink;
+import wbs.platform.console.module.SimpleConsoleBuilderContainer;
 import wbs.platform.console.object.ObjectContext;
 import wbs.platform.console.tab.ConsoleContextTab;
 
