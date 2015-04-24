@@ -18,7 +18,6 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.hibernate.TransientObjectException;
 import org.joda.time.Instant;
 
-import wbs.applications.imchat.model.ImChatTemplateRec;
 import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.CollectionField;

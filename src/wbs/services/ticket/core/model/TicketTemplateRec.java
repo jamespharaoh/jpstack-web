@@ -34,7 +34,7 @@ class TicketTemplateRec
 	// identity
 
 	@ParentField
-	TicketRec ticket;
+	TicketManagerRec ticketManager;
 
 	@CodeField
 	String code;
@@ -68,8 +68,8 @@ class TicketTemplateRec
 		return new CompareToBuilder ()
 
 			.append (
-				getTicket (),
-				other.getTicket ())
+				getTicketManager (),
+				other.getTicketManager ())
 
 			.append (
 				getCode (),

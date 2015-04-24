@@ -2,7 +2,6 @@ package wbs.services.ticket.core.console;
 
 import javax.inject.Inject;
 
-import wbs.applications.imchat.model.ImChatRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.Responder;
 import wbs.platform.console.context.ConsoleContext;
