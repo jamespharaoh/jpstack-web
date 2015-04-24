@@ -322,7 +322,7 @@ class Oxygen8InboundSmsAction
 			shortcode,
 			route,
 			Optional.of (oxygen8Network.getNetwork ()),
-			Optional.of (new Instant (dateReceived)),
+			Optional.of (new Instant (dateReceived * 1000)),
 			Collections.<MediaRec>emptyList (),
 			Optional.<String>absent (),
 			Optional.<String>absent ());

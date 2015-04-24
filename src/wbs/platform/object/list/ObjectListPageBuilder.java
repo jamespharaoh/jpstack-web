@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -96,6 +97,7 @@ class ObjectListPageBuilder {
 	String typeCode;
 
 	FormFieldSet formFieldSet;
+	Map<String,ObjectListBrowserSpec> listBrowsersByFieldName;
 	Map<String,ObjectListTabSpec> listTabsByName;
 
 	// build
@@ -107,9 +109,11 @@ class ObjectListPageBuilder {
 
 		setDefaults ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildContextTab (
 				resolvedExtensionPoint);
@@ -186,6 +190,9 @@ class ObjectListPageBuilder {
 					.listTabSpecs (
 						listTabsByName)
 
+					.listBrowserSpecs (
+						listBrowsersByFieldName)
+
 					.formFieldSet (
 						formFieldSet)
 
@@ -228,6 +235,11 @@ class ObjectListPageBuilder {
 				? consoleModule.formFieldSets ().get (
 					spec.fieldsName ())
 				: defaultFields ();
+
+		listBrowsersByFieldName =
+			ifNull (
+				spec.listBrowsersByFieldName (),
+				Collections.<String,ObjectListBrowserSpec>emptyMap ());
 
 		listTabsByName =
 			spec.listTabsByName () != null

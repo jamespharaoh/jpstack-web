@@ -3,10 +3,11 @@
 	package="wbs.platform.object.list">
 
 	<layer name="console">
-		<bean class="ObjectListTabSpec"/>
+		<bean class="ObjectListBrowserSpec"/>
 		<bean class="ObjectListPageBuilder"/>
 		<bean class="ObjectListPageSpec"/>
 		<bean class="ObjectListPart"/>
+		<bean class="ObjectListTabSpec"/>
 	</layer>
 
 </plugin>

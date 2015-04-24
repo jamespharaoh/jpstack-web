@@ -39,7 +39,16 @@ class ObjectListPageSpec {
 	// children
 
 	@DataChildren (
-		direct = true)
+		direct = true,
+		childElement = "list-browser")
+	List<ObjectListBrowserSpec> listBrowsers;
+
+	@DataChildrenIndex
+	Map<String,ObjectListBrowserSpec> listBrowsersByFieldName;
+
+	@DataChildren (
+		direct = true,
+		childElement = "list-tab")
 	List<ObjectListTabSpec> listTabs;
 
 	@DataChildrenIndex

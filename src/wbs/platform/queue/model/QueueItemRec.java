@@ -145,6 +145,10 @@ class QueueItemRec
 		List<QueueItemRec> findByCreatedTime (
 				Interval createdTimeInterval);
 
+		List<QueueItemRec> findByCreatedTime (
+				QueueRec queue,
+				Interval createdTimeInterval);
+
 		List<QueueItemRec> findByProcessedTime (
 				Interval processedTimeInterval);
 

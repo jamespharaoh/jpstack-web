@@ -34,6 +34,14 @@
 			<object-list-page
 				fields="list">
 
+				<list-browser
+					field="createdTime"
+					label="Date"/>
+
+				<list-tab
+					name="all"
+					label="All"/>
+
 				<list-tab
 					name="active"
 					label="Active">
