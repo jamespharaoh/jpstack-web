@@ -1,5 +1,7 @@
 package wbs.services.ticket.core.fixture;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import javax.inject.Inject;
 
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -27,6 +29,8 @@ import wbs.services.ticket.core.model.TicketManagerObjectHelper;
 import wbs.services.ticket.core.model.TicketNoteObjectHelper;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketStateObjectHelper;
+import wbs.services.ticket.core.model.TicketTemplateObjectHelper;
+import wbs.services.ticket.core.model.TicketTemplateRec;
 
 @PrototypeComponent ("ticketFixtureProvider")
 public class TicketFixtureProvider
@@ -57,6 +61,9 @@ public class TicketFixtureProvider
 	
 	@Inject
 	TicketStateObjectHelper ticketStateHelper;
+	
+	@Inject
+	TicketTemplateObjectHelper ticketTemplateHelper;
 	
 	@Inject
 	ObjectTypeObjectHelper objectTypeHelper;
@@ -128,21 +135,135 @@ public class TicketFixtureProvider
 	
 		);
 		
-		TicketStateRec submittedState =
+		TicketStateRec acceptedState =
 			ticketStateHelper.insert (
 				new TicketStateRec ()
 		
 				.setTicketManager (
 					ticketManager)
 						
-				.setName("Submitted")
+				.setName("Accepted")
 				
 				.setCode (
-					"submitted")
+					"accepted")
 				
-				.setState(TicketStateState.submitted)	
+				.setState (
+					TicketStateState.accepted)	
+				
+				.setShowInQueue (
+					true)
+					
+				.setMinimum (
+					0)
+					
+				.setMaximum (
+					0)
 			
 		);
+		
+		TicketStateRec pendingState =
+				ticketStateHelper.insert (
+					new TicketStateRec ()
+			
+					.setTicketManager (
+						ticketManager)
+							
+					.setName("Pending")
+					
+					.setCode (
+						"pending")
+					
+					.setState (
+						TicketStateState.pending)	
+					
+					.setShowInQueue (
+						true)
+						
+					.setMinimum (
+						0)
+						
+					.setMaximum (
+						0)
+				
+			);
+		
+		TicketStateRec solvedState =
+				ticketStateHelper.insert (
+					new TicketStateRec ()
+			
+					.setTicketManager (
+						ticketManager)
+							
+					.setName("Solved")
+					
+					.setCode (
+						"solved")
+					
+					.setState (
+						TicketStateState.solved)	
+					
+					.setShowInQueue (
+						true)
+						
+					.setMinimum (
+						0)
+						
+					.setMaximum (
+						0)
+				
+			);
+		
+		TicketStateRec closedState =
+				ticketStateHelper.insert (
+					new TicketStateRec ()
+			
+					.setTicketManager (
+						ticketManager)
+							
+					.setName("Closed")
+					
+					.setCode (
+						"closed")
+					
+					.setState (
+						TicketStateState.closed)	
+					
+					.setShowInQueue (
+						true)
+						
+					.setMinimum (
+						0)
+						
+					.setMaximum (
+						0)
+				
+			);
+		
+		TicketStateRec submittedState =
+				ticketStateHelper.insert (
+					new TicketStateRec ()
+			
+					.setTicketManager (
+						ticketManager)
+							
+					.setName("Submitted")
+					
+					.setCode (
+						"submitted")
+					
+					.setState (
+						TicketStateState.submitted)	
+					
+					.setShowInQueue (
+						true)
+						
+					.setMinimum (
+						0)
+						
+					.setMaximum (
+						0)
+				
+			);
 				
 		TicketRec ticket =
 			ticketHelper.insert (
@@ -158,7 +279,7 @@ public class TicketFixtureProvider
 				submittedState)
 	
 		);
-		
+			
 		TicketFieldTypeRec booleanType =
 				ticketFieldTypeHelper.insert (
 						new TicketFieldTypeRec ()
@@ -307,6 +428,41 @@ public class TicketFixtureProvider
 					ticket.getNumNotes ())
 	
 		);
+		
+		// ticket template
+
+		for (
+			TicketStateState state : TicketStateState.values()
+		) {
+
+		TicketTemplateRec template =
+			ticketTemplateHelper.insert (
+				new TicketTemplateRec ()
+
+				.setTicket (
+					ticket)
+
+				.setCode (
+					stringFormat (
+						"template_%s",
+						state.toString()))
+
+				.setName (
+					stringFormat (
+						"Template %s",
+						state.toString()))
+
+				.setTicketState (
+					ticketStateHelper.findByCode (
+						ticketManager, state.toString()))
+
+				.setTicketNote (null)
+
+			);
+			
+			ticket.getTemplates().add(template);
+
+		}
 		
 		ticket
 			.setNumNotes (

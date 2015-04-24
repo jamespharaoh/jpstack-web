@@ -9,6 +9,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.joda.time.Instant;
 
 import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
@@ -16,11 +17,13 @@ import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
+import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.RandomLogic;
+import wbs.platform.queue.model.QueueItemRec;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 
 @Accessors (chain = true)
@@ -49,6 +52,15 @@ public class TicketStateRec
 	
 	@SimpleField
 	TicketStateState state;
+	
+	@SimpleField
+	Boolean showInQueue;
+	
+	@SimpleField
+	Integer minimum;
+	
+	@SimpleField
+	Integer maximum;
 	
 	// object hooks
 

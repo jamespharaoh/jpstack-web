@@ -1,5 +1,6 @@
 package wbs.services.ticket.core.model;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.hibernate.TransientObjectException;
 import org.joda.time.Instant;
 
+import wbs.applications.imchat.model.ImChatTemplateRec;
 import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.CollectionField;
@@ -31,6 +33,8 @@ import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.object.core.model.ObjectTypeRec;
+import wbs.platform.queue.logic.QueueLogic;
+import wbs.platform.queue.model.QueueItemRec;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
 import wbs.services.ticket.core.model.TicketObjectHelper;
@@ -86,6 +90,18 @@ public class TicketRec
 	@SimpleField
 	Integer numFields = 0;
 	
+	// state
+	
+	@ReferenceField (
+			nullable = true)
+		QueueItemRec queueItem;
+	
+	// children
+
+	@CollectionField
+	Set<TicketTemplateRec> templates =
+		new LinkedHashSet<TicketTemplateRec> ();
+	
 	// object hooks
 
 	public static
@@ -103,13 +119,16 @@ public class TicketRec
 		
 		@Inject
 		Provider<ObjectManager> objectManager;
+		
+		@Inject
+		Provider<QueueLogic> queueLogic;
 				
 		@Inject
 		Database database;
 		
 		@Inject
 		RandomLogic randomLogic;
-
+		
 		@Override
 		public
 		void beforeInsert (
@@ -117,6 +136,30 @@ public class TicketRec
 
 			ticket.setCode (
 				randomLogic.generateNumericNoZero (8));
+
+		}
+
+		@Override
+		public void afterInsert(TicketRec ticket) {
+
+			// create queue item
+
+			QueueItemRec queueItem =
+				queueLogic.get().createQueueItem (
+					queueLogic.get().findQueue (
+						ticket.getTicketState (),
+						"default"),
+					ticket,
+					ticket,
+					ticket.getCode (),
+					ticket.getTicketState().toString());
+
+			// add queue item to ticket
+
+			ticket
+				.setQueueItem (
+					queueItem);
+		
 
 		}
 		
@@ -259,7 +302,7 @@ public class TicketRec
 			
 			ticket.setNumFields (
 				ticket.getNumFields() + 1);
-					
+			
 			ticket.getTicketFieldValues ().put (
 				ticketFieldType.getId(), 
 				ticketFieldValue);
