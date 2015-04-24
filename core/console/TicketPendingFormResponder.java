@@ -93,7 +93,7 @@ class TicketPendingFormResponder
 
 		for (
 			TicketTemplateRec template
-				: ticket.getTemplates ()
+				: ticket.getTicketManager().getTemplates ()
 		) {
 
 			if (template.getDeleted ())

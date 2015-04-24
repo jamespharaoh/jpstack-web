@@ -135,6 +135,32 @@ public class TicketFixtureProvider
 	
 		);
 		
+		TicketStateRec submittedState =
+				ticketStateHelper.insert (
+					new TicketStateRec ()
+			
+					.setTicketManager (
+						ticketManager)
+							
+					.setName("Submitted")
+					
+					.setCode (
+						"submitted")
+					
+					.setState (
+						TicketStateState.submitted)	
+					
+					.setShowInQueue (
+						true)
+						
+					.setMinimum (
+						0)
+						
+					.setMaximum (
+						0)
+				
+			);
+		
 		TicketStateRec acceptedState =
 			ticketStateHelper.insert (
 				new TicketStateRec ()
@@ -227,32 +253,6 @@ public class TicketFixtureProvider
 					
 					.setState (
 						TicketStateState.closed)	
-					
-					.setShowInQueue (
-						true)
-						
-					.setMinimum (
-						0)
-						
-					.setMaximum (
-						0)
-				
-			);
-		
-		TicketStateRec submittedState =
-				ticketStateHelper.insert (
-					new TicketStateRec ()
-			
-					.setTicketManager (
-						ticketManager)
-							
-					.setName("Submitted")
-					
-					.setCode (
-						"submitted")
-					
-					.setState (
-						TicketStateState.submitted)	
 					
 					.setShowInQueue (
 						true)
@@ -439,8 +439,8 @@ public class TicketFixtureProvider
 			ticketTemplateHelper.insert (
 				new TicketTemplateRec ()
 
-				.setTicket (
-					ticket)
+				.setTicketManager (
+					ticketManager)
 
 				.setCode (
 					stringFormat (
@@ -460,7 +460,7 @@ public class TicketFixtureProvider
 
 			);
 			
-			ticket.getTemplates().add(template);
+			ticketManager.getTemplates().add(template);
 
 		}
 		
