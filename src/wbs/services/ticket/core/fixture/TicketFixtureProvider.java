@@ -426,8 +426,31 @@ public class TicketFixtureProvider
 		
 				.setIndex (
 					ticket.getNumNotes ())
+				
+				.setNoteText("Ticket note 1 text")
 	
 		);
+		
+		ticket
+			.setNumNotes (
+				ticket.getNumNotes () + 1);
+			
+		ticketNoteHelper.insert (
+			new TicketNoteRec ()
+
+				.setTicket (
+					ticket)
+		
+				.setIndex (
+					ticket.getNumNotes ())
+				
+				.setNoteText("Ticket note 2 text")
+		
+			);
+		
+		ticket
+			.setNumNotes (
+				ticket.getNumNotes () + 1);
 		
 		// ticket template
 
@@ -462,12 +485,7 @@ public class TicketFixtureProvider
 			
 			ticketManager.getTemplates().add(template);
 
-		}
-		
-		ticket
-			.setNumNotes (
-				ticket.getNumNotes () + 1);
-		
+		}		
 	
 	}
 

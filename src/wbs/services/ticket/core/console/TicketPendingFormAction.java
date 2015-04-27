@@ -16,6 +16,7 @@ import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+import wbs.services.ticket.core.model.TicketNoteRec;
 import wbs.services.ticket.core.model.TicketStateState;
 import wbs.services.ticket.core.model.TicketTemplateRec;
 import wbs.services.ticket.core.model.TicketRec;
@@ -35,6 +36,9 @@ class TicketPendingFormAction
 
 	@Inject
 	TicketConsoleHelper ticketHelper;
+	
+	@Inject
+	TicketNoteConsoleHelper ticketNoteHelper;
 	
 	@Inject
 	TicketTemplateConsoleHelper ticketTemplateHelper;
@@ -137,6 +141,32 @@ class TicketPendingFormAction
 			ticket
 				.setQueueItem (
 					queueItem);
+			
+		}
+		
+		// check if a new note was added
+
+		String noteText =
+				requestContext.parameter ("note-text");
+		
+		if (!noteText.isEmpty()) {
+			
+			ticketNoteHelper.insert (
+				new TicketNoteRec ()
+
+					.setTicket (
+						ticket)
+			
+					.setIndex (
+						ticket.getNumNotes ())
+					
+					.setNoteText(noteText)
+			
+				);
+			
+			ticket
+			.setNumNotes (
+				ticket.getNumNotes () + 1);
 			
 		}
 		

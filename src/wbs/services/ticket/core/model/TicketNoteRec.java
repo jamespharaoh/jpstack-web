@@ -11,6 +11,7 @@ import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.IndexField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.ParentField;
+import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 
@@ -35,6 +36,11 @@ public class TicketNoteRec
 	@IndexField (
 		counter = "numNotes")
 	Integer index;
+	
+	// data
+	
+	@SimpleField
+	String noteText;
 	
 	// compare to
 	

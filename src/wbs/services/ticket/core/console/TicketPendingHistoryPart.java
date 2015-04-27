@@ -10,6 +10,7 @@ import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.module.ConsoleModule;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.priv.console.PrivChecker;
+import wbs.services.ticket.core.model.TicketNoteRec;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketStateObjectHelper;
@@ -42,6 +43,7 @@ class TicketPendingHistoryPart
 	// state
 
 	FormFieldSet ticketFields;
+	FormFieldSet ticketNoteFields;
 	FormFieldSet ticketStateFields;
 
 	TicketRec ticket;
@@ -57,6 +59,10 @@ class TicketPendingHistoryPart
 		ticketFields =
 			ticketPendingConsoleModule.formFieldSets ().get (
 				"ticketFields");
+		
+		ticketNoteFields =
+			ticketPendingConsoleModule.formFieldSets ().get (
+				"ticketNoteFields");
 
 		ticketStateFields =
 			ticketPendingConsoleModule.formFieldSets ().get (
@@ -75,6 +81,8 @@ class TicketPendingHistoryPart
 
 		goSummary ();
 		
+		goTicketNotes ();
+		
 		goStateSummary ();
 
 	}
@@ -82,7 +90,7 @@ class TicketPendingHistoryPart
 	void goSummary () {
 
 		printFormat (
-			"<h3>Ticket summary</h3>\n");
+			"<h3>Summary</h3>\n");
 
 		printFormat (
 			"<table class=\"details\">\n");
@@ -97,10 +105,32 @@ class TicketPendingHistoryPart
 
 	}
 	
+	void goTicketNotes () {
+
+		printFormat (
+			"<h3>Notes</h3>\n");
+
+		printFormat (
+			"<table class=\"details\">\n");
+		
+		for (TicketNoteRec ticketNote : ticket.getTicketNotes()) {
+			
+			formFieldLogic.outputTableRows (
+					out,
+					ticketNoteFields,
+					ticketNote);
+			
+		}
+
+		printFormat (
+			"</table>\n");
+
+	}
+	
 	void goStateSummary () {
 
 		printFormat (
-			"<h3>State details</h3>\n");
+			"<h3>State</h3>\n");
 
 		printFormat (
 			"<table class=\"details\">\n");
