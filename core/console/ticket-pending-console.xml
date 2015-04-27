@@ -36,6 +36,17 @@
 			finder="ticketState"/>
 
 	</field-set>
+	
+	<field-set
+		name="ticketNoteFields"
+		object-name="ticketNote">
+
+		<index-field/>
+		
+		<text-field
+			name="noteText"/>
+
+	</field-set>
 
 	<field-set
 		name="ticketStateFields"

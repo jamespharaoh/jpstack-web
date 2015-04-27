@@ -58,6 +58,9 @@
 
 		<parent-field/>
 		<index-field/>
+		
+		<text-field
+			name="noteText"/>			
 
 	</field-set>
 	
@@ -66,6 +69,9 @@
 		object-name="ticketNote">
 
 		<parent-field/>
+		
+		<text-field
+			name="noteText"/>	
 
 	</field-set>
 
@@ -76,6 +82,9 @@
 		<id-field/>
 		<parent-field/>
 		<index-field/>
+		
+		<text-field
+			name="noteText"/>	
 
 	</field-set>
 
@@ -85,6 +94,9 @@
 
 		<id-field/>
 		<index-field/>
+		
+		<text-field
+			name="noteText"/>	
 
 	</field-set>
 

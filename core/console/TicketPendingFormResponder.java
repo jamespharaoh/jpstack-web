@@ -21,6 +21,7 @@ import wbs.services.ticket.core.model.TicketTemplateRec;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 @PrototypeComponent ("ticketPendingFormResponder")
 public
@@ -194,12 +195,14 @@ class TicketPendingFormResponder
 			"<th>&nbsp;</td>\n",
 			"<th>Name</th>\n",
 			"<th>New State</th>\n",
-			"<th>Action</th>\n",
 			"</tr>\n");
+		
+		List<TicketTemplateRec> templatesReversed 
+			= Lists.reverse(templates);
 
 		for (
 			TicketTemplateRec template
-				: templates
+				: templatesReversed
 		) {
 
 			doTemplate (
@@ -208,10 +211,42 @@ class TicketPendingFormResponder
 
 		printFormat (
 			"</table>\n");
+		
+		addTicketNote();
+		
+		printFormat (
+			"<input",
+			" class=\"template-submit\"",
+			" type=\"submit\"",
+			" name=\"send\"",
+			" value=\"Send\"",
+			">\n");
 
 		printFormat (
 			"</form>\n");
 
+	}
+	
+	void addTicketNote () {
+		
+		printFormat (
+			"<p><h4>Add new note</h4>\n");
+		
+		printFormat (
+			"<label for=\"note-text\">",
+			"Note text",
+			"</label>");
+		
+		printFormat (
+			"<input",
+			" id=\"note-text\"",
+			" type=\"textarea\"",
+			" name=\"note-text\"",
+			">\n");
+		
+		printFormat (
+			"</p>\n");
+		
 	}
 
 	void doTemplate (
@@ -224,7 +259,10 @@ class TicketPendingFormResponder
 			template.getId (),
 			">\n");
 
-		if (template.getTicketState().getState().equals(ticket.getTicketState().getState())) {
+		if (template.getTicketState()
+				.getState().equals (
+					ticket.getTicketState().getState())) {
+			
 			printFormat (
 					"<td><input",
 					" id=\"radio-template-%h\"",
@@ -235,9 +273,11 @@ class TicketPendingFormResponder
 					" value=\"%h\"",
 					template.getId (),
 					"checked",
-					"></td>\n");			
+					"></td>\n");
+			
 		}
 		else {
+			
 			printFormat (
 				"<td><input",
 				" id=\"radio-template-%h\"",
@@ -257,19 +297,9 @@ class TicketPendingFormResponder
 		printFormat (
 			"<td>%h</td>\n",
 			template.getTicketState().toString());
-		
-
 
 		printFormat (
-			"<td><input",
-			" class=\"template-submit\"",
-			" type=\"submit\"",
-			" name=\"send\"",
-			" value=\"Send\"",
-			"></td>\n");
-
-		printFormat (
-			"</td>\n");
+			"</tr>\n");
 
 	}
 
