@@ -124,23 +124,27 @@ class TicketPendingFormAction
 			ticket.setTicketState(
 				template.getTicketState());
 			
-			// create item for the new state queue
+			// create item for the new state queue if the state allows it
+			
+			if (ticket.getTicketState().getShowInQueue()) {
 
-			QueueItemRec queueItem =
-				queueLogic.createQueueItem (
-					queueLogic.findQueue (
-						ticket.getTicketState (),
-						"default"),
-					ticket,
-					ticket,
-					ticket.getCode (),
-					ticket.getTicketState().toString());
-
-			// add queue item to ticket
-
-			ticket
-				.setQueueItem (
-					queueItem);
+				QueueItemRec queueItem =
+					queueLogic.createQueueItem (
+						queueLogic.findQueue (
+							ticket.getTicketState (),
+							"default"),
+						ticket,
+						ticket,
+						ticket.getCode (),
+						ticket.getTicketState().toString());
+	
+				// add queue item to ticket
+	
+				ticket
+					.setQueueItem (
+						queueItem);
+				
+			}
 			
 		}
 		

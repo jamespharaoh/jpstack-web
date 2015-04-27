@@ -140,25 +140,28 @@ public class TicketRec
 
 		@Override
 		public void afterInsert(TicketRec ticket) {
-
-			// create queue item
-
-			QueueItemRec queueItem =
-				queueLogic.get().createQueueItem (
-					queueLogic.get().findQueue (
-						ticket.getTicketState (),
-						"default"),
-					ticket,
-					ticket,
-					ticket.getCode (),
-					ticket.getTicketState().toString());
-
-			// add queue item to ticket
-
-			ticket
-				.setQueueItem (
-					queueItem);
-		
+			
+			if (ticket.getTicketState().getShowInQueue()) {				
+	
+				// create queue item
+	
+				QueueItemRec queueItem =
+					queueLogic.get().createQueueItem (
+						queueLogic.get().findQueue (
+							ticket.getTicketState (),
+							"default"),
+						ticket,
+						ticket,
+						ticket.getCode (),
+						ticket.getTicketState().toString());
+	
+				// add queue item to ticket
+	
+				ticket
+					.setQueueItem (
+						queueItem);
+			
+			}		
 
 		}
 		
