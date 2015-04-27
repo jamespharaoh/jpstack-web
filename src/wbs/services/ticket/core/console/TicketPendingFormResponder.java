@@ -230,7 +230,7 @@ class TicketPendingFormResponder
 	void addTicketNote () {
 		
 		printFormat (
-			"<p><h4>Add new note</h4>\n");
+			"<p><h3>Add new note</h3>\n");
 		
 		printFormat (
 			"<label for=\"note-text\">",
