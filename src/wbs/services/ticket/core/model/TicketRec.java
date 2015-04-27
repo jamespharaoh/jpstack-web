@@ -62,13 +62,12 @@ public class TicketRec
 	String code;
 
 	// details
-	
+
 	@ReferenceField
 	TicketStateRec ticketState;
 	
-	@SimpleField (
-			nullable = true)
-	Instant nextActionDate;
+	@SimpleField
+	Instant timestamp;
 	
 	@CollectionField (
 			orderBy = "index")

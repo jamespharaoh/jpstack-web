@@ -81,9 +81,9 @@ class TicketPendingHistoryPart
 
 		goSummary ();
 		
-		goTicketNotes ();
-		
 		goStateSummary ();
+		
+		goTicketNotes ();
 
 	}
 
