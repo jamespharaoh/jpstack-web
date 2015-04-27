@@ -2,7 +2,11 @@ package wbs.services.ticket.core.fixture;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.Date;
+
 import javax.inject.Inject;
+
+import org.joda.time.Instant;
 
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -277,6 +281,9 @@ public class TicketFixtureProvider
 				
 			.setTicketState(
 				submittedState)
+				
+			.setTimestamp (
+				Instant.now())
 	
 		);
 			

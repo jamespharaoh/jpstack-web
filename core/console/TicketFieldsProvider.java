@@ -116,7 +116,7 @@ class TicketFieldsProvider
 				.label("State")
 				.finderName("ticketState")
 				.dynamic (false));
-		
+			
 		String fieldSetName =
 			stringFormat (
 				"%s.%s",

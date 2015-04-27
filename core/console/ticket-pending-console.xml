@@ -30,6 +30,9 @@
 		<integer-field
 			name="numFields"/>
 			
+		<timestamp-field
+			name="timestamp"/>
+			
 		<object-field
 			name="ticketState"
 			label="State"
