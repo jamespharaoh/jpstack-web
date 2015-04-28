@@ -1,5 +1,7 @@
 package wbs.services.ticket.core.hibernate;
 
+import java.util.List;
+
 import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -41,5 +43,20 @@ class TicketDaoHibernate
 			.list ());
 
 	}
+	
+	@Override
+	public
+	List<TicketRec> findUnqueuedTickets () {
+
+		return findMany (
+				TicketRec.class,
+
+				createQuery (
+					"FROM TicketRec" +
+					" WHERE queued = 'false'")				
+
+				.list ());
+
+		}
 
 }

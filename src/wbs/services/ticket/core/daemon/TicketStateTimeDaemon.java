@@ -99,9 +99,9 @@ class TicketStateTimeDaemon
 	protected
 	void runOnce () {
 	
-		log.debug ("Getting all tickets");
+		log.debug ("Getting all unqueued tickets");
 	
-		// get all the tickets
+		// get all the unqueued tickets
 	
 		@Cleanup
 		Transaction transaction =
@@ -109,7 +109,7 @@ class TicketStateTimeDaemon
 				this);
 	
 		List<TicketRec> tickets =
-			ticketHelper.findAll();
+			ticketHelper.findUnqueuedTickets();
 	
 		transaction.close ();
 	
@@ -187,7 +187,10 @@ class TicketStateTimeDaemon
 
 			ticket
 				.setQueueItem (
-					queueItem);		
+					queueItem);	
+			
+			ticket.setQueued (
+				true);
 			
 		}		
 	
