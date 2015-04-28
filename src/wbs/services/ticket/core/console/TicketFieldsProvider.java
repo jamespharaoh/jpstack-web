@@ -17,6 +17,7 @@ import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.forms.IntegerFormFieldSpec;
 import wbs.platform.console.forms.ObjectFormFieldSpec;
 import wbs.platform.console.forms.TextFormFieldSpec;
+import wbs.platform.console.forms.TimestampFormFieldSpec;
 import wbs.platform.console.forms.YesNoFormFieldSpec;
 import wbs.platform.console.module.ConsoleModuleBuilder;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;

@@ -67,7 +67,8 @@ public class TicketRec
 	TicketStateRec ticketState;
 	
 	@SimpleField
-	Instant timestamp;
+	Instant timestamp =
+		Instant.now();
 	
 	@CollectionField (
 			orderBy = "index")
