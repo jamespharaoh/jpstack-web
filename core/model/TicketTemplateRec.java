@@ -14,6 +14,7 @@ import wbs.framework.entity.annotations.MinorEntity;
 import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
+import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
 
@@ -48,9 +49,9 @@ class TicketTemplateRec
 			nullable = true)
 	TicketStateRec ticketState;
 
-	@ReferenceField (
+	@SimpleField (
 			nullable = true)
-	TicketNoteRec ticketNote;
+	Integer timestamp;
 
 	@DeletedField
 	Boolean deleted = false;

@@ -2,8 +2,6 @@ package wbs.services.ticket.core.fixture;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Date;
-
 import javax.inject.Inject;
 
 import org.joda.time.Instant;
@@ -184,10 +182,10 @@ public class TicketFixtureProvider
 					true)
 					
 				.setMinimum (
-					0)
+					60)
 					
 				.setMaximum (
-					0)
+					120)
 			
 		);
 		
@@ -210,10 +208,10 @@ public class TicketFixtureProvider
 						true)
 						
 					.setMinimum (
-						0)
+						300)
 						
 					.setMaximum (
-						0)
+						600)
 				
 			);
 		
@@ -236,10 +234,10 @@ public class TicketFixtureProvider
 						true)
 						
 					.setMinimum (
-						0)
+						60)
 						
 					.setMaximum (
-						0)
+						120)
 				
 			);
 		
@@ -281,9 +279,6 @@ public class TicketFixtureProvider
 				
 			.setTicketState(
 				submittedState)
-				
-			.setTimestamp (
-				Instant.now())
 	
 		);
 			
@@ -485,8 +480,6 @@ public class TicketFixtureProvider
 				.setTicketState (
 					ticketStateHelper.findByCode (
 						ticketManager, state.toString()))
-
-				.setTicketNote (null)
 
 			);
 			

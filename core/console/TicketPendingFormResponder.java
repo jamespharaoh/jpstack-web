@@ -195,6 +195,7 @@ class TicketPendingFormResponder
 			"<th>&nbsp;</td>\n",
 			"<th>Name</th>\n",
 			"<th>New State</th>\n",
+			"<th>Time to queue</th>\n",
 			"</tr>\n");
 		
 		List<TicketTemplateRec> templatesReversed 
@@ -296,7 +297,20 @@ class TicketPendingFormResponder
 
 		printFormat (
 			"<td>%h</td>\n",
-			template.getTicketState().toString());
+			template.getTicketState ()
+				.getState ()
+					.toString ());
+		
+		printFormat (
+			"<td><input",
+			" id=\"timestamp-%h\"",
+			template.getId (),			
+			" type=\"textarea\"",
+			" name=\"timestamp-%h\"",
+			template.getTicketState ().getState ().toString (),
+			" value=\"%d\"",
+			template.getTicketState ().getMinimum (),			
+			"></td>\n");
 
 		printFormat (
 			"</tr>\n");

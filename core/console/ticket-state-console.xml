@@ -74,6 +74,15 @@
 			nullable="no"
 			helper="ticketStateStateConsoleHelper"/>
 			
+		<seconds-field
+			name="minimum"/>
+			
+		<seconds-field
+			name="maximum"/>
+			
+		<yes-no-field
+			name="showInQueue"/>
+			
 	</field-set>
 
 	<field-set
@@ -91,10 +100,10 @@
 			nullable="no"
 			helper="ticketStateStateConsoleHelper"/>
 			
-		<integer-field
+		<seconds-field
 			name="minimum"/>
 			
-		<integer-field
+		<seconds-field
 			name="maximum"/>
 			
 		<yes-no-field
@@ -115,10 +124,10 @@
 			nullable="no"
 			helper="ticketStateStateConsoleHelper"/>
 			
-		<integer-field
+		<seconds-field
 			name="minimum"/>
 			
-		<integer-field
+		<seconds-field
 			name="maximum"/>
 			
 		<yes-no-field

@@ -4,6 +4,8 @@ import static wbs.framework.utils.etc.Misc.toInteger;
 
 import javax.inject.Inject;
 
+import org.joda.time.Instant;
+
 import lombok.Cleanup;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -115,35 +117,37 @@ class TicketPendingFormAction
 			ticket.getQueueItem (),
 			myUser);
 		
+		ticket.setQueueItem (null);
+		
 		// if the ticket was not already closed
 		
 		if (ticket.getTicketState().getState() != TicketStateState.closed) {
 			
-			// update ticket state
+			// update ticket timestamp
 			
-			ticket.setTicketState(
-				template.getTicketState());
+			String timpesampStr =
+					requestContext.parameter (
+							"timestamp-" + template.getTicketState ().getState ().toString ());
 			
-			// create item for the new state queue if the state allows it
+			Integer timestamp =
+				Integer.parseInt(timpesampStr);
 			
-			if (ticket.getTicketState().getShowInQueue()) {
-
-				QueueItemRec queueItem =
-					queueLogic.createQueueItem (
-						queueLogic.findQueue (
-							ticket.getTicketState (),
-							"default"),
-						ticket,
-						ticket,
-						ticket.getCode (),
-						ticket.getTicketState().toString());
-	
-				// add queue item to ticket
-	
-				ticket
-					.setQueueItem (
-						queueItem);
+			if (timestamp >= template.getTicketState ().getMinimum () &&
+				timestamp <= template.getTicketState ().getMaximum ()) {
+			
+				// update ticket state
 				
+				ticket.setTicketState(
+					template.getTicketState());
+				
+				// set new timestamp
+				
+				ticket.setTimestamp(
+						Instant.now ()
+							.plus(timestamp * 1000));		
+			}
+			else {
+				throw new RuntimeException ("Timestamp out of bounds");	
 			}
 			
 		}
