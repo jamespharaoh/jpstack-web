@@ -22,7 +22,7 @@ import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.part.PagePart;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.HtmlResponder;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.priv.console.PrivChecker;
 
 import com.google.common.base.Optional;
@@ -40,7 +40,7 @@ class TabbedResponder
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	PrivChecker privChecker;

@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.priv.console.PrivChecker;
 
 @Accessors (fluent = true)
@@ -20,7 +20,7 @@ class ErrorResponder
 	// dependencies
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	PrivChecker privChecker;
