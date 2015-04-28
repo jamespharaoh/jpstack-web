@@ -1,6 +1,7 @@
 package wbs.services.ticket.core.model;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -62,7 +63,11 @@ public class TicketRec
 	String code;
 
 	// details
-
+	
+	@SimpleField
+	Boolean queued =
+		true;
+	
 	@ReferenceField
 	TicketStateRec ticketState;
 	
@@ -321,6 +326,8 @@ public class TicketRec
 		TicketFieldValueRec findTicketFieldValue (
 				TicketRec ticket,
 				TicketFieldTypeRec ticketFieldType);
+		
+		List<TicketRec> findUnqueuedTickets ();
 
 	}
 	

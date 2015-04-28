@@ -143,8 +143,11 @@ class TicketPendingFormAction
 				// set new timestamp
 				
 				ticket.setTimestamp(
-						Instant.now ()
-							.plus(timestamp * 1000));		
+					Instant.now ()
+						.plus(timestamp * 1000));	
+				
+				ticket.setQueued (
+					false);
 			}
 			else {
 				throw new RuntimeException ("Timestamp out of bounds");	
