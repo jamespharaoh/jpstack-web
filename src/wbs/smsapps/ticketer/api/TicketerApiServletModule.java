@@ -23,7 +23,7 @@ import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
 import wbs.platform.api.mvc.ApiFile;
 import wbs.platform.api.mvc.StringMapResponderFactory;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.rpc.php.PhpStringMapResponderFactory;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
@@ -46,7 +46,7 @@ class TicketerApiServletModule
 	RequestContext requestContext;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	Database database;

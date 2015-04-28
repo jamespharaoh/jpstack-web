@@ -18,7 +18,7 @@ import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.tab.Tab;
 import wbs.platform.console.tab.TabContext;
 import wbs.platform.console.tab.TabbedResponder;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 
 @Log4j
 @SingletonComponent ("notFoundHandler")
@@ -32,7 +32,7 @@ class ConsoleNotFoundHandler
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	Provider<NotFoundResponder> notFoundPage;

@@ -190,6 +190,7 @@ class ChatPhotoCommand
 						chat,
 						"help"
 					).getId (),
+					true,
 					Collections.<String,String>emptyMap ());
 
 			} else if (photoUser.getMainChatUserImage () == null) {
@@ -208,6 +209,7 @@ class ChatPhotoCommand
 						chat,
 						"help"
 					).getId (),
+					true,
 					Collections.<String,String>emptyMap ());
 
 			} else {

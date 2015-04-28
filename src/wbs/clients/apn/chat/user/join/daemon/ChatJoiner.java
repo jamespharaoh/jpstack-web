@@ -5,7 +5,6 @@ import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -50,7 +49,6 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.Record;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.event.logic.EventLogic;
@@ -196,29 +194,6 @@ class ChatJoiner {
 	boolean gotPlace;
 
 	// implementation
-
-	private
-	void sendMagicSystem (
-			String templateCode,
-			Record<?> commandParent,
-			String commandCode,
-			Map<String,String> params) {
-
-		chatSendLogic.sendSystemMagic (
-			chatUser,
-			Optional.of (
-				message.getThreadId ()),
-			templateCode,
-			commandHelper.findByCode (
-				chat,
-				"magic"),
-			commandHelper.findByCode (
-				commandParent,
-				commandCode
-			).getId (),
-			params);
-
-	}
 
 	/**
 	 * Checks the message for user prefs and updates the user's details with
@@ -385,7 +360,8 @@ class ChatJoiner {
 				"photo_error",
 				commandHelper.findByCode (
 					chatUser.getChatAffiliate (),
-					"date_set_photo"));
+					"date_set_photo"),
+				true);
 
 			return false;
 
@@ -601,10 +577,13 @@ class ChatJoiner {
 				null,
 				true);
 
-			sendMagicSystem (
+			chatSendLogic.sendSystemMagic (
+				chatUser,
+				Optional.of (message.getThreadId ()),
 				"join_error",
-				chat,
-				"help",
+				commandHelper.findByCode (chat, "help"),
+				0,
+				true,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -643,6 +622,7 @@ class ChatJoiner {
 					Optional.of (
 						message.getThreadId ()),
 					"dob_request",
+					true,
 					Collections.<String,String>emptyMap ());
 
 				chatUser
@@ -654,12 +634,17 @@ class ChatJoiner {
 
 			} else {
 
-				sendMagicSystem (
+				chatSendLogic.sendSystemMagic (
+					chatUser,
+					Optional.of (message.getThreadId ()),
 					"dob_request",
-					chatUser.getChatScheme (),
-					joinTypeIsChat (joinType)
-						? "chat_dob"
-						: "date_dob",
+					commandHelper.findByCode (
+						chatUser.getChatScheme (),
+						joinTypeIsChat (joinType)
+							? "chat_dob"
+							: "date_dob"),
+					0,
+					true,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -670,10 +655,13 @@ class ChatJoiner {
 
 		if (! chatUserLogic.dobOk (chatUser)) {
 
-			sendMagicSystem (
+			chatSendLogic.sendSystemMagic (
+				chatUser,
+				Optional.of (message.getThreadId ()),
 				"dob_too_young",
-				chat,
-				"help",
+				commandHelper.findByCode (chat, "help"),
+				0,
+				true,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -694,14 +682,35 @@ class ChatJoiner {
 					Optional.of (
 						message.getThreadId ()),
 					"join_warning",
+					true,
+					Collections.<String,String>emptyMap ());
+
+				chatSendLogic.sendSystemRbFree (
+					chatUser,
+					Optional.of (
+						message.getThreadId ()),
+					"join_warning_2",
+					false,
 					Collections.<String,String>emptyMap ());
 
 			} else {
 
-				sendMagicSystem (
+				chatSendLogic.sendSystemMagic (
+					chatUser,
+					Optional.of (message.getThreadId ()),
 					"join_warning",
-					chatUser.getChatScheme (),
-					"help",
+					commandHelper.findByCode (chat, "help"),
+					0,
+					true,
+					Collections.<String,String>emptyMap ());
+
+				chatSendLogic.sendSystemMagic (
+					chatUser,
+					Optional.of (message.getThreadId ()),
+					"join_warning_2",
+					commandHelper.findByCode (chat, "help"),
+					0,
+					false,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -728,12 +737,17 @@ class ChatJoiner {
 			&& ! chatUser.getChargesConfirmed ()
 		) {
 
-			sendMagicSystem (
+			chatSendLogic.sendSystemMagic (
+				chatUser,
+				Optional.of (message.getThreadId ()),
 				"charges_request",
-				chatUser.getChatScheme (),
-				joinTypeIsChat (joinType)
-					? "chat_charges"
-					: "date_charges",
+				commandHelper.findByCode (
+					chatUser.getChatScheme (),
+					joinTypeIsChat (joinType)
+						? "chat_charges"
+						: "date_charges"),
+				0,
+				true,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -747,12 +761,17 @@ class ChatJoiner {
 				JoinType.dateLocation)
 			&& ! gotPlace) {
 
-			sendMagicSystem (
+			chatSendLogic.sendSystemMagic (
+				chatUser,
+				Optional.of (message.getThreadId ()),
 				"location_error",
-				chatUser.getChatScheme (),
-				joinTypeIsChat (joinType)
-					? "chat_location"
-					: "date_location",
+				commandHelper.findByCode (
+					chatUser.getChatScheme (),
+					joinTypeIsChat (joinType)
+						? "chat_location"
+						: "date_location"),
+				0,
+				true,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -763,12 +782,17 @@ class ChatJoiner {
 
 		if (chatUser.getGender () == null) {
 
-			sendMagicSystem (
+			chatSendLogic.sendSystemMagic (
+				chatUser,
+				Optional.of (message.getThreadId ()),
 				"gender_request",
-				chatUser.getChatScheme (),
-				joinTypeIsChat (joinType)
-					? "chat_gender"
-					: "date_gender",
+				commandHelper.findByCode (
+					chatUser.getChatScheme (),
+					joinTypeIsChat (joinType)
+						? "chat_gender"
+						: "date_gender"),
+				0,
+				true,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -779,12 +803,17 @@ class ChatJoiner {
 
 		if (chatUser.getOrient () == null) {
 
-			sendMagicSystem (
+			chatSendLogic.sendSystemMagic (
+				chatUser,
+				Optional.of (message.getThreadId ()),
 				"gender_other_request",
-				chatUser.getChatScheme (),
-				joinTypeIsChat (joinType)
-					? "chat_gender_other"
-					: "date_gender_other",
+				commandHelper.findByCode (
+					chatUser.getChatScheme (),
+					joinTypeIsChat (joinType)
+						? "chat_gender_other"
+						: "date_gender_other"),
+				0,
+				true,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -798,12 +827,17 @@ class ChatJoiner {
 			&& chatUser.getNewChatUserInfo () == null
 		) {
 
-			sendMagicSystem (
+			chatSendLogic.sendSystemMagic (
+				chatUser,
+				Optional.of (message.getThreadId ()),
 				"info_request",
-				chatUser.getChatScheme (),
-				joinTypeIsChat (joinType)
-					? "chat_info"
-					: "date_info",
+				commandHelper.findByCode (
+					chatUser.getChatScheme (),
+					joinTypeIsChat (joinType)
+						? "chat_info"
+						: "date_info"),
+				0,
+				true,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -824,12 +858,17 @@ class ChatJoiner {
 
 		// otherwise, send an error
 
-		sendMagicSystem (
+		chatSendLogic.sendSystemMagic (
+			chatUser,
+			Optional.of (message.getThreadId ()),
 			"location_request",
-			chatUser.getChatScheme (),
-			joinTypeIsChat (joinType)
-				? "chat_location"
-				: "date_location",
+			commandHelper.findByCode (
+				chatUser.getChatScheme (),
+				joinTypeIsChat (joinType)
+					? "chat_location"
+					: "date_location"),
+			0,
+			true,
 			Collections.<String,String>emptyMap ());
 
 		return false;
@@ -1072,7 +1111,8 @@ class ChatJoiner {
 					"date_joined",
 					commandHelper.findByCode (chat, "help"),
 					0,
-					null);
+					true,
+					Collections.<String,String>emptyMap ());
 
 			}
 
@@ -1122,10 +1162,13 @@ class ChatJoiner {
 					message.getThreadId ())
 			) {
 
-				sendMagicSystem (
+				chatSendLogic.sendSystemMagic (
+					chatUser,
+					Optional.of (message.getThreadId ()),
 					"more_photos_error",
-					chat,
-					"help",
+					commandHelper.findByCode (chat, "help"),
+					0,
+					true,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -1141,10 +1184,13 @@ class ChatJoiner {
 					message.getThreadId ())
 			) {
 
-				sendMagicSystem (
+				chatSendLogic.sendSystemMagic (
+					chatUser,
+					Optional.of (message.getThreadId ()),
 					"more_videos_error",
-					chat,
-					"help",
+					commandHelper.findByCode (chat, "help"),
+					0,
+					true,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -1172,10 +1218,13 @@ class ChatJoiner {
 
 			} else {
 
-				sendMagicSystem (
+				chatSendLogic.sendSystemMagic (
+					chatUser,
+					Optional.of (message.getThreadId ()),
 					"more_error",
-					chat,
-					"help",
+					commandHelper.findByCode (chat, "help"),
+					0,
+					true,
 					Collections.<String,String>emptyMap ());
 
 			}

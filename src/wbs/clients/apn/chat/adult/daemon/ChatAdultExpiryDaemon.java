@@ -198,6 +198,7 @@ class ChatAdultExpiryDaemon
 					chatUser,
 					Optional.<Integer>absent (),
 					"adult_expiry",
+					true,
 					Collections.<String,String>emptyMap ());
 
 			} else {

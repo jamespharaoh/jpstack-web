@@ -22,7 +22,7 @@ interface ChatSendLogic {
 			ServiceRec service,
 			String message);
 
-	MessageRec sendSystem (
+	Optional<MessageRec> sendSystem (
 			ChatUserRec chatUser,
 			Optional<Integer> threadId,
 			String templateCode,
@@ -31,12 +31,14 @@ interface ChatSendLogic {
 			Set<String> tags,
 			Optional<String> deliveryTypeCode,
 			String serviceCode,
+			Boolean required,
 			Map<String,String> params);
 
-	MessageRec sendSystemRbFree (
+	Optional<MessageRec> sendSystemRbFree (
 			ChatUserRec chatUser,
 			Optional<Integer> threadId,
 			String templateCode,
+			Boolean required,
 			Map<String,String> params);
 
 	MessageRec sendMessageMmsFree (
@@ -46,11 +48,12 @@ interface ChatSendLogic {
 			CommandRec command,
 			ServiceRec service);
 
-	MessageRec sendSystemMmsFree (
+	Optional<MessageRec> sendSystemMmsFree (
 			ChatUserRec chatUser,
 			Optional<Integer> threadId,
 			String templateCode,
-			CommandRec command);
+			CommandRec command,
+			Boolean required);
 
 	MessageRec sendMessageMagic (
 			ChatUserRec chatUser,
@@ -60,12 +63,13 @@ interface ChatSendLogic {
 			ServiceRec service,
 			Integer magicRef);
 
-	MessageRec sendSystemMagic (
+	Optional<MessageRec> sendSystemMagic (
 			ChatUserRec chatUser,
 			Optional<Integer> threadId,
 			String templateCode,
 			CommandRec magicCommand,
 			Integer magicRef,
+			Boolean required,
 			Map<String,String> params);
 
 	Integer sendMessageMagic (

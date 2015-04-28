@@ -175,6 +175,7 @@ class ChatSetPhotoCommand
 				"photo_confirm",
 				commandHelper.findByCode (chat, "magic"),
 				commandHelper.findByCode (chat, "help").getId (),
+				true,
 				Collections.<String,String>emptyMap ());
 
 			// auto join
@@ -198,6 +199,7 @@ class ChatSetPhotoCommand
 				chatUser,
 				Optional.of (message.getThreadId ()),
 				"video_set_pending",
+				true,
 				Collections.<String,String>emptyMap ());
 
 			// auto join
@@ -214,7 +216,8 @@ class ChatSetPhotoCommand
 				chatUser,
 				Optional.of (message.getThreadId ()),
 				"photo_error",
-				commandHelper.findByCode (chat, "set_photo"));
+				commandHelper.findByCode (chat, "set_photo"),
+				true);
 
 		}
 

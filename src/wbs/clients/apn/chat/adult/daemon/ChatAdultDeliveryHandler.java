@@ -147,6 +147,7 @@ class ChatAdultDeliveryHandler
 				chatUser,
 				Optional.of (delivery.getMessage ().getThreadId ()),
 				"adult_confirm",
+				true,
 				Collections.<String,String>emptyMap ());
 
 			deliveryHelper.remove (

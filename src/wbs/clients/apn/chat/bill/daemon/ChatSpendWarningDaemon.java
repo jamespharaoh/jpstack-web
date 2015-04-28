@@ -19,7 +19,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 
 import com.google.common.base.Optional;
 
@@ -41,7 +41,7 @@ class ChatSpendWarningDaemon
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	ObjectManager objectManager;
@@ -159,6 +159,7 @@ class ChatSpendWarningDaemon
 			chatUser.getNumSpendWarnings () == 0
 				? "spend_warning_1"
 				: "spend_warning_2",
+			true,
 			Collections.<String,String>emptyMap ());
 
 		// update user

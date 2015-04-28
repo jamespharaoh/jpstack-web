@@ -20,7 +20,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 
 import com.google.common.base.Optional;
 
@@ -47,7 +47,7 @@ class ChatUserJoinOutboundDaemon
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	// details
 

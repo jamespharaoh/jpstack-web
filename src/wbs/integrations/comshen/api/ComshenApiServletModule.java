@@ -17,7 +17,7 @@ import wbs.framework.web.RegexpPathHandler;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.sms.command.logic.CommandLogic;
 import wbs.sms.message.core.model.MessageDao;
 import wbs.sms.message.core.model.MessageStatus;
@@ -47,7 +47,7 @@ class ComshenApiServletModule
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	MessageDao messageDao;

@@ -196,6 +196,7 @@ class ChatAdultVerifyCommand
 			alreadyVerified
 				? "adult_already"
 				: "adult_confirm",
+			true,
 			Collections.<String,String>emptyMap ());
 
 		// process inbox

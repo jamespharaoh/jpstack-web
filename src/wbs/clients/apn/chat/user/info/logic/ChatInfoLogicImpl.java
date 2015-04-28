@@ -41,7 +41,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.queue.logic.QueueLogic;
@@ -100,7 +100,7 @@ class ChatInfoLogicImpl
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	LocatorLogic locatorLogic;
@@ -1304,6 +1304,7 @@ class ChatInfoLogicImpl
 			"name_hint",
 			commandHelper.findByCode (chat, "magic"),
 			commandHelper.findByCode (chat, "name").getId (),
+			true,
 			Collections.<String,String>emptyMap ());
 
 		// and update the chat user
@@ -1329,7 +1330,8 @@ class ChatInfoLogicImpl
 			chatUser,
 			Optional.<Integer>absent (),
 			"photo_hint",
-			commandHelper.findByCode (chat, "set_photo"));
+			commandHelper.findByCode (chat, "set_photo"),
+			true);
 
 		// and update the chat user
 
@@ -1354,7 +1356,8 @@ class ChatInfoLogicImpl
 			chatUser,
 			Optional.<Integer>absent (),
 			"photo_hint_2",
-			commandHelper.findByCode (chat, "set_photo"));
+			commandHelper.findByCode (chat, "set_photo"),
+			true);
 
 		// and update the chat user
 

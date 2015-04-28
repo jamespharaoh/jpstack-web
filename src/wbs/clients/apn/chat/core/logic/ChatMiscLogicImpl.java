@@ -46,7 +46,7 @@ import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.event.logic.EventLogic;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -111,7 +111,7 @@ class ChatMiscLogicImpl
 	EventLogic eventLogic;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	LocatorObjectHelper locatorHelper;
@@ -279,6 +279,7 @@ class ChatMiscLogicImpl
 				chatUser,
 				Optional.<Integer>absent (),
 				"block_all_confirm",
+				true,
 				Collections.<String,String>emptyMap ());
 
 		}
@@ -414,16 +415,11 @@ class ChatMiscLogicImpl
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.fromNullable (
-					threadId),
+				Optional.fromNullable (threadId),
 				"logon",
-				commandHelper.findByCode (
-					chat,
-					"magic"),
-				commandHelper.findByCode (
-					chat,
-					"help"
-				).getId (),
+				commandHelper.findByCode (chat, "magic"),
+				commandHelper.findByCode (chat, "help").getId (),
+				true,
 				Collections.<String,String>emptyMap ());
 
 		}
@@ -548,11 +544,11 @@ class ChatMiscLogicImpl
 
 				chatSendLogic.sendSystemMagic (
 					chatUser,
-					Optional.of (
-						threadId),
+					Optional.fromNullable (threadId),
 					"date_stop_hint",
 					commandHelper.findByCode (chat, "help"),
 					0,
+					true,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -573,9 +569,9 @@ class ChatMiscLogicImpl
 
 			chatSendLogic.sendSystemRbFree (
 				chatUser,
-				Optional.fromNullable (
-					threadId),
+				Optional.fromNullable (threadId),
 				"logoff_confirm",
+				true,
 				Collections.<String,String>emptyMap ());
 
 		}
@@ -720,6 +716,7 @@ class ChatMiscLogicImpl
 				"name_confirm",
 				commandHelper.findByCode (chat, "magic"),
 				commandHelper.findByCode (chat, "name").getId (),
+				true,
 				ImmutableMap.<String,String>builder ()
 					.put ("newName", name)
 					.build ());

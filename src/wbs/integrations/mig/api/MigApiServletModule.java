@@ -27,7 +27,7 @@ import wbs.framework.web.WebFile;
 import wbs.integrations.mig.logic.MigLogic;
 import wbs.integrations.mig.model.MigRouteInObjectHelper;
 import wbs.integrations.mig.model.MigRouteInRec;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
@@ -62,7 +62,7 @@ class MigApiServletModule
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	InboxLogic inboxLogic;

@@ -145,6 +145,7 @@ class ChatVideoSetCommand
 				chatUser,
 				Optional.of (message.getThreadId ()),
 				"video_set_pending",
+				true,
 				Collections.<String,String>emptyMap ());
 
 			// auto join
@@ -161,6 +162,7 @@ class ChatVideoSetCommand
 				chatUser,
 				Optional.of (message.getThreadId ()),
 				"video_set_error",
+				true,
 				Collections.<String,String>emptyMap ());
 
 		}

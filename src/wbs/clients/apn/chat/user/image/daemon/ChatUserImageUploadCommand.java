@@ -161,14 +161,15 @@ class ChatUserImageUploadCommand
 		MessageRec messageOut =
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (
-					messageIn.getThreadId ()),
+				Optional.of (messageIn.getThreadId ()),
 				"image_upload_link",
 				magicCommand,
 				helpCommand.getId (),
+				true,
 				ImmutableMap.<String,String>builder ()
 					.put ("url", url)
-					.build ());
+					.build ()
+			).get ();
 
 		// save token in database
 

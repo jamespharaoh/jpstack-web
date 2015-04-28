@@ -20,7 +20,7 @@ import wbs.framework.utils.etc.StringFormatter;
 import wbs.framework.web.WebExceptionHandler;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.ErrorResponder;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.priv.console.PrivChecker;
 
 import com.google.common.base.Optional;
@@ -37,7 +37,7 @@ class ConsoleExceptionHandler
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	PrivChecker privChecker;

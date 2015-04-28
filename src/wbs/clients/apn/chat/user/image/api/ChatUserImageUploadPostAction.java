@@ -26,7 +26,7 @@ import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.api.mvc.ApiAction;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.sms.message.core.model.MessageRec;
 
 import com.google.common.base.Optional;
@@ -49,7 +49,7 @@ class ChatUserImageUploadPostAction
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	RandomLogic randomLogic;

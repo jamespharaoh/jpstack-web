@@ -39,7 +39,7 @@ import wbs.integrations.hybyte.model.HybyteRouteObjectHelper;
 import wbs.integrations.hybyte.model.HybyteRouteOutObjectHelper;
 import wbs.integrations.hybyte.model.HybyteRouteOutRec;
 import wbs.integrations.hybyte.model.HybyteRouteRec;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
@@ -69,7 +69,7 @@ class HybyteApiServletModule
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	HybyteNetworkObjectHelper hybyteNetworkHelper;

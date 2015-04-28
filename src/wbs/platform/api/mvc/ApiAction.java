@@ -9,7 +9,7 @@ import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.web.Action;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 
 import com.google.common.base.Optional;
 
@@ -23,7 +23,7 @@ abstract class ApiAction
 	ApplicationContext applicationContext;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	RequestContext requestContext;

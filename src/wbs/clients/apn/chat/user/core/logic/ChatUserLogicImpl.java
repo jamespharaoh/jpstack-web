@@ -54,7 +54,7 @@ import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.event.logic.EventLogic;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeObjectHelper;
@@ -103,7 +103,7 @@ class ChatUserLogicImpl
 	EventLogic eventLogic;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	GazetteerEntryObjectHelper gazetteerEntryHelper;

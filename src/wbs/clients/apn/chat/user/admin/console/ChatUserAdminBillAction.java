@@ -86,7 +86,7 @@ class ChatUserAdminBillAction
 		chatUserHelper.lock (
 			chatUser);
 
-		// enfore £30/day limit
+		// enforce £30/day limit
 
 		if (chatCreditLogic.userBillLimitApplies (chatUser)) {
 

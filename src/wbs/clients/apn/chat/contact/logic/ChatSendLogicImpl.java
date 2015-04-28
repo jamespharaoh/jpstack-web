@@ -164,7 +164,7 @@ class ChatSendLogicImpl
 	 */
 	@Override
 	public
-	MessageRec sendSystem (
+	Optional<MessageRec> sendSystem (
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Integer> threadId,
 			@NonNull String templateCode,
@@ -173,6 +173,7 @@ class ChatSendLogicImpl
 			@NonNull Set<String> tags,
 			@NonNull Optional<String> deliveryTypeCode,
 			@NonNull String serviceCode,
+			@NonNull Boolean required,
 			@NonNull Map<String,String> suppliedParams) {
 
 		ChatRec chat =
@@ -188,12 +189,20 @@ class ChatSendLogicImpl
 
 		if (chatHelpTemplate == null) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"System template %s not found for chat %s",
-					templateCode,
-					objectManager.objectPathMini (
-						chat)));
+			if (required) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"System template %s not found for chat %s",
+						templateCode,
+						objectManager.objectPathMini (
+							chat)));
+
+			} else {
+
+				return Optional.absent ();
+
+			}
 
 		}
 
@@ -282,16 +291,17 @@ class ChatSendLogicImpl
 			finalText,
 			null);
 
-		return message;
+		return Optional.of (message);
 
 	}
 
 	@Override
 	public
-	MessageRec sendSystemRbFree (
+	Optional<MessageRec> sendSystemRbFree (
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Integer> threadId,
 			@NonNull String templateCode,
+			@NonNull Boolean required,
 			@NonNull Map<String,String> suppliedParams) {
 
 		ChatRec chat =
@@ -307,8 +317,16 @@ class ChatSendLogicImpl
 
 		if (chatHelpTemplate == null) {
 
-			throw new RuntimeException (
-				"System template not found: " + templateCode);
+			if (required) {
+
+				throw new RuntimeException (
+					"System template not found: " + templateCode);
+
+			} else {
+
+				return Optional.absent ();
+
+			}
 
 		}
 
@@ -351,7 +369,7 @@ class ChatSendLogicImpl
 
 		// and return
 
-		return message;
+		return Optional.of (message);
 
 	}
 
@@ -418,11 +436,12 @@ class ChatSendLogicImpl
 
 	@Override
 	public
-	MessageRec sendSystemMmsFree (
+	Optional<MessageRec> sendSystemMmsFree (
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Integer> threadId,
 			@NonNull String templateCode,
-			@NonNull CommandRec command) {
+			@NonNull CommandRec command,
+			@NonNull Boolean required) {
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -437,12 +456,20 @@ class ChatSendLogicImpl
 
 		if (chatHelpTemplate == null) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"System template %s not found for chat %s.%s",
-					templateCode,
-					chat.getSlice ().getCode (),
-					chat.getCode ()));
+			if (required) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"System template %s not found for chat %s.%s",
+						templateCode,
+						chat.getSlice ().getCode (),
+						chat.getCode ()));
+
+			} else {
+
+				return Optional.absent ();
+
+			}
 
 		}
 
@@ -474,7 +501,7 @@ class ChatSendLogicImpl
 
 		// and return
 
-		return message;
+		return Optional.of (message);
 
 	}
 
@@ -522,12 +549,13 @@ class ChatSendLogicImpl
 
 	@Override
 	public
-	MessageRec sendSystemMagic (
+	Optional<MessageRec> sendSystemMagic (
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Integer> threadId,
 			@NonNull String templateCode,
 			@NonNull CommandRec magicCommand,
 			@NonNull Integer magicRef,
+			@NonNull Boolean required,
 			@NonNull Map<String,String> suppliedParams) {
 
 		ChatRec chat =
@@ -543,15 +571,23 @@ class ChatSendLogicImpl
 
 		if (chatHelpTemplate == null) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"System template not found: %s for chat %s, user %s and ",
-					templateCode,
-					chatUser.getChat ().getId (),
-					chatUser.getId (),
-					"thread %s and template code %s",
-					threadId,
-					templateCode));
+			if (required) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"System template not found: %s for chat %s, user %s and ",
+						templateCode,
+						chatUser.getChat ().getId (),
+						chatUser.getId (),
+						"thread %s and template code %s",
+						threadId,
+						templateCode));
+
+			} else {
+
+				return Optional.absent ();
+
+			}
 
 		}
 
@@ -598,7 +634,7 @@ class ChatSendLogicImpl
 				? commandHelper.find (magicRef)
 				: magicCommand);
 
-		return message;
+		return Optional.of (message);
 
 	}
 

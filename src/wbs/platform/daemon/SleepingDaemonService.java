@@ -5,7 +5,7 @@ import javax.inject.Inject;
 import org.apache.log4j.Logger;
 
 import wbs.framework.utils.RandomLogic;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 
 import com.google.common.base.Optional;
 
@@ -16,7 +16,7 @@ class SleepingDaemonService
 	// dependencies
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	RandomLogic randomLogic;

@@ -28,7 +28,7 @@ import wbs.framework.application.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutRec;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender2;
 import wbs.sms.message.outbox.model.OutboxRec;
@@ -48,7 +48,7 @@ class BroadcastSystemsSender2
 	BroadcastSystemsRouteOutObjectHelper broadcastSystemsRouteOutHelper;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	ObjectManager objectManager;

@@ -17,7 +17,7 @@ import wbs.framework.web.RegexpPathHandler;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.report.logic.ReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
@@ -39,7 +39,7 @@ class UnwiredPlazaApiServletModule
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	MessageReportCodeObjectHelper messageReportCodeHelper;

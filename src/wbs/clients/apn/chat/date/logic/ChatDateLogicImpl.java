@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.date.logic;
 
 import static wbs.framework.utils.etc.Misc.prettyHour;
 
+import java.util.Collections;
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -50,11 +51,12 @@ class ChatDateLogicImpl
 
 		chatSendLogic.sendSystemMagic (
 			chatUser,
-			null,
+			Optional.<Integer>absent (),
 			"date_hint_photo",
 			commandHelper.findByCode (chat, "date_join_photo"),
 			0,
-			null);
+			true,
+			Collections.<String,String>emptyMap ());
 
 		// and update the chat user
 
@@ -74,11 +76,12 @@ class ChatDateLogicImpl
 
 		chatSendLogic.sendSystemMagic (
 			chatUser,
-			null,
+			Optional.<Integer>absent (),
 			"date_hint_upgrade",
 			commandHelper.findByCode (chat, "magic"),
 			commandHelper.findByCode (chat, "date_join_photo").getId (),
-			null);
+			true,
+			Collections.<String,String>emptyMap ());
 
 		// and update the chat user
 
@@ -208,6 +211,7 @@ class ChatDateLogicImpl
 				code,
 				commandHelper.findByCode (chat, "magic"),
 				commandHelper.findByCode (chat, "help").getId (),
+				true,
 				ImmutableMap.<String,String>builder ()
 					.put (
 						"miles",
@@ -224,8 +228,10 @@ class ChatDateLogicImpl
 
 		// set first join if appropriate
 
-		if (chatUser.getFirstJoin () == null
-				&& chatUser.getDateMode () != ChatUserDateMode.none) {
+		if (
+			chatUser.getFirstJoin () == null
+			&& chatUser.getDateMode () != ChatUserDateMode.none
+		) {
 
 			chatUser.setFirstJoin (new Date ());
 

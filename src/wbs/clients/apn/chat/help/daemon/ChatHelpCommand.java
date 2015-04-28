@@ -165,6 +165,7 @@ class ChatHelpCommand
 					chat,
 					"help"
 				).getId (),
+				true,
 				Collections.<String,String>emptyMap ());
 
 		} else {
