@@ -206,6 +206,7 @@ class ChatVideoGetCommand
 					chatUser,
 					Optional.of (message.getThreadId ()),
 					"no_videos_error",
+					true,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -226,6 +227,7 @@ class ChatVideoGetCommand
 					chatUser,
 					Optional.of (message.getThreadId ()),
 					"video_not_found",
+					true,
 					Collections.<String,String>emptyMap ());
 
 				return inboxLogic.inboxProcessed (

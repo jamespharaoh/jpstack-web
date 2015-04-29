@@ -1164,6 +1164,7 @@ class ChatCreditLogicImpl
 						chatUser,
 						Optional.of (threadId),
 						"credit_hint_network",
+						true,
 						Collections.<String,String>emptyMap ());
 
 				} else {
@@ -1172,6 +1173,7 @@ class ChatCreditLogicImpl
 						chatUser,
 						Optional.of (threadId),
 						"credit_hint_prepay",
+						true,
 						Collections.<String,String>emptyMap ());
 
 				}
@@ -1188,6 +1190,7 @@ class ChatCreditLogicImpl
 						chatUser,
 						Optional.of (threadId),
 						"credit_hint_network",
+						true,
 						Collections.<String,String>emptyMap ());
 
 				} else if (
@@ -1199,6 +1202,7 @@ class ChatCreditLogicImpl
 						chatUser,
 						Optional.of (threadId),
 						"credit_hint_daily",
+						true,
 						ImmutableMap.<String,String>builder ()
 
 							.put (
@@ -1214,6 +1218,7 @@ class ChatCreditLogicImpl
 						chatUser,
 						Optional.of (threadId),
 						"credit_hint",
+						true,
 						Collections.<String,String>emptyMap ());
 
 				}

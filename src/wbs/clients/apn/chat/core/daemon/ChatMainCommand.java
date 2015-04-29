@@ -220,6 +220,7 @@ class ChatMainCommand
 				Collections.<String>emptySet (),
 				Optional.<String>absent (),
 				"system",
+				true,
 				Collections.<String,String>emptyMap ());
 
 			chatSendLogic.sendSystemMagic (
@@ -234,6 +235,7 @@ class ChatMainCommand
 					userChatScheme,
 					"chat_dob"
 				).getId (),
+				true,
 				Collections.<String,String>emptyMap ());
 
 		}
@@ -682,6 +684,7 @@ class ChatMainCommand
 					Optional.of (
 						smsMessage.getThreadId ()),
 					"keyword_error",
+					true,
 					Collections.<String,String>emptyMap ());
 
 				return inboxLogic.inboxProcessed (

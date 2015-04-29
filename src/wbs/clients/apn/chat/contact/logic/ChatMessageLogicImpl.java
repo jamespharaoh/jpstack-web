@@ -60,7 +60,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.integrations.jigsaw.api.JigsawApi;
 import wbs.integrations.urbanairship.logic.UrbanAirshipApi;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -125,7 +125,7 @@ class ChatMessageLogicImpl
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	ObjectManager objectManager;
@@ -465,6 +465,7 @@ class ChatMessageLogicImpl
 				"logon_hint",
 				commandHelper.findByCode (chat, "magic"),
 				commandHelper.findByCode (chat, "help").getId (),
+				true,
 				Collections.<String,String>emptyMap ());
 
 			fromUser
@@ -1411,6 +1412,7 @@ class ChatMessageLogicImpl
 				Collections.<String>emptySet (),
 				Optional.<String>absent (),
 				"system",
+				true,
 				Collections.<String,String>emptyMap ());
 
 			break;

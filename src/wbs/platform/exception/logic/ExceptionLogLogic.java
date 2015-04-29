@@ -5,7 +5,7 @@ import wbs.platform.exception.model.ExceptionLogRec;
 import com.google.common.base.Optional;
 
 public
-interface ExceptionLogic {
+interface ExceptionLogLogic {
 
 	ExceptionLogRec logSimple (
 			String typeCode,

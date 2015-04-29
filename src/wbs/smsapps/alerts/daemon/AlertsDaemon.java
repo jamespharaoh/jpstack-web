@@ -27,7 +27,7 @@ import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 import wbs.framework.utils.StringSubstituter;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemState;
 import wbs.platform.queue.model.QueueSubjectObjectHelper;
@@ -69,7 +69,7 @@ class AlertsDaemon
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	ObjectManager objectManager;

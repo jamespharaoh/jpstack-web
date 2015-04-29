@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.core.daemon;
 
+import java.util.Collections;
+
 import javax.inject.Inject;
 
 import lombok.Getter;
@@ -177,7 +179,8 @@ class ChatNameCommand
 				"name_error",
 				commandHelper.findByCode (chat, "magic"),
 				commandHelper.findByCode (chat, "name").getId (),
-				null);
+				true,
+				Collections.<String,String>emptyMap ());
 
 		}
 

@@ -24,7 +24,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.console.action.ConsoleAction;
 import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;
@@ -55,7 +55,7 @@ class ChatMessagePendingFormAction
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	Database database;

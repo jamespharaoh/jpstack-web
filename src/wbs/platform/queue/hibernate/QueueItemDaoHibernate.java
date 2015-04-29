@@ -1,12 +1,18 @@
 package wbs.platform.queue.hibernate;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
 
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemRec.QueueItemDaoMethods;
+import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.user.model.UserRec;
 
@@ -44,23 +50,64 @@ class QueueItemDaoHibernate
 	@Override
 	public
 	List<QueueItemRec> findByCreatedTime (
-			Interval createdTimeInterval) {
+			@NonNull Interval createdTimeInterval) {
 
 		return findMany (
 			QueueItemRec.class,
 
-			createQuery (
-				"FROM QueueItemRec queueItem " +
-				"WHERE queueItem.createdTime >= :start " +
-					"AND queueItem.createdTime < :end")
+			createCriteria (
+				QueueItemRec.class,
+				"_queueItem")
 
-			.setTimestamp (
-				"start",
-				createdTimeInterval.getStart ().toDate ())
+			.add (
+				Restrictions.ge (
+					"_queueItem.createdTime",
+					instantToDate (
+						createdTimeInterval.getStart ().toInstant ())))
 
-			.setTimestamp (
-				"end",
-				createdTimeInterval.getEnd ().toDate ())
+			.add (
+				Restrictions.lt (
+					"_queueItem.createdTime",
+					instantToDate (
+						createdTimeInterval.getEnd ().toInstant ())))
+
+			.list ());
+
+	}
+
+	@Override
+	public
+	List<QueueItemRec> findByCreatedTime (
+			@NonNull QueueRec queue,
+			@NonNull Interval createdTimeInterval) {
+
+		return findMany (
+			QueueItemRec.class,
+
+			createCriteria (
+				QueueItemRec.class,
+				"_queueItem")
+
+			.createAlias (
+				"_queueItem.queueSubject",
+				"_queueSubject")
+
+			.add (
+				Restrictions.eq (
+					"_queueSubject.queue",
+					queue))
+
+			.add (
+				Restrictions.ge (
+					"_queueItem.createdTime",
+					instantToDate (
+						createdTimeInterval.getStart ().toInstant ())))
+
+			.add (
+				Restrictions.lt (
+					"_queueItem.createdTime",
+					instantToDate (
+						createdTimeInterval.getEnd ().toInstant ())))
 
 			.list ());
 

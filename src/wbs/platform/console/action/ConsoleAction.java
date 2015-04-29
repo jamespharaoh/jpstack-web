@@ -17,7 +17,7 @@ import wbs.framework.web.Responder;
 import wbs.platform.console.misc.ConsoleExceptionHandler;
 import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 
 import com.google.common.base.Optional;
 
@@ -39,7 +39,7 @@ class ConsoleAction
 	ConsoleManager consoleManager;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	ConsoleRequestContext requestContext;

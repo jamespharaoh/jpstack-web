@@ -27,7 +27,7 @@ import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInRec;
 import wbs.platform.api.mvc.ApiAction;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
@@ -48,7 +48,7 @@ class Oxygen8InboundSmsAction
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	InboxLogic inboxLogic;
@@ -322,7 +322,7 @@ class Oxygen8InboundSmsAction
 			shortcode,
 			route,
 			Optional.of (oxygen8Network.getNetwork ()),
-			Optional.of (new Instant (dateReceived)),
+			Optional.of (new Instant (dateReceived * 1000)),
 			Collections.<MediaRec>emptyList (),
 			Optional.<String>absent (),
 			Optional.<String>absent ());

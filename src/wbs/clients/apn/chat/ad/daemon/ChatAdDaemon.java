@@ -28,7 +28,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
@@ -70,7 +70,7 @@ class ChatAdDaemon
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	ObjectManager objectManager;

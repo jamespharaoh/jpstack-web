@@ -162,6 +162,7 @@ class ChatCheckCreditCommand
 			chatUser,
 			Optional.of (message.getThreadId ()),
 			"check_credit",
+			true,
 			ImmutableMap.<String,String>builder ()
 				.put (
 					"credit",

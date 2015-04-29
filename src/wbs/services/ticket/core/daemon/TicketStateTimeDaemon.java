@@ -20,7 +20,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -50,7 +50,7 @@ class TicketStateTimeDaemon
 	Database database;
 	
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 	
 	@Inject
 	ObjectManager objectManager;

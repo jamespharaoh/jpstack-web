@@ -32,7 +32,7 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
 import wbs.integrations.mig.logic.MigLogic;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
@@ -54,7 +54,7 @@ class MigMmsApiServletModule
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	InboxLogic inboxLogic;

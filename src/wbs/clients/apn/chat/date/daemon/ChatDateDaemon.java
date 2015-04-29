@@ -39,7 +39,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.daemon.AbstractDaemonService;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.locator.model.LongLat;
 
@@ -50,7 +50,7 @@ import com.google.common.collect.ImmutableMap;
 @SingletonComponent ("chatDateDaemon")
 public
 class ChatDateDaemon
-		extends AbstractDaemonService {
+	extends AbstractDaemonService {
 
 	// dependencies
 
@@ -76,7 +76,7 @@ class ChatDateDaemon
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	LocatorLogic locatorLogic;
@@ -177,6 +177,12 @@ class ChatDateDaemon
 
 		ChatRec chat =
 			chatHelper.find (chatId);
+
+		log.info (
+			stringFormat (
+				"Start dating for chat %s.%s",
+				chat.getSlice ().getCode (),
+				chat.getCode ()));
 
 		if (! chat.getDatingEnabled ()) {
 
@@ -284,7 +290,7 @@ class ChatDateDaemon
 
 			}
 
-			numUsers++;
+			numUsers ++;
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
@@ -380,10 +386,11 @@ class ChatDateDaemon
 		int max = 1000;
 
 		for (Integer thisUserId : datingUserIds) {
+
 			try {
 
 				if (doUser (otherUserInfos, thisUserId))
-					count++;
+					count ++;
 
 				if (count >= max)
 					break;
@@ -396,7 +403,9 @@ class ChatDateDaemon
 					exception,
 					Optional.<Integer>absent (),
 					false);
+
 			}
+
 		}
 
 		log.info ("Dating done " + count);
@@ -448,9 +457,11 @@ class ChatDateDaemon
 
 		if (thisUser.getDateDailyDate () != null) {
 
-			for (LocalDate day = thisUser.getDateDailyDate ();
-					day.compareTo (today) < 0;
-					day = day.plusDays (1)) {
+			for (
+				LocalDate day = thisUser.getDateDailyDate ();
+				day.compareTo (today) < 0;
+				day = day.plusDays (1)
+			) {
 
 				int dailyCount =
 					thisUser.getDateDailyCount ();
@@ -460,7 +471,9 @@ class ChatDateDaemon
 
 				thisUser.setDateDailyCount (
 					min (dailyCount + dailyMax, dailyMax));
+
 			}
+
 		}
 
 		thisUser.setDateDailyDate (today);
