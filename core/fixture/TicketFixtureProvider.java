@@ -161,109 +161,109 @@ public class TicketFixtureProvider
 				
 			);
 		
-		TicketStateRec acceptedState =
-			ticketStateHelper.insert (
-				new TicketStateRec ()
-		
-				.setTicketManager (
-					ticketManager)
-						
-				.setName("Accepted")
-				
-				.setCode (
-					"accepted")
-				
-				.setState (
-					TicketStateState.accepted)	
-				
-				.setShowInQueue (
-					true)
+		// accepted state
+		ticketStateHelper.insert (
+			new TicketStateRec ()
+	
+			.setTicketManager (
+				ticketManager)
 					
-				.setMinimum (
-					60)
-					
-				.setMaximum (
-					120)
+			.setName("Accepted")
+			
+			.setCode (
+				"accepted")
+			
+			.setState (
+				TicketStateState.accepted)	
+			
+			.setShowInQueue (
+				true)
+				
+			.setMinimum (
+				60)
+				
+			.setMaximum (
+				120)
 			
 		);
 		
-		TicketStateRec pendingState =
-				ticketStateHelper.insert (
-					new TicketStateRec ()
+		// pending state
+		ticketStateHelper.insert (
+			new TicketStateRec ()
+	
+			.setTicketManager (
+				ticketManager)
+					
+			.setName("Pending")
 			
-					.setTicketManager (
-						ticketManager)
-							
-					.setName("Pending")
-					
-					.setCode (
-						"pending")
-					
-					.setState (
-						TicketStateState.pending)	
-					
-					.setShowInQueue (
-						true)
-						
-					.setMinimum (
-						300)
-						
-					.setMaximum (
-						600)
+			.setCode (
+				"pending")
+			
+			.setState (
+				TicketStateState.pending)	
+			
+			.setShowInQueue (
+				true)
 				
-			);
+			.setMinimum (
+				300)
+				
+			.setMaximum (
+				600)
+			
+		);
 		
-		TicketStateRec solvedState =
-				ticketStateHelper.insert (
-					new TicketStateRec ()
+		// solved state
+		ticketStateHelper.insert (
+			new TicketStateRec ()
+	
+			.setTicketManager (
+				ticketManager)
+					
+			.setName("Solved")
 			
-					.setTicketManager (
-						ticketManager)
-							
-					.setName("Solved")
-					
-					.setCode (
-						"solved")
-					
-					.setState (
-						TicketStateState.solved)	
-					
-					.setShowInQueue (
-						true)
-						
-					.setMinimum (
-						60)
-						
-					.setMaximum (
-						120)
+			.setCode (
+				"solved")
+			
+			.setState (
+				TicketStateState.solved)	
+			
+			.setShowInQueue (
+				true)
 				
-			);
+			.setMinimum (
+				60)
+				
+			.setMaximum (
+				120)
+			
+		);
 		
-		TicketStateRec closedState =
-				ticketStateHelper.insert (
-					new TicketStateRec ()
+		// closed state
+		ticketStateHelper.insert (
+			new TicketStateRec ()
+	
+			.setTicketManager (
+				ticketManager)
+					
+			.setName("Closed")
 			
-					.setTicketManager (
-						ticketManager)
-							
-					.setName("Closed")
-					
-					.setCode (
-						"closed")
-					
-					.setState (
-						TicketStateState.closed)	
-					
-					.setShowInQueue (
-						true)
-						
-					.setMinimum (
-						0)
-						
-					.setMaximum (
-						0)
+			.setCode (
+				"closed")
+			
+			.setState (
+				TicketStateState.closed)	
+			
+			.setShowInQueue (
+				true)
 				
-			);
+			.setMinimum (
+				0)
+				
+			.setMaximum (
+				0)
+			
+		);
 				
 		TicketRec ticket =
 			ticketHelper.insert (

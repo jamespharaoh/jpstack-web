@@ -15,7 +15,6 @@ import wbs.platform.console.action.ConsoleAction;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.queue.logic.QueueLogic;
-import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 import wbs.services.ticket.core.model.TicketNoteRec;
