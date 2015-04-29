@@ -23,49 +23,49 @@ import wbs.framework.record.Record;
 public class TicketFieldValueRec  
 	implements CommonRecord<TicketFieldValueRec> {
 	
-		// id
-	
-		@GeneratedIdField
-		Integer id;
-		
-		@ParentField
-		TicketRec ticket;
-		
-		@IdentityReferenceField
-		TicketFieldTypeRec ticketFieldType;
-		
-		// details
-		
-		@SimpleField (
-			nullable = true)
-		String stringValue;
+	// id
 
-		@SimpleField (
+	@GeneratedIdField
+	Integer id;
+	
+	@ParentField
+	TicketRec ticket;
+	
+	@IdentityReferenceField
+	TicketFieldTypeRec ticketFieldType;
+	
+	// details
+	
+	@SimpleField (
+		nullable = true)
+	String stringValue;
+
+	@SimpleField (
+		nullable = true)
+	Integer integerValue;
+	
+	@SimpleField (
 			nullable = true)
-		Integer integerValue;
-		
-		@SimpleField (
-				nullable = true)
-		Boolean booleanValue;
-		
-		// compare to
-		
-		@Override
-		public
-		int compareTo (
-				Record<TicketFieldValueRec> otherRecord) {
-		
-			TicketFieldValueRec other =
-				(TicketFieldValueRec) otherRecord;
-		
-			return new CompareToBuilder ()
-		
-				.append (
-					getId (),
-					other.getId ())
-		
-				.toComparison ();
-		
-		}
+	Boolean booleanValue;
+	
+	// compare to
+	
+	@Override
+	public
+	int compareTo (
+			Record<TicketFieldValueRec> otherRecord) {
+	
+		TicketFieldValueRec other =
+			(TicketFieldValueRec) otherRecord;
+	
+		return new CompareToBuilder ()
+	
+			.append (
+				getId (),
+				other.getId ())
+	
+			.toComparison ();
+	
+	}
 
 }
