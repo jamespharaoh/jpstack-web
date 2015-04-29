@@ -23,7 +23,7 @@ import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.daemon.AbstractDaemonService;
 import wbs.platform.daemon.ThreadManager;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 
 import com.google.common.base.Optional;
 
@@ -37,7 +37,7 @@ class PostgresqlMaintenanceDaemon
 	DataSource dataSource;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	ThreadManager threadManager;

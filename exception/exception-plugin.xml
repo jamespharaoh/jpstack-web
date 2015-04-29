@@ -13,7 +13,7 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ExceptionLogicImpl"/>
+		<bean class="logic.ExceptionLogLogicImpl"/>
 	</layer>
 
 	<layer name="console">

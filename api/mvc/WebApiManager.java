@@ -8,7 +8,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.RequestHandler;
 import wbs.framework.web.Responder;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 
 import com.google.common.base.Optional;
 
@@ -20,7 +20,7 @@ class WebApiManager {
 	RequestContext requestContext;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	public
 	class WebApiActionRequestHandler

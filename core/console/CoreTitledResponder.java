@@ -16,7 +16,7 @@ import wbs.framework.record.GlobalId;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.part.PagePart;
 import wbs.platform.console.responder.HtmlResponder;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.priv.console.PrivChecker;
 
 import com.google.common.base.Optional;
@@ -28,7 +28,7 @@ class CoreTitledResponder
 	extends HtmlResponder {
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	@Inject
 	PrivChecker privChecker;

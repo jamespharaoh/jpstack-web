@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.exception.logic.ExceptionLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
 
 import com.google.common.base.Optional;
 
@@ -23,7 +23,7 @@ class ThreadManager
 	}
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionLogLogic exceptionLogic;
 
 	/**
 	 * Thread class which provides the desired functionality.
