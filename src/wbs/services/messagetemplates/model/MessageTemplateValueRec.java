@@ -1,12 +1,11 @@
-package wbs.services.ticket.core.model;
+package wbs.services.messagetemplates.model;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.IdentityReferenceField;
 import wbs.framework.entity.annotations.MajorEntity;
@@ -20,8 +19,8 @@ import wbs.framework.record.Record;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public class TicketFieldValueRec  
-	implements CommonRecord<TicketFieldValueRec> {
+public class MessageTemplateValueRec  
+	implements CommonRecord<MessageTemplateValueRec> {
 	
 	// id
 
@@ -29,40 +28,35 @@ public class TicketFieldValueRec
 	Integer id;
 	
 	@ParentField
-	TicketRec ticket;
+	MessageTemplateDatabaseRec messageTemplateDatabase;
 	
 	@IdentityReferenceField
-	TicketFieldTypeRec ticketFieldType;
+	MessageTemplateTypeRec messageTemplateType;
 	
 	// details
 	
-	@SimpleField (
-		nullable = true)
+	@SimpleField
 	String stringValue;
 
-	@SimpleField (
-		nullable = true)
-	Integer integerValue;
-	
-	@SimpleField (
-			nullable = true)
-	Boolean booleanValue;
-	
 	// compare to
 	
 	@Override
 	public
 	int compareTo (
-			Record<TicketFieldValueRec> otherRecord) {
+			Record<MessageTemplateValueRec> otherRecord) {
 	
-		TicketFieldValueRec other =
-			(TicketFieldValueRec) otherRecord;
+		MessageTemplateValueRec other =
+			(MessageTemplateValueRec) otherRecord;
 	
 		return new CompareToBuilder ()
 	
 			.append (
 				getId (),
 				other.getId ())
+				
+			.append (
+				getMessageTemplateDatabase (),
+				other.getMessageTemplateDatabase ())
 	
 			.toComparison ();
 	
