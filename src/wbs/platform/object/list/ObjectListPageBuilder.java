@@ -200,7 +200,6 @@ class ObjectListPageBuilder {
 					.listTabSpecs (
 						listTabsByName)
 
-
 					.formFieldsProvider (
 						fieldsProvider)
 
