@@ -1,4 +1,4 @@
-package wbs.services.messagetemplates.model;
+package wbs.services.messagetemplate.model;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
@@ -28,7 +28,7 @@ public class MessageTemplateValueRec
 	Integer id;
 	
 	@ParentField
-	MessageTemplateDatabaseRec messageTemplateDatabase;
+	MessageTemplateSetRec messageTemplateSet;
 	
 	@IdentityReferenceField
 	MessageTemplateTypeRec messageTemplateType;
@@ -55,8 +55,8 @@ public class MessageTemplateValueRec
 				other.getId ())
 				
 			.append (
-				getMessageTemplateDatabase (),
-				other.getMessageTemplateDatabase ())
+				getMessageTemplateSet (),
+				other.getMessageTemplateSet ())
 	
 			.toComparison ();
 	

@@ -1,4 +1,7 @@
-package wbs.services.messagetemplates.model;
+package wbs.services.messagetemplate.model;
+
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -11,11 +14,12 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
+import wbs.framework.entity.annotations.CollectionField;
+import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
-import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
@@ -26,48 +30,43 @@ import wbs.framework.utils.RandomLogic;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public class MessageTemplateTypeRec  
-	implements CommonRecord<MessageTemplateTypeRec> {
+public class MessageTemplateSetRec 
+	implements CommonRecord<MessageTemplateSetRec> {
 	
 	// id
 	
 	@GeneratedIdField
 	Integer id;
 	
-	@CodeField
-	String code;
+	// identity
 	
 	@ParentField
 	MessageTemplateDatabaseRec messageTemplateDatabase;
+	
+	@CodeField
+	String code;
 	
 	// details
 	
 	@NameField
 	String name;
+
+	@DescriptionField
+	String description;
 	
-	@SimpleField
-	String defaultValue;
-	
-	@SimpleField
-	String helpText;
-	
-	@SimpleField
-	Integer minLength;
-	
-	@SimpleField
-	Integer maxLength;
-	
-	@SimpleField
-	MessageTemplateTypeCharset charset;
+	@CollectionField (
+			orderBy = "id")
+		Set<MessageTemplateValueRec> messageTemplateValues =
+			new TreeSet<MessageTemplateValueRec> ();
 	
 	// object hooks
 
 	public static
-	class MessageTemplateTypeHooks
-		extends AbstractObjectHooks<MessageTemplateTypeRec> {
+	class MessageTemplateSetHooks
+		extends AbstractObjectHooks<MessageTemplateSetRec> {
 
 		@Inject
-		Provider<MessageTemplateTypeObjectHelper> messageTemplateTypeHelper;
+		Provider<MessageTemplateSetObjectHelper> messageTemplateSetHelper;
 
 		@Inject
 		Database database;
@@ -78,10 +77,10 @@ public class MessageTemplateTypeRec
 		@Override
 		public
 		void beforeInsert (
-				MessageTemplateTypeRec messageTemplateType) {
+				MessageTemplateSetRec messageTemplateSet) {
 			
-			messageTemplateType.setCode (
-				messageTemplateType.getName().toLowerCase());
+			messageTemplateSet.setCode (
+				messageTemplateSet.getName().toLowerCase());
 
 		}
 
@@ -92,23 +91,23 @@ public class MessageTemplateTypeRec
 	@Override
 	public
 	int compareTo (
-			Record<MessageTemplateTypeRec> otherRecord) {
+			Record<MessageTemplateSetRec> otherRecord) {
 	
-		MessageTemplateTypeRec other =
-			(MessageTemplateTypeRec) otherRecord;
+		MessageTemplateSetRec other =
+			(MessageTemplateSetRec) otherRecord;
 	
 		return new CompareToBuilder ()
 	
 			.append (
 				getCode (),
 				other.getCode ())
-				
+	
 			.append (
 				getMessageTemplateDatabase (),
 				other.getMessageTemplateDatabase ())
 	
 			.toComparison ();
-	
+
 	}
 
 }

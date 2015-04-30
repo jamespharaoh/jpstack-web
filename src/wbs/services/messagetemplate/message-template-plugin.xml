@@ -1,0 +1,32 @@
+<plugin
+	name="message-template"
+	package="wbs.services.messagetemplate">
+
+	<plugin-dependencies>
+		<plugin-dependency name="sms-apps-common"/>
+		<plugin-dependency name="scaffold"/>
+	</plugin-dependencies>
+
+	<sql-scripts>
+		<sql-data name="message-template-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="messageTemplateDatabase"/>
+		<model name="messageTemplateType"/>
+		<model name="messageTemplateValue"/>
+		<model name="messageTemplateSet"/>
+		<enum-type name="messageTemplateTypeCharset"/>
+	</models>
+
+	<fixtures>
+		<fixture name="messageTemplate"/>
+	</fixtures>
+	
+	<console-modules>
+		<console-module name="message-template-database"/>
+		<console-module name="message-template-type"/>
+		<console-module name="message-template-set"/>
+	</console-modules>
+
+</plugin>

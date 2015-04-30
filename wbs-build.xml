@@ -562,6 +562,10 @@ i		<plugin
 		<plugin
 			name="ticket-core"
 			package="wbs.services.ticket.core"/>
+			
+		<plugin
+			name="message-template"
+			package="wbs.services.messagetemplate"/>
 
 		<!-- integrations -->
 

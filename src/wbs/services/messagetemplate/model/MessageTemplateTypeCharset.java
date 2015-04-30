@@ -1,4 +1,4 @@
-package wbs.services.messagetemplates.model;
+package wbs.services.messagetemplate.model;
 
 public 
 enum MessageTemplateTypeCharset {
