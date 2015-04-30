@@ -188,17 +188,12 @@ public class TicketRec
 
 			try {
 				
-				//Find the ticket fueld value
+				//Find the ticket field value
 				
 				TicketFieldValueRec ticketFieldValue =
 					ticket.getTicketFieldValues().get( 
 						ticketFieldType.getId());
-				
-				/*TicketFieldValueRec ticketFieldValue =
-						ticketHelper.get().findTicketFieldValue(
-							ticket,
-							ticketFieldType);*/	
-				
+							
 				if (ticketFieldValue == null) { return null; }
 				
 				switch( ticketFieldType.getType() ) {
@@ -259,11 +254,7 @@ public class TicketRec
 			
 			TicketFieldValueRec ticketFieldValue;
 			
-			try {
-				/*ticketFieldValue = 
-					ticketHelper.get().findTicketFieldValue(
-						ticket,
-						ticketFieldType);	*/				
+			try {		
 				
 				 ticketFieldValue =
 					ticket.getTicketFieldValues().get( 
