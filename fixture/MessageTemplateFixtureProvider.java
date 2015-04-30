@@ -111,20 +111,20 @@ public class MessageTemplateFixtureProvider
 	
 		);
 		
-		MessageTemplateTypeRec messageTemplateType =
+		MessageTemplateTypeRec messageTemplateType1 =
 			messageTemplateTypeHelper.insert (
 				new MessageTemplateTypeRec ()
 		
 					.setMessageTemplateDatabase (
 						messageTemplateDatabase)
 							
-					.setName("MessageTemplateType")
+					.setName("Template 1")
 					
 					.setDefaultValue (
-						"Default Value")
+						"Template 1 Default Value")
 						
 					.setHelpText (
-						"<p>Help text</p>")
+						"<p>Help text 1</p>")
 		
 					.setMinLength(
 						1)
@@ -137,9 +137,39 @@ public class MessageTemplateFixtureProvider
 			
 		);
 		
+		MessageTemplateTypeRec messageTemplateType2 =
+			messageTemplateTypeHelper.insert (
+				new MessageTemplateTypeRec ()
+		
+					.setMessageTemplateDatabase (
+						messageTemplateDatabase)
+							
+					.setName("Template 2")
+					
+					.setDefaultValue (
+						"Template 2 Default Value")
+						
+					.setHelpText (
+						"<p>Help text 2</p>")
+		
+					.setMinLength(
+						5)
+	
+					.setMaxLength(
+						20)
+						
+					.setCharset (
+						MessageTemplateTypeCharset.unicode)
+				
+			);
+		
 		messageTemplateDatabase
 			.getMessageTemplateTypes().add (
-				messageTemplateType);
+				messageTemplateType1);
+		
+		messageTemplateDatabase
+		.getMessageTemplateTypes().add (
+			messageTemplateType2);
 		
 		MessageTemplateSetRec messageTemplateSet =
 			messageTemplateSetHelper.insert (
@@ -165,16 +195,19 @@ public class MessageTemplateFixtureProvider
 							messageTemplateSet)
 			
 					.setMessageTemplateType (
-						messageTemplateType)
+						messageTemplateType1)
 						
 					.setStringValue(
 						"Message Template Value")
 					
 		);
 		
+		messageTemplateSet.setNumTemplates(
+				messageTemplateSet.getNumTemplates() + 1);
+		
 		messageTemplateSet
-			.getMessageTemplateValues().add (
-				messageTemplateValue);
+			.getMessageTemplateValues().put (
+				messageTemplateType1.getId(), messageTemplateValue);
 	
 	}
 

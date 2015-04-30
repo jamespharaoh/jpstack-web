@@ -31,20 +31,21 @@
 		<list>
 
 			<object-list-page
-				fields="list"/>
+				fields-provider="messageTemplateSetFieldsProvider"/>
 
 			<object-create-page
-				fields="create"/>
+				fields-provider="messageTemplateSetFieldsProvider"/>
 
 		</list>
 
 		<object>
-
+		
 			<object-summary-page
-				fields="summary"/>
+				fields-provider="messageTemplateSetFieldsProvider"
+				priv-key="messageTemplateDatabase.manage"/>
 
 			<object-settings-page
-				fields="settings"
+				fields-provider="messageTemplateSetFieldsProvider"
 				priv-key="messageTemplateDatabase.manage"/>
 				
 			<object-events-page/>
@@ -52,47 +53,5 @@
 		</object>
 
 	</object-context>
-
-	<field-set
-		name="list"
-		object-name="messageTemplateSet">
-
-		<parent-field/>
-		<name-field/>
-		<description-field/>		
-
-	</field-set>
-
-	<field-set
-		name="create"
-		object-name="messageTemplateSet">
-
-		<parent-field/>		
-		<name-field/>
-		<description-field/>
-			
-	</field-set>
-
-	<field-set
-		name="summary"
-		object-name="messageTemplateSet">
-
-		<id-field/>
-		<code-field/>	
-		<parent-field/>
-		<name-field/>
-		<description-field/>
-
-	</field-set>
-
-	<field-set
-		name="settings"
-		object-name="messageTemplateSet">
-
-		<parent-field/>
-		<name-field/>
-		<description-field/>
-
-	</field-set>
 
 </console-module>
