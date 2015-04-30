@@ -1,0 +1,98 @@
+<console-module
+	name="message-template-set">
+
+	<console-helper-provider
+		object-name="messageTemplateSet"
+		view-delegate-field="parent"
+		view-delegate-priv-code="manage">
+		
+		<context-stuff
+			name="messageTemplateSetName"
+			field="name"/>
+
+		<context-stuff
+			name="mmessageTemplateSetId"
+			field="id"/>
+
+		<context-stuff
+			name="messageTemplateDatabaseId"
+			delegate="messageTemplateDatabase"
+			field="id"/>
+
+		<run-post-processor
+			name="messageTemplateDatabase"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="messageTemplateSet"
+		object-name="messageTemplateSet">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"
+				priv-key="messageTemplateDatabase.manage"/>
+				
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="messageTemplateSet">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>		
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="messageTemplateSet">
+
+		<parent-field/>		
+		<name-field/>
+		<description-field/>
+			
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="messageTemplateSet">
+
+		<id-field/>
+		<code-field/>	
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="messageTemplateSet">
+
+		<parent-field/>
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+</console-module>
