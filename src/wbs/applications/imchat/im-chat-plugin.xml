@@ -49,6 +49,7 @@
 		<bean class="api.ImChatPurchaseHistoryAction"/>
 		<bean class="api.ImChatForgotPasswordAction"/>
 		<bean class="api.ImChatChangePasswordAction"/>
+		<bean class="api.ImChatMessageTemplateSetGetAction"/>
 	</layer>
 
 	<layer name="console">

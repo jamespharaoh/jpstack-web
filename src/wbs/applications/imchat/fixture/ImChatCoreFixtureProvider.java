@@ -45,6 +45,7 @@ import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.scaffold.model.SliceRec;
 
 @PrototypeComponent ("imChatCoreFixtureProvider")
 public
@@ -85,7 +86,7 @@ class ImChatCoreFixtureProvider
 
 	@Inject
 	ImChatTemplateObjectHelper imChatTemplateHelper;
-
+	
 	@Inject
 	MediaLogic mediaLogic;
 
@@ -145,14 +146,17 @@ class ImChatCoreFixtureProvider
 
 		);
 
+		SliceRec slice =
+			sliceHelper.findByCode (
+				GlobalId.root,
+					"test");
+		
 		paypalAccountHelper.insert (
 
 			new PaypalAccountRec ()
 
 				.setSlice (
-					sliceHelper.findByCode (
-						GlobalId.root,
-						"test"))
+					slice)
 
 				.setCode (
 					"imchat_paypal_acc")
@@ -163,7 +167,7 @@ class ImChatCoreFixtureProvider
 				.setDescription (
 					"Test paypal account")
 			);
-
+		
 		// im chat
 
 		ImChatRec imChat =
@@ -171,9 +175,7 @@ class ImChatCoreFixtureProvider
 				new ImChatRec ()
 
 			.setSlice (
-				sliceHelper.findByCode (
-					GlobalId.root,
-					"test"))
+				slice)
 
 			.setCode (
 				"test")
