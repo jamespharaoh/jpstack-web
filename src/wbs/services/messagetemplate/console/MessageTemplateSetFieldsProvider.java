@@ -19,7 +19,6 @@ import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
 import wbs.services.messagetemplate.model.MessageTemplateTypeObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateTypeRec;
 import wbs.services.ticket.core.console.FieldsProvider;
-import wbs.services.ticket.core.console.TicketFieldsProvider;
 
 @PrototypeComponent ("messageTemplateSetFieldsProvider")
 public
@@ -121,7 +120,7 @@ class MessageTemplateSetFieldsProvider
 	class Config {
 
 		@Inject
-		Provider<TicketFieldsProvider> messageTemplateSetFieldsProvider;
+		Provider<MessageTemplateSetFieldsProvider> messageTemplateSetFieldsProvider;
 		
 		@PrototypeComponent ("messageTemplateSetListFieldsProvider")
 		public

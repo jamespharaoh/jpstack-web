@@ -1,7 +1,12 @@
 package wbs.services.messagetemplate.fixture;
 
+import static wbs.framework.utils.etc.Misc.equal;
+
+import java.io.File;
+
 import javax.inject.Inject;
 
+import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
@@ -162,7 +167,7 @@ public class MessageTemplateFixtureProvider
 						MessageTemplateTypeCharset.unicode)
 				
 			);
-		
+
 		messageTemplateDatabase
 			.getMessageTemplateTypes().add (
 				messageTemplateType1);
@@ -208,6 +213,144 @@ public class MessageTemplateFixtureProvider
 		messageTemplateSet
 			.getMessageTemplateValues().put (
 				messageTemplateType1.getId(), messageTemplateValue);
+		
+		
+		///////////////////////////////////////
+		
+		// im chat message template database //
+		
+		///////////////////////////////////////
+		
+		// create database
+		
+		MessageTemplateDatabaseRec imChatMessageTemplateDatabase =
+			messageTemplateDatabaseHelper.insert (
+				new MessageTemplateDatabaseRec ()
+	
+					.setSlice (
+						sliceHelper.findByCode (
+							GlobalId.root,
+							"test"))
+			
+					.setCode (
+						"im_chat_message_template_database")
+					
+					.setName (
+						"Im Chat Message Template Database")
+					
+					.setDescription (
+						"Message Template Database for Im Chat application")
+	
+		);
+		
+		// create sets, types and values
+		
+		File imChatMessageTemplateDatabaseFile =
+				new File ("conf/im-chat-message-template-database.xml");
+
+			if (imChatMessageTemplateDatabaseFile.exists ()) {
+
+				DataFromXml dataFromXml =
+					new DataFromXml ()
+
+					.registerBuilderClasses (
+						ImChatMessageTemplateDatabaseSpec.class,
+						MessagesSpec.class);
+
+				ImChatMessageTemplateDatabaseSpec messageTemplateDatabaseElements =
+					(ImChatMessageTemplateDatabaseSpec)
+					dataFromXml.readFilename (
+						"conf/im-chat-message-template-database.xml");
+				
+				// read xml content	
+				
+				MessageTemplateSetRec imChatMessageTemplateSet =
+					messageTemplateSetHelper.insert (
+						new MessageTemplateSetRec ()
+					
+							.setMessageTemplateDatabase (
+									imChatMessageTemplateDatabase)
+									
+							.setName("Im Chat English")
+							
+							.setDescription (
+								"Im Chat message template database in english")
+				);
+
+				for (
+					MessagesSpec message
+						: messageTemplateDatabaseElements.messages()
+				) {
+
+					if (! equal (message.type (), "im-chat-message-template-database"))
+						continue;
+
+					if (! equal (message.name (), "english"))
+						continue;
+					
+					for (
+							String messageKey
+								: message.params().keySet()
+						) {
+		
+						MessageTemplateTypeRec imChatMessageTemplateType =
+							messageTemplateTypeHelper.insert (
+								new MessageTemplateTypeRec ()
+						
+									.setMessageTemplateDatabase (
+										imChatMessageTemplateDatabase)
+											
+									.setName(messageKey)
+									
+									.setDefaultValue (
+										message.params.get(messageKey))
+										
+									.setHelpText (
+										"<p>Help text 1</p>")
+						
+									.setMinLength(
+										5)
+					
+									.setMaxLength(
+										20)
+										
+									.setCharset (
+										MessageTemplateTypeCharset.unicode)
+							
+						);
+						
+						imChatMessageTemplateDatabase
+							.getMessageTemplateTypes()
+								.add(imChatMessageTemplateType);
+						
+						MessageTemplateValueRec imChatMessageTemplateValue =
+								messageTemplateValueHelper.insert(
+									new MessageTemplateValueRec ()
+										
+										.setMessageTemplateSet (
+											messageTemplateSet)
+								
+										.setMessageTemplateType (
+											imChatMessageTemplateType)
+											
+										.setStringValue(
+											message.params.get(messageKey))
+										
+							);
+							
+							imChatMessageTemplateSet.setNumTemplates(
+								imChatMessageTemplateSet.getNumTemplates() + 1);
+							
+							imChatMessageTemplateSet
+								.getMessageTemplateValues().put (
+									imChatMessageTemplateType.getId(), imChatMessageTemplateValue);
+						
+					}
+
+				}
+				
+
+		}
 	
 	}
 
