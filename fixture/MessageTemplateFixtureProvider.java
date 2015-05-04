@@ -6,6 +6,7 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.object.ObjectManager;
@@ -48,6 +49,9 @@ public class MessageTemplateFixtureProvider
 	
 	@Inject
 	MessageTemplateSetObjectHelper messageTemplateSetHelper;
+	
+	@Inject
+	ImChatObjectHelper imChatHelper;
 	
 	@Inject
 	ObjectTypeObjectHelper objectTypeHelper;
@@ -115,7 +119,7 @@ public class MessageTemplateFixtureProvider
 						"Message template database description")
 	
 		);
-		
+			
 		MessageTemplateTypeRec messageTemplateType1 =
 			messageTemplateTypeHelper.insert (
 				new MessageTemplateTypeRec ()
@@ -231,9 +235,6 @@ public class MessageTemplateFixtureProvider
 						sliceHelper.findByCode (
 							GlobalId.root,
 							"test"))
-			
-					.setCode (
-						"im_chat_message_template_database")
 					
 					.setName (
 						"Im Chat Message Template Database")
@@ -242,6 +243,12 @@ public class MessageTemplateFixtureProvider
 						"Message Template Database for Im Chat application")
 	
 		);
+		
+		// update im chat
+		
+		imChatHelper.find(1)
+			.setMessageTemplateDatabase (
+				imChatMessageTemplateDatabase);
 		
 		// create sets, types and values
 		

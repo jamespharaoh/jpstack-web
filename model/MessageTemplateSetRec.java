@@ -102,7 +102,7 @@ public class MessageTemplateSetRec
 				MessageTemplateSetRec messageTemplateSet) {
 			
 			messageTemplateSet.setCode (
-				randomLogic.generateNumericNoZero (8));
+				messageTemplateSet.getName().toLowerCase());
 			
 		}
 			
