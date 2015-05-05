@@ -139,17 +139,9 @@ class ImChatMessageTemplateSetGetAction
 				messageTemplateTypeHelper.find (
 					entry.getKey());
 			
-			String[] tokens =
+			String key = 
 				messageTemplateType
-					.getName()
-						.toString()
-							.split(" ");
-			
-			String type = 
-				tokens[0];
-			
-			String key =
-				tokens[1];
+					.getName();
 			
 			String value =
 				entry.getValue()
@@ -157,7 +149,6 @@ class ImChatMessageTemplateSetGetAction
 			
 			messages.add (
 				imChatApiLogic.messageTemplateData (
-					type,
 					key,
 					value));			
 		}

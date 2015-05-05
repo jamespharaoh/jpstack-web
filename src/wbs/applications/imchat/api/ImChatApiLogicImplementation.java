@@ -151,12 +151,9 @@ class ImChatApiLogicImplementation
 	@Override
 	public
 	ImChatMessageTemplateData messageTemplateData (
-			String type, String key, String value) {
+			String key, String value) {
 		
 		return new ImChatMessageTemplateData ()
-
-			.type (
-				type)
 
 			.key (
 				key)

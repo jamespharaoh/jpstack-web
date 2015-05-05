@@ -12,9 +12,6 @@ public class
 ImChatMessageTemplateData {
 	
 	@DataAttribute
-	String type;
-	
-	@DataAttribute
 	String key;
 
 	@DataAttribute
