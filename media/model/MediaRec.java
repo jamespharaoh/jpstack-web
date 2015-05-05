@@ -60,6 +60,14 @@ class MediaRec
 		nullable = true)
 	String encoding;
 
+	@SimpleField (
+		nullable = true)
+	Integer width;
+
+	@SimpleField (
+		nullable = true)
+	Integer height;
+
 	// compare to
 
 	@Override

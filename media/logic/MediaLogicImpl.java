@@ -410,7 +410,9 @@ class MediaLogicImpl
 			data,
 			image,
 			mimeType,
-			filename);
+			filename,
+			image.getWidth (),
+			image.getHeight ());
 
 	}
 
@@ -430,7 +432,9 @@ class MediaLogicImpl
 			data,
 			image,
 			mimeType,
-			filename);
+			filename,
+			image.getWidth (),
+			image.getHeight ());
 
 	}
 
@@ -440,7 +444,9 @@ class MediaLogicImpl
 			byte[] data,
 			BufferedImage thumbnailImage,
 			String mimeType,
-			String filename) {
+			String filename,
+			Integer width,
+			Integer height) {
 
 		// create the 100x100 thumbnail
 
@@ -491,7 +497,9 @@ class MediaLogicImpl
 			data100,
 			data32,
 			mimeType,
-			filename);
+			filename,
+			width,
+			height);
 
 	}
 
@@ -502,7 +510,9 @@ class MediaLogicImpl
 			byte[] thumb100,
 			byte[] thumb32,
 			String mimeType,
-			String filename) {
+			String filename,
+			Integer width,
+			Integer height) {
 
 		MediaTypeRec mediaType =
 			findMediaTypeRequired (mimeType);
@@ -531,6 +541,12 @@ class MediaLogicImpl
 			.setThumbMediaType (
 				mediaType)
 
+			.setWidth (
+				width)
+
+			.setHeight (
+				height)
+
 		);
 
 	}
@@ -542,11 +558,16 @@ class MediaLogicImpl
 			String mimeType,
 			String filename) {
 
+		BufferedImage videoFrameImage =
+			videoFrame (data);
+
 		return createMediaWithThumbnail (
 			data,
-			videoFrame (data),
+			videoFrameImage,
 			mimeType,
-			filename);
+			filename,
+			videoFrameImage.getWidth (),
+			videoFrameImage.getHeight ());
 
 	}
 
@@ -563,10 +584,14 @@ class MediaLogicImpl
 		return mediaHelper.insert (
 			new MediaRec ()
 
-				.setFilename (filename)
-				.setContent (findOrCreateContent (data))
+			.setFilename (
+				filename)
 
-				.setMediaType (mediaType));
+			.setContent (
+				findOrCreateContent (data))
+
+			.setMediaType (
+				mediaType));
 
 	}
 
