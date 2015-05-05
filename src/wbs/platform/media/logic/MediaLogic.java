@@ -33,14 +33,18 @@ interface MediaLogic {
 			byte[] data,
 			BufferedImage thumbnailImage,
 			String mimeType,
-			String filename);
+			String filename,
+			Integer width,
+			Integer height);
 
 	MediaRec createMediaWithThumbnail (
 			byte[] data,
 			byte[] thumb100,
 			byte[] thumb32,
 			String mimeType,
-			String filename);
+			String filename,
+			Integer width,
+			Integer height);
 
 	MediaRec createMediaFromVideo (
 			byte[] data,

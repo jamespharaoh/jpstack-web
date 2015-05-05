@@ -1,7 +1,10 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;
@@ -10,7 +13,10 @@ import wbs.applications.imchat.model.ImChatProfileRec;
 import wbs.applications.imchat.model.ImChatPurchaseRec;
 import wbs.applications.imchat.model.ImChatRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.media.model.ContentRec;
+import wbs.platform.media.model.MediaRec;
 
 @SingletonComponent ("imChatApiLogic")
 public
@@ -21,6 +27,9 @@ class ImChatApiLogicImplementation
 
 	@Inject
 	CurrencyLogic currencyLogic;
+
+	@Inject
+	WbsConfig wbsConfig;
 
 	// implementation
 
@@ -55,7 +64,21 @@ class ImChatApiLogicImplementation
 	@Override
 	public
 	ImChatProfileData profileData (
-			ImChatProfileRec profile) {
+			@NonNull ImChatProfileRec profile) {
+
+		if (profile.getDeleted ()) {
+			throw new RuntimeException ();
+		}
+
+		MediaRec image =
+			profile.getProfileImage ();
+
+		ContentRec content =
+			image.getContent ();
+
+		Integer hash =
+			Math.abs (
+				content.getHash ());
 
 		return new ImChatProfileData ()
 
@@ -69,7 +92,20 @@ class ImChatApiLogicImplementation
 				profile.getPublicDescription ())
 
 			.imageLink (
-				"TODO link");
+				stringFormat (
+					"%s",
+					wbsConfig.apiUrl (),
+					"/im-chat-media/%u",
+					image.getId (),
+					"/%u",
+					hash,
+					"/original.jpg"))
+
+			.imageWidth (
+				image.getWidth ())
+
+			.imageHeight (
+				image.getHeight ());
 
 	}
 
