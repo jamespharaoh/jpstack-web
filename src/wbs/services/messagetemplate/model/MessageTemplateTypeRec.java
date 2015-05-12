@@ -1,7 +1,7 @@
 package wbs.services.messagetemplate.model;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
@@ -9,8 +9,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
+import wbs.framework.entity.annotations.CollectionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.NameField;
@@ -19,8 +19,6 @@ import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
-import wbs.framework.utils.RandomLogic;
-import wbs.services.messagetemplate.model.MessageTemplateTypeObjectHelper;
 
 @Accessors (chain = true)
 @Data
@@ -61,20 +59,21 @@ public class MessageTemplateTypeRec
 	@SimpleField
 	MessageTemplateTypeCharset charset;
 	
+	@SimpleField
+	Integer numParameters = 0;
+	
+	// children
+
+	@CollectionField (
+		orderBy = "name")
+	Set<MessageTemplateParameterRec> messageTemplateParameters =
+		new TreeSet<MessageTemplateParameterRec> ();
+	
 	// object hooks
 
 	public static
 	class MessageTemplateTypeHooks
 		extends AbstractObjectHooks<MessageTemplateTypeRec> {
-
-		@Inject
-		Provider<MessageTemplateTypeObjectHelper> messageTemplateTypeHelper;
-
-		@Inject
-		Database database;
-		
-		@Inject
-		RandomLogic randomLogic;
 
 		@Override
 		public

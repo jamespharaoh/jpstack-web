@@ -17,6 +17,7 @@
 		<model name="messageTemplateValue"/>
 		<model name="messageTemplateSet"/>
 		<enum-type name="messageTemplateTypeCharset"/>
+		<model name="messageTemplateParameter"/>
 	</models>
 
 	<fixtures>
@@ -32,6 +33,7 @@
 		<console-module name="message-template-database"/>
 		<console-module name="message-template-type"/>
 		<console-module name="message-template-set"/>
+		<console-module name="message-template-parameter"/>
 	</console-modules>
 
 </plugin>
