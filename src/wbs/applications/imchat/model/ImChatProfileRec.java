@@ -56,6 +56,9 @@ class ImChatProfileRec
 	// public profile
 
 	@SimpleField
+	ImChatProfileState state;
+
+	@SimpleField
 	String publicName;
 
 	@SimpleField

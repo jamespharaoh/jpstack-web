@@ -15,6 +15,9 @@ class ImChatProfileData {
 	String code;
 
 	@DataAttribute
+	String state;
+
+	@DataAttribute
 	String name;
 
 	@DataAttribute
@@ -22,5 +25,11 @@ class ImChatProfileData {
 
 	@DataAttribute
 	String imageLink;
+
+	@DataAttribute
+	Integer imageWidth;
+
+	@DataAttribute
+	Integer imageHeight;
 
 }

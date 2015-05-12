@@ -23,6 +23,7 @@ import wbs.applications.imchat.model.ImChatPricePointObjectHelper;
 import wbs.applications.imchat.model.ImChatPricePointRec;
 import wbs.applications.imchat.model.ImChatProfileObjectHelper;
 import wbs.applications.imchat.model.ImChatProfileRec;
+import wbs.applications.imchat.model.ImChatProfileState;
 import wbs.applications.imchat.model.ImChatPurchaseObjectHelper;
 import wbs.applications.imchat.model.ImChatPurchaseRec;
 import wbs.applications.imchat.model.ImChatRec;
@@ -349,6 +350,9 @@ class ImChatCoreFixtureProvider
 					stringFormat (
 						"Test IM chat profile %s",
 						index))
+
+				.setState (
+					ImChatProfileState.ready)
 
 				.setPublicName (
 					stringFormat (

@@ -1111,7 +1111,7 @@ class ChatJoiner {
 					"date_joined",
 					commandHelper.findByCode (chat, "help"),
 					0,
-					true,
+					false,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -1125,8 +1125,10 @@ class ChatJoiner {
 					: ChatUserDateMode.photo,
 				true);
 
-			if (chatUser.getDateDailyCount ()
-					< chatUser.getDateDailyMax ()) {
+			if (
+				chatUser.getDateDailyCount ()
+					< chatUser.getDateDailyMax ()
+			) {
 
 				chatUser.setDateDailyCount (
 					chatUser.getDateDailyMax ());
