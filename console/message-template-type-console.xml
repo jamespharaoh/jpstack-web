@@ -48,6 +48,12 @@
 				priv-key="messageTemplateDatabase.manage"/>
 				
 			<object-events-page/>
+			
+			<context-link
+				name="messageTemplateParameter"
+				link="messageTemplateParameter"
+				label="Parameters"
+				priv-key="messageTemplateDatabase.manage"/>
 
 		</object>
 

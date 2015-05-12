@@ -19,6 +19,8 @@ import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
+import wbs.services.messagetemplate.model.MessageTemplateParameterObjectHelper;
+import wbs.services.messagetemplate.model.MessageTemplateParameterRec;
 import wbs.services.messagetemplate.model.MessageTemplateSetObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateSetRec;
 import wbs.services.messagetemplate.model.MessageTemplateTypeCharset;
@@ -43,6 +45,9 @@ public class MessageTemplateFixtureProvider
 	
 	@Inject
 	MessageTemplateTypeObjectHelper messageTemplateTypeHelper;
+	
+	@Inject
+	MessageTemplateParameterObjectHelper messageTemplateParameterHelper;
 	
 	@Inject
 	MessageTemplateValueObjectHelper messageTemplateValueHelper;
@@ -127,7 +132,7 @@ public class MessageTemplateFixtureProvider
 					.setMessageTemplateDatabase (
 						messageTemplateDatabase)
 							
-					.setName("Template 1")
+					.setName("Template-1")
 					
 					.setDefaultValue (
 						"Template 1 Default Value")
@@ -146,6 +151,24 @@ public class MessageTemplateFixtureProvider
 			
 		);
 		
+		MessageTemplateParameterRec parameterType1 =
+		messageTemplateParameterHelper.insert(
+				new MessageTemplateParameterRec ()
+				
+					.setName (
+						"name")
+					
+					.setMessageTemplateType (
+						messageTemplateType1)
+					
+					.setRequired (
+						true)
+						
+					.setLength (
+						10)
+					
+		);
+		
 		MessageTemplateTypeRec messageTemplateType2 =
 			messageTemplateTypeHelper.insert (
 				new MessageTemplateTypeRec ()
@@ -153,7 +176,7 @@ public class MessageTemplateFixtureProvider
 					.setMessageTemplateDatabase (
 						messageTemplateDatabase)
 							
-					.setName("Template 2")
+					.setName("Template-2")
 					
 					.setDefaultValue (
 						"Template 2 Default Value")
@@ -170,15 +193,48 @@ public class MessageTemplateFixtureProvider
 					.setCharset (
 						MessageTemplateTypeCharset.unicode)
 				
-			);
-
+		);
+		
+		MessageTemplateParameterRec parameterType2 =
+		messageTemplateParameterHelper.insert(
+				new MessageTemplateParameterRec ()
+				
+					.setName (
+						"genre")
+					
+					.setMessageTemplateType (
+						messageTemplateType2)
+					
+					.setRequired (
+						true)
+						
+					.setLength (
+						6)
+					
+		);
+		
 		messageTemplateDatabase
 			.getMessageTemplateTypes().add (
 				messageTemplateType1);
 		
 		messageTemplateDatabase
-		.getMessageTemplateTypes().add (
-			messageTemplateType2);
+			.getMessageTemplateTypes().add (
+				messageTemplateType2);
+		
+		messageTemplateType1
+			.setNumParameters(
+				messageTemplateType1.getNumParameters() + 1);
+		
+		messageTemplateType1
+			.getMessageTemplateParameters()
+				.add(parameterType1);
+		
+		messageTemplateType2.setNumParameters(
+			messageTemplateType2.getNumParameters() + 1);
+			
+		messageTemplateType2
+			.getMessageTemplateParameters()
+				.add (parameterType2);
 		
 		MessageTemplateSetRec messageTemplateSet =
 			messageTemplateSetHelper.insert (
