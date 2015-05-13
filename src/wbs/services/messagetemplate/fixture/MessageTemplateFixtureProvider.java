@@ -156,16 +156,13 @@ public class MessageTemplateFixtureProvider
 				new MessageTemplateParameterRec ()
 				
 					.setName (
-						"name")
+						"test")
 					
 					.setMessageTemplateType (
 						messageTemplateType1)
 					
 					.setRequired (
-						true)
-						
-					.setLength (
-						10)
+						false)
 					
 		);
 		
@@ -176,10 +173,10 @@ public class MessageTemplateFixtureProvider
 					.setMessageTemplateDatabase (
 						messageTemplateDatabase)
 							
-					.setName("Template-2")
+					.setName("Template-2-Parameter")
 					
 					.setDefaultValue (
-						"Template 2 Default Value")
+						"My name is {name}")
 						
 					.setHelpText (
 						"<p>Help text 2</p>")
@@ -200,7 +197,7 @@ public class MessageTemplateFixtureProvider
 				new MessageTemplateParameterRec ()
 				
 					.setName (
-						"genre")
+						"name")
 					
 					.setMessageTemplateType (
 						messageTemplateType2)
@@ -209,7 +206,7 @@ public class MessageTemplateFixtureProvider
 						true)
 						
 					.setLength (
-						6)
+						4)
 					
 		);
 		
