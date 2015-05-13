@@ -2,6 +2,8 @@ package wbs.services.messagetemplate.model;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -95,6 +97,9 @@ public class MessageTemplateSetRec
 		
 		@Inject
 		Provider<MessageTemplateValueObjectHelper> messageTemplateValueHelper;	
+		
+		@Inject
+		Provider<MessageTemplateParameterObjectHelper> messageTemplateParameterHelper;
 
 		@Override
 		public
@@ -167,9 +172,47 @@ public class MessageTemplateSetRec
 			
 			String message = (String) value;
 			
-			if (message.length () < messageTemplateType.getMinLength () ||
-				message.length () > messageTemplateType.getMaxLength ()) {				
-					throw new RuntimeException ("The message length is out of it's template type bounds!");
+			Integer messageLength = 0;
+			
+			// length of non variable parts
+			
+			String[] parts =
+				message.split("\\{(.*?)\\}");
+			
+			for (int i = 0; i < parts.length; i++) {
+				
+				messageLength += 
+					parts[i].length();
+				
+			}
+			
+			// length of the parameters
+			
+			Pattern regExp = Pattern.compile("\\{(.*?)\\}");
+			Matcher matcher = regExp.matcher(message);
+			
+			while (matcher.find()) {
+			    String parameterName = 
+			    	matcher.group(1);
+			    
+			    MessageTemplateParameterRec messageTemplateParameter =
+			    		messageTemplateParameterHelper
+			    			.get().findByCode (
+			    				messageTemplateType, parameterName);
+			    
+			    if ( 
+			    	messageTemplateParameter.getLength() != null
+			    ) {
+			    	messageLength +=
+		    			messageTemplateParameter.getLength();
+			    }
+			}
+			
+			if (
+				messageLength < messageTemplateType.getMinLength () ||
+				messageLength > messageTemplateType.getMaxLength ()
+			) {				
+				throw new RuntimeException ("The message length is out of it's template type bounds!");
 			}
 			
 			MessageTemplateValueRec messageTemplateValue;
