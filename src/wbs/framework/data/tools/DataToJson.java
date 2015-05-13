@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
@@ -23,7 +24,7 @@ class DataToJson {
 	})
 	public
 	Object toJson (
-			Object dataValue) {
+			@NonNull Object dataValue) {
 
 		Class<?> dataClass =
 			dataValue.getClass ();
@@ -109,6 +110,9 @@ class DataToJson {
 				Object fieldValue =
 					field.get (
 						dataValue);
+
+				if (fieldValue == null)
+					continue;
 
 				jsonValueBuilder.put (
 					field.getName (),
