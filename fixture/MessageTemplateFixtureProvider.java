@@ -210,6 +210,24 @@ public class MessageTemplateFixtureProvider
 					
 		);
 		
+		MessageTemplateParameterRec parameter2Type2 =
+		messageTemplateParameterHelper.insert(
+				new MessageTemplateParameterRec ()
+				
+					.setName (
+						"nick")
+					
+					.setMessageTemplateType (
+						messageTemplateType2)
+					
+					.setRequired (
+						false)
+						
+					.setLength (
+						3)
+					
+		);
+		
 		messageTemplateDatabase
 			.getMessageTemplateTypes().add (
 				messageTemplateType1);
@@ -227,11 +245,15 @@ public class MessageTemplateFixtureProvider
 				.add(parameterType1);
 		
 		messageTemplateType2.setNumParameters(
-			messageTemplateType2.getNumParameters() + 1);
+			messageTemplateType2.getNumParameters() + 2);
 			
 		messageTemplateType2
 			.getMessageTemplateParameters()
 				.add (parameterType2);
+		
+		messageTemplateType2
+		.getMessageTemplateParameters()
+			.add (parameter2Type2);
 		
 		MessageTemplateSetRec messageTemplateSet =
 			messageTemplateSetHelper.insert (
