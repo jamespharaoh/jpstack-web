@@ -1,6 +1,9 @@
 package wbs.services.messagetemplate.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,10 +66,10 @@ public class MessageTemplateSetRec
 	String description;
 	
 	@CollectionField (
-			index = "message_template_type_id")
-		Map<Integer,MessageTemplateValueRec> messageTemplateValues =
-			new TreeMap<Integer,MessageTemplateValueRec> (
-				Ordering.arbitrary ());
+		index = "message_template_type_id")
+	Map<Integer,MessageTemplateValueRec> messageTemplateValues =
+		new TreeMap<Integer,MessageTemplateValueRec> (
+			Ordering.arbitrary ());
 	
 	@SimpleField
 	Integer numTemplates = 0;
@@ -140,8 +143,7 @@ public class MessageTemplateSetRec
 				}
 				else {				
 					return messageTemplateValue.getStringValue();
-				}
-						
+				}						
 
 			} catch (TransientObjectException exception) {
 
@@ -163,18 +165,21 @@ public class MessageTemplateSetRec
 			MessageTemplateSetRec messageTemplateSet = 
 				(MessageTemplateSetRec) object;
 			
-			//Find the ticket field type
+			// find the ticket field type
 			
 			MessageTemplateTypeRec messageTemplateType =			
 				messageTemplateTypeHelper.get().findByCode(
-						messageTemplateSet.getMessageTemplateDatabase(), 
-						name);	
+					messageTemplateSet.getMessageTemplateDatabase(), 
+					name);	
+
+			List<String> messageTemplateUsedParameters =
+				new ArrayList<String>();
 			
 			String message = (String) value;
 			
-			Integer messageLength = 0;
-			
 			// length of non variable parts
+			
+			Integer messageLength = 0;
 			
 			String[] parts =
 				message.split("\\{(.*?)\\}");
@@ -200,20 +205,43 @@ public class MessageTemplateSetRec
 			    			.get().findByCode (
 			    				messageTemplateType, parameterName);
 			    
-			    if ( 
-			    	messageTemplateParameter.getLength() != null
-			    ) {
+			    if (messageTemplateParameter == null) {
+			    	throw new RuntimeException ("The parameter "+parameterName+" does not exist!");
+			    }
+			    
+			    if (messageTemplateParameter.getLength() != null) {
 			    	messageLength +=
 		    			messageTemplateParameter.getLength();
 			    }
+			    
+			    messageTemplateUsedParameters
+			    	.add(messageTemplateParameter.getName());
+			    
 			}
+			
+			// check if the rest of parameters which are not present were required
+			
+			for (MessageTemplateParameterRec messageTemplateParameter : messageTemplateType.getMessageTemplateParameters()) {
+				
+				if (
+						! messageTemplateUsedParameters.contains(messageTemplateParameter.getName()) 
+						&& messageTemplateParameter.getRequired()
+				) {					
+					throw new RuntimeException ("Parameter "+messageTemplateParameter.getName()+" required but not present!");
+				}
+				
+			}
+			
+			// check if the length is correct
 			
 			if (
 				messageLength < messageTemplateType.getMinLength () ||
-				messageLength > messageTemplateType.getMaxLength ()
-			) {				
+				messageLength > messageTemplateType.getMaxLength ())
+			{				
 				throw new RuntimeException ("The message length is out of it's template type bounds!");
 			}
+			
+			// if the length is correct and all the required parameters are present, the value is created
 			
 			MessageTemplateValueRec messageTemplateValue;
 			
@@ -249,7 +277,6 @@ public class MessageTemplateSetRec
 		}
 		
 	}
-
 	
 	// compare to
 	
