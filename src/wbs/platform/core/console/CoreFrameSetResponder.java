@@ -142,7 +142,7 @@ class CoreFrameSetResponder
 			"    document.getElementById ('right_frameset').rows = show? '2*,1*' : '*,0';\n",
 			"  }\n",
 			"</script>\n");
-
+		
 	}
 
 	public

@@ -38,6 +38,9 @@ class TextAreaFormFieldSpec {
 
 	@DataAttribute
 	String charCountData;
+	
+	@DataAttribute
+	String dataProvider;
 
 	@DataAttribute ("update-hook-bean")
 	String updateHookBeanName;

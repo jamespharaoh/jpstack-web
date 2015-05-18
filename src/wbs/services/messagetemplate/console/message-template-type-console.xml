@@ -131,8 +131,9 @@
 		
 		<name-field/>
 		
-		<text-field
-			name="defaultValue"/>
+		<text-area-field
+			name="defaultValue"
+			data-provider="messageTemplateSettingsFormFieldDataProvider"/>
 			
 		<text-field
 			name="helpText"/>
@@ -147,7 +148,7 @@
 			name="charset"
 			nullable="no"
 			helper="messageTemplateTypeCharsetConsoleHelper"/>
-
+			
 	</field-set>
 
 </console-module>

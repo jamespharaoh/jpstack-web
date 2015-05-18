@@ -17,6 +17,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.text.model.TextRec;
+import wbs.services.messagetemplate.console.FormFieldDataProvider;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("textAreaFormFieldBuilder")
@@ -70,6 +71,8 @@ class TextAreaFormFieldBuilder {
 	@Inject
 	Provider<TextFormFieldNativeMapping>
 	textFormFieldNativeMappingProvider;
+	
+	FormFieldDataProvider formFielDataProvider;
 
 	// builder
 
@@ -122,16 +125,31 @@ class TextAreaFormFieldBuilder {
 
 		String charCountData =
 			textAreaFormFieldSpec.charCountData ();
+		
+		// if a data provider is provided
+		
+		Class<?> propertyClass = null;
+		
+		if (textAreaFormFieldSpec.dataProvider () != null) {
+			
+			propertyClass = String.class;
+
+			formFielDataProvider = 
+				applicationContext.getBean (
+					textAreaFormFieldSpec.dataProvider (),
+					FormFieldDataProvider.class);		
+		}
+		else {
+			// field type
+	
+			propertyClass =
+				BeanLogic.propertyClass (
+					formFieldBuilderContext.containerClass (),
+					name);
+		}
 
 		String updateHookBeanName =
 			textAreaFormFieldSpec.updateHookBeanName ();
-
-		// field type
-
-		Class<?> propertyClass =
-			BeanLogic.propertyClass (
-				formFieldBuilderContext.containerClass (),
-				name);
 
 		FormFieldAccessor formFieldAccessor;
 		FormFieldNativeMapping formFieldNativeMapping;
@@ -187,7 +205,8 @@ class TextAreaFormFieldBuilder {
 				.rows (rows)
 				.cols (cols)
 				.charCountFunction (charCountFunction)
-				.charCountData (charCountData);
+				.charCountData (charCountData)
+				.formFieldDataProvider (formFielDataProvider);
 
 		// update hook
 

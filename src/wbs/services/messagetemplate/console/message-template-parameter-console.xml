@@ -93,7 +93,7 @@
 
 		<yes-no-field
 			name="required"/>
-
+			
 	</field-set>
 	
 	<field-set
@@ -109,7 +109,7 @@
 
 		<yes-no-field
 			name="required"/>
-
+			
 	</field-set>
 
 </console-module>

@@ -42,7 +42,7 @@ class SimpleFormFieldAccessor<Container,Native>
 
 		// get native object
 		Object nativeObject;
-		
+
 		if (dynamic != null && dynamic) {
 			
 			ConsoleHelper<?> consoleHelper =

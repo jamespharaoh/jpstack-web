@@ -3,6 +3,9 @@ package wbs.services.messagetemplate.model;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import lombok.Data;
@@ -74,16 +77,29 @@ public class MessageTemplateTypeRec
 	public static
 	class MessageTemplateTypeHooks
 		extends AbstractObjectHooks<MessageTemplateTypeRec> {
+		
+		@Inject
+		Provider<MessageTemplateParameterObjectHelper> messageTemplateParameterHelper;		
 
 		@Override
 		public
 		void beforeInsert (
-				MessageTemplateTypeRec messageTemplateType) {
+			MessageTemplateTypeRec messageTemplateType) {
 			
 			messageTemplateType.setCode (
 				messageTemplateType.getName().toLowerCase());
-
+			
 		}
+		
+		@Override
+		public
+		Object getDynamic (
+				Record<?> object,
+				String name) {
+			
+			return null;
+
+		}			
 
 	}	
 	
