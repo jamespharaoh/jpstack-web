@@ -27,6 +27,8 @@
 	<layer name="console">
 		<bean class="console.MessageTemplateSetFieldsProvider"/>
 		<bean class="console.MessageTemplateSetFieldsProvider$Config"/>
+		<bean class="console.MessageTemplateFormFieldDataProvider"/>
+		<bean class="console.MessageTemplateFormFieldDataProvider$Config"/>
 	</layer>
 	
 	<console-modules>

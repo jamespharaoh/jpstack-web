@@ -144,7 +144,7 @@ public class MessageTemplateFixtureProvider
 						1)
 	
 					.setMaxLength(
-						10)
+						50)
 						
 					.setCharset (
 						MessageTemplateTypeCharset.unicode)
@@ -391,10 +391,10 @@ public class MessageTemplateFixtureProvider
 										"<p>Help text 1</p>")
 						
 									.setMinLength(
-										5)
+										1)
 					
 									.setMaxLength(
-										20)
+										500)
 										
 									.setCharset (
 										MessageTemplateTypeCharset.unicode)
