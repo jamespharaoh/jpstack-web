@@ -6,6 +6,10 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -13,8 +17,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.console.request.ConsoleRequestContext;
+import wbs.services.messagetemplate.console.FormFieldDataProvider;
+import wbs.services.messagetemplate.model.MessageTemplateTypeRec;
 
 @PrototypeComponent ("textAreaFormFieldRenderer")
 @Accessors (fluent = true)
@@ -26,7 +33,7 @@ class TextAreaFormFieldRenderer<Container>
 
 	@Inject
 	ConsoleRequestContext requestContext;
-
+	
 	// properties
 
 	@Getter @Setter
@@ -49,6 +56,9 @@ class TextAreaFormFieldRenderer<Container>
 
 	@Getter @Setter
 	String charCountData;
+	
+	@Getter @Setter
+	FormFieldDataProvider formFieldDataProvider;
 
 	// details
 
@@ -212,6 +222,83 @@ class TextAreaFormFieldRenderer<Container>
 					name (),
 					">&nbsp;</span>"));
 
+		}
+		
+		if (formFieldDataProvider != null) {
+						
+			String data = 
+				formFieldDataProvider.getFormFieldData (
+					(Record<?>) container);
+			
+			out.write (
+				stringFormat (
+					"<span hidden=\"hidden\"",
+					" id=\"parameters-length-list\" style>",
+					data,
+					"</span>"));
+			
+			out.write (
+					stringFormat (
+						"<br>\n"));
+			
+			// parameters data
+			
+			String[] tokens =
+				data.split("&");
+			
+			Map<String, String> dataMap =
+				new TreeMap<String, String>();
+			
+			for (Integer i = 0; i < tokens.length; i++) {
+				String[] parameter = 
+					tokens[i].split("=");
+				
+				dataMap.put(parameter[0], parameter[1]);
+			}
+			
+			// length of non variable parts
+			
+			String message =
+				((MessageTemplateTypeRec) container)
+					.getDefaultValue();
+			
+			Integer messageLength = 0;
+			
+			String[] parts =
+				message.split("\\{(.*?)\\}");
+			
+			for (int i = 0; i < parts.length; i++) {
+				
+				messageLength += 
+					parts[i].length();
+				
+			}
+			
+			// length of the parameters
+			
+			Pattern regExp = Pattern.compile("\\{(.*?)\\}");
+			Matcher matcher = regExp.matcher(message);
+			
+			while (matcher.find()) {
+			    String parameterName = 
+			    	matcher.group(1);
+
+			    	messageLength +=
+			    		Integer.parseInt(dataMap.get(parameterName));			    
+			}
+			
+			out.write (
+				stringFormat (
+					"<span",
+					" class=\"template-chars\"",
+					" style>",
+					"Your template has %d characters. ",
+					messageLength,
+					"(Min. Length: %s - ",
+					dataMap.get("minimumTemplateLength"),
+					"Max. Length: %s)",
+					dataMap.get("maximumTemplateLength"),
+					"</span>"));
 		}
 
 	}
