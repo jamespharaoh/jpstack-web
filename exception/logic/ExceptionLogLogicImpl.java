@@ -189,13 +189,7 @@ class ExceptionLogLogicImpl
 					"Error logging error logging exception",
 					yetAnotherException);
 
-				realLogException (
-					typeCode,
-					"exception log",
-					furtherSummary,
-					"",
-					userId,
-					true);
+				return null;
 
 			}
 
