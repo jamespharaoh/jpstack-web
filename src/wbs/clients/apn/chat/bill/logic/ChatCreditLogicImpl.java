@@ -28,6 +28,7 @@ import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.bill.model.ChatUserSpendObjectHelper;
 import wbs.clients.apn.chat.bill.model.ChatUserSpendRec;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.logic.ChatNumberReportLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -1164,7 +1165,7 @@ class ChatCreditLogicImpl
 						chatUser,
 						Optional.of (threadId),
 						"credit_hint_network",
-						true,
+						TemplateMissing.error,
 						Collections.<String,String>emptyMap ());
 
 				} else {
@@ -1173,7 +1174,7 @@ class ChatCreditLogicImpl
 						chatUser,
 						Optional.of (threadId),
 						"credit_hint_prepay",
-						true,
+						TemplateMissing.error,
 						Collections.<String,String>emptyMap ());
 
 				}
@@ -1190,7 +1191,7 @@ class ChatCreditLogicImpl
 						chatUser,
 						Optional.of (threadId),
 						"credit_hint_network",
-						true,
+						TemplateMissing.error,
 						Collections.<String,String>emptyMap ());
 
 				} else if (
@@ -1202,7 +1203,7 @@ class ChatCreditLogicImpl
 						chatUser,
 						Optional.of (threadId),
 						"credit_hint_daily",
-						true,
+						TemplateMissing.error,
 						ImmutableMap.<String,String>builder ()
 
 							.put (
@@ -1218,7 +1219,7 @@ class ChatCreditLogicImpl
 						chatUser,
 						Optional.of (threadId),
 						"credit_hint",
-						true,
+						TemplateMissing.error,
 						Collections.<String,String>emptyMap ());
 
 				}

@@ -20,6 +20,7 @@ import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogLogic;
@@ -220,7 +221,7 @@ class ChatMainCommand
 				Collections.<String>emptySet (),
 				Optional.<String>absent (),
 				"system",
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			chatSendLogic.sendSystemMagic (
@@ -235,7 +236,7 @@ class ChatMainCommand
 					userChatScheme,
 					"chat_dob"
 				).getId (),
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 		}
@@ -684,7 +685,7 @@ class ChatMainCommand
 					Optional.of (
 						smsMessage.getThreadId ()),
 					"keyword_error",
-					true,
+					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
 				return inboxLogic.inboxProcessed (

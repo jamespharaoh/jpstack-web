@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.user.image.daemon;
 
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -11,6 +12,7 @@ import lombok.experimental.Accessors;
 import org.joda.time.Duration;
 
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -159,17 +161,17 @@ class ChatUserImageUploadCommand
 				"help");
 
 		MessageRec messageOut =
-			chatSendLogic.sendSystemMagic (
-				chatUser,
-				Optional.of (messageIn.getThreadId ()),
-				"image_upload_link",
-				magicCommand,
-				helpCommand.getId (),
-				true,
-				ImmutableMap.<String,String>builder ()
-					.put ("url", url)
-					.build ()
-			).get ();
+			optionalRequired (
+				chatSendLogic.sendSystemMagic (
+					chatUser,
+					Optional.of (messageIn.getThreadId ()),
+					"image_upload_link",
+					magicCommand,
+					helpCommand.getId (),
+					TemplateMissing.error,
+					ImmutableMap.<String,String>builder ()
+						.put ("url", url)
+						.build ()));
 
 		// save token in database
 

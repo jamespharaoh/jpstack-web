@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditObjectHelper;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeChargesObjectHelper;
@@ -196,7 +197,7 @@ class ChatAdultVerifyCommand
 			alreadyVerified
 				? "adult_already"
 				: "adult_confirm",
-			true,
+			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
 
 		// process inbox

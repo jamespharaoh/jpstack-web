@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogLogic;
@@ -206,7 +207,7 @@ class ChatVideoGetCommand
 					chatUser,
 					Optional.of (message.getThreadId ()),
 					"no_videos_error",
-					true,
+					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -220,14 +221,16 @@ class ChatVideoGetCommand
 					chat,
 					text);
 
-			if (otherUser == null
-					|| otherUser.getChatUserVideoList ().isEmpty ()) {
+			if (
+				otherUser == null
+				|| otherUser.getChatUserVideoList ().isEmpty ()
+			) {
 
 				chatSendLogic.sendSystemRbFree (
 					chatUser,
 					Optional.of (message.getThreadId ()),
 					"video_not_found",
-					true,
+					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
 				return inboxLogic.inboxProcessed (

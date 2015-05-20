@@ -20,6 +20,7 @@ import org.joda.time.DateTimeZone;
 
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -279,7 +280,7 @@ class ChatMiscLogicImpl
 				chatUser,
 				Optional.<Integer>absent (),
 				"block_all_confirm",
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 		}
@@ -419,7 +420,7 @@ class ChatMiscLogicImpl
 				"logon",
 				commandHelper.findByCode (chat, "magic"),
 				commandHelper.findByCode (chat, "help").getId (),
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 		}
@@ -548,7 +549,7 @@ class ChatMiscLogicImpl
 					"date_stop_hint",
 					commandHelper.findByCode (chat, "help"),
 					0,
-					true,
+					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -571,7 +572,7 @@ class ChatMiscLogicImpl
 				chatUser,
 				Optional.fromNullable (threadId),
 				"logoff_confirm",
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 		}
@@ -716,7 +717,7 @@ class ChatMiscLogicImpl
 				"name_confirm",
 				commandHelper.findByCode (chat, "magic"),
 				commandHelper.findByCode (chat, "name").getId (),
-				true,
+				TemplateMissing.error,
 				ImmutableMap.<String,String>builder ()
 					.put ("newName", name)
 					.build ());

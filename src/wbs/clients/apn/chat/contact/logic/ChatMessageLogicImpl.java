@@ -29,6 +29,7 @@ import wbs.clients.apn.chat.approval.model.ChatApprovalRegexpObjectHelper;
 import wbs.clients.apn.chat.approval.model.ChatApprovalRegexpRec;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.contact.model.ChatBlockObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatBlockRec;
 import wbs.clients.apn.chat.contact.model.ChatContactObjectHelper;
@@ -465,7 +466,7 @@ class ChatMessageLogicImpl
 				"logon_hint",
 				commandHelper.findByCode (chat, "magic"),
 				commandHelper.findByCode (chat, "help").getId (),
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			fromUser
@@ -1412,7 +1413,7 @@ class ChatMessageLogicImpl
 				Collections.<String>emptySet (),
 				Optional.<String>absent (),
 				"system",
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			break;
