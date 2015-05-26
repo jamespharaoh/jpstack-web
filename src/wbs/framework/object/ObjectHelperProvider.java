@@ -88,6 +88,10 @@ interface ObjectHelperProvider {
 	<RecordType extends Record<?>>
 	RecordType insert (
 			RecordType object);
+	
+	<RecordType extends Record<?>>
+	RecordType update (
+			RecordType object);
 
 	List<Integer> searchIds (
 			Object search);

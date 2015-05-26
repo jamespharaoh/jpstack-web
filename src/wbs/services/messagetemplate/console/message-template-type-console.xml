@@ -76,8 +76,8 @@
 		<name-field/>
 
 		<text-field
-			name="defaultValue"/>
-			
+			name="defaultValue"/>		
+
 		<text-field
 			name="helpText"/>
 			
@@ -133,7 +133,13 @@
 		
 		<text-area-field
 			name="defaultValue"
-			data-provider="messageTemplateSettingsFormFieldDataProvider"/>
+			data-provider="messageTemplateSettingsFormFieldDataProvider"/>		
+			
+		<script-ref
+			path="/js/jquery-1.7.1.js"/>
+					
+		<script-ref
+			path="/js/message-template.js"/>
 			
 		<text-field
 			name="helpText"/>

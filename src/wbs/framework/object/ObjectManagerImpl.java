@@ -460,6 +460,19 @@ class ObjectManagerImpl
 			object);
 
 	}
+	
+	@Override
+	public <RecordType extends Record<?>>
+	RecordType update (
+			@NonNull RecordType object) {
+
+		ObjectHelper<?> objectHelper =
+			objectHelperForClass (object.getClass ());
+
+		return objectHelper.update (
+			object);
+
+	}
 
 	@Override
 	public

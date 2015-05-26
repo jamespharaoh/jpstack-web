@@ -45,16 +45,6 @@ $(function () {
 			
 			var length = text.length;
 			
-			/*var length = 0;
-			
-			var parts = text.split(/{(.*?)}/);
-			
-			for (var i = 0; i < parts.length; i++) {
-				
-				length = length + parts[i].length;
-				
-			}*/
-
 			var charCountText = [
 				String (length),
 				" characters",

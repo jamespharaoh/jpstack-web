@@ -59,6 +59,9 @@ class TextAreaFormFieldRenderer<Container>
 	
 	@Getter @Setter
 	FormFieldDataProvider formFieldDataProvider;
+	
+	@Getter @Setter
+	Record<?> parent;
 
 	// details
 
@@ -225,15 +228,24 @@ class TextAreaFormFieldRenderer<Container>
 		}
 		
 		if (formFieldDataProvider != null) {
-						
-			String data = 
-				formFieldDataProvider.getFormFieldData (
-					(Record<?>) container);
+			
+			String data;
+			
+			if (parent != null) {
+				data = 
+					formFieldDataProvider.getFormFieldData (
+						parent);
+			}
+			else {		
+				data = 
+					formFieldDataProvider.getFormFieldData (
+						(Record<?>) container);
+			}
 			
 			out.write (
 				stringFormat (
 					"<span hidden=\"hidden\"",
-					" id=\"parameters-length-list\" style>",
+					" class=\"parameters-length-list\" style>",
 					data,
 					"</span>"));
 			
@@ -258,40 +270,54 @@ class TextAreaFormFieldRenderer<Container>
 			
 			// length of non variable parts
 			
-			String message =
-				((MessageTemplateTypeRec) container)
-					.getDefaultValue();
+			String message;
+			
+			if (parent == null) {
+				
+				message =
+					((MessageTemplateTypeRec) container)
+						.getDefaultValue();
+			}
+			else {
+				
+				message =
+					((MessageTemplateTypeRec) parent)
+						.getDefaultValue();
+			}
 			
 			Integer messageLength = 0;
 			
-			String[] parts =
-				message.split("\\{(.*?)\\}");
+			if (message != null) {
 			
-			for (int i = 0; i < parts.length; i++) {
+				String[] parts =
+					message.split("\\{(.*?)\\}");
 				
-				messageLength += 
-					parts[i].length();
+				for (int i = 0; i < parts.length; i++) {
+					
+					messageLength += 
+						parts[i].length();
+					
+				}
 				
-			}
-			
-			// length of the parameters
-			
-			Pattern regExp = Pattern.compile("\\{(.*?)\\}");
-			Matcher matcher = regExp.matcher(message);
-			
-			while (matcher.find()) {
-			    String parameterName = 
-			    	matcher.group(1);
-
-			    	messageLength +=
-			    		Integer.parseInt(dataMap.get(parameterName));			    
+				// length of the parameters
+				
+				Pattern regExp = Pattern.compile("\\{(.*?)\\}");
+				Matcher matcher = regExp.matcher(message);
+				
+				while (matcher.find()) {
+				    String parameterName = 
+				    	matcher.group(1);
+	
+				    	messageLength +=
+				    		Integer.parseInt(dataMap.get(parameterName));			    
+				}
 			}
 			
 			out.write (
 				stringFormat (
 					"<span",
-					" class=\"template-chars\"",
-					" style>",
+					" class=\"templatechars\"",
+					">",
 					"Your template has %d characters. ",
 					messageLength,
 					"(Min. Length: %s - ",

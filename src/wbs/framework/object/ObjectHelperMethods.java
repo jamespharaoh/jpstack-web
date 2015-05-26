@@ -117,6 +117,10 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	<RecordTypeAgain extends Record<?>>
 	RecordTypeAgain insert (
 			RecordTypeAgain object);
+	
+	<RecordTypeAgain extends Record<?>>
+	RecordTypeAgain update (
+			RecordTypeAgain object);
 
 	<RecordTypeAgain extends EphemeralRecord<?>>
 	RecordTypeAgain remove (

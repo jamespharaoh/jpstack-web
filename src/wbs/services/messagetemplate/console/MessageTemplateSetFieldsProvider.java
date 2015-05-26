@@ -13,6 +13,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.Record;
 import wbs.platform.console.forms.FormFieldSet;
+import wbs.platform.console.forms.ScriptRefFormFieldSpec;
+import wbs.platform.console.forms.TextAreaFormFieldSpec;
 import wbs.platform.console.forms.TextFormFieldSpec;
 import wbs.platform.console.module.ConsoleModuleBuilder;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
@@ -51,17 +53,15 @@ class MessageTemplateSetFieldsProvider
 		// add name and description fields
 		
 		formFieldSpecs
-		.add (new TextFormFieldSpec()
-			.name ("name")					
-			.label ("Name")
-			.dynamic (false));
+			.add (new TextFormFieldSpec()
+				.name ("name")					
+				.label ("Name"));
 		
 		formFieldSpecs
-		.add (new TextFormFieldSpec()
-			.name ("description")					
-			.label ("Description")
-			.dynamic (false));
-			
+			.add (new TextFormFieldSpec()
+				.name ("description")					
+				.label ("Description"));
+		
 		// retrieve existing message template types
 		
 		MessageTemplateDatabaseRec messageTemplateDatabase =
@@ -70,20 +70,32 @@ class MessageTemplateSetFieldsProvider
 		Set<MessageTemplateTypeRec> messageTemplateTypes =
 				messageTemplateDatabase.getMessageTemplateTypes();
 		
-		// build dynamic form fields
-		
-		for (MessageTemplateTypeRec messageTemplateType : messageTemplateTypes) {
+		if (mode != "list") { 
 			
-			if (mode == "list") { continue; }
-								
 			formFieldSpecs
-				.add (new TextFormFieldSpec()
-					.name (messageTemplateType.getCode ())					
-					.label (messageTemplateType.getName ())
-					.dynamic (true));				
-
-		}
+			.add (new ScriptRefFormFieldSpec()
+				.path ("/js/jquery-1.7.1.js"));
 		
+			formFieldSpecs
+				.add (new ScriptRefFormFieldSpec()
+					.path ("/js/message-template.js"));	
+		
+			// build dynamic form fields
+			
+			for (MessageTemplateTypeRec messageTemplateType : messageTemplateTypes) {
+									
+				formFieldSpecs
+					.add (new TextAreaFormFieldSpec()
+						.name (messageTemplateType.getCode ())					
+						.label (messageTemplateType.getName ())
+						.dataProvider("messageTemplateSettingsFormFieldDataProvider")
+						.parent(messageTemplateType)
+						.dynamic (true));				
+	
+			}
+		
+		}
+			
 		// build field set
 		
 		String fieldSetName =

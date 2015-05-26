@@ -831,6 +831,43 @@ class ObjectHelperBuilder {
 				return object;
 
 			}
+			
+			@Override
+			public
+			Record update (
+					@NonNull Record object) {
+
+				if (! objectClass ().isInstance (
+						object)) {
+
+					throw new ClassCastException (
+						stringFormat (
+							"Can't update %s as %s",
+							object.getClass ().getSimpleName (),
+							objectClass ().getSimpleName ()));
+
+				}
+
+				objectHelperProvider.update (
+					object);
+
+				for (ObjectHelper childObjectHelper
+						: list) {
+
+					ObjectHelperProvider childObjectHelperProvider =
+						childObjectHelper.objectHelperProvider ();
+
+					childObjectHelperProvider.createSingletons (
+						childObjectHelper,
+						objectHelper,
+						object);
+
+				}
+
+				return object;
+
+			}
+			
 
 			@Override
 			public

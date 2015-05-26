@@ -1,6 +1,8 @@
 package wbs.platform.object.create;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -14,6 +16,7 @@ import wbs.platform.console.forms.FormFieldLogic;
 import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.helper.ConsoleObjectManager;
+import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.scaffold.model.RootObjectHelper;
@@ -67,6 +70,20 @@ class ObjectCreatePart
 	Record<?> object;
 
 	// implementation
+	
+	@Override
+	public
+	Set<ScriptRef> scriptRefs () {
+
+		Set<ScriptRef> scriptRefs =
+			new LinkedHashSet<ScriptRef> ();
+
+		scriptRefs.addAll (
+			formFieldSet.scriptRefs ());
+
+		return scriptRefs;
+
+	}
 	
 	@Override
 	public

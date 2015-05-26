@@ -68,6 +68,10 @@ interface ObjectManagerMethods {
 	<ObjectType extends Record<?>>
 	ObjectType insert (
 			ObjectType object);
+	
+	<ObjectType extends Record<?>>
+	ObjectType update (
+			ObjectType object);
 
 	<ObjectType extends EphemeralRecord<?>>
 	ObjectType remove (

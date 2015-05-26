@@ -73,6 +73,7 @@
 		<bean class="SpecialFormFieldAccessor"/>
 		<bean class="TextAreaFormFieldBuilder"/>
 		<bean class="TextAreaFormFieldRenderer"/>
+		<bean class="TextAreaFormFieldConstraintValidator"/>
 		<bean class="TextAreaFormFieldSpec"/>
 		<bean class="TextFormFieldBuilder"/>
 		<bean class="TextFormFieldNativeMapping"/>

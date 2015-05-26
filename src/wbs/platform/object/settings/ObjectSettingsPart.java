@@ -1,6 +1,6 @@
 package wbs.platform.object.settings;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -73,7 +73,7 @@ class ObjectSettingsPart
 	Set<ScriptRef> scriptRefs () {
 
 		Set<ScriptRef> scriptRefs =
-			new HashSet<ScriptRef> ();
+			new LinkedHashSet<ScriptRef> ();
 
 		scriptRefs.addAll (
 			formFieldSet.scriptRefs ());
