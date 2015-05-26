@@ -1,5 +1,6 @@
 package wbs.smsapps.subscription.logic;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.notIn;
 
@@ -285,12 +286,16 @@ class SubscriptionLogicImpl
 
 				.service (
 					serviceHelper.findByCode (
-						subscriptionList,
+						ifNull (
+							subscriptionList,
+							subscription),
 						"default"))
 
 				.affiliate (
 					affiliateHelper.findByCode (
-						subscriptionAffiliate,
+						ifNull (
+							subscriptionAffiliate,
+							subscription),
 						"default"))
 
 				.deliveryTypeCode (
