@@ -31,14 +31,14 @@ interface ChatSendLogic {
 			Set<String> tags,
 			Optional<String> deliveryTypeCode,
 			String serviceCode,
-			Boolean required,
+			TemplateMissing templateMissing,
 			Map<String,String> params);
 
 	Optional<MessageRec> sendSystemRbFree (
 			ChatUserRec chatUser,
 			Optional<Integer> threadId,
 			String templateCode,
-			Boolean required,
+			TemplateMissing templateMissing,
 			Map<String,String> params);
 
 	MessageRec sendMessageMmsFree (
@@ -53,7 +53,7 @@ interface ChatSendLogic {
 			Optional<Integer> threadId,
 			String templateCode,
 			CommandRec command,
-			Boolean required);
+			TemplateMissing templateMissing);
 
 	MessageRec sendMessageMagic (
 			ChatUserRec chatUser,
@@ -69,7 +69,7 @@ interface ChatSendLogic {
 			String templateCode,
 			CommandRec magicCommand,
 			Integer magicRef,
-			Boolean required,
+			TemplateMissing templateMissing,
 			Map<String,String> params);
 
 	Integer sendMessageMagic (
@@ -89,5 +89,11 @@ interface ChatSendLogic {
 			String templateTypeCode,
 			String templateCode,
 			Map<String,String> suppliedParams);
+
+	public static
+	enum TemplateMissing {
+		error,
+		ignore;
+	}
 
 }

@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 // TODO lots to deprecate here
@@ -1876,6 +1877,14 @@ class Misc {
 		}
 
 		return earliest;
+
+	}
+
+	public static <Type>
+	Type optionalRequired (
+			@NonNull Optional<Type> optional) {
+
+		return optional.get ();
 
 	}
 

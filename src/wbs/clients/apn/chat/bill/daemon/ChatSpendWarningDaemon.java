@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeChargesRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -159,7 +160,7 @@ class ChatSpendWarningDaemon
 			chatUser.getNumSpendWarnings () == 0
 				? "spend_warning_1"
 				: "spend_warning_2",
-			true,
+			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
 
 		// update user

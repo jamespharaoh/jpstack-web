@@ -10,6 +10,7 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -147,7 +148,7 @@ class ChatAdultDeliveryHandler
 				chatUser,
 				Optional.of (delivery.getMessage ().getThreadId ()),
 				"adult_confirm",
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			deliveryHelper.remove (

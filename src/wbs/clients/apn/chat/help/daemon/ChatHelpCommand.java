@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogLogic;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -165,7 +166,7 @@ class ChatHelpCommand
 					chat,
 					"help"
 				).getId (),
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 		} else {

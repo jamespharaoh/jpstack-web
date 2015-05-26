@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
@@ -175,7 +176,7 @@ class ChatSetPhotoCommand
 				"photo_confirm",
 				commandHelper.findByCode (chat, "magic"),
 				commandHelper.findByCode (chat, "help").getId (),
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			// auto join
@@ -199,7 +200,7 @@ class ChatSetPhotoCommand
 				chatUser,
 				Optional.of (message.getThreadId ()),
 				"video_set_pending",
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			// auto join
@@ -217,7 +218,7 @@ class ChatSetPhotoCommand
 				Optional.of (message.getThreadId ()),
 				"photo_error",
 				commandHelper.findByCode (chat, "set_photo"),
-				true);
+				TemplateMissing.error);
 
 		}
 

@@ -141,8 +141,10 @@ class ChatDateCommand
 
 		// do join
 
-		if (chatUser.getDateMode () == ChatUserDateMode.none
-				&& dateMode != ChatUserDateMode.none) {
+		if (
+			chatUser.getDateMode () == ChatUserDateMode.none
+			&& dateMode != ChatUserDateMode.none
+		) {
 
 			// log request
 

@@ -20,6 +20,7 @@ import org.joda.time.Instant;
 
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -1304,7 +1305,7 @@ class ChatInfoLogicImpl
 			"name_hint",
 			commandHelper.findByCode (chat, "magic"),
 			commandHelper.findByCode (chat, "name").getId (),
-			true,
+			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
 
 		// and update the chat user
@@ -1331,7 +1332,7 @@ class ChatInfoLogicImpl
 			Optional.<Integer>absent (),
 			"photo_hint",
 			commandHelper.findByCode (chat, "set_photo"),
-			true);
+			TemplateMissing.error);
 
 		// and update the chat user
 
@@ -1357,7 +1358,7 @@ class ChatInfoLogicImpl
 			Optional.<Integer>absent (),
 			"photo_hint_2",
 			commandHelper.findByCode (chat, "set_photo"),
-			true);
+			TemplateMissing.error);
 
 		// and update the chat user
 

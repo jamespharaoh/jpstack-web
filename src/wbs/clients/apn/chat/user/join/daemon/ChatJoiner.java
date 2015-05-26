@@ -23,6 +23,7 @@ import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
@@ -361,7 +362,7 @@ class ChatJoiner {
 				commandHelper.findByCode (
 					chatUser.getChatAffiliate (),
 					"date_set_photo"),
-				true);
+				TemplateMissing.error);
 
 			return false;
 
@@ -583,7 +584,7 @@ class ChatJoiner {
 				"join_error",
 				commandHelper.findByCode (chat, "help"),
 				0,
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -622,7 +623,7 @@ class ChatJoiner {
 					Optional.of (
 						message.getThreadId ()),
 					"dob_request",
-					true,
+					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
 				chatUser
@@ -644,7 +645,7 @@ class ChatJoiner {
 							? "chat_dob"
 							: "date_dob"),
 					0,
-					true,
+					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -661,7 +662,7 @@ class ChatJoiner {
 				"dob_too_young",
 				commandHelper.findByCode (chat, "help"),
 				0,
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -682,7 +683,7 @@ class ChatJoiner {
 					Optional.of (
 						message.getThreadId ()),
 					"join_warning",
-					true,
+					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
 				chatSendLogic.sendSystemRbFree (
@@ -690,7 +691,7 @@ class ChatJoiner {
 					Optional.of (
 						message.getThreadId ()),
 					"join_warning_2",
-					false,
+					TemplateMissing.ignore,
 					Collections.<String,String>emptyMap ());
 
 			} else {
@@ -701,7 +702,7 @@ class ChatJoiner {
 					"join_warning",
 					commandHelper.findByCode (chat, "help"),
 					0,
-					true,
+					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
 				chatSendLogic.sendSystemMagic (
@@ -710,7 +711,7 @@ class ChatJoiner {
 					"join_warning_2",
 					commandHelper.findByCode (chat, "help"),
 					0,
-					false,
+					TemplateMissing.ignore,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -747,7 +748,7 @@ class ChatJoiner {
 						? "chat_charges"
 						: "date_charges"),
 				0,
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -771,7 +772,7 @@ class ChatJoiner {
 						? "chat_location"
 						: "date_location"),
 				0,
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -792,7 +793,7 @@ class ChatJoiner {
 						? "chat_gender"
 						: "date_gender"),
 				0,
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -813,7 +814,7 @@ class ChatJoiner {
 						? "chat_gender_other"
 						: "date_gender_other"),
 				0,
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -837,7 +838,7 @@ class ChatJoiner {
 						? "chat_info"
 						: "date_info"),
 				0,
-				true,
+				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			return false;
@@ -868,7 +869,7 @@ class ChatJoiner {
 					? "chat_location"
 					: "date_location"),
 			0,
-			true,
+			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
 
 		return false;
@@ -1111,7 +1112,7 @@ class ChatJoiner {
 					"date_joined",
 					commandHelper.findByCode (chat, "help"),
 					0,
-					false,
+					TemplateMissing.ignore,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -1123,7 +1124,7 @@ class ChatJoiner {
 				chatUser.getMainChatUserImage () != null
 					? ChatUserDateMode.text
 					: ChatUserDateMode.photo,
-				true);
+				false);
 
 			if (
 				chatUser.getDateDailyCount ()
@@ -1170,7 +1171,7 @@ class ChatJoiner {
 					"more_photos_error",
 					commandHelper.findByCode (chat, "help"),
 					0,
-					true,
+					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -1192,7 +1193,7 @@ class ChatJoiner {
 					"more_videos_error",
 					commandHelper.findByCode (chat, "help"),
 					0,
-					true,
+					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
 			}
@@ -1226,7 +1227,7 @@ class ChatJoiner {
 					"more_error",
 					commandHelper.findByCode (chat, "help"),
 					0,
-					true,
+					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
 			}

@@ -175,11 +175,11 @@ class ExceptionLogLogicImpl
 
 			try {
 
-				logThrowableWithSummary (
+				realLogException (
 					typeCode,
 					"exception log",
-					furtherSummary,
-					furtherException,
+					furtherSummary + "\n" + throwableSummary (furtherException),
+					throwableDump (furtherException),
 					Optional.<Integer>absent (),
 					true);
 
@@ -188,14 +188,6 @@ class ExceptionLogLogicImpl
 				log.fatal (
 					"Error logging error logging exception",
 					yetAnotherException);
-
-				realLogException (
-					typeCode,
-					"exception log",
-					furtherSummary,
-					"",
-					userId,
-					true);
 
 			}
 

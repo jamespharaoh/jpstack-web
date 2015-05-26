@@ -173,7 +173,7 @@ class ChatSendLogicImpl
 			@NonNull Set<String> tags,
 			@NonNull Optional<String> deliveryTypeCode,
 			@NonNull String serviceCode,
-			@NonNull Boolean required,
+			@NonNull TemplateMissing templateMissing,
 			@NonNull Map<String,String> suppliedParams) {
 
 		ChatRec chat =
@@ -189,7 +189,7 @@ class ChatSendLogicImpl
 
 		if (chatHelpTemplate == null) {
 
-			if (required) {
+			if (templateMissing == TemplateMissing.error) {
 
 				throw new RuntimeException (
 					stringFormat (
@@ -301,7 +301,7 @@ class ChatSendLogicImpl
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Integer> threadId,
 			@NonNull String templateCode,
-			@NonNull Boolean required,
+			@NonNull TemplateMissing templateMissing,
 			@NonNull Map<String,String> suppliedParams) {
 
 		ChatRec chat =
@@ -317,7 +317,7 @@ class ChatSendLogicImpl
 
 		if (chatHelpTemplate == null) {
 
-			if (required) {
+			if (templateMissing == TemplateMissing.error) {
 
 				throw new RuntimeException (
 					"System template not found: " + templateCode);
@@ -441,7 +441,7 @@ class ChatSendLogicImpl
 			@NonNull Optional<Integer> threadId,
 			@NonNull String templateCode,
 			@NonNull CommandRec command,
-			@NonNull Boolean required) {
+			@NonNull TemplateMissing templateMissing) {
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -456,7 +456,7 @@ class ChatSendLogicImpl
 
 		if (chatHelpTemplate == null) {
 
-			if (required) {
+			if (templateMissing == TemplateMissing.error) {
 
 				throw new RuntimeException (
 					stringFormat (
@@ -555,7 +555,7 @@ class ChatSendLogicImpl
 			@NonNull String templateCode,
 			@NonNull CommandRec magicCommand,
 			@NonNull Integer magicRef,
-			@NonNull Boolean required,
+			@NonNull TemplateMissing templateMissing,
 			@NonNull Map<String,String> suppliedParams) {
 
 		ChatRec chat =
@@ -571,7 +571,7 @@ class ChatSendLogicImpl
 
 		if (chatHelpTemplate == null) {
 
-			if (required) {
+			if (templateMissing == TemplateMissing.error) {
 
 				throw new RuntimeException (
 					stringFormat (

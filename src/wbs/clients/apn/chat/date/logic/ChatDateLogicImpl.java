@@ -8,6 +8,7 @@ import java.util.Date;
 import javax.inject.Inject;
 
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateLogObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateLogRec;
@@ -55,7 +56,7 @@ class ChatDateLogicImpl
 			"date_hint_photo",
 			commandHelper.findByCode (chat, "date_join_photo"),
 			0,
-			true,
+			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
 
 		// and update the chat user
@@ -80,7 +81,7 @@ class ChatDateLogicImpl
 			"date_hint_upgrade",
 			commandHelper.findByCode (chat, "magic"),
 			commandHelper.findByCode (chat, "date_join_photo").getId (),
-			true,
+			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
 
 		// and update the chat user
@@ -172,15 +173,35 @@ class ChatDateLogicImpl
 
 		chatUserDateLogHelper.insert (
 			new ChatUserDateLogRec ()
-				.setChatUser (chatUser)
-				.setUser (user)
-				.setMessage (message)
-				.setDateMode (dateMode)
-				.setRadius (chatUser.getDateRadius ())
-				.setStartHour (chatUser.getDateStartHour ())
-				.setEndHour (chatUser.getDateEndHour ())
-				.setDailyMax (chatUser.getDateDailyMax ())
-				.setTimestamp (new Date ()));
+
+			.setChatUser (
+				chatUser)
+
+			.setUser (
+				user)
+
+			.setMessage (
+				message)
+
+			.setDateMode (
+				dateMode)
+
+			.setRadius (
+				chatUser.getDateRadius ())
+
+			.setStartHour (
+				chatUser.getDateStartHour ())
+
+			.setEndHour (
+				chatUser.getDateEndHour ())
+
+			.setDailyMax (
+				chatUser.getDateDailyMax ())
+
+			.setTimestamp (
+				new Date ())
+
+		);
 
 		if (sendMessage) {
 
@@ -211,7 +232,7 @@ class ChatDateLogicImpl
 				code,
 				commandHelper.findByCode (chat, "magic"),
 				commandHelper.findByCode (chat, "help").getId (),
-				true,
+				TemplateMissing.ignore,
 				ImmutableMap.<String,String>builder ()
 					.put (
 						"miles",
