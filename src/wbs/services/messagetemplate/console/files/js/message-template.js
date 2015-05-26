@@ -42,7 +42,7 @@ $(function () {
 			
 				}
 	
-				// length of non variable parts
+				// length of the message
 				
 				var minLength = parametersObject["minimumTemplateLength"];
 				var maxLength = parametersObject["maximumTemplateLength"]
@@ -73,6 +73,28 @@ $(function () {
 				}
 				
 				var messageLength = templateTextReplaced.length;
+				
+				// length of special chars if gsm encoding
+				
+				if (parametersObject["charset"] == "gsm") {
+					
+					var specialChars = ['^', '{', '}', '[', ']', '\\', '/', '~', '\n', '€'];
+					
+					for (var j = 0; j < specialChars.length; j++) {
+						
+						var occurrences = 0;
+						
+						for (var c = 0; c < templateTextReplaced.length; c++)					
+							if(templateTextReplaced[c] == specialChars[j])						   
+								occurrences = occurrences + 1;
+						
+				    	messageLength +=
+							occurrences;
+						
+					}
+					
+				}				
+				
 				$("textarea", row).text (templateText);
 				
 				$(row).find ("td > span.templatechars").get(0).innerText =

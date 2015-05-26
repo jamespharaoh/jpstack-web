@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.services.messagetemplate.model.MessageTemplateParameterObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateParameterRec;
+import wbs.services.messagetemplate.model.MessageTemplateTypeCharset;
 import wbs.services.messagetemplate.model.MessageTemplateTypeRec;
 
 @PrototypeComponent ("textAreaFormFieldValueValidator")
@@ -22,7 +23,6 @@ class TextAreaFormFieldConstraintValidator<Container>
 	@Inject
 	MessageTemplateParameterObjectHelper messageTemplateParameterHelper;
 	
-	@SuppressWarnings("null")
 	@Override
 	public
 	void validate (
@@ -37,9 +37,7 @@ class TextAreaFormFieldConstraintValidator<Container>
 			new ArrayList<String>();
 		
 		String message = nativeValue;
-		
-		System.out.println(message);
-		
+
 		// length of non variable parts
 		
 		Integer messageLength = 0;
@@ -51,6 +49,27 @@ class TextAreaFormFieldConstraintValidator<Container>
 			
 			messageLength += 
 				parts[i].length();
+			
+			// length of special chars if gsm encoding
+			
+			if (messageTemplateType.getCharset() == MessageTemplateTypeCharset.gsm) {
+				
+				Character[] specialChars = {'^', '{', '}', '[', ']', '\\', '/', '~', '\n', '€'};
+				
+				for (int j = 0; j < specialChars.length; j++) {
+					
+					int occurrences = 0;
+					
+					for (Character c : parts[i].toCharArray())					
+						if(c.equals(specialChars[j]))						   
+							occurrences++;	
+					
+			    	messageLength +=
+		    			occurrences;
+					
+				}
+				
+			}
 			
 		}
 		
@@ -73,18 +92,21 @@ class TextAreaFormFieldConstraintValidator<Container>
 		    	errors.add (
 					stringFormat (
 						"The parameter "+parameterName+" does not exist!"));
+		    	
 		    }
-		    
-		    if (messageTemplateParameter.getLength() != null) {
-		    	messageLength +=
-	    			messageTemplateParameter.getLength();
+		    else {
+		    	
+			    if (messageTemplateParameter.getLength() != null) {
+			    	messageLength +=
+		    			messageTemplateParameter.getLength();
+			    }
+			    
+			    messageTemplateUsedParameters
+		    		.add(messageTemplateParameter.getName());
 		    }
-		    
-		    messageTemplateUsedParameters
-		    	.add(messageTemplateParameter.getName());
 		    
 		}
-		
+			
 		// check if the rest of parameters which are not present were required
 		
 		for (MessageTemplateParameterRec messageTemplateParameter : messageTemplateType.getMessageTemplateParameters()) {

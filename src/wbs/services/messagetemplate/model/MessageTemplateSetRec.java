@@ -188,6 +188,27 @@ public class MessageTemplateSetRec
 				messageLength += 
 					parts[i].length();
 				
+				// length of special chars if gsm encoding
+				
+				if (messageTemplateType.getCharset() == MessageTemplateTypeCharset.gsm) {
+					
+					Character[] specialChars = {'^', '{', '}', '[', ']', '\\', '/', '~', '\n', '€'};
+					
+					for (int j = 0; j < specialChars.length; j++) {
+						
+						int occurrences = 0;
+						
+						for (Character c : parts[i].toCharArray())					
+							if(c.equals(specialChars[j]))						   
+								occurrences++;
+						
+				    	messageLength +=
+			    			occurrences;
+						
+					}
+					
+				}
+				
 			}
 			
 			// length of the parameters
@@ -217,7 +238,7 @@ public class MessageTemplateSetRec
 			    	.add(messageTemplateParameter.getName());
 			    
 			}
-			
+				
 			// check if the rest of parameters which are not present were required
 			
 			for (MessageTemplateParameterRec messageTemplateParameter : messageTemplateType.getMessageTemplateParameters()) {

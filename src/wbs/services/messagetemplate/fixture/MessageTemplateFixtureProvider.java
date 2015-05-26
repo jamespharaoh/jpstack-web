@@ -228,6 +228,32 @@ public class MessageTemplateFixtureProvider
 					
 		);
 		
+		MessageTemplateTypeRec messageTemplateType3 =
+				messageTemplateTypeHelper.insert (
+					new MessageTemplateTypeRec ()
+			
+						.setMessageTemplateDatabase (
+							messageTemplateDatabase)
+								
+						.setName("Template-2-GSM")
+						
+						.setDefaultValue (
+							"Va/or por d€f€c\\o^")
+							
+						.setHelpText (
+							"<p>Help text 3</p>")
+			
+						.setMinLength(
+							5)
+		
+						.setMaxLength(
+							50)
+							
+						.setCharset (
+							MessageTemplateTypeCharset.gsm)
+					
+			);
+		
 		messageTemplateDatabase
 			.getMessageTemplateTypes().add (
 				messageTemplateType1);
@@ -235,6 +261,10 @@ public class MessageTemplateFixtureProvider
 		messageTemplateDatabase
 			.getMessageTemplateTypes().add (
 				messageTemplateType2);
+		
+		messageTemplateDatabase
+			.getMessageTemplateTypes().add (
+				messageTemplateType3);
 		
 		messageTemplateType1
 			.setNumParameters(
