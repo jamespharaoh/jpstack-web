@@ -38,7 +38,8 @@ class MessageTemplateFormFieldDataProvider
 		}
 		 
 		formFieldData += "minimumTemplateLength="+messageTemplateType.getMinLength()+"&";
-		formFieldData += "maximumTemplateLength="+messageTemplateType.getMaxLength();
+		formFieldData += "maximumTemplateLength="+messageTemplateType.getMaxLength()+"&";
+		formFieldData += "charset="+messageTemplateType.getCharset().toString();
 		
 		return formFieldData;
 	}
