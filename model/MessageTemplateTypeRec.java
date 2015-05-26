@@ -85,12 +85,12 @@ public class MessageTemplateTypeRec
 		public
 		void beforeInsert (
 			MessageTemplateTypeRec messageTemplateType) {
-			
+				
 			messageTemplateType.setCode (
 				messageTemplateType.getName().toLowerCase());
-			
+						
 		}
-		
+			
 		@Override
 		public
 		Object getDynamic (
