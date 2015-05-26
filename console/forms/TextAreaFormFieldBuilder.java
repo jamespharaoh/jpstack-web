@@ -14,6 +14,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.text.model.TextRec;
@@ -31,6 +32,10 @@ class TextAreaFormFieldBuilder {
 	ApplicationContext applicationContext;
 
 	// prototype dependencies
+	
+	@Inject
+	Provider<TextAreaFormFieldConstraintValidator>
+	textAreaFormFieldValueConstraintValidatorProvider;
 
 	@Inject
 	Provider<SimpleFormFieldUpdateHook>
@@ -119,6 +124,14 @@ class TextAreaFormFieldBuilder {
 			ifNull (
 				textAreaFormFieldSpec.cols (),
 				FormField.defaultSize);
+		
+		Boolean dynamic =
+			ifNull (textAreaFormFieldSpec.dynamic(),
+				false);
+		
+		Record<?> parent =
+			ifNull (textAreaFormFieldSpec.parent(),
+				null);
 
 		String charCountFunction =
 			textAreaFormFieldSpec.charCountFunction ();
@@ -132,20 +145,49 @@ class TextAreaFormFieldBuilder {
 		
 		if (textAreaFormFieldSpec.dataProvider () != null) {
 			
-			propertyClass = String.class;
+			propertyClass = 
+				String.class;
 
 			formFielDataProvider = 
 				applicationContext.getBean (
 					textAreaFormFieldSpec.dataProvider (),
 					FormFieldDataProvider.class);		
+			
 		}
 		else {
-			// field type
+			if (!dynamic) {
 	
-			propertyClass =
-				BeanLogic.propertyClass (
-					formFieldBuilderContext.containerClass (),
-					name);
+				propertyClass =
+					BeanLogic.propertyClass (
+						formFieldBuilderContext.containerClass (),
+						name);
+				
+			}
+			else {
+				propertyClass = 
+					String.class;
+			}
+			
+		}
+		
+		// constraint validator only use for simple type settings
+		
+		FormFieldConstraintValidator constraintValidator;
+		
+		if (parent == null) {
+			
+			// constraint validator
+
+			constraintValidator =
+				textAreaFormFieldValueConstraintValidatorProvider.get ();
+		}
+		else {
+			
+			// constraint validator
+
+			constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.get ();
+			
 		}
 
 		String updateHookBeanName =
@@ -159,7 +201,8 @@ class TextAreaFormFieldBuilder {
 			formFieldAccessor =
 				simpleFormFieldAccessorProvider.get ()
 					.name (name)
-					.nativeClass (String.class);
+					.nativeClass (String.class)
+					.dynamic (dynamic);
 
 			formFieldNativeMapping =
 				identityFormFieldNativeMappingProvider.get ();
@@ -169,7 +212,8 @@ class TextAreaFormFieldBuilder {
 			formFieldAccessor =
 				simpleFormFieldAccessorProvider.get ()
 					.name (name)
-					.nativeClass (TextRec.class);
+					.nativeClass (TextRec.class)				
+					.dynamic (dynamic);
 
 			formFieldNativeMapping =
 				textFormFieldNativeMappingProvider.get ();
@@ -184,12 +228,7 @@ class TextAreaFormFieldBuilder {
 
 		FormFieldValueValidator valueValidator =
 			nullFormFieldValueValidatorProvider.get ();
-
-		// constraint validator
-
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
-
+		
 		// interface mapping
 
 		FormFieldInterfaceMapping interfaceMapping =
@@ -206,6 +245,7 @@ class TextAreaFormFieldBuilder {
 				.cols (cols)
 				.charCountFunction (charCountFunction)
 				.charCountData (charCountData)
+				.parent(parent)
 				.formFieldDataProvider (formFielDataProvider);
 
 		// update hook

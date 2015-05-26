@@ -1046,6 +1046,18 @@ class HibernateHelperProviderBuilder {
 			return object;
 
 		}
+		
+		@Override
+		public
+		Record update (
+				Record object) {
+
+			objectHooks.beforeUpdate (
+				object);
+
+			return object;
+
+		}
 
 		@Override
 		public

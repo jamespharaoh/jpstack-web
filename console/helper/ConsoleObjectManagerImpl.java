@@ -649,6 +649,16 @@ class ConsoleObjectManagerImpl
 			object);
 
 	}
+	
+	@Override
+	public <ObjectType extends Record<?>>
+	ObjectType update (
+			ObjectType object) {
+
+		return objectManager.update (
+			object);
+
+	}
 
 	@Override
 	public

@@ -1,7 +1,7 @@
 package wbs.platform.console.forms;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,9 +34,9 @@ class FormFieldSet {
 
 	public
 	Set<ScriptRef> scriptRefs () {
-
+		
 		Set<ScriptRef> scriptRefs =
-			new HashSet<ScriptRef> ();
+			new LinkedHashSet<ScriptRef> ();
 
 		for (FormField formField
 				: formFields) {
