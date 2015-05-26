@@ -21,7 +21,10 @@ import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.services.messagetemplate.console.FormFieldDataProvider;
+import wbs.services.messagetemplate.model.MessageTemplateSetRec;
+import wbs.services.messagetemplate.model.MessageTemplateTypeCharset;
 import wbs.services.messagetemplate.model.MessageTemplateTypeRec;
+import wbs.services.messagetemplate.model.MessageTemplateValueRec;
 
 @PrototypeComponent ("textAreaFormFieldRenderer")
 @Accessors (fluent = true)
@@ -268,22 +271,47 @@ class TextAreaFormFieldRenderer<Container>
 				dataMap.put(parameter[0], parameter[1]);
 			}
 			
-			// length of non variable parts
+			// message and charset
 			
 			String message;
+			MessageTemplateTypeCharset charset;
 			
 			if (parent == null) {
 				
 				message =
 					((MessageTemplateTypeRec) container)
 						.getDefaultValue();
+				
+				charset =
+					((MessageTemplateTypeRec) container)
+						.getCharset();
+				
 			}
 			else {
 				
-				message =
+				// if the type has a defined value, we get it
+				
+				MessageTemplateValueRec messageTemplateValue =
+						((MessageTemplateSetRec) container).getMessageTemplateValues().get( 
+							((MessageTemplateTypeRec) parent).getId());
+				
+				if (messageTemplateValue == null) {
+					message =
+						((MessageTemplateTypeRec) parent)
+							.getDefaultValue();
+				}				
+				else {
+					message =
+						messageTemplateValue
+							.getStringValue();
+				}
+				
+				charset =
 					((MessageTemplateTypeRec) parent)
-						.getDefaultValue();
+						.getCharset();
 			}
+			
+			// length of non variable parts
 			
 			Integer messageLength = 0;
 			
@@ -296,6 +324,27 @@ class TextAreaFormFieldRenderer<Container>
 					
 					messageLength += 
 						parts[i].length();
+					
+					// length of special chars if gsm encoding
+					
+					if (charset == MessageTemplateTypeCharset.gsm) {
+						
+						Character[] specialChars = {'^', '{', '}', '[', ']', '\\', '/', '~', '\n', '€'};
+						
+						for (int j = 0; j < specialChars.length; j++) {
+							
+							int occurrences = 0;
+							
+							for (Character c : parts[i].toCharArray())					
+								if(c.equals(specialChars[j]))						   
+									occurrences++;				
+							
+					    	messageLength +=
+				    			occurrences;
+							
+						}
+						
+					}
 					
 				}
 				
@@ -311,6 +360,7 @@ class TextAreaFormFieldRenderer<Container>
 				    	messageLength +=
 				    		Integer.parseInt(dataMap.get(parameterName));			    
 				}
+								
 			}
 			
 			out.write (
