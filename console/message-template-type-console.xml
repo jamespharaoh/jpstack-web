@@ -141,6 +141,9 @@
 		<script-ref
 			path="/js/message-template.js"/>
 			
+		<script-ref
+			path="/js/gsm.js"/>
+			
 		<text-field
 			name="helpText"/>
 			

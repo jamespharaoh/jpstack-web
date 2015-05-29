@@ -238,7 +238,7 @@ public class MessageTemplateFixtureProvider
 						.setName("Template-2-GSM")
 						
 						.setDefaultValue (
-							"Va/or por d€f€c\\o^")
+							"Va/or por d€f€c/o^")
 							
 						.setHelpText (
 							"<p>Help text 3</p>")
