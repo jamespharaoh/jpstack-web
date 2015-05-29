@@ -79,6 +79,10 @@ class MessageTemplateSetFieldsProvider
 			formFieldSpecs
 				.add (new ScriptRefFormFieldSpec()
 					.path ("/js/message-template.js"));	
+			
+			formFieldSpecs
+				.add (new ScriptRefFormFieldSpec()
+					.path ("/js/gsm.js"));	
 		
 			// build dynamic form fields
 			

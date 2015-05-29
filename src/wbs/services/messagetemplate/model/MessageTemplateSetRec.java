@@ -34,6 +34,7 @@ import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.queue.logic.QueueLogic;
+import wbs.sms.gsm.Gsm;
 
 @Accessors (chain = true)
 @Data
@@ -184,29 +185,21 @@ public class MessageTemplateSetRec
 				message.split("\\{(.*?)\\}");
 			
 			for (int i = 0; i < parts.length; i++) {
-				
-				messageLength += 
-					parts[i].length();
-				
+							
 				// length of special chars if gsm encoding
 				
 				if (messageTemplateType.getCharset() == MessageTemplateTypeCharset.gsm) {
 					
-					Character[] specialChars = {'^', '{', '}', '[', ']', '\\', '/', '~', '\n', '€'};
-					
-					for (int j = 0; j < specialChars.length; j++) {
-						
-						int occurrences = 0;
-						
-						for (Character c : parts[i].toCharArray())					
-							if(c.equals(specialChars[j]))						   
-								occurrences++;
-						
-				    	messageLength +=
-			    			occurrences;
-						
-					}
-					
+					if (! Gsm.isGsm (parts[i]))		
+						throw new RuntimeException ("Message text is invalid");
+		
+					messageLength += 
+						Gsm.length (parts[i]);
+		
+				}
+				else {
+					messageLength += 
+							parts[i].length();
 				}
 				
 			}
@@ -238,7 +231,7 @@ public class MessageTemplateSetRec
 			    	.add(messageTemplateParameter.getName());
 			    
 			}
-				
+							
 			// check if the rest of parameters which are not present were required
 			
 			for (MessageTemplateParameterRec messageTemplateParameter : messageTemplateType.getMessageTemplateParameters()) {

@@ -14,6 +14,7 @@ import wbs.services.messagetemplate.model.MessageTemplateParameterObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateParameterRec;
 import wbs.services.messagetemplate.model.MessageTemplateTypeCharset;
 import wbs.services.messagetemplate.model.MessageTemplateTypeRec;
+import wbs.sms.gsm.Gsm;
 
 @PrototypeComponent ("textAreaFormFieldValueValidator")
 public 
@@ -47,28 +48,20 @@ class TextAreaFormFieldConstraintValidator<Container>
 		
 		for (int i = 0; i < parts.length; i++) {
 			
-			messageLength += 
-				parts[i].length();
-			
 			// length of special chars if gsm encoding
 			
 			if (messageTemplateType.getCharset() == MessageTemplateTypeCharset.gsm) {
 				
-				Character[] specialChars = {'^', '{', '}', '[', ']', '\\', '/', '~', '\n', '€'};
-				
-				for (int j = 0; j < specialChars.length; j++) {
-					
-					int occurrences = 0;
-					
-					for (Character c : parts[i].toCharArray())					
-						if(c.equals(specialChars[j]))						   
-							occurrences++;	
-					
-			    	messageLength +=
-		    			occurrences;
-					
-				}
-				
+				if (! Gsm.isGsm (parts[i]))		
+					throw new RuntimeException ("Message text is invalid");
+	
+				messageLength += 
+					Gsm.length (parts[i]);
+	
+			}
+			else {
+				messageLength += 
+						parts[i].length();
 			}
 			
 		}

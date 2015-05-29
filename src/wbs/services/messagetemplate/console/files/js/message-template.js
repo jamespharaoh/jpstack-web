@@ -59,41 +59,36 @@ $(function () {
 								.substring(1, parts[i].length - 1)];
 								
 						if (parameterLength == undefined) {
-						
+
 							continue;
 						
 						}
 						else {
 						
 							templateTextReplaced = 
-								templateText.replace(parts[i], generateString(parameterLength));
+								templateTextReplaced.replace(parts[i], generateString(parameterLength));								
 								
 						}
 					}
 				}
-				
-				var messageLength = templateTextReplaced.length;
-				
+					
+				var messageLength = 0;	
+					
 				// length of special chars if gsm encoding
 				
 				if (parametersObject["charset"] == "gsm") {
-					
-					var specialChars = ['^', '{', '}', '[', ']', '\\', '/', '~', '\n', '€'];
-					
-					for (var j = 0; j < specialChars.length; j++) {
-						
-						var occurrences = 0;
-						
-						for (var c = 0; c < templateTextReplaced.length; c++)					
-							if(templateTextReplaced[c] == specialChars[j])						   
-								occurrences = occurrences + 1;
-						
-				    	messageLength +=
-							occurrences;
-						
+				
+					if (isGsm(templateTextReplaced)) { 
+						messageLength = gsmlen (templateTextReplaced); 
+					}
+					else { 
+						messageLength = "--"; 
 					}
 					
-				}				
+				}	
+				else {
+					messageLength = templateTextReplaced.length;
+				}
 				
 				$("textarea", row).text (templateText);
 				
