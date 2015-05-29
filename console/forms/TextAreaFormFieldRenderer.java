@@ -25,6 +25,7 @@ import wbs.services.messagetemplate.model.MessageTemplateSetRec;
 import wbs.services.messagetemplate.model.MessageTemplateTypeCharset;
 import wbs.services.messagetemplate.model.MessageTemplateTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateValueRec;
+import wbs.sms.gsm.Gsm;
 
 @PrototypeComponent ("textAreaFormFieldRenderer")
 @Accessors (fluent = true)
@@ -322,28 +323,20 @@ class TextAreaFormFieldRenderer<Container>
 				
 				for (int i = 0; i < parts.length; i++) {
 					
-					messageLength += 
-						parts[i].length();
-					
 					// length of special chars if gsm encoding
 					
 					if (charset == MessageTemplateTypeCharset.gsm) {
 						
-						Character[] specialChars = {'^', '{', '}', '[', ']', '\\', '/', '~', '\n', '€'};
-						
-						for (int j = 0; j < specialChars.length; j++) {
-							
-							int occurrences = 0;
-							
-							for (Character c : parts[i].toCharArray())					
-								if(c.equals(specialChars[j]))						   
-									occurrences++;				
-							
-					    	messageLength +=
-				    			occurrences;
-							
-						}
-						
+						if (! Gsm.isGsm (parts[i]))		
+							throw new RuntimeException ("Message text is invalid");
+			
+						messageLength += 
+							Gsm.length (parts[i]);
+			
+					}
+					else {
+						messageLength += 
+								parts[i].length();
 					}
 					
 				}
