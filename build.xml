@@ -198,6 +198,7 @@
       <fileset dir="src/wbs/integrations/mediaburst/console/files"/>
       <fileset dir="src/wbs/integrations/mig/console/files"/>
       <fileset dir="src/wbs/integrations/oxygen8/console/files"/>
+      <fileset dir="src/wbs/integrations/smsarena/console/files"/>
       <fileset dir="src/wbs/integrations/paypal/console/files"/>
       <fileset dir="src/wbs/integrations/txtnation/console/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/console/files"/>
@@ -367,6 +368,7 @@
       <fileset dir="src/wbs/integrations/mediaburst/api/files"/>
       <fileset dir="src/wbs/integrations/mig/api/files"/>
       <fileset dir="src/wbs/integrations/oxygen8/api/files"/>
+      <fileset dir="src/wbs/integrations/smsarena/api/files"/>
       <fileset dir="src/wbs/integrations/paypal/api/files"/>
       <fileset dir="src/wbs/integrations/txtnation/api/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/api/files"/>
@@ -570,6 +572,7 @@
       <fileset dir="src/wbs/integrations/mediaburst/console/files"/>
       <fileset dir="src/wbs/integrations/mig/console/files"/>
       <fileset dir="src/wbs/integrations/oxygen8/console/files"/>
+      <fileset dir="src/wbs/integrations/smsarena/console/files"/>
       <fileset dir="src/wbs/integrations/paypal/console/files"/>
       <fileset dir="src/wbs/integrations/txtnation/console/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/console/files"/>
@@ -739,6 +742,7 @@
       <fileset dir="src/wbs/integrations/mediaburst/api/files"/>
       <fileset dir="src/wbs/integrations/mig/api/files"/>
       <fileset dir="src/wbs/integrations/oxygen8/api/files"/>
+      <fileset dir="src/wbs/integrations/smsarena/api/files"/>
       <fileset dir="src/wbs/integrations/paypal/api/files"/>
       <fileset dir="src/wbs/integrations/txtnation/api/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/api/files"/>
@@ -941,6 +945,7 @@
       <script name="src/wbs/integrations/hybyte/model/hybyte-data.sql"/>
       <script name="src/wbs/integrations/mediaburst/model/mediaburst-data.sql"/>
       <script name="src/wbs/integrations/oxygen8/model/oxygen8-data.sql"/>
+      <script name="src/wbs/integrations/smsarena/model/sms-arena-data.sql"/>
       <script name="src/wbs/integrations/paypal/model/paypal-data.sql"/>
       <script name="src/wbs/test/simulator/model/simulator-data.sql"/>
     </database-init>

@@ -1,0 +1,13 @@
+<api-module name="sms-arena">
+
+	<resource name="sms-arena">
+	<variable name="smsArenaId">
+
+		<resource name="dlr-dispatch">
+			<post-action name="dlrDispatch"/>
+		</resource>
+
+	</variable>
+	</resource>
+
+</api-module>

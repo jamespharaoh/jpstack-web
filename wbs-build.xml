@@ -608,6 +608,10 @@ i		<plugin
 		<plugin
 			name="paypal"
 			package="wbs.integrations.paypal"/>
+			
+		<plugin
+			name="sms-arena"
+			package="wbs.integrations.smsarena"/>
 
 		<plugin
 			name="txt-nation"

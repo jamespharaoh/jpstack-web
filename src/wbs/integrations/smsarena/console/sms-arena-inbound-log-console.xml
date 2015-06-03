@@ -1,0 +1,86 @@
+<console-module
+	name="sms-arena-inbound-log">
+
+	<console-helper-provider
+		object-name="smsArenaInboundLog"
+		view-delegate-field="root"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="smsArenaInboundLog.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="smsArenaInboundLogName"
+			field="id"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="smsArenaInboundLog"
+		object-name="smsArenaInboundLog">
+
+		<list>
+
+			<object-search-page
+				search-fields="search"
+				results-fields="results"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="search"
+		class="wbs.integrations.smsarena.model.SmsArenaInboundLogRec$SmsArenaInboundLogSearch">
+
+		<object-field
+			name="routeId"
+			label="Route"
+			finder="route"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="timestampAfter"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="timestampBefore"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="results"
+		object-name="smsArenaInboundLog">
+
+		<id-field/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="smsArenaInboundLog">
+
+		<id-field/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<text-area-field
+			name="details"/>
+
+	</field-set>
+
+</console-module>
