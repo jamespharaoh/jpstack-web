@@ -1,9 +1,9 @@
 <api-module name="sms-arena">
 
 	<resource name="sms-arena">
-	<variable name="smsArenaId">
+	<variable name="routeId">
 
-		<resource name="dlr-dispatch">
+		<resource name="report">
 			<post-action name="dlrDispatch"/>
 		</resource>
 

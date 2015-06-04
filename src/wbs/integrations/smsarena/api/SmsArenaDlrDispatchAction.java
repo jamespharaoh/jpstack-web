@@ -18,9 +18,9 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Action;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.integrations.oxygen8.model.Oxygen8InboundLogRec;
-import wbs.integrations.oxygen8.model.Oxygen8InboundLogType;
 import wbs.integrations.smsarena.model.SmsArenaInboundLogObjectHelper;
+import wbs.integrations.smsarena.model.SmsArenaInboundLogRec;
+import wbs.integrations.smsarena.model.SmsArenaInboundLogType;
 import wbs.integrations.smsarena.model.SmsArenaReportCodeObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaReportCodeRec;
 import wbs.integrations.smsarena.model.SmsArenaRouteInObjectHelper;
@@ -218,7 +218,7 @@ class SmsArenaDlrDispatchAction
 					this);
 
 			smsArenaInboundLogHelper.insert (
-				new Oxygen8InboundLogRec ()
+				new SmsArenaInboundLogRec ()
 
 				.setRoute (
 					routeHelper.find (
@@ -226,7 +226,7 @@ class SmsArenaDlrDispatchAction
 							"routeId")))
 
 				.setType (
-					Oxygen8InboundLogType.smsMessage)
+					SmsArenaInboundLogType.smsDelivery)
 
 				.setTimestamp (
 					transaction.now ())

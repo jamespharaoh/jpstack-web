@@ -383,13 +383,13 @@ public class SmsArenaSender
 				
 				String ack;
 				String id;
-				String charge;
+				//String charge;
 
 				String[] parts = responseString.split(";");
 				
 				ack = parts[0];
 				id = parts[1];
-				charge = parts[2];
+				//charge = parts[2];
 
 				if (!id.isEmpty() && messageId == Integer.parseInt(id)) {
 

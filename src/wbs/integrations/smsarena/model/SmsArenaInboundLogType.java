@@ -4,10 +4,8 @@ public
 enum SmsArenaInboundLogType {
 
 	smsMessage,
-	mmsMessage,
 	unknownMessage,
 	smsDelivery,
-	mmsDelivery,
 	unknownDelivery;
 
 }
