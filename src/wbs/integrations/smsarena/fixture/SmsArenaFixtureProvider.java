@@ -27,7 +27,8 @@ import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.sender.model.SenderObjectHelper;
 
 @PrototypeComponent ("smsArenaFixtureProvider")
-public class SmsArenaFixtureProvider 
+public 
+class SmsArenaFixtureProvider 
 	implements FixtureProvider {
 	
 	// dependencies

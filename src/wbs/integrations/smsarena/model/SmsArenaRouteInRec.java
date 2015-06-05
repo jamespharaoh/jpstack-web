@@ -20,7 +20,8 @@ import wbs.sms.route.core.model.RouteRec;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id")
 @MajorEntity
-public class SmsArenaRouteInRec
+public 
+class SmsArenaRouteInRec
 	implements MajorRecord<SmsArenaRouteInRec> {
 
 	// id

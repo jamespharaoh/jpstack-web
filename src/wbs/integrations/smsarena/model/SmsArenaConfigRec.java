@@ -20,7 +20,8 @@ import wbs.framework.record.Record;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id")
 @MajorEntity
-public class SmsArenaConfigRec
+public 
+class SmsArenaConfigRec
 	implements MajorRecord<SmsArenaConfigRec> {
 	
 	// id

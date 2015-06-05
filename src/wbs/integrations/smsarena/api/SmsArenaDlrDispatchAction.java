@@ -149,6 +149,8 @@ class SmsArenaDlrDispatchAction
 			debugLog.append (
 				stringFormat (
 					"\n"));
+			
+			// get request parameters
 
 			id =
 				requestContext.parameter ("id");
@@ -159,10 +161,14 @@ class SmsArenaDlrDispatchAction
 			desc =
 				requestContext.parameter ("desc");
 			
+			// begin transaction
+			
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
 					this);
+			
+			// find the route
 			
 			RouteRec route =
 				routeHelper.find (
@@ -177,6 +183,8 @@ class SmsArenaDlrDispatchAction
 	
 			if (smsArenaRouteIn == null)
 				throw new RuntimeException ();
+			
+			// get the code and create the report
 			
 			SmsArenaReportCodeRec reportCode =
 					smsArenaReportCodeHelper.findByCode (
@@ -212,6 +220,8 @@ class SmsArenaDlrDispatchAction
 
 		} finally {
 
+			// create the log for the delivery report
+			
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (

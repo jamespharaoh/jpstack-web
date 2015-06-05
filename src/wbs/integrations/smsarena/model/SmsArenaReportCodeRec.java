@@ -23,7 +23,8 @@ import wbs.sms.message.core.model.MessageStatus;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id")
 @MajorEntity
-public class SmsArenaReportCodeRec 
+public 
+class SmsArenaReportCodeRec 
 	implements MajorRecord<SmsArenaReportCodeRec> {
 	
 	// id

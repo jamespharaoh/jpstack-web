@@ -12,7 +12,8 @@ import wbs.integrations.smsarena.model.SmsArenaDlrReportLogDao;
 import wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec.SmsArenaDlrReportLogSearch;
 import wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec;
 
-public class SmsArenaDlrReportLogDaoHibernate
+public 
+class SmsArenaDlrReportLogDaoHibernate
 	extends HibernateDao
 	implements SmsArenaDlrReportLogDao {
 	

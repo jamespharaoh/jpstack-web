@@ -37,7 +37,8 @@ import wbs.sms.route.core.model.RouteRec;
 
 @Log4j
 @SingletonComponent ("smsArenaSender")
-public class SmsArenaSender 
+public 
+class SmsArenaSender 
 	extends AbstractSmsSender2 {
 
 	// dependencies
@@ -129,9 +130,10 @@ public class SmsArenaSender
 				"Sending message %s",
 				message.getId ()));
 	
-		Map<String,String> params =
-				new LinkedHashMap<String,String> ();
+		// create params map for the request query string
 		
+		Map<String,String> params =
+				new LinkedHashMap<String,String> ();		
 
 		params.put (
 			"auth_key",
@@ -241,6 +243,8 @@ public class SmsArenaSender
 					"Text contains non-GSM characters");
 
 		}
+		
+		// build the request query string
 
 		StringBuilder paramsString =
 			new StringBuilder ();
@@ -263,7 +267,7 @@ public class SmsArenaSender
 
 		}
 		
-		// create connection
+		// create connection with the url and the query string
 
 		String urlString =
 			stringFormat (
@@ -390,6 +394,8 @@ public class SmsArenaSender
 				ack = parts[0];
 				id = parts[1];
 				//charge = parts[2];
+				
+				// check if correct sms id
 
 				if (!id.isEmpty() && messageId == Integer.parseInt(id)) {
 
@@ -409,7 +415,7 @@ public class SmsArenaSender
 
 				}
 
-				if (ack.contains("Error")) {
+				if (ack.contains("ERROR")) {
 
 					return new PerformSendResult ()
 
