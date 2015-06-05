@@ -12,9 +12,9 @@
 	</sql-scripts>
 
 	<models>
-		<enum-type name="smsArenaInboundLogType"/>
+		<enum-type name="smsArenaDlrReportLogType"/>
 		<model name="smsArenaConfig"/>
-		<model name="smsArenaInboundLog"/>
+		<model name="smsArenaDlrReportLog"/>
 		<model name="smsArenaReportCode"/>
 		<model name="smsArenaRouteIn"/>
 		<model name="smsArenaRouteOut"/>
@@ -32,11 +32,6 @@
 		<bean class="api.SmsArenaDlrDispatchAction"/>
 	</layer>
 	
-	<layer name="console">
-		<bean class="console.SmsArenaRouteSummaryAdditionalPart"/>
-		<bean class="console.SmsArenaRouteSummaryAdditionalPartFactory"/>
-	</layer>
-	
 	<layer name="daemon">
 		<bean class="daemon.SmsArenaSender"/>
 	</layer>
@@ -44,7 +39,7 @@
 	<console-modules>
 		<console-module name="sms-arena"/>
 		<console-module name="sms-arena-config"/>
-		<console-module name="sms-arena-inbound-log"/>
+		<console-module name="sms-arena-dlr-report-log"/>
 		<console-module name="sms-arena-report-code"/>
 		<console-module name="sms-arena-route-in"/>
 		<console-module name="sms-arena-route-out"/>

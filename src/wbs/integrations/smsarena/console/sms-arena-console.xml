@@ -22,7 +22,7 @@
 			<context-link
 				name="in"
 				link="smsArenaRouteIn"
-				label="Inbound routes routes"
+				label="Inbound routes"
 				priv-key="smsArena.manage"/>
 
 			<context-link
@@ -38,9 +38,9 @@
 			label="Logs">
 
 			<context-link
-				name="Inbound"
-				link="smsArenaInboundLog"
-				label="Inbound"
+				name="DlrReport"
+				link="smsArenaDlrReportLog"
+				label="SMSArena Delivery Reports"
 				priv-key="smsArena.manage"/>
 
 		</section>

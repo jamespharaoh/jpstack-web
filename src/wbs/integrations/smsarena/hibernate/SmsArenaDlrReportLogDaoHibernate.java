@@ -8,25 +8,25 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.hibernate.HibernateDao;
-import wbs.integrations.smsarena.model.SmsArenaInboundLogDao;
-import wbs.integrations.smsarena.model.SmsArenaInboundLogRec;
-import wbs.integrations.smsarena.model.SmsArenaInboundLogRec.SmsArenaInboundLogSearch;
+import wbs.integrations.smsarena.model.SmsArenaDlrReportLogDao;
+import wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec.SmsArenaDlrReportLogSearch;
+import wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec;
 
-public class SmsArenaInboundLogDaoHibernate
+public class SmsArenaDlrReportLogDaoHibernate
 	extends HibernateDao
-	implements SmsArenaInboundLogDao {
+	implements SmsArenaDlrReportLogDao {
 	
 	// implementation
 	
 	@Override
 	public
 	List<Integer> searchIds (
-			SmsArenaInboundLogSearch search) {
+			SmsArenaDlrReportLogSearch search) {
 	
 		Criteria criteria =
 			createCriteria (
-				SmsArenaInboundLogRec.class,
-				"_smsArenaInboundLog");
+				SmsArenaDlrReportLogRec.class,
+				"_smsArenaDlrReportLog");
 	
 		// restrict by route
 	
@@ -34,7 +34,7 @@ public class SmsArenaInboundLogDaoHibernate
 	
 			criteria.add (
 				Restrictions.eq (
-					"_smsArenaInboundLog.route.id",
+					"_smsArenaDlrReportLog.route.id",
 					search.getRouteId ()));
 	
 		}
@@ -45,7 +45,7 @@ public class SmsArenaInboundLogDaoHibernate
 	
 			criteria.add (
 				Restrictions.ge (
-					"_smsArenaInboundLog.timestamp",
+					"_smsArenaDlrReportLog.timestamp",
 					search.getTimestampAfter ()));
 	
 		}
@@ -54,7 +54,7 @@ public class SmsArenaInboundLogDaoHibernate
 	
 			criteria.add (
 				Restrictions.lt (
-					"_smsArenaInboundLog.timestamp",
+					"_smsArenaDlrReportLog.timestamp",
 					search.getTimestampBefore ()));
 	
 		}

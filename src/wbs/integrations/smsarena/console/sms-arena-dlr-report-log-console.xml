@@ -1,25 +1,25 @@
 <console-module
-	name="sms-arena-inbound-log">
+	name="sms-arena-dlr-report-log">
 
 	<console-helper-provider
-		object-name="smsArenaInboundLog"
+		object-name="smsArenaDlrReportLog"
 		view-delegate-field="root"
 		view-delegate-priv-code="manage">
 
 		<priv-key
-			name="smsArenaInboundLog.manage"
+			name="smsArenaDlrReportLog.manage"
 			delegate="root"
 			priv="manage"/>
 
 		<context-stuff
-			name="smsArenaInboundLogName"
+			name="smsArenaDlrReportLogName"
 			field="id"/>
 
 	</console-helper-provider>
 
 	<object-context
-		name="smsArenaInboundLog"
-		object-name="smsArenaInboundLog">
+		name="smsArenaDlrReportLog"
+		object-name="smsArenaDlrReportLog">
 
 		<list>
 
@@ -40,7 +40,7 @@
 
 	<field-set
 		name="search"
-		class="wbs.integrations.smsarena.model.SmsArenaInboundLogRec$SmsArenaInboundLogSearch">
+		class="wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec$SmsArenaDlrReportLogSearch">
 
 		<object-field
 			name="routeId"
@@ -60,7 +60,7 @@
 
 	<field-set
 		name="results"
-		object-name="smsArenaInboundLog">
+		object-name="smsArenaDlrReportLog">
 
 		<id-field/>
 
@@ -71,7 +71,7 @@
 
 	<field-set
 		name="summary"
-		object-name="smsArenaInboundLog">
+		object-name="smsArenaDlrReportLog">
 
 		<id-field/>
 

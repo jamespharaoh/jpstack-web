@@ -11,7 +11,6 @@ import wbs.framework.entity.annotations.ForeignIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.MasterField;
 import wbs.framework.entity.annotations.ReferenceField;
-import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
 import wbs.sms.route.core.model.RouteRec;

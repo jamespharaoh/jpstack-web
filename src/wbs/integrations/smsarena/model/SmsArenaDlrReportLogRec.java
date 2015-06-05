@@ -26,8 +26,8 @@ import wbs.sms.route.core.model.RouteRec;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id")
 @CommonEntity
-public class SmsArenaInboundLogRec 
-	implements CommonRecord<SmsArenaInboundLogRec> {
+public class SmsArenaDlrReportLogRec 
+	implements CommonRecord<SmsArenaDlrReportLogRec> {
 	
 	// id
 
@@ -40,7 +40,7 @@ public class SmsArenaInboundLogRec
 	RouteRec route;
 
 	@SimpleField
-	SmsArenaInboundLogType type;
+	SmsArenaDlrReportLogType type;
 
 	@SimpleField
 	Instant timestamp;
@@ -53,10 +53,10 @@ public class SmsArenaInboundLogRec
 	@Override
 	public
 	int compareTo (
-			Record<SmsArenaInboundLogRec> otherRecord) {
+			Record<SmsArenaDlrReportLogRec> otherRecord) {
 
-		SmsArenaInboundLogRec other =
-			(SmsArenaInboundLogRec) otherRecord;
+		SmsArenaDlrReportLogRec other =
+			(SmsArenaDlrReportLogRec) otherRecord;
 
 		return new CompareToBuilder ()
 
@@ -75,23 +75,23 @@ public class SmsArenaInboundLogRec
 	// dao methods
 
 	public static
-	interface SmsArenaInboundLogDaoMethods {
+	interface SmsArenaDlrReportLogDaoMethods {
 
 		List<Integer> searchIds (
-				SmsArenaInboundLogSearch smsArenaInboundLogSearch);
+				SmsArenaDlrReportLogSearch smsArenaDlrReportLogSearch);
 
 	}
 
 	// object hooks
 
 	public static
-	class SmsArenaInboundLogHooks
-		extends AbstractObjectHooks<SmsArenaInboundLogRec> {
+	class SmsArenaDlrReportLogHooks
+		extends AbstractObjectHooks<SmsArenaDlrReportLogRec> {
 
 		// dependencies
 
 		@Inject
-		SmsArenaInboundLogDao smsArenaInboundLogDao;
+		SmsArenaDlrReportLogDao smsArenaDlrReportLogDao;
 
 		// implementation
 
@@ -100,11 +100,11 @@ public class SmsArenaInboundLogRec
 		List<Integer> searchIds (
 				Object search) {
 
-			SmsArenaInboundLogSearch smsArenaInboundLogSearch =
-					(SmsArenaInboundLogSearch) search;
+			SmsArenaDlrReportLogSearch smsArenaDlrReportLogSearch =
+				(SmsArenaDlrReportLogSearch) search;
 
-				return smsArenaInboundLogDao.searchIds (
-					smsArenaInboundLogSearch);
+				return smsArenaDlrReportLogDao.searchIds (
+					smsArenaDlrReportLogSearch);
 
 		}
 
@@ -117,7 +117,7 @@ public class SmsArenaInboundLogRec
 	@EqualsAndHashCode
 	@ToString
 	public static
-	class SmsArenaInboundLogSearch {
+	class SmsArenaDlrReportLogSearch {
 
 		Instant timestampAfter;
 		Instant timestampBefore;

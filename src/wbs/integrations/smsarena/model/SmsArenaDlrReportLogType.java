@@ -1,7 +1,7 @@
 package wbs.integrations.smsarena.model;
 
 public
-enum SmsArenaInboundLogType {
+enum SmsArenaDlrReportLogType {
 
 	smsMessage,
 	unknownMessage,

@@ -18,9 +18,9 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Action;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.integrations.smsarena.model.SmsArenaInboundLogObjectHelper;
-import wbs.integrations.smsarena.model.SmsArenaInboundLogRec;
-import wbs.integrations.smsarena.model.SmsArenaInboundLogType;
+import wbs.integrations.smsarena.model.SmsArenaDlrReportLogObjectHelper;
+import wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec;
+import wbs.integrations.smsarena.model.SmsArenaDlrReportLogType;
 import wbs.integrations.smsarena.model.SmsArenaReportCodeObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaReportCodeRec;
 import wbs.integrations.smsarena.model.SmsArenaRouteInObjectHelper;
@@ -49,7 +49,7 @@ class SmsArenaDlrDispatchAction
 	ReportLogic reportLogic;
 
 	@Inject
-	SmsArenaInboundLogObjectHelper smsArenaInboundLogHelper;
+	SmsArenaDlrReportLogObjectHelper smsArenaDlrReportLogHelper;
 
 	@Inject
 	SmsArenaRouteInObjectHelper smsArenaRouteInHelper;
@@ -149,10 +149,7 @@ class SmsArenaDlrDispatchAction
 			debugLog.append (
 				stringFormat (
 					"\n"));
-			
-			routeId =
-				requestContext.requestInt ("routeId");
-	
+
 			id =
 				requestContext.parameter ("id");
 	
@@ -166,10 +163,13 @@ class SmsArenaDlrDispatchAction
 			Transaction transaction =
 				database.beginReadWrite (
 					this);
-	
+			
 			RouteRec route =
 				routeHelper.find (
-					routeId);
+					Integer.parseInt (
+						(String)
+						requestContext.request (
+							"routeId")));
 	
 			SmsArenaRouteInRec smsArenaRouteIn =
 				smsArenaRouteInHelper.find (
@@ -216,17 +216,22 @@ class SmsArenaDlrDispatchAction
 			Transaction transaction =
 				database.beginReadWrite (
 					this);
+				
+			RouteRec route =
+				routeHelper.find (
+					Integer.parseInt (
+						(String)
+						requestContext.request (
+							"routeId")));
 
-			smsArenaInboundLogHelper.insert (
-				new SmsArenaInboundLogRec ()
+			smsArenaDlrReportLogHelper.insert (
+				new SmsArenaDlrReportLogRec ()
 
 				.setRoute (
-					routeHelper.find (
-						requestContext.requestInt (
-							"routeId")))
+					route)
 
 				.setType (
-					SmsArenaInboundLogType.smsDelivery)
+					SmsArenaDlrReportLogType.smsDelivery)
 
 				.setTimestamp (
 					transaction.now ())
