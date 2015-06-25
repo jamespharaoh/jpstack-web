@@ -1,28 +1,24 @@
 package wbs.smsapps.manualresponder.model;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.joda.time.Interval;
 
-
-import wbs.framework.entity.annotations.ReferenceField;
-import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.ForeignIdField;
 import wbs.framework.entity.annotations.MasterField;
-
+import wbs.framework.entity.annotations.ReferenceField;
+import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
-
+import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.user.model.UserRec;
-
-import java.util.List;
-
-import org.joda.time.Interval;
-
 
 @Accessors (chain = true)
 @Data
@@ -57,6 +53,9 @@ class ManualResponderReportRec
 
 	@SimpleField
 	String timestring;
+
+	@ReferenceField
+	QueueItemRec queueItem;
 
 	// compare to
 

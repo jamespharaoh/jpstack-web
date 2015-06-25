@@ -460,8 +460,10 @@ class ObjectSettingsPageBuilder {
 
 		}
 
-		if (consoleHelper.nameExists ()
-				&& ! consoleHelper.nameIsCode ()) {
+		if (
+			consoleHelper.nameExists ()
+			&& ! consoleHelper.nameIsCode ()
+		) {
 
 			formFieldSpecs.add (
 				new NameFormFieldSpec ());

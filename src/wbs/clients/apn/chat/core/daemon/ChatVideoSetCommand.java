@@ -153,7 +153,8 @@ class ChatVideoSetCommand
 
 			chatMiscLogic.userAutoJoin (
 				chatUser,
-				message);
+				message,
+				true);
 
 		} else {
 

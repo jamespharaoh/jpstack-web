@@ -265,7 +265,8 @@ class ChatChatCommand
 
 			chatMiscLogic.userAutoJoin (
 				fromChatUser,
-				message);
+				message,
+				true);
 
 		}
 

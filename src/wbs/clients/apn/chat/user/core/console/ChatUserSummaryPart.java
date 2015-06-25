@@ -131,22 +131,41 @@ class ChatUserSummaryPart
 			chatUser.getType () == ChatUserType.user;
 
 		printFormat (
-			"<table class=\"details\">\n",
+			"<table class=\"details\">\n");
 
+		printFormat (
 			"<tr> <th>Id</th> <td>%h</td> </tr>\n",
-			chatUser.getId (),
+			chatUser.getId ());
 
+		printFormat (
 			"<tr> <th>Code</th> <td>%h</td> </tr>\n",
-			chatUser.getCode (),
+			chatUser.getCode ());
 
+		printFormat (
 			"<tr> <th>Type</th> <td>%h</td> </tr>\n",
-			ifNull (chatUser.getType ()),
+			ifNull (chatUser.getType ()));
 
+		printFormat (
 			"<tr> <th>Gender</th> <td>%h</td> </tr>\n",
-			ifNull (chatUser.getGender (), "-"),
+			ifNull (chatUser.getGender (), "-"));
 
-			"<tr> <th>Orient</th> <td>%h</td> </tr>\n",
-			ifNull (chatUser.getOrient (), "-"));
+		printFormat (
+			"<tr>\n",
+			"<th>Orient</th>\n",
+
+			"<td>%h</td>\n",
+			ifNull (chatUser.getOrient (), "-"),
+
+			"</tr>\n");
+
+		printFormat (
+			"<tr>\n",
+			"<th>Operator label</th>\n",
+
+			"<td>%h</td>\n",
+			chatUser.getOperatorLabel (),
+
+			"</tr>\n");
 
 		printFormat (
 			"<tr>\n",

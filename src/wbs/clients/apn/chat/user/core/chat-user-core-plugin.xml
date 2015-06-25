@@ -14,6 +14,7 @@
 		<custom-type name="chatUserType"/>
 		<custom-type name="gender"/>
 		<custom-type name="orient"/>
+		<enum-type name="chatUserOperatorLabel"/>
 		<model name="chatBadUser"/>
 		<model name="chatUser"/>
 		<model name="chatUserAlarm"/>

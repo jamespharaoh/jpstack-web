@@ -104,7 +104,13 @@ class ConsoleModuleBuilder
 			formField.init (
 				fieldSetName);
 
+			if (formField.fileUpload ())
+				formFieldSet.fileUpload (true);
+
 		}
+
+		if (formFieldSet.fileUpload () == null)
+			formFieldSet.fileUpload (false);
 
 		return formFieldSet;
 

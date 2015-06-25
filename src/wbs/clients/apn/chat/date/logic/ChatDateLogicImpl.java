@@ -234,15 +234,19 @@ class ChatDateLogicImpl
 				commandHelper.findByCode (chat, "help").getId (),
 				TemplateMissing.ignore,
 				ImmutableMap.<String,String>builder ()
+
 					.put (
 						"miles",
 						chatUser.getDateRadius ().toString ())
+
 					.put (
 						"start",
 						prettyHour (chatUser.getDateStartHour ()))
+
 					.put (
 						"end",
 						prettyHour (chatUser.getDateEndHour ()))
+
 					.build ());
 
 		}

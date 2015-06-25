@@ -38,8 +38,10 @@ class FormFieldSet {
 		Set<ScriptRef> scriptRefs =
 			new HashSet<ScriptRef> ();
 
-		for (FormField formField
-				: formFields) {
+		for (
+			FormField formField
+				: formFields
+		) {
 
 			scriptRefs.addAll (
 				formField.scriptRefs ());

@@ -291,7 +291,8 @@ class ChatMiscLogicImpl
 	public
 	void userAutoJoin (
 			ChatUserRec chatUser,
-			MessageRec message) {
+			MessageRec message,
+			boolean sendMessage) {
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -305,9 +306,11 @@ class ChatMiscLogicImpl
 
 			userJoin (
 				chatUser,
-				true,
+				sendMessage,
 				message.getThreadId (),
 				ChatMessageMethod.sms);
+
+			sendMessage = false;
 
 		}
 
@@ -325,7 +328,7 @@ class ChatMiscLogicImpl
 				chatUser.getMainChatUserImage () != null
 					? ChatUserDateMode.photo
 					: ChatUserDateMode.text,
-				true);
+				sendMessage);
 
 		}
 

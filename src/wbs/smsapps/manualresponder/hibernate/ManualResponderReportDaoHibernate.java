@@ -23,8 +23,8 @@ class ManualResponderReportDaoHibernate
 
 			createQuery (
 				"FROM ManualResponderReportRec report " +
-				"WHERE report.manualResponderRequest.timestamp >= :from " +
-					"AND report.manualResponderRequest.timestamp < :to")
+				"WHERE report.queueItem.processedTime >= :from " +
+					"AND report.queueItem.processedTime < :to")
 
 			.setTimestamp (
 				"from",

@@ -21,6 +21,8 @@ public
 class ChatMessagePendingFormResponder
 	extends HtmlResponder {
 
+	// dependencies
+
 	@Inject
 	ChatHelpTemplateConsoleHelper chatHelpTemplateHelper;
 
@@ -30,8 +32,12 @@ class ChatMessagePendingFormResponder
 	@Inject
 	ConsoleRequestContext requestContext;
 
+	// state
+
 	ChatMessageRec chatMessage;
 	List<ChatHelpTemplateRec> chatHelpTemplates;
+
+	// implementation
 
 	@Override
 	public
@@ -65,12 +71,15 @@ class ChatMessagePendingFormResponder
 
 			"var helpTemplates = new Array ();\n");
 
-		for (ChatHelpTemplateRec cht : chatHelpTemplates) {
+		for (
+			ChatHelpTemplateRec chatHelpTemplate
+				: chatHelpTemplates
+		) {
 
 			printFormat (
 				"helpTemplates[%s] = '%j';\n",
-				cht.getId (),
-				cht.getText ());
+				chatHelpTemplate.getId (),
+				chatHelpTemplate.getText ());
 
 		}
 

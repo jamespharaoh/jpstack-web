@@ -11,6 +11,7 @@ import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmRec;
+import wbs.clients.apn.chat.user.core.model.ChatUserOperatorLabel;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.console.context.ConsoleContextScriptRef;
@@ -129,6 +130,19 @@ class ChatMonitorInboxFormResponder
 
 			"</script>\n");
 
+		if (
+			userChatUser.getOperatorLabel ()
+				== ChatUserOperatorLabel.operator
+		) {
+
+			printFormat (
+				"<style type=\"text/css\">\n",
+				"h2 { background: #800000; }\n",
+				"table.details th { background: #800000; }\n",
+				"</style>\n"); 
+
+		}
+
 	}
 
 	String doName (
@@ -170,7 +184,8 @@ class ChatMonitorInboxFormResponder
 			return;
 
 		printFormat (
-			"<h2>Send message as monitor</h2>\n");
+			"<h2>Send message as %h</h2>\n",
+			userChatUser.getOperatorLabel ());
 
 		printFormat (
 			"<form",
