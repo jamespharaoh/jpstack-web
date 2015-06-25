@@ -6,7 +6,7 @@
 		view-delegate-field="root">
 
 		<priv-key
-			name="currency_manage"
+			name="currency.manage"
 			delegate="root"
 			priv="manage"/>
 
