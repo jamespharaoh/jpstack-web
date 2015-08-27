@@ -139,7 +139,7 @@ class Oxygen8Sender
 		) {
 
 			return new SetupSendResult ()
-				
+
 				.status (
 					SetupSendStatus.validationError)
 
@@ -164,7 +164,7 @@ class Oxygen8Sender
 		) {
 
 			return new SetupSendResult ()
-				
+
 				.status (
 					SetupSendStatus.validationError)
 
@@ -283,7 +283,7 @@ class Oxygen8Sender
 		HttpURLConnection urlConnection;
 
 		@Override
-		public 
+		public
 		PerformSendResult call ()
 			throws IOException {
 
@@ -307,22 +307,22 @@ class Oxygen8Sender
 
 		void openConnection ()
 			throws IOException {
-	
+
 			// create connection
-	
+
 			String urlString =
 				oxygen8RouteOut.getRelayUrl ();
-	
+
 			URL url =
 				new URL (
 					urlString);
-	
+
 			urlConnection =
 				(HttpURLConnection)
 				url.openConnection ();
-	
+
 			// set basic params
-	
+
 			urlConnection.setDoOutput (true);
 			urlConnection.setDoInput (true);
 			urlConnection.setAllowUserInteraction (false);
@@ -333,144 +333,144 @@ class Oxygen8Sender
 
 			urlConnection.setReadTimeout (
 				oxygen8RouteOut.getReadTimeout () * 1000);
-	
+
 			// set request params
-	
+
 			urlConnection.setRequestProperty (
 				"Content-Type",
 				joinWithSeparator (
 					"; ",
 					"application/x-www-form-urlencoded",
 					"charset=UTF-8"));
-	
+
 			urlConnection.setRequestProperty (
 				"User-Agent",
 				wbsConfig.httpUserAgent ());
-	
+
 		}
-	
+
 		Optional<PerformSendResult> sendRequest ()
 			throws IOException {
-	
+
 			Map<String,String> params =
 				new LinkedHashMap<String,String> ();
-	
+
 			params.put (
 				"Reference",
 				message.getId ().toString ());
-	
+
 			if (
 				isNotNull (
 					oxygen8RouteOut.getCampaignId ())
 			) {
-	
+
 				params.put (
 					"CampaignID",
 					oxygen8RouteOut.getCampaignId ());
-	
+
 			}
-	
+
 			params.put (
 				"Username",
 				oxygen8RouteOut.getUsername ());
-	
+
 			params.put (
 				"Password",
 				oxygen8RouteOut.getPassword ());
-	
+
 			// set multipart
-	
+
 			params.put (
 				"Multipart",
 				needMultipart
 					? "1"
 					: "0");
-	
+
 			// set shortcode and channel
-	
+
 			if (oxygen8RouteOut.getPremium ()) {
-	
+
 				params.put (
 					"Shortcode",
 					oxygen8RouteOut.getShortcode ());
-	
+
 				params.put (
 					"Channel",
 					oxygen8Network.getChannel ());
-	
+
 			} else {
-	
+
 				params.put (
 					"Mask",
 					message.getNumFrom ());
-	
+
 				params.put (
 					"Channel",
 					"BULK");
-	
+
 			}
-	
+
 			params.put (
 				"MSISDN",
 				message.getNumTo ());
-	
+
 			params.put (
 				"Content",
 				message.getText ().getText ());
-	
+
 			params.put (
 				"Premium",
 				route.getOutCharge () > 0
 					? "1"
 					: "0");
-	
+
 			StringBuilder paramsString =
 				new StringBuilder ();
-	
+
 			for (Map.Entry<String,String> paramEntry
 					: params.entrySet ()) {
-	
+
 				if (! params.isEmpty ())
 					paramsString.append ('&');
-	
+
 				paramsString.append (
 					paramEntry.getKey ());
-	
+
 				paramsString.append (
 					'=');
-	
+
 				paramsString.append (
 					Html.urlEncode (
 						paramEntry.getValue ()));
-	
+
 			}
-	
+
 			OutputStream out =
 				urlConnection.getOutputStream ();
-	
+
 			IOUtils.write (
 				paramsString.toString (),
 				out);
-	
+
 			return Optional.<PerformSendResult>absent ();
-	
+
 		}
-	
+
 		public
 		PerformSendResult readResponse ()
 			throws IOException {
-	
+
 			String responseString =
 				IOUtils.toString (
 					urlConnection.getInputStream ());
-	
+
 			log.debug (
 				stringFormat (
 					"Message %s code %s response: [%s]",
 					message.getId (),
 					urlConnection.getResponseCode (),
 					responseString));
-	
+
 			Map<String,Object> responseTrace =
 				ImmutableMap.<String,Object>builder ()
 
@@ -489,10 +489,10 @@ class Oxygen8Sender
 					.build ();
 
 			if (urlConnection.getResponseCode () == 200) {
-	
+
 				String responseLines[] =
 					responseString.split ("\n");
-	
+
 				if (responseLines.length != 3) {
 
 					return new PerformSendResult ()
@@ -501,14 +501,14 @@ class Oxygen8Sender
 							PerformSendStatus.unknownError)
 
 						.message (
-							stringFormat (	
+							stringFormat (
 								"Invalid response: %s",
 								responseString))
 
 						.responseTrace (
 							new JSONObject (
 								responseTrace));
-	
+
 				} else if (
 					equal (
 						responseLines [0],
@@ -516,7 +516,7 @@ class Oxygen8Sender
 				) {
 
 					List<String> otherIds =
-						ImmutableList.<String>copyOf (	
+						ImmutableList.<String>copyOf (
 							responseLines [2].split (","));
 
 					return new PerformSendResult ()
@@ -525,14 +525,14 @@ class Oxygen8Sender
 							PerformSendStatus.success)
 
 						.otherIds (
-							otherIds)						
-	
+							otherIds)
+
 						.responseTrace (
 							new JSONObject (
 								responseTrace));
 
 				} else {
-	
+
 					return new PerformSendResult ()
 
 						.status (
@@ -543,15 +543,15 @@ class Oxygen8Sender
 								"Error %s: %s",
 								responseLines [0],
 								responseLines [1]))
-	
+
 						.responseTrace (
 							new JSONObject (
 								responseTrace));
 
 				}
-	
+
 			}
-	
+
 			return new PerformSendResult ()
 
 				.status (
@@ -561,7 +561,7 @@ class Oxygen8Sender
 					stringFormat (
 						"Server returned %s",
 						urlConnection.getResponseCode ()))
-	
+
 				.responseTrace (
 					new JSONObject (
 						responseTrace));

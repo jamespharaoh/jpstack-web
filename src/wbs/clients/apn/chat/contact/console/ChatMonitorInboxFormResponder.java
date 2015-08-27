@@ -139,7 +139,7 @@ class ChatMonitorInboxFormResponder
 				"<style type=\"text/css\">\n",
 				"h2 { background: #800000; }\n",
 				"table.details th { background: #800000; }\n",
-				"</style>\n"); 
+				"</style>\n");
 
 		}
 

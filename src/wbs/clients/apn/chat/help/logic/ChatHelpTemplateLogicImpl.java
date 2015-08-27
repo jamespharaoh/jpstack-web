@@ -65,7 +65,7 @@ class ChatHelpTemplateLogicImpl
 	}
 
 	@Override
-	public 
+	public
 	MessageSplitter.Templates splitter (
 			@NonNull ChatRec chat,
 			@NonNull String templateCode,
