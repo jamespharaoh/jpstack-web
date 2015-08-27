@@ -10,13 +10,18 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONObject;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
@@ -28,15 +33,19 @@ import wbs.integrations.oxygen8.model.Oxygen8RouteOutObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutRec;
 import wbs.sms.gsm.Gsm;
 import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
+import wbs.sms.message.outbox.daemon.AbstractSmsSender2;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @SingletonComponent ("oxygen8Sender")
 public
 class Oxygen8Sender
-	extends AbstractSmsSender1<Oxygen8Sender.State> {
+	extends AbstractSmsSender2 {
 
 	// dependencies
 
@@ -61,8 +70,8 @@ class Oxygen8Sender
 	}
 
 	@Override
-	protected
-	String getSenderCode () {
+	public
+	String senderCode () {
 		return "oxygen8";
 	}
 
@@ -70,63 +79,111 @@ class Oxygen8Sender
 
 	@Override
 	protected
-	State getMessage (
+	SetupSendResult setupSend (
 			OutboxRec outbox) {
-
-		State state =
-			new State ();
 
 		// get stuff
 
-		state.messageId =
-			outbox.getId ();
-
-		state.message =
+		MessageRec message =
 			outbox.getMessage ();
 
-		state.route =
-			state.message.getRoute ();
+		RouteRec route =
+			message.getRoute ();
 
 		// lookup route out
 
-		state.oxygen8RouteOut =
+		Oxygen8RouteOutRec oxygen8RouteOut =
 			oxygen8RouteOutHelper.find (
-				state.route.getId ());
+				route.getId ());
 
-		if (state.oxygen8RouteOut == null) {
+		if (oxygen8RouteOut == null) {
 
-			throw tempFailure (
-				stringFormat (
-					"Oxygen8 outbound route not found for %s",
-					state.route.getCode ()));
+			return new SetupSendResult ()
+
+				.status (
+					SetupSendStatus.configError)
+
+				.message (
+					stringFormat (
+						"Oxygen8 outbound route not found for %s",
+						route.getCode ()));
 
 		}
 
 		// lookup network
 
-		state.oxygen8Network =
+		Oxygen8NetworkRec oxygen8Network =
 			oxygen8NetworkHelper.find (
-				state.oxygen8RouteOut.getOxygen8Config (),
-				state.message.getNumber ().getNetwork ());
+				oxygen8RouteOut.getOxygen8Config (),
+				message.getNumber ().getNetwork ());
 
-		if (state.oxygen8Network == null) {
+		if (oxygen8Network == null) {
 
-			throw tempFailure (
-				stringFormat (
-					"Oxygen8 network not found for %s",
-					state.message.getNumber ().getNetwork ().getId ()));
+			return new SetupSendResult ()
+
+				.status (
+					SetupSendStatus.configError)
+
+				.message (
+					stringFormat (
+						"Oxygen8 network not found for %s",
+						message.getNumber ().getNetwork ().getId ()));
+
+		}
+
+		// validate message text
+
+		if (
+			! Gsm.isGsm (
+				message.getText ().getText ())
+		) {
+
+			return new SetupSendResult ()
+				
+				.status (
+					SetupSendStatus.validationError)
+
+				.message (
+					"The message text contains non-GSM characters");
+
+		}
+
+		int gsmLength =
+			Gsm.length (
+				message.getText ().getText ());
+
+		boolean needMultipart =
+			gsmLength > 160;
+
+		boolean allowMultipart =
+			oxygen8RouteOut.getMultipart ();
+
+		if (
+			needMultipart
+			&& ! allowMultipart
+		) {
+
+			return new SetupSendResult ()
+				
+				.status (
+					SetupSendStatus.validationError)
+
+				.message (
+					stringFormat (
+						"Length is %s but multipart not enabled",
+						gsmLength));
 
 		}
 
 		// load lazy stuff
 
-		state.message.getText ().getText ();
-		state.message.getTags ().size ();
-		state.route.getCode ();
+		message.getText ().getText ();
+		message.getTags ().size ();
+		route.getCode ();
 
-		state.servicePath =
+		String servicePath =
 			objectManager.objectPath (
-				state.message.getService (),
+				message.getService (),
 				null,
 				true,
 				false);
@@ -135,7 +192,7 @@ class Oxygen8Sender
 
 		if (
 			equal (
-				state.message.getMessageType ().getCode (),
+				message.getMessageType ().getCode (),
 				"sms")
 		) {
 
@@ -143,295 +200,373 @@ class Oxygen8Sender
 
 		} else {
 
-			throw tempFailure (
-				stringFormat (
-					"Don't know what to do with a %s",
-					state.message.getMessageType ().getCode ()));
+			return new SetupSendResult ()
+
+				.status (
+					SetupSendStatus.unknownError)
+
+				.message (
+					stringFormat (
+						"Don't know what to do with a %s",
+						message.getMessageType ().getCode ()));
 
 		}
 
-		return state;
+		// create trace
+
+		Map<String,Object> requestTrace =
+			ImmutableMap.<String,Object>builder ()
+
+			.put (
+				"url",
+				oxygen8RouteOut.getRelayUrl ())
+
+			.put (
+				"method",
+				"GET")
+
+			.build ();
+
+		// return
+
+		PerformSendCallable performSendCallable =
+			new PerformSendCallable ()
+
+			.outbox (
+				outbox)
+
+			.message (
+				message)
+
+			.route (
+				route)
+
+			.oxygen8RouteOut (
+				oxygen8RouteOut)
+
+			.oxygen8Network (
+				oxygen8Network)
+
+			.servicePath (
+				servicePath)
+
+			.needMultipart (
+				needMultipart);
+
+		return new SetupSendResult ()
+
+			.status (
+				SetupSendStatus.success)
+
+			.requestTrace (
+				new JSONObject (
+					requestTrace))
+
+			.performSend (
+				performSendCallable);
 
 	}
 
-	@Override
-	protected
-	String[] sendMessage (
-			State state) {
+	@Accessors (fluent = true)
+	@Data
+	class PerformSendCallable
+		implements Callable<PerformSendResult> {
 
-		log.info (
-			stringFormat (
-				"Sending message %s",
-				state.messageId));
-
-		try {
-
-			openConnection (
-				state);
-
-			sendRequest (
-				state);
-
-			return readResponse (
-				state);
-
-		} catch (IOException exception) {
-
-			throw tempFailure (
-				stringFormat (
-					"IO error %s",
-					exception.getMessage ()));
-
-		}
-
-	}
-
-	static
-	class State {
-
-		int messageId;
 		OutboxRec outbox;
 		MessageRec message;
 		RouteRec route;
 		Oxygen8RouteOutRec oxygen8RouteOut;
 		Oxygen8NetworkRec oxygen8Network;
 		String servicePath;
-		HttpURLConnection urlConn;
+		Boolean needMultipart;
 
-	}
+		HttpURLConnection urlConnection;
 
-	void openConnection (
-			State state)
-		throws IOException {
+		@Override
+		public 
+		PerformSendResult call ()
+			throws IOException {
 
-		// create connection
-
-		String urlString =
-			state.oxygen8RouteOut.getRelayUrl ();
-
-		URL url =
-			new URL (
-				urlString);
-
-		state.urlConn =
-			(HttpURLConnection)
-			url.openConnection ();
-
-		// set basic params
-
-		state.urlConn.setDoOutput (true);
-		state.urlConn.setDoInput (true);
-		state.urlConn.setAllowUserInteraction (false);
-		state.urlConn.setRequestMethod ("POST");
-
-		// set request params
-
-		state.urlConn.setRequestProperty (
-			"Content-Type",
-			joinWithSeparator (
-				"; ",
-				"application/x-www-form-urlencoded",
-				"charset=UTF-8"));
-
-		state.urlConn.setRequestProperty (
-			"User-Agent",
-			wbsConfig.httpUserAgent ());
-
-	}
-
-	void sendRequest (
-			State state)
-		throws IOException {
-
-		Map<String,String> params =
-			new LinkedHashMap<String,String> ();
-
-		params.put (
-			"Reference",
-			state.message.getId ().toString ());
-
-		if (
-			isNotNull (
-				state.oxygen8RouteOut.getCampaignId ())
-		) {
-
-			params.put (
-				"CampaignID",
-				state.oxygen8RouteOut.getCampaignId ());
-
-		}
-
-		params.put (
-			"Username",
-			state.oxygen8RouteOut.getUsername ());
-
-		params.put (
-			"Password",
-			state.oxygen8RouteOut.getPassword ());
-
-		// set multipart
-
-		if (
-			! Gsm.isGsm (
-				state.message.getText ().getText ())
-		) {
-
-			throw permFailure (
+			log.info (
 				stringFormat (
-					"Text contains non-GSM characters"));
+					"Sending message %s",
+					message.getId ()));
 
-		}
+			openConnection ();
 
-		int gsmLength =
-			Gsm.length (
-				state.message.getText ().getText ());
+			Optional<PerformSendResult> sendRequestResult =
+				sendRequest ();
 
-		boolean needMultipart =
-			gsmLength > 160;
-
-		boolean allowMultipart =
-			state.oxygen8RouteOut.getMultipart ();
-
-		if (
-			needMultipart
-			&& ! allowMultipart
-		) {
-
-			throw tempFailure (
-				stringFormat (
-					"Length is %s but multipart not enabled",
-					gsmLength));
-
-		}
-
-		params.put (
-			"Multipart",
-			needMultipart
-				? "1"
-				: "0");
-
-		// set shortcode and channel
-
-		if (state.oxygen8RouteOut.getPremium ()) {
-
-			params.put (
-				"Shortcode",
-				state.oxygen8RouteOut.getShortcode ());
-
-			params.put (
-				"Channel",
-				state.oxygen8Network.getChannel ());
-
-		} else {
-
-			params.put (
-				"Mask",
-				state.message.getNumFrom ());
-
-			params.put (
-				"Channel",
-				"BULK");
-
-		}
-
-		params.put (
-			"MSISDN",
-			state.message.getNumTo ());
-
-		params.put (
-			"Content",
-			state.message.getText ().getText ());
-
-		params.put (
-			"Premium",
-			state.route.getOutCharge () > 0
-				? "1"
-				: "0");
-
-		StringBuilder paramsString =
-			new StringBuilder ();
-
-		for (Map.Entry<String,String> paramEntry
-				: params.entrySet ()) {
-
-			if (! params.isEmpty ())
-				paramsString.append ('&');
-
-			paramsString.append (
-				paramEntry.getKey ());
-
-			paramsString.append (
-				'=');
-
-			paramsString.append (
-				Html.urlEncode (
-					paramEntry.getValue ()));
-
-		}
-
-		OutputStream out =
-			state.urlConn.getOutputStream ();
-
-		IOUtils.write (
-			paramsString.toString (),
-			out);
-
-	}
-
-	public
-	String[] readResponse (
-			State state)
-		throws
-			IOException,
-			SendFailureException {
-
-		String responseString =
-			IOUtils.toString (
-				state.urlConn.getInputStream ());
-
-		log.debug (
-			stringFormat (
-				"Message %s code %s response: [%s]",
-				state.messageId,
-				state.urlConn.getResponseCode (),
-				responseString));
-
-		if (state.urlConn.getResponseCode () == 200) {
-
-			String responseLines[] =
-				responseString.split ("\n");
-
-			if (responseLines.length != 3) {
-
-				throw tempFailure (
-					stringFormat (
-						"Invalid response: %s",
-						responseString));
-
-			} else if (
-				equal (
-					responseLines [0],
-					"101")
-			) {
-
-				return responseLines [2].split (",");
-
-			} else {
-
-				throw tempFailure (
-					stringFormat (
-						"Error %s: %s",
-						responseLines [0],
-						responseLines [1]));
-
+			if (sendRequestResult.isPresent ()) {
+				return sendRequestResult.get ();
 			}
 
+			return readResponse ();
+
 		}
 
-		throw tempFailure (
-			stringFormat (
-				"Server returned %s",
-				state.urlConn.getResponseCode ()));
+		void openConnection ()
+			throws IOException {
+	
+			// create connection
+	
+			String urlString =
+				oxygen8RouteOut.getRelayUrl ();
+	
+			URL url =
+				new URL (
+					urlString);
+	
+			urlConnection =
+				(HttpURLConnection)
+				url.openConnection ();
+	
+			// set basic params
+	
+			urlConnection.setDoOutput (true);
+			urlConnection.setDoInput (true);
+			urlConnection.setAllowUserInteraction (false);
+			urlConnection.setRequestMethod ("POST");
+
+			urlConnection.setConnectTimeout (
+				oxygen8RouteOut.getConnectTimeout () * 1000);
+
+			urlConnection.setReadTimeout (
+				oxygen8RouteOut.getReadTimeout () * 1000);
+	
+			// set request params
+	
+			urlConnection.setRequestProperty (
+				"Content-Type",
+				joinWithSeparator (
+					"; ",
+					"application/x-www-form-urlencoded",
+					"charset=UTF-8"));
+	
+			urlConnection.setRequestProperty (
+				"User-Agent",
+				wbsConfig.httpUserAgent ());
+	
+		}
+	
+		Optional<PerformSendResult> sendRequest ()
+			throws IOException {
+	
+			Map<String,String> params =
+				new LinkedHashMap<String,String> ();
+	
+			params.put (
+				"Reference",
+				message.getId ().toString ());
+	
+			if (
+				isNotNull (
+					oxygen8RouteOut.getCampaignId ())
+			) {
+	
+				params.put (
+					"CampaignID",
+					oxygen8RouteOut.getCampaignId ());
+	
+			}
+	
+			params.put (
+				"Username",
+				oxygen8RouteOut.getUsername ());
+	
+			params.put (
+				"Password",
+				oxygen8RouteOut.getPassword ());
+	
+			// set multipart
+	
+			params.put (
+				"Multipart",
+				needMultipart
+					? "1"
+					: "0");
+	
+			// set shortcode and channel
+	
+			if (oxygen8RouteOut.getPremium ()) {
+	
+				params.put (
+					"Shortcode",
+					oxygen8RouteOut.getShortcode ());
+	
+				params.put (
+					"Channel",
+					oxygen8Network.getChannel ());
+	
+			} else {
+	
+				params.put (
+					"Mask",
+					message.getNumFrom ());
+	
+				params.put (
+					"Channel",
+					"BULK");
+	
+			}
+	
+			params.put (
+				"MSISDN",
+				message.getNumTo ());
+	
+			params.put (
+				"Content",
+				message.getText ().getText ());
+	
+			params.put (
+				"Premium",
+				route.getOutCharge () > 0
+					? "1"
+					: "0");
+	
+			StringBuilder paramsString =
+				new StringBuilder ();
+	
+			for (Map.Entry<String,String> paramEntry
+					: params.entrySet ()) {
+	
+				if (! params.isEmpty ())
+					paramsString.append ('&');
+	
+				paramsString.append (
+					paramEntry.getKey ());
+	
+				paramsString.append (
+					'=');
+	
+				paramsString.append (
+					Html.urlEncode (
+						paramEntry.getValue ()));
+	
+			}
+	
+			OutputStream out =
+				urlConnection.getOutputStream ();
+	
+			IOUtils.write (
+				paramsString.toString (),
+				out);
+	
+			return Optional.<PerformSendResult>absent ();
+	
+		}
+	
+		public
+		PerformSendResult readResponse ()
+			throws IOException {
+	
+			String responseString =
+				IOUtils.toString (
+					urlConnection.getInputStream ());
+	
+			log.debug (
+				stringFormat (
+					"Message %s code %s response: [%s]",
+					message.getId (),
+					urlConnection.getResponseCode (),
+					responseString));
+	
+			Map<String,Object> responseTrace =
+				ImmutableMap.<String,Object>builder ()
+
+					.put (
+						"status",
+						urlConnection.getResponseCode ())
+
+					.put (
+						"message",
+						urlConnection.getResponseMessage ())
+
+					.put (
+						"body",
+						responseString)
+
+					.build ();
+
+			if (urlConnection.getResponseCode () == 200) {
+	
+				String responseLines[] =
+					responseString.split ("\n");
+	
+				if (responseLines.length != 3) {
+
+					return new PerformSendResult ()
+
+						.status (
+							PerformSendStatus.unknownError)
+
+						.message (
+							stringFormat (	
+								"Invalid response: %s",
+								responseString))
+
+						.responseTrace (
+							new JSONObject (
+								responseTrace));
+	
+				} else if (
+					equal (
+						responseLines [0],
+						"101")
+				) {
+
+					List<String> otherIds =
+						ImmutableList.<String>copyOf (	
+							responseLines [2].split (","));
+
+					return new PerformSendResult ()
+
+						.status (
+							PerformSendStatus.success)
+
+						.otherIds (
+							otherIds)						
+	
+						.responseTrace (
+							new JSONObject (
+								responseTrace));
+
+				} else {
+	
+					return new PerformSendResult ()
+
+						.status (
+							PerformSendStatus.remoteError)
+
+						.message (
+							stringFormat (
+								"Error %s: %s",
+								responseLines [0],
+								responseLines [1]))
+	
+						.responseTrace (
+							new JSONObject (
+								responseTrace));
+
+				}
+	
+			}
+	
+			return new PerformSendResult ()
+
+				.status (
+					PerformSendStatus.unknownError)
+
+				.message (
+					stringFormat (
+						"Server returned %s",
+						urlConnection.getResponseCode ()))
+	
+				.responseTrace (
+					new JSONObject (
+						responseTrace));
+
+		}
 
 	}
 

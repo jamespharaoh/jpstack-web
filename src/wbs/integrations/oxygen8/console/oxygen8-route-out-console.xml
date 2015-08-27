@@ -112,6 +112,12 @@
 		<yes-no-field
 			name="multipart"/>
 
+		<seconds-field
+			name="connectTimeout"/>
+
+		<seconds-field
+			name="readTimeout"/>
+
 	</field-set>
 
 	<field-set
@@ -146,6 +152,12 @@
 		<yes-no-field
 			name="multipart"/>
 
+		<seconds-field
+			name="connectTimeout"/>
+
+		<seconds-field
+			name="readTimeout"/>
+
 	</field-set>
 
 	<field-set
@@ -179,6 +191,12 @@
 
 		<yes-no-field
 			name="multipart"/>
+
+		<seconds-field
+			name="connectTimeout"/>
+
+		<seconds-field
+			name="readTimeout"/>
 
 	</field-set>
 

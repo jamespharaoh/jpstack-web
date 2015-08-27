@@ -63,6 +63,14 @@ class Oxygen8RouteOutRec
 	@SimpleField
 	Boolean multipart = false;
 
+	// timeouts
+
+	@SimpleField
+	Integer connectTimeout = 60;
+
+	@SimpleField
+	Integer readTimeout = 60;
+
 	// compare to
 
 	@Override
