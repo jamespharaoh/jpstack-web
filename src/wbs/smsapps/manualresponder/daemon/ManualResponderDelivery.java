@@ -10,6 +10,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.sms.message.core.logic.MessageLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
@@ -34,6 +35,9 @@ class ManualResponderDelivery
 
 	@Inject
 	ManualResponderReplyObjectHelper manualResponderReplyHelper;
+
+	@Inject
+	MessageLogic messageLogic;
 
 	@Inject
 	OutboxLogic outboxLogic;
@@ -95,6 +99,41 @@ class ManualResponderDelivery
 
 					outboxLogic.unholdMessage (
 						nextMessage);
+
+				}
+
+			}
+
+		}
+
+		if (delivery.getNewMessageStatus ().isBadType ()) {
+
+			MessageRec deliveryMessage =
+				delivery.getMessage ();
+
+			ManualResponderReplyRec reply =
+				manualResponderReplyHelper.find (
+					deliveryMessage.getRef ());
+
+			Integer deliveryMessageIndex =
+				reply.getMessages ().indexOf (
+					deliveryMessage);
+
+			for (
+				int messageIndex = deliveryMessageIndex + 1;
+				messageIndex < reply.getMessages ().size ();
+				messageIndex ++
+			) {
+
+				MessageRec heldMessage =
+					reply.getMessages ().get (
+						messageIndex);
+
+				if (heldMessage.getStatus () == MessageStatus.held) {
+
+					messageLogic.messageStatus (
+						heldMessage,
+						MessageStatus.cancelled);
 
 				}
 
