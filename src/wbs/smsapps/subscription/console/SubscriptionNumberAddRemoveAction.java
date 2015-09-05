@@ -219,6 +219,12 @@ class SubscriptionNumberAddRemoveAction
 					.setActiveSubscriptionSub (
 						subscriptionSub)
 
+					.setSubscriptionAffiliate (
+						newSubscriptionAffiliate)
+
+					.setSubscriptionList (
+						newSubscriptionList)
+
 					.setNumSubs (
 						subscriptionNumber.getNumSubs () + 1)
 
