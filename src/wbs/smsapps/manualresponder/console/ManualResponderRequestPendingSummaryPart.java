@@ -64,6 +64,9 @@ public
 class ManualResponderRequestPendingSummaryPart
 	extends AbstractPagePart {
 
+	final
+	int maxResults = 100;
+
 	// dependencies
 
 	@Inject
@@ -318,9 +321,10 @@ class ManualResponderRequestPendingSummaryPart
 		// get request history
 
 		oldManualResponderRequests =
-			manualResponderRequestHelper.find (
+			manualResponderRequestHelper.findRecentLimit (
 				manualResponder,
-				manualResponderRequest.getNumber ());
+				manualResponderRequest.getNumber (),
+				maxResults + 1);
 
 		Collections.sort (
 			oldManualResponderRequests);
@@ -650,8 +654,24 @@ class ManualResponderRequestPendingSummaryPart
 		if (oldManualResponderRequests.isEmpty ())
 			return;
 
+		// title
+
 		printFormat (
 			"<h2>Request history</h2>\n");
+
+		// warning if we have omitted old requests
+
+		if (oldManualResponderRequests.size () > maxResults) {
+
+			printFormat (
+				"<p class=\"warning\">%h</p>\n",
+				stringFormat (
+					"Only showing the first %s results.",
+					maxResults));
+
+		}
+
+		// begin table
 
 		printFormat (
 			"<table class=\"list\">\n");
@@ -664,14 +684,20 @@ class ManualResponderRequestPendingSummaryPart
 			"<th>User</th>\n",
 			"</tr>\n");
 
+		// iterate requests
+
 		for (ManualResponderRequestRec oldManualResponderRequest
 				: oldManualResponderRequests) {
 
 			printFormat (
 				"<tr class=\"sep\">\n");
 
+			// iterate replies, which are shown before their requests
+
 			for (ManualResponderReplyRec oldReply
 					: oldManualResponderRequest.getReplies ()) {
+
+				// print reply
 
 				printFormat (
 					"<tr",
@@ -706,6 +732,8 @@ class ManualResponderRequestPendingSummaryPart
 
 			}
 
+			// print request
+
 			printFormat (
 				"<tr",
 				" class=\"message-in\"",
@@ -724,6 +752,8 @@ class ManualResponderRequestPendingSummaryPart
 					.getMessage ()
 					.getText ()
 					.getText ());
+
+			// print request medias
 
 			printFormat (
 				"<td>\n");
@@ -750,6 +780,8 @@ class ManualResponderRequestPendingSummaryPart
 			printFormat (
 				"</td>\n");
 
+			// print request user
+
 			printFormat (
 				"<td>%h</td>\n",
 				oldManualResponderRequest.getUser () != null
@@ -760,6 +792,8 @@ class ManualResponderRequestPendingSummaryPart
 				"</tr>\n");
 
 		}
+
+		// close table
 
 		printFormat (
 			"</table>\n");

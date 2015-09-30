@@ -2,6 +2,8 @@ package wbs.smsapps.manualresponder.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -21,25 +23,38 @@ class ManualResponderRequestDaoHibernate
 
 	@Override
 	public
-	List<ManualResponderRequestRec> find (
-			ManualResponderRec manualResponder,
-			NumberRec number) {
+	List<ManualResponderRequestRec> findRecentLimit (
+			@NonNull ManualResponderRec manualResponder,
+			@NonNull NumberRec number,
+			@NonNull Integer maxResults) {
 
 		return findMany (
 			ManualResponderRequestRec.class,
 
-			createQuery (
-				"FROM ManualResponderRequestRec manualResponderRequest " +
-				"WHERE manualResponderRequest.manualResponder = :manualResponder " +
-					"AND manualResponderRequest.number = :number")
+			createCriteria (
+				ManualResponderRequestRec.class,
+				"_manualResponderRequest")
 
-			.setEntity (
-				"manualResponder",
-				manualResponder)
+			.add (
+				Restrictions.eq (
+					"_manualResponderRequest.manualResponder",
+					manualResponder))
 
-			.setEntity (
-				"number",
-				number)
+			.add (
+				Restrictions.eq (
+					"_manualResponderRequest.number",
+					number))
+
+			.addOrder (
+				Order.desc (
+					"_manualResponderRequest.timestamp"))
+
+			.addOrder (
+				Order.desc (
+					"_manualResponderRequest.id"))
+
+			.setMaxResults (
+				maxResults)
 
 			.list ());
 
