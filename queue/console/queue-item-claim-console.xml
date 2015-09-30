@@ -51,11 +51,11 @@
 
 		<object-field
 			name="user"
-			finder="user"/>
+			object-type="user"/>
 
 		<object-field
 			name="unclaimUser"
-			finder="user"/>
+			object-type="user"/>
 
 		<timestamp-field
 			name="startTime"/>
