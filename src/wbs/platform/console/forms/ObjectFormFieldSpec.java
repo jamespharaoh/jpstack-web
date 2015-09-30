@@ -29,9 +29,9 @@ class ObjectFormFieldSpec {
 	Boolean readOnly;
 
 	@DataAttribute (
-		value = "finder",
+		value = "object-type",
 		required = true)
-	String finderName;
+	String objectTypeName;
 
 	@DataAttribute ("root-field")
 	String rootFieldName;

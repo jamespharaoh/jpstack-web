@@ -58,7 +58,7 @@
 
 		<object-field
 			name="chat"
-			finder="chat"/>
+			object-type="chat"/>
 
 		<code-field
 			name="yearMonth"
@@ -75,7 +75,7 @@
 
 		<object-field
 			name="chat"
-			finder="chat"/>
+			object-type="chat"/>
 
 		<code-field
 			name="yearMonth"
@@ -92,7 +92,7 @@
 
 		<object-field
 			name="chat"
-			finder="chat"/>
+			object-type="chat"/>
 
 		<code-field
 			name="yearMonth"
@@ -109,7 +109,7 @@
 
 		<object-field
 			name="chat"
-			finder="chat"/>
+			object-type="chat"/>
 
 		<code-field
 			name="yearMonth"

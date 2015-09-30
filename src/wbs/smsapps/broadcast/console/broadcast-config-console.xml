@@ -137,11 +137,11 @@
 
 		<object-field
 			name="router"
-			finder="router"/>
+			object-type="router"/>
 
 		<object-field
 			name="blockNumberLookup"
-			finder="numberLookup"/>
+			object-type="numberLookup"/>
 
 		<text-area-field
 			name="defaultNumbers"/>
@@ -161,15 +161,15 @@
 
 		<object-field
 			name="router"
-			finder="router"/>
+			object-type="router"/>
 
 		<object-field
 			name="blockNumberLookup"
-			finder="numberLookup"/>
+			object-type="numberLookup"/>
 
 		<object-field
 			name="numberFormat"
-			finder="numberFormat"/>
+			object-type="numberFormat"/>
 
 		<text-area-field
 			name="defaultNumbers"

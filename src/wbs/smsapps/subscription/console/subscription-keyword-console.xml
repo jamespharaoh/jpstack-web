@@ -63,12 +63,12 @@
 		<object-field
 			name="subscriptionList"
 			label="List"
-			finder="subscriptionList"/>
+			object-type="subscriptionList"/>
 
 		<object-field
 			name="subscriptionAffiliate"
 			label="Affiliate"
-			finder="subscriptionAffiliate"/>
+			object-type="subscriptionAffiliate"/>
 
 	</field-set>
 
@@ -82,12 +82,12 @@
 		<object-field
 			name="subscriptionList"
 			label="List"
-			finder="subscriptionList"/>
+			object-type="subscriptionList"/>
 
 		<object-field
 			name="subscriptionAffiliate"
 			label="Affiliate"
-			finder="subscriptionAffiliate"/>
+			object-type="subscriptionAffiliate"/>
 
 	</field-set>
 
@@ -104,12 +104,12 @@
 		<object-field
 			name="subscriptionList"
 			label="List"
-			finder="subscriptionList"/>
+			object-type="subscriptionList"/>
 
 		<object-field
 			name="subscriptionAffiliate"
 			label="Affiliate"
-			finder="subscriptionAffiliate"/>
+			object-type="subscriptionAffiliate"/>
 
 	</field-set>
 
@@ -126,12 +126,12 @@
 		<object-field
 			name="subscriptionList"
 			label="List"
-			finder="subscriptionList"/>
+			object-type="subscriptionList"/>
 
 		<object-field
 			name="subscriptionAffiliate"
 			label="Affiliate"
-			finder="subscriptionAffiliate"/>
+			object-type="subscriptionAffiliate"/>
 
 	</field-set>
 

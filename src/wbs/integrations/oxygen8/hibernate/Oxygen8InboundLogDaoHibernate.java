@@ -60,6 +60,17 @@ class Oxygen8InboundLogDaoHibernate
 
 		}
 
+		// restrict by details
+
+		if (search.getDetails () != null) {
+
+			criteria.add (
+				Restrictions.ilike (
+					"_oxygen8InboundLog.details",
+					search.getDetails ()));
+
+		}
+
 		// add default order
 
 		criteria

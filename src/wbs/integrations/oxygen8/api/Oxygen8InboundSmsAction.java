@@ -1,5 +1,7 @@
 package wbs.integrations.oxygen8.api;
 
+import static wbs.framework.utils.etc.Misc.bytesToString;
+import static wbs.framework.utils.etc.Misc.fromHex;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -88,7 +90,8 @@ class Oxygen8InboundSmsAction
 	String trigger;
 	String shortcode;
 	String msisdn;
-	String content;
+	String rawContent;
+	String textContent;
 	Integer dataType;
 	Long dateReceived;
 	Integer campaignId;
@@ -254,14 +257,31 @@ class Oxygen8InboundSmsAction
 		msisdn =
 			requestContext.parameter ("MSISDN");
 
-		content =
+		rawContent =
 			requestContext.parameter ("Content");
 
 		dataType =
 			Integer.parseInt (
 				requestContext.parameter ("DataType"));
 
-		if (dataType != 0) {
+		switch (dataType) {
+
+		case 0:
+
+			textContent = rawContent;
+
+			break;
+
+		case 3:
+
+			textContent =
+				bytesToString (
+					fromHex (rawContent),
+					"utf-16be");
+
+			break;
+
+		default:
 
 			throw new RuntimeException (
 				stringFormat (
@@ -317,7 +337,8 @@ class Oxygen8InboundSmsAction
 
 		inboxLogic.inboxInsert (
 			Optional.of (reference),
-			textHelper.findOrCreate (content),
+			textHelper.findOrCreate (
+				textContent),
 			msisdn,
 			shortcode,
 			route,

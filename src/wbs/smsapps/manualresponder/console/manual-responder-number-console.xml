@@ -44,7 +44,7 @@
 
 		<object-field
 			name="number"
-			finder="number"/>
+			object-type="number"/>
 
 		<text-area-field
 			name="notesText"

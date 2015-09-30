@@ -75,7 +75,7 @@
 
 		<object-field
 			name="createdUser"
-			finder="user"/>
+			object-type="user"/>
 
 	</field-set>
 
@@ -100,7 +100,7 @@
 
 		<object-field
 			name="createdUser"
-			finder="user"/>
+			object-type="user"/>
 
 	</field-set>
 

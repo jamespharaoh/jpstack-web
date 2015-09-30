@@ -132,7 +132,7 @@
 		<object-field
 			name="smsTracker"
 			label="SMS tracker"
-			finder="smsTracker"/>
+			object-type="smsTracker"/>
 
 	</field-set>
 
@@ -199,7 +199,7 @@
 		<object-field
 			name="smsTracker"
 			label="SMS tracker"
-			finder="smsTracker"/>
+			object-type="smsTracker"/>
 
 	</field-set>
 

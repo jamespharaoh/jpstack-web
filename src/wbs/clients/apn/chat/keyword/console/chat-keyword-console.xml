@@ -64,7 +64,7 @@
 
 		<object-field
 			name="command"
-			finder="command"/>
+			object-type="command"/>
 
 		<yes-no-field
 			name="noCreditCheck"/>
@@ -104,12 +104,12 @@
 
 		<object-field
 			name="joinChatAffiliate"
-			finder="chatAffiliate"
+			object-type="chatAffiliate"
 			root-field="chat"/>
 
 		<object-field
 			name="command"
-			finder="command"/>
+			object-type="command"/>
 
 		<yes-no-field
 			name="noCreditCheck"/>

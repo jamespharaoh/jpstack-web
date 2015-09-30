@@ -60,7 +60,7 @@
 		<object-field
 			name="imChatProfile"
 			label="Profile"
-			finder="imChatProfile"/>
+			object-type="imChatProfile"/>
 
 		<integer-field
 			name="numMessages"
@@ -82,7 +82,7 @@
 		<object-field
 			name="imChatProfile"
 			label="Profile"
-			finder="imChatProfile"/>
+			object-type="imChatProfile"/>
 
 		<integer-field
 			name="numMessages"/>

@@ -56,7 +56,7 @@
 
 		<object-field
 			name="router"
-			finder="router"/>
+			object-type="router"/>
 
 		<yes-no-field
 			name="customisable"
@@ -81,7 +81,7 @@
 
 		<object-field
 			name="router"
-			finder="router"/>
+			object-type="router"/>
 
 		<text-field
 			name="number"/>
@@ -94,7 +94,7 @@
 
 		<object-field
 			name="replyKeywordSet"
-			finder="keywordSet"/>
+			object-type="keywordSet"/>
 
 		<integer-field
 			name="maximumMessages"
@@ -143,7 +143,7 @@
 
 		<object-field
 			name="router"
-			finder="router"/>
+			object-type="router"/>
 
 		<text-field
 			name="number"/>
@@ -156,7 +156,7 @@
 
 		<object-field
 			name="replyKeywordSet"
-			finder="keywordSet"/>
+			object-type="keywordSet"/>
 
 		<integer-field
 			name="maximumMessages"
@@ -208,7 +208,7 @@
 
 		<object-field
 			name="router"
-			finder="router"/>
+			object-type="router"/>
 
 		<text-field
 			name="number"/>
@@ -221,7 +221,7 @@
 
 		<object-field
 			name="replyKeywordSet"
-			finder="keywordSet"/>
+			object-type="keywordSet"/>
 
 		<integer-field
 			name="maximumMessages"

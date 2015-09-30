@@ -53,7 +53,7 @@
 
 		<object-field
 			name="network"
-			finder="network"/>
+			object-type="network"/>
 
 	</field-set>
 
@@ -65,7 +65,7 @@
 
 		<object-field
 			name="network"
-			finder="network"/>
+			object-type="network"/>
 
 	</field-set>
 
@@ -79,7 +79,7 @@
 
 		<object-field
 			name="network"
-			finder="network"/>
+			object-type="network"/>
 
 	</field-set>
 
@@ -93,7 +93,7 @@
 
 		<object-field
 			name="network"
-			finder="network"/>
+			object-type="network"/>
 
 	</field-set>
 

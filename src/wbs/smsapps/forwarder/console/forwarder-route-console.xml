@@ -75,7 +75,7 @@
 
 		<object-field
 			name="router"
-			finder="router"/>
+			object-type="router"/>
 
 		<text-field
 			name="number"/>
@@ -95,7 +95,7 @@
 
 		<object-field
 			name="router"
-			finder="router"/>
+			object-type="router"/>
 
 		<text-field
 			name="number"/>

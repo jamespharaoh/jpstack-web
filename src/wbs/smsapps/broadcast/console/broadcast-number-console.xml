@@ -42,7 +42,7 @@
 
 		<object-field
 			name="number"
-			finder="number"/>
+			object-type="number"/>
 
 		<enum-field
 			name="state"
@@ -50,15 +50,15 @@
 
 		<object-field
 			name="addedByUser"
-			finder="user"/>
+			object-type="user"/>
 
 		<object-field
 			name="removedByUser"
-			finder="user"/>
+			object-type="user"/>
 
 		<object-field
 			name="message"
-			finder="message"/>
+			object-type="message"/>
 
 	</field-set>
 

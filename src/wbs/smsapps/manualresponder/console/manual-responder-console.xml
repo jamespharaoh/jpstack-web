@@ -111,11 +111,11 @@
 
 		<object-field
 			name="unblockNumberList"
-			finder="numberList"/>
+			object-type="numberList"/>
 
 		<object-field
 			name="smsCustomerManager"
-			finder="smsCustomerManager"/>
+			object-type="smsCustomerManager"/>
 
 	</field-set>
 
@@ -148,15 +148,15 @@
 
 		<object-field
 			name="currency"
-			finder="currency"/>
+			object-type="currency"/>
 
 		<object-field
 			name="unblockNumberList"
-			finder="numberList"/>
+			object-type="numberList"/>
 
 		<object-field
 			name="smsCustomerManager"
-			finder="smsCustomerManager"/>
+			object-type="smsCustomerManager"/>
 
 	</field-set>
 

@@ -60,7 +60,7 @@
 		<object-field
 			name="oxygen8Config"
 			label="Config"
-			finder="oxygen8Config"/>
+			object-type="oxygen8Config"/>
 
 		<text-field
 			name="shortcode"/>
@@ -88,7 +88,7 @@
 
 		<object-field
 			name="oxygen8Config"
-			finder="oxygen8Config"/>
+			object-type="oxygen8Config"/>
 
 		<text-field
 			name="relayUrl"/>
@@ -129,7 +129,7 @@
 
 		<object-field
 			name="oxygen8Config"
-			finder="oxygen8Config"/>
+			object-type="oxygen8Config"/>
 
 		<text-field
 			name="relayUrl"/>
@@ -168,7 +168,7 @@
 
 		<object-field
 			name="oxygen8Config"
-			finder="oxygen8Config"/>
+			object-type="oxygen8Config"/>
 
 		<text-field
 			name="relayUrl"/>

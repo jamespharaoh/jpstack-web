@@ -127,7 +127,7 @@
 
 		<object-field
 			name="billedRoute"
-			finder="route"/>
+			object-type="route"/>
 
 		<text-field
 			name="billedNumber"/>
@@ -137,7 +137,7 @@
 
 		<object-field
 			name="freeRouter"
-			finder="router"/>
+			object-type="router"/>
 
 		<text-field
 			name="freeNumber"/>
@@ -173,7 +173,7 @@
 
 		<object-field
 			name="billedRoute"
-			finder="route"
+			object-type="route"
 			nullable="yes"/>
 
 		<text-field
@@ -186,7 +186,7 @@
 
 		<object-field
 			name="freeRouter"
-			finder="router"
+			object-type="router"
 			nullable="yes"/>
 
 		<text-field

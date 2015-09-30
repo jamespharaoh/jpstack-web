@@ -43,7 +43,7 @@
 		<object-field
 			name="senderUser"
 			label="User"
-			finder="user"/>
+			object-type="user"/>
 
 		<text-field
 			name="messageText"

@@ -15,7 +15,9 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.record.Record;
+import wbs.framework.utils.etc.BeanLogic;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.helper.ConsoleHelperRegistry;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -46,6 +48,10 @@ class ObjectFormFieldBuilder {
 	@Inject
 	Provider<IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
+
+	@Inject
+	Provider<ObjectIdFormFieldNativeMapping>
+	objectIdFormFieldNativeMappingProvider;
 
 	@Inject
 	Provider<SimpleFormFieldAccessor>
@@ -105,44 +111,89 @@ class ObjectFormFieldBuilder {
 				spec.readOnly (),
 				false);
 
-		EntityFinder<?> entityFinder =
+		ConsoleHelper<?> consoleHelper =
 			consoleHelperRegistry.findByObjectName (
-				spec.finderName ());
+				spec.objectTypeName ());
 
-		if (entityFinder == null) {
+		if (consoleHelper == null) {
 
 			throw new RuntimeException (
 				stringFormat (
-					"Entity finder does not exist: %s",
-					spec.finderName ()));
+					"Console helper does not exist: %s",
+					spec.objectTypeName ()));
 
 		}
 
 		String rootFieldName =
 			spec.rootFieldName ();
 
-		// field components
+		// field type
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+		Class<?> propertyClass =
+			BeanLogic.propertyClass (
+				context.containerClass (),
+				name);
 
-			.name (
-				name)
+		FormFieldAccessor accessor;
+		FormFieldNativeMapping nativeMapping;
 
-			.nativeClass (
-				Record.class);
+		if (propertyClass == Integer.class) {
 
-		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+			// accessor
+
+			accessor =
+				simpleFormFieldAccessorProvider.get ()
+
+				.name (
+					name)
+
+				.nativeClass (
+					Integer.class);
+
+			// native mapping
+
+			nativeMapping =
+				objectIdFormFieldNativeMappingProvider.get ()
+
+				.consoleHelper (
+					consoleHelper);
+
+		} else {
+
+			// accessor
+
+			accessor =
+				simpleFormFieldAccessorProvider.get ()
+
+				.name (
+					name)
+
+				.nativeClass (
+					Record.class);
+
+			// native mapping
+
+			nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
+
+		}
+
+		// value validator
 
 		FormFieldValueValidator valueValidator =
 			nullFormFieldValueValidatorProvider.get ();
 
+		// constraint validator
+
 		FormFieldConstraintValidator constraintValidator =
 			objectFormFieldConstraintValidatorProvider.get ();
 
+		// interface mapping
+
 		FormFieldInterfaceMapping interfaceMapping =
 			identityFormFieldInterfaceMappingProvider.get ();
+
+		// renderer
 
 		FormFieldRenderer renderer =
 			objectFormFieldRendererProvider.get ()
@@ -160,7 +211,7 @@ class ObjectFormFieldBuilder {
 				rootFieldName)
 
 			.entityFinder (
-				entityFinder);
+				consoleHelper);
 
 		FormFieldUpdateHook updateHook =
 			simpleFormFieldUpdateHookProvider.get ()
