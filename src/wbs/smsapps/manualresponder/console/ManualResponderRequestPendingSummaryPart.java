@@ -19,11 +19,13 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.log4j.Level;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
+import wbs.framework.utils.etc.ProfileLogger;
 import wbs.platform.console.context.ConsoleContextScriptRef;
 import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.html.ScriptRef;
@@ -65,7 +67,7 @@ class ManualResponderRequestPendingSummaryPart
 	extends AbstractPagePart {
 
 	final
-	int maxResults = 100;
+	int maxResults = 1000;
 
 	// dependencies
 
@@ -154,6 +156,15 @@ class ManualResponderRequestPendingSummaryPart
 	public
 	void prepare () {
 
+		ProfileLogger profileLogger =
+			new ProfileLogger (
+				log,
+				Level.INFO,
+				"prepare");
+
+		profileLogger.lap (
+			"load basics");
+
 		manualResponderRequest =
 			manualResponderRequestHelper.find (
 				requestContext.stuffInt (
@@ -191,6 +202,9 @@ class ManualResponderRequestPendingSummaryPart
 
 		// get routes
 
+		profileLogger.lap (
+			"load routes");
+
 		Set<RouteRec> routes =
 			new HashSet<RouteRec> ();
 
@@ -213,6 +227,9 @@ class ManualResponderRequestPendingSummaryPart
 		}
 
 		// get bill counts per route
+
+		profileLogger.lap (
+			"load route bill counts");
 
 		Instant startOfToday =
 			LocalDate.now ()
@@ -320,6 +337,9 @@ class ManualResponderRequestPendingSummaryPart
 
 		// get request history
 
+		profileLogger.lap (
+			"load request history");
+
 		oldManualResponderRequests =
 			manualResponderRequestHelper.findRecentLimit (
 				manualResponder,
@@ -328,6 +348,8 @@ class ManualResponderRequestPendingSummaryPart
 
 		Collections.sort (
 			oldManualResponderRequests);
+
+		profileLogger.end ();
 
 	}
 
