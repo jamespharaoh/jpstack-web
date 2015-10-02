@@ -47,7 +47,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.cal.CalDate;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.misc.TimeFormatter;
@@ -274,15 +274,15 @@ class ChatMonitorInboxSummaryPart
 				super.scriptRefs ())
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/jquery-1.7.1.js"))
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/jquery.jeditable.mini.js"))
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/chat-monitor-inbox-summary.js"))
 
 			.build ();

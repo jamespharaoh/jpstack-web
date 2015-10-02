@@ -13,7 +13,7 @@ import wbs.platform.console.request.ConsoleRequestContext;
 	of = { "applicationSource", "type" },
 	callSuper = false
 )
-public 
+public
 class ConsoleApplicationScriptRef
 	extends ScriptRef {
 

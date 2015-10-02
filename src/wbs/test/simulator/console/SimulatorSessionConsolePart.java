@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.html.SelectBuilder;
 import wbs.platform.console.part.AbstractPagePart;
@@ -55,11 +55,11 @@ class SimulatorSessionConsolePart
 				super.scriptRefs ())
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/jquery-1.7.1.js"))
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/simulator.js"))
 
 			.build ();

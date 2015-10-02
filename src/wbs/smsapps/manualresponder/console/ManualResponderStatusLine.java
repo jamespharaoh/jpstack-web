@@ -29,7 +29,7 @@ import wbs.smsapps.manualresponder.model.ManualResponderReportObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReportRec;
 
 @SingletonComponent ("manualResponderStatusLine")
-public 
+public
 class ManualResponderStatusLine
 	implements StatusLine {
 
@@ -98,7 +98,7 @@ class ManualResponderStatusLine
 				caches);
 
 		}
-		
+
 		// return update script
 
 		return stringFormat (
@@ -118,12 +118,12 @@ class ManualResponderStatusLine
 
 		class NumTodayCache
 			extends CachedGetter<Integer> {
-		
+
 			public
 			NumTodayCache () {
 				super (5000);
 			}
-		
+
 			@Override
 			public
 			Integer refresh () {
@@ -166,12 +166,12 @@ class ManualResponderStatusLine
 
 		class NumThisHourCache
 			extends CachedGetter<Integer> {
-		
+
 			public
 			NumThisHourCache () {
 				super (5000);
 			}
-		
+
 			@Override
 			public
 			Integer refresh () {
@@ -215,7 +215,7 @@ class ManualResponderStatusLine
 				return total;
 
 			}
-		
+
 		}
 
 		NumTodayCache numTodayCache =

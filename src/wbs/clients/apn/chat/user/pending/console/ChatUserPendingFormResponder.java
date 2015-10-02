@@ -21,7 +21,7 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.HtmlResponder;
@@ -76,7 +76,7 @@ class ChatUserPendingFormResponder
 				super.scriptRefs ())
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/jquery-1.4.2.js"))
 
 			.build ();

@@ -1,9 +1,13 @@
 package wbs.framework.application.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.tools.DataFromXml;
 
@@ -65,6 +69,13 @@ class WbsConfig {
 	@DataAttribute (
 		required = true)
 	String defaultEmailAddress;
+
+	@DataChildren (
+		childrenElement = "test-users",
+		childElement = "test-user",
+		valueAttribute = "name")
+	List<String> testUsers =
+		new ArrayList<String> ();
 
 	// implementation
 

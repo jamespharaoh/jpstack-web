@@ -14,7 +14,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserOperatorLabel;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.request.ConsoleRequestContext;
@@ -55,11 +55,11 @@ class ChatMonitorInboxFormResponder
 				super.scriptRefs ())
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/gsm.js"))
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/DOM.js"))
 
 			.build ();

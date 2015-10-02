@@ -20,8 +20,8 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 import wbs.framework.utils.etc.StringFormatter;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.context.ConsoleContext;
-import wbs.platform.console.context.ConsoleContextScriptRef;
 import wbs.platform.console.context.ConsoleContextType;
 import wbs.platform.console.html.HtmlLink;
 import wbs.platform.console.html.ScriptRef;
@@ -100,11 +100,11 @@ class ChatUserSearchResultsPart
 				super.scriptRefs ())
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/jquery-1.7.1.js"))
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/page-builder.js"))
 
 			.build ();

@@ -52,6 +52,9 @@
 		<timestamp-field
 			name="endTime"/>
 
+		<text-field
+			name="userAgent"/>
+
 	</field-set>
 
 	<field-set
@@ -66,6 +69,9 @@
 
 		<timestamp-field
 			name="endTime"/>
+
+		<text-field
+			name="userAgent"/>
 
 	</field-set>
 

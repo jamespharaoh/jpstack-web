@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.HtmlResponder;
@@ -55,11 +55,11 @@ class ChatHelpLogPendingFormResponder
 				super.scriptRefs ())
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/gsm.js"))
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/DOM.js"))
 
 			.build ();

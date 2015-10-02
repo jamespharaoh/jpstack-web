@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.forms.FormFieldLogic;
 import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.helper.ConsoleHelper;
@@ -195,12 +195,12 @@ class ObjectLinksPart
 	Set<ScriptRef> scriptRefs =
 		ImmutableSet.<ScriptRef> of (
 
-			new ConsoleContextScriptRef (
-				"/js/DOM.js",
-				"text/javascript"),
+		ConsoleApplicationScriptRef.javascript (
+			"/js/DOM.js"),
 
-			new ConsoleContextScriptRef (
-				"/js/wbs.js",
-				"text/javascript"));
+		ConsoleApplicationScriptRef.javascript (
+			"/js/wbs.js")
+
+	);
 
 }

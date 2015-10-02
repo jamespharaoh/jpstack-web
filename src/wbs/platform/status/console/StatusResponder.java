@@ -65,7 +65,7 @@ class StatusResponder
 	}
 
 	@Override
-	protected 
+	protected
 	Set<ScriptRef> scriptRefs () {
 
 		return ImmutableSet.<ScriptRef>builder ()

@@ -795,6 +795,10 @@ class DataFromXml {
 			if (
 				! dataChildrenAnnotation.direct ()
 				&& ! dataChildrenAnnotation.childElement ().isEmpty ()
+				&& (
+					field.getType () != Map.class
+					&& field.getType () != List.class
+				)
 			) {
 
 				throw new RuntimeException (

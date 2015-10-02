@@ -4,7 +4,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.console.part.AbstractPagePart;
 
 @PrototypeComponent ("manualResponderStatusLinePart")
-public 
+public
 class ManualResponderStatusLinePart
 	extends AbstractPagePart {
 
