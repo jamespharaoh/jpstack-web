@@ -108,7 +108,7 @@ class ManualResponderReportServicePart
 			new ArrayList<Long> ();
 
 		reports =
-			manualResponderReportHelper.find (
+			manualResponderReportHelper.findByProcessedTime (
 				new Interval (
 					searchForm.start (),
 					searchForm.end ()));

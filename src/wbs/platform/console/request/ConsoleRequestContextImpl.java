@@ -204,8 +204,14 @@ class ConsoleRequestContextImpl
 	String resolveContextUrl (
 			@NonNull String contextUrl) {
 
-		if (foreignContextPath () == null)
-			throw new NullPointerException ();
+		if (foreignContextPath () == null) {
+
+			throw new IllegalStateException (
+				stringFormat (
+					"Unable due resolve a context URL, as there is no current ",
+					"context."));
+
+		}
 
 		return joinWithoutSeparator (
 			foreignContextPath (),

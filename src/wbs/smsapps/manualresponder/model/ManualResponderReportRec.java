@@ -1,5 +1,6 @@
 package wbs.smsapps.manualresponder.model;
 
+import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
@@ -46,10 +47,19 @@ class ManualResponderReportRec
 	ManualResponderRec manualResponder;
 
 	@ReferenceField
+	UserRec processedByUser;
+
+	@ReferenceField
 	UserRec user;
 
 	@SimpleField
 	Integer num;
+
+	@SimpleField
+	Date requestTime;
+
+	@SimpleField
+	Date processedTime;
 
 	@SimpleField
 	String timestring;
@@ -80,8 +90,12 @@ class ManualResponderReportRec
 	public static
 	interface ManualResponderReportDaoMethods {
 
-		List<ManualResponderReportRec> find (
-				Interval timestampInterval);
+		List<ManualResponderReportRec> findByProcessedTime (
+				Interval processedTimeInterval);
+
+		List<ManualResponderReportRec> findByProcessedTime (
+				UserRec processedByUser,
+				Interval processedTimeInterval);
 
 	}
 

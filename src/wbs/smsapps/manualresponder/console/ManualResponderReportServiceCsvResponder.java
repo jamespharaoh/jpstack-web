@@ -103,7 +103,7 @@ class ManualResponderReportServiceCsvResponder
 			searchForm);
 
 		reports =
-			manualResponderReportHelper.find (
+			manualResponderReportHelper.findByProcessedTime (
 				new Interval (
 					searchForm.start (),
 					searchForm.end ()));

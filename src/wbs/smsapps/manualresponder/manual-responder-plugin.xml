@@ -34,6 +34,8 @@
 		<bean class="console.ManualResponderReportServiceCsvResponder"/>
 		<bean class="console.ManualResponderReportOperatorPart"/>
 		<bean class="console.ManualResponderReportOperatorCsvResponder"/>
+		<bean class="console.ManualResponderStatusLine"/>
+		<bean class="console.ManualResponderStatusLinePart"/>
 	</layer>
 
 	<layer name="daemon">

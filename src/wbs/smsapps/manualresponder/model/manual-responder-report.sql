@@ -6,6 +6,11 @@ AS SELECT
 	req.id AS manual_responder_request_id,
 	mr.id AS manual_responder_id,
 	u.id AS user_id,
+	u.id AS processed_by_user_id,
+	qi.id as queue_item_id,
+	req.timestamp AS request_time,
+	qi.processed_time AS processed_time,
+
 	to_char (req.timestamp, 'YYYY-MM-DD HH24:MI:SS') AS timestring,
 
 	(
