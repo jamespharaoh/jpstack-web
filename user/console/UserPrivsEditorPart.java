@@ -15,7 +15,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.group.model.GroupRec;
@@ -70,8 +70,14 @@ class UserPrivsEditorPart
 	@Override
 	public
 	Set<ScriptRef> scriptRefs () {
+
 		return ImmutableSet.<ScriptRef>of (
-			new ConsoleContextScriptRef ("/js/tree.js", "text/javascript"));
+
+			ConsoleApplicationScriptRef.javascript (
+				"/js/tree.js")
+
+		);
+
 	}
 
 	@Override
