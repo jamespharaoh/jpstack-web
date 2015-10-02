@@ -4,13 +4,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
+import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.part.PagePart;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.HtmlResponder;
+
+import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("statusResponder")
 public
@@ -56,6 +61,23 @@ class StatusResponder
 
 		for (PagePart pagePart : pageParts)
 			pagePart.prepare ();
+
+	}
+
+	@Override
+	protected 
+	Set<ScriptRef> scriptRefs () {
+
+		return ImmutableSet.<ScriptRef>builder ()
+
+			.addAll (
+				super.scriptRefs ())
+
+			.add (
+				ConsoleApplicationScriptRef.javascript (
+					"/js/jquery-1.11.2.js"))
+
+			.build ();
 
 	}
 
