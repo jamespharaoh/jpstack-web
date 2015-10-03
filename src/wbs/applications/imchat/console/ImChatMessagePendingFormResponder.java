@@ -16,6 +16,7 @@ import wbs.applications.imchat.model.ImChatTemplateRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.console.context.ConsoleApplicationScriptRef;
+import wbs.platform.console.html.JqueryScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.responder.HtmlResponder;
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -60,8 +61,7 @@ class ImChatMessagePendingFormResponder
 
 		return ImmutableSet.<ScriptRef>of (
 
-			ConsoleApplicationScriptRef.javascript (
-				"/js/jquery-1.11.2.js"),
+			JqueryScriptRef.instance,
 
 			ConsoleApplicationScriptRef.javascript (
 				"/js/imChatMessagePending.js"));

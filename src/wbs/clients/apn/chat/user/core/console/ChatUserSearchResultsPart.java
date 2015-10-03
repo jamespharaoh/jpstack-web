@@ -24,6 +24,7 @@ import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.context.ConsoleContext;
 import wbs.platform.console.context.ConsoleContextType;
 import wbs.platform.console.html.HtmlLink;
+import wbs.platform.console.html.JqueryScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.misc.PageBuilder;
 import wbs.platform.console.misc.Percentager;
@@ -100,8 +101,7 @@ class ChatUserSearchResultsPart
 				super.scriptRefs ())
 
 			.add (
-				ConsoleApplicationScriptRef.javascript (
-					"/js/jquery-1.7.1.js"))
+				JqueryScriptRef.instance)
 
 			.add (
 				ConsoleApplicationScriptRef.javascript (

@@ -28,6 +28,7 @@ import wbs.framework.utils.etc.Html;
 import wbs.framework.utils.etc.ProfileLogger;
 import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.helper.ConsoleObjectManager;
+import wbs.platform.console.html.JqueryScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.console.part.AbstractPagePart;
@@ -135,8 +136,7 @@ class ManualResponderRequestPendingSummaryPart
 				super.scriptRefs ())
 
 			.add (
-				ConsoleApplicationScriptRef.javascript (
-					"/js/jquery-1.7.1.js"))
+				JqueryScriptRef.instance)
 
 			.add (
 				ConsoleApplicationScriptRef.javascript (

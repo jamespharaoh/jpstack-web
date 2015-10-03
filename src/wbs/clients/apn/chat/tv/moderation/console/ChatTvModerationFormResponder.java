@@ -33,7 +33,7 @@ class ChatTvModerationFormResponder
 
 		return
 			ImmutableSet.<ScriptRef>of (
-				new ContextScriptRef ("/js/jquery-1.7.1.js", "text/javascript"),
+				JqueryScriptRef.instance,
 				new ContextScriptRef ("/js/gsm.js", "text/javascript"),
 				new ContextScriptRef ("/js/DOM.js", "text/javascript"),
 				new ContextScriptRef ("/js/chat.js", "text/javascript"));

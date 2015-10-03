@@ -19,6 +19,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.platform.console.context.ConsoleApplicationScriptRef;
+import wbs.platform.console.html.JqueryScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.console.part.AbstractPagePart;
@@ -91,8 +92,7 @@ class ChatBroadcastVerifyPart
 				super.scriptRefs ())
 
 			.add (
-				ConsoleApplicationScriptRef.javascript (
-					"/js/jquery-1.7.1.js"))
+				JqueryScriptRef.instance)
 
 			.add (
 				ConsoleApplicationScriptRef.javascript (
