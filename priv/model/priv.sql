@@ -162,9 +162,6 @@ RETURNS void AS $$
 
 					IF the_actually_create THEN
 
-RAISE NOTICE '% % % %', the_priv_type.id, the_object_type.id, the_record.id,
-	the_priv_type.code);
-
 						INSERT INTO priv (
 							priv_type_id,
 							parent_object_type_id,
