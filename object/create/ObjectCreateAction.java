@@ -108,10 +108,10 @@ class ObjectCreateAction
 
 	@Getter @Setter
 	String createUserFieldName;
-	
+
 	@Getter @Setter
 	FieldsProvider formFieldsProvider;
-	
+
 	// state
 
 	ConsoleHelper<?> parentHelper;
@@ -208,11 +208,11 @@ class ObjectCreateAction
 		}
 
 		// perform updates
-		
+
 		if (formFieldsProvider != null) {
 			prepareFieldSet();
 		}
-		
+
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
 				formFieldSet,
@@ -389,12 +389,12 @@ class ObjectCreateAction
 		}
 
 	}
-	
+
 	void prepareFieldSet () {
-		
+
 		formFieldSet = formFieldsProvider.getFields(
 			parent);
-	
+
 	}
 
 }

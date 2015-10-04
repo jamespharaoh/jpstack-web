@@ -1,14 +1,24 @@
 package wbs.platform.console.html;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import lombok.EqualsAndHashCode;
+import lombok.Builder;
+import lombok.experimental.Accessors;
+import wbs.platform.console.request.ConsoleRequestContext;
 
-/**
- * Immutable class to represent <link ...> elements in an html document.
- */
-@EqualsAndHashCode
+@Accessors (fluent = true)
+@Builder
 public
 class HtmlLink {
+
+	public static
+	enum Resolution {
+
+		absolute,
+		application;
+
+	}
+
+	Resolution resolution;
 
 	String charset;
 	String href;
@@ -18,82 +28,69 @@ class HtmlLink {
 	String rev;
 	String media;
 
-	/**
-	 * Sole public constructor.
-	 */
+	public static
+	HtmlLink applicationCssStyle (
+			String href) {
+
+		return HtmlLink.builder ()
+
+			.resolution (
+				Resolution.application)
+
+			.href (
+				href)
+
+			.type (
+				"text/css")
+
+			.rel (
+				"stylesheet")
+
+			.build ();
+
+	}
+
+	public static
+	HtmlLink applicationIcon (
+			String href) {
+
+		return HtmlLink.builder ()
+
+			.resolution (
+				Resolution.application)
+
+			.href (
+				href)
+
+			.rel (
+				"icon")
+
+			.build ();
+
+	}
+
+	public static
+	HtmlLink applicationShortcutIcon (
+			String href) {
+
+		return HtmlLink.builder ()
+
+			.resolution (
+				Resolution.application)
+
+			.href (
+				href)
+
+			.rel (
+				"shortcut icon")
+
+			.build ();
+
+	}
+
 	public
-	HtmlLink (
-			String newCharset,
-			String newHref,
-			String newHrefLang,
-			String newType,
-			String newRel,
-			String newRev,
-			String newMedia) {
-
-		charset = newCharset;
-		href = newHref;
-		hrefLang = newHrefLang;
-		type = newType;
-		rel = newRel;
-		rev = newRev;
-		media = newMedia;
-	}
-
-	/**
-	 * Static factory method to construct css stylesheet references.
-	 */
-	public static
-	HtmlLink cssStyle (
-			String href) {
-
-		return new HtmlLink (
-			null,
-			href,
-			null,
-			"text/css",
-			"stylesheet",
-			null,
-			null);
-
-	}
-
-	public static
-	HtmlLink icon (
-			String href) {
-
-		return new HtmlLink (
-			null,
-			href,
-			null,
-			null,
-			"icon",
-			null,
-			null);
-
-	}
-
-	public static
-	HtmlLink shortcutIcon (
-			String href) {
-
-		return new HtmlLink (
-			null,
-			href,
-			null,
-			null,
-			"shortcut icon",
-			null,
-			null);
-
-	}
-
-	/**
-	 * Returns the html string representation of the appropriate link element.
-	 */
-	@Override
-	public
-	String toString () {
+	String render (
+			ConsoleRequestContext requestContext) {
 
 		StringBuilder stringBuilder =
 			new StringBuilder ();
@@ -115,7 +112,7 @@ class HtmlLink {
 			stringBuilder.append (
 				stringFormat (
 					" href=\"%h\"",
-					href));
+					resolveHref (requestContext)));
 
 		}
 
@@ -168,6 +165,29 @@ class HtmlLink {
 			">");
 
 		return stringBuilder.toString ();
+
+	}
+
+	public
+	String resolveHref (
+			ConsoleRequestContext requestContext) {
+
+		switch (resolution) {
+
+		case absolute:
+
+			return href;
+
+		case application:
+
+			return requestContext.resolveApplicationUrl (
+				href);
+
+		default:
+
+			throw new RuntimeException ();
+
+		}
 
 	}
 

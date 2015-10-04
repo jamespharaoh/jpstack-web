@@ -105,7 +105,7 @@ class HibernateHelperProviderBuilder {
 
 		@Getter @Setter
 		ObjectHelperProvider parentObjectHelperProvider;
-		
+
 		@Getter @Setter
 		boolean dynamic;
 
@@ -1046,7 +1046,7 @@ class HibernateHelperProviderBuilder {
 			return object;
 
 		}
-		
+
 		@Override
 		public
 		Record update (
@@ -1380,9 +1380,9 @@ class HibernateHelperProviderBuilder {
 		Object getDynamic (
 				Record<?> object,
 				String name) {
-			
+
 			 return objectHooks.getDynamic(
-					 object, 
+					 object,
 					 name);
 
 		}
@@ -1393,12 +1393,12 @@ class HibernateHelperProviderBuilder {
 				Record<?> object,
 				String name,
 				Object value) {
-			
+
 			objectHooks.setDynamic (
-				object, 
-				name, 
-				value);			
-			
+				object,
+				name,
+				value);
+
 		}
 
 	}

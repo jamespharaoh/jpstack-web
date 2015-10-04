@@ -17,17 +17,23 @@ public
 class QueueItemStatusLine
 	implements StatusLine {
 
+	// dependencies
+
 	@Inject
 	ConsoleRequestContext requestContext;
 
 	@Inject
 	UserObjectHelper userHelper;
 
+	// prototype dependencies
+
 	@Inject
 	Provider<QueueItemsStatusLinePart> queueItemsStatusLinePart;
 
 	@Inject
 	Provider<QueueSubjectSorter> queueSubjectSorter;
+
+	// details
 
 	@Override
 	public
@@ -40,6 +46,8 @@ class QueueItemStatusLine
 	PagePart get () {
 		return queueItemsStatusLinePart.get ();
 	}
+
+	// implementation
 
 	@Override
 	public
@@ -57,8 +65,9 @@ class QueueItemStatusLine
 		// return
 
 		return stringFormat (
-			"updateQueueItems (%s);\n",
-			sortedSubjects.availableItems ());
+			"updateQueueItems (%s, %s);\n",
+			sortedSubjects.availableItems (),
+			sortedSubjects.userClaimedItems ());
 
 	}
 

@@ -49,7 +49,7 @@ public
 class ObjectListPageBuilder {
 
 	// dependencies
-	
+
 	@Inject
 	ApplicationContext applicationContext;
 
@@ -238,32 +238,32 @@ class ObjectListPageBuilder {
 
 		typeCode =
 			spec.typeCode ();
-		
+
 		// if a provider name is provided
-		
+
 		if (spec.fieldsProviderName () != null) {
 
-			fieldsProvider = 
+			fieldsProvider =
 					applicationContext.getBean (
 							spec.fieldsProviderName (),
 							FieldsProvider.class);
-		
-		} 
-		
+
+		}
+
 		// if a field name is provided
-		
+
 		else if (spec.fieldsName() != null) {
-			
+
 			fieldsProvider =
 				new StaticFieldsProvider ()
 					.setFields (
 						consoleModule.formFieldSets ().get (
 							spec.fieldsName ()));
-			
-		} 
-		
+
+		}
+
 		// if nothing is provided
-		
+
 		else {
 
 			fieldsProvider =

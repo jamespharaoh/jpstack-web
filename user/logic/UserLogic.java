@@ -2,6 +2,8 @@ package wbs.platform.user.logic;
 
 import wbs.platform.user.model.UserRec;
 
+import com.google.common.base.Optional;
+
 public
 interface UserLogic {
 
@@ -12,7 +14,8 @@ interface UserLogic {
 	 */
 	void userLogon (
 			UserRec user,
-			String sessionId);
+			String sessionId,
+			Optional<String> userAgent);
 
 	/**
 	 * Logs the specified user off the system. This includes updating all
@@ -26,6 +29,7 @@ interface UserLogic {
 			String sliceCode,
 			String username,
 			String password,
-			String sessionId);
+			String sessionId,
+			Optional<String> userAgent);
 
 }

@@ -44,6 +44,7 @@ import wbs.platform.console.tab.TabContext;
 import wbs.platform.console.tab.TabList;
 import wbs.platform.priv.console.PrivDataLoader;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -204,8 +205,14 @@ class ConsoleRequestContextImpl
 	String resolveContextUrl (
 			@NonNull String contextUrl) {
 
-		if (foreignContextPath () == null)
-			throw new NullPointerException ();
+		if (foreignContextPath () == null) {
+
+			throw new IllegalStateException (
+				stringFormat (
+					"Unable due resolve a context URL, as there is no current ",
+					"context."));
+
+		}
 
 		return joinWithoutSeparator (
 			foreignContextPath (),
@@ -1197,6 +1204,17 @@ class ConsoleRequestContextImpl
 
 		return requestContext.fileItemField (
 			name);
+
+	}
+
+	@Override
+	public
+	Optional<String> header (
+			String name) {
+
+		return Optional.fromNullable (
+			requestContext.header (
+				name));
 
 	}
 

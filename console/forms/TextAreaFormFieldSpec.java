@@ -41,13 +41,13 @@ class TextAreaFormFieldSpec {
 
 	@DataAttribute
 	String charCountData;
-	
+
 	@DataAttribute
 	String dataProvider;
-	
+
 	@Getter @Setter
 	boolean dynamic;
-	
+
 	@Getter @Setter
 	Record<?> parent;
 

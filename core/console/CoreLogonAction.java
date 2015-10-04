@@ -85,13 +85,19 @@ class CoreLogonAction
 				slice.toLowerCase (),
 				username.toLowerCase (),
 				password,
-				requestContext.sessionId ());
+				requestContext.sessionId (),
+				requestContext.header (
+					"User-Agent"));
 
 		transaction.commit ();
 
 		// if it failed show the logon page again
 
 		if (userId == null) {
+
+			requestContext.addWarning (
+				"Sorry, the details you entered did not match. Please try " +
+				"again, or contact an appropriate person for help.");
 
 			log.warn (
 				stringFormat (

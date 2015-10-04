@@ -30,11 +30,12 @@ import wbs.platform.console.helper.ConsoleHelperRegistry;
 import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.module.ConsoleMetaManager;
 import wbs.platform.console.module.ConsoleModuleImpl;
-import wbs.platform.console.module.SimpleConsoleBuilderContainer;
 import wbs.platform.console.module.ResolvedConsoleContextLink;
+import wbs.platform.console.module.SimpleConsoleBuilderContainer;
 import wbs.platform.console.request.Cryptor;
 import wbs.platform.console.tab.ConsoleContextTab;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("objectContextBuilder")
@@ -93,6 +94,7 @@ class ObjectContextBuilder {
 	String beanName;
 
 	String objectTitle;
+	Optional<String> defaultFileName;
 
 	Cryptor cryptor;
 
@@ -203,19 +205,28 @@ class ObjectContextBuilder {
 			contextType.get ()
 
 			.name (
-				name + "s"));
+				name + "s")
+
+			.defaultFileName (
+				defaultFileName.orNull ()));
 
 		consoleModule.addContextType (
 			contextType.get ()
 
 			.name (
-				name + "+"));
+				name + "+")
+
+			.defaultFileName (
+				defaultFileName.orNull ()));
 
 		consoleModule.addContextType (
 			contextType.get ()
 
 			.name (
-				name));
+				name)
+
+			.defaultFileName (
+				defaultFileName.orNull ()));
 
 	}
 
@@ -257,6 +268,9 @@ class ObjectContextBuilder {
 			.title (
 				objectTitle)
 
+			.defaultFileName (
+				defaultFileName)
+
 			.requestIdKey (
 				consoleHelper.idKey ())
 
@@ -286,6 +300,9 @@ class ObjectContextBuilder {
 
 			.title (
 				objectTitle)
+
+			.defaultFileName (
+				defaultFileName)
 
 			.requestIdKey (
 				consoleHelper.idKey ())
@@ -489,6 +506,10 @@ class ObjectContextBuilder {
 					stringFormat (
 						"%sName",
 						consoleHelper.objectName ())));
+
+		defaultFileName =
+			Optional.fromNullable (
+				spec.defaultFileName ());
 
 		cryptor =
 			spec.cryptorBeanName () != null

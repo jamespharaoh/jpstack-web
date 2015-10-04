@@ -26,12 +26,12 @@ class ConsoleResponder
 	}
 
 	protected
-	void goHeaders ()
+	void setHtmlHeaders ()
 		throws IOException {
 	}
 
 	protected
-	void goContent ()
+	void render ()
 		throws IOException {
 	}
 
@@ -47,8 +47,8 @@ class ConsoleResponder
 
 		setup ();
 		prepare ();
-		goHeaders ();
-		goContent ();
+		setHtmlHeaders ();
+		render ();
 
 	}
 

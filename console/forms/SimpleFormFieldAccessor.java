@@ -26,10 +26,10 @@ class SimpleFormFieldAccessor<Container,Native>
 
 	@Getter @Setter
 	Boolean dynamic;
-	
+
 	@Getter @Setter
 	Class<? extends Native> nativeClass;
-	
+
 	@Inject
 	ConsoleObjectManager consoleObjectManager;
 
@@ -44,7 +44,7 @@ class SimpleFormFieldAccessor<Container,Native>
 		Object nativeObject;
 
 		if (dynamic != null && dynamic) {
-			
+
 			ConsoleHelper<?> consoleHelper =
 				consoleObjectManager.getConsoleObjectHelper(
 					(Record<?>) container);
@@ -55,12 +55,12 @@ class SimpleFormFieldAccessor<Container,Native>
 					name);
 
 		} else {
-			
+
 			 nativeObject =
 				BeanLogic.getProperty (
 					container,
 					name);
-			 
+
 		}
 
 		// special case for null
@@ -96,7 +96,7 @@ class SimpleFormFieldAccessor<Container,Native>
 	void write (
 			Container container,
 			Native nativeValue) {
-		
+
 		// sanity check native type
 
 		if (
@@ -118,26 +118,26 @@ class SimpleFormFieldAccessor<Container,Native>
 		}
 
 		// set property
-		
+
 		if (dynamic != null && dynamic) {
-			
+
 			ConsoleHelper<?> consoleHelper =
 					consoleObjectManager.getConsoleObjectHelper(
 						(Record<?>) container);
-				
+
 			consoleHelper.setDynamic (
 					(Record<?>) container,
 					name,
-					nativeValue);			
+					nativeValue);
 		}
-		
+
 		else {
-			
+
 			BeanLogic.setProperty (
 				container,
 				name,
 				nativeValue);
-			
+
 		}
 
 	}

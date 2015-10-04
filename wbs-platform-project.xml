@@ -137,7 +137,7 @@
 	<plugin
 		name="object-settings"
 		package="object.settings"/>
-		
+
 	<plugin
 		name="priv"
 		package="priv"/>

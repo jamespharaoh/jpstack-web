@@ -59,7 +59,7 @@ class ContextFormActionPart<FormState>
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		if (helpText != null) {
 

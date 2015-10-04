@@ -27,13 +27,13 @@ class ObjectSettingsPart
 	extends AbstractPagePart {
 
 	// dependencies
-	
+
 	@Inject
 	ConsoleObjectManager objectManager;
 
 	@Inject
 	FormFieldLogic formFieldLogic;
-	
+
 	@Inject
 	RootObjectHelper rootHelper;
 
@@ -41,7 +41,7 @@ class ObjectSettingsPart
 
 	@Getter @Setter
 	ObjectLookup<?> objectLookup;
-	
+
 	@Getter @Setter
 	ConsoleHelper<?> consoleHelper;
 
@@ -56,7 +56,7 @@ class ObjectSettingsPart
 
 	@Getter @Setter
 	String removeLocalName;
-	
+
 	@Getter @Setter
 	FieldsProvider formFieldsProvider;
 
@@ -93,22 +93,22 @@ class ObjectSettingsPart
 
 		canEdit =
 			editPrivKey != null
-				&& requestContext.canContext (editPrivKey);		
-		
-		if (formFieldsProvider != null) {		
+				&& requestContext.canContext (editPrivKey);
+
+		if (formFieldsProvider != null) {
 			prepareParent();
 			prepareFieldSet();
 		}
 
 
 	}
-	
+
 	void prepareParent () {
-			
+
 		ConsoleHelper<?> parentHelper =
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
-			
+
 		if (parentHelper.root ()) {
 
 			parent =
@@ -133,19 +133,19 @@ class ObjectSettingsPart
 			return;
 
 		}
-		
+
 	}
-	
+
 	void prepareFieldSet() {
-		
+
 		formFieldSet = formFieldsProvider.getFields(
 				parent);
-		
+
 	}
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		//for (PagePart pagePart : pageParts)
 		//	pagePart.goHeadStuff();
@@ -154,10 +154,10 @@ class ObjectSettingsPart
 
 	@Override
 	public
-	void goBodyStuff () {
-		
+	void renderHtmlBodyContent () {
+
 		if (canEdit) {
-			
+
 			String enctype = "application/x-www-form-urlencoded";
 			try {
 				if (formFieldSet.fileUpload ()) {

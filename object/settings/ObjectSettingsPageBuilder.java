@@ -47,7 +47,7 @@ public
 class ObjectSettingsPageBuilder {
 
 	// dependencies
-	
+
 	@Inject
 	ApplicationContext applicationContext;
 
@@ -196,13 +196,13 @@ class ObjectSettingsPageBuilder {
 
 						.objectLookup (
 							consoleHelper)
-							
+
 						.consoleHelper (
 								consoleHelper)
 
 						.formFieldSet (
 							formFieldSet)
-							
+
 						.formFieldsProvider (
 								fieldsProvider)
 
@@ -234,13 +234,13 @@ class ObjectSettingsPageBuilder {
 
 						.objectLookup (
 							consoleHelper)
-							
+
 						.consoleHelper (
 								consoleHelper)
 
 						.formFieldSet (
 							formFieldSet)
-							
+
 						.formFieldsProvider (
 								fieldsProvider);
 
@@ -350,7 +350,7 @@ class ObjectSettingsPageBuilder {
 
 					.objectLookup (
 						consoleHelper)
-						
+
 					.consoleHelper (
 						consoleHelper)
 
@@ -362,9 +362,9 @@ class ObjectSettingsPageBuilder {
 
 					.formFieldSet (
 						formFieldSet)
-						
+
 					.formFieldsProvider (
-							fieldsProvider)						
+							fieldsProvider)
 
 					.removeLocalName (
 						consoleHelper.ephemeral ()
@@ -466,22 +466,22 @@ class ObjectSettingsPageBuilder {
 				? consoleModule.formFieldSets ().get (
 					spec.fieldsName ())
 				: defaultFields ();
-					
+
 		// if a provider name is provided
 
 		if (spec.fieldsProviderName () != null) {
 
-			fieldsProvider = 
+			fieldsProvider =
 					applicationContext.getBean (
 							spec.fieldsProviderName (),
-							FieldsProvider.class);		
-		} 
-		
+							FieldsProvider.class);
+		}
+
 		else {
-			
+
 			fieldsProvider =
 				null;
-			
+
 		}
 
 	}
@@ -501,8 +501,10 @@ class ObjectSettingsPageBuilder {
 
 		}
 
-		if (consoleHelper.nameExists ()
-				&& ! consoleHelper.nameIsCode ()) {
+		if (
+			consoleHelper.nameExists ()
+			&& ! consoleHelper.nameIsCode ()
+		) {
 
 			formFieldSpecs.add (
 				new NameFormFieldSpec ());

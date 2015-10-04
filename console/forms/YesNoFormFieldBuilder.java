@@ -104,7 +104,7 @@ class YesNoFormFieldBuilder {
 			ifNull (
 				spec.noLabel (),
 				"no");
-		
+
 		Boolean dynamic =
 			ifNull (
 				spec.dynamic(),

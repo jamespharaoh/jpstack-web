@@ -119,9 +119,9 @@ class IntegerFormFieldBuilder {
 		Boolean dynamic =
 				ifNull (spec.dynamic(),
 						false);
-		
+
 		Class<?> propertyClass;
-		
+
 		if (!dynamic) {
 			propertyClass =
 				BeanLogic.propertyClass (
@@ -144,7 +144,7 @@ class IntegerFormFieldBuilder {
 
 			.name (
 				name)
-									
+
 			.dynamic (
 				dynamic)
 

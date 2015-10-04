@@ -55,7 +55,7 @@ class ObjectCreatePart
 
 	@Getter @Setter
 	String localFile;
-	
+
 	@Getter @Setter
 	FieldsProvider formFieldsProvider;
 
@@ -70,7 +70,7 @@ class ObjectCreatePart
 	Record<?> object;
 
 	// implementation
-	
+
 	@Override
 	public
 	Set<ScriptRef> scriptRefs () {
@@ -84,15 +84,15 @@ class ObjectCreatePart
 		return scriptRefs;
 
 	}
-	
+
 	@Override
 	public
 	void prepare () {
 
 		prepareParents ();
-		
+
 		// if a field provider was provided
-		
+
 		if (formFieldsProvider != null) {
 			prepareFieldSet();
 		}
@@ -118,7 +118,7 @@ class ObjectCreatePart
 	}
 
 	void prepareParents () {
-		
+
 		parentHelper =
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
@@ -176,17 +176,17 @@ class ObjectCreatePart
 			parentHelper.findAll ();
 
 	}
-	
+
 	void prepareFieldSet () {
-		
+
 		formFieldSet = formFieldsProvider.getFields(
 			parent);
-	
+
 	}
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<p>Please enter the details for the new %h</p>\n",

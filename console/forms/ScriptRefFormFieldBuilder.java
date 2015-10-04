@@ -12,7 +12,7 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.html.ScriptRef;
 
 @PrototypeComponent ("scriptRefFormFieldBuilder")
@@ -51,7 +51,7 @@ class ScriptRefFormFieldBuilder {
 
 			.scriptRefs (
 				Collections.<ScriptRef>singleton (
-					ConsoleContextScriptRef.javascript (
+					ConsoleApplicationScriptRef.javascript (
 						spec.path ())))
 
 		);

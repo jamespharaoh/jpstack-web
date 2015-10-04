@@ -12,9 +12,11 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.ParentField;
+import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
+import wbs.platform.text.model.TextRec;
 
 @Accessors (chain = true)
 @Data
@@ -45,6 +47,10 @@ class UserSessionRec
 	@SimpleField (
 		nullable = true)
 	Date endTime;
+
+	@ReferenceField (
+		nullable = true)
+	TextRec userAgent;
 
 	// compare to
 

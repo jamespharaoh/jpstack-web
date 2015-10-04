@@ -4,13 +4,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.platform.console.html.JqueryScriptRef;
+import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.part.PagePart;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.HtmlResponder;
+
+import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("statusResponder")
 public
@@ -61,9 +66,33 @@ class StatusResponder
 
 	@Override
 	protected
-	void goHeadStuff () {
+	Set<ScriptRef> myScriptRefs () {
 
-		super.goHeadStuff ();
+		ImmutableSet.Builder<ScriptRef> ret =
+			ImmutableSet.<ScriptRef>builder ()
+
+			.add (
+				JqueryScriptRef.instance);
+
+		for (
+			PagePart pagePart
+				: pageParts
+		) {
+
+			ret.addAll (
+				pagePart.scriptRefs ());
+
+		}
+
+		return ret.build ();
+
+	}
+
+	@Override
+	protected
+	void renderHtmlHeadContents () {
+
+		super.renderHtmlHeadContents ();
 
 		printFormat (
 			"<style type=\"text/css\">\n",
@@ -167,18 +196,18 @@ class StatusResponder
 
 		for (PagePart pagePart
 				: pageParts)
-			pagePart.goHeadStuff ();
+			pagePart.renderHtmlHeadContent ();
 
 	}
 
 	@Override
 	protected
-	void goBody () {
+	void renderHtmlBody () {
 
 		printFormat (
 			"<body onload=\"statusRequestSchedule ();\">");
 
-		goBodyStuff ();
+		renderHtmlBodyContents ();
 
 		printFormat (
 			"</body>");
@@ -187,7 +216,7 @@ class StatusResponder
 
 	@Override
 	protected
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<table",
@@ -212,7 +241,7 @@ class StatusResponder
 			"</tr>\n");
 
 		for (PagePart pagePart : pageParts)
-			pagePart.goBodyStuff();
+			pagePart.renderHtmlBodyContent();
 
 		printFormat (
 			"<tr>\n",

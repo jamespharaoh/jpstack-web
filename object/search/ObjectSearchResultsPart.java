@@ -153,7 +153,7 @@ class ObjectSearchResultsPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		goNewSearch ();
 		goTotalObjects ();

@@ -32,7 +32,7 @@ class TextAreaFormFieldBuilder {
 	ApplicationContext applicationContext;
 
 	// prototype dependencies
-	
+
 	@Inject
 	Provider<TextAreaFormFieldConstraintValidator>
 	textAreaFormFieldValueConstraintValidatorProvider;
@@ -76,7 +76,7 @@ class TextAreaFormFieldBuilder {
 	@Inject
 	Provider<TextFormFieldNativeMapping>
 	textFormFieldNativeMappingProvider;
-	
+
 	FormFieldDataProvider formFielDataProvider;
 
 	// builder
@@ -124,11 +124,11 @@ class TextAreaFormFieldBuilder {
 			ifNull (
 				textAreaFormFieldSpec.cols (),
 				FormField.defaultSize);
-		
+
 		Boolean dynamic =
 			ifNull (textAreaFormFieldSpec.dynamic(),
 				false);
-		
+
 		Record<?> parent =
 			ifNull (textAreaFormFieldSpec.parent(),
 				null);
@@ -138,56 +138,56 @@ class TextAreaFormFieldBuilder {
 
 		String charCountData =
 			textAreaFormFieldSpec.charCountData ();
-		
+
 		// if a data provider is provided
-		
+
 		Class<?> propertyClass = null;
-		
+
 		if (textAreaFormFieldSpec.dataProvider () != null) {
-			
-			propertyClass = 
+
+			propertyClass =
 				String.class;
 
-			formFielDataProvider = 
+			formFielDataProvider =
 				applicationContext.getBean (
 					textAreaFormFieldSpec.dataProvider (),
-					FormFieldDataProvider.class);		
-			
+					FormFieldDataProvider.class);
+
 		}
 		else {
 			if (!dynamic) {
-	
+
 				propertyClass =
 					BeanLogic.propertyClass (
 						formFieldBuilderContext.containerClass (),
 						name);
-				
+
 			}
 			else {
-				propertyClass = 
+				propertyClass =
 					String.class;
 			}
-			
+
 		}
-		
+
 		// constraint validator only use for simple type settings
-		
+
 		FormFieldConstraintValidator constraintValidator;
-		
+
 		if (parent == null) {
-			
+
 			// constraint validator
 
 			constraintValidator =
 				textAreaFormFieldValueConstraintValidatorProvider.get ();
 		}
 		else {
-			
+
 			// constraint validator
 
 			constraintValidator =
 				nullFormFieldValueConstraintValidatorProvider.get ();
-			
+
 		}
 
 		String updateHookBeanName =
@@ -212,7 +212,7 @@ class TextAreaFormFieldBuilder {
 			formFieldAccessor =
 				simpleFormFieldAccessorProvider.get ()
 					.name (name)
-					.nativeClass (TextRec.class)				
+					.nativeClass (TextRec.class)
 					.dynamic (dynamic);
 
 			formFieldNativeMapping =
@@ -228,7 +228,7 @@ class TextAreaFormFieldBuilder {
 
 		FormFieldValueValidator valueValidator =
 			nullFormFieldValueValidatorProvider.get ();
-		
+
 		// interface mapping
 
 		FormFieldInterfaceMapping interfaceMapping =

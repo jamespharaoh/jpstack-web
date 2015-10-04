@@ -27,34 +27,60 @@ class HtmlResponder
 
 	protected
 	Set<ScriptRef> scriptRefs () {
-		return ImmutableSet.<ScriptRef>of ();
+
+		return ImmutableSet.<ScriptRef>builder ()
+
+			.addAll (
+				myScriptRefs ())
+
+			.build ();
+
 	}
 
 	protected
-	Set<HtmlLink> getLinks () {
+	Set<ScriptRef> myScriptRefs () {
 
-		return ImmutableSet.<HtmlLink>of (
+		return ImmutableSet.<ScriptRef>of ();
 
-			HtmlLink.cssStyle (
-				requestContext.resolveApplicationUrl (
-					"/style/basic.css")),
+	}
 
-			HtmlLink.icon (
-				requestContext.resolveApplicationUrl (
-					"/favicon.ico")),
+	protected
+	Set<HtmlLink> htmlLinks () {
 
-			HtmlLink.shortcutIcon (
-				requestContext.resolveApplicationUrl (
-					"/favicon.ico")));
+		return ImmutableSet.<HtmlLink>builder ()
+
+			.add (
+				HtmlLink.applicationCssStyle (
+					"/style/basic.css"))
+
+			.add (
+				HtmlLink.applicationIcon (
+					"/favicon.ico"))
+
+			.add (
+				HtmlLink.applicationShortcutIcon (
+					"/favicon.ico"))
+
+			.addAll (
+				myHtmlLinks ())
+
+			.build ();
+
+	}
+
+	protected
+	Set<HtmlLink> myHtmlLinks () {
+
+		return ImmutableSet.<HtmlLink>of ();
 
 	}
 
 	@Override
 	protected
-	void goHeaders ()
+	void setHtmlHeaders ()
 		throws IOException {
 
-		super.goHeaders ();
+		super.setHtmlHeaders ();
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -72,7 +98,7 @@ class HtmlResponder
 	}
 
 	protected
-	void goDoctype () {
+	void renderHtmlDoctype () {
 
 		printFormat (
 			"<!DOCTYPE html>\n");
@@ -80,7 +106,7 @@ class HtmlResponder
 	}
 
 	protected
-	void goStyleSheets () {
+	void renderHtmlStyleSheets () {
 
 		printFormat (
 			"<link",
@@ -102,7 +128,7 @@ class HtmlResponder
 	}
 
 	protected
-	void goTitle () {
+	void renderHtmlTitle () {
 
 		printFormat (
 			"<title>%h</title>\n",
@@ -111,7 +137,7 @@ class HtmlResponder
 	}
 
 	protected
-	void goScriptRefs () {
+	void renderHtmlScriptRefs () {
 
 		for (ScriptRef scriptRef
 				: scriptRefs ()) {
@@ -130,19 +156,20 @@ class HtmlResponder
 	}
 
 	protected
-	void goLinks () {
+	void renderHtmlLinks () {
 
 		Set<? extends HtmlLink> links =
-			getLinks ();
+			htmlLinks ();
 
 		if (links != null) {
 
 			for (HtmlLink link
-					: getLinks ()) {
+					: htmlLinks ()) {
 
 				printFormat (
 					"%s\n",
-					link.toString ());
+					link.render (
+						requestContext));
 
 			}
 
@@ -151,22 +178,22 @@ class HtmlResponder
 	}
 
 	protected
-	void goHeadStuff () {
+	void renderHtmlHeadContents () {
 
-		goTitle ();
-		goScriptRefs ();
-		goLinks ();
+		renderHtmlTitle ();
+		renderHtmlScriptRefs ();
+		renderHtmlLinks ();
 		goMeta ();
 
 	}
 
 	protected
-	void goHead () {
+	void renderHtmlHead () {
 
 		printFormat (
 			"<head>\n");
 
-		goHeadStuff ();
+		renderHtmlHeadContents ();
 
 		printFormat (
 			"</head>\n");
@@ -174,16 +201,16 @@ class HtmlResponder
 	}
 
 	protected
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 	}
 
 	protected
-	void goBody () {
+	void renderHtmlBody () {
 
 		printFormat (
 			"<body>\n");
 
-		goBodyStuff ();
+		renderHtmlBodyContents ();
 
 		printFormat (
 			"</body>\n");
@@ -192,15 +219,15 @@ class HtmlResponder
 
 	@Override
 	protected
-	void goContent () {
+	void render () {
 
-		goDoctype ();
+		renderHtmlDoctype ();
 
 		printFormat (
 			"<html>\n");
 
-		goHead ();
-		goBody ();
+		renderHtmlHead ();
+		renderHtmlBody ();
 
 		printFormat (
 			"</html>\n");

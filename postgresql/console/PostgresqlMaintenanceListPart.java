@@ -65,7 +65,7 @@ class PostgresqlMaintenanceListPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<table class=\"list\">\n");

@@ -20,7 +20,7 @@ class ObjectFormFieldSpec {
 	@DataAttribute (
 		required = true)
 	String name;
-	
+
 	@Getter @Setter
 	boolean dynamic;
 
@@ -34,9 +34,9 @@ class ObjectFormFieldSpec {
 	Boolean readOnly;
 
 	@DataAttribute (
-		value = "finder",
+		value = "object-type",
 		required = true)
-	String finderName;
+	String objectTypeName;
 
 	@DataAttribute ("root-field")
 	String rootFieldName;

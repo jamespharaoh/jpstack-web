@@ -124,7 +124,7 @@
 
 		<object-field
 			name="processedUser"
-			finder="user"/>
+			object-type="user"/>
 
 		<yes-no-field
 			name="processedByPreferredUser"/>
@@ -138,7 +138,7 @@
 
 		<object-field
 			name="queueItemClaim"
-			finder="queueItemClaim"/>
+			object-type="queueItemClaim"/>
 
 		<timestamp-field
 			name="createdTime"/>

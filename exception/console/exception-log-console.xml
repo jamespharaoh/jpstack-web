@@ -76,14 +76,14 @@
 
 		<object-field
 			name="type"
-			finder="exceptionLogType"/>
+			object-type="exceptionLogType"/>
 
 		<text-field
 			name="source"/>
 
 		<object-field
 			name="user"
-			finder="user"/>
+			object-type="user"/>
 
 		<yes-no-field
 			name="fatal"/>
@@ -101,7 +101,7 @@
 
 		<object-field
 			name="type"
-			finder="exceptionLogType"/>
+			object-type="exceptionLogType"/>
 
 		<timestamp-field
 			name="timestamp"/>

@@ -15,7 +15,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.group.model.GroupRec;
@@ -46,7 +46,11 @@ class GroupPrivsPart
 	static
 	Set<ScriptRef> privsScriptRefs =
 		ImmutableSet.<ScriptRef>of (
-			new ConsoleContextScriptRef ("/js/tree.js", "text/javascript"));
+
+		ConsoleApplicationScriptRef.javascript (
+			"/js/tree.js")
+
+	);
 
 	PrivsNode rootNode =
 		new PrivsNode ();
@@ -189,7 +193,7 @@ class GroupPrivsPart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		printFormat (
 			"<script language=\"JavaScript\">\n");
@@ -396,7 +400,7 @@ class GroupPrivsPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<form",

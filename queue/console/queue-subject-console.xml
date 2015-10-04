@@ -52,7 +52,7 @@
 
 		<object-field
 			name="preferredUser"
-			finder="user"/>
+			object-type="user"/>
 
 		<integer-field
 			name="totalItems"/>

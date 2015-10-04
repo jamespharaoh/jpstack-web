@@ -2,9 +2,6 @@ package wbs.platform.queue.model;
 
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -100,68 +97,19 @@ class QueueSubjectRec
 
 	}
 
-	// object helper methods
-
-	public static
-	interface QueueSubjectObjectHelperMethods {
-
-		QueueSubjectRec find (
-				QueueRec queue,
-				Record<?> object);
-
-		List<QueueSubjectRec> findActive (
-				QueueRec queue);
-
-	}
-
-	// object helper implementation
-
-	public static
-	class QueueSubjectObjectHelperImplementation
-		implements QueueSubjectObjectHelperMethods {
-
-		@Inject
-		Provider<QueueSubjectObjectHelper> queueSubjectHelper;
-
-		@Override
-		public
-		QueueSubjectRec find (
-				QueueRec queue,
-				Record<?> object) {
-
-			return queueSubjectHelper.get ()
-				.findByQueueAndObject (
-					queue.getId (),
-					object.getId ());
-
-		}
-
-		@Override
-		public
-		List<QueueSubjectRec> findActive (
-				QueueRec queue) {
-
-			return queueSubjectHelper.get ()
-				.findActiveByQueue (
-					queue.getId ());
-
-		}
-
-	}
-
 	// dao
 
 	public static
 	interface QueueSubjectDaoMethods {
 
-		QueueSubjectRec findByQueueAndObject (
-				int queueId,
-				int objectId);
+		QueueSubjectRec find (
+				QueueRec queue,
+				Record<?> object);
 
 		List<QueueSubjectRec> findActive ();
 
-		List<QueueSubjectRec> findActiveByQueue (
-				int queueId);
+		List<QueueSubjectRec> findActive (
+				QueueRec queue);
 
 	}
 

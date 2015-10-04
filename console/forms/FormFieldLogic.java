@@ -242,7 +242,7 @@ class FormFieldLogic {
 			FormField formField
 				: formFieldSet.formFields ()
 		) {
-			
+
 			if (formField.virtual ())
 				continue;
 
