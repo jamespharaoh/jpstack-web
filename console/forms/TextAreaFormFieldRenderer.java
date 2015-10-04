@@ -236,26 +236,29 @@ class TextAreaFormFieldRenderer<Container>
 			String data;
 
 			if (parent != null) {
+
 				data =
 					formFieldDataProvider.getFormFieldData (
 						parent);
-			}
-			else {
+
+			} else {
+			
 				data =
 					formFieldDataProvider.getFormFieldData (
 						(Record<?>) container);
+			
 			}
 
 			out.write (
 				stringFormat (
 					"<span hidden=\"hidden\"",
-					" class=\"parameters-length-list\" style>",
+					" class=\"parameters-length-list\"",
 					data,
-					"</span>"));
+					"></span>\n"));
 
 			out.write (
-					stringFormat (
-						"<br>\n"));
+				stringFormat (
+					"<br>\n"));
 
 			// parameters data
 
@@ -266,10 +269,14 @@ class TextAreaFormFieldRenderer<Container>
 				new TreeMap<String, String>();
 
 			for (Integer i = 0; i < tokens.length; i++) {
+
 				String[] parameter =
 					tokens[i].split("=");
 
-				dataMap.put(parameter[0], parameter[1]);
+				dataMap.put (
+					parameter [0],
+					parameter [1]);
+
 			}
 
 			// message and charset
@@ -287,29 +294,39 @@ class TextAreaFormFieldRenderer<Container>
 					((MessageTemplateTypeRec) container)
 						.getCharset();
 
-			}
-			else {
+			} else {
 
 				// if the type has a defined value, we get it
 
+				MessageTemplateSetRec messageTemplateSet =
+					(MessageTemplateSetRec)
+					(Object)
+					container;
+
+				MessageTemplateTypeRec messageTemplateType =
+					(MessageTemplateTypeRec)
+					(Object)
+					parent;
+
 				MessageTemplateValueRec messageTemplateValue =
-						((MessageTemplateSetRec) container).getMessageTemplateValues().get(
-							((MessageTemplateTypeRec) parent).getId());
+					messageTemplateSet.getMessageTemplateValues ().get (
+						messageTemplateType);
 
 				if (messageTemplateValue == null) {
+
 					message =
-						((MessageTemplateTypeRec) parent)
-							.getDefaultValue();
-				}
-				else {
+						messageTemplateType.getDefaultValue ();
+
+				} else {
+				
 					message =
-						messageTemplateValue
-							.getStringValue();
+						messageTemplateValue.getStringValue ();
+
 				}
 
 				charset =
-					((MessageTemplateTypeRec) parent)
-						.getCharset();
+					messageTemplateType.getCharset ();
+
 			}
 
 			// length of non variable parts
@@ -343,15 +360,21 @@ class TextAreaFormFieldRenderer<Container>
 
 				// length of the parameters
 
-				Pattern regExp = Pattern.compile("\\{(.*?)\\}");
-				Matcher matcher = regExp.matcher(message);
+				Pattern regExp =
+					Pattern.compile ("\\{(.*?)\\}");
 
-				while (matcher.find()) {
+				Matcher matcher =
+					regExp.matcher (message);
+
+				while (matcher.find ()) {
+
 					String parameterName =
-						matcher.group(1);
+						matcher.group (1);
 
 						messageLength +=
-							Integer.parseInt(dataMap.get(parameterName));
+							Integer.parseInt (
+								dataMap.get (parameterName));
+
 				}
 
 			}
