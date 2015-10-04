@@ -1,0 +1,48 @@
+<plugin
+	name="sms-arena"
+	package="wbs.integrations.smsarena">
+
+	<plugin-dependencies>
+		<plugin-dependency name="integrations-common"/>
+		<plugin-dependency name="scaffold"/>
+	</plugin-dependencies>
+
+	<sql-scripts>
+		<sql-data name="sms-arena-data"/>
+	</sql-scripts>
+
+	<models>
+		<enum-type name="smsArenaDlrReportLogType"/>
+		<model name="smsArenaConfig"/>
+		<model name="smsArenaDlrReportLog"/>
+		<model name="smsArenaReportCode"/>
+		<model name="smsArenaRouteIn"/>
+		<model name="smsArenaRouteOut"/>
+	</models>
+
+	<fixtures>
+		<fixture name="smsArena"/>
+	</fixtures>
+
+	<api-modules>
+		<api-module name="sms-arena"/>
+	</api-modules>
+
+	<layer name="api">
+		<bean class="api.SmsArenaDlrDispatchAction"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.SmsArenaSender"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="sms-arena"/>
+		<console-module name="sms-arena-config"/>
+		<console-module name="sms-arena-dlr-report-log"/>
+		<console-module name="sms-arena-report-code"/>
+		<console-module name="sms-arena-route-in"/>
+		<console-module name="sms-arena-route-out"/>
+	</console-modules>
+
+</plugin>

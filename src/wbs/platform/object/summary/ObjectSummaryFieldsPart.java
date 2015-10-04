@@ -10,7 +10,10 @@ import wbs.framework.record.Record;
 import wbs.platform.console.forms.FormFieldLogic;
 import wbs.platform.console.forms.FormFieldSet;
 import wbs.platform.console.helper.ConsoleHelper;
+import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.part.AbstractPagePart;
+import wbs.platform.scaffold.model.RootObjectHelper;
+import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryFieldsPart")
@@ -21,7 +24,13 @@ class ObjectSummaryFieldsPart
 	// dependencies
 
 	@Inject
+	ConsoleObjectManager objectManager;
+
+	@Inject
 	FormFieldLogic formFieldLogic;
+
+	@Inject
+	RootObjectHelper rootHelper;
 
 	// properties
 
@@ -31,9 +40,13 @@ class ObjectSummaryFieldsPart
 	@Getter @Setter
 	FormFieldSet formFieldSet;
 
+	@Getter @Setter
+	FieldsProvider formFieldsProvider;
+
 	// state
 
 	Record<?> object;
+	Record<?> parent;
 
 	// implementation
 
@@ -45,6 +58,51 @@ class ObjectSummaryFieldsPart
 			(Record<?>)
 			consoleHelper.lookupObject (
 				requestContext.contextStuff ());
+
+		if (formFieldsProvider != null) {
+			prepareParent();
+			prepareFieldSet();
+		}
+
+	}
+
+	void prepareParent () {
+
+		ConsoleHelper<?> parentHelper =
+			objectManager.getConsoleObjectHelper (
+				consoleHelper.parentClass ());
+
+		if (parentHelper.root ()) {
+
+			parent =
+				rootHelper.find (0);
+
+			return;
+
+		}
+
+		Integer parentId =
+			requestContext.stuffInt (
+				parentHelper.idKey ());
+
+		if (parentId != null) {
+
+			// use specific parent
+
+			parent =
+				parentHelper.find (
+					parentId);
+
+			return;
+
+		}
+
+	}
+
+	void prepareFieldSet() {
+
+		formFieldSet = formFieldsProvider.getFields(
+				parent);
 
 	}
 

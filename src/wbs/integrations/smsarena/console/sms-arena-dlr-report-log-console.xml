@@ -1,0 +1,86 @@
+<console-module
+	name="sms-arena-dlr-report-log">
+
+	<console-helper-provider
+		object-name="smsArenaDlrReportLog"
+		view-delegate-field="root"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="smsArenaDlrReportLog.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="smsArenaDlrReportLogName"
+			field="id"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="smsArenaDlrReportLog"
+		object-name="smsArenaDlrReportLog">
+
+		<list>
+
+			<object-search-page
+				search-fields="search"
+				results-fields="results"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="search"
+		class="wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec$SmsArenaDlrReportLogSearch">
+
+		<object-field
+			name="routeId"
+			label="Route"
+			object-type="route"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="timestampAfter"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="timestampBefore"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="results"
+		object-name="smsArenaDlrReportLog">
+
+		<id-field/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="smsArenaDlrReportLog">
+
+		<id-field/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<text-area-field
+			name="details"/>
+
+	</field-set>
+
+</console-module>

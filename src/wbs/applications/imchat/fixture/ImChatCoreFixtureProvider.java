@@ -38,6 +38,7 @@ import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.RandomLogic;
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
+import wbs.integrations.paypal.model.PaypalAccountRec;
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
@@ -45,6 +46,7 @@ import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.scaffold.model.SliceRec;
 
 @PrototypeComponent ("imChatCoreFixtureProvider")
 public
@@ -145,6 +147,28 @@ class ImChatCoreFixtureProvider
 
 		);
 
+		SliceRec slice =
+			sliceHelper.findByCode (
+				GlobalId.root,
+					"test");
+
+		paypalAccountHelper.insert (
+
+			new PaypalAccountRec ()
+
+				.setSlice (
+					slice)
+
+				.setCode (
+					"imchat_paypal_acc")
+
+				.setName (
+					"Im Chat Paypal Account")
+
+				.setDescription (
+					"Test paypal account")
+			);
+
 		// im chat
 
 		ImChatRec imChat =
@@ -152,9 +176,7 @@ class ImChatCoreFixtureProvider
 				new ImChatRec ()
 
 			.setSlice (
-				sliceHelper.findByCode (
-					GlobalId.root,
-					"test"))
+				slice)
 
 			.setCode (
 				"test")
@@ -198,6 +220,25 @@ class ImChatCoreFixtureProvider
 				50)
 
 		);
+
+		paypalAccountHelper.insert (
+				new PaypalAccountRec ()
+
+				.setSlice (
+					sliceHelper.findByCode (
+						GlobalId.root,
+						"test"))
+
+				.setCode (
+					"test")
+
+				.setName (
+					"Test")
+
+				.setDescription (
+					"Test paypal account")
+
+			);
 
 		// im chat price point
 
@@ -327,7 +368,6 @@ class ImChatCoreFixtureProvider
 					index % 2 == 0
 						? dougalMedia
 						: ermintrudeMedia)
-
 			));
 
 		}

@@ -1,0 +1,14 @@
+<plugin
+	name="object-ticket-create"
+	package="wbs.services.ticket.create">
+
+	<layer name="console">
+		<bean class="ObjectTicketCreatePageSpec"/>
+		<bean class="ObjectTicketCreatePageBuilder"/>
+		<bean class="ObjectTicketCreateAction"/>
+		<bean class="ObjectTicketCreatePart"/>
+		<bean class="ObjectTicketCreateSetFieldSpec"/>
+		<bean class="ObjectTicketCreateSetFieldBuilder"/>
+	</layer>
+
+</plugin>

@@ -33,6 +33,9 @@ class ObjectListPageSpec {
 	@DataAttribute ("fields")
 	String fieldsName;
 
+	@DataAttribute ("fields-provider")
+	String fieldsProviderName;
+
 	@DataAttribute ("target-context-type")
 	String targetContextTypeName;
 

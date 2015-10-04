@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -60,6 +61,7 @@ class DataToXml {
 
 		try {
 
+			@Cleanup
 			OutputStream outputStream =
 				new FileOutputStream (
 					new File (filename));
@@ -138,8 +140,10 @@ class DataToXml {
 			Element propertiesElement =
 				parent.addElement ("properties");
 
-			for (Map.Entry<?,?> entry
-					: propertiesObject.entrySet ()) {
+			for (
+				Map.Entry<?,?> propertyEntry
+					: propertiesObject.entrySet ()
+			) {
 
 				propertiesElement
 
@@ -148,11 +152,11 @@ class DataToXml {
 
 					.addAttribute (
 						"name",
-						(String) entry.getKey ())
+						(String) propertyEntry.getKey ())
 
 					.addAttribute (
 						"value",
-						(String) entry.getValue ());
+						(String) propertyEntry.getValue ());
 
 			}
 

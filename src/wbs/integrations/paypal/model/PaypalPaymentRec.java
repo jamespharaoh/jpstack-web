@@ -10,9 +10,11 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.ParentField;
+import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
+import wbs.integrations.paypal.model.PaypalPaymentRec;
 
 @Accessors (chain = true)
 @Data
@@ -52,6 +54,10 @@ class PaypalPaymentRec
 
 	@SimpleField
 	PaypalPaymentState state;
+
+	@ReferenceField(
+			nullable = true)
+	PaypalPaymentRec paypalPayment;
 
 	// compare to
 

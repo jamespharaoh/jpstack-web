@@ -1,6 +1,6 @@
 ---------------------------------------- TABLE message
 
-ALTER TABLE message
+ALTER TABLE MESSAGE
 ADD CHECK (
 	(direction = 0 AND status IN (0, 1, 7, 8, 9))
 OR	(direction = 1 AND status IN (0, 2, 3, 4, 5, 6, 10, 11, 12, 13, 14)));

@@ -1,0 +1,126 @@
+<console-module
+	name="sms-arena-report-code">
+
+	<console-helper-provider
+		object-name="smsArenaReportCode"
+		view-delegate-field="root"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="smsArena_manage"
+			delegate="root"
+			priv="manage"/>
+
+		<priv-key
+			name="smsArenaReportCode_manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="smsArenaReportCodeName"
+			field="code"/>
+
+		<context-stuff
+			name="smsArenaConfigId"
+			delegate="smsArenaConfig"
+			field="id"/>
+
+		<run-post-processor
+			name="smsArenaConfig"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="smsArenaReportCode"
+		object-name="smsArenaReportCode">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"
+				create-priv-delegate="root"
+				create-priv-code="manage"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="smsArenaReportCode">
+
+		<code-field/>
+		<description-field/>
+
+		<enum-field
+			name="messageStatus"
+			helper="messageStatusConsoleHelper"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="smsArenaReportCode">
+
+		<code-field pattern=".+"/>
+		<description-field/>
+
+		<enum-field
+			name="messageStatus"
+			helper="messageStatusConsoleHelper"/>
+
+		<text-area-field
+			name="additionalInformation"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="smsArenaReportCode">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<description-field/>
+
+		<enum-field
+			name="messageStatus"
+			helper="messageStatusConsoleHelper"/>
+
+		<text-area-field
+			name="additionalInformation"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="smsArenaReportCode">
+
+		<code-field pattern=".+"/>
+		<description-field/>
+
+		<enum-field
+			name="messageStatus"
+			helper="messageStatusConsoleHelper"/>
+
+		<text-area-field
+			name="additionalInformation"/>
+
+	</field-set>
+
+</console-module>

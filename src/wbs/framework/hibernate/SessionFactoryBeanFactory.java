@@ -438,21 +438,11 @@ class SessionFactoryBeanFactory
 
 		Element classElement =
 			hibernateMappingElement
-
-			.addElement (
-				"class")
-
-			.addAttribute (
-				"name",
-				model.objectClass ().getSimpleName ())
-
-			.addAttribute (
-				"table",
-				tableNameSql)
-
-			.addAttribute (
-				"lazy",
-				"true");
+				.addElement ("class")
+				.addAttribute ("name", model.objectClass ().getSimpleName ())
+				.addAttribute ("table", tableNameSql)
+				.addAttribute ("cascade", "save-update")
+				.addAttribute ("lazy", "true");
 
 		if (! model.mutable ()) {
 
@@ -926,17 +916,11 @@ class SessionFactoryBeanFactory
 
 			Element setElement =
 				classElement
+					.addElement ("set")
+					.addAttribute ("name", modelField.name ())
+					.addAttribute ("cascade", "save-update")
+					.addAttribute ("lazy", "true");
 
-				.addElement (
-					"set")
-
-				.addAttribute (
-					"name",
-					modelField.name ())
-
-				.addAttribute (
-					"lazy",
-					"true");
 
 			if (modelField.orderBy () != null) {
 
@@ -1031,17 +1015,11 @@ class SessionFactoryBeanFactory
 
 			Element listElement =
 				classElement
+					.addElement ("list")
+					.addAttribute ("name", modelField.name ())
+					.addAttribute ("cascade", "save-update")
+					.addAttribute ("lazy", "true");
 
-				.addElement (
-					"list")
-
-				.addAttribute (
-					"name",
-					modelField.name ())
-
-				.addAttribute (
-					"lazy",
-					"true");
 
 			if (modelField.orderBy () != null) {
 
@@ -1161,17 +1139,10 @@ class SessionFactoryBeanFactory
 
 			Element mapElement =
 				classElement
-
-				.addElement (
-					"map")
-
-				.addAttribute (
-					"name",
-					modelField.name ())
-
-				.addAttribute (
-					"lazy",
-					"true");
+					.addElement ("map")
+					.addAttribute ("name", modelField.name ())
+					.addAttribute ("cascade", "save-update")
+					.addAttribute ("lazy", "true");
 
 			// key
 
@@ -1272,21 +1243,12 @@ class SessionFactoryBeanFactory
 
 			Element setElement =
 				classElement
+					.addElement ("set")
+					.addAttribute ("name", modelField.name ())
+					.addAttribute ("table", modelField.table ())
+					.addAttribute ("cascade", "save-update")
+					.addAttribute ("lazy", "true");
 
-				.addElement (
-					"set")
-
-				.addAttribute (
-					"name",
-					modelField.name ())
-
-				.addAttribute (
-					"table",
-					modelField.table ())
-
-				.addAttribute (
-					"lazy",
-					"true");
 
 			if (modelField.where () != null) {
 
@@ -1386,21 +1348,12 @@ class SessionFactoryBeanFactory
 
 			Element listElement =
 				classElement
+					.addElement ("list")
+					.addAttribute ("name", modelField.name ())
+					.addAttribute ("table", modelField.table ())
+					.addAttribute ("cascade", "save-update")
+					.addAttribute ("lazy", "true");
 
-				.addElement (
-					"list")
-
-				.addAttribute (
-					"name",
-					modelField.name ())
-
-				.addAttribute (
-					"table",
-					modelField.table ())
-
-				.addAttribute (
-					"lazy",
-					"true");
 
 			if (modelField.where () != null) {
 

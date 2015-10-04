@@ -1,0 +1,240 @@
+<console-module
+	name="sms-arena-route-out">
+
+	<console-helper-provider
+		object-name="smsArenaRouteOut"
+		view-delegate-field="root"
+		view-delegate-priv-code="manage">
+
+		<priv-key
+			name="smsArena.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<priv-key
+			name="smsArenaRouteOut.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="smsArenaRouteOutName"
+			delegate="route"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="smsArenaRouteOut"
+		object-name="smsArenaRouteOut">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="smsArenaRouteOut">
+
+		<parent-field/>
+
+		<object-field
+			name="smsArenaConfig"
+			label="Config"
+			object-type="smsArenaConfig"/>
+
+		<text-field
+			name="relayUrl"/>
+
+		<text-field
+			name="authKey"/>
+
+		<yes-no-field
+			name="cid"
+			nullable="yes"/>
+
+		<text-field
+			name="pid"
+			nullable="yes"/>
+
+		<text-field
+			name="sid"
+			nullable="yes"/>
+
+		<integer-field
+			name="mclass"
+			nullable="yes"/>
+
+		<integer-field
+			name="coding"
+			nullable="yes"/>
+
+		<integer-field
+			name="date"
+			nullable="yes"/>
+
+		<integer-field
+			name="validity"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="smsArenaRouteOut">
+
+		<parent-field/>
+
+		<object-field
+			name="smsArenaConfig"
+			object-type="smsArenaConfig"/>
+
+		<text-field
+			name="relayUrl"/>
+
+		<text-field
+			name="authKey"/>
+
+		<yes-no-field
+			name="cid"
+			nullable="yes"/>
+
+		<text-field
+			name="pid"
+			nullable="yes"/>
+
+		<text-field
+			name="sid"
+			nullable="yes"/>
+
+		<integer-field
+			name="mclass"
+			nullable="yes"/>
+
+		<integer-field
+			name="coding"
+			nullable="yes"/>
+
+		<integer-field
+			name="date"
+			nullable="yes"/>
+
+		<integer-field
+			name="validity"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="smsArenaRouteOut">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="smsArenaConfig"
+			object-type="smsArenaConfig"/>
+
+		<text-field
+			name="relayUrl"/>
+
+		<text-field
+			name="authKey"/>
+
+		<yes-no-field
+			name="cid"
+			nullable="yes"/>
+
+		<text-field
+			name="pid"
+			nullable="yes"/>
+
+		<text-field
+			name="sid"
+			nullable="yes"/>
+
+		<integer-field
+			name="mclass"
+			nullable="yes"/>
+
+		<integer-field
+			name="coding"
+			nullable="yes"/>
+
+		<integer-field
+			name="date"
+			nullable="yes"/>
+
+		<integer-field
+			name="validity"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="smsArenaRouteOut">
+
+		<parent-field/>
+
+		<object-field
+			name="smsArenaConfig"
+			object-type="smsArenaConfig"/>
+
+		<text-field
+			name="relayUrl"/>
+
+		<text-field
+			name="authKey"/>
+
+		<yes-no-field
+			name="cid"
+			nullable="yes"/>
+
+		<text-field
+			name="pid"
+			nullable="yes"/>
+
+		<text-field
+			name="sid"
+			nullable="yes"/>
+
+		<integer-field
+			name="mclass"
+			nullable="yes"/>
+
+		<integer-field
+			name="coding"
+			nullable="yes"/>
+
+		<integer-field
+			name="date"
+			nullable="yes"/>
+
+		<integer-field
+			name="validity"
+			nullable="yes"/>
+
+	</field-set>
+
+</console-module>

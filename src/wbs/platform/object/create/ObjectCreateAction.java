@@ -34,6 +34,7 @@ import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCreateAction")
@@ -107,6 +108,9 @@ class ObjectCreateAction
 
 	@Getter @Setter
 	String createUserFieldName;
+
+	@Getter @Setter
+	FieldsProvider formFieldsProvider;
 
 	// state
 
@@ -204,6 +208,10 @@ class ObjectCreateAction
 		}
 
 		// perform updates
+
+		if (formFieldsProvider != null) {
+			prepareFieldSet();
+		}
 
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
@@ -379,6 +387,13 @@ class ObjectCreateAction
 				"Parent object not found");
 
 		}
+
+	}
+
+	void prepareFieldSet () {
+
+		formFieldSet = formFieldsProvider.getFields(
+			parent);
 
 	}
 

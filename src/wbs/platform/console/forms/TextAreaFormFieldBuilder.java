@@ -14,9 +14,11 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.platform.text.model.TextRec;
+import wbs.services.messagetemplate.console.FormFieldDataProvider;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("textAreaFormFieldBuilder")
@@ -30,6 +32,10 @@ class TextAreaFormFieldBuilder {
 	ApplicationContext applicationContext;
 
 	// prototype dependencies
+
+	@Inject
+	Provider<TextAreaFormFieldConstraintValidator>
+	textAreaFormFieldValueConstraintValidatorProvider;
 
 	@Inject
 	Provider<SimpleFormFieldUpdateHook>
@@ -70,6 +76,8 @@ class TextAreaFormFieldBuilder {
 	@Inject
 	Provider<TextFormFieldNativeMapping>
 	textFormFieldNativeMappingProvider;
+
+	FormFieldDataProvider formFielDataProvider;
 
 	// builder
 
@@ -117,21 +125,73 @@ class TextAreaFormFieldBuilder {
 				textAreaFormFieldSpec.cols (),
 				FormField.defaultSize);
 
+		Boolean dynamic =
+			ifNull (textAreaFormFieldSpec.dynamic(),
+				false);
+
+		Record<?> parent =
+			ifNull (textAreaFormFieldSpec.parent(),
+				null);
+
 		String charCountFunction =
 			textAreaFormFieldSpec.charCountFunction ();
 
 		String charCountData =
 			textAreaFormFieldSpec.charCountData ();
 
+		// if a data provider is provided
+
+		Class<?> propertyClass = null;
+
+		if (textAreaFormFieldSpec.dataProvider () != null) {
+
+			propertyClass =
+				String.class;
+
+			formFielDataProvider =
+				applicationContext.getBean (
+					textAreaFormFieldSpec.dataProvider (),
+					FormFieldDataProvider.class);
+
+		}
+		else {
+			if (!dynamic) {
+
+				propertyClass =
+					BeanLogic.propertyClass (
+						formFieldBuilderContext.containerClass (),
+						name);
+
+			}
+			else {
+				propertyClass =
+					String.class;
+			}
+
+		}
+
+		// constraint validator only use for simple type settings
+
+		FormFieldConstraintValidator constraintValidator;
+
+		if (parent == null) {
+
+			// constraint validator
+
+			constraintValidator =
+				textAreaFormFieldValueConstraintValidatorProvider.get ();
+		}
+		else {
+
+			// constraint validator
+
+			constraintValidator =
+				nullFormFieldValueConstraintValidatorProvider.get ();
+
+		}
+
 		String updateHookBeanName =
 			textAreaFormFieldSpec.updateHookBeanName ();
-
-		// field type
-
-		Class<?> propertyClass =
-			BeanLogic.propertyClass (
-				formFieldBuilderContext.containerClass (),
-				name);
 
 		FormFieldAccessor formFieldAccessor;
 		FormFieldNativeMapping formFieldNativeMapping;
@@ -141,7 +201,8 @@ class TextAreaFormFieldBuilder {
 			formFieldAccessor =
 				simpleFormFieldAccessorProvider.get ()
 					.name (name)
-					.nativeClass (String.class);
+					.nativeClass (String.class)
+					.dynamic (dynamic);
 
 			formFieldNativeMapping =
 				identityFormFieldNativeMappingProvider.get ();
@@ -151,7 +212,8 @@ class TextAreaFormFieldBuilder {
 			formFieldAccessor =
 				simpleFormFieldAccessorProvider.get ()
 					.name (name)
-					.nativeClass (TextRec.class);
+					.nativeClass (TextRec.class)
+					.dynamic (dynamic);
 
 			formFieldNativeMapping =
 				textFormFieldNativeMappingProvider.get ();
@@ -166,11 +228,6 @@ class TextAreaFormFieldBuilder {
 
 		FormFieldValueValidator valueValidator =
 			nullFormFieldValueValidatorProvider.get ();
-
-		// constraint validator
-
-		FormFieldConstraintValidator constraintValidator =
-			nullFormFieldValueConstraintValidatorProvider.get ();
 
 		// interface mapping
 
@@ -187,7 +244,9 @@ class TextAreaFormFieldBuilder {
 				.rows (rows)
 				.cols (cols)
 				.charCountFunction (charCountFunction)
-				.charCountData (charCountData);
+				.charCountData (charCountData)
+				.parent(parent)
+				.formFieldDataProvider (formFielDataProvider);
 
 		// update hook
 

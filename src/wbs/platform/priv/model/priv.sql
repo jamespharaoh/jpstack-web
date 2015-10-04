@@ -126,6 +126,11 @@ RETURNS void AS $$
 					'WHERE priv.id IS NULL'
 				LOOP
 
+						RAISE NOTICE
+							'		- Object % (%) AAA',
+							the_record.code,
+							the_record.id;
+
 					IF NOT has_shown_object_type AND the_make_noise THEN
 
 						RAISE NOTICE

@@ -107,12 +107,22 @@ class TextFormFieldBuilder {
 				textFormFieldSpec.size (),
 				FormField.defaultSize);
 
+		Boolean dynamic =
+			ifNull (textFormFieldSpec.dynamic(),
+					false);
+
 		// field type
 
-		Class<?> propertyClass =
-			BeanLogic.propertyClass (
-				context.containerClass (),
-				name);
+		Class<?> propertyClass;
+		if (!dynamic) {
+			propertyClass =
+				BeanLogic.propertyClass (
+					context.containerClass (),
+					name);
+		}
+		else {
+			propertyClass = String.class;
+		}
 
 		FormFieldAccessor accessor;
 		FormFieldNativeMapping nativeMapping;
@@ -124,6 +134,9 @@ class TextFormFieldBuilder {
 
 				.name (
 					name)
+
+				.dynamic (
+					dynamic)
 
 				.nativeClass (
 					String.class);
@@ -138,6 +151,9 @@ class TextFormFieldBuilder {
 
 				.name (
 					name)
+
+				.dynamic (
+					dynamic)
 
 				.nativeClass (
 					TextRec.class);

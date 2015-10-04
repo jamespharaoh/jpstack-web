@@ -243,6 +243,9 @@ class FormFieldLogic {
 				: formFieldSet.formFields ()
 		) {
 
+			if (formField.virtual ())
+				continue;
+
 			formField.renderTableCellList (
 				out,
 				object,
@@ -260,6 +263,9 @@ class FormFieldLogic {
 
 		for (FormField formField
 				: formFieldSet.formFields ()) {
+
+			if (formField.virtual ())
+				continue;
 
 			out.print (
 				stringFormat (

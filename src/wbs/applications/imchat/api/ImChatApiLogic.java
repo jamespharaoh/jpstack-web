@@ -28,4 +28,7 @@ interface ImChatApiLogic {
 	ImChatPurchaseData purchaseData (
 			ImChatPurchaseRec purchase);
 
+	ImChatMessageTemplateData messageTemplateData (
+			String key, String value);
+
 }

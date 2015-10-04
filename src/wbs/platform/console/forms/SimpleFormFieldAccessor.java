@@ -1,11 +1,17 @@
 package wbs.platform.console.forms;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
+
+import javax.inject.Inject;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
+import wbs.platform.console.helper.ConsoleHelper;
+import wbs.platform.console.helper.ConsoleObjectManager;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("simpleFormFieldAccessor")
@@ -19,21 +25,43 @@ class SimpleFormFieldAccessor<Container,Native>
 	String name;
 
 	@Getter @Setter
+	Boolean dynamic;
+
+	@Getter @Setter
 	Class<? extends Native> nativeClass;
+
+	@Inject
+	ConsoleObjectManager consoleObjectManager;
 
 	// implementation
 
 	@Override
 	public
 	Native read (
-			Container container) {
+		Container container) {
 
 		// get native object
+		Object nativeObject;
 
-		Object nativeObject =
-			BeanLogic.getProperty (
-				container,
-				name);
+		if (dynamic != null && dynamic) {
+
+			ConsoleHelper<?> consoleHelper =
+				consoleObjectManager.getConsoleObjectHelper(
+					(Record<?>) container);
+
+			nativeObject =
+				consoleHelper.getDynamic (
+					(Record<?>) container,
+					name);
+
+		} else {
+
+			 nativeObject =
+				BeanLogic.getProperty (
+					container,
+					name);
+
+		}
 
 		// special case for null
 
@@ -91,10 +119,26 @@ class SimpleFormFieldAccessor<Container,Native>
 
 		// set property
 
-		BeanLogic.setProperty (
-			container,
-			name,
-			nativeValue);
+		if (dynamic != null && dynamic) {
+
+			ConsoleHelper<?> consoleHelper =
+					consoleObjectManager.getConsoleObjectHelper(
+						(Record<?>) container);
+
+			consoleHelper.setDynamic (
+					(Record<?>) container,
+					name,
+					nativeValue);
+		}
+
+		else {
+
+			BeanLogic.setProperty (
+				container,
+				name,
+				nativeValue);
+
+		}
 
 	}
 

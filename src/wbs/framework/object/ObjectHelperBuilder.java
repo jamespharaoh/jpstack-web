@@ -79,6 +79,8 @@ class ObjectHelperBuilder {
 	@Getter
 	boolean ready = false;
 
+	boolean dynamic;
+
 	@PostConstruct
 	public
 	void init () {
@@ -436,37 +438,45 @@ class ObjectHelperBuilder {
 				Class<?> declaringClass =
 					method.getDeclaringClass ();
 
-				if (declaringClass == ObjectHelperMethods.class) {
+				try {
 
-					return method.invoke (
-						coreImplementation,
-						arguments);
+					if (declaringClass == ObjectHelperMethods.class) {
 
-				} else if (declaringClass == ModelMethods.class) {
+						return method.invoke (
+							coreImplementation,
+							arguments);
 
-					return method.invoke (
-						objectHelperProvider.model (),
-						arguments);
+					} else if (declaringClass == ModelMethods.class) {
 
-				} else if (declaringClass == extraInterface) {
+						return method.invoke (
+							objectHelperProvider.model (),
+							arguments);
 
-					return method.invoke (
-						extraImplementation,
-						arguments);
+					} else if (declaringClass == extraInterface) {
 
-				} else if (declaringClass == daoMethodsInterface) {
+						return method.invoke (
+							extraImplementation,
+							arguments);
 
-					return method.invoke (
-						daoImplementation,
-						arguments);
+					} else if (declaringClass == daoMethodsInterface) {
 
-				} else {
+						return method.invoke (
+							daoImplementation,
+							arguments);
 
-					throw new RuntimeException (
-						stringFormat (
-							"Don't know how to handle %s.%s",
-							declaringClass.getName (),
-							method.getName ()));
+					} else {
+
+						throw new RuntimeException (
+							stringFormat (
+								"Don't know how to handle %s.%s",
+								declaringClass.getName (),
+								method.getName ()));
+
+					}
+
+				} catch (InvocationTargetException exception) {
+
+					throw exception.getTargetException ();
 
 				}
 
@@ -821,6 +831,43 @@ class ObjectHelperBuilder {
 				return object;
 
 			}
+
+			@Override
+			public
+			Record update (
+					@NonNull Record object) {
+
+				if (! objectClass ().isInstance (
+						object)) {
+
+					throw new ClassCastException (
+						stringFormat (
+							"Can't update %s as %s",
+							object.getClass ().getSimpleName (),
+							objectClass ().getSimpleName ()));
+
+				}
+
+				objectHelperProvider.update (
+					object);
+
+				for (ObjectHelper childObjectHelper
+						: list) {
+
+					ObjectHelperProvider childObjectHelperProvider =
+						childObjectHelper.objectHelperProvider ();
+
+					childObjectHelperProvider.createSingletons (
+						childObjectHelper,
+						objectHelper,
+						object);
+
+				}
+
+				return object;
+
+			}
+
 
 			@Override
 			public
@@ -1429,6 +1476,32 @@ class ObjectHelperBuilder {
 
 				return objectHelperProvider.lock (
 					object);
+
+			}
+
+			@Override
+			public
+			Object getDynamic (
+				Record object,
+				String name) {
+
+				return objectHelperProvider.getDynamic (
+					object,
+					name);
+
+			}
+
+			@Override
+			public
+			void setDynamic (
+				Record object,
+				String name,
+				Object value) {
+
+				objectHelperProvider.setDynamic (
+					object,
+					name,
+					value);
 
 			}
 

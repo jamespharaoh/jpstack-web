@@ -74,9 +74,6 @@ class PaypalFixtureProvider
 		File testAccountsFile =
 			new File ("conf/test-accounts.xml");
 
-		if (! testAccountsFile.exists ())
-			throw new RuntimeException ("ABC");
-
 		if (testAccountsFile.exists ()) {
 
 			DataFromXml dataFromXml =
@@ -160,3 +157,5 @@ class PaypalFixtureProvider
 	}
 
 }
+
+

@@ -1,0 +1,115 @@
+<console-module
+	name="message-template-parameter">
+
+	<console-helper-provider
+		object-name="messageTemplateParameter"
+		view-delegate-field="grandparent"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="messageTemplateParameterName"
+			field="name"/>
+
+		<context-stuff
+			name="messageTemplateParameterId"
+			field="id"/>
+
+		<context-stuff
+			name="messageTemplateTypeId"
+			delegate="messageTemplateType"
+			field="id"/>
+
+		<run-post-processor
+			name="messageTemplateType"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="messageTemplateParameter"
+		object-name="messageTemplateParameter">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="messageTemplateParameter">
+
+		<name-field/>
+
+		<integer-field
+			name="length"/>
+
+		<yes-no-field
+			name="required"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="messageTemplateParameter">
+
+		<id-field/>
+		<parent-field/>
+		<name-field/>
+
+		<integer-field
+			name="length"/>
+
+		<yes-no-field
+			name="required"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="messageTemplateParameter">
+
+		<id-field/>
+		<parent-field/>
+		<name-field/>
+
+		<integer-field
+			name="length"/>
+
+		<yes-no-field
+			name="required"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="messageTemplateParameter">
+
+		<id-field/>
+		<parent-field/>
+		<name-field/>
+
+		<integer-field
+			name="length"/>
+
+		<yes-no-field
+			name="required"/>
+
+	</field-set>
+
+</console-module>

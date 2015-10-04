@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -38,6 +39,7 @@ import wbs.platform.console.part.PagePart;
 import wbs.platform.console.responder.ConsoleFile;
 import wbs.platform.console.tab.ConsoleContextTab;
 import wbs.platform.console.tab.TabContextResponder;
+import wbs.services.ticket.core.console.FieldsProvider;
 
 @PrototypeComponent ("objectSettingsPageBuilder")
 @ConsoleModuleBuilderHandler
@@ -45,6 +47,9 @@ public
 class ObjectSettingsPageBuilder {
 
 	// dependencies
+
+	@Inject
+	ApplicationContext applicationContext;
 
 	@Inject
 	ConsoleModuleBuilder consoleModuleBuilder;
@@ -95,6 +100,7 @@ class ObjectSettingsPageBuilder {
 
 	ConsoleHelper<?> consoleHelper;
 	FormFieldSet formFieldSet;
+	FieldsProvider fieldsProvider;
 	String privKey;
 	String name;
 	String shortName;
@@ -191,8 +197,14 @@ class ObjectSettingsPageBuilder {
 						.objectLookup (
 							consoleHelper)
 
+						.consoleHelper (
+								consoleHelper)
+
 						.formFieldSet (
 							formFieldSet)
+
+						.formFieldsProvider (
+								fieldsProvider)
 
 						.objectRefName (
 							consoleHelper.codeExists ()
@@ -223,8 +235,14 @@ class ObjectSettingsPageBuilder {
 						.objectLookup (
 							consoleHelper)
 
+						.consoleHelper (
+								consoleHelper)
+
 						.formFieldSet (
-							formFieldSet);
+							formFieldSet)
+
+						.formFieldsProvider (
+								fieldsProvider);
 
 				}
 
@@ -333,6 +351,9 @@ class ObjectSettingsPageBuilder {
 					.objectLookup (
 						consoleHelper)
 
+					.consoleHelper (
+						consoleHelper)
+
 					.editPrivKey (
 						privKey)
 
@@ -341,6 +362,9 @@ class ObjectSettingsPageBuilder {
 
 					.formFieldSet (
 						formFieldSet)
+
+					.formFieldsProvider (
+							fieldsProvider)
 
 					.removeLocalName (
 						consoleHelper.ephemeral ()
@@ -442,6 +466,23 @@ class ObjectSettingsPageBuilder {
 				? consoleModule.formFieldSets ().get (
 					spec.fieldsName ())
 				: defaultFields ();
+
+		// if a provider name is provided
+
+		if (spec.fieldsProviderName () != null) {
+
+			fieldsProvider =
+					applicationContext.getBean (
+							spec.fieldsProviderName (),
+							FieldsProvider.class);
+		}
+
+		else {
+
+			fieldsProvider =
+				null;
+
+		}
 
 	}
 

@@ -38,6 +38,7 @@ import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
 import wbs.platform.currency.model.CurrencyRec;
 import wbs.platform.scaffold.model.SliceRec;
+import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.sms.gazetteer.model.GazetteerRec;
 import wbs.sms.locator.model.LocatorRec;
 import wbs.sms.number.format.model.NumberFormatRec;
@@ -247,6 +248,9 @@ class ChatRec
 	Integer numChatBroadcastSent = 0;
 
 	// related objects
+
+	@ReferenceField (nullable = true)
+	TicketManagerRec ticketManager;
 
 	@CollectionField (
 		index = "keyword",

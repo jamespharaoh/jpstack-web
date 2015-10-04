@@ -106,6 +106,9 @@ class HibernateHelperProviderBuilder {
 		@Getter @Setter
 		ObjectHelperProvider parentObjectHelperProvider;
 
+		@Getter @Setter
+		boolean dynamic;
+
 		@Override
 		public
 		Class<? extends Record<?>> objectClass () {
@@ -1046,6 +1049,18 @@ class HibernateHelperProviderBuilder {
 
 		@Override
 		public
+		Record update (
+				Record object) {
+
+			objectHooks.beforeUpdate (
+				object);
+
+			return object;
+
+		}
+
+		@Override
+		public
 		List<Integer> searchIds (
 				Object search) {
 
@@ -1357,6 +1372,32 @@ class HibernateHelperProviderBuilder {
 				LockOptions.UPGRADE);
 
 			return object;
+
+		}
+
+		@Override
+		public
+		Object getDynamic (
+				Record<?> object,
+				String name) {
+
+			 return objectHooks.getDynamic(
+					 object,
+					 name);
+
+		}
+
+		@Override
+		public
+		void setDynamic (
+				Record<?> object,
+				String name,
+				Object value) {
+
+			objectHooks.setDynamic (
+				object,
+				name,
+				value);
 
 		}
 

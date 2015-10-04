@@ -53,6 +53,29 @@ class AbstractObjectHooks<RecordType extends Record<RecordType>>
 
 	@Override
 	public
+	Object getDynamic (
+			Record<?> object,
+			String name) {
+
+		throw new UnsupportedOperationException (
+				stringFormat (
+					"%s.getDynamic (...)",
+					getClass ().getSimpleName ()));
+	}
+
+	@Override
+	public
+	void setDynamic (
+			Record<?> object,
+			String name,
+			Object value) {
+
+		// do nothing
+
+	}
+
+	@Override
+	public
 	void beforeUpdate (
 			RecordType object) {
 

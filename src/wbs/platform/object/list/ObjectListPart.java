@@ -36,6 +36,7 @@ import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.object.criteria.CriteriaSpec;
 import wbs.platform.priv.console.PrivChecker;
+import wbs.services.ticket.core.console.FieldsProvider;
 
 import com.google.common.base.Optional;
 
@@ -77,16 +78,19 @@ class ObjectListPart
 	Map<String,ObjectListTabSpec> listTabSpecs;
 
 	@Getter @Setter
-	FormFieldSet formFieldSet;
+	FieldsProvider formFieldsProvider;
 
 	@Getter @Setter
 	String targetContextTypeName;
 
 	// state
 
+	FormFieldSet formFieldSet;
+
 	ObsoleteDateField dateField;
 
 	Optional<ObjectListBrowserSpec> currentListBrowserSpec;
+
 	ObjectListTabSpec currentListTabSpec;
 	Record<?> currentObject;
 
@@ -94,6 +98,7 @@ class ObjectListPart
 	List<Record<?>> selectedObjects;
 
 	ConsoleContext targetContext;
+	Record<?> parent;
 
 	// implementation
 
@@ -107,6 +112,14 @@ class ObjectListPart
 		prepareAllObjects ();
 		prepareSelectedObjects ();
 		prepareTargetContext ();
+		prepareFieldSet ();
+
+	}
+
+	void prepareFieldSet () {
+
+		formFieldSet = formFieldsProvider.getFields(
+			parent);
 
 	}
 
@@ -188,6 +201,9 @@ class ObjectListPart
 				parentHelper.idKey ());
 
 		if (parentId != null) {
+
+			parent = parentHelper.find(
+					parentId);
 
 			prepareAllObjectsViaParent (
 				parentHelper,

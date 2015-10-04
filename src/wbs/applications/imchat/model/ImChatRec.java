@@ -25,6 +25,7 @@ import wbs.framework.record.Record;
 import wbs.integrations.paypal.model.PaypalAccountRec;
 import wbs.platform.currency.model.CurrencyRec;
 import wbs.platform.scaffold.model.SliceRec;
+import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
 
 @Accessors (chain = true)
 @Data
@@ -64,6 +65,10 @@ class ImChatRec
 	@ReferenceField (
 		nullable = true)
 	CurrencyRec currency;
+
+	@ReferenceField (
+			nullable = true)
+	MessageTemplateDatabaseRec messageTemplateDatabase;
 
 	@SimpleField
 	Integer preferredQueueTime = 0;

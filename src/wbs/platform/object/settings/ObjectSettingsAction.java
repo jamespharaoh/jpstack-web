@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.PermanentRecord;
@@ -15,12 +16,16 @@ import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
 import wbs.platform.console.action.ConsoleAction;
+import wbs.platform.console.context.ConsoleContextBuilderContainer;
 import wbs.platform.console.forms.FormFieldLogic;
 import wbs.platform.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.platform.console.forms.FormFieldSet;
+import wbs.platform.console.helper.ConsoleHelper;
 import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.console.lookup.ObjectLookup;
 import wbs.platform.console.request.ConsoleRequestContext;
+import wbs.platform.scaffold.model.RootObjectHelper;
+import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsAction")
@@ -37,6 +42,12 @@ class ObjectSettingsAction
 	ConsoleRequestContext requestContext;
 
 	@Inject
+	RootObjectHelper rootHelper;
+
+	@BuilderParent
+	ConsoleContextBuilderContainer container;
+
+	@Inject
 	Database database;
 
 	@Inject
@@ -46,6 +57,9 @@ class ObjectSettingsAction
 
 	@Getter @Setter
 	ObjectLookup<?> objectLookup;
+
+	@Getter @Setter
+	ConsoleHelper<?> consoleHelper;
 
 	@Getter @Setter
 	Provider<Responder> detailsResponder;
@@ -64,6 +78,13 @@ class ObjectSettingsAction
 
 	@Getter @Setter
 	FormFieldSet formFieldSet;
+
+	@Getter @Setter
+	FieldsProvider formFieldsProvider;
+
+	// state
+
+	Record<?> parent;
 
 	// details
 
@@ -104,6 +125,11 @@ class ObjectSettingsAction
 				requestContext.contextStuff ());
 
 		// perform update
+
+		if (formFieldsProvider != null) {
+			prepareParent();
+			prepareFieldSet();
+		}
 
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
@@ -158,6 +184,46 @@ class ObjectSettingsAction
 			"Details updated");
 
 		return detailsResponder.get ();
+
+	}
+
+	void prepareParent () {
+
+		ConsoleHelper<?> parentHelper =
+			objectManager.getConsoleObjectHelper (
+				consoleHelper.parentClass ());
+
+		if (parentHelper.root ()) {
+
+			parent =
+				rootHelper.find (0);
+
+			return;
+
+		}
+
+		Integer parentId =
+			requestContext.stuffInt (
+				parentHelper.idKey ());
+
+		if (parentId != null) {
+
+			// use specific parent
+
+			parent =
+				parentHelper.find (
+					parentId);
+
+			return;
+
+		}
+
+	}
+
+	void prepareFieldSet() {
+
+		formFieldSet = formFieldsProvider.getFields(
+				parent);
 
 	}
 

@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -37,6 +38,8 @@ import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
 import wbs.platform.object.criteria.WhereICanManageCriteriaSpec;
 import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
 import wbs.platform.scaffold.model.SliceRec;
+import wbs.services.ticket.core.console.FieldsProvider;
+import wbs.services.ticket.core.console.StaticFieldsProvider;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -46,6 +49,9 @@ public
 class ObjectListPageBuilder {
 
 	// dependencies
+
+	@Inject
+	ApplicationContext applicationContext;
 
 	@Inject
 	ConsoleModuleBuilder consoleModuleBuilder;
@@ -96,8 +102,12 @@ class ObjectListPageBuilder {
 
 	String typeCode;
 
+	FieldsProvider fieldsProvider;
+
 	FormFieldSet formFieldSet;
+
 	Map<String,ObjectListBrowserSpec> listBrowsersByFieldName;
+
 	Map<String,ObjectListTabSpec> listTabsByName;
 
 	// build
@@ -190,17 +200,16 @@ class ObjectListPageBuilder {
 					.listTabSpecs (
 						listTabsByName)
 
+					.formFieldsProvider (
+						fieldsProvider)
+
 					.listBrowserSpecs (
 						listBrowsersByFieldName)
-
-					.formFieldSet (
-						formFieldSet)
 
 					.targetContextTypeName (
 						ifNull (
 							spec.targetContextTypeName (),
 							consoleHelper.objectName () + "+"));
-
 			}
 
 		};
@@ -230,11 +239,40 @@ class ObjectListPageBuilder {
 		typeCode =
 			spec.typeCode ();
 
-		formFieldSet =
-			spec.fieldsName () != null
-				? consoleModule.formFieldSets ().get (
-					spec.fieldsName ())
-				: defaultFields ();
+		// if a provider name is provided
+
+		if (spec.fieldsProviderName () != null) {
+
+			fieldsProvider =
+					applicationContext.getBean (
+							spec.fieldsProviderName (),
+							FieldsProvider.class);
+
+		}
+
+		// if a field name is provided
+
+		else if (spec.fieldsName() != null) {
+
+			fieldsProvider =
+				new StaticFieldsProvider ()
+					.setFields (
+						consoleModule.formFieldSets ().get (
+							spec.fieldsName ()));
+
+		}
+
+		// if nothing is provided
+
+		else {
+
+			fieldsProvider =
+				new StaticFieldsProvider ()
+					.setFields (
+						defaultFields());
+
+		}
+
 
 		listBrowsersByFieldName =
 			ifNull (

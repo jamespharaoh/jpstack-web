@@ -1,6 +1,8 @@
 package wbs.platform.console.forms;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -17,6 +19,9 @@ class YesNoFormFieldSpec {
 
 	@DataAttribute (required = true)
 	String name;
+
+	@Getter @Setter
+	boolean dynamic;
 
 	@DataAttribute
 	String label;

@@ -1,0 +1,52 @@
+<plugin
+	name="ticket-core"
+	package="wbs.services.ticket.core">
+
+	<plugin-dependencies>
+		<plugin-dependency name="sms-apps-common"/>
+		<plugin-dependency name="scaffold"/>
+	</plugin-dependencies>
+
+	<sql-scripts>
+		<sql-data name="ticket-data"/>
+	</sql-scripts>
+
+	<models>
+		<model name="ticketManager"/>
+		<model name="ticketTemplate"/>
+		<model name="ticket"/>
+		<model name="ticketNote"/>
+		<enum-type name="ticketStateState"/>
+		<model name="ticketFieldType"/>
+		<enum-type name="ticketFieldTypeType"/>
+		<model name="ticketFieldValue"/>
+		<model name="ticketState"/>
+	</models>
+
+	<fixtures>
+		<fixture name="ticket"/>
+	</fixtures>
+
+	<layer name="console">
+		<bean class="console.TicketFieldsProvider"/>
+		<bean class="console.TicketFieldsProvider$Config"/>
+		<bean class="console.TicketManagerQueueConsole"/>
+		<bean class="console.TicketPendingFormAction"/>
+		<bean class="console.TicketPendingFormResponder"/>
+		<bean class="console.TicketPendingHistoryPart"/>
+	</layer>
+
+	<layer name="daemon">
+		<bean class="daemon.TicketStateTimeDaemon"/>
+	</layer>
+
+	<console-modules>
+		<console-module name="ticket-manager"/>
+		<console-module name="ticket"/>
+		<console-module name="ticket-pending"/>
+		<console-module name="ticket-state"/>
+		<console-module name="ticket-field-type"/>
+		<console-module name="ticket-note"/>
+	</console-modules>
+
+</plugin>

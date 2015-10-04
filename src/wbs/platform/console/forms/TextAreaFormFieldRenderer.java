@@ -6,6 +6,10 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -13,8 +17,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.console.request.ConsoleRequestContext;
+import wbs.services.messagetemplate.console.FormFieldDataProvider;
+import wbs.services.messagetemplate.model.MessageTemplateSetRec;
+import wbs.services.messagetemplate.model.MessageTemplateTypeCharset;
+import wbs.services.messagetemplate.model.MessageTemplateTypeRec;
+import wbs.services.messagetemplate.model.MessageTemplateValueRec;
+import wbs.sms.gsm.Gsm;
 
 @PrototypeComponent ("textAreaFormFieldRenderer")
 @Accessors (fluent = true)
@@ -49,6 +60,12 @@ class TextAreaFormFieldRenderer<Container>
 
 	@Getter @Setter
 	String charCountData;
+
+	@Getter @Setter
+	FormFieldDataProvider formFieldDataProvider;
+
+	@Getter @Setter
+	Record<?> parent;
 
 	// details
 
@@ -212,6 +229,168 @@ class TextAreaFormFieldRenderer<Container>
 					name (),
 					">&nbsp;</span>"));
 
+		}
+
+		if (formFieldDataProvider != null) {
+
+			String data;
+
+			if (parent != null) {
+
+				data =
+					formFieldDataProvider.getFormFieldData (
+						parent);
+
+			} else {
+			
+				data =
+					formFieldDataProvider.getFormFieldData (
+						(Record<?>) container);
+			
+			}
+
+			out.write (
+				stringFormat (
+					"<span hidden=\"hidden\"",
+					" class=\"parameters-length-list\"",
+					data,
+					"></span>\n"));
+
+			out.write (
+				stringFormat (
+					"<br>\n"));
+
+			// parameters data
+
+			String[] tokens =
+				data.split("&");
+
+			Map<String, String> dataMap =
+				new TreeMap<String, String>();
+
+			for (Integer i = 0; i < tokens.length; i++) {
+
+				String[] parameter =
+					tokens[i].split("=");
+
+				dataMap.put (
+					parameter [0],
+					parameter [1]);
+
+			}
+
+			// message and charset
+
+			String message;
+			MessageTemplateTypeCharset charset;
+
+			if (parent == null) {
+
+				message =
+					((MessageTemplateTypeRec) container)
+						.getDefaultValue();
+
+				charset =
+					((MessageTemplateTypeRec) container)
+						.getCharset();
+
+			} else {
+
+				// if the type has a defined value, we get it
+
+				MessageTemplateSetRec messageTemplateSet =
+					(MessageTemplateSetRec)
+					(Object)
+					container;
+
+				MessageTemplateTypeRec messageTemplateType =
+					(MessageTemplateTypeRec)
+					(Object)
+					parent;
+
+				MessageTemplateValueRec messageTemplateValue =
+					messageTemplateSet.getMessageTemplateValues ().get (
+						messageTemplateType);
+
+				if (messageTemplateValue == null) {
+
+					message =
+						messageTemplateType.getDefaultValue ();
+
+				} else {
+				
+					message =
+						messageTemplateValue.getStringValue ();
+
+				}
+
+				charset =
+					messageTemplateType.getCharset ();
+
+			}
+
+			// length of non variable parts
+
+			Integer messageLength = 0;
+
+			if (message != null) {
+
+				String[] parts =
+					message.split("\\{(.*?)\\}");
+
+				for (int i = 0; i < parts.length; i++) {
+
+					// length of special chars if gsm encoding
+
+					if (charset == MessageTemplateTypeCharset.gsm) {
+
+						if (! Gsm.isGsm (parts[i]))
+							throw new RuntimeException ("Message text is invalid");
+
+						messageLength +=
+							Gsm.length (parts[i]);
+
+					}
+					else {
+						messageLength +=
+								parts[i].length();
+					}
+
+				}
+
+				// length of the parameters
+
+				Pattern regExp =
+					Pattern.compile ("\\{(.*?)\\}");
+
+				Matcher matcher =
+					regExp.matcher (message);
+
+				while (matcher.find ()) {
+
+					String parameterName =
+						matcher.group (1);
+
+						messageLength +=
+							Integer.parseInt (
+								dataMap.get (parameterName));
+
+				}
+
+			}
+
+			out.write (
+				stringFormat (
+					"<span",
+					" class=\"templatechars\"",
+					">",
+					"Your template has %d characters. ",
+					messageLength,
+					"(Min. Length: %s - ",
+					dataMap.get("minimumTemplateLength"),
+					"Max. Length: %s)",
+					dataMap.get("maximumTemplateLength"),
+					"</span>"));
 		}
 
 	}

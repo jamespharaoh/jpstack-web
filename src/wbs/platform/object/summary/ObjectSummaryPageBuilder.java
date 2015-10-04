@@ -38,6 +38,7 @@ import wbs.platform.console.responder.ConsoleFile;
 import wbs.platform.console.tab.ConsoleContextTab;
 import wbs.platform.console.tab.TabContextResponder;
 import wbs.platform.text.console.TextPart;
+import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryPageBuilder")
@@ -96,6 +97,8 @@ class ObjectSummaryPageBuilder {
 	ConsoleHelper<?> consoleHelper;
 
 	FormFieldSet formFieldSet;
+
+	FieldsProvider fieldsProvider;
 
 	String privKey;
 
@@ -250,7 +253,8 @@ class ObjectSummaryPageBuilder {
 
 				return summaryFieldsPart.get ()
 					.consoleHelper (consoleHelper)
-					.formFieldSet (formFieldSet);
+					.formFieldSet (formFieldSet)
+					.formFieldsProvider (fieldsProvider);
 
 			}
 
@@ -356,6 +360,23 @@ class ObjectSummaryPageBuilder {
 
 			addFieldsPart (
 				formFieldSet);
+
+		}
+
+		// if a provider name is provided
+
+		if (spec.fieldsProviderName () != null) {
+
+			fieldsProvider =
+				applicationContext.getBean (
+					spec.fieldsProviderName (),
+					FieldsProvider.class);
+		}
+
+		else {
+
+			fieldsProvider =
+				null;
 
 		}
 

@@ -89,6 +89,10 @@ interface ObjectHelperProvider {
 	RecordType insert (
 			RecordType object);
 
+	<RecordType extends Record<?>>
+	RecordType update (
+			RecordType object);
+
 	List<Integer> searchIds (
 			Object search);
 
@@ -125,6 +129,15 @@ interface ObjectHelperProvider {
 
 	boolean getDeleted (
 			Record<?> object);
+
+	Object getDynamic (
+			Record<?> object,
+			String name);
+
+	void setDynamic (
+			Record<?> object,
+			String name,
+			Object value);
 
 	// hooks
 

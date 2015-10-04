@@ -168,6 +168,10 @@
 			package="wbs.platform.object.list"/>
 
 		<plugin
+			name="object-ticket-create"
+			package="wbs.services.ticket.create"/>
+
+		<plugin
 			name="object-search"
 			package="wbs.platform.object.search"/>
 
@@ -555,6 +559,14 @@ i		<plugin
 			name="wallet"
 			package="wbs.services.wallet"/>
 
+		<plugin
+			name="ticket-core"
+			package="wbs.services.ticket.core"/>
+
+		<plugin
+			name="message-template"
+			package="wbs.services.messagetemplate"/>
+
 		<!-- integrations -->
 
 		<plugin
@@ -596,6 +608,10 @@ i		<plugin
 		<plugin
 			name="paypal"
 			package="wbs.integrations.paypal"/>
+
+		<plugin
+			name="sms-arena"
+			package="wbs.integrations.smsarena"/>
 
 		<plugin
 			name="txt-nation"

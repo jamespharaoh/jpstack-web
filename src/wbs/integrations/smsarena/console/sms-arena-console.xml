@@ -1,0 +1,50 @@
+<console-module
+	name="sms-arena">
+
+	<simple-context
+		name="sms-arena">
+
+		<priv-key
+			name="smsArena.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-link
+			name="config"
+			link="smsArenaConfig"
+			label="Configs"
+			priv-key="smsArena.manage"/>
+
+		<section
+			name="route"
+			label="Routes">
+
+			<context-link
+				name="in"
+				link="smsArenaRouteIn"
+				label="Inbound routes"
+				priv-key="smsArena.manage"/>
+
+			<context-link
+				name="out"
+				link="smsArenaRouteOut"
+				label="Outbound routes"
+				priv-key="smsArena.manage"/>
+
+		</section>
+
+		<section
+			name="log"
+			label="Logs">
+
+			<context-link
+				name="DlrReport"
+				link="smsArenaDlrReportLog"
+				label="SMSArena Delivery Reports"
+				priv-key="smsArena.manage"/>
+
+		</section>
+
+	</simple-context>
+
+</console-module>

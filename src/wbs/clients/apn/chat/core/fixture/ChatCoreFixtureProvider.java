@@ -47,6 +47,7 @@ import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.model.RouterRec;
 import wbs.sms.route.sender.model.SenderObjectHelper;
+import wbs.services.ticket.core.model.TicketManagerObjectHelper;
 
 @PrototypeComponent ("chatCoreFixtureProvider")
 public
@@ -75,6 +76,9 @@ class ChatCoreFixtureProvider
 
 	@Inject
 	CurrencyObjectHelper currencyHelper;
+
+	@Inject
+	TicketManagerObjectHelper ticketManagerHelper;
 
 	@Inject
 	Database database;
@@ -286,6 +290,10 @@ class ChatCoreFixtureProvider
 				currencyHelper.findByCode (
 					GlobalId.root,
 					"gbp"))
+
+			.setTicketManager(
+				ticketManagerHelper.find (
+						1))
 
 		);
 

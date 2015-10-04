@@ -462,6 +462,19 @@ class ObjectManagerImpl
 	}
 
 	@Override
+	public <RecordType extends Record<?>>
+	RecordType update (
+			@NonNull RecordType object) {
+
+		ObjectHelper<?> objectHelper =
+			objectHelperForClass (object.getClass ());
+
+		return objectHelper.update (
+			object);
+
+	}
+
+	@Override
 	public
 	String getCode (
 			@NonNull Record<?> object) {
@@ -637,6 +650,14 @@ class ObjectManagerImpl
 		) {
 
 			if (
+				equal (
+					pathPart,
+					"this")
+			) {
+
+				// same object
+
+			} else if (
 				equal (
 					pathPart,
 					"parent")

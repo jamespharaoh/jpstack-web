@@ -111,6 +111,11 @@ class ObjectFormFieldBuilder {
 				spec.readOnly (),
 				false);
 
+		Boolean dynamic =
+			ifNull (
+				spec.dynamic(),
+				false);
+
 		ConsoleHelper<?> consoleHelper =
 			consoleHelperRegistry.findByObjectName (
 				spec.objectTypeName ());
@@ -148,7 +153,10 @@ class ObjectFormFieldBuilder {
 					name)
 
 				.nativeClass (
-					Integer.class);
+					Integer.class)
+
+				.dynamic (
+					dynamic);
 
 			// native mapping
 
@@ -169,7 +177,10 @@ class ObjectFormFieldBuilder {
 					name)
 
 				.nativeClass (
-					Record.class);
+					Record.class)
+
+				.dynamic (
+					dynamic);
 
 			// native mapping
 
