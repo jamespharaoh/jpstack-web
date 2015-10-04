@@ -22,8 +22,8 @@ import org.joda.time.Instant;
 import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.CollectionField;
+import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
-import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
@@ -35,9 +35,6 @@ import wbs.framework.utils.RandomLogic;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
-import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
-import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
-import wbs.services.ticket.core.model.TicketObjectHelper;
 
 import com.google.common.collect.Ordering;
 
@@ -45,7 +42,7 @@ import com.google.common.collect.Ordering;
 @Data
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
-@MajorEntity
+@CommonEntity
 public class TicketRec
 	implements CommonRecord<TicketRec> {
 
@@ -177,7 +174,9 @@ public class TicketRec
 				String name) {
 
 			TicketRec ticket =
-				(TicketRec) object;
+				(TicketRec)
+				(Object)
+				object;
 
 			//Find the ticket field type
 
@@ -243,7 +242,9 @@ public class TicketRec
 				Object value) {
 
 			TicketRec ticket =
-				(TicketRec) object;
+				(TicketRec)
+				(Object)
+				object;
 
 			//Find the ticket field type
 

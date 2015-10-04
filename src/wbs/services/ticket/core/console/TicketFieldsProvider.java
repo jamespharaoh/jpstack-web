@@ -51,7 +51,9 @@ class TicketFieldsProvider
 		// retrieve existing ticket field types
 
 		TicketManagerRec ticketManager =
-			(TicketManagerRec) parent;
+			(TicketManagerRec)
+			(Object)
+			parent;
 
 		Set<TicketFieldTypeRec> ticketFieldTypes =
 				ticketManager.getTicketFieldTypes();

@@ -10,15 +10,14 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.hibernate.TransientObjectException;
-
-import com.google.common.collect.Ordering;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.hibernate.TransientObjectException;
+
 import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.CollectionField;
@@ -30,19 +29,22 @@ import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.CommonRecord;
+import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.sms.gsm.Gsm;
+
+import com.google.common.collect.Ordering;
 
 @Accessors (chain = true)
 @Data
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public class MessageTemplateSetRec
-	implements CommonRecord<MessageTemplateSetRec> {
+public 
+class MessageTemplateSetRec
+	implements MajorRecord<MessageTemplateSetRec> {
 
 	// id
 
@@ -121,9 +123,11 @@ public class MessageTemplateSetRec
 				String name) {
 
 			MessageTemplateSetRec messageTemplateSet =
-				(MessageTemplateSetRec) object;
+				(MessageTemplateSetRec)
+				(Object)
+				object;
 
-			//Find the ticket field type
+			// find the ticket field type
 
 			MessageTemplateTypeRec messageTemplateType =
 				messageTemplateTypeHelper.get().findByCode(
@@ -132,17 +136,20 @@ public class MessageTemplateSetRec
 
 			try {
 
-				//Find the message template value
+				// find the message template value
 
 				MessageTemplateValueRec messageTemplateValue =
-					messageTemplateSet.getMessageTemplateValues().get(
-						messageTemplateType.getId());
+					messageTemplateSet.getMessageTemplateValues ().get(
+						messageTemplateType.getId ());
 
 				if (messageTemplateValue == null) {
-					return messageTemplateType.getDefaultValue();
-				}
-				else {
-					return messageTemplateValue.getStringValue();
+
+					return messageTemplateType.getDefaultValue ();
+
+				} else {
+
+					return messageTemplateValue.getStringValue ();
+
 				}
 
 			} catch (TransientObjectException exception) {
@@ -163,26 +170,30 @@ public class MessageTemplateSetRec
 				Object value) {
 
 			MessageTemplateSetRec messageTemplateSet =
-				(MessageTemplateSetRec) object;
+				(MessageTemplateSetRec)
+				(Object)
+				object;
 
 			// find the ticket field type
 
 			MessageTemplateTypeRec messageTemplateType =
-				messageTemplateTypeHelper.get().findByCode(
-					messageTemplateSet.getMessageTemplateDatabase(),
+				messageTemplateTypeHelper.get ().findByCode (
+					messageTemplateSet.getMessageTemplateDatabase (),
 					name);
 
 			List<String> messageTemplateUsedParameters =
-				new ArrayList<String>();
+				new ArrayList<String> ();
 
-			String message = (String) value;
+			String message =
+				(String) value;
 
 			// length of non variable parts
 
 			Integer messageLength = 0;
 
 			String[] parts =
-				message.split("\\{(.*?)\\}");
+				message.split (
+					"\\{(.*?)\\}");
 
 			for (int i = 0; i < parts.length; i++) {
 
@@ -196,10 +207,11 @@ public class MessageTemplateSetRec
 					messageLength +=
 						Gsm.length (parts[i]);
 
-				}
-				else {
+				} else {
+				
 					messageLength +=
 							parts[i].length();
+				
 				}
 
 			}

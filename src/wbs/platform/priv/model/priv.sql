@@ -126,6 +126,11 @@ RETURNS void AS $$
 					'WHERE priv.id IS NULL'
 				LOOP
 
+						RAISE NOTICE
+							'		- Object % (%) AAA',
+							the_record.code,
+							the_record.id;
+
 					IF NOT has_shown_object_type AND the_make_noise THEN
 
 						RAISE NOTICE
@@ -156,6 +161,9 @@ RETURNS void AS $$
 					END IF;
 
 					IF the_actually_create THEN
+
+RAISE NOTICE '% % % %', the_priv_type.id, the_object_type.id, the_record.id,
+	the_priv_type.code);
 
 						INSERT INTO priv (
 							priv_type_id,

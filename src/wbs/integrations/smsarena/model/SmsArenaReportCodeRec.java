@@ -11,10 +11,10 @@ import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.DeletedField;
 import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
-import wbs.framework.entity.annotations.MajorEntity;
+import wbs.framework.entity.annotations.MinorEntity;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.record.MajorRecord;
+import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
 import wbs.sms.message.core.model.MessageStatus;
 
@@ -22,10 +22,10 @@ import wbs.sms.message.core.model.MessageStatus;
 @Data
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id")
-@MajorEntity
+@MinorEntity
 public
 class SmsArenaReportCodeRec
-	implements MajorRecord<SmsArenaReportCodeRec> {
+	implements MinorRecord<SmsArenaReportCodeRec> {
 
 	// id
 

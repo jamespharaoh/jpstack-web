@@ -1,11 +1,12 @@
 package wbs.integrations.smsarena.model;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.DescriptionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
