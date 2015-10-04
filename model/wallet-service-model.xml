@@ -1,11 +1,11 @@
 <model-meta
-	name="wallet">
+	name="walletService">
 
 	<priv-types>
 
 		<priv-type
 			name="Manage"
-			description="Full control of a wallet"
+			description="Full control of a wallet service"
 			template="yes"/>
 
 	</priv-types>
