@@ -1,24 +1,3 @@
-SELECT priv_type_insert (
-	'broadcast_config',
-	'manage',
-	'Full control',
-	'Full control of the broadcast config',
-	true);
-
-SELECT priv_type_insert (
-	'broadcast_config',
-	'messages',
-	'View messages',
-	'View message history for the broadcast config',
-	true);
-
-SELECT priv_type_insert (
-	'broadcast_config',
-	'stats',
-	'Message stats',
-	'View message stats for the broadcast config',
-	true);
-
 SELECT service_type_insert (
 	'broadcast_config',
 	'default',

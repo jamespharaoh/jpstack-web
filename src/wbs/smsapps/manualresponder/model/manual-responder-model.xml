@@ -1,0 +1,46 @@
+<model-meta
+	name="manualResponder">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a manual responder"
+			template="yes"/>
+
+		<priv-type
+			name="Messages"
+			description="View message history for a manual responder"
+			template="yes"/>
+
+		<priv-type
+			name="Stats"
+			description="View message statistics for a manual responder"
+			template="yes"/>
+
+		<priv-type
+			name="Supervisor"
+			description="View supervisor reports for a manual responder"
+			template="yes"/>
+
+		<priv-type
+			name="Reply"
+			description="Reply to requests received by a manual responder"
+			template="yes"/>
+
+		<priv-type
+			name="Number"
+			description="View phone numbers for a manual responder"
+			template="yes"/>
+
+		<!-- slice -->
+
+		<priv-type
+			subject="slice"
+			name="Manual responder create"
+			description="Create new manual responders in a slice"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

@@ -2,14 +2,17 @@
 	name="priv"
 	package="wbs.platform.priv">
 
-	<sql-scripts>
-		<sql-schema name="priv"/>
-	</sql-scripts>
-
 	<models>
 		<model name="priv"/>
 		<model name="privType"/>
 	</models>
+
+	<layer name="entity">
+		<bean class="model.PrivTypeBuilder"/>
+		<bean class="model.PrivTypeSpec"/>
+		<bean class="model.PrivTypesBuilder"/>
+		<bean class="model.PrivTypesSpec"/>
+	</layer>
 
 	<layer name="console">
 		<bean class="console.ObjectSummaryPrivPart"/>

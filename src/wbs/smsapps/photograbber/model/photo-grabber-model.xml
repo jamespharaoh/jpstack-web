@@ -1,0 +1,39 @@
+<model-meta
+	name="photoGrabber">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a photo grabber"
+			template="yes"/>
+
+		<priv-type
+			name="Messages"
+			description="View message history for a photo grabber"
+			template="yes"/>
+
+		<priv-type
+			name="Stats"
+			description="View messages stats for a photo grabber"
+			template="yes"/>
+
+		<priv-type
+			name="Photo grabber history"
+			description="View request history for a photo grabber"
+			template="yes"/>
+
+		<priv-type
+			name="Photo grabber reissue"
+			description="Reissue photos for a photo grabber"
+			template="yes"/>
+
+		<priv-type
+			subject="slice"
+			name="Photo grabber create"
+			description="Create a new photo grabber in a slice"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

@@ -1,0 +1,18 @@
+<model-meta
+	name="menuGroup">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a menu group"
+			template="yes"/>
+
+		<priv-type
+			name="View"
+			description="View all menu items in a menu group"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

@@ -1,0 +1,13 @@
+<model-meta
+	name="queue">
+
+	<priv-types>
+
+		<priv-type
+			name="Reply"
+			description="Reply to items in a queue"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

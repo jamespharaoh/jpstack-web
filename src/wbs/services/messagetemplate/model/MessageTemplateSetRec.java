@@ -42,7 +42,7 @@ import com.google.common.collect.Ordering;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public 
+public
 class MessageTemplateSetRec
 	implements MajorRecord<MessageTemplateSetRec> {
 
@@ -208,10 +208,10 @@ class MessageTemplateSetRec
 						Gsm.length (parts[i]);
 
 				} else {
-				
+
 					messageLength +=
 							parts[i].length();
-				
+
 				}
 
 			}

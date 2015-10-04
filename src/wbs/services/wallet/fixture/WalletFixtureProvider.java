@@ -1,4 +1,4 @@
-package wbs.wallet.fixture;
+package wbs.services.wallet.fixture;
 
 import javax.inject.Inject;
 
@@ -10,10 +10,10 @@ import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
-import wbs.wallet.model.WalletObjectHelper;
-import wbs.wallet.model.WalletRec;
-import wbs.wallet.model.WalletServiceObjectHelper;
-import wbs.wallet.model.WalletServiceRec;
+import wbs.services.wallet.model.WalletObjectHelper;
+import wbs.services.wallet.model.WalletRec;
+import wbs.services.wallet.model.WalletServiceObjectHelper;
+import wbs.services.wallet.model.WalletServiceRec;
 
 @PrototypeComponent ("walletFixtureProvider")
 public

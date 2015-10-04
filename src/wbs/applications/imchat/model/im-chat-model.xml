@@ -1,0 +1,18 @@
+<model-meta
+	name="imChat">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of an IM chat"
+			template="yes"/>
+
+		<priv-type
+			name="Supervisor"
+			description="View supervisor reports for an IM chat"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

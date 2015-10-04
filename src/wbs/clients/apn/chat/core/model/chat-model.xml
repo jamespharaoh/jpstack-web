@@ -1,0 +1,33 @@
+<model-meta
+	name="chat">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of an SMS chat service"
+			template="yes"/>
+
+		<priv-type
+			name="Messages"
+			description="View message history for an SMS chat service"
+			template="yes"/>
+
+		<priv-type
+			name="Stats"
+			description="View message statistics for an SMS chat service"
+			template="yes"/>
+
+		<priv-type
+			name="Supervisor"
+			description="View supervisor reports for an SMS chat service"
+			template="yes"/>
+
+		<priv-type
+			name="Broadcast"
+			description="Send and manage broadcasts for an SMS chat service"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

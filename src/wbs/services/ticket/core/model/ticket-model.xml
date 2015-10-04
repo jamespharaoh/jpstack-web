@@ -1,0 +1,13 @@
+<model-meta
+	name="ticketManager">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a ticket manager"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

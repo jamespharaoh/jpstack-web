@@ -1,0 +1,29 @@
+<model-meta
+	name="chatAffiliate">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a chat affiliate"
+			template="yes"/>
+
+		<priv-type
+			name="Messages"
+			description="View messages for a chat affiliate"
+			template="yes"/>
+
+		<priv-type
+			name="Stats"
+			description="View message stats for a chat affiliate"
+			template="yes"/>
+
+		<priv-type
+			subject="chatScheme"
+			name="Affiliate create"
+			description="Create chat affiliates in a chat scheme"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

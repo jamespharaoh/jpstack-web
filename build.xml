@@ -186,7 +186,7 @@
       <fileset dir="src/wbs/clients/apn/chat/user/pending/console/files"/>
       <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
       <fileset dir="src/wbs/applications/imchat/console/files"/>
-      <fileset dir="src/wbs/wallet/console/files"/>
+      <fileset dir="src/wbs/services/wallet/console/files"/>
       <fileset dir="src/wbs/services/ticket/core/console/files"/>
       <fileset dir="src/wbs/services/messagetemplate/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
@@ -198,8 +198,8 @@
       <fileset dir="src/wbs/integrations/mediaburst/console/files"/>
       <fileset dir="src/wbs/integrations/mig/console/files"/>
       <fileset dir="src/wbs/integrations/oxygen8/console/files"/>
-      <fileset dir="src/wbs/integrations/smsarena/console/files"/>
       <fileset dir="src/wbs/integrations/paypal/console/files"/>
+      <fileset dir="src/wbs/integrations/smsarena/console/files"/>
       <fileset dir="src/wbs/integrations/txtnation/console/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/console/files"/>
       <fileset dir="src/wbs/integrations/urbanairship/console/files"/>
@@ -356,7 +356,7 @@
       <fileset dir="src/wbs/clients/apn/chat/user/pending/api/files"/>
       <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
       <fileset dir="src/wbs/applications/imchat/api/files"/>
-      <fileset dir="src/wbs/wallet/api/files"/>
+      <fileset dir="src/wbs/services/wallet/api/files"/>
       <fileset dir="src/wbs/services/ticket/core/api/files"/>
       <fileset dir="src/wbs/services/messagetemplate/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
@@ -368,8 +368,8 @@
       <fileset dir="src/wbs/integrations/mediaburst/api/files"/>
       <fileset dir="src/wbs/integrations/mig/api/files"/>
       <fileset dir="src/wbs/integrations/oxygen8/api/files"/>
-      <fileset dir="src/wbs/integrations/smsarena/api/files"/>
       <fileset dir="src/wbs/integrations/paypal/api/files"/>
+      <fileset dir="src/wbs/integrations/smsarena/api/files"/>
       <fileset dir="src/wbs/integrations/txtnation/api/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/api/files"/>
       <fileset dir="src/wbs/integrations/urbanairship/api/files"/>
@@ -560,7 +560,7 @@
       <fileset dir="src/wbs/clients/apn/chat/user/pending/console/files"/>
       <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
       <fileset dir="src/wbs/applications/imchat/console/files"/>
-      <fileset dir="src/wbs/wallet/console/files"/>
+      <fileset dir="src/wbs/services/wallet/console/files"/>
       <fileset dir="src/wbs/services/ticket/core/console/files"/>
       <fileset dir="src/wbs/services/messagetemplate/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
@@ -572,8 +572,8 @@
       <fileset dir="src/wbs/integrations/mediaburst/console/files"/>
       <fileset dir="src/wbs/integrations/mig/console/files"/>
       <fileset dir="src/wbs/integrations/oxygen8/console/files"/>
-      <fileset dir="src/wbs/integrations/smsarena/console/files"/>
       <fileset dir="src/wbs/integrations/paypal/console/files"/>
+      <fileset dir="src/wbs/integrations/smsarena/console/files"/>
       <fileset dir="src/wbs/integrations/txtnation/console/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/console/files"/>
       <fileset dir="src/wbs/integrations/urbanairship/console/files"/>
@@ -730,7 +730,7 @@
       <fileset dir="src/wbs/clients/apn/chat/user/pending/api/files"/>
       <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
       <fileset dir="src/wbs/applications/imchat/api/files"/>
-      <fileset dir="src/wbs/wallet/api/files"/>
+      <fileset dir="src/wbs/services/wallet/api/files"/>
       <fileset dir="src/wbs/services/ticket/core/api/files"/>
       <fileset dir="src/wbs/services/messagetemplate/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
@@ -742,8 +742,8 @@
       <fileset dir="src/wbs/integrations/mediaburst/api/files"/>
       <fileset dir="src/wbs/integrations/mig/api/files"/>
       <fileset dir="src/wbs/integrations/oxygen8/api/files"/>
-      <fileset dir="src/wbs/integrations/smsarena/api/files"/>
       <fileset dir="src/wbs/integrations/paypal/api/files"/>
+      <fileset dir="src/wbs/integrations/smsarena/api/files"/>
       <fileset dir="src/wbs/integrations/txtnation/api/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/api/files"/>
       <fileset dir="src/wbs/integrations/urbanairship/api/files"/>
@@ -845,10 +845,7 @@
       <script name="src/wbs/platform/media/model/content.sql"/>
       <script name="src/wbs/platform/media/model/media.sql"/>
       <script name="src/wbs/platform/menu/model/menu.sql"/>
-      <script name="src/wbs/platform/priv/model/priv.sql"/>
       <script name="src/wbs/platform/queue/model/queue.sql"/>
-      <script name="src/wbs/platform/scaffold/model/root.sql"/>
-      <script name="src/wbs/platform/scaffold/model/slice.sql"/>
       <script name="src/wbs/platform/service/model/service.sql"/>
       <script name="src/wbs/platform/text/model/text.sql"/>
       <script name="src/wbs/platform/user/model/user.sql"/>
@@ -899,17 +896,11 @@
       <script name="src/wbs/platform/affiliate/model/affiliate-data.sql"/>
       <script name="src/wbs/platform/event/model/event-data.sql"/>
       <script name="src/wbs/platform/exception/model/exception-data.sql"/>
-      <script name="src/wbs/platform/group/model/group-data.sql"/>
       <script name="src/wbs/platform/media/model/media-data.sql"/>
-      <script name="src/wbs/platform/menu/model/menu-data.sql"/>
-      <script name="src/wbs/platform/queue/model/queue-data.sql"/>
       <script name="src/wbs/platform/service/model/service-data.sql"/>
-      <script name="src/wbs/platform/user/model/user-data.sql"/>
       <script name="src/wbs/platform/postgresql/model/postgresql-maintenance-data.sql"/>
-      <script name="src/wbs/sms/network/model/network-data.sql"/>
       <script name="src/wbs/sms/number/core/model/number-data.sql"/>
       <script name="src/wbs/sms/route/core/model/route-data.sql"/>
-      <script name="src/wbs/sms/gazetteer/model/gazetteer-data.sql"/>
       <script name="src/wbs/sms/message/inbox/model/sms-inbox-data.sql"/>
       <script name="src/wbs/sms/keyword/model/keyword-data.sql"/>
       <script name="src/wbs/sms/magicnumber/model/magic-number-data.sql"/>
@@ -936,9 +927,7 @@
       <script name="src/wbs/clients/apn/chat/bill/model/chat-bill-data.sql"/>
       <script name="src/wbs/clients/apn/chat/user/image/model/chat-user-image-data.sql"/>
       <script name="src/wbs/applications/imchat/model/im-chat-core-data.sql"/>
-      <script name="src/wbs/wallet/model/wallet-data.sql"/>
       <script name="src/wbs/services/ticket/core/model/ticket-data.sql"/>
-      <script name="src/wbs/services/messagetemplate/model/message-template-data.sql"/>
       <script name="src/wbs/integrations/broadcastsystems/model/broadcast-systems-data.sql"/>
       <script name="src/wbs/integrations/dialogue/model/dialogue-data.sql"/>
       <script name="src/wbs/integrations/digitalselect/model/digital-select-data.sql"/>
@@ -946,7 +935,6 @@
       <script name="src/wbs/integrations/mediaburst/model/mediaburst-data.sql"/>
       <script name="src/wbs/integrations/oxygen8/model/oxygen8-data.sql"/>
       <script name="src/wbs/integrations/smsarena/model/sms-arena-data.sql"/>
-      <script name="src/wbs/integrations/paypal/model/paypal-data.sql"/>
       <script name="src/wbs/test/simulator/model/simulator-data.sql"/>
     </database-init>
   </target>

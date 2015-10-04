@@ -7,10 +7,6 @@
 		<plugin-dependency name="scaffold"/>
 	</plugin-dependencies>
 
-	<sql-scripts>
-		<sql-data name="message-template-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="messageTemplateDatabase"/>
 		<model name="messageTemplateType"/>

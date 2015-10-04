@@ -1,0 +1,29 @@
+<model-meta
+	name="forwarder">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a forwarder"
+			template="yes"/>
+
+		<priv-type
+			name="Messages"
+			description="View message history for a forwarder"
+			template="yes"/>
+
+		<priv-type
+			name="Stats"
+			description="View message stats for a forwarder"
+			template="yes"/>
+
+		<priv-type
+			subject="slice"
+			name="Forwarder create"
+			description="Create a new forwarder in a slice"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

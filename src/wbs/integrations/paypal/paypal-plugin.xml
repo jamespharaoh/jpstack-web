@@ -7,10 +7,6 @@
 		<plugin-dependency name="scaffold"/>
 	</plugin-dependencies>
 
-	<sql-scripts>
-		<sql-data name="paypal-data"/>
-	</sql-scripts>
-
 	<models>
 		<enum-type name="paypalPaymentState"/>
 		<model name="paypalAccount"/>

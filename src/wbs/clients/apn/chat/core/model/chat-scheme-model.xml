@@ -1,0 +1,18 @@
+<model-meta
+	name="chatScheme">
+
+	<priv-types>
+
+		<priv-type
+			name="Messages"
+			description="View message history for an SMS chat service scheme"
+			template="yes"/>
+
+		<priv-type
+			name="Stats"
+			description="View message statistics for an SMS chat service scheme"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

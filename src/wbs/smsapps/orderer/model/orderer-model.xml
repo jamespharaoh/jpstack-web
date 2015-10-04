@@ -1,0 +1,34 @@
+<model-meta
+	name="orderer">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of an orderer"
+			template="yes"/>
+
+		<priv-type
+			name="Messages"
+			description="View message history for an orderer"
+			template="yes"/>
+
+		<priv-type
+			name="Stats"
+			description="View message statistics for an orderer"
+			template="yes"/>
+
+		<priv-type
+			name="Supervisor"
+			description="View supervisor reports for an IM chat"
+			template="yes"/>
+
+		<priv-type
+			subject="slice"
+			name="Orderer create"
+			description="Create new orderers in a slice"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

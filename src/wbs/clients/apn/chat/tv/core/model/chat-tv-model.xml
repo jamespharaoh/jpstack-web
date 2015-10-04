@@ -1,0 +1,6 @@
+SELECT priv_type_insert (
+	'chat',
+	'tv_to_screen',
+	'Moderate user messages to screen',
+	'Allows a user to moderate messages sent by chat users to the TV screen',
+	true);

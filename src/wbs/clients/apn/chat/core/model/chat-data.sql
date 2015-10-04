@@ -1,32 +1,3 @@
-SELECT priv_type_insert (
-	'chat',
-	'supervisor',
-	'Supervisor',
-	'View supervisor reports',
-	true);
-
-SELECT priv_type_insert (
-	'chat',
-	'broadcast',
-	'View and send broadcasts',
-	'Allows a user to create new broadcast advertising messages, and to view '
-	|| 'the history of previous messages.',
-	true);
-
-SELECT priv_type_insert (
-	'chat_scheme',
-	'stats',
-	'View stats',
-	'View messages stats for a chat scheme',
-	true);
-
-SELECT priv_type_insert (
-	'chat_scheme',
-	'messages',
-	'View messages',
-	'View message history for a chat scheme',
-	true);
-
 SELECT batch_type_insert (
 	'chat',
 	'broadcast',

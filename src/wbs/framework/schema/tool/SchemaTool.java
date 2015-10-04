@@ -23,6 +23,7 @@ import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
+import wbs.framework.entity.model.ModelMetaLoader;
 import wbs.framework.logging.TaskLog;
 import wbs.framework.schema.builder.SchemaFromModel;
 import wbs.framework.schema.helper.SchemaTypesHelper;
@@ -39,6 +40,9 @@ class SchemaTool {
 
 	@Inject
 	EntityHelper entityHelper;
+
+	@Inject
+	ModelMetaLoader modelMetaLoader;
 
 	@Inject
 	SchemaToSql schemaToSql;
@@ -68,14 +72,15 @@ class SchemaTool {
 			new TaskLog ()
 				.log (log);
 
-		createSchema ();
-		createSql ();
-		executeSql ();
+		defineTables ();
+		createSchemaSqlScript ();
+		executeSchemaSqlScript ();
 		createObjectTypes ();
+		runModelMetaBuilders ();
 
 	}
 
-	void createSchema () {
+	void defineTables () {
 
 		schema =
 			schemaFromModel.get ()
@@ -102,7 +107,7 @@ class SchemaTool {
 
 	}
 
-	void createSql ()
+	void createSchemaSqlScript ()
 		throws IOException {
 
 		sqlStatements =
@@ -137,7 +142,7 @@ class SchemaTool {
 
 	}
 
-	void executeSql ()
+	void executeSchemaSqlScript ()
 		throws SQLException {
 
 		// execute sql
@@ -301,6 +306,13 @@ class SchemaTool {
 			"Object types created successfully");
 
 		connection.close ();
+
+	}
+
+	private
+	void runModelMetaBuilders () {
+
+		modelMetaLoader.createFixtures ();
 
 	}
 

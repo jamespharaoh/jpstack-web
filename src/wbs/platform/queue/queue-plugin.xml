@@ -8,7 +8,6 @@
 
 	<sql-scripts>
 		<sql-schema name="queue"/>
-		<sql-data name="queue-data"/>
 	</sql-scripts>
 
 	<models>

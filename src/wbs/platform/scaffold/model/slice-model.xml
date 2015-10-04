@@ -1,0 +1,18 @@
+<model-meta
+	name="slice">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a slice"
+			template="yes"/>
+
+		<priv-type
+			name="Supervisor"
+			description="View supervisor reports for a slice"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

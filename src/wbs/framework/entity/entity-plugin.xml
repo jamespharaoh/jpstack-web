@@ -5,6 +5,8 @@
 	<layer name="entity">
 		<bean class="helper.EntityHelperImpl"/>
 		<bean class="model.ModelBuilder"/>
+		<bean class="model.ModelMetaLoader"/>
+		<bean class="model.ModelMetaSpec"/>
 	</layer>
 
 </plugin>

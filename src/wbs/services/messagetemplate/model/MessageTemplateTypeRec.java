@@ -29,7 +29,7 @@ import wbs.framework.record.Record;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MinorEntity
-public 
+public
 class MessageTemplateTypeRec
 	implements MinorRecord<MessageTemplateTypeRec> {
 

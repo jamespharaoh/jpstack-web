@@ -1,4 +1,4 @@
-package wbs.wallet.model;
+package wbs.services.wallet.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

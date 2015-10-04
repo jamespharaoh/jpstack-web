@@ -1,0 +1,19 @@
+<model-meta
+	name="group">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a group"
+			template="yes"/>
+
+		<priv-type
+			subject="slice"
+			name="Group create"
+			description="Create new groups in a slice"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

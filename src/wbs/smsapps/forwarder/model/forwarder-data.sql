@@ -12,34 +12,6 @@ SELECT message_set_type_insert (
 	'default',
 	'Forwarder');
 
-SELECT priv_type_insert (
-	'forwarder',
-	'manage',
-	'Full control',
-	'',
-	true);
-
-SELECT priv_type_insert (
-	'forwarder',
-	'stats',
-	'View message stats',
-	'',
-	true);
-
-SELECT priv_type_insert (
-	'forwarder',
-	'messages',
-	'View message history',
-	'',
-	true);
-
-SELECT priv_type_insert (
-	'slice',
-	'forwarder_create',
-	'Create new forwarders',
-	'',
-	true);
-
 SELECT service_type_insert (
 	'forwarder',
 	'default',

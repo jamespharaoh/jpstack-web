@@ -210,9 +210,17 @@ class DataFromXml {
 
 		dataClassInfos.add (
 			new DataClassInfo ()
-				.parentClass (parentClass)
-				.dataClass (dataClass)
-				.provider (builderProvider));
+
+			.parentClass (
+				parentClass)
+
+			.dataClass (
+				dataClass)
+
+			.provider (
+				builderProvider)
+
+		);
 
 		return this;
 
@@ -223,8 +231,10 @@ class DataFromXml {
 
 		Field parentField = null;
 
-		for (Field field
-				: dataClass.getDeclaredFields ()) {
+		for (
+			Field field
+				: dataClass.getDeclaredFields ()
+		) {
 
 			DataParent dataParentAnnotation =
 				field.getAnnotation (DataParent.class);
@@ -245,6 +255,56 @@ class DataFromXml {
 	}
 
 	public
+	Object readInputStream (
+			InputStream inputStream,
+			String filename) {
+
+		SAXReader saxReader =
+			new SAXReader ();
+
+		Document document;
+
+		try {
+
+			document =
+				saxReader.read (
+					inputStream,
+					filename);
+
+		} catch (DocumentException exception) {
+
+			throw new RuntimeException (exception);
+
+		}
+
+		try {
+
+			return new ElementBuilder ()
+
+				.element (
+					document.getRootElement ())
+
+				.parents (
+					Collections.emptyList ())
+
+				.contextString (
+					filename)
+
+				.build ();
+
+		} catch (Exception exception) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Error reading %s",
+					filename),
+				exception);
+
+		}
+
+	}
+
+	public
 	Object readClasspath (
 			List<Object> parents,
 			String filename) {
@@ -253,7 +313,8 @@ class DataFromXml {
 			new SAXReader ();
 
 		InputStream inputStream =
-			getClass ().getResourceAsStream (filename);
+			getClass ().getResourceAsStream (
+				filename);
 
 		if (inputStream == null) {
 
