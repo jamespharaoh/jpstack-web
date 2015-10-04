@@ -1,0 +1,75 @@
+<console-module
+	name="wallet">
+
+	<console-helper-provider
+		object-name="wallet"
+		view-delegate-field="parent"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="walletId"
+			field="id"/>
+
+		<context-stuff
+			name="walletServiceId"
+			delegate="walletService"
+			field="id"/>
+
+		<run-post-processor
+			name="walletService"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="wallet"
+		object-name="wallet">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"
+				priv-key="walletService.manage"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="wallet">
+
+		<parent-field/>
+		<code-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="wallet">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="wallet">
+
+		<id-field/>
+		<code-field/>
+
+	</field-set>
+
+</console-module>

@@ -1,15 +1,11 @@
 <plugin
 	name="wallet"
-	package="wbs.wallet">
+	package="wbs.services.wallet">
 
 	<plugin-dependencies>
 		<plugin-dependency name="sms-apps-common"/>
 		<plugin-dependency name="scaffold"/>
 	</plugin-dependencies>
-
-	<sql-scripts>
-		<sql-data name="wallet-data"/>
-	</sql-scripts>
 
 	<models>
 		<model name="walletService"/>

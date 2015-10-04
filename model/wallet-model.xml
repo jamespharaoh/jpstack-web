@@ -1,0 +1,13 @@
+<model-meta
+	name="wallet">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a wallet"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>
