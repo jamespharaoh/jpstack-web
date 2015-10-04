@@ -67,7 +67,7 @@ class CoreLogonResponder
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<h1>%h</h1>\n",

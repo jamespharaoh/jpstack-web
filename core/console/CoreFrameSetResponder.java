@@ -32,7 +32,7 @@ class CoreFrameSetResponder
 
 	@Override
 	public
-	void goContent () {
+	void render () {
 
 		goDocType ();
 
@@ -42,10 +42,10 @@ class CoreFrameSetResponder
 
 	@Override
 	public
-	void goHeaders ()
+	void setHtmlHeaders ()
 		throws IOException {
 
-		super.goHeaders ();
+		super.setHtmlHeaders ();
 
 		requestContext.setHeader (
 			"Content-Type",

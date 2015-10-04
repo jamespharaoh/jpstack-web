@@ -15,6 +15,8 @@ import wbs.platform.console.lookup.StringLookup;
 import wbs.platform.console.request.Cryptor;
 import wbs.platform.console.tab.ConsoleContextTab;
 
+import com.google.common.base.Optional;
+
 @Accessors (fluent = true)
 @DataClass ("object-context")
 @PrototypeComponent ("objectContext")
@@ -74,5 +76,8 @@ class ObjectContext
 
 	@Getter @Setter
 	Map<String,Object> stuff;
+
+	@Getter @Setter
+	Optional<String> defaultFileName;
 
 }

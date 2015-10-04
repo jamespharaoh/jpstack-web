@@ -82,7 +82,7 @@ class ObjectSettingsPart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		//for (PagePart pagePart : pageParts)
 		//	pagePart.goHeadStuff();
@@ -91,7 +91,7 @@ class ObjectSettingsPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		if (canEdit) {
 

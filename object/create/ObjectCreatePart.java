@@ -153,7 +153,7 @@ class ObjectCreatePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<p>Please enter the details for the new %h</p>\n",

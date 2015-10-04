@@ -67,12 +67,12 @@ class TabbedResponder
 
 	@Override
 	protected
-	Set<HtmlLink> getLinks () {
+	Set<HtmlLink> htmlLinks () {
 
 		return ImmutableSet.<HtmlLink>builder ()
 
 			.addAll (
-				super.getLinks ())
+				super.htmlLinks ())
 
 			.addAll (
 				pagePart.links ())
@@ -190,11 +190,11 @@ class TabbedResponder
 
 	@Override
 	protected
-	void goHeadStuff () {
+	void renderHtmlHeadContents () {
 
-		super.goHeadStuff ();
+		super.renderHtmlHeadContents ();
 
-		pagePart.goHeadStuff ();
+		pagePart.renderHtmlHeadContent ();
 
 		printFormat (
 			"<script type=\"text/javascript\">\n",
@@ -218,7 +218,7 @@ class TabbedResponder
 
 	@Override
 	protected
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<h1>%h</h1>\n",
@@ -304,7 +304,7 @@ class TabbedResponder
 
 		} else if (pagePart != null) {
 
-			pagePart.goBodyStuff ();
+			pagePart.renderHtmlBodyContent ();
 
 		}
 

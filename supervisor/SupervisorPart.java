@@ -380,14 +380,14 @@ class SupervisorPart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		for (
 			PagePart pagePart
 				: pageParts
 		) {
 
-			pagePart.goHeadStuff ();
+			pagePart.renderHtmlHeadContent ();
 
 		}
 
@@ -395,7 +395,7 @@ class SupervisorPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		String localUrl =
 			requestContext.resolveLocalUrl (
@@ -479,7 +479,7 @@ class SupervisorPart
 				: pageParts
 		) {
 
-			pagePart.goBodyStuff ();
+			pagePart.renderHtmlBodyContent ();
 
 		}
 

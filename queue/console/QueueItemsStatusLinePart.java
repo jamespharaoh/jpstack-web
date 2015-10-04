@@ -1,8 +1,15 @@
 package wbs.platform.queue.console;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
+
+import java.util.Set;
+
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
+import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.part.AbstractPagePart;
+
+import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("queueItemsStatusLinePart")
 public
@@ -11,38 +18,46 @@ class QueueItemsStatusLinePart
 
 	@Override
 	public
-	void goHeadStuff () {
+	Set<ScriptRef> scriptRefs () {
+
+		return ImmutableSet.<ScriptRef>of (
+
+			ConsoleApplicationScriptRef.javascript (
+				"/js/queue-status.js")
+
+		);
+
+	}
+
+	@Override
+	public
+	void renderHtmlHeadContent () {
 
 		printFormat (
 			"<style type=\"text/css\">\n",
 			"#queueRow { display: none; cursor: pointer; }\n",
 			"</style>\n");
 
-		printFormat (
-			"<script type=\"text/javascript\">\n",
-			"function updateQueueItems (numQueue) {\n",
-			"  var queueCell = document.getElementById ('queueCell');\n",
-			"  var queueRow = document.getElementById ('queueRow');\n",
-			"  if (numQueue > 0) queueCell.firstChild.data = '' + numQueue + ' items queueing';\n",
-			"  showTableRow (queueRow, numQueue > 0);\n",
-			"}\n",
-			"</script>\n");
-
 	}
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
-			"<tr id=\"queueRow\"" +
-			" onmouseover=\"this.className='hover';\"" +
-			" onmouseout=\"this.className='';\"" +
-			" onclick=\"%h\"> <td id=\"queueCell\">-</td> </tr>\n",
+			"<tr",
+			" id=\"queue-row\"",
+			" onmouseover=\"this.className='hover';\"",
+			" onmouseout=\"this.className='';\"",
+			" onclick=\"%h\"",
 			stringFormat (
 				"top.frames ['inbox'].location = '%j';",
 				requestContext.resolveApplicationUrl (
-					"/queues/queue.home")));
+					"/queues/queue.home")),
+			"><td",
+			" id=\"queue-cell\"",
+			">-</td>\n",
+			"</tr>\n");
 
 	}
 
