@@ -108,7 +108,7 @@ class ManualResponderReportOperatorCsvResponder
 
 	@Override
 	public
-	void goHeaders () {
+	void setHtmlHeaders () {
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -122,7 +122,7 @@ class ManualResponderReportOperatorCsvResponder
 
 	@Override
 	public
-	void goContent ()
+	void render ()
 		throws IOException {
 
 		List<Integer> users =

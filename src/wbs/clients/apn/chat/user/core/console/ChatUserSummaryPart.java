@@ -125,7 +125,7 @@ class ChatUserSummaryPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		boolean isUser =
 			chatUser.getType () == ChatUserType.user;

@@ -128,7 +128,7 @@ class ChatUserAdminBillPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		if (
 			equal (

@@ -25,7 +25,7 @@ class SubscriptionAdminSearchPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		String localName =
 			requestContext.stuffInt ("subscriptionAffiliateId") != null

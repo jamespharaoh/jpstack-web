@@ -81,7 +81,7 @@ class ChatAffiliateCreatePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		if (chatSchemes.size () == 0) {
 

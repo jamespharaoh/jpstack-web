@@ -150,9 +150,9 @@ class ChatUserPendingFormResponder
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContents () {
 
-		super.goHeadStuff ();
+		super.renderHtmlHeadContents ();
 
 		printFormat (
 			"<script language=\"JavaScript\">\n");
@@ -227,7 +227,7 @@ class ChatUserPendingFormResponder
 
 	@Override
 	protected
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<h1>Chat user&mdash;approve info</h1>\n");

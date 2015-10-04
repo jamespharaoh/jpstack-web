@@ -3,6 +3,8 @@ package wbs.platform.queue.hibernate;
 import java.util.List;
 
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.record.Record;
+import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.queue.model.QueueSubjectRec.QueueSubjectDaoMethods;
 
@@ -13,8 +15,8 @@ class QueueSubjectDaoHibernate
 
 	@Override
 	public
-	List<QueueSubjectRec> findActiveByQueue (
-			int queueId) {
+	List<QueueSubjectRec> findActive (
+			QueueRec queue) {
 
 		return findMany (
 			QueueSubjectRec.class,
@@ -26,7 +28,7 @@ class QueueSubjectDaoHibernate
 
 			.setInteger (
 				"queueId",
-				queueId)
+				queue.getId ())
 
 			.list ());
 
@@ -34,9 +36,9 @@ class QueueSubjectDaoHibernate
 
 	@Override
 	public
-	QueueSubjectRec findByQueueAndObject (
-			int queueId,
-			int objectId) {
+	QueueSubjectRec find (
+			QueueRec queue,
+			Record<?> object) {
 
 		return findOne (
 			QueueSubjectRec.class,
@@ -48,11 +50,11 @@ class QueueSubjectDaoHibernate
 
 			.setInteger (
 				"queueId",
-				queueId)
+				queue.getId ())
 
 			.setInteger (
 				"objectId",
-				objectId)
+				object.getId ())
 
 			.list ());
 

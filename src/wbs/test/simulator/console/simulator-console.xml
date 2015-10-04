@@ -16,7 +16,8 @@
 
 	<object-context
 		name="simulator"
-		object-name="simulator">
+		object-name="simulator"
+		default-file="session">
 
 		<list>
 

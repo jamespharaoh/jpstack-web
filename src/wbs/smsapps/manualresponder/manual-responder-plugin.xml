@@ -4,6 +4,7 @@
 
 	<plugin-dependencies>
 		<plugin-dependency name="network"/>
+		<plugin-dependency name="route-core"/>
 		<plugin-dependency name="sms-apps-common"/>
 	</plugin-dependencies>
 

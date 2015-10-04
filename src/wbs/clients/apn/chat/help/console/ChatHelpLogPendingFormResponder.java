@@ -88,9 +88,9 @@ class ChatHelpLogPendingFormResponder
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContents () {
 
-		super.goHeadStuff ();
+		super.renderHtmlHeadContents ();
 
 		printFormat (
 			"<script language=\"javascript\">\n");
@@ -143,7 +143,7 @@ class ChatHelpLogPendingFormResponder
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		requestContext.flushNotices ();
 

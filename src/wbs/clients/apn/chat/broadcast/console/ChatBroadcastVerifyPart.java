@@ -108,7 +108,7 @@ class ChatBroadcastVerifyPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		// form
 

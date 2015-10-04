@@ -178,7 +178,7 @@ class ObjectSummaryPrivPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<h2>Users</h2>\n");

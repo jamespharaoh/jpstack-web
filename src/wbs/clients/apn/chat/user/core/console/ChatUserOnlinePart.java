@@ -92,7 +92,7 @@ class ChatUserOnlinePart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		printFormat (
 			"<style type=\"text/css\">\n",
@@ -109,7 +109,7 @@ class ChatUserOnlinePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		Date now =
 			new Date ();

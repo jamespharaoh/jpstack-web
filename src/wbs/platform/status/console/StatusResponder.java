@@ -66,25 +66,33 @@ class StatusResponder
 
 	@Override
 	protected
-	Set<ScriptRef> scriptRefs () {
+	Set<ScriptRef> myScriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
-
-			.addAll (
-				super.scriptRefs ())
+		ImmutableSet.Builder<ScriptRef> ret =
+			ImmutableSet.<ScriptRef>builder ()
 
 			.add (
-				JqueryScriptRef.instance)
+				JqueryScriptRef.instance);
 
-			.build ();
+		for (
+			PagePart pagePart
+				: pageParts
+		) {
+
+			ret.addAll (
+				pagePart.scriptRefs ());
+
+		}
+
+		return ret.build ();
 
 	}
 
 	@Override
 	protected
-	void goHeadStuff () {
+	void renderHtmlHeadContents () {
 
-		super.goHeadStuff ();
+		super.renderHtmlHeadContents ();
 
 		printFormat (
 			"<style type=\"text/css\">\n",
@@ -188,18 +196,18 @@ class StatusResponder
 
 		for (PagePart pagePart
 				: pageParts)
-			pagePart.goHeadStuff ();
+			pagePart.renderHtmlHeadContent ();
 
 	}
 
 	@Override
 	protected
-	void goBody () {
+	void renderHtmlBody () {
 
 		printFormat (
 			"<body onload=\"statusRequestSchedule ();\">");
 
-		goBodyStuff ();
+		renderHtmlBodyContents ();
 
 		printFormat (
 			"</body>");
@@ -208,7 +216,7 @@ class StatusResponder
 
 	@Override
 	protected
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<table",
@@ -233,7 +241,7 @@ class StatusResponder
 			"</tr>\n");
 
 		for (PagePart pagePart : pageParts)
-			pagePart.goBodyStuff();
+			pagePart.renderHtmlBodyContent();
 
 		printFormat (
 			"<tr>\n",

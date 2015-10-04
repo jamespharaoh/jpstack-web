@@ -98,7 +98,7 @@ class SimulatorSessionConsolePart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		printFormat (
 			"<style>\n",
@@ -111,7 +111,7 @@ class SimulatorSessionConsolePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<div",

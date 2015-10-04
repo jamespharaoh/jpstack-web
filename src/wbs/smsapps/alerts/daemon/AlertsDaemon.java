@@ -262,22 +262,36 @@ class AlertsDaemon
 		Instant now = Instant.now ();
 		Instant oldest = now;
 
-		for (QueueSubjectRec queueSubject
-				: queueSubjectHelper.findActive ()) {
+		for (
+			QueueSubjectRec queueSubject
+				: queueSubjectHelper.findActive ()
+		) {
 
-			if (! isSubject (
+			if (
+				! isSubject (
 					subjects,
-					queueSubject.getQueue ()))
+					queueSubject.getQueue ())
+			) {
+
 				continue;
 
-			for (QueueItemRec queueItem
-					: queueSubject.getActiveQueueItems ()) {
+			}
 
-				if (! in (
+			for (
+				QueueItemRec queueItem
+					: queueSubject.getActiveQueueItems ()
+			) {
+
+				if (
+					! in (
 						queueItem.getState (),
 						QueueItemState.pending,
-						QueueItemState.waiting))
+						QueueItemState.waiting)
+				) {
+
 					continue;
+
+				}
 
 				Instant createdTime =
 					dateToInstant (

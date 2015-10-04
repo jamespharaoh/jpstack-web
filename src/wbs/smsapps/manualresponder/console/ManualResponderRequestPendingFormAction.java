@@ -1,6 +1,7 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -108,8 +109,7 @@ class ManualResponderRequestPendingFormAction
 	Responder goReal () {
 
 		int manualResponderRequestId =
-			Integer.parseInt (
-				requestContext.parameter ("request_id"));
+			requestContext.stuffInt ("manualResponderRequestId");
 
 		String templateIdStr =
 			requestContext.parameter ("template_id");
@@ -218,8 +218,10 @@ class ManualResponderRequestPendingFormAction
 		// consistency checks
 
 		if (
-			template.getManualResponder ()
-				!= manualResponder) {
+			notEqual (
+				template.getManualResponder (),
+				manualResponder)
+		) {
 
 			requestContext.addError (
 				"Internal error");

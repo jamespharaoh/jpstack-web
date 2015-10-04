@@ -50,7 +50,7 @@ class ChatUserImageViewPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<p>%s</p>\n",

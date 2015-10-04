@@ -109,7 +109,7 @@ class AbstractMediaImageResponder
 
 	@Override
 	protected
-	void goHeaders () {
+	void setHtmlHeaders () {
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -123,7 +123,7 @@ class AbstractMediaImageResponder
 	}
 
 	@Override
-	protected void goContent ()
+	protected void render ()
 		throws IOException {
 
 		requestContext.outputStream ().write (

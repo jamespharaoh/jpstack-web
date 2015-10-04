@@ -219,9 +219,9 @@ class UserPrivsEditorPart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
-		super.goHeadStuff ();
+		super.renderHtmlHeadContent ();
 
 		printFormat (
 			"<script language=\"JavaScript\">\n",
@@ -452,7 +452,7 @@ class UserPrivsEditorPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<form",

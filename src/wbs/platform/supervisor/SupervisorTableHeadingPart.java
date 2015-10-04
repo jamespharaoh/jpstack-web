@@ -41,7 +41,7 @@ class SupervisorTableHeadingPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		// main heading
 

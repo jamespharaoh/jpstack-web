@@ -193,7 +193,7 @@ class GroupPrivsPart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		printFormat (
 			"<script language=\"JavaScript\">\n");
@@ -400,7 +400,7 @@ class GroupPrivsPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<form",

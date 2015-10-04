@@ -147,9 +147,9 @@ class QueueHomeResponder
 
 	@Override
 	protected
-	void goHeadStuff () {
+	void renderHtmlHeadContents () {
 
-		super.goHeadStuff ();
+		super.renderHtmlHeadContents ();
 
 		printFormat (
 			"<script type=\"text/javascript\">\n",
@@ -447,7 +447,7 @@ class QueueHomeResponder
 
 	@Override
 	protected
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<p class=\"links\">\n",

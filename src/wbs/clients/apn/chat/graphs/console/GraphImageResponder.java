@@ -277,7 +277,7 @@ class GraphImageResponder
 
 	@Override
 	protected
-	void goHeaders () {
+	void setHtmlHeaders () {
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -287,7 +287,7 @@ class GraphImageResponder
 
 	@Override
 	protected
-	void goContent ()
+	void render ()
 		throws IOException {
 
 		ImageIO.write (

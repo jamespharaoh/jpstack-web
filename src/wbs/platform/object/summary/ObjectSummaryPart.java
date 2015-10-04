@@ -71,19 +71,19 @@ class ObjectSummaryPart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		for (PagePart part : parts)
-			part.goHeadStuff ();
+			part.renderHtmlHeadContent ();
 
 	}
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		for (PagePart part : parts)
-			part.goBodyStuff ();
+			part.renderHtmlBodyContent ();
 
 	}
 

@@ -116,9 +116,11 @@ class ChatUserSearchResultsPart
 	Set<HtmlLink> links () {
 
 		return ImmutableSet.<HtmlLink>of (
-			HtmlLink.cssStyle (
-				requestContext.resolveApplicationUrl (
-					"/js/chat.js")));
+
+			HtmlLink.applicationCssStyle (
+				"/js/chat.js")
+
+		);
 
 	}
 
@@ -495,7 +497,7 @@ class ChatUserSearchResultsPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<p",

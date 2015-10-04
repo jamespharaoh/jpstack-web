@@ -151,7 +151,7 @@ class ManualResponderReportServicePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		// search form
 

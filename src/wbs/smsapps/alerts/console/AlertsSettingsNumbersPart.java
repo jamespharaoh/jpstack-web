@@ -37,7 +37,7 @@ class AlertsSettingsNumbersPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		// top
 

@@ -101,7 +101,7 @@ class ManualResponderReportSimpleCsvResponder
 
 	@Override
 	public
-	void goHeaders () {
+	void setHtmlHeaders () {
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -115,7 +115,7 @@ class ManualResponderReportSimpleCsvResponder
 
 	@Override
 	public
-	void goContent ()
+	void render ()
 		throws IOException {
 
 		formFieldLogic.outputCsvHeadings (

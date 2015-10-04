@@ -62,7 +62,7 @@ class ChatUserNotesPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		// create note
 

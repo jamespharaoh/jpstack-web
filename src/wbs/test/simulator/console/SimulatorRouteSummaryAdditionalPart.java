@@ -10,7 +10,7 @@ class SimulatorRouteSummaryAdditionalPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<h2>Simulator route information</h2>\n");

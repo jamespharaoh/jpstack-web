@@ -94,7 +94,7 @@ class CoreSidebarMenuResponder
 
 	@Override
 	protected
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<table",

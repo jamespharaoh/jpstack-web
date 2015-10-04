@@ -102,7 +102,7 @@ class ManualResponderReportSimplePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		// search form
 

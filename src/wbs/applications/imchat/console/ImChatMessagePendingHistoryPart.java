@@ -79,7 +79,7 @@ class ImChatMessagePendingHistoryPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		goSummary ();
 

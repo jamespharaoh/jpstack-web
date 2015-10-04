@@ -88,7 +88,7 @@ class ChatUserAdminInfoPart
 
 	@Override
 	public
-	void goBodyStuff() {
+	void renderHtmlBodyContent() {
 
 		if (requestContext.canContext ("chat.userAdmin")) {
 

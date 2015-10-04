@@ -92,12 +92,12 @@ class AbstractPagePart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 	}
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 	}
 
 	public

@@ -355,7 +355,7 @@ class ManualResponderRequestPendingSummaryPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		if (manualResponderRequest == null) {
 
@@ -365,6 +365,9 @@ class ManualResponderRequestPendingSummaryPart
 			return;
 
 		}
+
+		printFormat (
+			"<div class=\"manual-responder-request-pending-summary\">\n");
 
 		goSummary ();
 
@@ -377,6 +380,9 @@ class ManualResponderRequestPendingSummaryPart
 		goSessionDetails ();
 
 		goRequestHistory ();
+
+		printFormat (
+			"</div>\n");
 
 	}
 

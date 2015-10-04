@@ -10,7 +10,7 @@ class ManualResponderStatusLinePart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		printFormat (
 
@@ -44,7 +44,7 @@ class ManualResponderStatusLinePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<tr",

@@ -56,9 +56,9 @@ class ChatMessagePendingFormResponder
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContents () {
 
-		super.goHeadStuff ();
+		super.renderHtmlHeadContents ();
 
 		printFormat (
 			"<script language=\"JavaScript\">\n",
@@ -134,7 +134,7 @@ class ChatMessagePendingFormResponder
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<h1>Chat message to approve</h1>");

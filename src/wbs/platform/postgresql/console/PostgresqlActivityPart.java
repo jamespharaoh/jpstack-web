@@ -60,7 +60,7 @@ class PostgresqlActivityPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		doList (
 			activeStatActivities);

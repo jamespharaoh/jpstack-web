@@ -14,8 +14,12 @@ import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.keyword.model.KeywordObjectHelper;
 import wbs.sms.keyword.model.KeywordRec;
 import wbs.sms.keyword.model.KeywordSetObjectHelper;
+import wbs.sms.route.core.model.RouteObjectHelper;
+import wbs.sms.route.router.model.RouterObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
+import wbs.smsapps.manualresponder.model.ManualResponderTemplateObjectHelper;
+import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
 
 @PrototypeComponent ("manualResponderFixtureProvider")
 public
@@ -40,10 +44,19 @@ class ManualResponderFixtureProvider
 	ManualResponderObjectHelper manualResponderHelper;
 
 	@Inject
+	ManualResponderTemplateObjectHelper manualResponderTemplateHelper;
+
+	@Inject
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@Inject
 	MenuItemObjectHelper menuItemHelper;
+
+	@Inject
+	RouteObjectHelper routeHelper;
+
+	@Inject
+	RouterObjectHelper routerHelper;
 
 	@Inject
 	SliceObjectHelper sliceHelper;
@@ -53,6 +66,15 @@ class ManualResponderFixtureProvider
 	@Override
 	public
 	void createFixtures () {
+
+		createMenuItem ();
+
+		createManualResponder ();
+
+	}
+
+	private
+	void createMenuItem () {
 
 		menuItemHelper.insert (
 			new MenuItemRec ()
@@ -82,6 +104,11 @@ class ManualResponderFixtureProvider
 				"main")
 
 		);
+
+	}
+
+	private
+	void createManualResponder () {
 
 		ManualResponderRec manualResponder =
 			manualResponderHelper.insert (
@@ -127,6 +154,181 @@ class ManualResponderFixtureProvider
 				commandHelper.findByCode (
 					manualResponder,
 					"default"))
+
+		);
+
+		createManualResponderTemplates (
+			manualResponder);
+
+	}
+
+	private
+	void createManualResponderTemplates (
+			ManualResponderRec manualResponder) {
+
+		manualResponderTemplateHelper.insert (
+			new ManualResponderTemplateRec ()
+
+			.setManualResponder (
+				manualResponder)
+
+			.setCode (
+				"fixed")
+
+			.setName (
+				"Fixed")
+
+			.setDescription (
+				"Fixed")
+
+			.setCustomisable (
+				false)
+
+			.setSingleTemplate (
+				"This is a fixed message")
+
+			.setMaximumMessages (
+				1)
+
+			.setMinimumMessageParts (
+				1)
+
+			.setRouter (
+				routerHelper.findByCode (
+					routeHelper.findByCode (
+						GlobalId.root,
+						"test",
+						"free"),
+					"static"))
+
+		);
+
+		manualResponderTemplateHelper.insert (
+			new ManualResponderTemplateRec ()
+
+			.setManualResponder (
+				manualResponder)
+
+			.setCode (
+				"short_billed")
+
+			.setName (
+				"Short Billed")
+
+			.setDescription (
+				"Short Billed")
+
+			.setCustomisable (
+				true)
+
+			.setSingleTemplate (
+				"BILLED MESSAGE: {message}")
+
+			.setFirstTemplate (
+				"BILLED MESSAGE {page}/{pages}: {message}")
+
+			.setMiddleTemplate (
+				"BILLED MESSAGE {page}/{pages}: {message}")
+
+			.setLastTemplate (
+				"BILLED MESSAGE {page}/{pages}: {message}")
+
+			.setMaximumMessages (
+				1)
+
+			.setMinimumMessageParts (
+				1)
+
+			.setRouter (
+				routerHelper.findByCode (
+					routeHelper.findByCode (
+						GlobalId.root,
+						"test",
+						"bill"),
+					"static"))
+
+		);
+
+		manualResponderTemplateHelper.insert (
+			new ManualResponderTemplateRec ()
+
+			.setManualResponder (
+				manualResponder)
+
+			.setCode (
+				"long_billed")
+
+			.setName (
+				"Long Billed")
+
+			.setDescription (
+				"Long Billed")
+
+			.setCustomisable (
+				true)
+
+			.setSingleTemplate (
+				"BILLED MESSAGE: {message}")
+
+			.setFirstTemplate (
+				"BILLED MESSAGE {page}/{pages}: {message}")
+
+			.setMiddleTemplate (
+				"BILLED MESSAGE {page}/{pages}: {message}")
+
+			.setLastTemplate (
+				"BILLED MESSAGE {page}/{pages}: {message}")
+
+			.setMaximumMessages (
+				3)
+
+			.setMinimumMessageParts (
+				2)
+
+			.setRouter (
+				routerHelper.findByCode (
+					routeHelper.findByCode (
+						GlobalId.root,
+						"test",
+						"bill"),
+					"static"))
+
+		);
+
+		manualResponderTemplateHelper.insert (
+			new ManualResponderTemplateRec ()
+
+			.setManualResponder (
+				manualResponder)
+
+			.setCode (
+				"free")
+
+			.setName (
+				"Free")
+
+			.setDescription (
+				"Free")
+
+			.setCustomisable (
+				true)
+
+			.setSingleTemplate (
+				"")
+
+			.setMaximumMessages (
+				1)
+
+			.setMinimumMessageParts (
+				1)
+
+			.setRouter (
+				routerHelper.findByCode (
+					routeHelper.findByCode (
+						GlobalId.root,
+						"test",
+						"free"),
+					"static"))
 
 		);
 

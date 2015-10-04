@@ -20,7 +20,7 @@ class ChatGraphsUsersPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		LocalDate date;
 

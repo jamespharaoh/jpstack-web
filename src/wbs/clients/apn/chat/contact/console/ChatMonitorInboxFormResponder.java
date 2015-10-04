@@ -103,9 +103,9 @@ class ChatMonitorInboxFormResponder
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContents () {
 
-		super.goHeadStuff ();
+		super.renderHtmlHeadContents ();
 
 		if (chatMonitorInbox == null)
 			return;
@@ -158,7 +158,7 @@ class ChatMonitorInboxFormResponder
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		requestContext.flushNotices (out);
 

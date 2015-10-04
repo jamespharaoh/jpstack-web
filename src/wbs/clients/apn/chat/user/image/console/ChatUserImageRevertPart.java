@@ -10,7 +10,7 @@ class ChatUserImageRevertPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<p>Not implemented...</p>\n");

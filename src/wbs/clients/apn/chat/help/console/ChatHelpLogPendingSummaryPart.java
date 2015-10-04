@@ -84,7 +84,7 @@ class ChatHelpLogPendingSummaryPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<table class=\"details\">\n");

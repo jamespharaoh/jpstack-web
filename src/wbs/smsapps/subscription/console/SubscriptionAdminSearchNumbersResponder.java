@@ -35,7 +35,7 @@ class SubscriptionAdminSearchNumbersResponder
 
 	@Override
 	public
-	void goHeaders () {
+	void setHtmlHeaders () {
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -49,7 +49,7 @@ class SubscriptionAdminSearchNumbersResponder
 
 	@Override
 	public
-	void goContent () {
+	void render () {
 
 		PrintWriter out =
 			requestContext.writer ();
