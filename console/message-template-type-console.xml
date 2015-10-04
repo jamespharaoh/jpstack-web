@@ -5,7 +5,7 @@
 		object-name="messageTemplateType"
 		view-delegate-field="parent"
 		view-delegate-priv-code="manage">
-		
+
 		<context-stuff
 			name="messageTemplateTypeName"
 			field="name"/>
@@ -46,9 +46,9 @@
 			<object-settings-page
 				fields="settings"
 				priv-key="messageTemplateDatabase.manage"/>
-				
+
 			<object-events-page/>
-			
+
 			<context-link
 				name="messageTemplateParameter"
 				link="messageTemplateParameter"
@@ -70,20 +70,20 @@
 	<field-set
 		name="create"
 		object-name="messageTemplateType">
-		
+
 		<parent-field/>
-		
+
 		<name-field/>
 
 		<text-field
-			name="defaultValue"/>		
+			name="defaultValue"/>
 
 		<text-field
 			name="helpText"/>
-			
+
 		<integer-field
 			name="minLength"/>
-			
+
 		<integer-field
 			name="maxLength"/>
 
@@ -91,7 +91,7 @@
 			name="charset"
 			nullable="no"
 			helper="messageTemplateTypeCharsetConsoleHelper"/>
-			
+
 	</field-set>
 
 	<field-set
@@ -101,25 +101,25 @@
 		<id-field/>
 		<parent-field/>
 		<code-field/>
-		
+
 		<name-field/>
-		
+
 		<text-field
 			name="defaultValue"/>
-			
+
 		<text-field
 			name="helpText"/>
-			
+
 		<integer-field
 			name="minLength"/>
-			
+
 		<integer-field
-			name="maxLength"/>	
+			name="maxLength"/>
 
 		<enum-field
 			name="charset"
 			nullable="no"
-			helper="messageTemplateTypeCharsetConsoleHelper"/>			
+			helper="messageTemplateTypeCharsetConsoleHelper"/>
 
 	</field-set>
 
@@ -128,36 +128,36 @@
 		object-name="messageTemplateType">
 
 		<parent-field/>
-		
+
 		<name-field/>
-		
+
 		<text-area-field
 			name="defaultValue"
-			data-provider="messageTemplateSettingsFormFieldDataProvider"/>		
-			
+			data-provider="messageTemplateSettingsFormFieldDataProvider"/>
+
 		<script-ref
 			path="/js/jquery-1.7.1.js"/>
-					
+
 		<script-ref
 			path="/js/message-template.js"/>
-			
+
 		<script-ref
 			path="/js/gsm.js"/>
-			
+
 		<text-field
 			name="helpText"/>
-			
+
 		<integer-field
 			name="minLength"/>
-			
+
 		<integer-field
 			name="maxLength"/>
-		
+
 		<enum-field
 			name="charset"
 			nullable="no"
 			helper="messageTemplateTypeCharsetConsoleHelper"/>
-			
+
 	</field-set>
 
 </console-module>

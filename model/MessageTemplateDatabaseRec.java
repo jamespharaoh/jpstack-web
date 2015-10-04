@@ -30,33 +30,33 @@ public class MessageTemplateDatabaseRec
 	implements CommonRecord<MessageTemplateDatabaseRec> {
 
 	// id
-	
+
 	@GeneratedIdField
 	Integer id;
-	
+
 	// identity
-	
+
 	@ParentField
 	SliceRec slice;
-	
+
 	@CodeField
 	String code;
-	
+
 	// details
-	
+
 	@NameField
 	String name;
 
 	@DescriptionField
 	String description;
-	
+
 	@CollectionField (
 			orderBy = "id")
 		Set<MessageTemplateTypeRec> messageTemplateTypes =
 			new TreeSet<MessageTemplateTypeRec> ();
-	
+
 	// object hooks
-	
+
 	public static
 	class MessageTemplateDatabaseHooks
 		extends AbstractObjectHooks<MessageTemplateDatabaseRec> {
@@ -65,35 +65,35 @@ public class MessageTemplateDatabaseRec
 		public
 		void beforeInsert (
 			MessageTemplateDatabaseRec messageTemplateDatabase) {
-			
+
 			messageTemplateDatabase.setCode (
 				messageTemplateDatabase.getName().toLowerCase());
-			
+
 		}
-					
+
 	}
-	
+
 	// compare to
-	
+
 	@Override
 	public
 	int compareTo (
 			Record<MessageTemplateDatabaseRec> otherRecord) {
-	
+
 		MessageTemplateDatabaseRec other =
 			(MessageTemplateDatabaseRec) otherRecord;
-	
+
 		return new CompareToBuilder ()
-	
+
 			.append (
 				getCode (),
 				other.getCode ())
-	
+
 			.append (
 				getSlice (),
 				other.getSlice ())
-	
+
 			.toComparison ();
 
-	}	
+	}
 }

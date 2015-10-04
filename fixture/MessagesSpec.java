@@ -13,7 +13,7 @@ import wbs.framework.data.annotations.DataParent;
 @Accessors (fluent = true)
 @Data
 @DataClass ("messages")
-public 
+public
 class MessagesSpec {
 
 	@DataParent
@@ -32,5 +32,5 @@ class MessagesSpec {
 		valueAttribute = "value")
 	Map<String,String> params =
 		new LinkedHashMap<String,String> ();
-	
+
 }

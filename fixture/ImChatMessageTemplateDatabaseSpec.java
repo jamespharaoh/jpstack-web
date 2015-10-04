@@ -11,9 +11,9 @@ import wbs.framework.data.annotations.DataClass;
 @Accessors (fluent = true)
 @Data
 @DataClass ("im-chat-message-template-database")
-public 
+public
 class ImChatMessageTemplateDatabaseSpec {
-	
+
 	@DataChildren (
 			direct = true)
 		List<MessagesSpec> messages =

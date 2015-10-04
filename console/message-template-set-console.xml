@@ -5,7 +5,7 @@
 		object-name="messageTemplateSet"
 		view-delegate-field="parent"
 		view-delegate-priv-code="manage">
-		
+
 		<context-stuff
 			name="messageTemplateSetName"
 			field="name"/>
@@ -39,7 +39,7 @@
 		</list>
 
 		<object>
-		
+
 			<object-summary-page
 				fields-provider="messageTemplateSetSummaryFieldsProvider"
 				priv-key="messageTemplateDatabase.manage"/>
@@ -47,7 +47,7 @@
 			<object-settings-page
 				fields-provider="messageTemplateSetSettingsFieldsProvider"
 				priv-key="messageTemplateDatabase.manage"/>
-				
+
 			<object-events-page/>
 
 		</object>

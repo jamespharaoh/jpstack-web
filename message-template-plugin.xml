@@ -23,14 +23,14 @@
 	<fixtures>
 		<fixture name="messageTemplate"/>
 	</fixtures>
-	
+
 	<layer name="console">
 		<bean class="console.MessageTemplateSetFieldsProvider"/>
 		<bean class="console.MessageTemplateSetFieldsProvider$Config"/>
 		<bean class="console.MessageTemplateFormFieldDataProvider"/>
 		<bean class="console.MessageTemplateFormFieldDataProvider$Config"/>
 	</layer>
-	
+
 	<console-modules>
 		<console-module name="message-template-database"/>
 		<console-module name="message-template-type"/>

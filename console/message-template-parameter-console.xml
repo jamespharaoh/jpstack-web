@@ -13,7 +13,7 @@
 		<context-stuff
 			name="messageTemplateParameterId"
 			field="id"/>
-			
+
 		<context-stuff
 			name="messageTemplateTypeId"
 			delegate="messageTemplateType"
@@ -32,7 +32,7 @@
 
 			<object-list-page
 				fields="list"/>
-				
+
 			<object-create-page
 				fields="create"/>
 
@@ -42,7 +42,7 @@
 
 			<object-summary-page
 				fields="summary"/>
-				
+
 			<object-settings-page
 				fields="settings"/>
 
@@ -55,7 +55,7 @@
 		object-name="messageTemplateParameter">
 
 		<name-field/>
-		
+
 		<integer-field
 			name="length"/>
 
@@ -63,7 +63,7 @@
 			name="required"/>
 
 	</field-set>
-	
+
 	<field-set
 		name="create"
 		object-name="messageTemplateParameter">
@@ -93,9 +93,9 @@
 
 		<yes-no-field
 			name="required"/>
-			
+
 	</field-set>
-	
+
 	<field-set
 		name="settings"
 		object-name="messageTemplateParameter">
@@ -109,7 +109,7 @@
 
 		<yes-no-field
 			name="required"/>
-			
+
 	</field-set>
 
 </console-module>
