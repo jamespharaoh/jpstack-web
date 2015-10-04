@@ -27,7 +27,7 @@ import wbs.platform.scaffold.model.SliceRec;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public 
+public
 class MessageTemplateDatabaseRec
 	implements MajorRecord<MessageTemplateDatabaseRec> {
 

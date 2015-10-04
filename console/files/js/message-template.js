@@ -4,7 +4,7 @@ function generateString(length) {
 	var str = "";
 
 	for( var i=0; i < length; i++ )
-	    str += 'a';
+		str += 'a';
 
 	return str;
 }
