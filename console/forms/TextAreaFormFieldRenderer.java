@@ -242,11 +242,11 @@ class TextAreaFormFieldRenderer<Container>
 						parent);
 
 			} else {
-			
+
 				data =
 					formFieldDataProvider.getFormFieldData (
 						(Record<?>) container);
-			
+
 			}
 
 			out.write (
@@ -318,7 +318,7 @@ class TextAreaFormFieldRenderer<Container>
 						messageTemplateType.getDefaultValue ();
 
 				} else {
-				
+
 					message =
 						messageTemplateValue.getStringValue ();
 

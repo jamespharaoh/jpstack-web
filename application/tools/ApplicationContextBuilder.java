@@ -226,8 +226,10 @@ class ApplicationContextBuilder {
 
 		}
 
-		for (BeanDefinition beanDefinition
-				: beanDefinitionsToRegister) {
+		for (
+			BeanDefinition beanDefinition
+				: beanDefinitionsToRegister
+		) {
 
 			applicationContext.registerBeanDefinition (
 				beanDefinition);
@@ -292,8 +294,10 @@ class ApplicationContextBuilder {
 
 		if (layer != null) {
 
-			for (PluginBeanSpec bean
-					: layer.beans ()) {
+			for (
+				PluginBeanSpec bean
+					: layer.beans ()
+			) {
 
 				errors +=
 					registerLayerBean (
@@ -328,8 +332,10 @@ class ApplicationContextBuilder {
 				registerConsoleLayerBeans (
 					plugin);
 
-			for (PluginConsoleModuleSpec consoleModule
-					: plugin.consoleModules ()) {
+			for (
+				PluginConsoleModuleSpec consoleModule
+					: plugin.consoleModules ()
+			) {
 
 				errors +=
 					registerConsoleModule (
@@ -339,9 +345,11 @@ class ApplicationContextBuilder {
 
 		}
 
-		if (equal (
+		if (
+			equal (
 				layerName,
-				"hibernate")) {
+				"hibernate")
+		) {
 
 			errors +=
 				registerHibernateLayerBeans (
@@ -349,9 +357,11 @@ class ApplicationContextBuilder {
 
 		}
 
-		if (equal (
+		if (
+			equal (
 				layerName,
-				"object")) {
+				"object")
+		) {
 
 			errors +=
 				registerObjectLayerBeans (
@@ -359,9 +369,11 @@ class ApplicationContextBuilder {
 
 		}
 
-		if (equal (
+		if (
+			equal (
 				layerName,
-				"fixture")) {
+				"fixture")
+		) {
 
 			errors +=
 				registerFixtureLayerBeans (
@@ -685,8 +697,10 @@ class ApplicationContextBuilder {
 
 		int errorCount = 0;
 
-		for (PluginModelSpec projectModelSpec
-				: plugin.models ().models ()) {
+		for (
+			PluginModelSpec projectModelSpec
+				: plugin.models ().models ()
+		) {
 
 			errorCount +=
 				registerDaoHibernate (
@@ -704,8 +718,10 @@ class ApplicationContextBuilder {
 
 		int errorCount = 0;
 
-		for (PluginModelSpec projectModelSpec
-				: plugin.models ().models ()) {
+		for (
+			PluginModelSpec projectModelSpec
+				: plugin.models ().models ()
+		) {
 
 			errorCount +=
 				registerObjectHooks (

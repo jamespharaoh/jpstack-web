@@ -1,0 +1,13 @@
+<model-meta
+	name="user">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a user"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>
