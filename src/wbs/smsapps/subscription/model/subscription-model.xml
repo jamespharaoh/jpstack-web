@@ -3,6 +3,8 @@
 
 	<priv-types>
 
+		<!-- subscription -->
+
 		<priv-type
 			name="Manage"
 			description="Full control of a subscription service"

@@ -1,0 +1,15 @@
+<model-meta
+	name="paypalAccount">
+
+	<priv-types>
+
+		<!-- paypal account -->
+
+		<priv-type
+			name="Manage"
+			description="Full control of a paypal account"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

@@ -1,0 +1,25 @@
+<model-meta
+	name="subscriptionAffiliate">
+
+	<priv-types>
+
+		<!-- subscription affiliate -->
+
+		<priv-type
+			name="Messages"
+			description="View message history for a subscription affiliate"
+			template="yes"/>
+
+		<priv-type
+			name="Stats"
+			description="View message statistics for a subscription affiliate"
+			template="yes"/>
+
+		<priv-type
+			name="Admin"
+			description="Perform administrative tasks for a subscription affiliate"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

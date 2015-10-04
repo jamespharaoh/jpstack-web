@@ -1,0 +1,15 @@
+<model-meta
+	name="messageTemplateDatabase">
+
+	<priv-types>
+
+		<!-- message template database -->
+
+		<priv-type
+			name="Manage"
+			description="Full control of a message template database"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>
