@@ -60,7 +60,7 @@
 		<object-field
 			name="oxygen8Config"
 			label="Config"
-			finder="oxygen8Config"/>
+			object-type="oxygen8Config"/>
 
 		<text-field
 			name="shortcode"/>
@@ -88,7 +88,7 @@
 
 		<object-field
 			name="oxygen8Config"
-			finder="oxygen8Config"/>
+			object-type="oxygen8Config"/>
 
 		<text-field
 			name="relayUrl"/>
@@ -112,6 +112,12 @@
 		<yes-no-field
 			name="multipart"/>
 
+		<seconds-field
+			name="connectTimeout"/>
+
+		<seconds-field
+			name="readTimeout"/>
+
 	</field-set>
 
 	<field-set
@@ -123,7 +129,7 @@
 
 		<object-field
 			name="oxygen8Config"
-			finder="oxygen8Config"/>
+			object-type="oxygen8Config"/>
 
 		<text-field
 			name="relayUrl"/>
@@ -146,6 +152,12 @@
 		<yes-no-field
 			name="multipart"/>
 
+		<seconds-field
+			name="connectTimeout"/>
+
+		<seconds-field
+			name="readTimeout"/>
+
 	</field-set>
 
 	<field-set
@@ -156,7 +168,7 @@
 
 		<object-field
 			name="oxygen8Config"
-			finder="oxygen8Config"/>
+			object-type="oxygen8Config"/>
 
 		<text-field
 			name="relayUrl"/>
@@ -179,6 +191,12 @@
 
 		<yes-no-field
 			name="multipart"/>
+
+		<seconds-field
+			name="connectTimeout"/>
+
+		<seconds-field
+			name="readTimeout"/>
 
 	</field-set>
 

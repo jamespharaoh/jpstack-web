@@ -18,7 +18,8 @@ import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
+import wbs.platform.console.html.JqueryScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.console.part.AbstractPagePart;
@@ -91,15 +92,14 @@ class ChatBroadcastVerifyPart
 				super.scriptRefs ())
 
 			.add (
-				ConsoleContextScriptRef.javascript (
-					"/js/jquery-1.7.1.js"))
+				JqueryScriptRef.instance)
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/DOM.js"))
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/gsm.js"))
 
 			.build ();
@@ -108,7 +108,7 @@ class ChatBroadcastVerifyPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		// form
 

@@ -10,7 +10,7 @@ class CoreHomeResponder
 
 	@Override
 	protected
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<h1>Home</h1>\n");

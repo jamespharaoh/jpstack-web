@@ -20,22 +20,22 @@ import wbs.framework.record.Record;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public class TicketFieldValueRec  
+public class TicketFieldValueRec
 	implements CommonRecord<TicketFieldValueRec> {
-	
+
 	// id
 
 	@GeneratedIdField
 	Integer id;
-	
+
 	@ParentField
 	TicketRec ticket;
-	
+
 	@IdentityReferenceField
 	TicketFieldTypeRec ticketFieldType;
-	
+
 	// details
-	
+
 	@SimpleField (
 		nullable = true)
 	String stringValue;
@@ -43,29 +43,29 @@ public class TicketFieldValueRec
 	@SimpleField (
 		nullable = true)
 	Integer integerValue;
-	
+
 	@SimpleField (
 			nullable = true)
 	Boolean booleanValue;
-	
+
 	// compare to
-	
+
 	@Override
 	public
 	int compareTo (
 			Record<TicketFieldValueRec> otherRecord) {
-	
+
 		TicketFieldValueRec other =
 			(TicketFieldValueRec) otherRecord;
-	
+
 		return new CompareToBuilder ()
-	
+
 			.append (
 				getId (),
 				other.getId ())
-	
+
 			.toComparison ();
-	
+
 	}
 
 }

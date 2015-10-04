@@ -22,13 +22,13 @@ class ObjectSummaryFieldsPart
 	extends AbstractPagePart {
 
 	// dependencies
-	
+
 	@Inject
 	ConsoleObjectManager objectManager;
 
 	@Inject
-	FormFieldLogic formFieldLogic;	
-	
+	FormFieldLogic formFieldLogic;
+
 	@Inject
 	RootObjectHelper rootHelper;
 
@@ -39,7 +39,7 @@ class ObjectSummaryFieldsPart
 
 	@Getter @Setter
 	FormFieldSet formFieldSet;
-	
+
 	@Getter @Setter
 	FieldsProvider formFieldsProvider;
 
@@ -58,20 +58,20 @@ class ObjectSummaryFieldsPart
 			(Record<?>)
 			consoleHelper.lookupObject (
 				requestContext.contextStuff ());
-		
-		if (formFieldsProvider != null) {		
+
+		if (formFieldsProvider != null) {
 			prepareParent();
 			prepareFieldSet();
 		}
 
 	}
-	
+
 	void prepareParent () {
-		
+
 		ConsoleHelper<?> parentHelper =
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
-			
+
 		if (parentHelper.root ()) {
 
 			parent =
@@ -96,19 +96,19 @@ class ObjectSummaryFieldsPart
 			return;
 
 		}
-		
+
 	}
-	
+
 	void prepareFieldSet() {
-		
+
 		formFieldSet = formFieldsProvider.getFields(
 				parent);
-		
+
 	}
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<table class=\"details\">\n");

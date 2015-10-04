@@ -21,6 +21,8 @@ public
 class ChatMessagePendingFormResponder
 	extends HtmlResponder {
 
+	// dependencies
+
 	@Inject
 	ChatHelpTemplateConsoleHelper chatHelpTemplateHelper;
 
@@ -30,8 +32,12 @@ class ChatMessagePendingFormResponder
 	@Inject
 	ConsoleRequestContext requestContext;
 
+	// state
+
 	ChatMessageRec chatMessage;
 	List<ChatHelpTemplateRec> chatHelpTemplates;
+
+	// implementation
 
 	@Override
 	public
@@ -50,9 +56,9 @@ class ChatMessagePendingFormResponder
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContents () {
 
-		super.goHeadStuff ();
+		super.renderHtmlHeadContents ();
 
 		printFormat (
 			"<script language=\"JavaScript\">\n",
@@ -65,12 +71,15 @@ class ChatMessagePendingFormResponder
 
 			"var helpTemplates = new Array ();\n");
 
-		for (ChatHelpTemplateRec cht : chatHelpTemplates) {
+		for (
+			ChatHelpTemplateRec chatHelpTemplate
+				: chatHelpTemplates
+		) {
 
 			printFormat (
 				"helpTemplates[%s] = '%j';\n",
-				cht.getId (),
-				cht.getText ());
+				chatHelpTemplate.getId (),
+				chatHelpTemplate.getText ());
 
 		}
 
@@ -125,7 +134,7 @@ class ChatMessagePendingFormResponder
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<h1>Chat message to approve</h1>");

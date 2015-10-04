@@ -1257,7 +1257,8 @@ class ChatJoiner {
 
 		chatMiscLogic.userAutoJoin (
 			chatUser,
-			message);
+			message,
+			false);
 
 		// run hooks
 

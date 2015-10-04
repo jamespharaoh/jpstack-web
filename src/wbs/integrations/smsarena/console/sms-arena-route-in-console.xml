@@ -60,7 +60,7 @@
 		<object-field
 			name="smsArenaConfig"
 			label="Config"
-			finder="smsArenaConfig"/>
+			object-type="smsArenaConfig"/>
 
 	</field-set>
 
@@ -72,7 +72,7 @@
 
 		<object-field
 			name="smsArenaConfig"
-			finder="smsArenaConfig"/>
+			object-type="smsArenaConfig"/>
 
 	</field-set>
 
@@ -85,7 +85,7 @@
 
 		<object-field
 			name="smsArenaConfig"
-			finder="smsArenaConfig"/>
+			object-type="smsArenaConfig"/>
 
 	</field-set>
 
@@ -97,7 +97,7 @@
 
 		<object-field
 			name="smsArenaConfig"
-			finder="smsArenaConfig"/>
+			object-type="smsArenaConfig"/>
 
 	</field-set>
 

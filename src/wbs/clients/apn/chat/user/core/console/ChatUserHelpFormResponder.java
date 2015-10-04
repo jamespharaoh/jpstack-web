@@ -33,7 +33,7 @@ class ChatUserHelpFormResponder
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<h2>Send help message</h2>\n");

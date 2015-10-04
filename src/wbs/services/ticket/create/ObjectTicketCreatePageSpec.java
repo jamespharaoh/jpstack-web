@@ -18,23 +18,23 @@ import wbs.platform.console.module.ConsoleModuleSpec;
 @PrototypeComponent ("objectTicketCreatePageSpec")
 @ConsoleModuleData
 public class ObjectTicketCreatePageSpec {
-	
+
 	// tree attributes
 
 	@DataAncestor
 	ConsoleModuleSpec consoleSpec;
 
 	// attributes
-	
+
 	@DataAttribute ("ticket-manager")
 	String ticketManager;
-	
+
 	@DataAttribute ("fields-provider")
 	String fieldsProviderName;
-	
+
 	@DataAttribute
 	String typeCode;
-	
+
 	@DataAttribute
 	String name;
 
@@ -52,7 +52,7 @@ public class ObjectTicketCreatePageSpec {
 
 	@DataAttribute ("responder")
 	String responderName;
-	
+
 	@DataAttribute ("target-context-type")
 	String targetContextTypeName;
 
@@ -61,7 +61,7 @@ public class ObjectTicketCreatePageSpec {
 
 	@DataAttribute
 	Boolean hideTab = false;
-	
+
 	@DataAttribute
 	String createPrivDelegate;
 

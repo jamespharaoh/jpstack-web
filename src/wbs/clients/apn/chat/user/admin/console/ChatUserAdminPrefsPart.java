@@ -30,7 +30,7 @@ class ChatUserAdminPrefsPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		if (chatUser == null
 				|| chatUser.getGender () == null

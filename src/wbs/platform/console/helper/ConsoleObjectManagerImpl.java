@@ -649,7 +649,7 @@ class ConsoleObjectManagerImpl
 			object);
 
 	}
-	
+
 	@Override
 	public <ObjectType extends Record<?>>
 	ObjectType update (

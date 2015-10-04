@@ -19,47 +19,47 @@ import wbs.framework.record.Record;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public class MessageTemplateValueRec  
+public class MessageTemplateValueRec
 	implements CommonRecord<MessageTemplateValueRec> {
-	
+
 	// id
 
 	@GeneratedIdField
 	Integer id;
-	
+
 	@ParentField
 	MessageTemplateSetRec messageTemplateSet;
-	
+
 	@IdentityReferenceField
 	MessageTemplateTypeRec messageTemplateType;
-	
+
 	// details
-	
+
 	@SimpleField
 	String stringValue;
 
 	// compare to
-	
+
 	@Override
 	public
 	int compareTo (
 			Record<MessageTemplateValueRec> otherRecord) {
-	
+
 		MessageTemplateValueRec other =
 			(MessageTemplateValueRec) otherRecord;
-	
+
 		return new CompareToBuilder ()
-	
+
 			.append (
 				getId (),
 				other.getId ())
-				
+
 			.append (
 				getMessageTemplateSet (),
 				other.getMessageTemplateSet ())
-	
+
 			.toComparison ();
-	
+
 	}
 
 }

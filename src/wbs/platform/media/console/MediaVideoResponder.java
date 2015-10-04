@@ -64,7 +64,7 @@ class MediaVideoResponder
 
 	@Override
 	public
-	void goHeaders () {
+	void setHtmlHeaders () {
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -78,7 +78,7 @@ class MediaVideoResponder
 
 	@Override
 	public
-	void goContent ()
+	void render ()
 		throws IOException {
 
 		out.write (

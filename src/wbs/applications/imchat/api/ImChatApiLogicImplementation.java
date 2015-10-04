@@ -183,12 +183,12 @@ class ImChatApiLogicImplementation
 				purchase.getValue ());
 
 	}
-	
+
 	@Override
 	public
 	ImChatMessageTemplateData messageTemplateData (
 			String key, String value) {
-		
+
 		return new ImChatMessageTemplateData ()
 
 			.key (

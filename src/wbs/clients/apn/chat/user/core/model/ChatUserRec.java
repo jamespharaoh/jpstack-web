@@ -447,10 +447,15 @@ class ChatUserRec
 	Boolean stealthMonitor = false;
 
 	@SimpleField
-	ChatUserImageMode imageMode = ChatUserImageMode.link;
+	ChatUserImageMode imageMode =
+		ChatUserImageMode.link;
+
+	@SimpleField
+	ChatUserOperatorLabel operatorLabel =
+		ChatUserOperatorLabel.operator;
 
 	// --------------------------------- related objects
-	
+
 	@CollectionField (
 		key = "to_user_id",
 		index = "from_user_id")

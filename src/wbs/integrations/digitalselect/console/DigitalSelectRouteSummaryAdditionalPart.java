@@ -50,7 +50,7 @@ class DigitalSelectRouteSummaryAdditionalPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<h2>Digital Select route information</h2>\n");

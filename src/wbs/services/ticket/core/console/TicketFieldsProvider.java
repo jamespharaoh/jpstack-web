@@ -19,131 +19,162 @@ import wbs.platform.console.forms.ObjectFormFieldSpec;
 import wbs.platform.console.forms.TextFormFieldSpec;
 import wbs.platform.console.forms.YesNoFormFieldSpec;
 import wbs.platform.console.module.ConsoleModuleBuilder;
+import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketManagerRec;
-import wbs.services.ticket.core.console.TicketConsoleHelper;
-import wbs.services.ticket.core.console.TicketFieldTypeConsoleHelper;
-import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 
 @PrototypeComponent ("ticketFieldsProvider")
-public 
-class TicketFieldsProvider 
+public
+class TicketFieldsProvider
 	implements FieldsProvider {
-	
+
 	@Inject
 	ConsoleModuleBuilder consoleModuleBuilder;
-	
+
 	@Inject
 	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
-	
+
 	@Inject
 	TicketFieldTypeConsoleHelper ticketFieldTypeConsoleHelper;
-	
+
 	@Inject
 	TicketConsoleHelper ticketConsoleHelper;
-	
+
 	FormFieldSet formFields;
-	
+
 	String mode;
 
 	@Override
-	public 
+	public
 	FormFieldSet getFields(Record<?> parent) {
-			
+
 		// retrieve existing ticket field types
-		
+
 		TicketManagerRec ticketManager =
 			(TicketManagerRec) parent;
-		
+
 		Set<TicketFieldTypeRec> ticketFieldTypes =
 				ticketManager.getTicketFieldTypes();
-		
+
 		// build form fields
-		
+
 		List<Object> formFieldSpecs =
 				new ArrayList<Object> ();
-		
+
 		for (TicketFieldTypeRec ticketFieldType : ticketFieldTypes) {
-			
+
 			if (mode == "list" && !ticketFieldType.getVisible()) { continue; }
-					
+
 			switch( ticketFieldType.getType() ) {
-				case string:					
+				case string:
 					formFieldSpecs
 						.add(new TextFormFieldSpec()
-							.name(ticketFieldType.getCode ())					
+							.name(ticketFieldType.getCode ())
 							.label(ticketFieldType.getName ())
 							.dynamic (true));
 					break;
-					
+
 				case number:
 					formFieldSpecs
-						.add(new IntegerFormFieldSpec()				
-							.name(ticketFieldType.getCode ())					
+						.add(new IntegerFormFieldSpec()
+							.name(ticketFieldType.getCode ())
 							.label(ticketFieldType.getName ())
 							.dynamic (true));
 					break;
-					
+
 				case bool:
-					formFieldSpecs
-						.add(new YesNoFormFieldSpec()				
-							.name(ticketFieldType.getCode ())					
-							.label(ticketFieldType.getName ())
-							.dynamic (true));
+
+					formFieldSpecs.add (
+						new YesNoFormFieldSpec ()
+
+						.name (
+							ticketFieldType.getCode ())
+
+						.label (
+							ticketFieldType.getName ())
+
+						.dynamic (
+							true)
+
+					);
+
 					break;
-					
-				case object:					
-					formFieldSpecs
-						.add(new ObjectFormFieldSpec()				
-							.name(ticketFieldType.getCode ())					
-							.label(ticketFieldType.getName ())
-							.finderName(underscoreToCamel(ticketFieldType.getObjectType().getCode()))
-							.dynamic (true));
+
+				case object:
+
+					formFieldSpecs.add (
+						new ObjectFormFieldSpec ()
+
+						.name (
+							ticketFieldType.getCode ())
+
+						.label (
+							ticketFieldType.getName ())
+
+						.objectTypeName (
+							underscoreToCamel (
+							 	ticketFieldType.getObjectType ().getCode ()))
+
+						.dynamic (
+							true)
+
+					);
+
 					break;
-					
+
 				default:
 					throw new RuntimeException ();
-			
+
 			}
-    
+
 		}
-		
+
 		// adding the state field
-		
-		formFieldSpecs
-			.add(new ObjectFormFieldSpec()				
-				.name("ticketState")					
-				.label("State")
-				.finderName("ticketState")
-				.dynamic (false));
-			
+
+		formFieldSpecs.add (
+			new ObjectFormFieldSpec ()
+
+			.name (
+				"ticketState")
+
+			.label (
+				"State")
+
+			.objectTypeName (
+				"ticketState")
+
+			.dynamic (
+				false)
+
+		);
+
 		String fieldSetName =
 			stringFormat (
 				"%s.%s",
-				ticketConsoleHelper.objectName(), 
+				ticketConsoleHelper.objectName(),
 				mode);
-		
+
 		return consoleModuleBuilder.buildFormFieldSet (
 			ticketConsoleHelper,
 			fieldSetName,
 			formFieldSpecs);
-	
+
 	}
 
 	@Override
 	public FieldsProvider setFields(FormFieldSet fields) {
-		
-		formFields = fields;	
+
+		formFields = fields;
 		return this;
-		
+
 	}
-	
+
 	@Override
 	public FieldsProvider setMode (String modeSet) {
-		
-		mode = modeSet;	
+
+		mode = modeSet;
 		return this;
-		
+
 	}
 
 	@SingletonComponent("ticketFieldsProviderConfig")
@@ -152,7 +183,7 @@ class TicketFieldsProvider
 
 		@Inject
 		Provider<TicketFieldsProvider> ticketFieldsProvider;
-		
+
 		@PrototypeComponent ("ticketListFieldsProvider")
 		public
 		FieldsProvider ticketListFieldsProvider () {
@@ -161,7 +192,7 @@ class TicketFieldsProvider
 				.setMode ("list");
 
 		}
-		
+
 		@PrototypeComponent ("ticketCreateFieldsProvider")
 		public
 		FieldsProvider ticketCreateFieldsProvider () {
@@ -170,7 +201,7 @@ class TicketFieldsProvider
 				.setMode ("create");
 
 		}
-		
+
 		@PrototypeComponent ("ticketSettingsFieldsProvider")
 		public
 		FieldsProvider ticketSettingsFieldsProvider () {
@@ -179,7 +210,7 @@ class TicketFieldsProvider
 				.setMode ("settings");
 
 		}
-		
+
 		@PrototypeComponent ("ticketSummaryFieldsProvider")
 		public
 		FieldsProvider ticketSummaryFieldsProvider () {
@@ -190,5 +221,5 @@ class TicketFieldsProvider
 		}
 
 	}
-	
+
 }

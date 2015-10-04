@@ -42,9 +42,9 @@ $(function () {
 		var updateCharCount = function () {
 
 			var text = $(template).find (".template-text").val ();
-			
+
 			var length = text.length;
-			
+
 			var charCountText = [
 				String (length),
 				" characters",

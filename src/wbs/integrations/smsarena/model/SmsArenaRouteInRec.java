@@ -20,7 +20,7 @@ import wbs.sms.route.core.model.RouteRec;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id")
 @MajorEntity
-public 
+public
 class SmsArenaRouteInRec
 	implements MajorRecord<SmsArenaRouteInRec> {
 
@@ -39,7 +39,7 @@ class SmsArenaRouteInRec
 
 	@ReferenceField
 	SmsArenaConfigRec smsArenaConfig;
-	
+
 	// compare to
 
 	@Override

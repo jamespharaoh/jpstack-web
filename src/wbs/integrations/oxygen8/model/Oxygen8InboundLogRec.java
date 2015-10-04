@@ -120,10 +120,12 @@ class Oxygen8InboundLogRec
 	public static
 	class Oxygen8InboundLogSearch {
 
+		Integer routeId;
+
 		Instant timestampAfter;
 		Instant timestampBefore;
 
-		Integer routeId;
+		String details;
 
 	}
 

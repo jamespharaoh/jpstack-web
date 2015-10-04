@@ -15,7 +15,7 @@ class NotFoundResponder
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<h1>Page not found</h1>\n");

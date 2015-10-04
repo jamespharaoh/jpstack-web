@@ -23,7 +23,7 @@ class ChatBroadcastSendPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		@SuppressWarnings ("unchecked")
 		Map<String,String> params =

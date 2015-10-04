@@ -80,7 +80,7 @@
 
 		<object-field
 			name="billRoute"
-			finder="route"/>
+			object-type="route"/>
 
 		<text-field
 			name="billNumber"/>
@@ -91,7 +91,7 @@
 		<object-field
 			name="mmsRoute"
 			label="MMS route"
-			finder="route"/>
+			object-type="route"/>
 
 		<text-field
 			name="mmsNumber"
@@ -139,7 +139,7 @@
 
 		<object-field
 			name="billRoute"
-			finder="route"/>
+			object-type="route"/>
 
 		<text-field
 			name="billNumber"/>
@@ -150,7 +150,7 @@
 		<object-field
 			name="mmsRoute"
 			label="MMS route"
-			finder="route"/>
+			object-type="route"/>
 
 		<text-field
 			name="mmsNumber"

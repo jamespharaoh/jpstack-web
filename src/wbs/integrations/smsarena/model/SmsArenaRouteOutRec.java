@@ -20,8 +20,8 @@ import wbs.sms.route.core.model.RouteRec;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id")
 @MajorEntity
-public 
-class SmsArenaRouteOutRec 
+public
+class SmsArenaRouteOutRec
 	implements MajorRecord<SmsArenaRouteOutRec> {
 
 	// id
@@ -49,11 +49,11 @@ class SmsArenaRouteOutRec
 	@SimpleField (
 		nullable = true)
 	String cid;
-	
+
 	@SimpleField (
 		nullable = true)
 	String pid;
-	
+
 	@SimpleField (
 		nullable = true)
 	String sid;
@@ -61,15 +61,15 @@ class SmsArenaRouteOutRec
 	@SimpleField (
 		nullable = true)
 	Integer mclass;
-	
+
 	@SimpleField (
 		nullable = true)
 	Integer coding;
-	
+
 	@SimpleField (
 		nullable = true)
 	Integer date;
-	
+
 	@SimpleField (
 		nullable = true)
 	Integer validity;

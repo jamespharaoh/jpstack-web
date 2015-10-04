@@ -24,6 +24,8 @@ import wbs.platform.console.tab.Tab;
 import wbs.platform.console.tab.TabContext;
 import wbs.platform.console.tab.TabList;
 
+import com.google.common.base.Optional;
+
 public
 interface ConsoleRequestContext {
 
@@ -275,5 +277,8 @@ interface ConsoleRequestContext {
 
 	String fileItemField (
 			 String name);
+
+	Optional<String> header (
+			String name);
 
 }

@@ -8,9 +8,9 @@ import wbs.framework.data.annotations.DataClass;
 @Accessors (fluent = true)
 @Data
 @DataClass
-public class 
+public class
 ImChatMessageTemplateData {
-	
+
 	@DataAttribute
 	String key;
 

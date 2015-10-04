@@ -7,12 +7,7 @@
 		view-delegate-priv-code="manage">
 
 		<priv-key
-			name="oxygen8_manage"
-			delegate="root"
-			priv="manage"/>
-
-		<priv-key
-			name="oxygen8Network_manage"
+			name="oxygen8Network.manage"
 			delegate="root"
 			priv="manage"/>
 
@@ -67,7 +62,7 @@
 
 		<object-field
 			name="network"
-			finder="network"/>
+			object-type="network"/>
 
 		<text-field
 			name="channel"/>
@@ -80,7 +75,7 @@
 
 		<object-field
 			name="network"
-			finder="network"/>
+			object-type="network"/>
 
 		<text-field
 			name="channel"/>
@@ -96,7 +91,7 @@
 
 		<object-field
 			name="network"
-			finder="network"/>
+			object-type="network"/>
 
 		<text-field
 			name="channel"/>
@@ -109,7 +104,7 @@
 
 		<object-field
 			name="network"
-			finder="network"/>
+			object-type="network"/>
 
 		<text-field
 			name="channel"/>

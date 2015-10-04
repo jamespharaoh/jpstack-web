@@ -23,61 +23,61 @@ import wbs.sms.message.core.model.MessageStatus;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id")
 @MajorEntity
-public 
-class SmsArenaReportCodeRec 
+public
+class SmsArenaReportCodeRec
 	implements MajorRecord<SmsArenaReportCodeRec> {
-	
+
 	// id
-	
+
 	@GeneratedIdField
 	Integer id;
-	
+
 	// identity
-	
+
 	@ParentField
 	SmsArenaConfigRec smsArenaConfig;
-	
+
 	@CodeField
 	String code;
-	
+
 	// details
-	
+
 	@DescriptionField
 	String description;
-	
+
 	@DeletedField
 	Boolean deleted = false;
-	
+
 	// settings
-	
+
 	@SimpleField
 	MessageStatus messageStatus;
-	
+
 	@SimpleField
 	String additionalInformation;
-	
+
 	// compare to
-	
+
 	@Override
 	public
 	int compareTo (
 			Record<SmsArenaReportCodeRec> otherRecord) {
-	
+
 		SmsArenaReportCodeRec other =
 			(SmsArenaReportCodeRec) otherRecord;
-	
+
 		return new CompareToBuilder ()
-	
+
 			.append (
 				getSmsArenaConfig (),
 				other.getSmsArenaConfig ())
-	
+
 			.append (
 				getCode (),
 				other.getCode ())
-	
+
 			.toComparison ();
-	
+
 	}
 
 }

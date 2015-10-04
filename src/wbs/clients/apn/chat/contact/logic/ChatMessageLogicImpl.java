@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,6 +53,7 @@ import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmRec;
+import wbs.clients.apn.chat.user.core.model.ChatUserOperatorLabel;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.clients.apn.chat.user.core.model.Gender;
@@ -73,6 +75,7 @@ import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.gsm.MessageSplitter;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 @Log4j
@@ -1320,7 +1323,8 @@ class ChatMessageLogicImpl
 				chatTemplateLogic.findChatHelpTemplate (
 					chatUser,
 					"system",
-					"monitor_message_warning");
+					warningByOperatorLabel.get (
+						chatUser.getOperatorLabel ()));
 
 			text =
 				template.getText () + text;
@@ -1330,6 +1334,20 @@ class ChatMessageLogicImpl
 		return text;
 
 	}
+
+	static
+	Map<ChatUserOperatorLabel,String> warningByOperatorLabel =
+		ImmutableMap.<ChatUserOperatorLabel,String>builder ()
+
+			.put (
+				ChatUserOperatorLabel.operator,
+				"operator_message_warning")
+
+			.put (
+				ChatUserOperatorLabel.monitor,
+				"monitor_message_warning")
+
+			.build ();
 
 	/**
 	 * Increments a chat users rejection count and, when appropriate, triggers

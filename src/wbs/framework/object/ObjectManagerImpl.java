@@ -460,7 +460,7 @@ class ObjectManagerImpl
 			object);
 
 	}
-	
+
 	@Override
 	public <RecordType extends Record<?>>
 	RecordType update (

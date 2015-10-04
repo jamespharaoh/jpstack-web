@@ -93,7 +93,7 @@ class ManualResponderReportSimplePart
 		// perform search
 
 		reports =
-			manualResponderReportHelper.find (
+			manualResponderReportHelper.findByProcessedTime (
 				new Interval (
 					searchForm.start (),
 					searchForm.end ()));
@@ -102,7 +102,7 @@ class ManualResponderReportSimplePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		// search form
 

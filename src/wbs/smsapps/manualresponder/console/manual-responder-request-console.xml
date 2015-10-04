@@ -74,7 +74,7 @@
 
 		<object-field
 			name="number"
-			finder="number"/>
+			object-type="number"/>
 
 		<!--
 		<delegate-field
@@ -92,25 +92,25 @@
 
 		<object-field
 			name="message"
-			finder="message"/>
+			object-type="message"/>
 
 		<timestamp-field
 			name="timestamp"/>
 
 		<object-field
 			name="user"
-			finder="user"/>
+			object-type="user"/>
 
 		<yes-no-field
 			name="pending"/>
 
 		<object-field
 			name="number"
-			finder="number"/>
+			object-type="number"/>
 
 		<object-field
 			name="queueItem"
-			finder="queueItem"/>
+			object-type="queueItem"/>
 
 		<!-- TODO replies -->
 

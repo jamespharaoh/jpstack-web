@@ -24,111 +24,111 @@ import wbs.services.ticket.core.console.FieldsProvider;
 
 @PrototypeComponent ("messageTemplateSetFieldsProvider")
 public
-class MessageTemplateSetFieldsProvider 
+class MessageTemplateSetFieldsProvider
 	implements FieldsProvider {
-	
+
 	@Inject
 	ConsoleModuleBuilder consoleModuleBuilder;
-	
+
 	@Inject
 	MessageTemplateTypeObjectHelper messageTemplateTypeHelper;
-	
+
 	@Inject
 	MessageTemplateTypeConsoleHelper messageTemplateTypeConsoleHelper;
-	
+
 	@Inject
 	MessageTemplateSetConsoleHelper messageTemplateSetConsoleHelper;
-	
+
 	FormFieldSet formFields;
-	
+
 	String mode;
 
 	@Override
-	public 
+	public
 	FormFieldSet getFields(Record<?> parent) {
-		
+
 		List<Object> formFieldSpecs =
 			new ArrayList<Object> ();
-		
+
 		// add name and description fields
-		
+
 		formFieldSpecs
 			.add (new TextFormFieldSpec()
-				.name ("name")					
+				.name ("name")
 				.label ("Name"));
-		
+
 		formFieldSpecs
 			.add (new TextFormFieldSpec()
-				.name ("description")					
+				.name ("description")
 				.label ("Description"));
-		
+
 		// retrieve existing message template types
-		
+
 		MessageTemplateDatabaseRec messageTemplateDatabase =
 			(MessageTemplateDatabaseRec) parent;
-		
+
 		Set<MessageTemplateTypeRec> messageTemplateTypes =
 				messageTemplateDatabase.getMessageTemplateTypes();
-		
-		if (mode != "list") { 
-			
+
+		if (mode != "list") {
+
 			formFieldSpecs
 			.add (new ScriptRefFormFieldSpec()
 				.path ("/js/jquery-1.7.1.js"));
-		
+
 			formFieldSpecs
 				.add (new ScriptRefFormFieldSpec()
-					.path ("/js/message-template.js"));	
-			
+					.path ("/js/message-template.js"));
+
 			formFieldSpecs
 				.add (new ScriptRefFormFieldSpec()
-					.path ("/js/gsm.js"));	
-		
+					.path ("/js/gsm.js"));
+
 			// build dynamic form fields
-			
+
 			for (MessageTemplateTypeRec messageTemplateType : messageTemplateTypes) {
-									
+
 				formFieldSpecs
 					.add (new TextAreaFormFieldSpec()
-						.name (messageTemplateType.getCode ())					
+						.name (messageTemplateType.getCode ())
 						.label (messageTemplateType.getName ())
 						.dataProvider("messageTemplateSettingsFormFieldDataProvider")
 						.parent(messageTemplateType)
-						.dynamic (true));				
-	
+						.dynamic (true));
+
 			}
-		
+
 		}
-			
+
 		// build field set
-		
+
 		String fieldSetName =
 			stringFormat (
 				"%s.%s",
-				messageTemplateSetConsoleHelper.objectName(), 
+				messageTemplateSetConsoleHelper.objectName(),
 				mode);
-		
+
 		return consoleModuleBuilder.buildFormFieldSet (
 			messageTemplateSetConsoleHelper,
 			fieldSetName,
 			formFieldSpecs);
-	
+
 	}
 
 	@Override
 	public FieldsProvider setFields(FormFieldSet fields) {
-		
-		formFields = fields;	
+
+		formFields = fields;
 		return this;
-		
+
 	}
-	
+
 	@Override
 	public FieldsProvider setMode (String modeSet) {
-		
-		mode = modeSet;	
+
+		mode = modeSet;
 		return this;
-		
+
 	}
 
 	@SingletonComponent("messageTemplateSetFieldsProviderConfig")
@@ -137,7 +137,7 @@ class MessageTemplateSetFieldsProvider
 
 		@Inject
 		Provider<MessageTemplateSetFieldsProvider> messageTemplateSetFieldsProvider;
-		
+
 		@PrototypeComponent ("messageTemplateSetListFieldsProvider")
 		public
 		FieldsProvider messageTemplateSetListFieldsProvider () {
@@ -146,7 +146,7 @@ class MessageTemplateSetFieldsProvider
 				.setMode ("list");
 
 		}
-		
+
 		@PrototypeComponent ("messageTemplateSetCreateFieldsProvider")
 		public
 		FieldsProvider messageTemplateSetCreateFieldsProvider () {
@@ -155,7 +155,7 @@ class MessageTemplateSetFieldsProvider
 				.setMode ("create");
 
 		}
-		
+
 		@PrototypeComponent ("messageTemplateSetSettingsFieldsProvider")
 		public
 		FieldsProvider messageTemplateSetSettingsFieldsProvider () {
@@ -164,7 +164,7 @@ class MessageTemplateSetFieldsProvider
 				.setMode ("settings");
 
 		}
-		
+
 		@PrototypeComponent ("messageTemplateSetSummaryFieldsProvider")
 		public
 		FieldsProvider messageTemplateSetSummaryFieldsProvider () {

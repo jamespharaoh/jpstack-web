@@ -131,9 +131,10 @@ class ManualResponderRequestRec
 	public static
 	interface ManualResponderRequestDaoMethods {
 
-		List<ManualResponderRequestRec> find (
+		List<ManualResponderRequestRec> findRecentLimit (
 				ManualResponderRec manualResponder,
-				NumberRec number);
+				NumberRec number,
+				Integer maxResults);
 
 		List<Integer> searchIds (
 				ManualResponderRequestSearch search);

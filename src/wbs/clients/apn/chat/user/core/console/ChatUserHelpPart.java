@@ -62,7 +62,7 @@ class ChatUserHelpPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		String link =
 			requestContext.resolveLocalUrl (

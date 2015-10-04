@@ -62,7 +62,7 @@
 
 		<object-field
 			name="numberFormat"
-			finder="numberFormat"/>
+			object-type="numberFormat"/>
 
 	</field-set>
 
@@ -76,7 +76,7 @@
 
 		<object-field
 			name="numberFormat"
-			finder="numberFormat"/>
+			object-type="numberFormat"/>
 
 	</field-set>
 
@@ -90,7 +90,7 @@
 
 		<object-field
 			name="numberFormat"
-			finder="numberFormat"/>
+			object-type="numberFormat"/>
 
 	</field-set>
 

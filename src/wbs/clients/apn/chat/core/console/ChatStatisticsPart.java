@@ -119,7 +119,7 @@ class ChatStatisticsPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		if (numAffiliates == 0
 				&& ! privChecker.can (chat, "monitor"))

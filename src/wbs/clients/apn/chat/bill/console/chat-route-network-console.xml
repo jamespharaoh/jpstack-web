@@ -60,11 +60,11 @@
 
 		<object-field
 			name="chatRoute"
-			finder="chatRoute"/>
+			object-type="chatRoute"/>
 
 		<object-field
 			name="network"
-			finder="network"/>
+			object-type="network"/>
 
 		<integer-field
 			name="outRev"/>
@@ -79,7 +79,7 @@
 
 		<object-field
 			name="network"
-			finder="network"/>
+			object-type="network"/>
 
 		<integer-field
 			name="outRev"/>
@@ -95,7 +95,7 @@
 
 		<object-field
 			name="network"
-			finder="network"/>
+			object-type="network"/>
 
 		<integer-field
 			name="outRev"/>
@@ -111,7 +111,7 @@
 
 		<object-field
 			name="network"
-			finder="network"/>
+			object-type="network"/>
 
 		<integer-field
 			name="outRev"/>

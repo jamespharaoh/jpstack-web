@@ -49,7 +49,7 @@ class SubscriptionNumberAddRemovePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<form",

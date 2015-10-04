@@ -19,13 +19,16 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.log4j.Level;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.framework.utils.etc.ProfileLogger;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.helper.ConsoleObjectManager;
+import wbs.platform.console.html.JqueryScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.console.part.AbstractPagePart;
@@ -63,6 +66,9 @@ import com.google.common.collect.ImmutableSet;
 public
 class ManualResponderRequestPendingSummaryPart
 	extends AbstractPagePart {
+
+	final
+	int maxResults = 1000;
 
 	// dependencies
 
@@ -130,15 +136,14 @@ class ManualResponderRequestPendingSummaryPart
 				super.scriptRefs ())
 
 			.add (
-				ConsoleContextScriptRef.javascript (
-					"/js/jquery-1.7.1.js"))
+				JqueryScriptRef.instance)
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/jquery.jeditable.mini.js"))
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/manual-responder-pending-summary.js"))
 
 			.build ();
@@ -150,6 +155,15 @@ class ManualResponderRequestPendingSummaryPart
 	@Override
 	public
 	void prepare () {
+
+		ProfileLogger profileLogger =
+			new ProfileLogger (
+				log,
+				Level.INFO,
+				"prepare");
+
+		profileLogger.lap (
+			"load basics");
 
 		manualResponderRequest =
 			manualResponderRequestHelper.find (
@@ -188,6 +202,9 @@ class ManualResponderRequestPendingSummaryPart
 
 		// get routes
 
+		profileLogger.lap (
+			"load routes");
+
 		Set<RouteRec> routes =
 			new HashSet<RouteRec> ();
 
@@ -210,6 +227,9 @@ class ManualResponderRequestPendingSummaryPart
 		}
 
 		// get bill counts per route
+
+		profileLogger.lap (
+			"load route bill counts");
 
 		Instant startOfToday =
 			LocalDate.now ()
@@ -317,19 +337,25 @@ class ManualResponderRequestPendingSummaryPart
 
 		// get request history
 
+		profileLogger.lap (
+			"load request history");
+
 		oldManualResponderRequests =
-			manualResponderRequestHelper.find (
+			manualResponderRequestHelper.findRecentLimit (
 				manualResponder,
-				manualResponderRequest.getNumber ());
+				manualResponderRequest.getNumber (),
+				maxResults + 1);
 
 		Collections.sort (
 			oldManualResponderRequests);
+
+		profileLogger.end ();
 
 	}
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		if (manualResponderRequest == null) {
 
@@ -339,6 +365,9 @@ class ManualResponderRequestPendingSummaryPart
 			return;
 
 		}
+
+		printFormat (
+			"<div class=\"manual-responder-request-pending-summary\">\n");
 
 		goSummary ();
 
@@ -351,6 +380,9 @@ class ManualResponderRequestPendingSummaryPart
 		goSessionDetails ();
 
 		goRequestHistory ();
+
+		printFormat (
+			"</div>\n");
 
 	}
 
@@ -650,8 +682,24 @@ class ManualResponderRequestPendingSummaryPart
 		if (oldManualResponderRequests.isEmpty ())
 			return;
 
+		// title
+
 		printFormat (
 			"<h2>Request history</h2>\n");
+
+		// warning if we have omitted old requests
+
+		if (oldManualResponderRequests.size () > maxResults) {
+
+			printFormat (
+				"<p class=\"warning\">%h</p>\n",
+				stringFormat (
+					"Only showing the first %s results.",
+					maxResults));
+
+		}
+
+		// begin table
 
 		printFormat (
 			"<table class=\"list\">\n");
@@ -664,14 +712,20 @@ class ManualResponderRequestPendingSummaryPart
 			"<th>User</th>\n",
 			"</tr>\n");
 
+		// iterate requests
+
 		for (ManualResponderRequestRec oldManualResponderRequest
 				: oldManualResponderRequests) {
 
 			printFormat (
 				"<tr class=\"sep\">\n");
 
+			// iterate replies, which are shown before their requests
+
 			for (ManualResponderReplyRec oldReply
 					: oldManualResponderRequest.getReplies ()) {
+
+				// print reply
 
 				printFormat (
 					"<tr",
@@ -706,6 +760,8 @@ class ManualResponderRequestPendingSummaryPart
 
 			}
 
+			// print request
+
 			printFormat (
 				"<tr",
 				" class=\"message-in\"",
@@ -724,6 +780,8 @@ class ManualResponderRequestPendingSummaryPart
 					.getMessage ()
 					.getText ()
 					.getText ());
+
+			// print request medias
 
 			printFormat (
 				"<td>\n");
@@ -750,6 +808,8 @@ class ManualResponderRequestPendingSummaryPart
 			printFormat (
 				"</td>\n");
 
+			// print request user
+
 			printFormat (
 				"<td>%h</td>\n",
 				oldManualResponderRequest.getUser () != null
@@ -760,6 +820,8 @@ class ManualResponderRequestPendingSummaryPart
 				"</tr>\n");
 
 		}
+
+		// close table
 
 		printFormat (
 			"</table>\n");

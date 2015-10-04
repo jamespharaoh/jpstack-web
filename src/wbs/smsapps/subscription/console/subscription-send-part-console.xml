@@ -62,7 +62,7 @@
 
 		<object-field
 			name="subscriptionList"
-			finder="subscriptionList"/>
+			object-type="subscriptionList"/>
 
 		<text-area-field
 			name="text"/>
@@ -75,7 +75,7 @@
 
 		<object-field
 			name="subscriptionList"
-			finder="subscriptionList"/>
+			object-type="subscriptionList"/>
 
 		<text-area-field
 			name="text"/>
@@ -92,7 +92,7 @@
 
 		<object-field
 			name="subscriptionList"
-			finder="subscriptionList"/>
+			object-type="subscriptionList"/>
 
 		<text-area-field
 			name="text"/>

@@ -47,8 +47,9 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.cal.CalDate;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.helper.ConsoleObjectManager;
+import wbs.platform.console.html.JqueryScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.console.part.AbstractPagePart;
@@ -274,15 +275,14 @@ class ChatMonitorInboxSummaryPart
 				super.scriptRefs ())
 
 			.add (
-				ConsoleContextScriptRef.javascript (
-					"/js/jquery-1.7.1.js"))
+				JqueryScriptRef.instance)
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/jquery.jeditable.mini.js"))
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/chat-monitor-inbox-summary.js"))
 
 			.build ();
@@ -291,7 +291,7 @@ class ChatMonitorInboxSummaryPart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		printFormat (
 			"<style type=\"text/css\">\n",
@@ -304,7 +304,7 @@ class ChatMonitorInboxSummaryPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<table class=\"details\">\n");

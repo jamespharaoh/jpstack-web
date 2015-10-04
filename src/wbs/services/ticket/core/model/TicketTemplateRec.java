@@ -41,7 +41,7 @@ class TicketTemplateRec
 	String code;
 
 	// details
-	
+
 	@NameField
 	String name;
 

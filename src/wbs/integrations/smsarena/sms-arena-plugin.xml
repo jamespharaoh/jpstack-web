@@ -23,7 +23,7 @@
 	<fixtures>
 		<fixture name="smsArena"/>
 	</fixtures>
-	
+
 	<api-modules>
 		<api-module name="sms-arena"/>
 	</api-modules>
@@ -31,7 +31,7 @@
 	<layer name="api">
 		<bean class="api.SmsArenaDlrDispatchAction"/>
 	</layer>
-	
+
 	<layer name="daemon">
 		<bean class="daemon.SmsArenaSender"/>
 	</layer>

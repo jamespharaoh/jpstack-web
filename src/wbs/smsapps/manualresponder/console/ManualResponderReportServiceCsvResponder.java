@@ -103,7 +103,7 @@ class ManualResponderReportServiceCsvResponder
 			searchForm);
 
 		reports =
-			manualResponderReportHelper.find (
+			manualResponderReportHelper.findByProcessedTime (
 				new Interval (
 					searchForm.start (),
 					searchForm.end ()));
@@ -112,7 +112,7 @@ class ManualResponderReportServiceCsvResponder
 
 	@Override
 	public
-	void goHeaders () {
+	void setHtmlHeaders () {
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -126,7 +126,7 @@ class ManualResponderReportServiceCsvResponder
 
 	@Override
 	public
-	void goContent ()
+	void render ()
 		throws IOException {
 
 		List<Integer> users =

@@ -11,9 +11,9 @@ import wbs.platform.console.module.ConsoleModuleImpl;
 
 @PrototypeComponent ("objectTicketCreateSetFieldBuilder")
 @ConsoleModuleBuilderHandler
-public 
+public
 class ObjectTicketCreateSetFieldBuilder {
-	
+
 	// builder
 
 	@BuilderParent

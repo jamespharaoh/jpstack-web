@@ -76,7 +76,7 @@
 
 		<object-field
 			name="billRoute"
-			finder="route"/>
+			object-type="route"/>
 
 		<text-field
 			name="billNumber"/>
@@ -110,7 +110,7 @@
 
 		<object-field
 			name="billRoute"
-			finder="route"/>
+			object-type="route"/>
 
 		<text-field
 			name="billNumber"/>

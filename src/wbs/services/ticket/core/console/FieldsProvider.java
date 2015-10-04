@@ -7,11 +7,11 @@ public interface FieldsProvider {
 
 	FormFieldSet getFields (
 			Record<?> parent);
-	
+
 	FieldsProvider setFields (
 			FormFieldSet fields);
 
 	FieldsProvider setMode(
 			String modeSet);
-	
+
 }

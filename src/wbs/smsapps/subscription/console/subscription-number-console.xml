@@ -88,7 +88,7 @@
 
 		<object-field
 			name="number"
-			finder="number"/>
+			object-type="number"/>
 
 		<yes-no-field
 			name="active"/>
@@ -99,12 +99,12 @@
 		<object-field
 			name="subscriptionList"
 			label="List"
-			finder="subscriptionList"/>
+			object-type="subscriptionList"/>
 
 		<object-field
 			name="subscriptionAffiliate"
 			label="Affiliate"
-			finder="subscriptionAffiliate"/>
+			object-type="subscriptionAffiliate"/>
 
 	</field-set>
 
@@ -117,7 +117,7 @@
 
 		<object-field
 			name="number"
-			finder="number"/>
+			object-type="number"/>
 
 		<yes-no-field
 			name="active"/>
@@ -130,11 +130,11 @@
 
 		<object-field
 			name="subscriptionList"
-			finder="subscriptionList"/>
+			object-type="subscriptionList"/>
 
 		<object-field
 			name="subscriptionAffiliate"
-			finder="subscriptionAffiliate"/>
+			object-type="subscriptionAffiliate"/>
 
 		<integer-field
 			name="balance"/>
@@ -147,17 +147,17 @@
 
 		<object-field
 			name="numberFormat"
-			finder="numberFormat"/>
+			object-type="numberFormat"/>
 
 		<object-field
 			name="subscriptionAffiliate"
 			label="Affiliate"
-			finder="subscriptionAffiliate"/>
+			object-type="subscriptionAffiliate"/>
 
 		<object-field
 			name="subscriptionList"
 			label="List"
-			finder="subscriptionList"/>
+			object-type="subscriptionList"/>
 
 		<text-area-field
 			name="numbers"/>

@@ -66,7 +66,7 @@
 		<resource name="change-password">
 			<post-action name="changePassword"/>
 		</resource>
-		
+
 		<resource name="get-message-template-list">
 			<post-action name="messageTemplateSetGet"/>
 		</resource>
@@ -85,5 +85,5 @@
 	</variable>
 	</variable>
 	</resource>
-	
+
 </api-module>

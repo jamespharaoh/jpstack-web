@@ -40,7 +40,7 @@ class BroadcastSendPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		switch (broadcast.getState ()) {
 

@@ -61,7 +61,8 @@ interface ChatMiscLogic {
 
 	void userAutoJoin (
 			ChatUserRec chatUser,
-			MessageRec message);
+			MessageRec message,
+			boolean sendMessage);
 
 	void chatUserSetName (
 			ChatUserRec chatUser,

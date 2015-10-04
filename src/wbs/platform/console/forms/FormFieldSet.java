@@ -34,12 +34,14 @@ class FormFieldSet {
 
 	public
 	Set<ScriptRef> scriptRefs () {
-		
+
 		Set<ScriptRef> scriptRefs =
 			new LinkedHashSet<ScriptRef> ();
 
-		for (FormField formField
-				: formFields) {
+		for (
+			FormField formField
+				: formFields
+		) {
 
 			scriptRefs.addAll (
 				formField.scriptRefs ());

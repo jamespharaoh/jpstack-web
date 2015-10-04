@@ -48,64 +48,64 @@ import com.google.common.collect.Ordering;
 @MajorEntity
 public class TicketRec
 	implements CommonRecord<TicketRec> {
-	
+
 	// id
-	
+
 	@GeneratedIdField
 	Integer id;
-	
+
 	// identity
-	
+
 	@ParentField
 	TicketManagerRec ticketManager;
-	
+
 	@CodeField
 	String code;
 
 	// details
-	
+
 	@SimpleField
 	Boolean queued =
 		true;
-	
+
 	@ReferenceField
 	TicketStateRec ticketState;
-	
+
 	@SimpleField
 	Instant timestamp =
 		Instant.now();
-	
+
 	@CollectionField (
 			orderBy = "index")
 		Set<TicketNoteRec> ticketNotes =
 			new TreeSet<TicketNoteRec> ();
-	
+
 	@CollectionField (
 			index = "ticket_field_type_id")
 		Map<Integer,TicketFieldValueRec> ticketFieldValues =
 			new TreeMap<Integer,TicketFieldValueRec> (
 				Ordering.arbitrary ());
-	
+
 	// statistics
 
 	@SimpleField
 	Integer numNotes = 0;
-	
+
 	@SimpleField
 	Integer numFields = 0;
-	
+
 	// state
-	
+
 	@ReferenceField (
 			nullable = true)
 		QueueItemRec queueItem;
-	
+
 	// children
 
 	@CollectionField
 	Set<TicketTemplateRec> templates =
 		new LinkedHashSet<TicketTemplateRec> ();
-	
+
 	// object hooks
 
 	public static
@@ -114,25 +114,25 @@ public class TicketRec
 
 		@Inject
 		Provider<TicketObjectHelper> ticketHelper;
-		
+
 		@Inject
-		Provider<TicketFieldTypeObjectHelper> ticketFieldTypeHelper;	
-		
+		Provider<TicketFieldTypeObjectHelper> ticketFieldTypeHelper;
+
 		@Inject
-		Provider<TicketFieldValueObjectHelper> ticketFieldValueHelper;	
-		
+		Provider<TicketFieldValueObjectHelper> ticketFieldValueHelper;
+
 		@Inject
 		Provider<ObjectManager> objectManager;
-		
+
 		@Inject
 		Provider<QueueLogic> queueLogic;
-				
+
 		@Inject
 		Database database;
-		
+
 		@Inject
 		RandomLogic randomLogic;
-		
+
 		@Override
 		public
 		void beforeInsert (
@@ -145,11 +145,11 @@ public class TicketRec
 
 		@Override
 		public void afterInsert(TicketRec ticket) {
-			
-			if (ticket.getTicketState().getShowInQueue()) {				
-	
+
+			if (ticket.getTicketState().getShowInQueue()) {
+
 				// create queue item
-	
+
 				QueueItemRec queueItem =
 					queueLogic.get().createQueueItem (
 						queueLogic.get().findQueue (
@@ -159,80 +159,80 @@ public class TicketRec
 						ticket,
 						ticket.getCode (),
 						ticket.getTicketState().toString());
-	
+
 				// add queue item to ticket
-	
+
 				ticket
 					.setQueueItem (
 						queueItem);
-			
-			}		
+
+			}
 
 		}
-		
+
 		@Override
 		public
 		Object getDynamic (
 				Record<?> object,
 				String name) {
-			
-			TicketRec ticket = 
+
+			TicketRec ticket =
 				(TicketRec) object;
-			
+
 			//Find the ticket field type
-			
-			TicketFieldTypeRec ticketFieldType =			
+
+			TicketFieldTypeRec ticketFieldType =
 				ticketFieldTypeHelper.get().findByCode(
-					ticket.getTicketManager(), 
+					ticket.getTicketManager(),
 					name);
 
 			try {
-				
+
 				//Find the ticket field value
-				
+
 				TicketFieldValueRec ticketFieldValue =
-					ticket.getTicketFieldValues().get( 
+					ticket.getTicketFieldValues().get(
 						ticketFieldType.getId());
-							
+
 				if (ticketFieldValue == null) { return null; }
-				
+
 				switch( ticketFieldType.getType() ) {
-				
+
 					case string:
 						return ticketFieldValue.getStringValue();
-						
+
 					case number:
 						return ticketFieldValue.getIntegerValue();
-						
+
 					case bool:
 						return ticketFieldValue.getBooleanValue();
-						
-					case object:						
+
+					case object:
 						ObjectTypeRec objectType =
 							ticketFieldType.getObjectType();
-						
+
 						Integer objectId =
 							ticketFieldValue.getIntegerValue();
-						
+
 						Object obj = objectManager.get()
 							.objectHelperForTypeId(objectType.getId())
 								.find(objectId);
-						
+
 						return obj;
-						
+
 					default:
 						throw new RuntimeException ();
-			
+
 				}
 
 			} catch (TransientObjectException exception) {
 
 				// object not yet saved so fields will all be null
-				
+
 				return null;
 
 			}
-				
+
 		}
 
 		@Override
@@ -241,74 +241,74 @@ public class TicketRec
 				Record<?> object,
 				String name,
 				Object value) {
-				
-			TicketRec ticket = 
+
+			TicketRec ticket =
 				(TicketRec) object;
-			
+
 			//Find the ticket field type
-			
-			TicketFieldTypeRec ticketFieldType =			
+
+			TicketFieldTypeRec ticketFieldType =
 				ticketFieldTypeHelper.get().findByCode(
-						ticket.getTicketManager(), 
-						name);			
-			
+						ticket.getTicketManager(),
+						name);
+
 			TicketFieldValueRec ticketFieldValue;
-			
-			try {		
-				
+
+			try {
+
 				 ticketFieldValue =
-					ticket.getTicketFieldValues().get( 
+					ticket.getTicketFieldValues().get(
 						ticketFieldType.getId());
 			}
 			catch (Exception e) {
 				ticketFieldValue =
 					null;
 			}
-			
+
 			// if the value object does not exist, a new one is created
-			
+
 			if (ticketFieldValue == null) {
-				ticketFieldValue = new TicketFieldValueRec()					
+				ticketFieldValue = new TicketFieldValueRec()
 					.setTicket(ticket)
 					.setTicketFieldType(ticketFieldType);
 			}
-			
+
 			switch( ticketFieldType.getType() ) {
-				case string:					
+				case string:
 					ticketFieldValue.setStringValue((String)value);
 					break;
-					
+
 				case number:
 					ticketFieldValue.setIntegerValue((Integer)value);
 					break;
-					
+
 				case bool:
 					ticketFieldValue.setBooleanValue((Boolean)value);
 					break;
-					
-				case object:					
-					Integer objectId = 
+
+				case object:
+					Integer objectId =
 						((Record<?>) value).getId();
-					
+
 					ticketFieldValue.setIntegerValue(objectId);
 					break;
-					
+
 				default:
 					throw new RuntimeException ();
-			
-			}		
-			
+
+			}
+
 			ticket.setNumFields (
 				ticket.getNumFields() + 1);
-			
+
 			ticket.getTicketFieldValues ().put (
-				ticketFieldType.getId(), 
+				ticketFieldType.getId(),
 				ticketFieldValue);
-			
+
 		}
-		
+
 	}
-	
+
 	// dao methods
 
 	public static
@@ -317,33 +317,33 @@ public class TicketRec
 		TicketFieldValueRec findTicketFieldValue (
 				TicketRec ticket,
 				TicketFieldTypeRec ticketFieldType);
-		
+
 		List<TicketRec> findUnqueuedTickets ();
 
 	}
-	
+
 	// compare to
-	
+
 	@Override
 	public
 	int compareTo (
 			Record<TicketRec> otherRecord) {
-	
+
 		TicketRec other =
 			(TicketRec) otherRecord;
-	
+
 		return new CompareToBuilder ()
-	
+
 			.append (
 				getTicketManager (),
 				other.getTicketManager ())
-	
+
 			.append (
 				getCode (),
 				other.getCode ())
-	
+
 			.toComparison ();
-	
+
 	}
 
 }

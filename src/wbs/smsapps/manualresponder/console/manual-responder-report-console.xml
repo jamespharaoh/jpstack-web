@@ -61,7 +61,7 @@
 		<object-field
 			name="manualResponderRequest"
 			label="Request"
-			finder="manualResponderRequest"/>
+			object-type="manualResponderRequest"/>
 
 		<text-field
 			name="timestring"
@@ -69,7 +69,7 @@
 
 		<object-field
 			name="user"
-			finder="user"/>
+			object-type="user"/>
 
 		<integer-field
 			name="num"

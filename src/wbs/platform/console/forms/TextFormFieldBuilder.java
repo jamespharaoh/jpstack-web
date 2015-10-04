@@ -106,13 +106,13 @@ class TextFormFieldBuilder {
 			ifNull (
 				textFormFieldSpec.size (),
 				FormField.defaultSize);
-		
+
 		Boolean dynamic =
 			ifNull (textFormFieldSpec.dynamic(),
 					false);
 
 		// field type
-		
+
 		Class<?> propertyClass;
 		if (!dynamic) {
 			propertyClass =
@@ -134,7 +134,7 @@ class TextFormFieldBuilder {
 
 				.name (
 					name)
-									
+
 				.dynamic (
 					dynamic)
 
@@ -151,7 +151,7 @@ class TextFormFieldBuilder {
 
 				.name (
 					name)
-									
+
 				.dynamic (
 					dynamic)
 

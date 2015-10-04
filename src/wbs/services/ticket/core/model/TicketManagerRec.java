@@ -28,59 +28,59 @@ import wbs.platform.scaffold.model.SliceRec;
 @MajorEntity
 public class TicketManagerRec
 	implements CommonRecord<TicketManagerRec> {
-	
+
 	// id
-	
+
 	@GeneratedIdField
 	Integer id;
-	
+
 	// identity
-	
+
 	@ParentField
 	SliceRec slice;
-	
+
 	@CodeField
 	String code;
-	
+
 	// details
-	
+
 	@NameField
 	String name;
 
 	@DescriptionField
 	String description;
-	
+
 	@CollectionField (
 			orderBy = "id")
 		Set<TicketFieldTypeRec> ticketFieldTypes =
 			new TreeSet<TicketFieldTypeRec> ();
-	
+
 	// children
 
 	@CollectionField
 	Set<TicketTemplateRec> templates =
 		new LinkedHashSet<TicketTemplateRec> ();
-	
+
 	// compare to
-	
+
 	@Override
 	public
 	int compareTo (
 			Record<TicketManagerRec> otherRecord) {
-	
+
 		TicketManagerRec other =
 			(TicketManagerRec) otherRecord;
-	
+
 		return new CompareToBuilder ()
-	
+
 			.append (
 				getCode (),
 				other.getCode ())
-	
+
 			.append (
 				getSlice (),
 				other.getSlice ())
-	
+
 			.toComparison ();
 
 	}

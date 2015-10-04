@@ -26,10 +26,10 @@ import wbs.sms.route.core.model.RouteRec;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id")
 @CommonEntity
-public 
-class SmsArenaDlrReportLogRec 
+public
+class SmsArenaDlrReportLogRec
 	implements CommonRecord<SmsArenaDlrReportLogRec> {
-	
+
 	// id
 
 	@GeneratedIdField

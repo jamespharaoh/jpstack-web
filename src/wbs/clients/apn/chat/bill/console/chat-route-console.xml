@@ -64,7 +64,7 @@
 
 		<object-field
 			name="route"
-			finder="route"/>
+			object-type="route"/>
 
 		<integer-field
 			name="mmsCost"/>
@@ -86,7 +86,7 @@
 
 		<object-field
 			name="route"
-			finder="route"/>
+			object-type="route"/>
 
 		<integer-field
 			name="mmsCost"/>
@@ -111,7 +111,7 @@
 
 		<object-field
 			name="route"
-			finder="route"/>
+			object-type="route"/>
 
 		<integer-field
 			name="mmsCost"/>
@@ -135,7 +135,7 @@
 
 		<object-field
 			name="route"
-			finder="route"/>
+			object-type="route"/>
 
 		<integer-field
 			name="mmsCost"/>

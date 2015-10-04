@@ -89,12 +89,12 @@
 		<object-field
 			name="rbBillRoute"
 			label="Reverse bill route"
-			finder="route"/>
+			object-type="route"/>
 
 		<object-field
 			name="rbFreeRouter"
 			label="Reverse bill free router"
-			finder="router"/>
+			object-type="router"/>
 
 		<text-field
 			name="rbNumber"
@@ -102,21 +102,21 @@
 
 		<object-field
 			name="magicNumberSet"
-			finder="magicNumberSet"/>
+			object-type="magicNumberSet"/>
 
 		<object-field
 			name="magicRouter"
-			finder="router"/>
+			object-type="router"/>
 
 		<object-field
 			name="mmsRoute"
 			label="MMS route"
-			finder="route"/>
+			object-type="route"/>
 
 		<object-field
 			name="mmsFreeRouter"
 			label="MMS free router"
-			finder="router"/>
+			object-type="router"/>
 
 		<text-field
 			name="mmsNumber"
@@ -125,12 +125,12 @@
 		<object-field
 			name="mmsKeywordSet"
 			label="MMS keyword set"
-			finder="keywordSet"/>
+			object-type="keywordSet"/>
 
 		<object-field
 			name="wapRouter"
 			label="WAP router"
-			finder="router"/>
+			object-type="router"/>
 
 		<integer-field
 			name="initialCredit"/>
@@ -157,12 +157,12 @@
 		<object-field
 			name="rbBillRoute"
 			label="Reverse bill route"
-			finder="route"/>
+			object-type="route"/>
 
 		<object-field
 			name="rbFreeRouter"
 			label="Reverse bill free router"
-			finder="router"/>
+			object-type="router"/>
 
 		<text-field
 			name="rbNumber"
@@ -170,21 +170,21 @@
 
 		<object-field
 			name="magicNumberSet"
-			finder="magicNumberSet"/>
+			object-type="magicNumberSet"/>
 
 		<object-field
 			name="magicRouter"
-			finder="router"/>
+			object-type="router"/>
 
 		<object-field
 			name="mmsRoute"
 			label="MMS route"
-			finder="route"/>
+			object-type="route"/>
 
 		<object-field
 			name="mmsFreeRouter"
 			label="MMS free router"
-			finder="router"/>
+			object-type="router"/>
 
 		<text-field
 			name="mmsNumber"
@@ -193,12 +193,12 @@
 		<object-field
 			name="mmsKeywordSet"
 			label="MMS keyword set"
-			finder="keywordSet"/>
+			object-type="keywordSet"/>
 
 		<object-field
 			name="wapRouter"
 			label="WAP router"
-			finder="router"/>
+			object-type="router"/>
 
 		<integer-field
 			name="initialCredit"/>

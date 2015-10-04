@@ -19,7 +19,7 @@ class YesNoFormFieldSpec {
 
 	@DataAttribute (required = true)
 	String name;
-	
+
 	@Getter @Setter
 	boolean dynamic;
 

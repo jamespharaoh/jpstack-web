@@ -81,10 +81,10 @@ class StatusUpdateResponder
 
 	@Override
 	protected
-	void goHeaders ()
+	void setHtmlHeaders ()
 		throws IOException {
 
-		super.goHeaders ();
+		super.setHtmlHeaders ();
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -103,7 +103,7 @@ class StatusUpdateResponder
 
 	@Override
 	protected
-	void goContent ()
+	void render ()
 		throws IOException {
 
 		Element statusUpdateElem =

@@ -39,21 +39,21 @@
 				fields="create"/>
 
 		</list>
-		
+
 		<object>
 
 			<object-summary-page
 				fields="summary"/>
-				
+
 			<object-settings-page
 				fields="settings"/>
-				
+
 			<context-link
 				name="messageTemplateType"
 				link="messageTemplateType"
 				label="Types"
 				priv-key="messageTemplateDatabase.manage"/>
-				
+
 			<context-link
 				name="messageTemplateSet"
 				link="messageTemplateSet"
@@ -61,7 +61,7 @@
 				priv-key="messageTemplateDatabase.manage"/>
 
 			<object-events-page/>
-			
+
 		</object>
 
 	</object-context>

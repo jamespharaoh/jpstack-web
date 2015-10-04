@@ -166,7 +166,7 @@
 		<plugin
 			name="object-list"
 			package="wbs.platform.object.list"/>
-			
+
 		<plugin
 			name="object-ticket-create"
 			package="wbs.services.ticket.create"/>
@@ -558,11 +558,11 @@ i		<plugin
 		<plugin
 			name="wallet"
 			package="wbs.services.wallet"/>
-			
+
 		<plugin
 			name="ticket-core"
 			package="wbs.services.ticket.core"/>
-			
+
 		<plugin
 			name="message-template"
 			package="wbs.services.messagetemplate"/>
@@ -608,7 +608,7 @@ i		<plugin
 		<plugin
 			name="paypal"
 			package="wbs.integrations.paypal"/>
-			
+
 		<plugin
 			name="sms-arena"
 			package="wbs.integrations.smsarena"/>

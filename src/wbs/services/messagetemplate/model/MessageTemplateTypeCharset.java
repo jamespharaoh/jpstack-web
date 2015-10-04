@@ -1,9 +1,9 @@
 package wbs.services.messagetemplate.model;
 
-public 
+public
 enum MessageTemplateTypeCharset {
 
 	unicode,
 	gsm;
-	
+
 }

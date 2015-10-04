@@ -120,14 +120,14 @@
 
 		<object-field
 			name="currency"
-			finder="currency"/>
+			object-type="currency"/>
 
 		<seconds-field
 			name="preferredQueueTime"/>
 
 		<object-field
 			name="paypalAccount"
-			finder="paypalAccount"/>
+			object-type="paypalAccount"/>
 
 		<currency-field
 			name="messageCost"
@@ -161,7 +161,7 @@
 
 		<object-field
 			name="currency"
-			finder="currency"
+			object-type="currency"
 			nullable="yes"/>
 
 		<seconds-field
@@ -170,7 +170,7 @@
 
 		<object-field
 			name="paypalAccount"
-			finder="paypalAccount"
+			object-type="paypalAccount"
 			nullable="yes"/>
 
 		<currency-field

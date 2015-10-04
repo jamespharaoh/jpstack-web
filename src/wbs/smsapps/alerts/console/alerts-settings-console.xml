@@ -90,7 +90,7 @@
 
 		<object-field
 			name="router"
-			finder="router"/>
+			object-type="router"/>
 
 		<integer-field
 			name="maxItemsInQueue"
@@ -129,7 +129,7 @@
 
 		<object-field
 			name="router"
-			finder="router"/>
+			object-type="router"/>
 
 		<text-field
 			name="numFrom"/>
@@ -182,7 +182,7 @@
 
 		<object-field
 			name="router"
-			finder="router"/>
+			object-type="router"/>
 
 		<text-field
 			name="numFrom"/>

@@ -33,7 +33,7 @@ class ChatUserImageRotatePart
 
 	@Override
 	public
-	void goBodyStuff() {
+	void renderHtmlBodyContent() {
 
 		if (chatUser.getChatUserImageList ().isEmpty ()) {
 

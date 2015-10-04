@@ -7,12 +7,7 @@
 		view-delegate-priv-code="manage">
 
 		<priv-key
-			name="oxygen8_manage"
-			delegate="root"
-			priv="manage"/>
-
-		<priv-key
-			name="oxygen8ReportCode_manage"
+			name="oxygen8ReportCode.manage"
 			delegate="root"
 			priv="manage"/>
 

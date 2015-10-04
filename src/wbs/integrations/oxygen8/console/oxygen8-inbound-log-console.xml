@@ -45,7 +45,7 @@
 		<object-field
 			name="routeId"
 			label="Route"
-			finder="route"
+			object-type="route"
 			nullable="yes"/>
 
 		<timestamp-field
@@ -54,6 +54,10 @@
 
 		<timestamp-field
 			name="timestampBefore"
+			nullable="yes"/>
+
+		<text-field
+			name="details"
 			nullable="yes"/>
 
 	</field-set>

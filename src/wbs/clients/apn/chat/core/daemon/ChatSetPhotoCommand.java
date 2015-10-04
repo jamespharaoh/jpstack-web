@@ -183,7 +183,8 @@ class ChatSetPhotoCommand
 
 			chatMiscLogic.userAutoJoin (
 				chatUser,
-				message);
+				message,
+				true);
 
 		// try set video
 
@@ -207,7 +208,8 @@ class ChatSetPhotoCommand
 
 			chatMiscLogic.userAutoJoin (
 				chatUser,
-				message);
+				message,
+				true);
 
 		} else {
 

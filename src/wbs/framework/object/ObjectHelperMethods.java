@@ -117,7 +117,7 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	<RecordTypeAgain extends Record<?>>
 	RecordTypeAgain insert (
 			RecordTypeAgain object);
-	
+
 	<RecordTypeAgain extends Record<?>>
 	RecordTypeAgain update (
 			RecordTypeAgain object);
@@ -184,11 +184,11 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	void setParent (
 			Record<?> object,
 			Record<?> parent);
-	
+
 	Object getDynamic (
 			Record<?> object,
 			String name);
-	
+
 	void setDynamic (
 			Record<?> object,
 			String name,

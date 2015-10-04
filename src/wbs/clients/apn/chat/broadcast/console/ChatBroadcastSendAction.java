@@ -14,6 +14,9 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.log4j.Level;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.broadcast.logic.ChatBroadcastLogic;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberObjectHelper;
@@ -23,7 +26,6 @@ import wbs.clients.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastRec;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastState;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
-import wbs.clients.apn.chat.core.daemon.ProfileLogger;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -37,6 +39,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
+import wbs.framework.utils.etc.ProfileLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.console.action.ConsoleAction;
 import wbs.platform.console.helper.ConsoleObjectManager;
@@ -165,6 +168,7 @@ class ChatBroadcastSendAction
 		ProfileLogger profileLogger =
 			new ProfileLogger (
 				log,
+				Level.DEBUG,
 				"Broadcast send");
 
 		try {
@@ -203,8 +207,6 @@ class ChatBroadcastSendAction
 			boolean send =
 				requestContext.getForm ("send") != null;
 
-System.out.println ("VERIFY: " + (verify? "yes": "no"));
-System.out.println ("SEND: " + (send? "yes": "no"));
 			if (verify || send) {
 
 				// verify params

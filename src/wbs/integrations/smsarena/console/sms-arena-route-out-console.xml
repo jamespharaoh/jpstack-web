@@ -60,7 +60,7 @@
 		<object-field
 			name="smsArenaConfig"
 			label="Config"
-			finder="smsArenaConfig"/>
+			object-type="smsArenaConfig"/>
 
 		<text-field
 			name="relayUrl"/>
@@ -71,27 +71,27 @@
 		<yes-no-field
 			name="cid"
 			nullable="yes"/>
-			
+
 		<text-field
 			name="pid"
 			nullable="yes"/>
 
 		<text-field
 			name="sid"
-			nullable="yes"/>		
-		
+			nullable="yes"/>
+
 		<integer-field
 			name="mclass"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="coding"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="date"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="validity"
 			nullable="yes"/>
@@ -106,7 +106,7 @@
 
 		<object-field
 			name="smsArenaConfig"
-			finder="smsArenaConfig"/>
+			object-type="smsArenaConfig"/>
 
 		<text-field
 			name="relayUrl"/>
@@ -117,7 +117,7 @@
 		<yes-no-field
 			name="cid"
 			nullable="yes"/>
-			
+
 		<text-field
 			name="pid"
 			nullable="yes"/>
@@ -125,19 +125,19 @@
 		<text-field
 			name="sid"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="mclass"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="coding"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="date"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="validity"
 			nullable="yes"/>
@@ -153,7 +153,7 @@
 
 		<object-field
 			name="smsArenaConfig"
-			finder="smsArenaConfig"/>
+			object-type="smsArenaConfig"/>
 
 		<text-field
 			name="relayUrl"/>
@@ -164,7 +164,7 @@
 		<yes-no-field
 			name="cid"
 			nullable="yes"/>
-			
+
 		<text-field
 			name="pid"
 			nullable="yes"/>
@@ -172,19 +172,19 @@
 		<text-field
 			name="sid"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="mclass"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="coding"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="date"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="validity"
 			nullable="yes"/>
@@ -199,7 +199,7 @@
 
 		<object-field
 			name="smsArenaConfig"
-			finder="smsArenaConfig"/>
+			object-type="smsArenaConfig"/>
 
 		<text-field
 			name="relayUrl"/>
@@ -210,7 +210,7 @@
 		<yes-no-field
 			name="cid"
 			nullable="yes"/>
-			
+
 		<text-field
 			name="pid"
 			nullable="yes"/>
@@ -222,15 +222,15 @@
 		<integer-field
 			name="mclass"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="coding"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="date"
 			nullable="yes"/>
-			
+
 		<integer-field
 			name="validity"
 			nullable="yes"/>

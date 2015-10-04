@@ -26,26 +26,26 @@
 
 		<integer-field
 			name="numNotes"/>
-			
+
 		<integer-field
 			name="numFields"/>
-			
+
 		<timestamp-field
 			name="timestamp"/>
-			
+
 		<object-field
 			name="ticketState"
 			label="State"
-			finder="ticketState"/>
+			object-type="ticketState"/>
 
 	</field-set>
-	
+
 	<field-set
 		name="ticketNoteFields"
 		object-name="ticketNote">
 
 		<index-field/>
-		
+
 		<text-field
 			name="noteText"/>
 
@@ -56,13 +56,13 @@
 		object-name="ticketState">
 
 		<name-field/>
-		
+
 		<yes-no-field
 			name="showInQueue"/>
 
 		<integer-field
 			name="minimum"/>
-			
+
 		<integer-field
 			name="maximum"/>
 

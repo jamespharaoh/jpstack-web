@@ -5,7 +5,7 @@
 		object-name="ticketNote"
 		view-delegate-field="grandparent"
 		view-delegate-priv-code="manage">
-		
+
 		<context-stuff
 			name="ticketNoteName"
 			field="id"/>
@@ -32,7 +32,7 @@
 
 			<object-list-page
 				fields="list"/>
-				
+
 			<object-create-page
 				fields="create"/>
 
@@ -42,12 +42,12 @@
 
 			<object-summary-page
 				fields="summary"/>
-				
+
 			<object-settings-page
 				fields="settings"/>
 
 			<object-events-page/>
-			
+
 		</object>
 
 	</object-context>
@@ -58,20 +58,20 @@
 
 		<parent-field/>
 		<index-field/>
-		
+
 		<text-field
-			name="noteText"/>			
+			name="noteText"/>
 
 	</field-set>
-	
+
 	<field-set
 		name="create"
 		object-name="ticketNote">
 
 		<parent-field/>
-		
+
 		<text-field
-			name="noteText"/>	
+			name="noteText"/>
 
 	</field-set>
 
@@ -82,9 +82,9 @@
 		<id-field/>
 		<parent-field/>
 		<index-field/>
-		
+
 		<text-field
-			name="noteText"/>	
+			name="noteText"/>
 
 	</field-set>
 
@@ -94,9 +94,9 @@
 
 		<id-field/>
 		<index-field/>
-		
+
 		<text-field
-			name="noteText"/>	
+			name="noteText"/>
 
 	</field-set>
 

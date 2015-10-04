@@ -87,7 +87,7 @@ class ImChatCoreFixtureProvider
 
 	@Inject
 	ImChatTemplateObjectHelper imChatTemplateHelper;
-	
+
 	@Inject
 	MediaLogic mediaLogic;
 
@@ -151,7 +151,7 @@ class ImChatCoreFixtureProvider
 			sliceHelper.findByCode (
 				GlobalId.root,
 					"test");
-		
+
 		paypalAccountHelper.insert (
 
 			new PaypalAccountRec ()
@@ -168,7 +168,7 @@ class ImChatCoreFixtureProvider
 				.setDescription (
 					"Test paypal account")
 			);
-		
+
 		// im chat
 
 		ImChatRec imChat =

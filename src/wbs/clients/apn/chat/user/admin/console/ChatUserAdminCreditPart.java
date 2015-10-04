@@ -48,7 +48,7 @@ class ChatUserAdminCreditPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		if (
 			equal (

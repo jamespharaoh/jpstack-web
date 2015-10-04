@@ -8,7 +8,7 @@ import wbs.framework.data.annotations.DataClass;
 @Accessors (fluent = true)
 @Data
 @DataClass
-public 
+public
 class ImChatMessageTemplateSetGetFailure {
 
 	@DataAttribute
@@ -19,5 +19,5 @@ class ImChatMessageTemplateSetGetFailure {
 
 	@DataAttribute
 	String message;
-	
+
 }

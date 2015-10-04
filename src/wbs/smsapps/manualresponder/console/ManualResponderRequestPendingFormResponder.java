@@ -11,10 +11,11 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.json.simple.JSONValue;
-
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.framework.utils.etc.Html;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
+import wbs.platform.console.html.HtmlLink;
+import wbs.platform.console.html.JqueryScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.console.responder.HtmlResponder;
@@ -31,7 +32,6 @@ import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("manualResponderRequestPendingFormResponder")
@@ -75,23 +75,33 @@ class ManualResponderRequestPendingFormResponder
 	// details
 
 	@Override
+	protected
+	Set<HtmlLink> myHtmlLinks () {
+
+		return ImmutableSet.<HtmlLink>of (
+
+			HtmlLink.applicationCssStyle (
+				"/styles/manual-responder.css")
+
+		);
+
+	}
+
+	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set<ScriptRef> myScriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef>of (
 
-			.addAll (
-				super.scriptRefs ())
+			JqueryScriptRef.instance,
 
-			.add (
-				ConsoleContextScriptRef.javascript (
-					"/js/DOM.js"))
+			ConsoleApplicationScriptRef.javascript (
+				"/js/gsm.js"),
 
-			.add (
-				ConsoleContextScriptRef.javascript (
-					"/js/gsm.js"))
+			ConsoleApplicationScriptRef.javascript (
+				"/js/manual-responder.js")
 
-			.build ();
+		);
 
 	}
 
@@ -214,69 +224,14 @@ class ManualResponderRequestPendingFormResponder
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContents () {
 
-		super.goHeadStuff ();
+		super.renderHtmlHeadContents ();
+
+		// show relevant frames
 
 		printFormat (
 			"<script language=\"JavaScript\">\n");
-
-		// template data
-
-		printFormat (
-			"template_ids = [ ");
-
-		boolean comma = false;
-
-		for (ManualResponderTemplateRec template
-				: manualResponderTemplates) {
-
-			if (comma) {
-				printFormat (
-					", ");
-			} else {
-				comma = true;
-			}
-
-			printFormat (
-				"%s",
-				template.getId ());
-
-		}
-
-		printFormat (
-			" ]\n");
-
-		// function to update form state
-
-		printFormat (
-			"function form_magic () {\n",
-			"  for (var i = 0; i < template_ids.length; i++) {\n",
-			"    var id = template_ids [i];\n",
-			"    var radio = document.getElementById ('template_' + id);\n",
-			"    var message = document.getElementById ('message_' + id);\n",
-			"    var row = document.getElementById ('row_' + id);\n",
-			"    var submit = document.getElementById ('submit_' + id);\n",
-			"    if (radio && message) message.disabled = ! radio.checked;\n",
-			"    if (radio && submit) submit.disabled = ! radio.checked;\n",
-			"    if (radio && row) row.className = radio.checked ? 'selected' : '';\n",
-			"  }");
-
-		if (alreadyReplied || canIgnore) {
-
-			printFormat (
-				"  var radio = document.getElementById ('template_ignore');\n",
-				"  var row = document.getElementById ('row_ignore');\n",
-				"  var submit = document.getElementById ('submit_ignore');\n",
-				"  if (radio && row) row.className = radio.checked ? 'selected' : '';\n",
-				"  if (radio && submit) submit.disabled = ! radio.checked;\n");
-
-		}
-
-		printFormat (
-			"}\n");
-
-		// show relevant frames
 
 		printFormat (
 			"top.show_inbox (true);\n",
@@ -291,99 +246,31 @@ class ManualResponderRequestPendingFormResponder
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		requestContext.flushNotices (out);
 
-		printFormat (
-			"<p",
-			" class=\"links\"",
-			">\n",
-
-			"<a",
-			" href=\"%h\">Queues</a>\n",
-			requestContext.resolveApplicationUrl (
-				"/queues/queue.home"),
-
-			"<a",
-			" href=\"%h\"",
-			summaryUrl,
-			" target=\"main\"",
-			">Summary</a>\n",
-
-			"<a",
-			" href=\"javascript:top.show_inbox (false);\"",
-			">Close</a>\n",
-
-			"</p>\n");
+		goLinks ();
 
 		if (manualResponderRequest == null) {
 
-			printFormat (
-				"<h2>Not found</h2>\n");
+			goNotFound ();
 
-			printFormat (
-				"<p>The specified request does not exist.</p>\n");
+		} else if (! manualResponderRequest.getPending ()) {
 
-			printFormat (
-				"<p",
-				" class=\"links\"",
-				"><a",
-				" href=\"%h\"",
-				requestContext.resolveApplicationUrl (
-					"/queues/queue.home"),
-				">Queues</a></p>\n");
+			goNotPending ();
 
-			return;
+		} else if (
 
-		}
-
-		if (! manualResponderRequest.getPending ()) {
-
-			printFormat (
-				"<h2>No longer pending</h2>\n");
-
-			printFormat (
-				"<p>The specified request does not exist.</p>\n");
-
-			printFormat (
-				"<p",
-				" class=\"links\"",
-				"><a",
-				" href=\"%h\"",
-				requestContext.resolveApplicationUrl (
-					"/queues/queue.home"),
-				">Queues</a></p>\n");
-
-			return;
-
-		}
-
-		if (! privChecker.can (
+			! privChecker.can (
 				manualResponderRequest.getManualResponder (),
-				"reply")) {
+				"reply")
 
-			printFormat (
-				"<h2>Access denied</h2>\n");
+		) {
 
-			printFormat (
-				"<p>You do not have permission to reply to this manual ",
-				"responder.</p>");
+			goAccessDenied ();
 
-			printFormat (
-				"<p",
-				" class=\"links\"",
-				"><a",
-				" href=\"%h\"",
-				requestContext.resolveContextUrl (
-					"/queues/queue.home"),
-				">Queues</a></p>\n");
-
-			return;
-
-		}
-
-		if (
+		} else if (
 
 			allOf (
 
@@ -402,16 +289,22 @@ class ManualResponderRequestPendingFormResponder
 
 		) {
 
-			printFormat (
-				"<p class=\"error\">No templates specified for this manual ",
-				"responder.</p>");
+			goNoTemplates ();
 
-			return;
+		} else {
+
+			goForm ();
 
 		}
 
+	}
+
+	private
+	void goForm () {
+
 		printFormat (
 			"<form",
+			" class=\"manual-responder-request-pending-form\"",
 			" action=\"%h\"",
 			requestContext.resolveApplicationUrl (
 				stringFormat (
@@ -423,28 +316,22 @@ class ManualResponderRequestPendingFormResponder
 			">\n");
 
 		printFormat (
-			"<input",
-			" type=\"hidden\"",
-			" name=\"request_id\"",
-			" value=\"%h\"",
-			manualResponderRequest.getId (),
-			">");
-
-		printFormat (
-			"<table class=\"list\">\n");
+			"<table",
+			" class=\"list\"",
+			" style=\"width: 100%%\"",
+			">\n");
 
 		printFormat (
 			"<tr>\n",
-			"<th>&nbsp;</th>\n",
-			"<th>Template</th>\n",
-			"<th>Charge</th>\n",
+			"<th style=\"width: 0\">&nbsp;</th>\n",
+			"<th style=\"width: 0\">Template</th>\n",
+			"<th style=\"width: 0\"Charge</th>\n",
 			"<th>Message</th>\n",
-			"<th>Chars</th>\n",
-			"<th>Send</th>\n",
+			"<th style=\"width: 0\">Send</th>\n",
 			"</tr>\n");
 
 		if (alreadyReplied)
-			doIgnore ();
+			renderIgnore ();
 
 		int selectedTemplateId = -1;
 
@@ -458,169 +345,21 @@ class ManualResponderRequestPendingFormResponder
 
 		}
 
-		for (ManualResponderTemplateRec template
-				: manualResponderTemplates) {
+		for (
 
-			printFormat (
-				"<tr",
-				" id=\"row_%h\"",
-				template.getId (),
-				" onclick=\"%h\"",
-				stringFormat (
-					"document.getElementById ('template_%j').checked = true; ",
-					template.getId (),
-					"form_magic ()"),
-				">\n");
+			ManualResponderTemplateRec template
+				: manualResponderTemplates
 
-			printFormat (
-				"<td><input",
-				" id=\"template_%h\"",
-				template.getId (),
-				" type=\"radio\"",
-				" name=\"template_id\"",
-				" value=\"%h\"",
-				template.getId (),
-				" onclick=\"form_magic ()\"",
-				template.getId () == selectedTemplateId
-					? " checked"
-					: "",
-				"></td>\n");
+		) {
 
-			printFormat (
-				"<td>%h</td>\n",
-				template.getName ());
-
-			RouteRec route =
-				routerLogic.resolveRouter (
-					template.getRouter ());
-
-			printFormat (
-				"<td>%h</td>\n",
-				route.getOutCharge () > 0
-					? currencyLogic.formatText (
-						route.getCurrency (),
-						Long.valueOf(route.getOutCharge ()))
-					: "-");
-
-			if (
-				template.getCustomisable ()
-			) {
-
-				int fixedLength;
-
-				if (template.getSingleTemplate () != null) {
-
-					String fixedText =
-						template.getSingleTemplate ().replace (
-							"{message}",
-							"");
-
-					fixedLength =
-						Gsm.length (
-							fixedText);
-
-				} else {
-
-					fixedLength = 0;
-
-				}
-
-				String charCountOptions =
-					JSONValue.toJSONString (
-						ImmutableMap.builder ()
-
-					.put (
-						"fixedLength",
-						fixedLength)
-
-					.put (
-						"maxForSingleMessage",
-						160)
-
-					.put (
-						"maxForMessagePart",
-						manualResponderRequest
-								.getNumber ()
-								.getNetwork ()
-								.getShortMultipartMessages ()
-							? 134
-							: 153)
-
-					.build ()
-
-				);
-
-				String charCountScript =
-					stringFormat (
-						"gsmCharCountMultiple (this, %s, %s);",
-						stringFormat (
-							"document.getElementById ('chars_%j')",
-							template.getId ()),
-						charCountOptions);
-
-				printFormat (
-					"<td><textarea",
-
-					" id=\"message_%h\"",
-					template.getId (),
-
-					" name=\"message_%h\"",
-					template.getId (),
-
-					" onkeyup=\"%h\"",
-					charCountScript,
-
-					" onfocus\"%h\"",
-					charCountScript,
-
-					" onclick=\"%h\"",
-					stringFormat (
-						"e = new MyEvent (event); ",
-						"e.stopPropagation ()"),
-
-					" rows=\"3\"",
-					" cols=\"48\"",
-
-					template.getId () != selectedTemplateId
-						? " disabled"
-						: "",
-
-					">%h</textarea></td>\n",
-					requestContext.parameter (
-						"message_" + template.getId (),
-						template.getDefaultText ()));
-
-			} else {
-
-				printFormat (
-					"<td>%h</td>\n",
-					template.getDefaultText ());
-
-			}
-
-			printFormat (
-				"<td",
-				" style=\"text-align: center\"",
-				"><span",
-				" id=\"chars_%h\"",
-				template.getId (),
-				">&nbsp;</span></td>\n");
-
-			printFormat (
-				"<td><input",
-				" id=\"submit_%h\"",
-				template.getId (),
-				" type=\"submit\"",
-				" value=\"send\"",
-				"></td>\n");
-
-			printFormat (
-				"</tr>\n");
+			goTemplate (
+				template,
+				template.getId () == selectedTemplateId);
 
 		}
 
 		if (canIgnore && ! alreadyReplied)
-			doIgnore ();
+			renderIgnore ();
 
 		printFormat (
 			"</table>\n");
@@ -628,38 +367,267 @@ class ManualResponderRequestPendingFormResponder
 		printFormat (
 			"</form>\n");
 
+	}
+
+	private
+	void goTemplate (
+			ManualResponderTemplateRec template,
+			boolean selected) {
+
 		printFormat (
-			"<script language=\"JavaScript\">\n",
-			"form_magic ();\n",
-			"</script>\n");
+			"<tr",
+			" class=\"template\"",
+
+			" data-template-id=\"%h\"",
+			template.getId (),
+
+			" data-template-fixed-length=\"%h\"",
+			templateFixedLength (
+				template),
+
+			" data-template-min-message-parts=\"%h\"",
+			template.getMinimumMessageParts (),
+
+			" data-template-max-for-single-message=\"%h\"",
+			160,
+
+			" data-template-max-for-message-part=\"%h\"",
+			manualResponderRequest
+					.getNumber ()
+					.getNetwork ()
+					.getShortMultipartMessages ()
+				? 134
+				: 153,
+
+			" data-template-max-messages=\"%h\"",
+			template.getMaximumMessages (),
+
+			">\n");
+
+		printFormat (
+			"<td><input",
+			" class=\"template-radio\"",
+			" type=\"radio\"",
+			" name=\"template-id\"",
+			" value=\"%h\"",
+			template.getId (),
+			selected
+				? " checked"
+				: "",
+			"></td>\n");
+
+		printFormat (
+			"<td>%s</td>\n",
+			Html.nbsp (
+				Html.encode (
+					template.getName ())));
+
+		RouteRec route =
+			routerLogic.resolveRouter (
+				template.getRouter ());
+
+		printFormat (
+			"<td>%s</td>\n",
+			Html.nbsp (
+				Html.encode (
+					route.getOutCharge () > 0
+						? currencyLogic.formatText (
+							route.getCurrency (),
+							Long.valueOf(route.getOutCharge ()))
+						: "-")));
+
+		if (template.getCustomisable ()) {
+
+			printFormat (
+				"<td><textarea",
+
+				" class=\"template-text\"",
+				" style=\"display: none\"",
+
+				" name=\"message-%h\"",
+				template.getId (),
+
+				" rows=\"3\"",
+				" cols=\"48\"",
+
+				">%h</textarea><br>\n",
+				requestContext.parameter (
+					"message_" + template.getId (),
+					template.getDefaultText ()),
+
+				"<span",
+				" class=\"template-chars\"",
+				" style=\"display: none\"",
+				"></span></td>\n");
+
+		} else {
+
+			printFormat (
+				"<td>%h</td>\n",
+				template.getDefaultText ());
+
+		}
+
+		printFormat (
+			"<td><input",
+			" class=\"template-submit\"",
+			" type=\"submit\"",
+			" value=\"send\"",
+			"></td>\n");
+
+		printFormat (
+			"</tr>\n");
 
 	}
 
 	private
-	void doIgnore () {
+	int templateFixedLength (
+			ManualResponderTemplateRec template) {
+
+		if (
+			! template.getCustomisable ()
+		) {
+
+			return 0;
+
+		}
+
+		if (template.getSingleTemplate () == null) {
+
+			return 0;
+
+		}
+
+		String fixedText =
+			template.getSingleTemplate ().replace (
+				"{message}",
+				"");
+
+		return Gsm.length (
+			fixedText);
+
+	}
+
+	private
+	void goNotFound () {
+
+		printFormat (
+			"<h2>Not found</h2>\n");
+
+		printFormat (
+			"<p>The specified request does not exist.</p>\n");
+
+		printFormat (
+			"<p",
+			" class=\"links\"",
+			"><a",
+			" href=\"%h\"",
+			requestContext.resolveApplicationUrl (
+				"/queues/queue.home"),
+			">Queues</a></p>\n");
+
+	}
+
+	private
+	void goNotPending () {
+
+		printFormat (
+			"<h2>No longer pending</h2>\n");
+
+		printFormat (
+			"<p>The specified request does not exist.</p>\n");
+
+		printFormat (
+			"<p",
+			" class=\"links\"",
+			"><a",
+			" href=\"%h\"",
+			requestContext.resolveApplicationUrl (
+				"/queues/queue.home"),
+			">Queues</a></p>\n");
+
+	}
+
+	private
+	void goAccessDenied () {
+
+		printFormat (
+			"<h2>Access denied</h2>\n");
+
+		printFormat (
+			"<p>You do not have permission to reply to this manual ",
+			"responder.</p>");
+
+		printFormat (
+			"<p",
+			" class=\"links\"",
+			"><a",
+			" href=\"%h\"",
+			requestContext.resolveContextUrl (
+				"/queues/queue.home"),
+			">Queues</a></p>\n");
+
+	}
+
+	private
+	void goNoTemplates () {
+
+		printFormat (
+			"<p class=\"error\">No templates specified for this manual ",
+			"responder.</p>");
+
+	}
+
+	private
+	void goLinks () {
+
+		printFormat (
+			"<p",
+			" class=\"links\"",
+			">\n");
+
+		printFormat (
+			"<a",
+			" href=\"%h\">Queues</a>\n",
+			requestContext.resolveApplicationUrl (
+				"/queues/queue.home"));
+
+		printFormat (
+			"<a",
+			" href=\"%h\"",
+			summaryUrl,
+			" target=\"main\"",
+			">Summary</a>\n");
+
+		printFormat (
+			"<a",
+			" href=\"javascript:top.show_inbox (false);\"",
+			">Close</a>\n");
+
+		printFormat (
+			"</p>\n");
+
+	}
+
+	private
+	void renderIgnore () {
 
 		printFormat (
 			"<tr",
-			" id=\"row_ignore\"",
-			" onclick=\"%h\"",
-			stringFormat (
-				"%s; %s",
-				"document.getElementById ('template_ignore').checked = true",
-				"form_magic ()"),
+			" class=\"template\"",
 			">\n",
 
 			"<td><input",
-			" id=\"template_ignore\"",
+			" class=\"template-radio\"",
 			" type=\"radio\"",
-			" name=\"template_id\"",
+			" name=\"template-id\"",
 			" value=\"ignore\"",
-			" onclick=\"form_magic ()\"",
 			"></td>\n",
 
-			"<td colspan=\"4\">&nbsp;</td>\n",
+			"<td colspan=\"3\">&nbsp;</td>\n",
 
 			"<td><input",
-			" id=\"submit_ignore\"",
+			" class=\"template-submit\"",
 			" type=\"submit\"",
 			" value=\"%h\"",
 			alreadyReplied

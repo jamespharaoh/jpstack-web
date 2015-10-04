@@ -76,7 +76,7 @@ class ChatCoreFixtureProvider
 
 	@Inject
 	CurrencyObjectHelper currencyHelper;
-	
+
 	@Inject
 	TicketManagerObjectHelper ticketManagerHelper;
 
@@ -290,7 +290,7 @@ class ChatCoreFixtureProvider
 				currencyHelper.findByCode (
 					GlobalId.root,
 					"gbp"))
-					
+
 			.setTicketManager(
 				ticketManagerHelper.find (
 						1))
@@ -445,7 +445,7 @@ class ChatCoreFixtureProvider
 					number)
 
 				.setCreditMode (
-					ChatUserCreditMode.strict)					
+					ChatUserCreditMode.strict)
 
 			);
 

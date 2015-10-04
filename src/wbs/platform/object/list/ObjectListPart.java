@@ -82,10 +82,10 @@ class ObjectListPart
 
 	@Getter @Setter
 	String targetContextTypeName;
-	
+
 	// state
 
-	FormFieldSet formFieldSet;	
+	FormFieldSet formFieldSet;
 
 	ObsoleteDateField dateField;
 
@@ -115,12 +115,12 @@ class ObjectListPart
 		prepareFieldSet ();
 
 	}
-	
+
 	void prepareFieldSet () {
-		
+
 		formFieldSet = formFieldsProvider.getFields(
 			parent);
-	
+
 	}
 
 	void prepareBrowserSpec () {
@@ -204,7 +204,7 @@ class ObjectListPart
 
 			parent = parentHelper.find(
 					parentId);
-			
+
 			prepareAllObjectsViaParent (
 				parentHelper,
 				parentId);
@@ -497,7 +497,7 @@ class ObjectListPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		goBrowser ();
 		goTabs ();

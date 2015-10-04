@@ -1,5 +1,6 @@
 package wbs.platform.queue.console;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -77,6 +78,9 @@ class QueueSubjectSorter {
 
 	@Getter
 	int claimedItems = 0;
+
+	@Getter
+	int userClaimedItems = 0;
 
 	@Getter
 	int claimedSubjects = 0;
@@ -199,10 +203,22 @@ class QueueSubjectSorter {
 			if (item.getState () == QueueItemState.claimed) {
 
 				claimedSubjects ++;
-				claimedItems ++;
-
 				queueInfo.claimedSubjects ++;
+
+				claimedItems ++;
 				queueInfo.claimedItems ++;
+
+				if (
+					user != null
+					&& equal (
+						user,
+						item.getQueueItemClaim ().getUser ())
+				) {
+
+					userClaimedItems ++;
+					queueInfo.userClaimedItems ++;
+
+				}
 
 				if (createdTime < queueInfo.oldestClaimed)
 					queueInfo.oldestClaimed = createdTime;
@@ -256,9 +272,9 @@ class QueueSubjectSorter {
 			// count available items
 
 			availableSubjects ++;
-			availableItems ++;
-
 			queueInfo.availableSubjects ++;
+
+			availableItems ++;
 			queueInfo.availableItems ++;
 
 			if (createdTime < queueInfo.oldestAvailable)
@@ -349,6 +365,12 @@ class QueueSubjectSorter {
 
 		@Getter
 		int claimedItems = 0;
+
+		@Getter
+		int userClaimedItems = 0;
+
+		@Getter
+		int myClaimedItems = 0;
 
 		@Getter
 		int claimedSubjects = 0;

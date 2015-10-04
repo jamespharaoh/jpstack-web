@@ -20,10 +20,11 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 import wbs.framework.utils.etc.StringFormatter;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
 import wbs.platform.console.context.ConsoleContext;
-import wbs.platform.console.context.ConsoleContextScriptRef;
 import wbs.platform.console.context.ConsoleContextType;
 import wbs.platform.console.html.HtmlLink;
+import wbs.platform.console.html.JqueryScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.misc.PageBuilder;
 import wbs.platform.console.misc.Percentager;
@@ -100,11 +101,10 @@ class ChatUserSearchResultsPart
 				super.scriptRefs ())
 
 			.add (
-				ConsoleContextScriptRef.javascript (
-					"/js/jquery-1.7.1.js"))
+				JqueryScriptRef.instance)
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/page-builder.js"))
 
 			.build ();
@@ -116,9 +116,11 @@ class ChatUserSearchResultsPart
 	Set<HtmlLink> links () {
 
 		return ImmutableSet.<HtmlLink>of (
-			HtmlLink.cssStyle (
-				requestContext.resolveApplicationUrl (
-					"/js/chat.js")));
+
+			HtmlLink.applicationCssStyle (
+				"/js/chat.js")
+
+		);
 
 	}
 
@@ -495,7 +497,7 @@ class ChatUserSearchResultsPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<p",

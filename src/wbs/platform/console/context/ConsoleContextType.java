@@ -44,6 +44,9 @@ class ConsoleContextType {
 	Map<String,WebFile> files =
 		new LinkedHashMap<String,WebFile> ();
 
+	@Getter @Setter
+	String defaultFileName;
+
 	public
 	String lookupDefaultFileName (
 			ConsoleRequestContext requestContext) {
@@ -57,10 +60,34 @@ class ConsoleContextType {
 
 		}
 
+		// look for specified default page
+
+		if (defaultFileName != null) {
+
+			for (
+				ConsoleContextTab contextTab
+					: tabs.values ()
+			) {
+
+				if (
+					contextTab.name ().endsWith (
+						"." + defaultFileName)
+				) {
+
+					return contextTab.localFile ();
+
+				}
+
+			}
+
+		}
+
 		// look for settings or summary page
 
-		for (ConsoleContextTab contextTab
-				: tabs.values ()) {
+		for (
+			ConsoleContextTab contextTab
+				: tabs.values ()
+		) {
 
 			if (contextTab.name ().endsWith (".summary"))
 				return contextTab.localFile ();

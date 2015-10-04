@@ -286,6 +286,9 @@ class DataFromXml {
 			.parents (
 				parents)
 
+			.contextString (
+				filename)
+
 			.build ();
 
 	}
@@ -314,8 +317,16 @@ class DataFromXml {
 		try {
 
 			return new ElementBuilder ()
-				.element (document.getRootElement ())
-				.parents (Collections.emptyList ())
+
+				.element (
+					document.getRootElement ())
+
+				.parents (
+					Collections.emptyList ())
+
+				.contextString (
+					filename)
+
 				.build ();
 
 		} catch (Exception exception) {
@@ -338,6 +349,9 @@ class DataFromXml {
 
 		@Getter @Setter
 		Iterable<Object> parents;
+
+		@Getter @Setter
+		String contextString;
 
 		Object object;
 
@@ -432,7 +446,8 @@ class DataFromXml {
 					: object.getClass ().getDeclaredFields ()) {
 
 				buildField (
-					field);
+					field,
+					contextString);
 
 			}
 
@@ -519,7 +534,8 @@ class DataFromXml {
 		}
 
 		void buildField (
-				Field field) {
+				Field field,
+				String contextString) {
 
 			for (Annotation annotation
 					: field.getAnnotations ()) {
@@ -528,7 +544,8 @@ class DataFromXml {
 
 					buildAttributeField (
 						field,
-						(DataAttribute) annotation);
+						(DataAttribute) annotation,
+						contextString);
 
 				}
 
@@ -536,7 +553,8 @@ class DataFromXml {
 
 					buildChildField (
 						field,
-						(DataChild) annotation);
+						(DataChild) annotation,
+						contextString);
 
 				}
 
@@ -599,7 +617,8 @@ class DataFromXml {
 
 		void buildAttributeField (
 				Field field,
-				DataAttribute dataAttributeAnnotation) {
+				DataAttribute dataAttributeAnnotation,
+				String contextString) {
 
 			String attributeName =
 				ifNull (
@@ -617,9 +636,10 @@ class DataFromXml {
 
 					throw new RuntimeException (
 						stringFormat (
-							"Required attribute %s of <%s> missing",
+							"Required attribute %s of <%s> missing at %s",
 							attributeName,
-							element.getName ()));
+							element.getName (),
+							contextString));
 
 				}
 
@@ -722,7 +742,8 @@ class DataFromXml {
 
 		void buildChildField (
 				Field field,
-				DataChild dataChildAnnotation) {
+				DataChild dataChildAnnotation,
+				String filename) {
 
 			String childElementName =
 				camelToHyphen (
@@ -748,9 +769,17 @@ class DataFromXml {
 
 			Object child =
 				new ElementBuilder ()
-					.element (childElement)
-					.parents (nextParents)
-					.build ();
+
+				.element (
+					childElement)
+
+				.parents (
+					nextParents)
+
+				.contextString (
+					filename)
+
+				.build ();
 
 			BeanLogic.set (
 				object,
@@ -766,6 +795,10 @@ class DataFromXml {
 			if (
 				! dataChildrenAnnotation.direct ()
 				&& ! dataChildrenAnnotation.childElement ().isEmpty ()
+				&& (
+					field.getType () != Map.class
+					&& field.getType () != List.class
+				)
 			) {
 
 				throw new RuntimeException (
@@ -947,6 +980,9 @@ class DataFromXml {
 
 						.parents (
 							nextParents)
+
+						.contextString (
+							contextString)
 
 						.build ());
 

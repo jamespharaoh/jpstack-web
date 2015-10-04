@@ -11,9 +11,9 @@ import wbs.framework.data.annotations.DataClass;
 @Accessors (fluent = true)
 @Data
 @DataClass
-public 
+public
 class ImChatMessageTemplateSetGetSuccess {
-	
+
 	@DataAttribute
 	String status = "success";
 

@@ -1,10 +1,14 @@
 package wbs.smsapps.manualresponder.hibernate;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.List;
 
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
 
 import wbs.framework.hibernate.HibernateDao;
+import wbs.platform.user.model.UserRec;
 import wbs.smsapps.manualresponder.model.ManualResponderReportDao;
 import wbs.smsapps.manualresponder.model.ManualResponderReportRec;
 
@@ -15,29 +19,64 @@ class ManualResponderReportDaoHibernate
 
 	@Override
 	public
-	List<ManualResponderReportRec> find (
-			Interval timestampInterval) {
+	List<ManualResponderReportRec> findByProcessedTime (
+			Interval processedTimeInterval) {
 
 		return findMany (
 			ManualResponderReportRec.class,
 
-			createQuery (
-				"FROM ManualResponderReportRec report " +
-				"WHERE report.manualResponderRequest.timestamp >= :from " +
-					"AND report.manualResponderRequest.timestamp < :to")
+			createCriteria (
+				ManualResponderReportRec.class,
+				"_manualResponderReport")
 
-			.setTimestamp (
-				"from",
-				timestampInterval.getStart ().toDate ())
+			.add (
+				Restrictions.ge (
+					"_manualResponderReport.processedTime",
+					instantToDate (
+						processedTimeInterval.getStart ().toInstant ())))
 
-			.setTimestamp (
-				"to",
-				timestampInterval.getEnd ().toDate ())
+			.add (
+				Restrictions.lt (
+					"_manualResponderReport.processedTime",
+					instantToDate (
+						processedTimeInterval.getEnd ().toInstant ())))
 
 			.list ());
 
 	}
 
+	@Override
+	public
+	List<ManualResponderReportRec> findByProcessedTime (
+			UserRec processedByUser,
+			Interval processedTimeInterval) {
 
+		return findMany (
+			ManualResponderReportRec.class,
+
+			createCriteria (
+				ManualResponderReportRec.class,
+				"_manualResponderReport")
+
+			.add (
+				Restrictions.eq (
+					"_manualResponderReport.processedByUser",
+					processedByUser))
+
+			.add (
+				Restrictions.ge (
+					"_manualResponderReport.processedTime",
+					instantToDate (
+						processedTimeInterval.getStart ().toInstant ())))
+
+			.add (
+				Restrictions.lt (
+					"_manualResponderReport.processedTime",
+					instantToDate (
+						processedTimeInterval.getEnd ().toInstant ())))
+
+			.list ());
+
+	}
 
 }

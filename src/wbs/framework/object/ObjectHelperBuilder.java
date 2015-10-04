@@ -78,7 +78,7 @@ class ObjectHelperBuilder {
 
 	@Getter
 	boolean ready = false;
-	
+
 	boolean dynamic;
 
 	@PostConstruct
@@ -439,39 +439,39 @@ class ObjectHelperBuilder {
 					method.getDeclaringClass ();
 
 				try {
-				
+
 					if (declaringClass == ObjectHelperMethods.class) {
-	
+
 						return method.invoke (
 							coreImplementation,
 							arguments);
-	
+
 					} else if (declaringClass == ModelMethods.class) {
-	
+
 						return method.invoke (
 							objectHelperProvider.model (),
 							arguments);
-	
+
 					} else if (declaringClass == extraInterface) {
-	
+
 						return method.invoke (
 							extraImplementation,
 							arguments);
-	
+
 					} else if (declaringClass == daoMethodsInterface) {
-	
+
 						return method.invoke (
 							daoImplementation,
 							arguments);
-	
+
 					} else {
-	
+
 						throw new RuntimeException (
 							stringFormat (
 								"Don't know how to handle %s.%s",
 								declaringClass.getName (),
 								method.getName ()));
-	
+
 					}
 
 				} catch (InvocationTargetException exception) {
@@ -479,7 +479,7 @@ class ObjectHelperBuilder {
 					throw exception.getTargetException ();
 
 				}
-		
+
 			}
 
 		}
@@ -831,7 +831,7 @@ class ObjectHelperBuilder {
 				return object;
 
 			}
-			
+
 			@Override
 			public
 			Record update (
@@ -867,7 +867,7 @@ class ObjectHelperBuilder {
 				return object;
 
 			}
-			
+
 
 			@Override
 			public
@@ -1478,13 +1478,13 @@ class ObjectHelperBuilder {
 					object);
 
 			}
-			
+
 			@Override
-			public 
+			public
 			Object getDynamic (
-				Record object, 
+				Record object,
 				String name) {
-				
+
 				return objectHelperProvider.getDynamic (
 					object,
 					name);
@@ -1492,17 +1492,17 @@ class ObjectHelperBuilder {
 			}
 
 			@Override
-			public 
+			public
 			void setDynamic (
-				Record object, 
-				String name, 
+				Record object,
+				String name,
 				Object value) {
 
 				objectHelperProvider.setDynamic (
-					object, 
-					name, 
+					object,
+					name,
 					value);
-				
+
 			}
 
 		}

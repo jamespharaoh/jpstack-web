@@ -43,7 +43,7 @@ class TicketPendingFormResponder
 
 	TicketRec ticket;
 	TicketStateRec ticketState;
-	
+
 	List<TicketTemplateRec> templates;
 
 	String summaryUrl;
@@ -112,9 +112,9 @@ class TicketPendingFormResponder
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContents () {
 
-		super.goHeadStuff ();
+		super.renderHtmlHeadContents ();
 
 		printFormat (
 			"<script language=\"JavaScript\">\n");
@@ -142,7 +142,7 @@ class TicketPendingFormResponder
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		requestContext.flushNotices (out);
 
@@ -197,8 +197,8 @@ class TicketPendingFormResponder
 			"<th>New State</th>\n",
 			"<th>Time to queue</th>\n",
 			"</tr>\n");
-		
-		List<TicketTemplateRec> templatesReversed 
+
+		List<TicketTemplateRec> templatesReversed
 			= Lists.reverse(templates);
 
 		for (
@@ -212,9 +212,9 @@ class TicketPendingFormResponder
 
 		printFormat (
 			"</table>\n");
-		
+
 		addTicketNote();
-		
+
 		printFormat (
 			"<input",
 			" class=\"template-submit\"",
@@ -227,27 +227,27 @@ class TicketPendingFormResponder
 			"</form>\n");
 
 	}
-	
+
 	void addTicketNote () {
-		
+
 		printFormat (
 			"<p><h3>Add new note</h3>\n");
-		
+
 		printFormat (
 			"<label for=\"note-text\">",
 			"Note text",
 			"</label>");
-		
+
 		printFormat (
 			"<input",
 			" id=\"note-text\"",
 			" type=\"textarea\"",
 			" name=\"note-text\"",
 			">\n");
-		
+
 		printFormat (
 			"</p>\n");
-		
+
 	}
 
 	void doTemplate (
@@ -263,32 +263,48 @@ class TicketPendingFormResponder
 		if (template.getTicketState()
 				.getState().equals (
 					ticket.getTicketState().getState())) {
-			
+
 			printFormat (
-					"<td><input",
-					" id=\"radio-template-%h\"",
-					template.getId (),
-					" class=\"template-radio\"",
-					" type=\"radio\"",
-					" name=\"template\"",
-					" value=\"%h\"",
-					template.getId (),
-					"checked",
-					"></td>\n");
-			
-		}
-		else {
-			
-			printFormat (
+
 				"<td><input",
+
 				" id=\"radio-template-%h\"",
 				template.getId (),
+
 				" class=\"template-radio\"",
+
 				" type=\"radio\"",
+
 				" name=\"template\"",
+
 				" value=\"%h\"",
 				template.getId (),
+
+				"checked",
+
 				"></td>\n");
+
+		}
+		else {
+
+			printFormat (
+
+				"<td><input",
+
+				" id=\"radio-template-%h\"",
+				template.getId (),
+
+				" class=\"template-radio\"",
+
+				" type=\"radio\"",
+
+				" name=\"template\"",
+
+				" value=\"%h\"",
+				template.getId (),
+
+				"></td>\n");
+
 		}
 
 		printFormat (
@@ -300,16 +316,22 @@ class TicketPendingFormResponder
 			template.getTicketState ()
 				.getState ()
 					.toString ());
-		
+
 		printFormat (
+
 			"<td><input",
+
 			" id=\"timestamp-%h\"",
-			template.getId (),			
+			template.getId (),
+
 			" type=\"textarea\"",
+
 			" name=\"timestamp-%h\"",
 			template.getTicketState ().getState ().toString (),
+
 			" value=\"%d\"",
-			template.getTicketState ().getMinimum (),			
+			template.getTicketState ().getMinimum (),
+
 			"></td>\n");
 
 		printFormat (

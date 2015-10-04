@@ -60,7 +60,7 @@ class SupervisorTableStatsGroupPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		try {
 

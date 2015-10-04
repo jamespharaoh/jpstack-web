@@ -54,7 +54,7 @@ class ChatUserAdminDeletePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		// can't delete monitors
 

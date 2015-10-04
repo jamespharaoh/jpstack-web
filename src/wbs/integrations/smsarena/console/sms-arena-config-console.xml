@@ -55,7 +55,7 @@
 		</object>
 
 	</object-context>
-	
+
 	<field-set
 		name="list"
 		object-name="smsArenaConfig">
@@ -65,7 +65,7 @@
 		<description-field/>
 
 	</field-set>
-	
+
 		<field-set
 		name="create"
 		object-name="smsArenaConfig">
@@ -73,12 +73,12 @@
 		<parent-field/>
 		<name-field/>
 		<description-field/>
-		
+
 		<integer-field
 			name="profileId"/>
 
 	</field-set>
-	
+
 		<field-set
 		name="summary"
 		object-name="smsArenaConfig">
@@ -86,12 +86,12 @@
 		<parent-field/>
 		<name-field/>
 		<description-field/>
-		
+
 		<integer-field
 			name="profileId"/>
 
 	</field-set>
-	
+
 		<field-set
 		name="settings"
 		object-name="smsArenaConfig">
@@ -99,7 +99,7 @@
 		<parent-field/>
 		<name-field/>
 		<description-field/>
-		
+
 		<integer-field
 			name="profileId"/>
 

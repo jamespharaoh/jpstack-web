@@ -1,6 +1,6 @@
 package wbs.applications.imchat.model;
 
-public 
+public
 enum ImChatProfileState {
 
 	disabled,

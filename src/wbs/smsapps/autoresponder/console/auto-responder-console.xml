@@ -70,7 +70,7 @@
 		<object-field
 			name="addToNumberList"
 			label="Add to"
-			finder="numberList"/>
+			object-type="numberList"/>
 
 	</field-set>
 
@@ -90,7 +90,7 @@
 
 		<object-field
 			name="addToNumberList"
-			finder="numberList"/>
+			object-type="numberList"/>
 
 	</field-set>
 
@@ -110,7 +110,7 @@
 
 		<object-field
 			name="addToNumberList"
-			finder="numberList"/>
+			object-type="numberList"/>
 
 	</field-set>
 

@@ -43,7 +43,7 @@ class ChatUserSearchPart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		printFormat (
 			"<script type=\"text/javascript\">\n",
@@ -73,7 +73,7 @@ class ChatUserSearchPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		@SuppressWarnings ("unchecked")
 		Map<String,String> params =

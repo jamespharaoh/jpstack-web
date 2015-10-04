@@ -40,10 +40,10 @@ class ObjectSettingsAction
 
 	@Inject
 	ConsoleRequestContext requestContext;
-	
+
 	@Inject
 	RootObjectHelper rootHelper;
-	
+
 	@BuilderParent
 	ConsoleContextBuilderContainer container;
 
@@ -57,7 +57,7 @@ class ObjectSettingsAction
 
 	@Getter @Setter
 	ObjectLookup<?> objectLookup;
-	
+
 	@Getter @Setter
 	ConsoleHelper<?> consoleHelper;
 
@@ -78,10 +78,10 @@ class ObjectSettingsAction
 
 	@Getter @Setter
 	FormFieldSet formFieldSet;
-	
+
 	@Getter @Setter
 	FieldsProvider formFieldsProvider;
-	
+
 	// state
 
 	Record<?> parent;
@@ -125,7 +125,7 @@ class ObjectSettingsAction
 				requestContext.contextStuff ());
 
 		// perform update
-		
+
 		if (formFieldsProvider != null) {
 			prepareParent();
 			prepareFieldSet();
@@ -186,13 +186,13 @@ class ObjectSettingsAction
 		return detailsResponder.get ();
 
 	}
-	
+
 	void prepareParent () {
-		
+
 		ConsoleHelper<?> parentHelper =
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
-			
+
 		if (parentHelper.root ()) {
 
 			parent =
@@ -217,14 +217,14 @@ class ObjectSettingsAction
 			return;
 
 		}
-		
+
 	}
-	
+
 	void prepareFieldSet() {
-		
+
 		formFieldSet = formFieldsProvider.getFields(
 				parent);
-		
+
 	}
 
 }

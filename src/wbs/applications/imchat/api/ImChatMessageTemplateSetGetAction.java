@@ -32,8 +32,8 @@ import wbs.services.messagetemplate.model.MessageTemplateTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateValueRec;
 
 @PrototypeComponent ("imChatMessageTemplateSetGetAction")
-public 
-class ImChatMessageTemplateSetGetAction 
+public
+class ImChatMessageTemplateSetGetAction
 	implements Action {
 
 	// dependencies
@@ -43,13 +43,13 @@ class ImChatMessageTemplateSetGetAction
 
 	@Inject
 	ImChatApiLogic imChatApiLogic;
-	
+
 	@Inject
 	ImChatObjectHelper imChatHelper;
-	
+
 	@Inject
 	MessageTemplateSetObjectHelper messageTemplateSetHelper;
-	
+
 	@Inject
 	MessageTemplateTypeObjectHelper messageTemplateTypeHelper;
 
@@ -89,19 +89,19 @@ class ImChatMessageTemplateSetGetAction
 		Transaction transaction =
 			database.beginReadOnly (
 				this);
-		
+
 		// lookup message template set
-		
+
 		ImChatRec imChat =
 			imChatHelper.find (
 				Integer.parseInt (
 					(String)
 					requestContext.request (
 						"imChatId")));
-		
+
 		MessageTemplateSetRec messageTemplateSet =
-			messageTemplateSetHelper.findByCode( 
-				imChat.getMessageTemplateDatabase(), 
+			messageTemplateSetHelper.findByCode(
+				imChat.getMessageTemplateDatabase(),
 				request.code ());
 
 		if (
@@ -122,35 +122,35 @@ class ImChatMessageTemplateSetGetAction
 				.value (failureResponse);
 
 		}
-		
+
 		// create response
-		
-		List<ImChatMessageTemplateData> messages = 
+
+		List<ImChatMessageTemplateData> messages =
 			new ArrayList<ImChatMessageTemplateData> ();
-		
+
 		Map<Integer, MessageTemplateValueRec> messageTemplateValues =
 			messageTemplateSet.getMessageTemplateValues();
-		
-		for ( 
+
+		for (
 			Map.Entry<Integer, MessageTemplateValueRec> entry : messageTemplateValues.entrySet()
 		) {
-		    
+
 			MessageTemplateTypeRec messageTemplateType =
 				messageTemplateTypeHelper.find (
 					entry.getKey());
-			
-			String key = 
+
+			String key =
 				messageTemplateType
 					.getName();
-			
+
 			String value =
 				entry.getValue()
 					.getStringValue();
-			
+
 			messages.add (
 				imChatApiLogic.messageTemplateData (
 					key,
-					value));			
+					value));
 		}
 
 		ImChatMessageTemplateSetGetSuccess messageTemplateSetGetSuccessResponse =

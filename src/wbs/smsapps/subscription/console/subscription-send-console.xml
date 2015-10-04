@@ -79,7 +79,7 @@
 
 		<object-field
 			name="createdUser"
-			finder="user"/>
+			object-type="user"/>
 
 		<timestamp-field
 			name="createdTime"/>
@@ -111,22 +111,22 @@
 
 		<object-field
 			name="batch"
-			finder="batch"/>
+			object-type="batch"/>
 
 		<object-field
 			name="createdUser"
 			label="Created by"
-			finder="user"/>
+			object-type="user"/>
 
 		<object-field
 			name="sentUser"
 			label="Sent by"
-			finder="user"/>
+			object-type="user"/>
 
 		<object-field
 			name="cancelledUser"
 			label="Cancelled by"
-			finder="user"/>
+			object-type="user"/>
 
 		<timestamp-field
 			name="createdTime"/>

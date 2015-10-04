@@ -54,7 +54,7 @@
 		<object-field
 			name="imChatPricePoint"
 			label="Price point"
-			finder="imChatPricePoint"/>
+			object-type="imChatPricePoint"/>
 
 		<timestamp-field
 			name="createdTime"
@@ -72,7 +72,7 @@
 
 		<object-field
 			name="imChatPricePoint"
-			finder="imChatPricePoint"/>
+			object-type="imChatPricePoint"/>
 
 		<currency-field
 			name="price"
@@ -93,7 +93,7 @@
 
 		<object-field
 			name="paypalPayment"
-			finder="paypalPayment"/>
+			object-type="paypalPayment"/>
 
 	</field-set>
 

@@ -64,7 +64,7 @@ class ChatUserImageUploadPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<p>Please upload the photo or video.</p>\n");

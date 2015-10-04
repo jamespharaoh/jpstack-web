@@ -41,7 +41,7 @@ class SubscriptionSendControlPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		goDetails ();
 

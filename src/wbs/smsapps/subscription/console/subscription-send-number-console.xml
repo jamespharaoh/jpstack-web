@@ -54,7 +54,7 @@
 
 		<object-field
 			name="number"
-			finder="number"/>
+			object-type="number"/>
 
 		<enum-field
 			name="state"
@@ -71,7 +71,7 @@
 
 		<object-field
 			name="number"
-			finder="number"/>
+			object-type="number"/>
 
 		<enum-field
 			name="state"

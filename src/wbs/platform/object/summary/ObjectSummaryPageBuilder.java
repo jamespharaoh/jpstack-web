@@ -97,7 +97,7 @@ class ObjectSummaryPageBuilder {
 	ConsoleHelper<?> consoleHelper;
 
 	FormFieldSet formFieldSet;
-	
+
 	FieldsProvider fieldsProvider;
 
 	String privKey;
@@ -253,7 +253,7 @@ class ObjectSummaryPageBuilder {
 
 				return summaryFieldsPart.get ()
 					.consoleHelper (consoleHelper)
-					.formFieldSet (formFieldSet)					
+					.formFieldSet (formFieldSet)
 					.formFieldsProvider (fieldsProvider);
 
 			}
@@ -352,7 +352,7 @@ class ObjectSummaryPageBuilder {
 				? consoleModule.formFieldSets ().get (
 					spec.fieldsName ())
 				: defaultFields ();
-					
+
 		privKey =
 			spec.privKey ();
 
@@ -362,22 +362,22 @@ class ObjectSummaryPageBuilder {
 				formFieldSet);
 
 		}
-		
+
 		// if a provider name is provided
 
 		if (spec.fieldsProviderName () != null) {
 
-			fieldsProvider = 
+			fieldsProvider =
 				applicationContext.getBean (
 					spec.fieldsProviderName (),
-					FieldsProvider.class);		
-		} 
-		
+					FieldsProvider.class);
+		}
+
 		else {
-			
+
 			fieldsProvider =
 				null;
-			
+
 		}
 
 	}

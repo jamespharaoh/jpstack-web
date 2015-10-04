@@ -668,7 +668,7 @@ class ChatReportRevSharePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		goSearchForm ();
 		goReport ();

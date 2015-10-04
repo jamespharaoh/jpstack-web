@@ -37,7 +37,7 @@ class TextAreaFormFieldRenderer<Container>
 
 	@Inject
 	ConsoleRequestContext requestContext;
-	
+
 	// properties
 
 	@Getter @Setter
@@ -60,10 +60,10 @@ class TextAreaFormFieldRenderer<Container>
 
 	@Getter @Setter
 	String charCountData;
-	
+
 	@Getter @Setter
 	FormFieldDataProvider formFieldDataProvider;
-	
+
 	@Getter @Setter
 	Record<?> parent;
 
@@ -230,132 +230,132 @@ class TextAreaFormFieldRenderer<Container>
 					">&nbsp;</span>"));
 
 		}
-		
+
 		if (formFieldDataProvider != null) {
-			
+
 			String data;
-			
+
 			if (parent != null) {
-				data = 
+				data =
 					formFieldDataProvider.getFormFieldData (
 						parent);
 			}
-			else {		
-				data = 
+			else {
+				data =
 					formFieldDataProvider.getFormFieldData (
 						(Record<?>) container);
 			}
-			
+
 			out.write (
 				stringFormat (
 					"<span hidden=\"hidden\"",
 					" class=\"parameters-length-list\" style>",
 					data,
 					"</span>"));
-			
+
 			out.write (
 					stringFormat (
 						"<br>\n"));
-			
+
 			// parameters data
-			
+
 			String[] tokens =
 				data.split("&");
-			
+
 			Map<String, String> dataMap =
 				new TreeMap<String, String>();
-			
+
 			for (Integer i = 0; i < tokens.length; i++) {
-				String[] parameter = 
+				String[] parameter =
 					tokens[i].split("=");
-				
+
 				dataMap.put(parameter[0], parameter[1]);
 			}
-			
+
 			// message and charset
-			
+
 			String message;
 			MessageTemplateTypeCharset charset;
-			
+
 			if (parent == null) {
-				
+
 				message =
 					((MessageTemplateTypeRec) container)
 						.getDefaultValue();
-				
+
 				charset =
 					((MessageTemplateTypeRec) container)
 						.getCharset();
-				
+
 			}
 			else {
-				
+
 				// if the type has a defined value, we get it
-				
+
 				MessageTemplateValueRec messageTemplateValue =
-						((MessageTemplateSetRec) container).getMessageTemplateValues().get( 
+						((MessageTemplateSetRec) container).getMessageTemplateValues().get(
 							((MessageTemplateTypeRec) parent).getId());
-				
+
 				if (messageTemplateValue == null) {
 					message =
 						((MessageTemplateTypeRec) parent)
 							.getDefaultValue();
-				}				
+				}
 				else {
 					message =
 						messageTemplateValue
 							.getStringValue();
 				}
-				
+
 				charset =
 					((MessageTemplateTypeRec) parent)
 						.getCharset();
 			}
-			
+
 			// length of non variable parts
-			
+
 			Integer messageLength = 0;
-			
+
 			if (message != null) {
-			
+
 				String[] parts =
 					message.split("\\{(.*?)\\}");
-				
+
 				for (int i = 0; i < parts.length; i++) {
-					
+
 					// length of special chars if gsm encoding
-					
+
 					if (charset == MessageTemplateTypeCharset.gsm) {
-						
-						if (! Gsm.isGsm (parts[i]))		
+
+						if (! Gsm.isGsm (parts[i]))
 							throw new RuntimeException ("Message text is invalid");
-			
-						messageLength += 
+
+						messageLength +=
 							Gsm.length (parts[i]);
-			
+
 					}
 					else {
-						messageLength += 
+						messageLength +=
 								parts[i].length();
 					}
-					
+
 				}
-				
+
 				// length of the parameters
-				
+
 				Pattern regExp = Pattern.compile("\\{(.*?)\\}");
 				Matcher matcher = regExp.matcher(message);
-				
+
 				while (matcher.find()) {
-				    String parameterName = 
-				    	matcher.group(1);
-	
-				    	messageLength +=
-				    		Integer.parseInt(dataMap.get(parameterName));			    
+					String parameterName =
+						matcher.group(1);
+
+						messageLength +=
+							Integer.parseInt(dataMap.get(parameterName));
 				}
-								
+
 			}
-			
+
 			out.write (
 				stringFormat (
 					"<span",

@@ -37,8 +37,8 @@ import wbs.sms.route.core.model.RouteRec;
 
 @Log4j
 @SingletonComponent ("smsArenaSender")
-public 
-class SmsArenaSender 
+public
+class SmsArenaSender
 	extends AbstractSmsSender2 {
 
 	// dependencies
@@ -129,11 +129,11 @@ class SmsArenaSender
 			stringFormat (
 				"Sending message %s",
 				message.getId ()));
-	
+
 		// create params map for the request query string
-		
+
 		Map<String,String> params =
-				new LinkedHashMap<String,String> ();		
+				new LinkedHashMap<String,String> ();
 
 		params.put (
 			"auth_key",
@@ -149,7 +149,7 @@ class SmsArenaSender
 				smsArenaRouteOut.getCid ());
 
 		}
-		
+
 		if (
 			isNotNull (
 				smsArenaRouteOut.getPid ())
@@ -160,7 +160,7 @@ class SmsArenaSender
 				smsArenaRouteOut.getPid ());
 
 		}
-		
+
 		if (
 			isNotNull (
 				smsArenaRouteOut.getSid ())
@@ -175,7 +175,7 @@ class SmsArenaSender
 		params.put (
 			"id",
 			message.getId ().toString ());
-		
+
 		params.put (
 			"from",
 			message.getNumFrom ());
@@ -187,7 +187,7 @@ class SmsArenaSender
 		params.put (
 			"text",
 			message.getText ().getText ());
-		
+
 		if (
 			isNotNull (
 				smsArenaRouteOut.getMclass ())
@@ -198,7 +198,7 @@ class SmsArenaSender
 				smsArenaRouteOut.getMclass ().toString ());
 
 		}
-		
+
 		if (
 			isNotNull (
 				smsArenaRouteOut.getCoding ())
@@ -209,7 +209,7 @@ class SmsArenaSender
 				smsArenaRouteOut.getCoding ().toString ());
 
 		}
-		
+
 		if (
 			isNotNull (
 				smsArenaRouteOut.getValidity ())
@@ -220,7 +220,7 @@ class SmsArenaSender
 				smsArenaRouteOut.getValidity ().toString ());
 
 		}
-		
+
 		if (
 			isNotNull (
 				smsArenaRouteOut.getDate ())
@@ -243,7 +243,7 @@ class SmsArenaSender
 					"Text contains non-GSM characters");
 
 		}
-		
+
 		// build the request query string
 
 		StringBuilder paramsString =
@@ -266,7 +266,7 @@ class SmsArenaSender
 					paramEntry.getValue ()));
 
 		}
-		
+
 		// create connection with the url and the query string
 
 		String urlString =
@@ -384,17 +384,17 @@ class SmsArenaSender
 					responseString));
 
 			if (httpUrlConnection.getResponseCode () == 200) {
-				
+
 				String ack;
 				String id;
 				//String charge;
 
 				String[] parts = responseString.split(";");
-				
+
 				ack = parts[0];
 				id = parts[1];
 				//charge = parts[2];
-				
+
 				// check if correct sms id
 
 				if (!id.isEmpty() && messageId == Integer.parseInt(id)) {

@@ -4,6 +4,7 @@
 
 	<plugin-dependencies>
 		<plugin-dependency name="test-common"/>
+		<plugin-dependency name="user"/>
 	</plugin-dependencies>
 
 	<sql-scripts>

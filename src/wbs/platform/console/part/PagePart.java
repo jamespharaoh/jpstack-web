@@ -18,9 +18,9 @@ interface PagePart {
 
 	Set<HtmlLink> links ();
 
-	void goHeadStuff ();
+	void renderHtmlHeadContent ();
 
-	void goBodyStuff ();
+	void renderHtmlBodyContent ();
 
 	void setWithMarkup (
 			boolean markup);

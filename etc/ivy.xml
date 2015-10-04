@@ -142,7 +142,7 @@
 		<dependency
 			org="org.projectlombok"
 			name="lombok"
-			rev="1.16.2"/>
+			rev="1.16.6"/>
 
 		<!-- paypal -->
 

@@ -73,7 +73,7 @@
 		<object-field
 			name="joinChatAffiliate"
 			label="Affiliate"
-			finder="chatAffiliate"/>
+			object-type="chatAffiliate"/>
 
 		<yes-no-field
 			name="confirmCharges"
@@ -81,7 +81,7 @@
 
 		<object-field
 			name="command"
-			finder="command"/>
+			object-type="command"/>
 
 		<yes-no-field
 			name="noCreditCheck"/>
@@ -110,7 +110,7 @@
 
 		<object-field
 			name="joinChatAffiliate"
-			finder="chatAffiliate"
+			object-type="chatAffiliate"
 			root-field="chatScheme"/>
 
 		<yes-no-field
@@ -118,7 +118,7 @@
 
 		<object-field
 			name="command"
-			finder="command"/>
+			object-type="command"/>
 
 		<yes-no-field
 			name="noCreditCheck"/>
@@ -146,7 +146,7 @@
 
 		<object-field
 			name="joinChatAffiliate"
-			finder="chatAffiliate"
+			object-type="chatAffiliate"
 			root-field="chatScheme"/>
 
 		<yes-no-field
@@ -154,7 +154,7 @@
 
 		<object-field
 			name="command"
-			finder="command"/>
+			object-type="command"/>
 
 		<yes-no-field
 			name="noCreditCheck"/>

@@ -60,7 +60,7 @@
 		<object-field
 			name="oxygen8Config"
 			label="Config"
-			finder="oxygen8Config"/>
+			object-type="oxygen8Config"/>
 
 	</field-set>
 
@@ -72,7 +72,7 @@
 
 		<object-field
 			name="oxygen8Config"
-			finder="oxygen8Config"/>
+			object-type="oxygen8Config"/>
 
 	</field-set>
 
@@ -85,7 +85,7 @@
 
 		<object-field
 			name="oxygen8Config"
-			finder="oxygen8Config"/>
+			object-type="oxygen8Config"/>
 
 	</field-set>
 
@@ -97,7 +97,7 @@
 
 		<object-field
 			name="oxygen8Config"
-			finder="oxygen8Config"/>
+			object-type="oxygen8Config"/>
 
 	</field-set>
 

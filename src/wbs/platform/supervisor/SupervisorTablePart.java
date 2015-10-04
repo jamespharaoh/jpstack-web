@@ -58,12 +58,12 @@ class SupervisorTablePart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		for (PagePart pagePart
 				: pageParts) {
 
-			pagePart.goHeadStuff ();
+			pagePart.renderHtmlHeadContent ();
 
 		}
 
@@ -71,7 +71,7 @@ class SupervisorTablePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<table class=\"list\">\n");
@@ -79,7 +79,7 @@ class SupervisorTablePart
 		for (PagePart pagePart
 				: pageParts) {
 
-			pagePart.goBodyStuff ();
+			pagePart.renderHtmlBodyContent ();
 
 		}
 

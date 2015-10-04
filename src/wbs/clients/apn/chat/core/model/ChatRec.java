@@ -172,7 +172,7 @@ class ChatRec
 
 	@ReferenceField (nullable = true)
 	ChatUserRec systemChatUser;
-	
+
 	@SimpleField
 	Integer maxAlarmTime = 0;
 
@@ -248,7 +248,7 @@ class ChatRec
 	Integer numChatBroadcastSent = 0;
 
 	// related objects
-	
+
 	@ReferenceField (nullable = true)
 	TicketManagerRec ticketManager;
 

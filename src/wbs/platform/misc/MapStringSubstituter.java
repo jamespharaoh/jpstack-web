@@ -9,14 +9,21 @@ class MapStringSubstituter
 	extends AbstractStringSubstituter {
 
 	private final
-	Map<String,String> map;
+	Map<String,String> substitutions;
+
+	private final
+	boolean ignoreMissing;
 
 	public
 	MapStringSubstituter (
-			Map<String,String> newMap) {
+			Map<String,String> substitutions,
+			boolean ignoreMissing) {
 
-		map =
-			newMap;
+		this.substitutions =
+			substitutions;
+
+		this.ignoreMissing =
+			ignoreMissing;
 
 	}
 
@@ -25,8 +32,16 @@ class MapStringSubstituter
 	String getSubstitute (
 			String name) {
 
-		return map.get (
+		String value = substitutions.get (
 			name);
+
+		if (value != null) {
+			return value;
+		} else if (ignoreMissing) {
+			return "{" + name + "}";
+		} else {
+			return null;
+		}
 
 	}
 
@@ -36,7 +51,22 @@ class MapStringSubstituter
 			Map<String,String> map) {
 
 		return new MapStringSubstituter (
-				map)
+				map,
+				false)
+
+			.substitute (
+				input);
+
+	}
+
+	public static
+	String substituteIgnoreMissing (
+			String input,
+			Map<String,String> map) {
+
+		return new MapStringSubstituter (
+				map,
+				true)
 
 			.substitute (
 				input);

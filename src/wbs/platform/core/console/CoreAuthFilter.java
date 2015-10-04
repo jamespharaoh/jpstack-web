@@ -22,6 +22,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
+import wbs.platform.console.html.JqueryScriptRef;
 import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.priv.console.PrivChecker;
@@ -242,10 +243,16 @@ class CoreAuthFilter
 
 				}
 
-			} else if (in (path,
+			} else if (
+
+				in (path,
 					"/style/basic.css",
 					"/favicon.ico",
-					"/status.update")) {
+					"/status.update",
+					"/js/login.js",
+					JqueryScriptRef.path)
+
+			) {
 
 				// these paths are available before login
 

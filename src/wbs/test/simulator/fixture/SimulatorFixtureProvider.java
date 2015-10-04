@@ -3,12 +3,15 @@ package wbs.test.simulator.fixture;
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.user.model.UserObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.sender.model.SenderObjectHelper;
@@ -16,6 +19,8 @@ import wbs.test.simulator.model.SimulatorObjectHelper;
 import wbs.test.simulator.model.SimulatorRec;
 import wbs.test.simulator.model.SimulatorRouteObjectHelper;
 import wbs.test.simulator.model.SimulatorRouteRec;
+import wbs.test.simulator.model.SimulatorSessionObjectHelper;
+import wbs.test.simulator.model.SimulatorSessionRec;
 
 @PrototypeComponent ("simulatorFixtureProvider")
 public
@@ -23,6 +28,9 @@ class SimulatorFixtureProvider
 	implements FixtureProvider {
 
 	// dependencies
+
+	@Inject
+	Database database;
 
 	@Inject
 	MenuGroupObjectHelper menuGroupHelper;
@@ -43,13 +51,28 @@ class SimulatorFixtureProvider
 	SimulatorRouteObjectHelper simulatorRouteHelper;
 
 	@Inject
+	SimulatorSessionObjectHelper simulatorSessionHelper;
+
+	@Inject
 	SliceObjectHelper sliceHelper;
+
+	@Inject
+	UserObjectHelper userHelper;
 
 	// implementation
 
 	@Override
 	public
 	void createFixtures () {
+
+		createMenuItem ();
+
+		createSimulator ();
+
+	}
+
+	private
+	void createMenuItem () {
 
 		menuItemHelper.insert (
 			new MenuItemRec ()
@@ -80,7 +103,13 @@ class SimulatorFixtureProvider
 
 		);
 
-		// simulator
+	}
+
+	private
+	void createSimulator () {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		SimulatorRec simulator =
 			simulatorHelper.insert (
@@ -181,6 +210,28 @@ class SimulatorFixtureProvider
 
 			.setRoute (
 				inboundRoute)
+
+		);
+
+		// session
+
+		simulatorSessionHelper.insert (
+			new SimulatorSessionRec ()
+
+			.setSimulator (
+				simulator)
+
+			.setDescription (
+				"Test simulator session")
+
+			.setCreatedTime (
+				transaction.now ())
+
+			.setCreatedUser (
+				userHelper.findByCode (
+					GlobalId.root,
+					"test",
+					"test0"))
 
 		);
 

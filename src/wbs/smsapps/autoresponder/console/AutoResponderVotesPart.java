@@ -143,7 +143,7 @@ class AutoResponderVotesPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<form",

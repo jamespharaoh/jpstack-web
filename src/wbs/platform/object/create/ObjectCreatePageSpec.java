@@ -42,7 +42,7 @@ class ObjectCreatePageSpec {
 
 	@DataAttribute ("fields")
 	String fieldsName;
-	
+
 	@DataAttribute ("fields-provider")
 	String fieldsProviderName;
 

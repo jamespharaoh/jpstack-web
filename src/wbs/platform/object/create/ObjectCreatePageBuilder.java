@@ -43,7 +43,7 @@ public
 class ObjectCreatePageBuilder {
 
 	// dependences
-	
+
 	@Inject
 	ApplicationContext applicationContext;
 
@@ -186,7 +186,7 @@ class ObjectCreatePageBuilder {
 
 					.formFieldSet (
 						formFieldSet)
-						
+
 					.formFieldsProvider (
 						fieldsProvider)
 
@@ -237,7 +237,7 @@ class ObjectCreatePageBuilder {
 
 					.formFieldSet (
 						formFieldSet)
-						
+
 					.formFieldsProvider (
 						fieldsProvider)
 
@@ -270,7 +270,7 @@ class ObjectCreatePageBuilder {
 	}
 
 	void setDefaults () {
-		
+
 		consoleHelper =
 			container.consoleHelper ();
 
@@ -325,22 +325,22 @@ class ObjectCreatePageBuilder {
 				? consoleModule.formFieldSets ().get (
 					spec.fieldsName ())
 				: defaultFields ();
-			
+
 		// if a provider name is provided
 
 		if (spec.fieldsProviderName () != null) {
 
-			fieldsProvider = 
+			fieldsProvider =
 					applicationContext.getBean (
 							spec.fieldsProviderName (),
-							FieldsProvider.class);		
-		} 
-		
+							FieldsProvider.class);
+		}
+
 		else {
-			
+
 			fieldsProvider =
 				null;
-			
+
 		}
 
 		createTimeFieldName =

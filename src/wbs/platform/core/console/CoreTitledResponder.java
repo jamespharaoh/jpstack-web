@@ -105,9 +105,9 @@ class CoreTitledResponder
 
 	@Override
 	protected
-	void goHeadStuff () {
+	void renderHtmlHeadContents () {
 
-		super.goHeadStuff ();
+		super.renderHtmlHeadContents ();
 
 		printFormat (
 			"<link",
@@ -117,7 +117,7 @@ class CoreTitledResponder
 				"/style/basic.css"),
 			">\n");
 
-		pagePart.goHeadStuff ();
+		pagePart.renderHtmlHeadContent ();
 
 	}
 
@@ -127,7 +127,7 @@ class CoreTitledResponder
 
 	@Override
 	protected
-	void goBodyStuff () {
+	void renderHtmlBodyContents () {
 
 		printFormat (
 			"<h1>%h</h1>\n",
@@ -153,7 +153,7 @@ class CoreTitledResponder
 
 		} else if (pagePart != null) {
 
-			pagePart.goBodyStuff ();
+			pagePart.renderHtmlBodyContent ();
 
 		}
 

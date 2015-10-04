@@ -1,29 +1,34 @@
-package wbs.clients.apn.chat.core.daemon;
+package wbs.framework.utils.etc;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
-// TODO where does this belong?
 
 public
 class ProfileLogger {
 
 	Logger logger;
+	Level logLevel;
+
 	long startTime;
 	long lapTime;
+
 	String name;
 	String lapName;
 
 	public
 	ProfileLogger (
 			Logger logger,
+			Level logLevel,
 			String name) {
 
 		this.logger = logger;
+		this.logLevel = logLevel;
 		this.name = name;
 
-		logger.debug (
+		logger.log (
+			logLevel,
 			stringFormat (
 				"---------- %s starting",
 				name));
@@ -50,7 +55,8 @@ class ProfileLogger {
 
 		lapTime = now;
 
-		logger.debug (
+		logger.log (
+			logLevel,
 			stringFormat (
 				"-- %s starting",
 				lapName));
@@ -63,7 +69,8 @@ class ProfileLogger {
 		if (lapName == null)
 			return;
 
-		logger.debug (
+		logger.log (
+			logLevel,
 			stringFormat (
 				"-- %s complete %dms",
 				lapName,
@@ -79,7 +86,8 @@ class ProfileLogger {
 
 		endLap (now);
 
-		logger.debug (
+		logger.log (
+			logLevel,
 			stringFormat (
 				"---------- %s complete %dms",
 				name,

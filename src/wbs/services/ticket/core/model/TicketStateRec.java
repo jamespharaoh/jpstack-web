@@ -28,37 +28,37 @@ import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
 @MajorEntity
-public class TicketStateRec 
+public class TicketStateRec
 	implements CommonRecord<TicketStateRec> {
-		
+
 	// id
-	
+
 	@GeneratedIdField
 	Integer id;
-	
+
 	@CodeField
 	String code;
-	
+
 	@ParentField
 	TicketManagerRec ticketManager;
-	
+
 	// details
-	
+
 	@NameField
 	String name;
-	
+
 	@SimpleField
 	TicketStateState state;
-	
+
 	@SimpleField
 	Boolean showInQueue;
-	
+
 	@SimpleField
 	Integer minimum;
-	
+
 	@SimpleField
 	Integer maximum;
-	
+
 	// object hooks
 
 	public static
@@ -70,7 +70,7 @@ public class TicketStateRec
 
 		@Inject
 		Database database;
-		
+
 		@Inject
 		RandomLogic randomLogic;
 
@@ -78,32 +78,32 @@ public class TicketStateRec
 		public
 		void beforeInsert (
 				TicketStateRec ticketState) {
-			
+
 			ticketState.setCode (
 				ticketState.getName().toLowerCase());
 
 		}
 
 	}
-	
+
 	// compare to
-	
+
 	@Override
 	public
 	int compareTo (
 			Record<TicketStateRec> otherRecord) {
-	
+
 		TicketStateRec other =
 			(TicketStateRec) otherRecord;
-	
+
 		return new CompareToBuilder ()
-	
+
 			.append (
 				getCode (),
 				other.getCode ())
-	
+
 			.toComparison ();
-	
+
 	}
 
 }

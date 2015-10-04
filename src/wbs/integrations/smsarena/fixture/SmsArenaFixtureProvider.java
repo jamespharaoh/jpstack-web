@@ -27,30 +27,30 @@ import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.sender.model.SenderObjectHelper;
 
 @PrototypeComponent ("smsArenaFixtureProvider")
-public 
-class SmsArenaFixtureProvider 
+public
+class SmsArenaFixtureProvider
 	implements FixtureProvider {
-	
+
 	// dependencies
-	
+
 	@Inject
 	MenuGroupObjectHelper menuGroupHelper;
-	
+
 	@Inject
 	MenuItemObjectHelper menuItemHelper;
-	
+
 	@Inject
 	RouteObjectHelper routeHelper;
-	
+
 	@Inject
 	SmsArenaRouteOutObjectHelper smsArenaRouteOutHelper;
-	
+
 	@Inject
 	SmsArenaRouteInObjectHelper smsArenaRouteInHelper;
-	
+
 	@Inject
 	SmsArenaConfigObjectHelper smsArenaConfigHelper;
-	
+
 	@Inject
 	SmsArenaReportCodeObjectHelper smsArenaReportCodeHelper;
 
@@ -59,42 +59,42 @@ class SmsArenaFixtureProvider
 
 	@Inject
 	SliceObjectHelper sliceHelper;
-	
+
 	// implementation
-	
+
 	@Override
 	public
 	void createFixtures () {
-	
+
 		menuItemHelper.insert (
 			new MenuItemRec ()
-	
+
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
 					GlobalId.root,
 					"test",
 					"integration"))
-	
+
 			.setCode (
 				"sms_arena")
-	
+
 			.setName (
 				"SmsArena")
-	
+
 			.setDescription (
 				"")
-	
+
 			.setLabel (
 				"Sms Arena")
-	
+
 			.setTargetPath (
 				"/sms-arena")
-	
+
 			.setTargetFrame (
 				"main")
-	
+
 		);
-		
+
 		RouteRec smsArenaRoute =
 			routeHelper.insert (
 				new RouteRec ()
@@ -125,121 +125,121 @@ class SmsArenaFixtureProvider
 					"sms_arena"))
 
 		);
-		
+
 		Properties prop = new Properties();
 		String propFileName = "conf/sms-arena-config.properties";
-		 
+
 		try {
-			
-			InputStream inputStream = 
+
+			InputStream inputStream =
 				new FileInputStream(propFileName);
-			
+
 			prop.load(inputStream);
-			
+
 		} catch (Exception e) {
-			
+
 			System.out.println("property file '" + propFileName + "' not found in the classpath: " + e);
 			return;
-			
+
 		}
-		
+
 		SmsArenaConfigRec smsArenaConfig =
 			smsArenaConfigHelper.insert (new SmsArenaConfigRec ()
-				
+
 			.setCode (
 				"sms_arena_config")
-			
+
 			.setName (
 				"SMSArena config")
 
 			.setDescription (
 				"SMSArena config description")
-				
+
 			.setProfileId (
 				Integer.parseInt(prop.getProperty("profileId")))
 
 		);
- 	
+
 		//SmsArenaRouteOutRec smsArenaRouteOut =
 		smsArenaRouteOutHelper.insert (
 				new SmsArenaRouteOutRec ()
-				
+
 			.setSmsArenaConfig (
 				smsArenaConfig)
 
 			.setAuthKey (
 				prop.getProperty("authKey"))
-	
+
 			.setRoute (
 				smsArenaRoute)
-			
+
 			.setRelayUrl (
 				prop.getProperty("smsUrl"))
 
 		);
-		
+
 		//SmsArenaRouteInRec smsArenaRouteIn =
 		smsArenaRouteInHelper.insert (
 				new SmsArenaRouteInRec ()
-				
+
 			.setSmsArenaConfig (
 				smsArenaConfig)
-				
+
 			.setRoute (
 				smsArenaRoute)
 		);
-		
+
 		smsArenaReportCodeHelper.insert (
 				new SmsArenaReportCodeRec ()
-				
+
 			.setSmsArenaConfig (
 				smsArenaConfig)
 
 			.setCode("1")
-			
+
 			.setDescription("Delivered to phone")
-			
+
 			.setMessageStatus (
 				MessageStatus.delivered)
-				
-			.setAdditionalInformation 
+
+			.setAdditionalInformation
 				("Delivered to phone")
 		);
-		
+
 		smsArenaReportCodeHelper.insert (
 				new SmsArenaReportCodeRec ()
-				
+
 			.setSmsArenaConfig (
 				smsArenaConfig)
 
 			.setCode("2")
-			
+
 			.setDescription("Undelivered to phone")
-			
+
 			.setMessageStatus (
 				MessageStatus.undelivered)
-				
-			.setAdditionalInformation 
+
+			.setAdditionalInformation
 				("Undelivered to phone")
 		);
-		
+
 		smsArenaReportCodeHelper.insert (
 				new SmsArenaReportCodeRec ()
-				
+
 			.setSmsArenaConfig (
 				smsArenaConfig)
 
 			.setCode("4")
-			
+
 			.setDescription("Buffered to gateway")
-			
+
 			.setMessageStatus (
 				MessageStatus.submitted)
-				
-			.setAdditionalInformation 
+
+			.setAdditionalInformation
 				("Buffered to gateway")
 		);
-	
+
 	}
 
 }

@@ -60,6 +60,7 @@ import wbs.sms.message.outbox.logic.MessageSender;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @SingletonComponent ("chatInfoLogic")
@@ -176,14 +177,26 @@ class ChatInfoLogicImpl
 				? otherUser.getCode ()
 				: otherUser.getName () + " " + otherUser.getCode ();
 
-		String distanceText = "" + miles + (miles == 1 ? " mile" : " miles");
+		String distanceText =
+			 "" + miles + (miles == 1 ? " mile" : " miles");
 
 		MessageSplitter.Templates templates =
-			new MessageSplitter.Templates (
-				"User " + userId + " (" + distanceText + "): {message}",
-				"User " + userId + " (" + distanceText + ") {page}/{pages}: {message}",
-				"User " + userId + " {page}/{pages}: {message}",
-				"User " + userId + " {page}/{pages}: {message}");
+			chatTemplateLogic.splitter (
+				chat,
+				otherUser.getType () == ChatUserType.monitor
+					? "info_monitor"
+					: "info_user",
+				ImmutableMap.<String,String>builder ()
+
+					.put (
+						"user",
+						userId)
+
+					.put (
+						"distance",
+						distanceText)
+
+					.build ());
 
 		List<String> stringParts;
 

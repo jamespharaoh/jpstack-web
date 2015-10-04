@@ -20,10 +20,10 @@ import wbs.framework.record.Record;
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id")
 @MajorEntity
-public 
+public
 class SmsArenaConfigRec
 	implements MajorRecord<SmsArenaConfigRec> {
-	
+
 	// id
 
 	@GeneratedIdField
@@ -41,10 +41,10 @@ class SmsArenaConfigRec
 
 	@DescriptionField
 	String description;
-	
+
 	@SimpleField
 	Integer profileId;
-	
+
 	// compare to
 
 	@Override

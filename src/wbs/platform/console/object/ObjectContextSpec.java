@@ -47,6 +47,9 @@ class ObjectContextSpec {
 	@DataAttribute ("cryptor")
 	String cryptorBeanName;
 
+	@DataAttribute ("default-file")
+	String defaultFileName;
+
 	// children
 
 	@DataChildren (

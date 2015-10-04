@@ -54,7 +54,7 @@ class Oxygen8RouteSummaryAdditionalPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<h2>Oxygen8 route information</h2>\n");

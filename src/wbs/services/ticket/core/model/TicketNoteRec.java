@@ -22,48 +22,48 @@ import wbs.framework.record.Record;
 @MajorEntity
 public class TicketNoteRec
 	implements CommonRecord<TicketNoteRec>{
-	
+
 	// id
-	
+
 	@GeneratedIdField
 	Integer id;
-	
+
 	// identity
-	
+
 	@ParentField
 	TicketRec ticket;
-	
+
 	@IndexField (
 		counter = "numNotes")
 	Integer index;
-	
+
 	// data
-	
+
 	@SimpleField
 	String noteText;
-	
+
 	// compare to
-	
+
 	@Override
 	public
 	int compareTo (
 			Record<TicketNoteRec> otherRecord) {
-	
+
 		TicketNoteRec other =
 			(TicketNoteRec) otherRecord;
-	
+
 		return new CompareToBuilder ()
-	
+
 			.append (
 				getTicket (),
 				other.getTicket ())
-	
+
 			.append (
 				getIndex (),
 				other.getIndex ())
-	
+
 			.toComparison ();
-	
+
 	}
 
 }

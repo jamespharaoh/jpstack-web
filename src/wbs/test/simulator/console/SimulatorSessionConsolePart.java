@@ -8,7 +8,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.context.ConsoleContextScriptRef;
+import wbs.platform.console.context.ConsoleApplicationScriptRef;
+import wbs.platform.console.html.JqueryScriptRef;
 import wbs.platform.console.html.ScriptRef;
 import wbs.platform.console.html.SelectBuilder;
 import wbs.platform.console.part.AbstractPagePart;
@@ -55,11 +56,10 @@ class SimulatorSessionConsolePart
 				super.scriptRefs ())
 
 			.add (
-				ConsoleContextScriptRef.javascript (
-					"/js/jquery-1.7.1.js"))
+				JqueryScriptRef.instance)
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/simulator.js"))
 
 			.build ();
@@ -98,7 +98,7 @@ class SimulatorSessionConsolePart
 
 	@Override
 	public
-	void goHeadStuff () {
+	void renderHtmlHeadContent () {
 
 		printFormat (
 			"<style>\n",
@@ -111,7 +111,7 @@ class SimulatorSessionConsolePart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		printFormat (
 			"<div",

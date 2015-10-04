@@ -65,7 +65,7 @@ class ImChatRec
 	@ReferenceField (
 		nullable = true)
 	CurrencyRec currency;
-	
+
 	@ReferenceField (
 			nullable = true)
 	MessageTemplateDatabaseRec messageTemplateDatabase;
