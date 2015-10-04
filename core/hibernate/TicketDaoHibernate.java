@@ -43,7 +43,7 @@ class TicketDaoHibernate
 			.list ());
 
 	}
-	
+
 	@Override
 	public
 	List<TicketRec> findUnqueuedTickets () {
@@ -53,7 +53,7 @@ class TicketDaoHibernate
 
 				createQuery (
 					"FROM TicketRec" +
-					" WHERE queued = 'false'")				
+					" WHERE queued = 'false'")
 
 				.list ());
 

@@ -5,7 +5,7 @@
 		object-name="ticketFieldType"
 		view-delegate-field="parent"
 		view-delegate-priv-code="manage">
-		
+
 		<context-stuff
 			name="ticketFieldTypeName"
 			field="name"/>
@@ -46,7 +46,7 @@
 			<object-settings-page
 				fields="settings"
 				priv-key="ticketManager.manage"/>
-				
+
 			<object-events-page/>
 
 		</object>
@@ -64,11 +64,11 @@
 	<field-set
 		name="create"
 		object-name="ticketFieldType">
-		
+
 		<parent-field/>
-		
+
 		<name-field/>
-		
+
 		<yes-no-field
 			name="required"/>
 
@@ -76,14 +76,14 @@
 			name="type"
 			nullable="no"
 			helper="ticketFieldTypeTypeConsoleHelper"/>
-					
+
 		<object-field
 			name="objectType"
-			finder="objectType"/>
-			
+			object-type="objectType"/>
+
 		<yes-no-field
 			name="visible"/>
-			
+
 	</field-set>
 
 	<field-set
@@ -93,9 +93,9 @@
 		<id-field/>
 		<parent-field/>
 		<code-field/>
-		
-		<name-field/>	
-		
+
+		<name-field/>
+
 		<yes-no-field
 			name="required"/>
 
@@ -103,11 +103,11 @@
 			name="type"
 			nullable="no"
 			helper="ticketFieldTypeTypeConsoleHelper"/>
-			
+
 		<object-field
 			name="objectType"
-			finder="objectType"/>
-			
+			object-type="objectType"/>
+
 		<yes-no-field
 			name="visible"/>
 
@@ -118,9 +118,9 @@
 		object-name="ticketFieldType">
 
 		<parent-field/>
-		
+
 		<name-field/>
-		
+
 		<yes-no-field
 			name="required"/>
 
@@ -128,11 +128,11 @@
 			name="type"
 			nullable="no"
 			helper="ticketFieldTypeTypeConsoleHelper"/>
-			
+
 		<object-field
 			name="objectType"
-			finder="objectType"/>
-			
+			object-type="objectType"/>
+
 		<yes-no-field
 			name="visible"/>
 

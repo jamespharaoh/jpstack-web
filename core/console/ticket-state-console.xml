@@ -5,7 +5,7 @@
 		object-name="ticketState"
 		view-delegate-field="parent"
 		view-delegate-priv-code="manage">
-		
+
 		<context-stuff
 			name="ticketStateName"
 			field="name"/>
@@ -35,7 +35,7 @@
 
 			<object-create-page
 				fields="create"/>
-				
+
 		</list>
 
 		<object>
@@ -64,25 +64,25 @@
 	<field-set
 		name="create"
 		object-name="ticketState">
-		
+
 		<parent-field/>
-		
+
 		<name-field/>
-		
+
 		<enum-field
 			name="state"
 			nullable="no"
 			helper="ticketStateStateConsoleHelper"/>
-			
+
 		<seconds-field
 			name="minimum"/>
-			
+
 		<seconds-field
 			name="maximum"/>
-			
+
 		<yes-no-field
 			name="showInQueue"/>
-			
+
 	</field-set>
 
 	<field-set
@@ -92,20 +92,20 @@
 		<id-field/>
 		<parent-field/>
 		<code-field/>
-		
-		<name-field/>		
+
+		<name-field/>
 
 		<enum-field
 			name="state"
 			nullable="no"
 			helper="ticketStateStateConsoleHelper"/>
-			
+
 		<seconds-field
 			name="minimum"/>
-			
+
 		<seconds-field
 			name="maximum"/>
-			
+
 		<yes-no-field
 			name="showInQueue"/>
 
@@ -116,20 +116,20 @@
 		object-name="ticketState">
 
 		<parent-field/>
-		
+
 		<name-field/>
 
 		<enum-field
 			name="state"
 			nullable="no"
 			helper="ticketStateStateConsoleHelper"/>
-			
+
 		<seconds-field
 			name="minimum"/>
-			
+
 		<seconds-field
 			name="maximum"/>
-			
+
 		<yes-no-field
 			name="showInQueue"/>
 

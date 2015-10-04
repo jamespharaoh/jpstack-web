@@ -14,12 +14,12 @@ import wbs.platform.console.module.ConsoleModuleData;
 @ConsoleModuleData
 public
 class ObjectTicketCreateSetFieldSpec {
-	
+
 	// attributes
-	
+
 	@DataAttribute
 	String fieldTypeCode;
-	
+
 	@DataAttribute
 	String valuePath;
 

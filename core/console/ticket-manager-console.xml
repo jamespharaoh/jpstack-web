@@ -58,7 +58,7 @@
 					link="ticketState"
 					label="States"
 					priv-key="ticketManager.manage"/>
-					
+
 				<context-link
 					name="ticketFieldType"
 					link="ticketFieldType"

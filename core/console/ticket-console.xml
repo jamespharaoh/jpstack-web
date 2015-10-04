@@ -5,7 +5,7 @@
 		object-name="ticket"
 		view-delegate-field="parent"
 		view-delegate-priv-code="manage">
-		
+
 		<context-stuff
 			name="ticketName"
 			field="id"/>
@@ -29,7 +29,7 @@
 		object-name="ticket">
 
 		<list>
-		
+
 			<object-list-page
 				fields-provider="ticketListFieldsProvider"/>
 
@@ -39,7 +39,7 @@
 		</list>
 
 		<object>
-		
+
 			<object-summary-page
 				fields-provider="ticketSummaryFieldsProvider"
 				priv-key="ticketManager.manage"/>
@@ -47,13 +47,13 @@
 			<object-settings-page
 				fields-provider="ticketSettingsFieldsProvider"
 				priv-key="ticketManager.manage"/>
-				
+
 			<context-link
 				name="ticketNote"
 				link="ticketNote"
 				label="Notes"
 				priv-key="ticket.ticketManager.manage"/>
-				
+
 			<object-events-page/>
 
 		</object>

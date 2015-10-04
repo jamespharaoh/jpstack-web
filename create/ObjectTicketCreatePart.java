@@ -25,10 +25,10 @@ import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectTicketCreatePart")
-public 
+public
 class ObjectTicketCreatePart
 	extends AbstractPagePart {
-	
+
 	// dependencies
 
 	@Inject
@@ -39,13 +39,13 @@ class ObjectTicketCreatePart
 
 	@Inject
 	FormFieldLogic formFieldLogic;
-	
+
 	@Inject
 	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
-	
+
 	@Inject
 	TicketFieldValueObjectHelper ticketFieldValueHelper;
-	
+
 	@Getter @Setter
 	List<ObjectTicketCreateSetFieldSpec> ticketFieldSpecs;
 
@@ -56,10 +56,10 @@ class ObjectTicketCreatePart
 
 	@Getter @Setter
 	String localFile;
-	
+
 	@Getter @Setter
 	FieldsProvider fieldsProvider;
-	
+
 	@Getter @Setter
 	String ticketManagerPath;
 
@@ -71,7 +71,7 @@ class ObjectTicketCreatePart
 	FormFieldSet formFieldSet;
 
 	// implementation
-	
+
 	@Override
 	public
 	void prepare () {
@@ -87,14 +87,14 @@ class ObjectTicketCreatePart
 			(TicketManagerRec)
 			objectManager.dereference (
 				contextObject,
-				ticketManagerPath);	
-				
+				ticketManagerPath);
+
 		prepareFieldSet ();
-		
+
 		// create dummy instance
 
 		ticket =
-			new TicketRec ()			
+			new TicketRec ()
 				.setTicketManager(ticketManager);
 
 		for (ObjectTicketCreateSetFieldSpec ticketFieldSpec
@@ -102,81 +102,81 @@ class ObjectTicketCreatePart
 
 			TicketFieldTypeRec ticketFieldType
 				= ticketFieldTypeHelper.findByCode (
-					ticketManager, 
+					ticketManager,
 					ticketFieldSpec.fieldTypeCode());
-			
+
 			if (ticketFieldType == null) {
 				throw new RuntimeException ("Field type does not exist");
 			}
-					
+
 			TicketFieldValueRec ticketFieldValue =
-				new TicketFieldValueRec ()				
-			
+				new TicketFieldValueRec ()
+
 					.setTicket(ticket)
 					.setTicketFieldType(ticketFieldType);
-					
+
 			switch( ticketFieldType.getType() ) {
-				case string:					
+				case string:
 					ticketFieldValue.setStringValue (
 						(String)objectManager.dereference (
 							contextObject,
 							ticketFieldSpec.valuePath()));
 					break;
-					
+
 				case number:
 					ticketFieldValue.setIntegerValue(
 						(Integer)objectManager.dereference (
 							contextObject,
 							ticketFieldSpec.valuePath()));
 					break;
-					
+
 				case bool:
 					ticketFieldValue.setBooleanValue(
 						(Boolean)objectManager.dereference (
 							contextObject,
 							ticketFieldSpec.valuePath()));
 					break;
-					
+
 				case object:
-					
-					Integer objectId = 
+
+					Integer objectId =
 						((Record<?>) objectManager.dereference (
 							contextObject,
 							ticketFieldSpec.valuePath())).getId();
-							
+
 					ticketFieldValue.setIntegerValue(objectId);
 					break;
-					
+
 				default:
 					throw new RuntimeException ();
-			
-			}		
-			
+
+			}
+
 			ticket.setNumFields (
 				ticket.getNumFields() + 1);
-					
+
 			ticket.getTicketFieldValues ().put (
 					ticketFieldType.getId (),
 					ticketFieldValue);
-	
+
 		}
 
 	}
-	
+
 	void prepareFieldSet () {
-		
-		formFieldSet = 
+
+		formFieldSet =
 			fieldsProvider.getFields(
 				ticketManager);
-	
+
 	}
-	
+
 	@Override
 	public
-	void goBodyStuff () {
-	
+	void renderHtmlBodyContent () {
+
 		printFormat (
-				"<p>Please enter the details for the new ticket</p>\n");
+			"<p>Please enter the details for the new ticket</p>\n");
 
 		printFormat (
 			"<form",
@@ -190,12 +190,12 @@ class ObjectTicketCreatePart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
-				out,
-				formFieldSet,
-				ticket);
-		
+			out,
+			formFieldSet,
+			ticket);
+
 		printFormat (
-				"</table>\n");
+			"</table>\n");
 
 		printFormat (
 			"<p><input",
@@ -204,8 +204,8 @@ class ObjectTicketCreatePart
 			"></p>\n");
 
 		printFormat (
-			"</form>\n");			
-		
+			"</form>\n");
+
 	}
-	
+
 }

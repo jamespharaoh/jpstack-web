@@ -40,9 +40,9 @@ import wbs.services.ticket.core.model.TicketManagerObjectHelper;
 @PrototypeComponent ("objectTicketCreatePageBuilder")
 @ConsoleModuleBuilderHandler
 public class ObjectTicketCreatePageBuilder {
-	
+
 	// dependencies
-	
+
 	@Inject
 	ApplicationContext applicationContext;
 
@@ -65,10 +65,10 @@ public class ObjectTicketCreatePageBuilder {
 
 	@Inject
 	Provider<ObjectTicketCreatePart> objectTicketCreatePart;
-	
+
 	@Inject
 	Provider<ObjectTicketCreateAction> objectTicketCreateAction;
-	
+
 	@Inject
 	Provider<TicketManagerObjectHelper> ticketManagerHelper;
 
@@ -100,7 +100,7 @@ public class ObjectTicketCreatePageBuilder {
 	ConsoleHelper<?> consoleHelper;
 
 	String typeCode;
-	FieldsProvider fieldsProvider;	
+	FieldsProvider fieldsProvider;
 	List<ObjectTicketCreateSetFieldSpec> ticketFields;
 	String name;
 	String tabName;
@@ -117,7 +117,7 @@ public class ObjectTicketCreatePageBuilder {
 	String createPrivCode;
 	String privKey;
 	String ticketManagerPath;
-	
+
 	// build
 
 	@BuildMethod
@@ -138,14 +138,14 @@ public class ObjectTicketCreatePageBuilder {
 				resolvedExtensionPoint);
 
 		}
-		
+
 		buildResponder ();
 
 	}
 
 	void buildTab (
 			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
-		
+
 		consoleModule.addContextTab (
 			container.tabLocation (),
 			contextTab.get ()
@@ -157,10 +157,10 @@ public class ObjectTicketCreatePageBuilder {
 				: resolvedExtensionPoint.contextTypeNames ());
 
 	}
-	
+
 	void buildFile (
 			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
-		
+
 		Action createAction =
 			new Action () {
 
@@ -193,13 +193,13 @@ public class ObjectTicketCreatePageBuilder {
 
 					.formFieldSet (
 						formFieldSet)
-						
+
 					.formFieldsProvider (
 						fieldsProvider)
-						
+
 					.ticketFieldSpecs(
 							ticketFields)
-													
+
 					.ticketManagerPath(
 						ticketManagerPath)
 
@@ -247,16 +247,16 @@ public class ObjectTicketCreatePageBuilder {
 
 						.consoleHelper (
 							consoleHelper)
-					
+
 						.localFile(
 							localFile)
-							
+
 						.ticketFieldSpecs(
 							ticketFields)
-						
+
 						.fieldsProvider(
 							fieldsProvider)
-							
+
 						.ticketManagerPath(
 							ticketManagerPath);
 
@@ -287,7 +287,7 @@ public class ObjectTicketCreatePageBuilder {
 
 		name =
 			spec.name ();
-		
+
 		typeCode =
 			spec.typeCode ();
 
@@ -330,7 +330,7 @@ public class ObjectTicketCreatePageBuilder {
 
 		hideTab =
 			spec.hideTab ();
-		
+
 		consoleHelper =
 				container.consoleHelper ();
 
@@ -347,20 +347,20 @@ public class ObjectTicketCreatePageBuilder {
 				spec.responderName (),
 				stringFormat (
 					"%sCreateResponder",
-					container.newBeanNamePrefix ()));		
-		
+					container.newBeanNamePrefix ()));
+
 		ticketManagerPath =
 			spec.ticketManager();
-		
+
 		if (spec.fieldsProviderName() != null) {
 
-			fieldsProvider = 
+			fieldsProvider =
 				applicationContext.getBean (
 					spec.fieldsProviderName (),
 					FieldsProvider.class);
-		
-		} 
-					
+
+		}
+
 		ticketFields =
 			spec.ticketFields;
 

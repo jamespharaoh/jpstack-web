@@ -33,7 +33,7 @@ class TicketPendingHistoryPart
 
 	@Inject
 	TicketStateObjectHelper ticketStateHelper;
-	
+
 	@Inject
 	TicketObjectHelper ticketHelper;
 
@@ -59,7 +59,7 @@ class TicketPendingHistoryPart
 		ticketFields =
 			ticketPendingConsoleModule.formFieldSets ().get (
 				"ticketFields");
-		
+
 		ticketNoteFields =
 			ticketPendingConsoleModule.formFieldSets ().get (
 				"ticketNoteFields");
@@ -69,7 +69,7 @@ class TicketPendingHistoryPart
 				"ticketStateFields");
 
 		// load data
-		
+
 		ticket =
 			ticketHelper.find (
 				requestContext.stuffInt ("ticketId"));
@@ -77,12 +77,12 @@ class TicketPendingHistoryPart
 
 	@Override
 	public
-	void goBodyStuff () {
+	void renderHtmlBodyContent () {
 
 		goSummary ();
-		
+
 		goStateSummary ();
-		
+
 		goTicketNotes ();
 
 	}
@@ -104,7 +104,7 @@ class TicketPendingHistoryPart
 			"</table>\n");
 
 	}
-	
+
 	void goTicketNotes () {
 
 		printFormat (
@@ -112,34 +112,34 @@ class TicketPendingHistoryPart
 
 		printFormat (
 			"<table class=\"details\">\n");
-		
+
 		printFormat (
 				"<tr>\n",
 				"<th>Index</td>\n",
 				"<th>Text</th>\n",
 				"</tr>\n");
-		
+
 		for (TicketNoteRec ticketNote : ticket.getTicketNotes()) {
-			
+
 			printFormat (
 				"<tr>\n");
-			
+
 			formFieldLogic.outputTableCellsList (
 					out,
 					ticketNoteFields,
 					ticketNote,
 					true);
-			
+
 			printFormat (
 					"</tr>\n");
-			
+
 		}
 
 		printFormat (
 			"</table>\n");
 
 	}
-	
+
 	void goStateSummary () {
 
 		printFormat (
