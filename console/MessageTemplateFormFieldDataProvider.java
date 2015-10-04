@@ -21,7 +21,9 @@ class MessageTemplateFormFieldDataProvider
 		String formFieldData = "";
 
 		MessageTemplateTypeRec messageTemplateType =
-			(MessageTemplateTypeRec) parent;
+			(MessageTemplateTypeRec)
+			(Object)
+			parent;
 
 		for (MessageTemplateParameterRec messageTemplateParameter : messageTemplateType.getMessageTemplateParameters()) {
 

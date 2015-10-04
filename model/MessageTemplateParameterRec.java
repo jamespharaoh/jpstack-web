@@ -1,42 +1,45 @@
 package wbs.services.messagetemplate.model;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.GeneratedIdField;
-import wbs.framework.entity.annotations.MajorEntity;
+import wbs.framework.entity.annotations.MinorEntity;
 import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.AbstractObjectHooks;
-import wbs.framework.record.CommonRecord;
+import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
 
 @Accessors (chain = true)
 @Data
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
-@MajorEntity
+@MinorEntity
 public
 class MessageTemplateParameterRec
-	implements CommonRecord<MessageTemplateParameterRec> {
+	implements MinorRecord<MessageTemplateParameterRec> {
 
 	// id
 
 	@GeneratedIdField
 	Integer id;
 
+	// identity
+
 	@ParentField
 	MessageTemplateTypeRec messageTemplateType;
 
-	// details
-
 	@CodeField
 	String code;
+
+	// details
 
 	@NameField
 	String name;
@@ -59,8 +62,10 @@ class MessageTemplateParameterRec
 		void beforeInsert (
 				MessageTemplateParameterRec messageTemplateParameter) {
 
-			messageTemplateParameter.setCode (
-					messageTemplateParameter.getName().toLowerCase());
+			messageTemplateParameter
+
+				.setCode (
+					messageTemplateParameter.getName ().toLowerCase ());
 
 		}
 

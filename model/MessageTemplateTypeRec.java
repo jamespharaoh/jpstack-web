@@ -6,41 +6,45 @@ import java.util.TreeSet;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.CollectionField;
 import wbs.framework.entity.annotations.GeneratedIdField;
-import wbs.framework.entity.annotations.MajorEntity;
+import wbs.framework.entity.annotations.MinorEntity;
 import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.object.AbstractObjectHooks;
-import wbs.framework.record.CommonRecord;
+import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
 
 @Accessors (chain = true)
 @Data
 @EqualsAndHashCode (of = "id")
 @ToString (of = "id" )
-@MajorEntity
-public class MessageTemplateTypeRec
-	implements CommonRecord<MessageTemplateTypeRec> {
+@MinorEntity
+public 
+class MessageTemplateTypeRec
+	implements MinorRecord<MessageTemplateTypeRec> {
 
 	// id
 
 	@GeneratedIdField
 	Integer id;
 
-	@CodeField
-	String code;
+	// identity
 
 	@ParentField
 	MessageTemplateDatabaseRec messageTemplateDatabase;
+
+	@CodeField
+	String code;
 
 	// details
 

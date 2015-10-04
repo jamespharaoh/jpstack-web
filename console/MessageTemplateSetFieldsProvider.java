@@ -65,36 +65,65 @@ class MessageTemplateSetFieldsProvider
 		// retrieve existing message template types
 
 		MessageTemplateDatabaseRec messageTemplateDatabase =
-			(MessageTemplateDatabaseRec) parent;
+			(MessageTemplateDatabaseRec)
+			(Object)
+			parent;
 
 		Set<MessageTemplateTypeRec> messageTemplateTypes =
-				messageTemplateDatabase.getMessageTemplateTypes();
+			messageTemplateDatabase.getMessageTemplateTypes();
 
 		if (mode != "list") {
 
-			formFieldSpecs
-			.add (new ScriptRefFormFieldSpec()
-				.path ("/js/jquery-1.7.1.js"));
+			formFieldSpecs.add (
+				new ScriptRefFormFieldSpec ()
 
-			formFieldSpecs
-				.add (new ScriptRefFormFieldSpec()
-					.path ("/js/message-template.js"));
+				.path (
+					"/js/jquery-1.7.1.js")
 
-			formFieldSpecs
-				.add (new ScriptRefFormFieldSpec()
-					.path ("/js/gsm.js"));
+			);
+
+			formFieldSpecs.add (
+				new ScriptRefFormFieldSpec()
+
+				.path (
+					"/js/message-template.js")
+
+			);
+
+			formFieldSpecs.add (
+				new ScriptRefFormFieldSpec ()
+
+				.path (
+					"/js/gsm.js")
+
+			);
 
 			// build dynamic form fields
 
-			for (MessageTemplateTypeRec messageTemplateType : messageTemplateTypes) {
+			for (
+				MessageTemplateTypeRec messageTemplateType
+					: messageTemplateTypes
+			) {
 
-				formFieldSpecs
-					.add (new TextAreaFormFieldSpec()
-						.name (messageTemplateType.getCode ())
-						.label (messageTemplateType.getName ())
-						.dataProvider("messageTemplateSettingsFormFieldDataProvider")
-						.parent(messageTemplateType)
-						.dynamic (true));
+				formFieldSpecs.add (
+					new TextAreaFormFieldSpec ()
+
+					.name (
+						messageTemplateType.getCode ())
+
+					.label (
+						messageTemplateType.getName ())
+
+					.dataProvider (
+						"messageTemplateSettingsFormFieldDataProvider")
+
+					.parent (
+						messageTemplateType)
+
+					.dynamic (
+						true)
+
+				);
 
 			}
 
