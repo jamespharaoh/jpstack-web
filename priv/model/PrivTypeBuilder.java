@@ -1,5 +1,6 @@
 package wbs.platform.priv.model;
 
+import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.codify;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -52,10 +53,34 @@ class PrivTypeBuilder {
 	// build
 
 	@BuildMethod
-	@SneakyThrows (SQLException.class)
 	public
 	void build (
 			Builder builder) {
+
+		try {
+
+			createPrivType ();
+
+		} catch (Exception exception) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Error creating priv type %s.%s",
+					camelToUnderscore (
+						ifNull (
+							spec.subject (),
+							parent.name ())),
+					codify (
+						spec.name ())),
+				exception);
+
+		}
+
+	}
+
+	@SneakyThrows (SQLException.class)
+	private
+	void createPrivType () {
 
 		@Cleanup
 		Connection connection =
@@ -164,6 +189,8 @@ class PrivTypeBuilder {
 			spec.template ());
 
 		insertPrivTypeStatement.executeUpdate ();
+
+		connection.commit ();
 
 	}
 
