@@ -6,10 +6,6 @@
 		<plugin-dependency name="platform-common"/>
 	</plugin-dependencies>
 
-	<sql-scripts>
-		<sql-schema name="queue"/>
-	</sql-scripts>
-
 	<models>
 		<custom-type name="queueItemState"/>
 		<custom-type name="queueItemClaimStatus"/>
@@ -19,6 +15,13 @@
 		<model name="queueSubject"/>
 		<model name="queueType"/>
 	</models>
+
+	<layer name="entity">
+		<bean class="model.QueueTypeBuilder"/>
+		<bean class="model.QueueTypeSpec"/>
+		<bean class="model.QueueTypesBuilder"/>
+		<bean class="model.QueueTypesSpec"/>
+	</layer>
 
 	<layer name="console">
 		<bean class="console.QueueClaimAction"/>

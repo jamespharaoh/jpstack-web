@@ -11,7 +11,6 @@
 	<sql-scripts>
 		<sql-schema name="manual-responder"/>
 		<sql-schema name="manual-responder-report"/>
-		<sql-data name="manual-responder-data"/>
 	</sql-scripts>
 
 	<models>

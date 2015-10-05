@@ -7,10 +7,6 @@
 		<plugin-dependency name="scaffold"/>
 	</plugin-dependencies>
 
-	<sql-scripts>
-		<sql-data name="ticket-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="ticketManager"/>
 		<model name="ticketTemplate"/>

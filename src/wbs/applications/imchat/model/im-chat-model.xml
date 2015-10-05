@@ -15,4 +15,14 @@
 
 	</priv-types>
 
+	<queue-types>
+
+		<queue-type
+			name="Reply"
+			description="New messages to reply to for an IM chat service"
+			subject="imChatConversation"
+			ref="imChatMessage"/>
+
+	</queue-types>
+
 </model-meta>

@@ -843,7 +843,6 @@
       <script name="src/wbs/platform/media/model/content.sql"/>
       <script name="src/wbs/platform/media/model/media.sql"/>
       <script name="src/wbs/platform/menu/model/menu.sql"/>
-      <script name="src/wbs/platform/queue/model/queue.sql"/>
       <script name="src/wbs/platform/text/model/text.sql"/>
       <script name="src/wbs/platform/user/model/user.sql"/>
       <script name="src/wbs/platform/postgresql/model/postgresql.sql"/>
@@ -888,14 +887,10 @@
       <script name="src/wbs/platform/exception/model/exception-data.sql"/>
       <script name="src/wbs/platform/media/model/media-data.sql"/>
       <script name="src/wbs/platform/postgresql/model/postgresql-maintenance-data.sql"/>
-      <script name="src/wbs/sms/route/core/model/route-data.sql"/>
       <script name="src/wbs/sms/message/batch/model/batch-data.sql"/>
       <script name="src/wbs/sms/route/router/model/router-data.sql"/>
       <script name="src/wbs/sms/smpp/model/smpp-data.sql"/>
       <script name="src/wbs/sms/message/wap/model/wap-push-data.sql"/>
-      <script name="src/wbs/smsapps/manualresponder/model/manual-responder-data.sql"/>
-      <script name="src/wbs/applications/imchat/model/im-chat-core-data.sql"/>
-      <script name="src/wbs/services/ticket/core/model/ticket-data.sql"/>
       <script name="src/wbs/integrations/broadcastsystems/model/broadcast-systems-data.sql"/>
       <script name="src/wbs/integrations/dialogue/model/dialogue-data.sql"/>
       <script name="src/wbs/integrations/digitalselect/model/digital-select-data.sql"/>

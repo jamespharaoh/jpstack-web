@@ -2,10 +2,6 @@
 	name="chat-tv-core"
 	package="wbs.clients.apn.chat.tv.core">
 
-	<sql-scripts>
-		<sql-data name="chat-tv-data"/>
-	</sql-scripts>
-
 	<models>
 		<enum-type name="chatTvMessageStatus"/>
 		<model name="chatTv"/>

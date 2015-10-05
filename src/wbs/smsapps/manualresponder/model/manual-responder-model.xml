@@ -67,4 +67,14 @@
 
 	</delivery-types>
 
+	<queue-types>
+
+		<queue-type
+			name="Default"
+			description="Pending requests for a manual-responder service"
+			subject="manualResponderNumber"
+			ref="manualResponderRequest"/>
+
+	</queue-types>
+
 </model-meta>
