@@ -1,0 +1,14 @@
+<model-meta
+	name="ticketState">
+
+	<queue-types>
+
+		<queue-type
+			name="Default"
+			description="Pending tickets for a ticket state"
+			subject="ticket"
+			ref="ticket"/>
+
+	</queue-types>
+
+</model-meta>
