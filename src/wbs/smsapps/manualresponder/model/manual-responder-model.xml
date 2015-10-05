@@ -59,4 +59,12 @@
 
 	</service-types>
 
+	<delivery-types>
+
+		<delivery-type
+			name="Manual responder"
+			description="Messages sent by a manual-responder service"/>
+
+	</delivery-types>
+
 </model-meta>

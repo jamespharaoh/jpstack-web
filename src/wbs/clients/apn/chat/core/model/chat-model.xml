@@ -67,4 +67,24 @@
 
 	</batch-types>
 
+	<delivery-types>
+
+		<delivery-type
+			name="Chat bill"
+			description="Billed message for an SMS chat service"/>
+
+		<delivery-type
+			name="Chat bill strict"
+			description="Strict billed message for an SMS chat service"/>
+
+		<delivery-type
+			name="Chat adult"
+			description="Adult verification for an SMS chat service"/>
+
+		<delivery-type
+			name="Chat adult join"
+			description="Adult verification and join for an SMS chat service"/>
+
+	</delivery-types>
+
 </model-meta>

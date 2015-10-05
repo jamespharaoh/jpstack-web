@@ -1,19 +1,3 @@
-SELECT delivery_type_insert (
-	'chat_bill',
-	'Chat bill');
-
-SELECT delivery_type_insert (
-	'chat_bill_strict',
-	'Chat bill strict');
-
-SELECT delivery_type_insert (
-	'chat_adult',
-	'Chat adult verification');
-
-SELECT delivery_type_insert (
-	'chat_adult_join',
-	'Chat adult verification and join');
-
 SELECT affiliate_type_insert (
 	'chat_scheme',
 	'default',

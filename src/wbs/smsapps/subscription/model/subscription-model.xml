@@ -64,4 +64,12 @@
 
 	</batch-types>
 
+	<delivery-types>
+
+		<delivery-type
+			name="Subscription"
+			description="Billed messages sent by a subscription service"/>
+
+	</delivery-types>
+
 </model-meta>

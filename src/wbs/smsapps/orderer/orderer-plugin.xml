@@ -6,10 +6,6 @@
 		<plugin-dependency name="sms-apps-common"/>
 	</plugin-dependencies>
 
-	<sql-scripts>
-		<sql-data name="orderer-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="orderer"/>
 		<model name="ordererOrder"/>

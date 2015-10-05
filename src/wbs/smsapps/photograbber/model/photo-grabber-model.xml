@@ -52,4 +52,12 @@
 
 	</service-types>
 
+	<delivery-types>
+
+		<delivery-type
+			name="Photo grabber"
+			description="Billed message for a photo-grabber service"/>
+
+	</delivery-types>
+
 </model-meta>

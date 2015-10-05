@@ -42,4 +42,12 @@
 
 	</service-types>
 
+	<delivery-types>
+
+		<delivery-type
+			name="Forwarder"
+			description="Messages sent from a forwarder service"/>
+
+	</delivery-types>
+
 </model-meta>
