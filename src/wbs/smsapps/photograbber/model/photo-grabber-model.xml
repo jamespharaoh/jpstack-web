@@ -60,4 +60,12 @@
 
 	</delivery-types>
 
+	<message-set-types>
+
+		<message-set-type
+			name="Default"
+			description="Not found message set for a photo-grabber service"/>
+
+	</message-set-types>
+
 </model-meta>

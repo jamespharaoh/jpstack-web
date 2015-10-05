@@ -857,7 +857,6 @@
       <script name="src/wbs/sms/message/core/model/message.sql"/>
       <script name="src/wbs/sms/message/core/model/message-media.sql"/>
       <script name="src/wbs/sms/message/core/model/message-type.sql"/>
-      <script name="src/wbs/sms/messageset/model/message-set.sql"/>
       <script name="src/wbs/sms/message/stats/model/message-stats.sql"/>
       <script name="src/wbs/sms/message/outbox/model/outbox.sql"/>
       <script name="src/wbs/sms/number/list/model/number-list.sql"/>
@@ -894,10 +893,7 @@
       <script name="src/wbs/sms/route/router/model/router-data.sql"/>
       <script name="src/wbs/sms/smpp/model/smpp-data.sql"/>
       <script name="src/wbs/sms/message/wap/model/wap-push-data.sql"/>
-      <script name="src/wbs/smsapps/autoresponder/model/auto-responder-data.sql"/>
-      <script name="src/wbs/smsapps/forwarder/model/forwarder-data.sql"/>
       <script name="src/wbs/smsapps/manualresponder/model/manual-responder-data.sql"/>
-      <script name="src/wbs/smsapps/photograbber/model/photo-grabber-data.sql"/>
       <script name="src/wbs/applications/imchat/model/im-chat-core-data.sql"/>
       <script name="src/wbs/services/ticket/core/model/ticket-data.sql"/>
       <script name="src/wbs/integrations/broadcastsystems/model/broadcast-systems-data.sql"/>

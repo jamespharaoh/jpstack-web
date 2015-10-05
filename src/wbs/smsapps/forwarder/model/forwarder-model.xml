@@ -50,4 +50,12 @@
 
 	</delivery-types>
 
+	<message-set-types>
+
+		<message-set-type
+			name="Default"
+			description="Default message set for a forwarder service"/>
+
+	</message-set-types>
+
 </model-meta>

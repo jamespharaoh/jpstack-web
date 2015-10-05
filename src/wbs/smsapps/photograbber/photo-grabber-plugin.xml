@@ -2,10 +2,6 @@
 	name="photo-grabber"
 	package="wbs.smsapps.photograbber">
 
-	<sql-scripts>
-		<sql-data name="photo-grabber-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="photoGrabber"/>
 		<model name="photoGrabberReissue"/>
