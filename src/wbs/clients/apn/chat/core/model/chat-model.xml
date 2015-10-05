@@ -87,4 +87,12 @@
 
 	</delivery-types>
 
+	<number-lookup-types>
+
+		<number-lookup-type
+			name="Block all"
+			description="Numbers of SMS chat service users who are fully blocked"/>
+
+	</number-lookup-types>
+
 </model-meta>
