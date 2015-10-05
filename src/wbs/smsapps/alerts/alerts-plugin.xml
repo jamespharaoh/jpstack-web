@@ -2,10 +2,6 @@
 	name="alerts"
 	package="wbs.smsapps.alerts">
 
-	<sql-scripts>
-		<sql-data name="alerts-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="alertsAlert"/>
 		<model name="alertsNumber"/>

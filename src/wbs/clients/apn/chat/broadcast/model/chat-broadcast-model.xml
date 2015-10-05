@@ -1,0 +1,12 @@
+<model-meta
+	name="chatBroadcast">
+
+	<event-types>
+
+		<event-type
+			name="Chat broadcast send completed"
+			text="%0 completed sending"/>
+
+	</event-types>
+
+</model-meta>

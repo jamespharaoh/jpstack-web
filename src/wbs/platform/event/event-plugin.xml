@@ -2,16 +2,18 @@
 	name="event"
 	package="wbs.platform.event">
 
-	<sql-scripts>
-		<sql-schema name="event"/>
-		<sql-data name="event-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="event"/>
 		<model name="eventLink"/>
 		<model name="eventType"/>
 	</models>
+
+	<layer name="entity">
+		<bean class="model.EventTypeBuilder"/>
+		<bean class="model.EventTypeSpec"/>
+		<bean class="model.EventTypesBuilder"/>
+		<bean class="model.EventTypesSpec"/>
+	</layer>
 
 	<layer name="logic">
 		<bean class="logic.EventLogicImpl"/>

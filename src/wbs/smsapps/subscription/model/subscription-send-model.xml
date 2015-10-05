@@ -1,0 +1,28 @@
+<model-meta
+	name="subscriptionSend">
+
+	<event-types>
+
+		<event-type
+			name="Subscription send scheduled"
+			text="%0 scheduled %1 for %2"/>
+
+		<event-type
+			name="Subscription send unscheduled"
+			text="%0 unscheduled %1"/>
+
+		<event-type
+			name="Subscription send cancelled"
+			text="%0 cancelled %1 for %2"/>
+
+		<event-type
+			name="Subscription send begin"
+			text="%0 begun sending"/>
+
+		<event-type
+			name="Subscription send completed"
+			text="%0 completed sending"/>
+
+	</event-types>
+
+</model-meta>

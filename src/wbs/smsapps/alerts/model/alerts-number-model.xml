@@ -1,0 +1,20 @@
+<model-meta
+	name="alertsNumber">
+
+	<event-types>
+
+		<event-type
+			name="Alerts number created"
+			text="%0 added number id %1 to %2"/>
+
+		<event-type
+			name="Alerts number deleted"
+			text="%0 deleted number id %1 from %2"/>
+
+		<event-type
+			name="Alerts number updated"
+			text="%0 set %1 for number id %2 of %3 to %4"/>
+
+	</event-types>
+
+</model-meta>

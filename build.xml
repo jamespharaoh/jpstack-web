@@ -838,7 +838,6 @@
     <database-init>
       <script name="src/wbs/platform/object/core/model/object-type.sql"/>
       <script name="src/wbs/platform/affiliate/model/affiliate.sql"/>
-      <script name="src/wbs/platform/event/model/event.sql"/>
       <script name="src/wbs/platform/exception/model/exception.sql"/>
       <script name="src/wbs/platform/group/model/group.sql"/>
       <script name="src/wbs/platform/lock/model/lock.sql"/>
@@ -892,22 +891,15 @@
     <taskdef name="database-init" classname="wbs.framework.utils.ant.DatabaseInitTask" classpathref="classpath"/>
     <database-init>
       <script name="src/wbs/platform/affiliate/model/affiliate-data.sql"/>
-      <script name="src/wbs/platform/event/model/event-data.sql"/>
       <script name="src/wbs/platform/exception/model/exception-data.sql"/>
       <script name="src/wbs/platform/media/model/media-data.sql"/>
       <script name="src/wbs/platform/postgresql/model/postgresql-maintenance-data.sql"/>
-      <script name="src/wbs/sms/number/core/model/number-data.sql"/>
       <script name="src/wbs/sms/route/core/model/route-data.sql"/>
-      <script name="src/wbs/sms/message/inbox/model/sms-inbox-data.sql"/>
       <script name="src/wbs/sms/message/batch/model/batch-data.sql"/>
-      <script name="src/wbs/sms/message/core/model/message-data.sql"/>
-      <script name="src/wbs/sms/messageset/model/message-set-data.sql"/>
-      <script name="src/wbs/sms/message/outbox/model/outbox-data.sql"/>
       <script name="src/wbs/sms/number/list/model/number-list-data.sql"/>
       <script name="src/wbs/sms/route/router/model/router-data.sql"/>
       <script name="src/wbs/sms/smpp/model/smpp-data.sql"/>
       <script name="src/wbs/sms/message/wap/model/wap-push-data.sql"/>
-      <script name="src/wbs/smsapps/alerts/model/alerts-data.sql"/>
       <script name="src/wbs/smsapps/autoresponder/model/auto-responder-data.sql"/>
       <script name="src/wbs/smsapps/broadcast/model/broadcast-data.sql"/>
       <script name="src/wbs/smsapps/forwarder/model/forwarder-data.sql"/>
