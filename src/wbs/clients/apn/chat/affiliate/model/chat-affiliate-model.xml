@@ -26,4 +26,12 @@
 
 	</priv-types>
 
+	<affiliate-types>
+
+		<affiliate-type
+			name="Default"
+			description="An SMS chat service affiliate"/>
+
+	</affiliate-types>
+
 </model-meta>

@@ -15,4 +15,12 @@
 
 	</priv-types>
 
+	<affiliate-types>
+
+		<affiliate-type
+			name="Default"
+			description="SMS chat service users who are not assigned to a specific affiliate"/>
+
+	</affiliate-types>
+
 </model-meta>

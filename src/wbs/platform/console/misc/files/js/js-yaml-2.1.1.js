@@ -3880,8 +3880,8 @@ exports.inspect = function(obj, showHidden, depth, colors) {
 
 	  case 'string':
 		var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
-										         .replace(/'/g, "\\'")
-										         .replace(/\\"/g, '"') + '\'';
+												 .replace(/'/g, "\\'")
+												 .replace(/\\"/g, '"') + '\'';
 		return stylize(simple, 'string');
 
 	  case 'number':

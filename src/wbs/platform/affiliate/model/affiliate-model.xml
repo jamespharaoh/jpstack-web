@@ -1,0 +1,13 @@
+<model-meta
+	name="affiliate">
+
+	<affiliate-types>
+
+		<affiliate-type
+			subject="root"
+			name="System"
+			description="System default affiliate"/>
+
+	</affiliate-types>
+
+</model-meta>

@@ -28,4 +28,12 @@
 
 	</command-types>
 
+	<affiliate-types>
+
+		<affiliate-type
+			name="Default"
+			description="A subscription service affiliate"/>
+
+	</affiliate-types>
+
 </model-meta>
