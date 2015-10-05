@@ -1,6 +1,13 @@
+TODO delete this or make it work?
+
 SELECT priv_type_insert (
 	'chat',
 	'tv_to_screen',
 	'Moderate user messages to screen',
 	'Allows a user to moderate messages sent by chat users to the TV screen',
 	true);
+
+SELECT command_type_insert (
+	'chat',
+	'tv_to_screen',
+	'Send message to screen');

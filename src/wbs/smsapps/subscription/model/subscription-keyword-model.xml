@@ -1,0 +1,12 @@
+<model-meta
+	name="subscriptionKeyword">
+
+	<command-types>
+
+		<command-type
+			name="Subscribe"
+			description="Subscribe to a subscription service with a specific affiliate and/or list"/>
+
+	</command-types>
+
+</model-meta>

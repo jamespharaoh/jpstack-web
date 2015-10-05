@@ -1,0 +1,12 @@
+<model-meta
+	name="subscriptionList">
+
+	<command-types>
+
+		<command-type
+			name="Subscribe"
+			description="Subscribe to a subscription service with a specific list"/>
+
+	</command-types>
+
+</model-meta>

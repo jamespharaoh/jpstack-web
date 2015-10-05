@@ -36,4 +36,12 @@
 
 	</priv-types>
 
+	<command-types>
+
+		<command-type
+			name="Default"
+			description="Purchase a photo from a photo grabber"/>
+
+	</command-types>
+
 </model-meta>

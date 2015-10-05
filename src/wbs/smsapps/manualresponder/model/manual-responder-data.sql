@@ -1,8 +1,3 @@
-SELECT command_type_insert (
-	'manual_responder',
-	'default',
-	'Manual responder');
-
 SELECT service_type_insert (
 	'manual_responder',
 	'default',

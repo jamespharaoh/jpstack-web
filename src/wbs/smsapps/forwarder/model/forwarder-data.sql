@@ -1,8 +1,3 @@
-SELECT command_type_insert (
-	'forwarder',
-	'default',
-	'Forwarder');
-
 SELECT delivery_type_insert (
 	'forwarder',
 	'Forwarder');

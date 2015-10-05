@@ -5,25 +5,33 @@
 
 		<priv-type
 			name="Manage"
-			description="Full control of a forwarder"
+			description="Full control of a forwarder service"
 			template="yes"/>
 
 		<priv-type
 			name="Messages"
-			description="View message history for a forwarder"
+			description="View message history for a forwarder service"
 			template="yes"/>
 
 		<priv-type
 			name="Stats"
-			description="View message stats for a forwarder"
+			description="View message stats for a forwarder service"
 			template="yes"/>
 
 		<priv-type
 			subject="slice"
 			name="Forwarder create"
-			description="Create a new forwarder in a slice"
+			description="Create a new forwarder service in a slice"
 			template="yes"/>
 
 	</priv-types>
+
+	<command-types>
+
+		<command-type
+			name="Default"
+			description="Forward a message to a forwarder service"/>
+
+	</command-types>
 
 </model-meta>

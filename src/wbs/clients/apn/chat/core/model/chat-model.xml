@@ -30,4 +30,16 @@
 
 	</priv-types>
 
+	<command-types>
+
+		<command-type
+			name="Check credit"
+			description="Request the current credit balance for a user of an SMS chat service"/>
+
+		<command-type
+			name="Image upload"
+			description="Request a URL to upload a new image for a user of an SMS chat service"/>
+
+	</command-types>
+
 </model-meta>

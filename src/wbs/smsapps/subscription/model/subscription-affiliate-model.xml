@@ -3,8 +3,6 @@
 
 	<priv-types>
 
-		<!-- subscription affiliate -->
-
 		<priv-type
 			name="Messages"
 			description="View message history for a subscription affiliate"
@@ -21,5 +19,13 @@
 			template="yes"/>
 
 	</priv-types>
+
+	<command-types>
+
+		<command-type
+			name="Subscribe"
+			description="Subscribe to a subscription service with a specific affiliate"/>
+
+	</command-types>
 
 </model-meta>

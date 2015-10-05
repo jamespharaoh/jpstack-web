@@ -1,28 +1,3 @@
-SELECT command_type_insert (
-	'subscription',
-	'subscribe',
-	'Subscribe');
-
-SELECT command_type_insert (
-	'subscription',
-	'unsubscribe',
-	'Unsubscribe');
-
-SELECT command_type_insert (
-	'subscription_affiliate',
-	'subscribe',
-	'Subscribe');
-
-SELECT command_type_insert (
-	'subscription_keyword',
-	'subscribe',
-	'Subscribe');
-
-SELECT command_type_insert (
-	'subscription_list',
-	'subscribe',
-	'Subscribe');
-
 SELECT service_type_insert (
 	'subscription',
 	'default',

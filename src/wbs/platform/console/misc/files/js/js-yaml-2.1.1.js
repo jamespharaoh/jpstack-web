@@ -3880,8 +3880,8 @@ exports.inspect = function(obj, showHidden, depth, colors) {
 
 	  case 'string':
 		var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
-				                                 .replace(/'/g, "\\'")
-				                                 .replace(/\\"/g, '"') + '\'';
+					                             .replace(/'/g, "\\'")
+					                             .replace(/\\"/g, '"') + '\'';
 		return stylize(simple, 'string');
 
 	  case 'number':
@@ -4001,8 +4001,8 @@ exports.inspect = function(obj, showHidden, depth, colors) {
 		  name = stylize(name, 'name');
 		} else {
 		  name = name.replace(/'/g, "\\'")
-				     .replace(/\\"/g, '"')
-				     .replace(/(^"|"$)/g, "'");
+					 .replace(/\\"/g, '"')
+					 .replace(/(^"|"$)/g, "'");
 		  name = stylize(name, 'string');
 		}
 	  }
@@ -4522,7 +4522,7 @@ function Buffer(subject, encoding, offset) {
 
 	  default:
 		throw new Error('First argument needs to be a number, ' +
-				        'array or string.');
+					    'array or string.');
 	}
 
 	if (this.length > Buffer.poolSize) {
@@ -4783,8 +4783,8 @@ Buffer.prototype.fill = function fill(value, start, end) {
   }
 
   return this.parent.fill(value,
-				          start + this.offset,
-				          end + this.offset);
+					      start + this.offset,
+					      end + this.offset);
 };
 
 
@@ -4823,9 +4823,9 @@ Buffer.prototype.copy = function(target, target_start, start, end) {
   }
 
   return this.parent.copy(target.parent,
-				          target_start + target.offset,
-				          start + this.offset,
-				          end + this.offset);
+					      target_start + target.offset,
+					      start + this.offset,
+					      end + this.offset);
 };
 
 
@@ -5503,8 +5503,8 @@ process.nextTick = (function () {
 			if (ev.source === window && ev.data === 'process-tick') {
 				ev.stopPropagation();
 				if (queue.length > 0) {
-				    var fn = queue.shift();
-				    fn();
+					var fn = queue.shift();
+					fn();
 				}
 			}
 		}, true);
@@ -5648,9 +5648,9 @@ EventEmitter.prototype.addListener = function(type, listener) {
 	  if (m && m > 0 && this._events[type].length > m) {
 		this._events[type].warned = true;
 		console.error('(node) warning: possible EventEmitter memory ' +
-				      'leak detected. %d listeners added. ' +
-				      'Use emitter.setMaxListeners() to increase limit.',
-				      this._events[type].length);
+					  'leak detected. %d listeners added. ' +
+					  'Use emitter.setMaxListeners() to increase limit.',
+					  this._events[type].length);
 		console.trace();
 	  }
 	}
@@ -6222,57 +6222,57 @@ parseStatement: true, parseSourceElement: true */
 			if (lineComment) {
 				ch = source[index++];
 				if (isLineTerminator(ch)) {
-				    lineComment = false;
-				    if (ch === '\r' && source[index] === '\n') {
-				        ++index;
-				    }
-				    ++lineNumber;
-				    lineStart = index;
+					lineComment = false;
+					if (ch === '\r' && source[index] === '\n') {
+					    ++index;
+					}
+					++lineNumber;
+					lineStart = index;
 				}
 			} else if (blockComment) {
 				if (isLineTerminator(ch)) {
-				    if (ch === '\r' && source[index + 1] === '\n') {
-				        ++index;
-				    }
-				    ++lineNumber;
-				    ++index;
-				    lineStart = index;
-				    if (index >= length) {
-				        throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
-				    }
+					if (ch === '\r' && source[index + 1] === '\n') {
+					    ++index;
+					}
+					++lineNumber;
+					++index;
+					lineStart = index;
+					if (index >= length) {
+					    throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
+					}
 				} else {
-				    ch = source[index++];
-				    if (index >= length) {
-				        throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
-				    }
-				    if (ch === '*') {
-				        ch = source[index];
-				        if (ch === '/') {
-				            ++index;
-				            blockComment = false;
-				        }
-				    }
+					ch = source[index++];
+					if (index >= length) {
+					    throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
+					}
+					if (ch === '*') {
+					    ch = source[index];
+					    if (ch === '/') {
+					        ++index;
+					        blockComment = false;
+					    }
+					}
 				}
 			} else if (ch === '/') {
 				ch = source[index + 1];
 				if (ch === '/') {
-				    index += 2;
-				    lineComment = true;
+					index += 2;
+					lineComment = true;
 				} else if (ch === '*') {
-				    index += 2;
-				    blockComment = true;
-				    if (index >= length) {
-				        throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
-				    }
+					index += 2;
+					blockComment = true;
+					if (index >= length) {
+					    throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
+					}
 				} else {
-				    break;
+					break;
 				}
 			} else if (isWhiteSpace(ch)) {
 				++index;
 			} else if (isLineTerminator(ch)) {
 				++index;
 				if (ch ===  '\r' && source[index] === '\n') {
-				    ++index;
+					++index;
 				}
 				++lineNumber;
 				lineStart = index;
@@ -6316,7 +6316,7 @@ parseStatement: true, parseSourceElement: true */
 			ch = scanHexEscape('u');
 			if (ch) {
 				if (ch === '\\' || !isIdentifierStart(ch)) {
-				    return;
+					return;
 				}
 				id = ch;
 			} else {
@@ -6335,19 +6335,19 @@ parseStatement: true, parseSourceElement: true */
 			if (ch === '\\') {
 				++index;
 				if (source[index] !== 'u') {
-				    return;
+					return;
 				}
 				++index;
 				restore = index;
 				ch = scanHexEscape('u');
 				if (ch) {
-				    if (ch === '\\' || !isIdentifierPart(ch)) {
-				        return;
-				    }
-				    id += ch;
+					if (ch === '\\' || !isIdentifierPart(ch)) {
+					    return;
+					}
+					id += ch;
 				} else {
-				    index = restore;
-				    id += 'u';
+					index = restore;
+					id += 'u';
 				}
 			} else {
 				id += source[index++];
@@ -6467,11 +6467,11 @@ parseStatement: true, parseSourceElement: true */
 			if (ch4 === '=') {
 				index += 4;
 				return {
-				    type: Token.Punctuator,
-				    value: '>>>=',
-				    lineNumber: lineNumber,
-				    lineStart: lineStart,
-				    range: [start, index]
+					type: Token.Punctuator,
+					value: '>>>=',
+					lineNumber: lineNumber,
+					lineStart: lineStart,
+					range: [start, index]
 				};
 			}
 		}
@@ -6540,11 +6540,11 @@ parseStatement: true, parseSourceElement: true */
 			if ('<>=!+-*%&|^/'.indexOf(ch1) >= 0) {
 				index += 2;
 				return {
-				    type: Token.Punctuator,
-				    value: ch1 + ch2,
-				    lineNumber: lineNumber,
-				    lineStart: lineStart,
-				    range: [start, index]
+					type: Token.Punctuator,
+					value: ch1 + ch2,
+					lineNumber: lineNumber,
+					lineStart: lineStart,
+					range: [start, index]
 				};
 			}
 		}
@@ -6553,11 +6553,11 @@ parseStatement: true, parseSourceElement: true */
 			if ('+-<>&|'.indexOf(ch2) >= 0) {
 				index += 2;
 				return {
-				    type: Token.Punctuator,
-				    value: ch1 + ch2,
-				    lineNumber: lineNumber,
-				    lineStart: lineStart,
-				    range: [start, index]
+					type: Token.Punctuator,
+					value: ch1 + ch2,
+					lineNumber: lineNumber,
+					lineStart: lineStart,
+					range: [start, index]
 				};
 			}
 		}
@@ -6594,69 +6594,69 @@ parseStatement: true, parseSourceElement: true */
 			// Octal number starts with '0'.
 			if (number === '0') {
 				if (ch === 'x' || ch === 'X') {
-				    number += source[index++];
-				    while (index < length) {
-				        ch = source[index];
-				        if (!isHexDigit(ch)) {
-				            break;
-				        }
-				        number += source[index++];
-				    }
+					number += source[index++];
+					while (index < length) {
+					    ch = source[index];
+					    if (!isHexDigit(ch)) {
+					        break;
+					    }
+					    number += source[index++];
+					}
 
-				    if (number.length <= 2) {
-				        // only 0x
-				        throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
-				    }
+					if (number.length <= 2) {
+					    // only 0x
+					    throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
+					}
 
-				    if (index < length) {
-				        ch = source[index];
-				        if (isIdentifierStart(ch)) {
-				            throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
-				        }
-				    }
-				    return {
-				        type: Token.NumericLiteral,
-				        value: parseInt(number, 16),
-				        lineNumber: lineNumber,
-				        lineStart: lineStart,
-				        range: [start, index]
-				    };
+					if (index < length) {
+					    ch = source[index];
+					    if (isIdentifierStart(ch)) {
+					        throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
+					    }
+					}
+					return {
+					    type: Token.NumericLiteral,
+					    value: parseInt(number, 16),
+					    lineNumber: lineNumber,
+					    lineStart: lineStart,
+					    range: [start, index]
+					};
 				} else if (isOctalDigit(ch)) {
-				    number += source[index++];
-				    while (index < length) {
-				        ch = source[index];
-				        if (!isOctalDigit(ch)) {
-				            break;
-				        }
-				        number += source[index++];
-				    }
+					number += source[index++];
+					while (index < length) {
+					    ch = source[index];
+					    if (!isOctalDigit(ch)) {
+					        break;
+					    }
+					    number += source[index++];
+					}
 
-				    if (index < length) {
-				        ch = source[index];
-				        if (isIdentifierStart(ch) || isDecimalDigit(ch)) {
-				            throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
-				        }
-				    }
-				    return {
-				        type: Token.NumericLiteral,
-				        value: parseInt(number, 8),
-				        octal: true,
-				        lineNumber: lineNumber,
-				        lineStart: lineStart,
-				        range: [start, index]
-				    };
+					if (index < length) {
+					    ch = source[index];
+					    if (isIdentifierStart(ch) || isDecimalDigit(ch)) {
+					        throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
+					    }
+					}
+					return {
+					    type: Token.NumericLiteral,
+					    value: parseInt(number, 8),
+					    octal: true,
+					    lineNumber: lineNumber,
+					    lineStart: lineStart,
+					    range: [start, index]
+					};
 				}
 
 				// decimal number starts with '0' such as '09' is illegal.
 				if (isDecimalDigit(ch)) {
-				    throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
+					throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
 				}
 			}
 
 			while (index < length) {
 				ch = source[index];
 				if (!isDecimalDigit(ch)) {
-				    break;
+					break;
 				}
 				number += source[index++];
 			}
@@ -6667,7 +6667,7 @@ parseStatement: true, parseSourceElement: true */
 			while (index < length) {
 				ch = source[index];
 				if (!isDecimalDigit(ch)) {
-				    break;
+					break;
 				}
 				number += source[index++];
 			}
@@ -6685,16 +6685,16 @@ parseStatement: true, parseSourceElement: true */
 			if (isDecimalDigit(ch)) {
 				number += source[index++];
 				while (index < length) {
-				    ch = source[index];
-				    if (!isDecimalDigit(ch)) {
-				        break;
-				    }
-				    number += source[index++];
+					ch = source[index];
+					if (!isDecimalDigit(ch)) {
+					    break;
+					}
+					number += source[index++];
 				}
 			} else {
 				ch = 'character ' + ch;
 				if (index >= length) {
-				    ch = '<end>';
+					ch = '<end>';
 				}
 				throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
 			}
@@ -6737,69 +6737,69 @@ parseStatement: true, parseSourceElement: true */
 			} else if (ch === '\\') {
 				ch = source[index++];
 				if (!isLineTerminator(ch)) {
-				    switch (ch) {
-				    case 'n':
-				        str += '\n';
-				        break;
-				    case 'r':
-				        str += '\r';
-				        break;
-				    case 't':
-				        str += '\t';
-				        break;
-				    case 'u':
-				    case 'x':
-				        restore = index;
-				        unescaped = scanHexEscape(ch);
-				        if (unescaped) {
-				            str += unescaped;
-				        } else {
-				            index = restore;
-				            str += ch;
-				        }
-				        break;
-				    case 'b':
-				        str += '\b';
-				        break;
-				    case 'f':
-				        str += '\f';
-				        break;
-				    case 'v':
-				        str += '\v';
-				        break;
+					switch (ch) {
+					case 'n':
+					    str += '\n';
+					    break;
+					case 'r':
+					    str += '\r';
+					    break;
+					case 't':
+					    str += '\t';
+					    break;
+					case 'u':
+					case 'x':
+					    restore = index;
+					    unescaped = scanHexEscape(ch);
+					    if (unescaped) {
+					        str += unescaped;
+					    } else {
+					        index = restore;
+					        str += ch;
+					    }
+					    break;
+					case 'b':
+					    str += '\b';
+					    break;
+					case 'f':
+					    str += '\f';
+					    break;
+					case 'v':
+					    str += '\v';
+					    break;
 
-				    default:
-				        if (isOctalDigit(ch)) {
-				            code = '01234567'.indexOf(ch);
+					default:
+					    if (isOctalDigit(ch)) {
+					        code = '01234567'.indexOf(ch);
 
-				            // \0 is not octal escape sequence
-				            if (code !== 0) {
-				                octal = true;
-				            }
+					        // \0 is not octal escape sequence
+					        if (code !== 0) {
+					            octal = true;
+					        }
 
-				            if (index < length && isOctalDigit(source[index])) {
-				                octal = true;
-				                code = code * 8 + '01234567'.indexOf(source[index++]);
+					        if (index < length && isOctalDigit(source[index])) {
+					            octal = true;
+					            code = code * 8 + '01234567'.indexOf(source[index++]);
 
-				                // 3 digits are only allowed when string starts
-				                // with 0, 1, 2, 3
-				                if ('0123'.indexOf(ch) >= 0 &&
-				                        index < length &&
-				                        isOctalDigit(source[index])) {
-				                    code = code * 8 + '01234567'.indexOf(source[index++]);
-				                }
-				            }
-				            str += String.fromCharCode(code);
-				        } else {
-				            str += ch;
-				        }
-				        break;
-				    }
+					            // 3 digits are only allowed when string starts
+					            // with 0, 1, 2, 3
+					            if ('0123'.indexOf(ch) >= 0 &&
+					                    index < length &&
+					                    isOctalDigit(source[index])) {
+					                code = code * 8 + '01234567'.indexOf(source[index++]);
+					            }
+					        }
+					        str += String.fromCharCode(code);
+					    } else {
+					        str += ch;
+					    }
+					    break;
+					}
 				} else {
-				    ++lineNumber;
-				    if (ch ===  '\r' && source[index] === '\n') {
-				        ++index;
-				    }
+					++lineNumber;
+					if (ch ===  '\r' && source[index] === '\n') {
+					    ++index;
+					}
 				}
 			} else if (isLineTerminator(ch)) {
 				break;
@@ -6838,23 +6838,23 @@ parseStatement: true, parseSourceElement: true */
 			str += ch;
 			if (classMarker) {
 				if (ch === ']') {
-				    classMarker = false;
+					classMarker = false;
 				}
 			} else {
 				if (ch === '\\') {
-				    ch = source[index++];
-				    // ECMA-262 7.8.5
-				    if (isLineTerminator(ch)) {
-				        throwError({}, Messages.UnterminatedRegExp);
-				    }
-				    str += ch;
+					ch = source[index++];
+					// ECMA-262 7.8.5
+					if (isLineTerminator(ch)) {
+					    throwError({}, Messages.UnterminatedRegExp);
+					}
+					str += ch;
 				} else if (ch === '/') {
-				    terminated = true;
-				    break;
+					terminated = true;
+					break;
 				} else if (ch === '[') {
-				    classMarker = true;
+					classMarker = true;
 				} else if (isLineTerminator(ch)) {
-				    throwError({}, Messages.UnterminatedRegExp);
+					throwError({}, Messages.UnterminatedRegExp);
 				}
 			}
 		}
@@ -6877,22 +6877,22 @@ parseStatement: true, parseSourceElement: true */
 			if (ch === '\\' && index < length) {
 				ch = source[index];
 				if (ch === 'u') {
-				    ++index;
-				    restore = index;
-				    ch = scanHexEscape('u');
-				    if (ch) {
-				        flags += ch;
-				        str += '\\u';
-				        for (; restore < index; ++restore) {
-				            str += source[restore];
-				        }
-				    } else {
-				        index = restore;
-				        flags += 'u';
-				        str += '\\u';
-				    }
+					++index;
+					restore = index;
+					ch = scanHexEscape('u');
+					if (ch) {
+					    flags += ch;
+					    str += '\\u';
+					    for (; restore < index; ++restore) {
+					        str += source[restore];
+					    }
+					} else {
+					    index = restore;
+					    flags += 'u';
+					    str += '\\u';
+					}
 				} else {
-				    str += '\\';
+					str += '\\';
 				}
 			} else {
 				flags += ch;
@@ -7016,7 +7016,7 @@ parseStatement: true, parseSourceElement: true */
 			msg = messageFormat.replace(
 				/%(\d)/g,
 				function (whole, index) {
-				    return args[index] || '';
+					return args[index] || '';
 				}
 			);
 
@@ -7185,7 +7185,7 @@ parseStatement: true, parseSourceElement: true */
 				elements.push(parseAssignmentExpression());
 
 				if (!match(']')) {
-				    expect(',');
+					expect(',');
 				}
 			}
 		}
@@ -7257,33 +7257,33 @@ parseStatement: true, parseSourceElement: true */
 				expect('(');
 				expect(')');
 				return {
-				    type: Syntax.Property,
-				    key: key,
-				    value: parsePropertyFunction([]),
-				    kind: 'get'
+					type: Syntax.Property,
+					key: key,
+					value: parsePropertyFunction([]),
+					kind: 'get'
 				};
 			} else if (token.value === 'set' && !match(':')) {
 				key = parseObjectPropertyKey();
 				expect('(');
 				token = lookahead();
 				if (token.type !== Token.Identifier) {
-				    throwUnexpected(lex());
+					throwUnexpected(lex());
 				}
 				param = [ parseVariableIdentifier() ];
 				expect(')');
 				return {
-				    type: Syntax.Property,
-				    key: key,
-				    value: parsePropertyFunction(param, token),
-				    kind: 'set'
+					type: Syntax.Property,
+					key: key,
+					value: parsePropertyFunction(param, token),
+					kind: 'set'
 				};
 			} else {
 				expect(':');
 				return {
-				    type: Syntax.Property,
-				    key: id,
-				    value: parseAssignmentExpression(),
-				    kind: 'init'
+					type: Syntax.Property,
+					key: id,
+					value: parseAssignmentExpression(),
+					kind: 'init'
 				};
 			}
 		} else if (token.type === Token.EOF || token.type === Token.Punctuator) {
@@ -7316,17 +7316,17 @@ parseStatement: true, parseSourceElement: true */
 			kind = (property.kind === 'init') ? PropertyKind.Data : (property.kind === 'get') ? PropertyKind.Get : PropertyKind.Set;
 			if (Object.prototype.hasOwnProperty.call(map, name)) {
 				if (map[name] === PropertyKind.Data) {
-				    if (strict && kind === PropertyKind.Data) {
-				        throwErrorTolerant({}, Messages.StrictDuplicateProperty);
-				    } else if (kind !== PropertyKind.Data) {
-				        throwErrorTolerant({}, Messages.AccessorDataProperty);
-				    }
+					if (strict && kind === PropertyKind.Data) {
+					    throwErrorTolerant({}, Messages.StrictDuplicateProperty);
+					} else if (kind !== PropertyKind.Data) {
+					    throwErrorTolerant({}, Messages.AccessorDataProperty);
+					}
 				} else {
-				    if (kind === PropertyKind.Data) {
-				        throwErrorTolerant({}, Messages.AccessorDataProperty);
-				    } else if (map[name] & kind) {
-				        throwErrorTolerant({}, Messages.AccessorGetSet);
-				    }
+					if (kind === PropertyKind.Data) {
+					    throwErrorTolerant({}, Messages.AccessorDataProperty);
+					} else if (map[name] & kind) {
+					    throwErrorTolerant({}, Messages.AccessorGetSet);
+					}
 				}
 				map[name] |= kind;
 			} else {
@@ -7387,7 +7387,7 @@ parseStatement: true, parseSourceElement: true */
 			if (matchKeyword('this')) {
 				lex();
 				return {
-				    type: Syntax.ThisExpression
+					type: Syntax.ThisExpression
 				};
 			}
 
@@ -7438,7 +7438,7 @@ parseStatement: true, parseSourceElement: true */
 			while (index < length) {
 				args.push(parseAssignmentExpression());
 				if (match(')')) {
-				    break;
+					break;
 				}
 				expect(',');
 			}
@@ -7506,23 +7506,23 @@ parseStatement: true, parseSourceElement: true */
 		while (match('.') || match('[') || match('(')) {
 			if (match('(')) {
 				expr = {
-				    type: Syntax.CallExpression,
-				    callee: expr,
-				    'arguments': parseArguments()
+					type: Syntax.CallExpression,
+					callee: expr,
+					'arguments': parseArguments()
 				};
 			} else if (match('[')) {
 				expr = {
-				    type: Syntax.MemberExpression,
-				    computed: true,
-				    object: expr,
-				    property: parseComputedMember()
+					type: Syntax.MemberExpression,
+					computed: true,
+					object: expr,
+					property: parseComputedMember()
 				};
 			} else {
 				expr = {
-				    type: Syntax.MemberExpression,
-				    computed: false,
-				    object: expr,
-				    property: parseNonComputedMember()
+					type: Syntax.MemberExpression,
+					computed: false,
+					object: expr,
+					property: parseNonComputedMember()
 				};
 			}
 		}
@@ -7539,17 +7539,17 @@ parseStatement: true, parseSourceElement: true */
 		while (match('.') || match('[')) {
 			if (match('[')) {
 				expr = {
-				    type: Syntax.MemberExpression,
-				    computed: true,
-				    object: expr,
-				    property: parseComputedMember()
+					type: Syntax.MemberExpression,
+					computed: true,
+					object: expr,
+					property: parseComputedMember()
 				};
 			} else {
 				expr = {
-				    type: Syntax.MemberExpression,
-				    computed: false,
-				    object: expr,
-				    property: parseNonComputedMember()
+					type: Syntax.MemberExpression,
+					computed: false,
+					object: expr,
+					property: parseNonComputedMember()
 				};
 			}
 		}
@@ -7886,7 +7886,7 @@ parseStatement: true, parseSourceElement: true */
 
 			while (index < length) {
 				if (!match(',')) {
-				    break;
+					break;
 				}
 				lex();
 				expr.expressions.push(parseAssignmentExpression());
@@ -8159,10 +8159,10 @@ parseStatement: true, parseSourceElement: true */
 				state.allowIn = true;
 
 				if (init.declarations.length === 1 && matchKeyword('in')) {
-				    lex();
-				    left = init;
-				    right = parseExpression();
-				    init = null;
+					lex();
+					left = init;
+					right = parseExpression();
+					init = null;
 				}
 			} else {
 				state.allowIn = false;
@@ -8170,15 +8170,15 @@ parseStatement: true, parseSourceElement: true */
 				state.allowIn = true;
 
 				if (matchKeyword('in')) {
-				    // LeftHandSideExpression
-				    if (!isLeftHandSide(init)) {
-				        throwError({}, Messages.InvalidLHSInForIn);
-				    }
+					// LeftHandSideExpression
+					if (!isLeftHandSide(init)) {
+					    throwError({}, Messages.InvalidLHSInForIn);
+					}
 
-				    lex();
-				    left = init;
-				    right = parseExpression();
-				    init = null;
+					lex();
+					left = init;
+					right = parseExpression();
+					init = null;
 				}
 			}
 
@@ -8350,8 +8350,8 @@ parseStatement: true, parseSourceElement: true */
 				argument = parseExpression();
 				consumeSemicolon();
 				return {
-				    type: Syntax.ReturnStatement,
-				    argument: argument
+					type: Syntax.ReturnStatement,
+					argument: argument
 				};
 			}
 		}
@@ -8472,7 +8472,7 @@ parseStatement: true, parseSourceElement: true */
 			clause = parseSwitchCase();
 			if (clause.test === null) {
 				if (defaultFound) {
-				    throwError({}, Messages.MultipleDefaultsInSwitch);
+					throwError({}, Messages.MultipleDefaultsInSwitch);
 				}
 				defaultFound = true;
 			}
@@ -8688,11 +8688,11 @@ parseStatement: true, parseSourceElement: true */
 			if (directive === 'use strict') {
 				strict = true;
 				if (firstRestricted) {
-				    throwErrorTolerant(firstRestricted, Messages.StrictOctalLiteral);
+					throwErrorTolerant(firstRestricted, Messages.StrictOctalLiteral);
 				}
 			} else {
 				if (!firstRestricted && token.octal) {
-				    firstRestricted = token;
+					firstRestricted = token;
 				}
 			}
 		}
@@ -8759,30 +8759,30 @@ parseStatement: true, parseSourceElement: true */
 				token = lookahead();
 				param = parseVariableIdentifier();
 				if (strict) {
-				    if (isRestrictedWord(token.value)) {
-				        stricted = token;
-				        message = Messages.StrictParamName;
-				    }
-				    if (Object.prototype.hasOwnProperty.call(paramSet, token.value)) {
-				        stricted = token;
-				        message = Messages.StrictParamDupe;
-				    }
+					if (isRestrictedWord(token.value)) {
+					    stricted = token;
+					    message = Messages.StrictParamName;
+					}
+					if (Object.prototype.hasOwnProperty.call(paramSet, token.value)) {
+					    stricted = token;
+					    message = Messages.StrictParamDupe;
+					}
 				} else if (!firstRestricted) {
-				    if (isRestrictedWord(token.value)) {
-				        firstRestricted = token;
-				        message = Messages.StrictParamName;
-				    } else if (isStrictModeReservedWord(token.value)) {
-				        firstRestricted = token;
-				        message = Messages.StrictReservedWord;
-				    } else if (Object.prototype.hasOwnProperty.call(paramSet, token.value)) {
-				        firstRestricted = token;
-				        message = Messages.StrictParamDupe;
-				    }
+					if (isRestrictedWord(token.value)) {
+					    firstRestricted = token;
+					    message = Messages.StrictParamName;
+					} else if (isStrictModeReservedWord(token.value)) {
+					    firstRestricted = token;
+					    message = Messages.StrictReservedWord;
+					} else if (Object.prototype.hasOwnProperty.call(paramSet, token.value)) {
+					    firstRestricted = token;
+					    message = Messages.StrictParamDupe;
+					}
 				}
 				params.push(param);
 				paramSet[param.name] = true;
 				if (match(')')) {
-				    break;
+					break;
 				}
 				expect(',');
 			}
@@ -8822,15 +8822,15 @@ parseStatement: true, parseSourceElement: true */
 			id = parseVariableIdentifier();
 			if (strict) {
 				if (isRestrictedWord(token.value)) {
-				    throwErrorTolerant(token, Messages.StrictFunctionName);
+					throwErrorTolerant(token, Messages.StrictFunctionName);
 				}
 			} else {
 				if (isRestrictedWord(token.value)) {
-				    firstRestricted = token;
-				    message = Messages.StrictFunctionName;
+					firstRestricted = token;
+					message = Messages.StrictFunctionName;
 				} else if (isStrictModeReservedWord(token.value)) {
-				    firstRestricted = token;
-				    message = Messages.StrictReservedWord;
+					firstRestricted = token;
+					message = Messages.StrictReservedWord;
 				}
 			}
 		}
@@ -8843,30 +8843,30 @@ parseStatement: true, parseSourceElement: true */
 				token = lookahead();
 				param = parseVariableIdentifier();
 				if (strict) {
-				    if (isRestrictedWord(token.value)) {
-				        stricted = token;
-				        message = Messages.StrictParamName;
-				    }
-				    if (Object.prototype.hasOwnProperty.call(paramSet, token.value)) {
-				        stricted = token;
-				        message = Messages.StrictParamDupe;
-				    }
+					if (isRestrictedWord(token.value)) {
+					    stricted = token;
+					    message = Messages.StrictParamName;
+					}
+					if (Object.prototype.hasOwnProperty.call(paramSet, token.value)) {
+					    stricted = token;
+					    message = Messages.StrictParamDupe;
+					}
 				} else if (!firstRestricted) {
-				    if (isRestrictedWord(token.value)) {
-				        firstRestricted = token;
-				        message = Messages.StrictParamName;
-				    } else if (isStrictModeReservedWord(token.value)) {
-				        firstRestricted = token;
-				        message = Messages.StrictReservedWord;
-				    } else if (Object.prototype.hasOwnProperty.call(paramSet, token.value)) {
-				        firstRestricted = token;
-				        message = Messages.StrictParamDupe;
-				    }
+					if (isRestrictedWord(token.value)) {
+					    firstRestricted = token;
+					    message = Messages.StrictParamName;
+					} else if (isStrictModeReservedWord(token.value)) {
+					    firstRestricted = token;
+					    message = Messages.StrictReservedWord;
+					} else if (Object.prototype.hasOwnProperty.call(paramSet, token.value)) {
+					    firstRestricted = token;
+					    message = Messages.StrictParamDupe;
+					}
 				}
 				params.push(param);
 				paramSet[param.name] = true;
 				if (match(')')) {
-				    break;
+					break;
 				}
 				expect(',');
 			}
@@ -8937,11 +8937,11 @@ parseStatement: true, parseSourceElement: true */
 			if (directive === 'use strict') {
 				strict = true;
 				if (firstRestricted) {
-				    throwErrorTolerant(firstRestricted, Messages.StrictOctalLiteral);
+					throwErrorTolerant(firstRestricted, Messages.StrictOctalLiteral);
 				}
 			} else {
 				if (!firstRestricted && token.octal) {
-				    firstRestricted = token;
+					firstRestricted = token;
 				}
 			}
 		}
@@ -9003,106 +9003,106 @@ parseStatement: true, parseSourceElement: true */
 			if (lineComment) {
 				ch = source[index++];
 				if (isLineTerminator(ch)) {
-				    loc.end = {
-				        line: lineNumber,
-				        column: index - lineStart - 1
-				    };
-				    lineComment = false;
-				    addComment('Line', comment, start, index - 1, loc);
-				    if (ch === '\r' && source[index] === '\n') {
-				        ++index;
-				    }
-				    ++lineNumber;
-				    lineStart = index;
-				    comment = '';
+					loc.end = {
+					    line: lineNumber,
+					    column: index - lineStart - 1
+					};
+					lineComment = false;
+					addComment('Line', comment, start, index - 1, loc);
+					if (ch === '\r' && source[index] === '\n') {
+					    ++index;
+					}
+					++lineNumber;
+					lineStart = index;
+					comment = '';
 				} else if (index >= length) {
-				    lineComment = false;
-				    comment += ch;
-				    loc.end = {
-				        line: lineNumber,
-				        column: length - lineStart
-				    };
-				    addComment('Line', comment, start, length, loc);
+					lineComment = false;
+					comment += ch;
+					loc.end = {
+					    line: lineNumber,
+					    column: length - lineStart
+					};
+					addComment('Line', comment, start, length, loc);
 				} else {
-				    comment += ch;
+					comment += ch;
 				}
 			} else if (blockComment) {
 				if (isLineTerminator(ch)) {
-				    if (ch === '\r' && source[index + 1] === '\n') {
-				        ++index;
-				        comment += '\r\n';
-				    } else {
-				        comment += ch;
-				    }
-				    ++lineNumber;
-				    ++index;
-				    lineStart = index;
-				    if (index >= length) {
-				        throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
-				    }
+					if (ch === '\r' && source[index + 1] === '\n') {
+					    ++index;
+					    comment += '\r\n';
+					} else {
+					    comment += ch;
+					}
+					++lineNumber;
+					++index;
+					lineStart = index;
+					if (index >= length) {
+					    throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
+					}
 				} else {
-				    ch = source[index++];
-				    if (index >= length) {
-				        throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
-				    }
-				    comment += ch;
-				    if (ch === '*') {
-				        ch = source[index];
-				        if (ch === '/') {
-				            comment = comment.substr(0, comment.length - 1);
-				            blockComment = false;
-				            ++index;
-				            loc.end = {
-				                line: lineNumber,
-				                column: index - lineStart
-				            };
-				            addComment('Block', comment, start, index, loc);
-				            comment = '';
-				        }
-				    }
+					ch = source[index++];
+					if (index >= length) {
+					    throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
+					}
+					comment += ch;
+					if (ch === '*') {
+					    ch = source[index];
+					    if (ch === '/') {
+					        comment = comment.substr(0, comment.length - 1);
+					        blockComment = false;
+					        ++index;
+					        loc.end = {
+					            line: lineNumber,
+					            column: index - lineStart
+					        };
+					        addComment('Block', comment, start, index, loc);
+					        comment = '';
+					    }
+					}
 				}
 			} else if (ch === '/') {
 				ch = source[index + 1];
 				if (ch === '/') {
-				    loc = {
-				        start: {
-				            line: lineNumber,
-				            column: index - lineStart
-				        }
-				    };
-				    start = index;
-				    index += 2;
-				    lineComment = true;
-				    if (index >= length) {
-				        loc.end = {
-				            line: lineNumber,
-				            column: index - lineStart
-				        };
-				        lineComment = false;
-				        addComment('Line', comment, start, index, loc);
-				    }
+					loc = {
+					    start: {
+					        line: lineNumber,
+					        column: index - lineStart
+					    }
+					};
+					start = index;
+					index += 2;
+					lineComment = true;
+					if (index >= length) {
+					    loc.end = {
+					        line: lineNumber,
+					        column: index - lineStart
+					    };
+					    lineComment = false;
+					    addComment('Line', comment, start, index, loc);
+					}
 				} else if (ch === '*') {
-				    start = index;
-				    index += 2;
-				    blockComment = true;
-				    loc = {
-				        start: {
-				            line: lineNumber,
-				            column: index - lineStart - 2
-				        }
-				    };
-				    if (index >= length) {
-				        throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
-				    }
+					start = index;
+					index += 2;
+					blockComment = true;
+					loc = {
+					    start: {
+					        line: lineNumber,
+					        column: index - lineStart - 2
+					    }
+					};
+					if (index >= length) {
+					    throwError({}, Messages.UnexpectedToken, 'ILLEGAL');
+					}
 				} else {
-				    break;
+					break;
 				}
 			} else if (isWhiteSpace(ch)) {
 				++index;
 			} else if (isLineTerminator(ch)) {
 				++index;
 				if (ch ===  '\r' && source[index] === '\n') {
-				    ++index;
+					++index;
 				}
 				++lineNumber;
 				lineStart = index;
@@ -9189,7 +9189,7 @@ parseStatement: true, parseSourceElement: true */
 			token = extra.tokens[extra.tokens.length - 1];
 			if (token.range[0] === pos && token.type === 'Punctuator') {
 				if (token.value === '/' || token.value === '/=') {
-				    extra.tokens.pop();
+					extra.tokens.pop();
 				}
 			}
 		}
@@ -9267,14 +9267,14 @@ parseStatement: true, parseSourceElement: true */
 			}
 			if (extra.loc) {
 				node.groupLoc = {
-				    start: {
-				        line: this.loc.start.line,
-				        column: this.loc.start.column
-				    },
-				    end: {
-				        line: this.loc.end.line,
-				        column: this.loc.end.column
-				    }
+					start: {
+					    line: this.loc.start.line,
+					    column: this.loc.start.column
+					},
+					end: {
+					    line: this.loc.end.line,
+					    column: this.loc.end.column
+					}
 				};
 			}
 		};
@@ -9285,14 +9285,14 @@ parseStatement: true, parseSourceElement: true */
 			}
 			if (extra.loc) {
 				node.loc = {
-				    start: {
-				        line: this.loc.start.line,
-				        column: this.loc.start.column
-				    },
-				    end: {
-				        line: this.loc.end.line,
-				        column: this.loc.end.column
-				    }
+					start: {
+					    line: this.loc.start.line,
+					    column: this.loc.start.column
+					},
+					end: {
+					    line: this.loc.end.line,
+					    column: this.loc.end.column
+					}
 				};
 			}
 		};
@@ -9328,19 +9328,19 @@ parseStatement: true, parseSourceElement: true */
 		while (match('.') || match('[')) {
 			if (match('[')) {
 				expr = {
-				    type: Syntax.MemberExpression,
-				    computed: true,
-				    object: expr,
-				    property: parseComputedMember()
+					type: Syntax.MemberExpression,
+					computed: true,
+					object: expr,
+					property: parseComputedMember()
 				};
 				marker.end();
 				marker.apply(expr);
 			} else {
 				expr = {
-				    type: Syntax.MemberExpression,
-				    computed: false,
-				    object: expr,
-				    property: parseNonComputedMember()
+					type: Syntax.MemberExpression,
+					computed: false,
+					object: expr,
+					property: parseNonComputedMember()
 				};
 				marker.end();
 				marker.apply(expr);
@@ -9361,27 +9361,27 @@ parseStatement: true, parseSourceElement: true */
 		while (match('.') || match('[') || match('(')) {
 			if (match('(')) {
 				expr = {
-				    type: Syntax.CallExpression,
-				    callee: expr,
-				    'arguments': parseArguments()
+					type: Syntax.CallExpression,
+					callee: expr,
+					'arguments': parseArguments()
 				};
 				marker.end();
 				marker.apply(expr);
 			} else if (match('[')) {
 				expr = {
-				    type: Syntax.MemberExpression,
-				    computed: true,
-				    object: expr,
-				    property: parseComputedMember()
+					type: Syntax.MemberExpression,
+					computed: true,
+					object: expr,
+					property: parseComputedMember()
 				};
 				marker.end();
 				marker.apply(expr);
 			} else {
 				expr = {
-				    type: Syntax.MemberExpression,
-				    computed: false,
-				    object: expr,
-				    property: parseNonComputedMember()
+					type: Syntax.MemberExpression,
+					computed: false,
+					object: expr,
+					property: parseNonComputedMember()
 				};
 				marker.end();
 				marker.apply(expr);
@@ -9399,9 +9399,9 @@ parseStatement: true, parseSourceElement: true */
 			if (node.hasOwnProperty(i) && i !== 'groupRange' && i !== 'groupLoc') {
 				entry = node[i];
 				if (entry === null || typeof entry !== 'object' || entry instanceof RegExp) {
-				    n[i] = entry;
+					n[i] = entry;
 				} else {
-				    n[i] = filterGroup(entry);
+					n[i] = filterGroup(entry);
 				}
 			}
 		}
@@ -9414,44 +9414,44 @@ parseStatement: true, parseSourceElement: true */
 
 			function isBinary(node) {
 				return node.type === Syntax.LogicalExpression ||
-				    node.type === Syntax.BinaryExpression;
+					node.type === Syntax.BinaryExpression;
 			}
 
 			function visit(node) {
 				var start, end;
 
 				if (isBinary(node.left)) {
-				    visit(node.left);
+					visit(node.left);
 				}
 				if (isBinary(node.right)) {
-				    visit(node.right);
+					visit(node.right);
 				}
 
 				if (range) {
-				    if (node.left.groupRange || node.right.groupRange) {
-				        start = node.left.groupRange ? node.left.groupRange[0] : node.left.range[0];
-				        end = node.right.groupRange ? node.right.groupRange[1] : node.right.range[1];
-				        node.range = [start, end];
-				    } else if (typeof node.range === 'undefined') {
-				        start = node.left.range[0];
-				        end = node.right.range[1];
-				        node.range = [start, end];
-				    }
+					if (node.left.groupRange || node.right.groupRange) {
+					    start = node.left.groupRange ? node.left.groupRange[0] : node.left.range[0];
+					    end = node.right.groupRange ? node.right.groupRange[1] : node.right.range[1];
+					    node.range = [start, end];
+					} else if (typeof node.range === 'undefined') {
+					    start = node.left.range[0];
+					    end = node.right.range[1];
+					    node.range = [start, end];
+					}
 				}
 				if (loc) {
-				    if (node.left.groupLoc || node.right.groupLoc) {
-				        start = node.left.groupLoc ? node.left.groupLoc.start : node.left.loc.start;
-				        end = node.right.groupLoc ? node.right.groupLoc.end : node.right.loc.end;
-				        node.loc = {
-				            start: start,
-				            end: end
-				        };
-				    } else if (typeof node.loc === 'undefined') {
-				        node.loc = {
-				            start: node.left.loc.start,
-				            end: node.right.loc.end
-				        };
-				    }
+					if (node.left.groupLoc || node.right.groupLoc) {
+					    start = node.left.groupLoc ? node.left.groupLoc.start : node.left.loc.start;
+					    end = node.right.groupLoc ? node.right.groupLoc.end : node.right.loc.end;
+					    node.loc = {
+					        start: start,
+					        end: end
+					    };
+					} else if (typeof node.loc === 'undefined') {
+					    node.loc = {
+					        start: node.left.loc.start,
+					        end: node.right.loc.end
+					    };
+					}
 				}
 			}
 
@@ -9465,15 +9465,15 @@ parseStatement: true, parseSourceElement: true */
 				marker.end();
 
 				if (range && typeof node.range === 'undefined') {
-				    marker.apply(node);
+					marker.apply(node);
 				}
 
 				if (loc && typeof node.loc === 'undefined') {
-				    marker.apply(node);
+					marker.apply(node);
 				}
 
 				if (isBinary(node)) {
-				    visit(node);
+					visit(node);
 				}
 
 				return node;
@@ -9696,12 +9696,12 @@ parseStatement: true, parseSourceElement: true */
 				// for old IE which understands string indexing for string
 				// literals only and not for string object.
 				if (code instanceof String) {
-				    source = code.valueOf();
+					source = code.valueOf();
 				}
 
 				// Force accessing the characters via an array.
 				if (typeof source[0] === 'undefined') {
-				    source = stringToArray(code);
+					source = stringToArray(code);
 				}
 			}
 		}

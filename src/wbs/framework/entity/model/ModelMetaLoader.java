@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
@@ -18,6 +19,7 @@ import wbs.framework.entity.helper.EntityHelper;
 
 import com.google.common.collect.ImmutableMap;
 
+@Log4j
 @SingletonComponent ("modelMetaLoader")
 public
 class ModelMetaLoader {
@@ -135,7 +137,15 @@ class ModelMetaLoader {
 					resourceName);
 
 			if (inputStream == null) {
+
+				log.warn (
+					stringFormat (
+						"Model meta not found for %s: %s",
+						model.objectName (),
+						resourceName));
+
 				continue;
+
 			}
 
 			ModelMetaSpec spec =

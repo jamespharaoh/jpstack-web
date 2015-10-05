@@ -1,0 +1,39 @@
+<model-meta
+	name="autoResponder">
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of an auto-responder"
+			template="yes"/>
+
+		<priv-type
+			name="Messages"
+			description="View message history for an auto-responder"
+			template="yes"/>
+
+		<priv-type
+			name="Stats"
+			description="View message statistics for an auto-responder"
+			template="yes"/>
+
+		<!-- slice -->
+
+		<priv-type
+			subject="slice"
+			name="Auto-responder create"
+			description="Create a new auto responder in a slice"
+			template="yes"/>
+
+	</priv-types>
+
+	<command-types>
+
+		<command-type
+			name="Default"
+			description="Request a response from an auto-responder"/>
+
+	</command-types>
+
+</model-meta>

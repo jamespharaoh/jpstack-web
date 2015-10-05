@@ -1,10 +1,3 @@
----------------------------------------- INSERT command_type
-
-SELECT command_type_insert (
-	'orderer',
-	'default',
-	'Default');
-
 ---------------------------------------- INSERT service_type
 
 SELECT service_type_insert (

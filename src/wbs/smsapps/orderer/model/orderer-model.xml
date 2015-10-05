@@ -5,30 +5,38 @@
 
 		<priv-type
 			name="Manage"
-			description="Full control of an orderer"
+			description="Full control of an orderer service"
 			template="yes"/>
 
 		<priv-type
 			name="Messages"
-			description="View message history for an orderer"
+			description="View message history for an orderer service"
 			template="yes"/>
 
 		<priv-type
 			name="Stats"
-			description="View message statistics for an orderer"
+			description="View message statistics for an orderer service"
 			template="yes"/>
 
 		<priv-type
 			name="Supervisor"
-			description="View supervisor reports for an IM chat"
+			description="View supervisor reports for an orderer service"
 			template="yes"/>
 
 		<priv-type
 			subject="slice"
 			name="Orderer create"
-			description="Create new orderers in a slice"
+			description="Create new orderer service in a slice"
 			template="yes"/>
 
 	</priv-types>
+
+	<command-types>
+
+		<command-type
+			name="Default"
+			description="Place an order with an orderer service"/>
+
+	</command-types>
 
 </model-meta>

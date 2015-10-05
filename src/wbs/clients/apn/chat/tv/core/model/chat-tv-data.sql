@@ -5,13 +5,6 @@ SELECT service_type_insert (
 	'tv_to_screen',
 	'Send message to screen');
 
----------------------------------------- INSERT command_type
-
-SELECT command_type_insert (
-	'chat',
-	'tv_to_screen',
-	'Send message to screen');
-
 ---------------------------------------- INSERT queue_type
 
 SELECT queue_type_insert (

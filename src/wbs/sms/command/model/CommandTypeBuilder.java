@@ -1,6 +1,5 @@
-package wbs.platform.priv.model;
+package wbs.sms.command.model;
 
-import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.codify;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -26,10 +25,10 @@ import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelMetaBuilderHandler;
 import wbs.framework.entity.model.ModelMetaSpec;
 
-@PrototypeComponent ("privTypeBuilder")
+@PrototypeComponent ("commandTypeBuilder")
 @ModelMetaBuilderHandler
 public
-class PrivTypeBuilder {
+class CommandTypeBuilder {
 
 	// dependencies
 
@@ -45,7 +44,7 @@ class PrivTypeBuilder {
 	ModelMetaSpec parent;
 
 	@BuilderSource
-	PrivTypeSpec spec;
+	CommandTypeSpec spec;
 
 	@BuilderTarget
 	Model model;
@@ -53,34 +52,10 @@ class PrivTypeBuilder {
 	// build
 
 	@BuildMethod
+	@SneakyThrows (SQLException.class)
 	public
 	void build (
 			Builder builder) {
-
-		try {
-
-			createPrivType ();
-
-		} catch (Exception exception) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Error creating priv type %s.%s",
-					camelToUnderscore (
-						ifNull (
-							spec.subject (),
-							parent.name ())),
-					codify (
-						spec.name ())),
-				exception);
-
-		}
-
-	}
-
-	@SneakyThrows (SQLException.class)
-	private
-	void createPrivType () {
 
 		@Cleanup
 		Connection connection =
@@ -90,19 +65,19 @@ class PrivTypeBuilder {
 			false);
 
 		@Cleanup
-		PreparedStatement nextPrivTypeIdStatement =
+		PreparedStatement nextCommandTypeIdStatement =
 			connection.prepareStatement (
 				stringFormat (
 					"SELECT ",
-						"nextval ('priv_type_id_seq')"));
+						"nextval ('command_type_id_seq')"));
 
-		ResultSet privTypeIdResultSet =
-			nextPrivTypeIdStatement.executeQuery ();
+		ResultSet commandTypeIdResultSet =
+			nextCommandTypeIdStatement.executeQuery ();
 
-		privTypeIdResultSet.next ();
+		commandTypeIdResultSet.next ();
 
-		int privTypeId =
-			privTypeIdResultSet.getInt (
+		int commandTypeId =
+			commandTypeIdResultSet.getInt (
 				1);
 
 		String objectTypeCode =
@@ -145,50 +120,40 @@ class PrivTypeBuilder {
 				1);
 
 		@Cleanup
-		PreparedStatement insertPrivTypeStatement =
+		PreparedStatement insertCommandTypeStatement =
 			connection.prepareStatement (
 				stringFormat (
-					"INSERT INTO priv_type (",
+					"INSERT INTO command_type (",
 						"id, ",
 						"parent_object_type_id, ",
 						"code, ",
 						"description, ",
-						"help, ",
-						"template) ",
+						"deleted) ",
 					"VALUES (",
 						"?, ",
 						"?, ",
 						"?, ",
 						"?, ",
-						"?, ",
-						"?)"));
+						"false)"));
 
-		insertPrivTypeStatement.setInt (
+		insertCommandTypeStatement.setInt (
 			1,
-			privTypeId);
+			commandTypeId);
 
-		insertPrivTypeStatement.setInt (
+		insertCommandTypeStatement.setInt (
 			2,
 			objectTypeId);
 
-		insertPrivTypeStatement.setString (
+		insertCommandTypeStatement.setString (
 			3,
 			codify (
 				spec.name ()));
 
-		insertPrivTypeStatement.setString (
+		insertCommandTypeStatement.setString (
 			4,
 			spec.description ());
 
-		insertPrivTypeStatement.setString (
-			5,
-			spec.description ());
-
-		insertPrivTypeStatement.setBoolean (
-			6,
-			spec.template ());
-
-		insertPrivTypeStatement.executeUpdate ();
+		insertCommandTypeStatement.executeUpdate ();
 
 		connection.commit ();
 

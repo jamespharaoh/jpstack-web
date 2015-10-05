@@ -5,32 +5,32 @@
 
 		<priv-type
 			name="Manage"
-			description="Full control of a manual responder"
+			description="Full control of a manual-responder service"
 			template="yes"/>
 
 		<priv-type
 			name="Messages"
-			description="View message history for a manual responder"
+			description="View message history for a manual-responder service"
 			template="yes"/>
 
 		<priv-type
 			name="Stats"
-			description="View message statistics for a manual responder"
+			description="View message statistics for a manual-responder service"
 			template="yes"/>
 
 		<priv-type
 			name="Supervisor"
-			description="View supervisor reports for a manual responder"
+			description="View supervisor reports for a manual-responder service"
 			template="yes"/>
 
 		<priv-type
 			name="Reply"
-			description="Reply to requests received by a manual responder"
+			description="Reply to requests received by a manual-responder service"
 			template="yes"/>
 
 		<priv-type
 			name="Number"
-			description="View phone numbers for a manual responder"
+			description="View phone numbers for a manual-responder service"
 			template="yes"/>
 
 		<!-- slice -->
@@ -38,9 +38,17 @@
 		<priv-type
 			subject="slice"
 			name="Manual responder create"
-			description="Create new manual responders in a slice"
+			description="Create new manual-responder services in a slice"
 			template="yes"/>
 
 	</priv-types>
+
+	<command-types>
+
+		<command-type
+			name="Default"
+			description="Queue a request with a manual-responder service"/>
+
+	</command-types>
 
 </model-meta>

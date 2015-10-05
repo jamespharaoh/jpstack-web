@@ -855,7 +855,6 @@
       <script name="src/wbs/sms/number/core/model/number.sql"/>
       <script name="src/wbs/sms/number/lookup/model/number-lookup.sql"/>
       <script name="src/wbs/sms/route/core/model/route.sql"/>
-      <script name="src/wbs/sms/command/model/command.sql"/>
       <script name="src/wbs/sms/message/delivery/model/delivery.sql"/>
       <script name="src/wbs/sms/message/inbox/model/sms-inbox.sql"/>
       <script name="src/wbs/sms/keyword/model/keyword-set-fallback.sql"/>
@@ -902,8 +901,6 @@
       <script name="src/wbs/sms/number/core/model/number-data.sql"/>
       <script name="src/wbs/sms/route/core/model/route-data.sql"/>
       <script name="src/wbs/sms/message/inbox/model/sms-inbox-data.sql"/>
-      <script name="src/wbs/sms/keyword/model/keyword-data.sql"/>
-      <script name="src/wbs/sms/magicnumber/model/magic-number-data.sql"/>
       <script name="src/wbs/sms/message/batch/model/batch-data.sql"/>
       <script name="src/wbs/sms/message/core/model/message-data.sql"/>
       <script name="src/wbs/sms/messageset/model/message-set-data.sql"/>
@@ -925,7 +922,6 @@
       <script name="src/wbs/clients/apn/chat/core/model/chat-data.sql"/>
       <script name="src/wbs/clients/apn/chat/affiliate/model/chat-affiliate-data.sql"/>
       <script name="src/wbs/clients/apn/chat/bill/model/chat-bill-data.sql"/>
-      <script name="src/wbs/clients/apn/chat/user/image/model/chat-user-image-data.sql"/>
       <script name="src/wbs/applications/imchat/model/im-chat-core-data.sql"/>
       <script name="src/wbs/services/ticket/core/model/ticket-data.sql"/>
       <script name="src/wbs/integrations/broadcastsystems/model/broadcast-systems-data.sql"/>

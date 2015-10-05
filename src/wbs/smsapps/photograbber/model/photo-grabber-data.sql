@@ -1,10 +1,3 @@
----------------------------------------- INSERT command_type
-
-SELECT command_type_insert (
-	'photo_grabber',
-	'default',
-	'Photo grabber');
-
 ---------------------------------------- INSERT service_type
 
 SELECT service_type_insert (

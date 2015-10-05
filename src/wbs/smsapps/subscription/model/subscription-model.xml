@@ -35,4 +35,16 @@
 
 	</priv-types>
 
+	<command-types>
+
+		<command-type
+			name="Subscribe"
+			description="Subscribe to a subscription service"/>
+
+		<command-type
+			name="Unsubscribe"
+			description="Unsubscribe from a subscription service"/>
+
+	</command-types>
+
 </model-meta>
