@@ -857,7 +857,6 @@
       <script name="src/wbs/sms/message/inbox/model/sms-inbox.sql"/>
       <script name="src/wbs/sms/keyword/model/keyword-set-fallback.sql"/>
       <script name="src/wbs/sms/magicnumber/model/magic-number.sql"/>
-      <script name="src/wbs/sms/message/batch/model/batch.sql"/>
       <script name="src/wbs/sms/message/core/model/message.sql"/>
       <script name="src/wbs/sms/message/core/model/message-media.sql"/>
       <script name="src/wbs/sms/message/core/model/message-type.sql"/>
@@ -901,7 +900,6 @@
       <script name="src/wbs/sms/smpp/model/smpp-data.sql"/>
       <script name="src/wbs/sms/message/wap/model/wap-push-data.sql"/>
       <script name="src/wbs/smsapps/autoresponder/model/auto-responder-data.sql"/>
-      <script name="src/wbs/smsapps/broadcast/model/broadcast-data.sql"/>
       <script name="src/wbs/smsapps/forwarder/model/forwarder-data.sql"/>
       <script name="src/wbs/smsapps/manualresponder/model/manual-responder-data.sql"/>
       <script name="src/wbs/smsapps/orderer/model/orderer-data.sql"/>

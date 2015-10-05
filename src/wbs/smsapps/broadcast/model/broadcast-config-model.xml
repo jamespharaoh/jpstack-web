@@ -28,4 +28,13 @@
 
 	</service-types>
 
+	<batch-types>
+
+		<batch-type
+			batch="broadcast"
+			name="Broadcast"
+			description="A single broadcast"/>
+
+	</batch-types>
+
 </model-meta>

@@ -1,9 +1,3 @@
-SELECT batch_type_insert (
-	'chat',
-	'broadcast',
-	'Broadcast',
-	'chat');
-
 SELECT delivery_type_insert (
 	'chat_bill',
 	'Chat bill');

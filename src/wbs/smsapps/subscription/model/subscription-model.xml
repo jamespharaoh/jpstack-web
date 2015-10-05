@@ -55,4 +55,13 @@
 
 	</service-types>
 
+	<batch-types>
+
+		<batch-type
+			name="Send"
+			batch="subscriptionSend"
+			description="A single send to a subscription service"/>
+
+	</batch-types>
+
 </model-meta>

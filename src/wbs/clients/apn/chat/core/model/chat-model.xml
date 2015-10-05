@@ -58,4 +58,13 @@
 
 	</service-types>
 
+	<batch-types>
+
+		<batch-type
+			name="Broadcast"
+			batch="chatBroadcast"
+			description="A single broadcast to an SMS chat service"/>
+
+	</batch-types>
+
 </model-meta>
