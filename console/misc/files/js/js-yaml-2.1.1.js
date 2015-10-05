@@ -3880,8 +3880,8 @@ exports.inspect = function(obj, showHidden, depth, colors) {
 
 	  case 'string':
 		var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
-							                     .replace(/'/g, "\\'")
-							                     .replace(/\\"/g, '"') + '\'';
+								                 .replace(/'/g, "\\'")
+								                 .replace(/\\"/g, '"') + '\'';
 		return stylize(simple, 'string');
 
 	  case 'number':
@@ -6774,20 +6774,20 @@ parseStatement: true, parseSourceElement: true */
 
 							// \0 is not octal escape sequence
 							if (code !== 0) {
-							    octal = true;
+								octal = true;
 							}
 
 							if (index < length && isOctalDigit(source[index])) {
-							    octal = true;
-							    code = code * 8 + '01234567'.indexOf(source[index++]);
+								octal = true;
+								code = code * 8 + '01234567'.indexOf(source[index++]);
 
-							    // 3 digits are only allowed when string starts
-							    // with 0, 1, 2, 3
-							    if ('0123'.indexOf(ch) >= 0 &&
-							            index < length &&
-							            isOctalDigit(source[index])) {
-							        code = code * 8 + '01234567'.indexOf(source[index++]);
-							    }
+								// 3 digits are only allowed when string starts
+								// with 0, 1, 2, 3
+								if ('0123'.indexOf(ch) >= 0 &&
+								        index < length &&
+								        isOctalDigit(source[index])) {
+								    code = code * 8 + '01234567'.indexOf(source[index++]);
+								}
 							}
 							str += String.fromCharCode(code);
 						} else {
@@ -9053,8 +9053,8 @@ parseStatement: true, parseSourceElement: true */
 							blockComment = false;
 							++index;
 							loc.end = {
-							    line: lineNumber,
-							    column: index - lineStart
+								line: lineNumber,
+								column: index - lineStart
 							};
 							addComment('Block', comment, start, index, loc);
 							comment = '';

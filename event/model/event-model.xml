@@ -1,0 +1,52 @@
+<model-meta
+	name="event">
+
+	<event-types>
+
+		<event-type
+			name="Object created"
+			text="%0 created %1 in %2"/>
+
+		<event-type
+			name="Object created in"
+			text="%0 created %1 of type %2 in %3"/>
+
+		<event-type
+			name="Object removed in"
+			text="%0 removed %1 of type %2 in %3"/>
+
+		<event-type
+			name="Object field updated"
+			text="%0 set %1 for %2 to %3"/>
+
+		<event-type
+			name="Object field updated in"
+			text="%0 set %1 for %2 of type %3 in %4 to %5"/>
+
+		<event-type
+			name="Object field nulled"
+			text="%0 unset %1 for %2"/>
+
+		<event-type
+			name="Object field nulled in"
+			text="%0 unset %1 for %2 of type %3 in %4"/>
+
+		<event-type
+			name="Object code changed"
+			text="%0 changed code for %1 from %2 to %3"/>
+
+		<event-type
+			name="Object code changed in"
+			text="%0 changed code for %1 of type %2 from %4 to %5"/>
+
+		<event-type
+			name="Object name changed"
+			text="%0 changed name for %1 from %2 to %3"/>
+
+		<event-type
+			name="Object name changed in"
+			text="%0 changed name for %1 of type %2 in %3 from %4 to %5"/>
+
+	</event-types>
+
+</model-meta>
