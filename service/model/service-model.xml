@@ -1,0 +1,15 @@
+<model-meta
+	name="service">
+
+	<service-types>
+
+		<!-- root -->
+
+		<service-type
+			subject="root"
+			name="System"
+			description="System default service"/>
+
+	</service-types>
+
+</model-meta>
