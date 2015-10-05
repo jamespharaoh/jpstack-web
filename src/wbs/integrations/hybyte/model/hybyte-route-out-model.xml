@@ -1,0 +1,12 @@
+<model-meta
+	name="hybyteRouteOut">
+
+	<senders>
+
+		<sender
+			name="Hybyte"
+			description="Hybyte sender"/>
+
+	</senders>
+
+</model-meta>

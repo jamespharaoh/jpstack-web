@@ -1,0 +1,12 @@
+<model-meta
+	name="smsArenaRouteOut">
+
+	<senders>
+
+		<sender
+			name="SMS Arena"
+			description="SMS Arena sender"/>
+
+	</senders>
+
+</model-meta>

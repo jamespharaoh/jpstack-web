@@ -2,10 +2,6 @@
 	name="broadcast-systems"
 	package="wbs.integrations.broadcastsystems">
 
-	<sql-scripts>
-		<sql-data name="broadcast-systems-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="broadcastSystemsRouteOut"/>
 	</models>

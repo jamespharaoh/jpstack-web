@@ -7,10 +7,6 @@
 		<plugin-dependency name="user"/>
 	</plugin-dependencies>
 
-	<sql-scripts>
-		<sql-data name="simulator-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="simulator"/>
 		<model name="simulatorEvent"/>

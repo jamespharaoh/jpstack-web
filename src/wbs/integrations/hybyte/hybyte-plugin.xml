@@ -2,10 +2,6 @@
 	name="hybyte"
 	package="wbs.integrations.hybyte">
 
-	<sql-scripts>
-		<sql-data name="hybyte-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="hybyteNetwork"/>
 		<model name="hybyteRoute"/>

@@ -2,10 +2,6 @@
 	name="mediaburst"
 	package="wbs.integrations.mediaburst">
 
-	<sql-scripts>
-		<sql-data name="mediaburst-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="mediaburstProteusRouteOut"/>
 		<model name="mediaburstNetwork"/>

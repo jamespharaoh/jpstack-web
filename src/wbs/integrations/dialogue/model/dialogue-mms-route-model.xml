@@ -1,0 +1,12 @@
+<model-meta
+	name="dialogueMmsRoute">
+
+	<senders>
+
+		<sender
+			name="Dialogue MMS"
+			description="Dialogue MMS sender"/>
+
+	</senders>
+
+</model-meta>

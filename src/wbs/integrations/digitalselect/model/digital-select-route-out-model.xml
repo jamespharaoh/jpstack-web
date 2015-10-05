@@ -1,0 +1,12 @@
+<model-meta
+	name="digitalSelectRouteOut">
+
+	<senders>
+
+		<sender
+			name="Digital Select"
+			description="Digital Select sender"/>
+
+	</senders>
+
+</model-meta>

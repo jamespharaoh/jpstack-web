@@ -7,10 +7,6 @@
 		<plugin-dependency name="scaffold"/>
 	</plugin-dependencies>
 
-	<sql-scripts>
-		<sql-data name="oxygen8-data"/>
-	</sql-scripts>
-
 	<models>
 		<enum-type name="oxygen8InboundLogType"/>
 		<model name="oxygen8Config"/>

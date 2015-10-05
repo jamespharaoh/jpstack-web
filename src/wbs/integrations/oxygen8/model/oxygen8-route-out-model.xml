@@ -1,0 +1,12 @@
+<model-meta
+	name="oxygen8RouteOut">
+
+	<senders>
+
+		<sender
+			name="oxygen8"
+			description="Oxygen8 SMS sender"/>
+
+	</senders>
+
+</model-meta>

@@ -10,4 +10,12 @@
 
 	</priv-types>
 
+	<senders>
+
+		<sender
+			name="Simulator"
+			description="Simulator virtual sender"/>
+
+	</senders>
+
 </model-meta>

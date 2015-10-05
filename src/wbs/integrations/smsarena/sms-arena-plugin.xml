@@ -7,10 +7,6 @@
 		<plugin-dependency name="scaffold"/>
 	</plugin-dependencies>
 
-	<sql-scripts>
-		<sql-data name="sms-arena-data"/>
-	</sql-scripts>
-
 	<models>
 		<enum-type name="smsArenaDlrReportLogType"/>
 		<model name="smsArenaConfig"/>

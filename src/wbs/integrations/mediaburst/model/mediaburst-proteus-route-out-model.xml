@@ -1,0 +1,12 @@
+<model-meta
+	name="mediaburstProteusRouteOut">
+
+	<senders>
+
+		<sender
+			name="Mediaburst Proteus"
+			description="Mediaburst Proteus sender"/>
+
+	</senders>
+
+</model-meta>

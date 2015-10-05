@@ -1,0 +1,16 @@
+<model-meta
+	name="broadcastSystemsRouteOut">
+
+	<senders>
+
+		<sender
+			name="Broadcast Systems 1"
+			description="Broadcast Systems legacy sender"/>
+
+		<sender
+			name="Broadcast Systems 2"
+			description="Broadcast Systems new sender"/>
+
+	</senders>
+
+</model-meta>
