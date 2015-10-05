@@ -2,15 +2,17 @@
 	name="affiliate"
 	package="wbs.platform.affiliate">
 
-	<sql-scripts>
-		<sql-schema name="affiliate"/>
-		<sql-data name="affiliate-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="affiliate"/>
 		<model name="affiliateType"/>
 	</models>
+
+	<layer name="entity">
+		<bean class="model.AffiliateTypeBuilder"/>
+		<bean class="model.AffiliateTypeSpec"/>
+		<bean class="model.AffiliateTypesBuilder"/>
+		<bean class="model.AffiliateTypesSpec"/>
+	</layer>
 
 	<console-modules>
 		<console-module name="affiliate"/>
