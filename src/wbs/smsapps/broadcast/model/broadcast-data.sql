@@ -1,8 +1,3 @@
-SELECT service_type_insert (
-	'broadcast_config',
-	'default',
-	'Default');
-
 SELECT event_type_insert (
 	'broadcast_numbers_added',
 	'%0 added %1 numbers to %2');

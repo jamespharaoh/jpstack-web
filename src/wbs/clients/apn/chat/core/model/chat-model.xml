@@ -42,4 +42,20 @@
 
 	</command-types>
 
+	<service-types>
+
+		<service-type
+			name="Bill"
+			description="Billed messages for an SMS chat service"/>
+
+		<service-type
+			name="Broadcast"
+			description="Broadcast messages for an SMS chat service"/>
+
+		<service-type
+			name="System"
+			description="System messages for an SMS chat service"/>
+
+	</service-types>
+
 </model-meta>

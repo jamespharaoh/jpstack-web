@@ -39,4 +39,12 @@
 
 	</command-types>
 
+	<service-types>
+
+		<service-type
+			name="Default"
+			description="Orderer service"/>
+
+	</service-types>
+
 </model-meta>

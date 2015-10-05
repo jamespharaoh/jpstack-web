@@ -9,4 +9,12 @@
 
 	</command-types>
 
+	<service-types>
+
+		<service-type
+			name="Default"
+			description="Subscription service list"/>
+
+	</service-types>
+
 </model-meta>

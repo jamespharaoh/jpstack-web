@@ -846,7 +846,6 @@
       <script name="src/wbs/platform/media/model/media.sql"/>
       <script name="src/wbs/platform/menu/model/menu.sql"/>
       <script name="src/wbs/platform/queue/model/queue.sql"/>
-      <script name="src/wbs/platform/service/model/service.sql"/>
       <script name="src/wbs/platform/text/model/text.sql"/>
       <script name="src/wbs/platform/user/model/user.sql"/>
       <script name="src/wbs/platform/postgresql/model/postgresql.sql"/>
@@ -896,7 +895,6 @@
       <script name="src/wbs/platform/event/model/event-data.sql"/>
       <script name="src/wbs/platform/exception/model/exception-data.sql"/>
       <script name="src/wbs/platform/media/model/media-data.sql"/>
-      <script name="src/wbs/platform/service/model/service-data.sql"/>
       <script name="src/wbs/platform/postgresql/model/postgresql-maintenance-data.sql"/>
       <script name="src/wbs/sms/number/core/model/number-data.sql"/>
       <script name="src/wbs/sms/route/core/model/route-data.sql"/>
@@ -909,7 +907,6 @@
       <script name="src/wbs/sms/route/router/model/router-data.sql"/>
       <script name="src/wbs/sms/smpp/model/smpp-data.sql"/>
       <script name="src/wbs/sms/message/wap/model/wap-push-data.sql"/>
-      <script name="src/wbs/sms/customer/model/sms-customer-data.sql"/>
       <script name="src/wbs/smsapps/alerts/model/alerts-data.sql"/>
       <script name="src/wbs/smsapps/autoresponder/model/auto-responder-data.sql"/>
       <script name="src/wbs/smsapps/broadcast/model/broadcast-data.sql"/>
@@ -918,10 +915,8 @@
       <script name="src/wbs/smsapps/orderer/model/orderer-data.sql"/>
       <script name="src/wbs/smsapps/photograbber/model/photo-grabber-data.sql"/>
       <script name="src/wbs/smsapps/subscription/model/subscription-data.sql"/>
-      <script name="src/wbs/smsapps/ticketer/model/ticketer-data.sql"/>
       <script name="src/wbs/clients/apn/chat/core/model/chat-data.sql"/>
       <script name="src/wbs/clients/apn/chat/affiliate/model/chat-affiliate-data.sql"/>
-      <script name="src/wbs/clients/apn/chat/bill/model/chat-bill-data.sql"/>
       <script name="src/wbs/applications/imchat/model/im-chat-core-data.sql"/>
       <script name="src/wbs/services/ticket/core/model/ticket-data.sql"/>
       <script name="src/wbs/integrations/broadcastsystems/model/broadcast-systems-data.sql"/>

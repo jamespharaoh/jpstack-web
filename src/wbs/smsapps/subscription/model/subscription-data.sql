@@ -1,13 +1,3 @@
-SELECT service_type_insert (
-	'subscription',
-	'default',
-	'Default');
-
-SELECT service_type_insert (
-	'subscription_list',
-	'default',
-	'Default');
-
 SELECT batch_type_insert (
 	'subscription',
 	'send',

@@ -1,4 +1,4 @@
-package wbs.sms.command.model;
+package wbs.platform.service.model;
 
 import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.codify;
@@ -25,10 +25,10 @@ import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelMetaBuilderHandler;
 import wbs.framework.entity.model.ModelMetaSpec;
 
-@PrototypeComponent ("commandTypeBuilder")
+@PrototypeComponent ("serviceTypeBuilder")
 @ModelMetaBuilderHandler
 public
-class CommandTypeBuilder {
+class ServiceTypeBuilder {
 
 	// dependencies
 
@@ -44,7 +44,7 @@ class CommandTypeBuilder {
 	ModelMetaSpec parent;
 
 	@BuilderSource
-	CommandTypeSpec spec;
+	ServiceTypeSpec spec;
 
 	@BuilderTarget
 	Model model;
@@ -58,13 +58,13 @@ class CommandTypeBuilder {
 
 		try {
 
-			createCommandType ();
+			createServiceType ();
 
 		} catch (Exception exception) {
 
 			throw new RuntimeException (
 				stringFormat (
-					"Error creating command type %s.%s",
+					"Error creating service type %s.%s",
 					camelToUnderscore (
 						ifNull (
 							spec.subject (),
@@ -78,7 +78,7 @@ class CommandTypeBuilder {
 	}
 
 	private
-	void createCommandType ()
+	void createServiceType ()
 		throws SQLException {
 
 		@Cleanup
@@ -89,19 +89,19 @@ class CommandTypeBuilder {
 			false);
 
 		@Cleanup
-		PreparedStatement nextCommandTypeIdStatement =
+		PreparedStatement nextServiceTypeIdStatement =
 			connection.prepareStatement (
 				stringFormat (
 					"SELECT ",
-						"nextval ('command_type_id_seq')"));
+						"nextval ('service_type_id_seq')"));
 
-		ResultSet commandTypeIdResultSet =
-			nextCommandTypeIdStatement.executeQuery ();
+		ResultSet serviceTypeIdResultSet =
+			nextServiceTypeIdStatement.executeQuery ();
 
-		commandTypeIdResultSet.next ();
+		serviceTypeIdResultSet.next ();
 
-		int commandTypeId =
-			commandTypeIdResultSet.getInt (
+		int serviceTypeId =
+			serviceTypeIdResultSet.getInt (
 				1);
 
 		String objectTypeCode =
@@ -144,40 +144,38 @@ class CommandTypeBuilder {
 				1);
 
 		@Cleanup
-		PreparedStatement insertCommandTypeStatement =
+		PreparedStatement insertServiceTypeStatement =
 			connection.prepareStatement (
 				stringFormat (
-					"INSERT INTO command_type (",
+					"INSERT INTO service_type (",
 						"id, ",
 						"parent_object_type_id, ",
 						"code, ",
-						"description, ",
-						"deleted) ",
+						"description) ",
 					"VALUES (",
 						"?, ",
 						"?, ",
 						"?, ",
-						"?, ",
-						"false)"));
+						"?)"));
 
-		insertCommandTypeStatement.setInt (
+		insertServiceTypeStatement.setInt (
 			1,
-			commandTypeId);
+			serviceTypeId);
 
-		insertCommandTypeStatement.setInt (
+		insertServiceTypeStatement.setInt (
 			2,
 			objectTypeId);
 
-		insertCommandTypeStatement.setString (
+		insertServiceTypeStatement.setString (
 			3,
 			codify (
 				spec.name ()));
 
-		insertCommandTypeStatement.setString (
+		insertServiceTypeStatement.setString (
 			4,
 			spec.description ());
 
-		insertCommandTypeStatement.executeUpdate ();
+		insertServiceTypeStatement.executeUpdate ();
 
 		connection.commit ();
 

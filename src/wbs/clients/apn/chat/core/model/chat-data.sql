@@ -4,11 +4,6 @@ SELECT batch_type_insert (
 	'Broadcast',
 	'chat');
 
-SELECT service_type_insert (
-	'chat',
-	'broadcast',
-	'Broadcast messages to large numbers of users');
-
 SELECT event_type_insert (
 	'chat_user_auto_strict',
 	'%0 was automatically moved from normal to strict credit mode due to a '
@@ -82,11 +77,6 @@ SELECT affiliate_type_insert (
 	'chat_scheme',
 	'default',
 	'Chat scheme');
-
-SELECT service_type_insert (
-	'chat',
-	'system',
-	'System message');
 
 SELECT number_lookup_type_insert (
 	'chat',

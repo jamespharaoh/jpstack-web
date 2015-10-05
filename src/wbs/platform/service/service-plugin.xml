@@ -2,15 +2,17 @@
 	name="service"
 	package="wbs.platform.service">
 
-	<sql-scripts>
-		<sql-schema name="service"/>
-		<sql-data name="service-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="service"/>
 		<model name="serviceType"/>
 	</models>
+
+	<layer name="entity">
+		<bean class="model.ServiceTypeBuilder"/>
+		<bean class="model.ServiceTypeSpec"/>
+		<bean class="model.ServiceTypesBuilder"/>
+		<bean class="model.ServiceTypesSpec"/>
+	</layer>
 
 	<console-modules>
 		<console-module name="service"/>

@@ -1,8 +1,3 @@
-SELECT service_type_insert (
-	'manual_responder',
-	'default',
-	'Manual responder');
-
 SELECT queue_type_insert (
 	'manual_responder',
 	'default',

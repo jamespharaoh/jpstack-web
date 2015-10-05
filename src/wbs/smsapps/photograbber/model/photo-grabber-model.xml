@@ -44,4 +44,12 @@
 
 	</command-types>
 
+	<service-types>
+
+		<service-type
+			name="Default"
+			description="Photo-grabber service"/>
+
+	</service-types>
+
 </model-meta>

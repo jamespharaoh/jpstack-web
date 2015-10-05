@@ -34,4 +34,12 @@
 
 	</command-types>
 
+	<service-types>
+
+		<service-type
+			name="Default"
+			description="Forwarder service"/>
+
+	</service-types>
+
 </model-meta>

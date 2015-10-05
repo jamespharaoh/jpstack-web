@@ -36,4 +36,12 @@
 
 	</command-types>
 
+	<service-types>
+
+		<service-type
+			name="Default"
+			description="Ticketer service"/>
+
+	</service-types>
+
 </model-meta>

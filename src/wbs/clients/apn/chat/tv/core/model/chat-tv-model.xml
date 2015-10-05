@@ -11,3 +11,8 @@ SELECT command_type_insert (
 	'chat',
 	'tv_to_screen',
 	'Send message to screen');
+
+SELECT service_type_insert (
+	'chat',
+	'tv_to_screen',
+	'Send message to screen');

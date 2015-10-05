@@ -2,10 +2,6 @@
 	name="chat-bill"
 	package="wbs.clients.apn.chat.bill">
 
-	<sql-scripts>
-		<sql-data name="chat-bill-data"/>
-	</sql-scripts>
-
 	<models>
 		<custom-type name="chatUserCreditMode"/>
 		<model name="chatDailyLimitLog"/>

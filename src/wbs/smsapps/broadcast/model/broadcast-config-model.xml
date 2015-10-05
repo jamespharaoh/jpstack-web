@@ -20,4 +20,12 @@
 
 	</priv-types>
 
+	<service-types>
+
+		<service-type
+			name="Default"
+			description="Broadcast config"/>
+
+	</service-types>
+
 </model-meta>

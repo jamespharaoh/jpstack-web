@@ -1,10 +1,3 @@
----------------------------------------- INSERT service_type
-
-SELECT service_type_insert (
-	'photo_grabber',
-	'default',
-	'Photo grabber');
-
 ---------------------------------------- INSERT message_set_type
 
 SELECT message_set_type_insert (

@@ -1,8 +1,3 @@
-SELECT service_type_insert (
-	'auto_responder',
-	'default',
-	'Auto responders messages');
-
 SELECT message_set_type_insert (
 	'auto_responder',
 	'default',

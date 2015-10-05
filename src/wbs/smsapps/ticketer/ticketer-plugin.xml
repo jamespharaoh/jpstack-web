@@ -2,10 +2,6 @@
 	name="ticketer"
 	package="wbs.smsapps.ticketer">
 
-	<sql-scripts>
-		<sql-data name="ticketer-data"/>
-	</sql-scripts>
-
 	<models>
 		<model name="ticketer"/>
 		<model name="ticketerTicket"/>
