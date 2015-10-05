@@ -841,7 +841,6 @@
       <script name="src/wbs/platform/group/model/group.sql"/>
       <script name="src/wbs/platform/lock/model/lock.sql"/>
       <script name="src/wbs/platform/media/model/content.sql"/>
-      <script name="src/wbs/platform/media/model/media.sql"/>
       <script name="src/wbs/platform/menu/model/menu.sql"/>
       <script name="src/wbs/platform/text/model/text.sql"/>
       <script name="src/wbs/platform/user/model/user.sql"/>
@@ -849,7 +848,6 @@
       <script name="src/wbs/platform/postgresql/model/postgresql-maintenance.sql"/>
       <script name="src/wbs/sms/network/model/network.sql"/>
       <script name="src/wbs/sms/number/core/model/number.sql"/>
-      <script name="src/wbs/sms/route/core/model/route.sql"/>
       <script name="src/wbs/sms/message/inbox/model/sms-inbox.sql"/>
       <script name="src/wbs/sms/keyword/model/keyword-set-fallback.sql"/>
       <script name="src/wbs/sms/magicnumber/model/magic-number.sql"/>
@@ -859,7 +857,6 @@
       <script name="src/wbs/sms/message/stats/model/message-stats.sql"/>
       <script name="src/wbs/sms/message/outbox/model/outbox.sql"/>
       <script name="src/wbs/sms/number/list/model/number-list.sql"/>
-      <script name="src/wbs/sms/route/router/model/router.sql"/>
       <script name="src/wbs/sms/route/tester/model/route-tester.sql"/>
       <script name="src/wbs/sms/tracker/model/sms-simple-tracker.sql"/>
       <script name="src/wbs/sms/tracker/model/sms-tracker.sql"/>
@@ -886,7 +883,6 @@
       <script name="src/wbs/platform/exception/model/exception-data.sql"/>
       <script name="src/wbs/platform/postgresql/model/postgresql-maintenance-data.sql"/>
       <script name="src/wbs/sms/message/batch/model/batch-data.sql"/>
-      <script name="src/wbs/sms/route/router/model/router-data.sql"/>
     </database-init>
   </target>
   <target name="just-schema-create">
