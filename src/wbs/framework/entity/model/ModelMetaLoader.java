@@ -1,6 +1,7 @@
 package wbs.framework.entity.model;
 
 import static wbs.framework.utils.etc.Misc.camelToHyphen;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.InputStream;
@@ -118,6 +119,8 @@ class ModelMetaLoader {
 		ImmutableMap.Builder<String,ModelMetaSpec> builder =
 			ImmutableMap.<String,ModelMetaSpec>builder ();
 
+		int errorCount = 0;
+
 		for (
 			Model model
 				: entityHelper.models ()
@@ -130,7 +133,8 @@ class ModelMetaLoader {
 						.getPackage ()
 						.getName ()
 						.replace ('.', '/'),
-					camelToHyphen (model.objectName ()));
+					camelToHyphen (
+						model.objectName ()));
 
 			InputStream inputStream =
 				getClass ().getClassLoader ().getResourceAsStream (
@@ -138,25 +142,74 @@ class ModelMetaLoader {
 
 			if (inputStream == null) {
 
-				log.warn (
+				log.error (
 					stringFormat (
 						"Model meta not found for %s: %s",
 						model.objectName (),
 						resourceName));
 
+				errorCount ++;
+
 				continue;
 
 			}
 
-			ModelMetaSpec spec =
-				(ModelMetaSpec)
-				dataFromXml.readInputStream (
-					inputStream,
-					resourceName);
+			ModelMetaSpec spec;
+
+			try {
+
+				spec =
+					(ModelMetaSpec)
+					dataFromXml.readInputStream (
+						inputStream,
+						resourceName);
+
+			} catch (Exception exception) {
+
+				log.error (
+					stringFormat (
+						"Error reading model meta for %s: %s",
+						model.objectName (),
+						resourceName),
+					exception);
+
+				errorCount ++;
+
+				continue;
+
+			}
+
+			if (
+				notEqual (
+					spec.name (),
+					model.objectName ())
+			) {
+
+				log.error (
+					stringFormat (
+						"Model meta name %s should be %s in %s",
+						spec.name (),
+						model.objectName (),
+						resourceName));
+
+				errorCount ++;
+
+				continue;
+
+			}
 
 			builder.put (
 				model.objectName (),
 				spec);
+
+		}
+
+		if (errorCount > 0) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Aborting due to %s errors",
+					errorCount));
 
 		}
 
