@@ -13,6 +13,7 @@
 		<bean class="meta.ModelFieldsSpec"/>
 		<bean class="meta.ModelMetaLoader"/>
 		<bean class="meta.ModelMetaSpec"/>
+		<bean class="meta.NameFieldSpec"/>
 		<bean class="meta.ParentFieldSpec"/>
 		<bean class="meta.ReferenceFieldSpec"/>
 		<bean class="meta.SlaveFieldSpec"/>
@@ -27,6 +28,7 @@
 		<bean class="generate.DeletedFieldWriter"/>
 		<bean class="generate.DescriptionFieldWriter"/>
 		<bean class="generate.GeneratedIdFieldWriter"/>
+		<bean class="generate.NameFieldWriter"/>
 		<bean class="generate.ParentFieldWriter"/>
 		<bean class="generate.SlaveFieldWriter"/>
 		<bean class="generate.StringFieldWriter"/>

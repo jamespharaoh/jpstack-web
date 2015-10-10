@@ -207,6 +207,7 @@ class ModelRecordGenerator {
 			wbs.framework.entity.annotations.GeneratedIdField.class,
 			wbs.framework.entity.annotations.LinkField.class,
 			wbs.framework.entity.annotations.MajorEntity.class,
+			wbs.framework.entity.annotations.NameField.class,
 			wbs.framework.entity.annotations.ParentField.class,
 			wbs.framework.entity.annotations.SimpleField.class,
 			wbs.framework.entity.annotations.SlaveField.class,

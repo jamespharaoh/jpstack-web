@@ -25,10 +25,10 @@ writeClasspath world = do
 			sattr "path" "work/generated"
 		] [
 			mkelem "attributes" [] [
-				mkelem "attribute" [] [
+				mkelem "attribute" [
 					sattr "name" "ignore_optional_problems",
 					sattr "value" "true"
-				]
+				] []
 			]
 		]
 

@@ -1,5 +1,35 @@
 <model-meta
-	name="group">
+	name="group"
+	type="major">
+
+	<fields>
+
+		<generated-id-field/>
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+	</fields>
+
+	<collections>
+
+		<associative-collection
+			type="user"
+			table="user_group"/>
+
+		<associative-collection
+			type="priv"
+			table="user_priv"/>
+
+	</collections>
 
 	<priv-types>
 

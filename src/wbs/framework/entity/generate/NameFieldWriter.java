@@ -12,13 +12,13 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.framework.entity.meta.CodeFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.NameFieldSpec;
 
-@PrototypeComponent ("codeFieldWriter")
+@PrototypeComponent ("nameFieldWriter")
 @ModelWriter
 public
-class CodeFieldWriter {
+class NameFieldWriter {
 
 	// builder
 
@@ -26,7 +26,7 @@ class CodeFieldWriter {
 	ModelMetaSpec parent;
 
 	@BuilderSource
-	CodeFieldSpec spec;
+	NameFieldSpec spec;
 
 	@BuilderTarget
 	Writer javaWriter;
@@ -42,10 +42,12 @@ class CodeFieldWriter {
 		javaWriter.write (
 			stringFormat (
 
-				"\t@CodeField\n",
+				"\t@NameField\n",
 
 				"\tString %s;\n",
-				ifNull (spec.name (), "code"),
+				ifNull (
+					spec.name (),
+					"name"),
 
 				"\n"));
 
