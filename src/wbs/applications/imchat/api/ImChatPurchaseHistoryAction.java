@@ -19,6 +19,7 @@ import wbs.applications.imchat.model.ImChatPurchaseObjectHelper;
 import wbs.applications.imchat.model.ImChatPurchaseRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
 import wbs.applications.imchat.model.ImChatSessionRec;
+import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
@@ -27,7 +28,6 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.console.misc.TimeFormatter;
 
 import com.google.common.collect.Lists;
 

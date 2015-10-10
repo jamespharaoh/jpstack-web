@@ -31,6 +31,7 @@ import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.application.context.NoSuchBeanException;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelMethods;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.EphemeralRecord;
@@ -116,6 +117,10 @@ class ObjectHelperBuilder {
 
 		}
 
+		if (rootObjectHelper == null) {
+			throw new RuntimeException ();
+		}
+
 		log.info (
 			stringFormat (
 				"Done"));
@@ -146,8 +151,15 @@ class ObjectHelperBuilder {
 			objectHelper.objectTypeCode (),
 			objectHelper);
 
-		if (objectHelper.root ())
+		if (objectHelper.isRoot ()) {
+
+			if (rootObjectHelper != null) {
+				throw new RuntimeException ();
+			}
+
 			rootObjectHelper = objectHelper;
+
+		}
 
 	}
 
@@ -256,6 +268,8 @@ class ObjectHelperBuilder {
 		@Getter @Setter
 		ObjectHelperProvider objectHelperProvider;
 
+		Model model;
+
 		String objectTypeCode;
 		Integer objectTypeId;
 
@@ -281,6 +295,9 @@ class ObjectHelperBuilder {
 		public
 		ObjectHelper<?> build () {
 
+			model =
+				objectHelperProvider.model ();
+
 			ObjectTypeEntry objectType =
 				objectTypeRegistry.findByCode (
 					objectHelperProvider.objectTypeCode ());
@@ -292,8 +309,8 @@ class ObjectHelperBuilder {
 				objectType.getId ();
 
 			if (
-				objectHelperProvider.parentTypeIsFixed ()
-				&& ! objectHelperProvider.root ()
+				model.parentTypeIsFixed ()
+				&& ! model.isRoot ()
 			) {
 
 				ObjectHelperProvider parentHelperProvider =
@@ -936,18 +953,25 @@ class ObjectHelperBuilder {
 			Integer getParentTypeId (
 					@NonNull Record object) {
 
-				if (! objectClass ().isInstance (object))
+				if (! objectClass ().isInstance (object)) {
+
 					throw new IllegalArgumentException ();
 
-				if (root ())
+				} else if (model.isRoot ()) {
+
 					throw new UnsupportedOperationException ();
 
-				if (parentTypeId != null)
+				} else if (parentTypeId != null) {
+
 					return parentTypeId;
 
-				return objectHelperProvider
-					.getParentType (object)
-					.getId ();
+				} else {
+
+					return objectHelperProvider
+						.getParentType (object)
+						.getId ();
+
+				}
 
 			}
 
@@ -956,16 +980,19 @@ class ObjectHelperBuilder {
 			Integer getParentId (
 					@NonNull Record object) {
 
-				if (! objectClass ().isInstance (object))
+				if (! objectClass ().isInstance (object)) {
+
 					throw new IllegalArgumentException ();
 
-				if (objectHelperProvider.root ())
+				} else if (model.isRoot ()) {
+
 					throw new UnsupportedOperationException ();
 
-				if (objectHelperProvider.rooted ())
+				} else if (model.isRooted ()) {
+
 					return 0;
 
-				if (objectHelperProvider.canGetParent ()) {
+				} else if (model.canGetParent ()) {
 
 					Record<?> parent =
 						objectHelperProvider.getParent (
@@ -979,41 +1006,6 @@ class ObjectHelperBuilder {
 						object);
 
 				}
-
-			}
-
-			@Override
-			public
-			boolean canGetParent () {
-
-				return objectHelperProvider
-					.canGetParent ();
-
-			}
-
-			@Override
-			public
-			boolean parentTypeIsFixed () {
-
-				return objectHelperProvider
-					.parentTypeIsFixed ();
-
-			}
-
-			@Override
-			public
-			boolean root () {
-
-				return objectHelperProvider
-					.root ();
-
-			}
-
-			@Override
-			public
-			boolean rooted () {
-
-				return objectHelperProvider.rooted ();
 
 			}
 
@@ -1083,12 +1075,17 @@ class ObjectHelperBuilder {
 			GlobalId getParentGlobalId (
 					@NonNull Record object) {
 
-				if (root ())
+				if (model.isRoot ()) {
+
 					return null;
 
-				return new GlobalId (
-					getParentTypeId (object),
-					getParentId (object));
+				} else {
+
+					return new GlobalId (
+						getParentTypeId (object),
+						getParentId (object));
+
+				}
 
 			}
 
@@ -1097,13 +1094,15 @@ class ObjectHelperBuilder {
 			Record getParent (
 					@NonNull Record object) {
 
-				if (objectHelperProvider.root ())
+				if (model.isRoot ()) {
+
 					return null;
 
-				if (objectHelperProvider.rooted ())
+				} else if (model.isRooted ()) {
+
 					return rootObjectHelper.find (0);
 
-				if (objectHelperProvider.canGetParent ()) {
+				} else if (model.canGetParent ()) {
 
 					Record parent =
 						objectHelperProvider.getParent (
@@ -1265,16 +1264,25 @@ class ObjectHelperBuilder {
 				GlobalId globalId =
 					getGlobalId (object);
 
-				for (ObjectHelperProvider childHelperProvider
-						: objectHelperProviderManager.list ()) {
+				for (
+					ObjectHelperProvider childHelperProvider
+						: objectHelperProviderManager.list ()
+				) {
 
-					if (childHelperProvider.root ())
-						continue;
+					Model childModel =
+						childHelperProvider.model ();
 
-					if (childHelperProvider.parentTypeIsFixed ()
-							&& childHelperProvider.parentClass ()
-								!= objectHelperProvider.objectClass ())
+					if (childModel.isRoot ()) {
 						continue;
+					}
+
+					if (
+						childModel.parentTypeIsFixed ()
+						&& childHelperProvider.parentClass ()
+							!= objectHelperProvider.objectClass ()
+					) {
+						continue;
+					}
 
 					children.addAll (
 						childHelperProvider.findAllByParent (
@@ -1298,28 +1306,37 @@ class ObjectHelperBuilder {
 				ObjectHelperProvider currentHelperProvider =
 					objectHelperProvider;
 
+				Model currentModel =
+					currentHelperProvider.model ();
+
 				for (;;) {
 
 					// root is never deleted
 
-					if (currentHelperProvider.root ())
+					if (currentModel.isRoot ()) {
 						return false;
+					}
 
 					// check our deleted flag
 
-					if (currentHelperProvider.getDeleted (
-							currentObject))
+					if (
+						currentHelperProvider.getDeleted (
+							currentObject)
+					) {
 						return true;
-
-					if (! checkParents)
-						return false;
+					}
 
 					// try parent
 
-					if (currentHelperProvider.rooted ())
+					if (! checkParents) {
 						return false;
+					}
 
-					if (currentHelperProvider.canGetParent ()) {
+					if (currentModel.isRooted ()) {
+						return false;
+					}
+
+					if (currentModel.canGetParent ()) {
 
 						currentObject =
 							currentHelperProvider.getParent (
@@ -1328,6 +1345,9 @@ class ObjectHelperBuilder {
 						currentHelperProvider =
 							objectHelperProviderManager.forObjectClassSearch (
 								currentObject.getClass ());
+
+						currentModel =
+							currentHelperProvider.model ();
 
 					} else {
 
@@ -1342,6 +1362,9 @@ class ObjectHelperBuilder {
 						currentHelperProvider =
 							objectHelperProviderManager.forObjectTypeId (
 								parentObjectType.getId ());
+
+						currentModel =
+							currentHelperProvider.model ();
 
 						currentObject =
 							currentHelperProvider.find (

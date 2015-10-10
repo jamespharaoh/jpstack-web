@@ -10,17 +10,17 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wbs.console.context.ConsoleContext;
+import wbs.console.context.ConsoleContextType;
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.module.ConsoleManager;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.context.ConsoleContext;
-import wbs.platform.console.context.ConsoleContextType;
-import wbs.platform.console.forms.FormFieldLogic;
-import wbs.platform.console.forms.FormFieldSet;
-import wbs.platform.console.helper.ConsoleHelper;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.module.ConsoleManager;
-import wbs.platform.console.part.AbstractPagePart;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchResultsPart")

@@ -155,27 +155,39 @@ final class Model
 
 	}
 
+	@Override
 	public
-	boolean isRoot () {
+	Boolean isRoot () {
+
 		return RootRecord.class.isAssignableFrom (
 			objectClass ());
+
 	}
 
+	@Override
 	public
-	boolean isRooted () {
+	Boolean isRooted () {
+
 		return ! isRoot ()
 			&& parentTypeField == null
 			&& parentField == null;
+
 	}
 
+	@Override
 	public
-	boolean canGetParent () {
+	Boolean canGetParent () {
+
 		return parentField != null;
+
 	}
 
+	@Override
 	public
-	boolean parentTypeIsFixed () {
+	Boolean parentTypeIsFixed () {
+
 		return parentTypeField == null;
+
 	}
 
 	public
@@ -248,28 +260,26 @@ final class Model
 					"Can't get parent class for %s",
 					objectName ()));
 
-		}
+		} else if (parentField != null) {
 
-		if (parentField != null)
 			return parentField.valueType ();
 
-		if (isRoot ()) {
+		} else if (isRoot ()) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Can't get parent class for %s",
 					objectName ()));
 
+		} else if (isRooted ()) {
+
+			throw new RuntimeException ("TODO");
+
+		} else {
+
+			throw new RuntimeException ();
+
 		}
-
-		throw new RuntimeException ("TODO");
-		//return RootRec.class;
-
-		/*
-		throw new UnsupportedOperationException (sf (
-			"Can't get parent class for %s",
-			objectName ()));
-		*/
 
 	}
 

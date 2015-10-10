@@ -3,13 +3,13 @@ package wbs.platform.object.criteria;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wbs.console.helper.ConsoleHelper;
+import wbs.console.module.ConsoleModuleData;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
-import wbs.platform.console.helper.ConsoleHelper;
-import wbs.platform.console.module.ConsoleModuleData;
 
 @Accessors (fluent = true)
 @DataClass ("where-null")

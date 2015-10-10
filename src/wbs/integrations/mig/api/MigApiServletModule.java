@@ -18,6 +18,8 @@ import org.joda.time.Instant;
 
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.RegexpPathHandler;
@@ -27,7 +29,6 @@ import wbs.framework.web.WebFile;
 import wbs.integrations.mig.logic.MigLogic;
 import wbs.integrations.mig.model.MigRouteInObjectHelper;
 import wbs.integrations.mig.model.MigRouteInRec;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
@@ -55,6 +56,8 @@ public
 class MigApiServletModule
 	implements ServletModule {
 
+	// dependencies
+
 	@Inject
 	ChatUserNumberReportObjectHelper chatUserNumberReportHelper;
 
@@ -62,7 +65,10 @@ class MigApiServletModule
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
+
+	@Inject
+	ExceptionLogic exceptionLogic;
 
 	@Inject
 	InboxLogic inboxLogic;
@@ -93,6 +99,8 @@ class MigApiServletModule
 
 	@Inject
 	TextObjectHelper textHelper;
+
+	// implementation
 
 	private
 	String getException (
@@ -243,7 +251,7 @@ class MigApiServletModule
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logSimple (
+				exceptionLogger.logSimple (
 					"webapi",
 					requestContext.requestUri (),
 					exceptionLogic.throwableSummary (
@@ -455,7 +463,7 @@ class MigApiServletModule
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logSimple (
+				exceptionLogger.logSimple (
 					"webapi",
 					requestContext.requestUri (),
 					exceptionLogic.throwableSummary (

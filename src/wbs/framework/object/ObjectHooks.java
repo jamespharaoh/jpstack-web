@@ -22,11 +22,11 @@ interface ObjectHooks<RecordType extends Record<RecordType>> {
 			RecordType object);
 
 	Object getDynamic (
-			Record<?> object,
+			RecordType object,
 			String name);
 
 	void setDynamic (
-			Record<?> object,
+			RecordType object,
 			String name,
 			Object value);
 

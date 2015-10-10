@@ -60,11 +60,6 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	boolean ephemeral ();
 	boolean common ();
 
-	boolean canGetParent ();
-	boolean parentTypeIsFixed ();
-	boolean root ();
-	boolean rooted ();
-
 	// data access
 
 	RecordType find (

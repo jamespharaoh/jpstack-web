@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.application.tools.ApplicationContextBuilder;
+import wbs.framework.application.tools.ThreadLocalProxyBeanFactory;
 import wbs.framework.web.RequestContextImpl;
-import wbs.platform.application.tools.ApplicationContextBuilder;
-import wbs.platform.application.tools.ThreadLocalProxyBeanFactory;
 
 @Log4j
 public

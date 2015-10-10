@@ -20,22 +20,22 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Interval;
 
+import wbs.console.context.ConsoleContext;
+import wbs.console.context.ConsoleContextType;
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.html.ObsoleteDateField;
+import wbs.console.html.ObsoleteDateLinks;
+import wbs.console.module.ConsoleManager;
+import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.context.ConsoleContext;
-import wbs.platform.console.context.ConsoleContextType;
-import wbs.platform.console.forms.FormFieldLogic;
-import wbs.platform.console.forms.FormFieldSet;
-import wbs.platform.console.helper.ConsoleHelper;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.html.ObsoleteDateField;
-import wbs.platform.console.html.ObsoleteDateLinks;
-import wbs.platform.console.module.ConsoleManager;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.object.criteria.CriteriaSpec;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.services.ticket.core.console.FieldsProvider;
 
 import com.google.common.base.Optional;

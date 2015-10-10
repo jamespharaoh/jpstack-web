@@ -67,16 +67,40 @@ class UserFixtureProvider
 			UserRec testUser =
 				userHelper.insert (
 					new UserRec ()
-						.setUsername ("test" + index)
-						.setPassword ("qUqP5cyxm6YcTAhz05Hph5gvu9M=")
-						.setActive (true)
-						.setSlice (testSlice));
+
+				.setUsername (
+					"test" + index)
+
+				.setPassword (
+					"qUqP5cyxm6YcTAhz05Hph5gvu9M=")
+
+				.setFullname (
+					"Test " + index)
+
+				.setDetails (
+					"Test user " + index)
+
+				.setActive (
+					true)
+
+				.setSlice (
+					testSlice)
+
+			);
 
 			userPrivHelper.insert (
 				new UserPrivRec ()
-					.setUser (testUser)
-					.setPriv (rootManagePriv)
-					.setCan (true));
+
+				.setUser (
+					testUser)
+
+				.setPriv (
+					rootManagePriv)
+
+				.setCan (
+					true)
+
+			);
 
 		}
 

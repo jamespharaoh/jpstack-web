@@ -9,14 +9,14 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import wbs.console.action.ConsoleAction;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.etc.Html;
 import wbs.framework.web.Responder;
-import wbs.platform.console.action.ConsoleAction;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;

@@ -42,19 +42,19 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageObjectHelper;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
+import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
-import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.event.logic.EventLogic;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeObjectHelper;
@@ -103,7 +103,7 @@ class ChatUserLogicImpl
 	EventLogic eventLogic;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
 
 	@Inject
 	GazetteerEntryObjectHelper gazetteerEntryHelper;
@@ -1144,7 +1144,7 @@ class ChatUserLogicImpl
 
 				} catch (Exception exception) {
 
-					exceptionLogic.logThrowable (
+					exceptionLogger.logThrowable (
 						"logic",
 						"ChatUserLogic.setPlace",
 						exception,

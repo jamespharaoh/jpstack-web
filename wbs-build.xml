@@ -22,6 +22,10 @@
 			package="wbs.framework.entity"/>
 
 		<plugin
+			name="framework-exception"
+			package="wbs.framework.exception"/>
+
+		<plugin
 			name="hibernate"
 			package="wbs.framework.hibernate"/>
 
@@ -49,6 +53,82 @@
 			name="application-config"
 			package="wbs.framework.application.config"/>
 
+		<!-- api -->
+
+		<plugin
+			name="api-module"
+			package="wbs.api.module"/>
+
+		<plugin
+			name="api-mvc"
+			package="wbs.api.mvc"/>
+
+		<plugin
+			name="api-resource"
+			package="wbs.api.resource"/>
+
+		<!-- console -->
+
+		<plugin
+			name="console-combo"
+			package="wbs.console.combo"/>
+
+		<plugin
+			name="console-context"
+			package="wbs.console.context"/>
+
+		<plugin
+			name="console-forms"
+			package="wbs.console.forms"/>
+
+		<plugin
+			name="console-helper"
+			package="wbs.console.helper"/>
+
+		<plugin
+			name="console-html"
+			package="wbs.console.html"/>
+
+		<plugin
+			name="console-misc"
+			package="wbs.console.misc"/>
+
+		<plugin
+			name="console-module"
+			package="wbs.console.module"/>
+
+		<plugin
+			name="console-object"
+			package="wbs.console.object"/>
+
+		<plugin
+			name="console-part"
+			package="wbs.console.part"/>
+
+		<plugin
+			name="console-request"
+			package="wbs.console.request"/>
+
+		<plugin
+			name="console-responder"
+			package="wbs.console.responder"/>
+
+		<plugin
+			name="console-supervisor"
+			package="wbs.console.supervisor"/>
+
+		<plugin
+			name="console-tab"
+			package="wbs.console.tab"/>
+
+		<plugin
+			name="console-priv"
+			package="wbs.console.priv"/>
+
+		<plugin
+			name="console-reporting"
+			package="wbs.console.reporting"/>
+
 		<!-- platform -->
 
 		<plugin
@@ -64,52 +144,12 @@
 			package="wbs.platform.affiliate"/>
 
 		<plugin
-			name="console-helper"
-			package="wbs.platform.console.helper"/>
-
-		<plugin
-			name="console-forms"
-			package="wbs.platform.console.forms"/>
-
-		<plugin
 			name="status"
 			package="wbs.platform.status"/>
 
 		<plugin
-			name="console-request"
-			package="wbs.platform.console.request"/>
-
-		<plugin
 			name="core"
 			package="wbs.platform.core"/>
-
-		<plugin
-			name="console-responder"
-			package="wbs.platform.console.responder"/>
-
-		<plugin
-			name="console-part"
-			package="wbs.platform.console.part"/>
-
-		<plugin
-			name="console-misc"
-			package="wbs.platform.console.misc"/>
-
-		<plugin
-			name="console-tab"
-			package="wbs.platform.console.tab"/>
-
-		<plugin
-			name="console-context"
-			package="wbs.platform.console.context"/>
-
-		<plugin
-			name="console-combo"
-			package="wbs.platform.console.combo"/>
-
-		<plugin
-			name="console-object"
-			package="wbs.platform.console.object"/>
 
 		<plugin
 			name="hooks"
@@ -126,10 +166,6 @@
 		<plugin
 			name="object-summary"
 			package="wbs.platform.object.summary"/>
-
-		<plugin
-			name="console-html"
-			package="wbs.platform.console.html"/>
 
 		<plugin
 			name="event"
@@ -183,10 +219,6 @@
 			name="priv"
 			package="wbs.platform.priv"/>
 
-i		<plugin
-			name="supervisor"
-			package="wbs.platform.supervisor"/>
-
 		<plugin
 			name="queue"
 			package="wbs.platform.queue"/>
@@ -208,10 +240,6 @@ i		<plugin
 			package="wbs.platform.user"/>
 
 		<plugin
-			name="console-module"
-			package="wbs.platform.console.module"/>
-
-		<plugin
 			name="update-log"
 			package="wbs.platform.updatelog"/>
 
@@ -226,22 +254,6 @@ i		<plugin
 		<plugin
 			name="rpc"
 			package="wbs.platform.rpc"/>
-
-		<plugin
-			name="api-module"
-			package="wbs.platform.api.module"/>
-
-		<plugin
-			name="api-mvc"
-			package="wbs.platform.api.mvc"/>
-
-		<plugin
-			name="api-resource"
-			package="wbs.platform.api.resource"/>
-
-		<plugin
-			name="reporting"
-			package="wbs.platform.reporting"/>
 
 		<plugin
 			name="platform-common"

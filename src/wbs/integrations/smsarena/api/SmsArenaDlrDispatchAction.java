@@ -15,6 +15,7 @@ import org.joda.time.DateTime;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.web.Action;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
@@ -25,7 +26,6 @@ import wbs.integrations.smsarena.model.SmsArenaReportCodeObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaReportCodeRec;
 import wbs.integrations.smsarena.model.SmsArenaRouteInObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaRouteInRec;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
 import wbs.sms.message.report.logic.ReportLogic;
@@ -43,7 +43,7 @@ class SmsArenaDlrDispatchAction
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogic exceptionLogic;
 
 	@Inject
 	ReportLogic reportLogic;

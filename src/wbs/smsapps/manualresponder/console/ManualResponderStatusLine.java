@@ -16,11 +16,11 @@ import lombok.experimental.Accessors;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
+import wbs.console.part.PagePart;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.platform.console.part.PagePart;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.misc.CachedGetter;
 import wbs.platform.status.console.StatusLine;
 import wbs.platform.user.model.UserObjectHelper;

@@ -17,11 +17,11 @@ import org.apache.commons.io.IOUtils;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutRec;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
 import wbs.sms.message.outbox.model.OutboxRec;
@@ -39,7 +39,7 @@ class BroadcastSystemsSender1
 	BroadcastSystemsRouteOutObjectHelper broadcastSystemsRouteOutHelper;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
 
 	@Inject
 	ObjectManager objectManager;
@@ -236,7 +236,7 @@ class BroadcastSystemsSender1
 						"Success response did not match: [%s]",
 						responseString));
 
-				exceptionLogic.logSimple (
+				exceptionLogger.logSimple (
 					"unknown",
 					stringFormat (
 						"message %s",
@@ -264,7 +264,7 @@ class BroadcastSystemsSender1
 						"Failure response did not match: [%s]",
 						responseString));
 
-				exceptionLogic.logSimple (
+				exceptionLogger.logSimple (
 					"unknown",
 					stringFormat (
 						"message %s",

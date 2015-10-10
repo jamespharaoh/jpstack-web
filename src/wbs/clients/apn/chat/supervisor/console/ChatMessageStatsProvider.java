@@ -13,12 +13,12 @@ import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageSearch;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
+import wbs.console.reporting.StatsDataSet;
+import wbs.console.reporting.StatsDatum;
+import wbs.console.reporting.StatsGranularity;
+import wbs.console.reporting.StatsPeriod;
+import wbs.console.reporting.StatsProvider;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.reporting.console.StatsDataSet;
-import wbs.platform.reporting.console.StatsDatum;
-import wbs.platform.reporting.console.StatsGranularity;
-import wbs.platform.reporting.console.StatsPeriod;
-import wbs.platform.reporting.console.StatsProvider;
 
 @SingletonComponent ("chatMessageStatsProvider")
 public

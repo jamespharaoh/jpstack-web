@@ -3,8 +3,8 @@ package wbs.test.simulator.console;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import wbs.console.part.PagePart;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.console.part.PagePart;
 import wbs.sms.route.core.console.RouteSummaryAdditionalPartFactory;
 
 @SingletonComponent ("simulatorRouteSummaryAdditionalPartFactory")

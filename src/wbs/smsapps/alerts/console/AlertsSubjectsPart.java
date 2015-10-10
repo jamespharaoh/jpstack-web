@@ -6,11 +6,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
 import wbs.smsapps.alerts.model.AlertsSubjectRec;
 

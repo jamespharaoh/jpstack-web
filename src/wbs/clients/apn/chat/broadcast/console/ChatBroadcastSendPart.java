@@ -9,9 +9,9 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import wbs.clients.apn.chat.core.console.ChatConsoleLogic;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.part.AbstractPagePart;
 
 @PrototypeComponent ("chatBroadcastSendPart")
 public

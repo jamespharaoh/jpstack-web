@@ -1,0 +1,42 @@
+<plugin
+	name="console-combo"
+	package="wbs.console.combo">
+
+	<layer name="console">
+		<bean class="ContextActionPageBuilder"/>
+		<bean class="ContextActionPageSpec"/>
+		<bean class="ContextActionBuilder"/>
+		<bean class="ContextActionSpec"/>
+		<bean class="ContextFileBuilder"/>
+		<bean class="ContextFileSpec"/>
+		<bean class="ContextFormActionAction"/>
+		<bean class="ContextFormActionPart"/>
+		<bean class="ContextGetActionBuilder"/>
+		<bean class="ContextGetActionSpec"/>
+		<bean class="ContextRequestHandlerBuilder"/>
+		<bean class="ContextRequestHandlerSpec"/>
+		<bean class="ContextResponderPageBuilder"/>
+		<bean class="ContextResponderPageSpec"/>
+		<bean class="ContextTabResponderBuilder"/>
+		<bean class="ContextTabResponderPageBuilder"/>
+		<bean class="ContextTabResponderPageSpec"/>
+		<bean class="ContextTabResponderSpec"/>
+		<bean class="ContextTabActionPageBuilder"/>
+		<bean class="ContextTabActionPageSpec"/>
+		<bean class="ContextTabFormActionPageBuilder"/>
+		<bean class="ContextTabFormActionPageSpec"/>
+		<bean class="ContextTabPageBuilder"/>
+		<bean class="ContextTabPageSpec"/>
+		<bean class="SimpleActionPageBuilder"/>
+		<bean class="SimpleActionPageSpec"/>
+		<bean class="SimpleFileBuilder"/>
+		<bean class="SimpleFileSpec"/>
+		<bean class="SimplePathBuilder"/>
+		<bean class="SimplePathSpec"/>
+		<bean class="SimpleResponderBuilder"/>
+		<bean class="SimpleResponderSpec"/>
+		<bean class="SimpleResponderFileBuilder"/>
+		<bean class="SimpleResponderFileSpec"/>
+	</layer>
+
+</plugin>

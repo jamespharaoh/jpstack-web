@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.tv.core.console;
 
+import wbs.console.action.ConsoleAction;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.action.ConsoleAction;
 
 @PrototypeComponent ("chatTvPostAction")
 public

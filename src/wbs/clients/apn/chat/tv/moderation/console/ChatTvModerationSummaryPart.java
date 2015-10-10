@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.tv.moderation.console;
 
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.console.part.AbstractPagePart;
 
 @SingletonComponent ("chatTvModerationSummaryPart")
 public

@@ -13,12 +13,12 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.clients.apn.chat.user.info.model.ChatUserNameObjectHelper;
 import wbs.clients.apn.chat.user.info.model.ChatUserNameRec;
+import wbs.console.action.ConsoleAction;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
-import wbs.platform.console.action.ConsoleAction;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 

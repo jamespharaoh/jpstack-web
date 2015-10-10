@@ -16,7 +16,8 @@
 
 	<layer name="console">
 		<bean class="console.TextConsoleConfig"/>
-		<bean class="console.TextPart"/>
+		<bean class="console.TextFormFieldNativeMapping"/>
+		<bean class="console.TextFormFieldPluginProvider"/>
 	</layer>
 
 	<console-modules>

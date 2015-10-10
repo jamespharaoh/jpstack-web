@@ -10,8 +10,8 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.YearMonth;
 
-import wbs.platform.console.html.ObsoleteDateLinks;
-import wbs.platform.console.part.AbstractPagePart;
+import wbs.console.html.ObsoleteDateLinks;
+import wbs.console.part.AbstractPagePart;
 
 @Accessors (fluent = true)
 public abstract

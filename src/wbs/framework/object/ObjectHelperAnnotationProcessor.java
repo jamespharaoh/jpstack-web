@@ -3,6 +3,7 @@ package wbs.framework.object;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.split;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringFormatArray;
@@ -59,12 +60,16 @@ class ObjectHelperAnnotationProcessor
 
 		try {
 
-			for (Class<? extends Annotation> annotationClass
-					: annotationClasses) {
+			for (
+				Class<? extends Annotation> annotationClass
+					: annotationClasses
+			) {
 
-				for (Element element
+				for (
+					Element element
 						: roundEnvironment.getElementsAnnotatedWith (
-							annotationClass)) {
+							annotationClass)
+				) {
 
 					TypeElement typeElement =
 						(TypeElement)
@@ -78,7 +83,9 @@ class ObjectHelperAnnotationProcessor
 			}
 
 		} catch (Exception exception) {
+
 			throw new RuntimeException (exception);
+
 		}
 
 		return true;
@@ -125,10 +132,15 @@ class ObjectHelperAnnotationProcessor
 			(PackageElement)
 			typeElement.getEnclosingElement ();
 
-		if (! equal (
+		if (
+			notEqual (
 				modelPackageElement.getSimpleName ().toString (),
-				"model"))
+				"model")
+		) {
+
 			throw new RuntimeException ();
+
+		}
 
 		String modelPackageName =
 			modelPackageElement.getQualifiedName ().toString ();
@@ -349,7 +361,7 @@ class ObjectHelperAnnotationProcessor
 		consoleHelperWriter
 
 			.addImport (
-				"wbs.platform.console.helper.ConsoleHelper")
+				"wbs.console.helper.ConsoleHelper")
 
 			.addInterface (
 				"ConsoleHelper<%s>",

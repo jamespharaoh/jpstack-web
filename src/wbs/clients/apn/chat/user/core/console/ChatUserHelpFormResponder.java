@@ -5,9 +5,9 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.HtmlResponder;
 
 @PrototypeComponent ("chatUserHelpFormResponder")
 public

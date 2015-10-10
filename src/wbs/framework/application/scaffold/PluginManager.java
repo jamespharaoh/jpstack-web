@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 
 import lombok.Getter;
@@ -15,6 +16,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @Accessors (fluent = true)
@@ -25,6 +27,9 @@ class PluginManager {
 
 	@Getter @Setter
 	List<PluginSpec> plugins;
+
+	@Getter @Setter
+	Map<String,PluginModelSpec> pluginModelsByName;
 
 	// implementation
 
@@ -48,6 +53,9 @@ class PluginManager {
 
 			ImmutableList.Builder<PluginSpec> pluginsBuilder =
 				ImmutableList.<PluginSpec>builder ();
+
+			ImmutableMap.Builder<String,PluginModelSpec> pluginModelsByNameBuilder =
+				ImmutableMap.<String,PluginModelSpec>builder ();
 
 			donePluginNames =
 				new HashSet<String> ();
@@ -80,6 +88,18 @@ class PluginManager {
 					pluginsBuilder.add (
 						plugin);
 
+
+					for (
+						PluginModelSpec pluginModel
+							: plugin.models ().models ()
+					) {
+
+						pluginModelsByNameBuilder.put (
+							pluginModel.name (),
+							pluginModel);
+
+					}
+
 					donePluginNames.add (
 						plugin.name ());
 
@@ -100,8 +120,10 @@ class PluginManager {
 
 			if (! remainingPlugins.isEmpty ()) {
 
-				for (PluginSpec plugin
-						: remainingPlugins) {
+				for (
+					PluginSpec plugin
+						: remainingPlugins
+				) {
 
 					log.error (
 						stringFormat (
@@ -120,7 +142,10 @@ class PluginManager {
 			return new PluginManager ()
 
 				.plugins (
-					pluginsBuilder.build ());
+					pluginsBuilder.build ())
+
+				.pluginModelsByName (
+					pluginModelsByNameBuilder.build ());
 
 		}
 

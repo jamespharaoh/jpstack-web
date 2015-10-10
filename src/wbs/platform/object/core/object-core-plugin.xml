@@ -14,10 +14,6 @@
 		<model name="objectType"/>
 	</models>
 
-	<layer name="hibernate">
-		<bean class="hibernate.HibernateHelperProviderBuilder"/>
-	</layer>
-
 	<fixtures>
 		<fixture name="objectType"/>
 	</fixtures>

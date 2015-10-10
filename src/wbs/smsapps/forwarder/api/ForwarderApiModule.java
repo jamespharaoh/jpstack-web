@@ -23,14 +23,14 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+import wbs.api.mvc.ApiFile;
+import wbs.api.mvc.WebApiAction;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
-import wbs.platform.api.mvc.ApiFile;
-import wbs.platform.api.mvc.WebApiAction;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.rpc.core.Rpc;

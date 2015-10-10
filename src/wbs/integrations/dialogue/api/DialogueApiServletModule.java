@@ -23,6 +23,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.joda.time.Instant;
 
+import wbs.api.mvc.ApiFile;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -35,7 +36,6 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
-import wbs.platform.api.mvc.ApiFile;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.gsm.ConcatenatedInformationElement;

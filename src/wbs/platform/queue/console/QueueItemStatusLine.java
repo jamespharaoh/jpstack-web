@@ -5,9 +5,9 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import wbs.console.part.PagePart;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.console.part.PagePart;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.status.console.StatusLine;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;

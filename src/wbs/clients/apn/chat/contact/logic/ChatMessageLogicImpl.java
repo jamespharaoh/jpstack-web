@@ -60,10 +60,11 @@ import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.object.ObjectManager;
 import wbs.integrations.jigsaw.api.JigsawApi;
 import wbs.integrations.urbanairship.logic.UrbanAirshipApi;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -129,7 +130,10 @@ class ChatMessageLogicImpl
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
+
+	@Inject
+	ExceptionLogic exceptionLogic;
 
 	@Inject
 	ObjectManager objectManager;
@@ -973,7 +977,7 @@ class ChatMessageLogicImpl
 
 		} catch (Exception exception) {
 
-			exceptionLogic.logSimple (
+			exceptionLogger.logSimple (
 				"unknown",
 				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
 
@@ -1020,7 +1024,7 @@ class ChatMessageLogicImpl
 
 		} catch (Exception exception) {
 
-			exceptionLogic.logSimple (
+			exceptionLogger.logSimple (
 				"unknown",
 				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
 
@@ -1056,7 +1060,7 @@ class ChatMessageLogicImpl
 
 		} catch (Exception exception) {
 
-			exceptionLogic.logSimple (
+			exceptionLogger.logSimple (
 				"unknown",
 				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
 
@@ -1227,7 +1231,7 @@ class ChatMessageLogicImpl
 					"MessageSplitter.split threw exception: %s",
 					exception));
 
-			exceptionLogic.logSimple (
+			exceptionLogger.logSimple (
 				"unknown",
 				"ChatReceivedHandler.sendUserMessage (...)",
 				"MessageSplitter.split (...) threw IllegalArgumentException",

@@ -1,0 +1,17 @@
+<plugin
+	name="console-module"
+	package="wbs.console.module">
+
+	<layer name="console">
+		<bean class="ConsoleManagerImplementation"/>
+		<bean class="ConsoleMetaManagerImpl"/>
+		<bean class="ConsoleMetaModuleBuilder"/>
+		<bean class="ConsoleMetaModuleImpl"/>
+		<bean class="ConsoleModuleBuilder"/>
+		<bean class="ConsoleModuleImpl"/>
+		<bean class="ConsoleModuleSpec"/>
+		<bean class="ConsoleModuleSpecReader"/>
+		<bean class="ResolvedConsoleContextLink"/>
+	</layer>
+
+</plugin>

@@ -9,13 +9,13 @@ import lombok.Cleanup;
 
 import org.joda.time.Instant;
 
+import wbs.console.action.ConsoleAction;
+import wbs.console.misc.TimeFormatter;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
-import wbs.platform.console.action.ConsoleAction;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;

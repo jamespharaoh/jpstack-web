@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.equal;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+import wbs.api.mvc.ApiAction;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
@@ -16,7 +17,6 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.api.mvc.ApiAction;
 
 @PrototypeComponent ("chatInfoSiteRespondAction")
 public

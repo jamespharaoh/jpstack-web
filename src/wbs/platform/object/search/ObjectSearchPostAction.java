@@ -13,21 +13,21 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+import wbs.console.action.ConsoleAction;
+import wbs.console.context.ConsoleContext;
+import wbs.console.context.ConsoleContextType;
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.helper.ConsoleHelper;
+import wbs.console.module.ConsoleManager;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.RedirectResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
-import wbs.platform.console.action.ConsoleAction;
-import wbs.platform.console.context.ConsoleContext;
-import wbs.platform.console.context.ConsoleContextType;
-import wbs.platform.console.forms.FormFieldLogic;
-import wbs.platform.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.platform.console.forms.FormFieldSet;
-import wbs.platform.console.helper.ConsoleHelper;
-import wbs.platform.console.module.ConsoleManager;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.RedirectResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchAction")

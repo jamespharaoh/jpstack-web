@@ -12,14 +12,14 @@ import org.joda.time.Instant;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.misc.TimeFormatter;
+import wbs.console.module.ConsoleManager;
+import wbs.console.module.ConsoleModule;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.UrlParams;
-import wbs.platform.console.forms.FormFieldLogic;
-import wbs.platform.console.forms.FormFieldSet;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.module.ConsoleManager;
-import wbs.platform.console.module.ConsoleModule;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.smsapps.manualresponder.model.ManualResponderReportObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReportRec;
 

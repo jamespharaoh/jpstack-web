@@ -10,12 +10,12 @@ import javax.inject.Inject;
 
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.ScriptRef;
+import wbs.console.priv.PrivChecker;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.context.ConsoleApplicationScriptRef;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.HtmlResponder;
-import wbs.platform.priv.console.PrivChecker;
 
 import com.google.common.collect.ImmutableSet;
 

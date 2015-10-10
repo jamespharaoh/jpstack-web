@@ -224,7 +224,7 @@ class ObjectManagerImpl
 		ObjectHelper<?> objectHelper =
 			objectHelperForObject (object);
 
-		if (objectHelper.root ())
+		if (objectHelper.isRoot ())
 			return "root";
 
 		List<String> partsToReturn =
@@ -315,7 +315,7 @@ class ObjectManagerImpl
 				parentHelper;
 
 		} while (
-			! objectHelper.root ()
+			! objectHelper.isRoot ()
 			&& object != assumedRoot
 		);
 
@@ -620,7 +620,7 @@ class ObjectManagerImpl
 
 			}
 
-			if (currentHelper.root ())
+			if (currentHelper.isRoot ())
 				return null;
 
 			current =

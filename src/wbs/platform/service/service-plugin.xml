@@ -7,11 +7,14 @@
 		<model name="serviceType"/>
 	</models>
 
-	<layer name="entity">
-		<bean class="model.ServiceTypeBuilder"/>
-		<bean class="model.ServiceTypeSpec"/>
-		<bean class="model.ServiceTypesBuilder"/>
-		<bean class="model.ServiceTypesSpec"/>
+	<layer name="fixture">
+		<bean class="fixture.ServiceTypeBuilder"/>
+		<bean class="fixture.ServiceTypesBuilder"/>
+	</layer>
+
+	<layer name="model-meta">
+		<bean class="metamodel.ServiceTypeSpec"/>
+		<bean class="metamodel.ServiceTypesSpec"/>
 	</layer>
 
 	<console-modules>

@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.user.image.console;
 
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.part.AbstractPagePart;
 
 @PrototypeComponent ("chatUserImageRevertPart")
 public

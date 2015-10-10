@@ -4,9 +4,9 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.smsapps.alerts.model.AlertsNumberRec;
 import wbs.smsapps.alerts.model.AlertsSettingsObjectHelper;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;

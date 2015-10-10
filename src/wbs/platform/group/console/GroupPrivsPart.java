@@ -11,15 +11,15 @@ import java.util.TreeMap;
 
 import javax.inject.Inject;
 
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.ScriptRef;
+import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
-import wbs.platform.console.context.ConsoleApplicationScriptRef;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.group.model.GroupRec;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.priv.console.PrivConsoleHelper;
 import wbs.platform.priv.model.PrivRec;
 import wbs.platform.scaffold.model.RootRec;

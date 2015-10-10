@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.core.console;
 
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
+import wbs.console.helper.EnumConsoleHelper;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.console.helper.EnumConsoleHelper;
 
 @SingletonComponent ("chatUserCreditModeConsoleHelper")
 public

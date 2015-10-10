@@ -8,11 +8,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.helper.ConsoleHelper;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.forms.FormFieldLogic;
-import wbs.platform.console.forms.FormFieldSet;
-import wbs.platform.console.helper.ConsoleHelper;
-import wbs.platform.console.part.AbstractPagePart;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchPart")

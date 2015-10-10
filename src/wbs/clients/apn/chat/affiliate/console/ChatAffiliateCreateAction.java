@@ -22,17 +22,17 @@ import wbs.clients.apn.chat.scheme.model.ChatSchemeKeywordRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.clients.apn.chat.user.core.model.Orient;
+import wbs.console.action.ConsoleAction;
+import wbs.console.context.ConsoleContext;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.module.ConsoleManager;
+import wbs.console.priv.PrivChecker;
+import wbs.console.priv.PrivDataLoader;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
-import wbs.platform.console.action.ConsoleAction;
-import wbs.platform.console.context.ConsoleContext;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.module.ConsoleManager;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.priv.console.PrivChecker;
-import wbs.platform.priv.console.PrivDataLoader;
 import wbs.sms.keyword.logic.KeywordLogic;
 
 @Accessors (fluent = true)

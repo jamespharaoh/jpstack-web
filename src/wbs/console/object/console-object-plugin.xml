@@ -1,0 +1,15 @@
+<plugin
+	name="console-object"
+	package="wbs.console.object">
+
+	<layer name="console">
+		<bean class="ExtendContextBuilder"/>
+		<bean class="ExtendContextMetaBuilder"/>
+		<bean class="ExtendContextSpec"/>
+		<bean class="ObjectContext"/>
+		<bean class="ObjectContextBuilder"/>
+		<bean class="ObjectContextMetaBuilder"/>
+		<bean class="ObjectContextSpec"/>
+	</layer>
+
+</plugin>

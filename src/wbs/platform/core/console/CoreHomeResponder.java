@@ -1,7 +1,7 @@
 package wbs.platform.core.console;
 
+import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.responder.HtmlResponder;
 
 @PrototypeComponent ("coreHomeResponder")
 public

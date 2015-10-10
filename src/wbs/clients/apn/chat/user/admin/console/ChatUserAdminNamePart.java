@@ -10,10 +10,10 @@ import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.info.model.ChatUserNameRec;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.misc.TimeFormatter;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.part.AbstractPagePart;
 
 @PrototypeComponent ("chatUserAdminNamePart")
 public

@@ -9,16 +9,16 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.html.ScriptRef;
+import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
-import wbs.platform.console.forms.FormFieldLogic;
-import wbs.platform.console.forms.FormFieldSet;
-import wbs.platform.console.helper.ConsoleHelper;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.part.AbstractPagePart;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.services.ticket.core.console.FieldsProvider;
 
@@ -123,7 +123,7 @@ class ObjectCreatePart
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
 
-		if (parentHelper.root ()) {
+		if (parentHelper.isRoot ()) {
 
 			parent =
 				rootHelper.find (0);

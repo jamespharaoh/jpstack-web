@@ -13,9 +13,9 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
+import wbs.console.misc.IntervalFormatter;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.misc.IntervalFormatter;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.sms.message.core.model.MessageDirection;

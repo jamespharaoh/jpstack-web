@@ -51,13 +51,6 @@ interface ObjectHelperProvider {
 	String descriptionLabel ();
 	Boolean descriptionExists ();
 
-	boolean root ();
-	boolean rooted ();
-	boolean canGetParent ();
-	boolean parentTypeIsFixed ();
-
-	ObjectHelperProvider parentObjectHelperProvider ();
-
 	// database
 
 	Record<?> find (

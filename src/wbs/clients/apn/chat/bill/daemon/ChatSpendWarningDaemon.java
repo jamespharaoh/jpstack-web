@@ -18,9 +18,9 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 
 import com.google.common.base.Optional;
 
@@ -42,11 +42,10 @@ class ChatSpendWarningDaemon
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
 
 	@Inject
 	ObjectManager objectManager;
-
 
 	// details
 
@@ -105,7 +104,7 @@ class ChatSpendWarningDaemon
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logThrowable (
+				exceptionLogger.logThrowable (
 					"daemon",
 					"ChatSpendWarningDaemon",
 					exception,

@@ -12,13 +12,13 @@ import lombok.Cleanup;
 
 import org.json.simple.JSONValue;
 
+import wbs.console.action.ConsoleAction;
+import wbs.console.misc.TimeFormatter;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
-import wbs.platform.console.action.ConsoleAction;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.text.web.TextResponder;
 import wbs.test.simulator.model.SimulatorEventObjectHelper;
 import wbs.test.simulator.model.SimulatorEventRec;

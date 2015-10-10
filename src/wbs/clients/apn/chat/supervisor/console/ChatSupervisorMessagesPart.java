@@ -18,10 +18,10 @@ import wbs.clients.apn.chat.core.console.ChatConsoleLogic;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
+import wbs.console.misc.TimeFormatter;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 

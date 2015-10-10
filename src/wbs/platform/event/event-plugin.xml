@@ -8,11 +8,14 @@
 		<model name="eventType"/>
 	</models>
 
-	<layer name="entity">
-		<bean class="model.EventTypeBuilder"/>
-		<bean class="model.EventTypeSpec"/>
-		<bean class="model.EventTypesBuilder"/>
-		<bean class="model.EventTypesSpec"/>
+	<layer name="fixture">
+		<bean class="fixture.EventTypeBuilder"/>
+		<bean class="fixture.EventTypesBuilder"/>
+	</layer>
+
+	<layer name="model-meta">
+		<bean class="metamodel.EventTypeSpec"/>
+		<bean class="metamodel.EventTypesSpec"/>
 	</layer>
 
 	<layer name="logic">
@@ -21,9 +24,11 @@
 
 	<layer name="console">
 		<bean class="console.EventConsoleLogic"/>
+		<bean class="console.NameFormFieldUpdateHook"/>
 		<bean class="console.ObjectEventsPageBuilder"/>
 		<bean class="console.ObjectEventsPageSpec"/>
 		<bean class="console.ObjectEventsPart"/>
+		<bean class="console.SimpleFormFieldUpdateHook"/>
 	</layer>
 
 </plugin>

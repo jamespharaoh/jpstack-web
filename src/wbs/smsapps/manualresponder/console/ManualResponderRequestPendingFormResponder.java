@@ -11,16 +11,16 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.HtmlLink;
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.ScriptRef;
+import wbs.console.priv.PrivChecker;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.context.ConsoleApplicationScriptRef;
-import wbs.platform.console.html.HtmlLink;
-import wbs.platform.console.html.JqueryScriptRef;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.HtmlResponder;
 import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.sms.gsm.Gsm;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.model.RouteRec;

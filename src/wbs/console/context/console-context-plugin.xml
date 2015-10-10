@@ -1,0 +1,28 @@
+<plugin
+	name="console-context"
+	package="wbs.console.context">
+
+	<layer name="console">
+		<bean class="ConsoleContextExtensionPointBuilder"/>
+		<bean class="ConsoleContextExtensionPointMetaBuilder"/>
+		<bean class="ConsoleContextExtensionPointSpec"/>
+		<bean class="ConsoleContextLink"/>
+		<bean class="ConsoleContextLinkBuilder"/>
+		<bean class="ConsoleContextLinkMetaBuilder"/>
+		<bean class="ConsoleContextLinkSpec"/>
+		<bean class="ConsoleContextNestedExtensionPoint"/>
+		<bean class="ConsoleContextPrivLookup"/>
+		<bean class="ConsoleContextRootExtensionPoint"/>
+		<bean class="ConsoleContextSectionBuilder"/>
+		<bean class="ConsoleContextSectionMetaBuilder"/>
+		<bean class="ConsoleContextSectionSpec"/>
+		<bean class="ConsoleContextStuff"/>
+		<bean class="ConsoleContextStuffSpec"/>
+		<bean class="ConsoleContextType"/>
+		<bean class="SimpleConsoleContext"/>
+		<bean class="SimpleConsoleContextBuilder"/>
+		<bean class="SimpleConsoleContextMetaBuilder"/>
+		<bean class="SimpleConsoleContextSpec"/>
+	</layer>
+
+</plugin>

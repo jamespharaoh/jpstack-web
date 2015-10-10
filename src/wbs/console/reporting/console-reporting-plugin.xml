@@ -1,0 +1,15 @@
+<plugin
+	name="console-reporting"
+	package="wbs.console.reporting">
+
+	<layer name="console">
+		<bean class="AdditionStatsResolver"/>
+		<bean class="IntegerStatsFormatter"/>
+		<bean class="MultiplicationStatsResolver"/>
+		<bean class="SimpleStatsResolver"/>
+		<bean class="StatsConsoleLogic"/>
+		<bean class="SumStatsAggregator"/>
+		<bean class="UnaryStatsGrouper"/>
+	</layer>
+
+</plugin>

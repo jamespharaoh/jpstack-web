@@ -14,13 +14,13 @@ import wbs.clients.apn.chat.scheme.model.ChatSchemeKeywordRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.clients.apn.chat.user.core.model.Orient;
+import wbs.console.action.ConsoleAction;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
-import wbs.platform.console.action.ConsoleAction;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.sms.keyword.logic.KeywordLogic;
 
 @PrototypeComponent ("chatAffiliateKeywordsCreateAction")

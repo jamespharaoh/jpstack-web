@@ -1,6 +1,7 @@
 package wbs.framework.entity.model;
 
-public enum ModelType {
+public
+enum ModelType {
 
 	major,
 	minor,

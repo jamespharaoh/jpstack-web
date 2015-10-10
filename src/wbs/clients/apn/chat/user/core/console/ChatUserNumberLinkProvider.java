@@ -13,10 +13,10 @@ import org.joda.time.Instant;
 import wbs.clients.apn.chat.user.core.model.ChatUserDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.console.priv.PrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.Record;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;
 

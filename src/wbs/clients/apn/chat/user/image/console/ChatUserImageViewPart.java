@@ -7,8 +7,8 @@ import wbs.clients.apn.chat.user.core.model.ChatUserDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageObjectHelper;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.media.console.MediaConsoleLogic;
 
 @PrototypeComponent ("chatUserImageViewPart")

@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.scaffold.PluginFixtureSpec;
 import wbs.framework.application.scaffold.PluginManager;
@@ -38,12 +37,12 @@ class FixturesTool {
 	// implementation
 
 	public
-	void createFixtures (
-			@NonNull List<String> arguments) {
+	void runFixtureProviders (
+			List<String> arguments) {
 
 		log.info (
 			stringFormat (
-				"About to create fixtures"));
+				"About to create run fixture providers"));
 
 		@Cleanup
 		Transaction transaction =
@@ -62,7 +61,7 @@ class FixturesTool {
 
 				log.info (
 					stringFormat (
-						"Creating fixture %s from %s",
+						"About to run fixture provider %s from %s",
 						fixture.name (),
 						plugin.name ()));
 
@@ -126,7 +125,7 @@ class FixturesTool {
 
 		log.info (
 			stringFormat (
-				"All fixtures created successfully"));
+				"All fixtures providers run successfully"));
 
 	}
 

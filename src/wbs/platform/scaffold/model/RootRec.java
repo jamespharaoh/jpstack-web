@@ -7,8 +7,8 @@ import lombok.experimental.Accessors;
 import wbs.framework.entity.annotations.AssignedIdField;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.RootEntity;
-import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
+import wbs.framework.record.RootRecord;
 
 @Accessors (chain = true)
 @Data
@@ -17,7 +17,7 @@ import wbs.framework.record.Record;
 @RootEntity
 public
 class RootRec
-	implements MajorRecord<RootRec> {
+	implements RootRecord<RootRec> {
 
 	// id
 

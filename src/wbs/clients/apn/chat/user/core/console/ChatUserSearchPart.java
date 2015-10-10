@@ -12,9 +12,9 @@ import javax.inject.Named;
 
 import wbs.clients.apn.chat.core.console.ChatUserCreditModeConsoleHelper;
 import wbs.clients.apn.chat.core.console.ChatUserDateModeConsoleHelper;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.part.AbstractPagePart;
 
 import com.google.common.collect.ImmutableMap;
 

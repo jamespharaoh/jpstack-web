@@ -2,11 +2,11 @@ package wbs.clients.apn.chat.settings.console;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import wbs.console.forms.FormField;
+import wbs.console.module.ConsoleModuleData;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
-import wbs.platform.console.forms.FormField;
-import wbs.platform.console.module.ConsoleModuleData;
 
 @Accessors (fluent = true)
 @Data

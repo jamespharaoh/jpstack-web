@@ -11,8 +11,8 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wbs.console.module.ConsoleManager;
 import wbs.framework.web.Responder;
-import wbs.platform.console.module.ConsoleManager;
 
 @Accessors (fluent = true)
 public abstract

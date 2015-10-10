@@ -1,7 +1,7 @@
 package wbs.platform.queue.console;
 
+import wbs.console.helper.EnumConsoleHelper;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.console.helper.EnumConsoleHelper;
 import wbs.platform.queue.model.QueueItemClaimStatus;
 
 @SingletonComponent ("queueItemClaimStatusConsoleHelper")

@@ -1,0 +1,13 @@
+<plugin
+	name="console-responder"
+	package="wbs.console.responder">
+
+	<layer name="console">
+		<bean class="ConsoleFile"/>
+		<bean class="ConsoleNotFoundHandler"/>
+		<bean class="ErrorResponder"/>
+		<bean class="NotFoundResponder"/>
+		<bean class="RedirectResponder"/>
+	</layer>
+
+</plugin>

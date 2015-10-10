@@ -13,12 +13,12 @@ import wbs.clients.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserOperatorLabel;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.ScriptRef;
+import wbs.console.module.ConsoleManager;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.context.ConsoleApplicationScriptRef;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.module.ConsoleManager;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.HtmlResponder;
 
 import com.google.common.collect.ImmutableSet;
 

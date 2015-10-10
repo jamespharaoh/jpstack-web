@@ -1888,4 +1888,14 @@ class Misc {
 
 	}
 
+	public static
+	boolean doesNotImplement (
+			@NonNull Class<?> subjectClass,
+			@NonNull Class<?> implementedClass) {
+
+		return ! implementedClass.isAssignableFrom (
+			subjectClass);
+
+	}
+
 }

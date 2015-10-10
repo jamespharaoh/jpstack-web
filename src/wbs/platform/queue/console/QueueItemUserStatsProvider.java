@@ -12,19 +12,19 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.priv.PrivChecker;
+import wbs.console.reporting.StatsDataSet;
+import wbs.console.reporting.StatsDatum;
+import wbs.console.reporting.StatsGranularity;
+import wbs.console.reporting.StatsPeriod;
+import wbs.console.reporting.StatsProvider;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.Record;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
-import wbs.platform.reporting.console.StatsDataSet;
-import wbs.platform.reporting.console.StatsDatum;
-import wbs.platform.reporting.console.StatsGranularity;
-import wbs.platform.reporting.console.StatsPeriod;
-import wbs.platform.reporting.console.StatsProvider;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 
 @SingletonComponent ("queueItemUserStatsProvider")

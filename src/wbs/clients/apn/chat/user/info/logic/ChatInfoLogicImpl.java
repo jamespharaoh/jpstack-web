@@ -40,9 +40,10 @@ import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.queue.logic.QueueLogic;
@@ -102,7 +103,10 @@ class ChatInfoLogicImpl
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
+
+	@Inject
+	ExceptionLogic exceptionLogic;
 
 	@Inject
 	LocatorLogic locatorLogic;
@@ -211,7 +215,7 @@ class ChatInfoLogicImpl
 
 			log.error ("MessageSplitter.split threw exception: " + exception);
 
-			exceptionLogic.logSimple (
+			exceptionLogger.logSimple (
 				"unknown",
 				"chatLogic.sendUserInfo (...)",
 

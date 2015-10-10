@@ -10,9 +10,9 @@ import javax.inject.Inject;
 
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.ConsoleResponder;
 
 @PrototypeComponent ("chatUserImageZipResponder")
 public

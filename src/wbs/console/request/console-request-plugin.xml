@@ -1,0 +1,9 @@
+<plugin
+	name="console-request"
+	package="wbs.console.request">
+
+	<layer name="console">
+		<bean class="ConsoleRequestContextImpl"/>
+	</layer>
+
+</plugin>

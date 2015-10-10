@@ -7,13 +7,13 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import wbs.console.context.ConsoleContextScriptRef;
+import wbs.console.html.ScriptRef;
+import wbs.console.priv.PrivChecker;
+import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.context.ConsoleContextScriptRef;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.responder.HtmlResponder;
 import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketStateRec;

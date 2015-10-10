@@ -23,4 +23,9 @@ interface ModelMethods {
 	ModelField field (
 			String name);
 
+	Boolean isRoot ();
+	Boolean isRooted ();
+	Boolean canGetParent ();
+	Boolean parentTypeIsFixed ();
+
 }

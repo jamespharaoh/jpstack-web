@@ -1,7 +1,7 @@
 package wbs.test.simulator.console;
 
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.part.AbstractPagePart;
 
 @PrototypeComponent ("simulatorRouteSummaryAdditionalPart")
 public

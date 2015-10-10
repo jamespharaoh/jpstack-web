@@ -25,10 +25,10 @@ import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
@@ -70,7 +70,7 @@ class ChatAdDaemon
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
 
 	@Inject
 	ObjectManager objectManager;
@@ -142,7 +142,7 @@ class ChatAdDaemon
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logThrowable (
+				exceptionLogger.logThrowable (
 					"daemon",
 					"ChatAdDaemon",
 					exception,

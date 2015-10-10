@@ -22,12 +22,12 @@ import org.joda.time.Instant;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 import wbs.framework.utils.StringSubstituter;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemState;
 import wbs.platform.queue.model.QueueSubjectObjectHelper;
@@ -69,7 +69,7 @@ class AlertsDaemon
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
 
 	@Inject
 	ObjectManager objectManager;
@@ -179,7 +179,7 @@ class AlertsDaemon
 						alertsSettingsId),
 					exception);
 
-				exceptionLogic.logThrowable (
+				exceptionLogger.logThrowable (
 					"daemon",
 					"alerts daemon " + alertsSettingsId,
 					exception,

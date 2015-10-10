@@ -4,6 +4,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import wbs.api.mvc.ApiAction;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -11,7 +12,6 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.api.mvc.ApiAction;
 
 @PrototypeComponent ("chatUserImageUploadViewAction")
 public

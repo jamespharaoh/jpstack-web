@@ -16,10 +16,10 @@ import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.console.context.ConsoleContextStuff;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.platform.console.context.ConsoleContextStuff;
-import wbs.platform.console.request.ConsoleRequestContext;
 
 @PrototypeComponent ("chatGraphsJoinersImageResponder")
 public

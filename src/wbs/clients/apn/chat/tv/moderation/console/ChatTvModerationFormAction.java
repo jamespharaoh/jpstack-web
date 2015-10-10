@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.tv.moderation.console;
 
+import wbs.console.action.ConsoleAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.Responder;
-import wbs.platform.console.action.ConsoleAction;
 
 @PrototypeComponent ("chatTvModerationFormAction")
 public

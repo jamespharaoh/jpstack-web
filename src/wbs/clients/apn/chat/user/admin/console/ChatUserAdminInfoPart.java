@@ -12,12 +12,12 @@ import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoRec;
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.html.ScriptRef;
+import wbs.console.misc.TimeFormatter;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.context.ConsoleApplicationScriptRef;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.part.AbstractPagePart;
 
 import com.google.common.collect.ImmutableSet;
 

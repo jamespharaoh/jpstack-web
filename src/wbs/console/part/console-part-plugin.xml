@@ -1,0 +1,10 @@
+<plugin
+	name="console-part"
+	package="wbs.console.part">
+
+	<layer name="console">
+		<bean class="NotFoundPart"/>
+		<bean class="TextPart"/>
+	</layer>
+
+</plugin>

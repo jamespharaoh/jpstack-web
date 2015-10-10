@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.tv.core.console;
 
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.part.AbstractPagePart;
 
 @PrototypeComponent ("chatTvPostPart")
 public

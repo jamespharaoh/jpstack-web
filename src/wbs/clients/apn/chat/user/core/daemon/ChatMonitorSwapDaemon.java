@@ -20,9 +20,9 @@ import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 
 import com.google.common.base.Optional;
 
@@ -44,7 +44,7 @@ class ChatMonitorSwapDaemon
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
 
 	@Inject
 	RandomLogic randomLogic;
@@ -133,7 +133,7 @@ class ChatMonitorSwapDaemon
 
 		} catch (Exception exception) {
 
-			exceptionLogic.logThrowable (
+			exceptionLogger.logThrowable (
 				"daemon",
 				stringFormat (
 					"chat %s %s %s",

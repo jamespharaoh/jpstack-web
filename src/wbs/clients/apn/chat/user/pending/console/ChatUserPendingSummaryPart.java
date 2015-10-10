@@ -9,9 +9,9 @@ import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.media.console.MediaConsoleLogic;
 
 @PrototypeComponent ("chatUserPendingSummaryPart")

@@ -17,9 +17,9 @@ import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.core.model.ChatStatsObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatStatsRec;
+import wbs.console.misc.TimeFormatter;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.graph.console.GraphScale;
 
 @PrototypeComponent ("chatGraphsUsersImageResponder")

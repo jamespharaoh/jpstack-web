@@ -16,11 +16,14 @@
 		<model name="queueType"/>
 	</models>
 
-	<layer name="entity">
-		<bean class="model.QueueTypeBuilder"/>
-		<bean class="model.QueueTypeSpec"/>
-		<bean class="model.QueueTypesBuilder"/>
-		<bean class="model.QueueTypesSpec"/>
+	<layer name="fixture">
+		<bean class="fixture.QueueTypeBuilder"/>
+		<bean class="fixture.QueueTypesBuilder"/>
+	</layer>
+
+	<layer name="model-meta">
+		<bean class="metamodel.QueueTypeSpec"/>
+		<bean class="metamodel.QueueTypesSpec"/>
 	</layer>
 
 	<layer name="console">

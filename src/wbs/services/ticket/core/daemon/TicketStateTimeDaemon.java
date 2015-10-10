@@ -7,20 +7,19 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.joda.time.Instant;
-
-import com.google.common.base.Optional;
-
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Instant;
+
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -28,6 +27,8 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.sms.command.model.CommandObjectHelper;
+
+import com.google.common.base.Optional;
 
 @Log4j
 @SingletonComponent ("ticketStateTimeDaemon")
@@ -50,7 +51,7 @@ class TicketStateTimeDaemon
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
 
 	@Inject
 	ObjectManager objectManager;
@@ -125,7 +126,7 @@ class TicketStateTimeDaemon
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logThrowable (
+				exceptionLogger.logThrowable (
 					"daemon",
 					"TicketStateTimeDaemon",
 					exception,

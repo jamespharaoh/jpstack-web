@@ -9,10 +9,10 @@ import javax.inject.Inject;
 
 import org.joda.time.Instant;
 
+import wbs.console.misc.TimeFormatter;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.Responder;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserObjectHelper;

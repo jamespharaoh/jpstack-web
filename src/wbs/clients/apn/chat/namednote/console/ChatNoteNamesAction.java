@@ -14,12 +14,12 @@ import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameObjectHelper;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameRec;
+import wbs.console.action.ConsoleAction;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
-import wbs.platform.console.action.ConsoleAction;
-import wbs.platform.console.request.ConsoleRequestContext;
 
 @PrototypeComponent ("chatNoteNamesAction")
 public

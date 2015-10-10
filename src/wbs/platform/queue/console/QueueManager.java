@@ -11,9 +11,9 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.extern.log4j.Log4j;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.web.Responder;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;

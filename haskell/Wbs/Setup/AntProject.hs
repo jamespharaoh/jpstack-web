@@ -54,6 +54,8 @@ writeBuildFile world = do
 
 			makeComboTarget "build" [
 				"build-framework",
+				"build-meta",
+				"generate-records",
 				"build-rest" ],
 
 			makeComboTarget "framework-jar" [
@@ -62,43 +64,59 @@ writeBuildFile world = do
 
 			makeComboTarget "console-live" [
 				"build-framework",
+				"build-meta",
+				"generate-records",
 				"build-rest",
 				"console-live" ],
 
 			makeComboTarget "console-test" [
 				"build-framework",
+				"build-meta",
+				"generate-records",
 				"build-rest",
 				"console-test" ],
 
 			makeComboTarget "console-auto" [
 				"build-framework",
+				"build-meta",
+				"generate-records",
 				"build-rest",
 				"console-live",
 				"console-restart" ],
 
 			makeComboTarget "api-live" [
 				"build-framework",
+				"build-meta",
+				"generate-records",
 				"build-rest",
 				"api-live" ],
 
 			makeComboTarget "api-test" [
 				"build-framework",
+				"build-meta",
+				"generate-records",
 				"build-rest",
 				"api-test" ],
 
 			makeComboTarget "api-auto" [
 				"build-framework",
+				"build-meta",
+				"generate-records",
 				"build-rest",
 				"api-live",
 				"api-restart" ],
 
 			makeComboTarget "daemon-auto" [
 				"build-framework",
+				"build-meta",
+				"generate-records",
 				"build-rest",
 				"daemon-restart" ],
 
 			makeComboTarget "all-auto" [
 				"build-framework",
+				"build-meta",
+				"generate-records",
 				"build-rest",
 				"api-live",
 				"api-restart",
@@ -111,6 +129,8 @@ writeBuildFile world = do
 
 			makeComboTarget "fixtures" [
 				"build-framework",
+				"build-meta",
+				"generate-records",
 				"build-rest",
 				"db-drop",
 				"db-create",
@@ -121,10 +141,15 @@ writeBuildFile world = do
 
 			makeComboTarget "tomcat-test" [
 				"build-framework",
+				"build-meta",
+				"generate-records",
 				"build-rest",
 				"console-test",
 				"api-test",
-				"tomcat-test" ]
+				"tomcat-test" ],
+
+			makeComboTarget "generate-records" [
+				"generate-records" ]
 
 		]
 
@@ -143,15 +168,14 @@ writeBuildFile world = do
 			sattr "dir" dir
 		] []
 
-	let makeJavacTask attrs =
+	let makeJavacTask attrs elems =
 		mkelem "javac" ([
 			sattr "destdir" "work/bin",
 			sattr "debug" "on",
 			sattr "includeantruntime" "false",
-			sattr "srcdir" "src",
 			sattr "classpathref" "classpath",
 			sattr "encoding" "utf8"
-		] ++ attrs) []
+		] ++ attrs) elems
 
 	let makeCleanTargets =
 		[
@@ -212,10 +236,15 @@ writeBuildFile world = do
 
 	let makeBuildTargets =
 		[
+
 			makeSimpleTarget "build-framework" [
 				makeMkdir "work/bin",
 				makeJavacTask [
 					sattr "includes" "wbs/framework/**"
+				] [
+					mkelem "src" [
+						sattr "path" "src"
+					] []
 				],
 				makeMkdir "work/bin/META-INF/services",
 				mkelem "echo" [
@@ -223,23 +252,76 @@ writeBuildFile world = do
 					sattr "message" "wbs.framework.object.ObjectHelperAnnotationProcessor"
 				] []
 			],
+
 			makeSimpleTarget "framework-jar" [
 				mkelem "jar" [
 					sattr "destfile" "work/wbs-framework.jar",
 					sattr "basedir" "work/bin"
 				] [
+
 					mkelem "include" [
 						sattr "name" "wbs/framework/**"
 					] [],
+					mkelem "include" [
+						sattr "name" "wbs/api/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/console/**"
+					] [],
+
 					mkelem "service" [
 						sattr "type" "javax.annotation.processing.Processor",
-						sattr "provider" "wbs.framework.object.ObjectHelperAnnotationProcessor"
+						sattr "provider"
+							"wbs.framework.object.ObjectHelperAnnotationProcessor"
 					] []
+
 				]
 			],
+
+			makeSimpleTarget "build-meta" [
+				makeJavacTask [] [
+
+					mkelem "src" [
+						sattr "path" "src"
+					] [],
+					mkelem "src" [
+						sattr "path" "work/bin"
+					] [],
+
+					mkelem "include" [
+						sattr "name" "wbs/framework/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/api/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/console/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/**/metamodel/**"
+					] []
+
+				],
+				makeCopyToDir "work/bin" [
+					makeFilesetDir "src" [
+						makeIncludeName "**/*.xml",
+						makeIncludeName "log4j.properties"
+					]
+				],
+				makeCopyFileToDir "wbs-build.xml" "work/bin" []
+			],
+
 			makeSimpleTarget "build-rest" [
-				makeJavacTask [
-					sattr "excludes" "wbs/framework/**"
+				makeJavacTask [] [
+					mkelem "src" [
+						sattr "path" "src"
+					] [],
+					mkelem "src" [
+						sattr "path" "work/generated"
+					] [],
+					mkelem "src" [
+						sattr "path" "work/bin"
+					] []
 				],
 				makeCopyToDir "work/bin" [
 					makeFilesetDir "src" [
@@ -249,6 +331,7 @@ writeBuildFile world = do
 				],
 				makeCopyFileToDir "wbs-build.xml" "work/bin" []
 			]
+
 		]
 
 
@@ -514,44 +597,85 @@ writeBuildFile world = do
 			makeSqlTarget "sql-data" plgSqlDatas ""
 		]
 
-	let makeSchemaTargets =
+	let makeGenerateTargets =
 		[
-			makeSimpleTarget "schema-create" [
+
+			makeSimpleTarget "generate-records" [
 
 				mkelem "java" [
 					sattr "classname"
-						"wbs.platform.application.tools.BeanRunner",
+						"wbs.framework.application.tools.BeanRunner",
 					sattr "classpathref" "classpath",
 					sattr "failonerror" "true"
 				] [
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
-					makeArgValue "utils,config,data,entity,schema,sql,schema-tool",
+					makeArgValue "data,model-meta,model-generate,utils",
+					makeArgValue "test",
+					makeArgValue "wbs.framework.entity.generate.ModelRecordGenerator",
+					makeArgValue "generateModelRecords"
+				]
+
+			]
+
+		]
+
+	let makeSchemaTargets =
+		[
+
+			makeSimpleTarget "schema-create" [
+
+				mkelem "java" [
+					sattr "classname"
+						"wbs.framework.application.tools.BeanRunner",
+					sattr "classpathref" "classpath",
+					sattr "failonerror" "true"
+				] [
+					makeArgValue "wbs-test",
+					makeArgValue "wbs.test",
+					makeArgValue "utils,config,data,entity,model-meta,schema,sql,schema-tool",
 					makeArgValue "test",
 					makeArgValue "wbs.framework.schema.tool.SchemaTool",
 					makeArgValue "schemaCreate"
 				]
 
 			]
+
 		]
 
 	let makeFixtureTargets =
 		[
+
 			makeSimpleTarget "fixtures" [
 
 				mkelem "java" [
 					sattr "classname"
-						"wbs.platform.application.tools.BeanRunner",
+						"wbs.framework.application.tools.BeanRunner",
 					sattr "classpathref" "classpath",
 					sattr "failonerror" "true"
 				] [
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
 					makeArgValue ("utils,config,data,entity,schema,sql," ++
-						"model,hibernate,object,logic,fixture"),
+						"model,model-meta,hibernate,object,logic,fixture"),
+					makeArgValue "test,hibernate",
+					makeArgValue "wbs.framework.entity.meta.ModelFixtureCreator",
+					makeArgValue "runModelFixtureCreators"
+				],
+
+				mkelem "java" [
+					sattr "classname"
+						"wbs.framework.application.tools.BeanRunner",
+					sattr "classpathref" "classpath",
+					sattr "failonerror" "true"
+				] [
+					makeArgValue "wbs-test",
+					makeArgValue "wbs.test",
+					makeArgValue ("utils,config,data,entity,schema,sql," ++
+						"model,model-meta,hibernate,object,logic,fixture"),
 					makeArgValue "test,hibernate",
 					makeArgValue "wbs.framework.fixtures.FixturesTool",
-					makeArgValue "createFixtures"
+					makeArgValue "runFixtureProviders"
 				]
 
 			]
@@ -575,6 +699,7 @@ writeBuildFile world = do
 				makeJavadocTargets ++
 				makeDatabaseTargets ++
 				makeSqlTargets ++
+				makeGenerateTargets ++
 				makeSchemaTargets ++
 				makeFixtureTargets
 			)

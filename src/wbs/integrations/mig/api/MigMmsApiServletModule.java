@@ -25,6 +25,8 @@ import org.joda.time.Instant;
 
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.RegexpPathHandler;
@@ -32,7 +34,6 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
 import wbs.integrations.mig.logic.MigLogic;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
@@ -50,11 +51,16 @@ public
 class MigMmsApiServletModule
 	implements ServletModule {
 
+	// dependencies
+
 	@Inject
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
+
+	@Inject
+	ExceptionLogic exceptionLogic;
 
 	@Inject
 	InboxLogic inboxLogic;
@@ -76,6 +82,8 @@ class MigMmsApiServletModule
 
 	@Inject
 	TextObjectHelper textHelper;
+
+	// implementation
 
 	String getException (
 			Throwable throwable,
@@ -463,7 +471,7 @@ logger.error ("Got item");
 
 			} catch (Exception exception) {
 
-				exceptionLogic.logSimple (
+				exceptionLogger.logSimple (
 					"webapi",
 					requestContext.requestUri (),
 					exceptionLogic.throwableSummary (

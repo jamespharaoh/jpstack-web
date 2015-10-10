@@ -6,11 +6,11 @@ import javax.inject.Inject;
 
 import org.joda.time.Instant;
 
+import wbs.console.misc.TimeFormatter;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.ConsolePrintResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.ConsolePrintResponder;
 
 @PrototypeComponent ("coreFrameSetResponder")
 public

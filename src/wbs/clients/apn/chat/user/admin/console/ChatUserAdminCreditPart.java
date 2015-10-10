@@ -9,9 +9,9 @@ import wbs.clients.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.currency.logic.CurrencyLogic;
 
 @PrototypeComponent ("chatUserAdminCreditPart")

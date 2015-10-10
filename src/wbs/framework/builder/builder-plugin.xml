@@ -3,7 +3,7 @@
 	package="wbs.framework.builder">
 
 	<layer name="data">
-		<bean class="BuilderFactoryImpl"/>
+		<bean class="BuilderFactoryImplementation"/>
 	</layer>
 
 </plugin>

@@ -10,9 +10,9 @@ import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUsersSummaryObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUsersSummaryRec;
+import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.part.AbstractPagePart;
-import wbs.platform.priv.console.PrivChecker;
 
 @PrototypeComponent ("chatStatisticsPart")
 public

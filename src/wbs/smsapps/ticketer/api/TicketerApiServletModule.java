@@ -11,9 +11,12 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import wbs.api.mvc.ApiFile;
+import wbs.api.mvc.StringMapResponderFactory;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.record.GlobalId;
 import wbs.framework.web.Action;
 import wbs.framework.web.PathHandler;
@@ -21,9 +24,6 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
-import wbs.platform.api.mvc.ApiFile;
-import wbs.platform.api.mvc.StringMapResponderFactory;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.rpc.php.PhpStringMapResponderFactory;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
@@ -42,11 +42,13 @@ public
 class TicketerApiServletModule
 	implements ServletModule {
 
+	// dependencies
+
 	@Inject
 	RequestContext requestContext;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
 
 	@Inject
 	Database database;
@@ -347,7 +349,7 @@ class TicketerApiServletModule
 
 			} catch (RuntimeException exception) {
 
-				exceptionLogic.logThrowable (
+				exceptionLogger.logThrowable (
 					"webapi",
 					requestContext.requestUri (),
 					exception,

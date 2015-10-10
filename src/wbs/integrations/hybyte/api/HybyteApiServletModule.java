@@ -27,6 +27,8 @@ import org.joda.time.Instant;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.RegexpPathHandler;
@@ -39,7 +41,6 @@ import wbs.integrations.hybyte.model.HybyteRouteObjectHelper;
 import wbs.integrations.hybyte.model.HybyteRouteOutObjectHelper;
 import wbs.integrations.hybyte.model.HybyteRouteOutRec;
 import wbs.integrations.hybyte.model.HybyteRouteRec;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
@@ -69,7 +70,10 @@ class HybyteApiServletModule
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
+
+	@Inject
+	ExceptionLogic exceptionLogic;
 
 	@Inject
 	HybyteNetworkObjectHelper hybyteNetworkHelper;
@@ -232,7 +236,7 @@ class HybyteApiServletModule
 
 				}
 
-				exceptionLogic.logSimple (
+				exceptionLogger.logSimple (
 					"webapi",
 					requestContext.requestUri (),
 					exceptionLogic.throwableSummary (

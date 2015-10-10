@@ -19,6 +19,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -257,7 +258,8 @@ class DataFromXml {
 	public
 	Object readInputStream (
 			InputStream inputStream,
-			String filename) {
+			String filename,
+			Collection<Object> parents) {
 
 		SAXReader saxReader =
 			new SAXReader ();
@@ -285,7 +287,7 @@ class DataFromXml {
 					document.getRootElement ())
 
 				.parents (
-					Collections.emptyList ())
+					parents)
 
 				.contextString (
 					filename)

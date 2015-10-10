@@ -10,13 +10,13 @@ import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageObjectHelper;
 import wbs.applications.imchat.model.ImChatMessageRec;
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.module.ConsoleModule;
+import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.forms.FormFieldLogic;
-import wbs.platform.console.forms.FormFieldSet;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.module.ConsoleModule;
-import wbs.platform.console.part.AbstractPagePart;
-import wbs.platform.priv.console.PrivChecker;
 
 import com.google.common.collect.Lists;
 

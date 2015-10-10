@@ -7,12 +7,12 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.ScriptRef;
+import wbs.console.html.SelectBuilder;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.context.ConsoleApplicationScriptRef;
-import wbs.platform.console.html.JqueryScriptRef;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.html.SelectBuilder;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.sms.network.console.NetworkConsoleHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;

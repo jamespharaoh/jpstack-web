@@ -1,0 +1,11 @@
+<plugin
+	name="console-tab"
+	package="wbs.console.tab">
+
+	<layer name="console">
+		<bean class="ConsoleContextTab"/>
+		<bean class="TabbedResponder"/>
+		<bean class="TabContextResponder"/>
+	</layer>
+
+</plugin>

@@ -2,11 +2,40 @@
 	name="entity"
 	package="wbs.framework.entity">
 
+	<layer name="model-meta">
+		<bean class="meta.AssociativeCollectionSpec"/>
+		<bean class="meta.ChildrenCollectionSpec"/>
+		<bean class="meta.CodeFieldSpec"/>
+		<bean class="meta.DeletedFieldSpec"/>
+		<bean class="meta.DescriptionFieldSpec"/>
+		<bean class="meta.GeneratedIdFieldSpec"/>
+		<bean class="meta.ModelCollectionsSpec"/>
+		<bean class="meta.ModelFieldsSpec"/>
+		<bean class="meta.ModelMetaLoader"/>
+		<bean class="meta.ModelMetaSpec"/>
+		<bean class="meta.ParentFieldSpec"/>
+		<bean class="meta.ReferenceFieldSpec"/>
+		<bean class="meta.SlaveFieldSpec"/>
+		<bean class="meta.StringFieldSpec"/>
+		<bean class="meta.YesNoFieldSpec"/>
+	</layer>
+
+	<layer name="model-generate">
+		<bean class="generate.AssociativeCollectionWriter"/>
+		<bean class="generate.CodeFieldWriter"/>
+		<bean class="generate.ChildrenCollectionWriter"/>
+		<bean class="generate.DeletedFieldWriter"/>
+		<bean class="generate.DescriptionFieldWriter"/>
+		<bean class="generate.GeneratedIdFieldWriter"/>
+		<bean class="generate.ParentFieldWriter"/>
+		<bean class="generate.SlaveFieldWriter"/>
+		<bean class="generate.StringFieldWriter"/>
+		<bean class="generate.YesNoFieldWriter"/>
+	</layer>
+
 	<layer name="entity">
-		<bean class="helper.EntityHelperImpl"/>
+		<bean class="helper.EntityHelperImplementation"/>
 		<bean class="model.ModelBuilder"/>
-		<bean class="model.ModelMetaLoader"/>
-		<bean class="model.ModelMetaSpec"/>
 	</layer>
 
 </plugin>

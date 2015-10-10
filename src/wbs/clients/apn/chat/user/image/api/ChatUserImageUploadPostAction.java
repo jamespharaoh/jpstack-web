@@ -15,6 +15,7 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 
+import wbs.api.mvc.ApiAction;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
@@ -22,11 +23,10 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.api.mvc.ApiAction;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.sms.message.core.model.MessageRec;
 
 import com.google.common.base.Optional;
@@ -49,7 +49,7 @@ class ChatUserImageUploadPostAction
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
 
 	@Inject
 	RandomLogic randomLogic;
@@ -210,7 +210,7 @@ class ChatUserImageUploadPostAction
 
 			// log exception
 
-			exceptionLogic.logThrowable (
+			exceptionLogger.logThrowable (
 				"webapi",
 				requestContext.requestPath (),
 				exception,

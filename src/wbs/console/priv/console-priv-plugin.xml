@@ -1,0 +1,9 @@
+<plugin
+	name="console-priv"
+	package="wbs.console.priv">
+
+	<layer name="console">
+		<bean class="PrivCheckerImplementation"/>
+	</layer>
+
+</plugin>

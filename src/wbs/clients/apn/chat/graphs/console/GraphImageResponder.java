@@ -12,8 +12,8 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.ConsoleResponder;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.ConsoleResponder;
 import wbs.platform.graph.console.GraphScale;
 
 public abstract

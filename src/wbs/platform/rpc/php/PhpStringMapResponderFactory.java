@@ -5,9 +5,9 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import wbs.api.mvc.StringMapResponderFactory;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.web.Responder;
-import wbs.platform.api.mvc.StringMapResponderFactory;
 
 @SingletonComponent ("phpStringMapResponderFactory")
 public

@@ -4,9 +4,9 @@ import javax.inject.Inject;
 
 import org.joda.time.Instant;
 
+import wbs.console.misc.TimeFormatter;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.smsapps.subscription.model.SubscriptionSendRec;
 
 @PrototypeComponent ("subscriptionSendControlPart")

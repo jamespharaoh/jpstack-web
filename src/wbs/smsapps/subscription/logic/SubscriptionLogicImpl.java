@@ -9,11 +9,11 @@ import javax.inject.Provider;
 
 import org.joda.time.Instant;
 
+import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
-import wbs.platform.console.misc.TimeFormatter;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.user.model.UserRec;

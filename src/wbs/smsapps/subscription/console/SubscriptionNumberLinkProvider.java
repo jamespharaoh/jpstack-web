@@ -6,9 +6,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import wbs.console.priv.PrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.subscription.model.SubscriptionSubObjectHelper;

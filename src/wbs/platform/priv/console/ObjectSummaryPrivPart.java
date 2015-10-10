@@ -12,12 +12,13 @@ import javax.inject.Inject;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.lookup.ObjectLookup;
+import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.lookup.ObjectLookup;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.group.console.GroupConsoleHelper;
 import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.model.PrivRec;

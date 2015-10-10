@@ -2,10 +2,10 @@ package wbs.clients.apn.chat.tv.moderation.console;
 
 import javax.inject.Inject;
 
+import wbs.console.context.ConsoleContext;
+import wbs.console.module.ConsoleManager;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.web.Responder;
-import wbs.platform.console.context.ConsoleContext;
-import wbs.platform.console.module.ConsoleManager;
 import wbs.platform.queue.console.AbstractQueueConsolePlugin;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;

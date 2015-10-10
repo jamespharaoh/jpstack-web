@@ -3,9 +3,6 @@ package wbs.services.messagetemplate.model;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -20,7 +17,6 @@ import wbs.framework.entity.annotations.MinorEntity;
 import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
 
@@ -75,37 +71,6 @@ class MessageTemplateTypeRec
 		orderBy = "name")
 	Set<MessageTemplateParameterRec> messageTemplateParameters =
 		new TreeSet<MessageTemplateParameterRec> ();
-
-	// object hooks
-
-	public static
-	class MessageTemplateTypeHooks
-		extends AbstractObjectHooks<MessageTemplateTypeRec> {
-
-		@Inject
-		Provider<MessageTemplateParameterObjectHelper> messageTemplateParameterHelper;
-
-		@Override
-		public
-		void beforeInsert (
-			MessageTemplateTypeRec messageTemplateType) {
-
-			messageTemplateType.setCode (
-				messageTemplateType.getName().toLowerCase());
-
-		}
-
-		@Override
-		public
-		Object getDynamic (
-				Record<?> object,
-				String name) {
-
-			return null;
-
-		}
-
-	}
 
 	// compare to
 

@@ -1,0 +1,22 @@
+<plugin
+	name="console-helper"
+	package="wbs.console.helper">
+
+	<layer name="console">
+		<bean class="ConsoleObjectManagerImplementation"/>
+		<bean class="ConsoleHelperBuilder"/>
+		<bean class="ConsoleHelperProviderManager"/>
+		<bean class="ConsoleHelperProviderMetaBuilder"/>
+		<bean class="ConsoleHelperProviderRegistry"/>
+		<bean class="ConsoleHelperProviderSpec"/>
+		<bean class="ConsoleHelperRegistry"/>
+		<bean class="GenericConsoleHelperProvider"/>
+		<bean class="PrivKeySpec"/>
+		<bean class="RunPostProcessorSpec"/>
+	</layer>
+
+	<layer name="compiler">
+		<bean class="ConsoleHelperCompiler"/>
+	</layer>
+
+</plugin>

@@ -19,6 +19,19 @@ writeClasspath world = do
 			sattr "path" "src"
 		] []
 
+	let makeGeneratedSrcEntry =
+		mkelem "classpathentry" [
+			sattr "kind" "src",
+			sattr "path" "work/generated"
+		] [
+			mkelem "attributes" [] [
+				mkelem "attribute" [] [
+					sattr "name" "ignore_optional_problems",
+					sattr "value" "true"
+				]
+			]
+		]
+
 	let makeConEntry =
 		mkelem "classpathentry" [
 			sattr "kind" "con",
@@ -55,7 +68,7 @@ writeClasspath world = do
 				libVersion library,
 				".jar" ]
 
-	let makeGeneratedSrcEntry =
+	let makeEclipseGeneratedSrcEntry =
 		mkelem "classpathentry" [
 			sattr "kind" "src",
 			sattr "path" "work/eclipse/generated"
@@ -78,9 +91,10 @@ writeClasspath world = do
 		root [] [
 			mkelem "classpath" [] (
 				[ makeOriginalSrcEntry ] ++
+				[ makeGeneratedSrcEntry ] ++
 				[ makeConEntry ] ++
 				map makeLibEntry libraries ++
-				[ makeGeneratedSrcEntry ] ++
+				[ makeEclipseGeneratedSrcEntry ] ++
 				[ makeOutputEntry ]
 			)
 		]

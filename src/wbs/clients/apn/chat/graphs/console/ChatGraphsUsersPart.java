@@ -6,9 +6,9 @@ import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
 
+import wbs.console.misc.TimeFormatter;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.part.AbstractPagePart;
 
 @PrototypeComponent ("chatGraphsUsersPart")
 public

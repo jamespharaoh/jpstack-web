@@ -15,9 +15,11 @@ import lombok.Cleanup;
 
 import org.joda.time.Instant;
 
+import wbs.api.mvc.ApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.integrations.oxygen8.model.Oxygen8ConfigRec;
@@ -28,8 +30,6 @@ import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInRec;
-import wbs.platform.api.mvc.ApiAction;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
@@ -50,7 +50,7 @@ class Oxygen8InboundSmsAction
 	Database database;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogic exceptionLogic;
 
 	@Inject
 	InboxLogic inboxLogic;

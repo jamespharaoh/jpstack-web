@@ -1,0 +1,48 @@
+<plugin
+	name="console-supervisor"
+	package="wbs.console.supervisor">
+
+	<layer name="console">
+		<bean class="SupervisorAdditionOperandSpec"/>
+		<bean class="SupervisorAdditionStatsResolverBuilder"/>
+		<bean class="SupervisorAdditionStatsResolverSpec"/>
+		<bean class="SupervisorConditionSpec"/>
+		<bean class="SupervisorConfigBuilder"/>
+		<bean class="SupervisorConfigSpec"/>
+		<bean class="SupervisorDataSetSpec"/>
+		<bean class="SupervisorHeadingPartBuilder"/>
+		<bean class="SupervisorHeadingPartSpec"/>
+		<bean class="SupervisorIntegerConditionSpec"/>
+		<bean class="SupervisorIntegerInConditionSpec"/>
+		<bean class="SupervisorIntegerStatsFormatterBuilder"/>
+		<bean class="SupervisorIntegerStatsFormatterSpec"/>
+		<bean class="SupervisorMultiplicationOperandSpec"/>
+		<bean class="SupervisorMultiplicationStatsResolverBuilder"/>
+		<bean class="SupervisorMultiplicationStatsResolverSpec"/>
+		<bean class="SupervisorPageBuilder"/>
+		<bean class="SupervisorPageSpec"/>
+		<bean class="SupervisorPart"/>
+		<bean class="SupervisorSimplePartBuilder"/>
+		<bean class="SupervisorSimplePartSpec"/>
+		<bean class="SupervisorSimpleStatsResolverBuilder"/>
+		<bean class="SupervisorSimpleStatsResolverSpec"/>
+		<bean class="SupervisorSumStatsAggregatorBuilder"/>
+		<bean class="SupervisorSumStatsAggregatorSpec"/>
+		<bean class="SupervisorTableHeadingBuilder"/>
+		<bean class="SupervisorTableHeadingSpec"/>
+		<bean class="SupervisorTableHeadingPart"/>
+		<bean class="SupervisorTablePart"/>
+		<bean class="SupervisorTablePartBuilder"/>
+		<bean class="SupervisorTablePartSpec"/>
+		<bean class="SupervisorTableSeparatorBuilder"/>
+		<bean class="SupervisorTableSeparatorSpec"/>
+		<bean class="SupervisorTableStatsGroupBuilder"/>
+		<bean class="SupervisorTableStatsGroupPart"/>
+		<bean class="SupervisorTableStatsGroupSpec"/>
+		<bean class="SupervisorTableStatsTotalBuilder"/>
+		<bean class="SupervisorTableStatsTotalSpec"/>
+		<bean class="SupervisorUnaryStatsGrouperBuilder"/>
+		<bean class="SupervisorUnaryStatsGrouperSpec"/>
+	</layer>
+
+</plugin>

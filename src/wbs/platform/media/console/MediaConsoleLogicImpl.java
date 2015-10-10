@@ -10,8 +10,8 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import lombok.NonNull;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeRec;

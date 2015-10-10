@@ -1,13 +1,13 @@
 package wbs.services.ticket.create;
 
+import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.module.ConsoleModuleImpl;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.platform.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.platform.console.module.ConsoleModuleImpl;
 
 @PrototypeComponent ("objectTicketCreateSetFieldBuilder")
 @ConsoleModuleBuilderHandler

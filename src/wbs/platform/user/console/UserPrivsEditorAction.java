@@ -6,14 +6,14 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+import wbs.console.action.ConsoleAction;
+import wbs.console.priv.PrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
-import wbs.platform.console.action.ConsoleAction;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.event.logic.EventLogic;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.priv.console.PrivConsoleHelper;
 import wbs.platform.priv.model.PrivRec;
 import wbs.platform.updatelog.logic.UpdateManager;

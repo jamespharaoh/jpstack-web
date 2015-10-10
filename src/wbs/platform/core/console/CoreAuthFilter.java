@@ -18,14 +18,14 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import lombok.Cleanup;
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.module.ConsoleManager;
+import wbs.console.priv.PrivChecker;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
-import wbs.platform.console.html.JqueryScriptRef;
-import wbs.platform.console.module.ConsoleManager;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.user.logic.UserLogic;
 import wbs.platform.user.model.UserOnlineObjectHelper;
 import wbs.platform.user.model.UserOnlineRec;

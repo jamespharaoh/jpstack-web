@@ -10,12 +10,12 @@ import javax.inject.Inject;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.html.ObsoleteDateField;
+import wbs.console.misc.TimeFormatter;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.html.ObsoleteDateField;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleHelper;

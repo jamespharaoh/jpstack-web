@@ -3,11 +3,11 @@ package wbs.smsapps.subscription.console;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.module.ConsoleModule;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.forms.FormFieldLogic;
-import wbs.platform.console.forms.FormFieldSet;
-import wbs.platform.console.module.ConsoleModule;
-import wbs.platform.console.part.AbstractPagePart;
 
 @PrototypeComponent ("subscriptionNumberAddRemovePart")
 public
