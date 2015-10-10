@@ -1,7 +1,7 @@
 package wbs.services.ticket.core.console;
 
+import wbs.console.forms.FormFieldSet;
 import wbs.framework.record.Record;
-import wbs.platform.console.forms.FormFieldSet;
 
 public interface FieldsProvider {
 

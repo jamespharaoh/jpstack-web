@@ -170,13 +170,8 @@ public class TicketRec
 		@Override
 		public
 		Object getDynamic (
-				Record<?> object,
+				TicketRec ticket,
 				String name) {
-
-			TicketRec ticket =
-				(TicketRec)
-				(Object)
-				object;
 
 			//Find the ticket field type
 
@@ -237,20 +232,15 @@ public class TicketRec
 		@Override
 		public
 		void setDynamic (
-				Record<?> object,
+				TicketRec ticket,
 				String name,
 				Object value) {
 
-			TicketRec ticket =
-				(TicketRec)
-				(Object)
-				object;
-
-			//Find the ticket field type
+			// find the ticket field type
 
 			TicketFieldTypeRec ticketFieldType =
-				ticketFieldTypeHelper.get().findByCode(
-						ticket.getTicketManager(),
+				ticketFieldTypeHelper.get ().findByCode (
+						ticket.getTicketManager (),
 						name);
 
 			TicketFieldValueRec ticketFieldValue;
@@ -258,52 +248,77 @@ public class TicketRec
 			try {
 
 				 ticketFieldValue =
-					ticket.getTicketFieldValues().get(
-						ticketFieldType.getId());
-			}
-			catch (Exception e) {
+					ticket.getTicketFieldValues ().get (
+						ticketFieldType.getId ());
+
+			} catch (Exception exception) {
+
 				ticketFieldValue =
 					null;
+
 			}
 
 			// if the value object does not exist, a new one is created
 
 			if (ticketFieldValue == null) {
-				ticketFieldValue = new TicketFieldValueRec()
-					.setTicket(ticket)
-					.setTicketFieldType(ticketFieldType);
+
+				ticketFieldValue =
+					new TicketFieldValueRec ()
+
+					.setTicket (
+						ticket)
+
+					.setTicketFieldType (
+						ticketFieldType);
+
 			}
 
-			switch( ticketFieldType.getType() ) {
+			switch (ticketFieldType.getType ()) {
+
 				case string:
-					ticketFieldValue.setStringValue((String)value);
+
+					ticketFieldValue.setStringValue (
+						(String) value);
+
 					break;
 
 				case number:
-					ticketFieldValue.setIntegerValue((Integer)value);
+
+					ticketFieldValue.setIntegerValue (
+						(Integer) value);
+
 					break;
 
 				case bool:
-					ticketFieldValue.setBooleanValue((Boolean)value);
+
+					ticketFieldValue.setBooleanValue (
+						(Boolean) value);
+
 					break;
 
 				case object:
-					Integer objectId =
-						((Record<?>) value).getId();
 
-					ticketFieldValue.setIntegerValue(objectId);
+					Record<?> record =
+						(Record<?>) value;
+
+					ticketFieldValue.setIntegerValue (
+						record.getId ());
+
 					break;
 
 				default:
+
 					throw new RuntimeException ();
 
 			}
 
-			ticket.setNumFields (
-				ticket.getNumFields() + 1);
+			ticket
+
+				.setNumFields (
+					ticket.getNumFields () + 1);
 
 			ticket.getTicketFieldValues ().put (
-				ticketFieldType.getId(),
+				ticketFieldType.getId (),
 				ticketFieldValue);
 
 		}

@@ -5,7 +5,7 @@
 
 		<queue-type
 			name="Default"
-			description="Pending tickets for a ticket state"
+			description="Pending tickets for a ticket type"
 			subject="ticket"
 			ref="ticket"/>
 
