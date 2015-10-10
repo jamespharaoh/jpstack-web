@@ -119,13 +119,8 @@ class MessageTemplateSetRec
 		@Override
 		public
 		Object getDynamic (
-				Record<?> object,
+				MessageTemplateSetRec messageTemplateSet,
 				String name) {
-
-			MessageTemplateSetRec messageTemplateSet =
-				(MessageTemplateSetRec)
-				(Object)
-				object;
 
 			// find the ticket field type
 
@@ -165,14 +160,9 @@ class MessageTemplateSetRec
 		@Override
 		public
 		void setDynamic (
-				Record<?> object,
+				MessageTemplateSetRec messageTemplateSet,
 				String name,
 				Object value) {
-
-			MessageTemplateSetRec messageTemplateSet =
-				(MessageTemplateSetRec)
-				(Object)
-				object;
 
 			// find the ticket field type
 
