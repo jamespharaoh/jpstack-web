@@ -4,10 +4,10 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Set;
 
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.ScriptRef;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.context.ConsoleApplicationScriptRef;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.part.AbstractPagePart;
 
 import com.google.common.collect.ImmutableSet;
 

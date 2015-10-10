@@ -11,13 +11,13 @@ import javax.inject.Provider;
 
 import org.joda.time.Instant;
 
+import wbs.console.context.ConsoleContext;
+import wbs.console.context.ConsoleContextType;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.module.ConsoleManager;
+import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.context.ConsoleContext;
-import wbs.platform.console.context.ConsoleContextType;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.module.ConsoleManager;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.model.QueueRec;
 

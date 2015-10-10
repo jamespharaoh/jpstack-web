@@ -11,13 +11,14 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wbs.console.html.ScriptRef;
+import wbs.console.part.PagePart;
+import wbs.console.priv.PrivChecker;
+import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.record.GlobalId;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.part.PagePart;
-import wbs.platform.console.responder.HtmlResponder;
-import wbs.platform.exception.logic.ExceptionLogLogic;
-import wbs.platform.priv.console.PrivChecker;
 
 import com.google.common.base.Optional;
 
@@ -27,11 +28,18 @@ public
 class CoreTitledResponder
 	extends HtmlResponder {
 
+	// dependencies
+
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
+
+	@Inject
+	ExceptionLogic exceptionLogic;
 
 	@Inject
 	PrivChecker privChecker;
+
+	// properties
 
 	@Getter @Setter
 	String title;
@@ -39,13 +47,19 @@ class CoreTitledResponder
 	@Getter @Setter
 	PagePart pagePart;
 
+	// state
+
 	Throwable pagePartThrew;
+
+	// details
 
 	@Override
 	protected
 	Set<ScriptRef> scriptRefs () {
 		return pagePart.scriptRefs ();
 	}
+
+	// implementation
 
 	@Override
 	protected
@@ -83,7 +97,7 @@ class CoreTitledResponder
 							? requestContext.pathInfo ()
 							: "");
 
-				exceptionLogic.logThrowable (
+				exceptionLogger.logThrowable (
 					"console",
 					path,
 					exception,
@@ -140,9 +154,11 @@ class CoreTitledResponder
 			printFormat (
 				"<p>Unable to show page contents.</p>\n");
 
-			if (privChecker.can (
+			if (
+				privChecker.can (
 					GlobalId.root,
-					"debug")) {
+					"debug")
+			) {
 
 				printFormat (
 					"<p><pre>%h</pre></p>\n",

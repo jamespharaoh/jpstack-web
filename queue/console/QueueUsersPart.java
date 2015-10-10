@@ -16,11 +16,11 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.Instant;
 
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.part.AbstractPagePart;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimRec;
 import wbs.platform.queue.model.QueueItemRec;

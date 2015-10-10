@@ -21,9 +21,9 @@ import javax.sql.DataSource;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.platform.daemon.AbstractDaemonService;
 import wbs.platform.daemon.ThreadManager;
-import wbs.platform.exception.logic.ExceptionLogLogic;
 
 import com.google.common.base.Optional;
 
@@ -33,14 +33,18 @@ public
 class PostgresqlMaintenanceDaemon
 	extends AbstractDaemonService {
 
+	// dependencies
+
 	@Inject
 	DataSource dataSource;
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
 
 	@Inject
 	ThreadManager threadManager;
+
+	// details
 
 	final static
 	int monthlyDay = 15;
@@ -209,7 +213,7 @@ class PostgresqlMaintenanceDaemon
 
 				} catch (Exception exception) {
 
-					exceptionLogic.logThrowable (
+					exceptionLogger.logThrowable (
 						"daemon",
 						getClass ().getSimpleName (),
 						exception,
@@ -222,7 +226,7 @@ class PostgresqlMaintenanceDaemon
 
 		} catch (Exception exception) {
 
-			exceptionLogic.logThrowable (
+			exceptionLogger.logThrowable (
 				"daemon",
 				getClass ().getSimpleName (),
 				exception,

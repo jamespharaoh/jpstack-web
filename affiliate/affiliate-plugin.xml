@@ -7,11 +7,14 @@
 		<model name="affiliateType"/>
 	</models>
 
-	<layer name="entity">
-		<bean class="model.AffiliateTypeBuilder"/>
-		<bean class="model.AffiliateTypeSpec"/>
-		<bean class="model.AffiliateTypesBuilder"/>
-		<bean class="model.AffiliateTypesSpec"/>
+	<layer name="fixture">
+		<bean class="fixture.AffiliateTypeBuilder"/>
+		<bean class="fixture.AffiliateTypesBuilder"/>
+	</layer>
+
+	<layer name="model-meta">
+		<bean class="metamodel.AffiliateTypeSpec"/>
+		<bean class="metamodel.AffiliateTypesSpec"/>
 	</layer>
 
 	<console-modules>

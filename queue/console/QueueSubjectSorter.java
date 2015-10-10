@@ -21,8 +21,8 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
+import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemState;

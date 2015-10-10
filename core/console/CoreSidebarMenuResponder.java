@@ -7,13 +7,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.ABSwap;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.HtmlResponder;
 import wbs.platform.menu.console.MenuGroupConsoleHelper;
 import wbs.platform.menu.model.MenuGroupRec;
 import wbs.platform.menu.model.MenuItemRec;

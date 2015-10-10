@@ -6,14 +6,14 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.ScriptRef;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.record.GlobalId;
-import wbs.platform.console.context.ConsoleApplicationScriptRef;
-import wbs.platform.console.html.JqueryScriptRef;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.HtmlResponder;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
 

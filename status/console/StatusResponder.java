@@ -8,12 +8,12 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.ScriptRef;
+import wbs.console.part.PagePart;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.html.JqueryScriptRef;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.part.PagePart;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.HtmlResponder;
 
 import com.google.common.collect.ImmutableSet;
 

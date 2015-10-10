@@ -5,9 +5,9 @@ import java.io.OutputStream;
 
 import javax.inject.Inject;
 
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.ConsoleResponder;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
 

@@ -1,7 +1,7 @@
 package wbs.platform.media.console;
 
+import wbs.console.request.Cryptor;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.console.request.Cryptor;
 
 @SingletonComponent ("mediaConsoleConfig")
 public

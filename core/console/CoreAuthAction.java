@@ -6,11 +6,11 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wbs.console.action.ConsoleAction;
+import wbs.console.lookup.BooleanLookup;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.Responder;
-import wbs.platform.console.action.ConsoleAction;
-import wbs.platform.console.lookup.BooleanLookup;
-import wbs.platform.console.request.ConsoleRequestContext;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("coreAuthAction")

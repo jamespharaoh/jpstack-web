@@ -1,5 +1,58 @@
 <model-meta
-	name="user">
+	name="user"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field
+			name="username"/>
+
+		<!-- details -->
+
+		<description-field
+			name="details"/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="fullname"/>
+
+		<string-field
+			name="password"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="active"/>
+
+		<slave-field
+			type="userOnline"/>
+
+	</fields>
+
+	<collections>
+
+		<children-collection
+			type="userPriv"/>
+
+		<children-collection
+			type="userSession"/>
+
+		<associative-collection
+			type="group"
+			table="user_group"/>
+
+	</collections>
 
 	<priv-types>
 

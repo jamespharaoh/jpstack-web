@@ -7,33 +7,12 @@ import com.google.common.base.Optional;
 public
 interface ExceptionLogLogic {
 
-	ExceptionLogRec logSimple (
+	ExceptionLogRec logException (
 			String typeCode,
 			String source,
 			String summary,
 			String dump,
 			Optional<Integer> userId,
 			Boolean fatal);
-
-	ExceptionLogRec logThrowable (
-			String typeCode,
-			String source,
-			Throwable throwable,
-			Optional<Integer> userId,
-			Boolean fatal);
-
-	ExceptionLogRec logThrowableWithSummary (
-			String typeCode,
-			String source,
-			String summary,
-			Throwable throwable,
-			Optional<Integer> userId,
-			Boolean fatal);
-
-	String throwableSummary (
-			Throwable throwable);
-
-	String throwableDump (
-			Throwable throwable);
 
 }

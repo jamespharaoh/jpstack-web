@@ -7,13 +7,18 @@
 		<plugin-dependency name="platform-common"/>
 	</plugin-dependencies>
 
-
 	<models>
 		<model name="currency"/>
 	</models>
 
 	<layer name="logic">
 		<bean class="logic.CurrencyLogicImpl"/>
+	</layer>
+
+	<layer name="console">
+		<bean class="console.CurrencyFormFieldBuilder"/>
+		<bean class="console.CurrencyFormFieldInterfaceMapping"/>
+		<bean class="console.CurrencyFormFieldSpec"/>
 	</layer>
 
 	<fixtures>

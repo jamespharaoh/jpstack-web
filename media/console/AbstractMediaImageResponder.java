@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.ConsoleResponder;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.ConsoleResponder;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;

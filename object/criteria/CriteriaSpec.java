@@ -1,7 +1,7 @@
 package wbs.platform.object.criteria;
 
+import wbs.console.helper.ConsoleHelper;
 import wbs.framework.record.Record;
-import wbs.platform.console.helper.ConsoleHelper;
 
 public
 interface CriteriaSpec {

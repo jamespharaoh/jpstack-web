@@ -7,6 +7,15 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wbs.console.action.ConsoleAction;
+import wbs.console.context.ConsoleContextBuilderContainer;
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.lookup.ObjectLookup;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.database.Database;
@@ -15,15 +24,6 @@ import wbs.framework.record.PermanentRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
-import wbs.platform.console.action.ConsoleAction;
-import wbs.platform.console.context.ConsoleContextBuilderContainer;
-import wbs.platform.console.forms.FormFieldLogic;
-import wbs.platform.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.platform.console.forms.FormFieldSet;
-import wbs.platform.console.helper.ConsoleHelper;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.lookup.ObjectLookup;
-import wbs.platform.console.request.ConsoleRequestContext;
 import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.services.ticket.core.console.FieldsProvider;
 
@@ -193,7 +193,7 @@ class ObjectSettingsAction
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
 
-		if (parentHelper.root ()) {
+		if (parentHelper.isRoot ()) {
 
 			parent =
 				rootHelper.find (0);

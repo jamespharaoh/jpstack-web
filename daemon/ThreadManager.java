@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.exception.logic.ExceptionLogLogic;
+import wbs.framework.exception.ExceptionLogger;
 
 import com.google.common.base.Optional;
 
@@ -23,7 +23,7 @@ class ThreadManager
 	}
 
 	@Inject
-	ExceptionLogLogic exceptionLogic;
+	ExceptionLogger exceptionLogger;
 
 	/**
 	 * Thread class which provides the desired functionality.
@@ -83,7 +83,7 @@ class ThreadManager
 
 			try {
 
-				exceptionLogic.logThrowable (
+				exceptionLogger.logThrowable (
 					"daemon",
 					stringFormat (
 						"Daemon thread %s",

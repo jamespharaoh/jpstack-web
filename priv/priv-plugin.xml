@@ -7,17 +7,19 @@
 		<model name="privType"/>
 	</models>
 
-	<layer name="entity">
-		<bean class="model.PrivTypeBuilder"/>
-		<bean class="model.PrivTypeSpec"/>
-		<bean class="model.PrivTypesBuilder"/>
-		<bean class="model.PrivTypesSpec"/>
+	<layer name="fixture">
+		<bean class="fixture.PrivTypeBuilder"/>
+		<bean class="fixture.PrivTypesBuilder"/>
+	</layer>
+
+	<layer name="model-meta">
+		<bean class="metamodel.PrivTypeSpec"/>
+		<bean class="metamodel.PrivTypesSpec"/>
 	</layer>
 
 	<layer name="console">
 		<bean class="console.ObjectSummaryPrivPart"/>
-		<bean class="console.PrivCheckerImpl"/>
-		<bean class="console.PrivDataLoaderImpl"/>
+		<bean class="console.PrivDataLoaderImplementation"/>
 	</layer>
 
 	<console-modules>

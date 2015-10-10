@@ -13,17 +13,17 @@ import javax.inject.Provider;
 
 import org.joda.time.Instant;
 
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.ScriptRef;
+import wbs.console.misc.TimeFormatter;
+import wbs.console.priv.PrivChecker;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.console.context.ConsoleApplicationScriptRef;
-import wbs.platform.console.html.JqueryScriptRef;
-import wbs.platform.console.html.ScriptRef;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.HtmlResponder;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimRec;

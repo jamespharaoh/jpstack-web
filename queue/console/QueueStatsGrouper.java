@@ -8,11 +8,11 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.reporting.StatsDataSet;
+import wbs.console.reporting.StatsGrouper;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.console.helper.ConsoleObjectManager;
 import wbs.platform.queue.model.QueueRec;
-import wbs.platform.reporting.console.StatsDataSet;
-import wbs.platform.reporting.console.StatsGrouper;
 
 @SingletonComponent ("queueStatsGrouper")
 public

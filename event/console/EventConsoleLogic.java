@@ -7,16 +7,16 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.lookup.ObjectLookup;
+import wbs.console.part.PagePart;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.PermanentRecord;
 import wbs.framework.record.Record;
-import wbs.platform.console.helper.ConsoleObjectManager;
-import wbs.platform.console.lookup.ObjectLookup;
-import wbs.platform.console.part.PagePart;
-import wbs.platform.console.request.ConsoleRequestContext;
 
 @SingletonComponent ("eventConsoleLogic")
 public

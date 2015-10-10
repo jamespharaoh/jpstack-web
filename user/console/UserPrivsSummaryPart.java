@@ -13,12 +13,12 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
+import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
-import wbs.platform.console.part.AbstractPagePart;
 import wbs.platform.group.model.GroupRec;
-import wbs.platform.priv.console.PrivChecker;
 import wbs.platform.priv.model.PrivRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserPrivRec;

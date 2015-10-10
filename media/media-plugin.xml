@@ -17,6 +17,9 @@
 	</layer>
 
 	<layer name="console">
+		<bean class="console.ImageFormFieldBuilder"/>
+		<bean class="console.ImageFormFieldRenderer"/>
+		<bean class="console.ImageFormFieldSpec"/>
 		<bean class="console.MediaAudioResponder"/>
 		<bean class="console.MediaConsoleConfig"/>
 		<bean class="console.MediaConsoleLogicImpl"/>

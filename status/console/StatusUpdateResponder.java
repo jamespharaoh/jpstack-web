@@ -14,10 +14,10 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.joda.time.Instant;
 
+import wbs.console.misc.TimeFormatter;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.platform.console.misc.TimeFormatter;
-import wbs.platform.console.request.ConsoleRequestContext;
-import wbs.platform.console.responder.ConsoleResponder;
 
 @PrototypeComponent ("statusUpdateResponder")
 public

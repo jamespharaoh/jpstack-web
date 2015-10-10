@@ -23,6 +23,10 @@
 		<bean class="console.UserPrivsEditorAction"/>
 		<bean class="console.UserPrivsEditorPart"/>
 		<bean class="console.UserPrivsSummaryPart"/>
+		<bean class="console.UserStatsGrouper"/>
+		<bean class="console.SupervisorHelperImplementation"/>
+		<bean class="console.SupervisorUserStatsGrouperBuilder"/>
+		<bean class="console.SupervisorUserStatsGrouperSpec"/>
 	</layer>
 
 	<fixtures>
