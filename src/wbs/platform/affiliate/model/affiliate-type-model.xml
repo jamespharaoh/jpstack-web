@@ -1,4 +1,17 @@
 <model-meta
-	name="affiliateType">
+	name="affiliateType"
+	type="type">
+
+	<fields>
+
+		<generated-id-field/>
+
+		<parent-type-field/>
+		<code-field/>
+
+		<name-field/>
+		<description-field/>
+
+	</fields>
 
 </model-meta>

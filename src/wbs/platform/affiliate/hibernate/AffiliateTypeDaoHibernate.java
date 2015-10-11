@@ -15,18 +15,18 @@ class AffiliateTypeDaoHibernate
 	@Override
 	public
 	List<AffiliateTypeRec> findByParentObjectType (
-			ObjectTypeRec parentObjectType) {
+			ObjectTypeRec parentType) {
 
 		return findMany (
 			AffiliateTypeRec.class,
 
 			createQuery (
 				"FROM AffiliateTypeRec affiliateType " +
-				"WHERE affiliateType.parentObjectType = :parentObjectType")
+				"WHERE affiliateType.parentType = :parentType")
 
 			.setEntity (
-				"parentObjectType",
-				parentObjectType)
+				"parentType",
+				parentType)
 
 			.list ());
 

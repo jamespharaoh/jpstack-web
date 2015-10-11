@@ -24,6 +24,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.entity.meta.CodeFieldSpec;
+import wbs.framework.entity.meta.IndexFieldSpec;
 import wbs.framework.entity.meta.ModelFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.ParentFieldSpec;
@@ -131,6 +132,7 @@ class ModelRecordGenerator {
 
 			org.apache.commons.lang3.builder.CompareToBuilder.class,
 
+			wbs.framework.entity.annotations.CommonEntity.class,
 			wbs.framework.entity.annotations.EphemeralEntity.class,
 			wbs.framework.entity.annotations.MajorEntity.class,
 			wbs.framework.entity.annotations.MinorEntity.class,
@@ -143,21 +145,28 @@ class ModelRecordGenerator {
 			wbs.framework.entity.annotations.DeletedField.class,
 			wbs.framework.entity.annotations.DescriptionField.class,
 			wbs.framework.entity.annotations.GeneratedIdField.class,
+			wbs.framework.entity.annotations.IndexField.class,
 			wbs.framework.entity.annotations.LinkField.class,
 			wbs.framework.entity.annotations.NameField.class,
 			wbs.framework.entity.annotations.ParentField.class,
 			wbs.framework.entity.annotations.ParentIdField.class,
 			wbs.framework.entity.annotations.ParentTypeField.class,
+			wbs.framework.entity.annotations.ReferenceField.class,
 			wbs.framework.entity.annotations.SimpleField.class,
 			wbs.framework.entity.annotations.SlaveField.class,
 			wbs.framework.entity.annotations.TypeField.class,
 
+			wbs.framework.record.CommonRecord.class,
 			wbs.framework.record.EphemeralRecord.class,
 			wbs.framework.record.MajorRecord.class,
 			wbs.framework.record.MinorRecord.class,
 			wbs.framework.record.Record.class,
 			wbs.framework.record.RootRecord.class,
-			wbs.framework.record.TypeRecord.class
+			wbs.framework.record.TypeRecord.class,
+
+			org.joda.time.Instant.class,
+
+			org.jadira.usertype.dateandtime.joda.PersistentInstantAsTimestamp.class
 
 		);
 
@@ -437,7 +446,9 @@ class ModelRecordGenerator {
 		ParentFieldSpec parentField = null;
 		ParentTypeFieldSpec parentTypeField = null;
 		ParentIdFieldSpec parentIdField = null;
+
 		CodeFieldSpec codeField = null;
+		IndexFieldSpec indexField = null;
 
 		for (
 			ModelFieldSpec modelField
@@ -472,6 +483,14 @@ class ModelRecordGenerator {
 
 				codeField =
 					(CodeFieldSpec)
+					modelField;
+
+			}
+
+			if (modelField instanceof IndexFieldSpec) {
+
+				indexField =
+					(IndexFieldSpec)
 					modelField;
 
 			}
@@ -539,6 +558,28 @@ class ModelRecordGenerator {
 					ifNull (
 						codeField.name (),
 						"code")),
+
+				"\n");
+
+		}
+
+		if (indexField != null) {
+
+			javaWriter.write (
+
+				"\t\t\t.append (\n",
+
+				"\t\t\t\tget%s (),\n",
+				capitalise (
+					ifNull (
+						indexField.name (),
+						"index")),
+
+				"\t\t\t\tother.get%s ())\n",
+				capitalise (
+					ifNull (
+						indexField.name (),
+						"index")),
 
 				"\n");
 

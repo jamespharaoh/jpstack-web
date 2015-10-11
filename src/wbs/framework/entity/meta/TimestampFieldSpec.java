@@ -8,11 +8,11 @@ import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("reference-field")
+@DataClass ("timestamp-field")
+@PrototypeComponent ("timestampFieldSpec")
 @ModelMetaData
-@PrototypeComponent ("referenceFieldSpec")
 public
-class ReferenceFieldSpec
+class TimestampFieldSpec
 	implements ModelFieldSpec {
 
 	@DataAttribute (
@@ -20,8 +20,12 @@ class ReferenceFieldSpec
 	String name;
 
 	@DataAttribute (
-		value = "type",
 		required = true)
-	String typeName;
+	ColumnType columnType;
+
+	public static
+	enum ColumnType {
+		timestamp;
+	}
 
 }

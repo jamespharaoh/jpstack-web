@@ -10,6 +10,8 @@
 		<bean class="meta.DeletedFieldSpec"/>
 		<bean class="meta.DescriptionFieldSpec"/>
 		<bean class="meta.GeneratedIdFieldSpec"/>
+		<bean class="meta.IndexFieldSpec"/>
+		<bean class="meta.IntegerFieldSpec"/>
 		<bean class="meta.ModelCollectionsSpec"/>
 		<bean class="meta.ModelFieldsSpec"/>
 		<bean class="meta.ModelMetaLoader"/>
@@ -21,6 +23,7 @@
 		<bean class="meta.ReferenceFieldSpec"/>
 		<bean class="meta.SlaveFieldSpec"/>
 		<bean class="meta.StringFieldSpec"/>
+		<bean class="meta.TimestampFieldSpec"/>
 		<bean class="meta.TypeFieldSpec"/>
 		<bean class="meta.YesNoFieldSpec"/>
 	</layer>
@@ -33,6 +36,8 @@
 		<bean class="generate.DeletedFieldWriter"/>
 		<bean class="generate.DescriptionFieldWriter"/>
 		<bean class="generate.GeneratedIdFieldWriter"/>
+		<bean class="generate.IndexFieldWriter"/>
+		<bean class="generate.IntegerFieldWriter"/>
 		<bean class="generate.ModelInterfacesGenerator"/>
 		<bean class="generate.ModelRecordGenerator"/>
 		<bean class="generate.ModelWriterManager"/>
@@ -40,8 +45,10 @@
 		<bean class="generate.ParentFieldWriter"/>
 		<bean class="generate.ParentIdFieldWriter"/>
 		<bean class="generate.ParentTypeFieldWriter"/>
+		<bean class="generate.ReferenceFieldWriter"/>
 		<bean class="generate.SlaveFieldWriter"/>
 		<bean class="generate.StringFieldWriter"/>
+		<bean class="generate.TimestampFieldWriter"/>
 		<bean class="generate.TypeFieldWriter"/>
 		<bean class="generate.YesNoFieldWriter"/>
 	</layer>
