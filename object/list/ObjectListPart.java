@@ -191,47 +191,59 @@ class ObjectListPart
 
 		// locate via parent
 
-		ConsoleHelper<?> parentHelper =
-			objectManager.getConsoleObjectHelper (
-				consoleHelper.parentClass ());
+		if (consoleHelper.parentTypeIsFixed ()) {
 
-		Integer parentId =
-			(Integer)
-			requestContext.stuff (
-				parentHelper.idKey ());
+			ConsoleHelper<?> parentHelper =
+				objectManager.getConsoleObjectHelper (
+					consoleHelper.parentClass ());
 
-		if (parentId != null) {
+			Integer parentId =
+				(Integer)
+				requestContext.stuff (
+					parentHelper.idKey ());
 
-			parent = parentHelper.find(
+			if (parentId != null) {
+
+				parent =
+					parentHelper.find (
+						parentId);
+
+				prepareAllObjectsViaParent (
+					parentHelper,
 					parentId);
 
-			prepareAllObjectsViaParent (
-				parentHelper,
-				parentId);
+				return;
 
-			return;
+			}
 
-		}
+			// locate via grand parent
 
-		// locate via grand parent
+			if (
+				! parentHelper.isRoot ()
+				&& parentHelper.parentTypeIsFixed ()
+			) {
 
-		ConsoleHelper<?> grandParentHelper =
-			objectManager.getConsoleObjectHelper (
-				parentHelper.parentClass ());
+				ConsoleHelper<?> grandParentHelper =
+					objectManager.getConsoleObjectHelper (
+						parentHelper.parentClass ());
 
-		Integer grandParentId =
-			(Integer)
-			requestContext.stuff (
-				grandParentHelper.idKey ());
+				Integer grandParentId =
+					(Integer)
+					requestContext.stuff (
+						grandParentHelper.idKey ());
 
-		if (grandParentId != null) {
+				if (grandParentId != null) {
 
-			prepareAllObjectsViaGrandParent (
-				parentHelper,
-				grandParentHelper,
-				grandParentId);
+					prepareAllObjectsViaGrandParent (
+						parentHelper,
+						grandParentHelper,
+						grandParentId);
 
-			return;
+					return;
+
+				}
+
+			}
 
 		}
 

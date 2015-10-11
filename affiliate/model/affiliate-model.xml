@@ -1,5 +1,19 @@
 <model-meta
-	name="affiliate">
+	name="affiliate"
+	type="minor">
+
+	<fields>
+
+		<generated-id-field/>
+
+		<parent-type-field/>
+		<parent-id-field/>
+		<code-field/>
+
+		<description-field/>
+		<type-field/>
+
+	</fields>
 
 	<affiliate-types>
 
