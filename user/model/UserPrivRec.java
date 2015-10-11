@@ -69,15 +69,4 @@ class UserPrivRec
 
 	}
 
-	// dao methods
-
-	public static
-	interface UserPrivDaoMethods {
-
-		UserPrivRec find (
-				UserRec user,
-				PrivRec priv);
-
-	}
-
 }

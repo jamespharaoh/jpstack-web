@@ -1,7 +1,5 @@
 package wbs.platform.affiliate.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -66,23 +64,6 @@ class AffiliateTypeRec
 				other.getCode ())
 
 			.toComparison ();
-
-	}
-
-	// object helper methods
-
-	public static
-	interface AffiliateTypeObjectHelperMethods {
-
-	}
-
-	// dao methods
-
-	public static
-	interface AffiliateTypeDaoMethods {
-
-		List<AffiliateTypeRec> findByParentObjectType (
-				ObjectTypeRec parentObjectType);
 
 	}
 

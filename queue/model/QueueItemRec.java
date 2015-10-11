@@ -2,7 +2,6 @@ package wbs.platform.queue.model;
 
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,7 +9,6 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.joda.time.Interval;
 
 import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
@@ -132,30 +130,5 @@ class QueueItemRec
 		}
 
 	};
-
-	// object dao
-
-	public static
-	interface QueueItemDaoMethods {
-
-		QueueItemRec findByIndex (
-				QueueSubjectRec queueSubject,
-				int index);
-
-		List<QueueItemRec> findByCreatedTime (
-				Interval createdTimeInterval);
-
-		List<QueueItemRec> findByCreatedTime (
-				QueueRec queue,
-				Interval createdTimeInterval);
-
-		List<QueueItemRec> findByProcessedTime (
-				Interval processedTimeInterval);
-
-		List<QueueItemRec> findByProcessedTime (
-				UserRec user,
-				Interval processedTimeInterval);
-
-	}
 
 }

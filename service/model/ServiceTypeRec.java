@@ -1,6 +1,5 @@
 package wbs.platform.service.model;
 
-import java.util.List;
 import java.util.Set;
 
 import lombok.Data;
@@ -74,23 +73,6 @@ class ServiceTypeRec
 				other.getCode ())
 
 			.toComparison ();
-
-	}
-
-	// object helper methods
-
-	public static
-	interface ServiceTypeObjectHelperMethods {
-
-	}
-
-	// dao methods
-
-	public static
-	interface ServiceTypeDaoMethods {
-
-		List<ServiceTypeRec> findByParentObjectType (
-				ObjectTypeRec parentObjectType);
 
 	}
 

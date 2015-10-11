@@ -3,8 +3,8 @@ package wbs.platform.queue.hibernate;
 import java.util.List;
 
 import wbs.framework.hibernate.HibernateDao;
+import wbs.platform.queue.model.QueueItemClaimDaoMethods;
 import wbs.platform.queue.model.QueueItemClaimRec;
-import wbs.platform.queue.model.QueueItemClaimRec.QueueItemClaimDaoMethods;
 import wbs.platform.queue.model.QueueItemClaimStatus;
 import wbs.platform.user.model.UserRec;
 

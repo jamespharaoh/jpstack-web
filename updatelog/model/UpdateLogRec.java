@@ -66,15 +66,4 @@ class UpdateLogRec
 
 	}
 
-	// dao methods
-
-	public static
-	interface UpdateLogDaoMethods {
-
-		UpdateLogRec findByTableAndRef (
-				String table,
-				int ref);
-
-	}
-
 }

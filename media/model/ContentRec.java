@@ -1,7 +1,5 @@
 package wbs.platform.media.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -64,16 +62,6 @@ class ContentRec
 				other.getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ContentDaoMethods {
-
-		List<ContentRec> findByHash (
-				int hash);
 
 	}
 

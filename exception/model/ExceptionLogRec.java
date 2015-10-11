@@ -1,7 +1,6 @@
 package wbs.platform.exception.model;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -79,20 +78,6 @@ class ExceptionLogRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ExceptionLogDaoMethods {
-
-		int countWithAlert ();
-
-		int countWithAlertAndFatal ();
-
-		List<Integer> searchIds (
-				ExceptionLogSearch search);
 
 	}
 

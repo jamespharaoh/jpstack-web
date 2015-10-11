@@ -1,7 +1,6 @@
 package wbs.platform.queue.model;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -86,18 +85,6 @@ class QueueItemClaimRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// object dao
-
-	public static
-	interface QueueItemClaimDaoMethods {
-
-		List<QueueItemClaimRec> findClaimed ();
-
-		List<QueueItemClaimRec> findClaimed (
-				UserRec user);
 
 	}
 
