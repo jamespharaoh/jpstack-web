@@ -150,10 +150,12 @@ class AffiliateTypeBuilder {
 				stringFormat (
 					"INSERT INTO affiliate_type (",
 						"id, ",
-						"parent_object_type_id, ",
+						"parent_type_id, ",
 						"code, ",
+						"name, ",
 						"description) ",
 					"VALUES (",
+						"?, ",
 						"?, ",
 						"?, ",
 						"?, ",
@@ -174,6 +176,10 @@ class AffiliateTypeBuilder {
 
 		insertAffiliateTypeStatement.setString (
 			4,
+			spec.name ());
+
+		insertAffiliateTypeStatement.setString (
+			5,
 			spec.description ());
 
 		insertAffiliateTypeStatement.executeUpdate ();
