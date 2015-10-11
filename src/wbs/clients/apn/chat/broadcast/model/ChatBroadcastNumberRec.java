@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.broadcast.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -83,17 +81,6 @@ class ChatBroadcastNumberRec
 				other.getChatUser ())
 
 			.toComparison ();
-
-	}
-
-	// dao
-
-	public static
-	interface ChatBroadcastNumberDaoMethods {
-
-		List<ChatBroadcastNumberRec> findAcceptedLimit (
-				ChatBroadcastRec chatBroadcast,
-				int limit);
 
 	}
 

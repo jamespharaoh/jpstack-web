@@ -88,8 +88,6 @@ class ForwarderMessageOutRec
 	List<ForwarderMessageOutReportRec> reports =
 		new ArrayList<ForwarderMessageOutReportRec> ();
 
-	//Boolean messageReportPending;
-
 	// compare to
 
 	@Override
@@ -111,21 +109,6 @@ class ForwarderMessageOutRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ForwarderMessageOutDaoMethods {
-
-		ForwarderMessageOutRec findByOtherId (
-				ForwarderRec forwarder,
-				String otherId);
-
-		List<ForwarderMessageOutRec> findPendingLimit (
-				ForwarderRec forwarder,
-				int maxResults);
 
 	}
 

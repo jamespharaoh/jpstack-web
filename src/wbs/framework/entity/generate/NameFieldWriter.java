@@ -1,10 +1,8 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
-import java.io.Writer;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -14,6 +12,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.NameFieldSpec;
+import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("nameFieldWriter")
 @ModelWriter
@@ -29,7 +28,7 @@ class NameFieldWriter {
 	NameFieldSpec spec;
 
 	@BuilderTarget
-	Writer javaWriter;
+	FormatWriter javaWriter;
 
 	// build
 
@@ -40,16 +39,15 @@ class NameFieldWriter {
 		throws IOException {
 
 		javaWriter.write (
-			stringFormat (
 
-				"\t@NameField\n",
+			"\t@NameField\n",
 
-				"\tString %s;\n",
-				ifNull (
-					spec.name (),
-					"name"),
+			"\tString %s;\n",
+			ifNull (
+				spec.name (),
+				"name"),
 
-				"\n"));
+			"\n");
 
 	}
 

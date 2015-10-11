@@ -61,14 +61,4 @@ class HybyteNetworkRec
 
 	}
 
-	// dao methods
-
-	public static
-	interface HybyteNetworkDaoMethods {
-
-		HybyteNetworkRec findByInText (
-				String inText);
-
-	}
-
 }

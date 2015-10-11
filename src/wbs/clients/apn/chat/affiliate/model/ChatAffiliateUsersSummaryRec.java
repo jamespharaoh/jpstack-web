@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.affiliate.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -9,7 +7,6 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
-import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.ForeignIdField;
 import wbs.framework.entity.annotations.MasterField;
@@ -87,6 +84,8 @@ class ChatAffiliateUsersSummaryRec
 	@SimpleField
 	Integer numOnlineLastMonth;
 
+	// compare to
+
 	@Override
 	public
 	int compareTo (
@@ -102,14 +101,6 @@ class ChatAffiliateUsersSummaryRec
 				other.getId ())
 
 			.toComparison ();
-
-	}
-
-	public static
-	interface ChatAffiliateUsersSummaryDaoMethods {
-
-		List<ChatAffiliateUsersSummaryRec> find (
-				ChatRec chat);
 
 	}
 

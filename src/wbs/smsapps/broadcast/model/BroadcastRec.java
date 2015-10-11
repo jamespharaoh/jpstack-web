@@ -1,7 +1,5 @@
 package wbs.smsapps.broadcast.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -129,18 +127,6 @@ class BroadcastRec
 				getCreatedTime ())
 
 			.toComparison ();
-
-	}
-
-	// dao
-
-	public static
-	interface BroadcastDaoMethods {
-
-		List<BroadcastRec> findSending ();
-
-		List<BroadcastRec> findScheduled (
-				Instant now);
 
 	}
 

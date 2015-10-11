@@ -1,7 +1,6 @@
 package wbs.smsapps.manualresponder.model;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import lombok.Data;
@@ -96,21 +95,6 @@ class ManualResponderRequestRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ManualResponderRequestDaoMethods {
-
-		List<ManualResponderRequestRec> findRecentLimit (
-				ManualResponderRec manualResponder,
-				NumberRec number,
-				Integer maxResults);
-
-		List<Integer> searchIds (
-				ManualResponderRequestSearch search);
 
 	}
 

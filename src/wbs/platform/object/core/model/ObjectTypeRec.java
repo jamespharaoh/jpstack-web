@@ -1,7 +1,5 @@
 package wbs.platform.object.core.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -54,21 +52,6 @@ class ObjectTypeRec
 				other.getCode ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ObjectTypeDaoMethods {
-
-		ObjectTypeRec findById (
-				int id);
-
-		ObjectTypeRec findByCode (
-				String code);
-
-		List<ObjectTypeRec> findAll ();
 
 	}
 

@@ -103,14 +103,4 @@ class PhotoGrabberRequestRec
 
 	}
 
-	// dao methods
-
-	public static
-	interface PhotoGrabberRequestDaoMethods {
-
-		PhotoGrabberRequestRec findByBilledMessage (
-				MessageRec billedMessage);
-
-	}
-
 }

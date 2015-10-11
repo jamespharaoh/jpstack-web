@@ -5,8 +5,8 @@ import java.util.List;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.framework.record.Record;
 import wbs.platform.queue.model.QueueRec;
+import wbs.platform.queue.model.QueueSubjectDaoMethods;
 import wbs.platform.queue.model.QueueSubjectRec;
-import wbs.platform.queue.model.QueueSubjectRec.QueueSubjectDaoMethods;
 
 public
 class QueueSubjectDaoHibernate

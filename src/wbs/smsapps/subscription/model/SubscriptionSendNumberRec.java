@@ -1,7 +1,5 @@
 package wbs.smsapps.subscription.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -77,17 +75,6 @@ class SubscriptionSendNumberRec
 				other.getSubscriptionSub ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface SubscriptionSendNumberDaoMethods {
-
-		List<SubscriptionSendNumberRec> findQueuedLimit (
-				SubscriptionSendRec subscriptionSend,
-				int maxResults);
 
 	}
 

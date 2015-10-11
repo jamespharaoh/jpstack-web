@@ -37,20 +37,12 @@ writeFactorypath world = do
 			"/binaries/libraries/joda-time-jar-2.3.jar"
 		]
 
-	let makeWbsFrameworkEntry =
-		makeEntry "WKSPJAR" $ concat [
-			"/",
-			bldName build,
-			"/work/wbs-framework.jar"
-		]
-
 	let makeFactorypath =
 		root [] [
 			mkelem "factorypath" [] [
 				makeAnnotationsEntry,
 				makeGuavaEntry,
-				makeJodaTimeEntry,
-				makeWbsFrameworkEntry
+				makeJodaTimeEntry
 			]
 		]
 

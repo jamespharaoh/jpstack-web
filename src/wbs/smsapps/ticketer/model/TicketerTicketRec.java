@@ -86,16 +86,4 @@ class TicketerTicketRec
 
 	}
 
-	// dao methods
-
-	public static
-	interface TicketerTicketDaoMethods {
-
-		TicketerTicketRec findByTicket (
-				TicketerRec ticketer,
-				NumberRec number,
-				String ticket);
-
-	}
-
 }

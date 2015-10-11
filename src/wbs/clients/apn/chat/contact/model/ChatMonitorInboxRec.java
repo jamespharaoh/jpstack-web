@@ -80,13 +80,4 @@ class ChatMonitorInboxRec
 
 	}
 
-	public static
-	interface ChatMonitorInboxDaoMethods {
-
-		ChatMonitorInboxRec find (
-				ChatUserRec monitorChatUser,
-				ChatUserRec userChatUser);
-
-	}
-
 }

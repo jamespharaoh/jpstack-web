@@ -97,20 +97,4 @@ class QueueSubjectRec
 
 	}
 
-	// dao
-
-	public static
-	interface QueueSubjectDaoMethods {
-
-		QueueSubjectRec find (
-				QueueRec queue,
-				Record<?> object);
-
-		List<QueueSubjectRec> findActive ();
-
-		List<QueueSubjectRec> findActive (
-				QueueRec queue);
-
-	}
-
 }

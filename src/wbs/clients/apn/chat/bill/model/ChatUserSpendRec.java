@@ -101,15 +101,4 @@ class ChatUserSpendRec
 
 	}
 
-	// dao methods
-
-	public static
-	interface ChatUserSpendDaoMethods {
-
-		ChatUserSpendRec findByDate (
-				ChatUserRec chatUser,
-				LocalDate date);
-
-	}
-
 }

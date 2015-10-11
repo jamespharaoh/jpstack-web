@@ -4,8 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 import wbs.framework.hibernate.HibernateDao;
+import wbs.smsapps.forwarder.model.ForwarderMessageInDaoMethods;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
-import wbs.smsapps.forwarder.model.ForwarderMessageInRec.ForwarderMessageInDaoMethods;
 import wbs.smsapps.forwarder.model.ForwarderRec;
 
 public

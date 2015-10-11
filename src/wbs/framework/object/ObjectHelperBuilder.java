@@ -360,8 +360,8 @@ class ObjectHelperBuilder {
 
 				String extraInterfaceName =
 					stringFormat (
-						"%s$%sObjectHelperMethods",
-						objectHelperProvider.objectClass ().getName (),
+						"%s.%sObjectHelperMethods",
+						objectHelperProvider.objectClass ().getPackage ().getName (),
 						capitalise (objectHelperProvider.objectName ()));
 
 				extraInterface =
@@ -390,8 +390,8 @@ class ObjectHelperBuilder {
 
 			String daoMethodsInterfaceName =
 				stringFormat (
-					"%s$%sDaoMethods",
-					objectHelperProvider.objectClass ().getName (),
+					"%s.%sDaoMethods",
+					objectHelperProvider.objectClass ().getPackage ().getName (),
 					capitalise (objectHelperProvider.objectName ()));
 
 			try {

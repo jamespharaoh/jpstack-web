@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.user.core.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -76,16 +74,6 @@ class ChatUserNoteRec
 
 			.toComparison ();
 
-
-	}
-
-	// dao methods
-
-	public static
-	interface ChatUserNoteDaoMethods {
-
-		List<ChatUserNoteRec> find (
-				ChatUserRec chatUser);
 
 	}
 

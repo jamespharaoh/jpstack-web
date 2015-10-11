@@ -1,9 +1,6 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import java.io.IOException;
-import java.io.Writer;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -13,6 +10,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.ParentIdFieldSpec;
+import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("parentIdFieldWriter")
 @ModelWriter
@@ -28,7 +26,7 @@ class ParentIdFieldWriter {
 	ParentIdFieldSpec spec;
 
 	@BuilderTarget
-	Writer javaWriter;
+	FormatWriter javaWriter;
 
 	// build
 
@@ -41,13 +39,12 @@ class ParentIdFieldWriter {
 		// TODO this should not be hardcoded, but not sure what instead
 
 		javaWriter.write (
-			stringFormat (
 
-				"\t@ParentIdField\n",
+			"\t@ParentIdField\n",
 
-				"\tInteger parentId;\n",
+			"\tInteger parentId;\n",
 
-				"\n"));
+			"\n");
 
 	}
 

@@ -4,7 +4,6 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import wbs.clients.apn.chat.contact.model.ChatContactRec.ChatContactCache;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.AbstractObjectHooks;

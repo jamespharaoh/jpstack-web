@@ -1,8 +1,5 @@
 package wbs.test.simulator.model;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -60,64 +57,6 @@ class SimulatorSessionNumberRec
 				other.getNumber ())
 
 			.toComparison ();
-
-	}
-
-	// object helper methods
-
-	public static
-	interface SimulatorSessionNumberObjectHelperMethods {
-
-		SimulatorSessionNumberRec findOrCreate (
-				NumberRec number);
-
-	}
-
-	// object helper implementation
-
-	public static
-	class SimulatorSessionNumberObjectHelperImplementation
-		implements SimulatorSessionNumberObjectHelperMethods {
-
-		// indirect dependencies
-
-		@Inject
-		Provider<SimulatorSessionNumberObjectHelper>
-		simulatorSessionNumberHelperProvider;
-
-		// implementation
-
-		@Override
-		public
-		SimulatorSessionNumberRec findOrCreate (
-				NumberRec number) {
-
-			SimulatorSessionNumberObjectHelper simulatorSessionNumberHelper =
-				simulatorSessionNumberHelperProvider.get ();
-
-			// find existing
-
-			SimulatorSessionNumberRec existingSimulatorSessionNumber =
-				simulatorSessionNumberHelper.find (
-					number.getId ());
-
-			if (existingSimulatorSessionNumber != null)
-				return existingSimulatorSessionNumber;
-
-			// create new
-
-			SimulatorSessionNumberRec newSimulatorSessionNumber =
-				simulatorSessionNumberHelper.insert (
-					new SimulatorSessionNumberRec ()
-
-				.setNumber (
-					number)
-
-			);
-
-			return newSimulatorSessionNumber;
-
-		}
 
 	}
 

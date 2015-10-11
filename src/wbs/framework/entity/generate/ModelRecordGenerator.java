@@ -9,153 +9,62 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.List;
-import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import org.apache.commons.io.FileUtils;
 
+import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
-import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderFactory;
 import wbs.framework.entity.meta.CodeFieldSpec;
 import wbs.framework.entity.meta.ModelFieldSpec;
-import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.ParentFieldSpec;
 import wbs.framework.entity.meta.ParentIdFieldSpec;
 import wbs.framework.entity.meta.ParentTypeFieldSpec;
+import wbs.framework.utils.etc.FormatWriter;
 
 import com.google.common.collect.ImmutableList;
 
-@Log4j
+@Accessors (fluent = true)
+@PrototypeComponent ("modelRecordGenerator")
 public
 class ModelRecordGenerator {
 
 	// dependencies
 
 	@Inject
-	ModelMetaLoader modelMetaLoader;
+	ModelWriterManager modelWriterBuilder;
 
-	// prototype dependencies
+	// properties
 
-	@Inject
-	Provider<BuilderFactory> builderFactoryProvider;
+	@Getter @Setter
+	PluginSpec plugin;
 
-	// collection dependencies
+	@Getter @Setter
+	PluginModelSpec pluginModel;
 
-	@Inject
-	@ModelWriter
-	Map<Class<?>,Provider<Object>> modelWriterProviders;
+	@Getter @Setter
+	ModelMetaSpec modelMeta;
 
 	// state
 
-	Builder modelWriter;
-
-	// lifecycle
-
-	@PostConstruct
-	public
-	void setup () {
-
-		createModelWriter ();
-
-	}
+	String className;
 
 	// implementation
 
-	private
-	void createModelWriter () {
-
-		BuilderFactory builderFactory =
-			builderFactoryProvider.get ();
-
-		for (
-			Map.Entry<Class<?>,Provider<Object>> modelWriterEntry
-				: modelWriterProviders.entrySet ()
-		) {
-
-			builderFactory.addBuilder (
-				modelWriterEntry.getKey (),
-				modelWriterEntry.getValue ());
-
-		}
-
-		modelWriter =
-			builderFactory.create ();
-
-	}
-
-	@SneakyThrows (IOException.class)
 	public
-	void generateModelRecords (
-			List<String> params) {
-
-		log.info (
-			stringFormat (
-				"About to generate up to %s model classes",
-				modelMetaLoader.modelSpecs ().size ()));
-
-		int successCount = 0;
-		int skipCount = 0;
-
-		for (
-			ModelMetaSpec modelSpec
-				: modelMetaLoader.modelSpecs ().values ()
-		) {
-
-			PluginModelSpec pluginModel =
-				modelSpec.pluginModel ();
-
-			PluginSpec plugin =
-				pluginModel.plugin ();
-
-			if (modelSpec.type () == null) {
-
-				skipCount ++;
-
-				continue;
-
-			}
-
-			generateModelRecord (
-				plugin,
-				pluginModel,
-				modelSpec);
-
-			successCount ++;
-
-		}
-
-		log.info (
-			stringFormat (
-				"Successfully created %s model classes",
-				successCount));
-
-		log.warn (
-			stringFormat (
-				"Skipped %s model classes which are explicitly defined",
-				skipCount));
-
-	}
-
-	private
-	void generateModelRecord (
-			PluginSpec plugin,
-			PluginModelSpec pluginModel,
-			ModelMetaSpec modelMeta)
+	void generateRecord ()
 		throws IOException {
 
-		String className =
+		className =
 			stringFormat (
 				"%sRec",
 				capitalise (
@@ -181,32 +90,30 @@ class ModelRecordGenerator {
 				filename);
 
 		@Cleanup
-		Writer javaWriter =
-			new OutputStreamWriter (
-				outputStream);
+		FormatWriter javaWriter =
+			new FormatWriter (
+				new OutputStreamWriter (
+					outputStream));
 
 		javaWriter.write (
-			stringFormat (
-				"package %s.model;\n\n",
-				plugin.packageName ()));
+
+			"package %s.model;\n\n",
+			plugin.packageName ());
 
 		writeStandardImports (
 			javaWriter);
 
 		writeClassAnnotations (
-			javaWriter,
-			modelMeta);
+			javaWriter);
 
 		writeClass (
-			javaWriter,
-			modelMeta,
-			className);
+			javaWriter);
 
 	}
 
 	private
 	void writeStandardImports (
-			Writer javaWriter)
+			FormatWriter javaWriter)
 		throws IOException {
 
 		List<Class<?>> standardImportClasses =
@@ -260,87 +167,86 @@ class ModelRecordGenerator {
 		) {
 
 			javaWriter.write (
-				stringFormat (
-					"import %s;\n",
-					standardImportClass.getName ()));
+
+				"import %s;\n",
+				standardImportClass.getName ());
 
 		}
 
 		javaWriter.write (
-			stringFormat (
-				"\n"));
+
+			"\n");
 
 	}
 
 	private
 	void writeClassAnnotations (
-			Writer javaWriter,
-			ModelMetaSpec modelMeta)
+			FormatWriter javaWriter)
 		throws IOException {
 
 		javaWriter.write (
-			stringFormat (
-				"@Accessors (chain = true)\n"));
+
+			"@Accessors (chain = true)\n");
 
 		javaWriter.write (
-			stringFormat (
-				"@Data\n"));
+
+			"@Data\n");
 
 		javaWriter.write (
-			stringFormat (
-				"@EqualsAndHashCode (of = \"id\")\n"));
+
+			"@EqualsAndHashCode (of = \"id\")\n");
 
 		javaWriter.write (
-			stringFormat (
-				"@ToString (of = \"id\")\n"));
+
+			"@ToString (of = \"id\")\n");
 
 		switch (modelMeta.type ()) {
 
 		case common:
 
 			javaWriter.write (
-				stringFormat (
-					"@CommonEntity\n"));
+
+				"@CommonEntity\n");
 
 			break;
 
 		case ephemeral:
 
 			javaWriter.write (
-				stringFormat (
-					"@EphemeralEntity\n"));
+
+				"@EphemeralEntity\n");
 
 			break;
 
 		case major:
 
 			javaWriter.write (
-				stringFormat (
-					"@MajorEntity\n"));
+
+				"@MajorEntity\n");
 
 			break;
 
 		case minor:
 
 			javaWriter.write (
-				stringFormat (
-					"@MinorEntity\n"));
+
+				"@MinorEntity\n");
 
 			break;
 
 		case root:
 
 			javaWriter.write (
-				stringFormat (
-					"@RootEntity\n"));
+
+				"@RootEntity\n");
 
 			break;
 
 		case type:
 
 			javaWriter.write (
-				stringFormat (
-					"@TypeEntity\n"));
+
+				"@TypeEntity\n");
 
 			break;
 
@@ -353,72 +259,69 @@ class ModelRecordGenerator {
 	}
 
 	void writeClass (
-			Writer javaWriter,
-			ModelMetaSpec modelMeta,
-			String className)
+			FormatWriter javaWriter)
 		throws IOException {
 
 		javaWriter.write (
-			stringFormat (
 
-				"public\n",
+			"public\n",
 
-				"class %s\n",
-				className));
+			"class %s\n",
+			className);
 
 		switch (modelMeta.type ()) {
 
 		case common:
 
 			javaWriter.write (
-				stringFormat (
-					"\timplements CommonRecord<%s> {\n",
-					className));
+
+				"\timplements CommonRecord<%s> {\n",
+				className);
 
 			break;
 
 		case ephemeral:
 
 			javaWriter.write (
-				stringFormat (
-					"\timplements EphemeralRecord<%s> {\n",
-					className));
+
+				"\timplements EphemeralRecord<%s> {\n",
+				className);
 
 			break;
 
 		case major:
 
 			javaWriter.write (
-				stringFormat (
-					"\timplements MajorRecord<%s> {\n",
-					className));
+
+				"\timplements MajorRecord<%s> {\n",
+				className);
 
 			break;
 
 		case minor:
 
 			javaWriter.write (
-				stringFormat (
-					"\timplements MinorRecord<%s> {\n",
-					className));
+
+				"\timplements MinorRecord<%s> {\n",
+				className);
 
 			break;
 
 		case root:
 
 			javaWriter.write (
-				stringFormat (
-					"\timplements RootRecord<%s> {\n",
-					className));
+
+				"\timplements RootRecord<%s> {\n",
+				className);
 
 			break;
 
 		case type:
 
 			javaWriter.write (
-				stringFormat (
-					"\timplements TypeRecord<%s> {\n",
-					className));
+
+				"\timplements TypeRecord<%s> {\n",
+				className);
 
 			break;
 
@@ -429,33 +332,27 @@ class ModelRecordGenerator {
 		}
 
 		javaWriter.write (
-			stringFormat (
 
-				"\n"));
+			"\n");
 
 		generateFields (
-			javaWriter,
-			modelMeta);
+			javaWriter);
 
 		generateCollections (
-			javaWriter,
-			modelMeta);
+			javaWriter);
 
 		generateCompareTo (
-			javaWriter,
-			modelMeta,
-			className);
+			javaWriter);
 
 		javaWriter.write (
-			stringFormat (
-				"}\n"));
+
+			"}\n");
 
 	}
 
 	private
 	void generateFields (
-			Writer javaWriter,
-			ModelMetaSpec modelMeta)
+			FormatWriter javaWriter)
 		throws IOException {
 
 		if (modelMeta.fields ().isEmpty ()) {
@@ -463,13 +360,12 @@ class ModelRecordGenerator {
 		}
 
 		javaWriter.write (
-			stringFormat (
 
-				"\t// fields\n",
+			"\t// fields\n",
 
-				"\n"));
+			"\n");
 
-		modelWriter.descend (
+		modelWriterBuilder.write (
 			modelMeta,
 			modelMeta.fields (),
 			javaWriter);
@@ -478,8 +374,7 @@ class ModelRecordGenerator {
 
 	private
 	void generateCollections (
-			Writer javaWriter,
-			ModelMetaSpec modelMeta)
+			FormatWriter javaWriter)
 		throws IOException {
 
 		if (modelMeta.collections ().isEmpty ()) {
@@ -487,13 +382,12 @@ class ModelRecordGenerator {
 		}
 
 		javaWriter.write (
-			stringFormat (
 
-				"\t// collections\n",
+			"\t// collections\n",
 
-				"\n"));
+			"\n");
 
-		modelWriter.descend (
+		modelWriterBuilder.write (
 			modelMeta,
 			modelMeta.collections (),
 			javaWriter);
@@ -502,49 +396,43 @@ class ModelRecordGenerator {
 
 	private
 	void generateCompareTo (
-			Writer javaWriter,
-			ModelMetaSpec modelMeta,
-			String className)
+			FormatWriter javaWriter)
 		throws IOException {
 
 		javaWriter.write (
-			stringFormat (
 
-				"\t// compare to\n",
+			"\t// compare to\n",
 
-				"\n"));
-
-		javaWriter.write (
-			stringFormat (
-
-				"\t@Override\n",
-
-				"\tpublic\n",
-
-				"\tint compareTo (\n",
-
-				"\t\t\tRecord<%s> otherRecord) {\n",
-				className,
-
-				"\n"));
+			"\n");
 
 		javaWriter.write (
-			stringFormat (
 
-				"\t\t%s other =\n",
-				className,
+			"\t@Override\n",
 
-				"\t\t\t(%s) otherRecord;\n",
-				className,
+			"\tpublic\n",
 
-				"\n"));
+			"\tint compareTo (\n",
+
+			"\t\t\tRecord<%s> otherRecord) {\n",
+			className,
+
+			"\n");
 
 		javaWriter.write (
-			stringFormat (
 
-				"\t\treturn new CompareToBuilder ()\n",
+			"\t\t%s other =\n",
+			className,
 
-				"\n"));
+			"\t\t\t(%s) otherRecord;\n",
+			className,
+
+			"\n");
+
+		javaWriter.write (
+
+			"\t\treturn new CompareToBuilder ()\n",
+
+			"\n");
 
 		ParentFieldSpec parentField = null;
 		ParentTypeFieldSpec parentTypeField = null;
@@ -593,101 +481,94 @@ class ModelRecordGenerator {
 		if (parentField != null) {
 
 			javaWriter.write (
-				stringFormat (
 
-					"\t\t\t.append (\n",
+				"\t\t\t.append (\n",
 
-					"\t\t\t\tget%s (),\n",
-					capitalise (parentField.typeName ()),
+				"\t\t\t\tget%s (),\n",
+				capitalise (parentField.typeName ()),
 
-					"\t\t\t\tother.get%s ())\n",
-					capitalise (parentField.typeName ()),
+				"\t\t\t\tother.get%s ())\n",
+				capitalise (parentField.typeName ()),
 
-					"\n"));
+				"\n");
 
 		}
 
 		if (parentTypeField != null) {
 
 			javaWriter.write (
-				stringFormat (
 
-					"\t\t\t.append (\n",
+				"\t\t\t.append (\n",
 
-					"\t\t\t\tgetParentType (),\n",
+				"\t\t\t\tgetParentType (),\n",
 
-					"\t\t\t\tother.getParentType ())\n",
+				"\t\t\t\tother.getParentType ())\n",
 
-					"\n"));
+				"\n");
 
 		}
 
 		if (parentIdField != null) {
 
 			javaWriter.write (
-				stringFormat (
 
-					"\t\t\t.append (\n",
+				"\t\t\t.append (\n",
 
-					"\t\t\t\tgetParentId (),\n",
+				"\t\t\t\tgetParentId (),\n",
 
-					"\t\t\t\tother.getParentId ())\n",
+				"\t\t\t\tother.getParentId ())\n",
 
-					"\n"));
+				"\n");
 
 		}
 
 		if (codeField != null) {
 
 			javaWriter.write (
-				stringFormat (
 
-					"\t\t\t.append (\n",
+				"\t\t\t.append (\n",
 
-					"\t\t\t\tget%s (),\n",
-					capitalise (
-						ifNull (
-							codeField.name (),
-							"code")),
+				"\t\t\t\tget%s (),\n",
+				capitalise (
+					ifNull (
+						codeField.name (),
+						"code")),
 
-					"\t\t\t\tother.get%s ())\n",
-					capitalise (
-						ifNull (
-							codeField.name (),
-							"code")),
+				"\t\t\t\tother.get%s ())\n",
+				capitalise (
+					ifNull (
+						codeField.name (),
+						"code")),
 
-					"\n"));
+				"\n");
 
 		}
 
 		if (parentField == null && codeField == null) {
 
 			javaWriter.write (
-				stringFormat (
 
-					"\t\t\t.append (\n",
+				"\t\t\t.append (\n",
 
-					"\t\t\t\tgetId (),\n",
+				"\t\t\t\tgetId (),\n",
 
-					"\t\t\t\tother.getId ())\n",
+				"\t\t\t\tother.getId ())\n",
 
-					"\n"));
+				"\n");
 
 		}
 
 		javaWriter.write (
-			stringFormat (
 
-				"\t\t\t.toComparison ();\n",
+			"\t\t\t.toComparison ();\n",
 
-				"\n"));
+			"\n");
 
 		javaWriter.write (
-			stringFormat (
 
-				"\t}\n",
+			"\t}\n",
 
-				"\n"));
+			"\n");
 
 	}
 

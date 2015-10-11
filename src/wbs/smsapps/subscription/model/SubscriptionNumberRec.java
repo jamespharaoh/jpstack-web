@@ -3,9 +3,6 @@ package wbs.smsapps.subscription.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -119,81 +116,6 @@ class SubscriptionNumberRec
 				other.getNumber ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface SubscriptionNumberDaoMethods {
-
-		SubscriptionNumberRec find (
-				SubscriptionRec subscription,
-				NumberRec number);
-
-		List<Integer> searchIds (
-				SubscriptionNumberSearch search);
-
-	}
-
-	// object helper methods
-
-	public static
-	interface SubscriptionNumberObjectHelperMethods {
-
-		SubscriptionNumberRec findOrCreate (
-				SubscriptionRec subscription,
-				NumberRec number);
-
-	}
-
-	// object helper implementation
-
-	public static
-	class SubscriptionNumberObjectHelperImplementation
-		implements SubscriptionNumberObjectHelperMethods {
-
-		// indirect dependencies
-
-		@Inject
-		Provider<SubscriptionNumberObjectHelper>
-		subscriptionNumberHelperProvider;
-
-		// implementation
-
-		@Override
-		public
-		SubscriptionNumberRec findOrCreate (
-				SubscriptionRec subscription,
-				NumberRec number) {
-
-			SubscriptionNumberObjectHelper subscriptionNumberHelper =
-				subscriptionNumberHelperProvider.get ();
-
-			// find existing
-
-			SubscriptionNumberRec subscriptionNumber =
-				subscriptionNumberHelper.find (
-					subscription,
-					number);
-
-			if (subscriptionNumber != null)
-				return subscriptionNumber;
-
-			// create new
-
-			return subscriptionNumberHelper.insert (
-				new SubscriptionNumberRec ()
-
-				.setSubscription (
-					subscription)
-
-				.setNumber (
-					number)
-
-			);
-
-		}
 
 	}
 

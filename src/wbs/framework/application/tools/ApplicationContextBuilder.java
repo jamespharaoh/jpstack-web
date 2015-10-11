@@ -1047,18 +1047,28 @@ class ApplicationContextBuilder {
 
 		applicationContext.registerBeanDefinition (
 			new BeanDefinition ()
-				.name (objectHelperBeanName)
-				.beanClass (objectHelperClass)
-				.scope ("singleton")
-				.factoryClass (ObjectHelperFactory.class)
 
-				.addValueProperty (
-					"objectName",
-					model.name ())
+			.name (
+				objectHelperBeanName)
 
-				.addValueProperty (
-					"objectHelperClass",
-					objectHelperClass));
+			.beanClass (
+				objectHelperClass)
+
+			.scope (
+				"singleton")
+
+			.factoryClass (
+				ObjectHelperFactory.class)
+
+			.addValueProperty (
+				"objectName",
+				model.name ())
+
+			.addValueProperty (
+				"objectHelperClass",
+				objectHelperClass)
+
+		);
 
 		return 0;
 
@@ -1075,9 +1085,8 @@ class ApplicationContextBuilder {
 
 		String objectHelperImplementationClassName =
 			stringFormat (
-				"%s.model.%sRec$%sObjectHelperImplementation",
+				"%s.model.%sObjectHelperImplementation",
 				model.plugin ().packageName (),
-				capitalise (model.name ()),
 				capitalise (model.name ()));
 
 		Class<?> objectHelperImplementationClass;
@@ -1103,9 +1112,17 @@ class ApplicationContextBuilder {
 
 		applicationContext.registerBeanDefinition (
 			new BeanDefinition ()
-				.name (objectHelperImplementationBeanName)
-				.beanClass (objectHelperImplementationClass)
-				.scope ("singleton"));
+
+			.name (
+				objectHelperImplementationBeanName)
+
+			.beanClass (
+				objectHelperImplementationClass)
+
+			.scope (
+				"singleton")
+
+		);
 
 		return 0;
 
@@ -1124,16 +1141,21 @@ class ApplicationContextBuilder {
 			stringFormat (
 				"%s.model.%sDao",
 				pluginModelSpec.plugin ().packageName (),
-				capitalise (pluginModelSpec.name ()));
+				capitalise (
+					pluginModelSpec.name ()));
+
+		boolean gotDaoClass;
 
 		try {
 
 			Class.forName (
 				daoClassName);
 
+			gotDaoClass = true;
+
 		} catch (ClassNotFoundException exception) {
 
-			return 0;
+			gotDaoClass = false;
 
 		}
 
@@ -1141,9 +1163,11 @@ class ApplicationContextBuilder {
 			stringFormat (
 				"%s.hibernate.%sDaoHibernate",
 				pluginModelSpec.plugin ().packageName (),
-				capitalise (pluginModelSpec.name ()));
+				capitalise (
+					pluginModelSpec.name ()));
 
-		Class<?> daoHibernateClass;
+		Class<?> daoHibernateClass = null;
+		boolean gotDaoHibernateClass;
 
 		try {
 
@@ -1151,9 +1175,31 @@ class ApplicationContextBuilder {
 				Class.forName (
 					daoHibernateClassName);
 
+			gotDaoHibernateClass = true;
+
 		} catch (ClassNotFoundException exception) {
 
+			gotDaoHibernateClass = false;
+
+		}
+
+		if (
+			! gotDaoClass
+			&& ! gotDaoHibernateClass
+		) {
 			return 0;
+		}
+
+		if (
+			! gotDaoClass
+			|| ! gotDaoHibernateClass
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"DAO methods or implementation missing for %s in %s",
+					pluginModelSpec.name (),
+					pluginModelSpec.plugin ().name ()));
 
 		}
 
@@ -1218,46 +1264,6 @@ class ApplicationContextBuilder {
 
 	}
 
-	/*
-	int registerConsoleHelperProvider (
-			ProjectModelSpec model)
-		throws Exception {
-
-		String consoleHelperProviderBeanName =
-			sf ("%sConsoleHelperProvider",
-				model.name ());
-
-		String consoleHelperProviderClassName =
-			sf ("%s.%s.console.%sConsoleHelper$%sConsoleHelperProvider",
-				model.project ().packageName (),
-				model.plugin ().packageName (),
-				capitalise (model.name ()),
-				capitalise (model.name ()));
-
-		Class<?> consoleHelperProviderClass;
-
-		try {
-
-			consoleHelperProviderClass =
-				Class.forName (consoleHelperProviderClassName);
-
-		} catch (ClassNotFoundException exception) {
-
-			return 0;
-
-		}
-
-		applicationContext.registerBeanDefinition (
-			new BeanDefinition ()
-				.name (consoleHelperProviderBeanName)
-				.beanClass (consoleHelperProviderClass)
-				.scope ("singleton"));
-
-		return 0;
-
-	}
-	*/
-
 	int registerConsoleHelper (
 			@NonNull PluginModelSpec model)
 		throws Exception {
@@ -1266,12 +1272,6 @@ class ApplicationContextBuilder {
 			stringFormat (
 				"%sObjectHelper",
 				model.name ());
-
-		/*
-		String consoleHelperProviderBeanName =
-			sf ("%sConsoleHelperProvider",
-				model.name ());
-		*/
 
 		String consoleHelperBeanName =
 			stringFormat (
@@ -1289,7 +1289,8 @@ class ApplicationContextBuilder {
 		try {
 
 			consoleHelperClass =
-				Class.forName (consoleHelperClassName);
+				Class.forName (
+					consoleHelperClassName);
 
 		} catch (ClassNotFoundException exception) {
 
@@ -1320,12 +1321,6 @@ class ApplicationContextBuilder {
 			.addReferenceProperty (
 				"objectHelper",
 				objectHelperBeanName)
-
-			/*
-			.addReferenceProperty (
-				"consoleHelperProvider",
-				consoleHelperProviderBeanName)
-			*/
 
 			.addValueProperty (
 				"consoleHelperClass",
@@ -1398,8 +1393,10 @@ class ApplicationContextBuilder {
 
 	int registerConfigBeans () {
 
-		for (String configName
-				: configNames) {
+		for (
+			String configName
+				: configNames
+		) {
 
 			log.info (
 				stringFormat (
@@ -1422,12 +1419,14 @@ class ApplicationContextBuilder {
 
 	int registerSingletonBeans () {
 
-		for (Map.Entry<String,Object> entry
-				: singletonBeans.entrySet ()) {
+		for (
+			Map.Entry<String,Object> entry
+				: singletonBeans.entrySet ()
+		) {
 
 			applicationContext.registerSingleton (
-					entry.getKey (),
-					entry.getValue ());
+				entry.getKey (),
+				entry.getValue ());
 
 		}
 
@@ -1439,7 +1438,9 @@ class ApplicationContextBuilder {
 
 		applicationContext =
 			new ApplicationContext ()
-				.outputPath (outputPath);
+
+			.outputPath (
+				outputPath);
 
 	}
 

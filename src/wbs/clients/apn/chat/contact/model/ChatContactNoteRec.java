@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.contact.model;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,7 +8,6 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.joda.time.Interval;
 
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -83,21 +81,6 @@ class ChatContactNoteRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ChatContactNoteDaoMethods {
-
-		List<ChatContactNoteRec> findByTimestamp (
-				ChatRec chat,
-				Interval timestampInterval);
-
-		List<ChatContactNoteRec> find (
-				ChatUserRec userChatUser,
-				ChatUserRec monitorChatUser);
 
 	}
 

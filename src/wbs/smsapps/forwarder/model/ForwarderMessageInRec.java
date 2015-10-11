@@ -1,7 +1,6 @@
 package wbs.smsapps.forwarder.model;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -96,23 +95,6 @@ class ForwarderMessageInRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ForwarderMessageInDaoMethods {
-
-		ForwarderMessageInRec findNext (
-				ForwarderRec forwarder);
-
-		List<ForwarderMessageInRec> findNexts (
-				int maxResults);
-
-		List<ForwarderMessageInRec> findPendingLimit (
-				ForwarderRec forwarder,
-				int maxResults);
 
 	}
 

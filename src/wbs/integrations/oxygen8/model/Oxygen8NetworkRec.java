@@ -63,19 +63,4 @@ class Oxygen8NetworkRec
 
 	}
 
-	// dao methods
-
-	public static
-	interface Oxygen8NetworkDaoMethods {
-
-		Oxygen8NetworkRec find (
-				Oxygen8ConfigRec oxygen8Config,
-				NetworkRec network);
-
-		Oxygen8NetworkRec findByChannel (
-				Oxygen8ConfigRec oxygen8Config,
-				String channel);
-
-	}
-
 }

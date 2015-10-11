@@ -1,10 +1,8 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
-import java.io.Writer;
 
 import javax.inject.Inject;
 
@@ -19,6 +17,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.ChildrenCollectionSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("childrenCollectionWriter")
 @ModelWriter
@@ -39,7 +38,7 @@ class ChildrenCollectionWriter {
 	ChildrenCollectionSpec spec;
 
 	@BuilderTarget
-	Writer javaWriter;
+	FormatWriter javaWriter;
 
 	// build
 
@@ -57,20 +56,19 @@ class ChildrenCollectionWriter {
 			fieldTypePluginModel.plugin ();
 
 		javaWriter.write (
-			stringFormat (
 
-				"\t@CollectionField\n",
+			"\t@CollectionField\n",
 
-				"\tSet<%s.model.%sRec> %ss =\n",
-				fieldTypePlugin.packageName (),
-				capitalise (spec.typeName ()),
-				spec.typeName (),
+			"\tSet<%s.model.%sRec> %ss =\n",
+			fieldTypePlugin.packageName (),
+			capitalise (spec.typeName ()),
+			spec.typeName (),
 
-				"\t\tnew LinkedHashSet<%s.model.%sRec> ();\n",
-				fieldTypePlugin.packageName (),
-				capitalise (spec.typeName ()),
+			"\t\tnew LinkedHashSet<%s.model.%sRec> ();\n",
+			fieldTypePlugin.packageName (),
+			capitalise (spec.typeName ()),
 
-				"\n"));
+			"\n");
 
 	}
 

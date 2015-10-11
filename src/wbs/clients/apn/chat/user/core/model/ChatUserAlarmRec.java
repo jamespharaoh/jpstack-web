@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.user.core.model;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -65,19 +64,6 @@ class ChatUserAlarmRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ChatUserAlarmDaoMethods {
-
-		List<ChatUserAlarmRec> findPending ();
-
-		ChatUserAlarmRec find (
-				ChatUserRec chatUser,
-				ChatUserRec monitorChatUser);
 
 	}
 

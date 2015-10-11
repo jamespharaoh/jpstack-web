@@ -1,6 +1,5 @@
 package wbs.platform.queue.model;
 
-import java.util.List;
 import java.util.Set;
 
 import lombok.Data;
@@ -81,23 +80,6 @@ class QueueTypeRec
 				other.getCode ())
 
 			.toComparison ();
-
-	}
-
-	// object helper methods
-
-	public static
-	interface QueueTypeObjectHelperMethods {
-
-	}
-
-	// dao methods
-
-	public static
-	interface QueueTypeDaoMethods {
-
-		List<QueueTypeRec> findByParentObjectType (
-				ObjectTypeRec parentType);
 
 	}
 

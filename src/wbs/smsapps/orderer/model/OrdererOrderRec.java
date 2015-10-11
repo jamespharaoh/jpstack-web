@@ -1,7 +1,6 @@
 package wbs.smsapps.orderer.model;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,7 +17,6 @@ import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.model.NumberRec;
-
 
 @Accessors (chain = true)
 @Data
@@ -76,15 +74,6 @@ class OrdererOrderRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	public static
-	interface OrdererOrderDaoMethods {
-
-		List<OrdererOrderRec> find (
-				OrdererRec orderer,
-				NumberRec number);
 
 	}
 

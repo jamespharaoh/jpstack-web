@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.bill.model;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,9 +8,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.joda.time.Interval;
 
-import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
@@ -85,17 +82,6 @@ class ChatUserCreditRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ChatUserCreditDaoMethods {
-
-		List<ChatUserCreditRec> findByTimestamp (
-				ChatRec chat,
-				Interval timestampInterval);
 
 	}
 

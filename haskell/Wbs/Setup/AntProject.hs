@@ -181,6 +181,7 @@ writeBuildFile world = do
 		[
 			makeSimpleTarget "clean" [
 				makeDeleteDir "work/bin",
+				makeDeleteDir "work/generated",
 				makeDeleteDir "work/test"
 			]
 		]
@@ -245,12 +246,7 @@ writeBuildFile world = do
 					mkelem "src" [
 						sattr "path" "src"
 					] []
-				],
-				makeMkdir "work/bin/META-INF/services",
-				mkelem "echo" [
-					sattr "file" "work/bin/META-INF/services/javax.annotation.processing.Processor",
-					sattr "message" "wbs.framework.object.ObjectHelperAnnotationProcessor"
-				] []
+				]
 			],
 
 			makeSimpleTarget "framework-jar" [
@@ -612,8 +608,8 @@ writeBuildFile world = do
 					makeArgValue "wbs.test",
 					makeArgValue "data,model-meta,model-generate,utils",
 					makeArgValue "test",
-					makeArgValue "wbs.framework.entity.generate.ModelRecordGenerator",
-					makeArgValue "generateModelRecords"
+					makeArgValue "wbs.framework.entity.generate.ModelGeneratorTool",
+					makeArgValue "generateModels"
 				]
 
 			]

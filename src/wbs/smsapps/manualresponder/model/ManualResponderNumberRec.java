@@ -75,15 +75,4 @@ class ManualResponderNumberRec
 
 	}
 
-	// dao methods
-
-	public static
-	interface ManualResponderNumberDaoMethods {
-
-		ManualResponderNumberRec find (
-				ManualResponderRec manualResponder,
-				NumberRec number);
-
-	}
-
 }

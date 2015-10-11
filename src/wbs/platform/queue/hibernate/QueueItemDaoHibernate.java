@@ -10,8 +10,8 @@ import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
 
 import wbs.framework.hibernate.HibernateDao;
+import wbs.platform.queue.model.QueueItemDaoMethods;
 import wbs.platform.queue.model.QueueItemRec;
-import wbs.platform.queue.model.QueueItemRec.QueueItemDaoMethods;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.user.model.UserRec;

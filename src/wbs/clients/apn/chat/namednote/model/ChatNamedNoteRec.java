@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.namednote.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -82,22 +80,6 @@ class ChatNamedNoteRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ChatNamedNoteDaoMethods {
-
-		ChatNamedNoteRec find (
-				ChatUserRec thisChatUser,
-				ChatUserRec otherChatUser,
-				ChatNoteNameRec chatNoteName);
-
-		List<ChatNamedNoteRec> find (
-				ChatUserRec thisChatUser,
-				ChatUserRec otherChatUser);
 
 	}
 

@@ -79,14 +79,4 @@ class ImChatSessionRec
 
 	}
 
-	// dao methods
-
-	public
-	interface ImChatSessionDaoMethods {
-
-		ImChatSessionRec findBySecret (
-				String secret);
-
-	}
-
 }

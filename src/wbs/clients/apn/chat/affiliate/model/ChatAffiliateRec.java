@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.affiliate.model;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import lombok.Data;
@@ -11,7 +10,6 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
-import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeKeywordRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.framework.entity.annotations.CodeField;
@@ -100,15 +98,5 @@ class ChatAffiliateRec
 			.toComparison ();
 
 	}
-
-	// dao methods
-
-		public static
-		interface ChatAffiliateDaoMethods {
-
-			List<ChatAffiliateRec> find (
-					ChatRec chat);
-
-		}
 
 }

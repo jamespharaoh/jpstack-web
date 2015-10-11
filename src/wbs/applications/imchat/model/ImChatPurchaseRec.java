@@ -94,14 +94,4 @@ class ImChatPurchaseRec
 
 	}
 
-	// dao methods
-
-	public
-	interface ImChatPurchaseDaoMethods {
-
-		ImChatPurchaseRec findByToken (
-				String token);
-
-	}
-
 }

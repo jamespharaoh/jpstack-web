@@ -132,9 +132,9 @@ class ConsoleHelperBuilder {
 
 			String extraInterfaceName =
 				stringFormat (
-					"%s$%sObjectHelperMethods",
-					consoleHelperProvider.objectClass ().getName (),
-					capitalise (consoleHelperProvider.objectName ()));
+					"%sObjectHelperMethods",
+					capitalise (
+						consoleHelperProvider.objectName ()));
 
 			extraInterface =
 				Class.forName (
@@ -162,9 +162,9 @@ class ConsoleHelperBuilder {
 
 		String daoMethodsInterfaceName =
 			stringFormat (
-				"%s$%sDaoMethods",
-				consoleHelperProvider.objectClass ().getName (),
-				capitalise (consoleHelperProvider.objectName ()));
+				"%sDaoMethods",
+				capitalise (
+					consoleHelperProvider.objectName ()));
 
 		try {
 

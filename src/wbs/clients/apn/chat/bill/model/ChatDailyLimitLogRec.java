@@ -2,7 +2,6 @@
 package wbs.clients.apn.chat.bill.model;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -55,15 +54,6 @@ class ChatDailyLimitLogRec
 				other.getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ChatDailyLimitLogDaoMethods {
-
-		List<ChatDailyLimitLogRec> findLimitedToday ();
 
 	}
 

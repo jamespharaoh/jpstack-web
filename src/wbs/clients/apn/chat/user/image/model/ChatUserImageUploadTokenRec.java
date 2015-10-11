@@ -110,16 +110,6 @@ class ChatUserImageUploadTokenRec
 	@SimpleField
 	Integer numFailures = 0;
 
-	// dao methods
-
-	public static
-	interface ChatUserImageUploadTokenDaoMethods {
-
-		ChatUserImageUploadTokenRec findByToken (
-				String token);
-
-	}
-
 	// compare to
 
 	@Override

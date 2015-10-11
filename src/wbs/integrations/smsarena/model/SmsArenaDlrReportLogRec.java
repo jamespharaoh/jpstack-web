@@ -1,7 +1,5 @@
 package wbs.integrations.smsarena.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -67,16 +65,6 @@ class SmsArenaDlrReportLogRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface SmsArenaDlrReportLogDaoMethods {
-
-		List<Integer> searchIds (
-				SmsArenaDlrReportLogSearch smsArenaDlrReportLogSearch);
 
 	}
 

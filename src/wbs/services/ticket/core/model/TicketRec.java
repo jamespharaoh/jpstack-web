@@ -1,7 +1,6 @@
 package wbs.services.ticket.core.model;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -92,19 +91,6 @@ public class TicketRec
 	@CollectionField
 	Set<TicketTemplateRec> templates =
 		new LinkedHashSet<TicketTemplateRec> ();
-
-	// dao methods
-
-	public static
-	interface TicketDaoMethods {
-
-		TicketFieldValueRec findTicketFieldValue (
-				TicketRec ticket,
-				TicketFieldTypeRec ticketFieldType);
-
-		List<TicketRec> findUnqueuedTickets ();
-
-	}
 
 	// compare to
 

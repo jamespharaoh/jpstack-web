@@ -1,7 +1,5 @@
 package wbs.test.simulator.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -68,17 +66,6 @@ class SimulatorEventRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface SimulatorEventDaoMethods {
-
-		List<SimulatorEventRec> findAfterLimit (
-				int afterId,
-				int maxResults);
 
 	}
 

@@ -24,6 +24,8 @@ public
 class MigNetworkRec
 	implements MajorRecord<MigNetworkRec> {
 
+	// fields
+
 	@ForeignIdField (
 		field = "network")
 	Integer id;
@@ -36,6 +38,8 @@ class MigNetworkRec
 
 	@SimpleField
 	Boolean virtual;
+
+	// compare to
 
 	@Override
 	public
@@ -52,14 +56,6 @@ class MigNetworkRec
 				other.getNetwork ())
 
 			.toComparison ();
-
-	}
-
-	public static
-	interface MigNetworkDaoMethods {
-
-		MigNetworkRec findBySuffix (
-				String suffix);
 
 	}
 

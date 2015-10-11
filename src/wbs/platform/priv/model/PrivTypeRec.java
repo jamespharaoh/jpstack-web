@@ -1,6 +1,5 @@
 package wbs.platform.priv.model;
 
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -80,16 +79,6 @@ class PrivTypeRec
 				other.getCode ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface PrivTypeDaoMethods {
-
-		List<PrivTypeRec> findByParentObjectType (
-				ObjectTypeRec parentObjectType);
 
 	}
 

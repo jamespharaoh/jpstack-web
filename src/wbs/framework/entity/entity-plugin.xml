@@ -33,6 +33,9 @@
 		<bean class="generate.DeletedFieldWriter"/>
 		<bean class="generate.DescriptionFieldWriter"/>
 		<bean class="generate.GeneratedIdFieldWriter"/>
+		<bean class="generate.ModelInterfacesGenerator"/>
+		<bean class="generate.ModelRecordGenerator"/>
+		<bean class="generate.ModelWriterManager"/>
 		<bean class="generate.NameFieldWriter"/>
 		<bean class="generate.ParentFieldWriter"/>
 		<bean class="generate.ParentIdFieldWriter"/>

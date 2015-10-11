@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.broadcast.model;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -160,23 +159,6 @@ class ChatBroadcastRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface ChatBroadcastDaoMethods {
-
-		List<ChatBroadcastRec> findRecentWindow (
-				ChatRec chat,
-				int firstResult,
-				int maxResults);
-
-		List<ChatBroadcastRec> findSending ();
-
-		List<ChatBroadcastRec> findScheduled (
-				Instant now);
 
 	}
 

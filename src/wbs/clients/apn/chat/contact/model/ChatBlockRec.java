@@ -57,13 +57,4 @@ class ChatBlockRec
 
 	}
 
-	public static
-	interface ChatBlockDaoMethods {
-
-		ChatBlockRec find (
-				ChatUserRec chatUser,
-				ChatUserRec blockedChatUser);
-
-	}
-
 }

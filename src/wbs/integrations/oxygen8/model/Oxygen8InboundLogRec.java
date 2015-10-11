@@ -1,7 +1,5 @@
 package wbs.integrations.oxygen8.model;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -67,16 +65,6 @@ class Oxygen8InboundLogRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// dao methods
-
-	public static
-	interface Oxygen8InboundLogDaoMethods {
-
-		List<Integer> searchIds (
-				Oxygen8InboundLogSearch oxygen8InboundLogSearch);
 
 	}
 

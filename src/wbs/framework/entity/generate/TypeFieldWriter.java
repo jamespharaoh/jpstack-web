@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
-import java.io.Writer;
 
 import javax.inject.Inject;
 
@@ -19,6 +18,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.TypeFieldSpec;
+import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("typeFieldWriter")
 @ModelWriter
@@ -39,7 +39,7 @@ class TypeFieldWriter {
 	TypeFieldSpec spec;
 
 	@BuilderTarget
-	Writer javaWriter;
+	FormatWriter javaWriter;
 
 	// build
 
@@ -62,15 +62,14 @@ class TypeFieldWriter {
 			fieldTypePluginModel.plugin ();
 
 		javaWriter.write (
-			stringFormat (
 
-				"\t@TypeField\n",
+			"\t@TypeField\n",
 
-				"\t%s.model.%sRec type;\n",
-				fieldTypePlugin.packageName (),
-				capitalise (fieldTypeName),
+			"\t%s.model.%sRec type;\n",
+			fieldTypePlugin.packageName (),
+			capitalise (fieldTypeName),
 
-				"\n"));
+			"\n");
 
 	}
 

@@ -23,6 +23,7 @@
   <target name="generate-records" depends="just-generate-records"/>
   <target name="just-clean">
     <delete dir="work/bin"/>
+    <delete dir="work/generated"/>
     <delete dir="work/test"/>
   </target>
   <target name="just-build-framework">
@@ -30,8 +31,6 @@
     <javac destdir="work/bin" debug="on" includeantruntime="false" classpathref="classpath" encoding="utf8" includes="wbs/framework/**">
       <src path="src"/>
     </javac>
-    <mkdir dir="work/bin/META-INF/services"/>
-    <echo file="work/bin/META-INF/services/javax.annotation.processing.Processor" message="wbs.framework.object.ObjectHelperAnnotationProcessor"/>
   </target>
   <target name="just-framework-jar">
     <jar destfile="work/wbs-framework.jar" basedir="work/bin">
@@ -925,8 +924,8 @@
       <arg value="wbs.test"/>
       <arg value="data,model-meta,model-generate,utils"/>
       <arg value="test"/>
-      <arg value="wbs.framework.entity.generate.ModelRecordGenerator"/>
-      <arg value="generateModelRecords"/>
+      <arg value="wbs.framework.entity.generate.ModelGeneratorTool"/>
+      <arg value="generateModels"/>
     </java>
   </target>
   <target name="just-schema-create">

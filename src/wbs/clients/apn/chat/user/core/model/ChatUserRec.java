@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.user.core.model;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,14 +8,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.LocalDate;
@@ -28,12 +22,10 @@ import wbs.clients.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.clients.apn.chat.contact.model.ChatBlockRec;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
-import wbs.clients.apn.chat.core.logic.ChatNumberReportLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.keyword.model.ChatKeywordJoinType;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
-import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageMode;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
@@ -49,15 +41,11 @@ import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
-import wbs.framework.utils.RandomLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.text.model.TextRec;
 import wbs.sms.locator.model.LongLat;
-import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.number.core.logic.NumberLogic;
 import wbs.sms.number.core.model.NumberRec;
 
-@Log4j
 @Accessors (chain = true)
 @Data
 @EqualsAndHashCode (of = "id")
@@ -759,263 +747,6 @@ class ChatUserRec
 		}
 
 		return false;
-	}
-
-	// dao methods
-
-	public static
-	interface ChatUserDaoMethods {
-
-		ChatUserRec find (
-				ChatRec chat,
-				NumberRec number);
-
-		int countOnline (
-				ChatRec chat,
-				ChatUserType type);
-
-		List<ChatUserRec> findOnline (
-				ChatRec chat);
-
-		List<ChatUserRec> findOnline (
-				ChatUserType type);
-
-		List<ChatUserRec> findWantingBill (
-				Date date);
-
-		List<ChatUserRec> findWantingWarning ();
-
-		List<ChatUserRec> findAdultExpiryLimit (
-				int maxResults);
-
-		List<ChatUserRec> find (
-				ChatRec chat,
-				ChatUserType type,
-				Orient orient,
-				Gender gender);
-
-		List<ChatUserRec> findWantingJoinOutbound ();
-
-		List<ChatUserRec> findWantingAdultAd ();
-
-		List<Integer> searchIds (
-				Map<String,Object> searchMap);
-
-		List<ChatUserRec> find (
-				ChatAffiliateRec chatAffiliate);
-
-		List<ChatUserRec> findDating (
-				ChatRec chat);
-
-		List<ChatUserRec> findWantingAd ();
-
-		List<ChatUserRec> findWantingQuietOutbound ();
-
-	}
-
-	// object helper methods
-
-	public static
-	interface ChatUserObjectHelperMethods {
-
-		ChatUserRec findOrCreate (
-				ChatRec chat,
-				NumberRec number);
-
-		ChatUserRec findOrCreate (
-				ChatRec chat,
-				MessageRec message);
-
-		ChatUserRec create (
-				ChatRec chat,
-				NumberRec number);
-
-	}
-
-	// object helper implementation
-
-	public static
-	class ChatUserObjectHelperImplementation
-		implements ChatUserObjectHelperMethods {
-
-		// dependencies
-
-		@Inject
-		RandomLogic randomLogic;
-
-		// indirect dependencies
-
-		@Inject
-		Provider<ChatNumberReportLogic> chatNumberReportLogicProvider;
-
-		@Inject
-		Provider<ChatUserObjectHelper> chatUserHelperProvider;
-
-		@Inject
-		Provider<ChatUserLogic> chatUserLogicProvider;
-
-		@Inject
-		Provider<NumberLogic> numberLogicProvider;
-
-		// implementation
-
-		@Override
-		public
-		ChatUserRec findOrCreate (
-				ChatRec chat,
-				MessageRec message) {
-
-			// resolve dependencies
-
-			ChatNumberReportLogic chatNumberReportLogic =
-				chatNumberReportLogicProvider.get ();
-
-			ChatUserObjectHelper chatUserHelper =
-				chatUserHelperProvider.get ();
-
-			NumberLogic numberLogic =
-				numberLogicProvider.get ();
-
-			// resolve stuff
-
-			NumberRec number =
-				message.getNumber ();
-
-			// check for an existing ChatUser
-
-			ChatUserRec chatUser =
-				chatUserHelper.find (
-					chat,
-					number);
-
-			if (chatUser != null) {
-
-				// check number
-
-				if (
-					! chatNumberReportLogic.isNumberReportSuccessful (number)
-					&& number.getArchiveDate () == null
-				) {
-
-					log.debug (
-						stringFormat (
-							"Number archiving %s code %s",
-							number.getNumber (),
-							chatUser.getCode ()));
-
-					NumberRec newNumber =
-						numberLogic.archiveNumberFromMessage (
-							message);
-
-					return create (
-						chat,
-						newNumber);
-
-				}
-
-				return chatUser;
-
-			}
-
-			return create (
-				chat,
-				number);
-
-		}
-
-		@Override
-		public
-		ChatUserRec findOrCreate (
-				ChatRec chat,
-				NumberRec number) {
-
-			// resolve dependencies
-
-			ChatUserObjectHelper chatUserHelper =
-				chatUserHelperProvider.get ();
-
-			// check for an existing ChatUser
-
-			ChatUserRec chatUser =
-				chatUserHelper.find (
-					chat,
-					number);
-
-			if (chatUser != null)
-				return chatUser;
-
-			return create (
-				chat,
-				number);
-
-		}
-
-		@Override
-		public
-		ChatUserRec create (
-				ChatRec chat,
-				NumberRec number) {
-
-			ChatUserObjectHelper chatUserHelper =
-				chatUserHelperProvider.get ();
-
-			ChatUserLogic chatUserLogic =
-				chatUserLogicProvider.get ();
-
-			// create him
-
-			ChatUserRec chatUser =
-				new ChatUserRec ()
-
-				.setChat (
-					chat)
-
-				.setNumber (
-					number)
-
-				.setOldNumber (
-					number)
-
-				.setType (
-					ChatUserType.user)
-
-				.setCode (
-					randomLogic.generateNumericNoZero (6))
-
-				.setDeliveryMethod (
-					ChatMessageMethod.sms)
-
-				.setGender (
-					chat.getGender ())
-
-				.setOrient (
-					chat.getOrient ())
-
-				.setCreditMode (
-					number.getFree ()
-						? ChatUserCreditMode.free
-						: ChatUserCreditMode.strict);
-
-			chatUserLogic.monitorCap (
-				chatUser);
-
-			// set adult verify on some services
-			// TODO this should probably not be here
-
-			if (chat.getAutoAdultVerify ()) {
-
-				chatUserLogic.adultVerify (
-					chatUser);
-
-			}
-
-			chatUserHelper.insert (
-				chatUser);
-
-			return chatUser;
-
-		}
-
 	}
 
 }

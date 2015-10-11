@@ -1,10 +1,8 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
-import java.io.Writer;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -14,6 +12,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.YesNoFieldSpec;
+import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("yesNoFieldWriter")
 @ModelWriter
@@ -29,7 +28,7 @@ class YesNoFieldWriter {
 	YesNoFieldSpec spec;
 
 	@BuilderTarget
-	Writer javaWriter;
+	FormatWriter javaWriter;
 
 	// build
 
@@ -42,31 +41,27 @@ class YesNoFieldWriter {
 		if (ifNull (spec.nullable (), false)) {
 
 			javaWriter.write (
-				stringFormat (
 
-					"\t@SimpleField (\n",
+				"\t@SimpleField (\n",
 
-					"\t\tnullable = true)\n"));
+				"\t\tnullable = true)\n");
 
 		} else {
 
 			javaWriter.write (
-				stringFormat (
 
-					"\t@SimpleField\n"));
+				"\t@SimpleField\n");
 
 		}
 
 		javaWriter.write (
-			stringFormat (
 
-				"\tBoolean %s;\n",
-				spec.name ()));
+			"\tBoolean %s;\n",
+			spec.name ());
 
 		javaWriter.write (
-			stringFormat (
 
-				"\n"));
+			"\n");
 
 	}
 

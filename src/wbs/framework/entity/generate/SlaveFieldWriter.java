@@ -1,10 +1,8 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
-import java.io.Writer;
 
 import javax.inject.Inject;
 
@@ -19,6 +17,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.SlaveFieldSpec;
+import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("slaveFieldWriter")
 @ModelWriter
@@ -39,7 +38,7 @@ class SlaveFieldWriter {
 	SlaveFieldSpec spec;
 
 	@BuilderTarget
-	Writer javaWriter;
+	FormatWriter javaWriter;
 
 	// build
 
@@ -57,22 +56,19 @@ class SlaveFieldWriter {
 			fieldTypePluginModel.plugin ();
 
 		javaWriter.write (
-			stringFormat (
 
-				"\t@SlaveField\n"));
-
-		javaWriter.write (
-			stringFormat (
-
-				"\t%s.model.%sRec %s;\n",
-				fieldTypePlugin.packageName (),
-				capitalise (spec.typeName ()),
-				spec.typeName ()));
+			"\t@SlaveField\n");
 
 		javaWriter.write (
-			stringFormat (
 
-				"\n"));
+			"\t%s.model.%sRec %s;\n",
+			fieldTypePlugin.packageName (),
+			capitalise (spec.typeName ()),
+			spec.typeName ());
+
+		javaWriter.write (
+
+			"\n");
 
 	}
 

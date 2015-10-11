@@ -141,16 +141,4 @@ class SubscriptionSendRec
 
 	}
 
-	// dao methods
-
-	public static
-	interface SubscriptionSendDaoMethods {
-
-		List<SubscriptionSendRec> findSending ();
-
-		List<SubscriptionSendRec> findScheduled (
-				Instant now);
-
-	}
-
 }
