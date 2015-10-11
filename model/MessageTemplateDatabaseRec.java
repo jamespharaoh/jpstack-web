@@ -17,7 +17,6 @@ import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.MajorRecord;
 import wbs.framework.record.Record;
 import wbs.platform.scaffold.model.SliceRec;
@@ -53,27 +52,9 @@ class MessageTemplateDatabaseRec
 	String description;
 
 	@CollectionField (
-			orderBy = "id")
-		Set<MessageTemplateTypeRec> messageTemplateTypes =
-			new TreeSet<MessageTemplateTypeRec> ();
-
-	// object hooks
-
-	public static
-	class MessageTemplateDatabaseHooks
-		extends AbstractObjectHooks<MessageTemplateDatabaseRec> {
-
-		@Override
-		public
-		void beforeInsert (
-			MessageTemplateDatabaseRec messageTemplateDatabase) {
-
-			messageTemplateDatabase.setCode (
-				messageTemplateDatabase.getName().toLowerCase());
-
-		}
-
-	}
+		orderBy = "id")
+	Set<MessageTemplateTypeRec> messageTemplateTypes =
+		new TreeSet<MessageTemplateTypeRec> ();
 
 	// compare to
 
