@@ -1,5 +1,13 @@
 <model-meta
-	name="root">
+	name="root"
+	type="root">
+
+	<fields>
+
+		<assigned-id-field/>
+		<code-field/>
+
+	</fields>
 
 	<priv-types>
 

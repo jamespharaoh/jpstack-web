@@ -19,6 +19,7 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.FileUtils;
 
@@ -31,9 +32,12 @@ import wbs.framework.entity.meta.ModelFieldSpec;
 import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.ParentFieldSpec;
+import wbs.framework.entity.meta.ParentIdFieldSpec;
+import wbs.framework.entity.meta.ParentTypeFieldSpec;
 
 import com.google.common.collect.ImmutableList;
 
+@Log4j
 public
 class ModelRecordGenerator {
 
@@ -96,6 +100,14 @@ class ModelRecordGenerator {
 	void generateModelRecords (
 			List<String> params) {
 
+		log.info (
+			stringFormat (
+				"About to generate up to %s model classes",
+				modelMetaLoader.modelSpecs ().size ()));
+
+		int successCount = 0;
+		int skipCount = 0;
+
 		for (
 			ModelMetaSpec modelSpec
 				: modelMetaLoader.modelSpecs ().values ()
@@ -108,20 +120,31 @@ class ModelRecordGenerator {
 				pluginModel.plugin ();
 
 			if (modelSpec.type () == null) {
-				continue;
-			}
 
-			System.out.println (
-				stringFormat (
-					"GENERATE: %s",
-					modelSpec.name ()));
+				skipCount ++;
+
+				continue;
+
+			}
 
 			generateModelRecord (
 				plugin,
 				pluginModel,
 				modelSpec);
 
+			successCount ++;
+
 		}
+
+		log.info (
+			stringFormat (
+				"Successfully created %s model classes",
+				successCount));
+
+		log.warn (
+			stringFormat (
+				"Skipped %s model classes which are explicitly defined",
+				skipCount));
 
 	}
 
@@ -171,7 +194,8 @@ class ModelRecordGenerator {
 			javaWriter);
 
 		writeClassAnnotations (
-			javaWriter);
+			javaWriter,
+			modelMeta);
 
 		writeClass (
 			javaWriter,
@@ -200,19 +224,33 @@ class ModelRecordGenerator {
 
 			org.apache.commons.lang3.builder.CompareToBuilder.class,
 
+			wbs.framework.entity.annotations.EphemeralEntity.class,
+			wbs.framework.entity.annotations.MajorEntity.class,
+			wbs.framework.entity.annotations.MinorEntity.class,
+			wbs.framework.entity.annotations.RootEntity.class,
+			wbs.framework.entity.annotations.TypeEntity.class,
+
+			wbs.framework.entity.annotations.AssignedIdField.class,
 			wbs.framework.entity.annotations.CodeField.class,
 			wbs.framework.entity.annotations.CollectionField.class,
 			wbs.framework.entity.annotations.DeletedField.class,
 			wbs.framework.entity.annotations.DescriptionField.class,
 			wbs.framework.entity.annotations.GeneratedIdField.class,
 			wbs.framework.entity.annotations.LinkField.class,
-			wbs.framework.entity.annotations.MajorEntity.class,
 			wbs.framework.entity.annotations.NameField.class,
 			wbs.framework.entity.annotations.ParentField.class,
+			wbs.framework.entity.annotations.ParentIdField.class,
+			wbs.framework.entity.annotations.ParentTypeField.class,
 			wbs.framework.entity.annotations.SimpleField.class,
 			wbs.framework.entity.annotations.SlaveField.class,
+			wbs.framework.entity.annotations.TypeField.class,
+
+			wbs.framework.record.EphemeralRecord.class,
 			wbs.framework.record.MajorRecord.class,
-			wbs.framework.record.Record.class
+			wbs.framework.record.MinorRecord.class,
+			wbs.framework.record.Record.class,
+			wbs.framework.record.RootRecord.class,
+			wbs.framework.record.TypeRecord.class
 
 		);
 
@@ -236,7 +274,8 @@ class ModelRecordGenerator {
 
 	private
 	void writeClassAnnotations (
-			Writer javaWriter)
+			Writer javaWriter,
+			ModelMetaSpec modelMeta)
 		throws IOException {
 
 		javaWriter.write (
@@ -255,9 +294,61 @@ class ModelRecordGenerator {
 			stringFormat (
 				"@ToString (of = \"id\")\n"));
 
-		javaWriter.write (
-			stringFormat (
-				"@MajorEntity\n"));
+		switch (modelMeta.type ()) {
+
+		case common:
+
+			javaWriter.write (
+				stringFormat (
+					"@CommonEntity\n"));
+
+			break;
+
+		case ephemeral:
+
+			javaWriter.write (
+				stringFormat (
+					"@EphemeralEntity\n"));
+
+			break;
+
+		case major:
+
+			javaWriter.write (
+				stringFormat (
+					"@MajorEntity\n"));
+
+			break;
+
+		case minor:
+
+			javaWriter.write (
+				stringFormat (
+					"@MinorEntity\n"));
+
+			break;
+
+		case root:
+
+			javaWriter.write (
+				stringFormat (
+					"@RootEntity\n"));
+
+			break;
+
+		case type:
+
+			javaWriter.write (
+				stringFormat (
+					"@TypeEntity\n"));
+
+			break;
+
+		default:
+
+			throw new RuntimeException ();
+
+		}
 
 	}
 
@@ -273,10 +364,72 @@ class ModelRecordGenerator {
 				"public\n",
 
 				"class %s\n",
-				className,
+				className));
 
-				"\timplements MajorRecord<%s> {\n",
-				className,
+		switch (modelMeta.type ()) {
+
+		case common:
+
+			javaWriter.write (
+				stringFormat (
+					"\timplements CommonRecord<%s> {\n",
+					className));
+
+			break;
+
+		case ephemeral:
+
+			javaWriter.write (
+				stringFormat (
+					"\timplements EphemeralRecord<%s> {\n",
+					className));
+
+			break;
+
+		case major:
+
+			javaWriter.write (
+				stringFormat (
+					"\timplements MajorRecord<%s> {\n",
+					className));
+
+			break;
+
+		case minor:
+
+			javaWriter.write (
+				stringFormat (
+					"\timplements MinorRecord<%s> {\n",
+					className));
+
+			break;
+
+		case root:
+
+			javaWriter.write (
+				stringFormat (
+					"\timplements RootRecord<%s> {\n",
+					className));
+
+			break;
+
+		case type:
+
+			javaWriter.write (
+				stringFormat (
+					"\timplements TypeRecord<%s> {\n",
+					className));
+
+			break;
+
+		default:
+
+			throw new RuntimeException ();
+
+		}
+
+		javaWriter.write (
+			stringFormat (
 
 				"\n"));
 
@@ -305,6 +458,10 @@ class ModelRecordGenerator {
 			ModelMetaSpec modelMeta)
 		throws IOException {
 
+		if (modelMeta.fields ().isEmpty ()) {
+			return;
+		}
+
 		javaWriter.write (
 			stringFormat (
 
@@ -324,6 +481,10 @@ class ModelRecordGenerator {
 			Writer javaWriter,
 			ModelMetaSpec modelMeta)
 		throws IOException {
+
+		if (modelMeta.collections ().isEmpty ()) {
+			return;
+		}
 
 		javaWriter.write (
 			stringFormat (
@@ -386,6 +547,8 @@ class ModelRecordGenerator {
 				"\n"));
 
 		ParentFieldSpec parentField = null;
+		ParentTypeFieldSpec parentTypeField = null;
+		ParentIdFieldSpec parentIdField = null;
 		CodeFieldSpec codeField = null;
 
 		for (
@@ -397,6 +560,22 @@ class ModelRecordGenerator {
 
 				parentField =
 					(ParentFieldSpec)
+					modelField;
+
+			}
+
+			if (modelField instanceof ParentTypeFieldSpec) {
+
+				parentTypeField =
+					(ParentTypeFieldSpec)
+					modelField;
+
+			}
+
+			if (modelField instanceof ParentIdFieldSpec) {
+
+				parentIdField =
+					(ParentIdFieldSpec)
 					modelField;
 
 			}
@@ -428,6 +607,36 @@ class ModelRecordGenerator {
 
 		}
 
+		if (parentTypeField != null) {
+
+			javaWriter.write (
+				stringFormat (
+
+					"\t\t\t.append (\n",
+
+					"\t\t\t\tgetParentType (),\n",
+
+					"\t\t\t\tother.getParentType ())\n",
+
+					"\n"));
+
+		}
+
+		if (parentIdField != null) {
+
+			javaWriter.write (
+				stringFormat (
+
+					"\t\t\t.append (\n",
+
+					"\t\t\t\tgetParentId (),\n",
+
+					"\t\t\t\tother.getParentId ())\n",
+
+					"\n"));
+
+		}
+
 		if (codeField != null) {
 
 			javaWriter.write (
@@ -446,6 +655,21 @@ class ModelRecordGenerator {
 						ifNull (
 							codeField.name (),
 							"code")),
+
+					"\n"));
+
+		}
+
+		if (parentField == null && codeField == null) {
+
+			javaWriter.write (
+				stringFormat (
+
+					"\t\t\t.append (\n",
+
+					"\t\t\t\tgetId (),\n",
+
+					"\t\t\t\tother.getId ())\n",
 
 					"\n"));
 

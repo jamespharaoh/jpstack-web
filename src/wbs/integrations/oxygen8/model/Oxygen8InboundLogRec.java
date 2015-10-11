@@ -2,8 +2,6 @@ package wbs.integrations.oxygen8.model;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -16,7 +14,6 @@ import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.sms.route.core.model.RouteRec;
@@ -80,34 +77,6 @@ class Oxygen8InboundLogRec
 
 		List<Integer> searchIds (
 				Oxygen8InboundLogSearch oxygen8InboundLogSearch);
-
-	}
-
-	// object hooks
-
-	public static
-	class Oxygen8InboundLogHooks
-		extends AbstractObjectHooks<Oxygen8InboundLogRec> {
-
-		// dependencies
-
-		@Inject
-		Oxygen8InboundLogDao oxygen8InboundLogDao;
-
-		// implementation
-
-		@Override
-		public
-		List<Integer> searchIds (
-				Object search) {
-
-			Oxygen8InboundLogSearch oxygen8InboundLogSearch =
-				(Oxygen8InboundLogSearch) search;
-
-			return oxygen8InboundLogDao.searchIds (
-				oxygen8InboundLogSearch);
-
-		}
 
 	}
 

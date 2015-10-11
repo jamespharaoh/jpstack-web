@@ -994,9 +994,8 @@ class ApplicationContextBuilder {
 
 		String objectHooksClassName =
 			stringFormat (
-				"%s.model.%sRec$%sHooks",
+				"%s.model.%sHooks",
 				model.plugin ().packageName (),
-				capitalise (model.name ()),
 				capitalise (model.name ()));
 
 		Class<?> objectHooksClass;

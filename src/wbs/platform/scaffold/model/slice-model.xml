@@ -1,5 +1,28 @@
 <model-meta
-	name="slice">
+	name="slice"
+	type="major">
+
+	<fields>
+
+		<generated-id-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<string-field
+			name="filter"
+			nullable="yes"/>
+
+		<string-field
+			name="adminEmail"
+			nullable="yes"/>
+
+		<string-field
+			name="supervisorConfigNames"
+			nullable="yes"/>
+
+	</fields>
 
 	<priv-types>
 

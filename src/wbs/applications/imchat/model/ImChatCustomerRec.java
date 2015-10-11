@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -19,7 +17,6 @@ import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 
@@ -80,34 +77,6 @@ class ImChatCustomerRec
 
 		List<Integer> searchIds (
 				ImChatCustomerSearch imChatCustomerSearch);
-
-	}
-
-	// object hooks
-
-	public static
-	class ImChatCustomerHooks
-		extends AbstractObjectHooks<ImChatCustomerRec> {
-
-		// dependencies
-
-		@Inject
-		ImChatCustomerDao imChatCustomerDao;
-
-		// implementation
-
-		@Override
-		public
-		List<Integer> searchIds (
-				Object search) {
-
-			ImChatCustomerSearch imChatCustomerSearch =
-				(ImChatCustomerSearch) search;
-
-			return imChatCustomerDao.searchIds (
-				imChatCustomerSearch);
-
-		}
 
 	}
 

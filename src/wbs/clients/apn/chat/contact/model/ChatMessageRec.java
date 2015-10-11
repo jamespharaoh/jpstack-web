@@ -1,15 +1,8 @@
 package wbs.clients.apn.chat.contact.model;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,14 +15,12 @@ import org.joda.time.Interval;
 
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CommonEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.LinkField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.platform.media.model.MediaRec;
@@ -149,78 +140,7 @@ class ChatMessageRec
 
 	}
 
-	// object hooks
-
-	public static
-	class ChatMessageHooks
-		extends AbstractObjectHooks<ChatMessageRec> {
-
-		@Inject
-		Provider<ChatContactObjectHelper> chatContactHelper;
-
-		@Inject
-		Database database;
-
-		@Override
-		public
-		void beforeInsert (
-				ChatMessageRec chatMessage) {
-
-			ChatUserRec fromChatUser =
-				chatMessage.getFromUser ();
-
-			ChatUserRec toChatUser =
-				chatMessage.getToUser ();
-
-			ChatRec chat =
-				fromChatUser.getChat ();
-
-			// sanity check
-
-			if (! equal (
-					fromChatUser.getChat (),
-					toChatUser.getChat ())) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"From user's chat %s does not match to user's %s",
-						fromChatUser.getChat (),
-						toChatUser.getChat ()));
-
-			}
-
-			// find or create chat contact
-
-			ChatContactRec chatContact =
-				chatContactHelper.get ().findOrCreate (
-					chatMessage.getFromUser (),
-					chatMessage.getToUser ());
-
-			// update message
-
-			chatMessage
-				.setIndex (chatContact.getNumChatMessages ())
-				.setChatContact (chatContact)
-				.setChat (chat);
-
-			// update chat contact
-
-			chatContact
-
-				.setNumChatMessages (
-					chatContact.getNumChatMessages () + 1)
-
-				.setFirstMessageTime (
-					ifNull (
-						chatContact.getFirstMessageTime (),
-						chatMessage.getTimestamp ()))
-
-				.setLastMessageTime (
-					chatMessage.getTimestamp ());
-
-		}
-
-	}
+	// dao methods
 
 	public static
 	interface ChatMessageDaoMethods {

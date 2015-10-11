@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -19,7 +17,6 @@ import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.platform.queue.model.QueueItemRec;
@@ -99,30 +96,6 @@ class ManualResponderRequestRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// object hooks
-
-	public static
-	class ManualResponderRequestHooks
-		extends AbstractObjectHooks<ManualResponderRequestRec> {
-
-		@Inject
-		ManualResponderRequestDao manualResponderRequestDao;
-
-		@Override
-		public
-		List<Integer> searchIds (
-				Object searchObject) {
-
-			ManualResponderRequestSearch search =
-				(ManualResponderRequestSearch) searchObject;
-
-			return manualResponderRequestDao.searchIds (
-				search);
-
-		}
 
 	}
 

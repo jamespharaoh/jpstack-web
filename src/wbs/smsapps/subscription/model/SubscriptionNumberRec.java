@@ -21,7 +21,6 @@ import wbs.framework.entity.annotations.IdentityReferenceField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.sms.number.core.model.NumberRec;
@@ -193,30 +192,6 @@ class SubscriptionNumberRec
 					number)
 
 			);
-
-		}
-
-	}
-
-	// object hooks
-
-	public static
-	class SubscriptionNumberHooks
-		extends AbstractObjectHooks<SubscriptionNumberRec> {
-
-		@Inject
-		SubscriptionNumberDao subscriptionNumberDao;
-
-		@Override
-		public
-		List<Integer> searchIds (
-				Object searchObject) {
-
-			SubscriptionNumberSearch search =
-				(SubscriptionNumberSearch) searchObject;
-
-			return subscriptionNumberDao.searchIds (
-				search);
 
 		}
 

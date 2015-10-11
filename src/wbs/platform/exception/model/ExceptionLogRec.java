@@ -3,8 +3,6 @@ package wbs.platform.exception.model;
 import java.util.Date;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -16,7 +14,6 @@ import wbs.framework.entity.annotations.EphemeralEntity;
 import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.Record;
 import wbs.platform.user.model.UserRec;
@@ -82,30 +79,6 @@ class ExceptionLogRec
 				getId ())
 
 			.toComparison ();
-
-	}
-
-	// object hooks
-
-	public static
-	class ExceptionLogHooks
-		extends AbstractObjectHooks<ExceptionLogRec> {
-
-		@Inject
-		ExceptionLogDao exceptionLogDao;
-
-		@Override
-		public
-		List<Integer> searchIds (
-				Object searchObject) {
-
-			ExceptionLogSearch search =
-				(ExceptionLogSearch) searchObject;
-
-			return exceptionLogDao.searchIds (
-				search);
-
-		}
 
 	}
 

@@ -13,7 +13,6 @@ import wbs.framework.entity.annotations.MinorEntity;
 import wbs.framework.entity.annotations.NameField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
 
@@ -50,26 +49,6 @@ class MessageTemplateParameterRec
 	@SimpleField (
 		nullable = true)
 	Integer length;
-
-	// object hooks
-
-	public static
-	class MessageTemplateParameterHooks
-		extends AbstractObjectHooks<MessageTemplateParameterRec> {
-
-		@Override
-		public
-		void beforeInsert (
-				MessageTemplateParameterRec messageTemplateParameter) {
-
-			messageTemplateParameter
-
-				.setCode (
-					messageTemplateParameter.getName ().toLowerCase ());
-
-		}
-
-	}
 
 	// compare to
 

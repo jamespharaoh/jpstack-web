@@ -1898,4 +1898,14 @@ class Misc {
 
 	}
 
+	public static <Type>
+	boolean doesNotContain (
+			@NonNull Collection<Type> collection,
+			@NonNull Type value) {
+
+		return ! collection.contains (
+			value);
+
+	}
+
 }

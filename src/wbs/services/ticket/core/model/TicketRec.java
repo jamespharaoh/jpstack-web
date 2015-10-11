@@ -7,19 +7,14 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.hibernate.TransientObjectException;
 import org.joda.time.Instant;
 
-import wbs.framework.database.Database;
 import wbs.framework.entity.annotations.CodeField;
 import wbs.framework.entity.annotations.CollectionField;
 import wbs.framework.entity.annotations.CommonEntity;
@@ -27,13 +22,8 @@ import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
-import wbs.framework.object.ObjectManager;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
-import wbs.framework.utils.RandomLogic;
-import wbs.platform.object.core.model.ObjectTypeRec;
-import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 
 import com.google.common.collect.Ordering;
@@ -102,228 +92,6 @@ public class TicketRec
 	@CollectionField
 	Set<TicketTemplateRec> templates =
 		new LinkedHashSet<TicketTemplateRec> ();
-
-	// object hooks
-
-	public static
-	class TicketHooks
-		extends AbstractObjectHooks<TicketRec> {
-
-		@Inject
-		Provider<TicketObjectHelper> ticketHelper;
-
-		@Inject
-		Provider<TicketFieldTypeObjectHelper> ticketFieldTypeHelper;
-
-		@Inject
-		Provider<TicketFieldValueObjectHelper> ticketFieldValueHelper;
-
-		@Inject
-		Provider<ObjectManager> objectManager;
-
-		@Inject
-		Provider<QueueLogic> queueLogic;
-
-		@Inject
-		Database database;
-
-		@Inject
-		RandomLogic randomLogic;
-
-		@Override
-		public
-		void beforeInsert (
-				TicketRec ticket) {
-
-			ticket.setCode (
-				randomLogic.generateNumericNoZero (8));
-
-		}
-
-		@Override
-		public void afterInsert(TicketRec ticket) {
-
-			if (ticket.getTicketState().getShowInQueue()) {
-
-				// create queue item
-
-				QueueItemRec queueItem =
-					queueLogic.get().createQueueItem (
-						queueLogic.get().findQueue (
-							ticket.getTicketState (),
-							"default"),
-						ticket,
-						ticket,
-						ticket.getCode (),
-						ticket.getTicketState().toString());
-
-				// add queue item to ticket
-
-				ticket
-					.setQueueItem (
-						queueItem);
-
-			}
-
-		}
-
-		@Override
-		public
-		Object getDynamic (
-				TicketRec ticket,
-				String name) {
-
-			//Find the ticket field type
-
-			TicketFieldTypeRec ticketFieldType =
-				ticketFieldTypeHelper.get().findByCode(
-					ticket.getTicketManager(),
-					name);
-
-			try {
-
-				//Find the ticket field value
-
-				TicketFieldValueRec ticketFieldValue =
-					ticket.getTicketFieldValues().get(
-						ticketFieldType.getId());
-
-				if (ticketFieldValue == null) { return null; }
-
-				switch( ticketFieldType.getType() ) {
-
-					case string:
-						return ticketFieldValue.getStringValue();
-
-					case number:
-						return ticketFieldValue.getIntegerValue();
-
-					case bool:
-						return ticketFieldValue.getBooleanValue();
-
-					case object:
-						ObjectTypeRec objectType =
-							ticketFieldType.getObjectType();
-
-						Integer objectId =
-							ticketFieldValue.getIntegerValue();
-
-						Object obj = objectManager.get()
-							.objectHelperForTypeId(objectType.getId())
-								.find(objectId);
-
-						return obj;
-
-					default:
-						throw new RuntimeException ();
-
-				}
-
-			} catch (TransientObjectException exception) {
-
-				// object not yet saved so fields will all be null
-
-				return null;
-
-			}
-
-		}
-
-		@Override
-		public
-		void setDynamic (
-				TicketRec ticket,
-				String name,
-				Object value) {
-
-			// find the ticket field type
-
-			TicketFieldTypeRec ticketFieldType =
-				ticketFieldTypeHelper.get ().findByCode (
-						ticket.getTicketManager (),
-						name);
-
-			TicketFieldValueRec ticketFieldValue;
-
-			try {
-
-				 ticketFieldValue =
-					ticket.getTicketFieldValues ().get (
-						ticketFieldType.getId ());
-
-			} catch (Exception exception) {
-
-				ticketFieldValue =
-					null;
-
-			}
-
-			// if the value object does not exist, a new one is created
-
-			if (ticketFieldValue == null) {
-
-				ticketFieldValue =
-					new TicketFieldValueRec ()
-
-					.setTicket (
-						ticket)
-
-					.setTicketFieldType (
-						ticketFieldType);
-
-			}
-
-			switch (ticketFieldType.getType ()) {
-
-				case string:
-
-					ticketFieldValue.setStringValue (
-						(String) value);
-
-					break;
-
-				case number:
-
-					ticketFieldValue.setIntegerValue (
-						(Integer) value);
-
-					break;
-
-				case bool:
-
-					ticketFieldValue.setBooleanValue (
-						(Boolean) value);
-
-					break;
-
-				case object:
-
-					Record<?> record =
-						(Record<?>) value;
-
-					ticketFieldValue.setIntegerValue (
-						record.getId ());
-
-					break;
-
-				default:
-
-					throw new RuntimeException ();
-
-			}
-
-			ticket
-
-				.setNumFields (
-					ticket.getNumFields () + 1);
-
-			ticket.getTicketFieldValues ().put (
-				ticketFieldType.getId (),
-				ticketFieldValue);
-
-		}
-
-	}
 
 	// dao methods
 

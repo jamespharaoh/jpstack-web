@@ -42,12 +42,7 @@ class FixturesTool {
 
 		log.info (
 			stringFormat (
-				"About to create run fixture providers"));
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				this);
+				"About to run fixture providers"));
 
 		for (
 			PluginSpec plugin
@@ -102,9 +97,14 @@ class FixturesTool {
 
 				try {
 
+					@Cleanup
+					Transaction transaction =
+						database.beginReadWrite (
+							this);
+
 					fixtureProvider.createFixtures ();
 
-					transaction.flush ();
+					transaction.commit ();
 
 				} catch (Exception exception) {
 
@@ -120,8 +120,6 @@ class FixturesTool {
 			}
 
 		}
-
-		transaction.commit ();
 
 		log.info (
 			stringFormat (

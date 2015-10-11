@@ -3,6 +3,7 @@
 	package="wbs.framework.entity">
 
 	<layer name="model-meta">
+		<bean class="meta.AssignedIdFieldSpec"/>
 		<bean class="meta.AssociativeCollectionSpec"/>
 		<bean class="meta.ChildrenCollectionSpec"/>
 		<bean class="meta.CodeFieldSpec"/>
@@ -15,13 +16,17 @@
 		<bean class="meta.ModelMetaSpec"/>
 		<bean class="meta.NameFieldSpec"/>
 		<bean class="meta.ParentFieldSpec"/>
+		<bean class="meta.ParentIdFieldSpec"/>
+		<bean class="meta.ParentTypeFieldSpec"/>
 		<bean class="meta.ReferenceFieldSpec"/>
 		<bean class="meta.SlaveFieldSpec"/>
 		<bean class="meta.StringFieldSpec"/>
+		<bean class="meta.TypeFieldSpec"/>
 		<bean class="meta.YesNoFieldSpec"/>
 	</layer>
 
 	<layer name="model-generate">
+		<bean class="generate.AssignedIdFieldWriter"/>
 		<bean class="generate.AssociativeCollectionWriter"/>
 		<bean class="generate.CodeFieldWriter"/>
 		<bean class="generate.ChildrenCollectionWriter"/>
@@ -30,8 +35,11 @@
 		<bean class="generate.GeneratedIdFieldWriter"/>
 		<bean class="generate.NameFieldWriter"/>
 		<bean class="generate.ParentFieldWriter"/>
+		<bean class="generate.ParentIdFieldWriter"/>
+		<bean class="generate.ParentTypeFieldWriter"/>
 		<bean class="generate.SlaveFieldWriter"/>
 		<bean class="generate.StringFieldWriter"/>
+		<bean class="generate.TypeFieldWriter"/>
 		<bean class="generate.YesNoFieldWriter"/>
 	</layer>
 

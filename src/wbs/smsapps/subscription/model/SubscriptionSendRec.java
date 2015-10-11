@@ -19,7 +19,6 @@ import wbs.framework.entity.annotations.IndexField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.platform.user.model.UserRec;
@@ -151,50 +150,6 @@ class SubscriptionSendRec
 
 		List<SubscriptionSendRec> findScheduled (
 				Instant now);
-
-	}
-
-	// object hooks
-
-	public static
-	class SubscriptionSendHooks
-		extends AbstractObjectHooks<SubscriptionSendRec> {
-
-		// implementation
-
-		@Override
-		public
-		void beforeInsert (
-				SubscriptionSendRec subscriptionSend) {
-
-			SubscriptionRec subscription =
-				subscriptionSend.getSubscription ();
-
-			// set index
-
-			subscriptionSend
-
-				.setIndex (
-					subscription.getNumSendsTotal ());
-
-		}
-
-		@Override
-		public
-		void afterInsert (
-				SubscriptionSendRec subscriptionSend) {
-
-			SubscriptionRec subscription =
-				subscriptionSend.getSubscription ();
-
-			// update parent counts
-
-			subscription
-
-				.setNumSendsTotal (
-					subscription.getNumSendsTotal () + 1);
-
-		}
 
 	}
 

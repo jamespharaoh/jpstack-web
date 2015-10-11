@@ -47,7 +47,6 @@ import wbs.framework.entity.annotations.GeneratedIdField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.RandomLogic;
@@ -1014,45 +1013,6 @@ class ChatUserRec
 				chatUser);
 
 			return chatUser;
-
-		}
-
-	}
-
-	// object hooks
-
-	public static
-	class ChatUserHooks
-		extends AbstractObjectHooks<ChatUserRec> {
-
-		// dependencies
-
-		@Inject
-		ChatUserDao chatUserDao;
-
-		// implementation
-
-		@Override
-		public
-		List<Integer> searchIds (
-				Object search) {
-
-			@SuppressWarnings ("unchecked")
-			Map<String,Object> chatUserSearch =
-				(Map<String,Object>) search;
-
-			return chatUserDao.searchIds (
-				chatUserSearch);
-
-		}
-
-		@Override
-		public
-		void beforeUpdate (
-				ChatUserRec object) {
-
-			System.out.println (
-				"BEFORE UPDATE " + object);
 
 		}
 

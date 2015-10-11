@@ -6,7 +6,6 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import lombok.Getter;
@@ -54,14 +53,6 @@ class HibernateHelperProviderBuilder {
 	// state
 
 	boolean built = false;
-
-	// lifecycle
-
-	@PostConstruct
-	public
-	void init () {
-
-	}
 
 	// implementation
 
@@ -555,11 +546,13 @@ class HibernateHelperProviderBuilder {
 							objectClass ().getSimpleName (),
 							objectName (),
 
-							"WHERE _%s.parentObjectType.id = :parentTypeId ",
+							"WHERE _%s.%s.id = :parentTypeId ",
 							objectName (),
+							model.parentTypeField ().name (),
 
-							"AND _%s.parentObjectId = :parentId ",
+							"AND _%s.%s = :parentId ",
 							objectName (),
+							model.parentIdField ().name (),
 
 							"AND _%s.%s = :code",
 							objectName (),
@@ -700,11 +693,13 @@ class HibernateHelperProviderBuilder {
 							objectClass ().getSimpleName (),
 							objectName (),
 
-							"WHERE _%s.parentObjectType.id = :parentTypeId ",
+							"WHERE _%s.%s.id = :parentTypeId ",
 							objectName (),
+							model.parentTypeField ().name (),
 
-							"AND _%s.parentObjectId = :parentId ",
+							"AND _%s.%s = :parentId ",
 							objectName (),
+							model.parentIdField ().name (),
 
 							"AND _%s.%s = :index",
 							objectName (),
@@ -873,11 +868,13 @@ class HibernateHelperProviderBuilder {
 							objectClass ().getSimpleName (),
 							objectName (),
 
-							"WHERE _%s.parentObjectType.id = :parentTypeId ",
+							"WHERE _%s.%s.id = :parentTypeId ",
 							objectName (),
+							model.parentTypeField ().name (),
 
-							"AND _%s.parentObjectId = :parentId ",
+							"AND _%s.%s = :parentId ",
 							objectName (),
+							model.parentIdField ().name (),
 
 							"AND _%s.%s = :%s ",
 							objectName (),
@@ -1006,11 +1003,13 @@ class HibernateHelperProviderBuilder {
 						objectClass ().getSimpleName (),
 						objectName (),
 
-						"WHERE _%s.parentObjectType.id = :parentTypeId ",
+						"WHERE _%s.%s.id = :parentTypeId ",
 						objectName (),
+						model.parentTypeField ().name (),
 
-						"AND _%s.parentObjectId = :parentId",
-						objectName ()))
+						"AND _%s.%s = :parentId",
+						objectName (),
+						model.parentIdField ().name ()))
 
 					.setInteger (
 						"parentTypeId",
@@ -1310,11 +1309,13 @@ class HibernateHelperProviderBuilder {
 						objectClass ().getSimpleName (),
 						objectName (),
 
-						"WHERE _%s.parentObjectType.id = :parentTypeId ",
+						"WHERE _%s.%s.id = :parentTypeId ",
 						objectName (),
+						model.parentTypeField ().name (),
 
-						"AND _%s.parentObjectId = :parentId",
+						"AND _%s.%s = :parentId",
 						objectName (),
+						model.parentIdField ().name (),
 
 						"AND _%s.%s = :%s",
 						objectName (),
@@ -1363,9 +1364,9 @@ class HibernateHelperProviderBuilder {
 				Record<?> object,
 				String name) {
 
-			 return objectHooks.getDynamic(
-					 object,
-					 name);
+			 return objectHooks.getDynamic (
+				 object,
+				 name);
 
 		}
 

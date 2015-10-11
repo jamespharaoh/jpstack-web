@@ -25,7 +25,6 @@ import wbs.framework.entity.annotations.IdentityReferenceField;
 import wbs.framework.entity.annotations.ParentField;
 import wbs.framework.entity.annotations.ReferenceField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.Record;
 
@@ -277,56 +276,6 @@ class ChatContactRec
 			// and return
 
 			return chatContact;
-
-		}
-
-	}
-
-	// hooks
-
-	public static
-	class ChatContactHooks
-		extends AbstractObjectHooks<ChatContactRec> {
-
-		@Inject
-		Database database;
-
-		@Override
-		public
-		void afterInsert (
-				ChatContactRec chatContact) {
-
-			Transaction transaction =
-				database.currentTransaction ();
-
-			// get cache
-
-			ChatContactCache chatContactCache =
-				(ChatContactCache)
-				transaction.getMeta (
-					"chatContactCache");
-
-			if (chatContactCache == null) {
-
-				chatContactCache =
-					new ChatContactCache ();
-
-				database.currentTransaction ().setMeta (
-					"chatContactCache",
-					chatContactCache);
-
-			}
-
-			// update cache
-
-			Pair<Integer,Integer> cacheKey =
-				Pair.of (
-					chatContact.getFromUser ().getId (),
-					chatContact.getToUser ().getId ());
-
-			chatContactCache.byUserIds.put (
-				cacheKey,
-				chatContact);
 
 		}
 

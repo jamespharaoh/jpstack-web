@@ -11,8 +11,6 @@ import wbs.framework.entity.annotations.ForeignIdField;
 import wbs.framework.entity.annotations.MajorEntity;
 import wbs.framework.entity.annotations.MasterField;
 import wbs.framework.entity.annotations.SimpleField;
-import wbs.framework.object.AbstractObjectHooks;
-import wbs.framework.object.ObjectHelper;
 import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
 
@@ -95,39 +93,6 @@ class ChatSchemeChargesRec
 				other.getChatScheme ())
 
 			.toComparison ();
-
-	}
-
-	// object hooks
-
-	public static
-	class ChatSchemeChargesHooks
-		extends AbstractObjectHooks<ChatSchemeRec> {
-
-		@Override
-		public
-		void createSingletons (
-				ObjectHelper<ChatSchemeRec> chatSchemeHelper,
-				ObjectHelper<?> parentHelper,
-				Record<?> parent) {
-
-			if (! ((Object) parent instanceof ChatSchemeRec))
-				return;
-
-			ChatSchemeRec chatScheme =
-				(ChatSchemeRec)
-				(Object)
-				parent;
-
-			ChatSchemeChargesRec chatSchemeCharges =
-				chatSchemeHelper.insert (
-					new ChatSchemeChargesRec ()
-						.setChatScheme (chatScheme));
-
-			chatScheme
-				.setCharges (chatSchemeCharges);
-
-		}
 
 	}
 
