@@ -3,11 +3,12 @@ package wbs.framework.entity.meta;
 public
 enum ModelMetaType {
 
-	root,
-	type,
+	common,
+	ephemeral,
+	event,
 	major,
 	minor,
-	common,
-	ephemeral;
+	root,
+	type;
 
 }

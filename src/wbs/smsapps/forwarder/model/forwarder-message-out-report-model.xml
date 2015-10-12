@@ -1,4 +1,39 @@
 <model-meta
-	name="forwarderMessageOutReport">
+	name="forwarderMessageOutReport"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="forwarderMessageOut"/>
+
+		<index-field/>
+
+		<!-- data -->
+
+		<enum-field
+			name="oldMessageStatus"
+			type="messageStatus"/>
+
+		<enum-field
+			name="newMessageStatus"
+			type="messageStatus"/>
+
+		<timestamp-field
+			name="createdTime"
+			column-type="postgresql"/>
+
+		<timestamp-field
+			name="processedTime"
+			column-type="postgresql"
+			nullable="yes"/>
+
+	</fields>
 
 </model-meta>

@@ -2,12 +2,14 @@ package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
 
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.scaffold.PluginCustomTypeSpec;
 import wbs.framework.application.scaffold.PluginEnumTypeSpec;
 import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.application.scaffold.PluginSpec;
@@ -49,12 +51,40 @@ class EnumFieldWriter {
 			Builder builder)
 		throws IOException {
 
+		String fieldTypePackageName;
+
 		PluginEnumTypeSpec fieldTypePluginEnumType =
 			pluginManager.pluginEnumTypesByName ().get (
 				spec.typeName ());
 
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginEnumType.plugin ();
+		PluginCustomTypeSpec fieldTypePluginCustomType =
+			pluginManager.pluginCustomTypesByName ().get (
+				spec.typeName ());
+
+		if (fieldTypePluginEnumType != null) {
+
+			PluginSpec fieldTypePlugin =
+				fieldTypePluginEnumType.plugin ();
+
+			fieldTypePackageName =
+				fieldTypePlugin.packageName ();
+
+		} else if (fieldTypePluginCustomType != null) {
+
+			PluginSpec fieldTypePlugin =
+				fieldTypePluginCustomType.plugin ();
+
+			fieldTypePackageName =
+				fieldTypePlugin.packageName ();
+
+		} else {
+
+			throw new RuntimeException (
+				stringFormat (
+					"No such enum or custom type: %s",
+					spec.typeName ()));
+
+		}
 
 		if (ifNull (spec.nullable (), false)) {
 
@@ -76,14 +106,14 @@ class EnumFieldWriter {
 
 			javaWriter.write (
 				"\t%s.model.%s %s =\n",
-				fieldTypePlugin.packageName (),
+				fieldTypePackageName,
 				capitalise (
 					spec.typeName ()),
 				spec.name ());
 
 			javaWriter.write (
 				 "\t\t%s.model.%s.%s;\n",
-				fieldTypePlugin.packageName (),
+				fieldTypePackageName,
 				capitalise (
 					spec.typeName ()),
 				spec.defaultValue ());
@@ -93,7 +123,7 @@ class EnumFieldWriter {
 			javaWriter.write (
 
 				"\t%s.model.%s %s;\n",
-				fieldTypePlugin.packageName (),
+				fieldTypePackageName,
 				capitalise (
 					spec.typeName ()),
 				spec.name ());

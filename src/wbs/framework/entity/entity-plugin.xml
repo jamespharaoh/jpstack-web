@@ -6,6 +6,7 @@
 		<bean class="meta.AssignedIdFieldSpec"/>
 		<bean class="meta.AssociativeCollectionSpec"/>
 		<bean class="meta.ChildrenCollectionSpec"/>
+		<bean class="meta.ChildrenListSpec"/>
 		<bean class="meta.ChildrenMappingSpec"/>
 		<bean class="meta.CodeFieldSpec"/>
 		<bean class="meta.DeletedFieldSpec"/>
@@ -37,6 +38,7 @@
 		<bean class="generate.AssociativeCollectionWriter"/>
 		<bean class="generate.CodeFieldWriter"/>
 		<bean class="generate.ChildrenCollectionWriter"/>
+		<bean class="generate.ChildrenListWriter"/>
 		<bean class="generate.ChildrenMappingWriter"/>
 		<bean class="generate.DeletedFieldWriter"/>
 		<bean class="generate.DescriptionFieldWriter"/>

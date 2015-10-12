@@ -29,9 +29,11 @@ import wbs.framework.entity.meta.IdentityReferenceFieldSpec;
 import wbs.framework.entity.meta.IndexFieldSpec;
 import wbs.framework.entity.meta.ModelFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.ModelMetaType;
 import wbs.framework.entity.meta.ParentFieldSpec;
 import wbs.framework.entity.meta.ParentIdFieldSpec;
 import wbs.framework.entity.meta.ParentTypeFieldSpec;
+import wbs.framework.entity.meta.TimestampFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
 
 import com.google.common.collect.ImmutableList;
@@ -122,9 +124,11 @@ class ModelRecordGenerator {
 		List<Class<?>> standardImportClasses =
 			ImmutableList.<Class<?>>of (
 
+			java.util.ArrayList.class,
 			java.util.Date.class,
 			java.util.LinkedHashMap.class,
 			java.util.LinkedHashSet.class,
+			java.util.List.class,
 			java.util.Map.class,
 			java.util.Set.class,
 
@@ -137,6 +141,7 @@ class ModelRecordGenerator {
 
 			wbs.framework.entity.annotations.CommonEntity.class,
 			wbs.framework.entity.annotations.EphemeralEntity.class,
+			wbs.framework.entity.annotations.EventEntity.class,
 			wbs.framework.entity.annotations.MajorEntity.class,
 			wbs.framework.entity.annotations.MinorEntity.class,
 			wbs.framework.entity.annotations.RootEntity.class,
@@ -163,6 +168,7 @@ class ModelRecordGenerator {
 
 			wbs.framework.record.CommonRecord.class,
 			wbs.framework.record.EphemeralRecord.class,
+			wbs.framework.record.EventRecord.class,
 			wbs.framework.record.MajorRecord.class,
 			wbs.framework.record.MinorRecord.class,
 			wbs.framework.record.Record.class,
@@ -212,7 +218,6 @@ class ModelRecordGenerator {
 			"@EqualsAndHashCode (of = \"id\")\n");
 
 		javaWriter.write (
-
 			"@ToString (of = \"id\")\n");
 
 		switch (modelMeta.type ()) {
@@ -220,7 +225,6 @@ class ModelRecordGenerator {
 		case common:
 
 			javaWriter.write (
-
 				"@CommonEntity\n");
 
 			break;
@@ -228,15 +232,20 @@ class ModelRecordGenerator {
 		case ephemeral:
 
 			javaWriter.write (
-
 				"@EphemeralEntity\n");
+
+			break;
+
+		case event:
+
+			javaWriter.write (
+				"@EventEntity\n");
 
 			break;
 
 		case major:
 
 			javaWriter.write (
-
 				"@MajorEntity\n");
 
 			break;
@@ -244,7 +253,6 @@ class ModelRecordGenerator {
 		case minor:
 
 			javaWriter.write (
-
 				"@MinorEntity\n");
 
 			break;
@@ -252,7 +260,6 @@ class ModelRecordGenerator {
 		case root:
 
 			javaWriter.write (
-
 				"@RootEntity\n");
 
 			break;
@@ -260,7 +267,6 @@ class ModelRecordGenerator {
 		case type:
 
 			javaWriter.write (
-
 				"@TypeEntity\n");
 
 			break;
@@ -278,9 +284,9 @@ class ModelRecordGenerator {
 		throws IOException {
 
 		javaWriter.write (
+			"public\n");
 
-			"public\n",
-
+		javaWriter.write (
 			"class %s\n",
 			className);
 
@@ -289,7 +295,6 @@ class ModelRecordGenerator {
 		case common:
 
 			javaWriter.write (
-
 				"\timplements CommonRecord<%s> {\n",
 				className);
 
@@ -298,8 +303,15 @@ class ModelRecordGenerator {
 		case ephemeral:
 
 			javaWriter.write (
-
 				"\timplements EphemeralRecord<%s> {\n",
+				className);
+
+			break;
+
+		case event:
+
+			javaWriter.write (
+				"\timplements EventRecord<%s> {\n",
 				className);
 
 			break;
@@ -307,7 +319,6 @@ class ModelRecordGenerator {
 		case major:
 
 			javaWriter.write (
-
 				"\timplements MajorRecord<%s> {\n",
 				className);
 
@@ -316,7 +327,6 @@ class ModelRecordGenerator {
 		case minor:
 
 			javaWriter.write (
-
 				"\timplements MinorRecord<%s> {\n",
 				className);
 
@@ -325,7 +335,6 @@ class ModelRecordGenerator {
 		case root:
 
 			javaWriter.write (
-
 				"\timplements RootRecord<%s> {\n",
 				className);
 
@@ -334,7 +343,6 @@ class ModelRecordGenerator {
 		case type:
 
 			javaWriter.write (
-
 				"\timplements TypeRecord<%s> {\n",
 				className);
 
@@ -458,6 +466,10 @@ class ModelRecordGenerator {
 		IdentityReferenceFieldSpec identityReferenceField = null;
 		IdentityIntegerFieldSpec identityIntegerField = null;
 
+		TimestampFieldSpec timestampField = null;
+
+		boolean gotName = false;
+
 		for (
 			ModelFieldSpec modelField
 				: modelMeta.fields ()
@@ -493,6 +505,8 @@ class ModelRecordGenerator {
 					(CodeFieldSpec)
 					modelField;
 
+				gotName = true;
+
 			}
 
 			if (modelField instanceof IndexFieldSpec) {
@@ -500,6 +514,8 @@ class ModelRecordGenerator {
 				indexField =
 					(IndexFieldSpec)
 					modelField;
+
+				gotName = true;
 
 			}
 
@@ -509,6 +525,8 @@ class ModelRecordGenerator {
 					(IdentityReferenceFieldSpec)
 					modelField;
 
+				gotName = true;
+
 			}
 
 			if (modelField instanceof IdentityIntegerFieldSpec) {
@@ -517,155 +535,200 @@ class ModelRecordGenerator {
 					(IdentityIntegerFieldSpec)
 					modelField;
 
+				gotName = true;
+
+			}
+
+			if (
+				modelField instanceof TimestampFieldSpec
+				&& timestampField == null
+			) {
+
+				timestampField =
+					(TimestampFieldSpec)
+					modelField;
+
 			}
 
 		}
 
-		if (parentField != null) {
+		if (modelMeta.type () == ModelMetaType.event) {
+
+			if (timestampField == null) {
+				throw new RuntimeException ();
+			}
 
 			javaWriter.write (
 
 				"\t\t\t.append (\n",
 
-				"\t\t\t\tget%s (),\n",
-				capitalise (parentField.typeName ()),
+				"\t\t\t\tother.get%s (),\n",
+				capitalise (
+					timestampField.name ()),
 
-				"\t\t\t\tother.get%s ())\n",
-				capitalise (parentField.typeName ()),
+				"\t\t\t\tget%s ())\n",
+				capitalise (
+					timestampField.name ()),
 
 				"\n");
 
-		}
-
-		if (parentTypeField != null) {
-
 			javaWriter.write (
 
 				"\t\t\t.append (\n",
 
-				"\t\t\t\tget%s (),\n",
-				capitalise (
-					ifNull (
-						parentTypeField.name (),
-						"parentType")),
+				"\t\t\t\tother.getId (),\n",
 
-				"\t\t\t\tother.get%s ())\n",
-				capitalise (
-					ifNull (
-						parentTypeField.name (),
-						"parentType")),
+				"\t\t\t\tgetId ())\n",
 
 				"\n");
 
-		}
+		} else if (gotName) {
 
-		if (parentIdField != null) {
+			if (parentField != null) {
+
+				javaWriter.write (
+
+					"\t\t\t.append (\n",
+
+					"\t\t\t\tget%s (),\n",
+					capitalise (parentField.typeName ()),
+
+					"\t\t\t\tother.get%s ())\n",
+					capitalise (parentField.typeName ()),
+
+					"\n");
+
+			}
+
+			if (parentTypeField != null) {
+
+				javaWriter.write (
+
+					"\t\t\t.append (\n",
+
+					"\t\t\t\tget%s (),\n",
+					capitalise (
+						ifNull (
+							parentTypeField.name (),
+							"parentType")),
+
+					"\t\t\t\tother.get%s ())\n",
+					capitalise (
+						ifNull (
+							parentTypeField.name (),
+							"parentType")),
+
+					"\n");
+
+			}
+
+			if (parentIdField != null) {
+
+				javaWriter.write (
+
+					"\t\t\t.append (\n",
+
+					"\t\t\t\tgetParentId (),\n",
+
+					"\t\t\t\tother.getParentId ())\n",
+
+					"\n");
+
+			}
+
+			if (codeField != null) {
+
+				javaWriter.write (
+
+					"\t\t\t.append (\n",
+
+					"\t\t\t\tget%s (),\n",
+					capitalise (
+						ifNull (
+							codeField.name (),
+							"code")),
+
+					"\t\t\t\tother.get%s ())\n",
+					capitalise (
+						ifNull (
+							codeField.name (),
+							"code")),
+
+					"\n");
+
+			}
+
+			if (indexField != null) {
+
+				javaWriter.write (
+
+					"\t\t\t.append (\n",
+
+					"\t\t\t\tget%s (),\n",
+					capitalise (
+						ifNull (
+							indexField.name (),
+							"index")),
+
+					"\t\t\t\tother.get%s ())\n",
+					capitalise (
+						ifNull (
+							indexField.name (),
+							"index")),
+
+					"\n");
+
+			}
+
+			if (identityReferenceField != null) {
+
+				javaWriter.write (
+
+					"\t\t\t.append (\n",
+
+					"\t\t\t\tget%s (),\n",
+					capitalise (
+						ifNull (
+							identityReferenceField.name (),
+							identityReferenceField.typeName ())),
+
+					"\t\t\t\tother.get%s ())\n",
+					capitalise (
+						ifNull (
+							identityReferenceField.name (),
+							identityReferenceField.typeName ())),
+
+					"\n");
+
+			}
+
+			if (identityIntegerField != null) {
+
+				javaWriter.write (
+
+					"\t\t\t.append (\n",
+
+					"\t\t\t\tget%s (),\n",
+					capitalise (
+						identityIntegerField.name ()),
+
+					"\t\t\t\tother.get%s ())\n",
+					capitalise (
+						identityIntegerField.name ()),
+
+					"\n");
+
+			}
+
+		} else {
 
 			javaWriter.write (
 
 				"\t\t\t.append (\n",
-
-				"\t\t\t\tgetParentId (),\n",
-
-				"\t\t\t\tother.getParentId ())\n",
-
-				"\n");
-
-		}
-
-		if (codeField != null) {
-
-			javaWriter.write (
-
-				"\t\t\t.append (\n",
-
-				"\t\t\t\tget%s (),\n",
-				capitalise (
-					ifNull (
-						codeField.name (),
-						"code")),
-
-				"\t\t\t\tother.get%s ())\n",
-				capitalise (
-					ifNull (
-						codeField.name (),
-						"code")),
-
-				"\n");
-
-		}
-
-		if (indexField != null) {
-
-			javaWriter.write (
-
-				"\t\t\t.append (\n",
-
-				"\t\t\t\tget%s (),\n",
-				capitalise (
-					ifNull (
-						indexField.name (),
-						"index")),
-
-				"\t\t\t\tother.get%s ())\n",
-				capitalise (
-					ifNull (
-						indexField.name (),
-						"index")),
-
-				"\n");
-
-		}
-
-		if (identityReferenceField != null) {
-
-			javaWriter.write (
-
-				"\t\t\t.append (\n",
-
-				"\t\t\t\tget%s (),\n",
-				capitalise (
-					ifNull (
-						identityReferenceField.name (),
-						identityReferenceField.typeName ())),
-
-				"\t\t\t\tother.get%s ())\n",
-				capitalise (
-					ifNull (
-						identityReferenceField.name (),
-						identityReferenceField.typeName ())),
-
-				"\n");
-
-		}
-
-		if (identityIntegerField != null) {
-
-			javaWriter.write (
-
-				"\t\t\t.append (\n",
-
-				"\t\t\t\tget%s (),\n",
-				capitalise (
-					identityIntegerField.name ()),
-
-				"\t\t\t\tother.get%s ())\n",
-				capitalise (
-					identityIntegerField.name ()),
-
-				"\n");
-
-		}
-
-		if (parentField == null && codeField == null) {
-
-			javaWriter.write (
-
-				"\t\t\t.append (\n",
-
-				"\t\t\t\tgetId (),\n",
 
 				"\t\t\t\tother.getId ())\n",
+
+				"\t\t\t\tgetId (),\n",
 
 				"\n");
 

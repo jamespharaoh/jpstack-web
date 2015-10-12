@@ -1,7 +1,8 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
 
@@ -16,15 +17,15 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.framework.entity.meta.ChildrenMappingSpec;
+import wbs.framework.entity.meta.ChildrenListSpec;
 import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.utils.etc.FormatWriter;
 
-@PrototypeComponent ("childrenMappingWriter")
+@PrototypeComponent ("childrenListWriter")
 @ModelWriter
 public
-class ChildrenMappingWriter {
+class ChildrenListWriter {
 
 	// dependencies
 
@@ -40,7 +41,7 @@ class ChildrenMappingWriter {
 	ModelMetaSpec parent;
 
 	@BuilderSource
-	ChildrenMappingSpec spec;
+	ChildrenListSpec spec;
 
 	@BuilderTarget
 	FormatWriter javaWriter;
@@ -53,6 +54,14 @@ class ChildrenMappingWriter {
 			Builder builder)
 		throws IOException {
 
+		String fieldName =
+			ifNull (
+				spec.name (),
+				stringFormat (
+					"%ss",
+					capitalise (
+						spec.typeName ())));
+
 		PluginModelSpec fieldTypePluginModel =
 			pluginManager.pluginModelsByName ().get (
 				spec.typeName ());
@@ -60,37 +69,29 @@ class ChildrenMappingWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
+		String fieldTypeName =
+			stringFormat (
+				"%sRec",
+				capitalise (
+					spec.typeName ()));
+
 		javaWriter.write (
 			"\t@CollectionField (\n");
 
 		javaWriter.write (
 			"\t\tindex = \"%s\")\n",
-			spec.mapColumnName ());
+			"index");
 
-		if (
-			equal (
-				spec.mapType (),
-				"integer")
-		) {
+		javaWriter.write (
+			"\tList<%s.model.%s> %s =\n",
+			fieldTypePlugin.packageName (),
+			fieldTypeName,
+			fieldName);
 
-			javaWriter.write (
-				"\tMap<Integer,%s.model.%sRec> %ss =\n",
-				fieldTypePlugin.packageName (),
-				capitalise (
-					spec.typeName ()),
-				spec.typeName ());
-
-			javaWriter.write (
-				"\t\tnew LinkedHashMap<Integer,%s.model.%sRec> ();\n",
-				fieldTypePlugin.packageName (),
-				capitalise (
-					spec.typeName ()));
-
-		} else {
-
-			throw new RuntimeException ();
-
-		}
+		javaWriter.write (
+			"\t\tnew ArrayList<%s.model.%s> ();\n",
+			fieldTypePlugin.packageName (),
+			fieldTypeName);
 
 		javaWriter.write (
 			"\n");

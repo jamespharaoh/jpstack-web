@@ -3,31 +3,28 @@ package wbs.framework.entity.meta;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("yes-no-field")
+@DataClass ("children-list")
+@PrototypeComponent ("childrenListSpec")
 @ModelMetaData
-@PrototypeComponent ("yesNoFieldSpec")
 public
-class YesNoFieldSpec
-	implements ModelFieldSpec {
+class ChildrenListSpec
+	implements ModelCollectionSpec {
 
-	@DataAttribute (
-		required = true)
-	String name;
+	@DataAncestor
+	ModelMetaSpec model;
 
 	@DataAttribute
-	Boolean nullable;
+	String name;
 
 	@DataAttribute (
-		value = "default")
-	Boolean defaultValue;
-
-	@DataAttribute (
-		value = "column")
-	String columnName;
+		value = "type",
+		required = true)
+	String typeName;
 
 }

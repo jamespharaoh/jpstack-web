@@ -1,6 +1,6 @@
 <model-meta
 	name="photoGrabberRequest"
-	type="common">
+	type="event">
 
 	<fields>
 

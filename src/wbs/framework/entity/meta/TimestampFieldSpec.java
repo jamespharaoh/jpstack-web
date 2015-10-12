@@ -26,6 +26,10 @@ class TimestampFieldSpec
 	@DataAttribute
 	Boolean nullable;
 
+	@DataAttribute (
+		value = "column")
+	String columnName;
+
 	public static
 	enum ColumnType {
 		unix,       // time since epoch

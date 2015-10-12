@@ -1,6 +1,6 @@
 <model-meta
 	name="ticketerTicket"
-	type="common">
+	type="event">
 
 	<fields>
 

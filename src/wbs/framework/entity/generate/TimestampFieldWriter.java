@@ -10,9 +10,9 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.TimestampFieldSpec;
-import wbs.framework.entity.meta.TimestampFieldSpec.ColumnType;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("timestampFieldWriter")
@@ -39,42 +39,29 @@ class TimestampFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		boolean nullable =
-			ifNull (
-				spec.nullable (),
-				false);
+		// write field annotation
 
-		// write annotation
+		AnnotationWriter annotationWriter =
+			new AnnotationWriter ()
 
-		if (nullable || spec.columnType () != ColumnType.postgresql) {
+			.name (
+				"SimpleField");
 
-			javaWriter.write (
-				"\t@SimpleField (\n");
+		if (ifNull (spec.nullable (), false)) {
 
-		} else {
-
-			javaWriter.write (
-				"\t@SimpleField\n");
+			annotationWriter.addAttributeFormat (
+				"nullable",
+				"true");
 
 		}
-
-		// write nullable
-
-		if (nullable) {
-
-			javaWriter.write (
-				"\t\tnullable = true,\n");
-
-		}
-
-		// write type helper
 
 		switch (spec.columnType ()) {
 
 		case sql:
 
-			javaWriter.write (
-				"\t\thibernateTypeHelper = PersistentInstantAsTimestamp.class)\n");
+			annotationWriter.addAttributeFormat (
+				"hibernateTypeHelper",
+				"PersistentInstantAsTimestamp.class");
 
 			break;
 
@@ -84,8 +71,9 @@ class TimestampFieldWriter {
 
 		case iso:
 
-			javaWriter.write (
-				"\t\thibernateTypeHelper = PersistentInstantAsString.class)\n");
+			annotationWriter.addAttributeFormat (
+				"hibernateTypeHelper",
+				"PersistentInstantAsString.class");
 
 			break;
 
@@ -95,6 +83,19 @@ class TimestampFieldWriter {
 				spec.columnType ().toString ());
 
 		}
+
+		if (spec.columnName () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"column",
+				"\"%s\"",
+				spec.columnName ().replace ("\"", "\\\""));
+
+		}
+
+		annotationWriter.write (
+			javaWriter,
+			"\t");
 
 		// write member
 

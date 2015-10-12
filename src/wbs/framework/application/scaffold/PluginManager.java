@@ -34,6 +34,9 @@ class PluginManager {
 	@Getter @Setter
 	Map<String,PluginEnumTypeSpec> pluginEnumTypesByName;
 
+	@Getter @Setter
+	Map<String,PluginCustomTypeSpec> pluginCustomTypesByName;
+
 	// implementation
 
 	@Accessors (fluent = true)
@@ -64,6 +67,10 @@ class PluginManager {
 			ImmutableMap.Builder<String,PluginEnumTypeSpec>
 			pluginEnumTypesByNameBuilder =
 				ImmutableMap.<String,PluginEnumTypeSpec>builder ();
+
+			ImmutableMap.Builder<String,PluginCustomTypeSpec>
+			pluginCustomTypesByNameBuilder =
+				ImmutableMap.<String,PluginCustomTypeSpec>builder ();
 
 			donePluginNames =
 				new HashSet<String> ();
@@ -119,6 +126,17 @@ class PluginManager {
 
 					}
 
+					for (
+						PluginCustomTypeSpec pluginCustomType
+							: plugin.models ().customTypes ()
+					) {
+
+						pluginCustomTypesByNameBuilder.put (
+							pluginCustomType.name (),
+							pluginCustomType);
+
+					}
+
 					donePluginNames.add (
 						plugin.name ());
 
@@ -167,7 +185,10 @@ class PluginManager {
 					pluginModelsByNameBuilder.build ())
 
 				.pluginEnumTypesByName (
-					pluginEnumTypesByNameBuilder.build ());
+					pluginEnumTypesByNameBuilder.build ())
+
+				.pluginCustomTypesByName (
+					pluginCustomTypesByNameBuilder.build ());
 
 		}
 

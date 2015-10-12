@@ -1,5 +1,102 @@
 <model-meta
-	name="forwarder">
+	name="forwarder"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<integer-field
+			name="maxReplies"
+			default="0"/>
+
+		<integer-field
+			name="maxFreeReplies"
+			default="0"/>
+
+		<integer-field
+			name="maxBillReplies"
+			default="0"/>
+
+		<yes-no-field
+			name="allowNewSends"
+			default="no"/>
+
+		<yes-no-field
+			name="allowNullOtherId"
+			default="no"/>
+
+		<string-field
+			name="password"
+			nullable="yes"/>
+
+		<string-field
+			name="url"
+			nullable="yes"/>
+
+		<string-field
+			name="urlParams"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="urlPost"
+			default="yes"/>
+
+		<integer-field
+			name="maxPri"
+			default="0"/>
+
+		<integer-field
+			name="defaultPri"
+			default="0"/>
+
+		<integer-field
+			name="inboundTimeoutSecs"
+			default="0"/>
+
+		<integer-field
+			name="outboundTimeoutSecs"
+			default="0"/>
+
+		<yes-no-field
+			name="reportEnabled"
+			default="no"/>
+
+		<string-field
+			name="reportUrl"
+			nullable="yes"/>
+
+		<reference-field
+			type="smsTracker"
+			nullable="yes"/>
+
+	</fields>
+
+	<collections>
+
+		<children-collection
+			type="forwarderRoute"/>
+
+	</collections>
 
 	<priv-types>
 

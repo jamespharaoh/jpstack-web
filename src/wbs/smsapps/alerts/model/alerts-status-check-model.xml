@@ -1,6 +1,6 @@
 <model-meta
 	name="alertsStatusCheck"
-	type="common">
+	type="event">
 
 	<fields>
 

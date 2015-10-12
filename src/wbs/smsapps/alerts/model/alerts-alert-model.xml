@@ -1,6 +1,6 @@
 <model-meta
 	name="alertsAlert"
-	type="common">
+	type="event">
 
 	<fields>
 
