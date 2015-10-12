@@ -1,5 +1,60 @@
 <model-meta
-	name="orderer">
+	name="orderer"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<reference-field
+			name="billRoute"
+			type="route"
+			nullable="yes"/>
+
+		<string-field
+			name="billNumber"
+			nullable="yes"/>
+
+		<string-field
+			name="billTemplate"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="allowRepeat"
+			nullable="yes"/>
+
+		<string-field
+			name="emailAddress"
+			nullable="yes"/>
+
+		<string-field
+			name="emailSubject"
+			nullable="yes"/>
+
+		<string-field
+			name="emailTemplate"
+			nullable="yes"/>
+
+	</fields>
 
 	<priv-types>
 
