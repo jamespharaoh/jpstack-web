@@ -59,28 +59,27 @@ class ReferenceFieldWriter {
 		if (ifNull (spec.nullable (), false)) {
 
 			javaWriter.write (
+				"\t@ReferenceField (\n");
 
-				"\t@ReferenceField (\n",
-
+			javaWriter.write (
 				"\t\tnullable = true)\n");
 
 		} else {
 
 			javaWriter.write (
-
 				"\t@ReferenceField\n");
 
 		}
 
 		javaWriter.write (
-
 			"\t%s.model.%sRec %s;\n",
 			fieldTypePlugin.packageName (),
 			capitalise (spec.typeName ()),
 			ifNull (
 				spec.name (),
-				spec.typeName ()),
+				spec.typeName ()));
 
+		javaWriter.write (
 			"\n");
 
 	}

@@ -41,15 +41,14 @@ class StringFieldWriter {
 		if (ifNull (spec.nullable (), false)) {
 
 			javaWriter.write (
+				"\t@SimpleField (\n");
 
-				"\t@SimpleField (\n",
-
+			javaWriter.write (
 				"\t\tnullable = true)\n");
 
 		} else {
 
 			javaWriter.write (
-
 				"\t@SimpleField\n");
 
 		}
@@ -57,31 +56,28 @@ class StringFieldWriter {
 		if (spec.defaultValue () == null) {
 
 			javaWriter.write (
-
 				"\tString %s;\n",
 				spec.name ());
 
 		} else if (spec.defaultValue ().isEmpty ()) {
 
 			javaWriter.write (
-
 				"\tString %s = \"\";\n",
 				spec.name ());
 
 		} else {
 
 			javaWriter.write (
-
 				"\tString %s =\n",
-				spec.name (),
+				spec.name ());
 
+			javaWriter.write (
 				"\t\t\"%s\";\n",
 				spec.defaultValue ().replace ("\"", "\\\""));
 
 		}
 
 		javaWriter.write (
-
 			"\n");
 
 	}

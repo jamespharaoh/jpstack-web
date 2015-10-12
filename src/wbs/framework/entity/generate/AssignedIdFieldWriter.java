@@ -37,11 +37,12 @@ class AssignedIdFieldWriter {
 		throws IOException {
 
 		javaWriter.write (
+			"\t@AssignedIdField\n");
 
-			"\t@AssignedIdField\n",
+		javaWriter.write (
+			"\tInteger id;\n");
 
-			"\tInteger id;\n",
-
+		javaWriter.write (
 			"\n");
 
 	}

@@ -72,11 +72,6 @@
 		<yes-no-field
 			name="required"/>
 
-		<enum-field
-			name="type"
-			nullable="no"
-			helper="ticketFieldTypeTypeConsoleHelper"/>
-
 		<object-field
 			name="objectType"
 			object-type="objectType"/>
@@ -99,11 +94,6 @@
 		<yes-no-field
 			name="required"/>
 
-		<enum-field
-			name="type"
-			nullable="no"
-			helper="ticketFieldTypeTypeConsoleHelper"/>
-
 		<object-field
 			name="objectType"
 			object-type="objectType"/>
@@ -123,11 +113,6 @@
 
 		<yes-no-field
 			name="required"/>
-
-		<enum-field
-			name="type"
-			nullable="no"
-			helper="ticketFieldTypeTypeConsoleHelper"/>
 
 		<object-field
 			name="objectType"

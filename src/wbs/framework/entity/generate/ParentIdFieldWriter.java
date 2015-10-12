@@ -36,14 +36,13 @@ class ParentIdFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		// TODO this should not be hardcoded, but not sure what instead
+		javaWriter.write (
+			"\t@ParentIdField\n");
 
 		javaWriter.write (
+			"\tInteger parentId;\n");
 
-			"\t@ParentIdField\n",
-
-			"\tInteger parentId;\n",
-
+		javaWriter.write (
 			"\n");
 
 	}

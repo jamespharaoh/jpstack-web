@@ -39,12 +39,15 @@ class DescriptionFieldWriter {
 		throws IOException {
 
 		javaWriter.write (
+			"\t@DescriptionField\n");
 
-			"\t@DescriptionField\n",
-
+		javaWriter.write (
 			"\tString %s;\n",
-			ifNull (spec.name (), "description"),
+			ifNull (
+				spec.name (),
+				"description"));
 
+		javaWriter.write (
 			"\n");
 
 	}

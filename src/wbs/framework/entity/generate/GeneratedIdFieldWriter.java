@@ -37,11 +37,12 @@ class GeneratedIdFieldWriter {
 		throws IOException {
 
 		javaWriter.write (
+			"\t@GeneratedIdField\n");
 
-			"\t@GeneratedIdField\n",
+		javaWriter.write (
+			"\tInteger id;\n");
 
-			"\tInteger id;\n",
-
+		javaWriter.write (
 			"\n");
 
 	}

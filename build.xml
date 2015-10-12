@@ -915,7 +915,6 @@
     <database-init>
       <script name="src/wbs/platform/exception/model/exception-data.sql"/>
       <script name="src/wbs/platform/postgresql/model/postgresql-maintenance-data.sql"/>
-      <script name="src/wbs/sms/message/batch/model/batch-data.sql"/>
     </database-init>
   </target>
   <target name="just-generate-records">

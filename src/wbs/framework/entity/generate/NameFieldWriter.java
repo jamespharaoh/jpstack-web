@@ -39,14 +39,15 @@ class NameFieldWriter {
 		throws IOException {
 
 		javaWriter.write (
+			"\t@NameField\n");
 
-			"\t@NameField\n",
-
+		javaWriter.write (
 			"\tString %s;\n",
 			ifNull (
 				spec.name (),
-				"name"),
+				"name"));
 
+		javaWriter.write (
 			"\n");
 
 	}

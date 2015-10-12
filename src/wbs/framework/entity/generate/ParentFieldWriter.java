@@ -56,14 +56,15 @@ class ParentFieldWriter {
 			fieldTypePluginModel.plugin ();
 
 		javaWriter.write (
+			"\t@ParentField\n");
 
-			"\t@ParentField\n",
-
+		javaWriter.write (
 			"\t%s.model.%sRec %s;\n",
 			fieldTypePlugin.packageName (),
 			capitalise (spec.typeName ()),
-			spec.typeName (),
+			spec.typeName ());
 
+		javaWriter.write (
 			"\n");
 
 	}

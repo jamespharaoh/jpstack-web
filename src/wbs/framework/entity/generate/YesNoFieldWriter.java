@@ -41,15 +41,14 @@ class YesNoFieldWriter {
 		if (ifNull (spec.nullable (), false)) {
 
 			javaWriter.write (
+				"\t@SimpleField (\n");
 
-				"\t@SimpleField (\n",
-
+			javaWriter.write (
 				"\t\tnullable = true)\n");
 
 		} else {
 
 			javaWriter.write (
-
 				"\t@SimpleField\n");
 
 		}
@@ -57,7 +56,6 @@ class YesNoFieldWriter {
 		if (spec.defaultValue () != null) {
 
 			javaWriter.write (
-
 				"\tBoolean %s = %s;\n",
 				spec.name (),
 				spec.defaultValue ()
@@ -67,14 +65,12 @@ class YesNoFieldWriter {
 		} else {
 
 			javaWriter.write (
-
 				"\tBoolean %s;\n",
 				spec.name ());
 
 		}
 
 		javaWriter.write (
-
 			"\n");
 
 	}
