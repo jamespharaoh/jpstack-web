@@ -1,6 +1,8 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
 
@@ -15,6 +17,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ChildrenCollectionSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.utils.etc.FormatWriter;
@@ -55,19 +58,48 @@ class ChildrenCollectionWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
+		String fieldName =
+			ifNull (
+				spec.name (),
+				stringFormat (
+					"%ss",
+					spec.typeName ()));
+
+		// write field annotation
+
+		AnnotationWriter annotationWriter =
+			new AnnotationWriter ()
+
+			.name (
+				"CollectionField");
+
+		if (spec.where () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"where",
+				"\"%s\"",
+				spec.where ().replace ("\"", "\\\""));
+
+		}
+
+		annotationWriter.write (
+			javaWriter,
+			"\t");
+
+		// write field
+
 		javaWriter.write (
-
-			"\t@CollectionField\n",
-
-			"\tSet<%s.model.%sRec> %ss =\n",
+			"\tSet<%s.model.%sRec> %s =\n",
 			fieldTypePlugin.packageName (),
 			capitalise (spec.typeName ()),
-			spec.typeName (),
+			fieldName);
 
+		javaWriter.write (
 			"\t\tnew LinkedHashSet<%s.model.%sRec> ();\n",
 			fieldTypePlugin.packageName (),
-			capitalise (spec.typeName ()),
+			capitalise (spec.typeName ()));
 
+		javaWriter.write (
 			"\n");
 
 	}

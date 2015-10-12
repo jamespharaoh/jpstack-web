@@ -19,9 +19,15 @@ class ChildrenCollectionSpec
 	@DataAncestor
 	ModelMetaSpec model;
 
+	@DataAttribute
+	String name;
+
 	@DataAttribute (
 		value = "type",
 		required = true)
 	String typeName;
+
+	@DataAttribute
+	String where;
 
 }

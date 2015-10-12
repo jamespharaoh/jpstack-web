@@ -188,14 +188,12 @@ class ModelRecordGenerator {
 		) {
 
 			javaWriter.write (
-
 				"import %s;\n",
 				standardImportClass.getName ());
 
 		}
 
 		javaWriter.write (
-
 			"\n");
 
 	}
@@ -206,15 +204,12 @@ class ModelRecordGenerator {
 		throws IOException {
 
 		javaWriter.write (
-
 			"@Accessors (chain = true)\n");
 
 		javaWriter.write (
-
 			"@Data\n");
 
 		javaWriter.write (
-
 			"@EqualsAndHashCode (of = \"id\")\n");
 
 		javaWriter.write (
@@ -355,7 +350,6 @@ class ModelRecordGenerator {
 		}
 
 		javaWriter.write (
-
 			"\n");
 
 		generateFields (
@@ -368,7 +362,6 @@ class ModelRecordGenerator {
 			javaWriter);
 
 		javaWriter.write (
-
 			"}\n");
 
 	}
@@ -383,9 +376,9 @@ class ModelRecordGenerator {
 		}
 
 		javaWriter.write (
+			"\t// fields\n");
 
-			"\t// fields\n",
-
+		javaWriter.write (
 			"\n");
 
 		modelWriterBuilder.write (
@@ -405,9 +398,9 @@ class ModelRecordGenerator {
 		}
 
 		javaWriter.write (
+			"\t// collections\n");
 
-			"\t// collections\n",
-
+		javaWriter.write (
 			"\n");
 
 		modelWriterBuilder.write (
@@ -422,40 +415,56 @@ class ModelRecordGenerator {
 			FormatWriter javaWriter)
 		throws IOException {
 
+		// write comment
+
 		javaWriter.write (
+			"\t// compare to\n");
 
-			"\t// compare to\n",
-
+		javaWriter.write (
 			"\n");
 
+		// write override annotation
+
 		javaWriter.write (
+			"\t@Override\n");
 
-			"\t@Override\n",
+		// write function definition
 
-			"\tpublic\n",
+		javaWriter.write (
+			"\tpublic\n");
 
-			"\tint compareTo (\n",
+		javaWriter.write (
+			"\tint compareTo (\n");
 
+		javaWriter.write (
 			"\t\t\tRecord<%s> otherRecord) {\n",
-			className,
-
-			"\n");
+			className);
 
 		javaWriter.write (
+			"\n");
 
+		// write cast to concrete type
+
+		javaWriter.write (
 			"\t\t%s other =\n",
-			className,
-
-			"\t\t\t(%s) otherRecord;\n",
-			className,
-
-			"\n");
+			className);
 
 		javaWriter.write (
+			"\t\t\t(%s) otherRecord;\n",
+			className);
 
-			"\t\treturn new CompareToBuilder ()\n",
-
+		javaWriter.write (
 			"\n");
+
+		// create compare to builder
+
+		javaWriter.write (
+			"\t\treturn new CompareToBuilder ()\n");
+
+		javaWriter.write (
+			"\n");
+
+		// scan fields
 
 		ParentFieldSpec parentField = null;
 		ParentTypeFieldSpec parentTypeField = null;
@@ -552,6 +561,8 @@ class ModelRecordGenerator {
 
 		}
 
+		// write comparisons
+
 		if (modelMeta.type () == ModelMetaType.event) {
 
 			if (timestampField == null) {
@@ -559,27 +570,31 @@ class ModelRecordGenerator {
 			}
 
 			javaWriter.write (
+				"\t\t\t.append (\n");
 
-				"\t\t\t.append (\n",
-
+			javaWriter.write (
 				"\t\t\t\tother.get%s (),\n",
 				capitalise (
-					timestampField.name ()),
+					timestampField.name ()));
 
+			javaWriter.write (
 				"\t\t\t\tget%s ())\n",
 				capitalise (
-					timestampField.name ()),
+					timestampField.name ()));
 
+			javaWriter.write (
 				"\n");
 
 			javaWriter.write (
+				"\t\t\t.append (\n");
 
-				"\t\t\t.append (\n",
+			javaWriter.write (
+				"\t\t\t\tother.getId (),\n");
 
-				"\t\t\t\tother.getId (),\n",
+			javaWriter.write (
+				"\t\t\t\tgetId ())\n");
 
-				"\t\t\t\tgetId ())\n",
-
+			javaWriter.write (
 				"\n");
 
 		} else if (gotName) {
@@ -587,15 +602,17 @@ class ModelRecordGenerator {
 			if (parentField != null) {
 
 				javaWriter.write (
+					"\t\t\t.append (\n");
 
-					"\t\t\t.append (\n",
-
+				javaWriter.write (
 					"\t\t\t\tget%s (),\n",
-					capitalise (parentField.typeName ()),
+					capitalise (parentField.typeName ()));
 
+				javaWriter.write (
 					"\t\t\t\tother.get%s ())\n",
-					capitalise (parentField.typeName ()),
+					capitalise (parentField.typeName ()));
 
+				javaWriter.write (
 					"\n");
 
 			}
@@ -603,21 +620,23 @@ class ModelRecordGenerator {
 			if (parentTypeField != null) {
 
 				javaWriter.write (
+					"\t\t\t.append (\n");
 
-					"\t\t\t.append (\n",
-
+				javaWriter.write (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
 						ifNull (
 							parentTypeField.name (),
-							"parentType")),
+							"parentType")));
 
+				javaWriter.write (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
 						ifNull (
 							parentTypeField.name (),
-							"parentType")),
+							"parentType")));
 
+				javaWriter.write (
 					"\n");
 
 			}
@@ -625,13 +644,15 @@ class ModelRecordGenerator {
 			if (parentIdField != null) {
 
 				javaWriter.write (
+					"\t\t\t.append (\n");
 
-					"\t\t\t.append (\n",
+				javaWriter.write (
+					"\t\t\t\tgetParentId (),\n");
 
-					"\t\t\t\tgetParentId (),\n",
+				javaWriter.write (
+					"\t\t\t\tother.getParentId ())\n");
 
-					"\t\t\t\tother.getParentId ())\n",
-
+				javaWriter.write (
 					"\n");
 
 			}
@@ -734,16 +755,20 @@ class ModelRecordGenerator {
 
 		}
 
+		// write converstion to return value
+
 		javaWriter.write (
+			"\t\t\t.toComparison ();\n");
 
-			"\t\t\t.toComparison ();\n",
-
+		javaWriter.write (
 			"\n");
 
+		// write end of function
+
 		javaWriter.write (
+			"\t}\n");
 
-			"\t}\n",
-
+		javaWriter.write (
 			"\n");
 
 	}

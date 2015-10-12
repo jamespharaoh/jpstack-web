@@ -19,6 +19,9 @@ class ChildrenMappingSpec
 	@DataAncestor
 	ModelMetaSpec model;
 
+	@DataAttribute
+	String name;
+
 	@DataAttribute (
 		value = "type",
 		required = true)

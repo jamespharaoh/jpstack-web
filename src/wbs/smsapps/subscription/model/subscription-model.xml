@@ -1,5 +1,97 @@
 <model-meta
-	name="subscription">
+	name="subscription"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<reference-field
+			name="billedRoute"
+			type="route"
+			nullable="yes"/>
+
+		<string-field
+			name="billedNumber"
+			nullable="yes"/>
+
+		<reference-field
+			name="billedMessage"
+			type="text"
+			nullable="yes"/>
+
+		<reference-field
+			name="freeRouter"
+			type="router"
+			nullable="yes"/>
+
+		<string-field
+			name="freeNumber"
+			nullable="yes"/>
+
+		<integer-field
+			name="creditsPerBill"
+			nullable="yes"/>
+
+		<integer-field
+			name="debitsPerSend"
+			nullable="yes"/>
+
+		<reference-field
+			name="subscribeMessageText"
+			type="text"
+			nullable="yes"/>
+
+		<reference-field
+			name="unsubscribeMessageText"
+			type="text"
+			nullable="yes"/>
+
+		<!-- statistics -->
+
+		<integer-field
+			name="numSubscribers"
+			default="0"/>
+
+		<integer-field
+			name="numSendsTotal"
+			default="0"/>
+
+	</fields>
+
+	<collections>
+
+		<children-collection
+			name="activeSubscriptionNumbers"
+			type="subscriptionNumber"
+			where="active"/>
+
+		<children-collection
+			type="subscriptionAffiliate"/>
+
+		<children-collection
+			type="subscriptionList"/>
+
+	</collections>
 
 	<priv-types>
 

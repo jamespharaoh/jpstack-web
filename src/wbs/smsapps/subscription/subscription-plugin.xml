@@ -8,7 +8,6 @@
 
 	<models>
 		<enum-type name="subscriptionBillState"/>
-		<enum-type name="subscriptionKeywordType"/>
 		<enum-type name="subscriptionSendState"/>
 		<enum-type name="subscriptionSendNumberState"/>
 		<model name="subscription"/>

@@ -1,5 +1,100 @@
 <model-meta
-	name="subscriptionSend">
+	name="subscriptionSend"
+	type="event">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="subscription"/>
+
+		<index-field/>
+
+		<!-- details -->
+
+		<description-field/>
+
+		<!-- state -->
+
+		<enum-field
+			name="state"
+			type="subscriptionSendState"
+			default="notSent"/>
+
+		<!-- data -->
+
+		<reference-field
+			type="batch"
+			nullable="yes"/>
+
+		<!-- users -->
+
+		<reference-field
+			name="createdUser"
+			type="user"/>
+
+		<reference-field
+			name="sentUser"
+			type="user"
+			nullable="yes"/>
+
+		<reference-field
+			name="cancelledUser"
+			type="user"
+			nullable="yes"/>
+
+		<!-- times -->
+
+		<timestamp-field
+			name="createdTime"
+			column-type="iso"/>
+
+		<timestamp-field
+			name="sentTime"
+			column-type="iso"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="cancelledTime"
+			column-type="iso"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="scheduledTime"
+			column-type="iso"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="scheduledForTime"
+			column-type="iso"
+			nullable="yes"/>
+
+		<!-- statistics -->
+
+		<integer-field
+			name="numRecipients"
+			default="0"/>
+
+	</fields>
+
+	<collections>
+
+		<children-list
+			name="parts"
+			type="subscriptionSendPart"/>
+
+		<children-mapping
+			name="partsByList"
+			type="subscriptionSendPart"
+			map-column="subscription_list_id"
+			map-type="integer"/>
+
+	</collections>
 
 	<event-types>
 

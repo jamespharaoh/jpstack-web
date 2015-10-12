@@ -1,5 +1,81 @@
 <model-meta
-	name="subscriptionNumber">
+	name="subscriptionNumber"
+	type="common">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="subscription"/>
+
+		<identity-reference-field
+			type="number"/>
+
+		<!-- state -->
+
+		<reference-field
+			type="subscriptionList"
+			nullable="yes"/>
+
+		<reference-field
+			type="subscriptionAffiliate"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="active"/>
+
+		<reference-field
+			name="activeSubscriptionSub"
+			type="subscriptionSub"
+			nullable="yes"/>
+
+		<reference-field
+			name="pendingSubscriptionBill"
+			type="subscriptionBill"
+			nullable="yes"/>
+
+		<reference-field
+			name="pendingSubscriptionSendNumber"
+			type="subscriptionSendNumber"
+			nullable="yes"/>
+
+		<!-- statistics -->
+
+		<timestamp-field
+			name="firstJoin"
+			column-type="iso"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastJoin"
+			column-type="iso"
+			nullable="yes"/>
+
+		<integer-field
+			name="numSubs"
+			default="0"/>
+
+		<integer-field
+			name="numBills"
+			default="0"/>
+
+		<integer-field
+			name="balance"
+			default="0"/>
+
+	</fields>
+
+	<collections>
+
+		<children-list
+			type="subscriptionSub"/>
+
+	</collections>
 
 	<event-types>
 

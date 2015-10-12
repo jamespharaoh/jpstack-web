@@ -1,4 +1,30 @@
 <model-meta
-	name="subscriptionSendPart">
+	name="subscriptionSendPart"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="subscriptionSend"/>
+
+		<identity-reference-field
+			type="subscriptionList"/>
+
+		<!-- details -->
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<reference-field
+			type="text"/>
+
+	</fields>
 
 </model-meta>

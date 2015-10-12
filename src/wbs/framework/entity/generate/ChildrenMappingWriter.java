@@ -2,6 +2,8 @@ package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
 
@@ -60,12 +62,29 @@ class ChildrenMappingWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
+		String fieldName =
+			ifNull (
+				spec.name (),
+				stringFormat (
+					"%ss",
+					spec.typeName ()));
+
+		String fieldTypeName =
+			stringFormat (
+				"%sRec",
+				capitalise (
+					spec.typeName ()));
+
+		// write field annotation
+
 		javaWriter.write (
 			"\t@CollectionField (\n");
 
 		javaWriter.write (
 			"\t\tindex = \"%s\")\n",
 			spec.mapColumnName ());
+
+		// write field
 
 		if (
 			equal (
@@ -74,17 +93,15 @@ class ChildrenMappingWriter {
 		) {
 
 			javaWriter.write (
-				"\tMap<Integer,%s.model.%sRec> %ss =\n",
+				"\tMap<Integer,%s.model.%s> %s =\n",
 				fieldTypePlugin.packageName (),
-				capitalise (
-					spec.typeName ()),
-				spec.typeName ());
+				fieldTypeName,
+				fieldName);
 
 			javaWriter.write (
-				"\t\tnew LinkedHashMap<Integer,%s.model.%sRec> ();\n",
+				"\t\tnew LinkedHashMap<Integer,%s.model.%s> ();\n",
 				fieldTypePlugin.packageName (),
-				capitalise (
-					spec.typeName ()));
+				fieldTypeName);
 
 		} else {
 
