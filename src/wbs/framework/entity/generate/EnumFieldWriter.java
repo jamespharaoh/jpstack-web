@@ -75,12 +75,17 @@ class EnumFieldWriter {
 		if (spec.defaultValue () != null) {
 
 			javaWriter.write (
-
-				"\t%s.model.%s %s = %s;\n",
+				"\t%s.model.%s %s =\n",
 				fieldTypePlugin.packageName (),
 				capitalise (
 					spec.typeName ()),
-				spec.name (),
+				spec.name ());
+
+			javaWriter.write (
+				 "\t\t%s.model.%s.%s;\n",
+				fieldTypePlugin.packageName (),
+				capitalise (
+					spec.typeName ()),
 				spec.defaultValue ());
 
 		} else {

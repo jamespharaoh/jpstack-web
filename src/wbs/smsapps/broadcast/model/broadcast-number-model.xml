@@ -1,4 +1,40 @@
 <model-meta
-	name="broadcastNumber">
+	name="broadcastNumber"
+	type="common">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="broadcast"/>
+
+		<identity-reference-field
+			type="number"/>
+
+		<!-- state -->
+
+		<enum-field
+			name="state"
+			type="broadcastNumberState"/>
+
+		<!-- data -->
+
+		<reference-field
+			name="addedByUser"
+			type="user"/>
+
+		<reference-field
+			name="removedByUser"
+			type="user"/>
+
+		<reference-field
+			type="message"/>
+
+	</fields>
 
 </model-meta>

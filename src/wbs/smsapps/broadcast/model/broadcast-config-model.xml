@@ -1,5 +1,77 @@
 <model-meta
-	name="broadcastConfig">
+	name="broadcastConfig"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<reference-field
+			type="router"
+			nullable="yes"/>
+
+		<reference-field
+			name="blockNumberLookup"
+			type="numberLookup"
+			nullable="yes"/>
+
+		<reference-field
+			type="numberFormat"/>
+
+		<string-field
+			name="defaultNumbers"
+			nullable="yes"/>
+
+		<!-- statistics -->
+
+		<integer-field
+			name="numTotal"
+			default="0"/>
+
+		<integer-field
+			name="numUnsent"
+			default="0"/>
+
+		<integer-field
+			name="numScheduled"
+			default="0"/>
+
+		<integer-field
+			name="numSending"
+			default="0"/>
+
+		<integer-field
+			name="numSent"
+			default="0"/>
+
+		<integer-field
+			name="numPartiallySent"
+			default="0"/>
+
+		<integer-field
+			name="numCancelled"
+			default="0"/>
+
+	</fields>
 
 	<priv-types>
 
