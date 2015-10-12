@@ -1,4 +1,49 @@
 <model-meta
-	name="manualResponderReport">
+	name="manualResponderReport"
+	type="event"
+	create="no">
+
+	<fields>
+
+		<!-- id -->
+
+		<foreign-id-field
+			field="manualResponderRequest"/>
+
+		<!-- identity -->
+
+		<master-field
+			type="manualResponderRequest"/>
+
+		<!-- data -->
+
+		<reference-field
+			type="manualResponder"/>
+
+		<reference-field
+			name="processedByUser"
+			type="user"/>
+
+		<reference-field
+			type="user"/>
+
+		<integer-field
+			name="num"/>
+
+		<timestamp-field
+			name="requestTime"
+			column-type="postgresql"/>
+
+		<timestamp-field
+			name="processedTime"
+			column-type="postgresql"/>
+
+		<string-field
+			name="timestring"/>
+
+		<reference-field
+			type="queueItem"/>
+
+	</fields>
 
 </model-meta>

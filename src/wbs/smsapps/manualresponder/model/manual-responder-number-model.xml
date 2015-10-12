@@ -1,4 +1,34 @@
 <model-meta
-	name="manualResponderNumber">
+	name="manualResponderNumber"
+	type="common">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="manualResponder"/>
+
+		<identity-reference-field
+			type="number"/>
+
+		<!-- state -->
+
+		<reference-field
+			type="smsCustomer"
+			nullable="yes"/>
+
+		<!-- settings -->
+
+		<reference-field
+			name="notesText"
+			type="text"
+			nullable="yes"/>
+
+	</fields>
 
 </model-meta>

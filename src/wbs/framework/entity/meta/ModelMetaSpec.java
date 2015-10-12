@@ -27,12 +27,19 @@ class ModelMetaSpec {
 	@DataParent
 	PluginModelSpec pluginModel;
 
+	// attributes
+
 	@DataAttribute (
 		required = true)
 	String name;
 
 	@DataAttribute
 	ModelMetaType type;
+
+	@DataAttribute
+	Boolean create;
+
+	// children
 
 	@DataChildren (
 		childrenElement = "fields")

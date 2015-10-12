@@ -23,6 +23,7 @@ import org.apache.commons.io.FileUtils;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
+import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.CodeFieldSpec;
 import wbs.framework.entity.meta.IdentityIntegerFieldSpec;
 import wbs.framework.entity.meta.IdentityReferenceFieldSpec;
@@ -152,11 +153,13 @@ class ModelRecordGenerator {
 			wbs.framework.entity.annotations.CollectionField.class,
 			wbs.framework.entity.annotations.DeletedField.class,
 			wbs.framework.entity.annotations.DescriptionField.class,
+			wbs.framework.entity.annotations.ForeignIdField.class,
 			wbs.framework.entity.annotations.GeneratedIdField.class,
 			wbs.framework.entity.annotations.IdentityReferenceField.class,
 			wbs.framework.entity.annotations.IdentitySimpleField.class,
 			wbs.framework.entity.annotations.IndexField.class,
 			wbs.framework.entity.annotations.LinkField.class,
+			wbs.framework.entity.annotations.MasterField.class,
 			wbs.framework.entity.annotations.NameField.class,
 			wbs.framework.entity.annotations.ParentField.class,
 			wbs.framework.entity.annotations.ParentIdField.class,
@@ -215,62 +218,36 @@ class ModelRecordGenerator {
 		javaWriter.write (
 			"@ToString (of = \"id\")\n");
 
-		switch (modelMeta.type ()) {
+		writeEntityAnnotation (
+			javaWriter);
 
-		case common:
+	}
 
-			javaWriter.write (
-				"@CommonEntity\n");
+	private
+	void writeEntityAnnotation (
+			FormatWriter javaWriter)
+		throws IOException {
 
-			break;
+		AnnotationWriter annotationWriter =
+			new AnnotationWriter ()
 
-		case ephemeral:
+			.name (
+				stringFormat (
+					"%sEntity",
+					capitalise (
+						modelMeta.type ().toString ())));
 
-			javaWriter.write (
-				"@EphemeralEntity\n");
+		if (! ifNull (modelMeta.create (), true)) {
 
-			break;
-
-		case event:
-
-			javaWriter.write (
-				"@EventEntity\n");
-
-			break;
-
-		case major:
-
-			javaWriter.write (
-				"@MajorEntity\n");
-
-			break;
-
-		case minor:
-
-			javaWriter.write (
-				"@MinorEntity\n");
-
-			break;
-
-		case root:
-
-			javaWriter.write (
-				"@RootEntity\n");
-
-			break;
-
-		case type:
-
-			javaWriter.write (
-				"@TypeEntity\n");
-
-			break;
-
-		default:
-
-			throw new RuntimeException ();
+			annotationWriter.addAttributeFormat (
+				"create",
+				"false");
 
 		}
+
+		annotationWriter.write (
+			javaWriter,
+			"");
 
 	}
 

@@ -1,4 +1,41 @@
 <model-meta
-	name="manualResponderReply">
+	name="manualResponderReply"
+	type="event">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="manualResponderRequest"/>
+
+		<!-- TODO index -->
+
+		<!-- details -->
+
+		<timestamp-field
+			name="timestamp"
+			column-type="postgresql"/>
+
+		<reference-field
+			type="user"/>
+
+		<reference-field
+			type="text"/>
+
+	</fields>
+
+	<collections>
+
+		<associative-list
+			name="messages"
+			type="message"
+			table="manual_responder_reply_message"/>
+
+	</collections>
 
 </model-meta>

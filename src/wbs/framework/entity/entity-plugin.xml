@@ -5,6 +5,7 @@
 	<layer name="model-meta">
 		<bean class="meta.AssignedIdFieldSpec"/>
 		<bean class="meta.AssociativeCollectionSpec"/>
+		<bean class="meta.AssociativeListSpec"/>
 		<bean class="meta.ChildrenCollectionSpec"/>
 		<bean class="meta.ChildrenListSpec"/>
 		<bean class="meta.ChildrenMappingSpec"/>
@@ -12,11 +13,13 @@
 		<bean class="meta.DeletedFieldSpec"/>
 		<bean class="meta.DescriptionFieldSpec"/>
 		<bean class="meta.EnumFieldSpec"/>
+		<bean class="meta.ForeignIdFieldSpec"/>
 		<bean class="meta.GeneratedIdFieldSpec"/>
 		<bean class="meta.IdentityIntegerFieldSpec"/>
 		<bean class="meta.IdentityReferenceFieldSpec"/>
 		<bean class="meta.IndexFieldSpec"/>
 		<bean class="meta.IntegerFieldSpec"/>
+		<bean class="meta.MasterFieldSpec"/>
 		<bean class="meta.ModelCollectionsSpec"/>
 		<bean class="meta.ModelFieldsSpec"/>
 		<bean class="meta.ModelMetaLoader"/>
@@ -36,6 +39,7 @@
 	<layer name="model-generate">
 		<bean class="generate.AssignedIdFieldWriter"/>
 		<bean class="generate.AssociativeCollectionWriter"/>
+		<bean class="generate.AssociativeListWriter"/>
 		<bean class="generate.CodeFieldWriter"/>
 		<bean class="generate.ChildrenCollectionWriter"/>
 		<bean class="generate.ChildrenListWriter"/>
@@ -43,11 +47,13 @@
 		<bean class="generate.DeletedFieldWriter"/>
 		<bean class="generate.DescriptionFieldWriter"/>
 		<bean class="generate.EnumFieldWriter"/>
+		<bean class="generate.ForeignIdFieldWriter"/>
 		<bean class="generate.GeneratedIdFieldWriter"/>
 		<bean class="generate.IdentityIntegerFieldWriter"/>
 		<bean class="generate.IdentityReferenceFieldWriter"/>
 		<bean class="generate.IndexFieldWriter"/>
 		<bean class="generate.IntegerFieldWriter"/>
+		<bean class="generate.MasterFieldWriter"/>
 		<bean class="generate.ModelInterfacesGenerator"/>
 		<bean class="generate.ModelRecordGenerator"/>
 		<bean class="generate.ModelWriterManager"/>

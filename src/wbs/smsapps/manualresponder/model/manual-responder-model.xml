@@ -1,5 +1,73 @@
 <model-meta
-	name="manualResponder">
+	name="manualResponder"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<yes-no-field
+			name="canIgnore"
+			default="no"/>
+
+		<yes-no-field
+			name="canSendMultiple"
+			default="no"/>
+
+		<reference-field
+			name="infoText"
+			type="text"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="showDailyBillInfo"
+			default="no"/>
+
+		<integer-field
+			name="preferredQueueTime"
+			default="0"/>
+
+		<reference-field
+			type="currency"
+			nullable="yes"/>
+
+		<reference-field
+			name="unblockNumberList"
+			type="numberList"
+			nullable="yes"/>
+
+		<reference-field
+			type="smsCustomerManager"
+			nullable="yes"/>
+
+	</fields>
+
+	<collections>
+
+		<children-collection
+			name="templates"
+			type="manualResponderTemplate"/>
+
+	</collections>
 
 	<priv-types>
 

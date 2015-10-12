@@ -1,4 +1,51 @@
 <model-meta
-	name="manualResponderRequest">
+	name="manualResponderRequest"
+	type="event">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="manualResponder"/>
+
+		<!-- data -->
+
+		<reference-field
+			type="message"/>
+
+		<timestamp-field
+			name="timestamp"
+			column-type="postgresql"/>
+
+		<reference-field
+			type="user"
+			nullable="yes"/>
+
+		<reference-field
+			type="number"/>
+
+		<!-- state -->
+
+		<yes-no-field
+			name="pending"/>
+
+		<reference-field
+			type="queueItem"
+			nullable="yes"/>
+
+	</fields>
+
+	<collections>
+
+		<children-collection
+			name="replies"
+			type="manualResponderReply"/>
+
+	</collections>
 
 </model-meta>
