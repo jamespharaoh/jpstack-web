@@ -46,7 +46,8 @@ class TicketFieldsProvider
 
 	@Override
 	public
-	FormFieldSet getFields(Record<?> parent) {
+	FormFieldSet getFields (
+			Record<?> parent) {
 
 		// retrieve existing ticket field types
 
@@ -56,76 +57,97 @@ class TicketFieldsProvider
 			parent;
 
 		Set<TicketFieldTypeRec> ticketFieldTypes =
-				ticketManager.getTicketFieldTypes();
+			ticketManager.getTicketFieldTypes ();
 
 		// build form fields
 
 		List<Object> formFieldSpecs =
 				new ArrayList<Object> ();
 
-		for (TicketFieldTypeRec ticketFieldType : ticketFieldTypes) {
+		for (
+			TicketFieldTypeRec ticketFieldType
+				: ticketFieldTypes
+		) {
 
-			if (mode == "list" && !ticketFieldType.getVisible()) { continue; }
+			switch (ticketFieldType.getDataType ()) {
 
-			switch( ticketFieldType.getType() ) {
-				case string:
-					formFieldSpecs
-						.add(new TextFormFieldSpec()
-							.name(ticketFieldType.getCode ())
-							.label(ticketFieldType.getName ())
-							.dynamic (true));
-					break;
+			case string:
 
-				case number:
-					formFieldSpecs
-						.add(new IntegerFormFieldSpec()
-							.name(ticketFieldType.getCode ())
-							.label(ticketFieldType.getName ())
-							.dynamic (true));
-					break;
+				formFieldSpecs.add (
+					new TextFormFieldSpec ()
 
-				case bool:
+					.name (
+						ticketFieldType.getCode ())
 
-					formFieldSpecs.add (
-						new YesNoFormFieldSpec ()
+					.label (
+						ticketFieldType.getName ())
 
-						.name (
-							ticketFieldType.getCode ())
+					.dynamic (
+						true)
 
-						.label (
-							ticketFieldType.getName ())
+				);
 
-						.dynamic (
-							true)
+				break;
 
-					);
+			case number:
 
-					break;
+				formFieldSpecs.add (
+					new IntegerFormFieldSpec ()
 
-				case object:
+					.name (
+						ticketFieldType.getCode ())
 
-					formFieldSpecs.add (
-						new ObjectFormFieldSpec ()
+					.label (
+						ticketFieldType.getName ())
 
-						.name (
-							ticketFieldType.getCode ())
+					.dynamic (
+						true));
 
-						.label (
-							ticketFieldType.getName ())
+				break;
 
-						.objectTypeName (
-							underscoreToCamel (
-							 	ticketFieldType.getObjectType ().getCode ()))
+			case bool:
 
-						.dynamic (
-							true)
+				formFieldSpecs.add (
+					new YesNoFormFieldSpec ()
 
-					);
+					.name (
+						ticketFieldType.getCode ())
 
-					break;
+					.label (
+						ticketFieldType.getName ())
 
-				default:
-					throw new RuntimeException ();
+					.dynamic (
+						true)
+
+				);
+
+				break;
+
+			case object:
+
+				formFieldSpecs.add (
+					new ObjectFormFieldSpec ()
+
+					.name (
+						ticketFieldType.getCode ())
+
+					.label (
+						ticketFieldType.getName ())
+
+					.objectTypeName (
+						underscoreToCamel (
+						 	ticketFieldType.getObjectType ().getCode ()))
+
+					.dynamic (
+						true)
+
+				);
+
+				break;
+
+			default:
+
+				throw new RuntimeException ();
 
 			}
 

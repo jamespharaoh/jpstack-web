@@ -1,10 +1,7 @@
 package wbs.services.ticket.core.fixture;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import javax.inject.Inject;
 
-import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.object.ObjectManager;
@@ -15,22 +12,20 @@ import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
-import wbs.services.ticket.core.model.TicketFieldTypeRec;
-import wbs.services.ticket.core.model.TicketFieldTypeType;
-import wbs.services.ticket.core.model.TicketFieldValueRec;
-import wbs.services.ticket.core.model.TicketManagerRec;
-import wbs.services.ticket.core.model.TicketNoteRec;
-import wbs.services.ticket.core.model.TicketRec;
-import wbs.services.ticket.core.model.TicketStateRec;
-import wbs.services.ticket.core.model.TicketStateState;
+import wbs.services.ticket.core.model.TicketFieldDataType;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
+import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
+import wbs.services.ticket.core.model.TicketFieldValueRec;
 import wbs.services.ticket.core.model.TicketManagerObjectHelper;
+import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketNoteObjectHelper;
+import wbs.services.ticket.core.model.TicketNoteRec;
 import wbs.services.ticket.core.model.TicketObjectHelper;
+import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketStateObjectHelper;
+import wbs.services.ticket.core.model.TicketStateRec;
 import wbs.services.ticket.core.model.TicketTemplateObjectHelper;
-import wbs.services.ticket.core.model.TicketTemplateRec;
 
 @PrototypeComponent ("ticketFixtureProvider")
 public class TicketFixtureProvider
@@ -136,32 +131,31 @@ public class TicketFixtureProvider
 		);
 
 		TicketStateRec submittedState =
-				ticketStateHelper.insert (
-					new TicketStateRec ()
+			ticketStateHelper.insert (
+				new TicketStateRec ()
 
-					.setTicketManager (
-						ticketManager)
+			.setTicketManager (
+				ticketManager)
 
-					.setName("Submitted")
+			.setName (
+				"Submitted")
 
-					.setCode (
-						"submitted")
+			.setCode (
+				"submitted")
 
-					.setState (
-						TicketStateState.submitted)
+			.setShowInQueue (
+				true)
 
-					.setShowInQueue (
-						true)
+			.setMinimum (
+				0)
 
-					.setMinimum (
-						0)
+			.setMaximum (
+				0)
 
-					.setMaximum (
-						0)
-
-			);
+		);
 
 		// accepted state
+
 		ticketStateHelper.insert (
 			new TicketStateRec ()
 
@@ -172,9 +166,6 @@ public class TicketFixtureProvider
 
 			.setCode (
 				"accepted")
-
-			.setState (
-				TicketStateState.accepted)
 
 			.setShowInQueue (
 				true)
@@ -194,13 +185,11 @@ public class TicketFixtureProvider
 			.setTicketManager (
 				ticketManager)
 
-			.setName("Pending")
-
 			.setCode (
 				"pending")
 
-			.setState (
-				TicketStateState.pending)
+			.setName (
+				"Pending")
 
 			.setShowInQueue (
 				true)
@@ -214,19 +203,18 @@ public class TicketFixtureProvider
 		);
 
 		// solved state
+
 		ticketStateHelper.insert (
 			new TicketStateRec ()
 
 			.setTicketManager (
 				ticketManager)
 
-			.setName("Solved")
-
 			.setCode (
 				"solved")
 
-			.setState (
-				TicketStateState.solved)
+			.setName (
+				"Solved")
 
 			.setShowInQueue (
 				true)
@@ -240,19 +228,18 @@ public class TicketFixtureProvider
 		);
 
 		// closed state
+
 		ticketStateHelper.insert (
 			new TicketStateRec ()
 
 			.setTicketManager (
 				ticketManager)
 
-			.setName("Closed")
-
 			.setCode (
 				"closed")
 
-			.setState (
-				TicketStateState.closed)
+			.setName (
+				"Closed")
 
 			.setShowInQueue (
 				true)
@@ -281,42 +268,50 @@ public class TicketFixtureProvider
 		);
 
 		TicketFieldTypeRec booleanType =
-				ticketFieldTypeHelper.insert (
-						new TicketFieldTypeRec ()
+			ticketFieldTypeHelper.insert (
+				new TicketFieldTypeRec ()
 
-					.setTicketManager (
-						ticketManager)
+			.setTicketManager (
+				ticketManager)
 
-					.setName("Read")
+			.setCode (
+				"read")
 
-					.setCode (
-						"read")
+			.setName (
+				"Read")
 
-					.setType(TicketFieldTypeType.bool)
+			.setDataType (
+				TicketFieldDataType.bool)
 
-					.setRequired(true)
+			.setRequired (
+				true)
 
-					.setVisible(true)
+			.setVisible (
+				true)
 
 		);
 
 		TicketFieldTypeRec numberType =
 			ticketFieldTypeHelper.insert (
-					new TicketFieldTypeRec ()
+				new TicketFieldTypeRec ()
 
-				.setTicketManager (
-					ticketManager)
+			.setTicketManager (
+				ticketManager)
 
-				.setName("Number")
+			.setCode (
+				"number")
 
-				.setCode (
-					"number")
+			.setName (
+				"Number")
 
-				.setType(TicketFieldTypeType.number)
+			.setDataType (
+				TicketFieldDataType.number)
 
-				.setRequired(true)
+			.setRequired (
+				true)
 
-				.setVisible(true)
+			.setVisible (
+				true)
 
 		);
 
@@ -324,110 +319,122 @@ public class TicketFixtureProvider
 			ticketFieldTypeHelper.insert (
 				new TicketFieldTypeRec ()
 
-				.setTicketManager (
-					ticketManager)
+			.setTicketManager (
+				ticketManager)
 
-				.setName("Text")
+			.setCode (
+				"text")
 
-				.setCode (
-					"text")
+			.setName (
+				"Text")
 
-				.setType(TicketFieldTypeType.string)
+			.setDataType (
+				TicketFieldDataType.string)
 
-				.setRequired(true)
+			.setRequired (
+				true)
 
-				.setVisible(true)
+			.setVisible (
+				true)
 
-			);
-
+		);
 
 		TicketFieldTypeRec chatUserType =
 			ticketFieldTypeHelper.insert (
 				new TicketFieldTypeRec ()
 
-				.setTicketManager (
-					ticketManager)
+			.setTicketManager (
+				ticketManager)
 
-				.setName("chat_user")
+			.setCode (
+				"chat_user")
 
-				.setCode (
-					"chat_user")
+			.setName (
+				"Chat user")
 
-				.setType(TicketFieldTypeType.object)
+			.setDataType (
+				TicketFieldDataType.object)
 
-				.setObjectType(
-					objectTypeHelper.findById (
-						objectManager.objectHelperForClass (
-							ChatUserRec.class).objectTypeId()))
+			.setObjectType (
+				objectTypeHelper.findByCode (
+					GlobalId.root,
+					"chat_user"))
 
-				.setRequired(true)
+			.setRequired (
+				true)
 
-				.setVisible(true)
+			.setVisible (
+				true)
 
-			);
+		);
 
-		ticketFieldValueHelper.insert(
+		ticketFieldValueHelper.insert (
 			new TicketFieldValueRec ()
 
-				.setTicket (
-					ticket)
+			.setTicket (
+				ticket)
 
-				.setTicketFieldType (
-					numberType)
+			.setTicketFieldType (
+				numberType)
 
-				.setIntegerValue(10)
+			.setIntegerValue (
+				10)
+
+		);
+
+		ticketFieldValueHelper.insert (
+			new TicketFieldValueRec ()
+
+			.setTicket (
+				ticket)
+
+			.setTicketFieldType (
+				stringType)
+
+			.setStringValue (
+				"Value")
 
 		);
 
 		ticketFieldValueHelper.insert(
 			new TicketFieldValueRec ()
 
-				.setTicket (
-					ticket)
+			.setTicket (
+				ticket)
 
-				.setTicketFieldType (
-					stringType)
+			.setTicketFieldType (
+				booleanType)
 
-				.setStringValue("Value")
-
-		);
-
-		ticketFieldValueHelper.insert(
-			new TicketFieldValueRec ()
-
-				.setTicket (
-					ticket)
-
-				.setTicketFieldType (
-					booleanType)
-
-				.setBooleanValue(true)
+			.setBooleanValue (
+				true)
 
 		);
 
 		ticketFieldValueHelper.insert(
 			new TicketFieldValueRec ()
 
-				.setTicket (
-					ticket)
+			.setTicket (
+				ticket)
 
-				.setTicketFieldType (
-					chatUserType)
+			.setTicketFieldType (
+				chatUserType)
 
-				.setIntegerValue(1)
+			.setIntegerValue (
+				1)
 
 		);
 
 		ticketNoteHelper.insert (
 			new TicketNoteRec ()
 
-				.setTicket (
-					ticket)
+			.setTicket (
+				ticket)
 
-				.setIndex (
-					ticket.getNumNotes ())
+			.setIndex (
+				ticket.getNumNotes ())
 
-				.setNoteText("Ticket note 1 text")
+			.setNoteText (
+				"Ticket note 1 text")
 
 		);
 
@@ -438,24 +445,28 @@ public class TicketFixtureProvider
 		ticketNoteHelper.insert (
 			new TicketNoteRec ()
 
-				.setTicket (
-					ticket)
+			.setTicket (
+				ticket)
 
-				.setIndex (
-					ticket.getNumNotes ())
+			.setIndex (
+				ticket.getNumNotes ())
 
-				.setNoteText("Ticket note 2 text")
+			.setNoteText (
+				"Ticket note 2 text")
 
-			);
+		);
 
 		ticket
+
 			.setNumNotes (
 				ticket.getNumNotes () + 1);
 
 		// ticket template
 
+		/*
 		for (
-			TicketStateState state : TicketStateState.values()
+			TicketStateState state
+				: TicketStateState.values ()
 		) {
 
 		TicketTemplateRec template =
@@ -473,17 +484,20 @@ public class TicketFixtureProvider
 				.setName (
 					stringFormat (
 						"Template %s",
-						state.toString()))
+						state.toString ()))
 
 				.setTicketState (
 					ticketStateHelper.findByCode (
-						ticketManager, state.toString()))
+						ticketManager,
+						state.toString ()))
 
 			);
 
-			ticketManager.getTemplates().add(template);
+			ticketManager.getTicketTemplates ().add (
+				template);
 
 		}
+		*/
 
 	}
 
