@@ -97,7 +97,7 @@ class TicketHooks
 				return null;
 			}
 
-			switch (ticketFieldType.getType ()) {
+			switch (ticketFieldType.getDataType ()) {
 
 			case string:
 
@@ -189,42 +189,42 @@ class TicketHooks
 
 		}
 
-		switch (ticketFieldType.getType ()) {
+		switch (ticketFieldType.getDataType ()) {
 
-			case string:
+		case string:
 
-				ticketFieldValue.setStringValue (
-					(String) value);
+			ticketFieldValue.setStringValue (
+				(String) value);
 
-				break;
+			break;
 
-			case number:
+		case number:
 
-				ticketFieldValue.setIntegerValue (
-					(Integer) value);
+			ticketFieldValue.setIntegerValue (
+				(Integer) value);
 
-				break;
+			break;
 
-			case bool:
+		case bool:
 
-				ticketFieldValue.setBooleanValue (
-					(Boolean) value);
+			ticketFieldValue.setBooleanValue (
+				(Boolean) value);
 
-				break;
+			break;
 
-			case object:
+		case object:
 
-				Record<?> record =
-					(Record<?>) value;
+			Record<?> record =
+				(Record<?>) value;
 
-				ticketFieldValue.setIntegerValue (
-					record.getId ());
+			ticketFieldValue.setIntegerValue (
+				record.getId ());
 
-				break;
+			break;
 
-			default:
+		default:
 
-				throw new RuntimeException ();
+			throw new RuntimeException ();
 
 		}
 

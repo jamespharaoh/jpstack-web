@@ -1,4 +1,32 @@
 <model-meta
-	name="photoGrabberReissue">
+	name="photoGrabberReissue"
+	type="common">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="photoGrabberRequest"/>
+
+		<index-field/>
+
+		<!-- details -->
+
+		<timestamp-field
+			name="timestamp"
+			column-type="postgresql"/>
+
+		<reference-field
+			type="user"/>
+
+		<reference-field
+			type="message"/>
+
+	</fields>
 
 </model-meta>

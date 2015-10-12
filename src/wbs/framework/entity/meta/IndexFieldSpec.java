@@ -18,4 +18,8 @@ class IndexFieldSpec
 	@DataAttribute
 	String name;
 
+	@DataAttribute (
+		value = "counter")
+	String counterName;
+
 }

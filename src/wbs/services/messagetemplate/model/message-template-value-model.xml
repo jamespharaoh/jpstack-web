@@ -1,4 +1,26 @@
 <model-meta
-	name="messageTemplateValue">
+	name="messageTemplateValue"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="messageTemplateSet"/>
+
+		<identity-reference-field
+			type="messageTemplateType"/>
+
+		<!-- settings -->
+
+		<string-field
+			name="stringValue"/>
+
+	</fields>
 
 </model-meta>

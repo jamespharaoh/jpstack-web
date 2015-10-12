@@ -1,6 +1,7 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -50,9 +51,11 @@ class TypeFieldWriter {
 		throws IOException {
 
 		String fieldTypeName =
-			stringFormat (
-				"%sType",
-				parent.name ());
+			ifNull (
+				spec.typeName (),
+				stringFormat (
+					"%sType",
+					parent.name ()));
 
 		PluginModelSpec fieldTypePluginModel =
 			pluginManager.pluginModelsByName ().get (

@@ -242,11 +242,11 @@ class SubscriptionSendHelper
 			batchHelper.insert (
 				new BatchRec ()
 
-			.setParentObjectType (
+			.setParentType (
 				objectTypeHelper.find (
 					subscriptionSendHelper.objectTypeId ()))
 
-			.setParentObjectId (
+			.setParentId (
 				subscriptionSend.getId ())
 
 			.setSubject (

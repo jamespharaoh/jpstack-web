@@ -22,4 +22,8 @@ class IntegerFieldSpec
 	@DataAttribute
 	Boolean nullable;
 
+	@DataAttribute (
+		value = "default")
+	Integer defaultValue;
+
 }

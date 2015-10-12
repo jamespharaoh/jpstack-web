@@ -1,5 +1,40 @@
 <model-meta
-	name="autoResponder">
+	name="autoResponder"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="emailAddress"
+			default=""/>
+
+		<reference-field
+			name="addToNumberList"
+			type="numberList"
+			nullable="yes"/>
+
+	</fields>
 
 	<priv-types>
 

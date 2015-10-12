@@ -31,6 +31,9 @@ class PluginManager {
 	@Getter @Setter
 	Map<String,PluginModelSpec> pluginModelsByName;
 
+	@Getter @Setter
+	Map<String,PluginEnumTypeSpec> pluginEnumTypesByName;
+
 	// implementation
 
 	@Accessors (fluent = true)
@@ -54,8 +57,13 @@ class PluginManager {
 			ImmutableList.Builder<PluginSpec> pluginsBuilder =
 				ImmutableList.<PluginSpec>builder ();
 
-			ImmutableMap.Builder<String,PluginModelSpec> pluginModelsByNameBuilder =
+			ImmutableMap.Builder<String,PluginModelSpec>
+			pluginModelsByNameBuilder =
 				ImmutableMap.<String,PluginModelSpec>builder ();
+
+			ImmutableMap.Builder<String,PluginEnumTypeSpec>
+			pluginEnumTypesByNameBuilder =
+				ImmutableMap.<String,PluginEnumTypeSpec>builder ();
 
 			donePluginNames =
 				new HashSet<String> ();
@@ -97,6 +105,17 @@ class PluginManager {
 						pluginModelsByNameBuilder.put (
 							pluginModel.name (),
 							pluginModel);
+
+					}
+
+					for (
+						PluginEnumTypeSpec pluginEnumType
+							: plugin.models ().enumTypes ()
+					) {
+
+						pluginEnumTypesByNameBuilder.put (
+							pluginEnumType.name (),
+							pluginEnumType);
 
 					}
 
@@ -145,7 +164,10 @@ class PluginManager {
 					pluginsBuilder.build ())
 
 				.pluginModelsByName (
-					pluginModelsByNameBuilder.build ());
+					pluginModelsByNameBuilder.build ())
+
+				.pluginEnumTypesByName (
+					pluginEnumTypesByNameBuilder.build ());
 
 		}
 

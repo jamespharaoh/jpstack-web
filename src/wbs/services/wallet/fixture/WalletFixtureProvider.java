@@ -98,7 +98,7 @@ class WalletFixtureProvider
 		walletHelper.insert (
 			new WalletRec ()
 
-			.setWalletServiceRec (
+			.setWalletService (
 				walletService)
 
 			.setCode (

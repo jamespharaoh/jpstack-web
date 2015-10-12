@@ -24,6 +24,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.entity.meta.CodeFieldSpec;
+import wbs.framework.entity.meta.IdentityIntegerFieldSpec;
+import wbs.framework.entity.meta.IdentityReferenceFieldSpec;
 import wbs.framework.entity.meta.IndexFieldSpec;
 import wbs.framework.entity.meta.ModelFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
@@ -120,6 +122,7 @@ class ModelRecordGenerator {
 		List<Class<?>> standardImportClasses =
 			ImmutableList.<Class<?>>of (
 
+			java.util.Date.class,
 			java.util.LinkedHashMap.class,
 			java.util.LinkedHashSet.class,
 			java.util.Map.class,
@@ -145,6 +148,8 @@ class ModelRecordGenerator {
 			wbs.framework.entity.annotations.DeletedField.class,
 			wbs.framework.entity.annotations.DescriptionField.class,
 			wbs.framework.entity.annotations.GeneratedIdField.class,
+			wbs.framework.entity.annotations.IdentityReferenceField.class,
+			wbs.framework.entity.annotations.IdentitySimpleField.class,
 			wbs.framework.entity.annotations.IndexField.class,
 			wbs.framework.entity.annotations.LinkField.class,
 			wbs.framework.entity.annotations.NameField.class,
@@ -166,6 +171,7 @@ class ModelRecordGenerator {
 
 			org.joda.time.Instant.class,
 
+			org.jadira.usertype.dateandtime.joda.PersistentInstantAsString.class,
 			org.jadira.usertype.dateandtime.joda.PersistentInstantAsTimestamp.class
 
 		);
@@ -449,6 +455,8 @@ class ModelRecordGenerator {
 
 		CodeFieldSpec codeField = null;
 		IndexFieldSpec indexField = null;
+		IdentityReferenceFieldSpec identityReferenceField = null;
+		IdentityIntegerFieldSpec identityIntegerField = null;
 
 		for (
 			ModelFieldSpec modelField
@@ -495,6 +503,22 @@ class ModelRecordGenerator {
 
 			}
 
+			if (modelField instanceof IdentityReferenceFieldSpec) {
+
+				identityReferenceField =
+					(IdentityReferenceFieldSpec)
+					modelField;
+
+			}
+
+			if (modelField instanceof IdentityIntegerFieldSpec) {
+
+				identityIntegerField =
+					(IdentityIntegerFieldSpec)
+					modelField;
+
+			}
+
 		}
 
 		if (parentField != null) {
@@ -519,9 +543,17 @@ class ModelRecordGenerator {
 
 				"\t\t\t.append (\n",
 
-				"\t\t\t\tgetParentType (),\n",
+				"\t\t\t\tget%s (),\n",
+				capitalise (
+					ifNull (
+						parentTypeField.name (),
+						"parentType")),
 
-				"\t\t\t\tother.getParentType ())\n",
+				"\t\t\t\tother.get%s ())\n",
+				capitalise (
+					ifNull (
+						parentTypeField.name (),
+						"parentType")),
 
 				"\n");
 
@@ -580,6 +612,46 @@ class ModelRecordGenerator {
 					ifNull (
 						indexField.name (),
 						"index")),
+
+				"\n");
+
+		}
+
+		if (identityReferenceField != null) {
+
+			javaWriter.write (
+
+				"\t\t\t.append (\n",
+
+				"\t\t\t\tget%s (),\n",
+				capitalise (
+					ifNull (
+						identityReferenceField.name (),
+						identityReferenceField.typeName ())),
+
+				"\t\t\t\tother.get%s ())\n",
+				capitalise (
+					ifNull (
+						identityReferenceField.name (),
+						identityReferenceField.typeName ())),
+
+				"\n");
+
+		}
+
+		if (identityIntegerField != null) {
+
+			javaWriter.write (
+
+				"\t\t\t.append (\n",
+
+				"\t\t\t\tget%s (),\n",
+				capitalise (
+					identityIntegerField.name ()),
+
+				"\t\t\t\tother.get%s ())\n",
+				capitalise (
+					identityIntegerField.name ()),
 
 				"\n");
 

@@ -16,14 +16,14 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.entity.meta.IdentityReferenceFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
-import wbs.framework.entity.meta.ReferenceFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
 
-@PrototypeComponent ("referenceFieldWriter")
+@PrototypeComponent ("identityReferenceFieldWriter")
 @ModelWriter
 public
-class ReferenceFieldWriter {
+class IdentityReferenceFieldWriter {
 
 	// dependencies
 
@@ -36,7 +36,7 @@ class ReferenceFieldWriter {
 	ModelMetaSpec parent;
 
 	@BuilderSource
-	ReferenceFieldSpec spec;
+	IdentityReferenceFieldSpec spec;
 
 	@BuilderTarget
 	FormatWriter javaWriter;
@@ -56,27 +56,14 @@ class ReferenceFieldWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
-		if (ifNull (spec.nullable (), false)) {
-
-			javaWriter.write (
-
-				"\t@ReferenceField (\n",
-
-				"\t\tnullable = true)\n");
-
-		} else {
-
-			javaWriter.write (
-
-				"\t@ReferenceField\n");
-
-		}
-
 		javaWriter.write (
+
+			"\t@IdentityReferenceField\n",
 
 			"\t%s.model.%sRec %s;\n",
 			fieldTypePlugin.packageName (),
-			capitalise (spec.typeName ()),
+			capitalise (
+				spec.typeName ()),
 			ifNull (
 				spec.name (),
 				spec.typeName ()),

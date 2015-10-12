@@ -1,5 +1,71 @@
 <model-meta
-	name="photoGrabber">
+	name="photoGrabber"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="url"/>
+
+		<reference-field
+			name="billRoute"
+			type="route"
+			nullable="yes"/>
+
+		<string-field
+			name="billNumber"/>
+
+		<string-field
+			name="billTemplate"/>
+
+		<reference-field
+			name="mmsRoute"
+			type="route"
+			nullable="yes"/>
+
+		<string-field
+			name="mmsNumber"/>
+
+		<string-field
+			name="mmsTemplate"/>
+
+		<string-field
+			name="mmsSubject"/>
+
+		<yes-no-field
+			name="jpeg"/>
+
+		<integer-field
+			name="jpegWidth"/>
+
+		<integer-field
+			name="jpegHeight"/>
+
+		<integer-field
+			name="jpegQuality"/>
+
+	</fields>
 
 	<priv-types>
 

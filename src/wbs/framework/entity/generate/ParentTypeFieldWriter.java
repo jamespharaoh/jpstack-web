@@ -1,5 +1,7 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
+
 import java.io.IOException;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -42,7 +44,10 @@ class ParentTypeFieldWriter {
 
 			"\t@ParentTypeField\n",
 
-			"\twbs.platform.object.core.model.ObjectTypeRec parentType;\n",
+			"\twbs.platform.object.core.model.ObjectTypeRec %s;\n",
+			ifNull (
+				spec.name (),
+				"parentType"),
 
 			"\n");
 

@@ -94,7 +94,7 @@ class TicketPendingFormResponder
 
 		for (
 			TicketTemplateRec template
-				: ticket.getTicketManager().getTemplates ()
+				: ticket.getTicketManager ().getTicketTemplates ()
 		) {
 
 			if (template.getDeleted ())
@@ -260,6 +260,7 @@ class TicketPendingFormResponder
 			template.getId (),
 			">\n");
 
+		/*
 		if (template.getTicketState()
 				.getState().equals (
 					ticket.getTicketState().getState())) {
@@ -306,16 +307,19 @@ class TicketPendingFormResponder
 				"></td>\n");
 
 		}
+		*/
 
 		printFormat (
 			"<td>%s</td>\n",
 			Html.nbsp (Html.encode (template.getName ())));
 
+		/*
 		printFormat (
 			"<td>%h</td>\n",
 			template.getTicketState ()
 				.getState ()
 					.toString ());
+		*/
 
 		printFormat (
 
@@ -326,8 +330,10 @@ class TicketPendingFormResponder
 
 			" type=\"textarea\"",
 
+			/*
 			" name=\"timestamp-%h\"",
 			template.getTicketState ().getState ().toString (),
+			*/
 
 			" value=\"%d\"",
 			template.getTicketState ().getMinimum (),

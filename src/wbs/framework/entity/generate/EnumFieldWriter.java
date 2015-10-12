@@ -1,23 +1,34 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.scaffold.PluginEnumTypeSpec;
+import wbs.framework.application.scaffold.PluginManager;
+import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.entity.meta.EnumFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
-import wbs.framework.entity.meta.YesNoFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
 
-@PrototypeComponent ("yesNoFieldWriter")
+@PrototypeComponent ("enumFieldWriter")
 @ModelWriter
 public
-class YesNoFieldWriter {
+class EnumFieldWriter {
+
+	// dependencies
+
+	@Inject
+	PluginManager pluginManager;
 
 	// builder
 
@@ -25,7 +36,7 @@ class YesNoFieldWriter {
 	ModelMetaSpec parent;
 
 	@BuilderSource
-	YesNoFieldSpec spec;
+	EnumFieldSpec spec;
 
 	@BuilderTarget
 	FormatWriter javaWriter;
@@ -37,6 +48,13 @@ class YesNoFieldWriter {
 	void build (
 			Builder builder)
 		throws IOException {
+
+		PluginEnumTypeSpec fieldTypePluginEnumType =
+			pluginManager.pluginEnumTypesByName ().get (
+				spec.typeName ());
+
+		PluginSpec fieldTypePlugin =
+			fieldTypePluginEnumType.plugin ();
 
 		if (ifNull (spec.nullable (), false)) {
 
@@ -58,17 +76,21 @@ class YesNoFieldWriter {
 
 			javaWriter.write (
 
-				"\tBoolean %s = %s;\n",
+				"\t%s.model.%s %s = %s;\n",
+				fieldTypePlugin.packageName (),
+				capitalise (
+					spec.typeName ()),
 				spec.name (),
-				spec.defaultValue ()
-					? "true"
-					: "false");
+				spec.defaultValue ());
 
 		} else {
 
 			javaWriter.write (
 
-				"\tBoolean %s;\n",
+				"\t%s.model.%s %s;\n",
+				fieldTypePlugin.packageName (),
+				capitalise (
+					spec.typeName ()),
 				spec.name ());
 
 		}

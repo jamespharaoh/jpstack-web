@@ -147,11 +147,16 @@ class AlertsSettingsNumbersAction
 			if (newName == null)
 				continue;
 
-			if (! equal (
+			if (
+				! equal (
 					alertsNumber.getName (),
-					newName)) {
+					newName)
+			) {
 
-				alertsNumber.setName (newName);
+				alertsNumber
+
+					.setName (
+						newName);
 
 				updatedNames ++;
 

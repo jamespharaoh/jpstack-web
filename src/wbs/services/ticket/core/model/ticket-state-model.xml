@@ -1,5 +1,40 @@
 <model-meta
-	name="ticketState">
+	name="ticketState"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="ticketManager"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<yes-no-field
+			name="showInQueue"/>
+
+		<integer-field
+			name="minimum"/>
+
+		<integer-field
+			name="maximum"/>
+
+	</fields>
 
 	<queue-types>
 

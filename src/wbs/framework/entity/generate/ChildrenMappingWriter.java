@@ -1,7 +1,7 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.equal;
 
 import java.io.IOException;
 
@@ -16,19 +16,23 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.entity.meta.ChildrenMappingSpec;
+import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
-import wbs.framework.entity.meta.ReferenceFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
 
-@PrototypeComponent ("referenceFieldWriter")
+@PrototypeComponent ("childrenMappingWriter")
 @ModelWriter
 public
-class ReferenceFieldWriter {
+class ChildrenMappingWriter {
 
 	// dependencies
 
 	@Inject
 	PluginManager pluginManager;
+
+	@Inject
+	ModelMetaLoader modelMetaLoader;
 
 	// builder
 
@@ -36,7 +40,7 @@ class ReferenceFieldWriter {
 	ModelMetaSpec parent;
 
 	@BuilderSource
-	ReferenceFieldSpec spec;
+	ChildrenMappingSpec spec;
 
 	@BuilderTarget
 	FormatWriter javaWriter;
@@ -56,30 +60,39 @@ class ReferenceFieldWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
-		if (ifNull (spec.nullable (), false)) {
+		javaWriter.write (
+
+			"\t@CollectionField (\n",
+
+			"\t\tindex = \"%s\")\n",
+			spec.mapColumnName ());
+
+		if (
+			equal (
+				spec.mapType (),
+				"integer")
+		) {
 
 			javaWriter.write (
 
-				"\t@ReferenceField (\n",
+				"\tMap<Integer,%s.model.%sRec> %ss =\n",
+				fieldTypePlugin.packageName (),
+				capitalise (
+					spec.typeName ()),
+				spec.typeName (),
 
-				"\t\tnullable = true)\n");
+				"\t\tnew LinkedHashMap<Integer,%s.model.%sRec> ();\n",
+				fieldTypePlugin.packageName (),
+				capitalise (
+					spec.typeName ()));
 
 		} else {
 
-			javaWriter.write (
-
-				"\t@ReferenceField\n");
+			throw new RuntimeException ();
 
 		}
 
 		javaWriter.write (
-
-			"\t%s.model.%sRec %s;\n",
-			fieldTypePlugin.packageName (),
-			capitalise (spec.typeName ()),
-			ifNull (
-				spec.name (),
-				spec.typeName ()),
 
 			"\n");
 

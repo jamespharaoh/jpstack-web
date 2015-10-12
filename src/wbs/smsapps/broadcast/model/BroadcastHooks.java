@@ -92,10 +92,10 @@ class BroadcastHooks
 		batchHelper.get ().insert (
 			new BatchRec ()
 
-			.setParentObjectType (
+			.setParentType (
 				broadcastObjectType)
 
-			.setParentObjectId (
+			.setParentId (
 				broadcast.getId ())
 
 			.setCode (

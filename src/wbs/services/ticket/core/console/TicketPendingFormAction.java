@@ -1,12 +1,14 @@
 package wbs.services.ticket.core.console;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toInteger;
 
 import javax.inject.Inject;
 
+import lombok.Cleanup;
+
 import org.joda.time.Instant;
 
-import lombok.Cleanup;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -18,9 +20,8 @@ import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 import wbs.services.ticket.core.model.TicketNoteRec;
-import wbs.services.ticket.core.model.TicketStateState;
-import wbs.services.ticket.core.model.TicketTemplateRec;
 import wbs.services.ticket.core.model.TicketRec;
+import wbs.services.ticket.core.model.TicketTemplateRec;
 
 @PrototypeComponent ("ticketPendingFormAction")
 public
@@ -116,42 +117,46 @@ class TicketPendingFormAction
 			ticket.getQueueItem (),
 			myUser);
 
-		ticket.setQueueItem (null);
+		ticket
 
-		// if the ticket was not already closed
+			.setQueueItem (
+				null);
 
-		if (ticket.getTicketState().getState() != TicketStateState.closed) {
+		// update ticket timestamp
 
-			// update ticket timestamp
+		String timpestampString =
+			requestContext.parameter (
+				stringFormat (
+					"timestamp-%s",
+					template.getTicketState ().getId ()));
 
-			String timpesampStr =
-					requestContext.parameter (
-							"timestamp-" + template.getTicketState ().getState ().toString ());
+		Integer timestamp =
+			Integer.parseInt (
+				timpestampString);
 
-			Integer timestamp =
-				Integer.parseInt(timpesampStr);
+		if (
+			timestamp >= template.getTicketState ().getMinimum ()
+			&& timestamp <= template.getTicketState ().getMaximum ()
+		) {
 
-			if (timestamp >= template.getTicketState ().getMinimum () &&
-				timestamp <= template.getTicketState ().getMaximum ()) {
+			// update ticket state
 
-				// update ticket state
+			ticket
 
-				ticket.setTicketState(
-					template.getTicketState());
+				.setTicketState (
+					template.getTicketState ());
 
-				// set new timestamp
+			// set new timestamp
 
-				ticket.setTimestamp(
-					Instant.now ()
-						.plus(timestamp * 1000));
+			ticket.setTimestamp(
+				Instant.now ()
+					.plus(timestamp * 1000));
 
-				ticket.setQueued (
-					false);
-			}
-			else {
-				throw new RuntimeException ("Timestamp out of bounds");
-			}
+			ticket.setQueued (
+				false);
 
+		} else {
+			throw new RuntimeException ("Timestamp out of bounds");
 		}
 
 		// check if a new note was added

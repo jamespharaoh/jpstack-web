@@ -22,4 +22,8 @@ class YesNoFieldSpec
 	@DataAttribute
 	Boolean nullable;
 
+	@DataAttribute (
+		value = "default")
+	Boolean defaultValue;
+
 }

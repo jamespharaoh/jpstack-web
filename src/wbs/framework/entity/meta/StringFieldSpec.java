@@ -22,4 +22,8 @@ class StringFieldSpec
 	@DataAttribute
 	Boolean nullable;
 
+	@DataAttribute (
+		value = "default")
+	String defaultValue;
+
 }

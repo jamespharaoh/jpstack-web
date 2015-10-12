@@ -1,4 +1,44 @@
 <model-meta
-	name="alertsStatusCheck">
+	name="alertsStatusCheck"
+	type="common">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="alertsSettings"/>
+
+		<index-field/>
+
+		<!-- data -->
+
+		<timestamp-field
+			name="timestamp"
+			column-type="sql"/>
+
+		<integer-field
+			name="unclaimedItems"/>
+
+		<integer-field
+			name="maximumDuration"/>
+
+		<yes-no-field
+			name="result"/>
+
+		<yes-no-field
+			name="active"/>
+
+		<yes-no-field
+			name="sentRecently"/>
+
+		<yes-no-field
+			name="alertSent"/>
+
+	</fields>
 
 </model-meta>

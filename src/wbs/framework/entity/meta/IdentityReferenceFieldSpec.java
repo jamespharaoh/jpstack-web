@@ -8,16 +8,19 @@ import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("type-field")
+@DataClass ("identity-reference-field")
 @ModelMetaData
-@PrototypeComponent ("typeFieldSpec")
+@PrototypeComponent ("identityReferenceFieldSpec")
 public
-class TypeFieldSpec
+class IdentityReferenceFieldSpec
 	implements ModelFieldSpec {
+
+	@DataAttribute
+	String name;
 
 	@DataAttribute (
 		value = "type",
-		required = false)
+		required = true)
 	String typeName;
 
 }

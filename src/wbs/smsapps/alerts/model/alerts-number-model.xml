@@ -1,5 +1,30 @@
 <model-meta
-	name="alertsNumber">
+	name="alertsNumber"
+	type="ephemeral">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="alertsSettings"/>
+
+		<identity-reference-field
+			type="number"/>
+
+		<!-- settings -->
+
+		<string-field
+			name="name"/>
+
+		<yes-no-field
+			name="enabled"/>
+
+	</fields>
 
 	<event-types>
 

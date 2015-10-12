@@ -3,27 +3,35 @@ package wbs.framework.entity.meta;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("reference-field")
+@DataClass ("children-mapping")
+@PrototypeComponent ("childrenMappingSpec")
 @ModelMetaData
-@PrototypeComponent ("referenceFieldSpec")
 public
-class ReferenceFieldSpec
-	implements ModelFieldSpec {
+class ChildrenMappingSpec
+	implements ModelCollectionSpec {
 
-	@DataAttribute
-	String name;
+	@DataAncestor
+	ModelMetaSpec model;
 
 	@DataAttribute (
 		value = "type",
 		required = true)
 	String typeName;
 
-	@DataAttribute
-	Boolean nullable;
+	@DataAttribute (
+		value = "map-column",
+		required = true)
+	String mapColumnName;
+
+	@DataAttribute (
+		value = "map-type",
+		required = true)
+	String mapType;
 
 }

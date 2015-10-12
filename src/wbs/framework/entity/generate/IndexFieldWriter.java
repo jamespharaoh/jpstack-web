@@ -38,9 +38,24 @@ class IndexFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		javaWriter.write (
+		if (spec.counterName () != null) {
 
-			"\t@IndexField\n",
+			javaWriter.write (
+
+				"\t@IndexField (\n",
+
+				"\t\tcounter = \"%s\")\n",
+				spec.counterName ());
+
+		} else {
+
+			javaWriter.write (
+
+				"\t@IndexField\n");
+
+		}
+
+		javaWriter.write (
 
 			"\tInteger %s;\n",
 			ifNull (

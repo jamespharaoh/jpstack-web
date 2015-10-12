@@ -1,4 +1,26 @@
 <model-meta
-	name="ticketNote">
+	name="ticketNote"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="ticket"/>
+
+		<index-field
+			counter="numNotes"/>
+
+		<!-- data -->
+
+		<string-field
+			name="noteText"/>
+
+	</fields>
 
 </model-meta>

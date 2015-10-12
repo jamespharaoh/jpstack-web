@@ -13,8 +13,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
@@ -35,11 +35,11 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 import wbs.services.ticket.core.console.FieldsProvider;
+import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketFieldValueRec;
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketRec;
-import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectTicketCreateAction")
@@ -210,60 +210,78 @@ class ObjectTicketCreateAction
 
 		TicketRec ticket =
 			new TicketRec ()
-				.setTicketManager(ticketManager);
 
-		for (ObjectTicketCreateSetFieldSpec ticketFieldSpec
-				: ticketFieldSpecs) {
+			.setTicketManager (
+				ticketManager);
 
-			TicketFieldTypeRec ticketFieldType
-				= ticketFieldTypeHelper.findByCode (
+		for (
+			ObjectTicketCreateSetFieldSpec ticketFieldSpec
+				: ticketFieldSpecs
+		) {
+
+			TicketFieldTypeRec ticketFieldType =
+				ticketFieldTypeHelper.findByCode (
 					ticketManager,
-					ticketFieldSpec.fieldTypeCode());
+					ticketFieldSpec.fieldTypeCode ());
 
 			if (ticketFieldType == null) {
-				throw new RuntimeException ("Field type does not exist");
+
+				throw new RuntimeException (
+					"Field type does not exist");
+
 			}
 
 			TicketFieldValueRec ticketFieldValue =
 				new TicketFieldValueRec ()
 
-					.setTicket(ticket)
-					.setTicketFieldType(ticketFieldType);
+				.setTicket (
+					ticket)
 
-			switch( ticketFieldType.getType() ) {
-				case string:
-					ticketFieldValue.setStringValue (
-						(String)objectManager.dereference (
-							contextObject,
-							ticketFieldSpec.valuePath()));
-					break;
+				.setTicketFieldType (
+					ticketFieldType);
 
-				case number:
-					ticketFieldValue.setIntegerValue(
-						(Integer)objectManager.dereference (
-							contextObject,
-							ticketFieldSpec.valuePath()));
-					break;
+			switch (ticketFieldType.getDataType ()) {
 
-				case bool:
-					ticketFieldValue.setBooleanValue(
-						(Boolean)objectManager.dereference (
-							contextObject,
-							ticketFieldSpec.valuePath()));
-					break;
+			case string:
 
-				case object:
+				ticketFieldValue.setStringValue (
+					(String)objectManager.dereference (
+						contextObject,
+						ticketFieldSpec.valuePath()));
+				break;
 
-					Integer objectId =
-						((Record<?>) objectManager.dereference (
-							contextObject,
-							ticketFieldSpec.valuePath())).getId();
+			case number:
 
-					ticketFieldValue.setIntegerValue(objectId);
-					break;
+				ticketFieldValue.setIntegerValue(
+					(Integer)objectManager.dereference (
+						contextObject,
+						ticketFieldSpec.valuePath()));
 
-				default:
-					throw new RuntimeException ();
+				break;
+
+			case bool:
+
+				ticketFieldValue.setBooleanValue(
+					(Boolean)objectManager.dereference (
+						contextObject,
+						ticketFieldSpec.valuePath()));
+
+				break;
+
+			case object:
+
+				Integer objectId =
+					((Record<?>) objectManager.dereference (
+						contextObject,
+						ticketFieldSpec.valuePath())).getId();
+
+				ticketFieldValue.setIntegerValue(objectId);
+
+				break;
+
+			default:
+
+				throw new RuntimeException ();
 
 			}
 

@@ -23,9 +23,15 @@ class TimestampFieldSpec
 		required = true)
 	ColumnType columnType;
 
+	@DataAttribute
+	Boolean nullable;
+
 	public static
 	enum ColumnType {
-		timestamp;
+		unix,       // time since epoch
+		iso,        // iso datetime string
+		sql,        // sql timestamp
+		postgresql; // postgresql timestamp with time zone (java date)
 	}
 
 }

@@ -16,12 +16,12 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.services.ticket.core.console.FieldsProvider;
+import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;
+import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldValueRec;
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketRec;
-import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
-import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectTicketCreatePart")
@@ -97,63 +97,92 @@ class ObjectTicketCreatePart
 			new TicketRec ()
 				.setTicketManager(ticketManager);
 
-		for (ObjectTicketCreateSetFieldSpec ticketFieldSpec
-				: ticketFieldSpecs) {
+		for (
+			ObjectTicketCreateSetFieldSpec ticketFieldSpec
+				: ticketFieldSpecs
+		) {
 
-			TicketFieldTypeRec ticketFieldType
-				= ticketFieldTypeHelper.findByCode (
+			TicketFieldTypeRec ticketFieldType =
+				ticketFieldTypeHelper.findByCode (
 					ticketManager,
-					ticketFieldSpec.fieldTypeCode());
+					ticketFieldSpec.fieldTypeCode ());
 
 			if (ticketFieldType == null) {
-				throw new RuntimeException ("Field type does not exist");
+
+				throw new RuntimeException (
+					"Field type does not exist");
+
 			}
 
 			TicketFieldValueRec ticketFieldValue =
 				new TicketFieldValueRec ()
 
-					.setTicket(ticket)
-					.setTicketFieldType(ticketFieldType);
+				.setTicket (
+					ticket)
 
-			switch( ticketFieldType.getType() ) {
-				case string:
-					ticketFieldValue.setStringValue (
-						(String)objectManager.dereference (
-							contextObject,
-							ticketFieldSpec.valuePath()));
-					break;
+				.setTicketFieldType (
+					ticketFieldType);
 
-				case number:
-					ticketFieldValue.setIntegerValue(
-						(Integer)objectManager.dereference (
-							contextObject,
-							ticketFieldSpec.valuePath()));
-					break;
+			switch (ticketFieldType.getDataType ()) {
 
-				case bool:
-					ticketFieldValue.setBooleanValue(
-						(Boolean)objectManager.dereference (
-							contextObject,
-							ticketFieldSpec.valuePath()));
-					break;
+			case string:
 
-				case object:
+				ticketFieldValue.setStringValue (
+					(String)
+					objectManager.dereference (
+						contextObject,
+						ticketFieldSpec.valuePath ()));
 
-					Integer objectId =
-						((Record<?>) objectManager.dereference (
-							contextObject,
-							ticketFieldSpec.valuePath())).getId();
+				break;
 
-					ticketFieldValue.setIntegerValue(objectId);
-					break;
+			case number:
 
-				default:
-					throw new RuntimeException ();
+				ticketFieldValue.setIntegerValue (
+					(Integer)
+					objectManager.dereference (
+						contextObject,
+						ticketFieldSpec.valuePath ()));
+
+				break;
+
+			case bool:
+
+				ticketFieldValue.setBooleanValue (
+					(Boolean)
+					objectManager.dereference (
+						contextObject,
+						ticketFieldSpec.valuePath ()));
+
+				break;
+
+			case object:
+
+				Record<?> objectValue =
+					(Record<?>)
+					objectManager.dereference (
+						contextObject,
+						ticketFieldSpec.valuePath ());
+
+				// TODO check type
+
+				Integer objectId =
+					objectValue.getId ();
+
+				ticketFieldValue
+
+					.setIntegerValue (
+						objectId);
+
+				break;
+
+			default:
+
+				throw new RuntimeException ();
 
 			}
 
 			ticket.setNumFields (
-				ticket.getNumFields() + 1);
+				ticket.getNumFields () + 1);
 
 			ticket.getTicketFieldValues ().put (
 					ticketFieldType.getId (),

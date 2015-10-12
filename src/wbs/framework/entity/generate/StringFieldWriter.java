@@ -54,10 +54,31 @@ class StringFieldWriter {
 
 		}
 
-		javaWriter.write (
+		if (spec.defaultValue () == null) {
 
-			"\tString %s;\n",
-			spec.name ());
+			javaWriter.write (
+
+				"\tString %s;\n",
+				spec.name ());
+
+		} else if (spec.defaultValue ().isEmpty ()) {
+
+			javaWriter.write (
+
+				"\tString %s = \"\";\n",
+				spec.name ());
+
+		} else {
+
+			javaWriter.write (
+
+				"\tString %s =\n",
+				spec.name (),
+
+				"\t\t\"%s\";\n",
+				spec.defaultValue ().replace ("\"", "\\\""));
+
+		}
 
 		javaWriter.write (
 

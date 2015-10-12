@@ -13,7 +13,7 @@
 
 		<timestamp-field
 			name="timestamp"
-			column-type="timestamp"/>
+			column-type="sql"/>
 
 		<integer-field
 			name="unclaimedItems"/>

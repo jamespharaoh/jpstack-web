@@ -1,5 +1,51 @@
 <model-meta
-	name="ticketer">
+	name="ticketer"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<integer-field
+			name="duration"
+			default="0"/>
+
+		<string-field
+			name="text"
+			default="{ticket}"/>
+
+		<reference-field
+			type="route"
+			nullable="yes"/>
+
+		<string-field
+			name="number"
+			default=""/>
+
+		<integer-field
+			name="value"
+			default="0"/>
+
+	</fields>
 
 	<priv-types>
 

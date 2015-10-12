@@ -8,15 +8,18 @@
 	</plugin-dependencies>
 
 	<models>
+
+		<enum-type name="ticketStateState"/>
+		<enum-type name="ticketFieldDataType"/>
+
 		<model name="ticketManager"/>
 		<model name="ticketTemplate"/>
 		<model name="ticket"/>
 		<model name="ticketNote"/>
-		<enum-type name="ticketStateState"/>
 		<model name="ticketFieldType"/>
-		<enum-type name="ticketFieldTypeType"/>
 		<model name="ticketFieldValue"/>
 		<model name="ticketState"/>
+
 	</models>
 
 	<fixtures>
