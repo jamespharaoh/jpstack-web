@@ -69,11 +69,6 @@
 
 		<name-field/>
 
-		<enum-field
-			name="state"
-			nullable="no"
-			helper="ticketStateStateConsoleHelper"/>
-
 		<seconds-field
 			name="minimum"/>
 
@@ -95,11 +90,6 @@
 
 		<name-field/>
 
-		<enum-field
-			name="state"
-			nullable="no"
-			helper="ticketStateStateConsoleHelper"/>
-
 		<seconds-field
 			name="minimum"/>
 
@@ -118,11 +108,6 @@
 		<parent-field/>
 
 		<name-field/>
-
-		<enum-field
-			name="state"
-			nullable="no"
-			helper="ticketStateStateConsoleHelper"/>
 
 		<seconds-field
 			name="minimum"/>

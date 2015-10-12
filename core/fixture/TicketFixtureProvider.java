@@ -3,6 +3,8 @@ package wbs.services.ticket.core.fixture;
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
@@ -28,10 +30,14 @@ import wbs.services.ticket.core.model.TicketStateRec;
 import wbs.services.ticket.core.model.TicketTemplateObjectHelper;
 
 @PrototypeComponent ("ticketFixtureProvider")
-public class TicketFixtureProvider
+public
+class TicketFixtureProvider
 	implements FixtureProvider {
 
 	// dependencies
+
+	@Inject
+	Database database;
 
 	@Inject
 	MenuGroupObjectHelper menuGroupHelper;
@@ -77,6 +83,9 @@ public class TicketFixtureProvider
 	@Override
 	public
 	void createFixtures () {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		menuHelper.insert (
 			new MenuItemRec ()
@@ -137,11 +146,14 @@ public class TicketFixtureProvider
 			.setTicketManager (
 				ticketManager)
 
+			.setCode (
+				"submitted")
+
 			.setName (
 				"Submitted")
 
-			.setCode (
-				"submitted")
+			.setDescription (
+				"Submitted")
 
 			.setShowInQueue (
 				true)
@@ -162,10 +174,14 @@ public class TicketFixtureProvider
 			.setTicketManager (
 				ticketManager)
 
-			.setName("Accepted")
-
 			.setCode (
 				"accepted")
+
+			.setName (
+				"Accepted")
+
+			.setDescription (
+				"Accepted")
 
 			.setShowInQueue (
 				true)
@@ -179,6 +195,7 @@ public class TicketFixtureProvider
 		);
 
 		// pending state
+
 		ticketStateHelper.insert (
 			new TicketStateRec ()
 
@@ -189,6 +206,9 @@ public class TicketFixtureProvider
 				"pending")
 
 			.setName (
+				"Pending")
+
+			.setDescription (
 				"Pending")
 
 			.setShowInQueue (
@@ -216,6 +236,9 @@ public class TicketFixtureProvider
 			.setName (
 				"Solved")
 
+			.setDescription (
+				"Solved")
+
 			.setShowInQueue (
 				true)
 
@@ -241,6 +264,9 @@ public class TicketFixtureProvider
 			.setName (
 				"Closed")
 
+			.setDescription (
+				"Closed")
+
 			.setShowInQueue (
 				true)
 
@@ -262,8 +288,11 @@ public class TicketFixtureProvider
 			.setCode (
 				randomLogic.generateNumericNoZero (8))
 
-			.setTicketState(
+			.setTicketState (
 				submittedState)
+
+			.setTimestamp (
+				transaction.now ())
 
 		);
 
@@ -278,6 +307,9 @@ public class TicketFixtureProvider
 				"read")
 
 			.setName (
+				"Read")
+
+			.setDescription (
 				"Read")
 
 			.setDataType (
@@ -304,6 +336,9 @@ public class TicketFixtureProvider
 			.setName (
 				"Number")
 
+			.setDescription (
+				"Number")
+
 			.setDataType (
 				TicketFieldDataType.number)
 
@@ -328,6 +363,9 @@ public class TicketFixtureProvider
 			.setName (
 				"Text")
 
+			.setDescription (
+				"Text")
+
 			.setDataType (
 				TicketFieldDataType.string)
 
@@ -350,6 +388,9 @@ public class TicketFixtureProvider
 				"chat_user")
 
 			.setName (
+				"Chat user")
+
+			.setDescription (
 				"Chat user")
 
 			.setDataType (
