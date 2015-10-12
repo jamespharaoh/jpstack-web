@@ -1,4 +1,49 @@
 <model-meta
-	name="imChatConversation">
+	name="imChatConversation"
+	type="event">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="imChatCustomer"/>
+
+		<index-field
+			counter="numConversations"/>
+
+		<!-- timings -->
+
+		<timestamp-field
+			name="startTime"
+			column-type="iso"/>
+
+		<!-- relations -->
+
+		<reference-field
+			type="imChatProfile"/>
+
+		<!-- statistics -->
+
+		<integer-field
+			name="numMessages"
+			default="0"/>
+
+		<integer-field
+			name="freeMessages"
+			default="0"/>
+
+	</fields>
+
+	<collections>
+
+		<children-collection
+			type="imChatMessage"/>
+
+	</collections>
 
 </model-meta>

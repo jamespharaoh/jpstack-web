@@ -1,4 +1,33 @@
 <model-meta
-	name="imChatTemplate">
+	name="imChatTemplate"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="imChat"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="text"/>
+
+	</fields>
 
 </model-meta>

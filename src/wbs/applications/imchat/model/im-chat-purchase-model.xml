@@ -1,4 +1,53 @@
 <model-meta
-	name="imChatPurchase">
+	name="imChatPurchase"
+	type="event">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="imChatCustomer"/>
+
+		<index-field/>
+
+		<!-- data -->
+
+		<reference-field
+			type="imChatPricePoint"/>
+
+		<integer-field
+			name="price"/>
+
+		<integer-field
+			name="value"/>
+
+		<timestamp-field
+			name="createdTime"
+			column-type="iso"/>
+
+		<timestamp-field
+			name="completedTime"
+			column-type="iso"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="cancelledTime"
+			column-type="iso"
+			nullable="yes"/>
+
+		<reference-field
+			type="paypalPayment"
+			nullable="yes"/>
+
+		<string-field
+			name="token"
+			nullable="yes"/>
+
+	</fields>
 
 </model-meta>

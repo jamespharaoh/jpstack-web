@@ -1,4 +1,49 @@
 <model-meta
-	name="imChatCustomer">
+	name="imChatCustomer"
+	type="common">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="imChat"/>
+
+		<code-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="email"/>
+
+		<string-field
+			name="password"/>
+
+		<!-- statistics -->
+
+		<integer-field
+			name="numConversations"
+			default="0"/>
+
+		<integer-field
+			name="numPurchases"
+			default="0"/>
+
+		<integer-field
+			name="balance"
+			default="0"/>
+
+	</fields>
+
+	<collections>
+
+		<children-collection
+			type="imChatPurchase"/>
+
+	</collections>
 
 </model-meta>

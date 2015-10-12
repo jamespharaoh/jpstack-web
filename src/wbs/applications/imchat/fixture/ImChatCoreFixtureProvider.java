@@ -492,9 +492,6 @@ class ImChatCoreFixtureProvider
 			.setTimestamp (
 				transaction.now ())
 
-			.setQueueItem (
-				null)
-
 		);
 
 		imChatConversation

@@ -1,4 +1,36 @@
 <model-meta
-	name="imChatPricePoint">
+	name="imChatPricePoint"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="imChat"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<integer-field
+			name="price"/>
+
+		<integer-field
+			name="value"/>
+
+	</fields>
 
 </model-meta>

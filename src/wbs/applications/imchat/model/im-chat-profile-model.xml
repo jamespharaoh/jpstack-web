@@ -1,4 +1,45 @@
 <model-meta
-	name="imChatProfile">
+	name="imChatProfile"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="imChat"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<enum-field
+			name="state"
+			type="imChatProfileState"/>
+
+		<string-field
+			name="publicName"/>
+
+		<string-field
+			name="publicDescription"/>
+
+		<reference-field
+			name="profileImage"
+			type="media"
+			nullable="yes"/>
+
+	</fields>
 
 </model-meta>

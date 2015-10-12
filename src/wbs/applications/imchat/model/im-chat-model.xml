@@ -1,5 +1,79 @@
 <model-meta
-	name="imChat">
+	name="imChat"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<reference-field
+			type="currency"
+			nullable="yes"/>
+
+		<reference-field
+			type="messageTemplateDatabase"
+			nullable="yes"/>
+
+		<integer-field
+			name="preferredQueueTime"
+			default="0"/>
+
+		<reference-field
+			type="paypalAccount"
+			nullable="yes"/>
+
+		<integer-field
+			name="messageCost"
+			nullable="yes"/>
+
+		<integer-field
+			name="freeMessageLimit"
+			nullable="yes"/>
+
+		<integer-field
+			name="billMessageMinChars"
+			nullable="yes"/>
+
+		<integer-field
+			name="billMessageMaxChars"
+			nullable="yes"/>
+
+		<integer-field
+			name="freeMessageMinChars"
+			nullable="yes"/>
+
+		<integer-field
+			name="freeMessageMaxChars"
+			nullable="yes"/>
+
+	</fields>
+
+	<collections>
+
+		<children-collection
+			name="templates"
+			type="imChatTemplate"/>
+
+	</collections>
 
 	<priv-types>
 
