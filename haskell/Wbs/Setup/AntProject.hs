@@ -240,12 +240,22 @@ writeBuildFile world = do
 
 			makeSimpleTarget "build-framework" [
 				makeMkdir "work/bin",
-				makeJavacTask [
-					sattr "includes" "wbs/framework/**"
-				] [
+				makeJavacTask [] [
+
+					mkelem "include" [
+						sattr "name" "wbs/api/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/console/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/framework/**"
+					] [],
+
 					mkelem "src" [
 						sattr "path" "src"
 					] []
+
 				]
 			],
 

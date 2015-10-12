@@ -1,4 +1,4 @@
-package wbs.clients.apn.chat.user.admin.console;
+package wbs.console.combo;
 
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;

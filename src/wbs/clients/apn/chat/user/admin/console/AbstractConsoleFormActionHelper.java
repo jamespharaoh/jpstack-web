@@ -3,6 +3,7 @@ package wbs.clients.apn.chat.user.admin.console;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import wbs.console.combo.ConsoleFormActionHelper;
 import wbs.console.module.ConsoleManager;
 import wbs.framework.web.Responder;
 

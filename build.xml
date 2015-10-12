@@ -28,7 +28,10 @@
   </target>
   <target name="just-build-framework">
     <mkdir dir="work/bin"/>
-    <javac destdir="work/bin" debug="on" includeantruntime="false" classpathref="classpath" encoding="utf8" includes="wbs/framework/**">
+    <javac destdir="work/bin" debug="on" includeantruntime="false" classpathref="classpath" encoding="utf8">
+      <include name="wbs/api/**"/>
+      <include name="wbs/console/**"/>
+      <include name="wbs/framework/**"/>
       <src path="src"/>
     </javac>
   </target>

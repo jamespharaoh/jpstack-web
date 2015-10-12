@@ -7,7 +7,6 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import wbs.clients.apn.chat.user.admin.console.ConsoleFormActionHelper;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
