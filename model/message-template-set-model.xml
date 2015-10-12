@@ -1,4 +1,41 @@
 <model-meta
-	name="messageTemplateSet">
+	name="messageTemplateSet"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="messageTemplateDatabase"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<!-- statistics -->
+
+		<integer-field
+			name="numTemplates"
+			default="0"/>
+
+	</fields>
+
+	<collections>
+
+		<children-mapping
+			type="messageTemplateValue"
+			map-column="message_template_type_id"
+			map-type="integer"/>
+
+	</collections>
 
 </model-meta>

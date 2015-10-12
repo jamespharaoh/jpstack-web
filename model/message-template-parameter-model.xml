@@ -1,4 +1,31 @@
 <model-meta
-	name="messageTemplateParameter">
+	name="messageTemplateParameter"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="messageTemplateType"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<yes-no-field
+			name="required"/>
+
+		<integer-field
+			name="length"
+			nullable="yes"/>
+
+	</fields>
 
 </model-meta>

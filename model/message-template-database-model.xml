@@ -1,5 +1,34 @@
 <model-meta
-	name="messageTemplateDatabase">
+	name="messageTemplateDatabase"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+	</fields>
+
+	<collections>
+
+		<children-collection
+			type="messageTemplateType"/>
+
+	</collections>
 
 	<priv-types>
 
