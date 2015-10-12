@@ -35,7 +35,8 @@
 			nullable="yes"/>
 
 		<reference-field
-			type="numberFormat"/>
+			type="numberFormat"
+			nullable="yes"/>
 
 		<string-field
 			name="defaultNumbers"
