@@ -133,6 +133,9 @@ public class MessageTemplateFixtureProvider
 			.setName (
 				"Template-1")
 
+			.setDescription (
+				"Template 1")
+
 			.setDefaultValue (
 				"Template 1 Default Value")
 
@@ -158,7 +161,7 @@ public class MessageTemplateFixtureProvider
 				"test")
 
 			.setName (
-				"test")
+				"Test")
 
 			.setMessageTemplateType (
 				messageTemplateType1)
@@ -180,6 +183,9 @@ public class MessageTemplateFixtureProvider
 
 			.setName (
 				"Template-2-Parameter")
+
+			.setDescription (
+				"Template 2 Parameter")
 
 			.setDefaultValue (
 				"My name is {name}")
@@ -206,7 +212,7 @@ public class MessageTemplateFixtureProvider
 				"name")
 
 			.setName (
-				"name")
+				"Name")
 
 			.setMessageTemplateType (
 				messageTemplateType2)
@@ -252,6 +258,9 @@ public class MessageTemplateFixtureProvider
 
 			.setName (
 				"Template-2-GSM")
+
+			.setDescription (
+				"Template 2 GSM")
 
 			.setDefaultValue (
 				"Va/or por d€f€c/o^")
