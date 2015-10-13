@@ -20,11 +20,17 @@
   <target name="javadoc" depends="just-javadoc"/>
   <target name="fixtures" depends="just-build-framework, just-build-meta, just-generate-records, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-fixtures"/>
   <target name="tomcat-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-rest, just-console-test, just-api-test, just-tomcat-test"/>
-  <target name="generate-records" depends="just-generate-records"/>
+  <target name="generate-records" depends="just-build-framework, just-build-meta, just-generate-records"/>
   <target name="just-clean">
-    <delete dir="work/bin"/>
-    <delete dir="work/generated"/>
-    <delete dir="work/test"/>
+    <delete includeEmptyDirs="true" failonerror="false">
+      <fileset dir="work/bin" includes="**/*"/>
+    </delete>
+    <delete includeEmptyDirs="true" failonerror="false">
+      <fileset dir="work/generated" includes="**/*"/>
+    </delete>
+    <delete includeEmptyDirs="true" failonerror="false">
+      <fileset dir="work/test" includes="**/*"/>
+    </delete>
   </target>
   <target name="just-build-framework">
     <mkdir dir="work/bin"/>

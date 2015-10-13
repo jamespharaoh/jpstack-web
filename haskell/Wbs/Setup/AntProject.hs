@@ -149,6 +149,8 @@ writeBuildFile world = do
 				"tomcat-test" ],
 
 			makeComboTarget "generate-records" [
+				"build-framework",
+				"build-meta",
 				"generate-records" ]
 
 		]
@@ -162,6 +164,17 @@ writeBuildFile world = do
 		mkelem "delete" [
 			sattr "dir" dir
 		] []
+
+	let makeDeleteDirContents dir =
+		mkelem "delete" [
+			sattr "includeEmptyDirs" "true",
+			sattr "failonerror" "false"
+		] [
+			mkelem "fileset" [
+				sattr "dir" dir,
+				sattr "includes" "**/*"
+			] []
+		]
 
 	let makeMkdir dir =
 		mkelem "mkdir" [
@@ -180,9 +193,9 @@ writeBuildFile world = do
 	let makeCleanTargets =
 		[
 			makeSimpleTarget "clean" [
-				makeDeleteDir "work/bin",
-				makeDeleteDir "work/generated",
-				makeDeleteDir "work/test"
+				makeDeleteDirContents "work/bin",
+				makeDeleteDirContents "work/generated",
+				makeDeleteDirContents "work/test"
 			]
 		]
 

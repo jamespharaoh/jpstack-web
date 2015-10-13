@@ -19,15 +19,34 @@ writeProject world = do
 	let makeProjects = eelem "projects"
 
 	let makeBuildSpec =
+
 		selem "buildSpec" [
+
+			selem "buildCommand" [
+				telem "name" "org.eclipse.ui.externaltools.ExternalToolBuilder",
+				telem "triggers" "clean,full,incremental",
+				selem "arguments" [
+					selem "dictionary" [
+						telem "key" "LaunchConfigHandle",
+						telem "value" "<project>/.externalToolBuilders/Code generator.launch"
+					],
+					selem "dictionary" [
+						telem "key" "incclean",
+						telem "value" "true"
+					]
+				]
+			],
+
 			selem "buildCommand" [
 				telem "name" "org.eclipse.jdt.core.javabuilder",
 				eelem "arguments"
 			],
+
 			selem "buildCommand" [
 				telem "name" "com.stateofflow.eclipse.metrics.MetricsBuilder",
 				eelem "arguments"
 			]
+
 		]
 
 	let makeNatures =
