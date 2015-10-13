@@ -36,23 +36,11 @@ class QueueLogicImpl
 
 	// dependencies
 
-//	@Inject
-//	ObjectDao objectDao;
-
 	@Inject
 	ObjectManager objectManager;
 
 	@Inject
 	ObjectTypeObjectHelper objectTypeHelper;
-
-//	@Inject
-//	PrivDao privDao;
-//
-//	@Inject
-//	QueueDao queueDao;
-//
-//	@Inject
-//	QueueSubjectObjectHelper queueSubjectDao;
 
 	@Inject
 	QueueObjectHelper queueHelper;
@@ -279,9 +267,22 @@ class QueueLogicImpl
 
 		// sanity check
 
-		if (objectManager.getObjectTypeId (object)
-				!= queueType.getSubjectObjectType ().getId ())
-			throw new IllegalArgumentException ();
+		if (
+			notEqual (
+				objectManager.getObjectTypeId (object),
+				queueType.getSubjectObjectType ().getId ())
+		) {
+
+			throw new IllegalArgumentException (
+				stringFormat (
+					"Queue %s expected subject type %s, got %s",
+					objectManager.objectPath (
+						queue),
+					queueType.getSubjectObjectType ().getCode (),
+					objectManager.getObjectTypeCode (
+						object)));
+
+		}
 
 		// lookup existing
 
