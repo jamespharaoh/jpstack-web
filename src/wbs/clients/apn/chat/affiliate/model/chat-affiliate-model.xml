@@ -1,5 +1,49 @@
 <model-meta
-	name="chatAffiliate">
+	name="chatAffiliate"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="chatScheme"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="brandName"
+			nullable="yes"/>
+
+		<!-- statistics -->
+
+		<integer-field
+			name="numUsers"
+			default="0"/>
+
+	</fields>
+
+	<collections>
+
+		<children-collection
+			join-column="john_chat_affiliate_id"
+			type="chatSchemeKeyword"/>
+
+	</collections>
 
 	<priv-types>
 

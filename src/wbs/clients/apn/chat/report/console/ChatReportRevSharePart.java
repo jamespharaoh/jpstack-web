@@ -31,7 +31,6 @@ import wbs.clients.apn.chat.core.console.ChatReportConsoleHelper;
 import wbs.clients.apn.chat.core.model.ChatMonthCostRec;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
-import wbs.clients.apn.chat.report.model.ChatReportRevShareRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -134,10 +133,10 @@ class ChatReportRevSharePart
 
 	ChatRec chat;
 
-	Map<AffiliateRec,ChatReportRevShareRec> chatReportsByAffiliate;
-	ChatReportRevShareRec totalReport;
+	Map<AffiliateRec,ChatReportRevShareItem> chatReportsByAffiliate;
+	ChatReportRevShareItem totalReport;
 
-	List<ChatReportRevShareRec> chatReportsSorted;
+	List<ChatReportRevShareItem> chatReportsSorted;
 
 	String outputTypeParam;
 
@@ -174,7 +173,7 @@ class ChatReportRevSharePart
 				requestContext.stuffInt ("chatId"));
 
 		totalReport =
-			new ChatReportRevShareRec ()
+			new ChatReportRevShareItem ()
 
 			.setCurrency (
 				chat.getCurrency ())
@@ -200,8 +199,8 @@ class ChatReportRevSharePart
 
 		// sort chat reports
 
-		List<ChatReportRevShareRec> chatReportsTemp =
-			new ArrayList<ChatReportRevShareRec> (
+		List<ChatReportRevShareItem> chatReportsTemp =
+			new ArrayList<ChatReportRevShareItem> (
 				chatReportsByAffiliate.values ());
 
 		Collections.sort (
@@ -251,7 +250,7 @@ class ChatReportRevSharePart
 		// aggregate by affiliate
 
 		chatReportsByAffiliate =
-			new HashMap<AffiliateRec,ChatReportRevShareRec> ();
+			new HashMap<AffiliateRec,ChatReportRevShareItem> ();
 
 		ArrayList<Integer> errorRoutes =
 			new ArrayList<Integer> ();
@@ -266,7 +265,7 @@ class ChatReportRevSharePart
 			AffiliateRec affiliate =
 				messageStats.getMessageStatsId ().getAffiliate ();
 
-			ChatReportRevShareRec currentReport =
+			ChatReportRevShareItem currentReport =
 				getReport (
 					affiliate);
 
@@ -350,7 +349,7 @@ class ChatReportRevSharePart
 				chatUserLogic.getAffiliate (
 					chatUser);
 
-			ChatReportRevShareRec affiliateReport =
+			ChatReportRevShareItem affiliateReport =
 				getReport (
 					affiliate);
 
@@ -397,7 +396,7 @@ class ChatReportRevSharePart
 				chatUserLogic.getAffiliate (
 					chatUser);
 
-			ChatReportRevShareRec affiliateReport =
+			ChatReportRevShareItem affiliateReport =
 				getReport (
 					affiliate);
 
@@ -412,7 +411,7 @@ class ChatReportRevSharePart
 	}
 
 	void addToReport (
-			@NonNull ChatReportRevShareRec report,
+			@NonNull ChatReportRevShareItem report,
 			@NonNull ChatRouteRec chatRoute,
 			@NonNull Optional<ChatRouteNetworkRec> chatRouteNetwork,
 			@NonNull MessageStats statsValue) {
@@ -508,7 +507,7 @@ class ChatReportRevSharePart
 	}
 
 	void addToReport (
-			@NonNull ChatReportRevShareRec report,
+			@NonNull ChatReportRevShareItem report,
 			@NonNull ChatUserCreditRec credit) {
 
 		report
@@ -519,10 +518,10 @@ class ChatReportRevSharePart
 
 	}
 
-	ChatReportRevShareRec getReport (
+	ChatReportRevShareItem getReport (
 			@NonNull AffiliateRec affiliate) {
 
-		ChatReportRevShareRec existingReport =
+		ChatReportRevShareItem existingReport =
 			chatReportsByAffiliate.get (
 				affiliate);
 
@@ -533,7 +532,7 @@ class ChatReportRevSharePart
 			objectManager.getParent (
 				affiliate);
 
-		ChatReportRevShareRec newReport;
+		ChatReportRevShareItem newReport;
 
 		if (affiliateParent instanceof ChatAffiliateRec) {
 
@@ -542,7 +541,7 @@ class ChatReportRevSharePart
 				affiliateParent;
 
 			newReport =
-				new ChatReportRevShareRec ()
+				new ChatReportRevShareItem ()
 
 				.setAffiliate (
 					affiliate)
@@ -565,7 +564,7 @@ class ChatReportRevSharePart
 				affiliateParent;
 
 			newReport =
-				new ChatReportRevShareRec ()
+				new ChatReportRevShareItem ()
 
 				.setAffiliate (
 					affiliate)
@@ -584,7 +583,7 @@ class ChatReportRevSharePart
 		} else if (affiliateParent instanceof RootRec) {
 
 			newReport =
-				new ChatReportRevShareRec ()
+				new ChatReportRevShareItem ()
 
 				.setAffiliate (
 					affiliate)
@@ -652,7 +651,7 @@ class ChatReportRevSharePart
 				chatUserLogic.getAffiliate (
 					chatMessage.getToUser ());
 
-			ChatReportRevShareRec affiliateReport =
+			ChatReportRevShareItem affiliateReport =
 				getReport (
 					affiliate);
 
@@ -728,7 +727,7 @@ class ChatReportRevSharePart
 		// row
 
 		for (
-			ChatReportRevShareRec chatReport
+			ChatReportRevShareItem chatReport
 				: chatReportsSorted
 		) {
 

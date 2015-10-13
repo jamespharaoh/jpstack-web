@@ -27,6 +27,10 @@ class ChildrenCollectionSpec
 		required = true)
 	String typeName;
 
+	@DataAttribute (
+		value = "join-column")
+	String joinColumnName;
+
 	@DataAttribute
 	String where;
 

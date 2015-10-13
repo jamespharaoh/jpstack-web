@@ -583,11 +583,17 @@ class ModelRecordGenerator {
 
 				javaWriter.write (
 					"\t\t\t\tget%s (),\n",
-					capitalise (parentField.typeName ()));
+					capitalise (
+						ifNull (
+							parentField.name (),
+							parentField.typeName ())));
 
 				javaWriter.write (
 					"\t\t\t\tother.get%s ())\n",
-					capitalise (parentField.typeName ()));
+					capitalise (
+						ifNull (
+							parentField.name (),
+							parentField.typeName ())));
 
 				javaWriter.write (
 					"\n");
@@ -659,21 +665,23 @@ class ModelRecordGenerator {
 			if (indexField != null) {
 
 				javaWriter.write (
+					"\t\t\t.append (\n");
 
-					"\t\t\t.append (\n",
-
+				javaWriter.write (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
 						ifNull (
 							indexField.name (),
-							"index")),
+							"index")));
 
+				javaWriter.write (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
 						ifNull (
 							indexField.name (),
-							"index")),
+							"index")));
 
+				javaWriter.write (
 					"\n");
 
 			}
@@ -681,21 +689,23 @@ class ModelRecordGenerator {
 			if (identityReferenceField != null) {
 
 				javaWriter.write (
+					"\t\t\t.append (\n");
 
-					"\t\t\t.append (\n",
-
+				javaWriter.write (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
 						ifNull (
 							identityReferenceField.name (),
-							identityReferenceField.typeName ())),
+							identityReferenceField.typeName ())));
 
+				javaWriter.write (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
 						ifNull (
 							identityReferenceField.name (),
-							identityReferenceField.typeName ())),
+							identityReferenceField.typeName ())));
 
+				javaWriter.write (
 					"\n");
 
 			}
@@ -703,17 +713,19 @@ class ModelRecordGenerator {
 			if (identityIntegerField != null) {
 
 				javaWriter.write (
+					"\t\t\t.append (\n");
 
-					"\t\t\t.append (\n",
-
+				javaWriter.write (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
-						identityIntegerField.name ()),
+						identityIntegerField.name ()));
 
+				javaWriter.write (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
-						identityIntegerField.name ()),
+						identityIntegerField.name ()));
 
+				javaWriter.write (
 					"\n");
 
 			}
@@ -721,13 +733,15 @@ class ModelRecordGenerator {
 		} else {
 
 			javaWriter.write (
+				"\t\t\t.append (\n");
 
-				"\t\t\t.append (\n",
+			javaWriter.write (
+				"\t\t\t\tother.getId (),\n");
 
-				"\t\t\t\tother.getId ())\n",
+			javaWriter.write (
+				"\t\t\t\tgetId ())\n");
 
-				"\t\t\t\tgetId (),\n",
-
+			javaWriter.write (
 				"\n");
 
 		}

@@ -123,10 +123,17 @@ class ChatContactObjectHelperImplementation
 		chatContact =
 			chatContactHelper.insert (
 				new ChatContactRec ()
-					.setChat (fromUser.getChat ())
-					.setFromUser (fromUser)
-					.setToUser (toUser))
-					.setInverseChatContact (inverseChatContact);
+
+			.setFromUser (
+				fromUser)
+
+			.setToUser (
+				toUser)
+
+			.setInverseChatContact (
+				inverseChatContact)
+
+		);
 
 		chatContactCache.byUserIds.put (
 			cacheKey,
@@ -137,7 +144,9 @@ class ChatContactObjectHelperImplementation
 		if (inverseChatContact != null) {
 
 			inverseChatContact
-				.setInverseChatContact (chatContact);
+
+				.setInverseChatContact (
+					chatContact);
 
 		}
 

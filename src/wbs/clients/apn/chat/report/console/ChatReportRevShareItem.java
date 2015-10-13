@@ -1,4 +1,4 @@
-package wbs.clients.apn.chat.report.model;
+package wbs.clients.apn.chat.report.console;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,8 +17,8 @@ import wbs.platform.currency.model.CurrencyRec;
 @EqualsAndHashCode
 @ToString
 public
-class ChatReportRevShareRec
-	implements CommonRecord<ChatReportRevShareRec> {
+class ChatReportRevShareItem
+	implements CommonRecord<ChatReportRevShareItem> {
 
 	Integer id;
 	AffiliateRec affiliate;
@@ -78,10 +78,10 @@ class ChatReportRevShareRec
 	@Override
 	public
 	int compareTo (
-			Record<ChatReportRevShareRec> otherRecord) {
+			Record<ChatReportRevShareItem> otherRecord) {
 
-		ChatReportRevShareRec other =
-			(ChatReportRevShareRec) otherRecord;
+		ChatReportRevShareItem other =
+			(ChatReportRevShareItem) otherRecord;
 
 		return new CompareToBuilder ()
 

@@ -29,7 +29,7 @@
 
 	<field-set
 		name="simpleReportResults"
-		class="wbs.clients.apn.chat.report.model.ChatReportRevShareRec">
+		class="wbs.clients.apn.chat.report.console.ChatReportRevShareItem">
 
 		<text-field
 			name="path"

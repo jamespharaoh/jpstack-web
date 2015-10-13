@@ -1,6 +1,7 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.io.IOException;
 
@@ -55,6 +56,11 @@ class ParentFieldWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
+		String fieldName =
+			ifNull (
+				spec.name (),
+				spec.typeName ());
+
 		javaWriter.write (
 			"\t@ParentField\n");
 
@@ -62,7 +68,7 @@ class ParentFieldWriter {
 			"\t%s.model.%sRec %s;\n",
 			fieldTypePlugin.packageName (),
 			capitalise (spec.typeName ()),
-			spec.typeName ());
+			fieldName);
 
 		javaWriter.write (
 			"\n");

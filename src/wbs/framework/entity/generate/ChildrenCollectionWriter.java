@@ -73,6 +73,15 @@ class ChildrenCollectionWriter {
 			.name (
 				"CollectionField");
 
+		if (spec.joinColumnName () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"key",
+				"\"%s\"",
+				spec.joinColumnName ().replace ("\"", "\\\""));
+
+		}
+
 		if (spec.where () != null) {
 
 			annotationWriter.addAttributeFormat (

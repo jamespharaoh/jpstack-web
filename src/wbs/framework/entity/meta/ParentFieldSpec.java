@@ -15,6 +15,9 @@ public
 class ParentFieldSpec
 	implements ModelFieldSpec {
 
+	@DataAttribute
+	String name;
+
 	@DataAttribute (
 		value = "type",
 		required = true)
