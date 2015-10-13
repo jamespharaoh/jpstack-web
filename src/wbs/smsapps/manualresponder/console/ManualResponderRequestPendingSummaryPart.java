@@ -144,7 +144,7 @@ class ManualResponderRequestPendingSummaryPart
 
 			.add (
 				ConsoleApplicationScriptRef.javascript (
-					"/js/manual-responder-pending-summary.js"))
+					"/js/manual-responder.js"))
 
 			.build ();
 

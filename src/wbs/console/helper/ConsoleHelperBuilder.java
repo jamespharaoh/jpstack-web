@@ -93,6 +93,12 @@ class ConsoleHelperBuilder {
 	public
 	ConsoleHelper<?> build () {
 
+		Class<?> objectClass =
+			consoleHelperProvider.objectClass ();
+
+		String modelPackageName =
+			objectClass.getPackage ().getName ();
+
 		Class<?> proxyClass =
 			Proxy.getProxyClass (
 				consoleHelperClass ().getClassLoader (),
@@ -132,7 +138,8 @@ class ConsoleHelperBuilder {
 
 			String extraInterfaceName =
 				stringFormat (
-					"%sObjectHelperMethods",
+					"%s.%sObjectHelperMethods",
+					modelPackageName,
 					capitalise (
 						consoleHelperProvider.objectName ()));
 

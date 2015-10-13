@@ -69,6 +69,10 @@ class ManualResponderLogicImpl
 			ManualResponderRequestRec request,
 			ManualResponderTemplateRec template) {
 
+		if (template.getMinimumMessageParts () <= 1) {
+			return 1;
+		}
+
 		boolean shortMessageParts =
 			request
 				.getNumber ()

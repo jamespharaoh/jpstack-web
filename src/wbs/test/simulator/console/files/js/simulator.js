@@ -65,11 +65,11 @@ $(function () {
 				url: pollUrl
 			})
 
-			.done (function (events) {
+			.done (function (response) {
 
-				for (var i = 0; i < events.length; i++) {
+				for (var i = 0; i < response.events.length; i++) {
 
-					var event = events [i];
+					var event = response.events [i];
 
 					var dataTd, actionsTd;
 

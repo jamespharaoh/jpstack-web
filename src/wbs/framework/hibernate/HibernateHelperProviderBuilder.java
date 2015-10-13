@@ -14,6 +14,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import org.hibernate.LockOptions;
+import org.hibernate.ReplicationMode;
 import org.hibernate.Session;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -1038,6 +1039,28 @@ class HibernateHelperProviderBuilder {
 
 			session.save (
 				object);
+
+			objectHooks.afterInsert (
+				object);
+
+			return object;
+
+		}
+
+		@Override
+		public
+		Record insertSpecial (
+				Record object) {
+
+			objectHooks.beforeInsert (
+				object);
+
+			Session session =
+				hibernateDatabase.currentSession ();
+
+			session.replicate (
+				object,
+				ReplicationMode.EXCEPTION);
 
 			objectHooks.afterInsert (
 				object);

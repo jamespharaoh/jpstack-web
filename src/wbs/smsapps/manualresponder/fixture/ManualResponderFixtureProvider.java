@@ -184,7 +184,7 @@ class ManualResponderFixtureProvider
 			.setCustomisable (
 				false)
 
-			.setSingleTemplate (
+			.setDefaultText (
 				"This is a fixed message")
 
 			.setMaximumMessages (
@@ -192,6 +192,9 @@ class ManualResponderFixtureProvider
 
 			.setMinimumMessageParts (
 				1)
+
+			.setNumber (
+				"free")
 
 			.setRouter (
 				routerHelper.findByCode (
@@ -239,6 +242,9 @@ class ManualResponderFixtureProvider
 			.setMinimumMessageParts (
 				1)
 
+			.setNumber (
+				"bill")
+
 			.setRouter (
 				routerHelper.findByCode (
 					routeHelper.findByCode (
@@ -285,6 +291,9 @@ class ManualResponderFixtureProvider
 			.setMinimumMessageParts (
 				2)
 
+			.setNumber (
+				"bill")
+
 			.setRouter (
 				routerHelper.findByCode (
 					routeHelper.findByCode (
@@ -321,6 +330,9 @@ class ManualResponderFixtureProvider
 
 			.setMinimumMessageParts (
 				1)
+
+			.setNumber (
+  				"free")
 
 			.setRouter (
 				routerHelper.findByCode (

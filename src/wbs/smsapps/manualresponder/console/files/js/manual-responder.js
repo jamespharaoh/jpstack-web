@@ -92,6 +92,11 @@ $(function () {
 
 				template.find (".template-text").show ().focus ();
 
+				template.find (".template-text").each (function () {
+					var length = $(this).val ().length;
+					this.setSelectionRange (length, length);
+				});
+
 				template.find (".template-text").css ("width",
 					+ template.find (".template-text").parent ().innerWidth ()
 					+ template.find (".template-text").innerWidth ()
@@ -302,6 +307,10 @@ $(function () {
 			};
 
 			template.click (selectTemplate);
+
+			if (template.find (".template-radio").prop ("checked")) {
+				selectTemplate.apply (template);
+			}
 
 			template.find (".template-text").keyup (updateCharCount);
 			template.find (".template-text").keydown (updateCharCount);

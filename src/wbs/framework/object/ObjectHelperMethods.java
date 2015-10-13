@@ -114,6 +114,10 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 			RecordTypeAgain object);
 
 	<RecordTypeAgain extends Record<?>>
+	RecordTypeAgain insertSpecial (
+			RecordTypeAgain object);
+
+	<RecordTypeAgain extends Record<?>>
 	RecordTypeAgain update (
 			RecordTypeAgain object);
 

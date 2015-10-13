@@ -22,6 +22,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.Responder;
@@ -65,6 +66,9 @@ class SimulatorSessionCreateEventAction
 	Database database;
 
 	@Inject
+	ExceptionLogger exceptionLogger;
+
+	@Inject
 	InboxLogic inboxLogic;
 
 	@Inject
@@ -100,6 +104,8 @@ class SimulatorSessionCreateEventAction
 	@Inject
 	TextObjectHelper textHelper;
 
+	// prototype dependencies
+
 	@Inject
 	Provider<JsonResponder> jsonResponder;
 
@@ -134,20 +140,48 @@ class SimulatorSessionCreateEventAction
 		} catch (AjaxException error) {
 
 			return jsonResponder.get ()
+
 				.value (
 					ImmutableMap.<Object,Object>builder ()
-						.put ("success", false)
-						.put ("error", error.message)
-						.build ());
 
-		} catch (RuntimeException error) {
+					.put (
+						"success",
+						false)
+
+					.put (
+						"error",
+						error.message)
+
+					.build ()
+
+				);
+
+		} catch (RuntimeException exception) {
+
+			exceptionLogger.logThrowable (
+				"console",
+				requestContext.requestPath (),
+				exception,
+				Optional.of (requestContext.userId ()),
+				false);
 
 			return jsonResponder.get ()
+
 				.value (
 					ImmutableMap.<Object,Object>builder ()
-						.put ("success", false)
-						.put ("error", "internal error")
-						.build ());
+
+					.put (
+						"success",
+						false)
+
+					.put (
+						"error",
+						"internal error")
+
+					.build ()
+
+				);
+
 		}
 
 	}
@@ -266,7 +300,9 @@ class SimulatorSessionCreateEventAction
 				transaction.now ())
 
 			.setData (
-				JSONValue.toJSONString (data)));
+				JSONValue.toJSONString (data))
+
+		);
 
 		// associate number with session
 
@@ -328,11 +364,24 @@ class SimulatorSessionCreateEventAction
 
 		Object data =
 			ImmutableMap.<String,Object>builder ()
-				.put ("deliveryReport", ImmutableMap.<String,Object>builder ()
-					.put ("messageId", messageId)
-					.put ("success", success)
-					.build ())
-				.build ();
+
+			.put (
+				"deliveryReport",
+				ImmutableMap.<String,Object>builder ()
+
+				.put (
+					"messageId",
+					messageId)
+
+				.put (
+					"success",
+					success)
+
+				.build ()
+
+			)
+
+			.build ();
 
 		// create event
 
@@ -356,10 +405,17 @@ class SimulatorSessionCreateEventAction
 		transaction.commit ();
 
 		return jsonResponder.get ()
+
 			.value (
 				ImmutableMap.<Object,Object>builder ()
-					.put ("success", true)
-					.build ());
+
+				.put (
+					"success",
+					true)
+
+				.build ()
+
+			);
 
 	}
 

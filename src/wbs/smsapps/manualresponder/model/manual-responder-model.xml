@@ -140,7 +140,7 @@
 		<queue-type
 			name="Default"
 			description="Pending requests for a manual-responder service"
-			subject="manualResponderNumber"
+			subject="number"
 			ref="manualResponderRequest"/>
 
 	</queue-types>

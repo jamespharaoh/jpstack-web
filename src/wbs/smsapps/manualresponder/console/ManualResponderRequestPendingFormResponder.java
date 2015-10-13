@@ -325,7 +325,7 @@ class ManualResponderRequestPendingFormResponder
 			"<tr>\n",
 			"<th style=\"width: 0\">&nbsp;</th>\n",
 			"<th style=\"width: 0\">Template</th>\n",
-			"<th style=\"width: 0\"Charge</th>\n",
+			"<th style=\"width: 0\">Charge</th>\n",
 			"<th>Message</th>\n",
 			"<th style=\"width: 0\">Send</th>\n",
 			"</tr>\n");
@@ -336,12 +336,14 @@ class ManualResponderRequestPendingFormResponder
 		int selectedTemplateId = -1;
 
 		String templateIdString =
-			requestContext.parameter ("template_id");
+			requestContext.parameter (
+				"template-id");
 
 		if (templateIdString != null) {
 
 			selectedTemplateId =
-				Integer.parseInt (templateIdString);
+				Integer.parseInt (
+					templateIdString);
 
 		}
 
@@ -452,7 +454,7 @@ class ManualResponderRequestPendingFormResponder
 
 				">%h</textarea><br>\n",
 				requestContext.parameter (
-					"message_" + template.getId (),
+					"message-" + template.getId (),
 					template.getDefaultText ()),
 
 				"<span",
@@ -615,17 +617,20 @@ class ManualResponderRequestPendingFormResponder
 		printFormat (
 			"<tr",
 			" class=\"template\"",
-			">\n",
+			">\n");
 
+		printFormat (
 			"<td><input",
 			" class=\"template-radio\"",
 			" type=\"radio\"",
 			" name=\"template-id\"",
 			" value=\"ignore\"",
-			"></td>\n",
+			"></td>\n");
 
-			"<td colspan=\"3\">&nbsp;</td>\n",
+		printFormat (
+			"<td colspan=\"3\">&nbsp;</td>\n");
 
+		printFormat (
 			"<td><input",
 			" class=\"template-submit\"",
 			" type=\"submit\"",
@@ -634,8 +639,9 @@ class ManualResponderRequestPendingFormResponder
 				? "done sending"
 				: "ignore",
 			" disabled=\"true\"",
-			"></td>\n",
+			"></td>\n");
 
+		printFormat (
 			"</tr>\n");
 
 	}

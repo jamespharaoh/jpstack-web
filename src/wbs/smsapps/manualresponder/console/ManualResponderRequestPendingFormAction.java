@@ -1,5 +1,6 @@
 package wbs.smsapps.manualresponder.console;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -109,13 +110,17 @@ class ManualResponderRequestPendingFormAction
 	Responder goReal () {
 
 		int manualResponderRequestId =
-			requestContext.stuffInt ("manualResponderRequestId");
+			requestContext.stuffInt (
+				"manualResponderRequestId");
 
 		String templateIdStr =
-			requestContext.parameter ("template_id");
+			requestContext.parameter (
+				"template-id");
 
 		boolean ignore =
-			templateIdStr.equals ("ignore");
+			equal (
+				templateIdStr,
+				"ignore");
 
 		if (ignore) {
 
@@ -177,7 +182,7 @@ class ManualResponderRequestPendingFormAction
 
 	Responder goSend (
 			int manualResponderRequestId,
-			String templateIdStr) {
+			String templateIdString) {
 
 		boolean sendAgain =
 			false;
@@ -185,13 +190,14 @@ class ManualResponderRequestPendingFormAction
 		// get params
 
 		int templateId =
-			Integer.parseInt (templateIdStr);
+			Integer.parseInt (
+				templateIdString);
 
 		// get message
 
 		String messageParam =
 			requestContext.parameter (
-				"message_" + templateId);
+				"message-" + templateId);
 
 		// begin transaction
 
@@ -251,6 +257,15 @@ class ManualResponderRequestPendingFormAction
 			template.getCustomisable ()
 				? messageParam
 				: template.getDefaultText ();
+
+		if (! Gsm.isGsm (messageString)) {
+
+			requestContext.addError (
+				"Message contains characters which cannot be sent via SMS");
+
+			return null;
+
+		}
 
 		TextRec messageText =
 			textHelper.findOrCreate (
@@ -364,7 +379,7 @@ class ManualResponderRequestPendingFormAction
 						stringFormat (
 							"Message is too long, contains %s chars, ",
 							actualLength,
-							"limit is %s",
+							"maximum is %s",
 							maxLength));
 
 					return null;
@@ -377,7 +392,7 @@ class ManualResponderRequestPendingFormAction
 						stringFormat (
 							"Message is too short, contains %s chars, ",
 							actualLength,
-							"limit is %s",
+							"minimum is %s",
 							minLength));
 
 					return null;

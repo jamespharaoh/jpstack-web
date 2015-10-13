@@ -83,6 +83,10 @@ interface ObjectHelperProvider {
 			RecordType object);
 
 	<RecordType extends Record<?>>
+	RecordType insertSpecial (
+			RecordType object);
+
+	<RecordType extends Record<?>>
 	RecordType update (
 			RecordType object);
 

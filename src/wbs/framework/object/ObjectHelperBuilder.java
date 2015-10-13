@@ -851,6 +851,46 @@ class ObjectHelperBuilder {
 
 			@Override
 			public
+			Record insertSpecial (
+					@NonNull Record object) {
+
+				if (
+					! objectClass ().isInstance (
+						object)
+				) {
+
+					throw new ClassCastException (
+						stringFormat (
+							"Can't insert %s as %s",
+							object.getClass ().getSimpleName (),
+							objectClass ().getSimpleName ()));
+
+				}
+
+				objectHelperProvider.insertSpecial (
+					object);
+
+				for (
+					ObjectHelper childObjectHelper
+						: list
+				) {
+
+					ObjectHelperProvider childObjectHelperProvider =
+						childObjectHelper.objectHelperProvider ();
+
+					childObjectHelperProvider.createSingletons (
+						childObjectHelper,
+						objectHelper,
+						object);
+
+				}
+
+				return object;
+
+			}
+
+			@Override
+			public
 			Record update (
 					@NonNull Record object) {
 

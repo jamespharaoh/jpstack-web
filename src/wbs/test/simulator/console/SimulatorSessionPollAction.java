@@ -3,7 +3,9 @@ package wbs.test.simulator.console;
 import static wbs.framework.utils.etc.Misc.toInteger;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -18,8 +20,8 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.web.JsonResponder;
 import wbs.framework.web.Responder;
-import wbs.platform.text.web.TextResponder;
 import wbs.test.simulator.model.SimulatorEventObjectHelper;
 import wbs.test.simulator.model.SimulatorEventRec;
 
@@ -30,11 +32,13 @@ public
 class SimulatorSessionPollAction
 	extends ConsoleAction {
 
-	@Inject
-	ConsoleRequestContext requestContext;
+	// dependencies
 
 	@Inject
 	Database database;
+
+	@Inject
+	ConsoleRequestContext requestContext;
 
 	@Inject
 	SimulatorEventObjectHelper simulatorEventHelper;
@@ -42,14 +46,20 @@ class SimulatorSessionPollAction
 	@Inject
 	TimeFormatter timeFormatter;
 
+	// prototype dependencies
+
 	@Inject
-	Provider<TextResponder> textResponder;
+	Provider<JsonResponder> jsonResponderProvider;
+
+	// details
 
 	@Override
 	protected
 	Responder backupResponder () {
 		return null;
 	}
+
+	// implementation
 
 	@Override
 	protected
@@ -73,52 +83,61 @@ class SimulatorSessionPollAction
 
 		// create response
 
-		List<Object> ret =
+		Map<String,Object> responseObject =
+			new LinkedHashMap<String,Object> ();
+
+		List<Object> eventResponses =
 			new ArrayList<Object> ();
 
-		for (SimulatorEventRec event : events) {
+		for (
+			SimulatorEventRec event
+				: events
+		) {
 
-			Object eventData =
-				JSONValue.parse (event.getData ());
-
-			ret.add (
+			eventResponses.add (
 				ImmutableMap.<String,Object>builder ()
 
-					.put (
-						"id",
-						event.getId ())
+				.put (
+					"id",
+					event.getId ())
 
-					.put (
-						"date",
-						timeFormatter.instantToDateStringShort (
-							timeFormatter.defaultTimezone (),
-							event.getTimestamp ()))
+				.put (
+					"date",
+					timeFormatter.instantToDateStringShort (
+						timeFormatter.defaultTimezone (),
+						event.getTimestamp ()))
 
-					.put (
-						"time",
-						timeFormatter.instantToTimeString (
-							timeFormatter.defaultTimezone (),
-							event.getTimestamp ()))
+				.put (
+					"time",
+					timeFormatter.instantToTimeString (
+						timeFormatter.defaultTimezone (),
+						event.getTimestamp ()))
 
-					.put (
-						"type",
-						event.getType ())
+				.put (
+					"type",
+					event.getType ())
 
-					.put (
-						"data",
-						eventData)
+				.put (
+					"data",
+					JSONValue.parse (
+						event.getData ()))
 
-					.build ());
+				.build ()
+
+			);
 
 		}
 
+		responseObject.put (
+			"events",
+			eventResponses);
+
 		// return it
 
-		String responseText =
-			JSONValue.toJSONString (ret);
+		return jsonResponderProvider.get ()
 
-		return textResponder.get ()
-			.text (responseText);
+			.value (
+				responseObject);
 
 	}
 
