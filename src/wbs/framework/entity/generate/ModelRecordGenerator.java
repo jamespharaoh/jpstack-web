@@ -200,6 +200,7 @@ class ModelRecordGenerator {
 			wbs.framework.record.TypeRecord.class,
 
 			org.joda.time.Instant.class,
+			org.joda.time.LocalDate.class,
 
 			org.jadira.usertype.dateandtime.joda.PersistentInstantAsString.class,
 			org.jadira.usertype.dateandtime.joda.PersistentInstantAsTimestamp.class

@@ -1,4 +1,27 @@
 <model-meta
-	name="chatUserBillLog">
+	name="chatUserBillLog"
+	type="event">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="chatUser"/>
+
+		<!-- data -->
+
+		<timestamp-field
+			name="timestamp"
+			column-type="postgresql"/>
+
+		<reference-field
+			type="user"/>
+
+	</fields>
 
 </model-meta>

@@ -169,7 +169,8 @@ class ConsoleHelperBuilder {
 
 		String daoMethodsInterfaceName =
 			stringFormat (
-				"%sDaoMethods",
+				"%s.%sDaoMethods",
+				modelPackageName,
 				capitalise (
 					consoleHelperProvider.objectName ()));
 

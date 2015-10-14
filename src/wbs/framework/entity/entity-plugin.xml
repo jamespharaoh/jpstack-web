@@ -15,6 +15,7 @@
 		<bean class="meta.EnumFieldSpec"/>
 		<bean class="meta.ForeignIdFieldSpec"/>
 		<bean class="meta.GeneratedIdFieldSpec"/>
+		<bean class="meta.IdentityDateFieldSpec"/>
 		<bean class="meta.IdentityIntegerFieldSpec"/>
 		<bean class="meta.IdentityReferenceFieldSpec"/>
 		<bean class="meta.IndexFieldSpec"/>
@@ -49,6 +50,7 @@
 		<bean class="generate.EnumFieldWriter"/>
 		<bean class="generate.ForeignIdFieldWriter"/>
 		<bean class="generate.GeneratedIdFieldWriter"/>
+		<bean class="generate.IdentityDateFieldWriter"/>
 		<bean class="generate.IdentityIntegerFieldWriter"/>
 		<bean class="generate.IdentityReferenceFieldWriter"/>
 		<bean class="generate.IndexFieldWriter"/>
