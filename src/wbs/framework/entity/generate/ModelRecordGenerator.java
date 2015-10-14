@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -89,6 +90,26 @@ class ModelRecordGenerator {
 				"%s/%s.java",
 				directory,
 				className);
+
+		String sourceDirectory =
+			stringFormat (
+				"src/%s/model",
+				plugin.packageName ().replace ('.', '/'));
+
+		String sourceFilename =
+			stringFormat (
+				"%s/%s-model.xml",
+				sourceDirectory,
+				camelToHyphen (
+					modelMeta.name ()));
+
+		if (
+			FileUtils.isFileNewer (
+				new File (filename),
+				new File (sourceFilename))
+		) {
+			return;
+		}
 
 		@Cleanup
 		OutputStream outputStream =

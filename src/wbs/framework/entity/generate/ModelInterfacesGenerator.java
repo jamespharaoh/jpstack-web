@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -46,6 +47,7 @@ class ModelInterfacesGenerator {
 	String consoleHelperName;
 
 	String sourceModelDirectoryName;
+	String sourceModelFilename;
 
 	String targetModelDirectoryName;
 	String targetConsoleDirectoryName;
@@ -133,6 +135,13 @@ class ModelInterfacesGenerator {
 				"src/%s",
 				modelPackageName.replace ('.', '/'));
 
+		sourceModelFilename =
+			stringFormat (
+				"%s/%s-model.xml",
+				sourceModelDirectoryName,
+				camelToHyphen (
+					modelMeta.name ()));
+
 		targetModelDirectoryName =
 			stringFormat (
 				"work/generated/%s",
@@ -202,6 +211,14 @@ class ModelInterfacesGenerator {
 	void generateObjectHelper ()
 		throws IOException {
 
+		if (
+			FileUtils.isFileNewer (
+				new File (objectHelperFilename),
+				new File (sourceModelFilename))
+		) {
+			return;
+		}
+
 		InterfaceWriter objectHelperWriter =
 			new InterfaceWriter ()
 
@@ -263,6 +280,14 @@ class ModelInterfacesGenerator {
 			return;
 		}
 
+		if (
+			FileUtils.isFileNewer (
+				new File (daoFilename),
+				new File (sourceModelFilename))
+		) {
+			return;
+		}
+
 		// write dao
 
 		InterfaceWriter daoWriter =
@@ -297,6 +322,14 @@ class ModelInterfacesGenerator {
 	private
 	void generateConsoleHelper ()
 		throws IOException {
+
+		if (
+			FileUtils.isFileNewer (
+				new File (consoleHelperFilename),
+				new File (sourceModelFilename))
+		) {
+			return;
+		}
 
 		InterfaceWriter consoleHelperWriter =
 			new InterfaceWriter ()
