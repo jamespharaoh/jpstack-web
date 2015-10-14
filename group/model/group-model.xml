@@ -27,7 +27,7 @@
 
 		<associative-collection
 			type="priv"
-			table="user_priv"/>
+			table="group_priv"/>
 
 	</collections>
 
