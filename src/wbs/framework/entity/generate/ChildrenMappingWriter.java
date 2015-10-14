@@ -103,6 +103,23 @@ class ChildrenMappingWriter {
 				fieldTypePlugin.packageName (),
 				fieldTypeName);
 
+		} else if (
+			equal (
+				spec.mapType (),
+				"string")
+		) {
+
+			javaWriter.write (
+				"\tMap<String,%s.model.%s> %s =\n",
+				fieldTypePlugin.packageName (),
+				fieldTypeName,
+				fieldName);
+
+			javaWriter.write (
+				"\t\tnew LinkedHashMap<String,%s.model.%s> ();\n",
+				fieldTypePlugin.packageName (),
+				fieldTypeName);
+
 		} else {
 
 			throw new RuntimeException ();

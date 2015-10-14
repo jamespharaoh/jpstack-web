@@ -1,4 +1,30 @@
 <model-meta
-	name="chatProfileField">
+	name="chatProfileField"
+	type="ephemeral">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="chat"/>
+
+		<code-field/>
+
+	</fields>
+
+	<collections>
+
+		<children-mapping
+			name="values"
+			map-column="code"
+			map-type="string"
+			type="chatProfileFieldValue"/>
+
+	</collections>
 
 </model-meta>

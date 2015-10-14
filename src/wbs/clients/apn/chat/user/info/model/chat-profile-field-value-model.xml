@@ -1,4 +1,20 @@
 <model-meta
-	name="chatProfileFieldValue">
+	name="chatProfileFieldValue"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="chatProfileField"/>
+
+		<code-field/>
+
+	</fields>
 
 </model-meta>
