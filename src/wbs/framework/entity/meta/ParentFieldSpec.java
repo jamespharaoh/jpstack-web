@@ -23,4 +23,8 @@ class ParentFieldSpec
 		required = true)
 	String typeName;
 
+	@DataAttribute (
+		value = "column")
+	String columnName;
+
 }

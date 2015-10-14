@@ -206,7 +206,8 @@ class ManualResponderReportOperatorPart
 			"<table class=\"list\">\n");
 
 		printFormat (
-			"<th>Operator</th><th>Count</th>");
+			"<th>Operator</th>\n",
+			"<th>Count</th>");
 
 		/*formFieldLogic.outputTableHeadings (
 				out,

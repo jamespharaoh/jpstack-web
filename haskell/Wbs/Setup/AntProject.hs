@@ -630,7 +630,7 @@ writeBuildFile world = do
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
 					makeArgValue "data,model-meta,model-generate,utils",
-					makeArgValue "test",
+					makeArgValue "build",
 					makeArgValue "wbs.framework.entity.generate.ModelGeneratorTool",
 					makeArgValue "generateModels"
 				]

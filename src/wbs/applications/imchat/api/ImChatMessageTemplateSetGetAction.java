@@ -100,8 +100,8 @@ class ImChatMessageTemplateSetGetAction
 						"imChatId")));
 
 		MessageTemplateSetRec messageTemplateSet =
-			messageTemplateSetHelper.findByCode(
-				imChat.getMessageTemplateDatabase(),
+			messageTemplateSetHelper.findByCode (
+				imChat.getMessageTemplateDatabase (),
 				request.code ());
 
 		if (

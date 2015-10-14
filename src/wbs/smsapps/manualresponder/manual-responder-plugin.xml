@@ -43,10 +43,6 @@
 		<bean class="daemon.ManualResponderDelivery"/>
 	</layer>
 
-	<layer name="logic">
-		<bean class="logic.ManualResponderLogicImpl"/>
-	</layer>
-
 	<fixtures>
 		<fixture name="manualResponder"/>
 	</fixtures>

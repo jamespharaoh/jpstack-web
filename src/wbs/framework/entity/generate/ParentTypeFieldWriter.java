@@ -10,6 +10,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.ParentTypeFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
@@ -38,17 +39,38 @@ class ParentTypeFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		// TODO this should not be hard-coded
+		// write field annotation
+
+		AnnotationWriter annotationWriter =
+			new AnnotationWriter ()
+
+			.name (
+				"ParentTypeField");
+
+		if (spec.columnName () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"column",
+				"\"%s\"",
+				spec.columnName ().replace ("\"", "\\\""));
+
+		}
+
+		annotationWriter.write (
+			javaWriter,
+			"\t");
+
+		// write field
+
+		// TODO this class name should not be hard-coded
 
 		javaWriter.write (
-
-			"\t@ParentTypeField\n",
-
 			"\twbs.platform.object.core.model.ObjectTypeRec %s;\n",
 			ifNull (
 				spec.name (),
-				"parentType"),
+				"parentType"));
 
+		javaWriter.write (
 			"\n");
 
 	}

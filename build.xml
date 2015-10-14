@@ -931,7 +931,7 @@
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="data,model-meta,model-generate,utils"/>
-      <arg value="test"/>
+      <arg value="build"/>
       <arg value="wbs.framework.entity.generate.ModelGeneratorTool"/>
       <arg value="generateModels"/>
     </java>

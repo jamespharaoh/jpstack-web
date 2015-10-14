@@ -150,7 +150,7 @@ class AffiliateTypeBuilder {
 				stringFormat (
 					"INSERT INTO affiliate_type (",
 						"id, ",
-						"parent_type_id, ",
+						"parent_object_type_id, ",
 						"code, ",
 						"name, ",
 						"description) ",
