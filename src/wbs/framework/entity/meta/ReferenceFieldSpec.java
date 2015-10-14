@@ -26,4 +26,8 @@ class ReferenceFieldSpec
 	@DataAttribute
 	Boolean nullable;
 
+	@DataAttribute (
+		value = "column")
+	String columnName;
+
 }

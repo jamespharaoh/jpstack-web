@@ -203,11 +203,10 @@
 			name="object-list"
 			package="wbs.platform.object.list"/>
 
-		<!-- TODO this does not belong here
+		<!-- TODO this does not belong here -->
 		<plugin
 			name="object-ticket-create"
 			package="wbs.services.ticket.create"/>
-		-->
 
 		<plugin
 			name="object-search"
@@ -573,11 +572,9 @@
 			name="wallet"
 			package="wbs.services.wallet"/>
 
-		<!--
 		<plugin
 			name="ticket-core"
 			package="wbs.services.ticket.core"/>
-		-->
 
 		<plugin
 			name="message-template"

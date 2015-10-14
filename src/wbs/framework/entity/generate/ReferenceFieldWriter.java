@@ -16,6 +16,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.ReferenceFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
@@ -56,20 +57,36 @@ class ReferenceFieldWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
+		// write field annotation
+
+		AnnotationWriter annotationWriter =
+			new AnnotationWriter ()
+
+			.name (
+				"ReferenceField");
+
 		if (ifNull (spec.nullable (), false)) {
 
-			javaWriter.write (
-				"\t@ReferenceField (\n");
-
-			javaWriter.write (
-				"\t\tnullable = true)\n");
-
-		} else {
-
-			javaWriter.write (
-				"\t@ReferenceField\n");
+			annotationWriter.addAttributeFormat (
+				"nullable",
+				"true");
 
 		}
+
+		if (spec.columnName () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"column",
+				"\"%s\"",
+				spec.columnName ().replace ("\"", "\\\""));
+
+		}
+
+		annotationWriter.write (
+			javaWriter,
+			"\t");
+
+		// write field
 
 		javaWriter.write (
 			"\t%s.model.%sRec %s;\n",
