@@ -26,4 +26,8 @@ class StringFieldSpec
 		value = "default")
 	String defaultValue;
 
+	@DataAttribute (
+		value = "column")
+	String columnName;
+
 }
