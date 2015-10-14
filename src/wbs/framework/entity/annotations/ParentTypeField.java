@@ -6,6 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import wbs.framework.entity.annotations.meta.FieldMeta;
+import wbs.framework.entity.annotations.meta.FieldMetaColumn;
 import wbs.framework.entity.model.ModelFieldType;
 
 @Retention (RetentionPolicy.RUNTIME)
@@ -15,5 +16,9 @@ import wbs.framework.entity.model.ModelFieldType;
 	treeParent = true)
 public
 @interface ParentTypeField {
+
+	@FieldMetaColumn
+	String column ()
+	default "";
 
 }
