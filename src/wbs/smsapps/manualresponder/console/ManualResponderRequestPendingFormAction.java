@@ -2,6 +2,8 @@ package wbs.smsapps.manualresponder.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.lessThan;
+import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -32,7 +34,6 @@ import wbs.sms.gsm.Gsm;
 import wbs.sms.gsm.MessageSplitter;
 import wbs.sms.keyword.logic.KeywordLogic;
 import wbs.sms.message.outbox.logic.MessageSender;
-import wbs.smsapps.manualresponder.logic.ManualResponderLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
@@ -62,9 +63,6 @@ class ManualResponderRequestPendingFormAction
 
 	@Inject
 	KeywordLogic keywordLogic;
-
-	@Inject
-	ManualResponderLogic manualResponderLogic;
 
 	@Inject
 	ManualResponderReplyObjectHelper manualResponderReplyHelper;
@@ -274,6 +272,7 @@ class ManualResponderRequestPendingFormAction
 		// split message and apply templates
 
 		List<String> messageParts;
+		int effectiveParts;
 
 		if (
 			template.getSplitLong ()
@@ -314,92 +313,103 @@ class ManualResponderRequestPendingFormAction
 					messageString,
 					messageSplitterTemplates);
 
-			// enforce minimum and maximum message counts
-
-			if (
-
-				messageParts.size ()
-					> template.getMaximumMessages ()
-
-				|| messageParts.size ()
-					< template.getMinimumMessageParts ()
-
-			) {
-
-				requestContext.addError (
-					stringFormat (
-						"Unable to split message into %s parts",
-						template.getMaximumMessages ()));
-
-				return null;
-
-			}
+			effectiveParts =
+				messageParts.size ();
 
 		} else {
 
 			// don't split message, apply template if enabled
 
+			String singleMessage;
+
 			if (template.getApplyTemplates ()) {
 
-				messageParts =
-					Collections.singletonList (
-						template.getSingleTemplate ().replaceAll (
-							Pattern.quote ("{message}"),
-							messageString));
+				singleMessage =
+					template.getSingleTemplate ().replaceAll (
+						Pattern.quote ("{message}"),
+						messageString);
 
 			} else {
 
-				messageParts =
-					Collections.singletonList (
-						messageString);
+				singleMessage =
+					messageString;
 
 			}
 
-			// enforce max and min length
+			messageParts =
+				Collections.singletonList (
+					singleMessage);
 
-			if (messageParam != null) {
+			// work out effective parts
 
-				int maxLength =
-					manualResponderLogic.maximumMessageLength (
-						request,
-						template);
+			if (messageParts.size () <= 160) {
 
-				int minLength =
-					manualResponderLogic.minimumMessageLength (
-						request,
-						template);
+				effectiveParts = 1;
 
-				int actualLength =
-					Gsm.length (
-						messageParam);
+			} else {
 
-				if (actualLength > maxLength) {
+				boolean shortMessageParts =
+					request
+						.getNumber ()
+						.getNetwork ()
+						.getShortMultipartMessages ();
 
-					requestContext.addError (
-						stringFormat (
-							"Message is too long, contains %s chars, ",
-							actualLength,
-							"maximum is %s",
-							maxLength));
+				int maxLengthPerMultipartMessage =
+					shortMessageParts
+						? 134
+						: 153;
 
-					return null;
-
-				}
-
-				if (actualLength < minLength) {
-
-					requestContext.addError (
-						stringFormat (
-							"Message is too short, contains %s chars, ",
-							actualLength,
-							"minimum is %s",
-							minLength));
-
-					return null;
-
-				}
+				effectiveParts = (
+					singleMessage.length () - 1
+				) / maxLengthPerMultipartMessage + 1;
 
 			}
+
+		}
+
+		// enforce minimum parts
+
+		if (
+
+			template.getMinimumMessageParts () != null
+
+			&& lessThan (
+				effectiveParts,
+				template.getMinimumMessageParts ())
+
+		) {
+
+			requestContext.addError (
+				stringFormat (
+					"Message is too short at %s parts, ",
+					effectiveParts,
+					"minimum is %s parts",
+					template.getMinimumMessageParts ()));
+
+			return null;
+
+		}
+
+		// enforce maximum parts
+
+		if (
+
+			template.getMaximumMessages () != null
+
+			&& moreThan (
+				effectiveParts,
+				template.getMaximumMessages ())
+
+		) {
+
+			requestContext.addError (
+				stringFormat (
+					"Message is too long at %s parts, ",
+					messageParts.size (),
+					"minimum is %s parts",
+					template.getMaximumMessages ()));
+
+			return null;
 
 		}
 

@@ -21,7 +21,6 @@ import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.sms.gsm.Gsm;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
@@ -377,18 +376,23 @@ class ManualResponderRequestPendingFormResponder
 			boolean selected) {
 
 		printFormat (
+
 			"<tr",
 			" class=\"template\"",
 
 			" data-template-id=\"%h\"",
 			template.getId (),
 
-			" data-template-fixed-length=\"%h\"",
-			templateFixedLength (
-				template),
+			" data-template-mode=\"%h\"",
+			template.getSplitLong ()
+				? "split"
+				: "join",
 
 			" data-template-min-message-parts=\"%h\"",
 			template.getMinimumMessageParts (),
+
+			" data-template-max-messages=\"%h\"",
+			template.getMaximumMessages (),
 
 			" data-template-max-for-single-message=\"%h\"",
 			160,
@@ -401,8 +405,25 @@ class ManualResponderRequestPendingFormResponder
 				? 134
 				: 153,
 
-			" data-template-max-messages=\"%h\"",
-			template.getMaximumMessages (),
+			" data-template-single=\"%h\"",
+			template.getApplyTemplates ()
+				? template.getSingleTemplate ()
+				: "{message}",
+
+			" data-template-first=\"%h\"",
+			template.getApplyTemplates ()
+				? template.getFirstTemplate ()
+				: "{message}",
+
+			" data-template-middle=\"%h\"",
+			template.getApplyTemplates ()
+				? template.getMiddleTemplate ()
+				: "{message}",
+
+			" data-template-last=\"%h\"",
+			template.getApplyTemplates ()
+				? template.getLastTemplate ()
+				: "{message}",
 
 			">\n");
 
@@ -479,34 +500,6 @@ class ManualResponderRequestPendingFormResponder
 
 		printFormat (
 			"</tr>\n");
-
-	}
-
-	private
-	int templateFixedLength (
-			ManualResponderTemplateRec template) {
-
-		if (
-			! template.getCustomisable ()
-		) {
-
-			return 0;
-
-		}
-
-		if (template.getSingleTemplate () == null) {
-
-			return 0;
-
-		}
-
-		String fixedText =
-			template.getSingleTemplate ().replace (
-				"{message}",
-				"");
-
-		return Gsm.length (
-			fixedText);
 
 	}
 
@@ -617,6 +610,7 @@ class ManualResponderRequestPendingFormResponder
 		printFormat (
 			"<tr",
 			" class=\"template\"",
+			" data-template-id=\"ignore\"",
 			">\n");
 
 		printFormat (

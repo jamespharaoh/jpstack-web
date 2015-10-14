@@ -2,42 +2,6 @@
 
 $(function () {
 
-	var debugEnabled = true;
-
-	var debugStart = function () {
-
-		if (! debugEnabled) {
-			return;
-		}
-
-		console.log ("========== MANUAL RESPONDER CHAR COUNT START ==========");
-
-	};
-
-	var debugStop = function () {
-
-		if (! debugEnabled) {
-			return;
-		}
-
-		console.log ("========== MANUAL RESPONDER CHAR COUNT END ==========");
-
-	};
-
-	var debugValue = function (name, value) {
-
-		if (! debugEnabled) {
-			return;
-		}
-
-		console.log ([
-			String (name),
-			": ",
-			value,
-		].join (""));
-
-	};
-
 	$(".manual-responder-request-pending-summary").each (function () {
 
 		var summary = $(this);
@@ -68,8 +32,7 @@ $(function () {
 
 			var template = $(this);
 
-			var text = template.find (".template-text");
-			var charCount = template.find (".template-chars");
+			// select a specific template
 
 			var selectTemplate = function () {
 
@@ -107,202 +70,9 @@ $(function () {
 
 				template.find (".template-submit").prop ("disabled", false);
 
-				updateCharCount ();
-
-			};
-
-			var updateCharCount = function () {
-
-				debugStart ();
-
-				// do nothing if no text field
-
-				if (text.length == 0) return;
-
-				var value = text.val ();
-
-				// error if not valid
-
-				if (! isGsm (value)) {
-
-					charCount.text (
-						"Message contains characters that can not be send via SMS");
-
-					charCount.removeClass ("warning");
-					charCount.addClass ("error");
-
-					debugStop ();
-
-					return;
-
+				if (updateCharCount) {
+					updateCharCount ();
 				}
-
-				// get parameters from html data
-
-				var fixedLength = Number (
-					template.data ("template-fixed-length"));
-
-				debugValue ("fixedLength", fixedLength);
-
-				var minMessageParts = Number (
-					template.data ("template-min-message-parts"));
-
-				debugValue ("minMessageParts", minMessageParts);
-
-				var maxForSingleMessage = Number (
-					template.data ("template-max-for-single-message"));
-
-				debugValue ("maxForSingleMessage", maxForSingleMessage);
-
-				var maxForMessagePart = Number (
-					template.data ("template-max-for-message-part"));
-
-				debugValue ("maxForMessagePart", maxForMessagePart);
-
-				var maxMessages = Number (
-					template.data ("template-max-messages"));
-
-				debugValue ("maxMessages", maxMessages);
-
-				// get length
-
-				var length = gsmlen (value);
-				debugValue ("length", length);
-
-				var fullLength = length + fixedLength;
-				debugValue ("fullLength", fullLength);
-
-				// work out max characters
-
-				var maxFullLength;
-
-				if (maxMessages == 1) {
-
-					maxFullLength = maxForSingleMessage;
-
-				} else {
-
-					maxFullLength = maxForMessagePart * maxMessages;
-
-				}
-
-				debugValue ("maxFullLength", maxFullLength);
-
-				var maxLength = maxFullLength - fixedLength;
-				debugValue ("maxLength", maxLength);
-
-				// work out min characters
-
-				var minFullLength;
-
-				if (minMessageParts <= 1) {
-
-					minFullLength = 1;
-
-				} else if (minMessageParts == 2) {
-
-					minFullLength = maxForSingleMessage + 1;
-
-				} else {
-
-					minFullLength = (
-						maxForMessagePart * (minMessageParts - 1)
-					) + 1;
-
-				}
-
-				debugValue ("minFullLength", minFullLength);
-
-				var minLength = minFullLength - fixedLength;
-				debugValue ("minLength", minLength);
-
-				// work out number of parts
-
-				var numParts;
-
-				if (fullLength <= maxForSingleMessage) {
-					numParts = 1;
-				} else {
-					numParts = Math.floor (
-						(fullLength - 1) / maxForMessagePart
-					) + 1;
-				}
-
-				debugValue ("numParts", numParts);
-
-				// warn if too short
-
-				if (numParts < minMessageParts) {
-
-					var numMore = minLength - length;
-
-					charCount.text ([
-						String (length),
-						" ",
-						length != 1 ? "characters" : "character",
-						" in ",
-						String (numParts),
-						" ",
-						numParts != 1 ? "parts" : "part",
-						", type ",
-						String (numMore),
-						" more ",
-						numMore != 1 ? "characters" : "character",
-					].join (""));
-
-					charCount.addClass ("warning");
-					charCount.removeClass ("error");
-
-					debugStop ();
-
-					return;
-
-				}
-
-				// error if too long
-
-				if (fullLength > maxFullLength) {
-
-					var numOver = length - maxLength;
-
-					charCount.text ([
-						String (length),
-						" ",
-						length != 1 ? "characters" : "character",
-						", remove ",
-						String (numOver),
-					].join (""));
-
-					charCount.removeClass ("warning");
-					charCount.addClass ("error");
-
-					debugStop ();
-
-					return;
-
-				}
-
-				// length is ok
-
-				var numLeft = maxLength - length;
-
-				charCount.text ([
-					String (length),
-					" ",
-					length > 1 ? "characters" : "character",
-					" in ",
-					String (numParts),
-					" ",
-					numParts > 1 ? "parts" : "part",
-					", ",
-					String (numLeft),
-					" left",
-				].join (""));
-
-				charCount.removeClass ("warning");
-				charCount.removeClass ("error");
-
-				debugStop ();
 
 			};
 
@@ -311,6 +81,355 @@ $(function () {
 			if (template.find (".template-radio").prop ("checked")) {
 				selectTemplate.apply (template);
 			}
+
+			// get template id
+
+			var templateId =
+				template.data ("template-id");
+
+			if (templateId == "ignore") {
+				return;
+			}
+
+			// find text input and char count display
+
+			var text =
+				template.find (".template-text");
+
+			var charCount =
+				template.find (".template-chars");
+
+			// get parameters from html data
+
+			var templateMode =
+				template.data ("template-mode");
+
+			var minMessageParts = Number (
+				template.data ("template-min-message-parts"));
+
+			var maxMessageParts = Number (
+				template.data ("template-max-messages"));
+
+			var maxForSingleMessage = Number (
+				template.data ("template-max-for-single-message"));
+
+			var maxForMessagePart = Number (
+				template.data ("template-max-for-message-part"));
+
+			var templates = {
+
+				single:
+					template.data ("template-single"),
+
+				first:
+					template.data ("template-first"),
+
+				middle:
+					template.data ("template-middle"),
+
+				last:
+					template.data ("template-last"),
+
+			};
+
+			var templateFixeds = {
+
+				single:
+					gsmlen (
+						templates.single
+							.replace ("{message}", "")
+							.replace ("{page}", "1")
+							.replace ("{pages}", "1")),
+
+				first:
+					gsmlen (
+						templates.first
+							.replace ("{message}", "")
+							.replace ("{page}", "1")
+							.replace ("{pages}", "1")),
+
+				middle:
+					gsmlen (
+						templates.middle
+							.replace ("{message}", "")
+							.replace ("{page}", "1")
+							.replace ("{pages}", "1")),
+
+				last:
+					gsmlen (
+						templates.last
+							.replace ("{message}", "")
+							.replace ("{page}", "1")
+							.replace ("{pages}", "1")),
+
+			};
+
+			var templateFrees = {
+
+				single:
+					maxForSingleMessage - templateFixeds.single,
+
+				first:
+					maxForSingleMessage - templateFixeds.first,
+
+				middle:
+					maxForSingleMessage - templateFixeds.middle,
+
+				last:
+					maxForSingleMessage - templateFixeds.last,
+
+			};
+
+			var effectiveMinimum;
+
+			if (minMessageParts <= 1) {
+
+				effectiveMinimum = 25;
+
+			} else if (templateMode == "join") {
+
+				effectiveMinimum =
+					+ maxForMessagePart * (minMessageParts - 1)
+					+ 25;
+
+			} else {
+
+				effectiveMinimum =
+					+ templateFrees.first
+					+ templateFrees.middle * (minMessageParts - 2)
+					+ 25;
+
+			}
+
+			var effectiveMaximum;
+
+			if (maxMessageParts <= 1) {
+
+				effectiveMaximum =
+					templateFrees.single;
+
+			} else if (templateMode == "join") {
+
+				effectiveMaximum =
+					+ maxForMessagePart * maxMessageParts;
+
+			} else {
+
+				effectiveMaximum =
+					+ templateFrees.first
+					+ templateFrees.last
+					+ templateFrees.middle * (minMessageParts - 2);
+
+			}
+
+			// update the character counter
+
+			var updateCharCount = function () {
+
+				// do nothing if no text field
+
+				if (text.length == 0) return;
+
+				// get value
+
+				var value =
+					text.val ().trim ();
+
+				// error if not valid
+
+				if (! isGsm (value)) {
+
+					charCount.text (
+						"Message contains characters that can not be sent via SMS");
+
+					charCount.removeClass ("warning");
+					charCount.addClass ("error");
+
+					return;
+
+				}
+
+				var length =
+					gsmlen (value);
+
+				var numParts;
+				var effectiveLength;
+
+				if (templateMode == "split") {
+
+					// split message
+
+					var messageParts =
+						gsmMessageSplit (templates, value);
+
+					numParts =
+						messageParts.length;
+
+					// calculate effective length
+
+					effectiveLength = 0;
+
+					for (
+						var index = 0;
+						index < messageParts.length;
+						index ++
+					) {
+
+						var messagePart =
+							messageParts [index];
+
+						var partLength =
+							gsmlen (messagePart);
+
+						var partSpare =
+							maxForSingleMessage - partLength;
+
+						if (messageParts.length == 1) {
+
+							effectiveLength +=
+								templateFrees.single - partSpare;
+
+						} else if (index == messageParts.length - 1) {
+
+							effectiveLength +=
+								templateFrees.last - partSpare;
+
+						} else if (index == 0) {
+
+							effectiveLength +=
+								templateFrees.first;
+
+						} else {
+
+							effectiveLength +=
+								templateFrees.middle;
+
+						}
+
+					}
+
+				} else if (templateMode == "join") {
+
+					if (length <= maxForSingleMessage) {
+
+						numParts = 1;
+
+					} else {
+
+						numParts =
+							+ Math.floor (
+								(length - 1) / maxForMessagePart)
+							+ 1;
+
+					}
+
+					effectiveLength = length;
+
+				}
+
+				var lengthNotice = [
+					String (effectiveLength),
+					" ",
+					effectiveLength != 1 ? "characters" : "character",
+					" in ",
+					String (numParts),
+					" ",
+					numParts != 1 ? "parts" : "part",
+				].join ("");
+
+				var splitNotice;
+
+				if (effectiveLength > length) {
+
+					splitNotice = [
+						" (lost ",
+						effectiveLength - length,
+						" ",
+						(effectiveLength - length) != 1
+							? "characters"
+							: "character",
+						")",
+					].join ("");
+
+				} else if (effectiveLength < length) {
+
+					splitNotice = [
+						" (gained ",
+						length - effectiveLength,
+						" ",
+						(length - effectiveLength) != 1
+							? "characters"
+							: "character",
+						")",
+					].join ("")
+
+				} else {
+
+					splitNotice = "";
+
+				}
+
+				if (effectiveLength < effectiveMinimum) {
+
+					// warn if too short
+
+					var charsMore =
+						effectiveMinimum - effectiveLength;
+
+					charCount.text ([
+						lengthNotice,
+						", type ",
+						String (charsMore),
+						" more ",
+						charsMore != 1 ? "characters" : "character",
+						splitNotice,
+					].join (""));
+
+					charCount.addClass ("warning");
+					charCount.removeClass ("error");
+
+				} else if (effectiveLength > effectiveMaximum) {
+
+					// error if too long
+
+					var charsOver =
+						effectiveLength - effectiveMaximum;
+
+					charCount.text ([
+						lengthNotice,
+						", remove ",
+						String (charsOver),
+						" ",
+						charsOver != 1 ? "characters" : "character",
+						splitNotice,
+					].join (""));
+
+					charCount.removeClass ("warning");
+					charCount.addClass ("error");
+
+				} else {
+
+					// info if length is right
+
+					var charsLeft =
+						effectiveMaximum - effectiveLength;
+
+					charCount.text ([
+						lengthNotice,
+						", ",
+						String (charsLeft),
+						" ",
+						charsLeft != 1 ? "characters" : "character",
+						" left",
+						splitNotice,
+					].join (""));
+
+					charCount.removeClass ("warning");
+					charCount.removeClass ("error");
+
+				}
+
+			};
 
 			template.find (".template-text").keyup (updateCharCount);
 			template.find (".template-text").keydown (updateCharCount);

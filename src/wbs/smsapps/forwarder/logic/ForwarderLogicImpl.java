@@ -732,7 +732,6 @@ class ForwarderLogicImpl
 
 	}
 
-	@SuppressWarnings ("null")
 	private
 	ForwarderMessageOutRec findExistingForwarderMessageOut (
 			ForwarderRec forwarder,

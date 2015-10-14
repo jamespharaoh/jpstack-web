@@ -224,6 +224,12 @@ class ManualResponderFixtureProvider
 			.setCustomisable (
 				true)
 
+			.setApplyTemplates (
+				true)
+
+			.setSplitLong (
+				false)
+
 			.setSingleTemplate (
 				"BILLED MESSAGE: {message}")
 
@@ -262,15 +268,18 @@ class ManualResponderFixtureProvider
 				manualResponder)
 
 			.setCode (
-				"long_billed")
+				"long_billed_join")
 
 			.setName (
-				"Long Billed")
+				"Long Billed Join")
 
 			.setDescription (
-				"Long Billed")
+				"Long Billed Join")
 
 			.setCustomisable (
+				true)
+
+			.setApplyTemplates (
 				true)
 
 			.setSingleTemplate (
@@ -284,6 +293,64 @@ class ManualResponderFixtureProvider
 
 			.setLastTemplate (
 				"BILLED MESSAGE {page}/{pages}: {message}")
+
+			.setSplitLong (
+				false)
+
+			.setMaximumMessages (
+				3)
+
+			.setMinimumMessageParts (
+				2)
+
+			.setNumber (
+				"bill")
+
+			.setRouter (
+				routerHelper.findByCode (
+					routeHelper.findByCode (
+						GlobalId.root,
+						"test",
+						"bill"),
+					"static"))
+
+		);
+
+		manualResponderTemplateHelper.insert (
+			new ManualResponderTemplateRec ()
+
+			.setManualResponder (
+				manualResponder)
+
+			.setCode (
+				"long_billed_split")
+
+			.setName (
+				"Long Billed Split")
+
+			.setDescription (
+				"Long Billed Split")
+
+			.setCustomisable (
+				true)
+
+			.setApplyTemplates (
+				true)
+
+			.setSingleTemplate (
+				"BILLED MESSAGE: {message}")
+
+			.setFirstTemplate (
+				"BILLED MESSAGE {page}/{pages}: {message}")
+
+			.setMiddleTemplate (
+				"BILLED MESSAGE {page}/{pages}: {message}")
+
+			.setLastTemplate (
+				"BILLED MESSAGE {page}/{pages}: {message}")
+
+			.setSplitLong (
+				true)
 
 			.setMaximumMessages (
 				3)
