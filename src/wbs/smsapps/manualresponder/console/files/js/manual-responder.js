@@ -222,7 +222,7 @@ $(function () {
 				effectiveMaximum =
 					+ templateFrees.first
 					+ templateFrees.last
-					+ templateFrees.middle * (minMessageParts - 2);
+					+ templateFrees.middle * (maxMessageParts - 2);
 
 			}
 
