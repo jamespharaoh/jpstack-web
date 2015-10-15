@@ -311,7 +311,7 @@ class TicketPendingFormResponder
 
 		printFormat (
 			"<td>%s</td>\n",
-			Html.nbsp (Html.encode (template.getName ())));
+			Html.nonBreakingWhitespace (Html.encode (template.getName ())));
 
 		/*
 		printFormat (
