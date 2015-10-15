@@ -109,7 +109,7 @@ class ExceptionLogicImplementation
 			printWriter.print (
 				jdbcException.getSQL ());
 
-			printWriter.print (	
+			printWriter.print (
 				"\n");
 
 			if (throwable instanceof ConstraintViolationException) {
@@ -131,7 +131,7 @@ class ExceptionLogicImplementation
 
 					printWriter.print (
 						"\n");
-						
+
 				}
 
 			}

@@ -1,6 +1,7 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.io.IOException;
 
@@ -61,8 +62,11 @@ class SlaveFieldWriter {
 		javaWriter.write (
 			"\t%s.model.%sRec %s;\n",
 			fieldTypePlugin.packageName (),
-			capitalise (spec.typeName ()),
-			spec.typeName ());
+			capitalise (
+				spec.typeName ()),
+			ifNull (
+				spec.name (),
+				spec.typeName ()));
 
 		javaWriter.write (
 			"\n");

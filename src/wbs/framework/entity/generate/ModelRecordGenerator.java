@@ -29,6 +29,7 @@ import wbs.framework.entity.meta.CodeFieldSpec;
 import wbs.framework.entity.meta.IdentityIntegerFieldSpec;
 import wbs.framework.entity.meta.IdentityReferenceFieldSpec;
 import wbs.framework.entity.meta.IndexFieldSpec;
+import wbs.framework.entity.meta.MasterFieldSpec;
 import wbs.framework.entity.meta.ModelFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.ModelMetaType;
@@ -468,6 +469,7 @@ class ModelRecordGenerator {
 		ParentFieldSpec parentField = null;
 		ParentTypeFieldSpec parentTypeField = null;
 		ParentIdFieldSpec parentIdField = null;
+		MasterFieldSpec masterField = null;
 
 		CodeFieldSpec codeField = null;
 		IndexFieldSpec indexField = null;
@@ -503,6 +505,14 @@ class ModelRecordGenerator {
 
 				parentIdField =
 					(ParentIdFieldSpec)
+					modelField;
+
+			}
+
+			if (modelField instanceof MasterFieldSpec) {
+
+				masterField =
+					(MasterFieldSpec)
 					modelField;
 
 			}
@@ -596,7 +606,7 @@ class ModelRecordGenerator {
 			javaWriter.write (
 				"\n");
 
-		} else if (gotName) {
+		} else if (gotName || masterField != null) {
 
 			if (parentField != null) {
 
@@ -656,6 +666,30 @@ class ModelRecordGenerator {
 
 				javaWriter.write (
 					"\t\t\t\tother.getParentId ())\n");
+
+				javaWriter.write (
+					"\n");
+
+			}
+
+			if (masterField != null) {
+
+				javaWriter.write (
+					"\t\t\t.append (\n");
+
+				javaWriter.write (
+					"\t\t\t\tget%s (),\n",
+					capitalise (
+						ifNull (
+							masterField.name (),
+							masterField.typeName ())));
+
+				javaWriter.write (
+					"\t\t\t\tother.get%s ())\n",
+					capitalise (
+						ifNull (
+							masterField.name (),
+							masterField.typeName ())));
 
 				javaWriter.write (
 					"\n");

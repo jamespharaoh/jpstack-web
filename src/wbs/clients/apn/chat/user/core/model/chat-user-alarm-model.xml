@@ -5,18 +5,18 @@
 	<fields>
 
 		<!-- id -->
-		
+
 		<generated-id-field/>
-		
+
 		<!-- identity -->
-		
+
 		<!-- TODO -->
 
 		<!-- details -->
 
 		<reference-field
 			type="chatUser"/>
-			
+
 		<reference-field
 			name="monitorChatUser"
 			type="chatUser"/>

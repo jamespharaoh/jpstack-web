@@ -17,7 +17,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 
 @PrototypeComponent ("jqueryScriptRefFormFieldBuilder")
 @ConsoleModuleBuilderHandler
-public 
+public
 class JqueryScriptRefFormFieldBuilder {
 
 	// prototype dependencies

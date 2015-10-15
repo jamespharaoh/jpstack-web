@@ -1,4 +1,114 @@
 <model-meta
-	name="chatScheme">
+	name="chatScheme"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="chat"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<reference-field
+			name="rbBillRoute"
+			type="route"
+			nullable="yes"/>
+
+		<reference-field
+			name="rbFreeRouter"
+			type="router"
+			nullable="yes"/>
+
+		<string-field
+			name="rbNumber"
+			default=""/>
+
+		<reference-field
+			type="magicNumberSet"
+			nullable="yes"/>
+
+		<reference-field
+			name="magicRouter"
+			type="router"
+			nullable="yes"/>
+
+		<reference-field
+			name="mmsRoute"
+			type="route"
+			nullable="yes"/>
+
+		<reference-field
+			name="mmsFreeRouter"
+			type="router"
+			nullable="yes"/>
+
+		<string-field
+			name="mmsNumber"
+			default=""/>
+
+		<reference-field
+			name="mmsKeywordSet"
+			type="keywordSet"
+			nullable="yes"/>
+
+		<reference-field
+			name="wapRouter"
+			type="router"
+			nullable="yes"/>
+
+		<integer-field
+			name="initialCredit"
+			default="0"/>
+
+		<string-field
+			name="style"
+			default=""/>
+
+		<yes-no-field
+			name="approvals"
+			default="yes"/>
+
+		<string-field
+			name="timezone"
+			nullable="yes"/>
+
+		<!-- slaves -->
+
+		<slave-field
+			name="charges"
+			type="chatSchemeCharges"/>
+
+	</fields>
+
+	<collections>
+
+		<children-collection
+			type="chatSchemeKeyword"
+			order-sql="keyword"/>
+
+		<children-collection
+			type="chatAffiliate"/>
+
+		<children-collection
+			type="chatSchemeMap"
+			join-column="parent_chat_scheme_id"/>
+
+	</collections>
 
 </model-meta>
