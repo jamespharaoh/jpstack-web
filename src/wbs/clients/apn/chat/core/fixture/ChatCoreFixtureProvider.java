@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.core.fixture;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -450,6 +451,10 @@ class ChatCoreFixtureProvider
 				.setCreditMode (
 					ChatUserCreditMode.strict)
 
+				.setCreated (
+					instantToDate (
+						transaction.now ()))
+
 			);
 
 			chatUsers.add (
@@ -488,6 +493,10 @@ class ChatCoreFixtureProvider
 
 				.setCreditMode (
 					ChatUserCreditMode.free)
+
+				.setCreated (
+					instantToDate (
+						transaction.now ()))
 
 			);
 

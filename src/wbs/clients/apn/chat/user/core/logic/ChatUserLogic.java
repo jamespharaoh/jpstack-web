@@ -315,4 +315,24 @@ interface ChatUserLogic {
 	DateTimeZone timezone (
 			ChatUserRec chatUser);
 
+	List<ChatUserImageRec> getChatUserImageListByType (
+			ChatUserRec chatUser,
+			ChatUserImageType type);
+
+	ChatUserImageRec getMainChatUserImageByType (
+			ChatUserRec chatUser,
+			ChatUserImageType type);
+
+	void setMainChatUserImageByType (
+			ChatUserRec chatUser,
+			ChatUserImageType type,
+			ChatUserImageRec cui);
+
+	String getPrettyName (
+			ChatUserRec chatUser);
+
+	boolean likes (
+			ChatUserRec chatUser,
+			Gender otherGender);
+
 }

@@ -16,6 +16,7 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
@@ -32,17 +33,24 @@ public
 class ChatUserImageListAction
 	extends ConsoleAction {
 
+	// dependencies
+
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
 
 	@Inject
-	ConsoleRequestContext requestContext;
+	ChatUserLogic chatUserLogic;
 
 	@Inject
 	Database database;
 
 	@Inject
 	MediaLogic mediaLogic;
+
+	@Inject
+	ConsoleRequestContext requestContext;
+
+	// details
 
 	@Override
 	public
@@ -82,10 +90,14 @@ class ChatUserImageListAction
 				(String) requestContext.stuff ("chatUserImageType"));
 
 		List<ChatUserImageRec> list =
-			chatUser.getChatUserImageListByType (type);
+			chatUserLogic.getChatUserImageListByType (
+				chatUser,
+				type);
 
-		for (String key
-				: requestContext.parameterMap ().keySet ()) {
+		for (
+			String key
+				: requestContext.parameterMap ().keySet ()
+		) {
 
 			Matcher matcher =
 				keyPattern.matcher (key);
@@ -109,10 +121,13 @@ class ChatUserImageListAction
 				if (
 					equal (
 						list.get (index),
-						chatUser.getMainChatUserImageByType (type))
+						chatUserLogic.getMainChatUserImageByType (
+							chatUser,
+							type))
 				) {
 
-					chatUser.setMainChatUserImageByType (
+					chatUserLogic.setMainChatUserImageByType (
+						chatUser,
 						type,
 						null);
 
@@ -226,18 +241,34 @@ class ChatUserImageListAction
 
 			if (in (command, "select")) {
 
-				ChatUserImageRec cui =
+				ChatUserImageRec chatUserImage =
 					list.get (index);
 
-				if (chatUser.getMainChatUserImageByType (type) == cui) {
+				if (
+					equal (
+						chatUserLogic.getMainChatUserImageByType (
+							chatUser,
+							type),
+						chatUserImage)
+				) {
 
-					chatUser.setMainChatUserImageByType (type, null);
-					notice = "Image unselected";
+					chatUserLogic.setMainChatUserImageByType (
+						chatUser,
+						type,
+						null);
+
+					notice =
+						"Image unselected";
 
 				} else {
 
-					chatUser.setMainChatUserImageByType (type, cui);
-					notice = "Image selected";
+					chatUserLogic.setMainChatUserImageByType (
+						chatUser,
+						type,
+						chatUserImage);
+
+					notice =
+						"Image selected";
 
 				}
 

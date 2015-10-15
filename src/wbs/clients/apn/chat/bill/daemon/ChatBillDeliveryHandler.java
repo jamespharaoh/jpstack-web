@@ -74,7 +74,11 @@ class ChatBillDeliveryHandler
 
 		if (status.isGoodType ()) {
 
-			chatUser.incCreditSuccess (amount);
+			chatUser
+
+				.setCreditSuccess (
+					+ chatUser.getCreditSuccess ()
+					+ amount);
 
 		} else if (status.isBadType ()) {
 
@@ -90,7 +94,11 @@ class ChatBillDeliveryHandler
 
 			if (strict) {
 
-				chatUser.incCreditRevoked (amount);
+				chatUser
+
+					.setCreditRevoked (
+						+ chatUser.getCreditRevoked ()
+						+ amount);
 
 				if (chatUser.getCreditMode () != ChatUserCreditMode.prePay) {
 
@@ -103,7 +111,11 @@ class ChatBillDeliveryHandler
 
 			} else {
 
-				chatUser.incCreditFailed (amount);
+				chatUser
+
+					.setCreditFailed (
+						+ chatUser.getCreditFailed ()
+						+ amount);
 
 			}
 
@@ -111,11 +123,19 @@ class ChatBillDeliveryHandler
 
 			if (strict) {
 
-				chatUser.incCreditPendingStrict (amount);
+				chatUser
+
+					.setCreditPendingStrict (
+						+ chatUser.getCreditPendingStrict ()
+						+ amount);
 
 			} else {
 
-				chatUser.incCreditPending (amount);
+				chatUser
+
+					.setCreditPending (
+						+ chatUser.getCreditPending ()
+						+ amount);
 
 			}
 

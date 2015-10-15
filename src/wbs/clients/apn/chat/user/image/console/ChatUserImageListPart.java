@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.user.image.console;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
@@ -8,6 +9,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
@@ -29,10 +31,13 @@ class ChatUserImageListPart
 	ChatUserConsoleHelper chatUserHelper;
 
 	@Inject
-	ConsoleObjectManager objectManager;
+	ChatUserLogic chatUserLogic;
 
 	@Inject
 	MediaConsoleLogic mediaConsoleLogic;
+
+	@Inject
+	ConsoleObjectManager objectManager;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -144,8 +149,12 @@ class ChatUserImageListPart
 					: "",
 
 				"<td>%h</td>\n",
-				chatUser.getMainChatUserImageByType (type) == chatUserImage ?
-					"Y"
+				equal (
+						chatUserLogic.getMainChatUserImageByType (
+							chatUser,
+							type),
+						chatUserImage)
+					? "Y"
 					: "",
 
 				"<td style=\"text-align: center;\">",

@@ -870,17 +870,29 @@ class ChatCreditLogicImpl
 
 			if (chatUser.getCreditMode () == ChatUserCreditMode.strict) {
 
-				chatUser.incCreditPendingStrict (route.getOutCharge ());
+				chatUser
+
+					.setCreditPendingStrict (
+						+ chatUser.getCreditPendingStrict ()
+						+ route.getOutCharge ());
 
 			} else {
 
-				chatUser.incCreditPending (route.getOutCharge ());
+				chatUser
+
+					.setCreditPending (
+						+ chatUser.getCreditPending ()
+						+ route.getOutCharge ());
 
 			}
 
 		} else {
 
-			chatUser.incCreditSent (route.getOutCharge ());
+			chatUser
+
+				.setCreditSent (
+					+ chatUser.getCreditSent ()
+					+ route.getOutCharge ());
 
 		}
 
@@ -895,19 +907,27 @@ class ChatCreditLogicImpl
 
 		if (revoked) {
 
-			chatUser.incCreditRevoked (
-				- route.getOutCharge ());
+			chatUser
 
-			chatUser.incCreditRetried (
-				+ route.getOutCharge ());
+				.setCreditRevoked (
+					+ chatUser.getCreditRevoked ()
+					- route.getOutCharge ())
+
+				.setCreditRetried (
+					+ chatUser.getCreditRetried ()
+					+ route.getOutCharge ());
 
 			if (chatUser.getCreditRevoked () < 0) {
 
-				chatUser.incCreditRetried (
-					chatUser.getCreditRevoked ());
+				chatUser
 
-				chatUser.incCreditRevoked (
-					- chatUser.getCreditRevoked ());
+					.setCreditRetried (
+						+ chatUser.getCreditRetried ()
+						+ chatUser.getCreditRevoked ())
+
+					.setCreditRevoked (
+						+ chatUser.getCreditRevoked ()
+						- chatUser.getCreditRevoked ());
 
 			}
 

@@ -689,7 +689,8 @@ class ChatUserLogicImpl
 					chatUser,
 					chatUser,
 					chatUser.getNumber ().getNumber (),
-					chatUser.getPrettyName ());
+					getPrettyName (
+						chatUser));
 
 			chatUser
 
@@ -1556,6 +1557,154 @@ class ChatUserLogicImpl
 
 		return timeFormatter.timezone (
 			chat.getTimezone ());
+
+	}
+
+	@Override
+	public
+	List<ChatUserImageRec> getChatUserImageListByType (
+			@NonNull ChatUserRec chatUser,
+			@NonNull ChatUserImageType type) {
+
+		switch (type) {
+
+			case image:
+				return chatUser.getChatUserImageList ();
+
+			case video:
+				return chatUser.getChatUserVideoList ();
+
+			case audio:
+				return chatUser.getChatUserAudioList ();
+
+			default:
+				throw new RuntimeException ();
+
+		}
+
+	}
+
+	@Override
+	public
+	ChatUserImageRec getMainChatUserImageByType (
+			@NonNull ChatUserRec chatUser,
+			@NonNull ChatUserImageType type) {
+
+		switch (type) {
+
+			case image:
+				return chatUser.getMainChatUserImage ();
+
+			case video:
+				return chatUser.getMainChatUserVideo ();
+
+			case audio:
+				return chatUser.getMainChatUserAudio ();
+
+			default:
+				throw new RuntimeException ();
+
+		}
+
+	}
+
+	@Override
+	public
+	void setMainChatUserImageByType (
+			@NonNull ChatUserRec chatUser,
+			@NonNull ChatUserImageType type,
+			@NonNull ChatUserImageRec cui) {
+
+		switch (type) {
+
+			case image:
+
+				chatUser.setMainChatUserImage (
+					cui);
+
+				break;
+
+			case video:
+
+				chatUser.setMainChatUserVideo (
+					cui);
+
+				break;
+
+			case audio:
+
+				chatUser.setMainChatUserAudio (
+					cui);
+
+				break;
+
+			default:
+				throw new RuntimeException ();
+
+		}
+
+	}
+
+	@Override
+	public
+	String getPrettyName (
+			@NonNull ChatUserRec chatUser) {
+
+		if (chatUser.getName () == null) {
+			return chatUser.getCode ();
+		} else {
+			return chatUser.getCode () + " " + chatUser.getName ();
+		}
+
+	}
+
+	@Override
+	public
+	boolean likes (
+			@NonNull ChatUserRec chatUser,
+			@NonNull Gender otherGender) {
+
+		if (chatUser.getOrient () == Orient.bi) {
+			return true;
+		}
+
+		if (otherGender == Gender.male) {
+
+			if (
+				chatUser.getGender () == Gender.male
+				&& chatUser.getOrient () == Orient.gay
+			) {
+				return true;
+			}
+
+			if (
+				chatUser.getGender () == Gender.female
+				&& chatUser.getOrient () == Orient.straight
+			) {
+				return true;
+			}
+
+		}
+
+		if (otherGender == Gender.female) {
+
+			if (
+				chatUser.getGender () == Gender.female
+				&& chatUser.getOrient () == Orient.gay
+			) {
+				return true;
+			}
+
+			if (
+				chatUser.getGender () == Gender.male
+				&& chatUser.getOrient () == Orient.straight
+			) {
+				return true;
+			}
+
+		}
+
+		return false;
 
 	}
 

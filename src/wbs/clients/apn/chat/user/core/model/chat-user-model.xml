@@ -1,5 +1,556 @@
 <model-meta
-	name="chatUser">
+	name="chatUser"
+	type="common">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="chat"/>
+
+		<code-field/>
+
+		<!-- data -->
+
+		<enum-field
+			name="type"
+			type="chatUserType"/>
+
+		<reference-field
+			type="number"
+			nullable="yes"/>
+
+		<reference-field
+			name="oldNumber"
+			type="number"
+			nullable="yes"/>
+
+		<!-- flags -->
+
+		<yes-no-field
+			name="online"
+			default="no"/>
+
+		<yes-no-field
+			name="ageChecked"
+			default="no"/>
+
+		<yes-no-field
+			name="blockAll"
+			default="no"/>
+
+		<yes-no-field
+			name="barred"
+			default="no"/>
+
+		<yes-no-field
+			name="chargesConfirmed"
+			default="no"/>
+
+		<yes-no-field
+			name="joinWarningSent"
+			default="no"/>
+
+		<yes-no-field
+			name="broadcastOptOut"
+			default="no"/>
+
+		<!-- profile -->
+
+		<enum-field
+			name="gender"
+			type="gender"
+			nullable="yes"/>
+
+		<enum-field
+			name="orient"
+			type="orient"
+			nullable="yes"/>
+
+		<date-field
+			name="dob"
+			nullable="yes"/>
+
+		<string-field
+			name="name"
+			nullable="yes"/>
+
+		<reference-field
+			name="newChatUserName"
+			type="chatUserName"
+			nullable="yes"/>
+
+		<reference-field
+			name="infoText"
+			type="text"
+			nullable="yes"/>
+
+		<reference-field
+			name="newChatUserInfo"
+			type="chatUserInfo"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="vetAgain"
+			default="no"/>
+
+		<reference-field
+			type="queueItem"
+			nullable="yes"/>
+
+		<longitude-lattitude-field
+			name="locationLongLat"
+			columns="location_%"
+			nullable="yes"/>
+
+		<longitude-lattitude-field
+			name="locationBackupLongLat"
+			columns="location_backup_%"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="locationTime"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<string-field
+			name="locationPlace"
+			nullable="yes"/>
+
+		<longitude-lattitude-field
+			name="locationPlaceLongLat"
+			columns="location_place_%"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastAction"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastJoin"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastSend"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastReceive"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastInfo"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastPic"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastNameHint"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastJoinHint"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastPicHint"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastCreditHint"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="nextRegisterHelp"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="nextAd"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="nextAdultAd"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="nextQuietOutbound"
+			column-type="postgresql"
+			column="next_outbound"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="nextJoinOutbound"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="created"
+			column-type="postgresql"/>
+
+		<timestamp-field
+			name="firstJoin"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<reference-field
+			type="chatAffiliate"
+			nullable="yes"/>
+
+		<reference-field
+			type="chatScheme"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastBillSent"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<reference-field
+			name="mainChatUserImage"
+			type="chatUserImage"
+			nullable="yes"/>
+
+		<reference-field
+			name="mainChatUserVideo"
+			type="chatUserImage"
+			nullable="yes"/>
+
+		<reference-field
+			name="mainChatUserAudio"
+			type="chatUserImage"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="adultVerified"
+			default="no"/>
+
+		<timestamp-field
+			name="adultExpiry"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<enum-field
+			name="nextJoinType"
+			type="chatKeywordJoinType"
+			nullable="yes"/>
+
+		<integer-field
+			name="monitorCap"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="rebillFlag"
+			default="no"/>
+
+		<yes-no-field
+			name="hiddenFromChatTube"
+			column="hidden_from_chattube"
+			default="no"/>
+
+		<yes-no-field
+			name="stealthMonitor"
+			default="no"/>
+
+		<enum-field
+			name="imageMode"
+			type="chatUserImageMode"
+			default="link"/>
+
+		<enum-field
+			name="operatorLabel"
+			type="chatUserOperatorLabel"
+			default="operator"/>
+
+		<!-- ios app -->
+
+		<timestamp-field
+			name="lastMessagePoll"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<integer-field
+			name="lastMessagePollId"
+			default="0"/>
+
+		<enum-field
+			name="deliveryMethod"
+			type="chatMessageMethod"
+			nullable="yes"/>
+
+		<integer-field
+			name="lastDeliveryId"
+			nullable="yes"/>
+
+		<string-field
+			name="email"
+			nullable="yes"/>
+
+		<string-field
+			name="jigsawApplicationIdentifier"
+			nullable="yes"/>
+
+		<string-field
+			name="jigsawToken"
+			nullable="yes"/>
+
+		<!-- accounting counters -->
+
+		<integer-field
+			name="valueSinceWarning"
+			default="0"/>
+
+		<integer-field
+			name="valueSinceEver"
+			default="0"/>
+
+		<integer-field
+			name="credit"
+			default="0"/>
+
+		<integer-field
+			name="creditPending"
+			default="0"/>
+
+		<integer-field
+			name="creditPendingStrict"
+			default="0"/>
+
+		<integer-field
+			name="creditSuccess"
+			default="0"/>
+
+		<integer-field
+			name="creditFailed"
+			default="0"/>
+
+		<integer-field
+			name="creditRevoked"
+			default="0"/>
+
+		<integer-field
+			name="creditRetried"
+			default="0"/>
+
+		<integer-field
+			name="creditSent"
+			default="0"/>
+
+		<integer-field
+			name="creditAdded"
+			default="0"/>
+
+		<integer-field
+			name="creditBought"
+			default="0"/>
+
+		<enum-field
+			name="creditMode"
+			type="chatUserCreditMode"/>
+
+		<integer-field
+			name="userMessageCount"
+			default="0"/>
+
+		<integer-field
+			name="userMessageCharge"
+			default="0"/>
+
+		<integer-field
+			name="monitorMessageCount"
+			default="0"/>
+
+		<integer-field
+			name="monitorMessageCharge"
+			default="0"/>
+
+		<integer-field
+			name="textProfileCount"
+			default="0"/>
+
+		<integer-field
+			name="textProfileCharge"
+			default="0"/>
+
+		<integer-field
+			name="imageProfileCount"
+			default="0"/>
+
+		<integer-field
+			name="imageProfileCharge"
+			default="0"/>
+
+		<integer-field
+			name="videoProfileCount"
+			default="0"/>
+
+		<integer-field
+			name="videoProfileCharge"
+			default="0"/>
+
+		<integer-field
+			name="receivedMessageCount"
+			default="0"/>
+
+		<integer-field
+			name="receivedMessageCharge"
+			default="0"/>
+
+		<integer-field
+			name="creditDailyAmount"
+			default="0"/>
+
+		<date-field
+			name="creditDailyDate"
+			nullable="yes"/>
+
+		<integer-field
+			name="sessionInfoRemain"
+			nullable="yes"/>
+
+		<integer-field
+			name="rejectionCount"
+			default="0"/>
+
+		<integer-field
+			name="creditLimit"
+			default="1000"/>
+
+		<integer-field
+			name="numSpendWarnings"
+			default="0"/>
+
+		<integer-field
+			name="numImageUploadTokens"
+			default="0"/>
+
+		<!-- dating -->
+
+		<enum-field
+			name="dateMode"
+			type="chatUserDateMode"
+			default="none"/>
+
+		<integer-field
+			name="dateRadius"
+			default="75"/>
+
+		<integer-field
+			name="dateStartHour"
+			default="9"/>
+
+		<integer-field
+			name="dateEndHour"
+			default="21"/>
+
+		<date-field
+			name="dateDailyDate"
+			nullable="yes"/>
+
+		<integer-field
+			name="dateDailyCount"
+			default="0"/>
+
+		<integer-field
+			name="dateDailyMax"
+			default="3"/>
+
+		<timestamp-field
+			name="lastDateHint"
+			column-type="postgresql"
+			nullable="yes"/>
+
+	</fields>
+
+	<collections>
+
+		<children-mapping
+			name="fromContacts"
+			type="chatContact"
+			map-column="to_user_id"
+			map-type="integer"/>
+
+		<children-mapping
+			name="toContacts"
+			type="chatContact"
+			map-column="from_user_id"
+			map-type="integer"/>
+
+		<children-collection
+			type="chatHelpLog"
+			order-sql="timestamp DESC"/>
+
+		<children-collection
+			type="chatUserInfo"
+			order-sql="timestamp DESC"/>
+
+		<children-collection
+			type="chatUserName"
+			order-sql="timestamp DESC"/>
+
+		<children-mapping
+			name="blocked"
+			type="chatBlock"
+			map-column="blocked_chat_user_id"
+			map-type="integer"/>
+
+		<children-collection
+			type="chatUserImage"
+			order-sql="timestamp DESC"/>
+
+		<children-collection
+			type="chatUserCredit"
+			order-sql="timestamp DESC"/>
+
+		<children-collection
+			type="chatUserSession"
+			order-sql="start_time DESC"/>
+
+		<children-collection
+			type="chatUserDateLog"
+			order-sql="timestamp DESC"/>
+
+		<children-list
+			name="chatUserImageList"
+			type="chatUserImage"
+			where-sql="index IS NOT NULL AND type = 'image'"/>
+
+		<children-list
+			name="chatUserVideoList"
+			type="chatUserImage"
+			where-sql="index IS NOT NULL AND type = 'video'"/>
+
+		<children-list
+			name="chatUserAudioList"
+			type="chatUserImage"
+			where-sql="index IS NOT NULL AND type = 'audio'"/>
+
+		<children-mapping
+			name="profileFields"
+			type="chatUserProfileField"
+			map-column="chat_profile_field_id"
+			map-type="integer"/>
+
+	</collections>
 
 	<event-types>
 

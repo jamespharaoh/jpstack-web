@@ -13,6 +13,7 @@ import javax.inject.Named;
 
 import lombok.Cleanup;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageObjectHelper;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
@@ -47,6 +48,9 @@ class ChatUserImageUploadAction
 
 	@Inject
 	ChatUserImageObjectHelper chatUserImageHelper;
+
+	@Inject
+	ChatUserLogic chatUserLogic;
 
 	@Inject
 	Database database;
@@ -201,7 +205,8 @@ class ChatUserImageUploadAction
 		// create chat user image
 
 		List<ChatUserImageRec> chatUserImageList =
-			chatUser.getChatUserImageListByType (
+			chatUserLogic.getChatUserImageListByType (
+				chatUser,
 				chatUserImageType);
 
 		ChatUserImageRec chatUserImage =
@@ -246,7 +251,8 @@ class ChatUserImageUploadAction
 
 		if (uploadForm.setAsPrimary ()) {
 
-			chatUser.setMainChatUserImageByType (
+			chatUserLogic.setMainChatUserImageByType (
+				chatUser,
 				chatUserImageType,
 				chatUserImage);
 

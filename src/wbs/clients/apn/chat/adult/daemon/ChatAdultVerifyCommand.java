@@ -184,8 +184,9 @@ class ChatAdultVerifyCommand
 				.setCredit (
 					chatUser.getCredit () + credit)
 
-				.incCreditBought (
-					credit);
+				.setCreditBought (
+					+ chatUser.getCreditBought ()
+					+ credit);
 
 		}
 

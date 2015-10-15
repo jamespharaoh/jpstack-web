@@ -456,7 +456,8 @@ class ChatUserPendingFormAction
 		if (! chatUserImage.getAppend ()) {
 
 			ChatUserImageRec oldChatUserImage =
-				chatUser.getMainChatUserImageByType (
+				chatUserLogic.getMainChatUserImageByType (
+					chatUser,
 					imageType);
 
 			if (oldChatUserImage != null) {
@@ -472,7 +473,8 @@ class ChatUserPendingFormAction
 
 			}
 
-			chatUser.setMainChatUserImageByType (
+			chatUserLogic.setMainChatUserImageByType (
+				chatUser,
 				imageType,
 				chatUserImage);
 

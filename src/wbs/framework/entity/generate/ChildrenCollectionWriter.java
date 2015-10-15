@@ -82,12 +82,21 @@ class ChildrenCollectionWriter {
 
 		}
 
-		if (spec.where () != null) {
+		if (spec.whereSql () != null) {
 
 			annotationWriter.addAttributeFormat (
 				"where",
 				"\"%s\"",
-				spec.where ().replace ("\"", "\\\""));
+				spec.whereSql ().replace ("\"", "\\\""));
+
+		}
+
+		if (spec.orderSql () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"orderBy",
+				"\"%s\"",
+				spec.orderSql ().replace ("\"", "\\\""));
 
 		}
 

@@ -659,7 +659,8 @@ class ChatMessageLogicImpl
 						queueLogic.findQueue (chat, "message"),
 						chatUserContact,
 						chatMessage,
-						fromUser.getPrettyName (),
+						chatUserLogic.getPrettyName (
+							fromUser),
 						chatMessage.getOriginalText ().getText ());
 
 				queueItem

@@ -2771,7 +2771,9 @@ class ChatApiServletModule
 					numberRec);
 
 			List<ChatUserImageRec> images =
-				chatUser.getChatUserImageListByType (type);
+				chatUserLogic.getChatUserImageListByType (
+					chatUser,
+					type);
 
 			// delete images
 
@@ -2816,8 +2818,19 @@ class ChatApiServletModule
 
 				for (ChatUserImageRec image : images) {
 
-					if (chatUser.getMainChatUserImageByType (type) == image)
-						chatUser.setMainChatUserImageByType (type, null);
+					ChatUserImageRec mainChatUserImage =
+						chatUserLogic.getMainChatUserImageByType (
+							chatUser,
+							type);
+
+					if (mainChatUserImage == image) {
+
+						chatUserLogic.setMainChatUserImageByType (
+							chatUser,
+							type,
+							null);
+
+					}
 
 					image.setIndex (requestImageIds.contains (image.getId ()) ? null : i++);
 
@@ -2825,7 +2838,10 @@ class ChatApiServletModule
 
 				transaction.refresh (chatUser);
 
-				images = chatUser.getChatUserImageListByType (type);
+				images =
+					chatUserLogic.getChatUserImageListByType (
+						chatUser,
+						type);
 
 			}
 
@@ -2887,7 +2903,8 @@ class ChatApiServletModule
 				transaction.refresh (chatUser);
 
 				images =
-					chatUser.getChatUserImageListByType (
+					chatUserLogic.getChatUserImageListByType (
+						chatUser,
 						type);
 
 			}
@@ -2912,16 +2929,36 @@ class ChatApiServletModule
 				transaction.refresh (chatUser);
 
 				images =
-					chatUser.getChatUserImageListByType (type);
+					chatUserLogic.getChatUserImageListByType (
+						chatUser,
+						type);
 
 			}
 
 			// set selected image
+
 			if (selectedImageId != null) {
+
 				ChatUserImageRec selectedCui = null;
-				for (ChatUserImageRec cui : chatUser.getChatUserImageListByType (type)) {
-					if (! equal (cui.getId (), selectedImageId)) continue;
-					selectedCui = cui;
+
+				for (
+					ChatUserImageRec cui
+						: chatUserLogic.getChatUserImageListByType (
+							chatUser,
+							type)
+				) {
+
+					if (
+						notEqual (
+							cui.getId (),
+							selectedImageId)
+					) {
+						continue;
+					}
+
+					selectedCui =
+						cui;
+
 				}
 
 				if (selectedCui == null) {
@@ -2935,7 +2972,8 @@ class ChatApiServletModule
 
 				}
 
-				chatUser.setMainChatUserImageByType (
+				chatUserLogic.setMainChatUserImageByType (
+					chatUser,
 					type,
 					selectedCui);
 
@@ -2946,16 +2984,44 @@ class ChatApiServletModule
 			respImages =
 				Rpc.rpcList ("images", "image", RpcType.rStructure);
 
-			for (ChatUserImageRec cui : chatUser.getChatUserImageListByType (type)) {
+			for (
+				ChatUserImageRec cui
+					: chatUserLogic.getChatUserImageListByType (
+						chatUser,
+						type)
+			) {
 
 				RpcStructure respImage =
-					Rpc.rpcStruct ("image",
-						Rpc.rpcElem ("image-id", cui.getId ()),
-						Rpc.rpcElem ("media-id", cui.getMedia ().getId ()),
-						Rpc.rpcElem ("classification", cui.getClassification ()),
-						Rpc.rpcElem ("selected", cui == chatUser.getMainChatUserImageByType (type)),
-						Rpc.rpcElem ("status", chatUserInfoStatusMuneMap.get (cui.getStatus ())),
-						Rpc.rpcElem ("creation-time", cui.getTimestamp ().getTime ()));
+
+					Rpc.rpcStruct (
+						"image",
+
+						Rpc.rpcElem (
+							"image-id",
+							cui.getId ()),
+
+						Rpc.rpcElem (
+							"media-id",
+							cui.getMedia ().getId ()),
+
+						Rpc.rpcElem (
+							"classification",
+							cui.getClassification ()),
+
+						Rpc.rpcElem (
+							"selected",
+							cui == chatUserLogic.getMainChatUserImageByType (
+								chatUser,
+								type)),
+
+						Rpc.rpcElem (
+							"status",
+							chatUserInfoStatusMuneMap.get (
+								cui.getStatus ())),
+
+						Rpc.rpcElem (
+							"creation-time",
+							cui.getTimestamp ().getTime ()));
 
 				if (cui.getFullMedia () != null) {
 
@@ -2991,13 +3057,36 @@ class ChatApiServletModule
 					continue;
 
 				RpcStructure respImage =
-					Rpc.rpcStruct ("image",
-						Rpc.rpcElem ("image-id", cui.getId ()),
-						Rpc.rpcElem ("media-id", cui.getMedia ().getId ()),
-						Rpc.rpcElem ("classification", cui.getClassification ()),
-						Rpc.rpcElem ("selected", cui == chatUser.getMainChatUserImageByType (type)),
-						Rpc.rpcElem ("status", chatUserInfoStatusMuneMap.get (cui.getStatus ())),
-						Rpc.rpcElem ("creation-time", cui.getTimestamp ().getTime ()));
+
+					Rpc.rpcStruct (
+						"image",
+
+						Rpc.rpcElem (
+							"image-id",
+							cui.getId ()),
+
+						Rpc.rpcElem (
+							"media-id",
+							cui.getMedia ().getId ()),
+
+						Rpc.rpcElem (
+							"classification",
+							cui.getClassification ()),
+
+						Rpc.rpcElem (
+							"selected",
+							cui == chatUserLogic.getMainChatUserImageByType (
+								chatUser,
+								type)),
+
+						Rpc.rpcElem (
+							"status",
+							chatUserInfoStatusMuneMap.get (
+								cui.getStatus ())),
+
+						Rpc.rpcElem (
+							"creation-time",
+							cui.getTimestamp ().getTime ()));
 
 				if (cui.getFullMedia () != null) {
 
@@ -3211,8 +3300,9 @@ class ChatApiServletModule
 						chatUser.getCredit ()
 						+ creditAmount)
 
-					.incCreditBought (
-						creditAmount);
+					.setCreditBought (
+						+ chatUser.getCreditBought ()
+						+ creditAmount);
 
 			}
 

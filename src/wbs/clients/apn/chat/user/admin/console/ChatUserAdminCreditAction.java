@@ -101,19 +101,36 @@ class ChatUserAdminCreditAction
 		ChatUserCreditRec chatUserCredit =
 			chatUserCreditHelper.insert (
 				new ChatUserCreditRec ()
-					.setChatUser (chatUser)
-					.setCreditAmount (creditAmount)
-					.setBillAmount (billAmount)
-					.setUser (myUser)
-					.setGift (billAmount == 0)
-					.setDetails (details));
+
+			.setChatUser (
+				chatUser)
+
+			.setCreditAmount (
+				creditAmount)
+
+			.setBillAmount (
+				billAmount)
+
+			.setUser (
+				myUser)
+
+			.setGift (
+				billAmount == 0)
+
+			.setDetails (
+				details)
+
+		);
 
 		chatUser
 
 			.setCredit (
-				chatUser.getCredit () + creditAmount)
+				+ chatUser.getCredit ()
+				+ creditAmount)
 
-			.incCreditBought (creditAmount);
+			.setCreditBought (
+				+ chatUser.getCreditBought ()
+				+ creditAmount);
 
 		transaction.commit ();
 

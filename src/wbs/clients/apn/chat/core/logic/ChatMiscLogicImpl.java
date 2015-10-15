@@ -703,7 +703,8 @@ class ChatMiscLogicImpl
 					queueLogic.findQueue (chat, "user"),
 					chatUser,
 					chatUser,
-					chatUser.getPrettyName (),
+					chatUserLogic.getPrettyName (
+						chatUser),
 					"Name to approve");
 
 			chatUser.setQueueItem (qi);

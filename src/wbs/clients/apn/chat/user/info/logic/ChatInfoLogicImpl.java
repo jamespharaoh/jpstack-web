@@ -1294,7 +1294,8 @@ class ChatInfoLogicImpl
 					queueLogic.findQueue (chat, "user"),
 					chatUser,
 					chatUser,
-					chatUser.getPrettyName (),
+					chatUserLogic.getPrettyName (
+						chatUser),
 					"Info to approve");
 
 			chatUser

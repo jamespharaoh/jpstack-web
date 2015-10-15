@@ -17,6 +17,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ChildrenListSpec;
 import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
@@ -75,12 +76,33 @@ class ChildrenListWriter {
 				capitalise (
 					spec.typeName ()));
 
-		javaWriter.write (
-			"\t@CollectionField (\n");
+		// write field annotation
 
-		javaWriter.write (
-			"\t\tindex = \"%s\")\n",
-			"index");
+		AnnotationWriter annotationWriter =
+			new AnnotationWriter ()
+
+			.name (
+				"CollectionField");
+
+		annotationWriter.addAttributeFormat (
+			"index",
+			"\"%s\"",
+			"index".replace ("\"", "\\\""));
+
+		if (spec.whereSql () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"where",
+				"\"%s\"",
+				spec.whereSql ().replace ("\"", "\\\""));
+
+		}
+
+		annotationWriter.write (
+			javaWriter,
+			"\t");
+
+		// write field
 
 		javaWriter.write (
 			"\tList<%s.model.%s> %s =\n",

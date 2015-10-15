@@ -16,6 +16,7 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -54,13 +55,16 @@ class ChatAdultAdDaemon
 	ChatUserObjectHelper chatUserHelper;
 
 	@Inject
-	ServiceObjectHelper serviceHelper;
+	ChatUserLogic chatUserLogic;
 
 	@Inject
 	Database database;
 
 	@Inject
 	ExceptionLogger exceptionLogger;
+
+	@Inject
+	ServiceObjectHelper serviceHelper;
 
 	@Inject
 	ObjectManager objectManager;
@@ -257,11 +261,28 @@ class ChatAdultAdDaemon
 		String templateCode = null;
 
 		if (chatUser.getOrient () == Orient.bi) {
-			templateCode = "adult_ad_both";
-		} else if (chatUser.likes (Gender.male)) {
-			templateCode = "adult_ad_guys";
-		} else if (chatUser.likes (Gender.female)) {
-			templateCode = "adult_ad_girls";
+
+			templateCode =
+				"adult_ad_both";
+
+		} else if (
+			chatUserLogic.likes (
+				chatUser,
+				Gender.male)
+		) {
+
+			templateCode =
+				"adult_ad_guys";
+
+		} else if (
+			chatUserLogic.likes (
+				chatUser,
+				Gender.female)
+		) {
+
+			templateCode =
+				"adult_ad_girls";
+
 		}
 
 		ChatHelpTemplateRec template =

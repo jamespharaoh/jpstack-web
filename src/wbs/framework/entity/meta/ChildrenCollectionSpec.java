@@ -32,6 +32,9 @@ class ChildrenCollectionSpec
 	String joinColumnName;
 
 	@DataAttribute
-	String where;
+	String whereSql;
+
+	@DataAttribute
+	String orderSql;
 
 }

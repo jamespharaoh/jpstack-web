@@ -3,31 +3,27 @@ package wbs.framework.entity.meta;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("children-list")
-@PrototypeComponent ("childrenListSpec")
+@DataClass ("date-field")
+@PrototypeComponent ("dateFieldSpec")
 @ModelMetaData
 public
-class ChildrenListSpec
-	implements ModelCollectionSpec {
+class DateFieldSpec
+	implements ModelFieldSpec {
 
-	@DataAncestor
-	ModelMetaSpec model;
-
-	@DataAttribute
+	@DataAttribute (
+		required = true)
 	String name;
 
 	@DataAttribute (
-		value = "type",
-		required = true)
-	String typeName;
+		value = "column")
+	String columnName;
 
 	@DataAttribute
-	String whereSql;
+	Boolean nullable;
 
 }

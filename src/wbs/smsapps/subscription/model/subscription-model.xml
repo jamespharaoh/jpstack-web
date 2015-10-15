@@ -83,7 +83,7 @@
 		<children-collection
 			name="activeSubscriptionNumbers"
 			type="subscriptionNumber"
-			where="active"/>
+			where-sql="active"/>
 
 		<children-collection
 			type="subscriptionAffiliate"/>

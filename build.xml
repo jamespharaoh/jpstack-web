@@ -56,6 +56,7 @@
       <include name="wbs/framework/**"/>
       <include name="wbs/api/**"/>
       <include name="wbs/console/**"/>
+      <include name="wbs/**/generate/**"/>
       <include name="wbs/**/metamodel/**"/>
     </javac>
     <copy todir="work/bin">

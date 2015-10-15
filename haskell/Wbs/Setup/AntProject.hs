@@ -317,6 +317,9 @@ writeBuildFile world = do
 						sattr "name" "wbs/console/**"
 					] [],
 					mkelem "include" [
+						sattr "name" "wbs/**/generate/**"
+					] [],
+					mkelem "include" [
 						sattr "name" "wbs/**/metamodel/**"
 					] []
 
