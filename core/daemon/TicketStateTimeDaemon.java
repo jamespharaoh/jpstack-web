@@ -100,6 +100,9 @@ class TicketStateTimeDaemon
 	protected
 	void runOnce () {
 
+		// TODO disabled for now
+		if (Boolean.parseBoolean ("true")) return;
+
 		log.debug ("Getting all unqueued tickets");
 
 		// get all the unqueued tickets
