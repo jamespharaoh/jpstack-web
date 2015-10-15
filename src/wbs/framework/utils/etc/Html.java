@@ -394,12 +394,22 @@ class Html {
 	}
 
 	public static
-	String nbsp (
+	String nonBreakingWhitespace (
 			String source) {
 
 		return source.replaceAll (
 			" ",
 			"&nbsp;");
+
+	}
+
+	public static
+	String encodeNonBreakingWhitespace (
+			String source) {
+
+		return nonBreakingWhitespace (
+			encode (
+				source));
 
 	}
 

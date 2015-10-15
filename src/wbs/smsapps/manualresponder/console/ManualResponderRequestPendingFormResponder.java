@@ -441,7 +441,7 @@ class ManualResponderRequestPendingFormResponder
 
 		printFormat (
 			"<td>%s</td>\n",
-			Html.nbsp (
+			Html.nonBreakingWhitespace (
 				Html.encode (
 					template.getName ())));
 
@@ -451,7 +451,7 @@ class ManualResponderRequestPendingFormResponder
 
 		printFormat (
 			"<td>%s</td>\n",
-			Html.nbsp (
+			Html.nonBreakingWhitespace (
 				Html.encode (
 					route.getOutCharge () > 0
 						? currencyLogic.formatText (

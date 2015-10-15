@@ -157,7 +157,7 @@ class ChatUserOnlinePart
 				chatConsoleLogic.tdForChatUserOrientShort (chatUser),
 
 				"<td>%s</td>\n",
-				Html.nbsp (
+				Html.nonBreakingWhitespace (
 					Html.encode (
 						chatUser.getName ())));
 
@@ -203,7 +203,7 @@ class ChatUserOnlinePart
 
 				printFormat (
 					"<td>%s</td>\n",
-					Html.nbsp (
+					Html.nonBreakingWhitespace (
 						Html.encode (
 							requestContext.prettyDateDiff (
 								chatUser.getLastAction (),

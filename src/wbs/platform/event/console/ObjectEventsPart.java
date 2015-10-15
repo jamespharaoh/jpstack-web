@@ -179,7 +179,7 @@ class ObjectEventsPart
 			"<tr>\n",
 
 			"<td>%s</td>\n",
-			Html.nbsp (Html.encode (
+			Html.nonBreakingWhitespace (Html.encode (
 				timeFormatter.instantToTimeString (
 					timeFormatter.defaultTimezone (),
 					dateToInstant (

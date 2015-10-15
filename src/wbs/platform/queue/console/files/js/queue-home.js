@@ -1,5 +1,3 @@
-// on load
-
 $(function () {
 
 	var allQueueItems;
@@ -14,12 +12,15 @@ $(function () {
 	// go function, called below
 
 	var go = function () {
+
 		getQueueItems ();
+
 		fetchOptionSets (function () {
 			createOptionSets ();
 			showAndHideQueueItems ();
 			createShowHideLink ();
 		});
+
 	};
 
 	var createShowHideLink = function () {
@@ -50,6 +51,7 @@ $(function () {
 
 		if (localStorage.getItem ("showHide") == "hide")
 			toggle ();
+
 	};
 
 	// read queue item data from html
@@ -59,6 +61,7 @@ $(function () {
 		allQueueItems = [];
 
 		$(".queueItemTable .queueItemRow").each (function () {
+
 			var row = $(this);
 
 			var queueItem = {
@@ -73,7 +76,9 @@ $(function () {
 			};
 
 			allQueueItems.push (queueItem);
+
 		});
+
 	};
 
 	// load option set data via ajax
@@ -96,7 +101,7 @@ $(function () {
 
 	var createOptionSets = function () {
 
-		$.each (optionSets, function (i, optionSet) {
+		optionSets.forEach (function (optionSet) {
 
 			// create the new option set element
 
@@ -110,7 +115,7 @@ $(function () {
 
 			// iterate option
 
-			$.each (optionSet.options, function (j, option) {
+			optionSet.options.forEach (function (option) {
 
 				option.key =
 					"optionSet/" + optionSet.name + "/" + option.name;
@@ -136,7 +141,7 @@ $(function () {
 
 				option.checkboxElem.attr ("id", option.checkboxId);
 
-				option.checkboxElem.attr ("checked", option.enabled);
+				option.checkboxElem.prop ("checked", option.enabled);
 
 				(function (option) { // capture value of option
 
@@ -145,7 +150,7 @@ $(function () {
 						// update local storage and stuff
 
 						option.enabled =
-							option.checkboxElem.attr ("checked");
+							option.checkboxElem.prop ("checked");
 
 						localStorage.setItem (
 							option.key,
@@ -154,6 +159,7 @@ $(function () {
 						// update display of queue items
 
 						showAndHideQueueItems ();
+
 					});
 
 				}) (option);
@@ -167,12 +173,15 @@ $(function () {
 				// add the option element
 
 				optionSet.elem.append (option.elem);
+
 			});
 
 			// add the option set element
 
 			optionSetsElem.append (optionSet.elem);
+
 		});
+
 	};
 
 	// display and hide queue items based on selection
@@ -183,13 +192,14 @@ $(function () {
 
 			var match = false;
 
-			$.each (option.or, function (i, subOption) {
+			option.or.forEach (function (subOption) {
 
 				var subMatch =
 					queueItemMatches (queueItem, subOption);
 
 				if (subMatch)
 					match = true;
+
 			});
 
 			return match;
@@ -197,13 +207,13 @@ $(function () {
 
 		var match = true;
 
-		$.each ([
+		[
 			"parentObjectTypeCode",
 			"parentObjectCode",
 			"queueTypeCode",
 			"queueCode",
 			"sliceCode"
-		], function (i, field) {
+		].forEach (function (field) {
 
 			if (! option [field])
 				return;
@@ -224,11 +234,11 @@ $(function () {
 		var enabledQueueItems = [];
 		var disabledQueueItems = [];
 
-		$.each (optionSet.options, function (j, option) {
+		optionSet.options.forEach (function (option) {
 
 			var nextQueueItems = [];
 
-			$.each (queueItems, function (k, queueItem) {
+			queueItems.forEach (function (queueItem) {
 
 				var match =
 					queueItemMatches (queueItem, option);
@@ -238,18 +248,21 @@ $(function () {
 					return;
 				}
 
-				if (option.checkboxElem.attr ("checked")) {
+				if (option.checkboxElem.prop ("checked")) {
 					enabledQueueItems.push (queueItem);
 				} else {
 					disabledQueueItems.push (queueItem);
 				}
+
 			});
 
 			queueItems = nextQueueItems;
+
 		});
 
 		var oldestDisabled = undefined;
-		$.each (disabledQueueItems, function (i, queueItem) {
+
+		disabledQueueItems.forEach (function (queueItem) {
 
 			if (! oldestDisabled) {
 				oldestDisabled = queueItem;
@@ -260,12 +273,14 @@ $(function () {
 				return;
 
 			oldestDisabled = queueItem;
+
 		});
 
 		return {
 			queueItems: enabledQueueItems,
 			oldestDisabled: oldestDisabled
 		};
+
 	};
 
 	// show or hide every queue item as appropriate
@@ -277,26 +292,34 @@ $(function () {
 
 		// filter queue items based on each option set
 
-		$.each (optionSets, function (i, optionSet) {
+		optionSets.forEach (function (optionSet) {
 
-			ret =
+			var ret =
 				filterQueueItems (optionSet, queueItems);
 
-			queueItems = ret.queueItems;
+			queueItems =
+				ret.queueItems;
 
-			if (ret.oldestDisabled && (
+			if (
+				ret.oldestDisabled
+				&& (
 					oldestDisabled == undefined
-						|| ret.oldestDisabled.oldestTimestamp
-							< oldestDisabled.oldestTimestamp))
+					|| ret.oldestDisabled.oldestTimestamp
+						< oldestDisabled.oldestTimestamp
+				)
+			) {
 
 				oldestDisabled = ret.oldestDisabled;
+
+			}
+
 		});
 
 		// hide and display them as appropriate
 
 		$(".queueItemTable .queueItemRow").hide ();
 
-		$.each (queueItems, function (i, queueItem) {
+		queueItems.forEach (function (queueItem) {
 			queueItem.row.show ();
 		});
 
@@ -312,6 +335,7 @@ $(function () {
 			disabledInfo += ", oldest is " + oldestDisabled.oldestString;
 
 		$(".disabledInfo").text (disabledInfo);
+
 	};
 
 	// go

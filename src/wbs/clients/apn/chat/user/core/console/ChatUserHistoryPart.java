@@ -188,7 +188,7 @@ class ChatUserHistoryPart
 						chatMessage.getTimestamp ())),
 
 				"<td>%s</td>\n",
-				Html.nbsp (
+				Html.nonBreakingWhitespace (
 					Html.encode (
 						otherUserId)),
 
