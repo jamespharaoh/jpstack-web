@@ -207,8 +207,11 @@ class QueueHomeResponder
 		// queue items
 
 		printFormat (
-			"<table class=\"list queueItemTable\">\n",
+			"<table",
+			" class=\"list queueItemTable\"",
+			">\n");
 
+		printFormat (
 			"<tr>\n",
 			"<th>Claim</th>\n",
 			"<th>Object</th>\n",
@@ -285,41 +288,49 @@ class QueueHomeResponder
 				">\n");
 
 			printFormat (
-
 				"<input",
 				" type=\"hidden\"",
 				" name=\"queue_id\"",
 				" value=\"%h\"",
 				queue.getId (),
-				">",
+				">");
 
+			printFormat (
 				"<input",
 				" type=\"submit\"",
 				" value=\"claim\"",
-				">",
+				">");
 
-				"</form></td>\n",
+			printFormat (
+				"</form></td>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
 				objectManager.objectPath (
 					objectManager.getParent (
 						queue),
 					myUser.getSlice (),
 					false,
-					false),
+					false));
 
+			printFormat (
 				"<td>%h</td>\n",
-				queue.getCode (),
+				queue.getCode ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				queueInfo.availableItems (),
+				queueInfo.availableItems ());
 
-				"<td class=\"queueItemOldest\">%h</td>\n",
-				requestContext.prettyDateDiff (
-					millisToInstant (queueInfo.oldestAvailable ()),
-					now),
+			printFormat (
+				"<td class=\"queueItemOldest\">%s</td>\n",
+				Html.encodeNonBreakingWhitespace (
+					requestContext.prettyDateDiff (
+						millisToInstant (queueInfo.oldestAvailable ()),
+						now)));
 
+			printFormat (
 				"</tr>\n");
+
 		}
 
 		printFormat (
