@@ -202,29 +202,49 @@ class ChatMonitorInboxFormAction
 				|| userChatUser.getBlockAll ();
 
 			boolean deleted =
-				chatUserLogic.deleted (userChatUser);
+				chatUserLogic.deleted (
+					userChatUser);
 
 			// create a chat message
 
 			TextRec textRec =
-				textHelper.findOrCreate (text);
+				textHelper.findOrCreate (
+					text);
 
 			ChatMessageRec chatMessage =
 				objectManager.insert (
 					new ChatMessageRec ()
-						.setChat (chat)
-						.setFromUser (monitorChatUser)
-						.setToUser (userChatUser)
-						.setOriginalText (textRec)
-						.setEditedText (
-							blocked
-								? null
-								: textRec)
-						.setStatus (
-							blocked
-								? ChatMessageStatus.blocked
-								: ChatMessageStatus.sent)
-						.setSender (myUser));
+
+				.setChat (
+					chat)
+
+				.setFromUser (
+					monitorChatUser)
+
+				.setToUser (
+					userChatUser)
+
+				.setTimestamp (
+					instantToDate (
+						transaction.now ()))
+
+				.setOriginalText (
+					textRec)
+
+				.setEditedText (
+					blocked
+						? null
+						: textRec)
+
+				.setStatus (
+					blocked
+						? ChatMessageStatus.blocked
+						: ChatMessageStatus.sent)
+
+				.setSender (
+					myUser)
+
+			);
 
 			// update contact entry, set monitor warning if first message
 

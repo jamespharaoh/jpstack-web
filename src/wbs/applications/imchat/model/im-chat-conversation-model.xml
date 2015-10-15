@@ -41,7 +41,7 @@
 
 	<collections>
 
-		<children-collection
+		<children-list
 			type="imChatMessage"/>
 
 	</collections>

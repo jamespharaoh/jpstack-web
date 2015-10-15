@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.broadcast.logic;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -304,6 +305,9 @@ class ChatBroadcastSendHelper
 			ChatBroadcastRec chatBroadcast,
 			ChatBroadcastNumberRec chatBroadcastNumber) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		// sanity check
 
 		if (
@@ -366,6 +370,10 @@ class ChatBroadcastSendHelper
 
 			.setToUser (
 				toChatUser)
+
+			.setTimestamp (
+				instantToDate (
+					transaction.now ()))
 
 			.setOriginalText (
 				chatBroadcast.getText ())

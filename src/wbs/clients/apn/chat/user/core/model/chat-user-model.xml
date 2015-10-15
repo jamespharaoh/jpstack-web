@@ -486,13 +486,15 @@
 		<children-mapping
 			name="fromContacts"
 			type="chatContact"
-			map-column="to_user_id"
+			join-column="to_user_id"
+			map-column="from_user_id"
 			map-type="integer"/>
 
 		<children-mapping
 			name="toContacts"
 			type="chatContact"
-			map-column="from_user_id"
+			join-column="from_user_id"
+			map-column="to_user_id"
 			map-type="integer"/>
 
 		<children-collection

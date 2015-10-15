@@ -412,6 +412,10 @@ class ChatMessageLogicImpl
 			.setToUser (
 				toUser)
 
+			.setTimestamp (
+				instantToDate (
+					transaction.now ()))
+
 			.setThreadId (
 				threadId)
 
@@ -1097,6 +1101,9 @@ class ChatMessageLogicImpl
 			ChatUserRec userChatUser,
 			boolean alarm) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ChatRec chat =
 			userChatUser.getChat ();
 
@@ -1121,6 +1128,10 @@ class ChatMessageLogicImpl
 
 			.setUserChatUser (
 				userChatUser)
+
+			.setTimestamp (
+				instantToDate (
+					transaction.now ()))
 
 		);
 

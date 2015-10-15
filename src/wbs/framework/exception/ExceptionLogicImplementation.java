@@ -1,5 +1,7 @@
 package wbs.framework.exception;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
@@ -8,6 +10,7 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.hibernate.JDBCException;
+import org.hibernate.exception.ConstraintViolationException;
 
 import wbs.framework.application.annotations.SingletonComponent;
 
@@ -105,6 +108,33 @@ class ExceptionLogicImplementation
 
 			printWriter.print (
 				jdbcException.getSQL ());
+
+			printWriter.print (	
+				"\n");
+
+			if (throwable instanceof ConstraintViolationException) {
+
+				ConstraintViolationException constraintViolationException =
+					(ConstraintViolationException)
+					jdbcException;
+
+				if (
+					isNotNull (
+						constraintViolationException.getConstraintName ())
+				) {
+
+					printWriter.print (
+						"\nCONSTRAINT:\n\n");
+
+					printWriter.print (
+						constraintViolationException.getConstraintName ());
+
+					printWriter.print (
+						"\n");
+						
+				}
+
+			}
 
 			writeSqlException (
 				jdbcException.getSQLException (),

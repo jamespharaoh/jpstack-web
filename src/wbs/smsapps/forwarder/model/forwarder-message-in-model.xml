@@ -31,6 +31,7 @@
 		<timestamp-field
 			name="createdTime"
 			column-type="postgresql"
+			column="created_timestamp"
 			nullable="yes"/>
 
 		<timestamp-field
@@ -42,11 +43,13 @@
 		<timestamp-field
 			name="processedTime"
 			column-type="postgresql"
+			column="processed_timestamp"
 			nullable="yes"/>
 
 		<timestamp-field
 			name="borrowedTime"
 			column-type="postgresql"
+			column="borrowed_timestamp"
 			nullable="yes"/>
 
 		<timestamp-field

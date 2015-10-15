@@ -174,7 +174,9 @@ class ChatUserAlarmDaemon
 					true);
 
 			chatMonitorInbox
-				.setOutbound (true);
+
+				.setOutbound (
+					true);
 
 		}
 

@@ -18,7 +18,10 @@
 			name="toUser"
 			type="chatUser"/>
 
-		<!-- data -->
+		<!-- details -->
+
+		<reference-field
+			type="chat"/>
 
 		<reference-field
 			name="inverseChatContact"

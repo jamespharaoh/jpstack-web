@@ -580,17 +580,24 @@ class ChatUserLogicImpl
 	ChatUserRec createChatMonitor (
 			@NonNull ChatRec chat) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		return objectManager.insert (
 			new ChatUserRec ()
 
 			.setChat (
 				chat)
 
-			.setType (
-				ChatUserType.monitor)
-
 			.setCode (
 				randomLogic.generateNumericNoZero (6))
+
+			.setCreated (
+				instantToDate (
+					transaction.now ()))
+
+			.setType (
+				ChatUserType.monitor)
 
 		);
 

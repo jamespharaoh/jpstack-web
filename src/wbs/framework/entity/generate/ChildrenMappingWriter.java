@@ -18,6 +18,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ChildrenMappingSpec;
 import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
@@ -77,12 +78,29 @@ class ChildrenMappingWriter {
 
 		// write field annotation
 
-		javaWriter.write (
-			"\t@CollectionField (\n");
+		AnnotationWriter annotationWriter =
+			new AnnotationWriter ()
 
-		javaWriter.write (
-			"\t\tindex = \"%s\")\n",
-			spec.mapColumnName ());
+			.name (
+				"CollectionField");
+
+		if (spec.joinColumnName () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"key",
+				"\"%s\"",
+				spec.joinColumnName ().replace ("\"", "\\\""));
+
+		}
+
+		annotationWriter.addAttributeFormat (
+			"index",
+			"\"%s\"",
+			spec.mapColumnName ().replace ("\"", "\\\""));
+
+		annotationWriter.write (
+			javaWriter,
+			"\t");
 
 		// write field
 

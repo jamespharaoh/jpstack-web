@@ -1,4 +1,31 @@
 <model-meta
-	name="chatUserDobFailure">
+	name="chatUserDobFailure"
+	type="event">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="chatUser"/>
+
+		<timestamp-field
+			name="timestamp"
+			column-type="postgresql"/>
+
+		<!-- data -->
+
+		<reference-field
+			type="message"/>
+
+		<reference-field
+			name="failingText"
+			type="text"/>
+
+	</fields>
 
 </model-meta>

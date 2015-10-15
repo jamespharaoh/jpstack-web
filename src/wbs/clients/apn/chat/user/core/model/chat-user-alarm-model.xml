@@ -1,4 +1,39 @@
 <model-meta
-	name="chatUserAlarm">
+	name="chatUserAlarm"
+	type="ephemeral">
+
+	<fields>
+
+		<!-- id -->
+		
+		<generated-id-field/>
+		
+		<!-- identity -->
+		
+		<!-- TODO -->
+
+		<!-- details -->
+
+		<reference-field
+			type="chatUser"/>
+			
+		<reference-field
+			name="monitorChatUser"
+			type="chatUser"/>
+
+		<!-- settings -->
+
+		<timestamp-field
+			name="alarmTime"
+			column-type="postgresql"/>
+
+		<timestamp-field
+			name="resetTime"
+			column-type="postgresql"/>
+
+		<yes-no-field
+			name="sticky"/>
+
+	</fields>
 
 </model-meta>

@@ -130,6 +130,9 @@ class ChatContactObjectHelperImplementation
 			.setToUser (
 				toUser)
 
+			.setChat (
+				fromUser.getChat ())
+
 			.setInverseChatContact (
 				inverseChatContact)
 

@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.user.core.model;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -11,6 +12,8 @@ import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.logic.ChatNumberReportLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.utils.RandomLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.logic.NumberLogic;
@@ -22,6 +25,9 @@ class ChatUserObjectHelperImplementation
 	implements ChatUserObjectHelperMethods {
 
 	// dependencies
+
+	@Inject
+	Database database;
 
 	@Inject
 	RandomLogic randomLogic;
@@ -139,6 +145,9 @@ class ChatUserObjectHelperImplementation
 			ChatRec chat,
 			NumberRec number) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ChatUserObjectHelper chatUserHelper =
 			chatUserHelperProvider.get ();
 
@@ -153,6 +162,13 @@ class ChatUserObjectHelperImplementation
 			.setChat (
 				chat)
 
+			.setCode (
+				randomLogic.generateNumericNoZero (6))
+
+			.setCreated (
+				instantToDate (
+					transaction.now ()))
+
 			.setNumber (
 				number)
 
@@ -161,9 +177,6 @@ class ChatUserObjectHelperImplementation
 
 			.setType (
 				ChatUserType.user)
-
-			.setCode (
-				randomLogic.generateNumericNoZero (6))
 
 			.setDeliveryMethod (
 				ChatMessageMethod.sms)

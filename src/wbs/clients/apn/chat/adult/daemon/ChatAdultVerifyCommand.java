@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.adult.daemon;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.Collections;
 
 import javax.inject.Inject;
@@ -20,6 +22,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -107,6 +110,9 @@ class ChatAdultVerifyCommand
 	public
 	InboxAttemptRec handle () {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ChatRec chat =
 			chatHelper.find (
 				command.getParentObjectId ());
@@ -164,6 +170,10 @@ class ChatAdultVerifyCommand
 
 				.setChatUser (
 					chatUser)
+
+				.setTimestamp (
+					instantToDate (
+						transaction.now ()))
 
 				.setCreditAmount (
 					credit)

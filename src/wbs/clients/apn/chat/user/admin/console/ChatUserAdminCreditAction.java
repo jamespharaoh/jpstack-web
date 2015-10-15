@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Map;
@@ -104,6 +105,10 @@ class ChatUserAdminCreditAction
 
 			.setChatUser (
 				chatUser)
+
+			.setTimestamp (
+				instantToDate (
+					transaction.now ()))
 
 			.setCreditAmount (
 				creditAmount)

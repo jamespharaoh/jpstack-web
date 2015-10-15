@@ -436,11 +436,15 @@ class ChatCoreFixtureProvider
 				.setChat (
 					chat)
 
-				.setChatScheme (
-					leftChatScheme)
-
 				.setCode (
 					code)
+
+				.setCreated (
+					instantToDate (
+						transaction.now ()))
+
+				.setChatScheme (
+					leftChatScheme)
 
 				.setType (
 					ChatUserType.user)
@@ -450,10 +454,6 @@ class ChatCoreFixtureProvider
 
 				.setCreditMode (
 					ChatUserCreditMode.strict)
-
-				.setCreated (
-					instantToDate (
-						transaction.now ()))
 
 			);
 
@@ -488,15 +488,15 @@ class ChatCoreFixtureProvider
 				.setCode (
 					code)
 
+				.setCreated (
+					instantToDate (
+						transaction.now ()))
+
 				.setType (
 					ChatUserType.monitor)
 
 				.setCreditMode (
 					ChatUserCreditMode.free)
-
-				.setCreated (
-					instantToDate (
-						transaction.now ()))
 
 			);
 

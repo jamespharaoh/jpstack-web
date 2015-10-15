@@ -3280,6 +3280,10 @@ class ChatApiServletModule
 					.setChatUser (
 						chatUser)
 
+					.setTimestamp (
+						instantToDate (
+							transaction.now ()))
+
 					.setCreditAmount (
 						ifNull (creditAmount, 0))
 

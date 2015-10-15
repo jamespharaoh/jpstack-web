@@ -30,7 +30,7 @@ export WBS_CONFIG_XML=$BASEDIR/conf/wbs-$WBS_CONFIG-config.xml
 # run command
 
 exec java $JAVA_OPTS \
-	wbs.platform.application.tools.BeanRunner \
+	wbs.framework.application.tools.BeanRunner \
 	wbs-apn \
 	wbs.apn \
 	utils,config,data,entity,schema,sql,model,hibernate,object,logic,daemon \

@@ -708,6 +708,9 @@ class ChatUserPendingFormAction
 			Integer threadId,
 			String messageParam) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ChatRec chat =
 			chatUser.getChat ();
 
@@ -738,11 +741,12 @@ class ChatUserPendingFormAction
 				.setToUser (
 					chatUser)
 
+				.setTimestamp (
+					instantToDate (
+						transaction.now ()))
+
 				.setChat (
 					chat)
-
-				.setTimestamp (
-					new Date ())
 
 				.setSender (
 					myUser)
@@ -892,11 +896,12 @@ class ChatUserPendingFormAction
 				.setToUser (
 					chatUser)
 
+				.setTimestamp (
+					instantToDate (
+						transaction.now ()))
+
 				.setChat (
 					chat)
-
-				.setTimestamp (
-					new Date ())
 
 				.setSender (
 					myUser)

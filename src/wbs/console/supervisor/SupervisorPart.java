@@ -121,7 +121,7 @@ class SupervisorPart
 
 		} else {
 
-			List<String> supervisorConfigNames =
+			supervisorConfigNames =
 				supervisorHelper.getSupervisorConfigNames ();
 
 			ImmutableList.Builder<SupervisorConfig> supervisorConfigsBuilder =
