@@ -152,8 +152,8 @@
 		name="settings"
 		object-name="broadcast">
 
-		<script-ref
-			path="/js/gsm.js"/>
+		<jquery-script-ref/>
+		<script-ref path="/js/gsm.js"/>
 
 		<id-field/>
 		<parent-field read-only="yes"/>

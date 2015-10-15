@@ -37,6 +37,8 @@
 		<bean class="IntegerFormFieldNativeMapping"/>
 		<bean class="IntegerFormFieldSpec"/>
 		<bean class="IntegerFormFieldValueValidator"/>
+		<bean class="JqueryScriptRefFormFieldBuilder"/>
+		<bean class="JqueryScriptRefFormFieldSpec"/>
 		<bean class="NameFormFieldAccessor"/>
 		<bean class="NameFormFieldBuilder"/>
 		<bean class="NameFormFieldConstraintValidator"/>
