@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -37,6 +38,7 @@ import wbs.framework.entity.meta.ParentFieldSpec;
 import wbs.framework.entity.meta.ParentIdFieldSpec;
 import wbs.framework.entity.meta.ParentTypeFieldSpec;
 import wbs.framework.entity.meta.TimestampFieldSpec;
+import wbs.framework.entity.meta.TypeCodeFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
 
 import com.google.common.collect.ImmutableList;
@@ -189,6 +191,7 @@ class ModelRecordGenerator {
 			wbs.framework.entity.annotations.ReferenceField.class,
 			wbs.framework.entity.annotations.SimpleField.class,
 			wbs.framework.entity.annotations.SlaveField.class,
+			wbs.framework.entity.annotations.TypeCodeField.class,
 			wbs.framework.entity.annotations.TypeField.class,
 
 			wbs.framework.record.CommonRecord.class,
@@ -471,10 +474,15 @@ class ModelRecordGenerator {
 		ParentIdFieldSpec parentIdField = null;
 		MasterFieldSpec masterField = null;
 
+		TypeCodeFieldSpec typeCodeField = null;
 		CodeFieldSpec codeField = null;
 		IndexFieldSpec indexField = null;
-		IdentityReferenceFieldSpec identityReferenceField = null;
-		IdentityIntegerFieldSpec identityIntegerField = null;
+
+		List<IdentityReferenceFieldSpec> identityReferenceFields =
+			new ArrayList<IdentityReferenceFieldSpec> ();
+
+		List<IdentityIntegerFieldSpec> identityIntegerFields =
+			new ArrayList<IdentityIntegerFieldSpec> ();
 
 		TimestampFieldSpec timestampField = null;
 
@@ -517,6 +525,14 @@ class ModelRecordGenerator {
 
 			}
 
+			if (modelField instanceof TypeCodeFieldSpec) {
+
+				typeCodeField =
+					(TypeCodeFieldSpec)
+					modelField;
+
+			}
+
 			if (modelField instanceof CodeFieldSpec) {
 
 				codeField =
@@ -539,9 +555,9 @@ class ModelRecordGenerator {
 
 			if (modelField instanceof IdentityReferenceFieldSpec) {
 
-				identityReferenceField =
+				identityReferenceFields.add (
 					(IdentityReferenceFieldSpec)
-					modelField;
+					modelField);
 
 				gotName = true;
 
@@ -549,9 +565,9 @@ class ModelRecordGenerator {
 
 			if (modelField instanceof IdentityIntegerFieldSpec) {
 
-				identityIntegerField =
+				identityIntegerFields.add (
 					(IdentityIntegerFieldSpec)
-					modelField;
+					modelField);
 
 				gotName = true;
 
@@ -696,24 +712,50 @@ class ModelRecordGenerator {
 
 			}
 
+			if (typeCodeField != null) {
+
+				javaWriter.write (
+					"\t\t\t.append (\n");
+
+				javaWriter.write (
+					"\t\t\t\tget%s (),\n",
+					capitalise (
+						ifNull (
+							typeCodeField.name (),
+							"type")));
+
+				javaWriter.write (
+					"\t\t\t\tother.get%s ())\n",
+					capitalise (
+						ifNull (
+							typeCodeField.name (),
+							"type")));
+
+				javaWriter.write (
+					"\n");
+
+			}
+
 			if (codeField != null) {
 
 				javaWriter.write (
+					"\t\t\t.append (\n");
 
-					"\t\t\t.append (\n",
-
+				javaWriter.write (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
 						ifNull (
 							codeField.name (),
-							"code")),
+							"code")));
 
+				javaWriter.write (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
 						ifNull (
 							codeField.name (),
-							"code")),
+							"code")));
 
+				javaWriter.write (
 					"\n");
 
 			}
@@ -742,7 +784,10 @@ class ModelRecordGenerator {
 
 			}
 
-			if (identityReferenceField != null) {
+			for (
+				IdentityReferenceFieldSpec identityReferenceField
+					: identityReferenceFields
+			) {
 
 				javaWriter.write (
 					"\t\t\t.append (\n");
@@ -766,7 +811,10 @@ class ModelRecordGenerator {
 
 			}
 
-			if (identityIntegerField != null) {
+			for (
+				IdentityIntegerFieldSpec identityIntegerField
+					: identityIntegerFields
+			) {
 
 				javaWriter.write (
 					"\t\t\t.append (\n");

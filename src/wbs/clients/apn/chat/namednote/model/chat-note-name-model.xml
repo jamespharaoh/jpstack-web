@@ -1,4 +1,28 @@
 <model-meta
-	name="chatNoteName">
+	name="chatNoteName"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="chat"/>
+
+		<index-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+	</fields>
 
 </model-meta>

@@ -8,31 +8,14 @@ import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("enum-field")
+@DataClass ("type-code-field")
+@PrototypeComponent ("typeCodeFieldSpec")
 @ModelMetaData
-@PrototypeComponent ("enumFieldSpec")
 public
-class EnumFieldSpec
+class TypeCodeFieldSpec
 	implements ModelFieldSpec {
 
-	@DataAttribute (
-		required = true)
-	String name;
-
 	@DataAttribute
-	Boolean nullable;
-
-	@DataAttribute (
-		value = "type",
-		required = true)
-	String typeName;
-
-	@DataAttribute (
-		value = "default")
-	String defaultValue;
-
-	@DataAttribute (
-		value = "column")
-	String columnName;
+	String name;
 
 }

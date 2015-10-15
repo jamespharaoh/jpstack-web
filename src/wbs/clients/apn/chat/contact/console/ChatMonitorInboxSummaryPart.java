@@ -646,6 +646,7 @@ class ChatMonitorInboxSummaryPart
 						.getUsername (),
 					namedNote
 						.getTimestamp ()
+						.toDateTime ()
 						.toString (timestampPattern)))
 
 			: stringFormat (

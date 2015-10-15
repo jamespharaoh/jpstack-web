@@ -315,6 +315,9 @@ class ChatCoreFixtureProvider
 			.setCode (
 				"spend_warning_1")
 
+			.setDescription (
+				"Spend warning 1")
+
 			.setText (
 				"spend 1")
 
@@ -331,6 +334,9 @@ class ChatCoreFixtureProvider
 
 			.setCode (
 				"spend_warning_2")
+
+			.setDescription (
+				"Spend warning 2")
 
 			.setText (
 				"spend 2")

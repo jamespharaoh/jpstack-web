@@ -1,4 +1,32 @@
 <model-meta
-	name="chatNamedNoteLog">
+	name="chatNamedNoteLog"
+	type="event">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="chatNamedNote"/>
+
+		<!-- TODO index -->
+
+		<timestamp-field
+			name="timestamp"
+			column-type="sql"/>
+
+		<!-- data -->
+
+		<reference-field
+			type="user"/>
+
+		<reference-field
+			type="text"/>
+
+	</fields>
 
 </model-meta>

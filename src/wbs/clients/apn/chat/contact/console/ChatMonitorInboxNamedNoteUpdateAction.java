@@ -9,9 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-
-import org.joda.time.DateTime;
-
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.namednote.model.ChatNamedNoteLogObjectHelper;
@@ -215,8 +212,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 				myUser)
 
 			.setTimestamp (
-				new DateTime (
-					transaction.now ()))
+				transaction.now ())
 
 		);
 
@@ -234,8 +230,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 				myUser)
 
 			.setTimestamp (
-				new DateTime (
-					transaction.now ()))
+				transaction.now ())
 
 		);
 

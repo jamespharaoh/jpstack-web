@@ -34,6 +34,7 @@
 		<bean class="meta.SlaveFieldSpec"/>
 		<bean class="meta.StringFieldSpec"/>
 		<bean class="meta.TimestampFieldSpec"/>
+		<bean class="meta.TypeCodeFieldSpec"/>
 		<bean class="meta.TypeFieldSpec"/>
 		<bean class="meta.YesNoFieldSpec"/>
 	</layer>
@@ -69,6 +70,7 @@
 		<bean class="generate.SlaveFieldWriter"/>
 		<bean class="generate.StringFieldWriter"/>
 		<bean class="generate.TimestampFieldWriter"/>
+		<bean class="generate.TypeCodeFieldWriter"/>
 		<bean class="generate.TypeFieldWriter"/>
 		<bean class="generate.YesNoFieldWriter"/>
 	</layer>
