@@ -4,9 +4,18 @@
 	padding-left: 10px;
 	padding-right: 10px;
 }
+
 .manual-responder-request-pending-form .template-chars.warning {
 	background-color: goldenrod;
 	color: white;
 	padding-left: 10px;
 	padding-right: 10px;
+}
+
+.manual-responder-request-pending-form .template {
+	cursor: pointer;
+}
+
+.manual-responder-request-pending-form .template.selected {
+	cursor: auto;
 }

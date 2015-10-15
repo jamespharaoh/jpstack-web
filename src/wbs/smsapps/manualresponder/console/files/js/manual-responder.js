@@ -36,6 +36,10 @@ $(function () {
 
 			var selectTemplate = function () {
 
+				if (template.hasClass ("selected")) {
+					return;
+				}
+
 				// disable others
 
 				form.find (".template").removeClass ("selected");
