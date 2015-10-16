@@ -15,6 +15,9 @@ public
 class TypeFieldSpec
 	implements ModelFieldSpec {
 
+	@DataAttribute
+	String name;
+
 	@DataAttribute (
 		value = "type",
 		required = false)

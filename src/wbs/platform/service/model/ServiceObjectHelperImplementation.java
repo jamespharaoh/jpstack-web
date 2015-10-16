@@ -66,13 +66,25 @@ class ServiceObjectHelperImplementation
 				typeCode);
 
 		service =
-			objectManager.insert (
+			serviceHelper.insert (
 				new ServiceRec ()
-					.setCode (code)
-					.setDescription (serviceType.getDescription ())
-					.setType (serviceType)
-					.setParentObjectType (parentType)
-					.setParentObjectId (parent.getId ()));
+
+			.setCode (
+				code)
+
+			.setDescription (
+				serviceType.getDescription ())
+
+			.setServiceType (
+				serviceType)
+
+			.setParentType (
+				parentType)
+
+			.setParentId (
+				parent.getId ())
+
+		);
 
 		return service;
 

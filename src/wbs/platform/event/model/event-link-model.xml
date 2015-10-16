@@ -1,4 +1,28 @@
 <model-meta
-	name="eventLink">
+	name="eventLink"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="event"/>
+
+		<index-field/>
+
+		<!-- data -->
+
+		<integer-field
+			name="typeId"/>
+
+		<integer-field
+			name="refId"/>
+
+	</fields>
 
 </model-meta>

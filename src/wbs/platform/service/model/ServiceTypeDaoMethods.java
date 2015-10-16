@@ -7,7 +7,7 @@ import wbs.platform.object.core.model.ObjectTypeRec;
 public
 interface ServiceTypeDaoMethods {
 
-	List<ServiceTypeRec> findByParentObjectType (
+	List<ServiceTypeRec> findByParentType (
 			ObjectTypeRec parentObjectType);
 
 }

@@ -1,5 +1,32 @@
 <model-meta
-	name="event">
+	name="event"
+	type="event">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<timestamp-field
+			name="timestamp"
+			column-type="postgresql"/>
+
+		<!-- data -->
+
+		<type-field
+			type="eventType"/>
+
+	</fields>
+
+	<collections>
+
+		<children-list
+			type="eventLink"/>
+
+	</collections>
 
 	<event-types>
 

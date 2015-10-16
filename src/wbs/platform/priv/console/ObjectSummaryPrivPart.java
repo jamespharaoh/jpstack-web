@@ -112,8 +112,10 @@ class ObjectSummaryPrivPart
 
 			// build group priv list
 
-			for (GroupRec group
-					: priv.getGroups ()) {
+			for (
+				GroupRec group
+					: priv.getGroups ()
+			) {
 
 				String groupPath =
 					objectManager.objectPath (

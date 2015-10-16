@@ -64,8 +64,14 @@ class EventLogicImpl
 		EventRec event =
 			eventHelper.insert (
 				new EventRec ()
-					.setEventType (eventType)
-					.setTimestamp (new Date ()));
+
+			.setEventType (
+				eventType)
+
+			.setTimestamp (
+				new Date ())
+
+		);
 
 		// return
 
@@ -126,14 +132,24 @@ class EventLogicImpl
 			if (dataObject.getId () == null)
 				throw new IllegalArgumentException ();
 
-			event.getEventLinks ().put (
-				index,
+			event.getEventLinks ().add (
 				eventLinkHelper.insert (
 					new EventLinkRec ()
-						.setEvent (event)
-						.setIndex (index)
-						.setTypeId (objectManager.getObjectTypeId (dataObject))
-						.setRefId (dataObject.getId ())));
+
+					.setEvent (
+						event)
+
+					.setIndex (
+						index)
+
+					.setTypeId (
+						objectManager.getObjectTypeId (
+							dataObject))
+
+					.setRefId (
+						dataObject.getId ())
+
+			));
 
 			return;
 
@@ -143,14 +159,23 @@ class EventLogicImpl
 
 		if (linkObject instanceof Integer) {
 
-			event.getEventLinks ().put (
-				index,
+			event.getEventLinks ().add (
 				eventLinkHelper.insert (
 					new EventLinkRec ()
-						.setEvent (event)
-						.setIndex (index)
-						.setTypeId (-1)
-						.setRefId ((Integer) linkObject)));
+
+				.setEvent (
+					event)
+
+				.setIndex (
+					index)
+
+				.setTypeId (
+					-1)
+
+				.setRefId (
+					(Integer) linkObject)
+
+			));
 
 			return;
 
@@ -160,15 +185,23 @@ class EventLogicImpl
 
 		if (linkObject instanceof Boolean) {
 
-			event.getEventLinks ().put (
-				index,
+			event.getEventLinks ().add (
 				eventLinkHelper.insert (
 					new EventLinkRec ()
-						.setEvent (event)
-						.setIndex (index)
-						.setTypeId (-2)
-						.setRefId (
-							(Boolean) linkObject ? 1 : 0)));
+
+				.setEvent (
+					event)
+
+				.setIndex (
+					index)
+
+				.setTypeId (
+					-2)
+
+				.setRefId (
+					(Boolean) linkObject ? 1 : 0)
+
+			));
 
 			return;
 

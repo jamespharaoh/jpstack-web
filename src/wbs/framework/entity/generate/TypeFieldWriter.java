@@ -57,6 +57,11 @@ class TypeFieldWriter {
 					"%sType",
 					parent.name ()));
 
+		String fieldName =
+			ifNull (
+				spec.name (),
+				fieldTypeName);
+
 		PluginModelSpec fieldTypePluginModel =
 			pluginManager.pluginModelsByName ().get (
 				fieldTypeName);
@@ -68,9 +73,10 @@ class TypeFieldWriter {
 			"\t@TypeField\n");
 
 		javaWriter.writeFormat (
-			"\t%s.model.%sRec type;\n",
+			"\t%s.model.%sRec %s;\n",
 			fieldTypePlugin.packageName (),
-			capitalise (fieldTypeName));
+			capitalise (fieldTypeName),
+			fieldName);
 
 		javaWriter.writeFormat (
 			"\n");

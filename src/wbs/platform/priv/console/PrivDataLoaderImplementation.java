@@ -227,9 +227,9 @@ class PrivDataLoaderImplementation
 							"Error getting parent for priv %s: ",
 							priv.getId (),
 							"type %s, ",
-							priv.getParentObjectType ().getCode (),
+							priv.getParentType ().getCode (),
 							"id %s",
-							priv.getParentObjectId ()),
+							priv.getParentId ()),
 						exception);
 
 				}
@@ -242,8 +242,8 @@ class PrivDataLoaderImplementation
 
 				GlobalId objectId =
 					new GlobalId (
-						priv.getParentObjectType ().getId (),
-						priv.getParentObjectId ());
+						priv.getParentType ().getId (),
+						priv.getParentId ());
 
 				ObjectData objectData =
 					newData.objectDatasByObjectId.get (objectId);

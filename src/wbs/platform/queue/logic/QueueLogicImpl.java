@@ -144,7 +144,7 @@ class QueueLogicImpl
 				.setCode (
 					code)
 
-				.setType (
+				.setQueueType (
 					queueType)
 
 				.setParentType (
@@ -176,7 +176,7 @@ class QueueLogicImpl
 			queueSubject.getQueue ();
 
 		QueueTypeRec queueType =
-			queue.getType ();
+			queue.getQueueType ();
 
 		// sanity check
 
@@ -274,7 +274,7 @@ class QueueLogicImpl
 			@NonNull Record<?> object) {
 
 		QueueTypeRec queueType =
-			queue.getType ();
+			queue.getQueueType ();
 
 		// sanity check
 

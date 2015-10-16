@@ -84,10 +84,20 @@ class PrivHooks
 
 			privHelper.insert (
 				new PrivRec ()
-					.setPrivType (privType)
-					.setCode (privType.getCode ())
-					.setParentObjectType (parentType)
-					.setParentObjectId (parent.getId ()));
+
+				.setPrivType (
+					privType)
+
+				.setCode (
+					privType.getCode ())
+
+				.setParentType (
+					parentType)
+
+				.setParentId (
+					parent.getId ())
+
+			);
 
 		}
 
