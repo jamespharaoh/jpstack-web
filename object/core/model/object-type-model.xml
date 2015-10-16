@@ -1,4 +1,18 @@
 <model-meta
-	name="objectType">
+	name="objectType"
+	type="type"
+	special="objectType">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<code-field/>
+
+	</fields>
 
 </model-meta>

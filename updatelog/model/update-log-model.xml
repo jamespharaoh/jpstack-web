@@ -1,4 +1,25 @@
 <model-meta
-	name="updateLog">
+	name="updateLog"
+	type="common">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<code-field/>
+
+		<identity-integer-field
+			name="ref"/>
+
+		<!-- state -->
+
+		<integer-field
+			name="version"/>
+
+	</fields>
 
 </model-meta>
