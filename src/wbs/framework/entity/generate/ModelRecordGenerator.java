@@ -148,6 +148,7 @@ class ModelRecordGenerator {
 			wbs.framework.entity.annotations.AssignedIdField.class,
 			wbs.framework.entity.annotations.CodeField.class,
 			wbs.framework.entity.annotations.CollectionField.class,
+			wbs.framework.entity.annotations.ComponentField.class,
 			wbs.framework.entity.annotations.DeletedField.class,
 			wbs.framework.entity.annotations.DescriptionField.class,
 			wbs.framework.entity.annotations.ForeignIdField.class,

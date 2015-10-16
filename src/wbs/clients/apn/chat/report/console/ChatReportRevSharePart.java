@@ -51,7 +51,7 @@ import wbs.platform.service.model.ServiceRec;
 import wbs.sms.message.stats.console.MessageStatsConsoleHelper;
 import wbs.sms.message.stats.model.MessageStats;
 import wbs.sms.message.stats.model.MessageStatsRec;
-import wbs.sms.message.stats.model.MessageStatsRec.MessageStatsSearch;
+import wbs.sms.message.stats.model.MessageStatsSearch;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteRec;
 

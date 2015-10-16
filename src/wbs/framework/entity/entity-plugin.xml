@@ -11,6 +11,7 @@
 		<bean class="meta.ChildrenListSpec"/>
 		<bean class="meta.ChildrenMappingSpec"/>
 		<bean class="meta.CodeFieldSpec"/>
+		<bean class="meta.ComponentFieldSpec"/>
 		<bean class="meta.DateFieldSpec"/>
 		<bean class="meta.DeletedFieldSpec"/>
 		<bean class="meta.DescriptionFieldSpec"/>
@@ -50,6 +51,7 @@
 		<bean class="generate.ChildrenCollectionWriter"/>
 		<bean class="generate.ChildrenListWriter"/>
 		<bean class="generate.ChildrenMappingWriter"/>
+		<bean class="generate.ComponentFieldWriter"/>
 		<bean class="generate.DateFieldWriter"/>
 		<bean class="generate.DeletedFieldWriter"/>
 		<bean class="generate.DescriptionFieldWriter"/>
