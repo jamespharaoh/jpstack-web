@@ -36,13 +36,13 @@ class GeneratedIdFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t@GeneratedIdField\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tInteger id;\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

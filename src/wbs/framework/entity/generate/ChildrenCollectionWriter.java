@@ -106,18 +106,18 @@ class ChildrenCollectionWriter {
 
 		// write field
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tSet<%s.model.%sRec> %s =\n",
 			fieldTypePlugin.packageName (),
 			capitalise (spec.typeName ()),
 			fieldName);
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t\tnew LinkedHashSet<%s.model.%sRec> ();\n",
 			fieldTypePlugin.packageName (),
 			capitalise (spec.typeName ()));
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

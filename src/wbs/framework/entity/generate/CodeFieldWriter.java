@@ -38,13 +38,16 @@ class CodeFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		javaWriter.write (
+		javaWriter.writeFormat (
+			"\t@CodeField\n");
 
-			"\t@CodeField\n",
-
+		javaWriter.writeFormat (
 			"\tString %s;\n",
-			ifNull (spec.name (), "code"),
+			ifNull (
+				spec.name (),
+				"code"));
 
+		javaWriter.writeFormat (
 			"\n");
 
 	}

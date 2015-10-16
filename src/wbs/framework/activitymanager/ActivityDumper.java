@@ -3,8 +3,10 @@ package wbs.framework.activitymanager;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 
+@Log4j
 @SingletonComponent ("activityDumper")
 public
 class ActivityDumper {
@@ -52,7 +54,9 @@ class ActivityDumper {
 
 		} catch (Exception exception) {
 
-			System.out.println ("ERROR");
+			log.fatal (
+				"Error in activity dumper",
+				exception);
 
 		}
 

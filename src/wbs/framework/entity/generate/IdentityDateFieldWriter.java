@@ -36,14 +36,14 @@ class IdentityDateFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t@IdentitySimpleField\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tLocalDate %s;\n",
 			spec.name ());
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

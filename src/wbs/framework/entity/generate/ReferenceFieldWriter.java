@@ -88,7 +88,7 @@ class ReferenceFieldWriter {
 
 		// write field
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t%s.model.%sRec %s;\n",
 			fieldTypePlugin.packageName (),
 			capitalise (spec.typeName ()),
@@ -96,7 +96,7 @@ class ReferenceFieldWriter {
 				spec.name (),
 				spec.typeName ()));
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

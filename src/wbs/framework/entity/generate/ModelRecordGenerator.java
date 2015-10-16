@@ -1,15 +1,11 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,39 +90,12 @@ class ModelRecordGenerator {
 				directory,
 				className);
 
-		String sourceDirectory =
-			stringFormat (
-				"src/%s/model",
-				plugin.packageName ().replace ('.', '/'));
-
-		String sourceFilename =
-			stringFormat (
-				"%s/%s-model.xml",
-				sourceDirectory,
-				camelToHyphen (
-					modelMeta.name ()));
-
-		if (
-			FileUtils.isFileNewer (
-				new File (filename),
-				new File (sourceFilename))
-		) {
-			return;
-		}
-
-		@Cleanup
-		OutputStream outputStream =
-			new FileOutputStream (
-				filename);
-
 		@Cleanup
 		FormatWriter javaWriter =
-			new FormatWriter (
-				new OutputStreamWriter (
-					outputStream));
+			new AtomicFileWriter (
+				filename);
 
-		javaWriter.write (
-
+		javaWriter.writeFormat (
 			"package %s.model;\n\n",
 			plugin.packageName ());
 
@@ -216,13 +185,13 @@ class ModelRecordGenerator {
 				: standardImportClasses
 		) {
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"import %s;\n",
 				standardImportClass.getName ());
 
 		}
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}
@@ -232,16 +201,16 @@ class ModelRecordGenerator {
 			FormatWriter javaWriter)
 		throws IOException {
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"@Accessors (chain = true)\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"@Data\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"@EqualsAndHashCode (of = \"id\")\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"@ToString (of = \"id\")\n");
 
 		writeEntityAnnotation (
@@ -281,10 +250,10 @@ class ModelRecordGenerator {
 			FormatWriter javaWriter)
 		throws IOException {
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"public\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"class %s\n",
 			className);
 
@@ -292,7 +261,7 @@ class ModelRecordGenerator {
 
 		case common:
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\timplements CommonRecord<%s> {\n",
 				className);
 
@@ -300,7 +269,7 @@ class ModelRecordGenerator {
 
 		case ephemeral:
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\timplements EphemeralRecord<%s> {\n",
 				className);
 
@@ -308,7 +277,7 @@ class ModelRecordGenerator {
 
 		case event:
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\timplements EventRecord<%s> {\n",
 				className);
 
@@ -316,7 +285,7 @@ class ModelRecordGenerator {
 
 		case major:
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\timplements MajorRecord<%s> {\n",
 				className);
 
@@ -324,7 +293,7 @@ class ModelRecordGenerator {
 
 		case minor:
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\timplements MinorRecord<%s> {\n",
 				className);
 
@@ -332,7 +301,7 @@ class ModelRecordGenerator {
 
 		case root:
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\timplements RootRecord<%s> {\n",
 				className);
 
@@ -340,7 +309,7 @@ class ModelRecordGenerator {
 
 		case type:
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\timplements TypeRecord<%s> {\n",
 				className);
 
@@ -352,7 +321,7 @@ class ModelRecordGenerator {
 
 		}
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 		generateFields (
@@ -364,7 +333,7 @@ class ModelRecordGenerator {
 		generateCompareTo (
 			javaWriter);
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"}\n");
 
 	}
@@ -378,10 +347,10 @@ class ModelRecordGenerator {
 			return;
 		}
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t// fields\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 		modelWriterBuilder.write (
@@ -400,10 +369,10 @@ class ModelRecordGenerator {
 			return;
 		}
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t// collections\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 		modelWriterBuilder.write (
@@ -420,51 +389,51 @@ class ModelRecordGenerator {
 
 		// write comment
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t// compare to\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 		// write override annotation
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t@Override\n");
 
 		// write function definition
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tpublic\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tint compareTo (\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t\t\tRecord<%s> otherRecord) {\n",
 			className);
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 		// write cast to concrete type
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t\t%s other =\n",
 			className);
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t\t\t(%s) otherRecord;\n",
 			className);
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 		// create compare to builder
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t\treturn new CompareToBuilder ()\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 		// scan fields
@@ -594,192 +563,192 @@ class ModelRecordGenerator {
 				throw new RuntimeException ();
 			}
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\t\t\t.append (\n");
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\t\t\t\tother.get%s (),\n",
 				capitalise (
 					timestampField.name ()));
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\t\t\t\tget%s ())\n",
 				capitalise (
 					timestampField.name ()));
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\n");
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\t\t\t.append (\n");
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\t\t\t\tother.getId (),\n");
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\t\t\t\tgetId ())\n");
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\n");
 
 		} else if (gotName || masterField != null) {
 
 			if (parentField != null) {
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t.append (\n");
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
 						ifNull (
 							parentField.name (),
 							parentField.typeName ())));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
 						ifNull (
 							parentField.name (),
 							parentField.typeName ())));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\n");
 
 			}
 
 			if (parentTypeField != null) {
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t.append (\n");
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
 						ifNull (
 							parentTypeField.name (),
 							"parentType")));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
 						ifNull (
 							parentTypeField.name (),
 							"parentType")));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\n");
 
 			}
 
 			if (parentIdField != null) {
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t.append (\n");
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tgetParentId (),\n");
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tother.getParentId ())\n");
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\n");
 
 			}
 
 			if (masterField != null) {
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t.append (\n");
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
 						ifNull (
 							masterField.name (),
 							masterField.typeName ())));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
 						ifNull (
 							masterField.name (),
 							masterField.typeName ())));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\n");
 
 			}
 
 			if (typeCodeField != null) {
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t.append (\n");
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
 						ifNull (
 							typeCodeField.name (),
 							"type")));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
 						ifNull (
 							typeCodeField.name (),
 							"type")));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\n");
 
 			}
 
 			if (codeField != null) {
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t.append (\n");
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
 						ifNull (
 							codeField.name (),
 							"code")));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
 						ifNull (
 							codeField.name (),
 							"code")));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\n");
 
 			}
 
 			if (indexField != null) {
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t.append (\n");
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
 						ifNull (
 							indexField.name (),
 							"index")));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
 						ifNull (
 							indexField.name (),
 							"index")));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\n");
 
 			}
@@ -789,24 +758,24 @@ class ModelRecordGenerator {
 					: identityReferenceFields
 			) {
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t.append (\n");
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
 						ifNull (
 							identityReferenceField.name (),
 							identityReferenceField.typeName ())));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
 						ifNull (
 							identityReferenceField.name (),
 							identityReferenceField.typeName ())));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\n");
 
 			}
@@ -816,54 +785,54 @@ class ModelRecordGenerator {
 					: identityIntegerFields
 			) {
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t.append (\n");
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tget%s (),\n",
 					capitalise (
 						identityIntegerField.name ()));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\t\t\t\tother.get%s ())\n",
 					capitalise (
 						identityIntegerField.name ()));
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\n");
 
 			}
 
 		} else {
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\t\t\t.append (\n");
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\t\t\t\tother.getId (),\n");
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\t\t\t\tgetId ())\n");
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\n");
 
 		}
 
 		// write converstion to return value
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t\t\t.toComparison ();\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 		// write end of function
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t}\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

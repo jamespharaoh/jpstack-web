@@ -9,8 +9,8 @@ import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.hibernate.HibernateDao;
 import wbs.integrations.smsarena.model.SmsArenaDlrReportLogDao;
-import wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec.SmsArenaDlrReportLogSearch;
 import wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec;
+import wbs.integrations.smsarena.model.SmsArenaDlrReportLogSearch;
 
 public
 class SmsArenaDlrReportLogDaoHibernate

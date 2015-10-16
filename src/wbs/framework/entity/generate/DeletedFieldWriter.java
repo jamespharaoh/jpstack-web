@@ -36,13 +36,13 @@ class DeletedFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t@DeletedField\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tBoolean deleted = false;\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

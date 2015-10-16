@@ -1,5 +1,6 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -160,7 +161,8 @@ class TextFormFieldRenderer<Container>
 				" value=\"%h\"",
 				formValuePresent ()
 					? formValue ()
-					: interfaceValue,
+					: emptyStringIfNull (
+						interfaceValue),
 				">\n"));
 
 	}

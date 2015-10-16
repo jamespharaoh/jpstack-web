@@ -64,15 +64,15 @@ class TypeFieldWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t@TypeField\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t%s.model.%sRec type;\n",
 			fieldTypePlugin.packageName (),
 			capitalise (fieldTypeName));
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

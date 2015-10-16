@@ -14,14 +14,13 @@ import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
-import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONObject;
-
-import com.google.common.collect.ImmutableMap;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONObject;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
@@ -34,6 +33,8 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender2;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
+
+import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @SingletonComponent ("smsArenaSender")
@@ -415,7 +416,9 @@ class SmsArenaSender
 
 				}
 
-				if (ack.contains("ERROR")) {
+				// TODO don't like this fuzzy matching...
+
+				if (ack.contains ("ERROR")) {
 
 					return new PerformSendResult ()
 

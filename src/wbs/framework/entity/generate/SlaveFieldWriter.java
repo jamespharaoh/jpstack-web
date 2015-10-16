@@ -56,10 +56,10 @@ class SlaveFieldWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t@SlaveField\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t%s.model.%sRec %s;\n",
 			fieldTypePlugin.packageName (),
 			capitalise (
@@ -68,7 +68,7 @@ class SlaveFieldWriter {
 				spec.name (),
 				spec.typeName ()));
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

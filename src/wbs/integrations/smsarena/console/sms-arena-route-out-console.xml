@@ -84,15 +84,15 @@
 			name="mclass"
 			nullable="yes"/>
 
-		<integer-field
+		<text-field
 			name="coding"
 			nullable="yes"/>
 
-		<integer-field
+		<text-field
 			name="date"
 			nullable="yes"/>
 
-		<integer-field
+		<text-field
 			name="validity"
 			nullable="yes"/>
 
@@ -130,15 +130,15 @@
 			name="mclass"
 			nullable="yes"/>
 
-		<integer-field
+		<text-field
 			name="coding"
 			nullable="yes"/>
 
-		<integer-field
+		<text-field
 			name="date"
 			nullable="yes"/>
 
-		<integer-field
+		<text-field
 			name="validity"
 			nullable="yes"/>
 
@@ -177,15 +177,15 @@
 			name="mclass"
 			nullable="yes"/>
 
-		<integer-field
+		<text-field
 			name="coding"
 			nullable="yes"/>
 
-		<integer-field
+		<text-field
 			name="date"
 			nullable="yes"/>
 
-		<integer-field
+		<text-field
 			name="validity"
 			nullable="yes"/>
 
@@ -223,15 +223,15 @@
 			name="mclass"
 			nullable="yes"/>
 
-		<integer-field
+		<text-field
 			name="coding"
 			nullable="yes"/>
 
-		<integer-field
+		<text-field
 			name="date"
 			nullable="yes"/>
 
-		<integer-field
+		<text-field
 			name="validity"
 			nullable="yes"/>
 

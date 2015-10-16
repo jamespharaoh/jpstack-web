@@ -72,7 +72,7 @@ class YesNoFieldWriter {
 
 		if (spec.defaultValue () != null) {
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\tBoolean %s = %s;\n",
 				spec.name (),
 				spec.defaultValue ()
@@ -81,13 +81,13 @@ class YesNoFieldWriter {
 
 		} else {
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\tBoolean %s;\n",
 				spec.name ());
 
 		}
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

@@ -60,10 +60,10 @@ class ParentIdFieldWriter {
 
 		// write field
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tInteger parentId;\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

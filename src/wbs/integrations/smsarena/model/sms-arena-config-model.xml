@@ -1,4 +1,30 @@
 <model-meta
-	name="smsArenaConfig">
+	name="smsArenaConfig"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<integer-field
+			name="profileId"/>
+
+	</fields>
 
 </model-meta>

@@ -119,13 +119,13 @@ class ChildrenMappingWriter {
 				"integer")
 		) {
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\tMap<Integer,%s.model.%s> %s =\n",
 				fieldTypePlugin.packageName (),
 				fieldTypeName,
 				fieldName);
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\t\tnew LinkedHashMap<Integer,%s.model.%s> ();\n",
 				fieldTypePlugin.packageName (),
 				fieldTypeName);
@@ -136,13 +136,13 @@ class ChildrenMappingWriter {
 				"string")
 		) {
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\tMap<String,%s.model.%s> %s =\n",
 				fieldTypePlugin.packageName (),
 				fieldTypeName,
 				fieldName);
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\t\tnew LinkedHashMap<String,%s.model.%s> ();\n",
 				fieldTypePlugin.packageName (),
 				fieldTypeName);
@@ -153,7 +153,7 @@ class ChildrenMappingWriter {
 
 		}
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

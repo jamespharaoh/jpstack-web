@@ -72,29 +72,29 @@ class StringFieldWriter {
 
 		if (spec.defaultValue () == null) {
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\tString %s;\n",
 				spec.name ());
 
 		} else if (spec.defaultValue ().isEmpty ()) {
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\tString %s = \"\";\n",
 				spec.name ());
 
 		} else {
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\tString %s =\n",
 				spec.name ());
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\t\t\"%s\";\n",
 				spec.defaultValue ().replace ("\"", "\\\""));
 
 		}
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

@@ -3,10 +3,7 @@ package wbs.framework.entity.generate;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormatArray;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,23 +57,15 @@ class InterfaceWriter {
 		throws IOException {
 
 		@Cleanup
-		OutputStream outputStream =
-			new FileOutputStream (
+		FormatWriter writer =
+			new AtomicFileWriter (
 				filename);
 
-		@Cleanup
-		FormatWriter writer =
-			new FormatWriter (
-				new OutputStreamWriter (
-					outputStream));
-
-		writer.write (
-
-			"\n",
-
+		writer.writeFormat (
 			"package %s;\n",
-			packageName,
+			packageName);
 
+		writer.writeFormat (
 			"\n");
 
 		if (! imports.isEmpty ()) {
@@ -86,30 +75,27 @@ class InterfaceWriter {
 					: imports
 			) {
 
-				writer.write (
-
+				writer.writeFormat (
 					"import %s;\n",
 					importValue);
 
 			}
 
-			writer.write (
-
+			writer.writeFormat (
 				"\n");
 
 		}
 
-		writer.write (
+		writer.writeFormat (
+			"public\n");
 
-			"public\n",
-
+		writer.writeFormat (
 			"interface %s",
 			name);
 
 		if (! interfaces.isEmpty ()) {
 
-			writer.write (
-
+			writer.writeFormat (
 				"\n\textends %s",
 				joinWithSeparator (
 					",\n\t\t",
@@ -117,14 +103,16 @@ class InterfaceWriter {
 
 		}
 
-		writer.write (
+		writer.writeFormat (
+			" {\n");
 
-			" {\n",
+		writer.writeFormat (
+			"\n");
 
-			"\n",
+		writer.writeFormat (
+			"}\n");
 
-			"}\n",
-
+		writer.writeFormat (
 			"\n");
 
 		writer.close ();

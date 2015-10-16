@@ -40,7 +40,7 @@
 
 	<field-set
 		name="search"
-		class="wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec$SmsArenaDlrReportLogSearch">
+		class="wbs.integrations.smsarena.model.SmsArenaDlrReportLogSearch">
 
 		<object-field
 			name="routeId"

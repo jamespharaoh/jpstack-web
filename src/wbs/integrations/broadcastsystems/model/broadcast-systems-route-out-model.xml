@@ -1,5 +1,26 @@
 <model-meta
-	name="broadcastSystemsRouteOut">
+	name="broadcastSystemsRouteOut"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<foreign-id-field
+			field="route"/>
+
+		<!-- identity -->
+
+		<master-field
+			type="route"/>
+
+		<string-field
+			name="baseUrl"/>
+
+		<string-field
+			name="token"/>
+
+	</fields>
 
 	<senders>
 

@@ -56,18 +56,19 @@ class IdentityReferenceFieldWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
-		javaWriter.write (
+		javaWriter.writeFormat (
+			"\t@IdentityReferenceField\n");
 
-			"\t@IdentityReferenceField\n",
-
+		javaWriter.writeFormat (
 			"\t%s.model.%sRec %s;\n",
 			fieldTypePlugin.packageName (),
 			capitalise (
 				spec.typeName ()),
 			ifNull (
 				spec.name (),
-				spec.typeName ()),
+				spec.typeName ()));
 
+		javaWriter.writeFormat (
 			"\n");
 
 	}

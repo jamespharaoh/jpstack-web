@@ -40,28 +40,27 @@ class IndexFieldWriter {
 
 		if (spec.counterName () != null) {
 
-			javaWriter.write (
+			javaWriter.writeFormat (
+				"\t@IndexField (\n");
 
-				"\t@IndexField (\n",
-
+			javaWriter.writeFormat (
 				"\t\tcounter = \"%s\")\n",
 				spec.counterName ());
 
 		} else {
 
-			javaWriter.write (
-
+			javaWriter.writeFormat (
 				"\t@IndexField\n");
 
 		}
 
-		javaWriter.write (
-
+		javaWriter.writeFormat (
 			"\tInteger %s;\n",
 			ifNull (
 				spec.name (),
-				"index"),
+				"index"));
 
+		javaWriter.writeFormat (
 			"\n");
 
 	}

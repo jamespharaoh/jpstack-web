@@ -95,18 +95,18 @@ class AssociativeListWriter {
 
 		// write field
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tList<%s.model.%s> %s =\n",
 			fieldTypePlugin.packageName (),
 			fieldTypeName,
 			fieldName);
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t\tnew ArrayList<%s.model.%s> ();\n",
 			fieldTypePlugin.packageName (),
 			fieldTypeName);
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

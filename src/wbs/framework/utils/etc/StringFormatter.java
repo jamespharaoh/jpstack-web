@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import lombok.NonNull;
+
 import com.google.common.collect.ImmutableMap;
 
 public
@@ -17,7 +19,7 @@ class StringFormatter {
 
 	public
 	StringFormatter (
-			Map<Character,Conversion> newConversions) {
+			@NonNull Map<Character,Conversion> newConversions) {
 
 		conversions =
 			newConversions;
@@ -30,7 +32,7 @@ class StringFormatter {
 	 */
 	public
 	List<String> formatSpecial (
-			List<Object> arguments) {
+			@NonNull List<Object> arguments) {
 
 		List<String> stringsToReturn =
 			new ArrayList<String> ();
@@ -66,8 +68,8 @@ class StringFormatter {
 
 	public
 	String formatReal (
-			String format,
-			List<?> argumenta) {
+			@NonNull String format,
+			@NonNull List<?> argumenta) {
 
 		StringBuilder stringBuilder =
 			new StringBuilder ();
@@ -159,14 +161,16 @@ class StringFormatter {
 
 	public
 	String format (
-			Object... args) {
+			@NonNull Object... args) {
 
 		StringBuilder stringBuilder =
 			new StringBuilder ();
 
-		for (String string
+		for (
+			String string
 				: formatSpecial (
-					Arrays.asList (args))) {
+					Arrays.asList (args))
+		) {
 
 			stringBuilder.append (
 				string);
@@ -179,7 +183,7 @@ class StringFormatter {
 
 	public static
 	int numPercents (
-			String format) {
+			@NonNull String format) {
 
 		int position = 0;
 		int count = 0;
@@ -228,7 +232,7 @@ class StringFormatter {
 		@Override
 		public
 		String convert (
-				Object arg) {
+				@NonNull Object arg) {
 
 			return arg != null
 				? arg.toString ()
@@ -245,7 +249,7 @@ class StringFormatter {
 		@Override
 		public
 		String convert (
-				Object source) {
+				@NonNull Object source) {
 
 			return source != null
 				? Html.encode (source)
@@ -262,7 +266,7 @@ class StringFormatter {
 		@Override
 		public
 		String convert (
-				Object argument) {
+				@NonNull Object argument) {
 
 			return argument != null
 				? Html.javascriptStringEscape (
@@ -280,7 +284,7 @@ class StringFormatter {
 		@Override
 		public
 		String convert (
-				Object argument) {
+				@NonNull Object argument) {
 
 			return argument != null
 				? Html.urlEncode (argument.toString ())
@@ -297,7 +301,7 @@ class StringFormatter {
 		@Override
 		public
 		String convert (
-				Object argument) {
+				@NonNull Object argument) {
 
 			return argument != null
 				? Html.encode (((Number) argument).toString ())
@@ -324,7 +328,7 @@ class StringFormatter {
 
 	public static
 	String standard (
-			Object... args) {
+			@NonNull Object... args) {
 
 		return standardStringFormatter.format (
 			args);

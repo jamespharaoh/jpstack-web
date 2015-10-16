@@ -70,13 +70,13 @@ class DateFieldWriter {
 
 		// write member
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tLocalDate %s;\n",
 			spec.name ());
 
 		// write blank line
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

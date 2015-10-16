@@ -5,7 +5,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import wbs.framework.object.AbstractObjectHooks;
-import wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec.SmsArenaDlrReportLogSearch;
 
 public
 class SmsArenaDlrReportLogHooks

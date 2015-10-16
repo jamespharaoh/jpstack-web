@@ -72,23 +72,20 @@ class IntegerFieldWriter {
 
 		if (spec.defaultValue () != null) {
 
-			javaWriter.write (
-
+			javaWriter.writeFormat (
 				"\tInteger %s = %s;\n",
 				spec.name (),
 				spec.defaultValue ());
 
 		} else {
 
-			javaWriter.write (
-
+			javaWriter.writeFormat (
 				"\tInteger %s;\n",
 				spec.name ());
 
 		}
 
-		javaWriter.write (
-
+		javaWriter.writeFormat (
 			"\n");
 
 	}

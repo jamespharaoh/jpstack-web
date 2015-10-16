@@ -1,4 +1,24 @@
 <model-meta
-	name="simulatorSessionNumber">
+	name="simulatorSessionNumber"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<foreign-id-field
+			field="number"/>
+
+		<!-- identity -->
+
+		<master-field
+			type="number"/>
+
+		<!-- state -->
+
+		<reference-field
+			type="simulatorSession"/>
+
+	</fields>
 
 </model-meta>

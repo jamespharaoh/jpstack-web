@@ -44,7 +44,7 @@ class AnnotationWriter {
 
 		// write name
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"%s@%s",
 			indent,
 			name);
@@ -53,7 +53,7 @@ class AnnotationWriter {
 
 		if (! attributes.isEmpty ()) {
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				" (");
 
 			boolean first = true;
@@ -65,12 +65,12 @@ class AnnotationWriter {
 
 				if (! first) {
 
-					javaWriter.write (
+					javaWriter.writeFormat (
 						",");
 
 				}
 
-				javaWriter.write (
+				javaWriter.writeFormat (
 					"\n%s\t%s = %s",
 					indent,
 					attributeEntry.getKey (),
@@ -80,12 +80,12 @@ class AnnotationWriter {
 
 			}
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				")");
 
 		}
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

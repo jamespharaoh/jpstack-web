@@ -1,4 +1,23 @@
 <model-meta
-	name="smsArenaRouteIn">
+	name="smsArenaRouteIn"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<master-field
+			type="route"/>
+
+		<!-- settings -->
+
+		<reference-field
+			type="smsArenaConfig"/>
+
+	</fields>
 
 </model-meta>

@@ -38,16 +38,16 @@ class TypeCodeFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t@TypeCodeField\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tString %s;\n",
 			ifNull (
 				spec.name (),
 				"type"));
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

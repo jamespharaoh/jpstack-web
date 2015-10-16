@@ -38,16 +38,16 @@ class DescriptionFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t@DescriptionField\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tString %s;\n",
 			ifNull (
 				spec.name (),
 				"description"));
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

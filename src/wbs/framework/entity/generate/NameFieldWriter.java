@@ -38,16 +38,16 @@ class NameFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t@NameField\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tString %s;\n",
 			ifNull (
 				spec.name (),
 				"name"));
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

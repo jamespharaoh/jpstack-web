@@ -36,13 +36,14 @@ class IdentityIntegerFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		javaWriter.write (
+		javaWriter.writeFormat (
+			"\t@IdentitySimpleField\n");
 
-			"\t@IdentitySimpleField\n",
-
+		javaWriter.writeFormat (
 			"\tInteger %s;\n",
-			spec.name (),
+			spec.name ());
 
+		javaWriter.writeFormat (
 			"\n");
 
 	}

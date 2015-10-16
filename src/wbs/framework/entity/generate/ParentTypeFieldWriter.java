@@ -64,13 +64,13 @@ class ParentTypeFieldWriter {
 
 		// TODO this class name should not be hard-coded
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\twbs.platform.object.core.model.ObjectTypeRec %s;\n",
 			ifNull (
 				spec.name (),
 				"parentType"));
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

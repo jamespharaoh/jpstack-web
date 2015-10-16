@@ -55,22 +55,25 @@ class AssociativeCollectionWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
-		javaWriter.write (
+		javaWriter.writeFormat (
+			"\t@LinkField (\n");
 
-			"\t@LinkField (\n",
-
+		javaWriter.writeFormat (
 			"\t\ttable = \"%s\")\n",
-			spec.tableName (),
+			spec.tableName ());
 
+		javaWriter.writeFormat (
 			"\tSet<%s.model.%sRec> %ss =\n",
 			fieldTypePlugin.packageName (),
 			capitalise (spec.typeName ()),
-			spec.typeName (),
+			spec.typeName ());
 
+		javaWriter.writeFormat (
 			"\t\tnew LinkedHashSet<%s.model.%sRec> ();\n",
 			fieldTypePlugin.packageName (),
-			capitalise (spec.typeName ()),
+			capitalise (spec.typeName ()));
 
+		javaWriter.writeFormat (
 			"\n");
 
 	}

@@ -1,5 +1,6 @@
 package wbs.framework.activitymanager;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -249,7 +250,9 @@ class ActivityManagerImplementation
 
 					stringFormat (
 						"end=%s",
-						task.endTime ())));
+						ifNull (
+							task.endTime (),
+							""))));
 
 		}
 

@@ -104,7 +104,7 @@ class TimestampFieldWriter {
 		case sql:
 		case iso:
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\tInstant %s;\n",
 				spec.name ());
 
@@ -112,7 +112,7 @@ class TimestampFieldWriter {
 
 		case postgresql:
 
-			javaWriter.write (
+			javaWriter.writeFormat (
 				"\tDate %s;\n",
 				spec.name ());
 
@@ -126,7 +126,7 @@ class TimestampFieldWriter {
 
 		// write blank line
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

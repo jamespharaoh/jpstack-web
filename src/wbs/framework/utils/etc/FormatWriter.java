@@ -1,40 +1,16 @@
 package wbs.framework.utils.etc;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import java.io.IOException;
-import java.io.Writer;
 
 public
-class FormatWriter {
+interface FormatWriter {
 
-	Writer writer;
-
-	public
-	FormatWriter (
-			Writer writer) {
-
-		this.writer = writer;
-
-	}
-
-	public
-	void write (
+	void writeFormat (
 			Object... arguments)
-		throws IOException {
-
-		writer.write (
-			stringFormat (
-				arguments));
-
-	}
+		throws IOException;
 
 	public
 	void close ()
-		throws IOException {
-
-		writer.close ();
-
-	}
+		throws IOException;
 
 }

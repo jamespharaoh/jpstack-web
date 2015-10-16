@@ -56,10 +56,10 @@ class MasterFieldWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t@MasterField\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t%s.model.%sRec %s;\n",
 			fieldTypePlugin.packageName (),
 			capitalise (
@@ -68,7 +68,7 @@ class MasterFieldWriter {
 				spec.name (),
 				spec.typeName ()));
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

@@ -36,17 +36,17 @@ class ForeignIdFieldWriter {
 			Builder builder)
 		throws IOException {
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t@ForeignIdField (\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\t\tfield = \"%s\")\n",
 			spec.fieldName ().replace ("\"", "\\\""));
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\tInteger id;\n");
 
-		javaWriter.write (
+		javaWriter.writeFormat (
 			"\n");
 
 	}

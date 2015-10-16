@@ -1,4 +1,31 @@
 <model-meta
-	name="smsArenaDlrReportLog">
+	name="smsArenaDlrReportLog"
+	type="event">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="route"/>
+
+		<timestamp-field
+			name="timestamp"
+			column-type="iso"/>
+
+		<!-- data -->
+
+		<enum-field
+			name="type"
+			type="smsArenaDlrReportLogType"/>
+
+		<string-field
+			name="details"/>
+
+	</fields>
 
 </model-meta>
