@@ -205,7 +205,9 @@ class UserPrivsSummaryPart
 
 		}
 
-		out.println("</table>");
+		printFormat (
+			"</table>\n");
+
 	}
 
 	class PrivStuff

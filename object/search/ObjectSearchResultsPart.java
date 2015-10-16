@@ -239,7 +239,7 @@ class ObjectSearchResultsPart
 			"<tr>\n");
 
 		formFieldLogic.outputTableHeadings (
-			out,
+			formatWriter,
 			formFieldSet);
 
 		printFormat (
@@ -291,7 +291,7 @@ class ObjectSearchResultsPart
 					object == currentObject));
 
 			formFieldLogic.outputTableCellsList (
-				out,
+				formatWriter,
 				formFieldSet,
 				object,
 				false);
