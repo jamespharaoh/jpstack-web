@@ -96,7 +96,7 @@ class TicketPendingHistoryPart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputTableRows (
-			out,
+			formatWriter,
 			ticketFields,
 			ticket);
 
@@ -114,24 +114,27 @@ class TicketPendingHistoryPart
 			"<table class=\"details\">\n");
 
 		printFormat (
-				"<tr>\n",
-				"<th>Index</td>\n",
-				"<th>Text</th>\n",
-				"</tr>\n");
+			"<tr>\n",
+			"<th>Index</td>\n",
+			"<th>Text</th>\n",
+			"</tr>\n");
 
-		for (TicketNoteRec ticketNote : ticket.getTicketNotes()) {
+		for (
+			TicketNoteRec ticketNote
+				: ticket.getTicketNotes ()
+		) {
 
 			printFormat (
 				"<tr>\n");
 
 			formFieldLogic.outputTableCellsList (
-					out,
-					ticketNoteFields,
-					ticketNote,
-					true);
+				formatWriter,
+				ticketNoteFields,
+				ticketNote,
+				true);
 
 			printFormat (
-					"</tr>\n");
+				"</tr>\n");
 
 		}
 
@@ -149,7 +152,7 @@ class TicketPendingHistoryPart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputTableRows (
-			out,
+			formatWriter,
 			ticketStateFields,
 			ticket.getTicketState());
 

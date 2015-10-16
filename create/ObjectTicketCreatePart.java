@@ -219,7 +219,7 @@ class ObjectTicketCreatePart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
-			out,
+			formatWriter,
 			formFieldSet,
 			ticket);
 
