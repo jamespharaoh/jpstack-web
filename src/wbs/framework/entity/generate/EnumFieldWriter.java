@@ -87,6 +87,11 @@ class EnumFieldWriter {
 
 		}
 
+		String fieldName =
+			ifNull (
+				spec.name (),
+				spec.typeName ());
+
 		// write field annotation
 
 		AnnotationWriter annotationWriter =
@@ -125,7 +130,7 @@ class EnumFieldWriter {
 				fieldTypePackageName,
 				capitalise (
 					spec.typeName ()),
-				spec.name ());
+				fieldName);
 
 			javaWriter.write (
 				 "\t\t%s.model.%s.%s;\n",
@@ -142,7 +147,7 @@ class EnumFieldWriter {
 				fieldTypePackageName,
 				capitalise (
 					spec.typeName ()),
-				spec.name ());
+				fieldName);
 
 		}
 

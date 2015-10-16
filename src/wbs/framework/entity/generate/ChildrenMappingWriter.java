@@ -98,6 +98,15 @@ class ChildrenMappingWriter {
 			"\"%s\"",
 			spec.mapColumnName ().replace ("\"", "\\\""));
 
+		if (spec.orderSql () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"orderBy",
+				"\"%s\"",
+				spec.orderSql ().replace ("\"", "\\\""));
+
+		}
+
 		annotationWriter.write (
 			javaWriter,
 			"\t");

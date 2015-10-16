@@ -1,4 +1,26 @@
 <model-meta
-	name="chatMonthCost">
+	name="chatMonthCost"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="chat"/>
+
+		<code-field
+			name="yearMonth"/>
+
+		<!-- settings -->
+
+		<integer-field
+			name="staffCost"/>
+
+	</fields>
 
 </model-meta>

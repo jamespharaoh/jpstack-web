@@ -1,14 +1,6 @@
 <console-module
 	name="chat-report">
 
-	<console-helper-provider
-		object-name="chatReport"
-		view-delegate-field="chat"
-		view-delegate-priv-code="manage"
-		id-key="manualResponderRequestId">
-
-	</console-helper-provider>
-
 	<simple-context
 		name="chatReport">
 

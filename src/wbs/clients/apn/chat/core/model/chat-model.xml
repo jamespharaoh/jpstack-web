@@ -1,5 +1,274 @@
 <model-meta
-	name="chat">
+	name="chat"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<integer-field
+			name="timeLogoff"
+			default="0"/>
+
+		<integer-field
+			name="timeSend"
+			default="0"/>
+
+		<integer-field
+			name="timeReceive"
+			default="0"/>
+
+		<integer-field
+			name="timeInfo"
+			default="0"/>
+
+		<integer-field
+			name="timeWebLogoff"
+			default="0"/>
+
+		<integer-field
+			name="timeName"
+			default="0"/>
+
+		<integer-field
+			name="timeNameJoin"
+			default="0"/>
+
+		<integer-field
+			name="timePicHint"
+			default="0"/>
+
+		<integer-field
+			name="timeJoinOutboundMin"
+			default="0"/>
+
+		<integer-field
+			name="timeJoinOutboundMax"
+			default="0"/>
+
+		<integer-field
+			name="timeQuietOutbound"
+			default="0"/>
+
+		<integer-field
+			name="timeSignupTimeout"
+			default="0"/>
+
+		<yes-no-field
+			name="autoAdultVerify"
+			default="no"/>
+
+		<enum-field
+			type="gender"
+			nullable="yes"/>
+
+		<enum-field
+			type="orient"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="autoJoinChat"
+			default="no"/>
+
+		<yes-no-field
+			name="autoJoinDate"
+			default="no"/>
+
+		<yes-no-field
+			name="autoJoinOnSend"
+			default="no"/>
+
+		<reference-field
+			type="numberFormat"
+			nullable="yes"/>
+
+		<reference-field
+			type="currency"
+			nullable="yes"/>
+
+		<reference-field
+			type="gazetteer"
+			nullable="yes"/>
+
+		<string-field
+			name="defaultBrandName"
+			default="Chat service"/>
+
+		<string-field
+			name="timezone"
+			nullable="yes"/>
+
+		<integer-field
+			name="timeMonitorSwap"
+			default="0"/>
+
+		<reference-field
+			type="locator"
+			nullable="yes"/>
+
+		<string-field
+			name="jigsawApplicationIdentifier"
+			nullable="yes"/>
+
+		<integer-field
+			name="minMonitorMessageLength"
+			default="80"/>
+
+		<reference-field
+			name="systemChatUser"
+			type="chatUser"
+			nullable="yes"/>
+
+		<integer-field
+			name="maxAlarmTime"
+			default="0"/>
+
+		<integer-field
+			name="sessionInfoLimit"
+			nullable="yes"/>
+
+		<reference-field
+			name="adultAdsChat"
+			type="chat"
+			nullable="yes"/>
+
+		<integer-field
+			name="adultAdsTime"
+			default="0"/>
+
+		<yes-no-field
+			name="datingEnabled"
+			default="yes"/>
+
+		<yes-no-field
+			name="joinWarningEnabled"
+			default="no"/>
+
+		<yes-no-field
+			name="errorOnUnrecognised"
+			default="no"/>
+
+		<yes-no-field
+			name="sendWarningFromShortcode"
+			default="no"/>
+
+		<yes-no-field
+			name="sendDobRequestFromShortcode"
+			default="no"/>
+
+		<yes-no-field
+			name="billDuringJoin"
+			default="no"/>
+
+		<yes-no-field
+			name="confirmCharges"
+			default="yes"/>
+
+		<integer-field
+			name="adTimeFirst"
+			default="0"/>
+
+		<integer-field
+			name="adTime"
+			default="0"/>
+
+		<integer-field
+			name="adCount"
+			default="0"/>
+
+		<integer-field
+			name="chatQueuePreferredTime"
+			default="0"/>
+
+		<integer-field
+			name="messageQueuePreferredTime"
+			default="0"/>
+
+		<integer-field
+			name="helpQueuePreferredTime"
+			default="0"/>
+
+		<integer-field
+			name="infoQueuePreferredTime"
+			default="0"/>
+
+		<!-- statistics -->
+
+		<timestamp-field
+			name="lastMonitorSwap"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<integer-field
+			name="numChatBroadcastScheduled"
+			default="0"/>
+
+		<integer-field
+			name="numChatBroadcastSending"
+			default="0"/>
+
+		<integer-field
+			name="numChatBroadcastSent"
+			default="0"/>
+
+		/*
+		@ReferenceField (nullable = true)
+		TicketManagerRec ticketManager;
+		*/
+
+	</fields>
+
+	<collections>
+
+		<children-mapping
+			name="keywords"
+			type="chatKeyword"
+			map-column="keyword"
+			map-type="string"
+			order-sql="keyword"/>
+
+		<children-collection
+			type="chatScheme"
+			order-sql="code"/>
+
+		<children-collection
+			type="chatHelpTemplate"
+			order-sql="code"/>
+
+		<children-collection
+			type="chatAdTemplate"/>
+
+		<children-mapping
+			name="profileFields"
+			type="chatProfileField"
+			map-column="code"
+			map-type="string"/>
+
+		<children-mapping
+			type="chatRoute"
+			map-column="route_id"
+			map-type="integer"/>
+
+	</collections>
 
 	<priv-types>
 

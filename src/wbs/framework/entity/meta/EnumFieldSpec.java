@@ -15,8 +15,7 @@ public
 class EnumFieldSpec
 	implements ModelFieldSpec {
 
-	@DataAttribute (
-		required = true)
+	@DataAttribute
 	String name;
 
 	@DataAttribute

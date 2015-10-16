@@ -15,7 +15,6 @@
 	<models>
 		<model name="chat"/>
 		<model name="chatStats"/>
-		<model name="chatReport" />
 		<model name="chatMonthCost"/>
 	</models>
 

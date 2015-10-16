@@ -27,7 +27,6 @@ import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageSearch;
 import wbs.clients.apn.chat.core.console.ChatMonthCostConsoleHelper;
-import wbs.clients.apn.chat.core.console.ChatReportConsoleHelper;
 import wbs.clients.apn.chat.core.model.ChatMonthCostRec;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -87,9 +86,6 @@ class ChatReportRevSharePart
 
 	@Inject
 	ChatRouteConsoleHelper chatRouteHelper;
-
-	@Inject
-	ChatReportConsoleHelper chatReportHelper;
 
 	@Inject
 	ChatUserCreditConsoleHelper chatUserCreditHelper;

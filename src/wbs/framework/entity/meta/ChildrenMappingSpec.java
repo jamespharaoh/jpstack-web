@@ -41,4 +41,7 @@ class ChildrenMappingSpec
 		required = true)
 	String mapType;
 
+	@DataAttribute
+	String orderSql;
+
 }
