@@ -1,4 +1,78 @@
 <model-meta
-	name="queueItem">
+	name="queueItem"
+	type="event">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="queueSubject"/>
+
+		<index-field/>
+
+		<timestamp-field
+			name="createdTime"
+			column-type="postgresql"/>
+
+		<!-- data -->
+
+		<string-field
+			name="source"/>
+
+		<string-field
+			name="details"/>
+
+		<integer-field
+			name="refObjectId"/>
+
+		<reference-field
+			name="processedUser"
+			type="user"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="processedByPreferredUser"
+			nullable="yes"/>
+
+		<integer-field
+			name="priority"
+			default="0"/>
+
+		<timestamp-field
+			name="pendingTime"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="cancelledTime"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="processedTime"
+			column-type="postgresql"
+			nullable="yes"/>
+
+		<!-- state -->
+
+		<enum-field
+			name="state"
+			type="queueItemState"/>
+
+		<reference-field
+			type="queueItemClaim"
+			nullable="yes"/>
+
+		<!-- TODO legacy, remove when possible -->
+
+		<reference-field
+			type="queue"/>
+
+	</fields>
 
 </model-meta>

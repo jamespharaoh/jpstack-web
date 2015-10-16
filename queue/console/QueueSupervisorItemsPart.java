@@ -16,6 +16,7 @@ import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
+import wbs.platform.queue.model.QueueItemProcessedTimeComparator;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleHelper;
@@ -74,7 +75,7 @@ class QueueSupervisorItemsPart
 
 		queueItems =
 			new TreeSet<QueueItemRec> (
-				QueueItemRec.processedTimeComparator);
+				QueueItemProcessedTimeComparator.instance);
 
 		queueItems.addAll (
 			queueItemHelper.findByProcessedTime (

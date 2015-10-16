@@ -264,7 +264,7 @@ class QueueHomeResponder
 				objectManager.getCode (parent),
 
 				" data-queue-type-code=\"%h\"",
-				queue.getQueueType ().getCode (),
+				queue.getType ().getCode (),
 
 				" data-queue-code=\"%h\"",
 				queue.getCode (),
