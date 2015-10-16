@@ -1,5 +1,6 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -195,7 +196,8 @@ class TextAreaFormFieldRenderer<Container>
 
 		out.writeFormat (
 			">%h</textarea>",
-			interfaceValue);
+			emptyStringIfNull (
+				interfaceValue));
 
 		if (charCountFunction != null) {
 

@@ -3,6 +3,7 @@ package wbs.framework.entity.generate;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -245,10 +246,27 @@ class ModelRecordGenerator {
 					capitalise (
 						modelMeta.type ().toString ())));
 
+		if (isNotNull (modelMeta.tableName ())) {
+
+			annotationWriter.addAttributeFormat (
+				"table",
+				"\"%s\"",
+				modelMeta.tableName ().replace ("\"", "\\\""));
+
+		}
+
 		if (! ifNull (modelMeta.create (), true)) {
 
 			annotationWriter.addAttributeFormat (
 				"create",
+				"false");
+
+		}
+
+		if (! ifNull (modelMeta.mutable (), true)) {
+
+			annotationWriter.addAttributeFormat (
+				"mutable",
 				"false");
 
 		}

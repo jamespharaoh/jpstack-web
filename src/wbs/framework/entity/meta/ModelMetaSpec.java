@@ -39,8 +39,15 @@ class ModelMetaSpec {
 	@DataAttribute
 	String special;
 
+	@DataAttribute (
+		value = "table")
+	String tableName;
+
 	@DataAttribute
 	Boolean create;
+
+	@DataAttribute
+	Boolean mutable;
 
 	// children
 

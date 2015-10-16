@@ -1,5 +1,40 @@
 <model-meta
-	name="menuItem">
+	name="menuItem"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="menuGroup"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="label"/>
+
+		<string-field
+			name="targetPath"/>
+
+		<string-field
+			name="targetFrame"/>
+
+	</fields>
 
 	<priv-types>
 
