@@ -32,4 +32,8 @@ class AssociativeListSpec
 		required = true)
 	String tableName;
 
+	@DataAttribute (
+		value = "list-column")
+	String listColumnName;
+
 }

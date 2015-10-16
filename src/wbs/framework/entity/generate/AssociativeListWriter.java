@@ -87,7 +87,9 @@ class AssociativeListWriter {
 		annotationWriter.addAttributeFormat (
 			"index",
 			"\"%s\"",
-			"index");
+			ifNull (
+				spec.listColumnName (),
+				"index"));
 
 		annotationWriter.write (
 			javaWriter,

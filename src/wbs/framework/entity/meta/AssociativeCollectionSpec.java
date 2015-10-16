@@ -19,6 +19,9 @@ class AssociativeCollectionSpec
 	@DataAncestor
 	ModelMetaSpec model;
 
+	@DataAttribute
+	String name;
+
 	@DataAttribute (
 		value = "type",
 		required = true)
@@ -28,5 +31,12 @@ class AssociativeCollectionSpec
 		value = "table",
 		required = true)
 	String tableName;
+
+	@DataAttribute (
+		value = "value-column")
+	String valueColumnName;
+
+	@DataAttribute
+	String whereSql;
 
 }

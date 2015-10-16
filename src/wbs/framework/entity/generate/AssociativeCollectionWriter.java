@@ -1,6 +1,9 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
 
@@ -15,6 +18,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.AssociativeCollectionSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.utils.etc.FormatWriter;
@@ -48,30 +52,87 @@ class AssociativeCollectionWriter {
 			Builder builder)
 		throws IOException {
 
-		PluginModelSpec fieldTypePluginModel =
-			pluginManager.pluginModelsByName ().get (
-				spec.typeName ());
+		String fullFieldTypeName;
 
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginModel.plugin ();
+		if (
+			equal (
+				spec.typeName (),
+				"string")
+		) {
+
+			fullFieldTypeName =
+				"String";
+
+		} else {
+
+			PluginModelSpec fieldTypePluginModel =
+				pluginManager.pluginModelsByName ().get (
+					spec.typeName ());
+
+			PluginSpec fieldTypePlugin =
+				fieldTypePluginModel.plugin ();
+
+			fullFieldTypeName =
+				stringFormat (
+					"%s.model.%sRec",
+					fieldTypePlugin.packageName (),
+					capitalise (
+						spec.typeName ()));
+
+		}
+
+		String fieldName =
+			ifNull (
+				spec.name (),
+				stringFormat (
+					"%ss",
+					spec.typeName ()));
+
+		// write field annotation
+
+		AnnotationWriter annotationWriter =
+			new AnnotationWriter ()
+
+			.name (
+				"LinkField");
+
+		annotationWriter.addAttributeFormat (
+			"table",
+			"\"%s\"",
+			spec.tableName ().replace ("\"", "\\\""));
+
+		if (spec.valueColumnName () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"element",
+				"\"%s\"",
+				spec.valueColumnName ().replace ("\"", "\\\""));
+
+		}
+
+		if (spec.whereSql () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"where",
+				"\"%s\"",
+				spec.whereSql ().replace ("\"", "\\\""));
+
+		}
+
+		annotationWriter.write (
+			javaWriter,
+			"\t");
+
+		// write field
 
 		javaWriter.writeFormat (
-			"\t@LinkField (\n");
+			"\tSet<%s> %s =\n",
+			fullFieldTypeName,
+			fieldName);
 
 		javaWriter.writeFormat (
-			"\t\ttable = \"%s\")\n",
-			spec.tableName ());
-
-		javaWriter.writeFormat (
-			"\tSet<%s.model.%sRec> %ss =\n",
-			fieldTypePlugin.packageName (),
-			capitalise (spec.typeName ()),
-			spec.typeName ());
-
-		javaWriter.writeFormat (
-			"\t\tnew LinkedHashSet<%s.model.%sRec> ();\n",
-			fieldTypePlugin.packageName (),
-			capitalise (spec.typeName ()));
+			"\t\tnew LinkedHashSet<%s> ();\n",
+			fullFieldTypeName);
 
 		javaWriter.writeFormat (
 			"\n");
