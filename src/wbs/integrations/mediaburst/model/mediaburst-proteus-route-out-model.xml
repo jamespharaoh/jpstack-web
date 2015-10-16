@@ -1,5 +1,34 @@
 <model-meta
-	name="mediaburstProteusRouteOut">
+	name="mediaburstProteusRouteOut"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<foreign-id-field
+			field="route"/>
+
+		<!-- identity -->
+
+		<master-field
+			type="route"/>
+
+		<!-- settings -->
+
+		<string-field
+			name="url"/>
+
+		<string-field
+			name="username"/>
+
+		<string-field
+			name="password"/>
+
+		<string-field
+			name="servType"/>
+
+	</fields>
 
 	<senders>
 

@@ -1,5 +1,31 @@
 <model-meta
-	name="digitalSelectRouteOut">
+	name="digitalSelectRouteOut"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<foreign-id-field
+			field="route"/>
+
+		<!-- identity -->
+
+		<master-field
+			type="route"/>
+
+		<!-- settings -->
+
+		<string-field
+			name="url"/>
+
+		<string-field
+			name="username"/>
+
+		<string-field
+			name="password"/>
+
+	</fields>
 
 	<senders>
 

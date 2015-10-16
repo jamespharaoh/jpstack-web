@@ -1,5 +1,71 @@
 <model-meta
-	name="paypalAccount">
+	name="paypalAccount"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="username"
+			nullable="yes"/>
+
+		<string-field
+			name="password"
+			nullable="yes"/>
+
+		<string-field
+			name="signature"
+			nullable="yes"/>
+
+		<string-field
+			name="appId"
+			nullable="yes"/>
+
+		<string-field
+			name="serviceEndpointPaypalApi"
+			nullable="yes"/>
+
+		<string-field
+			name="serviceEndpointPaypalApiAa"
+			nullable="yes"/>
+
+		<string-field
+			name="serviceEndpointPermissions"
+			nullable="yes"/>
+
+		<string-field
+			name="serviceEndpointAdaptivePayments"
+			nullable="yes"/>
+
+		<string-field
+			name="serviceEndpointAdaptiveAccounts"
+			nullable="yes"/>
+
+		<string-field
+			name="serviceEndpointInvoice"
+			nullable="yes"/>
+
+	</fields>
 
 	<priv-types>
 
