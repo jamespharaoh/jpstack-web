@@ -1,4 +1,18 @@
 <model-meta
-	name="text">
+	name="text"
+	type="common">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<identity-string-field
+			name="text"/>
+
+	</fields>
 
 </model-meta>

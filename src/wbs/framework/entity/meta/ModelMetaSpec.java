@@ -37,6 +37,9 @@ class ModelMetaSpec {
 	ModelMetaType type;
 
 	@DataAttribute
+	String special;
+
+	@DataAttribute
 	Boolean create;
 
 	// children

@@ -1,7 +1,9 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.File;
@@ -25,6 +27,7 @@ import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.CodeFieldSpec;
 import wbs.framework.entity.meta.IdentityIntegerFieldSpec;
 import wbs.framework.entity.meta.IdentityReferenceFieldSpec;
+import wbs.framework.entity.meta.IdentityStringFieldSpec;
 import wbs.framework.entity.meta.IndexFieldSpec;
 import wbs.framework.entity.meta.MasterFieldSpec;
 import wbs.framework.entity.meta.ModelFieldSpec;
@@ -163,6 +166,8 @@ class ModelRecordGenerator {
 			wbs.framework.entity.annotations.TypeCodeField.class,
 			wbs.framework.entity.annotations.TypeField.class,
 
+			wbs.framework.object.ObjectTypeEntry.class,
+
 			wbs.framework.record.CommonRecord.class,
 			wbs.framework.record.EphemeralRecord.class,
 			wbs.framework.record.EventRecord.class,
@@ -210,8 +215,16 @@ class ModelRecordGenerator {
 		javaWriter.writeFormat (
 			"@EqualsAndHashCode (of = \"id\")\n");
 
-		javaWriter.writeFormat (
-			"@ToString (of = \"id\")\n");
+		if (
+			notEqual (
+				modelMeta.name (),
+				"text")
+		) {
+
+			javaWriter.writeFormat (
+				"@ToString (of = \"id\")\n");
+
+		}
 
 		writeEntityAnnotation (
 			javaWriter);
@@ -262,7 +275,7 @@ class ModelRecordGenerator {
 		case common:
 
 			javaWriter.writeFormat (
-				"\timplements CommonRecord<%s> {\n",
+				"\timplements CommonRecord<%s>",
 				className);
 
 			break;
@@ -270,7 +283,7 @@ class ModelRecordGenerator {
 		case ephemeral:
 
 			javaWriter.writeFormat (
-				"\timplements EphemeralRecord<%s> {\n",
+				"\timplements EphemeralRecord<%s>",
 				className);
 
 			break;
@@ -278,7 +291,7 @@ class ModelRecordGenerator {
 		case event:
 
 			javaWriter.writeFormat (
-				"\timplements EventRecord<%s> {\n",
+				"\timplements EventRecord<%s>",
 				className);
 
 			break;
@@ -286,7 +299,7 @@ class ModelRecordGenerator {
 		case major:
 
 			javaWriter.writeFormat (
-				"\timplements MajorRecord<%s> {\n",
+				"\timplements MajorRecord<%s>",
 				className);
 
 			break;
@@ -294,7 +307,7 @@ class ModelRecordGenerator {
 		case minor:
 
 			javaWriter.writeFormat (
-				"\timplements MinorRecord<%s> {\n",
+				"\timplements MinorRecord<%s>",
 				className);
 
 			break;
@@ -302,7 +315,7 @@ class ModelRecordGenerator {
 		case root:
 
 			javaWriter.writeFormat (
-				"\timplements RootRecord<%s> {\n",
+				"\timplements RootRecord<%s>",
 				className);
 
 			break;
@@ -310,7 +323,7 @@ class ModelRecordGenerator {
 		case type:
 
 			javaWriter.writeFormat (
-				"\timplements TypeRecord<%s> {\n",
+				"\timplements TypeRecord<%s>",
 				className);
 
 			break;
@@ -320,6 +333,20 @@ class ModelRecordGenerator {
 			throw new RuntimeException ();
 
 		}
+
+		if (
+			equal (
+				modelMeta.special (),
+				"objectType")
+		) {
+
+			javaWriter.writeFormat (
+				", ObjectTypeEntry");
+
+		}
+
+		javaWriter.writeFormat (
+			" {\n");
 
 		javaWriter.writeFormat (
 			"\n");
@@ -331,6 +358,9 @@ class ModelRecordGenerator {
 			javaWriter);
 
 		generateCompareTo (
+			javaWriter);
+
+		generateSpecial (
 			javaWriter);
 
 		javaWriter.writeFormat (
@@ -453,6 +483,9 @@ class ModelRecordGenerator {
 		List<IdentityIntegerFieldSpec> identityIntegerFields =
 			new ArrayList<IdentityIntegerFieldSpec> ();
 
+		List<IdentityStringFieldSpec> identityStringFields =
+			new ArrayList<IdentityStringFieldSpec> ();
+
 		TimestampFieldSpec timestampField = null;
 
 		boolean gotName = false;
@@ -536,6 +569,16 @@ class ModelRecordGenerator {
 
 				identityIntegerFields.add (
 					(IdentityIntegerFieldSpec)
+					modelField);
+
+				gotName = true;
+
+			}
+
+			if (modelField instanceof IdentityStringFieldSpec) {
+
+				identityStringFields.add (
+					(IdentityStringFieldSpec)
 					modelField);
 
 				gotName = true;
@@ -803,6 +846,29 @@ class ModelRecordGenerator {
 
 			}
 
+			for (
+				IdentityStringFieldSpec identityStringField
+					: identityStringFields
+			) {
+
+				javaWriter.writeFormat (
+					"\t\t\t.append (\n");
+
+				javaWriter.writeFormat (
+					"\t\t\t\tget%s (),\n",
+					capitalise (
+						identityStringField.name ()));
+
+				javaWriter.writeFormat (
+					"\t\t\t\tother.get%s ())\n",
+					capitalise (
+						identityStringField.name ()));
+
+				javaWriter.writeFormat (
+					"\n");
+
+			}
+
 		} else {
 
 			javaWriter.writeFormat (
@@ -834,6 +900,35 @@ class ModelRecordGenerator {
 
 		javaWriter.writeFormat (
 			"\n");
+
+	}
+
+	private
+	void generateSpecial (
+			FormatWriter javaWriter) {
+
+		if (
+			equal (
+				modelMeta.name (),
+				"text")
+		) {
+
+			javaWriter.writeFormat (
+				"\tpublic\n");
+
+			javaWriter.writeFormat (
+				"\tString toString () {\n");
+
+			javaWriter.writeFormat (
+				"\t\treturn getText ();\n");
+
+			javaWriter.writeFormat (
+				"\t}\n");
+
+			javaWriter.writeFormat (
+				"\n");
+
+		}
 
 	}
 

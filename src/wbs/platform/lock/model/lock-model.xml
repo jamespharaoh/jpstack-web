@@ -1,4 +1,13 @@
 <model-meta
-	name="lock">
+	name="lock"
+	type="common">
+
+	<fields>
+
+		<!-- id -->
+
+		<assigned-id-field/>
+
+	</fields>
 
 </model-meta>
