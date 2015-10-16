@@ -1,5 +1,47 @@
 <model-meta
-	name="menuGroup">
+	name="menuGroup"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="slice"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="label"/>
+
+		<integer-field
+			name="order"
+			default="0"/>
+
+	</fields>
+
+	<collections>
+
+		<children-collection
+			name="menus"
+			type="menuItem"
+			order-sql="label"/>
+
+	</collections>
 
 	<priv-types>
 

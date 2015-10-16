@@ -96,24 +96,31 @@ class PostgresqlActivityPart
 			"<th>Query</th>\n",
 			"</tr>\n");
 
-		for (PostgresqlStatActivityRec statActivity
-				: statActivities) {
+		for (
+			PostgresqlStatActivityRec statActivity
+				: statActivities
+		) {
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
-				statActivity.getProcessPid (),
+				statActivity.getId ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				statActivity.getDatabaseName (),
+				statActivity.getDatabaseName ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				statActivity.getUserName (),
+				statActivity.getUserName ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				statActivity.getCurrentQuery (),
+				statActivity.getCurrentQuery ());
 
+			printFormat (
 				"</tr>\n");
 
 		}
