@@ -48,7 +48,7 @@ class ServiceHooks
 				: objectTypes) {
 
 			List<ServiceTypeRec> serviceTypes =
-				serviceTypeDao.findByParentObjectType (
+				serviceTypeDao.findByParentType (
 					objectType);
 
 			if (serviceTypes.isEmpty ())
@@ -77,19 +77,33 @@ class ServiceHooks
 				parentHelper.objectTypeId ());
 
 		List<ServiceTypeRec> serviceTypes =
-			serviceTypeDao.findByParentObjectType (
+			serviceTypeDao.findByParentType (
 				parentType);
 
-		for (ServiceTypeRec serviceType
-				: serviceTypes) {
+		for (
+			ServiceTypeRec serviceType
+				: serviceTypes
+		) {
 
 			serviceHelper.insert (
 				new ServiceRec ()
-					.setType (serviceType)
-					.setCode (serviceType.getCode ())
-					.setDescription (serviceType.getDescription ())
-					.setParentObjectType (parentType)
-					.setParentObjectId (parent.getId ()));
+
+				.setServiceType (
+					serviceType)
+
+				.setCode (
+					serviceType.getCode ())
+
+				.setDescription (
+					serviceType.getDescription ())
+
+				.setParentType (
+					parentType)
+
+				.setParentId (
+					parent.getId ())
+
+			);
 
 		}
 

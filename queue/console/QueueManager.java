@@ -89,7 +89,7 @@ class QueueManager {
 			queueSubject.getQueue ();
 
 		QueueTypeRec queueType =
-			queue.getType ();
+			queue.getQueueType ();
 
 		String key =
 			stringFormat (
@@ -119,7 +119,7 @@ class QueueManager {
 			QueueRec queue) {
 
 		QueueTypeRec queueType =
-			queue.getType ();
+			queue.getQueueType ();
 
 		String key =
 			stringFormat (

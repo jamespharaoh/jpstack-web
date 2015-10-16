@@ -24,6 +24,7 @@ import wbs.framework.utils.etc.Html;
 import wbs.platform.event.model.EventLinkObjectHelper;
 import wbs.platform.event.model.EventLinkRec;
 import wbs.platform.event.model.EventRec;
+import wbs.platform.event.model.EventTypeRec;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextRec;
@@ -195,13 +196,16 @@ class ObjectEventsPart
 	String eventText (
 			EventRec event) {
 
+		EventTypeRec eventType =
+			event.getEventType ();
+
 		String text =
 			Html.encode (
-				event.getEventType ().getDescription ());
+				eventType.getDescription ());
 
 		for (
 			EventLinkRec evLink
-				: event.getEventLinks ().values ()
+				: event.getEventLinks ()
 		) {
 
 			if (evLink.getTypeId () == -1) {

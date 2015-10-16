@@ -99,7 +99,7 @@ class AffiliateHooks
 			affiliateHelper.insert (
 				new AffiliateRec ()
 
-				.setType (
+				.setAffiliateType (
 					affiliateType)
 
 				.setCode (

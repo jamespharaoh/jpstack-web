@@ -14,19 +14,19 @@ class ServiceTypeDaoHibernate
 
 	@Override
 	public
-	List<ServiceTypeRec> findByParentObjectType (
-			ObjectTypeRec parentObjectType) {
+	List<ServiceTypeRec> findByParentType (
+			ObjectTypeRec parentType) {
 
 		return findMany (
 			ServiceTypeRec.class,
 
 			createQuery (
 				"FROM ServiceTypeRec serviceType " +
-				"WHERE serviceType.parentObjectType = :parentObjectType")
+				"WHERE serviceType.parentType = :parentType")
 
 			.setEntity (
-				"parentObjectType",
-				parentObjectType)
+				"parentType",
+				parentType)
 
 			.list ());
 

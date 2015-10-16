@@ -96,7 +96,7 @@ class QueueHooks
 			queueHelper.insert (
 				new QueueRec ()
 
-				.setType (
+				.setQueueType (
 					queueType)
 
 				.setCode (

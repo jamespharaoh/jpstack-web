@@ -1,4 +1,21 @@
 <model-meta
-	name="eventType">
+	name="eventType"
+	type="type">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<code-field/>
+
+		<!-- details -->
+
+		<description-field/>
+
+	</fields>
 
 </model-meta>
