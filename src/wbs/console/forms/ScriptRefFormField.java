@@ -1,6 +1,5 @@
 package wbs.console.forms;
 
-import java.io.PrintWriter;
 import java.util.Set;
 
 import lombok.Getter;
@@ -9,6 +8,7 @@ import lombok.experimental.Accessors;
 import wbs.console.html.ScriptRef;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.PermanentRecord;
+import wbs.framework.utils.etc.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("scriptRefFormField")
@@ -53,7 +53,7 @@ class ScriptRefFormField
 	@Override
 	public
 	void renderTableCellList (
-			PrintWriter out,
+			FormatWriter out,
 			Object object,
 			boolean link) {
 
@@ -64,7 +64,7 @@ class ScriptRefFormField
 	@Override
 	public
 	void renderTableCellProperties (
-			PrintWriter out,
+			FormatWriter out,
 			Object object) {
 
 		throw new UnsupportedOperationException ();
@@ -74,7 +74,7 @@ class ScriptRefFormField
 	@Override
 	public
 	void renderFormRow (
-			PrintWriter out,
+			FormatWriter out,
 			Object object) {
 
 		throw new UnsupportedOperationException ();
@@ -107,7 +107,7 @@ class ScriptRefFormField
 	@Override
 	public
 	void renderCsvRow (
-			PrintWriter out,
+			FormatWriter out,
 			Object object) {
 
 		throw new UnsupportedOperationException ();

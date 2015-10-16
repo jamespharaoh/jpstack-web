@@ -114,7 +114,7 @@ class ObjectSummaryFieldsPart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputTableRows (
-			out,
+			formatWriter,
 			formFieldSet,
 			object);
 

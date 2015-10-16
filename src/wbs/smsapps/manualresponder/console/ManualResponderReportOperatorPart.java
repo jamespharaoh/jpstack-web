@@ -122,7 +122,7 @@ class ManualResponderReportOperatorPart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
-			out,
+			formatWriter,
 			searchFormFieldSet,
 			searchForm);
 

@@ -624,7 +624,7 @@ class ObjectListPart
 			"<tr>\n");
 
 		formFieldLogic.outputTableHeadings (
-			out,
+			formatWriter,
 			formFieldSet);
 
 		printFormat (
@@ -632,8 +632,10 @@ class ObjectListPart
 
 		// render rows
 
-		for (Record<?> object
-				: selectedObjects) {
+		for (
+			Record<?> object
+				: selectedObjects
+		) {
 
 			String targetUrl =
 				requestContext.resolveContextUrl (
@@ -654,7 +656,7 @@ class ObjectListPart
 					isCurrentObject));
 
 			formFieldLogic.outputTableCellsList (
-				out,
+				formatWriter,
 				formFieldSet,
 				object,
 				false);

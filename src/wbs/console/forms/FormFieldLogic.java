@@ -1,8 +1,6 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -16,6 +14,7 @@ import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.PermanentRecord;
+import wbs.framework.utils.etc.FormatWriter;
 
 @SingletonComponent ("fieldsLogic")
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -129,7 +128,7 @@ class FormFieldLogic {
 
 	public
 	void outputTableHeadings (
-			PrintWriter out,
+			FormatWriter out,
 			FormFieldSet formFieldSet) {
 
 		for (
@@ -137,10 +136,9 @@ class FormFieldLogic {
 				: formFieldSet.formFields ()
 		) {
 
-			out.print (
-				stringFormat (
-					"<th>%h</th>\n",
-					formField.label ()));
+			out.writeFormat (
+				"<th>%h</th>\n",
+				formField.label ());
 
 		}
 
@@ -178,7 +176,7 @@ class FormFieldLogic {
 
 	public
 	void outputFormRows (
-			PrintWriter out,
+			FormatWriter out,
 			FormFieldSet formFieldSet,
 			Object object) {
 
@@ -200,7 +198,7 @@ class FormFieldLogic {
 
 	public
 	void outputCsvRow (
-			PrintWriter out,
+			FormatWriter out,
 			FormFieldSet formFieldSet,
 			Object object)
 		throws IOException {
@@ -216,7 +214,10 @@ class FormFieldLogic {
 				continue;
 
 			if (! first) {
-				out.write (",");
+
+				out.writeFormat (
+					",");
+
 			}
 
 			formField.renderCsvRow (
@@ -227,13 +228,14 @@ class FormFieldLogic {
 
 		}
 
-		out.write ("\n");
+		out.writeFormat (
+			"\n");
 
 	}
 
 	public
 	void outputTableCellsList (
-			PrintWriter out,
+			FormatWriter out,
 			FormFieldSet formFieldSet,
 			Object object,
 			boolean links) {
@@ -257,7 +259,7 @@ class FormFieldLogic {
 
 	public
 	void outputTableRows (
-			PrintWriter out,
+			FormatWriter out,
 			FormFieldSet formFieldSet,
 			Object object) {
 
@@ -267,19 +269,17 @@ class FormFieldLogic {
 			if (formField.virtual ())
 				continue;
 
-			out.print (
-				stringFormat (
-					"<tr>\n",
-					"<th>%h</th>\n",
-					formField.label ()));
+			out.writeFormat (
+				"<tr>\n",
+				"<th>%h</th>\n",
+				formField.label ());
 
 			formField.renderTableCellProperties (
 				out,
 				object);
 
-			out.print (
-				stringFormat (
-					"</tr>\n"));
+			out.writeFormat (
+				"</tr>\n");
 
 		}
 

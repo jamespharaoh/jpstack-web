@@ -3,7 +3,6 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -17,6 +16,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.record.PermanentRecord;
+import wbs.framework.utils.etc.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("updatableFormField")
@@ -105,7 +105,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	@Override
 	public
 	void renderTableCellList (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			boolean link) {
 
@@ -133,7 +133,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	@Override
 	public
 	void renderTableCellProperties (
-			PrintWriter out,
+			FormatWriter out,
 			Container container) {
 
 		Native nativeValue =
@@ -159,7 +159,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	@Override
 	public
 	void renderFormRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container) {
 
 		Native nativeValue =
@@ -188,7 +188,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	@Override
 	public
 	void renderCsvRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container) {
 
 		Native nativeValue =
@@ -207,13 +207,14 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		String stringValue =
 			interfaceValue.toString ();
 
-		out.write (
+		out.writeFormat (
 			"\"");
 
-		out.write (
+		out.writeFormat (
+			"%s",
 			stringValue.replace ("\"", "\"\""));
 
-		out.write (
+		out.writeFormat (
 			"\"");
 
 	}

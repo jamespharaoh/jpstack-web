@@ -82,7 +82,7 @@ class ContextFormActionPart<FormState>
 			">\n");
 
 		formFieldLogic.outputFormRows (
-			out,
+			formatWriter,
 			formFields,
 			formState);
 

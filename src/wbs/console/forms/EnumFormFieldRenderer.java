@@ -5,7 +5,6 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.Misc.toStringNull;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +16,7 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.etc.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("enumFormFieldRenderer")
@@ -53,90 +53,84 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	@Override
 	public
 	void renderTableCellList (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue,
 			boolean link) {
 
-		out.write (
-			stringFormat (
-				"<td>%h</td>\n",
-				camelToSpaces (
-					toStringNull (
-						interfaceValue))));
+		out.writeFormat (
+			"<td>%h</td>\n",
+			camelToSpaces (
+				toStringNull (
+					interfaceValue)));
 
 	}
 
 	@Override
 	public
 	void renderTableCellProperties (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<td>%h</td>\n",
-				camelToSpaces (
-					toStringNull (
-						interfaceValue))));
+		out.writeFormat (
+			"<td>%h</td>\n",
+			camelToSpaces (
+				toStringNull (
+					interfaceValue)));
 
 	}
 
 	@Override
 	public
 	void renderTableRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<tr>\n",
-				"<th>%h</th>\n",
-				label ()));
+		out.writeFormat (
+			"<tr>\n",
+			"<th>%h</th>\n",
+			label ());
 
 		renderTableCellProperties (
 			out,
 			container,
 			interfaceValue);
 
-		out.write (
-			stringFormat (
-				"</tr>\n"));
+		out.writeFormat (
+			"</tr>\n");
 
 	}
 
 	@Override
 	public
 	void renderFormRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<tr>\n",
-				"<th>%h</th>\n",
-				label (),
-				"<td>"));
+		out.writeFormat (
+			"<tr>\n",
+			"<th>%h</th>\n",
+			label (),
+			"<td>");
 
 		renderFormInput (
 			out,
 			container,
 			interfaceValue);
 
-		out.write (
-			stringFormat (
-				"</td>\n",
-				"</tr>\n"));
+		out.writeFormat (
+			"</td>\n",
+			"</tr>\n");
 
 	}
 
 	@Override
 	public
 	void renderFormInput (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue) {
 
@@ -156,22 +150,20 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 
 		if (nullable) {
 
-			out.write (
-				stringFormat (
-					"%s",
-					enumConsoleHelper.selectNull (
-						name (),
-						selectedValue,
-						"none")));
+			out.writeFormat (
+				"%s",
+				enumConsoleHelper.selectNull (
+					name (),
+					selectedValue,
+					"none"));
 
 		} else {
 
-			out.write (
-				stringFormat (
-					"%s",
-					enumConsoleHelper.select (
-						name (),
-						selectedValue)));
+			out.writeFormat (
+				"%s",
+				enumConsoleHelper.select (
+					name (),
+					selectedValue));
 
 		}
 

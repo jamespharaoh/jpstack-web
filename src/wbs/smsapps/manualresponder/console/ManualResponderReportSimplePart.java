@@ -113,7 +113,7 @@ class ManualResponderReportSimplePart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
-			out,
+			formatWriter,
 			searchFormFieldSet,
 			searchForm);
 
@@ -160,8 +160,8 @@ class ManualResponderReportSimplePart
 			"<table class=\"list\">\n");
 
 		formFieldLogic.outputTableHeadings (
-				out,
-				resultsFormFieldSet);
+			formatWriter,
+			resultsFormFieldSet);
 
 		for (
 			ManualResponderReportRec report
@@ -170,11 +170,12 @@ class ManualResponderReportSimplePart
 
 			printFormat (
 				"<tr>\n");
-				formFieldLogic.outputTableCellsList (
-					out,
-					resultsFormFieldSet,
-					report,
-				   true);
+
+			formFieldLogic.outputTableCellsList (
+				formatWriter,
+				resultsFormFieldSet,
+				report,
+			   true);
 
 			printFormat (
 				"</tr>\n");

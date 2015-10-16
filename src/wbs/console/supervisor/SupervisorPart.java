@@ -436,15 +436,17 @@ class SupervisorPart
 			">\n");
 
 		printFormat (
-			"<p>Date<br>\n",
+			"<p>Date<br>\n");
 
+		printFormat (
 			"<input",
 			" type=\"text\"",
 			" name=\"date\"",
 			" value=\"%h\"",
 			dateField.text,
-			">\n",
+			">\n");
 
+		printFormat (
 			"<input",
 			" type=\"submit\"",
 			" value=\"ok\"",
@@ -454,7 +456,7 @@ class SupervisorPart
 			"</form>\n");
 
 		ObsoleteDateLinks.dailyBrowserParagraph (
-			out,
+			printWriter,
 			localUrl,
 			requestContext.getFormData (),
 			dateField.date);

@@ -528,10 +528,16 @@ class ChatUserSearchResultsPart
 
 		printFormat (
 			"var pages = [ [\n");
-		pageBuilders [0].goPages (out);
+
+		pageBuilders [0].goPages (
+			printWriter);
+
 		printFormat (
 			"], [\n");
-		pageBuilders [1].goPages (out);
+
+		pageBuilders [1].goPages (
+			printWriter);
+
 		printFormat (
 			"] ];\n");
 

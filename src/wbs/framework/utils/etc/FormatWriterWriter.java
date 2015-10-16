@@ -22,21 +22,54 @@ class FormatWriterWriter
 	@Override
 	public
 	void writeFormat (
-			Object... arguments)
-		throws IOException {
+			Object... arguments) {
 
-		writer.write (
-			stringFormat (
-				arguments));
+		try {
+
+			writer.write (
+				stringFormat (
+					arguments));
+
+		} catch (IOException exception) {
+
+			throw new RuntimeIoException (exception);
+
+		}
 
 	}
 
 	@Override
 	public
-	void close ()
-		throws IOException {
+	void writeFormatArray (
+			Object[] arguments) {
 
-		writer.close ();
+		try {
+
+			writer.write (
+				stringFormat (
+					arguments));
+
+		} catch (IOException exception) {
+
+			throw new RuntimeIoException (exception);
+
+		}
+
+	}
+
+	@Override
+	public
+	void close () {
+
+		try {
+
+			writer.close ();
+
+		} catch (IOException exception) {
+
+			throw new RuntimeIoException (exception);
+
+		}
 
 	}
 

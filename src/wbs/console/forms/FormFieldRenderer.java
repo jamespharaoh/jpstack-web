@@ -1,7 +1,8 @@
 package wbs.console.forms;
 
-import java.io.PrintWriter;
 import java.util.List;
+
+import wbs.framework.utils.etc.FormatWriter;
 
 public
 interface FormFieldRenderer<Container,Interface> {
@@ -9,28 +10,28 @@ interface FormFieldRenderer<Container,Interface> {
 	boolean fileUpload ();
 
 	void renderTableCellProperties (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue);
 
 	void renderTableCellList (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue,
 			boolean link);
 
 	void renderTableRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue);
 
 	void renderFormRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue);
 
 	void renderFormInput (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue);
 

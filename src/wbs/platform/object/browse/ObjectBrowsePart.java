@@ -233,7 +233,7 @@ class ObjectBrowsePart
 			"<tr>\n");
 
 		formFieldLogic.outputTableHeadings (
-			out,
+			formatWriter,
 			formFieldSet);
 
 		printFormat (
@@ -241,8 +241,10 @@ class ObjectBrowsePart
 
 		// render rows
 
-		for (Record<?> object
-				: allObjects) {
+		for (
+			Record<?> object
+				: allObjects
+		) {
 
 			String targetUrl =
 				requestContext.resolveContextUrl (
@@ -263,7 +265,7 @@ class ObjectBrowsePart
 					isCurrentObject));
 
 			formFieldLogic.outputTableCellsList (
-				out,
+				formatWriter,
 				formFieldSet,
 				object,
 				false);

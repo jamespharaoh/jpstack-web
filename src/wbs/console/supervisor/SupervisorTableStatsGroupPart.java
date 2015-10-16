@@ -65,7 +65,7 @@ class SupervisorTableStatsGroupPart
 		try {
 
 			statsConsoleLogic.outputGroup (
-				out,
+				printWriter,
 				statsDataSetsByName,
 				statsPeriod,
 				statsGrouper,

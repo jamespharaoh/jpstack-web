@@ -117,15 +117,17 @@ class ObjectLinksPart
 			"<tr>\n");
 
 		formFieldLogic.outputTableHeadings (
-			out,
+			formatWriter,
 			formFieldSet);
 
 		printFormat (
 			"<th>Member</th>\n",
 			"</tr>\n");
 
-		for (Record<?> targetObject
-				: targetObjects) {
+		for (
+			Record<?> targetObject
+				: targetObjects
+		) {
 
 			if (! privChecker.can (
 					targetObject,
@@ -136,7 +138,7 @@ class ObjectLinksPart
 				"<tr>\n");
 
 			formFieldLogic.outputTableCellsList (
-				out,
+				formatWriter,
 				formFieldSet,
 				targetObject,
 				true);

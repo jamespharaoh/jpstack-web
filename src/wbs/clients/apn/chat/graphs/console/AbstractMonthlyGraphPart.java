@@ -74,7 +74,7 @@ class AbstractMonthlyGraphPart
 		if (yearMonth != null) {
 
 			ObsoleteDateLinks.monthlyBrowserParagraph (
-				out,
+				printWriter,
 				requestContext.resolveLocalUrl (
 					myLocalPart),
 				Collections.<String,String>emptyMap (),

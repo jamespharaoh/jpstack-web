@@ -1,9 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +18,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
+import wbs.framework.utils.etc.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectFormFieldRenderer")
@@ -62,7 +61,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Override
 	public
 	void renderTableCellList (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue,
 			boolean link) {
@@ -87,22 +86,21 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		// write table cell
 
-		out.write (
-			stringFormat (
-				"%s\n",
-				objectManager.tdForObject (
-					interfaceValue,
-					root,
-					true,
-					link,
-					1)));
+		out.writeFormat (
+			"%s\n",
+			objectManager.tdForObject (
+				interfaceValue,
+				root,
+				true,
+				link,
+				1));
 
 	}
 
 	@Override
 	public
 	void renderTableCellProperties (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue) {
 
@@ -126,72 +124,67 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		// write table cell
 
-		out.write (
-			stringFormat (
-				"%s\n",
-				objectManager.tdForObject (
-					interfaceValue,
-					root,
-					true,
-					true,
-					1)));
+		out.writeFormat (
+			"%s\n",
+			objectManager.tdForObject (
+				interfaceValue,
+				root,
+				true,
+				true,
+				1));
 
 	}
 
 	@Override
 	public
 	void renderTableRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue) {
 
-		out.print (
-			stringFormat (
-				"<tr>\n",
-				"<th>%h</th>\n",
-				label ()));
+		out.writeFormat (
+			"<tr>\n",
+			"<th>%h</th>\n",
+			label ());
 
 		renderTableCellProperties (
 			out,
 			container,
 			interfaceValue);
 
-		out.print (
-			stringFormat (
-				"</tr>\n"));
+		out.writeFormat (
+			"</tr>\n");
 
 	}
 
 	@Override
 	public
 	void renderFormRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue) {
 
-		out.print (
-			stringFormat (
-				"<tr>\n",
-				"<th>%h</th>\n",
-				label (),
-				"<td>"));
+		out.writeFormat (
+			"<tr>\n",
+			"<th>%h</th>\n",
+			label (),
+			"<td>");
 
 		renderFormInput (
 			out,
 			container,
 			interfaceValue);
 
-		out.print (
-			stringFormat (
-				"</td>\n",
-				"</tr>\n"));
+		out.writeFormat (
+			"</td>\n",
+			"</tr>\n");
 
 	}
 
 	@Override
 	public
 	void renderFormInput (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Interface interfaceValue) {
 
@@ -232,40 +225,39 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		}
 
-		out.write (
-			stringFormat (
-				"<select name=\"%h\">\n",
-				name));
+		out.writeFormat (
+			"<select name=\"%h\">\n",
+			name);
 
 		// unchanged option
 
-		out.write (
-			stringFormat (
-				"<option value=\"unchanged\">%h</option>\n",
-				interfaceValue == null
-					? "none"
-					: objectManager.objectPath (
-						(Record<?>) interfaceValue,
-						root,
-						true,
-						true)));
+		out.writeFormat (
+			"<option value=\"unchanged\">%h</option>\n",
+			interfaceValue == null
+				? "none"
+				: objectManager.objectPath (
+					(Record<?>) interfaceValue,
+					root,
+					true,
+					true));
 
 		// null option
 
-		out.write (
-			stringFormat (
-				"<option value=\"null\"",
-				equal (
-						requestContext.getForm (name),
-						"null")
-					? " selected"
-					: "",
-				">none</option>\n"));
+		out.writeFormat (
+			"<option value=\"null\"",
+			equal (
+					requestContext.getForm (name),
+					"null")
+				? " selected"
+				: "",
+			">none</option>\n");
 
 		// value options
 
-		for (Map.Entry<String,Record<?>> ent
-				: sortedOptions.entrySet ()) {
+		for (
+			Map.Entry<String,Record<?>> ent
+				: sortedOptions.entrySet ()
+		) {
 
 			String path =
 				ent.getKey ();
@@ -279,23 +271,21 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			if (objectHelper.getDeleted (option, true))
 				continue;
 
-			out.write (
-				stringFormat (
-					"<option value=\"%h\"",
-					option.getId (),
-					equal (
-							requestContext.getForm (name ()),
-							option.getId ().toString ())
-						? " selected"
-						: "",
-					">%h</option>\n",
-					path));
+			out.writeFormat (
+				"<option value=\"%h\"",
+				option.getId (),
+				equal (
+						requestContext.getForm (name ()),
+						option.getId ().toString ())
+					? " selected"
+					: "",
+				">%h</option>\n",
+				path);
 
 		}
 
-		out.write (
-			stringFormat (
-				"</select>"));
+		out.writeFormat (
+			"</select>");
 
 	}
 

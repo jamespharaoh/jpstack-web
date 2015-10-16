@@ -63,7 +63,7 @@ class SubscriptionNumberAddRemovePart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
-			out,
+			formatWriter,
 			addRemoveFormFieldSet,
 			addRemoveForm);
 

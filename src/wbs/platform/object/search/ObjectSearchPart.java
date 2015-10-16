@@ -90,7 +90,7 @@ class ObjectSearchPart
 			">\n");
 
 		formFieldLogic.outputFormRows (
-			out,
+			formatWriter,
 			formFieldSet,
 			search);
 

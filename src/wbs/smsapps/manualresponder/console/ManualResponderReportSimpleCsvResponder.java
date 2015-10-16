@@ -16,6 +16,7 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.etc.FormatWriterWriter;
 import wbs.smsapps.manualresponder.console.ManualResponderReportSimplePart.SearchForm;
 import wbs.smsapps.manualresponder.model.ManualResponderReportObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReportRec;
@@ -128,7 +129,7 @@ class ManualResponderReportSimpleCsvResponder
 		) {
 
 			formFieldLogic.outputCsvRow (
-				out,
+				new FormatWriterWriter (out),
 				resultsFormFieldSet,
 				report);
 

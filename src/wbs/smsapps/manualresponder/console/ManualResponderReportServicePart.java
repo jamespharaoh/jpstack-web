@@ -162,7 +162,7 @@ class ManualResponderReportServicePart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
-			out,
+			formatWriter,
 			searchFormFieldSet,
 			searchForm);
 

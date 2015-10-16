@@ -3,7 +3,6 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +14,7 @@ import lombok.experimental.Accessors;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
+import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.Html;
 
 @PrototypeComponent ("textAreaFormFieldRenderer")
@@ -67,41 +67,39 @@ class TextAreaFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellList (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			String interfaceValue,
 			boolean link) {
 
-		out.write (
-			stringFormat (
-				"<td>%s</td>\n",
-				interfaceToHtmlSimple (
-					container,
-					interfaceValue,
-					link)));
+		out.writeFormat (
+			"<td>%s</td>\n",
+			interfaceToHtmlSimple (
+				container,
+				interfaceValue,
+				link));
 
 	}
 
 	@Override
 	public
 	void renderTableCellProperties (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			String interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<td>%s</td>\n",
-				interfaceToHtmlComplex (
-					container,
-					interfaceValue)));
+		out.writeFormat (
+			"<td>%s</td>\n",
+			interfaceToHtmlComplex (
+				container,
+				interfaceValue));
 
 	}
 
 	@Override
 	public
 	void renderTableRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			String interfaceValue) {
 
@@ -119,67 +117,62 @@ class TextAreaFormFieldRenderer<Container>
 
 		}
 
-		out.write (
-			stringFormat (
-				"<tr>\n",
-				"<th>%h</th>\n",
-				label ()));
+		out.writeFormat (
+			"<tr>\n",
+			"<th>%h</th>\n",
+			label ());
 
 		renderTableCellProperties (
 			out,
 			container,
 			interfaceValue);
 
-		out.write (
-			stringFormat (
-				"</tr>\n"));
+		out.writeFormat (
+			"</tr>\n");
 
 	}
 
 	@Override
 	public
 	void renderFormRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			String interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<tr>\n",
-				"<th>%h</th>\n",
-				label (),
-				"<td>"));
+		out.writeFormat (
+			"<tr>\n",
+			"<th>%h</th>\n",
+			label (),
+			"<td>");
 
 		renderFormInput (
 			out,
 			container,
 			interfaceValue);
 
-		out.write (
-			stringFormat (
-				"</td>\n",
-				"</tr>\n"));
+		out.writeFormat (
+			"</td>\n",
+			"</tr>\n");
 
 	}
 
 	@Override
 	public
 	void renderFormInput (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			String interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<textarea",
-				" id=\"field_%h\"",
-				name (),
-				" rows=\"%h\"",
-				rows (),
-				" cols=\"%h\"",
-				cols (),
-				" name=\"%h\"",
-				name ()));
+		out.writeFormat (
+			"<textarea",
+			" id=\"field_%h\"",
+			name (),
+			" rows=\"%h\"",
+			rows (),
+			" cols=\"%h\"",
+			cols (),
+			" name=\"%h\"",
+			name ());
 
 		if (charCountFunction != null) {
 
@@ -192,32 +185,28 @@ class TextAreaFormFieldRenderer<Container>
 						charCountData,
 						"undefined"));
 
-			out.write (
-				stringFormat (
-					" onkeyup=\"%h\"",
-					onchange,
-					" onfocus=\"%h\"",
-					onchange));
+			out.writeFormat (
+				" onkeyup=\"%h\"",
+				onchange,
+				" onfocus=\"%h\"",
+				onchange);
 
 		}
 
-		out.write (
-			stringFormat (
-				">%h</textarea>",
-				interfaceValue));
+		out.writeFormat (
+			">%h</textarea>",
+			interfaceValue);
 
 		if (charCountFunction != null) {
 
-			out.write (
-				stringFormat (
-					"<br>\n"));
+			out.writeFormat (
+				"<br>\n");
 
-			out.write (
-				stringFormat (
-					"<span",
-					" id=\"chars_%h\"",
-					name (),
-					">&nbsp;</span>"));
+			out.writeFormat (
+				"<span",
+				" id=\"chars_%h\"",
+				name (),
+				">&nbsp;</span>");
 
 		}
 
@@ -239,16 +228,14 @@ class TextAreaFormFieldRenderer<Container>
 
 			}
 
-			out.write (
-				stringFormat (
-					"<span hidden=\"hidden\"",
-					" class=\"parameters-length-list\"",
-					data,
-					"></span>\n"));
+			out.writeFormat (
+				"<span hidden=\"hidden\"",
+				" class=\"parameters-length-list\"",
+				data,
+				"></span>\n");
 
-			out.write (
-				stringFormat (
-					"<br>\n"));
+			out.writeFormat (
+				"<br>\n");
 
 			/*
 			// parameters data

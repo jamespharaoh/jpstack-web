@@ -113,7 +113,7 @@ class ImChatMessagePendingHistoryPart
 			"<tr>\n");
 
 		formFieldLogic.outputTableHeadings (
-			out,
+			formatWriter,
 			messageFields);
 
 		printFormat (
@@ -130,7 +130,7 @@ class ImChatMessagePendingHistoryPart
 				"<tr>\n");
 
 			formFieldLogic.outputTableCellsList (
-				out,
+				formatWriter,
 				messageFields,
 				message,
 				true);
@@ -160,7 +160,7 @@ class ImChatMessagePendingHistoryPart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputTableRows (
-			out,
+			formatWriter,
 			customerFields,
 			imChatCustomer);
 

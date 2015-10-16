@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.Misc.booleanToString;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
 
-import java.io.PrintWriter;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -14,6 +13,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.etc.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("yesNoFormFieldRenderer")
@@ -53,150 +53,141 @@ class YesNoFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellList (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Boolean interfaceValue,
 			boolean link) {
 
-		out.write (
-			stringFormat (
-				"<td>%s</td>\n",
-				interfaceToHtmlSimple (
-					container,
-					interfaceValue,
-					link)));
+		out.writeFormat (
+			"<td>%s</td>\n",
+			interfaceToHtmlSimple (
+				container,
+				interfaceValue,
+				link));
 
 	}
 
 	@Override
 	public
 	void renderTableCellProperties (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Boolean interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<td>%s</td>\n",
-				interfaceToHtmlComplex (
-					container,
-					interfaceValue)));
+		out.writeFormat (
+			"<td>%s</td>\n",
+			interfaceToHtmlComplex (
+				container,
+				interfaceValue));
 
 	}
 
 	@Override
 	public
 	void renderTableRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Boolean interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<tr>\n",
-				"<th>%h</th>\n",
-				label ()));
+		out.writeFormat (
+			"<tr>\n",
+			"<th>%h</th>\n",
+			label ());
 
 		renderTableCellProperties (
 			out,
 			container,
 			interfaceValue);
 
-		out.write (
-			stringFormat (
-				"</tr>\n"));
+		out.writeFormat (
+			"</tr>\n");
 
 	}
 
 	@Override
 	public
 	void renderFormRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Boolean interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<tr>\n",
-				"<th>%h</th>\n",
-				label (),
-				"<td>"));
+		out.writeFormat (
+			"<tr>\n",
+			"<th>%h</th>\n",
+			label (),
+			"<td>");
 
 		renderFormInput (
 			out,
 			container,
 			interfaceValue);
 
-		out.write (
-			stringFormat (
-				"</td>\n",
-				"</tr>\n"));
+		out.writeFormat (
+			"</td>\n",
+			"</tr>\n");
 
 	}
 
 	@Override
 	public
 	void renderFormInput (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			Boolean interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<select name=\"%h\">",
-				name ()));
+		out.writeFormat (
+			"<select name=\"%h\">",
+			name ());
 
 		if (interfaceValue == null) {
 
-			out.write (
-				stringFormat (
+			out.writeFormat (
+				"<option",
+				" value=\"\"",
+				" selected",
+				"></option>\n");
 
-					"<option",
-					" value=\"\"",
-					" selected",
-					"></option>\n",
+			out.writeFormat (
+				"<option",
+				" value=\"yes\"",
+				">%h</option>\n",
+				yesLabel ());
 
-					"<option",
-					" value=\"yes\"",
-					">%h</option>\n",
-					yesLabel (),
-
-					"<option",
-					" value=\"no\"",
-					">%h</option>\n",
-					noLabel ()));
+			out.writeFormat (
+				"<option",
+				" value=\"no\"",
+				">%h</option>\n",
+				noLabel ());
 
 		} else if (interfaceValue == true) {
 
-			out.write (
-				stringFormat (
+			out.writeFormat (
+				"<option",
+				" value=\"yes\"",
+				" selected",
+				">%h</option>\n",
+				yesLabel ());
 
-					"<option",
-					" value=\"yes\"",
-					" selected",
-					">%h</option>\n",
-					yesLabel (),
-
-					"<option",
-					" value=\"no\"",
-					">%h</option>\n",
-					noLabel ()));
+			out.writeFormat (
+				"<option",
+				" value=\"no\"",
+				">%h</option>\n",
+				noLabel ());
 
 		} else if (interfaceValue == false) {
 
-			out.write (
-				stringFormat (
+			out.writeFormat (
+				"<option",
+				" value=\"yes\"",
+				">%h</option>\n",
+				yesLabel ());
 
-					"<option",
-					" value=\"yes\"",
-					">%h</option>\n",
-					yesLabel (),
-
-					"<option",
-					" value=\"no\"",
-					" selected",
-					">%h</option>\n",
-					noLabel ()));
+			out.writeFormat (
+				"<option",
+				" value=\"no\"",
+				" selected",
+				">%h</option>\n",
+				noLabel ());
 
 		} else {
 
@@ -204,9 +195,8 @@ class YesNoFormFieldRenderer<Container>
 
 		}
 
-		out.write (
-			stringFormat (
-				"</select>"));
+		out.writeFormat (
+			"</select>");
 
 	}
 

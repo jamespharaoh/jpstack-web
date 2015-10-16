@@ -204,7 +204,7 @@ class ObjectCreatePart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
-			out,
+			formatWriter,
 			formFieldSet,
 			object);
 

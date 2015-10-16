@@ -84,7 +84,7 @@ class ChatUserImageUploadPart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
-			out,
+			formatWriter,
 			formFieldSet,
 			uploadForm);
 

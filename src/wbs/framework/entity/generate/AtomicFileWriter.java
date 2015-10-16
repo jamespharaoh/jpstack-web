@@ -11,6 +11,7 @@ import lombok.NonNull;
 import org.apache.commons.io.FileUtils;
 
 import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.etc.RuntimeIoException;
 
 public
 class AtomicFileWriter
@@ -47,8 +48,18 @@ class AtomicFileWriter
 
 	@Override
 	public
-	void close ()
-		throws IOException {
+	void writeFormatArray (
+			Object[] arguments) {
+
+		stringBuilder.append (
+			stringFormatArray (
+				arguments));
+
+	}
+
+	@Override
+	public
+	void close () {
 
 		String newContents =
 			stringBuilder.toString ();
@@ -60,28 +71,45 @@ class AtomicFileWriter
 			return;
 		}
 
-		FileUtils.writeStringToFile (
-			file,
-			newContents);
+		try {
+
+			FileUtils.writeStringToFile (
+				file,
+				newContents);
+
+		} catch (IOException exception) {
+
+			throw new RuntimeIoException (
+				exception);
+
+		}
 
 	}
 
 	private
 	boolean contentHasChanged (
-			String newContents)
-		throws IOException {
+			String newContents) {
 
 		if (! file.exists ()) {
 			return true;
 		}
 
-		String oldContents =
-			FileUtils.readFileToString (
-				file);
+		try {
 
-		return notEqual (
-			oldContents,
-			newContents);
+			String oldContents =
+				FileUtils.readFileToString (
+					file);
+
+			return notEqual (
+				oldContents,
+				newContents);
+
+		} catch (IOException exception) {
+
+			throw new RuntimeIoException (
+				exception);
+
+		}
 
 	}
 

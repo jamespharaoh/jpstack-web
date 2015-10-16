@@ -1,6 +1,5 @@
 package wbs.console.forms;
 
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
 
@@ -8,6 +7,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import wbs.console.html.ScriptRef;
 import wbs.framework.record.PermanentRecord;
+import wbs.framework.utils.etc.FormatWriter;
 
 public
 interface FormField<Container,Generic,Native,Interface> {
@@ -28,20 +28,20 @@ interface FormField<Container,Generic,Native,Interface> {
 			String fieldSetName);
 
 	void renderTableCellList (
-			PrintWriter out,
+			FormatWriter out,
 			Container object,
 			boolean link);
 
 	void renderTableCellProperties (
-			PrintWriter out,
+			FormatWriter out,
 			Container object);
 
 	void renderFormRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container object);
 
 	void renderCsvRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container object);
 
 	void update (

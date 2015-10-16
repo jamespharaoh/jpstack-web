@@ -3,7 +3,6 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -18,6 +17,7 @@ import org.apache.commons.io.IOUtils;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("uploadFormFieldRenderer")
 @Accessors (fluent = true)
@@ -51,107 +51,100 @@ class UploadFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellList (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			FileUpload interfaceValue,
 			boolean link) {
 
-		out.write (
-			stringFormat (
-				"<td>%s</td>\n",
-				interfaceToHtmlSimple (
-					container,
-					interfaceValue,
-					link)));
+		out.writeFormat (
+			"<td>%s</td>\n",
+			interfaceToHtmlSimple (
+				container,
+				interfaceValue,
+				link));
 
 	}
 
 	@Override
 	public
 	void renderTableCellProperties (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			FileUpload interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<td>%s</td>\n",
-				interfaceToHtmlComplex (
-					container,
-					interfaceValue)));
+		out.writeFormat (
+			"<td>%s</td>\n",
+			interfaceToHtmlComplex (
+				container,
+				interfaceValue));
 
 	}
 
 	@Override
 	public
 	void renderTableRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			FileUpload interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<tr>\n",
-				"<th>%h</th>\n",
-				label ()));
+		out.writeFormat (
+			"<tr>\n",
+			"<th>%h</th>\n",
+			label ());
 
 		renderTableCellProperties (
 			out,
 			container,
 			interfaceValue);
 
-		out.write (
-			stringFormat (
-				"</tr>\n"));
+		out.writeFormat (
+			"</tr>\n");
 
 	}
 
 	@Override
 	public
 	void renderFormRow (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			FileUpload interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<tr>\n",
-				"<th>%h</th>\n",
-				label (),
-				"<td>"));
+		out.writeFormat (
+			"<tr>\n",
+			"<th>%h</th>\n",
+			label (),
+			"<td>");
 
 		renderFormInput (
 			out,
 			container,
 			interfaceValue);
 
-		out.write (
-			stringFormat (
-				"</td>\n",
-				"</tr>\n"));
+		out.writeFormat (
+			"</td>\n",
+			"</tr>\n");
 
 	}
 
 	@Override
 	public
 	void renderFormInput (
-			PrintWriter out,
+			FormatWriter out,
 			Container container,
 			FileUpload interfaceValue) {
 
-		out.write (
-			stringFormat (
-				"<input",
-				" type=\"file\"",
-				" size=\"%h\"",
-				size (),
-				" name=\"%h\"",
-				name (),
-				" value=\"%h\"",
-				formValuePresent ()
-					? formValue ()
-					: interfaceValue,
-				">\n"));
+		out.writeFormat (
+			"<input",
+			" type=\"file\"",
+			" size=\"%h\"",
+			size (),
+			" name=\"%h\"",
+			name (),
+			" value=\"%h\"",
+			formValuePresent ()
+				? formValue ()
+				: interfaceValue,
+			">\n");
 
 	}
 

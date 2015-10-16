@@ -11,8 +11,8 @@ import javax.inject.Inject;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.utils.etc.StringFormatter;
-
+import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.etc.FormatWriterWriter;
 import com.google.common.collect.ImmutableSet;
 
 public
@@ -27,7 +27,10 @@ class AbstractPagePart
 	Map<String,Object> parameters;
 
 	protected
-	PrintWriter out;
+	PrintWriter printWriter;
+
+	protected
+	FormatWriter formatWriter;
 
 	private
 	boolean withMarkup = false;
@@ -80,8 +83,12 @@ class AbstractPagePart
 		this.parameters =
 			parameters;
 
-		out =
+		printWriter =
 			requestContext.writer ();
+
+		formatWriter =
+			new FormatWriterWriter (
+				printWriter);
 
 	}
 
@@ -102,11 +109,10 @@ class AbstractPagePart
 
 	public
 	void printFormat (
-			Object... args) {
+			Object... arguments) {
 
-		out.print (
-			StringFormatter.standard (
-				args));
+		formatWriter.writeFormatArray (
+			arguments);
 
 	}
 
