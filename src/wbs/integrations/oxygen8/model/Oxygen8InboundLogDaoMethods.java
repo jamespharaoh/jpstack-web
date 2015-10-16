@@ -2,8 +2,6 @@ package wbs.integrations.oxygen8.model;
 
 import java.util.List;
 
-import wbs.integrations.oxygen8.model.Oxygen8InboundLogRec.Oxygen8InboundLogSearch;
-
 public
 interface Oxygen8InboundLogDaoMethods {
 

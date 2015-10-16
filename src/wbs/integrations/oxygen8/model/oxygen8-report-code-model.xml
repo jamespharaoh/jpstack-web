@@ -1,4 +1,34 @@
 <model-meta
-	name="oxygen8ReportCode">
+	name="oxygen8ReportCode"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="oxygen8Config"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<enum-field
+			type="messageStatus"/>
+
+		<string-field
+			name="additionalInformation"/>
+
+	</fields>
 
 </model-meta>

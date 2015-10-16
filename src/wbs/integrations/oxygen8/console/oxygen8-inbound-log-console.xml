@@ -40,7 +40,7 @@
 
 	<field-set
 		name="search"
-		class="wbs.integrations.oxygen8.model.Oxygen8InboundLogRec$Oxygen8InboundLogSearch">
+		class="wbs.integrations.oxygen8.model.Oxygen8InboundLogSearch">
 
 		<object-field
 			name="routeId"

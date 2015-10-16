@@ -5,7 +5,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import wbs.framework.object.AbstractObjectHooks;
-import wbs.integrations.oxygen8.model.Oxygen8InboundLogRec.Oxygen8InboundLogSearch;
 
 public
 class Oxygen8InboundLogHooks

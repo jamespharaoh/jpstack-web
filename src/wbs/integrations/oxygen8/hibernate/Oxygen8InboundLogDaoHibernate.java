@@ -10,7 +10,7 @@ import org.hibernate.criterion.Restrictions;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogDao;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogRec;
-import wbs.integrations.oxygen8.model.Oxygen8InboundLogRec.Oxygen8InboundLogSearch;
+import wbs.integrations.oxygen8.model.Oxygen8InboundLogSearch;
 
 public
 class Oxygen8InboundLogDaoHibernate
