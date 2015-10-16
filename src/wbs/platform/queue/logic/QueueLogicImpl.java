@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -139,10 +140,20 @@ class QueueLogicImpl
 			queue =
 				queueHelper.insert (
 					new QueueRec ()
-						.setCode (code)
-						.setQueueType (queueType)
-						.setParentObjectType (parentType)
-						.setParentObjectId (parent.getId ()));
+
+				.setCode (
+					code)
+
+				.setType (
+					queueType)
+
+				.setParentType (
+					parentType)
+
+				.setParentId (
+					parent.getId ())
+
+			);
 
 		}
 
@@ -165,7 +176,7 @@ class QueueLogicImpl
 			queueSubject.getQueue ();
 
 		QueueTypeRec queueType =
-			queue.getQueueType ();
+			queue.getType ();
 
 		// sanity check
 
@@ -263,7 +274,7 @@ class QueueLogicImpl
 			@NonNull Record<?> object) {
 
 		QueueTypeRec queueType =
-			queue.getQueueType ();
+			queue.getType ();
 
 		// sanity check
 
@@ -489,6 +500,17 @@ class QueueLogicImpl
 				.setPendingTime (now);
 
 		}
+
+	}
+
+	@Override
+	public
+	List<QueueItemRec> getActiveQueueItems (
+			@NonNull QueueSubjectRec queueSubject) {
+
+		return queueSubject.getQueueItems ().subList (
+			queueSubject.getTotalItems () - queueSubject.getActiveItems (),
+			queueSubject.getTotalItems ());
 
 	}
 

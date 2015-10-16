@@ -96,16 +96,16 @@ class QueueHooks
 			queueHelper.insert (
 				new QueueRec ()
 
-				.setQueueType (
+				.setType (
 					queueType)
 
 				.setCode (
 					queueType.getCode ())
 
-				.setParentObjectType (
+				.setParentType (
 					parentType)
 
-				.setParentObjectId (
+				.setParentId (
 					parent.getId ())
 
 			);

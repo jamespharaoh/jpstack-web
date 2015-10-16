@@ -28,6 +28,7 @@ import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 import wbs.framework.utils.StringSubstituter;
 import wbs.platform.daemon.SleepingDaemonService;
+import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemState;
 import wbs.platform.queue.model.QueueSubjectObjectHelper;
@@ -73,6 +74,9 @@ class AlertsDaemon
 
 	@Inject
 	ObjectManager objectManager;
+
+	@Inject
+	QueueLogic queueLogic;
 
 	@Inject
 	QueueSubjectObjectHelper queueSubjectHelper;
@@ -279,7 +283,8 @@ class AlertsDaemon
 
 			for (
 				QueueItemRec queueItem
-					: queueSubject.getActiveQueueItems ()
+					: queueLogic.getActiveQueueItems (
+						queueSubject)
 			) {
 
 				if (

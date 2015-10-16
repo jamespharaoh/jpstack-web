@@ -1,4 +1,35 @@
 <model-meta
-	name="queueType">
+	name="queueType"
+	type="type">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			name="parentObjectType"
+			type="objectType"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<description-field/>
+
+		<!-- data -->
+
+		<reference-field
+			name="subjectObjectType"
+			type="objectType"/>
+
+		<reference-field
+			name="refObjectType"
+			type="objectType"/>
+
+	</fields>
 
 </model-meta>

@@ -1,5 +1,7 @@
 package wbs.platform.queue.logic;
 
+import java.util.List;
+
 import wbs.framework.record.Record;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
@@ -41,5 +43,8 @@ interface QueueLogic {
 	QueueSubjectRec findOrCreateQueueSubject (
 			QueueRec queue,
 			Record<?> object);
+
+	List<QueueItemRec> getActiveQueueItems (
+			QueueSubjectRec queueSubject);
 
 }
