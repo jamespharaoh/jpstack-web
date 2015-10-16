@@ -6,11 +6,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import wbs.framework.entity.annotations.meta.EntityMeta;
+import wbs.framework.entity.annotations.meta.EntityMetaTable;
 
 @Retention (RetentionPolicy.RUNTIME)
 @Target (ElementType.TYPE)
 @EntityMeta
 public
 @interface TypeEntity {
+
+	@EntityMetaTable
+	String table ()
+	default "";
 
 }

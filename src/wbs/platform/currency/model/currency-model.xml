@@ -1,4 +1,36 @@
 <model-meta
-	name="currency">
+	name="currency"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<integer-field
+			name="divisions"/>
+
+		<string-field
+			name="prefix"/>
+
+		<string-field
+			name="suffix"/>
+
+	</fields>
 
 </model-meta>

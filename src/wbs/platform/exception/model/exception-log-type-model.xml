@@ -1,4 +1,22 @@
 <model-meta
-	name="exceptionLogType">
+	name="exceptionLogType"
+	type="type"
+	table="exception_type">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<code-field/>
+
+		<!-- details -->
+
+		<description-field/>
+
+	</fields>
 
 </model-meta>

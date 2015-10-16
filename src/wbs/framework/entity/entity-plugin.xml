@@ -6,6 +6,7 @@
 		<bean class="meta.AssignedIdFieldSpec"/>
 		<bean class="meta.AssociativeCollectionSpec"/>
 		<bean class="meta.AssociativeListSpec"/>
+		<bean class="meta.BinaryFieldSpec"/>
 		<bean class="meta.ChildrenCollectionSpec"/>
 		<bean class="meta.ChildrenListSpec"/>
 		<bean class="meta.ChildrenMappingSpec"/>
@@ -44,6 +45,7 @@
 		<bean class="generate.AssignedIdFieldWriter"/>
 		<bean class="generate.AssociativeCollectionWriter"/>
 		<bean class="generate.AssociativeListWriter"/>
+		<bean class="generate.BinaryFieldWriter"/>
 		<bean class="generate.CodeFieldWriter"/>
 		<bean class="generate.ChildrenCollectionWriter"/>
 		<bean class="generate.ChildrenListWriter"/>

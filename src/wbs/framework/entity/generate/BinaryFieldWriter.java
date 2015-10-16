@@ -1,5 +1,7 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
+
 import java.io.IOException;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -9,14 +11,14 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
-import wbs.framework.entity.meta.GeneratedIdFieldSpec;
+import wbs.framework.entity.meta.BinaryFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.utils.etc.FormatWriter;
 
-@PrototypeComponent ("generatedIdFieldWriter")
+@PrototypeComponent ("binaryFieldWriter")
 @ModelWriter
 public
-class GeneratedIdFieldWriter {
+class BinaryFieldWriter {
 
 	// builder
 
@@ -24,7 +26,7 @@ class GeneratedIdFieldWriter {
 	ModelMetaSpec parent;
 
 	@BuilderSource
-	GeneratedIdFieldSpec spec;
+	BinaryFieldSpec spec;
 
 	@BuilderTarget
 	FormatWriter javaWriter;
@@ -43,14 +45,22 @@ class GeneratedIdFieldWriter {
 			new AnnotationWriter ()
 
 			.name (
-				"GeneratedIdField");
+				"SimpleField");
 
-		if (spec.sequenceName () != null) {
+		if (ifNull (spec.nullable (), false)) {
 
 			annotationWriter.addAttributeFormat (
-				"sequence",
+				"nullable",
+				"true");
+
+		}
+
+		if (spec.columnName () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"column",
 				"\"%s\"",
-				spec.sequenceName ().replace ("\"", "\\\""));
+				spec.columnName ().replace ("\"", "\\\""));
 
 		}
 
@@ -61,7 +71,8 @@ class GeneratedIdFieldWriter {
 		// write field
 
 		javaWriter.writeFormat (
-			"\tInteger id;\n");
+			"\tbyte[] %s;\n",
+			spec.name ());
 
 		javaWriter.writeFormat (
 			"\n");
@@ -69,3 +80,4 @@ class GeneratedIdFieldWriter {
 	}
 
 }
+

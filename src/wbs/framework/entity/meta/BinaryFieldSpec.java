@@ -8,15 +8,22 @@ import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("generated-id-field")
-@PrototypeComponent ("generatedIdFieldSpec")
+@DataClass ("binary-field")
 @ModelMetaData
+@PrototypeComponent ("binaryFieldSpec")
 public
-class GeneratedIdFieldSpec
+class BinaryFieldSpec
 	implements ModelFieldSpec {
 
 	@DataAttribute (
-		value = "sequence")
-	String sequenceName;
+		required = true)
+	String name;
+
+	@DataAttribute
+	Boolean nullable;
+
+	@DataAttribute (
+		value = "column")
+	String columnName;
 
 }
