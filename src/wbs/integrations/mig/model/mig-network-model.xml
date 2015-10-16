@@ -1,4 +1,28 @@
 <model-meta
-	name="migNetwork">
+	name="migNetwork"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<foreign-id-field
+			field="network"/>
+
+		<!-- identity -->
+
+		<master-field
+			type="network"/>
+
+		<!-- settings -->
+
+		<string-field
+			name="suffix"/>
+
+		<!-- TODO does not belong here -->
+		<yes-no-field
+			name="virtual"/>
+
+	</fields>
 
 </model-meta>

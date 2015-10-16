@@ -1,5 +1,34 @@
 <model-meta
-	name="dialogueMmsRoute">
+	name="dialogueMmsRoute"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<foreign-id-field
+			field="route"/>
+
+		<!-- identity -->
+
+		<master-field
+			type="route"/>
+
+		<!-- settings -->
+
+		<string-field
+			name="url"/>
+
+		<string-field
+			name="account"/>
+
+		<string-field
+			name="username"/>
+
+		<string-field
+			name="password"/>
+
+	</fields>
 
 	<senders>
 

@@ -1,4 +1,27 @@
 <model-meta
-	name="hybyteNetwork">
+	name="hybyteNetwork"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<foreign-id-field
+			field="network"/>
+
+		<!-- identity -->
+
+		<master-field
+			type="network"/>
+
+		<!-- settings -->
+
+		<string-field
+			name="text"/>
+
+		<string-field
+			name="inText"/>
+
+	</fields>
 
 </model-meta>

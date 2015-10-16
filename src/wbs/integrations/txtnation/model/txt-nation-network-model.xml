@@ -1,4 +1,26 @@
 <model-meta
-	name="txtNationNetwork">
+	name="txtNationNetwork"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<code-field/>
+
+		<!-- details -->
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<reference-field
+			type="network"/>
+
+	</fields>
 
 </model-meta>
