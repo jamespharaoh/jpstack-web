@@ -52,6 +52,11 @@ class ModelMetaSpec {
 	// children
 
 	@DataChildren (
+		childrenElement = "implements-interfaces")
+	List<ModelImplementsInterfaceSpec> implementsInterfaces =
+		new ArrayList<ModelImplementsInterfaceSpec> ();
+
+	@DataChildren (
 		childrenElement = "fields")
 	List<ModelFieldSpec> fields =
 		new ArrayList<ModelFieldSpec> ();

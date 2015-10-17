@@ -32,6 +32,7 @@ import wbs.framework.entity.meta.IdentityStringFieldSpec;
 import wbs.framework.entity.meta.IndexFieldSpec;
 import wbs.framework.entity.meta.MasterFieldSpec;
 import wbs.framework.entity.meta.ModelFieldSpec;
+import wbs.framework.entity.meta.ModelImplementsInterfaceSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.ModelMetaType;
 import wbs.framework.entity.meta.ParentFieldSpec;
@@ -361,6 +362,18 @@ class ModelRecordGenerator {
 
 			javaWriter.writeFormat (
 				", ObjectTypeEntry");
+
+		}
+
+		for (
+			ModelImplementsInterfaceSpec implementsInterface
+				: modelMeta.implementsInterfaces ()
+		) {
+
+			javaWriter.writeFormat (
+				", %s.%s",
+				implementsInterface.packageName (),
+				implementsInterface.name ());
 
 		}
 

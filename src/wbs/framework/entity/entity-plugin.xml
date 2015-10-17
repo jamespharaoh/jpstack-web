@@ -16,6 +16,7 @@
 		<bean class="meta.DeletedFieldSpec"/>
 		<bean class="meta.DescriptionFieldSpec"/>
 		<bean class="meta.EnumFieldSpec"/>
+		<bean class="meta.FloatingPointFieldSpec"/>
 		<bean class="meta.ForeignIdFieldSpec"/>
 		<bean class="meta.GeneratedIdFieldSpec"/>
 		<bean class="meta.IdentityDateFieldSpec"/>
@@ -27,6 +28,8 @@
 		<bean class="meta.MasterFieldSpec"/>
 		<bean class="meta.ModelCollectionsSpec"/>
 		<bean class="meta.ModelFieldsSpec"/>
+		<bean class="meta.ModelImplementsInterfaceSpec"/>
+		<bean class="meta.ModelImplementsInterfacesSpec"/>
 		<bean class="meta.ModelMetaLoader"/>
 		<bean class="meta.ModelMetaSpec"/>
 		<bean class="meta.NameFieldSpec"/>
@@ -56,6 +59,7 @@
 		<bean class="generate.DeletedFieldWriter"/>
 		<bean class="generate.DescriptionFieldWriter"/>
 		<bean class="generate.EnumFieldWriter"/>
+		<bean class="generate.FloatingPointFieldWriter"/>
 		<bean class="generate.ForeignIdFieldWriter"/>
 		<bean class="generate.GeneratedIdFieldWriter"/>
 		<bean class="generate.IdentityDateFieldWriter"/>

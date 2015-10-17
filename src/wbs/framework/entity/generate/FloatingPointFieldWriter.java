@@ -1,4 +1,4 @@
-package wbs.sms.locator.generate;
+package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 
@@ -10,16 +10,15 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.AnnotationWriter;
+import wbs.framework.entity.meta.FloatingPointFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.utils.etc.FormatWriter;
-import wbs.sms.locator.metamodel.LongitudeLatitudeFieldSpec;
 
-@PrototypeComponent ("longitudeLatitudeFieldWriter")
+@PrototypeComponent ("floatingPointFieldWriter")
 @ModelWriter
 public
-class LongitudeLatitudeFieldWriter {
+class FloatingPointFieldWriter {
 
 	// builder
 
@@ -27,7 +26,7 @@ class LongitudeLatitudeFieldWriter {
 	ModelMetaSpec parent;
 
 	@BuilderSource
-	LongitudeLatitudeFieldSpec spec;
+	FloatingPointFieldSpec spec;
 
 	@BuilderTarget
 	FormatWriter javaWriter;
@@ -56,35 +55,35 @@ class LongitudeLatitudeFieldWriter {
 
 		}
 
-		String columnNamesPattern =
-			ifNull (
-				spec.columnNames (),
-				"%");
+		if (spec.columnName () != null) {
 
-		String longitudeColumnName =
-			columnNamesPattern.replace ("%", "longitude");
+			annotationWriter.addAttributeFormat (
+				"column",
+				"\"%s\"",
+				spec.columnName ().replace ("\"", "\\\""));
 
-		String latitudeColumnName =
-			columnNamesPattern.replace ("%", "latitude");
-
-		annotationWriter.addAttributeFormat (
-			"columns",
-			"{ \"%s\", \"%s\" }",
-			longitudeColumnName.replace ("\"", "\\\""),
-			latitudeColumnName.replace ("\"", "\\\""));
+		}
 
 		annotationWriter.write (
 			javaWriter,
 			"\t");
 
-		// write member
+		// write field
 
-		javaWriter.writeFormat (
-			"\t%s.LongLat %s;\n",
-			"wbs.sms.locator.model",
-			spec.name ());
+		if (spec.defaultValue () != null) {
 
-		// write blank line
+			javaWriter.writeFormat (
+				"\tDouble %s = %s;\n",
+				spec.name (),
+				spec.defaultValue ());
+
+		} else {
+
+			javaWriter.writeFormat (
+				"\tDouble %s;\n",
+				spec.name ());
+
+		}
 
 		javaWriter.writeFormat (
 			"\n");

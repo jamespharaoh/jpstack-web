@@ -103,12 +103,12 @@
 			type="queueItem"
 			nullable="yes"/>
 
-		<longitude-lattitude-field
+		<longitude-latitude-field
 			name="locationLongLat"
 			columns="location_%"
 			nullable="yes"/>
 
-		<longitude-lattitude-field
+		<longitude-latitude-field
 			name="locationBackupLongLat"
 			columns="location_backup_%"
 			nullable="yes"/>
@@ -122,7 +122,7 @@
 			name="locationPlace"
 			nullable="yes"/>
 
-		<longitude-lattitude-field
+		<longitude-latitude-field
 			name="locationPlaceLongLat"
 			columns="location_place_%"
 			nullable="yes"/>
