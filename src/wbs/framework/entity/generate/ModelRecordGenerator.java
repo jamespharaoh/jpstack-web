@@ -354,17 +354,6 @@ class ModelRecordGenerator {
 
 		}
 
-		if (
-			equal (
-				modelMeta.special (),
-				"objectType")
-		) {
-
-			javaWriter.writeFormat (
-				", ObjectTypeEntry");
-
-		}
-
 		for (
 			ModelImplementsInterfaceSpec implementsInterface
 				: modelMeta.implementsInterfaces ()

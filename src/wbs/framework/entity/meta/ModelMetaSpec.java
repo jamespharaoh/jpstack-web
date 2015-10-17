@@ -33,11 +33,9 @@ class ModelMetaSpec {
 		required = true)
 	String name;
 
-	@DataAttribute
+	@DataAttribute (
+		required = true)
 	ModelMetaType type;
-
-	@DataAttribute
-	String special;
 
 	@DataAttribute (
 		value = "table")
