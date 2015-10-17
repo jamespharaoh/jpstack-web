@@ -579,7 +579,7 @@ class ChatMainCommand
 
 		commandChatScheme =
 			chatSchemeHelper.find (
-				command.getParentObjectId ());
+				command.getParentId ());
 
 		chat =
 			commandChatScheme.getChat ();

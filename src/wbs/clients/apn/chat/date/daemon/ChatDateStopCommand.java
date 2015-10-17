@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.date.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.notEqual;
 
 import javax.inject.Inject;
 
@@ -107,21 +107,24 @@ class ChatDateStopCommand
 			command.getCommandType ();
 
 		if (
-			! equal (
+			notEqual (
 				commandType.getCode (),
 				"date_stop")
 		) {
 			throw new RuntimeException ();
 		}
 
-		if (! equal (
-				commandType.getParentObjectType ().getCode (),
-				"chat_scheme"))
+		if (
+			notEqual (
+				commandType.getParentType ().getCode (),
+				"chat_scheme")
+		) {
 			throw new RuntimeException ();
+		}
 
 		ChatSchemeRec chatScheme =
 			chatSchemeHelper.find (
-				command.getParentObjectId ());
+				command.getParentId ());
 
 		ChatRec chat =
 			chatScheme.getChat ();

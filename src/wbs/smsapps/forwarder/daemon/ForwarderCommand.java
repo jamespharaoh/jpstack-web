@@ -98,7 +98,7 @@ class ForwarderCommand
 
 		ForwarderRec forwarder =
 			forwarderHelper.find (
-				command.getParentObjectId ());
+				command.getParentId ());
 
 		MessageRec message =
 			inbox.getMessage ();

@@ -96,7 +96,7 @@ class ChatBlockAllCommand
 
 		ChatRec chat =
 			chatHelper.find (
-				command.getParentObjectId ());
+				command.getParentId ());
 
 		ServiceRec defaultService =
 			serviceHelper.findByCode (

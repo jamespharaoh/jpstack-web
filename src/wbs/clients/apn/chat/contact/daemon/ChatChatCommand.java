@@ -368,7 +368,7 @@ class ChatChatCommand
 
 		chat =
 			chatHelper.find (
-				command.getParentObjectId ());
+				command.getParentId ());
 
 		message =
 			inbox.getMessage ();

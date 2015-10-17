@@ -103,7 +103,7 @@ class AutoResponderCommand
 
 		AutoResponderRec autoResponder =
 			autoResponderHelper.find (
-				command.getParentObjectId ());
+				command.getParentId ());
 
 		ServiceRec defaultService =
 			serviceHelper.findByCode (
