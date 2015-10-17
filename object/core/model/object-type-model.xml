@@ -1,7 +1,14 @@
 <model-meta
 	name="objectType"
-	type="type"
-	special="objectType">
+	type="type">
+
+	<implements-interfaces>
+
+		<implements-interface
+			package="wbs.framework.object"
+			name="ObjectTypeEntry"/>
+
+	</implements-interfaces>
 
 	<fields>
 
