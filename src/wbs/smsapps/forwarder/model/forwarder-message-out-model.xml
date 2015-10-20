@@ -17,6 +17,7 @@
 
 		<reference-field
 			type="forwarderMessageIn"
+			column="in_id"
 			nullable="yes"/>
 
 		<reference-field

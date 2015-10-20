@@ -211,23 +211,47 @@ class ModelBuilder {
 
 		ModelField modelField =
 			new ModelField ()
-				.model (model)
-				.parentField (parentModelField)
-				.name (field.getName ())
-				.label (camelToSpaces (field.getName ()))
-				.type (fieldMetaAnnotation.modelFieldType ())
-				.parent (fieldMetaAnnotation.treeParent ())
-				.identity (fieldMetaAnnotation.treeIdentity ())
-				.valueType (field.getType ())
-				.field (field)
-				.annotation (fieldAnnotation);
+
+			.model (
+				model)
+
+			.parentField (
+				parentModelField)
+
+			.name (
+				field.getName ())
+
+			.label (
+				camelToSpaces (
+					field.getName ()))
+
+			.type (
+				fieldMetaAnnotation.modelFieldType ())
+
+			.parent (
+				fieldMetaAnnotation.treeParent ())
+
+			.identity (
+				fieldMetaAnnotation.treeIdentity ())
+
+			.valueType (
+				field.getType ())
+
+			.field (
+				field)
+
+			.annotation (
+				fieldAnnotation);
 
 		// collection types
 
-		if (field.getGenericType () instanceof ParameterizedType)
+		if (field.getGenericType () instanceof ParameterizedType) {
+
 			modelField.parameterizedType (
 				(ParameterizedType)
 				field.getGenericType ());
+
+		}
 
 		if (modelField.valueType () == Set.class) {
 
@@ -442,8 +466,10 @@ class ModelBuilder {
 			Class<?> componentClass =
 				modelField.valueType ();
 
-			for (Field componentField
-					: componentClass.getDeclaredFields ()) {
+			for (
+				Field componentField
+					: componentClass.getDeclaredFields ()
+			) {
 
 				Annotation componentFieldAnnotation =
 					findAnnotation (
@@ -485,11 +511,13 @@ class ModelBuilder {
 			modelField.name (),
 			modelField);
 
-		if (in (modelField.type (),
+		if (
+			in (modelField.type (),
 				ModelFieldType.assignedId,
 				ModelFieldType.generatedId,
 				ModelFieldType.foreignId,
-				ModelFieldType.compositeId)) {
+				ModelFieldType.compositeId)
+		) {
 
 			if (model.idField () != null)
 				throw new RuntimeException ();
@@ -498,9 +526,11 @@ class ModelBuilder {
 
 		}
 
-		if (in (modelField.type (),
+		if (
+			in (modelField.type (),
 				ModelFieldType.parent,
-				ModelFieldType.master)) {
+				ModelFieldType.master)
+		) {
 
 			if (model.parentField () != null)
 				throw new RuntimeException ();
@@ -645,8 +675,10 @@ class ModelBuilder {
 			Class<? extends Annotation> metaAnnotation,
 			String defaultValue) {
 
-		for (Method method
-				: annotation.annotationType ().getMethods ()) {
+		for (
+			Method method
+				: annotation.annotationType ().getMethods ()
+		) {
 
 			if (method.getReturnType () != String.class)
 				continue;

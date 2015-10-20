@@ -1,11 +1,14 @@
 package wbs.platform.exception.logic;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 
 import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogicImplementation;
 import wbs.framework.record.GlobalId;
 import wbs.platform.exception.model.ExceptionLogObjectHelper;
@@ -23,6 +26,9 @@ class ExceptionLogLogicImplementation
 	implements ExceptionLogLogic {
 
 	// dependencies
+
+	@Inject
+	Database database;
 
 	@Inject
 	ExceptionLogObjectHelper exceptionLogHelper;
@@ -44,6 +50,9 @@ class ExceptionLogLogicImplementation
 			@NonNull String dump,
 			@NonNull Optional<Integer> userId,
 			@NonNull Boolean fatal) {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		// lookup type
 
@@ -73,6 +82,10 @@ class ExceptionLogLogicImplementation
 		ExceptionLogRec exceptionLog =
 			exceptionLogHelper.insert (
 				new ExceptionLogRec ()
+
+			.setTimestamp (
+				instantToDate (
+					transaction.now ()))
 
 			.setType (
 				exceptionLogType)

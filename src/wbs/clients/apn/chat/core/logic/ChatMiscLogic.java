@@ -40,7 +40,9 @@ interface ChatMiscLogic {
 	ChatUserRec getOnlineMonitorForOutbound (
 			ChatUserRec thisUser);
 
-	void blockAll (ChatUserRec chatUser, MessageRec message);
+	void blockAll (
+			ChatUserRec chatUser,
+			MessageRec message);
 
 	void userJoin (
 			ChatUserRec chatUser,

@@ -19,8 +19,11 @@ class TypeFieldSpec
 	String name;
 
 	@DataAttribute (
-		value = "type",
-		required = false)
+		value = "type")
 	String typeName;
+
+	@DataAttribute (
+		value = "column")
+	String columnName;
 
 }

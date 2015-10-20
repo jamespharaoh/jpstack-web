@@ -126,7 +126,11 @@ class DevopsScript
 
 			ssh \
 				"-t",
-				"rm -rf #{@deployment_path}/work/bin"
+				[
+					"rm -rf",
+					"#{@deployment_path}/work/bin",
+					"#{@deployment_path}/work/generated",
+				].join(" ")
 
 		when "console-clean"
 

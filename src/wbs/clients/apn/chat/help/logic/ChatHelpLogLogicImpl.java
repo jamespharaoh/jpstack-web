@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.help.logic;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import javax.inject.Inject;
 
 import lombok.NonNull;
@@ -8,6 +10,8 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -20,6 +24,9 @@ import wbs.sms.message.core.model.MessageRec;
 public
 class ChatHelpLogLogicImpl
 	implements ChatHelpLogLogic {
+
+	@Inject
+	Database database;
 
 	@Inject
 	ObjectManager objectManager;
@@ -83,11 +90,18 @@ class ChatHelpLogLogicImpl
 			@NonNull String text,
 			CommandRec command) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		return objectManager.insert (
 			new ChatHelpLogRec ()
 
 			.setChatUser (
 				chatUser)
+
+			.setTimestamp (
+				instantToDate (
+					transaction.now ()))
 
 			.setReplyTo (
 				replyTo)

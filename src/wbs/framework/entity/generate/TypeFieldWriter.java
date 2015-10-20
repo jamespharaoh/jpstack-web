@@ -17,6 +17,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.TypeFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
@@ -69,8 +70,28 @@ class TypeFieldWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
-		javaWriter.writeFormat (
-			"\t@TypeField\n");
+		// write field annotation
+
+		AnnotationWriter annotationWriter =
+			new AnnotationWriter ()
+
+			.name (
+				"TypeField");
+
+		if (spec.columnName () != null) {
+
+			annotationWriter.addAttributeFormat (
+				"column",
+				"\"%s\"",
+				spec.columnName ().replace ("\"", "\\\""));
+
+		}
+
+		annotationWriter.write (
+			javaWriter,
+			"\t");
+
+		// write field
 
 		javaWriter.writeFormat (
 			"\t%s.model.%sRec %s;\n",
