@@ -39,6 +39,9 @@
 			<object-summary-page
 				fields="summary"/>
 
+			<object-settings-page
+				fields="settings"/>
+
 		</object>
 
 	</object-context>
@@ -106,6 +109,12 @@
 		<timestamp-field
 			name="timestamp"/>
 
+		<yes-no-field
+			name="alert"/>
+
+		<yes-no-field
+			name="fatal"/>
+
 		<text-field
 			name="source"/>
 
@@ -114,6 +123,15 @@
 
 		<text-area-field
 			name="dump"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="exceptionLog">
+
+		<yes-no-field
+			name="alert"/>
 
 	</field-set>
 
