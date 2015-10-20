@@ -3,8 +3,6 @@ package wbs.clients.apn.chat.contact.console;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 
-import java.util.Date;
-
 import javax.inject.Inject;
 
 import lombok.Cleanup;
@@ -248,7 +246,10 @@ class ChatMessagePendingFormAction
 				chatMessage.getToUser ());
 
 		chatContact
-			.setLastDeliveredMessageTime (new Date ());
+
+			.setLastDeliveredMessageTime (
+				instantToDate (
+					transaction.now ()));
 
 		// and send it
 

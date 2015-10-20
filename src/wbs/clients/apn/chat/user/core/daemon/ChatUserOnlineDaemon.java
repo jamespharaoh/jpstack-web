@@ -1,8 +1,14 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.lessThan;
+import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -115,9 +121,6 @@ class ChatUserOnlineDaemon
 	void doUser (
 			int chatUserId) {
 
-		Date timestamp =
-			new Date ();
-
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
@@ -138,17 +141,19 @@ class ChatUserOnlineDaemon
 
 		if (
 
-			chatUser.getDeliveryMethod ()
-				== ChatMessageMethod.sms
+			equal (
+				chatUser.getDeliveryMethod (),
+				ChatMessageMethod.sms)
 
 			&& (
 
-				chatUser.getLastAction () == null
+				isNull (
+					chatUser.getLastAction ())
 
-				|| (
+				|| lessThan (
 					chatUser.getLastAction ().getTime ()
-					+ chat.getTimeLogoff () * 1000
-				) < timestamp.getTime ()
+						+ chat.getTimeLogoff () * 1000,
+					transaction.now ().getMillis ())
 
 			)
 
@@ -253,36 +258,62 @@ class ChatUserOnlineDaemon
 		if (
 
 			(
-				chatUser.getLastSend () == null
-				|| chatUser.getLastSend ().getTime ()
-						+ chat.getTimeSend () * 1000
-					< timestamp.getTime ()
+
+				isNull (
+					chatUser.getLastSend ())
+
+				|| lessThan (
+					chatUser.getLastSend ().getTime ()
+						+ chat.getTimeSend () * 1000,
+					transaction.now ().getMillis ())
+
 			)
 
 			&& (
-				chatUser.getLastReceive () == null
-				|| chatUser.getLastReceive ().getTime ()
-						+ chat.getTimeReceive () * 1000
-					< timestamp.getTime ()
+
+				isNull (
+					chatUser.getLastReceive ())
+
+				|| lessThan (
+					chatUser.getLastReceive ().getTime ()
+						+ chat.getTimeReceive () * 1000,
+					transaction.now ().getMillis ())
+
 			)
 
 			&& (
-				chatUser.getLastInfo () == null
-				|| chatUser.getLastInfo ().getTime ()
-						+ chat.getTimeInfo () * 1000
-					< timestamp.getTime ()
+
+				isNull (
+					chatUser.getLastInfo ())
+
+				|| lessThan (
+					chatUser.getLastInfo ().getTime ()
+						+ chat.getTimeInfo () * 1000,
+					transaction.now ().getMillis ())
+
 			)
 
 			&& (
-				chatUser.getLastPic () == null
-				|| chatUser.getLastPic ().getTime ()
-						+ chat.getTimeInfo () * 1000
-					< timestamp.getTime ()
+
+				isNull (
+					chatUser.getLastPic ())
+
+				|| lessThan (
+					chatUser.getLastPic ().getTime ()
+						+ chat.getTimeInfo () * 1000,
+					transaction.now ().getMillis ())
+
 			)
 
 			&& (
-				chatUser.getSessionInfoRemain () == null
-				|| chatUser.getSessionInfoRemain () > 1
+
+				isNull (
+					chatUser.getSessionInfoRemain ())
+
+				|| moreThan (
+					chatUser.getSessionInfoRemain (),
+					1)
+
 			)
 
 		) {
@@ -314,18 +345,26 @@ class ChatUserOnlineDaemon
 
 		if (
 
-			chatUser.getName () == null
+			isNull (
+				chatUser.getName ())
 
-			&& (chatUser.getLastNameHint () == null
-				|| chatUser.getLastNameHint ().getTime ()
-						+ chat.getTimeName () * 1000
-					< timestamp.getTime ())
+			&& (
 
-			&& chatUser.getLastJoin () != null
+				isNull (
+					chatUser.getLastNameHint ())
 
-			&& chatUser.getLastJoin ().getTime ()
-					+ chat.getTimeNameJoin () * 1000
-				< timestamp.getTime ()
+				|| lessThan (
+					chatUser.getLastNameHint ().getTime ()
+						+ chat.getTimeName () * 1000,
+					transaction.now ().getMillis ()))
+
+			&& isNotNull (
+				chatUser.getLastJoin ())
+
+			&& lessThan (
+				chatUser.getLastJoin ().getTime ()
+					+ chat.getTimeNameJoin () * 1000,
+				transaction.now ().getMillis ())
 
 		) {
 
@@ -360,18 +399,26 @@ class ChatUserOnlineDaemon
 
 		if (
 
-			chatUser.getChatUserImageList ().isEmpty ()
+			isEmpty (
+				chatUser.getChatUserImageList ())
 
-			&& (chatUser.getLastPicHint () == null
-				|| chatUser.getLastPicHint ().getTime ()
-						+ chat.getTimePicHint () * 1000
-					< timestamp.getTime ())
+			&& (
 
-			&& chatUser.getLastJoin () != null
+				isNull (
+					chatUser.getLastPicHint ())
 
-			&& chatUser.getLastJoin ().getTime ()
-					+ 15 * 60 * 1000
-				< timestamp.getTime ()
+				|| lessThan (
+					chatUser.getLastPicHint ().getTime ()
+						+ chat.getTimePicHint () * 1000,
+					transaction.now ().getMillis ()))
+
+			&& isNotNull (
+				chatUser.getLastJoin ())
+
+			&& lessThan (
+				chatUser.getLastJoin ().getTime ()
+					+ 15 * 60 * 1000,
+				transaction.now ().getMillis ())
 
 		) {
 
@@ -389,23 +436,36 @@ class ChatUserOnlineDaemon
 
 		if (
 
-			! chatUser.getChatUserImageList ().isEmpty ()
+			isNotEmpty (
+				chatUser.getChatUserImageList ())
 
-			&& (chatUser.getLastPicHint () == null
-				|| chatUser.getLastPicHint ().getTime ()
-						+ chat.getTimePicHint () * 1000
-					< timestamp.getTime ())
+			&& (
 
-			&& (chatUser.getLastPic () == null
-				|| chatUser.getLastPic ().getTime ()
-						+ chat.getTimePicHint () * 1000
-					< timestamp.getTime ())
+				isNull (
+					chatUser.getLastPicHint ())
 
-			&& chatUser.getLastJoin () != null
+				|| lessThan (
+					chatUser.getLastPicHint ().getTime ()
+						+ chat.getTimePicHint () * 1000,
+					transaction.now ().getMillis ()))
 
-			&& chatUser.getLastJoin ().getTime ()
-					+ 15 * 60 * 1000
-				< timestamp.getTime ()
+			&& (
+
+				isNull (
+					chatUser.getLastPic ())
+
+				|| lessThan (
+					chatUser.getLastPic ().getTime ()
+						+ chat.getTimePicHint () * 1000,
+					transaction.now ().getMillis ()))
+
+			&& isNotNull (
+				chatUser.getLastJoin ())
+
+			&& lessThan (
+				chatUser.getLastJoin ().getTime ()
+					+ 15 * 60 * 1000,
+				transaction.now ().getMillis ())
 
 		) {
 

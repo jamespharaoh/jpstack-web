@@ -1,9 +1,9 @@
 package wbs.clients.apn.chat.ad.daemon;
 
+import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -126,7 +126,8 @@ class ChatAdDaemon
 				this);
 
 		List<ChatUserRec> chatUsers =
-			chatUserHelper.findWantingAd ();
+			chatUserHelper.findWantingAd (
+				transaction.now ());
 
 		transaction.close ();
 
@@ -179,11 +180,13 @@ class ChatAdDaemon
 
 		// check he really is due an ad
 
-		Date now =
-			new Date ();
-
-		if (chatUser.getNextAd ().getTime () > now.getTime ())
+		if (
+			moreThan (
+				chatUser.getNextAd ().getTime (),
+				transaction.now ().getMillis ())
+		) {
 			return;
+		}
 
 		// do a credit and number check
 

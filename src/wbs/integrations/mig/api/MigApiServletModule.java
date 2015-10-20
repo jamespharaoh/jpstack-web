@@ -1,9 +1,10 @@
 package wbs.integrations.mig.api;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -432,25 +433,47 @@ class MigApiServletModule
 							message.getNumber ().getId ());
 
 					// undelivered
+
 					if (newMessageStatus == MessageStatus.undelivered) {
+
 						// update chat user permanent failure
-						if (!reportCode.getSuccess()
-								&& reportCode.getPermanent()
-								&& ! (network.getId () == 6 && statusInt == 5
-										&& description != null && description
-										.contains("credit"))) {
+
+						if (
+							! reportCode.getSuccess ()
+							&& reportCode.getPermanent ()
+							&& ! (
+								network.getId () == 6
+								&& statusInt == 5
+								&& description != null
+								&& description.contains ("credit")
+							)
+						) {
+
 							numberReportRec
-									.setPermanentFailureReceived(new Date());
-							numberReportRec
-									.setPermanentFailureCount(numberReportRec
-											.getPermanentFailureCount() + 1);
+
+								.setPermanentFailureReceived (
+									instantToDate (
+										transaction.now ()))
+
+								.setPermanentFailureCount (
+									numberReportRec.getPermanentFailureCount () + 1);
+
 						}
-					}
+
 					// delivered
-					else if (newMessageStatus == MessageStatus.delivered) {
-						numberReportRec.setPermanentFailureReceived(null);
-						numberReportRec.setPermanentFailureCount(0);
+
+					} else if (newMessageStatus == MessageStatus.delivered) {
+
+						numberReportRec
+
+							.setPermanentFailureReceived (
+								null)
+
+							.setPermanentFailureCount (
+								0);
+
 					}
+
 				}
 
 				transaction.commit();

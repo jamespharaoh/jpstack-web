@@ -1,12 +1,21 @@
 package wbs.platform.misc;
 
-import java.util.Date;
+import static wbs.framework.utils.etc.Misc.lessThan;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
+
+import org.joda.time.Instant;
+
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 
 public abstract
 class CachedGetter<Type>
 	implements Provider<Type> {
+
+	@Inject
+	Database database;
 
 	long reloadTimeMs = 1000;
 
@@ -36,7 +45,8 @@ class CachedGetter<Type>
 	Type value;
 
 	private
-	long lastReload = 0;
+	Instant lastReload =
+		new Instant (0);
 
 	public abstract
 	Type refresh ();
@@ -45,18 +55,22 @@ class CachedGetter<Type>
 	public synchronized
 	Type get () {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		// call refresh if necessary
 
-		long now =
-			new Date ().getTime ();
-
-		if (lastReload + reloadTimeMs < now) {
+		if (
+			lessThan (
+				lastReload.getMillis () + reloadTimeMs,
+				transaction.now ().getMillis ())
+		) {
 
 			value =
 				refresh ();
 
 			lastReload =
-				now;
+				transaction.now ();
 
 		}
 

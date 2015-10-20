@@ -1,12 +1,13 @@
 package wbs.clients.apn.chat.user.info.logic;
 
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -140,8 +141,8 @@ class ChatInfoLogicImpl
 			Integer threadId,
 			boolean asDating) {
 
-		Date now =
-			new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
 		ChatRec chat =
 			thisUser.getChat ();
@@ -156,7 +157,11 @@ class ChatInfoLogicImpl
 			0,
 			0);
 
-		thisUser.setLastInfo (now);
+		thisUser
+
+			.setLastInfo (
+				instantToDate (
+					transaction.now ()));
 
 		// update contact record with last info stats
 
@@ -165,7 +170,11 @@ class ChatInfoLogicImpl
 				otherUser,
 				thisUser);
 
-		contact.setLastInfoTime (now);
+		contact
+
+			.setLastInfoTime (
+				instantToDate (
+					transaction.now ()));
 
 		// work out distance
 
@@ -266,16 +275,19 @@ class ChatInfoLogicImpl
 			int numToSend,
 			Integer threadId) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		// ignore deleted users
 
 		if (thisUser.getNumber () == null)
 			return 0;
 
-		Date now =
-			new Date ();
-
-		Date cutoffTime =
-			new Date (now.getTime () - 7 * 24 * 60 * 60 * 1000);
+		Instant cutoffTime =
+			transaction.now ()
+				.toDateTime ()
+				.minusWeeks (1)
+				.toInstant ();
 
 		Collection<ChatUserRec> otherUsers =
 			getNearbyOnlineUsersForInfo (
@@ -434,7 +446,11 @@ class ChatInfoLogicImpl
 			otherUsers.size (),
 			0);
 
-		thisUser.setLastPic (new Date ());
+		thisUser
+
+			.setLastPic (
+				instantToDate (
+					transaction.now ()));
 
 		// flush to generate id
 
@@ -522,6 +538,9 @@ class ChatInfoLogicImpl
 			Integer threadId,
 			boolean asDating) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ChatRec chat =
 			thisUser.getChat ();
 
@@ -533,8 +552,10 @@ class ChatInfoLogicImpl
 
 		int i = 0;
 
-		for (ChatUserRec otherUser
-				: otherUsers) {
+		for (
+			ChatUserRec otherUser
+				: otherUsers
+		) {
 
 			// add their image to the list
 
@@ -566,7 +587,11 @@ class ChatInfoLogicImpl
 			i,
 			0);
 
-		thisUser.setLastPic (new Date ());
+		thisUser
+
+			.setLastPic (
+				instantToDate (
+					transaction.now ()));
 
 		// now add a help message on the end
 
@@ -640,6 +665,9 @@ class ChatInfoLogicImpl
 			Integer threadId,
 			boolean asDating) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		switch (thisUser.getImageMode ()) {
 
 		case link:
@@ -670,17 +698,21 @@ class ChatInfoLogicImpl
 
 		// update contact record with last pic stats
 
-		Date now = new Date ();
-
-		for (ChatUserRec otherUser
-				: otherUsers) {
+		for (
+			ChatUserRec otherUser
+				: otherUsers
+		) {
 
 			ChatContactRec contact =
 				chatContactHelper.findOrCreate (
 					otherUser,
 					thisUser);
 
-			contact.setLastPicTime (now);
+			contact
+
+				.setLastPicTime (
+					instantToDate (
+						transaction.now ()));
 
 		}
 
@@ -694,6 +726,9 @@ class ChatInfoLogicImpl
 			Integer threadId,
 			boolean asDating) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ChatSchemeRec chatScheme =
 			thisUser.getChatScheme ();
 
@@ -702,8 +737,10 @@ class ChatInfoLogicImpl
 
 		int i = 0;
 
-		for (ChatUserRec otherUser
-				: otherUsers) {
+		for (
+			ChatUserRec otherUser
+				: otherUsers
+		) {
 
 			// add their video to the list
 
@@ -728,8 +765,11 @@ class ChatInfoLogicImpl
 					otherUser,
 					thisUser);
 
-			contact.setLastVideoTime (
-				new Date ());
+			contact
+
+				.setLastVideoTime (
+					instantToDate (
+						transaction.now ()));
 
 			i ++;
 
@@ -745,7 +785,11 @@ class ChatInfoLogicImpl
 			0,
 			i);
 
-		thisUser.setLastPic (new Date ());
+		thisUser
+
+			.setLastPic (
+				instantToDate (
+					transaction.now ()));
 
 		// now add a help message on the end
 
@@ -820,13 +864,14 @@ class ChatInfoLogicImpl
 			int numToSend,
 			Integer threadId) {
 
-		Date now =
-			new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
-		Date cutoffTime =
-			new Date (
-				+ now.getTime ()
-				- 24 * 60 * 60 * 1000);
+		Instant cutoffTime =
+			transaction.now ()
+				.toDateTime ()
+				.minusDays (1)
+				.toInstant ();
 
 		Collection<ChatUserRec> otherUsers =
 			getNearbyOnlineUsersForPic (
@@ -858,13 +903,14 @@ class ChatInfoLogicImpl
 			int numToSend,
 			Integer threadId) {
 
-		Date now =
-			new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
-		Date cutoffTime =
-			new Date (
-				+ now.getTime ()
-				- 24 * 60 * 60 * 1000);
+		Instant cutoffTime =
+			transaction.now ()
+				.toDateTime ()
+				.minusDays (1)
+				.toInstant ();
 
 		Collection<ChatUserRec> otherUsers =
 			getNearbyOnlineUsersForPic (
@@ -892,13 +938,14 @@ class ChatInfoLogicImpl
 			int numToSend,
 			Integer threadId) {
 
-		Date now =
-			new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
-		Date cutoffTime =
-			new Date (
-				+ now.getTime ()
-				- 24 * 60 * 60 * 1000);
+		Instant cutoffTime =
+			transaction.now ()
+				.toDateTime ()
+				.minusDays (1)
+				.toInstant ();
 
 		Collection<ChatUserRec> otherUsers =
 			getNearbyOnlineUsersForVideo (
@@ -927,7 +974,7 @@ class ChatInfoLogicImpl
 	public
 	Collection<ChatUserRec> getNearbyOnlineUsersForInfo (
 			ChatUserRec thisUser,
-			Date cutoffTime,
+			Instant cutoffTime,
 			int numToFind) {
 
 		Collection<ChatUserRec> chatUsers =
@@ -950,7 +997,7 @@ class ChatInfoLogicImpl
 	public
 	Collection<ChatUserRec> getNearbyOnlineUsersForPic (
 			ChatUserRec thisUser,
-			Date cutoffTime,
+			Instant cutoffTime,
 			int numToFind) {
 
 		Collection<ChatUserRec> chatUsers =
@@ -969,7 +1016,7 @@ class ChatInfoLogicImpl
 	public
 	Collection<ChatUserRec> getNearbyOnlineUsersForVideo (
 			ChatUserRec thisUser,
-			Date cutoffTime,
+			Instant cutoffTime,
 			int numToFind) {
 
 		Collection<ChatUserRec> chatUsers =
@@ -998,7 +1045,7 @@ class ChatInfoLogicImpl
 	private
 	Collection<ChatUserRec> getOnlineUsersForInfo (
 			@NonNull ChatUserRec thisUser,
-			@NonNull Date cutoffTime) {
+			@NonNull Instant cutoffTime) {
 
 		ChatRec chat =
 			thisUser.getChat ();
@@ -1010,7 +1057,10 @@ class ChatInfoLogicImpl
 		List<ChatUserRec> ret =
 			new ArrayList<ChatUserRec> ();
 
-		for (ChatUserRec chatUser : onlineUsers) {
+		for (
+			ChatUserRec chatUser
+				: onlineUsers
+		) {
 
 			// ignore ourselves
 
@@ -1042,20 +1092,44 @@ class ChatInfoLogicImpl
 
 			if (chatUserContact != null) {
 
-				if (chatUserContact.getLastInfoTime () != null
-						&& chatUserContact.getLastInfoTime ().getTime ()
-							> cutoffTime.getTime ())
-					continue;
+				if (
 
-				if (chatUserContact.getLastDeliveredMessageTime () != null
-						&& chatUserContact.getLastDeliveredMessageTime ().getTime ()
-							> cutoffTime.getTime ())
-					continue;
+					isNotNull (
+						chatUserContact.getLastInfoTime ())
 
-				if (chatUserContact.getLastPicTime () != null
-						&& chatUserContact.getLastPicTime ().getTime ()
-							> cutoffTime.getTime ())
+					&& moreThan (
+						chatUserContact.getLastInfoTime ().getTime (),
+						cutoffTime.getMillis ())
+
+				) {
 					continue;
+				}
+
+				if (
+
+					isNotNull (
+						chatUserContact.getLastDeliveredMessageTime ())
+
+					&& moreThan (
+						chatUserContact.getLastDeliveredMessageTime ().getTime (),
+						cutoffTime.getMillis ())
+
+				) {
+					continue;
+				}
+
+				if (
+
+					isNotNull (
+						chatUserContact.getLastPicTime ())
+
+					&& moreThan (
+						chatUserContact.getLastPicTime ().getTime (),
+						cutoffTime.getMillis ())
+
+				) {
+					continue;
+				}
 
 			}
 
@@ -1091,7 +1165,7 @@ class ChatInfoLogicImpl
 	private
 	Collection<ChatUserRec> getOnlineUsersForPic (
 			ChatUserRec thisUser,
-			Date cutoffTime) {
+			Instant cutoffTime) {
 
 		ChatRec chat =
 			thisUser.getChat ();
@@ -1103,8 +1177,10 @@ class ChatInfoLogicImpl
 		List<ChatUserRec> selectedChatUsers =
 			new ArrayList<ChatUserRec> ();
 
-		for (ChatUserRec chatUser
-				: onlineChatUsers) {
+		for (
+			ChatUserRec chatUser
+				: onlineChatUsers
+		) {
 
 			// ignore ourselves
 
@@ -1130,11 +1206,21 @@ class ChatInfoLogicImpl
 				thisUser.getFromContacts ().get (
 					chatUser.getId ());
 
-			if (chatContact != null
-					&& chatContact.getLastPicTime () != null
-					&& chatContact.getLastPicTime ().getTime ()
-						> cutoffTime.getTime ())
+			if (
+
+				isNotNull (
+					chatContact)
+
+				&& isNotNull (
+					chatContact.getLastPicTime ())
+
+				&& moreThan (
+					chatContact.getLastPicTime ().getTime (),
+					cutoffTime.getMillis ())
+
+			) {
 				continue;
+			}
 
 			// ignore users with no info or main pic
 
@@ -1168,7 +1254,7 @@ class ChatInfoLogicImpl
 	private
 	Collection<ChatUserRec> getOnlineUsersForVideo (
 		ChatUserRec thisUser,
-		Date cutoffTime) {
+		Instant cutoffTime) {
 
 		ChatRec chat =
 			thisUser.getChat ();
@@ -1180,8 +1266,10 @@ class ChatInfoLogicImpl
 		List<ChatUserRec> selectedChatUsers =
 			new ArrayList<ChatUserRec> ();
 
-		for (ChatUserRec chatUser
-				: onlineUsers) {
+		for (
+			ChatUserRec chatUser
+				: onlineUsers
+		) {
 
 			// ignore ourselves
 
@@ -1190,9 +1278,12 @@ class ChatInfoLogicImpl
 
 			// ignore blocked users
 
-			if (thisUser.getBlocked ().containsKey (
-					chatUser.getId ()))
+			if (
+				thisUser.getBlocked ().containsKey (
+					chatUser.getId ())
+			) {
 				continue;
+			}
 
 			// if we aren't suitable gender/orients for each other skip it
 
@@ -1207,11 +1298,21 @@ class ChatInfoLogicImpl
 				thisUser.getFromContacts ().get (
 					chatUser.getId ());
 
-			if (chatContact != null
-					&& chatContact.getLastVideoTime () != null
-					&& chatContact.getLastVideoTime ().getTime ()
-						> cutoffTime.getTime ())
+			if (
+
+				isNotNull (
+					chatContact)
+
+				&& isNotNull (
+					chatContact.getLastVideoTime ())
+
+				&& moreThan (
+					chatContact.getLastVideoTime ().getTime (),
+					cutoffTime.getMillis ())
+
+			) {
 				continue;
+			}
 
 			// ignore users with no info or main video
 
@@ -1315,6 +1416,9 @@ class ChatInfoLogicImpl
 	void sendNameHint (
 			ChatUserRec chatUser) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ChatRec chat =
 			chatUser.getChat ();
 
@@ -1334,7 +1438,8 @@ class ChatInfoLogicImpl
 		chatUser
 
 			.setLastNameHint (
-				new Date ());
+				instantToDate (
+					transaction.now ()));
 
 	}
 
@@ -1342,6 +1447,9 @@ class ChatInfoLogicImpl
 	public
 	void sendPicHint (
 			ChatUserRec chatUser) {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -1360,7 +1468,8 @@ class ChatInfoLogicImpl
 		chatUser
 
 			.setLastPicHint (
-				new Date ());
+				instantToDate (
+					transaction.now ()));
 
 	}
 
@@ -1368,6 +1477,9 @@ class ChatInfoLogicImpl
 	public
 	void sendPicHint2 (
 			ChatUserRec chatUser) {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -1386,7 +1498,8 @@ class ChatInfoLogicImpl
 		chatUser
 
 			.setLastPicHint (
-				new Date ());
+				instantToDate (
+					transaction.now ()));
 
 	}
 

@@ -490,25 +490,6 @@ class Misc {
 
 	}
 
-	public static
-	Date dateAddSecs (
-			Date date,
-			int seconds) {
-
-		Calendar calendar =
-			Calendar.getInstance ();
-
-		calendar.setTime (
-			date);
-
-		calendar.add (
-			Calendar.SECOND,
-			seconds);
-
-		return calendar.getTime ();
-
-	}
-
 	// TODO use LocalDate instead
 	public static
 	int age (
@@ -1734,9 +1715,27 @@ class Misc {
 	}
 
 	public static
+	boolean lessThan (
+			long left,
+			long right) {
+
+		return left < right;
+
+	}
+
+	public static
 	boolean moreThan (
 			int left,
 			int right) {
+
+		return left > right;
+
+	}
+
+	public static
+	boolean moreThan (
+			long left,
+			long right) {
 
 		return left > right;
 
@@ -1818,6 +1817,14 @@ class Misc {
 			Collection<?> collection) {
 
 		return collection.isEmpty ();
+
+	}
+
+	public static
+	boolean isNotEmpty (
+			Collection<?> collection) {
+
+		return ! collection.isEmpty ();
 
 	}
 

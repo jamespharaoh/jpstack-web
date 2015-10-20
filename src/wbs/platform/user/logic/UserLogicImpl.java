@@ -2,16 +2,17 @@ package wbs.platform.user.logic;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.hashSha1;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-
-import java.util.Date;
 
 import javax.inject.Inject;
 
 import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
@@ -31,6 +32,9 @@ class UserLogicImpl
 	implements UserLogic {
 
 	// dependencies
+
+	@Inject
+	Database database;
 
 	@Inject
 	SliceObjectHelper sliceHelper;
@@ -59,8 +63,8 @@ class UserLogicImpl
 			@NonNull String sessionId,
 			@NonNull Optional<String> userAgent) {
 
-		Date now =
-			new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
 		// end any existing session
 
@@ -77,7 +81,8 @@ class UserLogicImpl
 				user)
 
 			.setStartTime (
-				now)
+				instantToDate (
+					transaction.now ()))
 
 			.setUserAgent (
 				textHelper.findOrCreate (
@@ -97,7 +102,8 @@ class UserLogicImpl
 				sessionId)
 
 			.setTimestamp (
-				now)
+				instantToDate (
+					transaction.now ()))
 
 			.setUserSession (
 				session)

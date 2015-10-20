@@ -304,12 +304,10 @@ class TicketerApiServletModule
 
 				// old ticket
 
-				Date now = new Date ();
-
 				long remaining = (
-						ticket.getExpiresTime ().getTime ()
-							- now.getTime ()
-					) / 1000;
+					ticket.getExpiresTime ().getTime ()
+						- transaction.now ().getMillis ()
+				) / 1000;
 
 				transaction.commit ();
 

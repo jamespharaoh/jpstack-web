@@ -2,9 +2,12 @@ package wbs.platform.core.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.lessThan;
+import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +21,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import lombok.Cleanup;
+
+import org.joda.time.Instant;
+
 import wbs.console.html.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.priv.PrivChecker;
@@ -64,14 +70,11 @@ class CoreAuthFilter
 
 	Map<Integer,String> onlineSessionIdsByUserId;
 
-	Map<String,Date> activeSessions =
-		new HashMap<String,Date> ();
+	Map<String,Instant> activeSessions =
+		new HashMap<String,Instant> ();
 
 	private synchronized
 	void reload () {
-
-		Date now =
-			new Date ();
 
 		@Cleanup
 		Transaction transaction =
@@ -81,26 +84,40 @@ class CoreAuthFilter
 		onlineSessionIdsByUserId =
 			new HashMap<Integer,String> ();
 
-		for (UserOnlineRec online
-				: userOnlineHelper.findAll ()) {
+		for (
+			UserOnlineRec online
+				: userOnlineHelper.findAll ()
+		) {
 
 			UserRec user =
 				online.getUser ();
 
 			// update his timestamp if appropriate
 
-			if (activeSessions.containsKey (
-					online.getSessionId ()))
+			if (
+				activeSessions.containsKey (
+					online.getSessionId ())
+			)
 
-				online.setTimestamp (
-					activeSessions.get (
-						online.getSessionId ()));
+				online
+
+					.setTimestamp (
+						instantToDate (
+							activeSessions.get (
+								online.getSessionId ())));
 
 			// check if he has been disabled or timed out
 
-			if (! user.getActive ()
-					|| online .getTimestamp ().getTime () + logoffTime
-						< now.getTime ()) {
+			if (
+
+				! user.getActive ()
+
+				|| lessThan (
+					online .getTimestamp ().getTime ()
+						+ logoffTime,
+					transaction.now ().getMillis ())
+
+			) {
 
 				userLogic.userLogoff (
 					user);
@@ -120,7 +137,7 @@ class CoreAuthFilter
 		transaction.commit ();
 
 		activeSessions =
-			new HashMap<String,Date> ();
+			new HashMap<String,Instant> ();
 
 	}
 
@@ -130,7 +147,11 @@ class CoreAuthFilter
 	 * "active" list which updates our user record with a timestamp
 	 * automatically when the caches are updated.
 	 */
-	private synchronized boolean checkUser () {
+	private synchronized
+	boolean checkUser () {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		// check there is a user id
 
@@ -139,19 +160,27 @@ class CoreAuthFilter
 
 		// reload if overdue or not done yet, always for root path
 
-		Date now =
-			new Date ();
-
 		boolean reloaded = false;
 
-		if (onlineSessionIdsByUserId == null
-				|| lastReload + reloadTime < now.getTime ()
-				|| requestContext.servletPath ().equals ("/")) {
+		if (
+
+			isNull (
+				onlineSessionIdsByUserId)
+
+			|| lessThan (
+				lastReload + reloadTime,
+				transaction.now ().getMillis ())
+
+			|| equal (
+				requestContext.servletPath (),
+				"/")
+
+		) {
 
 			reload ();
 
 			lastReload =
-				now.getTime ();
+				transaction.now ().getMillis ();
 
 			reloaded = true;
 
@@ -159,10 +188,12 @@ class CoreAuthFilter
 
 		// check his session is valid, reload if it doesn't look right still
 
-		if (! equal (
+		if (
+			notEqual (
 				onlineSessionIdsByUserId.get (
 					requestContext.userId ()),
-				requestContext.sessionId ())) {
+				requestContext.sessionId ())
+		) {
 
 			if (reloaded)
 				return false;
@@ -170,7 +201,7 @@ class CoreAuthFilter
 			reload ();
 
 			lastReload =
-				now.getTime ();
+				transaction.now ().getMillis ();
 
 			if (! equal (
 					onlineSessionIdsByUserId.get (
@@ -184,7 +215,7 @@ class CoreAuthFilter
 
 		activeSessions.put (
 			requestContext.sessionId (),
-			now);
+			transaction.now ());
 
 		return true;
 

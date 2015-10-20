@@ -1,6 +1,5 @@
 package wbs.console.request;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
@@ -14,7 +13,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -646,21 +644,6 @@ class ConsoleRequestContextImpl
 			return wantedPath.substring (1);
 
 		}
-
-	}
-
-	@Override
-	public
-	String prettyDateDiff (
-			Date before,
-			Date after) {
-
-		if (before == null || after == null)
-			return null;
-
-		return prettyDateDiff (
-			dateToInstant (before),
-			dateToInstant (after));
 
 	}
 

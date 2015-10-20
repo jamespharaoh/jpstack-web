@@ -93,12 +93,15 @@ class ChatAdultExpiryDaemon
 
 		List<ChatUserRec> chatUsers =
 			chatUserHelper.findAdultExpiryLimit (
+				transaction.now (),
 				1000);
 
 		transaction.close ();
 
-		for (ChatUserRec chatUser
-				: chatUsers) {
+		for (
+			ChatUserRec chatUser
+				: chatUsers
+		) {
 
 			doUserAdultExpiry (
 				chatUser.getId ());

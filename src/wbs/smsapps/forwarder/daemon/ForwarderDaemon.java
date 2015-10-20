@@ -1,5 +1,6 @@
 package wbs.smsapps.forwarder.daemon;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -12,7 +13,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
@@ -81,12 +81,15 @@ class ForwarderDaemon
 
 			forwarderMessageIns =
 				forwarderMessageInHelper.findNexts (
+					transaction.now (),
 					buffer.getFullSize ());
 
 			// initialise any proxies
 
-			for (ForwarderMessageInRec forwarderMessageIn
-					: forwarderMessageIns) {
+			for (
+				ForwarderMessageInRec forwarderMessageIn
+					: forwarderMessageIns
+			) {
 
 				forwarderMessageIn
 					.getMessage ()
@@ -94,7 +97,8 @@ class ForwarderDaemon
 					.getText ();
 
 				forwarderMessageIn
-					.getForwarder ().getUrl ();
+					.getForwarder ()
+					.getUrl ();
 
 			}
 
@@ -421,7 +425,10 @@ class ForwarderDaemon
 							forwarderMessageIn.getId ());
 
 					forwarderMessageIn
-						.setCancelledTime (new Date ());
+
+						.setCancelledTime (
+							instantToDate (
+								transaction.now ()));
 
 					transaction.commit ();
 
@@ -451,6 +458,9 @@ class ForwarderDaemon
 				int forwarderMessageInId,
 				boolean success) {
 
+			Transaction transaction =
+				database.currentTransaction ();
+
 			ForwarderMessageInRec forwarderMessageIn =
 				forwarderMessageInHelper.find (
 					forwarderMessageInId);
@@ -461,10 +471,19 @@ class ForwarderDaemon
 			if (success) {
 
 				forwarderMessageIn
-					.setPending (false)
-					.setSendQueue (false)
-					.setProcessedTime (new Date ())
-					.setRetryTime (null);
+
+					.setPending (
+						false)
+
+					.setSendQueue (
+						false)
+
+					.setProcessedTime (
+						instantToDate (
+							transaction.now ()))
+
+					.setRetryTime (
+						null);
 
 			} else {
 

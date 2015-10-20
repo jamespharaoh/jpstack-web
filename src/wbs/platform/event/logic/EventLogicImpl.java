@@ -1,12 +1,13 @@
 package wbs.platform.event.logic;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-
-import java.util.Date;
 
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.PermanentRecord;
@@ -23,6 +24,11 @@ public
 class EventLogicImpl
 	implements EventLogic {
 
+	// dependencies
+
+	@Inject
+	Database database;
+
 	@Inject
 	EventObjectHelper eventHelper;
 
@@ -38,10 +44,15 @@ class EventLogicImpl
 	@Inject
 	TextObjectHelper textHelper;
 
+	// implementation
+
 	@Override
 	public
 	EventRec createEvent (
 			String typeCode) {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		// lookup type
 
@@ -69,7 +80,8 @@ class EventLogicImpl
 				eventType)
 
 			.setTimestamp (
-				new Date ())
+				instantToDate (
+					transaction.now ()))
 
 		);
 

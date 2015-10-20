@@ -1,8 +1,7 @@
 package wbs.smsapps.manualresponder.daemon;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-
-import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -11,6 +10,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.queue.logic.QueueLogic;
@@ -108,6 +108,9 @@ class ManualResponderCommand
 	public
 	InboxAttemptRec handle () {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ManualResponderRec manualResponder =
 			(ManualResponderRec) (Object)
 			objectManager.getParent (
@@ -167,7 +170,8 @@ class ManualResponderCommand
 				message)
 
 			.setTimestamp (
-				new Date ())
+				instantToDate (
+					transaction.now ()))
 
 			.setPending (
 				true)

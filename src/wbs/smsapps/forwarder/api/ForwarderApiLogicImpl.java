@@ -1,12 +1,12 @@
 package wbs.smsapps.forwarder.api;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +14,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
@@ -38,6 +40,11 @@ public
 class ForwarderApiLogicImpl
 	implements ForwarderApiLogic {
 
+	// dependencies
+
+	@Inject
+	Database database;
+
 	@Inject
 	ForwarderMessageInObjectHelper forwarderMessageInHelper;
 
@@ -47,8 +54,12 @@ class ForwarderApiLogicImpl
 	@Inject
 	SliceObjectHelper sliceHelper;
 
+	// prototype dependencies
+
 	@Inject
 	Provider<TextResponder> textResponder;
+
+	// implementation
 
 	@Override
 	public
@@ -97,25 +108,45 @@ class ForwarderApiLogicImpl
 	 * appropriately.
 	 */
 	@Override
-	public Responder controlActionGet (
+	public
+	Responder controlActionGet (
 			RequestContext requestContext,
 			ForwarderRec forwarder) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ForwarderMessageInRec forwarderMessageIn =
 			forwarderMessageInHelper.findNext (
+				transaction.now (),
 				forwarder);
 
-		if (forwarderMessageIn == null)
+		if (forwarderMessageIn == null) {
+
 			return textResponder.get ()
-				.text ("NONE\n");
+
+				.text (
+					"NONE\n");
+
+		}
 
 		forwarderMessageIn
-			.setPending (false)
-			.setSendQueue (false)
-			.setRetryTime (null)
-			.setProcessedTime (new Date ());
+
+			.setPending (
+				false)
+
+			.setSendQueue (
+				false)
+
+			.setRetryTime (
+				null)
+
+			.setProcessedTime (
+				instantToDate (
+					transaction.now ()));
 
 		return textResponder.get ()
+
 			.text (
 				printMessageIn (
 					requestContext,
@@ -135,8 +166,12 @@ class ForwarderApiLogicImpl
 			RequestContext requestContext,
 			ForwarderRec forwarder) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ForwarderMessageInRec forwarderMessageIn =
 			forwarderMessageInHelper.findNext (
+				transaction.now (),
 				forwarder);
 
 		if (forwarderMessageIn == null) {
@@ -174,8 +209,14 @@ class ForwarderApiLogicImpl
 			ForwarderRec forwarder)
 		throws ReportableException {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		// get the message id
-		String tempString = requestContext.parameter ("id");
+
+		String tempString =
+			requestContext.parameter (
+				"id");
 
 		if (tempString == null) {
 
@@ -201,10 +242,19 @@ class ForwarderApiLogicImpl
 		if (forwarderMessageIn.getPending ()) {
 
 			forwarderMessageIn
-				.setPending (false)
-				.setSendQueue (false)
-				.setRetryTime (null)
-				.setProcessedTime (new Date ());
+
+				.setPending (
+					false)
+
+				.setSendQueue (
+					false)
+
+				.setRetryTime (
+					null)
+
+				.setProcessedTime (
+					instantToDate (
+						transaction.now ()));
 
 		}
 

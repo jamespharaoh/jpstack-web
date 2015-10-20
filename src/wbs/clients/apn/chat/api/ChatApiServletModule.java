@@ -739,11 +739,24 @@ class ChatApiServletModule
 			searchMap.put ("barred", false);
 			searchMap.put ("notDeleted", true);
 
-			if (codes != null)
-				searchMap.put ("codeIn", codes);
-			if (lastAction != null)
-				searchMap.put ("lastActionAfter",
-					new Timestamp (System.currentTimeMillis () - (long) lastAction * 1000L));
+			if (codes != null){
+
+				searchMap.put (
+					"codeIn",
+					codes);
+
+			}
+
+			if (lastAction != null) {
+
+				searchMap.put (
+					"lastActionAfter",
+					new Timestamp (
+						+ System.currentTimeMillis ()
+						- (long) lastAction * 1000L));
+
+			}
+
 			if (types != null)
 				searchMap.put ("typeIn", types);
 			if (hasImage != null)

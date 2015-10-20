@@ -32,7 +32,8 @@
 
 		<timestamp-field
 			name="createdTime"
-			column-type="postgresql"/>
+			column-type="postgresql"
+			column="created_timestamp"/>
 
 		<string-field
 			name="otherId"

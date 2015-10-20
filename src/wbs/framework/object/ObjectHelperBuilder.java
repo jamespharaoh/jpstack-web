@@ -831,9 +831,6 @@ class ObjectHelperBuilder {
 
 				}
 
-				System.out.println (
-					"INSERT " + objectTypeCode);
-
 				objectHelperProvider.insert (
 					object);
 

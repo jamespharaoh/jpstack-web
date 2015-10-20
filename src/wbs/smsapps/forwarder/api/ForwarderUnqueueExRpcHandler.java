@@ -1,7 +1,8 @@
 package wbs.smsapps.forwarder.api;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -233,42 +234,73 @@ class ForwarderUnqueueExRpcHandler
 	private
 	void unqueueReports () {
 
-		Date now =
-			new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
-		for (UnqueueExReport uer : reports) {
+		for (
+			UnqueueExReport unqueueExReport
+				: reports
+		) {
 
 			// skip any which weren't found
-			if (uer.fmOutReport == null)
+
+			if (unqueueExReport.fmOutReport == null)
 				continue;
 
 			// skip any which are already processed
-			if (uer.fmOutReport.getProcessedTime() != null)
+
+			if (unqueueExReport.fmOutReport.getProcessedTime() != null)
 				continue;
-			uer.fmOutReport.setProcessedTime(now);
-			ForwarderMessageOutRec fmOut = uer.fmOutReport
-					.getForwarderMessageOut();
-			if (fmOut.getReportIndexPending() + 1 < fmOut
-					.getReportIndexNext()) {
-				fmOut
-						.setReportIndexPending(fmOut
-								.getReportIndexPending() + 1);
+
+			unqueueExReport.fmOutReport
+
+				.setProcessedTime (
+					instantToDate (
+						transaction.now ()));
+
+			ForwarderMessageOutRec forwarderMessageOut =
+				unqueueExReport.fmOutReport
+					.getForwarderMessageOut ();
+
+			if (
+				forwarderMessageOut.getReportIndexPending () + 1
+					< forwarderMessageOut.getReportIndexNext ()
+			) {
+
+				forwarderMessageOut
+
+					.setReportIndexPending (
+						forwarderMessageOut.getReportIndexPending () + 1);
+
 			} else {
-				fmOut.setReportIndexPending(null);
-				fmOut.setReportRetryTime(null);
-				fmOut.setReportTries(null);
+
+				forwarderMessageOut
+
+					.setReportIndexPending (
+						null)
+
+					.setReportRetryTime (
+						null)
+
+					.setReportTries (
+						null);
+
 			}
+
 		}
+
 	}
 
 	private
 	void unqueueMessages () {
 
-		Date now =
-			new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
-		for (UnqueueExMessage unqueueExMessage
-				: unqueueExMessages) {
+		for (
+			UnqueueExMessage unqueueExMessage
+				: unqueueExMessages
+		) {
 
 			// skip any which weren't found
 
@@ -285,7 +317,8 @@ class ForwarderUnqueueExRpcHandler
 			unqueueExMessage.forwarderMessageIn
 
 				.setProcessedTime (
-					now)
+					instantToDate (
+						transaction.now ()))
 
 				.setPending (
 					false)

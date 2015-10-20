@@ -1,8 +1,10 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -89,7 +91,8 @@ class ChatUserJoinOutboundDaemon
 				this);
 
 		List<ChatUserRec> chatUsers =
-			chatUserHelper.findWantingJoinOutbound ();
+			chatUserHelper.findWantingJoinOutbound (
+				transaction.now ());
 
 		transaction.close ();
 
@@ -136,9 +139,16 @@ class ChatUserJoinOutboundDaemon
 
 		// check and clear the outbound message flag
 
-		if (user.getNextJoinOutbound() == null
-				|| new Date ().getTime ()
-					< user.getNextJoinOutbound ().getTime ()) {
+		if (
+
+			isNull (
+				user.getNextJoinOutbound ())
+
+			|| lessThan (
+				transaction.now ().getMillis (),
+				user.getNextJoinOutbound ().getTime ())
+
+		) {
 
 			return;
 
@@ -169,7 +179,9 @@ class ChatUserJoinOutboundDaemon
 				true);
 
 		chatMonitorInbox
-			.setOutbound (true);
+
+			.setOutbound (
+				true);
 
 		// create a log
 
@@ -186,7 +198,8 @@ class ChatUserJoinOutboundDaemon
 				ChatUserInitiationReason.joinUser)
 
 			.setTimestamp (
-				new Date ())
+				instantToDate (
+					transaction.now ()))
 
 		);
 

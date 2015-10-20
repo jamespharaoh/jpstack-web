@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -91,14 +91,17 @@ class ChatUserAlarmDaemon
 				this);
 
 		List<ChatUserAlarmRec> alarms =
-			chatUserAlarmHelper.findPending ();
+			chatUserAlarmHelper.findPending (
+				transaction.now ());
 
 		transaction.close ();
 
 		// then do each one
 
-		for (ChatUserAlarmRec alarm
-				: alarms) {
+		for (
+			ChatUserAlarmRec alarm
+				: alarms
+		) {
 
 			try {
 
@@ -195,7 +198,8 @@ class ChatUserAlarmDaemon
 				reason)
 
 			.setTimestamp (
-				new Date ())
+				instantToDate (
+					transaction.now ()))
 
 			.setAlarmTime (
 				alarm.getAlarmTime ()));

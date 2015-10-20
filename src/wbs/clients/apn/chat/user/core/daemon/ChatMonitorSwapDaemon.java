@@ -1,9 +1,11 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -95,16 +97,22 @@ class ChatMonitorSwapDaemon
 
 		// then call doMonitorSwap for any whose time has come
 
-		Date now =
-			new Date ();
+		for (
+			ChatRec chat
+				: chats
+		) {
 
-		for (ChatRec chat
-				: chats) {
+			if (
 
-			if (chat.getLastMonitorSwap () == null
-				|| chat.getLastMonitorSwap ().getTime ()
-						+ chat.getTimeMonitorSwap () * 1000
-					< now.getTime ()) {
+				isNull (
+					chat.getLastMonitorSwap ())
+
+				|| lessThan (
+					chat.getLastMonitorSwap ().getTime ()
+						+ chat.getTimeMonitorSwap () * 1000,
+					transaction.now ().getMillis ())
+
+			) {
 
 				doMonitorSwap (
 					chat.getId (),
@@ -165,7 +173,8 @@ class ChatMonitorSwapDaemon
 		chat
 
 			.setLastMonitorSwap (
-				new Date ());
+				instantToDate (
+					transaction.now ()));
 
 		// fetch all appropriate monitors
 

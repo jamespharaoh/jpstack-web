@@ -86,7 +86,10 @@ class ChatMonitorInboxFormAction
 	@Override
 	public
 	Responder backupResponder () {
-		return responder ("chatMonitorInboxFormResponder");
+
+		return responder (
+			"chatMonitorInboxFormResponder");
+
 	}
 
 	@Override
@@ -94,12 +97,16 @@ class ChatMonitorInboxFormAction
 	Responder goReal () {
 
 		// get stuff
-		int monitorInboxId = requestContext.stuffInt ("chatMonitorInboxId");
+
+		int monitorInboxId =
+			requestContext.stuffInt (
+				"chatMonitorInboxId");
 
 		// get params
 
 		String text =
-			requestContext.parameter ("text");
+			requestContext.parameter (
+				"text");
 
 		boolean ignore =
 			requestContext.parameter ("ignore") != null;
@@ -190,6 +197,7 @@ class ChatMonitorInboxFormAction
 						chat.getMinMonitorMessageLength ()));
 
 				return null;
+
 			}
 
 			ChatBlockRec chatBlock =
@@ -358,16 +366,26 @@ class ChatMonitorInboxFormAction
 		// add notice
 
 		if (ignore) {
-			requestContext.addNotice ("Message ignored");
+
+			requestContext.addNotice (
+				"Message ignored");
+
 		} else if (note) {
-			requestContext.addNotice ("Message sent and note added");
+
+			requestContext.addNotice (
+				"Message sent and note added");
+
 		} else {
-			requestContext.addNotice ("Message sent");
+
+			requestContext.addNotice (
+				"Message sent");
+
 		}
 
 		// and return
 
-		return responder ("queueHomeResponder");
+		return responder (
+			"queueHomeResponder");
 
 	}
 

@@ -10,7 +10,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -1073,6 +1072,9 @@ class ChatUserLogicImpl
 			@NonNull Optional<MessageRec> message,
 			@NonNull Optional<UserRec> user) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		if (
 			message.isPresent ()
 			&& user.isPresent ()
@@ -1175,9 +1177,6 @@ class ChatUserLogicImpl
 
 		{
 
-			Transaction transaction =
-				database.currentTransaction ();
-
 			if (
 				! transaction.contains (
 					chatUser)
@@ -1207,7 +1206,8 @@ class ChatUserLogicImpl
 				gazetteerEntry.getLongLat ())
 
 			.setLocationTime (
-				new Date ());
+				instantToDate (
+					transaction.now ()));
 
 		// create event
 

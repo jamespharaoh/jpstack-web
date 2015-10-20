@@ -1,8 +1,10 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -92,7 +94,8 @@ class ChatUserQuietDaemon
 		// get a list of users who are past their outbound timestamp
 
 		List<ChatUserRec> chatUsers =
-			chatUserHelper.findWantingQuietOutbound ();
+			chatUserHelper.findWantingQuietOutbound (
+				transaction.now ());
 
 		transaction.close ();
 
@@ -139,12 +142,23 @@ class ChatUserQuietDaemon
 
 		// check and clear the outbound message flag
 
-		if (user.getNextQuietOutbound () == null
-				|| new Date ().getTime ()
-					< user.getNextQuietOutbound ().getTime ())
-			return;
+		if (
 
-		user.setNextQuietOutbound (null);
+			isNull (
+				user.getNextQuietOutbound ())
+
+			|| lessThan (
+				transaction.now ().getMillis (),
+				user.getNextQuietOutbound ().getTime ())
+
+		) {
+			return;
+		}
+
+		user
+
+			.setNextQuietOutbound (
+				null);
 
 		// check if they have been barred
 
@@ -217,7 +231,10 @@ class ChatUserQuietDaemon
 				user,
 				true);
 
-		chatMonitorInbox.setOutbound (true);
+		chatMonitorInbox
+
+			.setOutbound (
+				true);
 
 		// create a log
 
@@ -234,7 +251,10 @@ class ChatUserQuietDaemon
 				ChatUserInitiationReason.quietUser)
 
 			.setTimestamp (
-				new Date ()));
+				instantToDate (
+					transaction.now ()))
+
+		);
 
 		// and return
 

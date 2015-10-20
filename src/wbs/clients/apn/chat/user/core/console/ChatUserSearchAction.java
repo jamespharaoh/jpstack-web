@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.dateAddSecs;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.toBoolean;
@@ -15,6 +14,9 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
+import org.joda.time.Duration;
+
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -75,6 +77,11 @@ class ChatUserSearchAction
 	@Override
 	protected
 	Responder goReal () {
+
+		@Cleanup
+		Transaction transaction =
+			database.beginReadOnly (
+				this);
 
 		// save session
 
@@ -271,10 +278,15 @@ class ChatUserSearchAction
 		if (searchDateMode != null)
 			searchMap.put ("dateMode", searchDateMode);
 
-		if (searchOnline != null)
+		if (searchOnline != null) {
+
 			searchMap.put (
 				"onlineAfter",
-				dateAddSecs (new Date (), - searchOnline));
+				transaction.now ().minus (
+					Duration.standardSeconds (
+						searchOnline)));
+
+		}
 
 		if (searchOrder != null)
 			searchMap.put (
@@ -309,11 +321,6 @@ class ChatUserSearchAction
 			searchMap.put("limit", limit);
 
 		// and search!
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				this);
 
 		List<Integer> chatUserIds =
 			chatUserHelper.searchIds (

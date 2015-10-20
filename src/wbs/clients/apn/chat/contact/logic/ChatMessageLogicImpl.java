@@ -12,7 +12,6 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -497,6 +496,9 @@ class ChatMessageLogicImpl
 	void chatMessageSendFromUserPartTwo (
 			ChatMessageRec chatMessage) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ChatUserRec fromUser =
 			chatMessage.getFromUser ();
 
@@ -505,9 +507,6 @@ class ChatMessageLogicImpl
 
 		ChatRec chat =
 			chatMessage.getChat ();
-
-		Date now =
-			new Date ();
 
 		ChatContactRec chatUserContact =
 			chatContactHelper.findOrCreate (
@@ -541,7 +540,8 @@ class ChatMessageLogicImpl
 		toUser
 
 			.setLastReceive (
-				now);
+				instantToDate (
+					transaction.now ()));
 
 		// subtract credit etc
 
@@ -586,7 +586,10 @@ class ChatMessageLogicImpl
 				chatMessage);
 
 			chatUserContact
-				.setLastDeliveredMessageTime (now);
+
+				.setLastDeliveredMessageTime (
+					instantToDate (
+						transaction.now ()));
 
 		// if either are not adult
 
@@ -619,7 +622,8 @@ class ChatMessageLogicImpl
 				chatUserContact
 
 					.setLastDeliveredMessageTime (
-						now);
+						instantToDate (
+							transaction.now ()));
 
 				break;
 
@@ -637,7 +641,8 @@ class ChatMessageLogicImpl
 				chatUserContact
 
 					.setLastDeliveredMessageTime (
-						now);
+						instantToDate (
+							transaction.now ()));
 
 				chatUserRejectionCountInc (
 					fromUser,

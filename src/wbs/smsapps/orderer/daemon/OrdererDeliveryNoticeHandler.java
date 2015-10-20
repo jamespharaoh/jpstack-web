@@ -1,7 +1,8 @@
 package wbs.smsapps.orderer.daemon;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.Collection;
-import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -63,9 +64,6 @@ class OrdererDeliveryNoticeHandler
 			int deliveryId,
 			Integer ref) {
 
-		Date now =
-			new Date ();
-
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
@@ -100,7 +98,10 @@ class OrdererDeliveryNoticeHandler
 		// update the order
 
 		order
-			.setDeliveredTime (now);
+
+			.setDeliveredTime (
+				instantToDate (
+					transaction.now ()));
 
 		// construct the message
 

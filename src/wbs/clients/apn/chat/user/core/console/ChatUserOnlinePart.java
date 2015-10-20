@@ -1,10 +1,10 @@
 package wbs.clients.apn.chat.user.core.console;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.spacify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
@@ -20,6 +20,8 @@ import wbs.console.context.ConsoleContextType;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.sms.gazetteer.logic.GazetteerLogic;
@@ -48,12 +50,17 @@ class ChatUserOnlinePart
 	ConsoleManager consoleManager;
 
 	@Inject
+	Database database;
+
+	@Inject
 	GazetteerLogic gazetteerLogic;
 
 	@Inject
 	MediaConsoleLogic mediaConsoleLogic;
 
 	// state
+
+	Transaction transaction;
 
 	Collection<ChatUserRec> users;
 
@@ -65,6 +72,9 @@ class ChatUserOnlinePart
 	@Override
 	public
 	void prepare () {
+
+		transaction =
+			database.currentTransaction ();
 
 		ChatRec chat =
 			chatHelper.find (
@@ -111,9 +121,6 @@ class ChatUserOnlinePart
 	public
 	void renderHtmlBodyContent () {
 
-		Date now =
-			new Date ();
-
 		printFormat (
 			"<table class=\"list\">\n");
 
@@ -130,8 +137,10 @@ class ChatUserOnlinePart
 			"<th>Idle</th>\n",
 			"</tr>\n");
 
-		for (ChatUserRec chatUser
-				: users) {
+		for (
+			ChatUserRec chatUser
+				: users
+		) {
 
 			printFormat (
 				"%s",
@@ -203,11 +212,11 @@ class ChatUserOnlinePart
 
 				printFormat (
 					"<td>%s</td>\n",
-					Html.nonBreakingWhitespace (
-						Html.encode (
-							requestContext.prettyDateDiff (
-								chatUser.getLastAction (),
-								now))));
+					Html.encodeNonBreakingWhitespace (
+						requestContext.prettyDateDiff (
+							dateToInstant (
+								chatUser.getLastAction ()),
+							transaction.now ())));
 
 			} else {
 

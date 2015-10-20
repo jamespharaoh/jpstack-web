@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.ad.daemon;
 
+import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -116,17 +116,22 @@ class ChatAdultAdDaemon
 				this);
 
 		List<ChatUserRec> chatUsers =
-			chatUserHelper.findWantingAdultAd ();
+			chatUserHelper.findWantingAdultAd (
+				transaction.now ());
 
 		transaction.close ();
 
 		// then call doAdultAd for each one
 
-		for (ChatUserRec chatUser : chatUsers) {
+		for (
+			ChatUserRec chatUser
+				: chatUsers
+		) {
 
 			try {
 
-				doAdultAd (chatUser.getId ());
+				doAdultAd (
+					chatUser.getId ());
 
 			} catch (Exception exception) {
 
@@ -167,11 +172,13 @@ class ChatAdultAdDaemon
 
 		// check he really is due an adult ad
 
-		Date now =
-			new Date ();
-
-		if (chatUser.getNextAdultAd ().getTime () > now.getTime ())
+		if (
+			moreThan (
+				chatUser.getNextAdultAd ().getTime (),
+				transaction.now ().getMillis ())
+		) {
 			return;
+		}
 
 		if (chat.getAdultAdsChat () == null) {
 

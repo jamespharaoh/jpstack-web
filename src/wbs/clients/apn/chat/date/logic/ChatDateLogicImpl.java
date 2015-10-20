@@ -1,9 +1,9 @@
 package wbs.clients.apn.chat.date.logic;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.prettyHour;
 
 import java.util.Collections;
-import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -16,6 +16,8 @@ import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
@@ -27,6 +29,8 @@ import com.google.common.collect.ImmutableMap;
 public
 class ChatDateLogicImpl
 	implements ChatDateLogic {
+
+	// dependencies
 
 	@Inject
 	ChatUserDateLogObjectHelper chatUserDateLogHelper;
@@ -40,10 +44,18 @@ class ChatDateLogicImpl
 	@Inject
 	CommandObjectHelper commandHelper;
 
+	@Inject
+	Database database;
+
+	// implementation
+
 	@Override
 	public
 	void chatUserDateJoinHint (
 			ChatUserRec chatUser) {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -61,7 +73,11 @@ class ChatDateLogicImpl
 
 		// and update the chat user
 
-		chatUser.setLastDateHint (new Date ());
+		chatUser
+
+			.setLastDateHint (
+				instantToDate (
+					transaction.now ()));
 
 	}
 
@@ -69,6 +85,9 @@ class ChatDateLogicImpl
 	public
 	void chatUserDateUpgradeHint (
 			ChatUserRec chatUser) {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -86,7 +105,11 @@ class ChatDateLogicImpl
 
 		// and update the chat user
 
-		chatUser.setLastDateHint (new Date ());
+		chatUser
+
+			.setLastDateHint (
+				instantToDate (
+					transaction.now ()));
 
 	}
 
@@ -102,6 +125,9 @@ class ChatDateLogicImpl
 			Integer endHour,
 			Integer dailyMax,
 			boolean sendMessage) {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		if (chatUser == null)
 			throw new NullPointerException ();
@@ -199,7 +225,8 @@ class ChatDateLogicImpl
 				chatUser.getDateDailyMax ())
 
 			.setTimestamp (
-				new Date ())
+				instantToDate (
+					transaction.now ()))
 
 		);
 
@@ -258,7 +285,11 @@ class ChatDateLogicImpl
 			&& chatUser.getDateMode () != ChatUserDateMode.none
 		) {
 
-			chatUser.setFirstJoin (new Date ());
+			chatUser
+
+				.setFirstJoin (
+					instantToDate (
+						transaction.now ()));
 
 		}
 

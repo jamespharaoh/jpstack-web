@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 import wbs.framework.entity.annotations.meta.EntityMeta;
 import wbs.framework.entity.annotations.meta.EntityMetaCreate;
 import wbs.framework.entity.annotations.meta.EntityMetaMutable;
-import wbs.framework.entity.annotations.meta.FieldMetaTable;
+import wbs.framework.entity.annotations.meta.EntityMetaTable;
 
 @Retention (RetentionPolicy.RUNTIME)
 @Target (ElementType.TYPE)
@@ -16,7 +16,7 @@ import wbs.framework.entity.annotations.meta.FieldMetaTable;
 public
 @interface MinorEntity {
 
-	@FieldMetaTable
+	@EntityMetaTable
 	String table ()
 	default "";
 

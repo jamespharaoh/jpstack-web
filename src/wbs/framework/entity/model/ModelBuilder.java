@@ -105,12 +105,14 @@ class ModelBuilder {
 			throw new RuntimeException ();
 
 		model.objectName (
-			uncapitalise (classNameMatcher.group (1)));
+			uncapitalise (
+				classNameMatcher.group (1)));
 
 		// object type code
 
 		model.objectTypeCode (
-			camelToUnderscore (classNameMatcher.group (1)));
+			camelToUnderscore (
+				classNameMatcher.group (1)));
 
 		// object type id
 
@@ -122,7 +124,8 @@ class ModelBuilder {
 			annotationStringParam (
 				entityAnnotation,
 				EntityMetaTable.class,
-				schemaNamesHelper.tableName (objectClass)));
+				schemaNamesHelper.tableName (
+					objectClass)));
 
 		// create
 

@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.user.core.hibernate;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collection;
@@ -17,6 +18,7 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
+import org.joda.time.Instant;
 
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.hibernate.ChatUserCreditModeType;
@@ -169,6 +171,7 @@ class ChatUserDaoHibernate
 	@Override
 	public
 	List<ChatUserRec> findAdultExpiryLimit (
+			Instant now,
 			int maxResults) {
 
 		return findMany (
@@ -180,7 +183,8 @@ class ChatUserDaoHibernate
 
 			.setTimestamp (
 				"now",
-				new Date ())
+				instantToDate (
+					now))
 
 			.setMaxResults (
 				maxResults)
@@ -255,7 +259,8 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findWantingJoinOutbound () {
+	List<ChatUserRec> findWantingJoinOutbound (
+			Instant now) {
 
 		return findMany (
 			ChatUserRec.class,
@@ -266,7 +271,8 @@ class ChatUserDaoHibernate
 
 			.setTimestamp (
 				"now",
-				new Date ())
+				instantToDate (
+					now))
 
 			.list ());
 
@@ -274,7 +280,8 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findWantingAdultAd () {
+	List<ChatUserRec> findWantingAdultAd (
+			Instant now) {
 
 		return findMany (
 			ChatUserRec.class,
@@ -285,7 +292,8 @@ class ChatUserDaoHibernate
 
 			.setTimestamp (
 				"now",
-				new Date ())
+				instantToDate (
+					now))
 
 			.list ());
 
@@ -890,7 +898,8 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findWantingAd () {
+	List<ChatUserRec> findWantingAd (
+			Instant now) {
 
 		return findMany (
 			ChatUserRec.class,
@@ -901,7 +910,8 @@ class ChatUserDaoHibernate
 
 			.setTimestamp (
 				"now",
-				new Date ())
+				instantToDate (
+					now))
 
 			.list ());
 
@@ -909,7 +919,8 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findWantingQuietOutbound () {
+	List<ChatUserRec> findWantingQuietOutbound (
+			Instant now) {
 
 		return findMany (
 			ChatUserRec.class,
@@ -920,7 +931,8 @@ class ChatUserDaoHibernate
 
 			.setTimestamp (
 				"now",
-				new Date ())
+				instantToDate (
+					now))
 
 			.list ());
 

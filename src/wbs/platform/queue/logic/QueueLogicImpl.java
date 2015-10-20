@@ -1,10 +1,10 @@
 package wbs.platform.queue.logic;
 
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -12,6 +12,8 @@ import javax.inject.Inject;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
@@ -36,6 +38,9 @@ class QueueLogicImpl
 	implements QueueLogic {
 
 	// dependencies
+
+	@Inject
+	Database database;
 
 	@Inject
 	ObjectManager objectManager;
@@ -169,8 +174,8 @@ class QueueLogicImpl
 			@NonNull String source,
 			@NonNull String details) {
 
-		Date now =
-			new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
 		QueueRec queue =
 			queueSubject.getQueue ();
@@ -221,12 +226,14 @@ class QueueLogicImpl
 					: QueueItemState.pending)
 
 			.setCreatedTime (
-				now)
+				instantToDate (
+					transaction.now ()))
 
 			.setPendingTime (
 				waiting
 					? null
-					: now)
+					: instantToDate (
+						transaction.now ()))
 
 		);
 
@@ -322,10 +329,11 @@ class QueueLogicImpl
 	void cancelQueueItem (
 			@NonNull QueueItemRec queueItem) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		QueueSubjectRec queueSubject =
 			queueItem.getQueueSubject ();
-
-		Date now = new Date ();
 
 		// sanity checks
 
@@ -350,8 +358,13 @@ class QueueLogicImpl
 		// update queue item claim
 
 		queueItem.getQueueItemClaim ()
-			.setEndTime (now)
-			.setStatus (QueueItemClaimStatus.cancelled);
+
+			.setEndTime (
+				instantToDate (
+					transaction.now ()))
+
+			.setStatus (
+				QueueItemClaimStatus.cancelled);
 
 		// update the queue item
 
@@ -361,7 +374,8 @@ class QueueLogicImpl
 				QueueItemState.cancelled)
 
 			.setCancelledTime (
-				now)
+				instantToDate (
+					transaction.now ()))
 
 			.setQueueItemClaim (
 				null);
@@ -395,7 +409,8 @@ class QueueLogicImpl
 					QueueItemState.pending)
 
 				.setPendingTime (
-					now);
+					instantToDate (
+						transaction.now ()));
 
 		}
 
@@ -407,11 +422,11 @@ class QueueLogicImpl
 			@NonNull QueueItemRec queueItem,
 			@NonNull UserRec user) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		QueueSubjectRec queueSubject =
 			queueItem.getQueueSubject ();
-
-		Date now =
-			new Date ();
 
 		// sanity checks
 
@@ -458,26 +473,45 @@ class QueueLogicImpl
 		// update queue item claim
 
 		queueItem.getQueueItemClaim ()
-			.setEndTime (now)
-			.setStatus (QueueItemClaimStatus.processed);
+
+			.setEndTime (
+				instantToDate (
+					transaction.now ()))
+
+			.setStatus (
+				QueueItemClaimStatus.processed);
 
 		// update the queue item
 
 		queueItem
-			.setState (QueueItemState.processed)
-			.setProcessedTime (now)
-			.setProcessedUser (user)
+
+			.setState (
+				QueueItemState.processed)
+
+			.setProcessedTime (
+				instantToDate (
+					transaction.now ()))
+
+			.setProcessedUser (
+				user)
+
 			.setProcessedByPreferredUser (
 				queueSubject.getPreferredUser () == null
 					? null
 					: queueSubject.getPreferredUser () == user)
-			.setQueueItemClaim (null);
+
+			.setQueueItemClaim (
+				null);
 
 		// update the queue subject
 
 		queueSubject
-			.setActiveItems (queueSubject.getActiveItems () - 1)
-			.setPreferredUser (user);
+
+			.setActiveItems (
+				queueSubject.getActiveItems () - 1)
+
+			.setPreferredUser (
+				user);
 
 		// activate next queue item (if any)
 
@@ -496,8 +530,13 @@ class QueueLogicImpl
 				throw new IllegalStateException ();
 
 			nextQueueItem
-				.setState (QueueItemState.pending)
-				.setPendingTime (now);
+
+				.setState (
+					QueueItemState.pending)
+
+				.setPendingTime (
+					instantToDate (
+						transaction.now ()));
 
 		}
 

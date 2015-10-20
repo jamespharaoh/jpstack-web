@@ -1,7 +1,10 @@
 package wbs.smsapps.forwarder.hibernate;
 
-import java.util.Date;
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.List;
+
+import org.joda.time.Instant;
 
 import wbs.framework.hibernate.HibernateDao;
 import wbs.smsapps.forwarder.model.ForwarderMessageInDaoMethods;
@@ -16,6 +19,7 @@ class ForwarderMessageInDaoHibernate
 	@Override
 	public
 	ForwarderMessageInRec findNext (
+			Instant now,
 			ForwarderRec forwarder) {
 
 		return findOne (
@@ -35,7 +39,8 @@ class ForwarderMessageInDaoHibernate
 
 			.setTimestamp (
 				"now",
-				new Date ())
+				instantToDate (
+					now))
 
 			.setMaxResults (1)
 
@@ -46,6 +51,7 @@ class ForwarderMessageInDaoHibernate
 	@Override
 	public
 	List<ForwarderMessageInRec> findNexts (
+			Instant now,
 			int maxResults) {
 
 		return findMany (
@@ -58,9 +64,11 @@ class ForwarderMessageInDaoHibernate
 
 			.setTimestamp (
 				"now",
-				new Date ())
+				instantToDate (
+					now))
 
-			.setMaxResults (maxResults)
+			.setMaxResults (
+				maxResults)
 
 			.list ());
 

@@ -1,6 +1,7 @@
 package wbs.smsapps.photograbber.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -10,7 +11,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -30,6 +30,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -127,6 +128,9 @@ class PhotoGrabberCommand
 	public
 	InboxAttemptRec handle () {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		PhotoGrabberRec photoGrabber =
 			(PhotoGrabberRec) (Object)
 			objectManager.getParent (
@@ -159,7 +163,8 @@ class PhotoGrabberCommand
 				mediaRef)
 
 			.setRequestTime (
-				new Date ());
+				instantToDate (
+					transaction.now ()));
 
 		String mediaUrl;
 

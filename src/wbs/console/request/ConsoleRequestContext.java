@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,10 +134,6 @@ interface ConsoleRequestContext {
 
 	String resolveLocalUrl (
 			String wantedPath);
-
-	String prettyDateDiff (
-			Date before,
-			Date after);
 
 	String prettyDateDiff (
 			Instant before,

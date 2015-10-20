@@ -1,7 +1,8 @@
 package wbs.clients.apn.chat.user.info.logic;
 
 import java.util.Collection;
-import java.util.Date;
+
+import org.joda.time.Instant;
 
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.platform.media.model.MediaRec;
@@ -15,7 +16,7 @@ interface ChatInfoLogic {
 	 */
 	Collection<ChatUserRec> getNearbyOnlineUsersForInfo (
 			ChatUserRec thisUser,
-			Date cutoffTime,
+			Instant cutoffTime,
 			int numToFind);
 
 	/**
@@ -24,12 +25,12 @@ interface ChatInfoLogic {
 	 */
 	Collection<ChatUserRec> getNearbyOnlineUsersForPic (
 			ChatUserRec thisUser,
-			Date cutoffTime,
+			Instant cutoffTime,
 			int numToFind);
 
 	Collection<ChatUserRec> getNearbyOnlineUsersForVideo (
 			ChatUserRec thisUser,
-			Date cutoffTime,
+			Instant cutoffTime,
 			int numToFind);
 
 	void sendUserInfo (

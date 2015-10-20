@@ -1,7 +1,10 @@
 package wbs.clients.apn.chat.user.core.hibernate;
 
-import java.util.Date;
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.List;
+
+import org.joda.time.Instant;
 
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmRec;
@@ -15,7 +18,8 @@ class ChatUserAlarmDaoHibernate
 
 	@Override
 	public
-	List<ChatUserAlarmRec> findPending () {
+	List<ChatUserAlarmRec> findPending (
+			Instant now) {
 
 		return findMany (
 			ChatUserAlarmRec.class,
@@ -24,7 +28,10 @@ class ChatUserAlarmDaoHibernate
 				"FROM ChatUserAlarmRec cua " +
 				"WHERE cua.alarmTime <= :now")
 
-			.setTimestamp ("now", new Date ())
+			.setTimestamp (
+				"now",
+				instantToDate (
+					now))
 
 			.list ());
 

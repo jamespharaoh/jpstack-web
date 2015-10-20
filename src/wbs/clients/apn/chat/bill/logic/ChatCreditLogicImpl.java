@@ -4,12 +4,14 @@ import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.sum;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -826,6 +828,9 @@ class ChatCreditLogicImpl
 			ChatUserRec chatUser,
 			boolean updateRevoked) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ChatRec chat =
 			chatUser.getChat ();
 
@@ -1024,7 +1029,8 @@ class ChatCreditLogicImpl
 		chatUser
 
 			.setLastBillSent (
-				new Date ());
+				instantToDate (
+					transaction.now ()));
 
 		log.info (
 			stringFormat (
@@ -1143,7 +1149,8 @@ class ChatCreditLogicImpl
 			ChatUserRec chatUser,
 			Integer threadId) {
 
-		Date now = new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
 		if (chatUser.getBarred ())
 			return;
@@ -1152,9 +1159,11 @@ class ChatCreditLogicImpl
 			return;
 
 		if (
-			chatUser.getLastCreditHint () == null
-			|| chatUser.getLastCreditHint ().getTime ()
-				< now.getTime () - 1000 * 60 * 60 * 24
+			isNull (
+				chatUser.getLastCreditHint ())
+			|| lessThan (
+				chatUser.getLastCreditHint ().getTime (),
+				transaction.now ().getMillis () - 1000 * 60 * 60 * 24)
 		) {
 
 			// send message as appropriate
@@ -1258,7 +1267,8 @@ class ChatCreditLogicImpl
 			chatUser
 
 				.setLastCreditHint (
-					now);
+					instantToDate (
+						transaction.now ()));
 
 		}
 
@@ -1284,6 +1294,9 @@ class ChatCreditLogicImpl
 	void creditLimitUpdate (
 			ChatUserRec chatUser) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		// work out the minimum we are aiming for
 
 		int targetLimit =
@@ -1305,7 +1318,8 @@ class ChatCreditLogicImpl
 				chatUser)
 
 			.setTimestamp (
-				new Date ())
+				instantToDate (
+					transaction.now ()))
 
 			.setOldCreditLimit (
 				chatUser.getCreditLimit ())

@@ -3,10 +3,10 @@ package wbs.clients.apn.chat.user.pending.console;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -337,7 +337,8 @@ class ChatUserPendingFormAction
 					: ChatUserInfoStatus.moderatorEdited)
 
 			.setModerationTime (
-				new Date ())
+				instantToDate (
+					transaction.now ()))
 
 			.setEditedText (
 				textHelper.findOrCreate (
@@ -565,7 +566,8 @@ class ChatUserPendingFormAction
 				ChatUserInfoStatus.moderatorRejected)
 
 			.setModerationTime (
-				new Date ())
+				instantToDate (
+					transaction.now ()))
 
 			.setModerator (
 				myUser);
@@ -671,7 +673,8 @@ class ChatUserPendingFormAction
 				ChatUserInfoStatus.moderatorRejected)
 
 			.setModerationTime (
-				new Date ())
+				instantToDate (
+					transaction.now ()))
 
 			.setModerator (
 				myUser);
@@ -865,7 +868,8 @@ class ChatUserPendingFormAction
 				ChatUserInfoStatus.moderatorRejected)
 
 			.setModerationTime (
-				new Date ())
+				instantToDate (
+					transaction.now ()))
 
 			.setModerator (
 				myUser);
@@ -881,7 +885,8 @@ class ChatUserPendingFormAction
 				ChatMessageMethod.iphone,
 				ChatMessageMethod.web)
 
-			&& chat.getSystemChatUser () != null
+			&& isNotNull (
+				chat.getSystemChatUser ())
 
 		) {
 
