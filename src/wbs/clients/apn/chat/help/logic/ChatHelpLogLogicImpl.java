@@ -43,6 +43,9 @@ class ChatHelpLogLogicImpl
 			CommandRec command,
 			boolean queue) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ChatRec chat =
 			chatUser.getChat ();
 
@@ -51,12 +54,30 @@ class ChatHelpLogLogicImpl
 		ChatHelpLogRec chatHelpLog =
 			objectManager.insert (
 				new ChatHelpLogRec ()
-					.setChatUser (chatUser)
-					.setMessage (message)
-					.setText (text)
-					.setCommand (command)
-					.setOurNumber (message.getNumTo ())
-					.setDirection (MessageDirection.in));
+
+			.setChatUser (
+				chatUser)
+
+			.setTimestamp (
+				instantToDate (
+					transaction.now ()))
+
+			.setMessage (
+				message)
+
+			.setText (
+				text)
+
+			.setCommand (
+				command)
+
+			.setOurNumber (
+				message.getNumTo ())
+
+			.setDirection (
+				MessageDirection.in)
+
+		);
 
 		// now create the queue item
 

@@ -84,10 +84,20 @@ class ChatUserNotesAction
 
 		chatUserNoteHelper.insert (
 			new ChatUserNoteRec ()
-				.setChatUser (chatUser)
-				.setTimestamp (transaction.now ())
-				.setUser (user)
-				.setText (noteText));
+
+			.setChatUser (
+				chatUser)
+
+			.setTimestamp (
+				transaction.now ())
+
+			.setUser (
+				user)
+
+			.setText (
+				noteText)
+
+		);
 
 		// wrap up
 

@@ -2939,7 +2939,7 @@ class ChatApiServletModule
 
 			if (selectedImageId != null) {
 
-				ChatUserImageRec selectedCui = null;
+				ChatUserImageRec selectedChatUserImage = null;
 
 				for (
 					ChatUserImageRec cui
@@ -2956,12 +2956,12 @@ class ChatApiServletModule
 						continue;
 					}
 
-					selectedCui =
+					selectedChatUserImage =
 						cui;
 
 				}
 
-				if (selectedCui == null) {
+				if (selectedChatUserImage == null) {
 
 					throw new RpcException (
 						Rpc.rpcError (
@@ -2975,17 +2975,21 @@ class ChatApiServletModule
 				chatUserLogic.setMainChatUserImageByType (
 					chatUser,
 					type,
-					selectedCui);
+					Optional.of (
+						selectedChatUserImage));
 
 			}
 
 			// retrieve all images
 
 			respImages =
-				Rpc.rpcList ("images", "image", RpcType.rStructure);
+				Rpc.rpcList (
+					"images",
+					"image",
+					RpcType.rStructure);
 
 			for (
-				ChatUserImageRec cui
+				ChatUserImageRec chatUserImage
 					: chatUserLogic.getChatUserImageListByType (
 						chatUser,
 						type)
@@ -2998,44 +3002,44 @@ class ChatApiServletModule
 
 						Rpc.rpcElem (
 							"image-id",
-							cui.getId ()),
+							chatUserImage.getId ()),
 
 						Rpc.rpcElem (
 							"media-id",
-							cui.getMedia ().getId ()),
+							chatUserImage.getMedia ().getId ()),
 
 						Rpc.rpcElem (
 							"classification",
-							cui.getClassification ()),
+							chatUserImage.getClassification ()),
 
 						Rpc.rpcElem (
 							"selected",
-							cui == chatUserLogic.getMainChatUserImageByType (
+							chatUserImage == chatUserLogic.getMainChatUserImageByType (
 								chatUser,
 								type)),
 
 						Rpc.rpcElem (
 							"status",
 							chatUserInfoStatusMuneMap.get (
-								cui.getStatus ())),
+								chatUserImage.getStatus ())),
 
 						Rpc.rpcElem (
 							"creation-time",
-							cui.getTimestamp ().getTime ()));
+							chatUserImage.getTimestamp ().getTime ()));
 
-				if (cui.getFullMedia () != null) {
+				if (chatUserImage.getFullMedia () != null) {
 
 					respImage.add (
-						Rpc.rpcElem ("full-media-id", cui.getFullMedia ().getId ()),
-						Rpc.rpcElem ("full-media-filename", cui.getFullMedia ().getFilename ()),
-						Rpc.rpcElem ("full-media-mime-type", cui.getFullMedia ().getMediaType ().getMimeType ()));
+						Rpc.rpcElem ("full-media-id", chatUserImage.getFullMedia ().getId ()),
+						Rpc.rpcElem ("full-media-filename", chatUserImage.getFullMedia ().getFilename ()),
+						Rpc.rpcElem ("full-media-mime-type", chatUserImage.getFullMedia ().getMediaType ().getMimeType ()));
 
 				}
 
-				if (cui.getModerationTime () != null) {
+				if (chatUserImage.getModerationTime () != null) {
 
 					respImage.add (
-						Rpc.rpcElem ("moderation-time", cui.getModerationTime ().getTime ()));
+						Rpc.rpcElem ("moderation-time", chatUserImage.getModerationTime ().getTime ()));
 
 				}
 

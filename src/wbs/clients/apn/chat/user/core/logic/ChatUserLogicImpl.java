@@ -1620,32 +1620,39 @@ class ChatUserLogicImpl
 	void setMainChatUserImageByType (
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatUserImageType type,
-			@NonNull ChatUserImageRec cui) {
+			@NonNull Optional<ChatUserImageRec> chatUserImage) {
 
 		switch (type) {
 
 			case image:
 
-				chatUser.setMainChatUserImage (
-					cui);
+				chatUser
+
+					.setMainChatUserImage (
+						chatUserImage.orNull ());
 
 				break;
 
 			case video:
 
-				chatUser.setMainChatUserVideo (
-					cui);
+				chatUser
+
+					.setMainChatUserVideo (
+						chatUserImage.orNull ());
 
 				break;
 
 			case audio:
 
-				chatUser.setMainChatUserAudio (
-					cui);
+				chatUser
+
+					.setMainChatUserAudio (
+						chatUserImage.orNull ());
 
 				break;
 
 			default:
+
 				throw new RuntimeException ();
 
 		}

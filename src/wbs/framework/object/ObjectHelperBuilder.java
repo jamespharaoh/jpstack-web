@@ -818,8 +818,10 @@ class ObjectHelperBuilder {
 			Record insert (
 					@NonNull Record object) {
 
-				if (! objectClass ().isInstance (
-						object)) {
+				if (
+					! objectClass ().isInstance (
+						object)
+				) {
 
 					throw new ClassCastException (
 						stringFormat (
@@ -829,11 +831,16 @@ class ObjectHelperBuilder {
 
 				}
 
+				System.out.println (
+					"INSERT " + objectTypeCode);
+
 				objectHelperProvider.insert (
 					object);
 
-				for (ObjectHelper childObjectHelper
-						: list) {
+				for (
+					ObjectHelper childObjectHelper
+						: list
+				) {
 
 					ObjectHelperProvider childObjectHelperProvider =
 						childObjectHelper.objectHelperProvider ();
@@ -894,8 +901,10 @@ class ObjectHelperBuilder {
 			Record update (
 					@NonNull Record object) {
 
-				if (! objectClass ().isInstance (
-						object)) {
+				if (
+					! objectClass ().isInstance (
+						object)
+				) {
 
 					throw new ClassCastException (
 						stringFormat (
@@ -993,7 +1002,10 @@ class ObjectHelperBuilder {
 			Integer getParentTypeId (
 					@NonNull Record object) {
 
-				if (! objectClass ().isInstance (object)) {
+				if (
+					! objectClass ().isInstance (
+						object)
+				) {
 
 					throw new IllegalArgumentException ();
 

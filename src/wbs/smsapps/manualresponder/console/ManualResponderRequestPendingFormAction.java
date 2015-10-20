@@ -1,6 +1,7 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
@@ -429,7 +430,8 @@ class ManualResponderRequestPendingFormAction
 				messageText)
 
 			.setTimestamp (
-				transaction.now ().toDate ())
+				instantToDate (
+					transaction.now ()))
 
 		);
 

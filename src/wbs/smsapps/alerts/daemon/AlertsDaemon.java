@@ -413,19 +413,37 @@ class AlertsDaemon
 
 			alertsAlertHelper.insert (
 				new AlertsAlertRec ()
-					.setAlertsSettings (alertsSettings)
-					.setIndex (alertsSettings.getNumAlerts ())
-					.setTimestamp (now)
-					.setUnclaimedItems (numUnclaimed)
-					.setMaximumDuration (maxDurationSeconds)
-					.setText (messageText)
-					.setRecipients (numSent));
+
+				.setAlertsSettings (
+					alertsSettings)
+
+				.setIndex (
+					alertsSettings.getNumAlerts ())
+
+				.setTimestamp (
+					now)
+
+				.setUnclaimedItems (
+					numUnclaimed)
+
+				.setMaximumDuration (
+					maxDurationSeconds)
+
+				.setText (
+					messageText)
+
+				.setRecipients (
+					numSent)
+
+			);
 
 			// update alerts settings
 
 			alertsSettings
+
 				.setLastAlert (
 					transaction.now ())
+
 				.setNumAlerts (
 					alertsSettings.getNumAlerts () + 1);
 
@@ -435,21 +453,43 @@ class AlertsDaemon
 
 		alertsStatusCheckHelper.insert (
 			new AlertsStatusCheckRec ()
-				.setAlertsSettings (alertsSettings)
-				.setIndex (alertsSettings.getNumStatusChecks ())
-				.setTimestamp (transaction.now ())
-				.setUnclaimedItems (numUnclaimed)
-				.setMaximumDuration (maxDurationSeconds)
-				.setResult (alertDue)
-				.setActive (active)
-				.setSentRecently (sentRecently)
-				.setAlertSent (performSend));
+
+			.setAlertsSettings (
+				alertsSettings)
+
+			.setIndex (
+				alertsSettings.getNumStatusChecks ())
+
+			.setTimestamp (
+				transaction.now ())
+
+			.setUnclaimedItems (
+				numUnclaimed)
+
+			.setMaximumDuration (
+				maxDurationSeconds)
+
+			.setResult (
+				alertDue)
+
+			.setActive (
+				active)
+
+			.setSentRecently (
+				sentRecently)
+
+			.setAlertSent (
+				performSend)
+
+		);
 
 		// update alerts settings
 
 		alertsSettings
+
 			.setLastStatusCheck (
 				transaction.now ())
+
 			.setNumStatusChecks (
 				alertsSettings.getNumStatusChecks () + 1);
 

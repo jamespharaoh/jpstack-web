@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.bill.logic;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -439,8 +440,12 @@ class ChatCreditLogicImpl
 			stringFormat (
 				"userSpendCheck (%s, %s, %s)",
 				chatUser.getId (),
-				userActed ? "yes" : "no",
-				threadId));
+				userActed
+					? "yes"
+					: "no",
+				ifNull (
+					threadId,
+					"null")));
 
 		// if user acted then clear block and send pending bill
 

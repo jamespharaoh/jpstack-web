@@ -150,7 +150,7 @@ class SupervisorPageBuilder {
 				return supervisorPart.get ()
 
 					.fileName (
-						spec.fileName ())
+						fileName)
 
 					.fixedSupervisorConfigName (
 						spec.configName ());

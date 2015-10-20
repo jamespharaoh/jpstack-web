@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.contact.console;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.parseTimeAfter;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -173,12 +174,27 @@ class ChatMonitorInboxAlarmAction
 
 			chatUserInitiationLogHelper.insert (
 				new ChatUserInitiationLogRec ()
-					.setChatUser (userChatUser)
-					.setMonitorChatUser (monitorChatUser)
-					.setReason (ChatUserInitiationReason.alarmCancel)
-					.setTimestamp (transaction.now ().toDate ())
-					.setMonitorUser (myUser)
-					.setAlarmTime (chatUserAlarm.getAlarmTime ()));
+
+				.setChatUser (
+					userChatUser)
+
+				.setMonitorChatUser (
+					monitorChatUser)
+
+				.setReason (
+					ChatUserInitiationReason.alarmCancel)
+
+				.setTimestamp (
+					instantToDate (
+						transaction.now ()))
+
+				.setMonitorUser (
+					myUser)
+
+				.setAlarmTime (
+					chatUserAlarm.getAlarmTime ())
+
+			);
 
 		}
 
@@ -192,8 +208,12 @@ class ChatMonitorInboxAlarmAction
 
 				chatUserAlarm =
 					new ChatUserAlarmRec ()
-						.setChatUser (userChatUser)
-						.setMonitorChatUser (monitorChatUser);
+
+					.setChatUser (
+						userChatUser)
+
+					.setMonitorChatUser (
+						monitorChatUser);
 
 				insert = true;
 
@@ -224,12 +244,26 @@ class ChatMonitorInboxAlarmAction
 
 			chatUserInitiationLogHelper.insert (
 				new ChatUserInitiationLogRec ()
-					.setChatUser (userChatUser)
-					.setMonitorChatUser (monitorChatUser)
-					.setReason (ChatUserInitiationReason.alarmSet)
-					.setAlarmTime (alarmTime.toDate ())
-					.setTimestamp (transaction.now ().toDate ())
-					.setMonitorUser (myUser));
+
+				.setChatUser (
+					userChatUser)
+
+				.setMonitorChatUser (
+					monitorChatUser)
+
+				.setReason (
+					ChatUserInitiationReason.alarmSet)
+
+				.setAlarmTime (
+					alarmTime.toDate ())
+
+				.setTimestamp (
+					transaction.now ().toDate ())
+
+				.setMonitorUser (
+					myUser)
+
+			);
 
 		}
 

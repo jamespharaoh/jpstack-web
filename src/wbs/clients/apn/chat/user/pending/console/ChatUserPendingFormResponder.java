@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.user.pending.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -90,41 +91,47 @@ class ChatUserPendingFormResponder
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
 
-		if (chatUser.getNewChatUserName () != null) {
+		if (
+			isNotNull (
+				chatUser.getNewChatUserName ())
+		) {
 
 			mode =
 				PendingMode.name;
 
-		} else if (chatUser.getNewChatUserInfo () != null) {
+		} else if (
+			isNotNull (
+				chatUser.getNewChatUserInfo ())
+		) {
 
 			mode =
 				PendingMode.info;
 
 		} else if (
-			chatUserLogic.chatUserPendingImage (
-				chatUser,
-				ChatUserImageType.image
-			) != null
+			isNotNull (
+				chatUserLogic.chatUserPendingImage (
+					chatUser,
+					ChatUserImageType.image))
 		) {
 
 			mode =
 				PendingMode.image;
 
 		} else if (
-			chatUserLogic.chatUserPendingImage (
-				chatUser,
-				ChatUserImageType.video
-			) != null
+			isNotNull (
+				chatUserLogic.chatUserPendingImage (
+					chatUser,
+					ChatUserImageType.video))
 		) {
 
 			mode =
 				PendingMode.video;
 
 		} else if (
-			chatUserLogic.chatUserPendingImage (
-				chatUser,
-				ChatUserImageType.audio
-			) != null
+			isNotNull (
+				chatUserLogic.chatUserPendingImage (
+					chatUser,
+					ChatUserImageType.audio))
 		) {
 
 			mode =

@@ -384,6 +384,9 @@ class ChatInfoLogicImpl
 			Integer threadId,
 			boolean asDating) {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ChatRec chat =
 			thisUser.getChat ();
 
@@ -400,7 +403,7 @@ class ChatInfoLogicImpl
 				thisUser)
 
 			.setCreateTime (
-				Instant.now ())
+				transaction.now ())
 
 			.setNumViews (
 				0)

@@ -469,14 +469,18 @@ class ChatUserPendingFormAction
 
 				transaction.flush ();
 
-				chatUserImage.setIndex (index);
+				chatUserImage
+
+					.setIndex (
+						index);
 
 			}
 
 			chatUserLogic.setMainChatUserImageByType (
 				chatUser,
 				imageType,
-				chatUserImage);
+				Optional.of (
+					chatUserImage));
 
 		}
 

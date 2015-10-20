@@ -326,7 +326,7 @@ interface ChatUserLogic {
 	void setMainChatUserImageByType (
 			ChatUserRec chatUser,
 			ChatUserImageType type,
-			ChatUserImageRec cui);
+			Optional<ChatUserImageRec> chatUserImage);
 
 	String getPrettyName (
 			ChatUserRec chatUser);

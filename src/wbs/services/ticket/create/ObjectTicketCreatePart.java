@@ -95,7 +95,9 @@ class ObjectTicketCreatePart
 
 		ticket =
 			new TicketRec ()
-				.setTicketManager(ticketManager);
+
+			.setTicketManager (
+				ticketManager);
 
 		for (
 			ObjectTicketCreateSetFieldSpec ticketFieldSpec

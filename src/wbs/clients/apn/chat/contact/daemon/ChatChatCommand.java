@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.contact.daemon;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -28,6 +29,7 @@ import wbs.clients.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.clients.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -150,6 +152,9 @@ class ChatChatCommand
 
 	InboxAttemptRec doBlock () {
 
+		Transaction transaction =
+			database.currentTransaction ();
+
 		ServiceRec defaultService =
 			serviceHelper.findByCode (
 				chat,
@@ -166,8 +171,18 @@ class ChatChatCommand
 
 			chatBlockHelper.insert (
 				new ChatBlockRec ()
-					.setChatUser (fromChatUser)
-					.setBlockedChatUser (toChatUser));
+
+				.setChatUser (
+					fromChatUser)
+
+				.setBlockedChatUser (
+					toChatUser)
+
+				.setTimestamp (
+					instantToDate (
+						transaction.now ()))
+
+			);
 
 		}
 

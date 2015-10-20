@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
 import lombok.Cleanup;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -255,7 +257,7 @@ class ChatUserImageListAction
 					chatUserLogic.setMainChatUserImageByType (
 						chatUser,
 						type,
-						null);
+						Optional.<ChatUserImageRec>absent ());
 
 					notice =
 						"Image unselected";
@@ -265,7 +267,8 @@ class ChatUserImageListAction
 					chatUserLogic.setMainChatUserImageByType (
 						chatUser,
 						type,
-						chatUserImage);
+						Optional.of (
+							chatUserImage));
 
 					notice =
 						"Image selected";
