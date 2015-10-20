@@ -1,6 +1,6 @@
 package wbs.platform.misc;
 
-import static wbs.framework.utils.etc.Misc.lessThan;
+import static wbs.framework.utils.etc.Misc.earlierThan;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -61,9 +61,10 @@ class CachedGetter<Type>
 		// call refresh if necessary
 
 		if (
-			lessThan (
-				lastReload.getMillis () + reloadTimeMs,
-				transaction.now ().getMillis ())
+			earlierThan (
+				lastReload.plus (
+					reloadTimeMs),
+				transaction.now ())
 		) {
 
 			value =

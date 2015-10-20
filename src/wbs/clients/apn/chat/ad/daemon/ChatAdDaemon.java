@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.ad.daemon;
 
-import static wbs.framework.utils.etc.Misc.moreThan;
+import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -173,7 +174,8 @@ class ChatAdDaemon
 		// find the user
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (chatUserId);
+			chatUserHelper.find (
+				chatUserId);
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -181,9 +183,10 @@ class ChatAdDaemon
 		// check he really is due an ad
 
 		if (
-			moreThan (
-				chatUser.getNextAd ().getTime (),
-				transaction.now ().getMillis ())
+			laterThan (
+				dateToInstant (
+					chatUser.getNextAd ()),
+				transaction.now ())
 		) {
 			return;
 		}

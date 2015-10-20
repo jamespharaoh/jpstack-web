@@ -1,8 +1,9 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -138,7 +139,8 @@ class ChatUserQuietDaemon
 				chatUserId);
 
 		String userPath =
-			objectManager.objectPath (user);
+			objectManager.objectPath (
+				user);
 
 		// check and clear the outbound message flag
 
@@ -147,9 +149,10 @@ class ChatUserQuietDaemon
 			isNull (
 				user.getNextQuietOutbound ())
 
-			|| lessThan (
-				transaction.now ().getMillis (),
-				user.getNextQuietOutbound ().getTime ())
+			|| earlierThan (
+				transaction.now (),
+				dateToInstant (
+					user.getNextQuietOutbound ()))
 
 		) {
 			return;

@@ -1,7 +1,10 @@
 package wbs.clients.apn.chat.user.info.logic;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -1097,9 +1100,10 @@ class ChatInfoLogicImpl
 					isNotNull (
 						chatUserContact.getLastInfoTime ())
 
-					&& moreThan (
-						chatUserContact.getLastInfoTime ().getTime (),
-						cutoffTime.getMillis ())
+					&& laterThan (
+						dateToInstant (
+							chatUserContact.getLastInfoTime ()),
+						cutoffTime)
 
 				) {
 					continue;
@@ -1110,9 +1114,10 @@ class ChatInfoLogicImpl
 					isNotNull (
 						chatUserContact.getLastDeliveredMessageTime ())
 
-					&& moreThan (
-						chatUserContact.getLastDeliveredMessageTime ().getTime (),
-						cutoffTime.getMillis ())
+					&& laterThan (
+						dateToInstant (
+							chatUserContact.getLastDeliveredMessageTime ()),
+						cutoffTime)
 
 				) {
 					continue;
@@ -1123,9 +1128,10 @@ class ChatInfoLogicImpl
 					isNotNull (
 						chatUserContact.getLastPicTime ())
 
-					&& moreThan (
-						chatUserContact.getLastPicTime ().getTime (),
-						cutoffTime.getMillis ())
+					&& laterThan (
+						dateToInstant (
+							chatUserContact.getLastPicTime ()),
+						cutoffTime)
 
 				) {
 					continue;
@@ -1140,11 +1146,23 @@ class ChatInfoLogicImpl
 
 			// ignore users according to monitor cap
 
-			if (thisUser.getMonitorCap () != null
-					&& chatUser.getType () == ChatUserType.monitor
-					&& (chatUser.getCode ().charAt (2) - '0')
-						>= thisUser.getMonitorCap ())
+			if (
+
+				isNotNull (
+					thisUser.getMonitorCap ())
+
+				&& equal (
+					chatUser.getType (),
+					ChatUserType.monitor)
+
+				&& (
+					moreThan (
+						chatUser.getCode ().charAt (2) - '0',
+						thisUser.getMonitorCap ()))
+
+			) {
 				continue;
+			}
 
 			// ignore system user
 
@@ -1214,9 +1232,10 @@ class ChatInfoLogicImpl
 				&& isNotNull (
 					chatContact.getLastPicTime ())
 
-				&& moreThan (
-					chatContact.getLastPicTime ().getTime (),
-					cutoffTime.getMillis ())
+				&& laterThan (
+					dateToInstant (
+						chatContact.getLastPicTime ()),
+					cutoffTime)
 
 			) {
 				continue;
@@ -1306,9 +1325,10 @@ class ChatInfoLogicImpl
 				&& isNotNull (
 					chatContact.getLastVideoTime ())
 
-				&& moreThan (
-					chatContact.getLastVideoTime ().getTime (),
-					cutoffTime.getMillis ())
+				&& laterThan (
+					dateToInstant (
+						chatContact.getLastVideoTime ()),
+					cutoffTime)
 
 			) {
 				continue;

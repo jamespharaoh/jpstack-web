@@ -1585,7 +1585,8 @@ class Misc {
 	Instant millisToInstant (
 			long millis) {
 
-		return new Instant (millis);
+		return new Instant (
+			millis);
 
 	}
 
@@ -1864,8 +1865,10 @@ class Misc {
 		Instant earliest =
 			null;
 
-		for (Instant instant
-				: instants) {
+		for (
+			Instant instant
+				: instants
+		) {
 
 			if (
 
@@ -1912,6 +1915,26 @@ class Misc {
 
 		return ! collection.contains (
 			value);
+
+	}
+
+	public static
+	boolean earlierThan (
+			@NonNull Instant left,
+			@NonNull Instant right) {
+
+		return left.isBefore (
+			right);
+
+	}
+
+	public static
+	boolean laterThan (
+			@NonNull Instant left,
+			@NonNull Instant right) {
+
+		return left.isAfter (
+			right);
 
 	}
 

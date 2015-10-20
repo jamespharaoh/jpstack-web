@@ -1,11 +1,12 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -150,10 +151,12 @@ class ChatUserOnlineDaemon
 				isNull (
 					chatUser.getLastAction ())
 
-				|| lessThan (
-					chatUser.getLastAction ().getTime ()
-						+ chat.getTimeLogoff () * 1000,
-					transaction.now ().getMillis ())
+				|| earlierThan (
+					dateToInstant (
+						chatUser.getLastAction ()
+					).plus (
+						chat.getTimeLogoff () * 1000),
+					transaction.now ())
 
 			)
 
@@ -262,10 +265,12 @@ class ChatUserOnlineDaemon
 				isNull (
 					chatUser.getLastSend ())
 
-				|| lessThan (
-					chatUser.getLastSend ().getTime ()
-						+ chat.getTimeSend () * 1000,
-					transaction.now ().getMillis ())
+				|| earlierThan (
+					dateToInstant (
+						chatUser.getLastSend ()
+					).plus (
+						chat.getTimeSend () * 1000),
+					transaction.now ())
 
 			)
 
@@ -274,10 +279,12 @@ class ChatUserOnlineDaemon
 				isNull (
 					chatUser.getLastReceive ())
 
-				|| lessThan (
-					chatUser.getLastReceive ().getTime ()
-						+ chat.getTimeReceive () * 1000,
-					transaction.now ().getMillis ())
+				|| earlierThan (
+					dateToInstant (
+						chatUser.getLastReceive ()
+					).plus (
+						chat.getTimeReceive () * 1000),
+					transaction.now ())
 
 			)
 
@@ -286,24 +293,24 @@ class ChatUserOnlineDaemon
 				isNull (
 					chatUser.getLastInfo ())
 
-				|| lessThan (
-					chatUser.getLastInfo ().getTime ()
-						+ chat.getTimeInfo () * 1000,
-					transaction.now ().getMillis ())
-
-			)
+				|| earlierThan (
+					dateToInstant (
+						chatUser.getLastInfo ()
+					).plus (
+						chat.getTimeInfo () * 1000),
+					transaction.now ()))
 
 			&& (
 
 				isNull (
 					chatUser.getLastPic ())
 
-				|| lessThan (
-					chatUser.getLastPic ().getTime ()
-						+ chat.getTimeInfo () * 1000,
-					transaction.now ().getMillis ())
-
-			)
+				|| earlierThan (
+					dateToInstant (
+						chatUser.getLastPic ()
+					).plus (
+						chat.getTimeInfo () * 1000),
+					transaction.now ()))
 
 			&& (
 
@@ -312,9 +319,7 @@ class ChatUserOnlineDaemon
 
 				|| moreThan (
 					chatUser.getSessionInfoRemain (),
-					1)
-
-			)
+					1))
 
 		) {
 
@@ -353,18 +358,20 @@ class ChatUserOnlineDaemon
 				isNull (
 					chatUser.getLastNameHint ())
 
-				|| lessThan (
-					chatUser.getLastNameHint ().getTime ()
-						+ chat.getTimeName () * 1000,
-					transaction.now ().getMillis ()))
+				|| earlierThan (
+					dateToInstant (
+						chatUser.getLastNameHint ()
+					).plus (chat.getTimeName () * 1000),
+					transaction.now ()))
 
 			&& isNotNull (
 				chatUser.getLastJoin ())
 
-			&& lessThan (
-				chatUser.getLastJoin ().getTime ()
-					+ chat.getTimeNameJoin () * 1000,
-				transaction.now ().getMillis ())
+			&& earlierThan (
+				dateToInstant (
+					chatUser.getLastJoin ()
+				).plus (chat.getTimeNameJoin () * 1000),
+				transaction.now ())
 
 		) {
 
@@ -407,18 +414,20 @@ class ChatUserOnlineDaemon
 				isNull (
 					chatUser.getLastPicHint ())
 
-				|| lessThan (
-					chatUser.getLastPicHint ().getTime ()
-						+ chat.getTimePicHint () * 1000,
-					transaction.now ().getMillis ()))
+				|| earlierThan (
+					dateToInstant (
+						chatUser.getLastPicHint ()
+					).plus (chat.getTimePicHint () * 1000),
+					transaction.now ()))
 
 			&& isNotNull (
 				chatUser.getLastJoin ())
 
-			&& lessThan (
-				chatUser.getLastJoin ().getTime ()
-					+ 15 * 60 * 1000,
-				transaction.now ().getMillis ())
+			&& earlierThan (
+				dateToInstant (
+					chatUser.getLastJoin ()
+				).plus (15 * 60 * 1000),
+				transaction.now ())
 
 		) {
 
@@ -444,28 +453,33 @@ class ChatUserOnlineDaemon
 				isNull (
 					chatUser.getLastPicHint ())
 
-				|| lessThan (
-					chatUser.getLastPicHint ().getTime ()
-						+ chat.getTimePicHint () * 1000,
-					transaction.now ().getMillis ()))
+				|| earlierThan (
+					dateToInstant (
+						chatUser.getLastPicHint ()
+					).plus (
+						chat.getTimePicHint () * 1000),
+					transaction.now ()))
 
 			&& (
 
 				isNull (
 					chatUser.getLastPic ())
 
-				|| lessThan (
-					chatUser.getLastPic ().getTime ()
-						+ chat.getTimePicHint () * 1000,
-					transaction.now ().getMillis ()))
+				|| earlierThan (
+					dateToInstant (
+						chatUser.getLastPic ()
+					).plus (
+						chat.getTimePicHint () * 1000),
+					transaction.now ()))
 
 			&& isNotNull (
 				chatUser.getLastJoin ())
 
-			&& lessThan (
-				chatUser.getLastJoin ().getTime ()
-					+ 15 * 60 * 1000,
-				transaction.now ().getMillis ())
+			&& earlierThan (
+				dateToInstant (
+					chatUser.getLastJoin ()
+				).plus (15 * 60 * 1000),
+				transaction.now ())
 
 		) {
 

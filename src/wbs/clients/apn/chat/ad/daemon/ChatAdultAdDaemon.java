@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.ad.daemon;
 
-import static wbs.framework.utils.etc.Misc.moreThan;
+import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -165,7 +166,8 @@ class ChatAdultAdDaemon
 		// find the user
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (chatUserId);
+			chatUserHelper.find (
+				chatUserId);
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -173,9 +175,10 @@ class ChatAdultAdDaemon
 		// check he really is due an adult ad
 
 		if (
-			moreThan (
-				chatUser.getNextAdultAd ().getTime (),
-				transaction.now ().getMillis ())
+			laterThan (
+				dateToInstant (
+					chatUser.getNextAdultAd ()),
+				transaction.now ())
 		) {
 			return;
 		}
@@ -185,10 +188,16 @@ class ChatAdultAdDaemon
 			log.info (
 				stringFormat (
 					"Skipping adult ad to %s (no adult ads on this service)",
-					objectManager.objectPath (chatUser)));
+					objectManager.objectPath (
+						chatUser)));
 
-			chatUser.setNextAdultAd (null);
+			chatUser
+
+				.setNextAdultAd (
+					null);
+
 			transaction.commit ();
+
 			return;
 
 		}

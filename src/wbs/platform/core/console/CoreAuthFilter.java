@@ -1,10 +1,12 @@
 package wbs.platform.core.console;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.lessThan;
+import static wbs.framework.utils.etc.Misc.millisToInstant;
 import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.io.IOException;
@@ -66,7 +68,9 @@ class CoreAuthFilter
 	final static
 	int logoffTime = 60 * 1000;
 
-	long lastReload = 0;
+	Instant lastReload =
+		millisToInstant (
+			0);
 
 	Map<Integer,String> onlineSessionIdsByUserId;
 
@@ -112,10 +116,12 @@ class CoreAuthFilter
 
 				! user.getActive ()
 
-				|| lessThan (
-					online .getTimestamp ().getTime ()
-						+ logoffTime,
-					transaction.now ().getMillis ())
+				|| earlierThan (
+					dateToInstant (
+						online.getTimestamp ()
+					).plus (
+						logoffTime),
+					transaction.now ())
 
 			) {
 
@@ -167,9 +173,10 @@ class CoreAuthFilter
 			isNull (
 				onlineSessionIdsByUserId)
 
-			|| lessThan (
-				lastReload + reloadTime,
-				transaction.now ().getMillis ())
+			|| earlierThan (
+				lastReload.plus (
+					reloadTime),
+				transaction.now ())
 
 			|| equal (
 				requestContext.servletPath (),
@@ -180,7 +187,7 @@ class CoreAuthFilter
 			reload ();
 
 			lastReload =
-				transaction.now ().getMillis ();
+				transaction.now ();
 
 			reloaded = true;
 
@@ -201,7 +208,7 @@ class CoreAuthFilter
 			reload ();
 
 			lastReload =
-				transaction.now ().getMillis ();
+				transaction.now ();
 
 			if (! equal (
 					onlineSessionIdsByUserId.get (

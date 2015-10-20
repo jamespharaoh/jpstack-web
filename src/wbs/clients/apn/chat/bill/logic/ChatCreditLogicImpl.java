@@ -5,8 +5,8 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.sum;
@@ -1159,11 +1159,16 @@ class ChatCreditLogicImpl
 			return;
 
 		if (
+
 			isNull (
 				chatUser.getLastCreditHint ())
-			|| lessThan (
-				chatUser.getLastCreditHint ().getTime (),
-				transaction.now ().getMillis () - 1000 * 60 * 60 * 24)
+
+			|| earlierThan (
+				dateToInstant (
+					chatUser.getLastCreditHint ()),
+				transaction.now ().minus (
+					1000 * 60 * 60 * 24))
+
 		) {
 
 			// send message as appropriate
