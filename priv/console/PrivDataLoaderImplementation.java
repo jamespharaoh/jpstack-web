@@ -5,7 +5,6 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +18,9 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Instant;
+
 import wbs.console.priv.PrivDataLoader;
 import wbs.console.priv.UserPrivData;
 import wbs.console.priv.UserPrivData.ObjectData;
@@ -198,8 +200,8 @@ class PrivDataLoaderImplementation
 			log.debug (
 				"Priv reload started");
 
-			long startTime =
-				System.currentTimeMillis ();
+			Instant startTime =
+				Instant.now ();
 
 			// get privs, excluding any whose parent object types are
 			// unknown, this is a hack.
@@ -392,13 +394,13 @@ class PrivDataLoaderImplementation
 
 			// end timer
 
-			long endTime =
-				new Date ().getTime ();
+			Instant endTime =
+				Instant.now ();
 
 			log.debug (
 				stringFormat (
 					"Reload complete (%sms",
-					endTime - startTime));
+					endTime.getMillis () - startTime.getMillis ()));
 
 			return newData;
 		}
@@ -481,8 +483,8 @@ class PrivDataLoaderImplementation
 					"User %s priv reload started",
 					userId));
 
-			long startTime =
-				new Date ().getTime ();
+			Instant startTime =
+				Instant.now ();
 
 			// get user
 
@@ -491,8 +493,10 @@ class PrivDataLoaderImplementation
 
 			// do user-specific privs
 
-			for (UserPrivRec userPriv :
-					user.getUserPrivs ()) {
+			for (
+				UserPrivRec userPriv
+					: user.getUserPrivs ()
+			) {
 
 				PrivRec priv =
 					userPriv.getPriv ();
@@ -540,14 +544,14 @@ class PrivDataLoaderImplementation
 
 			// end timer
 
-			long endTime =
-				new Date ().getTime ();
+			Instant endTime =
+				Instant.now ();
 
 			log.debug (
 				stringFormat (
 					"User %s priv reload complere (%sms)",
 					userId,
-					endTime - startTime));
+					endTime.getMillis () - startTime.getMillis ()));
 
 			return newData;
 

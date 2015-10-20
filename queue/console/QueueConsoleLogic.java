@@ -1,13 +1,14 @@
 package wbs.platform.queue.console;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-
-import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimRec;
@@ -23,6 +24,11 @@ import wbs.platform.user.model.UserRec;
 public
 class QueueConsoleLogic {
 
+	// dependencies
+
+	@Inject
+	Database database;
+
 	@Inject
 	ObjectManager objectManager;
 
@@ -35,10 +41,15 @@ class QueueConsoleLogic {
 	@Inject
 	Provider<QueueSubjectSorter> queueSubjectSorter;
 
+	// implementation
+
 	public
 	QueueItemRec claimQueueItem (
 			QueueRec queue,
 			UserRec user) {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		// find the next waiting item
 
@@ -76,16 +87,31 @@ class QueueConsoleLogic {
 		QueueItemClaimRec queueItemClaim =
 			queueItemClaimHelper.insert (
 				new QueueItemClaimRec ()
-					.setQueueItem (queueItem)
-					.setUser (user)
-					.setStartTime (new Date ())
-					.setStatus (QueueItemClaimStatus.claimed));
+
+			.setQueueItem (
+				queueItem)
+
+			.setUser (
+				user)
+
+			.setStartTime (
+				instantToDate (
+					transaction.now ()))
+
+			.setStatus (
+				QueueItemClaimStatus.claimed)
+
+		);
 
 		// update queue item
 
 		queueItem
-			.setState (QueueItemState.claimed)
-			.setQueueItemClaim (queueItemClaim);
+
+			.setState (
+				QueueItemState.claimed)
+
+			.setQueueItemClaim (
+				queueItemClaim);
 
 		// and return
 
@@ -98,7 +124,8 @@ class QueueConsoleLogic {
 			QueueItemRec queueItem,
 			UserRec user) {
 
-		Date now = new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
 		QueueSubjectRec queueSubject =
 			queueItem.getQueueSubject ();
@@ -131,14 +158,23 @@ class QueueConsoleLogic {
 		// update queue item claim
 
 		queueItem.getQueueItemClaim ()
-			.setEndTime (now)
-			.setStatus (QueueItemClaimStatus.unclaimed);
+
+			.setEndTime (
+				instantToDate (
+					transaction.now ()))
+
+			.setStatus (
+				QueueItemClaimStatus.unclaimed);
 
 		// update the queue item
 
 		queueItem
-			.setState (QueueItemState.pending)
-			.setQueueItemClaim (null);
+
+			.setState (
+				QueueItemState.pending)
+
+			.setQueueItemClaim (
+				null);
 
 	}
 
@@ -148,7 +184,8 @@ class QueueConsoleLogic {
 			UserRec oldUser,
 			UserRec newUser) {
 
-		Date now = new Date ();
+		Transaction transaction =
+			database.currentTransaction ();
 
 		QueueSubjectRec queueSubject =
 			queueItem.getQueueSubject ();
@@ -181,18 +218,34 @@ class QueueConsoleLogic {
 		// update old queue item claim
 
 		queueItem.getQueueItemClaim ()
-			.setEndTime (now)
-			.setStatus (QueueItemClaimStatus.forcedUnclaim);
+
+			.setEndTime (
+				instantToDate (
+					transaction.now ()))
+
+			.setStatus (
+				QueueItemClaimStatus.forcedUnclaim);
 
 		// create new queue item claim
 
 		QueueItemClaimRec queueItemClaim =
 			queueItemClaimHelper.insert (
 				new QueueItemClaimRec ()
-					.setQueueItem (queueItem)
-					.setUser (newUser)
-					.setStartTime (now)
-					.setStatus (QueueItemClaimStatus.claimed));
+
+			.setQueueItem (
+				queueItem)
+
+			.setUser (
+				newUser)
+
+			.setStartTime (
+				instantToDate (
+					transaction.now ()))
+
+			.setStatus (
+				QueueItemClaimStatus.claimed)
+
+		);
 
 		// update queue item
 

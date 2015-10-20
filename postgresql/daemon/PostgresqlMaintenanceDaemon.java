@@ -20,6 +20,9 @@ import javax.sql.DataSource;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Instant;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.platform.daemon.AbstractDaemonService;
@@ -155,14 +158,14 @@ class PostgresqlMaintenanceDaemon
 
 					// perform (and time) the command
 
-					long time1 =
-						new Date ().getTime ();
+					Instant time1 =
+						Instant.now ();
 
 					statement.execute (
 						command.command);
 
-					long time2 =
-						new Date ().getTime ();
+					Instant time2 =
+						Instant.now ();
 
 					// collect output
 
@@ -195,11 +198,12 @@ class PostgresqlMaintenanceDaemon
 
 					updateStatement.setTimestamp (
 						1,
-						new Timestamp (time1));
+						new Timestamp (
+							time1.getMillis ()));
 
 					updateStatement.setLong (
 						2,
-						time2 - time1);
+						time2.getMillis () - time1.getMillis ());
 
 					updateStatement.setString (
 						3,
