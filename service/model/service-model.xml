@@ -22,7 +22,8 @@
 
 		<description-field/>
 
-		<type-field/>
+		<type-field
+			column="type_id"/>
 
 	</fields>
 
