@@ -156,8 +156,8 @@ class CoreAuthFilter
 	private synchronized
 	boolean checkUser () {
 
-		Transaction transaction =
-			database.currentTransaction ();
+		Instant now =
+			Instant.now ();
 
 		// check there is a user id
 
@@ -176,7 +176,7 @@ class CoreAuthFilter
 			|| earlierThan (
 				lastReload.plus (
 					reloadTime),
-				transaction.now ())
+				now)
 
 			|| equal (
 				requestContext.servletPath (),
@@ -187,7 +187,7 @@ class CoreAuthFilter
 			reload ();
 
 			lastReload =
-				transaction.now ();
+				now;
 
 			reloaded = true;
 
@@ -208,13 +208,16 @@ class CoreAuthFilter
 			reload ();
 
 			lastReload =
-				transaction.now ();
+				now;
 
-			if (! equal (
+			if (
+				notEqual (
 					onlineSessionIdsByUserId.get (
 						requestContext.userId ()),
-					requestContext.sessionId ()))
+					requestContext.sessionId ())
+			) {
 				return false;
+			}
 
 		}
 
@@ -222,7 +225,7 @@ class CoreAuthFilter
 
 		activeSessions.put (
 			requestContext.sessionId (),
-			transaction.now ());
+			now);
 
 		return true;
 

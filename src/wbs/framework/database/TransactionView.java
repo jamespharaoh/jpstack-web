@@ -1,5 +1,7 @@
 package wbs.framework.database;
 
+import lombok.NonNull;
+
 import org.joda.time.Instant;
 
 public
@@ -11,7 +13,7 @@ class TransactionView
 
 	public
 	TransactionView (
-			Transaction realTransaction) {
+			@NonNull Transaction realTransaction) {
 
 		this.realTransaction =
 			realTransaction;
