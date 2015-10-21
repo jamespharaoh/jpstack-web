@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.BinaryFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("binaryFieldWriter")
@@ -70,12 +72,23 @@ class BinaryFieldWriter {
 
 		// write field
 
-		javaWriter.writeFormat (
-			"\tbyte[] %s;\n",
-			spec.name ());
+		new PropertyWriter ()
 
-		javaWriter.writeFormat (
-			"\n");
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
+
+			.typeNameFormat (
+				"byte[]")
+
+			.propertyNameFormat (
+				"%s",
+				spec.name ())
+
+			.write (
+				javaWriter,
+				"\t");
 
 	}
 

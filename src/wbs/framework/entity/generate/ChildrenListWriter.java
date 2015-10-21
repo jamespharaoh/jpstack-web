@@ -21,6 +21,7 @@ import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ChildrenListSpec;
 import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("childrenListWriter")
@@ -70,9 +71,10 @@ class ChildrenListWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
-		String fieldTypeName =
+		String fullFieldTypeName =
 			stringFormat (
-				"%sRec",
+				"%s.model.%sRec",
+				fieldTypePlugin.packageName (),
 				capitalise (
 					spec.typeName ()));
 
@@ -104,19 +106,28 @@ class ChildrenListWriter {
 
 		// write field
 
-		javaWriter.writeFormat (
-			"\tList<%s.model.%s> %s =\n",
-			fieldTypePlugin.packageName (),
-			fieldTypeName,
-			fieldName);
+		new PropertyWriter ()
 
-		javaWriter.writeFormat (
-			"\t\tnew ArrayList<%s.model.%s> ();\n",
-			fieldTypePlugin.packageName (),
-			fieldTypeName);
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
 
-		javaWriter.writeFormat (
-			"\n");
+			.typeNameFormat (
+				"List<%s>",
+				fullFieldTypeName)
+
+			.propertyNameFormat (
+				"%s",
+				fieldName)
+
+			.defaultValueFormat (
+				"new ArrayList<%s> ()",
+				fullFieldTypeName)
+
+			.write (
+				javaWriter,
+				"\t");
 
 	}
 

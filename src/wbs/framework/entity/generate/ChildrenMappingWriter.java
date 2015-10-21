@@ -1,7 +1,6 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -22,6 +21,7 @@ import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ChildrenMappingSpec;
 import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("childrenMappingWriter")
@@ -70,9 +70,10 @@ class ChildrenMappingWriter {
 					"%ss",
 					spec.typeName ()));
 
-		String fieldTypeName =
+		String fullFieldTypeName =
 			stringFormat (
-				"%sRec",
+				"%s.model.%sRec",
+				fieldTypePlugin.packageName (),
 				capitalise (
 					spec.typeName ()));
 
@@ -113,48 +114,33 @@ class ChildrenMappingWriter {
 
 		// write field
 
-		if (
-			equal (
-				spec.mapType (),
-				"integer")
-		) {
+		new PropertyWriter ()
 
-			javaWriter.writeFormat (
-				"\tMap<Integer,%s.model.%s> %s =\n",
-				fieldTypePlugin.packageName (),
-				fieldTypeName,
-				fieldName);
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
 
-			javaWriter.writeFormat (
-				"\t\tnew LinkedHashMap<Integer,%s.model.%s> ();\n",
-				fieldTypePlugin.packageName (),
-				fieldTypeName);
+			.typeNameFormat (
+				"Map<%s,%s>",
+				capitalise (
+					spec.mapType ()),
+				fullFieldTypeName)
 
-		} else if (
-			equal (
-				spec.mapType (),
-				"string")
-		) {
+			.propertyNameFormat (
+				"%s",
+				fieldName)
 
-			javaWriter.writeFormat (
-				"\tMap<String,%s.model.%s> %s =\n",
-				fieldTypePlugin.packageName (),
-				fieldTypeName,
-				fieldName);
+			.defaultValueFormat (
+				"new LinkedHashMap<%s,%s> ()",
+				capitalise (
+					spec.mapType ()),
+				fullFieldTypeName)
 
-			javaWriter.writeFormat (
-				"\t\tnew LinkedHashMap<String,%s.model.%s> ();\n",
-				fieldTypePlugin.packageName (),
-				fieldTypeName);
+			.write (
+				javaWriter,
+				"\t");
 
-		} else {
-
-			throw new RuntimeException ();
-
-		}
-
-		javaWriter.writeFormat (
-			"\n");
 
 	}
 

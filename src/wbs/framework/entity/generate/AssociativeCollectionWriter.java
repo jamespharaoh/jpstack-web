@@ -21,6 +21,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.AssociativeCollectionSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("associativeCollectionWriter")
@@ -125,17 +126,28 @@ class AssociativeCollectionWriter {
 
 		// write field
 
-		javaWriter.writeFormat (
-			"\tSet<%s> %s =\n",
-			fullFieldTypeName,
-			fieldName);
+		new PropertyWriter ()
 
-		javaWriter.writeFormat (
-			"\t\tnew LinkedHashSet<%s> ();\n",
-			fullFieldTypeName);
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
 
-		javaWriter.writeFormat (
-			"\n");
+			.typeNameFormat (
+				"Set<%s>",
+				fullFieldTypeName)
+
+			.propertyNameFormat (
+				"%s",
+				fieldName)
+
+			.defaultValueFormat (
+				"new LinkedHashSet<%s> ()",
+				fullFieldTypeName)
+
+			.write (
+				javaWriter,
+				"\t");
 
 	}
 

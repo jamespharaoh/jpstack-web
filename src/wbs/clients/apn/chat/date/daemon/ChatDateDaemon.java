@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.date.daemon;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.min;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -476,20 +477,34 @@ class ChatDateDaemon
 
 		}
 
-		thisUser.setDateDailyDate (today);
+		thisUser
+
+			.setDateDailyDate (
+				today);
 
 		log.debug (
 			stringFormat (
-				"Updated %d: dailyCount %d to %d, dailyDate %s to %s",
+
+				"Updated %d: ",
 				thisUser.getId (),
-				oldDailyCount, thisUser.getDateDailyCount (),
-				oldDailyDate, thisUser.getDateDailyDate ()));
+
+				"dailyCount %d to %d, ",
+				oldDailyCount,
+				thisUser.getDateDailyCount (),
+
+				"dailyDate %s to %s",
+				ifNull (oldDailyDate, "none"),
+				thisUser.getDateDailyDate ()));
 
 		// check the user still wants a date message
 
 		if (thisUser.getDateDailyCount () < 1) {
-			log.debug ("Ignoring " + thisUserId + " (daily check failed)");
+
+			log.debug (
+				"Ignoring " + thisUserId + " (daily check failed)");
+
 			return false;
+
 		}
 
 		ChatCreditCheckResult creditCheckResult =

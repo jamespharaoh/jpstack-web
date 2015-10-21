@@ -20,6 +20,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ChildrenCollectionSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("childrenCollectionWriter")
@@ -65,6 +66,13 @@ class ChildrenCollectionWriter {
 					"%ss",
 					spec.typeName ()));
 
+		String fullFieldTypeName =
+			stringFormat (
+				"%s.model.%sRec",
+				fieldTypePlugin.packageName (),
+				capitalise (
+					spec.typeName ()));
+
 		// write field annotation
 
 		AnnotationWriter annotationWriter =
@@ -106,19 +114,28 @@ class ChildrenCollectionWriter {
 
 		// write field
 
-		javaWriter.writeFormat (
-			"\tSet<%s.model.%sRec> %s =\n",
-			fieldTypePlugin.packageName (),
-			capitalise (spec.typeName ()),
-			fieldName);
+		new PropertyWriter ()
 
-		javaWriter.writeFormat (
-			"\t\tnew LinkedHashSet<%s.model.%sRec> ();\n",
-			fieldTypePlugin.packageName (),
-			capitalise (spec.typeName ()));
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
 
-		javaWriter.writeFormat (
-			"\n");
+			.typeNameFormat (
+				"Set<%s>",
+				fullFieldTypeName)
+
+			.propertyNameFormat (
+				"%s",
+				fieldName)
+
+			.defaultValueFormat (
+				"new LinkedHashSet<%s> ()",
+				fullFieldTypeName)
+
+			.write (
+				javaWriter,
+				"\t");
 
 	}
 

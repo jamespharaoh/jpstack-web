@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.io.IOException;
@@ -12,6 +13,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.entity.meta.StringFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -70,32 +72,32 @@ class StringFieldWriter {
 
 		// write field
 
-		if (spec.defaultValue () == null) {
+		PropertyWriter propertyWriter =
+			new PropertyWriter ()
 
-			javaWriter.writeFormat (
-				"\tString %s;\n",
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
+
+			.typeNameFormat (
+				"String")
+
+			.propertyNameFormat (
+				"%s",
 				spec.name ());
 
-		} else if (spec.defaultValue ().isEmpty ()) {
+		if (spec.defaultValue () != null) {
 
-			javaWriter.writeFormat (
-				"\tString %s = \"\";\n",
-				spec.name ());
-
-		} else {
-
-			javaWriter.writeFormat (
-				"\tString %s =\n",
-				spec.name ());
-
-			javaWriter.writeFormat (
-				"\t\t\"%s\";\n",
+			propertyWriter.defaultValueFormat (
+				"\"%s\"",
 				spec.defaultValue ().replace ("\"", "\\\""));
 
 		}
 
-		javaWriter.writeFormat (
-			"\n");
+		propertyWriter.write (
+			javaWriter,
+			"\t");
 
 	}
 

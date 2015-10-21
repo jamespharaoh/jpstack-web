@@ -14,6 +14,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ComponentFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("componentFieldWriter")
@@ -54,16 +55,27 @@ class ComponentFieldWriter {
 
 		// write field
 
-		javaWriter.writeFormat (
-			"\t%s %s;\n",
-			capitalise (
-				spec.typeName ()),
-			ifNull (
-				spec.name (),
-				spec.typeName ()));
+		new PropertyWriter ()
 
-		javaWriter.writeFormat (
-			"\n");
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
+
+			.typeNameFormat (
+				"%s",
+				capitalise (
+					spec.typeName ()))
+
+			.propertyNameFormat (
+				"%s",
+				ifNull (
+					spec.name (),
+					spec.typeName ()))
+
+			.write (
+				javaWriter,
+				"\t");
 
 	}
 

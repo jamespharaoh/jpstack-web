@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.IntegerFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("integerFieldWriter")
@@ -70,23 +72,32 @@ class IntegerFieldWriter {
 
 		// write field
 
+		PropertyWriter propertyWriter =
+			new PropertyWriter ()
+
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
+
+			.typeNameFormat (
+				"Integer")
+
+			.propertyNameFormat (
+				"%s",
+				spec.name ());
+
 		if (spec.defaultValue () != null) {
 
-			javaWriter.writeFormat (
-				"\tInteger %s = %s;\n",
-				spec.name (),
+			propertyWriter.defaultValueFormat (
+				"%s",
 				spec.defaultValue ());
-
-		} else {
-
-			javaWriter.writeFormat (
-				"\tInteger %s;\n",
-				spec.name ());
 
 		}
 
-		javaWriter.writeFormat (
-			"\n");
+		propertyWriter.write (
+			javaWriter,
+			"\t");
 
 	}
 

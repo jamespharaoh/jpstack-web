@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.DateFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("dateFieldWriter")
@@ -68,16 +70,25 @@ class DateFieldWriter {
 			javaWriter,
 			"\t");
 
-		// write member
+		// write field
 
-		javaWriter.writeFormat (
-			"\tLocalDate %s;\n",
-			spec.name ());
+		new PropertyWriter ()
 
-		// write blank line
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
 
-		javaWriter.writeFormat (
-			"\n");
+			.typeNameFormat (
+				"LocalDate")
+
+			.propertyNameFormat (
+				"%s",
+				spec.name ())
+
+			.write (
+				javaWriter,
+				"\t");
 
 	}
 

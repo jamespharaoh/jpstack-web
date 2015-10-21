@@ -209,11 +209,11 @@ class ModelRecordGenerator {
 			FormatWriter javaWriter)
 		throws IOException {
 
-		javaWriter.writeFormat (
-			"@Accessors (chain = true)\n");
+		//javaWriter.writeFormat (
+		//	"@Accessors (chain = true)\n");
 
-		javaWriter.writeFormat (
-			"@Data\n");
+		//javaWriter.writeFormat (
+		//	"@Data\n");
 
 		javaWriter.writeFormat (
 			"@EqualsAndHashCode (of = \"id\")\n");

@@ -21,6 +21,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.EnumFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("enumFieldWriter")
@@ -92,6 +93,13 @@ class EnumFieldWriter {
 				spec.name (),
 				spec.typeName ());
 
+		String fullFieldTypeName =
+			stringFormat (
+				"%s.model.%s",
+				fieldTypePackageName,
+				capitalise (
+					spec.typeName ()));
+
 		// write field annotation
 
 		AnnotationWriter annotationWriter =
@@ -123,35 +131,34 @@ class EnumFieldWriter {
 
 		// write field
 
+		PropertyWriter propertyWriter =
+			new PropertyWriter ()
+
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
+
+			.typeNameFormat (
+				"%s",
+				fullFieldTypeName)
+
+			.propertyNameFormat (
+				"%s",
+				fieldName);
+
 		if (spec.defaultValue () != null) {
 
-			javaWriter.writeFormat (
-				"\t%s.model.%s %s =\n",
-				fieldTypePackageName,
-				capitalise (
-					spec.typeName ()),
-				fieldName);
-
-			javaWriter.writeFormat (
-				 "\t\t%s.model.%s.%s;\n",
-				fieldTypePackageName,
-				capitalise (
-					spec.typeName ()),
+			propertyWriter.defaultValueFormat (
+				"%s.%s",
+				fullFieldTypeName,
 				spec.defaultValue ());
-
-		} else {
-
-			javaWriter.writeFormat (
-				"\t%s.model.%s %s;\n",
-				fieldTypePackageName,
-				capitalise (
-					spec.typeName ()),
-				fieldName);
 
 		}
 
-		javaWriter.writeFormat (
-			"\n");
+		propertyWriter.write (
+			javaWriter,
+			"\t");
 
 	}
 

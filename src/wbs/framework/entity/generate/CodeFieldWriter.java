@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.io.IOException;
@@ -12,6 +13,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.CodeFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("codeFieldWriter")
@@ -41,14 +43,27 @@ class CodeFieldWriter {
 		javaWriter.writeFormat (
 			"\t@CodeField\n");
 
-		javaWriter.writeFormat (
-			"\tString %s;\n",
-			ifNull (
-				spec.name (),
-				"code"));
+		// write field
 
-		javaWriter.writeFormat (
-			"\n");
+		new PropertyWriter ()
+
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
+
+			.typeNameFormat (
+				"String")
+
+			.propertyNameFormat (
+				"%s",
+				ifNull (
+					spec.name (),
+					"code"))
+
+			.write (
+				javaWriter,
+				"\t");
 
 	}
 

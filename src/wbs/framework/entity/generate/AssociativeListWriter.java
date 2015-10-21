@@ -20,6 +20,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.AssociativeListSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("associativeListWriter")
@@ -65,9 +66,10 @@ class AssociativeListWriter {
 					"%ss",
 					spec.typeName ()));
 
-		String fieldTypeName =
+		String fullFieldTypeName =
 			stringFormat (
-				"%sRec",
+				"%s.model.%sRec",
+				fieldTypePlugin.packageName (),
 				capitalise (
 					spec.typeName ()));
 
@@ -97,19 +99,28 @@ class AssociativeListWriter {
 
 		// write field
 
-		javaWriter.writeFormat (
-			"\tList<%s.model.%s> %s =\n",
-			fieldTypePlugin.packageName (),
-			fieldTypeName,
-			fieldName);
+		new PropertyWriter ()
 
-		javaWriter.writeFormat (
-			"\t\tnew ArrayList<%s.model.%s> ();\n",
-			fieldTypePlugin.packageName (),
-			fieldTypeName);
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
 
-		javaWriter.writeFormat (
-			"\n");
+			.typeNameFormat (
+				"List<%s>",
+				fullFieldTypeName)
+
+			.propertyNameFormat (
+				"%s",
+				fieldName)
+
+			.defaultValueFormat (
+				"new ArrayList<%s> ()",
+				fullFieldTypeName)
+
+			.write (
+				javaWriter,
+				"\t");
 
 	}
 

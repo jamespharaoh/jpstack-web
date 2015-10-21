@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.io.IOException;
@@ -12,6 +13,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.entity.meta.YesNoFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -70,25 +72,34 @@ class YesNoFieldWriter {
 
 		// write field
 
+		PropertyWriter propertyWriter =
+			new PropertyWriter ()
+
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
+
+			.typeNameFormat (
+				"Boolean")
+
+			.propertyNameFormat (
+				"%s",
+				spec.name ());
+
 		if (spec.defaultValue () != null) {
 
-			javaWriter.writeFormat (
-				"\tBoolean %s = %s;\n",
-				spec.name (),
+			propertyWriter.defaultValueFormat (
+				"%s",
 				spec.defaultValue ()
 					? "true"
 					: "false");
 
-		} else {
-
-			javaWriter.writeFormat (
-				"\tBoolean %s;\n",
-				spec.name ());
-
 		}
 
-		javaWriter.writeFormat (
-			"\n");
+		propertyWriter.write (
+			javaWriter,
+			"\t");
 
 	}
 

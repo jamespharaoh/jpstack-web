@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.ParentTypeFieldSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("parentTypeFieldWriter")
@@ -64,14 +66,26 @@ class ParentTypeFieldWriter {
 
 		// TODO this class name should not be hard-coded
 
-		javaWriter.writeFormat (
-			"\twbs.platform.object.core.model.ObjectTypeRec %s;\n",
-			ifNull (
-				spec.name (),
-				"parentType"));
+		PropertyWriter propertyWriter =
+			new PropertyWriter ()
 
-		javaWriter.writeFormat (
-			"\n");
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
+
+			.typeNameFormat (
+				"wbs.platform.object.core.model.ObjectTypeRec")
+
+			.propertyNameFormat (
+				"%s",
+				ifNull (
+					spec.name (),
+					"parentType"));
+
+		propertyWriter.write (
+			javaWriter,
+			"\t");
 
 	}
 

@@ -2,6 +2,7 @@ package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
 
@@ -19,6 +20,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.ParentFieldSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("parentFieldWriter")
@@ -62,6 +64,13 @@ class ParentFieldWriter {
 				spec.name (),
 				spec.typeName ());
 
+		String fullFieldTypeName =
+			stringFormat (
+				"%s.model.%sRec",
+				fieldTypePlugin.packageName (),
+				capitalise (
+					spec.typeName ()));
+
 		// write field annotation
 
 		AnnotationWriter annotationWriter =
@@ -85,14 +94,25 @@ class ParentFieldWriter {
 
 		// write field
 
-		javaWriter.writeFormat (
-			"\t%s.model.%sRec %s;\n",
-			fieldTypePlugin.packageName (),
-			capitalise (spec.typeName ()),
-			fieldName);
+		PropertyWriter propertyWriter =
+			new PropertyWriter ()
 
-		javaWriter.writeFormat (
-			"\n");
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
+
+			.typeNameFormat (
+				"%s",
+				fullFieldTypeName)
+
+			.propertyNameFormat (
+				"%s",
+				fieldName);
+
+		propertyWriter.write (
+			javaWriter,
+			"\t");
 
 	}
 

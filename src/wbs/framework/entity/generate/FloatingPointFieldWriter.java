@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.FloatingPointFieldSpec;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
 @PrototypeComponent ("floatingPointFieldWriter")
@@ -70,23 +72,32 @@ class FloatingPointFieldWriter {
 
 		// write field
 
+		PropertyWriter propertyWriter =
+			new PropertyWriter ()
+
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
+
+			.typeNameFormat (
+				"Double")
+
+			.propertyNameFormat (
+				"%s",
+				spec.name ());
+
 		if (spec.defaultValue () != null) {
 
-			javaWriter.writeFormat (
-				"\tDouble %s = %s;\n",
-				spec.name (),
+			propertyWriter.defaultValueFormat (
+				"%s",
 				spec.defaultValue ());
-
-		} else {
-
-			javaWriter.writeFormat (
-				"\tDouble %s;\n",
-				spec.name ());
 
 		}
 
-		javaWriter.writeFormat (
-			"\n");
+		propertyWriter.write (
+			javaWriter,
+			"\t");
 
 	}
 

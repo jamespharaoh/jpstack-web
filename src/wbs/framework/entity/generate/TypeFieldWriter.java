@@ -19,6 +19,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.entity.meta.TypeFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -70,6 +71,13 @@ class TypeFieldWriter {
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();
 
+		String fullFieldTypeName =
+			stringFormat (
+				"%s.model.%sRec",
+				fieldTypePlugin.packageName (),
+				capitalise (
+					fieldTypeName));
+
 		// write field annotation
 
 		AnnotationWriter annotationWriter =
@@ -93,14 +101,25 @@ class TypeFieldWriter {
 
 		// write field
 
-		javaWriter.writeFormat (
-			"\t%s.model.%sRec %s;\n",
-			fieldTypePlugin.packageName (),
-			capitalise (fieldTypeName),
-			fieldName);
+		PropertyWriter propertyWriter =
+			new PropertyWriter ()
 
-		javaWriter.writeFormat (
-			"\n");
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
+
+			.typeNameFormat (
+				"%s",
+				fullFieldTypeName)
+
+			.propertyNameFormat (
+				"%s",
+				fieldName);
+
+		propertyWriter.write (
+			javaWriter,
+			"\t");
 
 	}
 

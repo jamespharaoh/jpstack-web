@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.io.IOException;
@@ -12,6 +13,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.entity.meta.TimestampFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -97,24 +99,34 @@ class TimestampFieldWriter {
 			javaWriter,
 			"\t");
 
-		// write member
+		// write field
+
+		PropertyWriter propertyWriter =
+			new PropertyWriter ()
+
+			.thisClassNameFormat (
+				"%sRec",
+				capitalise (
+					parent.name ()))
+
+			.propertyNameFormat (
+				"%s",
+				spec.name ());
 
 		switch (spec.columnType ()) {
 
 		case sql:
 		case iso:
 
-			javaWriter.writeFormat (
-				"\tInstant %s;\n",
-				spec.name ());
+			propertyWriter.typeNameFormat (
+				"Instant");
 
 			break;
 
 		case postgresql:
 
-			javaWriter.writeFormat (
-				"\tDate %s;\n",
-				spec.name ());
+			propertyWriter.typeNameFormat (
+				"Date");
 
 			break;
 
@@ -124,10 +136,9 @@ class TimestampFieldWriter {
 
 		}
 
-		// write blank line
-
-		javaWriter.writeFormat (
-			"\n");
+		propertyWriter.write (
+			javaWriter,
+			"\t");
 
 	}
 
