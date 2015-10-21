@@ -3,7 +3,6 @@ package wbs.framework.entity.generate;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormatArray;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,8 +52,7 @@ class InterfaceWriter {
 
 	public
 	void write (
-			String filename)
-		throws IOException {
+			String filename) {
 
 		@Cleanup
 		FormatWriter writer =

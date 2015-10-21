@@ -4,8 +4,6 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -48,8 +46,7 @@ class SlaveFieldWriter {
 	@BuildMethod
 	public
 	void build (
-			Builder builder)
-		throws IOException {
+			Builder builder) {
 
 		PluginModelSpec fieldTypePluginModel =
 			pluginManager.pluginModelsByName ().get (

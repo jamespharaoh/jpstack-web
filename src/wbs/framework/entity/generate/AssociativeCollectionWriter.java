@@ -5,8 +5,6 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -50,8 +48,7 @@ class AssociativeCollectionWriter {
 	@BuildMethod
 	public
 	void build (
-			Builder builder)
-		throws IOException {
+			Builder builder) {
 
 		String fullFieldTypeName;
 

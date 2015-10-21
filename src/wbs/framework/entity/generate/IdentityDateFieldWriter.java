@@ -1,9 +1,6 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
-
-import java.io.IOException;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -36,8 +33,7 @@ class IdentityDateFieldWriter {
 	@BuildMethod
 	public
 	void build (
-			Builder builder)
-		throws IOException {
+			Builder builder) {
 
 		javaWriter.writeFormat (
 			"\t@IdentitySimpleField\n");
