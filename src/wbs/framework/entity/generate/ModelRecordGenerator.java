@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.File;
@@ -131,11 +130,6 @@ class ModelRecordGenerator {
 			java.util.Map.class,
 			java.util.Set.class,
 
-			lombok.Data.class,
-			lombok.EqualsAndHashCode.class,
-			lombok.ToString.class,
-			lombok.experimental.Accessors.class,
-
 			org.apache.commons.lang3.builder.CompareToBuilder.class,
 
 			wbs.framework.entity.annotations.CommonEntity.class,
@@ -209,36 +203,6 @@ class ModelRecordGenerator {
 			FormatWriter javaWriter)
 		throws IOException {
 
-		//javaWriter.writeFormat (
-		//	"@Accessors (chain = true)\n");
-
-		//javaWriter.writeFormat (
-		//	"@Data\n");
-
-		javaWriter.writeFormat (
-			"@EqualsAndHashCode (of = \"id\")\n");
-
-		if (
-			notEqual (
-				modelMeta.name (),
-				"text")
-		) {
-
-			javaWriter.writeFormat (
-				"@ToString (of = \"id\")\n");
-
-		}
-
-		writeEntityAnnotation (
-			javaWriter);
-
-	}
-
-	private
-	void writeEntityAnnotation (
-			FormatWriter javaWriter)
-		throws IOException {
-
 		AnnotationWriter annotationWriter =
 			new AnnotationWriter ()
 
@@ -280,8 +244,7 @@ class ModelRecordGenerator {
 	}
 
 	void writeClass (
-			FormatWriter javaWriter)
-		throws IOException {
+			FormatWriter javaWriter) {
 
 		javaWriter.writeFormat (
 			"public\n");
@@ -378,10 +341,13 @@ class ModelRecordGenerator {
 		generateCollections (
 			javaWriter);
 
+		generateEquals (
+			javaWriter);
+
 		generateCompareTo (
 			javaWriter);
 
-		generateSpecial (
+		generateToString (
 			javaWriter);
 
 		javaWriter.writeFormat (
@@ -391,8 +357,7 @@ class ModelRecordGenerator {
 
 	private
 	void generateFields (
-			FormatWriter javaWriter)
-		throws IOException {
+			FormatWriter javaWriter) {
 
 		if (modelMeta.fields ().isEmpty ()) {
 			return;
@@ -413,8 +378,7 @@ class ModelRecordGenerator {
 
 	private
 	void generateCollections (
-			FormatWriter javaWriter)
-		throws IOException {
+			FormatWriter javaWriter) {
 
 		if (modelMeta.collections ().isEmpty ()) {
 			return;
@@ -434,9 +398,104 @@ class ModelRecordGenerator {
 	}
 
 	private
+	void generateEquals (
+			FormatWriter javaWriter) {
+
+		// write comment
+
+		javaWriter.writeFormat (
+			"\t// equals\n");
+
+		javaWriter.writeFormat (
+			"\n");
+
+		// write override annotation
+
+		javaWriter.writeFormat (
+			"\t@Override\n");
+
+		// write function definition
+
+		javaWriter.writeFormat (
+			"\tpublic\n");
+
+		javaWriter.writeFormat (
+			"\tboolean equals (\n");
+
+		javaWriter.writeFormat (
+			"\t\t\tObject otherObject) {\n");
+
+		javaWriter.writeFormat (
+			"\n");
+
+		// write class comparison
+
+		javaWriter.writeFormat (
+			"\t\tif (otherObject.getClass () != %s.class) {\n",
+			className);
+
+		javaWriter.writeFormat (
+			"\t\t\treturn false;\n");
+
+		javaWriter.writeFormat (
+			"\t\t}\n");
+
+		javaWriter.writeFormat (
+			"\n");
+
+		// write cast
+
+		javaWriter.writeFormat (
+			"\t\t%s other =\n",
+			className);
+
+		javaWriter.writeFormat (
+			"\t\t\t(%s)\n",
+			className);
+
+		javaWriter.writeFormat (
+			"\t\t\totherObject;\n");
+
+		javaWriter.writeFormat (
+			"\n");
+
+		// check for null id
+
+		javaWriter.writeFormat (
+			"\t\tif (getId () == null || other.getId () == null) {\n");
+
+		javaWriter.writeFormat (
+			"\t\t\treturn false;\n");
+
+		javaWriter.writeFormat (
+			"\t\t}\n");
+
+		javaWriter.writeFormat (
+			"\n");
+
+		// compare id
+
+		javaWriter.writeFormat (
+			"\t\treturn getId () == other.getId ();\n");
+
+		javaWriter.writeFormat (
+			"\n");
+
+		// write end of function
+
+		javaWriter.writeFormat (
+			"\t}\n");
+
+		javaWriter.writeFormat (
+			"\n");
+
+	}
+
+	private
 	void generateCompareTo (
-			FormatWriter javaWriter)
-		throws IOException {
+			FormatWriter javaWriter) {
+
+		// TODO generate better code
 
 		// write comment
 
@@ -925,8 +984,29 @@ class ModelRecordGenerator {
 	}
 
 	private
-	void generateSpecial (
+	void generateToString (
 			FormatWriter javaWriter) {
+
+		// write comment
+
+		javaWriter.writeFormat (
+			"\t// to string\n");
+
+		javaWriter.writeFormat (
+			"\n");
+
+		// write function definition
+
+		javaWriter.writeFormat (
+			"\tpublic\n");
+
+		javaWriter.writeFormat (
+			"\tString toString () {\n");
+
+		javaWriter.writeFormat (
+			"\n");
+
+		// write function body
 
 		if (
 			equal (
@@ -935,21 +1015,26 @@ class ModelRecordGenerator {
 		) {
 
 			javaWriter.writeFormat (
-				"\tpublic\n");
-
-			javaWriter.writeFormat (
-				"\tString toString () {\n");
-
-			javaWriter.writeFormat (
 				"\t\treturn getText ();\n");
 
-			javaWriter.writeFormat (
-				"\t}\n");
+		} else {
 
 			javaWriter.writeFormat (
-				"\n");
+				"\t\treturn \"%s(id=\" + getId () + \")\";\n",
+				className);
 
 		}
+
+		javaWriter.writeFormat (
+			"\n");
+
+		// write end of function
+
+		javaWriter.writeFormat (
+			"\t}\n");
+
+		javaWriter.writeFormat (
+			"\n");
 
 	}
 
