@@ -59,9 +59,17 @@ class ChatMessageStatsProvider
 		List<ChatMessageRec> chatMessages =
 			chatMessageHelper.search (
 				new ChatMessageSearch ()
-					.chatId ((Integer) conditions.get ("chatId"))
-					.timestampAfter (period.startTime ())
-					.timestampBefore (period.endTime ()));
+
+			.chatId (
+				(Integer) conditions.get ("chatId"))
+
+			.timestampAfter (
+				period.startTime ())
+
+			.timestampBefore (
+				period.endTime ())
+
+		);
 
 		// aggregate stats
 

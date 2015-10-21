@@ -17,6 +17,10 @@
 		<bean class="logic.ExceptionLoggerImplementation"/>
 	</layer>
 
+	<layer name="daemon">
+		<bean class="daemon.ExceptionLogRemovalDaemon"/>
+	</layer>
+
 	<layer name="console">
 		<bean class="console.ExceptionStatusLine"/>
 		<bean class="console.ExceptionStatusLinePart"/>

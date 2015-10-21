@@ -1,6 +1,6 @@
 <model-meta
 	name="exceptionLog"
-	type="event"
+	type="ephemeral"
 	table="exception">
 
 	<fields>
