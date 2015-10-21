@@ -1,6 +1,7 @@
 package wbs.platform.misc;
 
 import static wbs.framework.utils.etc.Misc.earlierThan;
+import static wbs.framework.utils.etc.Misc.millisToInstant;
 
 import javax.inject.Provider;
 
@@ -39,7 +40,7 @@ class CachedGetter<Type>
 
 	private
 	Instant lastReload =
-		new Instant (0);
+		millisToInstant (0);
 
 	public abstract
 	Type refresh ();
