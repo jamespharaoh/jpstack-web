@@ -1,11 +1,14 @@
 package wbs.platform.exception.hibernate;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.Instant;
 
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.exception.model.ExceptionLogDao;
@@ -140,6 +143,38 @@ class ExceptionLogDaoHibernate
 		return findMany (
 			Integer.class,
 			criteria.list ());
+
+	}
+
+	@Override
+	public
+	List<ExceptionLogRec> findOldLimit (
+			Instant cutoffTime,
+			int maxResults) {
+
+		return findMany (
+			ExceptionLogRec.class,
+
+			createCriteria (
+				ExceptionLogRec.class,
+				"_exceptionLog")
+
+			.add (
+				Restrictions.lt (
+					"_exceptionLog.timestamp",
+					instantToDate (
+						cutoffTime)))
+
+			.addOrder (
+				Order.asc (
+					"_exceptionLog.timestamp"))
+
+			.setMaxResults (
+				maxResults)
+
+			.list ()
+
+		);
 
 	}
 
