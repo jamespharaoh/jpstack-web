@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.supervisor.console;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -139,14 +141,18 @@ class ChatMessageUserStatsProvider
 
 		// aggregate stats
 
-		for (ChatMessageRec chatMessage
-				: chatMessages) {
+		for (
+			ChatMessageRec chatMessage
+				: chatMessages
+		) {
 
 			Instant chatMessageTimestamp =
-				new Instant (chatMessage.getTimestamp ());
+				dateToInstant (
+					chatMessage.getTimestamp ());
 
 			int hour =
-				period.assign (chatMessageTimestamp);
+				period.assign (
+					chatMessageTimestamp);
 
 			// count outbound messages
 

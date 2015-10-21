@@ -1,12 +1,14 @@
 package wbs.clients.apn.chat.bill.logic;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.instantToDate;
-import static wbs.framework.utils.etc.Misc.earlierThan;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.sum;
@@ -801,9 +803,15 @@ class ChatCreditLogicImpl
 		// check user hasnt been sent a bill today that wasn't successful
 
 		if (
-			chatUser.getLastBillSent () != null
-			&& ! dateToInstant (chatUser.getLastBillSent ()).isBefore (
+
+			isNotNull (
+				chatUser.getLastBillSent ())
+
+			&& laterThan (
+				dateToInstant (
+					chatUser.getLastBillSent ()),
 				startOfToday)
+
 		) {
 
 			log.info (

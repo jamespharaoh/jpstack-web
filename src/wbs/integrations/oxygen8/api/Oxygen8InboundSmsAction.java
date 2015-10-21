@@ -2,6 +2,7 @@ package wbs.integrations.oxygen8.api;
 
 import static wbs.framework.utils.etc.Misc.bytesToString;
 import static wbs.framework.utils.etc.Misc.fromHex;
+import static wbs.framework.utils.etc.Misc.secondsToInstant;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -12,9 +13,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-
-import org.joda.time.Instant;
-
 import wbs.api.mvc.ApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -336,14 +334,18 @@ class Oxygen8InboundSmsAction
 		}
 
 		inboxLogic.inboxInsert (
-			Optional.of (reference),
+			Optional.of (
+				reference),
 			textHelper.findOrCreate (
 				textContent),
 			msisdn,
 			shortcode,
 			route,
-			Optional.of (oxygen8Network.getNetwork ()),
-			Optional.of (new Instant (dateReceived * 1000)),
+			Optional.of (
+				oxygen8Network.getNetwork ()),
+			Optional.of (
+				secondsToInstant (
+					dateReceived)),
 			Collections.<MediaRec>emptyList (),
 			Optional.<String>absent (),
 			Optional.<String>absent ());

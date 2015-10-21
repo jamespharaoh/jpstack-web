@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.bill.hibernate;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.List;
 
 import org.joda.time.Interval;
@@ -35,11 +37,13 @@ class ChatUserCreditDaoHibernate
 
 			.setTimestamp (
 				"timestampFrom",
-				timestampInterval.getStart ().toDate ())
+				instantToDate (
+					timestampInterval.getStart ()))
 
 			.setTimestamp (
 				"timestampTo",
-				timestampInterval.getEnd ().toDate ())
+				instantToDate (
+					timestampInterval.getEnd ()))
 
 			.list ());
 

@@ -222,14 +222,19 @@ class ChatMonitorInboxAlarmAction
 			// and update it
 
 			chatUserAlarm
-				.setAlarmTime (alarmTime.toDate ())
+
+				.setAlarmTime (
+					instantToDate (
+						alarmTime))
+
 				.setResetTime (
-					transaction.now ()
-						.toDateTime ()
-						.plusHours (1)
-						.toInstant ()
-						.toDate ())
-				.setSticky (sticky);
+					instantToDate (
+						transaction.now ()
+							.toDateTime ()
+							.plusHours (1)))
+
+				.setSticky (
+					sticky);
 
 			// insert it if needed
 
@@ -255,10 +260,12 @@ class ChatMonitorInboxAlarmAction
 					ChatUserInitiationReason.alarmSet)
 
 				.setAlarmTime (
-					alarmTime.toDate ())
+					instantToDate (
+						alarmTime))
 
 				.setTimestamp (
-					transaction.now ().toDate ())
+					instantToDate (
+						transaction.now ()))
 
 				.setMonitorUser (
 					myUser)

@@ -197,9 +197,9 @@ class ChatDateDaemon
 			"Begin dating for " + chat.getCode ());
 
 		int hour =
-			transaction
-				.now ()
-				.toDateTime (chatMiscLogic.timezone (chat))
+			transaction.now ()
+				.toDateTime (
+					chatMiscLogic.timezone (chat))
 				.getHourOfDay ();
 
 		LocalDate today =

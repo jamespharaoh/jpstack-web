@@ -127,9 +127,6 @@ class ChatCoreFixtureProvider
 		Transaction transaction =
 			database.currentTransaction ();
 
-		Instant now =
-			transaction.now ();
-
 		menuItemHelper.insert (
 			new MenuItemRec ()
 
@@ -542,7 +539,9 @@ class ChatCoreFixtureProvider
 						chatUsers))
 
 				.setTimestamp (
-					pastInstant (now).toDate ())
+					instantToDate (
+						pastInstant (
+							transaction.now ())))
 
 				.setSource (
 					ChatMessageMethod.api)
@@ -597,7 +596,9 @@ class ChatCoreFixtureProvider
 						chatMonitors))
 
 				.setTimestamp (
-					pastInstant (now).toDate ())
+					instantToDate (
+						pastInstant (
+							transaction.now ())))
 
 				.setMethod (
 					ChatMessageMethod.api)
@@ -649,7 +650,9 @@ class ChatCoreFixtureProvider
 						chatUsers))
 
 				.setTimestamp (
-					pastInstant (now).toDate ())
+					instantToDate (
+						pastInstant (
+							transaction.now ())))
 
 				.setSender (
 					randomLogic.sample (

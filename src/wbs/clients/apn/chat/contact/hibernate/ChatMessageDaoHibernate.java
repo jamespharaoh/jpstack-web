@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.contact.hibernate;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -77,9 +79,12 @@ class ChatMessageDaoHibernate
 
 			.setTimestamp (
 				"timestamp",
-				timestamp.toDate ())
+				instantToDate (
+					timestamp))
 
-			.list ());
+			.list ()
+
+		);
 
 	}
 
@@ -141,11 +146,13 @@ class ChatMessageDaoHibernate
 
 			.setTimestamp (
 				"timestampStart",
-				timestampInterval.getStart ().toDate ())
+				instantToDate (
+					timestampInterval.getStart ()))
 
 			.setTimestamp (
 				"timestampEnd",
-				timestampInterval.getEnd ().toDate ())
+				instantToDate (
+					timestampInterval.getEnd ()))
 
 			.list ());
 

@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.contact.hibernate;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.List;
 
 import org.joda.time.Interval;
@@ -35,11 +37,13 @@ class ChatUserInitiationLogDaoHibernate
 
 			.setTimestamp (
 				"startTime",
-				timestampInterval.getStart ().toDate ())
+				instantToDate (
+					timestampInterval.getStart ()))
 
 			.setDate (
 				"endTime",
-				timestampInterval.getEnd ().toDate ())
+				instantToDate (
+					timestampInterval.getEnd ()))
 
 			.list ());
 

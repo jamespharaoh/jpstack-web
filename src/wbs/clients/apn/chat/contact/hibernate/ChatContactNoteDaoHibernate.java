@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.contact.hibernate;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.List;
 
 import org.joda.time.Interval;
@@ -37,13 +39,17 @@ class ChatContactNoteDaoHibernate
 
 			.setTimestamp (
 				"start",
-				timestampInterval.getStart ().toDate ())
+				instantToDate (
+					timestampInterval.getStart ()))
 
 			.setTimestamp (
 				"end",
-				timestampInterval.getEnd ().toDate ())
+				instantToDate (
+					timestampInterval.getEnd ()))
 
-			.list ());
+			.list ()
+
+		);
 
 	}
 

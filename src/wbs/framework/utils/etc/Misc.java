@@ -34,6 +34,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
+import org.joda.time.ReadableInstant;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -1566,18 +1567,19 @@ class Misc {
 		if (date == null)
 			return null;
 
-		return new Instant (date);
+		return new Instant (
+			date);
 
 	}
 
 	public static
 	Date instantToDate (
-			Instant instant) {
+			ReadableInstant instant) {
 
 		if (instant == null)
 			return null;
 
-		return instant.toDate ();
+		return instant.toInstant ().toDate ();
 
 	}
 
@@ -1587,6 +1589,15 @@ class Misc {
 
 		return new Instant (
 			millis);
+
+	}
+
+	public static
+	Instant secondsToInstant (
+			long seconds) {
+
+		return new Instant (
+			seconds * 1000);
 
 	}
 
