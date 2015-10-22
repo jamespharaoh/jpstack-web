@@ -55,7 +55,8 @@
 
 			</object-list-page>
 
-			<object-create-page/>
+			<object-create-page
+				fields="create"/>
 
 		</list>
 
@@ -111,12 +112,28 @@
 
 		<parent-field/>
 		<code-field/>
+		<description-field/>
 
 		<text-field
 			name="fullname"
 			label="Full name"/>
 
+		<yes-no-field
+			name="active"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="user">
+
+		<parent-field/>
+		<code-field/>
 		<description-field/>
+
+		<text-field
+			name="fullname"
+			label="Full name"/>
 
 		<yes-no-field
 			name="active"/>
@@ -129,16 +146,15 @@
 
 		<parent-field/>
 		<code-field/>
+		<description-field/>
 		<deleted-field/>
-
-		<yes-no-field
-			name="active"/>
 
 		<text-field
 			name="fullname"
 			label="Full name"/>
 
-		<description-field/>
+		<yes-no-field
+			name="active"/>
 
 	</field-set>
 
@@ -149,16 +165,15 @@
 		<id-field/>
 		<parent-field/>
 		<code-field/>
+		<description-field/>
 		<deleted-field/>
-
-		<yes-no-field
-			name="active"/>
 
 		<text-field
 			name="fullname"
 			label="Full name"/>
 
-		<description-field/>
+		<yes-no-field
+			name="active"/>
 
 	</field-set>
 
