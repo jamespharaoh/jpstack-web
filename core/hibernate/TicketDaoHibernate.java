@@ -6,10 +6,10 @@ import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.services.ticket.core.model.TicketDao;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketFieldValueRec;
 import wbs.services.ticket.core.model.TicketRec;
-import wbs.services.ticket.core.model.TicketDao;
 
 @SingletonComponent ("ticketDaoHibernate")
 public
