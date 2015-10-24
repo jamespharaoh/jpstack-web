@@ -24,6 +24,8 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
@@ -70,8 +72,6 @@ import wbs.sms.gazetteer.model.GazetteerEntryRec;
 import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.logic.NumberLogic;
-
-import com.google.common.base.Optional;
 
 @SingletonComponent ("chatUserLogic")
 public

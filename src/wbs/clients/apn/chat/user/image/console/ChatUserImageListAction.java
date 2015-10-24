@@ -15,6 +15,9 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -27,8 +30,6 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.media.logic.MediaLogic;
-
-import com.google.common.base.Optional;
 
 @PrototypeComponent ("chatUserImageListAction")
 public
@@ -116,9 +117,11 @@ class ChatUserImageListAction
 			if (index >= list.size ())
 				throw new RuntimeException ();
 
-			if (equal (
+			if (
+				equal (
 					command,
-					"remove")) {
+					"remove")
+			) {
 
 				if (
 					equal (
@@ -131,32 +134,41 @@ class ChatUserImageListAction
 					chatUserLogic.setMainChatUserImageByType (
 						chatUser,
 						type,
-						null);
+						Optional.<ChatUserImageRec>absent ());
 
 				}
 
 				list.get (index).setIndex (null);
 
-				for (int otherIndex = index + 1;
-						otherIndex < list.size ();
-						otherIndex++) {
+				for (
+					int otherIndex = index + 1;
+					otherIndex < list.size ();
+					otherIndex ++
+				) {
 
-					list.get (otherIndex).setIndex (otherIndex - 1);
+					list.get (otherIndex)
+
+						.setIndex (
+							otherIndex - 1);
 
 				}
 
-				notice = "Image/video removed";
+				notice =
+					"Image/video removed";
 
 			}
 
 			if (
+
 				notEqual (
 					type,
 					ChatUserImageType.video)
+
 				&& in (
 					command,
 					"rotate_cw",
 					"rotate_ccw")
+
 			) {
 
 				ChatUserImageRec chatUserImage =
@@ -170,7 +182,11 @@ class ChatUserImageListAction
 					mediaLogic.getImage (
 						chatUserImage.getFullMedia ());
 
-				if (equal (command, "rotate_ccw")) {
+				if (
+					equal (
+						command,
+						"rotate_ccw")
+				) {
 
 					smallImage =
 						mediaLogic.rotateImage270 (smallImage);
@@ -180,7 +196,11 @@ class ChatUserImageListAction
 
 				}
 
-				if (equal (command, "rotate_cw")) {
+				if (
+					equal (
+						command,
+						"rotate_cw")
+				) {
 
 					smallImage =
 						mediaLogic.rotateImage90 (smallImage);
@@ -220,8 +240,9 @@ class ChatUserImageListAction
 				int diff =
 					equal (command, "move_up") ? -1 : 1;
 
-				int otherIndex =
-					(index + list.size () + diff) % list.size ();
+				int otherIndex = (
+					index + list.size () + diff
+				) % list.size ();
 
 				ChatUserImageRec thisImage =
 					list.get (index);
@@ -237,7 +258,8 @@ class ChatUserImageListAction
 				thisImage.setIndex (otherIndex);
 				otherImage.setIndex (index);
 
-				notice = "Image/video moved";
+				notice =
+					"Image/video moved";
 
 			}
 
@@ -281,8 +303,12 @@ class ChatUserImageListAction
 
 		transaction.commit ();
 
-		if (notice != null)
-			requestContext.addNotice (notice);
+		if (notice != null) {
+
+			requestContext.addNotice (
+				notice);
+				
+		}
 
 		return null;
 

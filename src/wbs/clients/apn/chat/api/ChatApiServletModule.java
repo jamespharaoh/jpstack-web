@@ -37,6 +37,10 @@ import lombok.extern.log4j.Log4j;
 import org.apache.http.HttpStatus;
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.WebApiAction;
 import wbs.api.mvc.WebApiManager;
@@ -116,10 +120,6 @@ import wbs.sms.locator.model.MercatorProjection;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 @Log4j
 @SingletonComponent ("chatApiServletModule")
@@ -2841,7 +2841,7 @@ class ChatApiServletModule
 						chatUserLogic.setMainChatUserImageByType (
 							chatUser,
 							type,
-							null);
+							Optional.<ChatUserImageRec>absent ());
 
 					}
 

@@ -25,6 +25,10 @@ import lombok.extern.log4j.Log4j;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import wbs.clients.apn.chat.approval.model.ChatApprovalRegexpObjectHelper;
 import wbs.clients.apn.chat.approval.model.ChatApprovalRegexpRec;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
@@ -73,10 +77,6 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.gsm.MessageSplitter;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 @Log4j
 @SingletonComponent ("chatMessageLogic")
@@ -188,12 +188,12 @@ class ChatMessageLogicImpl
 	@Override
 	public
 	String chatMessageSendFromUser (
-			ChatUserRec fromUser,
-			ChatUserRec toUser,
-			String text,
-			Integer threadId,
-			ChatMessageMethod source,
-			List<MediaRec> medias) {
+			@NonNull ChatUserRec fromUser,
+			@NonNull ChatUserRec toUser,
+			@NonNull String text,
+			@NonNull Optional<Integer> threadId,
+			@NonNull ChatMessageMethod source,
+			@NonNull List<MediaRec> medias) {
 
 		log.debug (
 			stringFormat (
@@ -209,8 +209,8 @@ class ChatMessageLogicImpl
 						text.length () > 20
 							? text.substring (0, 20)
 							: text),
-					threadId != null
-						? threadId.toString ()
+					threadId.isPresent ()
+						? threadId.get ().toString ()
 						: "null",
 					source.toString (),
 					medias != null
@@ -266,7 +266,9 @@ class ChatMessageLogicImpl
 					"Ignoring duplicated message from %s to %s, threadId = %s",
 					fromUser.getCode (),
 					toUser.getCode (),
-					threadId);
+					threadId.isPresent ()
+						? threadId.get ().toString ()
+						: "null");
 
 			log.info (
 				errorMessage);
@@ -416,7 +418,7 @@ class ChatMessageLogicImpl
 					transaction.now ()))
 
 			.setThreadId (
-				threadId)
+				threadId.orNull ())
 
 			.setOriginalText (
 				originalText)
@@ -472,7 +474,7 @@ class ChatMessageLogicImpl
 
 			chatSendLogic.sendSystemMagic (
 				fromUser,
-				Optional.of (threadId),
+				threadId,
 				"logon_hint",
 				commandHelper.findByCode (chat, "magic"),
 				commandHelper.findByCode (chat, "help").getId (),

@@ -135,7 +135,8 @@ class ChatLogoffCommand
 			chatCreditLogic.userSpendCreditCheck (
 				chatUser,
 				true,
-				message.getThreadId ());
+				Optional.of (
+					message.getThreadId ()));
 
 		if (creditCheckResult.failed ()) {
 

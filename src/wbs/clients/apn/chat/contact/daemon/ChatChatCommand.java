@@ -267,7 +267,8 @@ class ChatChatCommand
 				fromChatUser,
 				toChatUser,
 				rest,
-				message.getThreadId (),
+				Optional.of (
+					message.getThreadId ()),
 				ChatMessageMethod.sms,
 				null);
 

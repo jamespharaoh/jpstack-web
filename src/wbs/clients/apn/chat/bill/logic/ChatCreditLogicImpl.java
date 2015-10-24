@@ -3,7 +3,6 @@ package wbs.clients.apn.chat.bill.logic;
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
@@ -19,11 +18,15 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 import wbs.clients.apn.chat.bill.model.ChatNetworkObjectHelper;
 import wbs.clients.apn.chat.bill.model.ChatNetworkRec;
@@ -56,9 +59,6 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.route.core.model.RouteRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @SingletonComponent ("chatCreditLogic")
@@ -436,9 +436,9 @@ class ChatCreditLogicImpl
 	@Override
 	public
 	ChatCreditCheckResult userSpendCreditCheck (
-			ChatUserRec chatUser,
-			boolean userActed,
-			Integer threadId) {
+			@NonNull ChatUserRec chatUser,
+			@NonNull Boolean userActed,
+			@NonNull Optional<Integer> threadId) {
 
 		log.debug (
 			stringFormat (
@@ -447,9 +447,9 @@ class ChatCreditLogicImpl
 				userActed
 					? "yes"
 					: "no",
-				ifNull (
-					threadId,
-					"null")));
+				threadId.isPresent ()
+					? threadId.get ().toString ()
+					: "null"));
 
 		// if user acted then clear block and send pending bill
 
@@ -1154,8 +1154,8 @@ class ChatCreditLogicImpl
 	@Override
 	public
 	void userCreditHint (
-			ChatUserRec chatUser,
-			Integer threadId) {
+			@NonNull ChatUserRec chatUser,
+			@NonNull Optional<Integer> threadId) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1210,7 +1210,7 @@ class ChatCreditLogicImpl
 
 					chatSendLogic.sendSystemRbFree (
 						chatUser,
-						Optional.of (threadId),
+						threadId,
 						"credit_hint_network",
 						TemplateMissing.error,
 						Collections.<String,String>emptyMap ());
@@ -1219,7 +1219,7 @@ class ChatCreditLogicImpl
 
 					chatSendLogic.sendSystemRbFree (
 						chatUser,
-						Optional.of (threadId),
+						threadId,
 						"credit_hint_prepay",
 						TemplateMissing.error,
 						Collections.<String,String>emptyMap ());
@@ -1236,7 +1236,7 @@ class ChatCreditLogicImpl
 
 					chatSendLogic.sendSystemRbFree (
 						chatUser,
-						Optional.of (threadId),
+						threadId,
 						"credit_hint_network",
 						TemplateMissing.error,
 						Collections.<String,String>emptyMap ());
@@ -1248,7 +1248,7 @@ class ChatCreditLogicImpl
 
 					chatSendLogic.sendSystemRbFree (
 						chatUser,
-						Optional.of (threadId),
+						threadId,
 						"credit_hint_daily",
 						TemplateMissing.error,
 						ImmutableMap.<String,String>builder ()
@@ -1264,7 +1264,7 @@ class ChatCreditLogicImpl
 
 					chatSendLogic.sendSystemRbFree (
 						chatUser,
-						Optional.of (threadId),
+						threadId,
 						"credit_hint",
 						TemplateMissing.error,
 						Collections.<String,String>emptyMap ());

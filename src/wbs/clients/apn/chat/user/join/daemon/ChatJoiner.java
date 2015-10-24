@@ -597,7 +597,8 @@ class ChatJoiner {
 			chatCreditLogic.userSpendCreditCheck (
 				chatUser,
 				true,
-				message.getThreadId ());
+				Optional.of (
+					message.getThreadId ()));
 
 		if (creditCheckResult.failed ()) {
 
@@ -975,7 +976,8 @@ class ChatJoiner {
 			chatCreditLogic.userSpendCreditCheck (
 				chatUser,
 				true,
-				message.getThreadId ());
+				Optional.of (
+					message.getThreadId ()));
 
 		if (creditCheckResult.failed ()) {
 

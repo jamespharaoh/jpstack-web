@@ -2,6 +2,8 @@ package wbs.clients.apn.chat.bill.logic;
 
 import org.joda.time.LocalDate;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.bill.model.ChatUserSpendRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 
@@ -39,12 +41,12 @@ interface ChatCreditLogic {
 	 */
 	ChatUserSpendRec findOrCreateChatUserSpend (
 			ChatUserRec chatUser,
-			LocalDate pdate);
+			LocalDate date);
 
 	ChatCreditCheckResult userSpendCreditCheck (
 			ChatUserRec chatUser,
-			boolean userActed,
-			Integer threadId);
+			Boolean userActed,
+			Optional<Integer> threadId);
 
 	ChatCreditCheckResult userCreditCheck (
 			ChatUserRec chatUser);
@@ -89,7 +91,7 @@ interface ChatCreditLogic {
 	 */
 	void userCreditHint (
 			ChatUserRec chatUser,
-			Integer threadId);
+			Optional<Integer> threadId);
 
 	void doRebill ();
 

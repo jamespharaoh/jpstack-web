@@ -2,6 +2,8 @@ package wbs.clients.apn.chat.contact.logic;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
@@ -39,7 +41,7 @@ interface ChatMessageLogic {
 			ChatUserRec fromUser,
 			ChatUserRec toUser,
 			String text,
-			Integer threadId,
+			Optional<Integer> threadId,
 			ChatMessageMethod source,
 			List<MediaRec> medias);
 

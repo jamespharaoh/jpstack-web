@@ -16,6 +16,8 @@ import lombok.extern.log4j.Log4j;
 
 import org.joda.time.LocalDate;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
@@ -39,6 +41,7 @@ import wbs.clients.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.clients.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.sms.command.logic.CommandLogic;
 import wbs.sms.command.model.CommandObjectHelper;
@@ -52,8 +55,6 @@ import wbs.sms.message.inbox.daemon.CommandManager;
 import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
-
-import com.google.common.base.Optional;
 
 /**
  * MainCommandHandler takes input from the main chat interface, looking for
@@ -203,9 +204,10 @@ class ChatMainCommand
 			fromChatUser,
 			toUser,
 			rest,
-			smsMessage.getThreadId (),
+			Optional.of (
+				smsMessage.getThreadId ()),
 			ChatMessageMethod.sms,
-			null);
+			Collections.<MediaRec>emptyList ());
 
 		// send signup info if relevant
 
@@ -794,7 +796,8 @@ class ChatMainCommand
 			chatCreditLogic.userSpendCreditCheck (
 				fromChatUser,
 				true,
-				smsMessage.getThreadId ());
+				Optional.of (
+					smsMessage.getThreadId ()));
 
 		if (creditCheckResult.failed ()) {
 
