@@ -395,40 +395,94 @@ class Misc {
 	}
 
 	public static
-	String pluralise (
-			long num,
-			String singularNoun,
-			String pluralNoun) {
+	String naivePluralise (
+			@NonNull String singular) {
 
-		return num == 1L
-			? "" + num + " " + singularNoun
-			: "" + num + " " + pluralNoun;
+		if (
+			endsWith (
+				singular,
+				"s")
+		) {
+
+			return singular + "es";
+
+		} else {
+
+			return singular + "s";
+
+		}
+
+	}
+
+	public static
+	boolean startsWith (
+			@NonNull String subject,
+			@NonNull String suffix) {
+
+		return subject.startsWith (
+			suffix);
+
+	}
+
+	public static
+	boolean endsWith (
+			@NonNull String subject,
+			@NonNull String suffix) {
+
+		return subject.endsWith (
+			suffix);
 
 	}
 
 	public static
 	String pluralise (
-			long num,
-			String singularNoun) {
+			long quantity,
+			String singularNoun,
+			String pluralNoun) {
 
-		return num == 1L
-			? "" + num + " " + singularNoun
-			: "" + num + " " + singularNoun + "s";
+		return quantity == 1L
+			? "" + quantity + " " + singularNoun
+			: "" + quantity + " " + pluralNoun;
 
 	}
 
-	public static <T>
+	public static
+	String pluralise (
+			long quantity,
+			String singularNoun) {
+
+		return quantity == 1L
+
+			? stringFormat (
+				"%s %s",
+				quantity,
+				singularNoun)
+
+			: stringFormat (
+				"%s %s",
+				quantity,
+				naivePluralise (
+					singularNoun));
+
+	}
+
+	public static <Type>
 	boolean in (
-			T left,
-			T... rights) {
+			Type left,
+			Type... rights) {
 
-		for (T right
-				: rights) {
+		for (
+			Type right
+				: rights
+		) {
 
-			if (equal (
+			if (
+				equal (
 					left,
-					right))
+					right)
+			) {
 				return true;
+			}
 
 		}
 
@@ -436,8 +490,7 @@ class Misc {
 
 	}
 
-	public static
-	<Type>
+	public static <Type>
 	boolean in (
 			Type left,
 			Collection<Type> rights) {
@@ -461,10 +514,10 @@ class Misc {
 
 	}
 
-	public static <T>
+	public static <Type>
 	boolean notIn (
-			T left,
-			T... rights) {
+			Type left,
+			Type... rights) {
 
 		return ! in (
 			left,
@@ -867,10 +920,10 @@ class Misc {
 
 	public static
 	String stringFormat (
-			Object... args) {
+			Object... arguments) {
 
-		return StringFormatter.standard (
-			args);
+		return StringFormatter.standardArray (
+			arguments);
 
 	}
 
@@ -1920,6 +1973,16 @@ class Misc {
 	}
 
 	public static <Type>
+	boolean contains (
+			@NonNull Collection<Type> collection,
+			@NonNull Type value) {
+
+		return collection.contains (
+			value);
+
+	}
+
+	public static <Type>
 	boolean doesNotContain (
 			@NonNull Collection<Type> collection,
 			@NonNull Type value) {
@@ -1946,6 +2009,51 @@ class Misc {
 
 		return left.isAfter (
 			right);
+
+	}
+
+	public static
+	Class<?> classForName (
+			@NonNull String className) {
+
+		try {
+
+			return Class.forName (
+				className);
+
+		} catch (ClassNotFoundException exception) {
+
+			throw new RuntimeException (
+				exception);
+
+		}
+
+	}
+
+	public static <Type>
+	Type orNull (
+			@NonNull Optional<Type> optional) {
+
+		return optional.orNull ();
+
+	}
+
+	public static
+	String fullClassName (
+			@NonNull Class<?> theClass) {
+
+		return theClass.getName ();
+
+	}
+
+	public static
+	Optional<String> fullClassName (
+			@NonNull Optional<Class<?>> theClass) {
+
+		return theClass.isPresent ()
+			? Optional.<String>of (
+				theClass.get ().getName ())
+			: Optional.<String>absent ();
 
 	}
 

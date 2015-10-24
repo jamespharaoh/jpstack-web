@@ -23,4 +23,7 @@ class IdentityReferenceFieldSpec
 		required = true)
 	String typeName;
 
+	@DataAttribute
+	String columnName;
+
 }

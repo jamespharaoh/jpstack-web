@@ -36,4 +36,10 @@ class AssociativeListSpec
 		value = "list-column")
 	String listColumnName;
 
+	@DataAttribute
+	String whereSql;
+
+	@DataAttribute
+	String orderSql;
+
 }

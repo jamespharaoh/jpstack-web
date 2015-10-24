@@ -18,7 +18,6 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.EnumFieldSpec;
-import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -35,7 +34,7 @@ class EnumFieldWriter {
 	// builder
 
 	@BuilderParent
-	ModelMetaSpec parent;
+	ModelFieldWriterContext context;
 
 	@BuilderSource
 	EnumFieldSpec spec;
@@ -132,9 +131,8 @@ class EnumFieldWriter {
 			new PropertyWriter ()
 
 			.thisClassNameFormat (
-				"%sRec",
-				capitalise (
-					parent.name ()))
+				"%s",
+				context.recordClassName ())
 
 			.typeNameFormat (
 				"%s",

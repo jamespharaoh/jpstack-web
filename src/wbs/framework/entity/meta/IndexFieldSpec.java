@@ -22,4 +22,8 @@ class IndexFieldSpec
 		value = "counter")
 	String counterName;
 
+	@DataAttribute (
+		value = "column")
+	String columnName;
+
 }

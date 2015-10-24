@@ -16,7 +16,6 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
-import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.entity.meta.TypeFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
@@ -34,7 +33,7 @@ class TypeFieldWriter {
 	// builder
 
 	@BuilderParent
-	ModelMetaSpec parent;
+	ModelFieldWriterContext context;
 
 	@BuilderSource
 	TypeFieldSpec spec;
@@ -54,7 +53,7 @@ class TypeFieldWriter {
 				spec.typeName (),
 				stringFormat (
 					"%sType",
-					parent.name ()));
+					context.modelMeta ().name ()));
 
 		String fieldName =
 			ifNull (
@@ -102,9 +101,8 @@ class TypeFieldWriter {
 			new PropertyWriter ()
 
 			.thisClassNameFormat (
-				"%sRec",
-				capitalise (
-					parent.name ()))
+				"%s",
+				context.recordClassName ())
 
 			.typeNameFormat (
 				"%s",

@@ -18,4 +18,7 @@ class CodeFieldSpec
 	@DataAttribute
 	String name;
 
+	@DataAttribute
+	String columnName;
+
 }

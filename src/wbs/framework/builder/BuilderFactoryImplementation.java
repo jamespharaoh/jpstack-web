@@ -6,9 +6,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -38,8 +40,10 @@ class BuilderFactoryImplementation
 		builderInfo.builderProvider =
 			builderProvider;
 
-		for (Field field
-				: builderClass.getDeclaredFields ()) {
+		for (
+			Field field
+				: builderClass.getDeclaredFields ()
+		) {
 
 			BuilderParent builderParentAnnotation =
 				field.getAnnotation (
@@ -144,6 +148,26 @@ class BuilderFactoryImplementation
 
 	@Override
 	public
+	BuilderFactory addBuilders (
+			Map<Class<?>,Provider<Object>> buildersMap) {
+
+		for (
+			Map.Entry<Class<?>,Provider<Object>> builderEntry
+				: buildersMap.entrySet ()
+		) {
+
+			addBuilder (
+				builderEntry.getKey (),
+				builderEntry.getValue ());
+
+		}
+
+		return this;
+
+	}
+
+	@Override
+	public
 	Builder create () {
 
 		return new BuilderImplementation ();
@@ -222,24 +246,29 @@ class BuilderFactoryImplementation
 		void descend (
 				Object parentObject,
 				List<?> sourceObjects,
-				Object targetObject) {
+				Object targetObject,
+				MissingBuilderBehaviour missingBuilderBehaviour) {
 
-			for (Object sourceObject
-					: sourceObjects) {
+			for (
+				Object sourceObject
+					: sourceObjects
+			) {
 
 				build (
 					parentObject,
 					sourceObject,
-					targetObject);
+					targetObject,
+					missingBuilderBehaviour);
 
 			}
 
 		}
 
 		void build (
-				Object parentObject,
-				Object sourceObject,
-				Object targetObject) {
+				@NonNull Object parentObject,
+				@NonNull Object sourceObject,
+				@NonNull Object targetObject,
+				@NonNull MissingBuilderBehaviour missingBuilderBehaviour) {
 
 			// select builder
 
@@ -248,8 +277,32 @@ class BuilderFactoryImplementation
 					parentObject.getClass (),
 					sourceObject.getClass ());
 
-			if (builderInfo == null)
-				return;
+			if (builderInfo == null) {
+
+				switch (missingBuilderBehaviour) {
+
+				case error:
+
+					throw new RuntimeException (
+						stringFormat (
+
+							"No builder found for parent %s ",
+							parentObject.getClass ().getSimpleName (),
+
+							"and source %s",
+							sourceObject.getClass ().getSimpleName ()));
+
+				case ignore:
+
+					return;
+
+				default:
+
+					throw new RuntimeException ();
+
+				}
+
+			}
 
 			// instantiate
 

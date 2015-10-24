@@ -5,12 +5,14 @@
 	<layer name="console">
 		<bean class="ConsoleObjectManagerImplementation"/>
 		<bean class="ConsoleHelperBuilder"/>
+		<bean class="ConsoleHelperProviderBuilder"/>
 		<bean class="ConsoleHelperProviderManager"/>
 		<bean class="ConsoleHelperProviderMetaBuilder"/>
 		<bean class="ConsoleHelperProviderRegistry"/>
 		<bean class="ConsoleHelperProviderSpec"/>
 		<bean class="ConsoleHelperRegistry"/>
 		<bean class="GenericConsoleHelperProvider"/>
+		<bean class="PrivKeyBuilder"/>
 		<bean class="PrivKeySpec"/>
 		<bean class="RunPostProcessorSpec"/>
 	</layer>

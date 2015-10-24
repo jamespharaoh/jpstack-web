@@ -22,6 +22,7 @@ import wbs.console.object.ObjectContext;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -159,7 +160,8 @@ class ChatHelpTemplateContextBuilder {
 		builder.descend (
 			listContainer,
 			listChildren,
-			consoleModule);
+			consoleModule,
+			MissingBuilderBehaviour.error);
 
 		ConsoleContextBuilderContainer objectContainer =
 			new ConsoleContextBuilderContainerImpl ()
@@ -191,7 +193,8 @@ class ChatHelpTemplateContextBuilder {
 		builder.descend (
 			objectContainer,
 			objectBuilders,
-			consoleModule);
+			consoleModule,
+			MissingBuilderBehaviour.error);
 
 	}
 

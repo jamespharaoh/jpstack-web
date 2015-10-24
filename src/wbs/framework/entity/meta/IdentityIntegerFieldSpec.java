@@ -18,4 +18,8 @@ class IdentityIntegerFieldSpec
 	@DataAttribute
 	String name;
 
+	@DataAttribute (
+		value = "column")
+	String columnName;
+
 }

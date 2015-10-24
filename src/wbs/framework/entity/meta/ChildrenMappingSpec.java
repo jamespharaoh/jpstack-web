@@ -37,9 +37,11 @@ class ChildrenMappingSpec
 	String mapColumnName;
 
 	@DataAttribute (
-		value = "map-type",
 		required = true)
 	String mapType;
+
+	@DataAttribute
+	String whereSql;
 
 	@DataAttribute
 	String orderSql;

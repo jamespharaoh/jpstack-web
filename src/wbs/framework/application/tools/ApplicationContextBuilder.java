@@ -41,6 +41,7 @@ import wbs.framework.application.scaffold.BuildPluginSpec;
 import wbs.framework.application.scaffold.BuildSpec;
 import wbs.framework.application.scaffold.PluginApiModuleSpec;
 import wbs.framework.application.scaffold.PluginBeanSpec;
+import wbs.framework.application.scaffold.PluginComponentSpec;
 import wbs.framework.application.scaffold.PluginConsoleModuleSpec;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
 import wbs.framework.application.scaffold.PluginDependencySpec;
@@ -147,6 +148,7 @@ class ApplicationContextBuilder {
 			.registerBuilderClasses (
 				PluginApiModuleSpec.class,
 				PluginBeanSpec.class,
+				PluginComponentSpec.class,
 				PluginConsoleModuleSpec.class,
 				PluginCustomTypeSpec.class,
 				PluginEnumTypeSpec.class,
@@ -326,7 +328,11 @@ class ApplicationContextBuilder {
 
 		}
 
-		if (equal (layerName, "console")) {
+		if (
+			equal (
+				layerName,
+				"console")
+		) {
 
 			errors +=
 				registerConsoleLayerBeans (

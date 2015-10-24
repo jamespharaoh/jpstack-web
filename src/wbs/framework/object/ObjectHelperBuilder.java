@@ -2,6 +2,7 @@ package wbs.framework.object;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.lang.reflect.Constructor;
@@ -26,6 +27,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.application.context.NoSuchBeanException;
@@ -1481,7 +1483,8 @@ class ObjectHelperBuilder {
 			public
 			String friendlyNamePlural () {
 
-				return friendlyName () + "s";
+				return naivePluralise (
+					friendlyName ());
 
 			}
 

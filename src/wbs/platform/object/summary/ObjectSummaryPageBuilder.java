@@ -34,6 +34,7 @@ import wbs.console.tab.TabContextResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -124,9 +125,11 @@ class ObjectSummaryPageBuilder {
 
 		buildResponder ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildContextTabs (
 				resolvedExtensionPoint);
@@ -139,7 +142,8 @@ class ObjectSummaryPageBuilder {
 		builder.descend (
 			spec,
 			spec.builders (),
-			this);
+			this,
+			MissingBuilderBehaviour.error);
 
 	}
 

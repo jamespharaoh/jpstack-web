@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import wbs.console.context.ConsoleContextMetaBuilderContainer;
 import wbs.framework.application.context.BeanFactory;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 
 @Accessors (fluent = true)
 public
@@ -48,7 +49,8 @@ class ConsoleMetaModuleFactory
 		consoleMetaModuleBuilder.descend (
 			contextMetaBuilderContainer,
 			consoleSpec.builders (),
-			consoleMetaModule);
+			consoleMetaModule,
+			MissingBuilderBehaviour.ignore);
 
 		return consoleMetaModule;
 

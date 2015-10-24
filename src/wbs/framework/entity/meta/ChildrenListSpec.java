@@ -2,6 +2,7 @@ package wbs.framework.entity.meta;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
@@ -27,7 +28,14 @@ class ChildrenListSpec
 		required = true)
 	String typeName;
 
+	@DataAttribute (
+		value = "list-index-column")
+	String listIndexColumnName;
+
 	@DataAttribute
 	String whereSql;
+
+	@DataAttribute
+	String orderSql;
 
 }

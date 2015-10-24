@@ -2,6 +2,7 @@ package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -18,7 +19,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ChildrenListSpec;
 import wbs.framework.entity.meta.ModelMetaLoader;
-import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -38,7 +38,7 @@ class ChildrenListWriter {
 	// builder
 
 	@BuilderParent
-	ModelMetaSpec parent;
+	ModelFieldWriterContext context;
 
 	@BuilderSource
 	ChildrenListSpec spec;
@@ -56,10 +56,8 @@ class ChildrenListWriter {
 		String fieldName =
 			ifNull (
 				spec.name (),
-				stringFormat (
-					"%ss",
-					capitalise (
-						spec.typeName ())));
+				naivePluralise (
+					spec.typeName ()));
 
 		PluginModelSpec fieldTypePluginModel =
 			pluginManager.pluginModelsByName ().get (
@@ -106,9 +104,8 @@ class ChildrenListWriter {
 		new PropertyWriter ()
 
 			.thisClassNameFormat (
-				"%sRec",
-				capitalise (
-					parent.name ()))
+				"%s",
+				context.recordClassName ())
 
 			.typeNameFormat (
 				"List<%s>",

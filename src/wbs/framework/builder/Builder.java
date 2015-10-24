@@ -8,6 +8,13 @@ interface Builder {
 	void descend (
 		Object parentObject,
 		List<?> childObjects,
-		Object targetObject);
+		Object targetObject,
+		MissingBuilderBehaviour missingBuilderBehaviour);
+
+	public
+	enum MissingBuilderBehaviour {
+		ignore,
+		error;
+	}
 
 }

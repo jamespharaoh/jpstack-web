@@ -19,6 +19,9 @@ public
 	String childElement ()
 	default "";
 
+	String[] excludeChildren ()
+	default {};
+
 	String surrogateParent ()
 	default "";
 

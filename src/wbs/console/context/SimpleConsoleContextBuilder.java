@@ -22,6 +22,7 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -139,7 +140,8 @@ class SimpleConsoleContextBuilder {
 		builder.descend (
 			nextBuilderContainer,
 			simpleContextSpec.children (),
-			consoleModule);
+			consoleModule,
+			MissingBuilderBehaviour.error);
 
 
 	}

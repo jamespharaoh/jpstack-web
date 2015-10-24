@@ -31,9 +31,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.console.context.ConsoleContext;
+import wbs.console.context.ConsoleContext.PathSupply;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.context.ConsoleContext.PathSupply;
 import wbs.console.helper.ConsoleHelperProvider;
 import wbs.console.helper.ConsoleHelperProviderRegistry;
 import wbs.console.helper.ConsoleObjectManager;

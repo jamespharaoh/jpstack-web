@@ -39,8 +39,10 @@ class ConsoleMetaModuleBuilder
 		BuilderFactory builderFactory =
 			builderFactoryProvider.get ();
 
-		for (Map.Entry<Class<?>,Provider<Object>> entry
-				: consoleMetaModuleBuilders.entrySet ()) {
+		for (
+			Map.Entry<Class<?>,Provider<Object>> entry
+				: consoleMetaModuleBuilders.entrySet ()
+		) {
 
 			builderFactory.addBuilder (
 				entry.getKey (),
@@ -60,12 +62,14 @@ class ConsoleMetaModuleBuilder
 	void descend (
 			Object parentObject,
 			List<?> childObjects,
-			Object targetObject) {
+			Object targetObject,
+			MissingBuilderBehaviour missingBuilderBehaviour) {
 
 		builder.descend (
 			parentObject,
 			childObjects,
-			targetObject);
+			targetObject,
+			missingBuilderBehaviour);
 
 	}
 

@@ -8,10 +8,11 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
+
+import com.google.common.collect.Iterables;
 
 @Log4j
 public
@@ -39,89 +40,74 @@ class ModelGeneratorTool {
 		log.info (
 			stringFormat (
 				"About to generate %s models",
-				modelMetaLoader.modelSpecs ().size ()));
+				modelMetaLoader.modelMetas ().size ()));
 
-		int recordSuccessCount = 0;
-		int recordErrorCount = 0;
-		int recordSkipCount = 0;
-
-		int interfacesSuccessCount = 0;
-		int interfacesErrorCount = 0;
+		StatusCounters statusCounters =
+			new StatusCounters ();
 
 		for (
 			ModelMetaSpec modelMeta
-				: modelMetaLoader.modelSpecs ().values ()
+				: Iterables.concat (
+					modelMetaLoader.modelMetas ().values (),
+					modelMetaLoader.componentMetas ().values ())
 		) {
 
-			PluginModelSpec pluginModel =
-				modelMeta.pluginModel ();
-
 			PluginSpec plugin =
-				pluginModel.plugin ();
-
-			if (modelMeta.type () != null) {
-
-				try {
-
-					modelRecordGeneratorProvider.get ()
-
-						.plugin (
-							plugin)
-
-						.pluginModel (
-							pluginModel)
-
-						.modelMeta (
-							modelMeta)
-
-						.generateRecord ();
-
-					recordSuccessCount ++;
-
-				} catch (Exception exception) {
-
-					log.error (
-						stringFormat (
-							"Error writing model record for %s",
-							modelMeta.name ()),
-						exception);
-
-					recordErrorCount ++;
-
-				}
-
-			} else {
-
-				recordSkipCount ++;
-
-			}
+				modelMeta.plugin ();
 
 			try {
 
-				modelInterfacesGeneratorProvider.get ()
+				modelRecordGeneratorProvider.get ()
 
 					.plugin (
 						plugin)
 
-					.pluginModel (
-						pluginModel)
-
 					.modelMeta (
 						modelMeta)
 
-					.generateInterfaces ();
+					.generateRecord ();
 
-				interfacesSuccessCount ++;
+				statusCounters.recordSuccessCount ++;
 
 			} catch (Exception exception) {
 
 				log.error (
 					stringFormat (
-						"Error writing model interfaces for %s",
+						"Error writing model record for %s",
 						modelMeta.name ()),
 					exception);
 
-				interfacesErrorCount ++;
+				statusCounters.recordErrorCount ++;
+
+			}
+
+			if (modelMeta.type ().record ()) {
+
+				try {
+
+					modelInterfacesGeneratorProvider.get ()
+
+						.plugin (
+							plugin)
+
+						.modelMeta (
+							modelMeta)
+
+						.generateInterfaces ();
+
+					statusCounters.interfacesSuccessCount ++;
+
+				} catch (Exception exception) {
+
+					log.error (
+						stringFormat (
+							"Error writing model interfaces for %s",
+							modelMeta.name ()),
+						exception);
+
+					statusCounters.interfacesErrorCount ++;
+
+				}
 
 			}
 
@@ -130,25 +116,33 @@ class ModelGeneratorTool {
 		log.info (
 			stringFormat (
 				"Successfully generated %s records and %s interfaces",
-				recordSuccessCount,
-				interfacesSuccessCount));
-
-		log.warn (
-			stringFormat (
-				"Skipped %s records which are explicitly defined",
-				recordSkipCount));
+				statusCounters.recordSuccessCount,
+				statusCounters.interfacesSuccessCount));
 
 		if (
-			recordErrorCount > 0
-			|| interfacesErrorCount > 0
+			statusCounters.recordErrorCount > 0
+			|| statusCounters.interfacesErrorCount > 0
 		) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Aborting due to %s errors",
-					recordErrorCount + interfacesErrorCount));
+					+ statusCounters.recordErrorCount
+					+ statusCounters.interfacesErrorCount));
 
 		}
+
+	}
+
+	// data structures
+
+	class StatusCounters {
+
+		int recordSuccessCount = 0;
+		int recordErrorCount = 0;
+
+		int interfacesSuccessCount = 0;
+		int interfacesErrorCount = 0;
 
 	}
 

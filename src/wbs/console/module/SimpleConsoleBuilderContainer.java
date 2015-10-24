@@ -1,7 +1,7 @@
 package wbs.console.module;
 
 public
-interface SimpleConsoleBuilderContainer {
+interface SimpleConsoleBuilderContainer  {
 
 	String newBeanNamePrefix ();
 

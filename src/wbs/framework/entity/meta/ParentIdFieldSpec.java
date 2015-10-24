@@ -15,6 +15,9 @@ public
 class ParentIdFieldSpec
 	implements ModelFieldSpec {
 
+	@DataAttribute
+	String name;
+
 	@DataAttribute (
 		value = "column")
 	String columnName;

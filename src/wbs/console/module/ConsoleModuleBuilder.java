@@ -94,7 +94,8 @@ class ConsoleModuleBuilder
 		builder.descend (
 			formFieldBuilderContext,
 			formFieldSpecs,
-			formFieldSet);
+			formFieldSet,
+			MissingBuilderBehaviour.error);
 
 		for (
 			FormField<?,?,?,?> formField
@@ -121,9 +122,10 @@ class ConsoleModuleBuilder
 	@Override
 	public
 	void descend (
-			Object parentObject,
-			List<?> childObjects,
-			Object targetObject) {
+			@NonNull Object parentObject,
+			@NonNull List<?> childObjects,
+			@NonNull Object targetObject,
+			@NonNull MissingBuilderBehaviour missingBuilderBehaviour) {
 
 		List<Object> firstPass =
 			new ArrayList<Object> ();
@@ -153,12 +155,14 @@ class ConsoleModuleBuilder
 		builder.descend (
 			parentObject,
 			firstPass,
-			targetObject);
+			targetObject,
+			missingBuilderBehaviour);
 
 		builder.descend (
 			parentObject,
 			secondPass,
-			targetObject);
+			targetObject,
+			missingBuilderBehaviour);
 
 	}
 

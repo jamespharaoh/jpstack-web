@@ -11,6 +11,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.context.BeanFactory;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 
 @Accessors (fluent = true)
 public
@@ -42,39 +43,25 @@ class ConsoleModuleFactory
 		ConsoleModuleImpl consoleModule =
 			consoleModuleProvider.get ();
 
+		SimpleConsoleBuilderContainer container =
+			new SimpleConsoleBuilderContainerImplementation ()
+
+			.newBeanNamePrefix (
+				hyphenToCamel (
+					consoleSpec.name ()))
+
+			.existingBeanNamePrefix (
+				hyphenToCamel (
+					consoleSpec.name ()));
+
 		consoleModuleBuilder.descend (
-			simpleContainerSpec,
+			container,
 			consoleSpec.builders (),
-			consoleModule);
+			consoleModule,
+			MissingBuilderBehaviour.error);
 
 		return consoleModule;
 
 	}
-
-	// simple container
-
-	public
-	SimpleConsoleBuilderContainer simpleContainerSpec =
-		new SimpleConsoleBuilderContainer () {
-
-		@Override
-		public
-		String newBeanNamePrefix () {
-
-			return hyphenToCamel (
-				consoleSpec.name ());
-
-		}
-
-		@Override
-		public
-		String existingBeanNamePrefix () {
-
-			return hyphenToCamel (
-				consoleSpec.name ());
-
-		}
-
-	};
 
 }

@@ -49,7 +49,7 @@ import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.scaffold.model.RootRec;
 import wbs.platform.service.model.ServiceRec;
 import wbs.sms.message.stats.console.MessageStatsConsoleHelper;
-import wbs.sms.message.stats.model.MessageStats;
+import wbs.sms.message.stats.model.MessageStatsData;
 import wbs.sms.message.stats.model.MessageStatsRec;
 import wbs.sms.message.stats.model.MessageStatsSearch;
 import wbs.sms.network.model.NetworkRec;
@@ -305,7 +305,7 @@ class ChatReportRevSharePart
 
 			// collect stats
 
-			MessageStats statsValue =
+			MessageStatsData statsValue =
 				messageStats.getStats ();
 
 			addToReport (
@@ -410,7 +410,7 @@ class ChatReportRevSharePart
 			@NonNull ChatReportRevShareItem report,
 			@NonNull ChatRouteRec chatRoute,
 			@NonNull Optional<ChatRouteNetworkRec> chatRouteNetwork,
-			@NonNull MessageStats statsValue) {
+			@NonNull MessageStatsData statsValue) {
 
 		if (
 			chatRouteNetwork.isPresent ()

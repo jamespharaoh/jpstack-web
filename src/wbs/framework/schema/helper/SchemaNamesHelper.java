@@ -1,6 +1,5 @@
 package wbs.framework.schema.helper;
 
-import java.lang.reflect.Field;
 
 public
 interface SchemaNamesHelper {
@@ -9,10 +8,10 @@ interface SchemaNamesHelper {
 			Class<?> entityClass);
 
 	String columnName (
-			Field field);
+			String fieldName);
 
 	String idColumnName (
-			Field field);
+			String fieldName);
 
 	String idColumnName (
 			Class<?> objectClass);

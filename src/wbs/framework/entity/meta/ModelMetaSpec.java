@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.scaffold.PluginModelSpec;
+import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
@@ -25,7 +25,7 @@ public
 class ModelMetaSpec {
 
 	@DataParent
-	PluginModelSpec pluginModel;
+	PluginSpec plugin;
 
 	// attributes
 
@@ -65,7 +65,8 @@ class ModelMetaSpec {
 		new ArrayList<ModelCollectionSpec> ();
 
 	@DataChildren (
-		direct = true)
+		direct = true,
+		excludeChildren = { "fields", "collections" })
 	List<Object> children =
 		new ArrayList<Object> ();
 

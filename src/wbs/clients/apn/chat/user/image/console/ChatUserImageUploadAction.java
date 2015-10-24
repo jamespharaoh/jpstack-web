@@ -11,8 +11,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.google.common.base.Optional;
-
 import lombok.Cleanup;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -34,6 +32,8 @@ import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+
+import com.google.common.base.Optional;
 
 @PrototypeComponent ("chatUserImageUploadAction")
 public

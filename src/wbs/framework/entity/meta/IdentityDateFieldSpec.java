@@ -18,4 +18,7 @@ class IdentityDateFieldSpec
 	@DataAttribute
 	String name;
 
+	@DataAttribute
+	String columnName;
+
 }

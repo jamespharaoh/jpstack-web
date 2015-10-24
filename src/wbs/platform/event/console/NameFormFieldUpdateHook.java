@@ -5,8 +5,8 @@ import static wbs.framework.utils.etc.Misc.equal;
 
 import javax.inject.Inject;
 
-import wbs.console.forms.FormFieldUpdateHook;
 import wbs.console.forms.FormField.UpdateResult;
+import wbs.console.forms.FormFieldUpdateHook;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;

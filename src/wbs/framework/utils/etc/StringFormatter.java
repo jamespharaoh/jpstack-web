@@ -161,7 +161,16 @@ class StringFormatter {
 
 	public
 	String format (
-			@NonNull Object... args) {
+			@NonNull Object... arguments) {
+
+		return formatArray (
+			arguments);
+
+	}
+
+	public
+	String formatArray (
+			@NonNull Object[] arguments) {
 
 		StringBuilder stringBuilder =
 			new StringBuilder ();
@@ -169,7 +178,7 @@ class StringFormatter {
 		for (
 			String string
 				: formatSpecial (
-					Arrays.asList (args))
+					Arrays.asList (arguments))
 		) {
 
 			stringBuilder.append (
@@ -232,11 +241,9 @@ class StringFormatter {
 		@Override
 		public
 		String convert (
-				@NonNull Object arg) {
+				@NonNull Object argument) {
 
-			return arg != null
-				? arg.toString ()
-				: "";
+			return argument.toString ();
 
 		}
 
@@ -249,11 +256,10 @@ class StringFormatter {
 		@Override
 		public
 		String convert (
-				@NonNull Object source) {
+				@NonNull Object argument) {
 
-			return source != null
-				? Html.encode (source)
-				: "";
+			return Html.encode (
+				argument);
 
 		}
 
@@ -268,10 +274,8 @@ class StringFormatter {
 		String convert (
 				@NonNull Object argument) {
 
-			return argument != null
-				? Html.javascriptStringEscape (
-					argument.toString ())
-					: "";
+			return Html.javascriptStringEscape (
+				argument.toString ());
 
 		}
 
@@ -286,9 +290,8 @@ class StringFormatter {
 		String convert (
 				@NonNull Object argument) {
 
-			return argument != null
-				? Html.urlEncode (argument.toString ())
-				: "";
+			return Html.urlEncode (
+				argument.toString ());
 
 		}
 
@@ -303,9 +306,12 @@ class StringFormatter {
 		String convert (
 				@NonNull Object argument) {
 
-			return argument != null
-				? Html.encode (((Number) argument).toString ())
-				: "";
+			Number number =
+				(Number)
+				argument;
+
+			return Html.encode (
+				number.toString ());
 
 		}
 
@@ -314,12 +320,14 @@ class StringFormatter {
 	private final static
 	Map<Character,Conversion> standardConversions =
 		ImmutableMap.<Character,Conversion>builder ()
-			.put ('d', new DecimalConversion ())
-			.put ('s', new StringConversion ())
-			.put ('h', new HtmlConversion ())
-			.put ('j', new JavaScriptConversion ())
-			.put ('u', new UrlConversion ())
-			.build ();
+
+		.put ('d', new DecimalConversion ())
+		.put ('s', new StringConversion ())
+		.put ('h', new HtmlConversion ())
+		.put ('j', new JavaScriptConversion ())
+		.put ('u', new UrlConversion ())
+
+		.build ();
 
 	public final static
 	StringFormatter standardStringFormatter =
@@ -328,20 +336,30 @@ class StringFormatter {
 
 	public static
 	String standard (
-			@NonNull Object... args) {
+			@NonNull Object... arguments) {
 
-		return standardStringFormatter.format (
-			args);
+		return standardStringFormatter.formatArray (
+			arguments);
+
+	}
+
+	public static
+	String standardArray (
+			@NonNull Object[] arguments) {
+
+		return standardStringFormatter.formatArray (
+			arguments);
 
 	}
 
 	public static
 	void printWriterFormat (
 			PrintWriter printWriter,
-			Object... args) {
+			Object... arguments) {
 
 		printWriter.print (
-			standard (args));
+			standardArray (
+				arguments));
 
 	}
 

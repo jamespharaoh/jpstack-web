@@ -169,7 +169,7 @@ class SchemaTableFromModel {
 			break;
 
 		case collection:
-		case link:
+		case associative:
 		case master:
 		case slave:
 			// no action needed

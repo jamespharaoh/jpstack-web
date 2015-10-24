@@ -21,14 +21,15 @@ import lombok.experimental.Accessors;
 import org.apache.commons.io.FileUtils;
 
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.CodeFieldSpec;
+import wbs.framework.entity.meta.DateFieldSpec;
 import wbs.framework.entity.meta.IdentityIntegerFieldSpec;
 import wbs.framework.entity.meta.IdentityReferenceFieldSpec;
 import wbs.framework.entity.meta.IdentityStringFieldSpec;
 import wbs.framework.entity.meta.IndexFieldSpec;
+import wbs.framework.entity.meta.IntegerFieldSpec;
 import wbs.framework.entity.meta.MasterFieldSpec;
 import wbs.framework.entity.meta.ModelFieldSpec;
 import wbs.framework.entity.meta.ModelImplementsInterfaceSpec;
@@ -37,6 +38,7 @@ import wbs.framework.entity.meta.ModelMetaType;
 import wbs.framework.entity.meta.ParentFieldSpec;
 import wbs.framework.entity.meta.ParentIdFieldSpec;
 import wbs.framework.entity.meta.ParentTypeFieldSpec;
+import wbs.framework.entity.meta.ReferenceFieldSpec;
 import wbs.framework.entity.meta.TimestampFieldSpec;
 import wbs.framework.entity.meta.TypeCodeFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
@@ -59,14 +61,11 @@ class ModelRecordGenerator {
 	PluginSpec plugin;
 
 	@Getter @Setter
-	PluginModelSpec pluginModel;
-
-	@Getter @Setter
 	ModelMetaSpec modelMeta;
 
 	// state
 
-	String className;
+	String recordClassName;
 
 	// implementation
 
@@ -74,11 +73,25 @@ class ModelRecordGenerator {
 	void generateRecord ()
 		throws IOException {
 
-		className =
-			stringFormat (
-				"%sRec",
+		if (modelMeta.type ().record ()) {
+
+			recordClassName =
+				stringFormat (
+					"%sRec",
+					capitalise (
+						modelMeta.name ()));
+
+		} else if (modelMeta.type ().component ()) {
+
+			recordClassName =
 				capitalise (
-					modelMeta.name ()));
+					modelMeta.name ());
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 		String directory =
 			stringFormat (
@@ -92,7 +105,7 @@ class ModelRecordGenerator {
 			stringFormat (
 				"%s/%s.java",
 				directory,
-				className);
+				recordClassName);
 
 		@Cleanup
 		FormatWriter javaWriter =
@@ -133,6 +146,7 @@ class ModelRecordGenerator {
 			org.apache.commons.lang3.builder.CompareToBuilder.class,
 
 			wbs.framework.entity.annotations.CommonEntity.class,
+			wbs.framework.entity.annotations.ComponentEntity.class,
 			wbs.framework.entity.annotations.EphemeralEntity.class,
 			wbs.framework.entity.annotations.EventEntity.class,
 			wbs.framework.entity.annotations.MajorEntity.class,
@@ -171,6 +185,7 @@ class ModelRecordGenerator {
 			wbs.framework.record.MajorRecord.class,
 			wbs.framework.record.MinorRecord.class,
 			wbs.framework.record.Record.class,
+			wbs.framework.record.RecordComponent.class,
 			wbs.framework.record.RootRecord.class,
 			wbs.framework.record.TypeRecord.class,
 
@@ -251,7 +266,7 @@ class ModelRecordGenerator {
 
 		javaWriter.writeFormat (
 			"class %s\n",
-			className);
+			recordClassName);
 
 		switch (modelMeta.type ()) {
 
@@ -259,7 +274,15 @@ class ModelRecordGenerator {
 
 			javaWriter.writeFormat (
 				"\timplements CommonRecord<%s>",
-				className);
+				recordClassName);
+
+			break;
+
+		case component:
+
+			javaWriter.writeFormat (
+				"\timplements RecordComponent<%s>",
+				recordClassName);
 
 			break;
 
@@ -267,7 +290,7 @@ class ModelRecordGenerator {
 
 			javaWriter.writeFormat (
 				"\timplements EphemeralRecord<%s>",
-				className);
+				recordClassName);
 
 			break;
 
@@ -275,7 +298,7 @@ class ModelRecordGenerator {
 
 			javaWriter.writeFormat (
 				"\timplements EventRecord<%s>",
-				className);
+				recordClassName);
 
 			break;
 
@@ -283,7 +306,7 @@ class ModelRecordGenerator {
 
 			javaWriter.writeFormat (
 				"\timplements MajorRecord<%s>",
-				className);
+				recordClassName);
 
 			break;
 
@@ -291,7 +314,7 @@ class ModelRecordGenerator {
 
 			javaWriter.writeFormat (
 				"\timplements MinorRecord<%s>",
-				className);
+				recordClassName);
 
 			break;
 
@@ -299,7 +322,7 @@ class ModelRecordGenerator {
 
 			javaWriter.writeFormat (
 				"\timplements RootRecord<%s>",
-				className);
+				recordClassName);
 
 			break;
 
@@ -307,7 +330,7 @@ class ModelRecordGenerator {
 
 			javaWriter.writeFormat (
 				"\timplements TypeRecord<%s>",
-				className);
+				recordClassName);
 
 			break;
 
@@ -344,11 +367,15 @@ class ModelRecordGenerator {
 		generateEquals (
 			javaWriter);
 
-		generateCompareTo (
-			javaWriter);
+		if (modelMeta.type ().record ()) {
 
-		generateToString (
-			javaWriter);
+			generateCompareTo (
+				javaWriter);
+
+			generateToString (
+				javaWriter);
+
+		}
 
 		javaWriter.writeFormat (
 			"}\n");
@@ -369,8 +396,17 @@ class ModelRecordGenerator {
 		javaWriter.writeFormat (
 			"\n");
 
+		ModelFieldWriterContext nextContext =
+			new ModelFieldWriterContext ()
+
+			.modelMeta (
+				modelMeta)
+
+			.recordClassName (
+				recordClassName);
+
 		modelWriterBuilder.write (
-			modelMeta,
+			nextContext,
 			modelMeta.fields (),
 			javaWriter);
 
@@ -390,8 +426,17 @@ class ModelRecordGenerator {
 		javaWriter.writeFormat (
 			"\n");
 
+		ModelFieldWriterContext nextContext =
+			new ModelFieldWriterContext ()
+
+			.modelMeta (
+				modelMeta)
+
+			.recordClassName (
+				recordClassName);
+
 		modelWriterBuilder.write (
-			modelMeta,
+			nextContext,
 			modelMeta.collections (),
 			javaWriter);
 
@@ -432,7 +477,7 @@ class ModelRecordGenerator {
 
 		javaWriter.writeFormat (
 			"\t\tif (otherObject.getClass () != %s.class) {\n",
-			className);
+			recordClassName);
 
 		javaWriter.writeFormat (
 			"\t\t\treturn false;\n");
@@ -447,11 +492,11 @@ class ModelRecordGenerator {
 
 		javaWriter.writeFormat (
 			"\t\t%s other =\n",
-			className);
+			recordClassName);
 
 		javaWriter.writeFormat (
 			"\t\t\t(%s)\n",
-			className);
+			recordClassName);
 
 		javaWriter.writeFormat (
 			"\t\t\totherObject;\n");
@@ -459,27 +504,147 @@ class ModelRecordGenerator {
 		javaWriter.writeFormat (
 			"\n");
 
-		// check for null id
+		if (modelMeta.type ().record ()) {
 
-		javaWriter.writeFormat (
-			"\t\tif (getId () == null || other.getId () == null) {\n");
+			// check for null id
 
-		javaWriter.writeFormat (
-			"\t\t\treturn false;\n");
+			javaWriter.writeFormat (
+				"\t\tif (getId () == null || other.getId () == null) {\n");
 
-		javaWriter.writeFormat (
-			"\t\t}\n");
+			javaWriter.writeFormat (
+				"\t\t\treturn false;\n");
 
-		javaWriter.writeFormat (
-			"\n");
+			javaWriter.writeFormat (
+				"\t\t}\n");
 
-		// compare id
+			javaWriter.writeFormat (
+				"\n");
 
-		javaWriter.writeFormat (
-			"\t\treturn getId () == other.getId ();\n");
+			// compare id
 
-		javaWriter.writeFormat (
-			"\n");
+			javaWriter.writeFormat (
+				"\t\treturn getId () == other.getId ();\n");
+
+			javaWriter.writeFormat (
+				"\n");
+
+		} else if (modelMeta.type ().component ()) {
+
+			// TODO this is not nice at all
+
+			for (
+				ModelFieldSpec modelField
+					: modelMeta.fields ()
+			) {
+
+				String fieldName;
+
+				if (modelField instanceof ReferenceFieldSpec) {
+
+					ReferenceFieldSpec referenceField =
+						(ReferenceFieldSpec)
+						modelField;
+
+					fieldName =
+						ifNull (
+							referenceField.name (),
+							referenceField.typeName ());
+
+				} else if (modelField instanceof DateFieldSpec) {
+
+					DateFieldSpec dateField =
+						(DateFieldSpec)
+						modelField;
+
+					fieldName =
+						dateField.name ();
+
+				} else if (modelField instanceof IntegerFieldSpec) {
+
+					IntegerFieldSpec integerField =
+						(IntegerFieldSpec)
+						modelField;
+
+					fieldName =
+						integerField.name ();
+
+				} else {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Don't know how to get name of component field ",
+							"type %s",
+							modelField.getClass ().getSimpleName ()));
+
+				}
+
+				javaWriter.writeFormat (
+					"\t\tif (\n");
+
+				javaWriter.writeFormat (
+					"\t\t\t! (\n");
+
+				javaWriter.writeFormat (
+					"\t\t\t\tget%s () == null\n",
+					capitalise (
+						fieldName));
+
+				javaWriter.writeFormat (
+					"\t\t\t\t&& other.get%s () == null\n",
+					capitalise (
+						fieldName));
+
+				javaWriter.writeFormat (
+					"\t\t\t) && (\n");
+
+				javaWriter.writeFormat (
+					"\t\t\t\tget%s () == null\n",
+					capitalise (
+						fieldName));
+
+				javaWriter.writeFormat (
+					"\t\t\t\t|| other.get%s () == null\n",
+					capitalise (
+						fieldName));
+
+				javaWriter.writeFormat (
+					"\t\t\t\t|| ! get%s ().equals (\n",
+					capitalise (
+						fieldName));
+
+				javaWriter.writeFormat (
+					"\t\t\t\t\tother.get%s ())\n",
+					capitalise (
+						fieldName));
+
+				javaWriter.writeFormat (
+					"\t\t\t)\n");
+
+				javaWriter.writeFormat (
+					"\t\t) {\n");
+
+				javaWriter.writeFormat (
+					"\t\t\treturn false;\n");
+
+				javaWriter.writeFormat (
+					"\t\t}\n");
+
+				javaWriter.writeFormat (
+					"\n");
+
+			}
+
+			javaWriter.writeFormat (
+				"\t\treturn true;\n");
+
+			javaWriter.writeFormat (
+				"\n");
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 		// write end of function
 
@@ -520,7 +685,7 @@ class ModelRecordGenerator {
 
 		javaWriter.writeFormat (
 			"\t\t\tRecord<%s> otherRecord) {\n",
-			className);
+			recordClassName);
 
 		javaWriter.writeFormat (
 			"\n");
@@ -529,11 +694,11 @@ class ModelRecordGenerator {
 
 		javaWriter.writeFormat (
 			"\t\t%s other =\n",
-			className);
+			recordClassName);
 
 		javaWriter.writeFormat (
 			"\t\t\t(%s) otherRecord;\n",
-			className);
+			recordClassName);
 
 		javaWriter.writeFormat (
 			"\n");
@@ -1021,7 +1186,7 @@ class ModelRecordGenerator {
 
 			javaWriter.writeFormat (
 				"\t\treturn \"%s(id=\" + getId () + \")\";\n",
-				className);
+				recordClassName);
 
 		}
 

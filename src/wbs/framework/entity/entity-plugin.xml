@@ -86,6 +86,41 @@
 	</layer>
 
 	<layer name="entity">
+		<bean class="build.AssignedIdModelFieldBuilder"/>
+		<bean class="build.AssociativeCollectionModelFieldBuilder"/>
+		<bean class="build.AssociativeListModelFieldBuilder"/>
+		<bean class="build.BinaryModelFieldBuilder"/>
+		<bean class="build.ChildrenCollectionModelFieldBuilder"/>
+		<bean class="build.ChildrenListModelFieldBuilder"/>
+		<bean class="build.ChildrenMappingModelFieldBuilder"/>
+		<bean class="build.CodeModelFieldBuilder"/>
+		<bean class="build.ComponentModelFieldBuilder"/>
+		<bean class="build.DateModelFieldBuilder"/>
+		<bean class="build.DeletedModelFieldBuilder"/>
+		<bean class="build.DescriptionModelFieldBuilder"/>
+		<bean class="build.EnumModelFieldBuilder"/>
+		<bean class="build.FloatingPointModelFieldBuilder"/>
+		<bean class="build.ForeignIdModelFieldBuilder"/>
+		<bean class="build.GeneratedIdModelFieldBuilder"/>
+		<bean class="build.IdentityDateModelFieldBuilder"/>
+		<bean class="build.IdentityIntegerModelFieldBuilder"/>
+		<bean class="build.IdentityReferenceModelFieldBuilder"/>
+		<bean class="build.IdentityStringModelFieldBuilder"/>
+		<bean class="build.IndexModelFieldBuilder"/>
+		<bean class="build.IntegerModelFieldBuilder"/>
+		<bean class="build.MasterModelFieldBuilder"/>
+		<bean class="build.ModelBuilderManager"/>
+		<bean class="build.NameModelFieldBuilder"/>
+		<bean class="build.ParentModelFieldBuilder"/>
+		<bean class="build.ParentIdModelFieldBuilder"/>
+		<bean class="build.ParentTypeModelFieldBuilder"/>
+		<bean class="build.ReferenceModelFieldBuilder"/>
+		<bean class="build.SlaveModelFieldBuilder"/>
+		<bean class="build.StringModelFieldBuilder"/>
+		<bean class="build.TimestampModelFieldBuilder"/>
+		<bean class="build.TypeCodeModelFieldBuilder"/>
+		<bean class="build.TypeModelFieldBuilder"/>
+		<bean class="build.YesNoModelFieldBuilder"/>
 		<bean class="helper.EntityHelperImplementation"/>
 		<bean class="model.ModelBuilder"/>
 	</layer>

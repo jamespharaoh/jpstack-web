@@ -39,4 +39,7 @@ class AssociativeCollectionSpec
 	@DataAttribute
 	String whereSql;
 
+	@DataAttribute
+	String orderSql;
+
 }

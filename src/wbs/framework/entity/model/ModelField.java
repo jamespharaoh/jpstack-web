@@ -3,10 +3,7 @@ package wbs.framework.entity.model;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,6 +12,7 @@ import java.util.Map;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
@@ -62,16 +60,16 @@ class ModelField {
 	ParameterizedType parameterizedType;
 
 	@DataAttribute
-	Type collectionKeyType;
+	Class<?> collectionKeyType;
 
 	@DataAttribute
-	Type collectionValueType;
+	Class<?> collectionValueType;
 
 	@DataAttribute
 	String sqlType;
 
 	@DataAttribute
-	String hibernateTypeHelper;
+	Class<?> hibernateTypeHelper;
 
 	@DataAttribute
 	Boolean nullable;
@@ -83,25 +81,28 @@ class ModelField {
 	String sequenceName;
 
 	@DataAttribute
-	String orderBy;
+	String orderSql;
 
 	@DataAttribute
-	String where;
+	String whereSql;
 
 	@DataAttribute
-	String key;
+	String joinColumnName;
 
 	@DataAttribute
-	String index;
+	String listIndexColumnName;
 
 	@DataAttribute
-	String element;
+	String mappingKeyColumnName;
 
 	@DataAttribute
-	String table;
+	String associationTableName;
 
 	@DataAttribute
-	String counter;
+	String valueColumnName;
+
+	@DataAttribute
+	String indexCounterFieldName;
 
 	@DataChildren
 	List<ModelField> fields =
@@ -111,8 +112,8 @@ class ModelField {
 	Map<String,ModelField> fieldsByName =
 		new LinkedHashMap<String,ModelField> ();
 
-	Field field;
-	Annotation annotation;
+	//Field field;
+	//Annotation annotation;
 
 	public
 	String columnName () {
@@ -220,7 +221,7 @@ class ModelField {
 
 	public
 	boolean link () {
-		return type == ModelFieldType.link;
+		return type == ModelFieldType.associative;
 	}
 
 	public

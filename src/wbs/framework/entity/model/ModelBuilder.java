@@ -1,59 +1,40 @@
 package wbs.framework.entity.model;
 
-import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
+import static wbs.framework.utils.etc.Misc.classForName;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.uncapitalise;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
+
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.entity.annotations.meta.EntityMeta;
-import wbs.framework.entity.annotations.meta.EntityMetaCreate;
-import wbs.framework.entity.annotations.meta.EntityMetaMutable;
-import wbs.framework.entity.annotations.meta.EntityMetaTable;
-import wbs.framework.entity.annotations.meta.FieldMeta;
-import wbs.framework.entity.annotations.meta.FieldMetaColumn;
-import wbs.framework.entity.annotations.meta.FieldMetaColumns;
-import wbs.framework.entity.annotations.meta.FieldMetaCounter;
-import wbs.framework.entity.annotations.meta.FieldMetaElement;
-import wbs.framework.entity.annotations.meta.FieldMetaField;
-import wbs.framework.entity.annotations.meta.FieldMetaHibernateTypeHelper;
-import wbs.framework.entity.annotations.meta.FieldMetaIndex;
-import wbs.framework.entity.annotations.meta.FieldMetaKey;
-import wbs.framework.entity.annotations.meta.FieldMetaNullable;
-import wbs.framework.entity.annotations.meta.FieldMetaOrderBy;
-import wbs.framework.entity.annotations.meta.FieldMetaSequence;
-import wbs.framework.entity.annotations.meta.FieldMetaSqlType;
-import wbs.framework.entity.annotations.meta.FieldMetaTable;
-import wbs.framework.entity.annotations.meta.FieldMetaWhere;
+import wbs.framework.application.scaffold.PluginModelSpec;
+import wbs.framework.application.scaffold.PluginSpec;
+import wbs.framework.entity.build.ModelBuilderManager;
+import wbs.framework.entity.build.ModelFieldBuilderContext;
+import wbs.framework.entity.build.ModelFieldBuilderTarget;
+import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.schema.helper.SchemaNamesHelper;
 import wbs.framework.schema.helper.SchemaTypesHelper;
 
 @Accessors (fluent = true)
-@Log4j
 @PrototypeComponent ("modelBuilder")
 public
 class ModelBuilder {
+
+	// dependencies
+
+	@Inject
+	ModelBuilderManager modelBuilderManager;
 
 	@Inject
 	SchemaNamesHelper schemaNamesHelper;
@@ -61,558 +42,160 @@ class ModelBuilder {
 	@Inject
 	SchemaTypesHelper schemaTypesHelper;
 
+	// properties
+
 	@Getter @Setter
-	Class<?> objectClass;
+	ModelMetaSpec modelMeta;
+
+	// state
+
+	PluginModelSpec pluginModel;
+	PluginSpec plugin;
 
 	Model model;
+
+	String recordClassName;
+	String recordClassNameFull;
+	Class<?> recordClass;
+
+	String objectHelperClassName;
+	String objectHelperClassNameFull;
+	Class<?> objectHelperClass;
+
+	// implementation
 
 	public
 	Model build () {
 
-		model =
-			new Model ();
-
-		Annotation entityAnnotation =
-			findAnnotation (
-				objectClass.getDeclaredAnnotations (),
-				EntityMeta.class);
-
-		if (entityAnnotation == null) {
-
-			log.error (
-				stringFormat (
-					"No entity annotation found on %s",
-					objectClass ().getName ()));
-
-			return null;
-
-		}
-
-		// object class
-
-		model.objectClass (
-			objectClass);
-
-		// object name
-
-		Pattern classNamePattern =
-			Pattern.compile ("(.+)(Rec|View)");
-
-		Matcher classNameMatcher =
-			classNamePattern.matcher (objectClass.getSimpleName ());
-
-		if (! classNameMatcher.matches ())
-			throw new RuntimeException ();
-
-		model.objectName (
-			uncapitalise (
-				classNameMatcher.group (1)));
-
-		// object type code
-
-		model.objectTypeCode (
-			camelToUnderscore (
-				classNameMatcher.group (1)));
-
-		// object type id
-
-		// TODO or not maybe...
-
-		// table name
-
-		model.tableName (
-			annotationStringParam (
-				entityAnnotation,
-				EntityMetaTable.class,
-				schemaNamesHelper.tableName (
-					objectClass)));
-
-		// create
-
-		model.create (
-			(Boolean)
-			annotationParam (
-				entityAnnotation,
-				EntityMetaCreate.class,
-				true));
-
-		// mutable
-
-		model.mutable (
-			(Boolean)
-			annotationParam (
-				entityAnnotation,
-				EntityMetaMutable.class,
-				true));
-
-		// fields
-
-		for (Field field
-				: objectClass.getDeclaredFields ()) {
-
-			Annotation fieldAnnotation =
-				findAnnotation (
-					field.getAnnotations (),
-					FieldMeta.class);
-
-			if (fieldAnnotation == null)
-				continue;
-
-			ModelField modelField =
-				createField (
-					null,
-					field,
-					fieldAnnotation);
-
-			storeField (
-				model,
-				modelField);
-
-		}
-
-		// object helper class
-
-		String objectHelperClassName =
-			stringFormat (
-				"%s.%sObjectHelper",
-				objectClass.getPackage ().getName (),
-				capitalise (model.objectName ()));
-
 		try {
 
-			Class<?> objectHelperClass =
-				Class.forName (objectHelperClassName);
+			return buildReal ();
 
-			model.helperClass (
-				objectHelperClass);
+		} catch (Exception exception) {
 
-		} catch (ClassNotFoundException exception) {
-
-			log.warn (
+			throw new RuntimeException (
 				stringFormat (
-					"Object helper class %s not found for %s",
-					objectHelperClassName,
-					model.objectName ()));
+					"Error creating model %s",
+					modelMeta.name ()),
+				exception);
 
 		}
-
-		// and return
-
-		return model;
 
 	}
 
-	ModelField createField (
-			ModelField parentModelField,
-			Field field,
-			Annotation fieldAnnotation) {
+	private
+	Model buildReal () {
 
-		FieldMeta fieldMetaAnnotation =
-			fieldAnnotation
-				.annotationType ()
-				.getAnnotation (FieldMeta.class);
+		plugin =
+			modelMeta.plugin ();
 
-		ModelField modelField =
-			new ModelField ()
+		// record class
+
+		recordClassName =
+			stringFormat (
+				"%sRec",
+				capitalise (
+					modelMeta.name ()));
+
+		recordClassNameFull =
+			stringFormat (
+				"%s.model.%s",
+				plugin.packageName (),
+				recordClassName);
+
+		recordClass =
+			classForName (
+				recordClassNameFull);
+
+		// object helper class
+
+		objectHelperClassName =
+			stringFormat (
+				"%sObjectHelper",
+				capitalise (
+					modelMeta.name ()));
+
+		objectHelperClassNameFull =
+			stringFormat (
+				"%s.model.%s",
+				plugin.packageName (),
+				objectHelperClassName);
+
+		objectHelperClass =
+			classForName (
+				objectHelperClassNameFull);
+
+		// model
+
+		model =
+			new Model ()
+
+			.objectClass (
+				recordClass)
+
+			.objectName (
+				uncapitalise (
+					modelMeta.name ()))
+
+			.objectTypeCode (
+				camelToUnderscore (
+					modelMeta.name ()))
+
+			.tableName (
+				ifNull (
+					modelMeta.tableName (),
+					schemaNamesHelper.tableName (
+						recordClass)))
+
+			.create (
+				ifNull (
+					modelMeta.create (),
+					true))
+
+			.mutable (
+				ifNull (
+					modelMeta.mutable (),
+					true))
+
+			.helperClass (
+				objectHelperClass);
+
+		// model fields
+
+		ModelFieldBuilderContext context =
+			new ModelFieldBuilderContext ()
+
+			.modelMeta (
+				modelMeta)
+
+			.recordClass (
+				recordClass);
+
+		ModelFieldBuilderTarget target =
+			new ModelFieldBuilderTarget ()
 
 			.model (
 				model)
 
-			.parentField (
-				parentModelField)
+			.fields (
+				model.fields ())
 
-			.name (
-				field.getName ())
+			.fieldsByName (
+				model.fieldsByName ());
 
-			.label (
-				camelToSpaces (
-					field.getName ()))
+		modelBuilderManager.build (
+			context,
+			modelMeta.fields (),
+			target);
 
-			.type (
-				fieldMetaAnnotation.modelFieldType ())
+		modelBuilderManager.build (
+			context,
+			modelMeta.collections (),
+			target);
 
-			.parent (
-				fieldMetaAnnotation.treeParent ())
+		// and return
 
-			.identity (
-				fieldMetaAnnotation.treeIdentity ())
-
-			.valueType (
-				field.getType ())
-
-			.field (
-				field)
-
-			.annotation (
-				fieldAnnotation);
-
-		// collection types
-
-		if (field.getGenericType () instanceof ParameterizedType) {
-
-			modelField.parameterizedType (
-				(ParameterizedType)
-				field.getGenericType ());
-
-		}
-
-		if (modelField.valueType () == Set.class) {
-
-			modelField.collectionKeyType (
-				modelField.parameterizedType ()
-					.getActualTypeArguments () [0]);
-
-			modelField.collectionValueType (
-				modelField.parameterizedType ()
-					.getActualTypeArguments () [0]);
-
-		}
-
-		if (modelField.valueType () == Map.class) {
-
-			modelField.collectionKeyType (
-				modelField.parameterizedType ()
-					.getActualTypeArguments () [0]);
-
-			modelField.collectionValueType (
-				modelField.parameterizedType ()
-					.getActualTypeArguments () [1]);
-
-		}
-
-		if (modelField.valueType () == List.class) {
-
-			modelField.collectionKeyType (
-				Integer.class);
-
-			modelField.collectionValueType (
-				modelField.parameterizedType ()
-					.getActualTypeArguments () [0]);
-
-		}
-
-		// foreign field
-
-		modelField.foreignFieldName (
-			nullIfEmptyString (
-				(String)
-				annotationParam (
-					fieldAnnotation,
-					FieldMetaField.class,
-					"")));
-
-		Field foreignField = null;
-
-		if (modelField.foreignFieldName () != null) {
-
-			try {
-
-				foreignField =
-					objectClass.getDeclaredField (
-						modelField.foreignFieldName ());
-
-			} catch (NoSuchFieldException exception) {
-
-				log.error (
-					stringFormat (
-						"Foreign field %s.%s doesn't exist",
-						model.objectName (),
-						modelField.foreignFieldName ()));
-
-				return null;
-
-			}
-
-		}
-
-		// sequence name
-
-		if (modelField.generatedId ()) {
-
-			modelField.sequenceName (
-				annotationStringParam (
-					fieldAnnotation,
-					FieldMetaSequence.class,
-					schemaNamesHelper.idSequenceName (
-						model.objectClass ())));
-
-		}
-
-		// column names
-
-		String[] annotationColumnNames =
-			(String[])
-			annotationParam (
-				fieldAnnotation,
-				FieldMetaColumns.class,
-				new String [] {});
-
-		String annotationColumnName =
-			(String)
-			annotationParam (
-				fieldAnnotation,
-				FieldMetaColumn.class,
-				"");
-
-		if (annotationColumnNames.length > 0
-				&& ! annotationColumnName.isEmpty ())
-			throw new RuntimeException ();
-
-		if (annotationColumnNames.length > 0) {
-
-			modelField.columnNames (
-				Arrays.asList (annotationColumnNames));
-
-		} else if (! annotationColumnName.isEmpty ()) {
-
-			modelField.columnNames (
-				Collections.singletonList (
-					annotationColumnName));
-
-		} else if (foreignField != null) {
-
-			modelField.columnNames (
-				Collections.singletonList (
-					schemaNamesHelper.idColumnName (
-						foreignField)));
-
-		} else if (modelField.reference ()) {
-
-			modelField.columnNames (
-				Collections.singletonList (
-					schemaNamesHelper.idColumnName (field)));
-
-		} else if (modelField.value ()) {
-
-			modelField.columnNames (
-				Collections.singletonList (
-					schemaNamesHelper.columnName (field)));
-
-		}
-
-		// type names
-
-		Class<?> annotationHibernateTypeHelper =
-			(Class<?>)
-			annotationParam (
-				fieldAnnotation,
-				FieldMetaHibernateTypeHelper.class,
-				Object.class);
-
-		if (annotationHibernateTypeHelper != Object.class) {
-
-			modelField.hibernateTypeHelper (
-				annotationHibernateTypeHelper.getName ());
-
-		}
-
-		// other misc files
-
-		modelField.sqlType (
-			annotationStringParam (
-				fieldAnnotation,
-				FieldMetaSqlType.class,
-				null));
-
-		modelField.nullable (
-			(Boolean) annotationParam (
-				fieldAnnotation,
-				FieldMetaNullable.class,
-				false));
-
-		modelField.orderBy (
-			annotationStringParam (
-				fieldAnnotation,
-				FieldMetaOrderBy.class,
-				null));
-
-		modelField.where (
-			annotationStringParam (
-				fieldAnnotation,
-				FieldMetaWhere.class,
-				null));
-
-		modelField.key (
-			annotationStringParam (
-				fieldAnnotation,
-				FieldMetaKey.class,
-				null));
-
-		modelField.index (
-			annotationStringParam (
-				fieldAnnotation,
-				FieldMetaIndex.class,
-				null));
-
-		modelField.element (
-			annotationStringParam (
-				fieldAnnotation,
-				FieldMetaElement.class,
-				null));
-
-		modelField.table (
-			annotationStringParam (
-				fieldAnnotation,
-				FieldMetaTable.class,
-				null));
-
-		modelField.counter (
-			annotationStringParam (
-				fieldAnnotation,
-				FieldMetaCounter.class,
-				null));
-
-		// member fields
-
-		if (modelField.composite ()) {
-
-			Class<?> componentClass =
-				modelField.valueType ();
-
-			for (
-				Field componentField
-					: componentClass.getDeclaredFields ()
-			) {
-
-				Annotation componentFieldAnnotation =
-					findAnnotation (
-						componentField.getAnnotations (),
-						FieldMeta.class);
-
-				if (componentFieldAnnotation == null)
-					continue;
-
-				ModelField componentModelField =
-					createField (
-						modelField,
-						componentField,
-						componentFieldAnnotation);
-
-				modelField.fields.add (
-					componentModelField);
-
-				modelField.fieldsByName.put (
-					componentModelField.name (),
-					componentModelField);
-
-			}
-
-		}
-
-		return modelField;
-
-	}
-
-	void storeField (
-			Model model,
-			ModelField modelField) {
-
-		model.fields ().add (
-			modelField);
-
-		model.fieldsByName ().put (
-			modelField.name (),
-			modelField);
-
-		if (
-			in (modelField.type (),
-				ModelFieldType.assignedId,
-				ModelFieldType.generatedId,
-				ModelFieldType.foreignId,
-				ModelFieldType.compositeId)
-		) {
-
-			if (model.idField () != null)
-				throw new RuntimeException ();
-
-			model.idField (modelField);
-
-		}
-
-		if (
-			in (modelField.type (),
-				ModelFieldType.parent,
-				ModelFieldType.master)
-		) {
-
-			if (model.parentField () != null)
-				throw new RuntimeException ();
-
-			model.parentField (modelField);
-
-		}
-
-		if (modelField.type () == ModelFieldType.parentType) {
-
-			if (model.parentTypeField () != null)
-				throw new RuntimeException ();
-
-			model.parentTypeField (modelField);
-
-		}
-
-		if (modelField.type () == ModelFieldType.parentId) {
-
-			if (model.parentIdField () != null)
-				throw new RuntimeException ();
-
-			model.parentIdField (modelField);
-
-		}
-
-		if (modelField.type () == ModelFieldType.typeCode) {
-
-			if (model.typeCodeField () != null)
-				throw new RuntimeException ();
-
-			model.typeCodeField (modelField);
-
-		}
-
-		if (modelField.type () == ModelFieldType.code) {
-
-			if (model.codeField () != null)
-				throw new RuntimeException ();
-
-			model.codeField (modelField);
-
-		}
-
-		if (modelField.type () == ModelFieldType.index) {
-
-			if (model.indexField () != null)
-				throw new RuntimeException ();
-
-			model.indexField (modelField);
-
-		}
-
-		if (modelField.type () == ModelFieldType.name) {
-
-			if (model.nameField () != null)
-				throw new RuntimeException ();
-
-			model.nameField (modelField);
-
-		}
-
-		if (modelField.type () == ModelFieldType.description) {
-
-			if (model.descriptionField () != null)
-				throw new RuntimeException ();
-
-			model.descriptionField (modelField);
-
-		}
-
-		if (modelField.type () == ModelFieldType.deleted) {
-
-			if (model.deletedField () != null)
-				throw new RuntimeException ();
-
-			model.deletedField (modelField);
-
-		}
+		return model;
 
 	}
 

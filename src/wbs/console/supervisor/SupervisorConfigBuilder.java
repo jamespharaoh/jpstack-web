@@ -21,6 +21,7 @@ import wbs.console.reporting.StatsProvider;
 import wbs.console.reporting.StatsResolver;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -79,14 +80,25 @@ class SupervisorConfigBuilder {
 		builder.descend (
 			spec,
 			spec.builders (),
-			this);
+			this,
+			MissingBuilderBehaviour.ignore);
 
 		consoleModule.addSupervisorConfig (
 			new SupervisorConfig ()
-				.name (spec.name ())
-				.label (spec.label ())
-				.spec (spec)
-				.pagePartFactories (pagePartFactories));
+
+			.name (
+				spec.name ())
+
+			.label (
+				spec.label ())
+
+			.spec (
+				spec)
+
+			.pagePartFactories (
+				pagePartFactories)
+
+		);
 
 	}
 

@@ -14,8 +14,6 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import com.google.common.base.Optional;
-
 import lombok.Cleanup;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -29,6 +27,8 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.media.logic.MediaLogic;
+
+import com.google.common.base.Optional;
 
 @PrototypeComponent ("chatUserImageListAction")
 public

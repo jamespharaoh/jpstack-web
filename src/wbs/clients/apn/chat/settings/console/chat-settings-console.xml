@@ -151,9 +151,11 @@
 			name="minMonitorMessageLength"
 			label="Minimum monitor message length"/>
 
+		<!--
 		<chat-user-code-field
 			name="systemChatUser"
 			label="Chat user for system messages"/>
+		-->
 
 		<yes-no-field
 			name="autoJoinChat"/>

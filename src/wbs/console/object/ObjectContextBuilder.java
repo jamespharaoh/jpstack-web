@@ -5,6 +5,8 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.maybeList;
+import static wbs.framework.utils.etc.Misc.naivePluralise;
+import static wbs.framework.utils.etc.Misc.startsWith;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -12,6 +14,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -30,13 +35,11 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("objectContextBuilder")
 @ConsoleModuleBuilderHandler
@@ -163,7 +166,8 @@ class ObjectContextBuilder {
 		builder.descend (
 			listContainer,
 			spec.listChildren (),
-			consoleModule);
+			consoleModule,
+			MissingBuilderBehaviour.error);
 
 		ConsoleContextBuilderContainer objectContainer =
 			new ConsoleContextBuilderContainerImpl ()
@@ -195,7 +199,8 @@ class ObjectContextBuilder {
 		builder.descend (
 			objectContainer,
 			spec.objectChildren (),
-			consoleModule);
+			consoleModule,
+			MissingBuilderBehaviour.error);
 
 	}
 
@@ -205,7 +210,8 @@ class ObjectContextBuilder {
 			contextType.get ()
 
 			.name (
-				name + "s")
+				naivePluralise (
+					name))
 
 			.defaultFileName (
 				defaultFileName.orNull ()));
@@ -236,19 +242,23 @@ class ObjectContextBuilder {
 			simpleContext.get ()
 
 			.name (
-				name + "s")
+				naivePluralise (
+					name))
 
 			.typeName (
-				name + "s")
+				naivePluralise (
+					name))
 
 			.pathPrefix (
-				"/" + name + "s")
+				"/" + naivePluralise (
+					name))
 
 			.global (
 				true)
 
-			.title (capitalise (
-				consoleHelper.shortNamePlural ())));
+			.title (
+				capitalise (
+					consoleHelper.shortNamePlural ())));
 
 		consoleModule.addContext (
 			objectContext.get ()
@@ -370,7 +380,9 @@ class ObjectContextBuilder {
 					resolvedContextLink.localName ());
 
 			boolean link =
-				resolvedContextName.startsWith ("link:");
+				startsWith (
+					resolvedContextName,
+					"link:");
 
 			String resolvedPathPrefix =
 				joinWithoutSeparator (
@@ -383,13 +395,16 @@ class ObjectContextBuilder {
 				simpleConsoleContextProvider.get ()
 
 				.name (
-					resolvedContextName + "s")
+					naivePluralise (
+						resolvedContextName))
 
 				.typeName (
-					name + "s")
+					naivePluralise (
+						name))
 
 				.pathPrefix (
-					resolvedPathPrefix + "s")
+					naivePluralise (
+						resolvedPathPrefix))
 
 				.global (
 					! link)
@@ -462,7 +477,8 @@ class ObjectContextBuilder {
 					resolvedConsoleContextLink.tabPrivKey ())
 
 				.localFile (
-					"type:" + name + "s"),
+					"type:" + naivePluralise (
+						name)),
 
 			resolvedConsoleContextLink.tabContextTypeNames ());
 
@@ -527,26 +543,32 @@ class ObjectContextBuilder {
 		listContextTypeNames =
 			ImmutableList.<String>builder ()
 
-				.addAll (maybeList (
-					hasListChildren,
-					name + "s"))
+				.addAll (
+					maybeList (
+						hasListChildren,
+						naivePluralise (
+							name)))
 
-				.addAll (maybeList (
-					hasObjectChildren,
-					name + "+"))
+				.addAll (
+					maybeList (
+						hasObjectChildren,
+						naivePluralise (
+							name)))
 
 				.build ();
 
 		objectContextTypeNames =
 			ImmutableList.<String>builder ()
 
-				.addAll (maybeList (
-					hasListChildren,
-					name + "+"))
+				.addAll (
+					maybeList (
+						hasListChildren,
+						name + "+"))
 
-				.addAll (maybeList (
-					hasObjectChildren,
-					name))
+				.addAll (
+					maybeList (
+						hasObjectChildren,
+						name))
 
 				.build ();
 

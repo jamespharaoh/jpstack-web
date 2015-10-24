@@ -3,7 +3,7 @@
 	package="wbs.platform.menu">
 
 	<plugin-dependencies>
-
+		<plugin-dependency name="scaffold"/>
 	</plugin-dependencies>
 
 	<sql-scripts>

@@ -49,7 +49,10 @@ class BroadcastLogicImpl
 
 		// add numbers
 
-		for (String numberString : numbers) {
+		for (
+			String numberString
+				: numbers
+		) {
 
 			NumberRec numberRecord =
 				numberHelper.findOrCreate (
@@ -78,24 +81,40 @@ class BroadcastLogicImpl
 				if (reject) {
 
 					broadcastNumber
-						.setState (BroadcastNumberState.rejected)
-						.setAddedByUser (user);
+
+						.setState (
+							BroadcastNumberState.rejected)
+
+						.setAddedByUser (
+							user);
 
 					broadcast
-						.setNumRemoved (broadcast.getNumRemoved () - 1)
-						.setNumRejected (broadcast.getNumRejected () + 1);
+
+						.setNumRemoved (
+							broadcast.getNumRemoved () - 1)
+
+						.setNumRejected (
+							broadcast.getNumRejected () + 1);
 
 					result.numRejected ++;
 
 				} else {
 
 					broadcastNumber
-						.setState (BroadcastNumberState.accepted)
-						.setAddedByUser (user);
+
+						.setState (
+							BroadcastNumberState.accepted)
+
+						.setAddedByUser (
+							user);
 
 					broadcast
-						.setNumRemoved (broadcast.getNumRemoved () - 1)
-						.setNumAccepted (broadcast.getNumAccepted () + 1);
+
+						.setNumRemoved (
+							broadcast.getNumRemoved () - 1)
+
+						.setNumAccepted (
+							broadcast.getNumAccepted () + 1);
 
 					result.numAdded ++;
 
@@ -118,12 +137,20 @@ class BroadcastLogicImpl
 				} else {
 
 					broadcastNumber
-						.setState (BroadcastNumberState.accepted)
-						.setAddedByUser (user);
+
+						.setState (
+							BroadcastNumberState.accepted)
+
+						.setAddedByUser (
+							user);
 
 					broadcast
-						.setNumRejected (broadcast.getNumRejected () - 1)
-						.setNumAccepted (broadcast.getNumAccepted () + 1);
+
+						.setNumRejected (
+							broadcast.getNumRejected () - 1)
+
+						.setNumAccepted (
+							broadcast.getNumAccepted () + 1);
 
 					result.numAdded ++;
 

@@ -1,6 +1,7 @@
 package wbs.framework.data.tools;
 
 import static wbs.framework.utils.etc.Misc.camelToHyphen;
+import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.hyphenToCamel;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
@@ -451,8 +452,10 @@ class DataFromXml {
 			List<DataClassInfo> matchingDataClassInfos =
 				new ArrayList<DataClassInfo> ();
 
-			for (DataClassInfo dataClassInfo :
-					dataClassInfosForElementName) {
+			for (
+				DataClassInfo dataClassInfo :
+					dataClassInfosForElementName
+			) {
 
 				if (! dataClassInfo.parentClass.isAssignableFrom (
 						parentClass))
@@ -505,8 +508,10 @@ class DataFromXml {
 			object =
 				builder.get ();
 
-			for (Field field
-					: object.getClass ().getDeclaredFields ()) {
+			for (
+				Field field
+					: object.getClass ().getDeclaredFields ()
+			) {
 
 				buildField (
 					field,
@@ -516,8 +521,10 @@ class DataFromXml {
 
 			// check for unmatched attributes
 
-			for (Object attributeObject
-					: element.attributes ()) {
+			for (
+				Object attributeObject
+					: element.attributes ()
+			) {
 
 				Attribute attribute =
 					(Attribute)
@@ -541,8 +548,10 @@ class DataFromXml {
 
 			// check for unmatched elements
 
-			for (Object childElementObject
-					: element.elements ()) {
+			for (
+				Object childElementObject
+					: element.elements ()
+			) {
 
 				Element childElement =
 					(Element) childElementObject;
@@ -562,8 +571,10 @@ class DataFromXml {
 
 			// run init method
 
-			for (Method method
-					: object.getClass ().getMethods ()) {
+			for (
+				Method method
+					: object.getClass ().getMethods ()
+			) {
 
 				DataInitMethod dataInitMethodAnnotation =
 					method.getAnnotation (DataInitMethod.class);
@@ -600,8 +611,10 @@ class DataFromXml {
 				Field field,
 				String contextString) {
 
-			for (Annotation annotation
-					: field.getAnnotations ()) {
+			for (
+				Annotation annotation
+					: field.getAnnotations ()
+			) {
 
 				if (annotation instanceof DataAttribute) {
 
@@ -945,15 +958,31 @@ class DataFromXml {
 						dataChildrenAnnotation.childElement ())
 					: childrenElement.elements ();
 
-			for (Object childElementObject
-					: childElementObjects) {
+			Set<String> newlyMatchedElementNames =
+				new HashSet<String> ();
+
+			for (
+				Object childElementObject
+					: childElementObjects
+			) {
 
 				Element childElement =
 					(Element) childElementObject;
 
-				if (dataChildrenAnnotation.direct ())
-					matchedElementNames.add (
+				if (dataChildrenAnnotation.direct ()) {
+
+					if (
+						contains (
+							matchedElementNames,
+							childElement.getName ())
+					) {
+						continue;
+					}
+
+					newlyMatchedElementNames.add (
 						childElement.getName ());
+
+				}
 
 				if (field.getType () == Map.class) {
 
@@ -1053,6 +1082,9 @@ class DataFromXml {
 
 			}
 
+			matchedElementNames.addAll (
+				newlyMatchedElementNames);
+
 			// set them
 
 			if (field.getType () == Map.class) {
@@ -1060,8 +1092,10 @@ class DataFromXml {
 				ImmutableMap.Builder<Object,Object> mapBuilder =
 					ImmutableMap.<Object,Object>builder ();
 
-				for (Object pairObject
-						: children) {
+				for (
+					Object pairObject
+						: children
+				) {
 
 					Pair<?,?> pair =
 						(Pair<?,?>) pairObject;

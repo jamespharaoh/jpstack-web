@@ -1,7 +1,10 @@
 package wbs.framework.hibernate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.contains;
+import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.File;
@@ -42,6 +45,9 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.Seconds;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import wbs.framework.application.context.BeanFactory;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
 import wbs.framework.application.scaffold.PluginEnumTypeSpec;
@@ -52,9 +58,6 @@ import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.schema.helper.SchemaNamesHelperImpl;
 import wbs.framework.sql.SqlLogicImpl;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 @Accessors (fluent = true)
 @Log4j
@@ -770,7 +773,7 @@ class SessionFactoryBeanFactory
 
 				.addAttribute (
 					"type",
-					modelField.hibernateTypeHelper ());
+					modelField.hibernateTypeHelper ().getName ());
 
 		} else if (
 			customTypes.containsKey (
@@ -908,309 +911,24 @@ class SessionFactoryBeanFactory
 
 		if (modelField.valueType () == Set.class) {
 
-			ParameterizedType type =
-				modelField.parameterizedType ();
-
-			Class<?> referencedClass =
-				(Class<?>) type.getActualTypeArguments () [0];
-
-			Element setElement =
-				classElement
-					.addElement ("set")
-					.addAttribute ("name", modelField.name ())
-					.addAttribute ("cascade", "save-update")
-					.addAttribute ("lazy", "true");
-
-
-			if (modelField.orderBy () != null) {
-
-				setElement
-
-					.addAttribute (
-						"order-by",
-						modelField.orderBy ());
-
-			}
-
-			if (modelField.where () != null) {
-
-				setElement
-
-					.addAttribute (
-						"where",
-						modelField.where ());
-
-			}
-
-			// key
-
-			String keyColumnSql =
-				sqlLogic.quoteIdentifier (
-					ifNull (
-						modelField.key (),
-						sqlEntityNames.idColumnName (
-							model.objectClass ())));
-
-			setElement
-
-				.addElement (
-					"key")
-
-				.addAttribute (
-					"column",
-					keyColumnSql);
-
-			// value
-
-			if (modelField.element () != null) {
-
-				if (! valueFieldTypes.contains (referencedClass))
-					throw new RuntimeException ();
-
-				String elementColumnSql =
-					sqlLogic.quoteIdentifier (
-						modelField.element ());
-
-				String elementType =
-					basicTypes.get (referencedClass);
-
-				setElement
-
-					.addElement (
-						"element")
-
-					.addAttribute (
-						"column",
-						elementColumnSql)
-
-					.addAttribute (
-						"type",
-						elementType);
-
-			} else {
-
-				if (valueFieldTypes.contains (referencedClass))
-					throw new RuntimeException ();
-
-				setElement
-
-					.addElement (
-						"one-to-many")
-
-					.addAttribute (
-						"class",
-						referencedClass.getName ());
-
-			}
+			configureCollectionSet (
+				model,
+				modelField,
+				classElement);
 
 		} else if (modelField.valueType () == List.class) {
 
-			ParameterizedType type =
-				modelField.parameterizedType ();
-
-			Class<?> referencedClass =
-				(Class<?>) type.getActualTypeArguments () [0];
-
-			// list
-
-			Element listElement =
-				classElement
-					.addElement ("list")
-					.addAttribute ("name", modelField.name ())
-					.addAttribute ("cascade", "save-update")
-					.addAttribute ("lazy", "true");
-
-
-			if (modelField.orderBy () != null) {
-
-				listElement
-
-					.addAttribute (
-						"order-by",
-						modelField.orderBy ());
-
-			}
-
-			if (modelField.where () != null) {
-
-				listElement
-
-					.addAttribute (
-						"where",
-						modelField.where ());
-
-			}
-
-			// key
-
-			String keyColumnSql =
-				sqlLogic.quoteIdentifier (
-					ifNull (
-						modelField.key (),
-						sqlEntityNames.idColumnName (
-							model.objectClass ())));
-
-			listElement
-
-				.addElement (
-					"key")
-
-				.addAttribute (
-					"column",
-					keyColumnSql);
-
-			// list index
-
-			if (modelField.index () == null) {
-
-				log.error (
-					stringFormat (
-						"No index specified for list %s",
-						modelField.fullName ()));
-
-				classErrors ++;
-
-				return;
-
-			}
-
-			String indexColumnSql =
-				sqlLogic.quoteIdentifier (
-					modelField.index ());
-
-			listElement
-
-				.addElement (
-					"list-index")
-
-				.addAttribute (
-					"column",
-					indexColumnSql);
-
-			// value
-
-			if (modelField.element () != null) {
-
-				if (! valueFieldTypes.contains (modelField.valueType ()))
-					throw new RuntimeException ();
-
-				String elementColumnSql =
-					sqlLogic.quoteIdentifier (modelField.element ());
-
-				String elementType =
-					basicTypes.get (referencedClass);
-
-				listElement
-
-					.addElement (
-						"element")
-
-					.addAttribute (
-						"column",
-						elementColumnSql)
-
-					.addAttribute (
-						"type",
-						elementType);
-
-			} else {
-
-				if (valueFieldTypes.contains (referencedClass))
-					throw new RuntimeException ();
-
-				listElement
-					.addElement ("one-to-many")
-					.addAttribute ("class", referencedClass.getName ());
-
-			}
+			configureCollectionList (
+				model,
+				modelField,
+				classElement);
 
 		} else if (modelField.valueType () == Map.class) {
 
-			ParameterizedType type =
-				modelField.parameterizedType ();
-
-			Class<?> indexClass =
-				(Class<?>) type.getActualTypeArguments () [0];
-
-			Class<?> referencedClass =
-				(Class<?>) type.getActualTypeArguments () [1];
-
-			// map
-
-			Element mapElement =
-				classElement
-					.addElement ("map")
-					.addAttribute ("name", modelField.name ())
-					.addAttribute ("cascade", "save-update")
-					.addAttribute ("lazy", "true");
-
-			// key
-
-			String keyColumnSql =
-				sqlLogic.quoteIdentifier (
-					ifNull (
-						modelField.key (),
-						sqlEntityNames.idColumnName (
-							model.objectClass ())));
-
-			mapElement
-
-				.addElement (
-					"key")
-
-				.addAttribute (
-					"column",
-					keyColumnSql);
-
-			// map key
-
-			String indexColumnSql =
-				sqlLogic.quoteIdentifier (
-					modelField.index ());
-
-			String indexType =
-				basicTypes.get (indexClass);
-
-			if (indexType == null) {
-
-				log.error (
-					stringFormat (
-						"Don't know index type %s for %s",
-						indexClass.getName (),
-						modelField.fullName ()));
-
-				classErrors ++;
-
-				return;
-
-			}
-
-			mapElement
-
-				.addElement (
-					"map-key")
-
-				.addAttribute (
-					"column",
-					indexColumnSql)
-
-				.addAttribute (
-					"type",
-					indexType);
-
-			// value
-
-			if (valueFieldTypes.contains (referencedClass))
-				throw new RuntimeException ();
-
-			mapElement
-
-				.addElement (
-					"one-to-many")
-
-				.addAttribute (
-					"class",
-					referencedClass.getName ());
+			configureCollectionMap (
+				model,
+				modelField,
+				classElement);
 
 		} else {
 
@@ -1223,6 +941,375 @@ class SessionFactoryBeanFactory
 			classErrors ++;
 
 		}
+
+	}
+
+	void configureCollectionSet (
+			Model model,
+			ModelField modelField,
+			Element classElement) {
+
+		Element setElement =
+			classElement
+
+			.addElement (
+				"set")
+
+			.addAttribute (
+				"name",
+				modelField.name ())
+
+			.addAttribute (
+				"cascade",
+				"save-update")
+
+			.addAttribute (
+				"lazy",
+				"true");
+
+		if (modelField.orderSql () != null) {
+
+			setElement
+
+				.addAttribute (
+					"order-by",
+					modelField.orderSql ());
+
+		}
+
+		if (modelField.whereSql () != null) {
+
+			setElement
+
+				.addAttribute (
+					"where",
+					modelField.whereSql ());
+
+		}
+
+		// key
+
+		String joinColumnSql =
+			sqlLogic.quoteIdentifier (
+				ifNull (
+					modelField.joinColumnName (),
+					sqlEntityNames.idColumnName (
+						model.objectClass ())));
+
+		setElement
+
+			.addElement (
+				"key")
+
+			.addAttribute (
+				"column",
+				joinColumnSql);
+
+		// value
+
+		if (modelField.valueColumnName () != null) {
+
+			if (
+				doesNotContain (
+					valueFieldTypes,
+					modelField.collectionValueType ())
+			) {
+				throw new RuntimeException ();
+			}
+
+			String elementColumnSql =
+				sqlLogic.quoteIdentifier (
+					modelField.valueColumnName ());
+
+			String elementType =
+				basicTypes.get (
+					modelField.collectionValueType ());
+
+			setElement
+
+				.addElement (
+					"element")
+
+				.addAttribute (
+					"column",
+					elementColumnSql)
+
+				.addAttribute (
+					"type",
+					elementType);
+
+		} else {
+
+			if (
+				contains (
+					valueFieldTypes,
+					modelField.collectionValueType ())
+			) {
+				throw new RuntimeException ();
+			}
+
+			setElement
+
+				.addElement (
+					"one-to-many")
+
+				.addAttribute (
+					"class",
+					modelField.collectionValueType ().getName ());
+
+		}
+
+	}
+
+	void configureCollectionList (
+			Model model,
+			ModelField modelField,
+			Element classElement) {
+
+		// list
+
+		Element listElement =
+			classElement
+
+			.addElement (
+				"list")
+
+			.addAttribute (
+				"name",
+				modelField.name ())
+
+			.addAttribute (
+				"cascade",
+				"save-update")
+
+			.addAttribute (
+				"lazy",
+				"true");
+
+
+		if (modelField.orderSql () != null) {
+
+			listElement
+
+				.addAttribute (
+					"order-by",
+					modelField.orderSql ());
+
+		}
+
+		if (modelField.whereSql () != null) {
+
+			listElement
+
+				.addAttribute (
+					"where",
+					modelField.whereSql ());
+
+		}
+
+		// key
+
+		String joinColumnSql =
+			sqlLogic.quoteIdentifier (
+				ifNull (
+					modelField.joinColumnName (),
+					sqlEntityNames.idColumnName (
+						model.objectClass ())));
+
+		listElement
+
+			.addElement (
+				"key")
+
+			.addAttribute (
+				"column",
+				joinColumnSql);
+
+		// list index
+
+		if (modelField.listIndexColumnName () == null) {
+
+			log.error (
+				stringFormat (
+					"No index specified for list %s",
+					modelField.fullName ()));
+
+			classErrors ++;
+
+			return;
+
+		}
+
+		String indexColumnSql =
+			sqlLogic.quoteIdentifier (
+				modelField.listIndexColumnName ());
+
+		listElement
+
+			.addElement (
+				"list-index")
+
+			.addAttribute (
+				"column",
+				indexColumnSql);
+
+		// value
+
+		if (
+			isNotNull (
+				modelField.valueColumnName ())
+		) {
+
+			if (
+				doesNotContain (
+					valueFieldTypes,
+					modelField.collectionValueType ())
+			) {
+				throw new RuntimeException ();
+			}
+
+			String elementColumnSql =
+				sqlLogic.quoteIdentifier (
+					modelField.valueColumnName ());
+
+			String elementType =
+				basicTypes.get (
+					modelField.collectionValueType ());
+
+			listElement
+
+				.addElement (
+					"element")
+
+				.addAttribute (
+					"column",
+					elementColumnSql)
+
+				.addAttribute (
+					"type",
+					elementType);
+
+		} else {
+
+			if (
+				contains (
+					valueFieldTypes,
+					modelField.collectionValueType ())
+			) {
+				throw new RuntimeException ();
+			}
+
+			listElement
+
+				.addElement (
+					"one-to-many")
+
+				.addAttribute (
+					"class",
+					modelField.collectionValueType ().getName ());
+
+		}
+
+	}
+
+	void configureCollectionMap (
+			Model model,
+			ModelField modelField,
+			Element classElement) {
+
+		// map
+
+		Element mapElement =
+			classElement
+
+			.addElement (
+				"map")
+
+			.addAttribute (
+				"name",
+				modelField.name ())
+
+			.addAttribute (
+				"cascade",
+				"save-update")
+
+			.addAttribute (
+				"lazy",
+				"true");
+
+		// key
+
+		String keyColumnSql =
+			sqlLogic.quoteIdentifier (
+				ifNull (
+					modelField.joinColumnName (),
+					sqlEntityNames.idColumnName (
+						model.objectClass ())));
+
+		mapElement
+
+			.addElement (
+				"key")
+
+			.addAttribute (
+				"column",
+				keyColumnSql);
+
+		// map key
+
+		String indexColumnSql =
+			sqlLogic.quoteIdentifier (
+				modelField.mappingKeyColumnName ());
+
+		String indexType =
+			basicTypes.get (
+				modelField.collectionKeyType ());
+
+		if (indexType == null) {
+
+			log.error (
+				stringFormat (
+					"Don't know index type %s for %s",
+					modelField.collectionKeyType ().getName (),
+					modelField.fullName ()));
+
+			classErrors ++;
+
+			return;
+
+		}
+
+		mapElement
+
+			.addElement (
+				"map-key")
+
+			.addAttribute (
+				"column",
+				indexColumnSql)
+
+			.addAttribute (
+				"type",
+				indexType);
+
+		// value
+
+		if (
+			contains (
+				valueFieldTypes,
+				modelField.collectionValueType ())
+		) {
+			throw new RuntimeException ();
+		}
+
+		mapElement
+
+			.addElement (
+				"one-to-many")
+
+			.addAttribute (
+				"class",
+				modelField.collectionValueType ().getName ());
 
 	}
 
@@ -1243,29 +1330,43 @@ class SessionFactoryBeanFactory
 
 			Element setElement =
 				classElement
-					.addElement ("set")
-					.addAttribute ("name", modelField.name ())
-					.addAttribute ("table", modelField.table ())
-					.addAttribute ("cascade", "save-update")
-					.addAttribute ("lazy", "true");
+
+				.addElement (
+					"set")
+
+				.addAttribute (
+					"name",
+					modelField.name ())
+
+				.addAttribute (
+					"table",
+					modelField.associationTableName ())
+
+				.addAttribute (
+					"cascade",
+					"save-update")
+
+				.addAttribute (
+					"lazy",
+					"true");
 
 
-			if (modelField.where () != null) {
+			if (modelField.whereSql () != null) {
 
 				setElement
 
 					.addAttribute (
 						"where",
-						modelField.where ());
+						modelField.whereSql ());
 
 			}
 
 			// key
 
-			String keyColumnSql =
+			String joinColumnSql =
 				sqlLogic.quoteIdentifier (
 					ifNull (
-						modelField.key (),
+						modelField.joinColumnName (),
 						sqlEntityNames.idColumnName (
 							model.objectClass ())));
 
@@ -1276,11 +1377,18 @@ class SessionFactoryBeanFactory
 
 				.addAttribute (
 					"column",
-					keyColumnSql);
+					joinColumnSql);
 
-			if (modelField.element () != null) {
+			if (
+				isNotNull (
+					modelField.valueColumnName ())
+			) {
 
-				if (! valueFieldTypes.contains (referencedClass)) {
+				if (
+					doesNotContain (
+						valueFieldTypes,
+						referencedClass)
+				) {
 
 					log.error (
 						stringFormat (
@@ -1294,10 +1402,11 @@ class SessionFactoryBeanFactory
 
 				String elementColumnSql =
 					sqlLogic.quoteIdentifier (
-						modelField.element ());
+						modelField.valueColumnName ());
 
 				String elementType =
-					basicTypes.get (referencedClass);
+					basicTypes.get (
+						referencedClass);
 
 				setElement
 
@@ -1348,20 +1457,33 @@ class SessionFactoryBeanFactory
 
 			Element listElement =
 				classElement
-					.addElement ("list")
-					.addAttribute ("name", modelField.name ())
-					.addAttribute ("table", modelField.table ())
-					.addAttribute ("cascade", "save-update")
-					.addAttribute ("lazy", "true");
 
+				.addElement (
+					"list")
 
-			if (modelField.where () != null) {
+				.addAttribute (
+					"name",
+					modelField.name ())
+
+				.addAttribute (
+					"table",
+					modelField.associationTableName ())
+
+				.addAttribute (
+					"cascade",
+					"save-update")
+
+				.addAttribute (
+					"lazy",
+					"true");
+
+			if (modelField.whereSql () != null) {
 
 				listElement
 
 					.addAttribute (
 						"where",
-						modelField.where ());
+						modelField.whereSql ());
 
 			}
 
@@ -1383,10 +1505,11 @@ class SessionFactoryBeanFactory
 
 			// list index
 
-			if (modelField.index () != null) {
+			if (modelField.listIndexColumnName () != null) {
 
 				String indexColumnSql =
-					sqlLogic.quoteIdentifier (modelField.index ());
+					sqlLogic.quoteIdentifier (
+						modelField.listIndexColumnName ());
 
 				listElement
 

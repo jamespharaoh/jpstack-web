@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.scaffold.PluginComponentSpec;
 import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
@@ -43,7 +44,10 @@ class ModelMetaLoader {
 	// properties
 
 	@Getter
-	Map<String,ModelMetaSpec> modelSpecs;
+	Map<String,ModelMetaSpec> modelMetas;
+
+	@Getter
+	Map<String,ModelMetaSpec> componentMetas;
 
 	// state
 
@@ -90,7 +94,10 @@ class ModelMetaLoader {
 	private
 	void loadSpecs () {
 
-		ImmutableMap.Builder<String,ModelMetaSpec> builder =
+		ImmutableMap.Builder<String,ModelMetaSpec> modelBuilder =
+			ImmutableMap.<String,ModelMetaSpec>builder ();
+
+		ImmutableMap.Builder<String,ModelMetaSpec> componentBuilder =
 			ImmutableMap.<String,ModelMetaSpec>builder ();
 
 		int errorCount = 0;
@@ -110,9 +117,22 @@ class ModelMetaLoader {
 
 				errorCount +=
 					loadModelMeta (
-						builder,
+						modelBuilder,
 						plugin,
-						model);
+						model.name ());
+
+			}
+
+			for (
+				PluginComponentSpec component
+					: plugin.models ().components ()
+			) {
+
+				errorCount +=
+					loadModelMeta (
+						componentBuilder,
+						plugin,
+						component.name ());
 
 			}
 
@@ -127,7 +147,11 @@ class ModelMetaLoader {
 
 		}
 
-		modelSpecs = builder.build ();
+		modelMetas =
+			modelBuilder.build ();
+
+		componentMetas =
+			componentBuilder.build ();
 
 	}
 
@@ -135,14 +159,14 @@ class ModelMetaLoader {
 	int loadModelMeta (
 			ImmutableMap.Builder<String,ModelMetaSpec> builder,
 			PluginSpec plugin,
-			PluginModelSpec model) {
+			String modelName) {
 
 		String resourceName =
 			stringFormat (
 				"/%s/model/%s-model.xml",
 				plugin.packageName ().replace ('.', '/'),
 				camelToHyphen (
-					model.name ()));
+					modelName));
 
 		InputStream inputStream =
 			getClass ().getClassLoader ().getResourceAsStream (
@@ -154,7 +178,7 @@ class ModelMetaLoader {
 				stringFormat (
 					"Model meta not found for %s.%s: %s",
 					plugin.name (),
-					model.name (),
+					modelName,
 					resourceName));
 
 			return 1;
@@ -171,7 +195,7 @@ class ModelMetaLoader {
 					inputStream,
 					resourceName,
 					ImmutableList.<Object>of (
-						model));
+						plugin));
 
 		} catch (Exception exception) {
 
@@ -179,7 +203,7 @@ class ModelMetaLoader {
 				stringFormat (
 					"Error reading model meta for %s.%s: %s",
 					plugin.name (),
-					model.name (),
+					modelName,
 					resourceName),
 				exception);
 
@@ -190,14 +214,14 @@ class ModelMetaLoader {
 		if (
 			notEqual (
 				spec.name (),
-				model.name ())
+				modelName)
 		) {
 
 			log.error (
 				stringFormat (
 					"Model meta name %s should be %s in %s",
 					spec.name (),
-					model.name (),
+					modelName,
 					resourceName));
 
 			return 1;
@@ -205,7 +229,7 @@ class ModelMetaLoader {
 		}
 
 		builder.put (
-			model.name (),
+			modelName,
 			spec);
 
 		return 0;

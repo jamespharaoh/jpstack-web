@@ -18,4 +18,7 @@ class NameFieldSpec
 	@DataAttribute
 	String name;
 
+	@DataAttribute
+	String columnName;
+
 }

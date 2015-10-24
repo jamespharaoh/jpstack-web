@@ -9,6 +9,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
@@ -106,8 +107,7 @@ class HibernateHelperProviderBuilder {
 		public
 		Class<? extends Record<?>> objectClass () {
 
-			return
-				(Class<? extends Record<?>>)
+			return (Class<? extends Record<?>>)
 				model.objectClass ();
 
 		}
@@ -288,7 +288,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		String indexCounterFieldName () {
-			return model.indexField ().counter ();
+			return model.indexField ().indexCounterFieldName ();
 		}
 
 		@Override
@@ -439,8 +439,8 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		Record<?> findByParentAndCode (
-				GlobalId parentGlobalId,
-				String code) {
+				@NonNull GlobalId parentGlobalId,
+				@NonNull String code) {
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -586,8 +586,8 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		Record<?> findByParentAndIndex (
-				GlobalId parentGlobalId,
-				Integer index) {
+				@NonNull GlobalId parentGlobalId,
+				@NonNull Integer index) {
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -733,9 +733,9 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		Record<?> findByParentAndTypeAndCode (
-				GlobalId parentGlobalId,
-				String typeCode,
-				String code) {
+				@NonNull GlobalId parentGlobalId,
+				@NonNull String typeCode,
+				@NonNull String code) {
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -930,7 +930,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		List<Record<?>> findAllByParent (
-				GlobalId parentGlobalId) {
+				@NonNull GlobalId parentGlobalId) {
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -1029,7 +1029,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		Record insert (
-				Record object) {
+				@NonNull Record object) {
 
 			objectHooks.beforeInsert (
 				object);
@@ -1050,7 +1050,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		Record insertSpecial (
-				Record object) {
+				@NonNull Record object) {
 
 			objectHooks.beforeInsert (
 				object);
@@ -1072,7 +1072,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		Record update (
-				Record object) {
+				@NonNull Record object) {
 
 			objectHooks.beforeUpdate (
 				object);
@@ -1084,7 +1084,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		List<Integer> searchIds (
-				Object search) {
+				@NonNull Object search) {
 
 			return objectHooks.searchIds (
 				search);
@@ -1094,7 +1094,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public <ObjectType extends EphemeralRecord<?>>
 		ObjectType remove (
-				ObjectType object) {
+				@NonNull ObjectType object) {
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -1109,7 +1109,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		String getName (
-				Record<?> object) {
+				@NonNull Record<?> object) {
 
 			return model.getName (object);
 
@@ -1118,7 +1118,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		String getCode (
-				Record<?> object) {
+				@NonNull Record<?> object) {
 
 			return model.getCode (
 				object);
@@ -1128,7 +1128,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		String getTypeCode (
-				Record<?> object) {
+				@NonNull Record<?> object) {
 
 			return model.getTypeCode (
 				object);
@@ -1138,7 +1138,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		String getDescription (
-				Record<?> object) {
+				@NonNull Record<?> object) {
 
 			return model.getDescription (
 				object);
@@ -1148,18 +1148,17 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		Record<?> getParentType (
-				Record<?> object) {
+				@NonNull Record<?> object) {
 
-			return
-				model.getParentType (
-					object);
+			return model.getParentType (
+				object);
 
 		}
 
 		@Override
 		public
 		Integer getParentId (
-				Record<?> object) {
+				@NonNull Record<?> object) {
 
 			return model.getParentId (
 				object);
@@ -1169,7 +1168,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		Record<?> getParent (
-				Record<?> object) {
+				@NonNull Record<?> object) {
 
 			return model.getParent (
 				object);
@@ -1179,9 +1178,9 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		void createSingletons (
-				ObjectHelper<?> objectHelper,
-				ObjectHelper<?> parentHelper,
-				Record<?> parentObject) {
+				@NonNull ObjectHelper<?> objectHelper,
+				@NonNull ObjectHelper<?> parentHelper,
+				@NonNull Record<?> parentObject) {
 
 			objectHooks.createSingletons (
 				objectHelper,
@@ -1193,8 +1192,8 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		void setParent (
-				Record<?> object,
-				Record<?> parent) {
+				@NonNull Record<?> object,
+				@NonNull Record<?> parent) {
 
 			BeanLogic.setProperty (
 				object,
@@ -1216,7 +1215,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		boolean getDeleted (
-				Record<?> object) {
+				@NonNull Record<?> object) {
 
 			try {
 
@@ -1242,8 +1241,8 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		List<Record<?>> findAllByParentAndType (
-				GlobalId parentGlobalId,
-				String typeCode) {
+				@NonNull GlobalId parentGlobalId,
+				@NonNull String typeCode) {
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -1366,7 +1365,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public <RecordType extends Record<?>>
 		RecordType lock (
-				RecordType object) {
+				@NonNull RecordType object) {
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -1384,8 +1383,8 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		Object getDynamic (
-				Record<?> object,
-				String name) {
+				@NonNull Record<?> object,
+				@NonNull String name) {
 
 			 return objectHooks.getDynamic (
 				 object,
@@ -1396,9 +1395,9 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		void setDynamic (
-				Record<?> object,
-				String name,
-				Object value) {
+				@NonNull Record<?> object,
+				@NonNull String name,
+				@NonNull Object value) {
 
 			objectHooks.setDynamic (
 				object,

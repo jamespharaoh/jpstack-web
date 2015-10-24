@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
@@ -409,7 +410,8 @@ class TextAreaFormFieldRenderer<Container>
 		return Html.newlineToBr (
 			stringFormat (
 				"%h",
-				interfaceValue));
+				emptyStringIfNull (
+					interfaceValue)));
 
 	}
 

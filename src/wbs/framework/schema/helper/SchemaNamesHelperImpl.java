@@ -3,7 +3,6 @@ package wbs.framework.schema.helper;
 import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,22 +26,22 @@ class SchemaNamesHelperImpl
 	@Override
 	public
 	String columnName (
-			Field field) {
+			String fieldName) {
 
 		return camelToUnderscore (
-			field.getName ());
+			fieldName);
 
 	}
 
 	@Override
 	public
 	String idColumnName (
-			Field field) {
+			String fieldName) {
 
 		return stringFormat (
 			"%s_id",
 			camelToUnderscore (
-				field.getName ()));
+				fieldName));
 
 	}
 

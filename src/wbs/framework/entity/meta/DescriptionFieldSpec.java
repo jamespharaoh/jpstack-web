@@ -18,4 +18,7 @@ class DescriptionFieldSpec
 	@DataAttribute
 	String name;
 
+	@DataAttribute
+	String columnName;
+
 }

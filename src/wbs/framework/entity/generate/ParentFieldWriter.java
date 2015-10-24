@@ -16,7 +16,6 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AnnotationWriter;
-import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.ParentFieldSpec;
 import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
@@ -34,7 +33,7 @@ class ParentFieldWriter {
 	// builder
 
 	@BuilderParent
-	ModelMetaSpec parent;
+	ModelFieldWriterContext context;
 
 	@BuilderSource
 	ParentFieldSpec spec;
@@ -95,9 +94,8 @@ class ParentFieldWriter {
 			new PropertyWriter ()
 
 			.thisClassNameFormat (
-				"%sRec",
-				capitalise (
-					parent.name ()))
+				"%s",
+				context.recordClassName ())
 
 			.typeNameFormat (
 				"%s",

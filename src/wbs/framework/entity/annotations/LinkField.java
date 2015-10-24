@@ -15,7 +15,7 @@ import wbs.framework.entity.model.ModelFieldType;
 
 @Retention (RetentionPolicy.RUNTIME)
 @Target (ElementType.FIELD)
-@FieldMeta (modelFieldType = ModelFieldType.link)
+@FieldMeta (modelFieldType = ModelFieldType.associative)
 public
 @interface LinkField {
 

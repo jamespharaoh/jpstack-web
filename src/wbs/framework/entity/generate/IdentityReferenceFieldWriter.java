@@ -16,7 +16,6 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.IdentityReferenceFieldSpec;
-import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -33,7 +32,7 @@ class IdentityReferenceFieldWriter {
 	// builder
 
 	@BuilderParent
-	ModelMetaSpec parent;
+	ModelFieldWriterContext context;
 
 	@BuilderSource
 	IdentityReferenceFieldSpec spec;
@@ -72,9 +71,8 @@ class IdentityReferenceFieldWriter {
 		new PropertyWriter ()
 
 			.thisClassNameFormat (
-				"%sRec",
-				capitalise (
-					parent.name ()))
+				"%s",
+				context.recordClassName ())
 
 			.typeNameFormat (
 				"%s",

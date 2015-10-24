@@ -24,7 +24,7 @@ import wbs.framework.utils.etc.BeanLogic;
 @Data
 @DataClass
 public
-final class Model
+class Model
 	implements ModelMethods {
 
 	// identity
@@ -64,6 +64,9 @@ final class Model
 	ModelField parentIdField;
 
 	@DataReference
+	ModelField masterField;
+
+	@DataReference
 	ModelField typeCodeField;
 
 	@DataReference
@@ -80,6 +83,9 @@ final class Model
 
 	@DataReference
 	ModelField deletedField;
+
+	@DataReference
+	ModelField typeField;
 
 	@DataChildren
 	List<ModelField> fields =

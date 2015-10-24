@@ -17,6 +17,7 @@
 		<bean class="ConsoleContextSectionMetaBuilder"/>
 		<bean class="ConsoleContextSectionSpec"/>
 		<bean class="ConsoleContextStuff"/>
+		<bean class="ConsoleContextStuffBuilder"/>
 		<bean class="ConsoleContextStuffSpec"/>
 		<bean class="ConsoleContextType"/>
 		<bean class="SimpleConsoleContext"/>

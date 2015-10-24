@@ -2,6 +2,7 @@ package wbs.console.helper;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.underscoreToCamel;
 
@@ -15,6 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.context.ConsoleContextStuffSpec;
 import wbs.console.module.ConsoleManager;
@@ -143,7 +145,8 @@ class GenericConsoleHelperProvider
 		defaultListContextName (
 			ifNull (
 				consoleHelperProviderSpec.defaultListContextName (),
-				objectHelper.objectName () + "s"));
+				naivePluralise (
+					objectName ())));
 
 		defaultObjectContextName (
 			ifNull (

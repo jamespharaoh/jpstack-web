@@ -40,6 +40,7 @@ declare variable $mode external;
 				'sql',
 				'model',
 				'hibernate',
+				'model-meta',
 				'object',
 				'logic',
 				'web',

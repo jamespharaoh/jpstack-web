@@ -2,6 +2,10 @@
 	name="media"
 	package="wbs.platform.media">
 
+	<plugin-dependencies>
+		<plugin-dependency name="scaffold"/>
+	</plugin-dependencies>
+
 	<sql-scripts>
 		<sql-schema name="content"/>
 	</sql-scripts>

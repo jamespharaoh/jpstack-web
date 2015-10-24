@@ -20,7 +20,7 @@ enum ModelFieldType {
 	compositeId,
 	component,
 	collection,
-	link,
+	associative,
 	description,
 	name,
 	type,

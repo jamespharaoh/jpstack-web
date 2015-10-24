@@ -15,15 +15,16 @@ import wbs.framework.data.annotations.DataParent;
 public
 class PluginModelsSpec {
 
-	/*
-	@DataAncestor
-	@Getter @Setter
-	ProjectSpec project;
-	*/
-
 	@DataParent
 	@Getter @Setter
 	PluginSpec plugin;
+
+	@DataChildren (
+		direct = true,
+		childElement = "component")
+	@Getter @Setter
+	List<PluginComponentSpec> components =
+		new ArrayList<PluginComponentSpec> ();
 
 	@DataChildren (
 		direct = true,

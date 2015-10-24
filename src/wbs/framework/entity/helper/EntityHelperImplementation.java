@@ -20,10 +20,10 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.io.FileUtils;
 
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.scaffold.PluginManager;
-import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataToXml;
+import wbs.framework.entity.meta.ModelMetaLoader;
+import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelBuilder;
 
@@ -40,7 +40,7 @@ class EntityHelperImplementation
 	// dependencies
 
 	@Inject
-	PluginManager pluginManager;
+	ModelMetaLoader modelMetaLoader;
 
 	// prototype dependencies
 
@@ -81,25 +81,23 @@ class EntityHelperImplementation
 			ImmutableList.<String>builder ();
 
 		for (
-			PluginSpec plugin
-				: pluginManager.plugins ()
+			ModelMetaSpec modelMeta
+				: modelMetaLoader.modelMetas ().values ()
 		) {
 
-			if (plugin.models () == null)
+			if (! modelMeta.type ().record ()) {
 				continue;
-
-			for (
-				PluginModelSpec model
-					: plugin.models ().models ()
-			) {
-
-				entityClassNamesBuilder.add (
-					stringFormat (
-						"%s.model.%sRec",
-						model.plugin ().packageName (),
-						capitalise (model.name ())));
-
 			}
+
+			PluginSpec plugin =
+				modelMeta.plugin ();
+
+			entityClassNamesBuilder.add (
+				stringFormat (
+					"%s.model.%sRec",
+					plugin.packageName (),
+					capitalise (
+						modelMeta.name ())));
 
 		}
 
@@ -183,17 +181,29 @@ class EntityHelperImplementation
 
 		int errors = 0;
 
-		for (Class<?> entityClass
-				: entityClasses) {
+		for (
+			ModelMetaSpec modelMeta
+				: modelMetaLoader.modelMetas ().values ()
+		) {
+
+			if (! modelMeta.type ().record ()) {
+				continue;
+			}
 
 			Model model =
 				modelBuilder.get ()
-					.objectClass (entityClass)
-					.build ();
+
+				.modelMeta (
+					modelMeta)
+
+				.build ();
 
 			if (model == null) {
+
 				errors ++;
+
 				continue;
+
 			}
 
 			modelsBuilder.add (

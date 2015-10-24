@@ -10,7 +10,7 @@ import javax.inject.Provider;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
-import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.utils.etc.FormatWriter;
 
 @SingletonComponent ("modelWriterManager")
@@ -61,14 +61,15 @@ class ModelWriterManager {
 
 	public
 	void write (
-			ModelMetaSpec modelMeta,
+			ModelFieldWriterContext context,
 			List<?> sourceItems,
 			FormatWriter javaWriter) {
 
 		modelWriter.descend (
-			modelMeta,
+			context,
 			sourceItems,
-			javaWriter);
+			javaWriter,
+			MissingBuilderBehaviour.error);
 
 	}
 
