@@ -33,13 +33,6 @@ class ForeignIdFieldWriter {
 	void build (
 			Builder builder) {
 
-		javaWriter.writeFormat (
-			"\t@ForeignIdField (\n");
-
-		javaWriter.writeFormat (
-			"\t\tfield = \"%s\")\n",
-			spec.fieldName ().replace ("\"", "\\\""));
-
 		// write field
 
 		new PropertyWriter ()

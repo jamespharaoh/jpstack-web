@@ -16,7 +16,6 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.ChildrenCollectionSpec;
 import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
@@ -68,45 +67,6 @@ class ChildrenCollectionWriter {
 				fieldTypePlugin.packageName (),
 				capitalise (
 					spec.typeName ()));
-
-		// write field annotation
-
-		AnnotationWriter annotationWriter =
-			new AnnotationWriter ()
-
-			.name (
-				"CollectionField");
-
-		if (spec.joinColumnName () != null) {
-
-			annotationWriter.addAttributeFormat (
-				"key",
-				"\"%s\"",
-				spec.joinColumnName ().replace ("\"", "\\\""));
-
-		}
-
-		if (spec.whereSql () != null) {
-
-			annotationWriter.addAttributeFormat (
-				"where",
-				"\"%s\"",
-				spec.whereSql ().replace ("\"", "\\\""));
-
-		}
-
-		if (spec.orderSql () != null) {
-
-			annotationWriter.addAttributeFormat (
-				"orderBy",
-				"\"%s\"",
-				spec.orderSql ().replace ("\"", "\\\""));
-
-		}
-
-		annotationWriter.write (
-			javaWriter,
-			"\t");
 
 		// write field
 

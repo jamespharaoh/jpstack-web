@@ -1,6 +1,7 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -33,22 +34,6 @@ class IndexFieldWriter {
 	public
 	void build (
 			Builder builder) {
-
-		if (spec.counterName () != null) {
-
-			javaWriter.writeFormat (
-				"\t@IndexField (\n");
-
-			javaWriter.writeFormat (
-				"\t\tcounter = \"%s\")\n",
-				spec.counterName ());
-
-		} else {
-
-			javaWriter.writeFormat (
-				"\t@IndexField\n");
-
-		}
 
 		// write field
 

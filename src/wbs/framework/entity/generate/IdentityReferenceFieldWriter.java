@@ -61,11 +61,6 @@ class IdentityReferenceFieldWriter {
 				capitalise (
 					spec.typeName ()));
 
-		// write field annotation
-
-		javaWriter.writeFormat (
-			"\t@IdentityReferenceField\n");
-
 		// write field
 
 		new PropertyWriter ()

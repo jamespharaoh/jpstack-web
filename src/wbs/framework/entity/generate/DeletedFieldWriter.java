@@ -33,9 +33,6 @@ class DeletedFieldWriter {
 	void build (
 			Builder builder) {
 
-		javaWriter.writeFormat (
-			"\t@DeletedField\n");
-
 		// write field
 
 		new PropertyWriter ()

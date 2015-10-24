@@ -17,7 +17,6 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.AssociativeCollectionSpec;
 import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
@@ -84,41 +83,6 @@ class AssociativeCollectionWriter {
 				spec.name (),
 				naivePluralise (
 					spec.typeName ()));
-
-		// write field annotation
-
-		AnnotationWriter annotationWriter =
-			new AnnotationWriter ()
-
-			.name (
-				"LinkField");
-
-		annotationWriter.addAttributeFormat (
-			"table",
-			"\"%s\"",
-			spec.tableName ().replace ("\"", "\\\""));
-
-		if (spec.valueColumnName () != null) {
-
-			annotationWriter.addAttributeFormat (
-				"element",
-				"\"%s\"",
-				spec.valueColumnName ().replace ("\"", "\\\""));
-
-		}
-
-		if (spec.whereSql () != null) {
-
-			annotationWriter.addAttributeFormat (
-				"where",
-				"\"%s\"",
-				spec.whereSql ().replace ("\"", "\\\""));
-
-		}
-
-		annotationWriter.write (
-			javaWriter,
-			"\t");
 
 		// write field
 

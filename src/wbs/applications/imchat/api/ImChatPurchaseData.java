@@ -2,9 +2,9 @@ package wbs.applications.imchat.api;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
-import wbs.framework.entity.annotations.SimpleField;
 
 @Accessors (fluent = true)
 @Data
@@ -15,10 +15,10 @@ class ImChatPurchaseData {
 	@DataAttribute
 	String token;
 
-	@SimpleField
+	@DataAttribute
 	Integer price;
 
-	@SimpleField
+	@DataAttribute
 	Integer value;
 
 }

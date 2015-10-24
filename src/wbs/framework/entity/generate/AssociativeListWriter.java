@@ -16,7 +16,6 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.AssociativeListSpec;
 import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.utils.etc.FormatWriter;
@@ -68,30 +67,6 @@ class AssociativeListWriter {
 				fieldTypePlugin.packageName (),
 				capitalise (
 					spec.typeName ()));
-
-		// write field annotation
-
-		AnnotationWriter annotationWriter =
-			new AnnotationWriter ()
-
-			.name (
-				"LinkField");
-
-		annotationWriter.addAttributeFormat (
-			"table",
-			"\"%s\"",
-			spec.tableName ().replace ("\"", "\\\""));
-
-		annotationWriter.addAttributeFormat (
-			"index",
-			"\"%s\"",
-			ifNull (
-				spec.listColumnName (),
-				"index"));
-
-		annotationWriter.write (
-			javaWriter,
-			"\t");
 
 		// write field
 

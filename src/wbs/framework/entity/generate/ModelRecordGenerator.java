@@ -3,7 +3,6 @@ package wbs.framework.entity.generate;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.File;
@@ -20,9 +19,10 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.io.FileUtils;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginSpec;
-import wbs.framework.entity.meta.AnnotationWriter;
 import wbs.framework.entity.meta.CodeFieldSpec;
 import wbs.framework.entity.meta.DateFieldSpec;
 import wbs.framework.entity.meta.IdentityIntegerFieldSpec;
@@ -42,8 +42,6 @@ import wbs.framework.entity.meta.ReferenceFieldSpec;
 import wbs.framework.entity.meta.TimestampFieldSpec;
 import wbs.framework.entity.meta.TypeCodeFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
-
-import com.google.common.collect.ImmutableList;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("modelRecordGenerator")
@@ -119,9 +117,6 @@ class ModelRecordGenerator {
 		writeStandardImports (
 			javaWriter);
 
-		writeClassAnnotations (
-			javaWriter);
-
 		writeClass (
 			javaWriter);
 
@@ -143,42 +138,6 @@ class ModelRecordGenerator {
 			java.util.Map.class,
 			java.util.Set.class,
 
-			org.apache.commons.lang3.builder.CompareToBuilder.class,
-
-			wbs.framework.entity.annotations.CommonEntity.class,
-			wbs.framework.entity.annotations.ComponentEntity.class,
-			wbs.framework.entity.annotations.EphemeralEntity.class,
-			wbs.framework.entity.annotations.EventEntity.class,
-			wbs.framework.entity.annotations.MajorEntity.class,
-			wbs.framework.entity.annotations.MinorEntity.class,
-			wbs.framework.entity.annotations.RootEntity.class,
-			wbs.framework.entity.annotations.TypeEntity.class,
-
-			wbs.framework.entity.annotations.AssignedIdField.class,
-			wbs.framework.entity.annotations.CodeField.class,
-			wbs.framework.entity.annotations.CollectionField.class,
-			wbs.framework.entity.annotations.ComponentField.class,
-			wbs.framework.entity.annotations.DeletedField.class,
-			wbs.framework.entity.annotations.DescriptionField.class,
-			wbs.framework.entity.annotations.ForeignIdField.class,
-			wbs.framework.entity.annotations.GeneratedIdField.class,
-			wbs.framework.entity.annotations.IdentityReferenceField.class,
-			wbs.framework.entity.annotations.IdentitySimpleField.class,
-			wbs.framework.entity.annotations.IndexField.class,
-			wbs.framework.entity.annotations.LinkField.class,
-			wbs.framework.entity.annotations.MasterField.class,
-			wbs.framework.entity.annotations.NameField.class,
-			wbs.framework.entity.annotations.ParentField.class,
-			wbs.framework.entity.annotations.ParentIdField.class,
-			wbs.framework.entity.annotations.ParentTypeField.class,
-			wbs.framework.entity.annotations.ReferenceField.class,
-			wbs.framework.entity.annotations.SimpleField.class,
-			wbs.framework.entity.annotations.SlaveField.class,
-			wbs.framework.entity.annotations.TypeCodeField.class,
-			wbs.framework.entity.annotations.TypeField.class,
-
-			wbs.framework.object.ObjectTypeEntry.class,
-
 			wbs.framework.record.CommonRecord.class,
 			wbs.framework.record.EphemeralRecord.class,
 			wbs.framework.record.EventRecord.class,
@@ -189,11 +148,10 @@ class ModelRecordGenerator {
 			wbs.framework.record.RootRecord.class,
 			wbs.framework.record.TypeRecord.class,
 
-			org.joda.time.Instant.class,
-			org.joda.time.LocalDate.class,
+			org.apache.commons.lang3.builder.CompareToBuilder.class,
 
-			org.jadira.usertype.dateandtime.joda.PersistentInstantAsString.class,
-			org.jadira.usertype.dateandtime.joda.PersistentInstantAsTimestamp.class
+			org.joda.time.Instant.class,
+			org.joda.time.LocalDate.class
 
 		);
 
@@ -210,51 +168,6 @@ class ModelRecordGenerator {
 
 		javaWriter.writeFormat (
 			"\n");
-
-	}
-
-	private
-	void writeClassAnnotations (
-			FormatWriter javaWriter)
-		throws IOException {
-
-		AnnotationWriter annotationWriter =
-			new AnnotationWriter ()
-
-			.name (
-				stringFormat (
-					"%sEntity",
-					capitalise (
-						modelMeta.type ().toString ())));
-
-		if (isNotNull (modelMeta.tableName ())) {
-
-			annotationWriter.addAttributeFormat (
-				"table",
-				"\"%s\"",
-				modelMeta.tableName ().replace ("\"", "\\\""));
-
-		}
-
-		if (! ifNull (modelMeta.create (), true)) {
-
-			annotationWriter.addAttributeFormat (
-				"create",
-				"false");
-
-		}
-
-		if (! ifNull (modelMeta.mutable (), true)) {
-
-			annotationWriter.addAttributeFormat (
-				"mutable",
-				"false");
-
-		}
-
-		annotationWriter.write (
-			javaWriter,
-			"");
 
 	}
 

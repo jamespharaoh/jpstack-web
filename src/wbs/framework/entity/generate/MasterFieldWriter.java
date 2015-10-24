@@ -61,11 +61,6 @@ class MasterFieldWriter {
 				capitalise (
 					spec.typeName ()));
 
-		// write field annotation
-
-		javaWriter.writeFormat (
-			"\t@MasterField\n");
-
 		// write field
 
 		PropertyWriter propertyWriter =

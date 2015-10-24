@@ -33,9 +33,6 @@ class IdentityDateFieldWriter {
 	void build (
 			Builder builder) {
 
-		javaWriter.writeFormat (
-			"\t@IdentitySimpleField\n");
-
 		// write field
 
 		new PropertyWriter ()

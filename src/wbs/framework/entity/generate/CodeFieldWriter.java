@@ -34,9 +34,6 @@ class CodeFieldWriter {
 	void build (
 			Builder builder) {
 
-		javaWriter.writeFormat (
-			"\t@CodeField\n");
-
 		// write field
 
 		new PropertyWriter ()

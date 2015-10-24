@@ -61,11 +61,6 @@ class SlaveFieldWriter {
 				capitalise (
 					spec.typeName ()));
 
-		// write field annotation
-
-		javaWriter.writeFormat (
-			"\t@SlaveField\n");
-
 		// write field
 
 		PropertyWriter propertyWriter =
