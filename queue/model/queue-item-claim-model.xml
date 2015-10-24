@@ -26,7 +26,8 @@
 
 		<reference-field
 			name="unclaimUser"
-			type="user"/>
+			type="user"
+			nullable="yes"/>
 
 		<timestamp-field
 			name="endTime"
