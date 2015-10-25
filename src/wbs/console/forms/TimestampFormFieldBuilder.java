@@ -111,6 +111,11 @@ class TimestampFormFieldBuilder {
 				spec.size (),
 				FormField.defaultSize);
 
+		TimestampFormFieldSpec.Format format =
+			ifNull (
+				spec.format (),
+				TimestampFormFieldSpec.Format.timestamp);
+
 		// accessor and native mapping
 
 		Class<?> propertyClass =
@@ -166,7 +171,12 @@ class TimestampFormFieldBuilder {
 
 		FormFieldInterfaceMapping interfaceMapping =
 			timestampFormFieldInterfaceMappingProvider.get ()
-				.name (name);
+
+			.name (
+				name)
+
+			.format (
+				format);
 
 		// renderer
 

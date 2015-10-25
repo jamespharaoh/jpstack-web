@@ -10,35 +10,17 @@ import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("timestamp-field")
-@PrototypeComponent ("timestampFormFieldSpec")
+@DataClass ("html-field")
+@PrototypeComponent ("htmlFormFieldSpec")
 @ConsoleModuleData
 public
-class TimestampFormFieldSpec {
+class HtmlFormFieldSpec {
 
-	@DataAttribute
-	String label;
-
-	@DataAttribute
+	@DataAttribute (
+		required = true)
 	String name;
 
 	@DataAttribute
-	Boolean nullable;
-
-	@DataAttribute
-	Boolean readOnly;
-
-	@DataAttribute
-	Integer size = FormField.defaultSize;
-
-	@DataAttribute
-	Format format;
-
-	public static
-	enum Format {
-		timestamp,
-		date,
-		time;
-	}
+	String label;
 
 }

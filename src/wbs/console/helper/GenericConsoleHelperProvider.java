@@ -1,8 +1,8 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.underscoreToCamel;
 
@@ -172,16 +172,21 @@ class GenericConsoleHelperProvider
 
 		String viewPrivKey =
 			stringFormat (
-				"%s_view",
+				"%s.view",
 				objectName ());
 
-		for (PrivKeySpec privKeySpec
-				: consoleHelperProviderSpec.privKeys ()) {
+		for (
+			PrivKeySpec privKeySpec
+				: consoleHelperProviderSpec.privKeys ()
+		) {
 
-			if (! equal (
+			if (
+				notEqual (
 					privKeySpec.name (),
-					viewPrivKey))
+					viewPrivKey)
+			) {
 				continue;
+			}
 
 			if (viewPrivKeySpecs == null) {
 
@@ -227,8 +232,10 @@ class GenericConsoleHelperProvider
 
 		// set context stuff
 
-		for (ConsoleContextStuffSpec contextStuffSpec
-				: consoleHelperProviderSpec.contextStuffs ()) {
+		for (
+			ConsoleContextStuffSpec contextStuffSpec
+				: consoleHelperProviderSpec.contextStuffs ()
+		) {
 
 			if (
 				contextStuffSpec.fieldName () != null
@@ -276,8 +283,10 @@ class GenericConsoleHelperProvider
 			(PrivChecker)
 			this.privChecker.get ();
 
-		for (PrivKeySpec privKeySpec
-				: consoleHelperProviderSpec.privKeys ()) {
+		for (
+			PrivKeySpec privKeySpec
+				: consoleHelperProviderSpec.privKeys ()
+		) {
 
 			Record<?> privObject =
 				privKeySpec.delegateName () != null

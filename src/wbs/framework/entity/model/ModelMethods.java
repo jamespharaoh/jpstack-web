@@ -6,16 +6,17 @@ import java.util.Map;
 public
 interface ModelMethods {
 
-	ModelField idField ();
-	ModelField parentField ();
-	ModelField parentTypeField ();
-	ModelField parentIdField ();
-	ModelField typeCodeField ();
 	ModelField codeField ();
+	ModelField deletedField ();
+	ModelField descriptionField ();
+	ModelField idField ();
 	ModelField indexField ();
 	ModelField nameField ();
-	ModelField descriptionField ();
-	ModelField deletedField ();
+	ModelField parentField ();
+	ModelField parentIdField ();
+	ModelField parentTypeField ();
+	ModelField timestampField ();
+	ModelField typeCodeField ();
 
 	List<ModelField> fields ();
 	Map<String,ModelField> fieldsByName ();

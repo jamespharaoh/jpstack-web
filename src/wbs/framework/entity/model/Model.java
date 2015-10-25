@@ -10,6 +10,7 @@ import java.util.Map;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataChildrenIndex;
@@ -53,6 +54,9 @@ class Model
 
 	@DataReference
 	ModelField idField;
+
+	@DataReference
+	ModelField timestampField;
 
 	@DataReference
 	ModelField parentField;

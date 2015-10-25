@@ -1,0 +1,85 @@
+<console-module
+	name="event">
+
+	<console-helper-provider
+		object-name="event">
+
+		<context-stuff
+			name="eventName"
+			field="id"/>
+
+		<priv-key
+			name="event.view"
+			delegate="root"
+			priv="events"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="event"
+		object-name="event">
+
+		<list>
+
+			<object-search-page
+				search-fields="search"
+				results-fields="results"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="search"
+		class="wbs.platform.event.model.EventSearch">
+
+		<timestamp-field
+			name="timestampAfter"
+			label="Time from"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="timestampBefore"
+			label="Time to"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="results"
+		object-name="event">
+
+		<timestamp-field
+			name="timestamp"
+			label="Time"
+			format="time"/>
+
+		<event-details-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="event">
+
+		<id-field/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<object-field
+			name="eventType"
+			object-type="eventType"/>
+
+		<event-details-field/>
+
+	</field-set>
+
+</console-module>

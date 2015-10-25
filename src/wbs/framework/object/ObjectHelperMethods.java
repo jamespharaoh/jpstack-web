@@ -55,10 +55,11 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	Boolean nameExists ();
 	Boolean nameIsCode ();
 
+	boolean common ();
+	boolean ephemeral ();
+	boolean event ();
 	boolean major ();
 	boolean minor ();
-	boolean ephemeral ();
-	boolean common ();
 
 	// data access
 

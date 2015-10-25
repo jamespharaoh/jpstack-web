@@ -2,6 +2,10 @@
 	name="event"
 	package="wbs.platform.event">
 
+	<plugin-dependencies>
+		<plugin-dependency name="platform-common"/>
+	</plugin-dependencies>
+
 	<models>
 		<model name="event"/>
 		<model name="eventLink"/>
@@ -23,12 +27,23 @@
 	</layer>
 
 	<layer name="console">
-		<bean class="console.EventConsoleLogic"/>
+		<bean class="console.EventConsoleLogicImplementation"/>
+		<bean class="console.EventDetailsFormFieldBuilder"/>
+		<bean class="console.EventDetailsFormFieldInterfaceMapping"/>
+		<bean class="console.EventDetailsFormFieldSpec"/>
 		<bean class="console.NameFormFieldUpdateHook"/>
 		<bean class="console.ObjectEventsPageBuilder"/>
 		<bean class="console.ObjectEventsPageSpec"/>
 		<bean class="console.ObjectEventsPart"/>
 		<bean class="console.SimpleFormFieldUpdateHook"/>
 	</layer>
+
+	<fixtures>
+		<fixture name="event"/>
+	</fixtures>
+
+	<console-modules>
+		<console-module name="event"/>
+	</console-modules>
 
 </plugin>

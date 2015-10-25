@@ -307,7 +307,7 @@ class ChatUserImageListAction
 
 			requestContext.addNotice (
 				notice);
-				
+
 		}
 
 		return null;

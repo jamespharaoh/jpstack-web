@@ -31,6 +31,9 @@ class TimestampFormFieldInterfaceMapping<Container>
 	@Getter @Setter
 	String name;
 
+	@Getter @Setter
+	TimestampFormFieldSpec.Format format;
+
 	// implementation
 
 	@Override
@@ -39,6 +42,10 @@ class TimestampFormFieldInterfaceMapping<Container>
 			Container container,
 			String interfaceValue,
 			List<String> errors) {
+
+		if (format != TimestampFormFieldSpec.Format.timestamp) {
+			throw new RuntimeException ();
+		}
 
 		if (interfaceValue == null)
 			return null;
@@ -74,9 +81,31 @@ class TimestampFormFieldInterfaceMapping<Container>
 		if (genericValue == null)
 			return null;
 
-		return timeFormatter.instantToTimestampString (
-			timeFormatter.defaultTimezone (),
-			genericValue);
+		switch (format) {
+
+		case timestamp:
+
+			return timeFormatter.instantToTimestampString (
+				timeFormatter.defaultTimezone (),
+				genericValue);
+
+		case date:
+
+			return timeFormatter.instantToDateStringShort (
+				timeFormatter.defaultTimezone (),
+				genericValue);
+
+		case time:
+
+			return timeFormatter.instantToTimeString (
+				timeFormatter.defaultTimezone (),
+				genericValue);
+
+		default:
+
+			throw new RuntimeException ();
+
+		}
 
 	}
 

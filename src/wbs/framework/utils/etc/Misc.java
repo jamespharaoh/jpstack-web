@@ -395,6 +395,24 @@ class Misc {
 	}
 
 	public static
+	boolean referenceEqual (
+			@NonNull Object object1,
+			@NonNull Object object2) {
+
+		return object1 == object2;
+
+	}
+
+	public static
+	boolean referenceNotEqual (
+			@NonNull Object object1,
+			@NonNull Object object2) {
+
+		return object1 != object2;
+
+	}
+
+	public static
 	String naivePluralise (
 			@NonNull String singular) {
 

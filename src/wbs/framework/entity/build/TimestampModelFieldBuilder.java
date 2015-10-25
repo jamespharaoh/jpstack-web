@@ -115,6 +115,13 @@ class TimestampModelFieldBuilder {
 			modelField.name (),
 			modelField);
 
+		if (target.model ().timestampField () == null) {
+
+			target.model ().timestampField (
+				modelField);
+
+		}
+
 	}
 
 	public final static

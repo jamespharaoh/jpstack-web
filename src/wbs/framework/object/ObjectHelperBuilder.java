@@ -28,6 +28,8 @@ import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.application.context.NoSuchBeanException;
@@ -37,12 +39,11 @@ import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelMethods;
 import wbs.framework.record.CommonRecord;
 import wbs.framework.record.EphemeralRecord;
+import wbs.framework.record.EventRecord;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.MajorRecord;
 import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
-
-import com.google.common.collect.ImmutableList;
 
 @Accessors (fluent = true)
 @SingletonComponent ("objectHelperBuilder")
@@ -691,6 +692,13 @@ class ObjectHelperBuilder {
 			public
 			boolean ephemeral () {
 				return EphemeralRecord.class.isAssignableFrom (
+					objectClass ());
+			}
+
+			@Override
+			public
+			boolean event () {
+				return EventRecord.class.isAssignableFrom (
 					objectClass ());
 			}
 
