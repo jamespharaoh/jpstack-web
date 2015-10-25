@@ -1,91 +1,25 @@
 package wbs.platform.event.console;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.PagePart;
-import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.record.GlobalId;
 import wbs.framework.record.PermanentRecord;
-import wbs.framework.record.Record;
+import wbs.platform.event.model.EventRec;
 
-@SingletonComponent ("eventConsoleLogic")
 public
-class EventConsoleLogic {
+interface EventConsoleLogic {
 
-	@Inject
-	ConsoleObjectManager objectManager;
-
-	@Inject
-	ConsoleRequestContext requestContext;
-
-	@Inject
-	Database database;
-
-	@Inject
-	Provider<ObjectEventsPart> objectEventsPart;
-
-	public
 	PagePart makeEventsPart (
-			PermanentRecord<?> object) {
+			PermanentRecord<?> object);
 
-		List<Record<?>> children =
-			objectManager.getMinorChildren (
-				object);
-
-		List<GlobalId> objectGlobalIds =
-			new ArrayList<GlobalId> ();
-
-		objectGlobalIds.add (
-			objectManager.getGlobalId (object));
-
-		for (Record<?> child : children)
-			objectGlobalIds.add (
-				objectManager.getGlobalId (child));
-
-		return objectEventsPart.get ()
-			.dataObjectIds (objectGlobalIds);
-
-	}
-
-	// ================================= make events part factory
-
-	public
 	Provider<PagePart> makeEventsPartFactory (
-			final ObjectLookup<?> objectLookup) {
+			ObjectLookup<?> objectLookup);
 
-		return new Provider<PagePart> () {
+	String eventText (
+			EventRec event);
 
-			@Override
-			public
-			PagePart get () {
-
-				@Cleanup
-				Transaction transaction =
-					database.beginReadOnly (
-						this);
-
-				PermanentRecord<?> object =
-					(PermanentRecord<?>)
-					objectLookup.lookupObject (
-						requestContext.contextStuff ());
-
-				return makeEventsPart (
-					object);
-
-			}
-
-		};
-
-	}
+	String objectToHtml (
+			Object object);
 
 }

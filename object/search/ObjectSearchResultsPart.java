@@ -1,8 +1,12 @@
 package wbs.platform.object.search;
 
+import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -10,16 +14,22 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
+import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.utils.etc.Html;
 
 @Accessors (fluent = true)
@@ -38,6 +48,9 @@ class ObjectSearchResultsPart
 
 	@Inject
 	ConsoleObjectManager objectManager;
+
+	@Inject
+	TimeFormatter timeFormatter;
 
 	// properties
 
@@ -245,6 +258,9 @@ class ObjectSearchResultsPart
 		printFormat (
 			"</tr>\n");
 
+		LocalDate currentDate =
+			new LocalDate (0);
+
 		for (
 			Record<?> object
 				: objects
@@ -275,6 +291,72 @@ class ObjectSearchResultsPart
 					"</tr>\n");
 
 				continue;
+
+			}
+
+			if (consoleHelper.event ()) {
+
+				Instant rowTimestamp;
+
+				if (
+					equal (
+						consoleHelper.timestampField ().valueType (),
+						Date.class)
+				) {
+
+					rowTimestamp =
+						dateToInstant (
+							(Date)
+							BeanLogic.getProperty (
+								object,
+								consoleHelper.timestampField ().name ()));
+
+				} else if (
+					equal (
+						consoleHelper.timestampField ().valueType (),
+						Instant.class)
+				) {
+
+					rowTimestamp =
+						(Instant)
+						BeanLogic.getProperty (
+							object,
+							consoleHelper.timestampField ().name ());
+
+				} else {
+
+					throw new RuntimeException ();
+
+				}
+
+				LocalDate rowDate =
+					rowTimestamp.toDateTime ().toLocalDate ();
+
+				if (
+					notEqual (
+						currentDate,
+						rowDate)
+				) {
+
+					currentDate =
+						rowDate;
+
+					printFormat (
+						"<tr class=\"sep\">\n");
+
+					printFormat (
+						"<tr style=\"font-weight: bold\">\n");
+
+					printFormat (
+						"<td colspan=\"2\">%h</td>\n",
+						timeFormatter.instantToDateStringLong (
+							timeFormatter.defaultTimezone (),
+							rowTimestamp));
+
+					printFormat (
+						"</tr>\n");
+
+				}
 
 			}
 
