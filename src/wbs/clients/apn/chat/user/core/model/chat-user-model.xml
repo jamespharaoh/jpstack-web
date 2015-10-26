@@ -558,75 +558,93 @@
 
 		<event-type
 			name="Chat user auto strict"
-			text="%0 automatically moved to strict credit mode"/>
+			text="%0 automatically moved to strict credit mode"
+			admin="no"/>
 
 		<event-type
 			name="Chat user monitor created"
-			text="%0 created %1 with name %2, place %3, gender %4, orient %5 and info %6"/>
+			text="%0 created %1 with name %2, place %3, gender %4, orient %5 and info %6"
+			admin="no"/>
 
 		<event-type
 			name="Chat user barred"
-			text="%0 barred %1 for reason %2"/>
+			text="%0 barred %1 for reason %2"
+			admin="no"/>
 
 		<event-type
 			name="Chat user unbarred"
-			text="%0 unbarred %1 for reason %2"/>
+			text="%0 unbarred %1 for reason %2"
+			admin="no"/>
 
 		<event-type
 			name="Chat user info admin"
-			text="%0 changed info for %1 from %2 to %3 for reason %4"/>
+			text="%0 changed info for %1 from %2 to %3 for reason %4"
+			admin="no"/>
 
 		<event-type
 			name="Chat user info cleared"
-			text="%0 clared info for %1, was %2, for reason %3"/>
+			text="%0 clared info for %1, was %2, for reason %3"
+			admin="no"/>
 
 		<event-type
 			name="Chat user prefs"
-			text="%0 set prefs for %1 to gender %2 and orient %3"/>
+			text="%0 set prefs for %1 to gender %2 and orient %3"
+			admin="no"/>
 
 		<event-type
 			name="Chat user credit mode"
-			text="%0 changed credit mode for %1 from %2 to %3"/>
+			text="%0 changed credit mode for %1 from %2 to %3"
+			admin="no"/>
 
 		<event-type
 			name="Chat user delete"
-			text="%0 deleted %1"/>
+			text="%0 deleted %1"
+			admin="no"/>
 
 		<event-type
 			name="Chat user undelete"
-			text="%0 undeleted %1"/>
+			text="%0 undeleted %1"
+			admin="no"/>
 
 		<event-type
 			name="chat_user_image_mode"
-			text="%0 set image mode for %1 to %2"/>
+			text="%0 set image mode for %1 to %2"
+			admin="no"/>
 
 		<event-type
 			name="chat_user_online"
-			text="%0 brought %1 online"/>
+			text="%0 brought %1 online"
+			admin="no"/>
 
 		<event-type
 			name="chat_user_offline"
-			text="%0 brought %1 offline"/>
+			text="%0 brought %1 offline"
+			admin="no"/>
 
 		<event-type
 			name="Chat user location API"
-			text="Location for %0 set to (%1,%2) via API"/>
+			text="Location for %0 set to (%1,%2) via API"
+			admin="no"/>
 
 		<event-type
 			name="Chat user place message"
-			text="Location for %0 set to %1 (%2,%3) by %4"/>
+			text="Location for %0 set to %1 (%2,%3) by %4"
+			admin="no"/>
 
 		<event-type
 			name="Chat user place user"
-			text="Location for %0 set to %1 (%2,%3) by %4"/>
+			text="Location for %0 set to %1 (%2,%3) by %4"
+			admin="no"/>
 
 		<event-type
 			name="Chat user place API"
-			text="Location for %0 set to %1 (%2,%3) by API"/>
+			text="Location for %0 set to %1 (%2,%3) by API"
+			admin="no"/>
 
 		<event-type
 			name="Chat user location locator"
-			text="Location for %0 set to (%1,%2) via %3"/>
+			text="Location for %0 set to (%1,%2) via %3"
+			admin="no"/>
 
 	</event-types>
 

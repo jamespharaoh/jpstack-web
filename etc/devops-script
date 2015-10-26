@@ -2,6 +2,8 @@
 
 module Wbs
 
+TAIL_LINES = 20
+
 class DevopsScript
 
 	def main
@@ -307,11 +309,11 @@ class DevopsScript
 
 		if STDIN.tty?
 			follow = [ "-F" ]
-			count = [ "-n", "1000" ]
+			count = [ "-n", TAIL_LINES.to_s ]
 			term = [ "-t" ]
 		else
 			follow = []
-			count = [ "-n", "1000" ]
+			count = [ "-n", TAIL_LINES.to_s ]
 			term = [ "-T" ]
 		end
 

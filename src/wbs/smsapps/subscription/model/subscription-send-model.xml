@@ -100,23 +100,28 @@
 
 		<event-type
 			name="Subscription send scheduled"
-			text="%0 scheduled %1 for %2"/>
+			text="%0 scheduled %1 for %2"
+			admin="no"/>
 
 		<event-type
 			name="Subscription send unscheduled"
-			text="%0 unscheduled %1"/>
+			text="%0 unscheduled %1"
+			admin="no"/>
 
 		<event-type
 			name="Subscription send cancelled"
-			text="%0 cancelled %1 for %2"/>
+			text="%0 cancelled %1 for %2"
+			admin="no"/>
 
 		<event-type
 			name="Subscription send begin"
-			text="%0 begun sending"/>
+			text="%0 begun sending"
+			admin="no"/>
 
 		<event-type
 			name="Subscription send completed"
-			text="%0 completed sending"/>
+			text="%0 completed sending"
+			admin="no"/>
 
 	</event-types>
 

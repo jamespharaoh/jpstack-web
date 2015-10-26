@@ -81,11 +81,13 @@
 
 		<event-type
 			name="Subscription number affiliate"
-			text="Assign %0 to %1 due to %2"/>
+			text="Assign %0 to %1 due to %2"
+			admin="no"/>
 
 		<event-type
 			name="Subscription number subscribe"
-			text="Subscribed %0 to %1 due to %2"/>
+			text="Subscribed %0 to %1 due to %2"
+			admin="no"/>
 
 	</event-types>
 

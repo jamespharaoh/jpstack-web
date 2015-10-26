@@ -13,4 +13,6 @@ class EventSearch {
 	Instant timestampAfter;
 	Instant timestampBefore;
 
+	Boolean admin;
+
 }

@@ -138,7 +138,8 @@
 
 		<event-type
 			name="Chat broadcast send completed"
-			text="%0 completed sending"/>
+			text="%0 completed sending"
+			admin="no"/>
 
 	</event-types>
 

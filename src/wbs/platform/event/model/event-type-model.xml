@@ -16,6 +16,11 @@
 
 		<description-field/>
 
+		<!-- data -->
+
+		<yes-no-field
+			name="admin"/>
+
 	</fields>
 
 </model-meta>
