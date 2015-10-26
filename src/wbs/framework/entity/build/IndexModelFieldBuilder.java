@@ -3,6 +3,9 @@ package wbs.framework.entity.build;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.ifNull;
+
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -12,8 +15,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.IndexFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
-
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("indexModelFieldBuilder")
 @ModelBuilder
@@ -81,7 +82,10 @@ class IndexModelFieldBuilder {
 					ifNull (
 						spec.columnName (),
 						camelToUnderscore (
-							fieldName))));
+							fieldName))))
+
+			.indexCounterFieldName (
+				spec.counterName ());
 
 		// store field
 
