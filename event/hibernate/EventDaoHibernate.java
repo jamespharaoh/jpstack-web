@@ -28,7 +28,13 @@ class EventDaoHibernate
 		Criteria criteria =
 			createCriteria (
 				EventRec.class,
-				"_event");
+				"_event")
+
+			.createAlias (
+				"_event.eventType",
+				"_eventType");
+
+		// add search criteria
 
 		if (
 			isNotNull (
@@ -53,6 +59,18 @@ class EventDaoHibernate
 					"_event.timestamp",
 					instantToDate (
 						eventSearch.timestampBefore ())));
+
+		}
+
+		if (
+			isNotNull (
+				eventSearch.admin ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_eventType.admin",
+					eventSearch.admin ()));
 
 		}
 

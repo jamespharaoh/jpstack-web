@@ -15,6 +15,8 @@ import javax.sql.DataSource;
 
 import lombok.Cleanup;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -27,6 +29,7 @@ import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
 import wbs.platform.priv.metamodel.PrivTypeSpec;
 
+@Log4j
 @PrototypeComponent ("privTypeBuilder")
 @ModelMetaBuilderHandler
 public
@@ -59,6 +62,16 @@ class PrivTypeBuilder {
 			Builder builder) {
 
 		try {
+
+			log.info (
+				stringFormat (
+					"Create priv type %s.%s",
+					camelToUnderscore (
+						ifNull (
+							spec.subject (),
+							parent.name ())),
+					codify (
+						spec.name ())));
 
 			createPrivType ();
 

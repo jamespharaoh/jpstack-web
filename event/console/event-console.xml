@@ -50,6 +50,10 @@
 			label="Time to"
 			nullable="yes"/>
 
+		<yes-no-field
+			name="admin"
+			nullable="yes"/>
+
 	</field-set>
 
 	<field-set
