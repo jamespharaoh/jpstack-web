@@ -125,8 +125,12 @@ class TimestampFromFormFieldBuilder {
 
 			formFieldAccessor =
 				simpleFormFieldAccessorProvider.get ()
-					.name (name)
-					.nativeClass (Instant.class);
+
+				.name (
+					name)
+
+				.nativeClass (
+					Instant.class);
 
 			formFieldNativeMapping =
 				identityFormFieldNativeMappingProvider.get ();
@@ -135,8 +139,12 @@ class TimestampFromFormFieldBuilder {
 
 			formFieldAccessor =
 				simpleFormFieldAccessorProvider.get ()
-					.name (name)
-					.nativeClass (Date.class);
+
+				.name (
+					name)
+
+				.nativeClass (
+					Date.class);
 
 			formFieldNativeMapping =
 				dateFormFieldNativeMappingProvider.get ();
@@ -198,7 +206,6 @@ class TimestampFromFormFieldBuilder {
 		if (readOnly) {
 
 			formFieldSet.formFields ().add (
-
 				readOnlyFormFieldProvider.get ()
 
 				.name (
@@ -224,7 +231,6 @@ class TimestampFromFormFieldBuilder {
 		} else {
 
 			formFieldSet.formFields ().add (
-
 				updatableFormFieldProvider.get ()
 
 				.name (

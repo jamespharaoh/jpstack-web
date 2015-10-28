@@ -84,6 +84,9 @@
 		<bean class="TimestampFromFormFieldBuilder"/>
 		<bean class="TimestampFromFormFieldInterfaceMapping"/>
 		<bean class="TimestampFromFormFieldSpec"/>
+		<bean class="TimestampPartialFormFieldBuilder"/>
+		<bean class="TimestampPartialFormFieldSpec"/>
+		<bean class="TimestampPartialFormFieldValueValidator"/>
 		<bean class="TimestampTimezoneFormFieldBuilder"/>
 		<bean class="TimestampTimezoneFormFieldInterfaceMapping"/>
 		<bean class="TimestampTimezoneFormFieldSpec"/>

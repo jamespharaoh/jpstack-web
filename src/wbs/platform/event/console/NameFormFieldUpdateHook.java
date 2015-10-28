@@ -1,9 +1,13 @@
 package wbs.platform.event.console;
 
 import static wbs.framework.utils.etc.Misc.codify;
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.notEqual;
 
 import javax.inject.Inject;
+
+import lombok.NonNull;
+
+import com.google.common.base.Optional;
 
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.forms.FormFieldUpdateHook;
@@ -35,11 +39,11 @@ class NameFormFieldUpdateHook
 	@Override
 	public
 	void onUpdate (
-			UpdateResult<String,String> updateResult,
-			Record<?> container,
-			Record<?> linkObject,
-			Object objectRef,
-			String objectType) {
+			@NonNull UpdateResult<String,String> updateResult,
+			@NonNull Record<?> container,
+			@NonNull Record<?> linkObject,
+			@NonNull Optional<Object> objectRef,
+			@NonNull Optional<String> objectType) {
 
 		UserRec user =
 			userHelper.find (
@@ -47,42 +51,45 @@ class NameFormFieldUpdateHook
 
 		// don't create event on initial creation
 
-		if (updateResult.oldNativeValue () == null)
+		if (! updateResult.oldNativeValue ().isPresent ()) {
 			return;
+		}
 
 		// derive codes
 
 		String oldCode =
-			codify (updateResult.oldNativeValue ());
+			codify (
+				updateResult.oldNativeValue ().get ());
 
 		String newCode =
-			codify (updateResult.newNativeValue ());
+			codify (
+				updateResult.newNativeValue ().get ());
 
 		boolean codeChanged =
-			! equal (
+			notEqual (
 				oldCode,
 				newCode);
 
 		// create an event
 
-		if (objectRef != null) {
+		if (objectRef.isPresent ()) {
 
 			eventLogic.createEvent (
 				"object_name_changed_in",
 				user,
-				objectRef,
-				objectType,
+				objectRef.get (),
+				objectType.get (),
 				linkObject,
-				updateResult.oldNativeValue (),
-				updateResult.newNativeValue ());
+				updateResult.oldNativeValue ().get (),
+				updateResult.newNativeValue ().get ());
 
 			if (codeChanged) {
 
 				eventLogic.createEvent (
 					"object_code_changed_in",
 					user,
-					objectRef,
-					objectType,
+					objectRef.get (),
+					objectType.get (),
 					linkObject,
 					oldCode,
 					newCode);
@@ -95,8 +102,8 @@ class NameFormFieldUpdateHook
 				"object_name_changed",
 				user,
 				linkObject,
-				updateResult.oldNativeValue (),
-				updateResult.newNativeValue ());
+				updateResult.oldNativeValue ().get (),
+				updateResult.newNativeValue ().get ());
 
 			if (codeChanged) {
 

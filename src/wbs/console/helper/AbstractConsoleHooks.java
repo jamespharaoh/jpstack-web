@@ -1,8 +1,8 @@
 package wbs.console.helper;
 
-import wbs.framework.record.Record;
-
 import com.google.common.base.Optional;
+
+import wbs.framework.record.Record;
 
 public
 class AbstractConsoleHooks<Type extends Record<Type>>
@@ -11,6 +11,15 @@ class AbstractConsoleHooks<Type extends Record<Type>>
 	@Override
 	public
 	Optional<String> getHtml (
+			Type object) {
+
+		return Optional.<String>absent ();
+
+	}
+
+	@Override
+	public
+	Optional<String> getListClass (
 			Type object) {
 
 		return Optional.<String>absent ();

@@ -10,7 +10,11 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Data;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -27,8 +31,8 @@ class FormFieldLogic {
 
 	public
 	UpdateResultSet update (
-			FormFieldSet formFieldSet,
-			Object container) {
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Object container) {
 
 		UpdateResultSet updateResultSet =
 			new UpdateResultSet ();
@@ -69,7 +73,7 @@ class FormFieldLogic {
 
 	public
 	void reportErrors (
-			UpdateResultSet updateResultSet) {
+			@NonNull UpdateResultSet updateResultSet) {
 
 		for (
 			UpdateResult<?,?> updateResult
@@ -99,11 +103,11 @@ class FormFieldLogic {
 
 	public
 	void runUpdateHooks (
-			UpdateResultSet updateResultSet,
-			Object container,
-			PermanentRecord<?> linkObject,
-			Object objectRef,
-			String objectType) {
+			@NonNull UpdateResultSet updateResultSet,
+			@NonNull Object container,
+			@NonNull PermanentRecord<?> linkObject,
+			@NonNull Optional<Object> objectRef,
+			@NonNull Optional<String> objectType) {
 
 		for (
 			UpdateResult updateResult
@@ -129,8 +133,8 @@ class FormFieldLogic {
 
 	public
 	void outputTableHeadings (
-			FormatWriter out,
-			FormFieldSet formFieldSet) {
+			@NonNull FormatWriter out,
+			@NonNull FormFieldSet formFieldSet) {
 
 		for (
 			FormField formField
@@ -147,8 +151,8 @@ class FormFieldLogic {
 
 	public
 	void outputCsvHeadings (
-			PrintWriter out,
-			FormFieldSet formFieldSet) {
+			@NonNull PrintWriter out,
+			@NonNull FormFieldSet formFieldSet) {
 
 		boolean first = true;
 
@@ -177,9 +181,9 @@ class FormFieldLogic {
 
 	public
 	void outputFormRows (
-			FormatWriter out,
-			FormFieldSet formFieldSet,
-			Object object) {
+			@NonNull FormatWriter out,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Object object) {
 
 		for (
 			FormField formField
@@ -191,6 +195,30 @@ class FormFieldLogic {
 
 			formField.renderFormRow (
 				out,
+				object);
+
+		}
+
+	}
+
+	public
+	void outputFormReset (
+			FormatWriter javascriptWriter,
+			String indent,
+			FormFieldSet formFieldSet,
+			Object object) {
+
+		for (
+			FormField formField
+				: formFieldSet.formFields ()
+		) {
+
+			if (formField.virtual ())
+				continue;
+
+			formField.renderFormReset (
+				javascriptWriter,
+				indent,
 				object);
 
 		}
@@ -252,7 +280,34 @@ class FormFieldLogic {
 			formField.renderTableCellList (
 				out,
 				object,
-				links);
+				links,
+				1);
+
+		}
+
+	}
+
+	public
+	void outputTableRowsList (
+			FormatWriter out,
+			FormFieldSet formFieldSet,
+			Object object,
+			boolean links,
+			int colspan) {
+
+		for (
+			FormField formField
+				: formFieldSet.formFields ()
+		) {
+
+			if (formField.virtual ())
+				continue;
+
+			formField.renderTableCellList (
+				out,
+				object,
+				links,
+				colspan);
 
 		}
 
@@ -260,15 +315,18 @@ class FormFieldLogic {
 
 	public
 	void outputTableRows (
-			FormatWriter out,
-			FormFieldSet formFieldSet,
-			Object object) {
+			@NonNull FormatWriter out,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Object object) {
 
-		for (FormField formField
-				: formFieldSet.formFields ()) {
+		for (
+			FormField formField
+				: formFieldSet.formFields ()
+		) {
 
-			if (formField.virtual ())
+			if (formField.virtual ()) {
 				continue;
+			}
 
 			out.writeFormat (
 				"<tr>\n",

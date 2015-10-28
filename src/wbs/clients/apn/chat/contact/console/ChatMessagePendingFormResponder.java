@@ -139,7 +139,8 @@ class ChatMessagePendingFormResponder
 		printFormat (
 			"<h1>Chat message to approve</h1>");
 
-		requestContext.flushNotices (out);
+		requestContext.flushNotices (
+			printWriter);
 
 		printFormat (
 			"<form",

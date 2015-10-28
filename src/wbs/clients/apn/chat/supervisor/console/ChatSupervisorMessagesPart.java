@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -12,16 +13,20 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.core.console.ChatConsoleLogic;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.MagicTableScriptRef;
+import wbs.console.html.ScriptRef;
 import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.Html;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
@@ -55,6 +60,27 @@ class ChatSupervisorMessagesPart
 	ChatRec chat;
 
 	List<ChatMessageRec> chatMessages;
+
+	// details
+
+	@Override
+	public
+	Set<ScriptRef> scriptRefs () {
+
+		return ImmutableSet.<ScriptRef>builder ()
+
+			.addAll (
+				super.scriptRefs ())
+
+			.add (
+				JqueryScriptRef.instance)
+
+			.add (
+				MagicTableScriptRef.instance)
+
+			.build ();
+
+	}
 
 	// implementation
 
@@ -116,39 +142,47 @@ class ChatSupervisorMessagesPart
 			"<th>Message</th>\n",
 			"</tr>\n");
 
-		for (ChatMessageRec chatMessage
-				: chatMessages) {
+		for (
+			ChatMessageRec chatMessage
+				: chatMessages
+		) {
 
 			printFormat (
-				"%s\n",
-				Html.magicTr (
-					requestContext.resolveLocalUrl (
-						stringFormat (
-							"/chat.supervisorConversation",
-							"?chatUserId1=%u",
-							chatMessage.getToUser ().getId (),
-							"&chatUserId2=%u",
-							chatMessage.getFromUser ().getId ())),
-					false),
+				"<tr",
+				" class=\"magic-table-row\"",
+				" data-target-href=\"%h\"",
+				requestContext.resolveLocalUrl (
+					stringFormat (
+						"/chat.supervisorConversation",
+						"?chatUserId1=%u",
+						chatMessage.getToUser ().getId (),
+						"&chatUserId2=%u",
+						chatMessage.getFromUser ().getId ())),
+				">\n");
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatConsoleLogic.textForChatUser (
-					chatMessage.getFromUser ()),
+					chatMessage.getFromUser ()));
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatConsoleLogic.textForChatUser (
-					chatMessage.getToUser ()),
+					chatMessage.getToUser ()));
 
+			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimeString (
 					chatMiscLogic.timezone (
 						chat),
 					dateToInstant (
-						chatMessage.getTimestamp ())),
+						chatMessage.getTimestamp ())));
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatMessage.getOriginalText ().getText (),
+				chatMessage.getOriginalText ().getText ());
 
+			printFormat (
 				"</tr>\n");
 
 		}

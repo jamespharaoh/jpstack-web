@@ -1,8 +1,8 @@
 package wbs.console.helper;
 
-import wbs.framework.record.Record;
-
 import com.google.common.base.Optional;
+
+import wbs.framework.record.Record;
 
 public
 interface ConsoleHelperMethods<ObjectType extends Record<ObjectType>> {
@@ -28,5 +28,8 @@ interface ConsoleHelperMethods<ObjectType extends Record<ObjectType>> {
 			Record<?> object,
 			Optional<Record<?>> assumedRoot,
 			Boolean mini);
+
+	Optional<String> getListClass (
+			Record<?> object);
 
 }

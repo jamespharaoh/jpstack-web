@@ -5,6 +5,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.etc.FormatWriterWriter;
 import wbs.framework.utils.etc.Html;
 
 public
@@ -18,7 +20,7 @@ class PageBuilder {
 
 	StringWriter stringWriter;
 
-	PrintWriter printWriter;
+	FormatWriter formatWriter;
 
 	StringWriter headStringWriter =
 		new StringWriter ();
@@ -26,12 +28,12 @@ class PageBuilder {
 	StringWriter footStringWriter =
 		new StringWriter ();
 
-	PrintWriter headPrintWriter =
-		new PrintWriter (
+	FormatWriter headFormatWriter =
+		new FormatWriterWriter (
 			headStringWriter);
 
-	PrintWriter footPrintWriter =
-		new PrintWriter (
+	FormatWriter footFormatWriter =
+		new FormatWriterWriter (
 			footStringWriter);
 
 	public
@@ -39,8 +41,6 @@ class PageBuilder {
 
 		if (! inPage)
 			return;
-
-		printWriter.flush ();
 
 		pages.add (
 			stringWriter.toString ());
@@ -53,12 +53,8 @@ class PageBuilder {
 	void goPages (
 			PrintWriter out) {
 
-		headPrintWriter.flush ();
-
 		String pageHeaderString =
 			headStringWriter.toString ();
-
-		footPrintWriter.flush ();
 
 		String pageFooterString =
 			footStringWriter.toString ();
@@ -99,15 +95,15 @@ class PageBuilder {
 	}
 
 	public
-	PrintWriter writer () {
+	FormatWriter writer () {
 
 		if (! inPage) {
 
 			stringWriter =
 				new StringWriter ();
 
-			printWriter =
-				new PrintWriter (
+			formatWriter =
+				new FormatWriterWriter (
 					stringWriter);
 
 			inPage =
@@ -115,7 +111,7 @@ class PageBuilder {
 
 		}
 
-		return printWriter;
+		return formatWriter;
 
 	}
 
@@ -131,13 +127,13 @@ class PageBuilder {
 	}
 
 	public
-	PrintWriter headWriter () {
-		return headPrintWriter;
+	FormatWriter headWriter () {
+		return headFormatWriter;
 	}
 
 	public
-	PrintWriter footWriter () {
-		return footPrintWriter;
+	FormatWriter footWriter () {
+		return footFormatWriter;
 	}
 
 }

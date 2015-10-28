@@ -3,8 +3,12 @@ package wbs.console.forms;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
@@ -20,36 +24,42 @@ class IntegerFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Long interfaceToGeneric (
-			Container container,
-			String interfaceValue,
-			List<String> errors) {
+	Optional<Long> interfaceToGeneric (
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue,
+			@NonNull List<String> errors) {
 
-		if (interfaceValue == null)
-			return null;
+		if (! interfaceValue.isPresent ()) {
+			return Optional.<Long>absent ();
+		}
 
-		if (interfaceValue.isEmpty ())
-			return null;
+		if (interfaceValue.get ().isEmpty ()) {
+			return Optional.<Long>absent ();
+		}
 
-		return Long.parseLong (
-			interfaceValue);
+		return Optional.of (
+			Long.parseLong (
+				interfaceValue.get ()));
 
 	}
 
 	@Override
 	public
-	String genericToInterface (
-			Container container,
-			Long genericValue) {
+	Optional<String> genericToInterface (
+			@NonNull Container container,
+			@NonNull Optional<Long> genericValue) {
 
-		if (genericValue == null)
-			return null;
+		if (! genericValue.isPresent ()) {
+			return Optional.<String>absent ();
+		}
 
-		if (genericValue == 0 && blankIfZero)
-			return "";
+		if (genericValue.get () == 0 && blankIfZero) {
+			return Optional.of ("");
+		}
 
-		return Long.toString (
-			genericValue);
+		return Optional.of (
+			Long.toString (
+				genericValue.get ()));
 
 	}
 

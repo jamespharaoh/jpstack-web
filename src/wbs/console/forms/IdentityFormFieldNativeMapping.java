@@ -1,5 +1,9 @@
 package wbs.console.forms;
 
+import lombok.NonNull;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @PrototypeComponent ("identityFormFieldNativeMapping")
@@ -9,8 +13,8 @@ class IdentityFormFieldNativeMapping<Type>
 
 	@Override
 	public
-	Type nativeToGeneric (
-			Type nativeValue) {
+	Optional<Type> nativeToGeneric (
+			@NonNull Optional<Type> nativeValue) {
 
 		return nativeValue;
 
@@ -18,8 +22,8 @@ class IdentityFormFieldNativeMapping<Type>
 
 	@Override
 	public
-	Type genericToNative (
-			Type genericValue) {
+	Optional<Type> genericToNative (
+			@NonNull Optional<Type> genericValue) {
 
 		return genericValue;
 

@@ -3,8 +3,12 @@ package wbs.console.forms;
 import java.util.Set;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.html.ScriptRef;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.PermanentRecord;
@@ -55,7 +59,8 @@ class ScriptRefFormField
 	void renderTableCellList (
 			FormatWriter out,
 			Object object,
-			boolean link) {
+			boolean link,
+			int colspan) {
 
 		throw new UnsupportedOperationException ();
 
@@ -83,9 +88,18 @@ class ScriptRefFormField
 
 	@Override
 	public
+	void renderFormReset (
+			@NonNull FormatWriter javascriptWriter,
+			@NonNull String indent,
+			@NonNull Object container) {
+
+	}
+
+	@Override
+	public
 	void update (
-			Object container,
-			UpdateResult<Object,Object> updateResult) {
+			@NonNull Object container,
+			@NonNull UpdateResult<Object,Object> updateResult) {
 
 		throw new UnsupportedOperationException ();
 
@@ -94,11 +108,11 @@ class ScriptRefFormField
 	@Override
 	public
 	void runUpdateHook (
-			UpdateResult<Object,Object> updateResult,
-			Object container,
-			PermanentRecord<?> linkObject,
-			Object objectRef,
-			String objectType) {
+			@NonNull UpdateResult<Object,Object> updateResult,
+			@NonNull Object container,
+			@NonNull PermanentRecord<?> linkObject,
+			@NonNull Optional<Object> objectRef,
+			@NonNull Optional<String> objectType) {
 
 		throw new UnsupportedOperationException ();
 
@@ -107,8 +121,8 @@ class ScriptRefFormField
 	@Override
 	public
 	void renderCsvRow (
-			FormatWriter out,
-			Object object) {
+			@NonNull FormatWriter out,
+			@NonNull Object object) {
 
 		throw new UnsupportedOperationException ();
 

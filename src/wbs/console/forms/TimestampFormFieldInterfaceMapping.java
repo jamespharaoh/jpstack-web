@@ -7,10 +7,13 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
+
+import com.google.common.base.Optional;
 
 import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -38,26 +41,29 @@ class TimestampFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Instant interfaceToGeneric (
-			Container container,
-			String interfaceValue,
-			List<String> errors) {
+	Optional<Instant> interfaceToGeneric (
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue,
+			@NonNull List<String> errors) {
 
 		if (format != TimestampFormFieldSpec.Format.timestamp) {
 			throw new RuntimeException ();
 		}
 
-		if (interfaceValue == null)
-			return null;
+		if (! interfaceValue.isPresent ()) {
+			return Optional.<Instant>absent ();
+		}
 
-		if (interfaceValue.isEmpty ())
-			return null;
+		if (interfaceValue.get ().isEmpty ()) {
+			return Optional.<Instant>absent ();
+		}
 
 		try {
 
-			return timeFormatter.timestampStringToInstant (
-				timeFormatter.defaultTimezone (),
-				interfaceValue);
+			return Optional.of (
+				timeFormatter.timestampStringToInstant (
+					timeFormatter.defaultTimezone (),
+					interfaceValue.get ()));
 
 		} catch (IllegalArgumentException exception) {
 
@@ -74,32 +80,36 @@ class TimestampFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	String genericToInterface (
-			Container container,
-			Instant genericValue) {
+	Optional<String> genericToInterface (
+			@NonNull Container container,
+			@NonNull Optional<Instant> genericValue) {
 
-		if (genericValue == null)
+		if (! genericValue.isPresent ()) {
 			return null;
+		}
 
 		switch (format) {
 
 		case timestamp:
 
-			return timeFormatter.instantToTimestampString (
-				timeFormatter.defaultTimezone (),
-				genericValue);
+			return Optional.of (
+				timeFormatter.instantToTimestampString (
+					timeFormatter.defaultTimezone (),
+					genericValue.get ()));
 
 		case date:
 
-			return timeFormatter.instantToDateStringShort (
-				timeFormatter.defaultTimezone (),
-				genericValue);
+			return Optional.of (
+				timeFormatter.instantToDateStringShort (
+					timeFormatter.defaultTimezone (),
+					genericValue.get ()));
 
 		case time:
 
-			return timeFormatter.instantToTimeString (
-				timeFormatter.defaultTimezone (),
-				genericValue);
+			return Optional.of (
+				timeFormatter.instantToTimeString (
+					timeFormatter.defaultTimezone (),
+					genericValue.get ()));
 
 		default:
 

@@ -10,8 +10,12 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -61,10 +65,11 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Override
 	public
 	void renderTableCellList (
-			FormatWriter out,
-			Container container,
-			Interface interfaceValue,
-			boolean link) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue,
+			boolean link,
+			int colspan) {
 
 		// work out root
 
@@ -89,20 +94,20 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		out.writeFormat (
 			"%s\n",
 			objectManager.tdForObject (
-				interfaceValue,
+				interfaceValue.orNull (),
 				root,
 				true,
 				link,
-				1));
+				colspan));
 
 	}
 
 	@Override
 	public
 	void renderTableCellProperties (
-			FormatWriter out,
-			Container container,
-			Interface interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue) {
 
 		// work out root
 
@@ -127,7 +132,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		out.writeFormat (
 			"%s\n",
 			objectManager.tdForObject (
-				interfaceValue,
+				interfaceValue.orNull (),
 				root,
 				true,
 				true,
@@ -138,9 +143,9 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Override
 	public
 	void renderTableRow (
-			FormatWriter out,
-			Container container,
-			Interface interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -160,9 +165,9 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Override
 	public
 	void renderFormRow (
-			FormatWriter out,
-			Container container,
-			Interface interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -184,9 +189,9 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Override
 	public
 	void renderFormInput (
-			FormatWriter out,
-			Container container,
-			Interface interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue) {
 
 		// get a list of options
 
@@ -212,8 +217,10 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		Map<String,Record<?>> sortedOptions =
 			new TreeMap<String,Record<?>> ();
 
-		for (Record<?> option
-				: options) {
+		for (
+			Record<?> option
+				: options
+		) {
 
 			sortedOptions.put (
 				objectManager.objectPath (
@@ -236,7 +243,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			interfaceValue == null
 				? "none"
 				: objectManager.objectPath (
-					(Record<?>) interfaceValue,
+					(Record<?>) interfaceValue.get (),
 					root,
 					true,
 					true));
@@ -291,6 +298,21 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 	@Override
 	public
+	void renderFormReset (
+			@NonNull FormatWriter javascriptWriter,
+			@NonNull String indent,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue) {
+
+		javascriptWriter.writeFormat (
+			"%s$(\"#%j\").val (\"null\");\n",
+			indent,
+			name);
+
+	}
+
+	@Override
+	public
 	boolean formValuePresent () {
 
 		String param =
@@ -310,22 +332,23 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 	@Override
 	public
-	Interface formToInterface (
-			List<String> errors) {
+	Optional<Interface> formToInterface (
+			@NonNull List<String> errors) {
 
 		String param =
 			requestContext.parameter (
 				name ());
 
-		if (param == null)
-			return null;
+		if (param == null) {
+			Optional.<Interface>absent ();
+		}
 
 		if (
 			equal (
 				param,
 				"null")
 		) {
-			return null;
+			return Optional.<Interface>absent ();
 		}
 
 		if (
@@ -344,15 +367,16 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			entityFinder.findEntity (
 				objectId);
 
-		return interfaceValue;
+		return Optional.of (
+			interfaceValue);
 
 	}
 
 	@Override
 	public
 	String interfaceToHtmlSimple (
-			Container container,
-			Interface interfaceValue,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue,
 			boolean link) {
 
 		// work out root
@@ -376,7 +400,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		// render object path
 
 		return objectManager.tdForObject (
-			interfaceValue,
+			interfaceValue.orNull (),
 			root,
 			true,
 			link,
@@ -387,8 +411,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Override
 	public
 	String interfaceToHtmlComplex (
-			Container container,
-			Interface interfaceValue) {
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue) {
 
 		return interfaceToHtmlSimple (
 			container,

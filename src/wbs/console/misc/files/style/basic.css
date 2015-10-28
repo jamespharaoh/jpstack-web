@@ -76,13 +76,53 @@ table.list tr.sep { height: 2px; }
 table.list tr.alert td { background: red; color: white; font-weight: bold; }
 table.list tr.alert_hover td { cursor: pointer; background: darkred; color: white; font-weight: bold; }
 
-table.list tr.message-in td { background: #ddddff; }
-table.list tr.message-out td { background: #ffffdd; }
-table.list tr.message-out-charge td { background: #ffdddd; }
+table.list tr.message-in td {
+	background: #ddddff;
+}
 
-table.list tr td.message-status-unknown { background: #ffffc0; }
-table.list tr td.message-status-succeeded { background: #c0ffc0; }
-table.list tr td.message-status-failed { background: #ffc0c0; }
+table.list tr.message-in.hover td {
+	background: #b1b1cc;
+}
+
+table.list tr.message-out td {
+	background: #ffffdd;
+}
+
+table.list tr.message-out.hover td {
+	background: #ccccb1;
+}
+
+table.list tr.message-out-charge td {
+	background: #ffdddd;
+}
+
+table.list tr.message-out-charge.hover td {
+	background: #ffdddd;
+}
+
+table.list tr td.message-status-unknown {
+	background: #ffffc0;
+}
+
+table.list tr.hover td.message-status-unknown {
+	background: #cccc9a;
+}
+
+table.list tr td.message-status-succeeded {
+	background: #c0ffc0;
+}
+
+table.list tr.hover td.message-status-succeeded {
+	background: #9acc9a;
+}
+
+table.list tr td.message-status-failed {
+	background: #ffc0c0;
+}
+
+table.list tr.hover td.message-status-failed {
+	background: #cc9a9a;
+}
 
 table.details { border-spacing: 1px; }
 table.details th { text-align: left; background: darkblue; color: white; }
@@ -198,4 +238,8 @@ h1 {
 	font-size: 110%;
 	font-weight: bold;
 	padding: 0.2ex 1ex;
+}
+
+.magic-table-row {
+	cursor: pointer;
 }

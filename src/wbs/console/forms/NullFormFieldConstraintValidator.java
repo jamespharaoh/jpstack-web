@@ -4,6 +4,10 @@ import static wbs.framework.utils.etc.Misc.doNothing;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @PrototypeComponent ("nullFormFieldConstraintValidator")
@@ -14,9 +18,9 @@ class NullFormFieldConstraintValidator<Container,Native>
 	@Override
 	public
 	void validate (
-			Container container,
-			Native nativeValue,
-			List<String> errors) {
+			@NonNull Container container,
+			@NonNull Optional<Native> nativeValue,
+			@NonNull List<String> errors) {
 
 		doNothing ();
 

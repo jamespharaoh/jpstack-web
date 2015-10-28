@@ -9,12 +9,15 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
+
+import com.google.common.base.Optional;
 
 import wbs.console.forms.FormFieldRenderer;
 import wbs.console.request.ConsoleRequestContext;
@@ -64,13 +67,20 @@ class ImageFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellList (
-			FormatWriter out,
-			Container container,
-			MediaRec interfaceValue,
-			boolean link) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<MediaRec> interfaceValue,
+			boolean link,
+			int colspan) {
 
 		out.writeFormat (
-			"<td>%s</td>\n",
+			"<td",
+			colspan > 1
+				? stringFormat (
+					" colspan=\"%h\"",
+					colspan)
+				: "",
+			">%s</td>\n",
 			interfaceToHtmlSimple (
 				container,
 				interfaceValue,
@@ -81,9 +91,9 @@ class ImageFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellProperties (
-			FormatWriter out,
-			Container container,
-			MediaRec interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<MediaRec> interfaceValue) {
 
 		out.writeFormat (
 			"<td>%s</td>\n",
@@ -96,9 +106,9 @@ class ImageFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableRow (
-			FormatWriter out,
-			Container container,
-			MediaRec interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<MediaRec> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -118,9 +128,9 @@ class ImageFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormRow (
-			FormatWriter out,
-			Container container,
-			MediaRec interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<MediaRec> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -142,11 +152,11 @@ class ImageFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormInput (
-			FormatWriter out,
-			Container container,
-			MediaRec interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<MediaRec> interfaceValue) {
 
-		if (interfaceValue != null) {
+		if (interfaceValue.isPresent ()) {
 
 			out.writeFormat (
 				"%s<br>\n",
@@ -163,14 +173,10 @@ class ImageFormFieldRenderer<Container>
 			size (),
 			" name=\"%h\"",
 			name (),
-			" value=\"%h\"",
-			formValuePresent ()
-				? formValue ()
-				: interfaceValue,
 			"><br>\n");
 
 		if (
-			interfaceValue != null
+			interfaceValue.isPresent ()
 			&& nullable ()
 		) {
 
@@ -183,6 +189,26 @@ class ImageFormFieldRenderer<Container>
 				">\n");
 
 		}
+
+	}
+
+	@Override
+	public
+	void renderFormReset (
+			@NonNull FormatWriter javascriptWriter,
+			@NonNull String indent,
+			@NonNull Container container,
+			@NonNull Optional<MediaRec> interfaceValue) {
+
+		javascriptWriter.writeFormat (
+			"%s$(\"#%j\").replaceWith (\n",
+			indent,
+			name);
+
+		javascriptWriter.writeFormat (
+			"%s\t$(\"#%j\").clone (true));\n",
+			indent,
+			name);
 
 	}
 
@@ -251,48 +277,51 @@ class ImageFormFieldRenderer<Container>
 
 	@Override
 	public
-	MediaRec formToInterface (
+	Optional<MediaRec> formToInterface (
 			List<String> errors) {
 
-		return formValue ();
+		return Optional.fromNullable (
+			formValue ());
 
 	}
 
 	@Override
 	public
 	String interfaceToHtmlSimple (
-			Container container,
-			MediaRec interfaceValue,
+			@NonNull Container container,
+			@NonNull Optional<MediaRec> interfaceValue,
 			boolean link) {
 
-		if (interfaceValue == null)
+		if (! interfaceValue.isPresent ()) {
 			return "";
+		}
 
 		return stringFormat (
 			"%s\n",
 			mediaConsoleLogic.mediaThumb32 (
-				interfaceValue),
+				interfaceValue.get ()),
 			"%h",
-			interfaceValue.getFilename ());
+			interfaceValue.get ().getFilename ());
 
 	}
 
 	@Override
 	public
 	String interfaceToHtmlComplex (
-			Container container,
-			MediaRec interfaceValue) {
+			@NonNull Container container,
+			@NonNull Optional<MediaRec> interfaceValue) {
 
-		if (interfaceValue == null)
+		if (! interfaceValue.isPresent ()) {
 			return "";
+		}
 
 		return stringFormat (
 			"%s<br>\n",
 			mediaConsoleLogic.mediaThumb100 (
-				interfaceValue),
+				interfaceValue.get ()),
 			"%h (%h bytes)",
-			interfaceValue.getFilename (),
-			interfaceValue.getContent ().getData ().length);
+			interfaceValue.get ().getFilename (),
+			interfaceValue.get ().getContent ().getData ().length);
 
 	}
 

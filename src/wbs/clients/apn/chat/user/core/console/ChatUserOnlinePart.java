@@ -5,9 +5,12 @@ import static wbs.framework.utils.etc.Misc.spacify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
+
+import com.google.common.collect.ImmutableSet;
 
 import wbs.clients.apn.chat.core.console.ChatConsoleLogic;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
@@ -17,6 +20,9 @@ import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.MagicTableScriptRef;
+import wbs.console.html.ScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -66,6 +72,27 @@ class ChatUserOnlinePart
 
 	ConsoleContextType targetContextType;
 	ConsoleContext targetContext;
+
+	// details
+
+	@Override
+	public
+	Set<ScriptRef> scriptRefs () {
+
+		return ImmutableSet.<ScriptRef>builder ()
+
+			.addAll (
+				super.scriptRefs ())
+
+			.add (
+				JqueryScriptRef.instance)
+
+			.add (
+				MagicTableScriptRef.instance)
+
+			.build ();
+
+	}
 
 	// implementation
 
@@ -143,28 +170,37 @@ class ChatUserOnlinePart
 		) {
 
 			printFormat (
-				"%s",
-				Html.magicTr (
-					requestContext.resolveContextUrl (
-						stringFormat (
-							"%s",
-							targetContext.pathPrefix (),
-							"/%u",
-							chatUser.getId ())),
-					false),
+				"<tr",
+				" class=\"magic-table-row\"",
+				" data-target-href=\"%h\"",
+				requestContext.resolveContextUrl (
+					stringFormat (
+						"%s",
+						targetContext.pathPrefix (),
+						"/%u",
+						chatUser.getId ())),
+				">\n");
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUser.getCode (),
+				chatUser.getCode ());
 
+			printFormat (
 				"%s\n",
-				chatConsoleLogic.tdForChatUserTypeShort (chatUser),
+				chatConsoleLogic.tdForChatUserTypeShort (
+					chatUser));
 
+			printFormat (
 				"%s\n",
-				chatConsoleLogic.tdForChatUserGenderShort (chatUser),
+				chatConsoleLogic.tdForChatUserGenderShort (
+					chatUser));
 
+			printFormat (
 				"%s\n",
-				chatConsoleLogic.tdForChatUserOrientShort (chatUser),
+				chatConsoleLogic.tdForChatUserOrientShort (
+					chatUser));
 
+			printFormat (
 				"<td>%s</td>\n",
 				Html.nonBreakingWhitespace (
 					Html.encode (

@@ -147,7 +147,8 @@ class CoreTitledResponder
 			"<h1>%h</h1>\n",
 			title);
 
-		requestContext.flushNotices (out);
+		requestContext.flushNotices (
+			printWriter);
 
 		if (pagePartThrew != null) {
 

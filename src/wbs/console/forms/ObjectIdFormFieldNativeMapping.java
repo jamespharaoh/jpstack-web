@@ -1,8 +1,12 @@
 package wbs.console.forms;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.helper.ConsoleHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
@@ -10,44 +14,48 @@ import wbs.framework.record.Record;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectIdFormFieldNativeMapping")
 public
-class ObjectIdFormFieldNativeMapping
-	implements FormFieldNativeMapping<Record<?>,Integer> {
+class ObjectIdFormFieldNativeMapping<Type extends Record<Type>>
+	implements FormFieldNativeMapping<Type,Integer> {
 
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<Type> consoleHelper;
 
 	// implementation
 
 	@Override
 	public
-	Record<?> nativeToGeneric (
-			Integer nativeValue) {
+	Optional<Type> nativeToGeneric (
+			@NonNull Optional<Integer> nativeValue) {
 
-		if (nativeValue == null)
-			return null;
+		if (! nativeValue.isPresent ()) {
+			return Optional.<Type>absent ();
+		}
 
-		Record<?> genericValue =
+		Type genericValue =
 			consoleHelper.find (
-				nativeValue);
+				nativeValue.get ());
 
 		if (genericValue == null)
 			throw new RuntimeException ();
 
-		return genericValue;
+		return Optional.of (
+			genericValue);
 
 	}
 
 	@Override
 	public
-	Integer genericToNative (
-			Record<?> genericValue) {
+	Optional<Integer> genericToNative (
+			@NonNull Optional<Type> genericValue) {
 
-		if (genericValue == null)
-			return null;
+		if (! genericValue.isPresent ()) {
+			return Optional.<Integer>absent ();
+		}
 
-		return genericValue.getId ();
+		return Optional.of (
+			genericValue.get ().getId ());
 
 	}
 

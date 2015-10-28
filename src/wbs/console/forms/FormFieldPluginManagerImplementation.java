@@ -7,9 +7,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import wbs.framework.application.annotations.SingletonComponent;
-
 import com.google.common.base.Optional;
+
+import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("formFieldPluginManager")
 public

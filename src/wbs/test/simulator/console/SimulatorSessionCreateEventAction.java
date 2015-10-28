@@ -193,10 +193,17 @@ class SimulatorSessionCreateEventAction
 			database.beginReadWrite (
 				this);
 
+System.out.println (
+	requestContext.stuffInt (
+		"simulatorSessionId"));
+
 		SimulatorSessionRec simulatorSession =
 			simulatorSessionHelper.find (
 				requestContext.stuffInt (
 					"simulatorSessionId"));
+
+System.out.println (
+	simulatorSession);
 
 		SimulatorRec simulator =
 			simulatorSession.getSimulator ();

@@ -5,9 +5,12 @@ import static wbs.framework.utils.etc.Misc.instantToDate;
 
 import java.util.Date;
 
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
+
+import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -21,27 +24,31 @@ class DateFormFieldNativeMapping
 
 	@Override
 	public
-	Date genericToNative (
-			Instant genericValue) {
+	Optional<Date> genericToNative (
+			@NonNull Optional<Instant> genericValue) {
 
-		if (genericValue == null)
-			return null;
+		if (! genericValue.isPresent ()) {
+			return Optional.<Date>absent ();
+		}
 
-		return instantToDate (
-			genericValue);
+		return Optional.of (
+			instantToDate (
+				genericValue.get ()));
 
 	}
 
 	@Override
 	public
-	Instant nativeToGeneric (
-			Date nativeValue) {
+	Optional<Instant> nativeToGeneric (
+			@NonNull Optional<Date> nativeValue) {
 
-		if (nativeValue == null)
-			return null;
+		if (! nativeValue.isPresent ()) {
+			return Optional.<Instant>absent ();
+		}
 
-		return dateToInstant (
-			nativeValue);
+		return Optional.of (
+			dateToInstant (
+				nativeValue.get ()));
 
 	}
 

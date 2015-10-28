@@ -1,5 +1,7 @@
 package wbs.console.forms;
 
+import com.google.common.base.Optional;
+
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.framework.record.Record;
 
@@ -10,7 +12,7 @@ interface FormFieldUpdateHook<Container,Generic,Native> {
 			UpdateResult<Generic,Native> updateResult,
 			Container container,
 			Record<?> linkObject,
-			Object objectRef,
-			String objectType);
+			Optional<Object> objectRef,
+			Optional<String> objectType);
 
 }

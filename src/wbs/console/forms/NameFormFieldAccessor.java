@@ -2,8 +2,12 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.codify;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.helper.ConsoleHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.BeanLogic;
@@ -23,33 +27,33 @@ class NameFormFieldAccessor<Container>
 
 	@Override
 	public
-	String read (
-			Container container) {
+	Optional<String> read (
+			@NonNull Container container) {
 
-		return
+		return Optional.of (
 			(String)
 			BeanLogic.getProperty (
 				container,
-				consoleHelper.nameFieldName ());
+				consoleHelper.nameFieldName ()));
 
 	}
 
 	@Override
 	public
 	void write (
-			Container container,
-			String nativeValue) {
+			@NonNull Container container,
+			@NonNull Optional<String> nativeValue) {
 
 		BeanLogic.setProperty (
 			container,
 			consoleHelper.nameFieldName (),
-			nativeValue);
+			nativeValue.get ());
 
 		if (consoleHelper.codeExists ()) {
 
 			String codeValue =
 				codify (
-					nativeValue);
+					nativeValue.get ());
 
 			BeanLogic.setProperty (
 				container,

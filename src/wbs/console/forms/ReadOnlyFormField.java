@@ -6,8 +6,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.html.ScriptRef;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -66,7 +70,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	@Override
 	public
 	void init (
-			String fieldSetName) {
+			@NonNull String fieldSetName) {
 
 		if (interfaceMapping == null) {
 
@@ -83,19 +87,20 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	@Override
 	public
 	void renderTableCellList (
-			FormatWriter out,
-			Container container,
-			boolean link) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			boolean link,
+			int colspan) {
 
-		Native nativeValue =
+		Optional<Native> nativeValue =
 			accessor.read (
 				container);
 
-		Generic genericValue =
+		Optional<Generic> genericValue =
 			nativeMapping.nativeToGeneric (
 				nativeValue);
 
-		Interface interfaceValue =
+		Optional<Interface> interfaceValue =
 			interfaceMapping.genericToInterface (
 				container,
 				genericValue);
@@ -104,25 +109,26 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			out,
 			container,
 			interfaceValue,
-			link);
+			link,
+			colspan);
 
 	}
 
 	@Override
 	public
 	void renderTableCellProperties (
-			FormatWriter out,
-			Container container) {
+			@NonNull FormatWriter out,
+			@NonNull Container container) {
 
-		Native nativeValue =
+		Optional<Native> nativeValue =
 			accessor.read (
 				container);
 
-		Generic genericValue =
+		Optional<Generic> genericValue =
 			nativeMapping.nativeToGeneric (
 				nativeValue);
 
-		Interface interfaceValue =
+		Optional<Interface> interfaceValue =
 			interfaceMapping.genericToInterface (
 				container,
 				genericValue);
@@ -137,18 +143,18 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	@Override
 	public
 	void renderFormRow (
-			FormatWriter out,
-			Container container) {
+			@NonNull FormatWriter out,
+			@NonNull Container container) {
 
-		Native nativeValue =
+		Optional<Native> nativeValue =
 			accessor.read (
 				container);
 
-		Generic genericValue =
+		Optional<Generic> genericValue =
 			nativeMapping.nativeToGeneric (
 				nativeValue);
 
-		Interface interfaceValue =
+		Optional<Interface> interfaceValue =
 			interfaceMapping.genericToInterface (
 				container,
 				genericValue);
@@ -162,25 +168,36 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 
 	@Override
 	public
-	void renderCsvRow (
-			FormatWriter out,
-			Container container) {
+	void renderFormReset (
+			@NonNull FormatWriter javascriptWriter,
+			@NonNull String indent,
+			@NonNull Container container) {
 
-		Native nativeValue =
+	}
+
+	@Override
+	public
+	void renderCsvRow (
+			@NonNull FormatWriter out,
+			@NonNull Container container) {
+
+		Optional<Native> nativeValue =
 			accessor.read (
 				container);
 
-		Generic genericValue =
+		Optional<Generic> genericValue =
 			nativeMapping.nativeToGeneric (
 				nativeValue);
 
-		Interface interfaceValue =
+		Optional<Interface> interfaceValue =
 			interfaceMapping.genericToInterface (
 				container,
 				genericValue);
 
 		String stringValue =
-			interfaceValue.toString ();
+			interfaceValue.isPresent ()
+				? interfaceValue.get ().toString ()
+				: "";
 
 		out.writeFormat (
 			"\"%s\"",
@@ -191,8 +208,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	@Override
 	public
 	void update (
-			Container container,
-			UpdateResult<Generic,Native> updateResult) {
+			@NonNull Container container,
+			@NonNull UpdateResult<Generic,Native> updateResult) {
 
 		updateResult
 
@@ -206,14 +223,12 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	@Override
 	public
 	void runUpdateHook (
-			UpdateResult<Generic,Native> updateResult,
-			Container container,
-			PermanentRecord<?> linkObject,
-			Object objectRef,
-			String objectType) {
+			@NonNull UpdateResult<Generic,Native> updateResult,
+			@NonNull Container container,
+			@NonNull PermanentRecord<?> linkObject,
+			@NonNull Optional<Object> objectRef,
+			@NonNull Optional<String> objectType) {
 
 	}
-
-
 
 }

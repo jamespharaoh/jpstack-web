@@ -34,6 +34,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
+import org.joda.time.Interval;
 import org.joda.time.ReadableInstant;
 
 import com.google.common.base.Optional;
@@ -700,242 +701,6 @@ class Misc {
 
 	}
 
-	private static
-	List<Pattern> datePatterns =
-		ImmutableList.<Pattern>of (
-			Pattern.compile (
-				"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) " +
-				"([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])"),
-			Pattern.compile (
-				"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) " +
-				"([01][0-9]|2[0-3]):([0-5][0-9])"),
-			Pattern.compile (
-				"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) " +
-				"([01][0-9]|2[0-3])"),
-			Pattern.compile (
-				"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])"),
-			Pattern.compile (
-				"([0-9]{4})-(0?[1-9]|1[0-2])"),
-			Pattern.compile (
-				"([0-9]{4})"),
-			Pattern.compile (
-				""));
-
-	public static
-	Instant parseTimeAfter (
-			String string) {
-
-		int year = 0, month = 1, date = 1;
-		int hour = 0, minute = 0, second = 0;
-
-		for (
-			Pattern datePattern
-				: datePatterns
-		) {
-
-			Matcher matcher =
-				datePattern.matcher (string);
-
-			if (! matcher.matches ())
-				continue;
-
-			int groupCount =
-				matcher.groupCount ();
-
-			if (groupCount >= 1) {
-
-				year =
-					Integer.parseInt (
-						matcher.group (1));
-
-			}
-
-			if (groupCount >= 2) {
-
-				month =
-					Integer.parseInt (
-						matcher.group (2));
-
-			}
-
-			if (groupCount >= 3) {
-
-				date =
-					Integer.parseInt (
-						matcher.group (3));
-
-			}
-
-			if (groupCount >= 4) {
-
-				hour =
-					Integer.parseInt (
-						matcher.group (4));
-
-			}
-
-			if (groupCount >= 5) {
-
-				minute =
-					Integer.parseInt (
-						matcher.group (5));
-
-			}
-
-			if (groupCount >= 6) {
-
-				second =
-					Integer.parseInt (
-						matcher.group (6));
-
-			}
-
-			DateTime dateTime =
-				new DateTime (
-					year,
-					month,
-					date,
-					hour,
-					minute,
-					second);
-
-			return dateTime.toInstant ();
-
-		}
-
-		throw new TimeFormatException (
-			"Date/time format not recognised");
-
-	}
-
-	public static
-	Instant parseTimeBefore (
-			String string) {
-
-		int year = 0, month = 1, date = 1;
-		int hour = 0, minute = 0, second = 0;
-
-		for (
-			Pattern datePattern
-				: datePatterns
-		) {
-
-			Matcher matcher =
-				datePattern.matcher (string);
-
-			if (! matcher.matches ())
-				continue;
-
-			int groupCount =
-				matcher.groupCount ();
-
-			if (groupCount >= 1) {
-
-				year =
-					Integer.parseInt (
-						matcher.group (1));
-
-			}
-
-			if (groupCount >= 2) {
-
-				month =
-					Integer.parseInt (
-						matcher.group (2));
-
-			}
-
-			if (groupCount >= 3) {
-
-				date =
-					Integer.parseInt (
-						matcher.group (3));
-
-			}
-
-			if (groupCount >= 4) {
-
-				hour =
-					Integer.parseInt (
-						matcher.group (4));
-
-			}
-
-			if (groupCount >= 5) {
-
-				minute =
-					Integer.parseInt (
-						matcher.group (5));
-
-			}
-
-			if (groupCount >= 6) {
-
-				second =
-					Integer.parseInt (
-						matcher.group (6));
-
-			}
-
-			DateTime dateTime =
-				new DateTime (
-					year,
-					month,
-					date,
-					hour,
-					minute,
-					second);
-
-			if (groupCount == 0) {
-
-				dateTime =
-					dateTime.plusYears (10000);
-
-			} else if (groupCount == 1) {
-
-				dateTime =
-					dateTime.plusYears (1);
-
-			} else if (groupCount == 2) {
-
-				dateTime =
-					dateTime.plusMonths (1);
-
-			} else if (groupCount == 3) {
-
-				dateTime =
-					dateTime.plusDays (1);
-
-			} else if (groupCount == 4) {
-
-				dateTime =
-					dateTime.plusHours (1);
-
-			} else if (groupCount == 5) {
-
-				dateTime =
-					dateTime.plusMinutes (1);
-
-			} else if (groupCount == 6) {
-
-				dateTime =
-					dateTime.plusSeconds (1);
-
-			} else {
-
-				throw new RuntimeException ();
-
-			}
-
-			return dateTime.toInstant ();
-
-		}
-
-		throw new TimeFormatException (
-			"Date/time format not recognised");
-
-	}
-
 	public static
 	String stringFormat (
 			Object... arguments) {
@@ -1438,7 +1203,7 @@ class Misc {
 	String joinWithSeparator (
 		String separator,
 		String prefix,
-		Collection<String> parts,
+		Iterable<String> parts,
 		String suffix) {
 
 		StringBuilder ret =
@@ -1466,7 +1231,7 @@ class Misc {
 
 	public static
 	String joinWithoutSeparator (
-			Collection<String> parts) {
+			Iterable<String> parts) {
 
 		return joinWithSeparator (
 			"",
@@ -1479,7 +1244,7 @@ class Misc {
 	public static
 	String joinWithSeparator (
 			String separator,
-			Collection<String> parts) {
+			Iterable<String> parts) {
 
 		return joinWithSeparator (
 			separator,
@@ -1508,6 +1273,30 @@ class Misc {
 
 		return joinWithSeparator (
 			"",
+			"",
+			Arrays.asList (parts),
+			"");
+
+	}
+
+	public static
+	String joinWithSpace (
+			Iterable<String> parts) {
+
+		return joinWithSeparator (
+			" ",
+			"",
+			parts,
+			"");
+
+	}
+
+	public static
+	String joinWithSpace (
+			String... parts) {
+
+		return joinWithSeparator (
+			" ",
 			"",
 			Arrays.asList (parts),
 			"");
@@ -2074,5 +1863,295 @@ class Misc {
 			: Optional.<String>absent ();
 
 	}
+
+	public static <Type>
+	Iterable<Type> presentInstances (
+			@NonNull Iterable<Optional<Type>> collection) {
+
+		return Optional.presentInstances (
+			collection);
+
+	}
+
+	public static <Type>
+	Iterable<Type> presentInstances () {
+
+		return ImmutableList.<Type>of ();
+
+	}
+
+	public static <Type>
+	Iterable<Type> presentInstances (
+			@NonNull Optional<Type> argument) {
+
+		return presentInstances (
+			ImmutableList.<Optional<Type>>of (
+				argument));
+
+	}
+
+	public static <Type>
+	Iterable<Type> presentInstances (
+			@NonNull Optional<Type> argument0,
+			@NonNull Optional<Type> argument1) {
+
+		return presentInstances (
+			ImmutableList.<Optional<Type>>of (
+				argument0,
+				argument1));
+
+	}
+
+	public static <Type>
+	Iterable<Type> presentInstances (
+			@NonNull Optional<Type> argument0,
+			@NonNull Optional<Type> argument1,
+			@NonNull Optional<Type> argument2) {
+
+		return presentInstances (
+			ImmutableList.<Optional<Type>>of (
+				argument0,
+				argument1,
+				argument2));
+
+	}
+
+	public static <Type>
+	Iterable<Type> presentInstances (
+			@NonNull Optional<Type> argument0,
+			@NonNull Optional<Type> argument1,
+			@NonNull Optional<Type> argument2,
+			@NonNull Optional<Type> argument3) {
+
+		return presentInstances (
+			ImmutableList.<Optional<Type>>of (
+				argument0,
+				argument1,
+				argument2,
+				argument3));
+
+	}
+
+	public static <Type>
+	Iterable<Type> presentInstances (
+			@NonNull Optional<Type>... arguments) {
+
+		return Optional.presentInstances (
+			Arrays.asList (
+				arguments));
+
+	}
+
+	public static <Type>
+	Optional<Type> optionalIf (
+			@NonNull Boolean present,
+			@NonNull Type value) {
+
+		return present
+			? Optional.<Type>of (
+				value)
+			: Optional.<Type>absent ();
+
+	}
+
+	public static
+	boolean validPartialTimestamp (
+			@NonNull String string) {
+
+		for (
+			Pattern pattern
+				: timestampPartialPatterns
+		) {
+
+			Matcher matcher =
+				pattern.matcher (
+					string);
+
+			if (matcher.matches ())
+				return true;
+
+		}
+
+		return false;
+
+	}
+
+	public static
+	Interval parsePartialTimestamp (
+			@NonNull String string) {
+
+		int fromYear = 0;
+		int fromMonth = 1;
+		int fromDate = 1;
+		int fromHour = 0;
+		int fromMinute = 0;
+		int fromSecond = 0;
+
+		for (
+			Pattern pattern
+				: timestampPartialPatterns
+		) {
+
+			Matcher matcher =
+				pattern.matcher (
+					string);
+
+			if (! matcher.matches ())
+				continue;
+
+			int groupCount =
+				matcher.groupCount ();
+
+			// work out time from
+
+			if (groupCount >= 1) {
+
+				fromYear =
+					Integer.parseInt (
+						matcher.group (1));
+
+			}
+
+			if (groupCount >= 2) {
+
+				fromMonth =
+					Integer.parseInt (
+						matcher.group (2));
+
+			}
+
+			if (groupCount >= 3) {
+
+				fromDate =
+					Integer.parseInt (
+						matcher.group (3));
+
+			}
+
+			if (groupCount >= 4) {
+
+				fromHour =
+					Integer.parseInt (
+						matcher.group (4));
+
+			}
+
+			if (groupCount >= 5) {
+
+				fromMinute =
+					Integer.parseInt (
+						matcher.group (5));
+
+			}
+
+			if (groupCount >= 6) {
+
+				fromSecond =
+					Integer.parseInt (
+						matcher.group (6));
+
+			}
+
+			DateTime fromDateTime =
+				new DateTime (
+					fromYear,
+					fromMonth,
+					fromDate,
+					fromHour,
+					fromMinute,
+					fromSecond);
+
+			// work out time to
+
+			DateTime toDateTime;
+
+			if (groupCount == 0) {
+
+				toDateTime =
+					fromDateTime.plusYears (
+						10000);
+
+			} else if (groupCount == 1) {
+
+				toDateTime =
+					fromDateTime.plusYears (
+						1);
+
+			} else if (groupCount == 2) {
+
+				toDateTime =
+					fromDateTime.plusMonths (
+						1);
+
+			} else if (groupCount == 3) {
+
+				toDateTime =
+					fromDateTime.plusDays (
+						1);
+
+			} else if (groupCount == 4) {
+
+				toDateTime =
+					fromDateTime.plusHours (
+						1);
+
+			} else if (groupCount == 5) {
+
+				toDateTime =
+					fromDateTime.plusMinutes (
+						1);
+
+			} else if (groupCount == 6) {
+
+				toDateTime =
+					fromDateTime.plusSeconds (
+						1);
+
+			} else {
+
+				throw new RuntimeException ();
+
+			}
+
+			return new Interval (
+				fromDateTime,
+				toDateTime);
+
+		}
+
+		throw new TimeFormatException (
+			"Date/time format not recognised");
+
+	}
+
+	private static
+	List<Pattern> timestampPartialPatterns =
+		ImmutableList.<Pattern>of (
+
+		Pattern.compile (
+			"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) " +
+			"([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])"),
+
+		Pattern.compile (
+			"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) " +
+			"([01][0-9]|2[0-3]):([0-5][0-9])"),
+
+		Pattern.compile (
+			"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) " +
+			"([01][0-9]|2[0-3])"),
+
+		Pattern.compile (
+			"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])"),
+
+		Pattern.compile (
+			"([0-9]{4})-(0?[1-9]|1[0-2])"),
+
+		Pattern.compile (
+			"([0-9]{4})"),
+
+		Pattern.compile (
+			"")
+
+	);
 
 }

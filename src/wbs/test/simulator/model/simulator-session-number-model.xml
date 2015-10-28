@@ -17,7 +17,8 @@
 		<!-- state -->
 
 		<reference-field
-			type="simulatorSession"/>
+			type="simulatorSession"
+			nullable="yes"/>
 
 	</fields>
 

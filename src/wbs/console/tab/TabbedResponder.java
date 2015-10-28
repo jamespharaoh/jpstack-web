@@ -288,7 +288,8 @@ class TabbedResponder
 				"border-top: 1px solid white",
 				"margin-bottom: 1ex"));
 
-		requestContext.flushNotices (out);
+		requestContext.flushNotices (
+			printWriter);
 
 		if (pagePartThrew != null) {
 

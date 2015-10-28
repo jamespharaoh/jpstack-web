@@ -1,12 +1,14 @@
 package wbs.console.forms;
 
+import com.google.common.base.Optional;
+
 public
 interface FormFieldNativeMapping<Generic,Native> {
 
-	Generic nativeToGeneric (
-			Native nativeValue);
+	Optional<Generic> nativeToGeneric (
+			Optional<Native> nativeValue);
 
-	Native genericToNative (
-			Generic genericValue);
+	Optional<Native> genericToNative (
+			Optional<Generic> genericValue);
 
 }

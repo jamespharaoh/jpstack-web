@@ -1,6 +1,7 @@
 package wbs.console.helper;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.lang.reflect.Constructor;
@@ -17,6 +18,9 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.forms.EntityFinder;
 import wbs.console.lookup.ObjectLookup;
@@ -31,8 +35,6 @@ import wbs.framework.object.ObjectHelperMethods;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
-
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleHelperBuilder")
@@ -461,6 +463,27 @@ class ConsoleHelperBuilder {
 			}
 
 			return stringBuilder.toString ();
+
+		}
+
+		@Override
+		public
+		Optional getListClass (
+				Record object) {
+
+			if (
+				isNotNull (
+					consoleHooks)
+			) {
+
+				return consoleHooks.getListClass (
+					object);
+
+			} else {
+
+				return Optional.<String>absent ();
+
+			}
 
 		}
 

@@ -2,6 +2,10 @@ package wbs.console.forms;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @PrototypeComponent ("doubleFormFieldInterfaceMapping")
@@ -11,33 +15,38 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Double interfaceToGeneric (
-			Container container,
-			String interfaceValue,
-			List<String> errors) {
+	Optional<Double> interfaceToGeneric (
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue,
+			@NonNull List<String> errors) {
 
-		if (interfaceValue == null)
+		if (! interfaceValue.isPresent ()) {
 			return null;
+		}
 
-		if (interfaceValue.isEmpty ())
+		if (interfaceValue.get ().isEmpty ()) {
 			return null;
+		}
 
-		return Double.parseDouble (
-			interfaceValue);
+		return Optional.of (
+			Double.parseDouble (
+				interfaceValue.get ()));
 
 	}
 
 	@Override
 	public
-	String genericToInterface (
-			Container container,
-			Double genericValue) {
+	Optional<String> genericToInterface (
+			@NonNull Container container,
+			@NonNull Optional<Double> genericValue) {
 
-		if (genericValue == null)
+		if (! genericValue.isPresent ()) {
 			return null;
+		}
 
-		return Double.toString (
-			genericValue);
+		return Optional.of (
+			Double.toString (
+				genericValue.get ()));
 
 	}
 

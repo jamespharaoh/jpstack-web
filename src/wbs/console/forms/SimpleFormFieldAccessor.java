@@ -5,8 +5,12 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -37,10 +41,11 @@ class SimpleFormFieldAccessor<Container,Native>
 
 	@Override
 	public
-	Native read (
+	Optional<Native> read (
 		Container container) {
 
 		// get native object
+
 		Object nativeObject;
 
 		if (dynamic != null && dynamic) {
@@ -65,8 +70,9 @@ class SimpleFormFieldAccessor<Container,Native>
 
 		// special case for null
 
-		if (nativeObject == null)
-			return null;
+		if (nativeObject == null) {
+			return Optional.<Native>absent ();
+		}
 
 		// sanity check native type
 
@@ -86,25 +92,26 @@ class SimpleFormFieldAccessor<Container,Native>
 
 		// cast and return
 
-		return nativeClass.cast (
-			nativeObject);
+		return Optional.<Native>of (
+			nativeClass.cast (
+				nativeObject));
 
 	}
 
 	@Override
 	public
 	void write (
-			Container container,
-			Native nativeValue) {
+			@NonNull Container container,
+			@NonNull Optional<Native> nativeValue) {
 
 		// sanity check native type
 
 		if (
 
-			nativeValue != null
+			nativeValue.isPresent ()
 
 			&& ! nativeClass.isInstance (
-				nativeValue)
+				nativeValue.get ())
 
 		) {
 
@@ -126,9 +133,10 @@ class SimpleFormFieldAccessor<Container,Native>
 						(Record<?>) container);
 
 			consoleHelper.setDynamic (
-					(Record<?>) container,
-					name,
-					nativeValue);
+				(Record<?>) container,
+				name,
+				nativeValue);
+
 		}
 
 		else {

@@ -1,5 +1,9 @@
 package wbs.console.forms;
 
+import lombok.NonNull;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @PrototypeComponent ("integerFormFieldNativeMapping")
@@ -9,25 +13,29 @@ class IntegerFormFieldNativeMapping
 
 	@Override
 	public
-	Long nativeToGeneric (
-			Integer nativeValue) {
+	Optional<Long> nativeToGeneric (
+			@NonNull Optional<Integer> nativeValue) {
 
-		if (nativeValue == null)
-			return null;
+		if (! nativeValue.isPresent ()) {
+			return Optional.<Long>absent ();
+		}
 
-		return (long) nativeValue;
+		return Optional.of (
+			(long) nativeValue.get ());
 
 	}
 
 	@Override
 	public
-	Integer genericToNative (
-			Long genericValue) {
+	Optional<Integer> genericToNative (
+			@NonNull Optional<Long> genericValue) {
 
-		if (genericValue == null)
-			return null;
+		if (! genericValue.isPresent ()) {
+			return Optional.<Integer>absent ();
+		}
 
-		return (int) (long) genericValue;
+		return Optional.of (
+			(int) (long) genericValue.get ());
 
 	}
 

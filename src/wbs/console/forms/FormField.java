@@ -5,6 +5,9 @@ import java.util.Set;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.html.ScriptRef;
 import wbs.framework.record.PermanentRecord;
 import wbs.framework.utils.etc.FormatWriter;
@@ -30,7 +33,8 @@ interface FormField<Container,Generic,Native,Interface> {
 	void renderTableCellList (
 			FormatWriter out,
 			Container object,
-			boolean link);
+			boolean link,
+			int colspan);
 
 	void renderTableCellProperties (
 			FormatWriter out,
@@ -39,6 +43,11 @@ interface FormField<Container,Generic,Native,Interface> {
 	void renderFormRow (
 			FormatWriter out,
 			Container object);
+
+	void renderFormReset (
+			FormatWriter out,
+			String indent,
+			Container container);
 
 	void renderCsvRow (
 			FormatWriter out,
@@ -52,8 +61,8 @@ interface FormField<Container,Generic,Native,Interface> {
 			UpdateResult<Generic,Native> updateResult,
 			Container container,
 			PermanentRecord<?> linkObject,
-			Object objectRef,
-			String objectType);
+			Optional<Object> objectRef,
+			Optional<String> objectType);
 
 	@Accessors (fluent = true)
 	@Data
@@ -64,11 +73,11 @@ interface FormField<Container,Generic,Native,Interface> {
 
 		FormField<?,Generic,Native,?> formField;
 
-		Generic oldGenericValue;
-		Generic newGenericValue;
+		Optional<Generic> oldGenericValue;
+		Optional<Generic> newGenericValue;
 
-		Native oldNativeValue;
-		Native newNativeValue;
+		Optional<Native> oldNativeValue;
+		Optional<Native> newNativeValue;
 
 		List<String> errors;
 

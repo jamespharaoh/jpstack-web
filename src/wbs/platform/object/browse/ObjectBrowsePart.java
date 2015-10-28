@@ -1,28 +1,38 @@
 package wbs.platform.object.browse;
 
+import static wbs.framework.utils.etc.Misc.joinWithSpace;
+import static wbs.framework.utils.etc.Misc.optionalIf;
+import static wbs.framework.utils.etc.Misc.presentInstances;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.MagicTableScriptRef;
+import wbs.console.html.ScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
-import wbs.framework.utils.etc.Html;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectBrowsePart")
@@ -67,6 +77,27 @@ class ObjectBrowsePart
 	List<? extends Record<?>> allObjects;
 
 	ConsoleContext targetContext;
+
+	// details
+
+	@Override
+	public
+	Set<ScriptRef> scriptRefs () {
+
+		return ImmutableSet.<ScriptRef>builder ()
+
+			.addAll (
+				super.scriptRefs ())
+
+			.add (
+				JqueryScriptRef.instance)
+
+			.add (
+				MagicTableScriptRef.instance)
+
+			.build ();
+
+	}
 
 	// implementation
 
@@ -246,23 +277,28 @@ class ObjectBrowsePart
 				: allObjects
 		) {
 
-			String targetUrl =
+			printFormat (
+				"<tr",
+
+				" class=\"%h\"",
+				joinWithSpace (
+					presentInstances (
+						Optional.of (
+							"magic-table-row"),
+						optionalIf (
+							object == currentObject,
+							"selected"))),
+
+				" data-target-href=\"%h\"",
 				requestContext.resolveContextUrl (
 					stringFormat (
 						"%s",
 						targetContext.pathPrefix (),
 						"/%s",
 						consoleHelper.getPathId (
-							object)));
+							object))),
 
-			boolean isCurrentObject =
-				object == currentObject;
-
-			printFormat (
-				"%s",
-				Html.magicTr (
-					targetUrl,
-					isCurrentObject));
+				">\n");
 
 			formFieldLogic.outputTableCellsList (
 				formatWriter,

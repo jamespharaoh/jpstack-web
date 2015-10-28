@@ -239,7 +239,8 @@ class ChatUserPendingFormResponder
 		printFormat (
 			"<h1>Chat user&mdash;approve info</h1>\n");
 
-		requestContext.flushNotices (out);
+		requestContext.flushNotices (
+			printWriter);
 
 		printFormat (
 			"<form",

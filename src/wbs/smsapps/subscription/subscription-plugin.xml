@@ -28,9 +28,6 @@
 	</layer>
 
 	<layer name="console">
-		<bean class="console.SubscriptionAdminSearchNumbersResponder"/>
-		<bean class="console.SubscriptionAdminSearchPart"/>
-		<bean class="console.SubscriptionAdminSearchRequestHandler"/>
 		<bean class="console.SubscriptionNumberAddRemoveAction"/>
 		<bean class="console.SubscriptionNumberAddRemovePart"/>
 		<bean class="console.SubscriptionNumberAdvice"/>

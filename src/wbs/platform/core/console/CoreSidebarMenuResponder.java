@@ -1,19 +1,25 @@
 package wbs.platform.core.console;
 
+import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.MagicTableScriptRef;
+import wbs.console.html.ScriptRef;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.ABSwap;
-import wbs.framework.utils.etc.Html;
 import wbs.platform.menu.console.MenuGroupConsoleHelper;
 import wbs.platform.menu.model.MenuGroupRec;
 import wbs.platform.menu.model.MenuItemRec;
@@ -47,6 +53,27 @@ class CoreSidebarMenuResponder
 	// state
 
 	List<MenuGroupRec> menuGroups;
+
+	// details
+
+	@Override
+	public
+	Set<ScriptRef> scriptRefs () {
+
+		return ImmutableSet.<ScriptRef>builder ()
+
+			.addAll (
+				super.scriptRefs ())
+
+			.add (
+				JqueryScriptRef.instance)
+
+			.add (
+				MagicTableScriptRef.instance)
+
+			.build ();
+
+	}
 
 	// implementation
 
@@ -137,19 +164,23 @@ class CoreSidebarMenuResponder
 				}
 
 				printFormat (
-					"%s\n",
-					Html.magicTr (
-						requestContext.resolveApplicationUrl (
-							menu.getTargetPath ()),
-						false,
-						menu.getTargetFrame (),
-						null,
-						null,
-						abSwap),
+					"<tr",
+					" class=\"%h\"",
+					joinWithSpace (
+						"magic-table-row",
+						abSwap.swap ()),
+					" data-target-href=\"%h\"",
+					requestContext.resolveApplicationUrl (
+						menu.getTargetPath ()),
+					" data-target-frame=\"%h\"",
+					menu.getTargetFrame (),
+					">\n");
 
-					"<td>%h</td> ",
-						menu.getLabel (),
+				printFormat (
+					"<td>%h</td>\n",
+						menu.getLabel ());
 
+				printFormat (
 					"</tr>\n");
 
 			}

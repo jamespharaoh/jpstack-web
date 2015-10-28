@@ -5,8 +5,12 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -37,8 +41,8 @@ class SpecialFormFieldAccessor<Container extends Record<?>,Native>
 
 	@Override
 	public
-	Native read (
-			Container container) {
+	Optional<Native> read (
+			@NonNull Container container) {
 
 		// get field name
 
@@ -66,8 +70,9 @@ class SpecialFormFieldAccessor<Container extends Record<?>,Native>
 
 		// special case for null
 
-		if (nativeObject == null)
-			return null;
+		if (nativeObject == null) {
+			return Optional.<Native>absent ();
+		}
 
 		// sanity check native type
 
@@ -87,16 +92,17 @@ class SpecialFormFieldAccessor<Container extends Record<?>,Native>
 
 		// cast and return
 
-		return nativeClass.cast (
-			nativeObject);
+		return Optional.<Native>of (
+			nativeClass.cast (
+				nativeObject));
 
 	}
 
 	@Override
 	public
 	void write (
-			Container container,
-			Native nativeValue) {
+			@NonNull Container container,
+			@NonNull Optional<Native> nativeValue) {
 
 		// get field name
 
@@ -119,10 +125,10 @@ class SpecialFormFieldAccessor<Container extends Record<?>,Native>
 
 		if (
 
-			nativeValue != null
+			nativeValue.isPresent ()
 
 			&& ! nativeClass.isInstance (
-				nativeValue)
+				nativeValue.get ())
 
 		) {
 
@@ -131,7 +137,7 @@ class SpecialFormFieldAccessor<Container extends Record<?>,Native>
 					"Field %s is %s, not %s",
 					name,
 					nativeClass.getSimpleName (),
-					nativeValue.getClass ().getSimpleName ()));
+					nativeValue.get ().getClass ().getSimpleName ()));
 
 		}
 
@@ -140,7 +146,7 @@ class SpecialFormFieldAccessor<Container extends Record<?>,Native>
 		BeanLogic.setProperty (
 			container,
 			name,
-			nativeValue);
+			nativeValue.orNull ());
 
 	}
 

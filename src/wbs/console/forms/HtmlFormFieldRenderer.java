@@ -1,12 +1,17 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import java.util.List;
 
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -41,13 +46,20 @@ class HtmlFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellList (
-			FormatWriter out,
-			Container container,
-			String interfaceValue,
-			boolean link) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue,
+			boolean link,
+			int colspan) {
 
 		out.writeFormat (
-			"<td>%s</td>\n",
+			"<td",
+			colspan > 1
+				? stringFormat (
+					" colspan=\"%h\"",
+					colspan)
+				: "",
+			">%s</td>\n",
 			interfaceToHtmlSimple (
 				container,
 				interfaceValue,
@@ -58,9 +70,9 @@ class HtmlFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellProperties (
-			FormatWriter out,
-			Container container,
-			String interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
 			"<td>%s</td>\n",
@@ -73,9 +85,9 @@ class HtmlFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableRow (
-			FormatWriter out,
-			Container container,
-			String interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -95,9 +107,9 @@ class HtmlFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormRow (
-			FormatWriter out,
-			Container container,
-			String interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue) {
 
 		renderTableRow (
 			out,
@@ -109,13 +121,23 @@ class HtmlFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormInput (
-			FormatWriter out,
-			Container container,
-			String interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
 			"%s",
-			interfaceValue);
+			interfaceValue.get ());
+
+	}
+
+	@Override
+	public
+	void renderFormReset (
+			@NonNull FormatWriter javascriptWriter,
+			@NonNull String indent,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue) {
 
 	}
 
@@ -130,28 +152,28 @@ class HtmlFormFieldRenderer<Container>
 	@Override
 	public
 	String interfaceToHtmlSimple (
-			Container container,
-			String interfaceValue,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue,
 			boolean link) {
 
-		return interfaceValue;
+		return interfaceValue.or ("");
 
 	}
 
 	@Override
 	public
 	String interfaceToHtmlComplex (
-			Container container,
-			String interfaceValue) {
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue) {
 
-		return interfaceValue;
+		return interfaceValue.or ("");
 
 	}
 
 	@Override
 	public
-	String formToInterface (
-			List<String> errors) {
+	Optional<String> formToInterface (
+			@NonNull List<String> errors) {
 
 		throw new UnsupportedOperationException ();
 

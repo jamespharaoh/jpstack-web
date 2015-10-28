@@ -1,11 +1,15 @@
 package wbs.test.simulator.console;
 
+import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.JqueryScriptRef;
@@ -17,8 +21,6 @@ import wbs.sms.network.console.NetworkConsoleHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
 import wbs.sms.route.core.model.RouteRec;
-
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("simulatorSessionConsolePart")
 public
@@ -176,7 +178,10 @@ class SimulatorSessionConsolePart
 			" class=\"numFromText\"",
 			" type=\"text\"",
 			" value=\"%h\">",
-			requestContext.session ("simulatorNumFrom"),
+			emptyStringIfNull (
+				(String)
+				requestContext.session (
+					"simulatorNumFrom")),
 			"</td>\n",
 
 			"</tr>\n");
@@ -190,7 +195,10 @@ class SimulatorSessionConsolePart
 			" class=\"numToText\"",
 			" type=\"text\"",
 			" value=\"%h\">",
-			requestContext.session ("simulatorNumTo"),
+			emptyStringIfNull (
+				(String)
+				requestContext.session (
+					"simulatorNumTo")),
 			"</td>\n",
 
 			"</tr>\n");
@@ -204,7 +212,10 @@ class SimulatorSessionConsolePart
 			" class=\"messageText\"",
 			" type=\"text\"",
 			" value=\"%h\">",
-			requestContext.session ("simulatorMessage"),
+			emptyStringIfNull (
+				(String)
+				requestContext.session (
+					"simulatorMessage")),
 			"</td>\n",
 
 			"</tr>\n");

@@ -1,9 +1,13 @@
 package wbs.console.forms;
 
+import lombok.NonNull;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
+
+import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -14,33 +18,37 @@ class TimestampTimezonePairFormFieldNativeMapping
 
 	@Override
 	public
-	DateTime nativeToGeneric (
-			Pair<Instant,String> nativeValue) {
+	Optional<DateTime> nativeToGeneric (
+			@NonNull Optional<Pair<Instant,String>> nativeValue) {
 
-		if (nativeValue == null)
-			return null;
+		if (! nativeValue.isPresent ()) {
+			return Optional.<DateTime>absent ();
+		}
 
 		DateTimeZone timeZone =
 			DateTimeZone.forID (
-				nativeValue.getRight ());
+				nativeValue.get ().getRight ());
 
-		return new DateTime (
-			nativeValue.getLeft (),
-			timeZone);
+		return Optional.of (
+			new DateTime (
+				nativeValue.get ().getLeft (),
+				timeZone));
 
 	}
 
 	@Override
 	public
-	Pair<Instant,String> genericToNative (
-			DateTime genericValue) {
+	Optional<Pair<Instant,String>> genericToNative (
+			@NonNull Optional<DateTime> genericValue) {
 
-		if (genericValue == null)
-			return null;
+		if (! genericValue.isPresent ()) {
+			return Optional.<Pair<Instant,String>>absent ();
+		}
 
-		return Pair.of (
-			genericValue.toInstant (),
-			genericValue.getZone ().getID ());
+		return Optional.of (
+			Pair.of (
+				genericValue.get ().toInstant (),
+				genericValue.get ().getZone ().getID ()));
 
 	}
 

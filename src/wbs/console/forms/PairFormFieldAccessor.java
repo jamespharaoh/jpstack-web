@@ -1,10 +1,13 @@
 package wbs.console.forms;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.tuple.Pair;
+
+import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -26,55 +29,72 @@ class PairFormFieldAccessor<Container,Left,Right>
 
 	@Override
 	public
-	Pair<Left,Right> read (
-			Container container) {
+	Optional<Pair<Left,Right>> read (
+			@NonNull Container container) {
 
 		// special case for null container
 
-		if (container == null)
-			return null;
+		/*
+		if (container == null) {
+			return Optional.<Pair<Left,Right>>absent ();
+		}
+		*/
 
 		// get native values
 
-		Left leftValue =
+		Optional<Left> leftValue =
 			leftAccessor.read (
 				container);
 
-		Right rightValue =
+		Optional<Right> rightValue =
 			rightAccessor.read (
 				container);
 
 		// return as pair
 
-		if (leftValue == null && rightValue == null)
-			return null;
+		if (
+			! leftValue.isPresent ()
+			&& ! rightValue.isPresent ()
+		) {
+			return Optional.<Pair<Left,Right>>absent ();
+		}
 
-		return Pair.of (
-			leftValue,
-			rightValue);
+		return Optional.of (
+			Pair.of (
+				leftValue.orNull (),
+				rightValue.orNull ()));
 
 	}
 
 	@Override
 	public
 	void write (
-			Container container,
-			Pair<Left,Right> nativeValue) {
+			@NonNull Container container,
+			@NonNull Optional<Pair<Left,Right>> nativeValue) {
 
 		// special case for null
 
-		if (nativeValue == null)
-			nativeValue = Pair.of (null, null);
+		if (! nativeValue.isPresent ()) {
+
+			nativeValue =
+				Optional.of (
+					Pair.<Left,Right>of (
+						null,
+						null));
+
+		}
 
 		// write values
 
 		leftAccessor.write (
 			container,
-			nativeValue.getLeft ());
+			Optional.fromNullable (
+				nativeValue.get ().getLeft ()));
 
 		rightAccessor.write (
 			container,
-			nativeValue.getRight ());
+			Optional.fromNullable (
+				nativeValue.get ().getRight ()));
 
 	}
 

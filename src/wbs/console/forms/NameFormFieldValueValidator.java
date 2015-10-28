@@ -8,8 +8,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
@@ -28,12 +32,12 @@ class NameFormFieldValueValidator
 	@Override
 	public
 	void validate (
-			String genericValue,
-			List<String> errors) {
+			@NonNull Optional<String> genericValue,
+			@NonNull List<String> errors) {
 
 		String code =
 			codify (
-				genericValue);
+				genericValue.get ());
 
 		Matcher matcher =
 			codePattern.matcher (

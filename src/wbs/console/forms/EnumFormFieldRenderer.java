@@ -11,8 +11,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -53,13 +57,34 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	@Override
 	public
 	void renderTableCellList (
-			FormatWriter out,
-			Container container,
-			Interface interfaceValue,
-			boolean link) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue,
+			boolean link,
+			int colspan) {
+
+		Optional<String> htmlClass =
+			interfaceValue.isPresent ()
+				? enumConsoleHelper.htmlClass (
+					interfaceValue.get ())
+				: Optional.<String>absent ();
 
 		out.writeFormat (
-			"<td>%h</td>\n",
+			"<td",
+
+			colspan > 1
+				? stringFormat (
+					" colspan=\"%h\"",
+					colspan)
+				: "",
+
+			htmlClass.isPresent ()
+				? stringFormat (
+					" class=\"%h\"",
+					htmlClass.get ())
+				: "",
+
+			">%h</td>\n",
 			camelToSpaces (
 				toStringNull (
 					interfaceValue)));
@@ -69,24 +94,25 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	@Override
 	public
 	void renderTableCellProperties (
-			FormatWriter out,
-			Container container,
-			Interface interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue) {
 
 		out.writeFormat (
 			"<td>%h</td>\n",
 			camelToSpaces (
-				toStringNull (
-					interfaceValue)));
+				interfaceValue.isPresent ()
+					? interfaceValue.toString ()
+					: ""));
 
 	}
 
 	@Override
 	public
 	void renderTableRow (
-			FormatWriter out,
-			Container container,
-			Interface interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -106,9 +132,9 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	@Override
 	public
 	void renderFormRow (
-			FormatWriter out,
-			Container container,
-			Interface interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -130,9 +156,9 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	@Override
 	public
 	void renderFormInput (
-			FormatWriter out,
-			Container container,
-			Interface interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue) {
 
 		List<String> errors =
 			new ArrayList<String> ();
@@ -141,12 +167,13 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			formValuePresent ()
 				? requestContext.parameter (
 					name ())
-				: interfaceValue != null
-					? interfaceValue.toString ()
+				: interfaceValue.isPresent ()
+					? interfaceValue.get ().toString ()
 					: "null";
 
-		if (! errors.isEmpty ())
+		if (! errors.isEmpty ()) {
 			throw new RuntimeException ();
+		}
 
 		if (nullable) {
 
@@ -171,6 +198,21 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 
 	@Override
 	public
+	void renderFormReset (
+			@NonNull FormatWriter javascriptWriter,
+			@NonNull String indent,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue) {
+
+		javascriptWriter.writeFormat (
+			"%s$(\"#%j\").val (\"null\");\n",
+			indent,
+			name);
+
+	}
+
+	@Override
+	public
 	boolean formValuePresent () {
 
 		String paramString =
@@ -182,34 +224,37 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 
 	@Override
 	public
-	Interface formToInterface (
-			List<String> errors) {
+	Optional<Interface> formToInterface (
+			@NonNull List<String> errors) {
 
-		return toEnum (
-			enumConsoleHelper.enumClass (),
-			requestContext.parameter (
-				name ()));
+		return Optional.fromNullable (
+			toEnum (
+				enumConsoleHelper.enumClass (),
+				requestContext.parameter (
+					name ())));
 
 	}
 
 	@Override
 	public
 	String interfaceToHtmlSimple (
-			Container container,
-			Interface interfaceValue,
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue,
 			boolean link) {
 
 		return stringFormat (
 			"%h",
-			interfaceValue.toString ());
+			interfaceValue.isPresent ()
+				? interfaceValue.get ().toString ()
+				: "");
 
 	}
 
 	@Override
 	public
 	String interfaceToHtmlComplex (
-			Container container,
-			Interface interfaceValue) {
+			@NonNull Container container,
+			@NonNull Optional<Interface> interfaceValue) {
 
 		return interfaceToHtmlSimple (
 			container,

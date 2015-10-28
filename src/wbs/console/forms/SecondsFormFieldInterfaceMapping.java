@@ -7,8 +7,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.misc.IntervalFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -32,20 +36,22 @@ class SecondsFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Integer interfaceToGeneric (
-			Container container,
-			String interfaceValue,
-			List<String> errors) {
+	Optional<Integer> interfaceToGeneric (
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue,
+			@NonNull List<String> errors) {
 
-		if (interfaceValue == null)
-			return null;
+		if (! interfaceValue.isPresent ()) {
+			return Optional.<Integer>absent ();
+		}
 
-		if (interfaceValue.isEmpty ())
-			return null;
+		if (interfaceValue.get ().isEmpty ()) {
+			return Optional.<Integer>absent ();
+		}
 
 		Integer genericValue =
 			intervalFormatter.processIntervalStringSeconds (
-				interfaceValue);
+				interfaceValue.get ());
 
 		if (genericValue == null) {
 
@@ -58,21 +64,24 @@ class SecondsFormFieldInterfaceMapping<Container>
 
 		}
 
-		return genericValue;
+		return Optional.of (
+			genericValue);
 
 	}
 
 	@Override
 	public
-	String genericToInterface (
-			Container container,
-			Integer genericValue) {
+	Optional<String> genericToInterface (
+			@NonNull Container container,
+			@NonNull Optional<Integer> genericValue) {
 
-		if (genericValue == null)
-			return null;
+		if (! genericValue.isPresent ()) {
+			return Optional.<String>absent ();
+		}
 
-		return intervalFormatter.createIntervalStringSeconds (
-			genericValue);
+		return Optional.of (
+			intervalFormatter.createIntervalStringSeconds (
+				genericValue.get ()));
 
 	}
 

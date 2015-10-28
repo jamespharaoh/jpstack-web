@@ -176,9 +176,15 @@ class ParentFormFieldBuilder {
 
 		FormFieldRenderer renderer =
 			objectFormFieldRendererProvider.get ()
-				.name (name)
-				.label (label)
-				.entityFinder (parentHelper);
+
+			.name (
+				name)
+
+			.label (
+				label)
+
+			.entityFinder (
+				parentHelper);
 
 		// update hook
 

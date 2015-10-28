@@ -11,10 +11,14 @@ import java.util.TreeSet;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableSet;
+
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.MagicTableScriptRef;
+import wbs.console.html.ScriptRef;
 import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.Html;
 import wbs.platform.postgresql.model.PostgresqlMaintenanceFrequency;
 import wbs.platform.postgresql.model.PostgresqlMaintenanceRec;
 
@@ -23,11 +27,15 @@ public
 class PostgresqlMaintenanceListPart
 	extends AbstractPagePart {
 
+	// dependencies
+
 	@Inject
 	PostgresqlMaintenanceConsoleHelper postgresqlMaintenanceHelper;
 
 	@Inject
 	TimeFormatter timeFormatter;
+
+	// state
 
 	Map<
 		PostgresqlMaintenanceFrequency,
@@ -39,12 +47,37 @@ class PostgresqlMaintenanceListPart
 			Set<PostgresqlMaintenanceRec>
 		> ();
 
+	// details
+
+	@Override
+	public
+	Set<ScriptRef> scriptRefs () {
+
+		return ImmutableSet.<ScriptRef>builder ()
+
+			.addAll (
+				super.scriptRefs ())
+
+			.add (
+				JqueryScriptRef.instance)
+
+			.add (
+				MagicTableScriptRef.instance)
+
+			.build ();
+
+	}
+
+	// implementation
+
 	@Override
 	public
 	void prepare () {
 
-		for (PostgresqlMaintenanceFrequency frequency
-				: PostgresqlMaintenanceFrequency.values ()) {
+		for (
+			PostgresqlMaintenanceFrequency frequency
+				: PostgresqlMaintenanceFrequency.values ()
+		) {
 
 			maintenancesByFrequency.put (
 				frequency,
@@ -52,8 +85,10 @@ class PostgresqlMaintenanceListPart
 
 		}
 
-		for (PostgresqlMaintenanceRec maintenance
-				: postgresqlMaintenanceHelper.findAll ()) {
+		for (
+			PostgresqlMaintenanceRec maintenance
+				: postgresqlMaintenanceHelper.findAll ()
+		) {
 
 			maintenancesByFrequency
 				.get (maintenance.getFrequency ())
@@ -78,17 +113,21 @@ class PostgresqlMaintenanceListPart
 			"<th>Last duration</th>\n",
 			"</tr>\n");
 
-		for (PostgresqlMaintenanceFrequency frequency
-				: PostgresqlMaintenanceFrequency.values ()) {
+		for (
+			PostgresqlMaintenanceFrequency frequency
+				: PostgresqlMaintenanceFrequency.values ()
+		) {
 
 			printFormat (
 				"<tr class=\"sep\">\n");
 
 			long totalDuration = 0;
 
-			for (PostgresqlMaintenanceRec maintenance
+			for (
+				PostgresqlMaintenanceRec maintenance
 					: maintenancesByFrequency.get (
-						frequency)) {
+						frequency)
+			) {
 
 				if (maintenance.getLastDuration () == null)
 					continue;
@@ -99,52 +138,65 @@ class PostgresqlMaintenanceListPart
 			}
 
 			printFormat (
-				"<tr style=\"font-weight: bold\">\n",
+				"<tr style=\"font-weight: bold\">\n");
 
+			printFormat (
 				"<td colspan=\"3\">%h</td>\n",
-				frequency.getDescription (),
+				frequency.getDescription ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				requestContext.prettyMsInterval (
-					totalDuration),
+					totalDuration));
 
+			printFormat (
 				"</tr>\n");
 
-			for (PostgresqlMaintenanceRec postgresqlMaintenance
+			for (
+				PostgresqlMaintenanceRec postgresqlMaintenance
 					: maintenancesByFrequency.get (
-						frequency)) {
+						frequency)
+			) {
 
 				printFormat (
-					"%s\n",
-					Html.magicTr (
-						requestContext.resolveContextUrl (
-							stringFormat (
-								"/postgresqlMaintenance",
-								"/%u",
-								postgresqlMaintenance.getId (),
-								"/postgresqlMaintenance.summary")),
-						false),
+					"<tr",
+					" class=\"magic-table-row\"",
 
+					" data-target-href=\"%h\"",
+					requestContext.resolveContextUrl (
+						stringFormat (
+							"/postgresqlMaintenance",
+							"/%u",
+							postgresqlMaintenance.getId (),
+							"/postgresqlMaintenance.summary")),
+
+					">\n");
+
+				printFormat (
 					"<td>%h</td>\n",
-					postgresqlMaintenance.getSequence (),
+					postgresqlMaintenance.getSequence ());
 
+				printFormat (
 					"<td>%h</td>\n",
-					postgresqlMaintenance.getCommand (),
+					postgresqlMaintenance.getCommand ());
 
+				printFormat (
 					"<td>%h</td>\n",
 					ifNull (
 						timeFormatter.instantToTimestampString (
 							timeFormatter.defaultTimezone (),
 							dateToInstant (
 								postgresqlMaintenance.getLastRun ())),
-						"-"),
+						"-"));
 
+				printFormat (
 					"<td>%h</td>\n",
 					ifNull (
 						requestContext.prettyMsInterval (
 							postgresqlMaintenance.getLastDuration ()),
-						"-"),
+						"-"));
 
+				printFormat (
 					"</tr>\n");
 
 			}

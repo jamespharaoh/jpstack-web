@@ -7,8 +7,6 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
-import wbs.framework.record.CommonRecord;
-import wbs.framework.record.Record;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.currency.model.CurrencyRec;
 
@@ -18,7 +16,7 @@ import wbs.platform.currency.model.CurrencyRec;
 @ToString
 public
 class ChatReportRevShareItem
-	implements CommonRecord<ChatReportRevShareItem> {
+	implements Comparable<ChatReportRevShareItem> {
 
 	Integer id;
 	AffiliateRec affiliate;
@@ -39,38 +37,68 @@ class ChatReportRevShareItem
 	Long joiners = 0L;
 	Long staffCost = 0L;
 
-	public Long getTotal(){
-		return outRev + inRev + creditRev - smsCost - mmsCost;
+	public
+	Long getTotal () {
+
+		return (
+			+ outRev
+			+ inRev
+			+ creditRev
+			- smsCost
+			- mmsCost
+		);
+
 	}
 
-	public Long getTotal_p(){
-		return (getTotal()/100);
+	public
+	Long getTotal_p () {
+
+		return getTotal () / 100;
+
 	}
 
-	public Long getCreditRev_p() {
-		return creditRev/100;
+	public
+	Long getCreditRev_p () {
+
+		return creditRev / 100;
+
 	}
 
-	public Long getOutRev_p() {
-		return outRev/100;
-	}
+	public
+	Long getOutRev_p () {
 
+		return outRev / 100;
 
-	public Long getInRev_p() {
-		return inRev/100;
-	}
-
-	public Long getSmsCost_p() {
-		return smsCost/100;
 	}
 
 
-	public Long getMmsCost_p() {
-		return mmsCost/100;
+	public
+	Long getInRev_p () {
+
+		return inRev / 100;
+
 	}
 
-	public Long staffCost_p() {
-		return staffCost/100;
+	public
+	Long getSmsCost_p () {
+
+		return smsCost / 100;
+
+	}
+
+
+	public
+	Long getMmsCost_p () {
+
+		return mmsCost / 100;
+
+	}
+
+	public
+	Long staffCost_p () {
+
+		return staffCost / 100;
+
 	}
 
 	// compare to
@@ -78,10 +106,7 @@ class ChatReportRevShareItem
 	@Override
 	public
 	int compareTo (
-			Record<ChatReportRevShareItem> otherRecord) {
-
-		ChatReportRevShareItem other =
-			(ChatReportRevShareItem) otherRecord;
+			ChatReportRevShareItem other) {
 
 		return new CompareToBuilder ()
 

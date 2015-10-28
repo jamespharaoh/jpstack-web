@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.instantToDate;
-import static wbs.framework.utils.etc.Misc.parseTimeAfter;
+import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import lombok.Cleanup;
 
 import org.joda.time.Instant;
+import org.joda.time.Interval;
 import org.joda.time.Seconds;
 
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
@@ -22,6 +23,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
+import wbs.console.misc.TimeFormatter;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -35,6 +37,8 @@ import wbs.platform.user.model.UserRec;
 public
 class ChatMonitorInboxAlarmAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ChatMonitorInboxObjectHelper chatMonitorInboxHelper;
@@ -52,7 +56,12 @@ class ChatMonitorInboxAlarmAction
 	ConsoleRequestContext requestContext;
 
 	@Inject
+	TimeFormatter timeFormatter;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
@@ -61,6 +70,8 @@ class ChatMonitorInboxAlarmAction
 		return responder ("chatMonitorInboxSummaryResponder");
 
 	}
+
+	// implementation
 
 	@Override
 	protected
@@ -85,17 +96,20 @@ class ChatMonitorInboxAlarmAction
 
 			try {
 
-				// TODO this is wrong, surely?
-				alarmTime =
-					parseTimeAfter (
+				Interval interval =
+					parsePartialTimestamp (
 						stringFormat (
 							"%s %s",
 							requestContext.parameter ("alarmDate"),
 							requestContext.parameter ("alarmTime")));
 
+				alarmTime =
+					interval.getStart ().toInstant ();
+
 			} catch (TimeFormatException exception) {
 
-				requestContext.addError ("Alarm time invalid");
+				requestContext.addError (
+					"Alarm time invalid");
 
 				return null;
 			}

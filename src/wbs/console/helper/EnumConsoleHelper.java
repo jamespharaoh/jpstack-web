@@ -7,8 +7,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.utils.etc.Html;
 
 @Accessors (fluent = true)
@@ -109,8 +113,10 @@ class EnumConsoleHelper<E extends Enum<E>> {
 	protected
 	EnumConsoleHelper<E> auto () {
 
-		for (E value
-				: enumClass.getEnumConstants ()) {
+		for (
+			E value
+				: enumClass.getEnumConstants ()
+		) {
 
 			add (
 				value,
@@ -120,6 +126,14 @@ class EnumConsoleHelper<E extends Enum<E>> {
 		}
 
 		return this;
+
+	}
+
+	public
+	Optional<String> htmlClass (
+			@NonNull E value) {
+
+		return Optional.<String>absent ();
 
 	}
 

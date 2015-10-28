@@ -9,8 +9,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
@@ -53,13 +57,20 @@ class YesNoFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellList (
-			FormatWriter out,
-			Container container,
-			Boolean interfaceValue,
-			boolean link) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Boolean> interfaceValue,
+			boolean link,
+			int colspan) {
 
 		out.writeFormat (
-			"<td>%s</td>\n",
+			"<td",
+			colspan > 1
+				? stringFormat (
+					" colspan=\"%h\"",
+					colspan)
+				: "",
+			">%s</td>\n",
 			interfaceToHtmlSimple (
 				container,
 				interfaceValue,
@@ -70,9 +81,9 @@ class YesNoFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellProperties (
-			FormatWriter out,
-			Container container,
-			Boolean interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Boolean> interfaceValue) {
 
 		out.writeFormat (
 			"<td>%s</td>\n",
@@ -85,9 +96,9 @@ class YesNoFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableRow (
-			FormatWriter out,
-			Container container,
-			Boolean interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Boolean> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -107,9 +118,9 @@ class YesNoFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormRow (
-			FormatWriter out,
-			Container container,
-			Boolean interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Boolean> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -131,15 +142,15 @@ class YesNoFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormInput (
-			FormatWriter out,
-			Container container,
-			Boolean interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<Boolean> interfaceValue) {
 
 		out.writeFormat (
 			"<select name=\"%h\">",
 			name ());
 
-		if (interfaceValue == null) {
+		if (! interfaceValue.isPresent ()) {
 
 			out.writeFormat (
 				"<option",
@@ -159,7 +170,7 @@ class YesNoFormFieldRenderer<Container>
 				">%h</option>\n",
 				noLabel ());
 
-		} else if (interfaceValue == true) {
+		} else if (interfaceValue.get () == true) {
 
 			out.writeFormat (
 				"<option",
@@ -174,7 +185,7 @@ class YesNoFormFieldRenderer<Container>
 				">%h</option>\n",
 				noLabel ());
 
-		} else if (interfaceValue == false) {
+		} else if (interfaceValue.get () == false) {
 
 			out.writeFormat (
 				"<option",
@@ -202,6 +213,26 @@ class YesNoFormFieldRenderer<Container>
 
 	@Override
 	public
+	void renderFormReset (
+			@NonNull FormatWriter javascriptWriter,
+			@NonNull String indent,
+			@NonNull Container container,
+			@NonNull Optional<Boolean> interfaceValue) {
+
+		javascriptWriter.writeFormat (
+			"%s$(\"#%j\").val (%s);\n",
+			indent,
+			name,
+			booleanToString (
+				interfaceValue.orNull (),
+				"true",
+				"false",
+				""));
+
+	}
+
+	@Override
+	public
 	boolean formValuePresent () {
 
 		String parameterValue =
@@ -224,28 +255,29 @@ class YesNoFormFieldRenderer<Container>
 
 	@Override
 	public
-	Boolean formToInterface (
-			List<String> errors) {
+	Optional<Boolean> formToInterface (
+			@NonNull List<String> errors) {
 
 		String formValue =
 			formValue ();
 
-		return stringToBoolean (
-			formValue);
+		return Optional.fromNullable (
+			stringToBoolean (
+				formValue));
 
 	}
 
 	@Override
 	public
 	String interfaceToHtmlSimple (
-			Container container,
-			Boolean genericValue,
+			@NonNull Container container,
+			@NonNull Optional<Boolean> genericValue,
 			boolean link) {
 
 		return stringFormat (
 			"%h",
 			booleanToString (
-				genericValue,
+				genericValue.orNull (),
 				yesLabel (),
 				noLabel (),
 				"-"));
@@ -255,8 +287,8 @@ class YesNoFormFieldRenderer<Container>
 	@Override
 	public
 	String interfaceToHtmlComplex (
-			Container container,
-			Boolean genericValue) {
+			@NonNull Container container,
+			@NonNull Optional<Boolean> genericValue) {
 
 		return interfaceToHtmlSimple (
 			container,

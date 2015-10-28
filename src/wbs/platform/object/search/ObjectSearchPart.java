@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
@@ -105,6 +106,24 @@ class ObjectSearchPart
 
 		printFormat (
 			"</form>\n");
+
+		printFormat (
+			"<script type=\"text/javascript\">\n");
+
+		printFormat (
+			"\tfunction resetSearchForm () {\n");
+
+		formFieldLogic.outputFormReset (
+			formatWriter,
+			"\t\t",
+			formFieldSet,
+			search);
+
+		printFormat (
+			"\t}\n");
+
+		printFormat (
+			"</script>\n");
 
 	}
 

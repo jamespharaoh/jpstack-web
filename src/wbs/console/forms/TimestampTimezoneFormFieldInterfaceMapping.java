@@ -7,10 +7,13 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import org.joda.time.DateTime;
+
+import com.google.common.base.Optional;
 
 import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -35,18 +38,19 @@ class TimestampTimezoneFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	DateTime interfaceToGeneric (
-			Container container,
-			String interfaceValue,
-			List<String> errors) {
+	Optional<DateTime> interfaceToGeneric (
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue,
+			@NonNull List<String> errors) {
 
-		if (interfaceValue.isEmpty ())
+		if (interfaceValue.get ().isEmpty ())
 			return null;
 
 		try {
 
-			return timeFormatter.timestampTimezoneToDateTime (
-				interfaceValue);
+			return Optional.of (
+				timeFormatter.timestampTimezoneToDateTime (
+					interfaceValue.get ()));
 
 		} catch (IllegalArgumentException exception) {
 
@@ -63,15 +67,17 @@ class TimestampTimezoneFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	String genericToInterface (
+	Optional<String> genericToInterface (
 			Container container,
-			DateTime genericValue) {
+			Optional<DateTime> genericValue) {
 
-		if (genericValue == null)
-			return null;
+		if (! genericValue.isPresent ()) {
+			return Optional.<String>absent ();
+		}
 
-		return timeFormatter.dateTimeToTimestampTimezoneString (
-			genericValue);
+		return Optional.of (
+			timeFormatter.dateTimeToTimestampTimezoneString (
+				genericValue.get ()));
 
 	}
 

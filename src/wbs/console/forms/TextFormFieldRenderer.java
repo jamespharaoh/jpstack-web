@@ -1,6 +1,5 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -9,8 +8,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
@@ -53,14 +56,20 @@ class TextFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellList (
-			FormatWriter out,
-			Container container,
-			String interfaceValue,
-			boolean link) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue,
+			boolean link,
+			int colspan) {
 
 		out.writeFormat (
-
 			"<td",
+
+			colspan > 1
+				? stringFormat (
+					" colspan=\"%h\"",
+					colspan)
+				: "",
 
 			"%s",
 			align != null
@@ -80,9 +89,9 @@ class TextFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellProperties (
-			FormatWriter out,
-			Container container,
-			String interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
 			"<td>%s</td>\n",
@@ -95,9 +104,9 @@ class TextFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableRow (
-			FormatWriter out,
-			Container container,
-			String interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -117,9 +126,9 @@ class TextFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormRow (
-			FormatWriter out,
-			Container container,
-			String interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -141,9 +150,9 @@ class TextFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormInput (
-			FormatWriter out,
-			Container container,
-			String interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
 			"<input",
@@ -155,9 +164,24 @@ class TextFormFieldRenderer<Container>
 			" value=\"%h\"",
 			formValuePresent ()
 				? formValue ()
-				: emptyStringIfNull (
-					interfaceValue),
+				: interfaceValue.or (""),
 			">\n");
+
+	}
+
+	@Override
+	public
+	void renderFormReset (
+			@NonNull FormatWriter javascriptWriter,
+			@NonNull String indent,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue) {
+
+		javascriptWriter.writeFormat (
+			"%s$(\"#%j\").val (\"%j\");\n",
+			indent,
+			name,
+			interfaceValue.or (""));
 
 	}
 
@@ -182,7 +206,7 @@ class TextFormFieldRenderer<Container>
 
 	@Override
 	public
-	String formToInterface (
+	Optional<String> formToInterface (
 			List<String> errors) {
 
 		String formValue =
@@ -200,29 +224,29 @@ class TextFormFieldRenderer<Container>
 			return null;
 		}
 
-		return formValue;
+		return Optional.fromNullable (
+			formValue);
 
 	}
 
 	@Override
 	public
 	String interfaceToHtmlSimple (
-			Container container,
-			String interfaceValue,
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue,
 			boolean link) {
 
 		return stringFormat (
 			"%h",
-			emptyStringIfNull (
-				interfaceValue));
+			interfaceValue.or (""));
 
 	}
 
 	@Override
 	public
 	String interfaceToHtmlComplex (
-			Container container,
-			String interfaceValue) {
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue) {
 
 		return interfaceToHtmlSimple (
 			container,

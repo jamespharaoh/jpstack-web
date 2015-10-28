@@ -8,12 +8,15 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
+
+import com.google.common.base.Optional;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -51,13 +54,20 @@ class UploadFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellList (
-			FormatWriter out,
-			Container container,
-			FileUpload interfaceValue,
-			boolean link) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<FileUpload> interfaceValue,
+			boolean link,
+			int colspan) {
 
 		out.writeFormat (
-			"<td>%s</td>\n",
+			"<td",
+			colspan > 1
+				? stringFormat (
+					" colspan=\"%h\"",
+					colspan)
+				: "",
+			">%s</td>\n",
 			interfaceToHtmlSimple (
 				container,
 				interfaceValue,
@@ -68,9 +78,9 @@ class UploadFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellProperties (
-			FormatWriter out,
-			Container container,
-			FileUpload interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<FileUpload> interfaceValue) {
 
 		out.writeFormat (
 			"<td>%s</td>\n",
@@ -83,9 +93,9 @@ class UploadFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableRow (
-			FormatWriter out,
-			Container container,
-			FileUpload interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<FileUpload> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -105,9 +115,9 @@ class UploadFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormRow (
-			FormatWriter out,
-			Container container,
-			FileUpload interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<FileUpload> interfaceValue) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -129,9 +139,9 @@ class UploadFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormInput (
-			FormatWriter out,
-			Container container,
-			FileUpload interfaceValue) {
+			@NonNull FormatWriter out,
+			@NonNull Container container,
+			@NonNull Optional<FileUpload> interfaceValue) {
 
 		out.writeFormat (
 			"<input",
@@ -140,11 +150,27 @@ class UploadFormFieldRenderer<Container>
 			size (),
 			" name=\"%h\"",
 			name (),
-			" value=\"%h\"",
-			formValuePresent ()
-				? formValue ()
-				: interfaceValue,
 			">\n");
+
+	}
+
+	@Override
+	public
+	void renderFormReset (
+			@NonNull FormatWriter javascriptWriter,
+			@NonNull String indent,
+			@NonNull Container container,
+			@NonNull Optional<FileUpload> interfaceValue) {
+
+		javascriptWriter.writeFormat (
+			"%s$(\"#%j\").replaceWith (\n",
+			indent,
+			name);
+
+		javascriptWriter.writeFormat (
+			"%s\t$(\"#%j\").clone (true));\n",
+			indent,
+			name);
 
 	}
 
@@ -189,35 +215,37 @@ class UploadFormFieldRenderer<Container>
 
 	@Override
 	public
-	FileUpload formToInterface (
+	Optional<FileUpload> formToInterface (
 			List<String> errors) {
 
-		return formValue ();
+		return Optional.fromNullable (
+			formValue ());
 
 	}
 
 	@Override
 	public
 	String interfaceToHtmlSimple (
-			Container container,
-			FileUpload interfaceValue,
+			@NonNull Container container,
+			@NonNull Optional<FileUpload> interfaceValue,
 			boolean link) {
 
-		if (interfaceValue == null)
+		if (! interfaceValue.isPresent ()) {
 			return "";
+		}
 
 		return stringFormat (
 			"%h (%h bytes)",
-			interfaceValue.name (),
-			interfaceValue.data ().length);
+			interfaceValue.get ().name (),
+			interfaceValue.get ().data ().length);
 
 	}
 
 	@Override
 	public
 	String interfaceToHtmlComplex (
-			Container container,
-			FileUpload interfaceValue) {
+			@NonNull Container container,
+			@NonNull Optional<FileUpload> interfaceValue) {
 
 		return interfaceToHtmlSimple (
 			container,

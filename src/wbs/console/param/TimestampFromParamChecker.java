@@ -5,9 +5,11 @@ package wbs.console.param;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.instantToDate;
-import static wbs.framework.utils.etc.Misc.parseTimeAfter;
+import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 
 import java.util.Date;
+
+import org.joda.time.Interval;
 
 import wbs.framework.utils.etc.TimeFormatException;
 
@@ -43,9 +45,12 @@ class TimestampFromParamChecker
 
 		try {
 
+			Interval interval =
+				parsePartialTimestamp (
+					param);
+
 			return instantToDate (
-				parseTimeAfter (
-					param));
+				interval.getStart ());
 
 		} catch (TimeFormatException exception) {
 

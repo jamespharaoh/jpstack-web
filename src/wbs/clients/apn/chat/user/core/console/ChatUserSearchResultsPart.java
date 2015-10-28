@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.user.core.console;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.sum;
 
@@ -13,6 +14,8 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.clients.apn.chat.core.console.ChatConsoleLogic;
 import wbs.clients.apn.chat.core.console.ChatUserCreditModeConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -22,6 +25,7 @@ import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.PageBuilder;
 import wbs.console.misc.Percentager;
@@ -29,12 +33,8 @@ import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.Html;
-import wbs.framework.utils.etc.StringFormatter;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
-
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("chatUserSearchResultsPart")
 public
@@ -104,6 +104,9 @@ class ChatUserSearchResultsPart
 				JqueryScriptRef.instance)
 
 			.add (
+				MagicTableScriptRef.instance)
+
+			.add (
 				ConsoleApplicationScriptRef.javascript (
 					"/js/page-builder.js"))
 
@@ -118,7 +121,7 @@ class ChatUserSearchResultsPart
 		return ImmutableSet.<HtmlLink>of (
 
 			HtmlLink.applicationCssStyle (
-				"/js/chat.js")
+				"/style/chat.css")
 
 		);
 
@@ -168,11 +171,10 @@ class ChatUserSearchResultsPart
 		PageBuilder pageBuilder =
 			pageBuilders [0];
 
-		StringFormatter.printWriterFormat (
-			pageBuilder.headWriter (),
+		pageBuilder.headWriter ().writeFormat (
+			"<table class=\"list\">\n");
 
-			"<table class=\"list\">\n",
-
+		pageBuilder.headWriter ().writeFormat (
 			"<tr>\n",
 			"<th>User</th>\n",
 			"<th>T</th>\n",
@@ -185,66 +187,70 @@ class ChatUserSearchResultsPart
 
 		int index = 0;
 
-		for (ChatUserRec chatUser
-				: chatUsers) {
+		for (
+			ChatUserRec chatUser
+				: chatUsers
+		) {
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
+			printFormat (
+				"<tr",
+				" class=\"magic-table-row\"",
+				" data-target-href=\"%h\"",
+				requestContext.resolveContextUrl (
+					stringFormat (
+						"%s",
+						targetContext.pathPrefix (),
+						"/%u",
+						chatUser.getId ())),
+				">\n");
 
-				"%s\n",
-				Html.magicTr (
-					requestContext.resolveContextUrl (
-						stringFormat (
-							"%s",
-							targetContext.pathPrefix (),
-							"/%u",
-							chatUser.getId ())),
-					false),
-
+			pageBuilder.writer ().writeFormat (
 				"<td>%h</td>\n",
-				chatUser.getCode (),
+				chatUser.getCode ());
 
+			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				chatConsoleLogic.tdForChatUserTypeShort (
-					chatUser),
+					chatUser));
 
+			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				chatConsoleLogic.tdForChatUserGenderShort (
-					chatUser),
+					chatUser));
 
+			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				chatConsoleLogic.tdForChatUserOrientShort (
-					chatUser),
+					chatUser));
 
+			pageBuilder.writer ().writeFormat (
 				"<td>%h</td>\n",
 				ifNull (chatUser.getName (), "-"));
 
-			if (! chatUser.getChatUserImageList ().isEmpty ()) {
+			if (
+				isNotEmpty (
+					chatUser.getChatUserImageList ())
+			) {
 
-				StringFormatter.printWriterFormat (
-					pageBuilder.writer (),
-
+				pageBuilder.writer ().writeFormat (
 					"<td>%s</td>\n",
 					mediaConsoleLogic.mediaThumb32 (
 						chatUser.getChatUserImageList ().get (0).getMedia ()));
 
 			} else {
 
-				StringFormatter.printWriterFormat (
-					pageBuilder.writer (),
-
+				pageBuilder.writer ().writeFormat (
 					"<td>-</td>\n");
 
 			}
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"<td>%h</td>\n",
 				ifNull (
 					chatUser.getInfoText (),
-					"-"),
+					"-"));
 
+			pageBuilder.writer ().writeFormat (
 				"</tr>\n");
 
 			if (index ++ == itemsPerSubPage) {
@@ -259,23 +265,21 @@ class ChatUserSearchResultsPart
 
 		pageBuilder.endPage ();
 
-		StringFormatter.printWriterFormat (
-			pageBuilder.footWriter (),
-
+		pageBuilder.footWriter ().writeFormat (
 			"</table>\n");
 
 	}
 
-	private void prepare1 () {
+	private
+	void prepare1 () {
 
 		PageBuilder pageBuilder =
 			pageBuilders [1];
 
-		StringFormatter.printWriterFormat (
-			pageBuilder.headWriter (),
+		pageBuilder.footWriter ().writeFormat (
+			"<table class=\"list\">\n");
 
-			"<table class=\"list\">\n",
-
+		pageBuilder.footWriter ().writeFormat (
 			"<tr>\n",
 			"<th>User</th>\n",
 			"<th>T</th>\n",
@@ -297,8 +301,10 @@ class ChatUserSearchResultsPart
 
 		int index = 0;
 
-		for (ChatUserRec chatUser
-				: chatUsers) {
+		for (
+			ChatUserRec chatUser
+				: chatUsers
+		) {
 
 			Percentager percentager =
 				new Percentager ();
@@ -318,92 +324,74 @@ class ChatUserSearchResultsPart
 			Iterator<Integer> percentagerIterator =
 				percentager.work ().iterator ();
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
+			printFormat (
+				"<tr",
+				" class=\"magic-table-row\"",
+				" data-target-href=\"%h\"",
+				requestContext.resolveContextUrl (
+					stringFormat (
+						"/chatUser",
+						"/%u",
+						chatUser.getId (),
+						"/chatUser.summary")),
+				">\n");
 
-				"%s\n",
-				Html.magicTr (
-					requestContext.resolveContextUrl (
-						stringFormat (
-							"/chatUser",
-							"/%u",
-							chatUser.getId (),
-							"/chatUser.summary")),
-					false));
-
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"<td>%h</td>\n",
 				chatUser.getCode ());
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				chatConsoleLogic.tdsForChatUserTypeGenderOrientShort (
 					chatUser));
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
 					Long.valueOf(chatUser.getValueSinceEver ())));
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
 					Long.valueOf(chatUser.getCredit ())));
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				chatUserCreditModeConsoleHelper.toTd (
 					chatUser.getCreditMode ()));
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					Long.valueOf(sum (
-						+ chatUser.getCreditPending (),
-						+ chatUser.getCreditPendingStrict ()))));
+					Long.valueOf (
+						sum (
+							+ chatUser.getCreditPending (),
+							+ chatUser.getCreditPendingStrict ()))));
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					Long.valueOf(chatUser.getCreditSuccess ())));
+					Long.valueOf (
+						chatUser.getCreditSuccess ())));
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					Long.valueOf(chatUser.getCreditFailed ())));
+					Long.valueOf (
+						chatUser.getCreditFailed ())));
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"<td>%h</td>\n",
 				chatUser.getChatScheme () != null
 					? chatUser.getChatScheme ().getCode ()
 					: "-");
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"<td>%h</td>\n",
 				chatUser.getLastAction () != null
 					? timeFormatter.instantToDateStringShort (
@@ -413,33 +401,23 @@ class ChatUserSearchResultsPart
 							chatUser.getLastAction ()))
 					: "-");
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
 				percentagerIterator.next ());
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
 				percentagerIterator.next ());
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
 				percentagerIterator.next ());
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
 				percentagerIterator.next ());
 
-			StringFormatter.printWriterFormat (
-				pageBuilder.writer (),
-
+			pageBuilder.writer ().writeFormat (
 				"</tr>\n");
 
 			if (index ++ == itemsPerSubPage) {
@@ -454,9 +432,7 @@ class ChatUserSearchResultsPart
 
 		pageBuilder.endPage ();
 
-		StringFormatter.printWriterFormat (
-			pageBuilder.footWriter (),
-
+		pageBuilder.footWriter ().writeFormat (
 			"</table>");
 
 	}
@@ -502,14 +478,16 @@ class ChatUserSearchResultsPart
 		printFormat (
 			"<p",
 			" class=\"links\"",
-			">Select mode\n",
+			">Select mode\n");
 
+		printFormat (
 			"<a",
 			" class=\"big-page-link-0\"",
 			" href=\"#\"",
 			" onclick=\"pageBuilder.showBigPage (0)\"",
-			">Normal</a>\n",
+			">Normal</a>\n");
 
+		printFormat (
 			"<a",
 			" class=\"big-page-link-1\"",
 			" href=\"#\"",

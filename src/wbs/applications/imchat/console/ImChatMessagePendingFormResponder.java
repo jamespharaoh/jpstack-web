@@ -158,7 +158,8 @@ class ImChatMessagePendingFormResponder
 	public
 	void renderHtmlBodyContents () {
 
-		requestContext.flushNotices (out);
+		requestContext.flushNotices (
+			printWriter);
 
 		renderLinks ();
 

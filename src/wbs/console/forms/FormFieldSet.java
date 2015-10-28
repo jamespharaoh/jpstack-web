@@ -8,6 +8,7 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.html.ScriptRef;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
@@ -49,6 +50,28 @@ class FormFieldSet {
 		}
 
 		return scriptRefs;
+
+	}
+
+	public
+	int columns () {
+
+		int ret = 0;
+
+		for (
+			FormField formField
+				: formFields
+		) {
+
+			if (formField.virtual ()) {
+				continue;
+			}
+
+			ret ++;
+
+		}
+
+		return ret;
 
 	}
 

@@ -3,8 +3,12 @@ package wbs.console.forms;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -31,7 +35,7 @@ class DelegateFormFieldAccessor<PrincipalContainer,DelegateContainer,Native>
 
 	@Override
 	public
-	Native read (
+	Optional<Native> read (
 			PrincipalContainer principalContainer) {
 
 		@SuppressWarnings ("unchecked")
@@ -41,8 +45,9 @@ class DelegateFormFieldAccessor<PrincipalContainer,DelegateContainer,Native>
 				principalContainer,
 				path);
 
-		if (delegateContainer == null)
+		if (delegateContainer == null) {
 			return null;
+		}
 
 		return delegateFormFieldAccessor.read (
 			delegateContainer);
@@ -52,8 +57,8 @@ class DelegateFormFieldAccessor<PrincipalContainer,DelegateContainer,Native>
 	@Override
 	public
 	void write (
-			PrincipalContainer principalContainer,
-			Native nativeValue) {
+			@NonNull PrincipalContainer principalContainer,
+			@NonNull Optional<Native> nativeValue) {
 
 		@SuppressWarnings ("unchecked")
 		DelegateContainer delegateContainer =
@@ -62,8 +67,9 @@ class DelegateFormFieldAccessor<PrincipalContainer,DelegateContainer,Native>
 				principalContainer,
 				path);
 
-		if (delegateContainer == null)
+		if (delegateContainer == null) {
 			throw new RuntimeException ();
+		}
 
 		delegateFormFieldAccessor.write (
 			delegateContainer,

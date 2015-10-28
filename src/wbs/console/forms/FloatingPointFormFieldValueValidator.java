@@ -5,8 +5,12 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
@@ -27,14 +31,17 @@ class FloatingPointFormFieldValueValidator
 	@Override
 	public
 	void validate (
-			Double genericValue,
-			List<String> errors) {
+			@NonNull Optional<Double> genericValue,
+			@NonNull List<String> errors) {
 
-		if (genericValue == null)
+		if (! genericValue.isPresent ()) {
 			return;
+		}
 
-		if (genericValue < minimum
-				|| genericValue > maximum) {
+		if (
+			genericValue.get () < minimum
+			|| genericValue.get () > maximum
+		) {
 
 			errors.add (
 				stringFormat (

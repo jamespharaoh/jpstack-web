@@ -7,8 +7,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -44,16 +48,16 @@ class ParentFormFieldConstraintValidator<
 	@Override
 	public
 	void validate (
-			Container container,
-			Native nativeValue,
-			List<String> errors) {
+			@NonNull Container container,
+			@NonNull Optional<Native> nativeValue,
+			@NonNull List<String> errors) {
 
 		Record<?> privDelegate =
 			createPrivDelegate != null
 				? (Record<?>) objectManager.dereference (
-					nativeValue,
+					nativeValue.get (),
 					createPrivDelegate)
-				: nativeValue;
+				: nativeValue.get ();
 
 		if (
 			! privChecker.can (

@@ -3,8 +3,11 @@ package wbs.platform.event.console;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
 
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.forms.FormFieldUpdateHook;
@@ -48,11 +51,11 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 	@Override
 	public
 	void onUpdate (
-			UpdateResult<Generic,Native> updateResult,
-			Container container,
-			Record<?> linkObject,
-			Object objectRef,
-			String objectType) {
+			@NonNull UpdateResult<Generic,Native> updateResult,
+			@NonNull Container container,
+			@NonNull Record<?> linkObject,
+			@NonNull Optional<Object> objectRef,
+			@NonNull Optional<String> objectType) {
 
 		// lookup user
 
@@ -90,18 +93,18 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 
 		// create an event
 
-		if (objectRef != null) {
+		if (objectRef.isPresent ()) {
 
-			if (updateResult.newNativeValue () != null) {
+			if (updateResult.newNativeValue ().isPresent ()) {
 
 				eventLogic.createEvent (
 					adminPrefix + "object_field_updated_in",
 					user,
 					name (),
-					objectRef,
-					objectType,
+					objectRef.get (),
+					objectType.get (),
 					linkObject,
-					updateResult.newNativeValue ());
+					updateResult.newNativeValue ().get ());
 
 			} else {
 
@@ -109,22 +112,22 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 					adminPrefix + "object_field_nulled_in",
 					user,
 					name (),
-					objectRef,
-					objectType,
+					objectRef.get (),
+					objectType.get (),
 					linkObject);
 
 			}
 
 		} else {
 
-			if (updateResult.newNativeValue () != null) {
+			if (updateResult.newNativeValue ().isPresent ()) {
 
 				eventLogic.createEvent (
 					adminPrefix + "object_field_updated",
 					user,
 					name (),
 					linkObject,
-					updateResult.newNativeValue ());
+					updateResult.newNativeValue ().get ());
 
 			} else {
 

@@ -7,6 +7,9 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.collect.ImmutableSet;
+
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
@@ -19,8 +22,6 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
-
-import com.google.common.collect.ImmutableSet;
 
 @Log4j
 @PrototypeComponent ("chatMonitorInboxFormResponder")
@@ -160,24 +161,28 @@ class ChatMonitorInboxFormResponder
 	public
 	void renderHtmlBodyContents () {
 
-		requestContext.flushNotices (out);
+		requestContext.flushNotices (
+			printWriter);
 
 		printFormat (
 			"<p",
 			" class=\"links\"",
-			">\n",
+			">\n");
 
+		printFormat (
 			"<a",
 			" href=\"%h\"",
 			requestContext.resolveApplicationUrl (
 				"/queues/queue.home"),
-			">Queues</a>\n",
+			">Queues</a>\n");
 
+		printFormat (
 			"<a",
 			" href=\"%h\"",
 			"javascript:top.show_inbox (false)",
-			">Close</a>\n",
+			">Close</a>\n");
 
+		printFormat (
 			"</p>\n");
 
 		if (chatMonitorInbox == null)

@@ -2,6 +2,10 @@ package wbs.console.forms;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @PrototypeComponent ("nameFormFieldConstraintValidator")
@@ -12,9 +16,9 @@ class NameFormFieldConstraintValidator<Container>
 	@Override
 	public
 	void validate (
-			Container container,
-			String nativeValue,
-			List<String> errors) {
+			@NonNull Container container,
+			@NonNull Optional<String> nativeValue,
+			@NonNull List<String> errors) {
 
 		/*
 

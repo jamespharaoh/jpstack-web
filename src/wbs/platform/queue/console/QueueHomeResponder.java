@@ -13,8 +13,12 @@ import javax.inject.Provider;
 
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.TimeFormatter;
 import wbs.console.priv.PrivChecker;
@@ -33,9 +37,6 @@ import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("queueHomeResponder")
 public
@@ -67,7 +68,7 @@ class QueueHomeResponder
 	@Inject
 	Provider<QueueSubjectSorter> queueSubjectSorter;
 
-	// satte
+	// state
 
 	boolean queueOptionsEnabled = true;
 
@@ -75,6 +76,60 @@ class QueueHomeResponder
 	UserRec myUser;
 	List<QueueItemClaimRec> myClaimedItems;
 	List<QueueInfo> queueInfos;
+
+	// details
+
+	@Override
+	public
+	Set<ScriptRef> scriptRefs () {
+
+		if (queueOptionsEnabled) {
+
+			return ImmutableSet.<ScriptRef>builder ()
+
+				.addAll (
+					super.scriptRefs ())
+
+				.add (
+					JqueryScriptRef.instance)
+
+				.add (
+					MagicTableScriptRef.instance)
+
+				.add (
+					ConsoleApplicationScriptRef.javascript (
+						"/js/js-yaml-2.1.1.js"))
+
+				.add (
+					ConsoleApplicationScriptRef.javascript (
+						"/js/wbs.js"))
+
+				.add (
+					ConsoleApplicationScriptRef.javascript (
+						"/js/queue-home.js"))
+
+				.build ();
+
+		} else {
+
+			return ImmutableSet.<ScriptRef>builder ()
+
+				.addAll (
+					super.scriptRefs ())
+
+				.add (
+					JqueryScriptRef.instance)
+
+				.add (
+					MagicTableScriptRef.instance)
+
+				.build ();
+
+		}
+
+	}
+
+	// implementation
 
 	@Override
 	protected
@@ -111,37 +166,6 @@ class QueueHomeResponder
 			queueInfos.add (queueInfo);
 
 		}
-
-	}
-
-	@Override
-	protected
-	Set<ScriptRef> scriptRefs () {
-
-		if (! queueOptionsEnabled)
-			return super.scriptRefs ();
-
-		return ImmutableSet.<ScriptRef>builder ()
-
-			.addAll (
-				super.scriptRefs ())
-
-			.add (
-				JqueryScriptRef.instance)
-
-			.add (
-				ConsoleApplicationScriptRef.javascript (
-					"/js/js-yaml-2.1.1.js"))
-
-			.add (
-				ConsoleApplicationScriptRef.javascript (
-					"/js/wbs.js"))
-
-			.add (
-				ConsoleApplicationScriptRef.javascript (
-					"/js/queue-home.js"))
-
-			.build ();
 
 	}
 
@@ -366,8 +390,10 @@ class QueueHomeResponder
 
 		int maxItems = 100;
 
-		for (QueueItemClaimRec queueItemClaim
-				: myClaimedItems) {
+		for (
+			QueueItemClaimRec queueItemClaim
+				: myClaimedItems
+		) {
 
 			QueueItemRec queueItem =
 				queueItemClaim.getQueueItem ();
@@ -378,20 +404,19 @@ class QueueHomeResponder
 			QueueRec queue =
 				queueSubject.getQueue ();
 
-			String url =
+			printFormat (
+				"<tr",
+				" class=\"magic-table-row\"",
+
+				" data-target-href=\"%h\"",
 				requestContext.resolveApplicationUrl (
 					stringFormat (
 						"/queues",
 						"/queue.item",
 						"?id=%s",
-						queueItem.getId ()));
+						queueItem.getId ())),
 
-			printFormat (
-				"%s",
-				Html.magicTr (
-					url,
-					false,
-					null));
+				">\n");
 
 			printFormat (
 				"<td><form",
@@ -468,7 +493,8 @@ class QueueHomeResponder
 			"<a href=\"#\" onclick=\"top.show_inbox (false)\">Close</a>\n",
 			"</p>\n");
 
-		requestContext.flushNotices (out);
+		requestContext.flushNotices (
+			printWriter);
 
 		goQueues ();
 
