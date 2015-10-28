@@ -86,8 +86,11 @@ class ObjectSearchPageBuilder {
 	ConsoleHelper<?> consoleHelper;
 
 	Class<?> searchClass;
+
 	FormFieldSet searchFormFieldSet;
 	FormFieldSet resultsFormFieldset;
+	FormFieldSet resultsRowsFormFieldSet;
+
 	String sessionKey;
 	String privKey;
 	String parentIdKey;
@@ -323,6 +326,9 @@ class ObjectSearchPageBuilder {
 					.formFieldSet (
 						resultsFormFieldset)
 
+					.rowsFormFieldSet (
+						resultsRowsFormFieldSet)
+
 					.itemsPerPage (
 						itemsPerPage)
 
@@ -416,6 +422,12 @@ class ObjectSearchPageBuilder {
 		resultsFormFieldset =
 			consoleModule.formFieldSets ().get (
 				spec.resultsFieldsName ());
+
+		resultsRowsFormFieldSet =
+			spec.resultsRowsFieldsName () != null
+				? consoleModule.formFieldSets ().get (
+					spec.resultsRowsFieldsName ())
+				: null;
 
 		privKey =
 			spec.privKey ();

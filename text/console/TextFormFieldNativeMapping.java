@@ -2,7 +2,11 @@ package wbs.platform.text.console;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.forms.FormFieldNativeMapping;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.text.model.TextObjectHelper;
@@ -23,26 +27,30 @@ class TextFormFieldNativeMapping
 
 	@Override
 	public
-	TextRec genericToNative (
-			String genericValue) {
+	Optional<TextRec> genericToNative (
+			@NonNull Optional<String> genericValue) {
 
-		if (genericValue == null)
-			return null;
+		if (! genericValue.isPresent ()) {
+			return Optional.<TextRec>absent ();
+		}
 
-		return textHelper.findOrCreate (
-			genericValue);
+		return Optional.of (
+			textHelper.findOrCreate (
+				genericValue.get ()));
 
 	}
 
 	@Override
 	public
-	String nativeToGeneric (
-			TextRec nativeValue) {
+	Optional<String> nativeToGeneric (
+			@NonNull Optional<TextRec> nativeValue) {
 
-		if (nativeValue == null)
-			return null;
+		if (! nativeValue.isPresent ()) {
+			return Optional.<String>absent ();
+		}
 
-		return nativeValue.getText ();
+		return Optional.of (
+			nativeValue.get ().getText ());
 
 	}
 

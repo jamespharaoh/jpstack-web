@@ -5,19 +5,24 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.joda.time.Instant;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.MagicTableScriptRef;
+import wbs.console.html.ScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.Html;
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.model.QueueRec;
 
@@ -41,6 +46,27 @@ class QueueListActivePart
 
 	Instant now;
 	List<QueueInfo> queueInfos;
+
+	// details
+
+	@Override
+	public
+	Set<ScriptRef> scriptRefs () {
+
+		return ImmutableSet.<ScriptRef>builder ()
+
+			.addAll (
+				super.scriptRefs ())
+
+			.add (
+				JqueryScriptRef.instance)
+
+			.add (
+				MagicTableScriptRef.instance)
+
+			.build ();
+
+	}
 
 	// implementation
 
@@ -98,94 +124,113 @@ class QueueListActivePart
 			"<th colspan=\"2\">Total</th>\n",
 			"</tr>\n");
 
-		for (QueueInfo queueInfo
-				: queueInfos) {
+		for (
+			QueueInfo queueInfo
+				: queueInfos
+		) {
 
 			QueueRec queue =
 				queueInfo.queue ();
 
 			printFormat (
-				"%s\n",
-				Html.magicTr (
-					requestContext.resolveContextUrl (
-						stringFormat (
-							"%s",
-							queueContext.pathPrefix (),
-							"/%u",
-							queue.getId ())),
-					false),
+				"<tr",
+				" class=\"magic-table-row\"",
 
+				" data-target-href=\"%h\"",
+				requestContext.resolveContextUrl (
+					stringFormat (
+						"%s",
+						queueContext.pathPrefix (),
+						"/%u",
+						queue.getId ())),
+
+				">\n");
+
+			printFormat (
 				"<td>%h</td>\n",
 				objectManager.objectPath (
 					objectManager.getParent (
 						queue),
 					null,
 					false,
-					false),
+					false));
 
+			printFormat (
 				"<td>%h</td>\n",
-				queue.getCode (),
+				queue.getCode ());
 
-				// available
+			// available
 
+			printFormat (
 				"<td>%h</td>\n",
-				queueInfo.availableItems (),
+				queueInfo.availableItems ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				queueInfo.availableItems () > 0
 					? requestContext.prettyDateDiff (
 						millisToInstant (queueInfo.oldestAvailable ()),
 						now)
-					: "-",
+					: "-");
 
-				// claimed
+			// claimed
 
+			printFormat (
 				"<td>%h</td>\n",
-				queueInfo.claimedItems (),
+				queueInfo.claimedItems ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				queueInfo.claimedItems () > 0
 					? requestContext.prettyDateDiff (
 						millisToInstant (queueInfo.oldestClaimed ()),
 						now)
-					: "-",
+					: "-");
 
-				// preferred
+			// preferred
 
+			printFormat (
 				"<td>%h</td>\n",
-				queueInfo.preferredItems (),
+				queueInfo.preferredItems ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				queueInfo.preferredItems () > 0
 					? requestContext.prettyDateDiff (
 						millisToInstant (queueInfo.oldestPreferred ()),
 						now)
-					: "-",
+					: "-");
 
-				// waiting
+			// waiting
 
+			printFormat (
 				"<td>%h</td>\n",
-				queueInfo.waitingItems (),
+				queueInfo.waitingItems ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				queueInfo.waitingItems () > 0
 					? requestContext.prettyDateDiff (
-						millisToInstant (queueInfo.oldestWaiting ()),
+						millisToInstant (
+							queueInfo.oldestWaiting ()),
 						now)
-					: "-",
+					: "-");
 
-				// total
+			// total
 
+			printFormat (
 				"<td>%h</td>\n",
-				queueInfo.totalItems (),
+				queueInfo.totalItems ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				queueInfo.totalItems () > 0
 					? requestContext.prettyDateDiff (
 						millisToInstant (queueInfo.oldest ()),
 						now)
-					: "-",
+					: "-");
 
+			printFormat (
 				"</tr>\n");
 
 		}

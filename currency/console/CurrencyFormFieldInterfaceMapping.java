@@ -5,8 +5,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
@@ -40,16 +44,18 @@ class CurrencyFormFieldInterfaceMapping<Container extends Record<?>>
 
 	@Override
 	public
-	Long interfaceToGeneric (
-			Container container,
-			String interfaceValue,
-			List<String> errors) {
+	Optional<Long> interfaceToGeneric (
+			@NonNull Container container,
+			@NonNull Optional<String> interfaceValue,
+			@NonNull List<String> errors) {
 
-		if (interfaceValue == null)
-			return null;
+		if (! interfaceValue.isPresent ()) {
+			return Optional.<Long>absent ();
+		}
 
-		if (interfaceValue.isEmpty ())
-			return null;
+		if (interfaceValue.get ().isEmpty ()) {
+			return Optional.<Long>absent ();
+		}
 
 		CurrencyRec currency =
 			(CurrencyRec)
@@ -60,14 +66,16 @@ class CurrencyFormFieldInterfaceMapping<Container extends Record<?>>
 
 		if (currency != null) {
 
-			return currencyLogic.parseText (
-				currency,
-				interfaceValue);
+			return Optional.of (
+				currencyLogic.parseText (
+					currency,
+					interfaceValue.get ()));
 
 		} else {
 
-			return Long.parseLong (
-				interfaceValue);
+			return Optional.of (
+				Long.parseLong (
+					interfaceValue.get ()));
 
 		}
 
@@ -75,12 +83,13 @@ class CurrencyFormFieldInterfaceMapping<Container extends Record<?>>
 
 	@Override
 	public
-	String genericToInterface (
-			Container container,
-			Long genericValue) {
+	Optional<String> genericToInterface (
+			@NonNull Container container,
+			@NonNull Optional<Long> genericValue) {
 
-		if (genericValue == null)
-			return null;
+		if (! genericValue.isPresent ()) {
+			return Optional.<String>absent ();
+		}
 
 		CurrencyRec currency =
 			(CurrencyRec)
@@ -89,19 +98,22 @@ class CurrencyFormFieldInterfaceMapping<Container extends Record<?>>
 				container,
 				currencyPath);
 
-		if (genericValue == 0 && blankIfZero)
-			return "";
+		if (genericValue.get () == 0 && blankIfZero) {
+			return Optional.of ("");
+		}
 
 		if (currency != null) {
 
-			return currencyLogic.formatText (
-				currency,
-				genericValue);
+			return Optional.of (
+				currencyLogic.formatText (
+					currency,
+					genericValue.get ()));
 
 		} else {
 
-			return Long.toString (
-				genericValue);
+			return Optional.of (
+				Long.toString (
+					genericValue.get ()));
 
 		}
 

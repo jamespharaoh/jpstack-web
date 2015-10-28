@@ -7,6 +7,9 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.forms.FormFieldLogic;
@@ -153,8 +156,8 @@ class ObjectSettingsAction
 				updateResultSet,
 				object,
 				(PermanentRecord<?>) object,
-				null,
-				null);
+				Optional.<Object>absent (),
+				Optional.<String>absent ());
 
 		} else {
 
@@ -171,8 +174,10 @@ class ObjectSettingsAction
 				updateResultSet,
 				object,
 				linkObject,
-				objectRef,
-				objectType);
+				Optional.of (
+					objectRef),
+				Optional.of (
+					objectType));
 
 		}
 

@@ -4,6 +4,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
+
+import com.google.common.base.Optional;
+
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.event.model.EventRec;
@@ -22,10 +26,10 @@ class EventDetailsFormFieldInterfaceMapping
 
 	@Override
 	public
-	EventRec interfaceToGeneric (
-			EventRec container,
-			String interfaceValue,
-			List<String> errors) {
+	Optional<EventRec> interfaceToGeneric (
+			@NonNull EventRec container,
+			@NonNull Optional<String> interfaceValue,
+			@NonNull List<String> errors) {
 
 		throw new UnsupportedOperationException ();
 
@@ -33,12 +37,13 @@ class EventDetailsFormFieldInterfaceMapping
 
 	@Override
 	public
-	String genericToInterface (
-			EventRec container,
-			EventRec genericValue) {
+	Optional<String> genericToInterface (
+			@NonNull EventRec container,
+			@NonNull Optional<EventRec> genericValue) {
 
-		return eventConsoleLogic.eventText (
-			genericValue);
+		return Optional.of (
+			eventConsoleLogic.eventText (
+				genericValue.get ()));
 
 	}
 

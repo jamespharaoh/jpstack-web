@@ -31,6 +31,7 @@
 		<bean class="console.EventDetailsFormFieldBuilder"/>
 		<bean class="console.EventDetailsFormFieldInterfaceMapping"/>
 		<bean class="console.EventDetailsFormFieldSpec"/>
+		<bean class="console.EventFormFieldPluginProvider"/>
 		<bean class="console.NameFormFieldUpdateHook"/>
 		<bean class="console.ObjectEventsPageBuilder"/>
 		<bean class="console.ObjectEventsPageSpec"/>

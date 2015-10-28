@@ -2,6 +2,7 @@ package wbs.platform.object.search;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.console.module.ConsoleModuleData;
 import wbs.console.module.ConsoleModuleSpec;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -35,6 +36,9 @@ class ObjectSearchPageSpec {
 
 	@DataAttribute ("results-fields")
 	String resultsFieldsName;
+
+	@DataAttribute ("results-rows-fields")
+	String resultsRowsFieldsName;
 
 	@DataAttribute
 	String privKey;
