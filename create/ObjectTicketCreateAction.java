@@ -11,6 +11,9 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
@@ -386,8 +389,8 @@ class ObjectTicketCreateAction
 				updateResultSet,
 				ticket,
 				(PermanentRecord<?>) ticket,
-				null,
-				null);
+				Optional.<Object>absent (),
+				Optional.<String>absent ());
 
 		} else {
 
@@ -395,8 +398,10 @@ class ObjectTicketCreateAction
 				updateResultSet,
 				ticket,
 				(PermanentRecord<?>) ticketManager,
-				objectRef,
-				consoleHelper.shortName ());
+				Optional.of (
+					objectRef),
+				Optional.of (
+					consoleHelper.shortName ()));
 
 		}
 

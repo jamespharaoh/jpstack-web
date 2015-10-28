@@ -7,6 +7,10 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+
 import wbs.console.context.ConsoleContextScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.PrivChecker;
@@ -18,10 +22,6 @@ import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketStateRec;
 import wbs.services.ticket.core.model.TicketTemplateRec;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 
 @PrototypeComponent ("ticketPendingFormResponder")
 public
@@ -144,7 +144,8 @@ class TicketPendingFormResponder
 	public
 	void renderHtmlBodyContents () {
 
-		requestContext.flushNotices (out);
+		requestContext.flushNotices (
+			printWriter);
 
 		printFormat (
 			"<p",
