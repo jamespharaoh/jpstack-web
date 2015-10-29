@@ -2,6 +2,8 @@ package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 
 import lombok.Getter;
@@ -9,9 +11,13 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
+import wbs.console.html.JqueryScriptRef;
+import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -43,6 +49,24 @@ class ObjectSearchPart
 	// state
 
 	Object search;
+
+	// details
+
+	@Override
+	public
+	Set<ScriptRef> scriptRefs () {
+
+		return ImmutableSet.<ScriptRef>builder ()
+
+			.addAll (
+				super.scriptRefs ())
+
+			.add (
+				JqueryScriptRef.instance)
+
+			.build ();
+
+	}
 
 	// implementation
 
@@ -102,7 +126,14 @@ class ObjectSearchPart
 			"<p><input",
 			" type=\"submit\"",
 			" value=\"search\"",
-			"></p>\n");
+			">\n");
+
+		printFormat (
+			"<input",
+			" type=\"button\"",
+			" value=\"reset form\"",
+			" onclick=\"resetSearchForm (); return false\"",
+			">\n");
 
 		printFormat (
 			"</form>\n");

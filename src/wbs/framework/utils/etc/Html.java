@@ -477,8 +477,10 @@ class Html {
 				name,
 				">\n"));
 
-		for (Map.Entry<? extends Key,String> optionEntry
-				: options.entrySet ()) {
+		for (
+			Map.Entry<? extends Key,String> optionEntry
+				: options.entrySet ()
+		) {
 
 			stringBuilder.append (
 				option (

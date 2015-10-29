@@ -159,6 +159,8 @@ class TextFormFieldRenderer<Container>
 			" type=\"text\"",
 			" size=\"%h\"",
 			size (),
+			" id=\"%h\"",
+			name (),
 			" name=\"%h\"",
 			name (),
 			" value=\"%h\"",
@@ -221,7 +223,7 @@ class TextFormFieldRenderer<Container>
 				"")
 
 		) {
-			return null;
+			return Optional.<String>absent ();
 		}
 
 		return Optional.fromNullable (

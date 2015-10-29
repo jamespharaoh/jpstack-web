@@ -233,25 +233,32 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		}
 
 		out.writeFormat (
-			"<select name=\"%h\">\n",
-			name);
+			"<select",
+			" id=\"%h\"",
+			name,
+			" name=\"%h\"",
+			name,
+			">\n");
 
 		// unchanged option
 
 		out.writeFormat (
-			"<option value=\"unchanged\">%h</option>\n",
-			interfaceValue == null
-				? "none"
-				: objectManager.objectPath (
+			"<option",
+			" value=\"unchanged\"",
+			">%h</option>\n",
+			interfaceValue.isPresent ()
+				? objectManager.objectPath (
 					(Record<?>) interfaceValue.get (),
 					root,
 					true,
-					true));
+					true)
+				: "none");
 
 		// null option
 
 		out.writeFormat (
-			"<option value=\"null\"",
+			"<option",
+			" value=\"null\"",
 			equal (
 					requestContext.getForm (name),
 					"null")
@@ -262,15 +269,15 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		// value options
 
 		for (
-			Map.Entry<String,Record<?>> ent
+			Map.Entry<String,Record<?>> optionEntry
 				: sortedOptions.entrySet ()
 		) {
 
 			String path =
-				ent.getKey ();
+				optionEntry.getKey ();
 
 			Record<?> option =
-				ent.getValue ();
+				optionEntry.getValue ();
 
 			ObjectHelper<?> objectHelper =
 				objectManager.objectHelperForObject (option);
@@ -340,7 +347,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 				name ());
 
 		if (param == null) {
-			Optional.<Interface>absent ();
+			return Optional.<Interface>absent ();
 		}
 
 		if (
