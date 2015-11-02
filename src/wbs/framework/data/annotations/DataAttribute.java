@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 public
 @interface DataAttribute {
 
-	String value ()
+	String name ()
 	default "";
 
 	String collection ()

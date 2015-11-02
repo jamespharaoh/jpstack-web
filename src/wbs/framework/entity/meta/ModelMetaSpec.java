@@ -38,7 +38,7 @@ class ModelMetaSpec {
 	ModelMetaType type;
 
 	@DataAttribute (
-		value = "table")
+		name = "table")
 	String tableName;
 
 	@DataAttribute

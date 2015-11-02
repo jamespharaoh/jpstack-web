@@ -19,11 +19,11 @@ class IndexFieldSpec
 	String name;
 
 	@DataAttribute (
-		value = "counter")
+		name = "counter")
 	String counterName;
 
 	@DataAttribute (
-		value = "column")
+		name = "column")
 	String columnName;
 
 }

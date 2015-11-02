@@ -226,6 +226,9 @@ class TimestampFormFieldBuilder {
 				.interfaceMapping (
 					interfaceMapping)
 
+				.csvMapping (
+					interfaceMapping)
+
 				.renderer (
 					renderer)
 
@@ -256,6 +259,9 @@ class TimestampFormFieldBuilder {
 					constraintValidator)
 
 				.interfaceMapping (
+					interfaceMapping)
+
+				.csvMapping (
 					interfaceMapping)
 
 				.renderer (

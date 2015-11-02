@@ -13,4 +13,7 @@ interface ConsoleHooks<RecordType extends Record<RecordType>> {
 	Optional<String> getListClass (
 			RecordType object);
 
+	void applySearchFilter (
+			Object searchObject);
+
 }

@@ -127,6 +127,9 @@ class IdFormFieldBuilder {
 			.interfaceMapping (
 				interfaceMapping)
 
+			.csvMapping (
+				interfaceMapping)
+
 			.renderer (
 				renderer)
 

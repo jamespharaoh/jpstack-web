@@ -24,12 +24,12 @@ class ChildrenListSpec
 	String name;
 
 	@DataAttribute (
-		value = "type",
+		name = "type",
 		required = true)
 	String typeName;
 
 	@DataAttribute (
-		value = "list-index-column")
+		name = "list-index-column")
 	String listIndexColumnName;
 
 	@DataAttribute

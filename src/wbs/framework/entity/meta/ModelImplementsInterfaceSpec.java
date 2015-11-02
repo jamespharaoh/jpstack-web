@@ -19,7 +19,7 @@ class ModelImplementsInterfaceSpec {
 	ModelMetaSpec modelMeta;
 
 	@DataAttribute (
-		value = "package")
+		name = "package")
 	String packageName;
 
 	@DataAttribute (

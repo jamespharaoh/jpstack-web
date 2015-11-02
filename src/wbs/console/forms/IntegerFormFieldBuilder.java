@@ -117,21 +117,23 @@ class IntegerFormFieldBuilder {
 				spec.maximum (),
 				Long.MAX_VALUE);
 
+/*
 		Boolean dynamic =
 				ifNull (spec.dynamic(),
 						false);
+*/
 
-		Class<?> propertyClass;
+		Class<?> propertyClass =
+			BeanLogic.propertyClass (
+				context.containerClass (),
+				name);
 
-		if (!dynamic) {
-			propertyClass =
-				BeanLogic.propertyClass (
-					context.containerClass (),
-					name);
-		}
-		else {
+/*
+		if (! dynamic) {
+		} else {
 			propertyClass = Integer.class;
 		}
+*/
 
 		Boolean blankIfZero =
 			ifNull (
@@ -146,8 +148,10 @@ class IntegerFormFieldBuilder {
 			.name (
 				name)
 
+/*
 			.dynamic (
 				dynamic)
+*/
 
 			.nativeClass (
 				propertyClass);

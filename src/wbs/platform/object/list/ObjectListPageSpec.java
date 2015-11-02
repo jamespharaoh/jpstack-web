@@ -30,13 +30,16 @@ class ObjectListPageSpec {
 	@DataAttribute
 	String typeCode;
 
-	@DataAttribute ("fields")
+	@DataAttribute (
+		name = "fields")
 	String fieldsName;
 
-	@DataAttribute ("fields-provider")
+	@DataAttribute (
+		name = "fields-provider")
 	String fieldsProviderName;
 
-	@DataAttribute ("target-context-type")
+	@DataAttribute (
+		name = "target-context-type")
 	String targetContextTypeName;
 
 	// children

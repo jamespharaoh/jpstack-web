@@ -28,7 +28,7 @@ class PluginBeanSpec {
 	PluginLayerSpec layer;
 
 	@DataAttribute (
-		value = "class",
+		name = "class",
 		required = true)
 	@Getter @Setter
 	String className;

@@ -2,6 +2,7 @@ package wbs.framework.entity.meta;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
@@ -20,7 +21,7 @@ class DateFieldSpec
 	String name;
 
 	@DataAttribute (
-		value = "column")
+		name = "column")
 	String columnName;
 
 	@DataAttribute

@@ -18,7 +18,7 @@ class ObjectListBrowserSpec {
 	// attributes
 
 	@DataAttribute (
-		value = "field",
+		name = "field",
 		required = true)
 	String fieldName;
 

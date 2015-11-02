@@ -76,7 +76,12 @@ class EventFormFieldPluginProvider
 			// other fields use simple update hook
 
 			return Optional.of (
-				simpleFormFieldUpdateHookProvider.get ());
+				simpleFormFieldUpdateHookProvider.get ()
+
+				.fieldName (
+					fieldName)
+
+			);
 
 		}
 

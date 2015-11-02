@@ -19,7 +19,7 @@ class IdentityStringFieldSpec
 	String name;
 
 	@DataAttribute (
-		value = "column")
+		name = "column")
 	String columnName;
 
 }

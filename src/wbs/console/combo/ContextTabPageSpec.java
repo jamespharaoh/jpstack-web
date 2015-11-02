@@ -42,7 +42,8 @@ class ContextTabPageSpec {
 	@DataAttribute
 	String title;
 
-	@DataAttribute ("page-part")
+	@DataAttribute (
+		name = "page-part")
 	String pagePartName;
 
 	@DataAttribute

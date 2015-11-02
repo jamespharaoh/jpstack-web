@@ -112,6 +112,10 @@ interface ObjectManagerMethods {
 			Record<?> dataObject,
 			Record<?> root);
 
+	String objectPathMiniPreload (
+			Record<?> dataObject,
+			Record<?> root);
+
 	String objectPath (
 			Record<?> dataObject,
 			Record<?> root);

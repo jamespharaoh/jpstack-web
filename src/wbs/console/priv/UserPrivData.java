@@ -1,6 +1,7 @@
 package wbs.console.priv;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collection;
@@ -132,22 +133,36 @@ class UserPrivData {
 
 			// check each named priv and any chained
 
-			for (String privCode
-					: privCodes) {
+			for (
+				String privCode
+					: privCodes
+			) {
 
-				if (equal (privCode, "manage"))
+				if (
+					equal (
+						privCode,
+						"manage")
+				) {
 					continue;
+				}
 
 				Integer privId =
-					objectData.privIdsByCode.get (privCode);
+					objectData.privIdsByCode.get (
+						privCode);
 
-				if (privId == null) {
+				if (
+					isNull (
+						privId)
+				) {
 
 					String objectTypeCode =
 						sharedData.objectTypeCodesById.get (
 							parentObjectId.typeId ());
 
-					if (objectTypeCode == null) {
+					if (
+						isNull (
+							objectTypeCode)
+					) {
 
 						throw new IllegalArgumentException (
 							stringFormat (
@@ -158,9 +173,8 @@ class UserPrivData {
 
 					throw new IllegalArgumentException (
 						stringFormat (
-							"Unknown priv %s (%s) on object type %s (%s)",
+							"Unknown priv %s on object type %s (%s)",
 							privCode,
-							privId,
 							objectTypeCode,
 							parentObjectId.objectId ()));
 

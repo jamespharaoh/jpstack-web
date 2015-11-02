@@ -2,6 +2,7 @@ package wbs.console.combo;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.console.module.ConsoleModuleData;
 import wbs.console.module.ConsoleModuleSpec;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -28,22 +29,27 @@ class ContextTabResponderPageSpec {
 		required = true)
 	String name;
 
-	@DataAttribute ("tab")
+	@DataAttribute (
+		name = "tab")
 	String tabName;
 
 	@DataAttribute
 	String tabLabel;
 
-	@DataAttribute ("file")
+	@DataAttribute (
+		name = "file")
 	String fileName;
 
-	@DataAttribute ("responder")
+	@DataAttribute (
+		name = "responder")
 	String responderName;
 
-	@DataAttribute ("title")
+	@DataAttribute (
+		name = "title")
 	String pageTitle;
 
-	@DataAttribute ("page-part")
+	@DataAttribute (
+		name = "page-part")
 	String pagePartName;
 
 	@DataAttribute

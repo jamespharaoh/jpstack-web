@@ -35,7 +35,7 @@ class ExtendContextSpec {
 	ConsoleModuleSpec consoleSpec;
 
 	@DataAttribute (
-		value = "extension-point",
+		name = "extension-point",
 		required = true)
 	String extensionPointName;
 

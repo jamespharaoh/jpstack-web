@@ -23,17 +23,17 @@ class AssociativeCollectionSpec
 	String name;
 
 	@DataAttribute (
-		value = "type",
+		name = "type",
 		required = true)
 	String typeName;
 
 	@DataAttribute (
-		value = "table",
+		name = "table",
 		required = true)
 	String tableName;
 
 	@DataAttribute (
-		value = "value-column")
+		name = "value-column")
 	String valueColumnName;
 
 	@DataAttribute

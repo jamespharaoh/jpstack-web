@@ -19,7 +19,7 @@ class MasterFieldSpec
 	String name;
 
 	@DataAttribute (
-		value = "type",
+		name = "type",
 		required = true)
 	String typeName;
 

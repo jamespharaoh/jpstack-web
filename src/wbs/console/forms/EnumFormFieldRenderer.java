@@ -3,7 +3,6 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
-import static wbs.framework.utils.etc.Misc.toStringNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,9 +84,10 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 				: "",
 
 			">%h</td>\n",
-			camelToSpaces (
-				toStringNull (
-					interfaceValue)));
+			interfaceValue.isPresent ()
+				? camelToSpaces (
+					interfaceValue.get ().toString ())
+				: "");
 
 	}
 

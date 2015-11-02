@@ -27,7 +27,7 @@ class TimestampFieldSpec
 	Boolean nullable;
 
 	@DataAttribute (
-		value = "column")
+		name = "column")
 	String columnName;
 
 	public static

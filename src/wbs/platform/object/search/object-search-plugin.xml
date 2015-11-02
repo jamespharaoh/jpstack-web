@@ -3,6 +3,7 @@
 	package="wbs.platform.object.search">
 
 	<layer name="console">
+		<bean class="ObjectSearchCsvResponder"/>
 		<bean class="ObjectSearchGetAction"/>
 		<bean class="ObjectSearchPageBuilder"/>
 		<bean class="ObjectSearchPageSpec"/>

@@ -26,16 +26,20 @@ class SimpleFileSpec {
 		required = true)
 	String path;
 
-	@DataAttribute ("get-responder")
+	@DataAttribute (
+		name = "get-responder")
 	String getResponderName;
 
-	@DataAttribute ("get-action")
+	@DataAttribute (
+		name = "get-action")
 	String getActionName;
 
-	@DataAttribute ("post-responder")
+	@DataAttribute (
+		name = "post-responder")
 	String postResponderName;
 
-	@DataAttribute ("post-action")
+	@DataAttribute (
+		name = "post-action")
 	String postActionName;
 
 }

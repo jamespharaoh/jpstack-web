@@ -37,7 +37,7 @@ class FormFieldSetSpec {
 	String name;
 
 	@DataAttribute (
-		value = "class")
+		name = "class")
 	String className;
 
 	@DataAttribute

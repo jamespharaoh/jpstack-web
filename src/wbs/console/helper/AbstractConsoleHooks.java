@@ -1,5 +1,7 @@
 package wbs.console.helper;
 
+import static wbs.framework.utils.etc.Misc.doNothing;
+
 import com.google.common.base.Optional;
 
 import wbs.framework.record.Record;
@@ -23,6 +25,15 @@ class AbstractConsoleHooks<Type extends Record<Type>>
 			Type object) {
 
 		return Optional.<String>absent ();
+
+	}
+
+	@Override
+	public
+	void applySearchFilter (
+			Object searchObject) {
+
+		doNothing ();
 
 	}
 

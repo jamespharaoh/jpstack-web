@@ -11,10 +11,8 @@ import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
 
-import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 
 @Accessors (fluent = true)
@@ -27,9 +25,6 @@ class SimpleFormFieldAccessor<Container,Native>
 
 	@Getter @Setter
 	String name;
-
-	@Getter @Setter
-	Boolean dynamic;
 
 	@Getter @Setter
 	Class<? extends Native> nativeClass;
@@ -48,6 +43,10 @@ class SimpleFormFieldAccessor<Container,Native>
 
 		Object nativeObject;
 
+		// TODO dynamic should be handled by a separate class
+
+		/*
+
 		if (dynamic != null && dynamic) {
 
 			ConsoleHelper<?> consoleHelper =
@@ -60,13 +59,12 @@ class SimpleFormFieldAccessor<Container,Native>
 					name);
 
 		} else {
+		*/
 
-			 nativeObject =
-				BeanLogic.getProperty (
-					container,
-					name);
-
-		}
+		 nativeObject =
+			BeanLogic.getProperty (
+				container,
+				name);
 
 		// special case for null
 
@@ -126,6 +124,9 @@ class SimpleFormFieldAccessor<Container,Native>
 
 		// set property
 
+		// TODO dynamic should be handled by a separate class
+
+		/*
 		if (dynamic != null && dynamic) {
 
 			ConsoleHelper<?> consoleHelper =
@@ -137,16 +138,13 @@ class SimpleFormFieldAccessor<Container,Native>
 				name,
 				nativeValue);
 
-		}
+		} else {
+		*/
 
-		else {
-
-			BeanLogic.setProperty (
-				container,
-				name,
-				nativeValue);
-
-		}
+		BeanLogic.setProperty (
+			container,
+			name,
+			nativeValue.orNull ());
 
 	}
 

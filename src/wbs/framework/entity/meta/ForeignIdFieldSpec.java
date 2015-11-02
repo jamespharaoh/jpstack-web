@@ -16,7 +16,7 @@ class ForeignIdFieldSpec
 	implements ModelFieldSpec {
 
 	@DataAttribute (
-		value = "field")
+		name = "field")
 	String fieldName;
 
 }

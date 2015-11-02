@@ -15,6 +15,7 @@ import wbs.console.forms.FormFieldBuilderContext;
 import wbs.console.forms.FormFieldConstraintValidator;
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.console.forms.FormFieldNativeMapping;
+import wbs.console.forms.FormFieldPluginManagerImplementation;
 import wbs.console.forms.FormFieldRenderer;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormFieldUpdateHook;
@@ -35,7 +36,6 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.utils.etc.BeanLogic;
-import wbs.platform.event.console.SimpleFormFieldUpdateHook;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("currencyFormFieldBuilder")
@@ -43,15 +43,16 @@ import wbs.platform.event.console.SimpleFormFieldUpdateHook;
 public
 class CurrencyFormFieldBuilder {
 
+	// dependencies
+
+	@Inject
+	FormFieldPluginManagerImplementation formFieldPluginManager;
+
 	// prototype dependencies
 
 	@Inject
 	Provider<ReadOnlyFormField>
 	readOnlyFormFieldProvider;
-
-	@Inject
-	Provider<SimpleFormFieldUpdateHook>
-	simpleFormFieldUpdateHookProvider;
 
 	@Inject
 	Provider<UpdatableFormField>
@@ -234,9 +235,9 @@ class CurrencyFormFieldBuilder {
 		// update hook
 
 		FormFieldUpdateHook updateHook =
-			simpleFormFieldUpdateHookProvider.get ()
-
-			.name (
+			formFieldPluginManager.getUpdateHook (
+				context,
+				context.containerClass (),
 				name);
 
 		// field

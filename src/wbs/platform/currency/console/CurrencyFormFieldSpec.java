@@ -28,11 +28,13 @@ class CurrencyFormFieldSpec {
 	@DataAttribute
 	Boolean readOnly;
 
-	@DataAttribute ("min")
+	@DataAttribute (
+		name = "min")
 	Long minimum =
 		Long.MIN_VALUE;
 
-	@DataAttribute ("max")
+	@DataAttribute (
+		name = "max")
 	Long maximum =
 		Long.MAX_VALUE;
 
@@ -40,7 +42,7 @@ class CurrencyFormFieldSpec {
 	Integer size;
 
 	@DataAttribute (
-		value = "currency",
+		name = "currency",
 		required = true)
 	String currencyPath;
 

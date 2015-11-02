@@ -26,7 +26,8 @@ class SimplePathSpec {
 		required = true)
 	String path;
 
-	@DataAttribute ("handler")
+	@DataAttribute (
+		name = "handler")
 	String pathHandlerName;
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.console.module.ConsoleModuleData;
 import wbs.console.module.ConsoleModuleSpec;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -26,10 +27,12 @@ public class ObjectTicketCreatePageSpec {
 
 	// attributes
 
-	@DataAttribute ("ticket-manager")
+	@DataAttribute (
+		name = "ticket-manager")
 	String ticketManager;
 
-	@DataAttribute ("fields-provider")
+	@DataAttribute (
+		name = "fields-provider")
 	String fieldsProviderName;
 
 	@DataAttribute
@@ -41,7 +44,8 @@ public class ObjectTicketCreatePageSpec {
 	@DataAttribute
 	String title;
 
-	@DataAttribute ("tab")
+	@DataAttribute (
+		name = "tab")
 	String tabName;
 
 	@DataAttribute
@@ -50,13 +54,16 @@ public class ObjectTicketCreatePageSpec {
 	@DataAttribute
 	String localFile;
 
-	@DataAttribute ("responder")
+	@DataAttribute (
+		name = "responder")
 	String responderName;
 
-	@DataAttribute ("target-context-type")
+	@DataAttribute (
+		name = "target-context-type")
 	String targetContextTypeName;
 
-	@DataAttribute ("target-responder")
+	@DataAttribute (
+		name = "target-responder")
 	String targetResponderName;
 
 	@DataAttribute

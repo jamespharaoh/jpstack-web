@@ -30,7 +30,8 @@ class ContextTabActionPageSpec {
 	@DataAttribute
 	String title;
 
-	@DataAttribute ("tab")
+	@DataAttribute (
+		name = "tab")
 	String tabName;
 
 	@DataAttribute
@@ -39,16 +40,20 @@ class ContextTabActionPageSpec {
 	@DataAttribute
 	String localFile;
 
-	@DataAttribute ("responder")
+	@DataAttribute (
+		name = "responder")
 	String responderName;
 
-	@DataAttribute ("action")
+	@DataAttribute (
+		name = "action")
 	String actionName;
 
-	@DataAttribute ("page-part")
+	@DataAttribute (
+		name = "page-part")
 	String pagePartName;
 
 	@DataAttribute
-	Boolean hideTab = false;
+	Boolean hideTab =
+		false;
 
 }

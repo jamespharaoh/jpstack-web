@@ -1,6 +1,7 @@
 package wbs.console.helper;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -482,6 +483,27 @@ class ConsoleHelperBuilder {
 			} else {
 
 				return Optional.<String>absent ();
+
+			}
+
+		}
+
+		@Override
+		public
+		void applySearchFilter (
+				Object searchObject) {
+
+			if (
+				isNotNull (
+					consoleHooks)
+			) {
+
+				consoleHooks.applySearchFilter (
+					searchObject);
+
+			} else {
+
+				doNothing ();
 
 			}
 

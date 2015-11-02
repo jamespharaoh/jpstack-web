@@ -19,7 +19,7 @@ class TypeCodeFieldSpec
 	String name;
 
 	@DataAttribute (
-		value = "column")
+		name = "column")
 	String columnName;
 
 }

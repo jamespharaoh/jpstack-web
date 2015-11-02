@@ -20,7 +20,7 @@ import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
-import wbs.sms.message.core.console.MessageConsoleStuff;
+import wbs.sms.message.core.console.MessageConsoleLogic;
 
 @PrototypeComponent ("chatUserHelpPart")
 public
@@ -34,6 +34,9 @@ class ChatUserHelpPart
 
 	@Inject
 	ChatUserLogic chatUserLogic;
+
+	@Inject
+	MessageConsoleLogic messageConsoleLogic;
 
 	@Inject
 	TimeFormatter timeFormatter;
@@ -136,37 +139,43 @@ class ChatUserHelpPart
 			}
 
 			String rowClass =
-				MessageConsoleStuff.classForMessageDirection (
+				messageConsoleLogic.classForMessageDirection (
 					chatHelpLog.getDirection ());
 
 			printFormat (
 				"<tr class=\"%h\">\n",
-				rowClass,
+				rowClass);
 
+			printFormat (
 				"<td style=\"background: %h\">&nbsp;</td>\n",
 				Html.genHtmlColor (
 					ifNull (
 						chatHelpLog.getOurNumber (),
-						0)),
+						0)));
 
+			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimeString (
 					chatUserLogic.timezone (
 						chatUser),
 					dateToInstant (
-						chatHelpLog.getTimestamp ())),
+						chatHelpLog.getTimestamp ())));
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatHelpLog.getText (),
+				chatHelpLog.getText ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatHelpLog.getOurNumber (),
+				chatHelpLog.getOurNumber ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatHelpLog.getUser () == null
 					? ""
-					: chatHelpLog.getUser ().getUsername (),
+					: chatHelpLog.getUser ().getUsername ());
 
+			printFormat (
 				"</tr>\n");
 
 		}

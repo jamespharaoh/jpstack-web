@@ -30,11 +30,13 @@ class FloatingPointFormFieldSpec {
 	@DataAttribute
 	Boolean readOnly;
 
-	@DataAttribute ("minimum")
+	@DataAttribute (
+		name = "minimum")
 	Double minimum =
 		Double.NEGATIVE_INFINITY;
 
-	@DataAttribute ("maximum")
+	@DataAttribute (
+		name = "maximum")
 	Double maximum =
 		Double.POSITIVE_INFINITY;
 

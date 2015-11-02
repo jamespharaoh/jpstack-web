@@ -22,16 +22,16 @@ class EnumFieldSpec
 	Boolean nullable;
 
 	@DataAttribute (
-		value = "type",
+		name = "type",
 		required = true)
 	String typeName;
 
 	@DataAttribute (
-		value = "default")
+		name = "default")
 	String defaultValue;
 
 	@DataAttribute (
-		value = "column")
+		name = "column")
 	String columnName;
 
 }

@@ -32,14 +32,15 @@ class ContextTabResponderSpec {
 	String title;
 
 	@DataAttribute (
-		value = "tab",
+		name = "tab",
 		required = true)
 	String tabName;
 
 	@DataAttribute
 	String responderName;
 
-	@DataAttribute ("page-part")
+	@DataAttribute (
+		name = "page-part")
 	String pagePartName;
 
 }

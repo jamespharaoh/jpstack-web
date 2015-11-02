@@ -183,8 +183,10 @@ class DataFromXml {
 
 		String elementName =
 			ifNull (
-				nullIfEmptyString (dataClassAnnotation.value ()),
-				camelToHyphen (dataClass.getSimpleName ()));
+				nullIfEmptyString (
+					dataClassAnnotation.value ()),
+				camelToHyphen (
+					dataClass.getSimpleName ()));
 
 		Field parentField =
 			findParentField (dataClass);
@@ -197,7 +199,8 @@ class DataFromXml {
 		// add to map
 
 		List<DataClassInfo> dataClassInfos =
-			dataClassesMap.get (elementName);
+			dataClassesMap.get (
+				elementName);
 
 		if (dataClassInfos == null) {
 
@@ -683,7 +686,8 @@ class DataFromXml {
 				if (annotation instanceof DataIgnore) {
 
 					matchedElementNames.add (
-						camelToHyphen (field.getName ()));
+						camelToHyphen (
+							field.getName ()));
 
 				}
 
@@ -698,7 +702,8 @@ class DataFromXml {
 
 			String attributeName =
 				ifNull (
-					nullIfEmptyString (dataAttributeAnnotation.value ()),
+					nullIfEmptyString (
+						dataAttributeAnnotation.name ()),
 					camelToHyphen (
 						field.getName ()));
 

@@ -23,11 +23,11 @@ class IntegerFieldSpec
 	Boolean nullable;
 
 	@DataAttribute (
-		value = "default")
+		name = "default")
 	Integer defaultValue;
 
 	@DataAttribute (
-		value = "column")
+		name = "column")
 	String columnName;
 
 }

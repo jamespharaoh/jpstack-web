@@ -37,7 +37,7 @@ class PluginSpec
 	String name;
 
 	@DataAttribute (
-		value = "package",
+		name = "package",
 		required = true)
 	@Getter @Setter
 	String packageName;

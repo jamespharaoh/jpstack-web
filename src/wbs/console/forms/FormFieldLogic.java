@@ -2,8 +2,6 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.isNull;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,7 +131,7 @@ class FormFieldLogic {
 
 	public
 	void outputTableHeadings (
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet) {
 
 		for (
@@ -141,7 +139,7 @@ class FormFieldLogic {
 				: formFieldSet.formFields ()
 		) {
 
-			out.writeFormat (
+			htmlWriter.writeFormat (
 				"<th>%h</th>\n",
 				formField.label ());
 
@@ -151,37 +149,47 @@ class FormFieldLogic {
 
 	public
 	void outputCsvHeadings (
-			@NonNull PrintWriter out,
-			@NonNull FormFieldSet formFieldSet) {
+			@NonNull FormatWriter csvWriter,
+			@NonNull List<FormFieldSet> formFieldSets) {
 
-		boolean first = true;
+		boolean first =
+			true;
 
 		for (
-			FormField formField
-				: formFieldSet.formFields ()
+			FormFieldSet formFieldSet
+				: formFieldSets
 		) {
 
-			if (! first)
-				out.write (",");
+			for (
+				FormField formField
+					: formFieldSet.formFields ()
+			) {
 
-			out.write ("\"");
+				if (! first) {
 
-			out.write (
-				formField.label ().replace ("\"", "\"\""));
+					csvWriter.writeFormat (
+						",");
 
-			out.write ("\"");
+				}
 
-			first = false;
+				csvWriter.writeFormat (
+					"\"%s\"",
+					formField.label ().replace ("\"", "\"\""));
+
+				first = false;
+
+			}
 
 		}
 
-		out.write ("\n");
+		csvWriter.writeFormat (
+			"\n");
 
 	}
 
 	public
 	void outputFormRows (
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object object) {
 
@@ -194,7 +202,7 @@ class FormFieldLogic {
 				continue;
 
 			formField.renderFormRow (
-				out,
+				htmlWriter,
 				object);
 
 		}
@@ -203,10 +211,10 @@ class FormFieldLogic {
 
 	public
 	void outputFormReset (
-			FormatWriter javascriptWriter,
-			String indent,
-			FormFieldSet formFieldSet,
-			Object object) {
+			@NonNull FormatWriter javascriptWriter,
+			@NonNull String indent,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Object object) {
 
 		for (
 			FormField formField
@@ -227,46 +235,52 @@ class FormFieldLogic {
 
 	public
 	void outputCsvRow (
-			FormatWriter out,
-			FormFieldSet formFieldSet,
-			Object object)
-		throws IOException {
+			@NonNull FormatWriter csvWriter,
+			@NonNull List<FormFieldSet> formFieldSets,
+			@NonNull Object object) {
 
 		boolean first = true;
 
 		for (
-			FormField formField
-				: formFieldSet.formFields ()
+			FormFieldSet formFieldSet
+				: formFieldSets
 		) {
 
-			if (formField.virtual ())
-				continue;
+			for (
+				FormField formField
+					: formFieldSet.formFields ()
+			) {
 
-			if (! first) {
+				if (formField.virtual ())
+					continue;
 
-				out.writeFormat (
-					",");
+				if (! first) {
+
+					csvWriter.writeFormat (
+						",");
+
+				}
+
+				formField.renderCsvRow (
+					csvWriter,
+					object);
+
+				first = false;
 
 			}
 
-			formField.renderCsvRow (
-				out,
-				object);
-
-			first = false;
-
 		}
 
-		out.writeFormat (
+		csvWriter.writeFormat (
 			"\n");
 
 	}
 
 	public
 	void outputTableCellsList (
-			FormatWriter out,
-			FormFieldSet formFieldSet,
-			Object object,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Object object,
 			boolean links) {
 
 		for (
@@ -278,7 +292,7 @@ class FormFieldLogic {
 				continue;
 
 			formField.renderTableCellList (
-				out,
+				htmlWriter,
 				object,
 				links,
 				1);
@@ -289,9 +303,9 @@ class FormFieldLogic {
 
 	public
 	void outputTableRowsList (
-			FormatWriter out,
-			FormFieldSet formFieldSet,
-			Object object,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Object object,
 			boolean links,
 			int colspan) {
 
@@ -304,7 +318,7 @@ class FormFieldLogic {
 				continue;
 
 			formField.renderTableCellList (
-				out,
+				htmlWriter,
 				object,
 				links,
 				colspan);
@@ -315,7 +329,7 @@ class FormFieldLogic {
 
 	public
 	void outputTableRows (
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object object) {
 
@@ -328,16 +342,16 @@ class FormFieldLogic {
 				continue;
 			}
 
-			out.writeFormat (
+			htmlWriter.writeFormat (
 				"<tr>\n",
 				"<th>%h</th>\n",
 				formField.label ());
 
 			formField.renderTableCellProperties (
-				out,
+				htmlWriter,
 				object);
 
-			out.writeFormat (
+			htmlWriter.writeFormat (
 				"</tr>\n");
 
 		}

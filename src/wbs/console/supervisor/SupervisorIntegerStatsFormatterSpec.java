@@ -23,16 +23,19 @@ class SupervisorIntegerStatsFormatterSpec {
 	@DataParent
 	SupervisorConfigSpec supervisorConfigSpec;
 
-	@DataAttribute (required = true)
+	@DataAttribute (
+		required = true)
 	String name;
 
 	@DataAttribute
 	String targetBase;
 
-	@DataAttribute ("target-group-param")
+	@DataAttribute (
+		name = "target-group-param")
 	String targetGroupParamName;
 
-	@DataAttribute ("target-step-param")
+	@DataAttribute (
+		name = "target-step-param")
 	String targetStepParamName;
 
 	@DataChildren (

@@ -14,6 +14,7 @@
 		<bean class="DeletedFormFieldSpec"/>
 		<bean class="DescriptionFormFieldBuilder"/>
 		<bean class="DescriptionFormFieldSpec"/>
+		<bean class="EnumCsvFormFieldInterfaceMapping"/>
 		<bean class="EnumFormFieldBuilder"/>
 		<bean class="EnumFormFieldRenderer"/>
 		<bean class="EnumFormFieldSpec"/>
@@ -51,6 +52,7 @@
 		<bean class="NullFormFieldConstraintValidator"/>
 		<bean class="NullFormFieldUpdateHook"/>
 		<bean class="NullFormFieldValueValidator"/>
+		<bean class="ObjectCsvFormFieldInterfaceMapping"/>
 		<bean class="ObjectFormFieldBuilder"/>
 		<bean class="ObjectFormFieldConstraintValidator"/>
 		<bean class="ObjectFormFieldRenderer"/>
@@ -98,6 +100,7 @@
 		<bean class="UploadFormFieldBuilder"/>
 		<bean class="UploadFormFieldRenderer"/>
 		<bean class="UploadFormFieldSpec"/>
+		<bean class="YesNoCsvFormFieldInterfaceMapping"/>
 		<bean class="YesNoFormFieldBuilder"/>
 		<bean class="YesNoFormFieldRenderer"/>
 		<bean class="YesNoFormFieldSpec"/>

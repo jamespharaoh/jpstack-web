@@ -2,9 +2,8 @@
 package wbs.console.forms;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.module.ConsoleModuleData;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -21,8 +20,8 @@ class IntegerFormFieldSpec {
 	@DataAttribute
 	String name;
 
-	@Getter @Setter
-	boolean dynamic;
+	@DataAttribute
+	Boolean dynamic;
 
 	@DataAttribute
 	String delegate;
@@ -36,11 +35,13 @@ class IntegerFormFieldSpec {
 	@DataAttribute
 	Boolean readOnly;
 
-	@DataAttribute ("min")
+	@DataAttribute (
+		name = "min")
 	Long minimum =
 		Long.MIN_VALUE;
 
-	@DataAttribute ("max")
+	@DataAttribute (
+		name = "max")
 	Long maximum =
 		Long.MAX_VALUE;
 

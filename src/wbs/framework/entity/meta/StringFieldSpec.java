@@ -23,11 +23,11 @@ class StringFieldSpec
 	Boolean nullable;
 
 	@DataAttribute (
-		value = "default")
+		name = "default")
 	String defaultValue;
 
 	@DataAttribute (
-		value = "column")
+		name = "column")
 	String columnName;
 
 }

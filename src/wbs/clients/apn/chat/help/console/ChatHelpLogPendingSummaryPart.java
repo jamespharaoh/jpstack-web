@@ -22,7 +22,7 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.sms.message.core.console.MessageConsoleStuff;
+import wbs.sms.message.core.console.MessageConsoleLogic;
 
 @PrototypeComponent ("chatHelpLogPendingSummaryPart")
 public
@@ -45,6 +45,9 @@ class ChatHelpLogPendingSummaryPart
 
 	@Inject
 	CurrencyLogic currencyLogic;
+
+	@Inject
+	MessageConsoleLogic messageConsoleLogic;
 
 	@Inject
 	TimeFormatter timeFormatter;
@@ -235,49 +238,58 @@ class ChatHelpLogPendingSummaryPart
 					nextDate;
 
 				printFormat (
-					"<tr class=\"sep\">\n",
+					"<tr class=\"sep\">\n");
 
-					"<tr style=\"font-weight: bold\">\n",
+				printFormat (
+					"<tr style=\"font-weight: bold\">\n");
 
+				printFormat (
 					"<td colspan=\"5\">%h</td>\n",
 					timeFormatter.instantToDateStringLong (
 						timezone,
 						dateToInstant (
-							chatHelpLog.getTimestamp ())),
+							chatHelpLog.getTimestamp ())));
 
+				printFormat (
 					"</tr>\n");
 
 			}
 
 			String rowClass =
-				MessageConsoleStuff.classForMessageDirection (
+				messageConsoleLogic.classForMessageDirection (
 					chatHelpLog.getDirection ());
 
 			printFormat (
 				"<tr class=\"%h\">\n",
-				rowClass,
+				rowClass);
 
+			printFormat (
 				"<td style=\"background: %h\">&nbsp;</td>\n",
 				Html.genHtmlColor (
-					chatHelpLog.getOurNumber ()),
+					chatHelpLog.getOurNumber ()));
 
+			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimeString (
 					timezone,
 					dateToInstant (
-						chatHelpLog.getTimestamp ())),
+						chatHelpLog.getTimestamp ())));
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatHelpLog.getText (),
+				chatHelpLog.getText ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatHelpLog.getOurNumber (),
+				chatHelpLog.getOurNumber ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatHelpLog.getUser () == null
 					? ""
-					: chatHelpLog.getUser ().getUsername (),
+					: chatHelpLog.getUser ().getUsername ());
 
+			printFormat (
 				"</tr>\n");
 
 		}

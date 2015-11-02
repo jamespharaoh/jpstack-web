@@ -24,7 +24,7 @@ class SupervisorDataSetSpec {
 	String name;
 
 	@DataAttribute (
-		value = "provider",
+		name = "provider",
 		required = true)
 	String providerBeanName;
 

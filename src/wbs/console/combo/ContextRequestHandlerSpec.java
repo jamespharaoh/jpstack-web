@@ -30,7 +30,8 @@ class ContextRequestHandlerSpec {
 	@DataAttribute
 	String fileName;
 
-	@DataAttribute ("request-handler")
+	@DataAttribute (
+		name = "request-handler")
 	String requestHandlerName;
 
 }

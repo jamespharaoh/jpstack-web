@@ -20,17 +20,17 @@ class SupervisorTableStatsGroupSpec {
 	SupervisorConfigSpec supervisorConfigSpec;
 
 	@DataAttribute (
-		value = "grouper",
+		name = "grouper",
 		required = true)
 	String grouperName;
 
 	@DataAttribute (
-		value = "resolver",
+		name = "resolver",
 		required = true)
 	String resolverName;
 
 	@DataAttribute (
-		value = "formatter",
+		name = "formatter",
 		required = true)
 	String formatterName;
 

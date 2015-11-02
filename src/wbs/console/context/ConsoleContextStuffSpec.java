@@ -15,22 +15,27 @@ import wbs.framework.data.annotations.DataClass;
 public
 class ConsoleContextStuffSpec {
 
-	@DataAttribute (required = true)
+	@DataAttribute (
+		required = true)
 	String name;
 
 	@DataAttribute
 	String template;
 
-	@DataAttribute ("field")
+	@DataAttribute (
+		name = "field")
 	String fieldName;
 
-	@DataAttribute ("delegate")
+	@DataAttribute (
+		name = "delegate")
 	String delegateName;
 
-	@DataAttribute ("value")
+	@DataAttribute (
+		name = "value")
 	String value;
 
-	@DataAttribute ("type")
+	@DataAttribute (
+		name = "type")
 	String type;
 
 }

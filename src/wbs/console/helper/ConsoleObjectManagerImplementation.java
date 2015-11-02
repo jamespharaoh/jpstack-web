@@ -62,8 +62,10 @@ class ConsoleObjectManagerImplementation
 		Map<Class<?>,String> beanNamesByObjectClass =
 			new HashMap<Class<?>,String> ();
 
-		for (Map.Entry<String,ConsoleHelper<?>> entry
-				: consoleHelpersByBeanName.entrySet ()) {
+		for (
+			Map.Entry<String,ConsoleHelper<?>> entry
+				: consoleHelpersByBeanName.entrySet ()
+		) {
 
 			String beanName =
 				entry.getKey ();
@@ -861,6 +863,18 @@ class ConsoleObjectManagerImplementation
 			Record<?> root) {
 
 		return objectManager.objectPathMini (
+			object,
+			root);
+
+	}
+
+	@Override
+	public
+	String objectPathMiniPreload (
+			Record<?> object,
+			Record<?> root) {
+
+		return objectManager.objectPathMiniPreload (
 			object,
 			root);
 

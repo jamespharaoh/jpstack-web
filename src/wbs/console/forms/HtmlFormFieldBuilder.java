@@ -100,8 +100,10 @@ class HtmlFormFieldBuilder {
 			.name (
 				name)
 
+		/*
 			.dynamic (
 				false)
+		*/
 
 			.nativeClass (
 				propertyClass);

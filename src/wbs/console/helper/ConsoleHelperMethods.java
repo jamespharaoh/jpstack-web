@@ -32,4 +32,7 @@ interface ConsoleHelperMethods<ObjectType extends Record<ObjectType>> {
 	Optional<String> getListClass (
 			Record<?> object);
 
+	void applySearchFilter (
+			Object searchObject);
+
 }

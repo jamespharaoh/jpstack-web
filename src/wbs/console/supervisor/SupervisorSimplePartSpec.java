@@ -26,7 +26,7 @@ class SupervisorSimplePartSpec {
 	// attributes
 
 	@DataAttribute (
-		value = "name",
+		name = "name",
 		required = true)
 	@Getter @Setter
 	String beanName;

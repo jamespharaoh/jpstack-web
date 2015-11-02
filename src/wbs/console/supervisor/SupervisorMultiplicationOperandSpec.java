@@ -2,6 +2,7 @@ package wbs.console.supervisor;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.console.module.ConsoleModuleData;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -26,7 +27,8 @@ class SupervisorMultiplicationOperandSpec {
 	@DataAttribute
 	Integer value = 1;
 
-	@DataAttribute ("resolver")
+	@DataAttribute (
+		name = "resolver")
 	String resolverName;
 
 }

@@ -132,7 +132,7 @@ class ObjectSearchPart
 			"<input",
 			" type=\"button\"",
 			" value=\"reset form\"",
-			" onclick=\"resetSearchForm (); return false\"",
+			" onclick=\"resetSearchForm (); return false;\"",
 			">\n");
 
 		printFormat (

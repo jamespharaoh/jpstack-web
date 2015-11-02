@@ -20,11 +20,12 @@ class PrivKeySpec {
 	String name;
 
 	@DataAttribute (
-		value = "priv",
+		name = "priv",
 		required = true)
 	String privName;
 
-	@DataAttribute ("delegate")
+	@DataAttribute (
+		name = "delegate")
 	String delegateName;
 
 }

@@ -16,7 +16,7 @@ class GeneratedIdFieldSpec
 	implements ModelFieldSpec {
 
 	@DataAttribute (
-		value = "sequence")
+		name = "sequence")
 	String sequenceName;
 
 }

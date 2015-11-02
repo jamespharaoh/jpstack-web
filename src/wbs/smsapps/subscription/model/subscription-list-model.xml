@@ -39,6 +39,20 @@
 
 	</command-types>
 
+	<priv-types>
+
+		<priv-type
+			name="Messages"
+			description="View message history for a subscription service"
+			template="yes"/>
+
+		<priv-type
+			name="Stats"
+			description="View message statistics for a subscription service"
+			template="yes"/>
+
+	</priv-types>
+
 	<service-types>
 
 		<service-type

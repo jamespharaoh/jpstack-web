@@ -28,7 +28,8 @@ class ObjectSummaryFieldsSpec {
 
 	// attributes
 
-	@DataAttribute ("fields")
+	@DataAttribute (
+		name = "fields")
 	String fieldsName;
 
 }

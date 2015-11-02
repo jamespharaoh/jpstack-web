@@ -34,6 +34,10 @@ class EnumFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
+	Provider<EnumCsvFormFieldInterfaceMapping>
+	enumCsvFormFieldInterfaceMappingProvider;
+
+	@Inject
 	Provider<EnumFormFieldRenderer>
 	enumFormFieldRendererProvider;
 
@@ -138,6 +142,11 @@ class EnumFormFieldBuilder {
 		FormFieldInterfaceMapping interfaceMapping =
 			identityFormFieldInterfaceMappingProvider.get ();
 
+		// csv mapping
+
+		FormFieldInterfaceMapping csvMapping =
+			enumCsvFormFieldInterfaceMappingProvider.get ();
+
 		// renderer
 
 		FormFieldRenderer renderer =
@@ -185,6 +194,9 @@ class EnumFormFieldBuilder {
 				.interfaceMapping (
 					interfaceMapping)
 
+				.csvMapping (
+					csvMapping)
+
 				.renderer (
 					renderer)
 
@@ -215,6 +227,9 @@ class EnumFormFieldBuilder {
 
 				.interfaceMapping (
 					interfaceMapping)
+
+				.csvMapping (
+					csvMapping)
 
 				.renderer (
 					renderer)

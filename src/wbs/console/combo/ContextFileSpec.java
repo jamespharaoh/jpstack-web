@@ -28,16 +28,20 @@ class ContextFileSpec {
 		required = true)
 	String name;
 
-	@DataAttribute ("file")
+	@DataAttribute (
+		name = "file")
 	String fileName;
 
-	@DataAttribute ("get-responder")
+	@DataAttribute (
+		name = "get-responder")
 	String getResponderName;
 
-	@DataAttribute ("get-action")
+	@DataAttribute (
+		name = "get-action")
 	String getActionName;
 
-	@DataAttribute ("post-action")
+	@DataAttribute (
+		name = "post-action")
 	String postActionName;
 
 }

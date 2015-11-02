@@ -19,13 +19,18 @@ class SupervisorTableStatsTotalSpec {
 	@DataAncestor
 	SupervisorConfigSpec supervisorConfigSpec;
 
-	@DataAttribute (required = true)
+	@DataAttribute (
+		required = true)
 	String label;
 
-	@DataAttribute (value = "resolver", required = true)
+	@DataAttribute (
+		name = "resolver",
+		required = true)
 	String resolverName;
 
-	@DataAttribute (value = "formatter", required = true)
+	@DataAttribute (
+		name = "formatter",
+		required = true)
 	String formatterName;
 
 }

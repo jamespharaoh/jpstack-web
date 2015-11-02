@@ -30,13 +30,16 @@ class ContextActionPageSpec {
 	@DataAttribute
 	String fileName;
 
-	@DataAttribute ("action")
+	@DataAttribute (
+		name = "action")
 	String actionName;
 
-	@DataAttribute ("responder")
+	@DataAttribute (
+		name = "responder")
 	String responderName;
 
-	@DataAttribute ("responder-bean")
+	@DataAttribute (
+		name = "responder-bean")
 	String responderBeanName;
 
 }

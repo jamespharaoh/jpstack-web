@@ -11,10 +11,12 @@ import wbs.framework.data.annotations.DataClass;
 public
 class ContextTabPlacement {
 
-	@DataAttribute ("location")
+	@DataAttribute (
+		name = "location")
 	String tabLocation;
 
-	@DataAttribute ("name")
+	@DataAttribute (
+		name = "name")
 	String tabName;
 
 }

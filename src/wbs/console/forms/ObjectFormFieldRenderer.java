@@ -2,6 +2,7 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -195,8 +196,30 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		// get a list of options
 
-		Collection<? extends Record<?>> options =
+		Collection<? extends Record<?>> allOptions =
 			entityFinder.findEntities ();
+
+		// filter visible options
+
+		List<Record<?>> filteredOptions =
+			new ArrayList<Record<?>> ();
+
+		for (
+			Record<?> option
+				: allOptions
+		) {
+
+			if (
+				! objectManager.canView (
+					option)
+			) {
+				continue;
+			}
+
+			filteredOptions.add (
+				option);
+
+		}
 
 		// lookup root
 
@@ -219,15 +242,13 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		for (
 			Record<?> option
-				: options
+				: filteredOptions
 		) {
 
 			sortedOptions.put (
-				objectManager.objectPath (
+				objectManager.objectPathMiniPreload (
 					option,
-					root,
-					true,
-					true),
+					root),
 				option);
 
 		}
@@ -247,11 +268,9 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			" value=\"unchanged\"",
 			">%h</option>\n",
 			interfaceValue.isPresent ()
-				? objectManager.objectPath (
+				? objectManager.objectPathMiniPreload (
 					(Record<?>) interfaceValue.get (),
-					root,
-					true,
-					true)
+					root)
 				: "none");
 
 		// null option
@@ -282,8 +301,13 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			ObjectHelper<?> objectHelper =
 				objectManager.objectHelperForObject (option);
 
-			if (objectHelper.getDeleted (option, true))
+			if (
+				objectHelper.getDeleted (
+					option,
+					true)
+			) {
 				continue;
+			}
 
 			out.writeFormat (
 				"<option value=\"%h\"",
@@ -323,7 +347,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	boolean formValuePresent () {
 
 		String param =
-			requestContext.getForm (name ());
+			requestContext.getForm (
+				name ());
 
 		if (param == null)
 			return false;

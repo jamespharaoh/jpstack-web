@@ -17,14 +17,15 @@ import javax.inject.Inject;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
-
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @SingletonComponent ("objectManager")
@@ -178,6 +179,20 @@ class ObjectManagerImpl
 			root,
 			true,
 			false);
+
+	}
+
+	@Override
+	public
+	String objectPathMiniPreload (
+			Record<?> object,
+			Record<?> root) {
+
+		return objectPath (
+			object,
+			root,
+			true,
+			true);
 
 	}
 

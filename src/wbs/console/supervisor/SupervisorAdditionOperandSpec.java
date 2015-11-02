@@ -25,7 +25,8 @@ class SupervisorAdditionOperandSpec {
 	@DataAttribute
 	Integer value = 1;
 
-	@DataAttribute ("resolver")
+	@DataAttribute (
+		name = "resolver")
 	String resolverName;
 
 }

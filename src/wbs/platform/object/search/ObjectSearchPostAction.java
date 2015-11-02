@@ -1,5 +1,6 @@
 package wbs.platform.object.search;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -54,6 +56,9 @@ class ObjectSearchPostAction
 	@Inject
 	Provider<RedirectResponder> redirectResponderProvider;
 
+	@Inject
+	Provider<ObjectSearchCsvResponder> objectSearchCsvResponderProvider;
+
 	// properties
 
 	@Getter @Setter
@@ -72,7 +77,10 @@ class ObjectSearchPostAction
 	String parentIdName;
 
 	@Getter @Setter
-	FormFieldSet formFieldSet;
+	FormFieldSet searchFormFieldSet;
+
+	@Getter @Setter
+	List<FormFieldSet> resultsFormFieldSets;
 
 	@Getter @Setter
 	String searchResponderName;
@@ -123,6 +131,25 @@ class ObjectSearchPostAction
 
 		}
 
+		if (
+			isNotNull (
+				requestContext.parameter (
+					"download-csv"))
+		) {
+
+			return objectSearchCsvResponderProvider.get ()
+
+				.consoleHelper (
+					consoleHelper)
+
+				.formFieldSets (
+					resultsFormFieldSets)
+
+				.sessionKey (
+					sessionKey);
+
+		}
+
 		// perform search
 
 		@Cleanup
@@ -145,17 +172,28 @@ class ObjectSearchPostAction
 
 		}
 
-		if (parentIdKey != null || parentIdName != null) {
+		consoleHelper.applySearchFilter (
+			search);
 
-			if (parentIdKey == null || parentIdName == null)
+		if (
+			parentIdKey != null
+			|| parentIdName != null
+		) {
+
+			if (
+				parentIdKey == null
+				|| parentIdName == null
+			) {
 				throw new RuntimeException ();
+			}
 
 			Object parentId =
 				requestContext.stuff (
 					parentIdKey);
 
-			if (parentId == null)
+			if (parentId == null) {
 				throw new RuntimeException ();
+			}
 
 			BeanLogic.setProperty (
 				search,
@@ -168,7 +206,7 @@ class ObjectSearchPostAction
 
 		UpdateResultSet updateResultSet =
 			fieldsLogic.update (
-				formFieldSet,
+				searchFormFieldSet,
 				search);
 
 		if (updateResultSet.errorCount () > 0) {

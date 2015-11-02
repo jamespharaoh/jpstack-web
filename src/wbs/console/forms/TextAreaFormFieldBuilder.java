@@ -169,10 +169,9 @@ class TextAreaFormFieldBuilder {
 					name)
 
 				.nativeClass (
-					propertyClass)
+					propertyClass);
 
-				.dynamic (
-					dynamic);
+		// TODO dynamic
 
 		// native mapping
 
@@ -266,6 +265,9 @@ class TextAreaFormFieldBuilder {
 				.interfaceMapping (
 					interfaceMapping)
 
+				.csvMapping (
+					interfaceMapping)
+
 				.renderer (
 					formFieldRenderer)
 
@@ -299,6 +301,9 @@ class TextAreaFormFieldBuilder {
 					constraintValidator)
 
 				.interfaceMapping (
+					interfaceMapping)
+
+				.csvMapping (
 					interfaceMapping)
 
 				.renderer (

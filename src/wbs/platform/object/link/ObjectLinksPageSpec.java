@@ -26,31 +26,41 @@ class ObjectLinksPageSpec {
 		required = true)
 	String name;
 
-	@DataAttribute (value = "links-field", required = true)
+	@DataAttribute (
+		name = "links-field",
+		required = true)
 	String linksFieldName;
 
-	@DataAttribute (value = "target-links-field", required = true)
+	@DataAttribute (
+		name = "target-links-field",
+		required = true)
 	String targetLinksFieldName;
 
-	@DataAttribute (required = true)
+	@DataAttribute (
+		required = true)
 	String addEventName;
 
-	@DataAttribute (required = true)
+	@DataAttribute (
+		required = true)
 	String removeEventName;
 
-	@DataAttribute (required = true)
+	@DataAttribute (
+		required = true)
 	ObjectLinksAction.EventOrder eventOrder;
 
-	@DataAttribute ("signal")
+	@DataAttribute (
+		name = "signal")
 	String updateSignalName;
 
-	@DataAttribute ("target-signal")
+	@DataAttribute (
+		name = "target-signal")
 	String targetUpdateSignalName;
 
 	@DataAttribute (required = true)
 	String successNotice;
 
-	@DataAttribute ("fields")
+	@DataAttribute (
+		name = "fields")
 	String fieldsName;
 
 }

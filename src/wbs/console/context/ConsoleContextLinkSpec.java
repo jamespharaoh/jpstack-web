@@ -25,12 +25,12 @@ class ConsoleContextLinkSpec {
 	// attributes
 
 	@DataAttribute (
-		value = "name",
+		name = "name",
 		required = true)
 	String localName;
 
 	@DataAttribute (
-		value = "link",
+		name = "link",
 		required = true)
 	String linkName;
 

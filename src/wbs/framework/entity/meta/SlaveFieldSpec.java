@@ -19,7 +19,7 @@ class SlaveFieldSpec
 	String name;
 
 	@DataAttribute (
-		value = "type",
+		name = "type",
 		required = true)
 	String typeName;
 

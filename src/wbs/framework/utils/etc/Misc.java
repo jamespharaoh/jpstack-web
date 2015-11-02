@@ -1761,6 +1761,22 @@ class Misc {
 
 	}
 
+	public static
+	boolean isPresent (
+			@NonNull Optional<?> optional) {
+
+		return optional.isPresent ();
+
+	}
+
+	public static
+	boolean isNotPresent (
+			@NonNull Optional<?> optional) {
+
+		return ! optional.isPresent ();
+
+	}
+
 	public static <Type>
 	Type optionalRequired (
 			@NonNull Optional<Type> optional) {

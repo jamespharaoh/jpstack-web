@@ -7,6 +7,7 @@ import java.util.List;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.console.context.ConsoleContextStuffSpec;
 import wbs.console.module.ConsoleModuleData;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -31,10 +32,12 @@ class ConsoleHelperProviderSpec {
 	@DataAttribute
 	String idKey;
 
-	@DataAttribute ("default-list-context")
+	@DataAttribute (
+		name = "default-list-context")
 	String defaultListContextName;
 
-	@DataAttribute ("default-object-context")
+	@DataAttribute (
+		name = "default-object-context")
 	String defaultObjectContextName;
 
 	@DataAttribute
@@ -43,7 +46,8 @@ class ConsoleHelperProviderSpec {
 	@DataAttribute
 	String viewDelegatePrivCode;
 
-	@DataAttribute ("cryptor")
+	@DataAttribute (
+		name = "cryptor")
 	String cryptorBeanName;
 
 	// children

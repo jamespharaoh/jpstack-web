@@ -24,12 +24,12 @@ class ChildrenCollectionSpec
 	String name;
 
 	@DataAttribute (
-		value = "type",
+		name = "type",
 		required = true)
 	String typeName;
 
 	@DataAttribute (
-		value = "join-column")
+		name = "join-column")
 	String joinColumnName;
 
 	@DataAttribute

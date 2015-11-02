@@ -262,6 +262,9 @@ class CodeFormFieldBuilder {
 				.interfaceMapping (
 					interfaceMapping)
 
+				.csvMapping (
+					interfaceMapping)
+
 				.renderer (
 					renderer)
 

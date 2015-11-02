@@ -25,10 +25,12 @@ class ObjectBrowsePageSpec {
 	@DataAttribute
 	String typeCode;
 
-	@DataAttribute ("fields")
+	@DataAttribute (
+		name = "fields")
 	String fieldsName;
 
-	@DataAttribute ("target-context-type")
+	@DataAttribute (
+		name = "target-context-type")
 	String targetContextTypeName;
 
 }

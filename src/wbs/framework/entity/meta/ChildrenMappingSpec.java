@@ -23,16 +23,16 @@ class ChildrenMappingSpec
 	String name;
 
 	@DataAttribute (
-		value = "type",
+		name = "type",
 		required = true)
 	String typeName;
 
 	@DataAttribute (
-		value = "join-column")
+		name = "join-column")
 	String joinColumnName;
 
 	@DataAttribute (
-		value = "map-column",
+		name = "map-column",
 		required = true)
 	String mapColumnName;
 

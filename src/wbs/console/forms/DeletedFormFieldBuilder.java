@@ -37,6 +37,10 @@ class DeletedFormFieldBuilder {
 	identityFormFieldInterfaceMappingProvider;
 
 	@Inject
+	Provider<YesNoCsvFormFieldInterfaceMapping>
+	yesNoCsvFormFieldInterfaceMappingProvider;
+
+	@Inject
 	Provider<IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
@@ -137,6 +141,11 @@ class DeletedFormFieldBuilder {
 		FormFieldInterfaceMapping interfaceMapping =
 			identityFormFieldInterfaceMappingProvider.get ();
 
+		// csv mapping
+
+		FormFieldInterfaceMapping csvMapping =
+			yesNoCsvFormFieldInterfaceMappingProvider.get ();
+
 		// render
 
 		FormFieldRenderer renderer =
@@ -193,6 +202,9 @@ class DeletedFormFieldBuilder {
 				.interfaceMapping (
 					interfaceMapping)
 
+				.csvMapping (
+					csvMapping)
+
 				.renderer (
 					renderer)
 
@@ -220,6 +232,9 @@ class DeletedFormFieldBuilder {
 
 				.interfaceMapping (
 					interfaceMapping)
+
+				.csvMapping (
+					csvMapping)
 
 				.renderer (
 					renderer)

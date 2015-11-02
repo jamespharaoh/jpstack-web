@@ -128,11 +128,10 @@ class TextFormFieldBuilder {
 			.name (
 				name)
 
-			.dynamic (
-				dynamic)
-
 			.nativeClass (
 				propertyClass);
+
+		// TODO dynamic
 
 		// native mapping
 
@@ -206,6 +205,9 @@ class TextFormFieldBuilder {
 				.interfaceMapping (
 					interfaceMapping)
 
+				.csvMapping (
+					interfaceMapping)
+
 				.renderer (
 					renderer)
 
@@ -235,6 +237,9 @@ class TextFormFieldBuilder {
 					constraintValidator)
 
 				.interfaceMapping (
+					interfaceMapping)
+
+				.csvMapping (
 					interfaceMapping)
 
 				.renderer (

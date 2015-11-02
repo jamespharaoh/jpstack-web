@@ -16,7 +16,7 @@ class AssignedIdFieldSpec
 	implements ModelFieldSpec {
 
 	@DataAttribute (
-		value = "column")
+		name = "column")
 	String columnName;
 
 }

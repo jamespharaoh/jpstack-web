@@ -23,11 +23,11 @@ class YesNoFieldSpec
 	Boolean nullable;
 
 	@DataAttribute (
-		value = "default")
+		name = "default")
 	Boolean defaultValue;
 
 	@DataAttribute (
-		value = "column")
+		name = "column")
 	String columnName;
 
 }

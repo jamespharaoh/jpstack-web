@@ -31,13 +31,16 @@ class ContextResponderPageSpec {
 	@DataAttribute
 	String beanName;
 
-	@DataAttribute ("file")
+	@DataAttribute (
+		name = "file")
 	String fileName;
 
-	@DataAttribute ("responder")
+	@DataAttribute (
+		name = "responder")
 	String responderName;
 
-	@DataAttribute ("responder-bean")
+	@DataAttribute (
+		name = "responder-bean")
 	String responderBeanName;
 
 }

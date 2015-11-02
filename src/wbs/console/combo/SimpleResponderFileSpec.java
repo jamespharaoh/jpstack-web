@@ -32,7 +32,8 @@ class SimpleResponderFileSpec {
 		required = true)
 	String name;
 
-	@DataAttribute ("responder")
+	@DataAttribute (
+		name = "responder")
 	String responderName;
 
 	@DataAttribute

@@ -27,7 +27,8 @@ class ContextTabFormActionPageSpec {
 	@DataAttribute
 	String name;
 
-	@DataAttribute ("fields")
+	@DataAttribute (
+		name = "fields")
 	String fieldsName;
 
 	@DataAttribute

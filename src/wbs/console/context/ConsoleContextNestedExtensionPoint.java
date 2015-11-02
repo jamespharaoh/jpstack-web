@@ -22,7 +22,8 @@ class ConsoleContextNestedExtensionPoint
 	@DataAttribute
 	String name;
 
-	@DataAttribute ("parent-extension-point")
+	@DataAttribute (
+		name = "parent-extension-point")
 	String parentExtensionPointName;
 
 	// details

@@ -1,7 +1,6 @@
 package wbs.smsapps.manualresponder.console;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -10,12 +9,15 @@ import javax.inject.Named;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.FormatWriterWriter;
 import wbs.smsapps.manualresponder.console.ManualResponderReportSimplePart.SearchForm;
 import wbs.smsapps.manualresponder.model.ManualResponderReportObjectHelper;
@@ -42,7 +44,7 @@ class ManualResponderReportSimpleCsvResponder
 
 	// state
 
-	PrintWriter out;
+	FormatWriter formatWriter;
 
 	List<ManualResponderReportRec> reports;
 	FormFieldSet searchFormFieldSet;
@@ -56,8 +58,9 @@ class ManualResponderReportSimpleCsvResponder
 	void setup ()
 		throws IOException {
 
-		out =
-			requestContext.writer ();
+		formatWriter =
+			new FormatWriterWriter (
+				requestContext.writer ());
 
 	}
 
@@ -120,8 +123,9 @@ class ManualResponderReportSimpleCsvResponder
 		throws IOException {
 
 		formFieldLogic.outputCsvHeadings (
-			out,
-			resultsFormFieldSet);
+			formatWriter,
+			ImmutableList.of (
+				resultsFormFieldSet));
 
 		for (
 			ManualResponderReportRec report
@@ -129,13 +133,12 @@ class ManualResponderReportSimpleCsvResponder
 		) {
 
 			formFieldLogic.outputCsvRow (
-				new FormatWriterWriter (out),
-				resultsFormFieldSet,
+				formatWriter,
+				ImmutableList.of (
+					resultsFormFieldSet),
 				report);
 
 		}
-
-		out.flush ();
 
 	}
 

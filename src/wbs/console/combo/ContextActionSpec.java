@@ -30,7 +30,8 @@ class ContextActionSpec {
 	@DataAttribute
 	String fileName;
 
-	@DataAttribute ("action")
+	@DataAttribute (
+		name = "action")
 	String actionName;
 
 }

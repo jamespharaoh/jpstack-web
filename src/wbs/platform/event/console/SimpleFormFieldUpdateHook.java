@@ -44,7 +44,7 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 	// properties
 
 	@Getter @Setter
-	String name;
+	String fieldName;
 
 	// implementation
 
@@ -100,7 +100,7 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 				eventLogic.createEvent (
 					adminPrefix + "object_field_updated_in",
 					user,
-					name (),
+					fieldName,
 					objectRef.get (),
 					objectType.get (),
 					linkObject,
@@ -111,7 +111,7 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 				eventLogic.createEvent (
 					adminPrefix + "object_field_nulled_in",
 					user,
-					name (),
+					fieldName,
 					objectRef.get (),
 					objectType.get (),
 					linkObject);
@@ -125,7 +125,7 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 				eventLogic.createEvent (
 					adminPrefix + "object_field_updated",
 					user,
-					name (),
+					fieldName,
 					linkObject,
 					updateResult.newNativeValue ().get ());
 
@@ -134,7 +134,7 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 				eventLogic.createEvent (
 					adminPrefix + "object_field_nulled",
 					user,
-					name (),
+					fieldName,
 					linkObject);
 
 			}

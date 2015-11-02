@@ -18,7 +18,8 @@ import wbs.framework.record.Record;
 public
 class TextAreaFormFieldSpec {
 
-	@DataAttribute (required = true)
+	@DataAttribute (
+		required = true)
 	String name;
 
 	@DataAttribute
@@ -51,7 +52,8 @@ class TextAreaFormFieldSpec {
 	@Getter @Setter
 	Record<?> parent;
 
-	@DataAttribute ("update-hook-bean")
+	@DataAttribute (
+		name = "update-hook-bean")
 	String updateHookBeanName;
 
 }

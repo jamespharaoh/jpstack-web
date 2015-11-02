@@ -1,5 +1,6 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.LinkedHashSet;
@@ -55,6 +56,9 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 
 	@Getter @Setter
 	FormFieldInterfaceMapping<Container,Generic,Interface> interfaceMapping;
+
+	@Getter @Setter
+	FormFieldInterfaceMapping<Container,Generic,String> csvMapping;
 
 	@Getter @Setter
 	FormFieldRenderer<Container,Interface> renderer;
@@ -189,19 +193,15 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			nativeMapping.nativeToGeneric (
 				nativeValue);
 
-		Optional<Interface> interfaceValue =
-			interfaceMapping.genericToInterface (
-				container,
-				genericValue);
-
-		String stringValue =
-			interfaceValue.isPresent ()
-				? interfaceValue.get ().toString ()
-				: "";
+		String csvValue =
+			optionalRequired (
+				csvMapping.genericToInterface (
+					container,
+					genericValue));
 
 		out.writeFormat (
 			"\"%s\"",
-			stringValue.replace ("\"", "\"\""));
+			csvValue.replace ("\"", "\"\""));
 
 	}
 

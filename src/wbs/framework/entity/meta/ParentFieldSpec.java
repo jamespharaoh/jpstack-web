@@ -19,12 +19,12 @@ class ParentFieldSpec
 	String name;
 
 	@DataAttribute (
-		value = "type",
+		name = "type",
 		required = true)
 	String typeName;
 
 	@DataAttribute (
-		value = "column")
+		name = "column")
 	String columnName;
 
 }

@@ -33,7 +33,8 @@ class SupervisorPageSpec {
 	@DataAttribute
 	String title;
 
-	@DataAttribute ("config")
+	@DataAttribute (
+		name = "config")
 	String configName;
 
 }

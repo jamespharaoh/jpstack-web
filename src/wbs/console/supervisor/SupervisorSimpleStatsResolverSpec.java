@@ -22,17 +22,20 @@ class SupervisorSimpleStatsResolverSpec {
 	@DataAttribute
 	String name;
 
-	@DataAttribute ("index")
+	@DataAttribute (
+		name = "index")
 	String indexName;
 
-	@DataAttribute ("value")
+	@DataAttribute (
+		name = "value")
 	String valueName;
 
-	@DataAttribute ("data-set")
+	@DataAttribute (
+		name = "data-set")
 	String dataSetName;
 
 	@DataAttribute (
-		value = "aggregator",
+		name = "aggregator",
 		required = true)
 	String aggregatorName;
 

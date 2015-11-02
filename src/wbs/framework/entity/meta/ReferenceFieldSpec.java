@@ -19,7 +19,7 @@ class ReferenceFieldSpec
 	String name;
 
 	@DataAttribute (
-		value = "type",
+		name = "type",
 		required = true)
 	String typeName;
 
@@ -27,7 +27,7 @@ class ReferenceFieldSpec
 	Boolean nullable;
 
 	@DataAttribute (
-		value = "column")
+		name = "column")
 	String columnName;
 
 }

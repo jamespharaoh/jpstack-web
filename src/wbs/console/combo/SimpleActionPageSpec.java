@@ -31,13 +31,16 @@ class SimpleActionPageSpec {
 	@DataAttribute
 	String name;
 
-	@DataAttribute ("action")
+	@DataAttribute (
+		name = "action")
 	String actionName;
 
-	@DataAttribute ("responder")
+	@DataAttribute (
+		name = "responder")
 	String responderName;
 
-	@DataAttribute ("responder-bean")
+	@DataAttribute (
+		name = "responder-bean")
 	String responderBeanName;
 
 }

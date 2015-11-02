@@ -45,6 +45,10 @@ class ObjectFormFieldBuilder {
 	identityFormFieldInterfaceMappingProvider;
 
 	@Inject
+	Provider<ObjectCsvFormFieldInterfaceMapping>
+	objectCsvFormFieldInterfaceMappingProvider;
+
+	@Inject
 	Provider<IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
@@ -110,10 +114,12 @@ class ObjectFormFieldBuilder {
 				spec.readOnly (),
 				false);
 
+		/*
 		Boolean dynamic =
 			ifNull (
 				spec.dynamic(),
 				false);
+		*/
 
 		ConsoleHelper<?> consoleHelper =
 			consoleHelperRegistry.findByObjectName (
@@ -152,10 +158,7 @@ class ObjectFormFieldBuilder {
 					name)
 
 				.nativeClass (
-					Integer.class)
-
-				.dynamic (
-					dynamic);
+					Integer.class);
 
 			// native mapping
 
@@ -176,10 +179,7 @@ class ObjectFormFieldBuilder {
 					name)
 
 				.nativeClass (
-					Record.class)
-
-				.dynamic (
-					dynamic);
+					Record.class);
 
 			// native mapping
 
@@ -202,6 +202,11 @@ class ObjectFormFieldBuilder {
 
 		FormFieldInterfaceMapping interfaceMapping =
 			identityFormFieldInterfaceMappingProvider.get ();
+
+		// csv mapping
+
+		FormFieldInterfaceMapping csvMapping =
+			objectCsvFormFieldInterfaceMappingProvider.get ();
 
 		// renderer
 
@@ -259,6 +264,9 @@ class ObjectFormFieldBuilder {
 				.interfaceMapping (
 					interfaceMapping)
 
+				.csvMapping (
+					csvMapping)
+
 				.renderer (
 					renderer)
 
@@ -286,6 +294,9 @@ class ObjectFormFieldBuilder {
 
 				.interfaceMapping (
 					interfaceMapping)
+
+				.csvMapping (
+					csvMapping)
 
 				.renderer (
 					renderer)

@@ -29,7 +29,7 @@ class EnumFormFieldSpec {
 	Boolean readOnly;
 
 	@DataAttribute (
-		value = "helper",
+		name = "helper",
 		required = true)
 	String helperBeanName;
 

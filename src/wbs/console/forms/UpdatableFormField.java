@@ -1,11 +1,13 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import lombok.Getter;
@@ -64,6 +66,13 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 
 	@Getter @Setter
 	FormFieldInterfaceMapping<Container,Generic,Interface> interfaceMapping;
+
+	@Getter @Setter
+	Map<String,FormFieldInterfaceMapping<Container,Generic,String>>
+	shortcutInterfaceMappings;
+
+	@Getter @Setter
+	FormFieldInterfaceMapping<Container,Generic,String> csvMapping;
 
 	@Getter @Setter
 	FormFieldRenderer<Container,Interface> renderer;
@@ -230,25 +239,15 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			nativeMapping.nativeToGeneric (
 				nativeValue);
 
-		Optional<Interface> interfaceValue =
-			interfaceMapping.genericToInterface (
-				container,
-				genericValue);
-
-		String stringValue =
-			interfaceValue.isPresent ()
-				? interfaceValue.get ().toString ()
-				: "";
+		String csvValue =
+			optionalRequired (
+				csvMapping.genericToInterface (
+					container,
+					genericValue));
 
 		out.writeFormat (
-			"\"");
-
-		out.writeFormat (
-			"%s",
-			stringValue.replace ("\"", "\"\""));
-
-		out.writeFormat (
-			"\"");
+			"\"%s\"",
+			csvValue.replace ("\"", "\"\""));
 
 	}
 

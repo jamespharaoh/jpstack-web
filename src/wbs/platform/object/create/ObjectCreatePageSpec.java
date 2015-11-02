@@ -25,31 +25,39 @@ class ObjectCreatePageSpec {
 	@DataAttribute
 	String typeCode;
 
-	@DataAttribute ("tab")
+	@DataAttribute (
+		name = "tab")
 	String tabName;
 
 	@DataAttribute
 	String localFile;
 
-	@DataAttribute ("responder")
+	@DataAttribute (
+		name = "responder")
 	String responderName;
 
-	@DataAttribute ("target-context-type")
+	@DataAttribute (
+		name = "target-context-type")
 	String targetContextTypeName;
 
-	@DataAttribute ("target-responder")
+	@DataAttribute (
+		name = "target-responder")
 	String targetResponderName;
 
-	@DataAttribute ("fields")
+	@DataAttribute (
+		name = "fields")
 	String fieldsName;
 
-	@DataAttribute ("fields-provider")
+	@DataAttribute (
+		name = "fields-provider")
 	String fieldsProviderName;
 
-	@DataAttribute ("create-time")
+	@DataAttribute (
+		name = "create-time")
 	String createTimeFieldName;
 
-	@DataAttribute ("create-user")
+	@DataAttribute (
+		name = "create-user")
 	String createUserFieldName;
 
 	@DataAttribute

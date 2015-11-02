@@ -26,13 +26,13 @@ class BeansBeanSpec {
 	String name;
 
 	@DataAttribute (
-		value = "class",
+		name = "class",
 		required = true)
 	@Getter @Setter
 	String className;
 
 	@DataAttribute (
-		value = "factory")
+		name = "factory")
 	@Getter @Setter
 	String factoryClassName;
 
