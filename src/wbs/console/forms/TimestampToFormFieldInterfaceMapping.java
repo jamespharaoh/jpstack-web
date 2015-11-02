@@ -1,5 +1,8 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -45,12 +48,19 @@ class TimestampToFormFieldInterfaceMapping<Container>
 			@NonNull Optional<String> interfaceValue,
 			@NonNull List<String> errors) {
 
-		if (! interfaceValue.isPresent ()) {
-			return Optional.<Instant>absent ();
-		}
+		if (
 
-		if (interfaceValue.get ().isEmpty ()) {
+			isNotPresent (
+				interfaceValue)
+
+			|| isEmpty (
+				optionalRequired (
+					interfaceValue))
+
+		) {
+
 			return Optional.<Instant>absent ();
+
 		}
 
 		try {
@@ -69,7 +79,7 @@ class TimestampToFormFieldInterfaceMapping<Container>
 					"Please enter a valid timestamp for %s",
 					name ()));
 
-			return null;
+			return Optional.<Instant>absent ();
 
 		}
 
@@ -81,8 +91,13 @@ class TimestampToFormFieldInterfaceMapping<Container>
 			@NonNull Container container,
 			@NonNull Optional<Instant> genericValue) {
 
-		if (! genericValue.isPresent ()) {
+		if (
+			isNotPresent (
+				genericValue)
+		) {
+
 			return Optional.<String>absent ();
+
 		}
 
 		return Optional.of (

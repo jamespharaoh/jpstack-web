@@ -1,5 +1,8 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -45,31 +48,39 @@ class TimestampFromFormFieldInterfaceMapping<Container>
 			@NonNull Optional<String> interfaceValue,
 			@NonNull List<String> errors) {
 
-		if (! interfaceValue.isPresent ()) {
+		if (
+
+			isNotPresent (
+				interfaceValue)
+
+			|| isEmpty (
+				optionalRequired (
+					interfaceValue))
+		) {
+
 			return Optional.<Instant>absent ();
-		}
 
-		if (interfaceValue.get ().isEmpty ()) {
-			return Optional.<Instant>absent ();
-		}
+		} else {
 
-		try {
+			try {
 
-			Interval interval =
-				parsePartialTimestamp (
-					interfaceValue.get ());
+				Interval interval =
+					parsePartialTimestamp (
+						interfaceValue.get ());
 
-			return Optional.of (
-				interval.getEnd ().toInstant ());
+				return Optional.of (
+					interval.getEnd ().toInstant ());
 
-		} catch (IllegalArgumentException exception) {
+			} catch (IllegalArgumentException exception) {
 
-			errors.add (
-				stringFormat (
-					"Please enter a valid timestamp for %s",
-					name ()));
+				errors.add (
+					stringFormat (
+						"Please enter a valid timestamp for %s",
+						name ()));
 
-			return null;
+				return Optional.<Instant>absent ();
+
+			}
 
 		}
 
@@ -81,14 +92,21 @@ class TimestampFromFormFieldInterfaceMapping<Container>
 			@NonNull Container container,
 			@NonNull Optional<Instant> genericValue) {
 
-		if (! genericValue.isPresent ()) {
-			return Optional.<String>absent ();
-		}
+		if (
+			isNotPresent (
+				genericValue)
+		) {
 
-		return Optional.of (
-			timeFormatter.instantToTimestampString (
-				timeFormatter.defaultTimezone (),
-				genericValue.get ()));
+			return Optional.<String>absent ();
+
+		} else {
+
+			return Optional.of (
+				timeFormatter.instantToTimestampString (
+					timeFormatter.defaultTimezone (),
+					genericValue.get ()));
+
+		}
 
 	}
 

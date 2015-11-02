@@ -1,5 +1,9 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -46,33 +50,46 @@ class TimestampFormFieldInterfaceMapping<Container>
 			@NonNull Optional<String> interfaceValue,
 			@NonNull List<String> errors) {
 
-		if (format != TimestampFormFieldSpec.Format.timestamp) {
+		if (
+			notEqual (
+				format,
+				TimestampFormFieldSpec.Format.timestamp)
+		) {
+
 			throw new RuntimeException ();
-		}
 
-		if (! interfaceValue.isPresent ()) {
+		} else if (
+
+			isNotPresent (
+				interfaceValue)
+
+			|| isEmpty (
+				optionalRequired (
+					interfaceValue))
+
+		) {
+
 			return Optional.<Instant>absent ();
-		}
 
-		if (interfaceValue.get ().isEmpty ()) {
-			return Optional.<Instant>absent ();
-		}
+		} else {
 
-		try {
+			try {
 
-			return Optional.of (
-				timeFormatter.timestampStringToInstant (
-					timeFormatter.defaultTimezone (),
-					interfaceValue.get ()));
+				return Optional.of (
+					timeFormatter.timestampStringToInstant (
+						timeFormatter.defaultTimezone (),
+						interfaceValue.get ()));
 
-		} catch (IllegalArgumentException exception) {
+			} catch (IllegalArgumentException exception) {
 
-			errors.add (
-				stringFormat (
-					"Please enter a valid timestamp for %s",
-					name ()));
+				errors.add (
+					stringFormat (
+						"Please enter a valid timestamp for %s",
+						name ()));
 
-			return null;
+				return Optional.<Instant>absent ();
+
+			}
 
 		}
 
@@ -84,8 +101,13 @@ class TimestampFormFieldInterfaceMapping<Container>
 			@NonNull Container container,
 			@NonNull Optional<Instant> genericValue) {
 
-		if (! genericValue.isPresent ()) {
-			return null;
+		if (
+			isNotPresent (
+				genericValue)
+		) {
+
+			return Optional.of ("");
+
 		}
 
 		switch (format) {

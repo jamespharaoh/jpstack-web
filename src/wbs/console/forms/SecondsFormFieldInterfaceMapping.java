@@ -1,5 +1,8 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -41,31 +44,40 @@ class SecondsFormFieldInterfaceMapping<Container>
 			@NonNull Optional<String> interfaceValue,
 			@NonNull List<String> errors) {
 
-		if (! interfaceValue.isPresent ()) {
+		if (
+
+			isNotPresent (
+				interfaceValue)
+
+			|| isEmpty (
+				optionalRequired (
+					interfaceValue))
+
+		) {
+
 			return Optional.<Integer>absent ();
+
+		} else {
+
+			Integer genericValue =
+				intervalFormatter.processIntervalStringSeconds (
+					interfaceValue.get ());
+
+			if (genericValue == null) {
+
+				errors.add (
+					stringFormat (
+						"Please enter a valid interval for '%s'",
+						label));
+
+				return Optional.<Integer>absent ();
+
+			}
+
+			return Optional.<Integer>of (
+				genericValue);
+
 		}
-
-		if (interfaceValue.get ().isEmpty ()) {
-			return Optional.<Integer>absent ();
-		}
-
-		Integer genericValue =
-			intervalFormatter.processIntervalStringSeconds (
-				interfaceValue.get ());
-
-		if (genericValue == null) {
-
-			errors.add (
-				stringFormat (
-					"Please enter a valid interval for '%s'",
-					label));
-
-			return null;
-
-		}
-
-		return Optional.of (
-			genericValue);
 
 	}
 
@@ -75,13 +87,20 @@ class SecondsFormFieldInterfaceMapping<Container>
 			@NonNull Container container,
 			@NonNull Optional<Integer> genericValue) {
 
-		if (! genericValue.isPresent ()) {
-			return Optional.<String>absent ();
-		}
+		if (
+			isNotPresent (
+				genericValue)
+		) {
 
-		return Optional.of (
-			intervalFormatter.createIntervalStringSeconds (
-				genericValue.get ()));
+			return Optional.<String>absent ();
+
+		} else {
+
+			return Optional.of (
+				intervalFormatter.createIntervalStringSeconds (
+					genericValue.get ()));
+
+		}
 
 	}
 

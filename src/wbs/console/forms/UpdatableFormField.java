@@ -2,6 +2,7 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
+import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -124,17 +125,20 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			int colspan) {
 
 		Optional<Native> nativeValue =
-			accessor.read (
-				container);
+			requiredValue (
+				accessor.read (
+					container));
 
 		Optional<Generic> genericValue =
-			nativeMapping.nativeToGeneric (
-				nativeValue);
+			requiredValue (
+				nativeMapping.nativeToGeneric (
+					nativeValue));
 
 		Optional<Interface> interfaceValue =
-			interfaceMapping.genericToInterface (
-				container,
-				genericValue);
+			requiredValue (
+				interfaceMapping.genericToInterface (
+					container,
+					genericValue));
 
 		renderer.renderTableCellList (
 			out,
@@ -152,17 +156,20 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			@NonNull Container container) {
 
 		Optional<Native> nativeValue =
-			accessor.read (
-				container);
+			requiredValue (
+				accessor.read (
+					container));
 
 		Optional<Generic> genericValue =
-			nativeMapping.nativeToGeneric (
-				nativeValue);
+			requiredValue (
+				nativeMapping.nativeToGeneric (
+					nativeValue));
 
 		Optional<Interface> interfaceValue =
-			interfaceMapping.genericToInterface (
-				container,
-				genericValue);
+			requiredValue (
+				interfaceMapping.genericToInterface (
+					container,
+					genericValue));
 
 		renderer.renderTableCellProperties (
 			out,
@@ -178,17 +185,20 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			@NonNull Container container) {
 
 		Optional<Native> nativeValue =
-			accessor.read (
-				container);
+			requiredValue (
+				accessor.read (
+					container));
 
 		Optional<Generic> genericValue =
-			nativeMapping.nativeToGeneric (
-				nativeValue);
+			requiredValue (
+				nativeMapping.nativeToGeneric (
+					nativeValue));
 
 		Optional<Interface> interfaceValue =
-			interfaceMapping.genericToInterface (
-				container,
-				genericValue);
+			requiredValue (
+				interfaceMapping.genericToInterface (
+					container,
+					genericValue));
 
 		renderer.renderFormRow (
 			out,
@@ -205,17 +215,20 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			@NonNull Container container) {
 
 		Optional<Native> nativeValue =
-			accessor.read (
-				container);
+			requiredValue (
+				accessor.read (
+					container));
 
 		Optional<Generic> genericValue =
-			nativeMapping.nativeToGeneric (
-				nativeValue);
+			requiredValue (
+				nativeMapping.nativeToGeneric (
+					nativeValue));
 
 		Optional<Interface> interfaceValue =
-			interfaceMapping.genericToInterface (
-				container,
-				genericValue);
+			requiredValue (
+				interfaceMapping.genericToInterface (
+					container,
+					genericValue));
 
 		renderer.renderFormReset (
 			javascriptWriter,
@@ -232,12 +245,14 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			@NonNull Container container) {
 
 		Optional<Native> nativeValue =
-			accessor.read (
-				container);
+			requiredValue (
+				accessor.read (
+					container));
 
 		Optional<Generic> genericValue =
-			nativeMapping.nativeToGeneric (
-				nativeValue);
+			requiredValue (
+				nativeMapping.nativeToGeneric (
+					nativeValue));
 
 		String csvValue =
 			optionalRequired (
@@ -265,7 +280,9 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		if (! renderer.formValuePresent ()) {
 
 			updateResult
-				.updated (false);
+
+				.updated (
+					false);
 
 			return;
 
@@ -274,8 +291,9 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		// get interface value from form
 
 		Optional<Interface> newInterfaceValue =
-			renderer.formToInterface (
-				errors);
+			requiredValue (
+				renderer.formToInterface (
+					errors));
 
 		if (! errors.isEmpty ()) {
 
@@ -294,10 +312,11 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		// convert to generic
 
 		Optional<Generic> newGenericValue =
-			interfaceMapping.interfaceToGeneric (
-				container,
-				newInterfaceValue,
-				errors);
+			requiredValue (
+				interfaceMapping.interfaceToGeneric (
+					container,
+					newInterfaceValue,
+					errors));
 
 		if (! errors.isEmpty ()) {
 
@@ -322,16 +341,21 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		if (! errors.isEmpty ()) {
 
 			updateResult
-				.updated (false)
-				.errors (errors);
+
+				.updated (
+					false)
+
+				.errors (
+					errors);
 
 		}
 
 		// convert to native
 
 		Optional<Native> newNativeValue =
-			nativeMapping.genericToNative (
-				newGenericValue);
+			requiredValue (
+				nativeMapping.genericToNative (
+					newGenericValue));
 
 		// check new value
 
@@ -343,8 +367,12 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		if (! errors.isEmpty ()) {
 
 			updateResult
-				.updated (false)
-				.errors (errors);
+
+				.updated (
+					false)
+
+				.errors (
+					errors);
 
 			return;
 
@@ -353,12 +381,14 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		// get the current value, if it is the same, do nothing
 
 		Optional<Native> oldNativeValue =
-			accessor.read (
-				container);
+			requiredValue (
+				accessor.read (
+					container));
 
 		Optional<Generic> oldGenericValue =
-			nativeMapping.nativeToGeneric (
-				oldNativeValue);
+			requiredValue (
+				nativeMapping.nativeToGeneric (
+					oldNativeValue));
 
 		if (
 			equal (

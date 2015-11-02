@@ -1693,6 +1693,14 @@ class Misc {
 	}
 
 	public static
+	boolean isEmpty (
+			String string) {
+
+		return string.isEmpty ();
+
+	}
+
+	public static
 	boolean isNotEmpty (
 			Collection<?> collection) {
 
@@ -1989,6 +1997,14 @@ class Misc {
 		}
 
 		return false;
+
+	}
+
+	public static <Type>
+	Type requiredValue (
+			@NonNull Type value) {
+
+		return value;
 
 	}
 

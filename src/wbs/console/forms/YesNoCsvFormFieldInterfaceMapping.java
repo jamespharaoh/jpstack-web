@@ -101,7 +101,6 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 
 		}
 
-
 	}
 
 }

@@ -117,6 +117,12 @@ class MasterModelFieldBuilder {
 		target.model ().masterField (
 			modelField);
 
+		if (target.model ().parentField () != null)
+			throw new RuntimeException ();
+
+		target.model ().parentField (
+			modelField);
+
 	}
 
 }

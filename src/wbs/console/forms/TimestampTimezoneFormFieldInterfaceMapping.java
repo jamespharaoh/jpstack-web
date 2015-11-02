@@ -1,5 +1,8 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -43,14 +46,27 @@ class TimestampTimezoneFormFieldInterfaceMapping<Container>
 			@NonNull Optional<String> interfaceValue,
 			@NonNull List<String> errors) {
 
-		if (interfaceValue.get ().isEmpty ())
-			return null;
+		if (
+
+			isNotPresent (
+				interfaceValue)
+
+			|| isEmpty (
+				optionalRequired (
+					interfaceValue))
+
+		) {
+
+			return Optional.<DateTime>absent ();
+
+		}
 
 		try {
 
 			return Optional.of (
 				timeFormatter.timestampTimezoneToDateTime (
-					interfaceValue.get ()));
+					optionalRequired (
+						interfaceValue)));
 
 		} catch (IllegalArgumentException exception) {
 
@@ -59,7 +75,7 @@ class TimestampTimezoneFormFieldInterfaceMapping<Container>
 					"Please enter a valid timestamp with timezone for %s",
 					name ()));
 
-			return null;
+			return Optional.<DateTime>absent ();
 
 		}
 
@@ -68,8 +84,8 @@ class TimestampTimezoneFormFieldInterfaceMapping<Container>
 	@Override
 	public
 	Optional<String> genericToInterface (
-			Container container,
-			Optional<DateTime> genericValue) {
+			@NonNull Container container,
+			@NonNull Optional<DateTime> genericValue) {
 
 		if (! genericValue.isPresent ()) {
 			return Optional.<String>absent ();

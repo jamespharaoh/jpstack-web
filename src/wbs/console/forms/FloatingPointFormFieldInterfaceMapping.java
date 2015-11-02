@@ -1,5 +1,8 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+
 import java.util.List;
 
 import lombok.NonNull;
@@ -20,17 +23,25 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 			@NonNull Optional<String> interfaceValue,
 			@NonNull List<String> errors) {
 
-		if (! interfaceValue.isPresent ()) {
-			return null;
-		}
+		if (
 
-		if (interfaceValue.get ().isEmpty ()) {
-			return null;
-		}
+			isNotPresent (
+				interfaceValue)
 
-		return Optional.of (
-			Double.parseDouble (
-				interfaceValue.get ()));
+			|| isEmpty (
+				interfaceValue.get ())
+
+		) {
+
+			return Optional.<Double>absent ();
+
+		} else {
+
+			return Optional.of (
+				Double.parseDouble (
+					interfaceValue.get ()));
+
+		}
 
 	}
 
@@ -40,13 +51,20 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 			@NonNull Container container,
 			@NonNull Optional<Double> genericValue) {
 
-		if (! genericValue.isPresent ()) {
-			return null;
-		}
+		if (
+			isNotPresent (
+				genericValue)
+		) {
 
-		return Optional.of (
-			Double.toString (
-				genericValue.get ()));
+			return Optional.<String>of ("");
+
+		} else {
+
+			return Optional.of (
+				Double.toString (
+					genericValue.get ()));
+
+		}
 
 	}
 

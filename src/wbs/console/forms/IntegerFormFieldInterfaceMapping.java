@@ -1,5 +1,10 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
+
 import java.util.List;
 
 import lombok.Getter;
@@ -22,6 +27,8 @@ class IntegerFormFieldInterfaceMapping<Container>
 	@Getter @Setter
 	Boolean blankIfZero = false;
 
+	// implementation
+
 	@Override
 	public
 	Optional<Long> interfaceToGeneric (
@@ -29,17 +36,26 @@ class IntegerFormFieldInterfaceMapping<Container>
 			@NonNull Optional<String> interfaceValue,
 			@NonNull List<String> errors) {
 
-		if (! interfaceValue.isPresent ()) {
-			return Optional.<Long>absent ();
-		}
+		if (
 
-		if (interfaceValue.get ().isEmpty ()) {
-			return Optional.<Long>absent ();
-		}
+			isNotPresent (
+				interfaceValue)
 
-		return Optional.of (
-			Long.parseLong (
-				interfaceValue.get ()));
+			|| isEmpty (
+				optionalRequired (
+					interfaceValue))
+
+		) {
+
+			return Optional.<Long>absent ();
+
+		} else {
+
+			return Optional.of (
+				Long.parseLong (
+					interfaceValue.get ()));
+
+		}
 
 	}
 
@@ -49,17 +65,30 @@ class IntegerFormFieldInterfaceMapping<Container>
 			@NonNull Container container,
 			@NonNull Optional<Long> genericValue) {
 
-		if (! genericValue.isPresent ()) {
+		if (
+
+			isNotPresent (
+				genericValue)
+
+			|| (
+
+				blankIfZero
+
+				&& equal (
+					genericValue.get (),
+					0))
+
+		) {
+
 			return Optional.<String>absent ();
-		}
 
-		if (genericValue.get () == 0 && blankIfZero) {
-			return Optional.of ("");
-		}
+		} else {
 
-		return Optional.of (
-			Long.toString (
-				genericValue.get ()));
+			return Optional.of (
+				Long.toString (
+					genericValue.get ()));
+
+		}
 
 	}
 
