@@ -13,6 +13,7 @@ import wbs.console.forms.FormFieldBuilderContext;
 import wbs.console.forms.FormFieldConstraintValidator;
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.console.forms.FormFieldNativeMapping;
+import wbs.console.forms.FormFieldPluginManagerImplementation;
 import wbs.console.forms.FormFieldRenderer;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormFieldUpdateHook;
@@ -30,7 +31,6 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.platform.event.console.SimpleFormFieldUpdateHook;
 import wbs.platform.media.model.MediaRec;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -38,6 +38,11 @@ import wbs.platform.media.model.MediaRec;
 @ConsoleModuleBuilderHandler
 public
 class ImageFormFieldBuilder {
+
+	// dependencies
+
+	@Inject
+	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
 
@@ -64,10 +69,6 @@ class ImageFormFieldBuilder {
 	@Inject
 	Provider<SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
-
-	@Inject
-	Provider<SimpleFormFieldUpdateHook>
-	simpleFormFieldUpdateHookProvider;
 
 	@Inject
 	Provider<ImageFormFieldRenderer>
@@ -175,9 +176,9 @@ class ImageFormFieldBuilder {
 		// update hook
 
 		FormFieldUpdateHook updateHook =
-			simpleFormFieldUpdateHookProvider.get ()
-
-			.name (
+			formFieldPluginManager.getUpdateHook (
+				context,
+				context.containerClass (),
 				name);
 
 		// form field

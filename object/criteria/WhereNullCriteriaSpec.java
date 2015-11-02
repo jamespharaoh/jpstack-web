@@ -20,13 +20,14 @@ class WhereNullCriteriaSpec
 	implements CriteriaSpec {
 
 	@DataAttribute (
-		value = "field",
+		name = "field",
 		required = true)
 	@Getter @Setter
 	String fieldName;
 
 	@Override
-	public boolean evaluate (
+	public
+	boolean evaluate (
 			ConsoleHelper<?> objectHelper,
 			Record<?> object) {
 

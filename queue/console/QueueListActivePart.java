@@ -85,12 +85,20 @@ class QueueListActivePart
 		queueInfos =
 			new ArrayList<QueueInfo> ();
 
-		for (QueueInfo queueInfo : queueInfosTemp) {
+		for (
+			QueueInfo queueInfo
+				: queueInfosTemp
+		) {
 
-			if (! objectManager.canView (queueInfo.queue ()))
+			if (
+				! objectManager.canView (
+					queueInfo.queue ())
+			) {
 				continue;
+			}
 
-			queueInfos.add (queueInfo);
+			queueInfos.add (
+				queueInfo);
 
 		}
 

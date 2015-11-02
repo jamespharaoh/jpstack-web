@@ -25,19 +25,23 @@ class ObjectSearchPageSpec {
 
 	// attributes
 
-	@DataAttribute ("search-class")
+	@DataAttribute (
+		name = "search-class")
 	String searchClassName;
 
 	@DataAttribute
 	String sessionKey;
 
-	@DataAttribute ("search-fields")
+	@DataAttribute (
+		name = "search-fields")
 	String searchFieldsName;
 
-	@DataAttribute ("results-fields")
+	@DataAttribute (
+		name = "results-fields")
 	String resultsFieldsName;
 
-	@DataAttribute ("results-rows-fields")
+	@DataAttribute (
+		name = "results-rows-fields")
 	String resultsRowsFieldsName;
 
 	@DataAttribute
@@ -55,10 +59,12 @@ class ObjectSearchPageSpec {
 	@DataAttribute
 	String fileName;
 
-	@DataAttribute ("search-responder")
+	@DataAttribute (
+		name = "search-responder")
 	String searchResponderName;
 
-	@DataAttribute ("results-responder")
+	@DataAttribute (
+		name = "results-responder")
 	String searchResultsResponderName;
 
 }

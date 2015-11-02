@@ -27,7 +27,7 @@ class ObjectSummaryBeanPartSpec {
 	ObjectSummaryPageSpec objectSummaryPageSpec;
 
 	@DataAttribute (
-		value = "name",
+		name = "name",
 		required = true)
 	String beanName;
 

@@ -220,12 +220,20 @@ class ObjectSearchResultsPart
 			" type=\"submit\"",
 			" name=\"new-search\"",
 			" value=\"new search\"",
-			">\n",
+			">\n");
 
+		printFormat (
 			"<input",
 			" type=\"submit\"",
 			" name=\"repeat-search\"",
 			" value=\"repeat search\"",
+			">\n");
+
+		printFormat (
+			"<input",
+			" type=\"submit\"",
+			" name=\"download-csv\"",
+			" value=\"download csv\"",
 			"></p>\n");
 
 		printFormat (

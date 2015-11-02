@@ -27,10 +27,12 @@ class ObjectSettingsPageSpec {
 	@DataAttribute
 	String objectName;
 
-	@DataAttribute ("fields")
+	@DataAttribute (
+		name = "fields")
 	String fieldsName;
 
-	@DataAttribute ("fields-provider")
+	@DataAttribute (
+		name = "fields-provider")
 	String fieldsProviderName;
 
 	@DataAttribute

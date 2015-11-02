@@ -26,10 +26,12 @@ class ObjectSummaryPageSpec {
 	@DataAncestor
 	ConsoleModuleSpec consoleSpec;
 
-	@DataAttribute ("fields")
+	@DataAttribute (
+		name = "fields")
 	String fieldsName;
 
-	@DataAttribute ("fields-provider")
+	@DataAttribute (
+		name = "fields-provider")
 	String fieldsProviderName;
 
 	@DataAttribute

@@ -21,6 +21,11 @@
 			description="See alert notifications in the status bar"
 			template="yes"/>
 
+		<priv-type
+			name="Debug"
+			description="View debug information for the entire system"
+			template="yes"/>
+
 	</priv-types>
 
 </model-meta>

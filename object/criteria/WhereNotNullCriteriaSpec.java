@@ -20,7 +20,7 @@ class WhereNotNullCriteriaSpec
 	implements CriteriaSpec {
 
 	@DataAttribute (
-		value = "field",
+		name = "field",
 		required = true)
 	@Getter @Setter
 	String fieldName;

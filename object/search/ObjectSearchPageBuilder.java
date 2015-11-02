@@ -2,12 +2,16 @@ package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.presentInstances;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -88,7 +92,7 @@ class ObjectSearchPageBuilder {
 	Class<?> searchClass;
 
 	FormFieldSet searchFormFieldSet;
-	FormFieldSet resultsFormFieldset;
+	FormFieldSet resultsFormFieldSet;
 	FormFieldSet resultsRowsFormFieldSet;
 
 	String sessionKey;
@@ -119,9 +123,11 @@ class ObjectSearchPageBuilder {
 		buildSearchResponder ();
 		buildResultsResponder ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildContextTab (
 				resolvedExtensionPoint);
@@ -214,8 +220,16 @@ class ObjectSearchPageBuilder {
 					.parentIdName (
 						parentIdName)
 
-					.formFieldSet (
+					.searchFormFieldSet (
 						searchFormFieldSet)
+
+					.resultsFormFieldSets (
+						ImmutableList.copyOf (
+							presentInstances (
+								Optional.of (
+									resultsFormFieldSet),
+								Optional.fromNullable (
+									resultsRowsFormFieldSet))))
 
 					.searchResponderName (
 						searchResponderName)
@@ -324,7 +338,7 @@ class ObjectSearchPageBuilder {
 						sessionKey)
 
 					.formFieldSet (
-						resultsFormFieldset)
+						resultsFormFieldSet)
 
 					.rowsFormFieldSet (
 						resultsRowsFormFieldSet)
@@ -333,9 +347,7 @@ class ObjectSearchPageBuilder {
 						itemsPerPage)
 
 					.targetContextTypeName (
-						consoleHelper.objectName () + "+")
-
-				;
+						consoleHelper.objectName () + "+");
 
 			}
 
@@ -419,7 +431,7 @@ class ObjectSearchPageBuilder {
 			consoleModule.formFieldSets ().get (
 				spec.searchFieldsName ());
 
-		resultsFormFieldset =
+		resultsFormFieldSet =
 			consoleModule.formFieldSets ().get (
 				spec.resultsFieldsName ());
 
