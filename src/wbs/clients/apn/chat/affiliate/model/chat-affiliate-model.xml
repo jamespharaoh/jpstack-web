@@ -40,7 +40,7 @@
 	<collections>
 
 		<children-collection
-			join-column="john_chat_affiliate_id"
+			join-column="join_chat_affiliate_id"
 			type="chatSchemeKeyword"/>
 
 	</collections>

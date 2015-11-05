@@ -66,11 +66,6 @@ class GenericConsoleHelperProvider
 
 	// required properties
 
-	/*
-	@Getter @Setter
-	ConsoleModuleMiniSpec consoleModuleMiniSpec;
-	*/
-
 	@Getter @Setter
 	ConsoleHelperProviderSpec consoleHelperProviderSpec;
 
@@ -116,11 +111,6 @@ class GenericConsoleHelperProvider
 	GenericConsoleHelperProvider init () {
 
 		// check required properties
-
-		/*
-		if (consoleModuleMiniSpec == null)
-			throw new NullPointerException ("consoleModuleMiniSpec");
-		*/
 
 		if (consoleHelperProviderSpec == null)
 			throw new NullPointerException ("consoleHelperProviderSpec");
@@ -474,6 +464,12 @@ class GenericConsoleHelperProvider
 
 			}
 
+		}
+
+		// types are always visible
+
+		if (objectHelper.type ()) {
+			return true;
 		}
 
 		// default

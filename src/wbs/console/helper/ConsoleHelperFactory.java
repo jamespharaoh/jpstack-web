@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
 import wbs.console.module.ConsoleMetaManager;
 import wbs.framework.application.context.BeanFactory;
 import wbs.framework.object.ObjectHelper;
@@ -60,6 +61,11 @@ class ConsoleHelperFactory
 				objectHelper.objectName ());
 
 		if (consoleHelperProvider == null) {
+
+			log.warn (
+				stringFormat (
+					"No console helper provider for %s",
+					objectHelper.objectName ()));
 
 			consoleHelperProvider =
 				genericConsoleHelperProviderProvider.get ()

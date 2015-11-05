@@ -44,6 +44,7 @@ import wbs.framework.record.GlobalId;
 import wbs.framework.record.MajorRecord;
 import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
+import wbs.framework.record.TypeRecord;
 
 @Accessors (fluent = true)
 @SingletonComponent ("objectHelperBuilder")
@@ -706,6 +707,13 @@ class ObjectHelperBuilder {
 			public
 			boolean common () {
 				return CommonRecord.class.isAssignableFrom (
+					objectClass ());
+			}
+
+			@Override
+			public
+			boolean type () {
+				return TypeRecord.class.isAssignableFrom (
 					objectClass ());
 			}
 

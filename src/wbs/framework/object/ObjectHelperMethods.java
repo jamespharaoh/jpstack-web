@@ -60,6 +60,7 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	boolean event ();
 	boolean major ();
 	boolean minor ();
+	boolean type ();
 
 	// data access
 
