@@ -86,11 +86,9 @@
 			name="sentTime"
 			label="Sent"/>
 
-		<!--
 		<integer-field
 			name="numTotal"
 			label="Numbers"/>
-		-->
 
 	</field-set>
 

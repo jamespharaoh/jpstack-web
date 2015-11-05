@@ -36,7 +36,8 @@
 
 	<object-context
 		name="broadcastConfig"
-		object-name="broadcastConfig">
+		object-name="broadcastConfig"
+		default-file="broadcast">
 
 		<list>
 

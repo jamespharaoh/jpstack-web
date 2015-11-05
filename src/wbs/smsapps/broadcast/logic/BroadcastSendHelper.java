@@ -273,7 +273,10 @@ class BroadcastSendHelper
 				broadcast.getNumAccepted () - 1)
 
 			.setNumRejected (
-				broadcast.getNumRejected () + 1);
+				broadcast.getNumRejected () + 1)
+
+			.setNumTotal (
+				broadcast.getNumTotal () - 1);
 
 	}
 

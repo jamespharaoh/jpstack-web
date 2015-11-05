@@ -214,7 +214,10 @@ class BroadcastNumbersAction
 							broadcast.getNumAccepted () - 1)
 
 						.setNumRemoved (
-							broadcast.getNumRemoved () + 1);
+							broadcast.getNumRemoved () + 1)
+
+						.setNumTotal (
+							broadcast.getNumTotal () - 1);
 
 					numRemoved ++;
 

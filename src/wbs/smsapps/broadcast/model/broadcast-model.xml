@@ -92,6 +92,10 @@
 			name="numSent"
 			default="0"/>
 
+		<integer-field
+			name="numTotal"
+			default="0"/>
+
 	</fields>
 
 	<event-types>

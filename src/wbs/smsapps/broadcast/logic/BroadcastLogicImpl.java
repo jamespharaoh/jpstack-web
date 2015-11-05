@@ -114,7 +114,10 @@ class BroadcastLogicImpl
 							broadcast.getNumRemoved () - 1)
 
 						.setNumAccepted (
-							broadcast.getNumAccepted () + 1);
+							broadcast.getNumAccepted () + 1)
+
+						.setNumTotal (
+							broadcast.getNumTotal () + 1);
 
 					result.numAdded ++;
 
@@ -150,7 +153,10 @@ class BroadcastLogicImpl
 							broadcast.getNumRejected () - 1)
 
 						.setNumAccepted (
-							broadcast.getNumAccepted () + 1);
+							broadcast.getNumAccepted () + 1)
+
+						.setNumTotal (
+							broadcast.getNumTotal () + 1);
 
 					result.numAdded ++;
 
