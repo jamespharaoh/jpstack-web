@@ -44,7 +44,7 @@ import com.google.common.collect.ImmutableSet;
 @Log4j
 @SingletonComponent ("mediaLogic")
 public
-class MediaLogicImpl
+class MediaLogicImplementation
 	implements MediaLogic {
 
 	// dependencies

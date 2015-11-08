@@ -17,7 +17,7 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.MediaLogicImpl"/>
+		<bean class="logic.MediaLogicImplementation"/>
 	</layer>
 
 	<layer name="console">

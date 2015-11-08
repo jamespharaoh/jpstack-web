@@ -67,7 +67,7 @@
 			<post-action name="changePassword"/>
 		</resource>
 
-		<resource name="get-message-template-list">
+		<resource name="message-template-set">
 			<post-action name="messageTemplateSetGet"/>
 		</resource>
 
@@ -80,6 +80,10 @@
 
 		<resource name="original.jpg">
 			<get-action name="mediaOriginalJpeg"/>
+		</resource>
+
+		<resource name="thumbnail.jpg">
+			<get-action name="mediaThumbnailJpeg"/>
 		</resource>
 
 	</variable>

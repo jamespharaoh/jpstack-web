@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 
 import lombok.NonNull;
+
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;
@@ -80,6 +81,11 @@ class ImChatApiLogicImplementation
 			Math.abs (
 				content.getHash ());
 
+		int resizedWidth = 98;
+
+		int resizedHeight =
+			image.getHeight () * resizedWidth / image.getWidth ();
+
 		return new ImChatProfileData ()
 
 			.code (
@@ -99,13 +105,13 @@ class ImChatApiLogicImplementation
 					image.getId (),
 					"/%u",
 					hash,
-					"/original.jpg"))
+					"/thumbnail.jpg"))
 
 			.imageWidth (
-				image.getWidth ())
+				resizedWidth)
 
 			.imageHeight (
-				image.getHeight ());
+				resizedHeight);
 
 	}
 
