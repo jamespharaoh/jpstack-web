@@ -2194,7 +2194,8 @@ class ChatApiServletModule
 		void doIt () {
 
 			ChatRec chat =
-				chatHelper.find (chatId);
+				chatHelper.find (
+					chatId);
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
@@ -2211,7 +2212,9 @@ class ChatApiServletModule
 					toCode);
 
 			// check the user is not barred
-			if (fromUser.getBarred ())
+
+			if (fromUser.getBarred ()) {
+
 				throw new RpcException (
 					Rpc.rpcError (
 						"chat-message-send-response",
@@ -2219,13 +2222,15 @@ class ChatApiServletModule
 						"barred",
 						"This profile has been barred"));
 
+			}
+
 			// check if the user is barred through credit
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
 					fromUser,
 					true,
-					null);
+					Optional.<Integer>absent ());
 
 			if (creditCheckResult.failed ()) {
 
@@ -2456,7 +2461,7 @@ class ChatApiServletModule
 					chatCreditLogic.userSpendCreditCheck (
 						chatUser,
 						true,
-						null);
+						Optional.<Integer>absent ());
 
 				if (creditCheckResult.failed ()) {
 

@@ -15,7 +15,7 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ChatCreditLogicImpl"/>
+		<bean class="logic.ChatCreditLogicImplementation"/>
 	</layer>
 
 	<layer name="daemon">

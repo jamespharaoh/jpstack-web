@@ -72,23 +72,11 @@ class ManualResponderDelivery
 			database.beginReadWrite (
 				this);
 
-System.out.println (
-	"MR DELIVERY " + deliveryId);
-
 		DeliveryRec delivery =
 			deliveryHelper.find (
 				deliveryId);
 
-System.out.println (
-	"MESSAGE " + delivery.getMessage ().getId ());
-
-System.out.println (
-	"STATUS " + delivery.getMessage ().getStatus ().toString ());
-
 		if (delivery.getNewMessageStatus ().isGoodType ()) {
-
-System.out.println (
-	"IS GOOD TYPE");
 
 			MessageRec deliveryMessage =
 				delivery.getMessage ();
@@ -102,12 +90,6 @@ System.out.println (
 					reply.getMessages (),
 					deliveryMessage);
 
-System.out.println (
-	"DELIVERY INDEX " + deliveryMessageIndex);
-
-System.out.println (
-	"MESSAGES SIZE " + reply.getMessages ().size ());
-
 			if (
 				reply.getMessages ().size ()
 					> deliveryMessageIndex + 1
@@ -117,16 +99,7 @@ System.out.println (
 					reply.getMessages ().get (
 						deliveryMessageIndex + 1);
 
-System.out.println (
-	"NEXT ID " + nextMessage.getId ());
-
-System.out.println (
-	"NEXT STATUS " + nextMessage.getStatus ());
-
 				if (nextMessage.getStatus () == MessageStatus.held) {
-
-System.out.println (
-	"UNHOLD");
 
 					outboxLogic.unholdMessage (
 						nextMessage);
@@ -138,9 +111,6 @@ System.out.println (
 		}
 
 		if (delivery.getNewMessageStatus ().isBadType ()) {
-
-System.out.println (
-	"IS BAD TYPE");
 
 			MessageRec deliveryMessage =
 				delivery.getMessage ();
@@ -176,16 +146,10 @@ System.out.println (
 
 		}
 
-System.out.println (
-	"REMOVE");
-
 		deliveryHelper.remove (
 			delivery);
 
 		transaction.commit ();
-
-System.out.println (
-	"COMMIT");
 
 	}
 

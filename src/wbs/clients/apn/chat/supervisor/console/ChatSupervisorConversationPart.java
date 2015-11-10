@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.supervisor.console;
 
 import static wbs.framework.utils.etc.Misc.anyOf;
 import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.spacify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -174,10 +175,12 @@ class ChatSupervisorConversationPart
 			"<th>Name</th>\n",
 
 			"<td>%h</td>\n",
-			monitorChatUser.getName (),
+			emptyStringIfNull (
+				monitorChatUser.getName ()),
 
 			"<td>%h</td>\n",
-			userChatUser.getName (),
+			emptyStringIfNull (
+				userChatUser.getName ()),
 
 			"</tr>\n");
 

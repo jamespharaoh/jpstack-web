@@ -241,7 +241,7 @@ class ChatDateDaemon
 				chatCreditLogic.userSpendCreditCheck (
 					chatUser,
 					false,
-					null);
+					Optional.<Integer>absent ());
 
 			if (creditCheckResult.failed ())
 				continue;
@@ -267,7 +267,10 @@ class ChatDateDaemon
 
 			.build ());
 
-		for (Integer chatUserId : monitorIds) {
+		for (
+			Integer chatUserId
+				: monitorIds
+		) {
 
 			ChatUserRec chatUser =
 				chatUserHelper.find (
@@ -281,7 +284,10 @@ class ChatDateDaemon
 		// put all active dating users who may still need a message into
 		// datingUserIds
 
-		for (ChatUserRec chatUser : datingUsers) {
+		for (
+			ChatUserRec chatUser
+				: datingUsers
+		) {
 
 			if (chatUser.getType () != ChatUserType.user) {
 
@@ -297,7 +303,7 @@ class ChatDateDaemon
 				chatCreditLogic.userSpendCreditCheck (
 					chatUser,
 					false,
-					null);
+					Optional.<Integer>absent ());
 
 			if (creditCheckResult.failed ()) {
 
@@ -511,7 +517,7 @@ class ChatDateDaemon
 			chatCreditLogic.userSpendCreditCheck (
 				thisUser,
 				false,
-				null);
+				Optional.<Integer>absent ());
 
 		if (creditCheckResult.failed ()) {
 
@@ -526,19 +532,33 @@ class ChatDateDaemon
 
 		}
 
-		if (! checkHours (hour, thisUser.getDateStartHour (), thisUser.getDateEndHour ())) {
+		if (
+			! checkHours (
+				hour,
+				thisUser.getDateStartHour (),
+				thisUser.getDateEndHour ())
+		) {
+
 			log.debug ("Ignoring " + thisUserId + " (time check failed)");
+
 			return false;
+
 		}
 
 		if (thisUser.getOnline ()) {
+
 			log.debug ("Ignoring " + thisUserId + " (online check failed)");
+
 			return false;
+
 		}
 
 		if (thisUser.getDateMode () == ChatUserDateMode.none) {
+
 			log.debug ("Ignoring " + thisUserId + " (dating mode check failed)");
+
 			return false;
+
 		}
 
 		// and send them
@@ -546,6 +566,7 @@ class ChatDateDaemon
 		if (thisUser.getDateMode () == ChatUserDateMode.photo) {
 
 			if (
+
 				sendSingleLot (
 					thisUser,
 					otherUserInfos,
@@ -553,6 +574,7 @@ class ChatDateDaemon
 					true,
 					false,
 					3)
+
 				|| sendSingleLot (
 					thisUser,
 					otherUserInfos,
@@ -560,6 +582,7 @@ class ChatDateDaemon
 					false,
 					true,
 					1)
+
 			) {
 				status = true;
 			}

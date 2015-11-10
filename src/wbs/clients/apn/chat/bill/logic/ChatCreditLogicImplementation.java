@@ -63,7 +63,7 @@ import wbs.sms.route.core.model.RouteRec;
 @Log4j
 @SingletonComponent ("chatCreditLogic")
 public
-class ChatCreditLogicImpl
+class ChatCreditLogicImplementation
 	implements ChatCreditLogic {
 
 	// dependencies
