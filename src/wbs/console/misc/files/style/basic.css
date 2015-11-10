@@ -80,6 +80,7 @@ table.list tr.message-in td {
 	background: #ddddff;
 }
 
+table.list tr.message-in.selected td,
 table.list tr.message-in.hover td {
 	background: #b1b1cc;
 }
@@ -88,6 +89,7 @@ table.list tr.message-out td {
 	background: #ffffdd;
 }
 
+table.list tr.message-out.selected td,
 table.list tr.message-out.hover td {
 	background: #ccccb1;
 }
@@ -96,6 +98,7 @@ table.list tr.message-out-charge td {
 	background: #ffdddd;
 }
 
+table.list tr.message-out-charge.selected td,
 table.list tr.message-out-charge.hover td {
 	background: #ffdddd;
 }

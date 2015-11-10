@@ -1,15 +1,15 @@
 <console-module
-	name="im-chat-message-pending">
+	name="im-chat-pending">
 
 	<object-context
-		name="imChatMessage.pending"
-		bean-name="imChatMessagePending"
+		name="imChat.pending"
+		bean-name="imChatPending"
 		object-name="imChatMessage">
 
 		<object>
 
 			<context-tab-responder-page
-				name="history"/>
+				name="summary"/>
 
 			<context-action-page
 				name="form"/>

@@ -56,7 +56,7 @@
 					priv-key="imChat.manage"/>
 
 				<context-link
-					name="price-point"
+					name="pricePoint"
 					link="imChatPricePoint"
 					label="Price Points"
 					priv-key="imChat.manage"/>
@@ -65,6 +65,12 @@
 					name="profile"
 					link="imChatProfile"
 					label="Profiles"
+					priv-key="imChat.manage"/>
+
+				<context-link
+					name="customerDetailType"
+					link="imChatCustomerDetailType"
+					label="Customer detail types"
 					priv-key="imChat.manage"/>
 
 			</section>

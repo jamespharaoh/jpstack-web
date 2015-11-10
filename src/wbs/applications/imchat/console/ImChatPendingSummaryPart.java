@@ -1,10 +1,21 @@
 package wbs.applications.imchat.console;
 
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.joinWithSpace;
+import static wbs.framework.utils.etc.Misc.optionalIf;
+import static wbs.framework.utils.etc.Misc.presentInstances;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import lombok.NonNull;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
@@ -18,11 +29,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 
-import com.google.common.collect.Lists;
-
-@PrototypeComponent ("imChatMessagePendingHistoryPart")
+@PrototypeComponent ("imChatPendingSummaryPart")
 public
-class ImChatMessagePendingHistoryPart
+class ImChatPendingSummaryPart
 	extends AbstractPagePart {
 
 	// dependencies
@@ -34,7 +43,7 @@ class ImChatMessagePendingHistoryPart
 	ConsoleObjectManager objectManager;
 
 	@Inject @Named
-	ConsoleModule imChatMessagePendingConsoleModule;
+	ConsoleModule imChatPendingConsoleModule;
 
 	@Inject
 	ImChatMessageObjectHelper imChatMessageHelper;
@@ -59,18 +68,19 @@ class ImChatMessagePendingHistoryPart
 		// get field sets
 
 		customerFields =
-			imChatMessagePendingConsoleModule.formFieldSets ().get (
+			imChatPendingConsoleModule.formFieldSets ().get (
 				"customerFields");
 
 		messageFields =
-			imChatMessagePendingConsoleModule.formFieldSets ().get (
+			imChatPendingConsoleModule.formFieldSets ().get (
 				"messageFields");
 
 		// load data
 
 		imChatMessage =
 			imChatMessageHelper.find (
-				requestContext.stuffInt ("imChatMessageId"));
+				requestContext.stuffInt (
+					"imChatMessageId"));
 
 		imChatConversation =
 			imChatMessage.getImChatConversation ();
@@ -96,7 +106,7 @@ class ImChatMessagePendingHistoryPart
 
 		List<ImChatMessageRec> messages =
 			new ArrayList<ImChatMessageRec> (
-				imChatConversation.getImChatMessages ());
+				imChatConversation.getMessagesIn ());
 
 		List<ImChatMessageRec> reverseMessages =
 			Lists.reverse (
@@ -126,8 +136,46 @@ class ImChatMessagePendingHistoryPart
 				: reverseMessages
 		) {
 
+			if (
+				isNotNull (
+					message.getPartnerImChatMessage ())
+			) {
+
+				ImChatMessageRec partnerMessage =
+					message.getPartnerImChatMessage ();
+
+				printFormat (
+					"<tr",
+					" class=\"%h\"",
+					classForMessage (
+						partnerMessage),
+					">\n");
+
+				formFieldLogic.outputTableCellsList (
+					formatWriter,
+					messageFields,
+					partnerMessage,
+					true);
+
+				printFormat (
+					"</tr>\n");
+
+			}
+
 			printFormat (
-				"<tr>\n");
+				"<tr",
+				" class=\"%h\"",
+				joinWithSpace (
+					presentInstances (
+						Optional.of (
+							classForMessage (
+								message)),
+						optionalIf (
+							equal (
+								message,
+								imChatMessage),
+							"selected"))),
+				">\n");
 
 			formFieldLogic.outputTableCellsList (
 				formatWriter,
@@ -166,6 +214,31 @@ class ImChatMessagePendingHistoryPart
 
 		printFormat (
 			"</table>\n");
+
+	}
+
+	String classForMessage (
+			@NonNull ImChatMessageRec message) {
+
+		if (
+			isNotNull (
+				message.getPrice ())
+		) {
+
+			return "message-out-charge";
+
+		} else if (
+			isNotNull (
+				message.getSenderUser ())
+		) {
+
+			return "message-out";
+
+		} else {
+
+			return "message-in";
+
+		}
 
 	}
 

@@ -12,6 +12,8 @@ import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import com.google.common.base.Optional;
+
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatPricePointObjectHelper;
@@ -37,8 +39,6 @@ import wbs.integrations.paypal.model.PaypalPaymentObjectHelper;
 import wbs.integrations.paypal.model.PaypalPaymentRec;
 import wbs.integrations.paypal.model.PaypalPaymentState;
 import wbs.platform.currency.logic.CurrencyLogic;
-
-import com.google.common.base.Optional;
 
 @PrototypeComponent ("imChatPurchaseStartAction")
 public
@@ -189,20 +189,33 @@ class ImChatPurchaseStartAction
 
 		// create paypal payment
 
-		PaypalPaymentRec paypalPayment =
-			paypalPaymentHelper.insert (
-				new PaypalPaymentRec ()
+		PaypalPaymentRec paypalPayment;
 
-			.setPaypalAccount (
-				paypalAccount)
+		if (imChat.getDevelopmentMode ()) {
 
-			.setValue (
-				pricePoint.getValue ())
+			paypalPayment = null;
 
-			.setState (
-				PaypalPaymentState.started)
+		} else {
 
-		);
+			paypalPayment =
+				paypalPaymentHelper.insert (
+					new PaypalPaymentRec ()
+
+				.setPaypalAccount (
+					paypalAccount)
+
+				.setTimestamp (
+					transaction.now ())
+
+				.setValue (
+					pricePoint.getValue ())
+
+				.setState (
+					PaypalPaymentState.started)
+
+			);
+
+		}
 
 		// create purchase
 
@@ -231,6 +244,11 @@ class ImChatPurchaseStartAction
 			.setCreatedTime (
 				transaction.now ())
 
+			.setCompletedTime (
+				imChat.getDevelopmentMode ()
+					? transaction.now ()
+					: null)
+
 			.setPaypalPayment (
 				paypalPayment)
 
@@ -241,26 +259,44 @@ class ImChatPurchaseStartAction
 		customer
 
 			.setNumPurchases (
-				customer.getNumPurchases () + 1);
+				customer.getNumPurchases () + 1)
+
+			.setBalance (
+				imChat.getDevelopmentMode ()
+					? customer.getBalance ()
+						+ pricePoint.getValue ()
+					: customer.getBalance ());
 
 		// update paypal
 
-		Map<String,String> expressCheckoutProperties =
-			paypalLogic.expressCheckoutProperties (
-				paypalAccount);
+		Optional<String> redirectUrl;
 
-		Optional<String> redirectUrl =
-			paypalApi.setExpressCheckout (
-				currencyLogic.formatSimple (
-					imChat.getCurrency (),
-					(long) pricePoint.getValue ()),
-				purchaseRequest.successUrl ().replace (
-					"{token}",
-					purchase.getToken ()),
-				purchaseRequest.failureUrl ().replace (
-					"{token}",
-					purchase.getToken ()),
-				expressCheckoutProperties);
+		if (imChat.getDevelopmentMode ()) {
+
+			redirectUrl =
+				Optional.of (
+					"development-mode");
+
+		} else {
+
+			Map<String,String> expressCheckoutProperties =
+				paypalLogic.expressCheckoutProperties (
+					paypalAccount);
+
+			redirectUrl =
+				paypalApi.setExpressCheckout (
+					currencyLogic.formatSimple (
+						imChat.getCurrency (),
+						(long) pricePoint.getValue ()),
+					purchaseRequest.successUrl ().replace (
+						"{token}",
+						purchase.getToken ()),
+					purchaseRequest.failureUrl ().replace (
+						"{token}",
+						purchase.getToken ()),
+					expressCheckoutProperties);
+
+		}
 
 		// create response
 
@@ -279,7 +315,9 @@ class ImChatPurchaseStartAction
 		transaction.commit ();
 
 		return jsonResponderProvider.get ()
-			.value (successResponse);
+
+			.value (
+				successResponse);
 
 	}
 

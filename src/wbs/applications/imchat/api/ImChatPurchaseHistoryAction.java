@@ -1,5 +1,7 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.isNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,8 @@ import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+
+import com.google.common.collect.Lists;
 
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
@@ -28,8 +32,6 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-
-import com.google.common.collect.Lists;
 
 @PrototypeComponent ("imChatPurchaseHistoryAction")
 public
@@ -115,13 +117,14 @@ class ImChatPurchaseHistoryAction
 					"longer active");
 
 			return jsonResponderProvider.get ()
-				.value (failureResponse);
+
+				.value (
+					failureResponse);
 
 		}
 
 		ImChatCustomerRec customer =
-				session.getImChatCustomer();
-
+			session.getImChatCustomer ();
 
 		// retrieve purchases
 
@@ -146,27 +149,24 @@ class ImChatPurchaseHistoryAction
 				: purchases
 		) {
 
-		purchaseHistoryResponse.purchases.add (
-			new ImChatPurchaseHistoryData ()
+			if (
+				isNull (
+					purchase.getCompletedTime ())
+			) {
+				continue;
+			}
 
-			.price (
-				purchase.getPrice ())
+			purchaseHistoryResponse.purchases.add (
+				imChatApiLogic.purchaseHistoryData (
+					purchase));
+
+		}
+
+		return jsonResponderProvider.get ()
 
 			.value (
-				purchase.getValue ())
-
-			.timestamp (
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
-					purchase.getCreatedTime ()))
-
-		);
+				purchaseHistoryResponse);
 
 	}
-
-	return jsonResponderProvider.get ()
-		.value (purchaseHistoryResponse);
-
-}
 
 }

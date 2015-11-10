@@ -14,15 +14,16 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.scaffold.PluginComponentSpec;
 import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @Accessors (fluent = true)
 @Log4j
@@ -169,7 +170,7 @@ class ModelMetaLoader {
 					modelName));
 
 		InputStream inputStream =
-			getClass ().getClassLoader ().getResourceAsStream (
+			getClass ().getResourceAsStream (
 				resourceName);
 
 		if (inputStream == null) {

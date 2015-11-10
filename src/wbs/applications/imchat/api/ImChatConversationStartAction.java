@@ -1,5 +1,7 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -158,6 +160,17 @@ class ImChatConversationStartAction
 
 		}
 
+		// check state
+
+		if (
+			isNotNull (
+				customer.getCurrentConversation ())
+		) {
+
+			throw new RuntimeException ();
+
+		}
+
 		// create conversation
 
 		ImChatConversationRec conversation =
@@ -183,7 +196,10 @@ class ImChatConversationStartAction
 		customer
 
 			.setNumConversations (
-				customer.getNumConversations () + 1);
+				customer.getNumConversations () + 1)
+
+			.setCurrentConversation (
+				conversation);
 
 		// create response
 

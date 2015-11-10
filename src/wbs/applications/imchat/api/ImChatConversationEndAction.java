@@ -1,6 +1,10 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.notLessThan;
 
 import java.io.IOException;
 
@@ -13,9 +17,12 @@ import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import wbs.applications.imchat.model.ImChatConversationObjectHelper;
+import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
+import wbs.applications.imchat.model.ImChatProfileObjectHelper;
 import wbs.applications.imchat.model.ImChatRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
 import wbs.applications.imchat.model.ImChatSessionRec;
@@ -23,15 +30,14 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 
-@PrototypeComponent ("imChatSessionStartAction")
+@PrototypeComponent ("imChatConversationEndAction")
 public
-class ImChatSessionStartAction
+class ImChatConversationEndAction
 	implements Action {
 
 	// dependencies
@@ -43,16 +49,19 @@ class ImChatSessionStartAction
 	ImChatApiLogic imChatApiLogic;
 
 	@Inject
+	ImChatConversationObjectHelper imChatConversationHelper;
+
+	@Inject
 	ImChatCustomerObjectHelper imChatCustomerHelper;
 
 	@Inject
 	ImChatObjectHelper imChatHelper;
 
 	@Inject
-	ImChatSessionObjectHelper imChatSessionHelper;
+	ImChatProfileObjectHelper imChatProfileHelper;
 
 	@Inject
-	RandomLogic randomLogic;
+	ImChatSessionObjectHelper imChatSessionHelper;
 
 	@Inject
 	RequestContext requestContext;
@@ -79,9 +88,9 @@ class ImChatSessionStartAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatSessionStartRequest startRequest =
+		ImChatConversationEndRequest endRequest =
 			dataFromJson.fromJson (
-				ImChatSessionStartRequest.class,
+				ImChatConversationEndRequest.class,
 				jsonValue);
 
 		// begin transaction
@@ -98,91 +107,96 @@ class ImChatSessionStartAction
 					requestContext.request (
 						"imChatId")));
 
-		// lookup customer
+		// lookup session and customer
+
+		ImChatSessionRec session =
+			imChatSessionHelper.findBySecret (
+				endRequest.sessionSecret ());
 
 		ImChatCustomerRec customer =
-			imChatCustomerHelper.findByEmail (
-				imChat,
-				startRequest.email ());
-
-		if (customer == null) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"email-invalid")
-
-				.message (
-					"No customer with that email address exists");
-
-			return jsonResponderProvider.get ()
-				.value (failureResponse);
-
-		}
-
-		// verify password
+			session.getImChatCustomer ();
 
 		if (
-			notEqual (
-				customer.getPassword (),
-				startRequest.password ())
+
+			isNull (
+				session)
+
+			|| ! session.getActive ()
+
+			|| notEqual (
+				imChat,
+				customer.getImChat ())
+
 		) {
 
 			ImChatFailure failureResponse =
 				new ImChatFailure ()
 
 				.reason (
-					"password-invalid")
+					"session-invalid")
 
 				.message (
-					"The supplied password is not correct");
+					"The session secret is invalid or the session is no " +
+					"longer active");
 
 			return jsonResponderProvider.get ()
-				.value (failureResponse);
+
+				.value (
+					failureResponse);
 
 		}
 
-		// create session
+		// get conversation
 
-		ImChatSessionRec session =
-			imChatSessionHelper.insert (
-				new ImChatSessionRec ()
+		if (
 
-			.setImChatCustomer (
-				customer)
+			lessThan (
+				endRequest.conversationIndex (),
+				0)
 
-			.setSecret (
-				randomLogic.generateLowercase (20))
+			|| notLessThan (
+				endRequest.conversationIndex (),
+				customer.getNumConversations ())
 
-			.setActive (
-				true)
+		) {
 
-			.setStartTime (
-				transaction.now ())
+			throw new RuntimeException ();
 
-			.setUpdateTime (
-				transaction.now ())
+		}
 
-		);
+		ImChatConversationRec conversation =
+			imChatConversationHelper.findByIndex (
+				customer,
+				endRequest.conversationIndex ());
+
+		// end conversation
+
+		if (
+			equal (
+				conversation,
+				customer.getCurrentConversation ())
+		) {
+
+			conversation
+
+				.setEndTime (
+					transaction.now ());
+
+			customer
+
+				.setCurrentConversation (
+					null);
+
+		}
 
 		// create response
 
-		ImChatSessionStartSuccess successResponse =
-			new ImChatSessionStartSuccess ()
-
-			.sessionSecret (
-				session.getSecret ())
+		ImChatConversationEndSuccess successResponse =
+			new ImChatConversationEndSuccess ()
 
 			.customer (
 				imChatApiLogic.customerData (
-					customer))
-
-			.conversation (
-				customer.getCurrentConversation () != null
-					? imChatApiLogic.conversationData (
-						customer.getCurrentConversation ())
-					: null);
+					customer));
 
 		// commit and return
 

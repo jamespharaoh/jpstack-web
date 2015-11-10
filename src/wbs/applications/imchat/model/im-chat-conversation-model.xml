@@ -22,6 +22,11 @@
 			name="startTime"
 			column-type="iso"/>
 
+		<timestamp-field
+			name="endTime"
+			column-type="iso"
+			nullable="yes"/>
+
 		<!-- relations -->
 
 		<reference-field
@@ -42,7 +47,14 @@
 	<collections>
 
 		<children-list
+			name="messages"
 			type="imChatMessage"/>
+
+		<children-collection
+			name="messagesIn"
+			type="imChatMessage"
+			order-sql="index"
+			where-sql="sender_user_id is null"/>
 
 	</collections>
 

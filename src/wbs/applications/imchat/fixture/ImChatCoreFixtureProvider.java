@@ -219,6 +219,9 @@ class ImChatCoreFixtureProvider
 			.setFreeMessageMaxChars (
 				50)
 
+			.setDevelopmentMode (
+				true)
+
 		);
 
 		paypalAccountHelper.insert (
@@ -242,7 +245,7 @@ class ImChatCoreFixtureProvider
 
 		// im chat price point
 
-		ImChatPricePointRec imChatPricePoint =
+		ImChatPricePointRec basicPricePoint =
 			imChatPricePointHelper.insert (
 				new ImChatPricePointRec ()
 
@@ -250,19 +253,65 @@ class ImChatCoreFixtureProvider
 				imChat)
 
 			.setCode (
-				"6_for_6")
+				"basic")
 
 			.setName (
-				"£6 for £6")
+				"Basic")
 
 			.setDescription (
-				"£6 for £6")
+				"Basic credit package")
 
 			.setPrice (
-				600)
+				599)
 
 			.setValue (
 				600)
+
+		);
+
+		imChatPricePointHelper.insert (
+			new ImChatPricePointRec ()
+
+			.setImChat (
+				imChat)
+
+			.setCode (
+				"saver")
+
+			.setName (
+				"Saver")
+
+			.setDescription (
+				"Saver credit offer")
+
+			.setPrice (
+				1099)
+
+			.setValue (
+				1200)
+
+		);
+
+		imChatPricePointHelper.insert (
+			new ImChatPricePointRec ()
+
+			.setImChat (
+				imChat)
+
+			.setCode (
+				"super_saver")
+
+			.setName (
+				"Super saver")
+
+			.setDescription (
+				"Super saver credit offer")
+
+			.setPrice (
+				1499)
+
+			.setValue (
+				1800)
 
 		);
 
@@ -454,13 +503,13 @@ class ImChatCoreFixtureProvider
 				imChatCustomer.getNumPurchases ())
 
 			.setImChatPricePoint (
-					imChatPricePoint)
+				basicPricePoint)
 
 			.setPrice (
-				10)
+				599)
 
 			.setValue (
-				10)
+				600)
 
 			.setCreatedTime (
 				transaction.now ())

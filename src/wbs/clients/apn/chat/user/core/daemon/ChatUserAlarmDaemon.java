@@ -156,7 +156,7 @@ class ChatUserAlarmDaemon
 			chatCreditLogic.userSpendCreditCheck (
 				user,
 				false,
-				null);
+				Optional.<Integer>absent ());
 
 		boolean ignore =
 			creditCheckResult.failed ();

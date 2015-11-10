@@ -10,6 +10,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.model.ChatBlockObjectHelper;
@@ -31,6 +35,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
@@ -46,8 +51,6 @@ import wbs.sms.message.inbox.daemon.CommandManager;
 import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
-
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @Log4j
@@ -270,7 +273,7 @@ class ChatChatCommand
 				Optional.of (
 					message.getThreadId ()),
 				ChatMessageMethod.sms,
-				null);
+				ImmutableList.<MediaRec>of ());
 
 		if (rejected != null)
 			message.setNotes (rejected);
@@ -290,8 +293,10 @@ class ChatChatCommand
 
 		return inboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (defaultService),
-			Optional.of (affiliate),
+			Optional.of (
+				defaultService),
+			Optional.of (
+				affiliate),
 			command);
 
 	}
@@ -370,6 +375,12 @@ class ChatChatCommand
 
 			.chatSchemeId (
 				chatScheme.getId ())
+
+			.inbox (
+				inbox)
+
+			.rest (
+				rest)
 
 			.handleInbox (
 				command)

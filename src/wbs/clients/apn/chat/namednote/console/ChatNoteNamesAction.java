@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameObjectHelper;
@@ -117,10 +118,24 @@ class ChatNoteNamesAction
 
 				chatNoteNameHelper.insert (
 					new ChatNoteNameRec ()
-						.setChat (chat)
-						.setIndex (chatNoteNames.size ())
-						.setName (requestContext.getForm ("noteNameNew"))
-						.setDeleted (false));
+
+					.setChat (
+						chat)
+
+					.setIndex (
+						chatNoteNames.size ())
+
+					.setName (
+						requestContext.getForm (
+							"noteNameNew"))
+
+					.setDescription (
+						"")
+
+					.setDeleted (
+						false)
+
+				);
 
 				notices.add ("New name added");
 

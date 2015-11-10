@@ -16,9 +16,9 @@ class ImChatPurchaseData {
 	String token;
 
 	@DataAttribute
-	Integer price;
+	String priceString;
 
 	@DataAttribute
-	Integer value;
+	String valueString;
 
 }

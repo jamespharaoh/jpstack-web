@@ -7,8 +7,8 @@
 			<post-action name="conversationStart"/>
 		</resource>
 
-		<resource name="customer">
-			<get-action name="customer"/>
+		<resource name="conversation-end">
+			<post-action name="conversationEnd"/>
 		</resource>
 
 		<resource name="customer-create">

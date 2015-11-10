@@ -10,18 +10,12 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass
 public
-class ImChatSessionStartSuccess {
-
-	@DataAttribute
-	String status = "success";
+class ImChatConversationEndRequest {
 
 	@DataAttribute
 	String sessionSecret;
 
 	@DataAttribute
-	ImChatCustomerData customer;
-
-	@DataAttribute
-	ImChatConversationData conversation;
+	Integer conversationIndex;
 
 }

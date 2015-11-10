@@ -12,6 +12,8 @@ import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
@@ -27,8 +29,6 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("imChatMessageListAction")
 public
@@ -111,7 +111,9 @@ class ImChatMessageListAction
 					"longer active");
 
 			return jsonResponderProvider.get ()
-				.value (failureResponse);
+
+				.value (
+					failureResponse);
 
 		}
 
@@ -129,7 +131,7 @@ class ImChatMessageListAction
 
 		List<ImChatMessageRec> allMessages =
 			ImmutableList.copyOf (
-				conversation.getImChatMessages ());
+				conversation.getMessages ());
 
 		List<ImChatMessageRec> newMessages =
 			ImmutableList.copyOf (
@@ -162,7 +164,9 @@ class ImChatMessageListAction
 		}
 
 		return jsonResponderProvider.get ()
-			.value (messageListSuccessResponse);
+
+			.value (
+				messageListSuccessResponse);
 
 	}
 

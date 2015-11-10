@@ -108,7 +108,7 @@ class ImChatSessionLoadAction
 
 		// get customer and conversation
 
-		ImChatCustomerRec imChatCustomer =
+		ImChatCustomerRec customer =
 			session.getImChatCustomer ();
 
 		// create response
@@ -118,7 +118,13 @@ class ImChatSessionLoadAction
 
 			.customer (
 				imChatApiLogic.customerData (
-					imChatCustomer));
+					customer))
+
+			.conversation (
+				customer.getCurrentConversation () != null
+					? imChatApiLogic.conversationData (
+						customer.getCurrentConversation ())
+					: null);
 
 		// commit and return
 

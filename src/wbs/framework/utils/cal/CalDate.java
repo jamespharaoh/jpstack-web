@@ -7,6 +7,8 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.NonNull;
+
 import org.joda.time.LocalDate;
 
 // TODO use LocalDate
@@ -206,10 +208,7 @@ class CalDate {
 
 	public static
 	CalDate forLocalDate (
-			LocalDate dob) {
-
-		if (dob == null)
-			return null;
+			@NonNull LocalDate dob) {
 
 		return new CalDate (
 			dob.getYear (),

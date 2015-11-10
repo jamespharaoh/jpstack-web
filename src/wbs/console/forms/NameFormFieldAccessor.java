@@ -30,7 +30,7 @@ class NameFormFieldAccessor<Container>
 	Optional<String> read (
 			@NonNull Container container) {
 
-		return Optional.of (
+		return Optional.fromNullable (
 			(String)
 			BeanLogic.getProperty (
 				container,

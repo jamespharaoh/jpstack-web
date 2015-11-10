@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -23,6 +24,8 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
+
+import com.google.common.collect.ImmutableSet;
 
 import wbs.clients.apn.chat.contact.model.ChatContactNoteObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatContactNoteRec;
@@ -55,8 +58,6 @@ import wbs.framework.utils.cal.CalDate;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.sms.gazetteer.logic.GazetteerLogic;
-
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("chatMonitorInboxSummaryPart")
 public
@@ -473,20 +474,23 @@ class ChatMonitorInboxSummaryPart
 
 		printFormat (
 			"<tr>\n",
-			"<th>Pic</th>",
+			"<th>Pic</th>");
 
+		printFormat (
 			"<td>%s</td>\n",
 			monitorChatUser.getChatUserImageList ().isEmpty ()
 				? "-"
 				: mediaConsoleLogic.mediaThumb100 (
-					monitorChatUser.getChatUserImageList ().get (0).getMedia ()),
+					monitorChatUser.getChatUserImageList ().get (0).getMedia ()));
 
+		printFormat (
 			"<td>%s</td>\n",
 			userChatUser.getChatUserImageList ().isEmpty ()
 				? "-"
 				: mediaConsoleLogic.mediaThumb100 (
-					userChatUser.getChatUserImageList ().get (0).getMedia ()),
+					userChatUser.getChatUserImageList ().get (0).getMedia ()));
 
+		printFormat (
 			"</tr>\n");
 
 	}
@@ -495,92 +499,143 @@ class ChatMonitorInboxSummaryPart
 
 		printFormat (
 			"<tr>\n",
-			"<th>Location</th>\n",
+			"<th>Location</th>\n");
 
+		printFormat (
 			"<td>%s</td>\n",
 			monitorChatUser.getLocationLongLat() != null
 				? gazetteerLogic.findNearestCanonicalEntry (
 						monitorChatUser.getChat ().getGazetteer (),
 						monitorChatUser.getLocationLongLat ()
 					).getName ()
-				: "-",
+				: "-");
 
+		printFormat (
 			"<td>%s</td>\n",
 			userChatUser.getLocationLongLat() != null
 				? gazetteerLogic.findNearestCanonicalEntry (
 						userChatUser.getChat ().getGazetteer (),
 						userChatUser.getLocationLongLat ()
 					).getName ()
-				: "-",
+				: "-");
 
+		printFormat (
 			"</tr>\n");
+
 	}
 
 	void goDob () {
 
 		printFormat (
 			"<tr>\n",
-			"<th>Date of birth</th>\n",
+			"<th>Date of birth</th>\n");
 
-			"<td>%h (%h)</td>\n",
-			CalDate.forLocalDate (monitorChatUser.getDob ()),
-			CalDate.age (
-				TimeZone.getDefault (),
-				CalDate.forLocalDate (monitorChatUser.getDob ()),
-				CalDate.fromJava (
-					instantToDate (
-						now))),
+		if (
+			isNotNull (
+				monitorChatUser.getDob ())
+		) {
 
-			"<td>%h (%h)</td>\n",
-			CalDate.forLocalDate (userChatUser.getDob ()),
-			CalDate.age (
-				TimeZone.getDefault (),
-				CalDate.forLocalDate (userChatUser.getDob ()),
-				CalDate.fromJava (
-					instantToDate (
-						now))),
+			printFormat (
+				"<td>%h (%h)</td>\n",
+					CalDate.forLocalDate (
+						monitorChatUser.getDob ()),
+				CalDate.age (
+					TimeZone.getDefault (),
+					CalDate.forLocalDate (
+						monitorChatUser.getDob ()),
+					CalDate.fromJava (
+						instantToDate (
+							now))));
 
+		} else {
+
+			printFormat (
+				"<td>-</td>\n");
+
+		}
+
+		if (
+			isNotNull (
+				userChatUser.getDob ())
+		) {
+
+			printFormat (
+				"<td>%h (%h)</td>\n",
+				CalDate.forLocalDate (
+					userChatUser.getDob ()),
+				CalDate.age (
+					TimeZone.getDefault (),
+					CalDate.forLocalDate (
+						userChatUser.getDob ()),
+					CalDate.fromJava (
+						instantToDate (
+							now))));
+
+		} else {
+
+			printFormat (
+				"<td>-</td>\n");
+
+		}
+
+		printFormat (
 			"</tr>\n");
+
 	}
 
 	void goScheme () {
 
 		printFormat (
 			"<tr>\n",
-			"<th>Scheme</th>\n",
+			"<th>Scheme</th>\n");
 
+		printFormat (
 			"<td colspan=\"2\" style=\"%h\">%h (%h)</td>\n",
 			userChatUser.getChatScheme ().getStyle (),
 			userChatUser.getChatScheme ().getCode (),
-			userChatUser.getChatScheme ().getRbNumber (),
+			userChatUser.getChatScheme ().getRbNumber ());
 
+		printFormat (
 			"</tr>\n");
+
 	}
 
 	void goNotesHeader () {
 
 		printFormat (
-			"<tr>\n",
+			"<tr>\n");
 
-			"<th colspan=\"3\" " +
-				"style=\"font-size: 120%%\">" +
-				"Notes (%s, %s)</th>\n",
-			"<a href=\"javascript:void(0)\" " +
-				"style=\"color: white\" " +
-				"class=\"namedNotesShowHideLink\">" +
-				"named notes</a>",
-			"<a href=\"javascript:void(0)\" " +
-				"style=\"color: white\" " +
-				"class=\"generalNotesShowHideLink\">" +
-				"general notes</a>",
+		printFormat (
+			"<th",
+			" colspan=\"3\"",
+			" style=\"font-size: 120%%\"",
+			">Notes (%s, %s)</th>\n",
 
+			stringFormat (
+				"<a",
+				" href=\"javascript:void(0)\"",
+				" style=\"color: white\"",
+				" class=\"namedNotesShowHideLink\"",
+				">named notes</a>"),
+
+			stringFormat (
+				"<a",
+				" href=\"javascript:void(0)\"",
+				" style=\"color: white\"",
+				" class=\"generalNotesShowHideLink\"",
+				">general notes</a>"));
+
+		printFormat (
 			"</tr>\n");
+
 	}
 
 	void goNamedNotes () {
 
-		for (ChatNoteNameRec chatNoteName
-				: chatNoteNames) {
+		for (
+			ChatNoteNameRec chatNoteName
+				: chatNoteNames
+		) {
 
 			printFormat (
 				"<tr",

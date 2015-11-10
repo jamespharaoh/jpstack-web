@@ -24,9 +24,9 @@ import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
-@PrototypeComponent ("imChatMessagePendingFormAction")
+@PrototypeComponent ("imChatPendingFormAction")
 public
-class ImChatMessagePendingFormAction
+class ImChatPendingFormAction
 	extends ConsoleAction {
 
 	// dependencies
@@ -59,7 +59,7 @@ class ImChatMessagePendingFormAction
 	Responder backupResponder () {
 
 		return responder (
-			"imChatMessagePendingFormResponder");
+			"imChatPendingFormResponder");
 
 	}
 

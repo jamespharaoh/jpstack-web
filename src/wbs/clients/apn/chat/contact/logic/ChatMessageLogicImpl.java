@@ -213,10 +213,8 @@ class ChatMessageLogicImpl
 						? threadId.get ().toString ()
 						: "null",
 					source.toString (),
-					medias != null
-						? Integer.toString (
-							medias.size ())
-						: "null")));
+					Integer.toString (
+						medias.size ()))));
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -434,9 +432,9 @@ class ChatMessageLogicImpl
 				source)
 
 			.setMedias (
-				medias != null
-					? medias
-					: new ArrayList<MediaRec> ()));
+				medias)
+
+		);
 
 		// check if we should actually send the message
 

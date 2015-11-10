@@ -16,6 +16,7 @@
 		<enum-type name="imChatProfileState"/>
 		<model name="imChat"/>
 		<model name="imChatCustomer"/>
+		<model name="imChatCustomerDetailType"/>
 		<model name="imChatConversation"/>
 		<model name="imChatMessage"/>
 		<model name="imChatPricePoint"/>
@@ -31,8 +32,8 @@
 
 	<layer name="api">
 		<bean class="api.ImChatApiLogicImplementation"/>
+		<bean class="api.ImChatConversationEndAction"/>
 		<bean class="api.ImChatConversationStartAction"/>
-		<bean class="api.ImChatCustomerAction"/>
 		<bean class="api.ImChatCustomerCreateAction"/>
 		<bean class="api.ImChatMediaResponder"/>
 		<bean class="api.ImChatMessageSendAction"/>
@@ -55,9 +56,9 @@
 
 	<layer name="console">
 		<bean class="console.ImChatQueueConsole"/>
-		<bean class="console.ImChatMessagePendingFormAction"/>
-		<bean class="console.ImChatMessagePendingFormResponder"/>
-		<bean class="console.ImChatMessagePendingHistoryPart"/>
+		<bean class="console.ImChatPendingFormAction"/>
+		<bean class="console.ImChatPendingFormResponder"/>
+		<bean class="console.ImChatPendingSummaryPart"/>
 	</layer>
 
 	<api-modules>
@@ -68,8 +69,9 @@
 		<console-module name="im-chat"/>
 		<console-module name="im-chat-conversation"/>
 		<console-module name="im-chat-customer"/>
+		<console-module name="im-chat-customer-detail-type"/>
 		<console-module name="im-chat-message"/>
-		<console-module name="im-chat-message-pending"/>
+		<console-module name="im-chat-pending"/>
 		<console-module name="im-chat-price-point"/>
 		<console-module name="im-chat-profile"/>
 		<console-module name="im-chat-purchase"/>

@@ -2,6 +2,7 @@ package wbs.applications.imchat.api;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 
@@ -12,12 +13,12 @@ public
 class ImChatPurchaseHistoryData {
 
 	@DataAttribute
-	Integer price;
+	String priceString;
 
 	@DataAttribute
-	Integer value;
+	String valueString;
 
 	@DataAttribute
-	String timestamp;
+	String timestampString;
 
 }

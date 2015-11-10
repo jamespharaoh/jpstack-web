@@ -2,6 +2,7 @@ package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -61,6 +62,20 @@ class ChildrenListWriter {
 		PluginModelSpec fieldTypePluginModel =
 			pluginManager.pluginModelsByName ().get (
 				spec.typeName ());
+
+		if (
+			isNull (
+				fieldTypePluginModel)
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Field %s.%s has invalid type %s",
+					context.recordClassName (),
+					fieldName,
+					spec.typeName ()));
+
+		}
 
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();

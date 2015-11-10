@@ -13,6 +13,7 @@ import wbs.applications.imchat.model.ImChatPricePointRec;
 import wbs.applications.imchat.model.ImChatProfileRec;
 import wbs.applications.imchat.model.ImChatPurchaseRec;
 import wbs.applications.imchat.model.ImChatRec;
+import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -28,6 +29,9 @@ class ImChatApiLogicImplementation
 
 	@Inject
 	CurrencyLogic currencyLogic;
+
+	@Inject
+	TimeFormatter timeFormatter;
 
 	@Inject
 	WbsConfig wbsConfig;
@@ -50,12 +54,15 @@ class ImChatApiLogicImplementation
 			.name (
 				pricePoint.getName ())
 
-			.price (
+			.description (
+				pricePoint.getDescription ())
+
+			.priceString (
 				currencyLogic.formatText (
 					imChat.getCurrency (),
 					(long) pricePoint.getPrice ()))
 
-			.value (
+			.valueString (
 				currencyLogic.formatText (
 					imChat.getCurrency (),
 					(long) pricePoint.getValue ()));
@@ -129,7 +136,12 @@ class ImChatApiLogicImplementation
 				customer.getEmail ())
 
 			.balance (
-				customer.getBalance ());
+				customer.getBalance ())
+
+			.balanceString (
+				currencyLogic.formatText (
+					customer.getImChat ().getCurrency (),
+					(long) customer.getBalance ()));
 
 	}
 
@@ -177,23 +189,34 @@ class ImChatApiLogicImplementation
 	ImChatPurchaseData purchaseData (
 			ImChatPurchaseRec purchase) {
 
+		ImChatCustomerRec customer =
+			purchase.getImChatCustomer ();
+
+		ImChatRec imChat =
+			customer.getImChat ();
+
 		return new ImChatPurchaseData ()
 
 			.token (
 				purchase.getToken ())
 
-			.price (
-				purchase.getPrice ())
+			.priceString (
+				currencyLogic.formatText (
+					imChat.getCurrency (),
+					(long) purchase.getPrice ()))
 
-			.value (
-				purchase.getValue ());
+			.valueString (
+				currencyLogic.formatText (
+					imChat.getCurrency (),
+					(long) purchase.getValue ()));
 
 	}
 
 	@Override
 	public
 	ImChatMessageTemplateData messageTemplateData (
-			String key, String value) {
+			@NonNull String key,
+			@NonNull String value) {
 
 		return new ImChatMessageTemplateData ()
 
@@ -202,6 +225,36 @@ class ImChatApiLogicImplementation
 
 			.value (
 				value);
+
+	}
+
+	@Override
+	public
+	ImChatPurchaseHistoryData purchaseHistoryData (
+			@NonNull ImChatPurchaseRec purchase) {
+
+		ImChatCustomerRec customer =
+			purchase.getImChatCustomer ();
+
+		ImChatRec imChat =
+			customer.getImChat ();
+
+		return new ImChatPurchaseHistoryData ()
+
+			.priceString (
+				currencyLogic.formatText (
+					imChat.getCurrency (),
+					(long) purchase.getPrice ()))
+
+			.valueString (
+				currencyLogic.formatText (
+					imChat.getCurrency (),
+					(long) purchase.getValue ()))
+
+			.timestampString (
+				timeFormatter.instantToTimestampString (
+					timeFormatter.defaultTimezone (),
+					purchase.getCreatedTime ()));
 
 	}
 

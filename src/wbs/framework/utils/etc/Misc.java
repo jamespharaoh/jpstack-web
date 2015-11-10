@@ -1596,6 +1596,24 @@ class Misc {
 	}
 
 	public static
+	boolean notLessThan (
+			int left,
+			int right) {
+
+		return left >= right;
+
+	}
+
+	public static
+	boolean notLessThan (
+			long left,
+			long right) {
+
+		return left >= right;
+
+	}
+
+	public static
 	boolean moreThan (
 			int left,
 			int right) {

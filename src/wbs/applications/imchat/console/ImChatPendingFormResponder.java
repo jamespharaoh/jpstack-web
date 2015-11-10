@@ -1,11 +1,16 @@
 package wbs.applications.imchat.console;
 
+import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
+import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
@@ -23,12 +28,9 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.currency.logic.CurrencyLogic;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-
-@PrototypeComponent ("imChatMessagePendingFormResponder")
+@PrototypeComponent ("imChatPendingFormResponder")
 public
-class ImChatMessagePendingFormResponder
+class ImChatPendingFormResponder
 	extends HtmlResponder {
 
 	// dependencies
@@ -94,7 +96,8 @@ class ImChatMessagePendingFormResponder
 
 		message =
 			imChatMessageHelper.find (
-				requestContext.stuffInt ("imChatMessageId"));
+				requestContext.stuffInt (
+					"imChatMessageId"));
 
 		conversation =
 			message.getImChatConversation ();
@@ -108,10 +111,10 @@ class ImChatMessagePendingFormResponder
 		summaryUrl =
 			requestContext.resolveApplicationUrl (
 				stringFormat (
-					"/imChatMessage.pending",
+					"/imChat.pending",
 					"/%u",
 					message.getId (),
-					"/imChatMessage.pending.history"));
+					"/imChat.pending.summary"));
 
 		ImmutableList.Builder<ImChatTemplateRec> templatesBuilder =
 			ImmutableList.<ImChatTemplateRec>builder ();
@@ -178,10 +181,10 @@ class ImChatMessagePendingFormResponder
 			" action=\"%h\"",
 			requestContext.resolveApplicationUrl (
 				stringFormat (
-					"/imChatMessage.pending",
+					"/imChat.pending",
 					"/%u",
 					message.getId (),
-					"/imChatMessage.pending.form")),
+					"/imChat.pending.form")),
 			" method=\"post\"",
 			">\n");
 
@@ -230,9 +233,10 @@ class ImChatMessagePendingFormResponder
 
 		printFormat (
 			"<a",
-			" href=\"%h\">Queues</a>\n",
+			" href=\"%h\"",
 			requestContext.resolveApplicationUrl (
-				"/queues/queue.home"));
+				"/queues/queue.home"),
+			">Queues</a>\n");
 
 		printFormat (
 			"<a",
@@ -253,8 +257,13 @@ class ImChatMessagePendingFormResponder
 
 	void renderBilledTemplate () {
 
-		if (customer.getBalance () < imChat.getMessageCost ())
+		if (
+			lessThan (
+				customer.getBalance (),
+				imChat.getMessageCost ())
+		) {
 			return;
+		}
 
 		printFormat (
 			"<tr",
@@ -291,8 +300,9 @@ class ImChatMessagePendingFormResponder
 			" cols=\"48\"",
 			" style=\"display: none\"",
 			">%h</textarea><br>\n",
-			requestContext.parameter (
-				"message-bill"),
+			emptyStringIfNull (
+				requestContext.parameter (
+					"message-bill")),
 			"<span",
 			" class=\"template-chars\"",
 			" style=\"display: none\"",
@@ -346,8 +356,9 @@ class ImChatMessagePendingFormResponder
 			" cols=\"48\"",
 			" style=\"display: none\"",
 			">%h</textarea><br>\n",
-			requestContext.parameter (
-				"message-free"),
+			emptyStringIfNull (
+				requestContext.parameter (
+					"message-free")),
 			"<span",
 			" class=\"template-chars\"",
 			" style=\"display: none\"",
@@ -390,7 +401,8 @@ class ImChatMessagePendingFormResponder
 
 		printFormat (
 			"<td>%s</td>\n",
-			Html.nonBreakingWhitespace (Html.encode (template.getName ())));
+			Html.encodeNonBreakingWhitespace (
+				template.getName ()));
 
 		printFormat (
 			"<td>%h</td>\n",

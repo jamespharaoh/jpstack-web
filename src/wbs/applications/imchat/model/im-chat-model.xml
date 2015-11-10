@@ -65,13 +65,19 @@
 			name="freeMessageMaxChars"
 			nullable="yes"/>
 
+		<yes-no-field
+			name="developmentMode"
+			default="no"/>
+
 	</fields>
 
 	<collections>
 
 		<children-collection
 			name="templates"
-			type="imChatTemplate"/>
+			type="imChatTemplate"
+			order-sql="code"
+			where-sql="not deleted"/>
 
 	</collections>
 

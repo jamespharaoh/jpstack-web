@@ -37,6 +37,11 @@
 			name="balance"
 			default="0"/>
 
+		<reference-field
+			type="imChatConversation"
+			name="currentConversation"
+			nullable="yes"/>
+
 	</fields>
 
 	<collections>

@@ -6,12 +6,6 @@ cd "$BASEDIR"
 # initialise GSM modem
 #/c/modeminit /dev/ttyS0
 
-# reset outbox
-#sudo -u james psql txt2 -c "UPDATE outbox SET sending = NULL WHERE sending IS NOT NULL"
-
-# reset exceptions
-#sudo -u james psql txt2 -c "SELECT exception_clear_alerts ('daemon')"
-
 # setup classpath
 
 CLASSPATH="$BASEDIR/work/bin"
@@ -24,8 +18,8 @@ export CLASSPATH
 
 # setup wbs
 
-export WBS_CONFIG=live
-export WBS_CONFIG_XML=$BASEDIR/conf/wbs-$WBS_CONFIG-config.xml
+export WBS_CONFIG="live"
+export WBS_CONFIG_XML="$BASEDIR/conf/wbs-$WBS_CONFIG-config.xml"
 
 # run command
 
@@ -33,7 +27,7 @@ exec java $JAVA_OPTS \
 	wbs.framework.application.tools.BeanRunner \
 	wbs-apn \
 	wbs.apn \
-	utils,config,data,entity,schema,sql,model,hibernate,object,logic,daemon \
+	utils,config,data,entity,schema,sql,model,hibernate,object,logic,daemon,model-meta \
 	hades,hibernate \
 	wbs.platform.daemon.DaemonRunner \
 	runDaemon

@@ -6,7 +6,9 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.logic.ChatNumberReportLogic;
@@ -51,8 +53,8 @@ class ChatUserObjectHelperImplementation
 	@Override
 	public
 	ChatUserRec findOrCreate (
-			ChatRec chat,
-			MessageRec message) {
+			@NonNull ChatRec chat,
+			@NonNull MessageRec message) {
 
 		// resolve dependencies
 
@@ -115,8 +117,8 @@ class ChatUserObjectHelperImplementation
 	@Override
 	public
 	ChatUserRec findOrCreate (
-			ChatRec chat,
-			NumberRec number) {
+			@NonNull ChatRec chat,
+			@NonNull NumberRec number) {
 
 		// resolve dependencies
 
@@ -142,8 +144,8 @@ class ChatUserObjectHelperImplementation
 	@Override
 	public
 	ChatUserRec create (
-			ChatRec chat,
-			NumberRec number) {
+			@NonNull ChatRec chat,
+			@NonNull NumberRec number) {
 
 		Transaction transaction =
 			database.currentTransaction ();

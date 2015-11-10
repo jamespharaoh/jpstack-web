@@ -1,0 +1,33 @@
+<model-meta
+	name="imChatCustomerDetailType"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="imChat"/>
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<yes-no-field
+			name="required"/>
+
+	</fields>
+
+</model-meta>
