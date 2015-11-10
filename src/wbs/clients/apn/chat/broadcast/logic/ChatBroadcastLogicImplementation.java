@@ -2,6 +2,8 @@ package wbs.clients.apn.chat.broadcast.logic;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -60,7 +62,7 @@ class ChatBroadcastLogicImplementation
 			chatCreditLogic.userSpendCreditCheck (
 				chatUser,
 				false,
-				null);
+				Optional.<Integer>absent ());
 
 		if (
 			creditCheckResult.failed ()

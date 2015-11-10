@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.help.console;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.util.Collection;
@@ -142,10 +143,9 @@ class ChatHelpLogPendingSummaryPart
 		printFormat (
 			"<tr>\n",
 			"<th>Name</th>\n",
-
 			"<td>%h</td>\n",
-			chatUser.getName (),
-
+			emptyStringIfNull (
+				chatUser.getName ()),
 			"</tr>\n");
 
 		printFormat (
@@ -164,7 +164,7 @@ class ChatHelpLogPendingSummaryPart
 			"<td>%s</td>\n",
 			currencyLogic.formatHtml (
 				chatUser.getChat ().getCurrency (),
-				Long.valueOf(chatUser.getCredit ())),
+				(long) chatUser.getCredit ()),
 
 			"</tr>\n");
 

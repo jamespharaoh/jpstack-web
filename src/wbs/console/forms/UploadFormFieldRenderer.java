@@ -41,9 +41,6 @@ class UploadFormFieldRenderer<Container>
 	@Getter @Setter
 	String label;
 
-	@Getter @Setter
-	Integer size;
-
 	// details
 
 	@Getter
@@ -146,8 +143,6 @@ class UploadFormFieldRenderer<Container>
 		out.writeFormat (
 			"<input",
 			" type=\"file\"",
-			" size=\"%h\"",
-			size (),
 			" name=\"%h\"",
 			name (),
 			">\n");

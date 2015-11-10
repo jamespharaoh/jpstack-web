@@ -17,6 +17,8 @@ import lombok.Cleanup;
 
 import org.joda.time.Duration;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -39,8 +41,6 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
-
-import com.google.common.collect.ImmutableMap;
 
 @PrototypeComponent ("chatUserSearchAction")
 public
@@ -236,47 +236,117 @@ class ChatUserSearchAction
 
 		// assemble search criteria
 
-		if (searchType != null)
-			searchMap.put("type", searchType);
+		if (searchType != null) {
 
-		if (searchCode != null)
-			searchMap.put("code", searchCode);
+			searchMap.put (
+				"type",
+				searchType);
 
-		if (searchNumber != null && searchIncludeDeleted)
-			searchMap.put ("oldNumber", searchNumber);
+		}
 
-		if (searchNumber != null && ! searchIncludeDeleted)
-			searchMap.put ("number", searchNumber);
+		if (searchCode != null) {
 
-		if (searchGender != null)
-			searchMap.put("gender", searchGender);
+			searchMap.put (
+				"code",
+				searchCode);
 
-		if (searchLocation != null)
-			searchMap.put("locPlace", searchLocation);
+		}
 
-		if (searchOrient != null)
-			searchMap.put ("orient", searchOrient);
+		if (searchNumber != null && searchIncludeDeleted) {
 
-		if (searchName != null)
-			searchMap.put ("nameILike", "%" + searchName + "%");
+			searchMap.put (
+				"oldNumber",
+				searchNumber);
 
-		if (searchInfo != null)
-			searchMap.put ("infoILike", "%" + searchInfo + "%");
+		}
 
-		if (searchPicture != null)
-			searchMap.put ("hasImage", searchPicture);
+		if (searchNumber != null && ! searchIncludeDeleted) {
 
-		if (searchVideo != null)
-			searchMap.put ("hasVideo", searchVideo);
+			searchMap.put (
+				"number",
+				searchNumber);
 
-		if (searchAdultVerified != null)
-			searchMap.put ("adultVerified", searchAdultVerified);
+		}
 
-		if (searchCreditMode != null)
-			searchMap.put ("creditMode", searchCreditMode);
+		if (searchGender != null) {
 
-		if (searchDateMode != null)
-			searchMap.put ("dateMode", searchDateMode);
+			searchMap.put (
+				"gender",
+				searchGender);
+
+		}
+
+		if (searchLocation != null) {
+
+			searchMap.put (
+				"locPlace",
+				searchLocation);
+
+		}
+
+		if (searchOrient != null) {
+
+			searchMap.put (
+				"orient",
+				searchOrient);
+
+		}
+
+		if (searchName != null) {
+
+			searchMap.put (
+				"nameILike",
+				"%" + searchName + "%");
+
+		}
+
+		if (searchInfo != null) {
+
+			searchMap.put (
+				"infoILike",
+				"%" + searchInfo + "%");
+
+		}
+
+		if (searchPicture != null) {
+
+			searchMap.put (
+				"hasImage",
+				searchPicture);
+
+		}
+
+		if (searchVideo != null) {
+
+			searchMap.put (
+				"hasVideo",
+				searchVideo);
+
+		}
+
+		if (searchAdultVerified != null) {
+
+			searchMap.put (
+				"adultVerified",
+				searchAdultVerified);
+
+		}
+
+		if (searchCreditMode != null) {
+
+			searchMap.put (
+				"creditMode",
+				searchCreditMode);
+
+		}
+
+		if (searchDateMode != null) {
+
+			searchMap.put (
+				"dateMode",
+				searchDateMode);
+
+		}
 
 		if (searchOnline != null) {
 
@@ -288,37 +358,85 @@ class ChatUserSearchAction
 
 		}
 
-		if (searchOrder != null)
+		if (searchOrder != null) {
+
 			searchMap.put (
 				"orderBy",
 				searchOrder);
 
-		if (searchCreditFailedGte != null)
-			searchMap.put("creditFailedGte", searchCreditFailedGte);
+		}
 
-		if (searchCreditFailedLte != null)
-			searchMap.put("creditFailedLte", searchCreditFailedLte);
+		if (searchCreditFailedGte != null) {
 
-		if (searchCreditNoReportGte != null)
-			searchMap.put("creditNoReportGte", searchCreditNoReportGte);
+			searchMap.put (
+				"creditFailedGte",
+				searchCreditFailedGte);
 
-		if (searchCreditNoReportLte != null)
-			searchMap.put("creditNoReportLte", searchCreditNoReportLte);
+		}
 
-		if (searchValueSinceEverGte != null)
-			searchMap.put("valueSinceEverGte", searchValueSinceEverGte);
+		if (searchCreditFailedLte != null) {
 
-		if (searchValueSinceEverGte != null)
-			searchMap.put("valueSinceEverLte", searchValueSinceEverLte);
+			searchMap.put (
+				"creditFailedLte",
+				searchCreditFailedLte);
 
-		if (searchFirstJoinGte != null)
-			searchMap.put("firstJoinAfter", searchFirstJoinGte);
+		}
 
-		if (searchFirstJoinLte != null)
-			searchMap.put("firstJoinBefore", searchFirstJoinLte);
+		if (searchCreditNoReportGte != null) {
 
-		if (limit != null)
-			searchMap.put("limit", limit);
+			searchMap.put (
+				"creditNoReportGte",
+				searchCreditNoReportGte);
+
+		}
+
+		if (searchCreditNoReportLte != null) {
+
+			searchMap.put (
+				"creditNoReportLte",
+				searchCreditNoReportLte);
+
+		}
+
+		if (searchValueSinceEverGte != null) {
+
+			searchMap.put (
+				"valueSinceEverGte",
+				searchValueSinceEverGte);
+
+		}
+
+		if (searchValueSinceEverGte != null) {
+
+			searchMap.put (
+				"valueSinceEverLte",
+				searchValueSinceEverLte);
+
+		}
+
+		if (searchFirstJoinGte != null) {
+
+			searchMap.put (
+				"firstJoinAfter",
+				searchFirstJoinGte);
+
+		}
+
+		if (searchFirstJoinLte != null) {
+
+			searchMap.put (
+				"firstJoinBefore",
+				searchFirstJoinLte);
+
+		}
+
+		if (limit != null) {
+
+			searchMap.put (
+				"limit",
+				limit);
+
+		}
 
 		// and search!
 

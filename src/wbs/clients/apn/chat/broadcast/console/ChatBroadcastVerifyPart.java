@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.broadcast.console;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -10,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+
+import com.google.common.collect.ImmutableSet;
 
 import wbs.clients.apn.chat.core.console.ChatConsoleHelper;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
@@ -24,8 +27,6 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.sms.gsm.Gsm;
-
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("chatBroadcastVerifyPart")
 public
@@ -61,23 +62,27 @@ class ChatBroadcastVerifyPart
 		@SuppressWarnings ("unchecked")
 		Map<String,String> paramsTemp =
 			(Map<String,String>)
-			requestContext.request ("chatBroadcastParams");
+			requestContext.request (
+				"chatBroadcastParams");
 
 		params =
 			paramsTemp;
 
 		chat =
 			chatHelper.find (
-				requestContext.stuffInt ("chatId"));
+				requestContext.stuffInt (
+					"chatId"));
 
 		fromUser =
 			chatUserHelper.findByCode (
 				chat,
-				params.get ("fromUserCode"));
+				params.get (
+					"fromUserCode"));
 
 		search =
 			equal (
-				requestContext.getForm ("search"),
+				requestContext.getForm (
+					"search"),
 				"true");
 
 	}
@@ -215,7 +220,9 @@ class ChatBroadcastVerifyPart
 					" data-char-count-id=\"%h\">",
 					charCountId,
 					"%h</textarea>",
-					params.get ("message"))),
+					emptyStringIfNull (
+						params.get (
+							"message")))),
 			"</tr>\n");
 
 		printFormat (
@@ -278,40 +285,50 @@ class ChatBroadcastVerifyPart
 				chatUserHelper.find (chatUserId);
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUser.getNumber ().getNumber (),
+				chatUser.getNumber ().getNumber ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUser.getCode (),
+				chatUser.getCode ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUser.getName (),
+				emptyStringIfNull (
+					chatUser.getName ()));
 
+			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
 					chatMiscLogic.timezone (
 						chat),
 					dateToInstant (
-						chatUser.getLastAction ())),
+						chatUser.getLastAction ())));
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUser.getGender (),
+				chatUser.getGender ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUser.getOrient (),
+				chatUser.getOrient ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatUser.getMainChatUserImage () != null
 					? "yes"
-					: "no",
+					: "no");
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatUser.getAdultVerified ()
 					? "yes"
-					: "no",
+					: "no");
 
+			printFormat (
 				"</tr>\n");
 
 			if (++ loop % 128 == 0) {

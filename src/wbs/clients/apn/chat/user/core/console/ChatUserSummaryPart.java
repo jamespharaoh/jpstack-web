@@ -143,18 +143,22 @@ class ChatUserSummaryPart
 
 		printFormat (
 			"<tr> <th>Type</th> <td>%h</td> </tr>\n",
-			ifNull (chatUser.getType ()));
+			chatUser.getType ());
 
 		printFormat (
 			"<tr> <th>Gender</th> <td>%h</td> </tr>\n",
-			ifNull (chatUser.getGender (), "-"));
+			ifNull (
+				chatUser.getGender (),
+				"-"));
 
 		printFormat (
 			"<tr>\n",
 			"<th>Orient</th>\n",
 
 			"<td>%h</td>\n",
-			ifNull (chatUser.getOrient (), "-"),
+			ifNull (
+				chatUser.getOrient (),
+				"-"),
 
 			"</tr>\n");
 
@@ -172,17 +176,25 @@ class ChatUserSummaryPart
 			"<th>Date of birth</th>\n",
 
 			"<td>%h</td>\n",
-			ifNull (
-				CalDate.forLocalDate (
-					chatUser.getDob ()),
-					"-"),
+			chatUser.getDob () != null
+				? CalDate.forLocalDate (
+					chatUser.getDob ())
+				: "-",
 
 			"</tr>\n");
 
 		printFormat (
-			"<tr> <th>Name</th> <td>%h</td> </tr>\n",
-			ifNull (chatUser.getName (), "-"),
+			"<tr>\n",
+			"<th>Name</th>\n",
 
+			"<td>%h</td>\n",
+			ifNull (
+				chatUser.getName (),
+				"-"),
+
+			"</tr>\n");
+
+		printFormat (
 			"<tr> <th>Info</th> <td>%h</td> </tr>\n",
 			chatUser.getInfoText () != null
 				? chatUser.getInfoText ().getText ()

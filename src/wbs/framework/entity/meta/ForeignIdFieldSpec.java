@@ -19,4 +19,8 @@ class ForeignIdFieldSpec
 		name = "field")
 	String fieldName;
 
+	@DataAttribute (
+		name = "column")
+	String columnName;
+
 }

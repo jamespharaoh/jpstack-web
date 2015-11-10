@@ -42,7 +42,8 @@ class ChatUserAdminCreditPart
 
 		chatUser =
 			chatUserHelper.find (
-				requestContext.stuffInt ("chatUserId"));
+				requestContext.stuffInt (
+					"chatUserId"));
 
 	}
 
@@ -93,46 +94,55 @@ class ChatUserAdminCreditPart
 
 		printFormat (
 			"<tr>\n",
+			"<th>Credit amount</th>\n");
 
-			"<th>Credit amount</th>\n",
-
+		printFormat (
 			"<td>&#163; ",
 			"<input",
 			" type=\"text\"",
 			" name=\"creditAmount\"",
 			" value=\"%h\"",
-			requestContext.getForm ("amount"),
-			"\"></td>\n",
+			requestContext.getForm (
+				"amount",
+				""),
+			"\"></td>\n");
 
+		printFormat (
 			"</tr>\n");
 
 		printFormat (
 			"<tr>\n",
+			"<th>Bill amount</th>\n");
 
-			"<th>Bill amount</th>\n",
-
+		printFormat (
 			"<td>&#163; ",
 			"<input",
 			" type=\"text\"",
 			" name=\"billAmount\"",
 			" value=\"%h\"",
-			requestContext.getForm ("amount"),
-			"\"></td>\n",
+			requestContext.getForm (
+				"amount",
+				""),
+			"\"></td>\n");
 
+		printFormat (
 			"</tr>\n");
 
 		printFormat (
 			"<tr>\n",
+			"<th>Details</th>\n");
 
-			"<th>Details</th>\n",
-
+		printFormat (
 			"<td><input",
 			" type=\"text\"",
 			" name=\"details\"",
 			" value=\"%h\"",
-			requestContext.getForm ("details"),
-			"></td>\n",
+			requestContext.getForm (
+				"details",
+				""),
+			"></td>\n");
 
+		printFormat (
 			"</tr>\n");
 
 		printFormat (
@@ -175,35 +185,44 @@ class ChatUserAdminCreditPart
 
 		} else {
 
-			for (ChatUserCreditRec chatUserCredit
-					: chatUser.getChatUserCredits ()) {
+			for (
+				ChatUserCreditRec chatUserCredit
+					: chatUser.getChatUserCredits ()
+			) {
 
 				printFormat (
-					"<tr>\n",
+					"<tr>\n");
 
+				printFormat (
 					"<td>%h</td>\n",
-					chatUserCredit.getId (),
+					chatUserCredit.getId ());
 
+				printFormat (
 					"<td>%h</td>\n",
-					chatUserCredit.getTimestamp (),
+					chatUserCredit.getTimestamp ());
 
+				printFormat (
 					"<td>%s</td>\n",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
-						Long.valueOf(chatUserCredit.getCreditAmount ())),
+						(long) chatUserCredit.getCreditAmount ()));
 
+				printFormat (
 					"<td>%s</td>\n",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
-						Long.valueOf(chatUserCredit.getBillAmount ())),
+						(long) chatUserCredit.getBillAmount ()));
 
+				printFormat (
 					"<td>%h</td>\n",
-					 chatUserCredit.getDetails (),
+					 chatUserCredit.getDetails ());
 
+				printFormat (
 					"%s\n",
 					consoleObjectManager.tdForObjectMiniLink (
-						chatUserCredit.getUser ()),
+						chatUserCredit.getUser ()));
 
+				printFormat (
 					"</tr>\n");
 
 			}

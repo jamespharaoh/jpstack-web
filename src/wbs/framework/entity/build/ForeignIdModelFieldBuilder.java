@@ -1,9 +1,12 @@
 package wbs.framework.entity.build;
 
 import static wbs.framework.utils.etc.Misc.camelToUnderscore;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
+
+import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -15,8 +18,6 @@ import wbs.framework.entity.meta.ForeignIdFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
 import wbs.framework.schema.helper.SchemaNamesHelper;
-
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("foreignIdModelFieldBuilder")
 @ModelBuilder
@@ -83,10 +84,12 @@ class ForeignIdModelFieldBuilder {
 
 			.columnNames (
 				ImmutableList.<String>of (
-					stringFormat (
-						"%s_id",
-						camelToUnderscore (
-							spec.fieldName ()))));
+					ifNull (
+						spec.columnName (),
+						stringFormat (
+							"%s_id",
+							camelToUnderscore (
+								spec.fieldName ())))));
 
 		// store field
 

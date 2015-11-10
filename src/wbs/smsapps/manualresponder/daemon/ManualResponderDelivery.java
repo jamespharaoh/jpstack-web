@@ -1,11 +1,14 @@
 package wbs.smsapps.manualresponder.daemon;
 
+import static wbs.framework.utils.etc.Misc.indexOfRequired;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -69,11 +72,23 @@ class ManualResponderDelivery
 			database.beginReadWrite (
 				this);
 
+System.out.println (
+	"MR DELIVERY " + deliveryId);
+
 		DeliveryRec delivery =
 			deliveryHelper.find (
 				deliveryId);
 
+System.out.println (
+	"MESSAGE " + delivery.getMessage ().getId ());
+
+System.out.println (
+	"STATUS " + delivery.getMessage ().getStatus ().toString ());
+
 		if (delivery.getNewMessageStatus ().isGoodType ()) {
+
+System.out.println (
+	"IS GOOD TYPE");
 
 			MessageRec deliveryMessage =
 				delivery.getMessage ();
@@ -83,8 +98,15 @@ class ManualResponderDelivery
 					deliveryMessage.getRef ());
 
 			Integer deliveryMessageIndex =
-				reply.getMessages ().indexOf (
+				indexOfRequired (
+					reply.getMessages (),
 					deliveryMessage);
+
+System.out.println (
+	"DELIVERY INDEX " + deliveryMessageIndex);
+
+System.out.println (
+	"MESSAGES SIZE " + reply.getMessages ().size ());
 
 			if (
 				reply.getMessages ().size ()
@@ -95,7 +117,16 @@ class ManualResponderDelivery
 					reply.getMessages ().get (
 						deliveryMessageIndex + 1);
 
+System.out.println (
+	"NEXT ID " + nextMessage.getId ());
+
+System.out.println (
+	"NEXT STATUS " + nextMessage.getStatus ());
+
 				if (nextMessage.getStatus () == MessageStatus.held) {
+
+System.out.println (
+	"UNHOLD");
 
 					outboxLogic.unholdMessage (
 						nextMessage);
@@ -108,6 +139,9 @@ class ManualResponderDelivery
 
 		if (delivery.getNewMessageStatus ().isBadType ()) {
 
+System.out.println (
+	"IS BAD TYPE");
+
 			MessageRec deliveryMessage =
 				delivery.getMessage ();
 
@@ -116,7 +150,8 @@ class ManualResponderDelivery
 					deliveryMessage.getRef ());
 
 			Integer deliveryMessageIndex =
-				reply.getMessages ().indexOf (
+				indexOfRequired (
+					reply.getMessages (),
 					deliveryMessage);
 
 			for (
@@ -141,10 +176,16 @@ class ManualResponderDelivery
 
 		}
 
+System.out.println (
+	"REMOVE");
+
 		deliveryHelper.remove (
 			delivery);
 
 		transaction.commit ();
+
+System.out.println (
+	"COMMIT");
 
 	}
 

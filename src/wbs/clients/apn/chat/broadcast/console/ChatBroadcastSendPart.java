@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.broadcast.console;
 
+import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -28,7 +29,8 @@ class ChatBroadcastSendPart
 		@SuppressWarnings ("unchecked")
 		Map<String,String> params =
 			(Map<String,String>)
-			requestContext.session ("chatBroadcastParams");
+			requestContext.session (
+				"chatBroadcastParams");
 
 		if (params == null) {
 
@@ -73,7 +75,9 @@ class ChatBroadcastSendPart
 				" cols=\"60\"",
 				" rows=\"12\"",
 				">%h</textarea></p>\n",
-				params.get ("numbers"));
+				emptyStringIfNull (
+					params.get (
+						"numbers")));
 
 			printFormat (
 				"<p><input",
@@ -87,7 +91,9 @@ class ChatBroadcastSendPart
 				" type=\"hidden\"",
 				" name=\"searchLastActionFrom\"",
 				" value=\"%h\"",
-				params.get ("searchLastActionFrom"),
+				emptyStringIfNull (
+					params.get (
+						"searchLastActionFrom")),
 				">\n");
 
 			printFormat (
@@ -95,7 +101,9 @@ class ChatBroadcastSendPart
 				" type=\"hidden\"",
 				" name=\"searchLastActionTo\"",
 				" value=\"%h\"",
-				params.get ("lastActionTo"),
+				emptyStringIfNull (
+					params.get (
+						"lastActionTo")),
 				">\n");
 
 			printFormat (
@@ -103,7 +111,9 @@ class ChatBroadcastSendPart
 				" type=\"hidden\"",
 				" name=\"searchGender\"",
 				" value=\"%h\"",
-				params.get ("searchGender"),
+				emptyStringIfNull (
+					params.get (
+						"searchGender")),
 				">\n");
 
 			printFormat (
@@ -111,7 +121,9 @@ class ChatBroadcastSendPart
 				" type=\"hidden\"",
 				" name=\"searchOrient\"",
 				" value=\"%h\"",
-				params.get ("searchOrient"),
+				emptyStringIfNull (
+					params.get (
+						"searchOrient")),
 				">\n");
 
 			printFormat (
@@ -119,7 +131,9 @@ class ChatBroadcastSendPart
 				" type=\"hidden\"",
 				" name=\"searchPicture\"",
 				" value=\"%h\"",
-				params.get ("searchPicture"),
+				emptyStringIfNull (
+					params.get (
+						"searchPicture")),
 				">\n");
 
 			printFormat (
@@ -127,7 +141,9 @@ class ChatBroadcastSendPart
 				" type=\"hidden\"",
 				" name=\"searchAdult\"",
 				" value=\"%h\"",
-				params.get ("searchAdult"),
+				emptyStringIfNull (
+					params.get (
+						"searchAdult")),
 				">\n");
 
 			printFormat (
@@ -135,7 +151,9 @@ class ChatBroadcastSendPart
 				" type=\"hidden\"",
 				" name=\"searchSpendMin\"",
 				" value=\"%h\"",
-				params.get ("searchSpendMin"),
+				emptyStringIfNull (
+					params.get (
+						"searchSpendMin")),
 				">\n");
 
 			printFormat (
@@ -143,7 +161,9 @@ class ChatBroadcastSendPart
 				" type=\"hidden\"",
 				" name=\"searchSpendMax\"",
 				" value=\"%h\"",
-				params.get ("searchSpendMax"),
+				emptyStringIfNull (
+					params.get (
+						"searchSpendMax")),
 				">\n");
 
 		}
@@ -162,7 +182,9 @@ class ChatBroadcastSendPart
 					" type=\"text\"",
 					" name=\"searchLastActionFrom\"",
 					" value=\"%h\"",
-					params.get ("searchLastActionFrom"),
+					emptyStringIfNull (
+						params.get (
+							"searchLastActionFrom")),
 					">"),
 				"</tr>\n");
 
@@ -175,7 +197,9 @@ class ChatBroadcastSendPart
 					" type=\"text\"",
 					" name=\"searchLastActionTo\"",
 					" value=\"%h\"",
-					params.get ("searchLastActionTo"),
+					emptyStringIfNull (
+						params.get (
+							"searchLastActionTo")),
 					">"),
 				"</tr>\n");
 
@@ -185,7 +209,9 @@ class ChatBroadcastSendPart
 				"<td>%s</td>\n",
 				chatConsoleLogic.selectForGender (
 					"searchGender",
-					params.get ("searchGender")),
+					emptyStringIfNull (
+						params.get (
+							"searchGender"))),
 				"</tr>\n");
 
 			printFormat (
@@ -194,7 +220,9 @@ class ChatBroadcastSendPart
 				"<td>%s</td>\n",
 				chatConsoleLogic.selectForOrient (
 					"searchOrient",
-					params.get ("searchOrient")),
+					emptyStringIfNull (
+						params.get (
+							"searchOrient"))),
 				"</tr>\n");
 
 			printFormat (
@@ -203,7 +231,9 @@ class ChatBroadcastSendPart
 				"<td>%s</td>\n",
 				Html.selectYesNoMaybe (
 					"searchPicture",
-					params.get ("searchPicture")),
+					emptyStringIfNull (
+						params.get (
+							"searchPicture"))),
 				"</tr>\n");
 
 			printFormat (
@@ -212,7 +242,9 @@ class ChatBroadcastSendPart
 				"<td>%s</td>\n",
 				Html.selectYesNoMaybe (
 					"searchAdult",
-					params.get ("searchAdult")),
+					emptyStringIfNull (
+						params.get (
+							"searchAdult"))),
 				"</tr>\n");
 
 			printFormat (
@@ -224,7 +256,9 @@ class ChatBroadcastSendPart
 					" type=\"text\"",
 					" name=\"searchSpendMin\"",
 					" value=\"%h\"",
-					params.get ("searchSpendMin"),
+					emptyStringIfNull (
+						params.get (
+							"searchSpendMin")),
 					">"),
 				"</tr>\n");
 
@@ -237,7 +271,9 @@ class ChatBroadcastSendPart
 					" type=\"text\"",
 					" name=\"searchSpendMax\"",
 					" value=\"%h\"",
-					params.get ("searchSpendMax"),
+					emptyStringIfNull (
+						params.get (
+							"searchSpendMax")),
 					">"),
 				"</tr>\n");
 
@@ -256,7 +292,9 @@ class ChatBroadcastSendPart
 				" type=\"hidden\"",
 				" name=\"numbers\"",
 				" value=\"%h\"",
-				params.get ("numbers"),
+				emptyStringIfNull (
+					params.get (
+						"numbers")),
 				">\n");
 
 		}
@@ -302,7 +340,9 @@ class ChatBroadcastSendPart
 			" type=\"text\"",
 			" name=\"fromUserCode\"",
 			" value=\"%h\"",
-			params.get ("fromUserCode"),
+			emptyStringIfNull (
+				params.get (
+					"fromUserCode")),
 			"></tr>\n");
 
 		printFormat (

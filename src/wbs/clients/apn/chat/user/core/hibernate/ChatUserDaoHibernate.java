@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
@@ -19,6 +21,8 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
 import org.joda.time.Instant;
+
+import com.google.common.collect.ImmutableList;
 
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.hibernate.ChatUserCreditModeType;
@@ -36,8 +40,6 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.sms.number.core.model.NumberRec;
 
-import com.google.common.collect.ImmutableList;
-
 public
 class ChatUserDaoHibernate
 	extends HibernateDao
@@ -46,8 +48,8 @@ class ChatUserDaoHibernate
 	@Override
 	public
 	ChatUserRec find (
-			ChatRec chat,
-			NumberRec number) {
+			@NonNull ChatRec chat,
+			@NonNull NumberRec number) {
 
 		return findOne (
 			ChatUserRec.class,
@@ -71,8 +73,8 @@ class ChatUserDaoHibernate
 	@Override
 	public
 	int countOnline (
-			ChatRec chat,
-			ChatUserType type) {
+			@NonNull ChatRec chat,
+			@NonNull ChatUserType type) {
 
 		return (int) (long) findOne (
 			Long.class,
@@ -100,7 +102,7 @@ class ChatUserDaoHibernate
 	@Override
 	public
 	List<ChatUserRec> findWantingBill (
-			Date date) {
+			@NonNull Date date) {
 
 		return findMany (
 			ChatUserRec.class,
@@ -171,7 +173,7 @@ class ChatUserDaoHibernate
 	@Override
 	public
 	List<ChatUserRec> findAdultExpiryLimit (
-			Instant now,
+			@NonNull Instant now,
 			int maxResults) {
 
 		return findMany (
@@ -326,7 +328,7 @@ class ChatUserDaoHibernate
 	List<Integer> searchIds (
 			Map<String,Object> searchMap) {
 
-		Criteria crit =
+		Criteria criteria =
 			createCriteria (
 				ChatUserRec.class,
 				"_chatUser")
@@ -348,8 +350,10 @@ class ChatUserDaoHibernate
 				"_oldNumber",
 				JoinType.LEFT_OUTER_JOIN);
 
-		for (Map.Entry<String,Object> entry
-				: searchMap.entrySet ()) {
+		for (
+			Map.Entry<String,Object> entry
+				: searchMap.entrySet ()
+		) {
 
 			String key =
 				entry.getKey ();
@@ -359,49 +363,49 @@ class ChatUserDaoHibernate
 
 			if (key.equals ("code")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chatUser.code",
 						value));
 
 			} else if (key.equals ("codeIn")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.in (
 						"_chatUser.code",
 						(Collection<?>) value));
 
 			} else if (key.equals ("number")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.ilike (
 						"_number.number",
 						value));
 
 			} else if (key.equals ("numberId")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_number.id",
 						value));
 
 			} else if (key.equals ("oldNumber")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.ilike (
 						"_oldNumber.number",
 						value));
 
 			} else if (key.equals ("oldNumberId")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_oldNumber.id",
 						value));
 
 			} else if (key.equals ("notDeleted")) {
 
-				crit.add (Restrictions.or (
+				criteria.add (Restrictions.or (
 						Restrictions.eq (
 							"_chatUser.type",
 							ChatUserType.monitor),
@@ -410,32 +414,32 @@ class ChatUserDaoHibernate
 
 			} else if (key.equals ("nameILike")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.ilike (
 						"_chatUser.name",
 						value));
 
 			} else if (key.equals ("infoILike")) {
 
-				crit.createAlias (
+				criteria.createAlias (
 					"infoText",
 					"_infoText");
 
-				crit.add (
+				criteria.add (
 					Restrictions.ilike (
 						"_infoText.text",
 						value));
 
 			} else if (key.equals ("chatId")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chat.id",
 						value));
 
 			} else if (key.equals ("type")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chatUser.type",
 						value));
@@ -469,13 +473,13 @@ class ChatUserDaoHibernate
 
 				if ((Boolean) value) {
 
-					crit.add (
+					criteria.add (
 						Subqueries.exists (
 							hasImageCriteria));
 
 				} else {
 
-					crit.add (
+					criteria.add (
 						Subqueries.notExists (
 							hasImageCriteria));
 
@@ -510,12 +514,12 @@ class ChatUserDaoHibernate
 
 				if ((Boolean) value) {
 
-					crit.add (
+					criteria.add (
 						Subqueries.exists (hasVideoCriteria));
 
 				} else {
 
-					crit.add (
+					criteria.add (
 						Subqueries.notExists (hasVideoCriteria));
 
 				}
@@ -549,86 +553,86 @@ class ChatUserDaoHibernate
 
 				if ((Boolean) value) {
 
-					crit.add (
+					criteria.add (
 						Subqueries.exists (hasAudioCritieria));
 
 				} else {
 
-					crit.add (
+					criteria.add (
 						Subqueries.notExists (hasAudioCritieria));
 
 				}
 
 			} else if (key.equals ("adultVerified")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chatUser.adultVerified",
 						value));
 
 			} else if (key.equals ("chatAffiliateId")) {
 
-				crit.createAlias (
+				criteria.createAlias (
 					"_chatUser.chatAffiliate",
 					"_chatAffiliate");
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chatAffiliate.id",
 						value));
 
 			} else if (key.equals ("firstJoinAfter")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.ge (
 						"_chatUser.firstJoin",
 						value));
 
 			} else if (key.equals ("firstJoinBefore")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.lt (
 						"_chatUser.firstJoin",
 						value));
 
 			} else if (key.equals ("creditMode")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chatUser.creditMode",
 						value));
 
 			} else if (key.equals ("dateMode")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chatUser.dateMode",
 						value));
 
 			} else if (key.equals ("online")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chatUser.online",
 						value));
 
 			} else if (equal (key, "gender")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chatUser.gender",
 						value));
 
 			} else if (equal (key, "locPlace")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chatuser.locationPlace",
 						value));
 
 			} else if (equal (key, "orient")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chatUser.orient",
 						value));
@@ -638,14 +642,14 @@ class ChatUserDaoHibernate
 				if (((Collection<?>) value).size () == 0)
 					return ImmutableList.<Integer>of ();
 
-				crit.add (
+				criteria.add (
 					Restrictions.in (
 						"_chatUser.type",
 						(Collection<?>) value));
 
 			} else if (key.equals ("hasGender")) {
 
-				crit.add (
+				criteria.add (
 					(Boolean) value
 						? Restrictions.isNotNull (
 							"_chatUser.gender")
@@ -657,14 +661,14 @@ class ChatUserDaoHibernate
 				if (((Collection<?>) value).size () == 0)
 					return ImmutableList.<Integer>of ();
 
-				crit.add (
+				criteria.add (
 					Restrictions.in (
 						"_chatUser.gender",
 						(Collection<?>) value));
 
 			} else if (key.equals ("hasOrient")) {
 
-				crit.add ((Boolean) value
+				criteria.add ((Boolean) value
 					? Restrictions.isNotNull (
 						"_chatUser.orient")
 					: Restrictions.isNull (
@@ -675,14 +679,14 @@ class ChatUserDaoHibernate
 				if (((Collection<?>) value).size () == 0)
 					return Collections.emptyList ();
 
-				crit.add (
+				criteria.add (
 					Restrictions.in (
 						"_chatUser.orient",
 						(Collection<?>) value));
 
 			} else if (key.equals ("hasDateMode")) {
 
-				crit.add ((Boolean) value
+				criteria.add ((Boolean) value
 					? Restrictions.isNotNull (
 						"_chatUser.dateMode")
 					: Restrictions.isNull (
@@ -690,114 +694,127 @@ class ChatUserDaoHibernate
 
 			} else if (key.equals ("blockAll")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chatUser.blockAll",
 						value));
 
 			} else if (key.equals ("barred")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.eq (
 						"_chatUser.barred",
 						value));
 
 			} else if (equal (key, "creditFailedGte")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.ge (
 						"_chatUser.creditFailed",
 						value));
 
 			} else if (equal (key, "creditFailedLte")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.le (
 						"_chatUser.creditFailed",
 						value));
 
 			} else if (equal (key, "creditNoReportGte")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.ge (
 						"_chatUser.creditSent",
 						value));
 
 			} else if (equal (key, "creditNoReportLte")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.le (
 						"_chatUser.creditSent",
 						value));
 
 			} else if (equal (key, "valueSinceEverGte")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.ge (
 						"_chatUser.valueSinceEver",
 						value));
 
 			} else if (equal (key, "valueSinceEverLte")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.le (
 						"_chatUser.valueSinceEver",
 						value));
 
-			} else if (key.equals ("onlineAfter")) {
+			} else if (
+				equal (
+					key,
+					"onlineAfter")
+			) {
+
+				Date dateValue =
+					instantToDate (
+						(Instant)
+						value);
 
 				DetachedCriteria onlineAfterCriteria =
 					DetachedCriteria
 
-						.forClass (
-							ChatUserSessionRec.class,
-							"_chatUserSession")
+					.forClass (
+						ChatUserSessionRec.class,
+						"_chatUserSession")
 
-						.add (
-							Restrictions.eqProperty (
-								"_chatUser.id",
-								"_chatUserSession.chatUser.id"))
+					.add (
+						Restrictions.eqProperty (
+							"_chatUser.id",
+							"_chatUserSession.chatUser.id"))
 
-						.add (
-							Restrictions.or (
-								Restrictions.ge (
-									"_chatUserSession.endTime",
-									value),
-								Restrictions.isNull (
-									"_chatUserSession.endTime")))
+					.add (
+						Restrictions.or (
+							Restrictions.ge (
+								"_chatUserSession.endTime",
+								dateValue),
+							Restrictions.isNull (
+								"_chatUserSession.endTime")))
 
-						.setProjection (
-							Property.forName (
-								"_chatUserSession.id"));
+					.setProjection (
+						Property.forName (
+							"_chatUserSession.id"));
 
-				crit.add (
+				criteria.add (
 					Subqueries.exists (
 						onlineAfterCriteria));
 
-			} else if (equal (key, "deliveryMethodIn")) {
+			} else if (
+				equal (
+					key,
+					"deliveryMethodIn")
+			) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.in (
 						"_chatUser.deliveryMethod",
 						(Collection<?>) value));
 
 			} else if (equal (key, "lastMessagePollBefore")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.lt (
 						"_chatUser.lastMessagePoll",
 						value));
 
 			} else if (equal (key, "lastActionAfter")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.ge (
 						"_chatUser.lastAction",
 						value));
 
 			} else if (equal (key, "lastActionBefore")) {
 
-				crit.add (
+				criteria.add (
 					Restrictions.lt (
 						"_chatUser.lastAction",
 						value));
@@ -806,13 +823,13 @@ class ChatUserDaoHibernate
 
 				if (value.equals ("code")) {
 
-					crit.addOrder (
+					criteria.addOrder (
 						Order.asc (
 							"_chatUser.code"));
 
 				} else if (value.equals ("creditFailedDesc")) {
 
-					crit.addOrder (
+					criteria.addOrder (
 						Order.desc (
 							"_chatUser.creditFailed"));
 
@@ -827,7 +844,7 @@ class ChatUserDaoHibernate
 
 			} else if (equal (key, "limit")) {
 
-				crit.setMaxResults (
+				criteria.setMaxResults (
 					(Integer) value);
 
 			} else {
@@ -843,7 +860,7 @@ class ChatUserDaoHibernate
 
 		return findMany (
 			Integer.class,
-			crit.list ());
+			criteria.list ());
 
 	}
 

@@ -389,7 +389,7 @@ class ModelRecordGenerator {
 		// write class comparison
 
 		javaWriter.writeFormat (
-			"\t\tif (otherObject.getClass () != %s.class) {\n",
+			"\t\tif (! (otherObject instanceof %s)) {\n",
 			recordClassName);
 
 		javaWriter.writeFormat (

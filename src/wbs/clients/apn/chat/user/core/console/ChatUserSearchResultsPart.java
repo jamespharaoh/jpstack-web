@@ -3,6 +3,7 @@ package wbs.clients.apn.chat.user.core.console;
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.sum;
 
@@ -150,12 +151,15 @@ class ChatUserSearchResultsPart
 		chatUsers =
 			new ArrayList<ChatUserRec> ();
 
-		for (Object chatUserIdObject
-				: chatUserSearchResult) {
+		for (
+			Object chatUserIdObject
+				: chatUserSearchResult
+		) {
 
 			chatUsers.add (
 				chatUserHelper.find (
-					(Integer) chatUserIdObject));
+					(Integer)
+					chatUserIdObject));
 
 		}
 
@@ -192,7 +196,7 @@ class ChatUserSearchResultsPart
 				: chatUsers
 		) {
 
-			printFormat (
+			pageBuilder.writer ().writeFormat (
 				"<tr",
 				" class=\"magic-table-row\"",
 				" data-target-href=\"%h\"",
@@ -276,10 +280,10 @@ class ChatUserSearchResultsPart
 		PageBuilder pageBuilder =
 			pageBuilders [1];
 
-		pageBuilder.footWriter ().writeFormat (
+		pageBuilder.headWriter ().writeFormat (
 			"<table class=\"list\">\n");
 
-		pageBuilder.footWriter ().writeFormat (
+		pageBuilder.headWriter ().writeFormat (
 			"<tr>\n",
 			"<th>User</th>\n",
 			"<th>T</th>\n",
@@ -324,7 +328,7 @@ class ChatUserSearchResultsPart
 			Iterator<Integer> percentagerIterator =
 				percentager.work ().iterator ();
 
-			printFormat (
+			pageBuilder.writer ().writeFormat (
 				"<tr",
 				" class=\"magic-table-row\"",
 				" data-target-href=\"%h\"",
@@ -349,13 +353,13 @@ class ChatUserSearchResultsPart
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					Long.valueOf(chatUser.getValueSinceEver ())));
+					(long) chatUser.getValueSinceEver ()));
 
 			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					Long.valueOf(chatUser.getCredit ())));
+					(long) chatUser.getCredit ()));
 
 			pageBuilder.writer ().writeFormat (
 				"%s\n",
@@ -366,24 +370,21 @@ class ChatUserSearchResultsPart
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					Long.valueOf (
-						sum (
-							+ chatUser.getCreditPending (),
-							+ chatUser.getCreditPendingStrict ()))));
+					(long) sum (
+						+ chatUser.getCreditPending (),
+						+ chatUser.getCreditPendingStrict ())));
 
 			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					Long.valueOf (
-						chatUser.getCreditSuccess ())));
+					(long) chatUser.getCreditSuccess ()));
 
 			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					Long.valueOf (
-						chatUser.getCreditFailed ())));
+					(long) chatUser.getCreditFailed ()));
 
 			pageBuilder.writer ().writeFormat (
 				"<td>%h</td>\n",
@@ -459,8 +460,12 @@ class ChatUserSearchResultsPart
 				" class=\"little-page-link-%s\"",
 				page,
 				" href=\"#\"",
-				" onclick=\"pageBuilder.showLittlePage (%s);\"",
-				page,
+				" onclick=\"%h\"",
+				joinWithSpace (
+					stringFormat (
+						"pageBuilder.showLittlePage (%s);",
+						page),
+					"magicTable.setupMagicHandlers ($('#pageHolder'));"),
 				">%s</a>\n",
 				page + 1);
 
@@ -484,14 +489,20 @@ class ChatUserSearchResultsPart
 			"<a",
 			" class=\"big-page-link-0\"",
 			" href=\"#\"",
-			" onclick=\"pageBuilder.showBigPage (0)\"",
+			" onclick=\"%h\"",
+			joinWithSpace (
+				"pageBuilder.showBigPage (0);",
+				"magicTable.setupMagicHandlers ($('#pageHolder'));"),
 			">Normal</a>\n");
 
 		printFormat (
 			"<a",
 			" class=\"big-page-link-1\"",
 			" href=\"#\"",
-			" onclick=\"pageBuilder.showBigPage (1)\"",
+			" onclick=\"%h\"",
+			joinWithSpace (
+				"pageBuilder.showBigPage (1);",
+				"magicTable.setupMagicHandlers ($('#pageHolder'));"),
 			">Credit</a></p>\n");
 
 		goPages ();
@@ -525,7 +536,8 @@ class ChatUserSearchResultsPart
 
 		printFormat (
 			"$(function () {\n",
-			"pageBuilder.init ();\n",
+			"\tpageBuilder.init ();\n",
+			"\tmagicTable.setupMagicHandlers ($('#pageHolder'));\n",
 			"});\n");
 
 		printFormat (

@@ -1841,6 +1841,49 @@ class Misc {
 
 	}
 
+	public static <Type>
+	Optional<Integer> indexOf (
+			@NonNull List<Type> list,
+			@NonNull Type value) {
+
+		int index =
+			list.indexOf (
+				value);
+
+		if (index < 0) {
+
+			return Optional.<Integer>absent ();
+
+		} else {
+
+			return Optional.of (
+				index);
+
+		}
+
+	}
+
+	public static <Type>
+	int indexOfRequired (
+			@NonNull List<Type> list,
+			@NonNull Type value) {
+
+		int index =
+			list.indexOf (
+				value);
+
+		if (index < 0) {
+
+			throw new IllegalArgumentException ();
+
+		} else {
+
+			return index;
+
+		}
+
+	}
+
 	public static
 	boolean earlierThan (
 			@NonNull Instant left,
