@@ -14,14 +14,13 @@ import com.google.common.base.Optional;
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.Record;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.currency.model.CurrencyRec;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("currencyFormFieldInterfaceMapping")
 public
-class CurrencyFormFieldInterfaceMapping<Container extends Record<?>>
+class CurrencyFormFieldInterfaceMapping<Container>
 	implements FormFieldInterfaceMapping<Container,Long,String> {
 
 	// dependencies
