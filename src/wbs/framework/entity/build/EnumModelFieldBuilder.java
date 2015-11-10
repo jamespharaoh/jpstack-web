@@ -3,7 +3,7 @@ package wbs.framework.entity.build;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.classForName;
+import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -128,7 +128,7 @@ class EnumModelFieldBuilder {
 				false)
 
 			.valueType (
-				classForName (
+				classForNameRequired (
 					fullFieldTypeName))
 
 			.nullable (

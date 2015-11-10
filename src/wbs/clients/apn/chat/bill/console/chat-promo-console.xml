@@ -1,0 +1,185 @@
+<console-module
+	name="chatPromo">
+
+	<console-helper-provider
+		object-name="chatPromo"
+		view-delegate-field="parent">
+
+		<context-stuff
+			name="chatPromoName"
+			field="name"/>
+
+		<context-stuff
+			name="chatId"
+			delegate="chat"
+			field="id"/>
+
+		<priv-key
+			name="chatPromo.manage"
+			delegate="parent"
+			priv="manage"/>
+
+		<priv-key
+			name="chatPromo.messages"
+			delegate="parent"
+			priv="messages"/>
+
+		<priv-key
+			name="chatPromo.stats"
+			delegate="parent"
+			priv="stats"/>
+
+		<run-post-processor
+			name="chat"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="chatPromo"
+		object-name="chatPromo">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="chatPromo">
+
+		<name-field/>
+		<description-field/>
+
+		<timestamp-field
+			name="startTime"/>
+
+		<timestamp-field
+			name="endTime"/>
+
+		<currency-field
+			name="amount"
+			currency="chat.currency"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="chatPromo">
+
+		<name-field/>
+		<description-field/>
+
+		<timestamp-field
+			name="startTime"/>
+
+		<timestamp-field
+			name="endTime"/>
+
+		<currency-field
+			name="amount"
+			currency="chat.currency"/>
+
+		<text-area-field
+			name="successText"/>
+
+		<text-area-field
+			name="alreadyClaimedText"/>
+
+		<text-area-field
+			name="promoNotStartedText"/>
+
+		<text-area-field
+			name="promoEndedText"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="chatPromo">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<timestamp-field
+			name="startTime"/>
+
+		<timestamp-field
+			name="endTime"/>
+
+		<currency-field
+			name="amount"
+			currency="chat.currency"/>
+
+		<text-area-field
+			name="successText"/>
+
+		<text-area-field
+			name="alreadyClaimedText"/>
+
+		<text-area-field
+			name="promoNotStartedText"/>
+
+		<text-area-field
+			name="promoEndedText"/>
+
+		<integer-field
+			name="numUsers"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="chatPromo">
+
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<timestamp-field
+			name="startTime"/>
+
+		<timestamp-field
+			name="endTime"/>
+
+		<currency-field
+			name="amount"
+			currency="chat.currency"/>
+
+		<text-area-field
+			name="successText"/>
+
+		<text-area-field
+			name="alreadyClaimedText"/>
+
+		<text-area-field
+			name="promoNotStartedText"/>
+
+		<text-area-field
+			name="promoEndedText"/>
+
+	</field-set>
+
+</console-module>

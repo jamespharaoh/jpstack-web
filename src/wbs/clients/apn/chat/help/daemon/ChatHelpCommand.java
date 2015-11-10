@@ -94,9 +94,11 @@ class ChatHelpCommand
 	@Override
 	public
 	String[] getCommandTypes () {
-		return new String[] {
+
+		return new String [] {
 			"chat.help"
 		};
+
 	}
 
 	// implementation
@@ -147,8 +149,10 @@ class ChatHelpCommand
 
 			return inboxLogic.inboxProcessed (
 				inbox,
-				Optional.of (defaultService),
-				Optional.of (affiliate),
+				Optional.of (
+					defaultService),
+				Optional.of (
+					affiliate),
 				command);
 
 		}
@@ -190,8 +194,10 @@ class ChatHelpCommand
 
 		return inboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (defaultService),
-			Optional.of (affiliate),
+			Optional.of (
+				defaultService),
+			Optional.of (
+				affiliate),
 			command);
 
 	}

@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.help.logic;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -7,7 +9,8 @@ import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageRec;
 
-public interface ChatHelpLogLogic {
+public
+interface ChatHelpLogLogic {
 
 	ChatHelpLogRec createChatHelpLogIn (
 			ChatUserRec chatUser,
@@ -18,11 +21,11 @@ public interface ChatHelpLogLogic {
 
 	ChatHelpLogRec createChatHelpLogOut (
 			ChatUserRec chatUser,
-			ChatHelpLogRec replyTo,
-			UserRec user,
+			Optional<ChatHelpLogRec> replyTo,
+			Optional<UserRec> user,
 			MessageRec message,
-			ChatMessageRec chatMessage,
+			Optional<ChatMessageRec> chatMessage,
 			String text,
-			CommandRec command);
+			Optional<CommandRec> command);
 
 }

@@ -5,6 +5,9 @@ import static wbs.framework.utils.etc.Misc.instantToDate;
 import javax.inject.Inject;
 
 import lombok.NonNull;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
@@ -22,7 +25,7 @@ import wbs.sms.message.core.model.MessageRec;
 
 @SingletonComponent ("chatHelpLogLogic")
 public
-class ChatHelpLogLogicImpl
+class ChatHelpLogLogicImplementation
 	implements ChatHelpLogLogic {
 
 	@Inject
@@ -91,9 +94,15 @@ class ChatHelpLogLogicImpl
 					chatUser.getCode (),
 					text);
 
-			queueItem.setPriority (-10);
+			queueItem
 
-			chatHelpLog.setQueueItem (queueItem);
+				.setPriority (
+					-10);
+
+			chatHelpLog
+
+				.setQueueItem (
+					queueItem);
 
 		}
 
@@ -104,12 +113,12 @@ class ChatHelpLogLogicImpl
 	public
 	ChatHelpLogRec createChatHelpLogOut (
 			@NonNull ChatUserRec chatUser,
-			ChatHelpLogRec replyTo,
-			UserRec user,
+			@NonNull Optional<ChatHelpLogRec> replyTo,
+			@NonNull Optional<UserRec> user,
 			@NonNull MessageRec message,
-			ChatMessageRec chatMessage,
+			@NonNull Optional<ChatMessageRec> chatMessage,
 			@NonNull String text,
-			CommandRec command) {
+			@NonNull Optional<CommandRec> command) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -125,22 +134,22 @@ class ChatHelpLogLogicImpl
 					transaction.now ()))
 
 			.setReplyTo (
-				replyTo)
+				replyTo.orNull ())
 
 			.setUser (
-				user)
+				user.orNull ())
 
 			.setMessage (
 				message)
 
 			.setChatMessage (
-				chatMessage)
+				chatMessage.orNull ())
 
 			.setText (
 				text)
 
 			.setCommand (
-				command)
+				command.orNull ())
 
 			.setOurNumber (
 				message.getNumFrom ())

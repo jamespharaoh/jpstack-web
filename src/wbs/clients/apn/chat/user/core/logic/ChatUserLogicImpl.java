@@ -1354,8 +1354,10 @@ class ChatUserLogicImpl
 			String number =
 				chatUser.getNumber ().getNumber ();
 
-			for (ChatSchemeMapRec chatSchemeMap
-					: chatSchemeMaps) {
+			for (
+				ChatSchemeMapRec chatSchemeMap
+					: chatSchemeMaps
+			) {
 
 				String prefix =
 					chatSchemeMap.getPrefix ();

@@ -10,9 +10,15 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
+import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogLogic;
 import wbs.clients.apn.chat.help.logic.ChatHelpTemplateLogic;
+import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -25,6 +31,7 @@ import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
+import wbs.platform.user.model.UserRec;
 import wbs.sms.command.logic.CommandLogic;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
@@ -33,9 +40,6 @@ import wbs.sms.magicnumber.logic.MagicNumberLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.route.router.model.RouterRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 @SingletonComponent ("chatSendLogic")
 public
@@ -625,16 +629,18 @@ class ChatSendLogicImpl
 
 		chatHelpLogLogic.createChatHelpLogOut (
 			chatUser,
-			null,
-			null,
+			Optional.<ChatHelpLogRec>absent (),
+			Optional.<UserRec>absent (),
 			message,
-			null,
+			Optional.<ChatMessageRec>absent (),
 			finalText,
-			magicCommand == commandHelper.findByCode (chat, "magic")
-				? commandHelper.find (magicRef)
-				: magicCommand);
+			Optional.of (
+				magicCommand == commandHelper.findByCode (chat, "magic")
+					? commandHelper.find (magicRef)
+					: magicCommand));
 
-		return Optional.of (message);
+		return Optional.of (
+			message);
 
 	}
 

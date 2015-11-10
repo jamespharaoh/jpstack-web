@@ -2,7 +2,7 @@ package wbs.framework.entity.build;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.classForName;
+import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -68,7 +68,7 @@ class ComponentModelFieldBuilder {
 				fieldTypeName);
 
 		Class<?> fieldTypeClass =
-			classForName (
+			classForNameRequired (
 				fullFieldTypeName);
 
 		// create model field

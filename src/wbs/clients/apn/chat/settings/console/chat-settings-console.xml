@@ -63,7 +63,7 @@
 			<context-link
 				name="monthCost"
 				link="chatMonthCost"
-				label="StaffCost"
+				label="Staff cost"
 				priv-key="chat.manage"/>
 
 			<context-tab-action-page
@@ -71,6 +71,12 @@
 
 			<extension-point
 				name="chat.noteName"/>
+
+			<context-link
+				name="promo"
+				link="chatPromo"
+				label="Promos"
+				priv-key="chat.manage"/>
 
 		</section>
 

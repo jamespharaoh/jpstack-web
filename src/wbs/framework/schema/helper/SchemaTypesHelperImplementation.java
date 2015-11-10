@@ -2,6 +2,8 @@ package wbs.framework.schema.helper;
 
 import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.classForName;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.sql.Types;
@@ -21,6 +23,10 @@ import org.hibernate.usertype.CompositeUserType;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
 import wbs.framework.application.scaffold.PluginEnumTypeSpec;
@@ -29,14 +35,11 @@ import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.hibernate.EnumUserType;
 import wbs.framework.logging.TaskLog;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 @Accessors (fluent = true)
 @Log4j
 @SingletonComponent ("schemaTypesHelper")
 public
-class SchemaTypesHelperImpl
+class SchemaTypesHelperImplementation
 	implements SchemaTypesHelper {
 
 	// dependencies
@@ -221,24 +224,25 @@ class SchemaTypesHelperImpl
 			ImmutableMap.Builder<String,List<String>> enumTypesBuilder,
 			PluginCustomTypeSpec customType) {
 
-		String className =
+		String objectClassName =
 			stringFormat (
 				"%s.model.%s",
 				customType.plugin ().packageName (),
-				capitalise (customType.name ()));
+				capitalise (
+					customType.name ()));
 
-		Class<?> objectClass = null;
+		Optional<Class<?>> objectClassOptional =
+			classForName (
+				objectClassName);
 
-		try {
-
-			objectClass =
-				Class.forName (className);
-
-		} catch (ClassNotFoundException exception) {
+		if (
+			isNotPresent (
+				objectClassOptional)
+		) {
 
 			taskLog.error (
 				"No such class %s",
-				className);
+				objectClassName);
 
 		}
 
@@ -246,16 +250,17 @@ class SchemaTypesHelperImpl
 			stringFormat (
 				"%s.hibernate.%sType",
 				customType.plugin ().packageName (),
-				capitalise (customType.name ()));
+				capitalise (
+					customType.name ()));
 
-		Class<?> helperClass = null;
+		Optional<Class<?>> helperClassOptional =
+			classForName (
+				helperClassName);
 
-		try {
-
-			helperClass =
-				Class.forName (helperClassName);
-
-		} catch (ClassNotFoundException exception) {
+		if (
+			isNotPresent (
+				helperClassOptional)
+		) {
 
 			taskLog.error (
 				"No such class %s",
@@ -263,9 +268,23 @@ class SchemaTypesHelperImpl
 
 		}
 
-		if (objectClass == null
-				|| helperClass == null)
+		if (
+
+			isNotPresent (
+				objectClassOptional)
+
+			|| isNotPresent (
+				helperClassOptional)
+
+		) {
 			return;
+		}
+
+		Class<?> objectClass =
+			objectClassOptional.get ();
+
+		Class<?> helperClass =
+			helperClassOptional.get ();
 
 		Object helper;
 
@@ -288,14 +307,17 @@ class SchemaTypesHelperImpl
 		if (helper instanceof EnumUserType) {
 
 			EnumUserType<?,?> enumHelper =
-				(EnumUserType<?,?>) helper;
+				(EnumUserType<?,?>)
+				helper;
 
 			String typeName =
 				enumHelper.sqlType () == 1111
-					? camelToUnderscore (
-						enumHelper.enumClass ().getSimpleName ())
-					: builtinSqlTypeNames.get (
-						enumHelper.sqlType ());
+
+				? camelToUnderscore (
+					enumHelper.enumClass ().getSimpleName ())
+
+				: builtinSqlTypeNames.get (
+					enumHelper.sqlType ());
 
 			if (typeName == null) {
 
@@ -317,8 +339,10 @@ class SchemaTypesHelperImpl
 				ImmutableList.Builder<String> enumValuesBuilder =
 					ImmutableList.<String>builder ();
 
-				for (Object enumValue
-						: enumHelper.databaseValues ()) {
+				for (
+					Object enumValue
+						: enumHelper.databaseValues ()
+				) {
 
 					enumValuesBuilder.add (
 						(String) enumValue);
@@ -338,7 +362,8 @@ class SchemaTypesHelperImpl
 		if (helper instanceof CompositeUserType) {
 
 			CompositeUserType compositeUserType =
-				(CompositeUserType) helper;
+				(CompositeUserType)
+				helper;
 
 			ImmutableList.Builder<String> typeNamesBuilder =
 				ImmutableList.<String>builder ();
@@ -386,22 +411,64 @@ class SchemaTypesHelperImpl
 
 	Map<Class<?>,String> builtinFieldTypeNames =
 		ImmutableMap.<Class<?>,String>builder ()
-			.put (Boolean.class, "boolean")
-			.put (Double.class, "double precision")
-			.put (Integer.class, "integer")
-			.put (String.class, "text")
-			.put (byte[].class, "bytea")
-			.put (LocalDate.class, "date")
-			.put (Instant.class, "text")
-			.put (Date.class, "timestamp with time zone")
-			.put (Character.class, "char (1)")
-			.build ();
+
+		.put (
+			Boolean.class,
+			"boolean")
+
+		.put (
+			Double.class,
+			"double precision")
+
+		.put (
+			Integer.class,
+			"integer")
+
+		.put (
+			Long.class,
+			"bigint")
+
+		.put (
+			String.class,
+			"text")
+
+		.put (
+			byte[].class,
+			"bytea")
+
+		.put (
+			LocalDate.class,
+			"date")
+
+		.put (
+			Instant.class,
+			"text")
+
+		.put (
+			Date.class,
+			"timestamp with time zone")
+
+		.put (
+			Character.class,
+			"char (1)")
+
+		.build ();
 
 	Map<Integer,String> builtinSqlTypeNames =
 		ImmutableMap.<Integer,String>builder ()
-			.put (Types.VARCHAR, "text")
-			.put (Types.CHAR, "char (1)")
-			.put (Types.INTEGER, "int")
-			.build ();
+
+		.put (
+			Types.VARCHAR,
+			"text")
+
+		.put (
+			Types.CHAR,
+			"char (1)")
+
+		.put (
+			Types.INTEGER,
+			"int")
+
+		.build ();
 
 }

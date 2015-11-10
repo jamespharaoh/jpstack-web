@@ -2,7 +2,7 @@ package wbs.framework.entity.model;
 
 import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.classForName;
+import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.uncapitalise;
@@ -104,7 +104,7 @@ class ModelBuilder {
 				recordClassName);
 
 		recordClass =
-			classForName (
+			classForNameRequired (
 				recordClassNameFull);
 
 		// object helper class
@@ -122,7 +122,7 @@ class ModelBuilder {
 				objectHelperClassName);
 
 		objectHelperClass =
-			classForName (
+			classForNameRequired (
 				objectHelperClassNameFull);
 
 		// model

@@ -6,6 +6,8 @@
 		<custom-type name="chatUserCreditMode"/>
 		<model name="chatDailyLimitLog"/>
 		<model name="chatNetwork"/>
+		<model name="chatPromo"/>
+		<model name="chatPromoUser"/>
 		<model name="chatRoute"/>
 		<model name="chatRouteNetwork"/>
 		<model name="chatUserBillLog"/>
@@ -22,11 +24,13 @@
 		<bean class="daemon.ChatBillDeliveryHandler"/>
 		<bean class="daemon.ChatCheckCreditCommand"/>
 		<bean class="daemon.ChatCreditDaemon"/>
+		<bean class="daemon.ChatPromoCommand"/>
 		<bean class="daemon.ChatSpendWarningDaemon"/>
 	</layer>
 
 	<console-modules>
 		<console-module name="chat-network"/>
+		<console-module name="chat-promo"/>
 		<console-module name="chat-route"/>
 		<console-module name="chat-route-network"/>
 	</console-modules>

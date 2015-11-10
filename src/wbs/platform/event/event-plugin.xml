@@ -23,7 +23,7 @@
 	</layer>
 
 	<layer name="logic">
-		<bean class="logic.EventLogicImpl"/>
+		<bean class="logic.EventLogicImplementation"/>
 	</layer>
 
 	<layer name="console">

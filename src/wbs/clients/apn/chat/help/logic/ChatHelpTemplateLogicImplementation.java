@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import lombok.NonNull;
+
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
@@ -18,7 +19,7 @@ import wbs.sms.gsm.MessageSplitter;
 
 @SingletonComponent ("chatTemplateLogic")
 public
-class ChatHelpTemplateLogicImpl
+class ChatHelpTemplateLogicImplementation
 	implements ChatHelpTemplateLogic {
 
 	@Inject

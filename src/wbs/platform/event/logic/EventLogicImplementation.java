@@ -5,6 +5,10 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
+
+import org.joda.time.Instant;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -21,7 +25,7 @@ import wbs.platform.text.model.TextObjectHelper;
 
 @SingletonComponent ("eventLogic")
 public
-class EventLogicImpl
+class EventLogicImplementation
 	implements EventLogic {
 
 	// dependencies
@@ -49,7 +53,7 @@ class EventLogicImpl
 	@Override
 	public
 	EventRec createEvent (
-			String typeCode) {
+			@NonNull String typeCode) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -94,25 +98,35 @@ class EventLogicImpl
 	@Override
 	public
 	EventRec createEvent (
-			String typeCode,
-			Object... linkObjects) {
+			@NonNull String typeCode,
+			@NonNull Object... linkObjects) {
 
 		// create event
 
 		EventRec event =
-			createEvent (typeCode);
+			createEvent (
+				typeCode);
 
 		// create event links
 
 		int index = 0;
 
-		for (Object linkObject
-				: linkObjects) {
+		for (
+			Object linkObject
+				: linkObjects
+		) {
 
-			createEventLink (
-				event,
-				linkObject,
-				index);
+			EventLinkRec eventLink =
+				createEventLink (
+					event,
+					linkObject,
+					index);
+
+			eventLinkHelper.insert (
+				eventLink);
+
+			event.getEventLinks ().add (
+				eventLink);
 
 			index ++;
 
@@ -124,9 +138,9 @@ class EventLogicImpl
 
 	}
 
-	void createEventLink (
-			EventRec event,
-			Object linkObject,
+	EventLinkRec createEventLink (
+			@NonNull EventRec event,
+			@NonNull Object linkObject,
 			int index) {
 
 		linkObject =
@@ -144,36 +158,7 @@ class EventLogicImpl
 			if (dataObject.getId () == null)
 				throw new IllegalArgumentException ();
 
-			event.getEventLinks ().add (
-				eventLinkHelper.insert (
-					new EventLinkRec ()
-
-					.setEvent (
-						event)
-
-					.setIndex (
-						index)
-
-					.setTypeId (
-						objectManager.getObjectTypeId (
-							dataObject))
-
-					.setRefId (
-						dataObject.getId ())
-
-			));
-
-			return;
-
-		}
-
-		// store integers directly
-
-		if (linkObject instanceof Integer) {
-
-			event.getEventLinks ().add (
-				eventLinkHelper.insert (
-					new EventLinkRec ()
+			return new EventLinkRec ()
 
 				.setEvent (
 					event)
@@ -182,14 +167,31 @@ class EventLogicImpl
 					index)
 
 				.setTypeId (
-					-1)
+					objectManager.getObjectTypeId (
+						dataObject))
 
 				.setRefId (
-					(Integer) linkObject)
+					(long) dataObject.getId ());
 
-			));
+		}
 
-			return;
+		// store longs directly
+
+		if (linkObject instanceof Long) {
+
+			return new EventLinkRec ()
+
+				.setEvent (
+					event)
+
+				.setIndex (
+					index)
+
+				.setTypeId (
+					EventLogic.integerEventLinkType)
+
+				.setRefId (
+					(Long) linkObject);
 
 		}
 
@@ -197,9 +199,7 @@ class EventLogicImpl
 
 		if (linkObject instanceof Boolean) {
 
-			event.getEventLinks ().add (
-				eventLinkHelper.insert (
-					new EventLinkRec ()
+			return new EventLinkRec ()
 
 				.setEvent (
 					event)
@@ -208,14 +208,36 @@ class EventLogicImpl
 					index)
 
 				.setTypeId (
-					-2)
+					EventLogic.booleanEventLinkType)
 
 				.setRefId (
-					(Boolean) linkObject ? 1 : 0)
+					(Boolean) linkObject
+						? 1L
+						: 0L);
 
-			));
+		}
 
-			return;
+		// store instants directly
+
+		if (linkObject instanceof Instant) {
+
+			Instant instant =
+				(Instant)
+				linkObject;
+
+			return new EventLinkRec ()
+
+				.setEvent (
+					event)
+
+				.setIndex (
+					index)
+
+				.setTypeId (
+					EventLogic.instantEventLinkType)
+
+				.setRefId (
+					instant.getMillis ());
 
 		}
 
@@ -230,7 +252,7 @@ class EventLogicImpl
 	}
 
 	Object normaliseLinkObject (
-			Object linkObject,
+			@NonNull Object linkObject,
 			int index) {
 
 		// don't allow null
@@ -254,6 +276,16 @@ class EventLogicImpl
 
 			linkObject =
 				linkObject.toString ();
+
+		}
+
+		// convert to long, continue processing
+
+		if (linkObject instanceof Integer) {
+
+			linkObject =
+				(long) (Integer)
+				linkObject;
 
 		}
 

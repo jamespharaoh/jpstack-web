@@ -1,5 +1,7 @@
 package wbs.framework.schema.builder;
 
+import static wbs.framework.utils.etc.Misc.doNothing;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -10,8 +12,12 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
@@ -25,8 +31,6 @@ import wbs.framework.schema.model.SchemaPrimaryKey;
 import wbs.framework.schema.model.SchemaSequence;
 import wbs.framework.schema.model.SchemaTable;
 import wbs.framework.sql.SqlLogicImpl;
-
-import com.google.common.collect.ImmutableList;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("prototype")
@@ -74,10 +78,14 @@ class SchemaTableFromModel {
 
 		schemaTable =
 			new SchemaTable ()
-				.name (model.tableName ());
 
-		for (ModelField modelField
-				: model.fields ()) {
+			.name (
+				model.tableName ());
+
+		for (
+			ModelField modelField
+				: model.fields ()
+		) {
 
 			forModelField (
 				modelField);
@@ -88,9 +96,14 @@ class SchemaTableFromModel {
 
 			List<String> treeColumnNames =
 				ImmutableList.<String>builder ()
-					.addAll (parentColumnNames)
-					.addAll (identityColumnNames)
-					.build ();
+
+				.addAll (
+					parentColumnNames)
+
+				.addAll (
+					identityColumnNames)
+
+				.build ();
 
 			String treeIndexName =
 				stringFormat (
@@ -99,9 +112,17 @@ class SchemaTableFromModel {
 
 			schemaTable.addIndex (
 				new SchemaIndex ()
-					.name (treeIndexName)
-					.unique (true)
-					.columns (treeColumnNames));
+
+				.name (
+					treeIndexName)
+
+				.unique (
+					true)
+
+				.columns (
+					treeColumnNames)
+
+			);
 
 		}
 
@@ -122,20 +143,29 @@ class SchemaTableFromModel {
 
 	public
 	void forModelField (
-			ModelField modelField) {
+			@NonNull ModelField modelField) {
 
 		switch (modelField.type ()) {
 
 		case generatedId:
-			forGeneratedId (modelField);
+
+			forGeneratedId (
+				modelField);
+
 			break;
 
 		case assignedId:
-			forAssignedId (modelField);
+
+			forAssignedId (
+				modelField);
+
 			break;
 
 		case foreignId:
-			forForeignId (modelField);
+
+			forForeignId (
+				modelField);
+
 			break;
 
 		case simple:
@@ -147,7 +177,10 @@ class SchemaTableFromModel {
 		case index:
 		case parentId:
 		case identitySimple:
-			forField (modelField);
+
+			forField (
+				modelField);
+
 			break;
 
 		case reference:
@@ -157,22 +190,33 @@ class SchemaTableFromModel {
 		case parentType:
 		case type:
 		case identityReference:
-			forReference (modelField);
+
+			forReference (
+				modelField);
+
 			break;
 
 		case compositeId:
-			forCompositeId (modelField);
+
+			forCompositeId (
+				modelField);
+
 			break;
 
 		case component:
-			forComponent (modelField);
+
+			forComponent (
+				modelField);
+
 			break;
 
 		case collection:
 		case associative:
 		case master:
 		case slave:
-			// no action needed
+
+			doNothing ();
+
 			break;
 
 		default:
@@ -202,7 +246,7 @@ class SchemaTableFromModel {
 	}
 
 	void forGeneratedId (
-			ModelField modelField) {
+			@NonNull ModelField modelField) {
 
 		String sequenceName =
 			stringFormat (
@@ -238,24 +282,32 @@ class SchemaTableFromModel {
 	}
 
 	void forAssignedId (
-			ModelField modelField) {
+			@NonNull ModelField modelField) {
 
 		schemaTable
 
 			.addColumn (
 				new SchemaColumn ()
-					.name (modelField.columnName ())
-					.type ("integer")
-					.nullable (false))
+
+				.name (
+					modelField.columnName ())
+
+				.type (
+					"integer")
+
+				.nullable (
+					false))
 
 			.primaryKey (
 				new SchemaPrimaryKey ()
-					.addColumn (modelField.columnName ()));
+
+				.addColumn (
+					modelField.columnName ()));
 
 	}
 
 	void forForeignId (
-			ModelField modelField) {
+			@NonNull ModelField modelField) {
 
 		ModelField foreignModelField =
 			model.fieldsByName ().get (
@@ -290,23 +342,35 @@ class SchemaTableFromModel {
 
 			.addColumn (
 				new SchemaColumn ()
-					.name (modelField.columnName ())
-					.type ("integer")
-					.nullable (false))
+
+				.name (
+					modelField.columnName ())
+
+				.type (
+					"integer")
+
+				.nullable (
+					false))
 
 			.primaryKey (
 				new SchemaPrimaryKey ()
-					.addColumn (modelField.columnName ()))
+
+				.addColumn (
+					modelField.columnName ()))
 
 			.addForeignKey (
 				new SchemaForeignKey ()
-					.addSourceColumn (modelField.columnName ())
-					.targetTable (targetModel.tableName ()));
+
+				.addSourceColumn (
+					modelField.columnName ())
+
+				.targetTable (
+					targetModel.tableName ()));
 
 	}
 
 	void forField (
-			ModelField modelField) {
+			@NonNull ModelField modelField) {
 
 		List<String> typeNames;
 
@@ -335,8 +399,11 @@ class SchemaTableFromModel {
 
 		}
 
-		if (modelField.columnNames ().size ()
-				!= typeNames.size ()) {
+		if (
+			notEqual (
+				modelField.columnNames ().size (),
+				typeNames.size ())
+		) {
 
 			taskLog.error (
 				"Expected %s columns for %s at %s, not %s",
@@ -365,19 +432,26 @@ class SchemaTableFromModel {
 
 				.addColumn (
 					new SchemaColumn ()
-						.name (columnName)
-						.type (typeName)
-						.nullable (modelField.nullable ()));
+
+					.name (
+						columnName)
+
+					.type (
+						typeName)
+
+					.nullable (
+						modelField.nullable ()));
 
 		}
 
 	}
 
 	void forReference (
-			ModelField modelField) {
+			@NonNull ModelField modelField) {
 
 		Model targetModel =
-			modelsByClass.get (modelField.valueType ());
+			modelsByClass.get (
+				modelField.valueType ());
 
 		if (targetModel == null) {
 
@@ -394,14 +468,24 @@ class SchemaTableFromModel {
 
 			.addColumn (
 				new SchemaColumn ()
-					.name (modelField.columnName ())
-					.type ("integer")
-					.nullable (modelField.nullable ()))
+
+				.name (
+					modelField.columnName ())
+
+				.type (
+					"integer")
+
+				.nullable (
+					modelField.nullable ()))
 
 			.addForeignKey (
 				new SchemaForeignKey ()
-					.addSourceColumn (modelField.columnName ())
-					.targetTable (targetModel.tableName ()));
+
+				.addSourceColumn (
+					modelField.columnName ())
+
+				.targetTable (
+					targetModel.tableName ()));
 
 	}
 
@@ -421,8 +505,10 @@ class SchemaTableFromModel {
 		schemaTable.primaryKey (
 			new SchemaPrimaryKey ());
 
-		for (ModelField compositeIdModelField
-				: modelField.fields ()) {
+		for (
+			ModelField compositeIdModelField
+				: modelField.fields ()
+		) {
 
 			forCompositeIdField (
 				modelField,
@@ -433,8 +519,8 @@ class SchemaTableFromModel {
 	}
 
 	void forCompositeIdField (
-			ModelField modelField,
-			ModelField compositeIdModelField) {
+			@NonNull ModelField modelField,
+			@NonNull ModelField compositeIdModelField) {
 
 		if (compositeIdModelField.reference ()) {
 
@@ -461,11 +547,12 @@ class SchemaTableFromModel {
 	}
 
 	void forCompositeIdReference (
-			ModelField modelField,
-			ModelField compositeIdModelField) {
+			@NonNull ModelField modelField,
+			@NonNull ModelField compositeIdModelField) {
 
 		Model targetModel =
-			modelsByClass.get (compositeIdModelField.valueType ());
+			modelsByClass.get (
+				compositeIdModelField.valueType ());
 
 		if (targetModel == null) {
 
@@ -482,24 +569,35 @@ class SchemaTableFromModel {
 
 			.addColumn (
 				new SchemaColumn ()
-					.name (compositeIdModelField.columnName ())
-					.type ("integer")
-					.nullable (false))
+
+				.name (
+					compositeIdModelField.columnName ())
+
+				.type (
+					"integer")
+
+				.nullable (
+					false))
 
 			.addForeignKey (
 				new SchemaForeignKey ()
-					.addSourceColumn (compositeIdModelField.columnName ())
-					.targetTable (targetModel.tableName ()));
 
-		schemaTable
-			.primaryKey ()
-			.addColumn (compositeIdModelField.columnName ());
+				.addSourceColumn (
+					compositeIdModelField.columnName ())
+
+				.targetTable (
+					targetModel.tableName ()));
+
+		schemaTable.primaryKey ()
+
+			.addColumn (
+				compositeIdModelField.columnName ());
 
 	}
 
 	void forCompositeIdValue (
-			ModelField modelField,
-			ModelField compositeIdModelField) {
+			@NonNull ModelField modelField,
+			@NonNull ModelField compositeIdModelField) {
 
 		List<String> typeNames =
 			schemaTypesHelper.fieldTypeNames ().get (
@@ -519,17 +617,20 @@ class SchemaTableFromModel {
 					.type (typeNames.get (0))
 					.nullable (false));
 
-		schemaTable
-			.primaryKey ()
-			.addColumn (compositeIdModelField.columnName ());
+		schemaTable.primaryKey ()
+
+			.addColumn (
+				compositeIdModelField.columnName ());
 
 	}
 
 	void forComponent (
-			ModelField modelField) {
+			@NonNull ModelField modelField) {
 
-		for (ModelField componentModelField
-				: modelField.fields ()) {
+		for (
+			ModelField componentModelField
+				: modelField.fields ()
+		) {
 
 			if (componentModelField.value ()) {
 
@@ -558,8 +659,8 @@ class SchemaTableFromModel {
 	}
 
 	void forComponentField (
-			ModelField modelField,
-			ModelField componentModelField) {
+			@NonNull ModelField modelField,
+			@NonNull ModelField componentModelField) {
 
 		List<String> typeNames =
 			schemaTypesHelper.fieldTypeNames ().get (
@@ -589,18 +690,25 @@ class SchemaTableFromModel {
 
 			.addColumn (
 				new SchemaColumn ()
-					.name (componentModelField.columnName ())
-					.type (typeNames.get (0))
-					.nullable (componentModelField.nullable ()));
+
+				.name (
+					componentModelField.columnName ())
+
+				.type (
+					typeNames.get (0))
+
+				.nullable (
+					componentModelField.nullable ()));
 
 	}
 
 	void forComponentReference (
-			ModelField modelField,
-			ModelField componentModelField) {
+			@NonNull ModelField modelField,
+			@NonNull ModelField componentModelField) {
 
 		Model targetModel =
-			modelsByClass.get (componentModelField.valueType ());
+			modelsByClass.get (
+				componentModelField.valueType ());
 
 		if (targetModel == null) {
 
@@ -617,14 +725,24 @@ class SchemaTableFromModel {
 
 			.addColumn (
 				new SchemaColumn ()
-					.name (componentModelField.columnName ())
-					.type ("integer")
-					.nullable (false))
+
+				.name (
+					componentModelField.columnName ())
+
+				.type (
+					"integer")
+
+				.nullable (
+					false))
 
 			.addForeignKey (
 				new SchemaForeignKey ()
-					.addSourceColumn (componentModelField.columnName ())
-					.targetTable (targetModel.tableName ()));
+
+				.addSourceColumn (
+					componentModelField.columnName ())
+
+				.targetTable (
+					targetModel.tableName ()));
 
 	}
 

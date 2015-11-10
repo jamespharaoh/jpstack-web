@@ -63,6 +63,14 @@ interface ChatSendLogic {
 			ServiceRec service,
 			Integer magicRef);
 
+	Integer sendMessageMagic (
+			ChatUserRec chatUser,
+			Optional<Integer> threadId,
+			Collection<TextRec> parts,
+			CommandRec magicCommand,
+			ServiceRec service,
+			Integer magicRef);
+
 	Optional<MessageRec> sendSystemMagic (
 			ChatUserRec chatUser,
 			Optional<Integer> threadId,
@@ -71,14 +79,6 @@ interface ChatSendLogic {
 			Integer magicRef,
 			TemplateMissing templateMissing,
 			Map<String,String> params);
-
-	Integer sendMessageMagic (
-			ChatUserRec chatUser,
-			Optional<Integer> threadId,
-			Collection<TextRec> parts,
-			CommandRec magicCommand,
-			ServiceRec service,
-			Integer magicRef);
 
 	Map<String,String> addDefaultParams (
 			ChatUserRec chatUser,

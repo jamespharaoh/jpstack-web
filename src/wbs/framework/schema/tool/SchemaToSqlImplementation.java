@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import lombok.NonNull;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.schema.model.Schema;
 import wbs.framework.schema.model.SchemaColumn;
@@ -21,7 +22,7 @@ import wbs.framework.sql.SqlLogic;
 
 @SingletonComponent ("schemaToSql")
 public
-class SchemaToSqlImpl
+class SchemaToSqlImplementation
 	implements SchemaToSql {
 
 	@Inject
@@ -42,8 +43,8 @@ class SchemaToSqlImpl
 	@Override
 	public
 	void forSchema (
-			List<String> sqlStatements,
-			Schema schema) {
+			@NonNull List<String> sqlStatements,
+			@NonNull Schema schema) {
 
 		forEnumTypes (
 			sqlStatements,
@@ -62,8 +63,10 @@ class SchemaToSqlImpl
 			@NonNull List<String> sqlStatements,
 			@NonNull Map<String,List<String>> enumTypes) {
 
-		for (Map.Entry<String,List<String>> entry
-				: enumTypes.entrySet ()) {
+		for (
+			Map.Entry<String,List<String>> entry
+				: enumTypes.entrySet ()
+		) {
 
 			doEnumType (
 				sqlStatements,
@@ -80,8 +83,10 @@ class SchemaToSqlImpl
 			@NonNull List<String> sqlStatements,
 			@NonNull List<SchemaTable> schemaTables) {
 
-		for (SchemaTable schemaTable
-				: schemaTables) {
+		for (
+			SchemaTable schemaTable
+				: schemaTables
+		) {
 
 			doTableFirstPass (
 				sqlStatements,
@@ -89,8 +94,10 @@ class SchemaToSqlImpl
 
 		}
 
-		for (SchemaTable schemaTable
-				: schemaTables) {
+		for (
+			SchemaTable schemaTable
+				: schemaTables
+		) {
 
 			doTableSecondPass (
 				sqlStatements,
@@ -151,8 +158,10 @@ class SchemaToSqlImpl
 				sqlLogic.quoteIdentifier (
 					schemaTable.name ())));
 
-		for (SchemaSequence schemaSequence
-				: schemaTable.sequences ().values ()) {
+		for (
+			SchemaSequence schemaSequence
+				: schemaTable.sequences ().values ()
+		) {
 
 			doSequence (
 				sqlStatements,
@@ -161,8 +170,10 @@ class SchemaToSqlImpl
 
 		}
 
-		for (SchemaColumn schemaColumn
-				: schemaTable.columns ().values ()) {
+		for (
+			SchemaColumn schemaColumn
+				: schemaTable.columns ().values ()
+		) {
 
 			doColumn (
 				sqlStatements,
@@ -187,8 +198,10 @@ class SchemaToSqlImpl
 			@NonNull List<String> sqlStatements,
 			@NonNull SchemaTable schemaTable) {
 
-		for (SchemaForeignKey schemaForeignKey
-				: schemaTable.foreignKeys ()) {
+		for (
+			SchemaForeignKey schemaForeignKey
+				: schemaTable.foreignKeys ()
+		) {
 
 			doForeignKey (
 				sqlStatements,
@@ -197,8 +210,10 @@ class SchemaToSqlImpl
 
 		}
 
-		for (SchemaIndex schemaIndex
-				: schemaTable.indexes ().values ()) {
+		for (
+			SchemaIndex schemaIndex
+				: schemaTable.indexes ().values ()
+		) {
 
 			doIndex (
 				sqlStatements,
@@ -292,8 +307,10 @@ class SchemaToSqlImpl
 		List<String> columnParts =
 			new ArrayList<String> ();
 
-		for (String column
-				: schemaPrimaryKey.columns ()) {
+		for (
+			String column
+				: schemaPrimaryKey.columns ()
+		) {
 
 			columnParts.add (
 				sqlLogic.quoteIdentifier (
@@ -358,8 +375,10 @@ class SchemaToSqlImpl
 		List<String> columnParts =
 			new ArrayList<String> ();
 
-		for (String column
-				: schemaForeignKey.sourceColumns ()) {
+		for (
+			String column
+				: schemaForeignKey.sourceColumns ()
+		) {
 
 			columnParts.add (
 				sqlLogic.quoteIdentifier (
@@ -444,7 +463,10 @@ class SchemaToSqlImpl
 		StringBuilder stringBuilder =
 			new StringBuilder ();
 
-		for (String part : parts) {
+		for (
+			String part
+				: parts
+		) {
 
 			if (stringBuilder.length () > 0)
 				stringBuilder.append (separator);

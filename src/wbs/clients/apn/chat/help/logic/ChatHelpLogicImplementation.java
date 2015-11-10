@@ -4,7 +4,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateObjectHelper;
@@ -12,17 +15,17 @@ import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.command.model.CommandRec;
 import wbs.sms.gsm.MessageSplitter;
 import wbs.sms.message.core.model.MessageRec;
 
-import com.google.common.base.Optional;
-
 @SingletonComponent ("chatHelpLogic")
 public
-class ChatHelpLogicImpl
+class ChatHelpLogicImplementation
 	implements ChatHelpLogic {
 
 	// dependencies
@@ -59,6 +62,21 @@ class ChatHelpLogicImpl
 		ChatRec chat =
 			chatUser.getChat ();
 
+		CommandRec magicCommand =
+			commandHelper.findByCode (
+				chat,
+				"magic");
+
+		CommandRec helpCommand =
+			commandHelper.findByCode (
+				chat,
+				"help");
+
+		ServiceRec helpService  =
+			serviceHelper.findByCode (
+				chat,
+				"help");
+
 		// load templates
 
 		ChatHelpTemplateRec singleTemplate =
@@ -87,7 +105,10 @@ class ChatHelpLogicImpl
 				text,
 				messageSplitterTemplates);
 
-		for (String splitText : splitTexts) {
+		for (
+			String splitText
+				: splitTexts
+		) {
 
 			// send message
 
@@ -96,23 +117,30 @@ class ChatHelpLogicImpl
 					chatUser,
 					Optional.fromNullable (threadId),
 					textHelper.findOrCreate (splitText),
-					commandHelper.findByCode (chat, "magic"),
-					serviceHelper.findByCode (chat, "help"),
-					commandHelper.findByCode (chat, "help").getId ());
+					magicCommand,
+					helpService,
+					helpCommand.getId ());
 
-			if (threadId == null)
-				threadId = message.getId ();
+			if (threadId == null) {
+
+				threadId =
+					message.getId ();
+
+			}
 
 			// save reply
 
 			chatHelpLogLogic.createChatHelpLogOut (
 				chatUser,
-				replyTo,
-				user,
+				Optional.of (
+					replyTo),
+				Optional.of (
+					user),
 				message,
-				null,
+				Optional.<ChatMessageRec>absent (),
 				splitText,
-				commandHelper.findByCode (chat, "help"));
+				Optional.of (
+					helpCommand));
 
 		}
 

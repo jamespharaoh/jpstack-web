@@ -10,7 +10,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("schemaNamesHelper")
 public
-class SchemaNamesHelperImpl
+class SchemaNamesHelperImplementation
 	implements SchemaNamesHelper {
 
 	@Override

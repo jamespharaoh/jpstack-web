@@ -12,6 +12,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
@@ -19,6 +22,7 @@ import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageStatus;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogLogic;
+import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic.PendingMode;
@@ -45,8 +49,6 @@ import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.gsm.Gsm;
 import wbs.sms.message.core.model.MessageRec;
-
-import com.google.common.base.Optional;
 
 @PrototypeComponent ("chatUserPendingFormAction")
 public
@@ -793,12 +795,17 @@ class ChatUserPendingFormAction
 
 		chatHelpLogLogic.createChatHelpLogOut (
 			chatUser,
-			null,
-			myUser,
+			Optional.<ChatHelpLogRec>absent (),
+			Optional.of (
+				myUser),
 			message,
-			chatMessage,
+			Optional.of (
+				chatMessage),
 			messageParam,
-			commandHelper.findByCode (chat, "join_info"));
+			Optional.of (
+				commandHelper.findByCode (
+					chat,
+					"join_info")));
 
 	}
 
@@ -954,14 +961,17 @@ class ChatUserPendingFormAction
 
 		chatHelpLogLogic.createChatHelpLogOut (
 			chatUser,
-			null,
-			myUser,
+			Optional.<ChatHelpLogRec>absent (),
+			Optional.of (
+				myUser),
 			message,
-			chatMessage,
+			Optional.of (
+				chatMessage),
 			messageParam,
-			commandHelper.findByCode (
-				chat,
-				mode.commandCode ()));
+			Optional.of (
+				commandHelper.findByCode (
+					chat,
+					mode.commandCode ())));
 
 		// clear queue item
 

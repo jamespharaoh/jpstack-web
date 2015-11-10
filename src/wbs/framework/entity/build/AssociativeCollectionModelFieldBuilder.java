@@ -2,7 +2,7 @@ package wbs.framework.entity.build;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.classForName;
+import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
@@ -89,7 +89,7 @@ class AssociativeCollectionModelFieldBuilder {
 						spec.typeName ()));
 
 			fieldTypeClass =
-				classForName (
+				classForNameRequired (
 					fullFieldTypeName);
 
 		}

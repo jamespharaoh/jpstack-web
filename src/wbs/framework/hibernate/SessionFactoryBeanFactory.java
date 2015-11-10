@@ -56,7 +56,7 @@ import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
-import wbs.framework.schema.helper.SchemaNamesHelperImpl;
+import wbs.framework.schema.helper.SchemaNamesHelperImplementation;
 import wbs.framework.sql.SqlLogicImpl;
 
 @Accessors (fluent = true)
@@ -74,7 +74,7 @@ class SessionFactoryBeanFactory
 	SqlLogicImpl sqlLogic;
 
 	@Inject
-	SchemaNamesHelperImpl sqlEntityNames;
+	SchemaNamesHelperImplementation sqlEntityNames;
 
 	@Inject
 	PluginManager pluginManager;

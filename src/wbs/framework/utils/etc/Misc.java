@@ -1905,7 +1905,7 @@ class Misc {
 	}
 
 	public static
-	Class<?> classForName (
+	Class<?> classForNameRequired (
 			@NonNull String className) {
 
 		try {
@@ -1917,6 +1917,24 @@ class Misc {
 
 			throw new RuntimeException (
 				exception);
+
+		}
+
+	}
+
+	public static
+	Optional<Class<?>> classForName (
+			@NonNull String className) {
+
+		try {
+
+			return Optional.<Class<?>>of (
+				Class.forName (
+					className));
+
+		} catch (ClassNotFoundException exception) {
+
+			return Optional.<Class<?>>absent ();
 
 		}
 

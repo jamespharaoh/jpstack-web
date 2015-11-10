@@ -324,9 +324,14 @@ class ChatAdDaemon
 					chatUser,
 					Optional.<Integer>absent (),
 					messageText,
-					commandHelper.findByCode (chat, "magic"),
+					commandHelper.findByCode (
+						chat,
+						"magic"),
 					adService,
-					commandHelper.findByCode (chat, "join_next").getId ());
+					commandHelper.findByCode (
+						chat,
+						"join_next"
+					).getId ());
 
 			}
 

@@ -1,6 +1,6 @@
 package wbs.framework.entity.build;
 
-import static wbs.framework.utils.etc.Misc.classForName;
+import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -66,7 +66,7 @@ class ParentTypeModelFieldBuilder {
 			// TODO this should noe be hard-coded
 
 			.valueType (
-				classForName (
+				classForNameRequired (
 					"wbs.platform.object.core.model.ObjectTypeRec"))
 
 			.nullable (

@@ -2,37 +2,24 @@ package wbs.framework.entity.build;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.camelToUnderscore;
-import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.scaffold.PluginManager;
-import wbs.framework.application.scaffold.PluginModelSpec;
-import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.framework.entity.meta.ReferenceFieldSpec;
+import wbs.framework.entity.meta.LargeIntegerFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
 
-import com.google.common.collect.ImmutableList;
-
-@PrototypeComponent ("referenceModelFieldBuilder")
+@PrototypeComponent ("largeIntegerModelFieldBuilder")
 @ModelBuilder
 public
-class ReferenceModelFieldBuilder {
-
-	// dependencies
-
-	@Inject
-	PluginManager pluginManager;
+class LargeIntegerModelFieldBuilder {
 
 	// builder
 
@@ -40,7 +27,7 @@ class ReferenceModelFieldBuilder {
 	ModelFieldBuilderContext context;
 
 	@BuilderSource
-	ReferenceFieldSpec spec;
+	LargeIntegerFieldSpec spec;
 
 	@BuilderTarget
 	ModelFieldBuilderTarget target;
@@ -53,23 +40,7 @@ class ReferenceModelFieldBuilder {
 			Builder builder) {
 
 		String fieldName =
-			ifNull (
-				spec.name (),
-				spec.typeName ());
-
-		PluginModelSpec fieldTypePluginModel =
-			pluginManager.pluginModelsByName ().get (
-				spec.typeName ());
-
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginModel.plugin ();
-
-		String fullFieldTypeName =
-			stringFormat (
-				"%s.model.%sRec",
-				fieldTypePlugin.packageName (),
-				capitalise (
-					spec.typeName ()));
+			spec.name ();
 
 		// create model field
 
@@ -90,7 +61,7 @@ class ReferenceModelFieldBuilder {
 					fieldName))
 
 			.type (
-				ModelFieldType.reference)
+				ModelFieldType.simple)
 
 			.parent (
 				false)
@@ -99,8 +70,7 @@ class ReferenceModelFieldBuilder {
 				false)
 
 			.valueType (
-				classForNameRequired (
-					fullFieldTypeName))
+				Long.class)
 
 			.nullable (
 				ifNull (
@@ -111,11 +81,8 @@ class ReferenceModelFieldBuilder {
 				ImmutableList.<String>of (
 					ifNull (
 						spec.columnName (),
-						stringFormat (
-							"%s_id",
-							camelToUnderscore (
-								fieldName)))));
-
+						camelToUnderscore (
+							fieldName))));
 		// store field
 
 		target.fields ().add (
