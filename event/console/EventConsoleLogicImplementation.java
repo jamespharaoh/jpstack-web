@@ -1,5 +1,7 @@
 package wbs.platform.event.console;
 
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.millisToInstant;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import lombok.Cleanup;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
+import wbs.console.misc.TimeFormatter;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -21,6 +24,7 @@ import wbs.framework.record.GlobalId;
 import wbs.framework.record.PermanentRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
+import wbs.platform.event.logic.EventLogic;
 import wbs.platform.event.model.EventLinkRec;
 import wbs.platform.event.model.EventRec;
 import wbs.platform.event.model.EventTypeRec;
@@ -47,6 +51,9 @@ class EventConsoleLogicImplementation
 	@Inject
 	ConsoleRequestContext requestContext;
 
+	@Inject
+	TimeFormatter timeFormatter;
+
 	// prototype dependencies
 
 	@Inject
@@ -67,14 +74,24 @@ class EventConsoleLogicImplementation
 			new ArrayList<GlobalId> ();
 
 		objectGlobalIds.add (
-			objectManager.getGlobalId (object));
+			objectManager.getGlobalId (
+				object));
 
-		for (Record<?> child : children)
+		for (
+			Record<?> child
+				: children
+		) {
+
 			objectGlobalIds.add (
-				objectManager.getGlobalId (child));
+				objectManager.getGlobalId (
+					child));
+
+		}
 
 		return objectEventsPart.get ()
-			.dataObjectIds (objectGlobalIds);
+
+			.dataObjectIds (
+				objectGlobalIds);
 
 	}
 
@@ -120,28 +137,56 @@ class EventConsoleLogicImplementation
 			Html.encode (
 				eventType.getDescription ());
 
+		// TODO this is not correct and will not handle text matching "%#" in
+		// the previous replacements. it should be replaced with a single pass.
+
 		for (
-			EventLinkRec evLink
+			EventLinkRec eventLink
 				: event.getEventLinks ()
 		) {
 
-			if (evLink.getTypeId () == -1) {
+			if (
+				equal (
+					eventLink.getTypeId (),
+					EventLogic.integerEventLinkType)
+			) {
 
 				// integer
 
 				text =
 					text.replaceAll (
-						"%" + evLink.getIndex (),
-						Html.encode (evLink.getRefId ().toString ()));
+						"%" + eventLink.getIndex (),
+						Html.encode (
+							eventLink.getRefId ().toString ()));
 
-			} else if (evLink.getTypeId () == -2) {
+			} else if (
+				equal (
+					eventLink.getTypeId (),
+					EventLogic.booleanEventLinkType)
+			) {
 
 				// boolean
 
 				text =
 					text.replaceAll (
-						"%" + evLink.getIndex (),
-						evLink.getRefId () != 0 ? "yes" : "no");
+						"%" + eventLink.getIndex (),
+						eventLink.getRefId () != 0 ? "yes" : "no");
+
+			} else if (
+				equal (
+					eventLink.getTypeId (),
+					EventLogic.instantEventLinkType)
+			) {
+
+				// instant
+
+				text =
+					text.replaceAll (
+						"%" + eventLink.getIndex (),
+						timeFormatter.instantToTimestampString (
+							timeFormatter.defaultTimezone (),
+							millisToInstant (
+								eventLink.getRefId ())));
 
 			} else {
 
@@ -150,21 +195,29 @@ class EventConsoleLogicImplementation
 				Record<?> object =
 					objectManager.findObject (
 						new GlobalId (
-							evLink.getTypeId (),
-							evLink.getRefId ()));
+							eventLink.getTypeId (),
+							(int) (long)
+							eventLink.getRefId ()));
 
 				// escape replacement text, what a mess ;-)
 
 				String replacement =
-					objectToHtml (object)
-						.replaceAll ("\\\\", "\\\\\\\\")
-						.replaceAll ("\\$", "\\\\\\$");
+					objectToHtml (
+						object)
+
+					.replaceAll (
+						"\\\\",
+						"\\\\\\\\")
+
+					.replaceAll (
+						"\\$",
+						"\\\\\\$");
 
 				// perform replacement
 
 				text =
 					text.replaceAll (
-						"%" + evLink.getIndex (),
+						"%" + eventLink.getIndex (),
 						replacement);
 
 			}
