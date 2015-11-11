@@ -14,6 +14,9 @@ import org.apache.commons.io.IOUtils;
 
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
+import wbs.applications.imchat.model.ImChatCustomerDetailDataType;
+import wbs.applications.imchat.model.ImChatCustomerDetailTypeObjectHelper;
+import wbs.applications.imchat.model.ImChatCustomerDetailTypeRec;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageObjectHelper;
@@ -38,7 +41,6 @@ import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.RandomLogic;
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
-import wbs.integrations.paypal.model.PaypalAccountRec;
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
@@ -46,7 +48,6 @@ import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
-import wbs.platform.scaffold.model.SliceRec;
 
 @PrototypeComponent ("imChatCoreFixtureProvider")
 public
@@ -60,6 +61,9 @@ class ImChatCoreFixtureProvider
 
 	@Inject
 	Database database;
+
+	@Inject
+	ImChatCustomerDetailTypeObjectHelper imChatCustomerDetailTypeHelper;
 
 	@Inject
 	ImChatCustomerObjectHelper imChatCustomerHelper;
@@ -147,28 +151,6 @@ class ImChatCoreFixtureProvider
 
 		);
 
-		SliceRec slice =
-			sliceHelper.findByCode (
-				GlobalId.root,
-					"test");
-
-		paypalAccountHelper.insert (
-
-			new PaypalAccountRec ()
-
-				.setSlice (
-					slice)
-
-				.setCode (
-					"imchat_paypal_acc")
-
-				.setName (
-					"Im Chat Paypal Account")
-
-				.setDescription (
-					"Test paypal account")
-			);
-
 		// im chat
 
 		ImChatRec imChat =
@@ -176,7 +158,9 @@ class ImChatCoreFixtureProvider
 				new ImChatRec ()
 
 			.setSlice (
-				slice)
+				sliceHelper.findByCode (
+					GlobalId.root,
+					"test"))
 
 			.setCode (
 				"test")
@@ -224,26 +208,7 @@ class ImChatCoreFixtureProvider
 
 		);
 
-		paypalAccountHelper.insert (
-				new PaypalAccountRec ()
-
-				.setSlice (
-					sliceHelper.findByCode (
-						GlobalId.root,
-						"test"))
-
-				.setCode (
-					"test")
-
-				.setName (
-					"Test")
-
-				.setDescription (
-					"Test paypal account")
-
-			);
-
-		// im chat price point
+		// price points
 
 		ImChatPricePointRec basicPricePoint =
 			imChatPricePointHelper.insert (
@@ -352,6 +317,107 @@ class ImChatCoreFixtureProvider
 			);
 
 		}
+
+		// customer detail types
+
+		imChatCustomerDetailTypeHelper.insert (
+			new ImChatCustomerDetailTypeRec ()
+
+			.setImChat (
+				imChat)
+
+			.setCode (
+				"name")
+
+			.setName (
+				"Name")
+
+			.setDescription (
+				"")
+
+			.setLabel (
+				"Name")
+
+			.setHelp (
+				"Please enter your name")
+
+			.setRequired (
+				true)
+
+			.setDataType (
+				ImChatCustomerDetailDataType.text)
+
+			.setOrdering (
+				1)
+
+		);
+
+		imChatCustomerDetailTypeHelper.insert (
+			new ImChatCustomerDetailTypeRec ()
+
+			.setImChat (
+				imChat)
+
+			.setCode (
+				"date_of_birth")
+
+			.setName (
+				"Date of birth")
+
+			.setDescription (
+				"")
+
+			.setLabel (
+				"Date of birth")
+
+			.setHelp (
+				"Please enter your date of birth")
+
+			.setRequired (
+				true)
+
+			.setDataType (
+				ImChatCustomerDetailDataType.dateOfBirth)
+
+			.setMinimumAge (
+				18)
+
+			.setOrdering (
+				2)
+
+		);
+
+		imChatCustomerDetailTypeHelper.insert (
+			new ImChatCustomerDetailTypeRec ()
+
+			.setImChat (
+				imChat)
+
+			.setCode (
+				"star_sign")
+
+			.setName (
+				"Star sign")
+
+			.setDescription (
+				"")
+
+			.setLabel (
+				"Star sign")
+
+			.setHelp (
+				"Please enter your star sign")
+
+			.setRequired (
+				false)
+
+			.setDataType (
+				ImChatCustomerDetailDataType.chooseOne)
+
+			.setOrdering (
+				3)
+
+		);
 
 		// im chat profile
 

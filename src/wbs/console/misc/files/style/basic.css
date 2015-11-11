@@ -100,7 +100,7 @@ table.list tr.message-out-charge td {
 
 table.list tr.message-out-charge.selected td,
 table.list tr.message-out-charge.hover td {
-	background: #ffdddd;
+	background: #ccb1b1;
 }
 
 table.list tr td.message-status-unknown {

@@ -115,8 +115,10 @@ class ChatHelpLogicImplementation
 			MessageRec message =
 				chatSendLogic.sendMessageMagic (
 					chatUser,
-					Optional.fromNullable (threadId),
-					textHelper.findOrCreate (splitText),
+					Optional.fromNullable (
+						threadId),
+					textHelper.findOrCreate (
+						splitText),
 					magicCommand,
 					helpService,
 					helpCommand.getId ());

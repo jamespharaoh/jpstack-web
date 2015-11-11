@@ -69,7 +69,7 @@ class TimestampFromFormFieldInterfaceMapping<Container>
 						interfaceValue.get ());
 
 				return Optional.of (
-					interval.getEnd ().toInstant ());
+					interval.getStart ().toInstant ());
 
 			} catch (IllegalArgumentException exception) {
 

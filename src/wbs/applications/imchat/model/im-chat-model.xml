@@ -79,6 +79,12 @@
 			order-sql="code"
 			where-sql="not deleted"/>
 
+		<children-collection
+			name="customerDetailTypes"
+			type="imChatCustomerDetailType"
+			order-sql="ordering, code"
+			where-sql="not deleted"/>
+
 	</collections>
 
 	<priv-types>

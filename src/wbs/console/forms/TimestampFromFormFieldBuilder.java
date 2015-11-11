@@ -174,7 +174,9 @@ class TimestampFromFormFieldBuilder {
 
 		FormFieldInterfaceMapping interfaceMapping =
 			timestampFromFormFieldInterfaceMappingProvider.get ()
-				.name (name);
+
+			.name (
+				name);
 
 		// renderer
 

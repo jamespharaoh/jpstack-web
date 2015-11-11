@@ -63,6 +63,13 @@
 		<yes-no-field
 			name="required"/>
 
+		<enum-field
+			name="dataType"
+			helper="imChatCustomerDetailDataTypeConsoleHelper"/>
+
+		<integer-field
+			name="minimumAge"/>
+
 	</field-set>
 
 	<field-set
@@ -74,6 +81,14 @@
 
 		<yes-no-field
 			name="required"/>
+
+		<enum-field
+			name="dataType"
+			helper="imChatCustomerDetailDataTypeConsoleHelper"/>
+
+		<integer-field
+			name="minimumAge"
+			nullable="yes"/>
 
 	</field-set>
 
@@ -91,6 +106,13 @@
 		<yes-no-field
 			name="required"/>
 
+		<enum-field
+			name="dataType"
+			helper="imChatCustomerDetailDataTypeConsoleHelper"/>
+
+		<integer-field
+			name="minimumAge"/>
+
 	</field-set>
 
 	<field-set
@@ -103,6 +125,14 @@
 
 		<yes-no-field
 			name="required"/>
+
+		<enum-field
+			name="dataType"
+			helper="imChatCustomerDetailDataTypeConsoleHelper"/>
+
+		<integer-field
+			name="minimumAge"
+			nullable="yes"/>
 
 	</field-set>
 

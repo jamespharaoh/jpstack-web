@@ -19,8 +19,8 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ChatMessageLogicImpl"/>
-		<bean class="logic.ChatSendLogicImpl"/>
+		<bean class="logic.ChatMessageLogicImplementation"/>
+		<bean class="logic.ChatSendLogicImplementation"/>
 	</layer>
 
 	<layer name="console">

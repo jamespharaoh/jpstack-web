@@ -81,7 +81,7 @@ import wbs.sms.gsm.MessageSplitter;
 @Log4j
 @SingletonComponent ("chatMessageLogic")
 public
-class ChatMessageLogicImpl
+class ChatMessageLogicImplementation
 	implements ChatMessageLogic {
 
 	// dependencies

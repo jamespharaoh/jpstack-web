@@ -11,6 +11,8 @@ import lombok.extern.log4j.Log4j;
 
 import org.hibernate.exception.LockAcquisitionException;
 
+import com.google.common.base.Optional;
+
 import wbs.console.misc.ConsoleExceptionHandler;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
@@ -18,8 +20,6 @@ import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
-
-import com.google.common.base.Optional;
 
 @Log4j
 public abstract
@@ -197,7 +197,8 @@ class ConsoleAction
 
 		// give the user an error message
 
-		requestContext.addError ("Internal error");
+		requestContext.addError (
+			"Internal error");
 
 		// and go to backup page!
 

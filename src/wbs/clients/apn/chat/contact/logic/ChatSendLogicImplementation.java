@@ -43,7 +43,7 @@ import wbs.sms.route.router.model.RouterRec;
 
 @SingletonComponent ("chatSendLogic")
 public
-class ChatSendLogicImpl
+class ChatSendLogicImplementation
 	implements ChatSendLogic {
 
 	@Inject
@@ -245,7 +245,8 @@ class ChatSendLogicImpl
 				serviceCode);
 
 		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (chatUser);
+			chatUserLogic.getAffiliate (
+				chatUser);
 
 		// send the message
 
@@ -274,7 +275,7 @@ class ChatSendLogicImpl
 				affiliate)
 
 			.deliveryTypeCode (
-				deliveryTypeCode.orNull ())
+				deliveryTypeCode)
 
 			.ref (
 				chatUser.getId ())
@@ -364,12 +365,12 @@ class ChatSendLogicImpl
 
 		chatHelpLogLogic.createChatHelpLogOut (
 			chatUser,
-			null,
-			null,
+			Optional.<ChatHelpLogRec>absent (),
+			Optional.<UserRec>absent (),
 			message,
-			null,
+			Optional.<ChatMessageRec>absent (),
 			finalText,
-			null);
+			Optional.<CommandRec>absent ());
 
 		// and return
 
@@ -392,7 +393,8 @@ class ChatSendLogicImpl
 		// send the message
 
 		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (chatUser);
+			chatUserLogic.getAffiliate (
+				chatUser);
 
 		MessageRec ret =
 			messageSender.get ()
@@ -496,16 +498,17 @@ class ChatSendLogicImpl
 
 		chatHelpLogLogic.createChatHelpLogOut (
 			chatUser,
-			null,
-			null,
+			Optional.<ChatHelpLogRec>absent (),
+			Optional.<UserRec>absent (),
 			message,
-			null,
+			Optional.<ChatMessageRec>absent (),
 			chatHelpTemplate.getText (),
-			null);
+			Optional.<CommandRec>absent ());
 
 		// and return
 
-		return Optional.of (message);
+		return Optional.of (
+			message);
 
 	}
 
@@ -530,8 +533,10 @@ class ChatSendLogicImpl
 				stringFormat (
 					"Error sending to chat user %s: " +
 					"Chat scheme %s has no magic number set",
-					objectManager.objectPath (chatUser, null, false),
-					objectManager.objectPath (chatScheme, null, false)));
+					objectManager.objectPath (
+						chatUser),
+					objectManager.objectPath (
+						chatScheme)));
 
 		}
 
@@ -547,7 +552,8 @@ class ChatSendLogicImpl
 			chatScheme.getMagicRouter (),
 			service,
 			null,
-			chatUserLogic.getAffiliate (chatUser));
+			chatUserLogic.getAffiliate (
+				chatUser));
 
 	}
 

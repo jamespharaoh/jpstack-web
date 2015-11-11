@@ -1,11 +1,15 @@
 package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.lessThan;
+import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatBlockObjectHelper;
@@ -109,10 +113,14 @@ class ChatMonitorInboxFormAction
 				"text");
 
 		boolean ignore =
-			requestContext.parameter ("ignore") != null;
+			isNotNull (
+				requestContext.parameter (
+					"ignore"));
 
 		boolean note =
-			requestContext.parameter ("sendAndNote") != null;
+			isNotNull (
+				requestContext.parameter (
+					"sendAndNote"));
 
 		// check params
 
@@ -136,9 +144,12 @@ class ChatMonitorInboxFormAction
 
 			}
 
-			if (Gsm.length (text)
-					> ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
-						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES) {
+			if (
+				moreThan (
+					Gsm.length (text),
+					ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
+						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES)
+			) {
 
 				requestContext.addError (
 					"Message text is too long");
@@ -188,8 +199,11 @@ class ChatMonitorInboxFormAction
 
 		} else {
 
-			if (Gsm.length (text)
-					< chat.getMinMonitorMessageLength ()) {
+			if (
+				lessThan (
+					Gsm.length (text),
+					chat.getMinMonitorMessageLength ())
+			) {
 
 				requestContext.addError (
 					stringFormat (

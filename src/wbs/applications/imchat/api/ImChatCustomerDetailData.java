@@ -1,7 +1,5 @@
 package wbs.applications.imchat.api;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -12,21 +10,27 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass
 public
-class ImChatCustomerData {
+class ImChatCustomerDetailData {
 
 	@DataAttribute
 	String code;
 
 	@DataAttribute
-	String email;
+	String label;
 
 	@DataAttribute
-	Integer balance;
+	String help;
 
 	@DataAttribute
-	String balanceString;
+	Boolean required;
 
 	@DataAttribute
-	List<ImChatCustomerDetailData> details;
+	String dataType;
+
+	@DataAttribute
+	Integer minimumAge;
+
+	@DataAttribute
+	Object value;
 
 }

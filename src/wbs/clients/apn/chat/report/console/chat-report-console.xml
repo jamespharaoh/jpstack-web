@@ -6,7 +6,7 @@
 
 		<context-tab-page
 			name="revShare"
-			title="revShare"/>
+			title="Revenue share report"/>
 
 	</simple-context>
 

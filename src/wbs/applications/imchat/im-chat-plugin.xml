@@ -13,7 +13,10 @@
 	</sql-scripts>
 
 	<models>
+
+		<enum-type name="imChatCustomerDetailDataType"/>
 		<enum-type name="imChatProfileState"/>
+
 		<model name="imChat"/>
 		<model name="imChatCustomer"/>
 		<model name="imChatCustomerDetailType"/>
@@ -24,6 +27,7 @@
 		<model name="imChatPurchase"/>
 		<model name="imChatSession"/>
 		<model name="imChatTemplate"/>
+
 	</models>
 
 	<fixtures>

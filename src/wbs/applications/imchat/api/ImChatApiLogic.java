@@ -1,5 +1,7 @@
 package wbs.applications.imchat.api;
 
+import java.util.List;
+
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;
@@ -17,6 +19,9 @@ interface ImChatApiLogic {
 			ImChatProfileRec profile);
 
 	ImChatCustomerData customerData (
+			ImChatCustomerRec customer);
+
+	List<ImChatCustomerDetailData> customerDetailData (
 			ImChatCustomerRec customer);
 
 	ImChatConversationData conversationData (

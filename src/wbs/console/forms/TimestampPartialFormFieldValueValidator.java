@@ -32,7 +32,7 @@ class TimestampPartialFormFieldValueValidator
 		// check it's a valid partial timestamp
 
 		if (
-			validPartialTimestamp (
+			! validPartialTimestamp (
 				genericValue.get ())
 		) {
 

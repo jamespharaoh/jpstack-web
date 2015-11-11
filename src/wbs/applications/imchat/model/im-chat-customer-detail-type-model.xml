@@ -25,8 +25,25 @@
 
 		<!-- settings -->
 
+		<string-field
+			name="label"/>
+
+		<string-field
+			name="help"/>
+
 		<yes-no-field
 			name="required"/>
+
+		<enum-field
+			name="dataType"
+			type="imChatCustomerDetailDataType"/>
+
+		<integer-field
+			name="minimumAge"
+			nullable="yes"/>
+
+		<integer-field
+			name="ordering"/>
 
 	</fields>
 

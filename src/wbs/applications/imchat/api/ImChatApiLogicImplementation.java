@@ -1,12 +1,19 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import lombok.NonNull;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.applications.imchat.model.ImChatConversationRec;
+import wbs.applications.imchat.model.ImChatCustomerDetailTypeRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;
 import wbs.applications.imchat.model.ImChatPricePointRec;
@@ -41,7 +48,7 @@ class ImChatApiLogicImplementation
 	@Override
 	public
 	ImChatPricePointData pricePointData (
-			ImChatPricePointRec pricePoint) {
+			@NonNull ImChatPricePointRec pricePoint) {
 
 		ImChatRec imChat =
 			pricePoint.getImChat ();
@@ -49,7 +56,8 @@ class ImChatApiLogicImplementation
 		return new ImChatPricePointData ()
 
 			.code (
-				pricePoint.getCode ())
+				underscoreToHyphen (
+					pricePoint.getCode ()))
 
 			.name (
 				pricePoint.getName ())
@@ -96,7 +104,8 @@ class ImChatApiLogicImplementation
 		return new ImChatProfileData ()
 
 			.code (
-				profile.getCode ())
+				underscoreToHyphen (
+					profile.getCode ()))
 
 			.name (
 				profile.getPublicName ())
@@ -125,12 +134,13 @@ class ImChatApiLogicImplementation
 	@Override
 	public
 	ImChatCustomerData customerData (
-			ImChatCustomerRec customer) {
+			@NonNull ImChatCustomerRec customer) {
 
 		return new ImChatCustomerData ()
 
 			.code (
-				customer.getCode ())
+				underscoreToHyphen (
+					customer.getCode ()))
 
 			.email (
 				customer.getEmail ())
@@ -141,14 +151,65 @@ class ImChatApiLogicImplementation
 			.balanceString (
 				currencyLogic.formatText (
 					customer.getImChat ().getCurrency (),
-					(long) customer.getBalance ()));
+					(long) customer.getBalance ()))
+
+			.details (
+				customerDetailData (
+					customer));
+
+	}
+
+	@Override
+	public
+	List<ImChatCustomerDetailData> customerDetailData (
+			@NonNull ImChatCustomerRec customer) {
+
+		ImChatRec imChat =
+			customer.getImChat ();
+
+		ImmutableList.Builder<ImChatCustomerDetailData> returnBuilder =
+			ImmutableList.<ImChatCustomerDetailData>builder ();
+
+		for (
+			ImChatCustomerDetailTypeRec customerDetailType
+				: imChat.getCustomerDetailTypes ()
+		) {
+
+			returnBuilder.add (
+				new ImChatCustomerDetailData ()
+
+				.code (
+					underscoreToHyphen (
+						customerDetailType.getCode ()))
+
+				.label (
+					customerDetailType.getLabel ())
+
+				.help (
+					customerDetailType.getHelp ())
+
+				.required (
+					customerDetailType.getRequired ())
+
+				.dataType (
+					camelToHyphen (
+						customerDetailType.getDataType ().toString ()))
+
+				.minimumAge (
+					customerDetailType.getMinimumAge ())
+
+			);
+
+		}
+
+		return returnBuilder.build ();
 
 	}
 
 	@Override
 	public
 	ImChatConversationData conversationData (
-			ImChatConversationRec conversation) {
+			@NonNull ImChatConversationRec conversation) {
 
 		return new ImChatConversationData ()
 
@@ -164,7 +225,7 @@ class ImChatApiLogicImplementation
 	@Override
 	public
 	ImChatMessageData messageData (
-			ImChatMessageRec message) {
+			@NonNull ImChatMessageRec message) {
 
 		return new ImChatMessageData ()
 
@@ -187,7 +248,7 @@ class ImChatApiLogicImplementation
 	@Override
 	public
 	ImChatPurchaseData purchaseData (
-			ImChatPurchaseRec purchase) {
+			@NonNull ImChatPurchaseRec purchase) {
 
 		ImChatCustomerRec customer =
 			purchase.getImChatCustomer ();

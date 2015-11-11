@@ -102,7 +102,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			"<td>%h</td>\n",
 			camelToSpaces (
 				interfaceValue.isPresent ()
-					? interfaceValue.toString ()
+					? interfaceValue.get ().toString ()
 					: ""));
 
 	}

@@ -566,7 +566,7 @@ class Misc {
 	// TODO use LocalDate instead
 	public static
 	int age (
-			TimeZone timeZone,
+			@NonNull TimeZone timeZone,
 			long birth,
 			long when) {
 
@@ -631,7 +631,7 @@ class Misc {
 
 	public static
 	String capitalise (
-			String string) {
+			@NonNull String string) {
 
 		if (string.length () == 0)
 			return "";
@@ -645,7 +645,7 @@ class Misc {
 
 	public static
 	String uncapitalise (
-			String string) {
+			@NonNull String string) {
 
 		if (string.length () == 0)
 			return "";
@@ -677,7 +677,7 @@ class Misc {
 
 	public static
 	String fixNewlines (
-			String input) {
+			@NonNull String input) {
 
 		return input
 			.replaceAll ("\r\n", "\n")
@@ -899,8 +899,10 @@ class Misc {
 
 			// stick the filenames into the command
 
-			for (List<String> command
-					: commands) {
+			for (
+				List<String> command
+					: commands
+			) {
 
 				String[] newCommand =
 					new String [command.size ()];
@@ -911,12 +913,20 @@ class Misc {
 					index ++
 				) {
 
-					if (equal (command.get (index), "<in>")) {
+					if (
+						equal (
+							command.get (index),
+							"<in>")
+					) {
 
 						newCommand [index] =
 							inFile.getPath ();
 
-					} else if (equal (command.get (index), "<out>")) {
+					} else if (
+						equal (
+							command.get (index),
+							"<out>")
+					) {
 
 						newCommand [index] =
 							outFile.getPath ();
@@ -962,10 +972,11 @@ class Misc {
 
 	public static
 	byte[] fromHex (
-			String hex) {
+			@NonNull String hex) {
 
 		byte[] bytes =
-			new byte [hex.length () / 2];
+			new byte [
+				hex.length () / 2];
 
 		for (
 			int index = 0;
@@ -996,7 +1007,7 @@ class Misc {
 
 	public static
 	String toHex (
-			byte[] byteValues) {
+			@NonNull byte[] byteValues) {
 
 		byte[] hex =
 			new byte [2 * byteValues.length];
@@ -1024,7 +1035,7 @@ class Misc {
 
 	public static
 	String substring (
-			Object object,
+			@NonNull Object object,
 			int start,
 			int end) {
 
@@ -1042,7 +1053,7 @@ class Misc {
 
 	public static
 	String hyphenToCamel (
-			String string) {
+			@NonNull String string) {
 
 		return delimitedToCamel (
 			string,
@@ -1052,7 +1063,7 @@ class Misc {
 
 	public static
 	String underscoreToCamel (
-			String string) {
+			@NonNull String string) {
 
 		return delimitedToCamel (
 			string,
@@ -1061,9 +1072,33 @@ class Misc {
 	}
 
 	public static
+	String replaceAll (
+			@NonNull String source,
+			@NonNull String find,
+			@NonNull String replaceWith) {
+
+		return source.replaceAll (
+			Pattern.quote (
+				find),
+			replaceWith);
+
+	}
+
+	public static
+	String underscoreToHyphen (
+			@NonNull String string) {
+
+		return replaceAll (
+			string,
+			"_",
+			"-");
+
+	}
+
+	public static
 	String delimitedToCamel (
-			String string,
-			String delimiter) {
+			@NonNull String string,
+			@NonNull String delimiter) {
 
 		String[] parts =
 			string.split (delimiter);

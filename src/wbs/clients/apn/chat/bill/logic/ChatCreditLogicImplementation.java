@@ -953,12 +953,13 @@ class ChatCreditLogicImplementation
 
 		// get delivery notice type
 
-		String deliveryTypeCode =
+		Optional<String> deliveryTypeCode =
 			route.getDeliveryReports ()
-				? chatUser.getCreditMode () == ChatUserCreditMode.strict
-					? "chat_bill_strict"
-					: "chat_bill"
-				: null;
+				? Optional.of (
+					chatUser.getCreditMode () == ChatUserCreditMode.strict
+						? "chat_bill_strict"
+						: "chat_bill")
+				: Optional.<String>absent ();
 
 		// lookup the template
 
