@@ -6,10 +6,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.platform.currency.model.CurrencyObjectHelper;
-import wbs.platform.currency.model.CurrencyRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.menu.model.MenuItemRec;
 
 @PrototypeComponent ("currencyFixtureProvider")
 public
@@ -34,7 +32,7 @@ class CurrencyFixtureProvider
 	void createFixtures () {
 
 		menuItemHelper.insert (
-			new MenuItemRec ()
+			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
@@ -63,7 +61,7 @@ class CurrencyFixtureProvider
 		);
 
 		currencyHelper.insert (
-			new CurrencyRec ()
+			currencyHelper.createInstance ()
 
 			.setCode (
 				"gbp")

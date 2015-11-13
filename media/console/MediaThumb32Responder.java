@@ -1,5 +1,7 @@
 package wbs.platform.media.console;
 
+import lombok.NonNull;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.media.model.MediaRec;
 
@@ -11,7 +13,7 @@ class MediaThumb32Responder
 	@Override
 	protected
 	byte[] getData (
-			MediaRec media) {
+			@NonNull MediaRec media) {
 
 		return media.getThumb32Content ().getData ();
 
@@ -20,7 +22,7 @@ class MediaThumb32Responder
 	@Override
 	protected
 	String getMimeType (
-			MediaRec media) {
+			@NonNull MediaRec media) {
 
 		return media.getThumbMediaType ().getMimeType ();
 

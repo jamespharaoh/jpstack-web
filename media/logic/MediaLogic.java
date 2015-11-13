@@ -3,6 +3,8 @@ package wbs.platform.media.logic;
 import java.awt.image.BufferedImage;
 import java.util.Set;
 
+import com.google.common.base.Optional;
+
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeRec;
@@ -13,18 +15,29 @@ interface MediaLogic {
 	ContentRec findOrCreateContent (
 			byte[] data);
 
-	MediaRec createMedia (
+	Optional<MediaRec> createMedia (
 			byte[] data,
 			String mimeType,
 			String filename,
-			String encoding);
+			Optional<String> encoding);
+
+	MediaRec createMediaRequired (
+			byte[] data,
+			String mimeType,
+			String filename,
+			Optional<String> encoding);
 
 	MediaRec createMediaFromImage (
 			BufferedImage image,
 			String mimeType,
 			String filename);
 
-	MediaRec createMediaFromImage (
+	Optional<MediaRec> createMediaFromImage (
+			byte[] data,
+			String mimeType,
+			String filename);
+
+	MediaRec createMediaFromImageRequired (
 			byte[] data,
 			String mimeType,
 			String filename);
@@ -46,7 +59,12 @@ interface MediaLogic {
 			Integer width,
 			Integer height);
 
-	MediaRec createMediaFromVideo (
+	Optional<MediaRec> createMediaFromVideo (
+			byte[] data,
+			String mimeType,
+			String filename);
+
+	MediaRec createMediaFromVideoRequired (
 			byte[] data,
 			String mimeType,
 			String filename);
@@ -59,7 +77,7 @@ interface MediaLogic {
 	MediaTypeRec findMediaTypeRequired (
 			String mimeType);
 
-	MediaRec createTextualMedia (
+	Optional<MediaRec> createTextualMedia (
 			byte[] data,
 			String mimeType,
 			String filename,
@@ -70,7 +88,11 @@ interface MediaLogic {
 			String mimeType,
 			String filename);
 
-	BufferedImage readImage (
+	Optional<BufferedImage> readImage (
+			byte[] data,
+			String mimeType);
+
+	BufferedImage readImageRequired (
 			byte[] data,
 			String mimeType);
 
@@ -99,14 +121,18 @@ interface MediaLogic {
 	BufferedImage rotateImage270 (
 			BufferedImage image);
 
-	byte[] videoConvert (
+	Optional<byte[]> videoConvert (
 			String profileName,
 			byte[] data);
 
-	byte[] videoFrameBytes (
+	byte[] videoConvertRequired (
+			String profileName,
 			byte[] data);
 
-	BufferedImage videoFrame (
+	Optional<byte[]> videoFrameBytes (
+			byte[] data);
+
+	Optional<BufferedImage> videoFrame (
 			byte[] data);
 
 	boolean isApplication (

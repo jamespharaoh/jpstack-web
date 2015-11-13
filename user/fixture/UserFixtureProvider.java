@@ -7,14 +7,12 @@ import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.priv.model.PrivObjectHelper;
 import wbs.platform.priv.model.PrivRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserPrivObjectHelper;
-import wbs.platform.user.model.UserPrivRec;
 import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("userFixtureProvider")
@@ -66,7 +64,7 @@ class UserFixtureProvider
 
 			UserRec testUser =
 				userHelper.insert (
-					new UserRec ()
+					userHelper.createInstance ()
 
 				.setUsername (
 					"test" + index)
@@ -89,7 +87,7 @@ class UserFixtureProvider
 			);
 
 			userPrivHelper.insert (
-				new UserPrivRec ()
+				userPrivHelper.createInstance ()
 
 				.setUser (
 					testUser)
@@ -105,7 +103,7 @@ class UserFixtureProvider
 		}
 
 		menuItemHelper.insert (
-			new MenuItemRec ()
+			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (

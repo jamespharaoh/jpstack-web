@@ -2,10 +2,11 @@ package wbs.platform.media.fixture;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.platform.media.model.MediaTypeObjectHelper;
-import wbs.platform.media.model.MediaTypeRec;
 
 @PrototypeComponent ("mediaFixtureProvider")
 public
@@ -81,12 +82,12 @@ class MediaFixtureProvider
 
 	private
 	void createMediaType (
-			String mimeType,
-			String description,
-			String extension) {
+			@NonNull String mimeType,
+			@NonNull String description,
+			@NonNull String extension) {
 
 		mediaTypeHelper.insert (
-			new MediaTypeRec ()
+			mediaTypeHelper.createInstance ()
 
 			.setMimeType (
 				mimeType)

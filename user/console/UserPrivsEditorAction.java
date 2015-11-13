@@ -115,21 +115,33 @@ class UserPrivsEditorAction
 				if (can) {
 
 					userPriv =
-						new UserPrivRec ()
-							.setPriv (priv)
-							.setUser (user);
+						userPrivHelper.createInstance ()
+
+						.setPriv (
+							priv)
+
+						.setUser (
+							user);
 
 					if (grant) {
 
 						userPriv
-							.setCan (false)
-							.setCanGrant (true);
+
+							.setCan (
+								false)
+
+							.setCanGrant (
+								true);
 
 					} else {
 
 						userPriv
-							.setCan (true)
-							.setCanGrant (false);
+
+							.setCan (
+								true)
+
+							.setCanGrant (
+								false);
 
 					}
 

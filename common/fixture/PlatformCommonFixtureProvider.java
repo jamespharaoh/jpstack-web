@@ -8,7 +8,6 @@ import wbs.framework.record.GlobalId;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuGroupRec;
 import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 
 @PrototypeComponent ("platformCommonFixtureProvider")
@@ -34,7 +33,7 @@ class PlatformCommonFixtureProvider
 	void createFixtures () {
 
 		menuGroupHelper.insert (
-			new MenuGroupRec ()
+			menuGroupHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -60,7 +59,7 @@ class PlatformCommonFixtureProvider
 
 		MenuGroupRec systemMenuGroup =
 			menuGroupHelper.insert (
-				new MenuGroupRec ()
+				menuGroupHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -83,7 +82,7 @@ class PlatformCommonFixtureProvider
 				50));
 
 		menuItemHelper.insert (
-			new MenuItemRec ()
+			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
 				systemMenuGroup)
@@ -109,7 +108,7 @@ class PlatformCommonFixtureProvider
 		);
 
 		menuItemHelper.insert (
-			new MenuItemRec ()
+			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
 				systemMenuGroup)

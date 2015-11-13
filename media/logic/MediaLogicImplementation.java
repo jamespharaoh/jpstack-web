@@ -1,7 +1,11 @@
 package wbs.platform.media.logic;
 
 import static wbs.framework.utils.etc.Misc.allOf;
+import static wbs.framework.utils.etc.Misc.contains;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.iterable;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.runFilter;
 import static wbs.framework.utils.etc.Misc.runFilterAdvanced;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -28,6 +32,12 @@ import javax.inject.Inject;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.GlobalId;
 import wbs.platform.media.model.ContentObjectHelper;
@@ -36,10 +46,6 @@ import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeObjectHelper;
 import wbs.platform.media.model.MediaTypeRec;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 @Log4j
 @SingletonComponent ("mediaLogic")
@@ -62,13 +68,15 @@ class MediaLogicImplementation
 
 	public static abstract
 	class FfmpegProfile {
-		final String fileExtension;
+
+		String fileExtension;
 
 		public
 		FfmpegProfile (
-				String fileExtension) {
+				@NonNull String fileExtension) {
 
-			this.fileExtension = fileExtension;
+			this.fileExtension =
+				fileExtension;
 
 		}
 
@@ -82,27 +90,38 @@ class MediaLogicImplementation
 		extends FfmpegProfile {
 
 		boolean twoPass;
-		String videoCodec;
-		String videoResolution;
-		String videoBitrate;
-		String videoDuration;
+
+		Optional<String> videoCodec;
+		Optional<String> videoResolution;
+		Optional<String> videoBitrate;
+		Optional<String> videoDuration;
 
 		public
 		FfmpegVideoProfile (
 				boolean twoPass,
-				String fileExtension,
-				String videoCodec,
-				String videoResolution,
-				String videoBitrate,
-				String videoDuration) {
+				@NonNull String fileExtension,
+				@NonNull Optional<String> videoCodec,
+				@NonNull Optional<String> videoResolution,
+				@NonNull Optional<String> videoBitrate,
+				@NonNull Optional<String> videoDuration) {
 
-			super (fileExtension);
+			super (
+				fileExtension);
 
-			this.twoPass = twoPass;
-			this.videoCodec = videoCodec;
-			this.videoResolution = videoResolution;
-			this.videoBitrate = videoBitrate;
-			this.videoDuration = videoDuration;
+			this.twoPass =
+				twoPass;
+
+			this.videoCodec =
+				videoCodec;
+
+			this.videoResolution =
+				videoResolution;
+
+			this.videoBitrate =
+				videoBitrate;
+
+			this.videoDuration =
+				videoDuration;
 
 		}
 
@@ -134,43 +153,54 @@ class MediaLogicImplementation
 
 			// video
 
-			if (videoCodec != null) {
+			if (
+				isPresent (
+					videoCodec)
+			) {
 
 				passOne.addAll (
 					ImmutableList.<String>of (
 						"-vcodec",
-						videoCodec));
+						videoCodec.get ()));
 
 				passTwo.addAll (
 					ImmutableList.<String>of (
 						"-vcodec",
-						videoCodec));
+						videoCodec.get ()));
 			}
 
-			if (videoResolution != null) {
+			if (
+				isPresent (
+					videoResolution)
+			) {
 
 				passOne.addAll (
 					ImmutableList.<String>of (
 						"-s",
-						videoResolution));
+						videoResolution.get ()));
 
 				passTwo.addAll (
 					ImmutableList.<String>of (
 						"-s",
-						videoResolution));
+						videoResolution.get ()));
+
 			}
 
-			if (videoBitrate != null) {
+			if (
+				isPresent (
+					videoBitrate)
+			) {
 
 				passOne.addAll (
 					ImmutableList.<String>of (
 						"-b",
-						videoBitrate));
+						videoBitrate.get ()));
 
 				passTwo.addAll (
 					ImmutableList.<String>of (
 						"-b",
-						videoBitrate));
+						videoBitrate.get ()));
+
 			}
 
 			// audio
@@ -200,12 +230,16 @@ class MediaLogicImplementation
 
 			// duration
 
-			if (videoDuration != null) {
+			if (
+				isPresent (
+					videoDuration)
+			) {
 
 				passTwo.addAll (
 					ImmutableList.<String>of (
 						"-t",
-						videoDuration));
+						videoDuration.get ()));
+
 			}
 
 			// output
@@ -227,7 +261,9 @@ class MediaLogicImplementation
 
 				: ImmutableList.<List<String>>of (
 					passTwo);
+
 		}
+
 	}
 
 	public static
@@ -265,48 +301,53 @@ class MediaLogicImplementation
 	Map<String,FfmpegProfile> ffmpegProfiles =
 		ImmutableMap.<String,FfmpegProfile>builder ()
 
-			.put ("3gpp",
-				new FfmpegVideoProfile (
-					true,
-					"3gp",
-					"h263",
-					"128x96",
-					"100k",
-					"00:00:15"))
+		.put (
+			"3gpp",
+			new FfmpegVideoProfile (
+				true,
+				"3gp",
+				Optional.of ("h263"),
+				Optional.of ("128x96"),
+				Optional.of ("100k"),
+				Optional.of ("00:00:15")))
 
-			.put ("flv",
-				new FfmpegVideoProfile (
-					false,
-					"flv",
-					"flv",
-					null,
-					null,
-					null))
+		.put (
+			"flv",
+			new FfmpegVideoProfile (
+				false,
+				"flv",
+				Optional.of ("flv"),
+				Optional.<String>absent (),
+				Optional.<String>absent (),
+				Optional.<String>absent ()))
 
-			.put ("mp4",
-				new FfmpegVideoProfile (
-					false,
-					"mp4",
-					"h263",
-					null,
-					null,
-					null))
+		.put (
+			"mp4",
+			new FfmpegVideoProfile (
+				false,
+				"mp4",
+				Optional.of ("h263"),
+				Optional.<String>absent (),
+				Optional.<String>absent (),
+				Optional.<String>absent ()))
 
-			.put ("mp3",
-				new FfmpegAudioProfile (
-					"mp3"))
+		.put (
+			"mp3",
+			new FfmpegAudioProfile (
+				"mp3"))
 
-			.build ();
+		.build ();
 
 	@Override
 	public
 	ContentRec findOrCreateContent (
-			byte[] data) {
+			@NonNull byte[] data) {
 
 		// work out hash code
 
 		int hash =
-			Arrays.hashCode (data);
+			Arrays.hashCode (
+				data);
 
 		// look for existing content
 
@@ -314,22 +355,45 @@ class MediaLogicImplementation
 			contentHelper.findByHash (
 				hash);
 
-		int i = 0;
-		for (ContentRec content : list) {
-			if (Arrays.equals(content.getData(), data))
+		int index = 0;
+
+		for (
+			ContentRec content
+				: list) {
+
+			if (
+				Arrays.equals (
+					content.getData (),
+					data)
+			) {
 				return content;
-			if (content.getI() >= i)
-				i = content.getI() + 1;
+			}
+
+			if (content.getI () >= index) {
+
+				index =
+					content.getI () + 1;
+
+			}
+
 		}
 
 		// create a new content object
 
 		ContentRec content =
 			contentHelper.insert (
-				new ContentRec ()
-					.setData (data)
-					.setHash (hash)
-					.setI (i));
+				contentHelper.createInstance ()
+
+			.setData (
+				data)
+
+			.setHash (
+				hash)
+
+			.setI (
+				index)
+
+		);
 
 		// return
 
@@ -339,44 +403,71 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	MediaRec createMedia (
+	Optional<MediaRec> createMedia (
 			byte[] data,
-			String mimeType,
-			String filename,
-			String encoding) {
+			@NonNull String mimeType,
+			@NonNull String filename,
+			@NonNull Optional<String> encoding) {
 
-		if (imageTypes.contains (mimeType)) {
+		if (
+			contains (
+				imageTypes,
+				mimeType)
+		) {
 
 			return createMediaFromImage (
 				data,
 				mimeType,
 				filename);
 
-		}
-
-		if (textualTypes.contains (mimeType)) {
+		} else if (
+			contains (
+				textualTypes,
+				mimeType)
+		) {
 
 			return createTextualMedia (
 				data,
 				mimeType,
 				filename,
-				encoding);
+				encoding.get ());
 
-		}
-
-		if (videoTypes.contains (mimeType)) {
+		} else if (
+			contains (
+				videoTypes,
+				mimeType)
+		) {
 
 			return createMediaFromVideo (
 				data,
 				mimeType,
 				filename);
 
+		} else {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Unknown media type \"%s\"",
+					mimeType));
+
 		}
 
-		throw new RuntimeException (
-			stringFormat (
-				"Unknown media type \"%s\"",
-				mimeType));
+	}
+
+	@Override
+	public
+	MediaRec createMediaRequired (
+			@NonNull byte[] data,
+			@NonNull String mimeType,
+			@NonNull String filename,
+			@NonNull Optional<String> encoding) {
+
+		return optionalRequired (
+			createMedia (
+				data,
+				mimeType,
+				filename,
+				encoding));
 
 	}
 
@@ -386,9 +477,9 @@ class MediaLogicImplementation
 	@Override
 	public
 	MediaRec createMediaFromImage (
-			BufferedImage image,
-			String mimeType,
-			String filename) {
+			@NonNull BufferedImage image,
+			@NonNull String mimeType,
+			@NonNull String filename) {
 
 		// encode the image
 
@@ -397,15 +488,6 @@ class MediaLogicImplementation
 				image,
 				defaultMimeType);
 
-		if (data == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Couldn't write image back as %s",
-					defaultMimeType));
-
-		}
-
 		return createMediaWithThumbnail (
 			data,
 			image,
@@ -418,35 +500,65 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	MediaRec createMediaFromImage (
-			byte[] data,
-			String mimeType,
-			String filename) {
+	Optional<MediaRec> createMediaFromImage (
+			@NonNull byte[] data,
+			@NonNull String mimeType,
+			@NonNull String filename) {
 
-		BufferedImage image =
+		Optional<BufferedImage> imageOptional =
 			readImage (
 				data,
 				mimeType);
 
-		return createMediaWithThumbnail (
-			data,
-			image,
-			mimeType,
-			filename,
-			image.getWidth (),
-			image.getHeight ());
+		if (
+			isPresent (
+				imageOptional)
+		) {
+
+			BufferedImage image =
+				imageOptional.get ();
+
+			return Optional.of (
+				createMediaWithThumbnail (
+					data,
+					image,
+					mimeType,
+					filename,
+					image.getWidth (),
+					image.getHeight ()));
+
+		} else {
+
+			return Optional.<MediaRec>absent ();
+
+		}
+
+	}
+
+	@Override
+	public
+	MediaRec createMediaFromImageRequired (
+			@NonNull byte[] data,
+			@NonNull String mimeType,
+			@NonNull String filename) {
+
+		return optionalRequired (
+			createMediaFromImage (
+				data,
+				mimeType,
+				filename));
 
 	}
 
 	@Override
 	public
 	MediaRec createMediaWithThumbnail (
-			byte[] data,
-			BufferedImage thumbnailImage,
-			String mimeType,
-			String filename,
-			Integer width,
-			Integer height) {
+			@NonNull byte[] data,
+			@NonNull BufferedImage thumbnailImage,
+			@NonNull String mimeType,
+			@NonNull String filename,
+			@NonNull Integer width,
+			@NonNull Integer height) {
 
 		// create the 100x100 thumbnail
 
@@ -461,15 +573,6 @@ class MediaLogicImplementation
 				image100,
 				defaultMimeType);
 
-		if (data == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Couldn't write thumbnail back as %s",
-					defaultMimeType));
-
-		}
-
 		// create the 32x32 thumbnail
 
 		BufferedImage image32 =
@@ -482,15 +585,6 @@ class MediaLogicImplementation
 			writeImage (
 				image32,
 				defaultMimeType);
-
-		if (data32 == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Couldn't write thumbnail back as %s",
-					defaultMimeType));
-
-		}
 
 		return createMediaWithThumbnail (
 			data,
@@ -506,19 +600,20 @@ class MediaLogicImplementation
 	@Override
 	public
 	MediaRec createMediaWithThumbnail (
-			byte[] data,
-			byte[] thumb100,
-			byte[] thumb32,
-			String mimeType,
-			String filename,
-			Integer width,
-			Integer height) {
+			@NonNull byte[] data,
+			@NonNull byte[] thumb100,
+			@NonNull byte[] thumb32,
+			@NonNull String mimeType,
+			@NonNull String filename,
+			@NonNull Integer width,
+			@NonNull Integer height) {
 
 		MediaTypeRec mediaType =
-			findMediaTypeRequired (mimeType);
+			findMediaTypeRequired (
+				mimeType);
 
 		return mediaHelper.insert (
-			new MediaRec ()
+			mediaHelper.createInstance ()
 
 			.setFilename (
 				filename)
@@ -553,42 +648,71 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	MediaRec createMediaFromVideo (
-			byte[] data,
-			String mimeType,
-			String filename) {
+	Optional<MediaRec> createMediaFromVideo (
+			@NonNull byte[] data,
+			@NonNull String mimeType,
+			@NonNull String filename) {
+
+		Optional<BufferedImage> videoFrameImageOptional =
+			videoFrame (
+				data);
+
+		if (
+			isNotPresent (
+				videoFrameImageOptional)
+		) {
+			return Optional.<MediaRec>absent ();
+		}
 
 		BufferedImage videoFrameImage =
-			videoFrame (data);
+			videoFrameImageOptional.get ();
 
-		return createMediaWithThumbnail (
-			data,
-			videoFrameImage,
-			mimeType,
-			filename,
-			videoFrameImage.getWidth (),
-			videoFrameImage.getHeight ());
+		return Optional.of (
+			createMediaWithThumbnail (
+				data,
+				videoFrameImage,
+				mimeType,
+				filename,
+				videoFrameImage.getWidth (),
+				videoFrameImage.getHeight ()));
+
+	}
+
+	@Override
+	public
+	MediaRec createMediaFromVideoRequired (
+			@NonNull byte[] data,
+			@NonNull String mimeType,
+			@NonNull String filename) {
+
+		return optionalRequired (
+			createMediaFromVideo (
+				data,
+				mimeType,
+				filename));
 
 	}
 
 	@Override
 	public
 	MediaRec createMediaFromAudio (
-			byte[] data,
-			String mimeType,
-			String filename) {
+			@NonNull byte[] data,
+			@NonNull String mimeType,
+			@NonNull String filename) {
 
 		MediaTypeRec mediaType =
-			findMediaTypeRequired (mimeType);
+			findMediaTypeRequired (
+				mimeType);
 
 		return mediaHelper.insert (
-			new MediaRec ()
+			mediaHelper.createInstance ()
 
 			.setFilename (
 				filename)
 
 			.setContent (
-				findOrCreateContent (data))
+				findOrCreateContent (
+					data))
 
 			.setMediaType (
 				mediaType));
@@ -598,7 +722,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	MediaTypeRec findMediaTypeRequired (
-			String mimeType) {
+			@NonNull String mimeType) {
 
 		MediaTypeRec mediaType =
 			mediaTypeHelper.findByCode (
@@ -618,14 +742,15 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	MediaRec createTextualMedia (
-			byte[] data,
-			String mimeType,
-			String filename,
-			String encoding) {
+	Optional<MediaRec> createTextualMedia (
+			@NonNull byte[] data,
+			@NonNull String mimeType,
+			@NonNull String filename,
+			@NonNull String encoding) {
 
-		return mediaHelper.insert (
-			new MediaRec ()
+		return Optional.of (
+			mediaHelper.insert (
+				mediaHelper.createInstance ()
 
 			.setMediaType (
 				findMediaTypeRequired (
@@ -641,19 +766,19 @@ class MediaLogicImplementation
 			.setEncoding (
 				encoding)
 
-		);
+		));
 
 	}
 
 	@Override
 	public
 	MediaRec createTextMedia (
-			String text,
-			String mimeType,
-			String filename) {
+			@NonNull String text,
+			@NonNull String mimeType,
+			@NonNull String filename) {
 
 		return mediaHelper.insert (
-			new MediaRec ()
+			mediaHelper.createInstance ()
 
 			.setMediaType (
 				findMediaTypeRequired (
@@ -683,7 +808,7 @@ class MediaLogicImplementation
 		byte[] data;
 
 		ByteArrayImageInputStream (
-				byte[] newData) {
+				@NonNull byte[] newData) {
 
 			data = newData;
 
@@ -702,7 +827,7 @@ class MediaLogicImplementation
 		@Override
 		public
 		int read (
-				byte[] bytes,
+				@NonNull byte[] bytes,
 				int offset,
 				int length) {
 
@@ -747,14 +872,16 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	BufferedImage readImage (
-			byte[] data,
-			String mimeType) {
+	Optional<BufferedImage> readImage (
+			@NonNull byte[] data,
+			@NonNull String mimeType) {
 
-		for (ImageReader imageReader
+		for (
+			ImageReader imageReader
 				: iterable (
 					ImageIO.getImageReadersByMIMEType (
-						mimeType))) {
+						mimeType))
+		) {
 
 			log.debug (
 				stringFormat (
@@ -768,7 +895,8 @@ class MediaLogicImplementation
 
 			try {
 
-				return imageReader.read (0);
+				return Optional.of (
+					imageReader.read (0));
 
 			} catch (IOException exception) {
 
@@ -789,20 +917,35 @@ class MediaLogicImplementation
 				mimeType,
 				data.length));
 
-		return null;
+		return Optional.<BufferedImage>absent ();
+
+	}
+
+	@Override
+	public
+	BufferedImage readImageRequired (
+			@NonNull byte[] data,
+			@NonNull String mimeType) {
+
+		return optionalRequired (
+			readImage (
+				data,
+				mimeType));
 
 	}
 
 	@Override
 	public
 	byte[] writeImage (
-			BufferedImage image,
-			String mimeType) {
+			@NonNull BufferedImage image,
+			@NonNull String mimeType) {
 
-		for (ImageWriter imageWriter
+		for (
+			ImageWriter imageWriter
 				: iterable (
 					ImageIO.getImageWritersByMIMEType (
-						mimeType))) {
+						mimeType))
+		) {
 
 			ByteArrayOutputStream byteArrayOutputStream =
 				new ByteArrayOutputStream ();
@@ -827,20 +970,22 @@ class MediaLogicImplementation
 
 		}
 
-		return null;
+		throw new RuntimeException ();
 
 	}
 
 	@Override
 	public
 	byte[] writeJpeg (
-			BufferedImage image,
+			@NonNull BufferedImage image,
 			float jpegQuality) {
 
-		for (ImageWriter imageWriter
+		for (
+			ImageWriter imageWriter
 				: iterable (
 					ImageIO.getImageWritersByMIMEType (
-						"image/jpeg"))) {
+						"image/jpeg"))
+		) {
 
 			ByteArrayOutputStream byteArrayOutputStream =
 				new ByteArrayOutputStream ();
@@ -876,16 +1021,16 @@ class MediaLogicImplementation
 
 		}
 
-		return null;
+		throw new RuntimeException ();
 
 	}
 
 	@Override
 	public
 	BufferedImage getImage (
-			MediaRec media) {
+			@NonNull MediaRec media) {
 
-		return readImage (
+		return readImageRequired (
 			media.getContent ().getData (),
 			media.getMediaType ().getMimeType ());
 
@@ -1042,7 +1187,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	BufferedImage rotateImage270 (
-			BufferedImage image) {
+			@NonNull BufferedImage image) {
 
 		BufferedImage newImage =
 			new BufferedImage (
@@ -1074,59 +1219,98 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	byte[] videoConvert (
-			String profileName,
-			byte[] data) {
+	Optional<byte[]> videoConvert (
+			@NonNull String profileName,
+			@NonNull byte[] data) {
 
 		FfmpegProfile ffmpegProfile =
-			ffmpegProfiles.get (profileName);
+			ffmpegProfiles.get (
+				profileName);
 
-		return runFilterAdvanced (
-			log,
-			data,
-			"",
-			"." + ffmpegProfile.fileExtension,
-			ffmpegProfile.toFfmpeg ());
+		try {
 
-	}
+			return Optional.of (
+				runFilterAdvanced (
+					log,
+					data,
+					"",
+					"." + ffmpegProfile.fileExtension,
+					ffmpegProfile.toFfmpeg ()));
 
-	@Override
-	public
-	byte[] videoFrameBytes (
-			byte[] data) {
+		} catch (Exception exception) {
 
-		return runFilter (
-			log,
-			data,
-			".mp4",
-			".mjpeg",
-			"ffmpeg",
-			"-y",
-			"-i",
-			"<in>",
-			"-vcodec",
-			"mjpeg",
-			"-vframes",
-			"1",
-			"<out>");
+			return Optional.<byte[]>absent ();
+
+		}
 
 	}
 
 	@Override
 	public
-	BufferedImage videoFrame (
-			byte[] data) {
+	byte[] videoConvertRequired (
+			@NonNull String profileName,
+			@NonNull byte[] data) {
 
-		return readImage (
-			videoFrameBytes (data),
-			"image/jpeg");
+		return optionalRequired (
+			videoConvert (
+				profileName,
+				data));
+
+	}
+
+	@Override
+	public
+	Optional<byte[]> videoFrameBytes (
+			@NonNull byte[] data) {
+
+		return Optional.of (
+			runFilter (
+				log,
+				data,
+				".mp4",
+				".mjpeg",
+				"ffmpeg",
+				"-y",
+				"-i",
+				"<in>",
+				"-vcodec",
+				"mjpeg",
+				"-vframes",
+				"1",
+				"<out>"));
+
+	}
+
+	@Override
+	public
+	Optional<BufferedImage> videoFrame (
+			@NonNull byte[] data) {
+
+		Optional<byte[]> videoFrameBytesOptional =
+			videoFrameBytes (
+				data);
+
+		if (
+			isPresent (
+				videoFrameBytesOptional)
+		) {
+
+			return readImage (
+				videoFrameBytesOptional.get (),
+				"image/jpeg");
+
+		} else {
+
+			return Optional.<BufferedImage>absent ();
+
+		}
 
 	}
 
 	@Override
 	public
 	boolean isApplication (
-			String mimeType) {
+			@NonNull String mimeType) {
 
 		return applicationTypes.contains (
 			mimeType);
@@ -1136,7 +1320,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isApplication (
-			MediaTypeRec mediaType) {
+			@NonNull MediaTypeRec mediaType) {
 
 		return isApplication (
 			mediaType.getMimeType ());
@@ -1146,7 +1330,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isApplication (
-			MediaRec media) {
+			@NonNull MediaRec media) {
 
 		return isApplication (
 			media.getMediaType ());
@@ -1156,7 +1340,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isAudio (
-			String mimeType) {
+			@NonNull String mimeType) {
 
 		return audioTypes.contains (
 			mimeType);
@@ -1166,7 +1350,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isAudio (
-			MediaTypeRec mediaType) {
+			@NonNull MediaTypeRec mediaType) {
 
 		return isAudio (
 			mediaType.getMimeType ());
@@ -1176,7 +1360,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isAudio (
-			MediaRec media) {
+			@NonNull MediaRec media) {
 
 		return isAudio (
 			media.getMediaType ());
@@ -1186,7 +1370,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isImage (
-			String mimeType) {
+			@NonNull String mimeType) {
 
 		return imageTypes.contains (
 			mimeType);
@@ -1196,7 +1380,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isImage (
-			MediaTypeRec mediaType) {
+			@NonNull MediaTypeRec mediaType) {
 
 		return isImage (
 			mediaType.getMimeType ());
@@ -1206,7 +1390,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isImage (
-			MediaRec media) {
+			@NonNull MediaRec media) {
 
 		return isImage (
 			media.getMediaType ());
@@ -1216,7 +1400,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isText (
-			String mimeType) {
+			@NonNull String mimeType) {
 
 		return textTypes.contains (
 			mimeType);
@@ -1226,7 +1410,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isText (
-			MediaTypeRec mediaType) {
+			@NonNull MediaTypeRec mediaType) {
 
 		return isText (
 			mediaType.getMimeType ());
@@ -1236,7 +1420,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isText (
-			MediaRec media) {
+			@NonNull MediaRec media) {
 
 		return isText (
 			media.getMediaType ());
@@ -1246,7 +1430,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isVideo (
-			String mimeType) {
+			@NonNull String mimeType) {
 
 		return videoTypes.contains (
 			mimeType);
@@ -1256,7 +1440,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isVideo (
-			MediaTypeRec mediaType) {
+			@NonNull MediaTypeRec mediaType) {
 
 		return isVideo (
 			mediaType.getMimeType ());
@@ -1266,7 +1450,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	boolean isVideo (
-			MediaRec media) {
+			@NonNull MediaRec media) {
 
 		return isVideo (
 			media.getMediaType ());

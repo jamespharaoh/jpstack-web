@@ -44,7 +44,8 @@
 				event-order="target-then-context"
 				target-signal="user_privs"
 				success-notice="Group membership updated"
-				fields="members"/>
+				fields="members"
+				owned-by="us"/>
 
 			<context-tab-action-page
 				name="privs"/>

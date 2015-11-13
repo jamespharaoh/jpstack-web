@@ -1,5 +1,7 @@
 package wbs.platform.media.console;
 
+import static wbs.framework.utils.etc.Misc.equal;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -27,8 +29,9 @@ class AbstractMediaImageResponder
 
 	// state
 
+	MediaRec media;
+
 	byte[] data;
-	String mimeType;
 
 	// hooks
 
@@ -46,21 +49,10 @@ class AbstractMediaImageResponder
 	protected
 	void prepare () {
 
-		int mediaId =
-			requestContext.stuffInt (
-				"mediaId");
-
-		MediaRec media =
+		media =
 			mediaHelper.find (
-				mediaId);
-
-		data =
-			getData (
-				media);
-
-		mimeType =
-			getMimeType (
-				media);
+				requestContext.stuffInt (
+					"mediaId"));
 
 		transform ();
 
@@ -73,35 +65,52 @@ class AbstractMediaImageResponder
 			requestContext.parameter (
 				"rotate");
 
-		if ("90".equals (rotate)) {
+		if (
+			equal (
+				rotate,
+				"90")
+		) {
 
 			data =
 				mediaLogic.writeImage (
 					mediaLogic.rotateImage90 (
-						mediaLogic.readImage (
-							data,
-							mimeType)),
-					mimeType);
+						mediaLogic.readImageRequired (
+							getData (media),
+							getMimeType (media))),
+					getMimeType (media));
 
-		} else if ("180".equals (rotate)) {
+		} else if (
+			equal (
+				rotate,
+				"180")
+		) {
 
 			data =
 				mediaLogic.writeImage (
 					mediaLogic.rotateImage180 (
-						mediaLogic.readImage (
-							data,
-							mimeType)),
-					mimeType);
+						mediaLogic.readImageRequired (
+							getData (media),
+							getMimeType (media))),
+					getMimeType (media));
 
-		} else if ("270".equals (rotate)) {
+		} else if (
+			equal (
+				rotate,
+				"270")
+		) {
 
 			data =
 				mediaLogic.writeImage (
 					mediaLogic.rotateImage270 (
-						mediaLogic.readImage (
-							data,
-							mimeType)),
-					mimeType);
+						mediaLogic.readImageRequired (
+							getData (media),
+							getMimeType (media))),
+					getMimeType (media));
+
+		} else {
+
+			data =
+				getData (media);
 
 		}
 
@@ -113,7 +122,7 @@ class AbstractMediaImageResponder
 
 		requestContext.setHeader (
 			"Content-Type",
-			mimeType);
+			getMimeType (media));
 
 		requestContext.setHeader (
 			"Content-Length",

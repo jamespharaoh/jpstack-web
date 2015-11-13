@@ -6,6 +6,9 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 
 import lombok.NonNull;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -17,8 +20,6 @@ import wbs.platform.exception.model.ExceptionLogTypeObjectHelper;
 import wbs.platform.exception.model.ExceptionLogTypeRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
-
-import com.google.common.base.Optional;
 
 @SingletonComponent ("exceptionLogLogic")
 public
@@ -81,7 +82,7 @@ class ExceptionLogLogicImplementation
 
 		ExceptionLogRec exceptionLog =
 			exceptionLogHelper.insert (
-				new ExceptionLogRec ()
+				exceptionLogHelper.createInstance ()
 
 			.setTimestamp (
 				instantToDate (
