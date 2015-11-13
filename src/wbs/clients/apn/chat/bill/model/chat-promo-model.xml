@@ -52,6 +52,12 @@
 			name="promoEndedText"
 			type="text"/>
 
+		<yes-no-field
+			name="joinChat"/>
+
+		<yes-no-field
+			name="joinDating"/>
+
 		<!-- statistics -->
 
 		<integer-field

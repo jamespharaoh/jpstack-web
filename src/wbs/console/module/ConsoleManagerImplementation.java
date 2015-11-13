@@ -858,8 +858,10 @@ class ConsoleManagerImplementation
 
 		// iterate modules
 
-		for (Map.Entry<String,ConsoleModule> consoleModuleEntry
-				: consoleModules.entrySet ()) {
+		for (
+			Map.Entry<String,ConsoleModule> consoleModuleEntry
+				: consoleModules.entrySet ()
+		) {
 
 			String consoleModuleBeanName =
 				consoleModuleEntry.getKey ();
@@ -876,8 +878,12 @@ class ConsoleManagerImplementation
 			try {
 
 				new DataToXml ()
-					.object (consoleModule)
-					.write (outputFileName);
+
+					.object (
+						consoleModule)
+
+					.write (
+						outputFileName);
 
 			} catch (IOException exception) {
 
@@ -981,8 +987,10 @@ class ConsoleManagerImplementation
 		Map<String,ConsoleContext> contextsByPathPrefix =
 			new HashMap<String,ConsoleContext> ();
 
-		for (ConsoleContext context
-				: consoleContextsByName.values ()) {
+		for (
+			ConsoleContext context
+				: consoleContextsByName.values ()
+		) {
 
 			if (! context.global ())
 				continue;
@@ -1012,8 +1020,10 @@ class ConsoleManagerImplementation
 		Map<String,PathHandler> pathHandlersByPathPrefix =
 			new HashMap<String,PathHandler> ();
 
-		for (Map.Entry<String,ConsoleContext> contextEntry
-				: contextsByPathPrefix.entrySet ()) {
+		for (
+			Map.Entry<String,ConsoleContext> contextEntry
+				: contextsByPathPrefix.entrySet ()
+		) {
 
 			pathHandlersByPathPrefix.put (
 				contextEntry.getKey (),
@@ -1034,7 +1044,7 @@ class ConsoleManagerImplementation
 
 	private static
 	PathSupply pathParts (
-			String path) {
+			@NonNull String path) {
 
 		List<String> ret =
 			new ArrayList<String> ();
@@ -1092,8 +1102,8 @@ class ConsoleManagerImplementation
 	@Override
 	public
 	void changeContext (
-			ConsoleContext context,
-			String contextPartSuffix) {
+			@NonNull ConsoleContext context,
+			@NonNull String contextPartSuffix) {
 
 		requestContext.changedContextPath (
 			joinWithoutSeparator (
@@ -1101,7 +1111,8 @@ class ConsoleManagerImplementation
 				contextPartSuffix));
 
 		PathSupply pathParts =
-			pathParts (contextPartSuffix);
+			pathParts (
+				contextPartSuffix);
 
 		ConsoleContextStuff contextStuff =
 			requestContext.contextStuff ();
@@ -1134,8 +1145,8 @@ class ConsoleManagerImplementation
 	@Override
 	public
 	void runPostProcessors (
-			String name,
-			ConsoleContextStuff contextStuff) {
+			@NonNull String name,
+			@NonNull ConsoleContextStuff contextStuff) {
 
 		ConsoleHelperProvider<?> consoleHelperProvider =
 			consoleHelperProviderRegistry.findByObjectName (
@@ -1173,7 +1184,7 @@ class ConsoleManagerImplementation
 		@Override
 		public
 		WebFile processPath (
-				String remainingPath) {
+				@NonNull String remainingPath) {
 
 			String fullPath =
 				joinWithoutSeparator (

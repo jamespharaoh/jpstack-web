@@ -5,7 +5,8 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.message.core.model.MessageRec;
 
-public interface ChatDateLogic {
+public
+interface ChatDateLogic {
 
 	void userDateStuff (
 			ChatUserRec chatUser,

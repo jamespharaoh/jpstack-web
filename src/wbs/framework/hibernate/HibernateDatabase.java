@@ -1,5 +1,7 @@
 package wbs.framework.hibernate;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -331,8 +333,12 @@ class HibernateDatabase
 		private
 		void begin () {
 
-			if (realTransaction != null)
+			if (
+				isNotNull (
+					realTransaction)
+			) {
 				return;
+			}
 
 			log.debug (
 				stringFormat (
@@ -342,6 +348,8 @@ class HibernateDatabase
 						? "rw"
 						: "ro"));
 
+			// create session
+
 			session =
 				sessionFactory.withOptions ()
 
@@ -350,8 +358,12 @@ class HibernateDatabase
 
 				.openSession ();
 
+			// begin transaction
+
 			hibernateTransaction =
 				session.beginTransaction ();
+
+			// create unsaved record detector frame
 
 			UnsavedRecordDetector.instance.createFrame (
 				this);
@@ -404,8 +416,15 @@ class HibernateDatabase
 
 			// verify unsaved records
 
-			UnsavedRecordDetector.instance.verifyFrame (
-				this);
+			if (
+				isNull (
+					realTransaction)
+			) {
+
+				UnsavedRecordDetector.instance.verifyFrame (
+					this);
+
+			}
 
 			// do the commit
 
@@ -503,16 +522,23 @@ class HibernateDatabase
 
 				// always tidy unsaved record detector
 
-				try {
+				if (
+					isNull (
+						realTransaction)
+				) {
 
-					UnsavedRecordDetector.instance.destroyFrame (
-						this);
+					try {
 
-				} catch (Exception exception) {
+						UnsavedRecordDetector.instance.destroyFrame (
+							this);
 
-					log.fatal (
-						"Error destroying unsaved record detector frame",
-						exception);
+					} catch (Exception exception) {
+
+						log.fatal (
+							"Error destroying unsaved record detector frame",
+							exception);
+
+					}
 
 				}
 

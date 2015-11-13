@@ -136,7 +136,7 @@ class ImChatPurchaseGetConfirmationAction
 		// lookup session
 
 		ImChatSessionRec session =
-			customer.getActiveSesion ();
+			customer.getActiveSession ();
 
 		if (
 			isNull (

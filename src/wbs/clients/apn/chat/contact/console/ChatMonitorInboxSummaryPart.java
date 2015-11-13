@@ -20,6 +20,8 @@ import java.util.TimeZone;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
+
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
@@ -132,8 +134,8 @@ class ChatMonitorInboxSummaryPart
 		@Override
 		public
 		int compare (
-				ChatMessageRec left,
-				ChatMessageRec right) {
+				@NonNull ChatMessageRec left,
+				@NonNull ChatMessageRec right) {
 
 			return new CompareToBuilder ()
 
@@ -151,7 +153,8 @@ class ChatMonitorInboxSummaryPart
 
 		static
 		Comparator<ChatMessageRec> descending =
-			Collections.reverseOrder (ascending);
+			Collections.reverseOrder (
+				ascending);
 
 	}
 
@@ -169,7 +172,8 @@ class ChatMonitorInboxSummaryPart
 
 		monitorInbox =
 			chatMonitorInboxHelper.find (
-				requestContext.stuffInt ("chatMonitorInboxId"));
+				requestContext.stuffInt (
+					"chatMonitorInboxId"));
 
 		monitorChatUser =
 			monitorInbox.getMonitorChatUser ();
@@ -208,7 +212,9 @@ class ChatMonitorInboxSummaryPart
 		chatMessageHistory.addAll (history1);
 		chatMessageHistory.addAll (history2);
 
-		Collections.sort (chatMessageHistory, ChatMessageComparator.descending);
+		Collections.sort (
+			chatMessageHistory,
+			ChatMessageComparator.descending);
 
 		if (chatMessageHistory.size () > 50)
 			chatMessageHistory = chatMessageHistory.subList (0, 50);
@@ -242,8 +248,8 @@ class ChatMonitorInboxSummaryPart
 	}
 
 	Map<Integer,ChatNamedNoteRec> getNamedNotes (
-			ChatUserRec thisUser,
-			ChatUserRec thatUser) {
+			@NonNull ChatUserRec thisUser,
+			@NonNull ChatUserRec thatUser) {
 
 		Map<Integer,ChatNamedNoteRec> namedNotes =
 			new HashMap<Integer,ChatNamedNoteRec> ();
@@ -253,8 +259,10 @@ class ChatMonitorInboxSummaryPart
 				thisUser,
 				thatUser);
 
-		for (ChatNamedNoteRec namedNote
-				: namedNotesTemp) {
+		for (
+			ChatNamedNoteRec namedNote
+				: namedNotesTemp
+		) {
 
 			namedNotes.put (
 				namedNote.getChatNoteName ().getId (),
@@ -280,7 +288,7 @@ class ChatMonitorInboxSummaryPart
 
 			.add (
 				ConsoleApplicationScriptRef.javascript (
-					"/js/jquery.jeditable.mini.js"))
+					"/js/jquery-jeditable-dea6556.js"))
 
 			.add (
 				ConsoleApplicationScriptRef.javascript (

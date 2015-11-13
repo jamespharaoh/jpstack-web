@@ -110,7 +110,8 @@ class UnsavedRecordDetector {
 				reference)
 		) {
 
-			throw new IllegalStateException ();
+			throw new IllegalStateException (
+				"Reference mismatch");
 
 		}
 
@@ -172,7 +173,10 @@ class UnsavedRecordDetector {
 				record)
 		) {
 
-			throw new IllegalStateException ();
+			throw new IllegalStateException (
+				stringFormat (
+					"Record to remove is not in list: %s",
+					record));
 
 		}
 

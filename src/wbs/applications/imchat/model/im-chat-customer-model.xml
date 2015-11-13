@@ -23,6 +23,10 @@
 		<string-field
 			name="password"/>
 
+		<yes-no-field
+			name="acceptedTermsAndConditions"
+			default="no"/>
+
 		<!-- statistics -->
 
 		<integer-field
@@ -45,7 +49,7 @@
 			nullable="yes"/>
 
 		<reference-field
-			name="activeSesion"
+			name="activeSession"
 			type="imChatSession"
 			nullable="yes"/>
 
@@ -57,5 +61,14 @@
 			type="imChatPurchase"/>
 
 	</collections>
+
+	<event-types>
+
+		<event-type
+			name="IM chat customer conditions accepted"
+			text="%0 accepted terms and conditions"
+			admin="no"/>
+
+	</event-types>
 
 </model-meta>

@@ -1096,6 +1096,17 @@ class Misc {
 	}
 
 	public static
+	String hyphenToUnderscore (
+			@NonNull String string) {
+
+		return replaceAll (
+			string,
+			"-",
+			"_");
+
+	}
+
+	public static
 	String delimitedToCamel (
 			@NonNull String string,
 			@NonNull String delimiter) {

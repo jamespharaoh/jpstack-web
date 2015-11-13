@@ -145,6 +145,9 @@ class ImChatApiLogicImplementation
 			.email (
 				customer.getEmail ())
 
+			.conditionsAccepted (
+				customer.getAcceptedTermsAndConditions ())
+
 			.balance (
 				customer.getBalance ())
 

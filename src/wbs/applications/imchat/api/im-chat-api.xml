@@ -3,6 +3,10 @@
 	<resource name="im-chat">
 	<variable name="imChatId">
 
+		<resource name="conditions-accept">
+			<post-action name="conditionsAccept"/>
+		</resource>
+
 		<resource name="conversation-start">
 			<post-action name="conversationStart"/>
 		</resource>

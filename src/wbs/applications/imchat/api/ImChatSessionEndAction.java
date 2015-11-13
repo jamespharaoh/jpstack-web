@@ -11,6 +11,7 @@ import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
 import wbs.applications.imchat.model.ImChatSessionRec;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -97,9 +98,14 @@ class ImChatSessionEndAction
 					"longer active");
 
 			return jsonResponderProvider.get ()
-				.value (failureResponse);
+
+				.value (
+					failureResponse);
 
 		}
+
+		ImChatCustomerRec customer =
+			session.getImChatCustomer ();
 
 		// update session
 
@@ -111,6 +117,11 @@ class ImChatSessionEndAction
 			.setEndTime (
 				transaction.now ());
 
+		customer
+
+			.setActiveSession (
+				null);
+
 		// create response
 
 		ImChatSessionEndSuccess successResponse =
@@ -121,7 +132,9 @@ class ImChatSessionEndAction
 		transaction.commit ();
 
 		return jsonResponderProvider.get ()
-			.value (successResponse);
+
+			.value (
+				successResponse);
 
 	}
 

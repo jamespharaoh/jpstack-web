@@ -110,6 +110,12 @@
 		<text-area-field
 			name="promoEndedText"/>
 
+		<yes-no-field
+			name="joinChat"/>
+
+		<yes-no-field
+			name="joinDating"/>
+
 	</field-set>
 
 	<field-set
@@ -145,6 +151,12 @@
 		<text-area-field
 			name="promoEndedText"/>
 
+		<yes-no-field
+			name="joinChat"/>
+
+		<yes-no-field
+			name="joinDating"/>
+
 		<integer-field
 			name="numUsers"/>
 
@@ -179,6 +191,12 @@
 
 		<text-area-field
 			name="promoEndedText"/>
+
+		<yes-no-field
+			name="joinChat"/>
+
+		<yes-no-field
+			name="joinDating"/>
 
 	</field-set>
 

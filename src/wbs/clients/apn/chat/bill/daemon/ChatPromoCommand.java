@@ -18,11 +18,15 @@ import wbs.clients.apn.chat.bill.model.ChatPromoRec;
 import wbs.clients.apn.chat.bill.model.ChatPromoUserObjectHelper;
 import wbs.clients.apn.chat.bill.model.ChatPromoUserRec;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
+import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
+import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
+import wbs.clients.apn.chat.date.logic.ChatDateLogic;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogLogic;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -54,7 +58,13 @@ class ChatPromoCommand
 	ChatCreditLogic chatCreditLogic;
 
 	@Inject
+	ChatDateLogic chatDateLogic;
+
+	@Inject
 	ChatHelpLogLogic chatHelpLogLogic;
+
+	@Inject
+	ChatMiscLogic chatMiscLogic;
 
 	@Inject
 	ChatPromoUserObjectHelper chatPromoUserHelper;
@@ -129,13 +139,13 @@ class ChatPromoCommand
 		ChatRec chat =
 			chatPromo.getChat ();
 
-		MessageRec message =
+		MessageRec inboundMessage =
 			inbox.getMessage ();
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
 				chat,
-				message);
+				inboundMessage);
 
 		AffiliateRec affiliate =
 			chatUserLogic.getAffiliate (
@@ -163,14 +173,14 @@ class ChatPromoCommand
 				chatUser,
 				true,
 				Optional.of (
-					message.getThreadId ()));
+					inboundMessage.getThreadId ()));
 
 		if (creditCheckResult.failed ()) {
 
 			chatHelpLogLogic.createChatHelpLogIn (
 				chatUser,
-				message,
-				message.getText ().getText (),
+				inboundMessage,
+				inboundMessage.getText ().getText (),
 				command,
 				true);
 
@@ -189,8 +199,8 @@ class ChatPromoCommand
 		ChatHelpLogRec inboundHelpLog =
 			chatHelpLogLogic.createChatHelpLogIn (
 				chatUser,
-				message,
-				message.getText ().getText (),
+				inboundMessage,
+				inboundMessage.getText ().getText (),
 				command,
 				false);
 
@@ -206,7 +216,7 @@ class ChatPromoCommand
 				chatSendLogic.sendMessageMagic (
 					chatUser,
 					Optional.of (
-						message.getThreadId ()),
+						inboundMessage.getThreadId ()),
 					chatPromo.getPromoNotStartedText (),
 					magicCommand,
 					promoService,
@@ -245,7 +255,7 @@ class ChatPromoCommand
 				chatSendLogic.sendMessageMagic (
 					chatUser,
 					Optional.of (
-						message.getThreadId ()),
+						inboundMessage.getThreadId ()),
 					chatPromo.getPromoEndedText (),
 					magicCommand,
 					promoService,
@@ -287,7 +297,7 @@ class ChatPromoCommand
 				chatSendLogic.sendMessageMagic (
 					chatUser,
 					Optional.of (
-						message.getThreadId ()),
+						inboundMessage.getThreadId ()),
 					chatPromo.getAlreadyClaimedText (),
 					magicCommand,
 					promoService,
@@ -329,9 +339,15 @@ class ChatPromoCommand
 				transaction.now ())
 
 			.setMessage (
-				message)
+				inboundMessage)
 
 		);
+
+		chatPromo
+
+			.setNumUsers (
+				+ chatPromo.getNumUsers ()
+				+ 1);
 
 		chatUser
 
@@ -347,7 +363,7 @@ class ChatPromoCommand
 			chatSendLogic.sendMessageMagic (
 				chatUser,
 				Optional.of (
-					message.getThreadId ()),
+					inboundMessage.getThreadId ()),
 				chatPromo.getSuccessText (),
 				magicCommand,
 				promoService,
@@ -363,6 +379,41 @@ class ChatPromoCommand
 			outboundMessage.getText ().getText (),
 			Optional.of (
 				helpCommand));
+
+		boolean sendMessage = true;
+
+		if (
+			chatPromo.getJoinChat ()
+			&& ! chatUser.getOnline ()
+		) {
+
+			chatMiscLogic.userJoin (
+				chatUser,
+				sendMessage,
+				inboundMessage.getThreadId (),
+				ChatMessageMethod.sms);
+
+			sendMessage = false;
+
+		}
+
+		if (
+			chatPromo.getJoinDating ()
+			&& chatUser.getDateMode () == ChatUserDateMode.none
+		) {
+
+			chatDateLogic.userDateStuff (
+				chatUser,
+				null,
+				inboundMessage,
+				chatUser.getMainChatUserImage () != null
+					? ChatUserDateMode.photo
+					: ChatUserDateMode.text,
+				sendMessage);
+
+			sendMessage = false;
+
+		}
 
 		return inboxLogic.inboxProcessed (
 			inbox,

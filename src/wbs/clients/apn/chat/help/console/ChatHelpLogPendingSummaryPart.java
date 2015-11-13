@@ -153,7 +153,9 @@ class ChatHelpLogPendingSummaryPart
 			"<th>Info</th>\n",
 
 			"<td>%h</td>\n",
-			chatUser.getInfoText (),
+			chatUser.getInfoText () != null
+				? chatUser.getInfoText ().getText ()
+				: "",
 
 			"</tr>\n");
 

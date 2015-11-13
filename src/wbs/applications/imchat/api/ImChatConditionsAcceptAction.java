@@ -1,5 +1,6 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.io.IOException;
@@ -13,7 +14,6 @@ import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatRec;
@@ -23,15 +23,15 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
+import wbs.platform.event.logic.EventLogic;
 
-@PrototypeComponent ("imChatSessionStartAction")
+@PrototypeComponent ("imChatConditionsAcceptAction")
 public
-class ImChatSessionStartAction
+class ImChatConditionsAcceptAction
 	implements Action {
 
 	// dependencies
@@ -40,19 +40,16 @@ class ImChatSessionStartAction
 	Database database;
 
 	@Inject
-	ImChatApiLogic imChatApiLogic;
+	EventLogic eventLogic;
 
 	@Inject
-	ImChatCustomerObjectHelper imChatCustomerHelper;
+	ImChatApiLogic imChatApiLogic;
 
 	@Inject
 	ImChatObjectHelper imChatHelper;
 
 	@Inject
 	ImChatSessionObjectHelper imChatSessionHelper;
-
-	@Inject
-	RandomLogic randomLogic;
 
 	@Inject
 	RequestContext requestContext;
@@ -79,9 +76,9 @@ class ImChatSessionStartAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatSessionStartRequest startRequest =
+		ImChatConditionsAcceptRequest conditionsAcceptRequest =
 			dataFromJson.fromJson (
-				ImChatSessionStartRequest.class,
+				ImChatConditionsAcceptRequest.class,
 				jsonValue);
 
 		// begin transaction
@@ -98,47 +95,37 @@ class ImChatSessionStartAction
 					requestContext.request (
 						"imChatId")));
 
-		// lookup customer
+		// lookup session
+
+		ImChatSessionRec session =
+			imChatSessionHelper.findBySecret (
+				conditionsAcceptRequest.sessionSecret ());
 
 		ImChatCustomerRec customer =
-			imChatCustomerHelper.findByEmail (
-				imChat,
-				startRequest.email ());
-
-		if (customer == null) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"email-invalid")
-
-				.message (
-					"No customer with that email address exists");
-
-			return jsonResponderProvider.get ()
-
-				.value (
-					failureResponse);
-
-		}
-
-		// verify password
+			session.getImChatCustomer ();
 
 		if (
-			notEqual (
-				customer.getPassword (),
-				startRequest.password ())
+
+			isNull (
+				session)
+
+			|| ! session.getActive ()
+
+			|| notEqual (
+				customer.getImChat (),
+				imChat)
+
 		) {
 
 			ImChatFailure failureResponse =
 				new ImChatFailure ()
 
 				.reason (
-					"password-invalid")
+					"session-invalid")
 
 				.message (
-					"The supplied password is not correct");
+					"The session secret is invalid or the session is no " +
+					"longer active");
 
 			return jsonResponderProvider.get ()
 
@@ -147,51 +134,25 @@ class ImChatSessionStartAction
 
 		}
 
-		// create session
-
-		ImChatSessionRec session =
-			imChatSessionHelper.insert (
-				imChatSessionHelper.createInstance ()
-
-			.setImChatCustomer (
-				customer)
-
-			.setSecret (
-				randomLogic.generateLowercase (20))
-
-			.setActive (
-				true)
-
-			.setStartTime (
-				transaction.now ())
-
-			.setUpdateTime (
-				transaction.now ())
-
-		);
+		// accept terms and conditions
 
 		customer
 
-			.setActiveSession (
-				session);
+			.setAcceptedTermsAndConditions (
+				true);
+
+		eventLogic.createEvent (
+			"im_chat_customer_conditions_accepted",
+			customer);
 
 		// create response
 
-		ImChatSessionStartSuccess successResponse =
-			new ImChatSessionStartSuccess ()
-
-			.sessionSecret (
-				session.getSecret ())
+		ImChatConditionsAcceptSuccess successResponse =
+			new ImChatConditionsAcceptSuccess ()
 
 			.customer (
 				imChatApiLogic.customerData (
-					customer))
-
-			.conversation (
-				customer.getCurrentConversation () != null
-					? imChatApiLogic.conversationData (
-						customer.getCurrentConversation ())
-					: null);
+					customer));
 
 		// commit and return
 

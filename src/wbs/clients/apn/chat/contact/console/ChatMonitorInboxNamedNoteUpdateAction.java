@@ -75,7 +75,8 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 	static
 	Pattern idPattern =
-		Pattern.compile ("namedNote([0-9]+)(user|monitor)");
+		Pattern.compile (
+			"namedNote([0-9]+)(user|monitor)");
 
 	@Override
 	protected
@@ -92,13 +93,20 @@ class ChatMonitorInboxNamedNoteUpdateAction
 		// get params
 
 		Matcher idMatcher =
-			idPattern.matcher (requestContext.parameter ("id"));
+			idPattern.matcher (
+				requestContext.parameter (
+					"id"));
 
-		if (! idMatcher.matches ())
-			throw new RuntimeException ("Invalid id in post");
+		if (! idMatcher.matches ()) {
+
+			throw new RuntimeException (
+				"Invalid id in post");
+
+		}
 
 		int noteNameId =
-			Integer.parseInt (idMatcher.group (1));
+			Integer.parseInt (
+				idMatcher.group (1));
 
 		String typeString =
 			idMatcher.group (2);
@@ -119,7 +127,8 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 		ChatMonitorInboxRec monitorInbox =
 			chatMonitorInboxHelper.find (
-				requestContext.stuffInt ("chatMonitorInboxId"));
+				requestContext.stuffInt (
+					"chatMonitorInboxId"));
 
 		ChatNoteNameRec chatNoteName =
 			chatNoteNameHelper.find (
@@ -130,7 +139,11 @@ class ChatMonitorInboxNamedNoteUpdateAction
 		ChatUserRec thisChatUser;
 		ChatUserRec otherChatUser;
 
-		if (equal (typeString, "user")) {
+		if (
+			equal (
+				typeString,
+				"user")
+		) {
 
 			thisChatUser =
 				monitorInbox.getUserChatUser ();
@@ -138,7 +151,11 @@ class ChatMonitorInboxNamedNoteUpdateAction
 			otherChatUser =
 				monitorInbox.getMonitorChatUser ();
 
-		} else if (equal (typeString, "monitor")) {
+		} else if (
+			equal (
+				typeString,
+				"monitor")
+		) {
 
 			thisChatUser =
 				monitorInbox.getMonitorChatUser ();
@@ -189,7 +206,8 @@ class ChatMonitorInboxNamedNoteUpdateAction
 		if (namedNote == null) {
 
 			namedNote =
-				chatNamedNoteHelper.createInstance ()
+				chatNamedNoteHelper.insert (
+					chatNamedNoteHelper.createInstance ()
 
 				.setChatNoteName (
 					chatNoteName)
@@ -198,24 +216,33 @@ class ChatMonitorInboxNamedNoteUpdateAction
 					thisChatUser)
 
 				.setOtherUser (
-					otherChatUser);
+					otherChatUser)
 
-		}
+				.setText (
+					newText)
 
-		chatNamedNoteHelper.insert (
+				.setUser (
+					myUser)
+
+				.setTimestamp (
+					transaction.now ())
+
+			);
+
+		} else {
+
 			namedNote
 
-			.setText (
-				newText)
+				.setText (
+					newText)
 
-			.setUser (
-				myUser)
+				.setUser (
+					myUser)
 
-			.setTimestamp (
-				transaction.now ())
+				.setTimestamp (
+					transaction.now ());
 
-		);
-
+		}
 
 		chatNamedNoteLogHelper.insert (
 			chatNamedNoteLogHelper.createInstance ()

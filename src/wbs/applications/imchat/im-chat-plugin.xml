@@ -36,6 +36,7 @@
 
 	<layer name="api">
 		<bean class="api.ImChatApiLogicImplementation"/>
+		<bean class="api.ImChatConditionsAcceptAction"/>
 		<bean class="api.ImChatConversationEndAction"/>
 		<bean class="api.ImChatConversationStartAction"/>
 		<bean class="api.ImChatCustomerCreateAction"/>

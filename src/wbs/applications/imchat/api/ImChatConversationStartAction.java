@@ -1,5 +1,6 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.hyphenToUnderscore;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import java.io.IOException;
@@ -126,7 +127,9 @@ class ImChatConversationStartAction
 					"longer active");
 
 			return jsonResponderProvider.get ()
-				.value (failureResponse);
+
+				.value (
+					failureResponse);
 
 		}
 
@@ -138,7 +141,8 @@ class ImChatConversationStartAction
 		ImChatProfileRec profile =
 			imChatProfileHelper.findByCode (
 				imChat,
-				startRequest.profileCode ());
+				hyphenToUnderscore (
+					startRequest.profileCode ()));
 
 		if (
 			profile == null
@@ -156,7 +160,9 @@ class ImChatConversationStartAction
 					"The profile id is invalid");
 
 			return jsonResponderProvider.get ()
-				.value (failureResponse);
+
+				.value (
+					failureResponse);
 
 		}
 
@@ -223,7 +229,9 @@ class ImChatConversationStartAction
 		transaction.commit ();
 
 		return jsonResponderProvider.get ()
-			.value (successResponse);
+
+			.value (
+				successResponse);
 
 	}
 
