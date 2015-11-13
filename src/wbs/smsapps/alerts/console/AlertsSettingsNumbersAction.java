@@ -2,6 +2,7 @@ package wbs.smsapps.alerts.console;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.pluralise;
@@ -172,8 +173,6 @@ class AlertsSettingsNumbersAction
 					newName)
 			) {
 
-System.out.println ("UPDATE NAME " + alertsNumber.getId ());
-
 				alertsNumber
 
 					.setName (
@@ -202,8 +201,6 @@ System.out.println ("UPDATE NAME " + alertsNumber.getId ());
 					alertsNumber.getNumber ().getNumber (),
 					newNumber)
 			) {
-
-System.out.println ("UPDATE NUMBER " + alertsNumber.getId ());
 
 				NumberRec numberRec =
 					numberHelper.findOrCreate (
@@ -238,8 +235,6 @@ System.out.println ("UPDATE NUMBER " + alertsNumber.getId ());
 					alertsNumber.getEnabled (),
 					newEnabled)
 			) {
-
-System.out.println ("UPDATE ENABLED " + alertsNumber.getId ());
 
 				alertsNumber
 
@@ -353,8 +348,6 @@ System.out.println ("UPDATE ENABLED " + alertsNumber.getId ());
 			alertsNumberHelper.insert (
 				alertsNumber);
 
-System.out.println ("ADDED " + alertsNumber.getId ());
-
 			eventLogic.createEvent (
 				"alerts_number_created",
 				myUser,
@@ -400,13 +393,25 @@ System.out.println ("ADDED " + alertsNumber.getId ());
 
 		transaction.commit ();
 
-		for (
-			String notice
-				: notices
+		if (
+			isNotEmpty (
+				notices)
 		) {
 
-			requestContext.addNotice (
-				notice);
+			for (
+				String notice
+					: notices
+			) {
+
+				requestContext.addNotice (
+					notice);
+
+			}
+
+		} else {
+
+			requestContext.addWarning (
+				"No changes to save");
 
 		}
 

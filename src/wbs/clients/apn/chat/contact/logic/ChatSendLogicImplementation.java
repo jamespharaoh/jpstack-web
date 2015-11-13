@@ -289,14 +289,15 @@ class ChatSendLogicImplementation
 
 		chatHelpLogLogic.createChatHelpLogOut (
 			chatUser,
-			null,
-			null,
+			Optional.<ChatHelpLogRec>absent (),
+			Optional.<UserRec>absent (),
 			message,
-			null,
+			Optional.<ChatMessageRec>absent (),
 			finalText,
-			null);
+			Optional.<CommandRec>absent ());
 
-		return Optional.of (message);
+		return Optional.of (
+			message);
 
 	}
 
