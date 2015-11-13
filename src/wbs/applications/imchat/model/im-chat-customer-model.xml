@@ -27,6 +27,10 @@
 			name="acceptedTermsAndConditions"
 			default="no"/>
 
+		<yes-no-field
+			name="detailsCompleted"
+			default="no"/>
+
 		<!-- statistics -->
 
 		<integer-field
@@ -58,7 +62,14 @@
 	<collections>
 
 		<children-list
+			name="purchases"
 			type="imChatPurchase"/>
+
+		<children-mapping
+			name="details"
+			type="imChatCustomerDetailValue"
+			map-type="integer"
+			map-column="im_chat_customer_detail_type_id"/>
 
 	</collections>
 
@@ -67,6 +78,11 @@
 		<event-type
 			name="IM chat customer conditions accepted"
 			text="%0 accepted terms and conditions"
+			admin="no"/>
+
+		<event-type
+			name="IM chat customer detail updated"
+			text="%0 set value for %1 to %2"
 			admin="no"/>
 
 	</event-types>

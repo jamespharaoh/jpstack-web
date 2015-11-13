@@ -19,6 +19,10 @@
 			<post-action name="customerCreate"/>
 		</resource>
 
+		<resource name="details-update">
+			<post-action name="detailsUpdate"/>
+		</resource>
+
 		<resource name="message-send">
 			<post-action name="messageSend"/>
 		</resource>

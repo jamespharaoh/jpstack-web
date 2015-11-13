@@ -24,6 +24,9 @@ class ImChatCustomerData {
 	Boolean conditionsAccepted;
 
 	@DataAttribute
+	Boolean detailsCompleted;
+
+	@DataAttribute
 	Integer balance;
 
 	@DataAttribute

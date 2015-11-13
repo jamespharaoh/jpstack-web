@@ -130,7 +130,7 @@ class ImChatPurchaseHistoryAction
 
 		List<ImChatPurchaseRec> purchases =
 			new ArrayList<ImChatPurchaseRec> (
-				customer.getImChatPurchases ());
+				customer.getPurchases ());
 
 		Lists.reverse (
 			purchases);

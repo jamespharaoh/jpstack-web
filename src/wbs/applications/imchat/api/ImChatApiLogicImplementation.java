@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableList;
 
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerDetailTypeRec;
+import wbs.applications.imchat.model.ImChatCustomerDetailValueRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;
 import wbs.applications.imchat.model.ImChatPricePointRec;
@@ -148,6 +149,9 @@ class ImChatApiLogicImplementation
 			.conditionsAccepted (
 				customer.getAcceptedTermsAndConditions ())
 
+			.detailsCompleted (
+				customer.getDetailsCompleted ())
+
 			.balance (
 				customer.getBalance ())
 
@@ -178,6 +182,10 @@ class ImChatApiLogicImplementation
 				: imChat.getCustomerDetailTypes ()
 		) {
 
+			ImChatCustomerDetailValueRec customerDetailValue =
+				customer.getDetails ().get (
+					customerDetailType.getId ());
+
 			returnBuilder.add (
 				new ImChatCustomerDetailData ()
 
@@ -200,6 +208,11 @@ class ImChatApiLogicImplementation
 
 				.minimumAge (
 					customerDetailType.getMinimumAge ())
+
+				.value (
+					customerDetailValue != null
+						? customerDetailValue.getValue ()
+						: null)
 
 			);
 

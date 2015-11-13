@@ -1,36 +1,24 @@
 package wbs.applications.imchat.api;
 
+import java.util.Map;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
 @DataClass
-public
-class ImChatCustomerDetailData {
+public 
+class ImChatDetailsUpdateRequest {
 
 	@DataAttribute
-	String code;
+	String sessionSecret;
 
-	@DataAttribute
-	String label;
-
-	@DataAttribute
-	String help;
-
-	@DataAttribute
-	Boolean required;
-
-	@DataAttribute
-	String dataType;
-
-	@DataAttribute
-	Integer minimumAge;
-
-	@DataAttribute
-	String value;
+	@DataChildren
+	Map<String,String> details;
 
 }

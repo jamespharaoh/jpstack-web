@@ -9,28 +9,13 @@ import wbs.framework.data.annotations.DataClass;
 @Accessors (fluent = true)
 @Data
 @DataClass
-public
-class ImChatCustomerDetailData {
+public 
+class ImChatDetailsUpdateSuccess {
 
 	@DataAttribute
-	String code;
+	String status = "success";
 
 	@DataAttribute
-	String label;
-
-	@DataAttribute
-	String help;
-
-	@DataAttribute
-	Boolean required;
-
-	@DataAttribute
-	String dataType;
-
-	@DataAttribute
-	Integer minimumAge;
-
-	@DataAttribute
-	String value;
+	ImChatCustomerData customer;
 
 }

@@ -20,6 +20,7 @@
 		<model name="imChat"/>
 		<model name="imChatCustomer"/>
 		<model name="imChatCustomerDetailType"/>
+		<model name="imChatCustomerDetailValue"/>
 		<model name="imChatConversation"/>
 		<model name="imChatMessage"/>
 		<model name="imChatPricePoint"/>
@@ -40,6 +41,7 @@
 		<bean class="api.ImChatConversationEndAction"/>
 		<bean class="api.ImChatConversationStartAction"/>
 		<bean class="api.ImChatCustomerCreateAction"/>
+		<bean class="api.ImChatDetailsUpdateAction"/>
 		<bean class="api.ImChatMediaResponder"/>
 		<bean class="api.ImChatMessageSendAction"/>
 		<bean class="api.ImChatMessageListAction"/>

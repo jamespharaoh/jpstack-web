@@ -79,6 +79,12 @@
 		<name-field/>
 		<description-field/>
 
+		<text-field
+			name="label"/>
+
+		<text-field
+			name="help"/>
+
 		<yes-no-field
 			name="required"/>
 
@@ -89,6 +95,9 @@
 		<integer-field
 			name="minimumAge"
 			nullable="yes"/>
+
+		<integer-field
+			name="ordering"/>
 
 	</field-set>
 
@@ -103,6 +112,12 @@
 		<description-field/>
 		<deleted-field/>
 
+		<text-field
+			name="label"/>
+
+		<text-field
+			name="help"/>
+
 		<yes-no-field
 			name="required"/>
 
@@ -112,6 +127,9 @@
 
 		<integer-field
 			name="minimumAge"/>
+
+		<integer-field
+			name="ordering"/>
 
 	</field-set>
 
@@ -123,6 +141,12 @@
 		<description-field/>
 		<deleted-field/>
 
+		<text-field
+			name="label"/>
+
+		<text-field
+			name="help"/>
+
 		<yes-no-field
 			name="required"/>
 
@@ -133,6 +157,9 @@
 		<integer-field
 			name="minimumAge"
 			nullable="yes"/>
+
+		<integer-field
+			name="ordering"/>
 
 	</field-set>
 

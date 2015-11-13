@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.bill.daemon;
 
 import static wbs.framework.utils.etc.Misc.earlierThan;
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.laterThan;
 
@@ -398,8 +399,13 @@ class ChatPromoCommand
 		}
 
 		if (
+
 			chatPromo.getJoinDating ()
-			&& chatUser.getDateMode () == ChatUserDateMode.none
+
+			&& equal (
+				chatUser.getDateMode (),
+				ChatUserDateMode.none)
+
 		) {
 
 			chatDateLogic.userDateStuff (
