@@ -1,10 +1,14 @@
 package wbs.clients.apn.chat.infosite.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.notEqual;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+
 import wbs.api.mvc.ApiAction;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
@@ -17,6 +21,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
+import wbs.platform.media.model.MediaRec;
 
 @PrototypeComponent ("chatInfoSiteRespondAction")
 public
@@ -49,27 +54,33 @@ class ChatInfoSiteRespondAction
 
 		ChatInfoSiteRec infoSite =
 			chatInfoSiteHelper.find (
-				requestContext.requestInt ("chatInfoSiteId"));
+				requestContext.requestInt (
+					"chatInfoSiteId"));
 
-		if (! equal (
+		if (
+			notEqual (
 				infoSite.getToken (),
-				requestContext.request ("chatInfoSiteToken"))) {
+				requestContext.request (
+					"chatInfoSiteToken"))
+		) {
 
-			throw new RuntimeException ("Token mismatch");
+			throw new RuntimeException (
+				"Token mismatch");
 
 		}
 
 		ChatUserRec otherUser =
 			chatUserHelper.find (
-				requestContext.parameterInt ("otherUserId"));
+				requestContext.parameterInt (
+					"otherUserId"));
 
 		chatMessageLogic.chatMessageSendFromUser (
 			infoSite.getChatUser (),
 			otherUser,
 			requestContext.parameter ("text"),
-			null,
+			Optional.<Integer>absent (),
 			ChatMessageMethod.infoSite,
-			null);
+			ImmutableList.<MediaRec>of ());
 
 		transaction.commit ();
 

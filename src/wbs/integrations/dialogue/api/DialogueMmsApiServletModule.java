@@ -166,11 +166,12 @@ class DialogueMmsApiServletModule
 					matcher.group (2);
 
 				medias.add (
-					mediaLogic.createMedia (
+					mediaLogic.createMediaRequired (
 						item.get (),
 						type,
 						item.getName (),
-						charset));
+						Optional.of (
+							charset)));
 
 				if (
 					text == null

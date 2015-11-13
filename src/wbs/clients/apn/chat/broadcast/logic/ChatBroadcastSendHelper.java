@@ -18,7 +18,6 @@ import wbs.clients.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastRec;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastState;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageStatus;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
@@ -360,7 +359,7 @@ class ChatBroadcastSendHelper
 		// create chat message
 
 		chatMessageHelper.insert (
-			new ChatMessageRec ()
+			chatMessageHelper.createInstance ()
 
 			.setChat (
 				chat)

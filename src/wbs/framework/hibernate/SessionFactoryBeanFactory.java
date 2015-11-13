@@ -1,10 +1,12 @@
 package wbs.framework.hibernate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.classForName;
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.File;
@@ -45,6 +47,7 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.Seconds;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -152,34 +155,40 @@ class SessionFactoryBeanFactory
 
 		valueFieldTypes =
 			ImmutableSet.<Class<?>>builder ()
-				.addAll (builtinFieldTypes)
-				.addAll (customTypes.keySet ())
-				.build ();
+
+			.addAll (
+				builtinFieldTypes)
+
+			.addAll (
+				customTypes.keySet ())
+
+			.build ();
 
 	}
 
 	void initCustomType (
 			@NonNull PluginCustomTypeSpec type) {
 
-		String className =
+		String objectClassName =
 			stringFormat (
 				"%s.model.%s",
 				type.plugin ().packageName (),
-				capitalise (type.name ()));
+				capitalise (
+					type.name ()));
 
-		Class<?> objectClass = null;
+		Optional<Class<?>> objectClassOptional =
+			classForName (
+				objectClassName);
 
-		try {
-
-			objectClass =
-				Class.forName (className);
-
-		} catch (ClassNotFoundException exception) {
+		if (
+			isNotPresent (
+				objectClassOptional)
+		) {
 
 			log.error (
 				stringFormat (
 					"No such class %s",
-					className));
+					objectClassName));
 
 		}
 
@@ -187,26 +196,34 @@ class SessionFactoryBeanFactory
 			stringFormat (
 				"%s.hibernate.%sType",
 				type.plugin ().packageName (),
-				capitalise (type.name ()));
+				capitalise (
+					type.name ()));
 
-		Class<?> helperClass = null;
+		Optional<Class<?>> helperClassOptional =
+			classForName (
+				helperClassName);
 
-		try {
-
-			helperClass =
-				Class.forName (helperClassName);
-
-		} catch (ClassNotFoundException exception) {
+		if (
+			isNotPresent (
+				helperClassOptional)
+		) {
 
 			log.error (
 				stringFormat (
 					"No such class %s",
-					className));
+					helperClassName));
 
 		}
 
-		if (objectClass == null
-				|| helperClass == null) {
+		if (
+
+			isNotPresent (
+				objectClassOptional)
+
+			|| isNotPresent (
+				helperClassOptional)
+
+		) {
 
 			errorTypes ++;
 
@@ -215,7 +232,7 @@ class SessionFactoryBeanFactory
 		}
 
 		customTypes.put (
-			objectClass,
+			objectClassOptional.get (),
 			helperClassName);
 
 	}
@@ -227,16 +244,17 @@ class SessionFactoryBeanFactory
 			stringFormat (
 				"%s.model.%s",
 				enumType.plugin ().packageName (),
-				capitalise (enumType.name ()));
+				capitalise (
+					enumType.name ()));
 
-		Class<?> enumClass = null;
+		Optional<Class<?>> enumClassOptional =
+			classForName (
+				enumClassName);
 
-		try {
-
-			enumClass =
-				Class.forName (enumClassName);
-
-		} catch (ClassNotFoundException exception) {
+		if (
+			isNotPresent (
+				enumClassOptional)
+		) {
 
 			log.error (
 				stringFormat (
@@ -249,7 +267,14 @@ class SessionFactoryBeanFactory
 
 		}
 
-		if (enumTypes.contains (enumClass)) {
+		Class<?> enumClass =
+			enumClassOptional.get ();
+
+		if (
+			contains (
+				enumTypes,
+				enumClass)
+		) {
 
 			throw new RuntimeException (
 				stringFormat (
@@ -441,11 +466,21 @@ class SessionFactoryBeanFactory
 
 		Element classElement =
 			hibernateMappingElement
-				.addElement ("class")
-				.addAttribute ("name", model.objectClass ().getSimpleName ())
-				.addAttribute ("table", tableNameSql)
-				.addAttribute ("cascade", "save-update")
-				.addAttribute ("lazy", "true");
+
+			.addElement (
+				"class")
+
+			.addAttribute (
+				"name",
+				model.objectClass ().getSimpleName ())
+
+			.addAttribute (
+				"table",
+				tableNameSql)
+
+			.addAttribute (
+				"lazy",
+				"true");
 
 		if (! model.mutable ()) {
 
@@ -960,11 +995,11 @@ class SessionFactoryBeanFactory
 				modelField.name ())
 
 			.addAttribute (
-				"cascade",
-				"save-update")
+				"lazy",
+				"true")
 
 			.addAttribute (
-				"lazy",
+				"inverse",
 				"true");
 
 		if (modelField.orderSql () != null) {
@@ -1079,15 +1114,17 @@ class SessionFactoryBeanFactory
 				modelField.name ())
 
 			.addAttribute (
-				"cascade",
-				"save-update")
+				"lazy",
+				"true")
 
 			.addAttribute (
-				"lazy",
+				"inverse",
 				"true");
 
-
-		if (modelField.orderSql () != null) {
+		if (
+			isNotNull (
+				modelField.orderSql ())
+		) {
 
 			listElement
 
@@ -1230,11 +1267,11 @@ class SessionFactoryBeanFactory
 				modelField.name ())
 
 			.addAttribute (
-				"cascade",
-				"save-update")
+				"lazy",
+				"true")
 
 			.addAttribute (
-				"lazy",
+				"inverse",
 				"true");
 
 		// key
@@ -1290,7 +1327,11 @@ class SessionFactoryBeanFactory
 
 			.addAttribute (
 				"type",
-				indexType);
+				indexType)
+
+			.addAttribute (
+				"inverse",
+				"true");
 
 		// value
 
@@ -1343,13 +1384,26 @@ class SessionFactoryBeanFactory
 					modelField.associationTableName ())
 
 				.addAttribute (
-					"cascade",
-					"save-update")
-
-				.addAttribute (
 					"lazy",
 					"true");
 
+			if (modelField.owned ()) {
+
+				setElement
+
+					.addAttribute (
+						"cascade",
+						"all");
+
+			} else {
+
+				setElement
+
+					.addAttribute (
+						"inverse",
+						"true");
+
+			}
 
 			if (modelField.whereSql () != null) {
 
@@ -1470,14 +1524,31 @@ class SessionFactoryBeanFactory
 					modelField.associationTableName ())
 
 				.addAttribute (
-					"cascade",
-					"save-update")
-
-				.addAttribute (
 					"lazy",
 					"true");
 
-			if (modelField.whereSql () != null) {
+			if (modelField.owned ()) {
+
+				listElement
+
+					.addAttribute (
+						"cascade",
+						"all");
+
+			} else {
+
+				listElement
+
+					.addAttribute (
+						"inverse",
+						"true");
+
+			}
+
+			if (
+				isNotNull (
+					modelField.whereSql ())
+			) {
 
 				listElement
 

@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.AbstractObjectHooks;
@@ -50,8 +51,10 @@ class AffiliateHooks
 		List<ObjectTypeRec> objectTypes =
 			objectTypeDao.findAll ();
 
-		for (ObjectTypeRec objectType
-				: objectTypes) {
+		for (
+			ObjectTypeRec objectType
+				: objectTypes
+		) {
 
 			List<AffiliateTypeRec> affiliateTypes =
 				affiliateTypeDao.findByParentObjectType (
@@ -97,7 +100,7 @@ class AffiliateHooks
 		) {
 
 			affiliateHelper.insert (
-				new AffiliateRec ()
+				affiliateHelper.createInstance ()
 
 				.setAffiliateType (
 					affiliateType)

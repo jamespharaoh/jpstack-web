@@ -8,18 +8,15 @@ import wbs.framework.record.GlobalId;
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.keyword.model.KeywordObjectHelper;
-import wbs.sms.keyword.model.KeywordRec;
 import wbs.sms.keyword.model.KeywordSetObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.router.model.RouterObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateObjectHelper;
-import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
 
 @PrototypeComponent ("manualResponderFixtureProvider")
 public
@@ -77,7 +74,7 @@ class ManualResponderFixtureProvider
 	void createMenuItem () {
 
 		menuItemHelper.insert (
-			new MenuItemRec ()
+			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
@@ -112,7 +109,7 @@ class ManualResponderFixtureProvider
 
 		ManualResponderRec manualResponder =
 			manualResponderHelper.insert (
-				new ManualResponderRec ()
+				manualResponderHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -136,7 +133,7 @@ class ManualResponderFixtureProvider
 		);
 
 		keywordHelper.insert (
-			new KeywordRec ()
+			keywordHelper.createInstance ()
 
 			.setKeywordSet (
 				keywordSetHelper.findByCode (
@@ -167,7 +164,7 @@ class ManualResponderFixtureProvider
 			ManualResponderRec manualResponder) {
 
 		manualResponderTemplateHelper.insert (
-			new ManualResponderTemplateRec ()
+			manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (
 				manualResponder)
@@ -207,7 +204,7 @@ class ManualResponderFixtureProvider
 		);
 
 		manualResponderTemplateHelper.insert (
-			new ManualResponderTemplateRec ()
+			manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (
 				manualResponder)
@@ -262,7 +259,7 @@ class ManualResponderFixtureProvider
 		);
 
 		manualResponderTemplateHelper.insert (
-			new ManualResponderTemplateRec ()
+			manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (
 				manualResponder)
@@ -317,7 +314,7 @@ class ManualResponderFixtureProvider
 		);
 
 		manualResponderTemplateHelper.insert (
-			new ManualResponderTemplateRec ()
+			manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (
 				manualResponder)
@@ -372,7 +369,7 @@ class ManualResponderFixtureProvider
 		);
 
 		manualResponderTemplateHelper.insert (
-			new ManualResponderTemplateRec ()
+			manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (
 				manualResponder)

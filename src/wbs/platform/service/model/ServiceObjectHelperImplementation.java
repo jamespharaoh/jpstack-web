@@ -12,6 +12,8 @@ public
 class ServiceObjectHelperImplementation
 	implements ServiceObjectHelperMethods {
 
+	// dependencies
+
 	@Inject
 	Provider<ObjectManager> objectManagerProvider;
 
@@ -23,6 +25,8 @@ class ServiceObjectHelperImplementation
 
 	@Inject
 	Provider<ObjectTypeObjectHelper> objectTypeHelperProvider;
+
+	// implementation
 
 	@Override
 	public
@@ -43,22 +47,22 @@ class ServiceObjectHelperImplementation
 		ServiceTypeObjectHelper serviceTypeHelper =
 			serviceTypeHelperProvider.get ();
 
-		// lookup existing service...
+		// lookup existing service
 
 		ServiceRec service =
-			serviceHelper
-				.findByCode (
-					parent,
-					code);
+			serviceHelper.findByCode (
+				parent,
+				code);
 
 		if (service != null)
 			return service;
 
-		// ...or create new service
+		// create new service
 
 		ObjectTypeRec parentType =
 			objectTypeHelper.find (
-				objectManager.getObjectTypeId (parent));
+				objectManager.getObjectTypeId (
+					parent));
 
 		ServiceTypeRec serviceType =
 			serviceTypeHelper.findByCode (
@@ -67,13 +71,10 @@ class ServiceObjectHelperImplementation
 
 		service =
 			serviceHelper.insert (
-				new ServiceRec ()
+				serviceHelper.createInstance ()
 
 			.setCode (
 				code)
-
-			.setDescription (
-				serviceType.getDescription ())
 
 			.setServiceType (
 				serviceType)

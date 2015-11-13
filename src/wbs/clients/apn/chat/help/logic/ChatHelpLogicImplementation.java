@@ -1,8 +1,12 @@
 package wbs.clients.apn.chat.help.logic;
 
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+
 import java.util.List;
 
 import javax.inject.Inject;
+
+import lombok.NonNull;
 
 import com.google.common.base.Optional;
 
@@ -53,11 +57,11 @@ class ChatHelpLogicImplementation
 	@Override
 	public
 	void sendHelpMessage (
-			UserRec user,
-			ChatUserRec chatUser,
-			String text,
-			Integer threadId,
-			ChatHelpLogRec replyTo) {
+			@NonNull UserRec user,
+			@NonNull ChatUserRec chatUser,
+			@NonNull String text,
+			@NonNull Optional<Integer> threadId,
+			@NonNull Optional<ChatHelpLogRec> replyTo) {
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -115,18 +119,21 @@ class ChatHelpLogicImplementation
 			MessageRec message =
 				chatSendLogic.sendMessageMagic (
 					chatUser,
-					Optional.fromNullable (
-						threadId),
+					threadId,
 					textHelper.findOrCreate (
 						splitText),
 					magicCommand,
 					helpService,
 					helpCommand.getId ());
 
-			if (threadId == null) {
+			if (
+				isNotPresent (
+					threadId)
+			) {
 
 				threadId =
-					message.getId ();
+					Optional.of (
+						message.getId ());
 
 			}
 
@@ -134,8 +141,7 @@ class ChatHelpLogicImplementation
 
 			chatHelpLogLogic.createChatHelpLogOut (
 				chatUser,
-				Optional.of (
-					replyTo),
+				replyTo,
 				Optional.of (
 					user),
 				message,

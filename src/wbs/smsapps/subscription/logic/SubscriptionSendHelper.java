@@ -240,7 +240,7 @@ class SubscriptionSendHelper
 
 		BatchRec batch =
 			batchHelper.insert (
-				new BatchRec ()
+				batchHelper.createInstance ()
 
 			.setParentType (
 				objectTypeHelper.find (
@@ -291,7 +291,7 @@ class SubscriptionSendHelper
 				continue;
 
 			subscriptionSendNumberHelper.insert (
-				new SubscriptionSendNumberRec ()
+				subscriptionSendNumberHelper.createInstance ()
 
 				.setSubscriptionSend (
 					subscriptionSend)

@@ -23,11 +23,13 @@
 
 		<associative-collection
 			type="user"
-			table="user_group"/>
+			table="user_group"
+			owned="yes"/>
 
 		<associative-collection
 			type="priv"
-			table="group_priv"/>
+			table="group_priv"
+			owned="yes"/>
 
 	</collections>
 

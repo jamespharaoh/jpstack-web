@@ -18,6 +18,9 @@ import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTimeZone;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
@@ -33,7 +36,6 @@ import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserSessionObjectHelper;
-import wbs.clients.apn.chat.user.core.model.ChatUserSessionRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.clients.apn.chat.user.core.model.Orient;
@@ -60,9 +62,6 @@ import wbs.sms.locator.model.LongLat;
 import wbs.sms.magicnumber.logic.MagicNumberLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.logic.MessageSender;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @SingletonComponent ("chatMiscLogic")
@@ -400,7 +399,7 @@ class ChatMiscLogicImpl
 		if (! wasOnline) {
 
 			chatUserSessionHelper.insert (
-				new ChatUserSessionRec ()
+				chatUserSessionHelper.createInstance ()
 
 				.setChatUser (
 					chatUser)
@@ -663,7 +662,7 @@ class ChatMiscLogicImpl
 
 		ChatUserNameRec chatUserName =
 			chatUserNameHelper.insert (
-				new ChatUserNameRec ()
+				chatUserNameHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)

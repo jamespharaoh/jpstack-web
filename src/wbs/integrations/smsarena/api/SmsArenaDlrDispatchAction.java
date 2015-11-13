@@ -20,7 +20,6 @@ import wbs.framework.web.Action;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.integrations.smsarena.model.SmsArenaDlrReportLogObjectHelper;
-import wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec;
 import wbs.integrations.smsarena.model.SmsArenaDlrReportLogType;
 import wbs.integrations.smsarena.model.SmsArenaReportCodeObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaReportCodeRec;
@@ -187,16 +186,16 @@ class SmsArenaDlrDispatchAction
 			// get the code and create the report
 
 			SmsArenaReportCodeRec reportCode =
-					smsArenaReportCodeHelper.findByCode (
-						smsArenaRouteIn.getSmsArenaConfig (),
-						dlr);
+				smsArenaReportCodeHelper.findByCode (
+					smsArenaRouteIn.getSmsArenaConfig (),
+					dlr);
 
 			reportLogic.deliveryReport (
-					route,
-					id,
-					reportCode.getMessageStatus (),
-					DateTime.now().toDate(),
-					null);
+				route,
+				id,
+				reportCode.getMessageStatus (),
+				DateTime.now().toDate(),
+				null);
 
 			transaction.commit ();
 
@@ -235,7 +234,7 @@ class SmsArenaDlrDispatchAction
 							"routeId")));
 
 			smsArenaDlrReportLogHelper.insert (
-				new SmsArenaDlrReportLogRec ()
+				smsArenaDlrReportLogHelper.createInstance ()
 
 				.setRoute (
 					route)

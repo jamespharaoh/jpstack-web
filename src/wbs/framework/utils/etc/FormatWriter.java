@@ -9,7 +9,10 @@ interface FormatWriter {
 	void writeFormatArray (
 			Object[] arguments);
 
-	public
 	void close ();
+
+	void indent ();
+
+	void unindent ();
 
 }

@@ -161,7 +161,7 @@ class ManualResponderCommand
 
 		ManualResponderRequestRec request =
 			manualResponderRequestHelper.insert (
-				new ManualResponderRequestRec ()
+				manualResponderRequestHelper.createInstance ()
 
 			.setManualResponder (
 				manualResponder)

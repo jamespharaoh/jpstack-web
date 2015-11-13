@@ -144,7 +144,7 @@ class ChatUserAdminBillAction
 		// log it
 
 		chatUserBillLogHelper.insert (
-			new ChatUserBillLogRec ()
+			chatUserBillLogHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)

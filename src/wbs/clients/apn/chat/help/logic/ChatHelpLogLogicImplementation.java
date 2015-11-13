@@ -10,12 +10,12 @@ import com.google.common.base.Optional;
 
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
+import wbs.clients.apn.chat.help.model.ChatHelpLogObjectHelper;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.object.ObjectManager;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.user.model.UserRec;
@@ -28,14 +28,18 @@ public
 class ChatHelpLogLogicImplementation
 	implements ChatHelpLogLogic {
 
+	// dependencies
+
+	@Inject
+	ChatHelpLogObjectHelper chatHelpLogHelper;
+
 	@Inject
 	Database database;
 
 	@Inject
-	ObjectManager objectManager;
-
-	@Inject
 	QueueLogic queueLogic;
+
+	// implementation
 
 	@Override
 	public
@@ -55,8 +59,8 @@ class ChatHelpLogLogicImplementation
 		// create the request first
 
 		ChatHelpLogRec chatHelpLog =
-			objectManager.insert (
-				new ChatHelpLogRec ()
+			chatHelpLogHelper.insert (
+				chatHelpLogHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)
@@ -123,8 +127,8 @@ class ChatHelpLogLogicImplementation
 		Transaction transaction =
 			database.currentTransaction ();
 
-		return objectManager.insert (
-			new ChatHelpLogRec ()
+		return chatHelpLogHelper.insert (
+			chatHelpLogHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)

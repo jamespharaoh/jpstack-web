@@ -131,7 +131,12 @@ class AssociativeListModelFieldBuilder {
 			.listIndexColumnName (
 				ifNull (
 					spec.listColumnName (),
-					"index"));
+					"index"))
+
+			.owned (
+				ifNull (
+					spec.owned (),
+					false));
 
 		// store field
 

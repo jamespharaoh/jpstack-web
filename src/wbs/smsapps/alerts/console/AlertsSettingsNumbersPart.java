@@ -31,7 +31,8 @@ class AlertsSettingsNumbersPart
 
 		alertsSettings =
 			alertsSettingsHelper.find (
-				requestContext.stuffInt ("alertsSettingsId"));
+				requestContext.stuffInt (
+					"alertsSettingsId"));
 
 	}
 
@@ -44,7 +45,10 @@ class AlertsSettingsNumbersPart
 		printFormat (
 			"<form method=\"post\">\n");
 
-		if (requestContext.canContext ("super")) {
+		if (
+			requestContext.canContext (
+				"super")
+		) {
 
 			printFormat (
 				"<p>",
@@ -68,43 +72,43 @@ class AlertsSettingsNumbersPart
 
 		// rows
 
-		for (AlertsNumberRec alertsNumber
-				: alertsSettings.getAlertsNumbers ()) {
+		for (
+			AlertsNumberRec alertsNumber
+				: alertsSettings.getAlertsNumbers ()
+		) {
 
 			printFormat (
 				"<tr>\n");
 
 			printFormat (
-				"<td>%s</td>\n",
+				"<td><input",
+				" type=\"text\"",
+				" name=\"%h\"",
 				stringFormat (
-					"<input",
-					" type=\"text\"",
-					" name=\"%h\"",
+					"name_%s",
+					alertsNumber.getId ()),
+				" value=\"%h\"",
+				requestContext.getForm (
 					stringFormat (
 						"name_%s",
 						alertsNumber.getId ()),
-					" value=\"%h\">",
-					requestContext.getForm (
-						stringFormat (
-							"name_%s",
-							alertsNumber.getId ()),
-						alertsNumber.getName ())));
+					alertsNumber.getName ()),
+				"></td>\n");
 
 			printFormat (
-				"<td>%s</td>\n",
+				"<td><input",
+				" type=\"text\"",
+				" name=\"%h\"",
 				stringFormat (
-					"<input",
-					" type=\"text\"",
-					" name=\"%h\"",
+					"number_%s",
+					alertsNumber.getId ()),
+				" value=\"%h\"",
+				requestContext.getForm (
 					stringFormat (
 						"number_%s",
 						alertsNumber.getId ()),
-					" value=\"%h\">",
-					requestContext.getForm (
-						stringFormat (
-							"number_%s",
-							alertsNumber.getId ()),
-						alertsNumber.getNumber ().getNumber ())));
+					alertsNumber.getNumber ().getNumber ()),
+				"></td>\n");
 
 			printFormat (
 				"<td>%s</td>\n",
@@ -119,16 +123,14 @@ class AlertsSettingsNumbersPart
 					alertsNumber.getEnabled ()));
 
 			printFormat (
-				"<td>%s</td>\n",
+				"<td><input",
+				" type=\"submit\"",
+				" name=\"%h\"",
 				stringFormat (
-					"<input",
-					" type=\"submit\"",
-					" name=\"%h\"",
-					stringFormat (
-						"delete_%s",
-						alertsNumber.getId ()),
-					" value=\"delete\"",
-					">"));
+					"delete_%s",
+					alertsNumber.getId ()),
+				" value=\"delete\"",
+				"></td>\n");
 
 			printFormat (
 				"</tr>\n");
@@ -141,30 +143,31 @@ class AlertsSettingsNumbersPart
 			"<tr>\n");
 
 		printFormat (
-			"<td>%s</td>\n",
-			stringFormat (
-				"<input",
-				" type=\"text\"",
-				" name=\"name_new\"",
-				" value=\"%h\"",
-				requestContext.getForm ("name_new"),
-				">"));
+			"<td><input",
+			" type=\"text\"",
+			" name=\"name_new\"",
+			" value=\"%h\"",
+			requestContext.getForm (
+				"name_new",
+				""),
+			"></td>\n");
 
 		printFormat (
-			"<td>%s</td>\n",
-			stringFormat (
-				"<input",
-				" type=\"text\"",
-				" name=\"number_new\"",
-				" value=\"%h\"",
-				requestContext.getForm ("number_new"),
-				">"));
+			"<td><input",
+			" type=\"text\"",
+			" name=\"number_new\"",
+			" value=\"%h\"",
+			requestContext.getForm (
+				"number_new",
+				""),
+			"></td>\n");
 
 		printFormat (
 			"<td>%s</td>\n",
 			Html.selectYesNo (
 				"enabled_new",
-				requestContext.getForm ("enabled_new"),
+				requestContext.getForm (
+					"enabled_new"),
 				true));
 
 		printFormat (
@@ -182,7 +185,10 @@ class AlertsSettingsNumbersPart
 		printFormat (
 			"</table>\n");
 
-		if (requestContext.canContext ("alertsSettings.manage")) {
+		if (
+			requestContext.canContext (
+				"alertsSettings.manage")
+		) {
 
 			printFormat (
 				"<p>",

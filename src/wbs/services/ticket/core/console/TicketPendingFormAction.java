@@ -19,7 +19,6 @@ import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
-import wbs.services.ticket.core.model.TicketNoteRec;
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketTemplateRec;
 
@@ -156,28 +155,33 @@ class TicketPendingFormAction
 				false);
 
 		} else {
-			throw new RuntimeException ("Timestamp out of bounds");
+
+			throw new RuntimeException (
+				"Timestamp out of bounds");
+
 		}
 
 		// check if a new note was added
 
 		String noteText =
-				requestContext.parameter ("note-text");
+			requestContext.parameter (
+				"note-text");
 
 		if (!noteText.isEmpty()) {
 
 			ticketNoteHelper.insert (
-				new TicketNoteRec ()
+				ticketNoteHelper.createInstance ()
 
-					.setTicket (
-						ticket)
+				.setTicket (
+					ticket)
 
-					.setIndex (
-						ticket.getNumNotes ())
+				.setIndex (
+					ticket.getNumNotes ())
 
-					.setNoteText(noteText)
+				.setNoteText (
+					noteText)
 
-				);
+			);
 
 			ticket
 			.setNumNotes (

@@ -16,7 +16,6 @@ import org.joda.time.Seconds;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
-import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationReason;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
@@ -187,7 +186,7 @@ class ChatMonitorInboxAlarmAction
 			// and create log
 
 			chatUserInitiationLogHelper.insert (
-				new ChatUserInitiationLogRec ()
+				chatUserInitiationLogHelper.createInstance ()
 
 				.setChatUser (
 					userChatUser)
@@ -221,7 +220,7 @@ class ChatMonitorInboxAlarmAction
 			if (chatUserAlarm == null) {
 
 				chatUserAlarm =
-					new ChatUserAlarmRec ()
+					chatUserAlarmHelper.createInstance ()
 
 					.setChatUser (
 						userChatUser)
@@ -262,7 +261,7 @@ class ChatMonitorInboxAlarmAction
 			// create log
 
 			chatUserInitiationLogHelper.insert (
-				new ChatUserInitiationLogRec ()
+				chatUserInitiationLogHelper.createInstance ()
 
 				.setChatUser (
 					userChatUser)

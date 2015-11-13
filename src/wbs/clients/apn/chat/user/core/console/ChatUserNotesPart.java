@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.user.core.console;
 
+import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -82,13 +83,14 @@ class ChatUserNotesPart
 
 		printFormat (
 			"<tr>\n",
-
 			"<th>Note</th>\n",
 
 			"<td>%s</td>\n",
 			stringFormat (
 				"<textarea name=\"note\">%h</textarea>",
-				requestContext.getForm ("note")),
+				emptyStringIfNull (
+					requestContext.getForm (
+						"note"))),
 
 			"</tr>\n");
 
@@ -120,26 +122,33 @@ class ChatUserNotesPart
 			"<th>User</th>\n",
 			"</tr>\n");
 
-		for (ChatUserNoteRec chatUserNote
-				: chatUserNotes) {
+		for (
+			ChatUserNoteRec chatUserNote
+				: chatUserNotes
+		) {
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
 					chatUserLogic.timezone (
 						chatUser),
-					chatUserNote.getTimestamp ()),
+					chatUserNote.getTimestamp ()));
 
-				"<td>%h</td> ",
-				chatUserNote.getText ().getText (),
+			printFormat (
+				"<td>%h</td>\n",
+				chatUserNote.getText ().getText ());
 
-				"%s",
+			printFormat (
+				"%s\n",
 				consoleObjectManager.tdForObjectMiniLink (
-					chatUserNote.getUser ()),
+					chatUserNote.getUser ()));
 
+			printFormat (
 				"</tr>\n");
+
 		}
 
 		printFormat (

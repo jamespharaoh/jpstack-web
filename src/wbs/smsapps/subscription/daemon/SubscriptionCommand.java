@@ -310,7 +310,7 @@ class SubscriptionCommand
 
 			SubscriptionSubRec newSubscriptionSub =
 				subscriptionSubHelper.insert (
-					new SubscriptionSubRec ()
+					subscriptionSubHelper.createInstance ()
 
 				.setSubscriptionNumber (
 					subscriptionNumber)

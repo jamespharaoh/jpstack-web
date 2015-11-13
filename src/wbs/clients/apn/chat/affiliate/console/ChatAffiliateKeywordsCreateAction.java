@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.toEnum;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.keyword.console.ChatKeywordConsoleHelper;
 import wbs.clients.apn.chat.keyword.model.ChatKeywordJoinType;
@@ -139,14 +140,28 @@ class ChatAffiliateKeywordsCreateAction
 
 		}
 
-		objectManager.insert (
-			new ChatSchemeKeywordRec ()
-				.setChatScheme (chatScheme)
-				.setKeyword (keyword)
-				.setJoinType (joinType)
-				.setJoinGender (gender)
-				.setJoinOrient (orient)
-				.setJoinChatAffiliate (chatAffiliate));
+		chatSchemeKeywordHelper.insert (
+			chatSchemeKeywordHelper.createInstance ()
+
+			.setChatScheme (
+				chatScheme)
+
+			.setKeyword (
+				keyword)
+
+			.setJoinType (
+				joinType)
+
+			.setJoinGender (
+				gender)
+
+			.setJoinOrient (
+				orient)
+
+			.setJoinChatAffiliate (
+				chatAffiliate)
+
+		);
 
 		transaction.commit ();
 
@@ -155,7 +170,8 @@ class ChatAffiliateKeywordsCreateAction
 
 		requestContext.setEmptyFormData ();
 
-		return responder ("chatAffiliateKeywordsListResponder");
+		return responder (
+			"chatAffiliateKeywordsListResponder");
 
 	}
 

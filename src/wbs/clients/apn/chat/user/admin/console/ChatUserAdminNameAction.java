@@ -7,6 +7,7 @@ import static wbs.framework.utils.etc.Misc.toEnum;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserEditReason;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -108,7 +109,7 @@ class ChatUserAdminNameAction
 
 			ChatUserNameRec chatUserName =
 				chatUserNameHelper.insert (
-					new ChatUserNameRec ()
+					chatUserNameHelper.createInstance ()
 
 				.setChatUser (
 					chatUser)

@@ -86,16 +86,13 @@ class ServiceHooks
 		) {
 
 			serviceHelper.insert (
-				new ServiceRec ()
+				serviceHelper.createInstance ()
 
 				.setServiceType (
 					serviceType)
 
 				.setCode (
 					serviceType.getCode ())
-
-				.setDescription (
-					serviceType.getDescription ())
 
 				.setParentType (
 					parentType)

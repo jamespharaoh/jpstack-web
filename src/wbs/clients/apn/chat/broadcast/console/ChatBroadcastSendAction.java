@@ -17,10 +17,12 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.log4j.Level;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.broadcast.logic.ChatBroadcastLogic;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberObjectHelper;
-import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberRec;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberState;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastRec;
@@ -63,15 +65,11 @@ import wbs.sms.gsm.Gsm;
 import wbs.sms.magicnumber.logic.MagicNumberLogic;
 import wbs.sms.message.batch.logic.BatchLogic;
 import wbs.sms.message.batch.model.BatchObjectHelper;
-import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.batch.model.BatchSubjectRec;
 import wbs.sms.number.core.console.NumberConsoleHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @PrototypeComponent ("chatBroadcastSendAction")
@@ -544,7 +542,7 @@ System.out.println ("include");
 						"broadcast");
 
 				batchHelper.insert (
-					new BatchRec ()
+					batchHelper.createInstance ()
 
 					.setSubject (
 						batchSubject)
@@ -588,7 +586,7 @@ System.out.println ("include");
 						messageString);
 
 				ChatBroadcastRec chatBroadcast =
-					new ChatBroadcastRec ()
+					chatBroadcastHelper.createInstance ()
 
 					.setChat (
 						chat)
@@ -729,7 +727,7 @@ System.out.println ("include");
 					// record this number in the broadcast
 
 					chatBroadcastNumberHelper.insert (
-						new ChatBroadcastNumberRec ()
+						chatBroadcastNumberHelper.createInstance ()
 
 						.setChatBroadcast (
 							chatBroadcast)

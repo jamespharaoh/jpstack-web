@@ -20,14 +20,15 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.joda.time.Instant;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.database.TransactionView;
-
-import com.google.common.collect.ImmutableMap;
+import wbs.framework.record.UnsavedRecordDetector;
 
 @SingletonComponent ("database")
 @Log4j
@@ -152,8 +153,12 @@ class HibernateDatabase
 
 			newTransaction.begin ();
 
-			if (makeCurrent)
-				currentTransactionStack.add (newTransaction);
+			if (makeCurrent) {
+
+				currentTransactionStack.add (
+					newTransaction);
+
+			}
 
 			return newTransaction;
 
@@ -172,8 +177,12 @@ class HibernateDatabase
 
 			newTransaction.begin ();
 
-			if (makeCurrent)
-				currentTransactionStack.add (newTransaction);
+			if (makeCurrent) {
+
+				currentTransactionStack.add (
+					newTransaction);
+
+			}
 
 			return newTransaction;
 
@@ -344,6 +353,9 @@ class HibernateDatabase
 			hibernateTransaction =
 				session.beginTransaction ();
 
+			UnsavedRecordDetector.instance.createFrame (
+				this);
+
 		}
 
 		@Override
@@ -383,13 +395,25 @@ class HibernateDatabase
 
 			// remove us from the transaction stack
 
-			if (stack != null)
-				stack.remove (this);
+			if (stack != null) {
+
+				stack.remove (
+					this);
+
+			}
+
+			// verify unsaved records
+
+			UnsavedRecordDetector.instance.verifyFrame (
+				this);
 
 			// do the commit
 
-			if (hibernateTransaction != null)
+			if (hibernateTransaction != null) {
+
 				hibernateTransaction.commit ();
+
+			}
 
 			committed = true;
 
@@ -473,6 +497,21 @@ class HibernateDatabase
 
 					log.fatal (
 						"Error closing active task",
+						exception);
+
+				}
+
+				// always tidy unsaved record detector
+
+				try {
+
+					UnsavedRecordDetector.instance.destroyFrame (
+						this);
+
+				} catch (Exception exception) {
+
+					log.fatal (
+						"Error destroying unsaved record detector frame",
 						exception);
 
 				}

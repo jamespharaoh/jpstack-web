@@ -11,7 +11,6 @@ import wbs.platform.object.core.model.ObjectTypeDao;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.sms.message.batch.logic.BatchLogic;
 import wbs.sms.message.batch.model.BatchObjectHelper;
-import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.batch.model.BatchSubjectRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
@@ -84,13 +83,14 @@ class BroadcastHooks
 				"broadcast");
 
 		ObjectTypeRec broadcastObjectType =
-			objectTypeDao.get ().findByCode ("broadcast");
+			objectTypeDao.get ().findByCode (
+				"broadcast");
 
 		if (broadcastObjectType == null)
 			throw new NullPointerException ();
 
 		batchHelper.get ().insert (
-			new BatchRec ()
+			batchHelper.get ().createInstance ()
 
 			.setParentType (
 				broadcastObjectType)

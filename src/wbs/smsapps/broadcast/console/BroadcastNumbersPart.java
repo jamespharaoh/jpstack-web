@@ -1,8 +1,11 @@
 package wbs.smsapps.broadcast.console;
 
+import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
+
 import javax.inject.Inject;
 
 import lombok.experimental.Accessors;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.smsapps.broadcast.model.BroadcastRec;
@@ -76,7 +79,9 @@ class BroadcastNumbersPart
 			" rows=\"8\"",
 			" cols=\"60\"",
 			">%h</textarea></p>\n",
-			requestContext.parameter ("numbers"));
+			emptyStringIfNull (
+				requestContext.parameter (
+					"numbers")));
 
 		printFormat (
 			"<p><input",

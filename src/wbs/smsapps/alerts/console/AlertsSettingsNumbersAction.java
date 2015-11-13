@@ -1,34 +1,37 @@
 package wbs.smsapps.alerts.console;
 
+import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.pluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
+
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.priv.PrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.object.ObjectManager;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
-import wbs.platform.user.model.UserObjectHelper;
+import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
-import wbs.sms.number.core.model.NumberObjectHelper;
+import wbs.sms.number.core.console.NumberConsoleHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.alerts.model.AlertsNumberRec;
-import wbs.smsapps.alerts.model.AlertsSettingsObjectHelper;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
-
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("alertsSettingsNumbersAction")
 public
@@ -38,7 +41,10 @@ class AlertsSettingsNumbersAction
 	// dependencies
 
 	@Inject
-	AlertsSettingsObjectHelper alertsSettingsHelper;
+	AlertsNumberConsoleHelper alertsNumberHelper;
+
+	@Inject
+	AlertsSettingsConsoleHelper alertsSettingsHelper;
 
 	@Inject
 	Database database;
@@ -47,10 +53,7 @@ class AlertsSettingsNumbersAction
 	EventLogic eventLogic;
 
 	@Inject
-	NumberObjectHelper numberHelper;
-
-	@Inject
-	ObjectManager objectManager;
+	NumberConsoleHelper numberHelper;
 
 	@Inject
 	PrivChecker privChecker;
@@ -59,14 +62,17 @@ class AlertsSettingsNumbersAction
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleHelper userHelper;
 
 	// details
 
 	@Override
 	public
 	Responder backupResponder () {
-		return responder ("alertsSettingsNumbersResponder");
+
+		return responder (
+			"alertsSettingsNumbersResponder");
+
 	}
 
 	// implementation
@@ -77,8 +83,12 @@ class AlertsSettingsNumbersAction
 		throws ServletException {
 
 		if (! requestContext.canContext ("alertsSettings.manage")) {
-			requestContext.addError ("Access denied");
+
+			requestContext.addError (
+				"Access denied");
+
 			return null;
+
 		}
 
 		List<String> notices =
@@ -95,7 +105,8 @@ class AlertsSettingsNumbersAction
 
 		AlertsSettingsRec alertsSettings =
 			alertsSettingsHelper.find (
-				requestContext.stuffInt ("alertsSettingsId"));
+				requestContext.stuffInt (
+					"alertsSettingsId"));
 
 		// add/delete
 
@@ -105,22 +116,29 @@ class AlertsSettingsNumbersAction
 		int numDisabled = 0;
 
 		for (
-			AlertsNumberRec alertsNumber
-				: alertsSettings.getAlertsNumbers ()
+			Iterator<AlertsNumberRec> alertsNumberIterator =
+				alertsSettings.getAlertsNumbers ().iterator ();
+			alertsNumberIterator.hasNext ();
+			doNothing ()
 		) {
+
+			AlertsNumberRec alertsNumber =
+				alertsNumberIterator.next ();
 
 			// delete
 
 			if (
-				requestContext.getForm (
-					stringFormat (
-						"delete_%d",
-						alertsNumber.getId ())
-				) != null
+				isNotNull (
+					requestContext.getForm (
+						stringFormat (
+							"delete_%d",
+							alertsNumber.getId ())))
 			) {
 
-				objectManager.remove (
+				alertsNumberHelper.remove (
 					alertsNumber);
+
+				alertsNumberIterator.remove ();
 
 				eventLogic.createEvent (
 					"alerts_number_deleted",
@@ -142,7 +160,8 @@ class AlertsSettingsNumbersAction
 				requestContext.getForm (
 					stringFormat (
 						"name_%d",
-						alertsNumber.getId ()));
+						alertsNumber.getId ()),
+					"");
 
 			if (newName == null)
 				continue;
@@ -152,6 +171,8 @@ class AlertsSettingsNumbersAction
 					alertsNumber.getName (),
 					newName)
 			) {
+
+System.out.println ("UPDATE NAME " + alertsNumber.getId ());
 
 				alertsNumber
 
@@ -176,15 +197,22 @@ class AlertsSettingsNumbersAction
 						"number_%s",
 						alertsNumber.getId ()));
 
-			if (! equal (
+			if (
+				notEqual (
 					alertsNumber.getNumber ().getNumber (),
-					newNumber)) {
+					newNumber)
+			) {
+
+System.out.println ("UPDATE NUMBER " + alertsNumber.getId ());
 
 				NumberRec numberRec =
 					numberHelper.findOrCreate (
 						newNumber);
 
-				alertsNumber.setNumber (numberRec);
+				alertsNumber
+
+					.setNumber (
+						numberRec);
 
 				updatedNumbers ++;
 
@@ -205,12 +233,28 @@ class AlertsSettingsNumbersAction
 							"enabled_%s",
 							alertsNumber.getId ())));
 
-			if (alertsNumber.getEnabled () != newEnabled) {
+			if (
+				notEqual (
+					alertsNumber.getEnabled (),
+					newEnabled)
+			) {
 
-				alertsNumber.setEnabled (newEnabled);
+System.out.println ("UPDATE ENABLED " + alertsNumber.getId ());
 
-				if (newEnabled) numEnabled ++;
-				else numDisabled ++;
+				alertsNumber
+
+					.setEnabled (
+						newEnabled);
+
+				if (newEnabled) {
+
+					numEnabled ++;
+
+				} else {
+
+					numDisabled ++;
+
+				}
 
 				eventLogic.createEvent (
 					"alerts_number_updated",
@@ -229,7 +273,9 @@ class AlertsSettingsNumbersAction
 			notices.add (
 				stringFormat (
 					"Updated %s",
-					pluralise (updatedNames, "name")));
+					pluralise (
+						updatedNames,
+						"name")));
 
 		}
 
@@ -238,7 +284,9 @@ class AlertsSettingsNumbersAction
 			notices.add (
 				stringFormat (
 					"Updated %s",
-					pluralise (updatedNumbers, "number")));
+					pluralise (
+						updatedNumbers,
+						"number")));
 
 		}
 
@@ -247,7 +295,9 @@ class AlertsSettingsNumbersAction
 			notices.add (
 				stringFormat (
 					"Enabled %s",
-					pluralise (numEnabled, "number")));
+					pluralise (
+						numEnabled,
+						"number")));
 
 		}
 
@@ -256,31 +306,54 @@ class AlertsSettingsNumbersAction
 			notices.add (
 				stringFormat (
 					"Disabled %s",
-					pluralise (numDisabled, "number")));
+					pluralise (
+						numDisabled,
+						"number")));
 
 		}
 
 		// add
 
-		if (requestContext.getForm ("add_new") != null) {
+		if (
+			isNotNull (
+				requestContext.getForm (
+					"add_new"))
+		) {
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
-					requestContext.getForm ("number_new"));
+					requestContext.getForm (
+						"number_new"));
 
 			AlertsNumberRec alertsNumber =
-				new AlertsNumberRec ()
-					.setAlertsSettings (alertsSettings)
-					.setName (requestContext.getForm ("name_new"))
-					.setNumber (numberRec);
+				alertsNumberHelper.createInstance ()
+
+				.setAlertsSettings (
+					alertsSettings)
+
+				.setName (
+					requestContext.getForm (
+						"name_new",
+						""))
+
+				.setNumber (
+					numberRec);
 
 			boolean newEnabled =
 				Boolean.parseBoolean (
-					requestContext.getForm ("enabled_new"));
+					requestContext.getForm (
+						"enabled_new",
+						""));
 
-			alertsNumber.setEnabled (newEnabled);
+			alertsNumber
 
-			objectManager.insert (alertsNumber);
+				.setEnabled (
+					newEnabled);
+
+			alertsNumberHelper.insert (
+				alertsNumber);
+
+System.out.println ("ADDED " + alertsNumber.getId ());
 
 			eventLogic.createEvent (
 				"alerts_number_created",
@@ -312,7 +385,8 @@ class AlertsSettingsNumbersAction
 				alertsSettings,
 				alertsNumber.getEnabled ());
 
-			notices.add ("Added new number");
+			notices.add (
+				"Added new number");
 
 			requestContext.hideFormData (
 				ImmutableSet.<String>of (
@@ -326,8 +400,15 @@ class AlertsSettingsNumbersAction
 
 		transaction.commit ();
 
-		for (String notice : notices)
-			requestContext.addNotice (notice);
+		for (
+			String notice
+				: notices
+		) {
+
+			requestContext.addNotice (
+				notice);
+
+		}
 
 		return null;
 

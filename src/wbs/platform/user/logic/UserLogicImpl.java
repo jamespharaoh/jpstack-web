@@ -9,6 +9,9 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 
 import lombok.NonNull;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -23,8 +26,6 @@ import wbs.platform.user.model.UserOnlineRec;
 import wbs.platform.user.model.UserRec;
 import wbs.platform.user.model.UserSessionObjectHelper;
 import wbs.platform.user.model.UserSessionRec;
-
-import com.google.common.base.Optional;
 
 @SingletonComponent ("userLogic")
 public
@@ -75,7 +76,7 @@ class UserLogicImpl
 
 		UserSessionRec session =
 			userSessionHelper.insert (
-				new UserSessionRec ()
+				userSessionHelper.createInstance ()
 
 			.setUser (
 				user)
@@ -93,7 +94,7 @@ class UserLogicImpl
 		// go online
 
 		userOnlineHelper.insert (
-			new UserOnlineRec ()
+			userOnlineHelper.createInstance ()
 
 			.setUser (
 				user)

@@ -14,6 +14,7 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -42,6 +43,7 @@ import wbs.framework.entity.meta.ReferenceFieldSpec;
 import wbs.framework.entity.meta.TimestampFieldSpec;
 import wbs.framework.entity.meta.TypeCodeFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.etc.RuntimeIoException;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("modelRecordGenerator")
@@ -68,8 +70,7 @@ class ModelRecordGenerator {
 	// implementation
 
 	public
-	void generateRecord ()
-		throws IOException {
+	void generateRecord () {
 
 		if (modelMeta.type ().record ()) {
 
@@ -96,8 +97,17 @@ class ModelRecordGenerator {
 				"work/generated/%s/model",
 				plugin.packageName ().replace ('.', '/'));
 
-		FileUtils.forceMkdir (
-			new File (directory));
+		try {
+
+			FileUtils.forceMkdir (
+				new File (directory));
+
+		} catch (IOException exception) {
+
+			throw new RuntimeIoException (
+				exception);
+
+		}
 
 		String filename =
 			stringFormat (
@@ -124,8 +134,7 @@ class ModelRecordGenerator {
 
 	private
 	void writeStandardImports (
-			FormatWriter javaWriter)
-		throws IOException {
+			@NonNull FormatWriter javaWriter) {
 
 		List<Class<?>> standardImportClasses =
 			ImmutableList.<Class<?>>of (
@@ -138,6 +147,7 @@ class ModelRecordGenerator {
 			java.util.Map.class,
 			java.util.Set.class,
 
+			wbs.framework.record.UnsavedRecordDetector.class,
 			wbs.framework.record.CommonRecord.class,
 			wbs.framework.record.EphemeralRecord.class,
 			wbs.framework.record.EventRecord.class,
@@ -172,7 +182,7 @@ class ModelRecordGenerator {
 	}
 
 	void writeClass (
-			FormatWriter javaWriter) {
+			@NonNull FormatWriter javaWriter) {
 
 		javaWriter.writeFormat (
 			"public\n");
@@ -271,6 +281,9 @@ class ModelRecordGenerator {
 		javaWriter.writeFormat (
 			"\n");
 
+		generateConstructor (
+			javaWriter);
+
 		generateFields (
 			javaWriter);
 
@@ -296,8 +309,49 @@ class ModelRecordGenerator {
 	}
 
 	private
+	void generateConstructor (
+			@NonNull FormatWriter javaWriter) {
+
+		// comment
+
+		javaWriter.writeFormat (
+			"\t// constructor\n");
+
+		javaWriter.writeFormat (
+			"\n");
+
+		// open function
+
+		if (modelMeta.type ().record ()) {
+
+			javaWriter.writeFormat (
+				"\t@Deprecated\n");
+
+		}
+
+		javaWriter.writeFormat (
+			"\tpublic\n");
+
+		javaWriter.writeFormat (
+			"\t%s () {\n",
+			recordClassName);
+
+		javaWriter.writeFormat (
+			"\n");
+
+		// close function
+
+		javaWriter.writeFormat (
+			"\t}\n");
+
+		javaWriter.writeFormat (
+			"\n");
+
+	}
+
+	private
 	void generateFields (
-			FormatWriter javaWriter) {
+			@NonNull FormatWriter javaWriter) {
 
 		if (modelMeta.fields ().isEmpty ()) {
 			return;
@@ -327,7 +381,7 @@ class ModelRecordGenerator {
 
 	private
 	void generateCollections (
-			FormatWriter javaWriter) {
+			@NonNull FormatWriter javaWriter) {
 
 		if (modelMeta.collections ().isEmpty ()) {
 			return;
@@ -357,7 +411,7 @@ class ModelRecordGenerator {
 
 	private
 	void generateEquals (
-			FormatWriter javaWriter) {
+			@NonNull FormatWriter javaWriter) {
 
 		// write comment
 
@@ -571,7 +625,7 @@ class ModelRecordGenerator {
 
 	private
 	void generateCompareTo (
-			FormatWriter javaWriter) {
+			@NonNull FormatWriter javaWriter) {
 
 		// TODO generate better code
 
@@ -1063,7 +1117,7 @@ class ModelRecordGenerator {
 
 	private
 	void generateToString (
-			FormatWriter javaWriter) {
+			@NonNull FormatWriter javaWriter) {
 
 		// write comment
 

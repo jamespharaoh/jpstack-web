@@ -3,6 +3,9 @@ package wbs.clients.apn.chat.help.console;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.help.logic.ChatHelpLogic;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -107,8 +110,10 @@ class ChatHelpLogPendingFormAction
 				user,
 				chatUser,
 				text,
-				helpRequest.getMessage ().getThreadId (),
-				helpRequest);
+				Optional.of (
+					helpRequest.getMessage ().getThreadId ()),
+				Optional.of (
+					helpRequest));
 
 		}
 

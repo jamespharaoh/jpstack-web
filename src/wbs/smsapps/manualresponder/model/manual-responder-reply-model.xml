@@ -34,7 +34,8 @@
 		<associative-list
 			name="messages"
 			type="message"
-			table="manual_responder_reply_message"/>
+			table="manual_responder_reply_message"
+			owned="yes"/>
 
 	</collections>
 

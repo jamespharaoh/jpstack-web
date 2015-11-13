@@ -465,19 +465,6 @@ class ObjectManagerImpl
 
 	@Override
 	public <RecordType extends Record<?>>
-	RecordType insert (
-			@NonNull RecordType object) {
-
-		ObjectHelper<?> objectHelper =
-			objectHelperForClass (object.getClass ());
-
-		return objectHelper.insert (
-			object);
-
-	}
-
-	@Override
-	public <RecordType extends Record<?>>
 	RecordType update (
 			@NonNull RecordType object) {
 

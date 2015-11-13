@@ -109,7 +109,7 @@ class ChatPromoCommand
 	String[] getCommandTypes () {
 
 		return new String [] {
-			"chatPromo.promo"
+			"chat_promo.promo"
 		};
 
 	}
@@ -317,7 +317,7 @@ class ChatPromoCommand
 		// claim promo
 
 		chatPromoUserHelper.insert (
-			new ChatPromoUserRec ()
+			chatPromoUserHelper.createInstance ()
 
 			.setChatPromo (
 				chatPromo)

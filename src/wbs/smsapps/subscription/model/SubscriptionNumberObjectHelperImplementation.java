@@ -39,7 +39,7 @@ class SubscriptionNumberObjectHelperImplementation
 		// create new
 
 		return subscriptionNumberHelper.insert (
-			new SubscriptionNumberRec ()
+			subscriptionNumberHelper.createInstance ()
 
 			.setSubscription (
 				subscription)

@@ -138,7 +138,7 @@ class SimulatorSender
 
 		SimulatorEventRec event =
 			simulatorEventHelper.insert (
-				new SimulatorEventRec ()
+				simulatorEventHelper.createInstance ()
 
 			.setSimulatorSession (
 				simulatorSessionNumber.getSimulatorSession ())
@@ -157,7 +157,8 @@ class SimulatorSender
 
 		transaction.commit ();
 
-		return Integer.toString (event.getId ());
+		return Integer.toString (
+			event.getId ());
 
 	}
 

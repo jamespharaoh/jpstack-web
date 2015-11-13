@@ -11,6 +11,7 @@ import javax.inject.Inject;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -144,7 +145,7 @@ class QueueLogicImpl
 
 			queue =
 				queueHelper.insert (
-					new QueueRec ()
+					queueHelper.createInstance ()
 
 				.setCode (
 					code)
@@ -200,7 +201,7 @@ class QueueLogicImpl
 
 		QueueItemRec queueItem =
 			queueItemHelper.insert (
-				new QueueItemRec ()
+				queueItemHelper.createInstance ()
 
 			.setQueueSubject (
 				queueSubject)
@@ -316,9 +317,15 @@ class QueueLogicImpl
 
 		queueSubject =
 			queueSubjectHelper.insert (
-				new QueueSubjectRec ()
-					.setQueue (queue)
-					.setObjectId (object.getId ()));
+				queueSubjectHelper.createInstance ()
+
+			.setQueue (
+				queue)
+
+			.setObjectId (
+				object.getId ())
+
+		);
 
 		return queueSubject;
 

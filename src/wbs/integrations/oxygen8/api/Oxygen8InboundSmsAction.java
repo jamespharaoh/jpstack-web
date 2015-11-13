@@ -13,6 +13,9 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+
+import com.google.common.base.Optional;
+
 import wbs.api.mvc.ApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -22,7 +25,6 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.integrations.oxygen8.model.Oxygen8ConfigRec;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogObjectHelper;
-import wbs.integrations.oxygen8.model.Oxygen8InboundLogRec;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogType;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
@@ -34,8 +36,6 @@ import wbs.platform.text.web.TextResponder;
 import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
-
-import com.google.common.base.Optional;
 
 @PrototypeComponent ("oxygen8InboundSmsAction")
 public
@@ -213,7 +213,7 @@ class Oxygen8InboundSmsAction
 				this);
 
 		oxygen8InboundLogHelper.insert (
-			new Oxygen8InboundLogRec ()
+			oxygen8InboundLogHelper.createInstance ()
 
 			.setRoute (
 				routeHelper.find (

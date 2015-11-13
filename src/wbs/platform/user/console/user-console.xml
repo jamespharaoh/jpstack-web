@@ -80,7 +80,8 @@
 				event-order="context-then-target"
 				signal="user_privs"
 				success-notice="User groups updated"
-				fields="groups"/>
+				fields="groups"
+				owned-by="them"/>
 
 			<section
 				name="privs"

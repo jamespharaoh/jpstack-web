@@ -3,8 +3,8 @@ package wbs.clients.apn.chat.user.core.console;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.user.core.model.ChatUserNoteObjectHelper;
-import wbs.clients.apn.chat.user.core.model.ChatUserNoteRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
@@ -83,7 +83,7 @@ class ChatUserNotesAction
 			textHelper.findOrCreate (noteString);
 
 		chatUserNoteHelper.insert (
-			new ChatUserNoteRec ()
+			chatUserNoteHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)

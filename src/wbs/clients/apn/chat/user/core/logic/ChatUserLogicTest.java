@@ -7,18 +7,27 @@ import java.util.List;
 import javax.inject.Inject;
 
 import junit.framework.TestCase;
+
+import com.google.common.collect.ImmutableList;
+
+import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.clients.apn.chat.user.core.model.Orient;
-
-import com.google.common.collect.ImmutableList;
 
 public
 class ChatUserLogicTest
 	extends TestCase {
 
+	// dependencies
+
 	@Inject
-	ChatUserLogicImpl chatUserLogic;
+	ChatUserObjectHelper chatUserHelper;
+
+	@Inject
+	ChatUserLogicImplementation chatUserLogic;
+
+	// data
 
 	List<Orient> compatibleOrients =
 		ImmutableList.<Orient>of (
@@ -107,10 +116,10 @@ class ChatUserLogicTest
 	void testChatUsersCompatibleChatUserChatUser () {
 
 		ChatUserRec chatUser1 =
-			new ChatUserRec ();
+			chatUserHelper.createInstance ();
 
 		ChatUserRec chatUser2 =
-			new ChatUserRec ();
+			chatUserHelper.createInstance ();
 
 		for (
 			int index1 = 0;

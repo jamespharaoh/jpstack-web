@@ -11,12 +11,10 @@ import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.keyword.model.KeywordObjectHelper;
-import wbs.sms.keyword.model.KeywordRec;
 import wbs.sms.keyword.model.KeywordSetObjectHelper;
 import wbs.sms.keyword.model.KeywordSetRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
@@ -24,7 +22,6 @@ import wbs.sms.route.router.model.RouterObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionAffiliateObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
 import wbs.smsapps.subscription.model.SubscriptionKeywordObjectHelper;
-import wbs.smsapps.subscription.model.SubscriptionKeywordRec;
 import wbs.smsapps.subscription.model.SubscriptionListObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionListRec;
 import wbs.smsapps.subscription.model.SubscriptionObjectHelper;
@@ -85,7 +82,7 @@ class SubscriptionFixtureProvider
 	void createFixtures () {
 
 		menuItemHelper.insert (
-			new MenuItemRec ()
+			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
@@ -115,7 +112,7 @@ class SubscriptionFixtureProvider
 
 		SubscriptionRec subscription =
 			subscriptionHelper.insert (
-				new SubscriptionRec ()
+				subscriptionHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -178,7 +175,7 @@ class SubscriptionFixtureProvider
 				"inbound");
 
 		keywordHelper.insert (
-			new KeywordRec ()
+			keywordHelper.createInstance ()
 
 			.setKeywordSet (
 				inboundKeywordSet)
@@ -197,7 +194,7 @@ class SubscriptionFixtureProvider
 		);
 
 		keywordHelper.insert (
-			new KeywordRec ()
+			keywordHelper.createInstance ()
 
 			.setKeywordSet (
 				inboundKeywordSet)
@@ -222,7 +219,7 @@ class SubscriptionFixtureProvider
 
 			SubscriptionListRec list =
 				subscriptionListHelper.insert (
-					new SubscriptionListRec ()
+					subscriptionListHelper.createInstance ()
 
 				.setSubscription (
 					subscription)
@@ -240,7 +237,7 @@ class SubscriptionFixtureProvider
 			);
 
 			subscriptionKeywordHelper.insert (
-				new SubscriptionKeywordRec ()
+				subscriptionKeywordHelper.createInstance ()
 
 				.setSubscription (
 					subscription)
@@ -265,7 +262,7 @@ class SubscriptionFixtureProvider
 
 			SubscriptionAffiliateRec affiliate =
 				subscriptionAffiliateHelper.insert (
-					new SubscriptionAffiliateRec ()
+					subscriptionAffiliateHelper.createInstance ()
 
 				.setSubscription (
 					subscription)
@@ -283,7 +280,7 @@ class SubscriptionFixtureProvider
 			);
 
 			keywordHelper.insert (
-				new KeywordRec ()
+				keywordHelper.createInstance ()
 
 				.setKeywordSet (
 					inboundKeywordSet)

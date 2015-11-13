@@ -7,6 +7,9 @@ import java.util.Collection;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -19,8 +22,6 @@ import wbs.smsapps.forwarder.model.ForwarderMessageOutObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutReportObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutReportRec;
-
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("forwarderDelivery")
 public
@@ -124,7 +125,7 @@ class ForwarderDelivery
 
 			ForwarderMessageOutReportRec forwarderMessageOutReport =
 				forwarderMessageOutReportHelper.insert (
-					new ForwarderMessageOutReportRec ()
+					forwarderMessageOutReportHelper.createInstance ()
 
 				.setForwarderMessageOut (
 					forwarderMessageOut)

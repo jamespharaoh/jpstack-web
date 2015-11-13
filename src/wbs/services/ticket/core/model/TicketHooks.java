@@ -156,8 +156,8 @@ class TicketHooks
 
 		TicketFieldTypeRec ticketFieldType =
 			ticketFieldTypeHelper.get ().findByCode (
-					ticket.getTicketManager (),
-					name);
+				ticket.getTicketManager (),
+				name);
 
 		TicketFieldValueRec ticketFieldValue;
 
@@ -179,7 +179,7 @@ class TicketHooks
 		if (ticketFieldValue == null) {
 
 			ticketFieldValue =
-				new TicketFieldValueRec ()
+				ticketFieldValueHelper.get ().createInstance ()
 
 				.setTicket (
 					ticket)
@@ -193,22 +193,31 @@ class TicketHooks
 
 		case string:
 
-			ticketFieldValue.setStringValue (
-				(String) value);
+			ticketFieldValue
+
+				.setStringValue (
+					(String)
+					value);
 
 			break;
 
 		case number:
 
-			ticketFieldValue.setIntegerValue (
-				(Integer) value);
+			ticketFieldValue
+
+				.setIntegerValue (
+					(Integer)
+					value);
 
 			break;
 
 		case bool:
 
-			ticketFieldValue.setBooleanValue (
-				(Boolean) value);
+			ticketFieldValue
+
+				.setBooleanValue (
+					(Boolean)
+					value);
 
 			break;
 

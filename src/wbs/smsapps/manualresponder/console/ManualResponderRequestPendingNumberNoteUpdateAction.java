@@ -121,10 +121,16 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 		if (manualResponderNumber == null) {
 
 			manualResponderNumber =
-				objectManager.insert (
-					new ManualResponderNumberRec ()
-						.setManualResponder (manualResponder)
-						.setNumber (number));
+				manualResponderNumberHelper.insert (
+					manualResponderNumberHelper.createInstance ()
+
+				.setManualResponder (
+					manualResponder)
+
+				.setNumber (
+					number)
+
+			);
 
 		}
 

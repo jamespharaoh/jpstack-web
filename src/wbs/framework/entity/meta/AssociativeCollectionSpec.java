@@ -42,4 +42,7 @@ class AssociativeCollectionSpec
 	@DataAttribute
 	String orderSql;
 
+	@DataAttribute
+	Boolean owned;
+
 }

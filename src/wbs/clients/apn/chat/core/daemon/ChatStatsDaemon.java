@@ -16,7 +16,6 @@ import org.joda.time.Interval;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.core.model.ChatStatsObjectHelper;
-import wbs.clients.apn.chat.core.model.ChatStatsRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -157,7 +156,8 @@ class ChatStatsDaemon
 				this);
 
 		ChatRec chat =
-			chatHelper.find (chatId);
+			chatHelper.find (
+				chatId);
 
 		int numUsers =
 			chatUserHelper.countOnline (
@@ -172,7 +172,7 @@ class ChatStatsDaemon
 		// insert stats
 
 		chatStatsHelper.insert (
-			new ChatStatsRec ()
+			chatStatsHelper.createInstance ()
 
 			.setChat (
 				chat)

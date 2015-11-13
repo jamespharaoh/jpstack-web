@@ -9,10 +9,10 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.namednote.model.ChatNamedNoteLogObjectHelper;
-import wbs.clients.apn.chat.namednote.model.ChatNamedNoteLogRec;
 import wbs.clients.apn.chat.namednote.model.ChatNamedNoteObjectHelper;
 import wbs.clients.apn.chat.namednote.model.ChatNamedNoteRec;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameObjectHelper;
@@ -189,7 +189,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 		if (namedNote == null) {
 
 			namedNote =
-				new ChatNamedNoteRec ()
+				chatNamedNoteHelper.createInstance ()
 
 				.setChatNoteName (
 					chatNoteName)
@@ -218,7 +218,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 
 		chatNamedNoteLogHelper.insert (
-			new ChatNamedNoteLogRec ()
+			chatNamedNoteLogHelper.createInstance ()
 
 			.setChatNamedNote (
 				namedNote)

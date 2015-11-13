@@ -151,7 +151,7 @@ class ImChatMessageSendAction
 
 		ImChatMessageRec message =
 			imChatMessageHelper.insert (
-				new ImChatMessageRec ()
+				imChatMessageHelper.createInstance ()
 
 			.setImChatConversation (
 				conversation)

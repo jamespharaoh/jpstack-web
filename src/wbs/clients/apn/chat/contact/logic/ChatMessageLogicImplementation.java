@@ -46,7 +46,6 @@ import wbs.clients.apn.chat.contact.model.ChatMessageStatus;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
-import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationReason;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogic;
@@ -339,7 +338,7 @@ class ChatMessageLogicImplementation
 				alarm);
 
 			chatUserInitiationLogHelper.insert (
-				new ChatUserInitiationLogRec ()
+				chatUserInitiationLogHelper.createInstance ()
 
 				.setChatUser (
 					fromUser)
@@ -399,8 +398,8 @@ class ChatMessageLogicImplementation
 		// create the chat message
 
 		ChatMessageRec chatMessage =
-			objectManager.insert (
-				new ChatMessageRec ()
+			chatMessageHelper.insert (
+				chatMessageHelper.createInstance ()
 
 			.setChat (
 				fromUser.getChat ())
@@ -1125,8 +1124,8 @@ class ChatMessageLogicImplementation
 		// there wasn't one, create one
 
 		chatMonitorInbox =
-			objectManager.insert (
-				new ChatMonitorInboxRec ()
+			chatMonitorInboxHelper.insert (
+				chatMonitorInboxHelper.createInstance ()
 
 			.setMonitorChatUser (
 				monitorChatUser)

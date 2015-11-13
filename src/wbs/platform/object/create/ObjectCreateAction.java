@@ -254,7 +254,7 @@ class ObjectCreateAction
 
 		// insert
 
-		objectManager.insert (
+		consoleHelper.insert (
 			object);
 
 		// create event

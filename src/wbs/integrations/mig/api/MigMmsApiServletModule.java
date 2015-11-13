@@ -23,6 +23,9 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.MultipartStream;
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -42,9 +45,6 @@ import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 @Log4j
 public
@@ -224,20 +224,24 @@ class MigMmsApiServletModule
 						filename));
 
 				MediaRec media =
-					mediaLogic.createMedia (
+					mediaLogic.createMediaRequired (
 						data,
 						contentType,
 						filename,
-						"utf-8");
+						Optional.of (
+							"utf-8"));
 
 				log.debug (
 					stringFormat (
 						"media id: %s",
 						media.getId ()));
 
-				medias.add (media);
+				medias.add (
+					media);
 
-				nextPart = multipartStream.readBoundary ();
+				nextPart =
+					multipartStream.readBoundary ();
+
 			}
 
 			/*

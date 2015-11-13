@@ -7,11 +7,13 @@ import java.util.Collections;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateLogObjectHelper;
-import wbs.clients.apn.chat.user.core.model.ChatUserDateLogRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -21,9 +23,6 @@ import wbs.framework.database.Transaction;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 @SingletonComponent ("chatDateLogic")
 public
@@ -198,7 +197,7 @@ class ChatDateLogicImpl
 			chatUser.setBlockAll (false);
 
 		chatUserDateLogHelper.insert (
-			new ChatUserDateLogRec ()
+			chatUserDateLogHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)

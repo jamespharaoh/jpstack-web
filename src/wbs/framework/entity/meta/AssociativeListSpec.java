@@ -2,6 +2,7 @@ package wbs.framework.entity.meta;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
@@ -41,5 +42,8 @@ class AssociativeListSpec
 
 	@DataAttribute
 	String orderSql;
+
+	@DataAttribute
+	Boolean owned;
 
 }

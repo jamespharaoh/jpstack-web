@@ -199,7 +199,7 @@ class ImChatPurchaseStartAction
 
 			paypalPayment =
 				paypalPaymentHelper.insert (
-					new PaypalPaymentRec ()
+					paypalPaymentHelper.createInstance ()
 
 				.setPaypalAccount (
 					paypalAccount)
@@ -221,7 +221,7 @@ class ImChatPurchaseStartAction
 
 		ImChatPurchaseRec purchase =
 			imChatPurchaseHelper.insert (
-				new ImChatPurchaseRec ()
+				imChatPurchaseHelper.createInstance ()
 
 			.setImChatCustomer (
 				customer)

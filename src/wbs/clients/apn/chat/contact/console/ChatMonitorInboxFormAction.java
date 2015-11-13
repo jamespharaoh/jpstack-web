@@ -14,7 +14,6 @@ import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatBlockObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatBlockRec;
-import wbs.clients.apn.chat.contact.model.ChatContactNoteRec;
 import wbs.clients.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
@@ -25,7 +24,6 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
-import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.priv.PrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -52,10 +50,13 @@ class ChatMonitorInboxFormAction
 	ChatContactObjectHelper chatContactHelper;
 
 	@Inject
+	ChatContactNoteConsoleHelper chatContactNoteHelper;
+
+	@Inject
 	ChatCreditLogic chatCreditLogic;
 
 	@Inject
-	ChatUserLogic chatUserLogic;
+	ChatMessageConsoleHelper chatMessageHelper;
 
 	@Inject
 	ChatMessageLogic chatMessageLogic;
@@ -64,7 +65,7 @@ class ChatMonitorInboxFormAction
 	ChatMonitorInboxObjectHelper chatMonitorInboxHelper;
 
 	@Inject
-	ConsoleObjectManager objectManager;
+	ChatUserLogic chatUserLogic;
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -234,8 +235,8 @@ class ChatMonitorInboxFormAction
 					text);
 
 			ChatMessageRec chatMessage =
-				objectManager.insert (
-					new ChatMessageRec ()
+				chatMessageHelper.insert (
+					chatMessageHelper.createInstance ()
 
 				.setChat (
 					chat)
@@ -336,8 +337,8 @@ class ChatMonitorInboxFormAction
 
 			if (note) {
 
-				objectManager.insert (
-					new ChatContactNoteRec ()
+				chatContactNoteHelper.insert (
+					chatContactNoteHelper.createInstance ()
 
 					.setUser (
 						userChatUser)
@@ -370,7 +371,7 @@ class ChatMonitorInboxFormAction
 			chatMonitorInbox.getQueueItem (),
 			myUser);
 
-		objectManager.remove (
+		chatMonitorInboxHelper.remove (
 			chatMonitorInbox);
 
 		// commit transaction

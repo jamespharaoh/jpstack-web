@@ -41,7 +41,6 @@ import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.test.simulator.model.SimulatorEventObjectHelper;
-import wbs.test.simulator.model.SimulatorEventRec;
 import wbs.test.simulator.model.SimulatorRec;
 import wbs.test.simulator.model.SimulatorRouteRec;
 import wbs.test.simulator.model.SimulatorSessionNumberObjectHelper;
@@ -295,7 +294,7 @@ System.out.println (
 		// create event
 
 		simulatorEventHelper.insert (
-			new SimulatorEventRec ()
+			simulatorEventHelper.createInstance ()
 
 			.setSimulatorSession (
 				simulatorSession)
@@ -393,7 +392,7 @@ System.out.println (
 		// create event
 
 		simulatorEventHelper.insert (
-			new SimulatorEventRec ()
+			simulatorEventHelper.createInstance ()
 
 			.setSimulatorSession (
 				simulatorSession)

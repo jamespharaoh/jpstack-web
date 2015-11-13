@@ -1,5 +1,7 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.isNull;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -11,6 +13,8 @@ import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+
+import com.google.common.base.Optional;
 
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
@@ -35,8 +39,6 @@ import wbs.integrations.paypal.model.PaypalAccountRec;
 import wbs.integrations.paypal.model.PaypalPaymentObjectHelper;
 import wbs.integrations.paypal.model.PaypalPaymentRec;
 import wbs.integrations.paypal.model.PaypalPaymentState;
-
-import com.google.common.base.Optional;
 
 @PrototypeComponent ("imChatPurchaseGetConfirmationAction")
 public
@@ -100,7 +102,7 @@ class ImChatPurchaseGetConfirmationAction
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatPurchaseGetConfirmationRequest purchaseRequest =
+		ImChatPurchaseGetConfirmationRequest confirmationRequest =
 			dataFromJson.fromJson (
 				ImChatPurchaseGetConfirmationRequest.class,
 				jsonValue);
@@ -123,7 +125,7 @@ class ImChatPurchaseGetConfirmationAction
 
 		ImChatPurchaseRec purchase =
 			imChatPurchaseHelper.findByToken (
-				purchaseRequest.token ());
+				confirmationRequest.token ());
 
 		if (purchase == null)
 			throw new RuntimeException ();
@@ -131,28 +133,32 @@ class ImChatPurchaseGetConfirmationAction
 		ImChatCustomerRec customer =
 			purchase.getImChatCustomer ();
 
-		// create session
+		// lookup session
 
 		ImChatSessionRec session =
-			imChatSessionHelper.insert (
-				new ImChatSessionRec ()
+			customer.getActiveSesion ();
 
-			.setImChatCustomer (
-				customer)
+		if (
+			isNull (
+				session)
+		) {
 
-			.setSecret (
-				randomLogic.generateLowercase (20))
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
 
-			.setActive (
-				true)
+				.reason (
+					"session-invalid")
 
-			.setStartTime (
-				transaction.now ())
+				.message (
+					"The session secret is invalid or the session is no " +
+					"longer active");
 
-			.setUpdateTime (
-				transaction.now ())
+			return jsonResponderProvider.get ()
 
-		);
+				.value (
+					failureResponse);
+
+		}
 
 		// lookup paypal payment
 
@@ -189,7 +195,7 @@ class ImChatPurchaseGetConfirmationAction
 
 		Optional<String> payerId =
 			paypalApi.getExpressCheckout (
-				purchaseRequest.paypalToken (),
+				confirmationRequest.paypalToken (),
 				expressCheckoutProperties);
 
 		// update payment status
@@ -197,7 +203,7 @@ class ImChatPurchaseGetConfirmationAction
 		paypalPayment
 
 			.setPaypalToken (
-				purchaseRequest.paypalToken ())
+				confirmationRequest.paypalToken ())
 
 			.setPaypalPayerId (
 				payerId.get ())
@@ -226,7 +232,9 @@ class ImChatPurchaseGetConfirmationAction
 		transaction.commit ();
 
 		return jsonResponderProvider.get ()
-			.value (successResponse);
+
+			.value (
+				successResponse);
 
 	}
 

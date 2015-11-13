@@ -762,7 +762,7 @@ class ForwarderApiModule
 							url.hashCode ());
 
 					medias.add (
-						mediaLogic.createMediaFromImage (
+						mediaLogic.createMediaFromImageRequired (
 							getImageContent (url),
 							"image/jpeg",
 							filename));

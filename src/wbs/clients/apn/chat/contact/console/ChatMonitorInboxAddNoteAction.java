@@ -8,13 +8,12 @@ import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
-import wbs.clients.apn.chat.contact.model.ChatContactNoteRec;
+
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
-import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -30,13 +29,16 @@ class ChatMonitorInboxAddNoteAction
 	extends ConsoleAction {
 
 	@Inject
+	ChatContactNoteConsoleHelper chatContactNoteHelper;
+
+	@Inject
 	ChatMonitorInboxObjectHelper chatMonitorInboxHelper;
 
 	@Inject
 	Database database;
 
-	@Inject
-	ConsoleObjectManager objectManager;
+	//@Inject
+	//ConsoleObjectManager objectManager;
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -89,8 +91,8 @@ class ChatMonitorInboxAddNoteAction
 					"Adding note to %s",
 					chatMonitorInbox.getMonitorChatUser ().getName ()));
 
-			objectManager.insert (
-				new ChatContactNoteRec ()
+			chatContactNoteHelper.insert (
+				chatContactNoteHelper.createInstance ()
 
 				.setChat (
 					chat)

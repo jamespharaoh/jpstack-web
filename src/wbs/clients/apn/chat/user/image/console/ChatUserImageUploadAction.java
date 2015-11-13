@@ -1,7 +1,9 @@
 package wbs.clients.apn.chat.user.image.console;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
@@ -12,6 +14,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import lombok.Cleanup;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -32,8 +37,6 @@ import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
-
-import com.google.common.base.Optional;
 
 @PrototypeComponent ("chatUserImageUploadAction")
 public
@@ -98,7 +101,8 @@ class ChatUserImageUploadAction
 		chatUserImageType =
 			toEnum (
 				ChatUserImageType.class,
-				(String) requestContext.stuff (
+				(String)
+				requestContext.stuff (
 					"chatUserImageType"));
 
 		uploadForm =
@@ -120,7 +124,7 @@ class ChatUserImageUploadAction
 			// resample the video
 
 			resampledData =
-				mediaLogic.videoConvert (
+				mediaLogic.videoConvertRequired (
 					"3gpp",
 					uploadForm.upload ().data ());
 
@@ -138,21 +142,29 @@ class ChatUserImageUploadAction
 
 			// read the image
 
-			BufferedImage image =
+			Optional<BufferedImage> imageOptional =
 				mediaLogic.readImage (
 					uploadForm.upload ().data (),
 					"image/jpeg");
 
-			if (image == null) {
+			if (
+				isNotPresent (
+					imageOptional)
+			) {
 
 				requestContext.addError (
 					stringFormat (
 						"Error reading image (content type was %s)",
-						uploadForm.upload ().contentType ()));
+						ifNull (
+							uploadForm.upload ().contentType (),
+							"not specified")));
 
 				return null;
 
 			}
+
+			BufferedImage image =
+				imageOptional.get ();
 
 			// resample image
 
@@ -198,11 +210,11 @@ class ChatUserImageUploadAction
 		// create media
 
 		MediaRec media =
-			mediaLogic.createMedia (
+			mediaLogic.createMediaRequired (
 				resampledData,
 				resultType,
 				chatUser.getCode () + "." + extension,
-				null);
+				Optional.<String>absent ());
 
 		// create chat user image
 
@@ -213,7 +225,7 @@ class ChatUserImageUploadAction
 
 		ChatUserImageRec chatUserImage =
 			chatUserImageHelper.insert (
-				new ChatUserImageRec ()
+				chatUserImageHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)

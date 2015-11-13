@@ -6,6 +6,9 @@ import static wbs.framework.utils.etc.Misc.instantToDate;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
@@ -16,6 +19,7 @@ import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogic;
+import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -352,9 +356,15 @@ class ChatMessagePendingFormAction
 		// update the chatMessage
 
 		chatMessage
-			.setModerator (myUser)
-			.setStatus (ChatMessageStatus.moderatorRejected)
-			.setEditedText (null);
+
+			.setModerator (
+				myUser)
+
+			.setStatus (
+				ChatMessageStatus.moderatorRejected)
+
+			.setEditedText (
+				null);
 
 		// and send help message
 
@@ -362,8 +372,9 @@ class ChatMessagePendingFormAction
 			myUser,
 			chatMessage.getFromUser (),
 			messageParam,
-			chatMessage.getThreadId (),
-			null);
+			Optional.of (
+				chatMessage.getThreadId ()),
+			Optional.<ChatHelpLogRec>absent ());
 
 		// inc rejection count
 
@@ -373,9 +384,11 @@ class ChatMessagePendingFormAction
 
 		transaction.commit ();
 
-		requestContext.addNotice ("Rejection sent");
+		requestContext.addNotice (
+			"Rejection sent");
 
-		return responder ("queueHomeResponder");
+		return responder (
+			"queueHomeResponder");
 
 	}
 

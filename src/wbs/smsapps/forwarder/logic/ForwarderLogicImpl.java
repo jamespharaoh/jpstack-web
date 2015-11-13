@@ -874,13 +874,27 @@ class ForwarderLogicImpl
 
 		ForwarderMessageOutRec forwarderMessageOut =
 			forwarderMessageOutHelper.insert (
-				new ForwarderMessageOutRec ()
-					.setForwarder (forwarder)
-					.setForwarderMessageIn (fmIn)
-					.setNumber (number)
-					.setOtherId (myId)
-					.setBill (false)
-					.setForwarderRoute (forwarderRoute));
+				forwarderMessageOutHelper.createInstance ()
+
+			.setForwarder (
+				forwarder)
+
+			.setForwarderMessageIn (
+				fmIn)
+
+			.setNumber (
+				number)
+
+			.setOtherId (
+				myId)
+
+			.setBill (
+				false)
+
+			.setForwarderRoute (
+				forwarderRoute)
+
+		);
 
 		// send the message
 

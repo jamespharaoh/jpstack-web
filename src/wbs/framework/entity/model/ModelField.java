@@ -87,6 +87,9 @@ class ModelField {
 	String whereSql;
 
 	@DataAttribute
+	Boolean owned;
+
+	@DataAttribute
 	String joinColumnName;
 
 	@DataAttribute

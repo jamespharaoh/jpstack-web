@@ -106,9 +106,11 @@ class ObjectLinksPageBuilder {
 
 		setDefaults ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildTab (
 				resolvedExtensionPoint);
@@ -147,17 +149,40 @@ class ObjectLinksPageBuilder {
 			Responder handle () {
 
 				return objectLinksAction.get ()
-					.responderName (responderName)
-					.contextHelper (consoleHelper)
-					.contextLinkField (linksField.name ())
-					.targetHelper (targetConsoleHelper)
-					.targetLinkField (targetLinksField.name ())
-					.addEventName (addEventName)
-					.removeEventName (removeEventName)
-					.eventOrder (eventOrder)
-					.contextUpdateSignalName (updateSignalName)
-					.targetUpdateSignalName (targetUpdateSignalName)
-					.successNotice (successNotice)
+
+					.responderName (
+						responderName)
+
+					.contextHelper (
+						consoleHelper)
+
+					.contextLinkField (
+						linksField.name ())
+
+					.targetHelper (
+						targetConsoleHelper)
+
+					.targetLinkField (
+						targetLinksField.name ())
+
+					.addEventName (
+						addEventName)
+
+					.removeEventName (
+						removeEventName)
+
+					.eventOrder (
+						eventOrder)
+
+					.contextUpdateSignalName (
+						updateSignalName)
+
+					.targetUpdateSignalName (
+						targetUpdateSignalName)
+
+					.successNotice (
+						successNotice)
+
 					.handle ();
 
 			}
@@ -222,7 +247,9 @@ class ObjectLinksPageBuilder {
 				name);
 
 		tabLabel =
-			capitalise (camelToSpaces (name));
+			capitalise (
+				camelToSpaces (
+					name));
 
 		localFile =
 			stringFormat (
@@ -239,13 +266,15 @@ class ObjectLinksPageBuilder {
 			stringFormat (
 				"%s%sResponder",
 				container.newBeanNamePrefix (),
-				capitalise (name));
+				capitalise (
+					name));
 
 		pageTitle =
 			stringFormat (
 				"%s %s",
 				container.consoleHelper ().friendlyName (),
-				camelToSpaces (name));
+				camelToSpaces (
+					name));
 
 		linksField =
 			container.consoleHelper ().field (

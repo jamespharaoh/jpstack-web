@@ -23,7 +23,6 @@ import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
-import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
 import wbs.smsapps.forwarder.model.ForwarderObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderRec;
 
@@ -109,7 +108,7 @@ class ForwarderCommand
 				"default");
 
 		forwarderMessageInHelper.insert (
-			new ForwarderMessageInRec ()
+			forwarderMessageInHelper.createInstance ()
 
 			.setForwarder (
 				forwarder)

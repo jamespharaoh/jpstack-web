@@ -419,7 +419,7 @@ class ManualResponderRequestPendingFormAction
 
 		ManualResponderReplyRec reply =
 			manualResponderReplyHelper.insert (
-				new ManualResponderReplyRec ()
+				manualResponderReplyHelper.createInstance ()
 
 			.setManualResponderRequest (
 				request)

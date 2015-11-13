@@ -38,7 +38,7 @@ class SimulatorSessionNumberObjectHelperImplementation
 
 		SimulatorSessionNumberRec newSimulatorSessionNumber =
 			simulatorSessionNumberHelper.insert (
-				new SimulatorSessionNumberRec ()
+				simulatorSessionNumberHelper.createInstance ()
 
 			.setNumber (
 				number)

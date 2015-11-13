@@ -145,7 +145,12 @@ class AssociativeCollectionModelFieldBuilder {
 				spec.whereSql ())
 
 			.orderSql (
-				spec.orderSql ());
+				spec.orderSql ())
+
+			.owned (
+				ifNull (
+					spec.owned (),
+					false));
 
 		// store field
 

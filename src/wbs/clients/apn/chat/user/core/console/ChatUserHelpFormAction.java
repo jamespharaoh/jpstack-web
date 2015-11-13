@@ -3,7 +3,11 @@ package wbs.clients.apn.chat.user.core.console;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.help.logic.ChatHelpLogic;
+import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
@@ -80,7 +84,8 @@ class ChatUserHelpFormAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (
-				requestContext.stuffInt ("chatUserId"));
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		// send message
 
@@ -88,14 +93,15 @@ class ChatUserHelpFormAction
 			user,
 			chatUser,
 			text,
-			null,
-			null);
+			Optional.<Integer>absent (),
+			Optional.<ChatHelpLogRec>absent ());
 
 		transaction.commit ();
 
 		// return
 
-		requestContext.addNotice ("Message sent");
+		requestContext.addNotice (
+			"Message sent");
 
 		return null;
 

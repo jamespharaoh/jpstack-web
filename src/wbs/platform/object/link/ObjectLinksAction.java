@@ -1,5 +1,10 @@
 package wbs.platform.object.link;
 
+import static wbs.framework.utils.etc.Misc.contains;
+import static wbs.framework.utils.etc.Misc.doesNotContain;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +17,7 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.priv.PrivChecker;
@@ -124,11 +130,14 @@ class ObjectLinksAction
 		List<Record<?>> updatedTargetObjects =
 			new ArrayList<Record<?>> ();
 
-		for (String param
-				: params) {
+		for (
+			String param
+				: params
+		) {
 
 			Matcher matcher =
-				oldGroupPattern.matcher (param);
+				oldGroupPattern.matcher (
+					param);
 
 			if (! matcher.matches ()) {
 
@@ -155,27 +164,33 @@ class ObjectLinksAction
 			Record<?> targetObject =
 				targetHelper.find (linkId);
 
-			//@SuppressWarnings ("unchecked")
-			//Set<Record<?>> targetLinks =
-			//	(Set<Record<?>>)
-			//	BeanLogic.getProperty (
-			//		targetObject,
-			//		targetLinkField);
+			@SuppressWarnings ("unchecked")
+			Set<Record<?>> targetLinks =
+				(Set<Record<?>>)
+				BeanLogic.getProperty (
+					targetObject,
+					targetLinkField);
 
 			if (! privChecker.can (
 					targetObject,
 					"manage"))
 				continue;
 
-			if (newIsMember
-					&& ! contextLinks.contains (targetObject)) {
+			if (
+
+				newIsMember
+
+				&& doesNotContain (
+					contextLinks,
+					targetObject)
+
+			) {
 
 				contextLinks.add (
 					targetObject);
 
-				// TODO fix this properly
-				//targetLinks.add (
-				//	contextObject);
+				targetLinks.add (
+					contextObject);
 
 				if (eventOrder == EventOrder.contextThenTarget) {
 
@@ -199,15 +214,21 @@ class ObjectLinksAction
 
 			}
 
-			if (oldIsMember
-					&& contextLinks.contains (targetObject)) {
+			if (
+
+				oldIsMember
+
+				&& contains (
+					contextLinks,
+					targetObject)
+
+			) {
 
 				contextLinks.remove (
 					targetObject);
 
-				// TODO fix this properly
-				//targetLinks.remove (
-				//	contextObject);
+				targetLinks.remove (
+					contextObject);
 
 				if (eventOrder == EventOrder.contextThenTarget) {
 
@@ -236,9 +257,15 @@ class ObjectLinksAction
 
 		}
 
-		if (! updatedTargetObjects.isEmpty ()) {
+		if (
+			isNotEmpty (
+				updatedTargetObjects)
+		) {
 
-			if (contextUpdateSignalName != null) {
+			if (
+				isNotNull (
+					contextUpdateSignalName)
+			) {
 
 				updateManager.signalUpdate (
 					contextUpdateSignalName,
@@ -246,10 +273,15 @@ class ObjectLinksAction
 
 			}
 
-			if (targetUpdateSignalName != null) {
+			if (
+				isNotNull (
+					targetUpdateSignalName)
+			) {
 
-				for (Record<?> targetObject
-						: updatedTargetObjects) {
+				for (
+					Record<?> targetObject
+						: updatedTargetObjects
+				) {
 
 					updateManager.signalUpdate (
 						targetUpdateSignalName,
@@ -263,7 +295,10 @@ class ObjectLinksAction
 
 		transaction.commit ();
 
-		if (! updatedTargetObjects.isEmpty ()) {
+		if (
+			isNotEmpty (
+				updatedTargetObjects)
+		) {
 
 			requestContext.addNotice (
 				successNotice);

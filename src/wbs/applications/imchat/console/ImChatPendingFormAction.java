@@ -225,7 +225,7 @@ class ImChatPendingFormAction
 
 		ImChatMessageRec operatorMessage =
 			imChatMessageHelper.insert (
-				new ImChatMessageRec ()
+				imChatMessageHelper.createInstance ()
 
 			.setImChatConversation (
 				conversation)

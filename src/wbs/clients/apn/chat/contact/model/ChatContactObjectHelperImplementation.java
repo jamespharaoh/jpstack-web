@@ -122,7 +122,7 @@ class ChatContactObjectHelperImplementation
 
 		chatContact =
 			chatContactHelper.insert (
-				new ChatContactRec ()
+				chatContactHelper.createInstance ()
 
 			.setFromUser (
 				fromUser)

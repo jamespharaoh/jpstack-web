@@ -16,11 +16,9 @@ import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerDetailDataType;
 import wbs.applications.imchat.model.ImChatCustomerDetailTypeObjectHelper;
-import wbs.applications.imchat.model.ImChatCustomerDetailTypeRec;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageObjectHelper;
-import wbs.applications.imchat.model.ImChatMessageRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatPricePointObjectHelper;
 import wbs.applications.imchat.model.ImChatPricePointRec;
@@ -28,12 +26,9 @@ import wbs.applications.imchat.model.ImChatProfileObjectHelper;
 import wbs.applications.imchat.model.ImChatProfileRec;
 import wbs.applications.imchat.model.ImChatProfileState;
 import wbs.applications.imchat.model.ImChatPurchaseObjectHelper;
-import wbs.applications.imchat.model.ImChatPurchaseRec;
 import wbs.applications.imchat.model.ImChatRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
-import wbs.applications.imchat.model.ImChatSessionRec;
 import wbs.applications.imchat.model.ImChatTemplateObjectHelper;
-import wbs.applications.imchat.model.ImChatTemplateRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -46,7 +41,6 @@ import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 
 @PrototypeComponent ("imChatCoreFixtureProvider")
@@ -123,7 +117,7 @@ class ImChatCoreFixtureProvider
 		// menu
 
 		menuItemHelper.insert (
-			new MenuItemRec ()
+			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
@@ -155,7 +149,7 @@ class ImChatCoreFixtureProvider
 
 		ImChatRec imChat =
 			imChatHelper.insert (
-				new ImChatRec ()
+				imChatHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -212,7 +206,7 @@ class ImChatCoreFixtureProvider
 
 		ImChatPricePointRec basicPricePoint =
 			imChatPricePointHelper.insert (
-				new ImChatPricePointRec ()
+				imChatPricePointHelper.createInstance ()
 
 			.setImChat (
 				imChat)
@@ -235,7 +229,7 @@ class ImChatCoreFixtureProvider
 		);
 
 		imChatPricePointHelper.insert (
-			new ImChatPricePointRec ()
+			imChatPricePointHelper.createInstance ()
 
 			.setImChat (
 				imChat)
@@ -258,7 +252,7 @@ class ImChatCoreFixtureProvider
 		);
 
 		imChatPricePointHelper.insert (
-			new ImChatPricePointRec ()
+			imChatPricePointHelper.createInstance ()
 
 			.setImChat (
 				imChat)
@@ -289,7 +283,7 @@ class ImChatCoreFixtureProvider
 		) {
 
 			imChatTemplateHelper.insert (
-				new ImChatTemplateRec ()
+				imChatTemplateHelper.createInstance ()
 
 				.setImChat (
 					imChat)
@@ -321,7 +315,7 @@ class ImChatCoreFixtureProvider
 		// customer detail types
 
 		imChatCustomerDetailTypeHelper.insert (
-			new ImChatCustomerDetailTypeRec ()
+			imChatCustomerDetailTypeHelper.createInstance ()
 
 			.setImChat (
 				imChat)
@@ -353,7 +347,7 @@ class ImChatCoreFixtureProvider
 		);
 
 		imChatCustomerDetailTypeHelper.insert (
-			new ImChatCustomerDetailTypeRec ()
+			imChatCustomerDetailTypeHelper.createInstance ()
 
 			.setImChat (
 				imChat)
@@ -388,7 +382,7 @@ class ImChatCoreFixtureProvider
 		);
 
 		imChatCustomerDetailTypeHelper.insert (
-			new ImChatCustomerDetailTypeRec ()
+			imChatCustomerDetailTypeHelper.createInstance ()
 
 			.setImChat (
 				imChat)
@@ -422,16 +416,18 @@ class ImChatCoreFixtureProvider
 		// im chat profile
 
 		MediaRec dougalMedia =
-			mediaLogic.createMediaFromImage (
+			mediaLogic.createMediaFromImageRequired (
 				IOUtils.toByteArray (
-					new FileInputStream ("binaries/test/dougal.jpg")),
+					new FileInputStream (
+						"binaries/test/dougal.jpg")),
 				"image/jpeg",
 				"dougal.jpg");
 
 		MediaRec ermintrudeMedia =
-			mediaLogic.createMediaFromImage (
+			mediaLogic.createMediaFromImageRequired (
 				IOUtils.toByteArray (
-					new FileInputStream ("binaries/test/ermintrude.jpg")),
+					new FileInputStream (
+						"binaries/test/ermintrude.jpg")),
 				"image/jpeg",
 				"ermintrude.jpg");
 
@@ -446,7 +442,7 @@ class ImChatCoreFixtureProvider
 
 			profiles.add (
 				imChatProfileHelper.insert (
-					new ImChatProfileRec ()
+					imChatProfileHelper.createInstance ()
 
 				.setImChat (
 					imChat)
@@ -491,7 +487,7 @@ class ImChatCoreFixtureProvider
 
 		ImChatCustomerRec imChatCustomer =
 			imChatCustomerHelper.insert (
-				new ImChatCustomerRec ()
+				imChatCustomerHelper.createInstance ()
 
 			.setImChat (
 				imChat)
@@ -511,7 +507,7 @@ class ImChatCoreFixtureProvider
 
 		ImChatConversationRec imChatConversation =
 			imChatConversationHelper.insert (
-				new ImChatConversationRec ()
+				imChatConversationHelper.createInstance ()
 
 			.setImChatCustomer (
 				imChatCustomer)
@@ -535,7 +531,7 @@ class ImChatCoreFixtureProvider
 		// im chat session
 
 		imChatSessionHelper.insert (
-			new ImChatSessionRec ()
+			imChatSessionHelper.createInstance ()
 
 			.setImChatCustomer (
 				imChatCustomer)
@@ -560,7 +556,7 @@ class ImChatCoreFixtureProvider
 		// im chat purchase
 
 		imChatPurchaseHelper.insert (
-			new ImChatPurchaseRec ()
+			imChatPurchaseHelper.createInstance ()
 
 			.setImChatCustomer (
 				imChatCustomer)
@@ -593,7 +589,7 @@ class ImChatCoreFixtureProvider
 		// im chat message
 
 		imChatMessageHelper.insert (
-			new ImChatMessageRec ()
+			imChatMessageHelper.createInstance ()
 
 			.setImChatConversation (
 				imChatConversation)

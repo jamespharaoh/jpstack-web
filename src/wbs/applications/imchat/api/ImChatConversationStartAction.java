@@ -175,7 +175,7 @@ class ImChatConversationStartAction
 
 		ImChatConversationRec conversation =
 			imChatConversationHelper.insert (
-				new ImChatConversationRec ()
+				imChatConversationHelper.createInstance ()
 
 			.setImChatCustomer (
 				customer)

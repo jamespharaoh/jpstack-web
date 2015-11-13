@@ -35,15 +35,25 @@ class BroadcastNumberObjectHelperImplementation
 
 		broadcastNumber =
 			broadcastNumberHelper.get ().insert (
-				new BroadcastNumberRec ()
-					.setBroadcast (broadcast)
-					.setNumber (number)
-					.setState (BroadcastNumberState.removed));
+				broadcastNumberHelper.get ().createInstance ()
+
+			.setBroadcast (
+				broadcast)
+
+			.setNumber (
+				number)
+
+			.setState (
+				BroadcastNumberState.removed)
+
+		);
 
 		// update broadcast
 
 		broadcast
-			.setNumRemoved (broadcast.getNumRemoved () + 1);
+
+			.setNumRemoved (
+				broadcast.getNumRemoved () + 1);
 
 		// return
 

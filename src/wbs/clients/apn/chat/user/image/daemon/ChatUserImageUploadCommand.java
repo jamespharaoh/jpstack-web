@@ -11,6 +11,9 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Duration;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -18,7 +21,6 @@ import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
-import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -35,9 +37,6 @@ import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatUserImageUploadCommand")
@@ -176,7 +175,7 @@ class ChatUserImageUploadCommand
 		// save token in database
 
 		chatUserImageUploadTokenHelper.insert (
-			new ChatUserImageUploadTokenRec ()
+			chatUserImageUploadTokenHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)

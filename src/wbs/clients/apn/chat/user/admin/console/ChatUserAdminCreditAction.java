@@ -8,6 +8,9 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.bill.model.ChatUserCreditObjectHelper;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -24,8 +27,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
-
-import com.google.common.collect.ImmutableMap;
 
 @PrototypeComponent ("chatUserAdminCreditAction")
 public
@@ -101,7 +102,7 @@ class ChatUserAdminCreditAction
 
 		ChatUserCreditRec chatUserCredit =
 			chatUserCreditHelper.insert (
-				new ChatUserCreditRec ()
+				chatUserCreditHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)

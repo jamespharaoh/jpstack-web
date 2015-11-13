@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.AbstractObjectHooks;
@@ -79,11 +80,13 @@ class PrivHooks
 			privTypeDao.findByParentObjectType (
 				parentType);
 
-		for (PrivTypeRec privType
-				: privTypes) {
+		for (
+			PrivTypeRec privType
+				: privTypes
+		) {
 
 			privHelper.insert (
-				new PrivRec ()
+				privHelper.createInstance ()
 
 				.setPrivType (
 					privType)

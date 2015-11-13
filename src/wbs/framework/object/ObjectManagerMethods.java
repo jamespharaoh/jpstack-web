@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
-
-import com.google.common.base.Optional;
 
 public
 interface ObjectManagerMethods {
@@ -64,10 +64,6 @@ interface ObjectManagerMethods {
 			Class<ObjectType> objectClass,
 			Record<?> parent,
 			String code);
-
-	<ObjectType extends Record<?>>
-	ObjectType insert (
-			ObjectType object);
 
 	<ObjectType extends Record<?>>
 	ObjectType update (

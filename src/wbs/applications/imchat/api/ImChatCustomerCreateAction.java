@@ -165,7 +165,7 @@ class ImChatCustomerCreateAction
 
 		ImChatCustomerRec newCustomer =
 			imChatCustomerHelper.insert (
-				new ImChatCustomerRec ()
+				imChatCustomerHelper.createInstance ()
 
 			.setImChat (
 				imChat)
@@ -185,7 +185,7 @@ class ImChatCustomerCreateAction
 
 		ImChatSessionRec session =
 			imChatSessionHelper.insert (
-				new ImChatSessionRec ()
+				imChatSessionHelper.createInstance ()
 
 			.setImChatCustomer (
 				newCustomer)

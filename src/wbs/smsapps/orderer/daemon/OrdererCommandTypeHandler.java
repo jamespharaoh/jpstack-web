@@ -158,7 +158,7 @@ class OrdererCommandTypeHandler
 
 		OrdererOrderRec order =
 			ordererOrderHelper.insert (
-				new OrdererOrderRec ()
+				ordererOrderHelper.createInstance ()
 
 			.setOrderer (
 				orderer)

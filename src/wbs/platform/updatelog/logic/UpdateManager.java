@@ -353,10 +353,18 @@ class UpdateManager {
 
 			updateLog =
 				updateLogHelper.insert (
-					new UpdateLogRec ()
-						.setCode (table)
-						.setRef (ref)
-						.setVersion (0));
+					updateLogHelper.createInstance ()
+
+				.setCode (
+					table)
+
+				.setRef (
+					ref)
+
+				.setVersion (
+					0)
+
+			);
 
 		}
 

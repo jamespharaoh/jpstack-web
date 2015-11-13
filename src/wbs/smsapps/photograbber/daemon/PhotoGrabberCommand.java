@@ -19,6 +19,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -27,6 +28,8 @@ import lombok.extern.log4j.Log4j;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -51,8 +54,6 @@ import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.smsapps.photograbber.model.PhotoGrabberRec;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestObjectHelper;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestRec;
-
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @Log4j
@@ -148,7 +149,7 @@ class PhotoGrabberCommand
 				"default");
 
 		PhotoGrabberRequestRec photoGrabberRequest =
-			new PhotoGrabberRequestRec ()
+			photoGrabberRequestHelper.createInstance ()
 
 			.setPhotoGrabber (
 				photoGrabber)
@@ -308,7 +309,7 @@ class PhotoGrabberCommand
 
 	@SneakyThrows (IOException.class)
 	MediaRec fetchMedia (
-			String url,
+			@NonNull String url,
 			boolean jpeg,
 			int jpegWidth,
 			int jpegHeight) {
@@ -316,7 +317,7 @@ class PhotoGrabberCommand
 		byte[] data =
 			fetchUrlData (url);
 
-		return mediaLogic.createMediaFromImage (
+		return mediaLogic.createMediaFromImageRequired (
 			data,
 			"image/jpeg",
 			null);

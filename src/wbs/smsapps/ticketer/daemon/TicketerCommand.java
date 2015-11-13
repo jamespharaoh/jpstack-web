@@ -24,8 +24,6 @@ import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.smsapps.ticketer.model.TicketerRec;
 import wbs.smsapps.ticketer.model.TicketerTicketObjectHelper;
-import wbs.smsapps.ticketer.model.TicketerTicketRec;
-
 import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
@@ -150,7 +148,7 @@ class TicketerCommand
 		// create ticketer ticket entry
 
 		ticketerTicketHelper.insert (
-			new TicketerTicketRec ()
+			ticketerTicketHelper.createInstance ()
 
 			.setTicketer (
 				ticketer)
@@ -170,7 +168,8 @@ class TicketerCommand
 
 		return inboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (defaultService),
+			Optional.of (
+				defaultService),
 			Optional.<AffiliateRec>absent (),
 			command);
 

@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
@@ -16,6 +17,7 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.services.ticket.core.console.FieldsProvider;
+import wbs.services.ticket.core.console.TicketConsoleHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
@@ -35,10 +37,10 @@ class ObjectTicketCreatePart
 	ConsoleManager consoleManager;
 
 	@Inject
-	ConsoleObjectManager objectManager;
+	FormFieldLogic formFieldLogic;
 
 	@Inject
-	FormFieldLogic formFieldLogic;
+	ConsoleObjectManager objectManager;
 
 	@Inject
 	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
@@ -46,10 +48,13 @@ class ObjectTicketCreatePart
 	@Inject
 	TicketFieldValueObjectHelper ticketFieldValueHelper;
 
-	@Getter @Setter
-	List<ObjectTicketCreateSetFieldSpec> ticketFieldSpecs;
+	@Inject
+	TicketConsoleHelper ticketHelper;
 
 	// properties
+
+	@Getter @Setter
+	List<ObjectTicketCreateSetFieldSpec> ticketFieldSpecs;
 
 	@Getter @Setter
 	ConsoleHelper<?> consoleHelper;
@@ -94,7 +99,7 @@ class ObjectTicketCreatePart
 		// create dummy instance
 
 		ticket =
-			new TicketRec ()
+			ticketHelper.createInstance ()
 
 			.setTicketManager (
 				ticketManager);
@@ -117,7 +122,7 @@ class ObjectTicketCreatePart
 			}
 
 			TicketFieldValueRec ticketFieldValue =
-				new TicketFieldValueRec ()
+				ticketFieldValueHelper.createInstance ()
 
 				.setTicket (
 					ticket)

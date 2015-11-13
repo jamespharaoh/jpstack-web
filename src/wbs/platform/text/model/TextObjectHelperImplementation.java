@@ -75,8 +75,12 @@ class TextObjectHelperImplementation
 
 		text =
 			textHelper.insert (
-				new TextRec ()
-					.setText (textValue));
+				textHelper.createInstance ()
+
+			.setText (
+				textValue)
+
+		);
 
 		textCache.byText.put (
 			textValue,

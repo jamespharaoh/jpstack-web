@@ -19,6 +19,8 @@ import lombok.extern.log4j.Log4j;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -41,15 +43,11 @@ import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
 import wbs.smsapps.alerts.model.AlertsAlertObjectHelper;
-import wbs.smsapps.alerts.model.AlertsAlertRec;
 import wbs.smsapps.alerts.model.AlertsNumberRec;
 import wbs.smsapps.alerts.model.AlertsSettingsObjectHelper;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
 import wbs.smsapps.alerts.model.AlertsStatusCheckObjectHelper;
-import wbs.smsapps.alerts.model.AlertsStatusCheckRec;
 import wbs.smsapps.alerts.model.AlertsSubjectRec;
-
-import com.google.common.base.Optional;
 
 @Log4j
 @SingletonComponent ("alertsDaemon")
@@ -412,7 +410,7 @@ class AlertsDaemon
 			// create alert
 
 			alertsAlertHelper.insert (
-				new AlertsAlertRec ()
+				alertsAlertHelper.createInstance ()
 
 				.setAlertsSettings (
 					alertsSettings)
@@ -452,7 +450,7 @@ class AlertsDaemon
 		// create status check log
 
 		alertsStatusCheckHelper.insert (
-			new AlertsStatusCheckRec ()
+			alertsStatusCheckHelper.createInstance ()
 
 			.setAlertsSettings (
 				alertsSettings)

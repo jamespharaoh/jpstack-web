@@ -11,10 +11,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
-import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationReason;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -24,8 +26,6 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.platform.daemon.SleepingDaemonService;
-
-import com.google.common.base.Optional;
 
 @SingletonComponent ("chatUserJoinOutboundDaemon")
 public
@@ -191,7 +191,7 @@ class ChatUserJoinOutboundDaemon
 		// create a log
 
 		chatUserInitiationLogHelper.insert (
-			new ChatUserInitiationLogRec ()
+			chatUserInitiationLogHelper.createInstance ()
 
 			.setChatUser (
 				user)

@@ -19,7 +19,8 @@ class Cryptor {
 		try {
 
 			KeyGenerator keyGenerator =
-				KeyGenerator.getInstance ("Blowfish");
+				KeyGenerator.getInstance (
+					"Blowfish");
 
 			keyGenerator.init (128);
 
@@ -60,7 +61,8 @@ class Cryptor {
 					cipher.doFinal (
 						clearText));
 
-			log.debug ("encrypted " + input + " as " + ret);
+			log.debug (
+				"encrypted " + input + " as " + ret);
 
 			return ret;
 
@@ -82,7 +84,8 @@ class Cryptor {
 				fromHex (input);
 
 			Cipher cipher =
-				Cipher.getInstance ("Blowfish");
+				Cipher.getInstance (
+					"Blowfish");
 
 			cipher.init (
 				Cipher.DECRYPT_MODE,

@@ -75,7 +75,7 @@ import wbs.sms.number.core.logic.NumberLogic;
 
 @SingletonComponent ("chatUserLogic")
 public
-class ChatUserLogicImpl
+class ChatUserLogicImplementation
 	implements ChatUserLogic {
 
 	// dependencies
@@ -582,8 +582,8 @@ class ChatUserLogicImpl
 		Transaction transaction =
 			database.currentTransaction ();
 
-		return objectManager.insert (
-			new ChatUserRec ()
+		return chatUserHelper.insert (
+			chatUserHelper.createInstance ()
 
 			.setChat (
 				chat)
@@ -658,7 +658,7 @@ class ChatUserLogicImpl
 
 		ChatUserImageRec chatUserImage =
 			chatUserImageHelper.insert (
-				new ChatUserImageRec ()
+				chatUserImageHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)
@@ -726,7 +726,7 @@ class ChatUserLogicImpl
 			fullMedia.getMediaType ().getMimeType ();
 
 		BufferedImage fullImage =
-			mediaLogic.readImage (
+			mediaLogic.readImageRequired (
 				fullData,
 				fullMimeType);
 
@@ -746,7 +746,7 @@ class ChatUserLogicImpl
 				0.6f);
 
 		MediaRec smallMedia =
-			mediaLogic.createMediaFromImage (
+			mediaLogic.createMediaFromImageRequired (
 				smallData,
 				"image/jpeg",
 				chatUser.getCode () + ".jpg");
@@ -780,7 +780,7 @@ class ChatUserLogicImpl
 				chatUser.getCode () + ".jpg");
 
 		MediaRec fullMedia =
-			mediaLogic.createMediaFromImage (
+			mediaLogic.createMediaFromImageRequired (
 				data,
 				mimeType.or (
 					"image/jpeg"),
@@ -854,8 +854,8 @@ class ChatUserLogicImpl
 		// resample
 
 		MediaRec newMedia =
-			mediaLogic.createMediaFromVideo (
-				mediaLogic.videoConvert (
+			mediaLogic.createMediaFromVideoRequired (
+				mediaLogic.videoConvertRequired (
 					"3gpp",
 					fullMedia.getContent ().getData ()),
 				"video/3gpp",
@@ -917,7 +917,7 @@ class ChatUserLogicImpl
 		// create media
 
 		MediaRec fullMedia =
-			mediaLogic.createMediaFromVideo (
+			mediaLogic.createMediaFromVideoRequired (
 				data,
 				mimeType,
 				filename);
@@ -925,8 +925,8 @@ class ChatUserLogicImpl
 		// resample
 
 		MediaRec newMedia =
-			mediaLogic.createMediaFromVideo (
-				mediaLogic.videoConvert ("3gpp", data),
+			mediaLogic.createMediaFromVideoRequired (
+				mediaLogic.videoConvertRequired ("3gpp", data),
 				"video/3gpp",
 				chatUser.getCode () + ".3gp");
 
@@ -955,7 +955,7 @@ class ChatUserLogicImpl
 
 		MediaRec newMedia =
 			mediaLogic.createMediaFromAudio (
-				mediaLogic.videoConvert ("mp3", data),
+				mediaLogic.videoConvertRequired ("mp3", data),
 				"audio/mpeg",
 				chatUser.getCode () + ".mp3");
 

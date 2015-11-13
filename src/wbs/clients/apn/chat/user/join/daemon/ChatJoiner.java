@@ -18,6 +18,8 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
@@ -39,7 +41,6 @@ import wbs.clients.apn.chat.scheme.model.ChatSchemeObjectHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserDobFailureObjectHelper;
-import wbs.clients.apn.chat.user.core.model.ChatUserDobFailureRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.Gender;
@@ -67,8 +68,6 @@ import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
-
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @Log4j
@@ -321,7 +320,7 @@ class ChatJoiner {
 		} else {
 
 			chatUserDobFailureHelper.insert (
-				new ChatUserDobFailureRec ()
+				chatUserDobFailureHelper.createInstance ()
 
 				.setChatUser (
 					chatUser)

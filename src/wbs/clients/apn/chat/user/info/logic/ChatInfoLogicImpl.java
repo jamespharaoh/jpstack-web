@@ -22,6 +22,10 @@ import lombok.extern.log4j.Log4j;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
@@ -62,10 +66,6 @@ import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.magicnumber.logic.MagicNumberLogic;
 import wbs.sms.magicnumber.model.MagicNumberRec;
 import wbs.sms.message.outbox.logic.MessageSender;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @SingletonComponent ("chatInfoLogic")
@@ -412,7 +412,7 @@ class ChatInfoLogicImpl
 
 		ChatInfoSiteRec chatInfoSite =
 			chatInfoSiteHelper.insert (
-				new ChatInfoSiteRec ()
+				chatInfoSiteHelper.createInstance ()
 
 			.setChatUser (
 				thisUser)
@@ -1384,7 +1384,7 @@ class ChatInfoLogicImpl
 
 		ChatUserInfoRec chatUserInfoRec =
 			chatUserInfoHelper.insert (
-				new ChatUserInfoRec ()
+				chatUserInfoHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)

@@ -25,7 +25,7 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ChatUserLogicImpl"/>
+		<bean class="logic.ChatUserLogicImplementation"/>
 	</layer>
 
 	<layer name="console">

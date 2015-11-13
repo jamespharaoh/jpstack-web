@@ -86,10 +86,12 @@
 	<collections>
 
 		<children-collection
-			type="alertsNumber"/>
+			type="alertsNumber"
+			order-sql="id"/>
 
 		<children-collection
-			type="alertsSubject"/>
+			type="alertsSubject"
+			order-sql="id"/>
 
 	</collections>
 

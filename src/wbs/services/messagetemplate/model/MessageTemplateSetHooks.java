@@ -216,7 +216,10 @@ class MessageTemplateSetHooks
 			messageLength < messageTemplateType.getMinLength () ||
 			messageLength > messageTemplateType.getMaxLength ())
 		{
-			throw new RuntimeException ("The message length is out of it's template type bounds!");
+
+			throw new RuntimeException (
+				"The message length is out of its template type bounds!");
+
 		}
 
 		// if the length is correct and all the required parameters are present, the value is created
@@ -226,30 +229,45 @@ class MessageTemplateSetHooks
 		try {
 
 			messageTemplateValue =
-				messageTemplateSet.getMessageTemplateValues().get(
-					messageTemplateType.getId());
-		}
-		catch (Exception e) {
+				messageTemplateSet.getMessageTemplateValues ().get (
+					messageTemplateType.getId ());
+
+		} catch (Exception exception) {
+
 			messageTemplateValue =
 				null;
+
 		}
 
 		// if the value object does not exist, a new one is created
 
 		if (messageTemplateValue == null) {
-			messageTemplateValue = new MessageTemplateValueRec()
-				.setMessageTemplateSet(messageTemplateSet)
-				.setMessageTemplateType(messageTemplateType);
+
+			messageTemplateValue =
+				messageTemplateValueHelper.get ().createInstance ()
+
+				.setMessageTemplateSet (
+					messageTemplateSet)
+
+				.setMessageTemplateType (
+					messageTemplateType);
+
 		}
 
 
-		messageTemplateValue.setStringValue((String)message);
+		messageTemplateValue
 
-		messageTemplateSet.setNumTemplates (
-			messageTemplateSet.getNumTemplates() + 1);
+			.setStringValue (
+				(String)
+				message);
+
+		messageTemplateSet
+
+			.setNumTemplates (
+				messageTemplateSet.getNumTemplates () + 1);
 
 		 messageTemplateSet.getMessageTemplateValues ().put (
-			messageTemplateType.getId(),
+			messageTemplateType.getId (),
 			messageTemplateValue);
 
 	}

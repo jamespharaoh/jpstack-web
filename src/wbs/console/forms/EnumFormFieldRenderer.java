@@ -100,10 +100,10 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 
 		out.writeFormat (
 			"<td>%h</td>\n",
-			camelToSpaces (
-				interfaceValue.isPresent ()
-					? interfaceValue.get ().toString ()
-					: ""));
+			interfaceValue.isPresent ()
+				? camelToSpaces (
+					interfaceValue.get ().toString ())
+				: "");
 
 	}
 

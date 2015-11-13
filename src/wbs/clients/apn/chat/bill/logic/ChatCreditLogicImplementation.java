@@ -31,7 +31,6 @@ import com.google.common.collect.ImmutableMap;
 import wbs.clients.apn.chat.bill.model.ChatNetworkObjectHelper;
 import wbs.clients.apn.chat.bill.model.ChatNetworkRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditLimitLogObjectHelper;
-import wbs.clients.apn.chat.bill.model.ChatUserCreditLimitLogRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.bill.model.ChatUserSpendObjectHelper;
 import wbs.clients.apn.chat.bill.model.ChatUserSpendRec;
@@ -418,7 +417,7 @@ class ChatCreditLogicImplementation
 
 			chatUserSpend =
 				chatUserSpendHelper.insert (
-					new ChatUserSpendRec ()
+					chatUserSpendHelper.createInstance ()
 
 				.setChatUser (
 					chatUser)
@@ -1326,7 +1325,7 @@ class ChatCreditLogicImplementation
 		// log it
 
 		chatUserCreditLimitLogHelper.insert (
-			new ChatUserCreditLimitLogRec ()
+			chatUserCreditLimitLogHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)

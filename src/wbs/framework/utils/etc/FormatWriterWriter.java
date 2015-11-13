@@ -1,5 +1,6 @@
 package wbs.framework.utils.etc;
 
+import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -70,6 +71,22 @@ class FormatWriterWriter
 			throw new RuntimeIoException (exception);
 
 		}
+
+	}
+
+	@Override
+	public
+	void indent () {
+
+		doNothing ();
+
+	}
+
+	@Override
+	public
+	void unindent () {
+
+		doNothing ();
 
 	}
 

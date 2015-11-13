@@ -621,16 +621,6 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public <ObjectType extends Record<?>>
-	ObjectType insert (
-			ObjectType object) {
-
-		return objectManager.insert (
-			object);
-
-	}
-
-	@Override
-	public <ObjectType extends Record<?>>
 	ObjectType update (
 			ObjectType object) {
 

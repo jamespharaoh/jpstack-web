@@ -268,7 +268,7 @@ class ImageFormFieldRenderer<Container>
 			IOUtils.toByteArray (
 				fileItem.getInputStream ());
 
-		return mediaLogic.createMediaFromImage (
+		return mediaLogic.createMediaFromImageRequired (
 			data,
 			"image/jpeg",
 			fileItem.getName ());

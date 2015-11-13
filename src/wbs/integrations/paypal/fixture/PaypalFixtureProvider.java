@@ -11,10 +11,8 @@ import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
-import wbs.integrations.paypal.model.PaypalAccountRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 
 @PrototypeComponent ("paypalFixtureProvider")
@@ -43,7 +41,7 @@ class PaypalFixtureProvider
 	void createFixtures () {
 
 		menuItemHelper.insert (
-			new MenuItemRec ()
+			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
@@ -100,7 +98,7 @@ class PaypalFixtureProvider
 					continue;
 
 				paypalAccountHelper.insert (
-					new PaypalAccountRec ()
+					paypalAccountHelper.createInstance ()
 
 					.setSlice (
 						sliceHelper.findByCode (

@@ -253,7 +253,7 @@ class SubscriptionLogicImpl
 
 			SubscriptionBillRec subscriptionBill =
 				subscriptionBillHelper.insert (
-					new SubscriptionBillRec ()
+					subscriptionBillHelper.createInstance ()
 
 				.setSubscriptionNumber (
 					subscriptionNumber)

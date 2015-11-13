@@ -173,7 +173,7 @@ class ChatChatCommand
 		if (chatBlock == null) {
 
 			chatBlockHelper.insert (
-				new ChatBlockRec ()
+				chatBlockHelper.createInstance ()
 
 				.setChatUser (
 					fromChatUser)

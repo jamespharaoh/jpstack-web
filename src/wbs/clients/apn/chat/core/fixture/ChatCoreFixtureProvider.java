@@ -13,12 +13,10 @@ import org.joda.time.Instant;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageStatus;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateObjectHelper;
-import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeObjectHelper;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -34,7 +32,6 @@ import wbs.framework.utils.RandomLogic;
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
@@ -128,7 +125,7 @@ class ChatCoreFixtureProvider
 			database.currentTransaction ();
 
 		menuItemHelper.insert (
-			new MenuItemRec ()
+			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
@@ -160,7 +157,7 @@ class ChatCoreFixtureProvider
 
 		RouteRec billRoute =
 			routeHelper.insert (
-				new RouteRec ()
+				routeHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -200,7 +197,7 @@ class ChatCoreFixtureProvider
 
 		RouteRec freeRoute =
 			routeHelper.insert (
-				new RouteRec ()
+				routeHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -241,7 +238,7 @@ class ChatCoreFixtureProvider
 				"magic_number");
 
 		routeHelper.insert (
-			new RouteRec ()
+			routeHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -269,7 +266,7 @@ class ChatCoreFixtureProvider
 
 		ChatRec chat =
 			chatHelper.insert (
-				new ChatRec ()
+				chatHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -301,7 +298,7 @@ class ChatCoreFixtureProvider
 		// templates
 
 		chatHelpTemplateHelper.insert (
-			new ChatHelpTemplateRec ()
+			chatHelpTemplateHelper.createInstance ()
 
 			.setChat (
 				chat)
@@ -321,7 +318,7 @@ class ChatCoreFixtureProvider
 		);
 
 		chatHelpTemplateHelper.insert (
-			new ChatHelpTemplateRec ()
+			chatHelpTemplateHelper.createInstance ()
 
 			.setChat (
 				chat)
@@ -343,8 +340,8 @@ class ChatCoreFixtureProvider
 		// chat schemes
 
 		ChatSchemeRec leftChatScheme =
-			objectManager.insert (
-				new ChatSchemeRec ()
+			chatSchemeHelper.insert (
+				chatSchemeHelper.createInstance ()
 
 			.setChat (
 				chat)
@@ -373,7 +370,7 @@ class ChatCoreFixtureProvider
 		);
 
 		chatSchemeHelper.insert (
-			new ChatSchemeRec ()
+			chatSchemeHelper.createInstance ()
 
 			.setChat (
 				chat)
@@ -420,7 +417,7 @@ class ChatCoreFixtureProvider
 
 			NumberRec number =
 				numberHelper.insert (
-					new NumberRec ()
+					numberHelper.createInstance ()
 
 				.setNumber (
 					numberString)
@@ -434,7 +431,7 @@ class ChatCoreFixtureProvider
 
 			ChatUserRec chatUser =
 				chatUserHelper.insert (
-					new ChatUserRec ()
+					chatUserHelper.createInstance ()
 
 				.setChat (
 					chat)
@@ -483,7 +480,7 @@ class ChatCoreFixtureProvider
 
 			ChatUserRec chatUser =
 				chatUserHelper.insert (
-					new ChatUserRec ()
+					chatUserHelper.createInstance ()
 
 				.setChat (
 					chat)
@@ -525,7 +522,7 @@ class ChatCoreFixtureProvider
 						index));
 
 			chatMessageHelper.insert (
-				new ChatMessageRec ()
+				chatMessageHelper.createInstance ()
 
 				.setChat (
 					chat)
@@ -582,7 +579,7 @@ class ChatCoreFixtureProvider
 						index));
 
 			chatMessageHelper.insert (
-				new ChatMessageRec ()
+				chatMessageHelper.createInstance ()
 
 				.setChat (
 					chat)
@@ -636,7 +633,7 @@ class ChatCoreFixtureProvider
 						index));
 
 			chatMessageHelper.insert (
-				new ChatMessageRec ()
+				chatMessageHelper.createInstance ()
 
 				.setChat (
 					chat)

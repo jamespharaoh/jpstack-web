@@ -219,10 +219,12 @@ class ChatSupervisorConversationPart
 			"<th>Location</th>\n",
 
 			"<td>%h</td>\n",
-			monitorChatUser.getLocationPlace (),
+			emptyStringIfNull (
+				monitorChatUser.getLocationPlace ()),
 
 			"<td>%h</td>\n",
-			userChatUser.getLocationPlace (),
+			emptyStringIfNull (
+				userChatUser.getLocationPlace ()),
 
 			"</tr>\n");
 

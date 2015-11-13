@@ -86,7 +86,7 @@ class QueueConsoleLogic {
 
 		QueueItemClaimRec queueItemClaim =
 			queueItemClaimHelper.insert (
-				new QueueItemClaimRec ()
+				queueItemClaimHelper.createInstance ()
 
 			.setQueueItem (
 				queueItem)
@@ -230,7 +230,7 @@ class QueueConsoleLogic {
 
 		QueueItemClaimRec queueItemClaim =
 			queueItemClaimHelper.insert (
-				new QueueItemClaimRec ()
+				queueItemClaimHelper.createInstance ()
 
 			.setQueueItem (
 				queueItem)
@@ -250,7 +250,9 @@ class QueueConsoleLogic {
 		// update queue item
 
 		queueItem
-			.setQueueItemClaim (queueItemClaim);
+
+			.setQueueItemClaim (
+				queueItemClaim);
 
 	}
 

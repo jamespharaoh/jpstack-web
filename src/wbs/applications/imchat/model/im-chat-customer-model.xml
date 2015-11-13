@@ -37,9 +37,16 @@
 			name="balance"
 			default="0"/>
 
+		<!-- data -->
+
 		<reference-field
-			type="imChatConversation"
 			name="currentConversation"
+			type="imChatConversation"
+			nullable="yes"/>
+
+		<reference-field
+			name="activeSesion"
+			type="imChatSession"
 			nullable="yes"/>
 
 	</fields>

@@ -189,7 +189,7 @@ class SubscriptionNumberAddRemoveAction
 
 				SubscriptionSubRec subscriptionSub =
 					subscriptionSubHelper.insert (
-						new SubscriptionSubRec ()
+						subscriptionSubHelper.createInstance ()
 
 					.setSubscriptionNumber (
 						subscriptionNumber)

@@ -9,7 +9,6 @@ import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
@@ -18,9 +17,7 @@ import wbs.sms.route.sender.model.SenderObjectHelper;
 import wbs.test.simulator.model.SimulatorObjectHelper;
 import wbs.test.simulator.model.SimulatorRec;
 import wbs.test.simulator.model.SimulatorRouteObjectHelper;
-import wbs.test.simulator.model.SimulatorRouteRec;
 import wbs.test.simulator.model.SimulatorSessionObjectHelper;
-import wbs.test.simulator.model.SimulatorSessionRec;
 
 @PrototypeComponent ("simulatorFixtureProvider")
 public
@@ -75,7 +72,7 @@ class SimulatorFixtureProvider
 	void createMenuItem () {
 
 		menuItemHelper.insert (
-			new MenuItemRec ()
+			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
@@ -113,7 +110,7 @@ class SimulatorFixtureProvider
 
 		SimulatorRec simulator =
 			simulatorHelper.insert (
-				new SimulatorRec ()
+				simulatorHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -197,7 +194,7 @@ class SimulatorFixtureProvider
 				"inbound");
 
 		simulatorRouteHelper.insert (
-			new SimulatorRouteRec ()
+			simulatorRouteHelper.createInstance ()
 
 			.setSimulator (
 				simulator)
@@ -216,7 +213,7 @@ class SimulatorFixtureProvider
 		// session
 
 		simulatorSessionHelper.insert (
-			new SimulatorSessionRec ()
+			simulatorSessionHelper.createInstance ()
 
 			.setSimulator (
 				simulator)

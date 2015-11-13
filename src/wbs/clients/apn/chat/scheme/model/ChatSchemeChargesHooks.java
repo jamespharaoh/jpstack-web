@@ -6,13 +6,13 @@ import wbs.framework.record.Record;
 
 public
 class ChatSchemeChargesHooks
-	extends AbstractObjectHooks<ChatSchemeRec> {
+	extends AbstractObjectHooks<ChatSchemeChargesRec> {
 
 	@Override
 	public
 	void createSingletons (
-			ObjectHelper<ChatSchemeRec> chatSchemeHelper,
-			ObjectHelper<?> parentHelper,
+			ObjectHelper<ChatSchemeChargesRec> chatSchemeChargesHelper,
+			ObjectHelper<?> chatSchemeHelper,
 			Record<?> parent) {
 
 		if (! ((Object) parent instanceof ChatSchemeRec))
@@ -24,12 +24,18 @@ class ChatSchemeChargesHooks
 			parent;
 
 		ChatSchemeChargesRec chatSchemeCharges =
-			chatSchemeHelper.insert (
-				new ChatSchemeChargesRec ()
-					.setChatScheme (chatScheme));
+			chatSchemeChargesHelper.insert (
+				chatSchemeChargesHelper.createInstance ()
+
+			.setChatScheme (
+				chatScheme)
+
+		);
 
 		chatScheme
-			.setCharges (chatSchemeCharges);
+
+			.setCharges (
+				chatSchemeCharges);
 
 	}
 

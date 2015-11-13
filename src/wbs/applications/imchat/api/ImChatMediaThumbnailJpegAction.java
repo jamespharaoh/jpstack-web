@@ -104,7 +104,7 @@ class ImChatMediaThumbnailJpegAction
 		// resize image
 
 		BufferedImage originalImage =
-			mediaLogic.readImage (
+			mediaLogic.readImageRequired (
 				content.getData (),
 				media.getMediaType ().getMimeType ());
 

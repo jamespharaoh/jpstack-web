@@ -99,7 +99,8 @@
 		<associative-list
 			name="medias"
 			type="media"
-			table="chat_message_media"/>
+			table="chat_message_media"
+			owned="yes"/>
 
 	</collections>
 

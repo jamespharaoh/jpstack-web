@@ -303,11 +303,12 @@ class Oxygen8InboundMmsAction
 				matcher.group (2);
 
 			medias.add (
-				mediaLogic.createMedia (
+				mediaLogic.createMediaRequired (
 					fileItem.get (),
 					type,
 					fileItem.getName (),
-					charset));
+					Optional.of (
+						charset)));
 
 			if (
 

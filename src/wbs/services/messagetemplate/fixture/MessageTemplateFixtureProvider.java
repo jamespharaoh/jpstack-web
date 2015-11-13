@@ -9,7 +9,6 @@ import wbs.framework.record.GlobalId;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseObjectHelper;
@@ -33,7 +32,7 @@ public class MessageTemplateFixtureProvider
 	MenuGroupObjectHelper menuGroupHelper;
 
 	@Inject
-	MenuItemObjectHelper menuHelper;
+	MenuItemObjectHelper menuItemHelper;
 
 	@Inject
 	MessageTemplateDatabaseObjectHelper messageTemplateDatabaseHelper;
@@ -71,8 +70,8 @@ public class MessageTemplateFixtureProvider
 	public
 	void createFixtures () {
 
-		menuHelper.insert (
-			new MenuItemRec ()
+		menuItemHelper.insert (
+			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
@@ -102,7 +101,7 @@ public class MessageTemplateFixtureProvider
 
 		MessageTemplateDatabaseRec messageTemplateDatabase =
 			messageTemplateDatabaseHelper.insert (
-				new MessageTemplateDatabaseRec ()
+				messageTemplateDatabaseHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -122,7 +121,7 @@ public class MessageTemplateFixtureProvider
 
 		MessageTemplateTypeRec messageTemplateType1 =
 			messageTemplateTypeHelper.insert (
-				new MessageTemplateTypeRec ()
+				messageTemplateTypeHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
 				messageTemplateDatabase)
@@ -155,7 +154,7 @@ public class MessageTemplateFixtureProvider
 
 		MessageTemplateParameterRec parameterType1 =
 			messageTemplateParameterHelper.insert (
-				new MessageTemplateParameterRec ()
+				messageTemplateParameterHelper.createInstance ()
 
 			.setCode (
 				"test")
@@ -173,7 +172,7 @@ public class MessageTemplateFixtureProvider
 
 		MessageTemplateTypeRec messageTemplateType2 =
 			messageTemplateTypeHelper.insert (
-				new MessageTemplateTypeRec ()
+				messageTemplateTypeHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
 				messageTemplateDatabase)
@@ -206,7 +205,7 @@ public class MessageTemplateFixtureProvider
 
 		MessageTemplateParameterRec parameterType2 =
 			messageTemplateParameterHelper.insert (
-				new MessageTemplateParameterRec ()
+				messageTemplateParameterHelper.createInstance ()
 
 			.setCode (
 				"name")
@@ -227,7 +226,7 @@ public class MessageTemplateFixtureProvider
 
 		MessageTemplateParameterRec parameter2Type2 =
 			messageTemplateParameterHelper.insert (
-				new MessageTemplateParameterRec ()
+				messageTemplateParameterHelper.createInstance ()
 
 			.setMessageTemplateType (
 				messageTemplateType2)
@@ -248,7 +247,7 @@ public class MessageTemplateFixtureProvider
 
 		MessageTemplateTypeRec messageTemplateType3 =
 			messageTemplateTypeHelper.insert (
-				new MessageTemplateTypeRec ()
+				messageTemplateTypeHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
 				messageTemplateDatabase)
@@ -305,7 +304,7 @@ public class MessageTemplateFixtureProvider
 
 		MessageTemplateSetRec messageTemplateSet =
 			messageTemplateSetHelper.insert (
-				new MessageTemplateSetRec ()
+				messageTemplateSetHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
 				messageTemplateDatabase)
@@ -323,7 +322,7 @@ public class MessageTemplateFixtureProvider
 
 		MessageTemplateValueRec messageTemplateValue =
 			messageTemplateValueHelper.insert (
-				new MessageTemplateValueRec ()
+				messageTemplateValueHelper.createInstance ()
 
 			.setMessageTemplateSet (
 				messageTemplateSet)

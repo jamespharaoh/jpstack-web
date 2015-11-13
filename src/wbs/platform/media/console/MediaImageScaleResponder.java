@@ -42,7 +42,7 @@ class MediaImageScaleResponder
 			media.getContent ();
 
 		BufferedImage fullImage =
-			mediaLogic.readImage (
+			mediaLogic.readImageRequired (
 				content.getData (),
 				mediaType.getMimeType ());
 

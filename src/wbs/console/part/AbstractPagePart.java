@@ -8,13 +8,15 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
+
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.FormatWriterWriter;
-
-import com.google.common.collect.ImmutableSet;
 
 public
 class AbstractPagePart
@@ -70,7 +72,7 @@ class AbstractPagePart
 	@Override
 	public
 	void setup (
-			Map<String,Object> parameters) {
+			@NonNull Map<String,Object> parameters) {
 
 		if (requestContext == null) {
 
@@ -110,7 +112,7 @@ class AbstractPagePart
 
 	public
 	void printFormat (
-			Object... arguments) {
+			@NonNull Object... arguments) {
 
 		formatWriter.writeFormatArray (
 			arguments);

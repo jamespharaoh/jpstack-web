@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormatArray;
 
@@ -38,7 +39,7 @@ class AtomicFileWriter
 	@Override
 	public
 	void writeFormat (
-			Object... arguments) {
+			@NonNull Object... arguments) {
 
 		stringBuilder.append (
 			stringFormatArray (
@@ -49,7 +50,7 @@ class AtomicFileWriter
 	@Override
 	public
 	void writeFormatArray (
-			Object[] arguments) {
+			@NonNull Object[] arguments) {
 
 		stringBuilder.append (
 			stringFormatArray (
@@ -88,7 +89,7 @@ class AtomicFileWriter
 
 	private
 	boolean contentHasChanged (
-			String newContents) {
+			@NonNull String newContents) {
 
 		if (! file.exists ()) {
 			return true;
@@ -110,6 +111,22 @@ class AtomicFileWriter
 				exception);
 
 		}
+
+	}
+
+	@Override
+	public
+	void indent () {
+
+		doNothing ();
+
+	}
+
+	@Override
+	public
+	void unindent () {
+
+		doNothing ();
 
 	}
 

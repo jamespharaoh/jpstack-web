@@ -78,7 +78,7 @@ class EventLogicImplementation
 
 		EventRec event =
 			eventHelper.insert (
-				new EventRec ()
+				eventHelper.createInstance ()
 
 			.setEventType (
 				eventType)
@@ -158,7 +158,7 @@ class EventLogicImplementation
 			if (dataObject.getId () == null)
 				throw new IllegalArgumentException ();
 
-			return new EventLinkRec ()
+			return eventLinkHelper.createInstance ()
 
 				.setEvent (
 					event)
@@ -179,7 +179,7 @@ class EventLogicImplementation
 
 		if (linkObject instanceof Long) {
 
-			return new EventLinkRec ()
+			return eventLinkHelper.createInstance ()
 
 				.setEvent (
 					event)
@@ -199,7 +199,7 @@ class EventLogicImplementation
 
 		if (linkObject instanceof Boolean) {
 
-			return new EventLinkRec ()
+			return eventLinkHelper.createInstance ()
 
 				.setEvent (
 					event)
@@ -225,7 +225,7 @@ class EventLogicImplementation
 				(Instant)
 				linkObject;
 
-			return new EventLinkRec ()
+			return eventLinkHelper.createInstance ()
 
 				.setEvent (
 					event)

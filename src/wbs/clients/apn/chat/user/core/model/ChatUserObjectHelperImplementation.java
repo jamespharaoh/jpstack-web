@@ -159,7 +159,7 @@ class ChatUserObjectHelperImplementation
 		// create him
 
 		ChatUserRec chatUser =
-			new ChatUserRec ()
+			chatUserHelper.createInstance ()
 
 			.setChat (
 				chat)

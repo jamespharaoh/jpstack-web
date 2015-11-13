@@ -49,7 +49,6 @@ import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditObjectHelper;
-import wbs.clients.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
@@ -267,7 +266,7 @@ class ChatApiServletModule
 					) {
 
 						data =
-							mediaLogic.videoConvert (
+							mediaLogic.videoConvertRequired (
 								format,
 								data);
 
@@ -1665,10 +1664,18 @@ class ChatApiServletModule
 
 						userField =
 							chatUserProfileFieldHelper.insert (
-								new ChatUserProfileFieldRec ()
-									.setChatUser (chatUser)
-									.setChatProfileField (field)
-									.setChatProfileFieldValue (value));
+								chatUserProfileFieldHelper.createInstance ()
+
+							.setChatUser (
+								chatUser)
+
+							.setChatProfileField (
+								field)
+
+							.setChatProfileFieldValue (
+								value)
+
+						);
 
 					} else if (
 						userField != null
@@ -2305,16 +2312,19 @@ class ChatApiServletModule
 
 			if (attachments != null) {
 
-				for (MessageSendAttachment attachment
-						: attachments) {
+				for (
+					MessageSendAttachment attachment
+						: attachments
+				) {
 
 					MediaRec media =
-						mediaLogic.createMediaFromImage (
+						mediaLogic.createMediaFromImageRequired (
 							attachment.data,
 							attachment.type,
 							attachment.filename);
 
-					medias.add (media);
+					medias.add (
+						media);
 
 				}
 
@@ -2335,14 +2345,44 @@ class ChatApiServletModule
 
 	final static
 	RpcDefinition messagePollRequestDef =
-		Rpc.rpcDefinition ("chat-message-poll-request", RpcType.rStructure,
-			Rpc.rpcDefinition ("chat-id", RpcType.rInteger),
-			Rpc.rpcDefinition ("number", RpcType.rString),
-			Rpc.rpcDefinition ("got-delivery-id", null, RpcType.rInteger),
-			Rpc.rpcDefinition ("ignore-credit", false, RpcType.rBoolean),
-			Rpc.rpcDefinition ("login", false, RpcType.rBoolean),
-			Rpc.rpcDefinition ("logout", false, RpcType.rBoolean),
-			Rpc.rpcDefinition ("device-type", RpcType.rString, Rpc.rpcEnumChecker (deviceTypeEnumMap)));
+
+		Rpc.rpcDefinition (
+			"chat-message-poll-request",
+			RpcType.rStructure,
+
+			Rpc.rpcDefinition (
+				"chat-id",
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"number",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"got-delivery-id",
+				null,
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"ignore-credit",
+				false,
+				RpcType.rBoolean),
+
+			Rpc.rpcDefinition (
+				"login",
+				false,
+				RpcType.rBoolean),
+
+			Rpc.rpcDefinition (
+				"logout",
+				false,
+				RpcType.rBoolean),
+
+			Rpc.rpcDefinition (
+				"device-type",
+				RpcType.rString,
+				Rpc.rpcEnumChecker (
+					deviceTypeEnumMap)));
 
 	@RpcExport ("messagePoll")
 	public
@@ -3297,7 +3337,7 @@ class ChatApiServletModule
 			if (creditAmount != null || billAmount != null) {
 
 				chatUserCreditHelper.insert (
-					new ChatUserCreditRec ()
+					chatUserCreditHelper.createInstance ()
 
 					.setChatUser (
 						chatUser)

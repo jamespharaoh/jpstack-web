@@ -38,6 +38,8 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 import wbs.services.ticket.core.console.FieldsProvider;
+import wbs.services.ticket.core.console.TicketConsoleHelper;
+import wbs.services.ticket.core.console.TicketFieldValueConsoleHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketFieldValueRec;
@@ -74,6 +76,9 @@ class ObjectTicketCreateAction
 	PrivChecker privChecker;
 
 	@Inject
+	QueueLogic queueLogic;
+
+	@Inject
 	ConsoleRequestContext requestContext;
 
 	@Inject
@@ -83,13 +88,16 @@ class ObjectTicketCreateAction
 	TextObjectHelper textHelper;
 
 	@Inject
-	UserObjectHelper userHelper;
-
-	@Inject
 	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
 
 	@Inject
-	QueueLogic queueLogic;
+	TicketFieldValueConsoleHelper ticketFieldValueHelper;
+
+	@Inject
+	TicketConsoleHelper ticketHelper;
+
+	@Inject
+	UserObjectHelper userHelper;
 
 	// properties
 
@@ -212,7 +220,7 @@ class ObjectTicketCreateAction
 		// create new record and set parent
 
 		TicketRec ticket =
-			new TicketRec ()
+			ticketHelper.createInstance ()
 
 			.setTicketManager (
 				ticketManager);
@@ -235,7 +243,7 @@ class ObjectTicketCreateAction
 			}
 
 			TicketFieldValueRec ticketFieldValue =
-				new TicketFieldValueRec ()
+				ticketFieldValueHelper.createInstance ()
 
 				.setTicket (
 					ticket)
@@ -248,37 +256,46 @@ class ObjectTicketCreateAction
 			case string:
 
 				ticketFieldValue.setStringValue (
-					(String)objectManager.dereference (
+					(String)
+					objectManager.dereference (
 						contextObject,
-						ticketFieldSpec.valuePath()));
+						ticketFieldSpec.valuePath ()));
+
 				break;
 
 			case number:
 
 				ticketFieldValue.setIntegerValue(
-					(Integer)objectManager.dereference (
+					(Integer)
+					objectManager.dereference (
 						contextObject,
-						ticketFieldSpec.valuePath()));
+						ticketFieldSpec.valuePath ()));
 
 				break;
 
 			case bool:
 
-				ticketFieldValue.setBooleanValue(
-					(Boolean)objectManager.dereference (
+				ticketFieldValue.setBooleanValue (
+					(Boolean)
+					objectManager.dereference (
 						contextObject,
-						ticketFieldSpec.valuePath()));
+						ticketFieldSpec.valuePath ()));
 
 				break;
 
 			case object:
 
-				Integer objectId =
-					((Record<?>) objectManager.dereference (
+				Integer objectId = (
+					(Record<?>)
+					objectManager.dereference (
 						contextObject,
-						ticketFieldSpec.valuePath())).getId();
+						ticketFieldSpec.valuePath ())
+				).getId ();
 
-				ticketFieldValue.setIntegerValue(objectId);
+				ticketFieldValue
+
+					.setIntegerValue (
+						objectId);
 
 				break;
 
@@ -288,12 +305,14 @@ class ObjectTicketCreateAction
 
 			}
 
-			ticket.setNumFields (
-				ticket.getNumFields() + 1);
+			ticket
+
+				.setNumFields (
+					ticket.getNumFields () + 1);
 
 			ticket.getTicketFieldValues ().put (
-					ticketFieldType.getId (),
-					ticketFieldValue);
+				ticketFieldType.getId (),
+				ticketFieldValue);
 
 		}
 
@@ -352,7 +371,7 @@ class ObjectTicketCreateAction
 
 		// insert
 
-		objectManager.insert (
+		ticketHelper.insert (
 			ticket);
 
 		// create event

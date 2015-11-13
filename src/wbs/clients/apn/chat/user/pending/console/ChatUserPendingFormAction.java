@@ -15,6 +15,7 @@ import lombok.Cleanup;
 
 import com.google.common.base.Optional;
 
+import wbs.clients.apn.chat.contact.console.ChatMessageConsoleHelper;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
@@ -62,6 +63,9 @@ class ChatUserPendingFormAction
 
 	@Inject
 	ChatSendLogic chatSendLogic;
+
+	@Inject
+	ChatMessageConsoleHelper chatMessageHelper;
 
 	@Inject
 	ChatMessageLogic chatMessageLogic;
@@ -741,8 +745,8 @@ class ChatUserPendingFormAction
 				textHelper.findOrCreate (messageParam);
 
 			chatMessage =
-				objectManager.insert (
-					new ChatMessageRec ()
+				chatMessageHelper.insert (
+					chatMessageHelper.createInstance ()
 
 				.setFromUser (
 					chat.getSystemChatUser ())
@@ -903,8 +907,8 @@ class ChatUserPendingFormAction
 				textHelper.findOrCreate (messageParam);
 
 			chatMessage =
-				objectManager.insert (
-					new ChatMessageRec ()
+				chatMessageHelper.insert (
+					chatMessageHelper.createInstance ()
 
 				.setFromUser (
 					chat.getSystemChatUser ())

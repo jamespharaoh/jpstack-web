@@ -10,6 +10,7 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.experimental.Accessors;
+
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.core.console.ChatConsoleHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -232,37 +233,66 @@ class ChatAffiliateCreateAction
 		// create chat affiliate
 
 		ChatAffiliateRec chatAffiliate =
-			objectManager.insert (
-				new ChatAffiliateRec ()
-					.setChatScheme (chatScheme)
-					.setName (name)
-					.setCode (code)
-					.setDescription (requestContext.parameter ("description")));
+			chatAffiliateHelper.insert (
+				chatAffiliateHelper.createInstance ()
+
+			.setChatScheme (
+				chatScheme)
+
+			.setName (
+				name)
+
+			.setCode (
+				code)
+
+			.setDescription (
+				requestContext.parameter (
+					"description"))
+
+		);
 
 		// create keywords
 
 		for (int index = 0; index < 3; index ++) {
 
 			String keyword =
-				requestContext.parameter ("keyword" + index);
+				requestContext.parameter (
+					"keyword" + index);
 
 			if (keyword.length () == 0)
 				continue;
 
-			objectManager.insert (
-				new ChatSchemeKeywordRec ()
-					.setChatScheme (chatScheme)
-					.setKeyword (keyword)
-					.setJoinType (toEnum (
+			chatSchemeKeywordHelper.insert (
+				chatSchemeKeywordHelper.createInstance ()
+
+				.setChatScheme (
+					chatScheme)
+
+				.setKeyword (
+					keyword)
+
+				.setJoinType (
+					toEnum (
 						ChatKeywordJoinType.class,
-						requestContext.parameter ("joinType" + index)))
-					.setJoinGender (toEnum (
+						requestContext.parameter (
+							"joinType" + index)))
+
+				.setJoinGender (
+					toEnum (
 						Gender.class,
-						requestContext.parameter ("gender" + index)))
-					.setJoinOrient (toEnum (
+						requestContext.parameter (
+							"gender" + index)))
+
+				.setJoinOrient (
+					toEnum (
 						Orient.class,
-						requestContext.parameter ("orient" + index)))
-					.setJoinChatAffiliate (chatAffiliate));
+						requestContext.parameter (
+							"orient" + index)))
+
+				.setJoinChatAffiliate (
+					chatAffiliate)
+
+			);
 
 		}
 

@@ -147,7 +147,7 @@ class ImChatSessionStartAction
 
 		ImChatSessionRec session =
 			imChatSessionHelper.insert (
-				new ImChatSessionRec ()
+				imChatSessionHelper.createInstance ()
 
 			.setImChatCustomer (
 				customer)

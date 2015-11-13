@@ -45,6 +45,7 @@ import wbs.framework.record.MajorRecord;
 import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
 import wbs.framework.record.TypeRecord;
+import wbs.framework.record.UnsavedRecordDetector;
 
 @Accessors (fluent = true)
 @SingletonComponent ("objectHelperBuilder")
@@ -852,6 +853,9 @@ class ObjectHelperBuilder {
 				objectHelperProvider.insert (
 					object);
 
+				UnsavedRecordDetector.instance.removeRecord (
+					object);
+
 				for (
 					ObjectHelper childObjectHelper
 						: list
@@ -890,6 +894,9 @@ class ObjectHelperBuilder {
 				}
 
 				objectHelperProvider.insertSpecial (
+					object);
+
+				UnsavedRecordDetector.instance.removeRecord (
 					object);
 
 				for (
@@ -1555,8 +1562,20 @@ class ObjectHelperBuilder {
 			public
 			Record createInstance () {
 
-				return (Record)
-					objectClass ().newInstance ();
+				Constructor constructor =
+					objectClass ().getDeclaredConstructor ();
+
+				constructor.setAccessible (
+					true);
+
+				Record object =
+					(Record)
+					constructor.newInstance ();
+
+				UnsavedRecordDetector.instance.addRecord (
+					object);
+
+				return object;
 
 			}
 
@@ -1573,8 +1592,8 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			Object getDynamic (
-				Record object,
-				String name) {
+					@NonNull Record object,
+					@NonNull String name) {
 
 				return objectHelperProvider.getDynamic (
 					object,
@@ -1585,9 +1604,9 @@ class ObjectHelperBuilder {
 			@Override
 			public
 			void setDynamic (
-				Record object,
-				String name,
-				Object value) {
+					@NonNull Record object,
+					@NonNull String name,
+					@NonNull Object value) {
 
 				objectHelperProvider.setDynamic (
 					object,

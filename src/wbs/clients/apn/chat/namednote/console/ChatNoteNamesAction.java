@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.namednote.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -114,10 +115,14 @@ class ChatNoteNamesAction
 
 			// add new note
 
-			if (! requestContext.getForm ("noteNameNew").isEmpty ()) {
+			if (
+				isNotEmpty (
+					requestContext.getForm (
+						"noteNameNew"))
+			) {
 
 				chatNoteNameHelper.insert (
-					new ChatNoteNameRec ()
+					chatNoteNameHelper.createInstance ()
 
 					.setChat (
 						chat)
