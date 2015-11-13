@@ -8,10 +8,8 @@ import wbs.framework.record.GlobalId;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.menu.model.MenuItemRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.services.wallet.model.WalletObjectHelper;
-import wbs.services.wallet.model.WalletRec;
 import wbs.services.wallet.model.WalletServiceObjectHelper;
 import wbs.services.wallet.model.WalletServiceRec;
 
@@ -47,7 +45,7 @@ class WalletFixtureProvider
 	void createFixtures () {
 
 		menuItemHelper.insert (
-			new MenuItemRec ()
+			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
 				menuGroupHelper.findByCode (
@@ -77,7 +75,7 @@ class WalletFixtureProvider
 
 		WalletServiceRec walletService =
 			walletServiceHelper.insert (
-				new WalletServiceRec ()
+				walletServiceHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCode (
@@ -96,7 +94,7 @@ class WalletFixtureProvider
 		);
 
 		walletHelper.insert (
-			new WalletRec ()
+			walletHelper.createInstance ()
 
 			.setWalletService (
 				walletService)
