@@ -95,11 +95,12 @@ class QueueManager {
 		String key =
 			stringFormat (
 				"%s.%s",
-				queueType.getParentObjectType ().getCode (),
+				queueType.getParentType ().getCode (),
 				queueType.getCode ());
 
 		QueueConsolePlugin queuePageFactory =
-			queueHelpers.get (key);
+			queueHelpers.get (
+				key);
 
 		if (queuePageFactory == null) {
 
@@ -125,7 +126,7 @@ class QueueManager {
 		String key =
 			stringFormat (
 				"%s.%s",
-				queueType.getParentObjectType ().getCode (),
+				queueType.getParentType ().getCode (),
 				queueType.getCode ());
 
 		QueueConsolePlugin queuePageFactory =
@@ -140,7 +141,8 @@ class QueueManager {
 
 		}
 
-		return queuePageFactory.preferredUserDelay (queue);
+		return queuePageFactory.preferredUserDelay (
+			queue);
 
 	}
 

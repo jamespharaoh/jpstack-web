@@ -189,9 +189,11 @@ class QueueLogicImpl
 		if (
 			notEqual (
 				objectManager.getObjectTypeId (refObject),
-				queueType.getRefObjectType ().getId ())
+				queueType.getRefType ().getId ())
 		) {
+
 			throw new IllegalArgumentException ();
+
 		}
 
 		// create the queue item
@@ -288,8 +290,9 @@ class QueueLogicImpl
 
 		if (
 			notEqual (
-				objectManager.getObjectTypeId (object),
-				queueType.getSubjectObjectType ().getId ())
+				objectManager.getObjectTypeId (
+					object),
+				queueType.getSubjectType ().getId ())
 		) {
 
 			throw new IllegalArgumentException (
@@ -297,7 +300,7 @@ class QueueLogicImpl
 					"Queue %s expected subject type %s, got %s",
 					objectManager.objectPath (
 						queue),
-					queueType.getSubjectObjectType ().getCode (),
+					queueType.getSubjectType ().getCode (),
 					objectManager.getObjectTypeCode (
 						object)));
 

@@ -3,15 +3,12 @@ package wbs.platform.event.fixture;
 import static wbs.framework.utils.etc.Misc.codify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.inject.Inject;
-import javax.sql.DataSource;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -20,11 +17,14 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.ModelMetaBuilderHandler;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
 import wbs.platform.event.metamodel.EventTypeSpec;
+import wbs.platform.event.model.EventTypeObjectHelper;
 
 @Log4j
 @PrototypeComponent ("eventTypeBuilder")
@@ -35,10 +35,13 @@ class EventTypeBuilder {
 	// dependencies
 
 	@Inject
-	DataSource dataSource;
+	Database database;
 
 	@Inject
 	EntityHelper entityHelper;
+
+	@Inject
+	EventTypeObjectHelper eventTypeHelper;
 
 	// builder
 
@@ -56,7 +59,7 @@ class EventTypeBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		try {
 
@@ -85,64 +88,33 @@ class EventTypeBuilder {
 	void createEventType ()
 		throws SQLException {
 
-		@Cleanup
-		Connection connection =
-			dataSource.getConnection ();
-
-		connection.setAutoCommit (
-			false);
+		// begin transaction
 
 		@Cleanup
-		PreparedStatement nextEventTypeIdStatement =
-			connection.prepareStatement (
-				stringFormat (
-					"SELECT ",
-						"nextval ('event_type_id_seq')"));
+		Transaction transaction =
+			database.beginReadWrite (
+				this);
 
-		ResultSet eventTypeIdResultSet =
-			nextEventTypeIdStatement.executeQuery ();
+		// create event type
 
-		eventTypeIdResultSet.next ();
+		eventTypeHelper.insert (
+			eventTypeHelper.createInstance ()
 
-		int eventTypeId =
-			eventTypeIdResultSet.getInt (
-				1);
+			.setCode (
+				codify (
+					spec.name ()))
 
-		@Cleanup
-		PreparedStatement insertEventTypeStatement =
-			connection.prepareStatement (
-				stringFormat (
-					"INSERT INTO event_type (",
-						"id, ",
-						"code, ",
-						"description, ",
-						"admin) ",
-					"VALUES (",
-						"?, ",
-						"?, ",
-						"?, ",
-						"?)"));
+			.setDescription (
+				spec.text ())
 
-		insertEventTypeStatement.setInt (
-			1,
-			eventTypeId);
+			.setAdmin (
+				spec.admin ())
 
-		insertEventTypeStatement.setString (
-			2,
-			codify (
-				spec.name ()));
+		);
 
-		insertEventTypeStatement.setString (
-			3,
-			spec.text ());
+		// commit transaction
 
-		insertEventTypeStatement.setBoolean (
-			4,
-			spec.admin ());
-
-		insertEventTypeStatement.executeUpdate ();
-
-		connection.commit ();
+		transaction.commit ();
 
 	}
 

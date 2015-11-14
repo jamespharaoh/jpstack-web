@@ -5,15 +5,12 @@ import static wbs.framework.utils.etc.Misc.codify;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.inject.Inject;
-import javax.sql.DataSource;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -22,11 +19,17 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.ModelMetaBuilderHandler;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
+import wbs.framework.record.GlobalId;
+import wbs.platform.object.core.model.ObjectTypeObjectHelper;
+import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.queue.metamodel.QueueTypeSpec;
+import wbs.platform.queue.model.QueueTypeObjectHelper;
 
 @Log4j
 @PrototypeComponent ("queueTypeBuilder")
@@ -37,10 +40,16 @@ class QueueTypeBuilder {
 	// dependencies
 
 	@Inject
-	DataSource dataSource;
+	Database database;
 
 	@Inject
 	EntityHelper entityHelper;
+
+	@Inject
+	ObjectTypeObjectHelper objectTypeHelper;
+
+	@Inject
+	QueueTypeObjectHelper queueTypeHelper;
 
 	// builder
 
@@ -58,7 +67,7 @@ class QueueTypeBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		try {
 
@@ -95,177 +104,74 @@ class QueueTypeBuilder {
 	void createQueueType ()
 		throws SQLException {
 
-		@Cleanup
-		Connection connection =
-			dataSource.getConnection ();
-
-		connection.setAutoCommit (
-			false);
-
-		// allocate id
+		// begin transaction
 
 		@Cleanup
-		PreparedStatement nextQueueTypeIdStatement =
-			connection.prepareStatement (
-				stringFormat (
-					"SELECT ",
-						"nextval ('queue_type_id_seq')"));
+		Transaction transaction =
+			database.beginReadWrite (
+				this);
 
-		ResultSet queueTypeIdResultSet =
-			nextQueueTypeIdStatement.executeQuery ();
-
-		queueTypeIdResultSet.next ();
-
-		int queueTypeId =
-			queueTypeIdResultSet.getInt (
-				1);
-
-		// lookup parent
+		// lookup parent type
 
 		String parentTypeCode =
-			ifNull (
-				spec.parent (),
-				parent.name ());
+			camelToUnderscore (
+				ifNull (
+					spec.parent (),
+					parent.name ()));
 
-		Model parentModel =
-			entityHelper.modelsByName ().get (
+		ObjectTypeRec parentType =
+			objectTypeHelper.findByCode (
+				GlobalId.root,
 				parentTypeCode);
 
-		if (parentModel == null) {
+		// lookup subject type
 
-			throw new RuntimeException (
-				stringFormat (
-					"No model for %s",
-					parentTypeCode));
-
-		}
-
-		@Cleanup
-		PreparedStatement getObjectTypeIdStatement =
-			connection.prepareStatement (
-				stringFormat (
-					"SELECT id ",
-					"FROM object_type ",
-					"WHERE code = ?"));
-
-		getObjectTypeIdStatement.setString (
-			1,
-			parentModel.objectTypeCode ());
-
-		ResultSet getObjectTypeIdResult =
-			getObjectTypeIdStatement.executeQuery ();
-
-		getObjectTypeIdResult.next ();
-
-		int parentObjectTypeId =
-			getObjectTypeIdResult.getInt (
-				1);
-
-		// lookup subject
-
-		Model subjectModel =
-			entityHelper.modelsByName ().get (
+		String subjectTypeCode =
+			camelToUnderscore (
 				spec.subject ());
 
-		if (subjectModel == null) {
+		ObjectTypeRec subjectType =
+			objectTypeHelper.findByCode (
+				GlobalId.root,
+				subjectTypeCode);
 
-			throw new RuntimeException (
-				stringFormat (
-					"No model for %s",
-					spec.subject ()));
+		// lookup ref type
 
-		}
-
-		getObjectTypeIdStatement.setString (
-			1,
-			subjectModel.objectTypeCode ());
-
-		getObjectTypeIdResult =
-			getObjectTypeIdStatement.executeQuery ();
-
-		getObjectTypeIdResult.next ();
-
-		int subjectObjectTypeId =
-			getObjectTypeIdResult.getInt (
-				1);
-
-		// lookup ref
-
-		Model refModel =
-			entityHelper.modelsByName ().get (
+		String refTypeCode =
+			camelToUnderscore (
 				spec.ref ());
 
-		if (refModel == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"No model for %s",
-					spec.ref ()));
-
-		}
-
-		getObjectTypeIdStatement.setString (
-			1,
-			refModel.objectTypeCode ());
-
-		getObjectTypeIdResult =
-			getObjectTypeIdStatement.executeQuery ();
-
-		getObjectTypeIdResult.next ();
-
-		int refObjectTypeId =
-			getObjectTypeIdResult.getInt (
-				1);
+		ObjectTypeRec refType =
+			objectTypeHelper.findByCode (
+				GlobalId.root,
+				refTypeCode);
 
 		// create queue type
 
-		@Cleanup
-		PreparedStatement insertQueueTypeStatement =
-			connection.prepareStatement (
-				stringFormat (
-					"INSERT INTO queue_type (",
-						"id, ",
-						"parent_object_type_id, ",
-						"code, ",
-						"description, ",
-						"subject_object_type_id, ",
-						"ref_object_type_id) ",
-					"VALUES (",
-						"?, ",
-						"?, ",
-						"?, ",
-						"?, ",
-						"?, ",
-						"?)"));
+		queueTypeHelper.insert (
+			queueTypeHelper.createInstance ()
 
-		insertQueueTypeStatement.setInt (
-			1,
-			queueTypeId);
+			.setParentType (
+				parentType)
 
-		insertQueueTypeStatement.setInt (
-			2,
-			parentObjectTypeId);
+			.setCode (
+				codify (
+					spec.name ()))
 
-		insertQueueTypeStatement.setString (
-			3,
-			codify (
-				spec.name ()));
+			.setDescription (
+				spec.description ())
 
-		insertQueueTypeStatement.setString (
-			4,
-			spec.description ());
+			.setSubjectType (
+				subjectType)
 
-		insertQueueTypeStatement.setInt (
-			5,
-			subjectObjectTypeId);
+			.setRefType (
+				refType)
 
-		insertQueueTypeStatement.setInt (
-			6,
-			refObjectTypeId);
+		);
 
-		insertQueueTypeStatement.executeUpdate ();
+		// commit transaction
 
-		connection.commit ();
+		transaction.commit ();
 
 	}
 

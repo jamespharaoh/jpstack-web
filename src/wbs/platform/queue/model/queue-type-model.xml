@@ -11,8 +11,9 @@
 		<!-- identity -->
 
 		<parent-field
-			name="parentObjectType"
-			type="objectType"/>
+			name="parentType"
+			type="objectType"
+			column="parent_object_type_id"/>
 
 		<code-field/>
 
@@ -23,12 +24,14 @@
 		<!-- data -->
 
 		<reference-field
-			name="subjectObjectType"
-			type="objectType"/>
+			name="subjectType"
+			type="objectType"
+			column="subject_object_type_id"/>
 
 		<reference-field
-			name="refObjectType"
-			type="objectType"/>
+			name="refType"
+			type="objectType"
+			column="ref_object_type_id"/>
 
 	</fields>
 
