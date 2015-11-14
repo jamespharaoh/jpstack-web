@@ -11,12 +11,14 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.StringMapResponderFactory;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.record.GlobalId;
 import wbs.framework.web.Action;
 import wbs.framework.web.PathHandler;
@@ -352,19 +354,33 @@ class TicketerApiServletModule
 					requestContext.requestUri (),
 					exception,
 					Optional.<Integer>absent (),
-					false);
+					Resolution.ignoreWithThirdPartyWarning);
 
 				requestContext.status (500);
 
 				Map<String,Object> map =
 					ImmutableMap.<String,Object>builder ()
-						.put ("status", stInternalError)
-						.put ("status-code", "internal-error")
-						.put ("valid", false)
-						.put ("message", "An internal error has occurred")
-						.build ();
 
-				return responderFactory.makeResponder (map);
+					.put (
+						"status",
+						stInternalError)
+
+					.put (
+						"status-code",
+						"internal-error")
+
+					.put (
+						"valid",
+						false)
+
+					.put (
+						"message",
+						"An internal error has occurred")
+
+					.build ();
+
+				return responderFactory.makeResponder (
+					map);
 
 			}
 

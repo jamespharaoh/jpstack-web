@@ -22,6 +22,9 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
@@ -40,12 +43,10 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.platform.daemon.AbstractDaemonService;
 import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.locator.model.LongLat;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @SingletonComponent ("chatDateDaemon")
@@ -107,7 +108,8 @@ class ChatDateDaemon
 
 			try {
 
-				Thread.sleep (datingSleepSeconds * 1000);
+				Thread.sleep (
+					datingSleepSeconds * 1000);
 
 			} catch (InterruptedException exception) {
 
@@ -127,7 +129,7 @@ class ChatDateDaemon
 					"Chat daemon dating",
 					exception,
 					Optional.<Integer>absent (),
-					false);
+					Resolution.tryAgainLater);
 
 			}
 
@@ -392,7 +394,10 @@ class ChatDateDaemon
 		int count = 0;
 		int max = 1000;
 
-		for (Integer thisUserId : datingUserIds) {
+		for (
+			Integer thisUserId
+				: datingUserIds
+		) {
 
 			try {
 
@@ -409,7 +414,7 @@ class ChatDateDaemon
 					"Chat daemon dating",
 					exception,
 					Optional.<Integer>absent (),
-					false);
+					Resolution.tryAgainLater);
 
 			}
 

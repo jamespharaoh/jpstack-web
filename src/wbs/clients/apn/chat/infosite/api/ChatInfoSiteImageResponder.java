@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.infosite.api;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,29 +43,46 @@ class ChatInfoSiteImageResponder
 
 		infoSite =
 			chatInfoSiteHelper.find (
-				requestContext.requestInt ("chatInfoSiteId"));
+				requestContext.requestInt (
+					"chatInfoSiteId"));
 
-		if (! equal (
-			infoSite.getToken (),
-			requestContext.request ("chatInfoSiteToken"))) {
+		if (
+			notEqual (
+				infoSite.getToken (),
+				requestContext.request (
+					"chatInfoSiteToken"))
+		) {
 
-			throw new RuntimeException ("Token mismatch");
+			throw new RuntimeException (
+				"Token mismatch");
 
 		}
 
 		int index =
-			requestContext.requestInt ("chatInfoSiteIndex");
+			requestContext.requestInt (
+				"chatInfoSiteIndex");
 
 		ChatUserRec chatUser =
-			infoSite.getOtherChatUsers ().get (index);
+			infoSite.getOtherChatUsers ().get (
+				index);
 
-		if (chatUser == null)
-			throw new RuntimeException ("Index out of bounds");
+		if (chatUser == null) {
 
-		String mode = (String)
-			requestContext.request ("chatUserSiteMode");
+			throw new RuntimeException (
+				"Index out of bounds");
 
-		if (equal (mode, "full")) {
+		}
+
+		String mode =
+			(String)
+			requestContext.request (
+				"chatUserSiteMode");
+
+		if (
+			equal (
+				mode,
+				"full")
+		) {
 
 			media =
 				chatUser.getMainChatUserImage ().getFullMedia ();
@@ -76,24 +94,36 @@ class ChatInfoSiteImageResponder
 
 		}
 
-		data = media.getContent ().getData ();
+		data =
+			media.getContent ().getData ();
 
 	}
 
 	@Override
-	protected void goHeaders () throws IOException {
-		requestContext.setHeader ("Content-Type", media.getMediaType ().getMimeType ());
-		requestContext.setHeader ("Content-Length", Integer.toString (data.length));
+	protected
+	void goHeaders () {
+
+		requestContext.setHeader (
+			"Content-Type",
+			media.getMediaType ().getMimeType ());
+
+		requestContext.setHeader (
+			"Content-Length",
+			Integer.toString (
+				data.length));
+
 	}
 
 	@Override
-	protected void goContent ()
+	protected
+	void goContent ()
 		throws IOException {
 
 		OutputStream out =
 			requestContext.outputStream ();
 
-		out.write (data);
+		out.write (
+			data);
 
 	}
 

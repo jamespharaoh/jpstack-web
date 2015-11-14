@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableMap;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.PathHandler;
@@ -484,14 +485,16 @@ logger.error ("Got item");
 						exception,
 						requestContext),
 					Optional.<Integer>absent (),
-					false);
+					Resolution.ignoreWithThirdPartyWarning);
 
 				PrintWriter out =
 					requestContext.writer ();
 
-				out.println("400");
+				out.println (
+					"400");
 
-				log.info("Response 400 ");
+				log.info (
+					"Response 400 ");
 
 			} finally {
 

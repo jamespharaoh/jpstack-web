@@ -21,6 +21,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.RegexpPathHandler;
@@ -259,7 +260,7 @@ class MigApiServletModule
 						exception),
 					getException (exception, requestContext),
 					Optional.<Integer>absent (),
-					false);
+					Resolution.ignoreWithThirdPartyWarning);
 
 				PrintWriter out =
 					requestContext.writer ();
@@ -495,14 +496,16 @@ class MigApiServletModule
 						exception,
 						requestContext),
 					Optional.<Integer>absent (),
-					false);
+					Resolution.ignoreWithThirdPartyWarning);
 
 				PrintWriter out =
 					requestContext.writer ();
 
-				out.println("400");
+				out.println (
+					"400");
 
-				log.debug ("Response 400 ");
+				log.debug (
+					"Response 400");
 
 			}
 

@@ -50,6 +50,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.logic.MediaLogic;
@@ -60,6 +61,7 @@ import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
+import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.gsm.MessageSplitter;
 import wbs.sms.locator.logic.LocatorLogic;
@@ -225,7 +227,10 @@ class ChatInfoLogicImpl
 
 		} catch (IllegalArgumentException exception) {
 
-			log.error ("MessageSplitter.split threw exception: " + exception);
+			log.error (
+				stringFormat (
+					"MessageSplitter.split threw exception: %s",
+					exception));
 
 			exceptionLogger.logSimple (
 				"unknown",
@@ -241,7 +246,7 @@ class ChatInfoLogicImpl
 					exception),
 
 				Optional.<Integer>absent (),
-				false);
+				Resolution.ignoreWithNoWarning);
 
 			return;
 
@@ -257,9 +262,16 @@ class ChatInfoLogicImpl
 		List<TextRec> textParts =
 			new ArrayList<TextRec> ();
 
-		for (String part : stringParts)
+		for (
+			String part
+				: stringParts
+		) {
+
 			textParts.add (
-				textHelper.findOrCreate (part));
+				textHelper.findOrCreate (
+					part));
+
+		}
 
 		chatSendLogic.sendMessageMagic (
 			thisUser,
@@ -267,14 +279,15 @@ class ChatInfoLogicImpl
 			textParts,
 			commandHelper.findByCode (chat, "chat"),
 			serviceHelper.findByCode (chat, serviceCode),
-			otherUser.getId ());
+			otherUser.getId (),
+			Optional.<UserRec>absent ());
 
 	}
 
 	@Override
 	public
 	int sendUserInfos (
-			ChatUserRec thisUser,
+			@NonNull ChatUserRec thisUser,
 			int numToSend,
 			Integer threadId) {
 
@@ -298,8 +311,10 @@ class ChatInfoLogicImpl
 				cutoffTime,
 				numToSend);
 
-		for (ChatUserRec otherUser
-				: otherUsers) {
+		for (
+			ChatUserRec otherUser
+				: otherUsers
+		) {
 
 			sendUserInfo (
 				thisUser,
@@ -316,8 +331,8 @@ class ChatInfoLogicImpl
 	@Override
 	public
 	String chatUserBlurb (
-			ChatUserRec thisUser,
-			ChatUserRec otherUser) {
+			@NonNull ChatUserRec thisUser,
+			@NonNull ChatUserRec otherUser) {
 
 		ChatRec chat =
 			thisUser.getChat ();
@@ -331,7 +346,9 @@ class ChatInfoLogicImpl
 			magicNumberLogic.allocateMagicNumber (
 				chatScheme.getMagicNumberSet (),
 				thisUser.getNumber (),
-				commandHelper.findByCode (chat, "chat"),
+				commandHelper.findByCode (
+					chat,
+					"chat"),
 				otherUser.getId ());
 
 		StringBuilder message =

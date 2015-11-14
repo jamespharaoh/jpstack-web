@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.infosite.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -45,13 +45,18 @@ class ChatInfoSiteViewResponder
 
 		infoSite =
 			chatInfoSiteHelper.find (
-				requestContext.requestInt ("chatInfoSiteId"));
+				requestContext.requestInt (
+					"chatInfoSiteId"));
 
-		if (! equal (
-			infoSite.getToken (),
-			requestContext.request ("chatInfoSiteToken"))) {
+		if (
+			notEqual (
+				infoSite.getToken (),
+				requestContext.request (
+					"chatInfoSiteToken"))
+		) {
 
-			throw new RuntimeException ("Token mismatch");
+			throw new RuntimeException (
+				"Token mismatch");
 
 		}
 
@@ -122,7 +127,8 @@ class ChatInfoSiteViewResponder
 		) {
 
 			ChatUserRec otherUser =
-				infoSite.getOtherChatUsers ().get (index);
+				infoSite.getOtherChatUsers ().get (
+					index);
 
 			if (index > 0) {
 
@@ -174,24 +180,23 @@ class ChatInfoSiteViewResponder
 				"<form method=\"post\">\n");
 
 			printFormat (
-				"<input " +
-					"type=\"hidden\" " +
-					"name=\"otherUserId\" " +
-					"value=\"%h\">\n",
-				otherUser.getId ());
+				"<input",
+				" type=\"hidden\"",
+				" name=\"otherUserId\"",
+				" value=\"%h\"",
+				otherUser.getId (),
+				">\n");
 
 			printFormat (
-				"<p>\n",
+				"<p><input",
+				" type=\"text\"",
+				" name=\"text\">\n");
 
-				"<input " +
-					"type=\"text\" " +
-					"name=\"text\">\n",
-
-				"<input " +
-					"type=\"submit\" " +
-					"value=\"send\">\n",
-
-				"</p>\n");
+			printFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"send\"",
+				"></p>\n");
 
 			printFormat (
 				"</form>\n");

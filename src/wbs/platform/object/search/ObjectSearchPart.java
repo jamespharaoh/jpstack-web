@@ -1,5 +1,6 @@
 package wbs.platform.object.search;
 
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Set;
@@ -82,7 +83,10 @@ class ObjectSearchPart
 			requestContext.session (
 				sessionKey + "Fields");
 
-		if (search == null) {
+		if (
+			isNull (
+				search)
+		) {
 
 			search =
 				searchClass.newInstance ();

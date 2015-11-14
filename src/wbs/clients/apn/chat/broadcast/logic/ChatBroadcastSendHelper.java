@@ -8,7 +8,11 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import org.joda.time.Instant;
+
+import com.google.common.base.Optional;
 
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberObjectHelper;
@@ -135,7 +139,7 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	List<ChatBroadcastRec> findScheduledJobs (
-			Instant now) {
+			@NonNull Instant now) {
 
 		return chatBroadcastHelper.findScheduled (
 			now);
@@ -145,8 +149,8 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	List<ChatBroadcastNumberRec> findItemsLimit (
-			ChatRec chat,
-			ChatBroadcastRec chatBroadcast,
+			@NonNull ChatRec chat,
+			@NonNull ChatBroadcastRec chatBroadcast,
 			int maxResults) {
 
 		return chatBroadcastNumberHelper.findAcceptedLimit (
@@ -158,7 +162,7 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	ChatRec getService (
-			ChatBroadcastRec chatBroadcast) {
+			@NonNull ChatBroadcastRec chatBroadcast) {
 
 		return chatBroadcast.getChat ();
 
@@ -167,8 +171,8 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	Instant getScheduledTime (
-			ChatRec chat,
-			ChatBroadcastRec chatBroadcast) {
+			@NonNull ChatRec chat,
+			@NonNull ChatBroadcastRec chatBroadcast) {
 
 		return chatBroadcast.getScheduledTime ();
 
@@ -177,8 +181,8 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	boolean jobScheduled (
-			ChatRec chat,
-			ChatBroadcastRec chatBroadcast) {
+			@NonNull ChatRec chat,
+			@NonNull ChatBroadcastRec chatBroadcast) {
 
 		return chatBroadcast.getState ()
 			== ChatBroadcastState.scheduled;
@@ -189,8 +193,8 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	boolean jobSending (
-			ChatRec chat,
-			ChatBroadcastRec chatBroadcast) {
+			@NonNull ChatRec chat,
+			@NonNull ChatBroadcastRec chatBroadcast) {
 
 		return chatBroadcast.getState ()
 			== ChatBroadcastState.sending;
@@ -200,8 +204,8 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	boolean jobConfigured (
-			ChatRec chat,
-			ChatBroadcastRec chatBroadcast) {
+			@NonNull ChatRec chat,
+			@NonNull ChatBroadcastRec chatBroadcast) {
 
 		// TODO something useful here
 
@@ -212,8 +216,8 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	void sendStart (
-			ChatRec chat,
-			ChatBroadcastRec chatBroadcast) {
+			@NonNull ChatRec chat,
+			@NonNull ChatBroadcastRec chatBroadcast) {
 
 		// sanity check
 
@@ -250,9 +254,9 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	boolean verifyItem (
-			ChatRec chat,
-			ChatBroadcastRec chatBroadcast,
-			ChatBroadcastNumberRec chatBroadcastNumber) {
+			@NonNull ChatRec chat,
+			@NonNull ChatBroadcastRec chatBroadcast,
+			@NonNull ChatBroadcastNumberRec chatBroadcastNumber) {
 
 		ChatUserRec chatUser =
 			chatBroadcastNumber.getChatUser ();
@@ -267,9 +271,9 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	void rejectItem (
-			ChatRec chat,
-			ChatBroadcastRec chatBroadcast,
-			ChatBroadcastNumberRec chatBroadcastNumber) {
+			@NonNull ChatRec chat,
+			@NonNull ChatBroadcastRec chatBroadcast,
+			@NonNull ChatBroadcastNumberRec chatBroadcastNumber) {
 
 		// sanity check
 
@@ -300,9 +304,9 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	void sendItem (
-			ChatRec chat,
-			ChatBroadcastRec chatBroadcast,
-			ChatBroadcastNumberRec chatBroadcastNumber) {
+			@NonNull ChatRec chat,
+			@NonNull ChatBroadcastRec chatBroadcast,
+			@NonNull ChatBroadcastNumberRec chatBroadcastNumber) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -347,14 +351,19 @@ class ChatBroadcastSendHelper
 			magicNumberLogic.sendMessage (
 				chatScheme.getMagicNumberSet (),
 				toChatUser.getNumber (),
-				commandHelper.findByCode (chat, "chat"),
+				commandHelper.findByCode (
+					chat,
+					"chat"),
 				fromChatUser.getId (),
-				null,
+				Optional.<Integer>absent (),
 				chatBroadcast.getText (),
 				chatScheme.getMagicRouter (),
 				broadcastService,
-				batch,
-				affiliate);
+				Optional.of (
+					batch),
+				affiliate,
+				Optional.of (
+					chatBroadcast.getSentUser ()));
 
 		// create chat message
 
@@ -411,8 +420,8 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	void sendComplete (
-			ChatRec chat,
-			ChatBroadcastRec chatBroadcast) {
+			@NonNull ChatRec chat,
+			@NonNull ChatBroadcastRec chatBroadcast) {
 
 		Transaction transaction =
 			database.currentTransaction ();

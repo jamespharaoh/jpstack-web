@@ -37,6 +37,7 @@ import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.keyword.logic.KeywordLogic;
 import wbs.sms.magicnumber.logic.MagicNumberLogic;
+import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.route.router.model.RouterRec;
@@ -548,13 +549,14 @@ class ChatSendLogicImplementation
 			chatUser.getNumber (),
 			magicCommand,
 			magicRef,
-			threadId.orNull (),
+			threadId,
 			message,
 			chatScheme.getMagicRouter (),
 			service,
-			null,
+			Optional.<BatchRec>absent (),
 			chatUserLogic.getAffiliate (
-				chatUser));
+				chatUser),
+			Optional.<UserRec>absent ());
 
 	}
 
@@ -659,7 +661,8 @@ class ChatSendLogicImplementation
 			@NonNull Collection<TextRec> parts,
 			@NonNull CommandRec magicCommand,
 			@NonNull ServiceRec service,
-			@NonNull Integer magicRef) {
+			@NonNull Integer magicRef,
+			@NonNull Optional<UserRec> user) {
 
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();
@@ -669,12 +672,14 @@ class ChatSendLogicImplementation
 			chatUser.getNumber (),
 			magicCommand,
 			magicRef,
-			threadId.orNull (),
+			threadId,
 			parts,
 			chatScheme.getMagicRouter (),
 			service,
-			null,
-			chatUserLogic.getAffiliate (chatUser));
+			Optional.<BatchRec>absent (),
+			chatUserLogic.getAffiliate (
+				chatUser),
+			user);
 
 	}
 

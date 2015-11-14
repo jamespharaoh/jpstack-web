@@ -37,7 +37,7 @@ import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 
 @PrototypeComponent ("imChatDetailsUpdateAction")
-public 
+public
 class ImChatDetailsUpdateAction
 	implements Action {
 
@@ -192,7 +192,7 @@ class ImChatDetailsUpdateAction
 				detailValue =
 					imChatCustomerDetailValueHelper.insert (
 						imChatCustomerDetailValueHelper.createInstance ()
-					
+
 					.setImChatCustomer (
 						customer)
 
@@ -207,8 +207,8 @@ class ImChatDetailsUpdateAction
 				customer.getDetails ().put (
 					detailType.getId (),
 					detailValue);
-							
-			}		
+
+			}
 
 			eventLogic.createEvent (
 				"im_chat_customer_detail_updated",

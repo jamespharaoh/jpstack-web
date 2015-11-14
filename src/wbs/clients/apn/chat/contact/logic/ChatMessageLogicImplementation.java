@@ -63,6 +63,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.object.ObjectManager;
 import wbs.integrations.jigsaw.api.JigsawApi;
@@ -834,7 +835,7 @@ class ChatMessageLogicImplementation
 	@Override
 	public
 	boolean chatMessageDeliverToUser (
-			ChatMessageRec chatMessage) {
+			@NonNull ChatMessageRec chatMessage) {
 
 		ChatUserRec toUser =
 			chatMessage.getToUser ();
@@ -997,7 +998,7 @@ class ChatMessageLogicImplementation
 					exception),
 
 				Optional.<Integer>absent (),
-				false);
+				Resolution.ignoreWithNoWarning);
 
 			success = false;
 
@@ -1044,7 +1045,7 @@ class ChatMessageLogicImplementation
 					exception),
 
 				Optional.<Integer>absent (),
-				false);
+				Resolution.ignoreWithNoWarning);
 
 			success = false;
 
@@ -1080,7 +1081,7 @@ class ChatMessageLogicImplementation
 					exception),
 
 				Optional.<Integer>absent (),
-				false);
+				Resolution.ignoreWithNoWarning);
 
 			success = false;
 
@@ -1218,8 +1219,8 @@ class ChatMessageLogicImplementation
 	@Override
 	public
 	boolean chatMessageDeliverViaSms (
-			ChatMessageRec chatMessage,
-			String text) {
+			@NonNull ChatMessageRec chatMessage,
+			@NonNull String text) {
 
 		ChatUserRec fromUser =
 			chatMessage.getFromUser ();
@@ -1275,7 +1276,7 @@ class ChatMessageLogicImplementation
 						exception)),
 
 				Optional.<Integer>absent (),
-				false);
+				Resolution.ignoreWithNoWarning);
 
 			return false;
 
@@ -1289,8 +1290,10 @@ class ChatMessageLogicImplementation
 		List<TextRec> textParts =
 			new ArrayList<TextRec> ();
 
-		for (String part
-				: stringParts) {
+		for (
+			String part
+				: stringParts
+		) {
 
 			textParts.add (
 				textHelper.findOrCreate (
@@ -1310,7 +1313,9 @@ class ChatMessageLogicImplementation
 				serviceHelper.findByCode (
 					chat,
 					serviceCode),
-				fromUser.getId ());
+				fromUser.getId (),
+				Optional.of (
+					chatMessage.getSender ()));
 
 		chatMessage
 

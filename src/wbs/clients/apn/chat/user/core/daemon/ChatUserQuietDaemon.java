@@ -27,6 +27,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.daemon.SleepingDaemonService;
 
@@ -102,11 +103,15 @@ class ChatUserQuietDaemon
 
 		// then do each one
 
-		for (ChatUserRec chatUser : chatUsers) {
+		for (
+			ChatUserRec chatUser
+				: chatUsers
+		) {
 
 			try {
 
-				doUser (chatUser.getId ());
+				doUser (
+					chatUser.getId ());
 
 			} catch (Exception exception) {
 
@@ -115,7 +120,7 @@ class ChatUserQuietDaemon
 					"Chat daemon",
 					exception,
 					Optional.<Integer>absent (),
-					false);
+					Resolution.tryAgainLater);
 
 			}
 

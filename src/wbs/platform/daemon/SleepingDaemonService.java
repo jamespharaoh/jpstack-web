@@ -4,12 +4,13 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.utils.RandomLogic;
-
 import com.google.common.base.Optional;
 
-abstract public
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
+import wbs.framework.utils.RandomLogic;
+
+public abstract
 class SleepingDaemonService
 	extends AbstractDaemonService {
 
@@ -52,9 +53,14 @@ class SleepingDaemonService
 			// delay
 
 			try {
-				Thread.sleep (delay);
+
+				Thread.sleep (
+					delay);
+
 			} catch (InterruptedException exception) {
+
 				return;
+
 			}
 
 			// run service hook
@@ -79,7 +85,7 @@ class SleepingDaemonService
 					generalErrorSummary (),
 					exception,
 					Optional.<Integer>absent (),
-					false);
+					Resolution.tryAgainLater);
 
 			}
 

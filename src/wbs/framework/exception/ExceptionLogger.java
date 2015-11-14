@@ -1,8 +1,8 @@
 package wbs.framework.exception;
 
-import wbs.framework.record.Record;
-
 import com.google.common.base.Optional;
+
+import wbs.framework.record.Record;
 
 public
 interface ExceptionLogger {
@@ -13,14 +13,14 @@ interface ExceptionLogger {
 			String summary,
 			String dump,
 			Optional<Integer> userId,
-			Boolean fatal);
+			Resolution resolution);
 
 	Record<?> logThrowable (
 			String typeCode,
 			String source,
 			Throwable throwable,
 			Optional<Integer> userId,
-			Boolean fatal);
+			Resolution resolution);
 
 	Record<?> logThrowableWithSummary (
 			String typeCode,
@@ -28,6 +28,19 @@ interface ExceptionLogger {
 			String summary,
 			Throwable throwable,
 			Optional<Integer> userId,
-			Boolean fatal);
+			Resolution resolution);
+
+	public static
+	enum Resolution {
+
+		tryAgainNow,
+		tryAgainLater,
+		ignoreWithUserWarning,
+		ignoreWithThirdPartyWarning,
+		ignoreWithLoggedWarning,
+		ignoreWithNoWarning,
+		fatalError;
+
+	}
 
 }

@@ -25,6 +25,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
@@ -165,8 +166,10 @@ class AlertsDaemon
 
 		// process alerts settings
 
-		for (Integer alertsSettingsId
-				: alertsSettingsIds) {
+		for (
+			Integer alertsSettingsId
+				: alertsSettingsIds
+		) {
 
 			try {
 
@@ -186,7 +189,7 @@ class AlertsDaemon
 					"alerts daemon " + alertsSettingsId,
 					exception,
 					Optional.<Integer>absent (),
-					false);
+					Resolution.ignoreWithNoWarning);
 
 			}
 

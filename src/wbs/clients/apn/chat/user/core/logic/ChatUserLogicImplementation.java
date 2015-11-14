@@ -49,6 +49,7 @@ import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.EmailLogic;
@@ -1159,7 +1160,7 @@ class ChatUserLogicImplementation
 						"ChatUserLogic.setPlace",
 						exception,
 						Optional.<Integer>absent (),
-						false);
+						Resolution.ignoreWithLoggedWarning);
 
 				}
 

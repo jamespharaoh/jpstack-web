@@ -23,6 +23,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.Responder;
@@ -161,8 +162,9 @@ class SimulatorSessionCreateEventAction
 				"console",
 				requestContext.requestPath (),
 				exception,
-				Optional.of (requestContext.userId ()),
-				false);
+				Optional.of (
+					requestContext.userId ()),
+				Resolution.ignoreWithUserWarning);
 
 			return jsonResponder.get ()
 

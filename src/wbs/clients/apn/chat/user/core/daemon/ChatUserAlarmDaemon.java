@@ -24,6 +24,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.platform.daemon.SleepingDaemonService;
 
 @SingletonComponent ("chatUserAlarmDaemon")
@@ -117,7 +118,7 @@ class ChatUserAlarmDaemon
 						alarm.getId ()),
 					exception,
 					Optional.<Integer>absent (),
-					false);
+					Resolution.tryAgainLater);
 
 			}
 

@@ -24,10 +24,14 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.PathHandler;
@@ -54,9 +58,6 @@ import wbs.sms.message.report.model.MessageReportCodeRec;
 import wbs.sms.message.report.model.MessageReportCodeType;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @SingletonComponent ("hybyteApiServletModule")
@@ -149,7 +150,8 @@ class HybyteApiServletModule
 					hybyteRouteHelper.find (
 						routeId);
 
-				log.debug("Hybyte network: [" + inRequestResult.net + "]");
+				log.debug (
+					"Hybyte network: [" + inRequestResult.net + "]");
 
 				// update network if provided
 
@@ -243,7 +245,10 @@ class HybyteApiServletModule
 						exception),
 					stringBuilder.toString (),
 					Optional.<Integer>absent (),
-					false);
+					Resolution.ignoreWithThirdPartyWarning);
+
+				throw new RuntimeException (
+					exception);
 
 			}
 

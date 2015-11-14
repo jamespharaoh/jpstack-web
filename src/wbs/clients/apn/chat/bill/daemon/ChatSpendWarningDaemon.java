@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeChargesRec;
@@ -19,6 +20,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.daemon.SleepingDaemonService;
 
@@ -94,8 +96,10 @@ class ChatSpendWarningDaemon
 
 		transaction.close ();
 
-		for (ChatUserRec chatUser
-				: chatUsers) {
+		for (
+			ChatUserRec chatUser
+				: chatUsers
+		) {
 
 			try {
 
@@ -109,7 +113,7 @@ class ChatSpendWarningDaemon
 					"ChatSpendWarningDaemon",
 					exception,
 					Optional.<Integer>absent (),
-					false);
+					Resolution.tryAgainLater);
 
 			}
 

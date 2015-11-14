@@ -18,6 +18,7 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 
@@ -166,16 +167,21 @@ class ConsoleAction
 				exceptionFromBackupResponder,
 				Optional.fromNullable (
 					requestContext.userId ()),
-				false);
+				Resolution.ignoreWithUserWarning);
 
 		}
 
 		if (backupResponder == null) {
 
-			if (throwable instanceof RuntimeException)
-				throw (RuntimeException) throwable;
+			if (throwable instanceof RuntimeException) {
 
-			throw new RuntimeException (throwable);
+				throw (RuntimeException)
+					throwable;
+
+			}
+
+			throw new RuntimeException (
+				throwable);
 
 		}
 
@@ -193,7 +199,7 @@ class ConsoleAction
 			throwable,
 			Optional.fromNullable (
 				requestContext.userId ()),
-			false);
+			Resolution.ignoreWithUserWarning);
 
 		// give the user an error message
 

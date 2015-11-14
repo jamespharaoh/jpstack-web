@@ -4,14 +4,15 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextRec;
+import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.route.router.model.RouterRec;
-
-import com.google.common.base.Optional;
 
 public
 interface ChatSendLogic {
@@ -69,7 +70,8 @@ interface ChatSendLogic {
 			Collection<TextRec> parts,
 			CommandRec magicCommand,
 			ServiceRec service,
-			Integer magicRef);
+			Integer magicRef,
+			Optional<UserRec> user);
 
 	Optional<MessageRec> sendSystemMagic (
 			ChatUserRec chatUser,

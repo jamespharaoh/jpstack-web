@@ -8,14 +8,15 @@ import javax.inject.Provider;
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionLogic;
 import wbs.platform.exception.model.ExceptionLogRec;
-
-import com.google.common.base.Optional;
 
 @SingletonComponent ("exceptionLogger")
 @Log4j
@@ -44,7 +45,7 @@ class ExceptionLoggerImplementation
 			final @NonNull String summary,
 			final @NonNull String dump,
 			final @NonNull Optional<Integer> userId,
-			final @NonNull Boolean fatal) {
+			final @NonNull Resolution resolution) {
 
 		return logExceptionWrapped (
 			typeCode,
@@ -62,7 +63,7 @@ class ExceptionLoggerImplementation
 					summary,
 					dump,
 					userId,
-					fatal);
+					resolution);
 
 			}
 
@@ -77,7 +78,7 @@ class ExceptionLoggerImplementation
 			final @NonNull String source,
 			final @NonNull Throwable throwable,
 			final @NonNull Optional<Integer> userId,
-			final @NonNull Boolean fatal) {
+			final @NonNull Resolution resolution) {
 
 		return logExceptionWrapped (
 			typeCode,
@@ -95,7 +96,7 @@ class ExceptionLoggerImplementation
 					exceptionLogic.throwableSummary (throwable),
 					exceptionLogic.throwableDump (throwable),
 					userId,
-					fatal);
+					resolution);
 
 			}
 
@@ -111,7 +112,7 @@ class ExceptionLoggerImplementation
 			final @NonNull String summary,
 			final @NonNull Throwable throwable,
 			final @NonNull Optional<Integer> userId,
-			final @NonNull Boolean fatal) {
+			final @NonNull Resolution resolution) {
 
 		return logExceptionWrapped (
 			typeCode,
@@ -126,10 +127,15 @@ class ExceptionLoggerImplementation
 				return realLogException (
 					typeCode,
 					source,
-					summary + "\n" + exceptionLogic.throwableSummary (throwable),
-					exceptionLogic.throwableDump (throwable),
+					stringFormat (
+						"%s\n%s",
+						summary,
+						exceptionLogic.throwableSummary (
+							throwable)),
+					exceptionLogic.throwableDump (
+						throwable),
 					userId,
-					fatal);
+					resolution);
 
 			}
 
@@ -164,10 +170,15 @@ class ExceptionLoggerImplementation
 				realLogException (
 					typeCode,
 					"exception log",
-					furtherSummary + "\n" + exceptionLogic.throwableSummary (furtherException),
-					exceptionLogic.throwableDump (furtherException),
+					stringFormat (
+						"%s\n%s",
+						furtherSummary,
+						exceptionLogic.throwableSummary (
+							furtherException)),
+					exceptionLogic.throwableDump (
+						furtherException),
 					Optional.<Integer>absent (),
-					true);
+					Resolution.fatalError);
 
 			} catch (Exception yetAnotherException) {
 
@@ -190,7 +201,7 @@ class ExceptionLoggerImplementation
 			@NonNull String summary,
 			@NonNull String dump,
 			@NonNull Optional<Integer> userId,
-			@NonNull Boolean fatal) {
+			@NonNull Resolution resolution) {
 
 		@Cleanup
 		Transaction transaction =
@@ -204,7 +215,7 @@ class ExceptionLoggerImplementation
 				summary,
 				dump,
 				userId,
-				fatal);
+				resolution);
 
 		transaction.commit ();
 

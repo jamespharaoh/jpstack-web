@@ -71,7 +71,9 @@ class SpecialFormFieldAccessor<Container extends Record<?>,Native>
 		// special case for null
 
 		if (nativeObject == null) {
+
 			return Optional.<Native>absent ();
+
 		}
 
 		// sanity check native type

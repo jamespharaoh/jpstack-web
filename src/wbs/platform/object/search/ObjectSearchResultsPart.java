@@ -88,6 +88,7 @@ class ObjectSearchResultsPart
 	List<Record<?>> objects;
 	Integer totalObjects;
 
+	Boolean singlePage;
 	Integer pageNumber;
 	Integer pageCount;
 
@@ -146,18 +147,35 @@ class ObjectSearchResultsPart
 		totalObjects =
 			allObjectIds.size ();
 
-		pageNumber =
-			Integer.parseInt (
+		if (
+			equal (
 				requestContext.parameter (
-					"page",
-					"0"));
+					"page"),
+				"all")
+		) {
+
+			singlePage = true;
+
+		} else {
+
+			singlePage = false;
+
+			pageNumber =
+				Integer.parseInt (
+					requestContext.parameter (
+						"page",
+						"0"));
+
+		}
 
 		List<Integer> pageObjectIds =
-			allObjectIds.subList (
-				pageNumber * itemsPerPage,
-				Math.min (
-					(pageNumber + 1) * itemsPerPage,
-					allObjectIds.size ()));
+			singlePage
+				? allObjectIds
+				: allObjectIds.subList (
+					pageNumber * itemsPerPage,
+					Math.min (
+						(pageNumber + 1) * itemsPerPage,
+						allObjectIds.size ()));
 
 		pageCount =
 			(allObjectIds.size () - 1) / itemsPerPage + 1;
@@ -259,6 +277,15 @@ class ObjectSearchResultsPart
 			" class=\"links\"",
 			">Select page\n");
 
+		printFormat (
+			"<a",
+			" class=\"%h\"",
+			singlePage
+				? "selected"
+				: "",
+			" href=\"?page=all\"",
+			">All</a>\n");
+
 		for (
 			int page = 0;
 			page < pageCount;
@@ -268,7 +295,7 @@ class ObjectSearchResultsPart
 			printFormat (
 				"<a",
 				" class=\"%h\"",
-				page == pageNumber
+				! singlePage && page == pageNumber
 					? "selected"
 					: "",
 				" href=\"%h\"",
@@ -288,7 +315,9 @@ class ObjectSearchResultsPart
 	void goSearchResults () {
 
 		printFormat (
-			"<table class=\"list\">\n");
+			"<table",
+			" class=\"list\"",
+			">\n");
 
 		printFormat (
 			"<tr>\n");

@@ -1,5 +1,6 @@
 package wbs.platform.exception.logic;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -12,6 +13,7 @@ import com.google.common.base.Optional;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.exception.ExceptionLogicImplementation;
 import wbs.framework.record.GlobalId;
 import wbs.platform.exception.model.ExceptionLogObjectHelper;
@@ -50,7 +52,7 @@ class ExceptionLogLogicImplementation
 			@NonNull String summary,
 			@NonNull String dump,
 			@NonNull Optional<Integer> userId,
-			@NonNull Boolean fatal) {
+			@NonNull Resolution resolution) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -106,7 +108,9 @@ class ExceptionLogLogicImplementation
 					dump))
 
 			.setFatal (
-				fatal)
+				equal (
+					resolution,
+					Resolution.fatalError))
 
 		);
 

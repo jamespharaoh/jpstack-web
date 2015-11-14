@@ -13,6 +13,9 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -24,10 +27,9 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
-
-import com.google.common.base.Optional;
 
 @Log4j
 @SingletonComponent ("chatMonitorSwapDaemon")
@@ -153,7 +155,7 @@ class ChatMonitorSwapDaemon
 					orient.toString ()),
 				exception,
 				Optional.<Integer>absent (),
-				false);
+				Resolution.tryAgainLater);
 
 		}
 

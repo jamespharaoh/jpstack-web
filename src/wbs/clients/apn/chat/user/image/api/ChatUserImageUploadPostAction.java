@@ -24,6 +24,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
@@ -215,7 +216,7 @@ class ChatUserImageUploadPostAction
 				requestContext.requestPath (),
 				exception,
 				Optional.<Integer>absent (),
-				false);
+				Resolution.ignoreWithUserWarning);
 
 			// start new transaction
 

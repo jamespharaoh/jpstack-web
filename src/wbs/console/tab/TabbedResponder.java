@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.PagePart;
@@ -24,6 +25,7 @@ import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.record.GlobalId;
 
 import com.google.common.base.Optional;
@@ -176,7 +178,7 @@ class TabbedResponder
 					exception,
 					Optional.fromNullable (
 						requestContext.userId ()),
-					false);
+					Resolution.ignoreWithUserWarning);
 
 				// and remember we had a problem
 

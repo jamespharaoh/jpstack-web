@@ -55,7 +55,8 @@
 		<associative-list
 			name="otherChatUsers"
 			type="chatUser"
-			table="chat_info_site_user"/>
+			table="chat_info_site_user"
+			owned="yes"/>
 
 	</collections>
 

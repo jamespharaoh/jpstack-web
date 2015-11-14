@@ -9,6 +9,9 @@ import javax.inject.Provider;
 import javax.servlet.ServletException;
 
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.base.Optional;
+
 import wbs.console.part.NotFoundPart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.tab.Tab;
@@ -16,9 +19,8 @@ import wbs.console.tab.TabContext;
 import wbs.console.tab.TabbedResponder;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.web.WebNotFoundHandler;
-
-import com.google.common.base.Optional;
 
 @Log4j
 @SingletonComponent ("notFoundHandler")
@@ -90,7 +92,7 @@ class ConsoleNotFoundHandler
 				"The specified path was not found",
 				Optional.fromNullable (
 					requestContext.userId ()),
-				false);
+				Resolution.ignoreWithUserWarning);
 
 		} catch (RuntimeException exception) {
 

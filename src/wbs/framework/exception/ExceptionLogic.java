@@ -1,6 +1,5 @@
 package wbs.framework.exception;
 
-
 public
 interface ExceptionLogic {
 

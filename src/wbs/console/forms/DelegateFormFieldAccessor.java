@@ -46,7 +46,9 @@ class DelegateFormFieldAccessor<PrincipalContainer,DelegateContainer,Native>
 				path);
 
 		if (delegateContainer == null) {
-			return null;
+
+			return Optional.<Native>absent ();
+
 		}
 
 		return delegateFormFieldAccessor.read (

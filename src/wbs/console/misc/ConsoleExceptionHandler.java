@@ -14,17 +14,19 @@ import javax.inject.Provider;
 import javax.servlet.ServletException;
 
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.base.Optional;
+
 import wbs.console.priv.PrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ErrorResponder;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.StringFormatter;
 import wbs.framework.web.WebExceptionHandler;
-
-import com.google.common.base.Optional;
 
 @Log4j
 @SingletonComponent ("exceptionHandler")
@@ -98,7 +100,7 @@ class ConsoleExceptionHandler
 				throwable,
 				Optional.fromNullable (
 					requestContext.userId ()),
-				false);
+				Resolution.ignoreWithUserWarning);
 
 		} catch (RuntimeException localException) {
 

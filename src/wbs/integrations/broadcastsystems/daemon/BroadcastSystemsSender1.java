@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
@@ -227,7 +228,8 @@ class BroadcastSystemsSender1
 		if (state.urlConn.getResponseCode () == 200) {
 
 			Matcher matcher =
-				successPattern.matcher (responseString);
+				successPattern.matcher (
+					responseString);
 
 			if (! matcher.matches ()) {
 
@@ -244,7 +246,7 @@ class BroadcastSystemsSender1
 					"Success response did not match",
 					responseString,
 					Optional.<Integer>absent (),
-					false);
+					Resolution.ignoreWithLoggedWarning);
 
 				return null;
 
@@ -255,7 +257,8 @@ class BroadcastSystemsSender1
 		} else {
 
 			Matcher matcher =
-				failurePattern.matcher (responseString);
+				failurePattern.matcher (
+					responseString);
 
 			if (! matcher.matches ()) {
 
@@ -272,7 +275,7 @@ class BroadcastSystemsSender1
 					"Failure response did not match",
 					responseString,
 					Optional.<Integer>absent (),
-					false);
+					Resolution.ignoreWithLoggedWarning);
 
 				throw tempFailure (
 					stringFormat (

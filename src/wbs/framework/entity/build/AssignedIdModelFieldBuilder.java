@@ -1,5 +1,9 @@
 package wbs.framework.entity.build;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
+
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -9,8 +13,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.AssignedIdFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
-
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("assignedIdModelFieldBuilder")
 @ModelBuilder
@@ -69,7 +71,9 @@ class AssignedIdModelFieldBuilder {
 
 			.columnNames (
 				ImmutableList.<String>of (
-					"id"));
+					ifNull (
+						spec.columnName (),
+						"id")));
 
 		// store field
 

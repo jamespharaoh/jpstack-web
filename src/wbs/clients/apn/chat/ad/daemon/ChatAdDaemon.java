@@ -11,6 +11,9 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.ad.model.ChatAdTemplateRec;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
@@ -27,6 +30,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
@@ -35,8 +39,6 @@ import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.sms.command.model.CommandObjectHelper;
-
-import com.google.common.base.Optional;
 
 @Log4j
 @SingletonComponent ("chatAdDaemon")
@@ -117,7 +119,8 @@ class ChatAdDaemon
 	protected
 	void runOnce () {
 
-		log.debug ("Looking for users to send an ad to");
+		log.debug (
+			"Looking for users to send an ad to");
 
 		// get a list of users who have passed their ad time
 
@@ -134,8 +137,10 @@ class ChatAdDaemon
 
 		// then call doChatUserAd for each one
 
-		for (ChatUserRec chatUser
-				: chatUsers) {
+		for (
+			ChatUserRec chatUser
+				: chatUsers
+		) {
 
 			try {
 
@@ -149,7 +154,7 @@ class ChatAdDaemon
 					"ChatAdDaemon",
 					exception,
 					Optional.<Integer>absent (),
-					false);
+					Resolution.tryAgainLater);
 
 			}
 
