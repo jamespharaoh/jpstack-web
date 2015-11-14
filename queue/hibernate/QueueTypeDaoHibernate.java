@@ -2,6 +2,8 @@ package wbs.platform.queue.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.queue.model.QueueTypeDao;
@@ -15,18 +17,18 @@ class QueueTypeDaoHibernate
 	@Override
 	public
 	List<QueueTypeRec> findByParentObjectType (
-			ObjectTypeRec parentObjectType) {
+			@NonNull ObjectTypeRec parentType) {
 
 		return findMany (
 			QueueTypeRec.class,
 
 			createQuery (
 				"FROM QueueTypeRec queueType " +
-				"WHERE queueType.parentObjectType = :parentObjectType")
+				"WHERE queueType.parentType = :parentType")
 
 			.setEntity (
-				"parentObjectType",
-				parentObjectType)
+				"parentType",
+				parentType)
 
 			.list ());
 

@@ -5,15 +5,12 @@ import static wbs.framework.utils.etc.Misc.codify;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.inject.Inject;
-import javax.sql.DataSource;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -22,11 +19,17 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.ModelMetaBuilderHandler;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
+import wbs.framework.record.GlobalId;
+import wbs.platform.object.core.model.ObjectTypeObjectHelper;
+import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.service.metamodel.ServiceTypeSpec;
+import wbs.platform.service.model.ServiceTypeObjectHelper;
 
 @Log4j
 @PrototypeComponent ("serviceTypeBuilder")
@@ -37,10 +40,16 @@ class ServiceTypeBuilder {
 	// dependencies
 
 	@Inject
-	DataSource dataSource;
+	Database database;
 
 	@Inject
 	EntityHelper entityHelper;
+
+	@Inject
+	ObjectTypeObjectHelper objectTypeHelper;
+
+	@Inject
+	ServiceTypeObjectHelper serviceTypeHelper;
 
 	// builder
 
@@ -58,7 +67,7 @@ class ServiceTypeBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		try {
 
@@ -95,103 +104,46 @@ class ServiceTypeBuilder {
 	void createServiceType ()
 		throws SQLException {
 
-		@Cleanup
-		Connection connection =
-			dataSource.getConnection ();
-
-		connection.setAutoCommit (
-			false);
+		// begin transaction
 
 		@Cleanup
-		PreparedStatement nextServiceTypeIdStatement =
-			connection.prepareStatement (
-				stringFormat (
-					"SELECT ",
-						"nextval ('service_type_id_seq')"));
+		Transaction transaction =
+			database.beginReadWrite (
+				this);
 
-		ResultSet serviceTypeIdResultSet =
-			nextServiceTypeIdStatement.executeQuery ();
+		// lookup parent type
 
-		serviceTypeIdResultSet.next ();
+		String parentTypeCode =
+			camelToUnderscore (
+				ifNull (
+					spec.subject (),
+					parent.name ()));
 
-		int serviceTypeId =
-			serviceTypeIdResultSet.getInt (
-				1);
+		ObjectTypeRec parentType =
+			objectTypeHelper.findByCode (
+				GlobalId.root,
+				parentTypeCode);
 
-		String objectTypeCode =
-			ifNull (
-				spec.subject (),
-				parent.name ());
+		// create service type
 
-		Model model =
-			entityHelper.modelsByName ().get (
-				objectTypeCode);
+		serviceTypeHelper.insert (
+			serviceTypeHelper.createInstance ()
 
-		if (model == null) {
+			.setParentType (
+				parentType)
 
-			throw new RuntimeException (
-				stringFormat (
-					"No model for %s",
-					objectTypeCode));
+			.setCode (
+				codify (
+					spec.name ()))
 
-		}
+			.setDescription (
+				spec.description ())
 
-		@Cleanup
-		PreparedStatement getObjectTypeIdStatement =
-			connection.prepareStatement (
-				stringFormat (
-					"SELECT id ",
-					"FROM object_type ",
-					"WHERE code = ?"));
+		);
 
-		getObjectTypeIdStatement.setString (
-			1,
-			model.objectTypeCode ());
+		// commit transaction
 
-		ResultSet getObjectTypeIdResult =
-			getObjectTypeIdStatement.executeQuery ();
-
-		getObjectTypeIdResult.next ();
-
-		int objectTypeId =
-			getObjectTypeIdResult.getInt (
-				1);
-
-		@Cleanup
-		PreparedStatement insertServiceTypeStatement =
-			connection.prepareStatement (
-				stringFormat (
-					"INSERT INTO service_type (",
-						"id, ",
-						"parent_object_type_id, ",
-						"code, ",
-						"description) ",
-					"VALUES (",
-						"?, ",
-						"?, ",
-						"?, ",
-						"?)"));
-
-		insertServiceTypeStatement.setInt (
-			1,
-			serviceTypeId);
-
-		insertServiceTypeStatement.setInt (
-			2,
-			objectTypeId);
-
-		insertServiceTypeStatement.setString (
-			3,
-			codify (
-				spec.name ()));
-
-		insertServiceTypeStatement.setString (
-			4,
-			spec.description ());
-
-		insertServiceTypeStatement.executeUpdate ();
-
-		connection.commit ();
+		transaction.commit ();
 
 	}
 

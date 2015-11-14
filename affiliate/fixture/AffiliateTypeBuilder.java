@@ -4,16 +4,14 @@ import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.codify;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.Misc.underscoreToCamel;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.inject.Inject;
-import javax.sql.DataSource;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -22,11 +20,17 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.ModelMetaBuilderHandler;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
+import wbs.framework.record.GlobalId;
 import wbs.platform.affiliate.metamodel.AffiliateTypeSpec;
+import wbs.platform.affiliate.model.AffiliateTypeObjectHelper;
+import wbs.platform.object.core.model.ObjectTypeObjectHelper;
+import wbs.platform.object.core.model.ObjectTypeRec;
 
 @Log4j
 @PrototypeComponent ("affiliateTypeBuilder")
@@ -37,10 +41,16 @@ class AffiliateTypeBuilder {
 	// dependencies
 
 	@Inject
-	DataSource dataSource;
+	AffiliateTypeObjectHelper affiliateTypeHelper;
+
+	@Inject
+	Database database;
 
 	@Inject
 	EntityHelper entityHelper;
+
+	@Inject
+	ObjectTypeObjectHelper objectTypeHelper;
 
 	// builder
 
@@ -58,7 +68,7 @@ class AffiliateTypeBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		try {
 
@@ -96,108 +106,54 @@ class AffiliateTypeBuilder {
 		throws SQLException {
 
 		@Cleanup
-		Connection connection =
-			dataSource.getConnection ();
+		Transaction transaction =
+			database.beginReadWrite (
+				this);
 
-		connection.setAutoCommit (
-			false);
+		String parentTypeCode =
+			camelToUnderscore (
+				ifNull (
+					spec.subject (),
+					parent.name ()));
 
-		@Cleanup
-		PreparedStatement nextAffiliateTypeIdStatement =
-			connection.prepareStatement (
-				stringFormat (
-					"SELECT ",
-						"nextval ('affiliate_type_id_seq')"));
+		ObjectTypeRec parentType =
+			objectTypeHelper.findByCode (
+				GlobalId.root,
+				parentTypeCode);
 
-		ResultSet affiliateTypeIdResultSet =
-			nextAffiliateTypeIdStatement.executeQuery ();
-
-		affiliateTypeIdResultSet.next ();
-
-		int affiliateTypeId =
-			affiliateTypeIdResultSet.getInt (
-				1);
-
-		String objectTypeCode =
-			ifNull (
-				spec.subject (),
-				parent.name ());
-
-		Model model =
+		Model parentModel =
 			entityHelper.modelsByName ().get (
-				objectTypeCode);
+				underscoreToCamel (
+					parentTypeCode));
 
-		if (model == null) {
+		if (parentModel == null) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"No model for %s",
-					objectTypeCode));
+					parentTypeCode));
 
 		}
 
-		@Cleanup
-		PreparedStatement getObjectTypeIdStatement =
-			connection.prepareStatement (
-				stringFormat (
-					"SELECT id ",
-					"FROM object_type ",
-					"WHERE code = ?"));
+		affiliateTypeHelper.insert (
+			affiliateTypeHelper.createInstance ()
 
-		getObjectTypeIdStatement.setString (
-			1,
-			model.objectTypeCode ());
+			.setParentType (
+				parentType)
 
-		ResultSet getObjectTypeIdResult =
-			getObjectTypeIdStatement.executeQuery ();
+			.setCode (
+				codify (
+					spec.name ()))
 
-		getObjectTypeIdResult.next ();
+			.setName (
+				spec.name ())
 
-		int objectTypeId =
-			getObjectTypeIdResult.getInt (
-				1);
+			.setDescription (
+				spec.description ())
 
-		@Cleanup
-		PreparedStatement insertAffiliateTypeStatement =
-			connection.prepareStatement (
-				stringFormat (
-					"INSERT INTO affiliate_type (",
-						"id, ",
-						"parent_object_type_id, ",
-						"code, ",
-						"name, ",
-						"description) ",
-					"VALUES (",
-						"?, ",
-						"?, ",
-						"?, ",
-						"?, ",
-						"?)"));
+		);
 
-		insertAffiliateTypeStatement.setInt (
-			1,
-			affiliateTypeId);
-
-		insertAffiliateTypeStatement.setInt (
-			2,
-			objectTypeId);
-
-		insertAffiliateTypeStatement.setString (
-			3,
-			codify (
-				spec.name ()));
-
-		insertAffiliateTypeStatement.setString (
-			4,
-			spec.name ());
-
-		insertAffiliateTypeStatement.setString (
-			5,
-			spec.description ());
-
-		insertAffiliateTypeStatement.executeUpdate ();
-
-		connection.commit ();
+		transaction.commit ();
 
 	}
 
