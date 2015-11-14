@@ -1,8 +1,9 @@
 package wbs.platform.exception.logic;
 
-import wbs.platform.exception.model.ExceptionLogRec;
-
 import com.google.common.base.Optional;
+
+import wbs.framework.exception.ExceptionLogger.Resolution;
+import wbs.platform.exception.model.ExceptionLogRec;
 
 public
 interface ExceptionLogLogic {
@@ -13,6 +14,6 @@ interface ExceptionLogLogic {
 			String summary,
 			String dump,
 			Optional<Integer> userId,
-			Boolean fatal);
+			Resolution resolution);
 
 }

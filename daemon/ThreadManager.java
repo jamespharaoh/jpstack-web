@@ -1,5 +1,6 @@
 package wbs.platform.daemon;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.concurrent.ThreadFactory;
@@ -7,10 +8,12 @@ import java.util.concurrent.ThreadFactory;
 import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.exception.ExceptionLogger;
 
 import com.google.common.base.Optional;
+
+import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 
 @Log4j
 @SingletonComponent ("threadManager")
@@ -59,9 +62,13 @@ class ThreadManager
 
 		void logThrowable (
 				Throwable throwable,
-				boolean fatal) {
+				Resolution resolution) {
 
-			if (fatal) {
+			if (
+				equal (
+					resolution,
+					Resolution.fatalError)
+			) {
 
 				log.fatal (
 					stringFormat (
@@ -90,7 +97,7 @@ class ThreadManager
 						getName ()),
 					throwable,
 					Optional.<Integer>absent (),
-					fatal);
+					resolution);
 
 			} catch (Throwable exception) {
 
@@ -118,7 +125,7 @@ class ThreadManager
 
 				logThrowable (
 					throwable,
-					true);
+					Resolution.fatalError);
 
 			}
 

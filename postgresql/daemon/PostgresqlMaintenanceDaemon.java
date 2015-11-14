@@ -25,6 +25,7 @@ import org.joda.time.Instant;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.platform.daemon.AbstractDaemonService;
 import wbs.platform.daemon.ThreadManager;
 
@@ -222,7 +223,7 @@ class PostgresqlMaintenanceDaemon
 						getClass ().getSimpleName (),
 						exception,
 						Optional.<Integer>absent (),
-						false);
+						Resolution.tryAgainLater);
 
 				}
 
@@ -235,7 +236,7 @@ class PostgresqlMaintenanceDaemon
 				getClass ().getSimpleName (),
 				exception,
 				Optional.<Integer>absent (),
-				false);
+				Resolution.tryAgainLater);
 
 		}
 

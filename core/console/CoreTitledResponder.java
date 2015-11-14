@@ -11,12 +11,14 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.html.ScriptRef;
 import wbs.console.part.PagePart;
 import wbs.console.priv.PrivChecker;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.record.GlobalId;
 
@@ -103,13 +105,14 @@ class CoreTitledResponder
 					exception,
 					Optional.fromNullable (
 						requestContext.userId ()),
-					false);
+					Resolution.ignoreWithUserWarning);
 
 				// and remember we had a problem
 
 				pagePartThrew = exception;
 
-				requestContext.addError ("Internal error");
+				requestContext.addError (
+					"Internal error");
 
 			}
 
