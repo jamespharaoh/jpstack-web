@@ -8,8 +8,12 @@
 	</sql-scripts>
 
 	<models>
+
+		<enum-type name="exceptionResolution"/>
+
 		<model name="exceptionLog"/>
 		<model name="exceptionLogType"/>
+
 	</models>
 
 	<layer name="logic">

@@ -8,14 +8,14 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.html.JqueryScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
-
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("statusResponder")
 public

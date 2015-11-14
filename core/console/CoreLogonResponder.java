@@ -6,6 +6,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.JqueryScriptRef;
 import wbs.console.html.ScriptRef;
@@ -16,8 +18,6 @@ import wbs.framework.application.config.WbsConfig;
 import wbs.framework.record.GlobalId;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
-
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("coreLogonResponder")
 public

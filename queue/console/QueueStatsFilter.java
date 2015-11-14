@@ -8,6 +8,9 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.queue.model.QueueItemRec;
@@ -15,9 +18,6 @@ import wbs.platform.queue.model.QueueObjectHelper;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("queueStatsFilter")
 public

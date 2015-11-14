@@ -11,6 +11,8 @@ import java.util.TreeMap;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
@@ -23,8 +25,6 @@ import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.console.PrivConsoleHelper;
 import wbs.platform.priv.model.PrivRec;
 import wbs.platform.scaffold.model.RootRec;
-
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("groupPrivsPart")
 public

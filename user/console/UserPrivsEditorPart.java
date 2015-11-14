@@ -11,6 +11,8 @@ import java.util.TreeMap;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
@@ -26,8 +28,6 @@ import wbs.platform.scaffold.model.RootRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserPrivRec;
 import wbs.platform.user.model.UserRec;
-
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("userPrivsEditorPart")
 public

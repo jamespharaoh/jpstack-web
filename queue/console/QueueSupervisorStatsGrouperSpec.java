@@ -2,6 +2,7 @@ package wbs.platform.queue.console;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.console.module.ConsoleModuleData;
 import wbs.console.supervisor.SupervisorConfigSpec;
 import wbs.framework.application.annotations.PrototypeComponent;

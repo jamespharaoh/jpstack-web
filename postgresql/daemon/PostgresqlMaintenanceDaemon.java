@@ -23,13 +23,13 @@ import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.platform.daemon.AbstractDaemonService;
 import wbs.platform.daemon.ThreadManager;
-
-import com.google.common.base.Optional;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 
 @Log4j
 @SingletonComponent ("pgMaint")
@@ -223,7 +223,7 @@ class PostgresqlMaintenanceDaemon
 						getClass ().getSimpleName (),
 						exception,
 						Optional.<Integer>absent (),
-						Resolution.tryAgainLater);
+						ExceptionResolution.tryAgainLater);
 
 				}
 
@@ -236,7 +236,7 @@ class PostgresqlMaintenanceDaemon
 				getClass ().getSimpleName (),
 				exception,
 				Optional.<Integer>absent (),
-				Resolution.tryAgainLater);
+				ExceptionResolution.tryAgainLater);
 
 		}
 

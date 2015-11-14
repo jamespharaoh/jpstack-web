@@ -3,6 +3,7 @@ package wbs.platform.object.criteria;
 import javax.inject.Inject;
 
 import lombok.experimental.Accessors;
+
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.module.ConsoleModuleData;
 import wbs.console.priv.PrivChecker;

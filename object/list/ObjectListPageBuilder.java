@@ -12,6 +12,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -40,8 +42,6 @@ import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.services.ticket.core.console.FieldsProvider;
 import wbs.services.ticket.core.console.StaticFieldsProvider;
-
-import com.google.common.collect.ImmutableMap;
 
 @PrototypeComponent ("objectListPageBuilder")
 @ConsoleModuleBuilderHandler

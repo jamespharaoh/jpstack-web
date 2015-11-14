@@ -15,8 +15,8 @@ import org.joda.time.Instant;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
 import wbs.platform.daemon.SleepingDaemonService;
+import wbs.platform.exception.logic.ExceptionLogger;
 import wbs.platform.exception.model.ExceptionLogObjectHelper;
 import wbs.platform.exception.model.ExceptionLogRec;
 

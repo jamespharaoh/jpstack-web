@@ -13,13 +13,13 @@ import com.google.common.base.Optional;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.exception.ExceptionLogicImplementation;
 import wbs.framework.record.GlobalId;
 import wbs.platform.exception.model.ExceptionLogObjectHelper;
 import wbs.platform.exception.model.ExceptionLogRec;
 import wbs.platform.exception.model.ExceptionLogTypeObjectHelper;
 import wbs.platform.exception.model.ExceptionLogTypeRec;
+import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
@@ -52,7 +52,7 @@ class ExceptionLogLogicImplementation
 			@NonNull String summary,
 			@NonNull String dump,
 			@NonNull Optional<Integer> userId,
-			@NonNull Resolution resolution) {
+			@NonNull ExceptionResolution resolution) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -110,7 +110,10 @@ class ExceptionLogLogicImplementation
 			.setFatal (
 				equal (
 					resolution,
-					Resolution.fatalError))
+					ExceptionResolution.fatalError))
+
+			.setResolution (
+				resolution)
 
 		);
 
