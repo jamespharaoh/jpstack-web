@@ -10,6 +10,9 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
@@ -20,8 +23,6 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.daemon.SleepingDaemonService;
-
-import com.google.common.base.Optional;
 
 @Log4j
 @SingletonComponent ("chatAdultExpiryDaemon")

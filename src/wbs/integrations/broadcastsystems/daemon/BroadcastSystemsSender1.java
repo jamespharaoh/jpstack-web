@@ -11,24 +11,25 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.IOUtils;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutRec;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
-
-import com.google.common.base.Optional;
 
 @Log4j
 @SingletonComponent ("broadcastSystemsSender1")
@@ -211,13 +212,14 @@ class BroadcastSystemsSender1
 
 	public
 	String readResponse (
-			State state)
+			@NonNull State state)
 		throws
 			IOException,
 			SendFailureException {
 
 		String responseString =
-			IOUtils.toString (state.urlConn.getInputStream ());
+			IOUtils.toString (
+				state.urlConn.getInputStream ());
 
 		log.debug (
 			stringFormat (
@@ -246,7 +248,7 @@ class BroadcastSystemsSender1
 					"Success response did not match",
 					responseString,
 					Optional.<Integer>absent (),
-					Resolution.ignoreWithLoggedWarning);
+					ExceptionResolution.ignoreWithLoggedWarning);
 
 				return null;
 
@@ -275,7 +277,7 @@ class BroadcastSystemsSender1
 					"Failure response did not match",
 					responseString,
 					Optional.<Integer>absent (),
-					Resolution.ignoreWithLoggedWarning);
+					ExceptionResolution.ignoreWithLoggedWarning);
 
 				throw tempFailure (
 					stringFormat (

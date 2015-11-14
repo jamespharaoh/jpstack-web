@@ -7,6 +7,7 @@ import javax.inject.Provider;
 import javax.servlet.ServletException;
 import javax.validation.ConstraintViolationException;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.hibernate.exception.LockAcquisitionException;
@@ -17,10 +18,10 @@ import wbs.console.misc.ConsoleExceptionHandler;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.context.ApplicationContext;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 
 @Log4j
 public abstract
@@ -148,7 +149,7 @@ class ConsoleAction
 	}
 
 	Responder handleException (
-			Throwable throwable) {
+			@NonNull Throwable throwable) {
 
 		// if we have no backup page just die
 
@@ -167,7 +168,7 @@ class ConsoleAction
 				exceptionFromBackupResponder,
 				Optional.fromNullable (
 					requestContext.userId ()),
-				Resolution.ignoreWithUserWarning);
+				ExceptionResolution.ignoreWithUserWarning);
 
 		}
 
@@ -199,7 +200,7 @@ class ConsoleAction
 			throwable,
 			Optional.fromNullable (
 				requestContext.userId ()),
-			Resolution.ignoreWithUserWarning);
+			ExceptionResolution.ignoreWithUserWarning);
 
 		// give the user an error message
 
@@ -214,7 +215,7 @@ class ConsoleAction
 
 	protected
 	Provider<Responder> reusableResponder (
-			String responderName) {
+			@NonNull String responderName) {
 
 		return consoleManager.responder (
 			responderName,
@@ -224,7 +225,7 @@ class ConsoleAction
 
 	protected
 	Responder responder (
-			String responderName) {
+			@NonNull String responderName) {
 
 		Provider<Responder> responderProvider =
 			consoleManager.responder (

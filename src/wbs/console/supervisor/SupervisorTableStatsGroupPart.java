@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.console.reporting.StatsConsoleLogic;
 import wbs.console.reporting.StatsDataSet;

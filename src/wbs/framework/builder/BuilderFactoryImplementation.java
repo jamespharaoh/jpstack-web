@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.inject.Provider;
 
 import lombok.NonNull;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;

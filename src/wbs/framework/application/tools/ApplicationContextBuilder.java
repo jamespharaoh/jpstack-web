@@ -18,6 +18,9 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.collect.ImmutableList;
+
 import wbs.api.module.ApiModule;
 import wbs.api.module.ApiModuleFactory;
 import wbs.api.module.ApiModuleSpec;
@@ -57,8 +60,6 @@ import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.object.ObjectHelperFactory;
 import wbs.framework.object.ObjectHelperProvider;
 import wbs.framework.object.ObjectHelperProviderFactory;
-
-import com.google.common.collect.ImmutableList;
 
 @Accessors (fluent = true)
 @Log4j

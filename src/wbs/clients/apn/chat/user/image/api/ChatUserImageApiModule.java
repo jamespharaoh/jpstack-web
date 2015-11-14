@@ -7,6 +7,8 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.api.mvc.ApiFile;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.web.PathHandler;
@@ -14,8 +16,6 @@ import wbs.framework.web.RegexpPathHandler;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
-
-import com.google.common.collect.ImmutableMap;
 
 @SingletonComponent ("chatUserImageApiModule")
 public

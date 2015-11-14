@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import wbs.framework.record.Record;
 
 public
-interface ExceptionLogger {
+interface GenericExceptionLogger<Resolution> {
 
 	Record<?> logSimple (
 			String typeCode,
@@ -29,18 +29,5 @@ interface ExceptionLogger {
 			Throwable throwable,
 			Optional<Integer> userId,
 			Resolution resolution);
-
-	public static
-	enum Resolution {
-
-		tryAgainNow,
-		tryAgainLater,
-		ignoreWithUserWarning,
-		ignoreWithThirdPartyWarning,
-		ignoreWithLoggedWarning,
-		ignoreWithNoWarning,
-		fatalError;
-
-	}
 
 }

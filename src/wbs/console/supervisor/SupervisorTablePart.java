@@ -8,11 +8,12 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.collect.ImmutableList;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.console.part.PagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-
-import com.google.common.collect.ImmutableList;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTablePart")

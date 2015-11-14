@@ -4,6 +4,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.experimental.Accessors;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.part.PagePart;
 import wbs.framework.application.annotations.PrototypeComponent;

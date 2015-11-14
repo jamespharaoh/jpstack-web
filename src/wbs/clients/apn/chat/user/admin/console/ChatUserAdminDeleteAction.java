@@ -3,6 +3,7 @@ package wbs.clients.apn.chat.user.admin.console;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;

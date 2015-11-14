@@ -6,6 +6,9 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
@@ -24,7 +27,6 @@ import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.smsapps.ticketer.model.TicketerRec;
 import wbs.smsapps.ticketer.model.TicketerTicketObjectHelper;
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("ticketerCommand")

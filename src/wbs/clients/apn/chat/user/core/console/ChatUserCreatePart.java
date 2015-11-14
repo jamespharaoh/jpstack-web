@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.user.core.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 

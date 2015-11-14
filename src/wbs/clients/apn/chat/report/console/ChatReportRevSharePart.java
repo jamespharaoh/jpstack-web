@@ -16,6 +16,10 @@ import lombok.NonNull;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.affiliate.console.ChatAffiliateConsoleHelper;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.console.ChatRouteConsoleHelper;
@@ -54,10 +58,6 @@ import wbs.sms.message.stats.model.MessageStatsRec;
 import wbs.sms.message.stats.model.MessageStatsSearch;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @PrototypeComponent ("chatReportRevSharePart")
 public

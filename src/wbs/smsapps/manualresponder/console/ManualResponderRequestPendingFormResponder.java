@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.JqueryScriptRef;
@@ -30,8 +32,6 @@ import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
-
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("manualResponderRequestPendingFormResponder")
 public

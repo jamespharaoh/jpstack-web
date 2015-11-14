@@ -7,6 +7,9 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -25,8 +28,6 @@ import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderRec;
-
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @SingletonComponent ("forwarderCommand")

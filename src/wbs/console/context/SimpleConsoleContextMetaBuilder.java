@@ -3,6 +3,8 @@ package wbs.console.context;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.console.module.ConsoleMetaModuleImpl;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -12,8 +14,6 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("simpleConsoleContextMetaBuilder")
 @ConsoleMetaModuleBuilderHandler

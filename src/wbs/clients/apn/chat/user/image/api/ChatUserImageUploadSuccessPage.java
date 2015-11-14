@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -12,8 +14,6 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.PrintResponder;
 import wbs.framework.web.RequestContext;
-
-import com.google.common.collect.ImmutableMap;
 
 @PrototypeComponent ("chatUserImageUploadSuccessPage")
 public

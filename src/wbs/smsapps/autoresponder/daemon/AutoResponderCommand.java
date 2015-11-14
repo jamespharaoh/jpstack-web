@@ -7,6 +7,9 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -27,8 +30,6 @@ import wbs.sms.messageset.model.MessageSetRec;
 import wbs.sms.number.list.logic.NumberListLogic;
 import wbs.smsapps.autoresponder.model.AutoResponderObjectHelper;
 import wbs.smsapps.autoresponder.model.AutoResponderRec;
-
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("autoResponderCommand")

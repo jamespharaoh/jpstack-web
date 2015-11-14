@@ -5,6 +5,7 @@ import java.util.List;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.console.module.ConsoleModuleData;
 import wbs.console.module.ConsoleModuleSpec;
 import wbs.framework.application.annotations.PrototypeComponent;

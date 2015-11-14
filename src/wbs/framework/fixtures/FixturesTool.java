@@ -11,6 +11,7 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
 import wbs.framework.application.scaffold.PluginFixtureSpec;
 import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.application.scaffold.PluginSpec;

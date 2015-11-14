@@ -12,6 +12,7 @@ import javax.inject.Provider;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;

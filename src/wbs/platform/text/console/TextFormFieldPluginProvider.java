@@ -5,12 +5,12 @@ import static wbs.framework.utils.etc.Misc.equal;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import wbs.console.forms.AbstractFormFieldPluginProvider;
 import wbs.console.forms.FormFieldBuilderContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.text.model.TextRec;
-
-import com.google.common.base.Optional;
 
 @SingletonComponent ("textFormFieldPluginProvider")
 @SuppressWarnings ({ "rawtypes", "unchecked" })

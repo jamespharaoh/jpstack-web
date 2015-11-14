@@ -21,6 +21,8 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONObject;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
@@ -33,8 +35,6 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender2;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
-
-import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @SingletonComponent ("smsArenaSender")

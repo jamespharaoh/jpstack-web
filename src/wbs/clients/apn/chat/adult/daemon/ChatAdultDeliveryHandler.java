@@ -9,6 +9,10 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -24,9 +28,6 @@ import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.sms.message.delivery.model.DeliveryTypeRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("chatAdultDeliveryHandler")
 public

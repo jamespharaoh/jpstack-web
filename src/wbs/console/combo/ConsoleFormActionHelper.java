@@ -1,9 +1,9 @@
 package wbs.console.combo;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
-
-import com.google.common.base.Optional;
 
 public
 interface ConsoleFormActionHelper<FormState> {

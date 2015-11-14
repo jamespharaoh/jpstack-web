@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
@@ -26,8 +28,6 @@ import wbs.smsapps.subscription.model.SubscriptionListObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionListRec;
 import wbs.smsapps.subscription.model.SubscriptionObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionRec;
-
-import com.google.common.collect.ImmutableMap;
 
 @PrototypeComponent ("subscriptionFixtureProvider")
 public

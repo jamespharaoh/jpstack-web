@@ -14,6 +14,9 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.base.Optional;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.object.ObjectHelper;
@@ -22,8 +25,6 @@ import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
-
-import com.google.common.base.Optional;
 
 /**
  * Performs console-relevant operations on DataObjects such as resolving names

@@ -62,12 +62,12 @@ import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.exception.ExceptionLogic;
 import wbs.framework.object.ObjectManager;
 import wbs.integrations.jigsaw.api.JigsawApi;
 import wbs.integrations.urbanairship.logic.UrbanAirshipApi;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -998,7 +998,7 @@ class ChatMessageLogicImplementation
 					exception),
 
 				Optional.<Integer>absent (),
-				Resolution.ignoreWithNoWarning);
+				ExceptionResolution.ignoreWithNoWarning);
 
 			success = false;
 
@@ -1045,7 +1045,7 @@ class ChatMessageLogicImplementation
 					exception),
 
 				Optional.<Integer>absent (),
-				Resolution.ignoreWithNoWarning);
+				ExceptionResolution.ignoreWithNoWarning);
 
 			success = false;
 
@@ -1081,7 +1081,7 @@ class ChatMessageLogicImplementation
 					exception),
 
 				Optional.<Integer>absent (),
-				Resolution.ignoreWithNoWarning);
+				ExceptionResolution.ignoreWithNoWarning);
 
 			success = false;
 
@@ -1102,8 +1102,8 @@ class ChatMessageLogicImplementation
 	@Override
 	public
 	ChatMonitorInboxRec findOrCreateChatMonitorInbox (
-			ChatUserRec monitorChatUser,
-			ChatUserRec userChatUser,
+			@NonNull ChatUserRec monitorChatUser,
+			@NonNull ChatUserRec userChatUser,
 			boolean alarm) {
 
 		Transaction transaction =
@@ -1276,7 +1276,7 @@ class ChatMessageLogicImplementation
 						exception)),
 
 				Optional.<Integer>absent (),
-				Resolution.ignoreWithNoWarning);
+				ExceptionResolution.ignoreWithNoWarning);
 
 			return false;
 

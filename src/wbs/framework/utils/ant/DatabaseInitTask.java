@@ -15,9 +15,9 @@ import lombok.Data;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
-import wbs.framework.application.config.WbsConfig;
-
 import com.google.common.base.Joiner;
+
+import wbs.framework.application.config.WbsConfig;
 
 public
 class DatabaseInitTask

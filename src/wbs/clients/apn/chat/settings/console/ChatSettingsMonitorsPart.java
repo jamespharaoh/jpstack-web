@@ -8,6 +8,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -16,8 +19,6 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-
-import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @PrototypeComponent ("chatSettingsMonitorsPart")

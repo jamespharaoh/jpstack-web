@@ -5,6 +5,8 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.console.context.ConsoleContextMetaBuilderContainer;
 import wbs.console.context.ConsoleContextRootExtensionPoint;
@@ -15,8 +17,6 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("chatHelpTemplateContextMetaBuilder")
 @ConsoleMetaModuleBuilderHandler

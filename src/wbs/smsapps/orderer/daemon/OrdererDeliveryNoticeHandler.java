@@ -7,6 +7,10 @@ import java.util.Collection;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -19,9 +23,6 @@ import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.smsapps.orderer.model.OrdererOrderObjectHelper;
 import wbs.smsapps.orderer.model.OrdererOrderRec;
 import wbs.smsapps.orderer.model.OrdererRec;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @SingletonComponent ("ordererDeliveryNoticeHandler")
 public

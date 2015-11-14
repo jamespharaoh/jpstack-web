@@ -12,6 +12,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.collect.Iterables;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
@@ -24,8 +26,6 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-
-import com.google.common.collect.Iterables;
 
 @PrototypeComponent ("consoleContextSectionBuilder")
 @ConsoleModuleBuilderHandler

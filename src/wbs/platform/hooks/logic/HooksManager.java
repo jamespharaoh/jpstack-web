@@ -15,10 +15,11 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.annotations.SingletonComponent;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+
+import wbs.framework.application.annotations.SingletonComponent;
 
 @Log4j
 @SingletonComponent ("hooksManager")

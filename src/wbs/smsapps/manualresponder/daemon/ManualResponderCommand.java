@@ -8,6 +8,9 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -32,8 +35,6 @@ import wbs.sms.number.list.logic.NumberListLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
-
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("manualResponderCommand")

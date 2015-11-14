@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.bill.model;
 
-import wbs.clients.apn.chat.user.core.model.ChatUserRec;
-
 import com.google.common.base.Optional;
+
+import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 
 public
 interface ChatNetworkObjectHelperMethods {

@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
 import wbs.framework.application.context.BeanFactory;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;

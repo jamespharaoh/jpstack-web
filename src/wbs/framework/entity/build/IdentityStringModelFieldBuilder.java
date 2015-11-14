@@ -6,6 +6,8 @@ import static wbs.framework.utils.etc.Misc.ifNull;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.builder.Builder;
@@ -16,8 +18,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.IdentityStringFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
-
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("identityStringModelFieldBuilder")
 @ModelBuilder

@@ -5,13 +5,14 @@ import java.util.List;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.tools.DataFromXml;
-
-import com.google.common.collect.ImmutableList;
 
 @Accessors (fluent = true)
 @Data

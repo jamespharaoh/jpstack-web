@@ -9,6 +9,8 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.application.scaffold.PluginModelSpec;
@@ -21,8 +23,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.TypeFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
-
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("typeModelFieldBuilder")
 @ModelBuilder

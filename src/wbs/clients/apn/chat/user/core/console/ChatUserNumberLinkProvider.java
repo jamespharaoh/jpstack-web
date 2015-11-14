@@ -10,6 +10,8 @@ import javax.inject.Inject;
 
 import org.joda.time.Instant;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.user.core.model.ChatUserDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -19,8 +21,6 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.Record;
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;
-
-import com.google.common.collect.ImmutableMap;
 
 @SingletonComponent ("chatUserNumberLinkProvider")
 public

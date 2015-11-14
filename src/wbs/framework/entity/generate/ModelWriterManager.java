@@ -9,8 +9,8 @@ import javax.inject.Provider;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.builder.Builder;
-import wbs.framework.builder.BuilderFactory;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
+import wbs.framework.builder.BuilderFactory;
 import wbs.framework.utils.etc.FormatWriter;
 
 @SingletonComponent ("modelWriterManager")

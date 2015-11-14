@@ -46,6 +46,10 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChild;
@@ -56,10 +60,6 @@ import wbs.framework.data.annotations.DataIgnore;
 import wbs.framework.data.annotations.DataInitMethod;
 import wbs.framework.data.annotations.DataParent;
 import wbs.framework.utils.etc.BeanLogic;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 
 /**
  * Automatically builds data objects from XML guided by annotations.

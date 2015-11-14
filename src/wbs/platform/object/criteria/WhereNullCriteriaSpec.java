@@ -3,6 +3,7 @@ package wbs.platform.object.criteria;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.module.ConsoleModuleData;
 import wbs.framework.application.annotations.PrototypeComponent;

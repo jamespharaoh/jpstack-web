@@ -29,10 +29,10 @@ import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.daemon.SleepingDaemonService;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.sms.message.outbox.logic.MessageSender;
@@ -109,7 +109,8 @@ class ChatAdultAdDaemon
 	protected
 	void runOnce () {
 
-		log.debug ("Looking for users to send an adult ad to");
+		log.debug (
+			"Looking for users to send an adult ad to");
 
 		// get a list of users who have passed their ad time
 
@@ -143,7 +144,7 @@ class ChatAdultAdDaemon
 					"ChatAdDaemon",
 					exception,
 					Optional.<Integer>absent (),
-					Resolution.tryAgainLater);
+					ExceptionResolution.tryAgainLater);
 
 			}
 

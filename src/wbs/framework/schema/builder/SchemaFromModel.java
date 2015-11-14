@@ -9,6 +9,7 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.entity.model.Model;
 import wbs.framework.logging.TaskLog;

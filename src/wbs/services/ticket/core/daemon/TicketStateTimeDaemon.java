@@ -1,11 +1,12 @@
 package wbs.services.ticket.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.notLessThanZero;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
@@ -18,11 +19,11 @@ import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -67,7 +68,7 @@ class TicketStateTimeDaemon
 	TextObjectHelper textHelper;
 
 	@Inject
-	Provider<QueueLogic> queueLogic;
+	QueueLogic queueLogic;
 
 	// details
 
@@ -102,9 +103,16 @@ class TicketStateTimeDaemon
 	void runOnce () {
 
 		// TODO disabled for now
-		if (Boolean.parseBoolean ("true")) return;
 
-		log.debug ("Getting all unqueued tickets");
+		if (
+			Boolean.parseBoolean (
+				"true")
+		) {
+			return;
+		}
+
+		log.debug (
+			"Getting all unqueued tickets");
 
 		// get all the unqueued tickets
 
@@ -114,7 +122,7 @@ class TicketStateTimeDaemon
 				this);
 
 		List<TicketRec> tickets =
-			ticketHelper.findUnqueuedTickets();
+			ticketHelper.findUnqueuedTickets ();
 
 		transaction.close ();
 
@@ -137,7 +145,7 @@ class TicketStateTimeDaemon
 					"TicketStateTimeDaemon",
 					exception,
 					Optional.<Integer>absent (),
-					Resolution.tryAgainLater);
+					ExceptionResolution.tryAgainLater);
 
 			}
 
@@ -162,27 +170,38 @@ class TicketStateTimeDaemon
 		// find the ticket
 
 		TicketRec ticket =
-			ticketHelper.find (ticketId);
+			ticketHelper.find (
+				ticketId);
 
 		// check if the ticket is already in a queue
 
-		if (ticket.getQueueItem() != null)
+		if (
+			isNotNull (
+				ticket.getQueueItem ())
+		) {
 			return;
+		}
 
 		// check if the ticket is ready to be queued
 
 		Integer timeComparison =
-			Instant.now ()
-				.compareTo (ticket.getTimestamp ());
+			Instant.now ().compareTo (
+				ticket.getTimestamp ());
 
-		if (timeComparison >= 0 &&
-			ticket.getTicketState().getShowInQueue()) {
+		if (
+
+			notLessThanZero (
+				timeComparison)
+
+			&& ticket.getTicketState ().getShowInQueue ()
+
+		) {
 
 			// create queue item
 
 			QueueItemRec queueItem =
-				queueLogic.get().createQueueItem (
-					queueLogic.get().findQueue (
+				queueLogic.createQueueItem (
+					queueLogic.findQueue (
 						ticket.getTicketState (),
 						"default"),
 					ticket,
@@ -193,6 +212,7 @@ class TicketStateTimeDaemon
 			// add queue item to ticket
 
 			ticket
+
 				.setQueueItem (
 					queueItem);
 

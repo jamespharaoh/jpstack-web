@@ -1678,6 +1678,14 @@ class Misc {
 	}
 
 	public static
+	boolean notLessThanZero (
+			int value) {
+
+		return value >= 0;
+
+	}
+
+	public static
 	boolean doesNotStartWith (
 			String string,
 			String prefix) {

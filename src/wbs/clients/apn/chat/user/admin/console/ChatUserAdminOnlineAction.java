@@ -6,6 +6,7 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;

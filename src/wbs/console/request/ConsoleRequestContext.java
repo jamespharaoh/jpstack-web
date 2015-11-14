@@ -16,14 +16,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
 import wbs.console.tab.TabList;
 import wbs.framework.record.Record;
-
-import com.google.common.base.Optional;
 
 public
 interface ConsoleRequestContext {

@@ -13,6 +13,8 @@ import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -27,8 +29,6 @@ import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
-
-import com.google.common.base.Optional;
 
 @Log4j
 @SingletonComponent ("txtNationRouteInFile")

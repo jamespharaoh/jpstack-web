@@ -17,6 +17,10 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.html.ObsoleteDateField;
 import wbs.console.html.ObsoleteDateLinks;
 import wbs.console.module.ConsoleManager;
@@ -30,10 +34,6 @@ import wbs.console.reporting.StatsProvider;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorPart")

@@ -5,6 +5,8 @@ import static wbs.framework.utils.etc.Misc.ifNull;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -15,8 +17,6 @@ import wbs.framework.entity.meta.BinaryFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
 import wbs.framework.schema.helper.SchemaNamesHelper;
-
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("BinaryModelFieldBuilder")
 @ModelBuilder

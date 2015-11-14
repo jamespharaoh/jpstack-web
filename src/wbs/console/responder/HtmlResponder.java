@@ -7,11 +7,11 @@ import javax.inject.Inject;
 
 import org.joda.time.Instant;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.TimeFormatter;
-
-import com.google.common.collect.ImmutableSet;
 
 public abstract
 class HtmlResponder

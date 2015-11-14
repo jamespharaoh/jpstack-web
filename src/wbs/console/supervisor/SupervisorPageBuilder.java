@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.experimental.Accessors;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;

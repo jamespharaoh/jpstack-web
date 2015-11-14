@@ -12,9 +12,10 @@ import javax.sql.DataSource;
 
 import lombok.Cleanup;
 import lombok.Getter;
-import wbs.framework.application.annotations.SingletonComponent;
 
 import com.google.common.collect.ImmutableSet;
+
+import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("sqlLogic")
 public

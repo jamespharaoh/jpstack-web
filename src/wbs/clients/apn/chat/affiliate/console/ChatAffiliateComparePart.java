@@ -14,6 +14,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -23,8 +25,6 @@ import wbs.console.misc.IntervalFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
-
-import com.google.common.collect.ImmutableMap;
 
 @PrototypeComponent ("chatAffiliateComparePart")
 public

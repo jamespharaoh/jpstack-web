@@ -11,6 +11,8 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.DateTimeZone;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -24,8 +26,6 @@ import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.message.core.model.MessageRec;
-
-import com.google.common.base.Optional;
 
 public
 interface ChatUserLogic {

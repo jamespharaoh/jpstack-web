@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import wbs.framework.web.HttpStatus;
-
 import com.google.common.collect.ImmutableList;
+
+import wbs.framework.web.HttpStatus;
 
 public
 class Rpc {

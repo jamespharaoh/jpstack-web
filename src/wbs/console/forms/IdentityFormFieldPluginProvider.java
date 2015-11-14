@@ -5,9 +5,9 @@ import static wbs.framework.utils.etc.Misc.equal;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import wbs.framework.application.annotations.SingletonComponent;
-
 import com.google.common.base.Optional;
+
+import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("identityFormFieldPluginProvider")
 @SuppressWarnings ({ "rawtypes", "unchecked" })

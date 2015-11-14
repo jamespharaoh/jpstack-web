@@ -1,6 +1,7 @@
 package wbs.framework.application.config;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("wbsConfigLoader")

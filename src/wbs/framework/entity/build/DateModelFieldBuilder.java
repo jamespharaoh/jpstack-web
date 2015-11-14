@@ -8,6 +8,8 @@ import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.builder.Builder;
@@ -18,8 +20,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.DateFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
-
-import com.google.common.collect.ImmutableList;
 
 @PrototypeComponent ("dateModelFieldBuilder")
 @ModelBuilder

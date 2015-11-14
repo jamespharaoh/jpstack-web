@@ -7,13 +7,14 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 
 @Log4j
 @SingletonComponent ("threadManager")
@@ -61,13 +62,13 @@ class ThreadManager
 		}
 
 		void logThrowable (
-				Throwable throwable,
-				Resolution resolution) {
+				@NonNull Throwable throwable,
+				@NonNull ExceptionResolution resolution) {
 
 			if (
 				equal (
 					resolution,
-					Resolution.fatalError)
+					ExceptionResolution.fatalError)
 			) {
 
 				log.fatal (
@@ -125,7 +126,7 @@ class ThreadManager
 
 				logThrowable (
 					throwable,
-					Resolution.fatalError);
+					ExceptionResolution.fatalError);
 
 			}
 
@@ -139,7 +140,7 @@ class ThreadManager
 	 */
 	public
 	Thread makeThread (
-			Runnable target) {
+			@NonNull Runnable target) {
 
 		return new ManagedThread (
 			target);

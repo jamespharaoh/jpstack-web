@@ -48,8 +48,6 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.EmailLogic;
@@ -57,6 +55,8 @@ import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.event.logic.EventLogic;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeObjectHelper;
@@ -1160,7 +1160,7 @@ class ChatUserLogicImplementation
 						"ChatUserLogic.setPlace",
 						exception,
 						Optional.<Integer>absent (),
-						Resolution.ignoreWithLoggedWarning);
+						ExceptionResolution.ignoreWithLoggedWarning);
 
 				}
 

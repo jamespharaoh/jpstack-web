@@ -45,6 +45,9 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
+
 import wbs.framework.application.context.EasyReadWriteLock.HeldLock;
 import wbs.framework.application.context.InjectedProperty.CollectionType;
 import wbs.framework.application.xml.BeansBeanSpec;
@@ -57,9 +60,6 @@ import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.utils.etc.Misc;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
 
 /**
  * My not-quite-drop-in replacement for spring's ApplicationContext. This

@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
+
 import wbs.console.misc.IntervalFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;

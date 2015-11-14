@@ -8,6 +8,9 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
@@ -30,8 +33,6 @@ import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.orderer.model.OrdererOrderObjectHelper;
 import wbs.smsapps.orderer.model.OrdererOrderRec;
 import wbs.smsapps.orderer.model.OrdererRec;
-
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @SingletonComponent ("ordererCommandTypeHandler")

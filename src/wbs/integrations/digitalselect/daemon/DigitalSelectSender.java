@@ -22,6 +22,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -32,8 +34,6 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
-
-import com.google.common.collect.ImmutableList;
 
 @Log4j
 @SingletonComponent ("digitalSelectSender")

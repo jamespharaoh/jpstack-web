@@ -3,6 +3,7 @@ package wbs.test.fixtures;
 import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
+
 import wbs.clients.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;

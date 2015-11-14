@@ -5,6 +5,9 @@ import javax.inject.Inject;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.user.admin.console.ChatUserAdminLocationFormActionHelper.ChatUserAdminLocationForm;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -16,8 +19,6 @@ import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.message.core.model.MessageRec;
-
-import com.google.common.base.Optional;
 
 @PrototypeComponent ("chatUserAdminLocationFormActionHelper")
 public

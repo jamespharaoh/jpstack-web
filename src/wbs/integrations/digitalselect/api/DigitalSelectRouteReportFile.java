@@ -9,6 +9,9 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.collect.ImmutableMap;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -21,8 +24,6 @@ import wbs.sms.core.logic.NoSuchMessageException;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.report.logic.ReportLogic;
-
-import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @SingletonComponent ("digitalSelectRouteReportFile")

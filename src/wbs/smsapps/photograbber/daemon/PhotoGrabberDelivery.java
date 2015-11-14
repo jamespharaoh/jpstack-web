@@ -9,6 +9,9 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -22,8 +25,6 @@ import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.smsapps.photograbber.model.PhotoGrabberRec;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestObjectHelper;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestRec;
-
-import com.google.common.collect.ImmutableList;
 
 @SingletonComponent ("photoGrabberDelivery")
 public

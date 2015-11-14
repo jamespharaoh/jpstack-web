@@ -4,12 +4,12 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("queueItemsStatusLinePart")
 public

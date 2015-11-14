@@ -1,10 +1,10 @@
 package wbs.platform.text.console;
 
+import com.google.common.base.Optional;
+
 import wbs.console.helper.AbstractConsoleHooks;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.text.model.TextRec;
-
-import com.google.common.base.Optional;
 
 public
 class TextConsoleHooks

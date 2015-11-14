@@ -2,6 +2,7 @@ package wbs.framework.entity.meta;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.stringFormatArray;
+
 import wbs.framework.utils.etc.FormatWriter;
 
 public

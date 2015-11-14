@@ -3,6 +3,7 @@ package wbs.framework.application.xml;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.framework.application.context.BeanDefinition;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;

@@ -19,6 +19,9 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.FileUtils;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataToXml;
@@ -26,9 +29,6 @@ import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelBuilder;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @Accessors (fluent = true)
 @Log4j

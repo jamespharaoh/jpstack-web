@@ -1,8 +1,8 @@
 package wbs.platform.user.logic;
 
-import wbs.platform.user.model.UserRec;
-
 import com.google.common.base.Optional;
+
+import wbs.platform.user.model.UserRec;
 
 public
 interface UserLogic {

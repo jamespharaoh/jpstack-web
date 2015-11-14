@@ -15,6 +15,7 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
@@ -42,9 +43,9 @@ import wbs.clients.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.platform.daemon.AbstractDaemonService;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.locator.model.LongLat;
 
@@ -129,7 +130,7 @@ class ChatDateDaemon
 					"Chat daemon dating",
 					exception,
 					Optional.<Integer>absent (),
-					Resolution.tryAgainLater);
+					ExceptionResolution.tryAgainLater);
 
 			}
 
@@ -139,9 +140,11 @@ class ChatDateDaemon
 
 	void doRun () {
 
-		log.info ("Dating batch started");
+		log.info (
+			"Dating batch started");
 
-		log.debug ("Retrieving list of chats");
+		log.debug (
+			"Retrieving list of chats");
 
 		@Cleanup
 		Transaction transaction =
@@ -414,18 +417,19 @@ class ChatDateDaemon
 					"Chat daemon dating",
 					exception,
 					Optional.<Integer>absent (),
-					Resolution.tryAgainLater);
+					ExceptionResolution.tryAgainLater);
 
 			}
 
 		}
 
-		log.info ("Dating done " + count);
+		log.info (
+			"Dating done " + count);
 
 	}
 
 	boolean doUser (
-			Collection<DatingUserInfo> otherUserInfos,
+			@NonNull Collection<DatingUserInfo> otherUserInfos,
 			int thisUserId) {
 
 		log.info (

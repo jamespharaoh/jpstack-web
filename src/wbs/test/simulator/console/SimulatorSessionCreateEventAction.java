@@ -17,16 +17,19 @@ import lombok.Cleanup;
 import org.joda.time.Instant;
 import org.json.simple.JSONValue;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.Responder;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.console.SliceConsoleHelper;
@@ -48,9 +51,6 @@ import wbs.test.simulator.model.SimulatorSessionNumberObjectHelper;
 import wbs.test.simulator.model.SimulatorSessionNumberRec;
 import wbs.test.simulator.model.SimulatorSessionObjectHelper;
 import wbs.test.simulator.model.SimulatorSessionRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 @PrototypeComponent ("simulatorSessionCreateEventAction")
 public
@@ -164,7 +164,7 @@ class SimulatorSessionCreateEventAction
 				exception,
 				Optional.of (
 					requestContext.userId ()),
-				Resolution.ignoreWithUserWarning);
+				ExceptionResolution.ignoreWithUserWarning);
 
 			return jsonResponder.get ()
 

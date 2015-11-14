@@ -7,6 +7,9 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.date.logic.ChatDateLogic;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogLogic;
@@ -30,8 +33,6 @@ import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
-
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatDateStopCommand")

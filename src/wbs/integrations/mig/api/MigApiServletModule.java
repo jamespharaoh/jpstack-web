@@ -13,15 +13,17 @@ import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionLogic;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.RegexpPathHandler;
@@ -31,6 +33,8 @@ import wbs.framework.web.WebFile;
 import wbs.integrations.mig.logic.MigLogic;
 import wbs.integrations.mig.model.MigRouteInObjectHelper;
 import wbs.integrations.mig.model.MigRouteInRec;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
@@ -49,9 +53,6 @@ import wbs.sms.number.core.model.ChatUserNumberReportObjectHelper;
 import wbs.sms.number.core.model.ChatUserNumberReportRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 @Log4j
 public
@@ -249,7 +250,8 @@ class MigApiServletModule
 				PrintWriter out = requestContext.writer ();
 				out.println (response);
 
-				log.debug ("Response 000 " + message.getId ());
+				log.debug (
+					"Response 000 " + message.getId ());
 
 			} catch (Exception exception) {
 
@@ -260,14 +262,16 @@ class MigApiServletModule
 						exception),
 					getException (exception, requestContext),
 					Optional.<Integer>absent (),
-					Resolution.ignoreWithThirdPartyWarning);
+					ExceptionResolution.ignoreWithThirdPartyWarning);
 
 				PrintWriter out =
 					requestContext.writer ();
 
-				out.println ("400");
+				out.println (
+					"400");
 
-				log.debug ("Response 400 ");
+				log.debug (
+					"Response 400 ");
 
 			}
 
@@ -496,7 +500,7 @@ class MigApiServletModule
 						exception,
 						requestContext),
 					Optional.<Integer>absent (),
-					Resolution.ignoreWithThirdPartyWarning);
+					ExceptionResolution.ignoreWithThirdPartyWarning);
 
 				PrintWriter out =
 					requestContext.writer ();
@@ -521,11 +525,12 @@ class MigApiServletModule
 		@Override
 		protected
 		WebFile handle (
-				Matcher matcher) {
+				@NonNull Matcher matcher) {
 
 			requestContext.request (
 				"routeId",
-				Integer.parseInt (matcher.group (1)));
+				Integer.parseInt (
+					matcher.group (1)));
 
 			return defaultFiles.get (
 				matcher.group (2));

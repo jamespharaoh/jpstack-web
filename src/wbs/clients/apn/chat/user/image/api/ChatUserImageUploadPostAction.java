@@ -15,6 +15,8 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 
+import com.google.common.base.Optional;
+
 import wbs.api.mvc.ApiAction;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
@@ -23,14 +25,12 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 import wbs.sms.message.core.model.MessageRec;
-
-import com.google.common.base.Optional;
 
 @Log4j
 @PrototypeComponent ("chatUserImageUploadPostAction")
@@ -216,7 +216,7 @@ class ChatUserImageUploadPostAction
 				requestContext.requestPath (),
 				exception,
 				Optional.<Integer>absent (),
-				Resolution.ignoreWithUserWarning);
+				ExceptionResolution.ignoreWithUserWarning);
 
 			// start new transaction
 

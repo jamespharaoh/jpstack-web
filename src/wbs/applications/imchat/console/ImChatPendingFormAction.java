@@ -8,6 +8,7 @@ import static wbs.framework.utils.etc.Misc.toInteger;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;

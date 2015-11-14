@@ -23,6 +23,8 @@ import org.apache.log4j.Level;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.JqueryScriptRef;
@@ -58,8 +60,6 @@ import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
-
-import com.google.common.collect.ImmutableSet;
 
 @Log4j
 @PrototypeComponent ("manualResponderRequestPendingSummaryPart")

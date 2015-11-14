@@ -18,9 +18,9 @@ import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
 import wbs.console.tab.TabbedResponder;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.web.WebNotFoundHandler;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 
 @Log4j
 @SingletonComponent ("notFoundHandler")
@@ -92,7 +92,7 @@ class ConsoleNotFoundHandler
 				"The specified path was not found",
 				Optional.fromNullable (
 					requestContext.userId ()),
-				Resolution.ignoreWithUserWarning);
+				ExceptionResolution.ignoreWithUserWarning);
 
 		} catch (RuntimeException exception) {
 

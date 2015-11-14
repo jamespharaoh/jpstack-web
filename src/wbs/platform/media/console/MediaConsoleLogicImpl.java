@@ -10,14 +10,15 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import lombok.NonNull;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeRec;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @SingletonComponent ("mediaConsoleLogic")
 public

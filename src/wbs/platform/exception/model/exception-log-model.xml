@@ -42,6 +42,10 @@
 		<yes-no-field
 			name="fatal"/>
 
+		<enum-field
+			name="resolution"
+			type="exceptionResolution"/>
+
 	</fields>
 
 </model-meta>

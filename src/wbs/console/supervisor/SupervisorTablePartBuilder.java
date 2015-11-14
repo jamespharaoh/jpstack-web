@@ -9,6 +9,7 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.part.PagePart;
 import wbs.framework.application.annotations.PrototypeComponent;

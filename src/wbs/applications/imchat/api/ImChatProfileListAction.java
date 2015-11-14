@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatProfileObjectHelper;
 import wbs.applications.imchat.model.ImChatProfileRec;

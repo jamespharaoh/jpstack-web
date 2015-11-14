@@ -9,12 +9,13 @@ import java.util.Set;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import wbs.framework.data.annotations.DataAttribute;
-import wbs.framework.data.annotations.DataClass;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+
+import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataClass;
 
 public
 class DataToJson {

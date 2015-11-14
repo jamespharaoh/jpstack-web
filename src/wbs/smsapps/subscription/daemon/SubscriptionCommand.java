@@ -11,6 +11,9 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -42,8 +45,6 @@ import wbs.smsapps.subscription.model.SubscriptionObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionRec;
 import wbs.smsapps.subscription.model.SubscriptionSubObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionSubRec;
-
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("subscriptionCommand")

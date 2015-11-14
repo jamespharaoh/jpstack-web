@@ -22,13 +22,13 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.FileUtils;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.console.context.ConsoleContextExtensionPoint;
 import wbs.console.context.ConsoleContextLink;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataToXml;
-
-import com.google.common.collect.ImmutableList;
 
 @Log4j
 @SingletonComponent ("consoleMetaManagerImpl")

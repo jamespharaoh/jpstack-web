@@ -12,13 +12,14 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.StringMapResponderFactory;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.record.GlobalId;
 import wbs.framework.web.Action;
 import wbs.framework.web.PathHandler;
@@ -26,6 +27,8 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.rpc.php.PhpStringMapResponderFactory;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
@@ -35,9 +38,6 @@ import wbs.smsapps.ticketer.model.TicketerObjectHelper;
 import wbs.smsapps.ticketer.model.TicketerRec;
 import wbs.smsapps.ticketer.model.TicketerTicketObjectHelper;
 import wbs.smsapps.ticketer.model.TicketerTicketRec;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 @SingletonComponent ("ticketerApiServletModule")
 public
@@ -342,7 +342,8 @@ class TicketerApiServletModule
 			try {
 
 				Map<String,Object> map =
-					myGo (requestContext);
+					myGo (
+						requestContext);
 
 				return responderFactory.makeResponder (
 					map);
@@ -354,7 +355,7 @@ class TicketerApiServletModule
 					requestContext.requestUri (),
 					exception,
 					Optional.<Integer>absent (),
-					Resolution.ignoreWithThirdPartyWarning);
+					ExceptionResolution.ignoreWithThirdPartyWarning);
 
 				requestContext.status (500);
 

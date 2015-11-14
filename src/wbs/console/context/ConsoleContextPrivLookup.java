@@ -8,6 +8,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.lookup.BooleanLookup;
 import wbs.framework.application.annotations.PrototypeComponent;
 

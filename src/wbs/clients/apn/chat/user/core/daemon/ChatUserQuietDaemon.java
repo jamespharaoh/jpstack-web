@@ -26,10 +26,10 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.daemon.SleepingDaemonService;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 
 @Log4j
 @SingletonComponent ("chatUserQuietDaemon")
@@ -120,7 +120,7 @@ class ChatUserQuietDaemon
 					"Chat daemon",
 					exception,
 					Optional.<Integer>absent (),
-					Resolution.tryAgainLater);
+					ExceptionResolution.tryAgainLater);
 
 			}
 

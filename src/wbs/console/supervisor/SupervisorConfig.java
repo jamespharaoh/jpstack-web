@@ -7,6 +7,7 @@ import javax.inject.Provider;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.console.part.PagePart;
 
 @Accessors (fluent = true)

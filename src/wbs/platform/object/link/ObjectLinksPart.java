@@ -9,6 +9,9 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.collect.ImmutableSet;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -20,8 +23,6 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.platform.user.model.UserObjectHelper;
-
-import com.google.common.collect.ImmutableSet;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectLinksPart")

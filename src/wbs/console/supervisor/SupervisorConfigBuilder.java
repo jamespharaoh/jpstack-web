@@ -10,6 +10,7 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleModuleImpl;
 import wbs.console.module.SimpleConsoleBuilderContainer;

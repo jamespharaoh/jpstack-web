@@ -6,6 +6,7 @@ import java.util.Random;
 
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+
 import wbs.console.html.ScriptRef;
 import wbs.console.request.ConsoleRequestContext;
 

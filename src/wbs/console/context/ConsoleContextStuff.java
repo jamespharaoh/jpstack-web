@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.module.ConsoleManager;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.Tab;

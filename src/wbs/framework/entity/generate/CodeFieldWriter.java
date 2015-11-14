@@ -1,6 +1,7 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;

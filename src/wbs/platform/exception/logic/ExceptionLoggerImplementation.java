@@ -14,9 +14,9 @@ import com.google.common.base.Optional;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionLogic;
 import wbs.platform.exception.model.ExceptionLogRec;
+import wbs.platform.exception.model.ExceptionResolution;
 
 @SingletonComponent ("exceptionLogger")
 @Log4j
@@ -45,7 +45,7 @@ class ExceptionLoggerImplementation
 			final @NonNull String summary,
 			final @NonNull String dump,
 			final @NonNull Optional<Integer> userId,
-			final @NonNull Resolution resolution) {
+			final @NonNull ExceptionResolution resolution) {
 
 		return logExceptionWrapped (
 			typeCode,
@@ -78,7 +78,7 @@ class ExceptionLoggerImplementation
 			final @NonNull String source,
 			final @NonNull Throwable throwable,
 			final @NonNull Optional<Integer> userId,
-			final @NonNull Resolution resolution) {
+			final @NonNull ExceptionResolution resolution) {
 
 		return logExceptionWrapped (
 			typeCode,
@@ -112,7 +112,7 @@ class ExceptionLoggerImplementation
 			final @NonNull String summary,
 			final @NonNull Throwable throwable,
 			final @NonNull Optional<Integer> userId,
-			final @NonNull Resolution resolution) {
+			final @NonNull ExceptionResolution resolution) {
 
 		return logExceptionWrapped (
 			typeCode,
@@ -178,7 +178,7 @@ class ExceptionLoggerImplementation
 					exceptionLogic.throwableDump (
 						furtherException),
 					Optional.<Integer>absent (),
-					Resolution.fatalError);
+					ExceptionResolution.fatalError);
 
 			} catch (Exception yetAnotherException) {
 
@@ -201,7 +201,7 @@ class ExceptionLoggerImplementation
 			@NonNull String summary,
 			@NonNull String dump,
 			@NonNull Optional<Integer> userId,
-			@NonNull Resolution resolution) {
+			@NonNull ExceptionResolution resolution) {
 
 		@Cleanup
 		Transaction transaction =

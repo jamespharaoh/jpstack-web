@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.settings.console;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FormField;
 import wbs.console.module.ConsoleModuleData;
 import wbs.framework.application.annotations.PrototypeComponent;

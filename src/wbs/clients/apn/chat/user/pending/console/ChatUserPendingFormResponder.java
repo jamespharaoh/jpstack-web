@@ -11,6 +11,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableSet;
+
 import wbs.clients.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -28,8 +30,6 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.media.console.MediaConsoleLogic;
-
-import com.google.common.collect.ImmutableSet;
 
 @PrototypeComponent ("chatUserPendingFormResponder")
 public

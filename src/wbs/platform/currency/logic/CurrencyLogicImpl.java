@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.NonNull;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.currency.model.CurrencyRec;
 

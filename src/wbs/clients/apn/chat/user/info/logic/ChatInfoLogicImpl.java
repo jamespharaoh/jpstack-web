@@ -48,11 +48,11 @@ import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionLogic;
-import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.queue.logic.QueueLogic;
@@ -235,8 +235,8 @@ class ChatInfoLogicImpl
 			exceptionLogger.logSimple (
 				"unknown",
 				"chatLogic.sendUserInfo (...)",
-
 				"MessageSplitter.split (...) threw IllegalArgumentException",
+
 				"Error probably caused by illegal characters in user's info. Ignoring error.\n" +
 				"\n" +
 				"thisUser.id = " + thisUser.getId () + "\n" +
@@ -246,7 +246,7 @@ class ChatInfoLogicImpl
 					exception),
 
 				Optional.<Integer>absent (),
-				Resolution.ignoreWithNoWarning);
+				ExceptionResolution.ignoreWithNoWarning);
 
 			return;
 

@@ -11,6 +11,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ConsoleContextBuilderContainerImpl;
@@ -30,9 +33,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.platform.object.create.ObjectCreatePageSpec;
 import wbs.platform.object.list.ObjectListPageSpec;
 import wbs.platform.object.settings.ObjectSettingsPageSpec;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @PrototypeComponent ("chatHelpTemplateContextBuilder")
 @ConsoleModuleBuilderHandler
