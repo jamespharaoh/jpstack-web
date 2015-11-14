@@ -12,11 +12,14 @@ import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionLogger.Resolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
@@ -27,8 +30,6 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.sms.command.model.CommandObjectHelper;
-
-import com.google.common.base.Optional;
 
 @Log4j
 @SingletonComponent ("ticketStateTimeDaemon")
@@ -119,8 +120,10 @@ class TicketStateTimeDaemon
 
 		// then call doTicketTimeCheck for each one
 
-		for (TicketRec ticket
-				: tickets) {
+		for (
+			TicketRec ticket
+				: tickets
+		) {
 
 			try {
 
@@ -134,7 +137,7 @@ class TicketStateTimeDaemon
 					"TicketStateTimeDaemon",
 					exception,
 					Optional.<Integer>absent (),
-					false);
+					Resolution.tryAgainLater);
 
 			}
 
