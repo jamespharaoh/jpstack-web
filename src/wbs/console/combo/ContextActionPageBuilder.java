@@ -11,7 +11,7 @@ import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.module.ConsoleMetaManager;
-import wbs.console.module.ConsoleModuleImpl;
+import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.responder.ConsoleFile;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -44,7 +44,7 @@ class ContextActionPageBuilder {
 	ConsoleContextBuilderContainer container;
 
 	@BuilderTarget
-	ConsoleModuleImpl consoleModule;
+	ConsoleModuleImplementation consoleModule;
 
 	// state
 

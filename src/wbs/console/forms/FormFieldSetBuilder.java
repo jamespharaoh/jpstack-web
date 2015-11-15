@@ -9,7 +9,7 @@ import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleHelperRegistry;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.module.ConsoleModuleImpl;
+import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -41,7 +41,7 @@ class FormFieldSetBuilder {
 	FormFieldSetSpec spec;
 
 	@BuilderTarget
-	ConsoleModuleImpl consoleModule;
+	ConsoleModuleImplementation consoleModule;
 
 	// build
 
@@ -118,7 +118,7 @@ class FormFieldSetBuilder {
 		}
 
 		FormFieldBuilderContext formFieldBuilderContext =
-			new FormFieldBuilderContextImpl ()
+			new FormFieldBuilderContextImplementation ()
 
 			.containerClass (
 				objectClass)

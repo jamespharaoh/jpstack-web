@@ -27,7 +27,7 @@ class ResponseFilter
 			ServletException,
 			IOException {
 
-		RequestContextImpl.servletResponseThreadLocal.set (
+		RequestContextImplementation.servletResponseThreadLocal.set (
 			(HttpServletResponse)
 			response);
 

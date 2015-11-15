@@ -3,7 +3,7 @@
 	package="wbs.clients.apn.chat.date">
 
 	<layer name="logic">
-		<bean class="logic.ChatDateLogicImpl"/>
+		<bean class="logic.ChatDateLogicImplementation"/>
 	</layer>
 
 	<layer name="daemon">

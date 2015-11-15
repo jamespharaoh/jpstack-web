@@ -13,7 +13,7 @@ import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.forms.FormField;
 import wbs.console.forms.FormFieldBuilderContext;
-import wbs.console.forms.FormFieldBuilderContextImpl;
+import wbs.console.forms.FormFieldBuilderContextImplementation;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormFieldSetSpec;
 import wbs.console.helper.ConsoleHelper;
@@ -81,7 +81,7 @@ class ConsoleModuleBuilder
 			@NonNull List<Object> formFieldSpecs) {
 
 		FormFieldBuilderContext formFieldBuilderContext =
-			new FormFieldBuilderContextImpl ()
+			new FormFieldBuilderContextImplementation ()
 
 			.containerClass (
 				consoleHelper.objectClass ())

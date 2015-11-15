@@ -19,14 +19,14 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ChatLogicHooksImpl"/>
-		<bean class="logic.ChatMiscLogicImpl"/>
+		<bean class="logic.ChatLogicHooksImplementation"/>
+		<bean class="logic.ChatMiscLogicImplementation"/>
 		<bean class="logic.ChatNumberLookupHelper"/>
-		<bean class="logic.ChatNumberReportLogicImpl"/>
+		<bean class="logic.ChatNumberReportLogicImplementation"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.ChatConsoleLogicImpl"/>
+		<bean class="console.ChatConsoleLogicImplementation"/>
 		<bean class="console.ChatKeywordJoinTypeConsoleHelper"/>
 		<bean class="console.ChatStatisticsPart"/>
 		<bean class="console.ChatUserCreditModeConsoleHelper"/>

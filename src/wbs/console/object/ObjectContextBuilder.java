@@ -20,14 +20,14 @@ import com.google.common.collect.ImmutableList;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
-import wbs.console.context.ConsoleContextBuilderContainerImpl;
+import wbs.console.context.ConsoleContextBuilderContainerImplementation;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.context.SimpleConsoleContext;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleHelperRegistry;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
-import wbs.console.module.ConsoleModuleImpl;
+import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.ResolvedConsoleContextLink;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.console.request.Cryptor;
@@ -86,7 +86,7 @@ class ObjectContextBuilder {
 	ObjectContextSpec spec;
 
 	@BuilderTarget
-	ConsoleModuleImpl consoleModule;
+	ConsoleModuleImplementation consoleModule;
 
 	// state
 
@@ -137,7 +137,7 @@ class ObjectContextBuilder {
 		}
 
 		ConsoleContextBuilderContainer listContainer =
-			new ConsoleContextBuilderContainerImpl ()
+			new ConsoleContextBuilderContainerImplementation ()
 
 			.consoleHelper (
 				consoleHelper)
@@ -170,7 +170,7 @@ class ObjectContextBuilder {
 			MissingBuilderBehaviour.error);
 
 		ConsoleContextBuilderContainer objectContainer =
-			new ConsoleContextBuilderContainerImpl ()
+			new ConsoleContextBuilderContainerImplementation ()
 
 			.consoleHelper (
 				consoleHelper)

@@ -19,11 +19,11 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ForwarderLogicImpl"/>
+		<bean class="logic.ForwarderLogicImplementation"/>
 	</layer>
 
 	<layer name="api">
-		<bean class="api.ForwarderApiLogicImpl"/>
+		<bean class="api.ForwarderApiLogicImplementation"/>
 		<bean class="api.ForwarderApiModule"/>
 		<bean class="api.ForwarderInAction"/>
 		<bean class="api.ForwarderOutAction"/>

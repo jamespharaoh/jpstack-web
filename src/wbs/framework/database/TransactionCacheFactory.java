@@ -15,25 +15,37 @@ class TransactionCacheFactory {
 	@Inject
 	Database database;
 
-	public <T> TransactionCache<T> create (
+	public <T>
+	TransactionCache<T> create (
 			Initialiser<T> newInitialiser) {
-		return new TransactionCacheImpl<T> (newInitialiser);
+
+		return new TransactionCacheImplementation<T> (
+			newInitialiser);
+
 	}
 
-	private class TransactionCacheImpl<T>
+	private
+	class TransactionCacheImplementation<T>
 		implements TransactionCache<T> {
 
 		Map<Transaction,T> cache =
 			new WeakHashMap<Transaction,T> ();
 
-		private final Initialiser<T> initialiser;
+		private final
+		Initialiser<T> initialiser;
 
-		private TransactionCacheImpl (Initialiser<T> newInitialiser) {
-			initialiser = newInitialiser;
+		private
+		TransactionCacheImplementation (
+				Initialiser<T> newInitialiser) {
+
+			initialiser =
+				newInitialiser;
+
 		}
 
 		@Override
-		public synchronized T get () {
+		public synchronized
+		T get () {
 
 			Transaction transaction =
 				database.currentTransaction ();
@@ -46,7 +58,9 @@ class TransactionCacheFactory {
 		}
 
 		@Override
-		public synchronized void set (T value) {
+		public synchronized
+		void set (
+				T value) {
 
 			Transaction transaction =
 				database.currentTransaction ();
@@ -59,7 +73,11 @@ class TransactionCacheFactory {
 
 	}
 
-	public static interface Initialiser<T> {
+	public static
+	interface Initialiser<T> {
+
 		T initialise ();
+
 	}
+
 }

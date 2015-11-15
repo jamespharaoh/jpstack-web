@@ -2,7 +2,7 @@ package wbs.console.object;
 
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.console.context.ConsoleContextMetaBuilderContainer;
-import wbs.console.module.ConsoleMetaModuleImpl;
+import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
@@ -25,7 +25,7 @@ class ExtendContextMetaBuilder {
 	ExtendContextSpec spec;
 
 	@BuilderTarget
-	ConsoleMetaModuleImpl metaModule;
+	ConsoleMetaModuleImplementation metaModule;
 
 	// state
 

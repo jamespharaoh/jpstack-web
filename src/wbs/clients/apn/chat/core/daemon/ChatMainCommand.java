@@ -106,9 +106,6 @@ class ChatMainCommand
 	CommandLogic commandLogic;
 
 	@Inject
-	CommandManager commandManager;
-
-	@Inject
 	InboxLogic inboxLogic;
 
 	@Inject
@@ -122,6 +119,13 @@ class ChatMainCommand
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
+
+	// indirect dependencies
+
+	@Inject
+	Provider<CommandManager> commandManagerProvider;
+
+	// prototype dependencies
 
 	@Inject
 	Provider<ChatJoiner> chatJoinerProvider;
@@ -365,7 +369,7 @@ class ChatMainCommand
 			}
 
 			return Optional.of (
-				commandManager.handle (
+				commandManagerProvider.get ().handle (
 					inbox,
 					chatSchemeKeyword.getCommand (),
 					Optional.<Integer>absent (),
@@ -477,7 +481,7 @@ class ChatMainCommand
 					chatKeyword.getCommand ().getId ()));
 
 			return Optional.of (
-				commandManager.handle (
+				commandManagerProvider.get ().handle (
 					inbox,
 					chatKeyword.getCommand (),
 					Optional.<Integer>absent (),

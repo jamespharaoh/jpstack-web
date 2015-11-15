@@ -18,7 +18,7 @@ import lombok.extern.log4j.Log4j;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.application.tools.ApplicationContextBuilder;
 import wbs.framework.application.tools.ThreadLocalProxyBeanFactory;
-import wbs.framework.web.RequestContextImpl;
+import wbs.framework.web.RequestContextImplementation;
 
 @Log4j
 public
@@ -131,7 +131,7 @@ class WbsServletListener
 
 		}
 
-		RequestContextImpl
+		RequestContextImplementation
 			.servletRequestThreadLocal
 			.remove ();
 
@@ -152,12 +152,12 @@ class WbsServletListener
 
 		try {
 
-			RequestContextImpl.servletContextThreadLocal.set (
+			RequestContextImplementation.servletContextThreadLocal.set (
 				servletContext);
 
 			setServletContext = true;
 
-			RequestContextImpl.servletRequestThreadLocal.set (
+			RequestContextImplementation.servletRequestThreadLocal.set (
 				(HttpServletRequest)
 				event.getServletRequest ());
 
@@ -211,7 +211,7 @@ class WbsServletListener
 
 				if (setServletRequest) {
 
-					RequestContextImpl
+					RequestContextImplementation
 						.servletRequestThreadLocal
 						.remove ();
 
@@ -219,7 +219,7 @@ class WbsServletListener
 
 				if (setServletContext) {
 
-					RequestContextImpl
+					RequestContextImplementation
 						.servletContextThreadLocal
 						.remove ();
 

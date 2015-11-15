@@ -14,7 +14,7 @@ import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.module.ConsoleMetaManager;
-import wbs.console.module.ConsoleModuleImpl;
+import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
@@ -66,7 +66,7 @@ class ContextTabPageBuilder {
 	ContextTabPageSpec spec;
 
 	@BuilderTarget
-	ConsoleModuleImpl consoleModule;
+	ConsoleModuleImplementation consoleModule;
 
 	// build
 

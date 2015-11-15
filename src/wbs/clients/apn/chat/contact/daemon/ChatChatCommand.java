@@ -92,9 +92,6 @@ class ChatChatCommand
 	CommandObjectHelper commandHelper;
 
 	@Inject
-	CommandManager commandManager;
-
-	@Inject
 	InboxLogic inboxLogic;
 
 	@Inject
@@ -111,6 +108,11 @@ class ChatChatCommand
 
 	@Inject
 	TextObjectHelper textHelper;
+
+	// indirect dependencies
+
+	@Inject
+	Provider<CommandManager> commandManagerProvider;
 
 	// prototype dependencies
 
@@ -333,7 +335,7 @@ class ChatChatCommand
 		) {
 
 			return Optional.of (
-				commandManager.handle (
+				commandManagerProvider.get ().handle (
 					inbox,
 					chatKeyword.getCommand (),
 					Optional.<Integer>absent (),

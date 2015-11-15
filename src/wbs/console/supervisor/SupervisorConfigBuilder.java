@@ -12,7 +12,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.module.ConsoleModuleImpl;
+import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.console.part.PagePart;
 import wbs.console.reporting.StatsAggregator;
@@ -43,7 +43,7 @@ class SupervisorConfigBuilder {
 	SupervisorConfigSpec spec;
 
 	@BuilderTarget
-	ConsoleModuleImpl consoleModule;
+	ConsoleModuleImplementation consoleModule;
 
 	// properties
 

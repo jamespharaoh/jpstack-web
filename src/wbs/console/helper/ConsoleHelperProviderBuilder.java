@@ -3,7 +3,7 @@ package wbs.console.helper;
 import javax.inject.Inject;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.module.ConsoleModuleImpl;
+import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -30,7 +30,7 @@ class ConsoleHelperProviderBuilder {
 	ConsoleHelperProviderSpec spec;
 
 	@BuilderTarget
-	ConsoleModuleImpl consoleModule;
+	ConsoleModuleImplementation consoleModule;
 
 	// build
 

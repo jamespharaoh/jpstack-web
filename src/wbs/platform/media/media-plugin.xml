@@ -26,7 +26,7 @@
 		<bean class="console.ImageFormFieldSpec"/>
 		<bean class="console.MediaAudioResponder"/>
 		<bean class="console.MediaConsoleConfig"/>
-		<bean class="console.MediaConsoleLogicImpl"/>
+		<bean class="console.MediaConsoleLogicImplementation"/>
 		<bean class="console.MediaImageResponder"/>
 		<bean class="console.MediaImageScaleResponder"/>
 		<bean class="console.MediaThumb100Responder"/>

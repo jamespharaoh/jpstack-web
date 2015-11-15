@@ -28,7 +28,7 @@ class ConsoleMetaModuleFactory
 	Provider<BuilderFactory> builderFactoryProvider;
 
 	@Inject
-	Provider<ConsoleMetaModuleImpl> consoleMetaModuleProvider;
+	Provider<ConsoleMetaModuleImplementation> consoleMetaModuleProvider;
 
 	// properties
 
@@ -41,7 +41,7 @@ class ConsoleMetaModuleFactory
 	public
 	Object instantiate () {
 
-		ConsoleMetaModuleImpl consoleMetaModule =
+		ConsoleMetaModuleImplementation consoleMetaModule =
 			consoleMetaModuleProvider.get ();
 
 		ConsoleContextMetaBuilderContainer contextMetaBuilderContainer =

@@ -17,7 +17,7 @@ import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.helper.PrivKeySpec;
 import wbs.console.module.ConsoleMetaManager;
-import wbs.console.module.ConsoleModuleImpl;
+import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.ResolvedConsoleContextLink;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.console.object.ObjectContext;
@@ -70,7 +70,7 @@ class SimpleConsoleContextBuilder {
 	SimpleConsoleContextSpec simpleContextSpec;
 
 	@BuilderTarget
-	ConsoleModuleImpl consoleModule;
+	ConsoleModuleImplementation consoleModule;
 
 	// state
 
@@ -111,7 +111,7 @@ class SimpleConsoleContextBuilder {
 		}
 
 		ConsoleContextBuilderContainer nextBuilderContainer =
-			new ConsoleContextBuilderContainerImpl ()
+			new ConsoleContextBuilderContainerImplementation ()
 
 			.consoleHelper (
 				null)

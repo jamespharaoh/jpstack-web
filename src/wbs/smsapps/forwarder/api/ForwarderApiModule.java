@@ -54,7 +54,7 @@ import wbs.platform.rpc.web.ReusableRpcHandler;
 import wbs.platform.rpc.xml.XmlRpcAction;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.smsapps.forwarder.logic.ForwarderLogic;
-import wbs.smsapps.forwarder.logic.ForwarderLogicImpl;
+import wbs.smsapps.forwarder.logic.ForwarderLogicImplementation;
 import wbs.smsapps.forwarder.logic.ReportableException;
 import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
@@ -338,7 +338,7 @@ class ForwarderApiModule
 		Integer pri;
 
 		ForwarderRec forwarder;
-		ForwarderLogicImpl.SendTemplate sendTemplate;
+		ForwarderLogicImplementation.SendTemplate sendTemplate;
 
 		List<String> errors =
 			new ArrayList<String> ();
@@ -443,7 +443,7 @@ class ForwarderApiModule
 		void createTemplate () {
 
 			sendTemplate =
-				new ForwarderLogicImpl.SendTemplate ();
+				new ForwarderLogicImplementation.SendTemplate ();
 
 			sendTemplate.forwarder =
 				forwarder;
@@ -451,8 +451,8 @@ class ForwarderApiModule
 			sendTemplate.fmInId =
 				replyToServerId;
 
-			ForwarderLogicImpl.SendPart part =
-				new ForwarderLogicImpl.SendPart ();
+			ForwarderLogicImplementation.SendPart part =
+				new ForwarderLogicImplementation.SendPart ();
 
 			sendTemplate.parts.add (part);
 
@@ -618,7 +618,7 @@ class ForwarderApiModule
 		List<SendExMessage> messages =
 			new ArrayList<SendExMessage> ();
 
-		ForwarderLogicImpl.SendTemplate sendTemplate;
+		ForwarderLogicImplementation.SendTemplate sendTemplate;
 
 		List<String> errors =
 			new ArrayList<String> ();
@@ -642,7 +642,7 @@ class ForwarderApiModule
 		Integer pri;
 		Integer retryDays;
 		Set<String> tags;
-		ForwarderLogicImpl.SendPart part;
+		ForwarderLogicImplementation.SendPart part;
 		Collection<MediaRec> medias = null;
 		String subject;
 
@@ -673,7 +673,7 @@ class ForwarderApiModule
 		// to form the main request result in case
 		// of a partial failure cancelling the whole request.
 
-		ForwarderLogicImpl.SendError firstError = null;
+		ForwarderLogicImplementation.SendError firstError = null;
 
 		// keep track of the result of the check stage, and whether we have
 		// decided to cancel the whole request.
@@ -987,7 +987,7 @@ class ForwarderApiModule
 					: messageChains) {
 
 				sendExMessageChain.sendTemplate =
-					new ForwarderLogicImpl.SendTemplate ();
+					new ForwarderLogicImplementation.SendTemplate ();
 
 				sendExMessageChain.sendTemplate.forwarder =
 					forwarder;
@@ -998,8 +998,8 @@ class ForwarderApiModule
 				for (SendExMessage sendExMessage
 						: sendExMessageChain.messages) {
 
-					ForwarderLogicImpl.SendPart part =
-						new ForwarderLogicImpl.SendPart ();
+					ForwarderLogicImplementation.SendPart part =
+						new ForwarderLogicImplementation.SendPart ();
 
 					part.message = sendExMessage.message;
 					part.url = sendExMessage.url;
@@ -1357,7 +1357,7 @@ class ForwarderApiModule
 
 		private
 		int forwarderSendErrorToStatus (
-				ForwarderLogicImpl.SendError sendError) {
+				ForwarderLogicImplementation.SendError sendError) {
 
 			switch (sendError) {
 
@@ -1391,7 +1391,7 @@ class ForwarderApiModule
 
 		private
 		String forwarderSendErrorToStatusCode (
-				ForwarderLogicImpl.SendError sendError) {
+				ForwarderLogicImplementation.SendError sendError) {
 
 			switch (sendError) {
 
@@ -1425,7 +1425,7 @@ class ForwarderApiModule
 
 		private
 		String forwarderSendErrorToStatusMessage (
-				ForwarderLogicImpl.SendError sendError) {
+				ForwarderLogicImplementation.SendError sendError) {
 
 			switch (sendError) {
 

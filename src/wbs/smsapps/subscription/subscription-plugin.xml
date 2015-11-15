@@ -23,7 +23,7 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.SubscriptionLogicImpl"/>
+		<bean class="logic.SubscriptionLogicImplementation"/>
 		<bean class="logic.SubscriptionSendHelper"/>
 	</layer>
 

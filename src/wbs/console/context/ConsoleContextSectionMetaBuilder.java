@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 import com.google.common.collect.ImmutableList;
 
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
-import wbs.console.module.ConsoleMetaModuleImpl;
+import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
@@ -45,7 +45,7 @@ class ConsoleContextSectionMetaBuilder {
 	ConsoleContextSectionSpec spec;
 
 	@BuilderTarget
-	ConsoleMetaModuleImpl consoleMetaModule;
+	ConsoleMetaModuleImplementation consoleMetaModule;
 
 	// state
 

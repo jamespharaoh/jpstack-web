@@ -6,7 +6,7 @@
 		<bean class="ActionRequestHandler"/>
 		<bean class="JsonResponder"/>
 		<bean class="PathHandlerServlet"/>
-		<bean class="RequestContextImpl"/>
+		<bean class="RequestContextImplementation"/>
 		<bean class="ResponseFilter"/>
 	</layer>
 

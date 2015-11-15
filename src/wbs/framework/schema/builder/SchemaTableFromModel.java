@@ -30,7 +30,7 @@ import wbs.framework.schema.model.SchemaIndex;
 import wbs.framework.schema.model.SchemaPrimaryKey;
 import wbs.framework.schema.model.SchemaSequence;
 import wbs.framework.schema.model.SchemaTable;
-import wbs.framework.sql.SqlLogicImpl;
+import wbs.framework.sql.SqlLogicImplementation;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("prototype")
@@ -44,7 +44,7 @@ class SchemaTableFromModel {
 	SchemaTypesHelper schemaTypesHelper;
 
 	@Inject
-	SqlLogicImpl sqlLogic;
+	SqlLogicImplementation sqlLogic;
 
 	@Getter @Setter
 	TaskLog taskLog;

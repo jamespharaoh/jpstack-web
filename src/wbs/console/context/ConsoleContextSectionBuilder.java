@@ -17,7 +17,7 @@ import com.google.common.collect.Iterables;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
-import wbs.console.module.ConsoleModuleImpl;
+import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -57,7 +57,7 @@ class ConsoleContextSectionBuilder {
 	ConsoleContextSectionSpec spec;
 
 	@BuilderTarget
-	ConsoleModuleImpl consoleModule;
+	ConsoleModuleImplementation consoleModule;
 
 	// state
 
@@ -97,7 +97,7 @@ class ConsoleContextSectionBuilder {
 		}
 
 		ConsoleContextBuilderContainer nextContextBuilderContainer =
-			new ConsoleContextBuilderContainerImpl ()
+			new ConsoleContextBuilderContainerImplementation ()
 
 			.consoleHelper (
 				consoleHelper)

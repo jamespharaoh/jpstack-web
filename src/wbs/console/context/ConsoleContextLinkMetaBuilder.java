@@ -4,7 +4,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
-import wbs.console.module.ConsoleMetaModuleImpl;
+import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -31,7 +31,7 @@ class ConsoleContextLinkMetaBuilder {
 	ConsoleContextLinkSpec spec;
 
 	@BuilderTarget
-	ConsoleMetaModuleImpl consoleMetaModule;
+	ConsoleMetaModuleImplementation consoleMetaModule;
 
 	// build
 

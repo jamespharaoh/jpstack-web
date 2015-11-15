@@ -60,7 +60,7 @@ import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.schema.helper.SchemaNamesHelperImplementation;
-import wbs.framework.sql.SqlLogicImpl;
+import wbs.framework.sql.SqlLogicImplementation;
 
 @Accessors (fluent = true)
 @Log4j
@@ -74,7 +74,7 @@ class SessionFactoryBeanFactory
 	EntityHelper entityHelper;
 
 	@Inject
-	SqlLogicImpl sqlLogic;
+	SqlLogicImplementation sqlLogic;
 
 	@Inject
 	SchemaNamesHelperImplementation sqlEntityNames;

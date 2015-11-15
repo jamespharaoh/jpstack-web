@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.core.daemon;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -41,9 +42,6 @@ class ChatMagicCommand
 	CommandObjectHelper commandHelper;
 
 	@Inject
-	CommandManager commandManager;
-
-	@Inject
 	Database database;
 
 	@Inject
@@ -51,6 +49,11 @@ class ChatMagicCommand
 
 	@Inject
 	ObjectManager objectManager;
+
+	// prototype dependencies
+
+	@Inject
+	Provider<CommandManager> commandManagerProvider;
 
 	// properties
 
@@ -110,7 +113,7 @@ class ChatMagicCommand
 				&& chatKeyword.getCommand () != null
 			) {
 
-				return commandManager.handle (
+				return commandManagerProvider.get ().handle (
 					inbox,
 					chatKeyword.getCommand (),
 					Optional.<Integer>absent (),
@@ -126,7 +129,7 @@ class ChatMagicCommand
 			commandHelper.find (
 				commandRef.get ());
 
-		return commandManager.handle (
+		return commandManagerProvider.get ().handle (
 			inbox,
 			defaultCommand,
 			Optional.<Integer>absent (),

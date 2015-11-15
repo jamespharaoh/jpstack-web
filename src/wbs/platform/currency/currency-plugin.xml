@@ -12,7 +12,7 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.CurrencyLogicImpl"/>
+		<bean class="logic.CurrencyLogicImplementation"/>
 	</layer>
 
 	<layer name="console">

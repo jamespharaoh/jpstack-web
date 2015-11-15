@@ -28,7 +28,7 @@ class ConsoleModuleFactory
 	// prototype dependencies
 
 	@Inject
-	Provider<ConsoleModuleImpl> consoleModuleProvider;
+	Provider<ConsoleModuleImplementation> consoleModuleProvider;
 
 	// properties
 
@@ -41,7 +41,7 @@ class ConsoleModuleFactory
 	public
 	Object instantiate () {
 
-		ConsoleModuleImpl consoleModule =
+		ConsoleModuleImplementation consoleModule =
 			consoleModuleProvider.get ();
 
 		SimpleConsoleBuilderContainer container =

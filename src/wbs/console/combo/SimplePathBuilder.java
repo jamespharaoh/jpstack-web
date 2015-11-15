@@ -3,7 +3,7 @@ package wbs.console.combo;
 import javax.inject.Inject;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.module.ConsoleModuleImpl;
+import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
@@ -33,7 +33,7 @@ class SimplePathBuilder {
 	SimplePathSpec simplePathSpec;
 
 	@BuilderTarget
-	ConsoleModuleImpl consoleModule;
+	ConsoleModuleImplementation consoleModule;
 
 	// state
 

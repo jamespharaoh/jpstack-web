@@ -3,7 +3,7 @@ package wbs.smsapps.forwarder.logic;
 import java.util.Collection;
 
 import wbs.platform.media.model.MediaRec;
-import wbs.smsapps.forwarder.logic.ForwarderLogicImpl.SendTemplate;
+import wbs.smsapps.forwarder.logic.ForwarderLogicImplementation.SendTemplate;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
 import wbs.smsapps.forwarder.model.ForwarderRec;

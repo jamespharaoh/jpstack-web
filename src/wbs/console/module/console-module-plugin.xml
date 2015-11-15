@@ -4,11 +4,11 @@
 
 	<layer name="console">
 		<bean class="ConsoleManagerImplementation"/>
-		<bean class="ConsoleMetaManagerImpl"/>
+		<bean class="ConsoleMetaManagerImplementation"/>
 		<bean class="ConsoleMetaModuleBuilder"/>
-		<bean class="ConsoleMetaModuleImpl"/>
+		<bean class="ConsoleMetaModuleImplementation"/>
 		<bean class="ConsoleModuleBuilder"/>
-		<bean class="ConsoleModuleImpl"/>
+		<bean class="ConsoleModuleImplementation"/>
 		<bean class="ConsoleModuleSpec"/>
 		<bean class="ConsoleModuleSpecReader"/>
 		<bean class="ResolvedConsoleContextLink"/>

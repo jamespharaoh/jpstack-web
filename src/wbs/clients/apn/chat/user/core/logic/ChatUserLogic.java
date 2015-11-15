@@ -65,10 +65,6 @@ interface ChatUserLogic {
 			ChatUserRec thisUser,
 			Collection<ChatUserRec> otherUsers);
 
-	/**
-	 * Aggregate for a ChatUser and an integer distance. Implements
-	 * Object.hashCode and is Comparable--ascending by distance.
-	 */
 	@Accessors (fluent = true)
 	@Data
 	@EqualsAndHashCode
@@ -109,11 +105,6 @@ interface ChatUserLogic {
 	ChatUserRec createChatMonitor (
 			ChatRec chat);
 
-	/**
-	 * Updates the user's credit mode. This also increases or decreases their
-	 * credit as necessary, as revoked credit is still counted in prePay mode,
-	 * whereas it isn't otherwise.
-	 */
 	void creditModeChange (
 			ChatUserRec chatUser,
 			ChatUserCreditMode newMode);
@@ -185,66 +176,16 @@ interface ChatUserLogic {
 			Optional<MessageRec> message,
 			Optional<UserRec> user);
 
-	/**
-	 * Checks if a given user has attempted one of the three methods of age
-	 * verification:
-	 *
-	 * <ul>
-	 * <li>responding "yes" to a message asking them (the old method)</li>
-	 * <li>sending in their date of birth</li>
-	 * <li>going through adult verfication</li>
-	 * </ul>
-	 *
-	 * Note that in the case of DOB they may not be over 18, use the
-	 * chatUserDobOk method for that.
-	 *
-	 * @param chatUser
-	 *            ChatUserRec of the chat user to check
-	 * @return true if they meet any of the criteria
-	 * @see #chatUserDobOk
-	 */
 	boolean gotDob (
 			ChatUserRec chatUser);
 
-	/**
-	 * Checks if a given chat user has given adequate evidence they are over 18:
-	 *
-	 * <ul>
-	 * <li>responding "yes" to a message asking them (the old method)</li>
-	 * <li>sending in their date of birth which shows them to be at least 18</li>
-	 * <li>going through adult verfication</li>
-	 * </ul>
-	 *
-	 * @param chatUser
-	 * @return
-	 */
 	boolean dobOk (
 			ChatUserRec chatUser);
 
-	/**
-	 * Sets a chat user's scheme. This does nothing if they are already on
-	 * another scheme, and will automatically give them any free credit they are
-	 * due.
-	 *
-	 * @param chatUser
-	 *            chat user to set the scheme of
-	 * @param chatScheme
-	 *            chat scheme to set
-	 */
 	void setScheme (
 			ChatUserRec chatUser,
 			ChatSchemeRec chatScheme);
 
-	/**
-	 * Sets a chat user's affiliate (and scheme). This will automatically give
-	 * them any free credit they are due and will not do anything if they are
-	 * already set to a different affiliate or scheme.
-	 *
-	 * @param chatUser
-	 *            the chat user to update
-	 * @param chatAffiliate
-	 *            the chat affiliate to set to
-	 */
 	void setAffiliate (
 			ChatUserRec chatUser,
 			ChatAffiliateRec chatAffiliate);

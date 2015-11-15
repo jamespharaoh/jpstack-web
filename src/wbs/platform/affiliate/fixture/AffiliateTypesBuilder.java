@@ -1,5 +1,7 @@
 package wbs.platform.affiliate.fixture;
 
+import lombok.NonNull;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
@@ -33,7 +35,7 @@ class AffiliateTypesBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		builder.descend (
 			parent,
