@@ -29,7 +29,7 @@ import wbs.platform.user.model.UserSessionRec;
 
 @SingletonComponent ("userLogic")
 public
-class UserLogicImpl
+class UserLogicImplementation
 	implements UserLogic {
 
 	// dependencies

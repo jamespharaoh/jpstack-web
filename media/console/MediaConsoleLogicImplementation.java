@@ -22,7 +22,7 @@ import wbs.platform.media.model.MediaTypeRec;
 
 @SingletonComponent ("mediaConsoleLogic")
 public
-class MediaConsoleLogicImpl
+class MediaConsoleLogicImplementation
 	implements MediaConsoleLogic {
 
 	// dependencies
@@ -45,13 +45,17 @@ class MediaConsoleLogicImpl
 	@Override
 	public
 	String mediaUrl (
-			MediaRec media) {
+			@NonNull MediaRec media) {
 
-		if (mediaLogic.isImage (media)) {
+		if (
+			mediaLogic.isImage (
+				media)
+		) {
 
 			return stringFormat (
 				"%s",
-				mediaHelper.getDefaultContextPath (media),
+				mediaHelper.getDefaultContextPath (
+					media),
 				"/media.image");
 
 		} else {

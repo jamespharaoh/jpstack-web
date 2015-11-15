@@ -35,7 +35,7 @@ import wbs.platform.user.model.UserRec;
 @Log4j
 @SingletonComponent ("queueLogic")
 public
-class QueueLogicImpl
+class QueueLogicImplementation
 	implements QueueLogic {
 
 	// dependencies

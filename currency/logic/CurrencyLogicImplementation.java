@@ -13,7 +13,7 @@ import wbs.platform.currency.model.CurrencyRec;
 
 @SingletonComponent ("currencyLogic")
 public
-class CurrencyLogicImpl
+class CurrencyLogicImplementation
 	implements CurrencyLogic {
 
 	@Override

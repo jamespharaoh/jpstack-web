@@ -10,7 +10,7 @@ import wbs.platform.lock.model.LockRec;
 
 @SingletonComponent ("lockLogic")
 public
-class LockLogicImpl
+class LockLogicImplementation
 	implements LockLogic {
 
 	@Inject

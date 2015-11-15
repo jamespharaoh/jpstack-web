@@ -1,9 +1,10 @@
 package wbs.platform.hooks.logic;
 
 import lombok.Getter;
+import lombok.NonNull;
 
 public abstract
-class HooksProxyImpl<
+class HooksProxyImplementation<
 		Parent,
 		Proxy extends Parent,
 		Target extends Parent>
@@ -22,10 +23,10 @@ class HooksProxyImpl<
 	Class<Target> targetClass;
 
 	protected
-	HooksProxyImpl (
-		Class<Parent> parentClass,
-		Class<Proxy> proxyClass,
-		Class<Target> targetClass) {
+	HooksProxyImplementation (
+			@NonNull Class<Parent> parentClass,
+			@NonNull Class<Proxy> proxyClass,
+			@NonNull Class<Target> targetClass) {
 
 		this.parentClass =
 			parentClass;

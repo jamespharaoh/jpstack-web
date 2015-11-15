@@ -11,7 +11,7 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.LockLogicImpl"/>
+		<bean class="logic.LockLogicImplementation"/>
 	</layer>
 
 </plugin>

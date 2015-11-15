@@ -24,9 +24,9 @@ import wbs.console.forms.NameFormFieldSpec;
 import wbs.console.forms.ParentFormFieldSpec;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
-import wbs.console.module.ConsoleMetaModuleImpl;
+import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.console.module.ConsoleModuleBuilder;
-import wbs.console.module.ConsoleModuleImpl;
+import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
 import wbs.console.part.TextPart;
 import wbs.console.responder.ConsoleFile;
@@ -91,7 +91,7 @@ class ObjectSummaryPageBuilder {
 	ObjectSummaryPageSpec spec;
 
 	@BuilderTarget
-	ConsoleModuleImpl consoleModule;
+	ConsoleModuleImplementation consoleModule;
 
 	// state
 
@@ -111,7 +111,7 @@ class ObjectSummaryPageBuilder {
 
 	public
 	void buildMeta (
-			ConsoleMetaModuleImpl consoleMetaModule) {
+			ConsoleMetaModuleImplementation consoleMetaModule) {
 
 	}
 

@@ -14,7 +14,7 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.UserLogicImpl"/>
+		<bean class="logic.UserLogicImplementation"/>
 	</layer>
 
 	<layer name="console">

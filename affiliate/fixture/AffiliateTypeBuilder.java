@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.codify;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.underscoreToCamel;
 
 import java.sql.SQLException;
 
@@ -105,10 +104,14 @@ class AffiliateTypeBuilder {
 	void createAffiliateType ()
 		throws SQLException {
 
+		// begin transaction
+
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
+
+		// lookup parent type
 
 		String parentTypeCode =
 			camelToUnderscore (
@@ -121,19 +124,7 @@ class AffiliateTypeBuilder {
 				GlobalId.root,
 				parentTypeCode);
 
-		Model parentModel =
-			entityHelper.modelsByName ().get (
-				underscoreToCamel (
-					parentTypeCode));
-
-		if (parentModel == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"No model for %s",
-					parentTypeCode));
-
-		}
+		// create affiliate type
 
 		affiliateTypeHelper.insert (
 			affiliateTypeHelper.createInstance ()
@@ -152,6 +143,8 @@ class AffiliateTypeBuilder {
 				spec.description ())
 
 		);
+
+		// commit transaction
 
 		transaction.commit ();
 

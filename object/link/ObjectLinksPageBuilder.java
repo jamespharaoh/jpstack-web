@@ -15,7 +15,7 @@ import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
-import wbs.console.module.ConsoleModuleImpl;
+import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
@@ -72,7 +72,7 @@ class ObjectLinksPageBuilder {
 	ObjectLinksPageSpec spec;
 
 	@BuilderTarget
-	ConsoleModuleImpl consoleModule;
+	ConsoleModuleImplementation consoleModule;
 
 	// state
 
