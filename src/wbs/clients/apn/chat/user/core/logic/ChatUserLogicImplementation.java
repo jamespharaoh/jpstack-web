@@ -25,6 +25,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
@@ -734,7 +735,7 @@ class ChatUserLogicImplementation
 		// resample
 
 		BufferedImage smallImage =
-			mediaLogic.resampleImage (
+			mediaLogic.resampleImageToFit (
 				fullImage,
 				320,
 				240);
@@ -1118,9 +1119,11 @@ class ChatUserLogicImplementation
 
 				try {
 
-					emailLogic.sendEmail (
-						wbsConfig.defaultEmailAddress (),
-						slice.getAdminEmail (),
+					emailLogic.sendSystemEmail (
+
+						ImmutableList.of (
+							slice.getAdminEmail ()),
+
 						stringFormat (
 							"Chat user %s location not recognised: %s",
 							stringFormat (
@@ -1129,6 +1132,7 @@ class ChatUserLogicImplementation
 								chat.getCode (),
 								chatUser.getCode ()),
 							place),
+
 						stringFormat (
 
 							"Chat: %s\n",

@@ -14,7 +14,7 @@ class ForwarderQueryExRequestDefConfig {
 	@Inject
 	ForwarderQueryExMessageChecker forwarderQueryExMessageChecker;
 
-	@SingletonComponent ("fowarderQueryExRequestDef")
+	@SingletonComponent ("forwarderQueryExRequestDef")
 	public
 	RpcDefinition forwarderQueryExRequestDef () {
 

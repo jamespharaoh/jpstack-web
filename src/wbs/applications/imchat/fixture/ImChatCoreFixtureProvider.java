@@ -200,6 +200,18 @@ class ImChatCoreFixtureProvider
 			.setDevelopmentMode (
 				true)
 
+			.setEmailFromName (
+				"IM chat test")
+
+			.setEmailFromAddress (
+				"im-chat-test@wellbehavedsoftware.com")
+
+			.setEmailReplyToAddress (
+				"im-chat-test@wellbehavedsoftware.com")
+
+			.setEmailSubjectForgotPassword (
+				"New password for IM chat test")
+
 		);
 
 		// price points
@@ -520,6 +532,9 @@ class ImChatCoreFixtureProvider
 
 			.setStartTime (
 				transaction.now ())
+
+			.setPendingReply (
+				false)
 
 		);
 

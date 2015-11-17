@@ -107,7 +107,8 @@ class ImChatPendingFormAction
 		// select template
 
 		String templateString =
-			requestContext.parameter ("template");
+			requestContext.parameter (
+				"template");
 
 		boolean bill;
 		int minLength;
@@ -117,13 +118,18 @@ class ImChatPendingFormAction
 
 		String messageText;
 
-		if (equal (templateString, "bill")) {
+		if (
+			equal (
+				templateString,
+				"bill")
+		) {
 
 			bill = true;
 			template = null;
 
 			messageText =
-				requestContext.parameter ("message-bill");
+				requestContext.parameter (
+					"message-bill");
 
 			minLength =
 				imChat.getBillMessageMinChars ();
@@ -131,13 +137,18 @@ class ImChatPendingFormAction
 			maxLength =
 				imChat.getBillMessageMaxChars ();
 
-		} else if (equal (templateString, "free")) {
+		} else if (
+			equal (
+				templateString,
+				"free")
+		) {
 
 			bill = false;
 			template = null;
 
 			messageText =
-				requestContext.parameter ("message-free");
+				requestContext.parameter (
+					"message-free");
 
 			minLength =
 				imChat.getFreeMessageMinChars ();
@@ -147,11 +158,13 @@ class ImChatPendingFormAction
 
 		} else {
 
-			bill = false;
+			bill =
+				false;
 
 			template =
 				imChatTemplateHelper.find (
-					toInteger (templateString));
+					toInteger (
+						templateString));
 
 			if (template == null)
 				throw new RuntimeException ();
@@ -266,7 +279,10 @@ class ImChatPendingFormAction
 		conversation
 
 			.setNumMessages (
-				conversation.getNumMessages () + 1);
+				conversation.getNumMessages () + 1)
+
+			.setPendingReply (
+				false);
 
 		// update customer
 
@@ -274,7 +290,9 @@ class ImChatPendingFormAction
 
 			.setBalance (
 				+ customer.getBalance ()
-				- ifNull (operatorMessage.getPrice (), 0));
+				- ifNull (
+					operatorMessage.getPrice (),
+					0));
 
 		// remove queue item
 

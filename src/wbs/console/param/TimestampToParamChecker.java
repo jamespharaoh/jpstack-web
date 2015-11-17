@@ -9,6 +9,7 @@ import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 
 import java.util.Date;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
 import wbs.framework.utils.etc.TimeFormatException;
@@ -51,8 +52,12 @@ class TimestampToParamChecker
 
 		try {
 
+			// TODO timezone should not be hardcoded
+
 			Interval interval =
 				parsePartialTimestamp (
+					DateTimeZone.forID (
+						"Europe/London"),
 					param);
 
 			return instantToDate (

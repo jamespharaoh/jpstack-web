@@ -33,6 +33,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 import org.joda.time.ReadableInstant;
@@ -2143,6 +2144,7 @@ class Misc {
 
 	public static
 	Interval parsePartialTimestamp (
+			@NonNull DateTimeZone timeZone,
 			@NonNull String string) {
 
 		int fromYear = 0;

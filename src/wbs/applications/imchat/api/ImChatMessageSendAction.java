@@ -1,5 +1,7 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.lessThan;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -125,7 +127,9 @@ class ImChatMessageSendAction
 					"longer active");
 
 			return jsonResponderProvider.get ()
-				.value (failureResponse);
+
+				.value (
+					failureResponse);
 
 		}
 
@@ -144,8 +148,50 @@ class ImChatMessageSendAction
 				customer,
 				messageSendRequest.conversationIndex ());
 
-		if (conversation.getImChatCustomer () != customer)
-			throw new RuntimeException ();
+		// check customer balance
+
+		if (
+			lessThan (
+				customer.getBalance (),
+				imChat.getMessageCost ())
+		) {
+
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
+
+				.reason (
+					"credit-insufficient")
+
+				.message (
+					"The customer's credit balance is not sufficient to " +
+					"continue the chat conversation");
+
+			return jsonResponderProvider.get ()
+
+				.value (
+					failureResponse);
+
+		}
+
+		// check conversation state
+
+		if (conversation.getPendingReply ()) {
+
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
+
+				.reason (
+					"reply-pending")
+
+				.message (
+					"This conversation already has a reply pending.");
+
+			return jsonResponderProvider.get ()
+
+				.value (
+					failureResponse);
+
+		}
 
 		// create chat message
 
@@ -173,7 +219,10 @@ class ImChatMessageSendAction
 				conversation.getNumMessages () + 1)
 
 			.setFreeMessages (
-				0);
+				0)
+
+			.setPendingReply (
+				true);
 
 		// create queue item
 
@@ -198,6 +247,14 @@ class ImChatMessageSendAction
 
 		ImChatMessageSendSuccess successResponse =
 			new ImChatMessageSendSuccess ()
+
+			.customer (
+				imChatApiLogic.customerData (
+					customer))
+
+			.conversation (
+				imChatApiLogic.conversationData (
+					conversation))
 
 			.message (
 				imChatApiLogic.messageData (

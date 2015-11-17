@@ -412,8 +412,10 @@ class ApplicationContext {
 
 		// run post construct
 
-		for (Method method
-				: bean.getClass ().getMethods ()) {
+		for (
+			Method method
+				: bean.getClass ().getMethods ()
+		) {
 
 			PostConstruct postConstructAnnotation =
 				method.getAnnotation (

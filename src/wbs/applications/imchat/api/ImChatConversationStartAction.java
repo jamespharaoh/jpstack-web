@@ -195,6 +195,9 @@ class ImChatConversationStartAction
 			.setStartTime (
 				transaction.now ())
 
+			.setPendingReply (
+				false)
+
 		);
 
 		// update customer

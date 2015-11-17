@@ -13,6 +13,8 @@ import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
@@ -120,7 +122,9 @@ class ImChatForgotPasswordAction
 					"There is no customer with the email address specified");
 
 			return jsonResponderProvider.get ()
-				.value (failureResponse);
+
+				.value (
+					failureResponse);
 
 		}
 
@@ -139,9 +143,12 @@ class ImChatForgotPasswordAction
 		// send new password via mail
 
 		emailLogic.sendEmail (
-			wbsConfig.defaultEmailAddress (),
-			forgotPasswordRequest.email (),
-			"Chat-app new password",
+			imChat.getEmailFromName (),
+			imChat.getEmailFromAddress (),
+			imChat.getEmailReplyToAddress (),
+			ImmutableList.of (
+				forgotPasswordRequest.email ()),
+			imChat.getEmailSubjectForgotPassword (),
 			stringFormat (
 				"Please log on with your new password:\n",
 				"\n",
@@ -158,7 +165,9 @@ class ImChatForgotPasswordAction
 		transaction.commit ();
 
 		return jsonResponderProvider.get ()
-			.value (successResponse);
+
+			.value (
+				successResponse);
 
 	}
 

@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
@@ -126,14 +127,17 @@ class AutoResponderCommand
 
 		// send email
 
-		if (autoResponder.getEmailAddress () != null
-				&& autoResponder.getEmailAddress ().length () > 0) {
+		if (
+			autoResponder.getEmailAddress () != null
+			&& autoResponder.getEmailAddress ().length () > 0
+		) {
 
-			emailLogic.sendEmail (
-				wbsConfig.defaultEmailAddress (),
-				autoResponder.getEmailAddress (),
+			emailLogic.sendSystemEmail (
+				ImmutableList.of (
+					autoResponder.getEmailAddress ()),
 				"Auto responder " + autoResponder.getDescription (),
 				message.getText ().getText ());
+
 		}
 
 		// add to number list

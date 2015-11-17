@@ -69,7 +69,15 @@ class WbsConfig {
 
 	@DataAttribute (
 		required = true)
-	String defaultEmailAddress;
+	String defaultEmailFromAddress;
+
+	@DataAttribute (
+		required = true)
+	String defaultEmailFromName;
+
+	@DataAttribute (
+		required = true)
+	String defaultEmailReplyToAddress;
 
 	@DataChildren (
 		childrenElement = "test-users",

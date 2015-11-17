@@ -18,4 +18,7 @@ class ImChatConversationData {
 	@DataAttribute
 	ImChatProfileData profile;
 
+	@DataAttribute
+	Boolean replyPending;
+
 }

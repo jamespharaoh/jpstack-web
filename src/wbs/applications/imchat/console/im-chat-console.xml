@@ -154,6 +154,18 @@
 		<integer-field
 			name="freeMessageMaxChars"/>
 
+		<text-field
+			name="emailFromName"/>
+
+		<text-field
+			name="emailFromAddress"/>
+
+		<text-field
+			name="emailReplyToAddress"/>
+
+		<text-field
+			name="emailSubjectForgotPassword"/>
+
 	</field-set>
 
 	<field-set
@@ -202,6 +214,22 @@
 
 		<integer-field
 			name="freeMessageMaxChars"
+			nullable="yes"/>
+
+		<text-field
+			name="emailFromName"
+			nullable="yes"/>
+
+		<text-field
+			name="emailFromAddress"
+			nullable="yes"/>
+
+		<text-field
+			name="emailReplyToAddress"
+			nullable="yes"/>
+
+		<text-field
+			name="emailSubjectForgotPassword"
 			nullable="yes"/>
 
 	</field-set>

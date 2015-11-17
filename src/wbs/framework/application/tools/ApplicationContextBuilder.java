@@ -3,6 +3,7 @@ package wbs.framework.application.tools;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.hyphenToCamel;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.lang.reflect.Method;
@@ -66,6 +67,8 @@ import wbs.framework.object.ObjectHelperProviderFactory;
 public
 class ApplicationContextBuilder {
 
+	// properties
+
 	@Getter @Setter
 	String primaryProjectPackageName;
 
@@ -83,6 +86,8 @@ class ApplicationContextBuilder {
 	@Getter @Setter
 	String outputPath;
 
+	// state
+
 	List<PluginSpec> plugins;
 	PluginManager pluginManager;
 
@@ -93,6 +98,8 @@ class ApplicationContextBuilder {
 		new ArrayList<BeanDefinition> ();
 
 	ApplicationContext applicationContext;
+
+	// implementation
 
 	public
 	ApplicationContextBuilder addSingletonBean (
@@ -843,14 +850,23 @@ class ApplicationContextBuilder {
 
 			applicationContext.registerBeanDefinition (
 				new BeanDefinition ()
-					.name (beanName)
-					.beanClass (beanClass)
-					.scope ("singleton"));
+
+				.name (
+					beanName)
+
+				.beanClass (
+					beanClass)
+
+				.scope (
+					"singleton")
+
+			);
 
 		}
 
 		PrototypeComponent prototypeComponent =
-			beanClass.getAnnotation (PrototypeComponent.class);
+			beanClass.getAnnotation (
+				PrototypeComponent.class);
 
 		if (prototypeComponent != null) {
 
@@ -859,9 +875,17 @@ class ApplicationContextBuilder {
 
 			applicationContext.registerBeanDefinition (
 				new BeanDefinition ()
-					.name (beanName)
-					.beanClass (beanClass)
-					.scope ("prototype"));
+
+				.name (
+					beanName)
+
+				.beanClass (
+					beanClass)
+
+				.scope (
+					"prototype")
+
+			);
 
 		}
 
@@ -881,25 +905,45 @@ class ApplicationContextBuilder {
 
 			applicationContext.registerBeanDefinition (
 				new BeanDefinition ()
-					.name (targetBeanName)
-					.beanClass (beanClass)
-					.scope ("prototype")
-					.hide (true));
+
+				.name (
+					targetBeanName)
+
+				.beanClass (
+					beanClass)
+
+				.scope (
+					"prototype")
+
+				.hide (
+					true)
+
+			);
 
 			applicationContext.registerBeanDefinition (
 				new BeanDefinition ()
-					.name (beanName)
-					.beanClass (proxiedRequestComponent.proxyInterface ())
-					.factoryClass (ThreadLocalProxyBeanFactory.class)
-					.scope ("singleton")
 
-					.addValueProperty (
-						"beanName",
-						beanName)
+				.name (
+					beanName)
 
-					.addValueProperty (
-						"beanClass",
-						proxiedRequestComponent.proxyInterface ()));
+				.beanClass (
+					proxiedRequestComponent.proxyInterface ())
+
+				.factoryClass (
+					ThreadLocalProxyBeanFactory.class)
+
+				.scope (
+					"singleton")
+
+				.addValueProperty (
+					"beanName",
+					beanName)
+
+				.addValueProperty (
+					"beanClass",
+					proxiedRequestComponent.proxyInterface ())
+
+			);
 
 			applicationContext.requestBeanNames ().add (
 				beanName);
@@ -917,8 +961,10 @@ class ApplicationContextBuilder {
 
 		}
 
-		for (Method method
-				: beanClass.getDeclaredMethods ()) {
+		for (
+			Method method
+				: beanClass.getDeclaredMethods ()
+		) {
 
 			SingletonComponent singletonComponentAnnotation =
 				method.getAnnotation (
@@ -926,11 +972,26 @@ class ApplicationContextBuilder {
 
 			if (singletonComponentAnnotation != null) {
 
+				if (
+					notEqual (
+						method.getName (),
+						singletonComponentAnnotation.value ())
+				) {
+
+					log.warn (
+						stringFormat (
+							"Factory method name '%s' ",
+							method.getName (),
+							"does not match component name '%s' ",
+							singletonComponentAnnotation.value ()));
+
+				}
+
 				applicationContext.registerBeanDefinition (
 					new BeanDefinition ()
 
 					.name (
-						method.getName ())
+						singletonComponentAnnotation.value ())
 
 					.beanClass (
 						method.getReturnType ())
@@ -959,11 +1020,26 @@ class ApplicationContextBuilder {
 
 			if (prototypeComponentAnnotation != null) {
 
+				if (
+					notEqual (
+						method.getName (),
+						prototypeComponentAnnotation.value ())
+				) {
+
+					log.warn (
+						stringFormat (
+							"Factory method name '%s' ",
+							method.getName (),
+							"does not match component name '%s' ",
+							prototypeComponentAnnotation.value ()));
+
+				}
+
 				applicationContext.registerBeanDefinition (
 					new BeanDefinition ()
 
 					.name (
-						method.getName ())
+						prototypeComponentAnnotation.value ())
 
 					.beanClass (
 						method.getReturnType ())
@@ -980,7 +1056,9 @@ class ApplicationContextBuilder {
 
 					.addValueProperty (
 						"factoryMethodName",
-						method.getName ()));
+						method.getName ())
+
+				);
 
 			}
 
@@ -1010,13 +1088,22 @@ class ApplicationContextBuilder {
 		try {
 
 			objectHooksClass =
-				Class.forName (objectHooksClassName);
+				Class.forName (
+					objectHooksClassName);
 
 			applicationContext.registerBeanDefinition (
 				new BeanDefinition ()
-					.name (objectHooksBeanName)
-					.beanClass (objectHooksClass)
-					.scope ("singleton"));
+
+				.name (
+					objectHooksBeanName)
+
+				.beanClass (
+					objectHooksClass)
+
+				.scope (
+					"singleton")
+
+			);
 
 			return 0;
 
@@ -1024,9 +1111,17 @@ class ApplicationContextBuilder {
 
 			applicationContext.registerBeanDefinition (
 				new BeanDefinition ()
-					.name (objectHooksBeanName)
-					.beanClass (AbstractObjectHooks.class)
-					.scope ("singleton"));
+
+				.name (
+					objectHooksBeanName)
+
+				.beanClass (
+					AbstractObjectHooks.class)
+
+				.scope (
+					"singleton")
+
+			);
 
 			return 0;
 
@@ -1101,7 +1196,8 @@ class ApplicationContextBuilder {
 		try {
 
 			objectHelperImplementationClass =
-				Class.forName (objectHelperImplementationClassName);
+				Class.forName (
+					objectHelperImplementationClassName);
 
 		} catch (ClassNotFoundException exception) {
 

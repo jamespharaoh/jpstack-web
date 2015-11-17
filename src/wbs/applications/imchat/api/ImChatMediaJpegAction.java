@@ -1,5 +1,7 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.awt.image.BufferedImage;
@@ -8,6 +10,9 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatProfileObjectHelper;
@@ -24,9 +29,10 @@ import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
 
-@PrototypeComponent ("imChatMediaThumbnailJpegAction")
+@PrototypeComponent ("imChatMediaJpegAction")
+@Accessors (fluent = true)
 public
-class ImChatMediaThumbnailJpegAction
+class ImChatMediaJpegAction
 	implements Action {
 
 	// dependencies
@@ -56,6 +62,14 @@ class ImChatMediaThumbnailJpegAction
 
 	@Inject
 	Provider<JsonResponder> jsonResponderProvider;
+
+	// properties
+
+	@Getter @Setter
+	Integer targetWidth;
+
+	@Getter @Setter
+	Integer targetHeight;
 
 	// implementation
 
@@ -108,16 +122,39 @@ class ImChatMediaThumbnailJpegAction
 				content.getData (),
 				media.getMediaType ().getMimeType ());
 
-		int resizedWidth = 98;
+		BufferedImage resizedImage;
 
-		int resizedHeight =
-			media.getHeight () * resizedWidth / media.getWidth ();
+		if (
 
-		BufferedImage resizedImage =
-			mediaLogic.resampleImage (
-				originalImage,
-				resizedWidth,
-				resizedHeight);
+			isNotNull (
+				targetWidth)
+
+			&& isNotNull (
+				targetHeight)
+
+		) {
+
+			resizedImage =
+				mediaLogic.cropAndResampleImage (
+					originalImage,
+					targetWidth,
+					targetHeight);
+
+		} else {
+
+			resizedImage =
+				mediaLogic.resampleImageToFit (
+					originalImage,
+					ifNull (
+						targetWidth,
+						Integer.MAX_VALUE),
+					ifNull (
+						targetHeight,
+						Integer.MAX_VALUE));
+
+		}
+
+		// create jpeg
 
 		byte[] resizedImageJpeg =
 			mediaLogic.writeJpeg (

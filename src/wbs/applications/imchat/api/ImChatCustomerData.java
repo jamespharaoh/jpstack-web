@@ -33,6 +33,18 @@ class ImChatCustomerData {
 	String balanceString;
 
 	@DataAttribute
+	Integer minimumBalance;
+
+	@DataAttribute
+	String minimumBalanceString;
+
+	@DataAttribute
+	Integer requiredBalance;
+
+	@DataAttribute
+	String requiredBalanceString;
+
+	@DataAttribute
 	List<ImChatCustomerDetailData> details;
 
 }

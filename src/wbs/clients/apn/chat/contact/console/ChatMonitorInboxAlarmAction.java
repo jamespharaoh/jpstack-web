@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -9,6 +10,7 @@ import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 import org.joda.time.Seconds;
@@ -18,6 +20,7 @@ import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationReason;
 import wbs.clients.apn.chat.core.model.ChatRec;
+import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -60,13 +63,18 @@ class ChatMonitorInboxAlarmAction
 	@Inject
 	UserObjectHelper userHelper;
 
+	// state
+
+	DateTimeZone timeZone;
+
 	// details
 
 	@Override
 	public
 	Responder backupResponder () {
 
-		return responder ("chatMonitorInboxSummaryResponder");
+		return responder (
+			"chatMonitorInboxSummaryResponder");
 
 	}
 
@@ -77,15 +85,59 @@ class ChatMonitorInboxAlarmAction
 	Responder goReal ()
 			throws ServletException {
 
+		// start transaction
+
+		@Cleanup
+		Transaction transaction =
+			database.beginReadWrite (
+				this);
+
+		UserRec myUser =
+			userHelper.find (
+				requestContext.userId ());
+
+		ChatMonitorInboxRec chatMonitorInbox =
+			chatMonitorInboxHelper.find (
+				requestContext .stuffInt (
+					"chatMonitorInboxId"));
+
+		ChatUserRec userChatUser =
+			chatMonitorInbox.getUserChatUser ();
+
+		ChatUserRec monitorChatUser =
+			chatMonitorInbox.getMonitorChatUser ();
+
+		ChatRec chat =
+			userChatUser.getChat ();
+
+		ChatSchemeRec chatScheme =
+			userChatUser.getChatScheme ();
+
+		ChatUserAlarmRec chatUserAlarm =
+			chatUserAlarmHelper.find (
+				userChatUser,
+				monitorChatUser);
+
+		timeZone =
+			DateTimeZone.forID (
+				chatScheme.getTimezone ());
+
+		// pull in parameters
+
 		boolean save =
-			requestContext.parameter ("alarmSet") != null;
+			isNotNull (
+				requestContext.parameter (
+					"alarmSet"));
 
 		boolean clear =
-			requestContext.parameter ("alarmCancel") != null;
+			isNotNull (
+				requestContext.parameter (
+					"alarmCancel"));
 
 		boolean sticky =
 			Boolean.parseBoolean (
-				requestContext.parameter ("alarmSticky"));
+				requestContext.parameter (
+					"alarmSticky"));
 
 		Instant alarmTime = null;
 
@@ -97,10 +149,13 @@ class ChatMonitorInboxAlarmAction
 
 				Interval interval =
 					parsePartialTimestamp (
+						timeZone,
 						stringFormat (
 							"%s %s",
-							requestContext.parameter ("alarmDate"),
-							requestContext.parameter ("alarmTime")));
+							requestContext.parameter (
+								"alarmDate"),
+							requestContext.parameter (
+								"alarmTime")));
 
 				alarmTime =
 					interval.getStart ().toInstant ();
@@ -117,41 +172,13 @@ class ChatMonitorInboxAlarmAction
 
 			if (alarmTime.isBefore (Instant.now ())) {
 
-				requestContext.addError ("Alarm time is in past");
+				requestContext.addError (
+					"Alarm time is in past");
 
 				return null;
 			}
 
 		}
-
-		// start transaction
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				this);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
-		ChatMonitorInboxRec chatMonitorInbox =
-			chatMonitorInboxHelper.find (
-				requestContext .stuffInt ("chatMonitorInboxId"));
-
-		ChatUserRec userChatUser =
-			chatMonitorInbox.getUserChatUser ();
-
-		ChatUserRec monitorChatUser =
-			chatMonitorInbox.getMonitorChatUser ();
-
-		ChatRec chat =
-			userChatUser.getChat ();
-
-		ChatUserAlarmRec chatUserAlarm =
-			chatUserAlarmHelper.find (
-				userChatUser,
-				monitorChatUser);
 
 		// check alarm is within allowed range
 

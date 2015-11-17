@@ -16,6 +16,12 @@ class ImChatMessageSendSuccess {
 	String status = "success";
 
 	@DataAttribute
+	ImChatCustomerData customer;
+
+	@DataAttribute
+	ImChatConversationData conversation;
+
+	@DataAttribute
 	ImChatMessageData message;
 
 }

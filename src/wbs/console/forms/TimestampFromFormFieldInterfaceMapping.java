@@ -15,6 +15,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
@@ -64,8 +65,12 @@ class TimestampFromFormFieldInterfaceMapping<Container>
 
 			try {
 
+				// TODO timezone should not be hardcoded
+
 				Interval interval =
 					parsePartialTimestamp (
+						DateTimeZone.forID (
+							"Europe/London"),
 						interfaceValue.get ());
 
 				return Optional.of (

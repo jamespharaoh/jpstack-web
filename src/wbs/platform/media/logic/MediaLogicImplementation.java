@@ -2,9 +2,12 @@ package wbs.platform.media.logic;
 
 import static wbs.framework.utils.etc.Misc.allOf;
 import static wbs.framework.utils.etc.Misc.contains;
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.iterable;
+import static wbs.framework.utils.etc.Misc.lessThan;
+import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.runFilter;
 import static wbs.framework.utils.etc.Misc.runFilterAdvanced;
@@ -563,7 +566,7 @@ class MediaLogicImplementation
 		// create the 100x100 thumbnail
 
 		BufferedImage image100 =
-			resampleImage (
+			resampleImageToFit (
 				thumbnailImage,
 				100,
 				100);
@@ -576,7 +579,7 @@ class MediaLogicImplementation
 		// create the 32x32 thumbnail
 
 		BufferedImage image32 =
-			resampleImage (
+			resampleImageToFit (
 				thumbnailImage,
 				32,
 				32);
@@ -1038,10 +1041,12 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	BufferedImage resampleImage (
+	BufferedImage resampleImageToFit (
 			@NonNull BufferedImage image,
 			int maxWidth,
 			int maxHeight) {
+
+		// same image if already fits
 
 		if (
 			allOf (
@@ -1053,28 +1058,34 @@ class MediaLogicImplementation
 
 		}
 
-		int newWidth =
+		// start with max target size
+
+		int targetWidth =
 			image.getWidth ();
 
-		int newHeight =
+		int targetHeight =
 			image.getHeight ();
 
-		if (maxWidth > 0 && newWidth > maxWidth) {
+		// reduce height to maintain ratio
 
-			newWidth =
+		if (targetWidth > maxWidth) {
+
+			targetWidth =
 				maxWidth;
 
-			newHeight =
+			targetHeight =
 				image.getHeight () * maxWidth / image.getWidth ();
 
 		}
 
-		if (maxHeight > 0 && newHeight > maxHeight) {
+		// reduce width to maintain ratio
 
-			newHeight =
+		if (targetHeight > maxHeight) {
+
+			targetHeight =
 				maxHeight;
 
-			newWidth =
+			targetWidth =
 				image.getWidth () * maxHeight / image.getHeight ();
 
 		}
@@ -1091,21 +1102,23 @@ class MediaLogicImplementation
 
 		}
 
-		BufferedImage newImage =
+		// resample image
+
+		BufferedImage targetImage =
 			new BufferedImage (
-				newWidth,
-				newHeight,
+				targetWidth,
+				targetHeight,
 				imageType);
 
 		Graphics2D graphics =
-			newImage.createGraphics ();
+			targetImage.createGraphics ();
 
 		graphics.drawImage (
 			image,
 			0,
 			0,
-			newWidth,
-			newHeight,
+			targetWidth,
+			targetHeight,
 			0,
 			0,
 			image.getWidth (),
@@ -1114,14 +1127,146 @@ class MediaLogicImplementation
 
 		graphics.dispose ();
 
-		return newImage;
+		return targetImage;
+
+	}
+
+	@Override
+	public
+	BufferedImage cropAndResampleImage (
+			@NonNull BufferedImage sourceImage,
+			int targetWidth,
+			int targetHeight) {
+
+		// same image if already fits
+
+		if (
+			allOf (
+				sourceImage.getWidth () == targetWidth,
+				sourceImage.getHeight () == targetHeight)
+		) {
+
+			return sourceImage;
+
+		}
+
+		// select crop type
+
+		int sourceRatio =
+			sourceImage.getWidth ()
+				* targetHeight;
+
+		int targetRatio =
+			targetWidth
+				* sourceImage.getHeight ();
+
+		int sourceWidth;
+		int sourceHeight;
+
+		if (
+			equal (
+				sourceRatio,
+				targetRatio)
+		) {
+
+			// keep same ratio
+
+			sourceWidth =
+				sourceImage.getWidth ();
+
+			sourceHeight =
+				sourceImage.getHeight ();
+
+		} else if (
+			moreThan (
+				sourceRatio,
+				targetRatio)
+		) {
+
+			// reduce width
+
+			sourceWidth =
+				sourceImage.getWidth ()
+					* targetHeight
+					/ sourceImage.getHeight ();
+
+			sourceHeight =
+				sourceImage.getHeight ();
+
+		} else if (
+			lessThan (
+				sourceRatio,
+				targetRatio)
+		) {
+
+			// reduce height
+
+			sourceWidth =
+				sourceImage.getWidth ();
+
+			sourceHeight =
+				sourceImage.getHeight ()
+					* targetWidth
+					/ sourceImage.getWidth ();
+
+		} else {
+
+			throw new RuntimeException (
+				"LOGIC ERROR");
+
+		}
+
+		int sourceOffsetHorizontal =
+			(sourceImage.getWidth () - sourceWidth) / 2;
+
+		int sourceOffsetVertical =
+			(sourceImage.getHeight () - sourceHeight) / 2;
+
+		// determine image type
+
+		int imageType =
+			sourceImage.getType ();
+
+		if (imageType == BufferedImage.TYPE_CUSTOM) {
+
+			imageType =
+				BufferedImage.TYPE_INT_RGB;
+
+		}
+
+		// resample image
+
+		BufferedImage targetImage =
+			new BufferedImage (
+				targetWidth,
+				targetHeight,
+				imageType);
+
+		Graphics2D graphics =
+			targetImage.createGraphics ();
+
+		graphics.drawImage (
+			sourceImage,
+			0,
+			0,
+			targetWidth,
+			targetHeight,
+			sourceOffsetHorizontal,
+			sourceOffsetVertical,
+			sourceOffsetHorizontal + sourceWidth,
+			sourceOffsetVertical + sourceHeight,
+			null);
+
+		graphics.dispose ();
+
+		return targetImage;
 
 	}
 
 	@Override
 	public
 	BufferedImage rotateImage90 (
-			BufferedImage image) {
+			@NonNull BufferedImage image) {
 
 		BufferedImage newImage =
 			new BufferedImage (

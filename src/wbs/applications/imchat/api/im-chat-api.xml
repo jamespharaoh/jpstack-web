@@ -94,6 +94,10 @@
 			<get-action name="mediaThumbnailJpeg"/>
 		</resource>
 
+		<resource name="miniature.jpg">
+			<get-action name="mediaMiniatureJpeg"/>
+		</resource>
+
 	</variable>
 	</variable>
 	</resource>

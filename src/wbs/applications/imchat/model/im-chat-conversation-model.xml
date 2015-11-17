@@ -16,6 +16,11 @@
 		<index-field
 			counter="numConversations"/>
 
+		<!-- state -->
+
+		<yes-no-field
+			name="pendingReply"/>
+
 		<!-- timings -->
 
 		<timestamp-field

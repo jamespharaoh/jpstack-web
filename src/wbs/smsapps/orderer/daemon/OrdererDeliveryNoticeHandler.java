@@ -124,9 +124,9 @@ class OrdererDeliveryNoticeHandler
 
 		// send the email
 
-		emailLogic.sendEmail (
-			wbsConfig.defaultEmailAddress (),
-			orderer.getEmailAddress (),
+		emailLogic.sendSystemEmail (
+			ImmutableList.of (
+				orderer.getEmailAddress ()),
 			orderer.getEmailSubject (),
 			emailBody);
 

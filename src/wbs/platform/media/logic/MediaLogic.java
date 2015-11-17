@@ -107,7 +107,12 @@ interface MediaLogic {
 	BufferedImage getImage (
 			MediaRec media);
 
-	BufferedImage resampleImage (
+	BufferedImage resampleImageToFit (
+			BufferedImage image,
+			int maxWidth,
+			int maxHeight);
+
+	BufferedImage cropAndResampleImage (
 			BufferedImage image,
 			int maxWidth,
 			int maxHeight);

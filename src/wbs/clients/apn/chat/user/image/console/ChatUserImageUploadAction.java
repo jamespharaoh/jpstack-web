@@ -169,7 +169,7 @@ class ChatUserImageUploadAction
 			// resample image
 
 			image =
-				mediaLogic.resampleImage (
+				mediaLogic.resampleImageToFit (
 					image,
 					320,
 					240);
@@ -190,6 +190,7 @@ class ChatUserImageUploadAction
 			break;
 
 		default:
+
 			throw new RuntimeException ();
 
 		}
@@ -201,7 +202,8 @@ class ChatUserImageUploadAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (
-				requestContext.stuffInt ("chatUserId"));
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		UserRec myUser =
 			userHelper.find (

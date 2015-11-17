@@ -24,13 +24,26 @@ class ImChatProfileData {
 	@DataAttribute
 	String description;
 
-	@DataAttribute
-	String imageLink;
+	// thumbnail image
 
 	@DataAttribute
-	Integer imageWidth;
+	String thumbnailImageLink;
 
 	@DataAttribute
-	Integer imageHeight;
+	Integer thumbnailImageWidth;
+
+	@DataAttribute
+	Integer thumbnailImageHeight;
+
+	// miniature image
+
+	@DataAttribute
+	String miniatureImageLink;
+
+	@DataAttribute
+	Integer miniatureImageWidth;
+
+	@DataAttribute
+	Integer miniatureImageHeight;
 
 }

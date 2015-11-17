@@ -69,6 +69,22 @@
 			name="developmentMode"
 			default="no"/>
 
+		<string-field
+			name="emailFromName"
+			nullable="yes"/>
+
+		<string-field
+			name="emailFromAddress"
+			nullable="yes"/>
+
+		<string-field
+			name="emailReplyToAddress"
+			nullable="yes"/>
+
+		<string-field
+			name="emailSubjectForgotPassword"
+			nullable="yes"/>
+
 	</fields>
 
 	<collections>

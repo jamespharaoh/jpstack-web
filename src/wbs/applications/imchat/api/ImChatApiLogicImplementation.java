@@ -114,7 +114,7 @@ class ImChatApiLogicImplementation
 			.description (
 				profile.getPublicDescription ())
 
-			.imageLink (
+			.thumbnailImageLink (
 				stringFormat (
 					"%s",
 					wbsConfig.apiUrl (),
@@ -124,11 +124,27 @@ class ImChatApiLogicImplementation
 					hash,
 					"/thumbnail.jpg"))
 
-			.imageWidth (
+			.thumbnailImageWidth (
 				resizedWidth)
 
-			.imageHeight (
-				resizedHeight);
+			.thumbnailImageHeight (
+				resizedHeight)
+
+			.miniatureImageLink (
+				stringFormat (
+					"%s",
+					wbsConfig.apiUrl (),
+					"/im-chat-media/%u",
+					image.getId (),
+					"/%u",
+					hash,
+					"/miniature.jpg"))
+
+			.miniatureImageWidth (
+				24)
+
+			.miniatureImageHeight (
+				24);
 
 	}
 
@@ -136,6 +152,14 @@ class ImChatApiLogicImplementation
 	public
 	ImChatCustomerData customerData (
 			@NonNull ImChatCustomerRec customer) {
+
+		ImChatRec imChat =
+			customer.getImChat ();
+
+		Integer requiredBalance =
+			customer.getBalance () < imChat.getMessageCost ()
+				? imChat.getMessageCost () - customer.getBalance ()
+				: 0;
 
 		return new ImChatCustomerData ()
 
@@ -157,8 +181,24 @@ class ImChatApiLogicImplementation
 
 			.balanceString (
 				currencyLogic.formatText (
-					customer.getImChat ().getCurrency (),
+					imChat.getCurrency (),
 					(long) customer.getBalance ()))
+
+			.minimumBalance (
+				imChat.getMessageCost ())
+
+			.minimumBalanceString (
+				currencyLogic.formatText (
+					imChat.getCurrency (),
+					(long) imChat.getMessageCost ()))
+
+			.requiredBalance (
+				requiredBalance)
+
+			.requiredBalanceString (
+				currencyLogic.formatText (
+					imChat.getCurrency (),
+					(long) requiredBalance))
 
 			.details (
 				customerDetailData (
@@ -234,7 +274,10 @@ class ImChatApiLogicImplementation
 
 			.profile (
 				profileData (
-					conversation.getImChatProfile ()));
+					conversation.getImChatProfile ()))
+
+			.replyPending (
+				conversation.getPendingReply ());
 
 	}
 
