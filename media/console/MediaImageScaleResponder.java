@@ -47,7 +47,7 @@ class MediaImageScaleResponder
 				mediaType.getMimeType ());
 
 		BufferedImage scaledImage =
-			mediaLogic.resampleImage (
+			mediaLogic.resampleImageToFit (
 				fullImage,
 				maxWidth,
 				maxHeight);
