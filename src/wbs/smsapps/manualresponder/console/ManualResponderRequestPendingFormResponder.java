@@ -15,8 +15,8 @@ import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.HtmlLink;
-import wbs.console.html.JqueryScriptRef;
 import wbs.console.html.ScriptRef;
+import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.PrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;

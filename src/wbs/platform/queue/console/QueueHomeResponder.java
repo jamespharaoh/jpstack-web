@@ -17,9 +17,9 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.html.JqueryScriptRef;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
+import wbs.console.misc.JqueryScriptRef;
 import wbs.console.misc.TimeFormatter;
 import wbs.console.priv.PrivChecker;
 import wbs.console.request.ConsoleRequestContext;

@@ -12,9 +12,9 @@ import javax.inject.Provider;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.html.JqueryScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.html.SelectBuilder;
+import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.sms.network.console.NetworkConsoleHelper;

@@ -1,14 +1,13 @@
-package wbs.console.html;
+package wbs.console.misc;
 
+import lombok.NonNull;
+
+import wbs.console.html.ScriptRef;
 import wbs.console.request.ConsoleRequestContext;
 
 public
-class JqueryScriptRef
+class JqueryEditableScriptRef
 	extends ScriptRef {
-
-	private
-	JqueryScriptRef () {
-	}
 
 	@Override
 	public
@@ -19,7 +18,7 @@ class JqueryScriptRef
 	@Override
 	public
 	String getUrl (
-			ConsoleRequestContext requestContext) {
+			@NonNull ConsoleRequestContext requestContext) {
 
 		return requestContext.resolveApplicationUrl (
 			path);
@@ -27,11 +26,11 @@ class JqueryScriptRef
 	}
 
 	public static final
-	JqueryScriptRef instance =
-		new JqueryScriptRef ();
+	JqueryEditableScriptRef instance =
+		new JqueryEditableScriptRef ();
 
 	public static final
 	String path =
-		"/js/jquery-1.11.2.js";
+		"/js/jquery-jeditable-dea6556.js";
 
 }

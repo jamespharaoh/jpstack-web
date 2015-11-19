@@ -27,8 +27,9 @@ import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.html.JqueryScriptRef;
 import wbs.console.html.ScriptRef;
+import wbs.console.misc.JqueryEditableScriptRef;
+import wbs.console.misc.JqueryScriptRef;
 import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.PrivChecker;
@@ -139,8 +140,7 @@ class ManualResponderRequestPendingSummaryPart
 				JqueryScriptRef.instance)
 
 			.add (
-				ConsoleApplicationScriptRef.javascript (
-					"/js/jquery.jeditable.mini.js"))
+				JqueryEditableScriptRef.instance)
 
 			.add (
 				ConsoleApplicationScriptRef.javascript (

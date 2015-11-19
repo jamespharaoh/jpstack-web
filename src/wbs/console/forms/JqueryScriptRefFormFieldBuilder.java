@@ -6,8 +6,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.html.JqueryScriptRef;
 import wbs.console.html.ScriptRef;
+import wbs.console.misc.JqueryScriptRef;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;

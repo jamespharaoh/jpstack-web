@@ -49,8 +49,9 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.html.JqueryScriptRef;
 import wbs.console.html.ScriptRef;
+import wbs.console.misc.JqueryEditableScriptRef;
+import wbs.console.misc.JqueryScriptRef;
 import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -287,8 +288,7 @@ class ChatMonitorInboxSummaryPart
 				JqueryScriptRef.instance)
 
 			.add (
-				ConsoleApplicationScriptRef.javascript (
-					"/js/jquery-jeditable-dea6556.js"))
+				JqueryEditableScriptRef.instance)
 
 			.add (
 				ConsoleApplicationScriptRef.javascript (
