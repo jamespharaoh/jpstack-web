@@ -55,6 +55,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.ProfileLogger;
 import wbs.framework.web.Responder;
+import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.service.console.ServiceConsoleHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
@@ -126,6 +127,9 @@ class ChatBroadcastSendAction
 
 	@Inject
 	ConsoleObjectManager objectManager;
+
+	@Inject
+	ObjectTypeConsoleHelper objectTypeHelper;
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -536,22 +540,6 @@ System.out.println ("include");
 				profileLogger.lap (
 					"perform send");
 
-				BatchSubjectRec batchSubject =
-					batchLogic.batchSubject (
-						chat,
-						"broadcast");
-
-				batchHelper.insert (
-					batchHelper.createInstance ()
-
-					.setSubject (
-						batchSubject)
-
-					.setCode (
-						batchSubject.getCode ())
-
-				);
-
 				UserRec myUser =
 					userHelper.find (
 						requestContext.userId ());
@@ -562,7 +550,8 @@ System.out.println ("include");
 						(String) params.get ("message"));
 
 				int messageLength =
-					Gsm.length (messageString);
+					Gsm.length (
+						messageString);
 
 				if (messageLength > 160) {
 
@@ -712,6 +701,34 @@ System.out.println ("include");
 
 				chatBroadcastHelper.insert (
 					chatBroadcast);
+
+				// create batch
+
+				BatchSubjectRec batchSubject =
+					batchLogic.batchSubject (
+						chat,
+						"broadcast");
+
+				batchHelper.insert (
+					batchHelper.createInstance ()
+
+					.setSubject (
+						batchSubject)
+
+					.setCode (
+						batchSubject.getCode ())
+
+					.setParentType (
+						objectTypeHelper.findByCode (
+							GlobalId.root,
+							"chat_broadcast"))
+
+					.setParentId (
+						chatBroadcast.getId ())
+
+				);
+
+				// store broadcast numbers
 
 				int loop3 = 0;
 

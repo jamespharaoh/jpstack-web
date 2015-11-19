@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.broadcast.logic;
 
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -332,18 +333,21 @@ class ChatBroadcastSendHelper
 			toChatUser.getChatScheme ();
 
 		ServiceRec broadcastService =
-			serviceHelper.findByCode (
-				chat,
-				"broadcast");
+			requiredValue (
+				serviceHelper.findByCode (
+					chat,
+					"broadcast"));
 
 		BatchRec batch =
-			batchHelper.findByCode (
-				chatBroadcast,
-				"broadcast");
+			requiredValue (
+				batchHelper.findByCode (
+					chatBroadcast,
+					"broadcast"));
 
 		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				toChatUser);
+			requiredValue (
+				chatUserLogic.getAffiliate (
+					toChatUser));
 
 		// send message
 
