@@ -26,7 +26,7 @@ import lombok.Cleanup;
 
 import org.joda.time.Instant;
 
-import wbs.console.html.JqueryScriptRef;
+import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.priv.PrivChecker;
 import wbs.console.request.ConsoleRequestContext;

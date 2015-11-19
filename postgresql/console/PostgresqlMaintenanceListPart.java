@@ -13,9 +13,9 @@ import javax.inject.Inject;
 
 import com.google.common.collect.ImmutableSet;
 
-import wbs.console.html.JqueryScriptRef;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
+import wbs.console.misc.JqueryScriptRef;
 import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;

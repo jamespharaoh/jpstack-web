@@ -12,9 +12,9 @@ import javax.inject.Inject;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.html.JqueryScriptRef;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
+import wbs.console.misc.JqueryScriptRef;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
