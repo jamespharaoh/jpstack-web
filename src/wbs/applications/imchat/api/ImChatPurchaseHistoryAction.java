@@ -3,7 +3,6 @@ package wbs.applications.imchat.api;
 import static wbs.framework.utils.etc.Misc.isNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -129,11 +128,8 @@ class ImChatPurchaseHistoryAction
 		// retrieve purchases
 
 		List<ImChatPurchaseRec> purchases =
-			new ArrayList<ImChatPurchaseRec> (
+			Lists.reverse (
 				customer.getPurchases ());
-
-		Lists.reverse (
-			purchases);
 
 		// create response
 

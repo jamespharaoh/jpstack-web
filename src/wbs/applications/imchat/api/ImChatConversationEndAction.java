@@ -17,6 +17,7 @@ import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import wbs.applications.imchat.logic.ImChatLogic;
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
@@ -56,6 +57,9 @@ class ImChatConversationEndAction
 
 	@Inject
 	ImChatObjectHelper imChatHelper;
+
+	@Inject
+	ImChatLogic imChatLogic;
 
 	@Inject
 	ImChatProfileObjectHelper imChatProfileHelper;
@@ -177,15 +181,8 @@ class ImChatConversationEndAction
 				customer.getCurrentConversation ())
 		) {
 
-			conversation
-
-				.setEndTime (
-					transaction.now ());
-
-			customer
-
-				.setCurrentConversation (
-					null);
+			imChatLogic.conversationEnd (
+				conversation);
 
 		}
 

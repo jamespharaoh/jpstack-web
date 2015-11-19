@@ -24,9 +24,6 @@
 
 		<code-field/>
 
-		<text-field
-			name="email"/>
-
 		<integer-field
 			name="numConversations"/>
 

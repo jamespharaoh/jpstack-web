@@ -2226,7 +2226,8 @@ class Misc {
 					fromDate,
 					fromHour,
 					fromMinute,
-					fromSecond);
+					fromSecond,
+					timeZone);
 
 			// work out time to
 

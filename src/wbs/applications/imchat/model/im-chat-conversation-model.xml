@@ -32,6 +32,11 @@
 			column-type="iso"
 			nullable="yes"/>
 
+		<timestamp-field
+			name="emailTime"
+			column-type="iso"
+			nullable="yes"/>
+
 		<!-- relations -->
 
 		<reference-field

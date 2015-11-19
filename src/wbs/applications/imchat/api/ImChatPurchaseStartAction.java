@@ -1,5 +1,7 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.hyphenToUnderscore;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -146,7 +148,9 @@ class ImChatPurchaseStartAction
 					"longer active");
 
 			return jsonResponderProvider.get ()
-				.value (failureResponse);
+
+				.value (
+					failureResponse);
 
 		}
 
@@ -160,7 +164,8 @@ class ImChatPurchaseStartAction
 		ImChatPricePointRec pricePoint =
 			imChatPricePointHelper.findByCode (
 				imChat,
-				purchaseRequest.pricePointCode ());
+				hyphenToUnderscore (
+					purchaseRequest.pricePointCode ()));
 
 		if (
 			pricePoint == null

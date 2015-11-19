@@ -32,13 +32,18 @@
 	</models>
 
 	<fixtures>
-
 		<fixture name="imChatCore"/>
-
 	</fixtures>
 
-	<layer name="api">
+	<layer name="logic">
+		<bean class="logic.ImChatLogicImplementation"/>
+	</layer>
 
+	<layer name="daemon">
+		<bean class="daemon.ImChatConversationEmailDaemon"/>
+	</layer>
+
+	<layer name="api">
 		<bean class="api.ImChatApiLogicImplementation"/>
 		<bean class="api.ImChatConditionsAcceptAction"/>
 		<bean class="api.ImChatConversationEndAction"/>

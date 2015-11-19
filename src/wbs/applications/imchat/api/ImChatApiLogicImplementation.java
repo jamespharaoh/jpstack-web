@@ -1,6 +1,7 @@
 package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.camelToHyphen;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
 
@@ -286,6 +287,15 @@ class ImChatApiLogicImplementation
 	ImChatMessageData messageData (
 			@NonNull ImChatMessageRec message) {
 
+		ImChatConversationRec conversation =
+			message.getImChatConversation ();
+
+		ImChatCustomerRec customer =
+			conversation.getImChatCustomer ();
+
+		ImChatRec imChat =
+			customer.getImChat ();
+
 		return new ImChatMessageData ()
 
 			.index (
@@ -300,7 +310,19 @@ class ImChatApiLogicImplementation
 				message.getMessageText ())
 
 			.timestamp (
-				message.getTimestamp ().getMillis ());
+				message.getTimestamp ().getMillis ())
+
+			.charge (
+				ifNull (
+					message.getPrice (),
+					0))
+
+			.chargeString (
+				currencyLogic.formatText (
+					imChat.getCurrency (),
+					(long) ifNull (
+						message.getPrice (),
+						0)));
 
 	}
 

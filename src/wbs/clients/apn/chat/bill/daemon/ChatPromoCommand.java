@@ -3,9 +3,11 @@ package wbs.clients.apn.chat.bill.daemon;
 import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.laterThan;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +32,8 @@ import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.clients.apn.chat.user.join.daemon.ChatJoiner;
+import wbs.clients.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -96,6 +100,11 @@ class ChatPromoCommand
 
 	@Inject
 	TextObjectHelper textHelper;
+
+	// prototype dependencies
+
+	@Inject
+	Provider<ChatJoiner> chatJoinerProvider;
 
 	// properties
 
@@ -381,6 +390,39 @@ class ChatPromoCommand
 			Optional.of (
 				helpCommand));
 
+		// new users jump to join process
+
+		if (
+			isNull (
+				chatUser.getFirstJoin ())
+		) {
+
+			return chatJoinerProvider.get ()
+
+				.chatId (
+					chat.getId ())
+
+				.joinType (
+					(
+						chatPromo.getJoinDating ()
+						&& ! chatPromo.getJoinChat ()
+					)
+						? JoinType.dateSimple
+						: JoinType.chatSimple)
+
+				.inbox (
+					inbox)
+
+				.rest (
+					"")
+
+				.handleInbox (
+					command);
+
+		}
+
+		// simple join for existing customers
+
 		boolean sendMessage = true;
 
 		if (
@@ -420,6 +462,8 @@ class ChatPromoCommand
 			sendMessage = false;
 
 		}
+
+		// process inbox
 
 		return inboxLogic.inboxProcessed (
 			inbox,

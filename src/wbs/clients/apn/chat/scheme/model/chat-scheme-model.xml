@@ -88,6 +88,11 @@
 			name="timezone"
 			nullable="yes"/>
 
+		<enum-field
+			name="operatorLabel"
+			type="chatUserOperatorLabel"
+			default="operator"/>
+
 		<!-- slaves -->
 
 		<slave-field
@@ -110,5 +115,27 @@
 			join-column="parent_chat_scheme_id"/>
 
 	</collections>
+
+	<priv-types>
+
+		<priv-type
+			name="Messages"
+			description="View message history for an SMS chat service scheme"
+			template="yes"/>
+
+		<priv-type
+			name="Stats"
+			description="View message statistics for an SMS chat service scheme"
+			template="yes"/>
+
+	</priv-types>
+
+	<affiliate-types>
+
+		<affiliate-type
+			name="Default"
+			description="SMS chat service users who are not assigned to a specific affiliate"/>
+
+	</affiliate-types>
 
 </model-meta>

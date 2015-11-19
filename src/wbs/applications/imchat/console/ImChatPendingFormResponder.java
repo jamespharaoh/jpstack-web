@@ -192,7 +192,6 @@ class ImChatPendingFormResponder
 			"<table",
 			" id=\"templates\"",
 			" class=\"list\"",
-			" style=\"width: 100%%\"",
 			">\n");
 
 		printFormat (

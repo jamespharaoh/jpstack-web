@@ -18,9 +18,12 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
 import wbs.applications.imchat.model.ImChatConversationRec;
+import wbs.applications.imchat.model.ImChatCustomerDetailTypeRec;
+import wbs.applications.imchat.model.ImChatCustomerDetailValueRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageObjectHelper;
 import wbs.applications.imchat.model.ImChatMessageRec;
+import wbs.applications.imchat.model.ImChatRec;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleObjectManager;
@@ -56,8 +59,10 @@ class ImChatPendingSummaryPart
 	FormFieldSet customerFields;
 	FormFieldSet messageFields;
 
-	ImChatMessageRec imChatMessage;
-	ImChatConversationRec imChatConversation;
+	ImChatMessageRec message;
+	ImChatConversationRec conversation;
+	ImChatCustomerRec customer;
+	ImChatRec imChat;
 
 	// implementation
 
@@ -77,13 +82,19 @@ class ImChatPendingSummaryPart
 
 		// load data
 
-		imChatMessage =
+		message =
 			imChatMessageHelper.find (
 				requestContext.stuffInt (
 					"imChatMessageId"));
 
-		imChatConversation =
-			imChatMessage.getImChatConversation ();
+		conversation =
+			message.getImChatConversation ();
+
+		customer =
+			conversation.getImChatCustomer ();
+
+		imChat =
+			customer.getImChat ();
 
 	}
 
@@ -91,9 +102,83 @@ class ImChatPendingSummaryPart
 	public
 	void renderHtmlBodyContent () {
 
+		printFormat (
+			"<div class=\"layout-container\">\n",
+			"<table class=\"layout\">\n",
+			"<tbody>\n",
+			"<tr>\n",
+			"<td style=\"width: 50%%\">\n");
+
 		goSummary ();
 
+		printFormat (
+			"</td>\n",
+			"<td style=\"width: 50%%\">\n");
+
+		goDetails ();
+
+		printFormat (
+			"</td>\n",
+			"</tr>\n",
+			"</tbody>\n",
+			"</table>\n",
+			"</div>\n");
+
 		goHistory ();
+
+	}
+
+	void goDetails () {
+
+		printFormat (
+			"<h3>Customer details</h3>\n");
+
+		printFormat (
+			"<table class=\"details\">\n",
+			"<tbody>\n");
+
+		for (
+			ImChatCustomerDetailTypeRec detailType
+				: imChat.getCustomerDetailTypes ()
+		) {
+
+			ImChatCustomerDetailValueRec detailValue =
+				customer.getDetails ().get (
+					detailType.getId ());
+
+			printFormat (
+				"<tr>\n",
+				"<th>%h</th>\n",
+				detailType.getName (),
+				"<td>%h</td>\n",
+				detailValue != null
+					? detailValue.getValue ()
+					: "-",
+				"</tr>\n");
+
+		}
+
+		printFormat (
+			"</tbody>\n",
+			"</table>\n");
+
+	}
+
+	void goSummary () {
+
+		printFormat (
+			"<h3>Customer summary</h3>\n");
+
+		printFormat (
+			"<table class=\"details\">\n");
+
+		formFieldLogic.outputTableRows (
+			formatWriter,
+			customerFields,
+			customer);
+
+		printFormat (
+			"</table>\n");
 
 	}
 
@@ -106,9 +191,9 @@ class ImChatPendingSummaryPart
 
 		List<ImChatMessageRec> messages =
 			new ArrayList<ImChatMessageRec> (
-				imChatConversation.getMessagesIn ());
+				conversation.getMessagesIn ());
 
-		List<ImChatMessageRec> reverseMessages =
+		List<ImChatMessageRec> historyRequests =
 			Lists.reverse (
 				messages);
 
@@ -132,29 +217,29 @@ class ImChatPendingSummaryPart
 		// row
 
 		for (
-			ImChatMessageRec message
-				: reverseMessages
+			ImChatMessageRec historyRequest
+				: historyRequests
 		) {
 
 			if (
 				isNotNull (
-					message.getPartnerImChatMessage ())
+					historyRequest.getPartnerImChatMessage ())
 			) {
 
-				ImChatMessageRec partnerMessage =
-					message.getPartnerImChatMessage ();
+				ImChatMessageRec historyReply =
+					historyRequest.getPartnerImChatMessage ();
 
 				printFormat (
 					"<tr",
 					" class=\"%h\"",
 					classForMessage (
-						partnerMessage),
+						historyReply),
 					">\n");
 
 				formFieldLogic.outputTableCellsList (
 					formatWriter,
 					messageFields,
-					partnerMessage,
+					historyReply,
 					true);
 
 				printFormat (
@@ -169,18 +254,18 @@ class ImChatPendingSummaryPart
 					presentInstances (
 						Optional.of (
 							classForMessage (
-								message)),
+								historyRequest)),
 						optionalIf (
 							equal (
 								message,
-								imChatMessage),
+								historyRequest),
 							"selected"))),
 				">\n");
 
 			formFieldLogic.outputTableCellsList (
 				formatWriter,
 				messageFields,
-				message,
+				historyRequest,
 				true);
 
 			printFormat (
@@ -190,27 +275,6 @@ class ImChatPendingSummaryPart
 
 		printFormat (
 			"<tr>\n");
-
-		printFormat (
-			"</table>\n");
-
-	}
-
-	void goSummary () {
-
-		ImChatCustomerRec imChatCustomer =
-			imChatConversation.getImChatCustomer ();
-
-		printFormat (
-			"<h3>Customer summary</h3>\n");
-
-		printFormat (
-			"<table class=\"details\">\n");
-
-		formFieldLogic.outputTableRows (
-			formatWriter,
-			customerFields,
-			imChatCustomer);
 
 		printFormat (
 			"</table>\n");

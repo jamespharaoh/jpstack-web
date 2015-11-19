@@ -212,6 +212,10 @@
 		<text-field
 			name="timezone"/>
 
+		<enum-field
+			name="operatorLabel"
+			helper="chatUserOperatorLabelConsoleHelper"/>
+
 	</field-set>
 
 	<field-set

@@ -1388,6 +1388,9 @@ class ChatUserLogicImplementation
 			.setChatScheme (
 				chatScheme)
 
+			.setOperatorLabel (
+				chatScheme.getOperatorLabel ())
+
 			.setCredit (
 				chatUser.getCredit ()
 				+ chatScheme.getInitialCredit ());
@@ -1428,6 +1431,9 @@ class ChatUserLogicImplementation
 				.setChatScheme (
 					chatScheme)
 
+				.setOperatorLabel (
+					chatScheme.getOperatorLabel ())
+
 				.setCredit (
 					chatUser.getCredit ()
 					+ chatScheme.getInitialCredit ());
@@ -1444,7 +1450,9 @@ class ChatUserLogicImplementation
 		) {
 
 			chatUser
-				.setChatAffiliate (chatAffiliate);
+
+				.setChatAffiliate (
+					chatAffiliate);
 
 			return;
 		}

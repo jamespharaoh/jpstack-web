@@ -122,6 +122,9 @@ class ChatMonitorInboxAlarmAction
 			DateTimeZone.forID (
 				chatScheme.getTimezone ());
 
+System.out.println (
+	"XX TIME ZONE: " + timeZone);
+
 		// pull in parameters
 
 		boolean save =
@@ -147,15 +150,24 @@ class ChatMonitorInboxAlarmAction
 
 			try {
 
+				String timestampString =
+					stringFormat (
+						"%s %s",
+						requestContext.parameter (
+							"alarmDate"),
+						requestContext.parameter (
+							"alarmTime"));
+
+System.out.println (
+	"XX TIMESTAMP STRING: " + timestampString);
+
 				Interval interval =
 					parsePartialTimestamp (
 						timeZone,
-						stringFormat (
-							"%s %s",
-							requestContext.parameter (
-								"alarmDate"),
-							requestContext.parameter (
-								"alarmTime")));
+						timestampString);
+
+System.out.println (
+	"XX INTERVAL: " + interval);
 
 				alarmTime =
 					interval.getStart ().toInstant ();
@@ -275,6 +287,9 @@ class ChatMonitorInboxAlarmAction
 
 				.setSticky (
 					sticky);
+
+System.out.println (
+	"XX ALARN TIME: " + chatUserAlarm.getAlarmTime ());
 
 			// insert it if needed
 

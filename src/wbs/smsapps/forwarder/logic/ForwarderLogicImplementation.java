@@ -11,7 +11,12 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Instant;
+
+import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.GlobalId;
@@ -347,9 +352,12 @@ class ForwarderLogicImplementation
 
 	private
 	void sendTemplateCheckParts (
-			SendTemplateCheckWork work) {
+			@NonNull SendTemplateCheckWork work) {
 
-		for (SendPart part : work.template.parts) {
+		for (
+			SendPart part
+				: work.template.parts
+		) {
 
 			// lookup route
 
@@ -480,10 +488,12 @@ class ForwarderLogicImplementation
 					numberHelper.findOrCreate (
 						part.numTo);
 
-				if (! smsTrackerManager.canSend (
+				if (
+					! smsTrackerManager.canSend (
 						work.template.forwarder.getSmsTracker (),
 						part.numToNumber,
-						null)) {
+						Optional.<Instant>absent ())
+				) {
 
 					sendTemplateCheckError (
 						work,
