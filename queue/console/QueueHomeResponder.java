@@ -333,9 +333,7 @@ class QueueHomeResponder
 				objectManager.objectPath (
 					objectManager.getParent (
 						queue),
-					myUser.getSlice (),
-					false,
-					false));
+					myUser.getSlice ()));
 
 			printFormat (
 				"<td>%h</td>\n",
@@ -448,10 +446,9 @@ class QueueHomeResponder
 			printFormat (
 				"<td>%h</td>\n",
 				objectManager.objectPath (
-					objectManager.getParent (queue),
-					myUser.getSlice (),
-					false,
-					false));
+					objectManager.getParent (
+						queue),
+					myUser.getSlice ()));
 
 			printFormat (
 				"<td>%h</td>\n",
