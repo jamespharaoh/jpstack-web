@@ -12,7 +12,8 @@ import wbs.framework.data.annotations.DataClass;
 @Accessors (fluent = true)
 @Data
 @DataClass
-public class ImChatMessageListSuccess {
+public
+class ImChatMessageListSuccess {
 
 	@DataAttribute
 	String status = "success";

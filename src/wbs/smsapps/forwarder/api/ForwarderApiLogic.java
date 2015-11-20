@@ -11,7 +11,8 @@ import wbs.smsapps.forwarder.logic.IncorrectPasswordException;
 import wbs.smsapps.forwarder.logic.ReportableException;
 import wbs.smsapps.forwarder.model.ForwarderRec;
 
-public interface ForwarderApiLogic {
+public
+interface ForwarderApiLogic {
 
 	ForwarderRec lookupForwarder (
 			RequestContext requestContext,

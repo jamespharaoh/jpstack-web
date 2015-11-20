@@ -1,6 +1,7 @@
 package wbs.framework.sql;
 
-public interface SqlLogic {
+public
+interface SqlLogic {
 
 	String quoteIdentifier (
 			String identifier);

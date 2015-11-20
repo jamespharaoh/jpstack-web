@@ -169,6 +169,7 @@ class ChatUserLogicImplementation
 		}
 
 		return null;
+
 	}
 
 	@Override
@@ -379,7 +380,8 @@ class ChatUserLogicImplementation
 	 * @return true if they are
 	 */
 	@Override
-	public boolean compatible (
+	public
+	boolean compatible (
 			@NonNull Gender gender1,
 			@NonNull Orient orient1,
 			@NonNull Gender gender2,

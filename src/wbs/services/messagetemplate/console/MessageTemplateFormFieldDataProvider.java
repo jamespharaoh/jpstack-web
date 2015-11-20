@@ -18,7 +18,10 @@ class MessageTemplateFormFieldDataProvider
 	String mode;
 
 	@Override
-	public String getFormFieldData(Record<?> parent) {
+	public
+	String getFormFieldData (
+			Record<?> parent) {
+
 		String formFieldData = "";
 
 		MessageTemplateTypeRec messageTemplateType =
@@ -26,18 +29,25 @@ class MessageTemplateFormFieldDataProvider
 			(Object)
 			parent;
 
-		for (MessageTemplateParameterRec messageTemplateParameter : messageTemplateType.getMessageTemplateParameters()) {
+		for (
+			MessageTemplateParameterRec messageTemplateParameter
+				: messageTemplateType.getMessageTemplateParameters ()
+		) {
 
 			if (messageTemplateParameter.getLength() != null) {
 
-				formFieldData += messageTemplateParameter.getName()+"="+messageTemplateParameter.getLength().toString()+"&";
+				formFieldData +=
+					messageTemplateParameter.getName () +
+					"=" +
+					messageTemplateParameter.getLength ().toString () +
+					"&";
 
-			}
-			else {
+			} else {
 
 				formFieldData += messageTemplateParameter.getName()+"="+0+"&";
 
 			}
+
 		}
 
 		formFieldData += "minimumTemplateLength="+messageTemplateType.getMinLength()+"&";
@@ -48,14 +58,18 @@ class MessageTemplateFormFieldDataProvider
 	}
 
 	@Override
-	public FormFieldDataProvider setMode (String modeSet) {
+	public
+	FormFieldDataProvider setMode (
+			String modeSet) {
 
-		mode = modeSet;
+		mode =
+			modeSet;
+
 		return this;
 
 	}
 
-	@SingletonComponent("messageTemplateFormFieldDataProviderConfig")
+	@SingletonComponent ("messageTemplateFormFieldDataProviderConfig")
 	public static
 	class Config {
 
@@ -68,7 +82,9 @@ class MessageTemplateFormFieldDataProvider
 		FormFieldDataProvider messageTemplateSettingsFormFieldDataProvider () {
 
 			return messageTemplateFormFieldDataProvider.get ()
-				.setMode ("settings");
+
+				.setMode (
+					"settings");
 
 		}
 

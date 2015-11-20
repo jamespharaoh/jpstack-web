@@ -4,7 +4,8 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-public interface WebExceptionHandler {
+public
+interface WebExceptionHandler {
 
 	void handleException (
 			Throwable exception)

@@ -570,7 +570,8 @@ class ConsoleRequestContextImplementation
 	}
 
 	@Override
-	public TabContext setTabContext (
+	public
+	TabContext setTabContext (
 			@NonNull TabContext tabContext) {
 
 		request (
@@ -667,28 +668,53 @@ class ConsoleRequestContextImplementation
 	String prettyMsInterval (
 			Long interval) {
 
-		if (interval == null)
+		if (interval == null) {
+
 			return null;
 
-		if (interval < 2 * 1000L)
-			return pluralise (interval, "millisecond");
+		} else if (interval < 2 * 1000L) {
 
-		if (interval < 2 * 60000L)
-			return pluralise (interval / 1000L, "second");
+			return pluralise (
+				interval,
+				"millisecond");
 
-		if (interval < 2 * 3600000L)
-			return pluralise (interval / 60000L, "minute");
+		} else if (interval < 2 * 60000L) {
 
-		if (interval < 2 * 86400000L)
-			return pluralise (interval / 3600000L, "hour");
+			return pluralise (
+				interval / 1000L,
+				"second");
 
-		if (interval < 2 * 2678400000L)
-			return pluralise (interval / 86400000L, "day");
+		} else if (interval < 2 * 3600000L) {
 
-		if (interval < 2 * 31557600000L)
-			return pluralise (interval / 2592000000L, "month");
+			return pluralise (
+				interval / 60000L,
+				"minute");
 
-		return pluralise (interval / 31556736000L, "year");
+		} else if (interval < 2 * 86400000L) {
+
+			return pluralise (
+				interval / 3600000L,
+				"hour");
+
+		} else if (interval < 2 * 2678400000L) {
+
+			return pluralise (
+				interval / 86400000L,
+				"day");
+
+		} else if (interval < 2 * 31557600000L) {
+
+			return pluralise (
+				interval / 2592000000L,
+				"month");
+
+		} else {
+
+			return pluralise (
+				interval / 31556736000L,
+				"year");
+
+		}
 
 	}
 
@@ -710,25 +736,47 @@ class ConsoleRequestContextImplementation
 	String prettySecsInterval (
 			Long interval) {
 
-		if (interval == null)
+		if (interval == null) {
+
 			return null;
 
-		if (interval < 2 * 60L)
-			return pluralise (interval, "second");
+		} else if (interval < 2 * 60L) {
 
-		if (interval < 2 * 3600L)
-			return pluralise (interval / 60L, "minute");
+			return pluralise (
+				interval,
+				"second");
 
-		if (interval < 2 * 86400L)
-			return pluralise (interval / 3600L, "hour");
+		} else if (interval < 2 * 3600L) {
 
-		if (interval < 2 * 2678400L)
-			return pluralise (interval / 86400L, "day");
+			return pluralise (
+				interval / 60L,
+				"minute");
 
-		if (interval < 2 * 31557600L)
-			return pluralise (interval / 2592000L, "month");
+		} else if (interval < 2 * 86400L) {
 
-		return pluralise (interval / 31556736L, "year");
+			return pluralise (
+				interval / 3600L,
+				"hour");
+
+		} else if (interval < 2 * 2678400L) {
+
+			return pluralise (
+				interval / 86400L,
+				"day");
+
+		} else if (interval < 2 * 31557600L) {
+
+			return pluralise (
+				interval / 2592000L,
+				"month");
+
+		} else {
+
+			return pluralise (
+				interval / 31556736L,
+				"year");
+
+		}
 
 	}
 

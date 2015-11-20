@@ -91,7 +91,8 @@ class ChatVideoSetCommand
 	// details
 
 	@Override
-	public String[] getCommandTypes () {
+	public
+	String[] getCommandTypes () {
 
 		return new String [] {
 			"chat.video_set"
@@ -174,8 +175,10 @@ class ChatVideoSetCommand
 
 		return inboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (defaultService),
-			Optional.of (affiliate),
+			Optional.of (
+				defaultService),
+			Optional.of (
+				affiliate),
 			command);
 
 	}

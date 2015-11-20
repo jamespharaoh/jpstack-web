@@ -52,10 +52,10 @@ class ConsoleNotFoundHandler
 		new Tab ("Not found") {
 
 		@Override
-		public String getUrl () {
+		public
+		String getUrl () {
 
-			return requestContext
-				.requestPath ();
+			return requestContext.requestPath ();
 
 		}
 

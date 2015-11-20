@@ -99,7 +99,8 @@ class ChatNumberReportLogicImplementation
 	}
 
 	@Override
-	public boolean isNumberReportPastPermanentDeliveryConstraint (
+	public
+	boolean isNumberReportPastPermanentDeliveryConstraint (
 			NumberRec number) {
 
 		ChatUserNumberReportRec numberReportRec =

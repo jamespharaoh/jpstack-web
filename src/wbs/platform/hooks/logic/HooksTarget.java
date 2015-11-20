@@ -1,5 +1,6 @@
 package wbs.platform.hooks.logic;
 
-public interface HooksTarget {
+public
+interface HooksTarget {
 
 }

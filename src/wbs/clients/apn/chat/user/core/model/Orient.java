@@ -1,16 +1,19 @@
 package wbs.clients.apn.chat.user.core.model;
 
-public enum Orient {
+public
+enum Orient {
 
 	gay,
 	straight,
 	bi;
 
-	public boolean doesSame () {
+	public
+	boolean doesSame () {
 		return this != straight;
 	}
 
-	public boolean doesDifferent () {
+	public
+	boolean doesDifferent () {
 		return this != gay;
 	}
 

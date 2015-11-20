@@ -8,12 +8,9 @@ import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
 import wbs.smsapps.forwarder.model.ForwarderRec;
 
-public interface ForwarderLogic {
+public
+interface ForwarderLogic {
 
-	/**
-	 * Takes a SendTemplate and checks it for validity, filling in missing bits
-	 * as it goes.
-	 */
 	boolean sendTemplateCheck (
 			SendTemplate template);
 

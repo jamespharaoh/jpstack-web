@@ -27,7 +27,8 @@ class ChatUserOnlineComparator
 	}
 
 	@Override
-	public int compare (
+	public
+	int compare (
 			ChatUserRec chatUser1,
 			ChatUserRec chatUser2) {
 

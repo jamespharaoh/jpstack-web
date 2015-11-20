@@ -401,7 +401,8 @@ class ForwarderApiLogicImplementation
 
 	@Override
 	@SuppressWarnings ("unchecked")
-	public Map<String,Object> unsafeMapStringObject (
+	public
+	Map<String,Object> unsafeMapStringObject (
 			Object input) {
 
 		return (Map<String,Object>) input;
@@ -410,7 +411,8 @@ class ForwarderApiLogicImplementation
 
 	@Override
 	@SuppressWarnings ("unchecked")
-	public List<Map<String,Object>> unsafeListMapStringObject (
+	public
+	List<Map<String,Object>> unsafeListMapStringObject (
 			Object input) {
 
 		return (List<Map<String,Object>>) input;

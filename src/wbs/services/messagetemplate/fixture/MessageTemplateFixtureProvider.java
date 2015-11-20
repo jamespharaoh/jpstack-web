@@ -23,7 +23,8 @@ import wbs.services.messagetemplate.model.MessageTemplateTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateValueObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateValueRec;
 
-public class MessageTemplateFixtureProvider
+public
+class MessageTemplateFixtureProvider
 	implements FixtureProvider {
 
 	// dependencies

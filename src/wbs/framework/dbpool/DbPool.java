@@ -382,7 +382,8 @@ class DbPool
 		}
 
 		@Override
-		public int compareTo (
+		public
+		int compareTo (
 				ConnectionStuff other) {
 
 			if (other.serial < serial)
@@ -396,7 +397,8 @@ class DbPool
 		}
 
 		@Override
-		public Object invoke (
+		public
+		Object invoke (
 				Object proxy,
 				Method method,
 				Object[] args)

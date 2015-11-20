@@ -18,7 +18,8 @@ import wbs.framework.data.annotations.DataClass;
 @DataClass ("object-ticket-create-page")
 @PrototypeComponent ("objectTicketCreatePageSpec")
 @ConsoleModuleData
-public class ObjectTicketCreatePageSpec {
+public
+class ObjectTicketCreatePageSpec {
 
 	// tree attributes
 

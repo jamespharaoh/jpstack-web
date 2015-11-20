@@ -2,9 +2,10 @@ package wbs.clients.apn.chat.core.logic;
 
 import wbs.sms.number.core.model.NumberRec;
 
-public interface ChatNumberReportLogic {
+public
+interface ChatNumberReportLogic {
 
-	public boolean isNumberReportSuccessful (
+	boolean isNumberReportSuccessful (
 			NumberRec number);
 
 	boolean isNumberReportPastPermanentDeliveryConstraint (

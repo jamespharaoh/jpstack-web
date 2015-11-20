@@ -4,6 +4,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention (RetentionPolicy.RUNTIME)
-public @interface RpcExport {
-	public String value ();
+public
+@interface RpcExport {
+
+	String value ();
+
 }

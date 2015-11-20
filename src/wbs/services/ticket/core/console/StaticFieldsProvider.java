@@ -4,8 +4,7 @@ import wbs.console.forms.FormFieldSet;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 
-
-@PrototypeComponent(value = "staticFieldsProvider")
+@PrototypeComponent ("staticFieldsProvider")
 public
 class StaticFieldsProvider
 	implements FieldsProvider {
@@ -14,24 +13,36 @@ class StaticFieldsProvider
 	String mode;
 
 	@Override
-	public FormFieldSet getFields (Record<?> parent) {
+	public
+	FormFieldSet getFields (
+			Record<?> parent) {
 
 		return formFields;
 
 	}
 
 	@Override
-	public FieldsProvider setFields (FormFieldSet fields) {
+	public
+	FieldsProvider setFields (
+			FormFieldSet fields) {
 
-		formFields = fields;
+		formFields =
+			fields;
+
 		return this;
 
 	}
 
 	@Override
-	public FieldsProvider setMode(String modeSet) {
-		mode = modeSet;
+	public
+	FieldsProvider setMode (
+			String modeSet) {
+
+		mode =
+			modeSet;
+
 		return this;
+
 	}
 
 }

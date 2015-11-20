@@ -197,15 +197,18 @@ class XmlRpcAction
 
 	}
 
-	public RpcResult realGo ()
+	public
+	RpcResult realGo ()
 		throws IOException {
 
 		try {
 
 			XmlRpcSource source =
-				parse (requestContext.inputStream ());
+				parse (
+					requestContext.inputStream ());
 
-			return rpcHandler.handle (source);
+			return rpcHandler.handle (
+				source);
 
 		} catch (RpcException exception) {
 
@@ -213,7 +216,8 @@ class XmlRpcAction
 
 		} catch (Exception exception) {
 
-			throw new RuntimeException (exception);
+			throw new RuntimeException (
+				exception);
 
 		}
 

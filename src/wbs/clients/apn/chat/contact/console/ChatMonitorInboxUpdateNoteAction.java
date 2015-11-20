@@ -48,9 +48,11 @@ class ChatMonitorInboxUpdateNoteAction
 	UserObjectHelper userHelper;
 
 	@Override
-	public Responder backupResponder () {
+	public
+	Responder backupResponder () {
 
-		return responder ("chatMonitorInboxSummaryResponder");
+		return responder (
+			"chatMonitorInboxSummaryResponder");
 
 	}
 

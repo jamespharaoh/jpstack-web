@@ -28,6 +28,8 @@ public
 class TicketFieldsProvider
 	implements FieldsProvider {
 
+	// dependencies
+
 	@Inject
 	ConsoleModuleBuilder consoleModuleBuilder;
 
@@ -40,9 +42,13 @@ class TicketFieldsProvider
 	@Inject
 	TicketConsoleHelper ticketConsoleHelper;
 
+	// state
+
 	FormFieldSet formFields;
 
 	String mode;
+
+	// implementation
 
 	@Override
 	public
@@ -186,22 +192,30 @@ class TicketFieldsProvider
 	}
 
 	@Override
-	public FieldsProvider setFields(FormFieldSet fields) {
+	public
+	FieldsProvider setFields (
+			FormFieldSet fields) {
 
-		formFields = fields;
+		formFields =
+			fields;
+
 		return this;
 
 	}
 
 	@Override
-	public FieldsProvider setMode (String modeSet) {
+	public
+	FieldsProvider setMode (
+			String modeSet) {
 
-		mode = modeSet;
+		mode =
+			modeSet;
+
 		return this;
 
 	}
 
-	@SingletonComponent("ticketFieldsProviderConfig")
+	@SingletonComponent ("ticketFieldsProviderConfig")
 	public static
 	class Config {
 
@@ -213,7 +227,9 @@ class TicketFieldsProvider
 		FieldsProvider ticketListFieldsProvider () {
 
 			return ticketFieldsProvider.get ()
-				.setMode ("list");
+
+				.setMode (
+					"list");
 
 		}
 
@@ -222,7 +238,9 @@ class TicketFieldsProvider
 		FieldsProvider ticketCreateFieldsProvider () {
 
 			return ticketFieldsProvider.get ()
-				.setMode ("create");
+
+				.setMode (
+					"create");
 
 		}
 
@@ -231,7 +249,9 @@ class TicketFieldsProvider
 		FieldsProvider ticketSettingsFieldsProvider () {
 
 			return ticketFieldsProvider.get ()
-				.setMode ("settings");
+
+				.setMode (
+					"settings");
 
 		}
 
@@ -240,7 +260,9 @@ class TicketFieldsProvider
 		FieldsProvider ticketSummaryFieldsProvider () {
 
 			return ticketFieldsProvider.get ()
-				.setMode ("summary");
+
+				.setMode (
+					"summary");
 
 		}
 

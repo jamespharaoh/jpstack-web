@@ -223,16 +223,21 @@ class ChatMiscLogicImplementation
 	 * @return Monitor to send
 	 */
 	@Override
-	public ChatUserRec getOnlineMonitorForOutbound (
+	public
+	ChatUserRec getOnlineMonitorForOutbound (
 			ChatUserRec thisUser) {
 
 		List<ChatUserRec> monitors =
-			getOnlineMonitorsForOutbound (thisUser);
+			getOnlineMonitorsForOutbound (
+				thisUser);
 
 		List<UserDistance> distances =
-			chatUserLogic.getUserDistances (thisUser, monitors);
+			chatUserLogic.getUserDistances (
+				thisUser,
+				monitors);
 
-		Collections.sort (distances);
+		Collections.sort (
+			distances);
 
 		return distances.size () > 0
 			? distances.get (0).user ()

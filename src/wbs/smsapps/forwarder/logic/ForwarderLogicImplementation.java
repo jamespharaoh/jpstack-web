@@ -678,21 +678,27 @@ class ForwarderLogicImplementation
 			if (lastForwarderMessageOut != null) {
 
 				lastForwarderMessageOut
-					.setNextForwarderMessageOut (sendPart.forwarderMessageOut);
+
+					.setNextForwarderMessageOut (
+						sendPart.forwarderMessageOut);
 
 				sendPart.forwarderMessageOut
-					.setPrevForwarderMessageOut (lastForwarderMessageOut);
+
+					.setPrevForwarderMessageOut (
+						lastForwarderMessageOut);
 
 			}
 
-			lastForwarderMessageOut = sendPart.forwarderMessageOut;
+			lastForwarderMessageOut =
+				sendPart.forwarderMessageOut;
 
 		}
 
 	}
 
 	@Override
-	public ForwarderMessageOutRec sendMessage (
+	public
+	ForwarderMessageOutRec sendMessage (
 			ForwarderRec forwarder,
 			ForwarderMessageInRec fmIn,
 			String message,
@@ -711,7 +717,7 @@ class ForwarderLogicImplementation
 		sendTemplate.fmIn = fmIn;
 
 		SendPart sendPart =
-			new SendPart();
+			new SendPart ();
 
 		sendTemplate.parts.add (
 			sendPart);
@@ -726,7 +732,7 @@ class ForwarderLogicImplementation
 		sendPart.pri = pri;
 		sendPart.medias = medias;
 
-		if (!sendTemplateCheck(sendTemplate)) {
+		if (! sendTemplateCheck (sendTemplate)) {
 
 			if (sendTemplate.sendError == SendError.trackerBlocked)
 				return null;
@@ -737,9 +743,10 @@ class ForwarderLogicImplementation
 
 		}
 
-		sendTemplateSend(sendTemplate);
+		sendTemplateSend (
+			sendTemplate);
 
-		return sendTemplate.parts.get(0).forwarderMessageOut;
+		return sendTemplate.parts.get (0).forwarderMessageOut;
 
 	}
 

@@ -119,7 +119,8 @@ class ObjectHelperProviderManager {
 
 	}
 
-	public ObjectHelperProvider forObjectClass (
+	public
+	ObjectHelperProvider forObjectClass (
 			Class<?> objectClass) {
 
 		return objectHelperProvidersByObjectClass.get (
@@ -127,7 +128,8 @@ class ObjectHelperProviderManager {
 
 	}
 
-	public ObjectHelperProvider forObjectTypeId (
+	public
+	ObjectHelperProvider forObjectTypeId (
 			@NonNull Integer objectTypeId) {
 
 		return objectHelperProvidersByTypeId.get (
@@ -135,13 +137,15 @@ class ObjectHelperProviderManager {
 
 	}
 
-	public List<ObjectHelperProvider> list () {
+	public
+	List<ObjectHelperProvider> list () {
 
 		return objectHelperProviders;
 
 	}
 
-	public ObjectHelperProvider forObjectClassSearch (
+	public
+	ObjectHelperProvider forObjectClassSearch (
 			Class<?> objectClass) {
 
 		while (objectClass != Object.class) {
@@ -160,4 +164,5 @@ class ObjectHelperProviderManager {
 		return null;
 
 	}
+
 }

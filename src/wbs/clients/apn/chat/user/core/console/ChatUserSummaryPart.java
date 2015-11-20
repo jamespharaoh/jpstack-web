@@ -83,7 +83,8 @@ class ChatUserSummaryPart
 
 		chatUser =
 			chatUserHelper.find (
-				requestContext.stuffInt ("chatUserId"));
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		creditCheckResult =
 			chatCreditLogic.userCreditCheck (
@@ -104,11 +105,13 @@ class ChatUserSummaryPart
 			new Comparator<ChatLogicHooks.ChatUserCharge> () {
 
 			@Override
-			public int compare (
+			public
+			int compare (
 					ChatUserCharge left,
 					ChatUserCharge right) {
 
-				return left.name.compareTo (right.name);
+				return left.name.compareTo (
+					right.name);
 
 			}
 
@@ -497,14 +500,14 @@ class ChatUserSummaryPart
 						"%s (%s)",
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
-							Long.valueOf(charges.getCreditLimit ())),
+							(long) charges.getCreditLimit ()),
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
-							Long.valueOf(chatUser.getCreditLimit ())))
+							(long) chatUser.getCreditLimit ()))
 
 					: currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
-						Long.valueOf(chatUser.getCreditLimit ())),
+						(long) chatUser.getCreditLimit ()),
 
 				"</tr>\n");
 
@@ -517,7 +520,7 @@ class ChatUserSummaryPart
 				"<td>%s</td>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					Long.valueOf(chatUser.getCreditDailyAmount ())),
+					(long) chatUser.getCreditDailyAmount ()),
 				"<tr>\n");
 
 			printFormat (
