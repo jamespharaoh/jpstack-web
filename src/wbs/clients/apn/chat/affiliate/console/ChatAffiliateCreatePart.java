@@ -61,18 +61,18 @@ class ChatAffiliateCreatePart
 		chatSchemes =
 			new TreeMap<String,Integer> ();
 
-		for (ChatSchemeRec chatScheme
-				: chat.getChatSchemes ()) {
+		for (
+			ChatSchemeRec chatScheme
+				: chat.getChatSchemes ()
+		) {
 
 			if (! privChecker.can (chatScheme, "affiliate_create"))
 				continue;
 
 			chatSchemes.put (
-				objectManager.objectPath (
+				objectManager.objectPathMini (
 					chatScheme,
-					chat,
-					true,
-					false),
+					chat),
 				chatScheme.getId ());
 
 		}

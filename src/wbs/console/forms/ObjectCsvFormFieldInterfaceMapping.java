@@ -66,7 +66,7 @@ class ObjectCsvFormFieldInterfaceMapping<Container,Generic extends Record<Generi
 
 		} else {
 
-			Record<?> root;
+			Optional<Record<?>> root;
 
 			if (
 				isNotNull (
@@ -74,15 +74,16 @@ class ObjectCsvFormFieldInterfaceMapping<Container,Generic extends Record<Generi
 			) {
 
 				root =
-					(Record<?>)
-					BeanLogic.getProperty (
-						container,
-						rootFieldName);
+					Optional.<Record<?>>of (
+						(Record<?>)
+						BeanLogic.getProperty (
+							container,
+							rootFieldName));
 
 			} else {
 
 				root =
-					null;
+					Optional.<Record<?>>absent ();
 
 			}
 

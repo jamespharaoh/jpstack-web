@@ -109,10 +109,9 @@ class ChatBroadcastListPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				objectManager.objectPath (
+				objectManager.objectPathMini (
 					chatBroadcast.getChatUser (),
-					chat,
-					true));
+					chat));
 
 			printFormat (
 				"<td>%h</td>\n",

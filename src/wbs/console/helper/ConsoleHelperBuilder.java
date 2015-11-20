@@ -439,7 +439,7 @@ class ConsoleHelperBuilder {
 			String path =
 				objectManager.objectPath (
 					object,
-					(Record) assumedRoot.orNull (),
+					assumedRoot,
 					mini,
 					false);
 

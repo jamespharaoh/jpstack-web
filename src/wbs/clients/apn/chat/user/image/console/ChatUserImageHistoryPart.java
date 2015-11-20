@@ -102,42 +102,50 @@ class ChatUserImageHistoryPart
 
 		}
 
-		for (ChatUserImageRec chatUserImage
-				: chatUserImages) {
+		for (
+			ChatUserImageRec chatUserImage
+				: chatUserImages
+		) {
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUserImage.getType (),
+				chatUserImage.getType ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatUserImage.getIndex () != null
 					? chatUserImage.getIndex () + 1
-					: "",
+					: "");
 
+			printFormat (
 				"<td style=\"text-align: center;\">%s</td>\n",
 				chatUserImage.getMedia () == null
 					? "(none)"
 					: mediaConsoleLogic.mediaThumb100 (
-						chatUserImage.getMedia ()),
+						chatUserImage.getMedia ()));
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUserImage.getTimestamp (),
+				chatUserImage.getTimestamp ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUserImage.getStatus (),
+				chatUserImage.getStatus ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				objectManager.objectPath (
+				objectManager.objectPathMini (
 					chatUserImage.getModerator (),
-					myUser.getSlice (),
-					true,
-					false),
+					myUser.getSlice ()));
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUserImage.getModerationTime (),
+				chatUserImage.getModerationTime ());
 
+			printFormat (
 				"</tr>\n");
 
 		}

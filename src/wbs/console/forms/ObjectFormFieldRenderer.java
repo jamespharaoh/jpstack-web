@@ -223,15 +223,21 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		// lookup root
 
-		Record<?> root = null;
+		Optional<Record<?>> root;
 
 		if (rootFieldName != null) {
 
 			root =
-				(Record<?>)
-				BeanLogic.getProperty (
-					container,
-					rootFieldName);
+				Optional.<Record<?>>of (
+					(Record<?>)
+					BeanLogic.getProperty (
+						container,
+						rootFieldName));
+
+		} else {
+
+			root =
+				Optional.<Record<?>>absent ();
 
 		}
 

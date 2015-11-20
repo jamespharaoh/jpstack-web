@@ -141,13 +141,15 @@ class ChatUserImageListPart
 		) {
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatUserImage.getIndex () != null
 					? chatUserImage.getIndex () + 1
-					: "",
+					: "");
 
+			printFormat (
 				"<td>%h</td>\n",
 				equal (
 						chatUserLogic.getMainChatUserImageByType (
@@ -155,8 +157,9 @@ class ChatUserImageListPart
 							type),
 						chatUserImage)
 					? "Y"
-					: "",
+					: "");
 
+			printFormat (
 				"<td style=\"text-align: center;\">",
 				"<a href=\"%h\">%s</a>",
 				requestContext.resolveLocalUrl (
@@ -169,18 +172,19 @@ class ChatUserImageListPart
 					? "(none)"
 					: mediaConsoleLogic.mediaThumb100 (
 						chatUserImage.getMedia ()),
-				"</td>\n",
+				"</td>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUserImage.getTimestamp (),
+				chatUserImage.getTimestamp ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				objectManager.objectPath (
+				objectManager.objectPathMini (
 					chatUserImage.getModerator (),
-					myUser.getSlice (),
-					true,
-					false),
+					myUser.getSlice ()));
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatUserImage.getClassification ());
 

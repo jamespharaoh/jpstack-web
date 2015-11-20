@@ -183,7 +183,8 @@ class ConsoleObjectManagerImplementation
 		String path =
 			objectManager.objectPath (
 				object,
-				assumedRoot,
+				Optional.<Record<?>>fromNullable (
+					assumedRoot),
 				mini,
 				false);
 
@@ -350,16 +351,11 @@ class ConsoleObjectManagerImplementation
 					"%s.htmlForObject (%s, %s, %s)",
 					getClass ().getName (),
 					objectManager.objectPath (
-						object,
-						null,
-						false,
-						false),
+						object),
 					objectManager.objectPath (
-						assumedRoot,
-						null,
-						false,
-						false),
-					Boolean.toString (mini)));
+						assumedRoot),
+					Boolean.toString (
+						mini)));
 
 		}
 
@@ -368,7 +364,8 @@ class ConsoleObjectManagerImplementation
 		}
 
 		ConsoleHelper<?> objectHelper =
-			getConsoleObjectHelper (object);
+			getConsoleObjectHelper (
+				object);
 
 		return objectHelper.getHtml (
 			object,
@@ -423,10 +420,7 @@ class ConsoleObjectManagerImplementation
 				stringFormat (
 					"canView (%s) userId=%s",
 					objectManager.objectPath (
-						object,
-						null,
-						false,
-						false),
+						object),
 					requestContext.userId ()));
 
 		}
@@ -538,8 +532,8 @@ class ConsoleObjectManagerImplementation
 	Class<?> objectTypeCodeToClass (
 			String typeCode) {
 
-		return objectManager
-			.objectTypeCodeToClass (typeCode);
+		return objectManager.objectTypeCodeToClass (
+			typeCode);
 
 	}
 
@@ -548,8 +542,20 @@ class ConsoleObjectManagerImplementation
 	String objectPath (
 			Record<?> dataObject) {
 
-		return objectManager
-			.objectPath (dataObject);
+		return objectManager.objectPath (
+			dataObject);
+
+	}
+
+	@Override
+	public
+	String objectPath (
+			Record<?> dataObject,
+			Optional<Record<?>> root) {
+
+		return objectManager.objectPath (
+			dataObject,
+			root);
 
 	}
 
@@ -559,24 +565,9 @@ class ConsoleObjectManagerImplementation
 			Record<?> dataObject,
 			Record<?> root) {
 
-		return objectManager
-			.objectPath (
-				dataObject,
-				root);
-
-	}
-
-	@Override
-	public
-	String objectPath (
-			Record<?> dataObject,
-			Record<?> root,
-			boolean mini) {
-
 		return objectManager.objectPath (
 			dataObject,
-			root,
-			mini);
+			root);
 
 	}
 
@@ -584,7 +575,7 @@ class ConsoleObjectManagerImplementation
 	public
 	String objectPath (
 			Record<?> dataObject,
-			Record<?> assumedRoot,
+			Optional<Record<?>> assumedRoot,
 			boolean mini,
 			boolean preload) {
 
@@ -851,9 +842,33 @@ class ConsoleObjectManagerImplementation
 	public
 	String objectPathMini (
 			Record<?> object,
+			Optional<Record<?>> root) {
+
+		return objectManager.objectPathMini (
+			object,
+			root);
+
+	}
+
+	@Override
+	public
+	String objectPathMini (
+			Record<?> object,
 			Record<?> root) {
 
 		return objectManager.objectPathMini (
+			object,
+			root);
+
+	}
+
+	@Override
+	public
+	String objectPathMiniPreload (
+			Record<?> object,
+			Optional<Record<?>> root) {
+
+		return objectManager.objectPathMiniPreload (
 			object,
 			root);
 

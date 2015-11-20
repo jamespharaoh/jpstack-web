@@ -173,7 +173,7 @@ class ObjectManagerImplementation
 	public
 	String objectPathMini (
 			@NonNull Record<?> object,
-			@NonNull Record<?> root) {
+			@NonNull Optional<Record<?>> root) {
 
 		return objectPath (
 			object,
@@ -185,9 +185,24 @@ class ObjectManagerImplementation
 
 	@Override
 	public
+	String objectPathMini (
+			@NonNull Record<?> object,
+			@NonNull Record<?> root) {
+
+		return objectPath (
+			object,
+			Optional.<Record<?>>of (
+				root),
+			true,
+			false);
+
+	}
+
+	@Override
+	public
 	String objectPathMiniPreload (
-			Record<?> object,
-			Record<?> root) {
+			@NonNull Record<?> object,
+			@NonNull Optional<Record<?>> root) {
 
 		return objectPath (
 			object,
@@ -199,9 +214,24 @@ class ObjectManagerImplementation
 
 	@Override
 	public
+	String objectPathMiniPreload (
+			@NonNull Record<?> object,
+			@NonNull Record<?> root) {
+
+		return objectPath (
+			object,
+			Optional.<Record<?>>of (
+				root),
+			true,
+			true);
+
+	}
+
+	@Override
+	public
 	String objectPath (
-			Record<?> dataObject,
-			Record<?> root) {
+			@NonNull Record<?> dataObject,
+			@NonNull Optional<Record<?>> root) {
 
 		return objectPath (
 			dataObject,
@@ -214,14 +244,14 @@ class ObjectManagerImplementation
 	@Override
 	public
 	String objectPath (
-			Record<?> dataObject,
-			Record<?> root,
-			boolean mini) {
+			@NonNull Record<?> dataObject,
+			@NonNull Record<?> root) {
 
 		return objectPath (
 			dataObject,
-			root,
-			mini,
+			Optional.<Record<?>>of (
+				root),
+			false,
 			false);
 
 	}
@@ -230,7 +260,7 @@ class ObjectManagerImplementation
 	public
 	String objectPath (
 			Record<?> object,
-			Record<?> assumedRoot,
+			Optional<Record<?>> assumedRoot,
 			boolean mini,
 			boolean preload) {
 
@@ -416,13 +446,16 @@ class ObjectManagerImplementation
 		SortedMap<String,RecordType> ret =
 			new TreeMap<String,RecordType> ();
 
-		for (RecordType object
-				: objects) {
+		for (
+			RecordType object
+				: objects
+		) {
 
 			ret.put (
 				objectPath (
 					object,
-					root,
+					Optional.<Record<?>>fromNullable (
+						root),
 					mini,
 					false),
 				object);

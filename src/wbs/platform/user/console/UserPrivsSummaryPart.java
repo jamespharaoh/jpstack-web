@@ -50,7 +50,8 @@ class UserPrivsSummaryPart
 
 		UserRec user =
 			userHelper.find (
-				requestContext.stuffInt ("userId"));
+				requestContext.stuffInt (
+					"userId"));
 
 		// load up some info about the acting user
 
@@ -58,14 +59,19 @@ class UserPrivsSummaryPart
 			userHelper.find (
 				requestContext.userId ());
 
-		for (UserPrivRec userPriv
-				: user.getUserPrivs ()) {
+		for (
+			UserPrivRec userPriv
+				: user.getUserPrivs ()
+		) {
 
 			// check we can see this priv
 
-			if (! privChecker.canGrant (
-					userPriv.getPriv ().getId ()))
+			if (
+				! privChecker.canGrant (
+					userPriv.getPriv ().getId ())
+			) {
 				continue;
+			}
 
 			PrivRec priv =
 				userPriv.getPriv ();
@@ -82,9 +88,7 @@ class UserPrivsSummaryPart
 			privStuff.path =
 				objectManager.objectPath (
 					parent,
-					myUser.getSlice (),
-					false,
-					false);
+					myUser.getSlice ());
 
 			privStuff.privCode =
 				priv.getCode ();
@@ -128,9 +132,7 @@ class UserPrivsSummaryPart
 					privStuff.path =
 						objectManager.objectPath (
 							parent,
-							myUser.getSlice (),
-							false,
-							false);
+							myUser.getSlice ());
 
 					privStuff.privCode =
 						priv.getCode ();

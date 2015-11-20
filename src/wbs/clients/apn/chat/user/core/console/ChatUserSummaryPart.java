@@ -167,7 +167,9 @@ class ChatUserSummaryPart
 			"<th>Operator label</th>\n",
 
 			"<td>%h</td>\n",
-			chatUser.getOperatorLabel (),
+			chatUser.getOperatorLabel () != null
+				? chatUser.getOperatorLabel ()
+				: "",
 
 			"</tr>\n");
 
