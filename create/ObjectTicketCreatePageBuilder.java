@@ -39,7 +39,8 @@ import wbs.services.ticket.core.model.TicketManagerObjectHelper;
 
 @PrototypeComponent ("objectTicketCreatePageBuilder")
 @ConsoleModuleBuilderHandler
-public class ObjectTicketCreatePageBuilder {
+public
+class ObjectTicketCreatePageBuilder {
 
 	// dependencies
 
