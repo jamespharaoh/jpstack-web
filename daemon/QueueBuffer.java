@@ -59,7 +59,8 @@ class QueueBuffer<K,V> {
 	 * @throws IllegalArgumentException
 	 *             if fullSize is < 1.
 	 */
-	public QueueBuffer (
+	public
+	QueueBuffer (
 			int fullSize) {
 
 		if (fullSize < 1)

@@ -18,7 +18,8 @@ class WhereDeletedCriteriaSpec
 	implements CriteriaSpec {
 
 	@Override
-	public boolean evaluate (
+	public
+	boolean evaluate (
 			ConsoleHelper<?> objectHelper,
 			Record<?> object) {
 

@@ -1,99 +1,168 @@
 package wbs.platform.php;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-class PhpInteger extends AbstractPhpEntity {
+class PhpInteger
+	extends AbstractPhpEntity {
 
-	private int value;
+	private
+	int value;
 
-	public PhpInteger(int newValue) {
-		super(PhpType.pInteger);
-		value = newValue;
+	public
+	PhpInteger (
+			int newValue) {
+
+		super (
+			PhpType.pInteger);
+
+		value =
+			newValue;
+
 	}
 
 	@Override
-	public Boolean asBoolean() {
+	public
+	Boolean asBoolean () {
+
 		return value != 0;
+
 	}
 
 	@Override
-	public Integer asInteger() {
+	public
+	Integer asInteger () {
+
 		return (int) value;
+
 	}
 
 	@Override
-	public Long asLong() {
+	public
+	Long asLong () {
+
 		return (long) value;
+
 	}
 
 	@Override
-	public Double asDouble() {
+	public
+	Double asDouble () {
+
 		return (double) value;
+
 	}
 
 	@Override
-	public String asString() {
-		return Long.toString(value);
+	public
+	String asString () {
+
+		return Long.toString (
+			value);
+
 	}
 
 	@Override
-	public String asString(String encoding) {
-		return Long.toString(value);
+	public
+	String asString (
+			String encoding) {
+
+		return Long.toString (
+			value);
+
 	}
 
 	@Override
-	public byte[] asByteArray() {
+	public
+	byte[] asByteArray () {
+
 		try {
-			return Long.toString(value).getBytes("iso-8859-1");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
+
+			return Long.toString (
+				value
+			).getBytes (
+				"iso-8859-1");
+
+		} catch (UnsupportedEncodingException exception) {
+
+			throw new RuntimeException (
+				exception);
+
 		}
+
 	}
 
 	@Override
-	public Map<Object,PhpEntity> asMap () {
-		return ImmutableMap.<Object,PhpEntity>builder ()
-			.put (0, this)
-			.build ();
+	public
+	Map<Object,PhpEntity> asMap () {
+
+		return ImmutableMap.<Object,PhpEntity>of (
+			0,
+			this);
+
 	}
 
 	@Override
-	public List<PhpEntity> asList() {
-		List<PhpEntity> ret = new ArrayList<PhpEntity>();
-		ret.add(this);
-		return ret;
+	public
+	List<PhpEntity> asList () {
+
+		return ImmutableList.<PhpEntity>of (
+			this);
+
 	}
 
 	@Override
-	public Map<Object,PhpEntity> asObjectMap () {
-		return ImmutableMap.<Object,PhpEntity>builder ()
-			.put ("scalar", this)
-			.build ();
+	public
+	Map<Object,PhpEntity> asObjectMap () {
+
+		return ImmutableMap.<Object,PhpEntity>of (
+			"scalar",
+			this);
+
 	}
 
 	@Override
-	public Object asObject() {
+	public
+	Object asObject () {
+
 		return value;
+
 	}
 
 	@Override
-	public int hashCode() {
+	public
+	int hashCode () {
+
 		return (int) (value & 0xffffffff);
+
 	}
 
 	@Override
-	public boolean equals(Object object) {
-		if (!(object instanceof PhpInteger))
+	public
+	boolean equals (
+			Object object) {
+
+		if (! (object instanceof PhpInteger)) {
 			return false;
-		PhpInteger other = (PhpInteger) object;
+		}
+
+		PhpInteger other =
+			(PhpInteger) object;
+
 		return value == other.value;
+
 	}
 
-	public final static PhpInteger zero = new PhpInteger(0),
-			one = new PhpInteger(1);
+	public final static
+	PhpInteger zero =
+		new PhpInteger (0);
+
+	public final static
+	PhpInteger one =
+		new PhpInteger (1);
+
 }

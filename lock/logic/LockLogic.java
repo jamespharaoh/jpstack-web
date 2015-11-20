@@ -1,6 +1,7 @@
 package wbs.platform.lock.logic;
 
-public interface LockLogic {
+public
+interface LockLogic {
 
 	void magicLock (
 			Object... objects);

@@ -27,7 +27,8 @@ class WhereNotNullCriteriaSpec
 	String fieldName;
 
 	@Override
-	public boolean evaluate (
+	public
+	boolean evaluate (
 			ConsoleHelper<?> objectHelper,
 			Record<?> object) {
 

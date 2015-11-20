@@ -50,7 +50,8 @@ class RpcList
 
 	}
 
-	public RpcList (
+	public
+	RpcList (
 			String name,
 			String newMemberName,
 			RpcType newMemberType,
@@ -69,8 +70,10 @@ class RpcList
 		members =
 			new ArrayList<RpcElem> ();
 
-		for (RpcElem member
-				: newMembers) {
+		for (
+			RpcElem member
+				: newMembers
+		) {
 
 			add (
 				member);
@@ -125,8 +128,10 @@ class RpcList
 		List<Object> ret =
 			new ArrayList<Object> ();
 
-		for (RpcElem member
-				: members) {
+		for (
+			RpcElem member
+				: members
+		) {
 
 			ret.add (
 				member.getNative ());

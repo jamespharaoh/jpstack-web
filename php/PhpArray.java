@@ -37,8 +37,10 @@ class PhpArray
 		map =
 			new LinkedHashMap<Object,PhpEntity> ();
 
-		for (Map.Entry<PhpEntity,PhpEntity> entry
-				: newMap.entrySet ()) {
+		for (
+			Map.Entry<PhpEntity,PhpEntity> entry
+				: newMap.entrySet ()
+		) {
 
 			PhpEntity key =
 				entry.getKey ();
@@ -66,93 +68,174 @@ class PhpArray
 	}
 
 	public @Override
-	boolean isNormalArray() {
+	boolean isNormalArray () {
 
-		if (triedNormal)
+		if (triedNormal) {
 			return array != null;
+		}
 
 		triedNormal = true;
-		PhpEntity[] tempArray = new PhpEntity[map.size()];
-		int i = 0;
 
-		for (Map.Entry<Object, PhpEntity> ent : map.entrySet()) {
+		PhpEntity[] tempArray =
+			new PhpEntity [
+				map.size ()];
 
-			Object key = ent.getKey();
+		int index = 0;
+
+		for (
+			Map.Entry<Object,PhpEntity> entry
+				: map.entrySet ()
+		) {
+
+			Object key =
+				entry.getKey ();
 
 			log.debug (
-				"Key is " + key + ", " + key.getClass());
+				"Key is " + key + ", " + key.getClass ());
 
-			if (!(key instanceof Integer))
+			if (! (key instanceof Integer)) {
 				return false;
-			if ((Integer) key != i)
+			}
+
+			if ((Integer) key != index) {
 				return false;
-			tempArray[i] = ent.getValue();
-			i++;
+			}
+
+			tempArray [index] =
+				entry.getValue ();
+
+			index ++;
+
 		}
-		array = tempArray;
+
+		array =
+			tempArray;
+
 		return true;
+
 	}
 
 	@Override
-	public Boolean asBoolean() {
-		return map.size() > 0;
+	public
+	Boolean asBoolean () {
+
+		return map.size () > 0;
+
 	}
 
 	@Override
-	public Integer asInteger() {
-		return map.size() > 0 ? 1 : 0;
+	public
+	Integer asInteger () {
+
+		return map.size () > 0
+			? 1
+			: 0;
+
 	}
 
 	@Override
-	public Double asDouble() {
-		return map.size() > 0 ? 1.0D : 0.0D;
+	public
+	Double asDouble () {
+
+		return map.size () > 0
+			? 1.0D
+			: 0.0D;
+
 	}
 
 	@Override
-	public String asString() {
+	public
+	String asString () {
+
 		return "Array";
+
 	}
 
 	@Override
-	public String asString(String charset) {
+	public
+	String asString (
+			String charset) {
+
 		return "Array";
+
 	}
 
 	@Override
-	public byte[] asByteArray() {
+	public
+	byte[] asByteArray () {
+
 		try {
-			return "Array".getBytes("iso-8859-1");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
+
+			return "Array".getBytes (
+				"iso-8859-1");
+
+		} catch (UnsupportedEncodingException exception) {
+
+			throw new RuntimeException (
+				exception);
+
 		}
+
 	}
 
 	@Override
-	public PhpEntity[] asArray() {
-		if (!isNormalArray())
-			throw new PhpTypeException(type, "asArray()");
+	public
+	PhpEntity[] asArray () {
+
+		if (! isNormalArray ()) {
+
+			throw new PhpTypeException (
+				type,
+				"asArray ()");
+
+		}
+
 		return array;
+
 	}
 
 	@Override
-	public List<PhpEntity> asList() {
-		if (!isNormalArray())
-			throw new PhpTypeException(type, "asList()");
-		return Arrays.asList(array);
+	public
+	List<PhpEntity> asList () {
+
+		if (! isNormalArray ()) {
+
+			throw new PhpTypeException (
+				type,
+				"asList ()");
+
+		}
+
+		return Arrays.asList (
+			array);
+
 	}
 
 	@Override
-	public Map<Object,PhpEntity> asMap () {
-		return ImmutableMap.copyOf (map);
+	public
+	Map<Object,PhpEntity> asMap () {
+
+		return ImmutableMap.copyOf (
+			map);
+
 	}
 
 	@Override
-	public Map<Object, PhpEntity> asObjectMap () {
-		return ImmutableMap.copyOf (map);
+	public
+	Map<Object,PhpEntity> asObjectMap () {
+
+		return ImmutableMap.copyOf (
+			map);
+
 	}
 
 	@Override
-	public Object asObject () {
-		return ImmutableMap.copyOf (map);
+	public
+	Object asObject () {
+
+		return ImmutableMap.copyOf (
+			map);
+
 	}
+
 }

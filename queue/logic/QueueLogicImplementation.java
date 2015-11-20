@@ -257,7 +257,8 @@ class QueueLogicImplementation
 	}
 
 	@Override
-	public QueueItemRec createQueueItem (
+	public
+	QueueItemRec createQueueItem (
 			@NonNull QueueRec queue,
 			@NonNull Record<?> subjectObject,
 			@NonNull Record<?> refObject,

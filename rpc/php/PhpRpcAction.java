@@ -65,7 +65,8 @@ class PhpRpcAction
 			new ReusableRpcHandler () {
 
 			@Override
-			public RpcResult handle (
+			public
+			RpcResult handle (
 					RpcSource source) {
 
 				RpcHandler delegate =
@@ -73,13 +74,15 @@ class PhpRpcAction
 						name,
 						RpcHandler.class);
 
-				return delegate.handle (source);
+				return delegate.handle (
+					source);
 
 			}
 
 		};
 
-		return rpcHandler (rpcHandler);
+		return rpcHandler (
+			rpcHandler);
 
 	}
 
@@ -226,19 +229,41 @@ class PhpRpcAction
 	class PhpRpcSource
 		implements RpcSource {
 
-		private String encoding;
-		private PhpEntity entity;
+		private
+		String encoding;
 
-		private PhpRpcSource(String newEncoding, PhpEntity newEntity) {
-			encoding = newEncoding;
-			entity = newEntity;
+		private
+		PhpEntity entity;
+
+		private
+		PhpRpcSource (
+				String newEncoding,
+				PhpEntity newEntity) {
+
+			encoding =
+				newEncoding;
+
+			entity =
+				newEntity;
+
 		}
 
 		@Override
-		public Object obtain(RpcDefinition def, List<String> errors,
+		public
+		Object obtain (
+				RpcDefinition def,
+				List<String> errors,
 				boolean checkRequires) {
-			return phpToObject(def, entity, errors, encoding, checkRequires);
+
+			return phpToObject (
+				def,
+				entity,
+				errors,
+				encoding,
+				checkRequires);
+
 		}
+
 	}
 
 	private
@@ -587,8 +612,10 @@ class PhpRpcAction
 
 		// check all required parameters are present
 
-		for (RpcDefinition member
-				: defMap.values ()) {
+		for (
+			RpcDefinition member
+				: defMap.values ()
+		) {
 
 			if (inMap.containsKey (
 					member.name ()))
@@ -646,7 +673,10 @@ class PhpRpcAction
 		RpcDefinition memberDefinition =
 			rpcDefinition.members () [0];
 
-		for (PhpEntity in : entity.asList()) {
+		for (
+			PhpEntity in
+				: entity.asList ()
+		) {
 
 			Object out =
 				phpToObject (
