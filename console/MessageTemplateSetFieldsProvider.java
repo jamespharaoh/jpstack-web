@@ -27,6 +27,8 @@ public
 class MessageTemplateSetFieldsProvider
 	implements FieldsProvider {
 
+	// dependencies
+
 	@Inject
 	ConsoleModuleBuilder consoleModuleBuilder;
 
@@ -39,28 +41,45 @@ class MessageTemplateSetFieldsProvider
 	@Inject
 	MessageTemplateSetConsoleHelper messageTemplateSetConsoleHelper;
 
+	// state
+
 	FormFieldSet formFields;
 
 	String mode;
 
+	// implementation
+
 	@Override
 	public
-	FormFieldSet getFields(Record<?> parent) {
+	FormFieldSet getFields (
+			Record<?> parent) {
 
 		List<Object> formFieldSpecs =
 			new ArrayList<Object> ();
 
 		// add name and description fields
 
-		formFieldSpecs
-			.add (new TextFormFieldSpec()
-				.name ("name")
-				.label ("Name"));
+		formFieldSpecs.add (
+			new TextFormFieldSpec ()
 
-		formFieldSpecs
-			.add (new TextFormFieldSpec()
-				.name ("description")
-				.label ("Description"));
+			.name (
+				"name")
+
+			.label (
+				"Name")
+
+		);
+
+		formFieldSpecs.add (
+			new TextFormFieldSpec ()
+
+			.name (
+				"description")
+
+			.label (
+				"Description")
+
+		);
 
 		// retrieve existing message template types
 
@@ -70,7 +89,7 @@ class MessageTemplateSetFieldsProvider
 			parent;
 
 		Set<MessageTemplateTypeRec> messageTemplateTypes =
-			messageTemplateDatabase.getMessageTemplateTypes();
+			messageTemplateDatabase.getMessageTemplateTypes ();
 
 		if (mode != "list") {
 
@@ -83,7 +102,7 @@ class MessageTemplateSetFieldsProvider
 			);
 
 			formFieldSpecs.add (
-				new ScriptRefFormFieldSpec()
+				new ScriptRefFormFieldSpec ()
 
 				.path (
 					"/js/message-template.js")
@@ -145,34 +164,45 @@ class MessageTemplateSetFieldsProvider
 	}
 
 	@Override
-	public FieldsProvider setFields(FormFieldSet fields) {
+	public
+	FieldsProvider setFields (
+			FormFieldSet fields) {
 
-		formFields = fields;
+		formFields =
+			fields;
+
 		return this;
 
 	}
 
 	@Override
-	public FieldsProvider setMode (String modeSet) {
+	public
+	FieldsProvider setMode (
+			String modeSet) {
 
-		mode = modeSet;
+		mode =
+			modeSet;
+
 		return this;
 
 	}
 
-	@SingletonComponent("messageTemplateSetFieldsProviderConfig")
+	@SingletonComponent ("messageTemplateSetFieldsProviderConfig")
 	public static
 	class Config {
 
 		@Inject
-		Provider<MessageTemplateSetFieldsProvider> messageTemplateSetFieldsProvider;
+		Provider<MessageTemplateSetFieldsProvider>
+		messageTemplateSetFieldsProvider;
 
 		@PrototypeComponent ("messageTemplateSetListFieldsProvider")
 		public
 		FieldsProvider messageTemplateSetListFieldsProvider () {
 
 			return messageTemplateSetFieldsProvider.get ()
-				.setMode ("list");
+
+				.setMode (
+					"list");
 
 		}
 
@@ -181,7 +211,9 @@ class MessageTemplateSetFieldsProvider
 		FieldsProvider messageTemplateSetCreateFieldsProvider () {
 
 			return messageTemplateSetFieldsProvider.get ()
-				.setMode ("create");
+
+				.setMode (
+					"create");
 
 		}
 
@@ -190,7 +222,9 @@ class MessageTemplateSetFieldsProvider
 		FieldsProvider messageTemplateSetSettingsFieldsProvider () {
 
 			return messageTemplateSetFieldsProvider.get ()
-				.setMode ("settings");
+
+				.setMode (
+					"settings");
 
 		}
 
@@ -199,7 +233,9 @@ class MessageTemplateSetFieldsProvider
 		FieldsProvider messageTemplateSetSummaryFieldsProvider () {
 
 			return messageTemplateSetFieldsProvider.get ()
-				.setMode ("summary");
+
+				.setMode (
+					"summary");
 
 		}
 
