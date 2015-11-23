@@ -4,15 +4,17 @@ import wbs.console.forms.FormFieldSet;
 import wbs.framework.record.Record;
 
 public
-interface FieldsProvider {
+interface FieldsProvider<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+> {
 
-	FormFieldSet getFields (
-			Record<?> parent);
+	FormFieldSet getStaticFields ();
 
-	FieldsProvider setFields (
-			FormFieldSet fields);
+	FormFieldSet getFieldsForParent (
+			ParentType parent);
 
-	FieldsProvider setMode (
-			String modeSet);
+	FormFieldSet getFieldsForObject (
+			ObjectType object);
 
 }

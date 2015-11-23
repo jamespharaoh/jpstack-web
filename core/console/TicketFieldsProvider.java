@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+
+import lombok.NonNull;
 
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.IntegerFormFieldSpec;
@@ -17,16 +20,17 @@ import wbs.console.forms.TextFormFieldSpec;
 import wbs.console.forms.YesNoFormFieldSpec;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.record.Record;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketManagerRec;
+import wbs.services.ticket.core.model.TicketRec;
 
 @PrototypeComponent ("ticketFieldsProvider")
 public
 class TicketFieldsProvider
-	implements FieldsProvider {
+	implements FieldsProvider<TicketRec,TicketManagerRec> {
 
 	// dependencies
 
@@ -52,15 +56,20 @@ class TicketFieldsProvider
 
 	@Override
 	public
-	FormFieldSet getFields (
-			Record<?> parent) {
+	FormFieldSet getFieldsForObject (
+			@NonNull TicketRec ticket) {
+
+		return getFieldsForParent (
+			ticket.getTicketManager ());
+
+	}
+
+	@Override
+	public
+	FormFieldSet getFieldsForParent (
+			@NonNull TicketManagerRec ticketManager) {
 
 		// retrieve existing ticket field types
-
-		TicketManagerRec ticketManager =
-			(TicketManagerRec)
-			(Object)
-			parent;
 
 		Set<TicketFieldTypeRec> ticketFieldTypes =
 			ticketManager.getTicketFieldTypes ();
@@ -68,7 +77,7 @@ class TicketFieldsProvider
 		// build form fields
 
 		List<Object> formFieldSpecs =
-				new ArrayList<Object> ();
+			new ArrayList<Object> ();
 
 		for (
 			TicketFieldTypeRec ticketFieldType
@@ -193,20 +202,15 @@ class TicketFieldsProvider
 
 	@Override
 	public
-	FieldsProvider setFields (
-			FormFieldSet fields) {
+	FormFieldSet getStaticFields () {
 
-		formFields =
-			fields;
-
-		return this;
+		throw new UnsupportedOperationException ();
 
 	}
 
-	@Override
 	public
-	FieldsProvider setMode (
-			String modeSet) {
+	TicketFieldsProvider setMode (
+			@NonNull String modeSet) {
 
 		mode =
 			modeSet;
@@ -219,12 +223,13 @@ class TicketFieldsProvider
 	public static
 	class Config {
 
-		@Inject
+		@PrototypeDependency
 		Provider<TicketFieldsProvider> ticketFieldsProvider;
 
 		@PrototypeComponent ("ticketListFieldsProvider")
+		@Named
 		public
-		FieldsProvider ticketListFieldsProvider () {
+		TicketFieldsProvider ticketListFieldsProvider () {
 
 			return ticketFieldsProvider.get ()
 
@@ -234,8 +239,9 @@ class TicketFieldsProvider
 		}
 
 		@PrototypeComponent ("ticketCreateFieldsProvider")
+		@Named
 		public
-		FieldsProvider ticketCreateFieldsProvider () {
+		TicketFieldsProvider ticketCreateFieldsProvider () {
 
 			return ticketFieldsProvider.get ()
 
@@ -245,8 +251,9 @@ class TicketFieldsProvider
 		}
 
 		@PrototypeComponent ("ticketSettingsFieldsProvider")
+		@Named
 		public
-		FieldsProvider ticketSettingsFieldsProvider () {
+		TicketFieldsProvider ticketSettingsFieldsProvider () {
 
 			return ticketFieldsProvider.get ()
 
@@ -256,8 +263,9 @@ class TicketFieldsProvider
 		}
 
 		@PrototypeComponent ("ticketSummaryFieldsProvider")
+		@Named
 		public
-		FieldsProvider ticketSummaryFieldsProvider () {
+		TicketFieldsProvider ticketSummaryFieldsProvider () {
 
 			return ticketFieldsProvider.get ()
 
