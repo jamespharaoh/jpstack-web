@@ -27,13 +27,15 @@ import wbs.framework.record.PermanentRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
-import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsAction")
 public
-class ObjectSettingsAction
+class ObjectSettingsAction<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+>
 	extends ConsoleAction {
 
 	// dependencies
@@ -44,11 +46,8 @@ class ObjectSettingsAction
 	@Inject
 	ConsoleRequestContext requestContext;
 
-	@Inject
-	RootObjectHelper rootHelper;
-
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@Inject
 	Database database;
@@ -59,10 +58,10 @@ class ObjectSettingsAction
 	// properties
 
 	@Getter @Setter
-	ObjectLookup<?> objectLookup;
+	ObjectLookup<ObjectType> objectLookup;
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	@Getter @Setter
 	Provider<Responder> detailsResponder;
@@ -83,11 +82,12 @@ class ObjectSettingsAction
 	FormFieldSet formFieldSet;
 
 	@Getter @Setter
-	FieldsProvider formFieldsProvider;
+	FieldsProvider<ObjectType,ParentType> formFieldsProvider;
 
 	// state
 
-	Record<?> parent;
+	ObjectType object;
+	ParentType parent;
 
 	// details
 
@@ -122,8 +122,7 @@ class ObjectSettingsAction
 			database.beginReadWrite (
 				this);
 
-		Record<?> object =
-			(Record<?>)
+		object =
 			objectLookup.lookupObject (
 				requestContext.contextStuff ());
 
@@ -194,14 +193,17 @@ class ObjectSettingsAction
 
 	void prepareParent () {
 
-		ConsoleHelper<?> parentHelper =
+		@SuppressWarnings ("unchecked")
+		ConsoleHelper<ParentType> parentHelper =
+			(ConsoleHelper<ParentType>)
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
 
 		if (parentHelper.isRoot ()) {
 
 			parent =
-				rootHelper.find (0);
+				parentHelper.find (
+					0);
 
 			return;
 
@@ -225,10 +227,11 @@ class ObjectSettingsAction
 
 	}
 
-	void prepareFieldSet() {
+	void prepareFieldSet () {
 
-		formFieldSet = formFieldsProvider.getFields(
-				parent);
+		formFieldSet =
+			formFieldsProvider.getFieldsForObject (
+				object);
 
 	}
 

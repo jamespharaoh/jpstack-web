@@ -23,10 +23,16 @@ public
 class ObjectSummaryPart
 	extends AbstractPagePart {
 
+	// properties
+
 	@Getter @Setter
 	List<Provider<PagePart>> partFactories;
 
+	// state
+
 	List<PagePart> parts;
+
+	// implementation
 
 	@Override
 	public
@@ -35,8 +41,10 @@ class ObjectSummaryPart
 		parts =
 			new ArrayList<PagePart> ();
 
-		for (Provider<PagePart> partFactory
-				: partFactories) {
+		for (
+			Provider<PagePart> partFactory
+				: partFactories
+		) {
 
 			PagePart pagePart =
 				partFactory.get ();
@@ -46,7 +54,8 @@ class ObjectSummaryPart
 
 			pagePart.prepare ();
 
-			parts.add (pagePart);
+			parts.add (
+				pagePart);
 
 		}
 
@@ -59,7 +68,10 @@ class ObjectSummaryPart
 		Set<ScriptRef> scriptRefs =
 			new LinkedHashSet<ScriptRef> ();
 
-		for (PagePart pagePart : parts) {
+		for (
+			PagePart pagePart
+				: parts
+		) {
 
 			scriptRefs.addAll (
 				pagePart.scriptRefs ());
@@ -74,8 +86,14 @@ class ObjectSummaryPart
 	public
 	void renderHtmlHeadContent () {
 
-		for (PagePart part : parts)
+		for (
+			PagePart part
+				: parts
+		) {
+
 			part.renderHtmlHeadContent ();
+
+		}
 
 	}
 
@@ -83,8 +101,14 @@ class ObjectSummaryPart
 	public
 	void renderHtmlBodyContent () {
 
-		for (PagePart part : parts)
+		for (
+			PagePart part
+				: parts
+		) {
+
 			part.renderHtmlBodyContent ();
+
+		}
 
 	}
 

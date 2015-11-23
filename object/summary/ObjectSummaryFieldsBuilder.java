@@ -11,11 +11,15 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @PrototypeComponent ("objectSummaryFieldsBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectSummaryFieldsBuilder {
+class ObjectSummaryFieldsBuilder<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+> {
 
 	// dependencies
 
@@ -25,7 +29,7 @@ class ObjectSummaryFieldsBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<ObjectSummaryFieldsPart> summaryFieldsPart;
+	Provider<ObjectSummaryFieldsPart<ObjectType,ParentType>> summaryFieldsPart;
 
 	// builder
 
@@ -36,7 +40,7 @@ class ObjectSummaryFieldsBuilder {
 	ObjectSummaryFieldsSpec objectSummaryFieldsSpec;
 
 	@BuilderTarget
-	ObjectSummaryPageBuilder objectSummaryPageBuilder;
+	ObjectSummaryPageBuilder<ObjectType,ParentType> objectSummaryPageBuilder;
 
 	// build
 

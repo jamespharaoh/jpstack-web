@@ -24,7 +24,10 @@ import wbs.services.ticket.core.console.FieldsProvider;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsPart")
 public
-class ObjectSettingsPart
+class ObjectSettingsPart<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+>
 	extends AbstractPagePart {
 
 	// dependencies
@@ -41,10 +44,10 @@ class ObjectSettingsPart
 	// properties
 
 	@Getter @Setter
-	ObjectLookup<?> objectLookup;
+	ObjectLookup<ObjectType> objectLookup;
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	@Getter @Setter
 	String editPrivKey;
@@ -59,12 +62,12 @@ class ObjectSettingsPart
 	String removeLocalName;
 
 	@Getter @Setter
-	FieldsProvider formFieldsProvider;
+	FieldsProvider<ObjectType,ParentType> formFieldsProvider;
 
 	// state
 
-	Record<?> object;
-	Record<?> parent;
+	ObjectType object;
+	ParentType parent;
 	boolean canEdit;
 
 	// implementation
@@ -88,32 +91,40 @@ class ObjectSettingsPart
 	void prepare () {
 
 		object =
-			(Record<?>)
 			objectLookup.lookupObject (
 				requestContext.contextStuff ());
 
-		canEdit =
+		canEdit = (
+
 			editPrivKey != null
-				&& requestContext.canContext (editPrivKey);
+
+			&& requestContext.canContext (
+				editPrivKey)
+
+		);
 
 		if (formFieldsProvider != null) {
-			prepareParent();
-			prepareFieldSet();
-		}
 
+			prepareParent ();
+			prepareFieldSet ();
+
+		}
 
 	}
 
 	void prepareParent () {
 
-		ConsoleHelper<?> parentHelper =
+		@SuppressWarnings ("unchecked")
+		ConsoleHelper<ParentType> parentHelper =
+			(ConsoleHelper<ParentType>)
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
 
 		if (parentHelper.isRoot ()) {
 
 			parent =
-				rootHelper.find (0);
+				parentHelper.find (
+					0);
 
 			return;
 
@@ -137,19 +148,17 @@ class ObjectSettingsPart
 
 	}
 
-	void prepareFieldSet() {
+	void prepareFieldSet () {
 
-		formFieldSet = formFieldsProvider.getFields(
-				parent);
+		formFieldSet =
+			formFieldsProvider.getFieldsForObject (
+				object);
 
 	}
 
 	@Override
 	public
 	void renderHtmlHeadContent () {
-
-		//for (PagePart pagePart : pageParts)
-		//	pagePart.goHeadStuff();
 
 	}
 
@@ -159,21 +168,31 @@ class ObjectSettingsPart
 
 		if (canEdit) {
 
-			String enctype = "application/x-www-form-urlencoded";
+			String enctype =
+				"application/x-www-form-urlencoded";
+
 			try {
+
 				if (formFieldSet.fileUpload ()) {
-					enctype = "multipart/form-data";
+
+					enctype =
+						"multipart/form-data";
+
 				}
-			}
-			catch (Exception e) {
-				enctype = "application/x-www-form-urlencoded";
+
+			} catch (Exception exception) {
+
+				enctype =
+					"application/x-www-form-urlencoded";
+
 			}
 
 			printFormat (
 				"<form",
 				" method=\"post\"",
 				" action=\"%h\"",
-				requestContext.resolveLocalUrl (localName),
+				requestContext.resolveLocalUrl (
+					localName),
 				" enctype=\"%h\"",
 				enctype,
 				">\n");

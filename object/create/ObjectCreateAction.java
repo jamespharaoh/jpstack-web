@@ -42,7 +42,10 @@ import wbs.services.ticket.core.console.FieldsProvider;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCreateAction")
 public
-class ObjectCreateAction
+class ObjectCreateAction<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+>
 	extends ConsoleAction {
 
 	// dependencies
@@ -113,12 +116,12 @@ class ObjectCreateAction
 	String createUserFieldName;
 
 	@Getter @Setter
-	FieldsProvider formFieldsProvider;
+	FieldsProvider<ObjectType,ParentType> formFieldsProvider;
 
 	// state
 
-	ConsoleHelper<?> parentHelper;
-	Record<?> parent;
+	ConsoleHelper<ParentType> parentHelper;
+	ParentType parent;
 
 	ConsoleContext targetContext;
 
@@ -137,9 +140,14 @@ class ObjectCreateAction
 	protected
 	Responder goReal () {
 
-		parentHelper =
+		@SuppressWarnings ("unchecked")
+		ConsoleHelper<ParentType> parentHelperTemp =
+			(ConsoleHelper<ParentType>)
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
+
+		parentHelper =
+			parentHelperTemp;
 
 		// begin transaction
 
@@ -345,8 +353,15 @@ class ObjectCreateAction
 
 		if (parentHelper.isRoot ()) {
 
+			@SuppressWarnings ("unchecked")
+			ParentType parentTemp1 =
+				(ParentType)
+				(Object)
+				rootHelper.find (
+					0);
+
 			parent =
-				rootHelper.find (0);
+				parentTemp1;
 
 			return;
 
@@ -397,8 +412,11 @@ class ObjectCreateAction
 
 	void prepareFieldSet () {
 
-		formFieldSet = formFieldsProvider.getFields(
-			parent);
+		formFieldSet =
+			parent != null
+				? formFieldsProvider.getFieldsForParent (
+					parent)
+				: formFieldsProvider.getStaticFields ();
 
 	}
 

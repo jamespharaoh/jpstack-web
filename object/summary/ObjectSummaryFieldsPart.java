@@ -19,7 +19,10 @@ import wbs.services.ticket.core.console.FieldsProvider;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryFieldsPart")
 public
-class ObjectSummaryFieldsPart
+class ObjectSummaryFieldsPart<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+>
 	extends AbstractPagePart {
 
 	// dependencies
@@ -36,18 +39,18 @@ class ObjectSummaryFieldsPart
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	@Getter @Setter
 	FormFieldSet formFieldSet;
 
 	@Getter @Setter
-	FieldsProvider formFieldsProvider;
+	FieldsProvider<ObjectType,ParentType> formFieldsProvider;
 
 	// state
 
-	Record<?> object;
-	Record<?> parent;
+	ObjectType object;
+	ParentType parent;
 
 	// implementation
 
@@ -56,7 +59,6 @@ class ObjectSummaryFieldsPart
 	void prepare () {
 
 		object =
-			(Record<?>)
 			consoleHelper.lookupObject (
 				requestContext.contextStuff ());
 
@@ -69,14 +71,17 @@ class ObjectSummaryFieldsPart
 
 	void prepareParent () {
 
-		ConsoleHelper<?> parentHelper =
+		@SuppressWarnings ("unchecked")
+		ConsoleHelper<ParentType> parentHelper =
+			(ConsoleHelper<ParentType>)
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
 
 		if (parentHelper.isRoot ()) {
 
 			parent =
-				rootHelper.find (0);
+				parentHelper.find (
+					0);
 
 			return;
 
@@ -100,10 +105,11 @@ class ObjectSummaryFieldsPart
 
 	}
 
-	void prepareFieldSet() {
+	void prepareFieldSet () {
 
-		formFieldSet = formFieldsProvider.getFields(
-				parent);
+		formFieldSet =
+			formFieldsProvider.getFieldsForObject (
+				object);
 
 	}
 

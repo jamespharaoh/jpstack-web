@@ -12,6 +12,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import com.google.common.collect.ImmutableMap;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -36,6 +38,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
 import wbs.platform.object.criteria.WhereICanManageCriteriaSpec;
 import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
@@ -46,7 +49,10 @@ import wbs.services.ticket.core.console.StaticFieldsProvider;
 @PrototypeComponent ("objectListPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectListPageBuilder {
+class ObjectListPageBuilder<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+> {
 
 	// dependencies
 
@@ -71,7 +77,7 @@ class ObjectListPageBuilder {
 	Provider<ObjectListTabSpec> listTabSpec;
 
 	@Inject
-	Provider<ObjectListPart> objectListPart;
+	Provider<ObjectListPart<ObjectType,ParentType>> objectListPart;
 
 	@Inject
 	Provider<TabContextResponder> tabContextResponder;
@@ -88,7 +94,7 @@ class ObjectListPageBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ObjectListPageSpec spec;
@@ -98,11 +104,11 @@ class ObjectListPageBuilder {
 
 	// state
 
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	String typeCode;
 
-	FieldsProvider fieldsProvider;
+	FieldsProvider<ObjectType,ParentType> fieldsProvider;
 
 	FormFieldSet formFieldSet;
 
@@ -115,7 +121,7 @@ class ObjectListPageBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
@@ -243,33 +249,36 @@ class ObjectListPageBuilder {
 
 		if (spec.fieldsProviderName () != null) {
 
-			fieldsProvider =
-					applicationContext.getBean (
-							spec.fieldsProviderName (),
-							FieldsProvider.class);
+			@SuppressWarnings ("unchecked")
+			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
+				(FieldsProvider<ObjectType,ParentType>)
+				applicationContext.getBean (
+					spec.fieldsProviderName (),
+					FieldsProvider.class);
 
-		}
+			fieldsProvider =
+				fieldsProviderTemp;
 
 		// if a field name is provided
 
-		else if (spec.fieldsName() != null) {
+		} else if (spec.fieldsName () != null) {
 
 			fieldsProvider =
-				new StaticFieldsProvider ()
-					.setFields (
-						consoleModule.formFieldSets ().get (
-							spec.fieldsName ()));
+				new StaticFieldsProvider<ObjectType,ParentType> ()
 
-		}
+				.setFields (
+					consoleModule.formFieldSets ().get (
+						spec.fieldsName ()));
 
 		// if nothing is provided
 
-		else {
+		} else {
 
 			fieldsProvider =
-				new StaticFieldsProvider ()
-					.setFields (
-						defaultFields());
+				new StaticFieldsProvider<ObjectType,ParentType> ()
+
+				.setFields (
+					defaultFields ());
 
 		}
 

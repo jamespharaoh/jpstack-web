@@ -3,6 +3,8 @@ package wbs.platform.object.summary;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -11,11 +13,15 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @PrototypeComponent ("objectSummaryHeadingBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectSummaryHeadingBuilder {
+class ObjectSummaryHeadingBuilder<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+> {
 
 	// dependencies
 
@@ -25,7 +31,7 @@ class ObjectSummaryHeadingBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<ObjectSummaryFieldsPart> summaryFieldsPart;
+	Provider<ObjectSummaryFieldsPart<ObjectType,ParentType>> summaryFieldsPart;
 
 	// builder
 
@@ -36,14 +42,14 @@ class ObjectSummaryHeadingBuilder {
 	ObjectSummaryHeadingSpec objectSummaryHeadingSpec;
 
 	@BuilderTarget
-	ObjectSummaryPageBuilder objectSummaryPageBuilder;
+	ObjectSummaryPageBuilder<ObjectType,ParentType> objectSummaryPageBuilder;
 
 	// build
 
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		objectSummaryPageBuilder.addHeading (
 			objectSummaryHeadingSpec.label ());

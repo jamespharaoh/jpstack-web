@@ -50,7 +50,10 @@ import wbs.services.ticket.core.console.FieldsProvider;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectListPart")
 public
-class ObjectListPart
+class ObjectListPart<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+>
 	extends AbstractPagePart {
 
 	// dependencies
@@ -70,7 +73,7 @@ class ObjectListPart
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	@Getter @Setter
 	String typeCode;
@@ -85,7 +88,7 @@ class ObjectListPart
 	Map<String,ObjectListTabSpec> listTabSpecs;
 
 	@Getter @Setter
-	FieldsProvider formFieldsProvider;
+	FieldsProvider<ObjectType,ParentType> formFieldsProvider;
 
 	@Getter @Setter
 	String targetContextTypeName;
@@ -105,7 +108,7 @@ class ObjectListPart
 	List<Record<?>> selectedObjects;
 
 	ConsoleContext targetContext;
-	Record<?> parent;
+	ParentType parent;
 
 	// details
 
@@ -147,8 +150,10 @@ class ObjectListPart
 	void prepareFieldSet () {
 
 		formFieldSet =
-			formFieldsProvider.getFields (
-				parent);
+			parent != null
+				? formFieldsProvider.getFieldsForParent (
+					parent)
+				: formFieldsProvider.getStaticFields ();
 
 	}
 
@@ -222,7 +227,9 @@ class ObjectListPart
 
 		if (consoleHelper.parentTypeIsFixed ()) {
 
-			ConsoleHelper<?> parentHelper =
+			@SuppressWarnings ("unchecked")
+			ConsoleHelper<ParentType> parentHelper =
+				(ConsoleHelper<ParentType>)
 				objectManager.getConsoleObjectHelper (
 					consoleHelper.parentClass ());
 

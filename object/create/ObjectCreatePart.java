@@ -26,7 +26,10 @@ import wbs.services.ticket.core.console.FieldsProvider;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCreatePart")
 public
-class ObjectCreatePart
+class ObjectCreatePart<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+>
 	extends AbstractPagePart {
 
 	// dependencies
@@ -46,7 +49,7 @@ class ObjectCreatePart
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	@Getter @Setter
 	FormFieldSet formFieldSet;
@@ -58,17 +61,17 @@ class ObjectCreatePart
 	String localFile;
 
 	@Getter @Setter
-	FieldsProvider formFieldsProvider;
+	FieldsProvider<ObjectType,ParentType> formFieldsProvider;
 
 	// state
 
-	Record<?> parent;
+	ParentType parent;
 
-	List<? extends Record<?>> parents;
+	List<ParentType> parents;
 
-	ConsoleHelper<?> parentHelper;
+	ConsoleHelper<ParentType> parentHelper;
 
-	Record<?> object;
+	ObjectType object;
 
 	// implementation
 
@@ -120,14 +123,26 @@ class ObjectCreatePart
 
 	void prepareParents () {
 
-		parentHelper =
+		@SuppressWarnings ("unchecked")
+		ConsoleHelper<ParentType> parentHelperTemp =
+			(ConsoleHelper<ParentType>)
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
 
+		parentHelper =
+			parentHelperTemp;
+
 		if (parentHelper.isRoot ()) {
 
+			@SuppressWarnings ("unchecked")
+			ParentType parentTemp =
+				(ParentType)
+				(Object)
+				rootHelper.find (
+					0);
+
 			parent =
-				rootHelper.find (0);
+				parentTemp;
 
 			return;
 
@@ -180,8 +195,11 @@ class ObjectCreatePart
 
 	void prepareFieldSet () {
 
-		formFieldSet = formFieldsProvider.getFields(
-			parent);
+		formFieldSet =
+			parent != null
+				? formFieldsProvider.getFieldsForParent (
+					parent)
+				: formFieldsProvider.getStaticFields ();
 
 	}
 
