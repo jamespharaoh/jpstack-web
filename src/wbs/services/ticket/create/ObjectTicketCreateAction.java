@@ -49,7 +49,10 @@ import wbs.services.ticket.core.model.TicketRec;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectTicketCreateAction")
 public
-class ObjectTicketCreateAction
+class ObjectTicketCreateAction<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+>
 	extends ConsoleAction {
 
 	// dependencies
@@ -135,14 +138,14 @@ class ObjectTicketCreateAction
 	String ticketManagerPath;
 
 	@Getter @Setter
-	FieldsProvider formFieldsProvider;
+	FieldsProvider<TicketRec,TicketManagerRec> formFieldsProvider;
 
 	@Getter @Setter
 	List<ObjectTicketCreateSetFieldSpec> ticketFieldSpecs;
 
 	// state
 
-	ConsoleHelper<?> parentHelper;
+	ConsoleHelper<ParentType> parentHelper;
 	TicketManagerRec ticketManager;
 
 	// details
@@ -160,9 +163,14 @@ class ObjectTicketCreateAction
 	protected
 	Responder goReal () {
 
-		parentHelper =
+		@SuppressWarnings ("unchecked")
+		ConsoleHelper<ParentType> parentHelperTemp =
+			(ConsoleHelper<ParentType>)
 			objectManager.getConsoleObjectHelper (
 				consoleHelper.parentClass ());
+
+		parentHelper =
+			parentHelperTemp;
 
 		// begin transaction
 
@@ -433,17 +441,20 @@ class ObjectTicketCreateAction
 		requestContext.addNotice (
 			stringFormat (
 				"%s created",
-				capitalise (consoleHelper.shortName ())));
+				capitalise (
+					consoleHelper.shortName ())));
 
 		requestContext.setEmptyFormData ();
 
 		return null;
+
 	}
 
 	void prepareFieldSet () {
 
-		formFieldSet = formFieldsProvider.getFields(
-			ticketManager);
+		formFieldSet =
+			formFieldsProvider.getFieldsForParent (
+				ticketManager);
 
 	}
 

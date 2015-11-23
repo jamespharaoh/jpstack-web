@@ -356,22 +356,6 @@ class ImChatApiLogicImplementation
 
 	@Override
 	public
-	ImChatMessageTemplateData messageTemplateData (
-			@NonNull String key,
-			@NonNull String value) {
-
-		return new ImChatMessageTemplateData ()
-
-			.key (
-				key)
-
-			.value (
-				value);
-
-	}
-
-	@Override
-	public
 	ImChatPurchaseHistoryData purchaseHistoryData (
 			@NonNull ImChatPurchaseRec purchase) {
 

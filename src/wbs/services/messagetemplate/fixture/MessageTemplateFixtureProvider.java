@@ -13,21 +13,26 @@ import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
+import wbs.services.messagetemplate.model.MessageTemplateEntryTypeObjectHelper;
+import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
+import wbs.services.messagetemplate.model.MessageTemplateEntryValueObjectHelper;
+import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
+import wbs.services.messagetemplate.model.MessageTemplateFieldTypeObjectHelper;
+import wbs.services.messagetemplate.model.MessageTemplateFieldTypeRec;
+import wbs.services.messagetemplate.model.MessageTemplateFieldValueObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateParameterObjectHelper;
-import wbs.services.messagetemplate.model.MessageTemplateParameterRec;
 import wbs.services.messagetemplate.model.MessageTemplateSetObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateSetRec;
 import wbs.services.messagetemplate.model.MessageTemplateTypeCharset;
-import wbs.services.messagetemplate.model.MessageTemplateTypeObjectHelper;
-import wbs.services.messagetemplate.model.MessageTemplateTypeRec;
-import wbs.services.messagetemplate.model.MessageTemplateValueObjectHelper;
-import wbs.services.messagetemplate.model.MessageTemplateValueRec;
 
 public
 class MessageTemplateFixtureProvider
 	implements FixtureProvider {
 
 	// dependencies
+
+	@Inject
+	ImChatObjectHelper imChatHelper;
 
 	@Inject
 	MenuGroupObjectHelper menuGroupHelper;
@@ -39,31 +44,34 @@ class MessageTemplateFixtureProvider
 	MessageTemplateDatabaseObjectHelper messageTemplateDatabaseHelper;
 
 	@Inject
-	MessageTemplateTypeObjectHelper messageTemplateTypeHelper;
+	MessageTemplateEntryTypeObjectHelper messageTemplateEntryTypeHelper;
+
+	@Inject
+	MessageTemplateEntryValueObjectHelper messageTemplateEntryValueHelper;
+
+	@Inject
+	MessageTemplateFieldTypeObjectHelper messageTemplateFieldTypeHelper;
+
+	@Inject
+	MessageTemplateFieldValueObjectHelper messageTemplateFieldValueHelper;
 
 	@Inject
 	MessageTemplateParameterObjectHelper messageTemplateParameterHelper;
 
 	@Inject
-	MessageTemplateValueObjectHelper messageTemplateValueHelper;
-
-	@Inject
 	MessageTemplateSetObjectHelper messageTemplateSetHelper;
-
-	@Inject
-	ImChatObjectHelper imChatHelper;
-
-	@Inject
-	ObjectTypeObjectHelper objectTypeHelper;
 
 	@Inject
 	ObjectManager objectManager;
 
 	@Inject
-	SliceObjectHelper sliceHelper;
+	ObjectTypeObjectHelper objectTypeHelper;
 
 	@Inject
 	RandomLogic randomLogic;
+
+	@Inject
+	SliceObjectHelper sliceHelper;
 
 	// implementation
 
@@ -81,16 +89,16 @@ class MessageTemplateFixtureProvider
 					"facility"))
 
 			.setCode (
-				"message_template_database")
+				"message_template")
 
 			.setName (
-				"Message Template Database")
+				"Message templates")
 
 			.setDescription (
-				"Message Template Database description")
+				"Message templates")
 
 			.setLabel (
-				"Message Template Database")
+				"Message templates")
 
 			.setTargetPath (
 				"/messageTemplateDatabases")
@@ -120,21 +128,39 @@ class MessageTemplateFixtureProvider
 
 		);
 
-		MessageTemplateTypeRec messageTemplateType1 =
-			messageTemplateTypeHelper.insert (
-				messageTemplateTypeHelper.createInstance ()
+		MessageTemplateEntryTypeRec entryType1 =
+			messageTemplateEntryTypeHelper.insert (
+				messageTemplateEntryTypeHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
 				messageTemplateDatabase)
 
 			.setCode (
-				"template_1")
+				"entry_type_1")
 
 			.setName (
-				"Template-1")
+				"Entry type 1")
 
 			.setDescription (
-				"Template 1")
+				"")
+
+		);
+
+		MessageTemplateFieldTypeRec fieldType1a =
+			messageTemplateFieldTypeHelper.insert (
+				messageTemplateFieldTypeHelper.createInstance ()
+
+			.setMessageTemplateEntryType (
+				entryType1)
+
+			.setCode (
+				"field_type_a")
+
+			.setName (
+				"Field type A")
+
+			.setDescription (
+				"")
 
 			.setDefaultValue (
 				"Template 1 Default Value")
@@ -153,9 +179,8 @@ class MessageTemplateFixtureProvider
 
 		);
 
-		MessageTemplateParameterRec parameterType1 =
-			messageTemplateParameterHelper.insert (
-				messageTemplateParameterHelper.createInstance ()
+		messageTemplateParameterHelper.insert (
+			messageTemplateParameterHelper.createInstance ()
 
 			.setCode (
 				"test")
@@ -163,29 +188,49 @@ class MessageTemplateFixtureProvider
 			.setName (
 				"Test")
 
-			.setMessageTemplateType (
-				messageTemplateType1)
+			.setDescription (
+				"")
+
+			.setMessageTemplateEntryType (
+				entryType1)
 
 			.setRequired (
 				false)
 
 		);
 
-		MessageTemplateTypeRec messageTemplateType2 =
-			messageTemplateTypeHelper.insert (
-				messageTemplateTypeHelper.createInstance ()
+		MessageTemplateEntryTypeRec entryType2 =
+			messageTemplateEntryTypeHelper.insert (
+				messageTemplateEntryTypeHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
 				messageTemplateDatabase)
 
 			.setCode (
-				"template_2_parameter")
+				"entry_type_2")
 
 			.setName (
-				"Template-2-Parameter")
+				"Entry type 2")
 
 			.setDescription (
-				"Template 2 Parameter")
+				"")
+
+		);
+
+		messageTemplateFieldTypeHelper.insert (
+			messageTemplateFieldTypeHelper.createInstance ()
+
+			.setMessageTemplateEntryType (
+				entryType2)
+
+			.setCode (
+				"field_type_a")
+
+			.setName (
+				"Field type A")
+
+			.setDescription (
+				"")
 
 			.setDefaultValue (
 				"My name is {name}")
@@ -204,104 +249,51 @@ class MessageTemplateFixtureProvider
 
 		);
 
-		MessageTemplateParameterRec parameterType2 =
-			messageTemplateParameterHelper.insert (
-				messageTemplateParameterHelper.createInstance ()
+		messageTemplateParameterHelper.insert (
+			messageTemplateParameterHelper.createInstance ()
+
+			.setMessageTemplateEntryType (
+				entryType2)
 
 			.setCode (
-				"name")
+				"parameter_type_a")
 
 			.setName (
-				"Name")
+				"Parameter type A")
 
-			.setMessageTemplateType (
-				messageTemplateType2)
+			.setDescription (
+				"")
 
 			.setRequired (
 				true)
 
-			.setLength (
+			.setMaximumLength (
 				4)
 
 		);
 
-		MessageTemplateParameterRec parameter2Type2 =
-			messageTemplateParameterHelper.insert (
-				messageTemplateParameterHelper.createInstance ()
+		messageTemplateParameterHelper.insert (
+			messageTemplateParameterHelper.createInstance ()
 
-			.setMessageTemplateType (
-				messageTemplateType2)
+			.setMessageTemplateEntryType (
+				entryType2)
 
 			.setCode (
-				"nick")
+				"parameter_type_b")
 
 			.setName (
-				"nick")
+				"Parameter type B")
+
+			.setDescription (
+				"")
 
 			.setRequired (
 				false)
 
-			.setLength (
+			.setMaximumLength (
 				3)
 
 		);
-
-		MessageTemplateTypeRec messageTemplateType3 =
-			messageTemplateTypeHelper.insert (
-				messageTemplateTypeHelper.createInstance ()
-
-			.setMessageTemplateDatabase (
-				messageTemplateDatabase)
-
-			.setCode (
-				"template_2_gsm")
-
-			.setName (
-				"Template-2-GSM")
-
-			.setDescription (
-				"Template 2 GSM")
-
-			.setDefaultValue (
-				"Va/or por d€f€c/o^")
-
-			.setHelpText (
-				"<p>Help text 3</p>")
-
-			.setMinLength (
-				5)
-
-			.setMaxLength (
-				50)
-
-			.setCharset (
-				MessageTemplateTypeCharset.gsm)
-
-		);
-
-		messageTemplateDatabase.getMessageTemplateTypes ().add (
-			messageTemplateType1);
-
-		messageTemplateDatabase.getMessageTemplateTypes ().add (
-			messageTemplateType2);
-
-		messageTemplateDatabase.getMessageTemplateTypes ().add (
-			messageTemplateType3);
-
-		messageTemplateType1.setNumParameters (
-			messageTemplateType1.getNumParameters () + 1);
-
-		messageTemplateType1.getMessageTemplateParameters ().add (
-			parameterType1);
-
-		messageTemplateType2.setNumParameters (
-			messageTemplateType2.getNumParameters () + 2);
-
-		messageTemplateType2.getMessageTemplateParameters ().add (
-			parameterType2);
-
-		messageTemplateType2.getMessageTemplateParameters ().add (
-			parameter2Type2);
 
 		MessageTemplateSetRec messageTemplateSet =
 			messageTemplateSetHelper.insert (
@@ -317,175 +309,35 @@ class MessageTemplateFixtureProvider
 				"Test")
 
 			.setDescription (
-				"Test message template set")
+				"")
 
 		);
 
-		MessageTemplateValueRec messageTemplateValue =
-			messageTemplateValueHelper.insert (
-				messageTemplateValueHelper.createInstance ()
+		MessageTemplateEntryValueRec entryValue1 =
+			messageTemplateEntryValueHelper.insert (
+				messageTemplateEntryValueHelper.createInstance ()
 
 			.setMessageTemplateSet (
 				messageTemplateSet)
 
-			.setMessageTemplateType (
-				messageTemplateType1)
+			.setMessageTemplateEntryType (
+				entryType1)
+
+		);
+
+		messageTemplateFieldValueHelper.insert (
+			messageTemplateFieldValueHelper.createInstance ()
+
+			.setMessageTemplateEntryValue (
+				entryValue1)
+
+			.setMessageTemplateFieldType (
+				fieldType1a)
 
 			.setStringValue (
-				"Message Template Value")
+				"hello world")
 
 		);
-
-		messageTemplateSet.setNumTemplates (
-			messageTemplateSet.getNumTemplates () + 1);
-
-		messageTemplateSet.getMessageTemplateValues ().put (
-			messageTemplateType1.getId (),
-			messageTemplateValue);
-
-		/*
-
-		///////////////////////////////////////
-
-		// im chat message template database //
-
-		///////////////////////////////////////
-
-		// create database
-
-		MessageTemplateDatabaseRec imChatMessageTemplateDatabase =
-			messageTemplateDatabaseHelper.insert (
-				new MessageTemplateDatabaseRec ()
-
-					.setSlice (
-						sliceHelper.findByCode (
-							GlobalId.root,
-							"test"))
-
-					.setName (
-						"Im Chat Message Template Database")
-
-					.setDescription (
-						"Message Template Database for Im Chat application")
-
-		);
-
-		// update im chat
-
-		imChatHelper.find(1)
-			.setMessageTemplateDatabase (
-				imChatMessageTemplateDatabase);
-
-		// create sets, types and values
-
-		File imChatMessageTemplateDatabaseFile =
-				new File ("conf/im-chat-message-template-database.xml");
-
-			if (imChatMessageTemplateDatabaseFile.exists ()) {
-
-				DataFromXml dataFromXml =
-					new DataFromXml ()
-
-					.registerBuilderClasses (
-						ImChatMessageTemplateDatabaseSpec.class,
-						MessagesSpec.class);
-
-				ImChatMessageTemplateDatabaseSpec messageTemplateDatabaseElements =
-					(ImChatMessageTemplateDatabaseSpec)
-					dataFromXml.readFilename (
-						"conf/im-chat-message-template-database.xml");
-
-				// read xml content
-
-				MessageTemplateSetRec imChatMessageTemplateSet =
-					messageTemplateSetHelper.insert (
-						new MessageTemplateSetRec ()
-
-							.setMessageTemplateDatabase (
-									imChatMessageTemplateDatabase)
-
-							.setName("Im Chat English")
-
-							.setDescription (
-								"Im Chat message template database in english")
-				);
-
-				for (
-					MessagesSpec message
-						: messageTemplateDatabaseElements.messages()
-				) {
-
-					if (! equal (message.type (), "im-chat-message-template-database"))
-						continue;
-
-					if (! equal (message.name (), "english"))
-						continue;
-
-					for (
-							String messageKey
-								: message.params().keySet()
-						) {
-
-						MessageTemplateTypeRec imChatMessageTemplateType =
-							messageTemplateTypeHelper.insert (
-								new MessageTemplateTypeRec ()
-
-									.setMessageTemplateDatabase (
-										imChatMessageTemplateDatabase)
-
-									.setName(messageKey)
-
-									.setDefaultValue (
-										message.params.get(messageKey))
-
-									.setHelpText (
-										"<p>Help text 1</p>")
-
-									.setMinLength(
-										1)
-
-									.setMaxLength(
-										500)
-
-									.setCharset (
-										MessageTemplateTypeCharset.unicode)
-
-						);
-
-						imChatMessageTemplateDatabase
-							.getMessageTemplateTypes()
-								.add(imChatMessageTemplateType);
-
-						MessageTemplateValueRec imChatMessageTemplateValue =
-								messageTemplateValueHelper.insert(
-									new MessageTemplateValueRec ()
-
-										.setMessageTemplateSet (
-											messageTemplateSet)
-
-										.setMessageTemplateType (
-											imChatMessageTemplateType)
-
-										.setStringValue(
-											message.params.get(messageKey))
-
-							);
-
-							imChatMessageTemplateSet.setNumTemplates(
-								imChatMessageTemplateSet.getNumTemplates() + 1);
-
-							imChatMessageTemplateSet
-								.getMessageTemplateValues().put (
-									imChatMessageTemplateType.getId(), imChatMessageTemplateValue);
-
-					}
-
-				}
-
-
-		}
-
-		*/
 
 	}
 

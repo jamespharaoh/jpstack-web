@@ -10,6 +10,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -29,6 +31,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
@@ -36,11 +39,16 @@ import wbs.platform.object.criteria.WhereICanManageCriteriaSpec;
 import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
 import wbs.services.ticket.core.console.FieldsProvider;
 import wbs.services.ticket.core.model.TicketManagerObjectHelper;
+import wbs.services.ticket.core.model.TicketManagerRec;
+import wbs.services.ticket.core.model.TicketRec;
 
 @PrototypeComponent ("objectTicketCreatePageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectTicketCreatePageBuilder {
+class ObjectTicketCreatePageBuilder<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+> {
 
 	// dependencies
 
@@ -56,39 +64,42 @@ class ObjectTicketCreatePageBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<ConsoleFile> consoleFile;
+	Provider<ConsoleFile> consoleFileProvider;
 
 	@Inject
-	Provider<ConsoleContextTab> contextTab;
+	Provider<ConsoleContextTab> contextTabProvider;
 
 	@Inject
-	Provider<ObjectTicketCreateSetFieldSpec> ticketCreateSetFieldSpec;
+	Provider<ObjectTicketCreateSetFieldSpec> ticketCreateSetFieldSpecProvider;
 
 	@Inject
-	Provider<ObjectTicketCreatePart> objectTicketCreatePart;
+	Provider<ObjectTicketCreatePart<ObjectType,ParentType>>
+	objectTicketCreatePartProvider;
 
 	@Inject
-	Provider<ObjectTicketCreateAction> objectTicketCreateAction;
+	Provider<ObjectTicketCreateAction<ObjectType,ParentType>>
+	objectTicketCreateActionProvider;
 
 	@Inject
-	Provider<TicketManagerObjectHelper> ticketManagerHelper;
+	Provider<TabContextResponder> tabContextResponderProvider;
+
+	Provider<WhereDeletedCriteriaSpec> whereDeletedCriteriaSpecProvider;
 
 	@Inject
-	Provider<TabContextResponder> tabContextResponder;
+	Provider<WhereICanManageCriteriaSpec> whereICanManageCriteriaSpecProvider;
 
 	@Inject
-	Provider<WhereDeletedCriteriaSpec> whereDeletedCriteriaSpec;
+	Provider<WhereNotDeletedCriteriaSpec> whereNotDeletedCriteriaSpecProvider;
+
+	// indirect dependencies
 
 	@Inject
-	Provider<WhereICanManageCriteriaSpec> whereICanManageCriteriaSpec;
-
-	@Inject
-	Provider<WhereNotDeletedCriteriaSpec> whereNotDeletedCriteriaSpec;
+	Provider<TicketManagerObjectHelper> ticketManagerHelperProvider;
 
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ObjectTicketCreatePageSpec spec;
@@ -98,10 +109,10 @@ class ObjectTicketCreatePageBuilder {
 
 	// state
 
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	String typeCode;
-	FieldsProvider fieldsProvider;
+	FieldsProvider<TicketRec,TicketManagerRec> fieldsProvider;
 	List<ObjectTicketCreateSetFieldSpec> ticketFields;
 	String name;
 	String tabName;
@@ -124,13 +135,15 @@ class ObjectTicketCreatePageBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildTab (
 				resolvedExtensionPoint);
@@ -145,11 +158,11 @@ class ObjectTicketCreatePageBuilder {
 	}
 
 	void buildTab (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextTab (
 			container.tabLocation (),
-			contextTab.get ()
+			contextTabProvider.get ()
 				.name (tabName)
 				.defaultLabel (tabLabel)
 				.localFile (localFile),
@@ -160,7 +173,7 @@ class ObjectTicketCreatePageBuilder {
 	}
 
 	void buildFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		Action createAction =
 			new Action () {
@@ -169,7 +182,7 @@ class ObjectTicketCreatePageBuilder {
 			public
 			Responder handle () {
 
-				return objectTicketCreateAction.get ()
+				return objectTicketCreateActionProvider.get ()
 
 					.consoleHelper (
 						consoleHelper)
@@ -220,7 +233,7 @@ class ObjectTicketCreatePageBuilder {
 
 				localFile,
 
-				consoleFile.get ()
+				consoleFileProvider.get ()
 
 					.getResponderName (
 						responderName)
@@ -238,48 +251,49 @@ class ObjectTicketCreatePageBuilder {
 	void buildResponder () {
 
 		Provider<PagePart> partFactory =
-				new Provider<PagePart> () {
+			new Provider<PagePart> () {
 
-				@Override
-				public
-				PagePart get () {
+			@Override
+			public
+			PagePart get () {
 
-					return objectTicketCreatePart.get ()
+				return objectTicketCreatePartProvider.get ()
 
-						.consoleHelper (
-							consoleHelper)
+					.consoleHelper (
+						consoleHelper)
 
-						.localFile(
-							localFile)
+					.localFile(
+						localFile )
 
-						.ticketFieldSpecs(
-							ticketFields)
+					.ticketFieldSpecs (
+						ticketFields)
 
-						.fieldsProvider(
-							fieldsProvider)
+					.fieldsProvider (
+						fieldsProvider)
 
-						.ticketManagerPath(
-							ticketManagerPath);
+					.ticketManagerPath (
+						ticketManagerPath);
 
-				}
+			}
 
-			};
+		};
 
-			consoleModule.addResponder (
+		consoleModule.addResponder (
 
-				responderName,
+			responderName,
 
-				tabContextResponder.get ()
+			tabContextResponderProvider.get ()
 
-					.tab (
-						tabName)
+				.tab (
+					tabName)
 
-					.title (
-						capitalise (
-							consoleHelper.friendlyName () + " create"))
+				.title (
+					capitalise (
+						consoleHelper.friendlyName () + " create"))
 
-					.pagePartFactory (
-						partFactory));
+				.pagePartFactory (
+					partFactory));
+
 	}
 
 	// defaults
@@ -351,14 +365,19 @@ class ObjectTicketCreatePageBuilder {
 					container.newBeanNamePrefix ()));
 
 		ticketManagerPath =
-			spec.ticketManager();
+			spec.ticketManager ();
 
-		if (spec.fieldsProviderName() != null) {
+		if (spec.fieldsProviderName () != null) {
 
-			fieldsProvider =
+			@SuppressWarnings ("unchecked")
+			FieldsProvider<TicketRec,TicketManagerRec> fieldsProviderTemp =
+				(FieldsProvider<TicketRec,TicketManagerRec>)
 				applicationContext.getBean (
 					spec.fieldsProviderName (),
 					FieldsProvider.class);
+
+			fieldsProvider =
+				fieldsProviderTemp;
 
 		}
 

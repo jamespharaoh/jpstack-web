@@ -14,6 +14,7 @@
 		<bean class="DeletedFormFieldSpec"/>
 		<bean class="DescriptionFormFieldBuilder"/>
 		<bean class="DescriptionFormFieldSpec"/>
+		<bean class="DynamicFormFieldAccessor"/>
 		<bean class="EnumCsvFormFieldInterfaceMapping"/>
 		<bean class="EnumFormFieldBuilder"/>
 		<bean class="EnumFormFieldRenderer"/>

@@ -1,5 +1,6 @@
 package wbs.applications.imchat.fixture;
 
+import static wbs.framework.utils.etc.Misc.joinWithSlash;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.FileInputStream;
@@ -42,6 +43,9 @@ import wbs.platform.media.model.MediaRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.services.messagetemplate.logic.MessageTemplateLogic;
+import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
+import wbs.services.messagetemplate.model.MessageTemplateSetObjectHelper;
 
 @PrototypeComponent ("imChatCoreFixtureProvider")
 public
@@ -96,6 +100,12 @@ class ImChatCoreFixtureProvider
 	MenuItemObjectHelper menuItemHelper;
 
 	@Inject
+	MessageTemplateLogic messageTemplateLogic;
+
+	@Inject
+	MessageTemplateSetObjectHelper messageTemplateSetHelper;
+
+	@Inject
 	PaypalAccountObjectHelper paypalAccountHelper;
 
 	@Inject
@@ -145,6 +155,34 @@ class ImChatCoreFixtureProvider
 
 		);
 
+		// message template database
+
+		MessageTemplateDatabaseRec messageTemplateDatabase =
+			messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
+				sliceHelper.findByCode (
+					GlobalId.root,
+					"test"),
+				joinWithSlash (
+					"/wbs/applications/imchat/fixture",
+					"im-chat-message-template-database.xml"));
+
+		messageTemplateSetHelper.insert (
+			messageTemplateSetHelper.createInstance ()
+
+			.setMessageTemplateDatabase (
+				messageTemplateDatabase)
+
+			.setCode (
+				"default")
+
+			.setName (
+				"Default")
+
+			.setDescription (
+				"")
+
+		);
+
 		// im chat
 
 		ImChatRec imChat =
@@ -175,6 +213,9 @@ class ImChatCoreFixtureProvider
 				currencyHelper.findByCode (
 					GlobalId.root,
 					"gbp"))
+
+			.setMessageTemplateDatabase (
+				messageTemplateDatabase)
 
 			.setPreferredQueueTime (
 				5 * 60)

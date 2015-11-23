@@ -10,6 +10,8 @@ import java.util.Collections;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -24,11 +26,14 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @PrototypeComponent ("contextTabActionPageBuider")
 @ConsoleModuleBuilderHandler
 public
-class ContextTabActionPageBuilder {
+class ContextTabActionPageBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -49,7 +54,7 @@ class ContextTabActionPageBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ContextTabActionPageSpec spec;
@@ -74,13 +79,15 @@ class ContextTabActionPageBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildTab (
 				resolvedExtensionPoint);
@@ -95,14 +102,22 @@ class ContextTabActionPageBuilder {
 	}
 
 	void buildTab (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextTab (
 			container.tabLocation (),
+
 			contextTab.get ()
-				.name (tabName)
-				.defaultLabel (tabLabel)
-				.localFile (localFile),
+
+				.name (
+					tabName)
+
+				.defaultLabel (
+					tabLabel)
+
+				.localFile (
+					localFile),
+
 			hideTab
 				? Collections.<String>emptyList ()
 				: resolvedExtensionPoint.contextTypeNames ());
@@ -110,7 +125,7 @@ class ContextTabActionPageBuilder {
 	}
 
 	void buildFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextFile (
 			localFile,
@@ -126,9 +141,17 @@ class ContextTabActionPageBuilder {
 		consoleModule.addResponder (
 			responderName,
 			tabContextResponder.get ()
-				.tab (tabName)
-				.title (title)
-				.pagePartName (pagePartName));
+
+			.tab (
+				tabName)
+
+			.title (
+				title)
+
+			.pagePartName (
+				pagePartName)
+
+		);
 
 	}
 

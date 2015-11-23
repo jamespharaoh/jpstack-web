@@ -43,6 +43,8 @@ public
 class ChatMonitorInboxFormAction
 	extends ConsoleAction {
 
+	// dependencies
+
 	@Inject
 	ChatBlockObjectHelper chatBlockHelper;
 
@@ -88,6 +90,8 @@ class ChatMonitorInboxFormAction
 	@Inject
 	UserObjectHelper userHelper;
 
+	// details
+
 	@Override
 	public
 	Responder backupResponder () {
@@ -96,6 +100,8 @@ class ChatMonitorInboxFormAction
 			"chatMonitorInboxFormResponder");
 
 	}
+
+	// implementation
 
 	@Override
 	protected

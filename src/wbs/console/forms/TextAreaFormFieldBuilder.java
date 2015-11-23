@@ -35,8 +35,8 @@ class TextAreaFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<UpdatableFormField>
-	updatableFormFieldProvider;
+	Provider<DynamicFormFieldAccessor>
+	dynamicFormFieldAccessorProvider;
 
 	@Inject
 	Provider<IdentityFormFieldInterfaceMapping>
@@ -61,6 +61,10 @@ class TextAreaFormFieldBuilder {
 	@Inject
 	Provider<TextAreaFormFieldRenderer>
 	textAreaFormFieldRendererProvider;
+
+	@Inject
+	Provider<UpdatableFormField>
+	updatableFormFieldProvider;
 
 	// builder
 
@@ -162,14 +166,31 @@ class TextAreaFormFieldBuilder {
 
 		// accessor
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+		FormFieldAccessor accessor;
+
+		if (dynamic) {
+
+			accessor =
+				dynamicFormFieldAccessorProvider.get ()
 
 				.name (
 					name)
 
 				.nativeClass (
 					propertyClass);
+
+		} else {
+
+			accessor =
+				simpleFormFieldAccessorProvider.get ()
+
+				.name (
+					name)
+
+				.nativeClass (
+					propertyClass);
+
+		}
 
 		// TODO dynamic
 

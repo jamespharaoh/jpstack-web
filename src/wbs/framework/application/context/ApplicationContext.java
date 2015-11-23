@@ -3,6 +3,7 @@ package wbs.framework.application.context;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -48,6 +49,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.EasyReadWriteLock.HeldLock;
 import wbs.framework.application.context.InjectedProperty.CollectionType;
 import wbs.framework.application.xml.BeansBeanSpec;
@@ -519,8 +522,10 @@ class ApplicationContext {
 		HeldLock heldlock =
 			lock.read ();
 
-		for (InjectedProperty injectedProperty
-				: beanDefinition.injectedProperties ()) {
+		for (
+			InjectedProperty injectedProperty
+				: beanDefinition.injectedProperties ()
+		) {
 
 			log.debug (
 				stringFormat (
@@ -1173,17 +1178,40 @@ class ApplicationContext {
 
 		for (
 			Field field
-				: FieldUtils.getAllFields (instantiateClass)
+				: FieldUtils.getAllFields (
+					instantiateClass)
 		) {
 
 			Inject injectAnnotation =
-				field.getAnnotation (Inject.class);
+				field.getAnnotation (
+					Inject.class);
 
-			if (injectAnnotation == null)
+			PrototypeDependency prototypeDependencyAnnotation =
+				field.getAnnotation (
+					PrototypeDependency.class);
+
+			SingletonDependency singletonDependencyAnnotation =
+				field.getAnnotation (
+					SingletonDependency.class);
+
+			if (
+
+				isNull (
+					injectAnnotation)
+
+				&& isNull (
+					prototypeDependencyAnnotation)
+
+				&& isNull (
+					singletonDependencyAnnotation)
+
+			) {
 				continue;
+			}
 
 			Named namedAnnotation =
-				field.getAnnotation (Named.class);
+				field.getAnnotation (
+					Named.class);
 
 			if (namedAnnotation != null) {
 
@@ -1198,8 +1226,10 @@ class ApplicationContext {
 				List<Annotation> qualifierAnnotations =
 					new ArrayList<Annotation> ();
 
-				for (Annotation annotation
-						: field.getDeclaredAnnotations ()) {
+				for (
+					Annotation annotation
+						: field.getDeclaredAnnotations ()
+				) {
 
 					if (annotation instanceof Named)
 						continue;

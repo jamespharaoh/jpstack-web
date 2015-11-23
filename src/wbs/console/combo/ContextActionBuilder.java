@@ -7,6 +7,8 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -19,11 +21,14 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @PrototypeComponent ("contextActionBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ContextActionBuilder {
+class ContextActionBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -36,7 +41,7 @@ class ContextActionBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ContextActionSpec spec;
@@ -55,13 +60,15 @@ class ContextActionBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildContextFile (
 				resolvedExtensionPoint);

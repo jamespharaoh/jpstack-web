@@ -10,6 +10,8 @@ import java.util.Collections;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -32,13 +34,16 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 
 @PrototypeComponent ("objectSearchPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectSearchPageBuilder {
+class ObjectSearchPageBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -77,7 +82,7 @@ class ObjectSearchPageBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ObjectSearchPageSpec spec;
@@ -87,7 +92,7 @@ class ObjectSearchPageBuilder {
 
 	// state
 
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	Class<?> searchClass;
 
@@ -113,7 +118,7 @@ class ObjectSearchPageBuilder {
 	@BuildMethod
 	public
 	void buildConsoleModule (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 

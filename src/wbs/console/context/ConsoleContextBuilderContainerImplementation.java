@@ -4,12 +4,15 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.ConsoleHelper;
+import wbs.framework.record.Record;
 
 @Accessors (fluent = true)
 @Data
 public
-class ConsoleContextBuilderContainerImplementation
-	implements ConsoleContextBuilderContainer {
+class ConsoleContextBuilderContainerImplementation<
+	ObjectType extends Record<ObjectType>
+>
+	implements ConsoleContextBuilderContainer<ObjectType> {
 
 	String existingBeanNamePrefix;
 	String newBeanNamePrefix;
@@ -17,7 +20,7 @@ class ConsoleContextBuilderContainerImplementation
 	String structuralName;
 	String extensionPointName;
 	String pathPrefix;
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 	String friendlyName;
 	String tabLocation;
 

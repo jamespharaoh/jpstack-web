@@ -2,6 +2,8 @@ package wbs.console.context;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
@@ -11,11 +13,14 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @PrototypeComponent ("consoleContextLinkBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ConsoleContextLinkBuilder {
+class ConsoleContextLinkBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -25,7 +30,7 @@ class ConsoleContextLinkBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ConsoleContextLinkSpec spec;
@@ -42,13 +47,15 @@ class ConsoleContextLinkBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildTabLocation (
 				resolvedExtensionPoint);

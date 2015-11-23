@@ -36,6 +36,7 @@ import javax.inject.Provider;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -56,6 +57,7 @@ import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataChildrenIndex;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.data.annotations.DataContent;
 import wbs.framework.data.annotations.DataIgnore;
 import wbs.framework.data.annotations.DataInitMethod;
 import wbs.framework.data.annotations.DataParent;
@@ -628,6 +630,15 @@ class DataFromXml {
 
 				}
 
+				if (annotation instanceof DataContent) {
+
+					buildContentField (
+						field,
+						(DataContent) annotation,
+						contextString);
+
+				}
+
 				if (annotation instanceof DataChild) {
 
 					buildChildField (
@@ -696,9 +707,9 @@ class DataFromXml {
 		}
 
 		void buildAttributeField (
-				Field field,
-				DataAttribute dataAttributeAnnotation,
-				String contextString) {
+				@NonNull Field field,
+				@NonNull DataAttribute dataAttributeAnnotation,
+				@NonNull String contextString) {
 
 			String attributeName =
 				ifNull (
@@ -816,6 +827,29 @@ class DataFromXml {
 						"at %s.%s",
 						object.getClass ().getSimpleName (),
 						field.getName ()));
+
+			}
+
+		}
+
+		void buildContentField (
+				@NonNull Field field,
+				@NonNull DataContent dataContentAnnotation,
+				@NonNull String contextString) {
+
+			String stringValue =
+				element.getTextTrim ();
+
+			if (field.getType () == String.class) {
+
+				BeanLogic.set (
+					object,
+					field.getName (),
+					stringValue);
+
+			} else {
+
+				throw new RuntimeException ();
 
 			}
 

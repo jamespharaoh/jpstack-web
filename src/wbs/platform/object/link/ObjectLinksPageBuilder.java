@@ -7,6 +7,8 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -27,13 +29,16 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.model.ModelField;
+import wbs.framework.record.Record;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 
 @PrototypeComponent ("objectLinksPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectLinksPageBuilder {
+class ObjectLinksPageBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -66,7 +71,7 @@ class ObjectLinksPageBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ObjectLinksPageSpec spec;
@@ -76,7 +81,7 @@ class ObjectLinksPageBuilder {
 
 	// state
 
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	String name;
 	String tabName;
@@ -102,7 +107,7 @@ class ObjectLinksPageBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
@@ -125,7 +130,7 @@ class ObjectLinksPageBuilder {
 	}
 
 	void buildTab (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextTab (
 			container.tabLocation (),
@@ -139,7 +144,7 @@ class ObjectLinksPageBuilder {
 	}
 
 	void buildFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		Action action =
 			new Action () {

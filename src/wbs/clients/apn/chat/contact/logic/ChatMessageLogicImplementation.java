@@ -751,8 +751,10 @@ class ChatMessageLogicImplementation
 			chatApprovalRegexpHelper.findByParent (
 				chat);
 
-		for (ChatApprovalRegexpRec chatApprovalRegexp
-				: chatApprovalRegexps) {
+		for (
+			ChatApprovalRegexpRec chatApprovalRegexp
+				: chatApprovalRegexps
+		) {
 
 			// look for any matches
 
@@ -769,8 +771,10 @@ class ChatMessageLogicImplementation
 
 			// update the return status as appropriate
 
-			if (chatApprovalRegexp.getAuto ()
-					&& approvalResult.status == ApprovalResult.Status.clean) {
+			if (
+				chatApprovalRegexp.getAuto ()
+				&& approvalResult.status == ApprovalResult.Status.clean
+			) {
 
 				approvalResult.status =
 					ApprovalResult.Status.auto;
@@ -1013,14 +1017,31 @@ class ChatMessageLogicImplementation
 		UrbanAirshipApi.PushRequest urbanApiRequest =
 			new UrbanAirshipApi.PushRequest ();
 
-		urbanApiRequest.tokens.add (toUser.getJigsawToken ());
-		urbanApiRequest.apsAlert = "New message from " + ifNull (fromUser.getName (), fromUser.getCode ());
-		urbanApiRequest.apsSound = "default";
-		urbanApiRequest.apsBadge = messages.size ();
-		urbanApiRequest.customProperties.put ("fromUserCode", fromUser.getCode ());
-		urbanApiRequest.customProperties.put ("timestamp", isoDate (chatMessage.getTimestamp ()));
+		urbanApiRequest.tokens.add (
+			toUser.getJigsawToken ());
 
-		long urbanStart = System.nanoTime ();
+		urbanApiRequest.apsAlert =
+			"New message from " + ifNull (
+				fromUser.getName (),
+				fromUser.getCode ());
+
+		urbanApiRequest.apsSound =
+			"default";
+
+		urbanApiRequest.apsBadge =
+			messages.size ();
+
+		urbanApiRequest.customProperties.put (
+			"fromUserCode",
+			fromUser.getCode ());
+
+		urbanApiRequest.customProperties.put (
+			"timestamp",
+			isoDate (
+				chatMessage.getTimestamp ()));
+
+		long urbanStart =
+			System.nanoTime ();
 
 		try {
 
@@ -1314,7 +1335,7 @@ class ChatMessageLogicImplementation
 					chat,
 					serviceCode),
 				fromUser.getId (),
-				Optional.of (
+				Optional.fromNullable (
 					chatMessage.getSender ()));
 
 		chatMessage
@@ -1364,15 +1385,15 @@ class ChatMessageLogicImplementation
 	Map<ChatUserOperatorLabel,String> warningByOperatorLabel =
 		ImmutableMap.<ChatUserOperatorLabel,String>builder ()
 
-			.put (
-				ChatUserOperatorLabel.operator,
-				"operator_message_warning")
+		.put (
+			ChatUserOperatorLabel.operator,
+			"operator_message_warning")
 
-			.put (
-				ChatUserOperatorLabel.monitor,
-				"monitor_message_warning")
+		.put (
+			ChatUserOperatorLabel.monitor,
+			"monitor_message_warning")
 
-			.build ();
+		.build ();
 
 	/**
 	 * Increments a chat users rejection count and, when appropriate, triggers
@@ -1476,7 +1497,7 @@ class ChatMessageLogicImplementation
 
 	private final static
 	MessageSplitter.Templates messageFromTemplates (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
 
 		String userId =
 			chatUser.getName () == null

@@ -31,40 +31,44 @@ class IntegerFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<ReadOnlyFormField>
-	readOnlyFormFieldProvider;
-
-	@Inject
-	Provider<UpdatableFormField>
-	updatableFormFieldProvider;
+	Provider<DynamicFormFieldAccessor>
+	dynamicFormFieldAccessorProvider;
 
 	@Inject
 	Provider<IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
 	@Inject
-	Provider<IntegerFormFieldNativeMapping>
-	integerFormFieldNativeMappingProvider;
+	Provider<IntegerFormFieldInterfaceMapping>
+	integerFormFieldInterfaceMappingProvider;
 
 	@Inject
-	Provider<NullFormFieldConstraintValidator>
-	nullFormFieldValueConstraintValidatorProvider;
+	Provider<IntegerFormFieldNativeMapping>
+	integerFormFieldNativeMappingProvider;
 
 	@Inject
 	Provider<IntegerFormFieldValueValidator>
 	integerFormFieldValueValidatorProvider;
 
 	@Inject
+	Provider<NullFormFieldConstraintValidator>
+	nullFormFieldValueConstraintValidatorProvider;
+
+	@Inject
+	Provider<ReadOnlyFormField>
+	readOnlyFormFieldProvider;
+
+	@Inject
 	Provider<SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
 	@Inject
-	Provider<IntegerFormFieldInterfaceMapping>
-	integerFormFieldInterfaceMappingProvider;
-
-	@Inject
 	Provider<TextFormFieldRenderer>
 	textFormFieldRendererProvider;
+
+	@Inject
+	Provider<UpdatableFormField>
+	updatableFormFieldProvider;
 
 	// builder
 
@@ -117,23 +121,17 @@ class IntegerFormFieldBuilder {
 				spec.maximum (),
 				Long.MAX_VALUE);
 
-/*
 		Boolean dynamic =
-				ifNull (spec.dynamic(),
-						false);
-*/
+			ifNull (
+				spec.dynamic (),
+				false);
 
 		Class<?> propertyClass =
-			BeanLogic.propertyClass (
-				context.containerClass (),
-				name);
-
-/*
-		if (! dynamic) {
-		} else {
-			propertyClass = Integer.class;
-		}
-*/
+			dynamic
+				? Integer.class
+				: BeanLogic.propertyClass (
+					context.containerClass (),
+					name);
 
 		Boolean blankIfZero =
 			ifNull (
@@ -142,19 +140,31 @@ class IntegerFormFieldBuilder {
 
 		// accessor
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+		FormFieldAccessor accessor;
 
-			.name (
-				name)
+		if (dynamic) {
 
-/*
-			.dynamic (
-				dynamic)
-*/
+			accessor =
+				dynamicFormFieldAccessorProvider.get ()
 
-			.nativeClass (
-				propertyClass);
+				.name (
+					name)
+
+				.nativeClass (
+					propertyClass);
+
+		} else {
+
+			accessor =
+				simpleFormFieldAccessorProvider.get ()
+
+				.name (
+					name)
+
+				.nativeClass (
+					propertyClass);
+
+		}
 
 		// native mapping
 

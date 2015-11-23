@@ -1,0 +1,111 @@
+<console-module
+	name="message-template-entry-value">
+
+	<console-helper-provider
+		object-name="messageTemplateEntryValue"
+		view-delegate-field="messageTemplateSet.messageTemplateDatabase"
+		view-delegate-priv-code="manage">
+
+		<context-stuff
+			name="messageTemplateEntryValueName"
+			delegate="messageTemplateEntryType"
+			field="name"/>
+
+		<context-stuff
+			name="messageTemplateSetId"
+			delegate="messageTemplateSet"
+			field="id"/>
+
+		<run-post-processor
+			name="messageTemplateSet"/>
+
+		<priv-key
+			name="messageTemplateEntryValue.manage"
+			delegate="messageTemplateSet.messageTemplateDatabase"
+			priv="manage"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="messageTemplateEntryValue"
+		object-name="messageTemplateEntryValue">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"
+				fields-provider="messageTemplateEntryValueSummaryFieldsProvider"/>
+
+			<object-settings-page
+				fields="settings"
+				fields-provider="messageTemplateEntryValueSettingsFieldsProvider"/>
+
+			<context-link
+				name="fieldValue"
+				link="messageTemplateFieldValue"
+				label="Fields"
+				priv-key="messageTemplateDatabase.manage"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="messageTemplateEntryValue">
+
+		<object-field
+			name="messageTemplateEntryType"
+			object-type="messageTemplateEntryType"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="messageTemplateEntryValue">
+
+		<object-field
+			name="messageTemplateEntryType"
+			object-type="messageTemplateEntryType"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="messageTemplateEntryValue">
+
+		<id-field/>
+		<parent-field/>
+		<deleted-field/>
+
+		<object-field
+			name="messageTemplateEntryType"
+			object-type="messageTemplateEntryType"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="messageTemplateEntryValue">
+
+		<deleted-field/>
+
+		<object-field
+			name="messageTemplateEntryType"
+			object-type="messageTemplateEntryType"/>
+
+	</field-set>
+
+</console-module>

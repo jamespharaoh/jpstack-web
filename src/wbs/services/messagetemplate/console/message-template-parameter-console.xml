@@ -15,12 +15,12 @@
 			field="id"/>
 
 		<context-stuff
-			name="messageTemplateTypeId"
-			delegate="messageTemplateType"
+			name="messageTemplateEntryTypeId"
+			delegate="messageTemplateEntryType"
 			field="id"/>
 
 		<run-post-processor
-			name="messageTemplateType"/>
+			name="messageTemplateEntryType"/>
 
 	</console-helper-provider>
 
@@ -55,9 +55,10 @@
 		object-name="messageTemplateParameter">
 
 		<name-field/>
+		<description-field/>
 
 		<integer-field
-			name="length"/>
+			name="maximumLength"/>
 
 		<yes-no-field
 			name="required"/>
@@ -68,12 +69,11 @@
 		name="create"
 		object-name="messageTemplateParameter">
 
-		<id-field/>
-		<parent-field/>
 		<name-field/>
+		<description-field/>
 
 		<integer-field
-			name="length"/>
+			name="maximumLength"/>
 
 		<yes-no-field
 			name="required"/>
@@ -86,10 +86,13 @@
 
 		<id-field/>
 		<parent-field/>
+		<code-field/>
 		<name-field/>
+		<description-field/>
+		<deleted-field/>
 
 		<integer-field
-			name="length"/>
+			name="maximumLength"/>
 
 		<yes-no-field
 			name="required"/>
@@ -100,12 +103,13 @@
 		name="settings"
 		object-name="messageTemplateParameter">
 
-		<id-field/>
 		<parent-field/>
 		<name-field/>
+		<description-field/>
+		<deleted-field/>
 
 		<integer-field
-			name="length"/>
+			name="maximumLength"/>
 
 		<yes-no-field
 			name="required"/>

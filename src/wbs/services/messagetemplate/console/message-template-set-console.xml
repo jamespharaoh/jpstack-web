@@ -11,16 +11,17 @@
 			field="name"/>
 
 		<context-stuff
-			name="mmessageTemplateSetId"
-			field="id"/>
-
-		<context-stuff
 			name="messageTemplateDatabaseId"
 			delegate="messageTemplateDatabase"
 			field="id"/>
 
 		<run-post-processor
 			name="messageTemplateDatabase"/>
+
+		<priv-key
+			name="messageTemplateSet.manage"
+			delegate="messageTemplateDatabase"
+			priv="manage"/>
 
 	</console-helper-provider>
 
@@ -30,22 +31,22 @@
 
 		<list>
 
-			<object-list-page
-				fields-provider="messageTemplateSetListFieldsProvider"/>
+			<object-list-page/>
 
-			<object-create-page
-				fields-provider="messageTemplateSetCreateFieldsProvider"/>
+			<object-create-page/>
 
 		</list>
 
 		<object>
 
-			<object-summary-page
-				fields-provider="messageTemplateSetSummaryFieldsProvider"
-				priv-key="messageTemplateDatabase.manage"/>
+			<object-summary-page/>
 
-			<object-settings-page
-				fields-provider="messageTemplateSetSettingsFieldsProvider"
+			<object-settings-page/>
+
+			<context-link
+				name="entry"
+				link="messageTemplateEntryValue"
+				label="Entries"
 				priv-key="messageTemplateDatabase.manage"/>
 
 			<object-events-page/>

@@ -128,6 +128,11 @@
 			name="currency"
 			object-type="currency"/>
 
+		<object-field
+			name="messageTemplateDatabase"
+			object-type="messageTemplateDatabase"
+			nullable="yes"/>
+
 		<seconds-field
 			name="preferredQueueTime"/>
 
@@ -180,6 +185,11 @@
 		<object-field
 			name="currency"
 			object-type="currency"
+			nullable="yes"/>
+
+		<object-field
+			name="messageTemplateDatabase"
+			object-type="messageTemplateDatabase"
 			nullable="yes"/>
 
 		<seconds-field

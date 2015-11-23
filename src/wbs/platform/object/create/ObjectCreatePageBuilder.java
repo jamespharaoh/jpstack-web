@@ -10,6 +10,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -33,6 +35,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 import wbs.services.ticket.core.console.FieldsProvider;
@@ -40,7 +43,10 @@ import wbs.services.ticket.core.console.FieldsProvider;
 @PrototypeComponent ("objectCreatePageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectCreatePageBuilder {
+class ObjectCreatePageBuilder<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+> {
 
 	// dependences
 
@@ -62,10 +68,10 @@ class ObjectCreatePageBuilder {
 	Provider<ConsoleContextTab> contextTab;
 
 	@Inject
-	Provider<ObjectCreateAction> objectCreateAction;
+	Provider<ObjectCreateAction<ObjectType,ParentType>> objectCreateAction;
 
 	@Inject
-	Provider<ObjectCreatePart> objectCreatePart;
+	Provider<ObjectCreatePart<ObjectType,ParentType>> objectCreatePart;
 
 	@Inject
 	Provider<TabContextResponder> tabContextResponder;
@@ -73,7 +79,7 @@ class ObjectCreatePageBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ObjectCreatePageSpec spec;
@@ -83,7 +89,7 @@ class ObjectCreatePageBuilder {
 
 	// state
 
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	String typeCode;
 	String tabName;
@@ -91,7 +97,7 @@ class ObjectCreatePageBuilder {
 	String responderName;
 	String targetContextTypeName;
 	String targetResponderName;
-	FieldsProvider fieldsProvider;
+	FieldsProvider<ObjectType,ParentType> fieldsProvider;
 	FormFieldSet formFieldSet;
 	String createTimeFieldName;
 	String createUserFieldName;
@@ -104,7 +110,7 @@ class ObjectCreatePageBuilder {
 	@BuildMethod
 	public
 	void buildConsoleModule (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
@@ -330,10 +336,16 @@ class ObjectCreatePageBuilder {
 
 		if (spec.fieldsProviderName () != null) {
 
+			@SuppressWarnings ("unchecked")
+			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
+				(FieldsProvider<ObjectType,ParentType>)
+				applicationContext.getBean (
+					spec.fieldsProviderName (),
+					FieldsProvider.class);
+
 			fieldsProvider =
-					applicationContext.getBean (
-							spec.fieldsProviderName (),
-							FieldsProvider.class);
+				fieldsProviderTemp;
+
 		}
 
 		else {

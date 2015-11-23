@@ -2,6 +2,7 @@ package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -52,18 +53,35 @@ class ChildrenMappingWriter {
 	void build (
 			Builder builder) {
 
-		PluginModelSpec fieldTypePluginModel =
-			pluginManager.pluginModelsByName ().get (
-				spec.typeName ());
-
-		PluginSpec fieldTypePlugin =
-			fieldTypePluginModel.plugin ();
-
 		String fieldName =
 			ifNull (
 				spec.name (),
 				naivePluralise (
 					spec.typeName ()));
+
+		PluginModelSpec fieldTypePluginModel =
+			pluginManager.pluginModelsByName ().get (
+				spec.typeName ());
+
+		if (
+			isNull (
+				fieldTypePluginModel)
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Field '%s.%s' ",
+					context.modelMeta ().name (),
+					fieldName,
+					"has type '%s' ",
+					spec.typeName (),
+					"which does not exist"));
+
+
+		}
+
+		PluginSpec fieldTypePlugin =
+			fieldTypePluginModel.plugin ();
 
 		String fullFieldTypeName =
 			stringFormat (

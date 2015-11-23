@@ -1,14 +1,15 @@
 package wbs.console.forms;
 
-import wbs.framework.record.Record;
-
 public
-interface FormFieldDataProvider {
+interface FormFieldDataProvider<
+	ObjectType,
+	ParentType
+> {
 
-	String getFormFieldData (
-		Record<?> parent);
+	String getFormFieldDataForParent (
+			ParentType parent);
 
-	FormFieldDataProvider setMode (
-		String modeSet);
+	String getFormFieldDataForObject (
+			ObjectType object);
 
 }

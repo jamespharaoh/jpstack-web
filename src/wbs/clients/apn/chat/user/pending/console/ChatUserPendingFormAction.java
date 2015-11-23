@@ -12,6 +12,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import com.google.common.base.Optional;
 
@@ -588,7 +589,8 @@ class ChatUserPendingFormAction
 		sendRejection (
 			myUser,
 			chatUser,
-			chatUserName.getThreadId (),
+			Optional.fromNullable (
+				chatUserName.getThreadId ()),
 			messageParam);
 
 		Responder responder =
@@ -697,7 +699,8 @@ class ChatUserPendingFormAction
 		sendRejection (
 			myUser,
 			chatUser,
-			chatUserInfo.getThreadId (),
+			Optional.fromNullable (
+				chatUserInfo.getThreadId ()),
 			messageParam);
 
 		Responder responder =
@@ -716,10 +719,10 @@ class ChatUserPendingFormAction
 
 	private
 	void sendRejection (
-			UserRec myUser,
-			ChatUserRec chatUser,
-			Integer threadId,
-			String messageParam) {
+			@NonNull UserRec myUser,
+			@NonNull ChatUserRec chatUser,
+			@NonNull Optional<Integer> threadId,
+			@NonNull String messageParam) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -789,10 +792,14 @@ class ChatUserPendingFormAction
 			message =
 				chatSendLogic.sendMessageMagic (
 					chatUser,
-					Optional.of (threadId),
+					threadId,
 					messageText,
-					commandHelper.findByCode (chat, "join_info"),
-					serviceHelper.findByCode (chat, "system"),
+					commandHelper.findByCode (
+						chat,
+						"join_info"),
+					serviceHelper.findByCode (
+						chat,
+						"system"),
 					0);
 
 		}

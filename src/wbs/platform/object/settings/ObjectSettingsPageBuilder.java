@@ -13,6 +13,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -38,6 +40,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 import wbs.services.ticket.core.console.FieldsProvider;
@@ -45,7 +48,10 @@ import wbs.services.ticket.core.console.FieldsProvider;
 @PrototypeComponent ("objectSettingsPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectSettingsPageBuilder {
+class ObjectSettingsPageBuilder<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+> {
 
 	// dependencies
 
@@ -78,10 +84,10 @@ class ObjectSettingsPageBuilder {
 	Provider<ObjectRemoveAction> objectRemoveAction;
 
 	@Inject
-	Provider<ObjectSettingsAction> objectSettingsAction;
+	Provider<ObjectSettingsAction<ObjectType,ParentType>> objectSettingsAction;
 
 	@Inject
-	Provider<ObjectSettingsPart> objectSettingsPart;
+	Provider<ObjectSettingsPart<ObjectType,ParentType>> objectSettingsPart;
 
 	@Inject
 	Provider<TabContextResponder> tabContextResponder;
@@ -89,7 +95,7 @@ class ObjectSettingsPageBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ObjectSettingsPageSpec spec;
@@ -99,9 +105,10 @@ class ObjectSettingsPageBuilder {
 
 	// state
 
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 	FormFieldSet formFieldSet;
-	FieldsProvider fieldsProvider;
+	FieldsProvider<ObjectType,ParentType> fieldsProvider;
+
 	String privKey;
 	String name;
 	String shortName;
@@ -120,7 +127,7 @@ class ObjectSettingsPageBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
@@ -205,7 +212,7 @@ class ObjectSettingsPageBuilder {
 							formFieldSet)
 
 						.formFieldsProvider (
-								fieldsProvider)
+							fieldsProvider)
 
 						.objectRefName (
 							consoleHelper.codeExists ()
@@ -366,7 +373,7 @@ class ObjectSettingsPageBuilder {
 						formFieldSet)
 
 					.formFieldsProvider (
-							fieldsProvider)
+						fieldsProvider)
 
 					.removeLocalName (
 						consoleHelper.ephemeral ()
@@ -399,11 +406,17 @@ class ObjectSettingsPageBuilder {
 
 	void setDefaults () {
 
-		consoleHelper =
+		@SuppressWarnings ("unchecked")
+		ConsoleHelper<ObjectType> consoleHelperTemp =
 			spec.objectName () != null
-				? consoleHelperRegistry.get ()
-					.findByObjectName (spec.objectName ())
+				? (ConsoleHelper<ObjectType>)
+				consoleHelperRegistry.get ()
+					.findByObjectName (
+						spec.objectName ())
 				: container.consoleHelper ();
+
+		consoleHelper =
+			consoleHelperTemp;
 
 		name =
 			spec.name ();
@@ -473,10 +486,16 @@ class ObjectSettingsPageBuilder {
 
 		if (spec.fieldsProviderName () != null) {
 
+			@SuppressWarnings ("unchecked")
+			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
+				(FieldsProvider<ObjectType,ParentType>)
+				applicationContext.getBean (
+					spec.fieldsProviderName (),
+					FieldsProvider.class);
+
 			fieldsProvider =
-					applicationContext.getBean (
-							spec.fieldsProviderName (),
-							FieldsProvider.class);
+				fieldsProviderTemp;
+
 		}
 
 		else {

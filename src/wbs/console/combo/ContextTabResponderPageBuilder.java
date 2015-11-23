@@ -7,8 +7,11 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -24,11 +27,14 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @PrototypeComponent ("contextTabResponderPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ContextTabResponderPageBuilder {
+class ContextTabResponderPageBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -49,7 +55,7 @@ class ContextTabResponderPageBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ContextTabResponderPageSpec spec;
@@ -73,13 +79,15 @@ class ContextTabResponderPageBuilder {
 	@BuildMethod
 	public
 	void buildConsoleModule (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildTab (
 				resolvedExtensionPoint);
@@ -97,7 +105,7 @@ class ContextTabResponderPageBuilder {
 	// private implementation
 
 	void buildTab (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@Nonnull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextTab (
 
@@ -121,7 +129,7 @@ class ContextTabResponderPageBuilder {
 	}
 
 	void buildFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextFile (
 

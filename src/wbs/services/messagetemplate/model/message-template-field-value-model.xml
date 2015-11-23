@@ -1,5 +1,5 @@
 <model-meta
-	name="messageTemplateValue"
+	name="messageTemplateFieldValue"
 	type="minor">
 
 	<fields>
@@ -11,10 +11,14 @@
 		<!-- identity -->
 
 		<parent-field
-			type="messageTemplateSet"/>
+			type="messageTemplateEntryValue"/>
 
 		<identity-reference-field
-			type="messageTemplateType"/>
+			type="messageTemplateFieldType"/>
+
+		<!-- details -->
+
+		<deleted-field/>
 
 		<!-- settings -->
 

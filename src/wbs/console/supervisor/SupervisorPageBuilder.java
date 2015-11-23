@@ -8,6 +8,7 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -28,12 +29,15 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SupervisorPageBuilder {
+class SupervisorPageBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -65,7 +69,7 @@ class SupervisorPageBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	SupervisorPageSpec spec;
@@ -75,7 +79,7 @@ class SupervisorPageBuilder {
 
 	// state
 
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	String name;
 	String tabName;
@@ -92,7 +96,7 @@ class SupervisorPageBuilder {
 	@BuildMethod
 	public
 	void buildConsoleModule (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
@@ -116,7 +120,7 @@ class SupervisorPageBuilder {
 	}
 
 	void buildContextTab (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextTab (
 			container.tabLocation (),
@@ -129,7 +133,7 @@ class SupervisorPageBuilder {
 	}
 
 	void buildContextFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextFile (
 			fileName,

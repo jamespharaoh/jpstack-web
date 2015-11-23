@@ -15,6 +15,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -40,11 +42,14 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @PrototypeComponent ("objectContextBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectContextBuilder {
+class ObjectContextBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -90,7 +95,7 @@ class ObjectContextBuilder {
 
 	// state
 
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	String name;
 	String structuralName;
@@ -112,7 +117,7 @@ class ObjectContextBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
@@ -125,8 +130,10 @@ class ObjectContextBuilder {
 			consoleMetaManager.resolveContextLink (
 				name);
 
-		for (ResolvedConsoleContextLink resolvedContextLink
-				: resolvedContextLinks) {
+		for (
+			ResolvedConsoleContextLink resolvedContextLink
+				: resolvedContextLinks
+		) {
 
 			buildResolvedContexts (
 				resolvedContextLink);
@@ -136,8 +143,8 @@ class ObjectContextBuilder {
 
 		}
 
-		ConsoleContextBuilderContainer listContainer =
-			new ConsoleContextBuilderContainerImplementation ()
+		ConsoleContextBuilderContainer<ObjectType> listContainer =
+			new ConsoleContextBuilderContainerImplementation<ObjectType> ()
 
 			.consoleHelper (
 				consoleHelper)
@@ -169,8 +176,8 @@ class ObjectContextBuilder {
 			consoleModule,
 			MissingBuilderBehaviour.error);
 
-		ConsoleContextBuilderContainer objectContainer =
-			new ConsoleContextBuilderContainerImplementation ()
+		ConsoleContextBuilderContainer<ObjectType> objectContainer =
+			new ConsoleContextBuilderContainerImplementation<ObjectType> ()
 
 			.consoleHelper (
 				consoleHelper)
@@ -488,9 +495,14 @@ class ObjectContextBuilder {
 
 	void setDefaults () {
 
-		consoleHelper =
+		@SuppressWarnings ("unchecked")
+		ConsoleHelper<ObjectType> consoleHelperTemp =
+			(ConsoleHelper<ObjectType>)
 			consoleHelperRegistry.findByObjectName (
 				spec.objectName ());
+
+		consoleHelper =
+			consoleHelperTemp;
 
 		name =
 			spec.name ();

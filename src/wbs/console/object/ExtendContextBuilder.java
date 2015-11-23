@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -24,12 +25,15 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @Log4j
 @PrototypeComponent ("extendContextBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ExtendContextBuilder {
+class ExtendContextBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -56,14 +60,14 @@ class ExtendContextBuilder {
 	String baseName;
 	String extensionPointName;
 
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	// build
 
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
@@ -73,7 +77,7 @@ class ExtendContextBuilder {
 	}
 
 	void buildChildren (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		List<ResolvedConsoleContextExtensionPoint> resolvedExtensionPoints =
 			consoleMetaManager.resolveExtensionPoint (
@@ -91,8 +95,8 @@ class ExtendContextBuilder {
 
 		}
 
-		ConsoleContextBuilderContainer nextBuilderContainer =
-			new ConsoleContextBuilderContainerImplementation ()
+		ConsoleContextBuilderContainer<ObjectType> nextBuilderContainer =
+			new ConsoleContextBuilderContainerImplementation<ObjectType> ()
 
 			.consoleHelper (
 				consoleHelper)
@@ -139,11 +143,16 @@ class ExtendContextBuilder {
 		extensionPointName =
 			spec.extensionPointName ();
 
-		consoleHelper =
+		@SuppressWarnings ("unchecked")
+		ConsoleHelper<ObjectType> consoleHelperTemp =
 			spec.objectName () != null
-				? consoleHelperRegistry.findByObjectName (
+				? (ConsoleHelper<ObjectType>)
+				consoleHelperRegistry.findByObjectName (
 					spec.objectName ())
 				: null;
+
+		consoleHelper =
+			consoleHelperTemp;
 
 	}
 

@@ -30,6 +30,9 @@ class TextFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
+	Provider<DynamicFormFieldAccessor> dynamicFormFieldAccessorProvider;
+
+	@Inject
 	Provider<IdentityFormFieldInterfaceMapping>
 	identityFormFieldInterfaceMappingProvider;
 
@@ -38,24 +41,19 @@ class TextFormFieldBuilder {
 	nullFormFieldValueConstraintValidatorProvider;
 
 	@Inject
-	Provider<NullFormFieldValueValidator>
-	nullFormFieldValueValidatorProvider;
+	Provider<NullFormFieldValueValidator> nullFormFieldValueValidatorProvider;
 
 	@Inject
-	Provider<ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	Provider<ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@Inject
-	Provider<SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	Provider<SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
 
 	@Inject
-	Provider<TextFormFieldRenderer>
-	textFormFieldRendererProvider;
+	Provider<TextFormFieldRenderer> textFormFieldRendererProvider;
 
 	@Inject
-	Provider<UpdatableFormField>
-	updatableFormFieldProvider;
+	Provider<UpdatableFormField> updatableFormFieldProvider;
 
 	// builder
 
@@ -122,14 +120,31 @@ class TextFormFieldBuilder {
 
 		// accessor
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+		FormFieldAccessor accessor;
 
-			.name (
-				name)
+		if (dynamic) {
 
-			.nativeClass (
-				propertyClass);
+			accessor =
+				dynamicFormFieldAccessorProvider.get ()
+
+				.name (
+					name)
+
+				.nativeClass (
+					propertyClass);
+
+		} else {
+
+			accessor =
+				simpleFormFieldAccessorProvider.get ()
+
+				.name (
+					name)
+
+				.nativeClass (
+					propertyClass);
+
+		}
 
 		// TODO dynamic
 

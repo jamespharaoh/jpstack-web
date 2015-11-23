@@ -8,11 +8,13 @@
 	</plugin-dependencies>
 
 	<models>
-		<model name="messageTemplateDatabase"/>
-		<model name="messageTemplateType"/>
-		<model name="messageTemplateValue"/>
-		<model name="messageTemplateSet"/>
 		<enum-type name="messageTemplateTypeCharset"/>
+		<model name="messageTemplateDatabase"/>
+		<model name="messageTemplateEntryType"/>
+		<model name="messageTemplateFieldType"/>
+		<model name="messageTemplateEntryValue"/>
+		<model name="messageTemplateFieldValue"/>
+		<model name="messageTemplateSet"/>
 		<model name="messageTemplateParameter"/>
 	</models>
 
@@ -20,16 +22,22 @@
 		<fixture name="messageTemplate"/>
 	</fixtures>
 
+	<layer name="logic">
+		<bean class="logic.MessageTemplateLogicImplementation"/>
+	</layer>
+
 	<layer name="console">
-		<bean class="console.MessageTemplateSetFieldsProvider"/>
-		<bean class="console.MessageTemplateSetFieldsProvider$Config"/>
-		<bean class="console.MessageTemplateFormFieldDataProvider"/>
-		<bean class="console.MessageTemplateFormFieldDataProvider$Config"/>
+		<bean class="console.MessageTemplateEntryValueFieldsProvider"/>
+		<bean class="console.MessageTemplateEntryValueFieldsProvider$Config"/>
+		<bean class="console.MessageTemplateEntryValueFormFieldDataProvider"/>
 	</layer>
 
 	<console-modules>
 		<console-module name="message-template-database"/>
-		<console-module name="message-template-type"/>
+		<console-module name="message-template-entry-type"/>
+		<console-module name="message-template-entry-value"/>
+		<console-module name="message-template-field-type"/>
+		<console-module name="message-template-field-value"/>
 		<console-module name="message-template-set"/>
 		<console-module name="message-template-parameter"/>
 	</console-modules>

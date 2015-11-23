@@ -31,12 +31,15 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 import wbs.platform.scaffold.model.SliceRec;
 
 @PrototypeComponent ("objectBrowsePageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectBrowsePageBuilder {
+class ObjectBrowsePageBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -63,7 +66,7 @@ class ObjectBrowsePageBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ObjectBrowsePageSpec spec;
@@ -73,7 +76,7 @@ class ObjectBrowsePageBuilder {
 
 	// state
 
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	String typeCode;
 

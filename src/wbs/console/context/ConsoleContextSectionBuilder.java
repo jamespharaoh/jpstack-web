@@ -26,11 +26,14 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @PrototypeComponent ("consoleContextSectionBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ConsoleContextSectionBuilder {
+class ConsoleContextSectionBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -51,7 +54,7 @@ class ConsoleContextSectionBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ConsoleContextSectionSpec spec;
@@ -61,7 +64,7 @@ class ConsoleContextSectionBuilder {
 
 	// state
 
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	String name;
 	String structuralName;
@@ -96,8 +99,8 @@ class ConsoleContextSectionBuilder {
 
 		}
 
-		ConsoleContextBuilderContainer nextContextBuilderContainer =
-			new ConsoleContextBuilderContainerImplementation ()
+		ConsoleContextBuilderContainer<ObjectType> nextContextBuilderContainer =
+			new ConsoleContextBuilderContainerImplementation<ObjectType> ()
 
 			.consoleHelper (
 				consoleHelper)
@@ -143,7 +146,9 @@ class ConsoleContextSectionBuilder {
 			contextTypeProvider.get ()
 
 			.name (
-				contextTypeName));
+				contextTypeName)
+
+		);
 
 	}
 

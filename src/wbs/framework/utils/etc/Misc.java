@@ -1248,31 +1248,44 @@ class Misc {
 
 	public static
 	String joinWithSeparator (
-		String separator,
-		String prefix,
-		Iterable<String> parts,
-		String suffix) {
+			@NonNull String separator,
+			@NonNull String prefix,
+			@NonNull Iterable<String> parts,
+			@NonNull String suffix) {
 
-		StringBuilder ret =
+		StringBuilder stringBuilder =
 			new StringBuilder ();
 
 		boolean first = true;
 
-		for (String part : parts) {
+		for (
+			String part
+				: parts
+		) {
 
 			if (first) {
+
 				first = false;
+
 			} else {
-				ret.append (separator);
+
+				stringBuilder.append (
+					separator);
+
 			}
 
-			ret.append (prefix);
-			ret.append (part);
-			ret.append (suffix);
+			stringBuilder.append (
+				prefix);
+
+			stringBuilder.append (
+				part);
+
+			stringBuilder.append (
+				suffix);
 
 		}
 
-		return ret.toString ();
+		return stringBuilder.toString ();
 
 	}
 
@@ -1303,8 +1316,8 @@ class Misc {
 
 	public static
 	String joinWithSeparator (
-			String separator,
-			String... parts) {
+			@NonNull String separator,
+			@NonNull String... parts) {
 
 		return joinWithSeparator (
 			separator,
@@ -1316,7 +1329,7 @@ class Misc {
 
 	public static
 	String joinWithoutSeparator (
-			String... parts) {
+			@NonNull String... parts) {
 
 		return joinWithSeparator (
 			"",
@@ -1328,7 +1341,7 @@ class Misc {
 
 	public static
 	String joinWithSpace (
-			Iterable<String> parts) {
+			@NonNull Iterable<String> parts) {
 
 		return joinWithSeparator (
 			" ",
@@ -1345,7 +1358,58 @@ class Misc {
 		return joinWithSeparator (
 			" ",
 			"",
-			Arrays.asList (parts),
+			Arrays.asList (
+				parts),
+			"");
+
+	}
+
+	public static
+	String joinWithFullStop (
+			@NonNull Iterable<String> parts) {
+
+		return joinWithSeparator (
+			".",
+			"",
+			parts,
+			"");
+
+	}
+
+	public static
+	String joinWithFullStop (
+			@NonNull String... parts) {
+
+		return joinWithSeparator (
+			".",
+			"",
+			Arrays.asList (
+				parts),
+			"");
+
+	}
+
+	public static
+	String joinWithSlash (
+			@NonNull Iterable<String> parts) {
+
+		return joinWithSeparator (
+			"/",
+			"",
+			parts,
+			"");
+
+	}
+
+	public static
+	String joinWithSlash (
+			@NonNull String... parts) {
+
+		return joinWithSeparator (
+			"/",
+			"",
+			Arrays.asList (
+				parts),
 			"");
 
 	}

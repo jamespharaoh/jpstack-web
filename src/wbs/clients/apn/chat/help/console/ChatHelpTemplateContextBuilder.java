@@ -11,9 +11,12 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ConsoleContextBuilderContainerImplementation;
@@ -73,7 +76,7 @@ class ChatHelpTemplateContextBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ChatHelpTemplateRec> container;
 
 	@BuilderSource
 	ChatHelpTemplateContextSpec spec;
@@ -119,7 +122,7 @@ class ChatHelpTemplateContextBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
@@ -130,8 +133,8 @@ class ChatHelpTemplateContextBuilder {
 		buildCreatePage ();
 		buildSettingsPage ();
 
-		ConsoleContextBuilderContainer listContainer =
-			new ConsoleContextBuilderContainerImplementation ()
+		ConsoleContextBuilderContainer<ChatHelpTemplateRec> listContainer =
+			new ConsoleContextBuilderContainerImplementation<ChatHelpTemplateRec> ()
 
 			.consoleHelper (
 				chatHelpTemplateHelper)
@@ -155,7 +158,8 @@ class ChatHelpTemplateContextBuilder {
 				"end")
 
 			.friendlyName (
-				camelToSpaces (beanName));
+				camelToSpaces (
+					beanName));
 
 		builder.descend (
 			listContainer,
@@ -163,8 +167,8 @@ class ChatHelpTemplateContextBuilder {
 			consoleModule,
 			MissingBuilderBehaviour.error);
 
-		ConsoleContextBuilderContainer objectContainer =
-			new ConsoleContextBuilderContainerImplementation ()
+		ConsoleContextBuilderContainer<ChatHelpTemplateRec> objectContainer =
+			new ConsoleContextBuilderContainerImplementation<ChatHelpTemplateRec> ()
 
 			.consoleHelper (
 				chatHelpTemplateHelper)

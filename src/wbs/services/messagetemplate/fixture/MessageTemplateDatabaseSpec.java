@@ -6,18 +6,25 @@ import java.util.List;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("im-chat-message-template-database")
+@DataClass ("message-template-database")
 public
-class ImChatMessageTemplateDatabaseSpec {
+class MessageTemplateDatabaseSpec {
+
+	@DataAttribute
+	String name;
+
+	@DataAttribute
+	String description;
 
 	@DataChildren (
-			direct = true)
-		List<MessagesSpec> messages =
-			new ArrayList<MessagesSpec> ();
+		direct = true)
+	List<MessageTemplateEntryTypeSpec> entryTypes =
+		new ArrayList<MessageTemplateEntryTypeSpec> ();
 
 }

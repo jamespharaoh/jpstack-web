@@ -11,7 +11,7 @@
 		<!-- identity -->
 
 		<parent-field
-			type="messageTemplateType"/>
+			type="messageTemplateEntryType"/>
 
 		<code-field/>
 
@@ -19,11 +19,17 @@
 
 		<name-field/>
 
+		<description-field/>
+
+		<deleted-field/>
+
+		<!-- settings -->
+
 		<yes-no-field
 			name="required"/>
 
 		<integer-field
-			name="length"
+			name="maximumLength"
 			nullable="yes"/>
 
 	</fields>

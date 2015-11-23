@@ -18,14 +18,13 @@ import com.google.common.base.Optional;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.Record;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.Html;
 
 @PrototypeComponent ("textAreaFormFieldRenderer")
 @Accessors (fluent = true)
 public
-class TextAreaFormFieldRenderer<Container>
+class TextAreaFormFieldRenderer<Container,Parent>
 	implements FormFieldRenderer<Container,String> {
 
 	// dependencies
@@ -57,10 +56,10 @@ class TextAreaFormFieldRenderer<Container>
 	String charCountData;
 
 	@Getter @Setter
-	FormFieldDataProvider formFieldDataProvider;
+	FormFieldDataProvider<Container,Parent> formFieldDataProvider;
 
 	@Getter @Setter
-	Record<?> parent;
+	Parent parent;
 
 	// details
 
@@ -226,21 +225,9 @@ class TextAreaFormFieldRenderer<Container>
 
 		if (formFieldDataProvider != null) {
 
-			String data;
-
-			if (parent != null) {
-
-				data =
-					formFieldDataProvider.getFormFieldData (
-						parent);
-
-			} else {
-
-				data =
-					formFieldDataProvider.getFormFieldData (
-						(Record<?>) container);
-
-			}
+			String data =
+				formFieldDataProvider.getFormFieldDataForObject (
+					container);
 
 			out.writeFormat (
 				"<span hidden=\"hidden\"",

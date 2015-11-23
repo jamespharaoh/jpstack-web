@@ -28,7 +28,10 @@ import wbs.services.ticket.core.model.TicketRec;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectTicketCreatePart")
 public
-class ObjectTicketCreatePart
+class ObjectTicketCreatePart<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+>
 	extends AbstractPagePart {
 
 	// dependencies
@@ -63,7 +66,7 @@ class ObjectTicketCreatePart
 	String localFile;
 
 	@Getter @Setter
-	FieldsProvider fieldsProvider;
+	FieldsProvider<TicketRec,TicketManagerRec> fieldsProvider;
 
 	@Getter @Setter
 	String ticketManagerPath;
@@ -192,8 +195,8 @@ class ObjectTicketCreatePart
 				ticket.getNumFields () + 1);
 
 			ticket.getTicketFieldValues ().put (
-					ticketFieldType.getId (),
-					ticketFieldValue);
+				ticketFieldType.getId (),
+				ticketFieldValue);
 
 		}
 
@@ -202,7 +205,7 @@ class ObjectTicketCreatePart
 	void prepareFieldSet () {
 
 		formFieldSet =
-			fieldsProvider.getFields(
+			fieldsProvider.getFieldsForParent (
 				ticketManager);
 
 	}

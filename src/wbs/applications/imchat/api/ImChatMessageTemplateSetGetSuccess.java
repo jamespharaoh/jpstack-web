@@ -1,7 +1,7 @@
 package wbs.applications.imchat.api;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -19,7 +19,7 @@ class ImChatMessageTemplateSetGetSuccess {
 	String status = "success";
 
 	@DataAttribute
-	List<ImChatMessageTemplateData> messages =
-		new ArrayList<ImChatMessageTemplateData> ();
+	Map<String,String> messages =
+		new LinkedHashMap<String,String> ();
 
 }

@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -40,13 +41,17 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectSummaryPageBuilder {
+class ObjectSummaryPageBuilder<
+	ObjectType extends Record<ObjectType>,
+	ParentType extends Record<ParentType>
+> {
 
 	// dependencies
 
@@ -74,7 +79,7 @@ class ObjectSummaryPageBuilder {
 	Provider<ParentFormFieldSpec> parentField;
 
 	@Inject
-	Provider<ObjectSummaryFieldsPart> summaryFieldsPart;
+	Provider<ObjectSummaryFieldsPart<ObjectType,ParentType>> summaryFieldsPart;
 
 	@Inject
 	Provider<TabContextResponder> tabContextResponder;
@@ -85,7 +90,7 @@ class ObjectSummaryPageBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ObjectSummaryPageSpec spec;
@@ -96,11 +101,11 @@ class ObjectSummaryPageBuilder {
 	// state
 
 	@Getter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	FormFieldSet formFieldSet;
 
-	FieldsProvider fieldsProvider;
+	FieldsProvider<ObjectType,ParentType> fieldsProvider;
 
 	String privKey;
 
@@ -111,7 +116,7 @@ class ObjectSummaryPageBuilder {
 
 	public
 	void buildMeta (
-			ConsoleMetaModuleImplementation consoleMetaModule) {
+			@NonNull ConsoleMetaModuleImplementation consoleMetaModule) {
 
 	}
 
@@ -120,7 +125,7 @@ class ObjectSummaryPageBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
@@ -149,7 +154,7 @@ class ObjectSummaryPageBuilder {
 	}
 
 	void buildContextTabs (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextTab (
 
@@ -178,7 +183,7 @@ class ObjectSummaryPageBuilder {
 	}
 
 	void buildContextFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextFile (
 
@@ -243,11 +248,8 @@ class ObjectSummaryPageBuilder {
 	}
 
 	public
-	ObjectSummaryPageBuilder addFieldsPart (
-			final FormFieldSet formFieldSet) {
-
-		if (formFieldSet == null)
-			return this;
+	ObjectSummaryPageBuilder<ObjectType,ParentType> addFieldsPart (
+			@NonNull final FormFieldSet formFieldSet) {
 
 		Provider<PagePart> partFactory =
 			new Provider<PagePart> () {
@@ -257,9 +259,15 @@ class ObjectSummaryPageBuilder {
 			PagePart get () {
 
 				return summaryFieldsPart.get ()
-					.consoleHelper (consoleHelper)
-					.formFieldSet (formFieldSet)
-					.formFieldsProvider (fieldsProvider);
+
+					.consoleHelper (
+						consoleHelper)
+
+					.formFieldSet (
+						formFieldSet)
+
+					.formFieldsProvider (
+						fieldsProvider);
 
 			}
 
@@ -273,8 +281,8 @@ class ObjectSummaryPageBuilder {
 	}
 
 	public
-	ObjectSummaryPageBuilder addHeading (
-			String heading) {
+	ObjectSummaryPageBuilder<ObjectType,ParentType> addHeading (
+			@NonNull String heading) {
 
 		final
 		String html =
@@ -290,7 +298,9 @@ class ObjectSummaryPageBuilder {
 			PagePart get () {
 
 				return textPart.get ()
-					.text (html);
+
+					.text (
+						html);
 
 			}
 
@@ -305,8 +315,8 @@ class ObjectSummaryPageBuilder {
 	}
 
 	public
-	ObjectSummaryPageBuilder addPart (
-			final String beanName) {
+	ObjectSummaryPageBuilder<ObjectType,ParentType> addPart (
+			@NonNull final String beanName) {
 
 		Provider<PagePart> partFactory =
 			new Provider<PagePart> () {
@@ -372,10 +382,16 @@ class ObjectSummaryPageBuilder {
 
 		if (spec.fieldsProviderName () != null) {
 
-			fieldsProvider =
+			@SuppressWarnings ("unchecked")
+			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
+				(FieldsProvider<ObjectType,ParentType>)
 				applicationContext.getBean (
 					spec.fieldsProviderName (),
 					FieldsProvider.class);
+
+			fieldsProvider =
+				fieldsProviderTemp;
+
 		}
 
 		else {

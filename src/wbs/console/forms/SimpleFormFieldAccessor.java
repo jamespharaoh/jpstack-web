@@ -43,25 +43,7 @@ class SimpleFormFieldAccessor<Container,Native>
 
 		Object nativeObject;
 
-		// TODO dynamic should be handled by a separate class
-
-		/*
-
-		if (dynamic != null && dynamic) {
-
-			ConsoleHelper<?> consoleHelper =
-				consoleObjectManager.getConsoleObjectHelper(
-					(Record<?>) container);
-
-			nativeObject =
-				consoleHelper.getDynamic (
-					(Record<?>) container,
-					name);
-
-		} else {
-		*/
-
-		 nativeObject =
+		nativeObject =
 			BeanLogic.getProperty (
 				container,
 				name);
@@ -123,23 +105,6 @@ class SimpleFormFieldAccessor<Container,Native>
 		}
 
 		// set property
-
-		// TODO dynamic should be handled by a separate class
-
-		/*
-		if (dynamic != null && dynamic) {
-
-			ConsoleHelper<?> consoleHelper =
-					consoleObjectManager.getConsoleObjectHelper(
-						(Record<?>) container);
-
-			consoleHelper.setDynamic (
-				(Record<?>) container,
-				name,
-				nativeValue);
-
-		} else {
-		*/
 
 		BeanLogic.setProperty (
 			container,

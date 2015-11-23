@@ -7,6 +7,8 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.module.ConsoleModuleImplementation;
@@ -17,11 +19,14 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @PrototypeComponent ("contextTabResponderBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ContextTabResponderBuilder {
+class ContextTabResponderBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// prototype dependencies
 
@@ -31,7 +36,7 @@ class ContextTabResponderBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ContextTabResponderSpec spec;
@@ -52,7 +57,7 @@ class ContextTabResponderBuilder {
 	@BuildMethod
 	public
 	void buildConsoleModule (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 

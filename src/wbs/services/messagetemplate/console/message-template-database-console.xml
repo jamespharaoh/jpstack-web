@@ -49,15 +49,15 @@
 				fields="settings"/>
 
 			<context-link
-				name="messageTemplateType"
-				link="messageTemplateType"
+				name="entryType"
+				link="messageTemplateEntryType"
 				label="Types"
 				priv-key="messageTemplateDatabase.manage"/>
 
 			<context-link
-				name="messageTemplateSet"
+				name="value"
 				link="messageTemplateSet"
-				label="Type sets"
+				label="Values"
 				priv-key="messageTemplateDatabase.manage"/>
 
 			<object-events-page/>

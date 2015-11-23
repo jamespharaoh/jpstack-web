@@ -1,9 +1,10 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.joinWithFullStop;
+import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -13,6 +14,8 @@ import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+
+import com.google.common.collect.ImmutableMap;
 
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatRec;
@@ -24,11 +27,13 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
+import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
+import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
+import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
+import wbs.services.messagetemplate.model.MessageTemplateFieldTypeRec;
+import wbs.services.messagetemplate.model.MessageTemplateFieldValueRec;
 import wbs.services.messagetemplate.model.MessageTemplateSetObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateSetRec;
-import wbs.services.messagetemplate.model.MessageTemplateTypeObjectHelper;
-import wbs.services.messagetemplate.model.MessageTemplateTypeRec;
-import wbs.services.messagetemplate.model.MessageTemplateValueRec;
 
 @PrototypeComponent ("imChatMessageTemplateSetGetAction")
 public
@@ -48,9 +53,6 @@ class ImChatMessageTemplateSetGetAction
 
 	@Inject
 	MessageTemplateSetObjectHelper messageTemplateSetHelper;
-
-	@Inject
-	MessageTemplateTypeObjectHelper messageTemplateTypeHelper;
 
 	@Inject
 	RequestContext requestContext;
@@ -103,12 +105,16 @@ class ImChatMessageTemplateSetGetAction
 				imChat.getMessageTemplateDatabase (),
 				request.code ());
 
+		MessageTemplateDatabaseRec messageTemplateDatabase =
+			messageTemplateSet.getMessageTemplateDatabase ();
+
 		if (
-			messageTemplateSet == null
+			isNull (
+				messageTemplateSet)
 		) {
 
-			ImChatMessageTemplateSetGetFailure failureResponse =
-				new ImChatMessageTemplateSetGetFailure ()
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
 
 				.reason (
 					"code-invalid")
@@ -118,46 +124,67 @@ class ImChatMessageTemplateSetGetAction
 					"longer active");
 
 			return jsonResponderProvider.get ()
-				.value (failureResponse);
+
+				.value (
+					failureResponse);
 
 		}
 
 		// create response
 
-		List<ImChatMessageTemplateData> messages =
-			new ArrayList<ImChatMessageTemplateData> ();
-
-		Map<Integer, MessageTemplateValueRec> messageTemplateValues =
-			messageTemplateSet.getMessageTemplateValues();
+		ImmutableMap.Builder<String,String> messagesBuilder =
+			ImmutableMap.<String,String>builder ();
 
 		for (
-			Map.Entry<Integer, MessageTemplateValueRec> entry : messageTemplateValues.entrySet()
+			MessageTemplateEntryTypeRec entryType
+				: messageTemplateDatabase.getMessageTemplateEntryTypes ()
 		) {
 
-			MessageTemplateTypeRec messageTemplateType =
-				messageTemplateTypeHelper.find (
-					entry.getKey());
+			MessageTemplateEntryValueRec entryValue =
+				messageTemplateSet.getMessageTemplateEntryValues ().get (
+					entryType.getId ());
 
-			String key =
-				messageTemplateType
-					.getName();
+			for (
+				MessageTemplateFieldTypeRec fieldType
+					: entryType.getMessageTemplateFieldTypes ()
+			) {
 
-			String value =
-				entry.getValue()
-					.getStringValue();
+				MessageTemplateFieldValueRec fieldValue =
+					entryValue != null
+						? entryValue.getFields ().get (
+							fieldType.getId ())
+						: null;
 
-			messages.add (
-				imChatApiLogic.messageTemplateData (
+				String key =
+					joinWithFullStop (
+						underscoreToHyphen (
+							entryType.getCode ()),
+						underscoreToHyphen (
+							fieldType.getCode ()));
+
+				String value =
+					fieldValue != null
+						? fieldValue.getStringValue ()
+						: fieldType.getDefaultValue ();
+
+				messagesBuilder.put (
 					key,
-					value));
+					value);
+
+			}
+
 		}
 
-		ImChatMessageTemplateSetGetSuccess messageTemplateSetGetSuccessResponse =
+		ImChatMessageTemplateSetGetSuccess successResponse =
 			new ImChatMessageTemplateSetGetSuccess ()
-				.messages(messages);
+
+			.messages (
+				messagesBuilder.build ());
 
 		return jsonResponderProvider.get ()
-			.value (messageTemplateSetGetSuccessResponse);
+
+			.value (
+				successResponse);
 
 	}
 

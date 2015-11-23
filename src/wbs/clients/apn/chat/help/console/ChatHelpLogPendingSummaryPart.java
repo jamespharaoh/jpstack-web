@@ -127,7 +127,9 @@ class ChatHelpLogPendingSummaryPart
 			"<th>Gender</th>\n",
 
 			"<td>%h</td>\n",
-			chatUser.getGender (),
+			chatUser.getGender () != null
+				? chatUser.getGender ()
+				: "-",
 
 			"</tr>");
 
@@ -136,7 +138,9 @@ class ChatHelpLogPendingSummaryPart
 			"<th>Orientation</th>\n",
 
 			"<td>%h</td>\n",
-			chatUser.getOrient (),
+			chatUser.getOrient () != null
+				? chatUser.getOrient ()
+				: "-",
 
 			"</tr>");
 
@@ -222,8 +226,10 @@ class ChatHelpLogPendingSummaryPart
 
 		LocalDate previousDate = null;
 
-		for (ChatHelpLogRec chatHelpLog
-				: chatHelpLogs) {
+		for (
+			ChatHelpLogRec chatHelpLog
+				: chatHelpLogs
+		) {
 
 			LocalDate nextDate =
 				dateToInstant (chatHelpLog.getTimestamp ())

@@ -9,6 +9,8 @@ import java.util.Collections;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -26,11 +28,14 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @PrototypeComponent ("objectEventsPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectEventsPageBuilder {
+class ObjectEventsPageBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -54,7 +59,7 @@ class ObjectEventsPageBuilder {
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer container;
+	ConsoleContextBuilderContainer<ObjectType> container;
 
 	@BuilderSource
 	ObjectEventsPageSpec spec;
@@ -64,7 +69,7 @@ class ObjectEventsPageBuilder {
 
 	// state
 
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	String privKey;
 	String tabName;
@@ -75,7 +80,7 @@ class ObjectEventsPageBuilder {
 
 	public
 	void buildMeta (
-			ConsoleMetaModuleImplementation consoleMetaModule) {
+			@NonNull ConsoleMetaModuleImplementation consoleMetaModule) {
 
 	}
 
@@ -84,13 +89,15 @@ class ObjectEventsPageBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildTab (
 				resolvedExtensionPoint);
@@ -105,7 +112,7 @@ class ObjectEventsPageBuilder {
 	}
 
 	void buildTab (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextTab (
 			"end",
@@ -119,7 +126,7 @@ class ObjectEventsPageBuilder {
 	}
 
 	void buildFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextFile (
 			fileName,

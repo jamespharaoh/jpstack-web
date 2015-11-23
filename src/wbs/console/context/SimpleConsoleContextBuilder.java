@@ -10,6 +10,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
@@ -30,11 +32,14 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.record.Record;
 
 @PrototypeComponent ("simpleConsoleContextBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SimpleConsoleContextBuilder {
+class SimpleConsoleContextBuilder<
+	ObjectType extends Record<ObjectType>
+> {
 
 	// dependencies
 
@@ -88,7 +93,7 @@ class SimpleConsoleContextBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
@@ -99,8 +104,10 @@ class SimpleConsoleContextBuilder {
 			consoleMetaManager.resolveContextLink (
 				name);
 
-		for (ResolvedConsoleContextLink resolvedContextLink
-				: resolvedContextLinks) {
+		for (
+			ResolvedConsoleContextLink resolvedContextLink
+				: resolvedContextLinks
+		) {
 
 			buildResolvedContexts (
 				resolvedContextLink);
@@ -110,8 +117,8 @@ class SimpleConsoleContextBuilder {
 
 		}
 
-		ConsoleContextBuilderContainer nextBuilderContainer =
-			new ConsoleContextBuilderContainerImplementation ()
+		ConsoleContextBuilderContainer<ObjectType> nextBuilderContainer =
+			new ConsoleContextBuilderContainerImplementation<ObjectType> ()
 
 			.consoleHelper (
 				null)
@@ -135,7 +142,8 @@ class SimpleConsoleContextBuilder {
 				"end")
 
 			.friendlyName (
-				camelToSpaces (structuralName));
+				camelToSpaces (
+					structuralName));
 
 		builder.descend (
 			nextBuilderContainer,
@@ -184,10 +192,12 @@ class SimpleConsoleContextBuilder {
 	}
 
 	void buildResolvedContexts (
-			ResolvedConsoleContextLink resolvedContextLink) {
+			@NonNull ResolvedConsoleContextLink resolvedContextLink) {
 
-		for (String parentContextName
-				: resolvedContextLink.parentContextNames ()) {
+		for (
+			String parentContextName
+				: resolvedContextLink.parentContextNames ()
+		) {
 
 			String resolvedContextName =
 				stringFormat (

@@ -32,8 +32,8 @@
 	<collections>
 
 		<children-mapping
-			type="messageTemplateValue"
-			map-column="message_template_type_id"
+			type="messageTemplateEntryValue"
+			map-column="message_template_entry_type_id"
 			map-type="integer"/>
 
 	</collections>

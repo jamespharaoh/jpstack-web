@@ -3,6 +3,7 @@ package wbs.framework.application.tools;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.hyphenToCamel;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -12,6 +13,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Named;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -966,6 +969,10 @@ class ApplicationContextBuilder {
 				: beanClass.getDeclaredMethods ()
 		) {
 
+			Named namedAnnotation =
+				method.getAnnotation (
+					Named.class);
+
 			SingletonComponent singletonComponentAnnotation =
 				method.getAnnotation (
 					SingletonComponent.class);
@@ -1009,6 +1016,10 @@ class ApplicationContextBuilder {
 					.addValueProperty (
 						"factoryMethodName",
 						method.getName ())
+
+					.hide (
+						isNotNull (
+							namedAnnotation))
 
 				);
 
@@ -1057,6 +1068,10 @@ class ApplicationContextBuilder {
 					.addValueProperty (
 						"factoryMethodName",
 						method.getName ())
+
+					.hide (
+						isNotNull (
+							namedAnnotation))
 
 				);
 

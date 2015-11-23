@@ -2,9 +2,12 @@ package wbs.console.context;
 
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.module.SimpleConsoleBuilderContainer;
+import wbs.framework.record.Record;
 
 public
-interface ConsoleContextBuilderContainer
+interface ConsoleContextBuilderContainer<
+	ObjectType extends Record<ObjectType>
+>
 	extends SimpleConsoleBuilderContainer {
 
 	String structuralName ();
@@ -13,7 +16,7 @@ interface ConsoleContextBuilderContainer
 
 	String pathPrefix ();
 
-	ConsoleHelper<?> consoleHelper ();
+	ConsoleHelper<ObjectType> consoleHelper ();
 
 	String friendlyName ();
 
