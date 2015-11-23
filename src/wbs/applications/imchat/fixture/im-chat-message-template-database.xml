@@ -130,12 +130,20 @@
 			Live chat
 		</field>
 
+		<field name="Credit balance label">
+			Credit: ${credit-balance}
+		</field>
+
 		<field name="Purchase credit button label">
 			Purchase credit
 		</field>
 
 		<field name="End conversation button label">
 			End conversation
+		</field>
+
+		<field name="You have been charged message">
+			You have been charged ${charge} for this message
 		</field>
 
 		<field name="Send button label">
@@ -183,6 +191,19 @@
 			Here you can see your recent payments. For more information, or for
 			information about older payments which are not shown here, please
 			contact customer services.
+		</field>
+
+		<field name="Credit balance message">
+			You currently have a credit balance of ${credit-balance}
+		</field>
+
+		<field name="No credit message">
+			You do not currently have any credit. Please purchase some if you
+			wish to use the paid chat service.
+		</field>
+
+		<field name="No payments message">
+			You have never made any payments.
 		</field>
 
 		<field name="Date and time column">
@@ -240,6 +261,14 @@
 			We now have all the necessary details to process your payment.
 			Please review all of the information and then press the "confirm
 			payment" button below.
+		</field>
+
+		<field name="Price message">
+			You pay: ${price}
+		</field>
+
+		<field name="Value message">
+			You get credit: ${value}
 		</field>
 
 		<field name="Confirm payment button label">
