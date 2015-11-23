@@ -1,29 +1,43 @@
 package wbs.services.messagetemplate.console;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import lombok.NonNull;
 
 import wbs.console.forms.FormFieldDataProvider;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.record.Record;
-import wbs.services.messagetemplate.model.MessageTemplateParameterRec;
-import wbs.services.messagetemplate.model.MessageTemplateTypeRec;
+import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
+import wbs.services.messagetemplate.model.MessageTemplateSetRec;
 
-@PrototypeComponent ("messageTemplateFormFieldDataProvider")
+@PrototypeComponent ("messageTemplateEntryValueFormFieldDataProvider")
 public
-class MessageTemplateFormFieldDataProvider
-	implements FormFieldDataProvider {
+class MessageTemplateEntryValueFormFieldDataProvider
+	implements FormFieldDataProvider<
+		MessageTemplateEntryValueRec,
+		MessageTemplateSetRec
+	> {
+
+	// dependencies
 
 	String mode;
 
+	// implementation
+
 	@Override
 	public
-	String getFormFieldData (
-			Record<?> parent) {
+	String getFormFieldDataForParent (
+			@NonNull MessageTemplateSetRec messageTemplateSet) {
+
+		throw new UnsupportedOperationException ();
+
+	}
+
+	@Override
+	public
+	String getFormFieldDataForObject (
+			@NonNull MessageTemplateEntryValueRec entryValue) {
 
 		String formFieldData = "";
 
+		/*
 		MessageTemplateTypeRec messageTemplateType =
 			(MessageTemplateTypeRec)
 			(Object)
@@ -54,40 +68,20 @@ class MessageTemplateFormFieldDataProvider
 		formFieldData += "maximumTemplateLength="+messageTemplateType.getMaxLength()+"&";
 		formFieldData += "charset="+messageTemplateType.getCharset().toString();
 
+		*/
+
 		return formFieldData;
+
 	}
 
-	@Override
 	public
-	FormFieldDataProvider setMode (
-			String modeSet) {
+	MessageTemplateEntryValueFormFieldDataProvider setMode (
+			@NonNull String mode) {
 
-		mode =
-			modeSet;
+		this.mode =
+			mode;
 
 		return this;
-
-	}
-
-	@SingletonComponent ("messageTemplateFormFieldDataProviderConfig")
-	public static
-	class Config {
-
-		@Inject
-		Provider<MessageTemplateFormFieldDataProvider> messageTemplateFormFieldDataProvider;
-
-		@PrototypeComponent ("messageTemplateSettingsFormFieldDataProvider")
-
-		public
-		FormFieldDataProvider messageTemplateSettingsFormFieldDataProvider () {
-
-			return messageTemplateFormFieldDataProvider.get ()
-
-				.setMode (
-					"settings");
-
-		}
-
 
 	}
 

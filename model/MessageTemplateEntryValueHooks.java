@@ -1,16 +1,11 @@
 package wbs.services.messagetemplate.model;
 
-import static wbs.framework.utils.etc.Misc.doesNotContain;
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import static wbs.framework.utils.etc.Misc.isNull;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import lombok.NonNull;
 
 import org.hibernate.TransientObjectException;
 
@@ -19,11 +14,12 @@ import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.queue.logic.QueueLogic;
-import wbs.sms.gsm.Gsm;
 
 public
-class MessageTemplateSetHooks
-	extends AbstractObjectHooks<MessageTemplateSetRec> {
+class MessageTemplateEntryValueHooks
+	extends AbstractObjectHooks<MessageTemplateEntryValueRec> {
+
+	// dependencies
 
 	@Inject
 	Database database;
@@ -37,46 +33,52 @@ class MessageTemplateSetHooks
 	@Inject
 	Provider<QueueLogic> queueLogic;
 
-	@Inject
-	Provider<MessageTemplateSetObjectHelper> messageTemplateSetHelper;
+	// indirect dependencies
 
 	@Inject
-	Provider<MessageTemplateTypeObjectHelper> messageTemplateTypeHelper;
+	Provider<MessageTemplateFieldTypeObjectHelper>
+	messageTemplateFieldTypeHelperProvider;
 
 	@Inject
-	Provider<MessageTemplateValueObjectHelper> messageTemplateValueHelper;
+	Provider<MessageTemplateFieldValueObjectHelper>
+	messageTemplateFieldValueHelperProvider;
 
-	@Inject
-	Provider<MessageTemplateParameterObjectHelper> messageTemplateParameterHelper;
+	// implementation
 
 	@Override
 	public
 	Object getDynamic (
-			MessageTemplateSetRec messageTemplateSet,
-			String name) {
+			@NonNull MessageTemplateEntryValueRec entryValue,
+			@NonNull String name) {
+
+		MessageTemplateFieldTypeObjectHelper messageTemplateFieldTypeHelper =
+			messageTemplateFieldTypeHelperProvider.get ();
+
+		MessageTemplateEntryTypeRec entryType =
+			entryValue.getMessageTemplateEntryType ();
 
 		// find the ticket field type
 
-		MessageTemplateTypeRec messageTemplateType =
-			messageTemplateTypeHelper.get ().findByCode (
-				messageTemplateSet.getMessageTemplateDatabase (),
+		MessageTemplateFieldTypeRec fieldType =
+			messageTemplateFieldTypeHelper.findByCode (
+				entryType,
 				name);
 
 		try {
 
 			// find the message template value
 
-			MessageTemplateValueRec messageTemplateValue =
-				messageTemplateSet.getMessageTemplateValues ().get (
-					messageTemplateType.getId ());
+			MessageTemplateFieldValueRec fieldValue =
+				entryValue.getFields ().get (
+					fieldType.getId ());
 
-			if (messageTemplateValue == null) {
+			if (fieldValue == null) {
 
-				return messageTemplateType.getDefaultValue ();
+				return fieldType.getDefaultValue ();
 
 			} else {
 
-				return messageTemplateValue.getStringValue ();
+				return fieldValue.getStringValue ();
 
 			}
 
@@ -93,17 +95,27 @@ class MessageTemplateSetHooks
 	@Override
 	public
 	void setDynamic (
-			MessageTemplateSetRec messageTemplateSet,
-			String name,
+			@NonNull MessageTemplateEntryValueRec entryValue,
+			@NonNull String name,
 			Object value) {
+
+		MessageTemplateFieldTypeObjectHelper messageTemplateFieldTypeHelper =
+			messageTemplateFieldTypeHelperProvider.get ();
+
+		MessageTemplateFieldValueObjectHelper messageTemplateFieldValueHelper =
+			messageTemplateFieldValueHelperProvider.get ();
+
+		MessageTemplateEntryTypeRec entryType =
+			entryValue.getMessageTemplateEntryType ();
 
 		// find the ticket field type
 
-		MessageTemplateTypeRec messageTemplateType =
-			messageTemplateTypeHelper.get ().findByCode (
-				messageTemplateSet.getMessageTemplateDatabase (),
+		MessageTemplateFieldTypeRec fieldType =
+			messageTemplateFieldTypeHelper.findByCode (
+				entryType,
 				name);
 
+		/*
 		List<String> messageTemplateUsedParameters =
 			new ArrayList<String> ();
 
@@ -221,54 +233,38 @@ class MessageTemplateSetHooks
 				"The message length is out of its template type bounds!");
 
 		}
+		*/
 
-		// if the length is correct and all the required parameters are present, the value is created
+		// find or create value
 
-		MessageTemplateValueRec messageTemplateValue;
+		MessageTemplateFieldValueRec fieldValue =
+			entryValue.getFields ().get (
+				fieldType.getId ());
 
-		try {
+		if (
+			isNull (
+				fieldValue)
+		) {
 
-			messageTemplateValue =
-				messageTemplateSet.getMessageTemplateValues ().get (
-					messageTemplateType.getId ());
+			fieldValue =
+				messageTemplateFieldValueHelper.insert (
+					messageTemplateFieldValueHelper.createInstance ()
 
-		} catch (Exception exception) {
+				.setMessageTemplateEntryValue (
+					entryValue)
 
-			messageTemplateValue =
-				null;
+				.setMessageTemplateFieldType (
+					fieldType)
 
-		}
-
-		// if the value object does not exist, a new one is created
-
-		if (messageTemplateValue == null) {
-
-			messageTemplateValue =
-				messageTemplateValueHelper.get ().createInstance ()
-
-				.setMessageTemplateSet (
-					messageTemplateSet)
-
-				.setMessageTemplateType (
-					messageTemplateType);
+			);
 
 		}
 
-
-		messageTemplateValue
+		fieldValue
 
 			.setStringValue (
 				(String)
-				message);
-
-		messageTemplateSet
-
-			.setNumTemplates (
-				messageTemplateSet.getNumTemplates () + 1);
-
-		 messageTemplateSet.getMessageTemplateValues ().put (
-			messageTemplateType.getId (),
-			messageTemplateValue);
+				value);
 
 	}
 

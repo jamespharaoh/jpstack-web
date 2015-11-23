@@ -1,34 +1,28 @@
 <console-module
-	name="message-template-database">
+	name="message-template-entry-type">
 
 	<console-helper-provider
-		object-name="messageTemplateDatabase">
+		object-name="messageTemplateEntryType"
+		view-delegate-field="messageTemplateDatabase"
+		view-delegate-priv-code="manage">
 
 		<context-stuff
-			name="messageTemplateDatabaseName"
-			field="id"/>
+			name="messageTemplateEntryTypeName"
+			field="name"/>
 
 		<context-stuff
 			name="messageTemplateDatabaseId"
+			delegate="messageTemplateDatabase"
 			field="id"/>
-
-		<context-stuff
-			name="sliceId"
-			delegate="slice"
-			field="id"/>
-
-		<priv-key
-			name="messageTemplateDatabase.manage"
-			priv="manage"/>
 
 		<run-post-processor
-			name="slice"/>
+			name="messageTemplateDatabase"/>
 
 	</console-helper-provider>
 
 	<object-context
-		name="messageTemplateDatabase"
-		object-name="messageTemplateDatabase">
+		name="messageTemplateEntryType"
+		object-name="messageTemplateEntryType">
 
 		<list>
 
@@ -49,15 +43,15 @@
 				fields="settings"/>
 
 			<context-link
-				name="entryType"
-				link="messageTemplateEntryType"
-				label="Types"
+				name="fieldType"
+				link="messageTemplateFieldType"
+				label="Fields"
 				priv-key="messageTemplateDatabase.manage"/>
 
 			<context-link
-				name="value"
-				link="messageTemplateSet"
-				label="Values"
+				name="parameter"
+				link="messageTemplateParameter"
+				label="Parameters"
 				priv-key="messageTemplateDatabase.manage"/>
 
 			<object-events-page/>
@@ -68,9 +62,8 @@
 
 	<field-set
 		name="list"
-		object-name="messageTemplateDatabase">
+		object-name="messageTemplateEntryType">
 
-		<parent-field/>
 		<name-field/>
 		<description-field/>
 
@@ -78,9 +71,8 @@
 
 	<field-set
 		name="create"
-		object-name="messageTemplateDatabase">
+		object-name="messageTemplateEntryType">
 
-		<parent-field/>
 		<name-field/>
 		<description-field/>
 
@@ -88,24 +80,24 @@
 
 	<field-set
 		name="summary"
-		object-name="messageTemplateDatabase">
+		object-name="messageTemplateEntryType">
 
 		<id-field/>
-		<code-field/>
 		<parent-field/>
+		<code-field/>
 		<name-field/>
 		<description-field/>
-
+		<deleted-field/>
 
 	</field-set>
 
 	<field-set
 		name="settings"
-		object-name="messageTemplateDatabase">
+		object-name="messageTemplateEntryType">
 
-		<parent-field/>
 		<name-field/>
 		<description-field/>
+		<deleted-field/>
 
 	</field-set>
 

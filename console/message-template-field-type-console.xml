@@ -1,18 +1,14 @@
 <console-module
-	name="message-template-parameter">
+	name="message-template-field-type">
 
 	<console-helper-provider
-		object-name="messageTemplateParameter"
-		view-delegate-field="grandparent"
+		object-name="messageTemplateFieldType"
+		view-delegate-field="messageTemplateEntryType.messageTemplateDatabase"
 		view-delegate-priv-code="manage">
 
 		<context-stuff
-			name="messageTemplateParameterName"
+			name="messageTemplateFieldTypeName"
 			field="name"/>
-
-		<context-stuff
-			name="messageTemplateParameterId"
-			field="id"/>
 
 		<context-stuff
 			name="messageTemplateEntryTypeId"
@@ -25,8 +21,8 @@
 	</console-helper-provider>
 
 	<object-context
-		name="messageTemplateParameter"
-		object-name="messageTemplateParameter">
+		name="messageTemplateFieldType"
+		object-name="messageTemplateFieldType">
 
 		<list>
 
@@ -46,43 +42,33 @@
 			<object-settings-page
 				fields="settings"/>
 
+			<object-events-page/>
+
 		</object>
 
 	</object-context>
 
 	<field-set
 		name="list"
-		object-name="messageTemplateParameter">
+		object-name="messageTemplateFieldType">
 
 		<name-field/>
 		<description-field/>
-
-		<integer-field
-			name="maximumLength"/>
-
-		<yes-no-field
-			name="required"/>
 
 	</field-set>
 
 	<field-set
 		name="create"
-		object-name="messageTemplateParameter">
+		object-name="messageTemplateFieldType">
 
 		<name-field/>
 		<description-field/>
-
-		<integer-field
-			name="maximumLength"/>
-
-		<yes-no-field
-			name="required"/>
 
 	</field-set>
 
 	<field-set
 		name="summary"
-		object-name="messageTemplateParameter">
+		object-name="messageTemplateFieldType">
 
 		<id-field/>
 		<parent-field/>
@@ -91,28 +77,15 @@
 		<description-field/>
 		<deleted-field/>
 
-		<integer-field
-			name="maximumLength"/>
-
-		<yes-no-field
-			name="required"/>
-
 	</field-set>
 
 	<field-set
 		name="settings"
-		object-name="messageTemplateParameter">
+		object-name="messageTemplateFieldType">
 
-		<parent-field/>
 		<name-field/>
 		<description-field/>
 		<deleted-field/>
-
-		<integer-field
-			name="maximumLength"/>
-
-		<yes-no-field
-			name="required"/>
 
 	</field-set>
 

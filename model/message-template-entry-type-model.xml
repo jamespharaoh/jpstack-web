@@ -1,6 +1,6 @@
 <model-meta
-	name="messageTemplateSet"
-	type="major">
+	name="messageTemplateEntryType"
+	type="minor">
 
 	<fields>
 
@@ -21,20 +21,20 @@
 
 		<description-field/>
 
+		<deleted-field/>
+
 		<!-- statistics -->
 
 		<integer-field
-			name="numTemplates"
+			name="numFields"
 			default="0"/>
 
 	</fields>
 
 	<collections>
 
-		<children-mapping
-			type="messageTemplateEntryValue"
-			map-column="message_template_entry_type_id"
-			map-type="integer"/>
+		<children-collection
+			type="messageTemplateFieldType"/>
 
 	</collections>
 

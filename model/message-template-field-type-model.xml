@@ -1,5 +1,5 @@
 <model-meta
-	name="messageTemplateType"
+	name="messageTemplateFieldType"
 	type="minor">
 
 	<fields>
@@ -11,7 +11,7 @@
 		<!-- identity -->
 
 		<parent-field
-			type="messageTemplateDatabase"/>
+			type="messageTemplateEntryType"/>
 
 		<code-field/>
 
@@ -32,10 +32,12 @@
 			name="helpText"/>
 
 		<integer-field
-			name="minLength"/>
+			name="minLength"
+			nullable="yes"/>
 
 		<integer-field
-			name="maxLength"/>
+			name="maxLength"
+			nullable="yes"/>
 
 		<enum-field
 			name="charset"
