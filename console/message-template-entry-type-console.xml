@@ -18,6 +18,11 @@
 		<run-post-processor
 			name="messageTemplateDatabase"/>
 
+		<priv-key
+			name="messageTemplateEntryType.manage"
+			delegate="messageTemplateDatabase"
+			priv="manage"/>
+
 	</console-helper-provider>
 
 	<object-context
