@@ -976,7 +976,7 @@ class ChatUserPendingFormAction
 			Optional.of (
 				myUser),
 			message,
-			Optional.of (
+			Optional.fromNullable (
 				chatMessage),
 			messageParam,
 			Optional.of (

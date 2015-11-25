@@ -18,6 +18,11 @@
 		<run-post-processor
 			name="messageTemplateEntryType"/>
 
+		<priv-key
+			name="messageTemplateFieldType.manage"
+			delegate="messageTemplateEntryType.messageTemplateDatabase"
+			priv="manage"/>
+
 	</console-helper-provider>
 
 	<object-context
@@ -30,7 +35,9 @@
 				fields="list"/>
 
 			<object-create-page
-				fields="create"/>
+				fields="create"
+				create-priv-delegate="messageTemplateDatabase"
+				create-priv-code="manage"/>
 
 		</list>
 
@@ -55,6 +62,9 @@
 		<name-field/>
 		<description-field/>
 
+		<text-area-field
+			name="defaultValue"/>
+
 	</field-set>
 
 	<field-set
@@ -63,6 +73,24 @@
 
 		<name-field/>
 		<description-field/>
+
+		<text-area-field
+			name="defaultValue"/>
+
+		<text-field
+			name="helpText"/>
+
+		<integer-field
+			name="minLength"
+			nullable="yes"/>
+
+		<integer-field
+			name="maxLength"
+			nullable="yes"/>
+
+		<enum-field
+			name="charset"
+			helper="messageTemplateTypeCharsetConsoleHelper"/>
 
 	</field-set>
 
@@ -77,6 +105,22 @@
 		<description-field/>
 		<deleted-field/>
 
+		<text-field
+			name="defaultValue"/>
+
+		<text-field
+			name="helpText"/>
+
+		<integer-field
+			name="minLength"/>
+
+		<integer-field
+			name="maxLength"/>
+
+		<enum-field
+			name="charset"
+			helper="messageTemplateTypeCharsetConsoleHelper"/>
+
 	</field-set>
 
 	<field-set
@@ -86,6 +130,24 @@
 		<name-field/>
 		<description-field/>
 		<deleted-field/>
+
+		<text-area-field
+			name="defaultValue"/>
+
+		<text-field
+			name="helpText"/>
+
+		<integer-field
+			name="minLength"
+			nullable="yes"/>
+
+		<integer-field
+			name="maxLength"
+			nullable="yes"/>
+
+		<enum-field
+			name="charset"
+			helper="messageTemplateTypeCharsetConsoleHelper"/>
 
 	</field-set>
 
