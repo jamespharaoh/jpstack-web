@@ -2,6 +2,54 @@
 	name="IM chat"
 	description="">
 
+	<entry name="Fonts">
+
+		<field name="Regular font family">
+			Verdana, sans-serif
+		</field>
+
+		<field name="Regular font size">
+			16px
+		</field>
+
+		<field name="Heading text colour">
+			#00aabf
+		</field>
+
+	</entry>
+
+	<entry name="Forms">
+
+		<field name="Button background colour">
+			#00bcd4
+		</field>
+
+		<field name="Button text colour">
+			#ffffff
+		</field>
+
+		<field name="Button highlight background colour">
+			#00cce6
+		</field>
+
+	</entry>
+
+	<entry name="Page header">
+
+		<field name="Background colour">
+			#00bcd4
+		</field>
+
+		<field name="Text colour">
+			#ffffff
+		</field>
+
+		<field name="Highlight background colour">
+			#00aabf
+		</field>
+
+	</entry>
+
 	<entry name="Navigation">
 
 		<field name="Chat">
@@ -138,8 +186,16 @@
 			Purchase credit
 		</field>
 
+		<field name="Purchase credit button label short">
+			Buy
+		</field>
+
 		<field name="End conversation button label">
 			End conversation
+		</field>
+
+		<field name="End conversation button label short">
+			End
 		</field>
 
 		<field name="You have been charged message">
