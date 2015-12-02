@@ -228,9 +228,9 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		if (rootFieldName != null) {
 
 			root =
-				Optional.<Record<?>>of (
+				Optional.<Record<?>>fromNullable (
 					(Record<?>)
-					BeanLogic.getProperty (
+					objectManager.dereference (
 						container,
 						rootFieldName));
 

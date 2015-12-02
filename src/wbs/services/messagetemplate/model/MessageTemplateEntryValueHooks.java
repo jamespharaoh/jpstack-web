@@ -1,5 +1,6 @@
 package wbs.services.messagetemplate.model;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 
 import javax.inject.Inject;
@@ -242,8 +243,13 @@ class MessageTemplateEntryValueHooks
 				fieldType.getId ());
 
 		if (
+
 			isNull (
 				fieldValue)
+
+			&& isNotNull (
+				value)
+
 		) {
 
 			fieldValue =
@@ -256,15 +262,44 @@ class MessageTemplateEntryValueHooks
 				.setMessageTemplateFieldType (
 					fieldType)
 
+				.setStringValue (
+					(String)
+					value)
+
 			);
 
+			entryValue.getFields ().put (
+				fieldType.getId (),
+				fieldValue);
+
+		} else if (
+			isNotNull (
+				value)
+		) {
+
+			fieldValue
+	
+				.setStringValue (
+					(String)
+					value);
+
+		} else if (
+
+			isNotNull (
+				fieldValue)
+
+			&& isNull (
+				value)
+
+		) {
+
+			messageTemplateFieldValueHelper.remove (
+				fieldValue);
+
+			entryValue.getFields ().remove (
+				fieldType.getId ());
+
 		}
-
-		fieldValue
-
-			.setStringValue (
-				(String)
-				value);
 
 	}
 

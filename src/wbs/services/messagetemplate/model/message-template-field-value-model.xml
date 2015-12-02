@@ -1,6 +1,6 @@
 <model-meta
 	name="messageTemplateFieldValue"
-	type="minor">
+	type="ephemeral">
 
 	<fields>
 

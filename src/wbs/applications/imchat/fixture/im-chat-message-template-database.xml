@@ -16,6 +16,22 @@
 			#00aabf
 		</field>
 
+		<field name="Heading font size">
+			140%
+		</field>
+
+	</entry>
+
+	<entry name="Responsive">
+
+		<field name="Full screen width">
+			640px
+		</field>
+
+		<field name="Short text width">
+			480px
+		</field>
+
 	</entry>
 
 	<entry name="Forms">
@@ -48,9 +64,21 @@
 			#00aabf
 		</field>
 
+		<field name="Heading font size">
+			24px
+		</field>
+
+		<field name="Height">
+			56px
+		</field>
+
 	</entry>
 
 	<entry name="Navigation">
+
+		<field name="Roll up width">
+			640px
+		</field>
 
 		<field name="Chat">
 			Live chat
@@ -91,6 +119,14 @@
 		<field name="Introduction">
 			Please select one of the following psychic readers, in order to
 			begin a live internet chat reading.
+		</field>
+
+		<field name="Profile name font size">
+			120%
+		</field>
+
+		<field name="Profile description font size">
+			inherit
 		</field>
 
 		<field name="Start chat button label">
