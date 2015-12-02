@@ -36,7 +36,9 @@
 				fields="list"/>
 
 			<object-create-page
-				fields="create"/>
+				fields="create"
+				create-priv-delegate="messageTemplateDatabase"
+				create-priv-code="manage"/>
 
 		</list>
 
@@ -78,7 +80,8 @@
 
 		<object-field
 			name="messageTemplateEntryType"
-			object-type="messageTemplateEntryType"/>
+			object-type="messageTemplateEntryType"
+			root-field="messageTemplateSet.messageTemplateDatabase"/>
 
 	</field-set>
 
