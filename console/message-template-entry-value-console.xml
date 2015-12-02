@@ -28,7 +28,8 @@
 
 	<object-context
 		name="messageTemplateEntryValue"
-		object-name="messageTemplateEntryValue">
+		object-name="messageTemplateEntryValue"
+		default-file="settings">
 
 		<list>
 
@@ -52,11 +53,13 @@
 				fields="settings"
 				fields-provider="messageTemplateEntryValueSettingsFieldsProvider"/>
 
+			<!--
 			<context-link
 				name="fieldValue"
 				link="messageTemplateFieldValue"
 				label="Fields"
 				priv-key="messageTemplateDatabase.manage"/>
+			-->
 
 			<object-events-page/>
 
@@ -68,9 +71,11 @@
 		name="list"
 		object-name="messageTemplateEntryValue">
 
-		<object-field
-			name="messageTemplateEntryType"
-			object-type="messageTemplateEntryType"/>
+		<name-field
+			delegate="messageTemplateEntryType"/>
+
+		<description-field
+			delegate="messageTemplateEntryType"/>
 
 	</field-set>
 
