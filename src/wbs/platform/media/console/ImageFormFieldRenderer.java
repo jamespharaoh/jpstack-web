@@ -52,9 +52,6 @@ class ImageFormFieldRenderer<Container>
 	String label;
 
 	@Getter @Setter
-	Integer size;
-
-	@Getter @Setter
 	Boolean nullable;
 
 	// details
@@ -169,8 +166,6 @@ class ImageFormFieldRenderer<Container>
 		out.writeFormat (
 			"<input",
 			" type=\"file\"",
-			" size=\"%h\"",
-			size (),
 			" name=\"%h\"",
 			name (),
 			"><br>\n");

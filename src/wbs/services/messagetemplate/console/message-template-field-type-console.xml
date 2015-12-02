@@ -27,7 +27,8 @@
 
 	<object-context
 		name="messageTemplateFieldType"
-		object-name="messageTemplateFieldType">
+		object-name="messageTemplateFieldType"
+		default-file="settings">
 
 		<list>
 

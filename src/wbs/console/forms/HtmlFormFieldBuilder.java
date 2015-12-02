@@ -88,7 +88,7 @@ class HtmlFormFieldBuilder {
 		// field type
 
 		Class<?> propertyClass =
-			BeanLogic.propertyClass (
+			BeanLogic.propertyClassForClass (
 				context.containerClass (),
 				name);
 

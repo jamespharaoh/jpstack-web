@@ -129,7 +129,7 @@ class IntegerFormFieldBuilder {
 		Class<?> propertyClass =
 			dynamic
 				? Integer.class
-				: BeanLogic.propertyClass (
+				: BeanLogic.propertyClassForClass (
 					context.containerClass (),
 					name);
 

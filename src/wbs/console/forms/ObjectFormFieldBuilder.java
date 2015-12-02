@@ -140,7 +140,7 @@ class ObjectFormFieldBuilder {
 		// field type
 
 		Class<?> propertyClass =
-			BeanLogic.propertyClass (
+			BeanLogic.propertyClassForClass (
 				context.containerClass (),
 				name);
 

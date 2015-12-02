@@ -332,23 +332,23 @@ class BeanLogic {
 	}
 
 	public static
-	Class<?> propertyClass (
-			Object object,
-			String propertyName) {
+	Class<?> propertyClassForObject (
+			@NonNull Object object,
+			@NonNull String propertyName) {
 
 		Class<?> objectClass =
 			object.getClass ();
 
-		return propertyClass (
+		return propertyClassForClass (
 			objectClass,
 			propertyName);
 
 	}
 
 	public static
-	Class<?> propertyClass (
-			Class<?> objectClass,
-			String propertyName) {
+	Class<?> propertyClassForClass (
+			@NonNull Class<?> objectClass,
+			@NonNull String propertyName) {
 
 		Method getter =
 			getPropertyGetter (

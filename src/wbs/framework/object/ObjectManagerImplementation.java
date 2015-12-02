@@ -839,8 +839,8 @@ class ObjectManagerImplementation
 
 				objectClass =
 					Optional.<Class<?>>of (
-						BeanLogic.propertyClass (
-							objectClass,
+						BeanLogic.propertyClassForClass (
+							objectClass.get (),
 							pathPart));
 
 			}

@@ -2,19 +2,25 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.ConsoleHelperRegistry;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.object.ObjectManager;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("nameFormFieldBuilder")
@@ -25,7 +31,13 @@ class NameFormFieldBuilder {
 	// dependencies
 
 	@Inject
+	ConsoleHelperRegistry consoleHelperRegistry;
+
+	@Inject
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@Inject
+	ObjectManager objectManager;
 
 	// prototype dependencies
 
@@ -83,14 +95,40 @@ class NameFormFieldBuilder {
 	void build (
 			Builder builder) {
 
-		ConsoleHelper consoleHelper =
+		ConsoleHelper thisConsoleHelper =
 			context.consoleHelper ();
+
+		ConsoleHelper thatConsoleHelper;
+
+		if (
+			isNotNull (
+				spec.delegate ())
+		) {
+
+			Class thatClass =
+				optionalRequired (
+					objectManager.dereferenceType (
+						Optional.<Class<?>>of (
+							thisConsoleHelper.objectClass ()),
+						Optional.of (
+							spec.delegate ())));
+
+			thatConsoleHelper =
+				consoleHelperRegistry.findByObjectClass (
+					thatClass);
+
+		} else {
+
+			thatConsoleHelper =
+				thisConsoleHelper;
+
+		}
 
 		String name =
 			ifNull (
 				spec.name (),
 				spec.delegate () == null
-					? consoleHelper.nameFieldName ()
+					? thatConsoleHelper.nameFieldName ()
 					: null,
 				"name");
 
@@ -107,7 +145,7 @@ class NameFormFieldBuilder {
 				spec.label (),
 				spec.delegate () == null
 					? capitalise (
-						consoleHelper.nameLabel ())
+						thatConsoleHelper.nameLabel ())
 					: null,
 				"Name");
 
@@ -133,7 +171,7 @@ class NameFormFieldBuilder {
 			nameFormFieldAccessorProvider.get ()
 
 			.consoleHelper (
-				consoleHelper);
+				thatConsoleHelper);
 
 		if (spec.delegate () != null) {
 

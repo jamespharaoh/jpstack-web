@@ -27,7 +27,8 @@
 
 	<object-context
 		name="messageTemplateSet"
-		object-name="messageTemplateSet">
+		object-name="messageTemplateSet"
+		default-file="entry">
 
 		<list>
 

@@ -108,7 +108,7 @@ class TextFormFieldBuilder {
 		if (! dynamic) {
 
 			propertyClass =
-				BeanLogic.propertyClass (
+				BeanLogic.propertyClassForClass (
 					context.containerClass (),
 					name);
 

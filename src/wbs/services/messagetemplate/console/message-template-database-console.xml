@@ -28,7 +28,8 @@
 
 	<object-context
 		name="messageTemplateDatabase"
-		object-name="messageTemplateDatabase">
+		object-name="messageTemplateDatabase"
+		default-file="value">
 
 		<list>
 
@@ -45,14 +46,21 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"/>
+			<section
+				name="settings"
+				label="Settings">
 
-			<context-link
-				name="entryType"
-				link="messageTemplateEntryType"
-				label="Types"
-				priv-key="messageTemplateDatabase.manage"/>
+				<object-settings-page
+					fields="settings"
+					short-name="general"/>
+
+				<context-link
+					name="entryType"
+					link="messageTemplateEntryType"
+					label="Types"
+					priv-key="messageTemplateDatabase.manage"/>
+
+			</section>
 
 			<context-link
 				name="value"

@@ -114,7 +114,7 @@ class TimestampToFormFieldBuilder {
 		// accessor and native mapping
 
 		Class<?> propertyClass =
-			BeanLogic.propertyClass (
+			BeanLogic.propertyClassForClass (
 				context.containerClass (),
 				name);
 
