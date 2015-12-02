@@ -134,7 +134,7 @@ class CurrencyFormFieldBuilder {
 				Long.MAX_VALUE);
 
 		Class<?> propertyClass =
-			BeanLogic.propertyClass (
+			BeanLogic.propertyClassForClass (
 				context.containerClass (),
 				name);
 
