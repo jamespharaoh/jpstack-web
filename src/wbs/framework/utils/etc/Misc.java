@@ -2234,6 +2234,40 @@ class Misc {
 
 	}
 
+	public static
+	boolean validInterval (
+			@NonNull String string) {
+
+		List<String> parts =
+			split (
+				string,
+				" to ");
+
+		if (parts.size () == 1) {
+
+			return validPartialTimestamp (
+				parts.get (0).trim ());
+
+		} else if (parts.size () == 2) {
+
+			return (
+
+				validPartialTimestamp (
+					parts.get (0).trim ())
+
+				&& validPartialTimestamp (
+					parts.get (1).trim ())
+
+			);
+
+		} else {
+
+			return false;
+
+		}
+
+	}
+
 	public static <Type>
 	Type requiredValue (
 			@NonNull Type value) {
@@ -2389,6 +2423,46 @@ class Misc {
 
 		throw new TimeFormatException (
 			"Date/time format not recognised");
+
+	}
+
+	public static
+	Interval parseInterval (
+			@NonNull DateTimeZone timeZone,
+			@NonNull String string) {
+
+		List<String> parts =
+			split (
+				string,
+				" to ");
+
+		if (parts.size () == 1) {
+
+			return parsePartialTimestamp (
+				timeZone,
+				parts.get (0).trim ());
+
+		} else if (parts.size () == 2) {
+
+			Interval firstInterval =
+				parsePartialTimestamp (
+					timeZone,
+					parts.get (0).trim ());
+
+			Interval secondInterval =
+				parsePartialTimestamp (
+					timeZone,
+					parts.get (1).trim ());
+
+			return new Interval (
+				firstInterval.getStart (),
+				secondInterval.getEnd ());
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 	}
 

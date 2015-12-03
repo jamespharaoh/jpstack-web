@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -22,7 +23,7 @@ class ConsoleHelperRegistry {
 
 	public synchronized
 	void register (
-			ConsoleHelper<?> consoleHelper) {
+			@NonNull ConsoleHelper<?> consoleHelper) {
 
 		// detect dupes
 
@@ -69,7 +70,7 @@ class ConsoleHelperRegistry {
 
 	public synchronized
 	ConsoleHelper<?> findByObjectClass (
-			Class<?> objectClass) {
+			@NonNull Class<?> objectClass) {
 
 		return byObjectClass.get (
 			objectClass);
@@ -78,7 +79,7 @@ class ConsoleHelperRegistry {
 
 	public synchronized
 	ConsoleHelper<?> findByObjectName (
-			String objectName) {
+			@NonNull String objectName) {
 
 		ConsoleHelper<?> consoleHelper =
 			byObjectName.get (

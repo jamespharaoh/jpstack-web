@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.validPartialTimestamp;
+import static wbs.framework.utils.etc.Misc.validInterval;
 
 import java.util.List;
 
@@ -32,12 +32,12 @@ class TimestampPartialFormFieldValueValidator
 		// check it's a valid partial timestamp
 
 		if (
-			! validPartialTimestamp (
+			! validInterval (
 				genericValue.get ())
 		) {
 
 			errors.add (
-				"Invalid partial timestamp");
+				"Invalid interval");
 
 		}
 
