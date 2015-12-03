@@ -473,7 +473,7 @@ class ObjectSearchPageBuilder<
 		name =
 			ifNull (
 				spec.name (),
-				"name");
+				"search");
 
 		privKey =
 			spec.privKey ();
