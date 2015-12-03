@@ -12,6 +12,8 @@ class QueueItemSearch {
 
 	String createdTime;
 
+	Integer processedUserId;
+
 	boolean filter;
 	Collection<Integer> filterQueueIds;
 

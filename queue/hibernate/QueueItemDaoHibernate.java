@@ -3,7 +3,7 @@ package wbs.platform.queue.hibernate;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
+import static wbs.framework.utils.etc.Misc.parseInterval;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,11 @@ class QueueItemDaoHibernate
 
 			.createAlias (
 				"_queueSubject.queue",
-				"_queue");
+				"_queue")
+
+			.createAlias (
+				"_queueItem.processedUser",
+				"_processedUser");
 
 		if (
 			isNotNull (
@@ -54,7 +58,7 @@ class QueueItemDaoHibernate
 		) {
 
 			Interval createdTimeInterval =
-				parsePartialTimestamp (
+				parseInterval (
 					DateTimeZone.getDefault (),
 					search.createdTime ());
 
@@ -64,8 +68,25 @@ class QueueItemDaoHibernate
 					instantToDate (
 						createdTimeInterval.getStart ())));
 
+			criteria.add (
+				Restrictions.lt (
+					"_queueItem.createdTime",
+					instantToDate (
+						createdTimeInterval.getEnd ())));
+
 		}
 
+		if (
+			isNotNull (
+				search.processedUserId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_processedUser.id",
+					search.processedUserId ()));
+
+		}
 
 		if (search.filter ()) {
 

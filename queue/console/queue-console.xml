@@ -101,6 +101,11 @@
 			name="createdTime"
 			label="Created time"/>
 
+		<object-id-field
+			name="processedUserId"
+			object-type="user"
+			nullable="yes"/>
+
 	</field-set>
 
 	<field-set
