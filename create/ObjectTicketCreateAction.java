@@ -166,7 +166,7 @@ class ObjectTicketCreateAction<
 		@SuppressWarnings ("unchecked")
 		ConsoleHelper<ParentType> parentHelperTemp =
 			(ConsoleHelper<ParentType>)
-			objectManager.getConsoleObjectHelper (
+			objectManager.findConsoleHelper (
 				consoleHelper.parentClass ());
 
 		parentHelper =

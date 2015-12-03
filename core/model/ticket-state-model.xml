@@ -36,6 +36,15 @@
 
 	</fields>
 
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a ticket state"
+			template="yes"/>
+
+	</priv-types>
+
 	<queue-types>
 
 		<queue-type
