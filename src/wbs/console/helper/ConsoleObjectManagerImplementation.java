@@ -1,18 +1,16 @@
 package wbs.console.helper;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import com.google.common.base.Optional;
@@ -40,87 +38,29 @@ class ConsoleObjectManagerImplementation
 	// dependencies
 
 	@Inject
-	ConsoleRequestContext requestContext;
+	ConsoleHelperRegistry consoleHelperRegistry;
 
 	@Inject
 	ObjectManager objectManager;
 
 	@Inject
-	Map<String,ConsoleHelper<?>> consoleHelpersByBeanName =
-		Collections.emptyMap ();
+	ConsoleRequestContext requestContext;
 
-	// state
+	// collection dependencies
 
-	Map<Class<?>,ConsoleHelper<?>> consoleHelpersByObjectClass =
-		new HashMap<Class<?>,ConsoleHelper<?>> ();
+	// (force instantiation)
+	@Inject
+	List<ConsoleHelper<?>> consoleHelpers;
 
-	@PostConstruct
-	public
-	void init () {
-
-		// collect all object helpers
-
-		Map<Class<?>,String> beanNamesByObjectClass =
-			new HashMap<Class<?>,String> ();
-
-		for (
-			Map.Entry<String,ConsoleHelper<?>> entry
-				: consoleHelpersByBeanName.entrySet ()
-		) {
-
-			String beanName =
-				entry.getKey ();
-
-			ConsoleHelper<?> consoleHelper =
-				entry.getValue ();
-
-			// check for duplicates
-
-			String existingBeanName =
-				beanNamesByObjectClass.get (
-					consoleHelper.objectClass ());
-
-			if (existingBeanName != null) {
-
-				log.error (
-					stringFormat (
-						"Ignoring duplicated object helper class %s from %s, ",
-						consoleHelper.objectClass ().getName (),
-						beanName,
-						"original from %s",
-						existingBeanName));
-
-				continue;
-
-			}
-
-			beanNamesByObjectClass.put (
-				consoleHelper.objectClass (),
-				beanName);
-
-			// store it
-
-			consoleHelpersByObjectClass.put (
-				consoleHelper.objectClass (),
-				consoleHelper);
-
-			log.debug (
-				stringFormat (
-					"Adding object helper for %s from bean %s",
-					consoleHelper.objectClass ().getName (),
-					beanName));
-
-		}
-
-	}
+	// implementation
 
 	@Override
 	public
-	ConsoleHelper<?> getConsoleObjectHelper (
-			Record<?> dataObject) {
+	ConsoleHelper<?> findConsoleHelper (
+			@NonNull Record<?> dataObject) {
 
 		ConsoleHelper<?> objectHelper =
-			getConsoleObjectHelper (
+			findConsoleHelper (
 				dataObject.getClass ());
 
 		if (objectHelper == null) {
@@ -138,20 +78,24 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	ConsoleHelper<?> getConsoleObjectHelper (
-			Class<?> objectClass) {
+	ConsoleHelper<?> findConsoleHelper (
+			@NonNull Class<?> objectClass) {
 
 		Class<?> tempClass =
 			objectClass;
 
 		while (Record.class.isAssignableFrom (tempClass)) {
 
-			if (consoleHelpersByObjectClass.containsKey (tempClass)) {
+			ConsoleHelper<?> consoleHelper =
+				consoleHelperRegistry.findByObjectClass (
+					tempClass);
 
-				ConsoleHelper<?> objectHelper =
-					consoleHelpersByObjectClass.get (tempClass);
+			if (
+				isNotNull (
+					consoleHelper)
+			) {
 
-				return objectHelper;
+				return consoleHelper;
 
 			}
 
@@ -164,6 +108,15 @@ class ConsoleObjectManagerImplementation
 
 	}
 
+	@Override
+	public
+	ConsoleHelper<?> findConsoleHelper (
+			@NonNull String objectTypeName) {
+
+		return consoleHelperRegistry.findByObjectName (
+			objectTypeName);
+
+	}
 
 	@Override
 	public
@@ -178,7 +131,8 @@ class ConsoleObjectManagerImplementation
 			return "<td>-</td>";
 
 		ConsoleHelper<?> objectHelper =
-			getConsoleObjectHelper (object);
+			findConsoleHelper (
+				object);
 
 		String path =
 			objectManager.objectPath (
@@ -198,7 +152,8 @@ class ConsoleObjectManagerImplementation
 					"%s",
 					Html.magicTd (
 						requestContext.resolveLocalUrl (
-							objectHelper.getDefaultLocalPath (object)),
+							objectHelper.getDefaultLocalPath (
+								object)),
 						"main",
 						colspan),
 					"%h</td>",
@@ -364,7 +319,7 @@ class ConsoleObjectManagerImplementation
 		}
 
 		ConsoleHelper<?> objectHelper =
-			getConsoleObjectHelper (
+			findConsoleHelper (
 				object);
 
 		return objectHelper.getHtml (
@@ -426,7 +381,7 @@ class ConsoleObjectManagerImplementation
 		}
 
 		ConsoleHelper<?> objectHelper =
-			getConsoleObjectHelper (object);
+			findConsoleHelper (object);
 
 		return objectHelper.canView (
 			object);
@@ -439,7 +394,7 @@ class ConsoleObjectManagerImplementation
 			Record<?> object) {
 
 		ConsoleHelper<?> objectHelper =
-			getConsoleObjectHelper (object);
+			findConsoleHelper (object);
 
 		if (objectHelper.typeCodeExists ()) {
 
@@ -462,7 +417,7 @@ class ConsoleObjectManagerImplementation
 			Record<?> object) {
 
 		ConsoleHelper<?> objectHelper =
-			getConsoleObjectHelper (object);
+			findConsoleHelper (object);
 
 		return requestContext.resolveContextUrl (
 			objectHelper.getDefaultContextPath (object));
@@ -475,7 +430,7 @@ class ConsoleObjectManagerImplementation
 			Record<?> object) {
 
 		ConsoleHelper<?> objectHelper =
-			getConsoleObjectHelper (object);
+			findConsoleHelper (object);
 
 		return requestContext.resolveLocalUrl (
 			objectHelper.getDefaultLocalPath (object));
@@ -562,8 +517,8 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPath (
-			Record<?> dataObject,
-			Record<?> root) {
+			@NonNull Record<?> dataObject,
+			@NonNull Record<?> root) {
 
 		return objectManager.objectPath (
 			dataObject,
@@ -574,8 +529,8 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPath (
-			Record<?> dataObject,
-			Optional<Record<?>> assumedRoot,
+			@NonNull Record<?> dataObject,
+			@NonNull Optional<Record<?>> assumedRoot,
 			boolean mini,
 			boolean preload) {
 

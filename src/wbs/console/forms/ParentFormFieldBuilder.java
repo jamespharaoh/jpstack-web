@@ -184,7 +184,10 @@ class ParentFormFieldBuilder {
 				label)
 
 			.entityFinder (
-				parentHelper);
+				parentHelper)
+
+			.mini (
+				consoleHelper.parentTypeIsFixed ());
 
 		// update hook
 

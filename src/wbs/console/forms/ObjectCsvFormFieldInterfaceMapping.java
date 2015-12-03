@@ -17,7 +17,6 @@ import com.google.common.base.Optional;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCsvFormFieldInterfaceMapping")
@@ -34,9 +33,6 @@ class ObjectCsvFormFieldInterfaceMapping<Container,Generic extends Record<Generi
 
 	@Getter @Setter
 	String rootFieldName;
-
-	@Getter @Setter
-	EntityFinder<Generic> entityFinder;
 
 	// implementation
 
@@ -76,7 +72,7 @@ class ObjectCsvFormFieldInterfaceMapping<Container,Generic extends Record<Generi
 				root =
 					Optional.<Record<?>>of (
 						(Record<?>)
-						BeanLogic.getProperty (
+						objectManager.dereference (
 							container,
 							rootFieldName));
 

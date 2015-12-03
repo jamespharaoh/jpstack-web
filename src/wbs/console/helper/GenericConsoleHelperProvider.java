@@ -456,7 +456,7 @@ class GenericConsoleHelperProvider
 			} else {
 
 				ConsoleHelper<?> delegateHelper =
-					consoleObjectManager.get ().getConsoleObjectHelper (
+					consoleObjectManager.get ().findConsoleHelper (
 						delegate);
 
 				return delegateHelper.canView (

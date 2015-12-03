@@ -211,6 +211,8 @@ class ConsoleHelperBuilder {
 					consoleHooksBeanName,
 					ConsoleHooks.class);
 
+System.out.println ("#### GOT HOOKS FOR " + consoleHelperProvider.objectName ());
+
 		} catch (NoSuchBeanException exception) {
 		}
 

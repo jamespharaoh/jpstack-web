@@ -35,9 +35,12 @@ class ObjectFormFieldSpec {
 	Boolean readOnly;
 
 	@DataAttribute (
-		name = "object-type",
-		required = true)
+		name = "object-type")
 	String objectTypeName;
+
+	@DataAttribute (
+		name = "field")
+	String fieldName;
 
 	@DataAttribute (
 		name = "root-field")

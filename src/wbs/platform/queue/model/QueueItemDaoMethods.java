@@ -9,6 +9,9 @@ import wbs.platform.user.model.UserRec;
 public
 interface QueueItemDaoMethods {
 
+	List<Integer> searchIds (
+			QueueItemSearch search);
+
 	QueueItemRec findByIndex (
 			QueueSubjectRec queueSubject,
 			int index);

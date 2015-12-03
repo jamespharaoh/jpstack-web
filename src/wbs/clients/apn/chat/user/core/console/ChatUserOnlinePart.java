@@ -121,7 +121,7 @@ class ChatUserOnlinePart
 				true);
 
 		targetContext =
-			consoleManager.relatedContext (
+			consoleManager.relatedContextRequired (
 				requestContext.consoleContext (),
 				targetContextType);
 

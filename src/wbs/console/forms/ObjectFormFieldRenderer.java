@@ -56,6 +56,9 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Getter @Setter
 	EntityFinder<Interface> entityFinder;
 
+	@Getter @Setter
+	Boolean mini;
+
 	// details
 
 	@Getter
@@ -74,19 +77,21 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		// work out root
 
-		Record<?> root;
+		Optional<Record<?>> root;
 
 		if (rootFieldName != null) {
 
 			root =
-				(Record<?>)
-				BeanLogic.getProperty (
-					container,
-					rootFieldName);
+				Optional.<Record<?>>fromNullable (
+					(Record<?>)
+					objectManager.dereference (
+						container,
+						rootFieldName));
 
 		} else {
 
-			root = null;
+			root =
+				Optional.<Record<?>>absent ();
 
 		}
 
@@ -96,8 +101,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			"%s\n",
 			objectManager.tdForObject (
 				interfaceValue.orNull (),
-				root,
-				true,
+				root.orNull (),
+				mini,
 				link,
 				colspan));
 
@@ -112,19 +117,21 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		// work out root
 
-		Record<?> root;
+		Optional<Record<?>> root;
 
 		if (rootFieldName != null) {
 
 			root =
-				(Record<?>)
-				BeanLogic.getProperty (
-					container,
-					rootFieldName);
+				Optional.<Record<?>>fromNullable (
+					(Record<?>)
+					objectManager.dereference (
+						container,
+						rootFieldName));
 
 		} else {
 
-			root = null;
+			root =
+				Optional.<Record<?>>absent ();
 
 		}
 
@@ -134,8 +141,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			"%s\n",
 			objectManager.tdForObject (
 				interfaceValue.orNull (),
-				root,
-				true,
+				root.orNull (),
+				mini,
 				true,
 				1));
 

@@ -12,6 +12,7 @@
 		<bean class="DelegateFormFieldAccessor"/>
 		<bean class="DeletedFormFieldBuilder"/>
 		<bean class="DeletedFormFieldSpec"/>
+		<bean class="DereferenceFormFieldAccessor"/>
 		<bean class="DescriptionFormFieldBuilder"/>
 		<bean class="DescriptionFormFieldSpec"/>
 		<bean class="DynamicFormFieldAccessor"/>

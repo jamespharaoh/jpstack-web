@@ -3,10 +3,15 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.optionalEquals;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleHelper;
@@ -17,8 +22,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.framework.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.framework.object.ObjectManager;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("objectFormFieldBuilder")
@@ -34,7 +38,14 @@ class ObjectFormFieldBuilder {
 	@Inject
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
+	@Inject
+	ObjectManager objectManager;
+
 	// prototype dependencies
+
+	@Inject
+	Provider<DereferenceFormFieldAccessor>
+	dereferenceFormFieldAccessorProvider;
 
 	@Inject
 	Provider<NullFormFieldValueValidator>
@@ -99,10 +110,17 @@ class ObjectFormFieldBuilder {
 		String name =
 			spec.name ();
 
+		String fieldName =
+			ifNull (
+				spec.fieldName (),
+				name);
+
 		String label =
 			ifNull (
 				spec.label (),
-				capitalise (camelToSpaces (name)));
+				capitalise (
+					camelToSpaces (
+						name)));
 
 		Boolean nullable =
 			ifNull (
@@ -121,16 +139,34 @@ class ObjectFormFieldBuilder {
 				false);
 		*/
 
-		ConsoleHelper<?> consoleHelper =
-			consoleHelperRegistry.findByObjectName (
-				spec.objectTypeName ());
+		Optional<ConsoleHelper<?>> consoleHelper;
 
-		if (consoleHelper == null) {
+		if (
+			isNotNull (
+				spec.objectTypeName ())
+		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Console helper does not exist: %s",
-					spec.objectTypeName ()));
+			consoleHelper =
+				Optional.<ConsoleHelper<?>>fromNullable (
+					consoleHelperRegistry.findByObjectName (
+						spec.objectTypeName ()));
+
+			if (
+				isNotPresent (
+					consoleHelper)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Console helper does not exist: %s",
+						spec.objectTypeName ()));
+
+			}
+
+		} else {
+
+			consoleHelper =
+				Optional.<ConsoleHelper<?>>absent ();
 
 		}
 
@@ -139,17 +175,29 @@ class ObjectFormFieldBuilder {
 
 		// field type
 
-		Class<?> propertyClass =
-			BeanLogic.propertyClassForClass (
-				context.containerClass (),
-				name);
+		Optional<Class<?>> propertyClass =
+			objectManager.dereferenceType (
+				Optional.<Class<?>>of (
+					context.containerClass ()),
+				Optional.of (
+					fieldName));
+
+		// accessor
 
 		FormFieldAccessor accessor;
-		FormFieldNativeMapping nativeMapping;
 
-		if (propertyClass == Integer.class) {
+		if (
+			isNotNull (
+				spec.fieldName ())
+		) {
 
-			// accessor
+			accessor =
+				dereferenceFormFieldAccessorProvider.get ()
+
+				.path (
+					spec.fieldName ());
+
+		} else {
 
 			accessor =
 				simpleFormFieldAccessorProvider.get ()
@@ -158,30 +206,29 @@ class ObjectFormFieldBuilder {
 					name)
 
 				.nativeClass (
-					Integer.class);
+					propertyClass.get ());
 
-			// native mapping
+		}
+
+		// native mapping
+
+		FormFieldNativeMapping nativeMapping;
+
+		if (
+
+			optionalEquals (
+				propertyClass,
+				Integer.class)
+
+		) {
 
 			nativeMapping =
 				objectIdFormFieldNativeMappingProvider.get ()
 
 				.consoleHelper (
-					consoleHelper);
+					consoleHelper.orNull ());
 
 		} else {
-
-			// accessor
-
-			accessor =
-				simpleFormFieldAccessorProvider.get ()
-
-				.name (
-					name)
-
-				.nativeClass (
-					Record.class);
-
-			// native mapping
 
 			nativeMapping =
 				identityFormFieldNativeMappingProvider.get ();
@@ -206,7 +253,10 @@ class ObjectFormFieldBuilder {
 		// csv mapping
 
 		FormFieldInterfaceMapping csvMapping =
-			objectCsvFormFieldInterfaceMappingProvider.get ();
+			objectCsvFormFieldInterfaceMappingProvider.get ()
+
+			.rootFieldName (
+				rootFieldName);
 
 		// renderer
 
@@ -226,7 +276,11 @@ class ObjectFormFieldBuilder {
 				rootFieldName)
 
 			.entityFinder (
-				consoleHelper);
+				consoleHelper.orNull ())
+
+			.mini (
+				isNotNull (
+					spec.objectTypeName ()));
 
 		// update hook
 

@@ -132,40 +132,47 @@ class QueueSupervisorItemsPart
 					queue);
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
+			printFormat (
 				"%s\n",
 				objectManager.tdForObjectLink (
-					parent),
+					parent));
 
+			printFormat (
 				"%s\n",
 				objectManager.tdForObjectMiniLink (
 					queue,
-					parent),
+					parent));
 
+			printFormat (
 				"%s\n",
 				objectManager.tdForObjectMiniLink (
 					queueItem,
-					queue),
+					queue));
 
+			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
 					timeFormatter.defaultTimezone (),
 					dateToInstant (
-						queueItem.getCreatedTime ())),
+						queueItem.getCreatedTime ())));
 
+			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
 					timeFormatter.defaultTimezone (),
 					dateToInstant (
-						queueItem.getPendingTime ())),
+						queueItem.getPendingTime ())));
 
+			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.instantToTimestampString (
 					timeFormatter.defaultTimezone (),
 					dateToInstant (
-						queueItem.getProcessedTime ())),
+						queueItem.getProcessedTime ())));
 
+			printFormat (
 				"</tr>\n");
 
 		}

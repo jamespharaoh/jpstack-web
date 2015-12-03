@@ -3,6 +3,7 @@ package wbs.platform.object.search;
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.optionalIf;
@@ -17,6 +18,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -92,7 +94,7 @@ class ObjectSearchResultsPart
 	Integer pageNumber;
 	Integer pageCount;
 
-	ConsoleContext targetContext;
+	Optional<ConsoleContext> targetContext;
 
 	// details
 
@@ -466,13 +468,8 @@ class ObjectSearchResultsPart
 					object.getId ()),
 
 				" data-target-href=\"%h\"",
-				requestContext.resolveContextUrl (
-					stringFormat (
-						"%s",
-						targetContext.pathPrefix (),
-						"/%s",
-						consoleHelper.getPathId (
-							object))),
+				objectUrl (
+					object),
 
 				">\n");
 
@@ -514,13 +511,8 @@ class ObjectSearchResultsPart
 						object.getId ()),
 
 					" data-target-href=\"%h\"",
-					requestContext.resolveContextUrl (
-						stringFormat (
-							"%s",
-							targetContext.pathPrefix (),
-							"/%s",
-							consoleHelper.getPathId (
-								object))),
+					objectUrl (
+						object),
 
 					">\n");
 
@@ -540,6 +532,33 @@ class ObjectSearchResultsPart
 
 		printFormat (
 			"</table>\n");
+
+	}
+
+	private
+	String objectUrl (
+			@NonNull Record<?> object) {
+
+		if (
+			isPresent (
+				targetContext)
+		) {
+
+			return requestContext.resolveContextUrl (
+				stringFormat (
+					"%s",
+					targetContext.get ().pathPrefix (),
+					"/%s",
+					consoleHelper.getPathId (
+						object)));
+
+		} else {
+
+			return requestContext.resolveLocalUrl (
+				consoleHelper.getDefaultLocalPath (
+					object));
+
+		}
 
 	}
 

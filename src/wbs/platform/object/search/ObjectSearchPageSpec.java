@@ -25,6 +25,13 @@ class ObjectSearchPageSpec {
 
 	// attributes
 
+	@DataAttribute
+	String name;
+
+	@DataAttribute (
+		name = "object-type")
+	String objectTypeName;
+
 	@DataAttribute (
 		name = "search-class")
 	String searchClassName;
@@ -55,6 +62,9 @@ class ObjectSearchPageSpec {
 
 	@DataAttribute
 	String tabName;
+
+	@DataAttribute
+	String tabLabel;
 
 	@DataAttribute
 	String fileName;

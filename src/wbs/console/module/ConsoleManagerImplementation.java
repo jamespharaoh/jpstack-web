@@ -4,8 +4,11 @@ import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.pluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -29,6 +32,8 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
+
+import com.google.common.base.Optional;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContext.PathSupply;
@@ -1490,7 +1495,7 @@ class ConsoleManagerImplementation
 
 	@Override
 	public
-	ConsoleContext contextWithParentOfType (
+	Optional<ConsoleContext> contextWithParentOfType (
 			@NonNull ConsoleContext parentContext,
 			@NonNull ConsoleContextType contextType,
 			boolean required) {
@@ -1508,8 +1513,10 @@ class ConsoleManagerImplementation
 			List<String> contextNames =
 				new ArrayList<String> ();
 
-			for (ConsoleContext context
-					: contexts) {
+			for (
+				ConsoleContext context
+					: contexts
+			) {
 
 				contextNames.add (
 					context.name ());
@@ -1539,19 +1546,47 @@ class ConsoleManagerImplementation
 
 			} else {
 
-				return null;
+				return Optional.<ConsoleContext>absent ();
 
 			}
 
 		}
 
-		return contexts.get (0);
+		return Optional.of (
+			contexts.get (0));
 
 	}
 
 	@Override
 	public
-	ConsoleContext contextWithoutParentOfType (
+	Optional<ConsoleContext> contextWithParentOfType (
+			@NonNull ConsoleContext parentContext,
+			@NonNull ConsoleContextType contextType) {
+
+		return contextWithParentOfType (
+			parentContext,
+			contextType,
+			false);
+
+	}
+
+	@Override
+	public
+	ConsoleContext contextWithParentOfTypeRequired (
+			@NonNull ConsoleContext parentContext,
+			@NonNull ConsoleContextType contextType) {
+
+		return optionalRequired (
+			contextWithParentOfType (
+				parentContext,
+				contextType,
+				true));
+
+	}
+
+	@Override
+	public
+	Optional<ConsoleContext> contextWithoutParentOfType (
 			@NonNull ConsoleContextType contextType,
 			boolean required) {
 
@@ -1578,13 +1613,37 @@ class ConsoleManagerImplementation
 
 			} else {
 
-				return null;
+				return Optional.<ConsoleContext>absent ();
 
 			}
 
 		}
 
-		return contexts.get (0);
+		return Optional.of (
+			contexts.get (0));
+
+	}
+
+	@Override
+	public
+	Optional<ConsoleContext> contextWithoutParentOfType (
+			@NonNull ConsoleContextType contextType) {
+
+		return contextWithoutParentOfType (
+			contextType,
+			false);
+
+	}
+
+	@Override
+	public
+	ConsoleContext contextWithoutParentOfTypeRequired (
+			@NonNull ConsoleContextType contextType) {
+
+		return optionalRequired (
+			contextWithoutParentOfType (
+				contextType,
+				true));
 
 	}
 
@@ -1614,9 +1673,9 @@ class ConsoleManagerImplementation
 	@Override
 	public
 	String resolveLocalFile (
-			ConsoleContextStuff contextStuff,
-			ConsoleContext consoleContext,
-			String localFile) {
+			@NonNull ConsoleContextStuff contextStuff,
+			@NonNull ConsoleContext consoleContext,
+			@NonNull String localFile) {
 
 		if (localFile.charAt (0) == '/') {
 
@@ -1639,34 +1698,54 @@ class ConsoleManagerImplementation
 
 			// try and resolve target context
 
-			ConsoleContext targetContext =
-				null;
+			Optional<ConsoleContext> targetContext =
+				Optional.<ConsoleContext>absent ();
 
-			ConsoleContext searchContext =
-				consoleContext;
+			Optional<ConsoleContext> searchContext =
+				Optional.of (
+					consoleContext);
 
-			while (searchContext != null) {
+			while (
+				isPresent (
+					searchContext)
+			) {
 
 				targetContext =
 					contextWithParentOfType (
-						searchContext,
-						targetContextType,
-						false);
+						searchContext.get (),
+						targetContextType);
 
-				if (targetContext != null)
+				if (
+					isPresent (
+						targetContext)
+				) {
 					break;
+				}
 
-				searchContext =
+				if (
 					isNotNull (
-							searchContext.parentContextName ())
-						? context (
-							searchContext.parentContextName (),
-							true)
-						: null;
+						searchContext.get ().parentContextName ())
+				) {
+
+					searchContext =
+						Optional.of (
+							context (
+								searchContext.get ().parentContextName (),
+								true));
+
+				} else {
+
+					searchContext =
+						Optional.<ConsoleContext>absent ();
+
+				}
 
 			}
 
-			if (targetContext == null) {
+			if (
+				isNotPresent (
+					targetContext)
+			) {
 
 				throw new RuntimeException (
 					stringFormat (
@@ -1681,7 +1760,7 @@ class ConsoleManagerImplementation
 			return joinWithoutSeparator (
 				requestContext.applicationPathPrefix (),
 				contextStuff.foreignPath (),
-				targetContext.pathPrefix (),
+				targetContext.get ().pathPrefix (),
 				consoleContext.localPathForStuff (
 					contextStuff));
 
@@ -1703,9 +1782,10 @@ class ConsoleManagerImplementation
 
 	@Override
 	public
-	ConsoleContext relatedContext (
-			ConsoleContext sourceContext,
-			ConsoleContextType targetContextType) {
+	Optional<ConsoleContext> relatedContext (
+			@NonNull ConsoleContext sourceContext,
+			@NonNull ConsoleContextType targetContextType,
+			boolean required) {
 
 		log.debug (
 			stringFormat (
@@ -1723,8 +1803,6 @@ class ConsoleManagerImplementation
 				"Source context: %s",
 				sourceContext.name ()));
 
-		ConsoleContext targetContext;
-
 		if (
 			isNotNull (
 				sourceContext.parentContextName ())
@@ -1737,40 +1815,49 @@ class ConsoleManagerImplementation
 					sourceContext.parentContextName (),
 					true);
 
-			log.debug (
-				stringFormat (
-					"Parent context: %s",
-					parentContext.name ()));
-
 			// lookup target context based on parent and type
 
-			targetContext =
-				contextWithParentOfType (
-					parentContext,
-					targetContextType,
-					true);
+			return contextWithParentOfType (
+				parentContext,
+				targetContextType,
+				required);
 
 		} else {
 
-			log.debug (
-				stringFormat (
-					"No parent context"));
-
 			// lookup parent-less target context based on type
 
-			targetContext =
-				contextWithoutParentOfType (
-					targetContextType,
-					true);
+			return contextWithoutParentOfType (
+				targetContextType,
+				required);
 
 		}
 
-		log.debug (
-			stringFormat (
-				"Target context chosen: %s",
-				targetContext.name ()));
+	}
 
-		return targetContext;
+	@Override
+	public
+	Optional<ConsoleContext> relatedContext (
+			@NonNull ConsoleContext sourceContext,
+			@NonNull ConsoleContextType targetContextType) {
+
+		return relatedContext (
+			sourceContext,
+			targetContextType,
+			false);
+
+	}
+
+	@Override
+	public
+	ConsoleContext relatedContextRequired (
+			@NonNull ConsoleContext sourceContext,
+			@NonNull ConsoleContextType targetContextType) {
+
+		return optionalRequired (
+			relatedContext (
+				sourceContext,
+				targetContextType,
+				true));
 
 	}
 

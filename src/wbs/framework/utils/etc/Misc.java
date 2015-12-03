@@ -318,12 +318,30 @@ class Misc {
 		return sb.toString();
 	}
 
-	public static String implode(String glue, Object... pieces) {
-		return implode(glue, Arrays.asList(pieces));
+	@Deprecated
+	public static
+	String implode (
+			String glue,
+			Object... pieces) {
+
+		return implode (
+			glue,
+			Arrays.asList (
+				pieces));
+
 	}
 
-	public static String implode(String glue, String... pieces) {
-		return implode(glue, Arrays.asList(pieces));
+	@Deprecated
+	public static
+	String implode (
+			String glue,
+			String... pieces) {
+
+		return implode (
+			glue,
+			Arrays.asList (
+				pieces));
+
 	}
 
 	static SimpleDateFormat isoDateFormat = new SimpleDateFormat ("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -350,6 +368,24 @@ class Misc {
 			return false;
 
 		return object1.equals (object2);
+
+	}
+
+	public static <Type>
+	boolean optionalEquals (
+			@NonNull Optional<Type> left,
+			@NonNull Type right) {
+
+		if (left.isPresent ()) {
+
+			return left.equals (
+				right);
+
+		} else {
+
+			return false;
+
+		}
 
 	}
 

@@ -47,7 +47,7 @@ class SpecialFormFieldAccessor<Container extends Record<?>,Native>
 		// get field name
 
 		ConsoleHelper<?> consoleHelper =
-			objectManager.getConsoleObjectHelper (
+			objectManager.findConsoleHelper (
 				container);
 
 		ModelField modelField =
@@ -109,7 +109,7 @@ class SpecialFormFieldAccessor<Container extends Record<?>,Native>
 		// get field name
 
 		ConsoleHelper<?> consoleHelper =
-			objectManager.getConsoleObjectHelper (
+			objectManager.findConsoleHelper (
 				container);
 
 		ModelField modelField =

@@ -2,6 +2,7 @@ package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.presentInstances;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -54,7 +55,7 @@ class ObjectSearchPageBuilder<
 	ConsoleModuleBuilder consoleModuleBuilder;
 
 	@Inject
-	ConsoleObjectManager consoleObjectManager;
+	ConsoleObjectManager objectManager;
 
 	// prototype dependencies
 
@@ -100,11 +101,13 @@ class ObjectSearchPageBuilder<
 	FormFieldSet resultsFormFieldSet;
 	FormFieldSet resultsRowsFormFieldSet;
 
+	String name;
 	String sessionKey;
 	String privKey;
 	String parentIdKey;
 	String parentIdName;
 	String tabName;
+	String tabLabel;
 	String fileName;
 	String searchResponderName;
 	String searchResultsResponderName;
@@ -157,7 +160,7 @@ class ObjectSearchPageBuilder<
 					tabName)
 
 				.defaultLabel (
-					"Search")
+					tabLabel)
 
 				.localFile (
 					fileName)
@@ -295,7 +298,10 @@ class ObjectSearchPageBuilder<
 						sessionKey)
 
 					.formFieldSet (
-						searchFormFieldSet);
+						searchFormFieldSet)
+
+					.fileName (
+						fileName);
 
 			}
 
@@ -380,8 +386,26 @@ class ObjectSearchPageBuilder<
 
 	void setDefaults () {
 
-		consoleHelper =
-			container.consoleHelper ();
+		if (
+			isNotNull (
+				spec.objectTypeName ())
+		) {
+
+			@SuppressWarnings ("unchecked")
+			ConsoleHelper<ObjectType> consoleHelperTemp =
+				(ConsoleHelper<ObjectType>)
+				objectManager.findConsoleHelper (
+					spec.objectTypeName ());
+
+			consoleHelper =
+				consoleHelperTemp;
+
+		} else {
+
+			consoleHelper =
+				container.consoleHelper ();
+
+		}
 
 		String searchClassName =
 			stringFormat (
@@ -446,6 +470,11 @@ class ObjectSearchPageBuilder<
 					spec.resultsRowsFieldsName ())
 				: null;
 
+		name =
+			ifNull (
+				spec.name (),
+				"name");
+
 		privKey =
 			spec.privKey ();
 
@@ -457,36 +486,48 @@ class ObjectSearchPageBuilder<
 
 		sessionKey =
 			stringFormat (
-				"%s.search",
-				container.pathPrefix ());
+				"%s.%s",
+				container.pathPrefix (),
+				name);
 
 		tabName =
 			ifNull (
 				spec.tabName (),
 				stringFormat (
-					"%s.search",
-					container.pathPrefix ()));
+					"%s.%s",
+					container.pathPrefix (),
+					name));
+
+		tabLabel =
+			ifNull (
+				spec.tabLabel (),
+				"Search");
 
 		fileName =
 			ifNull (
 				spec.fileName (),
 				stringFormat (
-					"%s.search",
-					container.pathPrefix ()));
+					"%s.%s",
+					container.pathPrefix (),
+					name));
 
 		searchResponderName =
 			ifNull (
 				spec.searchResponderName (),
 				stringFormat (
-					"%sSearchResponder",
-					container.newBeanNamePrefix ()));
+					"%s%sResponder",
+					container.newBeanNamePrefix (),
+					capitalise (
+						name)));
 
 		searchResultsResponderName =
 			ifNull (
 				spec.searchResultsResponderName (),
 				stringFormat (
-					"%sSearchResultsResponder",
-					container.newBeanNamePrefix ()));
+					"%s%sResultsResponder",
+					container.newBeanNamePrefix (),
+					capitalise (
+						name)));
 
 		itemsPerPage =
 			100;

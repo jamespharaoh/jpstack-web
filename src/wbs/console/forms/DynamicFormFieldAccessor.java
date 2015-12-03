@@ -46,7 +46,7 @@ class DynamicFormFieldAccessor<
 		// get native object
 
 		ConsoleHelper<?> consoleHelper =
-			consoleObjectManager.getConsoleObjectHelper (
+			consoleObjectManager.findConsoleHelper (
 				(Container)
 				container);
 
@@ -114,7 +114,7 @@ class DynamicFormFieldAccessor<
 		// set property
 
 		ConsoleHelper<?> consoleHelper =
-			consoleObjectManager.getConsoleObjectHelper(
+			consoleObjectManager.findConsoleHelper(
 				container);
 
 		consoleHelper.setDynamic (

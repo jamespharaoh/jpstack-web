@@ -2,6 +2,8 @@ package wbs.console.module;
 
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.context.ConsoleContextType;
@@ -36,21 +38,44 @@ interface ConsoleManager {
 			String name,
 			ConsoleContextStuff contextStuff);
 
-	ConsoleContext contextWithParentOfType (
+	Optional<ConsoleContext> contextWithParentOfType (
 			ConsoleContext parentContext,
 			ConsoleContextType contextType,
 			boolean required);
 
-	ConsoleContext contextWithoutParentOfType (
+	Optional<ConsoleContext> contextWithParentOfType (
+			ConsoleContext parentContext,
+			ConsoleContextType contextType);
+
+	ConsoleContext contextWithParentOfTypeRequired (
+			ConsoleContext parentContext,
+			ConsoleContextType contextType);
+
+	Optional<ConsoleContext> contextWithoutParentOfType (
 			ConsoleContextType contextType,
 			boolean required);
+
+	ConsoleContext contextWithoutParentOfTypeRequired (
+			ConsoleContextType contextType);
+
+	Optional<ConsoleContext> contextWithoutParentOfType (
+			ConsoleContextType contextType);
 
 	String resolveLocalFile (
 			ConsoleContextStuff contextStuff,
 			ConsoleContext consoleContext,
 			String localFile);
 
-	ConsoleContext relatedContext (
+	Optional<ConsoleContext> relatedContext (
+			ConsoleContext sourceContext,
+			ConsoleContextType targetContextType,
+			boolean required);
+
+	Optional<ConsoleContext> relatedContext (
+			ConsoleContext sourceContext,
+			ConsoleContextType targetContextType);
+
+	ConsoleContext relatedContextRequired (
 			ConsoleContext sourceContext,
 			ConsoleContextType targetContextType);
 

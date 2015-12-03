@@ -140,7 +140,7 @@ class ChatUserSearchResultsPart
 				true);
 
 		targetContext =
-			consoleManager.relatedContext (
+			consoleManager.relatedContextRequired (
 				requestContext.consoleContext (),
 				targetContextType);
 

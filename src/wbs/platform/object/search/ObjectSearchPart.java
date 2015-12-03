@@ -1,7 +1,6 @@
 package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Set;
 
@@ -46,6 +45,9 @@ class ObjectSearchPart
 
 	@Getter @Setter
 	FormFieldSet formFieldSet;
+
+	@Getter @Setter
+	String fileName;
 
 	// state
 
@@ -108,9 +110,7 @@ class ObjectSearchPart
 			" method=\"post\"",
 			" action=\"%h\"",
 			requestContext.resolveLocalUrl (
-				stringFormat (
-					"/%s.search",
-					consoleHelper.objectName ())),
+				"/" + fileName),
 			">\n");
 
 		printFormat (

@@ -117,7 +117,7 @@ class QueueListActivePart
 				true);
 
 		ConsoleContext queueContext =
-			consoleManager.relatedContext (
+			consoleManager.relatedContextRequired (
 				requestContext.consoleContext (),
 				queueContextType);
 
@@ -158,10 +158,7 @@ class QueueListActivePart
 				"<td>%h</td>\n",
 				objectManager.objectPath (
 					objectManager.getParent (
-						queue),
-					null,
-					false,
-					false));
+						queue)));
 
 			printFormat (
 				"<td>%h</td>\n",
@@ -177,7 +174,8 @@ class QueueListActivePart
 				"<td>%h</td>\n",
 				queueInfo.availableItems () > 0
 					? requestContext.prettyDateDiff (
-						millisToInstant (queueInfo.oldestAvailable ()),
+						millisToInstant (
+							queueInfo.oldestAvailable ()),
 						now)
 					: "-");
 

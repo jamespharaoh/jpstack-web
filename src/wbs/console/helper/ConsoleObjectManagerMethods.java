@@ -5,11 +5,14 @@ import wbs.framework.record.Record;
 public
 interface ConsoleObjectManagerMethods {
 
-	ConsoleHelper<?> getConsoleObjectHelper (
+	ConsoleHelper<?> findConsoleHelper (
 			Record<?> dataObject);
 
-	ConsoleHelper<?> getConsoleObjectHelper (
+	ConsoleHelper<?> findConsoleHelper (
 			Class<?> objectClass);
+
+	ConsoleHelper<?> findConsoleHelper (
+			String objectTypeName);
 
 	String tdForObject (
 			Record<?> object,

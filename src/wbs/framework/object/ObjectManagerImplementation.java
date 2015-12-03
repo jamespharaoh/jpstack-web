@@ -1,5 +1,6 @@
 package wbs.framework.object;
 
+import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.split;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -150,7 +151,7 @@ class ObjectManagerImplementation
 
 		return objectPath (
 			dataObject,
-			null,
+			Optional.<Record<?>>absent (),
 			false,
 			false);
 
@@ -163,7 +164,7 @@ class ObjectManagerImplementation
 
 		return objectPath (
 			dataObject,
-			null,
+			Optional.<Record<?>>absent (),
 			true,
 			false);
 
@@ -362,11 +363,13 @@ class ObjectManagerImplementation
 
 		} while (
 			! objectHelper.isRoot ()
-			&& object != assumedRoot
+			&& object != assumedRoot.orNull ()
 		);
 
-		if (specificObjectHelper != null
-				&& ! mini) {
+		if (
+			specificObjectHelper != null
+			&& ! mini
+		) {
 
 			partsToReturn.add (
 				":");
@@ -384,10 +387,13 @@ class ObjectManagerImplementation
 		Collections.reverse (
 			partsToReturn);
 
-		for (String string
-				: partsToReturn) {
+		for (
+			String string
+				: partsToReturn
+		) {
 
-			stringBuilder.append (string);
+			stringBuilder.append (
+				string);
 
 		}
 
@@ -793,6 +799,14 @@ class ObjectManagerImplementation
 				return Optional.absent ();
 
 			if (
+				equal (
+					pathPart,
+					"this")
+			) {
+
+				doNothing ();
+
+			} else if (
 				equal (
 					pathPart,
 					"parent")

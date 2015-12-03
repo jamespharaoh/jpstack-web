@@ -1,12 +1,15 @@
 package wbs.console.priv;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.NonNull;
 
 import wbs.console.priv.PrivDataLoader.UnknownObjectException;
 import wbs.framework.record.GlobalId;
@@ -108,15 +111,18 @@ class UserPrivData {
 
 	public
 	boolean canList (
-			GlobalId parentObjectId,
-			Collection<String> privCodes)
+			@NonNull GlobalId parentObjectId,
+			@NonNull Collection<String> privCodes)
 		throws UnknownObjectException {
 
 		ObjectData objectData =
-			sharedData.objectDatasByObjectId
-				.get (parentObjectId);
+			sharedData.objectDatasByObjectId.get (
+				parentObjectId);
 
-		if (objectData == null) {
+		if (
+			isNull (
+				objectData)
+		) {
 
 			throw new UnknownObjectException (
 				parentObjectId.toString ());
@@ -125,9 +131,17 @@ class UserPrivData {
 
 		// check manage priv
 
-		if (objectData.managePrivId != null
-				&& canChain (objectData.managePrivId))
+		if (
+
+			isNotNull (
+				objectData.managePrivId)
+
+			&& canChain (
+				objectData.managePrivId)
+
+		) {
 			return true;
+		}
 
 		if (! privCodes.isEmpty ()) {
 

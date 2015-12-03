@@ -168,7 +168,10 @@ class ObjectIdFormFieldBuilder {
 				rootFieldName)
 
 			.entityFinder (
-				consoleHelper);
+				consoleHelper)
+
+			.mini (
+				true);
 
 		// update hook
 
