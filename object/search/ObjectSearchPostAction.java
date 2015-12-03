@@ -1,6 +1,7 @@
 package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -15,6 +16,8 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
+import com.google.common.base.Optional;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -28,6 +31,7 @@ import wbs.console.responder.RedirectResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
 
@@ -244,21 +248,42 @@ class ObjectSearchPostAction
 					consoleHelper.objectName () + "+",
 					true);
 
-			ConsoleContext targetContext =
+			Optional<ConsoleContext> targetContext =
 				consoleManager.relatedContext (
 					requestContext.consoleContext (),
 					targetContextType);
 
-			return redirectResponderProvider.get ()
+			if (
+				isPresent (
+					targetContext)
+			) {
 
-				.targetUrl (
-					requestContext.resolveContextUrl (
-						stringFormat (
-							"%s",
-							targetContext.pathPrefix (),
-							"/%s",
-							consoleHelper.getPathId (
-								objectIds.get (0)))));
+				return redirectResponderProvider.get ()
+
+					.targetUrl (
+						requestContext.resolveContextUrl (
+							stringFormat (
+								"%s",
+								targetContext.get ().pathPrefix (),
+								"/%s",
+								consoleHelper.getPathId (
+									objectIds.get (0)))));
+
+			} else {
+
+				Record<?> object =
+					consoleHelper.find (
+						objectIds.get (0));
+
+				return redirectResponderProvider.get ()
+
+					.targetUrl (
+						requestContext.resolveLocalUrl (
+							consoleHelper.getDefaultLocalPath (
+								object)));
+
+
+			}
 
 		} else {
 

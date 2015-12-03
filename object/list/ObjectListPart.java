@@ -230,7 +230,7 @@ class ObjectListPart<
 			@SuppressWarnings ("unchecked")
 			ConsoleHelper<ParentType> parentHelper =
 				(ConsoleHelper<ParentType>)
-				objectManager.getConsoleObjectHelper (
+				objectManager.findConsoleHelper (
 					consoleHelper.parentClass ());
 
 			Integer parentId =
@@ -260,7 +260,7 @@ class ObjectListPart<
 			) {
 
 				ConsoleHelper<?> grandParentHelper =
-					objectManager.getConsoleObjectHelper (
+					objectManager.findConsoleHelper (
 						parentHelper.parentClass ());
 
 				Integer grandParentId =
@@ -537,7 +537,7 @@ class ObjectListPart<
 				true);
 
 		targetContext =
-			consoleManager.relatedContext (
+			consoleManager.relatedContextRequired (
 				requestContext.consoleContext (),
 				targetContextType);
 

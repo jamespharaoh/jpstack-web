@@ -1,17 +1,26 @@
 package wbs.platform.queue.hibernate;
 
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.NonNull;
 
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
 import wbs.framework.hibernate.HibernateDao;
-import wbs.platform.queue.model.QueueItemDaoMethods;
+import wbs.platform.queue.model.QueueItemDao;
 import wbs.platform.queue.model.QueueItemRec;
+import wbs.platform.queue.model.QueueItemSearch;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.user.model.UserRec;
@@ -19,7 +28,77 @@ import wbs.platform.user.model.UserRec;
 public
 class QueueItemDaoHibernate
 	extends HibernateDao
-	implements QueueItemDaoMethods {
+	implements QueueItemDao {
+
+	@Override
+	public
+	List<Integer> searchIds (
+			@NonNull QueueItemSearch search) {
+
+		Criteria criteria =
+			createCriteria (
+				QueueItemRec.class,
+				"_queueItem")
+
+			.createAlias (
+				"_queueItem.queueSubject",
+				"_queueSubject")
+
+			.createAlias (
+				"_queueSubject.queue",
+				"_queue");
+
+		if (
+			isNotNull (
+				search.createdTime ())
+		) {
+
+			Interval createdTimeInterval =
+				parsePartialTimestamp (
+					DateTimeZone.getDefault (),
+					search.createdTime ());
+
+			criteria.add (
+				Restrictions.ge (
+					"_queueItem.createdTime",
+					instantToDate (
+						createdTimeInterval.getStart ())));
+
+		}
+
+
+		if (search.filter ()) {
+
+			List<Criterion> filterCriteria =
+				new ArrayList<Criterion> ();
+
+			if (
+				isNotEmpty (
+					search.filterQueueIds ())
+			) {
+
+				filterCriteria.add (
+					Restrictions.in (
+						"_queue.id",
+						search.filterQueueIds ()));
+
+			}
+
+			criteria.add (
+				Restrictions.or (
+					filterCriteria.toArray (
+						new Criterion [] {})));
+
+		}
+
+		criteria.setProjection (
+			Projections.id ());
+
+		return findMany (
+			Integer.class,
+			criteria.list ());
+
+	}
 
 	@Override
 	public

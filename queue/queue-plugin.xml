@@ -33,6 +33,7 @@
 		<bean class="console.QueueHomeResponder"/>
 		<bean class="console.QueueItemAction"/>
 		<bean class="console.QueueItemClaimStatusConsoleHelper"/>
+		<bean class="console.QueueItemConsoleHooks"/>
 		<bean class="console.QueueItemQueueStatsProvider"/>
 		<bean class="console.QueueItemsStatusLinePart"/>
 		<bean class="console.QueueItemStatusLine"/>

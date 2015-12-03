@@ -133,7 +133,7 @@ class ObjectBrowsePart
 		// locate via parent
 
 		ConsoleHelper<?> parentHelper =
-			objectManager.getConsoleObjectHelper (
+			objectManager.findConsoleHelper (
 				consoleHelper.parentClass ());
 
 		Integer parentId =
@@ -170,7 +170,7 @@ class ObjectBrowsePart
 		// locate via grand parent
 
 		ConsoleHelper<?> grandParentHelper =
-			objectManager.getConsoleObjectHelper (
+			objectManager.findConsoleHelper (
 				parentHelper.parentClass ());
 
 		Integer grandParentId =
@@ -247,7 +247,7 @@ class ObjectBrowsePart
 				true);
 
 		targetContext =
-			consoleManager.relatedContext (
+			consoleManager.relatedContextRequired (
 				requestContext.consoleContext (),
 				targetContextType);
 

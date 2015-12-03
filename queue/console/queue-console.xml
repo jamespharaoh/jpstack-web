@@ -37,6 +37,20 @@
 				name="supervisorItems"
 				hide-tab="yes"/>
 
+			<section
+				name="report"
+				label="Reports">
+
+				<object-search-page
+					name="queueItem"
+					tab-label="Queue items"
+					object-type="queueItem"
+					search-class="wbs.platform.queue.model.QueueItemSearch"
+					search-fields="queue-item-report-search"
+					results-fields="queue-item-report-results"/>
+
+			</section>
+
 			<context-responder-page
 				name="home"/>
 
@@ -76,6 +90,55 @@
 		<id-field/>
 		<parent-field/>
 		<code-field/>
+
+	</field-set>
+
+	<field-set
+		name="queue-item-report-search"
+		class="wbs.platform.queue.model.QueueItemSearch">
+
+		<timestamp-partial-field
+			name="createdTime"
+			label="Created time"/>
+
+	</field-set>
+
+	<field-set
+		name="queue-item-report-results"
+		object-name="queueItem">
+
+		<object-field
+			name="processedUser"
+			label="User"
+			object-type="user"/>
+
+		<object-field
+			name="object"
+			field="greatgrandparent"/>
+
+		<object-field
+			name="queue"
+			object-type="queue"
+			field="grandparent"
+			root-field="greatgrandparent"/>
+
+		<object-field
+			name="item"
+			object-type="queueItem"
+			field="this"
+			root-field="grandparent"/>
+
+		<timestamp-field
+			name="createdTime"
+			label="Created"/>
+
+		<timestamp-field
+			name="pendingTime"
+			label="Pending"/>
+
+		<timestamp-field
+			name="processedTime"
+			label="Processed"/>
 
 	</field-set>
 

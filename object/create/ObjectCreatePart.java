@@ -126,7 +126,7 @@ class ObjectCreatePart<
 		@SuppressWarnings ("unchecked")
 		ConsoleHelper<ParentType> parentHelperTemp =
 			(ConsoleHelper<ParentType>)
-			objectManager.getConsoleObjectHelper (
+			objectManager.findConsoleHelper (
 				consoleHelper.parentClass ());
 
 		parentHelper =
@@ -165,7 +165,7 @@ class ObjectCreatePart<
 		}
 
 		ConsoleHelper<?> grandParentHelper =
-			objectManager.getConsoleObjectHelper (
+			objectManager.findConsoleHelper (
 				parentHelper.parentClass ());
 
 		Integer grandParentId =

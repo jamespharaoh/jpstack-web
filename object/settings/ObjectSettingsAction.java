@@ -196,7 +196,7 @@ class ObjectSettingsAction<
 		@SuppressWarnings ("unchecked")
 		ConsoleHelper<ParentType> parentHelper =
 			(ConsoleHelper<ParentType>)
-			objectManager.getConsoleObjectHelper (
+			objectManager.findConsoleHelper (
 				consoleHelper.parentClass ());
 
 		if (parentHelper.isRoot ()) {

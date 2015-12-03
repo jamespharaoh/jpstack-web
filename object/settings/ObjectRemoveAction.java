@@ -131,7 +131,7 @@ System.out.println ("LOOKING FOR CONTEXT TYPE " + nextContextTypeName);
 System.out.println ("GOT CONTEXT TYPE " + targetContextType);
 
 		ConsoleContext targetContext =
-			consoleManager.relatedContext (
+			consoleManager.relatedContextRequired (
 				requestContext.consoleContext (),
 				targetContextType);
 System.out.println ("GOT CONTEXT " + targetContext);

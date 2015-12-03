@@ -143,7 +143,7 @@ class ObjectCreateAction<
 		@SuppressWarnings ("unchecked")
 		ConsoleHelper<ParentType> parentHelperTemp =
 			(ConsoleHelper<ParentType>)
-			objectManager.getConsoleObjectHelper (
+			objectManager.findConsoleHelper (
 				consoleHelper.parentClass ());
 
 		parentHelper =
@@ -336,7 +336,7 @@ class ObjectCreateAction<
 				true);
 
 		ConsoleContext targetContext =
-			consoleManager.relatedContext (
+			consoleManager.relatedContextRequired (
 				requestContext.consoleContext (),
 				targetContextType);
 
