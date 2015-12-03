@@ -278,7 +278,7 @@ class MessageTemplateEntryValueHooks
 		) {
 
 			fieldValue
-	
+
 				.setStringValue (
 					(String)
 					value);
