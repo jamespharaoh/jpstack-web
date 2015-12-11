@@ -80,6 +80,10 @@
 			640px
 		</field>
 
+		<field name="Font weight">
+			regular
+		</field>
+
 		<field name="Chat">
 			Live chat
 		</field>
@@ -312,6 +316,23 @@
 
 	</entry>
 
+	<entry name="General information section">
+
+		<field name="Heading">
+			General information
+		</field>
+
+		<field name="Conditions introduction">
+			Press this button to see the terms and conditions, which you agreed
+			to when you first signed up to this service.
+		</field>
+
+		<field name="Conditions button label">
+			Terms and conditions
+		</field>
+
+	</entry>
+
 	<entry name="Change password section">
 
 		<field name="Heading">
@@ -447,6 +468,10 @@
 
 		<field name="Accept button label">
 			Accept terms and conditions
+		</field>
+
+		<field name="Back to customer area button label">
+			Back to customer area
 		</field>
 
 	</entry>

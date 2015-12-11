@@ -134,16 +134,20 @@ class ImChatConditionsAcceptAction
 
 		}
 
-		// accept terms and conditions
+		if (! customer.getAcceptedTermsAndConditions ()) {
 
-		customer
+			// accept terms and conditions
 
-			.setAcceptedTermsAndConditions (
-				true);
+			customer
 
-		eventLogic.createEvent (
-			"im_chat_customer_conditions_accepted",
-			customer);
+				.setAcceptedTermsAndConditions (
+					true);
+
+			eventLogic.createEvent (
+				"im_chat_customer_conditions_accepted",
+				customer);
+
+		}
 
 		// create response
 
