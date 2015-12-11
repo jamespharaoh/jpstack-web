@@ -3,6 +3,8 @@ package wbs.smsapps.subscription.model;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.sms.number.core.model.NumberRec;
 
 public
@@ -20,8 +22,8 @@ class SubscriptionNumberObjectHelperImplementation
 	@Override
 	public
 	SubscriptionNumberRec findOrCreate (
-			SubscriptionRec subscription,
-			NumberRec number) {
+			@NonNull SubscriptionRec subscription,
+			@NonNull NumberRec number) {
 
 		SubscriptionNumberObjectHelper subscriptionNumberHelper =
 			subscriptionNumberHelperProvider.get ();
@@ -46,6 +48,9 @@ class SubscriptionNumberObjectHelperImplementation
 
 			.setNumber (
 				number)
+
+			.setActive (
+				false)
 
 		);
 

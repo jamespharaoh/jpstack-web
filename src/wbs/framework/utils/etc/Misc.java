@@ -1779,6 +1779,14 @@ class Misc {
 	}
 
 	public static
+	boolean isZero (
+			int value) {
+
+		return value == 0;
+
+	}
+
+	public static
 	boolean notLessThanZero (
 			int value) {
 
@@ -2495,5 +2503,21 @@ class Misc {
 			"")
 
 	);
+
+	public static
+	String trim (
+			@NonNull String source) {
+
+		return source.trim ();
+
+	}
+
+	public static
+	boolean moreThanZero (
+			int value) {
+
+		return value > 0;
+
+	}
 
 }

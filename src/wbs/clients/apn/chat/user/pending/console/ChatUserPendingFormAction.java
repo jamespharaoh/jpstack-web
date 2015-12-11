@@ -4,8 +4,11 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isZero;
+import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.Misc.trim;
 
 import java.util.List;
 
@@ -732,7 +735,7 @@ class ChatUserPendingFormAction
 
 		MessageRec message = null;
 
-		ChatMessageRec chatMessage = null;
+		Optional<ChatMessageRec> chatMessage;
 
 		if (
 
@@ -748,8 +751,9 @@ class ChatUserPendingFormAction
 				textHelper.findOrCreate (messageParam);
 
 			chatMessage =
-				chatMessageHelper.insert (
-					chatMessageHelper.createInstance ()
+				Optional.of (
+					chatMessageHelper.insert (
+						chatMessageHelper.createInstance ()
 
 				.setFromUser (
 					chat.getSystemChatUser ())
@@ -779,15 +783,16 @@ class ChatUserPendingFormAction
 				.setStatus (
 					ChatMessageStatus.sent)
 
-			);
+			));
 
 			chatMessageLogic.chatMessageDeliverToUser (
-				chatMessage);
+				chatMessage.get ());
 
 		} else {
 
 			TextRec messageText =
-				textHelper.findOrCreate (messageParam);
+				textHelper.findOrCreate (
+					messageParam);
 
 			message =
 				chatSendLogic.sendMessageMagic (
@@ -802,6 +807,9 @@ class ChatUserPendingFormAction
 						"system"),
 					0);
 
+			chatMessage =
+				Optional.<ChatMessageRec>absent ();
+
 		}
 
 		chatHelpLogLogic.createChatHelpLogOut (
@@ -810,8 +818,7 @@ class ChatUserPendingFormAction
 			Optional.of (
 				myUser),
 			message,
-			Optional.of (
-				chatMessage),
+			chatMessage,
 			messageParam,
 			Optional.of (
 				commandHelper.findByCode (
@@ -827,16 +834,35 @@ class ChatUserPendingFormAction
 		// check params
 
 		String messageParam =
-			requestContext.parameter ("message").trim ();
+			trim (
+				requestContext.parameter (
+					"message"));
 
-		if (Gsm.length (messageParam) == 0) {
-			requestContext.addError ("Please enter a message to send");
+		if (
+			isZero (
+				Gsm.length (
+					messageParam))
+		) {
+
+			requestContext.addError (
+				"Please enter a message to send");
+
 			return null;
+
 		}
 
-		if (Gsm.length (messageParam) > 160) {
-			requestContext.addError ("Message is too long");
+		if (
+			moreThan (
+				Gsm.length (
+					messageParam),
+				160)
+		) {
+
+			requestContext.addError (
+				"Message is too long");
+
 			return null;
+
 		}
 
 		// start transaction
@@ -848,7 +874,8 @@ class ChatUserPendingFormAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (
-				requestContext.stuffInt ("chatUserId"));
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -860,7 +887,8 @@ class ChatUserPendingFormAction
 		ChatUserImageRec chatUserImage =
 			chatUserLogic.chatUserPendingImage (
 				chatUser,
-				ChatUserImageType.valueOf (mode.toString ()));
+				ChatUserImageType.valueOf (
+					mode.toString ()));
 
 		// checks involving database
 

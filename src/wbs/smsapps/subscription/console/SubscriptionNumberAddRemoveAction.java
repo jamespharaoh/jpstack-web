@@ -1,6 +1,9 @@
 package wbs.smsapps.subscription.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.moreThanZero;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -157,7 +160,11 @@ class SubscriptionNumberAddRemoveAction
 
 		// add numbers
 
-		if (requestContext.parameter ("add") != null) {
+		if (
+			isNotNull (
+				requestContext.parameter (
+					"add"))
+		) {
 
 			int numAdded = 0;
 			int numAlreadyAdded = 0;
@@ -172,7 +179,10 @@ class SubscriptionNumberAddRemoveAction
 						subscription,
 						number);
 
-				if (subscriptionNumber.getActiveSubscriptionSub () != null) {
+				if (
+					isNotNull (
+						subscriptionNumber.getActiveSubscriptionSub ())
+				) {
 
 					numAlreadyAdded ++;
 
@@ -209,6 +219,9 @@ class SubscriptionNumberAddRemoveAction
 
 					.setStartedBy (
 						myUser)
+
+					.setActive (
+						true)
 
 				);
 
@@ -284,19 +297,29 @@ class SubscriptionNumberAddRemoveAction
 
 		// remove numbers
 
-		if (requestContext.parameter ("remove") != null) {
+		if (
+			isNotNull (
+				requestContext.parameter (
+					"remove"))
+		) {
 
 			int numRemoved = 0;
 			int numAlreadyRemoved = 0;
 
-			for (NumberRec number : numbers) {
+			for (
+				NumberRec number
+					: numbers
+			) {
 
 				SubscriptionNumberRec subscriptionNumber =
 					subscriptionNumberHelper.findOrCreate (
 						subscription,
 						number);
 
-				if (subscriptionNumber.getActiveSubscriptionSub () == null) {
+				if (
+					isNull (
+						subscriptionNumber.getActiveSubscriptionSub ())
+				) {
 
 					numAlreadyRemoved ++;
 
@@ -319,7 +342,10 @@ class SubscriptionNumberAddRemoveAction
 						transaction.now ())
 
 					.setEndedBy (
-						myUser);
+						myUser)
+
+					.setActive (
+						false);
 
 				subscriptionNumber
 
@@ -352,7 +378,10 @@ class SubscriptionNumberAddRemoveAction
 
 			transaction.commit ();
 
-			if (numRemoved > 0) {
+			if (
+				moreThanZero (
+					numRemoved)
+			) {
 
 				requestContext.addNotice (
 					stringFormat (
@@ -361,7 +390,10 @@ class SubscriptionNumberAddRemoveAction
 
 			}
 
-			if (numAlreadyRemoved > 0) {
+			if (
+				moreThanZero (
+					numAlreadyRemoved)
+			) {
 
 				requestContext.addWarning (
 					stringFormat (
