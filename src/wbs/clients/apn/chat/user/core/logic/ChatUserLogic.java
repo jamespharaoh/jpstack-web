@@ -47,14 +47,16 @@ interface ChatUserLogic {
 			ChatUserRec chatUser);
 
 	boolean compatible (
-			Gender gender1,
-			Orient orient1,
-			Gender gender2,
-			Orient orient2);
+			Gender thisGender,
+			Orient thisOrient,
+			Optional<Integer> thisCategoryId,
+			Gender thatGender,
+			Orient thatOrient,
+			Optional<Integer> thatCategoryId);
 
 	boolean compatible (
-			ChatUserRec user1,
-			ChatUserRec user2);
+			ChatUserRec thisUser,
+			ChatUserRec thatUser);
 
 	Collection<ChatUserRec> getNearestUsers (
 			ChatUserRec thisUser,
@@ -188,7 +190,8 @@ interface ChatUserLogic {
 
 	void setAffiliate (
 			ChatUserRec chatUser,
-			ChatAffiliateRec chatAffiliate);
+			ChatAffiliateRec chatAffiliate,
+			Optional<MessageRec> message);
 
 	MediaRec findPhoto (
 			MessageRec message);

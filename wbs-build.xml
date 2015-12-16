@@ -487,6 +487,10 @@
 			package="wbs.clients.apn.chat.broadcast"/>
 
 		<plugin
+			name="chat-category"
+			package="wbs.clients.apn.chat.category"/>
+
+		<plugin
 			name="chat-contact"
 			package="wbs.clients.apn.chat.contact"/>
 

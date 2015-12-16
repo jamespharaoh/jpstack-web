@@ -3,6 +3,7 @@ package wbs.clients.apn.chat.date.daemon;
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.min;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -755,19 +756,31 @@ class ChatDateDaemon
 
 		// check they are compatible
 
-		if (thisUser.getGender () == null
+		if (
 
-				|| thisUser.getOrient () == null
+			isNull (
+				thisUser.getGender ())
 
-				|| ! chatUserLogic.compatible (
-					thisUser.getGender (),
-					thisUser.getOrient (),
-					thatUserInfo.gender,
-					thatUserInfo.orient)) {
+			|| isNull (
+				thisUser.getOrient ())
 
-			dateUserStats.numIncompatible++;
+			|| ! chatUserLogic.compatible (
+				thisUser.getGender (),
+				thisUser.getOrient (),
+				thisUser.getCategory () != null
+					? Optional.<Integer>of (
+						thisUser.getCategory ().getId ())
+					: Optional.<Integer>absent (),
+				thatUserInfo.gender,
+				thatUserInfo.orient,
+				thatUserInfo.categoryId)
+
+		) {
+
+			dateUserStats.numIncompatible ++;
 
 			return null;
+
 		}
 
 		// check they have a photo (where appropriate)
@@ -913,17 +926,26 @@ class ChatDateDaemon
 		int id;
 		LongLat longLat;
 		boolean photo;
+
 		Gender gender;
 		Orient orient;
+		Optional<Integer> categoryId;
 
 		DatingUserInfo (
-				ChatUserRec chatUser) {
+				@NonNull ChatUserRec chatUser) {
 
 			id = chatUser.getId ();
 			longLat = chatUser.getLocationLongLat ();
 			photo = ! chatUser.getChatUserImageList ().isEmpty ();
+
 			gender = chatUser.getGender ();
 			orient = chatUser.getOrient ();
+
+			categoryId =
+				chatUser.getCategory () != null
+					? Optional.<Integer>of (
+						chatUser.getCategory ().getId ())
+					: Optional.<Integer>absent ();
 
 		}
 

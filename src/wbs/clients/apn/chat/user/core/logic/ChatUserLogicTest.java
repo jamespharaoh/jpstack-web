@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import junit.framework.TestCase;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -101,10 +102,12 @@ class ChatUserLogicTest
 							.get (indexLeft),
 						compatibleOrients
 							.get (indexLeft),
+						Optional.<Integer>absent (),
 						compatibleGenders
 							.get (indexRight),
 						compatibleOrients
-							.get (indexRight)));
+							.get (indexRight),
+						Optional.<Integer>absent ()));
 
 			}
 

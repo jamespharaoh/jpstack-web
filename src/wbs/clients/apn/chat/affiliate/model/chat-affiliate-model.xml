@@ -29,6 +29,11 @@
 			name="brandName"
 			nullable="yes"/>
 
+		<reference-field
+			name="category"
+			type="chatCategory"
+			nullable="yes"/>
+
 		<!-- statistics -->
 
 		<integer-field

@@ -111,6 +111,11 @@
 		<yes-no-field
 			name="broadcastOptOut"/>
 
+		<object-field
+			name="category"
+			object-type="chatCategory"
+			nullable="yes"/>
+
 	</field-set>
 
 </console-module>

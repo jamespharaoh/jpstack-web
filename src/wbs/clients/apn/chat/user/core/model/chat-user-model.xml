@@ -127,6 +127,37 @@
 			columns="location_place_%"
 			nullable="yes"/>
 
+		<yes-no-field
+			name="hiddenFromChatTube"
+			column="hidden_from_chattube"
+			default="no"/>
+
+		<yes-no-field
+			name="stealthMonitor"
+			default="no"/>
+
+		<reference-field
+			name="mainChatUserImage"
+			type="chatUserImage"
+			nullable="yes"/>
+
+		<reference-field
+			name="mainChatUserVideo"
+			type="chatUserImage"
+			nullable="yes"/>
+
+		<reference-field
+			name="mainChatUserAudio"
+			type="chatUserImage"
+			nullable="yes"/>
+
+		<reference-field
+			name="category"
+			type="chatCategory"
+			nullable="yes"/>
+
+		<!-- statistics -->
+
 		<timestamp-field
 			name="lastAction"
 			column-type="postgresql"
@@ -225,21 +256,6 @@
 			column-type="postgresql"
 			nullable="yes"/>
 
-		<reference-field
-			name="mainChatUserImage"
-			type="chatUserImage"
-			nullable="yes"/>
-
-		<reference-field
-			name="mainChatUserVideo"
-			type="chatUserImage"
-			nullable="yes"/>
-
-		<reference-field
-			name="mainChatUserAudio"
-			type="chatUserImage"
-			nullable="yes"/>
-
 		<yes-no-field
 			name="adultVerified"
 			default="no"/>
@@ -260,15 +276,6 @@
 
 		<yes-no-field
 			name="rebillFlag"
-			default="no"/>
-
-		<yes-no-field
-			name="hiddenFromChatTube"
-			column="hidden_from_chattube"
-			default="no"/>
-
-		<yes-no-field
-			name="stealthMonitor"
 			default="no"/>
 
 		<enum-field
@@ -644,6 +651,16 @@
 		<event-type
 			name="Chat user location locator"
 			text="Location for %0 set to (%1,%2) via %3"
+			admin="no"/>
+
+		<event-type
+			name="Chat user category message"
+			text="Category for %0 set to %1 by $2"
+			admin="no"/>
+
+		<event-type
+			name="Chat user category API"
+			text="Category for %0 set to %1 by API"
 			admin="no"/>
 
 	</event-types>

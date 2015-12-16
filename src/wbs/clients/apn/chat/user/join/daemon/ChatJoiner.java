@@ -381,7 +381,9 @@ class ChatJoiner {
 			chatUserLogic.setAffiliate (
 				chatUser,
 				chatAffiliateHelper.find (
-					chatAffiliateId));
+					chatAffiliateId),
+				Optional.<MessageRec>fromNullable (
+					message));
 
 		}
 
@@ -391,7 +393,8 @@ class ChatJoiner {
 
 			chatUserLogic.setScheme (
 				chatUser,
-				chatSchemeHelper.find (chatSchemeId));
+				chatSchemeHelper.find (
+					chatSchemeId));
 
 		}
 

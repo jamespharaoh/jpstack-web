@@ -4,6 +4,11 @@ import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.awt.image.BufferedImage;
@@ -366,73 +371,105 @@ class ChatUserLogicImplementation
 
 	}
 
-	/**
-	 * Checks if the two gender/orient pairs are both potential matches.
-	 *
-	 * @param gender1
-	 *            the first gender
-	 * @param orient1
-	 *            the first orient
-	 * @param gender2
-	 *            the second gender
-	 * @param orient2
-	 *            the second orient
-	 * @return true if they are
-	 */
 	@Override
 	public
 	boolean compatible (
-			@NonNull Gender gender1,
-			@NonNull Orient orient1,
-			@NonNull Gender gender2,
-			@NonNull Orient orient2) {
+			@NonNull Gender thisGender,
+			@NonNull Orient thisOrient,
+			@NonNull Optional<Integer> thisCategoryId,
+			@NonNull Gender thatGender,
+			@NonNull Orient thatOrient,
+			@NonNull Optional<Integer> thatCategoryId) {
 
-		if (gender1 == gender2) {
+		if (
 
-			return orient1.doesSame ()
-				&& orient2.doesSame ();
+			isPresent (
+				thisCategoryId)
+
+			&& (
+
+				isNotPresent (
+					thatCategoryId)
+
+				|| notEqual (
+					thisCategoryId.get (),
+					thatCategoryId.get ())
+
+			)
+
+		) {
+
+			// category mismatch
+
+			return false;
+
+		} else if (
+			equal (
+				thisGender,
+				thatGender)
+		) {
+
+			// same gender match
+
+			return (
+				thisOrient.doesSame ()
+				&& thatOrient.doesSame ()
+			);
 
 		} else {
 
-			return orient1.doesDifferent ()
-				&& orient2.doesDifferent ();
+			// different gender match
+
+			return (
+				thisOrient.doesDifferent ()
+				&& thatOrient.doesDifferent ()
+			);
 
 		}
 
 	}
 
-	/**
-	 * Returns true if and only if the two users are both potential matches,
-	 * based on orient and gender.
-	 *
-	 * @param user1
-	 *            the first user
-	 * @param user2
-	 *            the second user
-	 * @return true if they are
-	 */
 	@Override
 	public
 	boolean compatible (
-			@NonNull ChatUserRec user1,
-			@NonNull ChatUserRec user2) {
+			@NonNull ChatUserRec thisUser,
+			@NonNull ChatUserRec thatUser) {
 
 		if (
 
-			user1.getGender () == null
-			|| user1.getOrient () == null
-			|| user2.getGender () == null
-			|| user2.getOrient () == null
+			isNull (
+				thisUser.getGender ())
+
+			|| isNull (
+				thisUser.getOrient ())
+
+			|| isNull (
+				thatUser.getGender ())
+
+			|| isNull (
+				thatUser.getOrient ())
 
 		) {
-			return false;
-		}
 
-		return compatible (
-			user1.getGender (),
-			user1.getOrient (),
-			user2.getGender (),
-			user2.getOrient ());
+			return false;
+
+		} else {
+
+			return compatible (
+				thisUser.getGender (),
+				thisUser.getOrient (),
+				thisUser.getCategory () != null
+					? Optional.<Integer>of (
+						thisUser.getCategory ().getId ())
+					: Optional.<Integer>absent (),
+				thatUser.getGender (),
+				thatUser.getOrient (),
+				thatUser.getCategory () != null
+					? Optional.<Integer>of (
+						thatUser.getCategory ().getId ())
+					: Optional.<Integer>absent ());
+
+		}
 
 	}
 
@@ -1413,10 +1450,51 @@ class ChatUserLogicImplementation
 	public
 	void setAffiliate (
 			@NonNull ChatUserRec chatUser,
-			@NonNull ChatAffiliateRec chatAffiliate) {
+			@NonNull ChatAffiliateRec chatAffiliate,
+			@NonNull Optional<MessageRec> message) {
 
 		ChatSchemeRec chatScheme =
 			chatAffiliate.getChatScheme ();
+
+		// set category
+
+		if (
+
+			isNotNull (
+				chatAffiliate.getCategory ())
+
+			&& notEqual (
+				chatUser.getCategory (),
+				chatAffiliate.getCategory ())
+
+		) {
+
+			chatUser
+
+				.setCategory (
+					chatAffiliate.getCategory ());
+
+			if (
+				isPresent (
+					message)
+			) {
+
+				eventLogic.createEvent (
+					"chat_user_category_message",
+					chatUser,
+					chatUser.getCategory (),
+					message.get ());
+
+			} else {
+
+				eventLogic.createEvent (
+					"chat_user_category_api",
+					chatUser,
+					chatUser.getCategory ());
+
+			}
+
+		}
 
 		// user has no scheme or affiliate
 

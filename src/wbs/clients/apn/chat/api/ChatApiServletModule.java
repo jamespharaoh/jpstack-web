@@ -1470,7 +1470,8 @@ class ChatApiServletModule
 
 				chatUserLogic.setAffiliate (
 					chatUser,
-					affiliate);
+					affiliate,
+					Optional.<MessageRec>absent ());
 
 			}
 

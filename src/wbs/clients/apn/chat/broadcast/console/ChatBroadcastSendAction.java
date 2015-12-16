@@ -262,7 +262,8 @@ class ChatBroadcastSendAction
 							"Chat user not found: %s",
 							params.get ("fromUserCode")));
 
-					return responder ("chatBroadcastSendResponder");
+					return responder (
+						"chatBroadcastSendResponder");
 
 				}
 
@@ -273,7 +274,8 @@ class ChatBroadcastSendAction
 							"Chat user is not a monitor: %s",
 							fromChatUser.getCode ()));
 
-					return responder ("chatBroadcastSendResponder");
+					return responder (
+						"chatBroadcastSendResponder");
 
 				}
 
@@ -393,7 +395,6 @@ class ChatBroadcastSendAction
 						for (String number
 								: allNumbers) {
 
-System.out.println ("NUMBER:"+number);
 							NumberRec numberRec =
 								numberHelper.findByCode (
 									GlobalId.root,
@@ -402,7 +403,6 @@ System.out.println ("NUMBER:"+number);
 							if (numberRec == null)
 								continue;
 
-System.out.println ("a");
 							ChatUserRec chatUser =
 								chatUserHelper.find (
 									chat,
@@ -410,7 +410,6 @@ System.out.println ("a");
 
 							if (chatUser == null)
 								continue;
-System.out.println ("b");
 
 							allChatUserIds.add (
 								chatUser.getId ());
@@ -435,7 +434,8 @@ System.out.println ("b");
 
 				// purge numbers
 
-				profileLogger.lap ("purge numbers");
+				profileLogger.lap (
+					"purge numbers");
 
 				int removedNumbers = 0;
 
@@ -459,7 +459,6 @@ System.out.println ("b");
 						: allChatUserIds
 				) {
 
-System.out.println ("ID:"+chatUserId);
 					ChatUserRec chatUser =
 						chatUserHelper.find (
 							chatUserId);
@@ -470,10 +469,8 @@ System.out.println ("ID:"+chatUserId);
 							includeBlocked,
 							includeOptedOut)
 					) {
-System.out.println ("skip");
 						continue;
 					}
-System.out.println ("include");
 
 					remainingChatUserIds.add (
 						chatUserId);

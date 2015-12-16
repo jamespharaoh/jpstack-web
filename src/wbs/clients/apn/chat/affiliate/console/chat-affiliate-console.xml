@@ -97,6 +97,10 @@
 		<text-field
 			name="brandName"/>
 
+		<object-field
+			name="category"
+			object-type="chatCategory"/>
+
 	</field-set>
 
 	<field-set
@@ -112,6 +116,10 @@
 
 		<text-field
 			name="brandName"/>
+
+		<object-field
+			name="category"
+			object-type="chatCategory"/>
 
 		<integer-field
 			name="numUsers"/>
@@ -131,6 +139,11 @@
 
 		<text-field
 			name="brandName"
+			nullable="yes"/>
+
+		<object-field
+			name="category"
+			object-type="chatCategory"
 			nullable="yes"/>
 
 	</field-set>

@@ -78,6 +78,12 @@
 				label="Promos"
 				priv-key="chat.manage"/>
 
+			<context-link
+				name="category"
+				link="chatCategory"
+				label="Categories"
+				priv-key="chat.manage"/>
+
 		</section>
 
 	</extend-context>
