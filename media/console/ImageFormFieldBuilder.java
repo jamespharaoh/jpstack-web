@@ -61,6 +61,10 @@ class ImageFormFieldBuilder {
 	identityFormFieldNativeMappingProvider;
 
 	@Inject
+	Provider<ImageCsvFormFieldInterfaceMapping>
+	imageCsvFormFieldInterfaceMappingProvider;
+
+	@Inject
 	Provider<NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
 
@@ -204,6 +208,11 @@ class ImageFormFieldBuilder {
 				context.containerClass (),
 				name);
 
+		// csv mapping
+
+		FormFieldInterfaceMapping csvMapping =
+			imageCsvFormFieldInterfaceMappingProvider.get ();
+
 		// form field
 
 		formFieldSet.formFields ().add (
@@ -229,6 +238,9 @@ class ImageFormFieldBuilder {
 
 			.interfaceMapping (
 				interfaceMapping)
+
+			.csvMapping (
+				csvMapping)
 
 			.renderer (
 				renderer)

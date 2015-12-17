@@ -21,6 +21,7 @@
 	</layer>
 
 	<layer name="console">
+		<bean class="console.ImageCsvFormFieldInterfaceMapping"/>
 		<bean class="console.ImageFormFieldBuilder"/>
 		<bean class="console.ImageFormFieldRenderer"/>
 		<bean class="console.ImageFormFieldSpec"/>
