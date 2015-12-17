@@ -182,11 +182,8 @@ class Oxygen8Sender
 		route.getCode ();
 
 		String servicePath =
-			objectManager.objectPath (
-				message.getService (),
-				null,
-				true,
-				false);
+			objectManager.objectPathMini (
+				message.getService ());
 
 		// pick a handler
 

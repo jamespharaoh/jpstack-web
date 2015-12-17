@@ -261,7 +261,7 @@ class ObjectManagerImplementation
 	public
 	String objectPath (
 			Record<?> object,
-			Optional<Record<?>> assumedRoot,
+			@NonNull Optional<Record<?>> assumedRoot,
 			boolean mini,
 			boolean preload) {
 
