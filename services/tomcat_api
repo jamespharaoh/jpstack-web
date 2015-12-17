@@ -5,27 +5,21 @@ tomcat_api_stop_timeout=15
 tomcat_api_kill_timeout=5
 
 function tomcat_api_is_running_1 {
-	ps ax | grep Dcatalina.base=/home/james/tomcat/api | grep -v grep >/dev/null
+	ps ax | grep Dcatalina.base=/home/ubuntu/tomcat-api | grep -v grep >/dev/null
 }
 
 function tomcat_api_is_running_2 {
-	$BASEDIR/c/socktest localhost 8030 && \
-	$BASEDIR/c/socktest localhost 8031
+	$BASEDIR/c/socktest localhost 9080
 }
 
 function tomcat_api_start {
-	unset DISPLAY
-	sudo svc -u /service/tomcat-api
+	sudo start platform-live-api
 }
 
 function tomcat_api_stop {
-	sudo svc -d /service/tomcat-api
-# UGLY HACK TO KILL OFF CRASHED API!
-# I bet this sticks around forever... :(
-	sudo svstat /service/tomcat-api | cut -f 4 -d " " | cut -f 1 -d ")" | xargs sudo kill -9
-	echo "TXT services restarted, API forcefully killed" | mail -s "TXT Restart" dan@bent.com
+	sudo stop platform-live-api
 }
 
 function tomcat_api_kill {
-	kill -kill $(ps ax | grep Dcatalina.base=/home/james/tomcat/api | grep -v grep | cut -d' ' -f1)
+	kill -kill $(ps ax | grep Dcatalina.base=/home/ubuntu/tomcat-api | grep -v grep | cut -d' ' -f1)
 }

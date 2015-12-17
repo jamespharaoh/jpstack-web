@@ -5,23 +5,21 @@ tomcat_console_stop_timeout=15
 tomcat_console_kill_timeout=5
 
 function tomcat_console_is_running_1 {
-	ps ax | grep Dcatalina.base=/home/james/tomcat/console | grep -v grep >/dev/null
+	ps ax | grep Dcatalina.base=/home/ubuntu/tomcat-console | grep -v grep >/dev/null
 }
 
 function tomcat_console_is_running_2 {
-	$BASEDIR/c/socktest localhost 8010 && \
-	$BASEDIR/c/socktest localhost 8012
+	$BASEDIR/c/socktest localhost 8080
 }
 
 function tomcat_console_start {
-	unset DISPLAY
-	sudo svc -u /service/tomcat-console
+	sudo start platform-live-console
 }
 
 function tomcat_console_stop {
-	sudo svc -d /service/tomcat-console
+	sudo stop platform-live-console
 }
 
 function tomcat_console_kill {
-	kill -kill $(ps ax | grep Dcatalina.base=/home/james/tomcat/console | grep -v grep | cut -d' ' -f1)
+	kill -kill $(ps ax | grep Dcatalina.base=/home/ubuntu/tomcat-console | grep -v grep | cut -d' ' -f1)
 }

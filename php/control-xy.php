@@ -1,9 +1,11 @@
-<?
+<?php
+
+define ("HOME", "/home/ubuntu/wbs-hades");
 
 function find_services () {
 
 	$services = array ();
-	$dir = opendir ("/home/james/wbs/services");
+	$dir = opendir (HOME . "/services");
 
 	while ($file = readdir ($dir)) {
 
@@ -24,7 +26,7 @@ function find_services () {
 function get_status ($service) {
 
 	exec (
-		"/home/james/wbs/service $service status",
+		HOME . "/service $service status",
 		$output,
 		$status);
 
@@ -37,7 +39,7 @@ function send_command ($service, $command) {
 	global $messages;
 
 	exec (
-		"sh -c \"/home/james/wbs/service $service $command >/dev/null 2>&1 &\"",
+		"sh -c \"" . HOME . "/service $service $command >/dev/null 2>&1 &\"",
 		$output,
 		$status);
 
@@ -91,21 +93,21 @@ function do_button ($service, $command, $enabled) { ?>
 		<input
 			type="hidden"
 			name="service"
-			value="<?= htmlentities ($service) ?>"/>
+			value="<?php print htmlentities ($service) ?>"/>
 
 		<input
 			type="hidden"
 			name="command"
-			value="<?= htmlentities ($command) ?>"/>
+			value="<?php print htmlentities ($command) ?>"/>
 
 		<input
 			type="submit"
-			value="<?= htmlentities ($command) ?>"
-			<?= $enabled ? "" : "disabled" ?>/>
+			value="<?php print htmlentities ($command) ?>"
+			<?php print $enabled ? "" : "disabled" ?>/>
 
 	</form>
 
-<? }
+<?php }
 
 // make sure we reload
 header ("Expires: 0");
@@ -130,7 +132,7 @@ header ("Refresh: 10");
 <body>
 	<h1>Hades Control Panel</h1>
 
-	<? foreach ($messages as $message) {
+	<?php foreach ($messages as $message) {
 		echo $message;
 	} ?>
 
@@ -142,27 +144,27 @@ header ("Refresh: 10");
 			<th>Stop</th>
 			<th>Restart</th>
 		</tr>
-		<? $statuses = array (
+		<?php $statuses = array (
 			array ("running", "yes", "yes", false, true, true),
 			array ("not-running", "no", "no", true, false, false),
 			array ("part-running", "part", "partially", false, true, true));
 		foreach ($services as $service) {
 			$status = $statuses [get_status ($service)]; ?>
-			<tr class="<?= $status [0] ?>">
-				<td><?= htmlentities ($service) ?></td>
+			<tr class="<?php print $status [0] ?>">
+				<td><?php print htmlentities ($service) ?></td>
 				<td class="<?= $status [1] ?>"><?= $status [2] ?></td>
-				<td><? do_button ($service, "start", $status [3]); ?></td>
-				<td><? do_button ($service, "stop", $status [4]); ?></td>
-				<td><? do_button ($service, "restart", $status [5]); ?></td>
+				<td><?php do_button ($service, "start", $status [3]); ?></td>
+				<td><?php do_button ($service, "stop", $status [4]); ?></td>
+				<td><?php do_button ($service, "restart", $status [5]); ?></td>
 			</tr>
-		<? } ?>
+		<?php } ?>
 	</table>
 
 	<p><a href="?">Reload page &gt;&gt;</a></p>
 
-	<p><?= date ("Y-m-d H:i:s") ?></p>
+	<p><?php print date ("Y-m-d H:i:s") ?></p>
 
-	<p>Number of database processes: <?= count_postgres () ?></p>
+	<p>Number of database processes: <?php print count_postgres () ?></p>
 
 	<form
 		method="post"

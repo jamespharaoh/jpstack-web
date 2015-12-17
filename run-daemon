@@ -1,10 +1,14 @@
 #!/bin/bash
 
-BASEDIR="/home/james/wbs"
+BASEDIR="/home/ubuntu/wbs-hades"
 cd "$BASEDIR"
 
 # initialise GSM modem
 #/c/modeminit /dev/ttyS0
+
+# set java
+
+JAVA_OPTS="-Xmx4096m"
 
 # setup classpath
 

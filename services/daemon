@@ -15,12 +15,11 @@ function daemon_is_running_2 {
 }
 
 function daemon_start {
-	unset DISPLAY
-	sudo svc -u /service/daemon
+	sudo start platform-live-daemon
 }
 
 function daemon_stop {
-	sudo svc -d /service/daemon
+	sudo stop platform-live-daemon
 }
 
 function daemon_kill {
