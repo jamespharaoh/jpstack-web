@@ -63,9 +63,6 @@
 		<text-field
 			name="publicName"/>
 
-		<text-area-field
-			name="publicDescription"/>
-
 		<image-field
 			name="profileImage"/>
 
@@ -88,6 +85,10 @@
 
 		<text-area-field
 			name="publicDescription"
+			nullable="yes"/>
+
+		<text-area-field
+			name="publicDescriptionShort"
 			nullable="yes"/>
 
 		<image-field
@@ -117,6 +118,9 @@
 		<text-area-field
 			name="publicDescription"/>
 
+		<text-area-field
+			name="publicDescriptionShort"/>
+
 		<image-field
 			name="profileImage"/>
 
@@ -140,6 +144,10 @@
 
 		<text-area-field
 			name="publicDescription"
+			nullable="yes"/>
+
+		<text-area-field
+			name="publicDescriptionShort"
 			nullable="yes"/>
 
 		<image-field

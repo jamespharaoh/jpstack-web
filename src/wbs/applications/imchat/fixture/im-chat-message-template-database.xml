@@ -242,6 +242,10 @@
 			You have been charged ${charge} for this message
 		</field>
 
+		<field name="You have not been charged message">
+			You have not been charged for this message
+		</field>
+
 		<field name="Send button label">
 			Send
 		</field>

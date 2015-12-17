@@ -24,6 +24,9 @@ class ImChatProfileData {
 	@DataAttribute
 	String description;
 
+	@DataAttribute
+	String descriptionShort;
+
 	// thumbnail image
 
 	@DataAttribute

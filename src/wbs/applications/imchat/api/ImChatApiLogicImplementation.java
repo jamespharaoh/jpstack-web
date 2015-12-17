@@ -115,6 +115,9 @@ class ImChatApiLogicImplementation
 			.description (
 				profile.getPublicDescription ())
 
+			.descriptionShort (
+				profile.getPublicDescriptionShort ())
+
 			.thumbnailImageLink (
 				stringFormat (
 					"%s",

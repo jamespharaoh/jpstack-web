@@ -528,6 +528,11 @@ class ImChatCoreFixtureProvider
 						"Test IM chat profile %s",
 						index))
 
+				.setPublicDescriptionShort (
+					stringFormat (
+						"Test IM chat profile %s",
+						index))
+
 				.setProfileImage (
 					index % 2 == 0
 						? dougalMedia

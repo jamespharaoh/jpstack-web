@@ -44,10 +44,10 @@ class ImChatMediaConfig {
 		return imChatMediaJpegActionProvider.get ()
 
 			.targetWidth (
-				24)
+				32)
 
 			.targetHeight (
-				24);
+				32);
 
 	}
 

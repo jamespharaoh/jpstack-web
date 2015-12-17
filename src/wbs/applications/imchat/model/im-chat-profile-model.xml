@@ -35,6 +35,9 @@
 		<string-field
 			name="publicDescription"/>
 
+		<string-field
+			name="publicDescriptionShort"/>
+
 		<reference-field
 			name="profileImage"
 			type="media"
