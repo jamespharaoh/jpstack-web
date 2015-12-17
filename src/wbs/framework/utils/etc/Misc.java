@@ -2520,4 +2520,14 @@ class Misc {
 
 	}
 
+	public static <T>
+	T optionalOr (
+			Optional<T> optional,
+			T instead) {
+
+		return optional.or (
+			instead);
+
+	}
+
 }

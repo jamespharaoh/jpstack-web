@@ -268,6 +268,9 @@ class CurrencyFormFieldBuilder {
 				.interfaceMapping (
 					interfaceMapping)
 
+				.csvMapping (
+					interfaceMapping)
+
 				.renderer (
 					renderer)
 
@@ -294,6 +297,9 @@ class CurrencyFormFieldBuilder {
 					nativeMapping)
 
 				.interfaceMapping (
+					interfaceMapping)
+
+				.csvMapping (
 					interfaceMapping)
 
 				.renderer (

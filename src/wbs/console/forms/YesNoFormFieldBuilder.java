@@ -60,6 +60,10 @@ class YesNoFormFieldBuilder {
 	Provider<YesNoFormFieldRenderer>
 	yesNoFormFieldRendererProvider;
 
+	@Inject
+	Provider<YesNoCsvFormFieldInterfaceMapping>
+	yesNoCsvFormFieldInterfaceMappingProvider;
+
 	// builder
 
 	@BuilderParent
@@ -140,11 +144,21 @@ class YesNoFormFieldBuilder {
 
 		FormFieldRenderer renderer =
 			yesNoFormFieldRendererProvider.get ()
-				.name (name)
-				.label (label)
-				.nullable (nullable)
-				.yesLabel (yesLabel)
-				.noLabel (noLabel);
+
+			.name (
+				name)
+
+			.label (
+				label)
+
+			.nullable (
+				nullable)
+
+			.yesLabel (
+				yesLabel)
+
+			.noLabel (
+				noLabel);
 
 		// update hook
 
@@ -153,6 +167,11 @@ class YesNoFormFieldBuilder {
 				context,
 				context.containerClass (),
 				name);
+
+		// csv mapping
+
+		FormFieldInterfaceMapping csvMapping =
+			yesNoCsvFormFieldInterfaceMappingProvider.get ();
 
 		// field
 
@@ -182,6 +201,9 @@ class YesNoFormFieldBuilder {
 				.interfaceMapping (
 					interfaceMapping)
 
+				.csvMapping (
+					csvMapping)
+
 				.renderer (
 					renderer)
 
@@ -209,6 +231,9 @@ class YesNoFormFieldBuilder {
 
 				.interfaceMapping (
 					interfaceMapping)
+
+				.csvMapping (
+					csvMapping)
 
 				.renderer (
 					renderer)

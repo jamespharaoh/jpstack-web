@@ -276,6 +276,9 @@ class IntegerFormFieldBuilder {
 				.interfaceMapping (
 					interfaceMapping)
 
+				.csvMapping (
+					interfaceMapping)
+
 				.renderer (
 					renderer)
 
@@ -302,6 +305,9 @@ class IntegerFormFieldBuilder {
 					nativeMapping)
 
 				.interfaceMapping (
+					interfaceMapping)
+
+				.csvMapping (
 					interfaceMapping)
 
 				.renderer (

@@ -142,15 +142,17 @@
 		<integer-field
 			name="creditBought"/>
 
-		<integer-field
-			name="credit"/>
+		<currency-field
+			name="credit"
+			currency="chat.currency"/>
 
 		<text-field
 			name="locationPlace"/>
 
 		<object-field
 			name="chatAffiliate"
-			object-type="chatAffiliate"/>
+			object-type="chatAffiliate"
+			root-field="chat"/>
 
 	</field-set>
 

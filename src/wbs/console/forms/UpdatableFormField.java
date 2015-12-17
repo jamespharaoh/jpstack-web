@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.optionalRequired;
+import static wbs.framework.utils.etc.Misc.optionalOr;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -255,10 +255,11 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 					nativeValue));
 
 		String csvValue =
-			optionalRequired (
+			optionalOr (
 				csvMapping.genericToInterface (
 					container,
-					genericValue));
+					genericValue),
+				"");
 
 		out.writeFormat (
 			"\"%s\"",
