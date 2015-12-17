@@ -20,6 +20,10 @@ class ImageFormFieldSpec {
 		required = true)
 	String name;
 
+	@DataAttribute (
+		name = "field")
+	String fieldName;
+
 	@DataAttribute
 	String label;
 
