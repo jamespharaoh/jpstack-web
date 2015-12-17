@@ -139,8 +139,9 @@
 			name="image"
 			field="mainChatUserImage.media"/>
 
-		<integer-field
-			name="creditBought"/>
+		<currency-field
+			name="creditBought"
+			currency="chat.currency"/>
 
 		<currency-field
 			name="credit"
