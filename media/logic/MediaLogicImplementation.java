@@ -1186,9 +1186,9 @@ class MediaLogicImplementation
 			// reduce width
 
 			sourceWidth =
-				sourceImage.getWidth ()
-					* targetHeight
-					/ sourceImage.getHeight ();
+				sourceImage.getHeight ()
+					* targetWidth
+					/ targetHeight;
 
 			sourceHeight =
 				sourceImage.getHeight ();
@@ -1205,9 +1205,9 @@ class MediaLogicImplementation
 				sourceImage.getWidth ();
 
 			sourceHeight =
-				sourceImage.getHeight ()
-					* targetWidth
-					/ sourceImage.getWidth ();
+				sourceImage.getWidth ()
+					* targetHeight
+					/ targetWidth;
 
 		} else {
 
