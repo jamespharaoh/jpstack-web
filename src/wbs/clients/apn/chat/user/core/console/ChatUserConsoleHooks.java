@@ -12,7 +12,9 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.console.helper.AbstractConsoleHooks;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.application.annotations.SingletonComponent;
 
+@SingletonComponent ("chatUserConsoleHooks")
 public
 class ChatUserConsoleHooks
 	extends AbstractConsoleHooks<ChatUserRec> {

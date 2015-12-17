@@ -30,6 +30,7 @@
 
 	<layer name="console">
 		<bean class="console.ChatUserConsoleConfig"/>
+		<bean class="console.ChatUserConsoleHooks"/>
 		<bean class="console.ChatUserCreateAction"/>
 		<bean class="console.ChatUserCreatePart"/>
 		<bean class="console.ChatUserHelpFormAction"/>
