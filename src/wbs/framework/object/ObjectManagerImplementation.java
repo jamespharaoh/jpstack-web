@@ -2,6 +2,7 @@ package wbs.framework.object;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.split;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -694,10 +695,26 @@ class ObjectManagerImplementation
 			if (
 				equal (
 					pathPart,
+					"root")
+			) {
+
+				object =
+					rootHelper.find (0);
+
+			} else if (
+				equal (
+					pathPart,
 					"this")
 			) {
 
 				// same object
+
+			} else if (
+				isNull (
+					object)
+			) {
+
+				doNothing ();
 
 			} else if (
 				equal (
@@ -733,15 +750,6 @@ class ObjectManagerImplementation
 					getParent (
 						(Record<?>)
 						object)));
-
-			} else if (
-				equal (
-					pathPart,
-					"root")
-			) {
-
-				object =
-					rootHelper.find (0);
 
 			} else {
 

@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
+
 import wbs.framework.object.AbstractObjectHooks;
 
 public
@@ -21,14 +23,31 @@ class ChatUserHooks
 	@Override
 	public
 	List<Integer> searchIds (
-			Object search) {
+			@NonNull Object searchObject) {
 
-		@SuppressWarnings ("unchecked")
-		Map<String,Object> chatUserSearch =
-			(Map<String,Object>) search;
+		if (searchObject instanceof Map) {
 
-		return chatUserDao.searchIds (
-			chatUserSearch);
+			@SuppressWarnings ("unchecked")
+			Map<String,Object> searchMap =
+				(Map<String,Object>) searchObject;
+
+			return chatUserDao.searchIds (
+				searchMap);
+
+		} else if (searchObject instanceof ChatUserSearch) {
+
+			ChatUserSearch search =
+				(ChatUserSearch)
+				searchObject;
+
+			return chatUserDao.searchIds (
+				search);
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 	}
 

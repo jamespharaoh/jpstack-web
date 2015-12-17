@@ -2,6 +2,8 @@ package wbs.clients.apn.chat.user.core.hibernate;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collection;
@@ -20,7 +22,9 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
+import org.joda.time.Interval;
 
 import com.google.common.collect.ImmutableList;
 
@@ -31,6 +35,7 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.clients.apn.chat.user.core.model.ChatUserSessionRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.clients.apn.chat.user.core.model.Gender;
@@ -326,7 +331,7 @@ class ChatUserDaoHibernate
 	@Override
 	public
 	List<Integer> searchIds (
-			Map<String,Object> searchMap) {
+			@NonNull Map<String,Object> searchMap) {
 
 		Criteria criteria =
 			createCriteria (
@@ -857,6 +862,67 @@ class ChatUserDaoHibernate
 			}
 
 		}
+
+		return findMany (
+			Integer.class,
+			criteria.list ());
+
+	}
+
+	@Override
+	public
+	List<Integer> searchIds (
+			@NonNull ChatUserSearch search) {
+
+		Criteria criteria =
+
+			createCriteria (
+				ChatUserRec.class,
+				"_chatUser")
+
+			.createAlias (
+				"_chatUser.chat",
+				"_chat");
+
+		if (
+			isNotNull (
+				search.chatId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chat.id",
+					search.chatId ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.lastJoin ())
+		) {
+
+			Interval lastJoinInterval =
+				parsePartialTimestamp (
+					DateTimeZone.forID (
+						"Europe/London"),
+					search.lastJoin ());
+
+			criteria.add (
+				Restrictions.ge (
+					"_chatUser.lastJoin",
+					instantToDate (
+						lastJoinInterval.getStart ())));
+
+			criteria.add (
+				Restrictions.lt (
+					"_chatUser.lastJoin",
+					instantToDate (
+						lastJoinInterval.getEnd ())));
+
+		}
+
+		criteria.setProjection (
+			Projections.id ());
 
 		return findMany (
 			Integer.class,

@@ -3,11 +3,13 @@ package wbs.platform.media.console;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.forms.DereferenceFormFieldAccessor;
 import wbs.console.forms.FormFieldAccessor;
 import wbs.console.forms.FormFieldBuilderContext;
 import wbs.console.forms.FormFieldConstraintValidator;
@@ -45,6 +47,10 @@ class ImageFormFieldBuilder {
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
+
+	@Inject
+	Provider<DereferenceFormFieldAccessor>
+	dereferenceFormFieldAccessorProvider;
 
 	@Inject
 	Provider<IdentityFormFieldInterfaceMapping>
@@ -130,14 +136,31 @@ class ImageFormFieldBuilder {
 
 		// accessor
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+		FormFieldAccessor accessor;
 
-			.name (
-				name)
+		if (
+			isNotNull (
+				spec.fieldName ())
+		) {
 
-			.nativeClass (
-				MediaRec.class);
+			accessor =
+				dereferenceFormFieldAccessorProvider.get ()
+
+				.path (
+					spec.fieldName ());
+
+		} else {
+
+			accessor =
+				simpleFormFieldAccessorProvider.get ()
+
+				.name (
+					name)
+
+				.nativeClass (
+					MediaRec.class);
+
+		}
 
 		// native mapping
 

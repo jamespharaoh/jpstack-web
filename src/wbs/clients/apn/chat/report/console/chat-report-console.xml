@@ -8,6 +8,14 @@
 			name="revShare"
 			title="Revenue share report"/>
 
+		<object-search-page
+			name="recentUsers"
+			tab-label="Recent users"
+			object-type="chatUser"
+			search-class="wbs.platform.queue.model.ChatUserSearch"
+			search-fields="recent-user-search"
+			results-fields="recent-user-results"/>
+
 	</simple-context>
 
 	<field-set
@@ -97,6 +105,52 @@
 			label="Total"
 			currency="currency"
 			blank-if-zero="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="recent-user-search"
+		class="wbs.clients.apn.chat.user.core.model.ChatUserSearch">
+
+		<timestamp-partial-field
+			name="lastJoin"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="recent-user-results"
+		object-name="chatUser">
+
+		<code-field/>
+
+		<enum-field
+			name="gender"
+			helper="genderConsoleHelper"/>
+
+		<enum-field
+			name="orient"
+			helper="orientConsoleHelper"/>
+
+		<yes-no-field
+			name="adultVerified"/>
+
+		<image-field
+			name="image"
+			field="mainChatUserImage.media"/>
+
+		<integer-field
+			name="creditBought"/>
+
+		<integer-field
+			name="credit"/>
+
+		<text-field
+			name="locationPlace"/>
+
+		<object-field
+			name="chatAffiliate"
+			object-type="chatAffiliate"/>
 
 	</field-set>
 

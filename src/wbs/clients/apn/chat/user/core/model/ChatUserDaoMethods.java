@@ -51,6 +51,9 @@ interface ChatUserDaoMethods {
 	List<Integer> searchIds (
 			Map<String,Object> searchMap);
 
+	List<Integer> searchIds (
+			ChatUserSearch search);
+
 	List<ChatUserRec> find (
 			ChatAffiliateRec chatAffiliate);
 

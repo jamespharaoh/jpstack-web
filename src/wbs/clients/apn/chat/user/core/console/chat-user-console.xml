@@ -2,7 +2,9 @@
 	name="chat-user">
 
 	<console-helper-provider
-		object-name="chatUser">
+		object-name="chatUser"
+		view-delegate-field="chat"
+		view-delegate-priv-code="supervisor">
 
 		<context-stuff
 			name="chatUserName"
@@ -12,6 +14,16 @@
 			name="chatId"
 			delegate="chat"
 			field="id"/>
+
+		<priv-key
+			name="chatUser.view"
+			delegate="chat"
+			priv="supervisor"/>
+
+		<priv-key
+			name="chatUser.manage"
+			delegate="chat"
+			priv="manage"/>
 
 		<run-post-processor
 			name="chat"/>
