@@ -57,7 +57,7 @@ class WbsConfig {
 
 	@DataAttribute (
 		required = true)
-	Integer smtpPort;
+	String smtpPort;
 
 	@DataAttribute (
 		required = true)
@@ -66,6 +66,10 @@ class WbsConfig {
 	@DataAttribute (
 		required = true)
 	String smtpPassword;
+
+	@DataAttribute (
+		required = true)
+	String defaultEmailEnvelopeFrom;
 
 	@DataAttribute (
 		required = true)

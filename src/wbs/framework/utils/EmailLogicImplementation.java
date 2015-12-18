@@ -1,19 +1,23 @@
 package wbs.framework.utils;
 
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Properties;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+
+import com.sun.mail.smtp.SMTPMessage;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
@@ -29,6 +33,65 @@ class EmailLogicImplementation
 	@Inject
 	WbsConfig wbsConfig;
 
+	// state
+
+	Session mailSession;
+
+	// life cycle
+
+	@PostConstruct
+	void setup () {
+
+		Properties properties =
+			new Properties (
+				System.getProperties ());
+
+		if (
+			isNotEmpty (
+				wbsConfig.smtpHostname ())
+		) {
+
+			properties.setProperty (
+				"mail.smtp.host",
+				wbsConfig.smtpHostname ());
+
+		}
+
+		if (
+			isNotEmpty (
+				wbsConfig.smtpPort ())
+		) {
+
+			properties.setProperty (
+				"mail.smtp.port",
+				wbsConfig.smtpPort ());
+
+		}
+
+		if (
+			isNotEmpty (
+				wbsConfig.smtpUsername ())
+		) {
+
+			throw new RuntimeException ();
+
+		}
+
+		if (
+			isNotEmpty (
+				wbsConfig.smtpPassword ())
+		) {
+
+			throw new RuntimeException ();
+
+		}
+
+		mailSession =
+			Session.getInstance (
+				properties);
+
+	}
+
 	// implementation
 
 	@Override
@@ -43,24 +106,16 @@ class EmailLogicImplementation
 
 		try {
 
-			Properties properties =
-				System.getProperties ();
+			SMTPMessage smtpMessage =
+				new SMTPMessage (
+					mailSession);
 
-			properties.setProperty (
-				"mail.smtp.host",
-				wbsConfig.smtpHostname ());
-
-			Session session =
-				Session.getDefaultInstance (
-					properties);
-
-			MimeMessage mimeMessage =
-				new MimeMessage (
-					session);
+			smtpMessage.setEnvelopeFrom (
+				wbsConfig.defaultEmailEnvelopeFrom ());
 
 			try {
 
-				mimeMessage.setFrom (
+				smtpMessage.setFrom (
 					new InternetAddress (
 						fromAddress,
 						fromName));
@@ -72,7 +127,7 @@ class EmailLogicImplementation
 
 			}
 
-			mimeMessage.setSubject (
+			smtpMessage.setSubject (
 				subjectText);
 
 			for (
@@ -80,7 +135,7 @@ class EmailLogicImplementation
 					: toAddresses
 			) {
 
-				mimeMessage.addRecipient (
+				smtpMessage.addRecipient (
 					Message.RecipientType.TO,
 					new InternetAddress (
 						toAddress,
@@ -88,12 +143,12 @@ class EmailLogicImplementation
 
 			}
 
-			mimeMessage.setText (
+			smtpMessage.setText (
 				messageText,
 				"utf-8");
 
 			Transport.send (
-				mimeMessage);
+				smtpMessage);
 
 		} catch (MessagingException exception) {
 
