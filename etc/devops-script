@@ -27,10 +27,15 @@ class DevopsScript
 
 			title "#{@config_name} sql"
 
-			ssh \
-				"-t",
-				"psql #{@config_database["name"]}",
-				*ARGV
+			system_nofail [
+				"psql",
+				"#{@config_database["name"]}",
+				* ARGV,
+			], {
+				"PGHOST" => "#{@config_database["host"]}",
+				"PGUSER" => "#{@config_database["user"]}",
+				"PGPASSWORD" => "#{@config_database["password"]}",
+			}
 
 		when "daemon-log"
 
@@ -89,9 +94,7 @@ class DevopsScript
 				[
 					"cd #{@deployment_project_path}",
 					"ant console-live",
-					"sudo svc -d #{@config_services["console"]}",
-					"sleep 1",
-					"sudo svc -u #{@config_services["console"]}",
+					"./service tomcat_console restart",
 				].join(" && ")
 
 		when "api-auto"
@@ -103,9 +106,7 @@ class DevopsScript
 				[
 					"cd #{@deployment_project_path}",
 					"ant api-live",
-					"sudo svc -d #{@config_services["api"]}",
-					"sleep 1",
-					"sudo svc -u #{@config_services["api"]}",
+					"./service tomcat_api restart",
 				].join(" && ")
 
 		when "daemon-auto"
@@ -117,9 +118,7 @@ class DevopsScript
 				[
 					"cd #{@deployment_project_path}",
 					"ant build",
-					"sudo svc -d #{@config_services["daemon"]}",
-					"sleep 1",
-					"sudo svc -u #{@config_services["daemon"]}",
+					"./service daemon restart",
 				].join(" && ")
 
 		when "clean"
@@ -327,10 +326,6 @@ class DevopsScript
 			count,
 			follow,
 			logs,
-			"|",
-			"tai64nlocal",
-			"|",
-			"cut -c12-19,30-",
 		]
 
 	end
@@ -349,9 +344,17 @@ class DevopsScript
 
 	end
 
-	def system_nofail command
+	def system_nofail command, environment = nil
 
-		system command
+		if environment
+
+			system environment, * command
+
+		else
+
+			system * command
+
+		end
 
 		exit \
 			unless $?.to_i == 0
