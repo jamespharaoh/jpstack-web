@@ -30,7 +30,7 @@ class DevopsScript
 			system_nofail [
 				"psql",
 				"#{@config_database["name"]}",
-				* ARGV,
+				*ARGV,
 			], {
 				"PGHOST" => "#{@config_database["host"]}",
 				"PGUSER" => "#{@config_database["user"]}",
@@ -346,13 +346,17 @@ class DevopsScript
 
 	def system_nofail command, environment = nil
 
+		if command.is_a? String
+			command = [ command ]
+		end
+
 		if environment
 
-			system environment, * command
+			system environment, *command
 
 		else
 
-			system * command
+			system *command
 
 		end
 
