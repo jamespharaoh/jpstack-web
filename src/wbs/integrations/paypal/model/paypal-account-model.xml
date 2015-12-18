@@ -65,6 +65,14 @@
 			name="serviceEndpointInvoice"
 			nullable="yes"/>
 
+		<string-field
+			name="checkoutUrl"
+			nullable="yes"/>
+
+		<string-field
+			name="mode"
+			nullable="yes"/>
+
 	</fields>
 
 	<priv-types>

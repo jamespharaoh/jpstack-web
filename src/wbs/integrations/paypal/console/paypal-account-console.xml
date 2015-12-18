@@ -121,6 +121,14 @@
 			name="serviceEndpointInvoice"
 			nullable="yes"/>
 
+		<text-field
+			name="checkoutUrl"
+			nullable="yes"/>
+
+		<text-field
+			name="mode"
+			nullable="yes"/>
+
 	</field-set>
 
 	<field-set
@@ -170,6 +178,14 @@
 
 		<text-field
 			name="serviceEndpointInvoice"
+			nullable="yes"/>
+
+		<text-field
+			name="checkoutUrl"
+			nullable="yes"/>
+
+		<text-field
+			name="mode"
 			nullable="yes"/>
 
 	</field-set>

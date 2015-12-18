@@ -40,6 +40,10 @@ class PaypalLogicImplementation
 		return ImmutableMap.<String,String>builder ()
 
 			.put (
+				"mode",
+				paypalAccount.getMode ())
+
+			.put (
 				"acct1.UserName",
 				paypalAccount.getUsername ())
 

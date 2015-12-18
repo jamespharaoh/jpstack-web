@@ -4,6 +4,8 @@
 
 	<layer name="console">
 		<bean class="ConsoleRequestContextImplementation"/>
+		<bean class="CryptorFactory"/>
+		<bean class="CryptorImplementation"/>
 	</layer>
 
 </plugin>

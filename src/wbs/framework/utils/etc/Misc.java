@@ -225,9 +225,20 @@ class Misc {
 	}
 
 	public static
+	byte[] stringToUnicodeBytes (
+			@NonNull String string) {
+
+		return stringToBytes (
+			string,
+			"utf-8");
+
+	}
+	
+
+	public static
 	byte[] stringToBytes (
-			String string,
-			String charset) {
+			@NonNull String string,
+			@NonNull String charset) {
 
 		try {
 

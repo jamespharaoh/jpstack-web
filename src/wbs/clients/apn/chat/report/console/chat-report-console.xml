@@ -124,6 +124,11 @@
 
 		<code-field/>
 
+		<code-field
+			name="number"
+			label="Number"
+			delegate="number"/>
+
 		<enum-field
 			name="gender"
 			helper="genderConsoleHelper"/>

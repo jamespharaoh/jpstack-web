@@ -83,6 +83,10 @@ class WbsConfig {
 		required = true)
 	String defaultEmailReplyToAddress;
 
+	@DataAttribute (
+		required = true)
+	String cryptorSeed;
+
 	@DataChildren (
 		childrenElement = "test-users",
 		childElement = "test-user",

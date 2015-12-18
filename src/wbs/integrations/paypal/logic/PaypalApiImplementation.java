@@ -1,6 +1,7 @@
 package wbs.integrations.paypal.logic;
 
 import static wbs.framework.utils.etc.Misc.equalIgnoreCase;
+import static wbs.framework.utils.etc.Misc.replaceAll;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -47,7 +48,10 @@ class PaypalApiImplementation
 			@NonNull String amount,
 			@NonNull String returnUrl,
 			@NonNull String cancelUrl,
+			@NonNull String checkoutUrl,
 			@NonNull Map<String,String> expressCheckoutProperties) {
+
+		// setup request
 
 		SetExpressCheckoutRequestDetailsType requestDetails =
 			new SetExpressCheckoutRequestDetailsType ();
@@ -57,8 +61,6 @@ class PaypalApiImplementation
 
 		requestDetails.setCancelURL (
 			cancelUrl);
-
-		// Payment Information
 
 		List<PaymentDetailsType> paymentDetailsList =
 			new ArrayList<PaymentDetailsType> ();
@@ -77,15 +79,11 @@ class PaypalApiImplementation
 		paymentDetails.setPaymentAction (
 			PaymentActionCodeType.SALE);
 
-		// Your URL for receiving Instant Payment Notification (IPN)
-
 		paymentDetailsList.add (
 			paymentDetails);
 
 		requestDetails.setPaymentDetails (
 			paymentDetailsList);
-
-		// Express checkout
 
 		SetExpressCheckoutReq checkoutReq =
 			new SetExpressCheckoutReq ();
@@ -97,7 +95,7 @@ class PaypalApiImplementation
 		checkoutReq.setSetExpressCheckoutRequest (
 			checkoutRequest);
 
-		// Creating service wrapper object
+		// make call
 
 		PayPalAPIInterfaceServiceService service =
 			new PayPalAPIInterfaceServiceService (
@@ -116,10 +114,9 @@ class PaypalApiImplementation
 		) {
 
 			return Optional.of (
-				stringFormat (
-					"https://www.sandbox.paypal.com/cgi-bin/webscr",
-					"?cmd=_express-checkout",
-					"&token=%u",
+				replaceAll (
+					checkoutUrl,
+					"{token}",
 					response.getToken ()));
 
 		} else {

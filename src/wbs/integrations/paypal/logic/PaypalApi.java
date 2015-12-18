@@ -11,6 +11,7 @@ interface PaypalApi {
 			String amount,
 			String returnUrl,
 			String cancelUrl,
+			String checkoutUrl,
 			Map<String,String> expressCheckoutProperties);
 
 	Optional<String> getExpressCheckout (

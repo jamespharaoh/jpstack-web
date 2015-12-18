@@ -213,7 +213,7 @@ class ImChatPurchaseStartAction
 					transaction.now ())
 
 				.setValue (
-					pricePoint.getValue ())
+					pricePoint.getPrice ())
 
 				.setState (
 					PaypalPaymentState.started)
@@ -299,6 +299,7 @@ class ImChatPurchaseStartAction
 					purchaseRequest.failureUrl ().replace (
 						"{token}",
 						purchase.getToken ()),
+					paypalAccount.getCheckoutUrl (),
 					expressCheckoutProperties);
 
 		}

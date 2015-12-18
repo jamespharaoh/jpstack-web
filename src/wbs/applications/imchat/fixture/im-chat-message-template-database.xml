@@ -653,4 +653,20 @@
 
 	</entry>
 
+	<entry name="Customer details section">
+
+		<field name="Heading">
+			Customer details
+		</field>
+
+		<field name="Introduction">
+			Here are the personal details we have on file for you.
+		</field>
+
+		<field name="Update button label">
+			Update customer details
+		</field>
+
+	</entry>
+
 </message-template-database>
