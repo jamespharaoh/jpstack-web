@@ -1,16 +1,25 @@
 package wbs.platform.media.console;
 
+import javax.inject.Inject;
+
 import wbs.console.request.Cryptor;
+import wbs.console.request.CryptorFactory;
 import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("mediaConsoleConfig")
 public
 class MediaConsoleConfig {
 
+	@Inject
+	CryptorFactory cryptorFactory;
+
 	@SingletonComponent ("mediaCryptor")
 	public
 	Cryptor mediaCryptor () {
-		return new Cryptor ();
+
+		return cryptorFactory.makeCryptor (
+			"media");
+
 	}
 
 }
