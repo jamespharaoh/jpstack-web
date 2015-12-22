@@ -117,7 +117,7 @@ class ChatUserOnlinePart
 
 		targetContextType =
 			consoleManager.contextType (
-				"chatUser+",
+				"chatUser:combo",
 				true);
 
 		targetContext =

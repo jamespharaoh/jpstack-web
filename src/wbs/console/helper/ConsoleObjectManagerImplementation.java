@@ -135,12 +135,10 @@ class ConsoleObjectManagerImplementation
 				object);
 
 		String path =
-			objectManager.objectPath (
+			objectManager.objectPathMini (
 				object,
 				Optional.<Record<?>>fromNullable (
-					assumedRoot),
-				mini,
-				false);
+					assumedRoot));
 
 		StringBuilder stringBuilder =
 			new StringBuilder ();

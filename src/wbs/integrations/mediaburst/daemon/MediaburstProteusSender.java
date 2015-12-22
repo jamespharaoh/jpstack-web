@@ -146,11 +146,8 @@ class MediaburstProteusSender
 		proteusOutbox.message.getText ().getText ();
 
 		proteusOutbox.servicePath =
-			objectManager.objectPath (
-				proteusOutbox.message.getService (),
-				null,
-				true,
-				false);
+			objectManager.objectPathMini (
+				proteusOutbox.message.getService ());
 
 		// pick a handler
 

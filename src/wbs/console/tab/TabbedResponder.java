@@ -132,21 +132,25 @@ class TabbedResponder
 
 		MyLayer myLayer1 = null;
 
-		for (TabContext.Layer tabContextLayer
-				: tabContext.getLayers ()) {
+		for (
+			TabContext.Layer tabContextLayer
+				: tabContext.getLayers ()
+		) {
 
 			myLayers.add (
 				myLayer1 =
 					new MyLayer ()
 
-					.title (
-						tabContextLayer.title ())
+				.title (
+					tabContextLayer.title ())
 
-					.tabList (
-						tabContextLayer.tabList ())
+				.tabList (
+					tabContextLayer.tabList ())
 
-					.tab (
-						tabContextLayer.tab ()));
+				.tab (
+					tabContextLayer.tab ())
+
+			);
 
 		}
 
@@ -246,8 +250,10 @@ class TabbedResponder
 			printFormat (
 				"<td class=\"l\">\n");
 
-			for (TabRef tabRef
-					: myLayer.tabList.getTabRefs ()) {
+			for (
+				TabRef tabRef
+					: myLayer.tabList.getTabRefs ()
+			) {
 
 				if (! tabRef.getTab ().isAvailable ())
 					continue;

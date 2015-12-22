@@ -439,11 +439,9 @@ System.out.println ("#### GOT HOOKS FOR " + consoleHelperProvider.objectName ())
 			}
 
 			String path =
-				objectManager.objectPath (
+				objectManager.objectPathMini (
 					object,
-					assumedRoot,
-					mini,
-					false);
+					assumedRoot);
 
 			StringBuilder stringBuilder =
 				new StringBuilder ();

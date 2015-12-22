@@ -133,11 +133,8 @@ class HybyteSender
 		hybyteOutbox.message.getTags ().size ();
 
 		hybyteOutbox.servicePath =
-			objectManager.objectPath (
-				hybyteOutbox.message.getService (),
-				null,
-				true,
-				false);
+			objectManager.objectPathMini (
+				hybyteOutbox.message.getService ());
 
 		// pick a handler
 

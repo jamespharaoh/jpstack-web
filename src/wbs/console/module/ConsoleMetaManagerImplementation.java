@@ -82,8 +82,10 @@ class ConsoleMetaManagerImplementation
 
 		// collect stuff
 
-		for (Map.Entry<String,ConsoleMetaModule> consoleMetaModuleEntry
-				: consoleMetaModules.entrySet ()) {
+		for (
+			Map.Entry<String,ConsoleMetaModule> consoleMetaModuleEntry
+				: consoleMetaModules.entrySet ()
+		) {
 
 			String consoleMetaModuleName =
 				consoleMetaModuleEntry.getKey ();
@@ -93,8 +95,10 @@ class ConsoleMetaManagerImplementation
 
 			// collect context links
 
-			for (ConsoleContextLink contextLink
-					: consoleMetaModule.contextLinks ()) {
+			for (
+				ConsoleContextLink contextLink
+					: consoleMetaModule.contextLinks ()
+			) {
 
 				List<ConsoleContextLink> contextLinksForName =
 					contextLinks.get (
@@ -183,8 +187,10 @@ class ConsoleMetaManagerImplementation
 				extensionPoints.get (name),
 				Collections.<ConsoleContextExtensionPoint>emptyList ());
 
-		for (ConsoleContextExtensionPoint extensionPoint
-				: extensionPointsForName) {
+		for (
+			ConsoleContextExtensionPoint extensionPoint
+				: extensionPointsForName
+		) {
 
 			if (extensionPoint.root ()) {
 

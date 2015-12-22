@@ -46,7 +46,7 @@ class ObjectContextMetaBuilder {
 
 	// state
 
-	String contextName;
+	String contextTypeName;
 	String beanName;
 
 	Boolean hasListChildren;
@@ -70,38 +70,42 @@ class ObjectContextMetaBuilder {
 			rootExtensionPointProvider.get ()
 
 			.name (
-				contextName + ":list")
+				contextTypeName + ":list")
 
 			.contextTypeNames (
 				listContextTypeNames)
 
 			.contextLinkNames (
 				ImmutableList.<String>of (
-					contextName))
+					contextTypeName))
 
 			.parentContextNames (
 				ImmutableList.<String>of (
 					naivePluralise (
-						contextName),
-					contextName)));
+						contextTypeName),
+					contextTypeName + "+"))
+
+		);
 
 		metaModule.addExtensionPoint (
 			rootExtensionPointProvider.get ()
 
 			.name (
-				contextName + ":object")
+				contextTypeName + ":object")
 
 			.contextTypeNames (
 				objectContextTypeNames)
 
 			.contextLinkNames (
 				ImmutableList.<String>of (
-					contextName))
+					contextTypeName))
 
 			.parentContextNames (
 				ImmutableList.<String>of (
-					contextName,
-					"link:" + contextName)));
+					contextTypeName,
+					"link:" + contextTypeName))
+
+		);
 
 		// descend
 
@@ -109,10 +113,10 @@ class ObjectContextMetaBuilder {
 			new ConsoleContextMetaBuilderContainer ()
 
 			.structuralName (
-				contextName)
+				contextTypeName)
 
 			.extensionPointName (
-				contextName + ":list");
+				contextTypeName + ":list");
 
 		builder.descend (
 			listContainer,
@@ -124,10 +128,10 @@ class ObjectContextMetaBuilder {
 			new ConsoleContextMetaBuilderContainer ()
 
 			.structuralName (
-				contextName)
+				contextTypeName)
 
 			.extensionPointName (
-				contextName + ":object");
+				contextTypeName + ":object");
 
 		builder.descend (
 			objectContainer,
@@ -141,20 +145,20 @@ class ObjectContextMetaBuilder {
 
 	void setDefaults () {
 
-		contextName =
+		contextTypeName =
 			spec.name ();
 
 		beanName =
 			ifNull (
 				spec.beanName (),
-				contextName);
+				contextTypeName);
 
 		if (beanName.contains ("_")) {
 
 			throw new RuntimeException (
 				stringFormat (
-					"Object context name %s cannot be used as bean name",
-					contextName));
+					"Object context type name %s cannot be used as bean name",
+					contextTypeName));
 
 		}
 
@@ -170,11 +174,10 @@ class ObjectContextMetaBuilder {
 			ImmutableList.<String>builder ()
 
 			.add (
-				naivePluralise (
-					contextName))
+				contextTypeName + ":list")
 
 			.add (
-				contextName + "+")
+				contextTypeName + ":combo")
 
 			.build ();
 
@@ -182,10 +185,10 @@ class ObjectContextMetaBuilder {
 			ImmutableList.<String>builder ()
 
 			.add (
-				contextName + "+")
+				contextTypeName + ":combo")
 
 			.add (
-				contextName)
+				contextTypeName + ":object")
 
 			.build ();
 

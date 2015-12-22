@@ -233,7 +233,7 @@ class Misc {
 			"utf-8");
 
 	}
-	
+
 
 	public static
 	byte[] stringToBytes (

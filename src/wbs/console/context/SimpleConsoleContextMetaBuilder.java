@@ -38,7 +38,7 @@ class SimpleConsoleContextMetaBuilder {
 
 	// state
 
-	String contextName;
+	String contextTypeName;
 
 	// build
 
@@ -55,18 +55,19 @@ class SimpleConsoleContextMetaBuilder {
 			rootExtensionPointProvider.get ()
 
 			.name (
-				contextName)
+				contextTypeName)
 
 			.contextTypeNames (
 				ImmutableList.<String>of (
-					contextName))
+					contextTypeName))
 
 			.contextLinkNames (
-				ImmutableList.<String>of ())
+				ImmutableList.<String>of (
+					contextTypeName))
 
 			.parentContextNames (
 				ImmutableList.<String>of (
-					contextName)));
+					contextTypeName)));
 
 		// descend
 
@@ -74,10 +75,10 @@ class SimpleConsoleContextMetaBuilder {
 			new ConsoleContextMetaBuilderContainer ()
 
 			.structuralName (
-				contextName)
+				contextTypeName)
 
 			.extensionPointName (
-				contextName);
+				contextTypeName);
 
 		builder.descend (
 			nextContainer,
@@ -89,7 +90,7 @@ class SimpleConsoleContextMetaBuilder {
 
 	void setDefaults () {
 
-		contextName =
+		contextTypeName =
 			spec.name ();
 
 	}

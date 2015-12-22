@@ -2,9 +2,9 @@
 	name="chat-graphs">
 
 	<extend-context
-		name="chat.graphs"
-		base-name="chat"
-		extension-point="chat.graphs"
+		name="chatReport.graphs"
+		base-name="chatReport"
+		extension-point="chatReport.graphs"
 		object-name="chat">
 
 		<section

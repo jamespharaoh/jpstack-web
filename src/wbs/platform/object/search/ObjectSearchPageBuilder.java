@@ -358,7 +358,7 @@ class ObjectSearchPageBuilder<
 						itemsPerPage)
 
 					.targetContextTypeName (
-						consoleHelper.objectName () + "+");
+						consoleHelper.objectName () + ":combo");
 
 			}
 

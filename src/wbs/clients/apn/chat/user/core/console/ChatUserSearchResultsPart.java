@@ -136,7 +136,7 @@ class ChatUserSearchResultsPart
 
 		ConsoleContextType targetContextType =
 			consoleManager.contextType (
-				"chatUser+",
+				"chatUser:combo",
 				true);
 
 		targetContext =

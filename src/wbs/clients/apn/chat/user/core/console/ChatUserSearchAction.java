@@ -471,11 +471,12 @@ class ChatUserSearchAction
 				Integer chatUserId =
 					chatUserIds.get (0);
 
-				requestContext.addNotice ("Found single user");
+				requestContext.addNotice (
+					"Found single user");
 
 				ConsoleContextType targetContextType =
 					consoleManager.contextType (
-						"chatUser+",
+						"chatUser:combo",
 						true);
 
 				ConsoleContext targetContext =

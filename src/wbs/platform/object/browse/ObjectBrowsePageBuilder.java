@@ -173,7 +173,7 @@ class ObjectBrowsePageBuilder<
 					.targetContextTypeName (
 						ifNull (
 							spec.targetContextTypeName (),
-							consoleHelper.objectName () + "+"));
+							consoleHelper.objectName () + ":combo"));
 
 			}
 

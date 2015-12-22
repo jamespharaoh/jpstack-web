@@ -13,7 +13,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 @PrototypeComponent ("cryptorImplementation")
 @Accessors (fluent = true)
 @Log4j
-public 
+public
 class CryptorImplementation
 	implements Cryptor {
 

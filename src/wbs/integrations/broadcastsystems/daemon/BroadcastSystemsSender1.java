@@ -100,11 +100,8 @@ class BroadcastSystemsSender1
 		state.message.getTags ().size ();
 
 		state.servicePath =
-			objectManager.objectPath (
-				state.message.getService (),
-				null,
-				true,
-				false);
+			objectManager.objectPathMini (
+				state.message.getService ());
 
 		// pick a handler
 

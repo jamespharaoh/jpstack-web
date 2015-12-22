@@ -16,6 +16,9 @@
 			search-fields="recent-user-search"
 			results-fields="recent-user-results"/>
 
+		<extension-point
+			name="chatReport.graphs"/>
+
 	</simple-context>
 
 	<field-set

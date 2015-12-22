@@ -217,8 +217,7 @@ class ObjectContextBuilder<
 			contextType.get ()
 
 			.name (
-				naivePluralise (
-					name))
+				name + ":list")
 
 			.defaultFileName (
 				defaultFileName.orNull ()));
@@ -227,7 +226,7 @@ class ObjectContextBuilder<
 			contextType.get ()
 
 			.name (
-				name + "+")
+				name + ":combo")
 
 			.defaultFileName (
 				defaultFileName.orNull ()));
@@ -236,7 +235,7 @@ class ObjectContextBuilder<
 			contextType.get ()
 
 			.name (
-				name)
+				name + ":object")
 
 			.defaultFileName (
 				defaultFileName.orNull ()));
@@ -253,8 +252,7 @@ class ObjectContextBuilder<
 					name))
 
 			.typeName (
-				naivePluralise (
-					name))
+				name + ":list")
 
 			.pathPrefix (
 				"/" + naivePluralise (
@@ -274,7 +272,7 @@ class ObjectContextBuilder<
 				name)
 
 			.typeName (
-				name + "+")
+				name + ":combo")
 
 			.pathPrefix (
 				"/" + name)
@@ -307,7 +305,7 @@ class ObjectContextBuilder<
 				"link:" + name)
 
 			.typeName (
-				name)
+				name + ":object")
 
 			.pathPrefix (
 				"/" + name)
@@ -406,8 +404,7 @@ class ObjectContextBuilder<
 						resolvedContextName))
 
 				.typeName (
-					naivePluralise (
-						name))
+					name + ":list")
 
 				.pathPrefix (
 					naivePluralise (
@@ -433,7 +430,7 @@ class ObjectContextBuilder<
 					resolvedContextName)
 
 				.typeName (
-					name + "+")
+					name + ":combo")
 
 				.pathPrefix (
 					resolvedPathPrefix)
@@ -484,8 +481,7 @@ class ObjectContextBuilder<
 					resolvedConsoleContextLink.tabPrivKey ())
 
 				.localFile (
-					"type:" + naivePluralise (
-						name)),
+					"type:" + name + ":list"),
 
 			resolvedConsoleContextLink.tabContextTypeNames ());
 
@@ -558,14 +554,12 @@ class ObjectContextBuilder<
 				.addAll (
 					maybeList (
 						hasListChildren,
-						naivePluralise (
-							name)))
+						name + ":list"))
 
 				.addAll (
 					maybeList (
 						hasObjectChildren,
-						naivePluralise (
-							name)))
+						name + ":combo"))
 
 				.build ();
 
@@ -575,12 +569,12 @@ class ObjectContextBuilder<
 				.addAll (
 					maybeList (
 						hasListChildren,
-						name + "+"))
+						name + ":combo"))
 
 				.addAll (
 					maybeList (
 						hasObjectChildren,
-						name))
+						name + ":object"))
 
 				.build ();
 
