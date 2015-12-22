@@ -39,8 +39,7 @@ class ConsoleContextLinkSpec {
 		required = true)
 	String label;
 
-	@DataAttribute (
-		required = true)
+	@DataAttribute
 	String privKey;
 
 }

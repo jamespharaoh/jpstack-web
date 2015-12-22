@@ -1,11 +1,14 @@
 package wbs.console.module;
 
+import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -72,6 +75,9 @@ class ConsoleModuleImplementation
 	List<ConsoleContextTab> tabs =
 		new ArrayList<ConsoleContextTab> ();
 
+	Set<String> tabNames =
+		new HashSet<String> ();
+
 	@DataChildren
 	@Getter @Setter
 	Map<String,List<ContextTabPlacement>> tabPlacementsByContextType =
@@ -135,9 +141,26 @@ class ConsoleModuleImplementation
 		if (tab.name ().isEmpty ())
 			throw new RuntimeException ();
 
-		tabs.add (tab);
+		if (
+			contains (
+				tabNames,
+				tab.name ())
+		) {
 
-		for (String contextTypeName : contextTypes) {
+			throw new RuntimeException ();
+
+		}
+
+		tabs.add (
+			tab);
+
+		tabNames.add (
+			tab.name ());
+
+		for (
+			String contextTypeName
+				: contextTypes
+		) {
 
 			List<ContextTabPlacement> tabPlacements =
 				tabPlacementsByContextType.get (

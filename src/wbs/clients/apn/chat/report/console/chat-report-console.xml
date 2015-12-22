@@ -12,12 +12,25 @@
 			name="recentUsers"
 			tab-label="Recent users"
 			object-type="chatUser"
-			search-class="wbs.platform.queue.model.ChatUserSearch"
+			search-class="user.core.model.ChatUserSearch"
 			search-fields="recent-user-search"
 			results-fields="recent-user-results"/>
 
 		<extension-point
 			name="chatReport.graphs"/>
+
+	</simple-context>
+
+	<simple-context
+		name="chatSharedReport">
+
+		<object-search-page
+			name="adminCredit"
+			tab-label="Admin credit"
+			object-type="chatUserCredit"
+			search-class="wbs.clients.apn.chat.bill.model.ChatUserCreditSearch"
+			search-fields="admin-credit-search"
+			results-fields="admin-credit-results"/>
 
 	</simple-context>
 
@@ -162,6 +175,45 @@
 			name="chatAffiliate"
 			object-type="chatAffiliate"
 			root-field="chat"/>
+
+	</field-set>
+
+	<field-set
+		name="admin-credit-search"
+		class="wbs.clients.apn.chat.bill.model.ChatUserCreditSearch">
+
+		<timestamp-partial-field
+			name="timestamp"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="admin-credit-results"
+		object-name="chatUserCredit">
+
+		<id-field/>
+
+		<code-field
+			delegate="chatUser"/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<currency-field
+			name="creditAmount"
+			currency="chatUser.chat.currency"/>
+
+		<currency-field
+			name="billAmount"
+			currency="chatUser.chat.currency"/>
+
+		<text-field
+			name="details"/>
+
+		<object-field
+			name="user"
+			object-type="user"/>
 
 	</field-set>
 

@@ -149,7 +149,9 @@ class ConsoleContextStuff {
 				}
 
 				tab =
-					contextTab.realTab (this, consoleContext);
+					contextTab.realTab (
+						this,
+						consoleContext);
 
 				tabsByNameByContext
 					.get (consoleContext)

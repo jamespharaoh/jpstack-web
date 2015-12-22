@@ -78,6 +78,11 @@
 			<object-create-page
 				target-responder="chatSummaryResponder"/>
 
+			<context-link
+				name="sharedReport"
+				link="chatSharedReport"
+				label="Shared reports"/>
+
 		</list>
 
 		<object>

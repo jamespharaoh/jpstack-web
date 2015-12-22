@@ -13,4 +13,7 @@ interface ChatUserCreditDaoMethods {
 			ChatRec chat,
 			Interval timestampInterval);
 
+	List<Integer> searchIds (
+			ChatUserCreditSearch search);
+
 }

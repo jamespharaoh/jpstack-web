@@ -33,6 +33,7 @@
 		<console-module name="chat-promo"/>
 		<console-module name="chat-route"/>
 		<console-module name="chat-route-network"/>
+		<console-module name="chat-user-credit"/>
 	</console-modules>
 
 </plugin>

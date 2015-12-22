@@ -83,7 +83,7 @@ class ObjectContextMetaBuilder {
 				ImmutableList.<String>of (
 					naivePluralise (
 						contextTypeName),
-					contextTypeName + "+"))
+					contextTypeName))
 
 		);
 

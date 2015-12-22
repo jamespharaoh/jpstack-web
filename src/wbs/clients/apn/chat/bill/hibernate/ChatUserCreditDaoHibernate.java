@@ -1,13 +1,22 @@
 package wbs.clients.apn.chat.bill.hibernate;
 
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
 import wbs.clients.apn.chat.bill.model.ChatUserCreditDao;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditRec;
+import wbs.clients.apn.chat.bill.model.ChatUserCreditSearch;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.framework.hibernate.HibernateDao;
 
@@ -46,6 +55,81 @@ class ChatUserCreditDaoHibernate
 					timestampInterval.getEnd ()))
 
 			.list ());
+
+	}
+
+	@Override
+	public
+	List<Integer> searchIds (
+			@NonNull ChatUserCreditSearch search) {
+
+		Criteria criteria =
+
+			createCriteria (
+				ChatUserCreditRec.class,
+				"_chatUserCredit")
+
+			.createAlias (
+				"_chatUserCredit.chatUser",
+				"_chatUser")
+
+			.createAlias (
+				"_chatUser.chat",
+				"_chat");
+
+		if (
+			isNotNull (
+				search.chatId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chat.id",
+					search.chatId ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.timestamp ())
+		) {
+
+			Interval timestampInterval =
+				parsePartialTimestamp (
+					DateTimeZone.forID (
+						"Europe/London"),
+					search.timestamp ());
+
+			criteria.add (
+				Restrictions.ge (
+					"_chatUserCredit.timestamp",
+					instantToDate (
+						timestampInterval.getStart ())));
+
+			criteria.add (
+				Restrictions.lt (
+					"_chatUserCredit.timestamp",
+					instantToDate (
+						timestampInterval.getEnd ())));
+
+		}
+
+		if (search.filter ()) {
+
+			criteria.add (
+				Restrictions.or (
+					Restrictions.in (
+						"_chat.id",
+						search.filterChatIds ())));
+
+		}
+
+		criteria.setProjection (
+			Projections.id ());
+
+		return findMany (
+			Integer.class,
+			criteria.list ());
 
 	}
 
