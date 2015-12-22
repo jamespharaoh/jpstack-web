@@ -78,36 +78,46 @@ class ObjectSummaryPrivPart
 
 		// for each priv
 
-		for (PrivRec priv
-				: privs) {
+		for (
+			PrivRec priv
+				: privs
+		) {
 
 			// build user priv list
 
-			for (UserPrivRec userPriv
-					: priv.getUserPrivs ()) {
+			for (
+				UserPrivRec userPriv
+					: priv.getUserPrivs ()
+			) {
 
 				String userPath =
-					objectManager.objectPath (
-						userPriv.getUser (),
-						null,
-						true,
-						false);
+					objectManager.objectPathMini (
+						userPriv.getUser ());
 
 				UserPrivSets userPrivSets =
 					userPrivs.get (userPath);
 
-				if (userPrivSets == null)
+				if (userPrivSets == null) {
+
 					userPrivs.put (
 						userPath,
 						userPrivSets = new UserPrivSets ());
 
-				if (userPriv.getCan ())
+				}
+
+				if (userPriv.getCan ()) {
+
 					userPrivSets.canPrivCodes.add (
 						priv.getCode ());
 
-				if (userPriv.getCanGrant ())
+				}
+
+				if (userPriv.getCanGrant ()) {
+
 					userPrivSets.canGrantPrivCodes.add (
 						priv.getCode ());
+
+				}
 
 			}
 
@@ -119,11 +129,8 @@ class ObjectSummaryPrivPart
 			) {
 
 				String groupPath =
-					objectManager.objectPath (
-						group,
-						null,
-						true,
-						false);
+					objectManager.objectPathMini (
+						group);
 
 				Set<String> privCodes =
 					groupPrivs.get (groupPath);
@@ -153,27 +160,23 @@ class ObjectSummaryPrivPart
 				continue;
 
 			users.put (
-				objectManager.objectPath (
-					user,
-					null,
-					true,
-					false),
+				objectManager.objectPathMini (
+					user),
 				user);
 
 		}
 
-		for (GroupRec group
-				: groupHelper.findAll ()) {
+		for (
+			GroupRec group
+				: groupHelper.findAll ()
+		) {
 
 			if (! objectManager.canView (group))
 				continue;
 
 			groups.put (
-				objectManager.objectPath (
-					group,
-					null,
-					true,
-					false),
+				objectManager.objectPathMini (
+					group),
 				group);
 
 		}

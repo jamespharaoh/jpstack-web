@@ -307,7 +307,7 @@ class ObjectCreatePageBuilder<
 		targetContextTypeName =
 			ifNull (
 				spec.targetContextTypeName (),
-				consoleHelper.objectName () + "+");
+				consoleHelper.objectName () + ":combo");
 
 		targetResponderName =
 			ifNull (

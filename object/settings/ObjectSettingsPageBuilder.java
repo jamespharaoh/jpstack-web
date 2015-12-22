@@ -3,7 +3,6 @@ package wbs.platform.object.settings;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -314,8 +313,7 @@ class ObjectSettingsPageBuilder<
 						.nextContextTypeName (
 							ifNull (
 								spec.listContextTypeName (),
-								 naivePluralise (
-								 	consoleHelper.objectName ())))
+								consoleHelper.objectName () + ":list"))
 
 						.editPrivKey (
 							privKey);

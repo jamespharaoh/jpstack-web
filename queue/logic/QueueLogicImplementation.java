@@ -128,11 +128,8 @@ class QueueLogicImplementation
 			}
 
 			String objectPath =
-				objectManager.objectPath (
-					parent,
-					null,
-					true,
-					false);
+				objectManager.objectPathMini (
+					parent);
 
 			log.info (
 				stringFormat (
