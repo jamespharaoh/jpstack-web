@@ -156,8 +156,12 @@ class DialogueMmsApiServletModule
 					contentTypePattern.matcher (
 						item.getContentType ());
 
-				if (! matcher.matches ())
-					throw new RuntimeException ("Content type error");
+				if (! matcher.matches ()) {
+
+					throw new RuntimeException (
+						"Content type error");
+
+				}
 
 				String type =
 					matcher.group (1);
@@ -191,39 +195,49 @@ class DialogueMmsApiServletModule
 				text = "";
 
 			String mmsMessageId =
-				requestContext.header ("x-mms-message-id");
+				requestContext.header (
+					"x-mms-message-id");
 
 			String mmsSenderAddress =
-				requestContext.header ("x-mms-sender-address");
+				requestContext.header (
+					"x-mms-sender-address");
 
 			String mmsRecipientAddress =
-				requestContext.header ("x-mms-recipient-address");
+				requestContext.header (
+					"x-mms-recipient-address");
 
 			RouteRec route =
 				routeHelper.find (
-					requestContext.requestInt ("routeId"));
+					requestContext.requestInt (
+						"routeId"));
 
 			Instant mmsDate =
 				dateToInstant (
 					getDateFormat ().parse (
-						requestContext.header ("x-mms-date")));
+						requestContext.header (
+							"x-mms-date")));
 
 			String mmsSubject =
-				requestContext.header ("x-mms-subject");
+				requestContext.header (
+					"x-mms-subject");
 
 			// insert into inbox
 
 			inboxLogic.inboxInsert (
-				Optional.of (mmsMessageId),
-				textHelper.findOrCreate (text),
+				Optional.of (
+					mmsMessageId),
+				textHelper.findOrCreate (
+					text),
 				mmsSenderAddress,
 				mmsRecipientAddress,
 				route,
 				Optional.<NetworkRec>absent (),
-				Optional.of (mmsDate),
+				Optional.of (
+					mmsDate),
 				medias,
 				Optional.<String>absent (),
-				Optional.of (mmsSubject));
+				Optional.fromNullable (
+					mmsSubject));
 
 			transaction.commit ();
 
@@ -272,29 +286,38 @@ class DialogueMmsApiServletModule
 			// int routeId = requestContext.getRequestInt ("routeId");
 
 			String userKeyParam =
-				requestContext.parameter ("X-Mms-User-Key");
+				requestContext.parameter (
+					"X-Mms-User-Key");
 
 			final int messageId;
 
 			try {
 
 				messageId =
-					Integer.parseInt(userKeyParam);
+					Integer.parseInt (
+						userKeyParam);
 
-			} catch (NumberFormatException e) {
+			} catch (NumberFormatException exception) {
 
-				throw new ServletException(
-						"Ignoring dialogue MMS report with invalid user key, X-Mms-User-Key="
-								+ userKeyParam);
+				throw new ServletException (
+					stringFormat (
+						"Ignoring dialogue MMS report with invalid user key, ",
+						"X-Mms-User-Key=%s",
+						userKeyParam));
 
 			}
 
 			MessageRec message =
-				messageHelper.find (messageId);
+				messageHelper.find (
+					messageId);
 
 			if (message == null) {
-				throw new ServletException("Message ID invalid : "
-						+ messageId);
+
+				throw new ServletException (
+					stringFormat (
+						"Message ID invalid: %s",
+						messageId));
+
 			}
 
 			if (! equal (message.getMessageType ().getCode (), "mms")) {
