@@ -209,26 +209,46 @@ class HibernateDao {
 
 	}
 
+	protected
+	List<Integer> findIdsOnly (
+			List<?> list) {
+
+		List<Integer> idList =
+			new ArrayList<Integer> ();
+
+		for (
+			Object rowObject
+				: list
+		) {
+
+			Object[] rowArray =
+				(Object[])
+				rowObject;
+
+			idList.add (
+				(Integer)
+				rowArray [0]);
+
+		}
+
+		return idList;
+
+	}
+
 	protected <RowType extends IdObject>
 	List<RowType> findOrdered (
 			Class<RowType> rowTypeClass,
 			List<Integer> objectIds,
 			List<?> unorderedList) {
 
-System.out.println ("D");
-
 		HashMap<Integer,RowType> indexedList =
 			new HashMap<Integer,RowType> ();
-
-System.out.println ("E");
 
 		for (
 			int index = 0;
 			index < unorderedList.size ();
 			index ++
 		) {
-
-System.out.println ("F");
 
 			RowType object =
 				rowTypeClass.cast (
@@ -251,23 +271,15 @@ System.out.println ("F");
 				objectId,
 				object);
 
-System.out.println ("G");
-
 		}
-
-System.out.println ("H");
 
 		List<RowType> orderedList =
 			new ArrayList<RowType> ();
-
-System.out.println ("I");
 
 		for (
 			Integer objectId
 				: objectIds
 		) {
-
-System.out.println ("J");
 
 			RowType object =
 				indexedList.get (
@@ -285,11 +297,7 @@ System.out.println ("J");
 			orderedList.add (
 				object);
 
-System.out.println ("K");
-
 		}
-
-System.out.println ("L " + orderedList);
 
 		return orderedList;
 
