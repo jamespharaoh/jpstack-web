@@ -66,7 +66,7 @@ class CoreAuthFilter
 	int reloadTime = 10 * 1000;
 
 	final static
-	int logoffTime = 60 * 1000;
+	int logoffTime = 5 * 60 * 1000;
 
 	Instant lastReload =
 		millisToInstant (

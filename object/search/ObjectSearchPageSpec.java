@@ -32,16 +32,24 @@ class ObjectSearchPageSpec {
 		name = "object-type")
 	String objectTypeName;
 
-	@DataAttribute (
-		name = "search-class")
-	String searchClassName;
-
 	@DataAttribute
 	String sessionKey;
 
 	@DataAttribute (
+		name = "search-class")
+	String searchClassName;
+
+	@DataAttribute (
 		name = "search-fields")
 	String searchFieldsName;
+
+	@DataAttribute (
+		name = "search-dao-method")
+	String searchDaoMethodName;
+
+	@DataAttribute (
+		name = "results-class")
+	String resultsClassName;
 
 	@DataAttribute (
 		name = "results-fields")
@@ -50,6 +58,10 @@ class ObjectSearchPageSpec {
 	@DataAttribute (
 		name = "results-rows-fields")
 	String resultsRowsFieldsName;
+
+	@DataAttribute (
+		name = "results-dao-method")
+	String resultsDaoMethodName;
 
 	@DataAttribute
 	String privKey;

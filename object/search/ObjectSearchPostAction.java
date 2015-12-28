@@ -1,9 +1,12 @@
 package wbs.platform.object.search;
 
+import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.methodInvoke;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -17,6 +20,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
@@ -70,6 +74,9 @@ class ObjectSearchPostAction
 
 	@Getter @Setter
 	Class<?> searchClass;
+
+	@Getter @Setter
+	String searchDaoMethodName;
 
 	@Getter @Setter
 	String sessionKey;
@@ -225,9 +232,39 @@ class ObjectSearchPostAction
 
 		// perform search
 
-		List<Integer> objectIds =
-			consoleHelper.searchIds (
-				search);
+		List<Integer> objectIds;
+
+		if (
+			isNotNull (
+				searchDaoMethodName)
+		) {
+
+			Method method =
+				getMethodRequired (
+					consoleHelper.getClass (),
+					searchDaoMethodName,
+					ImmutableList.<Class<?>>of (
+						searchClass));
+
+			@SuppressWarnings ("unchecked")
+			List<Integer> objectIdsTemp =
+				(List<Integer>)
+				methodInvoke (
+					method,
+					consoleHelper,
+					ImmutableList.<Object>of (
+						search));
+
+			objectIds =
+				objectIdsTemp;
+
+		} else {
+
+			objectIds =
+				consoleHelper.searchIds (
+					search);
+
+		}
 
 		if (objectIds.isEmpty ()) {
 
