@@ -1082,16 +1082,6 @@ class HibernateHelperProviderBuilder {
 		}
 
 		@Override
-		public
-		List<Integer> searchIds (
-				@NonNull Object search) {
-
-			return objectHooks.searchIds (
-				search);
-
-		}
-
-		@Override
 		public <ObjectType extends EphemeralRecord<?>>
 		ObjectType remove (
 				@NonNull ObjectType object) {

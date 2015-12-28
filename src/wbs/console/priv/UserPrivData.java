@@ -10,11 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 
 import wbs.console.priv.PrivDataLoader.UnknownObjectException;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 
+@Log4j
 public
 class UserPrivData {
 
@@ -185,12 +187,14 @@ class UserPrivData {
 
 					}
 
-					throw new IllegalArgumentException (
+					log.warn (
 						stringFormat (
 							"Unknown priv %s on object type %s (%s)",
 							privCode,
 							objectTypeCode,
 							parentObjectId.objectId ()));
+
+					return false;
 
 				}
 
@@ -203,8 +207,10 @@ class UserPrivData {
 
 			// check all this object's privs
 
-			for (Integer privId
-					: objectData.privIdsByCode.values ()) {
+			for (
+				Integer privId
+					: objectData.privIdsByCode.values ()
+			) {
 
 				if (canSingle (privId))
 					return true;

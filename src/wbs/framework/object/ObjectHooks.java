@@ -1,7 +1,5 @@
 package wbs.framework.object;
 
-import java.util.List;
-
 import wbs.framework.record.Record;
 
 public
@@ -11,9 +9,6 @@ interface ObjectHooks<RecordType extends Record<RecordType>> {
 			ObjectHelper<RecordType> objectHelper,
 			ObjectHelper<?> parentHelper,
 			Record<?> parentObject);
-
-	List<Integer> searchIds (
-			Object search);
 
 	void beforeInsert (
 			RecordType object);

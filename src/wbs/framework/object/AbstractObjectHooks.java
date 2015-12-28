@@ -2,8 +2,6 @@ package wbs.framework.object;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.List;
-
 import wbs.framework.record.Record;
 
 public
@@ -18,18 +16,6 @@ class AbstractObjectHooks<RecordType extends Record<RecordType>>
 			Record<?> parentObject) {
 
 		// do nothing
-
-	}
-
-	@Override
-	public
-	List<Integer> searchIds (
-			Object search) {
-
-		throw new UnsupportedOperationException (
-			stringFormat (
-				"%s.searchIds (...)",
-				getClass ().getSimpleName ()));
 
 	}
 

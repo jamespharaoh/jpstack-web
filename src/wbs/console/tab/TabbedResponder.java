@@ -2,6 +2,7 @@ package wbs.console.tab;
 
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.log4j.Logger;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
@@ -167,14 +170,26 @@ class TabbedResponder
 
 			} catch (RuntimeException exception) {
 
-				// record the exception
-
 				String path =
 					joinWithoutSeparator (
 						requestContext.servletPath (),
 						requestContext.pathInfo () != null
 							? requestContext.pathInfo ()
 							: "");
+
+				// log the exception
+
+				Logger logger =
+					Logger.getLogger (
+						getClass ());
+
+				logger.warn (
+					stringFormat (
+						"Exception while reponding to: %s",
+						path),
+					exception);
+
+				// record the exception
 
 				exceptionLogger.logThrowable (
 					"console",

@@ -1,8 +1,11 @@
 package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.classForName;
+import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.presentInstances;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -96,6 +99,7 @@ class ObjectSearchPageBuilder<
 	ConsoleHelper<ObjectType> consoleHelper;
 
 	Class<?> searchClass;
+	Class<?> resultsClass;
 
 	FormFieldSet searchFormFieldSet;
 	FormFieldSet resultsFormFieldSet;
@@ -218,6 +222,9 @@ class ObjectSearchPageBuilder<
 
 					.searchClass (
 						searchClass)
+
+					.searchDaoMethodName (
+						spec.searchDaoMethodName ())
 
 					.sessionKey (
 						sessionKey)
@@ -354,6 +361,12 @@ class ObjectSearchPageBuilder<
 					.rowsFormFieldSet (
 						resultsRowsFormFieldSet)
 
+					.resultsClass (
+						resultsClass)
+
+					.resultsDaoMethodName (
+						spec.resultsDaoMethodName ())
+
 					.itemsPerPage (
 						itemsPerPage)
 
@@ -408,28 +421,8 @@ class ObjectSearchPageBuilder<
 		}
 
 		String searchClassName =
-			stringFormat (
-				"%s.%sRec$%sSearch",
-				consoleHelper
-					.objectClass ()
-					.getPackage ()
-					.getName (),
-				capitalise (
-					consoleHelper.objectName ()),
-				capitalise (
-					consoleHelper.objectName ()));
-
-		try {
-
-			searchClass =
-				Class.forName (
-					searchClassName);
-
-		} catch (ClassNotFoundException exception) {
-
-			// TODO change all to nested classes, remove the following
-
-			String alternateSearchClassName =
+			ifNull (
+				spec.searchClassName (),
 				stringFormat (
 					"%s.%sSearch",
 					consoleHelper
@@ -437,24 +430,32 @@ class ObjectSearchPageBuilder<
 						.getPackage ()
 						.getName (),
 					capitalise (
-						consoleHelper.objectName ()));
+						consoleHelper.objectName ())));
 
-			try {
+		Optional<Class<?>> searchClassOptional =
+			classForName (
+				searchClassName);
 
-				searchClass =
-					Class.forName (
-						alternateSearchClassName);
+		if (
+			isNotPresent (
+				searchClassOptional)
+		) {
 
-			} catch (ClassNotFoundException secondException) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"Search class not found: %s",
-						searchClassName));
-
-			}
+			throw new RuntimeException (
+				stringFormat (
+					"Search class not found: %s",
+					searchClassName));
 
 		}
+
+		searchClass =
+			searchClassOptional.get ();
+
+		resultsClass =
+			spec.resultsClassName () != null
+				? classForNameRequired (
+					spec.resultsClassName ())
+				: consoleHelper.objectClass ();
 
 		searchFormFieldSet =
 			consoleModule.formFieldSets ().get (

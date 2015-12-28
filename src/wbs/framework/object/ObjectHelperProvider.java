@@ -90,9 +90,6 @@ interface ObjectHelperProvider {
 	RecordType update (
 			RecordType object);
 
-	List<Integer> searchIds (
-			Object search);
-
 	<RecordType extends EphemeralRecord<?>>
 	RecordType remove (
 			RecordType object);

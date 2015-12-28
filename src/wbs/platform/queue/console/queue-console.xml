@@ -49,6 +49,17 @@
 					search-fields="queue-item-report-search"
 					results-fields="queue-item-report-results"/>
 
+				<object-search-page
+					name="user"
+					tab-label="Users"
+					object-type="queueItem"
+					search-class="wbs.platform.queue.model.QueueItemSearch"
+					search-fields="user-queue-search"
+					search-dao-method="searchUserQueueReportIds"
+					results-class="wbs.platform.queue.model.UserQueueReport"
+					results-fields="user-queue-results"
+					results-dao-method="searchUserQueueReports"/>
+
 			</section>
 
 			<context-responder-page
@@ -144,6 +155,35 @@
 		<timestamp-field
 			name="processedTime"
 			label="Processed"/>
+
+	</field-set>
+
+	<field-set
+		name="user-queue-search"
+		class="wbs.platform.queue.model.QueueItemSearch">
+
+		<timestamp-partial-field
+			name="createdTime"
+			label="Time"/>
+
+	</field-set>
+
+	<field-set
+		name="user-queue-results"
+		class="wbs.platform.queue.model.UserQueueReport">
+
+		<object-field
+			name="user"
+			object-type="user"/>
+
+		<integer-field
+			name="messageCount"/>
+
+		<timestamp-field
+			name="firstMessage"/>
+
+		<timestamp-field
+			name="lastMessage"/>
 
 	</field-set>
 

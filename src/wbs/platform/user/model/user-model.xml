@@ -52,6 +52,11 @@
 			type="group"
 			table="user_group"/>
 
+		<children-collection
+			name="processedQueueItems"
+			type="queueItem"
+			join-column="processed_user_id"/>
+
 	</collections>
 
 	<priv-types>

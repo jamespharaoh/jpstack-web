@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -2538,6 +2540,66 @@ class Misc {
 
 		return optional.or (
 			instead);
+
+	}
+
+	public static
+	Method getMethodRequired (
+			@NonNull Class<?> objectClass,
+			@NonNull String name,
+			@NonNull List<Class<?>> parameterTypes) {
+
+		try {
+
+			return objectClass.getMethod (
+				name,
+				parameterTypes.toArray (
+					new Class<?> [0]));
+
+		} catch (NoSuchMethodException exception) {
+
+			throw new RuntimeException (
+				exception);
+
+		}
+
+	}
+
+	public static
+	Object methodInvoke (
+			@NonNull Method method,
+			@NonNull Object target,
+			@NonNull List<Object> arguments) {
+
+		try {
+
+			return method.invoke (
+				target,
+				arguments.toArray ());
+
+		} catch (InvocationTargetException exception) {
+
+			Throwable targetException =
+				exception.getTargetException ();
+
+			if (targetException instanceof RuntimeException) {
+
+				throw (RuntimeException)
+					targetException;
+
+			} else {
+
+				throw new RuntimeException (
+					targetException);
+
+			}
+
+		} catch (IllegalAccessException exception) {
+
+			throw new RuntimeException (
+				exception);
+
+		}
 
 	}
 

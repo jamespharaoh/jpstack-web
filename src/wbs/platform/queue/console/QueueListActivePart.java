@@ -113,7 +113,7 @@ class QueueListActivePart
 
 		ConsoleContextType queueContextType =
 			consoleManager.contextType (
-				"queue",
+				"queue:object",
 				true);
 
 		ConsoleContext queueContext =

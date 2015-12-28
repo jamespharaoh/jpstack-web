@@ -2,14 +2,18 @@ package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.joinWithSpace;
+import static wbs.framework.utils.etc.Misc.methodInvoke;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.optionalIf;
 import static wbs.framework.utils.etc.Misc.presentInstances;
+import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +30,7 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleContext;
@@ -41,6 +46,7 @@ import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.record.IdObject;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 
@@ -76,6 +82,12 @@ class ObjectSearchResultsPart
 	FormFieldSet rowsFormFieldSet;
 
 	@Getter @Setter
+	Class<?> resultsClass;
+
+	@Getter @Setter
+	String resultsDaoMethodName;
+
+	@Getter @Setter
 	String sessionKey;
 
 	@Getter @Setter
@@ -86,8 +98,8 @@ class ObjectSearchResultsPart
 
 	// state
 
-	Record<?> currentObject;
-	List<Record<?>> objects;
+	IdObject currentObject;
+	List<IdObject> objects;
 	Integer totalObjects;
 
 	Boolean singlePage;
@@ -123,28 +135,46 @@ class ObjectSearchResultsPart
 	public
 	void prepare () {
 
+System.out.println ("PREPARE");
+
 		// current object
 
-		Integer currentObjectId =
-			(Integer)
-			requestContext.stuff (
-				consoleHelper.objectName () + "Id");
+		if (
+			equal (
+				consoleHelper.objectClass (),
+				resultsClass)
+		) {
 
-		if (currentObjectId != null) {
+			Integer currentObjectId =
+				(Integer)
+				requestContext.stuff (
+					consoleHelper.objectName () + "Id");
 
-			currentObject =
-				consoleHelper.find (
-					currentObjectId);
+			if (currentObjectId != null) {
+
+				currentObject =
+					consoleHelper.find (
+						currentObjectId);
+
+			}
 
 		}
+
+		// set search object
+
+		Object searchObject =
+			requiredValue (
+				requestContext.session (
+					sessionKey + "Fields"));
 
 		// get search results for page
 
 		@SuppressWarnings ("unchecked")
 		List<Integer> allObjectIds =
 			(List<Integer>)
-			requestContext.session (
-				sessionKey + "Results");
+			requiredValue (
+				requestContext.session (
+					sessionKey + "Results"));
 
 		totalObjects =
 			allObjectIds.size ();
@@ -184,17 +214,49 @@ class ObjectSearchResultsPart
 
 		// load objects
 
-		objects =
-			new ArrayList<Record<?>> ();
-
-		for (
-			Integer objectId
-				: pageObjectIds
+		if (
+			isNotNull (
+				resultsDaoMethodName)
 		) {
 
-			objects.add (
-				consoleHelper.find (
-					objectId));
+			Method method =
+				getMethodRequired (
+					consoleHelper.getClass (),
+					resultsDaoMethodName,
+					ImmutableList.<Class<?>>of (
+						searchObject.getClass (),
+						List.class));
+
+			@SuppressWarnings ("unchecked")
+			List<IdObject> objectsTemp =
+				(List<IdObject>)
+				methodInvoke (
+					method,
+					consoleHelper,
+					ImmutableList.<Object>of (
+						searchObject,
+						pageObjectIds));
+
+			objects =
+				objectsTemp;
+
+System.out.println ("PR2");
+
+		} else {
+
+			objects =
+				new ArrayList<IdObject> ();
+
+			for (
+				Integer objectId
+					: pageObjectIds
+			) {
+
+				objects.add (
+					consoleHelper.find (
+						objectId));
+
+			}
 
 		}
 
@@ -335,7 +397,7 @@ class ObjectSearchResultsPart
 			new LocalDate (0);
 
 		for (
-			Record<?> object
+			IdObject object
 				: objects
 		) {
 
@@ -353,7 +415,15 @@ class ObjectSearchResultsPart
 
 			}
 
-			if (! consoleHelper.canView (object)) {
+			if (
+
+				object instanceof Record
+
+				&& ! consoleHelper.canView (
+					(Record<?>)
+					object)
+
+			)  {
 
 				printFormat (
 					"<tr>\n",
@@ -367,7 +437,15 @@ class ObjectSearchResultsPart
 
 			}
 
-			if (consoleHelper.event ()) {
+			if (
+
+				equal (
+					consoleHelper.objectClass (),
+					resultsClass)
+
+				&& consoleHelper.event ()
+
+			) {
 
 				Instant rowTimestamp;
 
@@ -444,34 +522,45 @@ class ObjectSearchResultsPart
 
 			}
 
-			printFormat (
-				"<tr",
+			if (object instanceof Record) {
 
-				" class=\"%h\"",
-				joinWithSpace (
-					presentInstances (
-						Optional.of (
-							"magic-table-row"),
-						Optional.of (
-							stringFormat (
-								"search-result-%s",
-								object.getId ())),
-						optionalIf (
-							object == currentObject,
-							"selected"),
-						consoleHelper.getListClass (
-							object))),
+				printFormat (
+					"<tr",
 
-				" data-rows-class=\"%h\"",
-				stringFormat (
-					"search-result-%s",
-					object.getId ()),
+					" class=\"%h\"",
+					joinWithSpace (
+						presentInstances (
+							Optional.of (
+								"magic-table-row"),
+							Optional.of (
+								stringFormat (
+									"search-result-%s",
+									object.getId ())),
+							optionalIf (
+								object == currentObject,
+								"selected"),
+							consoleHelper.getListClass (
+								(Record<?>)
+								object))),
 
-				" data-target-href=\"%h\"",
-				objectUrl (
-					object),
+					" data-rows-class=\"%h\"",
+					stringFormat (
+						"search-result-%s",
+						object.getId ()),
 
-				">\n");
+					" data-target-href=\"%h\"",
+					objectUrl (
+						(Record<?>)
+						object),
+
+					">\n");
+
+			} else {
+
+				printFormat (
+					"<tr>\n");
+
+			}
 
 			formFieldLogic.outputTableCellsList (
 				formatWriter,
@@ -493,27 +582,41 @@ class ObjectSearchResultsPart
 					" class=\"%h\"",
 					joinWithSpace (
 						presentInstances (
-							Optional.of (
-								"magic-table-row"),
-							Optional.of (
-								stringFormat (
-									"search-result-%s",
-									object.getId ())),
-							optionalIf (
-								object == currentObject,
-								"selected"),
-							consoleHelper.getListClass (
-								object))),
+
+						Optional.of (
+							"magic-table-row"),
+
+						Optional.of (
+							stringFormat (
+								"search-result-%s",
+								object.getId ())),
+
+						optionalIf (
+							object == currentObject,
+							"selected"),
+
+						object instanceof Record
+							? consoleHelper.getListClass (
+								(Record<?>)
+								object)
+							: Optional.<String>absent ())),
 
 					" data-rows-class=\"%h\"",
 					stringFormat (
 						"search-result-%s",
-						object.getId ()),
+						object.getId ()));
 
-					" data-target-href=\"%h\"",
-					objectUrl (
-						object),
+				if (object instanceof Record) {
 
+					printFormat (
+						" data-target-href=\"%h\"",
+						objectUrl (
+							(Record<?>)
+							object));
+
+				}
+
+				printFormat (
 					">\n");
 
 				formFieldLogic.outputTableRowsList (

@@ -94,7 +94,7 @@ class DevopsScript
 				[
 					"cd #{@deployment_project_path}",
 					"ant console-live",
-					"./service tomcat_console restart",
+					"sudo restart #{@config_services["console"]}",
 				].join(" && ")
 
 		when "api-auto"
@@ -106,7 +106,7 @@ class DevopsScript
 				[
 					"cd #{@deployment_project_path}",
 					"ant api-live",
-					"./service tomcat_api restart",
+					"sudo restart #{@config_services["api"]}",
 				].join(" && ")
 
 		when "daemon-auto"
@@ -118,7 +118,7 @@ class DevopsScript
 				[
 					"cd #{@deployment_project_path}",
 					"ant build",
-					"./service daemon restart",
+					"sudo restart #{@config_services["daemon"]}",
 				].join(" && ")
 
 		when "clean"
@@ -139,7 +139,7 @@ class DevopsScript
 
 			ssh \
 				"-t",
-				"rm -rf #{@deployment_path}/work/live/console"
+				"echo rm -rf #{@deployment_path}/work/live/console"
 
 			;;
 

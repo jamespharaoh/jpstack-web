@@ -12,8 +12,10 @@ import lombok.NonNull;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
@@ -23,6 +25,7 @@ import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemSearch;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
+import wbs.platform.queue.model.UserQueueReport;
 import wbs.platform.user.model.UserRec;
 
 public
@@ -32,7 +35,7 @@ class QueueItemDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
+	Criteria searchCriteria (
 			@NonNull QueueItemSearch search) {
 
 		Criteria criteria =
@@ -111,6 +114,23 @@ class QueueItemDaoHibernate
 						new Criterion [] {})));
 
 		}
+
+		return criteria;
+
+	}
+
+	@Override
+	public
+	List<Integer> searchIds (
+			@NonNull QueueItemSearch search) {
+
+		Criteria criteria =
+			searchCriteria (
+				search);
+
+		criteria.addOrder (
+			Order.desc (
+				"_queueItem.createdTime"));
 
 		criteria.setProjection (
 			Projections.id ());
@@ -266,6 +286,100 @@ class QueueItemDaoHibernate
 				processedTimeInterval.getEnd ().toDate ())
 
 			.list ());
+
+	}
+
+	@Override
+	public
+	Criteria searchUserQueueReportCriteria (
+			@NonNull QueueItemSearch search) {
+
+		Criteria criteria =
+			searchCriteria (
+				search);
+
+		criteria.setProjection (
+			Projections.projectionList ()
+
+			.add (
+				Projections.property (
+					"_queueItem.processedUser"),
+				"user")
+
+			.add (
+				Projections.count (
+					"_queueItem.id"),
+				"messageCount")
+
+			.add (
+				Projections.min (
+					"_queueItem.createdTime"),
+				"firstMessage")
+
+			.add (
+				Projections.max (
+					"_queueItem.createdTime"),
+				"lastMessage")
+
+			.add (
+				Projections.groupProperty (
+					"_queueItem.processedUser"))
+
+		);
+
+		criteria.setResultTransformer (
+			Transformers.aliasToBean (
+				UserQueueReport.class));
+
+		return criteria;
+
+	}
+
+	@Override
+	public
+	List<Integer> searchUserQueueReportIds (
+			@NonNull QueueItemSearch search) {
+
+		Criteria criteria =
+			searchCriteria (
+				search);
+
+		criteria.setProjection (
+			Projections.distinct (
+				Projections.property (
+					"_queueItem.processedUser.id")));
+
+		return findMany (
+			Integer.class,
+			criteria.list ());
+
+	}
+
+	@Override
+	public
+	List<UserQueueReport> searchUserQueueReports (
+			@NonNull QueueItemSearch search,
+			@NonNull List<Integer> objectIds) {
+
+System.out.println ("A " + objectIds.size ());
+
+		Criteria criteria =
+			searchUserQueueReportCriteria (
+				search);
+
+System.out.println ("B");
+
+		criteria.add (
+			Restrictions.in (
+				"_processedUser.id",
+				objectIds));
+
+System.out.println ("C");
+
+		return findOrdered (
+			UserQueueReport.class,
+			objectIds,
+			criteria.list ());
 
 	}
 

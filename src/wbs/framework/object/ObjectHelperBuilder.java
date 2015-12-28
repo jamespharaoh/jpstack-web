@@ -2,6 +2,7 @@ package wbs.framework.object;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -1089,14 +1090,16 @@ class ObjectHelperBuilder {
 					@NonNull Object search) {
 
 				List<Integer> objectIds =
-					objectHelperProvider.searchIds (
+					searchIds (
 						search);
 
 				ImmutableList.Builder<Record<?>> objectsBuilder =
 					ImmutableList.builder ();
 
-				for (Integer objectId
-						: objectIds) {
+				for (
+					Integer objectId
+						: objectIds
+				) {
 
 					objectsBuilder.add (
 						find (
@@ -1113,8 +1116,48 @@ class ObjectHelperBuilder {
 			List<Integer> searchIds (
 					@NonNull Object search) {
 
-				return objectHelperProvider.searchIds (
-					search);
+				Method searchIdsMethod =
+					getMethodRequired (
+						daoImplementation.getClass (),
+						"searchIds",
+						ImmutableList.<Class<?>>of (
+							search.getClass ()));
+
+				try {
+
+					@SuppressWarnings ("unchecked")
+					List<Integer> objectIds =
+						(List<Integer>)
+						searchIdsMethod.invoke (
+							daoImplementation,
+							search);
+
+					return objectIds;
+
+				} catch (InvocationTargetException exception) {
+
+					Throwable targetException =
+						exception.getTargetException ();
+
+					if (targetException instanceof RuntimeException) {
+
+						throw
+							(RuntimeException)
+							targetException;
+
+					} else {
+
+						throw new RuntimeException (
+							exception);
+
+					}
+
+				} catch (IllegalAccessException exception) {
+
+					throw new RuntimeException (
+						exception);
+
+				}
 
 			}
 

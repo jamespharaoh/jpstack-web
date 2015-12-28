@@ -103,10 +103,13 @@ class QueueItemUserStatsProvider
 			Record<?> parent =
 				objectManager.getParent (queue);
 
-			if (! privChecker.can (
+			if (
+				! privChecker.can (
 					parent,
-					"supervisor"))
+					"supervisor")
+			) {
 				continue;
+			}
 
 			int hour =
 				statsPeriod.assign (

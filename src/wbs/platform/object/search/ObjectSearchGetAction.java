@@ -1,5 +1,8 @@
 package wbs.platform.object.search;
 
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -52,17 +55,43 @@ class ObjectSearchGetAction
 	protected
 	Responder goReal () {
 
+		Object searchObject =
+			requestContext.session (
+				sessionKey + "Fields");
+
 		List<?> objectIds =
 			(List<?>)
 			requestContext.session (
 				sessionKey + "Results");
 
-		if (objectIds == null) {
+System.out.println (
+	stringFormat (
+		"X0 %s, %s",
+		searchObject == null ? "NULL" : "NOT NULL",
+		objectIds == null ? "NULL" : "NOT NULL"));
+
+		if (
+
+			isNull (
+				searchObject)
+
+			|| isNull (
+				objectIds)
+
+		) {
+
+			requestContext.session (
+				sessionKey + "Results",
+				null);
+
+System.out.println ("X1");
 
 			return responder (
 				searchResponderName);
 
 		} else {
+
+System.out.println ("X2 " + objectIds.size ());
 
 			return responder (
 				searchResultsResponderName);

@@ -1,5 +1,8 @@
 package wbs.console.priv;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -8,6 +11,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.request.ConsoleRequestContext;
@@ -105,8 +109,8 @@ class PrivCheckerImplementation
 	@Override
 	public
 	boolean can (
-			Record<?> parentObject,
-			String... privCodes) {
+			@NonNull Record<?> parentObject,
+			@NonNull String... privCodes) {
 
 		int parentObjectTypeId =
 			userPrivData.coreGetObjectTypeId (
@@ -161,17 +165,30 @@ class PrivCheckerImplementation
 
 			}
 
-			if (privCodes != null
-					&& userPrivData.canList (
-						parentObjectId,
-						privCodes))
-				return true;
+			if (
 
-			if (privCodes == null
-					&& userPrivData.canList (
-						parentObjectId,
-						Collections.<String>emptyList ()))
+				isNotNull (
+					privCodes)
+
+				&& userPrivData.canList (
+					parentObjectId,
+					privCodes)
+
+			) {
 				return true;
+			}
+
+			if (
+
+				isNull (
+					privCodes)
+
+				&& userPrivData.canList (
+					parentObjectId,
+					Collections.<String>emptyList ())
+			) {
+				return true;
+			}
 
 		}
 
@@ -185,10 +202,18 @@ class PrivCheckerImplementation
 			int privId) {
 
 		Integer managePrivId =
-			userPrivData.sharedData.managePrivIds.get (privId);
+			userPrivData.sharedData.managePrivIds.get (
+				privId);
 
-		return managePrivId != null
-			&& userPrivData.canChain (managePrivId);
+		return (
+
+			isNotNull (
+				managePrivId)
+
+			&& userPrivData.canChain (
+				managePrivId)
+
+		);
 
 	}
 

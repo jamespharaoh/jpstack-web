@@ -12,7 +12,7 @@
 			name="recentUsers"
 			tab-label="Recent users"
 			object-type="chatUser"
-			search-class="user.core.model.ChatUserSearch"
+			search-class="wbs.clients.apn.chat.user.core.model.ChatUserSearch"
 			search-fields="recent-user-search"
 			results-fields="recent-user-results"/>
 

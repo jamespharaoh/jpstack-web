@@ -1,5 +1,9 @@
 package wbs.framework.hibernate;
 
+import static wbs.framework.utils.etc.Misc.isNull;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -8,6 +12,8 @@ import org.hibernate.Criteria;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.Session;
+
+import wbs.framework.record.IdObject;
 
 public abstract
 class HibernateDao {
@@ -200,6 +206,92 @@ class HibernateDao {
 			(List<Record>) list;
 
 		return ret;
+
+	}
+
+	protected <RowType extends IdObject>
+	List<RowType> findOrdered (
+			Class<RowType> rowTypeClass,
+			List<Integer> objectIds,
+			List<?> unorderedList) {
+
+System.out.println ("D");
+
+		HashMap<Integer,RowType> indexedList =
+			new HashMap<Integer,RowType> ();
+
+System.out.println ("E");
+
+		for (
+			int index = 0;
+			index < unorderedList.size ();
+			index ++
+		) {
+
+System.out.println ("F");
+
+			RowType object =
+				rowTypeClass.cast (
+					unorderedList.get (
+						index));
+
+			if (
+				isNull (
+					object)
+			) {
+
+				throw new RuntimeException ();
+
+			}
+
+			Integer objectId =
+				object.getId ();
+
+			indexedList.put (
+				objectId,
+				object);
+
+System.out.println ("G");
+
+		}
+
+System.out.println ("H");
+
+		List<RowType> orderedList =
+			new ArrayList<RowType> ();
+
+System.out.println ("I");
+
+		for (
+			Integer objectId
+				: objectIds
+		) {
+
+System.out.println ("J");
+
+			RowType object =
+				indexedList.get (
+					objectId);
+
+			if (
+				isNull (
+					object)
+			) {
+
+				throw new RuntimeException ();
+
+			}
+
+			orderedList.add (
+				object);
+
+System.out.println ("K");
+
+		}
+
+System.out.println ("L " + orderedList);
+
+		return orderedList;
 
 	}
 

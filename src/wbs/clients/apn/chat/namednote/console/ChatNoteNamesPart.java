@@ -66,8 +66,10 @@ class ChatNoteNamesPart
 			"<th>Options</th>\n",
 			"</tr>\n");
 
-		for (ChatNoteNameRec noteName
-				: noteNames) {
+		for (
+			ChatNoteNameRec noteName
+				: noteNames
+		) {
 
 			printFormat (
 				"<tr>\n");
@@ -86,50 +88,55 @@ class ChatNoteNamesPart
 				"></td>\n");
 
 			printFormat (
-				"<td>%s</td>\n",
+				"<td><input",
+				" type=\"submit\"",
+				" name=\"noteMoveUp%d\"",
+				noteName.getId (),
+				" value=\"&uarr;\"",
+				">\n");
 
-				stringFormat (
-					"<input",
-					" type=\"submit\"",
-					" name=\"noteMoveUp%d\"",
-					noteName.getId (),
-					" value=\"&uarr;\"",
-					">",
+			printFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"noteMoveDown%d\"",
+				noteName.getId (),
+				" value=\"&darr;\"",
+				">\n");
 
-					"<input",
-					" type=\"submit\"",
-					" name=\"noteMoveDown%d\"",
-					noteName.getId (),
-					" value=\"&darr;\"",
-					">",
+			printFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"noteDelete%d\"",
+				noteName.getId (),
+				" value=\"&times;\"",
+				"></td>\n");
 
-					"<input",
-					" type=\"submit\"",
-					" name=\"noteDelete%d\"",
-					noteName.getId (),
-					" value=\"&times;\"",
-					">"),
-
+			printFormat (
 				"</tr>\n");
 
 		}
 
 		printFormat (
-			"<tr>\n",
+			"<tr>\n");
 
+		printFormat (
 			"<td><input",
 			" type=\"text\"",
 			" name=\"noteNameNew\"",
 			" value=\"%h\"",
-			requestContext.getForm ("noteNameNew"),
-			"></td>\n",
+			requestContext.getForm (
+				"noteNameNew",
+				""),
+			"></td>\n");
 
+		printFormat (
 			"<td><input",
 			" type=\"submit\"",
 			" name=\"saveChanges\"",
 			" value=\"add new\"",
-			"></td>\n",
+			"></td>\n");
 
+		printFormat (
 			"</tr>\n");
 
 		printFormat (
