@@ -1987,6 +1987,18 @@ class Misc {
 
 	}
 
+	public static <Type>
+	Optional<Type> requiredOptional (
+			@NonNull Optional<Type> optional) {
+
+		if (! optional.isPresent ()) {
+			throw new RuntimeException ();
+		}
+
+		return optional;
+
+	}
+
 	public static
 	boolean doesNotImplement (
 			@NonNull Class<?> subjectClass,

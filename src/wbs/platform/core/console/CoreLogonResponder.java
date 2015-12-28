@@ -1,11 +1,14 @@
 package wbs.platform.core.console;
 
 import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isPresent;
 
 import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
@@ -16,6 +19,8 @@ import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.record.GlobalId;
+import wbs.platform.scaffold.console.SliceConsoleHelper;
+import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
 
@@ -30,10 +35,17 @@ class CoreLogonResponder
 	ConsoleRequestContext requestContext;
 
 	@Inject
+	SliceConsoleHelper sliceHelper;
+
+	@Inject
 	UserConsoleHelper userHelper;
 
 	@Inject
 	WbsConfig wbsConfig;
+
+	// state
+
+	Optional<SliceRec> slice;
 
 	// details
 
@@ -42,8 +54,6 @@ class CoreLogonResponder
 	String getTitle () {
 		return wbsConfig.consoleTitle ();
 	}
-
-	// implementation
 
 	@Override
 	protected
@@ -62,6 +72,36 @@ class CoreLogonResponder
 					"/js/login.js"))
 
 			.build ();
+
+	}
+
+	// implementation
+
+	@Override
+	protected
+	void prepare () {
+
+		Optional<String> sliceCode =
+			requestContext.header (
+				"x-wbs-slice");
+
+		if (
+			isPresent (
+				sliceCode)
+		) {
+
+			slice =
+				Optional.of (
+					sliceHelper.findByCode (
+						GlobalId.root,
+						sliceCode.get ()));
+
+		} else {
+
+			slice =
+				Optional.<SliceRec>absent ();
+
+		}
 
 	}
 
@@ -152,26 +192,48 @@ class CoreLogonResponder
 			" method=\"post\"",
 			">\n");
 
+		if (
+			isPresent (
+				slice)
+		) {
+
+			printFormat (
+				"<input",
+				" type=\"hidden\"",
+				" name=\"slice\"",
+				" value=\"%h\"",
+				slice.get ().getCode (),
+				">\n");
+
+		}
+
 		printFormat (
 			"<table class=\"details\">\n");
 
-		printFormat (
-			"<tr>\n",
+		if (
+			isNotPresent (
+				slice)
+		) {
 
-			"<th>Slice</th>\n",
+			printFormat (
+				"<tr>\n",
 
-			"<td><input",
-			" class=\"slice-input\"",
-			" type=\"text\"",
-			" name=\"slice\"",
-			" value=\"%h\"",
-			requestContext.parameter (
-				"slice",
-				wbsConfig.defaultSlice ()),
-			" size=\"32\"",
-			"></td>\n",
+				"<th>Slice</th>\n",
 
-			"</tr>\n");
+				"<td><input",
+				" class=\"slice-input\"",
+				" type=\"text\"",
+				" name=\"slice\"",
+				" value=\"%h\"",
+				requestContext.parameter (
+					"slice",
+					wbsConfig.defaultSlice ()),
+				" size=\"32\"",
+				"></td>\n",
+
+				"</tr>\n");
+
+		}
 
 		printFormat (
 			"<tr>\n",

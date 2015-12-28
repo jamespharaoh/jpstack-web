@@ -1,7 +1,6 @@
 $(function () {
 
 	var cookieName = "txt2_console";
-	var cookieDomain = "txtit.com";
 	var cookieDuration = 365;
 
 	var idCounter = 0;
@@ -78,11 +77,7 @@ $(function () {
 		Cookies.set (
 			cookieName,
 			consoleSelected,
-			{
-				domain: cookieDomain,
-				expires: cookieDuration,
-			}
-		);
+			{ expires: cookieDuration });
 
 	}
 
