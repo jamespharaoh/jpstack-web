@@ -53,7 +53,11 @@ class QueueItemDaoHibernate
 
 			.createAlias (
 				"_queueItem.processedUser",
-				"_processedUser");
+				"_processedUser")
+
+			.createAlias (
+				"_processedUser.slice",
+				"_processedUserSlice");
 
 		if (
 			isNotNull (
@@ -345,12 +349,36 @@ class QueueItemDaoHibernate
 				search);
 
 		criteria.setProjection (
-			Projections.distinct (
-				Projections.property (
-					"_queueItem.processedUser.id")));
+			Projections.projectionList ()
 
-		return findMany (
-			Integer.class,
+			.add (
+				Projections.distinct (
+					Projections.property (
+						"_queueItem.processedUser.id")))
+
+			.add (
+				Projections.groupProperty (
+					"_queueItem.processedUser"))
+
+			.add (
+				Projections.groupProperty (
+					"_processedUserSlice.code"))
+
+			.add (
+				Projections.groupProperty (
+					"_processedUser.username"))
+
+		);
+
+		criteria.addOrder (
+			Order.asc (
+				"_processedUserSlice.code"));
+
+		criteria.addOrder (
+			Order.asc (
+				"_processedUser.username"));
+
+		return findIdsOnly (
 			criteria.list ());
 
 	}
@@ -361,20 +389,14 @@ class QueueItemDaoHibernate
 			@NonNull QueueItemSearch search,
 			@NonNull List<Integer> objectIds) {
 
-System.out.println ("A " + objectIds.size ());
-
 		Criteria criteria =
 			searchUserQueueReportCriteria (
 				search);
-
-System.out.println ("B");
 
 		criteria.add (
 			Restrictions.in (
 				"_processedUser.id",
 				objectIds));
-
-System.out.println ("C");
 
 		return findOrdered (
 			UserQueueReport.class,
