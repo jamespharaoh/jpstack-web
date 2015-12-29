@@ -204,6 +204,7 @@
       <fileset dir="src/wbs/clients/apn/chat/approval/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/bill/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/broadcast/console/files"/>
+      <fileset dir="src/wbs/clients/apn/chat/category/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/contact/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/date/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/graphs/console/files"/>
@@ -376,6 +377,7 @@
       <fileset dir="src/wbs/clients/apn/chat/approval/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/bill/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/broadcast/api/files"/>
+      <fileset dir="src/wbs/clients/apn/chat/category/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/contact/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/date/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/graphs/api/files"/>
@@ -429,11 +431,11 @@
     <mkdir dir="temp"/>
     <exec failonerror="true" dir="temp" executable="tar">
       <arg line="--extract"/>
-      <arg line="--file ../binaries/packages/apache-tomcat-6.0.37.tar.gz"/>
+      <arg line="--file ../binaries/packages/apache-tomcat-7.0.67.tar.gz"/>
     </exec>
     <delete dir="work/live/tomcat/**"/>
-    <move file="temp/apache-tomcat-6.0.37" tofile="work/live/tomcat"/>
-    <copy file="console/server-live.xml" tofile="work/live/tomcat/conf/server.xml"/>
+    <move file="temp/apache-tomcat-7.0.67" tofile="work/live/tomcat"/>
+    <copy file="console/server-live.xml" tofile="work/live/tomcat/conf/server.xml" overwrite="true"/>
     <copy file="conf/tomcat-users.xml" tofile="work/live/tomcat/conf/tomcat-users.xml"/>
     <delete dir="work/live/tomcat/apps/console/ROOT"/>
     <copy todir="work/live/tomcat/apps/console/ROOT">
@@ -582,6 +584,7 @@
       <fileset dir="src/wbs/clients/apn/chat/approval/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/bill/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/broadcast/console/files"/>
+      <fileset dir="src/wbs/clients/apn/chat/category/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/contact/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/date/console/files"/>
       <fileset dir="src/wbs/clients/apn/chat/graphs/console/files"/>
@@ -754,6 +757,7 @@
       <fileset dir="src/wbs/clients/apn/chat/approval/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/bill/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/broadcast/api/files"/>
+      <fileset dir="src/wbs/clients/apn/chat/category/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/contact/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/date/api/files"/>
       <fileset dir="src/wbs/clients/apn/chat/graphs/api/files"/>
@@ -807,11 +811,11 @@
     <mkdir dir="temp"/>
     <exec failonerror="true" dir="temp" executable="tar">
       <arg line="--extract"/>
-      <arg line="--file ../binaries/packages/apache-tomcat-6.0.37.tar.gz"/>
+      <arg line="--file ../binaries/packages/apache-tomcat-7.0.67.tar.gz"/>
     </exec>
     <delete dir="work/test/tomcat/**"/>
-    <move file="temp/apache-tomcat-6.0.37" tofile="work/test/tomcat"/>
-    <copy file="console/server-test.xml" tofile="work/test/tomcat/conf/server.xml"/>
+    <move file="temp/apache-tomcat-7.0.67" tofile="work/test/tomcat"/>
+    <copy file="console/server-test.xml" tofile="work/test/tomcat/conf/server.xml" overwrite="true"/>
     <copy file="conf/tomcat-users.xml" tofile="work/test/tomcat/conf/tomcat-users.xml"/>
     <delete dir="work/test/tomcat/apps/console/ROOT"/>
     <copy todir="work/test/tomcat/apps/console/ROOT">

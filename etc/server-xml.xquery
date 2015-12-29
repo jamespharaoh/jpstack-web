@@ -4,6 +4,7 @@
 		className="org.apache.catalina.core.AprLifecycleListener"
 		SSLEngine="on"/>
 
+	<!--
 	<Listener
 		className="org.apache.catalina.core.JasperListener"/>
 
@@ -12,6 +13,7 @@
 
 	<Listener
 		className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"/>
+	-->
 
 	<GlobalNamingResources>
 

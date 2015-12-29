@@ -242,6 +242,13 @@ writeBuildFile world = do
 			sattr "tofile" tofile
 		] []
 
+	let makeCopyFileToFileOverwrite file tofile =
+		mkelem "copy" [
+			sattr "file" file,
+			sattr "tofile" tofile,
+			sattr "overwrite" "true"
+		] []
+
 	let makeMoveFileToFile file tofile =
 		mkelem "move" [
 			sattr "file" file,
@@ -459,15 +466,15 @@ writeBuildFile world = do
 
 			makeExecDir "temp" "tar" [
 				makeArgLine "--extract",
-				makeArgLine "--file ../binaries/packages/apache-tomcat-6.0.37.tar.gz"
+				makeArgLine "--file ../binaries/packages/apache-tomcat-7.0.67.tar.gz"
 			],
 
 			makeDeleteDir $ tomcatDir ++ "/**",
-			makeMoveFileToFile "temp/apache-tomcat-6.0.37" tomcatDir,
+			makeMoveFileToFile "temp/apache-tomcat-7.0.67" tomcatDir,
 
 			-- configure tomcat
 
-			makeCopyFileToFile
+			makeCopyFileToFileOverwrite
 				("console/server-" ++ env ++ ".xml")
 				(tomcatDir ++ "/conf/server.xml"),
 
