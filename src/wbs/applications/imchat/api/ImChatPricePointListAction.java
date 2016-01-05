@@ -2,12 +2,15 @@ package wbs.applications.imchat.api;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatPricePointObjectHelper;
@@ -79,7 +82,30 @@ class ImChatPricePointListAction
 				imChat);
 
 		Collections.sort (
-			pricePoints);
+			pricePoints,
+			new Comparator<ImChatPricePointRec> () {
+
+			@Override
+			public
+			int compare (
+					ImChatPricePointRec left,
+					ImChatPricePointRec right) {
+
+				return new CompareToBuilder ()
+
+					.append (
+						left.getOrder (),
+						right.getOrder ())
+
+					.append (
+						left.getCode (),
+						right.getCode ())
+
+					.toComparison ();
+
+			}
+
+		});
 
 		// create response
 
@@ -101,7 +127,9 @@ class ImChatPricePointListAction
 		}
 
 		return jsonResponderProvider.get ()
-			.value (pricePointDatas);
+
+			.value (
+				pricePointDatas);
 
 	}
 

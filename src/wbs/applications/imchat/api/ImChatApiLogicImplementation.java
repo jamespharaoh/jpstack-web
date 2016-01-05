@@ -62,10 +62,10 @@ class ImChatApiLogicImplementation
 					pricePoint.getCode ()))
 
 			.name (
-				pricePoint.getName ())
+				pricePoint.getPublicName ())
 
 			.description (
-				pricePoint.getDescription ())
+				pricePoint.getPublicDescription ())
 
 			.priceString (
 				currencyLogic.formatText (

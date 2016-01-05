@@ -1116,12 +1116,26 @@ class ObjectHelperBuilder {
 			List<Integer> searchIds (
 					@NonNull Object search) {
 
+				Class<?> searchClass;
+
+				if (search instanceof Map) {
+
+					searchClass =
+						Map.class;
+
+				} else {
+
+					searchClass =
+						search.getClass ();
+
+				}
+
 				Method searchIdsMethod =
 					getMethodRequired (
 						daoImplementation.getClass (),
 						"searchIds",
 						ImmutableList.<Class<?>>of (
-							search.getClass ()));
+							searchClass));
 
 				try {
 

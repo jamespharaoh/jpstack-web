@@ -60,6 +60,17 @@
 		<name-field/>
 		<description-field/>
 
+		<currency-field
+			name="price"
+			currency="imChat.currency"/>
+
+		<currency-field
+			name="value"
+			currency="imChat.currency"/>
+
+		<integer-field
+			name="order"/>
+
 	</field-set>
 
 	<field-set
@@ -69,23 +80,22 @@
 		<name-field/>
 		<description-field/>
 
+		<text-field
+			name="publicName"/>
+
+		<text-field
+			name="publicDescription"/>
+
 		<currency-field
 			name="price"
-			currency="imChat.currency"
-			nullable="yes"/>
+			currency="imChat.currency"/>
 
 		<currency-field
 			name="value"
-			currency="imChat.currency"
-			nullable="yes"/>
+			currency="imChat.currency"/>
 
-	</field-set>
-
-	<field-set
-		name="results"
-		object-name="imChatPricePoint">
-
-		<code-field/>
+		<integer-field
+			name="order"/>
 
 	</field-set>
 
@@ -100,15 +110,22 @@
 		<description-field/>
 		<deleted-field/>
 
+		<text-field
+			name="publicName"/>
+
+		<text-field
+			name="publicDescription"/>
+
 		<currency-field
 			name="price"
-			currency="imChat.currency"
-			nullable="yes"/>
+			currency="imChat.currency"/>
 
 		<currency-field
 			name="value"
-			currency="imChat.currency"
-			nullable="yes"/>
+			currency="imChat.currency"/>
+
+		<integer-field
+			name="order"/>
 
 	</field-set>
 
@@ -120,15 +137,22 @@
 		<description-field/>
 		<deleted-field/>
 
+		<text-field
+			name="publicName"/>
+
+		<text-field
+			name="publicDescription"/>
+
 		<currency-field
 			name="price"
-			currency="imChat.currency"
-			nullable="yes"/>
+			currency="imChat.currency"/>
 
 		<currency-field
 			name="value"
-			currency="imChat.currency"
-			nullable="yes"/>
+			currency="imChat.currency"/>
+
+		<integer-field
+			name="order"/>
 
 	</field-set>
 

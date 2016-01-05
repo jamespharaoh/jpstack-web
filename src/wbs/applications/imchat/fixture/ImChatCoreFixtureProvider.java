@@ -273,11 +273,20 @@ class ImChatCoreFixtureProvider
 			.setDescription (
 				"Basic credit package")
 
+			.setPublicName (
+				"Basic")
+
+			.setPublicDescription (
+				"Basic credit package")
+
 			.setPrice (
 				599)
 
 			.setValue (
 				600)
+
+			.setOrder (
+				1)
 
 		);
 
@@ -296,11 +305,20 @@ class ImChatCoreFixtureProvider
 			.setDescription (
 				"Saver credit offer")
 
+			.setPublicName (
+				"Saver")
+
+			.setPublicDescription (
+				"Saver credit offer")
+
 			.setPrice (
 				1099)
 
 			.setValue (
 				1200)
+
+			.setOrder (
+				2)
 
 		);
 
@@ -319,11 +337,20 @@ class ImChatCoreFixtureProvider
 			.setDescription (
 				"Super saver credit offer")
 
+			.setPublicName (
+				"Super saver")
+
+			.setPublicDescription (
+				"Super saver credit offer")
+
 			.setPrice (
 				1499)
 
 			.setValue (
 				1800)
+
+			.setOrder (
+				3)
 
 		);
 
