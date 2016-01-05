@@ -2,27 +2,9 @@
 	<library name="activation" type="jar" version="1.1"/>
 	<library name="ant" type="jar" version="1.9.2" source="yes"/>
 	<library name="ant-launcher" type="jar" version="1.9.2"/>
-	<library name="antlr" type="jar" version="2.7.5H3"/>
 	<library name="antlr" type="jar" version="2.7.7"/>
-	<library name="aopalliance" type="jar" version="1.0"/>
-	<library name="asm-analysis" type="jar" version="4.0"/>
-	<library name="asm-commons" type="jar" version="4.0"/>
-	<library name="asm" type="jar" version="3.1"/>
-	<library name="asm" type="jar" version="4.0"/>
-	<library name="asm-tree" type="jar" version="4.0"/>
-	<library name="asm-util" type="jar" version="4.0"/>
-	<library name="aspectjweaver" type="jar" version="1.7.2"/>
-	<library name="backport-util-concurrent" type="jar" version="3.0"/>
-	<library name="bsh" type="jar" version="2.0b4"/>
-	<library name="c3p0" type="jar" version="0.9.1.2"/>
-	<library name="cglib" type="jar" version="2.2"/>
-	<library name="classmate" type="bundle" version="0.5.2"/>
-	<library name="commons-cli" type="jar" version="1.2"/>
 	<library name="commons-codec" type="jar" version="1.6"/>
-	<library name="commons-collections" type="jar" version="3.1"/>
-	<library name="commons-collections" type="jar" version="3.2"/>
 	<library name="commons-fileupload" type="jar" version="1.3" source="yes"/>
-	<library name="commons-httpclient" type="jar" version="3.1"/>
 	<library name="commons-io" type="jar" version="2.2"/>
 	<library name="commons-lang3" type="jar" version="3.2.1" source="yes"/>
 	<library name="commons-logging" type="jar" version="1.1.3"/>

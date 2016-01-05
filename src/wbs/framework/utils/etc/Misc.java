@@ -60,9 +60,10 @@ class Misc {
 		// never instantiated
 	}
 
+	@SafeVarargs
 	public static
 	<Type> Type ifNull (
-			Type... values) {
+			@NonNull Type... values) {
 
 		for (Type value : values) {
 
@@ -535,10 +536,11 @@ class Misc {
 
 	}
 
+	@SafeVarargs
 	public static <Type>
 	boolean in (
-			Type left,
-			Type... rights) {
+			@NonNull Type left,
+			@NonNull Type... rights) {
 
 		for (
 			Type right
@@ -583,6 +585,7 @@ class Misc {
 
 	}
 
+	@SafeVarargs
 	public static <Type>
 	boolean notIn (
 			Type left,
@@ -2223,6 +2226,7 @@ class Misc {
 
 	}
 
+	@SafeVarargs
 	public static <Type>
 	Iterable<Type> presentInstances (
 			@NonNull Optional<Type>... arguments) {

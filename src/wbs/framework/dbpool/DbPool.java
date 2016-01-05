@@ -7,11 +7,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -456,6 +458,15 @@ class DbPool
 
 		return dataSource.unwrap (
 			wrappedClass);
+
+	}
+
+	@Override
+	public 
+	Logger getParentLogger ()
+		throws SQLFeatureNotSupportedException {
+
+		return dataSource.getParentLogger ();
 
 	}
 
