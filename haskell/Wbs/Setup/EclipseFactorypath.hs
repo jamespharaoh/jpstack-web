@@ -23,26 +23,10 @@ writeFactorypath world = do
 	let makeAnnotationsEntry =
 		makeEntry "PLUGIN" "org.eclipse.jst.ws.annotations.core"
 
-	let makeGuavaEntry =
-		makeEntry "WKSPJAR" $ concat [
-			"/",
-			bldName build,
-			"/binaries/libraries/guava-bundle-16.0.1.jar"
-		]
-
-	let makeJodaTimeEntry =
-		makeEntry "WKSPJAR" $ concat [
-			"/",
-			bldName build,
-			"/binaries/libraries/joda-time-jar-2.3.jar"
-		]
-
 	let makeFactorypath =
 		root [] [
 			mkelem "factorypath" [] [
-				makeAnnotationsEntry,
-				makeGuavaEntry,
-				makeJodaTimeEntry
+				makeAnnotationsEntry
 			]
 		]
 

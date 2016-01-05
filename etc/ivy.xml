@@ -35,7 +35,7 @@
 		<dependency
 			org="com.google.guava"
 			name="guava"
-			rev="16.0.1"/>
+			rev="19.0"/>
 
 		<!-- hibernate -->
 
