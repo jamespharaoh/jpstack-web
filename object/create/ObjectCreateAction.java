@@ -296,6 +296,7 @@ class ObjectCreateAction<
 		if (object instanceof PermanentRecord) {
 
 			formFieldLogic.runUpdateHooks (
+				formFieldSet,
 				updateResultSet,
 				object,
 				(PermanentRecord<?>) object,
@@ -305,6 +306,7 @@ class ObjectCreateAction<
 		} else {
 
 			formFieldLogic.runUpdateHooks (
+				formFieldSet,
 				updateResultSet,
 				object,
 				(PermanentRecord<?>) parent,

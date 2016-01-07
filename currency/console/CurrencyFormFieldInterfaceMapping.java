@@ -1,6 +1,10 @@
 package wbs.platform.currency.console;
 
-import java.util.List;
+import static wbs.framework.utils.etc.Misc.errorResult;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import javax.inject.Inject;
 
@@ -10,6 +14,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -43,17 +49,22 @@ class CurrencyFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<Long> interfaceToGeneric (
+	Either<Optional<Long>,String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue,
-			@NonNull List<String> errors) {
+			@NonNull Optional<String> interfaceValue) {
 
 		if (! interfaceValue.isPresent ()) {
-			return Optional.<Long>absent ();
+
+			return successResult (
+				Optional.<Long>absent ());
+
 		}
 
 		if (interfaceValue.get ().isEmpty ()) {
-			return Optional.<Long>absent ();
+
+			return successResult (
+				Optional.<Long>absent ());
+
 		}
 
 		CurrencyRec currency =
@@ -63,31 +74,57 @@ class CurrencyFormFieldInterfaceMapping<Container>
 				container,
 				currencyPath);
 
-		if (currency != null) {
+		if (
+			isNull (
+				currency)
+		) {
 
-			return Optional.of (
-				currencyLogic.parseText (
-					currency,
-					interfaceValue.get ()));
-
-		} else {
-
-			return Optional.of (
-				Long.parseLong (
-					interfaceValue.get ()));
+			return successResult (
+				Optional.of (
+					Long.parseLong (
+						interfaceValue.get ())));
 
 		}
+
+		Optional<Long> parseResult =
+			currencyLogic.parseText (
+				currency,
+				interfaceValue.get ());
+
+		if (
+			isNotPresent (
+				parseResult)
+		) {
+
+			return errorResult (
+				stringFormat (
+					"A currency value must be numeric and include the ",
+					"appropriate decimal places"));
+
+		}
+
+		return successResult (
+			Optional.of (
+				currencyLogic.parseTextRequired (
+					currency,
+					interfaceValue.get ())));
 
 	}
 
 	@Override
 	public
-	Optional<String> genericToInterface (
+	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Optional<Long> genericValue) {
 
-		if (! genericValue.isPresent ()) {
-			return Optional.<String>absent ();
+		if (
+			isNotPresent (
+				genericValue)
+		) {
+
+			return successResult (
+				Optional.<String>absent ());
+
 		}
 
 		CurrencyRec currency =
@@ -98,21 +135,27 @@ class CurrencyFormFieldInterfaceMapping<Container>
 				currencyPath);
 
 		if (genericValue.get () == 0 && blankIfZero) {
-			return Optional.of ("");
+
+			return successResult (
+				Optional.of (
+					""));
+
 		}
 
 		if (currency != null) {
 
-			return Optional.of (
-				currencyLogic.formatText (
-					currency,
-					genericValue.get ()));
+			return successResult (
+				Optional.of (
+					currencyLogic.formatText (
+						currency,
+						genericValue.get ())));
 
 		} else {
 
-			return Optional.of (
-				Long.toString (
-					genericValue.get ()));
+			return successResult (
+				Optional.of (
+					Long.toString (
+						genericValue.get ())));
 
 		}
 

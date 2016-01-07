@@ -11,9 +11,11 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.html.ScriptRef;
@@ -121,6 +123,7 @@ class ObjectSearchPart
 		formFieldLogic.outputFormRows (
 			formatWriter,
 			formFieldSet,
+			Optional.<UpdateResultSet>absent (),
 			search);
 
 		printFormat (

@@ -1,5 +1,7 @@
 package wbs.platform.currency.logic;
 
+import com.google.common.base.Optional;
+
 import wbs.platform.currency.model.CurrencyRec;
 
 public
@@ -21,7 +23,11 @@ interface CurrencyLogic {
 			CurrencyRec currency,
 			Long credit);
 
-	Long parseText (
+	Optional<Long> parseText (
+			CurrencyRec currency,
+			String text);
+
+	Long parseTextRequired (
 			CurrencyRec currency,
 			String text);
 

@@ -1,6 +1,6 @@
 package wbs.platform.event.fixture;
 
-import static wbs.framework.utils.etc.Misc.codify;
+import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.sql.SQLException;
@@ -66,7 +66,7 @@ class EventTypeBuilder {
 			log.info (
 				stringFormat (
 					"Create event type %s",
-					codify (
+					simplifyToCodeRequired (
 						spec.name ())));
 
 			createEventType ();
@@ -76,7 +76,7 @@ class EventTypeBuilder {
 			throw new RuntimeException (
 				stringFormat (
 					"Error creating event type %s",
-					codify (
+					simplifyToCodeRequired (
 						spec.name ())),
 				exception);
 
@@ -101,7 +101,7 @@ class EventTypeBuilder {
 			eventTypeHelper.createInstance ()
 
 			.setCode (
-				codify (
+				simplifyToCodeRequired (
 					spec.name ()))
 
 			.setDescription (

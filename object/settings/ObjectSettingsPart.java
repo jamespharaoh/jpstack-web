@@ -9,7 +9,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import com.google.common.base.Optional;
+
 import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
@@ -66,6 +69,7 @@ class ObjectSettingsPart<
 
 	// state
 
+	Optional<UpdateResultSet> updateResultSet;
 	ObjectType object;
 	ParentType parent;
 	boolean canEdit;
@@ -89,6 +93,12 @@ class ObjectSettingsPart<
 	@Override
 	public
 	void prepare () {
+
+		updateResultSet =
+			Optional.fromNullable (
+				(UpdateResultSet)
+				requestContext.request (
+					"objectCreateUpdateResultSet"));
 
 		object =
 			objectLookup.lookupObject (
@@ -205,6 +215,7 @@ class ObjectSettingsPart<
 		formFieldLogic.outputFormRows (
 			formatWriter,
 			formFieldSet,
+			updateResultSet,
 			object);
 
 		printFormat (

@@ -1,7 +1,7 @@
 package wbs.platform.priv.fixture;
 
+import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import static wbs.framework.utils.etc.Misc.camelToUnderscore;
-import static wbs.framework.utils.etc.Misc.codify;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -76,7 +76,7 @@ class PrivTypeBuilder {
 						ifNull (
 							spec.subject (),
 							parent.name ())),
-					codify (
+					simplifyToCodeRequired (
 						spec.name ())));
 
 			createPrivType ();
@@ -90,7 +90,7 @@ class PrivTypeBuilder {
 						ifNull (
 							spec.subject (),
 							parent.name ())),
-					codify (
+					simplifyToCodeRequired (
 						spec.name ())),
 				exception);
 
@@ -130,7 +130,7 @@ class PrivTypeBuilder {
 				parentType)
 
 			.setCode (
-				codify (
+				simplifyToCodeRequired (
 					spec.name ()))
 
 			.setDescription (

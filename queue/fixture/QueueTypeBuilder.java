@@ -1,7 +1,7 @@
 package wbs.platform.queue.fixture;
 
+import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import static wbs.framework.utils.etc.Misc.camelToUnderscore;
-import static wbs.framework.utils.etc.Misc.codify;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -78,7 +78,7 @@ class QueueTypeBuilder {
 						ifNull (
 							spec.subject (),
 							parent.name ())),
-					codify (
+					simplifyToCodeRequired (
 						spec.name ())));
 
 			createQueueType ();
@@ -92,7 +92,7 @@ class QueueTypeBuilder {
 						ifNull (
 							spec.subject (),
 							parent.name ())),
-					codify (
+					simplifyToCodeRequired (
 						spec.name ())),
 				exception);
 
@@ -155,7 +155,7 @@ class QueueTypeBuilder {
 				parentType)
 
 			.setCode (
-				codify (
+				simplifyToCodeRequired (
 					spec.name ()))
 
 			.setDescription (
