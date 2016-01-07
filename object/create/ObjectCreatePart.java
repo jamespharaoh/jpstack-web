@@ -140,7 +140,6 @@ class ObjectCreatePart<
 			@SuppressWarnings ("unchecked")
 			ParentType parentTemp =
 				(ParentType)
-				(Object)
 				rootHelper.find (
 					0);
 

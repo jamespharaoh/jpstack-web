@@ -358,7 +358,6 @@ class ObjectCreateAction<
 			@SuppressWarnings ("unchecked")
 			ParentType parentTemp1 =
 				(ParentType)
-				(Object)
 				rootHelper.find (
 					0);
 
