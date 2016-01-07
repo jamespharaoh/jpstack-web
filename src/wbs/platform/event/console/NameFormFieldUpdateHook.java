@@ -1,6 +1,6 @@
 package wbs.platform.event.console;
 
-import static wbs.framework.utils.etc.Misc.codify;
+import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import static wbs.framework.utils.etc.Misc.notEqual;
 
 import javax.inject.Inject;
@@ -58,11 +58,11 @@ class NameFormFieldUpdateHook
 		// derive codes
 
 		String oldCode =
-			codify (
+			simplifyToCodeRequired (
 				updateResult.oldNativeValue ().get ());
 
 		String newCode =
-			codify (
+			simplifyToCodeRequired (
 				updateResult.newNativeValue ().get ());
 
 		boolean codeChanged =

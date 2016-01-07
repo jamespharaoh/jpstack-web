@@ -1,9 +1,9 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-
-import java.util.List;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import javax.inject.Inject;
 
@@ -13,6 +13,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -128,7 +130,8 @@ class TextFormFieldRenderer<Container>
 	void renderFormRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Optional<String> interfaceValue,
+			@NonNull Optional<String> error) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -140,6 +143,18 @@ class TextFormFieldRenderer<Container>
 			out,
 			container,
 			interfaceValue);
+
+		if (
+			isPresent (
+				error)
+		) {
+
+			out.writeFormat (
+				"<br>\n",
+				"%h",
+				error.get ());
+
+		}
 
 		out.writeFormat (
 			"</td>\n",
@@ -208,8 +223,7 @@ class TextFormFieldRenderer<Container>
 
 	@Override
 	public
-	Optional<String> formToInterface (
-			List<String> errors) {
+	Either<Optional<String>,String> formToInterface () {
 
 		String formValue =
 			formValue ();
@@ -223,11 +237,15 @@ class TextFormFieldRenderer<Container>
 				"")
 
 		) {
-			return Optional.<String>absent ();
+
+			return successResult (
+				Optional.<String>absent ());
+
 		}
 
-		return Optional.fromNullable (
-			formValue);
+		return successResult (
+			Optional.fromNullable (
+				formValue));
 
 	}
 

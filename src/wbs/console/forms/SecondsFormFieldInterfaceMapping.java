@@ -1,11 +1,11 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.errorResult;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-
-import java.util.List;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import javax.inject.Inject;
 
@@ -15,6 +15,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.misc.IntervalFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -39,10 +41,9 @@ class SecondsFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<Integer> interfaceToGeneric (
+	Either<Optional<Integer>,String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue,
-			@NonNull List<String> errors) {
+			@NonNull Optional<String> interfaceValue) {
 
 		if (
 
@@ -55,26 +56,28 @@ class SecondsFormFieldInterfaceMapping<Container>
 
 		) {
 
-			return Optional.<Integer>absent ();
+			return successResult (
+				Optional.<Integer>absent ());
 
 		} else {
 
-			Integer genericValue =
-				intervalFormatter.processIntervalStringSeconds (
+			Optional<Integer> genericValue =
+				intervalFormatter.parseIntervalStringSeconds (
 					interfaceValue.get ());
 
-			if (genericValue == null) {
+			if (
+				isNotPresent (
+					genericValue)
+			) {
 
-				errors.add (
+				return errorResult (
 					stringFormat (
 						"Please enter a valid interval for '%s'",
 						label));
 
-				return Optional.<Integer>absent ();
-
 			}
 
-			return Optional.<Integer>of (
+			return successResult (
 				genericValue);
 
 		}
@@ -83,7 +86,7 @@ class SecondsFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<String> genericToInterface (
+	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Optional<Integer> genericValue) {
 
@@ -92,13 +95,15 @@ class SecondsFormFieldInterfaceMapping<Container>
 				genericValue)
 		) {
 
-			return Optional.<String>absent ();
+			return successResult (
+				Optional.<String>absent ());
 
 		} else {
 
-			return Optional.of (
-				intervalFormatter.createIntervalStringSeconds (
-					genericValue.get ()));
+			return successResult (
+				Optional.of (
+					intervalFormatter.createIntervalStringSeconds (
+						genericValue.get ())));
 
 		}
 

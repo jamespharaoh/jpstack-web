@@ -3,7 +3,10 @@ package wbs.smsapps.subscription.console;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.common.base.Optional;
+
 import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
@@ -65,6 +68,7 @@ class SubscriptionNumberAddRemovePart
 		formFieldLogic.outputFormRows (
 			formatWriter,
 			addRemoveFormFieldSet,
+			Optional.<UpdateResultSet>absent (),
 			addRemoveForm);
 
 		printFormat (

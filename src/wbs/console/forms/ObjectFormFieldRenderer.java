@@ -1,6 +1,8 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +18,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
@@ -175,7 +179,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	void renderFormRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<Interface> interfaceValue) {
+			@NonNull Optional<Interface> interfaceValue,
+			@NonNull Optional<String> error) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -187,6 +192,18 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			out,
 			container,
 			interfaceValue);
+
+		if (
+			isPresent (
+				error)
+		) {
+
+			out.writeFormat (
+				"<br>\n",
+				"%h",
+				error.get ());
+
+		}
 
 		out.writeFormat (
 			"</td>\n",
@@ -377,15 +394,17 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 	@Override
 	public
-	Optional<Interface> formToInterface (
-			@NonNull List<String> errors) {
+	Either<Optional<Interface>,String> formToInterface () {
 
 		String param =
 			requestContext.parameter (
 				name ());
 
 		if (param == null) {
-			return Optional.<Interface>absent ();
+
+			return successResult (
+				Optional.<Interface>absent ());
+
 		}
 
 		if (
@@ -393,7 +412,10 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 				param,
 				"null")
 		) {
-			return Optional.<Interface>absent ();
+
+			return successResult (
+				Optional.<Interface>absent ());
+
 		}
 
 		if (
@@ -412,8 +434,9 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			entityFinder.findEntity (
 				objectId);
 
-		return Optional.of (
-			interfaceValue);
+		return successResult (
+			Optional.of (
+				interfaceValue));
 
 	}
 

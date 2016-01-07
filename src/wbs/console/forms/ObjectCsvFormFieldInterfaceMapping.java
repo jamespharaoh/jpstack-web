@@ -2,8 +2,7 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
-
-import java.util.List;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import javax.inject.Inject;
 
@@ -13,6 +12,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -38,10 +39,9 @@ class ObjectCsvFormFieldInterfaceMapping<Container,Generic extends Record<Generi
 
 	@Override
 	public
-	Optional<Generic> interfaceToGeneric (
+	Either<Optional<Generic>,String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue,
-			@NonNull List<String> errors) {
+			@NonNull Optional<String> interfaceValue) {
 
 		throw new UnsupportedOperationException ();
 
@@ -49,7 +49,7 @@ class ObjectCsvFormFieldInterfaceMapping<Container,Generic extends Record<Generi
 
 	@Override
 	public
-	Optional<String> genericToInterface (
+	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Optional<Generic> genericValue) {
 
@@ -58,7 +58,9 @@ class ObjectCsvFormFieldInterfaceMapping<Container,Generic extends Record<Generi
 				genericValue)
 		) {
 
-			return Optional.<String>of ("");
+			return successResult (
+				Optional.<String>of (
+					""));
 
 		} else {
 
@@ -83,10 +85,11 @@ class ObjectCsvFormFieldInterfaceMapping<Container,Generic extends Record<Generi
 
 			}
 
-			return Optional.of (
-				objectManager.objectPathMini (
-					genericValue.get (),
-					root));
+			return successResult (
+				Optional.of (
+					objectManager.objectPathMini (
+						genericValue.get (),
+						root)));
 
 		}
 

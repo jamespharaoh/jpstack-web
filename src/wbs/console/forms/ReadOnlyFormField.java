@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
+import static wbs.framework.utils.etc.Misc.eitherGetLeft;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -110,9 +111,10 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 
 		Optional<Interface> interfaceValue =
 			requiredValue (
-				interfaceMapping.genericToInterface (
-					container,
-					genericValue));
+				eitherGetLeft (
+					interfaceMapping.genericToInterface (
+						container,
+						genericValue)));
 
 		renderer.renderTableCellList (
 			out,
@@ -141,9 +143,10 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 
 		Optional<Interface> interfaceValue =
 			requiredValue (
-				interfaceMapping.genericToInterface (
-					container,
-					genericValue));
+				eitherGetLeft (
+					interfaceMapping.genericToInterface (
+						container,
+						genericValue)));
 
 		renderer.renderTableCellProperties (
 			out,
@@ -156,7 +159,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	public
 	void renderFormRow (
 			@NonNull FormatWriter out,
-			@NonNull Container container) {
+			@NonNull Container container,
+			@NonNull Optional<String> error) {
 
 		Optional<Native> nativeValue =
 			requiredValue (
@@ -170,9 +174,10 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 
 		Optional<Interface> interfaceValue =
 			requiredValue (
-				interfaceMapping.genericToInterface (
-					container,
-					genericValue));
+				eitherGetLeft (
+					interfaceMapping.genericToInterface (
+						container,
+						genericValue)));
 
 		renderer.renderTableRow (
 			out,
@@ -208,9 +213,10 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 
 		String csvValue =
 			optionalRequired (
-				csvMapping.genericToInterface (
-					container,
-					genericValue));
+				eitherGetLeft (
+					csvMapping.genericToInterface (
+						container,
+						genericValue)));
 
 		out.writeFormat (
 			"\"%s\"",
@@ -220,16 +226,16 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 
 	@Override
 	public
-	void update (
-			@NonNull Container container,
-			@NonNull UpdateResult<Generic,Native> updateResult) {
+	UpdateResult<Generic,Native> update (
+			@NonNull Container container) {
 
-		updateResult
+		return new UpdateResult<Generic,Native> ()
 
 			.updated (
-				false);
+				false)
 
-		return;
+			.error (
+				Optional.<String>absent ());
 
 	}
 

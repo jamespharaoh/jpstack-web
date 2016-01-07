@@ -10,7 +10,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import com.google.common.base.Optional;
+
 import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
@@ -225,6 +228,7 @@ class ObjectCreatePart<
 		formFieldLogic.outputFormRows (
 			formatWriter,
 			formFieldSet,
+			Optional.<UpdateResultSet>absent (),
 			object);
 
 		printFormat (

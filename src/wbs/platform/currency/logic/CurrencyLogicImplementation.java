@@ -1,12 +1,15 @@
 package wbs.platform.currency.logic;
 
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.NonNull;
+
+import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.currency.model.CurrencyRec;
@@ -161,9 +164,9 @@ class CurrencyLogicImplementation
 
 	@Override
 	public
-	Long parseText (
-			CurrencyRec currency,
-			String text) {
+	Optional<Long> parseText (
+			@NonNull CurrencyRec currency,
+			@NonNull String text) {
 
 		// build pattern
 
@@ -202,7 +205,7 @@ class CurrencyLogicImplementation
 					"\\s*",
 					"(?:",
 					Pattern.quote (
-						currency.getSuffix()),
+						currency.getSuffix ()),
 					")?",
 					"\\s*"));
 
@@ -212,8 +215,11 @@ class CurrencyLogicImplementation
 			pattern.matcher (
 				text);
 
-		if (! matcher.matches ())
-			throw new RuntimeException ();
+		if (! matcher.matches ()) {
+
+			return Optional.<Long>absent ();
+
+		}
 
 		// return the result
 
@@ -225,9 +231,22 @@ class CurrencyLogicImplementation
 			Long.parseLong (
 				matcher.group (2));
 
-		return
+		return Optional.<Long>of (
 			+ units * currency.getDivisions ()
-			+ subDivisions;
+			+ subDivisions);
+
+	}
+
+	@Override
+	public
+	Long parseTextRequired (
+			@NonNull CurrencyRec currency,
+			@NonNull String text) {
+
+		return optionalRequired (
+			parseText (
+				currency,
+				text));
 
 	}
 

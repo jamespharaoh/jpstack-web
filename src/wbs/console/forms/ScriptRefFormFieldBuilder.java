@@ -46,7 +46,7 @@ class ScriptRefFormFieldBuilder {
 	void build (
 			Builder builder) {
 
-		formFieldSet.formFields ().add (
+		formFieldSet.addFormField (
 			scriptRefFormFieldProvider.get ()
 
 			.scriptRefs (

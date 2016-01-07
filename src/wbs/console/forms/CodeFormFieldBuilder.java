@@ -18,6 +18,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.utils.etc.CodeUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("codeFormFieldBuilder")
@@ -134,8 +135,9 @@ class CodeFormFieldBuilder {
 
 		Pattern pattern =
 			spec.pattern () != null
-				? Pattern.compile (spec.pattern ())
-				: CodeFormFieldValueValidator.defaultPattern;
+				? Pattern.compile (
+					spec.pattern ())
+				: CodeUtils.codePattern;
 
 		// accessor
 
@@ -213,7 +215,7 @@ class CodeFormFieldBuilder {
 
 		if (readOnly) {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 				readOnlyFormFieldProvider.get ()
 
 				.name (
@@ -241,7 +243,7 @@ class CodeFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 				updatableFormFieldProvider.get ()
 
 				.name (

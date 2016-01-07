@@ -1,9 +1,14 @@
 package wbs.console.misc;
 
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import lombok.NonNull;
+
+import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
 
@@ -14,23 +19,38 @@ class IntervalFormatterImplementation
 
 	@Override
 	public
-	Integer processIntervalStringSeconds (
-			String input) {
+	Optional<Integer> parseIntervalStringSeconds (
+			@NonNull String input) {
 
-		for (IntervalMatcher intervalMatcher
-				: intervalMatchers) {
+		for (
+			IntervalMatcher intervalMatcher
+				: intervalMatchers
+		) {
 
 			Integer interval =
-				intervalMatcher.match (input);
+				intervalMatcher.match (
+					input);
 
 			if (interval == null)
 				continue;
 
-			return interval;
+			return Optional.of (
+				interval);
 
 		}
 
-		return null;
+		return Optional.<Integer>absent ();
+
+	}
+
+	@Override
+	public
+	Integer parseIntervalStringSecondsRequired (
+			@NonNull String input) {
+
+		return optionalRequired (
+			parseIntervalStringSeconds (
+				input));
 
 	}
 

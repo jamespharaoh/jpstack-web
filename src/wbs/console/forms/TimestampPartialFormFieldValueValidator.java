@@ -1,9 +1,7 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.validInterval;
-
-import java.util.List;
-
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
@@ -19,14 +17,18 @@ class TimestampPartialFormFieldValueValidator
 
 	@Override
 	public
-	void validate (
-			@NonNull Optional<String> genericValue,
-			@NonNull List<String> errors) {
+	Optional<String> validate (
+			@NonNull Optional<String> genericValue) {
 
 		// allow null
 
-		if (! genericValue.isPresent ()) {
-			return;
+		if (
+			isNotPresent (
+				genericValue)
+		) {
+
+			return Optional.<String>absent ();
+
 		}
 
 		// check it's a valid partial timestamp
@@ -36,10 +38,12 @@ class TimestampPartialFormFieldValueValidator
 				genericValue.get ())
 		) {
 
-			errors.add (
+			return Optional.of (
 				"Invalid interval");
 
 		}
+
+		return Optional.<String>absent ();
 
 	}
 

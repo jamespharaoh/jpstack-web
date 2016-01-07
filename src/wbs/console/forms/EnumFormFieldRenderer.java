@@ -1,7 +1,9 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.Misc.successResult;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.request.ConsoleRequestContext;
@@ -134,7 +138,8 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	void renderFormRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<Interface> interfaceValue) {
+			@NonNull Optional<Interface> interfaceValue,
+			@NonNull Optional<String> error) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -146,6 +151,18 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			out,
 			container,
 			interfaceValue);
+
+		if (
+			isPresent (
+				error)
+		) {
+
+			out.writeFormat (
+				"<br>\n",
+				"%h",
+				error.get ());
+
+		}
 
 		out.writeFormat (
 			"</td>\n",
@@ -224,14 +241,14 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 
 	@Override
 	public
-	Optional<Interface> formToInterface (
-			@NonNull List<String> errors) {
+	Either<Optional<Interface>,String> formToInterface () {
 
-		return Optional.fromNullable (
-			toEnum (
-				enumConsoleHelper.enumClass (),
-				requestContext.parameter (
-					name ())));
+		return successResult (
+			Optional.fromNullable (
+				toEnum (
+					enumConsoleHelper.enumClass (),
+					requestContext.parameter (
+						name ()))));
 
 	}
 

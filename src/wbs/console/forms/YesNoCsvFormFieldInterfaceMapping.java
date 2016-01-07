@@ -3,12 +3,12 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
-
-import java.util.List;
-
+import static wbs.framework.utils.etc.Misc.successResult;
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -19,10 +19,9 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<Boolean> interfaceToGeneric (
+	Either<Optional<Boolean>,String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue,
-			@NonNull List<String> errors) {
+			@NonNull Optional<String> interfaceValue) {
 
 		if (
 			equal (
@@ -31,8 +30,9 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 				"yes")
 		) {
 
-			return Optional.<Boolean>of (
-				true);
+			return successResult (
+				Optional.<Boolean>of (
+					true));
 
 		} else if (
 			equal (
@@ -41,8 +41,9 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 				"no")
 		) {
 
-			return Optional.<Boolean>of (
-				false);
+			return successResult (
+				Optional.<Boolean>of (
+					false));
 
 		} else if (
 			equal (
@@ -51,7 +52,8 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 				"")
 		) {
 
-			return Optional.<Boolean>absent ();
+			return successResult (
+				Optional.<Boolean>absent ());
 
 		} else {
 
@@ -63,7 +65,7 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<String> genericToInterface (
+	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Optional<Boolean> genericValue) {
 
@@ -72,8 +74,9 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 				genericValue)
 		) {
 
-			return Optional.<String>of (
-				"");
+			return successResult (
+				Optional.<String>of (
+					""));
 
 		} else if (
 			equal (
@@ -82,8 +85,9 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 				true)
 		) {
 
-			return Optional.<String>of (
-				"yes");
+			return successResult (
+				Optional.<String>of (
+					"yes"));
 
 		} else if (
 			equal (
@@ -92,8 +96,9 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 				false)
 		) {
 
-			return Optional.<String>of (
-				"no");
+			return successResult (
+				Optional.<String>of (
+					"no"));
 
 		} else {
 

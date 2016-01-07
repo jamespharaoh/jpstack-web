@@ -79,8 +79,9 @@ class ScriptRefFormField
 	@Override
 	public
 	void renderFormRow (
-			FormatWriter out,
-			Object object) {
+			@NonNull FormatWriter out,
+			@NonNull Object object,
+			@NonNull Optional<String> error) {
 
 		throw new UnsupportedOperationException ();
 
@@ -97,9 +98,8 @@ class ScriptRefFormField
 
 	@Override
 	public
-	void update (
-			@NonNull Object container,
-			@NonNull UpdateResult<Object,Object> updateResult) {
+	UpdateResult<Object,Object> update (
+			@NonNull Object container) {
 
 		throw new UnsupportedOperationException ();
 

@@ -1,7 +1,5 @@
 package wbs.console.forms;
 
-import java.util.List;
-
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
@@ -15,10 +13,9 @@ class NameFormFieldConstraintValidator<Container>
 
 	@Override
 	public
-	void validate (
+	Optional<String> validate (
 			@NonNull Container container,
-			@NonNull Optional<String> nativeValue,
-			@NonNull List<String> errors) {
+			@NonNull Optional<String> nativeValue) {
 
 		/*
 
@@ -42,6 +39,8 @@ class NameFormFieldConstraintValidator<Container>
 
 		}
 		*/
+
+		return Optional.<String>absent ();
 
 	}
 

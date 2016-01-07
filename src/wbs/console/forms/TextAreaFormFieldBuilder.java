@@ -264,7 +264,7 @@ class TextAreaFormFieldBuilder {
 
 		if (readOnly) {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 
 				readOnlyFormFieldProvider.get ()
 
@@ -296,7 +296,7 @@ class TextAreaFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 
 				updatableFormFieldProvider.get ()
 

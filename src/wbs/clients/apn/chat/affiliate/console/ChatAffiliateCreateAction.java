@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.affiliate.console;
 
-import static wbs.framework.utils.etc.Misc.codify;
+import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
@@ -101,14 +101,21 @@ class ChatAffiliateCreateAction
 			requestContext.parameter ("name");
 
 		String code =
-			codify (name);
+			simplifyToCodeRequired (
+				name);
 
 		Integer chatSchemeId =
-			toInteger (requestContext.parameter ("chatScheme"));
+			toInteger (
+				requestContext.parameter (
+					"chatScheme"));
 
 		if (chatSchemeId == null) {
-			requestContext.addError ("Please fill in the form properly");
+
+			requestContext.addError (
+				"Please fill in the form properly");
+
 			return null;
+
 		}
 
 		// check keywords

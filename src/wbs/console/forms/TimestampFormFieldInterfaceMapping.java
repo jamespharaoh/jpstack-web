@@ -1,12 +1,12 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.errorResult;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-
-import java.util.List;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import javax.inject.Inject;
 
@@ -18,6 +18,8 @@ import lombok.experimental.Accessors;
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -45,10 +47,9 @@ class TimestampFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<Instant> interfaceToGeneric (
+	Either<Optional<Instant>,String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue,
-			@NonNull List<String> errors) {
+			@NonNull Optional<String> interfaceValue) {
 
 		if (
 			notEqual (
@@ -69,25 +70,25 @@ class TimestampFormFieldInterfaceMapping<Container>
 
 		) {
 
-			return Optional.<Instant>absent ();
+			return successResult (
+				Optional.<Instant>absent ());
 
 		} else {
 
 			try {
 
-				return Optional.of (
-					timeFormatter.timestampStringToInstant (
-						timeFormatter.defaultTimezone (),
-						interfaceValue.get ()));
+				return successResult (
+					Optional.of (
+						timeFormatter.timestampStringToInstant (
+							timeFormatter.defaultTimezone (),
+							interfaceValue.get ())));
 
 			} catch (IllegalArgumentException exception) {
 
-				errors.add (
+				return errorResult (
 					stringFormat (
 						"Please enter a valid timestamp for %s",
 						name ()));
-
-				return Optional.<Instant>absent ();
 
 			}
 
@@ -97,7 +98,7 @@ class TimestampFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<String> genericToInterface (
+	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Optional<Instant> genericValue) {
 
@@ -106,7 +107,9 @@ class TimestampFormFieldInterfaceMapping<Container>
 				genericValue)
 		) {
 
-			return Optional.of ("");
+			return successResult (
+				Optional.of (
+					""));
 
 		}
 
@@ -114,24 +117,27 @@ class TimestampFormFieldInterfaceMapping<Container>
 
 		case timestamp:
 
-			return Optional.of (
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
-					genericValue.get ()));
+			return successResult (
+				Optional.of (
+					timeFormatter.instantToTimestampString (
+						timeFormatter.defaultTimezone (),
+						genericValue.get ())));
 
 		case date:
 
-			return Optional.of (
-				timeFormatter.instantToDateStringShort (
-					timeFormatter.defaultTimezone (),
-					genericValue.get ()));
+			return successResult (
+				Optional.of (
+					timeFormatter.instantToDateStringShort (
+						timeFormatter.defaultTimezone (),
+						genericValue.get ())));
 
 		case time:
 
-			return Optional.of (
-				timeFormatter.instantToTimeString (
-					timeFormatter.defaultTimezone (),
-					genericValue.get ()));
+			return successResult (
+				Optional.of (
+					timeFormatter.instantToTimeString (
+						timeFormatter.defaultTimezone (),
+						genericValue.get ())));
 
 		default:
 

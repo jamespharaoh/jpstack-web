@@ -1,17 +1,23 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.contains;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.html.ScriptRef;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
+import wbs.framework.data.annotations.DataChildrenIndex;
 import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
@@ -30,6 +36,13 @@ class FormFieldSet {
 	@Getter @Setter
 	List<FormField> formFields =
 		new ArrayList<FormField> ();
+
+	// state
+
+	@DataChildrenIndex
+	@Getter @Setter
+	Map<String,FormField> formFieldsByName =
+		new HashMap<String,FormField> ();
 
 	// utility methods
 
@@ -72,6 +85,49 @@ class FormFieldSet {
 		}
 
 		return ret;
+
+	}
+
+	public
+	FormFieldSet addFormField (
+			@NonNull FormField formField) {
+
+		if (formField.virtual ()) {
+
+			formFields.add (
+				formField);
+
+		} else {
+
+			if (
+				contains (
+					formFieldsByName,
+					formField.name ())
+			) {
+
+				throw new RuntimeException ();
+
+			}
+
+			formFields.add (
+				formField);
+
+			formFieldsByName.put (
+				formField.name (),
+				formField);
+
+		}
+
+		return this;
+
+	}
+
+	public
+	FormField formField (
+			@NonNull String name) {
+
+		return formFieldsByName.get (
+			name);
 
 	}
 

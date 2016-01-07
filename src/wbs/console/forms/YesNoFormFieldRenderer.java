@@ -1,10 +1,10 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.booleanToString;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
-
-import java.util.List;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import javax.inject.Inject;
 
@@ -14,6 +14,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -120,7 +122,8 @@ class YesNoFormFieldRenderer<Container>
 	void renderFormRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<Boolean> interfaceValue) {
+			@NonNull Optional<Boolean> interfaceValue,
+			@NonNull Optional<String> error) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -132,6 +135,18 @@ class YesNoFormFieldRenderer<Container>
 			out,
 			container,
 			interfaceValue);
+
+		if (
+			isPresent (
+				error)
+		) {
+
+			out.writeFormat (
+				"<br>\n",
+				"%h",
+				error.get ());
+
+		}
 
 		out.writeFormat (
 			"</td>\n",
@@ -255,15 +270,15 @@ class YesNoFormFieldRenderer<Container>
 
 	@Override
 	public
-	Optional<Boolean> formToInterface (
-			@NonNull List<String> errors) {
+	Either<Optional<Boolean>,String> formToInterface () {
 
 		String formValue =
 			formValue ();
 
-		return Optional.fromNullable (
-			stringToBoolean (
-				formValue));
+		return successResult (
+			Optional.fromNullable (
+				stringToBoolean (
+					formValue)));
 
 	}
 

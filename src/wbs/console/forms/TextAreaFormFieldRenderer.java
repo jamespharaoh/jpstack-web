@@ -1,11 +1,12 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.getValue;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isError;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-
-import java.util.ArrayList;
-import java.util.List;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import javax.inject.Inject;
 
@@ -15,6 +16,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -114,17 +117,23 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue) {
 
-		List<String> errors =
-			new ArrayList<String> ();
-
 		if (formValuePresent ()) {
 
-			interfaceValue =
-				formToInterface (
-					errors);
+			Either<Optional<String>,String> toInterfaceResult =
+				formToInterface ();
 
-			if (! errors.isEmpty ())
+			if (
+				isError (
+					toInterfaceResult)
+			) {
+
 				throw new RuntimeException ();
+
+			}
+
+			interfaceValue =
+				getValue (
+					toInterfaceResult);
 
 		}
 
@@ -148,7 +157,8 @@ class TextAreaFormFieldRenderer<Container,Parent>
 	void renderFormRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Optional<String> interfaceValue,
+			@NonNull Optional<String> error) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -160,6 +170,18 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			out,
 			container,
 			interfaceValue);
+
+		if (
+			isPresent (
+				error)
+		) {
+
+			out.writeFormat (
+				"<br>\n",
+				"%h",
+				error.get ());
+
+		}
 
 		out.writeFormat (
 			"</td>\n",
@@ -415,12 +437,12 @@ class TextAreaFormFieldRenderer<Container,Parent>
 
 	@Override
 	public
-	Optional<String> formToInterface (
-			@NonNull List<String> errors) {
+	Either<Optional<String>,String> formToInterface () {
 
-		return Optional.fromNullable (
-			requestContext.parameter (
-				name ()));
+		return successResult (
+			Optional.fromNullable (
+				requestContext.parameter (
+					name ())));
 
 	}
 

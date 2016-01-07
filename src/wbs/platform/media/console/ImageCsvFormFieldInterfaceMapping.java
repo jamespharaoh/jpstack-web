@@ -1,12 +1,12 @@
 package wbs.platform.media.console;
 
 import static wbs.framework.utils.etc.Misc.isNotPresent;
-
-import java.util.List;
-
+import static wbs.framework.utils.etc.Misc.successResult;
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -19,10 +19,9 @@ class ImageCsvFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<MediaRec> interfaceToGeneric (
+	Either<Optional<MediaRec>,String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue,
-			@NonNull List<String> errors) {
+			@NonNull Optional<String> interfaceValue) {
 
 		throw new UnsupportedOperationException ();
 
@@ -30,7 +29,7 @@ class ImageCsvFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<String> genericToInterface (
+	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Optional<MediaRec> genericValue) {
 
@@ -39,12 +38,15 @@ class ImageCsvFormFieldInterfaceMapping<Container>
 				genericValue)
 		) {
 
-			return Optional.of ("");
+			return successResult (
+				Optional.of (
+					""));
 
 		} else {
 
-			return Optional.of (
-				genericValue.get ().getFilename ());
+			return successResult (
+				Optional.of (
+					genericValue.get ().getFilename ()));
 
 		}
 

@@ -1,6 +1,5 @@
 package wbs.console.forms;
 
-import java.util.List;
 import java.util.Set;
 
 import lombok.Data;
@@ -42,7 +41,8 @@ interface FormField<Container,Generic,Native,Interface> {
 
 	void renderFormRow (
 			FormatWriter out,
-			Container object);
+			Container object,
+			Optional<String> error);
 
 	void renderFormReset (
 			FormatWriter out,
@@ -53,9 +53,8 @@ interface FormField<Container,Generic,Native,Interface> {
 			FormatWriter out,
 			Container object);
 
-	void update (
-			Container container,
-			UpdateResult<Generic,Native> updateResult);
+	UpdateResult<Generic,Native> update (
+			Container container);
 
 	void runUpdateHook (
 			UpdateResult<Generic,Native> updateResult,
@@ -71,15 +70,13 @@ interface FormField<Container,Generic,Native,Interface> {
 
 		Boolean updated;
 
-		FormField<?,Generic,Native,?> formField;
-
 		Optional<Generic> oldGenericValue;
 		Optional<Generic> newGenericValue;
 
 		Optional<Native> oldNativeValue;
 		Optional<Native> newNativeValue;
 
-		List<String> errors;
+		Optional<String> error;
 
 	}
 

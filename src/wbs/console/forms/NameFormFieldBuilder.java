@@ -194,10 +194,7 @@ class NameFormFieldBuilder {
 		// value validator
 
 		FormFieldValueValidator valueValidator =
-			nameFormFieldValueValidatorProvider.get ()
-
-			.codePattern (
-				CodeFormFieldValueValidator.defaultPattern);
+			nameFormFieldValueValidatorProvider.get ();
 
 		// constraint validator
 
@@ -238,7 +235,7 @@ class NameFormFieldBuilder {
 
 		if (readOnly) {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 				readOnlyFormFieldProvider.get ()
 
 				.name (
@@ -263,7 +260,7 @@ class NameFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 				updatableFormFieldProvider.get ()
 
 				.name (

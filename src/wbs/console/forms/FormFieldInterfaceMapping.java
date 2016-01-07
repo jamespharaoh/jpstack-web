@@ -1,18 +1,17 @@
 package wbs.console.forms;
 
-import java.util.List;
-
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 public
 interface FormFieldInterfaceMapping<Container,Generic,Interface> {
 
-	Optional<Generic> interfaceToGeneric (
+	Either<Optional<Generic>,String> interfaceToGeneric (
 			Container container,
-			Optional<Interface> interfaceValue,
-			List<String> errors);
+			Optional<Interface> interfaceValue);
 
-	Optional<Interface> genericToInterface (
+	Either<Optional<Interface>,String> genericToInterface (
 			Container container,
 			Optional<Generic> genericValue);
 

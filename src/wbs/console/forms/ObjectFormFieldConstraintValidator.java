@@ -1,7 +1,5 @@
 package wbs.console.forms;
 
-import java.util.List;
-
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
@@ -17,12 +15,11 @@ class ObjectFormFieldConstraintValidator<Container,Generic>
 
 	@Override
 	public
-	void validate (
+	Optional<String> validate (
 			@NonNull Container container,
-			@NonNull Optional<Generic> nativeValue,
-			@NonNull List<String> errors) {
+			@NonNull Optional<Generic> nativeValue) {
 
-		// TODO validate the root and permissions
+		return Optional.<String>absent ();
 
 	}
 

@@ -1,9 +1,15 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.doNothing;
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -44,23 +50,20 @@ class FormFieldLogic {
 				continue;
 
 			UpdateResult updateResult =
-				new UpdateResult ()
+				formField.update (
+					container);
 
-				.formField (
-					formField);
+			if (
+				isPresent (
+					updateResult.error ())
+			) {
 
-			formField.update (
-				container,
-				updateResult);
-
-			if (updateResult.errors () != null) {
-
-				updateResultSet.errorCount +=
-					updateResult.errors ().size ();
+				updateResultSet.errorCount ++;
 
 			}
 
-			updateResultSet.updateResults ().add (
+			updateResultSet.updateResults ().put (
+				formField.name (),
 				updateResult);
 
 		}
@@ -73,27 +76,81 @@ class FormFieldLogic {
 	void reportErrors (
 			@NonNull UpdateResultSet updateResultSet) {
 
+		List<String> errorFieldNames =
+			new ArrayList<String> ();
+
 		for (
-			UpdateResult<?,?> updateResult
-				: updateResultSet.updateResults ()
+			Map.Entry<String,UpdateResult<?,?>> updateResultEntry
+				: updateResultSet.updateResults ().entrySet ()
 		) {
 
+			String formFieldName =
+				updateResultEntry.getKey ();
+
+			UpdateResult updateResult =
+				updateResultEntry.getValue ();
+
 			if (
-				isNull (
-					updateResult.errors ())
-			) {
-				continue;
-			}
-
-			for (
-				String error
-					: updateResult.errors ()
+				isPresent (
+					updateResult.error ())
 			) {
 
-				requestContext.addError (
-					error);
+				errorFieldNames.add (
+					formFieldName);
 
 			}
+
+		}
+
+		if (
+			isEmpty (
+				errorFieldNames)
+		) {
+
+			doNothing ();
+
+		} else if (
+			equal (
+				errorFieldNames.size (),
+				1)
+		) {
+
+			requestContext.addError (
+				stringFormat (
+					"The '%s' field is not valid",
+					errorFieldNames.get (0)));
+
+		} else if (
+			equal (
+				errorFieldNames.size (),
+				2)
+		) {
+
+			requestContext.addError (
+				stringFormat (
+					"The '%s' and '%s' fields are invalid",
+					errorFieldNames.get (0),
+					errorFieldNames.get (1)));
+
+		} else if (
+			equal (
+				errorFieldNames.size (),
+				3)
+		) {
+
+			requestContext.addError (
+				stringFormat (
+					"The '%s', '%s' and '%s' fields are invalid",
+					errorFieldNames.get (0),
+					errorFieldNames.get (1),
+					errorFieldNames.get (2)));
+
+		} else {
+
+			requestContext.addError (
+				stringFormat (
+					"There are %s invalid fields",
+					errorFieldNames.size ()));
 
 		}
 
@@ -101,6 +158,7 @@ class FormFieldLogic {
 
 	public
 	void runUpdateHooks (
+			@NonNull FormFieldSet formFieldSet,
 			@NonNull UpdateResultSet updateResultSet,
 			@NonNull Object container,
 			@NonNull PermanentRecord<?> linkObject,
@@ -108,15 +166,21 @@ class FormFieldLogic {
 			@NonNull Optional<String> objectType) {
 
 		for (
-			UpdateResult updateResult
-				: updateResultSet.updateResults ()
+			Map.Entry updateResultEntry
+				: updateResultSet.updateResults ().entrySet ()
 		) {
+
+			FormField formField =
+				formFieldSet.formField (
+					(String)
+					updateResultEntry.getKey ());
+
+			UpdateResult updateResult =
+				(UpdateResult)
+				updateResultEntry.getValue ();
 
 			if (! updateResult.updated ())
 				continue;
-
-			FormField formField =
-				updateResult.formField ();
 
 			formField.runUpdateHook (
 				updateResult,
@@ -191,6 +255,7 @@ class FormFieldLogic {
 	void outputFormRows (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
+			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object) {
 
 		for (
@@ -201,9 +266,31 @@ class FormFieldLogic {
 			if (formField.virtual ())
 				continue;
 
+			Optional<String> error;
+
+			if (
+				isPresent (
+					updateResultSet)
+			) {
+
+				UpdateResult updateResult =
+					updateResultSet.get ().updateResults ().get (
+						formField.name ());
+
+				error =
+					updateResult.error ();
+
+			} else {
+
+				error =
+					Optional.<String>absent ();
+
+			}
+
 			formField.renderFormRow (
 				htmlWriter,
-				object);
+				object,
+				error);
 
 		}
 
@@ -363,8 +450,8 @@ class FormFieldLogic {
 	public static
 	class UpdateResultSet {
 
-		List<UpdateResult<?,?>> updateResults =
-			new ArrayList<UpdateResult<?,?>> ();
+		Map<String,UpdateResult<?,?>> updateResults =
+			new LinkedHashMap<String,UpdateResult<?,?>> ();
 
 		int errorCount;
 

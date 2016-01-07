@@ -2,8 +2,6 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.List;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -30,12 +28,13 @@ class IntegerFormFieldValueValidator
 
 	@Override
 	public
-	void validate (
-			@NonNull Optional<Long> genericValue,
-			@NonNull List<String> errors) {
+	Optional<String> validate (
+			@NonNull Optional<Long> genericValue) {
 
 		if (! genericValue.isPresent ()) {
-			return;
+
+			return Optional.<String>absent ();
+
 		}
 
 		if (
@@ -43,7 +42,7 @@ class IntegerFormFieldValueValidator
 			|| genericValue.get () > maximum
 		) {
 
-			errors.add (
+			return Optional.of (
 				stringFormat (
 					"Value for \"%s\" must be between %s and %s",
 					label (),
@@ -51,6 +50,8 @@ class IntegerFormFieldValueValidator
 					maximum));
 
 		}
+
+		return Optional.<String>absent ();
 
 	}
 

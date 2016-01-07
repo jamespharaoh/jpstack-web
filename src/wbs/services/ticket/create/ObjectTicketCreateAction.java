@@ -413,6 +413,7 @@ class ObjectTicketCreateAction<
 		if (ticket instanceof PermanentRecord) {
 
 			formFieldLogic.runUpdateHooks (
+				formFieldSet,
 				updateResultSet,
 				ticket,
 				(PermanentRecord<?>) ticket,
@@ -422,6 +423,7 @@ class ObjectTicketCreateAction<
 		} else {
 
 			formFieldLogic.runUpdateHooks (
+				formFieldSet,
 				updateResultSet,
 				ticket,
 				(PermanentRecord<?>) ticketManager,

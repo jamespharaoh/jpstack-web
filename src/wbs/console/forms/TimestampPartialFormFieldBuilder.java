@@ -161,7 +161,7 @@ class TimestampPartialFormFieldBuilder {
 
 		if (readOnly) {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 				readOnlyFormFieldProvider.get ()
 
 				.name (
@@ -186,7 +186,7 @@ class TimestampPartialFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 				updatableFormFieldProvider.get ()
 
 				.name (

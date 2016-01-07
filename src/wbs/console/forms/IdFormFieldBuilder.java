@@ -109,7 +109,7 @@ class IdFormFieldBuilder {
 
 		// field
 
-		formFieldSet.formFields ().add (
+		formFieldSet.addFormField (
 			readOnlyFormFieldProvider.get ()
 
 			.name (

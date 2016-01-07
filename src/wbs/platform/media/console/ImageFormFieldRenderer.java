@@ -1,10 +1,11 @@
 package wbs.platform.media.console;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -18,6 +19,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.forms.FormFieldRenderer;
 import wbs.console.request.ConsoleRequestContext;
@@ -127,7 +130,8 @@ class ImageFormFieldRenderer<Container>
 	void renderFormRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<MediaRec> interfaceValue) {
+			@NonNull Optional<MediaRec> interfaceValue,
+			@NonNull Optional<String> error) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -139,6 +143,18 @@ class ImageFormFieldRenderer<Container>
 			out,
 			container,
 			interfaceValue);
+
+		if (
+			isPresent (
+				error)
+		) {
+
+			out.writeFormat (
+				"<br>\n",
+				"%h",
+				error.get ());
+
+		}
 
 		out.writeFormat (
 			"</td>\n",
@@ -272,11 +288,11 @@ class ImageFormFieldRenderer<Container>
 
 	@Override
 	public
-	Optional<MediaRec> formToInterface (
-			List<String> errors) {
+	Either<Optional<MediaRec>,String> formToInterface () {
 
-		return Optional.fromNullable (
-			formValue ());
+		return successResult (
+			Optional.fromNullable (
+				formValue ()));
 
 	}
 

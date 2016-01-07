@@ -182,7 +182,7 @@ class TimestampTimezoneFormFieldBuilder {
 
 		if (readOnly) {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 				readOnlyFormFieldProvider.get ()
 
 				.name (
@@ -207,7 +207,7 @@ class TimestampTimezoneFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 				updatableFormFieldProvider.get ()
 
 				.name (

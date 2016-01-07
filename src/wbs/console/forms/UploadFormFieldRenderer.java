@@ -1,9 +1,10 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -17,6 +18,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -114,7 +117,8 @@ class UploadFormFieldRenderer<Container>
 	void renderFormRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<FileUpload> interfaceValue) {
+			@NonNull Optional<FileUpload> interfaceValue,
+			@NonNull Optional<String> error) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -126,6 +130,18 @@ class UploadFormFieldRenderer<Container>
 			out,
 			container,
 			interfaceValue);
+
+		if (
+			isPresent (
+				error)
+		) {
+
+			out.writeFormat (
+				"<br>\n",
+				"%h",
+				error.get ());
+
+		}
 
 		out.writeFormat (
 			"</td>\n",
@@ -210,11 +226,11 @@ class UploadFormFieldRenderer<Container>
 
 	@Override
 	public
-	Optional<FileUpload> formToInterface (
-			List<String> errors) {
+	Either<Optional<FileUpload>,String> formToInterface () {
 
-		return Optional.fromNullable (
-			formValue ());
+		return successResult (
+			Optional.fromNullable (
+				formValue ()));
 
 	}
 

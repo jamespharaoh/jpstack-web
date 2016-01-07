@@ -2,12 +2,13 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
-
-import java.util.List;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -18,10 +19,9 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<Double> interfaceToGeneric (
+	Either<Optional<Double>,String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue,
-			@NonNull List<String> errors) {
+			@NonNull Optional<String> interfaceValue) {
 
 		if (
 
@@ -33,13 +33,15 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 
 		) {
 
-			return Optional.<Double>absent ();
+			return successResult (
+				Optional.<Double>absent ());
 
 		} else {
 
-			return Optional.of (
-				Double.parseDouble (
-					interfaceValue.get ()));
+			return successResult (
+				Optional.of (
+					Double.parseDouble (
+						interfaceValue.get ())));
 
 		}
 
@@ -47,7 +49,7 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<String> genericToInterface (
+	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Optional<Double> genericValue) {
 
@@ -56,13 +58,16 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 				genericValue)
 		) {
 
-			return Optional.<String>of ("");
+			return successResult (
+				Optional.<String>of (
+					""));
 
 		} else {
 
-			return Optional.of (
-				Double.toString (
-					genericValue.get ()));
+			return successResult (
+				Optional.of (
+					Double.toString (
+						genericValue.get ())));
 
 		}
 

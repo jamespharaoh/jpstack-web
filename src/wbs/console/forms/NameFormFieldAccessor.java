@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.codify;
+import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -52,7 +52,7 @@ class NameFormFieldAccessor<Container>
 		if (consoleHelper.codeExists ()) {
 
 			String codeValue =
-				codify (
+				simplifyToCodeRequired (
 					nativeValue.get ());
 
 			BeanLogic.setProperty (

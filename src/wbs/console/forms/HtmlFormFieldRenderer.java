@@ -2,8 +2,6 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import lombok.Getter;
@@ -12,6 +10,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -109,7 +109,8 @@ class HtmlFormFieldRenderer<Container>
 	void renderFormRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Optional<String> interfaceValue,
+			@NonNull Optional<String> error) {
 
 		renderTableRow (
 			out,
@@ -172,8 +173,7 @@ class HtmlFormFieldRenderer<Container>
 
 	@Override
 	public
-	Optional<String> formToInterface (
-			@NonNull List<String> errors) {
+	Either<Optional<String>,String> formToInterface () {
 
 		throw new UnsupportedOperationException ();
 

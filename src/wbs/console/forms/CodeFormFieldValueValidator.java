@@ -1,9 +1,7 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,9 +29,8 @@ class CodeFormFieldValueValidator
 
 	@Override
 	public
-	void validate (
-			@NonNull Optional<String> genericValue,
-			@NonNull List<String> errors) {
+	Optional<String> validate (
+			@NonNull Optional<String> genericValue) {
 
 		Matcher matcher =
 			pattern.matcher (
@@ -41,21 +38,14 @@ class CodeFormFieldValueValidator
 
 		if (! matcher.matches ()) {
 
-			errors.add (
+			return Optional.of (
 				stringFormat (
 					"Invalid code"));
 
 		}
 
-	}
+		return Optional.<String>absent ();
 
-	public static final
-	Pattern defaultPattern =
-		Pattern.compile (
-			joinWithoutSeparator (
-				"^",
-				"([a-z][a-z0-9]*)",
-				"(_([a-z0-9]+))*",
-				"$"));
+	}
 
 }

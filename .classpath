@@ -19,6 +19,7 @@
   <classpathentry kind="lib" path="binaries/libraries/commons-logging-jar-1.1.3.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/dom4j-jar-1.6.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/error_prone_annotations-jar-2.0.2.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/functionaljava-jar-3.0.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/functionaljava-source-3.0.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/gson-jar-2.2.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/guava-bundle-19.0.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/guava-source-19.0.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/hamcrest-core-jar-1.1.jar"/>

@@ -1,9 +1,14 @@
 package wbs.console.misc;
 
+import com.google.common.base.Optional;
+
 public
 interface IntervalFormatter {
 
-	Integer processIntervalStringSeconds (
+	Optional<Integer> parseIntervalStringSeconds (
+			String input);
+
+	Integer parseIntervalStringSecondsRequired (
 			String input);
 
 	String createIntervalStringSeconds (

@@ -9,7 +9,10 @@ import javax.inject.Named;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
+import com.google.common.base.Optional;
+
 import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.misc.TimeFormatter;
@@ -124,6 +127,7 @@ class ManualResponderReportOperatorPart
 		formFieldLogic.outputFormRows (
 			formatWriter,
 			searchFormFieldSet,
+			Optional.<UpdateResultSet>absent (),
 			searchForm);
 
 		printFormat (

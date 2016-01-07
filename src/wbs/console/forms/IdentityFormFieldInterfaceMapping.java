@@ -1,10 +1,12 @@
 package wbs.console.forms;
 
-import java.util.List;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -15,22 +17,23 @@ class IdentityFormFieldInterfaceMapping<Container,Type>
 
 	@Override
 	public
-	Optional<Type> interfaceToGeneric (
+	Either<Optional<Type>,String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<Type> value,
-			@NonNull List<String> errors) {
+			@NonNull Optional<Type> value) {
 
-		return value;
+		return successResult (
+			value);
 
 	}
 
 	@Override
 	public
-	Optional<Type> genericToInterface (
+	Either<Optional<Type>,String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Optional<Type> value) {
 
-		return value;
+		return successResult (
+			value);
 
 	}
 

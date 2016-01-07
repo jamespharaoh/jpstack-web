@@ -11,6 +11,7 @@
 	<library name="commons-logging" type="jar" version="1.1.3"/>
 	<library name="dom4j" type="jar" version="1.6.1"/>
 	<library name="error_prone_annotations" type="jar" version="2.0.2"/>
+	<library name="functionaljava" type="jar" version="3.0" source="yes"/>
 	<library name="gson" type="jar" version="2.2.2"/>
 	<library name="guava" type="bundle" version="19.0" source="yes"/>
 	<library name="hamcrest-core" type="jar" version="1.1"/>

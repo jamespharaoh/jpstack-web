@@ -462,7 +462,7 @@ class DbPool
 	}
 
 	@Override
-	public 
+	public
 	Logger getParentLogger ()
 		throws SQLFeatureNotSupportedException {
 

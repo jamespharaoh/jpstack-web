@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import com.google.common.base.Optional;
+
 import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -85,6 +88,7 @@ class ContextFormActionPart<FormState>
 		formFieldLogic.outputFormRows (
 			formatWriter,
 			formFields,
+			Optional.<UpdateResultSet>absent (),
 			formState);
 
 		printFormat (

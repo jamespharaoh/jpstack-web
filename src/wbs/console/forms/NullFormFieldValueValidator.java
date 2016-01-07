@@ -1,9 +1,5 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
-
-import java.util.List;
-
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
@@ -17,11 +13,10 @@ class NullFormFieldValueValidator<Generic>
 
 	@Override
 	public
-	void validate (
-			@NonNull Optional<Generic> genericValue,
-			@NonNull List<String> errors) {
+	Optional<String> validate (
+			@NonNull Optional<Generic> genericValue) {
 
-		doNothing ();
+		return Optional.<String>absent ();
 
 	}
 

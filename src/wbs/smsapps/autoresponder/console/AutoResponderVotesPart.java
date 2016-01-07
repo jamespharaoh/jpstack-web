@@ -65,7 +65,7 @@ class AutoResponderVotesPart
 				"12 hours");
 
 		Integer timePeriodSeconds =
-			intervalFormatter.processIntervalStringSeconds (
+			intervalFormatter.parseIntervalStringSecondsRequired (
 				timePeriodString);
 
 		if (timePeriodSeconds == null) {

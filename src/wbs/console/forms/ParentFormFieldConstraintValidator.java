@@ -2,8 +2,6 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import lombok.Getter;
@@ -47,10 +45,9 @@ class ParentFormFieldConstraintValidator<
 
 	@Override
 	public
-	void validate (
+	Optional<String> validate (
 			@NonNull Container container,
-			@NonNull Optional<Native> nativeValue,
-			@NonNull List<String> errors) {
+			@NonNull Optional<Native> nativeValue) {
 
 		Record<?> privDelegate =
 			createPrivDelegate != null
@@ -65,11 +62,13 @@ class ParentFormFieldConstraintValidator<
 				createPrivCode)
 		) {
 
-			errors.add (
+			return Optional.of (
 				stringFormat (
 					"Permission denied"));
 
 		}
+
+		return Optional.<String>absent ();
 
 	}
 

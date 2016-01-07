@@ -30,6 +30,13 @@
 			name="commons-lang3"
 			rev="3.2.1"/>
 
+		<!-- functional java -->
+
+		<dependency
+			org="org.functionaljava"
+			name="functionaljava"
+			rev="3.0"/>
+
 		<!-- guava -->
 
 		<dependency

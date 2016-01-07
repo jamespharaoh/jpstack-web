@@ -1,6 +1,6 @@
 package wbs.services.messagetemplate.logic;
 
-import static wbs.framework.utils.etc.Misc.codify;
+import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import lombok.NonNull;
 
@@ -80,7 +80,7 @@ class MessageTemplateLogicImplementation
 				slice)
 
 			.setCode (
-				codify (
+				simplifyToCodeRequired (
 					databaseSpec.name ()))
 
 			.setName (
@@ -107,7 +107,7 @@ class MessageTemplateLogicImplementation
 					mtDatabase)
 
 				.setCode (
-					codify (
+					simplifyToCodeRequired (
 						entryTypeSpec.name ()))
 
 				.setName (
@@ -133,7 +133,7 @@ class MessageTemplateLogicImplementation
 						entryType)
 
 					.setCode (
-						codify (
+						simplifyToCodeRequired (
 							fieldTypeSpec.name ()))
 
 					.setName (
@@ -170,7 +170,7 @@ class MessageTemplateLogicImplementation
 						entryType)
 
 					.setCode (
-						codify (
+						simplifyToCodeRequired (
 							parameterSpec.name ()))
 
 					.setName (

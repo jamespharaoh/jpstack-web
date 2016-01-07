@@ -136,7 +136,7 @@ class UploadFormFieldBuilder {
 
 		// form field
 
-		formFieldSet.formFields ().add (
+		formFieldSet.addFormField (
 			updatableFormFieldProvider.get ()
 
 			.name (

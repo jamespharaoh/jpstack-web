@@ -197,7 +197,7 @@ class TimestampToFormFieldBuilder {
 
 		if (readOnly) {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 
 				readOnlyFormFieldProvider.get ()
 
@@ -223,7 +223,7 @@ class TimestampToFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 
 				updatableFormFieldProvider.get ()
 

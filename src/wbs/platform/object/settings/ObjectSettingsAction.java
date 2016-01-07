@@ -143,6 +143,10 @@ class ObjectSettingsAction<
 			formFieldLogic.reportErrors (
 				updateResultSet);
 
+			requestContext.request (
+				"objectCreateUpdateResultSet",
+				updateResultSet);
+
 			return null;
 
 		}
@@ -152,6 +156,7 @@ class ObjectSettingsAction<
 		if (object instanceof PermanentRecord) {
 
 			formFieldLogic.runUpdateHooks (
+				formFieldSet,
 				updateResultSet,
 				object,
 				(PermanentRecord<?>) object,
@@ -170,6 +175,7 @@ class ObjectSettingsAction<
 					objectRefName);
 
 			formFieldLogic.runUpdateHooks (
+				formFieldSet,
 				updateResultSet,
 				object,
 				linkObject,

@@ -4,8 +4,7 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
-
-import java.util.List;
+import static wbs.framework.utils.etc.Misc.successResult;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -13,6 +12,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -31,10 +32,9 @@ class IntegerFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<Long> interfaceToGeneric (
+	Either<Optional<Long>,String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue,
-			@NonNull List<String> errors) {
+			@NonNull Optional<String> interfaceValue) {
 
 		if (
 
@@ -47,13 +47,15 @@ class IntegerFormFieldInterfaceMapping<Container>
 
 		) {
 
-			return Optional.<Long>absent ();
+			return successResult (
+				Optional.<Long>absent ());
 
 		} else {
 
-			return Optional.of (
-				Long.parseLong (
-					interfaceValue.get ()));
+			return successResult (
+				Optional.of (
+					Long.parseLong (
+						interfaceValue.get ())));
 
 		}
 
@@ -61,7 +63,7 @@ class IntegerFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Optional<String> genericToInterface (
+	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Optional<Long> genericValue) {
 
@@ -80,13 +82,15 @@ class IntegerFormFieldInterfaceMapping<Container>
 
 		) {
 
-			return Optional.<String>absent ();
+			return successResult (
+				Optional.<String>absent ());
 
 		} else {
 
-			return Optional.of (
-				Long.toString (
-					genericValue.get ()));
+			return successResult (
+				Optional.of (
+					Long.toString (
+						genericValue.get ())));
 
 		}
 

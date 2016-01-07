@@ -2,12 +2,12 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
-
-import java.util.List;
-
+import static wbs.framework.utils.etc.Misc.successResult;
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -18,10 +18,9 @@ class EnumCsvFormFieldInterfaceMapping<Container,Generic extends Enum<Generic>>
 
 	@Override
 	public
-	Optional<Generic> interfaceToGeneric (
+	Either<Optional<Generic>,String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue,
-			@NonNull List<String> errors) {
+			@NonNull Optional<String> interfaceValue) {
 
 		throw new UnsupportedOperationException ();
 
@@ -29,7 +28,7 @@ class EnumCsvFormFieldInterfaceMapping<Container,Generic extends Enum<Generic>>
 
 	@Override
 	public
-	Optional<String> genericToInterface (
+	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Optional<Generic> genericValue) {
 
@@ -38,13 +37,16 @@ class EnumCsvFormFieldInterfaceMapping<Container,Generic extends Enum<Generic>>
 				genericValue)
 		) {
 
-			return Optional.of ("");
+			return successResult (
+				Optional.of (
+					""));
 
 		} else {
 
-			return Optional.of (
-				camelToHyphen (
-					genericValue.get ().toString ()));
+			return successResult (
+				Optional.of (
+					camelToHyphen (
+						genericValue.get ().toString ())));
 
 		}
 

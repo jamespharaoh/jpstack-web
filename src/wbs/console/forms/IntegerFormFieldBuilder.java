@@ -252,7 +252,7 @@ class IntegerFormFieldBuilder {
 
 		if (! readOnly) {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 				updatableFormFieldProvider.get ()
 
 				.name (
@@ -289,7 +289,7 @@ class IntegerFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.formFields ().add (
+			formFieldSet.addFormField (
 				readOnlyFormFieldProvider.get ()
 
 				.name (

@@ -1,8 +1,8 @@
 package wbs.console.forms;
 
-import java.util.List;
-
 import com.google.common.base.Optional;
+
+import fj.data.Either;
 
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -31,7 +31,8 @@ interface FormFieldRenderer<Container,Interface> {
 	void renderFormRow (
 			FormatWriter out,
 			Container container,
-			Optional<Interface> interfaceValue);
+			Optional<Interface> interfaceValue,
+			Optional<String> error);
 
 	void renderFormInput (
 			FormatWriter out,
@@ -46,8 +47,7 @@ interface FormFieldRenderer<Container,Interface> {
 
 	boolean formValuePresent ();
 
-	Optional<Interface> formToInterface (
-			List<String> errors);
+	Either<Optional<Interface>,String> formToInterface ();
 
 	String interfaceToHtmlSimple (
 			Container container,

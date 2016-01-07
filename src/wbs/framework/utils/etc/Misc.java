@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +43,8 @@ import org.joda.time.ReadableInstant;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+
+import fj.data.Either;
 
 // TODO lots to deprecate here
 public
@@ -280,20 +283,13 @@ class Misc {
 		Pattern.compile ("[^a-z0-9]+");
 
 	public static
-	String codify (
-			String string) {
+	String simplify (
+			@NonNull String s) {
 
-		return string
-			.toLowerCase ()
-			.replaceAll ("[^a-z0-9]+", " ")
-			.trim ()
-			.replaceAll (" ", "_");
-
-	}
-
-	public static String simplify(String s) {
-		return nonAlphanumericWordsPattern.matcher(s.toLowerCase()).replaceAll(
+		return nonAlphanumericWordsPattern.matcher (
+			s.toLowerCase()).replaceAll(
 				" ").trim();
+
 	}
 
 	public static
@@ -2023,6 +2019,16 @@ class Misc {
 	}
 
 	public static <Type>
+	boolean contains (
+			@NonNull Map<Type,?> map,
+			@NonNull Type value) {
+
+		return map.keySet ().contains (
+			value);
+
+	}
+
+	public static <Type>
 	boolean doesNotContain (
 			@NonNull Collection<Type> collection,
 			@NonNull Type value) {
@@ -2616,6 +2622,88 @@ class Misc {
 				exception);
 
 		}
+
+	}
+
+	public static <Type>
+	Type eitherGetLeft (
+			@NonNull Either<Type,?> either) {
+
+		return either.left ().value ();
+
+	}
+
+	public static <Type>
+	Type getValue (
+			@NonNull Either<Type,?> either) {
+
+		return either.left ().value ();
+
+	}
+
+	public static <Type>
+	Type eitherGetRight (
+			@NonNull Either<?,Type> either) {
+
+		return either.right ().value ();
+
+	}
+
+	public static <Type>
+	Type getError (
+			@NonNull Either<?,Type> either) {
+
+		return either.right ().value ();
+
+	}
+
+	public static
+	boolean isLeft (
+			@NonNull Either<?,?> either) {
+
+		return either.isLeft ();
+
+	}
+
+	public static
+	boolean isRight (
+			@NonNull Either<?,?> either) {
+
+		return either.isRight ();
+
+	}
+
+	public static <LeftType,RightType>
+	Either<LeftType,RightType> successResult (
+			@NonNull LeftType left) {
+
+		return Either.<LeftType,RightType>left (
+			left);
+
+	}
+
+	public static <LeftType,RightType>
+	Either<LeftType,RightType> errorResult (
+			@NonNull RightType right) {
+
+		return Either.<LeftType,RightType>right (
+			right);
+
+	}
+
+	public static
+	boolean isError (
+			@NonNull Either<?,?> either) {
+
+		return either.isRight ();
+
+	}
+
+	public static
+	boolean isSuccess (
+			@NonNull Either<?,?> either) {
+
+		return either.isLeft ();
 
 	}
 

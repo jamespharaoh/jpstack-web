@@ -1,6 +1,6 @@
 package wbs.smsapps.subscription.fixture;
 
-import static wbs.framework.utils.etc.Misc.codify;
+import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 
 import java.util.Map;
 
@@ -225,7 +225,7 @@ class SubscriptionFixtureProvider
 					subscription)
 
 				.setCode (
-					codify (
+					simplifyToCodeRequired (
 						listSpecEntry.getValue ()))
 
 				.setName (
@@ -268,7 +268,7 @@ class SubscriptionFixtureProvider
 					subscription)
 
 				.setCode (
-					codify (
+					simplifyToCodeRequired (
 						affiliateSpecEntry.getValue ()))
 
 				.setName (

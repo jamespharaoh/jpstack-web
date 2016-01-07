@@ -6,8 +6,11 @@ import static wbs.framework.utils.etc.Misc.toEnum;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
@@ -86,6 +89,7 @@ class ChatUserImageUploadPart
 		formFieldLogic.outputFormRows (
 			formatWriter,
 			formFieldSet,
+			Optional.<UpdateResultSet>absent (),
 			uploadForm);
 
 		printFormat (

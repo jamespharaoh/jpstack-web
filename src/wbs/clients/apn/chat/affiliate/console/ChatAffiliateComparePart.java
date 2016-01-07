@@ -64,7 +64,7 @@ class ChatAffiliateComparePart
 				"7 days");
 
 		Integer timePeriodSeconds =
-			intervalFormatter.processIntervalStringSeconds (
+			intervalFormatter.parseIntervalStringSecondsRequired (
 				timePeriodString);
 
 		if (timePeriodSeconds == null) {

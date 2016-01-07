@@ -1,10 +1,9 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.codify;
+import static wbs.framework.utils.etc.CodeUtils.simplifyToCode;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.Getter;
@@ -31,25 +30,27 @@ class NameFormFieldValueValidator
 
 	@Override
 	public
-	void validate (
-			@NonNull Optional<String> genericValue,
-			@NonNull List<String> errors) {
+	Optional<String> validate (
+			@NonNull Optional<String> genericValue) {
 
-		String code =
-			codify (
+		Optional<String> code =
+			simplifyToCode (
 				genericValue.get ());
 
-		Matcher matcher =
-			codePattern.matcher (
-				code);
+		if (
+			isNotPresent (
+				code)
+		) {
 
-		if (! matcher.matches ()) {
-
-			errors.add (
+			return Optional.of (
 				stringFormat (
-					"Invalid name"));
+					"Names must contain at least one letter, and cannot have ",
+					"a digit before the first letter"));
+
 
 		}
+
+		return Optional.<String>absent ();
 
 	}
 
