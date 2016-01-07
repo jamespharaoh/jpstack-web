@@ -445,7 +445,6 @@ class SubscriptionCommand
 
 			subscription =
 				(SubscriptionRec)
-				(Object)
 				commandParent;
 
 		}
@@ -454,7 +453,6 @@ class SubscriptionCommand
 
 			subscriptionAffiliate =
 				(SubscriptionAffiliateRec)
-				(Object)
 				commandParent;
 
 			subscription =
@@ -466,7 +464,6 @@ class SubscriptionCommand
 
 			subscriptionKeyword =
 				(SubscriptionKeywordRec)
-				(Object)
 				commandParent;
 
 			subscription =
@@ -478,7 +475,6 @@ class SubscriptionCommand
 
 			subscriptionList =
 				(SubscriptionListRec)
-				(Object)
 				commandParent;
 
 			subscription =

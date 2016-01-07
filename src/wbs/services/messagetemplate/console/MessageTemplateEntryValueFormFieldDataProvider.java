@@ -40,7 +40,6 @@ class MessageTemplateEntryValueFormFieldDataProvider
 		/*
 		MessageTemplateTypeRec messageTemplateType =
 			(MessageTemplateTypeRec)
-			(Object)
 			parent;
 
 		for (

@@ -69,7 +69,6 @@ class CurrencyFormFieldInterfaceMapping<Container>
 
 		CurrencyRec currency =
 			(CurrencyRec)
-			(Object)
 			objectManager.dereference (
 				container,
 				currencyPath);
@@ -129,7 +128,6 @@ class CurrencyFormFieldInterfaceMapping<Container>
 
 		CurrencyRec currency =
 			(CurrencyRec)
-			(Object)
 			objectManager.dereference (
 				container,
 				currencyPath);

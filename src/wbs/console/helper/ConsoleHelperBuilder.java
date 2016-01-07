@@ -347,9 +347,7 @@ System.out.println ("#### GOT HOOKS FOR " + consoleHelperProvider.objectName ())
 		public
 		List<Record<?>> findEntities () {
 
-			return
-				(List<Record<?>>)
-				(Object)
+			return (List<Record<?>>)
 				objectHelper.findAll ();
 
 		}

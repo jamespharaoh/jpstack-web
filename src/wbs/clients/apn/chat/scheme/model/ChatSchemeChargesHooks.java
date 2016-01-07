@@ -15,12 +15,11 @@ class ChatSchemeChargesHooks
 			ObjectHelper<?> chatSchemeHelper,
 			Record<?> parent) {
 
-		if (! ((Object) parent instanceof ChatSchemeRec))
+		if (! (parent instanceof ChatSchemeRec))
 			return;
 
 		ChatSchemeRec chatScheme =
 			(ChatSchemeRec)
-			(Object)
 			parent;
 
 		ChatSchemeChargesRec chatSchemeCharges =

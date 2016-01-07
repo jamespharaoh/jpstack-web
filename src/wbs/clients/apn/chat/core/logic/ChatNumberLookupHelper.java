@@ -44,7 +44,6 @@ class ChatNumberLookupHelper
 
 		ChatRec chat =
 			(ChatRec)
-			(Object)
 			objectManager.getParent (
 				numberLookup);
 

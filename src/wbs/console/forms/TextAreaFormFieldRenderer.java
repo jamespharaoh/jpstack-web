@@ -301,12 +301,10 @@ class TextAreaFormFieldRenderer<Container,Parent>
 
 				MessageTemplateSetRec messageTemplateSet =
 					(MessageTemplateSetRec)
-					(Object)
 					container;
 
 				MessageTemplateTypeRec messageTemplateType =
 					(MessageTemplateTypeRec)
-					(Object)
 					parent;
 
 				MessageTemplateValueRec messageTemplateValue =
