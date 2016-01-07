@@ -477,7 +477,8 @@ class HybyteSender
 		// check for an ok acknowledgement and return the uuid
 
 		nodes =
-			document.query ("/Airbyte/acknowledgement");
+			document.query (
+				"/Airbyte/acknowledgement");
 
 		if (nodes.size() == 1) {
 
