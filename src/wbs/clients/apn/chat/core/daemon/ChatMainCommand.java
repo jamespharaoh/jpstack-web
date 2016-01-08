@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.core.daemon;
 
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.notIn;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -533,10 +534,15 @@ class ChatMainCommand
 			return Optional.<InboxAttemptRec>absent ();
 
 		if (
-			! in (
+
+			isNotNull (
+				fromChatUser.getNextJoinType ())
+
+			&& notIn (
 				fromChatUser.getNextJoinType (),
 				ChatKeywordJoinType.chatDob,
 				ChatKeywordJoinType.dateDob)
+
 		) {
 			return Optional.<InboxAttemptRec>absent ();
 		}
