@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.parseInterval;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,8 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.LongType;
+import org.hibernate.type.Type;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
@@ -324,6 +327,21 @@ class QueueItemDaoHibernate
 				Projections.max (
 					"_queueItem.createdTime"),
 				"lastMessage")
+
+			.add (
+				Projections.sqlProjection (
+					stringFormat (
+						"avg (CASE WHEN {alias}.processed_time IS NULL THEN ",
+						"NULL ELSE EXTRACT (EPOCH FROM ({alias}.",
+						"processed_time - {alias}.created_time)) END) / count ",
+						"({alias}.processed_time) AS time_to_process"),
+					new String [] {
+						"time_to_process",
+					},
+					new Type [] {
+						LongType.INSTANCE,
+					}),
+				"timeToProcess")
 
 			.add (
 				Projections.groupProperty (

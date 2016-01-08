@@ -37,7 +37,7 @@ class SimpleFormFieldAccessor<Container,Native>
 	@Override
 	public
 	Optional<Native> read (
-		Container container) {
+			Container container) {
 
 		// get native object
 
@@ -63,7 +63,7 @@ class SimpleFormFieldAccessor<Container,Native>
 
 			throw new RuntimeException (
 				stringFormat (
-					"Field %s is %s, not %s",
+					"Field '%s' is %s, expected %s",
 					name,
 					nativeObject.getClass ().getSimpleName (),
 					nativeClass.getSimpleName ()));

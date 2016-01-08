@@ -32,6 +32,14 @@
 			search-fields="admin-credit-search"
 			results-fields="admin-credit-results"/>
 
+		<object-search-page
+			name="alarms"
+			tab-label="Alarms"
+			object-type="chatUserInitiationLog"
+			search-class="wbs.clients.apn.chat.contact.model.ChatUserInitiationLogSearch"
+			search-fields="initiation-log-search"
+			results-fields="initiation-log-results"/>
+
 	</simple-context>
 
 	<field-set
@@ -214,6 +222,58 @@
 		<object-field
 			name="user"
 			object-type="user"/>
+
+	</field-set>
+
+	<field-set
+		name="initiation-log-search"
+		class="wbs.clients.apn.chat.contact.model.ChatUserInitiationLogSearch">
+
+		<timestamp-partial-field
+			name="timestamp"
+			nullable="yes"/>
+
+		<enum-field
+			name="reason"
+			helper="chatUserInitiationReasonConsoleHelper"
+			nullable="yes"/>
+
+		<object-id-field
+			name="monitorUserId"
+			label="User"
+			object-type="user"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="initiation-log-results"
+		object-name="chatUserInitiationLog">
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<object-field
+			name="chatUser"
+			label="Chat user"
+			object-type="chatUser"/>
+
+		<object-field
+			name="monitorChatUser"
+			label="Monitor"
+			object-type="chatUser"/>
+
+		<object-field
+			name="monitorUser"
+			label="User"
+			object-type="user"/>
+
+		<timestamp-field
+			name="alarmTime"/>
+
+		<enum-field
+			name="reason"
+			helper="chatUserInitiationReasonConsoleHelper"/>
 
 	</field-set>
 

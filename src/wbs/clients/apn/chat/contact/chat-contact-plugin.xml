@@ -35,6 +35,7 @@
 		<bean class="console.ChatMonitorInboxQueueConsolePlugin"/>
 		<bean class="console.ChatMonitorInboxSummaryPart"/>
 		<bean class="console.ChatMonitorInboxUpdateNoteAction"/>
+		<bean class="console.ChatUserInitiationReasonConsoleHelper"/>
 	</layer>
 
 	<layer name="daemon">
@@ -45,6 +46,7 @@
 		<console-module name="chat-message"/>
 		<console-module name="chat-monitor-inbox"/>
 		<console-module name="chat-message-pending"/>
+		<console-module name="chat-user-initiation-log"/>
 	</console-modules>
 
 </plugin>

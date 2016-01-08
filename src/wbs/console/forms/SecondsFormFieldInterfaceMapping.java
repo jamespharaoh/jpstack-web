@@ -25,7 +25,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 @PrototypeComponent ("secondsFormFieldInterfaceMapping")
 public
 class SecondsFormFieldInterfaceMapping<Container>
-	implements FormFieldInterfaceMapping<Container,Integer,String> {
+	implements FormFieldInterfaceMapping<Container,Long,String> {
 
 	// dependencies
 
@@ -41,7 +41,7 @@ class SecondsFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Either<Optional<Integer>,String> interfaceToGeneric (
+	Either<Optional<Long>,String> interfaceToGeneric (
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue) {
 
@@ -57,7 +57,7 @@ class SecondsFormFieldInterfaceMapping<Container>
 		) {
 
 			return successResult (
-				Optional.<Integer>absent ());
+				Optional.<Long>absent ());
 
 		} else {
 
@@ -78,7 +78,9 @@ class SecondsFormFieldInterfaceMapping<Container>
 			}
 
 			return successResult (
-				genericValue);
+				Optional.of (
+					(long)
+					genericValue.get ()));
 
 		}
 
@@ -88,7 +90,7 @@ class SecondsFormFieldInterfaceMapping<Container>
 	public
 	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
-			@NonNull Optional<Integer> genericValue) {
+			@NonNull Optional<Long> genericValue) {
 
 		if (
 			isNotPresent (
@@ -103,6 +105,7 @@ class SecondsFormFieldInterfaceMapping<Container>
 			return successResult (
 				Optional.of (
 					intervalFormatter.createIntervalStringSeconds (
+						(int) (long)
 						genericValue.get ())));
 
 		}

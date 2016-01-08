@@ -185,6 +185,9 @@
 		<timestamp-field
 			name="lastMessage"/>
 
+		<seconds-field
+			name="timeToProcess"/>
+
 	</field-set>
 
 </console-module>

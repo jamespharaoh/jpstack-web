@@ -13,4 +13,7 @@ interface ChatUserInitiationLogDaoMethods {
 			ChatRec chat,
 			Interval timestampInterval);
 
+	List<Integer> searchIds (
+			ChatUserInitiationLogSearch search);
+
 }

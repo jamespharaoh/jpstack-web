@@ -3,6 +3,7 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -14,6 +15,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.utils.etc.BeanLogic;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("secondsFormFieldBuilder")
@@ -27,6 +29,10 @@ class SecondsFormFieldBuilder {
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
+
+	@Inject
+	Provider<IntegerFormFieldNativeMapping>
+	integerFormFieldNativeMappingProvider;
 
 	@Inject
 	Provider<ReadOnlyFormField>
@@ -96,7 +102,12 @@ class SecondsFormFieldBuilder {
 				spec.readOnly (),
 				false);
 
-		// field components
+		Class<?> propertyClass =
+			BeanLogic.propertyClassForClass (
+				context.containerClass (),
+				name);
+
+		// accessor
 
 		FormFieldAccessor accessor =
 			simpleFormFieldAccessorProvider.get ()
@@ -105,7 +116,33 @@ class SecondsFormFieldBuilder {
 				name)
 
 			.nativeClass (
-				Integer.class);
+				propertyClass);
+
+		// native mapping
+
+		FormFieldNativeMapping nativeMapping;
+
+		if (propertyClass == Integer.class) {
+
+			nativeMapping =
+				integerFormFieldNativeMappingProvider.get ();
+
+		} else if (propertyClass == Long.class) {
+
+			nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
+
+		} else {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Don't know how to map %s as integer for %s.%s",
+					propertyClass,
+					context.containerClass (),
+					name));
+
+		}
+
 
 		FormFieldConstraintValidator constraintValidator =
 			nullFormFieldConstraintValidatorProvider.get ();
@@ -154,7 +191,7 @@ class SecondsFormFieldBuilder {
 					accessor)
 
 				.nativeMapping (
-					identityFormFieldNativeMappingProvider.get ())
+					nativeMapping)
 
 				.valueValidator (
 					nullFormFieldValueValidatorProvider.get ())
@@ -188,7 +225,7 @@ class SecondsFormFieldBuilder {
 					accessor)
 
 				.nativeMapping (
-					identityFormFieldNativeMappingProvider.get ())
+					nativeMapping)
 
 				.interfaceMapping (
 					interfaceMapping)
