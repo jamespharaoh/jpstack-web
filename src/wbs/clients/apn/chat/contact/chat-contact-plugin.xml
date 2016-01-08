@@ -35,6 +35,7 @@
 		<bean class="console.ChatMonitorInboxQueueConsolePlugin"/>
 		<bean class="console.ChatMonitorInboxSummaryPart"/>
 		<bean class="console.ChatMonitorInboxUpdateNoteAction"/>
+		<bean class="console.ChatUserInitiationLogConsoleHooks"/>
 		<bean class="console.ChatUserInitiationReasonConsoleHelper"/>
 	</layer>
 

@@ -333,8 +333,8 @@ class QueueItemDaoHibernate
 					stringFormat (
 						"avg (CASE WHEN {alias}.processed_time IS NULL THEN ",
 						"NULL ELSE EXTRACT (EPOCH FROM ({alias}.",
-						"processed_time - {alias}.created_time)) END) / count ",
-						"({alias}.processed_time) AS time_to_process"),
+						"processed_time - {alias}.created_time)) END) AS ",
+						"time_to_process"),
 					new String [] {
 						"time_to_process",
 					},

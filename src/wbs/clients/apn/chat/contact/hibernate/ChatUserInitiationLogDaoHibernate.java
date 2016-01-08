@@ -1,14 +1,17 @@
 package wbs.clients.apn.chat.contact.hibernate;
 
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.parseInterval;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.NonNull;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -67,7 +70,15 @@ class ChatUserInitiationLogDaoHibernate
 		Criteria criteria =
 			createCriteria (
 				ChatUserInitiationLogRec.class,
-				"_chatUserInitiationLog");
+				"_chatUserInitiationLog")
+
+			.createAlias (
+				"_chatUserInitiationLog.chatUser",
+				"_chatUser")
+
+			.createAlias (
+				"_chatUser.chat",
+				"_chat");
 
 		if (
 			isNotNull (
@@ -127,6 +138,30 @@ class ChatUserInitiationLogDaoHibernate
 				Restrictions.eq (
 					"_chatUserInitiationLog.monitorUser.id",
 					search.monitorUserId ()));
+
+		}
+
+		if (search.filter ()) {
+
+			List<Criterion> filterCriteria =
+				new ArrayList<Criterion> ();
+
+			if (
+				isNotEmpty (
+					search.filterChatIds ())
+			) {
+
+				filterCriteria.add (
+					Restrictions.in (
+						"_chat.id",
+						search.filterChatIds ()));
+
+			}
+
+			criteria.add (
+				Restrictions.or (
+					filterCriteria.toArray (
+						new Criterion [] {})));
 
 		}
 

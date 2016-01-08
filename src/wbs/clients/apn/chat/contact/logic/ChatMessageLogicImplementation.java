@@ -565,13 +565,13 @@ class ChatMessageLogicImplementation
 
 			toUser.getAdultVerified ()
 
+			|| toUser.getType ()
+				== ChatUserType.monitor
+
 			|| in (
 				toUser.getDeliveryMethod (),
 				ChatMessageMethod.iphone,
-				ChatMessageMethod.web)
-
-			|| toUser.getType ()
-				== ChatUserType.monitor;
+				ChatMessageMethod.web);
 
 		// if they are both adult
 
