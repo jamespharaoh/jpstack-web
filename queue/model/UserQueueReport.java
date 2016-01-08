@@ -21,7 +21,7 @@ class UserQueueReport
 	Date firstMessage;
 	Date lastMessage;
 
-	Integer timeToProcess;
+	Long timeToProcess;
 
 	@Override
 	public
