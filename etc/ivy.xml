@@ -182,6 +182,18 @@
 			name="postgresql"
 			rev="9.4.1207.jre7"/>
 
+		<!-- tomcat -->
+
+		<dependency
+			org="org.apache.tomcat"
+			name="tomcat-servlet-api"
+			rev="7.0.67"/>
+
+		<dependency
+			org="org.apache.tomcat.embed"
+			name="tomcat-embed-core"
+			rev="7.0.67"/>
+
 		<!-- usertype -->
 
 		<dependency
@@ -198,11 +210,9 @@
 
 		<!-- exclusions -->
 
-		<!--
 		<exclude
 			org="javax.servlet"
 			artifact="servlet-api"/>
-		-->
 
 		<exclude
 			org="org.apache.openejb"

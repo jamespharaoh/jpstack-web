@@ -3,8 +3,13 @@ declare variable $build := /wbs-build;
 declare variable $mode external;
 
 <web-app
-	xmlns="http://java.sun.com/xml/ns/j2ee"
-	version="2.4">
+	version="3.0"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://java.sun.com/xml/ns/javaee
+		http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd
+	">
 
 	<display-name>{
 		'WBS API'

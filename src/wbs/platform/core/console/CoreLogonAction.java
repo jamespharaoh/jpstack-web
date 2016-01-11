@@ -43,7 +43,10 @@ class CoreLogonAction
 	@Override
 	public
 	Responder backupResponder () {
-		return responder ("coreLogonResponder");
+
+		return responder (
+			"coreLogonResponder");
+
 	}
 
 	// implementation

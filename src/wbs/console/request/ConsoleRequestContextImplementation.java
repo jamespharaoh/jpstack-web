@@ -1,6 +1,7 @@
 package wbs.console.request;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.pluralise;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -233,6 +235,27 @@ class ConsoleRequestContextImplementation
 	void session (
 			@NonNull String key,
 			Object object) {
+
+		if (
+
+			isNotNull (
+				object)
+
+			&& isNotInstanceOf (
+				Serializable.class,
+				object)
+
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Object of type %s ",
+					object.getClass ().getSimpleName (),
+					"stored in session as '%s', ",
+					key,
+					"but is not serializable"));
+
+		}
 
 		requestContext.session (
 			key,

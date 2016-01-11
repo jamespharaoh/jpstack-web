@@ -51,8 +51,11 @@
 	<library name="portlet-api" type="jar" version="1.0"/>
 	<library name="postgresql" type="bundle" version="9.4.1207.jre7" source="yes"/>
 	<library name="serializer" type="jar" version="2.7.1"/>
-	<library name="servlet-api" type="jar" version="2.5"/>
 	<library name="slf4j-api" type="jar" version="1.6.1"/>
+	<library name="tomcat-embed-core" type="jar" version="7.0.67" source="yes"/>
+	<library name="tomcat-embed-logging-juli" type="jar" version="7.0.67"/>
+	<library name="tomcat-embed-logging-log4j" type="jar" version="7.0.67"/>
+	<library name="tomcat-servlet-api" type="jar" version="7.0.67" source="yes"/>
 	<library name="usertype.jodatime" type="jar" version="2.0.1" source="yes"/>
 	<library name="usertype.spi" type="jar" version="2.0.1"/>
 	<library name="validation-api" type="jar" version="1.0.0.GA"/>

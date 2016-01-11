@@ -59,8 +59,11 @@
   <classpathentry kind="lib" path="binaries/libraries/portlet-api-jar-1.0.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/postgresql-bundle-9.4.1207.jre7.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/postgresql-source-9.4.1207.jre7.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/serializer-jar-2.7.1.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/servlet-api-jar-2.5.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/slf4j-api-jar-1.6.1.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/tomcat-embed-core-jar-7.0.67.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/tomcat-embed-core-source-7.0.67.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/tomcat-embed-logging-juli-jar-7.0.67.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/tomcat-embed-logging-log4j-jar-7.0.67.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/tomcat-servlet-api-jar-7.0.67.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/tomcat-servlet-api-source-7.0.67.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/usertype.jodatime-jar-2.0.1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/usertype.jodatime-source-2.0.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/usertype.spi-jar-2.0.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/validation-api-jar-1.0.0.GA.jar"/>

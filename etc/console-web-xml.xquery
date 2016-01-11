@@ -3,8 +3,13 @@ declare variable $build := /wbs-build;
 declare variable $mode external;
 
 <web-app
-	xmlns="http://java.sun.com/xml/ns/j2ee"
-	version="2.4">
+	version="3.0"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://java.sun.com/xml/ns/javaee
+		http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd
+	">
 
 	<display-name>{
 		'WBS console'
@@ -68,16 +73,6 @@ declare variable $mode external;
 
 	</context-param>
 
-	<!-- listeners -->
-
-	<listener>
-
-		<listener-class>{
-			'wbs.platform.servlet.WbsServletListener'
-		}</listener-class>
-
-	</listener>
-
 	<!-- filters -->
 
 	<filter>
@@ -116,6 +111,16 @@ declare variable $mode external;
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
+	<!-- listeners -->
+
+	<listener>
+
+		<listener-class>{
+			'wbs.platform.servlet.WbsServletListener'
+		}</listener-class>
+
+	</listener>
+
 	<!-- servlets -->
 
 	<servlet>
@@ -153,5 +158,11 @@ declare variable $mode external;
 		<extension>ico</extension>
 		<mime-type>image/vnd.microsoft.icon</mime-type>
 	</mime-mapping>
+
+	<!-- welcome file -->
+
+	<welcome-file-list>
+		<welcome-file>HOME</welcome-file>
+	</welcome-file-list>
 
 </web-app>
