@@ -99,7 +99,6 @@
   <classpathentry kind="lib" path="binaries/libraries/tomcat-embed-core-jar-7.0.67.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/tomcat-embed-core-source-7.0.67.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/tomcat-embed-logging-juli-jar-7.0.67.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/tomcat-embed-logging-log4j-jar-7.0.67.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/tomcat-servlet-api-jar-7.0.67.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/tomcat-servlet-api-source-7.0.67.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/txw2-jar-2.2.11.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/usertype.jodatime-jar-2.0.1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/usertype.jodatime-source-2.0.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/usertype.spi-jar-2.0.1.jar"/>

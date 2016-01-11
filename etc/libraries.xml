@@ -57,8 +57,6 @@
 	<library name="jdeparser" type="jar" version="1.0.0.Final"/>
 	<library name="jdom" type="jar" version="2.0.2" source="yes"/>
 	<library name="jeromq" type="jar" version="0.3.5"/>
-	<library name="jna" type="jar" version="4.1.0"/>
-	<library name="jna-platform" type="jar" version="4.1.0"/>
 	<library name="joda-convert" type="jar" version="1.2"/>
 	<library name="joda-time" type="jar" version="2.9.1" source="yes"/>
 	<library name="json-simple" type="bundle" version="1.1.1" source="yes"/>
@@ -91,12 +89,10 @@
 	<library name="tomcat-embed-core" type="jar" version="7.0.67" source="yes"/>
 	<library name="tomcat-embed-logging-juli" type="jar" version="7.0.67"/>
 	<library name="tomcat-embed-logging-log4j" type="jar" version="7.0.67"/>
-	<library name="tomcat-servlet-api" type="jar" version="7.0.67" source="yes"/>
 	<library name="txw2" type="jar" version="2.2.11"/>
 	<library name="usertype.jodatime" type="jar" version="2.0.1" source="yes"/>
 	<library name="usertype.spi" type="jar" version="2.0.1"/>
 	<library name="validation-api" type="jar" version="1.1.0.Final"/>
-	<library name="waffle-jna" type="jar" version="1.7"/>
 	<library name="woodstox-core-asl" type="jar" version="4.3.0"/>
 	<library name="xalan" type="jar" version="2.7.1"/>
 	<library name="xercesImpl" type="jar" version="2.10.0"/>
