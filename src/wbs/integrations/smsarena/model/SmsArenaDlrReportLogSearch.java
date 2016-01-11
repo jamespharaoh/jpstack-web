@@ -1,5 +1,7 @@
 package wbs.integrations.smsarena.model;
 
+import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,7 +14,8 @@ import org.joda.time.Instant;
 @EqualsAndHashCode
 @ToString
 public
-class SmsArenaDlrReportLogSearch {
+class SmsArenaDlrReportLogSearch
+	implements Serializable {
 
 	Instant timestampAfter;
 	Instant timestampBefore;

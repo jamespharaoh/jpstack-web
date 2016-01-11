@@ -56,14 +56,17 @@ class IntervalFormatterImplementation
 
 	@Override
 	public
-	String createIntervalStringSeconds (
+	String createTextualIntervalStringSeconds (
 			int input) {
 
-		for (IntervalMatcher intervalMatcher
-				: intervalMatchers) {
+		for (
+			IntervalMatcher intervalMatcher
+				: intervalMatchers
+		) {
 
 			String intervalString =
-				intervalMatcher.textify (input);
+				intervalMatcher.textify (
+					input);
 
 			if (intervalString == null)
 				continue;
@@ -73,6 +76,36 @@ class IntervalFormatterImplementation
 		}
 
 		throw new RuntimeException ();
+
+	}
+
+	@Override
+	public
+	String createNumericIntervalStringSeconds (
+			int input) {
+
+		if (input < 60) {
+
+			return String.format (
+				"%d",
+				input);
+
+		} else if (input < 60 * 60) {
+
+			return String.format (
+				"%d:%02d",
+				input / 60,
+				input % 60);
+
+		} else {
+
+			return String.format (
+				"%d:%02d:%02d",
+				input / 60 / 60,
+				input / 60 % 60,
+				input % 60);
+
+		}
 
 	}
 

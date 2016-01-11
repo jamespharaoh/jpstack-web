@@ -37,6 +37,9 @@ class SecondsFormFieldInterfaceMapping<Container>
 	@Getter @Setter
 	String label;
 
+	@Getter @Setter
+	SecondsFormFieldSpec.Format format;
+
 	// implementation
 
 	@Override
@@ -102,11 +105,29 @@ class SecondsFormFieldInterfaceMapping<Container>
 
 		} else {
 
-			return successResult (
-				Optional.of (
-					intervalFormatter.createIntervalStringSeconds (
-						(int) (long)
-						genericValue.get ())));
+			switch (format) {
+
+			case textual:
+
+				return successResult (
+					Optional.of (
+						intervalFormatter.createTextualIntervalStringSeconds (
+							(int) (long)
+							genericValue.get ())));
+
+			case numeric:
+
+				return successResult (
+					Optional.of (
+						intervalFormatter.createNumericIntervalStringSeconds (
+							(int) (long)
+							genericValue.get ())));
+
+			default:
+
+				throw new RuntimeException ();
+
+			}
 
 		}
 

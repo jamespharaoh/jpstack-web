@@ -11,7 +11,10 @@ interface IntervalFormatter {
 	Integer parseIntervalStringSecondsRequired (
 			String input);
 
-	String createIntervalStringSeconds (
+	String createTextualIntervalStringSeconds (
+			int input);
+
+	String createNumericIntervalStringSeconds (
 			int input);
 
 }

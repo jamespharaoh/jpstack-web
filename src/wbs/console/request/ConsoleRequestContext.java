@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,9 +70,9 @@ interface ConsoleRequestContext {
 
 	void session (
 			String key,
-			Object object);
+			Serializable object);
 
-	Object session (
+	Serializable session (
 			String key);
 
 	void copyIntParamToSession (

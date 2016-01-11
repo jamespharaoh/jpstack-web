@@ -1,5 +1,7 @@
 package wbs.integrations.oxygen8.model;
 
+import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,7 +14,8 @@ import org.joda.time.Instant;
 @EqualsAndHashCode
 @ToString
 public
-class Oxygen8InboundLogSearch {
+class Oxygen8InboundLogSearch
+	implements Serializable {
 
 	Integer routeId;
 

@@ -6,6 +6,7 @@ import static wbs.framework.utils.etc.Misc.toBoolean;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.Misc.toInteger;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -87,6 +88,7 @@ class ChatUserSearchAction
 
 		requestContext.session (
 			"chatUserSearchParams",
+			(Serializable)
 			requestContext.parameterMapSimple ());
 
 		// check params

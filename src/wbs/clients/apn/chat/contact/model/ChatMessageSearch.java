@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.contact.model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,7 +12,8 @@ import org.joda.time.Instant;
 @Accessors (fluent = true)
 @Data
 public
-class ChatMessageSearch {
+class ChatMessageSearch
+	implements Serializable {
 
 	Integer chatId;
 

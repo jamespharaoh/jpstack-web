@@ -1,7 +1,6 @@
 package wbs.console.request;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.pluralise;
@@ -234,28 +233,7 @@ class ConsoleRequestContextImplementation
 	public
 	void session (
 			@NonNull String key,
-			Object object) {
-
-		if (
-
-			isNotNull (
-				object)
-
-			&& isNotInstanceOf (
-				Serializable.class,
-				object)
-
-		) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Object of type %s ",
-					object.getClass ().getSimpleName (),
-					"stored in session as '%s', ",
-					key,
-					"but is not serializable"));
-
-		}
+			Serializable object) {
 
 		requestContext.session (
 			key,
@@ -265,7 +243,7 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	Object session (
+	Serializable session (
 			@NonNull String key) {
 
 		return requestContext.session (

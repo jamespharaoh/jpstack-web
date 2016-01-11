@@ -186,7 +186,8 @@
 			name="lastMessage"/>
 
 		<seconds-field
-			name="timeToProcess"/>
+			name="timeToProcess"
+			format="numeric"/>
 
 	</field-set>
 

@@ -1,5 +1,7 @@
 package wbs.smsapps.manualresponder.model;
 
+import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,7 +14,8 @@ import org.joda.time.Instant;
 @EqualsAndHashCode
 @ToString
 public
-class ManualResponderRequestSearch {
+class ManualResponderRequestSearch
+	implements Serializable {
 
 	Integer manualResponderId;
 
@@ -21,7 +24,8 @@ class ManualResponderRequestSearch {
 	Instant timestampAfter;
 	Instant timestampBefore;
 
-	Order order = Order.timestampDesc;
+	Order order =
+		Order.timestampDesc;
 
 	public static
 	enum Order {

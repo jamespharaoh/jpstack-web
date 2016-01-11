@@ -1,5 +1,7 @@
 package wbs.applications.imchat.model;
 
+import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -10,12 +12,15 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode
 @ToString
 public
-class ImChatCustomerSearch {
+class ImChatCustomerSearch
+	implements Serializable {
 
 	Integer imChatId;
+
 	String code;
 
-	Order order = Order.timestampDesc;
+	Order order =
+		Order.timestampDesc;
 
 	public static
 	enum Order {

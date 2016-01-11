@@ -2,6 +2,7 @@ package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.isNull;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -97,6 +98,7 @@ class ObjectSearchPart
 
 			requestContext.session (
 				sessionKey + "Fields",
+				(Serializable)
 				search);
 
 		}

@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.allOf;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -201,6 +202,7 @@ class ChatBroadcastSendAction
 
 			requestContext.session (
 				"chatBroadcastParams",
+				(Serializable)
 				sessionParams);
 
 			boolean verify =

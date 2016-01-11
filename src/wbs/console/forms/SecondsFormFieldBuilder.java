@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.forms.TextFormFieldRenderer.Align;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -102,6 +103,11 @@ class SecondsFormFieldBuilder {
 				spec.readOnly (),
 				false);
 
+		SecondsFormFieldSpec.Format format =
+			ifNull (
+				spec.format (),
+				SecondsFormFieldSpec.Format.textual);
+
 		Class<?> propertyClass =
 			BeanLogic.propertyClassForClass (
 				context.containerClass (),
@@ -149,7 +155,12 @@ class SecondsFormFieldBuilder {
 
 		FormFieldInterfaceMapping interfaceMapping =
 			secondsFormFieldInterfaceMapping.get ()
-				.label (label);
+
+			.label (
+				label)
+
+			.format (
+				format);
 
 		FormFieldRenderer renderer =
 			textFormFieldRendererProvider.get ()
@@ -164,7 +175,12 @@ class SecondsFormFieldBuilder {
 				nullable)
 
 			.size (
-				FormField.defaultSize);
+				FormField.defaultSize)
+
+			.align (
+				format == SecondsFormFieldSpec.Format.numeric
+					? Align.right
+					: Align.left);
 
 		// update hook
 

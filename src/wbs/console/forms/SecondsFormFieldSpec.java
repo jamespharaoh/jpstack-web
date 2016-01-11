@@ -28,4 +28,13 @@ class SecondsFormFieldSpec {
 	@DataAttribute
 	Boolean readOnly;
 
+	@DataAttribute
+	Format format;
+
+	public static
+	enum Format {
+		textual,
+		numeric;
+	}
+
 }
