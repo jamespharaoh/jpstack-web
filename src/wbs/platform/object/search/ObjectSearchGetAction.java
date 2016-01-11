@@ -64,12 +64,6 @@ class ObjectSearchGetAction
 			requestContext.session (
 				sessionKey + "Results");
 
-System.out.println (
-	stringFormat (
-		"X0 %s, %s",
-		searchObject == null ? "NULL" : "NOT NULL",
-		objectIds == null ? "NULL" : "NOT NULL"));
-
 		if (
 
 			isNull (
@@ -84,14 +78,10 @@ System.out.println (
 				sessionKey + "Results",
 				null);
 
-System.out.println ("X1");
-
 			return responder (
 				searchResponderName);
 
 		} else {
-
-System.out.println ("X2 " + objectIds.size ());
 
 			return responder (
 				searchResultsResponderName);
