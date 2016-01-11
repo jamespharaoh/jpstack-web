@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -euf -o pipefail
+
+name="$1"
+path="$2"
+
+temp="/data/wal-new-temp"
+local_target="/data/wal-new"
+remote_target="ubuntu@bunga-platform-backup.vpn.wellbehavedsoftware.com:database-journal"
+
+cp "$path" "$temp/$name"
+
+nice xz --force "$temp/$name"
+
+rsync "$temp/$name.xz" "$remote_target/$name.xz"
+
+mv "$temp/$name.xz" "$local_target"
+
+# ex: noet ts=4 filetype=bash
