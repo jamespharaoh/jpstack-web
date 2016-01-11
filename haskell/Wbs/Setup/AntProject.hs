@@ -560,7 +560,7 @@ writeBuildFile world = do
 						sattr "refid" "classpath"
 					] [],
 					mkelem "link" [
-						sattr "href" "http://java.sun.com/j2se/1.7.0/docs/api"
+						sattr "href" "https://docs.oracle.com/javase/8/docs/api/"
 					] [],
 					mkelem "link" [
 						sattr "href" "http://logging.apache.org/log4j/docs/api"
