@@ -184,6 +184,19 @@ class Misc {
 	}
 
 	public static
+	Enum<?> toEnumGeneric (
+			@NonNull Class<?> enumType,
+			@NonNull String name) {
+
+		return (Enum<?>)
+			Arrays.stream (enumType.getEnumConstants ())
+			.filter (value -> ((Enum<?>) value).name ().equals (name))
+			.findFirst ()
+			.orElseThrow (() -> new IllegalArgumentException ());
+
+	}
+
+	public static
 	Boolean toBoolean (
 			String string) {
 

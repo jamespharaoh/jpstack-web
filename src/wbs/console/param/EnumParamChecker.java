@@ -1,6 +1,7 @@
 package wbs.console.param;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import lombok.NonNull;
 
 public
 class EnumParamChecker<E extends Enum<E>>
@@ -25,7 +26,7 @@ class EnumParamChecker<E extends Enum<E>>
 	@Override
 	public
 	E get (
-			String param) {
+			@NonNull String param) {
 
 		param =
 			param.trim ();

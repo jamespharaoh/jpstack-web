@@ -274,7 +274,7 @@ class ImChatPendingFormAction
 				.setTimestamp (
 					transaction.now ())
 
-					.setMessageText (
+				.setMessageText (
 					messageText)
 
 				.setImChatTemplate (

@@ -8,7 +8,7 @@ import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
-import static wbs.framework.utils.etc.Misc.toEnum;
+import static wbs.framework.utils.etc.Misc.toEnumGeneric;
 import static wbs.framework.utils.etc.Misc.uncapitalise;
 
 import java.io.File;
@@ -807,11 +807,11 @@ class DataFromXml {
 
 			} else if (field.getType ().isEnum ()) {
 
-				@SuppressWarnings ("unchecked")
 				Enum<?> enumValue =
-					toEnum (
-						field.getType ().asSubclass (Enum.class),
-						hyphenToCamel (attributeValue));
+					toEnumGeneric (
+						field.getType (),
+						hyphenToCamel (
+							attributeValue));
 
 				BeanLogic.set (
 					object,
