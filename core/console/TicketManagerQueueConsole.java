@@ -9,8 +9,6 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.console.AbstractQueueConsolePlugin;
 import wbs.platform.queue.model.QueueItemRec;
-import wbs.platform.queue.model.QueueRec;
-import wbs.services.ticket.core.model.TicketStateRec;
 
 @PrototypeComponent ("ticketManagerQueueConsole")
 public
@@ -50,20 +48,6 @@ class TicketManagerQueueConsole
 		return responder (
 			"ticketPendingFormResponder"
 		).get ();
-
-	}
-
-	@Override
-	public
-	long preferredUserDelay (
-			QueueRec queue) {
-
-		TicketStateRec ticketState =
-			(TicketStateRec) (Object)
-			objectManager.getParent (
-				queue);
-
-		return ticketState.getMinimum () * 1000L;
 
 	}
 
