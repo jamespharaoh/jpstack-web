@@ -1,5 +1,7 @@
 package wbs.platform.exception.model;
 
+import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -10,7 +12,8 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode
 @ToString
 public
-class ExceptionLogSearch {
+class ExceptionLogSearch
+	implements Serializable {
 
 	Boolean alert;
 	Boolean fatal;

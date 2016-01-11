@@ -6,6 +6,7 @@ import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.methodInvoke;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -168,13 +169,14 @@ class ObjectSearchPostAction
 			database.beginReadOnly (
 				this);
 
-		Object search =
+		Serializable search =
 			requestContext.session (
 				sessionKey + "Fields");
 
 		if (search == null) {
 
 			search =
+				(Serializable)
 				searchClass.newInstance ();
 
 			requestContext.session (
@@ -328,6 +330,7 @@ class ObjectSearchPostAction
 
 			requestContext.session (
 				sessionKey + "Results",
+				(Serializable)
 				objectIds);
 
 			return redirectResponderProvider.get ()
