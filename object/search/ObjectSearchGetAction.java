@@ -1,7 +1,6 @@
 package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
 
