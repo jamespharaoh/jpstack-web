@@ -4,7 +4,6 @@ import java.util.List;
 
 import wbs.framework.web.Responder;
 import wbs.platform.queue.model.QueueItemRec;
-import wbs.platform.queue.model.QueueRec;
 
 public
 interface QueueConsolePlugin {
@@ -13,8 +12,5 @@ interface QueueConsolePlugin {
 
 	Responder makeResponder (
 			QueueItemRec queueItem);
-
-	long preferredUserDelay (
-			QueueRec queue);
 
 }

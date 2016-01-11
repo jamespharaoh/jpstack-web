@@ -9,8 +9,6 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.console.AbstractQueueConsolePlugin;
 import wbs.platform.queue.model.QueueItemRec;
-import wbs.platform.queue.model.QueueRec;
-import wbs.smsapps.manualresponder.model.ManualResponderRec;
 
 @PrototypeComponent ("manualResponderQueueConsolePlugin")
 public
@@ -44,20 +42,6 @@ class ManualResponderQueueConsolePlugin
 		return responder (
 			"manualResponderRequestPendingFormResponder"
 		).get ();
-
-	}
-
-	@Override
-	public
-	long preferredUserDelay (
-			QueueRec queue) {
-
-		ManualResponderRec manualResponder =
-			(ManualResponderRec) (Object)
-			objectManager.getParent (
-				queue);
-
-		return manualResponder.getPreferredQueueTime () * 1000L;
 
 	}
 

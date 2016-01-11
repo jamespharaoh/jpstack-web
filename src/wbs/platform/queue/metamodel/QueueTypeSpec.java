@@ -35,4 +35,12 @@ class QueueTypeSpec {
 		required = true)
 	String ref;
 
+	@DataAttribute (
+		required = true)
+	String preferredUserDelay;
+
+	@DataAttribute (
+		required = true)
+	String supervisorPriv;
+
 }

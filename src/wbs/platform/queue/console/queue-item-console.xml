@@ -72,6 +72,9 @@
 				label="Claims"
 				priv-key="queueItem.manage"/>
 
+			<context-tab-action-page
+				name="actions"/>
+
 		</object>
 
 	</object-context>

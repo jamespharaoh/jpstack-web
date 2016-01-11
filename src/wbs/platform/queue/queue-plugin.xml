@@ -32,6 +32,8 @@
 		<bean class="console.QueueFilterResponder"/>
 		<bean class="console.QueueHomeResponder"/>
 		<bean class="console.QueueItemAction"/>
+		<bean class="console.QueueItemActionsAction"/>
+		<bean class="console.QueueItemActionsPart"/>
 		<bean class="console.QueueItemClaimStatusConsoleHelper"/>
 		<bean class="console.QueueItemConsoleHooks"/>
 		<bean class="console.QueueItemQueueStatsProvider"/>
@@ -43,6 +45,8 @@
 		<bean class="console.QueueManager"/>
 		<bean class="console.QueueStatsFilter"/>
 		<bean class="console.QueueStatsGrouper"/>
+		<bean class="console.QueueSubjectActionsAction"/>
+		<bean class="console.QueueSubjectActionsPart"/>
 		<bean class="console.QueueSubjectSorter"/>
 		<bean class="console.QueueSupervisorItemsPart"/>
 		<bean class="console.QueueSupervisorStatsGrouperBuilder"/>

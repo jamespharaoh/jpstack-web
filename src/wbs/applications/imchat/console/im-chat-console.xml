@@ -147,11 +147,17 @@
 		<integer-field
 			name="freeMessageLimit"/>
 
+		<yes-no-field
+			name="billMessageEnabled"/>
+
 		<integer-field
 			name="billMessageMinChars"/>
 
 		<integer-field
 			name="billMessageMaxChars"/>
+
+		<yes-no-field
+			name="freeMessageEnabled"/>
 
 		<integer-field
 			name="freeMessageMinChars"/>
@@ -210,12 +216,20 @@
 			name="freeMessageLimit"
 			nullable="yes"/>
 
+		<yes-no-field
+			name="billMessageEnabled"
+			nullable="yes"/>
+
 		<integer-field
 			name="billMessageMinChars"
 			nullable="yes"/>
 
 		<integer-field
 			name="billMessageMaxChars"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="freeMessageEnabled"
 			nullable="yes"/>
 
 		<integer-field

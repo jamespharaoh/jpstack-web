@@ -1,7 +1,10 @@
 package wbs.platform.queue.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -130,9 +133,12 @@ class QueueSubjectSorter {
 				queueInfo.queue = queue;
 
 				queueInfo.delay =
-					queueManager.getPreferredUserDelay (queue);
+					queueManager.getPreferredUserDelay (
+						queue);
 
-				allQueueInfos.put (queue, queueInfo);
+				allQueueInfos.put (
+					queue,
+					queueInfo);
 
 			}
 
@@ -231,13 +237,28 @@ class QueueSubjectSorter {
 
 			// preferred items have their effective time delayed
 
-			boolean preferred =
-				subject.getPreferredUser () != null
-					&& subject.getPreferredUser () != user;
+			UserRec preferredUser =
+				ifNull (
+					subject.getForcePreferredUser (),
+					subject.getPreferredUser ());
 
-			if (preferred)
+			boolean preferred = (
+
+				isNotNull (
+					preferredUser)
+
+				&& notEqual (
+					preferredUser,
+					user)
+
+			);
+
+			if (preferred) {
+
 				subjectInfo.effectiveTime +=
 					queueInfo.delay;
+
+			}
 
 			// work out if we should hide because of being preferred
 

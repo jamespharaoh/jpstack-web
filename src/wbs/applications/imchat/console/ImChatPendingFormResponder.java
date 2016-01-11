@@ -215,6 +215,8 @@ class ImChatPendingFormResponder
 
 		}
 
+		renderIgnore ();
+
 		printFormat (
 			"</table>\n");
 
@@ -257,9 +259,13 @@ class ImChatPendingFormResponder
 	void renderBilledTemplate () {
 
 		if (
-			lessThan (
+
+			! imChat.getBillMessageEnabled ()
+
+			|| lessThan (
 				customer.getBalance (),
 				imChat.getMessageCost ())
+
 		) {
 			return;
 		}
@@ -322,6 +328,10 @@ class ImChatPendingFormResponder
 	}
 
 	void renderFreeTemplate () {
+
+		if (! imChat.getFreeMessageEnabled ()) {
+			return;
+		}
 
 		printFormat (
 			"<tr",
@@ -413,6 +423,50 @@ class ImChatPendingFormResponder
 			" type=\"submit\"",
 			" name=\"send\"",
 			" value=\"Send\"",
+			" disabled",
+			"></td>\n");
+
+		printFormat (
+			"</td>\n");
+
+	}
+
+	void renderIgnore () {
+
+		if (
+			! privChecker.can (
+				imChat,
+				"supervisor")
+		) {
+			return;
+		}
+
+		printFormat (
+			"<tr",
+			" class=\"template\"",
+			">\n");
+
+		printFormat (
+			"<td><input",
+			" id=\"radio-template-ignore\"",
+			" class=\"template-radio\"",
+			" type=\"radio\"",
+			" name=\"template\"",
+			" value=\"ignore\"",
+			"></td>\n");
+
+		printFormat (
+			"<td>Ignore</td>\n");
+
+		printFormat (
+			"<td></td>\n");
+
+		printFormat (
+			"<td><input",
+			" class=\"template-submit\"",
+			" type=\"submit\"",
+			" name=\"ignore\"",
+			" value=\"Ignore\"",
 			" disabled",
 			"></td>\n");
 

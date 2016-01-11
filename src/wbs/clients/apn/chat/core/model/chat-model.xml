@@ -364,4 +364,112 @@
 
 	</number-lookup-types>
 
+	<queue-types>
+
+		<queue-type
+			name="Help"
+			description="Pending help messages from users of a chat service"
+			subject="chatUser"
+			ref="chatHelpLog"
+			preferred-user-delay="helpQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+		<queue-type
+			name="Chat gay female"
+			description="Pending messages to a chat service monitor"
+			subject="chatUser"
+			ref="chatMonitorInbox"
+			preferred-user-delay="chatQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+		<queue-type
+			name="Chat gay female alarm"
+			description="Pending alarm for a chat service monitor"
+			subject="chatUser"
+			ref="chatMonitorInbox"
+			preferred-user-delay="messageQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+		<queue-type
+			name="Chat gay male"
+			description="Pending messages to a chat service monitor"
+			subject="chatUser"
+			ref="chatMonitorInbox"
+			preferred-user-delay="chatQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+		<queue-type
+			name="Chat gay male alarm"
+			description="Pending alarm for a chat service monitor"
+			subject="chatUser"
+			ref="chatMonitorInbox"
+			preferred-user-delay="chatQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+		<queue-type
+			name="Chat straight female"
+			description="Pending messages to a chat service monitor"
+			subject="chatUser"
+			ref="chatMonitorInbox"
+			preferred-user-delay="chatQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+		<queue-type
+			name="Chat straight female alarm"
+			description="Pending alarm for a chat service monitor"
+			subject="chatUser"
+			ref="chatMonitorInbox"
+			preferred-user-delay="chatQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+		<queue-type
+			name="Chat straight male"
+			description="Pending messages to a chat service monitor"
+			subject="chatUser"
+			ref="chatMonitorInbox"
+			preferred-user-delay="chatQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+		<queue-type
+			name="Chat straight male alarm"
+			description="Pending alarm for a chat service monitor"
+			subject="chatUser"
+			ref="chatMonitorInbox"
+			preferred-user-delay="chatQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+		<queue-type
+			name="Chat unknown"
+			description="Pending messages to a chat service monitor"
+			subject="chatUser"
+			ref="chatMonitorInbox"
+			preferred-user-delay="chatQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+		<queue-type
+			name="Chat unknown alarm"
+			description="Pending alarm for a chat service monitor"
+			subject="chatUser"
+			ref="chatMonitorInbox"
+			preferred-user-delay="chatQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+		<queue-type
+			name="Message"
+			description="User-to-user chat service message pending approval"
+			subject="chatUser"
+			ref="chatMessage"
+			preferred-user-delay="messageQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+		<queue-type
+			name="User"
+			description="Chat service user profile pending approval"
+			subject="chatUser"
+			ref="chatUser"
+			preferred-user-delay="infoQueuePreferredTime"
+			supervisor-priv="this:supervisor"/>
+
+	</queue-types>
+
 </model-meta>

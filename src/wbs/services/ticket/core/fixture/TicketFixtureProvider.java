@@ -161,6 +161,9 @@ class TicketFixtureProvider
 			.setMaximum (
 				0)
 
+			.setPreferredQueueTime (
+				15)
+
 		);
 
 		// accepted state
@@ -188,6 +191,9 @@ class TicketFixtureProvider
 
 			.setMaximum (
 				120)
+
+			.setPreferredQueueTime (
+				15)
 
 		);
 
@@ -217,6 +223,9 @@ class TicketFixtureProvider
 			.setMaximum (
 				600)
 
+			.setPreferredQueueTime (
+				15)
+
 		);
 
 		// solved state
@@ -245,6 +254,9 @@ class TicketFixtureProvider
 			.setMaximum (
 				120)
 
+			.setPreferredQueueTime (
+				15)
+
 		);
 
 		// closed state
@@ -272,6 +284,9 @@ class TicketFixtureProvider
 
 			.setMaximum (
 				0)
+
+			.setPreferredQueueTime (
+				15)
 
 		);
 

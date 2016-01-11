@@ -34,6 +34,9 @@
 		<integer-field
 			name="maximum"/>
 
+		<integer-field
+			name="preferredQueueTime"/>
+
 	</fields>
 
 	<priv-types>
@@ -51,7 +54,9 @@
 			name="Default"
 			description="Pending tickets for a ticket type"
 			subject="ticket"
-			ref="ticket"/>
+			ref="ticket"
+			preferred-user-delay="preferredQueueTime"
+			supervisor-priv="this:manage"/>
 
 	</queue-types>
 

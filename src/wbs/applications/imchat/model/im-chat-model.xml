@@ -49,12 +49,20 @@
 			name="freeMessageLimit"
 			nullable="yes"/>
 
+		<yes-no-field
+			name="billMessageEnabled"
+			nullable="yes"/>
+
 		<integer-field
 			name="billMessageMinChars"
 			nullable="yes"/>
 
 		<integer-field
 			name="billMessageMaxChars"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="freeMessageEnabled"
 			nullable="yes"/>
 
 		<integer-field
@@ -123,7 +131,9 @@
 			name="Reply"
 			description="New messages to reply to for an IM chat service"
 			subject="imChatConversation"
-			ref="imChatMessage"/>
+			ref="imChatMessage"
+			preferred-user-delay="preferredQueueTime"
+			supervisor-priv="this:supervisor"/>
 
 	</queue-types>
 

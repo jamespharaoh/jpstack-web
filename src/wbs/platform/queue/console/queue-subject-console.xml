@@ -15,12 +15,10 @@
 		<run-post-processor
 			name="queue"/>
 
-		<!--
 		<priv-key
 			name="queueSubject.manage"
 			delegate="grandparent"
 			priv="manage"/>
-		-->
 
 	</console-helper-provider>
 
@@ -35,6 +33,14 @@
 
 			<object-summary-page
 				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<context-tab-action-page
+				name="actions"/>
+
+			<object-events-page/>
 
 		</object>
 
@@ -54,11 +60,26 @@
 			name="preferredUser"
 			object-type="user"/>
 
+		<object-field
+			name="forcePreferredUser"
+			object-type="user"/>
+
 		<integer-field
 			name="totalItems"/>
 
 		<integer-field
 			name="activeItems"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="queueSubject">
+
+		<object-field
+			name="forcePreferredUser"
+			object-type="user"
+			nullable="yes"/>
 
 	</field-set>
 

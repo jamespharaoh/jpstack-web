@@ -111,6 +111,8 @@ class ImChatPendingFormAction
 				"template");
 
 		boolean bill;
+		boolean ignore;
+
 		int minLength;
 		int maxLength;
 
@@ -125,6 +127,7 @@ class ImChatPendingFormAction
 		) {
 
 			bill = true;
+			ignore = false;
 			template = null;
 
 			messageText =
@@ -144,6 +147,7 @@ class ImChatPendingFormAction
 		) {
 
 			bill = false;
+			ignore = false;
 			template = null;
 
 			messageText =
@@ -156,10 +160,25 @@ class ImChatPendingFormAction
 			maxLength =
 				imChat.getFreeMessageMaxChars ();
 
+		} else if (
+			equal (
+				templateString,
+				"ignore")
+		) {
+
+			bill = false;
+			ignore = true;
+
+			template = null;
+			messageText = null;
+
+			minLength = 0;
+			maxLength = 0;
+
 		} else {
 
-			bill =
-				false;
+			bill = false;
+			ignore = false;
 
 			template =
 				imChatTemplateHelper.find (
@@ -189,11 +208,11 @@ class ImChatPendingFormAction
 
 			requestContext.addError (
 				stringFormat (
-					"Billed message pricse is %s, ",
+					"Billed message price is %s, ",
 					currencyLogic.formatText (
 						imChat.getCurrency (),
 						(long) imChat.getMessageCost ()),
-					"but customer's balancer is only %s",
+					"but customer's balance is only %s",
 					currencyLogic.formatText (
 						imChat.getCurrency (),
 						(long) customer.getBalance ())));
@@ -202,97 +221,110 @@ class ImChatPendingFormAction
 
 		// check length
 
-		int messageLength =
-			messageText.length ();
+		if (! ignore) {
 
-		if (messageLength < minLength) {
+			int messageLength =
+				messageText.length ();
 
-			requestContext.addError (
-				stringFormat (
-					"Message has %s ",
-					messageLength,
-					"characters, but the minimum is %s, ",
-					minLength,
-					"please add %s more",
-					minLength - messageLength));
+			if (messageLength < minLength) {
 
-			return null;
+				requestContext.addError (
+					stringFormat (
+						"Message has %s ",
+						messageLength,
+						"characters, but the minimum is %s, ",
+						minLength,
+						"please add %s more",
+						minLength - messageLength));
+
+				return null;
+
+			}
+
+			if (messageLength > maxLength) {
+
+				requestContext.addError (
+					stringFormat (
+						"Message has %s ",
+						messageLength,
+						"characters, but the maximum is %s, ",
+						maxLength,
+						"please remove %s",
+						messageLength - maxLength));
+
+				return null;
+
+			}
+
+			// create reply
+
+			ImChatMessageRec operatorMessage =
+				imChatMessageHelper.insert (
+					imChatMessageHelper.createInstance ()
+
+				.setImChatConversation (
+					conversation)
+
+				.setIndex (
+					conversation.getNumMessages ())
+
+				.setSenderUser (
+					myUser)
+
+				.setTimestamp (
+					transaction.now ())
+
+					.setMessageText (
+					messageText)
+
+				.setImChatTemplate (
+					template)
+
+				.setPartnerImChatMessage (
+					customerMessage)
+
+				.setPrice (
+					bill
+						? imChat.getMessageCost ()
+						: null)
+
+			);
+
+			customerMessage
+
+				.setPartnerImChatMessage (
+					operatorMessage);
+
+			// update conversation
+
+			conversation
+
+				.setNumMessages (
+					conversation.getNumMessages () + 1)
+
+				.setPendingReply (
+					false);
+
+			// update customer
+
+			customer
+
+				.setBalance (
+					+ customer.getBalance ()
+					- ifNull (
+						operatorMessage.getPrice (),
+						0));
+
+		} else {
+
+			// update conversation
+
+			conversation
+
+				.setPendingReply (
+					false);
 
 		}
-
-		if (messageLength > maxLength) {
-
-			requestContext.addError (
-				stringFormat (
-					"Message has %s ",
-					messageLength,
-					"characters, but the maximum is %s, ",
-					maxLength,
-					"please remove %s",
-					messageLength - maxLength));
-
-			return null;
-
-		}
-
-		// create reply
-
-		ImChatMessageRec operatorMessage =
-			imChatMessageHelper.insert (
-				imChatMessageHelper.createInstance ()
-
-			.setImChatConversation (
-				conversation)
-
-			.setIndex (
-				conversation.getNumMessages ())
-
-			.setSenderUser (
-				myUser)
-
-			.setTimestamp (
-				transaction.now ())
-
-				.setMessageText (
-				messageText)
-
-			.setImChatTemplate (
-				template)
-
-			.setPartnerImChatMessage (
-				customerMessage)
-
-			.setPrice (
-				bill
-					? imChat.getMessageCost ()
-					: null)
-
-		);
-
-		customerMessage
-
-			.setPartnerImChatMessage (
-				operatorMessage);
-
-		// update conversation
-
-		conversation
-
-			.setNumMessages (
-				conversation.getNumMessages () + 1)
-
-			.setPendingReply (
-				false);
-
-		// update customer
-
-		customer
-
-			.setBalance (
-				+ customer.getBalance ()
-				- ifNull (
-					operatorMessage.getPrice (),
-					0));
 
 		// remove queue item
 
@@ -304,8 +336,17 @@ class ImChatPendingFormAction
 
 		transaction.commit ();
 
-		requestContext.addNotice (
-			"Reply sent");
+		if (ignore) {
+
+			requestContext.addNotice (
+				"Message ignored");
+
+		} else {
+
+			requestContext.addNotice (
+				"Reply sent");
+
+		}
 
 		// return
 

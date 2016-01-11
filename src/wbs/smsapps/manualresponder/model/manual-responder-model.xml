@@ -141,7 +141,9 @@
 			name="Default"
 			description="Pending requests for a manual-responder service"
 			subject="number"
-			ref="manualResponderRequest"/>
+			ref="manualResponderRequest"
+			preferred-user-delay="preferredQueueTime"
+			supervisor-priv="this:supervisor"/>
 
 	</queue-types>
 

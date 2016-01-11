@@ -2707,4 +2707,24 @@ class Misc {
 
 	}
 
+	public static
+	boolean isInstanceOf (
+			@NonNull Class<?> theClass,
+			@NonNull Object object) {
+
+		return theClass.isInstance (
+			object);
+
+	}
+
+	public static
+	boolean isNotInstanceOf (
+			@NonNull Class<?> theClass,
+			@NonNull Object object) {
+
+		return ! theClass.isInstance (
+			object);
+
+	}
+
 }
