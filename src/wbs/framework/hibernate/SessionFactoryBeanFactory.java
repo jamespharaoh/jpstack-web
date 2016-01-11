@@ -7,6 +7,7 @@ import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.File;
@@ -39,10 +40,9 @@ import org.dom4j.QName;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.internal.util.xml.XmlDocumentImpl;
 import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.Seconds;
@@ -328,9 +328,9 @@ class SessionFactoryBeanFactory
 			Instant.now ();
 
 		ServiceRegistry serviceRegistry =
-			new ServiceRegistryBuilder ()
+			new StandardServiceRegistryBuilder ()
 				.applySettings (config.getProperties ())
-				.buildServiceRegistry ();
+				.build ();
 
 		SessionFactory sessionFactory =
 			config.buildSessionFactory (
@@ -456,9 +456,13 @@ class SessionFactoryBeanFactory
 				namespace)
 
 			.addAttribute (
-				QName.get ("schemaLocation", "xsi", "xsi-ns"),
-				"http://www.hibernate.org/xsd/hibernate-mapping " +
-				"classpath://org/hibernate/hibernate-mapping-4.0.xsd")
+				QName.get (
+					"schemaLocation",
+					"xsi",
+					"http://www.w3.org/2001/XMLSchema-instance"),
+				joinWithSpace (
+					"http://www.hibernate.org/xsd/hibernate-mapping",
+					"classpath://org/hibernate/hibernate-mapping-4.0.xsd"))
 
 			.addAttribute (
 				"package",
@@ -635,11 +639,8 @@ class SessionFactoryBeanFactory
 
 		// add document to hibernate
 
-		config.add (
-			new XmlDocumentImpl (
-				document,
-				"wbs annotated class",
-				model.objectClass ().getName ()));
+		config.addFile (
+			outputFile);
 
 	}
 
@@ -755,7 +756,7 @@ class SessionFactoryBeanFactory
 
 			.addAttribute (
 				"class",
-				"sequence");
+				"org.hibernate.id.enhanced.SequenceStyleGenerator");
 
 		generatorElement
 
@@ -764,10 +765,10 @@ class SessionFactoryBeanFactory
 
 			.addAttribute (
 				"name",
-				"sequence")
+				"optimizer")
 
 			.addText (
-				sequenceNameSql);
+				"none");
 
 		generatorElement
 
@@ -776,10 +777,22 @@ class SessionFactoryBeanFactory
 
 			.addAttribute (
 				"name",
-				"increment")
+				"increment_size")
 
 			.addText (
 				"100");
+
+		generatorElement
+
+			.addElement (
+				"param")
+
+			.addAttribute (
+				"name",
+				"sequence_name")
+
+			.addText (
+				sequenceNameSql);
 
 	}
 
@@ -1327,11 +1340,7 @@ class SessionFactoryBeanFactory
 
 			.addAttribute (
 				"type",
-				indexType)
-
-			.addAttribute (
-				"inverse",
-				"true");
+				indexType);
 
 		// value
 
