@@ -1,5 +1,6 @@
 package wbs.platform.queue.console;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -10,11 +11,15 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.record.Record;
 import wbs.framework.web.Responder;
+import wbs.platform.queue.metamodel.QueueTypeSpec;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
@@ -25,12 +30,26 @@ import wbs.platform.queue.model.QueueTypeRec;
 public
 class QueueManager {
 
+	// dependencies
+
+	@Inject
+	ConsoleObjectManager objectManager;
+
+	@Inject
+	QueueConsoleLogic queueConsoleLogic;
+
+	// collection dependencies
+
 	@Inject
 	Map<String,Provider<QueueConsolePlugin>> queueHelpersByBeanName =
 		Collections.emptyMap ();
 
+	// state
+
 	Map<String,QueueConsolePlugin> queueHelpers =
 		new HashMap<String,QueueConsolePlugin>();
+
+	// lifecycle
 
 	@PostConstruct
 	public
@@ -38,8 +57,10 @@ class QueueManager {
 
 		// initialise queuePageFactories by querying each factory
 
-		for (Map.Entry<String,Provider<QueueConsolePlugin>> entry
-				: queueHelpersByBeanName.entrySet ()) {
+		for (
+			Map.Entry<String,Provider<QueueConsolePlugin>> entry
+				: queueHelpersByBeanName.entrySet ()
+		) {
 
 			String beanName =
 				entry.getKey ();
@@ -78,10 +99,12 @@ class QueueManager {
 
 	}
 
+	// implementation
+
 	public
 	Responder getItemResponder (
-			ConsoleRequestContext  requestContext,
-			QueueItemRec queueItem) {
+			@NonNull ConsoleRequestContext  requestContext,
+			@NonNull QueueItemRec queueItem) {
 
 		QueueSubjectRec queueSubject =
 			queueItem.getQueueSubject ();
@@ -118,31 +141,31 @@ class QueueManager {
 
 	public
 	long getPreferredUserDelay (
-			QueueRec queue) {
+			@NonNull QueueRec queue) {
 
-		QueueTypeRec queueType =
-			queue.getQueueType ();
+		Record<?> queueParent =
+			objectManager.getParent (
+				queue);
 
-		String key =
-			stringFormat (
-				"%s.%s",
-				queueType.getParentType ().getCode (),
-				queueType.getCode ());
+		QueueTypeSpec queueTypeSpec =
+			queueConsoleLogic.queueTypeSpec (
+				queue.getQueueType ());
 
-		QueueConsolePlugin queuePageFactory =
-			queueHelpers.get (key);
-
-		if (queuePageFactory == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Queue page factory not found: %s",
-					key));
-
+		if (
+			equal (
+				queueTypeSpec.preferredUserDelay (),
+				"0")
+		) {
+			return 0l;
 		}
 
-		return queuePageFactory.preferredUserDelay (
-			queue);
+		Integer preferredUserDelay =
+			(Integer)
+			objectManager.dereference (
+				queueParent,
+				queueTypeSpec.preferredUserDelay ());
+
+		return (long) preferredUserDelay * 1000l;
 
 	}
 

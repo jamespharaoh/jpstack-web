@@ -23,6 +23,13 @@
 			type="user"
 			nullable="yes"/>
 
+		<!-- settings -->
+
+		<reference-field
+			name="forcePreferredUser"
+			type="user"
+			nullable="yes"/>
+
 		<!-- statistics -->
 
 		<integer-field
