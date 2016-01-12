@@ -73,7 +73,7 @@ class CurrencyFixtureProvider
 				"Pounds sterling")
 
 			.setDivisions (
-				100)
+				100l)
 
 			.setPrefix (
 				"£")

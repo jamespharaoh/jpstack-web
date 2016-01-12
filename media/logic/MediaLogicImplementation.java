@@ -496,8 +496,8 @@ class MediaLogicImplementation
 			image,
 			mimeType,
 			filename,
-			image.getWidth (),
-			image.getHeight ());
+			(long) image.getWidth (),
+			(long) image.getHeight ());
 
 	}
 
@@ -527,8 +527,8 @@ class MediaLogicImplementation
 					image,
 					mimeType,
 					filename,
-					image.getWidth (),
-					image.getHeight ()));
+					(long) image.getWidth (),
+					(long) image.getHeight ()));
 
 		} else {
 
@@ -560,16 +560,16 @@ class MediaLogicImplementation
 			@NonNull BufferedImage thumbnailImage,
 			@NonNull String mimeType,
 			@NonNull String filename,
-			@NonNull Integer width,
-			@NonNull Integer height) {
+			@NonNull Long width,
+			@NonNull Long height) {
 
 		// create the 100x100 thumbnail
 
 		BufferedImage image100 =
 			resampleImageToFit (
 				thumbnailImage,
-				100,
-				100);
+				100l,
+				100l);
 
 		byte[] data100 =
 			writeImage (
@@ -581,8 +581,8 @@ class MediaLogicImplementation
 		BufferedImage image32 =
 			resampleImageToFit (
 				thumbnailImage,
-				32,
-				32);
+				32l,
+				32l);
 
 		byte[] data32 =
 			writeImage (
@@ -608,8 +608,8 @@ class MediaLogicImplementation
 			@NonNull byte[] thumb32,
 			@NonNull String mimeType,
 			@NonNull String filename,
-			@NonNull Integer width,
-			@NonNull Integer height) {
+			@NonNull Long width,
+			@NonNull Long height) {
 
 		MediaTypeRec mediaType =
 			findMediaTypeRequired (
@@ -676,8 +676,8 @@ class MediaLogicImplementation
 				videoFrameImage,
 				mimeType,
 				filename,
-				videoFrameImage.getWidth (),
-				videoFrameImage.getHeight ()));
+				(long) videoFrameImage.getWidth (),
+				(long) videoFrameImage.getHeight ()));
 
 	}
 
@@ -1043,8 +1043,8 @@ class MediaLogicImplementation
 	public
 	BufferedImage resampleImageToFit (
 			@NonNull BufferedImage image,
-			int maxWidth,
-			int maxHeight) {
+			@NonNull Long maxWidth,
+			@NonNull Long maxHeight) {
 
 		// same image if already fits
 
@@ -1060,10 +1060,10 @@ class MediaLogicImplementation
 
 		// start with max target size
 
-		int targetWidth =
+		long targetWidth =
 			image.getWidth ();
 
-		int targetHeight =
+		long targetHeight =
 			image.getHeight ();
 
 		// reduce height to maintain ratio
@@ -1106,8 +1106,8 @@ class MediaLogicImplementation
 
 		BufferedImage targetImage =
 			new BufferedImage (
-				targetWidth,
-				targetHeight,
+				(int) targetWidth,
+				(int) targetHeight,
 				imageType);
 
 		Graphics2D graphics =
@@ -1117,8 +1117,8 @@ class MediaLogicImplementation
 			image,
 			0,
 			0,
-			targetWidth,
-			targetHeight,
+			(int) targetWidth,
+			(int) targetHeight,
 			0,
 			0,
 			image.getWidth (),
@@ -1135,8 +1135,8 @@ class MediaLogicImplementation
 	public
 	BufferedImage cropAndResampleImage (
 			@NonNull BufferedImage sourceImage,
-			int targetWidth,
-			int targetHeight) {
+			@NonNull Long targetWidth,
+			@NonNull Long targetHeight) {
 
 		// same image if already fits
 
@@ -1152,16 +1152,16 @@ class MediaLogicImplementation
 
 		// select crop type
 
-		int sourceRatio =
+		long sourceRatio =
 			sourceImage.getWidth ()
 				* targetHeight;
 
-		int targetRatio =
+		long targetRatio =
 			targetWidth
 				* sourceImage.getHeight ();
 
-		int sourceWidth;
-		int sourceHeight;
+		long sourceWidth;
+		long sourceHeight;
 
 		if (
 			equal (
@@ -1216,11 +1216,11 @@ class MediaLogicImplementation
 
 		}
 
-		int sourceOffsetHorizontal =
-			(sourceImage.getWidth () - sourceWidth) / 2;
+		long sourceOffsetHorizontal =
+			(sourceImage.getWidth () - sourceWidth) / 2l;
 
-		int sourceOffsetVertical =
-			(sourceImage.getHeight () - sourceHeight) / 2;
+		long sourceOffsetVertical =
+			(sourceImage.getHeight () - sourceHeight) / 2l;
 
 		// determine image type
 
@@ -1238,7 +1238,9 @@ class MediaLogicImplementation
 
 		BufferedImage targetImage =
 			new BufferedImage (
+				(int) (long)
 				targetWidth,
+				(int) (long)
 				targetHeight,
 				imageType);
 
@@ -1249,12 +1251,12 @@ class MediaLogicImplementation
 			sourceImage,
 			0,
 			0,
-			targetWidth,
-			targetHeight,
-			sourceOffsetHorizontal,
-			sourceOffsetVertical,
-			sourceOffsetHorizontal + sourceWidth,
-			sourceOffsetVertical + sourceHeight,
+			(int) (long) targetWidth,
+			(int) (long) targetHeight,
+			(int) sourceOffsetHorizontal,
+			(int) sourceOffsetVertical,
+			(int) (sourceOffsetHorizontal + sourceWidth),
+			(int) (sourceOffsetVertical + sourceHeight),
 			null);
 
 		graphics.dispose ();

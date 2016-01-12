@@ -47,8 +47,8 @@ interface MediaLogic {
 			BufferedImage thumbnailImage,
 			String mimeType,
 			String filename,
-			Integer width,
-			Integer height);
+			Long width,
+			Long height);
 
 	MediaRec createMediaWithThumbnail (
 			byte[] data,
@@ -56,8 +56,8 @@ interface MediaLogic {
 			byte[] thumb32,
 			String mimeType,
 			String filename,
-			Integer width,
-			Integer height);
+			Long width,
+			Long height);
 
 	Optional<MediaRec> createMediaFromVideo (
 			byte[] data,
@@ -109,13 +109,13 @@ interface MediaLogic {
 
 	BufferedImage resampleImageToFit (
 			BufferedImage image,
-			int maxWidth,
-			int maxHeight);
+			Long maxWidth,
+			Long maxHeight);
 
 	BufferedImage cropAndResampleImage (
 			BufferedImage image,
-			int maxWidth,
-			int maxHeight);
+			Long maxWidth,
+			Long maxHeight);
 
 	BufferedImage rotateImage90 (
 			BufferedImage image);

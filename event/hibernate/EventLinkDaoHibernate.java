@@ -14,8 +14,8 @@ class EventLinkDaoHibernate
 	@Override
 	public
 	List<EventLinkRec> findByTypeAndRef (
-			int typeId,
-			int refId) {
+			long typeId,
+			long refId) {
 
 		return findMany (
 			EventLinkRec.class,
@@ -27,10 +27,12 @@ class EventLinkDaoHibernate
 
 			.setInteger (
 				"typeId",
+				(int) (long)
 				typeId)
 
 			.setInteger (
 				"refId",
+				(int) (long)
 				refId)
 
 			.list ());

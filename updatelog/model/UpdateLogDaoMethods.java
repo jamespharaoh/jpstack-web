@@ -5,6 +5,6 @@ interface UpdateLogDaoMethods {
 
 	UpdateLogRec findByTableAndRef (
 			String table,
-			int ref);
+			long ref);
 
 }

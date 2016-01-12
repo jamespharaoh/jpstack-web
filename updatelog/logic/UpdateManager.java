@@ -55,27 +55,27 @@ class UpdateManager {
 
 	long reloadTime = 0;
 
-	int masterVersion = -2;
+	long masterVersion = -2;
 
 	Map<String,UpdateStuff> secondaryVersions =
-		new HashMap<String,UpdateStuff> ();
+		new HashMap<> ();
 
-	Map<String,Map<Integer,UpdateStuff>> tertiaryVersions =
-		new HashMap<String,Map<Integer,UpdateStuff>> ();
+	Map<String,Map<Long,UpdateStuff>> tertiaryVersions =
+		new HashMap<> ();
 
-	int getDatabaseVersion (
+	long getDatabaseVersion (
 			String table,
-			int ref) {
+			long ref) {
 
 		UpdateLogRec updateLog =
 			updateLogHelper.findByTableAndRef (
 				table,
 				ref);
 
-		int ret =
+		long ret =
 			updateLog != null
 				? updateLog.getVersion ()
-				: -1;
+				: -1l;
 
 		log.debug (
 			stringFormat (
@@ -104,7 +104,7 @@ class UpdateManager {
 
 		// hit the db
 
-		int newMasterVersion =
+		long newMasterVersion =
 			getDatabaseVersion (
 				"master",
 				0);
@@ -161,7 +161,7 @@ class UpdateManager {
 
 		// hit the db
 
-		int newSecondaryVersion =
+		long newSecondaryVersion =
 			getDatabaseVersion (
 				table,
 				0);
@@ -180,8 +180,9 @@ class UpdateManager {
 
 		// mark all this table's tertiary versions as dirty
 
-		Map<Integer,UpdateStuff> map =
-			tertiaryVersions.get (table);
+		Map<Long,UpdateStuff> map =
+			tertiaryVersions.get (
+				table);
 
 		if (map == null)
 			return;
@@ -192,19 +193,20 @@ class UpdateManager {
 	}
 
 	public
-	int refreshTertiary (
+	long refreshTertiary (
 			String table,
-			int ref) {
+			long ref) {
 
 		// if it's not dirty don't bother
 
-		Map<Integer,UpdateStuff> map =
-			tertiaryVersions.get (table);
+		Map<Long,UpdateStuff> map =
+			tertiaryVersions.get (
+				table);
 
 		if (map == null) {
 
 			map =
-				new HashMap<Integer,UpdateStuff> ();
+				new HashMap<Long,UpdateStuff> ();
 
 			tertiaryVersions.put (
 				table,
@@ -236,7 +238,7 @@ class UpdateManager {
 
 		// hit the db
 
-		int newTertiaryVersion =
+		long newTertiaryVersion =
 			getDatabaseVersion (
 				table,
 				ref);
@@ -256,9 +258,9 @@ class UpdateManager {
 	}
 
 	public
-	int getVersionDb (
+	long getVersionDb (
 			String table,
-			int ref) {
+			long ref) {
 
 		@Cleanup
 		Transaction transaction =
@@ -274,8 +276,9 @@ class UpdateManager {
 			table,
 			ref);
 
-		Map<Integer,UpdateStuff> map =
-			tertiaryVersions.get (table);
+		Map<Long,UpdateStuff> map =
+			tertiaryVersions.get (
+				table);
 
 		UpdateStuff stuff2 =
 			map.get (ref);
@@ -285,9 +288,9 @@ class UpdateManager {
 	}
 
 	public synchronized
-	int getVersion (
+	long getVersion (
 			String table,
-			int ref) {
+			long ref) {
 
 		// check master
 
@@ -318,8 +321,9 @@ class UpdateManager {
 
 		// check tertiary
 
-		Map<Integer, UpdateStuff> map =
-			tertiaryVersions.get (table);
+		Map<Long,UpdateStuff> map =
+			tertiaryVersions.get (
+				table);
 
 		if (map == null)
 			return getVersionDb (
@@ -363,7 +367,7 @@ class UpdateManager {
 					ref)
 
 				.setVersion (
-					0)
+					0l)
 
 			);
 
@@ -405,7 +409,7 @@ class UpdateManager {
 	static
 	class UpdateStuff {
 
-		int version;
+		long version;
 		boolean dirty;
 
 	}
@@ -415,8 +419,8 @@ class UpdateManager {
 
 		String table;
 
-		Map<Integer,Integer> versions =
-			new HashMap<Integer,Integer> ();
+		Map<Long,Long> versions =
+			new HashMap<> ();
 
 		Watcher (
 				String newTable) {
@@ -427,19 +431,19 @@ class UpdateManager {
 
 		public
 		boolean isUpdated (
-				int ref) {
+				long ref) {
 
 			log.debug (
 				"Watcher (\"" + table + "\").isUpdated (" + ref + ")");
 
-			int newVersion =
+			long newVersion =
 				getVersion (
 					table,
 					ref);
 
 			if (versions.containsKey (ref)) {
 
-				int oldVersion =
+				long oldVersion =
 					versions.get (ref);
 
 				if (oldVersion == newVersion)
@@ -513,7 +517,7 @@ class UpdateManager {
 
 		T value;
 		long lastReload = 0;
-		int oldVersion = -1;
+		long oldVersion = -1;
 
 		@Override
 		public synchronized
@@ -538,7 +542,7 @@ class UpdateManager {
 
 			// check for an update trigger
 
-			int newVersion =
+			long newVersion =
 				getVersion (
 					table,
 					ref);

@@ -37,7 +37,7 @@ class SymbolicLock<T> {
 
 	public synchronized
 	HeldLock easy (
-			final T symbol) {
+			T symbol) {
 
 		try {
 			aquire (symbol);

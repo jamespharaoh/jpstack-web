@@ -179,7 +179,7 @@ class QueueConsoleLogic {
 		QueueSubjectRec queueSubject =
 			sorter.subjects ().get (0).subject ();
 
-		int nextQueueItemId =
+		long nextQueueItemId =
 			+ queueSubject.getTotalItems ()
 			- queueSubject.getActiveItems ();
 
@@ -246,7 +246,7 @@ class QueueConsoleLogic {
 
 		// sanity checks
 
-		int currentItemIndex =
+		long currentItemIndex =
 			+ queueSubject.getTotalItems ()
 			- queueSubject.getActiveItems ();
 
@@ -306,7 +306,7 @@ class QueueConsoleLogic {
 
 		// sanity checks
 
-		int currentItemIndex =
+		long currentItemIndex =
 			+ queueSubject.getTotalItems ()
 			- queueSubject.getActiveItems ();
 

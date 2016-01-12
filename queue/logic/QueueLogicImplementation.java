@@ -206,6 +206,7 @@ class QueueLogicImplementation
 				queueSubject)
 
 			.setIndex (
+				(int) (long)
 				queueSubject.getTotalItems ())
 
 			.setQueue (
@@ -218,6 +219,7 @@ class QueueLogicImplementation
 				details)
 
 			.setRefObjectId (
+				(long)
 				refObject.getId ())
 
 			.setState (
@@ -345,7 +347,7 @@ class QueueLogicImplementation
 
 		// sanity checks
 
-		int currentItemIndex =
+		long currentItemIndex =
 			+ queueSubject.getTotalItems ()
 			- queueSubject.getActiveItems ();
 
@@ -399,7 +401,7 @@ class QueueLogicImplementation
 
 		if (queueSubject.getActiveItems () > 0) {
 
-			int nextItemIndex =
+			long nextItemIndex =
 				+ queueSubject.getTotalItems ()
 				- queueSubject.getActiveItems ();
 
@@ -438,7 +440,7 @@ class QueueLogicImplementation
 
 		// sanity checks
 
-		int currentItemIndex =
+		long currentItemIndex =
 			+ queueSubject.getTotalItems ()
 			- queueSubject.getActiveItems ();
 
@@ -525,7 +527,7 @@ class QueueLogicImplementation
 
 		if (queueSubject.getActiveItems () > 0) {
 
-			int nextItemIndex =
+			long nextItemIndex =
 				+ queueSubject.getTotalItems ()
 				- queueSubject.getActiveItems ();
 
@@ -556,8 +558,11 @@ class QueueLogicImplementation
 			@NonNull QueueSubjectRec queueSubject) {
 
 		return queueSubject.getQueueItems ().subList (
-			queueSubject.getTotalItems () - queueSubject.getActiveItems (),
-			queueSubject.getTotalItems ());
+			(int) (
+				+ queueSubject.getTotalItems ()
+				- queueSubject.getActiveItems ()),
+			(int) (long) (
+				queueSubject.getTotalItems ()));
 
 	}
 
