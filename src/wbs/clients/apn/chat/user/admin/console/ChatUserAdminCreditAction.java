@@ -51,7 +51,10 @@ class ChatUserAdminCreditAction
 	@Override
 	public
 	Responder backupResponder () {
-		return responder ("chatUserAdminCreditResponder");
+
+		return responder (
+			"chatUserAdminCreditResponder");
+
 	}
 
 	@Override
@@ -71,7 +74,8 @@ class ChatUserAdminCreditAction
 		// check params
 
 		Map<String,Object> params =
-			paramsChecker.apply (requestContext);
+			paramsChecker.apply (
+				requestContext);
 
 		if (params == null)
 			return null;
@@ -79,13 +83,19 @@ class ChatUserAdminCreditAction
 		// get params
 
 		long creditAmount =
-			(Long) params.get ("creditAmount");
+			(Long)
+			params.get (
+				"creditAmount");
 
 		long billAmount =
-			(Long) params.get ("billAmount");
+			(Long)
+			params.get (
+				"billAmount");
 
 		String details =
-			(String) params.get ("details");
+			(String)
+			params.get (
+				"details");
 
 		@Cleanup
 		Transaction transaction =
@@ -94,7 +104,8 @@ class ChatUserAdminCreditAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (
-				requestContext.stuffInt ("chatUserId"));
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		UserRec myUser =
 			userHelper.find (

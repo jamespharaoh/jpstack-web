@@ -434,7 +434,7 @@ class ForwarderApiModule
 			clientId = (String) params.get("client-id");
 			route = (String) params.get("route");
 			service = (String) params.get("service");
-			replyToServerId = (Integer) params.get("reply-to-server-id");
+			replyToServerId = (int) (long) (Long) params.get("reply-to-server-id");
 			pri = (Long) params.get("pri");
 
 		}
@@ -877,7 +877,9 @@ class ForwarderApiModule
 					messageChains.add (sendExMessageChain);
 
 					sendExMessageChain.replyToServerId =
-						(Integer) params.get ("reply-to-server-id");
+						(int) (long) (Long)
+						params.get (
+							"reply-to-server-id");
 
 					List<Map<String,Object>> mpList =
 						forwarderApiLogic.unsafeListMapStringObject (

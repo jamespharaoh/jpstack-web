@@ -850,7 +850,8 @@ class ChatUserDaoHibernate
 			} else if (equal (key, "limit")) {
 
 				criteria.setMaxResults (
-					(Integer) value);
+					(int) (long) (Long)
+					value);
 
 			} else {
 

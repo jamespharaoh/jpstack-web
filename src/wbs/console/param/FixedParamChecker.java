@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public
 class FixedParamChecker
-	implements ParamChecker<Integer> {
+	implements ParamChecker<Long> {
 
 	String error;
 	int decimalPlaces;
@@ -47,14 +47,14 @@ class FixedParamChecker
 
 	@Override
 	public
-	Integer get (
+	Long get (
 			String param) {
 
 		if (decimalPlaces == 0) {
 
 			try {
 
-				return Integer.parseInt (
+				return Long.parseLong (
 					param);
 
 			} catch (NumberFormatException exception) {
@@ -79,8 +79,8 @@ class FixedParamChecker
 
 		}
 
-		int value =
-			- Integer.parseInt (
+		long value =
+			- Long.parseLong (
 				matcher.group (1));
 
 		for (int i = 0; i < decimalPlaces; i++)

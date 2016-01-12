@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
 import static wbs.framework.utils.etc.Misc.toEnum;
-import static wbs.framework.utils.etc.Misc.toInteger;
 import static wbs.framework.utils.etc.Misc.toLong;
 
 import javax.inject.Inject;

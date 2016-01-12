@@ -37,8 +37,10 @@ class ParamCheckerSet {
 		List<String> errors =
 			new ArrayList<String> ();
 
-		for (Map.Entry<String,ParamChecker<?>> ent
-				: paramCheckers.entrySet ()) {
+		for (
+			Map.Entry<String,ParamChecker<?>> ent
+				: paramCheckers.entrySet ()
+		) {
 
 			String key = ent.getKey ();
 			ParamChecker<?> paramChecker = ent.getValue ();
@@ -46,7 +48,8 @@ class ParamCheckerSet {
 			try {
 
 				Object value =
-					paramChecker.get (requestContext.parameter (key));
+					paramChecker.get (
+						requestContext.parameter (key));
 
 				if (ret != null)
 					ret.put (key, value);

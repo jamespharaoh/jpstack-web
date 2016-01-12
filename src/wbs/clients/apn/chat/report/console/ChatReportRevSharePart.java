@@ -645,8 +645,6 @@ class ChatReportRevSharePart
 
 		);
 
-System.out.println (chatMessages.size ());
-
 		long staffCostPerMessage =
 			chatMessages.isEmpty ()
 				? 0

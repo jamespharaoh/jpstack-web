@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.api;
 
 import static wbs.framework.utils.etc.Misc.age;
 import static wbs.framework.utils.etc.Misc.allOf;
+import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -615,10 +617,10 @@ class ChatApiServletModule
 
 		Integer chatId;
 		String number;
-		Integer limit;
+		Long limit;
 
 		Set<String> codes;
-		Integer lastAction;
+		Long lastAction;
 		Boolean hasImage;
 		Boolean hasVideo;
 		Boolean hasAudio;
@@ -674,12 +676,12 @@ class ChatApiServletModule
 			if (params == null)
 				return;
 
-			chatId = (Integer) params.get ("chat-id");
+			chatId = (int) (long) (Long) params.get ("chat-id");
 			number = (String) params.get ("number");
-			limit = (Integer) params.get ("limit");
+			limit = (Long) params.get ("limit");
 
 			codes = (Set<String>) params.get ("codes");
-			lastAction = (Integer) params.get ("last-action");
+			lastAction = (Long) params.get ("last-action");
 			hasImage = (Boolean) params.get ("has-image");
 			hasVideo = (Boolean) params.get ("has-video");
 			hasAudio = (Boolean) params.get ("has-audio");
@@ -1184,11 +1186,13 @@ class ChatApiServletModule
 
 		}
 
-		private void getParams (
+		private
+		void getParams (
 				RpcSource source) {
 
 			@SuppressWarnings ("unchecked")
-			Map<String,Object> params = (Map<String,Object>)
+			Map<String,Object> params =
+				(Map<String,Object>)
 				source.obtain (
 					mediaRequestDef,
 					errors,
@@ -1197,16 +1201,19 @@ class ChatApiServletModule
 			if (params == null)
 				return;
 
-			@SuppressWarnings ("unchecked")
-			Set<Integer> mediaIdsTemp = (Set<Integer>)
-				params.get ("media-ids");
-
-			mediaIds =
-				mediaIdsTemp;
+			mediaIds = (
+				(Set<?>)
+				params.get (
+					"media-ids")
+			)
+				.stream ()
+				.map (value -> (int) (long) (Long) value)
+				.collect (Collectors.toSet ());
 
 		}
 
-		private RpcResult makeResponse () {
+		private
+		RpcResult makeResponse () {
 
 			// build list
 
@@ -1216,7 +1223,10 @@ class ChatApiServletModule
 					"media",
 					RpcType.rStructure);
 
-			for (Integer mediaId : mediaIds) {
+			for (
+				Integer mediaId
+					: mediaIds
+			) {
 
 				MediaRec mediaRec =
 					mediaHelper.find (
@@ -1374,7 +1384,7 @@ class ChatApiServletModule
 			if (params == null)
 				return;
 
-			chatId = (Integer) params.get ("chat-id");
+			chatId = (int) (long) (Long) params.get ("chat-id");
 			number = (String) params.get ("number");
 			schemeCode = (String) params.get ("scheme-code");
 			affiliateCode = (String) params.get ("affiliate-code");
@@ -2190,7 +2200,7 @@ class ChatApiServletModule
 			if (params == null)
 				return;
 
-			chatId = (Integer) params.get ("chat-id");
+			chatId = (int) (long) (Long) params.get ("chat-id");
 			number = (String) params.get ("number");
 			toCode = (String) params.get ("to-code");
 			message = (String) params.get ("message");
@@ -2456,7 +2466,7 @@ class ChatApiServletModule
 			if (params == null)
 				return;
 
-			chatId = (Integer) params.get ("chat-id");
+			chatId = (int) (long) (Long) params.get ("chat-id");
 			number = (String) params.get ("number");
 			gotDeliveryId = (Long) params.get ("got-delivery-id");
 			ignoreCredit = (Boolean) params.get ("ignore-credit");
@@ -2758,8 +2768,8 @@ class ChatApiServletModule
 		String number;
 		ChatUserImageType type;
 		List<ImageUpdateAdd> add;
-		List<Integer> reorder;
-		List<Integer> delete;
+		List<Long> reorder;
+		List<Long> delete;
 		Integer selectedImageId;
 
 		RpcList respImages;
@@ -2818,7 +2828,7 @@ class ChatApiServletModule
 			if (params == null)
 				return;
 
-			chatId = (Integer) params.get ("chat-id");
+			chatId = (int) (long) (Long) params.get ("chat-id");
 			number = (String) params.get ("number");
 			type = (ChatUserImageType) params.get ("type");
 			add = new ArrayList<ImageUpdateAdd> ();
@@ -2831,9 +2841,13 @@ class ChatApiServletModule
 					add.add (imageUpdateAdd);
 				}
 			}
-			reorder = (List<Integer>) params.get ("reorder");
-			delete = (List<Integer>) params.get ("delete");
-			selectedImageId = (Integer) params.get ("selected-image-id");
+
+			reorder = (List<Long>) params.get ("reorder");
+
+			delete = (List<Long>) params.get ("delete");
+
+			selectedImageId = (int) (long) (Long) params.get ("selected-image-id");
+
 		}
 
 		private void doIt (
@@ -2863,10 +2877,20 @@ class ChatApiServletModule
 
 				// check the delete image ids are valid
 
-				Set<Integer> userImageIds = new HashSet<Integer> ();
-				for (ChatUserImageRec image : images) userImageIds.add (image.getId ());
-				Set<Integer> requestImageIds = new HashSet<Integer> ();
-				for (Integer imageId : delete) {
+				Set<Long> userImageIds =
+					images
+						.stream ()
+						.map (ChatUserImageRec::getId)
+						.map (value -> (long) value)
+						.collect (Collectors.toSet ());
+
+				Set<Long> requestImageIds =
+					new HashSet<> ();
+
+				for (
+					Long imageId
+						: delete
+				) {
 
 					if (requestImageIds.contains (imageId)) {
 
@@ -2937,13 +2961,27 @@ class ChatApiServletModule
 			if (reorder != null) {
 
 				// check the reorder image ids are valid
-				Set<Integer> userImageIds = new HashSet<Integer> ();
-				for (ChatUserImageRec image : images) userImageIds.add (image.getId ());
-				Set<Integer> requestImageIds = new HashSet<Integer> ();
 
-				for (Integer imageId : reorder) {
+				Set<Long> userImageIds =
+					images
+						.stream ()
+						.map (ChatUserImageRec::getId)
+						.map (value -> (long) value)
+						.collect (Collectors.toSet ());
 
-					if (requestImageIds.contains (imageId)) {
+				Set<Long> requestImageIds =
+					new HashSet<> ();
+
+				for (
+					Long imageId
+						: reorder
+				) {
+
+					if (
+						contains (
+							requestImageIds,
+							imageId)
+					) {
 
 						throw new RpcException (
 							Rpc.rpcError (
@@ -2954,7 +2992,8 @@ class ChatApiServletModule
 
 					}
 
-					requestImageIds.add (imageId);
+					requestImageIds.add (
+						imageId);
 
 				}
 
@@ -2979,7 +3018,7 @@ class ChatApiServletModule
 				long index = 0;
 
 				for (
-					Integer chatUserImageId
+					Long chatUserImageId
 						: reorder
 				) {
 
@@ -3302,7 +3341,7 @@ class ChatApiServletModule
 			if (params == null)
 				return;
 
-			chatId = (Integer) params.get ("chat-id");
+			chatId = (int) (long) (Long) params.get ("chat-id");
 			number = (String) params.get ("number");
 			sendCount = (Long) params.get ("send-count");
 			sendAmount = (Long) params.get ("send-amount");

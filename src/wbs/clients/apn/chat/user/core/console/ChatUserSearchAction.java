@@ -127,93 +127,114 @@ class ChatUserSearchAction
 
 		String searchName =
 			nullIfEmptyString (
-				requestContext.parameter ("name"));
+				requestContext.parameter (
+					"name"));
 
 		String searchLocation =
 			nullIfEmptyString (
-				requestContext.parameter ("location"));
+				requestContext.parameter (
+					"location"));
 
 		String searchInfo =
 			nullIfEmptyString (
-				requestContext.parameter ("info"));
+				requestContext.parameter (
+					"info"));
 
 		Boolean searchPicture =
 			toBoolean (
-				requestContext.parameter ("picture"));
+				requestContext.parameter (
+					"picture"));
 
 		Boolean searchVideo =
 			toBoolean (
-				requestContext.parameter ("video"));
+				requestContext.parameter (
+					"video"));
 
 		Boolean searchAdultVerified =
 			toBoolean (
-				requestContext.parameter ("adultVerified"));
+				requestContext.parameter (
+					"adultVerified"));
 
 		ChatUserCreditMode searchCreditMode =
 			toEnum (
 				ChatUserCreditMode.class,
-				requestContext.parameter ("creditMode"));
+				requestContext.parameter (
+					"creditMode"));
 
 		ChatUserDateMode searchDateMode =
 			toEnum (
 				ChatUserDateMode.class,
-				requestContext.parameter ("dateMode"));
+				requestContext.parameter (
+					"dateMode"));
 
 		Integer searchOnline =
 			toInteger (
-				requestContext.parameter ("online"));
+				requestContext.parameter (
+					"online"));
 
 		String searchOutput =
 			nullIfEmptyString (
-				requestContext.parameter ("output"));
+				requestContext.parameter (
+					"output"));
 
 		String searchOrder =
 			nullIfEmptyString (
-				requestContext.parameter ("order"));
+				requestContext.parameter (
+					"order"));
 
-		Integer searchCreditFailedGte =
-			(Integer)
-			params.get ("creditFailedGte");
+		Long searchCreditFailedGte =
+			(Long)
+			params.get (
+				"creditFailedGte");
 
-		Integer searchCreditFailedLte =
-			(Integer)
-			params.get ("creditFailedLte");
+		Long searchCreditFailedLte =
+			(Long)
+			params.get (
+				"creditFailedLte");
 
-		Integer searchCreditNoReportGte =
-			(Integer)
-			params.get ("creditNoReportGte");
+		Long searchCreditNoReportGte =
+			(Long)
+			params.get (
+				"creditNoReportGte");
 
-		Integer searchCreditNoReportLte =
-			(Integer)
-			params.get ("creditNoReportLte");
+		Long searchCreditNoReportLte =
+			(Long)
+			params.get (
+				"creditNoReportLte");
 
-		Integer searchValueSinceEverGte =
-			(Integer)
-			params.get ("valueSinceEverGte");
+		Long searchValueSinceEverGte =
+			(Long)
+			params.get (
+				"valueSinceEverGte");
 
-		Integer searchValueSinceEverLte =
-			(Integer)
-			params.get ("valueSinceEverLte");
+		Long searchValueSinceEverLte =
+			(Long)
+			params.get (
+				"valueSinceEverLte");
 
 		Date searchFirstJoinGte =
 			(Date)
-			params.get ("firstJoinGte");
+			params.get (
+				"firstJoinGte");
 
 		Date searchFirstJoinLte =
 			(Date)
-			params.get ("firstJoinLte");
+			params.get (
+				"firstJoinLte");
 
-		Integer limit =
-			(Integer) params.get ("limit");
+		Long limit =
+			(Long) params.get (
+				"limit");
 
 		// create basic criteria
 
 		Map<String,Object> searchMap =
-			new LinkedHashMap<String,Object> ();
+			new LinkedHashMap<> ();
 
 		searchMap.put (
 			"chatId",
-			requestContext.stuffInt ("chatId"));
+			requestContext.stuffInt (
+				"chatId"));
 
 		// check we are not being stupid
 

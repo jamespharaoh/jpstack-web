@@ -26,6 +26,7 @@ class AliasToBeanNestedResultTransformer
 	private final
 	Class<?> resultClass;
 
+	@Override
 	public
 	boolean isTransformedValueATupleElement (
 			String[] aliases,
@@ -45,6 +46,7 @@ class AliasToBeanNestedResultTransformer
 	}
 
 	@SuppressWarnings ("unchecked")
+	@Override
 	public
 	Object transformTuple (
 			Object[] tuple,

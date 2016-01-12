@@ -237,7 +237,8 @@ class ChatBroadcastSendAction
 
 				// start transaction
 
-				profileLogger.lap ("start transaction");
+				profileLogger.lap (
+					"start transaction");
 
 				@Cleanup
 				Transaction transaction =
@@ -255,14 +256,16 @@ class ChatBroadcastSendAction
 				ChatUserRec fromChatUser =
 					chatUserHelper.findByCode (
 						chat,
-						(String) params.get ("fromUserCode"));
+						(String) params.get (
+							"fromUserCode"));
 
 				if (fromChatUser == null) {
 
 					requestContext.addError (
 						stringFormat (
 							"Chat user not found: %s",
-							params.get ("fromUserCode")));
+							params.get (
+								"fromUserCode")));
 
 					return responder (
 						"chatBroadcastSendResponder");
@@ -356,7 +359,7 @@ class ChatBroadcastSendAction
 
 						searchMap.put (
 							"valueSinceEverGte",
-							((Integer) params.get ("searchSpendMin")) * 100);
+							((Long) params.get ("searchSpendMin")) * 100);
 
 					}
 
@@ -364,7 +367,7 @@ class ChatBroadcastSendAction
 
 						searchMap.put (
 							"valueSinceEverLte",
-							((Integer) params.get ("searchSpendMax")) * 100);
+							((Long) params.get ("searchSpendMax")) * 100);
 
 					}
 
@@ -394,8 +397,10 @@ class ChatBroadcastSendAction
 
 						int loop0 = 0;
 
-						for (String number
-								: allNumbers) {
+						for (
+							String number
+								: allNumbers
+						) {
 
 							NumberRec numberRec =
 								numberHelper.findByCode (

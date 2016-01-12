@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public
 class IntegerParamChecker
-	implements ParamChecker<Integer> {
+	implements ParamChecker<Long> {
 
 	String error;
 	boolean required;
@@ -31,7 +31,7 @@ class IntegerParamChecker
 
 	@Override
 	public
-	Integer get (
+	Long get (
 			String param) {
 
 		param =
@@ -46,7 +46,7 @@ class IntegerParamChecker
 		if (! matcher.matches ())
 			throw new ParamFormatException (error);
 
-		return Integer.parseInt (param);
+		return Long.parseLong (param);
 
 	}
 
