@@ -139,7 +139,7 @@ class DevopsScript
 
 			ssh \
 				"-t",
-				"echo rm -rf #{@deployment_path}/work/live/console"
+				"rm -rf #{@deployment_path}/work/live/console"
 
 			;;
 

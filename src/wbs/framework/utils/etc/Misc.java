@@ -2784,4 +2784,14 @@ class Misc {
 
 	}
 
+	public static
+	Integer toIntegerNullSafe (
+			Long longValue) {
+
+		return longValue == null
+			? null
+			: (int) (long) longValue;
+
+	}
+
 }

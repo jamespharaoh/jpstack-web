@@ -242,6 +242,18 @@ class ChatReportRevSharePart
 			.dateBefore (
 				endDate)
 
+			.group (
+				true)
+
+			.groupByAffiliate (
+				true)
+
+			.groupByRoute (
+				true)
+
+			.groupByNetwork (
+				true)
+
 		);
 
 		// aggregate by affiliate
@@ -632,6 +644,8 @@ class ChatReportRevSharePart
 				startDate.toDateTimeAtStartOfDay ().toInstant ())
 
 		);
+
+System.out.println (chatMessages.size ());
 
 		long staffCostPerMessage =
 			chatMessages.isEmpty ()

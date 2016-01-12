@@ -67,9 +67,6 @@ class AliasToBeanNestedResultTransformer
 				String alias =
 					aliases [index];
 
-System.out.println (
-	"ALIAS: " + alias);
-
 				if (alias.contains (".")) {
 
 					nestedAliases.add (alias);
