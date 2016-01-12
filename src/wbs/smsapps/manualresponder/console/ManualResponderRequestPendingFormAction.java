@@ -474,6 +474,7 @@ class ManualResponderRequestPendingFormAction
 					"manual_responder")
 
 				.ref (
+					(long)
 					reply.getId ())
 
 				.sendNow (

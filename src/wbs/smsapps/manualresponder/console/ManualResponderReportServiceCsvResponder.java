@@ -130,10 +130,10 @@ class ManualResponderReportServiceCsvResponder
 		throws IOException {
 
 		List<Integer> users =
-			new ArrayList<Integer> ();
+			new ArrayList<> ();
 
 		List<Long> numCount =
-			new ArrayList<Long> ();
+			new ArrayList<> ();
 
 		for (
 			ManualResponderReportRec report
@@ -143,7 +143,7 @@ class ManualResponderReportServiceCsvResponder
 			Integer userId =
 				report.getUser ().getId ();
 
-			Integer num =
+			Long num =
 				report.getNum ();
 
 			if (users.contains (userId)){

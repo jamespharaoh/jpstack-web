@@ -128,7 +128,7 @@ class ChatChatCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -216,18 +216,21 @@ class ChatChatCommand
 
 		chatSendLogic.sendMessageMagic (
 			fromChatUser,
-			Optional.of (message.getThreadId ()),
+			Optional.of (
+				message.getThreadId ()),
 			text,
 			magicCommand,
 			systemService,
-			helpCommand.getId ());
+			(long) helpCommand.getId ());
 
 		// process inbox
 
 		return inboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (defaultService),
-			Optional.of (affiliate),
+			Optional.of (
+				defaultService),
+			Optional.of (
+				affiliate),
 			command);
 
 	}
@@ -338,7 +341,7 @@ class ChatChatCommand
 				commandManagerProvider.get ().handle (
 					inbox,
 					chatKeyword.getCommand (),
-					Optional.<Integer>absent (),
+					Optional.<Long>absent (),
 					rest));
 
 		}

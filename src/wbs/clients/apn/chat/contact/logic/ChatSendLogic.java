@@ -19,13 +19,13 @@ interface ChatSendLogic {
 
 	MessageRec sendMessageRbFree (
 			ChatUserRec chatUser,
-			Optional<Integer> threadId,
+			Optional<Long> threadId,
 			ServiceRec service,
 			String message);
 
 	Optional<MessageRec> sendSystem (
 			ChatUserRec chatUser,
-			Optional<Integer> threadId,
+			Optional<Long> threadId,
 			String templateCode,
 			RouterRec router,
 			String numFrom,
@@ -37,48 +37,48 @@ interface ChatSendLogic {
 
 	Optional<MessageRec> sendSystemRbFree (
 			ChatUserRec chatUser,
-			Optional<Integer> threadId,
+			Optional<Long> threadId,
 			String templateCode,
 			TemplateMissing templateMissing,
 			Map<String,String> params);
 
 	MessageRec sendMessageMmsFree (
 			ChatUserRec chatUser,
-			Optional<Integer> threadId,
+			Optional<Long> threadId,
 			String message,
 			CommandRec command,
 			ServiceRec service);
 
 	Optional<MessageRec> sendSystemMmsFree (
 			ChatUserRec chatUser,
-			Optional<Integer> threadId,
+			Optional<Long> threadId,
 			String templateCode,
 			CommandRec command,
 			TemplateMissing templateMissing);
 
 	MessageRec sendMessageMagic (
 			ChatUserRec chatUser,
-			Optional<Integer> threadId,
+			Optional<Long> threadId,
 			TextRec message,
 			CommandRec magicCommand,
 			ServiceRec service,
-			Integer magicRef);
+			Long magicRef);
 
-	Integer sendMessageMagic (
+	Long sendMessageMagic (
 			ChatUserRec chatUser,
-			Optional<Integer> threadId,
+			Optional<Long> threadId,
 			Collection<TextRec> parts,
 			CommandRec magicCommand,
 			ServiceRec service,
-			Integer magicRef,
+			Long magicRef,
 			Optional<UserRec> user);
 
 	Optional<MessageRec> sendSystemMagic (
 			ChatUserRec chatUser,
-			Optional<Integer> threadId,
+			Optional<Long> threadId,
 			String templateCode,
 			CommandRec magicCommand,
-			Integer magicRef,
+			Long magicRef,
 			TemplateMissing templateMissing,
 			Map<String,String> params);
 

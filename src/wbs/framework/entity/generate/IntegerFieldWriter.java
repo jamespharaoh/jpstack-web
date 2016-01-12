@@ -43,7 +43,7 @@ class IntegerFieldWriter {
 				context.recordClassName ())
 
 			.typeNameFormat (
-				"Integer")
+				"Long")
 
 			.propertyNameFormat (
 				"%s",
@@ -52,8 +52,9 @@ class IntegerFieldWriter {
 		if (spec.defaultValue () != null) {
 
 			propertyWriter.defaultValueFormat (
-				"%s",
-				spec.defaultValue ());
+				"%sl",
+				Long.toString (
+					spec.defaultValue ()));
 
 		}
 

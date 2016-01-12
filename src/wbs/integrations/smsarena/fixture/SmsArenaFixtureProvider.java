@@ -160,7 +160,7 @@ class SmsArenaFixtureProvider
 				"SMSArena config description")
 
 			.setProfileId (
-				Integer.parseInt (
+				Long.parseLong (
 					prop.getProperty (
 						"profileId")))
 

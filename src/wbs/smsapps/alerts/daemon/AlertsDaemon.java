@@ -263,7 +263,8 @@ class AlertsDaemon
 
 		// get queue info
 
-		int numUnclaimed = 0;
+		long numUnclaimed = 0;
+
 		Instant now = Instant.now ();
 		Instant oldest = now;
 
@@ -313,9 +314,12 @@ class AlertsDaemon
 		}
 
 		Duration maxDurationFoundInQueue =
-			new Duration (oldest, now);
+			new Duration (
+				oldest,
+				now);
 
-		Integer maxDurationSeconds =
+		Long maxDurationSeconds =
+			(long)
 			maxDurationFoundInQueue
 				.toStandardSeconds ()
 				.getSeconds ();
@@ -405,7 +409,7 @@ class AlertsDaemon
 
 		if (performSend) {
 
-			int numSent =
+			long numSent =
 				sendAlerts (
 					alertsSettings,
 					messageText);
@@ -419,6 +423,7 @@ class AlertsDaemon
 					alertsSettings)
 
 				.setIndex (
+					(int) (long)
 					alertsSettings.getNumAlerts ())
 
 				.setTimestamp (
@@ -459,6 +464,7 @@ class AlertsDaemon
 				alertsSettings)
 
 			.setIndex (
+				(int) (long)
 				alertsSettings.getNumStatusChecks ())
 
 			.setTimestamp (
@@ -502,7 +508,7 @@ class AlertsDaemon
 
 	TextRec constructMessage (
 			AlertsSettingsRec alertsSettings,
-			Integer numUnclaimed,
+			Long numUnclaimed,
 			Duration maximumDuration) {
 
 		Integer maxDurationMinutes =
@@ -513,16 +519,18 @@ class AlertsDaemon
 		String message =
 			new StringSubstituter ()
 
-				.param (
-					"numItems",
-					Integer.toString (numUnclaimed))
+			.param (
+				"numItems",
+				Long.toString (
+					numUnclaimed))
 
-				.param (
-					"numMinutes",
-					Integer.toString (maxDurationMinutes))
+			.param (
+				"numMinutes",
+				Integer.toString (
+					maxDurationMinutes))
 
-				.substitute (
-					alertsSettings.getTemplate ());
+			.substitute (
+				alertsSettings.getTemplate ());
 
 		log.warn (message);
 
@@ -589,15 +597,15 @@ class AlertsDaemon
 
 		// check time
 
-		int startHour =
+		long startHour =
 			ifNull (
 				alertsSettings.getStartHour (),
-				0);
+				0l);
 
-		int endHour =
+		long endHour =
 			ifNull (
 				alertsSettings.getEndHour (),
-				24);
+				24l);
 
 		int currentHour =
 			transaction.now ()

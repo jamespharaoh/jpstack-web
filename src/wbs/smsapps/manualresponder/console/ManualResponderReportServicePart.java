@@ -105,10 +105,10 @@ class ManualResponderReportServicePart
 		// perform search
 
 		List<Integer> services =
-			new ArrayList<Integer> ();
+			new ArrayList<> ();
 
 		List<Long> numCount =
-			new ArrayList<Long> ();
+			new ArrayList<> ();
 
 		reports =
 			manualResponderReportHelper.findByProcessedTime (
@@ -124,7 +124,7 @@ class ManualResponderReportServicePart
 			Integer manualResponderId =
 				report.getManualResponder ().getId ();
 
-			Integer num =
+			Long num =
 				report.getNum ();
 
 			if (services.contains (manualResponderId)){
@@ -210,10 +210,10 @@ class ManualResponderReportServicePart
 			">Download CSV File</a></p>\n");
 
 		List<Integer> services =
-			new ArrayList<Integer> ();
+			new ArrayList<> ();
 
 		List<Long> numCount =
-			new ArrayList<Long> ();
+			new ArrayList<> ();
 
 		for (
 			ManualResponderReportRec report
@@ -223,7 +223,7 @@ class ManualResponderReportServicePart
 			Integer manualResponderId =
 				report.getManualResponder ().getId ();
 
-			Integer num =
+			Long num =
 				report.getNum ();
 
 			if (services.contains (manualResponderId)){

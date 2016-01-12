@@ -115,7 +115,7 @@ class ChatPromoCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -230,7 +230,7 @@ class ChatPromoCommand
 					chatPromo.getPromoNotStartedText (),
 					magicCommand,
 					promoService,
-					helpCommand.getId ());
+					(long) helpCommand.getId ());
 
 			chatHelpLogLogic.createChatHelpLogOut (
 				chatUser,
@@ -269,7 +269,7 @@ class ChatPromoCommand
 					chatPromo.getPromoEndedText (),
 					magicCommand,
 					promoService,
-					helpCommand.getId ());
+					(long) helpCommand.getId ());
 
 			chatHelpLogLogic.createChatHelpLogOut (
 				chatUser,
@@ -311,7 +311,7 @@ class ChatPromoCommand
 					chatPromo.getAlreadyClaimedText (),
 					magicCommand,
 					promoService,
-					helpCommand.getId ());
+					(long) helpCommand.getId ());
 
 			chatHelpLogLogic.createChatHelpLogOut (
 				chatUser,
@@ -377,7 +377,7 @@ class ChatPromoCommand
 				chatPromo.getSuccessText (),
 				magicCommand,
 				promoService,
-				helpCommand.getId ());
+				(long) helpCommand.getId ());
 
 		chatHelpLogLogic.createChatHelpLogOut (
 			chatUser,

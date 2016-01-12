@@ -273,8 +273,8 @@ class ObjectTicketCreateAction<
 
 			case number:
 
-				ticketFieldValue.setIntegerValue(
-					(Integer)
+				ticketFieldValue.setIntegerValue (
+					(Long)
 					objectManager.dereference (
 						contextObject,
 						ticketFieldSpec.valuePath ()));
@@ -303,6 +303,7 @@ class ObjectTicketCreateAction<
 				ticketFieldValue
 
 					.setIntegerValue (
+						(long)
 						objectId);
 
 				break;

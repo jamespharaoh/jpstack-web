@@ -43,6 +43,30 @@ class RandomLogicImplementation
 
 	@Override
 	public
+	long randomInteger (
+			long limit) {
+
+		if (limit == Long.MAX_VALUE) {
+
+			return random.nextLong ();
+
+		} else if (limit <= Integer.MAX_VALUE) {
+
+			return (long)
+				random.nextInt (
+					(int) limit);
+
+		} else {
+
+			throw new RuntimeException (
+				"TODO");
+
+		}
+
+	}
+
+	@Override
+	public
 	String generateString (
 			String chars,
 			int length) {

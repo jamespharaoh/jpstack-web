@@ -360,7 +360,7 @@ class HybyteSender
 
 					Xom.xomAttr (
 						"cost",
-						Integer.toString (
+						Long.toString (
 							hybyteOutbox.route.getOutCharge ()))));
 
 			if (hybyteOutbox.hybyteNetwork != null) {

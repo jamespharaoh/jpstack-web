@@ -98,9 +98,9 @@ class ImChatApiLogicImplementation
 			Math.abs (
 				content.getHash ());
 
-		int resizedWidth = 98;
+		long resizedWidth = 98;
 
-		int resizedHeight =
+		long resizedHeight =
 			image.getHeight () * resizedWidth / image.getWidth ();
 
 		return new ImChatProfileData ()
@@ -145,10 +145,10 @@ class ImChatApiLogicImplementation
 					"/miniature.jpg"))
 
 			.miniatureImageWidth (
-				24)
+				24l)
 
 			.miniatureImageHeight (
-				24);
+				24l);
 
 	}
 
@@ -160,7 +160,7 @@ class ImChatApiLogicImplementation
 		ImChatRec imChat =
 			customer.getImChat ();
 
-		Integer requiredBalance =
+		Long requiredBalance =
 			customer.getBalance () < imChat.getMessageCost ()
 				? imChat.getMessageCost () - customer.getBalance ()
 				: 0;
@@ -318,7 +318,7 @@ class ImChatApiLogicImplementation
 			.charge (
 				ifNull (
 					message.getPrice (),
-					0))
+					0l))
 
 			.chargeString (
 				currencyLogic.formatText (

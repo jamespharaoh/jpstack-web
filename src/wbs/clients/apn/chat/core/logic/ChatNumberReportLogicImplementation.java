@@ -119,7 +119,8 @@ class ChatNumberReportLogicImplementation
 
 		if (numberReportRec.getPermanentFailureReceived () != null) {
 
-			int count = numberReportRec.getPermanentFailureCount ();
+			long count =
+				numberReportRec.getPermanentFailureCount ();
 
 			log.debug ("REPORT PERMANENT COUNT " + count + " "
 					+ number.getNumber ());

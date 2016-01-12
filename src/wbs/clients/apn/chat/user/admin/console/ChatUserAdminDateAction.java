@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.user.admin.console;
 
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.Misc.toInteger;
+import static wbs.framework.utils.etc.Misc.toLong;
 
 import javax.inject.Inject;
 
@@ -56,17 +57,25 @@ class ChatUserAdminDateAction
 				ChatUserDateMode.class,
 				requestContext.parameter ("dateMode"));
 
-		Integer radius =
-			toInteger (requestContext.parameter ("radius"));
+		Long radius =
+			toLong (
+				requestContext.parameter (
+					"radius"));
 
-		Integer startHour =
-			toInteger (requestContext.parameter ("startHour"));
+		Long startHour =
+			toLong (
+				requestContext.parameter (
+					"startHour"));
 
-		Integer endHour =
-			toInteger (requestContext.parameter ("endHour"));
+		Long endHour =
+			toLong (
+				requestContext.parameter (
+					"endHour"));
 
-		Integer dailyMax =
-			toInteger (requestContext.parameter ("dailyMax"));
+		Long dailyMax =
+			toLong (
+				requestContext.parameter (
+					"dailyMax"));
 
 		if (radius == null
 				|| startHour == null

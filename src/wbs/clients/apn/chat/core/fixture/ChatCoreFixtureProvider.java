@@ -177,7 +177,7 @@ class ChatCoreFixtureProvider
 				"c500")
 
 			.setOutCharge (
-				500)
+				500l)
 
 			.setCanSend (
 				true)

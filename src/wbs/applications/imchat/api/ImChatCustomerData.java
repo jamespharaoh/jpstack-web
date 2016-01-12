@@ -27,19 +27,19 @@ class ImChatCustomerData {
 	Boolean detailsCompleted;
 
 	@DataAttribute
-	Integer balance;
+	Long balance;
 
 	@DataAttribute
 	String balanceString;
 
 	@DataAttribute
-	Integer minimumBalance;
+	Long minimumBalance;
 
 	@DataAttribute
 	String minimumBalanceString;
 
 	@DataAttribute
-	Integer requiredBalance;
+	Long requiredBalance;
 
 	@DataAttribute
 	String requiredBalanceString;

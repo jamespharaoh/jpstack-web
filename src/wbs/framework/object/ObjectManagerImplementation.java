@@ -536,6 +536,7 @@ class ObjectManagerImplementation
 
 		ObjectHelper<?> objectHelper =
 			objectHelperManager.forObjectTypeId (
+				(int) (long)
 				objectGlobalId.typeId ());
 
 		return objectHelper.find (

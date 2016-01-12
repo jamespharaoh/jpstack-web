@@ -25,7 +25,7 @@ class ImChatMessageData {
 	Long timestamp;
 
 	@DataAttribute
-	Integer charge;
+	Long charge;
 
 	@DataAttribute
 	String chargeString;

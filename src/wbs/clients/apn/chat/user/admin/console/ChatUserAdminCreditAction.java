@@ -78,11 +78,11 @@ class ChatUserAdminCreditAction
 
 		// get params
 
-		int creditAmount =
-			(Integer) params.get ("creditAmount");
+		long creditAmount =
+			(Long) params.get ("creditAmount");
 
-		int billAmount =
-			(Integer) params.get ("billAmount");
+		long billAmount =
+			(Long) params.get ("billAmount");
 
 		String details =
 			(String) params.get ("details");

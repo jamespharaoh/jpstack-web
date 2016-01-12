@@ -64,7 +64,7 @@ class ChatMagicCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -116,7 +116,7 @@ class ChatMagicCommand
 				return commandManagerProvider.get ().handle (
 					inbox,
 					chatKeyword.getCommand (),
-					Optional.<Integer>absent (),
+					Optional.<Long>absent (),
 					"");
 
 			}
@@ -132,7 +132,7 @@ class ChatMagicCommand
 		return commandManagerProvider.get ().handle (
 			inbox,
 			defaultCommand,
-			Optional.<Integer>absent (),
+			Optional.<Long>absent (),
 			rest);
 
 	}

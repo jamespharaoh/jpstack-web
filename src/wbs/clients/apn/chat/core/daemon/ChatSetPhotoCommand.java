@@ -85,7 +85,7 @@ class ChatSetPhotoCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -173,10 +173,10 @@ class ChatSetPhotoCommand
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.<Integer>absent (),
+				Optional.<Long>absent (),
 				"photo_confirm",
 				commandHelper.findByCode (chat, "magic"),
-				commandHelper.findByCode (chat, "help").getId (),
+				(long) commandHelper.findByCode (chat, "help").getId (),
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 

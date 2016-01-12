@@ -457,6 +457,7 @@ class ChatUserPendingFormAction
 					transaction.now ()))
 
 			.setIndex (
+				(long)
 				list.size ())
 
 			.setClassification (
@@ -473,7 +474,7 @@ class ChatUserPendingFormAction
 
 			if (oldChatUserImage != null) {
 
-				int index =
+				long index =
 					oldChatUserImage.getIndex ();
 
 				oldChatUserImage.setIndex (null);
@@ -724,7 +725,7 @@ class ChatUserPendingFormAction
 	void sendRejection (
 			@NonNull UserRec myUser,
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<Integer> threadId,
+			@NonNull Optional<Long> threadId,
 			@NonNull String messageParam) {
 
 		Transaction transaction =
@@ -805,7 +806,7 @@ class ChatUserPendingFormAction
 					serviceHelper.findByCode (
 						chat,
 						"system"),
-					0);
+					0l);
 
 			chatMessage =
 				Optional.<ChatMessageRec>absent ();
@@ -985,7 +986,7 @@ class ChatUserPendingFormAction
 			message =
 				chatSendLogic.sendMessageMmsFree (
 					chatUser,
-					Optional.<Integer>absent (),
+					Optional.<Long>absent (),
 					messageParam,
 					commandHelper.findByCode (
 						chat,

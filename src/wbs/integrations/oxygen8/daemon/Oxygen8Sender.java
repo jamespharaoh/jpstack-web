@@ -326,9 +326,11 @@ class Oxygen8Sender
 			urlConnection.setRequestMethod ("POST");
 
 			urlConnection.setConnectTimeout (
+				(int) (long)
 				oxygen8RouteOut.getConnectTimeout () * 1000);
 
 			urlConnection.setReadTimeout (
+				(int) (long)
 				oxygen8RouteOut.getReadTimeout () * 1000);
 
 			// set request params

@@ -84,7 +84,7 @@ class OrdererCommandTypeHandler
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -108,7 +108,7 @@ class OrdererCommandTypeHandler
 	InboxAttemptRec handle () {
 
 		OrdererRec orderer =
-			(OrdererRec) (Object)
+			(OrdererRec)
 			objectManager.getParent (
 				command);
 
@@ -202,6 +202,7 @@ class OrdererCommandTypeHandler
 				"orderer")
 
 			.ref (
+				(long)
 				order.getId ())
 
 			.send ();

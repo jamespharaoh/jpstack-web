@@ -24,10 +24,10 @@ interface ChatLogicHooks {
 		String name;
 
 		public
-		int count;
+		long count;
 
 		public
-		int charge;
+		long charge;
 
 	}
 

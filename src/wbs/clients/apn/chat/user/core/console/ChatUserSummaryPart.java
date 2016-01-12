@@ -404,25 +404,27 @@ class ChatUserSummaryPart
 				"<td>%s</td>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					Long.valueOf(chatUser.getValueSinceEver ())),
+					chatUser.getValueSinceEver ()),
 
 				"</tr>\n");
 
 			printFormat (
 				"<tr class=\"sep\">\n");
 
-			int total =
+			long total =
 				chatUser.getValueSinceEver ();
 
-			for (ChatLogicHooks.ChatUserCharge chatUserCharge
-					: externalChatUserCharges) {
+			for (
+				ChatLogicHooks.ChatUserCharge chatUserCharge
+					: externalChatUserCharges
+			) {
 
 				printFormat (
 					"<tr> <th>%h</th> <td>%s (%h)</td> </tr>\n",
 					chatUserCharge.name,
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
-						Long.valueOf(chatUserCharge.charge)),
+						chatUserCharge.charge),
 					chatUserCharge.count);
 
 				total += chatUserCharge.charge;
@@ -432,7 +434,7 @@ class ChatUserSummaryPart
 				"<tr> <th>Grand total</th> <td>%s</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					Long.valueOf(total)));
+					total));
 
 			printFormat (
 				"<tr class=\"sep\">\n");
@@ -441,7 +443,7 @@ class ChatUserSummaryPart
 				"<tr> <th>Credit</th> <td>%s</td> </tr>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					Long.valueOf(chatUser.getCredit ())));
+					chatUser.getCredit ()));
 
 			printFormat (
 				"<tr> <th>Credit mode</th> <td>%h</td> </tr>\n",

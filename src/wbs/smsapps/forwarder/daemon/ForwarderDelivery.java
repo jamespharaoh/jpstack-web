@@ -56,7 +56,7 @@ class ForwarderDelivery
 	public
 	void handle (
 			int deliveryId,
-			Integer ref) {
+			Long ref) {
 
 		@Cleanup
 		Transaction transaction =
@@ -131,6 +131,7 @@ class ForwarderDelivery
 					forwarderMessageOut)
 
 				.setIndex (
+					(int) (long)
 					forwarderMessageOut.getReportIndexNext ())
 
 				.setOldMessageStatus (
@@ -152,6 +153,7 @@ class ForwarderDelivery
 				forwarderMessageOut
 
 					.setReportIndexPending (
+						(long)
 						forwarderMessageOutReport.getIndex ())
 
 					.setReportRetryTime (
@@ -159,7 +161,7 @@ class ForwarderDelivery
 							transaction.now ()))
 
 					.setReportTries (
-						0);
+						0l);
 
 			}
 

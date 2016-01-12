@@ -140,7 +140,7 @@ class ChatMainCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -239,7 +239,7 @@ class ChatMainCommand
 				commandHelper.findByCode (
 					chat,
 					"magic"),
-				commandHelper.findByCode (
+				(long) commandHelper.findByCode (
 					userChatScheme,
 					"chat_dob"
 				).getId (),
@@ -373,7 +373,7 @@ class ChatMainCommand
 				commandManagerProvider.get ().handle (
 					inbox,
 					chatSchemeKeyword.getCommand (),
-					Optional.<Integer>absent (),
+					Optional.<Long>absent (),
 					rest));
 
 		}
@@ -485,7 +485,7 @@ class ChatMainCommand
 				commandManagerProvider.get ().handle (
 					inbox,
 					chatKeyword.getCommand (),
-					Optional.<Integer>absent (),
+					Optional.<Long>absent (),
 					rest));
 
 		}

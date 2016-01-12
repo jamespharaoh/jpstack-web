@@ -12,15 +12,15 @@ public
 class GlobalId {
 
 	@Getter
-	int typeId;
+	long typeId;
 
 	@Getter
-	int objectId;
+	long objectId;
 
 	public
 	GlobalId (
-			int newTypeId,
-			int newObjectId) {
+			long newTypeId,
+			long newObjectId) {
 
 		typeId =
 			newTypeId;

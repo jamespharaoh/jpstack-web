@@ -143,7 +143,7 @@ class ChatInfoLogicImplementation
 	void sendUserInfo (
 			ChatUserRec thisUser,
 			ChatUserRec otherUser,
-			Integer threadId,
+			Long threadId,
 			boolean asDating) {
 
 		Transaction transaction =
@@ -275,11 +275,12 @@ class ChatInfoLogicImplementation
 
 		chatSendLogic.sendMessageMagic (
 			thisUser,
-			Optional.fromNullable (threadId),
+			Optional.fromNullable (
+				threadId),
 			textParts,
 			commandHelper.findByCode (chat, "chat"),
 			serviceHelper.findByCode (chat, serviceCode),
-			otherUser.getId (),
+			(long) otherUser.getId (),
 			Optional.<UserRec>absent ());
 
 	}
@@ -289,7 +290,7 @@ class ChatInfoLogicImplementation
 	int sendUserInfos (
 			@NonNull ChatUserRec thisUser,
 			int numToSend,
-			Integer threadId) {
+			Long threadId) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -413,7 +414,7 @@ class ChatInfoLogicImplementation
 	void sendUserPicsViaLink (
 			ChatUserRec thisUser,
 			Collection<ChatUserRec> otherUsers,
-			Integer threadId,
+			Long threadId,
 			boolean asDating) {
 
 		Transaction transaction =
@@ -438,10 +439,10 @@ class ChatInfoLogicImplementation
 				transaction.now ())
 
 			.setNumViews (
-				0)
+				0l)
 
 			.setNumExpired (
-				0)
+				0l)
 
 			.setExpireTime (
 				Instant.now ().plus (
@@ -555,7 +556,7 @@ class ChatInfoLogicImplementation
 	void sendUserPicsViaMms (
 			ChatUserRec thisUser,
 			Collection<ChatUserRec> otherUsers,
-			Integer threadId,
+			Long threadId,
 			boolean asDating) {
 
 		Transaction transaction =
@@ -682,7 +683,7 @@ class ChatInfoLogicImplementation
 	void sendUserPics (
 			ChatUserRec thisUser,
 			Collection<ChatUserRec> otherUsers,
-			Integer threadId,
+			Long threadId,
 			boolean asDating) {
 
 		Transaction transaction =
@@ -743,7 +744,7 @@ class ChatInfoLogicImplementation
 	void sendUserVideos (
 			final ChatUserRec thisUser,
 			Collection<ChatUserRec> otherUsers,
-			Integer threadId,
+			Long threadId,
 			boolean asDating) {
 
 		Transaction transaction =
@@ -882,7 +883,7 @@ class ChatInfoLogicImplementation
 			ChatUserRec thisUser,
 			ChatUserRec requestedUser,
 			int numToSend,
-			Integer threadId) {
+			Long threadId) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -921,7 +922,7 @@ class ChatInfoLogicImplementation
 	int sendUserPics (
 			ChatUserRec thisUser,
 			int numToSend,
-			Integer threadId) {
+			Long threadId) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -956,7 +957,7 @@ class ChatInfoLogicImplementation
 	int sendUserVideos (
 			ChatUserRec thisUser,
 			int numToSend,
-			Integer threadId) {
+			Long threadId) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1386,7 +1387,7 @@ class ChatInfoLogicImplementation
 	void chatUserSetInfo (
 			ChatUserRec chatUser,
 			String info,
-			Integer threadId) {
+			Long threadId) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1463,10 +1464,10 @@ class ChatInfoLogicImplementation
 
 		chatSendLogic.sendSystemMagic (
 			chatUser,
-			Optional.<Integer>absent (),
+			Optional.<Long>absent (),
 			"name_hint",
 			commandHelper.findByCode (chat, "magic"),
-			commandHelper.findByCode (chat, "name").getId (),
+			(long) commandHelper.findByCode (chat, "name").getId (),
 			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
 
@@ -1495,7 +1496,7 @@ class ChatInfoLogicImplementation
 
 		chatSendLogic.sendSystemMmsFree (
 			chatUser,
-			Optional.<Integer>absent (),
+			Optional.<Long>absent (),
 			"photo_hint",
 			commandHelper.findByCode (chat, "set_photo"),
 			TemplateMissing.error);
@@ -1525,7 +1526,7 @@ class ChatInfoLogicImplementation
 
 		chatSendLogic.sendSystemMmsFree (
 			chatUser,
-			Optional.<Integer>absent (),
+			Optional.<Long>absent (),
 			"photo_hint_2",
 			commandHelper.findByCode (chat, "set_photo"),
 			TemplateMissing.error);

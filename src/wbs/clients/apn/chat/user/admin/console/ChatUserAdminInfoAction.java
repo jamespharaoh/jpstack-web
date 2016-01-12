@@ -192,7 +192,7 @@ class ChatUserAdminInfoAction
 					messageText,
 					commandHelper.findByCode (chat, "magic"),
 					serviceHelper.findByCode (chat, "system"),
-					commandHelper.findByCode (chat, "join_info").getId ());
+					(long) commandHelper.findByCode (chat, "join_info").getId ());
 
 			}
 

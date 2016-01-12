@@ -582,10 +582,13 @@ class ChatJoiner {
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				"join_error",
-				commandHelper.findByCode (chat, "help"),
-				0,
+				commandHelper.findByCode (
+					chat,
+					"help"),
+				0l,
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -640,14 +643,15 @@ class ChatJoiner {
 
 				chatSendLogic.sendSystemMagic (
 					chatUser,
-					Optional.of (message.getThreadId ()),
+					Optional.of (
+						message.getThreadId ()),
 					"dob_request",
 					commandHelper.findByCode (
 						chatUser.getChatScheme (),
 						joinTypeIsChat (joinType)
 							? "chat_dob"
 							: "date_dob"),
-					0,
+					0l,
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
@@ -661,10 +665,11 @@ class ChatJoiner {
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				"dob_too_young",
 				commandHelper.findByCode (chat, "help"),
-				0,
+				0l,
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -701,19 +706,21 @@ class ChatJoiner {
 
 				chatSendLogic.sendSystemMagic (
 					chatUser,
-					Optional.of (message.getThreadId ()),
+					Optional.of (
+						message.getThreadId ()),
 					"join_warning",
 					commandHelper.findByCode (chat, "help"),
-					0,
+					0l,
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
 				chatSendLogic.sendSystemMagic (
 					chatUser,
-					Optional.of (message.getThreadId ()),
+					Optional.of (
+						message.getThreadId ()),
 					"join_warning_2",
 					commandHelper.findByCode (chat, "help"),
-					0,
+					0l,
 					TemplateMissing.ignore,
 					Collections.<String,String>emptyMap ());
 
@@ -743,14 +750,15 @@ class ChatJoiner {
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				"charges_request",
 				commandHelper.findByCode (
 					chatUser.getChatScheme (),
 					joinTypeIsChat (joinType)
 						? "chat_charges"
 						: "date_charges"),
-				0,
+				0l,
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -767,14 +775,15 @@ class ChatJoiner {
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				"location_error",
 				commandHelper.findByCode (
 					chatUser.getChatScheme (),
 					joinTypeIsChat (joinType)
 						? "chat_location"
 						: "date_location"),
-				0,
+				0l,
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -788,14 +797,15 @@ class ChatJoiner {
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				"gender_request",
 				commandHelper.findByCode (
 					chatUser.getChatScheme (),
 					joinTypeIsChat (joinType)
 						? "chat_gender"
 						: "date_gender"),
-				0,
+				0l,
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -809,14 +819,15 @@ class ChatJoiner {
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				"gender_other_request",
 				commandHelper.findByCode (
 					chatUser.getChatScheme (),
 					joinTypeIsChat (joinType)
 						? "chat_gender_other"
 						: "date_gender_other"),
-				0,
+				0l,
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -833,14 +844,15 @@ class ChatJoiner {
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				"info_request",
 				commandHelper.findByCode (
 					chatUser.getChatScheme (),
 					joinTypeIsChat (joinType)
 						? "chat_info"
 						: "date_info"),
-				0,
+				0l,
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -864,14 +876,15 @@ class ChatJoiner {
 
 		chatSendLogic.sendSystemMagic (
 			chatUser,
-			Optional.of (message.getThreadId ()),
+			Optional.of (
+				message.getThreadId ()),
 			"location_request",
 			commandHelper.findByCode (
 				chatUser.getChatScheme (),
 				joinTypeIsChat (joinType)
 					? "chat_location"
 					: "date_location"),
-			0,
+			0l,
 			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
 
@@ -1112,10 +1125,11 @@ class ChatJoiner {
 
 				chatSendLogic.sendSystemMagic (
 					chatUser,
-					Optional.of (message.getThreadId ()),
+					Optional.of (
+						message.getThreadId ()),
 					"date_joined",
 					commandHelper.findByCode (chat, "help"),
-					0,
+					0l,
 					TemplateMissing.ignore,
 					Collections.<String,String>emptyMap ());
 
@@ -1171,10 +1185,11 @@ class ChatJoiner {
 
 				chatSendLogic.sendSystemMagic (
 					chatUser,
-					Optional.of (message.getThreadId ()),
+					Optional.of (
+						message.getThreadId ()),
 					"more_photos_error",
 					commandHelper.findByCode (chat, "help"),
-					0,
+					0l,
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
@@ -1193,10 +1208,11 @@ class ChatJoiner {
 
 				chatSendLogic.sendSystemMagic (
 					chatUser,
-					Optional.of (message.getThreadId ()),
+					Optional.of (
+						message.getThreadId ()),
 					"more_videos_error",
 					commandHelper.findByCode (chat, "help"),
-					0,
+					0l,
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
@@ -1227,10 +1243,11 @@ class ChatJoiner {
 
 				chatSendLogic.sendSystemMagic (
 					chatUser,
-					Optional.of (message.getThreadId ()),
+					Optional.of (
+						message.getThreadId ()),
 					"more_error",
 					commandHelper.findByCode (chat, "help"),
-					0,
+					0l,
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 

@@ -437,7 +437,7 @@ class ChatCreditLogicImplementation
 	ChatCreditCheckResult userSpendCreditCheck (
 			@NonNull ChatUserRec chatUser,
 			@NonNull Boolean userActed,
-			@NonNull Optional<Integer> threadId) {
+			@NonNull Optional<Long> threadId) {
 
 		log.debug (
 			stringFormat (
@@ -606,7 +606,7 @@ class ChatCreditLogicImplementation
 
 		// check credit
 
-		int effectiveCredit =
+		long effectiveCredit =
 			+ chatUser.getCredit ()
 			- chatUser.getCreditPendingStrict ();
 
@@ -1022,7 +1022,7 @@ class ChatCreditLogicImplementation
 				deliveryTypeCode)
 
 			.ref (
-				chatUser.getId ())
+				(long) chatUser.getId ())
 
 			.send ();
 
@@ -1050,7 +1050,7 @@ class ChatCreditLogicImplementation
 
 	@Override
 	public
-	int userBillLimitAmount (
+	long userBillLimitAmount (
 			ChatUserRec chatUser) {
 
 		boolean onAdultService =
@@ -1122,19 +1122,20 @@ class ChatCreditLogicImplementation
 					today)
 
 				.setCreditDailyAmount (
-					0);
+					0l);
 
 		}
 
 		// apply the limit
 
-		int routeCharge =
+		long routeCharge =
 			chatScheme.getRbBillRoute ().getOutCharge ();
 
-		int limit =
-			userBillLimitAmount (chatUser);
+		long limit =
+			userBillLimitAmount (
+				chatUser);
 
-		int newDailyBilledAmount =
+		long newDailyBilledAmount =
 			+ chatUser.getCreditDailyAmount ()
 			+ routeCharge;
 
@@ -1155,7 +1156,7 @@ class ChatCreditLogicImplementation
 	public
 	void userCreditHint (
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<Integer> threadId) {
+			@NonNull Optional<Long> threadId) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1255,7 +1256,7 @@ class ChatCreditLogicImplementation
 
 							.put (
 								"limit",
-								Integer.toString (
+								Long.toString (
 									userBillLimitAmount (chatUser) / 100))
 
 							.build ());
@@ -1312,7 +1313,7 @@ class ChatCreditLogicImplementation
 
 		// work out the minimum we are aiming for
 
-		int targetLimit =
+		long targetLimit =
 			sum (
 				+ chatUser.getCreditSuccess (),
 				- (chatUser.getCreditSuccess () % 1000) + 1000);

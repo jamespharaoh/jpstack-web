@@ -190,6 +190,7 @@ class ImChatConversationStartAction
 				profile)
 
 			.setIndex (
+				(int) (long)
 				customer.getNumConversations ())
 
 			.setStartTime (

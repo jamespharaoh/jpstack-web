@@ -87,7 +87,7 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 
 	RecordType findByIndex (
 			Record<?> parent,
-			Integer index);
+			Long index);
 
 	List<RecordType> findAll ();
 

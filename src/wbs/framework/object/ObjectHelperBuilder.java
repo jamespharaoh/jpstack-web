@@ -777,7 +777,7 @@ class ObjectHelperBuilder {
 			public
 			Record findByIndex (
 					@NonNull Record parent,
-					@NonNull Integer index) {
+					@NonNull Long index) {
 
 				ObjectHelper<?> parentHelper =
 					forObjectClass (

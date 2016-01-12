@@ -28,7 +28,7 @@ class ImChatCustomerDetailData {
 	String dataType;
 
 	@DataAttribute
-	Integer minimumAge;
+	Long minimumAge;
 
 	@DataAttribute
 	String value;

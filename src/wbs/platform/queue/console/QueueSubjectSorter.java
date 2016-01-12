@@ -152,7 +152,7 @@ class QueueSubjectSorter {
 
 			// find next item
 
-			int nextItemIndex =
+			long nextItemIndex =
 				+ subject.getTotalItems ()
 				- subject.getActiveItems ();
 

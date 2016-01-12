@@ -52,7 +52,7 @@ class ChatBillDeliveryHandler
 	DeliveryObjectHelper deliveryHelper;
 
 	@Inject @Named
-	SymbolicLock<Integer> chatUserDeliveryLocks;
+	SymbolicLock<Long> chatUserDeliveryLocks;
 
 	@Override
 	public
@@ -68,7 +68,7 @@ class ChatBillDeliveryHandler
 	void addCredit (
 			ChatUserRec chatUser,
 			MessageStatus status,
-			int amount,
+			long amount,
 			boolean today,
 			boolean strict) {
 
@@ -147,7 +147,7 @@ class ChatBillDeliveryHandler
 	public
 	void handle (
 			int deliveryId,
-			Integer ref) {
+			Long ref) {
 
 		@Cleanup
 		HeldLock lock =

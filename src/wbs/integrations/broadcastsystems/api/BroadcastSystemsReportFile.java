@@ -115,7 +115,7 @@ class BroadcastSystemsReportFile
 
 		MessageReportCodeRec reportCode =
 			messageReportCodeHelper.findOrCreate (
-				data.statusCode.hashCode (),
+				(long) data.statusCode.hashCode (),
 				null,
 				null,
 				MessageReportCodeType.broadcastSystems,

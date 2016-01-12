@@ -203,6 +203,7 @@ class ImChatMessageSendAction
 				conversation)
 
 			.setIndex (
+				(int) (long)
 				conversation.getNumMessages ())
 
 			.setTimestamp (
@@ -219,7 +220,7 @@ class ImChatMessageSendAction
 				conversation.getNumMessages () + 1)
 
 			.setFreeMessages (
-				0)
+				0l)
 
 			.setPendingReply (
 				true);

@@ -191,7 +191,7 @@ class ChatMessageLogicImplementation
 			@NonNull ChatUserRec fromUser,
 			@NonNull ChatUserRec toUser,
 			@NonNull String text,
-			@NonNull Optional<Integer> threadId,
+			@NonNull Optional<Long> threadId,
 			@NonNull ChatMessageMethod source,
 			@NonNull List<MediaRec> medias) {
 
@@ -475,7 +475,7 @@ class ChatMessageLogicImplementation
 				threadId,
 				"logon_hint",
 				commandHelper.findByCode (chat, "magic"),
-				commandHelper.findByCode (chat, "help").getId (),
+				(long) commandHelper.findByCode (chat, "help").getId (),
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -675,7 +675,7 @@ class ChatMessageLogicImplementation
 				queueItem
 
 					.setPriority (
-						-10);
+						-10l);
 
 				chatMessage
 
@@ -856,7 +856,7 @@ class ChatMessageLogicImplementation
 		// set the delivery id
 
 		if (toUser.getLastDeliveryId () == null)
-			toUser.setLastDeliveryId (0);
+			toUser.setLastDeliveryId (0l);
 
 		toUser
 
@@ -939,6 +939,7 @@ class ChatMessageLogicImplementation
 					ChatMessageStatus.moderatorEdited))
 
 			.deliveryIdGreaterThan (
+				(int) (long)
 				toUser.getLastMessagePollId ())
 
 			.orderBy (
@@ -1322,7 +1323,7 @@ class ChatMessageLogicImplementation
 
 		}
 
-		Integer threadId =
+		Long threadId =
 			chatSendLogic.sendMessageMagic (
 				toUser,
 				Optional.fromNullable (
@@ -1334,7 +1335,7 @@ class ChatMessageLogicImplementation
 				serviceHelper.findByCode (
 					chat,
 					serviceCode),
-				fromUser.getId (),
+				(long) fromUser.getId (),
 				Optional.fromNullable (
 					chatMessage.getSender ()));
 
@@ -1413,7 +1414,7 @@ class ChatMessageLogicImplementation
 	public
 	void chatUserRejectionCountInc (
 			ChatUserRec chatUser,
-			Integer threadId) {
+			Long threadId) {
 
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();

@@ -316,9 +316,16 @@ class ChatUserLogicImplementation
 
 		Instant firstAdTime =
 			startDate
-				.plusDays (chat.getAdTimeFirst () / 60 / 60 / 24)
-				.toDateTime (timeOfDay, timezone)
-				.toInstant ();
+
+			.plusDays (
+				(int) (long)
+				chat.getAdTimeFirst () / 60 / 60 / 24)
+
+			.toDateTime (
+				timeOfDay,
+				timezone)
+
+			.toInstant ();
 
 		if (firstAdTime.isAfter (
 				midnightTonight)) {
@@ -343,9 +350,16 @@ class ChatUserLogicImplementation
 
 			Instant nextAdTime =
 				startDate
-					.plusDays (chat.getAdTime () / 60 / 60 / 24 * index)
-					.toDateTime (timeOfDay, timezone)
-					.toInstant ();
+
+				.plusDays (
+					(int) (long)
+					chat.getAdTime () / 60 / 60 / 24 * index)
+
+				.toDateTime (
+					timeOfDay,
+					timezone)
+
+				.toInstant ();
 
 			if (nextAdTime.isAfter (
 					midnightTonight)) {
@@ -607,11 +621,18 @@ class ChatUserLogicImplementation
 	void monitorCap (
 			@NonNull ChatUserRec chatUser) {
 
-		int number =
-			randomLogic.randomInteger (100);
+		long number =
+			randomLogic.randomInteger (
+				100);
 
-		if (number < 10)
-			chatUser.setMonitorCap (number);
+		if (number < 10) {
+
+			chatUser
+
+				.setMonitorCap (
+					number);
+
+		}
 
 	}
 
@@ -776,8 +797,8 @@ class ChatUserLogicImplementation
 		BufferedImage smallImage =
 			mediaLogic.resampleImageToFit (
 				fullImage,
-				320,
-				240);
+				320l,
+				240l);
 
 		// save
 

@@ -27,7 +27,7 @@ interface ForwarderLogic {
 			String numTo,
 			String routeCode,
 			String myId,
-			Integer pri,
+			Long pri,
 			Collection<MediaRec> medias);
 
 }

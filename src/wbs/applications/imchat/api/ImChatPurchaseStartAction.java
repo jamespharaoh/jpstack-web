@@ -232,6 +232,7 @@ class ImChatPurchaseStartAction
 				customer)
 
 			.setIndex (
+				(int) (long)
 				customer.getNumPurchases ())
 
 			.setToken (

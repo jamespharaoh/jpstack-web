@@ -55,6 +55,7 @@ class BroadcastHooks
 		// set index
 
 		broadcast.setIndex (
+			(int) (long)
 			broadcastConfig.getNumTotal ());
 
 	}

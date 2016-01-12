@@ -247,7 +247,7 @@ class ChatDateDaemon
 				chatCreditLogic.userSpendCreditCheck (
 					chatUser,
 					false,
-					Optional.<Integer>absent ());
+					Optional.<Long>absent ());
 
 			if (creditCheckResult.failed ())
 				continue;
@@ -309,7 +309,7 @@ class ChatDateDaemon
 				chatCreditLogic.userSpendCreditCheck (
 					chatUser,
 					false,
-					Optional.<Integer>absent ());
+					Optional.<Long>absent ());
 
 			if (creditCheckResult.failed ()) {
 
@@ -466,7 +466,7 @@ class ChatDateDaemon
 
 		// inc the daily count thing as appropriate
 
-		int oldDailyCount =
+		long oldDailyCount =
 			thisUser.getDateDailyCount ();
 
 		LocalDate oldDailyDate =
@@ -480,14 +480,16 @@ class ChatDateDaemon
 				day = day.plusDays (1)
 			) {
 
-				int dailyCount =
+				long dailyCount =
 					thisUser.getDateDailyCount ();
 
-				int dailyMax =
+				long dailyMax =
 					thisUser.getDateDailyMax ();
 
 				thisUser.setDateDailyCount (
-					min (dailyCount + dailyMax, dailyMax));
+					min (
+						dailyCount + dailyMax,
+						dailyMax));
 
 			}
 
@@ -527,7 +529,7 @@ class ChatDateDaemon
 			chatCreditLogic.userSpendCreditCheck (
 				thisUser,
 				false,
-				Optional.<Integer>absent ());
+				Optional.<Long>absent ());
 
 		if (creditCheckResult.failed ()) {
 
@@ -981,9 +983,9 @@ class ChatDateDaemon
 
 	public
 	boolean checkHours (
-			int now,
-			int start,
-			int end) {
+			long now,
+			long start,
+			long end) {
 
 		if (start == end)
 			return false;

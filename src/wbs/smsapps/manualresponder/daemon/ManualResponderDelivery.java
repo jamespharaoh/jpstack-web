@@ -65,7 +65,7 @@ class ManualResponderDelivery
 	public
 	void handle (
 			int deliveryId,
-			Integer ref) {
+			Long ref) {
 
 		@Cleanup
 		Transaction transaction =

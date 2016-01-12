@@ -70,6 +70,7 @@ class ChatMessageHooks
 		chatMessage
 
 			.setIndex (
+				(int) (long)
 				chatContact.getNumChatMessages ())
 
 			.setChatContact (

@@ -13,10 +13,10 @@ interface ChatDateLogic {
 			UserRec user,
 			MessageRec message,
 			ChatUserDateMode dateMode,
-			Integer radius,
-			Integer startHour,
-			Integer endHour,
-			Integer dailyMax,
+			Long radius,
+			Long startHour,
+			Long endHour,
+			Long dailyMax,
 			boolean sendMessage);
 
 	void userDateStuff (

@@ -335,7 +335,7 @@ class ForwarderApiModule
 		String route;
 		String service;
 		Integer replyToServerId;
-		Integer pri;
+		Long pri;
 
 		ForwarderRec forwarder;
 		ForwarderLogicImplementation.SendTemplate sendTemplate;
@@ -435,7 +435,7 @@ class ForwarderApiModule
 			route = (String) params.get("route");
 			service = (String) params.get("service");
 			replyToServerId = (Integer) params.get("reply-to-server-id");
-			pri = (Integer) params.get("pri");
+			pri = (Long) params.get("pri");
 
 		}
 
@@ -639,8 +639,8 @@ class ForwarderApiModule
 		String clientId;
 		String route;
 		String service;
-		Integer pri;
-		Integer retryDays;
+		Long pri;
+		Long retryDays;
 		Set<String> tags;
 		ForwarderLogicImplementation.SendPart part;
 		Collection<MediaRec> medias = null;
@@ -911,8 +911,8 @@ class ForwarderApiModule
 							sendExMessage.clientId = (String) mp.get("client-id");
 							sendExMessage.route = (String) mp.get("route");
 							sendExMessage.service = (String) mp.get("service");
-							sendExMessage.pri = (Integer) mp.get("pri");
-							sendExMessage.retryDays = (Integer) mp.get("retry-days");
+							sendExMessage.pri = (Long) mp.get("pri");
+							sendExMessage.retryDays = (Long) mp.get("retry-days");
 
 							@SuppressWarnings ("unchecked")
 							Set<String> tagsTemp =
@@ -1980,6 +1980,7 @@ class ForwarderApiModule
 
 					ForwarderMessageOutReportRec forwarderMessageOutReport =
 						forwarderMessageOut.getReports ().get (
+							(int) (long)
 							forwarderMessageOut.getReportIndexPending ());
 
 					ForwarderMessageStatus forwarderMessageStatus =

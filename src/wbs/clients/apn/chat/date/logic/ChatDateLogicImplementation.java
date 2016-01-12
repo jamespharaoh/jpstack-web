@@ -65,10 +65,10 @@ class ChatDateLogicImplementation
 
 		chatSendLogic.sendSystemMagic (
 			chatUser,
-			Optional.<Integer>absent (),
+			Optional.<Long>absent (),
 			"date_hint_photo",
 			commandHelper.findByCode (chat, "date_join_photo"),
-			0,
+			0l,
 			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
 
@@ -97,10 +97,10 @@ class ChatDateLogicImplementation
 
 		chatSendLogic.sendSystemMagic (
 			chatUser,
-			Optional.<Integer>absent (),
+			Optional.<Long>absent (),
 			"date_hint_upgrade",
 			commandHelper.findByCode (chat, "magic"),
-			commandHelper.findByCode (chat, "date_join_photo").getId (),
+			(long) commandHelper.findByCode (chat, "date_join_photo").getId (),
 			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
 
@@ -121,10 +121,10 @@ class ChatDateLogicImplementation
 			UserRec user,
 			MessageRec message,
 			ChatUserDateMode dateMode,
-			Integer radius,
-			Integer startHour,
-			Integer endHour,
-			Integer dailyMax,
+			Long radius,
+			Long startHour,
+			Long endHour,
+			Long dailyMax,
 			boolean sendMessage) {
 
 		Transaction transaction =
@@ -256,10 +256,11 @@ class ChatDateLogicImplementation
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				code,
 				commandHelper.findByCode (chat, "magic"),
-				commandHelper.findByCode (chat, "help").getId (),
+				(long) commandHelper.findByCode (chat, "help").getId (),
 				TemplateMissing.ignore,
 				ImmutableMap.<String,String>builder ()
 
@@ -269,11 +270,13 @@ class ChatDateLogicImplementation
 
 					.put (
 						"start",
-						prettyHour (chatUser.getDateStartHour ()))
+						prettyHour (
+							chatUser.getDateStartHour ()))
 
 					.put (
 						"end",
-						prettyHour (chatUser.getDateEndHour ()))
+						prettyHour (
+							chatUser.getDateEndHour ()))
 
 					.build ());
 

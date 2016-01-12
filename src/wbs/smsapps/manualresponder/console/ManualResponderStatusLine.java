@@ -117,7 +117,7 @@ class ManualResponderStatusLine
 		Integer operatorUserId;
 
 		class NumTodayCache
-			extends CachedGetter<Integer> {
+			extends CachedGetter<Long> {
 
 			public
 			NumTodayCache () {
@@ -126,7 +126,7 @@ class ManualResponderStatusLine
 
 			@Override
 			public
-			Integer refresh () {
+			Long refresh () {
 
 				Transaction transaction =
 					database.currentTransaction ();
@@ -142,7 +142,7 @@ class ManualResponderStatusLine
 						.toDateTimeAtStartOfDay ()
 						.toInstant ();
 
-				Integer total = 0;
+				Long total = 0l;
 
 				List<ManualResponderReportRec> reports =
 					manualResponderReportHelper.findByProcessedTime (
@@ -155,7 +155,10 @@ class ManualResponderStatusLine
 					ManualResponderReportRec report
 						: reports
 				) {
-					total += report.getNum ();
+
+					total +=
+						report.getNum ();
+
 				}
 
 				return total;
@@ -165,7 +168,7 @@ class ManualResponderStatusLine
 		}
 
 		class NumThisHourCache
-			extends CachedGetter<Integer> {
+			extends CachedGetter<Long> {
 
 			public
 			NumThisHourCache () {
@@ -174,7 +177,7 @@ class ManualResponderStatusLine
 
 			@Override
 			public
-			Integer refresh () {
+			Long refresh () {
 
 				Transaction transaction =
 					database.currentTransaction ();
@@ -196,7 +199,7 @@ class ManualResponderStatusLine
 						.plusHours (hourOfDay)
 						.toInstant ();
 
-				Integer total = 0;
+				Long total = 0l;
 
 				List<ManualResponderReportRec> reports =
 					manualResponderReportHelper.findByProcessedTime (
@@ -209,7 +212,10 @@ class ManualResponderStatusLine
 					ManualResponderReportRec report
 						: reports
 				) {
-					total += report.getNum ();
+
+					total +=
+						report.getNum ();
+
 				}
 
 				return total;

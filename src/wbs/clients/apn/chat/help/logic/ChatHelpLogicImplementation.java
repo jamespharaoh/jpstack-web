@@ -60,7 +60,7 @@ class ChatHelpLogicImplementation
 			@NonNull UserRec user,
 			@NonNull ChatUserRec chatUser,
 			@NonNull String text,
-			@NonNull Optional<Integer> threadId,
+			@NonNull Optional<Long> threadId,
 			@NonNull Optional<ChatHelpLogRec> replyTo) {
 
 		ChatRec chat =
@@ -124,7 +124,7 @@ class ChatHelpLogicImplementation
 						splitText),
 					magicCommand,
 					helpService,
-					helpCommand.getId ());
+					(long) helpCommand.getId ());
 
 			if (
 				isNotPresent (
@@ -133,6 +133,7 @@ class ChatHelpLogicImplementation
 
 				threadId =
 					Optional.of (
+						(long)
 						message.getId ());
 
 			}

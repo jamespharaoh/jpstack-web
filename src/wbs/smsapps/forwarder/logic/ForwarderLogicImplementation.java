@@ -161,10 +161,10 @@ class ForwarderLogicImplementation
 		String clientId;
 
 		public
-		Integer pri;
+		Long pri;
 
 		public
-		Integer retryDays;
+		Long retryDays;
 
 		public
 		Set<String> tags;
@@ -558,7 +558,10 @@ class ForwarderLogicImplementation
 
 		// check if any unqueueExMessages have already been sent
 
-		for (SendPart sendPart : work.template.parts) {
+		for (
+			SendPart sendPart
+				: work.template.parts
+		) {
 
 			sendPart.forwarderMessageOut =
 				findExistingForwarderMessageOut (
@@ -632,15 +635,17 @@ class ForwarderLogicImplementation
 
 		ForwarderMessageOutRec lastForwarderMessageOut = null;
 
-		Integer threadId =
+		Long threadId =
 			sendTemplate.fmIn != null
 				? sendTemplate.fmIn.getMessage ().getThreadId ()
 				: null;
 
 		// for each part
 
-		for (SendPart sendPart
-				: sendTemplate.parts) {
+		for (
+			SendPart sendPart
+				: sendTemplate.parts
+		) {
 
 			// check it is still going
 
@@ -707,7 +712,7 @@ class ForwarderLogicImplementation
 			String numTo,
 			String routeCode,
 			String myId,
-			Integer pri,
+			Long pri,
 			Collection<MediaRec> medias) {
 
 		SendTemplate sendTemplate =
@@ -760,7 +765,7 @@ class ForwarderLogicImplementation
 			String numTo,
 			ForwarderRouteRec route,
 			String otherId,
-			Integer priority) {
+			Long priority) {
 
 		// if there is no client id, skip this check
 
@@ -867,11 +872,11 @@ class ForwarderLogicImplementation
 			String url,
 			String numfrom,
 			String numto,
-			Integer threadId,
+			Long threadId,
 			ForwarderRouteRec forwarderRoute,
 			ServiceRec service,
 			String myId,
-			Integer pri,
+			Long pri,
 			boolean sendNow,
 			Set<String> tags,
 			NetworkRec network,
@@ -944,6 +949,7 @@ class ForwarderLogicImplementation
 					"forwarder")
 
 				.ref (
+					(long) (int)
 					forwarderMessageOut.getId ())
 
 				.subjectString (
@@ -979,6 +985,7 @@ class ForwarderLogicImplementation
 					deliveryTypeHelper.findByCode (
 						GlobalId.root,
 						"forwarder"),
+					(long) (int)
 					forwarderMessageOut.getId (),
 					sendNow,
 					tags,

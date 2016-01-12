@@ -286,8 +286,14 @@ class TicketerApiServletModule
 				Calendar calendar =
 					Calendar.getInstance ();
 
-				Date now = calendar.getTime();
-				calendar.add(Calendar.SECOND, ticketer.getDuration());
+				Date now =
+					calendar.getTime ();
+
+				calendar.add (
+					Calendar.SECOND,
+					(int) (long)
+					ticketer.getDuration ());
+
 				Date then = calendar.getTime();
 				ticket.setRetrievedTime(now);
 				ticket.setExpiresTime(then);

@@ -8,6 +8,9 @@ interface RandomLogic {
 	int randomInteger (
 			int limit);
 
+	long randomInteger (
+			long limit);
+
 	String generateString (
 			String chars,
 			int length);

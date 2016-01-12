@@ -59,7 +59,7 @@ class PhotoGrabberDelivery
 	public
 	void handle (
 			int deliveryId,
-			Integer ref) {
+			Long ref) {
 
 		@Cleanup
 		Transaction transaction =
@@ -77,8 +77,10 @@ class PhotoGrabberDelivery
 			photoGrabberRequestHelper.findByBilledMessage (
 				message);
 
-		if (delivery.getNewMessageStatus () != MessageStatus.delivered
-				|| photoGrabberRequest.getResponseTime () != null) {
+		if (
+			delivery.getNewMessageStatus () != MessageStatus.delivered
+			|| photoGrabberRequest.getResponseTime () != null
+		) {
 
 			deliveryHelper.remove (
 				delivery);

@@ -1306,10 +1306,10 @@ class ChatApiServletModule
 		String location;
 		Double longitude, latitude;
 		ChatUserDateMode dateMode;
-		Integer dateRadius;
-		Integer dateStartHour;
-		Integer dateEndHour;
-		Integer dateDailyMax;
+		Long dateRadius;
+		Long dateStartHour;
+		Long dateEndHour;
+		Long dateDailyMax;
 		Boolean chargesConfirmed;
 		byte[] image;
 		String email;
@@ -1387,10 +1387,10 @@ class ChatApiServletModule
 			longitude = (Double) params.get ("longitude");
 			latitude = (Double) params.get ("latitude");
 			dateMode = (ChatUserDateMode) params.get ("date-mode");
-			dateRadius = (Integer) params.get ("date-radius");
-			dateStartHour = (Integer) params.get ("date-start-hour");
-			dateEndHour = (Integer) params.get ("date-end-hour");
-			dateDailyMax = (Integer) params.get ("date-daily-max");
+			dateRadius = (Long) params.get ("date-radius");
+			dateStartHour = (Long) params.get ("date-start-hour");
+			dateEndHour = (Long) params.get ("date-end-hour");
+			dateDailyMax = (Long) params.get ("date-daily-max");
 			chargesConfirmed = (Boolean) params.get ("charges-confirmed");
 			image = (byte[]) params.get ("image");
 			email = (String) params.get ("email");
@@ -2238,7 +2238,7 @@ class ChatApiServletModule
 				chatCreditLogic.userSpendCreditCheck (
 					fromUser,
 					true,
-					Optional.<Integer>absent ());
+					Optional.<Long>absent ());
 
 			if (creditCheckResult.failed ()) {
 
@@ -2395,7 +2395,7 @@ class ChatApiServletModule
 
 		Integer chatId;
 		String number;
-		Integer gotDeliveryId;
+		Long gotDeliveryId;
 		Boolean ignoreCredit;
 		Boolean login;
 		Boolean logout;
@@ -2458,7 +2458,7 @@ class ChatApiServletModule
 
 			chatId = (Integer) params.get ("chat-id");
 			number = (String) params.get ("number");
-			gotDeliveryId = (Integer) params.get ("got-delivery-id");
+			gotDeliveryId = (Long) params.get ("got-delivery-id");
 			ignoreCredit = (Boolean) params.get ("ignore-credit");
 			login = (Boolean) params.get ("login");
 			logout = (Boolean) params.get ("logout");
@@ -2502,7 +2502,7 @@ class ChatApiServletModule
 					chatCreditLogic.userSpendCreditCheck (
 						chatUser,
 						true,
-						Optional.<Integer>absent ());
+						Optional.<Long>absent ());
 
 				if (creditCheckResult.failed ()) {
 
@@ -2590,10 +2590,13 @@ class ChatApiServletModule
 						chatUser.getId ())
 
 					.deliveryId (
+						(int) (long)
 						gotDeliveryId));
 
-				if (chatMessages.isEmpty ()
-						|| chatMessages.get (0).getToUser () != chatUser) {
+				if (
+					chatMessages.isEmpty ()
+					|| chatMessages.get (0).getToUser () != chatUser
+				) {
 
 					throw new RpcException (
 						Rpc.rpcError (
@@ -2604,9 +2607,17 @@ class ChatApiServletModule
 
 				}
 
-				if (chatUser.getLastMessagePollId () == null
-						|| gotDeliveryId > chatUser.getLastMessagePollId ())
-					chatUser.setLastMessagePollId (gotDeliveryId);
+				if (
+					chatUser.getLastMessagePollId () == null
+					|| gotDeliveryId > chatUser.getLastMessagePollId ()
+				) {
+
+					chatUser
+
+						.setLastMessagePollId (
+							gotDeliveryId);
+
+				}
 
 			}
 
@@ -2621,17 +2632,29 @@ class ChatApiServletModule
 			List<ChatMessageRec> messages =
 				chatMessageHelper.search (
 					new ChatMessageSearch ()
-						.toUserId (chatUser.getId ())
-						.method (method)
-						.statusIn (
-							ImmutableSet.<ChatMessageStatus>of (
-								ChatMessageStatus.sent,
-								ChatMessageStatus.broadcast,
-								ChatMessageStatus.moderatorApproved,
-								ChatMessageStatus.moderatorAutoEdited,
-								ChatMessageStatus.moderatorEdited))
-						.deliveryIdGreaterThan (chatUser.getLastMessagePollId ())
-						.orderBy (ChatMessageSearch.Order.deliveryId));
+
+				.toUserId (
+					chatUser.getId ())
+
+				.method (
+					method)
+
+				.statusIn (
+					ImmutableSet.<ChatMessageStatus>of (
+						ChatMessageStatus.sent,
+						ChatMessageStatus.broadcast,
+						ChatMessageStatus.moderatorApproved,
+						ChatMessageStatus.moderatorAutoEdited,
+						ChatMessageStatus.moderatorEdited))
+
+				.deliveryIdGreaterThan (
+					(int) (long)
+					chatUser.getLastMessagePollId ())
+
+				.orderBy (
+					ChatMessageSearch.Order.deliveryId)
+
+			);
 
 			for (ChatMessageRec message : messages) {
 
@@ -2873,9 +2896,12 @@ class ChatApiServletModule
 
 				// perform the deletions
 
-				int i = 0;
+				long i = 0l;
 
-				for (ChatUserImageRec image : images) {
+				for (
+					ChatUserImageRec image
+						: images
+				) {
 
 					ChatUserImageRec mainChatUserImage =
 						chatUserLogic.getMainChatUserImageByType (
@@ -2891,7 +2917,10 @@ class ChatApiServletModule
 
 					}
 
-					image.setIndex (requestImageIds.contains (image.getId ()) ? null : i++);
+					image.setIndex (
+						requestImageIds.contains (image.getId ())
+							? null
+							: i ++);
 
 				}
 
@@ -2947,15 +2976,19 @@ class ChatApiServletModule
 
 				transaction.flush ();
 
-				int index = 0;
+				long index = 0;
 
-				for (Integer chatUserImageId : reorder) {
+				for (
+					Integer chatUserImageId
+						: reorder
+				) {
 
 					ChatUserImageRec image =
 						chatUserImageHelper.find (
 							chatUserImageId);
 
-					image.setIndex (index ++);
+					image.setIndex (
+						index ++);
 
 				}
 
@@ -3199,13 +3232,14 @@ class ChatApiServletModule
 		Integer chatId;
 		String number;
 
-		Integer sendCount;
-		Integer sendAmount;
-		Integer creditAmount;
-		Integer billAmount;
+		Long sendCount;
+		Long sendAmount;
+		Long creditAmount;
+		Long billAmount;
+
 		String details;
 
-		int routeCharge;
+		long routeCharge;
 
 		@Override
 		public
@@ -3254,24 +3288,31 @@ class ChatApiServletModule
 		}
 
 		@SuppressWarnings ("unchecked")
-		private void getParams (RpcSource source) {
+		private
+		void getParams (
+				RpcSource source) {
 
-			Map<String,Object> params = (Map<String,Object>)
-				source.obtain (creditRequestDef, errors, true);
+			Map<String,Object> params =
+				(Map<String,Object>)
+				source.obtain (
+					creditRequestDef,
+					errors,
+					true);
 
 			if (params == null)
 				return;
 
 			chatId = (Integer) params.get ("chat-id");
 			number = (String) params.get ("number");
-			sendCount = (Integer) params.get ("send-count");
-			sendAmount = (Integer) params.get ("send-amount");
-			creditAmount = (Integer) params.get ("credit-amount");
-			billAmount = (Integer) params.get ("bill-amount");
+			sendCount = (Long) params.get ("send-count");
+			sendAmount = (Long) params.get ("send-amount");
+			creditAmount = (Long) params.get ("credit-amount");
+			billAmount = (Long) params.get ("bill-amount");
 			details = (String) params.get ("details");
 		}
 
-		private void doIt (
+		private
+		void doIt (
 				Transaction transaction) {
 
 			ChatRec chat =
@@ -3295,8 +3336,12 @@ class ChatApiServletModule
 
 			// set count from amount if not specified
 
-			if (sendCount == null && sendAmount != null)
-				sendCount = sendAmount / routeCharge;
+			if (sendCount == null && sendAmount != null) {
+
+				sendCount =
+					sendAmount / routeCharge;
+
+			}
 
 			// check send count and amount match
 
@@ -3348,16 +3393,25 @@ class ChatApiServletModule
 							transaction.now ()))
 
 					.setCreditAmount (
-						ifNull (creditAmount, 0))
+						ifNull (
+							creditAmount,
+							0l))
 
 					.setBillAmount (
-						ifNull (billAmount, 0))
+						ifNull (
+							billAmount,
+							0l))
 
 					.setGift (
-						ifNull (billAmount, 0) == 0)
+						ifNull (
+							billAmount,
+							0l
+						) == 0)
 
 					.setDetails (
-						ifNull (details, ""))
+						ifNull (
+							details,
+							""))
 
 				);
 

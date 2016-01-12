@@ -13,12 +13,12 @@ interface EventLogic {
 			Object... objects);
 
 	public final static
-	int integerEventLinkType = -1;
+	long integerEventLinkType = -1l;
 
 	public final static
-	int booleanEventLinkType = -2;
+	long booleanEventLinkType = -2l;
 
 	public final static
-	int instantEventLinkType = -3;
+	long instantEventLinkType = -3l;
 
 }

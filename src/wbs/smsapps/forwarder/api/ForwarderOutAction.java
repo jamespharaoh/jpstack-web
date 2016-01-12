@@ -73,7 +73,7 @@ class ForwarderOutAction
 			String route = null;
 			Integer inId = null;
 			String myId = null;
-			Integer pri = null;
+			Long pri = null;
 
 			for (
 				Map.Entry<String,List<String>> parameterEntry
@@ -158,7 +158,7 @@ class ForwarderOutAction
 
 				} else if (paramName.equals ("pri")) {
 					try {
-						pri = Integer.parseInt (value);
+						pri = Long.parseLong (value);
 					} catch (NumberFormatException e) {
 						throw new ReportableException ("pri should be an integer value");
 					}

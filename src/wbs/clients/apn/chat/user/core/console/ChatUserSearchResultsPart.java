@@ -325,7 +325,7 @@ class ChatUserSearchResultsPart
 			percentager.add (
 				chatUser.getImageProfileCharge ());
 
-			Iterator<Integer> percentagerIterator =
+			Iterator<Long> percentagerIterator =
 				percentager.work ().iterator ();
 
 			pageBuilder.writer ().writeFormat (

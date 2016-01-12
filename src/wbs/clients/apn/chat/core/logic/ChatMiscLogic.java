@@ -47,12 +47,12 @@ interface ChatMiscLogic {
 	void userJoin (
 			ChatUserRec chatUser,
 			boolean sendMessage,
-			Integer threadId,
+			Long threadId,
 			ChatMessageMethod deliveryMethod);
 
 	void userLogoffWithMessage (
 			ChatUserRec chatUser,
-			Integer threadId,
+			Long threadId,
 			boolean automatic);
 
 	void monitorsToTarget (
@@ -69,7 +69,7 @@ interface ChatMiscLogic {
 	void chatUserSetName (
 			ChatUserRec chatUser,
 			String name,
-			Integer threadId);
+			Long threadId);
 
 	DateTimeZone timezone (
 			ChatRec chat);

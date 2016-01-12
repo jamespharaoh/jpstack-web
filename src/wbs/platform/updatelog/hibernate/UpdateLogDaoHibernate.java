@@ -15,7 +15,7 @@ class UpdateLogDaoHibernate
 	public
 	UpdateLogRec findByTableAndRef (
 			String table,
-			int ref) {
+			long ref) {
 
 		return findOne (
 			UpdateLogRec.class,
@@ -31,7 +31,7 @@ class UpdateLogDaoHibernate
 
 			.setInteger (
 				"ref",
-				ref)
+				(int) ref)
 
 			.list ());
 

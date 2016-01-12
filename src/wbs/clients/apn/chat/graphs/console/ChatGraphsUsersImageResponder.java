@@ -123,10 +123,18 @@ class ChatGraphsUsersImageResponder
 
 		int realMax = 0;
 
-		for (ChatStatsRec cs : allChatStats) {
+		for (
+			ChatStatsRec cs
+				: allChatStats
+		) {
 
-			if (cs.getNumUsers() > realMax)
-				realMax = cs.getNumUsers ();
+			if (cs.getNumUsers() > realMax) {
+
+				realMax =
+					(int) (long)
+					cs.getNumUsers ();
+
+			}
 
 		}
 
@@ -217,16 +225,20 @@ class ChatGraphsUsersImageResponder
 	void prepareImageData () {
 
 		int[] xPoints =
-			new int [allChatStats.size ()];
+			new int [
+				allChatStats.size ()];
 
 
 		int[] yPoints =
-			new int [allChatStats.size ()];
+			new int [
+				allChatStats.size ()];
 
 		int index = 0;
 
-		for (ChatStatsRec chatStats
-				: allChatStats) {
+		for (
+			ChatStatsRec chatStats
+				: allChatStats
+		) {
 
 			xPoints [index] =
 				+ xOrigin
@@ -241,7 +253,7 @@ class ChatGraphsUsersImageResponder
 
 			yPoints [index] =
 				+ yOrigin
-				- (1
+				- (int) (1
 					* chatStats.getNumUsers ()
 					* plotHeight
 					* verticalScale.getMultiplier ()

@@ -282,7 +282,7 @@ class ChatMiscLogicImplementation
 
 			chatSendLogic.sendSystemRbFree (
 				chatUser,
-				Optional.<Integer>absent (),
+				Optional.<Long>absent (),
 				"block_all_confirm",
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
@@ -343,7 +343,7 @@ class ChatMiscLogicImplementation
 	void userJoin (
 			ChatUserRec chatUser,
 			boolean sendMessage,
-			Integer threadId,
+			Long threadId,
 			ChatMessageMethod deliveryMethod) {
 
 		Transaction transaction =
@@ -423,10 +423,11 @@ class ChatMiscLogicImplementation
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.fromNullable (threadId),
+				Optional.fromNullable (
+					threadId),
 				"logon",
 				commandHelper.findByCode (chat, "magic"),
-				commandHelper.findByCode (chat, "help").getId (),
+				(long) commandHelper.findByCode (chat, "help").getId (),
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -539,7 +540,7 @@ class ChatMiscLogicImplementation
 	public
 	void userLogoffWithMessage (
 			ChatUserRec chatUser,
-			Integer threadId,
+			Long threadId,
 			boolean automatic) {
 
 		ChatRec chat = chatUser.getChat ();
@@ -552,10 +553,11 @@ class ChatMiscLogicImplementation
 
 				chatSendLogic.sendSystemMagic (
 					chatUser,
-					Optional.fromNullable (threadId),
+					Optional.fromNullable (
+						threadId),
 					"date_stop_hint",
 					commandHelper.findByCode (chat, "help"),
-					0,
+					0l,
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
@@ -654,7 +656,7 @@ class ChatMiscLogicImplementation
 	void chatUserSetName (
 			ChatUserRec chatUser,
 			String name,
-			Integer threadId) {
+			Long threadId) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -721,10 +723,11 @@ class ChatMiscLogicImplementation
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (threadId),
+				Optional.of (
+					threadId),
 				"name_confirm",
 				commandHelper.findByCode (chat, "magic"),
-				commandHelper.findByCode (chat, "name").getId (),
+				(long) commandHelper.findByCode (chat, "name").getId (),
 				TemplateMissing.error,
 				ImmutableMap.<String,String>builder ()
 					.put ("newName", name)

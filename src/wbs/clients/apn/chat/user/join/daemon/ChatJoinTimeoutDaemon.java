@@ -87,9 +87,12 @@ class ChatJoinTimeoutDaemon
 
 			Instant createdTime =
 				DateTime.now ()
-					.minusSeconds (
-						chat.getTimeSignupTimeout ())
-					.toInstant ();
+
+				.minusSeconds (
+					(int) (long)
+					chat.getTimeSignupTimeout ())
+
+				.toInstant ();
 
 			List<ChatMessageRec> messages =
 				chatMessageHelper.findSignupTimeout (

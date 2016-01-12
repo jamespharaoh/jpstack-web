@@ -136,6 +136,7 @@ class ImChatMessageListAction
 		List<ImChatMessageRec> newMessages =
 			ImmutableList.copyOf (
 				allMessages.subList (
+					(int) (long)
 					request.messageIndex (),
 					allMessages.size ()));
 

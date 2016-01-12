@@ -201,7 +201,7 @@ class ChatAdultExpiryDaemon
 
 				chatSendLogic.sendSystemRbFree (
 					chatUser,
-					Optional.<Integer>absent (),
+					Optional.<Long>absent (),
 					"adult_expiry",
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());

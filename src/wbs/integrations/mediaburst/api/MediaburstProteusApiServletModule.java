@@ -119,12 +119,12 @@ class MediaburstProteusApiServletModule
 				database.beginReadWrite (
 					this);
 
-			Integer statusCode = null;
+			Long statusCode;
 
 			try {
 
 				statusCode =
-					Integer.parseInt (
+					Long.parseLong (
 						reportRequestResult.errCode);
 
 			} catch (NumberFormatException exception) {
@@ -133,10 +133,11 @@ class MediaburstProteusApiServletModule
 
 			}
 
-			Integer statusType = null;
-			Integer reason = null;
+			Long statusType = null;
+			Long reason = null;
 
 			statusType =
+				(long) (int)
 				allMessageStatuses.indexOf (
 					reportRequestResult.statusString.toLowerCase ());
 

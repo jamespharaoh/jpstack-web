@@ -55,6 +55,11 @@ class ComponentFieldWriter {
 					spec.name (),
 					spec.typeName ()))
 
+			.defaultValueFormat (
+				"new %s ()",
+				capitalise (
+					spec.typeName ()))
+
 			.write (
 				javaWriter,
 				"\t");

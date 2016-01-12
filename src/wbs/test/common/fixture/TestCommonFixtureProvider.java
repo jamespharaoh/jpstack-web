@@ -48,7 +48,7 @@ class TestCommonFixtureProvider
 				"Test")
 
 			.setOrder (
-				60)
+				60l)
 
 		);
 

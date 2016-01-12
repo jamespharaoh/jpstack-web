@@ -337,17 +337,25 @@ class DialogueMmsApiServletModule
 
 			MessageStatus newMessageStatus = null;
 
-			int statusCode =
-				Integer.parseInt (deliveryReportParam, 16);
+			long statusCode =
+				Long.parseLong (
+					deliveryReportParam,
+					16);
 
 			if (statusCode == 0) {
-				newMessageStatus = MessageStatus.delivered;
+
+				newMessageStatus =
+					MessageStatus.delivered;
+
 			} else {
-				newMessageStatus = MessageStatus.undelivered;
+
+				newMessageStatus =
+					MessageStatus.undelivered;
+
 			}
 
-			Integer statusType = null;
-			Integer reason = null;
+			Long statusType = null;
+			Long reason = null;
 
 			MessageReportCodeRec messageReportCode =
 				messageReportCodeHelper.findOrCreate (
@@ -365,7 +373,7 @@ class DialogueMmsApiServletModule
 				null,
 				messageReportCode);
 
-			transaction.commit();
+			transaction.commit ();
 
 		}
 
@@ -375,7 +383,8 @@ class DialogueMmsApiServletModule
 
 	final
 	RegexpPathHandler.Entry routeEntry =
-		new RegexpPathHandler.Entry ("/route/([0-9]+)/([^/]+)") {
+		new RegexpPathHandler.Entry (
+			"/route/([0-9]+)/([^/]+)") {
 
 		@Override
 		protected

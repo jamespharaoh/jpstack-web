@@ -83,7 +83,7 @@ class ChatDateCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -94,7 +94,7 @@ class ChatDateCommand
 	public
 	String[] getCommandTypes () {
 
-		return new String[] {
+		return new String [] {
 			"chat.date_join_photo",
 			"chat.date_join_text",
 			"chat.date_upgrade"

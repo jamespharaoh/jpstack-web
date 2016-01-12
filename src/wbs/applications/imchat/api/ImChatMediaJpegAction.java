@@ -66,10 +66,10 @@ class ImChatMediaJpegAction
 	// properties
 
 	@Getter @Setter
-	Integer targetWidth;
+	Long targetWidth;
 
 	@Getter @Setter
-	Integer targetHeight;
+	Long targetHeight;
 
 	// implementation
 
@@ -147,10 +147,10 @@ class ImChatMediaJpegAction
 					originalImage,
 					ifNull (
 						targetWidth,
-						Integer.MAX_VALUE),
+						(long) Integer.MAX_VALUE),
 					ifNull (
 						targetHeight,
-						Integer.MAX_VALUE));
+						(long) Integer.MAX_VALUE));
 
 		}
 

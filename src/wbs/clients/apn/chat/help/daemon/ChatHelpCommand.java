@@ -84,7 +84,7 @@ class ChatHelpCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -163,12 +163,13 @@ class ChatHelpCommand
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				"help_error",
 				commandHelper.findByCode (
 					chat,
 					"magic"),
-				commandHelper.findByCode (
+				(long) commandHelper.findByCode (
 					chat,
 					"help"
 				).getId (),

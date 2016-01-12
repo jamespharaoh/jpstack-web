@@ -366,12 +366,13 @@ class HybyteApiServletModule
 
 			}
 
-			Integer statusCode = null;
+			Long statusCode;
 
 			try {
 
 				statusCode =
-					Integer.parseInt (req.code);
+					Long.parseLong (
+						req.code);
 
 			} catch (NumberFormatException exception) {
 
@@ -379,8 +380,8 @@ class HybyteApiServletModule
 
 			}
 
-			Integer statusType = null;
-			Integer reason = null;
+			Long statusType = null;
+			Long reason = null;
 
 			// update message report code
 

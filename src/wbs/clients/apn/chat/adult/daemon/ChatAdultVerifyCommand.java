@@ -87,7 +87,7 @@ class ChatAdultVerifyCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -160,7 +160,7 @@ class ChatAdultVerifyCommand
 			chatSchemeChargesHelper.find (
 				chatUser.getChatScheme ().getId ());
 
-		int credit =
+		long credit =
 			chatSchemeCharges.getAdultVerifyCredit ();
 
 		if (! alreadyVerified && credit > 0) {
@@ -179,7 +179,7 @@ class ChatAdultVerifyCommand
 					credit)
 
 				.setBillAmount (
-					0)
+					0l)
 
 				.setGift (
 					true)

@@ -113,7 +113,7 @@ class SubscriptionCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -317,6 +317,7 @@ class SubscriptionCommand
 					subscriptionNumber)
 
 				.setIndex (
+					(int) (long)
 					subscriptionNumber.getNumSubs ())
 
 				.setSubscriptionList (

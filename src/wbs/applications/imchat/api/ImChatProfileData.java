@@ -33,10 +33,10 @@ class ImChatProfileData {
 	String thumbnailImageLink;
 
 	@DataAttribute
-	Integer thumbnailImageWidth;
+	Long thumbnailImageWidth;
 
 	@DataAttribute
-	Integer thumbnailImageHeight;
+	Long thumbnailImageHeight;
 
 	// miniature image
 
@@ -44,9 +44,9 @@ class ImChatProfileData {
 	String miniatureImageLink;
 
 	@DataAttribute
-	Integer miniatureImageWidth;
+	Long miniatureImageWidth;
 
 	@DataAttribute
-	Integer miniatureImageHeight;
+	Long miniatureImageHeight;
 
 }

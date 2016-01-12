@@ -6,7 +6,7 @@ public
 interface EventLinkDaoMethods {
 
 	List<EventLinkRec> findByTypeAndRef (
-			int typeId,
-			int refId);
+			long typeId,
+			long refId);
 
 }

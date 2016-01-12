@@ -53,7 +53,7 @@ class PlatformCommonFixtureProvider
 				"Internals")
 
 			.setOrder (
-				70)
+				70l)
 
 		);
 
@@ -79,7 +79,9 @@ class PlatformCommonFixtureProvider
 				"System")
 
 			.setOrder (
-				50));
+				50l)
+
+		);
 
 		menuItemHelper.insert (
 			menuItemHelper.createInstance ()

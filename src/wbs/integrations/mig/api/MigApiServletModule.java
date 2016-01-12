@@ -392,20 +392,37 @@ class MigApiServletModule
 
 				}
 
-				int statusInt = Integer.parseInt (status);
+				long statusInt =
+					Long.parseLong (
+						status);
 
-				Integer statusTypeInt = null;
+				Long statusTypeInt;
+
 				try {
-					statusTypeInt = Integer.parseInt (statusType);
+
+					statusTypeInt =
+						Long.parseLong (
+							statusType);
+
 				} catch (NumberFormatException e) {
+
 					statusTypeInt = null;
+
 				}
 
-				Integer reasonInt;
+				Long reasonInt;
+
 				try {
-					reasonInt = Integer.parseInt(reason);
+
+					reasonInt =
+						Long.parseLong (
+							reason);
+
 				} catch (NumberFormatException e) {
-					reasonInt = null;
+
+					reasonInt =
+						null;
+
 				}
 
 				MessageReportCodeRec reportCode =
@@ -475,7 +492,7 @@ class MigApiServletModule
 								null)
 
 							.setPermanentFailureCount (
-								0);
+								0l);
 
 					}
 

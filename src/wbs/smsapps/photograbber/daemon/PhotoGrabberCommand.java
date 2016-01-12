@@ -106,7 +106,7 @@ class PhotoGrabberCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -311,8 +311,8 @@ class PhotoGrabberCommand
 	MediaRec fetchMedia (
 			@NonNull String url,
 			boolean jpeg,
-			int jpegWidth,
-			int jpegHeight) {
+			long jpegWidth,
+			long jpegHeight) {
 
 		byte[] data =
 			fetchUrlData (url);

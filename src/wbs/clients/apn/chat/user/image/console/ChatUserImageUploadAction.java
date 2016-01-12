@@ -171,8 +171,8 @@ class ChatUserImageUploadAction
 			image =
 				mediaLogic.resampleImageToFit (
 					image,
-					320,
-					240);
+					320l,
+					240l);
 
 			resampledData =
 				mediaLogic.writeImage (
@@ -256,6 +256,7 @@ class ChatUserImageUploadAction
 				chatUserImageType)
 
 			.setIndex (
+				(long)
 				chatUserImageList.size ())
 
 		);

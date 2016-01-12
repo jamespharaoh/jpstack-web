@@ -539,7 +539,7 @@ class MigSender
 		}
 
 		stringBuilder.append ("&OADC=" + URLEncoder.encode (numFrom, encoding));
-		stringBuilder.append ("&OADCTYPE=" + Integer.toString (migOutbox.migRouteOut.getOadctype ()));
+		stringBuilder.append ("&OADCTYPE=" + Long.toString (migOutbox.migRouteOut.getOadctype ()));
 		stringBuilder.append ("&MESSAGEID=" + Integer.toString (migOutbox.messageId));
 		stringBuilder.append ("&TIMETOLIVE=" + (migOutbox.route.getExpirySecs () / 60));
 		stringBuilder.append ("&NUMBERS=" + URLEncoder.encode ((connection == null ? "" : (connection + ".")) + numTo, encoding));

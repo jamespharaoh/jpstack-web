@@ -168,6 +168,20 @@ class Misc {
 
 	}
 
+	public static
+	Long toLong (
+			String string) {
+
+		if (string == null)
+			return null;
+
+		if (isInt (string))
+			return Long.parseLong (string);
+
+		return null;
+
+	}
+
 	public static <Type extends Enum<Type>>
 	Type toEnum (
 			Class<Type> enumType,
@@ -692,6 +706,27 @@ class Misc {
 	}
 
 	public static
+	long min (
+			long... params) {
+
+		long ret =
+			params [0];
+
+		for (
+			long param
+				: params
+		) {
+
+			if (param < ret)
+				ret = param;
+
+		}
+
+		return ret;
+
+	}
+
+	public static
 	String capitalise (
 			@NonNull String string) {
 
@@ -719,7 +754,7 @@ class Misc {
 
 	public static
 	String prettyHour (
-			int hour) {
+			long hour) {
 
 		if (hour < 0 || hour > 23)
 			throw new IllegalArgumentException ();
@@ -1832,6 +1867,15 @@ class Misc {
 	int sum (
 			int value0,
 			int value1) {
+
+		return value0 + value1;
+
+	}
+
+	public static
+	long sum (
+			long value0,
+			long value1) {
 
 		return value0 + value1;
 

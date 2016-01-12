@@ -88,7 +88,7 @@ class ChatUserImageUploadCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -162,10 +162,11 @@ class ChatUserImageUploadCommand
 			optionalRequired (
 				chatSendLogic.sendSystemMagic (
 					chatUser,
-					Optional.of (messageIn.getThreadId ()),
+					Optional.of (
+						messageIn.getThreadId ()),
 					"image_upload_link",
 					magicCommand,
-					helpCommand.getId (),
+					(long) helpCommand.getId (),
 					TemplateMissing.error,
 					ImmutableMap.<String,String>builder ()
 						.put ("url", url)
@@ -180,6 +181,7 @@ class ChatUserImageUploadCommand
 				chatUser)
 
 			.setIndex (
+				(int) (long)
 				chatUser.getNumImageUploadTokens ())
 
 			.setToken (

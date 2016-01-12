@@ -13,7 +13,7 @@ interface ChatHelpLogic {
 			UserRec user,
 			ChatUserRec chatUser,
 			String text,
-			Optional<Integer> threadId,
+			Optional<Long> threadId,
 			Optional<ChatHelpLogRec> replyTo);
 
 }

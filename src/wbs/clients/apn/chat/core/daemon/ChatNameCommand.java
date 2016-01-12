@@ -88,7 +88,7 @@ class ChatNameCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -178,10 +178,11 @@ class ChatNameCommand
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				Optional.of (
+					message.getThreadId ()),
 				"name_error",
 				commandHelper.findByCode (chat, "magic"),
-				commandHelper.findByCode (chat, "name").getId (),
+				(long) commandHelper.findByCode (chat, "name").getId (),
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 

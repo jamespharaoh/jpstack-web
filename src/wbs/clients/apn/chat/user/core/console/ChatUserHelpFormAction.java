@@ -93,7 +93,7 @@ class ChatUserHelpFormAction
 			user,
 			chatUser,
 			text,
-			Optional.<Integer>absent (),
+			Optional.<Long>absent (),
 			Optional.<ChatHelpLogRec>absent ());
 
 		transaction.commit ();

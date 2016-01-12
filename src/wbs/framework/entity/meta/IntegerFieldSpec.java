@@ -25,7 +25,7 @@ class IntegerFieldSpec
 
 	@DataAttribute (
 		name = "default")
-	Integer defaultValue;
+	Long defaultValue;
 
 	@DataAttribute (
 		name = "column")

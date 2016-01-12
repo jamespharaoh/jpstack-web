@@ -151,7 +151,7 @@ class ObjectTicketCreatePart<
 			case number:
 
 				ticketFieldValue.setIntegerValue (
-					(Integer)
+					(Long)
 					objectManager.dereference (
 						contextObject,
 						ticketFieldSpec.valuePath ()));
@@ -184,6 +184,7 @@ class ObjectTicketCreatePart<
 				ticketFieldValue
 
 					.setIntegerValue (
+						(long)
 						objectId);
 
 				break;

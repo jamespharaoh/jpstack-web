@@ -48,7 +48,7 @@ class SmsAppsCommonFixtureProvider
 				"Facilities")
 
 			.setOrder (
-				20)
+				20l)
 
 		);
 

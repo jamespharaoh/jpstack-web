@@ -149,7 +149,7 @@ class ChatUserImageListAction
 					list.get (otherIndex)
 
 						.setIndex (
-							otherIndex - 1);
+							(long) otherIndex - 1l);
 
 				}
 
@@ -255,8 +255,13 @@ class ChatUserImageListAction
 
 				transaction.flush ();
 
-				thisImage.setIndex (otherIndex);
-				otherImage.setIndex (index);
+				thisImage.setIndex (
+					(long) (int)
+					otherIndex);
+
+				otherImage.setIndex (
+					(long) (int)
+					index);
 
 				notice =
 					"Image/video moved";

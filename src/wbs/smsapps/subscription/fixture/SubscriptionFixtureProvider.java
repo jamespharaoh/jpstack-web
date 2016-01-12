@@ -153,10 +153,10 @@ class SubscriptionFixtureProvider
 				"free")
 
 			.setCreditsPerBill (
-				2)
+				2l)
 
 			.setDebitsPerSend (
-				1)
+				1l)
 
 			.setSubscribeMessageText (
 				textHelper.findOrCreate (

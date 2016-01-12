@@ -206,6 +206,7 @@ class SubscriptionNumberAddRemoveAction
 						subscriptionNumber)
 
 					.setIndex (
+						(int) (long)
 						subscriptionNumber.getNumSubs ())
 
 					.setSubscriptionList (

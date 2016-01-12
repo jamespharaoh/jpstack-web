@@ -522,6 +522,7 @@ class HibernateHelperProviderBuilder {
 
 						.setInteger (
 							"parentId",
+							(int) (long)
 							parentGlobalId.objectId ())
 
 						.setString (
@@ -561,10 +562,12 @@ class HibernateHelperProviderBuilder {
 
 					.setInteger (
 						"parentTypeId",
+						(int) (long)
 						parentGlobalId.typeId ())
 
 					.setInteger (
 						"parentId",
+						(int) (long)
 						parentGlobalId.objectId ())
 
 					.setString (
@@ -587,7 +590,7 @@ class HibernateHelperProviderBuilder {
 		public
 		Record<?> findByParentAndIndex (
 				@NonNull GlobalId parentGlobalId,
-				@NonNull Integer index) {
+				@NonNull Long index) {
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -626,6 +629,7 @@ class HibernateHelperProviderBuilder {
 
 					.setInteger (
 						"index",
+						(int) (long)
 						index)
 
 					.list ();
@@ -669,10 +673,12 @@ class HibernateHelperProviderBuilder {
 
 						.setInteger (
 							"parentId",
+							(int) (long)
 							parentGlobalId.objectId ())
 
 						.setInteger (
 							"index",
+							(int) (long)
 							index)
 
 						.list ();
@@ -708,14 +714,17 @@ class HibernateHelperProviderBuilder {
 
 					.setInteger (
 						"parentTypeId",
+						(int) (long)
 						parentGlobalId.typeId ())
 
 					.setInteger (
 						"parentId",
+						(int) (long)
 						parentGlobalId.objectId ())
 
 					.setInteger (
 						"index",
+						(int) (long)
 						index)
 
 					.list ();
@@ -840,6 +849,7 @@ class HibernateHelperProviderBuilder {
 
 					.setInteger (
 						"parentId",
+						(int) (long)
 						parentGlobalId.objectId ())
 
 					.setString (
@@ -888,10 +898,12 @@ class HibernateHelperProviderBuilder {
 
 					.setInteger (
 						"parentTypeId",
+						(int) (long)
 						parentGlobalId.typeId ())
 
 					.setInteger (
 						"parentId",
+						(int) (long)
 						parentGlobalId.objectId ())
 
 					.setString (
@@ -990,6 +1002,7 @@ class HibernateHelperProviderBuilder {
 
 					.setInteger (
 						"parentId",
+						(int) (long)
 						parentGlobalId.objectId ())
 
 					.list ();
@@ -1014,10 +1027,12 @@ class HibernateHelperProviderBuilder {
 
 					.setInteger (
 						"parentTypeId",
+						(int) (long)
 						parentGlobalId.typeId ())
 
 					.setInteger (
 						"parentId",
+						(int) (long)
 						parentGlobalId.objectId ())
 
 					.list ();
@@ -1302,6 +1317,7 @@ class HibernateHelperProviderBuilder {
 
 					.setInteger (
 						"parentId",
+						(int) (long)
 						parentGlobalId.objectId ())
 
 					.setString (
@@ -1336,10 +1352,12 @@ class HibernateHelperProviderBuilder {
 
 					.setInteger (
 						"parentTypeId",
+						(int) (long)
 						parentGlobalId.typeId ())
 
 					.setInteger (
 						"parentId",
+						(int) (long)
 						parentGlobalId.objectId ())
 
 					.setString (

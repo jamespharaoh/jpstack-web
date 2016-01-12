@@ -218,25 +218,25 @@ class ImChatCoreFixtureProvider
 				messageTemplateDatabase)
 
 			.setPreferredQueueTime (
-				5 * 60)
+				5l * 60l)
 
 			.setMessageCost (
-				300)
+				300l)
 
 			.setFreeMessageLimit (
-				3)
+				3l)
 
 			.setBillMessageMinChars (
-				50)
+				50l)
 
 			.setBillMessageMaxChars (
-				100)
+				100l)
 
 			.setFreeMessageMinChars (
-				10)
+				10l)
 
 			.setFreeMessageMaxChars (
-				50)
+				50l)
 
 			.setDevelopmentMode (
 				true)
@@ -280,13 +280,13 @@ class ImChatCoreFixtureProvider
 				"Basic credit package")
 
 			.setPrice (
-				599)
+				599l)
 
 			.setValue (
-				600)
+				600l)
 
 			.setOrder (
-				1)
+				1l)
 
 		);
 
@@ -312,13 +312,13 @@ class ImChatCoreFixtureProvider
 				"Saver credit offer")
 
 			.setPrice (
-				1099)
+				1099l)
 
 			.setValue (
-				1200)
+				1200l)
 
 			.setOrder (
-				2)
+				2l)
 
 		);
 
@@ -344,13 +344,13 @@ class ImChatCoreFixtureProvider
 				"Super saver credit offer")
 
 			.setPrice (
-				1499)
+				1499l)
 
 			.setValue (
-				1800)
+				1800l)
 
 			.setOrder (
-				3)
+				3l)
 
 		);
 
@@ -422,7 +422,7 @@ class ImChatCoreFixtureProvider
 				ImChatCustomerDetailDataType.text)
 
 			.setOrdering (
-				1)
+				1l)
 
 		);
 
@@ -454,10 +454,10 @@ class ImChatCoreFixtureProvider
 				ImChatCustomerDetailDataType.dateOfBirth)
 
 			.setMinimumAge (
-				18)
+				18l)
 
 			.setOrdering (
-				2)
+				2l)
 
 		);
 
@@ -489,7 +489,7 @@ class ImChatCoreFixtureProvider
 				ImChatCustomerDetailDataType.chooseOne)
 
 			.setOrdering (
-				3)
+				3l)
 
 		);
 
@@ -598,6 +598,7 @@ class ImChatCoreFixtureProvider
 				imChatCustomer)
 
 			.setIndex (
+				(int) (long)
 				imChatCustomer.getNumConversations ())
 
 			.setImChatProfile (
@@ -650,16 +651,17 @@ class ImChatCoreFixtureProvider
 				imChatCustomer)
 
 			.setIndex (
+				(int) (long)
 				imChatCustomer.getNumPurchases ())
 
 			.setImChatPricePoint (
 				basicPricePoint)
 
 			.setPrice (
-				599)
+				599l)
 
 			.setValue (
-				600)
+				600l)
 
 			.setCreatedTime (
 				transaction.now ())
@@ -683,6 +685,7 @@ class ImChatCoreFixtureProvider
 				imChatConversation)
 
 			.setIndex (
+				(int) (long)
 				imChatConversation.getNumMessages ())
 
 			.setMessageText (

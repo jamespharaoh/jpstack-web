@@ -167,6 +167,7 @@ class EventLogicImplementation
 					index)
 
 				.setTypeId (
+					(long) (int)
 					objectManager.getObjectTypeId (
 						dataObject))
 

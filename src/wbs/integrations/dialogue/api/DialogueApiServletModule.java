@@ -434,10 +434,14 @@ class DialogueApiServletModule
 
 			}
 
-			Integer statusCode = null;
+			Long statusCode;
+
 			if (deliveryReportParam != null) {
 
-				statusCode = Integer.parseInt (deliveryReportParam, 16);
+				statusCode =
+					Long.parseLong (
+						deliveryReportParam,
+						16);
 
 				if (statusCode == 0)
 					newMessageStatus = MessageStatus.delivered;
@@ -449,7 +453,10 @@ class DialogueApiServletModule
 
 			} else if (submissionReportParam != null) {
 
-				statusCode = Integer.parseInt (submissionReportParam, 16);
+				statusCode =
+					Long.parseLong (
+						submissionReportParam,
+						16);
 
 				if (statusCode == 0)
 					newMessageStatus = MessageStatus.submitted;
@@ -471,8 +478,8 @@ class DialogueApiServletModule
 				database.beginReadWrite (
 					this);
 
-			Integer statusType = null;
-			Integer reason = null;
+			Long statusType = null;
+			Long reason = null;
 
 			MessageReportCodeRec messageReportCode =
 				messageReportCodeHelper.findOrCreate (

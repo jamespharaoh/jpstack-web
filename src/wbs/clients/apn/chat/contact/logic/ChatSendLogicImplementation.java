@@ -97,7 +97,7 @@ class ChatSendLogicImplementation
 	public
 	MessageRec sendMessageRbFree (
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<Integer> threadId,
+			@NonNull Optional<Long> threadId,
 			@NonNull ServiceRec service,
 			@NonNull String message) {
 
@@ -171,7 +171,7 @@ class ChatSendLogicImplementation
 	public
 	Optional<MessageRec> sendSystem (
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<Integer> threadId,
+			@NonNull Optional<Long> threadId,
 			@NonNull String templateCode,
 			@NonNull RouterRec router,
 			@NonNull String numFrom,
@@ -279,6 +279,7 @@ class ChatSendLogicImplementation
 				deliveryTypeCode)
 
 			.ref (
+				(long)
 				chatUser.getId ())
 
 			.tags (
@@ -306,7 +307,7 @@ class ChatSendLogicImplementation
 	public
 	Optional<MessageRec> sendSystemRbFree (
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<Integer> threadId,
+			@NonNull Optional<Long> threadId,
 			@NonNull String templateCode,
 			@NonNull TemplateMissing templateMissing,
 			@NonNull Map<String,String> suppliedParams) {
@@ -384,7 +385,7 @@ class ChatSendLogicImplementation
 	public
 	MessageRec sendMessageMmsFree (
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<Integer> threadId,
+			@NonNull Optional<Long> threadId,
 			@NonNull String message,
 			@NonNull CommandRec command,
 			@NonNull ServiceRec service) {
@@ -446,7 +447,7 @@ class ChatSendLogicImplementation
 	public
 	Optional<MessageRec> sendSystemMmsFree (
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<Integer> threadId,
+			@NonNull Optional<Long> threadId,
 			@NonNull String templateCode,
 			@NonNull CommandRec command,
 			@NonNull TemplateMissing templateMissing) {
@@ -518,11 +519,11 @@ class ChatSendLogicImplementation
 	public
 	MessageRec sendMessageMagic (
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<Integer> threadId,
+			@NonNull Optional<Long> threadId,
 			@NonNull TextRec message,
 			@NonNull CommandRec magicCommand,
 			@NonNull ServiceRec service,
-			@NonNull Integer magicRef) {
+			@NonNull Long magicRef) {
 
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();
@@ -564,10 +565,10 @@ class ChatSendLogicImplementation
 	public
 	Optional<MessageRec> sendSystemMagic (
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<Integer> threadId,
+			@NonNull Optional<Long> threadId,
 			@NonNull String templateCode,
 			@NonNull CommandRec magicCommand,
-			@NonNull Integer magicRef,
+			@NonNull Long magicRef,
 			@NonNull TemplateMissing templateMissing,
 			@NonNull Map<String,String> suppliedParams) {
 
@@ -631,7 +632,9 @@ class ChatSendLogicImplementation
 				threadId,
 				text,
 				magicCommand,
-				serviceHelper.findByCode (chat, "system"),
+				serviceHelper.findByCode (
+					chat,
+					"system"),
 				magicRef);
 
 		// log it
@@ -655,13 +658,13 @@ class ChatSendLogicImplementation
 
 	@Override
 	public
-	Integer sendMessageMagic (
+	Long sendMessageMagic (
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<Integer> threadId,
+			@NonNull Optional<Long> threadId,
 			@NonNull Collection<TextRec> parts,
 			@NonNull CommandRec magicCommand,
 			@NonNull ServiceRec service,
-			@NonNull Integer magicRef,
+			@NonNull Long magicRef,
 			@NonNull Optional<UserRec> user) {
 
 		ChatSchemeRec chatScheme =

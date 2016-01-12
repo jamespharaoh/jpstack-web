@@ -259,6 +259,7 @@ class SubscriptionLogicImplementation
 					subscriptionNumber)
 
 				.setIndex (
+					(int) (long)
 					subscriptionNumber.getNumBills ())
 
 				.setCreatedTime (
@@ -302,6 +303,7 @@ class SubscriptionLogicImplementation
 					"subscription")
 
 				.ref (
+					(long)
 					subscriptionBill.getId ())
 
 				.send ();

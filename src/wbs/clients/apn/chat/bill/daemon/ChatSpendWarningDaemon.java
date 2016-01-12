@@ -159,7 +159,7 @@ class ChatSpendWarningDaemon
 
 		chatSendLogic.sendSystemRbFree (
 			chatUser,
-			Optional.<Integer>absent (),
+			Optional.<Long>absent (),
 			chatUser.getNumSpendWarnings () == 0
 				? "spend_warning_1"
 				: "spend_warning_2",

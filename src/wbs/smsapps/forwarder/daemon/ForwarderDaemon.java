@@ -396,7 +396,7 @@ class ForwarderDaemon
 
 			// check if we should cancel it
 
-			int timeout =
+			long timeout =
 				forwarderMessageIn
 					.getForwarder ()
 					.getInboundTimeoutSecs ();
@@ -411,7 +411,7 @@ class ForwarderDaemon
 
 				calendar.add (
 					Calendar.SECOND,
-					timeout);
+					(int) timeout);
 
 				if (calendar.getTime ().getTime ()
 						< System.currentTimeMillis()) {

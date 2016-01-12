@@ -101,7 +101,7 @@ class ChatHelpLogLogicImplementation
 			queueItem
 
 				.setPriority (
-					-10);
+					-10l);
 
 			chatHelpLog
 

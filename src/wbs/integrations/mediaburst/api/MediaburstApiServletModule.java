@@ -400,13 +400,14 @@ class MediaburstApiServletModule
 
 			try {
 
-				Integer statusCode = null;
+				Long statusCode;
 
 				try {
 
 					statusCode =
-						Integer.parseInt (
-							requestContext.parameter ("deliver_code"));
+						Long.parseLong (
+							requestContext.parameter (
+								"deliver_code"));
 
 				} catch (NumberFormatException exception) {
 
@@ -414,13 +415,15 @@ class MediaburstApiServletModule
 
 				}
 
-				Integer statusType = null;
-				Integer reason = null;
+				Long statusType = null;
+				Long reason = null;
 
 				statusType =
+					(long)
 					Arrays.asList (
-						stringToMessageStatus.keySet ().toArray ()).indexOf (
-							statusParam.toLowerCase ());
+						stringToMessageStatus.keySet ().toArray ()
+					).indexOf (
+						statusParam.toLowerCase ());
 
 				MessageReportCodeRec messageReportCode =
 					messageReportCodeHelper.findOrCreate (

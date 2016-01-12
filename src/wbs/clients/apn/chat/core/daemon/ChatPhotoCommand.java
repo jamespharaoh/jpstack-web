@@ -88,7 +88,7 @@ class ChatPhotoCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Integer> commandRef;
+	Optional<Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -189,7 +189,7 @@ class ChatPhotoCommand
 					commandHelper.findByCode (
 						chat,
 						"magic"),
-					commandHelper.findByCode (
+					(long) commandHelper.findByCode (
 						chat,
 						"help"
 					).getId (),
@@ -208,7 +208,7 @@ class ChatPhotoCommand
 					commandHelper.findByCode (
 						chat,
 						"magic"),
-					commandHelper.findByCode (
+					(long) commandHelper.findByCode (
 						chat,
 						"help"
 					).getId (),

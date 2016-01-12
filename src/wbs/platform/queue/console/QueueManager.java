@@ -159,13 +159,13 @@ class QueueManager {
 			return 0l;
 		}
 
-		Integer preferredUserDelay =
-			(Integer)
+		Long preferredUserDelay =
+			(Long)
 			objectManager.dereference (
 				queueParent,
 				queueTypeSpec.preferredUserDelay ());
 
-		return (long) preferredUserDelay * 1000l;
+		return preferredUserDelay * 1000l;
 
 	}
 

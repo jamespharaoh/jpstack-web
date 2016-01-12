@@ -134,14 +134,20 @@ class UnwiredPlazaApiServletModule
 			Integer id =
 				Integer.parseInt (requestContext.parameter ("id"));
 
-			Integer status =
-				Integer.parseInt (requestContext.parameter ("status"));
+			Long status =
+				Long.parseLong (
+					requestContext.parameter (
+						"status"));
 
-			Integer subStatus =
-				Integer.parseInt (requestContext.parameter ("substatus"));
+			Long subStatus =
+				Long.parseLong (
+					requestContext.parameter (
+						"substatus"));
 
-			Integer finalParam =
-				Integer.parseInt (requestContext.parameter ("final"));
+			Long finalParam =
+				Long.parseLong (
+					requestContext.parameter (
+						"final"));
 
 			//String phone =
 			//	requestContext.getParameter ("phone");

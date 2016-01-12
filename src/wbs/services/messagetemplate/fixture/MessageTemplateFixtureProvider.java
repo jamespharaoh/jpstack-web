@@ -169,10 +169,10 @@ class MessageTemplateFixtureProvider
 				"<p>Help text 1</p>")
 
 			.setMinLength (
-				1)
+				1l)
 
 			.setMaxLength (
-				50)
+				50l)
 
 			.setCharset (
 				MessageTemplateTypeCharset.unicode)
@@ -239,10 +239,10 @@ class MessageTemplateFixtureProvider
 				"<p>Help text 2</p>")
 
 			.setMinLength (
-				5)
+				5l)
 
 			.setMaxLength (
-				20)
+				20l)
 
 			.setCharset (
 				MessageTemplateTypeCharset.unicode)
@@ -268,7 +268,7 @@ class MessageTemplateFixtureProvider
 				true)
 
 			.setMaximumLength (
-				4)
+				4l)
 
 		);
 
@@ -291,7 +291,7 @@ class MessageTemplateFixtureProvider
 				false)
 
 			.setMaximumLength (
-				3)
+				3l)
 
 		);
 

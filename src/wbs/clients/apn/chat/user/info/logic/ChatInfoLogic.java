@@ -36,13 +36,13 @@ interface ChatInfoLogic {
 	void sendUserInfo (
 			ChatUserRec thisUser,
 			ChatUserRec otherUser,
-			Integer threadId,
+			Long threadId,
 			boolean asDating);
 
 	int sendUserInfos (
 			final ChatUserRec thisUser,
 			final int numToSend,
-			Integer threadId);
+			Long threadId);
 
 	String chatUserBlurb (
 			ChatUserRec thisUser,
@@ -53,37 +53,37 @@ interface ChatInfoLogic {
 			ChatUserRec otherUser);
 
 	void sendUserPics (
-			final ChatUserRec thisUser,
+			ChatUserRec thisUser,
 			Collection<ChatUserRec> otherUsers,
-			Integer threadId,
+			Long threadId,
 			boolean asDating);
 
 	void sendUserVideos (
-			final ChatUserRec thisUser,
+			ChatUserRec thisUser,
 			Collection<ChatUserRec> otherUsers,
-			Integer threadId,
+			Long threadId,
 			boolean asDating);
 
 	int sendRequestedUserPicandOtherUserPics (
-			final ChatUserRec thisUser,
-			final ChatUserRec requestedUser,
-			final int numToSend,
-			Integer threadId);
+			ChatUserRec thisUser,
+			ChatUserRec requestedUser,
+			int numToSend,
+			Long threadId);
 
 	int sendUserPics (
-			final ChatUserRec thisUser,
-			final int numToSend,
-			Integer threadId);
+			ChatUserRec thisUser,
+			int numToSend,
+			Long threadId);
 
 	int sendUserVideos (
-			final ChatUserRec thisUser,
-			final int numToSend,
-			Integer threadId);
+			ChatUserRec thisUser,
+			int numToSend,
+			Long threadId);
 
 	void chatUserSetInfo (
 			ChatUserRec chatUser,
 			String info,
-			Integer threadId);
+			Long threadId);
 
 	void sendNameHint (
 			ChatUserRec chatUser);

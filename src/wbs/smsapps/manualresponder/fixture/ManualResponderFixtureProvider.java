@@ -185,10 +185,10 @@ class ManualResponderFixtureProvider
 				"This is a fixed message")
 
 			.setMaximumMessages (
-				1)
+				1l)
 
 			.setMinimumMessageParts (
-				1)
+				1l)
 
 			.setNumber (
 				"free")
@@ -240,10 +240,10 @@ class ManualResponderFixtureProvider
 				"BILLED MESSAGE {page}/{pages}: {message}")
 
 			.setMaximumMessages (
-				1)
+				1l)
 
 			.setMinimumMessageParts (
-				1)
+				1l)
 
 			.setNumber (
 				"bill")
@@ -295,10 +295,10 @@ class ManualResponderFixtureProvider
 				false)
 
 			.setMaximumMessages (
-				3)
+				3l)
 
 			.setMinimumMessageParts (
-				2)
+				2l)
 
 			.setNumber (
 				"bill")
@@ -350,10 +350,10 @@ class ManualResponderFixtureProvider
 				true)
 
 			.setMaximumMessages (
-				3)
+				3l)
 
 			.setMinimumMessageParts (
-				2)
+				2l)
 
 			.setNumber (
 				"bill")
@@ -390,10 +390,10 @@ class ManualResponderFixtureProvider
 				"")
 
 			.setMaximumMessages (
-				1)
+				1l)
 
 			.setMinimumMessageParts (
-				1)
+				1l)
 
 			.setNumber (
   				"free")

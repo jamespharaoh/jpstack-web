@@ -16,6 +16,6 @@ class ImChatConversationEndRequest {
 	String sessionSecret;
 
 	@DataAttribute
-	Integer conversationIndex;
+	Long conversationIndex;
 
 }

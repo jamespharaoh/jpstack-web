@@ -63,7 +63,7 @@ class OrdererDeliveryNoticeHandler
 	public
 	void handle (
 			int deliveryId,
-			Integer ref) {
+			Long ref) {
 
 		@Cleanup
 		Transaction transaction =
@@ -84,8 +84,10 @@ class OrdererDeliveryNoticeHandler
 		// if its not delivered or we've already seen delivery just
 		// ignore it
 
-		if (! delivery.getNewMessageStatus ().isGoodType ()
-				|| order.getDeliveredTime () != null) {
+		if (
+			! delivery.getNewMessageStatus ().isGoodType ()
+			|| order.getDeliveredTime () != null
+		) {
 
 			deliveryHelper.remove (
 				delivery);

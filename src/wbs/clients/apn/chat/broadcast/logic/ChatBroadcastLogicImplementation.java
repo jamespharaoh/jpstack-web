@@ -62,7 +62,7 @@ class ChatBroadcastLogicImplementation
 			chatCreditLogic.userSpendCreditCheck (
 				chatUser,
 				false,
-				Optional.<Integer>absent ());
+				Optional.<Long>absent ());
 
 		if (
 			creditCheckResult.failed ()

@@ -21,6 +21,7 @@ class SubscriptionSendHooks
 		subscriptionSend
 
 			.setIndex (
+				(int) (long)
 				subscription.getNumSendsTotal ());
 
 	}

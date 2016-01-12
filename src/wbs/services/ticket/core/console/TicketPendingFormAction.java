@@ -176,6 +176,7 @@ class TicketPendingFormAction
 					ticket)
 
 				.setIndex (
+					(int) (long)
 					ticket.getNumNotes ())
 
 				.setNoteText (

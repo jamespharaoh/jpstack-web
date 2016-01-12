@@ -6,14 +6,14 @@ import java.util.List;
 public
 class Percentager {
 
-	List<Integer> values =
-		new ArrayList<Integer> ();
+	List<Long> values =
+		new ArrayList<Long> ();
 
-	int total = 0;
+	long total = 0l;
 
 	public
 	void add (
-			int value) {
+			long value) {
 
 		values.add (
 			value);
@@ -24,22 +24,29 @@ class Percentager {
 	}
 
 	public
-	List<Integer> work () {
+	List<Long> work () {
 
-		List<Integer> ret =
-			new ArrayList<Integer> ();
+		List<Long> ret =
+			new ArrayList<Long> ();
 
-		int pcLeft = 100, totalLeft = total;
+		long pcLeft = 100;
+		long totalLeft = total;
 
-		for (Integer value : values) {
+		for (
+			Long value
+				: values
+		) {
 
-			int pc = totalLeft > 0
-				? value * pcLeft / totalLeft
-				: 0;
+			long pc =
+				totalLeft > 0
+					? value * pcLeft / totalLeft
+					: 0;
 
-			ret.add (pc);
+			ret.add (
+				pc);
 
 			pcLeft -= pc;
+
 			totalLeft -= value;
 
 		}

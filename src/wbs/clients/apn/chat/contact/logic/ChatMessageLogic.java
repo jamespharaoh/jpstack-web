@@ -41,7 +41,7 @@ interface ChatMessageLogic {
 			ChatUserRec fromUser,
 			ChatUserRec toUser,
 			String text,
-			Optional<Integer> threadId,
+			Optional<Long> threadId,
 			ChatMessageMethod source,
 			List<MediaRec> medias);
 
@@ -73,7 +73,7 @@ interface ChatMessageLogic {
 	 */
 	void chatUserRejectionCountInc (
 			ChatUserRec chatUser,
-			Integer threadId);
+			Long threadId);
 
 	static
 	class ApprovalResult {

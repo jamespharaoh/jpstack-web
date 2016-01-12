@@ -62,7 +62,7 @@ interface ObjectHelperProvider {
 
 	Record<?> findByParentAndIndex (
 			GlobalId parentGlobalId,
-			Integer index);
+			Long index);
 
 	Record<?> findByParentAndTypeAndCode (
 			GlobalId parentGlobalId,

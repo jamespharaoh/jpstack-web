@@ -46,7 +46,7 @@ interface ChatCreditLogic {
 	ChatCreditCheckResult userSpendCreditCheck (
 			ChatUserRec chatUser,
 			Boolean userActed,
-			Optional<Integer> threadId);
+			Optional<Long> threadId);
 
 	ChatCreditCheckResult userCreditCheck (
 			ChatUserRec chatUser);
@@ -74,7 +74,7 @@ interface ChatCreditLogic {
 			ChatUserRec chatUser,
 			boolean updateRevoked);
 
-	int userBillLimitAmount (
+	long userBillLimitAmount (
 			ChatUserRec chatUser);
 
 	boolean userBillLimitApplies (
@@ -91,7 +91,7 @@ interface ChatCreditLogic {
 	 */
 	void userCreditHint (
 			ChatUserRec chatUser,
-			Optional<Integer> threadId);
+			Optional<Long> threadId);
 
 	void doRebill ();
 

@@ -38,15 +38,15 @@
 		for example: "objectNameId".
 
 	@attr default-list-context
-	
+
 		@todo
 
 	@attr default-object-context
-	
+
 		@todo
 
 	@attr view-delegate-field
-	
+
 		@todo
 
 	@attr view-delegate-priv-code
@@ -54,6 +54,6 @@
 		@todo
 
 	@attr cryptor
-	
+
 		@todo
 

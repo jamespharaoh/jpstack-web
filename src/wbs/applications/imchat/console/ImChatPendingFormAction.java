@@ -113,8 +113,8 @@ class ImChatPendingFormAction
 		boolean bill;
 		boolean ignore;
 
-		int minLength;
-		int maxLength;
+		long minLength;
+		long maxLength;
 
 		ImChatTemplateRec template;
 
@@ -266,6 +266,7 @@ class ImChatPendingFormAction
 					conversation)
 
 				.setIndex (
+					(int) (long)
 					conversation.getNumMessages ())
 
 				.setSenderUser (
@@ -313,7 +314,7 @@ class ImChatPendingFormAction
 					+ customer.getBalance ()
 					- ifNull (
 						operatorMessage.getPrice (),
-						0));
+						0l));
 
 		} else {
 

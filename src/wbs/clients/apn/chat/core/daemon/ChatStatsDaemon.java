@@ -159,12 +159,12 @@ class ChatStatsDaemon
 			chatHelper.find (
 				chatId);
 
-		int numUsers =
+		long numUsers =
 			chatUserHelper.countOnline (
 				chat,
 				ChatUserType.user);
 
-		int numMonitors =
+		long numMonitors =
 			chatUserHelper.countOnline (
 				chat,
 				ChatUserType.monitor);

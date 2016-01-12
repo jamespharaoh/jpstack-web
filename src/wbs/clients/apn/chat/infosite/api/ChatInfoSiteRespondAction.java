@@ -78,7 +78,7 @@ class ChatInfoSiteRespondAction
 			infoSite.getChatUser (),
 			otherUser,
 			requestContext.parameter ("text"),
-			Optional.<Integer>absent (),
+			Optional.<Long>absent (),
 			ChatMessageMethod.infoSite,
 			ImmutableList.<MediaRec>of ());
 

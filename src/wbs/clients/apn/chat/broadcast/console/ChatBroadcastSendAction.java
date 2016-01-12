@@ -601,6 +601,7 @@ class ChatBroadcastSendAction
 						text)
 
 					.setNumAccepted (
+						(long)
 						remainingChatUserIds.size ())
 
 					.setSearch (
@@ -673,7 +674,7 @@ class ChatBroadcastSendAction
 						chatBroadcast
 
 							.setSearchSpendMin (
-								(Integer)
+								(Long)
 								params.get ("searchSpendMin"));
 
 					}
@@ -683,7 +684,7 @@ class ChatBroadcastSendAction
 						chatBroadcast
 
 							.setSearchSpendMax (
-								(Integer)
+								(Long)
 								params.get ("searchSpendMax"));
 
 					}

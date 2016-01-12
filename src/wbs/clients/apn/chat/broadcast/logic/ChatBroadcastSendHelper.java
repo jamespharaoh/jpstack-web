@@ -359,7 +359,7 @@ class ChatBroadcastSendHelper
 					chat,
 					"chat"),
 				fromChatUser.getId (),
-				Optional.<Integer>absent (),
+				Optional.<Long>absent (),
 				chatBroadcast.getText (),
 				chatScheme.getMagicRouter (),
 				broadcastService,

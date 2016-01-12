@@ -231,7 +231,7 @@ class ChatAdDaemon
 
 			// work out credit
 
-			int approvedCredit =
+			long approvedCredit =
 				+ chatUser.getCredit ()
 				- chatUser.getCreditPending ()
 				- chatUser.getCreditPendingStrict ();
@@ -327,13 +327,13 @@ class ChatAdDaemon
 
 				chatSendLogic.sendMessageMagic (
 					chatUser,
-					Optional.<Integer>absent (),
+					Optional.<Long>absent (),
 					messageText,
 					commandHelper.findByCode (
 						chat,
 						"magic"),
 					adService,
-					commandHelper.findByCode (
+					(long) commandHelper.findByCode (
 						chat,
 						"join_next"
 					).getId ());
