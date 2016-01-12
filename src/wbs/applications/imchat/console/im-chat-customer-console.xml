@@ -77,6 +77,10 @@
 			name="code"
 			nullable="yes"/>
 
+		<text-field
+			name="email"
+			nullable="yes"/>
+
 	</field-set>
 
 	<field-set

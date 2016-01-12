@@ -1,5 +1,7 @@
 package wbs.applications.imchat.hibernate;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
+
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -60,21 +62,36 @@ class ImChatCustomerDaoHibernate
 				"_imChatCustomer.imChat",
 				"_imChat");
 
-		if (imChatCustomerSearch.getImChatId () != null) {
+		if (
+			isNotNull (
+				imChatCustomerSearch.imChatId ())
+		) {
 
 			criteria.add (
 				Restrictions.eq (
 					"_imChat.id",
-					imChatCustomerSearch.getImChatId ()));
+					imChatCustomerSearch.imChatId ()));
 
 		}
 
-		if (imChatCustomerSearch.getCode () != null) {
+		if (imChatCustomerSearch.code () != null) {
 
 			criteria.add (
 				Restrictions.eq (
 					"_imChatCustomer.code",
-					imChatCustomerSearch.getCode ()));
+					imChatCustomerSearch.code ()));
+
+		}
+
+		if (
+			isNotNull (
+				imChatCustomerSearch.email ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_imChatCustomer.email",
+					imChatCustomerSearch.email ()));
 
 		}
 

@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-@Accessors (chain = true)
+@Accessors (fluent = true)
 @Data
 @EqualsAndHashCode
 @ToString
@@ -18,6 +18,7 @@ class ImChatCustomerSearch
 	Integer imChatId;
 
 	String code;
+	String email;
 
 	Order order =
 		Order.timestampDesc;
