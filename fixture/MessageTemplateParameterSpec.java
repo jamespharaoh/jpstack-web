@@ -24,6 +24,6 @@ class MessageTemplateParameterSpec {
 	String description;
 
 	@DataAttribute
-	Integer maximumLength;
+	Long maximumLength;
 
 }
