@@ -156,13 +156,13 @@ class TicketFixtureProvider
 				true)
 
 			.setMinimum (
-				0)
+				0l)
 
 			.setMaximum (
-				0)
+				0l)
 
 			.setPreferredQueueTime (
-				15)
+				15l)
 
 		);
 
@@ -187,13 +187,13 @@ class TicketFixtureProvider
 				true)
 
 			.setMinimum (
-				60)
+				60l)
 
 			.setMaximum (
-				120)
+				120l)
 
 			.setPreferredQueueTime (
-				15)
+				15l)
 
 		);
 
@@ -218,13 +218,13 @@ class TicketFixtureProvider
 				true)
 
 			.setMinimum (
-				300)
+				300l)
 
 			.setMaximum (
-				600)
+				600l)
 
 			.setPreferredQueueTime (
-				15)
+				15l)
 
 		);
 
@@ -249,13 +249,13 @@ class TicketFixtureProvider
 				true)
 
 			.setMinimum (
-				60)
+				60l)
 
 			.setMaximum (
-				120)
+				120l)
 
 			.setPreferredQueueTime (
-				15)
+				15l)
 
 		);
 
@@ -280,13 +280,13 @@ class TicketFixtureProvider
 				true)
 
 			.setMinimum (
-				0)
+				0l)
 
 			.setMaximum (
-				0)
+				0l)
 
 			.setPreferredQueueTime (
-				15)
+				15l)
 
 		);
 
@@ -431,7 +431,7 @@ class TicketFixtureProvider
 				numberType)
 
 			.setIntegerValue (
-				10)
+				10l)
 
 		);
 
@@ -473,7 +473,7 @@ class TicketFixtureProvider
 				chatUserType)
 
 			.setIntegerValue (
-				1)
+				1l)
 
 		);
 
@@ -484,6 +484,7 @@ class TicketFixtureProvider
 				ticket)
 
 			.setIndex (
+				(int) (long)
 				ticket.getNumNotes ())
 
 			.setNoteText (
@@ -502,6 +503,7 @@ class TicketFixtureProvider
 				ticket)
 
 			.setIndex (
+				(int) (long)
 				ticket.getNumNotes ())
 
 			.setNoteText (
