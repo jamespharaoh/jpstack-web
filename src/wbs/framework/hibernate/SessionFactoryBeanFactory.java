@@ -639,7 +639,7 @@ class SessionFactoryBeanFactory
 
 		// add document to hibernate
 
-		config.addFile (
+		config.addCacheableFile (
 			outputFile);
 
 	}
