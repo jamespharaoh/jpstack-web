@@ -35,7 +35,7 @@ class RpcResult {
 
 		rpcStruct =
 			Rpc.rpcStruct (name,
-				Rpc.rpcElem ("status", status),
+				Rpc.rpcElem ("status", (long) status),
 				Rpc.rpcElem ("status-code", statusCode),
 				Rpc.rpcElem ("status-message", getStatusMessage ()),
 				Rpc.rpcList ("status-messages", "status-message", statusMessages),

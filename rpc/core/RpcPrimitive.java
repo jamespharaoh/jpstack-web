@@ -30,7 +30,7 @@ class RpcPrimitive
 	RpcType typeOfPrimitive (
 			Object primitive) {
 
-		if (primitive instanceof Integer || primitive instanceof Long)
+		if (primitive instanceof Long)
 			return RpcType.rInteger;
 
 		if (primitive instanceof String)
@@ -39,7 +39,7 @@ class RpcPrimitive
 		if (primitive instanceof Boolean)
 			return RpcType.rBoolean;
 
-		if (primitive instanceof Double || primitive instanceof Float)
+		if (primitive instanceof Double)
 			return RpcType.rFloat;
 
 		if (primitive instanceof byte[])

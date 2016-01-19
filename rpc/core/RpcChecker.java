@@ -61,10 +61,11 @@ interface RpcChecker {
 				Object value,
 				List<String> errors) {
 
-			Integer integer = (Integer) value;
+			Long longValue =
+				(Long) value;
 
-			if (integer >= 0)
-				return integer;
+			if (longValue >= 0l)
+				return longValue;
 
 			errors.add (
 				stringFormat (
@@ -88,12 +89,12 @@ interface RpcChecker {
 				Object value,
 				List<String> errors) {
 
-			Integer integer =
-				(Integer)
+			Long longValue =
+				(Long)
 				value;
 
-			if (integer >= 1)
-				return integer;
+			if (longValue >= 1)
+				return longValue;
 
 			errors.add (
 				stringFormat (
@@ -107,7 +108,8 @@ interface RpcChecker {
 	};
 
 	public static
-	class EnumRpcChecker implements RpcChecker {
+	class EnumRpcChecker
+		implements RpcChecker {
 
 		private final
 		Map<String, ?> map;
