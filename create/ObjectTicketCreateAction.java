@@ -344,12 +344,14 @@ class ObjectTicketCreateAction<
 
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
+				requestContext,
 				formFieldSet,
 				ticket);
 
 		if (updateResultSet.errorCount () > 0) {
 
 			formFieldLogic.reportErrors (
+				requestContext,
 				updateResultSet);
 
 			return null;
