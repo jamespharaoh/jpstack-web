@@ -321,6 +321,125 @@ class FormFieldLogic {
 	}
 
 	public
+	void outputFormTable (
+			@NonNull FormatWriter htmlWriter,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Optional<UpdateResultSet> updateResultSet,
+			@NonNull Object object,
+			@NonNull String actionUrl,
+			@NonNull String submitButtonLabel) {
+
+		htmlWriter.writeFormat (
+			"<form",
+			" method=\"post\"",
+			" action=\"%h\"",
+			actionUrl,
+			">\n");
+
+		htmlWriter.writeFormat (
+			"<table class=\"details\">\n");
+
+		outputFormRows (
+			htmlWriter,
+			formFieldSet,
+			updateResultSet,
+			object);
+
+		htmlWriter.writeFormat (
+			"</table>\n");
+
+		htmlWriter.writeFormat (
+			"<p><input",
+			" type=\"submit\"",
+			" value=\"%h\"",
+			submitButtonLabel,
+			"></p>\n");
+
+		htmlWriter.writeFormat (
+			"</form>\n");
+
+	}
+
+	public
+	void outputDetailsTable (
+			@NonNull FormatWriter htmlWriter,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Object object) {
+
+		htmlWriter.writeFormat (
+			"<table class=\"details\">\n");
+
+		outputTableRows (
+			htmlWriter,
+			formFieldSet,
+			object);
+
+		htmlWriter.writeFormat (
+			"</table>\n");
+
+	}
+
+	public
+	void outputListTable (
+			@NonNull FormatWriter htmlWriter,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull List<?> objects,
+			boolean links) {
+
+		htmlWriter.writeFormat (
+			"<table class=\"list\">\n");
+
+		htmlWriter.writeFormat (
+			"<tr>\n");
+
+		outputTableHeadings (
+			htmlWriter,
+			formFieldSet);
+
+		htmlWriter.writeFormat (
+			"</tr>");
+
+		if (
+			isEmpty (
+				objects)
+		) {
+
+			htmlWriter.writeFormat (
+				"<tr><td",
+				" colspan=\"%h\"",
+				formFieldSet.columns (),
+				">%h</td></tr>\n",
+				"There is no data to display");
+
+		} else {
+
+			for (
+				Object object
+					: objects
+			) {
+
+				htmlWriter.writeFormat (
+					"<tr>\n");
+
+				outputTableCellsList (
+					htmlWriter,
+					formFieldSet,
+					object,
+					links);
+
+				htmlWriter.writeFormat (
+					"</tr>\n");
+
+			}
+
+		}
+
+		htmlWriter.writeFormat (
+			"</table>\n");
+
+	}
+
+	public
 	void outputCsvRow (
 			@NonNull FormatWriter csvWriter,
 			@NonNull List<FormFieldSet> formFieldSets,

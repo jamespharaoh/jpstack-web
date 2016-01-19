@@ -42,6 +42,10 @@
 			default="0"/>
 
 		<integer-field
+			name="numCredits"
+			default="0"/>
+
+		<integer-field
 			name="balance"
 			default="0"/>
 

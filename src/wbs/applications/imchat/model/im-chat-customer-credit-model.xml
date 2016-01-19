@@ -1,0 +1,44 @@
+<model-meta
+	name="imChatCustomerCredit"
+	type="event">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="imChatCustomer"/>
+
+		<index-field/>
+
+		<timestamp-field
+			name="timestamp"
+			column-type="iso"/>
+
+		<!-- data -->
+
+		<reference-field
+			type="user"/>
+
+		<string-field
+			name="reason"/>
+
+		<integer-field
+			name="creditAmount"/>
+
+		<integer-field
+			name="creditBalanceBefore"/>
+
+		<integer-field
+			name="creditBalanceAfter"/>
+
+		<integer-field
+			name="billAmount"/>
+
+	</fields>
+
+</model-meta>

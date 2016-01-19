@@ -3,14 +3,19 @@ package wbs.console.combo;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.presentInstances;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -73,6 +78,7 @@ class ContextTabActionPageBuilder<
 	String actionName;
 	String title;
 	String pagePartName;
+	List<String> privKeys;
 
 	// build
 
@@ -116,7 +122,10 @@ class ContextTabActionPageBuilder<
 					tabLabel)
 
 				.localFile (
-					localFile),
+					localFile)
+
+				.privKeys (
+					privKeys),
 
 			hideTab
 				? Collections.<String>emptyList ()
@@ -130,8 +139,16 @@ class ContextTabActionPageBuilder<
 		consoleModule.addContextFile (
 			localFile,
 			consoleFile.get ()
-				.getResponderName (responderName)
-				.postActionName (actionName),
+
+				.getResponderName (
+					responderName)
+
+				.postActionName (
+					actionName)
+
+				.privKeys (
+					privKeys),
+
 			resolvedExtensionPoint.contextTypeNames ());
 
 	}
@@ -218,6 +235,12 @@ class ContextTabActionPageBuilder<
 					"%s%sPart",
 					container.existingBeanNamePrefix (),
 					capitalise (name)));
+
+		privKeys =
+			ImmutableList.copyOf (
+				presentInstances (
+					Optional.fromNullable (
+						spec.privKey ())));
 
 	}
 

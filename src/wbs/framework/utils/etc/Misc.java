@@ -727,6 +727,27 @@ class Misc {
 	}
 
 	public static
+	long max (
+			long... params) {
+
+		long ret =
+			params [0];
+
+		for (
+			long param
+				: params
+		) {
+
+			if (param > ret)
+				ret = param;
+
+		}
+
+		return ret;
+
+	}
+
+	public static
 	String capitalise (
 			@NonNull String string) {
 

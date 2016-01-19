@@ -6,11 +6,6 @@
 		view-delegate-field="imChat"
 		view-delegate-priv-code="manage">
 
-		<priv-key
-			name="imChatCustomer.manage"
-			delegate="imChat"
-			priv="manage"/>
-
 		<context-stuff
 			name="imChatCustomerName"
 			field="code"/>
@@ -22,6 +17,16 @@
 
 		<run-post-processor
 			name="imChat"/>
+
+		<priv-key
+			name="imChatCustomer.manage"
+			delegate="imChat"
+			priv="manage"/>
+
+		<priv-key
+			name="imChatCustomer.supervisor"
+			delegate="imChat"
+			priv="supervisor"/>
 
 	</console-helper-provider>
 
@@ -45,23 +50,27 @@
 			<object-summary-page
 				fields="summary"/>
 
+			<context-tab-action-page
+				name="credit"
+				priv-key="imChatCustomer.supervisor"/>
+
 			<context-link
 				name="conversation"
 				link="imChatConversation"
 				label="Conversations"
-				priv-key="imChatCustomer.manage"/>
+				priv-key="imChatCustomer.supervisor"/>
 
 			<context-link
 				name="session"
 				link="imChatSession"
 				label="Sessions"
-				priv-key="imChatSession.manage"/>
+				priv-key="imChatSession.supervisor"/>
 
 			<context-link
 				name="purchase"
 				link="imChatPurchase"
 				label="Purchases"
-				priv-key="imChatPurchase.manage"/>
+				priv-key="imChatPurchase.supervisor"/>
 
 			<object-events-page/>
 
@@ -126,6 +135,75 @@
 		<currency-field
 			name="balance"
 			currency="imChat.currency"/>
+
+	</field-set>
+
+	<field-set
+		name="credit-summary"
+		object-name="imChatCustomer">
+
+		<code-field/>
+
+		<integer-field
+			name="numConversations"/>
+
+		<integer-field
+			name="numPurchases"/>
+
+		<integer-field
+			name="numCredits"/>
+
+		<currency-field
+			name="balance"
+			currency="imChat.currency"/>
+
+	</field-set>
+
+	<field-set
+		name="credit-request"
+		class="wbs.applications.imchat.console.ImChatCustomerCreditRequest">
+
+		<text-field
+			name="reason"/>
+
+		<currency-field
+			name="creditAmount"
+			currency="customer.imChat.currency"/>
+
+		<currency-field
+			name="billAmount"
+			currency="customer.imChat.currency"/>
+
+	</field-set>
+
+	<field-set
+		name="credit-history"
+		object-name="imChatCustomerCredit">
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<object-field
+			name="user"
+			object-type="user"/>
+
+		<text-field
+			name="reason"/>
+
+		<currency-field
+			name="creditAmount"
+			label="Credit"
+			currency="imChatCustomer.imChat.currency"/>
+
+		<currency-field
+			name="creditBalanceAfter"
+			label="Balance"
+			currency="imChatCustomer.imChat.currency"/>
+
+		<currency-field
+			name="billAmount"
+			label="Bill"
+			currency="imChatCustomer.imChat.currency"/>
 
 	</field-set>
 

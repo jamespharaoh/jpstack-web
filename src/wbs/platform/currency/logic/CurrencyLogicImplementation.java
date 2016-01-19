@@ -1,5 +1,7 @@
 package wbs.platform.currency.logic;
 
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -191,6 +193,10 @@ class CurrencyLogicImplementation
 					")?",
 					"\\s*",
 
+					// sign
+
+					"([-+])?",
+
 					// units
 
 					"(\\d+)",
@@ -223,17 +229,34 @@ class CurrencyLogicImplementation
 
 		// return the result
 
-		Long units =
-			Long.parseLong (
-				matcher.group (1));
+		boolean positive =
+			equal (
+				ifNull (
+					matcher.group (1),
+					"+"),
+				"+");
 
-		Long subDivisions =
+		Long units =
 			Long.parseLong (
 				matcher.group (2));
 
-		return Optional.<Long>of (
-			+ units * currency.getDivisions ()
-			+ subDivisions);
+		Long subDivisions =
+			Long.parseLong (
+				matcher.group (3));
+
+		if (positive) {
+
+			return Optional.<Long>of (
+				+ units * currency.getDivisions ()
+				+ subDivisions);
+
+		} else {
+
+			return Optional.<Long>of (
+				- units * currency.getDivisions ()
+				- subDivisions);
+
+		}
 
 	}
 

@@ -29,8 +29,11 @@ class TextDaoHibernate
 				"text",
 				textValue)
 
-			//.setCacheable (true)
-			.setFlushMode (FlushMode.MANUAL)
+			//.setCacheable (
+			//	true)
+
+			.setFlushMode (
+				FlushMode.MANUAL)
 
 			.list ());
 

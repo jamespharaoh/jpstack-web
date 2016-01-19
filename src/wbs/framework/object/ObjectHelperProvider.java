@@ -74,6 +74,11 @@ interface ObjectHelperProvider {
 	List<Record<?>> findAllByParent (
 			GlobalId parentGlobalId);
 
+	List<Record<?>> findByParentAndIndexRange (
+			GlobalId parentGlobalId,
+			Long indexStart,
+			Long indexEnd);
+
 	List<Record<?>> findAllByParentAndType (
 			GlobalId parentGlobalId,
 			String typeCode);

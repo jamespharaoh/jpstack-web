@@ -14,9 +14,12 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
+import org.hibernate.Criteria;
 import org.hibernate.LockOptions;
 import org.hibernate.ReplicationMode;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.entity.model.Model;
@@ -1038,6 +1041,136 @@ class HibernateHelperProviderBuilder {
 					.list ();
 
 			}
+
+		}
+
+		private
+		void applyParentRestrictions (
+				@NonNull Criteria criteria,
+				@NonNull GlobalId parentGlobalId) {
+
+			if (model.isRooted ()) {
+
+				if (
+					notEqual (
+						parentGlobalId,
+						GlobalId.root)
+				) {
+
+					throw new IllegalArgumentException (
+						stringFormat (
+							"Invalid parent global id %s for rooted object in %s.%s",
+							parentGlobalId,
+							getClass ().getSimpleName (),
+							"findChildren"));
+
+				}
+
+			} else if (model.canGetParent ()) {
+
+				/*
+
+				TODO enable this again
+
+				if (parentGlobalId.getTypeId ()
+						!= parentObjectHelperProvider ().objectTypeId ()) {
+
+					throw new IllegalArgumentException (sf (
+						"Invalid parent type id %s for %s (should be %s)",
+						parentGlobalId.getTypeId (),
+						objectClass ().getSimpleName (),
+						parentObjectHelperProvider ().objectTypeId ()));
+
+				}
+
+				*/
+
+				criteria.add (
+					Restrictions.eq (
+						stringFormat (
+							"_%s.%s.id",
+							objectName (),
+							parentFieldName ()),
+						(int) (long)
+						parentGlobalId.objectId ()));
+
+			} else {
+
+				criteria.add (
+					Restrictions.eq (
+						stringFormat (
+							"_%s.%s.id",
+							objectName (),
+							model.parentTypeField ().name ()),
+						(int) (long)
+						parentGlobalId.typeId ()));
+
+				criteria.add (
+					Restrictions.eq (
+						stringFormat (
+							"_%s.%s",
+							objectName (),
+							model.parentIdField ().name ()),
+						(int) (long)
+						parentGlobalId.objectId ()));
+
+			}
+
+		}
+
+		@Override
+		public
+		List<Record<?>> findByParentAndIndexRange (
+				@NonNull GlobalId parentGlobalId,
+				@NonNull Long indexStart,
+				@NonNull Long indexEnd) {
+
+			Session session =
+				hibernateDatabase.currentSession ();
+
+			Criteria criteria =
+				session.createCriteria (
+					objectClass (),
+					"_" + objectName ());
+
+			// apply parent restriction
+
+			applyParentRestrictions (
+				criteria,
+				parentGlobalId);
+
+			// apply index range restriction
+
+			criteria.add (
+				Restrictions.ge (
+					stringFormat (
+						"_%s.%s",
+						objectName (),
+						indexFieldName ()),
+					(int) (long)
+					indexStart));
+
+			criteria.add (
+				Restrictions.lt (
+					stringFormat (
+						"_%s.%s",
+						objectName (),
+						indexFieldName ()),
+					(int) (long)
+					indexEnd));
+
+			// order by index ascending
+
+			criteria.addOrder (
+				Order.asc (
+					stringFormat (
+						"_%s.%s",
+						objectName (),
+						indexFieldName ())));
+
+			// execute and return
+
+			return criteria.list ();
 
 		}
 

@@ -325,7 +325,7 @@ class ImChatApiLogicImplementation
 					imChat.getCurrency (),
 					(long) ifNull (
 						message.getPrice (),
-						0)));
+						0l)));
 
 	}
 

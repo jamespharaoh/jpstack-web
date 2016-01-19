@@ -19,6 +19,7 @@
 
 		<model name="imChat"/>
 		<model name="imChatCustomer"/>
+		<model name="imChatCustomerCredit"/>
 		<model name="imChatCustomerDetailType"/>
 		<model name="imChatCustomerDetailValue"/>
 		<model name="imChatConversation"/>
@@ -70,6 +71,8 @@
 	</layer>
 
 	<layer name="console">
+		<bean class="console.ImChatCustomerCreditAction"/>
+		<bean class="console.ImChatCustomerCreditPart"/>
 		<bean class="console.ImChatQueueConsole"/>
 		<bean class="console.ImChatPendingFormAction"/>
 		<bean class="console.ImChatPendingFormResponder"/>

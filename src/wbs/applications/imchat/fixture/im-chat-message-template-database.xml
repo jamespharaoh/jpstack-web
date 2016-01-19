@@ -104,6 +104,14 @@
 			Log in
 		</field>
 
+		<field name="Exit link">
+			http://google.com/
+		</field>
+
+		<field name="Exit">
+			Back To Website
+		</field>
+
 	</entry>
 
 	<entry name="Loading screen">

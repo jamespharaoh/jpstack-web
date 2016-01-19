@@ -17,6 +17,10 @@
 			name="imChat.manage"
 			priv="manage"/>
 
+		<priv-key
+			name="imChat.supervisor"
+			priv="supervisor"/>
+
 		<run-post-processor
 			name="slice"/>
 

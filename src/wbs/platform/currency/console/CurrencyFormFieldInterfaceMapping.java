@@ -78,10 +78,19 @@ class CurrencyFormFieldInterfaceMapping<Container>
 				currency)
 		) {
 
-			return successResult (
-				Optional.of (
-					Long.parseLong (
-						interfaceValue.get ())));
+			try {
+
+				return successResult (
+					Optional.of (
+						Long.parseLong (
+							interfaceValue.get ())));
+
+			} catch (NumberFormatException exception) {
+
+				return errorResult (
+					"This currency value must be a whole number");
+
+			}
 
 		}
 

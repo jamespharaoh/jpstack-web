@@ -1586,6 +1586,43 @@ class ObjectHelperBuilder {
 
 			@Override
 			public
+			List findByIndexRange (
+					@NonNull Record parent,
+					@NonNull Long indexStart,
+					@NonNull Long indexEnd) {
+
+				ObjectHelper<?> parentHelper =
+					forObjectClass (
+						parent.getClass ());
+
+				GlobalId parentGlobalId =
+					new GlobalId (
+						parentHelper.objectTypeId (),
+						parent.getId ());
+
+				return objectHelperProvider.findByParentAndIndexRange (
+					parentGlobalId,
+					indexStart,
+					indexEnd);
+
+			}
+
+			@Override
+			public
+			List findByIndexRange (
+					@NonNull GlobalId parentGlobalId,
+					@NonNull Long indexStart,
+					@NonNull Long indexEnd) {
+
+				return objectHelperProvider.findByParentAndIndexRange (
+					parentGlobalId,
+					indexStart,
+					indexEnd);
+
+			}
+
+			@Override
+			public
 			Record findByTypeAndCode (
 					@NonNull GlobalId parentGlobalId,
 					@NonNull String typeCode,

@@ -57,4 +57,7 @@ class ContextTabActionPageSpec {
 	Boolean hideTab =
 		false;
 
+	@DataAttribute
+	String privKey;
+
 }

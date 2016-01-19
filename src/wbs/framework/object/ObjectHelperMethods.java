@@ -97,6 +97,16 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	List<RecordType> findByParent (
 			GlobalId parentGlobalId);
 
+	List<RecordType> findByIndexRange (
+			Record<?> parent,
+			Long indexStart,
+			Long indexEnd);
+
+	List<RecordType> findByIndexRange (
+			GlobalId parentGlobalId,
+			Long indexStart,
+			Long indexEnd);
+
 	List<RecordType> findByParentAndType (
 			Record<?> parent,
 			String typeCode);
