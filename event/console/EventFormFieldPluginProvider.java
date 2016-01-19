@@ -10,8 +10,8 @@ import lombok.NonNull;
 
 import com.google.common.base.Optional;
 
-import wbs.console.forms.AbstractFormFieldPluginProvider;
 import wbs.console.forms.FormFieldBuilderContext;
+import wbs.console.forms.FormFieldPluginProvider;
 import wbs.console.helper.ConsoleHelper;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.Record;
@@ -20,7 +20,7 @@ import wbs.framework.record.Record;
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 public
 class EventFormFieldPluginProvider
-	extends AbstractFormFieldPluginProvider {
+	implements FormFieldPluginProvider {
 
 	// prototype dependencies
 

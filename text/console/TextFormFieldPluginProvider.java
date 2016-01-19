@@ -7,8 +7,8 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import wbs.console.forms.AbstractFormFieldPluginProvider;
 import wbs.console.forms.FormFieldBuilderContext;
+import wbs.console.forms.FormFieldPluginProvider;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.text.model.TextRec;
 
@@ -16,7 +16,7 @@ import wbs.platform.text.model.TextRec;
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 public
 class TextFormFieldPluginProvider
-	extends AbstractFormFieldPluginProvider {
+	implements FormFieldPluginProvider {
 
 	// prototype dependencies
 

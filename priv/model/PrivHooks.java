@@ -11,15 +11,17 @@ import lombok.Cleanup;
 
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.object.ObjectHelper;
+import wbs.framework.object.ObjectHooks;
 import wbs.framework.record.Record;
 import wbs.platform.object.core.model.ObjectTypeDao;
 import wbs.platform.object.core.model.ObjectTypeRec;
 
 public
 class PrivHooks
-	extends AbstractObjectHooks<PrivRec> {
+	implements ObjectHooks<PrivRec> {
+
+	// dependencies
 
 	@Inject
 	Database database;
@@ -30,8 +32,12 @@ class PrivHooks
 	@Inject
 	PrivTypeDao privTypeDao;
 
+	// state
+
 	Set<Integer> parentObjectTypeIds =
 		new HashSet<Integer> ();
+
+	// lifecycle
 
 	@PostConstruct
 	public
@@ -60,6 +66,8 @@ class PrivHooks
 		}
 
 	}
+
+	// implementation
 
 	@Override
 	public
