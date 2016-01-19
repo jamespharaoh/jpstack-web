@@ -6,8 +6,8 @@ import javax.inject.Provider;
 import org.hibernate.TransientObjectException;
 
 import wbs.framework.database.Database;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.object.ObjectHelper;
+import wbs.framework.object.ObjectHooks;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.framework.utils.RandomLogic;
@@ -17,7 +17,7 @@ import wbs.platform.queue.model.QueueItemRec;
 
 public
 class TicketHooks
-	extends AbstractObjectHooks<TicketRec> {
+	implements ObjectHooks<TicketRec> {
 
 	@Inject
 	Provider<TicketObjectHelper> ticketHelper;
