@@ -5,16 +5,26 @@ set -euf -o pipefail
 name="$1"
 path="$2"
 
-temp="/data/wal-new-temp"
-local_target="/data/wal-new"
-remote_target="ubuntu@bunga-platform-backup.vpn.wellbehavedsoftware.com:database-journal"
+temp="/tmp/postgresql-journal-archive"
+zbackup="/opt/zbackup-1.4.4/zbackup --non-encrypted"
 
+zbackup_target="/backup/backups/platform-database-journal"
+rsync_target="ubuntu@bunga-platform-backup.vpn.wellbehavedsoftware.com:database-journal"
+
+# move to temp directory
+mkdir -p "$temp"
 cp "$path" "$temp/$name"
 
+# compress
 nice xz --force "$temp/$name"
 
-rsync "$temp/$name.xz" "$remote_target/$name.xz"
+# ssh to backup server
+rsync "$temp/$name.xz" "$rsync_target/$name.xz"
 
-mv "$temp/$name.xz" "$local_target"
+# store in zbackup
+nice $zbackup backup "$zbackup_target-$name" < "$temp/$name"
+
+# delete
+rm "$temp/$name.xz"
 
 # ex: noet ts=4 filetype=bash
