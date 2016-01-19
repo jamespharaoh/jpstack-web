@@ -123,6 +123,7 @@ class ObjectSearchPart
 			">\n");
 
 		formFieldLogic.outputFormRows (
+			requestContext,
 			formatWriter,
 			formFieldSet,
 			Optional.<UpdateResultSet>absent (),
