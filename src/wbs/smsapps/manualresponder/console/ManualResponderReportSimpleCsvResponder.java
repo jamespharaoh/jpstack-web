@@ -92,6 +92,7 @@ class ManualResponderReportSimpleCsvResponder
 				todayInterval.getEnd ().toInstant ());
 
 		formFieldLogic.update (
+			requestContext,
 			searchFormFieldSet,
 			searchForm);
 

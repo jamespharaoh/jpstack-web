@@ -219,12 +219,14 @@ class ObjectSearchPostAction
 
 		UpdateResultSet updateResultSet =
 			fieldsLogic.update (
+				requestContext,
 				searchFormFieldSet,
 				search);
 
 		if (updateResultSet.errorCount () > 0) {
 
 			fieldsLogic.reportErrors (
+				requestContext,
 				updateResultSet);
 
 			return responder (

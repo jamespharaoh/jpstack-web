@@ -1,7 +1,7 @@
 package wbs.platform.media.console;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.moreThanZero;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 
@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.fileupload.FileItem;
@@ -23,9 +22,10 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 import wbs.console.forms.FormFieldRenderer;
-import wbs.console.request.ConsoleRequestContext;
+import wbs.console.forms.FormFieldSubmission;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.etc.RuntimeIoException;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 
@@ -42,9 +42,6 @@ class ImageFormFieldRenderer<Container>
 
 	@Inject
 	MediaLogic mediaLogic;
-
-	@Inject
-	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -128,6 +125,7 @@ class ImageFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormRow (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<MediaRec> interfaceValue,
@@ -140,6 +138,7 @@ class ImageFormFieldRenderer<Container>
 			"<td>");
 
 		renderFormInput (
+			submission,
 			out,
 			container,
 			interfaceValue);
@@ -165,6 +164,7 @@ class ImageFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormInput (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<MediaRec> interfaceValue) {
@@ -225,74 +225,77 @@ class ImageFormFieldRenderer<Container>
 
 	@Override
 	public
-	boolean formValuePresent () {
+	boolean formValuePresent (
+			@NonNull FormFieldSubmission submission) {
 
-		if (
-			isNotNull (
-				requestContext.getForm (
-					stringFormat (
-						"%s-remove",
-						name ())))
-		) {
-			return true;
-		}
+		return (
 
-		if (! requestContext.isMultipart ())
-			return false;
+			submission.hasParameter (
+				stringFormat (
+					"%s-remove",
+					name ()))
 
-		FileItem fileItem =
-			requestContext.fileItemFile (
-				name ());
+		) || (
 
-		return fileItem != null
-			&& fileItem.getSize () > 0;
+			submission.multipart ()
+
+			&& submission.hasFileItem (
+				name ())
+
+			&& moreThanZero (
+				submission.fileItem (
+					name ()
+				).getSize ())
+
+		);
 
 	}
 
-	@SneakyThrows ({
-		IOException.class
-	})
-	MediaRec formValue () {
+	MediaRec formValue (
+			@NonNull FormFieldSubmission submission) {
 
 		if (
-			isNotNull (
-				requestContext.getForm (
-					stringFormat (
-						"%s-remove",
-						name ())))
+			submission.hasParameter (
+				stringFormat (
+					"%s-remove",
+					name ()))
 		) {
 			return null;
 		}
 
 		FileItem fileItem =
-			requestContext.fileItemFile (
+			submission.fileItem (
 				name ());
 
-		if (
-			fileItem == null
-			|| fileItem.getSize () == 0
-		) {
-			throw new IllegalStateException ();
+		try {
+
+			byte[] data =
+				IOUtils.toByteArray (
+					fileItem.getInputStream ());
+
+			return mediaLogic.createMediaFromImageRequired (
+				data,
+				"image/jpeg",
+				fileItem.getName ());
+
+		} catch (IOException exception) {
+
+			throw new RuntimeIoException (
+				exception);
+
 		}
-
-		byte[] data =
-			IOUtils.toByteArray (
-				fileItem.getInputStream ());
-
-		return mediaLogic.createMediaFromImageRequired (
-			data,
-			"image/jpeg",
-			fileItem.getName ());
 
 	}
 
 	@Override
 	public
-	Either<Optional<MediaRec>,String> formToInterface () {
+	Either<Optional<MediaRec>,String> formToInterface (
+			@NonNull FormFieldSubmission submission) {
 
 		return successResult (
 			Optional.fromNullable (
-				formValue ()));
+				formValue (
+					submission)));
 
 	}
 

@@ -6,12 +6,9 @@ import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.fileupload.FileItem;
@@ -21,20 +18,15 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.etc.RuntimeIoException;
 
 @PrototypeComponent ("uploadFormFieldRenderer")
 @Accessors (fluent = true)
 public
 class UploadFormFieldRenderer<Container>
 	implements FormFieldRenderer<Container,FileUpload> {
-
-	// dependencies
-
-	@Inject
-	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -54,13 +46,13 @@ class UploadFormFieldRenderer<Container>
 	@Override
 	public
 	void renderTableCellList (
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Optional<FileUpload> interfaceValue,
 			boolean link,
 			int colspan) {
 
-		out.writeFormat (
+		htmlWriter.writeFormat (
 			"<td",
 			colspan > 1
 				? stringFormat (
@@ -115,6 +107,7 @@ class UploadFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormRow (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<FileUpload> interfaceValue,
@@ -127,6 +120,7 @@ class UploadFormFieldRenderer<Container>
 			"<td>");
 
 		renderFormInput (
+			submission,
 			out,
 			container,
 			interfaceValue);
@@ -152,6 +146,7 @@ class UploadFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormInput (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<FileUpload> interfaceValue) {
@@ -187,50 +182,59 @@ class UploadFormFieldRenderer<Container>
 
 	@Override
 	public
-	boolean formValuePresent () {
+	boolean formValuePresent (
+			@NonNull FormFieldSubmission submission) {
 
-		if (! requestContext.isMultipart ())
-			return false;
+		return (
 
-		FileItem fileItem =
-			requestContext.fileItemFile (
-				name ());
+			submission.multipart ()
 
-		return fileItem != null;
+			&& submission.hasFileItem (
+				name ())
+
+		);
 
 	}
 
-	@SneakyThrows (IOException.class)
-	FileUpload formValue () {
+	FileUpload formValue (
+			@NonNull FormFieldSubmission submission) {
 
 		FileItem fileItem =
-			requestContext.fileItemFile (
+			submission.fileItem (
 				name ());
 
-		if (fileItem == null)
-			return null;
+		try {
 
-		byte[] data =
-			IOUtils.toByteArray (
-				fileItem.getInputStream ());
+			byte[] data =
+				IOUtils.toByteArray (
+					fileItem.getInputStream ());
 
-		return new FileUpload ()
+			return new FileUpload ()
 
-			.name (
-				fileItem.getName ())
+				.name (
+					fileItem.getName ())
 
-			.data (
-				data);
+				.data (
+					data);
+
+		} catch (IOException exception) {
+
+			throw new RuntimeIoException (
+				exception);
+
+		}
 
 	}
 
 	@Override
 	public
-	Either<Optional<FileUpload>,String> formToInterface () {
+	Either<Optional<FileUpload>,String> formToInterface (
+			@NonNull FormFieldSubmission submission) {
 
 		return successResult (
 			Optional.fromNullable (
-				formValue ()));
+				formValue (
+					submission)));
 
 	}
 

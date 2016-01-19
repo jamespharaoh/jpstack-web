@@ -109,6 +109,7 @@ class ChatUserImageUploadAction
 			new ChatUserImageUploadForm ();
 
 		formFieldLogic.update (
+			requestContext,
 			formFieldSet,
 			uploadForm);
 

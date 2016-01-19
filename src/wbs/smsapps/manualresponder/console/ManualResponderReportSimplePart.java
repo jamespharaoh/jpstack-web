@@ -90,6 +90,7 @@ class ManualResponderReportSimplePart
 				todayInterval.getEnd ().toInstant ());
 
 		formFieldLogic.update (
+			requestContext,
 			searchFormFieldSet,
 			searchForm);
 
@@ -116,6 +117,7 @@ class ManualResponderReportSimplePart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
+			requestContext,
 			formatWriter,
 			searchFormFieldSet,
 			Optional.<UpdateResultSet>absent (),

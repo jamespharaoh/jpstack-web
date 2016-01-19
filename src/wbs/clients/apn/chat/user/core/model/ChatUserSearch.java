@@ -15,4 +15,9 @@ class ChatUserSearch
 
 	String lastJoin;
 
+	Gender gender;
+	Orient orient;
+
+	Boolean blockAll;
+
 }

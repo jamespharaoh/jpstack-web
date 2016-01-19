@@ -3,7 +3,7 @@ package wbs.clients.apn.chat.user.core.hibernate;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
+import static wbs.framework.utils.etc.Misc.parseInterval;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collection;
@@ -903,7 +903,7 @@ class ChatUserDaoHibernate
 		) {
 
 			Interval lastJoinInterval =
-				parsePartialTimestamp (
+				parseInterval (
 					DateTimeZone.forID (
 						"Europe/London"),
 					search.lastJoin ());
@@ -919,6 +919,42 @@ class ChatUserDaoHibernate
 					"_chatUser.lastJoin",
 					instantToDate (
 						lastJoinInterval.getEnd ())));
+
+		}
+
+		if (
+			isNotNull (
+				search.gender ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatUser.gender",
+					search.gender ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.orient ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatUser.orient",
+					search.orient ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.blockAll ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatUser.blockAll",
+					search.blockAll ()));
 
 		}
 

@@ -29,12 +29,14 @@ interface FormFieldRenderer<Container,Interface> {
 			Optional<Interface> interfaceValue);
 
 	void renderFormRow (
+			FormFieldSubmission submission,
 			FormatWriter out,
 			Container container,
 			Optional<Interface> interfaceValue,
 			Optional<String> error);
 
 	void renderFormInput (
+			FormFieldSubmission submission,
 			FormatWriter out,
 			Container container,
 			Optional<Interface> interfaceValue);
@@ -45,9 +47,11 @@ interface FormFieldRenderer<Container,Interface> {
 			Container container,
 			Optional<Interface> interfaceValue);
 
-	boolean formValuePresent ();
+	boolean formValuePresent (
+			FormFieldSubmission submission);
 
-	Either<Optional<Interface>,String> formToInterface ();
+	Either<Optional<Interface>,String> formToInterface (
+			FormFieldSubmission submission);
 
 	String interfaceToHtmlSimple (
 			Container container,

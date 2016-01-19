@@ -11,13 +11,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.request.ConsoleRequestContext;
@@ -30,11 +29,23 @@ import wbs.framework.utils.etc.FormatWriter;
 public
 class FormFieldLogic {
 
-	@Inject
-	ConsoleRequestContext requestContext;
+	public
+	UpdateResultSet update (
+			@NonNull ConsoleRequestContext requestContext,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Object container) {
+
+		return update (
+			requestContextToSubmission (
+				requestContext),
+			formFieldSet,
+			container);
+
+	}
 
 	public
 	UpdateResultSet update (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object container) {
 
@@ -51,6 +62,7 @@ class FormFieldLogic {
 
 			UpdateResult updateResult =
 				formField.update (
+					submission,
 					container);
 
 			if (
@@ -74,6 +86,7 @@ class FormFieldLogic {
 
 	public
 	void reportErrors (
+			@NonNull ConsoleRequestContext requestContext,
 			@NonNull UpdateResultSet updateResultSet) {
 
 		List<String> errorFieldNames =
@@ -252,7 +265,47 @@ class FormFieldLogic {
 	}
 
 	public
+	FormFieldSubmission requestContextToSubmission (
+			@NonNull ConsoleRequestContext requestContext) {
+
+		return new FormFieldSubmissionImplementation ()
+
+			.multipart (
+				requestContext.isMultipart ())
+
+			.parameters (
+				requestContext.getFormData ())
+
+			.fileItems (
+				requestContext.isMultipart ()
+					? Maps.uniqueIndex (
+						requestContext.fileItems (),
+						fileItem -> fileItem.getFieldName ())
+					: null);
+
+	}
+
+	public
 	void outputFormRows (
+			@NonNull ConsoleRequestContext requestContext,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Optional<UpdateResultSet> updateResultSet,
+			@NonNull Object object) {
+
+		outputFormRows (
+			requestContextToSubmission (
+				requestContext),
+			htmlWriter,
+			formFieldSet,
+			updateResultSet,
+			object);
+
+	}
+
+	public
+	void outputFormRows (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Optional<UpdateResultSet> updateResultSet,
@@ -288,6 +341,7 @@ class FormFieldLogic {
 			}
 
 			formField.renderFormRow (
+				submission,
 				htmlWriter,
 				object,
 				error);
@@ -322,6 +376,29 @@ class FormFieldLogic {
 
 	public
 	void outputFormTable (
+			@NonNull ConsoleRequestContext requestContext,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Optional<UpdateResultSet> updateResultSet,
+			@NonNull Object object,
+			@NonNull String actionUrl,
+			@NonNull String submitButtonLabel) {
+
+		outputFormTable (
+			requestContextToSubmission (
+				requestContext),
+			htmlWriter,
+			formFieldSet,
+			updateResultSet,
+			object,
+			actionUrl,
+			submitButtonLabel);
+
+	}
+
+	public
+	void outputFormTable (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Optional<UpdateResultSet> updateResultSet,
@@ -340,6 +417,7 @@ class FormFieldLogic {
 			"<table class=\"details\">\n");
 
 		outputFormRows (
+			submission,
 			htmlWriter,
 			formFieldSet,
 			updateResultSet,

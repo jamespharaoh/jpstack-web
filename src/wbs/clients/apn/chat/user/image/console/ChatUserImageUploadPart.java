@@ -58,6 +58,7 @@ class ChatUserImageUploadPart
 		if (requestContext.post ()) {
 
 			formFieldLogic.update (
+				requestContext,
 				formFieldSet,
 				uploadForm);
 
@@ -87,6 +88,7 @@ class ChatUserImageUploadPart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
+			requestContext,
 			formatWriter,
 			formFieldSet,
 			Optional.<UpdateResultSet>absent (),

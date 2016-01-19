@@ -1,15 +1,9 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.getValue;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.isError;
-import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
-
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -19,7 +13,6 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.Html;
@@ -29,11 +22,6 @@ import wbs.framework.utils.etc.Html;
 public
 class TextAreaFormFieldRenderer<Container,Parent>
 	implements FormFieldRenderer<Container,String> {
-
-	// dependencies
-
-	@Inject
-	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -117,26 +105,6 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue) {
 
-		if (formValuePresent ()) {
-
-			Either<Optional<String>,String> toInterfaceResult =
-				formToInterface ();
-
-			if (
-				isError (
-					toInterfaceResult)
-			) {
-
-				throw new RuntimeException ();
-
-			}
-
-			interfaceValue =
-				getValue (
-					toInterfaceResult);
-
-		}
-
 		out.writeFormat (
 			"<tr>\n",
 			"<th>%h</th>\n",
@@ -155,6 +123,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 	@Override
 	public
 	void renderFormRow (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
@@ -167,6 +136,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			"<td>");
 
 		renderFormInput (
+			submission,
 			out,
 			container,
 			interfaceValue);
@@ -192,6 +162,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 	@Override
 	public
 	void renderFormInput (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue) {
@@ -228,9 +199,12 @@ class TextAreaFormFieldRenderer<Container,Parent>
 
 		out.writeFormat (
 			">%h</textarea>",
-			formValuePresent ()
-				? formValue ()
-				: interfaceValue.or (""));
+			formValuePresent (
+					submission)
+				? formValue (
+					submission)
+				: interfaceValue.or (
+					""));
 
 		if (charCountFunction != null) {
 
@@ -415,31 +389,30 @@ class TextAreaFormFieldRenderer<Container,Parent>
 
 	@Override
 	public
-	boolean formValuePresent () {
+	boolean formValuePresent (
+			@NonNull FormFieldSubmission submission) {
 
-		String paramString =
-			requestContext.parameter (
-				name ());
-
-		return isNotNull (
-			paramString);
+		return submission.hasParameter (
+			name ());
 
 	}
 
-	String formValue () {
+	String formValue (
+			@NonNull FormFieldSubmission submission) {
 
-		return requestContext.parameter (
+		return submission.parameter (
 			name ());
 
 	}
 
 	@Override
 	public
-	Either<Optional<String>,String> formToInterface () {
+	Either<Optional<String>,String> formToInterface (
+			@NonNull FormFieldSubmission submission) {
 
 		return successResult (
 			Optional.fromNullable (
-				requestContext.parameter (
+				submission.parameter (
 					name ())));
 
 	}

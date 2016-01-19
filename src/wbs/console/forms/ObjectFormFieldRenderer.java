@@ -2,6 +2,7 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.ArrayList;
@@ -22,7 +23,6 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.record.Record;
@@ -39,9 +39,6 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 	@Inject
 	ConsoleObjectManager objectManager;
-
-	@Inject
-	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -177,6 +174,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Override
 	public
 	void renderFormRow (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<Interface> interfaceValue,
@@ -189,6 +187,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			"<td>");
 
 		renderFormInput (
+			submission,
 			out,
 			container,
 			interfaceValue);
@@ -214,6 +213,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Override
 	public
 	void renderFormInput (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<Interface> interfaceValue) {
@@ -309,7 +309,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			"<option",
 			" value=\"null\"",
 			equal (
-					requestContext.getForm (name),
+					submission.parameter (
+						name),
 					"null")
 				? " selected"
 				: "",
@@ -343,7 +344,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 				"<option value=\"%h\"",
 				option.getId (),
 				equal (
-						requestContext.getForm (name ()),
+						submission.parameter (
+							name ()),
 						option.getId ().toString ())
 					? " selected"
 					: "",
@@ -374,69 +376,58 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 	@Override
 	public
-	boolean formValuePresent () {
+	boolean formValuePresent (
+			@NonNull FormFieldSubmission submission) {
 
-		String param =
-			requestContext.getForm (
-				name ());
+		return (
 
-		if (param == null)
-			return false;
+			submission.hasParameter (
+				name ())
 
-		if (equal (
-				param,
-				"unchanged"))
-			return false;
+			&& notEqual (
+				submission.parameter (
+					name ()),
+				"unchanged")
 
-		return true;
+		);
 
 	}
 
 	@Override
 	public
-	Either<Optional<Interface>,String> formToInterface () {
+	Either<Optional<Interface>,String> formToInterface (
+			@NonNull FormFieldSubmission submission) {
 
 		String param =
-			requestContext.parameter (
+			submission.parameter (
 				name ());
 
-		if (param == null) {
+		switch (param) {
+
+		case "null":
 
 			return successResult (
 				Optional.<Interface>absent ());
 
-		}
+		case "unchanged":
 
-		if (
-			equal (
-				param,
-				"null")
-		) {
-
-			return successResult (
-				Optional.<Interface>absent ());
-
-		}
-
-		if (
-			equal (
-				param,
-				"unchanged")
-		) {
 			throw new IllegalStateException ();
+
+		default:
+
+			Integer objectId =
+				Integer.parseInt (
+					param);
+
+			Interface interfaceValue =
+				entityFinder.findEntity (
+					objectId);
+
+			return successResult (
+				Optional.of (
+					interfaceValue));
+
 		}
-
-		Integer objectId =
-			Integer.parseInt (
-				param);
-
-		Interface interfaceValue =
-			entityFinder.findEntity (
-				objectId);
-
-		return successResult (
-			Optional.of (
-				interfaceValue));
 
 	}
 

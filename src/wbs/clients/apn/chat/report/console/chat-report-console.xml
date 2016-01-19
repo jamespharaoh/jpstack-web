@@ -140,6 +140,20 @@
 			name="lastJoin"
 			nullable="yes"/>
 
+		<enum-field
+			name="gender"
+			helper="genderConsoleHelper"
+			nullable="yes"/>
+
+		<enum-field
+			name="orient"
+			helper="orientConsoleHelper"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="blockAll"
+			nullable="yes"/>
+
 	</field-set>
 
 	<field-set

@@ -1,9 +1,6 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
-
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -13,7 +10,6 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -22,11 +18,6 @@ import wbs.framework.utils.etc.FormatWriter;
 public
 class HtmlFormFieldRenderer<Container>
 	implements FormFieldRenderer<Container,String> {
-
-	// dependencies
-
-	@Inject
-	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -107,6 +98,7 @@ class HtmlFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormRow (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
@@ -122,6 +114,7 @@ class HtmlFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormInput (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue) {
@@ -144,7 +137,8 @@ class HtmlFormFieldRenderer<Container>
 
 	@Override
 	public
-	boolean formValuePresent () {
+	boolean formValuePresent (
+			@NonNull FormFieldSubmission submission) {
 
 		return false;
 
@@ -173,7 +167,8 @@ class HtmlFormFieldRenderer<Container>
 
 	@Override
 	public
-	Either<Optional<String>,String> formToInterface () {
+	Either<Optional<String>,String> formToInterface (
+			@NonNull FormFieldSubmission submission) {
 
 		throw new UnsupportedOperationException ();
 

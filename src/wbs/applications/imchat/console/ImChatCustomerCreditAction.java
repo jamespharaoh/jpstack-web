@@ -102,6 +102,7 @@ class ImChatCustomerCreditAction
 
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
+				requestContext,
 				formFields,
 				request);
 
@@ -112,6 +113,7 @@ class ImChatCustomerCreditAction
 				updateResultSet);
 
 			formFieldLogic.reportErrors (
+				requestContext,
 				updateResultSet);
 
 			return null;

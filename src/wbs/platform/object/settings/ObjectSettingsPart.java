@@ -213,6 +213,7 @@ class ObjectSettingsPart<
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
+			requestContext,
 			formatWriter,
 			formFieldSet,
 			updateResultSet,

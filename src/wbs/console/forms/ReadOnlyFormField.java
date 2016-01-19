@@ -158,6 +158,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	@Override
 	public
 	void renderFormRow (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<String> error) {
@@ -227,6 +228,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	@Override
 	public
 	UpdateResult<Generic,Native> update (
+			@NonNull FormFieldSubmission submission,
 			@NonNull Container container) {
 
 		return new UpdateResult<Generic,Native> ()

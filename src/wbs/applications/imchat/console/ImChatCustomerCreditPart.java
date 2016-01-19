@@ -117,6 +117,7 @@ class ImChatCustomerCreditPart
 			"<h2>Apply credit</h2>\n");
 
 		formFieldLogic.outputFormTable (
+			requestContext,
 			formatWriter,
 			creditFormFields,
 			updateResultSet,

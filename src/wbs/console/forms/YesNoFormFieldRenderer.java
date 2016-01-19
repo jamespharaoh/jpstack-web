@@ -5,9 +5,6 @@ import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
 import static wbs.framework.utils.etc.Misc.successResult;
-
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -17,7 +14,6 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -26,11 +22,6 @@ import wbs.framework.utils.etc.FormatWriter;
 public
 class YesNoFormFieldRenderer<Container>
 	implements FormFieldRenderer<Container,Boolean> {
-
-	// dependencies
-
-	@Inject
-	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -120,6 +111,7 @@ class YesNoFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormRow (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<Boolean> interfaceValue,
@@ -132,6 +124,7 @@ class YesNoFormFieldRenderer<Container>
 			"<td>");
 
 		renderFormInput (
+			submission,
 			out,
 			container,
 			interfaceValue);
@@ -157,6 +150,7 @@ class YesNoFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormInput (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<Boolean> interfaceValue) {
@@ -187,6 +181,15 @@ class YesNoFormFieldRenderer<Container>
 
 		} else if (interfaceValue.get () == true) {
 
+			if (nullable ()) {
+
+				out.writeFormat (
+					"<option",
+					" value=\"\"",
+					"></option>\n");
+
+			}
+
 			out.writeFormat (
 				"<option",
 				" value=\"yes\"",
@@ -201,6 +204,15 @@ class YesNoFormFieldRenderer<Container>
 				noLabel ());
 
 		} else if (interfaceValue.get () == false) {
+
+			if (nullable ()) {
+
+				out.writeFormat (
+					"<option",
+					" value=\"\"",
+					"></option>\n");
+
+			}
 
 			out.writeFormat (
 				"<option",
@@ -248,32 +260,30 @@ class YesNoFormFieldRenderer<Container>
 
 	@Override
 	public
-	boolean formValuePresent () {
+	boolean formValuePresent (
+			@NonNull FormFieldSubmission submission) {
 
-		String parameterValue =
-			requestContext.parameter (
-				name ());
-
-		return parameterValue != null;
+		return submission.hasParameter (
+			name ());
 
 	}
 
-	String formValue () {
+	String formValue (
+			@NonNull FormFieldSubmission submission) {
 
-		String parameterValue =
-			requestContext.parameter (
-				name ());
-
-		return parameterValue;
+		return submission.parameter (
+			name ());
 
 	}
 
 	@Override
 	public
-	Either<Optional<Boolean>,String> formToInterface () {
+	Either<Optional<Boolean>,String> formToInterface (
+			@NonNull FormFieldSubmission submission) {
 
 		String formValue =
-			formValue ();
+			formValue (
+				submission);
 
 		return successResult (
 			Optional.fromNullable (

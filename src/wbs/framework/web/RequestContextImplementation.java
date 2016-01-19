@@ -157,7 +157,7 @@ class RequestContextImplementation
 
 			for (
 				Map.Entry<String,String> fileItemFieldEntry
-					: fileItemFields.entrySet ()
+					: fileItemFields ().entrySet ()
 			) {
 
 				String[] requestValues =

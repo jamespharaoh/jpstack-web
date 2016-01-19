@@ -14,6 +14,7 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
+import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -32,6 +33,9 @@ class ContextFormActionAction<FormState>
 
 	@Inject
 	FormFieldLogic formFieldLogic;
+
+	@Inject
+	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -73,6 +77,7 @@ class ContextFormActionAction<FormState>
 
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
+				requestContext,
 				fields,
 				formState);
 

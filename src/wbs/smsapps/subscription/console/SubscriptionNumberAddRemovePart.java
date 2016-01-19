@@ -45,6 +45,7 @@ class SubscriptionNumberAddRemovePart
 			new SubscriptionNumberAddRemoveForm ();
 
 		formFieldLogic.update (
+			requestContext,
 			addRemoveFormFieldSet,
 			addRemoveForm);
 
@@ -66,6 +67,7 @@ class SubscriptionNumberAddRemovePart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
+			requestContext,
 			formatWriter,
 			addRemoveFormFieldSet,
 			Optional.<UpdateResultSet>absent (),

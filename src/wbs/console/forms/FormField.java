@@ -40,6 +40,7 @@ interface FormField<Container,Generic,Native,Interface> {
 			Container object);
 
 	void renderFormRow (
+			FormFieldSubmission submission,
 			FormatWriter out,
 			Container object,
 			Optional<String> error);
@@ -54,6 +55,7 @@ interface FormField<Container,Generic,Native,Interface> {
 			Container object);
 
 	UpdateResult<Generic,Native> update (
+			FormFieldSubmission submission,
 			Container container);
 
 	void runUpdateHook (

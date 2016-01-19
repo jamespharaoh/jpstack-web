@@ -162,6 +162,7 @@ class ChatReportRevSharePart
 					"YYYY-MM"));
 
 		formFieldLogic.update (
+			requestContext,
 			searchFields,
 			form);
 
@@ -692,6 +693,7 @@ class ChatReportRevSharePart
 			"<table class=\"details\">\n");
 
 		formFieldLogic.outputFormRows (
+			requestContext,
 			formatWriter,
 			searchFields,
 			Optional.<UpdateResultSet>absent (),

@@ -9,8 +9,6 @@ import static wbs.framework.utils.etc.Misc.toEnum;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -21,7 +19,6 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 import wbs.console.helper.EnumConsoleHelper;
-import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -30,11 +27,6 @@ import wbs.framework.utils.etc.FormatWriter;
 public
 class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	implements FormFieldRenderer<Container,Interface> {
-
-	// dependencies
-
-	@Inject
-	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -136,6 +128,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	@Override
 	public
 	void renderFormRow (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<Interface> interfaceValue,
@@ -148,6 +141,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			"<td>");
 
 		renderFormInput (
+			submission,
 			out,
 			container,
 			interfaceValue);
@@ -173,6 +167,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	@Override
 	public
 	void renderFormInput (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<Interface> interfaceValue) {
@@ -181,8 +176,9 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			new ArrayList<String> ();
 
 		String selectedValue =
-			formValuePresent ()
-				? requestContext.parameter (
+			formValuePresent (
+					submission)
+				? submission.parameter (
 					name ())
 				: interfaceValue.isPresent ()
 					? interfaceValue.get ().toString ()
@@ -230,24 +226,24 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 
 	@Override
 	public
-	boolean formValuePresent () {
+	boolean formValuePresent (
+			@NonNull FormFieldSubmission submission) {
 
-		String paramString =
-			requestContext.parameter (name ());
-
-		return paramString != null;
+		return submission.hasParameter (
+			name ());
 
 	}
 
 	@Override
 	public
-	Either<Optional<Interface>,String> formToInterface () {
+	Either<Optional<Interface>,String> formToInterface (
+			@NonNull FormFieldSubmission submission) {
 
 		return successResult (
 			Optional.fromNullable (
 				toEnum (
 					enumConsoleHelper.enumClass (),
-					requestContext.parameter (
+					submission.parameter (
 						name ()))));
 
 	}

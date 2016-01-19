@@ -2633,6 +2633,14 @@ class Misc {
 
 	}
 
+	public static
+	boolean moreThanZero (
+			long value) {
+
+		return value > 0;
+
+	}
+
 	public static <T>
 	T optionalOr (
 			Optional<T> optional,

@@ -4,9 +4,6 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
-
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -16,7 +13,6 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -25,11 +21,6 @@ import wbs.framework.utils.etc.FormatWriter;
 public
 class TextFormFieldRenderer<Container>
 	implements FormFieldRenderer<Container,String> {
-
-	// dependencies
-
-	@Inject
-	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -128,6 +119,7 @@ class TextFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormRow (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
@@ -140,6 +132,7 @@ class TextFormFieldRenderer<Container>
 			"<td>");
 
 		renderFormInput (
+			submission,
 			out,
 			container,
 			interfaceValue);
@@ -165,6 +158,7 @@ class TextFormFieldRenderer<Container>
 	@Override
 	public
 	void renderFormInput (
+			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue) {
@@ -179,9 +173,12 @@ class TextFormFieldRenderer<Container>
 			" name=\"%h\"",
 			name (),
 			" value=\"%h\"",
-			formValuePresent ()
-				? formValue ()
-				: interfaceValue.or (""),
+			formValuePresent (
+					submission)
+				? formValue (
+					submission)
+				: interfaceValue.or (
+					""),
 			">\n");
 
 	}
@@ -204,29 +201,30 @@ class TextFormFieldRenderer<Container>
 
 	@Override
 	public
-	boolean formValuePresent () {
+	boolean formValuePresent (
+			@NonNull FormFieldSubmission submission) {
 
-		String paramString =
-			requestContext.parameter (
-				name ());
-
-		return paramString != null;
+		return submission.hasParameter (
+			name ());
 
 	}
 
-	String formValue () {
+	String formValue (
+			@NonNull FormFieldSubmission submission) {
 
-		return requestContext.parameter (
+		return submission.parameter (
 			name ());
 
 	}
 
 	@Override
 	public
-	Either<Optional<String>,String> formToInterface () {
+	Either<Optional<String>,String> formToInterface (
+			@NonNull FormFieldSubmission submission) {
 
 		String formValue =
-			formValue ();
+			formValue (
+				submission);
 
 		if (
 
