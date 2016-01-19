@@ -4,6 +4,8 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -170,11 +172,16 @@ class CodeFormFieldBuilder {
 
 		// value validator
 
-		FormFieldValueValidator valueValidator =
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
+
+		valueValidators.add (
 			codeFormFieldValueValidatorProvider.get ()
 
 			.pattern (
-				pattern);
+				pattern)
+
+		);
 
 		// constraint validator
 
@@ -198,10 +205,7 @@ class CodeFormFieldBuilder {
 				label)
 
 			.nullable (
-				false)
-
-			.size (
-				FormField.defaultSize);
+				false);
 
 		// update hook
 
@@ -258,8 +262,8 @@ class CodeFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

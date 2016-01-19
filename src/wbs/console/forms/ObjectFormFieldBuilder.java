@@ -8,6 +8,9 @@ import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.optionalEquals;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -46,10 +49,6 @@ class ObjectFormFieldBuilder {
 	@Inject
 	Provider<DereferenceFormFieldAccessor>
 	dereferenceFormFieldAccessorProvider;
-
-	@Inject
-	Provider<NullFormFieldValueValidator>
-	nullFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<IdentityFormFieldInterfaceMapping>
@@ -237,8 +236,8 @@ class ObjectFormFieldBuilder {
 
 		// value validator
 
-		FormFieldValueValidator valueValidator =
-			nullFormFieldValueValidatorProvider.get ();
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
 
 		// constraint validator
 
@@ -309,8 +308,8 @@ class ObjectFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

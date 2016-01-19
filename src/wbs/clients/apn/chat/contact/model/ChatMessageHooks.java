@@ -10,11 +10,11 @@ import javax.inject.Provider;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.database.Database;
-import wbs.framework.object.AbstractObjectHooks;
+import wbs.framework.object.ObjectHooks;
 
 public
 class ChatMessageHooks
-	extends AbstractObjectHooks<ChatMessageRec> {
+	implements ObjectHooks<ChatMessageRec> {
 
 	// dependencies
 

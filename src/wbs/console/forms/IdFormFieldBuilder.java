@@ -101,9 +101,6 @@ class IdFormFieldBuilder {
 			.label (
 				label)
 
-			.size (
-				FormField.defaultSize)
-
 			.nullable (
 				false);
 

@@ -1,12 +1,12 @@
 package wbs.clients.apn.chat.scheme.model;
 
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.object.ObjectHelper;
+import wbs.framework.object.ObjectHooks;
 import wbs.framework.record.Record;
 
 public
 class ChatSchemeChargesHooks
-	extends AbstractObjectHooks<ChatSchemeChargesRec> {
+	implements ObjectHooks<ChatSchemeChargesRec> {
 
 	@Override
 	public

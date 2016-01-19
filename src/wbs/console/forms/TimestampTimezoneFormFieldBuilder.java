@@ -4,6 +4,9 @@ import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -37,10 +40,6 @@ class TimestampTimezoneFormFieldBuilder {
 	@Inject
 	Provider<NullFormFieldConstraintValidator>
 	nullFormFieldConstraintValidatorProvider;
-
-	@Inject
-	Provider<NullFormFieldValueValidator>
-	nullFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<PairFormFieldAccessor>
@@ -102,11 +101,6 @@ class TimestampTimezoneFormFieldBuilder {
 				spec.nullable (),
 				false);
 
-		Integer size =
-			ifNull (
-				spec.size (),
-				FormField.defaultSize);
-
 		// accessor
 
 		FormFieldAccessor accessor =
@@ -137,8 +131,8 @@ class TimestampTimezoneFormFieldBuilder {
 
 		// value validator
 
-		FormFieldValueValidator valueValidator =
-			nullFormFieldValueValidatorProvider.get ();
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
 
 		// constraint validator
 
@@ -165,10 +159,7 @@ class TimestampTimezoneFormFieldBuilder {
 				label)
 
 			.nullable (
-				nullable)
-
-			.size (
-				size);
+				nullable);
 
 		// update hook
 
@@ -222,8 +213,8 @@ class TimestampTimezoneFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

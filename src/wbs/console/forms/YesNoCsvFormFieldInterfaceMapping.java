@@ -1,10 +1,14 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.errorResult;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.successResult;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
 
@@ -12,10 +16,18 @@ import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 
+@Accessors (fluent = true)
 @PrototypeComponent ("yesNoCsvFormFieldInterfaceMapping")
 public
 class YesNoCsvFormFieldInterfaceMapping<Container>
 	implements FormFieldInterfaceMapping<Container,Boolean,String> {
+
+	// properties
+
+	@Getter @Setter
+	Boolean nullable;
+
+	// implementation
 
 	@Override
 	public
@@ -52,12 +64,31 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 				"")
 		) {
 
-			return successResult (
-				Optional.<Boolean>absent ());
+			if (nullable ()) {
+
+				return successResult (
+					Optional.<Boolean>absent ());
+
+			} else {
+
+				return errorResult (
+					"This is a required field");
+
+			}
 
 		} else {
 
-			throw new IllegalArgumentException ();
+			if (nullable ()) {
+
+				return errorResult (
+					"This field must contain 'yes' or 'no', or be empty");
+
+			} else {
+
+				return errorResult (
+					"This field must contain 'yes' or 'no'");
+
+			}
 
 		}
 

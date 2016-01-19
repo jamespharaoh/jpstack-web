@@ -5,11 +5,13 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.forms.FormField;
 import wbs.console.forms.FormFieldAccessor;
 import wbs.console.forms.FormFieldBuilderContext;
 import wbs.console.forms.FormFieldConstraintValidator;
@@ -182,7 +184,10 @@ class CurrencyFormFieldBuilder {
 
 		// value validator
 
-		FormFieldValueValidator valueValidator =
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
+
+		valueValidators.add (
 			integerFormFieldValueValidatorProvider.get ()
 
 			.label (
@@ -192,7 +197,9 @@ class CurrencyFormFieldBuilder {
 				minimum)
 
 			.maximum (
-				maximum);
+				maximum)
+
+		);
 
 		// constraint validator
 
@@ -220,9 +227,6 @@ class CurrencyFormFieldBuilder {
 
 			.label (
 				label)
-
-			.size (
-				FormField.defaultSize)
 
 			.nullable (
 				ifNull (
@@ -259,8 +263,8 @@ class CurrencyFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

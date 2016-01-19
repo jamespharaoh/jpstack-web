@@ -6,6 +6,9 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -193,8 +196,11 @@ class NameFormFieldBuilder {
 
 		// value validator
 
-		FormFieldValueValidator valueValidator =
-			nameFormFieldValueValidatorProvider.get ();
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
+
+		valueValidators.add (
+			nameFormFieldValueValidatorProvider.get ());
 
 		// constraint validator
 
@@ -218,10 +224,7 @@ class NameFormFieldBuilder {
 				label)
 
 			.nullable (
-				false)
-
-			.size (
-				FormField.defaultSize);
+				false);
 
 		// update hook
 
@@ -275,8 +278,8 @@ class NameFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

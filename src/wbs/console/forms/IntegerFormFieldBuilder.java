@@ -5,6 +5,9 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -193,7 +196,10 @@ class IntegerFormFieldBuilder {
 
 		// value validator
 
-		FormFieldValueValidator valueValidator =
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
+
+		valueValidators.add (
 			integerFormFieldValueValidatorProvider.get ()
 
 			.label (
@@ -203,7 +209,9 @@ class IntegerFormFieldBuilder {
 				minimum)
 
 			.maximum (
-				maximum);
+				maximum)
+
+		);
 
 		// constraint validator
 
@@ -228,9 +236,6 @@ class IntegerFormFieldBuilder {
 
 			.label (
 				label)
-
-			.size (
-				FormField.defaultSize)
 
 			.nullable (
 				ifNull (
@@ -267,8 +272,8 @@ class IntegerFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

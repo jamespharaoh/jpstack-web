@@ -1,8 +1,10 @@
-package wbs.console.forms;
+package wbs.sms.gazetteer.console;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isPresent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +12,27 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.forms.ChainedFormFieldNativeMapping;
+import wbs.console.forms.DereferenceFormFieldAccessor;
+import wbs.console.forms.DynamicFormFieldAccessor;
+import wbs.console.forms.FormFieldAccessor;
+import wbs.console.forms.FormFieldBuilderContext;
+import wbs.console.forms.FormFieldConstraintValidator;
+import wbs.console.forms.FormFieldInterfaceMapping;
+import wbs.console.forms.FormFieldNativeMapping;
+import wbs.console.forms.FormFieldPluginManagerImplementation;
+import wbs.console.forms.FormFieldRenderer;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormFieldUpdateHook;
+import wbs.console.forms.FormFieldValueValidator;
+import wbs.console.forms.NullFormFieldConstraintValidator;
+import wbs.console.forms.ReadOnlyFormField;
+import wbs.console.forms.SimpleFormFieldAccessor;
+import wbs.console.forms.TextFormFieldRenderer;
+import wbs.console.forms.UpdatableFormField;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -18,12 +40,13 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.utils.etc.BeanLogic;
+import wbs.sms.gazetteer.model.GazetteerEntryRec;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
-@PrototypeComponent ("textFormFieldBuilder")
+@PrototypeComponent ("gazetteerFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class TextFormFieldBuilder {
+class GazetteerFormFieldBuilder {
 
 	// dependencies
 
@@ -33,11 +56,22 @@ class TextFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
+	Provider<ChainedFormFieldNativeMapping>
+	chainedFormFieldNativeMappingProvider;
+
+	@Inject
+	Provider<DereferenceFormFieldAccessor> dereferenceFormFieldAccessorProvider;
+
+	@Inject
 	Provider<DynamicFormFieldAccessor> dynamicFormFieldAccessorProvider;
 
 	@Inject
-	Provider<IdentityFormFieldInterfaceMapping>
-	identityFormFieldInterfaceMappingProvider;
+	Provider<GazetteerCodeFormFieldNativeMapping>
+	gazetteerCodeFormFieldNativeMappingProvider;
+
+	@Inject
+	Provider<GazetteerFormFieldInterfaceMapping>
+	gazetteerFormFieldInterfaceMappingProvider;
 
 	@Inject
 	Provider<NullFormFieldConstraintValidator>
@@ -61,10 +95,10 @@ class TextFormFieldBuilder {
 	FormFieldBuilderContext context;
 
 	@BuilderSource
-	TextFormFieldSpec textFormFieldSpec;
+	GazetteerFormFieldSpec spec;
 
 	@BuilderTarget
-	FormFieldSet formFieldSet;
+	FormFieldSet target;
 
 	// build
 
@@ -74,29 +108,36 @@ class TextFormFieldBuilder {
 			Builder builder) {
 
 		String name =
-			textFormFieldSpec.name ();
+			spec.name ();
+
+		String nativeFieldName =
+			ifNull (
+				spec.fieldName (),
+				name);
 
 		String label =
 			ifNull (
-				textFormFieldSpec.label (),
-				capitalise (camelToSpaces (name)));
+				spec.label (),
+				capitalise (
+					camelToSpaces (
+						name)));
 
 		Boolean readOnly =
 			ifNull (
-				textFormFieldSpec.readOnly (),
+				spec.readOnly (),
 				false);
 
 		Boolean nullable =
 			ifNull (
-				textFormFieldSpec.nullable (),
+				spec.nullable (),
 				false);
 
 		Boolean dynamic =
 			ifNull (
-				textFormFieldSpec.dynamic (),
+				spec.dynamic (),
 				false);
 
-		// field type
+		// property class
 
 		Class<?> propertyClass;
 
@@ -105,13 +146,15 @@ class TextFormFieldBuilder {
 			propertyClass =
 				BeanLogic.propertyClassForClass (
 					context.containerClass (),
-					name);
+					nativeFieldName);
 
 		} else {
 
-			propertyClass = String.class;
+			propertyClass =
+				GazetteerEntryRec.class;
 
 		}
+
 
 		// accessor
 
@@ -123,10 +166,18 @@ class TextFormFieldBuilder {
 				dynamicFormFieldAccessorProvider.get ()
 
 				.name (
-					name)
+					nativeFieldName)
 
 				.nativeClass (
 					propertyClass);
+
+		} else if (readOnly) {
+
+			accessor =
+				dereferenceFormFieldAccessorProvider.get ()
+
+				.path (
+					nativeFieldName);
 
 		} else {
 
@@ -134,24 +185,64 @@ class TextFormFieldBuilder {
 				simpleFormFieldAccessorProvider.get ()
 
 				.name (
-					name)
+					nativeFieldName)
 
 				.nativeClass (
 					propertyClass);
 
 		}
 
-		// TODO dynamic
-
 		// native mapping
 
-		FormFieldNativeMapping nativeMapping =
-			formFieldPluginManager.getNativeMappingRequired (
+		FormFieldNativeMapping nativeMapping;
+
+		Optional gazetteerNativeMappingOptional =
+			formFieldPluginManager.getNativeMapping (
 				context,
 				context.containerClass (),
 				name,
-				String.class,
+				GazetteerEntryRec.class,
 				propertyClass);
+
+		if (
+			isPresent (
+				gazetteerNativeMappingOptional)
+		) {
+
+			nativeMapping =
+				(FormFieldNativeMapping)
+				gazetteerNativeMappingOptional.get ();
+
+		} else {
+
+			Optional stringNativeMappingOptional =
+				formFieldPluginManager.getNativeMapping (
+					context,
+					context.containerClass (),
+					name,
+					String.class,
+					propertyClass);
+
+			if (
+				isNotPresent (
+					stringNativeMappingOptional)
+			) {
+
+				throw new RuntimeException ();
+
+			}
+
+			nativeMapping =
+				chainedFormFieldNativeMappingProvider.get ()
+
+				.previousMapping (
+					gazetteerCodeFormFieldNativeMappingProvider.get ())
+
+				.nextMapping (
+					(FormFieldNativeMapping)
+					stringNativeMappingOptional.get ());
+
+		}
 
 		// value validator
 
@@ -166,7 +257,7 @@ class TextFormFieldBuilder {
 		// interface mapping
 
 		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
+			gazetteerFormFieldInterfaceMappingProvider.get ();
 
 		// renderer
 
@@ -194,7 +285,7 @@ class TextFormFieldBuilder {
 
 		if (readOnly) {
 
-			formFieldSet.addFormField (
+			target.addFormField (
 				readOnlyFormFieldProvider.get ()
 
 				.name (
@@ -222,7 +313,7 @@ class TextFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.addFormField (
+			target.addFormField (
 				updatableFormFieldProvider.get ()
 
 				.name (

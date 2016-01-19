@@ -9,9 +9,9 @@ import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.isRight;
 import static wbs.framework.utils.etc.Misc.optionalOr;
 import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,10 +63,10 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	FormFieldAccessor<Container,Native> accessor;
 
 	@Getter @Setter
-	FormFieldNativeMapping<Generic,Native> nativeMapping;
+	FormFieldNativeMapping<Container,Generic,Native> nativeMapping;
 
 	@Getter @Setter
-	FormFieldValueValidator<Generic> valueValidator;
+	List<FormFieldValueValidator<Generic>> valueValidators;
 
 	@Getter @Setter
 	FormFieldConstraintValidator<Container,Native> constraintValidator;
@@ -100,26 +100,6 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	void init (
 			String fieldSetName) {
 
-		if (valueValidator == null) {
-
-			throw new NullPointerException (
-				stringFormat (
-					"No value validator for %s.%s",
-					fieldSetName,
-					name));
-
-		}
-
-		if (interfaceMapping == null) {
-
-			throw new NullPointerException (
-				stringFormat (
-					"No interface mapping for %s.%s",
-					fieldSetName,
-					name));
-
-		}
-
 	}
 
 	@Override
@@ -138,6 +118,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		Optional<Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
+					container,
 					nativeValue));
 
 		Optional<Interface> interfaceValue =
@@ -170,6 +151,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		Optional<Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
+					container,
 					nativeValue));
 
 		Optional<Interface> interfaceValue =
@@ -202,6 +184,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		Optional<Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
+					container,
 					nativeValue));
 
 		Optional<Interface> interfaceValue =
@@ -235,6 +218,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		Optional<Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
+					container,
 					nativeValue));
 
 		Optional<Interface> interfaceValue =
@@ -266,6 +250,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		Optional<Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
+					container,
 					nativeValue));
 
 		String csvValue =
@@ -358,23 +343,30 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 
 		// perform value validation
 
-		Optional<String> valueError =
-			valueValidator.validate (
-				newGenericValue);
-
-		if (
-			isPresent (
-				valueError)
+		for (
+			FormFieldValueValidator<Generic> valueValidator
+				: valueValidators
 		) {
 
-			return new UpdateResult<Generic,Native> ()
+			Optional<String> valueError =
+				valueValidator.validate (
+					newGenericValue);
 
-				.updated (
-					false)
+			if (
+				isPresent (
+					valueError)
+			) {
 
-				.error (
-					Optional.of (
-						valueError.get ()));
+				return new UpdateResult<Generic,Native> ()
+
+					.updated (
+						false)
+
+					.error (
+						Optional.of (
+							valueError.get ()));
+
+			}
 
 		}
 
@@ -383,6 +375,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		Optional<Native> newNativeValue =
 			requiredValue (
 				nativeMapping.genericToNative (
+					container,
 					newGenericValue));
 
 		// check new value
@@ -417,6 +410,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		Optional<Generic> oldGenericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
+					container,
 					oldNativeValue));
 
 		if (

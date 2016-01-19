@@ -8,12 +8,13 @@ import wbs.framework.application.annotations.PrototypeComponent;
 
 @PrototypeComponent ("identityFormFieldNativeMapping")
 public
-class IdentityFormFieldNativeMapping<Type>
-	implements FormFieldNativeMapping<Type,Type> {
+class IdentityFormFieldNativeMapping<Container,Type>
+	implements FormFieldNativeMapping<Container,Type,Type> {
 
 	@Override
 	public
 	Optional<Type> nativeToGeneric (
+			@NonNull Container container,
 			@NonNull Optional<Type> nativeValue) {
 
 		return nativeValue;
@@ -23,6 +24,7 @@ class IdentityFormFieldNativeMapping<Type>
 	@Override
 	public
 	Optional<Type> genericToNative (
+			@NonNull Container container,
 			@NonNull Optional<Type> genericValue) {
 
 		return genericValue;

@@ -1,5 +1,6 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -31,7 +32,7 @@ class FormFieldPluginManagerImplementation
 
 	@Override
 	public
-	FormFieldNativeMapping<?,?> getNativeMapping (
+	Optional<FormFieldNativeMapping<?,?,?>> getNativeMapping (
 			FormFieldBuilderContext context,
 			Class<?> containerClass,
 			String fieldName,
@@ -43,7 +44,7 @@ class FormFieldPluginManagerImplementation
 				: formFieldPluginProviders
 		) {
 
-			Optional<FormFieldNativeMapping<?,?>> optionalNativeMapping =
+			Optional<FormFieldNativeMapping<?,?,?>> optionalNativeMapping =
 				pluginProvider.getNativeMapping (
 					context,
 					containerClass,
@@ -52,18 +53,50 @@ class FormFieldPluginManagerImplementation
 					nativeClass);
 
 			if (optionalNativeMapping.isPresent ()) {
-				return optionalNativeMapping.get ();
+				return optionalNativeMapping;
 			}
 
 		}
 
-		throw new RuntimeException (
-			stringFormat (
-				"Don't know how to natively map %s as %s for %s.%s",
-				genericClass.getSimpleName (),
-				nativeClass.getSimpleName (),
-				containerClass.getSimpleName (),
-				fieldName));
+		return Optional.<FormFieldNativeMapping<?,?,?>>absent ();
+
+	}
+
+	@Override
+	public
+	FormFieldNativeMapping<?,?,?> getNativeMappingRequired (
+			FormFieldBuilderContext context,
+			Class<?> containerClass,
+			String fieldName,
+			Class<?> genericClass,
+			Class<?> nativeClass) {
+
+		Optional<FormFieldNativeMapping<?,?,?>> result =
+			getNativeMapping (
+				context,
+				containerClass,
+				fieldName,
+				genericClass,
+				nativeClass);
+
+		if (
+			isPresent (
+				result)
+		) {
+
+			return result.get ();
+
+		} else {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Don't know how to natively map %s as %s for %s.%s",
+					genericClass.getSimpleName (),
+					nativeClass.getSimpleName (),
+					containerClass.getSimpleName (),
+					fieldName));
+
+		}
 
 	}
 

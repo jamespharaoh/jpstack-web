@@ -4,6 +4,9 @@ import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -45,10 +48,6 @@ class TextAreaFormFieldBuilder {
 	@Inject
 	Provider<NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
-
-	@Inject
-	Provider<NullFormFieldValueValidator>
-	nullFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<ReadOnlyFormField>
@@ -196,8 +195,8 @@ class TextAreaFormFieldBuilder {
 
 		// native mapping
 
-		FormFieldNativeMapping<?,?> nativeMapping =
-			formFieldPluginManager.getNativeMapping (
+		FormFieldNativeMapping nativeMapping =
+			formFieldPluginManager.getNativeMappingRequired (
 				context,
 				context.containerClass (),
 				name,
@@ -206,8 +205,8 @@ class TextAreaFormFieldBuilder {
 
 		// value validator
 
-		FormFieldValueValidator valueValidator =
-			nullFormFieldValueValidatorProvider.get ();
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
 
 		// interface mapping
 
@@ -315,8 +314,8 @@ class TextAreaFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

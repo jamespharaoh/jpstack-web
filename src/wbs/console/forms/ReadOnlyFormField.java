@@ -55,7 +55,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	FormFieldAccessor<Container,Native> accessor;
 
 	@Getter @Setter
-	FormFieldNativeMapping<Generic,Native> nativeMapping;
+	FormFieldNativeMapping<Container,Generic,Native> nativeMapping;
 
 	@Getter @Setter
 	FormFieldInterfaceMapping<Container,Generic,Interface> interfaceMapping;
@@ -107,6 +107,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 		Optional<Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
+					container,
 					nativeValue));
 
 		Optional<Interface> interfaceValue =
@@ -139,6 +140,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 		Optional<Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
+					container,
 					nativeValue));
 
 		Optional<Interface> interfaceValue =
@@ -171,6 +173,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 		Optional<Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
+					container,
 					nativeValue));
 
 		Optional<Interface> interfaceValue =
@@ -210,6 +213,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 		Optional<Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
+					container,
 					nativeValue));
 
 		String csvValue =

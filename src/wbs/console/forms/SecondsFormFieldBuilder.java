@@ -5,6 +5,9 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -50,10 +53,6 @@ class SecondsFormFieldBuilder {
 	@Inject
 	Provider<NullFormFieldConstraintValidator>
 	nullFormFieldConstraintValidatorProvider;
-
-	@Inject
-	Provider<NullFormFieldValueValidator>
-	nullFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<SecondsFormFieldInterfaceMapping>
@@ -149,9 +148,17 @@ class SecondsFormFieldBuilder {
 
 		}
 
+		// value validators
+
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
+
+		// constraint validator
 
 		FormFieldConstraintValidator constraintValidator =
 			nullFormFieldConstraintValidatorProvider.get ();
+
+		// interface mapping
 
 		FormFieldInterfaceMapping interfaceMapping =
 			secondsFormFieldInterfaceMapping.get ()
@@ -161,6 +168,8 @@ class SecondsFormFieldBuilder {
 
 			.format (
 				format);
+
+		// renderer
 
 		FormFieldRenderer renderer =
 			textFormFieldRendererProvider.get ()
@@ -173,9 +182,6 @@ class SecondsFormFieldBuilder {
 
 			.nullable (
 				nullable)
-
-			.size (
-				FormField.defaultSize)
 
 			.align (
 				format == SecondsFormFieldSpec.Format.numeric
@@ -209,8 +215,8 @@ class SecondsFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					nullFormFieldValueValidatorProvider.get ())
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

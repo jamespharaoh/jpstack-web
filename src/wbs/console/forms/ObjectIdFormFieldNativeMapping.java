@@ -14,8 +14,8 @@ import wbs.framework.record.Record;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectIdFormFieldNativeMapping")
 public
-class ObjectIdFormFieldNativeMapping<Type extends Record<Type>>
-	implements FormFieldNativeMapping<Type,Integer> {
+class ObjectIdFormFieldNativeMapping<Container,Type extends Record<Type>>
+	implements FormFieldNativeMapping<Container,Type,Integer> {
 
 	// properties
 
@@ -27,6 +27,7 @@ class ObjectIdFormFieldNativeMapping<Type extends Record<Type>>
 	@Override
 	public
 	Optional<Type> nativeToGeneric (
+			@NonNull Container container,
 			@NonNull Optional<Integer> nativeValue) {
 
 		if (! nativeValue.isPresent ()) {
@@ -48,6 +49,7 @@ class ObjectIdFormFieldNativeMapping<Type extends Record<Type>>
 	@Override
 	public
 	Optional<Integer> genericToNative (
+			@NonNull Container container,
 			@NonNull Optional<Type> genericValue) {
 
 		if (! genericValue.isPresent ()) {

@@ -5,6 +5,9 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -33,10 +36,6 @@ class ObjectIdFormFieldBuilder {
 	FormFieldPluginManager formFieldPluginManager;
 
 	// prototype dependencies
-
-	@Inject
-	Provider<NullFormFieldValueValidator>
-	nullFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<IdentityFormFieldInterfaceMapping>
@@ -137,20 +136,30 @@ class ObjectIdFormFieldBuilder {
 			.nativeClass (
 				Integer.class);
 
+		// native mapping
+
 		FormFieldNativeMapping nativeMapping =
 			objectIdFormFieldNativeMappingProvider.get ()
 
 			.consoleHelper (
 				consoleHelper);
 
-		FormFieldValueValidator valueValidator =
-			nullFormFieldValueValidatorProvider.get ();
+		// value validators
+
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
+
+		// constraint validator
 
 		FormFieldConstraintValidator constraintValidator =
 			objectFormFieldConstraintValidatorProvider.get ();
 
+		// interface mapping
+
 		FormFieldInterfaceMapping interfaceMapping =
 			identityFormFieldInterfaceMappingProvider.get ();
+
+		// renderer
 
 		FormFieldRenderer renderer =
 			objectFormFieldRendererProvider.get ()
@@ -200,8 +209,8 @@ class ObjectIdFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

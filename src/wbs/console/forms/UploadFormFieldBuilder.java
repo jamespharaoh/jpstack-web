@@ -4,6 +4,9 @@ import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -39,10 +42,6 @@ class UploadFormFieldBuilder {
 	@Inject
 	Provider<NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
-
-	@Inject
-	Provider<NullFormFieldValueValidator>
-	nullFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<ReadOnlyFormField>
@@ -102,8 +101,8 @@ class UploadFormFieldBuilder {
 
 		// value validator
 
-		FormFieldValueValidator valueValidator =
-			nullFormFieldValueValidatorProvider.get ();
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
 
 		// constraint validator
 
@@ -151,8 +150,8 @@ class UploadFormFieldBuilder {
 			.nativeMapping (
 				nativeMapping)
 
-			.valueValidator (
-				valueValidator)
+			.valueValidators (
+				valueValidators)
 
 			.constraintValidator (
 				constraintValidator)

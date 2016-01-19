@@ -60,10 +60,10 @@ import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginModelsSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
-import wbs.framework.object.AbstractObjectHooks;
 import wbs.framework.object.ObjectHelperFactory;
 import wbs.framework.object.ObjectHelperProvider;
 import wbs.framework.object.ObjectHelperProviderFactory;
+import wbs.framework.object.ObjectHooks;
 
 @Accessors (fluent = true)
 @Log4j
@@ -1131,7 +1131,7 @@ class ApplicationContextBuilder {
 					objectHooksBeanName)
 
 				.beanClass (
-					AbstractObjectHooks.class)
+					ObjectHooks.DefaultImplementation.class)
 
 				.scope (
 					"singleton")

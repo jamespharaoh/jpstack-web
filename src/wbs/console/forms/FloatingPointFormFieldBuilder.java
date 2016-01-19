@@ -5,6 +5,9 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -143,9 +146,12 @@ class FloatingPointFormFieldBuilder {
 		FormFieldNativeMapping nativeMapping =
 			identityFormFieldNativeMappingProvider.get ();
 
-		// value validator
+		// value validators
 
-		FormFieldValueValidator valueValidator =
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
+
+		valueValidators.add (
 			floatingPointFormFieldValueValidatorProvider.get ()
 
 			.label (
@@ -155,7 +161,9 @@ class FloatingPointFormFieldBuilder {
 				minimum)
 
 			.maximum (
-				maximum);
+				maximum)
+
+		);
 
 		// constraint validator
 
@@ -177,9 +185,6 @@ class FloatingPointFormFieldBuilder {
 
 			.label (
 				label)
-
-			.size (
-				FormField.defaultSize)
 
 			.nullable (
 				ifNull (
@@ -213,8 +218,8 @@ class FloatingPointFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

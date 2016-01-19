@@ -3,6 +3,7 @@
 	package="wbs.console.forms">
 
 	<layer name="console">
+		<bean class="ChainedFormFieldNativeMapping"/>
 		<bean class="CodeFormFieldBuilder"/>
 		<bean class="CodeFormFieldConstraintValidator"/>
 		<bean class="CodeFormFieldSpec"/>

@@ -5,6 +5,9 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -23,7 +26,6 @@ import wbs.console.forms.FormFieldValueValidator;
 import wbs.console.forms.IdentityFormFieldInterfaceMapping;
 import wbs.console.forms.IdentityFormFieldNativeMapping;
 import wbs.console.forms.NullFormFieldConstraintValidator;
-import wbs.console.forms.NullFormFieldValueValidator;
 import wbs.console.forms.ReadOnlyFormField;
 import wbs.console.forms.SimpleFormFieldAccessor;
 import wbs.console.forms.UpdatableFormField;
@@ -67,10 +69,6 @@ class ImageFormFieldBuilder {
 	@Inject
 	Provider<NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
-
-	@Inject
-	Provider<NullFormFieldValueValidator>
-	nullFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<ReadOnlyFormField>
@@ -173,8 +171,8 @@ class ImageFormFieldBuilder {
 
 		// value validator
 
-		FormFieldValueValidator valueValidator =
-			nullFormFieldValueValidatorProvider.get ();
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
 
 		// constraint validator
 
@@ -230,8 +228,8 @@ class ImageFormFieldBuilder {
 			.nativeMapping (
 				nativeMapping)
 
-			.valueValidator (
-				valueValidator)
+			.valueValidators (
+				valueValidators)
 
 			.constraintValidator (
 				constraintValidator)

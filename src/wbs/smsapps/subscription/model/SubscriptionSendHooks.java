@@ -1,10 +1,10 @@
 package wbs.smsapps.subscription.model;
 
-import wbs.framework.object.AbstractObjectHooks;
+import wbs.framework.object.ObjectHooks;
 
 public
 class SubscriptionSendHooks
-	extends AbstractObjectHooks<SubscriptionSendRec> {
+	implements ObjectHooks<SubscriptionSendRec> {
 
 	// implementation
 

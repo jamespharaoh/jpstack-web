@@ -34,9 +34,6 @@ class TextFormFieldRenderer<Container>
 	Boolean nullable;
 
 	@Getter @Setter
-	Integer size;
-
-	@Getter @Setter
 	Align align;
 
 	// details
@@ -166,8 +163,6 @@ class TextFormFieldRenderer<Container>
 		out.writeFormat (
 			"<input",
 			" type=\"text\"",
-			" size=\"%h\"",
-			size (),
 			" id=\"%h\"",
 			name (),
 			" name=\"%h\"",
@@ -179,6 +174,8 @@ class TextFormFieldRenderer<Container>
 					submission)
 				: interfaceValue.or (
 					""),
+			" size=\"%h\"",
+			FormField.defaultSize,
 			">\n");
 
 	}

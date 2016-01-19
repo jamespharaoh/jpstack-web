@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.database.Database;
-import wbs.framework.object.AbstractObjectHooks;
+import wbs.framework.object.ObjectHooks;
 import wbs.platform.object.core.model.ObjectTypeDao;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.sms.message.batch.logic.BatchLogic;
@@ -18,7 +18,7 @@ import wbs.smsapps.broadcast.logic.BroadcastLogic;
 
 public
 class BroadcastHooks
-	extends AbstractObjectHooks<BroadcastRec> {
+	implements ObjectHooks<BroadcastRec> {
 
 	// dependencies
 

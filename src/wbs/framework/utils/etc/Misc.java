@@ -748,6 +748,14 @@ class Misc {
 	}
 
 	public static
+	String lowercase (
+			@NonNull String string) {
+
+		return string.toLowerCase ();
+
+	}
+
+	public static
 	String capitalise (
 			@NonNull String string) {
 

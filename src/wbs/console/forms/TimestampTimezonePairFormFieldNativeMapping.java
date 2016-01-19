@@ -13,12 +13,13 @@ import wbs.framework.application.annotations.PrototypeComponent;
 
 @PrototypeComponent ("timestampTimezonePairFormFieldNativeMapping")
 public
-class TimestampTimezonePairFormFieldNativeMapping
-	implements FormFieldNativeMapping<DateTime,Pair<Instant,String>> {
+class TimestampTimezonePairFormFieldNativeMapping<Container>
+	implements FormFieldNativeMapping<Container,DateTime,Pair<Instant,String>> {
 
 	@Override
 	public
 	Optional<DateTime> nativeToGeneric (
+			@NonNull Container container,
 			@NonNull Optional<Pair<Instant,String>> nativeValue) {
 
 		if (! nativeValue.isPresent ()) {
@@ -39,6 +40,7 @@ class TimestampTimezonePairFormFieldNativeMapping
 	@Override
 	public
 	Optional<Pair<Instant,String>> genericToNative (
+			@NonNull Container container,
 			@NonNull Optional<DateTime> genericValue) {
 
 		if (! genericValue.isPresent ()) {

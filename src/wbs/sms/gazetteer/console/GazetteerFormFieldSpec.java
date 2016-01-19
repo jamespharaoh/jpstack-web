@@ -1,8 +1,6 @@
-package wbs.console.forms;
+package wbs.sms.gazetteer.console;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleModuleData;
@@ -12,17 +10,17 @@ import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("text-field")
-@PrototypeComponent ("textFormFieldSpec")
+@DataClass ("gazetteer-field")
+@PrototypeComponent ("gazetteerFormFieldSpec")
 @ConsoleModuleData
 public
-class TextFormFieldSpec {
+class GazetteerFormFieldSpec {
 
 	@DataAttribute (
 		required = true)
 	String name;
 
-	@Getter @Setter
+	@DataAttribute
 	boolean dynamic;
 
 	@DataAttribute
@@ -33,5 +31,21 @@ class TextFormFieldSpec {
 
 	@DataAttribute
 	Boolean nullable;
+
+	@DataAttribute (
+		name = "field")
+	String fieldName;
+
+	@DataAttribute (
+		name = "code-field")
+	String codeFieldName;
+
+	@DataAttribute (
+		name = "location-field")
+	String locationFieldName;
+
+	@DataAttribute (
+		name = "gazetteer")
+	String gazetteerFieldName;
 
 }

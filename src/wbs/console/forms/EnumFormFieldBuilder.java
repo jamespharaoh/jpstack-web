@@ -4,6 +4,9 @@ import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -54,10 +57,6 @@ class EnumFormFieldBuilder {
 	nullFormFieldValueConstraintValidatorProvider;
 
 	@Inject
-	Provider<NullFormFieldValueValidator>
-	nullFormFieldValueValidatorProvider;
-
-	@Inject
 	Provider<ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
@@ -65,7 +64,7 @@ class EnumFormFieldBuilder {
 	Provider<SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
-@Inject
+	@Inject
 	Provider<UpdatableFormField>
 	updatableFormFieldProvider;
 
@@ -127,10 +126,10 @@ class EnumFormFieldBuilder {
 		FormFieldNativeMapping nativeMapping =
 			identityFormFieldNativeMappingProvider.get ();
 
-		// value validator
+		// value validators
 
-		FormFieldValueValidator valueValidator =
-			nullFormFieldValueValidatorProvider.get ();
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
 
 		// constraint validator
 
@@ -219,8 +218,8 @@ class EnumFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

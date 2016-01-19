@@ -15,8 +15,8 @@ import wbs.platform.text.model.TextRec;
 @Accessors (fluent = true)
 @PrototypeComponent ("textFormFieldNativeMapping")
 public
-class TextFormFieldNativeMapping
-	implements FormFieldNativeMapping<String,TextRec> {
+class TextFormFieldNativeMapping<Container>
+	implements FormFieldNativeMapping<Container,String,TextRec> {
 
 	// dependencies
 
@@ -28,6 +28,7 @@ class TextFormFieldNativeMapping
 	@Override
 	public
 	Optional<TextRec> genericToNative (
+			@NonNull Container container,
 			@NonNull Optional<String> genericValue) {
 
 		if (! genericValue.isPresent ()) {
@@ -43,6 +44,7 @@ class TextFormFieldNativeMapping
 	@Override
 	public
 	Optional<String> nativeToGeneric (
+			@NonNull Container container,
 			@NonNull Optional<TextRec> nativeValue) {
 
 		if (! nativeValue.isPresent ()) {

@@ -4,6 +4,9 @@ import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -43,10 +46,6 @@ class YesNoFormFieldBuilder {
 	@Inject
 	Provider<NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
-
-	@Inject
-	Provider<NullFormFieldValueValidator>
-	nullFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<ReadOnlyFormField>
@@ -130,17 +129,27 @@ class YesNoFormFieldBuilder {
 
 		// TODO dynamic
 
+		// native mapping
+
 		FormFieldNativeMapping nativeMapping =
 			identityFormFieldNativeMappingProvider.get ();
 
-		FormFieldValueValidator valueValidator =
-			nullFormFieldValueValidatorProvider.get ();
+		// value validators
+
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
+
+		// constraint validator
 
 		FormFieldConstraintValidator constraintValidator =
 			nullFormFieldValueConstraintValidatorProvider.get ();
 
+		// interface mapping
+
 		FormFieldInterfaceMapping interfaceMapping =
 			identityFormFieldInterfaceMappingProvider.get ();
+
+		// renderer
 
 		FormFieldRenderer renderer =
 			yesNoFormFieldRendererProvider.get ()
@@ -171,7 +180,10 @@ class YesNoFormFieldBuilder {
 		// csv mapping
 
 		FormFieldInterfaceMapping csvMapping =
-			yesNoCsvFormFieldInterfaceMappingProvider.get ();
+			yesNoCsvFormFieldInterfaceMappingProvider.get ()
+
+			.nullable (
+				nullable);
 
 		// field
 
@@ -192,8 +204,8 @@ class YesNoFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

@@ -8,12 +8,13 @@ import wbs.framework.application.annotations.PrototypeComponent;
 
 @PrototypeComponent ("integerFormFieldNativeMapping")
 public
-class IntegerFormFieldNativeMapping
-	implements FormFieldNativeMapping<Long,Integer> {
+class IntegerFormFieldNativeMapping<Container>
+	implements FormFieldNativeMapping<Container,Long,Integer> {
 
 	@Override
 	public
 	Optional<Long> nativeToGeneric (
+			@NonNull Container container,
 			@NonNull Optional<Integer> nativeValue) {
 
 		if (! nativeValue.isPresent ()) {
@@ -28,6 +29,7 @@ class IntegerFormFieldNativeMapping
 	@Override
 	public
 	Optional<Integer> genericToNative (
+			@NonNull Container container,
 			@NonNull Optional<Long> genericValue) {
 
 		if (! genericValue.isPresent ()) {

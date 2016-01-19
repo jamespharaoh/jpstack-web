@@ -38,10 +38,6 @@ class HtmlFormFieldBuilder {
 	nullFormFieldValueConstraintValidatorProvider;
 
 	@Inject
-	Provider<NullFormFieldValueValidator>
-	nullFormFieldValueValidatorProvider;
-
-	@Inject
 	Provider<ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
@@ -110,8 +106,8 @@ class HtmlFormFieldBuilder {
 
 		// native mapping
 
-		FormFieldNativeMapping<?,?> nativeMapping =
-			formFieldPluginManager.getNativeMapping (
+		FormFieldNativeMapping nativeMapping =
+			formFieldPluginManager.getNativeMappingRequired (
 				context,
 				context.containerClass (),
 				name,

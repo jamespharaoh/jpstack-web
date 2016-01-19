@@ -13,7 +13,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 public
 class IdentityFormFieldPluginProvider
-	extends AbstractFormFieldPluginProvider {
+	implements FormFieldPluginProvider {
 
 	// prototype dependencies
 

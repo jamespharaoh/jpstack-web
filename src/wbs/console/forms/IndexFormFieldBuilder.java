@@ -106,9 +106,6 @@ class IndexFormFieldBuilder {
 			.label (
 				label)
 
-			.size (
-				FormField.defaultSize)
-
 			.nullable (
 				false);
 

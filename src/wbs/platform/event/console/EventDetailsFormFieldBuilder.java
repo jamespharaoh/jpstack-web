@@ -86,7 +86,7 @@ class EventDetailsFormFieldBuilder {
 
 		// native mapping
 
-		FormFieldNativeMapping<?,?> nativeMapping =
+		FormFieldNativeMapping nativeMapping =
 			identityFormFieldNativeMappingProvider.get ();
 
 		// interface mapping

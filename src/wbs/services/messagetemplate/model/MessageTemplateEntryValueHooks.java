@@ -11,14 +11,14 @@ import lombok.NonNull;
 import org.hibernate.TransientObjectException;
 
 import wbs.framework.database.Database;
-import wbs.framework.object.AbstractObjectHooks;
+import wbs.framework.object.ObjectHooks;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.queue.logic.QueueLogic;
 
 public
 class MessageTemplateEntryValueHooks
-	extends AbstractObjectHooks<MessageTemplateEntryValueRec> {
+	implements ObjectHooks<MessageTemplateEntryValueRec> {
 
 	// dependencies
 

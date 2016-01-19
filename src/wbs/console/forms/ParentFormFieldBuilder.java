@@ -4,6 +4,9 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -32,10 +35,6 @@ class ParentFormFieldBuilder {
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
-
-	@Inject
-	Provider<NullFormFieldValueValidator>
-	nullFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<ParentFormFieldConstraintValidator>
@@ -149,23 +148,23 @@ class ParentFormFieldBuilder {
 
 		// value validator
 
-		FormFieldValueValidator valueValidator =
-			nullFormFieldValueValidatorProvider.get ();
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
 
 		// constraint validator
 
 		FormFieldConstraintValidator constraintValidator =
 			parentHelper != null
 
-				? parentFormFieldValueConstraintValidatorProvider.get ()
+			? parentFormFieldValueConstraintValidatorProvider.get ()
 
-					.createPrivDelegate (
-						createPrivDelegate)
+				.createPrivDelegate (
+					createPrivDelegate)
 
-					.createPrivCode (
-						createPrivCode)
+				.createPrivCode (
+					createPrivCode)
 
-				: null;
+			: null;
 
 		// interface mapping
 
@@ -221,8 +220,8 @@ class ParentFormFieldBuilder {
 				.nativeMapping (
 					nativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

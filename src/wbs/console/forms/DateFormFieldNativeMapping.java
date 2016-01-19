@@ -17,14 +17,15 @@ import wbs.framework.application.annotations.PrototypeComponent;
 @Accessors (fluent = true)
 @PrototypeComponent ("dateFormFieldNativeMapping")
 public
-class DateFormFieldNativeMapping
-	implements FormFieldNativeMapping<Instant,Date> {
+class DateFormFieldNativeMapping<Container>
+	implements FormFieldNativeMapping<Container,Instant,Date> {
 
 	// implementation
 
 	@Override
 	public
 	Optional<Date> genericToNative (
+			@NonNull Container container,
 			@NonNull Optional<Instant> genericValue) {
 
 		if (! genericValue.isPresent ()) {
@@ -40,6 +41,7 @@ class DateFormFieldNativeMapping
 	@Override
 	public
 	Optional<Instant> nativeToGeneric (
+			@NonNull Container container,
 			@NonNull Optional<Date> nativeValue) {
 
 		if (! nativeValue.isPresent ()) {

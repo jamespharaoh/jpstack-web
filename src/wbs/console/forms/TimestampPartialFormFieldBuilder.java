@@ -4,6 +4,9 @@ import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -98,11 +101,6 @@ class TimestampPartialFormFieldBuilder {
 				spec.nullable (),
 				false);
 
-		Integer size =
-			ifNull (
-				spec.size (),
-				FormField.defaultSize);
-
 		// accessor and native mapping
 
 		FormFieldAccessor formFieldAccessor =
@@ -119,8 +117,11 @@ class TimestampPartialFormFieldBuilder {
 
 		// value validator
 
-		FormFieldValueValidator valueValidator =
-			timestampPartialFormFieldValueValidatorProvider.get ();
+		List<FormFieldValueValidator> valueValidators =
+			new ArrayList<> ();
+
+		valueValidators.add (
+			timestampPartialFormFieldValueValidatorProvider.get ());
 
 		// constraint validator
 
@@ -144,10 +145,7 @@ class TimestampPartialFormFieldBuilder {
 				label)
 
 			.nullable (
-				nullable)
-
-			.size (
-				size);
+				nullable);
 
 		// update hook
 
@@ -201,8 +199,8 @@ class TimestampPartialFormFieldBuilder {
 				.nativeMapping (
 					formFieldNativeMapping)
 
-				.valueValidator (
-					valueValidator)
+				.valueValidators (
+					valueValidators)
 
 				.constraintValidator (
 					constraintValidator)

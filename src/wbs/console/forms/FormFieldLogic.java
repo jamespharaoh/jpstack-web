@@ -15,6 +15,8 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import org.apache.commons.fileupload.FileItem;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 
@@ -280,7 +282,7 @@ class FormFieldLogic {
 				requestContext.isMultipart ()
 					? Maps.uniqueIndex (
 						requestContext.fileItems (),
-						fileItem -> fileItem.getFieldName ())
+						FileItem::getFieldName)
 					: null);
 
 	}

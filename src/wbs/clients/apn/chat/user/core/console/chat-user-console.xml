@@ -46,8 +46,8 @@
 			<context-tab-responder-page
 				name="online"/>
 
-			<context-tab-action-page
-				name="create"/>
+			<object-create-page
+				fields="create"/>
 
 		</list>
 
@@ -80,5 +80,42 @@
 		</object>
 
 	</object-context>
+
+	<field-set
+		name="create"
+		object-name="chatUser">
+
+		<text-field
+			name="name"/>
+
+		<enum-field
+			name="gender"
+			helper="genderConsoleHelper"/>
+
+		<enum-field
+			name="orient"
+			helper="orientConsoleHelper"/>
+
+		<gazetteer-field
+			name="postcode"
+			field="locationPlace"
+			gazetteer="gazetteer"/>
+
+		<text-field
+			name="infoText"
+			label="Info"/>
+
+		<!--
+		<text-field
+			name="dob"
+			label="DOB"/>
+		-->
+
+		<object-field
+			name="category"
+			object-type="chatCategory"
+			root-field="chat"/>
+
+	</field-set>
 
 </console-module>
