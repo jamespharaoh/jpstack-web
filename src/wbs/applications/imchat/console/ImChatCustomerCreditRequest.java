@@ -13,8 +13,6 @@ public
 class ImChatCustomerCreditRequest
 	implements Serializable {
 
-	Integer customerId;
-
 	transient
 	ImChatCustomerRec customer;
 

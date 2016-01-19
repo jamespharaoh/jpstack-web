@@ -78,15 +78,12 @@ class ImChatCustomerCreditPart
 
 			new ImChatCustomerCreditRequest ()
 
-				.customerId (
-					requestContext.stuffInt (
-						"imChatCustomerId"))
-
 		);
 
 		request.customer (
 			imChatCustomerHelper.find (
-				request.customerId ()));
+				requestContext.stuffInt (
+					"imChatCustomerId")));
 
 		updateResultSet =
 			Optional.fromNullable (

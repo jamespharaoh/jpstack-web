@@ -1,7 +1,6 @@
 package wbs.applications.imchat.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.ifNull;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -85,42 +84,21 @@ class ImChatCustomerCreditAction
 			imChatCustomerConsoleModule.formFieldSets ().get (
 				"credit-request");
 
-		ImChatCustomerCreditRequest existingRequest =
+		ImChatCustomerCreditRequest request =
+			ifNull (
+
 			(ImChatCustomerCreditRequest)
 			requestContext.request (
-				"imChatCustomerCreditRequest");
+				"imChatCustomerCreditRequest"),
 
-		ImChatCustomerCreditRequest request;
+			new ImChatCustomerCreditRequest ()
 
-		if (
-
-			isNotNull (
-				existingRequest)
-
-			&& equal (
-				existingRequest.customerId (),
-				requestContext.stuffInt (
-					"imChatCustomerId"))
-
-		) {
-
-			request =
-				existingRequest;
-
-		} else {
-
-			request =
-				new ImChatCustomerCreditRequest ()
-
-				.customerId (
-					requestContext.stuffInt (
-						"imChatCustomerId"));
-
-		}
+		);
 
 		request.customer (
 			imChatCustomerHelper.find (
-				request.customerId ()));
+				requestContext.stuffInt (
+					"imChatCustomerId")));
 
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
