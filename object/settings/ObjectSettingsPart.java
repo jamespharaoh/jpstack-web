@@ -98,7 +98,7 @@ class ObjectSettingsPart<
 			Optional.fromNullable (
 				(UpdateResultSet)
 				requestContext.request (
-					"objectCreateUpdateResultSet"));
+					"objectSettingsUpdateResultSet"));
 
 		object =
 			objectLookup.lookupObject (

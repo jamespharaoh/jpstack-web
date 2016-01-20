@@ -28,6 +28,7 @@ import wbs.console.forms.IntegerFormFieldNativeMapping;
 import wbs.console.forms.IntegerFormFieldValueValidator;
 import wbs.console.forms.NullFormFieldConstraintValidator;
 import wbs.console.forms.ReadOnlyFormField;
+import wbs.console.forms.RequiredFormFieldValueValidator;
 import wbs.console.forms.SimpleFormFieldAccessor;
 import wbs.console.forms.TextFormFieldRenderer;
 import wbs.console.forms.UpdatableFormField;
@@ -53,28 +54,12 @@ class CurrencyFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<ReadOnlyFormField>
-	readOnlyFormFieldProvider;
-
-	@Inject
-	Provider<UpdatableFormField>
-	updatableFormFieldProvider;
+	Provider<CurrencyFormFieldInterfaceMapping>
+	currencyFormFieldInterfaceMappingProvider;
 
 	@Inject
 	Provider<IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
-
-	@Inject
-	Provider<NullFormFieldConstraintValidator>
-	nullFormFieldValueConstraintValidatorProvider;
-
-	@Inject
-	Provider<IntegerFormFieldValueValidator>
-	integerFormFieldValueValidatorProvider;
-
-	@Inject
-	Provider<SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
 
 	@Inject
 	Provider<IntegerFormFieldInterfaceMapping>
@@ -85,12 +70,32 @@ class CurrencyFormFieldBuilder {
 	integerFormFieldNativeMappingProvider;
 
 	@Inject
-	Provider<CurrencyFormFieldInterfaceMapping>
-	currencyFormFieldInterfaceMappingProvider;
+	Provider<IntegerFormFieldValueValidator>
+	integerFormFieldValueValidatorProvider;
+
+	@Inject
+	Provider<NullFormFieldConstraintValidator>
+	nullFormFieldValueConstraintValidatorProvider;
+
+	@Inject
+	Provider<ReadOnlyFormField>
+	readOnlyFormFieldProvider;
+
+	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
+
+	@Inject
+	Provider<SimpleFormFieldAccessor>
+	simpleFormFieldAccessorProvider;
 
 	@Inject
 	Provider<TextFormFieldRenderer>
 	textFormFieldRendererProvider;
+
+	@Inject
+	Provider<UpdatableFormField>
+	updatableFormFieldProvider;
 
 	// builder
 
@@ -123,6 +128,11 @@ class CurrencyFormFieldBuilder {
 		Boolean readOnly =
 			ifNull (
 				spec.readOnly (),
+				false);
+
+		Boolean nullable =
+			ifNull (
+				spec.nullable (),
 				false);
 
 		Long minimum =
@@ -186,6 +196,13 @@ class CurrencyFormFieldBuilder {
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		if (! nullable) {
+
+			valueValidators.add (
+				requiredFormFieldValueValidatorProvider.get ());
+
+		}
 
 		valueValidators.add (
 			integerFormFieldValueValidatorProvider.get ()

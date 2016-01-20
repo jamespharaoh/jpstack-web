@@ -236,6 +236,10 @@ class ObjectCreateAction<
 				requestContext,
 				updateResultSet);
 
+			requestContext.request (
+				"objectCreateUpdateResultSet",
+				updateResultSet);
+
 			return null;
 
 		}
