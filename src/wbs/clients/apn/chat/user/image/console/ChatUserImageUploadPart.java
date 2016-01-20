@@ -9,6 +9,7 @@ import javax.inject.Named;
 import com.google.common.base.Optional;
 
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
+import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
@@ -92,7 +93,8 @@ class ChatUserImageUploadPart
 			formatWriter,
 			formFieldSet,
 			Optional.<UpdateResultSet>absent (),
-			uploadForm);
+			uploadForm,
+			FormType.perform);
 
 		printFormat (
 			"</table>\n");

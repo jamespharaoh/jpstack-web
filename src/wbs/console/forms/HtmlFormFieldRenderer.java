@@ -10,6 +10,7 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
+import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -102,7 +103,8 @@ class HtmlFormFieldRenderer<Container>
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
-			@NonNull Optional<String> error) {
+			@NonNull Optional<String> error,
+			@NonNull FormType formType) {
 
 		renderTableRow (
 			out,
@@ -117,7 +119,8 @@ class HtmlFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Optional<String> interfaceValue,
+			@NonNull FormType formType) {
 
 		out.writeFormat (
 			"%s",

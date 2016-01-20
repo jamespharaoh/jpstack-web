@@ -18,6 +18,7 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
+import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.RuntimeIoException;
@@ -111,7 +112,8 @@ class UploadFormFieldRenderer<Container>
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<FileUpload> interfaceValue,
-			@NonNull Optional<String> error) {
+			@NonNull Optional<String> error,
+			@NonNull FormType formType) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -123,7 +125,8 @@ class UploadFormFieldRenderer<Container>
 			submission,
 			out,
 			container,
-			interfaceValue);
+			interfaceValue,
+			formType);
 
 		if (
 			isPresent (
@@ -149,7 +152,8 @@ class UploadFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<FileUpload> interfaceValue) {
+			@NonNull Optional<FileUpload> interfaceValue,
+			@NonNull FormType formType) {
 
 		out.writeFormat (
 			"<input",

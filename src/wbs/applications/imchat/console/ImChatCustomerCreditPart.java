@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 
 import wbs.applications.imchat.model.ImChatCustomerCreditRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
+import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
@@ -124,7 +125,8 @@ class ImChatCustomerCreditPart
 			request,
 			requestContext.resolveLocalUrl (
 				"/imChatCustomer.credit"),
-			"apply credit");
+			"apply credit",
+			FormType.perform);
 
 		printFormat (
 			"<h2>Recent credit history</h2>\n");

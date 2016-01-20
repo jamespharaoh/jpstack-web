@@ -229,6 +229,10 @@ class ObjectSearchPostAction
 				requestContext,
 				updateResultSet);
 
+			requestContext.request (
+				"objectSearchUpdateResultSet",
+				updateResultSet);
+
 			return responder (
 				searchResponderName);
 

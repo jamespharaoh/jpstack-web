@@ -16,6 +16,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
@@ -55,6 +56,7 @@ class ObjectSearchPart
 	// state
 
 	Object search;
+	Optional<UpdateResultSet> updateResultSet;
 
 	// details
 
@@ -103,6 +105,12 @@ class ObjectSearchPart
 
 		}
 
+		updateResultSet =
+			Optional.fromNullable (
+				(UpdateResultSet)
+				requestContext.request (
+					"objectSearchUpdateResultSet"));
+
 	}
 
 	@Override
@@ -126,8 +134,9 @@ class ObjectSearchPart
 			requestContext,
 			formatWriter,
 			formFieldSet,
-			Optional.<UpdateResultSet>absent (),
-			search);
+			updateResultSet,
+			search,
+			FormType.search);
 
 		printFormat (
 			"</table>\n");

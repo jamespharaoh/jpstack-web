@@ -20,6 +20,7 @@ import org.apache.commons.fileupload.FileItem;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 
+import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -293,7 +294,8 @@ class FormFieldLogic {
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Optional<UpdateResultSet> updateResultSet,
-			@NonNull Object object) {
+			@NonNull Object object,
+			@NonNull FormType formType) {
 
 		outputFormRows (
 			requestContextToSubmission (
@@ -301,7 +303,8 @@ class FormFieldLogic {
 			htmlWriter,
 			formFieldSet,
 			updateResultSet,
-			object);
+			object,
+			formType);
 
 	}
 
@@ -311,7 +314,8 @@ class FormFieldLogic {
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Optional<UpdateResultSet> updateResultSet,
-			@NonNull Object object) {
+			@NonNull Object object,
+			@NonNull FormType formType) {
 
 		for (
 			FormField formField
@@ -346,7 +350,8 @@ class FormFieldLogic {
 				submission,
 				htmlWriter,
 				object,
-				error);
+				error,
+				formType);
 
 		}
 
@@ -384,7 +389,8 @@ class FormFieldLogic {
 			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object,
 			@NonNull String actionUrl,
-			@NonNull String submitButtonLabel) {
+			@NonNull String submitButtonLabel,
+			@NonNull FormType formType) {
 
 		outputFormTable (
 			requestContextToSubmission (
@@ -394,7 +400,8 @@ class FormFieldLogic {
 			updateResultSet,
 			object,
 			actionUrl,
-			submitButtonLabel);
+			submitButtonLabel,
+			formType);
 
 	}
 
@@ -406,7 +413,8 @@ class FormFieldLogic {
 			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object,
 			@NonNull String actionUrl,
-			@NonNull String submitButtonLabel) {
+			@NonNull String submitButtonLabel,
+			@NonNull FormType formType) {
 
 		htmlWriter.writeFormat (
 			"<form",
@@ -423,7 +431,8 @@ class FormFieldLogic {
 			htmlWriter,
 			formFieldSet,
 			updateResultSet,
-			object);
+			object,
+			formType);
 
 		htmlWriter.writeFormat (
 			"</table>\n");

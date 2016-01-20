@@ -1,5 +1,7 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.doNothing;
+
 import java.util.Set;
 
 import lombok.Data;
@@ -21,49 +23,109 @@ interface FormField<Container,Generic,Native,Interface> {
 	Boolean virtual ();
 	Boolean large ();
 
-	String name ();
-	String label ();
+	default
+	String name () {
+
+		throw new UnsupportedOperationException ();
+
+	}
+
+	default
+	String label () {
+
+		throw new UnsupportedOperationException ();
+
+	}
 
 	Set<ScriptRef> scriptRefs ();
 
+	default
 	void init (
-			String fieldSetName);
+			String fieldSetName) {
 
+		doNothing ();
+
+	}
+
+	default
 	void renderTableCellList (
 			FormatWriter out,
 			Container object,
 			boolean link,
-			int colspan);
+			int colspan) {
 
+		throw new UnsupportedOperationException ();
+
+	}
+
+	default
 	void renderTableCellProperties (
 			FormatWriter out,
-			Container object);
+			Container object) {
 
+		throw new UnsupportedOperationException ();
+
+	}
+
+	default
 	void renderFormRow (
 			FormFieldSubmission submission,
 			FormatWriter out,
 			Container object,
-			Optional<String> error);
+			Optional<String> error,
+			FormType formType) {
 
+		throw new UnsupportedOperationException ();
+
+	}
+
+	default
 	void renderFormReset (
 			FormatWriter out,
 			String indent,
-			Container container);
+			Container container) {
 
+		throw new UnsupportedOperationException ();
+
+	}
+
+	default
 	void renderCsvRow (
 			FormatWriter out,
-			Container object);
+			Container object) {
 
+		throw new UnsupportedOperationException ();
+
+	}
+
+	default
 	UpdateResult<Generic,Native> update (
 			FormFieldSubmission submission,
-			Container container);
+			Container container) {
 
+		throw new UnsupportedOperationException ();
+
+	}
+
+	default
 	void runUpdateHook (
 			UpdateResult<Generic,Native> updateResult,
 			Container container,
 			PermanentRecord<?> linkObject,
 			Optional<Object> objectRef,
-			Optional<String> objectType);
+			Optional<String> objectType) {
+
+		throw new UnsupportedOperationException ();
+
+	}
+
+	public static
+	enum FormType {
+		create,
+		update,
+		search,
+		perform;
+	}
 
 	@Accessors (fluent = true)
 	@Data

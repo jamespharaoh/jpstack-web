@@ -21,6 +21,7 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
+import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldRenderer;
 import wbs.console.forms.FormFieldSubmission;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -129,7 +130,8 @@ class ImageFormFieldRenderer<Container>
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<MediaRec> interfaceValue,
-			@NonNull Optional<String> error) {
+			@NonNull Optional<String> error,
+			@NonNull FormType formType) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -141,7 +143,8 @@ class ImageFormFieldRenderer<Container>
 			submission,
 			out,
 			container,
-			interfaceValue);
+			interfaceValue,
+			formType);
 
 		if (
 			isPresent (
@@ -167,7 +170,8 @@ class ImageFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<MediaRec> interfaceValue) {
+			@NonNull Optional<MediaRec> interfaceValue,
+			@NonNull FormType formType) {
 
 		if (interfaceValue.isPresent ()) {
 

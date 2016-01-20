@@ -1,11 +1,12 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.errorResult;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -36,6 +37,8 @@ class IntegerFormFieldInterfaceMapping<Container>
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue) {
 
+		// handle not present or empty
+
 		if (
 
 			isNotPresent (
@@ -50,12 +53,22 @@ class IntegerFormFieldInterfaceMapping<Container>
 			return successResult (
 				Optional.<Long>absent ());
 
-		} else {
+		}
+
+		// parse integer
+
+		try {
 
 			return successResult (
 				Optional.of (
 					Long.parseLong (
 						interfaceValue.get ())));
+
+		} catch (NumberFormatException exception) {
+
+			return errorResult (
+				stringFormat (
+					"You must enter a whole number using digits"));
 
 		}
 

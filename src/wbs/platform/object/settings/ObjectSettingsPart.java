@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 import com.google.common.base.Optional;
 
 import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
@@ -217,7 +218,8 @@ class ObjectSettingsPart<
 			formatWriter,
 			formFieldSet,
 			updateResultSet,
-			object);
+			object,
+			FormType.update);
 
 		printFormat (
 			"</table>");

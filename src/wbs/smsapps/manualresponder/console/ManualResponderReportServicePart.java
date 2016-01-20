@@ -11,6 +11,7 @@ import org.joda.time.LocalDate;
 
 import com.google.common.base.Optional;
 
+import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
@@ -170,7 +171,8 @@ class ManualResponderReportServicePart
 			formatWriter,
 			searchFormFieldSet,
 			Optional.<UpdateResultSet>absent (),
-			searchForm);
+			searchForm,
+			FormType.search);
 
 		printFormat (
 			"<tr>\n",

@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.eitherGetLeft;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -72,23 +71,6 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	public
 	Boolean fileUpload () {
 		return renderer.fileUpload ();
-	}
-
-	@Override
-	public
-	void init (
-			@NonNull String fieldSetName) {
-
-		if (interfaceMapping == null) {
-
-			throw new NullPointerException (
-				stringFormat (
-					"No interface mapping for %s.%s",
-					fieldSetName,
-					name));
-
-		}
-
 	}
 
 	@Override
@@ -163,7 +145,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<String> error) {
+			@NonNull Optional<String> error,
+			@NonNull FormType formType) {
 
 		Optional<Native> nativeValue =
 			requiredValue (

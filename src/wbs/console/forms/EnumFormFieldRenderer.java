@@ -1,13 +1,16 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -18,6 +21,7 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
+import wbs.console.forms.FormField.FormType;
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
@@ -132,7 +136,8 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<Interface> interfaceValue,
-			@NonNull Optional<String> error) {
+			@NonNull Optional<String> error,
+			@NonNull FormType formType) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -144,7 +149,8 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			submission,
 			out,
 			container,
-			interfaceValue);
+			interfaceValue,
+			formType);
 
 		if (
 			isPresent (
@@ -168,44 +174,70 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	public
 	void renderFormInput (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Optional<Interface> interfaceValue) {
+			@NonNull Optional<Interface> interfaceValue,
+			@NonNull FormType formType) {
 
-		List<String> errors =
-			new ArrayList<String> ();
+		htmlWriter.writeFormat (
+			"<select",
+			" id=\"%h\"",
+			name,
+			" name=\"%h\"",
+			name,
+			">\n");
 
-		String selectedValue =
-			formValuePresent (
-					submission)
-				? submission.parameter (
-					name ())
-				: interfaceValue.isPresent ()
-					? interfaceValue.get ().toString ()
-					: "null";
+		if (
 
-		if (! errors.isEmpty ()) {
-			throw new RuntimeException ();
+			nullable ()
+
+			|| isNotPresent (
+				interfaceValue)
+
+			|| in (
+				formType,
+				FormType.create,
+				FormType.search,
+				FormType.update)
+
+		) {
+
+			htmlWriter.writeFormat (
+				"<option",
+				" value=\"none\"",
+				interfaceValue.isPresent ()
+					? ""
+					: " selected",
+				">&mdash;</option>\n");
+
 		}
 
-		if (nullable) {
+		for (
+			Map.Entry<Interface,String> optionEntry
+				: enumConsoleHelper.map ().entrySet ()
+		) {
 
-			out.writeFormat (
-				"%s",
-				enumConsoleHelper.selectNull (
-					name (),
-					selectedValue,
-					"none"));
+			Interface optionValue =
+				optionEntry.getKey ();
 
-		} else {
+			String optionLabel =
+				optionEntry.getValue ();
 
-			out.writeFormat (
-				"%s",
-				enumConsoleHelper.select (
-					name (),
-					selectedValue));
+			htmlWriter.writeFormat (
+				"<option",
+				" value=\"%h\"",
+				camelToHyphen (
+					optionValue.name ()),
+				optionValue == interfaceValue.orNull ()
+					? " selected"
+					: "",
+				">%h</option>\n",
+				optionLabel);
 
 		}
+
+		htmlWriter.writeFormat (
+			"</select>\n");
 
 	}
 
@@ -218,7 +250,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull Optional<Interface> interfaceValue) {
 
 		javascriptWriter.writeFormat (
-			"%s$(\"#%j\").val (\"null\");\n",
+			"%s$(\"#%j\").val (\"none\");\n",
 			indent,
 			name);
 
@@ -239,12 +271,29 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	Either<Optional<Interface>,String> formToInterface (
 			@NonNull FormFieldSubmission submission) {
 
-		return successResult (
-			Optional.fromNullable (
-				toEnum (
-					enumConsoleHelper.enumClass (),
-					submission.parameter (
-						name ()))));
+		String parameterValue =
+			submission.parameter (
+				name ());
+
+		if (
+			equal (
+				parameterValue,
+				"none")
+		) {
+
+			return successResult (
+				Optional.absent ());
+
+		} else {
+
+			return successResult (
+				Optional.of (
+					toEnum (
+						enumConsoleHelper.enumClass (),
+						submission.parameter (
+							name ()))));
+
+		}
 
 	}
 

@@ -13,6 +13,7 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
+import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.Html;
@@ -127,7 +128,8 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
-			@NonNull Optional<String> error) {
+			@NonNull Optional<String> error,
+			@NonNull FormType formType) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -139,7 +141,8 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			submission,
 			out,
 			container,
-			interfaceValue);
+			interfaceValue,
+			formType);
 
 		if (
 			isPresent (
@@ -165,7 +168,8 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Optional<String> interfaceValue,
+			@NonNull FormType formType) {
 
 		out.writeFormat (
 			"<textarea",

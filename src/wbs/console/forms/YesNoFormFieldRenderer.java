@@ -1,6 +1,8 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.booleanToString;
+import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
@@ -14,6 +16,7 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
+import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -115,7 +118,8 @@ class YesNoFormFieldRenderer<Container>
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<Boolean> interfaceValue,
-			@NonNull Optional<String> error) {
+			@NonNull Optional<String> error,
+			@NonNull FormType formType) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -127,7 +131,8 @@ class YesNoFormFieldRenderer<Container>
 			submission,
 			out,
 			container,
-			interfaceValue);
+			interfaceValue,
+			formType);
 
 		if (
 			isPresent (
@@ -151,89 +156,59 @@ class YesNoFormFieldRenderer<Container>
 	public
 	void renderFormInput (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Optional<Boolean> interfaceValue) {
+			@NonNull Optional<Boolean> interfaceValue,
+			@NonNull FormType formType) {
 
-		out.writeFormat (
+		htmlWriter.writeFormat (
 			"<select name=\"%h\">",
 			name ());
 
-		if (! interfaceValue.isPresent ()) {
+		if (
 
-			out.writeFormat (
+			nullable ()
+
+			|| isNotPresent (
+				interfaceValue)
+
+			|| in (
+				formType,
+				FormType.create,
+				FormType.perform,
+				FormType.search)
+
+		) {
+
+			htmlWriter.writeFormat (
 				"<option",
 				" value=\"\"",
-				" selected",
-				"></option>\n");
-
-			out.writeFormat (
-				"<option",
-				" value=\"yes\"",
-				">%h</option>\n",
-				yesLabel ());
-
-			out.writeFormat (
-				"<option",
-				" value=\"no\"",
-				">%h</option>\n",
-				noLabel ());
-
-		} else if (interfaceValue.get () == true) {
-
-			if (nullable ()) {
-
-				out.writeFormat (
-					"<option",
-					" value=\"\"",
-					"></option>\n");
-
-			}
-
-			out.writeFormat (
-				"<option",
-				" value=\"yes\"",
-				" selected",
-				">%h</option>\n",
-				yesLabel ());
-
-			out.writeFormat (
-				"<option",
-				" value=\"no\"",
-				">%h</option>\n",
-				noLabel ());
-
-		} else if (interfaceValue.get () == false) {
-
-			if (nullable ()) {
-
-				out.writeFormat (
-					"<option",
-					" value=\"\"",
-					"></option>\n");
-
-			}
-
-			out.writeFormat (
-				"<option",
-				" value=\"yes\"",
-				">%h</option>\n",
-				yesLabel ());
-
-			out.writeFormat (
-				"<option",
-				" value=\"no\"",
-				" selected",
-				">%h</option>\n",
-				noLabel ());
-
-		} else {
-
-			throw new RuntimeException ();
+				interfaceValue.isPresent ()
+					? ""
+					: " selected",
+				">&mdash;</option>\n");
 
 		}
 
-		out.writeFormat (
+		htmlWriter.writeFormat (
+			"<option",
+			" value=\"yes\"",
+			interfaceValue.or (false) == true
+				? " selected"
+				: "",
+			">%h</option>\n",
+			yesLabel ());
+
+		htmlWriter.writeFormat (
+			"<option",
+			" value=\"no\"",
+			interfaceValue.or (true) == false
+				? " selected"
+				: "",
+			">%h</option>\n",
+			noLabel ());
+
+		htmlWriter.writeFormat (
 			"</select>");
 
 	}

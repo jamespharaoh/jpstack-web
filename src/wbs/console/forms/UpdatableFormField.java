@@ -174,7 +174,8 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<String> error) {
+			@NonNull Optional<String> error,
+			@NonNull FormType formType) {
 
 		Optional<Native> nativeValue =
 			requiredValue (
@@ -199,7 +200,8 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			out,
 			container,
 			interfaceValue,
-			error);
+			error,
+			formType);
 
 	}
 

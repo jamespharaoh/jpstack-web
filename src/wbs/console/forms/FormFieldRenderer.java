@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
+import wbs.console.forms.FormField.FormType;
 import wbs.framework.utils.etc.FormatWriter;
 
 public
@@ -33,13 +34,15 @@ interface FormFieldRenderer<Container,Interface> {
 			FormatWriter out,
 			Container container,
 			Optional<Interface> interfaceValue,
-			Optional<String> error);
+			Optional<String> error,
+			FormType formType);
 
 	void renderFormInput (
 			FormFieldSubmission submission,
 			FormatWriter out,
 			Container container,
-			Optional<Interface> interfaceValue);
+			Optional<Interface> interfaceValue,
+			FormType formType);
 
 	void renderFormReset (
 			FormatWriter out,

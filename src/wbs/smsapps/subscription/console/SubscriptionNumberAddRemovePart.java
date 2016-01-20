@@ -6,6 +6,7 @@ import javax.inject.Named;
 import com.google.common.base.Optional;
 
 import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
@@ -71,7 +72,8 @@ class SubscriptionNumberAddRemovePart
 			formatWriter,
 			addRemoveFormFieldSet,
 			Optional.<UpdateResultSet>absent (),
-			addRemoveForm);
+			addRemoveForm,
+			FormType.perform);
 
 		printFormat (
 			"</table>\n");

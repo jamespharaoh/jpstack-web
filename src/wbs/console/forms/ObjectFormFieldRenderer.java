@@ -1,15 +1,16 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isPresent;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.successResult;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -22,6 +23,7 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
+import wbs.console.forms.FormField.FormType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectHelper;
@@ -178,7 +180,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			@NonNull FormatWriter out,
 			@NonNull Container container,
 			@NonNull Optional<Interface> interfaceValue,
-			@NonNull Optional<String> error) {
+			@NonNull Optional<String> error,
+			@NonNull FormType formType) {
 
 		out.writeFormat (
 			"<tr>\n",
@@ -190,7 +193,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			submission,
 			out,
 			container,
-			interfaceValue);
+			interfaceValue,
+			formType);
 
 		if (
 			isPresent (
@@ -216,7 +220,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Optional<Interface> interfaceValue) {
+			@NonNull Optional<Interface> interfaceValue,
+			@NonNull FormType formType) {
 
 		// get a list of options
 
@@ -226,24 +231,13 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		// filter visible options
 
 		List<Record<?>> filteredOptions =
-			new ArrayList<Record<?>> ();
+			allOptions.stream ()
 
-		for (
-			Record<?> option
-				: allOptions
-		) {
+			.filter (
+				objectManager::canView)
 
-			if (
-				! objectManager.canView (
-					option)
-			) {
-				continue;
-			}
-
-			filteredOptions.add (
-				option);
-
-		}
+			.collect (
+				Collectors.toList ());
 
 		// lookup root
 
@@ -291,30 +285,32 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			name,
 			">\n");
 
-		// unchanged option
+		// none option
 
-		out.writeFormat (
-			"<option",
-			" value=\"unchanged\"",
-			">%h</option>\n",
-			interfaceValue.isPresent ()
-				? objectManager.objectPathMiniPreload (
-					(Record<?>) interfaceValue.get (),
-					root)
-				: "none");
+		if (
 
-		// null option
+			nullable ()
 
-		out.writeFormat (
-			"<option",
-			" value=\"null\"",
-			equal (
-					submission.parameter (
-						name),
-					"null")
-				? " selected"
-				: "",
-			">none</option>\n");
+			|| isNotPresent (
+				interfaceValue)
+
+			|| in (
+				formType,
+				FormType.create,
+				FormType.search,
+				FormType.update)
+
+		) {
+
+			out.writeFormat (
+				"<option",
+				" value=\"none\"",
+				interfaceValue.isPresent ()
+					? ""
+					: " selected",
+				">&mdash;</option>\n");
+
+		}
 
 		// value options
 
@@ -323,34 +319,40 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 				: sortedOptions.entrySet ()
 		) {
 
-			String path =
+			String optionLabel =
 				optionEntry.getKey ();
 
-			Record<?> option =
+			Record<?> optionValue =
 				optionEntry.getValue ();
 
 			ObjectHelper<?> objectHelper =
-				objectManager.objectHelperForObject (option);
+				objectManager.objectHelperForObject (
+					optionValue);
+
+			boolean selected =
+				optionValue == interfaceValue.orNull ();
 
 			if (
-				objectHelper.getDeleted (
-					option,
+
+				! selected
+
+				&& objectHelper.getDeleted (
+					optionValue,
 					true)
+
 			) {
 				continue;
 			}
 
 			out.writeFormat (
-				"<option value=\"%h\"",
-				option.getId (),
-				equal (
-						submission.parameter (
-							name ()),
-						option.getId ().toString ())
+				"<option",
+				" value=\"%h\"",
+				optionValue.getId (),
+				selected
 					? " selected"
 					: "",
 				">%h</option>\n",
-				path);
+				optionLabel);
 
 		}
 
@@ -368,7 +370,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			@NonNull Optional<Interface> interfaceValue) {
 
 		javascriptWriter.writeFormat (
-			"%s$(\"#%j\").val (\"null\");\n",
+			"%s$(\"#%j\").val (\"none\");\n",
 			indent,
 			name);
 
@@ -384,11 +386,6 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			submission.hasParameter (
 				name ())
 
-			&& notEqual (
-				submission.parameter (
-					name ()),
-				"unchanged")
-
 		);
 
 	}
@@ -402,18 +399,16 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			submission.parameter (
 				name ());
 
-		switch (param) {
-
-		case "null":
+		if (
+			equal (
+				param,
+				"none")
+		) {
 
 			return successResult (
 				Optional.<Interface>absent ());
 
-		case "unchanged":
-
-			throw new IllegalStateException ();
-
-		default:
+		} else {
 
 			Integer objectId =
 				Integer.parseInt (

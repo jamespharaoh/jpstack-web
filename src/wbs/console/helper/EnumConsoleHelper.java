@@ -2,7 +2,6 @@ package wbs.console.helper;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,12 +18,15 @@ import wbs.framework.utils.etc.Html;
 public
 class EnumConsoleHelper<E extends Enum<E>> {
 
+	@Getter
 	Map<E,String> map =
-		new HashMap<E,String> ();
+		new LinkedHashMap<E,String> ();
 
+	@Getter
 	Map<String,String> optionsMap =
 		new LinkedHashMap<String,String> ();
 
+	@Getter
 	Map<String,String> nullOptionsMap =
 		new LinkedHashMap<String,String> ();
 
@@ -85,6 +87,7 @@ class EnumConsoleHelper<E extends Enum<E>> {
 
 	}
 
+	@Deprecated
 	public
 	String select (
 			String name,
@@ -97,6 +100,7 @@ class EnumConsoleHelper<E extends Enum<E>> {
 
 	}
 
+	@Deprecated
 	public
 	String selectNull (
 			String name,

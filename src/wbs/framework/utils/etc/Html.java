@@ -296,6 +296,7 @@ class Html {
 
 	}
 
+	@Deprecated
 	public static
 	String selectYesNo (
 			String name,
@@ -343,6 +344,7 @@ class Html {
 
 	}
 
+	@Deprecated
 	public static
 	String selectYesNo (
 			String name,
@@ -356,6 +358,7 @@ class Html {
 
 	}
 
+	@Deprecated
 	public static
 	String selectYesNo (
 			String name,

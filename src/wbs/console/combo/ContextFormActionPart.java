@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import com.google.common.base.Optional;
 
 import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.part.AbstractPagePart;
@@ -72,38 +73,16 @@ class ContextFormActionPart<FormState>
 
 		}
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
-			requestContext.resolveLocalUrl (
-				localFile),
-			">\n");
-
-		printFormat (
-			"<table",
-			" class=\"details\"",
-			">\n");
-
-		formFieldLogic.outputFormRows (
+		formFieldLogic.outputFormTable (
 			requestContext,
 			formatWriter,
 			formFields,
 			Optional.<UpdateResultSet>absent (),
-			formState);
-
-		printFormat (
-			"</table>\n");
-
-		printFormat (
-			"<p><input",
-			" type=\"submit\"",
-			" value=\"%h\"",
+			formState,
+			requestContext.resolveLocalUrl (
+				localFile),
 			submitLabel,
-			"></p>\n");
-
-		printFormat (
-			"</form>\n");
+			FormType.perform);
 
 	}
 
