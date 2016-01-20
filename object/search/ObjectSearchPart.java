@@ -167,6 +167,7 @@ class ObjectSearchPart
 			formatWriter,
 			"\t\t",
 			formFieldSet,
+			FormType.search,
 			search);
 
 		printFormat (

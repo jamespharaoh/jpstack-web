@@ -213,7 +213,8 @@ class ImageFormFieldRenderer<Container>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Optional<MediaRec> interfaceValue) {
+			@NonNull Optional<MediaRec> interfaceValue,
+			@NonNull FormType formType) {
 
 		javascriptWriter.writeFormat (
 			"%s$(\"#%j\").replaceWith (\n",
