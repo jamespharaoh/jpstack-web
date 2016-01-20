@@ -6,7 +6,7 @@ import lombok.NonNull;
 
 import com.google.common.collect.ImmutableList;
 
-import wbs.console.helper.AbstractConsoleHooks;
+import wbs.console.helper.ConsoleHooks;
 import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.object.ObjectManager;
@@ -18,7 +18,7 @@ import wbs.platform.queue.model.QueueRec;
 @SingletonComponent ("queueItemConsoleHooks")
 public
 class QueueItemConsoleHooks
-	extends AbstractConsoleHooks<QueueItemRec> {
+	implements ConsoleHooks<QueueItemRec> {
 
 	// dependencies
 

@@ -1,5 +1,8 @@
 package wbs.console.helper;
 
+import static wbs.framework.utils.etc.Misc.doNothing;
+import lombok.NonNull;
+
 import com.google.common.base.Optional;
 
 import wbs.framework.record.Record;
@@ -7,13 +10,29 @@ import wbs.framework.record.Record;
 public
 interface ConsoleHooks<RecordType extends Record<RecordType>> {
 
+	default
 	Optional<String> getHtml (
-			RecordType object);
+			@NonNull RecordType object,
+			@NonNull Boolean mini) {
 
+		return Optional.<String>absent ();
+
+	}
+
+	default
 	Optional<String> getListClass (
-			RecordType object);
+			@NonNull RecordType object) {
 
+		return Optional.<String>absent ();
+
+	}
+
+	default
 	void applySearchFilter (
-			Object searchObject);
+			@NonNull Object searchObject) {
+
+		doNothing ();
+
+	}
 
 }

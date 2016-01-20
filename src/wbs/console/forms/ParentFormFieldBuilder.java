@@ -193,7 +193,10 @@ class ParentFormFieldBuilder {
 				parentHelper)
 
 			.mini (
-				consoleHelper.parentTypeIsFixed ());
+				consoleHelper.parentTypeIsFixed ())
+
+			.nullable (
+				false);
 
 		// update hook
 

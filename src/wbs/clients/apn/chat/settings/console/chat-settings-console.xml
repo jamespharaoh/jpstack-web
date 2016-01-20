@@ -133,7 +133,7 @@
 
 		<seconds-field
 			name="timeMonitorSwap"
-			label="TIme between monitor swaps"/>
+			label="Time between monitor swaps"/>
 
 		<object-field
 			name="locator"
@@ -205,7 +205,8 @@
 
 		<integer-field
 			name="sessionInfoLimit"
-			label="Maximum profiles per chat session"/>
+			label="Maximum profiles per chat session"
+			nullable="yes"/>
 
 		<object-field
 			name="adultAdsChat"

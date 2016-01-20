@@ -129,8 +129,11 @@ class ObjectSettingsAction<
 		// perform update
 
 		if (formFieldsProvider != null) {
-			prepareParent();
-			prepareFieldSet();
+
+			prepareParent ();
+
+			prepareFieldSet ();
+
 		}
 
 		UpdateResultSet updateResultSet =
@@ -148,6 +151,15 @@ class ObjectSettingsAction<
 			requestContext.request (
 				"objectSettingsUpdateResultSet",
 				updateResultSet);
+
+			return null;
+
+		}
+
+		if (updateResultSet.updateCount () == 0) {
+
+			requestContext.addWarning (
+				"No changes made");
 
 			return null;
 

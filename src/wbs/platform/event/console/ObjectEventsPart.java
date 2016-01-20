@@ -176,11 +176,11 @@ class ObjectEventsPart
 			"<tr>\n",
 
 			"<td>%s</td>\n",
-			Html.nonBreakingWhitespace (Html.encode (
+			Html.encodeNonBreakingWhitespace (
 				timeFormatter.instantToTimeString (
 					timeFormatter.defaultTimezone (),
 					dateToInstant (
-						event.getTimestamp ())))),
+						event.getTimestamp ()))),
 
 			"<td>%s</td>\n",
 			text,

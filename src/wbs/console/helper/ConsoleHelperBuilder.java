@@ -428,7 +428,8 @@ System.out.println ("#### GOT HOOKS FOR " + consoleHelperProvider.objectName ())
 
 				Optional<String> optionalHtml =
 					consoleHooks.getHtml (
-						object);
+						object,
+						mini);
 
 				if (optionalHtml.isPresent ()) {
 					return optionalHtml.get ();
@@ -437,9 +438,11 @@ System.out.println ("#### GOT HOOKS FOR " + consoleHelperProvider.objectName ())
 			}
 
 			String path =
-				objectManager.objectPathMini (
+				objectManager.objectPath (
 					object,
-					assumedRoot);
+					assumedRoot,
+					false,
+					mini);
 
 			StringBuilder stringBuilder =
 				new StringBuilder ();

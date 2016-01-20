@@ -75,6 +75,12 @@ class FormFieldLogic {
 
 				updateResultSet.errorCount ++;
 
+			} else if (
+				updateResult.updated ()
+			) {
+
+				updateResultSet.updateCount ++;
+
 			}
 
 			updateResultSet.updateResults ().put (
@@ -662,6 +668,7 @@ class FormFieldLogic {
 			new LinkedHashMap<String,UpdateResult<?,?>> ();
 
 		int errorCount;
+		int updateCount;
 
 	}
 

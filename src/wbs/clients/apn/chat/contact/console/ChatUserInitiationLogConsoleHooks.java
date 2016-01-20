@@ -8,14 +8,14 @@ import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogSearch;
 import wbs.clients.apn.chat.core.console.ChatConsoleHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
-import wbs.console.helper.AbstractConsoleHooks;
+import wbs.console.helper.ConsoleHooks;
 import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("chatUserInitiationLogConsoleHooks")
 public
 class ChatUserInitiationLogConsoleHooks
-	extends AbstractConsoleHooks<ChatUserInitiationLogRec> {
+	implements ConsoleHooks<ChatUserInitiationLogRec> {
 
 	// dependencies
 
