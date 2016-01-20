@@ -3,9 +3,11 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.hyphenToCamel;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 import static wbs.framework.utils.etc.Misc.toEnum;
@@ -179,6 +181,14 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull Optional<Interface> interfaceValue,
 			@NonNull FormType formType) {
 
+		Optional<Interface> currentValue =
+			formValuePresent (
+					submission)
+				? requiredSuccess (
+					formToInterface (
+						submission))
+				: interfaceValue;
+
 		htmlWriter.writeFormat (
 			"<select",
 			" id=\"%h\"",
@@ -192,7 +202,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			nullable ()
 
 			|| isNotPresent (
-				interfaceValue)
+				currentValue)
 
 			|| in (
 				formType,
@@ -205,7 +215,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			htmlWriter.writeFormat (
 				"<option",
 				" value=\"none\"",
-				interfaceValue.isPresent ()
+				currentValue.isPresent ()
 					? ""
 					: " selected",
 				">&mdash;</option>\n");
@@ -228,7 +238,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 				" value=\"%h\"",
 				camelToHyphen (
 					optionValue.name ()),
-				optionValue == interfaceValue.orNull ()
+				optionValue == currentValue.orNull ()
 					? " selected"
 					: "",
 				">%h</option>\n",
@@ -247,12 +257,42 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Optional<Interface> interfaceValue) {
+			@NonNull Optional<Interface> interfaceValue,
+			@NonNull FormType formType) {
 
-		javascriptWriter.writeFormat (
-			"%s$(\"#%j\").val (\"none\");\n",
-			indent,
-			name);
+		if (
+			in (
+				formType,
+				FormType.create,
+				FormType.perform,
+				FormType.search)
+		) {
+
+			javascriptWriter.writeFormat (
+				"%s$(\"#%j\").val (\"none\");\n",
+				indent,
+				name);
+
+		} else if (
+			in (
+				formType,
+				FormType.update)
+		) {
+
+			javascriptWriter.writeFormat (
+				"%s$(\"#%j\").val (\"%h\");\n",
+				indent,
+				name,
+				interfaceValue.isPresent ()
+					? camelToHyphen (
+						interfaceValue.get ().name ())
+					: "none");
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 	}
 
@@ -290,8 +330,9 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 				Optional.of (
 					toEnum (
 						enumConsoleHelper.enumClass (),
-						submission.parameter (
-							name ()))));
+						hyphenToCamel (
+							submission.parameter (
+								name ())))));
 
 		}
 

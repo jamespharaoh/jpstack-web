@@ -170,7 +170,8 @@ class UploadFormFieldRenderer<Container>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Optional<FileUpload> interfaceValue) {
+			@NonNull Optional<FileUpload> interfaceValue,
+			@NonNull FormType formType) {
 
 		javascriptWriter.writeFormat (
 			"%s$(\"#%j\").replaceWith (\n",

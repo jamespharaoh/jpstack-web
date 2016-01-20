@@ -134,7 +134,8 @@ class HtmlFormFieldRenderer<Container>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Optional<String> interfaceValue,
+			@NonNull FormType formType) {
 
 	}
 

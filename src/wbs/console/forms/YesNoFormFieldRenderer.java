@@ -161,6 +161,18 @@ class YesNoFormFieldRenderer<Container>
 			@NonNull Optional<Boolean> interfaceValue,
 			@NonNull FormType formType) {
 
+		Optional<Boolean> currentValue =
+			formValuePresent (
+					submission)
+				? Optional.fromNullable (
+					stringToBoolean (
+						formValue (
+							submission),
+						"yes",
+						"no",
+						"none"))
+				: interfaceValue;
+
 		htmlWriter.writeFormat (
 			"<select name=\"%h\">",
 			name ());
@@ -170,7 +182,7 @@ class YesNoFormFieldRenderer<Container>
 			nullable ()
 
 			|| isNotPresent (
-				interfaceValue)
+				currentValue)
 
 			|| in (
 				formType,
@@ -182,8 +194,8 @@ class YesNoFormFieldRenderer<Container>
 
 			htmlWriter.writeFormat (
 				"<option",
-				" value=\"\"",
-				interfaceValue.isPresent ()
+				" value=\"none\"",
+				currentValue.isPresent ()
 					? ""
 					: " selected",
 				">&mdash;</option>\n");
@@ -193,7 +205,7 @@ class YesNoFormFieldRenderer<Container>
 		htmlWriter.writeFormat (
 			"<option",
 			" value=\"yes\"",
-			interfaceValue.or (false) == true
+			currentValue.or (false) == true
 				? " selected"
 				: "",
 			">%h</option>\n",
@@ -202,7 +214,7 @@ class YesNoFormFieldRenderer<Container>
 		htmlWriter.writeFormat (
 			"<option",
 			" value=\"no\"",
-			interfaceValue.or (true) == false
+			currentValue.or (true) == false
 				? " selected"
 				: "",
 			">%h</option>\n",
@@ -219,17 +231,43 @@ class YesNoFormFieldRenderer<Container>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Optional<Boolean> interfaceValue) {
+			@NonNull Optional<Boolean> interfaceValue,
+			@NonNull FormType formType) {
 
-		javascriptWriter.writeFormat (
-			"%s$(\"#%j\").val (%s);\n",
-			indent,
-			name,
-			booleanToString (
-				interfaceValue.orNull (),
-				"true",
-				"false",
-				""));
+		if (
+			in (
+				formType,
+				FormType.create,
+				FormType.perform,
+				FormType.search)
+		) {
+
+			javascriptWriter.writeFormat (
+				"%s$(\"#%j\").val (\"none\");\n",
+				indent,
+				name);
+
+		} else if (
+			in (
+				formType,
+				FormType.update)
+		) {
+
+			javascriptWriter.writeFormat (
+				"%s$(\"#%j\").val (%s);\n",
+				indent,
+				name,
+				booleanToString (
+					interfaceValue.orNull (),
+					"true",
+					"false",
+					"none"));
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 	}
 

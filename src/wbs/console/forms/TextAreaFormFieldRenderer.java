@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
@@ -225,12 +226,14 @@ class TextAreaFormFieldRenderer<Container,Parent>
 
 		if (formFieldDataProvider != null) {
 
+			/*
 			String data =
 				formFieldDataProvider.getFormFieldDataForObject (
 					container);
 
 			out.writeFormat (
-				"<span hidden=\"hidden\"",
+				"<span",
+				" hidden=\"hidden\"",
 				" class=\"parameters-length-list\"",
 				data,
 				"></span>\n");
@@ -238,7 +241,6 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			out.writeFormat (
 				"<br>\n");
 
-			/*
 			// parameters data
 
 			String[] tokens =
@@ -381,13 +383,39 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Optional<String> interfaceValue,
+			@NonNull FormType formType) {
 
-		javascriptWriter.writeFormat (
-			"%s$(\"#%j\").val (\"%j\");\n",
-			indent,
-			name,
-			interfaceValue.or (""));
+		if (
+			in (
+				formType,
+				FormType.create,
+				FormType.perform,
+				FormType.search)
+		) {
+
+			javascriptWriter.writeFormat (
+				"%s$(\"#%j\").val (\"\");\n",
+				indent,
+				name);
+
+		} else if (
+			in (
+				formType,
+				FormType.update)
+		) {
+
+			javascriptWriter.writeFormat (
+				"%s$(\"#%j\").val (\"%j\");\n",
+				indent,
+				name,
+				interfaceValue.or (""));
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 	}
 

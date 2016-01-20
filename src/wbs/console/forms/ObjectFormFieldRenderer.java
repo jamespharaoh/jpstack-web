@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Collection;
@@ -223,6 +224,14 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			@NonNull Optional<Interface> interfaceValue,
 			@NonNull FormType formType) {
 
+		Optional<Interface> currentValue =
+			formValuePresent (
+					submission)
+				? requiredSuccess (
+					formToInterface (
+						submission))
+				: interfaceValue;
+
 		// get a list of options
 
 		Collection<? extends Record<?>> allOptions =
@@ -292,20 +301,20 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			nullable ()
 
 			|| isNotPresent (
-				interfaceValue)
+				currentValue)
 
 			|| in (
 				formType,
 				FormType.create,
-				FormType.search,
-				FormType.update)
+				FormType.perform,
+				FormType.search)
 
 		) {
 
 			out.writeFormat (
 				"<option",
 				" value=\"none\"",
-				interfaceValue.isPresent ()
+				currentValue.isPresent ()
 					? ""
 					: " selected",
 				">&mdash;</option>\n");
@@ -330,7 +339,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 					optionValue);
 
 			boolean selected =
-				optionValue == interfaceValue.orNull ();
+				optionValue == currentValue.orNull ();
 
 			if (
 
@@ -367,12 +376,41 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Optional<Interface> interfaceValue) {
+			@NonNull Optional<Interface> interfaceValue,
+			@NonNull FormType formType) {
 
-		javascriptWriter.writeFormat (
-			"%s$(\"#%j\").val (\"none\");\n",
-			indent,
-			name);
+		if (
+			in (
+				formType,
+				FormType.create,
+				FormType.perform,
+				FormType.search)
+		) {
+
+			javascriptWriter.writeFormat (
+				"%s$(\"#%j\").val (\"none\");\n",
+				indent,
+				name);
+
+		} else if (
+			in (
+				formType,
+				FormType.update)
+		) {
+
+			javascriptWriter.writeFormat (
+				"%s$(\"#%j\").val (\"%h\");\n",
+				indent,
+				name,
+				interfaceValue.isPresent ()
+					? interfaceValue.get ().getId ()
+					: "none");
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 	}
 

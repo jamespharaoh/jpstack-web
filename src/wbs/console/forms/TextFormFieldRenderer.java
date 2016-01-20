@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
@@ -190,13 +191,39 @@ class TextFormFieldRenderer<Container>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Optional<String> interfaceValue,
+			@NonNull FormType formType) {
 
-		javascriptWriter.writeFormat (
-			"%s$(\"#%j\").val (\"%j\");\n",
-			indent,
-			name,
-			interfaceValue.or (""));
+		if (
+			in (
+				formType,
+				FormType.create,
+				FormType.perform,
+				FormType.search)
+		) {
+
+			javascriptWriter.writeFormat (
+				"%s$(\"#%j\").val (\"\");\n",
+				indent,
+				name);
+
+		} else if (
+			in (
+				formType,
+				FormType.update)
+		) {
+
+			javascriptWriter.writeFormat (
+				"%s$(\"#%j\").val (\"%j\");\n",
+				indent,
+				name,
+				interfaceValue.or (""));
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 	}
 

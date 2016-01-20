@@ -368,6 +368,7 @@ class FormFieldLogic {
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull String indent,
 			@NonNull FormFieldSet formFieldSet,
+			@NonNull FormType formType,
 			@NonNull Object object) {
 
 		for (
@@ -381,7 +382,8 @@ class FormFieldLogic {
 			formField.renderFormReset (
 				javascriptWriter,
 				indent,
-				object);
+				object,
+				formType);
 
 		}
 

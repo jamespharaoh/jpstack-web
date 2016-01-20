@@ -178,7 +178,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull String indent,
-			@NonNull Container container) {
+			@NonNull Container container,
+			@NonNull FormType formType) {
 
 	}
 

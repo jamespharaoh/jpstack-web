@@ -210,7 +210,8 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull String indent,
-			@NonNull Container container) {
+			@NonNull Container container,
+			@NonNull FormType formType) {
 
 		Optional<Native> nativeValue =
 			requiredValue (
@@ -234,7 +235,8 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			javascriptWriter,
 			indent,
 			container,
-			interfaceValue);
+			interfaceValue,
+			formType);
 
 	}
 

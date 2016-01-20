@@ -48,7 +48,8 @@ interface FormFieldRenderer<Container,Interface> {
 			FormatWriter out,
 			String indent,
 			Container container,
-			Optional<Interface> interfaceValue);
+			Optional<Interface> interfaceValue,
+			FormType formType);
 
 	boolean formValuePresent (
 			FormFieldSubmission submission);

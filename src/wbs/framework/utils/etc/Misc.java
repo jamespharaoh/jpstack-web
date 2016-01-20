@@ -2801,6 +2801,22 @@ class Misc {
 
 	}
 
+	public static <Left,Right>
+	Left requiredSuccess (
+			@NonNull Either<Left,Right> either) {
+
+		return either.left ().value ();
+
+	}
+
+	public static <Left,Right>
+	Right requiredError (
+			@NonNull Either<Left,Right> either) {
+
+		return either.right ().value ();
+
+	}
+
 	public static
 	boolean isInstanceOf (
 			@NonNull Class<?> theClass,

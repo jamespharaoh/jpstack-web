@@ -83,7 +83,8 @@ interface FormField<Container,Generic,Native,Interface> {
 	void renderFormReset (
 			FormatWriter out,
 			String indent,
-			Container container) {
+			Container container,
+			FormType formType) {
 
 		throw new UnsupportedOperationException ();
 
@@ -119,6 +120,7 @@ interface FormField<Container,Generic,Native,Interface> {
 
 	}
 
+	@Accessors (fluent = true)
 	public static
 	enum FormType {
 		create,
