@@ -34,10 +34,6 @@ class HtmlFormFieldBuilder {
 	identityFormFieldInterfaceMappingProvider;
 
 	@Inject
-	Provider<NullFormFieldConstraintValidator>
-	nullFormFieldValueConstraintValidatorProvider;
-
-	@Inject
 	Provider<ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
@@ -48,10 +44,6 @@ class HtmlFormFieldBuilder {
 	@Inject
 	Provider<HtmlFormFieldRenderer>
 	htmlFormFieldRendererProvider;
-
-	@Inject
-	Provider<UpdatableFormField>
-	updatableFormFieldProvider;
 
 	// builder
 

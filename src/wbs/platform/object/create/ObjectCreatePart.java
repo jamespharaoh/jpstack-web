@@ -1,5 +1,7 @@
 package wbs.platform.object.create;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,11 +70,11 @@ class ObjectCreatePart<
 
 	// state
 
-	ParentType parent;
-
-	List<ParentType> parents;
+	Optional<UpdateResultSet> updateResultSet;
 
 	ConsoleHelper<ParentType> parentHelper;
+	List<ParentType> parents;
+	ParentType parent;
 
 	ObjectType object;
 
@@ -101,8 +103,16 @@ class ObjectCreatePart<
 		// if a field provider was provided
 
 		if (formFieldsProvider != null) {
-			prepareFieldSet();
+			prepareFieldSet ();
 		}
+
+		// get update results
+
+		updateResultSet =
+			Optional.fromNullable (
+				(UpdateResultSet)
+				requestContext.request (
+					"objectCreateUpdateResultSet"));
 
 		// create dummy instance
 
@@ -213,36 +223,17 @@ class ObjectCreatePart<
 			"<p>Please enter the details for the new %h</p>\n",
 			consoleHelper.shortName ());
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
-			requestContext.resolveLocalUrl (
-				"/" + localFile),
-			">\n");
-
-		printFormat (
-			"<table class=\"details\">\n");
-
-		formFieldLogic.outputFormRows (
+		formFieldLogic.outputFormTable (
 			requestContext,
 			formatWriter,
 			formFieldSet,
-			Optional.<UpdateResultSet>absent (),
-			object);
-
-		printFormat (
-			"</table>\n");
-
-		printFormat (
-			"<p><input",
-			" type=\"submit\"",
-			" value=\"create %h\"",
-			consoleHelper.shortName (),
-			"></p>\n");
-
-		printFormat (
-			"</form>\n");
+			updateResultSet,
+			object,
+			requestContext.resolveLocalUrl (
+				"/" + localFile),
+			stringFormat (
+				"create %h",
+				consoleHelper.shortName ()));
 
 	}
 

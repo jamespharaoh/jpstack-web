@@ -63,6 +63,10 @@ class CodeFormFieldBuilder {
 	readOnlyFormFieldProvider;
 
 	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
+
+	@Inject
 	Provider<SpecialFormFieldAccessor>
 	specialFormFieldAccessorProvider;
 
@@ -174,6 +178,9 @@ class CodeFormFieldBuilder {
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		valueValidators.add (
+			requiredFormFieldValueValidatorProvider.get ());
 
 		valueValidators.add (
 			codeFormFieldValueValidatorProvider.get ()

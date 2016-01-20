@@ -10,6 +10,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.joda.time.LocalDate;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -19,10 +21,10 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
-@PrototypeComponent ("timestampPartialFormFieldBuilder")
+@PrototypeComponent ("dateFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class TimestampPartialFormFieldBuilder {
+class DateFormFieldBuilder {
 
 	// dependencies
 
@@ -32,16 +34,16 @@ class TimestampPartialFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
+	Provider<DereferenceFormFieldAccessor>
+	dereferenceFormFieldAccessorProvider;
+
+	@Inject
 	Provider<IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
 	@Inject
 	Provider<NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
-
-	@Inject
-	Provider<TimestampPartialFormFieldValueValidator>
-	timestampPartialFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<ReadOnlyFormField>
@@ -60,8 +62,8 @@ class TimestampPartialFormFieldBuilder {
 	textFormFieldRendererProvider;
 
 	@Inject
-	Provider<IdentityFormFieldInterfaceMapping>
-	identityFormFieldInterfaceMappingProvider;
+	Provider<DateFormFieldInterfaceMapping>
+	dateFormFieldInterfaceMappingProvider;
 
 	@Inject
 	Provider<UpdatableFormField>
@@ -73,10 +75,10 @@ class TimestampPartialFormFieldBuilder {
 	FormFieldBuilderContext context;
 
 	@BuilderSource
-	TimestampPartialFormFieldSpec spec;
+	DateFormFieldSpec spec;
 
 	@BuilderTarget
-	FormFieldSet formFieldSet;
+	FormFieldSet target;
 
 	// build
 
@@ -87,6 +89,11 @@ class TimestampPartialFormFieldBuilder {
 
 		String name =
 			spec.name ();
+
+		String nativeFieldName =
+			ifNull (
+				spec.fieldName (),
+				name);
 
 		String label =
 			ifNull (
@@ -105,18 +112,34 @@ class TimestampPartialFormFieldBuilder {
 				spec.nullable (),
 				false);
 
-		// accessor and native mapping
+		// accessor
 
-		FormFieldAccessor formFieldAccessor =
-			simpleFormFieldAccessorProvider.get ()
+		FormFieldAccessor accessor;
 
-			.name (
-				name)
+		if (readOnly) {
 
-			.nativeClass (
-				String.class);
+			accessor =
+				dereferenceFormFieldAccessorProvider.get ()
 
-		FormFieldNativeMapping formFieldNativeMapping =
+				.path (
+					nativeFieldName);
+
+		} else {
+
+			accessor =
+				simpleFormFieldAccessorProvider.get ()
+
+				.name (
+					nativeFieldName)
+
+				.nativeClass (
+					LocalDate.class);
+
+		}
+
+		// native mapping
+
+		FormFieldNativeMapping nativeMapping =
 			identityFormFieldNativeMappingProvider.get ();
 
 		// value validator
@@ -131,9 +154,6 @@ class TimestampPartialFormFieldBuilder {
 
 		}
 
-		valueValidators.add (
-			timestampPartialFormFieldValueValidatorProvider.get ());
-
 		// constraint validator
 
 		FormFieldConstraintValidator constraintValidator =
@@ -142,7 +162,7 @@ class TimestampPartialFormFieldBuilder {
 		// interface mapping
 
 		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
+			dateFormFieldInterfaceMappingProvider.get ();
 
 		// renderer
 
@@ -170,7 +190,8 @@ class TimestampPartialFormFieldBuilder {
 
 		if (readOnly) {
 
-			formFieldSet.addFormField (
+			target.addFormField (
+
 				readOnlyFormFieldProvider.get ()
 
 				.name (
@@ -180,12 +201,15 @@ class TimestampPartialFormFieldBuilder {
 					label)
 
 				.accessor (
-					formFieldAccessor)
+					accessor)
 
 				.nativeMapping (
-					formFieldNativeMapping)
+					nativeMapping)
 
 				.interfaceMapping (
+					interfaceMapping)
+
+				.csvMapping (
 					interfaceMapping)
 
 				.renderer (
@@ -195,7 +219,8 @@ class TimestampPartialFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.addFormField (
+			target.addFormField (
+
 				updatableFormFieldProvider.get ()
 
 				.name (
@@ -205,10 +230,10 @@ class TimestampPartialFormFieldBuilder {
 					label)
 
 				.accessor (
-					formFieldAccessor)
+					accessor)
 
 				.nativeMapping (
-					formFieldNativeMapping)
+					nativeMapping)
 
 				.valueValidators (
 					valueValidators)
@@ -217,6 +242,9 @@ class TimestampPartialFormFieldBuilder {
 					constraintValidator)
 
 				.interfaceMapping (
+					interfaceMapping)
+
+				.csvMapping (
 					interfaceMapping)
 
 				.renderer (

@@ -62,6 +62,10 @@ class IntegerFormFieldBuilder {
 	readOnlyFormFieldProvider;
 
 	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
+
+	@Inject
 	Provider<SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
@@ -112,6 +116,11 @@ class IntegerFormFieldBuilder {
 		Boolean readOnly =
 			ifNull (
 				spec.readOnly (),
+				false);
+
+		Boolean nullable =
+			ifNull (
+				spec.nullable (),
 				false);
 
 		Long minimum =
@@ -198,6 +207,13 @@ class IntegerFormFieldBuilder {
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		if (! nullable) {
+
+			valueValidators.add (
+				requiredFormFieldValueValidatorProvider.get ());
+
+		}
 
 		valueValidators.add (
 			integerFormFieldValueValidatorProvider.get ()

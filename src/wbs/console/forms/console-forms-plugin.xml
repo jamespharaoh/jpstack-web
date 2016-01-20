@@ -8,6 +8,8 @@
 		<bean class="CodeFormFieldConstraintValidator"/>
 		<bean class="CodeFormFieldSpec"/>
 		<bean class="CodeFormFieldValueValidator"/>
+		<bean class="DateFormFieldBuilder"/>
+		<bean class="DateFormFieldInterfaceMapping"/>
 		<bean class="DateFormFieldNativeMapping"/>
 		<bean class="DateFormFieldSpec"/>
 		<bean class="DelegateFormFieldAccessor"/>
@@ -54,7 +56,6 @@
 		<bean class="NameFormFieldValueValidator"/>
 		<bean class="NullFormFieldConstraintValidator"/>
 		<bean class="NullFormFieldUpdateHook"/>
-		<bean class="NullFormFieldValueValidator"/>
 		<bean class="ObjectCsvFormFieldInterfaceMapping"/>
 		<bean class="ObjectFormFieldBuilder"/>
 		<bean class="ObjectFormFieldConstraintValidator"/>
@@ -69,6 +70,7 @@
 		<bean class="ParentFormFieldConstraintValidator"/>
 		<bean class="ParentFormFieldSpec"/>
 		<bean class="ReadOnlyFormField"/>
+		<bean class="RequiredFormFieldValueValidator"/>
 		<bean class="ScriptRefFormField"/>
 		<bean class="ScriptRefFormFieldBuilder"/>
 		<bean class="ScriptRefFormFieldSpec"/>

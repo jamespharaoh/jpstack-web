@@ -41,7 +41,7 @@ class ChatGraphsUsersPart
 			try {
 
 				date =
-					timeFormatter.dateStringToLocalDate (
+					timeFormatter.dateStringToLocalDateRequired (
 						dateString);
 
 			} catch (IllegalArgumentException exception) {

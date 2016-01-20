@@ -48,6 +48,10 @@ class UploadFormFieldBuilder {
 	readOnlyFormFieldProvider;
 
 	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
+
+	@Inject
 	Provider<SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
@@ -87,6 +91,13 @@ class UploadFormFieldBuilder {
 					camelToSpaces (
 						name)));
 
+		Boolean nullable =
+			ifNull (
+				spec.nullable (),
+				false);
+
+		// accessor
+
 		FormFieldAccessor accessor =
 			simpleFormFieldAccessorProvider.get ()
 
@@ -99,10 +110,17 @@ class UploadFormFieldBuilder {
 		FormFieldNativeMapping nativeMapping =
 			identityFormFieldNativeMappingProvider.get ();
 
-		// value validator
+		// value validators
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		if (! nullable) {
+
+			valueValidators.add (
+				requiredFormFieldValueValidatorProvider.get ());
+
+		}
 
 		// constraint validator
 

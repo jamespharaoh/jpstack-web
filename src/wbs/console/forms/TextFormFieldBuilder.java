@@ -47,6 +47,10 @@ class TextFormFieldBuilder {
 	Provider<ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
+
+	@Inject
 	Provider<SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
 
 	@Inject
@@ -157,6 +161,13 @@ class TextFormFieldBuilder {
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		if (! nullable) {
+
+			valueValidators.add (
+				requiredFormFieldValueValidatorProvider.get ());
+
+		}
 
 		// constraint validator
 

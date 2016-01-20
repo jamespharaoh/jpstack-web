@@ -53,6 +53,10 @@ class TimestampToFormFieldBuilder {
 	readOnlyFormFieldProvider;
 
 	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
+
+	@Inject
 	Provider<SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
@@ -145,10 +149,17 @@ class TimestampToFormFieldBuilder {
 
 		}
 
-		// value validator
+		// value validators
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		if (! nullable) {
+
+			valueValidators.add (
+				requiredFormFieldValueValidatorProvider.get ());
+
+		}
 
 		// constraint validator
 

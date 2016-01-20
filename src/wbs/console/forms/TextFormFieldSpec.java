@@ -34,4 +34,10 @@ class TextFormFieldSpec {
 	@DataAttribute
 	Boolean nullable;
 
+	@DataAttribute
+	Integer minimumLength;
+
+	@DataAttribute
+	Integer maximumLength;
+
 }

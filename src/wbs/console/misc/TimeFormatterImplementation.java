@@ -11,6 +11,8 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("timeFormatter")
@@ -148,7 +150,26 @@ class TimeFormatterImplementation
 
 	@Override
 	public
-	LocalDate dateStringToLocalDate (
+	Optional<LocalDate> dateStringToLocalDate (
+			@NonNull String string) {
+
+		try {
+
+			return Optional.of (
+				shortDateFormat.parseLocalDate (
+					string));
+
+		} catch (IllegalArgumentException exception) {
+
+			return Optional.absent ();
+
+		}
+
+	}
+
+	@Override
+	public
+	LocalDate dateStringToLocalDateRequired (
 			@NonNull String string) {
 
 		return shortDateFormat.parseLocalDate (

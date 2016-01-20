@@ -1,9 +1,8 @@
-package wbs.platform.currency.console;
+package wbs.sms.gsm.console;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.forms.DynamicFormFieldAccessor;
 import wbs.console.forms.FormFieldAccessor;
 import wbs.console.forms.FormFieldBuilderContext;
 import wbs.console.forms.FormFieldConstraintValidator;
@@ -22,10 +22,7 @@ import wbs.console.forms.FormFieldRenderer;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormFieldUpdateHook;
 import wbs.console.forms.FormFieldValueValidator;
-import wbs.console.forms.IdentityFormFieldNativeMapping;
-import wbs.console.forms.IntegerFormFieldInterfaceMapping;
-import wbs.console.forms.IntegerFormFieldNativeMapping;
-import wbs.console.forms.IntegerFormFieldValueValidator;
+import wbs.console.forms.IdentityFormFieldInterfaceMapping;
 import wbs.console.forms.NullFormFieldConstraintValidator;
 import wbs.console.forms.ReadOnlyFormField;
 import wbs.console.forms.RequiredFormFieldValueValidator;
@@ -41,10 +38,10 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.utils.etc.BeanLogic;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
-@PrototypeComponent ("currencyFormFieldBuilder")
+@PrototypeComponent ("gsmFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class CurrencyFormFieldBuilder {
+class GsmFormFieldBuilder {
 
 	// dependencies
 
@@ -54,48 +51,34 @@ class CurrencyFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<CurrencyFormFieldInterfaceMapping>
-	currencyFormFieldInterfaceMappingProvider;
+	Provider<DynamicFormFieldAccessor> dynamicFormFieldAccessorProvider;
 
 	@Inject
-	Provider<IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	Provider<GsmFormFieldValueValidator> gsmValueValidatorProvider;
 
 	@Inject
-	Provider<IntegerFormFieldInterfaceMapping>
-	integerFormFieldInterfaceMappingProvider;
-
-	@Inject
-	Provider<IntegerFormFieldNativeMapping>
-	integerFormFieldNativeMappingProvider;
-
-	@Inject
-	Provider<IntegerFormFieldValueValidator>
-	integerFormFieldValueValidatorProvider;
+	Provider<IdentityFormFieldInterfaceMapping>
+	identityFormFieldInterfaceMappingProvider;
 
 	@Inject
 	Provider<NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
 
 	@Inject
-	Provider<ReadOnlyFormField>
-	readOnlyFormFieldProvider;
+	Provider<ReadOnlyFormField> readOnlyFormFieldProvider;
 
 	@Inject
 	Provider<RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
 	@Inject
-	Provider<SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	Provider<SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
 
 	@Inject
-	Provider<TextFormFieldRenderer>
-	textFormFieldRendererProvider;
+	Provider<TextFormFieldRenderer> textFormFieldRendererProvider;
 
 	@Inject
-	Provider<UpdatableFormField>
-	updatableFormFieldProvider;
+	Provider<UpdatableFormField> updatableFormFieldProvider;
 
 	// builder
 
@@ -103,10 +86,10 @@ class CurrencyFormFieldBuilder {
 	FormFieldBuilderContext context;
 
 	@BuilderSource
-	CurrencyFormFieldSpec spec;
+	GsmFormFieldSpec spec;
 
 	@BuilderTarget
-	FormFieldSet formFieldSet;
+	FormFieldSet target;
 
 	// build
 
@@ -115,15 +98,15 @@ class CurrencyFormFieldBuilder {
 	void build (
 			Builder builder) {
 
-		// resolve properties from spec
-
 		String name =
 			spec.name ();
 
 		String label =
 			ifNull (
 				spec.label (),
-				capitalise (camelToSpaces (name)));
+				capitalise (
+					camelToSpaces (
+						name)));
 
 		Boolean readOnly =
 			ifNull (
@@ -135,62 +118,73 @@ class CurrencyFormFieldBuilder {
 				spec.nullable (),
 				false);
 
-		Long minimum =
-			ifNull (
-				spec.minimum (),
-				Long.MIN_VALUE);
+		Integer minimumLength =
+			spec.minimumLength ();
 
-		Long maximum =
-			ifNull (
-				spec.maximum (),
-				Long.MAX_VALUE);
+		Integer maximumLength =
+			spec.maximumLength ();
 
-		Class<?> propertyClass =
-			BeanLogic.propertyClassForClass (
-				context.containerClass (),
-				name);
-
-		Boolean blankIfZero =
+		Boolean dynamic =
 			ifNull (
-				spec.blankIfZero (),
+				spec.dynamic (),
 				false);
 
-		// accessor
+		// field type
 
-		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+		Class<?> propertyClass;
 
-			.name (
-				name)
+		if (! dynamic) {
 
-			.nativeClass (
-				propertyClass);
-
-		// native mapping
-
-		FormFieldNativeMapping nativeMapping ;
-
-
-		if (propertyClass == Integer.class) {
-
-			nativeMapping =
-				integerFormFieldNativeMappingProvider.get ();
-
-		} else if (propertyClass == Long.class) {
-
-			nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
+			propertyClass =
+				BeanLogic.propertyClassForClass (
+					context.containerClass (),
+					name);
 
 		} else {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Don't know how to map %s as integer for %s.%s",
-					propertyClass,
-					context.containerClass (),
-					name));
+			propertyClass = String.class;
 
 		}
+
+		// accessor
+
+		FormFieldAccessor accessor;
+
+		if (dynamic) {
+
+			accessor =
+				dynamicFormFieldAccessorProvider.get ()
+
+				.name (
+					name)
+
+				.nativeClass (
+					propertyClass);
+
+		} else {
+
+			accessor =
+				simpleFormFieldAccessorProvider.get ()
+
+				.name (
+					name)
+
+				.nativeClass (
+					propertyClass);
+
+		}
+
+		// TODO dynamic
+
+		// native mapping
+
+		FormFieldNativeMapping nativeMapping =
+			formFieldPluginManager.getNativeMappingRequired (
+				context,
+				context.containerClass (),
+				name,
+				String.class,
+				propertyClass);
 
 		// value validator
 
@@ -205,16 +199,13 @@ class CurrencyFormFieldBuilder {
 		}
 
 		valueValidators.add (
-			integerFormFieldValueValidatorProvider.get ()
+			gsmValueValidatorProvider.get ()
 
-			.label (
-				label)
+			.minimumLength (
+				minimumLength)
 
-			.minimum (
-				minimum)
-
-			.maximum (
-				maximum)
+			.maximumLength (
+				maximumLength)
 
 		);
 
@@ -226,13 +217,7 @@ class CurrencyFormFieldBuilder {
 		// interface mapping
 
 		FormFieldInterfaceMapping interfaceMapping =
-			currencyFormFieldInterfaceMappingProvider.get ()
-
-			.currencyPath (
-				spec.currencyPath ())
-
-			.blankIfZero (
-				blankIfZero);
+			identityFormFieldInterfaceMappingProvider.get ();
 
 		// renderer
 
@@ -246,12 +231,7 @@ class CurrencyFormFieldBuilder {
 				label)
 
 			.nullable (
-				ifNull (
-					spec.nullable (),
-					false))
-
-			.align (
-				TextFormFieldRenderer.Align.right);
+				nullable);
 
 		// update hook
 
@@ -261,11 +241,39 @@ class CurrencyFormFieldBuilder {
 				context.containerClass (),
 				name);
 
-		// field
+		// form field
 
-		if (! readOnly) {
+		if (readOnly) {
 
-			formFieldSet.addFormField (
+			target.addFormField (
+				readOnlyFormFieldProvider.get ()
+
+				.name (
+					name)
+
+				.label (
+					label)
+
+				.accessor (
+					accessor)
+
+				.nativeMapping (
+					nativeMapping)
+
+				.interfaceMapping (
+					interfaceMapping)
+
+				.csvMapping (
+					interfaceMapping)
+
+				.renderer (
+					renderer)
+
+			);
+
+		} else {
+
+			target.addFormField (
 				updatableFormFieldProvider.get ()
 
 				.name (
@@ -297,34 +305,6 @@ class CurrencyFormFieldBuilder {
 
 				.updateHook (
 					updateHook)
-
-			);
-
-		} else {
-
-			formFieldSet.addFormField (
-				readOnlyFormFieldProvider.get ()
-
-				.name (
-					name)
-
-				.label (
-					label)
-
-				.accessor (
-					accessor)
-
-				.nativeMapping (
-					nativeMapping)
-
-				.interfaceMapping (
-					interfaceMapping)
-
-				.csvMapping (
-					interfaceMapping)
-
-				.renderer (
-					renderer)
 
 			);
 

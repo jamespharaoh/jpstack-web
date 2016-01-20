@@ -35,24 +35,24 @@ class SecondsFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
+	Provider<IdentityFormFieldNativeMapping>
+	identityFormFieldNativeMappingProvider;
+
+	@Inject
 	Provider<IntegerFormFieldNativeMapping>
 	integerFormFieldNativeMappingProvider;
+
+	@Inject
+	Provider<NullFormFieldConstraintValidator>
+	nullFormFieldConstraintValidatorProvider;
 
 	@Inject
 	Provider<ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
 	@Inject
-	Provider<UpdatableFormField>
-	updatableFormFieldProvider;
-
-	@Inject
-	Provider<IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
-
-	@Inject
-	Provider<NullFormFieldConstraintValidator>
-	nullFormFieldConstraintValidatorProvider;
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<SecondsFormFieldInterfaceMapping>
@@ -65,6 +65,10 @@ class SecondsFormFieldBuilder {
 	@Inject
 	Provider<TextFormFieldRenderer>
 	textFormFieldRendererProvider;
+
+	@Inject
+	Provider<UpdatableFormField>
+	updatableFormFieldProvider;
 
 	// builder
 
@@ -152,6 +156,13 @@ class SecondsFormFieldBuilder {
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		if (! nullable) {
+
+			valueValidators.add (
+				requiredFormFieldValueValidatorProvider.get ());
+
+		}
 
 		// constraint validator
 

@@ -67,6 +67,10 @@ class DescriptionFormFieldBuilder {
 	readOnlyFormFieldProvider;
 
 	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
+
+	@Inject
 	Provider<SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
@@ -193,6 +197,9 @@ class DescriptionFormFieldBuilder {
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		valueValidators.add (
+			requiredFormFieldValueValidatorProvider.get ());
 
 		// constraint validators
 

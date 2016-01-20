@@ -37,20 +37,12 @@ class ParentFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<ParentFormFieldConstraintValidator>
-	parentFormFieldValueConstraintValidatorProvider;
-
-	@Inject
 	Provider<IdentityFormFieldInterfaceMapping>
 	identityFormFieldInterfaceMappingProvider;
 
 	@Inject
 	Provider<IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
-
-	@Inject
-	Provider<SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
 
 	@Inject
 	Provider<ObjectFormFieldRenderer>
@@ -61,8 +53,20 @@ class ParentFormFieldBuilder {
 	parentFormFieldAccessorProvider;
 
 	@Inject
+	Provider<ParentFormFieldConstraintValidator>
+	parentFormFieldValueConstraintValidatorProvider;
+
+	@Inject
 	Provider<ReadOnlyFormField>
 	readOnlyFormFieldProvider;
+
+	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
+
+	@Inject
+	Provider<SimpleFormFieldAccessor>
+	simpleFormFieldAccessorProvider;
 
 	@Inject
 	Provider<UpdatableFormField>
@@ -150,6 +154,9 @@ class ParentFormFieldBuilder {
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		valueValidators.add (
+			requiredFormFieldValueValidatorProvider.get ());
 
 		// constraint validator
 

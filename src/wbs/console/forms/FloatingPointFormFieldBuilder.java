@@ -57,6 +57,10 @@ class FloatingPointFormFieldBuilder {
 	readOnlyFormFieldProvider;
 
 	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
+
+	@Inject
 	Provider<SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
@@ -107,6 +111,11 @@ class FloatingPointFormFieldBuilder {
 				spec.readOnly (),
 				false);
 
+		Boolean nullable =
+			ifNull (
+				spec.nullable (),
+				false);
+
 		Double minimum =
 			ifNull (
 				spec.minimum (),
@@ -150,6 +159,13 @@ class FloatingPointFormFieldBuilder {
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		if (! nullable) {
+
+			valueValidators.add (
+				requiredFormFieldValueValidatorProvider.get ());
+
+		}
 
 		valueValidators.add (
 			floatingPointFormFieldValueValidatorProvider.get ()

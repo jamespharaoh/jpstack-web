@@ -5,6 +5,8 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import com.google.common.base.Optional;
+
 public
 interface TimeFormatter {
 
@@ -37,7 +39,10 @@ interface TimeFormatter {
 	String localDateToDateString (
 			LocalDate localDate);
 
-	LocalDate dateStringToLocalDate (
+	Optional<LocalDate> dateStringToLocalDate (
+			String string);
+
+	LocalDate dateStringToLocalDateRequired (
 			String string);
 
 	DateTime timestampTimezoneToDateTime (

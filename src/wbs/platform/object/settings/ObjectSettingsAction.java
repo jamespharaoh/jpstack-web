@@ -146,7 +146,7 @@ class ObjectSettingsAction<
 				updateResultSet);
 
 			requestContext.request (
-				"objectCreateUpdateResultSet",
+				"objectSettingsUpdateResultSet",
 				updateResultSet);
 
 			return null;

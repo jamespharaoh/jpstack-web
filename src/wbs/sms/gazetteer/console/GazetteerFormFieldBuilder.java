@@ -30,6 +30,7 @@ import wbs.console.forms.FormFieldUpdateHook;
 import wbs.console.forms.FormFieldValueValidator;
 import wbs.console.forms.NullFormFieldConstraintValidator;
 import wbs.console.forms.ReadOnlyFormField;
+import wbs.console.forms.RequiredFormFieldValueValidator;
 import wbs.console.forms.SimpleFormFieldAccessor;
 import wbs.console.forms.TextFormFieldRenderer;
 import wbs.console.forms.UpdatableFormField;
@@ -79,6 +80,10 @@ class GazetteerFormFieldBuilder {
 
 	@Inject
 	Provider<ReadOnlyFormField> readOnlyFormFieldProvider;
+
+	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
 
 	@Inject
 	Provider<SimpleFormFieldAccessor> simpleFormFieldAccessorProvider;
@@ -244,10 +249,17 @@ class GazetteerFormFieldBuilder {
 
 		}
 
-		// value validator
+		// value validators
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		if (! nullable) {
+
+			valueValidators.add (
+				requiredFormFieldValueValidatorProvider.get ());
+
+		}
 
 		// constraint validator
 
@@ -257,7 +269,10 @@ class GazetteerFormFieldBuilder {
 		// interface mapping
 
 		FormFieldInterfaceMapping interfaceMapping =
-			gazetteerFormFieldInterfaceMappingProvider.get ();
+			gazetteerFormFieldInterfaceMappingProvider.get ()
+
+			.gazetteerFieldName (
+				spec.gazetteerFieldName ());
 
 		// renderer
 

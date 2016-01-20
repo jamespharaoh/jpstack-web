@@ -42,24 +42,28 @@ class ObjectIdFormFieldBuilder {
 	identityFormFieldInterfaceMappingProvider;
 
 	@Inject
-	Provider<ObjectIdFormFieldNativeMapping>
-	objectIdFormFieldNativeMappingProvider;
-
-	@Inject
-	Provider<SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	Provider<ObjectFormFieldConstraintValidator>
+	objectFormFieldConstraintValidatorProvider;
 
 	@Inject
 	Provider<ObjectFormFieldRenderer>
 	objectFormFieldRendererProvider;
 
 	@Inject
-	Provider<ObjectFormFieldConstraintValidator>
-	objectFormFieldConstraintValidatorProvider;
+	Provider<ObjectIdFormFieldNativeMapping>
+	objectIdFormFieldNativeMappingProvider;
 
 	@Inject
 	Provider<ReadOnlyFormField>
 	readOnlyFormFieldProvider;
+
+	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
+
+	@Inject
+	Provider<SimpleFormFieldAccessor>
+	simpleFormFieldAccessorProvider;
 
 	@Inject
 	Provider<UpdatableFormField>
@@ -102,7 +106,7 @@ class ObjectIdFormFieldBuilder {
 		Boolean nullable =
 			ifNull (
 				spec.nullable (),
-				true);
+				false);
 
 		Boolean readOnly =
 			ifNull (
@@ -148,6 +152,13 @@ class ObjectIdFormFieldBuilder {
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		if (! nullable) {
+
+			valueValidators.add (
+				requiredFormFieldValueValidatorProvider.get ());
+
+		}
 
 		// constraint validator
 

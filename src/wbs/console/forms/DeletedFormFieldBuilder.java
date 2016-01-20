@@ -56,6 +56,10 @@ class DeletedFormFieldBuilder {
 	readOnlyFormFieldProvider;
 
 	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
+
+	@Inject
 	Provider<SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
@@ -129,6 +133,9 @@ class DeletedFormFieldBuilder {
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		valueValidators.add (
+			requiredFormFieldValueValidatorProvider.get ());
 
 		// constraint validator
 

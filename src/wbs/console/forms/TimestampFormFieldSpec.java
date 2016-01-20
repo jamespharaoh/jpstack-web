@@ -29,9 +29,6 @@ class TimestampFormFieldSpec {
 	Boolean readOnly;
 
 	@DataAttribute
-	Integer size = FormField.defaultSize;
-
-	@DataAttribute
 	Format format;
 
 	public static

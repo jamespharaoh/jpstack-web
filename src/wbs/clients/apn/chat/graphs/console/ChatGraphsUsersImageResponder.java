@@ -84,7 +84,7 @@ class ChatGraphsUsersImageResponder
 
 			date =
 				timeFormatter
-					.dateStringToLocalDate (
+					.dateStringToLocalDateRequired (
 						requestContext.parameter ("date"));
 
 			minTime =

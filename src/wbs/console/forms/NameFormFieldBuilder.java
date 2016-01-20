@@ -73,6 +73,10 @@ class NameFormFieldBuilder {
 	readOnlyFormFieldProvider;
 
 	@Inject
+	Provider<RequiredFormFieldValueValidator>
+	requiredFormFieldValueValidatorProvider;
+
+	@Inject
 	Provider<TextFormFieldRenderer>
 	textFormFieldRendererProvider;
 
@@ -198,6 +202,9 @@ class NameFormFieldBuilder {
 
 		List<FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
+
+		valueValidators.add (
+			requiredFormFieldValueValidatorProvider.get ());
 
 		valueValidators.add (
 			nameFormFieldValueValidatorProvider.get ());

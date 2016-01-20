@@ -85,8 +85,10 @@
 		name="create"
 		object-name="chatUser">
 
-		<text-field
-			name="name"/>
+		<gsm-field
+			name="name"
+			minimum-length="1"
+			maximum-length="16"/>
 
 		<enum-field
 			name="gender"
@@ -99,17 +101,17 @@
 		<gazetteer-field
 			name="postcode"
 			field="locationPlace"
-			gazetteer="gazetteer"/>
+			gazetteer="chat.gazetteer"/>
 
-		<text-field
+		<gsm-field
 			name="infoText"
-			label="Info"/>
+			label="Info"
+			minimum-length="1"
+			maximum-length="160"/>
 
-		<!--
-		<text-field
+		<date-field
 			name="dob"
-			label="DOB"/>
-		-->
+			label="Date of birth"/>
 
 		<object-field
 			name="category"
