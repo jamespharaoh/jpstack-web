@@ -1747,18 +1747,6 @@ class Misc {
 	}
 
 	public static
-	Boolean stringToBoolean (
-			String value) {
-
-		return stringToBoolean (
-			value,
-			"yes",
-			"no",
-			"");
-
-	}
-
-	public static
 	List<String> split (
 			String source,
 			String regex) {

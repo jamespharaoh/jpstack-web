@@ -301,7 +301,10 @@ class YesNoFormFieldRenderer<Container>
 		return successResult (
 			Optional.fromNullable (
 				stringToBoolean (
-					formValue)));
+					formValue,
+					"yes",
+					"no",
+					"none")));
 
 	}
 

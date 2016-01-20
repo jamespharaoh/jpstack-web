@@ -803,7 +803,11 @@ class DataFromXml {
 				BeanLogic.set (
 					object,
 					field.getName (),
-					stringToBoolean (attributeValue));
+					stringToBoolean (
+						attributeValue,
+						"yes",
+						"no",
+						""));
 
 			} else if (field.getType ().isEnum ()) {
 
