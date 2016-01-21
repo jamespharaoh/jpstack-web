@@ -12,6 +12,7 @@ import lombok.NonNull;
 import org.joda.time.LocalDate;
 
 // TODO use LocalDate
+@Deprecated
 public
 class CalDate {
 

@@ -2,9 +2,14 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -38,10 +43,28 @@ class TextFormFieldRenderer<Container>
 	@Getter @Setter
 	Align align;
 
+	@Getter @Setter
+	Map<String,String> presets =
+		new LinkedHashMap<> ();
+
 	// details
 
 	@Getter
 	boolean fileUpload = false;
+
+	// utilities
+
+	public
+	TextFormFieldRenderer<Container> addPreset (
+			@NonNull String preset) {
+
+		presets.put (
+			preset,
+			preset);
+
+		return this;
+
+	}
 
 	// implementation
 
@@ -181,7 +204,34 @@ class TextFormFieldRenderer<Container>
 					""),
 			" size=\"%h\"",
 			FormField.defaultSize,
-			">\n");
+			">");
+
+		if (
+			isNotEmpty (
+				presets ())
+		) {
+
+			out.writeFormat (
+				"<br>");
+
+			for (
+				Map.Entry<String,String> presetEntry
+					: presets ().entrySet ()
+			) {
+
+				out.writeFormat (
+					"\n<button",
+					" onclick=\"%h\"",
+					stringFormat (
+						"$('#%j').val ('%j'); return false",
+						name (),
+						presetEntry.getValue ()),
+					">%h</button>",
+					presetEntry.getKey ());
+
+			}
+
+		}
 
 	}
 

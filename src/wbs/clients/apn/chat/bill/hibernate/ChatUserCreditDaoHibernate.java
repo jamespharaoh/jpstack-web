@@ -2,7 +2,6 @@ package wbs.clients.apn.chat.bill.hibernate;
 
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 
 import java.util.List;
 
@@ -11,7 +10,6 @@ import lombok.NonNull;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
 import wbs.clients.apn.chat.bill.model.ChatUserCreditDao;
@@ -94,23 +92,17 @@ class ChatUserCreditDaoHibernate
 				search.timestamp ())
 		) {
 
-			Interval timestampInterval =
-				parsePartialTimestamp (
-					DateTimeZone.forID (
-						"Europe/London"),
-					search.timestamp ());
-
 			criteria.add (
 				Restrictions.ge (
 					"_chatUserCredit.timestamp",
 					instantToDate (
-						timestampInterval.getStart ())));
+						search.timestamp ().getStart ())));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUserCredit.timestamp",
 					instantToDate (
-						timestampInterval.getEnd ())));
+						search.timestamp ().getEnd ())));
 
 		}
 

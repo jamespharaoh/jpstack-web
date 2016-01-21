@@ -136,7 +136,7 @@
 		name="recent-user-search"
 		class="wbs.clients.apn.chat.user.core.model.ChatUserSearch">
 
-		<timestamp-partial-field
+		<interval-field
 			name="lastJoin"
 			nullable="yes"/>
 
@@ -204,7 +204,7 @@
 		name="admin-credit-search"
 		class="wbs.clients.apn.chat.bill.model.ChatUserCreditSearch">
 
-		<timestamp-partial-field
+		<interval-field
 			name="timestamp"
 			nullable="yes"/>
 
@@ -243,7 +243,7 @@
 		name="initiation-log-search"
 		class="wbs.clients.apn.chat.contact.model.ChatUserInitiationLogSearch">
 
-		<timestamp-partial-field
+		<interval-field
 			name="timestamp"
 			nullable="yes"/>
 
@@ -252,7 +252,7 @@
 			helper="chatUserInitiationReasonConsoleHelper"
 			nullable="yes"/>
 
-		<object-id-field
+		<object-field
 			name="monitorUserId"
 			label="User"
 			object-type="user"

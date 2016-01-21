@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.Misc.errorResult;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
-import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 
@@ -15,9 +14,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
-import org.joda.time.Interval;
 
 import com.google.common.base.Optional;
 
@@ -25,6 +22,7 @@ import fj.data.Either;
 
 import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("timestampFromFormFieldInterfaceMapping")
@@ -33,6 +31,9 @@ class TimestampFromFormFieldInterfaceMapping<Container>
 	implements FormFieldInterfaceMapping<Container,Instant,String> {
 
 	// dependencies
+
+	@Inject
+	FormFieldPreferencesProvider formFieldPreferences;
 
 	@Inject
 	TimeFormatter timeFormatter;
@@ -69,15 +70,15 @@ class TimestampFromFormFieldInterfaceMapping<Container>
 
 				// TODO timezone should not be hardcoded
 
-				Interval interval =
-					parsePartialTimestamp (
-						DateTimeZone.forID (
-							"Europe/London"),
-						interfaceValue.get ());
+				TextualInterval interval =
+					TextualInterval.parseRequired (
+						formFieldPreferences.timeZone (),
+						interfaceValue.get (),
+						formFieldPreferences.hourOffset ());
 
 				return successResult (
 					Optional.of (
-						interval.getStart ().toInstant ()));
+						interval.value ().getStart ().toInstant ()));
 
 			} catch (IllegalArgumentException exception) {
 

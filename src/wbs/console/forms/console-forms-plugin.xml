@@ -61,8 +61,6 @@
 		<bean class="ObjectFormFieldConstraintValidator"/>
 		<bean class="ObjectFormFieldRenderer"/>
 		<bean class="ObjectFormFieldSpec"/>
-		<bean class="ObjectIdFormFieldBuilder"/>
-		<bean class="ObjectIdFormFieldSpec"/>
 		<bean class="ObjectIdFormFieldNativeMapping"/>
 		<bean class="PairFormFieldAccessor"/>
 		<bean class="ParentFormFieldAccessor"/>
@@ -91,9 +89,10 @@
 		<bean class="TimestampFromFormFieldBuilder"/>
 		<bean class="TimestampFromFormFieldInterfaceMapping"/>
 		<bean class="TimestampFromFormFieldSpec"/>
-		<bean class="TimestampPartialFormFieldBuilder"/>
-		<bean class="TimestampPartialFormFieldSpec"/>
-		<bean class="TimestampPartialFormFieldValueValidator"/>
+		<bean class="IntervalFormFieldBuilder"/>
+		<bean class="IntervalFormFieldInterfaceMapping"/>
+		<bean class="IntervalFormFieldNativeMapping"/>
+		<bean class="IntervalFormFieldSpec"/>
 		<bean class="TimestampTimezoneFormFieldBuilder"/>
 		<bean class="TimestampTimezoneFormFieldInterfaceMapping"/>
 		<bean class="TimestampTimezoneFormFieldSpec"/>

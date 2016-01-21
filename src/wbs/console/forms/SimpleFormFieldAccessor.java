@@ -97,10 +97,13 @@ class SimpleFormFieldAccessor<Container,Native>
 
 			throw new RuntimeException (
 				stringFormat (
-					"Field %s is %s, not %s",
+					"Field %s.%s ",
+					container.getClass ().getSimpleName (),
 					name,
+					"is %s, ",
 					nativeClass.getSimpleName (),
-					nativeValue.getClass ().getSimpleName ()));
+					"attempted to write %s",
+					nativeValue.get ().getClass ().getSimpleName ()));
 
 		}
 

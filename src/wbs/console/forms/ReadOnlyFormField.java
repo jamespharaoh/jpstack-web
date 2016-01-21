@@ -2,8 +2,10 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.eitherGetLeft;
-import static wbs.framework.utils.etc.Misc.optionalRequired;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.requiredValue;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -200,12 +202,27 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 					container,
 					nativeValue));
 
+		Optional<String> csvValueOptional =
+			requiredSuccess (
+				csvMapping.genericToInterface (
+					container,
+					genericValue));
+
+		if (
+			isNotPresent (
+				csvValueOptional)
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Missing CSV value for %s.%s",
+					container.getClass ().getName (),
+					name ()));
+
+		}
+
 		String csvValue =
-			optionalRequired (
-				eitherGetLeft (
-					csvMapping.genericToInterface (
-						container,
-						genericValue)));
+			csvValueOptional.get ();
 
 		out.writeFormat (
 			"\"%s\"",

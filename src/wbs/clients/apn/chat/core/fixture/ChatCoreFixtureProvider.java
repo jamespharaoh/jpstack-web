@@ -38,6 +38,7 @@ import wbs.platform.text.model.TextRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
+import wbs.sms.gazetteer.model.GazetteerObjectHelper;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
@@ -74,13 +75,11 @@ class ChatCoreFixtureProvider
 	@Inject
 	CurrencyObjectHelper currencyHelper;
 
-	/*
-	@Inject
-	TicketManagerObjectHelper ticketManagerHelper;
-	*/
-
 	@Inject
 	Database database;
+
+	@Inject
+	GazetteerObjectHelper gazetteerHelper;
 
 	@Inject
 	MenuGroupObjectHelper menuGroupHelper;
@@ -111,6 +110,11 @@ class ChatCoreFixtureProvider
 
 	@Inject
 	TextObjectHelper textHelper;
+
+	/*
+	@Inject
+	TicketManagerObjectHelper ticketManagerHelper;
+	*/
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -286,6 +290,12 @@ class ChatCoreFixtureProvider
 				currencyHelper.findByCode (
 					GlobalId.root,
 					"gbp"))
+
+			.setGazetteer (
+				gazetteerHelper.findByCode (
+					GlobalId.root,
+					"test",
+					"test"))
 
 			/* TODO should not reference by id
 			.setTicketManager (

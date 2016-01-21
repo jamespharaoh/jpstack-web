@@ -29,10 +29,6 @@ interface ConsoleHelperMethods<ObjectType extends Record<ObjectType>> {
 			Optional<Record<?>> assumedRoot,
 			Boolean mini);
 
-	Optional<String> getListClass (
-			Record<?> object);
-
-	void applySearchFilter (
-			Object searchObject);
+	ConsoleHooks<ObjectType> consoleHooks ();
 
 }

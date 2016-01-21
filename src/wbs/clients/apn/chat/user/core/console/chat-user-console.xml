@@ -47,7 +47,9 @@
 				name="online"/>
 
 			<object-create-page
-				fields="create"/>
+				fields="create"
+				create-time="created"
+				target-responder="chatUserCreateResponder"/>
 
 		</list>
 
@@ -116,7 +118,8 @@
 		<object-field
 			name="category"
 			object-type="chatCategory"
-			root-field="chat"/>
+			root-field="chat"
+			nullable="yes"/>
 
 	</field-set>
 

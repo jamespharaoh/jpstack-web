@@ -35,10 +35,7 @@ import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
-import org.joda.time.Interval;
 import org.joda.time.ReadableInstant;
 
 import com.google.common.base.Optional;
@@ -415,7 +412,7 @@ class Misc {
 
 		if (left.isPresent ()) {
 
-			return left.equals (
+			return left.get ().equals (
 				right);
 
 		} else {
@@ -1977,6 +1974,14 @@ class Misc {
 
 	public static
 	boolean isNotEmpty (
+			Map<?,?> collection) {
+
+		return ! collection.isEmpty ();
+
+	}
+
+	public static
+	boolean isNotEmpty (
 			String string) {
 
 		if (string == null)
@@ -2329,62 +2334,6 @@ class Misc {
 
 	}
 
-	public static
-	boolean validPartialTimestamp (
-			@NonNull String string) {
-
-		for (
-			Pattern pattern
-				: timestampPartialPatterns
-		) {
-
-			Matcher matcher =
-				pattern.matcher (
-					string);
-
-			if (matcher.matches ())
-				return true;
-
-		}
-
-		return false;
-
-	}
-
-	public static
-	boolean validInterval (
-			@NonNull String string) {
-
-		List<String> parts =
-			split (
-				string,
-				" to ");
-
-		if (parts.size () == 1) {
-
-			return validPartialTimestamp (
-				parts.get (0).trim ());
-
-		} else if (parts.size () == 2) {
-
-			return (
-
-				validPartialTimestamp (
-					parts.get (0).trim ())
-
-				&& validPartialTimestamp (
-					parts.get (1).trim ())
-
-			);
-
-		} else {
-
-			return false;
-
-		}
-
-	}
-
 	public static <Type>
 	Type requiredValue (
 			@NonNull Type value) {
@@ -2392,226 +2341,6 @@ class Misc {
 		return value;
 
 	}
-
-	public static
-	Interval parsePartialTimestamp (
-			@NonNull DateTimeZone timeZone,
-			@NonNull String string) {
-
-		int fromYear = 0;
-		int fromMonth = 1;
-		int fromDate = 1;
-		int fromHour = 0;
-		int fromMinute = 0;
-		int fromSecond = 0;
-
-		for (
-			Pattern pattern
-				: timestampPartialPatterns
-		) {
-
-			Matcher matcher =
-				pattern.matcher (
-					string);
-
-			if (! matcher.matches ())
-				continue;
-
-			int groupCount =
-				matcher.groupCount ();
-
-			// work out time from
-
-			if (groupCount >= 1) {
-
-				fromYear =
-					Integer.parseInt (
-						matcher.group (1));
-
-			}
-
-			if (groupCount >= 2) {
-
-				fromMonth =
-					Integer.parseInt (
-						matcher.group (2));
-
-			}
-
-			if (groupCount >= 3) {
-
-				fromDate =
-					Integer.parseInt (
-						matcher.group (3));
-
-			}
-
-			if (groupCount >= 4) {
-
-				fromHour =
-					Integer.parseInt (
-						matcher.group (4));
-
-			}
-
-			if (groupCount >= 5) {
-
-				fromMinute =
-					Integer.parseInt (
-						matcher.group (5));
-
-			}
-
-			if (groupCount >= 6) {
-
-				fromSecond =
-					Integer.parseInt (
-						matcher.group (6));
-
-			}
-
-			DateTime fromDateTime =
-				new DateTime (
-					fromYear,
-					fromMonth,
-					fromDate,
-					fromHour,
-					fromMinute,
-					fromSecond,
-					timeZone);
-
-			// work out time to
-
-			DateTime toDateTime;
-
-			if (groupCount == 0) {
-
-				toDateTime =
-					fromDateTime.plusYears (
-						10000);
-
-			} else if (groupCount == 1) {
-
-				toDateTime =
-					fromDateTime.plusYears (
-						1);
-
-			} else if (groupCount == 2) {
-
-				toDateTime =
-					fromDateTime.plusMonths (
-						1);
-
-			} else if (groupCount == 3) {
-
-				toDateTime =
-					fromDateTime.plusDays (
-						1);
-
-			} else if (groupCount == 4) {
-
-				toDateTime =
-					fromDateTime.plusHours (
-						1);
-
-			} else if (groupCount == 5) {
-
-				toDateTime =
-					fromDateTime.plusMinutes (
-						1);
-
-			} else if (groupCount == 6) {
-
-				toDateTime =
-					fromDateTime.plusSeconds (
-						1);
-
-			} else {
-
-				throw new RuntimeException ();
-
-			}
-
-			return new Interval (
-				fromDateTime,
-				toDateTime);
-
-		}
-
-		throw new TimeFormatException (
-			"Date/time format not recognised");
-
-	}
-
-	public static
-	Interval parseInterval (
-			@NonNull DateTimeZone timeZone,
-			@NonNull String string) {
-
-		List<String> parts =
-			split (
-				string,
-				" to ");
-
-		if (parts.size () == 1) {
-
-			return parsePartialTimestamp (
-				timeZone,
-				parts.get (0).trim ());
-
-		} else if (parts.size () == 2) {
-
-			Interval firstInterval =
-				parsePartialTimestamp (
-					timeZone,
-					parts.get (0).trim ());
-
-			Interval secondInterval =
-				parsePartialTimestamp (
-					timeZone,
-					parts.get (1).trim ());
-
-			return new Interval (
-				firstInterval.getStart (),
-				secondInterval.getEnd ());
-
-		} else {
-
-			throw new RuntimeException ();
-
-		}
-
-	}
-
-	private static
-	List<Pattern> timestampPartialPatterns =
-		ImmutableList.<Pattern>of (
-
-		Pattern.compile (
-			"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) " +
-			"([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])"),
-
-		Pattern.compile (
-			"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) " +
-			"([01][0-9]|2[0-3]):([0-5][0-9])"),
-
-		Pattern.compile (
-			"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01]) " +
-			"([01][0-9]|2[0-3])"),
-
-		Pattern.compile (
-			"([0-9]{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])"),
-
-		Pattern.compile (
-			"([0-9]{4})-(0?[1-9]|1[0-2])"),
-
-		Pattern.compile (
-			"([0-9]{4})"),
-
-		Pattern.compile (
-			"")
-
-	);
 
 	public static
 	String trim (

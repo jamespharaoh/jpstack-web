@@ -10,21 +10,30 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.joda.time.Interval;
+
+import com.google.common.base.Optional;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.utils.etc.BeanLogic;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
-@PrototypeComponent ("timestampPartialFormFieldBuilder")
+@PrototypeComponent ("intervalFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class TimestampPartialFormFieldBuilder {
+class IntervalFormFieldBuilder {
 
 	// dependencies
+
+	@Inject
+	ConsoleObjectManager objectManager;
 
 	@Inject
 	FormFieldPluginManagerImplementation formFieldPluginManager;
@@ -32,16 +41,20 @@ class TimestampPartialFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	Provider<DereferenceFormFieldAccessor>
+	dereferenceFormFieldAccessorProvider;
+
+	@Inject
+	Provider<IntervalFormFieldNativeMapping>
+	intervalFormFieldNativeMappingProvider;
 
 	@Inject
 	Provider<NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
 
 	@Inject
-	Provider<TimestampPartialFormFieldValueValidator>
-	timestampPartialFormFieldValueValidatorProvider;
+	Provider<IntervalFormFieldInterfaceMapping>
+	intervalFormFieldInterfaceMappingProvider;
 
 	@Inject
 	Provider<ReadOnlyFormField>
@@ -73,7 +86,7 @@ class TimestampPartialFormFieldBuilder {
 	FormFieldBuilderContext context;
 
 	@BuilderSource
-	TimestampPartialFormFieldSpec spec;
+	IntervalFormFieldSpec spec;
 
 	@BuilderTarget
 	FormFieldSet formFieldSet;
@@ -87,6 +100,11 @@ class TimestampPartialFormFieldBuilder {
 
 		String name =
 			spec.name ();
+
+		String fieldName =
+			ifNull (
+				spec.fieldName (),
+				name);
 
 		String label =
 			ifNull (
@@ -105,19 +123,59 @@ class TimestampPartialFormFieldBuilder {
 				spec.nullable (),
 				false);
 
-		// accessor and native mapping
+		// accessor
 
-		FormFieldAccessor formFieldAccessor =
-			simpleFormFieldAccessorProvider.get ()
+		Optional<Class<?>> propertyClass;
+		FormFieldAccessor accessor;
 
-			.name (
-				name)
+		if (readOnly) {
 
-			.nativeClass (
-				String.class);
+			propertyClass =
+				objectManager.dereferenceType (
+					Optional.of (
+						context.containerClass ()),
+					Optional.of (
+						fieldName));
 
-		FormFieldNativeMapping formFieldNativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+			accessor =
+				dereferenceFormFieldAccessorProvider.get ()
+
+				.path (
+					fieldName);
+
+		} else {
+
+			propertyClass =
+				Optional.of (
+					BeanLogic.propertyClassForClass (
+						context.containerClass (),
+						fieldName));
+
+			accessor =
+				simpleFormFieldAccessorProvider.get ()
+
+				.name (
+					name)
+
+				.nativeClass (
+					propertyClass.get ());
+
+		}
+
+		// native mapping
+
+		FormFieldNativeMapping nativeMapping;
+
+		if (propertyClass.get () == Interval.class) {
+
+			nativeMapping =
+				intervalFormFieldNativeMappingProvider.get ();
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 		// value validator
 
@@ -131,9 +189,6 @@ class TimestampPartialFormFieldBuilder {
 
 		}
 
-		valueValidators.add (
-			timestampPartialFormFieldValueValidatorProvider.get ());
-
 		// constraint validator
 
 		FormFieldConstraintValidator constraintValidator =
@@ -142,7 +197,7 @@ class TimestampPartialFormFieldBuilder {
 		// interface mapping
 
 		FormFieldInterfaceMapping interfaceMapping =
-			identityFormFieldInterfaceMappingProvider.get ();
+			intervalFormFieldInterfaceMappingProvider.get ();
 
 		// renderer
 
@@ -156,7 +211,19 @@ class TimestampPartialFormFieldBuilder {
 				label)
 
 			.nullable (
-				nullable);
+				nullable)
+
+			.addPreset (
+				"today")
+
+			.addPreset (
+				"yesterday")
+
+			.addPreset (
+				"this month")
+
+			.addPreset (
+				"last month");
 
 		// update hook
 
@@ -180,10 +247,10 @@ class TimestampPartialFormFieldBuilder {
 					label)
 
 				.accessor (
-					formFieldAccessor)
+					accessor)
 
 				.nativeMapping (
-					formFieldNativeMapping)
+					nativeMapping)
 
 				.interfaceMapping (
 					interfaceMapping)
@@ -205,10 +272,10 @@ class TimestampPartialFormFieldBuilder {
 					label)
 
 				.accessor (
-					formFieldAccessor)
+					accessor)
 
 				.nativeMapping (
-					formFieldNativeMapping)
+					nativeMapping)
 
 				.valueValidators (
 					valueValidators)

@@ -1,8 +1,6 @@
 package wbs.console.helper;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.lang.reflect.Constructor;
@@ -211,9 +209,11 @@ class ConsoleHelperBuilder {
 					consoleHooksBeanName,
 					ConsoleHooks.class);
 
-System.out.println ("#### GOT HOOKS FOR " + consoleHelperProvider.objectName ());
-
 		} catch (NoSuchBeanException exception) {
+
+			consoleHooks =
+				new ConsoleHooks.DefaultImplementation ();
+
 		}
 
 		// instance
@@ -419,22 +419,26 @@ System.out.println ("#### GOT HOOKS FOR " + consoleHelperProvider.objectName ())
 
 		@Override
 		public
+		ConsoleHooks consoleHooks () {
+
+			return consoleHooks;
+
+		}
+
+		@Override
+		public
 		String getHtml (
 				@NonNull Record object,
 				@NonNull Optional assumedRoot,
 				@NonNull Boolean mini) {
 
-			if (consoleHooks != null) {
+			Optional<String> optionalHtml =
+				consoleHooks.getHtml (
+					object,
+					mini);
 
-				Optional<String> optionalHtml =
-					consoleHooks.getHtml (
-						object,
-						mini);
-
-				if (optionalHtml.isPresent ()) {
-					return optionalHtml.get ();
-				}
-
+			if (optionalHtml.isPresent ()) {
+				return optionalHtml.get ();
 			}
 
 			String path =
@@ -465,48 +469,6 @@ System.out.println ("#### GOT HOOKS FOR " + consoleHelperProvider.objectName ())
 			}
 
 			return stringBuilder.toString ();
-
-		}
-
-		@Override
-		public
-		Optional getListClass (
-				Record object) {
-
-			if (
-				isNotNull (
-					consoleHooks)
-			) {
-
-				return consoleHooks.getListClass (
-					object);
-
-			} else {
-
-				return Optional.<String>absent ();
-
-			}
-
-		}
-
-		@Override
-		public
-		void applySearchFilter (
-				Object searchObject) {
-
-			if (
-				isNotNull (
-					consoleHooks)
-			) {
-
-				consoleHooks.applySearchFilter (
-					searchObject);
-
-			} else {
-
-				doNothing ();
-
-			}
 
 		}
 

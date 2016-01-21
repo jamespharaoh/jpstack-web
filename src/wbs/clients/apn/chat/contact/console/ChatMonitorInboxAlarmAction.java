@@ -2,7 +2,6 @@ package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -12,7 +11,6 @@ import lombok.Cleanup;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
-import org.joda.time.Interval;
 import org.joda.time.Seconds;
 
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
@@ -30,6 +28,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.TextualInterval;
 import wbs.framework.utils.etc.TimeFormatException;
 import wbs.framework.web.Responder;
 import wbs.platform.user.model.UserObjectHelper;
@@ -155,13 +154,14 @@ class ChatMonitorInboxAlarmAction
 						requestContext.parameter (
 							"alarmTime"));
 
-				Interval interval =
-					parsePartialTimestamp (
+				TextualInterval interval =
+					TextualInterval.parseRequired (
 						timeZone,
-						timestampString);
+						timestampString,
+						0);
 
 				alarmTime =
-					interval.getStart ().toInstant ();
+					interval.value ().getStart ().toInstant ();
 
 			} catch (TimeFormatException exception) {
 

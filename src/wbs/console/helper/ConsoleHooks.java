@@ -35,4 +35,26 @@ interface ConsoleHooks<RecordType extends Record<RecordType>> {
 
 	}
 
+	default
+	void beforeCreate (
+			@NonNull RecordType object) {
+
+		doNothing ();
+
+	}
+
+	default
+	void afterCreate (
+			@NonNull RecordType object) {
+
+		doNothing ();
+
+	}
+
+	public static
+	class DefaultImplementation<RecordType extends Record<RecordType>>
+		implements ConsoleHooks<RecordType> {
+
+	}
+
 }

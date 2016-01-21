@@ -58,12 +58,12 @@
 			name="fatal"
 			nullable="yes"/>
 
-		<object-id-field
+		<object-field
 			name="typeId"
 			object-type="exceptionLogType"
 			nullable="yes"/>
 
-		<object-id-field
+		<object-field
 			name="userId"
 			object-type="user"
 			nullable="yes"/>

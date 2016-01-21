@@ -3,7 +3,6 @@ package wbs.clients.apn.chat.user.core.hibernate;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.parseInterval;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collection;
@@ -22,9 +21,7 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
-import org.joda.time.Interval;
 
 import com.google.common.collect.ImmutableList;
 
@@ -902,23 +899,17 @@ class ChatUserDaoHibernate
 				search.lastJoin ())
 		) {
 
-			Interval lastJoinInterval =
-				parseInterval (
-					DateTimeZone.forID (
-						"Europe/London"),
-					search.lastJoin ());
-
 			criteria.add (
 				Restrictions.ge (
 					"_chatUser.lastJoin",
 					instantToDate (
-						lastJoinInterval.getStart ())));
+						search.lastJoin ().getStart ())));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUser.lastJoin",
 					instantToDate (
-						lastJoinInterval.getEnd ())));
+						search.lastJoin ().getEnd ())));
 
 		}
 
@@ -955,6 +946,17 @@ class ChatUserDaoHibernate
 				Restrictions.eq (
 					"_chatUser.blockAll",
 					search.blockAll ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.deleted ())
+		) {
+
+			criteria.add (
+				Restrictions.isNotNull (
+					"_chatUser.number"));
 
 		}
 

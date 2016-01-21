@@ -10,35 +10,25 @@ import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("object-id-field")
-@PrototypeComponent ("objectIdFormFieldSpec")
+@DataClass ("interval-field")
+@PrototypeComponent ("intervalFormFieldSpec")
 @ConsoleModuleData
 public
-class ObjectIdFormFieldSpec {
-
-	@DataAttribute (
-		required = true)
-	String name;
+class IntervalFormFieldSpec {
 
 	@DataAttribute
 	String label;
+
+	@DataAttribute
+	String name;
+
+	@DataAttribute
+	String fieldName;
 
 	@DataAttribute
 	Boolean nullable;
 
 	@DataAttribute
 	Boolean readOnly;
-
-	@DataAttribute (
-		name = "object-type")
-	String objectTypeName;
-
-	@DataAttribute (
-		name = "object-type-field")
-	String objectTypeFieldName;
-
-	@DataAttribute (
-		name = "root-field")
-	String rootFieldName;
 
 }

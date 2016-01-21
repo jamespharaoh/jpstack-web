@@ -1,10 +1,15 @@
 package wbs.platform.object.create;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toInteger;
 
+import java.util.Date;
+
 import javax.inject.Inject;
+
+import org.joda.time.Instant;
 
 import lombok.Cleanup;
 import lombok.Getter;
@@ -86,7 +91,7 @@ class ObjectCreateAction<
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper<ObjectType> consoleHelper;
 
 	@Getter @Setter
 	String typeCode;
@@ -193,7 +198,7 @@ class ObjectCreateAction<
 
 		// create new record
 
-		Record<?> object =
+		ObjectType object =
 			consoleHelper.createInstance ();
 
 		// set parent
@@ -248,10 +253,31 @@ class ObjectCreateAction<
 
 		if (createTimeFieldName != null) {
 
-			BeanLogic.setProperty (
-				object,
-				createTimeFieldName,
-				transaction.now ());
+			Class<?> createTimeFieldClass =
+				BeanLogic.propertyClassForObject (
+					object,
+					createTimeFieldName);
+
+			if (createTimeFieldClass == Instant.class) {
+
+				BeanLogic.setProperty (
+					object,
+					createTimeFieldName,
+					transaction.now ());
+
+			} else if (createTimeFieldClass == Date.class) {
+
+				BeanLogic.setProperty (
+					object,
+					createTimeFieldName,
+					instantToDate (
+						transaction.now ()));
+
+			} else {
+
+				throw new RuntimeException ();
+
+			}
 
 		}
 
@@ -266,9 +292,19 @@ class ObjectCreateAction<
 
 		}
 
+		// before create hook
+
+		consoleHelper ().consoleHooks ().beforeCreate (
+			object);
+
 		// insert
 
 		consoleHelper.insert (
+			object);
+
+		// after create hook
+
+		consoleHelper ().consoleHooks ().afterCreate (
 			object);
 
 		// create event
@@ -332,7 +368,8 @@ class ObjectCreateAction<
 		requestContext.addNotice (
 			stringFormat (
 				"%s created",
-				capitalise (consoleHelper.shortName ())));
+				capitalise (
+					consoleHelper.shortName ())));
 
 		requestContext.setEmptyFormData ();
 

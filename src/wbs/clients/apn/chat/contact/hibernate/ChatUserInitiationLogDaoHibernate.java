@@ -3,7 +3,6 @@ package wbs.clients.apn.chat.contact.hibernate;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.parseInterval;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogDao;
@@ -97,23 +95,17 @@ class ChatUserInitiationLogDaoHibernate
 				search.timestamp ())
 		) {
 
-			Interval timestampInterval =
-				parseInterval (
-					DateTimeZone.forID (
-						"Europe/London"),
-					search.timestamp ());
-
 			criteria.add (
 				Restrictions.ge (
 					"_chatUserInitiationLog.timestamp",
 					instantToDate (
-						timestampInterval.getStart ())));
+						search.timestamp ().getStart ())));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUserInitiationLog.timestamp",
 					instantToDate (
-						timestampInterval.getEnd ())));
+						search.timestamp ().getEnd ())));
 
 		}
 

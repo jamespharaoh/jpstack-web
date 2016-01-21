@@ -108,11 +108,11 @@
 		name="queue-item-report-search"
 		class="wbs.platform.queue.model.QueueItemSearch">
 
-		<timestamp-partial-field
+		<interval-field
 			name="createdTime"
 			label="Created time"/>
 
-		<object-id-field
+		<object-field
 			name="processedUserId"
 			object-type="user"
 			nullable="yes"/>
@@ -162,7 +162,7 @@
 		name="user-queue-search"
 		class="wbs.platform.queue.model.QueueItemSearch">
 
-		<timestamp-partial-field
+		<interval-field
 			name="createdTime"
 			label="Time"/>
 

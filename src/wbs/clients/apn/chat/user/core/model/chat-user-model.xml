@@ -372,7 +372,8 @@
 
 		<enum-field
 			name="creditMode"
-			type="chatUserCreditMode"/>
+			type="chatUserCreditMode"
+			nullable="yes"/>
 
 		<integer-field
 			name="userMessageCount"
@@ -655,7 +656,7 @@
 
 		<event-type
 			name="Chat user category message"
-			text="Category for %0 set to %1 by $2"
+			text="Category for %0 set to %1 by %2"
 			admin="no"/>
 
 		<event-type

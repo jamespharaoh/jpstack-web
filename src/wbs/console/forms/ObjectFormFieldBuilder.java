@@ -123,7 +123,11 @@ class ObjectFormFieldBuilder {
 				spec.label (),
 				capitalise (
 					camelToSpaces (
-						name)));
+						name.endsWith ("Id")
+							? name.substring (
+								0,
+								name.length () - 2)
+							: name)));
 
 		Boolean nullable =
 			ifNull (

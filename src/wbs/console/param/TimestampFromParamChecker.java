@@ -5,15 +5,15 @@ package wbs.console.param;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.instantToDate;
-import static wbs.framework.utils.etc.Misc.parsePartialTimestamp;
 
 import java.util.Date;
 
 import org.joda.time.DateTimeZone;
-import org.joda.time.Interval;
 
+import wbs.framework.utils.TextualInterval;
 import wbs.framework.utils.etc.TimeFormatException;
 
+@Deprecated
 public
 class TimestampFromParamChecker
 	implements ParamChecker<Date> {
@@ -48,14 +48,15 @@ class TimestampFromParamChecker
 
 			// TODO timestamp should not be hardcoded
 
-			Interval interval =
-				parsePartialTimestamp (
+			TextualInterval interval =
+				TextualInterval.parseRequired (
 					DateTimeZone.forID (
 						"Europe/London"),
-					param);
+					param,
+					0);
 
 			return instantToDate (
-				interval.getStart ());
+				interval.value ().getStart ());
 
 		} catch (TimeFormatException exception) {
 
