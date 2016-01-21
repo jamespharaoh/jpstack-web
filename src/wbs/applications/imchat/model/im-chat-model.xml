@@ -26,6 +26,12 @@
 		<!-- settings -->
 
 		<reference-field
+			name="billingCurrency"
+			type="currency"
+			nullable="yes"/>
+
+		<reference-field
+			name="creditCurrency"
 			type="currency"
 			nullable="yes"/>
 

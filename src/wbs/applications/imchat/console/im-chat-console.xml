@@ -129,7 +129,11 @@
 		<deleted-field/>
 
 		<object-field
-			name="currency"
+			name="billingCurrency"
+			object-type="currency"/>
+
+		<object-field
+			name="creditCurrency"
 			object-type="currency"/>
 
 		<object-field
@@ -146,7 +150,7 @@
 
 		<currency-field
 			name="messageCost"
-			currency="currency"/>
+			currency="creditCurrency"/>
 
 		<integer-field
 			name="freeMessageLimit"/>
@@ -193,7 +197,12 @@
 		<deleted-field/>
 
 		<object-field
-			name="currency"
+			name="billingCurrency"
+			object-type="currency"
+			nullable="yes"/>
+
+		<object-field
+			name="creditCurrency"
 			object-type="currency"
 			nullable="yes"/>
 
@@ -213,7 +222,7 @@
 
 		<currency-field
 			name="messageCost"
-			currency="currency"
+			currency="creditCurrency"
 			nullable="yes"/>
 
 		<integer-field

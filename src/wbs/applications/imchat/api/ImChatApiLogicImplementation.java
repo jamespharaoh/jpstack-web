@@ -69,13 +69,13 @@ class ImChatApiLogicImplementation
 
 			.priceString (
 				currencyLogic.formatText (
-					imChat.getCurrency (),
-					(long) pricePoint.getPrice ()))
+					imChat.getBillingCurrency (),
+					pricePoint.getPrice ()))
 
 			.valueString (
 				currencyLogic.formatText (
-					imChat.getCurrency (),
-					(long) pricePoint.getValue ()));
+					imChat.getCreditCurrency (),
+					pricePoint.getValue ()));
 
 	}
 
@@ -185,24 +185,24 @@ class ImChatApiLogicImplementation
 
 			.balanceString (
 				currencyLogic.formatText (
-					imChat.getCurrency (),
-					(long) customer.getBalance ()))
+					imChat.getCreditCurrency (),
+					customer.getBalance ()))
 
 			.minimumBalance (
 				imChat.getMessageCost ())
 
 			.minimumBalanceString (
 				currencyLogic.formatText (
-					imChat.getCurrency (),
-					(long) imChat.getMessageCost ()))
+					imChat.getCreditCurrency (),
+					imChat.getMessageCost ()))
 
 			.requiredBalance (
 				requiredBalance)
 
 			.requiredBalanceString (
 				currencyLogic.formatText (
-					imChat.getCurrency (),
-					(long) requiredBalance))
+					imChat.getCreditCurrency (),
+					requiredBalance))
 
 			.details (
 				customerDetailData (
@@ -322,8 +322,8 @@ class ImChatApiLogicImplementation
 
 			.chargeString (
 				currencyLogic.formatText (
-					imChat.getCurrency (),
-					(long) ifNull (
+					imChat.getBillingCurrency (),
+					ifNull (
 						message.getPrice (),
 						0l)));
 
@@ -347,13 +347,13 @@ class ImChatApiLogicImplementation
 
 			.priceString (
 				currencyLogic.formatText (
-					imChat.getCurrency (),
-					(long) purchase.getPrice ()))
+					imChat.getBillingCurrency (),
+					purchase.getPrice ()))
 
 			.valueString (
 				currencyLogic.formatText (
-					imChat.getCurrency (),
-					(long) purchase.getValue ()));
+					imChat.getCreditCurrency (),
+					purchase.getValue ()));
 
 	}
 
@@ -372,13 +372,13 @@ class ImChatApiLogicImplementation
 
 			.priceString (
 				currencyLogic.formatText (
-					imChat.getCurrency (),
-					(long) purchase.getPrice ()))
+					imChat.getBillingCurrency (),
+					purchase.getPrice ()))
 
 			.valueString (
 				currencyLogic.formatText (
-					imChat.getCurrency (),
-					(long) purchase.getValue ()))
+					imChat.getCreditCurrency (),
+					purchase.getValue ()))
 
 			.timestampString (
 				timeFormatter.instantToTimestampString (

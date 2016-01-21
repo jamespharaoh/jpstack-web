@@ -145,8 +145,8 @@ class ImChatLogicImplementation
 				formatWriter.writeFormat (
 					"(you were charged %s for this message)\n",
 					currencyLogic.formatText (
-						imChat.getCurrency (),
-						(long) message.getPrice ()));
+						imChat.getCreditCurrency (),
+						message.getPrice ()));
 
 			}
 

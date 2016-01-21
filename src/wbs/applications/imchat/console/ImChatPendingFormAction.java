@@ -210,12 +210,12 @@ class ImChatPendingFormAction
 				stringFormat (
 					"Billed message price is %s, ",
 					currencyLogic.formatText (
-						imChat.getCurrency (),
-						(long) imChat.getMessageCost ()),
+						imChat.getCreditCurrency (),
+						imChat.getMessageCost ()),
 					"but customer's balance is only %s",
 					currencyLogic.formatText (
-						imChat.getCurrency (),
-						(long) customer.getBalance ())));
+						imChat.getCreditCurrency (),
+						customer.getBalance ())));
 
 		}
 

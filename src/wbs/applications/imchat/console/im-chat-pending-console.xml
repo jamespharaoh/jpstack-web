@@ -22,7 +22,15 @@
 		name="customerFields"
 		object-name="imChatCustomer">
 
-		<code-field/>
+		<object-field
+			name="imChat"
+			object-type="imChat"/>
+
+		<object-field
+			name="customer"
+			object-type="imChatCustomer"
+			field="this"
+			root-field="imChat"/>
 
 		<integer-field
 			name="numConversations"/>

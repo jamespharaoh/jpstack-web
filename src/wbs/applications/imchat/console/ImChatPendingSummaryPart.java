@@ -64,6 +64,8 @@ class ImChatPendingSummaryPart
 	ImChatCustomerRec customer;
 	ImChatRec imChat;
 
+	boolean canSupervise;
+
 	// implementation
 
 	@Override
@@ -95,6 +97,13 @@ class ImChatPendingSummaryPart
 
 		imChat =
 			customer.getImChat ();
+
+		// misc
+
+		canSupervise =
+			privChecker.can (
+				imChat,
+				"supervisor");
 
 	}
 
@@ -142,6 +151,16 @@ class ImChatPendingSummaryPart
 				: imChat.getCustomerDetailTypes ()
 		) {
 
+			if (
+
+				detailType.getRestricted ()
+
+				&& ! canSupervise
+
+			) {
+				continue;
+			}
+
 			ImChatCustomerDetailValueRec detailValue =
 				customer.getDetails ().get (
 					detailType.getId ());
@@ -169,16 +188,10 @@ class ImChatPendingSummaryPart
 		printFormat (
 			"<h3>Customer summary</h3>\n");
 
-		printFormat (
-			"<table class=\"details\">\n");
-
-		formFieldLogic.outputTableRows (
+		formFieldLogic.outputDetailsTable (
 			formatWriter,
 			customerFields,
 			customer);
-
-		printFormat (
-			"</table>\n");
 
 	}
 

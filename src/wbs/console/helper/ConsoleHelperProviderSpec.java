@@ -41,10 +41,7 @@ class ConsoleHelperProviderSpec {
 	String defaultObjectContextName;
 
 	@DataAttribute
-	String viewDelegateField;
-
-	@DataAttribute
-	String viewDelegatePrivCode;
+	String viewPriv;
 
 	@DataAttribute (
 		name = "cryptor")

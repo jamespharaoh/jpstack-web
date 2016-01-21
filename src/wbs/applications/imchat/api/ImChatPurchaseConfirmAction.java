@@ -209,8 +209,8 @@ class ImChatPurchaseConfirmAction
 				paypalPayment.getPaypalToken (),
 				paypalPayment.getPaypalPayerId (),
 				currencyLogic.formatSimple (
-					imChat.getCurrency (),
-					(long) paypalPayment.getValue ()),
+					imChat.getBillingCurrency (),
+					paypalPayment.getValue ()),
 				expressCheckoutProperties);
 
 		if (! checkoutSuccess) {

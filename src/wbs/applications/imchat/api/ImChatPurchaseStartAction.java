@@ -292,8 +292,8 @@ class ImChatPurchaseStartAction
 			redirectUrl =
 				paypalApi.setExpressCheckout (
 					currencyLogic.formatSimple (
-						imChat.getCurrency (),
-						(long) pricePoint.getValue ()),
+						imChat.getBillingCurrency (),
+						pricePoint.getValue ()),
 					purchaseRequest.successUrl ().replace (
 						"{token}",
 						purchase.getToken ()),

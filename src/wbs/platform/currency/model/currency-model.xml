@@ -29,7 +29,10 @@
 			name="prefix"/>
 
 		<string-field
-			name="suffix"/>
+			name="singularSuffix"/>
+
+		<string-field
+			name="pluralSuffix"/>
 
 	</fields>
 

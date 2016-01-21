@@ -209,10 +209,15 @@ class ImChatCoreFixtureProvider
 					"test",
 					"wbs_sandbox"))
 
-			.setCurrency (
+			.setBillingCurrency (
 				currencyHelper.findByCode (
 					GlobalId.root,
 					"gbp"))
+
+			.setCreditCurrency (
+				currencyHelper.findByCode (
+					GlobalId.root,
+					"credit"))
 
 			.setMessageTemplateDatabase (
 				messageTemplateDatabase)
@@ -226,11 +231,17 @@ class ImChatCoreFixtureProvider
 			.setFreeMessageLimit (
 				3l)
 
+			.setBillMessageEnabled (
+				true)
+
 			.setBillMessageMinChars (
 				50l)
 
 			.setBillMessageMaxChars (
 				100l)
+
+			.setFreeMessageEnabled (
+				true)
 
 			.setFreeMessageMinChars (
 				10l)
@@ -418,6 +429,9 @@ class ImChatCoreFixtureProvider
 			.setRequired (
 				true)
 
+			.setRestricted (
+				false)
+
 			.setDataType (
 				ImChatCustomerDetailDataType.text)
 
@@ -449,6 +463,9 @@ class ImChatCoreFixtureProvider
 
 			.setRequired (
 				true)
+
+			.setRestricted (
+				false)
 
 			.setDataType (
 				ImChatCustomerDetailDataType.dateOfBirth)
@@ -485,11 +502,49 @@ class ImChatCoreFixtureProvider
 			.setRequired (
 				false)
 
+			.setRestricted (
+				false)
+
 			.setDataType (
 				ImChatCustomerDetailDataType.chooseOne)
 
 			.setOrdering (
 				3l)
+
+		);
+
+		imChatCustomerDetailTypeHelper.insert (
+			imChatCustomerDetailTypeHelper.createInstance ()
+
+			.setImChat (
+				imChat)
+
+			.setCode (
+				"phone_number")
+
+			.setName (
+				"Phone number")
+
+			.setDescription (
+				"")
+
+			.setLabel (
+				"Phone number")
+
+			.setHelp (
+				"Please enter your phone number")
+
+			.setRequired (
+				false)
+
+			.setRestricted (
+				true)
+
+			.setDataType (
+				ImChatCustomerDetailDataType.text)
+
+			.setOrdering (
+				4l)
 
 		);
 

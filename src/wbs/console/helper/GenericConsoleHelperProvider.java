@@ -1,8 +1,10 @@
 package wbs.console.helper;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.split;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.underscoreToCamel;
 
@@ -143,11 +145,36 @@ class GenericConsoleHelperProvider
 				consoleHelperProviderSpec.defaultObjectContextName (),
 				objectHelper.objectName ()));
 
-		viewDelegateField (
-			consoleHelperProviderSpec.viewDelegateField ());
+		if (
+			isNotNull (
+				consoleHelperProviderSpec.viewPriv ())
+		) {
 
-		viewDelegatePrivCode (
-			consoleHelperProviderSpec.viewDelegatePrivCode ());
+			List<String> viewPrivParts =
+				split (
+					consoleHelperProviderSpec.viewPriv (),
+					":");
+
+			if (viewPrivParts.size () == 1) {
+
+				viewDelegateField (
+					viewPrivParts.get (0));
+
+			} else if (viewPrivParts.size () == 2) {
+
+				viewDelegateField (
+					viewPrivParts.get (0));
+
+				viewDelegatePrivCode (
+					viewPrivParts.get (1));
+
+			} else {
+
+				throw new RuntimeException ();
+
+			}
+
+		}
 
 		if (consoleHelperProviderSpec.cryptorBeanName () != null) {
 

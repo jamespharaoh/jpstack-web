@@ -292,8 +292,8 @@ class ImChatPendingFormResponder
 		printFormat (
 			"<td>Bill&nbsp;%s</td>\n",
 			currencyLogic.formatHtml (
-				imChat.getCurrency (),
-				(long) imChat.getMessageCost ()));
+				imChat.getCreditCurrency (),
+				imChat.getMessageCost ()));
 
 		printFormat (
 			"<td",

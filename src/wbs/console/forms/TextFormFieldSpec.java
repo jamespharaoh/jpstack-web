@@ -40,4 +40,7 @@ class TextFormFieldSpec {
 	@DataAttribute
 	Integer maximumLength;
 
+	@DataAttribute
+	String viewPriv;
+
 }

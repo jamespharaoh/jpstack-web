@@ -3,7 +3,7 @@
 
 	<console-helper-provider
 		object-name="currency"
-		view-delegate-field="root">
+		view-priv="root">
 
 		<priv-key
 			name="currency.manage"
@@ -59,7 +59,10 @@
 			name="prefix"/>
 
 		<text-field
-			name="suffix"/>
+			name="singularSuffix"/>
+
+		<text-field
+			name="pluralSuffix"/>
 
 	</field-set>
 
@@ -78,7 +81,10 @@
 			name="prefix"/>
 
 		<text-field
-			name="suffix"/>
+			name="singularSuffix"/>
+
+		<text-field
+			name="pluralSuffix"/>
 
 	</field-set>
 
@@ -100,7 +106,10 @@
 			name="prefix"/>
 
 		<text-field
-			name="suffix"/>
+			name="singularSuffix"/>
+
+		<text-field
+			name="pluralSuffix"/>
 
 	</field-set>
 
@@ -119,7 +128,10 @@
 			name="prefix"/>
 
 		<text-field
-			name="suffix"/>
+			name="singularSuffix"/>
+
+		<text-field
+			name="pluralSuffix"/>
 
 	</field-set>
 

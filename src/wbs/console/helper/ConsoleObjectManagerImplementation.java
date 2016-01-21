@@ -143,7 +143,14 @@ class ConsoleObjectManagerImplementation
 		StringBuilder stringBuilder =
 			new StringBuilder ();
 
-		if (link) {
+		if (
+
+			link
+
+			&& canView (
+				object)
+
+		) {
 
 			stringBuilder.append (
 				stringFormat (

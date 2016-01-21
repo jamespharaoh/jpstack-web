@@ -34,6 +34,9 @@
 		<yes-no-field
 			name="required"/>
 
+		<yes-no-field
+			name="restricted"/>
+
 		<enum-field
 			name="dataType"
 			type="imChatCustomerDetailDataType"/>

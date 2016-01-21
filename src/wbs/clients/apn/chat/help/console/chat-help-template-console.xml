@@ -5,8 +5,7 @@
 		object-name="chatHelpTemplate"
 		default-list-context="chatHelpTemplates.{typeCamel}"
 		default-object-context="chatHelpTemplate.{typeCamel}"
-		view-delegate-field="chat"
-		view-delegate-priv-code="manage">
+		view-priv="chat:manage">
 
 		<context-stuff
 			name="chatHelpTemplateName"
