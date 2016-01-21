@@ -3,6 +3,7 @@ package wbs.platform.object.search;
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
+import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.joinWithSpace;
@@ -38,6 +39,7 @@ import wbs.console.context.ConsoleContextType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.ConsoleHooks;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
@@ -539,8 +541,7 @@ System.out.println ("PR2");
 							optionalIf (
 								object == currentObject,
 								"selected"),
-							consoleHelper.getListClass (
-								(Record<?>)
+							getListClass (
 								object))),
 
 					" data-rows-class=\"%h\"",
@@ -595,11 +596,8 @@ System.out.println ("PR2");
 							object == currentObject,
 							"selected"),
 
-						object instanceof Record
-							? consoleHelper.getListClass (
-								(Record<?>)
-								object)
-							: Optional.<String>absent ())),
+						getListClass (
+							object))),
 
 					" data-rows-class=\"%h\"",
 					stringFormat (
@@ -662,6 +660,33 @@ System.out.println ("PR2");
 					object));
 
 		}
+
+	}
+
+	private <ObjectType extends Record<ObjectType>>
+	Optional<String> getListClass (
+			@NonNull IdObject idObject) {
+
+		if (
+			isNotInstanceOf (
+				Record.class,
+				idObject)
+		) {
+			return Optional.absent ();
+		}
+
+		@SuppressWarnings ("unchecked")
+		ConsoleHooks<ObjectType> consoleHooks =
+			(ConsoleHooks<ObjectType>)
+			consoleHelper.consoleHooks ();
+
+		@SuppressWarnings ("unchecked")
+		ObjectType object =
+			(ObjectType)
+			idObject;
+
+		return consoleHooks.getListClass (
+			object);
 
 	}
 

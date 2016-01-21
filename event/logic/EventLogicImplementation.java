@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import lombok.NonNull;
 
 import org.joda.time.Instant;
+import org.joda.time.LocalDate;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
@@ -273,6 +274,7 @@ class EventLogicImplementation
 			linkObject instanceof Float
 			|| linkObject instanceof Double
 			|| linkObject instanceof Enum<?>
+			|| linkObject instanceof LocalDate
 		) {
 
 			linkObject =

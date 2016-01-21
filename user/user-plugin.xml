@@ -18,6 +18,7 @@
 	</layer>
 
 	<layer name="console">
+		<bean class="console.UserFormFieldPreferencesProvider"/>
 		<bean class="console.UserPasswordAction"/>
 		<bean class="console.UserPasswordPart"/>
 		<bean class="console.UserPrivsEditorAction"/>

@@ -22,6 +22,10 @@
 			name="supervisorConfigNames"
 			nullable="yes"/>
 
+		<integer-field
+			name="defaultHourOffset"
+			default="0"/>
+
 	</fields>
 
 	<priv-types>

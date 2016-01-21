@@ -3,7 +3,6 @@ package wbs.platform.queue.hibernate;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.parseInterval;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
 import wbs.framework.hibernate.HibernateDao;
@@ -67,22 +65,17 @@ class QueueItemDaoHibernate
 				search.createdTime ())
 		) {
 
-			Interval createdTimeInterval =
-				parseInterval (
-					DateTimeZone.getDefault (),
-					search.createdTime ());
-
 			criteria.add (
 				Restrictions.ge (
 					"_queueItem.createdTime",
 					instantToDate (
-						createdTimeInterval.getStart ())));
+						search.createdTime ().getStart ())));
 
 			criteria.add (
 				Restrictions.lt (
 					"_queueItem.createdTime",
 					instantToDate (
-						createdTimeInterval.getEnd ())));
+						search.createdTime ().getEnd ())));
 
 		}
 

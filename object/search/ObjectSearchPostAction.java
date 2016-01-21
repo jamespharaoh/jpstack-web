@@ -185,7 +185,7 @@ class ObjectSearchPostAction
 
 		}
 
-		consoleHelper.applySearchFilter (
+		consoleHelper.consoleHooks ().applySearchFilter (
 			search);
 
 		if (
