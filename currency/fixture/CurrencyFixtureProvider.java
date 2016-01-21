@@ -78,8 +78,63 @@ class CurrencyFixtureProvider
 			.setPrefix (
 				"£")
 
-			.setSuffix (
+			.setSingularSuffix (
 				"")
+
+			.setPluralSuffix (
+				"")
+
+		);
+
+		currencyHelper.insert (
+			currencyHelper.createInstance ()
+
+			.setCode (
+				"usd")
+
+			.setName (
+				"USD")
+
+			.setDescription (
+				"US Dollars")
+
+			.setDivisions (
+				100l)
+
+			.setPrefix (
+				"$")
+
+			.setSingularSuffix (
+				"")
+
+			.setPluralSuffix (
+				"")
+
+		);
+
+		currencyHelper.insert (
+			currencyHelper.createInstance ()
+
+			.setCode (
+				"credit")
+
+			.setName (
+				"Credits")
+
+			.setDescription (
+				"Arbitrary credits")
+
+			.setDivisions (
+				1l)
+
+			.setPrefix (
+				"")
+
+			.setSingularSuffix (
+				" credit")
+
+			.setPluralSuffix (
+				" credits")
 
 		);
 

@@ -1,5 +1,6 @@
 package wbs.platform.currency.logic;
 
+import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
@@ -75,7 +76,7 @@ class CurrencyLogicImplementation
 	public
 	String formatText (
 			@NonNull CurrencyRec currency,
-			Long amount) {
+			@NonNull Long amount) {
 
 		StringBuilder stringBuilder =
 			new StringBuilder ();
@@ -86,10 +87,34 @@ class CurrencyLogicImplementation
 		stringBuilder.append (
 			amount / currency.getDivisions ());
 
-		stringBuilder.append (
-			".");
+		if (currency.getDivisions () == 1) {
 
-		if (currency.getDivisions () == 100) {
+			doNothing ();
+
+		} else if (currency.getDivisions () == 10) {
+
+			stringBuilder.append (
+				".");
+
+			Long remainder =
+				Math.abs (amount % 10);
+
+			if (remainder == 0) {
+
+				stringBuilder.append (
+					"0");
+
+			} else {
+
+				stringBuilder.append (
+					remainder);
+
+			}
+
+		} else if (currency.getDivisions () == 100) {
+
+			stringBuilder.append (
+				".");
 
 			Long remainder =
 				Math.abs (amount % 100);
@@ -120,8 +145,18 @@ class CurrencyLogicImplementation
 
 		}
 
-		stringBuilder.append (
-			currency.getSuffix ());
+		if (amount == 1 || amount == -1) {
+
+			stringBuilder.append (
+				currency.getSingularSuffix ());
+
+		} else {
+
+			stringBuilder.append (
+				currency.getPluralSuffix ());
+
+		}
+
 
 		return stringBuilder.toString ();
 
@@ -174,7 +209,11 @@ class CurrencyLogicImplementation
 
 		int decimalPlaces;
 
-		if (currency.getDivisions () == 100) {
+		if (currency.getDivisions () == 1) {
+			decimalPlaces = 0;
+		} else if (currency.getDivisions () == 10) {
+			decimalPlaces = 1;
+		} else if (currency.getDivisions () == 100) {
 			decimalPlaces = 2;
 		} else {
 			throw new RuntimeException ();
@@ -203,15 +242,21 @@ class CurrencyLogicImplementation
 
 					// subdivisions
 
-					"\\.",
-					"(\\d{" + decimalPlaces + "})",
+					decimalPlaces > 0
+						? joinWithoutSeparator (
+							"\\.",
+							"(\\d{" + decimalPlaces + "})")
+						: "",
 
 					// suffix
 
 					"\\s*",
 					"(?:",
 					Pattern.quote (
-						currency.getSuffix ()),
+						currency.getSingularSuffix ().trim ()),
+					"|",
+					Pattern.quote (
+						currency.getPluralSuffix ().trim ()),
 					")?",
 					"\\s*"));
 
@@ -223,9 +268,13 @@ class CurrencyLogicImplementation
 
 		if (! matcher.matches ()) {
 
+System.out.println ("AA");
+
 			return Optional.<Long>absent ();
 
 		}
+
+System.out.println ("BB");
 
 		// return the result
 
@@ -241,8 +290,10 @@ class CurrencyLogicImplementation
 				matcher.group (2));
 
 		Long subDivisions =
-			Long.parseLong (
-				matcher.group (3));
+			decimalPlaces > 0
+				? Long.parseLong (
+					matcher.group (3))
+				: 0;
 
 		if (positive) {
 

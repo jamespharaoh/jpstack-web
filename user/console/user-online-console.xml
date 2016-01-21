@@ -5,8 +5,7 @@
 		object-name="userOnline"
 		id-key="userId">
 
-		view-delegate-field="user"
-		view-delegate-priv-code="manage">
+		view-priv="user:manage">
 
 		<context-stuff
 			name="userOnlineName"
