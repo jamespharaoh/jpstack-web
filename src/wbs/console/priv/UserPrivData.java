@@ -12,7 +12,6 @@ import java.util.Map;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
-import wbs.console.priv.PrivDataLoader.UnknownObjectException;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 
@@ -114,8 +113,7 @@ class UserPrivData {
 	public
 	boolean canList (
 			@NonNull GlobalId parentObjectId,
-			@NonNull Collection<String> privCodes)
-		throws UnknownObjectException {
+			@NonNull Collection<String> privCodes) {
 
 		ObjectData objectData =
 			sharedData.objectDatasByObjectId.get (
@@ -126,8 +124,12 @@ class UserPrivData {
 				objectData)
 		) {
 
-			throw new UnknownObjectException (
-				parentObjectId.toString ());
+			log.warn (
+				stringFormat (
+					"No priv data for %s",
+					parentObjectId.toString ()));
+
+			return false;
 
 		}
 

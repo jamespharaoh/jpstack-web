@@ -243,7 +243,9 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			allOptions.stream ()
 
 			.filter (
-				objectManager::canView)
+				item ->
+					objectManager.canView (item)
+					|| equal (item, interfaceValue.orNull ()))
 
 			.collect (
 				Collectors.toList ());
