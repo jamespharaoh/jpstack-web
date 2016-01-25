@@ -106,6 +106,7 @@ class TextFormFieldRenderer<Container>
 	void renderTableCellProperties (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
@@ -121,6 +122,7 @@ class TextFormFieldRenderer<Container>
 	void renderTableRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
@@ -131,6 +133,7 @@ class TextFormFieldRenderer<Container>
 		renderTableCellProperties (
 			out,
 			container,
+			hints,
 			interfaceValue);
 
 		out.writeFormat (
@@ -144,6 +147,7 @@ class TextFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
 			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
@@ -158,6 +162,7 @@ class TextFormFieldRenderer<Container>
 			submission,
 			out,
 			container,
+			hints,
 			interfaceValue,
 			formType);
 
@@ -185,6 +190,7 @@ class TextFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
 			@NonNull FormType formType) {
 

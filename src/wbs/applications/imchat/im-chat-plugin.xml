@@ -74,6 +74,7 @@
 		<bean class="console.ImChatCustomerCreditAction"/>
 		<bean class="console.ImChatCustomerCreditPart"/>
 		<bean class="console.ImChatQueueConsole"/>
+		<bean class="console.ImChatPendingCustomerNoteUpdateAction"/>
 		<bean class="console.ImChatPendingFormAction"/>
 		<bean class="console.ImChatPendingFormResponder"/>
 		<bean class="console.ImChatPendingSummaryPart"/>
@@ -93,6 +94,7 @@
 		<console-module name="im-chat-price-point"/>
 		<console-module name="im-chat-profile"/>
 		<console-module name="im-chat-purchase"/>
+		<console-module name="im-chat-report"/>
 		<console-module name="im-chat-session"/>
 		<console-module name="im-chat-template"/>
 	</console-modules>

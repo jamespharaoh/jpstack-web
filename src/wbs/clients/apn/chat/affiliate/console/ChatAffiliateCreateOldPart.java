@@ -19,9 +19,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 
-@PrototypeComponent ("chatAffiliateCreatePart")
+@PrototypeComponent ("chatAffiliateCreateOldPart")
 public
-class ChatAffiliateCreatePart
+class ChatAffiliateCreateOldPart
 	extends AbstractPagePart {
 
 	// dependencies
@@ -102,7 +102,7 @@ class ChatAffiliateCreatePart
 			" method=\"post\"",
 			" action=\"%h\"",
 			requestContext.resolveLocalUrl (
-				"/chatAffiliate.create"),
+				"/chatAffiliate.create.old"),
 			">\n");
 
 		printFormat (

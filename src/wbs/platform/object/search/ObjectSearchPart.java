@@ -13,10 +13,11 @@ import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormField.FormType;
+import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
@@ -136,6 +137,7 @@ class ObjectSearchPart
 			formFieldSet,
 			updateResultSet,
 			search,
+			ImmutableMap.of (),
 			FormType.search);
 
 		printFormat (

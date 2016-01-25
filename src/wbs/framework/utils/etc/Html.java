@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
 
 public
@@ -293,6 +294,16 @@ class Html {
 		return source.replaceAll (
 			"\r\n|\n|\r",
 			"<br>");
+
+	}
+
+	public static
+	String encodeNewlineToBr (
+			@NonNull String source) {
+
+		return newlineToBr (
+			encode (
+				source));
 
 	}
 

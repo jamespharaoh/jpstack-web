@@ -117,6 +117,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	void renderTableCellProperties (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue) {
 
 		// work out root
@@ -130,7 +131,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 					(Record<?>)
 					objectManager.dereference (
 						container,
-						rootFieldName));
+						rootFieldName,
+						hints));
 
 		} else {
 
@@ -157,6 +159,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	void renderTableRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue) {
 
 		out.writeFormat (
@@ -167,6 +170,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		renderTableCellProperties (
 			out,
 			container,
+			hints,
 			interfaceValue);
 
 		out.writeFormat (
@@ -180,6 +184,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
 			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
@@ -194,6 +199,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			submission,
 			out,
 			container,
+			hints,
 			interfaceValue,
 			formType);
 
@@ -221,8 +227,37 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
 			@NonNull FormType formType) {
+
+		// lookup root
+
+		Optional<Record<?>> root;
+
+		if (rootFieldName != null) {
+
+System.out.println ("ROOT FIELD NAME: " + rootFieldName);
+for (String hint : hints.keySet ()) {
+System.out.println ("HINT: " + hint);
+}
+
+			root =
+				Optional.<Record<?>>of (
+					(Record<?>)
+					objectManager.dereference (
+						container,
+						rootFieldName,
+						hints));
+
+		} else {
+
+			root =
+				Optional.<Record<?>>absent ();
+
+		}
+
+		// get current option
 
 		Optional<Interface> currentValue =
 			formValuePresent (
@@ -243,32 +278,17 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			allOptions.stream ()
 
 			.filter (
+				root.isPresent ()
+					? item -> objectManager.isParent (item, root.get ())
+					: item -> true)
+
+			.filter (
 				item ->
 					objectManager.canView (item)
 					|| equal (item, interfaceValue.orNull ()))
 
 			.collect (
 				Collectors.toList ());
-
-		// lookup root
-
-		Optional<Record<?>> root;
-
-		if (rootFieldName != null) {
-
-			root =
-				Optional.<Record<?>>fromNullable (
-					(Record<?>)
-					objectManager.dereference (
-						container,
-						rootFieldName));
-
-		} else {
-
-			root =
-				Optional.<Record<?>>absent ();
-
-		}
 
 		// sort options by path
 

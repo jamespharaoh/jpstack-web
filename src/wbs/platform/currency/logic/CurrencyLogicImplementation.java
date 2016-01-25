@@ -3,8 +3,12 @@ package wbs.platform.currency.logic;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
+import static wbs.framework.utils.etc.Misc.presentInstances;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.regex.Matcher;
@@ -13,6 +17,7 @@ import java.util.regex.Pattern;
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.currency.model.CurrencyRec;
@@ -219,46 +224,80 @@ class CurrencyLogicImplementation
 			throw new RuntimeException ();
 		}
 
-		Pattern pattern =
-			Pattern.compile (
+		StringBuilder patternBuilder =
+			new StringBuilder ();
+
+		patternBuilder.append (
+			joinWithoutSeparator (
+				"\\s*",
+				"(?:",
+				Pattern.quote (
+					currency.getPrefix ()),
+				")?",
+				"\\s*"));
+
+		patternBuilder.append (
+			joinWithoutSeparator (
+				"([-+])?"));
+
+		patternBuilder.append (
+			joinWithoutSeparator (
+				"(\\d+)"));
+
+		if (decimalPlaces > 0) {
+
+			patternBuilder.append (
+				joinWithoutSeparator (
+					"\\.",
+					"(\\d{" + decimalPlaces + "})"));
+
+		}
+
+		if (
+			isNotEmpty (
+				currency.getSingularSuffix ().trim ())
+			|| isNotEmpty (
+				currency.getPluralSuffix ().trim ())
+		) {
+
+			patternBuilder.append (
 				joinWithoutSeparator (
 
-					// prefix
+				"\\s*",
+				"(?:",
 
-					"\\s*",
-					"(?:",
-					Pattern.quote (
-						currency.getPrefix ()),
-					")?",
-					"\\s*",
-
-					// sign
-
-					"([-+])?",
-
-					// units
-
-					"(\\d+)",
-
-					// subdivisions
-
-					decimalPlaces > 0
-						? joinWithoutSeparator (
-							"\\.",
-							"(\\d{" + decimalPlaces + "})")
-						: "",
-
-					// suffix
-
-					"\\s*",
-					"(?:",
-					Pattern.quote (
-						currency.getSingularSuffix ().trim ()),
+				joinWithSeparator (
 					"|",
-					Pattern.quote (
-						currency.getPluralSuffix ().trim ()),
-					")?",
-					"\\s*"));
+
+					ImmutableList.copyOf (
+						presentInstances (
+
+						Optional.fromNullable (
+							nullIfEmptyString (
+								Pattern.quote (
+									currency.getSingularSuffix ().trim ()))),
+
+						Optional.fromNullable (
+							nullIfEmptyString (
+								Pattern.quote (
+									currency.getPluralSuffix ().trim ())))
+
+					))
+
+				),
+
+				")\\s*"
+
+			));
+
+		}
+
+		patternBuilder.append (
+			"\\s*");
+
+		Pattern pattern =
+			Pattern.compile (
+				patternBuilder.toString ());
 
 		// perform match
 
@@ -268,13 +307,9 @@ class CurrencyLogicImplementation
 
 		if (! matcher.matches ()) {
 
-System.out.println ("AA");
-
 			return Optional.<Long>absent ();
 
 		}
-
-System.out.println ("BB");
 
 		// return the result
 

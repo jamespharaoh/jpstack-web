@@ -42,8 +42,19 @@
 			<context-tab-responder-page
 				name="compare"/>
 
-			<context-tab-action-page
-				name="create"/>
+			<section
+				name="create"
+				label="Create">
+
+				<object-create-page
+					name="new"
+					fields="create"
+					target-context-type="chatAffiliate:combo"/>
+
+				<context-tab-action-page
+					name="old"/>
+
+			</section>
 
 		</list>
 
@@ -100,6 +111,21 @@
 		<object-field
 			name="category"
 			object-type="chatCategory"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="chatAffiliate">
+
+		<object-field
+			name="chatScheme"
+			label="Scheme"
+			object-type="chatScheme"
+			root-field="chatScheme.chat"/>
+
+		<name-field/>
+		<description-field/>
 
 	</field-set>
 

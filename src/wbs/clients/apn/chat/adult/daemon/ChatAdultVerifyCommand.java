@@ -140,9 +140,12 @@ class ChatAdultVerifyCommand
 
 			return inboxLogic.inboxNotProcessed (
 				inbox,
-				Optional.of (defaultService),
-				Optional.of (affiliate),
-				Optional.of (command),
+				Optional.of (
+					defaultService),
+				Optional.fromNullable (
+					affiliate),
+				Optional.of (
+					command),
 				"No chat scheme for chat user");
 
 		}

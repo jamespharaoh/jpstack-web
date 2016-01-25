@@ -13,8 +13,8 @@
 
 	<layer name="console">
 		<bean class="console.ChatAffiliateComparePart"/>
-		<bean class="console.ChatAffiliateCreateAction"/>
-		<bean class="console.ChatAffiliateCreatePart"/>
+		<bean class="console.ChatAffiliateCreateOldAction"/>
+		<bean class="console.ChatAffiliateCreateOldPart"/>
 		<bean class="console.ChatAffiliateKeywordsCreateAction"/>
 		<bean class="console.ChatAffiliateKeywordsCreatePart"/>
 		<bean class="console.ChatAffiliateKeywordsListPart"/>

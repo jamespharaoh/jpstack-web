@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import wbs.applications.imchat.model.ImChatCustomerCreditRec;
@@ -112,7 +113,8 @@ class ImChatCustomerCreditPart
 		formFieldLogic.outputDetailsTable (
 			formatWriter,
 			customerFormFields,
-			request.customer ());
+			request.customer (),
+			ImmutableMap.of ());
 
 		printFormat (
 			"<h2>Apply credit</h2>\n");
@@ -123,6 +125,7 @@ class ImChatCustomerCreditPart
 			creditFormFields,
 			updateResultSet,
 			request,
+			ImmutableMap.of (),
 			requestContext.resolveLocalUrl (
 				"/imChatCustomer.credit"),
 			"apply credit",

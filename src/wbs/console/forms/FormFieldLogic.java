@@ -301,6 +301,7 @@ class FormFieldLogic {
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object,
+			@NonNull Map<String,Object> hints,
 			@NonNull FormType formType) {
 
 		outputFormRows (
@@ -310,6 +311,7 @@ class FormFieldLogic {
 			formFieldSet,
 			updateResultSet,
 			object,
+			hints,
 			formType);
 
 	}
@@ -321,6 +323,7 @@ class FormFieldLogic {
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object,
+			@NonNull Map<String,Object> hints,
 			@NonNull FormType formType) {
 
 		for (
@@ -356,6 +359,7 @@ class FormFieldLogic {
 				submission,
 				htmlWriter,
 				object,
+				hints,
 				error,
 				formType);
 
@@ -396,6 +400,7 @@ class FormFieldLogic {
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object,
+			@NonNull Map<String,Object> hints,
 			@NonNull String actionUrl,
 			@NonNull String submitButtonLabel,
 			@NonNull FormType formType) {
@@ -407,6 +412,7 @@ class FormFieldLogic {
 			formFieldSet,
 			updateResultSet,
 			object,
+			hints,
 			actionUrl,
 			submitButtonLabel,
 			formType);
@@ -420,6 +426,7 @@ class FormFieldLogic {
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object,
+			@NonNull Map<String,Object> hints,
 			@NonNull String actionUrl,
 			@NonNull String submitButtonLabel,
 			@NonNull FormType formType) {
@@ -440,6 +447,7 @@ class FormFieldLogic {
 			formFieldSet,
 			updateResultSet,
 			object,
+			hints,
 			formType);
 
 		htmlWriter.writeFormat (
@@ -461,7 +469,8 @@ class FormFieldLogic {
 	void outputDetailsTable (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
-			@NonNull Object object) {
+			@NonNull Object object,
+			@NonNull Map<String,Object> hints) {
 
 		htmlWriter.writeFormat (
 			"<table class=\"details\">\n");
@@ -469,7 +478,8 @@ class FormFieldLogic {
 		outputTableRows (
 			htmlWriter,
 			formFieldSet,
-			object);
+			object,
+			hints);
 
 		htmlWriter.writeFormat (
 			"</table>\n");
@@ -634,7 +644,8 @@ class FormFieldLogic {
 	void outputTableRows (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
-			@NonNull Object object) {
+			@NonNull Object object,
+			@NonNull Map<String,Object> hints) {
 
 		for (
 			FormField formField
@@ -652,7 +663,8 @@ class FormFieldLogic {
 
 			formField.renderTableCellProperties (
 				htmlWriter,
-				object);
+				object,
+				hints);
 
 			htmlWriter.writeFormat (
 				"</tr>\n");

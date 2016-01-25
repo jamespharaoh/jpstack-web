@@ -1,5 +1,7 @@
 package wbs.console.forms;
 
+import java.util.Map;
+
 import com.google.common.base.Optional;
 
 import fj.data.Either;
@@ -15,6 +17,7 @@ interface FormFieldRenderer<Container,Interface> {
 	void renderTableCellProperties (
 			FormatWriter out,
 			Container container,
+			Map<String,Object> hints,
 			Optional<Interface> interfaceValue);
 
 	void renderTableCellList (
@@ -27,12 +30,14 @@ interface FormFieldRenderer<Container,Interface> {
 	void renderTableRow (
 			FormatWriter out,
 			Container container,
+			Map<String,Object> hints,
 			Optional<Interface> interfaceValue);
 
 	void renderFormRow (
 			FormFieldSubmission submission,
 			FormatWriter out,
 			Container container,
+			Map<String,Object> hints,
 			Optional<Interface> interfaceValue,
 			Optional<String> error,
 			FormType formType);
@@ -41,6 +46,7 @@ interface FormFieldRenderer<Container,Interface> {
 			FormFieldSubmission submission,
 			FormatWriter out,
 			Container container,
+			Map<String,Object> hints,
 			Optional<Interface> interfaceValue,
 			FormType formType);
 

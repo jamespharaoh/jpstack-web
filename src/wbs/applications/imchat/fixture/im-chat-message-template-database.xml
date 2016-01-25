@@ -92,10 +92,6 @@
 			Customer area
 		</field>
 
-		<field name="Log out">
-			Log out
-		</field>
-
 		<field name="Profiles">
 			Profiles
 		</field>
@@ -104,12 +100,20 @@
 			Log in
 		</field>
 
-		<field name="Exit link">
-			http://google.com/
+		<field name="Help">
+			Help
+		</field>
+
+		<field name="Log out">
+			Log out
 		</field>
 
 		<field name="Exit">
 			Back To Website
+		</field>
+
+		<field name="Exit link">
+			http://google.com/
 		</field>
 
 	</entry>
@@ -290,24 +294,6 @@
 			Credit balance
 		</field>
 
-		<field name="Purchase credit button label">
-			Purchase credit
-		</field>
-
-	</entry>
-
-	<entry name="Payment history section">
-
-		<field name="Heading">
-			Payment history
-		</field>
-
-		<field name="Introduction">
-			Here you can see your recent payments. For more information, or for
-			information about older payments which are not shown here, please
-			contact customer services.
-		</field>
-
 		<field name="Credit balance message">
 			You currently have a credit balance of ${credit-balance}
 		</field>
@@ -315,6 +301,28 @@
 		<field name="No credit message">
 			You do not currently have any credit. Please purchase some if you
 			wish to use the paid chat service.
+		</field>
+
+		<field name="Purchase credit button label">
+			Purchase credit
+		</field>
+
+		<field name="Payment history button label">
+			Payment history
+		</field>
+
+	</entry>
+
+	<entry name="Payment history screen">
+
+		<field name="Title">
+			Payment history
+		</field>
+
+		<field name="Introduction">
+			Here you can see your recent payments. For more information, or for
+			information about older payments which are not shown here, please
+			contact customer services.
 		</field>
 
 		<field name="No payments message">
@@ -331,6 +339,10 @@
 
 		<field name="Credit amount column">
 			Credit amount
+		</field>
+
+		<field name="Back to customer area button label">
+			Back to customer area
 		</field>
 
 	</entry>
@@ -360,7 +372,7 @@
 
 		<field name="Information 1">
 			Please use this form if you wish to change your password. You will
-			need to enter your current password, or security, and the new
+			need to enter your current password, for security, and the new
 			password.
 		</field>
 
@@ -680,6 +692,23 @@
 
 		<field name="Update button label">
 			Update customer details
+		</field>
+
+	</entry>
+
+	<entry name="Help screen">
+
+		<field name="Title">
+			Help
+		</field>
+
+		<field name="Content"><![CDATA[
+			<p>This is the content for the help screen.</p>
+			<p>It is in HTML format.</p>
+		]]></field>
+
+		<field name="Back to chat button label">
+			Back to chat
 		</field>
 
 	</entry>

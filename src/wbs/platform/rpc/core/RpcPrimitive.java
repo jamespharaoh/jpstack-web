@@ -2,7 +2,7 @@ package wbs.platform.rpc.core;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import wbs.framework.utils.cal.CalDate;
+import org.joda.time.LocalDate;
 
 public
 class RpcPrimitive
@@ -45,7 +45,7 @@ class RpcPrimitive
 		if (primitive instanceof byte[])
 			return RpcType.rBinary;
 
-		if (primitive instanceof CalDate)
+		if (primitive instanceof LocalDate)
 			return RpcType.rDate;
 
 		throw new RuntimeException (

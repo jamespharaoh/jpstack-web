@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableList;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.hibernate.ChatUserCreditModeType;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
+import wbs.clients.apn.chat.category.model.ChatCategoryRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
@@ -217,6 +218,45 @@ class ChatUserDaoHibernate
 				ChatUserTypeType.INSTANCE)
 
 			.list ());
+
+	}
+
+	@Override
+	public
+	List<ChatUserRec> findOnlineOrMonitorCategory (
+			@NonNull ChatRec chat,
+			@NonNull ChatCategoryRec category) {
+
+		Criteria criteria =
+			createCriteria (
+				ChatUserRec.class,
+				"_chatUser");
+
+		criteria.add (
+			Restrictions.eq (
+				"_chatUser.chat",
+				chat));
+
+		criteria.add (
+			Restrictions.or (
+				Restrictions.eq (
+					"_chatUser.online",
+					true),
+				Restrictions.and (
+					Restrictions.eq (
+						"_chatUser.type",
+						ChatUserType.monitor),
+					Restrictions.eq (
+						"_chatUser.category",
+						category))));
+
+		criteria.addOrder (
+			Order.desc (
+				"_chatUser.lastAction"));
+
+		return findMany (
+			ChatUserRec.class,
+			criteria.list ());
 
 	}
 

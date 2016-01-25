@@ -10,10 +10,10 @@ import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
-import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormField.FormType;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.misc.TimeFormatter;
@@ -130,8 +130,9 @@ class ManualResponderReportOperatorPart
 			requestContext,
 			formatWriter,
 			searchFormFieldSet,
-			Optional.<UpdateResultSet>absent (),
+			Optional.absent (),
 			searchForm,
+			ImmutableMap.of (),
 			FormType.search);
 
 		printFormat (

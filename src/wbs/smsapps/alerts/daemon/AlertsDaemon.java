@@ -535,7 +535,8 @@ class AlertsDaemon
 		log.warn (message);
 
 		TextRec messageText =
-			textHelper.findOrCreate (message);
+			textHelper.findOrCreate (
+				message);
 
 		return messageText;
 

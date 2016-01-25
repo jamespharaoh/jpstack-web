@@ -4,10 +4,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
-import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormField.FormType;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
@@ -71,8 +71,9 @@ class SubscriptionNumberAddRemovePart
 			requestContext,
 			formatWriter,
 			addRemoveFormFieldSet,
-			Optional.<UpdateResultSet>absent (),
+			Optional.absent (),
 			addRemoveForm,
+			ImmutableMap.of (),
 			FormType.perform);
 
 		printFormat (

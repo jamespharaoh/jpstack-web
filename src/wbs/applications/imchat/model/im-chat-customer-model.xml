@@ -31,6 +31,15 @@
 			name="detailsCompleted"
 			default="no"/>
 
+		<reference-field
+			name="notesText"
+			type="text"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="developerMode"
+			default="no"/>
+
 		<!-- statistics -->
 
 		<integer-field

@@ -54,12 +54,11 @@
 		name="list"
 		object-name="imChatConversation">
 
-		<index-field/>
-
 		<object-field
 			name="imChatProfile"
 			label="Profile"
-			object-type="imChatProfile"/>
+			object-type="imChatProfile"
+			root-field="imChatCustomer.imChat"/>
 
 		<integer-field
 			name="numMessages"
@@ -67,6 +66,9 @@
 
 		<timestamp-field
 			name="startTime"/>
+
+		<timestamp-field
+			name="endTime"/>
 
 	</field-set>
 
@@ -81,7 +83,8 @@
 		<object-field
 			name="imChatProfile"
 			label="Profile"
-			object-type="imChatProfile"/>
+			object-type="imChatProfile"
+			root-field="imChatCustomer.imChat"/>
 
 		<integer-field
 			name="numMessages"/>
@@ -89,8 +92,8 @@
 		<timestamp-field
 			name="startTime"/>
 
-		<integer-field
-			name="freeMessages"/>
+		<timestamp-field
+			name="endTime"/>
 
 	</field-set>
 

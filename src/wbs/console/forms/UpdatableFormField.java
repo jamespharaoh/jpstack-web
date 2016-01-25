@@ -141,7 +141,8 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	public
 	void renderTableCellProperties (
 			@NonNull FormatWriter out,
-			@NonNull Container container) {
+			@NonNull Container container,
+			@NonNull Map<String,Object> hints) {
 
 		Optional<Native> nativeValue =
 			requiredValue (
@@ -164,6 +165,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		renderer.renderTableCellProperties (
 			out,
 			container,
+			hints,
 			interfaceValue);
 
 	}
@@ -174,6 +176,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
 
@@ -199,6 +202,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			submission,
 			out,
 			container,
+			hints,
 			interfaceValue,
 			error,
 			formType);

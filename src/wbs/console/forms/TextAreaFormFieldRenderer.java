@@ -5,6 +5,9 @@ import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -90,6 +93,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 	void renderTableCellProperties (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
@@ -105,6 +109,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 	void renderTableRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
@@ -115,6 +120,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 		renderTableCellProperties (
 			out,
 			container,
+			hints,
 			interfaceValue);
 
 		out.writeFormat (
@@ -128,6 +134,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
 			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
@@ -142,6 +149,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			submission,
 			out,
 			container,
+			hints,
 			interfaceValue,
 			formType);
 
@@ -169,6 +177,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
 			@NonNull FormType formType) {
 

@@ -1,6 +1,9 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
+
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -64,6 +67,7 @@ class HtmlFormFieldRenderer<Container>
 	void renderTableCellProperties (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
@@ -79,6 +83,7 @@ class HtmlFormFieldRenderer<Container>
 	void renderTableRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		out.writeFormat (
@@ -89,6 +94,7 @@ class HtmlFormFieldRenderer<Container>
 		renderTableCellProperties (
 			out,
 			container,
+			hints,
 			interfaceValue);
 
 		out.writeFormat (
@@ -102,6 +108,7 @@ class HtmlFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
 			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
@@ -109,6 +116,7 @@ class HtmlFormFieldRenderer<Container>
 		renderTableRow (
 			out,
 			container,
+			hints,
 			interfaceValue);
 
 	}
@@ -119,6 +127,7 @@ class HtmlFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
 			@NonNull FormType formType) {
 

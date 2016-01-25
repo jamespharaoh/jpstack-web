@@ -1,0 +1,48 @@
+<console-module
+	name="im-chat-report">
+
+	<simple-context
+		name="imChatReport">
+
+		<object-search-page
+			name="operator"
+			tab-label="Operators"
+			object-type="imChatMessage"
+			search-class="wbs.applications.imchat.model.ImChatMessageSearch"
+			search-fields="operator-report-search"
+			search-dao-method="searchOperatorReportIds"
+			results-class="wbs.applications.imchat.model.ImChatOperatorReport"
+			results-fields="operator-report-results"
+			results-dao-method="findOperatorReports"/>
+
+	</simple-context>
+
+	<field-set
+		name="operator-report-search"
+		class="wbs.applications.imchat.model.ImChatMessageSearch">
+
+		<interval-field
+			name="timestamp"
+			label="Time range"/>
+
+	</field-set>
+
+	<field-set
+		name="operator-report-results"
+		class="wbs.applications.imchat.model.ImChatOperatorReport">
+
+		<object-field
+			name="user"
+			object-type="user"/>
+
+		<integer-field
+			name="numFreeMessages"
+			label="Free"/>
+
+		<integer-field
+			name="numBilledMessages"
+			label="Billed"/>
+
+	</field-set>
+
+</console-module>

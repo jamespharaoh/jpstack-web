@@ -40,7 +40,6 @@ import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleManager;
@@ -697,8 +696,9 @@ class ChatReportRevSharePart
 			requestContext,
 			formatWriter,
 			searchFields,
-			Optional.<UpdateResultSet>absent (),
+			Optional.absent (),
 			form,
+			ImmutableMap.of (),
 			FormType.search);
 
 		printFormat (

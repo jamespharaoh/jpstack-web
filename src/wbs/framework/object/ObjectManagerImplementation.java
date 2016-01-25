@@ -4,12 +4,14 @@ import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.split;
+import static wbs.framework.utils.etc.Misc.startsWith;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -142,119 +144,6 @@ class ObjectManagerImplementation
 
 		return objectHelperManager.forObjectClass (
 			objectClass);
-
-	}
-
-	@Override
-	public
-	String objectPath (
-			@NonNull Record<?> dataObject) {
-
-		return objectPath (
-			dataObject,
-			Optional.<Record<?>>absent (),
-			false,
-			false);
-
-	}
-
-	@Override
-	public
-	String objectPathMini (
-			@NonNull Record<?> dataObject) {
-
-		return objectPath (
-			dataObject,
-			Optional.<Record<?>>absent (),
-			true,
-			false);
-
-	}
-
-	@Override
-	public
-	String objectPathMini (
-			@NonNull Record<?> object,
-			@NonNull Optional<Record<?>> root) {
-
-		return objectPath (
-			object,
-			root,
-			true,
-			false);
-
-	}
-
-	@Override
-	public
-	String objectPathMini (
-			@NonNull Record<?> object,
-			@NonNull Record<?> root) {
-
-		return objectPath (
-			object,
-			Optional.<Record<?>>of (
-				root),
-			true,
-			false);
-
-	}
-
-	@Override
-	public
-	String objectPathMiniPreload (
-			@NonNull Record<?> object,
-			@NonNull Optional<Record<?>> root) {
-
-		return objectPath (
-			object,
-			root,
-			true,
-			true);
-
-	}
-
-	@Override
-	public
-	String objectPathMiniPreload (
-			@NonNull Record<?> object,
-			@NonNull Record<?> root) {
-
-		return objectPath (
-			object,
-			Optional.<Record<?>>of (
-				root),
-			true,
-			true);
-
-	}
-
-	@Override
-	public
-	String objectPath (
-			@NonNull Record<?> dataObject,
-			@NonNull Optional<Record<?>> root) {
-
-		return objectPath (
-			dataObject,
-			root,
-			false,
-			false);
-
-	}
-
-	@Override
-	public
-	String objectPath (
-			@NonNull Record<?> dataObject,
-			@NonNull Record<?> root) {
-
-		return objectPath (
-			dataObject,
-			Optional.<Record<?>>of (
-				root),
-			false,
-			false);
 
 	}
 
@@ -680,8 +569,45 @@ class ObjectManagerImplementation
 	@Override
 	public
 	Object dereference (
-			Object object,
-			String path) {
+			@NonNull Object object,
+			@NonNull String path,
+			@NonNull Map<String,Object> hints) {
+
+		// check hints
+
+		for (
+			Map.Entry<String,Object> hintEntry
+				: hints.entrySet ()
+		) {
+
+			if (
+				equal (
+					hintEntry.getKey (),
+					path)
+			) {
+
+				return hintEntry.getValue ();
+
+			} else if (
+				startsWith (
+					path,
+					hintEntry.getKey () + ".")
+			) {
+
+				path =
+					path.substring (
+						hintEntry.getKey ().length () + 1);
+
+				object =
+					hintEntry.getValue ();
+
+				break;
+
+			}
+
+		}
+
+		// iterate through path
 
 		List<String> pathParts =
 			split (

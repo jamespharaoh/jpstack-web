@@ -7,6 +7,7 @@ import java.util.Map;
 import org.joda.time.Instant;
 
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
+import wbs.clients.apn.chat.category.model.ChatCategoryRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.sms.number.core.model.NumberRec;
 
@@ -26,6 +27,10 @@ interface ChatUserDaoMethods {
 
 	List<ChatUserRec> findOnline (
 			ChatUserType type);
+
+	List<ChatUserRec> findOnlineOrMonitorCategory (
+			ChatRec chat,
+			ChatCategoryRec category);
 
 	List<ChatUserRec> findWantingBill (
 			Date date);

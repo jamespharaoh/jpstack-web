@@ -7,6 +7,9 @@ import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
 import static wbs.framework.utils.etc.Misc.successResult;
+
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -79,6 +82,7 @@ class YesNoFormFieldRenderer<Container>
 	void renderTableCellProperties (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Boolean> interfaceValue) {
 
 		out.writeFormat (
@@ -94,6 +98,7 @@ class YesNoFormFieldRenderer<Container>
 	void renderTableRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Boolean> interfaceValue) {
 
 		out.writeFormat (
@@ -104,6 +109,7 @@ class YesNoFormFieldRenderer<Container>
 		renderTableCellProperties (
 			out,
 			container,
+			hints,
 			interfaceValue);
 
 		out.writeFormat (
@@ -117,6 +123,7 @@ class YesNoFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Boolean> interfaceValue,
 			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
@@ -131,6 +138,7 @@ class YesNoFormFieldRenderer<Container>
 			submission,
 			out,
 			container,
+			hints,
 			interfaceValue,
 			formType);
 
@@ -158,6 +166,7 @@ class YesNoFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Boolean> interfaceValue,
 			@NonNull FormType formType) {
 

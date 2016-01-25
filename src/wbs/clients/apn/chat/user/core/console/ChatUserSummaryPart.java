@@ -24,7 +24,6 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.cal.CalDate;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.sms.gazetteer.logic.GazetteerLogic;
@@ -182,7 +181,7 @@ class ChatUserSummaryPart
 
 			"<td>%h</td>\n",
 			chatUser.getDob () != null
-				? CalDate.forLocalDate (
+				? timeFormatter.localDateToDateString (
 					chatUser.getDob ())
 				: "-",
 

@@ -91,8 +91,10 @@ class ObjectCreatePageBuilder<
 
 	ConsoleHelper<ObjectType> consoleHelper;
 
+	String name;
 	String typeCode;
 	String tabName;
+	String tabLabel;
 	String localFile;
 	String responderName;
 	String targetContextTypeName;
@@ -145,7 +147,7 @@ class ObjectCreatePageBuilder<
 					tabName)
 
 				.defaultLabel (
-					"Create")
+					tabLabel)
 
 				.localFile (
 					localFile)
@@ -280,6 +282,11 @@ class ObjectCreatePageBuilder<
 		consoleHelper =
 			container.consoleHelper ();
 
+		name =
+			ifNull (
+				spec.name (),
+				"create");
+
 		typeCode =
 			spec.typeCode ();
 
@@ -287,22 +294,30 @@ class ObjectCreatePageBuilder<
 			ifNull (
 				spec.tabName (),
 				stringFormat (
-					"%s.create",
-					container.pathPrefix ()));
+					"%s.%s",
+					container.pathPrefix (),
+					name));
+
+		tabLabel =
+			capitalise (
+				name);
 
 		localFile =
 			ifNull (
 				spec.localFile (),
 				stringFormat (
-					"%s.create",
-					container.pathPrefix ()));
+					"%s.%s",
+					container.pathPrefix (),
+					name));
 
 		responderName =
 			ifNull (
 				spec.responderName (),
 				stringFormat (
-					"%sCreateResponder",
-					container.newBeanNamePrefix ()));
+					"%s%sResponder",
+					container.newBeanNamePrefix (),
+					capitalise (
+						name)));
 
 		targetContextTypeName =
 			ifNull (

@@ -140,6 +140,10 @@ class ImChatMessageTemplateSetGetAction
 				: messageTemplateDatabase.getMessageTemplateEntryTypes ()
 		) {
 
+			if (entryType.getDeleted ()) {
+				continue;
+			}
+
 			MessageTemplateEntryValueRec entryValue =
 				messageTemplateSet.getMessageTemplateEntryValues ().get (
 					entryType.getId ());
@@ -149,8 +153,12 @@ class ImChatMessageTemplateSetGetAction
 					: entryType.getMessageTemplateFieldTypes ()
 			) {
 
+				if (fieldType.getDeleted ()) {
+					continue;
+				}
+
 				MessageTemplateFieldValueRec fieldValue =
-					entryValue != null
+					entryValue != null && ! entryValue.getDeleted ()
 						? entryValue.getFields ().get (
 							fieldType.getId ())
 						: null;
@@ -163,7 +171,7 @@ class ImChatMessageTemplateSetGetAction
 							fieldType.getCode ()));
 
 				String value =
-					fieldValue != null
+					fieldValue != null && ! fieldValue.getDeleted ()
 						? fieldValue.getStringValue ()
 						: fieldType.getDefaultValue ();
 

@@ -17,7 +17,6 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.event.logic.EventLogic;
-import wbs.platform.user.model.UserRec;
 import wbs.sms.gazetteer.model.GazetteerEntryObjectHelper;
 import wbs.sms.gazetteer.model.GazetteerEntryRec;
 

@@ -30,4 +30,7 @@ class ImageFormFieldSpec {
 	@DataAttribute
 	Boolean nullable;
 
+	@DataAttribute
+	Boolean showFilename;
+
 }

@@ -98,6 +98,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	void renderTableCellProperties (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue) {
 
 		out.writeFormat (
@@ -114,6 +115,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	void renderTableRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue) {
 
 		out.writeFormat (
@@ -124,6 +126,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 		renderTableCellProperties (
 			out,
 			container,
+			hints,
 			interfaceValue);
 
 		out.writeFormat (
@@ -137,6 +140,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
 			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
@@ -151,6 +155,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			submission,
 			out,
 			container,
+			hints,
 			interfaceValue,
 			formType);
 
@@ -178,6 +183,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
 			@NonNull FormType formType) {
 

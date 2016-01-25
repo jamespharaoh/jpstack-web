@@ -87,9 +87,27 @@
 					name="customer"
 					link="imChatCustomer"
 					label="Customers"
-					priv-key="imChat.manage"/>
+					priv-key="imChat.supervisor"/>
+
+				<context-link
+					name="conversation"
+					link="imChatConversation"
+					label="Conversations"
+					priv-key="imChat.supervisor"/>
+
+				<context-link
+					name="purchase"
+					link="imChatPurchase"
+					label="Purchases"
+					priv-key="imChat.supervisor"/>
 
 			</section>
+
+			<context-link
+				name="report"
+				link="imChatReport"
+				label="Reports"
+				priv-key="imChat.supervisor"/>
 
 			<object-events-page/>
 

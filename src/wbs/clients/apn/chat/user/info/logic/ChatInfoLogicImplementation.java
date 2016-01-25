@@ -1071,9 +1071,25 @@ class ChatInfoLogicImplementation
 		ChatRec chat =
 			thisUser.getChat ();
 
-		Collection<ChatUserRec> onlineUsers =
-			chatUserHelper.findOnline (
-				chat);
+		Collection<ChatUserRec> onlineUsers;
+
+		if (
+			isNotNull (
+				thisUser.getCategory ())
+		) {
+
+			onlineUsers =
+				chatUserHelper.findOnlineOrMonitorCategory (
+					chat,
+					thisUser.getCategory ());
+
+		} else {
+
+			onlineUsers =
+				chatUserHelper.findOnline (
+					chat);
+
+		}
 
 		List<ChatUserRec> ret =
 			new ArrayList<ChatUserRec> ();
@@ -1206,9 +1222,25 @@ class ChatInfoLogicImplementation
 		ChatRec chat =
 			thisUser.getChat ();
 
-		Collection<ChatUserRec> onlineChatUsers =
-			chatUserHelper.findOnline (
-				chat);
+		Collection<ChatUserRec> onlineChatUsers;
+
+		if (
+			isNotNull (
+				thisUser.getCategory ())
+		) {
+
+			onlineChatUsers =
+				chatUserHelper.findOnlineOrMonitorCategory (
+					chat,
+					thisUser.getCategory ());
+
+		} else {
+
+			onlineChatUsers =
+				chatUserHelper.findOnline (
+					chat);
+
+		}
 
 		List<ChatUserRec> selectedChatUsers =
 			new ArrayList<ChatUserRec> ();
@@ -1296,9 +1328,25 @@ class ChatInfoLogicImplementation
 		ChatRec chat =
 			thisUser.getChat ();
 
-		Collection<ChatUserRec> onlineUsers =
-			chatUserHelper.findOnline (
-				chat);
+		Collection<ChatUserRec> onlineUsers;
+
+		if (
+			isNotNull (
+				thisUser.getCategory ())
+		) {
+
+			onlineUsers =
+				chatUserHelper.findOnlineOrMonitorCategory (
+					chat,
+					thisUser.getCategory ());
+
+		} else {
+
+			onlineUsers =
+				chatUserHelper.findOnline (
+					chat);
+
+		}
 
 		List<ChatUserRec> selectedChatUsers =
 			new ArrayList<ChatUserRec> ();

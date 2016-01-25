@@ -137,8 +137,6 @@ class ObjectSearchResultsPart
 	public
 	void prepare () {
 
-System.out.println ("PREPARE");
-
 		// current object
 
 		if (
@@ -241,8 +239,6 @@ System.out.println ("PREPARE");
 
 			objects =
 				objectsTemp;
-
-System.out.println ("PR2");
 
 		} else {
 

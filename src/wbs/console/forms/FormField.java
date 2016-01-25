@@ -2,9 +2,11 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
 
+import java.util.Map;
 import java.util.Set;
 
 import lombok.Data;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
@@ -60,8 +62,9 @@ interface FormField<Container,Generic,Native,Interface> {
 
 	default
 	void renderTableCellProperties (
-			FormatWriter out,
-			Container object) {
+			@NonNull FormatWriter out,
+			@NonNull Container object,
+			@NonNull Map<String,Object> hints) {
 
 		throw new UnsupportedOperationException ();
 
@@ -69,9 +72,10 @@ interface FormField<Container,Generic,Native,Interface> {
 
 	default
 	void renderFormRow (
-			FormFieldSubmission submission,
+			@NonNull FormFieldSubmission submission,
 			FormatWriter out,
 			Container object,
+			Map<String,Object> hints,
 			Optional<String> error,
 			FormType formType) {
 

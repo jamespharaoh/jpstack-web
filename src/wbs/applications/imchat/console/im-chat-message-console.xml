@@ -51,8 +51,21 @@
 		name="list"
 		object-name="imChatMessage">
 
-		<parent-field/>
-		<index-field/>
+		<timestamp-field
+			name="timestamp"/>
+
+		<object-field
+			name="senderUser"
+			label="Sender"
+			object-type="user"/>
+
+		<currency-field
+			name="price"
+			currency="imChatConversation.imChatCustomer.imChat.creditCurrency"/>
+
+		<text-field
+			name="messageText"
+			label="Message"/>
 
 	</field-set>
 
@@ -63,21 +76,22 @@
 		<id-field/>
 		<parent-field/>
 		<index-field/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<object-field
+			name="senderUser"
+			object-type="user"/>
+
+		<currency-field
+			name="price"
+			currency="imChatConversation.imChatCustomer.imChat.creditCurrency"/>
+
 		<text-field
 			name="messageText"
 			nullable="yes"/>
 
-		<yes-no-field
-			name="pending"/>
-
-	</field-set>
-
-	<field-set
-		name="settings"
-		object-name="imChatMessage">
-
-		<id-field/>
-		<index-field/>
 
 	</field-set>
 

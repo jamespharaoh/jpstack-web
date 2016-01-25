@@ -12,6 +12,7 @@ import javax.inject.Provider;
 import com.google.common.collect.ImmutableList;
 
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
+import wbs.console.context.ConsoleContextHint;
 import wbs.console.context.ConsoleContextMetaBuilderContainer;
 import wbs.console.context.ConsoleContextRootExtensionPoint;
 import wbs.console.module.ConsoleMetaModuleImplementation;
@@ -28,11 +29,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 public
 class ObjectContextMetaBuilder {
 
-	// prototype dependencies
-
-	@Inject
-	Provider<ConsoleContextRootExtensionPoint> rootExtensionPointProvider;
-
 	// builder
 
 	@BuilderParent
@@ -43,6 +39,11 @@ class ObjectContextMetaBuilder {
 
 	@BuilderTarget
 	ConsoleMetaModuleImplementation metaModule;
+
+	// prototype dependencies
+
+	@Inject
+	Provider<ConsoleContextRootExtensionPoint> rootExtensionPointProvider;
 
 	// state
 
@@ -104,6 +105,22 @@ class ObjectContextMetaBuilder {
 				ImmutableList.<String>of (
 					contextTypeName,
 					"link:" + contextTypeName))
+
+		);
+
+		// context hints
+
+		metaModule.addContextHint (
+			new ConsoleContextHint ()
+
+			.linkName (
+				contextTypeName)
+
+			.singular (
+				true)
+
+			.plural (
+				true)
 
 		);
 

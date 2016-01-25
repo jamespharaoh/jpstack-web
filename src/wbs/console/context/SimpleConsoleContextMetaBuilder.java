@@ -69,6 +69,22 @@ class SimpleConsoleContextMetaBuilder {
 				ImmutableList.<String>of (
 					contextTypeName)));
 
+		// context hints
+
+		metaModule.addContextHint (
+			new ConsoleContextHint ()
+
+			.linkName (
+				contextTypeName)
+
+			.singular (
+				true)
+
+			.plural (
+				false)
+
+		);
+
 		// descend
 
 		ConsoleContextMetaBuilderContainer nextContainer =

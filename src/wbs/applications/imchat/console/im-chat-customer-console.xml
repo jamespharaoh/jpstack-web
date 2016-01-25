@@ -49,6 +49,9 @@
 			<object-summary-page
 				fields="summary"/>
 
+			<object-settings-page
+				fields="settings"/>
+
 			<context-tab-action-page
 				name="credit"
 				priv-key="imChatCustomer.supervisor"/>
@@ -110,7 +113,7 @@
 
 		<currency-field
 			name="balance"
-			currency="imChat.currency"/>
+			currency="imChat.creditCurrency"/>
 
 	</field-set>
 
@@ -134,7 +137,27 @@
 
 		<currency-field
 			name="balance"
-			currency="imChat.currency"/>
+			currency="imChat.creditCurrency"/>
+
+		<text-area-field
+			name="notesText"
+			label="Notes"/>
+
+		<yes-no-field
+			name="developerMode"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="imChatCustomer">
+
+		<text-area-field
+			name="notesText"
+			label="Notes"/>
+
+		<yes-no-field
+			name="developerMode"/>
 
 	</field-set>
 
@@ -155,7 +178,7 @@
 
 		<currency-field
 			name="balance"
-			currency="imChat.currency"/>
+			currency="imChat.creditCurrency"/>
 
 	</field-set>
 
@@ -168,11 +191,11 @@
 
 		<currency-field
 			name="creditAmount"
-			currency="customer.imChat.currency"/>
+			currency="customer.imChat.creditCurrency"/>
 
 		<currency-field
 			name="billAmount"
-			currency="customer.imChat.currency"/>
+			currency="customer.imChat.billingCurrency"/>
 
 	</field-set>
 
@@ -193,17 +216,17 @@
 		<currency-field
 			name="creditAmount"
 			label="Credit"
-			currency="imChatCustomer.imChat.currency"/>
+			currency="imChatCustomer.imChat.creditCurrency"/>
 
 		<currency-field
 			name="creditBalanceAfter"
 			label="Balance"
-			currency="imChatCustomer.imChat.currency"/>
+			currency="imChatCustomer.imChat.creditCurrency"/>
 
 		<currency-field
 			name="billAmount"
 			label="Bill"
-			currency="imChatCustomer.imChat.currency"/>
+			currency="imChatCustomer.imChat.billingCurrency"/>
 
 	</field-set>
 

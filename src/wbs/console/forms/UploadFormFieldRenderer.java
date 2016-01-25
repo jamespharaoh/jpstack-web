@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.io.IOException;
+import java.util.Map;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -73,6 +74,7 @@ class UploadFormFieldRenderer<Container>
 	void renderTableCellProperties (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<FileUpload> interfaceValue) {
 
 		out.writeFormat (
@@ -88,6 +90,7 @@ class UploadFormFieldRenderer<Container>
 	void renderTableRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<FileUpload> interfaceValue) {
 
 		out.writeFormat (
@@ -98,6 +101,7 @@ class UploadFormFieldRenderer<Container>
 		renderTableCellProperties (
 			out,
 			container,
+			hints,
 			interfaceValue);
 
 		out.writeFormat (
@@ -111,6 +115,7 @@ class UploadFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<FileUpload> interfaceValue,
 			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
@@ -125,6 +130,7 @@ class UploadFormFieldRenderer<Container>
 			submission,
 			out,
 			container,
+			hints,
 			interfaceValue,
 			formType);
 
@@ -152,6 +158,7 @@ class UploadFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<FileUpload> interfaceValue,
 			@NonNull FormType formType) {
 

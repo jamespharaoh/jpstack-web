@@ -219,6 +219,8 @@ class ConsoleManagerImplementation
 
 		if (errors != 0) {
 
+			log.error ("TESTING");
+
 			throw new RuntimeException (
 				stringFormat (
 					"%s initialising context manager",
@@ -609,6 +611,12 @@ class ConsoleManagerImplementation
 					contextTabs);
 
 			} catch (Exception exception) {
+
+				log.error (
+					stringFormat (
+						"Error resolving tab specs for %s",
+						contextType.name ()),
+					exception);
 
 				errors ++;
 
@@ -1803,34 +1811,43 @@ class ConsoleManagerImplementation
 				"Source context: %s",
 				sourceContext.name ()));
 
-		if (
+		ConsoleContext currentContext =
+			sourceContext;
+
+		while (
 			isNotNull (
-				sourceContext.parentContextName ())
+				currentContext.parentContextName ())
 		) {
 
 			// get parent of current context
 
-			ConsoleContext parentContext =
+			currentContext =
 				context (
-					sourceContext.parentContextName (),
+					currentContext.parentContextName (),
 					true);
 
 			// lookup target context based on parent and type
 
-			return contextWithParentOfType (
-				parentContext,
-				targetContextType,
-				required);
+			Optional<ConsoleContext> targetOptional =
+				contextWithParentOfType (
+					currentContext,
+					targetContextType,
+					false);
 
-		} else {
-
-			// lookup parent-less target context based on type
-
-			return contextWithoutParentOfType (
-				targetContextType,
-				required);
+			if (
+				isPresent (
+					targetOptional)
+			) {
+				return targetOptional;
+			}
 
 		}
+
+		// lookup parent-less target context based on type
+
+		return contextWithoutParentOfType (
+			targetContextType,
+			required);
 
 	}
 

@@ -45,6 +45,9 @@ class ImChatCustomerData {
 	String requiredBalanceString;
 
 	@DataAttribute
+	Boolean developerMode;
+
+	@DataAttribute
 	List<ImChatCustomerDetailData> details;
 
 }

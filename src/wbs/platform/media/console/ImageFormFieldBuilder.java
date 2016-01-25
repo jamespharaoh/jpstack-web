@@ -107,6 +107,7 @@ class ImageFormFieldBuilder {
 	String name;
 	String label;
 	Boolean nullable;
+	Boolean showFilename;
 
 	// build
 
@@ -136,6 +137,11 @@ class ImageFormFieldBuilder {
 			ifNull (
 				spec.nullable (),
 				false);
+
+		showFilename =
+			ifNull (
+				spec.showFilename (),
+				true);
 
 	}
 
@@ -208,7 +214,10 @@ class ImageFormFieldBuilder {
 				label)
 
 			.nullable (
-				nullable);
+				nullable)
+
+			.showFilename (
+				showFilename);
 
 		// update hook
 

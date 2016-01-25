@@ -48,6 +48,10 @@
 			name="token"
 			nullable="yes"/>
 
+		<yes-no-field
+			name="developerMode"
+			default="no"/>
+
 	</fields>
 
 </model-meta>

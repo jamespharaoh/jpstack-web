@@ -2,8 +2,10 @@ package wbs.platform.object.create;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -78,6 +80,9 @@ class ObjectCreatePart<
 	ParentType parent;
 
 	ObjectType object;
+
+	Map<String,Object> hints =
+		new LinkedHashMap<> ();
 
 	// implementation
 
@@ -195,6 +200,35 @@ class ObjectCreatePart<
 						grandParentHelper.objectTypeId (),
 						grandParentId));
 
+			// set grandparent hints
+
+			hints.put (
+				"grandparent",
+				grandParentHelper.find (
+					grandParentId));
+
+			hints.put (
+				stringFormat (
+					"%s.parent",
+					consoleHelper.parentFieldName ()),
+				grandParentHelper.find (
+					grandParentId));
+
+			hints.put (
+				stringFormat (
+					"parent.%s",
+					parentHelper.parentFieldName ()),
+				grandParentHelper.find (
+					grandParentId));
+
+			hints.put (
+				stringFormat (
+					"%s.%s",
+					consoleHelper.parentFieldName (),
+					parentHelper.parentFieldName ()),
+				grandParentHelper.find (
+					grandParentId));
+
 			return;
 
 		}
@@ -230,6 +264,7 @@ class ObjectCreatePart<
 			formFieldSet,
 			updateResultSet,
 			object,
+			hints,
 			requestContext.resolveLocalUrl (
 				"/" + localFile),
 			stringFormat (

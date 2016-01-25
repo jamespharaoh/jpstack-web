@@ -5,9 +5,11 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.optionalIf;
 import static wbs.framework.utils.etc.Misc.presentInstances;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -15,6 +17,8 @@ import javax.inject.Named;
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 import wbs.applications.imchat.model.ImChatConversationRec;
@@ -23,14 +27,21 @@ import wbs.applications.imchat.model.ImChatCustomerDetailValueRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageObjectHelper;
 import wbs.applications.imchat.model.ImChatMessageRec;
+import wbs.applications.imchat.model.ImChatProfileRec;
 import wbs.applications.imchat.model.ImChatRec;
+import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.html.HtmlLink;
+import wbs.console.html.ScriptRef;
+import wbs.console.misc.JqueryEditableScriptRef;
+import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.etc.Html;
 
 @PrototypeComponent ("imChatPendingSummaryPart")
 public
@@ -57,14 +68,58 @@ class ImChatPendingSummaryPart
 	// state
 
 	FormFieldSet customerFields;
+	FormFieldSet profileFields;
 	FormFieldSet messageFields;
 
 	ImChatMessageRec message;
 	ImChatConversationRec conversation;
 	ImChatCustomerRec customer;
+	ImChatProfileRec profile;
 	ImChatRec imChat;
 
 	boolean canSupervise;
+
+	// details
+
+	@Override
+	public
+	Set<ScriptRef> scriptRefs () {
+
+		return ImmutableSet.<ScriptRef>builder ()
+
+			.addAll (
+				super.scriptRefs ())
+
+			.add (
+				JqueryScriptRef.instance)
+
+			.add (
+				JqueryEditableScriptRef.instance)
+
+			.add (
+				ConsoleApplicationScriptRef.javascript (
+					"/js/im-chat.js"))
+
+			.build ();
+
+	}
+
+	@Override
+	public
+	Set<HtmlLink> links () {
+
+		return ImmutableSet.<HtmlLink>builder ()
+
+			.addAll (
+				super.links ())
+
+			.add (
+				HtmlLink.applicationCssStyle (
+					"/styles/im-chat.css"))
+
+			.build ();
+
+	}
 
 	// implementation
 
@@ -77,6 +132,10 @@ class ImChatPendingSummaryPart
 		customerFields =
 			imChatPendingConsoleModule.formFieldSets ().get (
 				"customerFields");
+
+		profileFields =
+			imChatPendingConsoleModule.formFieldSets ().get (
+				"profileFields");
 
 		messageFields =
 			imChatPendingConsoleModule.formFieldSets ().get (
@@ -94,6 +153,9 @@ class ImChatPendingSummaryPart
 
 		customer =
 			conversation.getImChatCustomer ();
+
+		profile =
+			conversation.getImChatProfile ();
 
 		imChat =
 			customer.getImChat ();
@@ -118,13 +180,15 @@ class ImChatPendingSummaryPart
 			"<tr>\n",
 			"<td style=\"width: 50%%\">\n");
 
-		goSummary ();
+		goCustomerSummary ();
+		goCustomerDetails ();
 
 		printFormat (
 			"</td>\n",
 			"<td style=\"width: 50%%\">\n");
 
-		goDetails ();
+		goProfileSummary ();
+		goCustomerNotes ();
 
 		printFormat (
 			"</td>\n",
@@ -137,7 +201,7 @@ class ImChatPendingSummaryPart
 
 	}
 
-	void goDetails () {
+	void goCustomerDetails () {
 
 		printFormat (
 			"<h3>Customer details</h3>\n");
@@ -183,7 +247,7 @@ class ImChatPendingSummaryPart
 
 	}
 
-	void goSummary () {
+	void goCustomerSummary () {
 
 		printFormat (
 			"<h3>Customer summary</h3>\n");
@@ -191,7 +255,42 @@ class ImChatPendingSummaryPart
 		formFieldLogic.outputDetailsTable (
 			formatWriter,
 			customerFields,
-			customer);
+			customer,
+			ImmutableMap.of ());
+
+	}
+
+	void goProfileSummary () {
+
+		printFormat (
+			"<h3>Profile summary</h3>\n");
+
+		formFieldLogic.outputDetailsTable (
+			formatWriter,
+			profileFields,
+			profile,
+			ImmutableMap.of ());
+
+	}
+
+	void goCustomerNotes () {
+
+		printFormat (
+			"<h3>Notes</h3>\n");
+
+		printFormat (
+			"<p",
+			" id=\"%h\"",
+			stringFormat (
+				"im-chat-customer-note-%d",
+				customer.getId ()),
+			" class=\"im-chat-customer-note-editable\"",
+			">%s</p>\n",
+			Html.newlineToBr (
+				Html.encode (
+					customer.getNotesText () != null
+						? customer.getNotesText ().getText ()
+						: "")));
 
 	}
 

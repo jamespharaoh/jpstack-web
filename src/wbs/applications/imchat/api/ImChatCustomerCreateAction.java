@@ -204,6 +204,11 @@ class ImChatCustomerCreateAction
 
 		);
 
+		newCustomer
+
+			.setActiveSession (
+				session);
+
 		// create response
 
 		ImChatCustomerCreateSuccess successResponse =

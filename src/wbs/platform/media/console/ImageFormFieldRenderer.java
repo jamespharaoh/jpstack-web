@@ -6,6 +6,7 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -55,6 +56,9 @@ class ImageFormFieldRenderer<Container>
 	@Getter @Setter
 	Boolean nullable;
 
+	@Getter @Setter
+	Boolean showFilename;
+
 	// details
 
 	@Getter
@@ -91,6 +95,7 @@ class ImageFormFieldRenderer<Container>
 	void renderTableCellProperties (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue) {
 
 		out.writeFormat (
@@ -106,6 +111,7 @@ class ImageFormFieldRenderer<Container>
 	void renderTableRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue) {
 
 		out.writeFormat (
@@ -116,6 +122,7 @@ class ImageFormFieldRenderer<Container>
 		renderTableCellProperties (
 			out,
 			container,
+			hints,
 			interfaceValue);
 
 		out.writeFormat (
@@ -129,6 +136,7 @@ class ImageFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue,
 			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
@@ -143,6 +151,7 @@ class ImageFormFieldRenderer<Container>
 			submission,
 			out,
 			container,
+			hints,
 			interfaceValue,
 			formType);
 
@@ -170,6 +179,7 @@ class ImageFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue,
 			@NonNull FormType formType) {
 
@@ -315,12 +325,25 @@ class ImageFormFieldRenderer<Container>
 			return "";
 		}
 
-		return stringFormat (
-			"%s\n",
-			mediaConsoleLogic.mediaThumb32 (
-				interfaceValue.get ()),
-			"%h",
-			interfaceValue.get ().getFilename ());
+		StringBuilder stringBuilder =
+			new StringBuilder ();
+
+		stringBuilder.append (
+			stringFormat (
+				"%s",
+				mediaConsoleLogic.mediaThumb32 (
+					interfaceValue.get ())));
+
+		if (showFilename) {
+
+			stringBuilder.append (
+				stringFormat (
+					"\n%h",
+					interfaceValue.get ().getFilename ()));
+
+		}
+
+		return stringBuilder.toString ();
 
 	}
 
@@ -334,13 +357,26 @@ class ImageFormFieldRenderer<Container>
 			return "";
 		}
 
-		return stringFormat (
-			"%s<br>\n",
-			mediaConsoleLogic.mediaThumb100 (
-				interfaceValue.get ()),
-			"%h (%h bytes)",
-			interfaceValue.get ().getFilename (),
-			interfaceValue.get ().getContent ().getData ().length);
+		StringBuilder stringBuilder =
+			new StringBuilder ();
+
+		stringBuilder.append (
+			stringFormat (
+				"%s",
+				mediaConsoleLogic.mediaThumb100 (
+					interfaceValue.get ())));
+
+		if (showFilename) {
+
+			stringBuilder.append (
+				stringFormat (
+					"<br>\n%h (%h bytes)",
+					interfaceValue.get ().getFilename (),
+					interfaceValue.get ().getContent ().getData ().length));
+
+		}
+
+		return stringBuilder.toString ();
 
 	}
 

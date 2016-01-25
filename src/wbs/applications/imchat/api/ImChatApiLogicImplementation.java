@@ -204,6 +204,9 @@ class ImChatApiLogicImplementation
 					imChat.getCreditCurrency (),
 					requiredBalance))
 
+			.developerMode (
+				customer.getDeveloperMode ())
+
 			.details (
 				customerDetailData (
 					customer));
@@ -322,7 +325,7 @@ class ImChatApiLogicImplementation
 
 			.chargeString (
 				currencyLogic.formatText (
-					imChat.getBillingCurrency (),
+					imChat.getCreditCurrency (),
 					ifNull (
 						message.getPrice (),
 						0l)));

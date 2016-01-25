@@ -6,19 +6,28 @@ import javax.inject.Inject;
 
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.cal.CalDate;
 
 @PrototypeComponent ("chatUserAdminDobPart")
 public
 class ChatUserAdminDobPart
 	extends AbstractPagePart {
 
+	// dependencies
+
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
 
+	@Inject
+	TimeFormatter timeFormatter;
+
+	// state
+
 	ChatUserRec chatUser;
+
+	// implementation
 
 	@Override
 	public
@@ -50,7 +59,8 @@ class ChatUserAdminDobPart
 			" value=\"%h\"></p>\n",
 			ifNull (
 				requestContext.getForm ("dob"),
-				CalDate.forLocalDate (chatUser.getDob ()),
+				timeFormatter.localDateToDateString (
+					chatUser.getDob ()),
 				""));
 
 		printFormat (

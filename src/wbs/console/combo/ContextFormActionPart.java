@@ -7,10 +7,10 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
-import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormField.FormType;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -77,8 +77,9 @@ class ContextFormActionPart<FormState>
 			requestContext,
 			formatWriter,
 			formFields,
-			Optional.<UpdateResultSet>absent (),
+			Optional.absent (),
 			formState,
+			ImmutableMap.of (),
 			requestContext.resolveLocalUrl (
 				localFile),
 			submitLabel,

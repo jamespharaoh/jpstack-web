@@ -25,6 +25,8 @@ public
 class ChatHelpLogPendingFormAction
 	extends ConsoleAction {
 
+	// dependencies
+
 	@Inject
 	ChatHelpLogConsoleHelper chatHelpLogHelper;
 
@@ -43,11 +45,15 @@ class ChatHelpLogPendingFormAction
 	@Inject
 	UserObjectHelper userHelper;
 
+	// details
+
 	@Override
 	public
 	Responder backupResponder () {
-		return responder ("chatHelpPendingFormResponder");
+		return responder ("chatHelpLogPendingFormResponder");
 	}
+
+	// implementation
 
 	@Override
 	protected

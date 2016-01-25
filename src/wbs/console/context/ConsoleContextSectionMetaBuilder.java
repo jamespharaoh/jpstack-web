@@ -103,6 +103,22 @@ class ConsoleContextSectionMetaBuilder {
 
 		);
 
+		// context hints
+
+		consoleMetaModule.addContextHint (
+			new ConsoleContextHint ()
+
+			.linkName (
+				structuralName)
+
+			.singular (
+				true)
+
+			.plural (
+				false)
+
+		);
+
 		// build children
 
 		ConsoleContextMetaBuilderContainer nextContainer =

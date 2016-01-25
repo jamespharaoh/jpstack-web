@@ -3,7 +3,6 @@ package wbs.clients.apn.chat.contact.console;
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.notEqual;
@@ -16,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -26,6 +24,7 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
+import org.joda.time.Years;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -57,7 +56,6 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.cal.CalDate;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.sms.gazetteer.logic.GazetteerLogic;
@@ -545,15 +543,13 @@ class ChatMonitorInboxSummaryPart
 
 			printFormat (
 				"<td>%h (%h)</td>\n",
-					CalDate.forLocalDate (
-						monitorChatUser.getDob ()),
-				CalDate.age (
-					TimeZone.getDefault (),
-					CalDate.forLocalDate (
-						monitorChatUser.getDob ()),
-					CalDate.fromJava (
-						instantToDate (
-							now))));
+				timeFormatter.localDateToDateString (
+					monitorChatUser.getDob ()),
+				Years.yearsBetween (
+					monitorChatUser.getDob ().toDateTimeAtStartOfDay (
+						DateTimeZone.forID (
+							chat.getTimezone ())),
+					now));
 
 		} else {
 
@@ -569,15 +565,13 @@ class ChatMonitorInboxSummaryPart
 
 			printFormat (
 				"<td>%h (%h)</td>\n",
-				CalDate.forLocalDate (
+				timeFormatter.localDateToDateString (
 					userChatUser.getDob ()),
-				CalDate.age (
-					TimeZone.getDefault (),
-					CalDate.forLocalDate (
-						userChatUser.getDob ()),
-					CalDate.fromJava (
-						instantToDate (
-							now))));
+				Years.yearsBetween (
+					userChatUser.getDob ().toDateTimeAtStartOfDay (
+						DateTimeZone.forID (
+							chat.getTimezone ())),
+					now));
 
 		} else {
 

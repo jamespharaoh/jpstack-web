@@ -14,6 +14,9 @@
 			<context-action-page
 				name="form"/>
 
+			<context-action
+				name="customerNoteUpdate"/>
+
 		</object>
 
 	</object-context>
@@ -37,7 +40,31 @@
 
 		<currency-field
 			name="balance"
-			currency="imChat.currency"/>
+			currency="imChat.creditCurrency"/>
+
+	</field-set>
+
+	<field-set
+		name="profileFields"
+		object-name="imChatProfile">
+
+		<object-field
+			name="profile"
+			object-type="imChatProfile"
+			field="this"
+			root-field="imChat"/>
+
+		<text-field
+			name="publicName"
+			label="Name"/>
+
+		<text-field
+			name="publicDescription"
+			label="Description"/>
+
+		<image-field
+			name="profileImage"
+			show-filename="no"/>
 
 	</field-set>
 
@@ -59,7 +86,7 @@
 
 		<currency-field
 			name="price"
-			currency="imChatConversation.imChatCustomer.imChat.currency"/>
+			currency="imChatConversation.imChatCustomer.imChat.creditCurrency"/>
 
 	</field-set>
 

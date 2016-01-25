@@ -8,6 +8,7 @@ import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import lombok.Getter;
@@ -114,7 +115,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	public
 	void renderTableCellProperties (
 			@NonNull FormatWriter out,
-			@NonNull Container container) {
+			@NonNull Container container,
+			@NonNull Map<String,Object> hints) {
 
 		Optional<Native> nativeValue =
 			requiredValue (
@@ -137,6 +139,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 		renderer.renderTableCellProperties (
 			out,
 			container,
+			hints,
 			interfaceValue);
 
 	}
@@ -147,6 +150,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
 
@@ -171,6 +175,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 		renderer.renderTableRow (
 			out,
 			container,
+			hints,
 			interfaceValue);
 
 	}

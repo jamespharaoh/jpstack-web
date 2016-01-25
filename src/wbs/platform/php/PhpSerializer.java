@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 
-import wbs.framework.utils.cal.CalDate;
+import org.joda.time.LocalDate;
 
 public
 class PhpSerializer {
@@ -275,7 +275,7 @@ class PhpSerializer {
 				out,
 				(Collection<?>) object);
 
-		} else if (object instanceof CalDate) {
+		} else if (object instanceof LocalDate) {
 
 			serializeString (
 				out,

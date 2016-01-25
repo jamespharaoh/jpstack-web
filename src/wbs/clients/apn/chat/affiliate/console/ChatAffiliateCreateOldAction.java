@@ -37,9 +37,9 @@ import wbs.framework.web.Responder;
 import wbs.sms.keyword.logic.KeywordLogic;
 
 @Accessors (fluent = true)
-@PrototypeComponent ("chatAffiliateCreateAction")
+@PrototypeComponent ("chatAffiliateCreateOldAction")
 public
-class ChatAffiliateCreateAction
+class ChatAffiliateCreateOldAction
 	extends ConsoleAction {
 
 	// dependencies

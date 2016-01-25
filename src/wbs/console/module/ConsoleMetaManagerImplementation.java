@@ -1,8 +1,12 @@
 package wbs.console.module;
 
 import static wbs.framework.utils.etc.Misc.camelToHyphen;
+import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.File;
@@ -25,6 +29,7 @@ import org.apache.commons.io.FileUtils;
 import com.google.common.collect.ImmutableList;
 
 import wbs.console.context.ConsoleContextExtensionPoint;
+import wbs.console.context.ConsoleContextHint;
 import wbs.console.context.ConsoleContextLink;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -35,6 +40,8 @@ import wbs.framework.data.tools.DataToXml;
 public
 class ConsoleMetaManagerImplementation
 	implements ConsoleMetaManager {
+
+int debug;
 
 	// prototype dependencies
 
@@ -49,10 +56,13 @@ class ConsoleMetaManagerImplementation
 	// state
 
 	Map<String,List<ConsoleContextLink>> contextLinks =
-		new HashMap<String,List<ConsoleContextLink>> ();
+		new HashMap<> ();
 
 	Map<String,List<ConsoleContextExtensionPoint>> extensionPoints =
-		new HashMap<String,List<ConsoleContextExtensionPoint>> ();
+		new HashMap<> ();
+
+	Map<String,ConsoleContextHint> contextHints =
+		new HashMap<> ();
 
 	// init
 
@@ -120,10 +130,12 @@ class ConsoleMetaManagerImplementation
 
 			}
 
-			// collection extension points
+			// collect extension points
 
-			for (ConsoleContextExtensionPoint extensionPoint
-					: consoleMetaModule.extensionPoints ()) {
+			for (
+				ConsoleContextExtensionPoint extensionPoint
+					: consoleMetaModule.extensionPoints ()
+			) {
 
 				List<ConsoleContextExtensionPoint> extensionPointsForName =
 					extensionPoints.get (
@@ -142,6 +154,27 @@ class ConsoleMetaManagerImplementation
 
 				extensionPointsForName.add (
 					extensionPoint);
+
+			}
+
+			// collect context hints
+
+			for (
+				ConsoleContextHint contextHint
+					: consoleMetaModule.contextHints ()
+			) {
+
+				if (
+					contains (
+						contextHints,
+						contextHint.linkName ())
+				) {
+					throw new RuntimeException ();
+				}
+
+				contextHints.put (
+					contextHint.linkName (),
+					contextHint);
 
 			}
 
@@ -179,6 +212,18 @@ class ConsoleMetaManagerImplementation
 	List<ResolvedConsoleContextExtensionPoint> resolveExtensionPoint (
 			@NonNull String name) {
 
+if (
+	in (
+		name,
+		"chatAffiliate:list",
+		"chatUser:list")
+) {
+	debug ++;
+}
+
+if (debug > 0)
+System.out.println ("=========== START ==========");
+
 		List<ResolvedConsoleContextExtensionPoint> resolvedExtensionPoints =
 			new ArrayList<ResolvedConsoleContextExtensionPoint> ();
 
@@ -193,6 +238,12 @@ class ConsoleMetaManagerImplementation
 		) {
 
 			if (extensionPoint.root ()) {
+
+if (debug > 0) {
+System.out.println ("- root extension point: " + extensionPoint.name ());
+for (String parent : extensionPoint.parentContextNames ())
+System.out.println ("  parent: " + parent);
+}
 
 				resolvedExtensionPoints.add (
 					new ResolvedConsoleContextExtensionPoint ()
@@ -220,6 +271,9 @@ class ConsoleMetaManagerImplementation
 
 			} else if (extensionPoint.nested ()) {
 
+if (debug > 0)
+System.out.println ("- nested extension point: " + extensionPoint.name ());
+
 				if (
 					equal (
 						extensionPoint.name (),
@@ -245,6 +299,18 @@ class ConsoleMetaManagerImplementation
 
 		}
 
+if (debug > 0)
+System.out.println ("=========== END ==========");
+
+if (
+	in (
+		name,
+		"chatAffiliate:list",
+		"chatUser:list")
+) {
+	debug --;
+}
+
 		return resolvedExtensionPoints;
 
 	}
@@ -260,21 +326,61 @@ class ConsoleMetaManagerImplementation
 				: contextLinkNames
 		) {
 
+if (debug > 0)
+System.out.println ("  link: " + contextLinkName);
+
 			for (
 				ResolvedConsoleContextLink resolvedContextLink
 					: resolveContextLink (contextLinkName)
 			) {
+
+if (debug > 0)
+System.out.println ("    resolved link: " + resolvedContextLink.name () + "." + resolvedContextLink.localName ());
 
 				for (
 					String parentContextName
 						: resolvedContextLink.parentContextNames ()
 				) {
 
-					parentContextNamesBuilder.add (
-						stringFormat (
-							"%s.%s",
-							parentContextName,
-							resolvedContextLink.localName ()));
+if (debug > 0)
+System.out.println ("      resolved context: " + parentContextName + "." + resolvedContextLink.localName ());
+
+					ConsoleContextHint contextHint =
+						contextHints.get (
+							contextLinkName);
+
+					if (
+						isNull (
+							contextHint)
+					) {
+
+						throw new RuntimeException (
+							stringFormat (
+								"No context hint for context link name: %s",
+								contextLinkName));
+
+					}
+
+					if (contextHint.singular ()) {
+
+						parentContextNamesBuilder.add (
+							stringFormat (
+								"%s.%s",
+								parentContextName,
+								resolvedContextLink.localName ()));
+
+					}
+
+					if (contextHint.plural ()) {
+
+						parentContextNamesBuilder.add (
+							stringFormat (
+								"%s.%s",
+								parentContextName,
+								naivePluralise (
+									resolvedContextLink.localName ())));
+
+					}
 
 				}
 
@@ -304,11 +410,17 @@ class ConsoleMetaManagerImplementation
 				: contextLinksForName
 		) {
 
+if (debug > 0)
+System.out.println ("      * resolving link: " + contextLink.linkName () + " / " + contextLink.localName ());
+
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: resolveExtensionPoint (
 						contextLink.extensionPointName ())
 			) {
+
+if (debug > 0)
+System.out.println ("        - extension point: " + resolvedExtensionPoint.name ());
 
 				// generate
 

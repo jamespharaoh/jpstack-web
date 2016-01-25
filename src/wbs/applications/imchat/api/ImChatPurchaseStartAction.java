@@ -213,7 +213,9 @@ class ImChatPurchaseStartAction
 					transaction.now ())
 
 				.setValue (
-					pricePoint.getPrice ())
+					customer.getDeveloperMode ()
+						? 1
+						: pricePoint.getPrice ())
 
 				.setState (
 					PaypalPaymentState.started)
@@ -242,7 +244,9 @@ class ImChatPurchaseStartAction
 				pricePoint)
 
 			.setPrice (
-				pricePoint.getPrice ())
+				customer.getDeveloperMode ()
+					? 1
+					: pricePoint.getPrice ())
 
 			.setValue (
 				pricePoint.getValue ())
@@ -293,7 +297,7 @@ class ImChatPurchaseStartAction
 				paypalApi.setExpressCheckout (
 					currencyLogic.formatSimple (
 						imChat.getBillingCurrency (),
-						pricePoint.getValue ()),
+						purchase.getPrice ()),
 					purchaseRequest.successUrl ().replace (
 						"{token}",
 						purchase.getToken ()),

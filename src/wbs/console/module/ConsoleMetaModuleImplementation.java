@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.context.ConsoleContextExtensionPoint;
+import wbs.console.context.ConsoleContextHint;
 import wbs.console.context.ConsoleContextLink;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataChildren;
@@ -25,18 +27,23 @@ class ConsoleMetaModuleImplementation
 	@DataChildren
 	@Getter @Setter
 	List<ConsoleContextExtensionPoint> extensionPoints =
-		new ArrayList<ConsoleContextExtensionPoint> ();
+		new ArrayList<> ();
 
 	@DataChildren
 	@Getter @Setter
 	List<ConsoleContextLink> contextLinks =
-		new ArrayList<ConsoleContextLink> ();
+		new ArrayList<> ();
+
+	@DataChildren
+	@Getter @Setter
+	List<ConsoleContextHint> contextHints =
+		new ArrayList<> ();
 
 	// property utils
 
 	public
 	ConsoleMetaModuleImplementation addExtensionPoint (
-			ConsoleContextExtensionPoint extensionPoint) {
+			@NonNull ConsoleContextExtensionPoint extensionPoint) {
 
 		extensionPoints.add (
 			extensionPoint);
@@ -47,10 +54,21 @@ class ConsoleMetaModuleImplementation
 
 	public
 	ConsoleMetaModuleImplementation addContextLink (
-			ConsoleContextLink contextLink) {
+			@NonNull ConsoleContextLink contextLink) {
 
 		contextLinks.add (
 			contextLink);
+
+		return this;
+
+	}
+
+	public
+	ConsoleMetaModuleImplementation addContextHint (
+			@NonNull ConsoleContextHint contextHint) {
+
+		contextHints.add (
+			contextHint);
 
 		return this;
 

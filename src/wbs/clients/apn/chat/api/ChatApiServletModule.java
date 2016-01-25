@@ -39,6 +39,7 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.http.HttpStatus;
 import org.joda.time.Instant;
+import org.joda.time.LocalDate;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -84,7 +85,6 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.cal.CalDate;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.RegexpPathHandler;
@@ -1313,7 +1313,7 @@ class ChatApiServletModule
 		Gender gender;
 		Orient orient;
 		String info;
-		CalDate dob;
+		LocalDate dob;
 		String location;
 		Double longitude, latitude;
 		ChatUserDateMode dateMode;
@@ -1393,7 +1393,7 @@ class ChatApiServletModule
 			gender = (Gender) params.get ("gender");
 			orient = (Orient) params.get ("orient");
 			info = (String) params.get ("info");
-			dob = (CalDate) params.get ("dob");
+			dob = (LocalDate) params.get ("dob");
 			location = (String) params.get ("location");
 			longitude = (Double) params.get ("longitude");
 			latitude = (Double) params.get ("latitude");
@@ -1517,7 +1517,7 @@ class ChatApiServletModule
 				}
 
 				chatUser.setDob (
-					dob.toLocalDate ());
+					dob);
 
 			}
 
@@ -1819,8 +1819,7 @@ class ChatApiServletModule
 				profile.add (
 					Rpc.rpcElem (
 						"dob",
-						CalDate.forLocalDate (
-							chatUser.getDob ())));
+						chatUser.getDob ()));
 
 			}
 

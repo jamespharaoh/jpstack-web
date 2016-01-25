@@ -12,6 +12,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import com.google.common.collect.Iterables;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -85,13 +87,21 @@ class ConsoleContextSectionBuilder<
 
 		buildContextTypes ();
 
+System.out.println ("DOING " + name);
+System.out.println ("- extension " + container.extensionPointName ());
+
 		for (
 			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
 					container.extensionPointName ())
 		) {
 
-			buildContexts (
+System.out.println ("  - resolved: " + resolvedExtensionPoint.name ());
+for (String parentName : resolvedExtensionPoint.parentContextNames ()) {
+System.out.println ("    - parent: " + parentName);
+}
+
+			buildResolvedContexts (
 				resolvedExtensionPoint);
 
 			buildContextTabs (
@@ -152,8 +162,8 @@ class ConsoleContextSectionBuilder<
 
 	}
 
-	void buildContexts (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+	void buildResolvedContexts (
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		Map<String,Object> stuffMap =
 			new HashMap<String,Object> ();
