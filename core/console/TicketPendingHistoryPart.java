@@ -3,6 +3,8 @@ package wbs.services.ticket.core.console;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleObjectManager;
@@ -98,7 +100,8 @@ class TicketPendingHistoryPart
 		formFieldLogic.outputTableRows (
 			formatWriter,
 			ticketFields,
-			ticket);
+			ticket,
+			ImmutableMap.of ());
 
 		printFormat (
 			"</table>\n");
@@ -154,7 +157,8 @@ class TicketPendingHistoryPart
 		formFieldLogic.outputTableRows (
 			formatWriter,
 			ticketStateFields,
-			ticket.getTicketState());
+			ticket.getTicketState (),
+			ImmutableMap.of ());
 
 		printFormat (
 			"</table>\n");

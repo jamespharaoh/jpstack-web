@@ -9,10 +9,10 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
-import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormField.FormType;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
@@ -237,8 +237,9 @@ class ObjectTicketCreatePart<
 			requestContext,
 			formatWriter,
 			formFieldSet,
-			Optional.<UpdateResultSet>absent (),
+			Optional.absent (),
 			ticket,
+			ImmutableMap.of (),
 			FormType.create);
 
 		printFormat (
