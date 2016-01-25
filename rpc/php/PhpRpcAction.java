@@ -20,10 +20,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
+import org.joda.time.LocalDate;
+
 import wbs.api.mvc.WebApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
-import wbs.framework.utils.cal.CalDate;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.php.PhpEntity;
@@ -527,7 +528,7 @@ class PhpRpcAction
 
 		}
 
-		return CalDate.parseYmd (
+		return LocalDate.parse (
 			entity.asString ());
 
 	}

@@ -24,6 +24,9 @@ class ObjectCreatePageSpec {
 	ConsoleModuleSpec consoleSpec;
 
 	@DataAttribute
+	String name;
+
+	@DataAttribute
 	String typeCode;
 
 	@DataAttribute (

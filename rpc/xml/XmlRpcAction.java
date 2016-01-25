@@ -27,10 +27,11 @@ import nu.xom.ParsingException;
 import nu.xom.Serializer;
 import nu.xom.ValidityException;
 
+import org.joda.time.LocalDate;
+
 import wbs.api.mvc.WebApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
-import wbs.framework.utils.cal.CalDate;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.rpc.core.Rpc;
@@ -504,7 +505,7 @@ class XmlRpcAction
 
 		try {
 
-			return CalDate.parseYmd (
+			return LocalDate.parse (
 				string);
 
 		} catch (Exception exception) {

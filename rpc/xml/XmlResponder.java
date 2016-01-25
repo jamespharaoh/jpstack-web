@@ -167,7 +167,8 @@ class XmlResponder
 		case rFloat:
 		case rBinary:
 
-			return toNode ((RpcPrimitive) data);
+			return toNode (
+				(RpcPrimitive) data);
 
 		default:
 

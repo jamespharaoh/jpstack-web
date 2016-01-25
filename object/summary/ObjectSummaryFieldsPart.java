@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
@@ -123,7 +125,8 @@ class ObjectSummaryFieldsPart<
 		formFieldLogic.outputTableRows (
 			formatWriter,
 			formFieldSet,
-			object);
+			object,
+			ImmutableMap.of ());
 
 		printFormat (
 			"</table>\n");

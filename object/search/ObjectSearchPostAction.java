@@ -80,6 +80,9 @@ class ObjectSearchPostAction
 	String searchDaoMethodName;
 
 	@Getter @Setter
+	String resultsDaoMethodName;
+
+	@Getter @Setter
 	String sessionKey;
 
 	@Getter @Setter
@@ -156,6 +159,9 @@ class ObjectSearchPostAction
 
 				.formFieldSets (
 					resultsFormFieldSets)
+
+				.resultsDaoMethodName (
+					resultsDaoMethodName)
 
 				.sessionKey (
 					sessionKey);

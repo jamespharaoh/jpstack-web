@@ -226,6 +226,9 @@ class ObjectSearchPageBuilder<
 					.searchDaoMethodName (
 						spec.searchDaoMethodName ())
 
+					.resultsDaoMethodName (
+						spec.resultsDaoMethodName ())
+
 					.sessionKey (
 						sessionKey)
 

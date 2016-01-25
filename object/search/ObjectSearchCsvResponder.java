@@ -1,8 +1,14 @@
 package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.camelToHyphen;
+import static wbs.framework.utils.etc.Misc.getMethodRequired;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.methodInvoke;
+import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -10,6 +16,9 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -19,7 +28,7 @@ import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.record.Record;
+import wbs.framework.record.IdObject;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.FormatWriterWriter;
 
@@ -49,12 +58,16 @@ class ObjectSearchCsvResponder
 	List<FormFieldSet> formFieldSets;
 
 	@Getter @Setter
+	String resultsDaoMethodName;
+
+	@Getter @Setter
 	String sessionKey;
 
 	// state
 
 	FormatWriter formatWriter;
 
+	Object searchObject;
 	List<Integer> objectIds;
 
 	// implementation
@@ -75,18 +88,27 @@ class ObjectSearchCsvResponder
 	public
 	void prepare () {
 
-		// get search results from session
+		// set search object
+
+		searchObject =
+			requiredValue (
+				requestContext.session (
+					sessionKey + "Fields"));
+
+		// get object ids
 
 		@SuppressWarnings ("unchecked")
 		List<Integer> objectIdsTemp =
 			(List<Integer>)
-			requestContext.session (
-				sessionKey + "Results");
+			requiredValue (
+				requestContext.session (
+					sessionKey + "Results"));
 
 		objectIds =
 			objectIdsTemp;
 
 	}
+
 
 	@Override
 	protected
@@ -120,35 +142,82 @@ class ObjectSearchCsvResponder
 
 		// iterate through objects
 
-		int recordCountSinceFlush = 0;
+		int batchesSinceFlush = 0;
 
 		for (
-			Integer objectId
-				: objectIds
+			List<Integer> batch
+				: Lists.partition (
+					objectIds,
+					64)
 		) {
 
-			// load object
+			List<IdObject> objects;
 
-			// TODO this should be done in batches for efficiency, how?
+			if (
+				isNotNull (
+					resultsDaoMethodName)
+			) {
 
-			Record<?> object =
-				consoleHelper.find (
-					objectId);
+				Method method =
+					getMethodRequired (
+						consoleHelper.getClass (),
+						resultsDaoMethodName,
+						ImmutableList.<Class<?>>of (
+							searchObject.getClass (),
+							List.class));
 
-			// write object
+				@SuppressWarnings ("unchecked")
+				List<IdObject> objectsTemp =
+					(List<IdObject>)
+					methodInvoke (
+						method,
+						consoleHelper,
+						ImmutableList.<Object>of (
+							searchObject,
+							batch));
 
-			formFieldLogic.outputCsvRow (
-				formatWriter,
-				formFieldSets,
-				object);
+				objects =
+					objectsTemp;
+
+			} else {
+
+				objects =
+					new ArrayList<IdObject> ();
+
+				for (
+					Integer objectId
+						: batch
+				) {
+
+					objects.add (
+						consoleHelper.find (
+							objectId));
+
+				}
+
+			}
+
+			for (
+				Object object
+					: objects
+			) {
+
+				// write object
+
+				formFieldLogic.outputCsvRow (
+					formatWriter,
+					formFieldSets,
+					object);
+
+			}
 
 			// flush regularly
 
-			if (recordCountSinceFlush == 1000) {
+			if (++ batchesSinceFlush == 64) {
 
 				transaction.flush ();
 
-				recordCountSinceFlush = 0;
+				batchesSinceFlush = 0;
 
 			}
 
