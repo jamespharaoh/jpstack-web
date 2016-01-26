@@ -2,6 +2,7 @@ package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.methodInvoke;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -280,6 +281,8 @@ class ObjectSearchPostAction
 
 		}
 
+System.out.println ("IT IS: " + resultsDaoMethodName);
+
 		if (objectIds.isEmpty ()) {
 
 			// no results
@@ -290,7 +293,14 @@ class ObjectSearchPostAction
 			return responder (
 				searchResponderName);
 
-		} else if (objectIds.size () == 1) {
+		} else if (
+
+			objectIds.size () == 1
+
+			&& isNull (
+				resultsDaoMethodName)
+
+		) {
 
 			// single result
 
