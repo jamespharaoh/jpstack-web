@@ -1,9 +1,13 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.millisToInstant;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.objectToString;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
 
@@ -15,6 +19,8 @@ import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+
+import com.google.common.base.Optional;
 
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatEventObjectHelper;
@@ -30,6 +36,8 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
+import wbs.platform.exception.logic.ExceptionLogger;
+import wbs.platform.exception.model.ExceptionResolution;
 
 @PrototypeComponent ("imChatEventPostAction")
 public
@@ -40,6 +48,9 @@ class ImChatEventPostAction
 
 	@Inject
 	Database database;
+
+	@Inject
+	ExceptionLogger exceptionLogger;
 
 	@Inject
 	ImChatEventObjectHelper imChatEventHelper;
@@ -190,7 +201,137 @@ class ImChatEventPostAction
 
 			);
 
+			// write exceptions
+
+			if (
+				equal (
+					eventItemRequest.type (),
+					"unhandled-error")
+			) {
+
+				JSONObject payload =
+					eventItemRequest.payload ();
+
+				exceptionLogger.logSimple (
+					"external",
+
+					objectToString (
+						ifNull (
+							payload.get ("source"),
+							"unknown")),
+
+					objectToString (
+						ifNull (
+							payload.get ("message"),
+							"unknown")),
+
+					stringFormat (
+
+						"URL: %s\n",
+						objectToString (
+							ifNull (
+								payload.get ("url"),
+								"unknown")),
+
+						"Line: %s\n",
+						objectToString (
+							ifNull (
+								payload.get ("line"),
+								"unknown")),
+
+						"Column: %s\n",
+						objectToString (
+							ifNull (
+								payload.get ("column"),
+								"unknown")),
+
+						"Message: %s\n",
+						objectToString (
+							ifNull (
+								payload.get ("message"),
+								"unknown")),
+
+						"User agent: %s\n",
+						objectToString (
+							ifNull (
+								payload.get ("userAgent"),
+								"unknown")),
+
+						"\n",
+
+						"Trace:\n",
+						objectToString (
+							ifNull (
+								payload.get ("trace"),
+								""))),
+
+					Optional.absent (),
+
+					ExceptionResolution.ignoreWithThirdPartyWarning);
+
+			} else if (
+				equal (
+					eventItemRequest.type (),
+					"api-error")
+			) {
+
+				JSONObject payload =
+					eventItemRequest.payload ();
+
+				exceptionLogger.logSimple (
+					"external",
+
+					objectToString (
+						ifNull (
+							payload.get ("source"),
+							"unknown")),
+
+					objectToString (
+						ifNull (
+							payload.get ("error"),
+							"unknown")),
+
+					stringFormat (
+
+						"Error: %s\n",
+						objectToString (
+							ifNull (
+								payload.get ("error"),
+								"unknown")),
+
+						"Path: %s\n",
+						objectToString (
+							ifNull (
+								payload.get ("path"),
+								"none")),
+
+						"User agent: %s\n",
+						objectToString (
+							ifNull (
+								payload.get ("userAgent"),
+								"unknown")),
+
+						"Request: %s\n",
+						objectToString (
+							ifNull (
+								payload.get ("request"),
+								"none")),
+
+						"Response: %s\n",
+						objectToString (
+							ifNull (
+								payload.get ("response"),
+								"none"))),
+
+					Optional.absent (),
+
+					ExceptionResolution.ignoreWithThirdPartyWarning);
+
+			}
+
 		}
+
+		// commit and return
 
 		transaction.commit ();
 

@@ -18,3 +18,7 @@ SELECT exception_type_insert (
 SELECT exception_type_insert (
 	'webapi',
 	'Web API');
+
+SELECT exception_type_insert (
+	'external',
+	'External');

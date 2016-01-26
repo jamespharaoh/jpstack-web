@@ -236,6 +236,14 @@ class Misc {
 	}
 
 	public static
+	String objectToString (
+			@NonNull Object object) {
+
+		return object.toString ();
+
+	}
+
+	public static
 	String urlEncode (
 			String string) {
 
