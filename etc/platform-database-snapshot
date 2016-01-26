@@ -1,0 +1,94 @@
+#!/bin/bash
+
+set -euf -o pipefail
+
+today="$(date +'%Y-%m-%d' --date='-0 days')"
+yesterday="$(date +'%Y-%m-%d' --date='-1 days')"
+
+lock="/backup/lock"
+basebackup="/backup/backups/platform-database-basebackup"
+dump="/backup/backups/platform-database-dump"
+
+exec 200>"$lock"
+flock --exclusive 200
+
+if test -e $basebackup-$today; then
+
+	echo "Already done a basebackup today"
+
+elif test -e $dump-$today; then
+
+	echo "Already done a dump today"
+
+elif ! test -e "$basebackup-$yesterday"; then
+
+	echo "Performing base backup"
+
+	time {
+
+		echo "========== BEGIN BACKUP =========="
+
+		ssh ubuntu@zuri-platform-database-32bit \
+			"psql txt2 -c \"select pg_start_backup ('$today');\""
+
+		echo "========== PERFORM BACKUP =========="
+
+		{
+
+			tar \
+				--create \
+				--verbose \
+				--one-file-system \
+				--warning=no-file-ignored \
+				--warning=file-changed \
+				--directory "/mnt/zuri-platform-database-data/8.3/main" \
+				"."
+
+		} | {
+
+			sudo -u ubuntu -- \
+			zbackup \
+				--non-encrypted \
+				--silent \
+				backup \
+				"$basebackup-$today"
+
+		}
+	
+		echo "========== END BACKUP =========="
+	
+		ssh ubuntu@zuri-platform-database-32bit \
+			"psql txt2 -c \"select pg_stop_backup ();\""
+
+		echo "========== DONE =========="
+
+	}
+
+elif ! test -e "$dump-$yesterday"; then
+
+	echo "Performing SQL dump"
+
+	time {
+
+		{
+
+			lxc-attach -n zuri-platform-database-32bit -- \
+			sudo -H -u ubuntu -- \
+			pg_dump txt2 \
+
+		} | {
+
+			sudo -u ubuntu -- \
+			zbackup \
+				--non-encrypted \
+				--silent \
+				backup \
+				"$dump-$today"
+
+		}
+
+	}
+
+fi
+
+# ex: noet ts=4 filetype=bash

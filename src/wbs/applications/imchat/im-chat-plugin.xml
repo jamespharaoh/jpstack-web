@@ -23,6 +23,7 @@
 		<model name="imChatCustomerDetailType"/>
 		<model name="imChatCustomerDetailValue"/>
 		<model name="imChatConversation"/>
+		<model name="imChatEvent"/>
 		<model name="imChatMessage"/>
 		<model name="imChatPricePoint"/>
 		<model name="imChatProfile"/>
@@ -51,6 +52,7 @@
 		<bean class="api.ImChatConversationStartAction"/>
 		<bean class="api.ImChatCustomerCreateAction"/>
 		<bean class="api.ImChatDetailsUpdateAction"/>
+		<bean class="api.ImChatEventPostAction"/>
 		<bean class="api.ImChatMediaConfig"/>
 		<bean class="api.ImChatMediaJpegAction"/>
 		<bean class="api.ImChatMediaResponder"/>

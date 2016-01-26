@@ -160,8 +160,10 @@ class AbstractObjectContext
 
 		if (stuff () != null) {
 
-			for (Map.Entry<String,? extends Object> entry
-					: stuff ().entrySet ()) {
+			for (
+				Map.Entry<String,? extends Object> entry
+					: stuff ().entrySet ()
+			) {
 
 				contextStuff.set (
 					entry.getKey (),

@@ -8,6 +8,7 @@ import java.util.List;
 import lombok.NonNull;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
@@ -115,6 +116,14 @@ class ChatUserCreditDaoHibernate
 						search.filterChatIds ())));
 
 		}
+
+		criteria.addOrder (
+			Order.desc (
+				"_chatUserCredit.timestamp"));
+
+		criteria.addOrder (
+			Order.desc (
+				"_chatUserCredit.id"));
 
 		criteria.setProjection (
 			Projections.id ());

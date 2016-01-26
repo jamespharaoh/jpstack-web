@@ -79,6 +79,10 @@
 			<post-action name="messageTemplateSetGet"/>
 		</resource>
 
+		<resource name="event">
+			<post-action name="eventPost"/>
+		</resource>
+
 	</variable>
 	</resource>
 

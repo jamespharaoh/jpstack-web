@@ -4,12 +4,16 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import wbs.framework.data.annotations.DataAttribute;
@@ -122,6 +126,13 @@ class DataFromJson {
 				(String)
 				fieldValue);
 
+		} else if (field.getType () == JSONObject.class) {
+
+			field.set (
+				dataValue,
+				(JSONObject)
+				fieldValue);
+
 		} else {
 
 			throw new RuntimeException (
@@ -148,14 +159,48 @@ class DataFromJson {
 			InstantiationException,
 			IllegalAccessException {
 
-		JSONObject fieldValue =
-			(JSONObject)
-			fieldValueObject;
-
 		if (
+			List.class.isAssignableFrom (
+				field.getType ())
+		) {
+
+			JSONArray fieldValue =
+				(JSONArray)
+				fieldValueObject;
+
+			List<Object> listValue =
+				new ArrayList<> ();
+
+			for (
+				Object jsonObject
+					: fieldValue
+			) {
+
+				ParameterizedType parameterizedType =
+					(ParameterizedType)
+					field.getGenericType ();
+
+				listValue.add (
+					fromJson (
+						(Class<?>)
+							parameterizedType.getActualTypeArguments () [0],
+						(JSONObject)
+							jsonObject));
+
+			}
+
+			field.set (
+				dataValue,
+				listValue);
+
+		} else if (
 			Map.class.isAssignableFrom (
 				field.getType ())
 		) {
+
+			JSONObject fieldValue =
+				(JSONObject)
+				fieldValueObject;
 
 			Map<String,Object> mapValue =
 				new LinkedHashMap<String,Object> ();
