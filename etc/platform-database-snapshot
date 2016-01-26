@@ -54,9 +54,9 @@ elif ! test -e "$basebackup-$yesterday"; then
 				"$basebackup-$today"
 
 		}
-	
+
 		echo "========== END BACKUP =========="
-	
+
 		ssh ubuntu@zuri-platform-database-32bit \
 			"psql txt2 -c \"select pg_stop_backup ();\""
 

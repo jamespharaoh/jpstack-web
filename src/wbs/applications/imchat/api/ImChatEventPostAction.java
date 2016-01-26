@@ -32,7 +32,7 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 
 @PrototypeComponent ("imChatEventPostAction")
-public 
+public
 class ImChatEventPostAction
 	implements Action {
 
@@ -48,7 +48,7 @@ class ImChatEventPostAction
 	ImChatObjectHelper imChatHelper;
 
 	@Inject
-	ImChatSessionObjectHelper imChatSessionHelper;	
+	ImChatSessionObjectHelper imChatSessionHelper;
 
 	@Inject
 	RequestContext requestContext;
@@ -120,30 +120,30 @@ class ImChatEventPostAction
 						eventItemRequest.sessionSecret ());
 
 				if (
-					isNotNull (	
+					isNotNull (
 						session)
 				) {
 
 					customer =
 						session.getImChatCustomer ();
-	
+
 					if (
-	
+
 						! session.getActive ()
-		
+
 						|| notEqual (
 							session.getImChatCustomer ().getImChat (),
 							imChat)
-		
+
 					) {
 						session = null;
 						customer = null;
 					}
-	
+
 				}
 
 			}
-		
+
 			imChatEventHelper.insert (
 				imChatEventHelper.createInstance ()
 
