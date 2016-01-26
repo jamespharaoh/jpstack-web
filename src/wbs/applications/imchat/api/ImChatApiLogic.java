@@ -8,6 +8,7 @@ import wbs.applications.imchat.model.ImChatMessageRec;
 import wbs.applications.imchat.model.ImChatPricePointRec;
 import wbs.applications.imchat.model.ImChatProfileRec;
 import wbs.applications.imchat.model.ImChatPurchaseRec;
+import wbs.applications.imchat.model.ImChatRec;
 
 public
 interface ImChatApiLogic {
@@ -23,6 +24,9 @@ interface ImChatApiLogic {
 
 	List<ImChatCustomerDetailData> customerDetailData (
 			ImChatCustomerRec customer);
+
+	List<ImChatCustomerDetailData> createDetailData (
+			ImChatRec imChat);
 
 	ImChatConversationData conversationData (
 			ImChatConversationRec conversation);

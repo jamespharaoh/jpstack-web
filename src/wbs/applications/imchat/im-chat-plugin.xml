@@ -47,17 +47,21 @@
 
 	<layer name="api">
 		<bean class="api.ImChatApiLogicImplementation"/>
+		<bean class="api.ImChatChangePasswordAction"/>
 		<bean class="api.ImChatConditionsAcceptAction"/>
 		<bean class="api.ImChatConversationEndAction"/>
 		<bean class="api.ImChatConversationStartAction"/>
 		<bean class="api.ImChatCustomerCreateAction"/>
 		<bean class="api.ImChatDetailsUpdateAction"/>
 		<bean class="api.ImChatEventPostAction"/>
+		<bean class="api.ImChatForgotPasswordAction"/>
 		<bean class="api.ImChatMediaConfig"/>
 		<bean class="api.ImChatMediaJpegAction"/>
 		<bean class="api.ImChatMediaResponder"/>
-		<bean class="api.ImChatMessageSendAction"/>
 		<bean class="api.ImChatMessageListAction"/>
+		<bean class="api.ImChatMessageSendAction"/>
+		<bean class="api.ImChatMessageTemplateSetGetAction"/>
+		<bean class="api.ImChatServiceGetAction"/>
 		<bean class="api.ImChatSessionStartAction"/>
 		<bean class="api.ImChatSessionLoadAction"/>
 		<bean class="api.ImChatSessionEndAction"/>
@@ -67,9 +71,6 @@
 		<bean class="api.ImChatPurchaseGetConfirmationAction"/>
 		<bean class="api.ImChatPurchaseConfirmAction"/>
 		<bean class="api.ImChatPurchaseHistoryAction"/>
-		<bean class="api.ImChatForgotPasswordAction"/>
-		<bean class="api.ImChatChangePasswordAction"/>
-		<bean class="api.ImChatMessageTemplateSetGetAction"/>
 	</layer>
 
 	<layer name="console">

@@ -264,6 +264,12 @@ class ImChatCoreFixtureProvider
 			.setEmailSubjectForgotPassword (
 				"New password for IM chat test")
 
+			.setProfilePageBeforeLogin (
+				true)
+
+			.setDetailsPageOnFirstLogin (
+				true)
+
 		);
 
 		// price points
@@ -432,6 +438,9 @@ class ImChatCoreFixtureProvider
 			.setRestricted (
 				false)
 
+			.setWhenCreatingAccount (
+				true)
+
 			.setDataType (
 				ImChatCustomerDetailDataType.text)
 
@@ -466,6 +475,9 @@ class ImChatCoreFixtureProvider
 
 			.setRestricted (
 				false)
+
+			.setWhenCreatingAccount (
+				true)
 
 			.setDataType (
 				ImChatCustomerDetailDataType.dateOfBirth)
@@ -505,6 +517,9 @@ class ImChatCoreFixtureProvider
 			.setRestricted (
 				false)
 
+			.setWhenCreatingAccount (
+				false)
+
 			.setDataType (
 				ImChatCustomerDetailDataType.chooseOne)
 
@@ -539,6 +554,9 @@ class ImChatCoreFixtureProvider
 
 			.setRestricted (
 				true)
+
+			.setWhenCreatingAccount (
+				false)
 
 			.setDataType (
 				ImChatCustomerDetailDataType.text)

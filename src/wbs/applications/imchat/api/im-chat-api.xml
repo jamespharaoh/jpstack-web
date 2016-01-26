@@ -3,6 +3,10 @@
 	<resource name="im-chat">
 	<variable name="imChatId">
 
+		<resource name="change-password">
+			<post-action name="changePassword"/>
+		</resource>
+
 		<resource name="conditions-accept">
 			<post-action name="conditionsAccept"/>
 		</resource>
@@ -23,8 +27,24 @@
 			<post-action name="detailsUpdate"/>
 		</resource>
 
+		<resource name="event">
+			<post-action name="eventPost"/>
+		</resource>
+
+		<resource name="forgot-password">
+			<post-action name="forgotPassword"/>
+		</resource>
+
+		<resource name="message-list">
+			<post-action name="messageList"/>
+		</resource>
+
 		<resource name="message-send">
 			<post-action name="messageSend"/>
+		</resource>
+
+		<resource name="message-template-set">
+			<post-action name="messageTemplateSetGet"/>
 		</resource>
 
 		<resource name="price-point-list">
@@ -51,6 +71,10 @@
 			<post-action name="purchaseHistory"/>
 		</resource>
 
+		<resource name="service">
+			<get-action name="serviceGet"/>
+		</resource>
+
 		<resource name="session-start">
 			<post-action name="sessionStart"/>
 		</resource>
@@ -61,26 +85,6 @@
 
 		<resource name="session-end">
 			<post-action name="sessionEnd"/>
-		</resource>
-
-		<resource name="message-list">
-			<post-action name="messageList"/>
-		</resource>
-
-		<resource name="forgot-password">
-			<post-action name="forgotPassword"/>
-		</resource>
-
-		<resource name="change-password">
-			<post-action name="changePassword"/>
-		</resource>
-
-		<resource name="message-template-set">
-			<post-action name="messageTemplateSetGet"/>
-		</resource>
-
-		<resource name="event">
-			<post-action name="eventPost"/>
 		</resource>
 
 	</variable>

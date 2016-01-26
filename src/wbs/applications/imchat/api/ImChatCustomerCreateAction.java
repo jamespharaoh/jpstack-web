@@ -1,5 +1,8 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.Misc.doesNotContain;
+import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
+
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,6 +16,9 @@ import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import wbs.applications.imchat.model.ImChatCustomerDetailTypeRec;
+import wbs.applications.imchat.model.ImChatCustomerDetailValueObjectHelper;
+import wbs.applications.imchat.model.ImChatCustomerDetailValueRec;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
@@ -28,6 +34,7 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
+import wbs.platform.event.logic.EventLogic;
 
 @PrototypeComponent ("imChatCustomerCreateAction")
 public
@@ -40,7 +47,13 @@ class ImChatCustomerCreateAction
 	Database database;
 
 	@Inject
+	EventLogic eventLogic;
+
+	@Inject
 	ImChatApiLogic imChatApiLogic;
+
+	@Inject
+	ImChatCustomerDetailValueObjectHelper imChatCustomerDetailValueHelper;
 
 	@Inject
 	ImChatCustomerObjectHelper imChatCustomerHelper;
@@ -180,6 +193,54 @@ class ImChatCustomerCreateAction
 				createRequest.password ())
 
 		);
+
+		// update details
+
+		for (
+			ImChatCustomerDetailTypeRec detailType
+				: imChat.getCustomerDetailTypes ()
+		) {
+
+			if (
+				doesNotContain (
+					createRequest.details ().keySet (),
+					underscoreToHyphen (
+						detailType.getCode ()))
+			) {
+				continue;
+			}
+
+			String stringValue =
+				createRequest.details ().get (
+					underscoreToHyphen (
+						detailType.getCode ()));
+
+			ImChatCustomerDetailValueRec detailValue =
+				imChatCustomerDetailValueHelper.insert (
+					imChatCustomerDetailValueHelper.createInstance ()
+
+				.setImChatCustomer (
+					newCustomer)
+
+				.setImChatCustomerDetailType (
+					detailType)
+
+				.setValue (
+					stringValue)
+
+			);
+
+			newCustomer.getDetails ().put (
+				detailType.getId (),
+				detailValue);
+
+			eventLogic.createEvent (
+				"im_chat_customer_detail_updated",
+				newCustomer,
+				detailType,
+				stringValue);
+
+		}
 
 		// create session
 

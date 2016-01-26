@@ -99,6 +99,14 @@
 			name="emailSubjectForgotPassword"
 			nullable="yes"/>
 
+		<yes-no-field
+			name="profilePageBeforeLogin"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="detailsPageOnFirstLogin"
+			nullable="yes"/>
+
 	</fields>
 
 	<collections>

@@ -6,6 +6,7 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -178,7 +179,8 @@ class ImChatApiLogicImplementation
 				customer.getAcceptedTermsAndConditions ())
 
 			.detailsCompleted (
-				customer.getDetailsCompleted ())
+				customer.getDetailsCompleted ()
+				|| ! imChat.getDetailsPageOnFirstLogin ())
 
 			.balance (
 				customer.getBalance ())
@@ -249,6 +251,9 @@ class ImChatApiLogicImplementation
 				.required (
 					customerDetailType.getRequired ())
 
+				.whenCreatingAccount (
+					customerDetailType.getWhenCreatingAccount ())
+
 				.dataType (
 					camelToHyphen (
 						customerDetailType.getDataType ().toString ()))
@@ -266,6 +271,51 @@ class ImChatApiLogicImplementation
 		}
 
 		return returnBuilder.build ();
+
+	}
+
+	@Override
+	public
+	List<ImChatCustomerDetailData> createDetailData (
+			@NonNull ImChatRec imChat) {
+
+		return imChat.getCustomerDetailTypes ().stream ()
+
+			.filter (
+				ImChatCustomerDetailTypeRec::getWhenCreatingAccount)
+
+			.map (
+				detailType ->
+					new ImChatCustomerDetailData ()
+
+				.code (
+					underscoreToHyphen (
+						detailType.getCode ()))
+
+				.label (
+					detailType.getLabel ())
+
+				.help (
+					detailType.getHelp ())
+
+				.required (
+					detailType.getRequired ())
+
+				.whenCreatingAccount (
+					detailType.getWhenCreatingAccount ())
+
+				.dataType (
+					camelToHyphen (
+						detailType.getDataType ().toString ()))
+
+				.minimumAge (
+					detailType.getMinimumAge ())
+
+				.value (
+					null))
+
+			.collect (
+				Collectors.toList ());
 
 	}
 

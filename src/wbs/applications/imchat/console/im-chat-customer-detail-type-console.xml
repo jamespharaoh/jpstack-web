@@ -65,6 +65,10 @@
 		<yes-no-field
 			name="restricted"/>
 
+		<yes-no-field
+			name="whenCreatingAccount"
+			label="Create"/>
+
 		<enum-field
 			name="dataType"
 			helper="imChatCustomerDetailDataTypeConsoleHelper"/>
@@ -92,6 +96,9 @@
 
 		<yes-no-field
 			name="restricted"/>
+
+		<yes-no-field
+			name="whenCreatingAccount"/>
 
 		<enum-field
 			name="dataType"
@@ -129,6 +136,9 @@
 		<yes-no-field
 			name="restricted"/>
 
+		<yes-no-field
+			name="whenCreatingAccount"/>
+
 		<enum-field
 			name="dataType"
 			helper="imChatCustomerDetailDataTypeConsoleHelper"/>
@@ -160,6 +170,9 @@
 
 		<yes-no-field
 			name="restricted"/>
+
+		<yes-no-field
+			name="whenCreatingAccount"/>
 
 		<enum-field
 			name="dataType"

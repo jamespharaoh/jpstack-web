@@ -203,6 +203,12 @@
 		<text-field
 			name="emailSubjectForgotPassword"/>
 
+		<yes-no-field
+			name="profilePageBeforeLogin"/>
+
+		<yes-no-field
+			name="detailsPageOnFirstLogin"/>
+
 	</field-set>
 
 	<field-set
@@ -285,6 +291,14 @@
 
 		<text-field
 			name="emailSubjectForgotPassword"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="profilePageBeforeLogin"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="detailsPageOnFirstLogin"
 			nullable="yes"/>
 
 	</field-set>

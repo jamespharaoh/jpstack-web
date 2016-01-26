@@ -151,22 +151,17 @@
 
 	</entry>
 
-	<entry name="Login screen">
+	<entry name="Login existing screen">
 
 		<field name="Title">
-			Login or create account
+			Login to existing account
 		</field>
 
-		<field name="Information 1">
-			Please enter your email address and password, and press "login to
+		<field name="Introduction"><![CDATA[
+			<p>Please enter your email address and password, and press "login to
 			existing account". If you can't remember your password, enter your
-			email address only and press "forgot password".
-		</field>
-
-		<field name="Information 2">
-			If you don't have an account, please enter your email address, and
-			a password of your choice, and press "create account".
-		</field>
+			email address only and press "forgot password".</p>
+		]]></field>
 
 		<field name="Email field label">
 			Email address
@@ -178,10 +173,6 @@
 
 		<field name="Login button label">
 			Login to existing account
-		</field>
-
-		<field name="Create button label">
-			Create new account
 		</field>
 
 		<field name="Forgot button label">
@@ -709,6 +700,51 @@
 
 		<field name="Back to chat button label">
 			Back to chat
+		</field>
+
+	</entry>
+
+	<entry name="Pre login screen">
+
+		<field name="Title">
+			Login to chat
+		</field>
+
+		<field name="Introduction"><![CDATA[
+			<p>Please select whether to log in using an existing account, or to
+			set up a new account.</p>
+		]]></field>
+
+		<field name="Goto login button label">
+			Login to existing account
+		</field>
+
+		<field name="Goto create button label">
+			Create new account
+		</field>
+
+	</entry>
+
+	<entry name="Create account screen">
+
+		<field name="Title">
+			Create account
+		</field>
+
+		<field name="Introduction"><![CDATA[
+			<p>Please enter the details for your new account.</p>
+		]]></field>
+
+		<field name="Email field label">
+			Email address
+		</field>
+
+		<field name="Password field label">
+			Password
+		</field>
+
+		<field name="Create button label">
+			Create account
 		</field>
 
 	</entry>

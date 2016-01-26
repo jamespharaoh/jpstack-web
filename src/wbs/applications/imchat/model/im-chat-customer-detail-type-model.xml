@@ -37,6 +37,9 @@
 		<yes-no-field
 			name="restricted"/>
 
+		<yes-no-field
+			name="whenCreatingAccount"/>
+
 		<enum-field
 			name="dataType"
 			type="imChatCustomerDetailDataType"/>
