@@ -1,7 +1,9 @@
-<console-module name="queue-subject">
+<console-module
+	name="queue-subject">
 
 	<console-helper-provider
-		object-name="queueSubject">
+		object-name="queueSubject"
+		view-priv="grandparent:manage">
 
 		<context-stuff
 			name="queueSubjectName"
