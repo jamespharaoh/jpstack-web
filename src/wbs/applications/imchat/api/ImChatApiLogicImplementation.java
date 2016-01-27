@@ -1,21 +1,33 @@
 package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.camelToHyphen;
+import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
 import lombok.NonNull;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
+import org.joda.time.Years;
+
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerDetailTypeRec;
+import wbs.applications.imchat.model.ImChatCustomerDetailValueObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerDetailValueRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;
@@ -26,9 +38,13 @@ import wbs.applications.imchat.model.ImChatRec;
 import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.event.logic.EventLogic;
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaRec;
+import wbs.sms.core.logic.DateFinder;
 
 @SingletonComponent ("imChatApiLogic")
 public
@@ -39,6 +55,15 @@ class ImChatApiLogicImplementation
 
 	@Inject
 	CurrencyLogic currencyLogic;
+
+	@Inject
+	Database database;
+
+	@Inject
+	EventLogic eventLogic;
+
+	@Inject
+	ImChatCustomerDetailValueObjectHelper imChatCustomerDetailValueHelper;
 
 	@Inject
 	TimeFormatter timeFormatter;
@@ -251,8 +276,10 @@ class ImChatApiLogicImplementation
 				.required (
 					customerDetailType.getRequired ())
 
-				.whenCreatingAccount (
-					customerDetailType.getWhenCreatingAccount ())
+				.requiredLabel (
+					customerDetailType.getRequired ()
+						? customerDetailType.getRequiredLabel ()
+						: "")
 
 				.dataType (
 					camelToHyphen (
@@ -301,8 +328,10 @@ class ImChatApiLogicImplementation
 				.required (
 					detailType.getRequired ())
 
-				.whenCreatingAccount (
-					detailType.getWhenCreatingAccount ())
+				.requiredLabel (
+					detailType.getRequired ()
+						? detailType.getRequiredLabel ()
+						: "")
 
 				.dataType (
 					camelToHyphen (
@@ -312,7 +341,27 @@ class ImChatApiLogicImplementation
 					detailType.getMinimumAge ())
 
 				.value (
-					null))
+					null)
+
+				.requiredErrorTitle (
+					detailType.getRequiredErrorTitle ())
+
+				.requiredErrorMessage (
+					detailType.getRequiredErrorMessage ())
+
+				.invalidErrorTitle (
+					detailType.getInvalidErrorTitle ())
+
+				.invalidErrorMessage (
+					detailType.getInvalidErrorMessage ())
+
+				.ageErrorTitle (
+					detailType.getAgeErrorTitle ())
+
+				.ageErrorMessage (
+					detailType.getAgeErrorMessage ())
+
+			)
 
 			.collect (
 				Collectors.toList ());
@@ -437,6 +486,170 @@ class ImChatApiLogicImplementation
 				timeFormatter.instantToTimestampString (
 					timeFormatter.defaultTimezone (),
 					purchase.getCreatedTime ()));
+
+	}
+
+	@Override
+	public
+	Map<String,String> updateCustomerDetails (
+			@NonNull ImChatCustomerRec customer,
+			@NonNull Map<String,String> newDetails) {
+
+		Transaction transaction =
+			database.currentTransaction ();
+
+		ImChatRec imChat =
+			customer.getImChat ();
+
+		ImmutableMap.Builder<String,String> returnBuilder =
+			ImmutableMap.builder ();
+
+		for (
+			ImChatCustomerDetailTypeRec detailType
+				: imChat.getCustomerDetailTypes ()
+		) {
+
+			if (
+				doesNotContain (
+					newDetails.keySet (),
+					underscoreToHyphen (
+						detailType.getCode ()))
+			) {
+				continue;
+			}
+
+			String stringValue =
+				newDetails.get (
+					underscoreToHyphen (
+						detailType.getCode ()));
+
+			switch (detailType.getDataType ()) {
+
+			case text:
+
+				if (
+
+					detailType.getRequired ()
+
+					&& isEmpty (
+						stringValue.trim ())
+
+				) {
+
+					returnBuilder.put (
+						underscoreToHyphen (
+							detailType.getCode ()),
+						"required");
+
+					continue;
+
+				}
+
+				break;
+
+			case dateOfBirth:
+
+				if (
+
+					detailType.getRequired ()
+
+					&& isEmpty (
+						stringValue.trim ())
+
+				) {
+
+					returnBuilder.put (
+						underscoreToHyphen (
+							detailType.getCode ()),
+						"required");
+
+					continue;
+
+				}
+
+				LocalDate dateOfBirth =
+					DateFinder.find (
+						stringValue,
+						1915);
+
+				if (
+					isNull (
+						dateOfBirth)
+				) {
+
+					returnBuilder.put (
+						underscoreToHyphen (
+							detailType.getCode ()),
+						"invalid");
+
+					continue;
+
+				}
+
+				Integer ageInYears =
+					Years.yearsBetween (
+						dateOfBirth.toDateTimeAtStartOfDay (
+							DateTimeZone.forID (
+								"Europe/London")),
+						transaction.now ()
+					).getYears ();
+
+				if (
+
+					isNotNull (
+						detailType.getMinimumAge ())
+
+					&& lessThan (
+						ageInYears,
+						detailType.getMinimumAge ())
+
+				) {
+
+					returnBuilder.put (
+						underscoreToHyphen (
+							detailType.getCode ()),
+						"below-minimum-age");
+
+					continue;
+
+				}
+
+				break;
+
+			default:
+
+				throw new RuntimeException ("TODO");
+
+			}
+
+			ImChatCustomerDetailValueRec detailValue =
+				imChatCustomerDetailValueHelper.insert (
+					imChatCustomerDetailValueHelper.createInstance ()
+
+				.setImChatCustomer (
+					customer)
+
+				.setImChatCustomerDetailType (
+					detailType)
+
+				.setValue (
+					stringValue)
+
+			);
+
+			customer.getDetails ().put (
+				detailType.getId (),
+				detailValue);
+
+			eventLogic.createEvent (
+				"im_chat_customer_detail_updated",
+				customer,
+				detailType,
+				stringValue);
+
+		}
+
+		return returnBuilder.build ();
 
 	}
 

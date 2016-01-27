@@ -25,7 +25,7 @@ class ImChatCustomerDetailData {
 	Boolean required;
 
 	@DataAttribute
-	Boolean whenCreatingAccount;
+	String requiredLabel;
 
 	@DataAttribute
 	String dataType;
@@ -35,5 +35,23 @@ class ImChatCustomerDetailData {
 
 	@DataAttribute
 	String value;
+
+	@DataAttribute
+	String requiredErrorTitle;
+
+	@DataAttribute
+	String requiredErrorMessage;
+
+	@DataAttribute
+	String invalidErrorTitle;
+
+	@DataAttribute
+	String invalidErrorMessage;
+
+	@DataAttribute
+	String ageErrorTitle;
+
+	@DataAttribute
+	String ageErrorMessage;
 
 }

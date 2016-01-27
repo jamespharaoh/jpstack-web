@@ -435,6 +435,9 @@ class ImChatCoreFixtureProvider
 			.setRequired (
 				true)
 
+			.setRequiredLabel (
+				"(required)")
+
 			.setRestricted (
 				false)
 
@@ -472,6 +475,9 @@ class ImChatCoreFixtureProvider
 
 			.setRequired (
 				true)
+
+			.setRequiredLabel (
+				"")
 
 			.setRestricted (
 				false)
@@ -514,6 +520,9 @@ class ImChatCoreFixtureProvider
 			.setRequired (
 				false)
 
+			.setRequiredLabel (
+				"")
+
 			.setRestricted (
 				false)
 
@@ -551,6 +560,9 @@ class ImChatCoreFixtureProvider
 
 			.setRequired (
 				false)
+
+			.setRequiredLabel (
+				"(required)")
 
 			.setRestricted (
 				true)

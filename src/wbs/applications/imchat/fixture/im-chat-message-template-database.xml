@@ -739,8 +739,16 @@
 			Email address
 		</field>
 
+		<field name="Email field required label">
+			(Required field)
+		</field>
+
 		<field name="Password field label">
 			Password
+		</field>
+
+		<field name="Password field required label">
+			(Required field)
 		</field>
 
 		<field name="Create button label">

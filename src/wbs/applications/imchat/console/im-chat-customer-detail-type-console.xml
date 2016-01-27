@@ -76,6 +76,9 @@
 		<integer-field
 			name="minimumAge"/>
 
+		<integer-field
+			name="ordering"/>
+
 	</field-set>
 
 	<field-set
@@ -93,6 +96,9 @@
 
 		<yes-no-field
 			name="required"/>
+
+		<text-field
+			name="requiredLabel"/>
 
 		<yes-no-field
 			name="restricted"/>
@@ -133,6 +139,9 @@
 		<yes-no-field
 			name="required"/>
 
+		<text-field
+			name="requiredLabel"/>
+
 		<yes-no-field
 			name="restricted"/>
 
@@ -148,6 +157,24 @@
 
 		<integer-field
 			name="ordering"/>
+
+		<text-field
+			name="requiredErrorTitle"/>
+
+		<text-area-field
+			name="requiredErrorMessage"/>
+
+		<text-field
+			name="invalidErrorTitle"/>
+
+		<text-area-field
+			name="invalidErrorMessage"/>
+
+		<text-field
+			name="ageErrorTitle"/>
+
+		<text-area-field
+			name="ageErrorMessage"/>
 
 	</field-set>
 
@@ -168,6 +195,9 @@
 		<yes-no-field
 			name="required"/>
 
+		<text-field
+			name="requiredLabel"/>
+
 		<yes-no-field
 			name="restricted"/>
 
@@ -184,6 +214,30 @@
 
 		<integer-field
 			name="ordering"/>
+
+		<text-field
+			name="requiredErrorTitle"
+			nullable="yes"/>
+
+		<text-area-field
+			name="requiredErrorMessage"
+			nullable="yes"/>
+
+		<text-field
+			name="invalidErrorTitle"
+			nullable="yes"/>
+
+		<text-area-field
+			name="invalidErrorMessage"
+			nullable="yes"/>
+
+		<text-field
+			name="ageErrorTitle"
+			nullable="yes"/>
+
+		<text-area-field
+			name="ageErrorMessage"
+			nullable="yes"/>
 
 	</field-set>
 

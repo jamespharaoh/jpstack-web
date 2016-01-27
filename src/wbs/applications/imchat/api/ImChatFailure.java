@@ -21,4 +21,7 @@ class ImChatFailure {
 	@DataAttribute
 	String message;
 
+	@DataAttribute
+	Object details;
+
 }

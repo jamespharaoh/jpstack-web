@@ -1,6 +1,7 @@
 package wbs.applications.imchat.api;
 
 import java.util.List;
+import java.util.Map;
 
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
@@ -39,5 +40,9 @@ interface ImChatApiLogic {
 
 	ImChatPurchaseHistoryData purchaseHistoryData (
 			ImChatPurchaseRec purchase);
+
+	Map<String,String> updateCustomerDetails (
+			ImChatCustomerRec customer,
+			Map<String,String> newDetails);
 
 }

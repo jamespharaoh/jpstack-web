@@ -1,9 +1,9 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.doesNotContain;
-import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,9 +16,6 @@ import lombok.SneakyThrows;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import wbs.applications.imchat.model.ImChatCustomerDetailTypeRec;
-import wbs.applications.imchat.model.ImChatCustomerDetailValueObjectHelper;
-import wbs.applications.imchat.model.ImChatCustomerDetailValueRec;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
@@ -34,7 +31,6 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.event.logic.EventLogic;
 
 @PrototypeComponent ("imChatCustomerCreateAction")
 public
@@ -47,13 +43,7 @@ class ImChatCustomerCreateAction
 	Database database;
 
 	@Inject
-	EventLogic eventLogic;
-
-	@Inject
 	ImChatApiLogic imChatApiLogic;
-
-	@Inject
-	ImChatCustomerDetailValueObjectHelper imChatCustomerDetailValueHelper;
 
 	@Inject
 	ImChatCustomerObjectHelper imChatCustomerHelper;
@@ -196,49 +186,32 @@ class ImChatCustomerCreateAction
 
 		// update details
 
-		for (
-			ImChatCustomerDetailTypeRec detailType
-				: imChat.getCustomerDetailTypes ()
+		Map<String,String> detailErrors =
+			imChatApiLogic.updateCustomerDetails (
+				newCustomer,
+				createRequest.details ());
+
+		if (
+			isNotEmpty (
+				detailErrors)
 		) {
 
-			if (
-				doesNotContain (
-					createRequest.details ().keySet (),
-					underscoreToHyphen (
-						detailType.getCode ()))
-			) {
-				continue;
-			}
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
 
-			String stringValue =
-				createRequest.details ().get (
-					underscoreToHyphen (
-						detailType.getCode ()));
+				.reason (
+					"details-invalid")
 
-			ImChatCustomerDetailValueRec detailValue =
-				imChatCustomerDetailValueHelper.insert (
-					imChatCustomerDetailValueHelper.createInstance ()
+				.message (
+					"One or more of the details provided are invalid")
 
-				.setImChatCustomer (
-					newCustomer)
+				.details (
+					detailErrors);
 
-				.setImChatCustomerDetailType (
-					detailType)
+			return jsonResponderProvider.get ()
 
-				.setValue (
-					stringValue)
-
-			);
-
-			newCustomer.getDetails ().put (
-				detailType.getId (),
-				detailValue);
-
-			eventLogic.createEvent (
-				"im_chat_customer_detail_updated",
-				newCustomer,
-				detailType,
-				stringValue);
+				.value (
+					failureResponse);
 
 		}
 
