@@ -134,6 +134,7 @@ class TicketPendingHistoryPart
 				formatWriter,
 				ticketNoteFields,
 				ticketNote,
+				ImmutableMap.of (),
 				true);
 
 			printFormat (
