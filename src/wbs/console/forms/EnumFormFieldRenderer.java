@@ -49,7 +49,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	// implementation
 
 	@Override
-	public 
+	public
 	void renderFormTemporarilyHidden (
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
@@ -69,7 +69,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 					interfaceValue.get ().name ())
 				: "none",
 			">\n");
-		
+
 	}
 
 	@Override

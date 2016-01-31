@@ -47,7 +47,7 @@ class RangeFormFieldInterfaceMapping<
 	// implementation
 
 	@Override
-	public 
+	public
 	Either<Optional<Range<Interface>>,String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
@@ -140,7 +140,7 @@ class RangeFormFieldInterfaceMapping<
 	}
 
 	@Override
-	public 
+	public
 	Either<Optional<Range<Generic>>,String> interfaceToGeneric (
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,

@@ -34,7 +34,7 @@ class HtmlFormFieldRenderer<Container>
 	// implementation
 
 	@Override
-	public 
+	public
 	void renderFormTemporarilyHidden (
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
@@ -44,7 +44,7 @@ class HtmlFormFieldRenderer<Container>
 			@NonNull FormType formType) {
 
 		doNothing ();
-		
+
 	}
 
 	@Override

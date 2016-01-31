@@ -84,7 +84,7 @@ class ChatBroadcastSendPart
 	// implementation
 
 	@Override
-	public 
+	public
 	void prepare () {
 
 		searchFields =

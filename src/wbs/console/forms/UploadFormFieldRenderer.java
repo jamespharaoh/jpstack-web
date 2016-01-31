@@ -56,7 +56,7 @@ class UploadFormFieldRenderer<Container>
 			@NonNull FormType formType) {
 
 		doNothing ();
-		
+
 	}
 
 	@Override

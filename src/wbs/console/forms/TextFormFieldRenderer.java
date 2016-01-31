@@ -43,6 +43,10 @@ class TextFormFieldRenderer<Container>
 	Align align;
 
 	@Getter @Setter
+	Integer size =
+		FormField.defaultSize;
+
+	@Getter @Setter
 	Map<String,String> presets =
 		new LinkedHashMap<> ();
 
@@ -118,7 +122,7 @@ class TextFormFieldRenderer<Container>
 				: interfaceValue.or (
 					""),
 			" size=\"%h\"",
-			FormField.defaultSize,
+			size,
 			">");
 
 		if (

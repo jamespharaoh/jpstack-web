@@ -1064,6 +1064,18 @@ class ChatUserDaoHibernate
 
 		if (
 			isNotNull (
+				search.online ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatUser.online",
+					search.online ()));
+
+		}
+
+		if (
+			isNotNull (
 				search.hasPicture ())
 		) {
 

@@ -35,15 +35,15 @@ import wbs.framework.utils.etc.FormatWriter;
 @Accessors (fluent = true)
 @PrototypeComponent ("hiddenFormField")
 @DataClass ("hidden-form-field")
-public 
+public
 class HiddenFormField<Container,Generic,Native>
 	implements FormField<Container,Generic,Native,String> {
 
 	// dependencies
-	
+
 	@Inject
 	ConsoleObjectManager objectManager;
-	
+
 	@Inject
 	PrivChecker privChecker;
 
@@ -88,7 +88,7 @@ class HiddenFormField<Container,Generic,Native>
 	// implementation
 
 	@Override
-	public 
+	public
 	boolean canView (
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints) {
@@ -110,7 +110,7 @@ class HiddenFormField<Container,Generic,Native>
 				privParts.size (),
 				1)
 		) {
-	
+
 			String privCode =
 				privParts.get (0);
 
@@ -327,7 +327,7 @@ class HiddenFormField<Container,Generic,Native>
 	private
 	boolean formValuePresent (
 			@NonNull FormFieldSubmission submission) {
-	
+
 		return submission.hasParameter (
 			name ());
 
@@ -336,10 +336,10 @@ class HiddenFormField<Container,Generic,Native>
 	private
 	String formToInterface (
 			@NonNull FormFieldSubmission submission) {
-	
+
 		return submission.parameter (
 			name ());
-	
+
 	}
 
 }

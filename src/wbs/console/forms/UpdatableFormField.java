@@ -115,7 +115,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	}
 
 	@Override
-	public 
+	public
 	boolean canView (
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints) {
@@ -137,7 +137,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 				privParts.size (),
 				1)
 		) {
-	
+
 			String privCode =
 				privParts.get (0);
 
@@ -257,7 +257,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	}
 
 	@Override
-	public 
+	public
 	void renderFormTemporarilyHidden (
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,

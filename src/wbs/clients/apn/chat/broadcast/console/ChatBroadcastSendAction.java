@@ -212,7 +212,7 @@ class ChatBroadcastSendAction
 
 				.search (
 					requestContext.getForm ("search") != null)
-			
+
 				.includeBlocked (
 					false)
 
@@ -221,13 +221,13 @@ class ChatBroadcastSendAction
 
 			Map<String,Object> formHints =
 				ImmutableMap.<String,Object>builder ()
-	
+
 				.put (
 					"chat",
 					chatHelper.find (
 						requestContext.stuffInt (
 							"chatId")))
-	
+
 				.build ();
 
 			UpdateResultSet updateResults =
@@ -283,22 +283,22 @@ class ChatBroadcastSendAction
 
 				form.search (
 					true);
-	
+
 				return null;
-	
+
 			}
-	
+
 			if (
 				isNotNull (
 					requestContext.getForm (
 						"searchOff"))
 			) {
-	
+
 				form.search (
 					false);
-	
+
 				return null;
-	
+
 			}
 
 			// report errors
@@ -307,11 +307,11 @@ class ChatBroadcastSendAction
 				moreThanZero (
 					updateResults.errorCount ())
 			) {
-						
+
 				formFieldLogic.reportErrors (
 					requestContext,
 					updateResults);
-				
+
 				return null;
 
 			}
@@ -406,7 +406,7 @@ class ChatBroadcastSendAction
 							form.lastAction ())
 
 						.gender (
-							form.gender ())							
+							form.gender ())
 
 						.orient (
 							form.orient ())
@@ -416,7 +416,7 @@ class ChatBroadcastSendAction
 
 						.adultVerified (
 							form.isAdult ())
-							
+
 						.valueSinceEver (
 							Range.between (
 								form.minimumSpend (),

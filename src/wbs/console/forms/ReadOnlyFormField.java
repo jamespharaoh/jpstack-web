@@ -43,10 +43,10 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	implements FormField<Container,Generic,Native,Interface> {
 
 	// dependencies
-	
+
 	@Inject
 	ConsoleObjectManager objectManager;
-	
+
 	@Inject
 	PrivChecker privChecker;
 
@@ -99,7 +99,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	}
 
 	@Override
-	public 
+	public
 	boolean canView (
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints) {
@@ -121,7 +121,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 				privParts.size (),
 				1)
 		) {
-	
+
 			String privCode =
 				privParts.get (0);
 
@@ -162,7 +162,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	}
 
 	@Override
-	public 
+	public
 	void renderFormAlwaysHidden (
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,

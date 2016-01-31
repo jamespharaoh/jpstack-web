@@ -14,6 +14,7 @@ import javax.inject.Provider;
 import org.apache.commons.lang3.Range;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.forms.FormField;
 import wbs.console.forms.FormFieldAccessor;
 import wbs.console.forms.FormFieldBuilderContext;
 import wbs.console.forms.FormFieldConstraintValidator;
@@ -258,19 +259,19 @@ class CurrencyFormFieldBuilder {
 
 				.left (
 					currencyFormFieldInterfaceMappingProvider.get ()
-		
+
 					.currencyPath (
 						spec.currencyPath ())
-		
+
 					.blankIfZero (
 						blankIfZero))
 
 				.right (
 					currencyFormFieldInterfaceMappingProvider.get ()
-		
+
 					.currencyPath (
 						spec.currencyPath ())
-		
+
 					.blankIfZero (
 						blankIfZero));
 
@@ -278,10 +279,10 @@ class CurrencyFormFieldBuilder {
 
 			interfaceMapping =
 				currencyFormFieldInterfaceMappingProvider.get ()
-	
+
 				.currencyPath (
 					spec.currencyPath ())
-	
+
 				.blankIfZero (
 					blankIfZero);
 
@@ -291,20 +292,25 @@ class CurrencyFormFieldBuilder {
 
 		FormFieldRenderer unitRenderer =
 			textFormFieldRendererProvider.get ()
-	
+
 			.name (
 				name)
-	
+
 			.label (
 				label)
-	
+
 			.nullable (
 				ifNull (
 					spec.nullable (),
 					false))
-	
+
 			.align (
-				TextFormFieldRenderer.Align.right);
+				TextFormFieldRenderer.Align.right)
+
+			.size (
+				range
+					? FormField.defaultSize / 2 - 2
+					: FormField.defaultSize);
 
 		FormFieldRenderer renderer =
 			range

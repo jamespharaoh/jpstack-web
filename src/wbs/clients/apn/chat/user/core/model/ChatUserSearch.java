@@ -24,17 +24,20 @@ class ChatUserSearch
 
 	String code;
 
+	String numberLike;
+
 	Boolean blockAll;
 	Boolean deleted;
 
 	Gender gender;
 	Orient orient;
-
-	String numberLike;
+	Integer categoryId;
 
 	String name;
 	String info;
 	String location;
+
+	Boolean online;
 
 	Boolean hasPicture;
 	Boolean hasVideo;

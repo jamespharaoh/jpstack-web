@@ -114,7 +114,7 @@ class RangeFormFieldRenderer<
 					interfaceValue.get ().getMaximum ())
 				: Optional.absent (),
 			formType);
-		
+
 	}
 
 	@Override
@@ -135,7 +135,7 @@ class RangeFormFieldRenderer<
 					interfaceValue.get ().getMinimum ())
 				: Optional.absent (),
 			formType);
-		
+
 		maximum.renderFormReset (
 			htmlWriter,
 			indent,
@@ -145,7 +145,7 @@ class RangeFormFieldRenderer<
 					interfaceValue.get ().getMaximum ())
 				: Optional.absent (),
 			formType);
-		
+
 	}
 
 	@Override
@@ -162,7 +162,7 @@ class RangeFormFieldRenderer<
 				submission)
 
 		);
-		
+
 	}
 
 	@Override
@@ -214,7 +214,7 @@ class RangeFormFieldRenderer<
 			return successResult (
 				Optional.absent ());
 
-		}		
+		}
 
 		return successResult (
 			Optional.of (

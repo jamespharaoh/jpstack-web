@@ -5,7 +5,7 @@ import wbs.console.helper.EnumConsoleHelper;
 import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("chatUserTypeConsoleHelper")
-public 
+public
 class ChatUserTypeConsoleHelper
 	extends EnumConsoleHelper<ChatUserType> {
 

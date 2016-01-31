@@ -73,7 +73,7 @@ class YesNoFormFieldRenderer<Container>
 			">\n");
 
 		doNothing ();
-		
+
 	}
 
 	@Override
