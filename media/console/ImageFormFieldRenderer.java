@@ -77,7 +77,7 @@ class ImageFormFieldRenderer<Container>
 			@NonNull FormType formType) {
 
 		doNothing ();
-		
+
 	}
 
 	@Override
