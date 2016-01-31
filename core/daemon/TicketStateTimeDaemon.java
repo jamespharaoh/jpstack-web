@@ -19,11 +19,11 @@ import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -145,7 +145,7 @@ class TicketStateTimeDaemon
 					"TicketStateTimeDaemon",
 					exception,
 					Optional.<Integer>absent (),
-					ExceptionResolution.tryAgainLater);
+					GenericExceptionResolution.tryAgainLater);
 
 			}
 
