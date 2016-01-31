@@ -8,6 +8,7 @@ import wbs.framework.record.GlobalId;
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
+import wbs.platform.scaffold.model.SliceObjectHelper;
 
 @PrototypeComponent ("currencyFixtureProvider")
 public
@@ -24,6 +25,9 @@ class CurrencyFixtureProvider
 
 	@Inject
 	MenuItemObjectHelper menuItemHelper;
+
+	@Inject
+	SliceObjectHelper sliceHelper;
 
 	// implementation
 
@@ -63,6 +67,11 @@ class CurrencyFixtureProvider
 		currencyHelper.insert (
 			currencyHelper.createInstance ()
 
+			.setSlice (
+				sliceHelper.findByCode (
+					GlobalId.root,
+					"test"))
+
 			.setCode (
 				"gbp")
 
@@ -89,6 +98,11 @@ class CurrencyFixtureProvider
 		currencyHelper.insert (
 			currencyHelper.createInstance ()
 
+			.setSlice (
+				sliceHelper.findByCode (
+					GlobalId.root,
+					"test"))
+
 			.setCode (
 				"usd")
 
@@ -114,6 +128,11 @@ class CurrencyFixtureProvider
 
 		currencyHelper.insert (
 			currencyHelper.createInstance ()
+
+			.setSlice (
+				sliceHelper.findByCode (
+					GlobalId.root,
+					"test"))
 
 			.setCode (
 				"credit")

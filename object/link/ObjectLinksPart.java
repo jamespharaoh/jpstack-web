@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
@@ -142,6 +143,7 @@ class ObjectLinksPart
 				formatWriter,
 				formFieldSet,
 				targetObject,
+				ImmutableMap.of (),
 				true);
 
 			printFormat (

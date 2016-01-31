@@ -23,6 +23,7 @@ import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
@@ -228,7 +229,8 @@ class ObjectSearchPostAction
 			fieldsLogic.update (
 				requestContext,
 				searchFormFieldSet,
-				search);
+				search,
+				ImmutableMap.of ());
 
 		if (updateResultSet.errorCount () > 0) {
 

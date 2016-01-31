@@ -10,6 +10,9 @@
 
 		<!-- identity -->
 
+		<parent-field
+			type="slice"/>
+
 		<code-field/>
 
 		<!-- details -->
@@ -35,5 +38,19 @@
 			name="pluralSuffix"/>
 
 	</fields>
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a currency"
+			template="yes"/>
+
+		<priv-type
+			name="View"
+			description="View a currency"
+			template="yes"/>
+
+	</priv-types>
 
 </model-meta>

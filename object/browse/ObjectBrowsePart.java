@@ -16,6 +16,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleContext;
@@ -304,6 +305,7 @@ class ObjectBrowsePart
 				formatWriter,
 				formFieldSet,
 				object,
+				ImmutableMap.of (),
 				false);
 
 			printFormat (

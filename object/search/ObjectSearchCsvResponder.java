@@ -18,6 +18,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import wbs.console.forms.FormFieldLogic;
@@ -207,7 +208,8 @@ class ObjectSearchCsvResponder
 				formFieldLogic.outputCsvRow (
 					formatWriter,
 					formFieldSets,
-					object);
+					object,
+					ImmutableMap.of ());
 
 			}
 

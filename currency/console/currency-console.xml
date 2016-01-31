@@ -2,12 +2,10 @@
 	name="currency">
 
 	<console-helper-provider
-		object-name="currency"
-		view-priv="root">
+		object-name="currency">
 
 		<priv-key
 			name="currency.manage"
-			delegate="root"
 			priv="manage"/>
 
 		<context-stuff
@@ -48,6 +46,7 @@
 		name="list"
 		object-name="currency">
 
+		<parent-field/>
 		<name-field/>
 		<description-field/>
 
@@ -70,6 +69,7 @@
 		name="create"
 		object-name="currency">
 
+		<parent-field/>
 		<name-field/>
 		<description-field/>
 
@@ -117,6 +117,7 @@
 		name="settings"
 		object-name="currency">
 
+		<parent-field/>
 		<name-field/>
 		<description-field/>
 

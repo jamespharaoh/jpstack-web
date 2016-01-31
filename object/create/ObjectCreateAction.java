@@ -9,14 +9,15 @@ import java.util.Date;
 
 import javax.inject.Inject;
 
-import org.joda.time.Instant;
-
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.joda.time.Instant;
+
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
@@ -233,7 +234,8 @@ class ObjectCreateAction<
 			formFieldLogic.update (
 				requestContext,
 				formFieldSet,
-				object);
+				object,
+				ImmutableMap.of ());
 
 		if (updateResultSet.errorCount () > 0) {
 

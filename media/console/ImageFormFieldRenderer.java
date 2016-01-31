@@ -1,6 +1,6 @@
 package wbs.platform.media.console;
 
-import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.moreThanZero;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
@@ -68,109 +68,16 @@ class ImageFormFieldRenderer<Container>
 
 	@Override
 	public
-	void renderTableCellList (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Optional<MediaRec> interfaceValue,
-			boolean link,
-			int colspan) {
-
-		out.writeFormat (
-			"<td",
-			colspan > 1
-				? stringFormat (
-					" colspan=\"%h\"",
-					colspan)
-				: "",
-			">%s</td>\n",
-			interfaceToHtmlSimple (
-				container,
-				interfaceValue,
-				link));
-
-	}
-
-	@Override
-	public
-	void renderTableCellProperties (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<MediaRec> interfaceValue) {
-
-		out.writeFormat (
-			"<td>%s</td>\n",
-			interfaceToHtmlComplex (
-				container,
-				interfaceValue));
-
-	}
-
-	@Override
-	public
-	void renderTableRow (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<MediaRec> interfaceValue) {
-
-		out.writeFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
-			label ());
-
-		renderTableCellProperties (
-			out,
-			container,
-			hints,
-			interfaceValue);
-
-		out.writeFormat (
-			"</tr>\n");
-
-	}
-
-	@Override
-	public
-	void renderFormRow (
+	void renderFormTemporarilyHidden (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue,
-			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
 
-		out.writeFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
-			label (),
-			"<td>");
-
-		renderFormInput (
-			submission,
-			out,
-			container,
-			hints,
-			interfaceValue,
-			formType);
-
-		if (
-			isPresent (
-				error)
-		) {
-
-			out.writeFormat (
-				"<br>\n",
-				"%h",
-				error.get ());
-
-		}
-
-		out.writeFormat (
-			"</td>\n",
-			"</tr>\n");
-
+		doNothing ();
+		
 	}
 
 	@Override
