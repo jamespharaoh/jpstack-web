@@ -44,7 +44,7 @@
 
 		<enum-field
 			name="resolution"
-			type="exceptionResolution"/>
+			type="concreteExceptionResolution"/>
 
 	</fields>
 

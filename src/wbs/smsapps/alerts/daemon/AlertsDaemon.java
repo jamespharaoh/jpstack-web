@@ -24,13 +24,13 @@ import com.google.common.base.Optional;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 import wbs.framework.utils.StringSubstituter;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemState;
@@ -189,7 +189,7 @@ class AlertsDaemon
 					"alerts daemon " + alertsSettingsId,
 					exception,
 					Optional.<Integer>absent (),
-					ExceptionResolution.ignoreWithNoWarning);
+					GenericExceptionResolution.ignoreWithNoWarning);
 
 			}
 

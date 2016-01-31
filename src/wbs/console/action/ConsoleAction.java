@@ -18,10 +18,10 @@ import wbs.console.misc.ConsoleExceptionHandler;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 
 @Log4j
 public abstract
@@ -168,7 +168,7 @@ class ConsoleAction
 				exceptionFromBackupResponder,
 				Optional.fromNullable (
 					requestContext.userId ()),
-				ExceptionResolution.ignoreWithUserWarning);
+				GenericExceptionResolution.ignoreWithUserWarning);
 
 		}
 
@@ -200,7 +200,7 @@ class ConsoleAction
 			throwable,
 			Optional.fromNullable (
 				requestContext.userId ()),
-			ExceptionResolution.ignoreWithUserWarning);
+			GenericExceptionResolution.ignoreWithUserWarning);
 
 		// give the user an error message
 

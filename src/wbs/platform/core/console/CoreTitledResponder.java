@@ -19,10 +19,10 @@ import wbs.console.part.PagePart;
 import wbs.console.priv.PrivChecker;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.record.GlobalId;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("coreTitledResponder")
@@ -105,7 +105,7 @@ class CoreTitledResponder
 					exception,
 					Optional.fromNullable (
 						requestContext.userId ()),
-					ExceptionResolution.ignoreWithUserWarning);
+					GenericExceptionResolution.ignoreWithUserWarning);
 
 				// and remember we had a problem
 

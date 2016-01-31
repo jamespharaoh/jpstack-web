@@ -32,12 +32,12 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 
 @PrototypeComponent ("imChatEventPostAction")
 public
@@ -267,7 +267,7 @@ class ImChatEventPostAction
 
 					Optional.absent (),
 
-					ExceptionResolution.ignoreWithThirdPartyWarning);
+					GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
 			} else if (
 				equal (
@@ -325,7 +325,7 @@ class ImChatEventPostAction
 
 					Optional.absent (),
 
-					ExceptionResolution.ignoreWithThirdPartyWarning);
+					GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
 			}
 

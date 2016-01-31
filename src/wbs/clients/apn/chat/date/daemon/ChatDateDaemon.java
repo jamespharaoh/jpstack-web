@@ -44,9 +44,9 @@ import wbs.clients.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.platform.daemon.AbstractDaemonService;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.locator.model.LongLat;
 
@@ -131,7 +131,7 @@ class ChatDateDaemon
 					"Chat daemon dating",
 					exception,
 					Optional.<Integer>absent (),
-					ExceptionResolution.tryAgainLater);
+					GenericExceptionResolution.tryAgainLater);
 
 			}
 
@@ -418,7 +418,7 @@ class ChatDateDaemon
 					"Chat daemon dating",
 					exception,
 					Optional.<Integer>absent (),
-					ExceptionResolution.tryAgainLater);
+					GenericExceptionResolution.tryAgainLater);
 
 			}
 

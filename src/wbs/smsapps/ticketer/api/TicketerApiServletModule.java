@@ -20,6 +20,8 @@ import wbs.api.mvc.StringMapResponderFactory;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.record.GlobalId;
 import wbs.framework.web.Action;
 import wbs.framework.web.PathHandler;
@@ -27,8 +29,6 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.rpc.php.PhpStringMapResponderFactory;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
@@ -361,7 +361,7 @@ class TicketerApiServletModule
 					requestContext.requestUri (),
 					exception,
 					Optional.<Integer>absent (),
-					ExceptionResolution.ignoreWithThirdPartyWarning);
+					GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
 				requestContext.status (500);
 

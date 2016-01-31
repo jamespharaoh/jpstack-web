@@ -25,11 +25,11 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 import wbs.sms.message.core.model.MessageRec;
 
 @Log4j
@@ -216,7 +216,7 @@ class ChatUserImageUploadPostAction
 				requestContext.requestPath (),
 				exception,
 				Optional.<Integer>absent (),
-				ExceptionResolution.ignoreWithUserWarning);
+				GenericExceptionResolution.ignoreWithUserWarning);
 
 			// start new transaction
 

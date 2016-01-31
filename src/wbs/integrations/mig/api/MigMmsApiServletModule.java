@@ -28,7 +28,9 @@ import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.RegexpPathHandler;
@@ -36,8 +38,6 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
 import wbs.integrations.mig.logic.MigLogic;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
@@ -485,7 +485,7 @@ logger.error ("Got item");
 						exception,
 						requestContext),
 					Optional.<Integer>absent (),
-					ExceptionResolution.ignoreWithThirdPartyWarning);
+					GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
 				PrintWriter out =
 					requestContext.writer ();

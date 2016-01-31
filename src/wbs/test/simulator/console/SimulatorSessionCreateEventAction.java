@@ -25,11 +25,11 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.Responder;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.console.SliceConsoleHelper;
@@ -164,7 +164,7 @@ class SimulatorSessionCreateEventAction
 				exception,
 				Optional.of (
 					requestContext.userId ()),
-				ExceptionResolution.ignoreWithUserWarning);
+				GenericExceptionResolution.ignoreWithUserWarning);
 
 			return jsonResponder.get ()
 

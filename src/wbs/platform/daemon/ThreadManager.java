@@ -13,8 +13,8 @@ import lombok.extern.log4j.Log4j;
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
 
 @Log4j
 @SingletonComponent ("threadManager")
@@ -63,12 +63,12 @@ class ThreadManager
 
 		void logThrowable (
 				@NonNull Throwable throwable,
-				@NonNull ExceptionResolution resolution) {
+				@NonNull GenericExceptionResolution resolution) {
 
 			if (
 				equal (
 					resolution,
-					ExceptionResolution.fatalError)
+					GenericExceptionResolution.fatalError)
 			) {
 
 				log.fatal (
@@ -126,7 +126,7 @@ class ThreadManager
 
 				logThrowable (
 					throwable,
-					ExceptionResolution.fatalError);
+					GenericExceptionResolution.fatalError);
 
 			}
 

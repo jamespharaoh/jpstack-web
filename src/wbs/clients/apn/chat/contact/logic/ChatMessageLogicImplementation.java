@@ -62,12 +62,12 @@ import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
 import wbs.integrations.jigsaw.api.JigsawApi;
 import wbs.integrations.urbanairship.logic.UrbanAirshipApi;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -1003,7 +1003,7 @@ class ChatMessageLogicImplementation
 					exception),
 
 				Optional.<Integer>absent (),
-				ExceptionResolution.ignoreWithNoWarning);
+				GenericExceptionResolution.ignoreWithNoWarning);
 
 			success = false;
 
@@ -1067,7 +1067,7 @@ class ChatMessageLogicImplementation
 					exception),
 
 				Optional.<Integer>absent (),
-				ExceptionResolution.ignoreWithNoWarning);
+				GenericExceptionResolution.ignoreWithNoWarning);
 
 			success = false;
 
@@ -1103,7 +1103,7 @@ class ChatMessageLogicImplementation
 					exception),
 
 				Optional.<Integer>absent (),
-				ExceptionResolution.ignoreWithNoWarning);
+				GenericExceptionResolution.ignoreWithNoWarning);
 
 			success = false;
 
@@ -1298,7 +1298,7 @@ class ChatMessageLogicImplementation
 						exception)),
 
 				Optional.<Integer>absent (),
-				ExceptionResolution.ignoreWithNoWarning);
+				GenericExceptionResolution.ignoreWithNoWarning);
 
 			return false;
 

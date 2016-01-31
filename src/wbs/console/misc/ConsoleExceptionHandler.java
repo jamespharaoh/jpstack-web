@@ -22,12 +22,12 @@ import wbs.console.priv.PrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ErrorResponder;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.StringFormatter;
 import wbs.framework.web.WebExceptionHandler;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 
 @Log4j
 @SingletonComponent ("exceptionHandler")
@@ -101,7 +101,7 @@ class ConsoleExceptionHandler
 				throwable,
 				Optional.fromNullable (
 					requestContext.userId ()),
-				ExceptionResolution.ignoreWithUserWarning);
+				GenericExceptionResolution.ignoreWithUserWarning);
 
 		} catch (RuntimeException localException) {
 

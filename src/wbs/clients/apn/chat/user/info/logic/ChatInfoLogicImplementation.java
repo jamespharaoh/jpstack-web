@@ -48,11 +48,11 @@ import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.queue.logic.QueueLogic;
@@ -246,7 +246,7 @@ class ChatInfoLogicImplementation
 					exception),
 
 				Optional.<Integer>absent (),
-				ExceptionResolution.ignoreWithNoWarning);
+				GenericExceptionResolution.ignoreWithNoWarning);
 
 			return;
 

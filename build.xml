@@ -46,7 +46,6 @@
       <include name="wbs/framework/**"/>
       <include name="wbs/api/**"/>
       <include name="wbs/console/**"/>
-      <service type="javax.annotation.processing.Processor" provider="wbs.framework.object.ObjectHelperAnnotationProcessor"/>
     </jar>
   </target>
   <target name="just-build-meta">

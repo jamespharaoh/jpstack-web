@@ -20,12 +20,12 @@ import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutRec;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
 import wbs.sms.message.outbox.model.OutboxRec;
@@ -245,7 +245,7 @@ class BroadcastSystemsSender1
 					"Success response did not match",
 					responseString,
 					Optional.<Integer>absent (),
-					ExceptionResolution.ignoreWithLoggedWarning);
+					GenericExceptionResolution.ignoreWithLoggedWarning);
 
 				return null;
 
@@ -274,7 +274,7 @@ class BroadcastSystemsSender1
 					"Failure response did not match",
 					responseString,
 					Optional.<Integer>absent (),
-					ExceptionResolution.ignoreWithLoggedWarning);
+					GenericExceptionResolution.ignoreWithLoggedWarning);
 
 				throw tempFailure (
 					stringFormat (

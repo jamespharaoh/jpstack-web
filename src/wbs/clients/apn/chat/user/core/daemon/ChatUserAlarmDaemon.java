@@ -23,9 +23,9 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.platform.daemon.SleepingDaemonService;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 
 @SingletonComponent ("chatUserAlarmDaemon")
 public
@@ -118,7 +118,7 @@ class ChatUserAlarmDaemon
 						alarm.getId ()),
 					exception,
 					Optional.<Integer>absent (),
-					ExceptionResolution.tryAgainLater);
+					GenericExceptionResolution.tryAgainLater);
 
 			}
 
