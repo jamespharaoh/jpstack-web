@@ -51,6 +51,7 @@ interface FormFieldRenderer<Container,Interface> {
 	default
 	String interfaceToHtmlTableCell (
 			Container container,
+			Map<String,Object> hints,
 			Optional<Interface> interfaceValue,
 			boolean link,
 			int colspan) {
@@ -65,6 +66,7 @@ interface FormFieldRenderer<Container,Interface> {
 			">%s</td>",
 			interfaceToHtmlSimple (
 				container,
+				hints,
 				interfaceValue,
 				link));
 
@@ -72,11 +74,13 @@ interface FormFieldRenderer<Container,Interface> {
 
 	String interfaceToHtmlSimple (
 			Container container,
+			Map<String,Object> hints,
 			Optional<Interface> interfaceValue,
 			boolean link);
 
 	String interfaceToHtmlComplex (
 			Container container,
+			Map<String,Object> hints,
 			Optional<Interface> interfaceValue);
 
 }

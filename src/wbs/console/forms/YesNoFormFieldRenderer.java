@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.Misc.booleanToString;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
 import static wbs.framework.utils.etc.Misc.successResult;
@@ -237,6 +236,7 @@ class YesNoFormFieldRenderer<Container>
 	public
 	String interfaceToHtmlSimple (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Boolean> genericValue,
 			boolean link) {
 
@@ -254,10 +254,12 @@ class YesNoFormFieldRenderer<Container>
 	public
 	String interfaceToHtmlComplex (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Boolean> genericValue) {
 
 		return interfaceToHtmlSimple (
 			container,
+			hints,
 			genericValue,
 			true);
 

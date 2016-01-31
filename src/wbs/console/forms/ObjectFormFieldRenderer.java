@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.successResult;
 
@@ -29,7 +30,6 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.utils.etc.FormatWriter;
 
 @Accessors (fluent = true)
@@ -343,6 +343,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	public
 	String interfaceToHtmlSimple (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
 			boolean link) {
 
@@ -353,9 +354,9 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		if (rootFieldName != null) {
 
 			root =
-				Optional.fromNullable (
+				Optional.of (
 					(Record<?>)
-					BeanLogic.getProperty (
+					objectManager.dereference (
 						container,
 						rootFieldName));
 
@@ -368,11 +369,22 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		// render object path
 
-		return objectManager.objectPath (
-			interfaceValue.orNull (),
-			root,
-			true,
-			link);
+		if (
+			isPresent (
+				interfaceValue)
+		) {
+
+			return objectManager.objectPath (
+				interfaceValue.get (),
+				root,
+				true,
+				link);
+
+		} else {
+
+			return "&mdash;";
+
+		}
 
 	}
 
@@ -380,10 +392,12 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	public
 	String interfaceToHtmlComplex (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue) {
 
 		return interfaceToHtmlSimple (
 			container,
+			hints,
 			interfaceValue,
 			true);
 

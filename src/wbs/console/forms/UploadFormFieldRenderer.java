@@ -161,6 +161,7 @@ class UploadFormFieldRenderer<Container>
 	public
 	String interfaceToHtmlSimple (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<FileUpload> interfaceValue,
 			boolean link) {
 
@@ -179,10 +180,12 @@ class UploadFormFieldRenderer<Container>
 	public
 	String interfaceToHtmlComplex (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<FileUpload> interfaceValue) {
 
 		return interfaceToHtmlSimple (
 			container,
+			hints,
 			interfaceValue,
 			true);
 

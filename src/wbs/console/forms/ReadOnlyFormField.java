@@ -232,11 +232,14 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 						hints,
 						genericValue)));
 
-		renderer.interfaceToHtmlTableCell (
-			container,
-			interfaceValue,
-			link,
-			colspan);
+		htmlWriter.writeFormat (
+			"%s\n",
+			renderer.interfaceToHtmlTableCell (
+				container,
+				hints,
+				interfaceValue,
+				link,
+				colspan));
 
 	}
 
@@ -270,6 +273,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			"<td>%s</td>\n",
 			renderer.interfaceToHtmlComplex (
 				container,
+				hints,
 				interfaceValue));
 
 	}

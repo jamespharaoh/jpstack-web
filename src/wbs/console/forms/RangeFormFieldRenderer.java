@@ -238,6 +238,7 @@ class RangeFormFieldRenderer<
 	public
 	String interfaceToHtmlSimple (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Range<Interface>> interfaceValue,
 			boolean link) {
 
@@ -246,6 +247,7 @@ class RangeFormFieldRenderer<
 
 			minimum.interfaceToHtmlSimple (
 				container,
+				hints,
 				interfaceValue.isPresent ()
 					? Optional.of (
 						interfaceValue.get ().getMinimum ())
@@ -254,6 +256,7 @@ class RangeFormFieldRenderer<
 
 			maximum.interfaceToHtmlSimple (
 				container,
+				hints,
 				interfaceValue.isPresent ()
 					? Optional.of (
 						interfaceValue.get ().getMinimum ())
@@ -268,6 +271,7 @@ class RangeFormFieldRenderer<
 	public
 	String interfaceToHtmlComplex (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Range<Interface>> interfaceValue) {
 
 		return stringFormat (
@@ -275,6 +279,7 @@ class RangeFormFieldRenderer<
 
 			minimum.interfaceToHtmlComplex (
 				container,
+				hints,
 				interfaceValue.isPresent ()
 					? Optional.of (
 						interfaceValue.get ().getMinimum ())
@@ -282,6 +287,7 @@ class RangeFormFieldRenderer<
 
 			maximum.interfaceToHtmlComplex (
 				container,
+				hints,
 				interfaceValue.isPresent ()
 					? Optional.of (
 						interfaceValue.get ().getMinimum ())

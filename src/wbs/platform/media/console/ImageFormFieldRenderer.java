@@ -96,6 +96,7 @@ class ImageFormFieldRenderer<Container>
 				"%s<br>\n",
 				interfaceToHtmlComplex (
 					container,
+					hints,
 					interfaceValue));
 
 		}
@@ -225,6 +226,7 @@ class ImageFormFieldRenderer<Container>
 	public
 	String interfaceToHtmlSimple (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue,
 			boolean link) {
 
@@ -258,6 +260,7 @@ class ImageFormFieldRenderer<Container>
 	public
 	String interfaceToHtmlComplex (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue) {
 
 		if (! interfaceValue.isPresent ()) {

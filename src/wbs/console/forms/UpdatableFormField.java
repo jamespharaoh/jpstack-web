@@ -216,6 +216,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			"%s",
 			renderer.interfaceToHtmlTableCell (
 				container,
+				hints,
 				interfaceValue,
 				link,
 				colspan));
@@ -252,6 +253,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			"<td>%s</td>\n",
 			renderer.interfaceToHtmlComplex (
 				container,
+				hints,
 				interfaceValue));
 
 	}
@@ -474,12 +476,6 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 		}
 
 		// convert to generic
-
-System.out.println (
-	"INTERFACE VALUE: " + newInterfaceValue.getClass ().getName ());
-
-System.out.println (
-	"INTERFACE MAPPIN: " + interfaceMapping.getClass ().getName ());
 
 		Either<Optional<Generic>,String> interfaceToGenericResult =
 			interfaceMapping.interfaceToGeneric (

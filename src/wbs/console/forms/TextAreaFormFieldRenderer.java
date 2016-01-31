@@ -380,6 +380,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 	public
 	String interfaceToHtmlSimple (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
 			boolean link) {
 
@@ -394,10 +395,12 @@ class TextAreaFormFieldRenderer<Container,Parent>
 	public
 	String interfaceToHtmlComplex (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		return interfaceToHtmlSimple (
 			container,
+			hints,
 			interfaceValue,
 			true);
 

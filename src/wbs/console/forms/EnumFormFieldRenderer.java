@@ -243,6 +243,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	public
 	String interfaceToHtmlSimple (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
 			boolean link) {
 
@@ -258,10 +259,12 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	public
 	String interfaceToHtmlComplex (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue) {
 
 		return interfaceToHtmlSimple (
 			container,
+			hints,
 			interfaceValue,
 			true);
 
