@@ -9,7 +9,7 @@
 
 	<models>
 
-		<enum-type name="exceptionResolution"/>
+		<enum-type name="concreteExceptionResolution"/>
 
 		<model name="exceptionLog"/>
 		<model name="exceptionLogType"/>

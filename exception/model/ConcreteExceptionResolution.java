@@ -1,7 +1,7 @@
 package wbs.platform.exception.model;
 
 public
-enum ExceptionResolution {
+enum ConcreteExceptionResolution {
 
 	tryAgainNow,
 	tryAgainLater,

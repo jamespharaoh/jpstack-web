@@ -6,9 +6,9 @@ import org.apache.log4j.Logger;
 
 import com.google.common.base.Optional;
 
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.utils.RandomLogic;
-import wbs.platform.exception.logic.ExceptionLogger;
-import wbs.platform.exception.model.ExceptionResolution;
 
 public abstract
 class SleepingDaemonService
@@ -85,7 +85,7 @@ class SleepingDaemonService
 					generalErrorSummary (),
 					exception,
 					Optional.<Integer>absent (),
-					ExceptionResolution.tryAgainLater);
+					GenericExceptionResolution.tryAgainLater);
 
 			}
 
