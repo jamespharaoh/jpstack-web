@@ -2,14 +2,21 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.eitherGetLeft;
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.requiredValue;
+import static wbs.framework.utils.etc.Misc.split;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -18,11 +25,14 @@ import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
 
+import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
+import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.record.PermanentRecord;
+import wbs.framework.record.Record;
 import wbs.framework.utils.etc.FormatWriter;
 
 @Accessors (fluent = true)
@@ -31,6 +41,14 @@ import wbs.framework.utils.etc.FormatWriter;
 public
 class ReadOnlyFormField<Container,Generic,Native,Interface>
 	implements FormField<Container,Generic,Native,Interface> {
+
+	// dependencies
+	
+	@Inject
+	ConsoleObjectManager objectManager;
+	
+	@Inject
+	PrivChecker privChecker;
 
 	// properties
 
@@ -48,6 +66,10 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	@DataAttribute
 	@Getter @Setter
 	String label;
+
+	@DataAttribute
+	@Getter @Setter
+	String viewPriv;
 
 	@Getter @Setter
 	Set<ScriptRef> scriptRefs =
@@ -77,10 +99,117 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	}
 
 	@Override
+	public 
+	boolean canView (
+			@NonNull Container container,
+			@NonNull Map<String,Object> hints) {
+
+		if (
+			isNull (
+				viewPriv)
+		) {
+			return true;
+		}
+
+		List<String> privParts =
+			split (
+				viewPriv,
+				":");
+
+		if (
+			equal (
+				privParts.size (),
+				1)
+		) {
+	
+			String privCode =
+				privParts.get (0);
+
+			return privChecker.can (
+				(Record<?>)
+				container,
+				privCode);
+
+		} else if (
+			equal (
+				privParts.size (),
+				2)
+		) {
+
+			String delegatePath =
+				privParts.get (0);
+
+			String privCode =
+				privParts.get (1);
+
+			Record<?> delegate =
+				(Record<?>)
+				objectManager.dereference (
+					container,
+					delegatePath,
+					hints);
+
+			return privChecker.can (
+				delegate,
+				privCode);
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
+
+	}
+
+	@Override
+	public 
+	void renderFormAlwaysHidden (
+			@NonNull FormFieldSubmission submission,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
+			@NonNull FormType formType) {
+
+		Optional<Native> nativeValue =
+			requiredValue (
+				accessor.read (
+					container));
+
+		Optional<Generic> genericValue =
+			requiredValue (
+				nativeMapping.nativeToGeneric (
+					container,
+					nativeValue));
+
+		Optional<Interface> interfaceValue =
+			requiredValue (
+				eitherGetLeft (
+					interfaceMapping.genericToInterface (
+						container,
+						hints,
+						genericValue)));
+
+		htmlWriter.writeFormat (
+			"<input",
+			" type=\"hidden\"",
+			" id=\"%h\"",
+			name (),
+			" name=\"%h\"",
+			name (),
+			" value=\"%h\"",
+			interfaceValue.isPresent ()
+				? interfaceValue.get ()
+				: "",
+			">\n");
+
+	}
+
+	@Override
 	public
 	void renderTableCellList (
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			boolean link,
 			int colspan) {
 
@@ -100,10 +229,10 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
 						container,
+						hints,
 						genericValue)));
 
-		renderer.renderTableCellList (
-			out,
+		renderer.interfaceToHtmlTableCell (
 			container,
 			interfaceValue,
 			link,
@@ -114,7 +243,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	@Override
 	public
 	void renderTableCellProperties (
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints) {
 
@@ -134,13 +263,14 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
 						container,
+						hints,
 						genericValue)));
 
-		renderer.renderTableCellProperties (
-			out,
-			container,
-			hints,
-			interfaceValue);
+		htmlWriter.writeFormat (
+			"<td>%s</td>\n",
+			renderer.interfaceToHtmlComplex (
+				container,
+				interfaceValue));
 
 	}
 
@@ -148,7 +278,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	public
 	void renderFormRow (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> error,
@@ -170,13 +300,38 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
 						container,
+						hints,
 						genericValue)));
 
-		renderer.renderTableRow (
-			out,
+		htmlWriter.writeFormat (
+			"<tr>\n",
+			"<th>%h</th>\n",
+			label (),
+			"<td>");
+
+		renderer.renderFormInput (
+			submission,
+			htmlWriter,
 			container,
 			hints,
-			interfaceValue);
+			interfaceValue,
+			formType);
+
+		if (
+			isPresent (
+				error)
+		) {
+
+			htmlWriter.writeFormat (
+				"<br>\n",
+				"%h",
+				error.get ());
+
+		}
+
+		htmlWriter.writeFormat (
+			"</td>\n",
+			"</tr>\n");
 
 	}
 
@@ -186,6 +341,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull String indent,
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull FormType formType) {
 
 	}
@@ -194,7 +350,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	public
 	void renderCsvRow (
 			@NonNull FormatWriter out,
-			@NonNull Container container) {
+			@NonNull Container container,
+			@NonNull Map<String,Object> hints) {
 
 		Optional<Native> nativeValue =
 			requiredValue (
@@ -211,6 +368,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			requiredSuccess (
 				csvMapping.genericToInterface (
 					container,
+					hints,
 					genericValue));
 
 		if (
@@ -239,7 +397,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	public
 	UpdateResult<Generic,Native> update (
 			@NonNull FormFieldSubmission submission,
-			@NonNull Container container) {
+			@NonNull Container container,
+			@NonNull Map<String,Object> hints) {
 
 		return new UpdateResult<Generic,Native> ()
 

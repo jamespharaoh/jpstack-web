@@ -2,6 +2,8 @@ package wbs.platform.event.console;
 
 import static wbs.framework.utils.etc.Misc.successResult;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import lombok.NonNull;
@@ -30,6 +32,7 @@ class EventDetailsFormFieldInterfaceMapping
 	public
 	Either<Optional<EventRec>,String> interfaceToGeneric (
 			@NonNull EventRec container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		throw new UnsupportedOperationException ();
@@ -40,6 +43,7 @@ class EventDetailsFormFieldInterfaceMapping
 	public
 	Either<Optional<String>,String> genericToInterface (
 			@NonNull EventRec container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<EventRec> genericValue) {
 
 		return successResult (

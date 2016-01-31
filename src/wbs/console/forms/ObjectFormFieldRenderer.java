@@ -1,9 +1,9 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.successResult;
 
@@ -63,162 +63,20 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Getter @Setter
 	Boolean mini;
 
-	// details
-
-	@Getter
-	boolean fileUpload = false;
-
 	// implementation
 
 	@Override
 	public
-	void renderTableCellList (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Optional<Interface> interfaceValue,
-			boolean link,
-			int colspan) {
-
-		// work out root
-
-		Optional<Record<?>> root;
-
-		if (rootFieldName != null) {
-
-			root =
-				Optional.<Record<?>>fromNullable (
-					(Record<?>)
-					objectManager.dereference (
-						container,
-						rootFieldName));
-
-		} else {
-
-			root =
-				Optional.<Record<?>>absent ();
-
-		}
-
-		// write table cell
-
-		out.writeFormat (
-			"%s\n",
-			objectManager.tdForObject (
-				interfaceValue.orNull (),
-				root.orNull (),
-				mini,
-				link,
-				colspan));
-
-	}
-
-	@Override
-	public
-	void renderTableCellProperties (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue) {
-
-		// work out root
-
-		Optional<Record<?>> root;
-
-		if (rootFieldName != null) {
-
-			root =
-				Optional.<Record<?>>fromNullable (
-					(Record<?>)
-					objectManager.dereference (
-						container,
-						rootFieldName,
-						hints));
-
-		} else {
-
-			root =
-				Optional.<Record<?>>absent ();
-
-		}
-
-		// write table cell
-
-		out.writeFormat (
-			"%s\n",
-			objectManager.tdForObject (
-				interfaceValue.orNull (),
-				root.orNull (),
-				mini,
-				true,
-				1));
-
-	}
-
-	@Override
-	public
-	void renderTableRow (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue) {
-
-		out.writeFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
-			label ());
-
-		renderTableCellProperties (
-			out,
-			container,
-			hints,
-			interfaceValue);
-
-		out.writeFormat (
-			"</tr>\n");
-
-	}
-
-	@Override
-	public
-	void renderFormRow (
+	void renderFormTemporarilyHidden (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
-			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
 
-		out.writeFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
-			label (),
-			"<td>");
-
-		renderFormInput (
-			submission,
-			out,
-			container,
-			hints,
-			interfaceValue,
-			formType);
-
-		if (
-			isPresent (
-				error)
-		) {
-
-			out.writeFormat (
-				"<br>\n",
-				"%h",
-				error.get ());
-
-		}
-
-		out.writeFormat (
-			"</td>\n",
-			"</tr>\n");
-
+		doNothing ();
+		
 	}
 
 	@Override
@@ -236,11 +94,6 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		Optional<Record<?>> root;
 
 		if (rootFieldName != null) {
-
-System.out.println ("ROOT FIELD NAME: " + rootFieldName);
-for (String hint : hints.keySet ()) {
-System.out.println ("HINT: " + hint);
-}
 
 			root =
 				Optional.<Record<?>>of (
@@ -495,30 +348,31 @@ System.out.println ("HINT: " + hint);
 
 		// work out root
 
-		Record<?> root;
+		Optional<Record<?>> root;
 
 		if (rootFieldName != null) {
 
 			root =
-				(Record<?>)
-				BeanLogic.getProperty (
-					container,
-					rootFieldName);
+				Optional.fromNullable (
+					(Record<?>)
+					BeanLogic.getProperty (
+						container,
+						rootFieldName));
 
 		} else {
 
-			root = null;
+			root =
+				Optional.absent ();
 
 		}
 
 		// render object path
 
-		return objectManager.tdForObject (
+		return objectManager.objectPath (
 			interfaceValue.orNull (),
 			root,
 			true,
-			link,
-			1);
+			link);
 
 	}
 

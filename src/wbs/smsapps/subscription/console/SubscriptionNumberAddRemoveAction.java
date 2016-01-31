@@ -14,6 +14,8 @@ import javax.inject.Named;
 
 import lombok.Cleanup;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -118,7 +120,8 @@ class SubscriptionNumberAddRemoveAction
 		formFieldLogic.update (
 			requestContext,
 			addRemoveFormFieldSet,
-			addRemoveForm);
+			addRemoveForm,
+			ImmutableMap.of ());
 
 		// parse numbers
 

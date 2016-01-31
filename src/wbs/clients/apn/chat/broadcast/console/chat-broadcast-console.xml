@@ -25,4 +25,105 @@
 
 	</extend-context>
 
+	<field-set
+		name="send-search"
+		class="wbs.clients.apn.chat.broadcast.console.ChatBroadcastSendForm">
+
+		<yes-no-field
+			name="search"
+			hidden="yes"/>
+
+		<interval-field
+			name="lastAction"
+			nullable="yes"/>
+
+		<enum-field
+			name="gender"
+			helper="genderConsoleHelper"
+			nullable="yes"/>
+
+		<enum-field
+			name="orient"
+			helper="orientConsoleHelper"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="hasPicture"
+			label="Picture"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="isAdult"
+			label="Adult"
+			nullable="yes"/>
+
+		<currency-field
+			name="minimumSpend"
+			label="Search spend minimum"
+			currency="chat.currency"
+			nullable="yes"/>
+
+		<currency-field
+			name="maximumSpend"
+			label="Search spend maximum"
+			currency="chat.currency"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="includeBlocked"
+			view-priv="chat:supervisor"/>
+
+		<yes-no-field
+			name="includeOptedOut"
+			view-priv="chat:supervisor"/>
+
+	</field-set>
+
+	<field-set
+		name="send-numbers"
+		class="wbs.clients.apn.chat.broadcast.console.ChatBroadcastSendForm">
+
+		<text-area-field
+			name="numbers"/>
+
+	</field-set>
+
+	<field-set
+		name="send-message-user"
+		class="wbs.clients.apn.chat.broadcast.console.ChatBroadcastSendForm">
+
+		<text-field
+			name="fromUser"/>
+
+	</field-set>
+
+	<field-set
+		name="send-message-message"
+		class="wbs.clients.apn.chat.broadcast.console.ChatBroadcastSendForm">
+
+		<text-field
+			name="prefix"
+			read-only="yes"/>
+
+		<text-area-field
+			name="message"
+			char-count-function="gsmCharCountNew"
+			char-count-data="{ maxReduceField: 'prefix' }"/>
+
+<!--
+	<td>From Opal 276831:  (
+		<span id="gsmCharCount-0">-</span>
+	)<br>
+	<textarea
+		class="gsmCharCount"
+		name="message"
+		rows="6"
+		cols="60"
+		data-char-count-max="142"
+		data-char-count-id="gsmCharCount-0"></textarea>
+	</td>
+-->
+
+	</field-set>
+
 </console-module>

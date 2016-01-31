@@ -131,32 +131,40 @@
 		<deleted-field/>
 
 		<yes-no-field
-			name="canIgnore"/>
+			name="canIgnore"
+			nullable="yes"/>
 
 		<yes-no-field
-			name="canSendMultiple"/>
+			name="canSendMultiple"
+			nullable="yes"/>
 
 		<text-area-field
 			name="infoText"
-			label="Operator info (html)"/>
+			label="Operator info (html)"
+			nullable="yes"/>
 
 		<yes-no-field
-			name="showDailyBillInfo"/>
+			name="showDailyBillInfo"
+			nullable="yes"/>
 
 		<seconds-field
-			name="preferredQueueTime"/>
+			name="preferredQueueTime"
+			nullable="yes"/>
 
 		<object-field
 			name="currency"
-			object-type="currency"/>
+			object-type="currency"
+			nullable="yes"/>
 
 		<object-field
 			name="unblockNumberList"
-			object-type="numberList"/>
+			object-type="numberList"
+			nullable="yes"/>
 
 		<object-field
 			name="smsCustomerManager"
-			object-type="smsCustomerManager"/>
+			object-type="smsCustomerManager"
+			nullable="yes"/>
 
 	</field-set>
 

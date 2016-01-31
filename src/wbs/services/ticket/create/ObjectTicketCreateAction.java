@@ -13,6 +13,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
@@ -346,7 +347,8 @@ class ObjectTicketCreateAction<
 			formFieldLogic.update (
 				requestContext,
 				formFieldSet,
-				ticket);
+				ticket,
+				ImmutableMap.of ());
 
 		if (updateResultSet.errorCount () > 0) {
 

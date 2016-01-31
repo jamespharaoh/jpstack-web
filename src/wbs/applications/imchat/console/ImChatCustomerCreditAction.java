@@ -8,6 +8,8 @@ import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
@@ -104,7 +106,8 @@ class ImChatCustomerCreditAction
 			formFieldLogic.update (
 				requestContext,
 				formFields,
-				request);
+				request,
+				ImmutableMap.of ());
 
 		if (updateResultSet.errorCount () > 0) {
 

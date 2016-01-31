@@ -61,7 +61,8 @@ class ChatUserImageUploadPart
 			formFieldLogic.update (
 				requestContext,
 				formFieldSet,
-				uploadForm);
+				uploadForm,
+				ImmutableMap.of ());
 
 		}
 

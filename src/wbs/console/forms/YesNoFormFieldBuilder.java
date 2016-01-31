@@ -32,6 +32,9 @@ class YesNoFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
+	Provider<HiddenFormField> hiddenFormFieldProvider;
+
+	@Inject
 	Provider<UpdatableFormField>
 	updatableFormFieldProvider;
 
@@ -101,6 +104,11 @@ class YesNoFormFieldBuilder {
 		Boolean readOnly =
 			ifNull (
 				spec.readOnly (),
+				false);
+
+		Boolean hidden =
+			ifNull (
+				spec.hidden (),
 				false);
 
 		String yesLabel =
@@ -198,7 +206,26 @@ class YesNoFormFieldBuilder {
 
 		// field
 
-		if (! readOnly) {
+		if (hidden) {
+
+			formFieldSet.addFormField (
+				hiddenFormFieldProvider.get ()
+
+				.name (
+					name)
+
+				.accessor (
+					accessor)
+
+				.nativeMapping (
+					nativeMapping)
+
+				.csvMapping (
+					csvMapping)
+
+			);
+
+		} else if (! readOnly) {
 
 			formFieldSet.addFormField (
 				updatableFormFieldProvider.get ()
@@ -208,6 +235,9 @@ class YesNoFormFieldBuilder {
 
 				.label (
 					label)
+
+				.viewPriv (
+					spec.viewPriv ())
 
 				.accessor (
 					accessor)
@@ -245,6 +275,9 @@ class YesNoFormFieldBuilder {
 
 				.label (
 					label)
+
+				.viewPriv (
+					spec.viewPriv ())
 
 				.accessor (
 					accessor)

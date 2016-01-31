@@ -352,6 +352,7 @@ class ImChatPendingSummaryPart
 					formatWriter,
 					messageFields,
 					historyReply,
+					ImmutableMap.of (),
 					true);
 
 				printFormat (
@@ -378,6 +379,7 @@ class ImChatPendingSummaryPart
 				formatWriter,
 				messageFields,
 				historyRequest,
+				ImmutableMap.of (),
 				true);
 
 			printFormat (

@@ -1,5 +1,6 @@
 package wbs.console.request;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
@@ -11,12 +12,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -358,6 +361,27 @@ class ConsoleRequestContextImplementation
 	Map<String,String> requestFormData () {
 
 		return parameterMapSimple ();
+
+	}
+
+	@Override
+	public
+	void formData (
+			@NonNull String name,
+			@NonNull String value) {
+
+		formData (
+			ImmutableMap.<String,String>copyOf (
+				getFormData ().entrySet ().stream ()
+					.map (entry ->
+						new SimpleEntry<> (
+							entry.getKey (),
+							equal (entry.getKey (), name)
+								? value
+								: entry.getValue ()))
+					.collect (Collectors.toMap (
+						Map.Entry::getKey,
+						Map.Entry::getValue))));
 
 	}
 

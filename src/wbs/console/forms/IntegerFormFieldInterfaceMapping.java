@@ -7,6 +7,9 @@ import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -35,6 +38,7 @@ class IntegerFormFieldInterfaceMapping<Container>
 	public
 	Either<Optional<Long>,String> interfaceToGeneric (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		// handle not present or empty
@@ -78,6 +82,7 @@ class IntegerFormFieldInterfaceMapping<Container>
 	public
 	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Long> genericValue) {
 
 		if (

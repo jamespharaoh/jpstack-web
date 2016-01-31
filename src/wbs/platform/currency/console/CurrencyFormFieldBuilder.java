@@ -11,6 +11,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.Range;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.forms.FormFieldAccessor;
 import wbs.console.forms.FormFieldBuilderContext;
@@ -27,6 +29,8 @@ import wbs.console.forms.IntegerFormFieldInterfaceMapping;
 import wbs.console.forms.IntegerFormFieldNativeMapping;
 import wbs.console.forms.IntegerFormFieldValueValidator;
 import wbs.console.forms.NullFormFieldConstraintValidator;
+import wbs.console.forms.RangeFormFieldInterfaceMapping;
+import wbs.console.forms.RangeFormFieldRenderer;
 import wbs.console.forms.ReadOnlyFormField;
 import wbs.console.forms.RequiredFormFieldValueValidator;
 import wbs.console.forms.SimpleFormFieldAccessor;
@@ -76,6 +80,14 @@ class CurrencyFormFieldBuilder {
 	@Inject
 	Provider<NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
+
+	@Inject
+	Provider<RangeFormFieldInterfaceMapping>
+	rangeFormFieldInterfaceMappingProvider;
+
+	@Inject
+	Provider<RangeFormFieldRenderer>
+	rangeFormFieldInterfaceRendererProvider;
 
 	@Inject
 	Provider<ReadOnlyFormField>
@@ -168,18 +180,30 @@ class CurrencyFormFieldBuilder {
 
 		// native mapping
 
-		FormFieldNativeMapping nativeMapping ;
+		FormFieldNativeMapping nativeMapping;
 
+		boolean range;
 
 		if (propertyClass == Integer.class) {
 
 			nativeMapping =
 				integerFormFieldNativeMappingProvider.get ();
 
+			range = false;
+
 		} else if (propertyClass == Long.class) {
 
 			nativeMapping =
 				identityFormFieldNativeMappingProvider.get ();
+
+			range = false;
+
+		} else if (propertyClass == Range.class) {
+
+			nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
+
+			range = true;
 
 		} else {
 
@@ -225,33 +249,69 @@ class CurrencyFormFieldBuilder {
 
 		// interface mapping
 
-		FormFieldInterfaceMapping interfaceMapping =
-			currencyFormFieldInterfaceMappingProvider.get ()
+		FormFieldInterfaceMapping interfaceMapping;
 
-			.currencyPath (
-				spec.currencyPath ())
+		if (range) {
 
-			.blankIfZero (
-				blankIfZero);
+			interfaceMapping =
+				rangeFormFieldInterfaceMappingProvider.get ()
+
+				.left (
+					currencyFormFieldInterfaceMappingProvider.get ()
+		
+					.currencyPath (
+						spec.currencyPath ())
+		
+					.blankIfZero (
+						blankIfZero))
+
+				.right (
+					currencyFormFieldInterfaceMappingProvider.get ()
+		
+					.currencyPath (
+						spec.currencyPath ())
+		
+					.blankIfZero (
+						blankIfZero));
+
+		} else {
+
+			interfaceMapping =
+				currencyFormFieldInterfaceMappingProvider.get ()
+	
+				.currencyPath (
+					spec.currencyPath ())
+	
+				.blankIfZero (
+					blankIfZero);
+
+		}
 
 		// renderer
 
-		FormFieldRenderer renderer =
+		FormFieldRenderer unitRenderer =
 			textFormFieldRendererProvider.get ()
-
+	
 			.name (
 				name)
-
+	
 			.label (
 				label)
-
+	
 			.nullable (
 				ifNull (
 					spec.nullable (),
 					false))
-
+	
 			.align (
 				TextFormFieldRenderer.Align.right);
+
+		FormFieldRenderer renderer =
+			range
+				? rangeFormFieldInterfaceRendererProvider.get ()
+					.minimum (unitRenderer)
+					.maximum (unitRenderer)
+				: unitRenderer;
 
 		// update hook
 

@@ -18,6 +18,7 @@ import lombok.experimental.Accessors;
 import org.apache.commons.fileupload.FileItem;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 import wbs.console.forms.FormField.FormType;
@@ -36,24 +37,48 @@ class FormFieldLogic {
 	UpdateResultSet update (
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormFieldSet formFieldSet,
-			@NonNull Object container) {
+			@NonNull Object container,
+			@NonNull Map<String,Object> hints) {
 
-		return update (
-			requestContextToSubmission (
-				requestContext),
+		UpdateResultSet updateResultSet =
+			new UpdateResultSet ();
+
+		update (
+			requestContext,
 			formFieldSet,
-			container);
+			updateResultSet,
+			container,
+			hints);
+
+		return updateResultSet;
 
 	}
 
 	public
-	UpdateResultSet update (
+	void update (
+			@NonNull ConsoleRequestContext requestContext,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull UpdateResultSet updateResults,
+			@NonNull Object container,
+			@NonNull Map<String,Object> hints) {
+
+		update (
+			requestContextToSubmission (
+				requestContext),
+			formFieldSet,
+			updateResults,
+			container,
+			hints);
+
+	}
+
+	public
+	void update (
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormFieldSet formFieldSet,
-			@NonNull Object container) {
-
-		UpdateResultSet updateResultSet =
-			new UpdateResultSet ();
+			@NonNull UpdateResultSet updateResults,
+			@NonNull Object container,
+			@NonNull Map<String,Object> hints) {
 
 		for (
 			FormField formField
@@ -66,30 +91,29 @@ class FormFieldLogic {
 			UpdateResult updateResult =
 				formField.update (
 					submission,
-					container);
+					container,
+					hints);
 
 			if (
 				isPresent (
 					updateResult.error ())
 			) {
 
-				updateResultSet.errorCount ++;
+				updateResults.errorCount ++;
 
 			} else if (
 				updateResult.updated ()
 			) {
 
-				updateResultSet.updateCount ++;
+				updateResults.updateCount ++;
 
 			}
 
-			updateResultSet.updateResults ().put (
+			updateResults.updateResults ().put (
 				formField.name (),
 				updateResult);
 
 		}
-
-		return updateResultSet;
 
 	}
 
@@ -317,6 +341,131 @@ class FormFieldLogic {
 	}
 
 	public
+	void outputFormAlwaysHidden (
+			@NonNull ConsoleRequestContext requestContext,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Optional<UpdateResultSet> updateResultSet,
+			@NonNull Object object,
+			@NonNull Map<String,Object> hints,
+			@NonNull FormType formType) {
+
+		outputFormAlwaysHidden (
+			requestContextToSubmission (
+				requestContext),
+			htmlWriter,
+			formFieldSet,
+			updateResultSet,
+			object,
+			hints,
+			formType);
+
+	}
+
+	public
+	void outputFormAlwaysHidden (
+			@NonNull FormFieldSubmission submission,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Optional<UpdateResultSet> updateResultSet,
+			@NonNull Object object,
+			@NonNull Map<String,Object> hints,
+			@NonNull FormType formType) {
+
+		for (
+			FormField formField
+				: formFieldSet.formFields ()
+		) {
+
+			if (formField.virtual ())
+				continue;
+
+			if (
+				! formField.canView (
+					object,
+					hints)
+			) {
+				continue;
+			}
+
+			if (
+				isPresent (
+					updateResultSet)
+			) {
+
+				updateResultSet.get ().updateResults ().get (
+					formField.name ());
+
+			}
+
+			formField.renderFormAlwaysHidden (
+				submission,
+				htmlWriter,
+				object,
+				hints,
+				formType);
+
+		}
+
+	}
+
+	public
+	void outputFormTemporarilyHidden (
+			@NonNull ConsoleRequestContext requestContext,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Object object,
+			@NonNull Map<String,Object> hints,
+			@NonNull FormType formType) {
+
+		outputFormTemporarilyHidden (
+			requestContextToSubmission (
+				requestContext),
+			htmlWriter,
+			formFieldSet,
+			object,
+			hints,
+			formType);
+
+	}
+
+	public
+	void outputFormTemporarilyHidden (
+			@NonNull FormFieldSubmission submission,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Object object,
+			@NonNull Map<String,Object> hints,
+			@NonNull FormType formType) {
+
+		for (
+			FormField formField
+				: formFieldSet.formFields ()
+		) {
+
+			if (formField.virtual ())
+				continue;
+
+			if (
+				! formField.canView (
+					object,
+					hints)
+			) {
+				continue;
+			}
+
+			formField.renderFormTemporarilyHidden (
+				submission,
+				htmlWriter,
+				object,
+				hints,
+				formType);
+
+		}
+
+	}
+
+	public
 	void outputFormRows (
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
@@ -333,6 +482,14 @@ class FormFieldLogic {
 
 			if (formField.virtual ())
 				continue;
+
+			if (
+				! formField.canView (
+					object,
+					hints)
+			) {
+				continue;
+			}
 
 			Optional<String> error;
 
@@ -373,7 +530,8 @@ class FormFieldLogic {
 			@NonNull String indent,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull FormType formType,
-			@NonNull Object object) {
+			@NonNull Object object,
+			@NonNull Map<String,Object> hints) {
 
 		for (
 			FormField formField
@@ -387,6 +545,7 @@ class FormFieldLogic {
 				javascriptWriter,
 				indent,
 				object,
+				hints,
 				formType);
 
 		}
@@ -532,6 +691,7 @@ class FormFieldLogic {
 					htmlWriter,
 					formFieldSet,
 					object,
+					ImmutableMap.of (),
 					links);
 
 				htmlWriter.writeFormat (
@@ -550,7 +710,8 @@ class FormFieldLogic {
 	void outputCsvRow (
 			@NonNull FormatWriter csvWriter,
 			@NonNull List<FormFieldSet> formFieldSets,
-			@NonNull Object object) {
+			@NonNull Object object,
+			@NonNull Map<String,Object> hints) {
 
 		boolean first = true;
 
@@ -576,7 +737,8 @@ class FormFieldLogic {
 
 				formField.renderCsvRow (
 					csvWriter,
-					object);
+					object,
+					hints);
 
 				first = false;
 
@@ -594,6 +756,7 @@ class FormFieldLogic {
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object object,
+			@NonNull Map<String,Object> hints,
 			boolean links) {
 
 		for (
@@ -607,6 +770,7 @@ class FormFieldLogic {
 			formField.renderTableCellList (
 				htmlWriter,
 				object,
+				hints,
 				links,
 				1);
 
@@ -633,6 +797,7 @@ class FormFieldLogic {
 			formField.renderTableCellList (
 				htmlWriter,
 				object,
+				ImmutableMap.of (),
 				links,
 				colspan);
 

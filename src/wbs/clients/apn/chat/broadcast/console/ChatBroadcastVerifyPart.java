@@ -2,16 +2,16 @@ package wbs.clients.apn.chat.broadcast.console;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.clients.apn.chat.core.console.ChatConsoleHelper;
@@ -20,18 +20,27 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.forms.FormField.FormType;
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.forms.FormFieldSet;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.misc.TimeFormatter;
+import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.sms.gsm.Gsm;
 
 @PrototypeComponent ("chatBroadcastVerifyPart")
 public
 class ChatBroadcastVerifyPart
 	extends AbstractPagePart {
+
+	// dependencies
+
+	@Inject @Named
+	ConsoleModule chatBroadcastConsoleModule;
 
 	@Inject
 	ChatConsoleHelper chatHelper;
@@ -46,46 +55,26 @@ class ChatBroadcastVerifyPart
 	Database database;
 
 	@Inject
+	FormFieldLogic formFieldLogic;
+
+	@Inject
 	TimeFormatter timeFormatter;
 
-	Map<String,String> params;
+	// state
 
 	ChatRec chat;
 	ChatUserRec fromUser;
 
-	boolean search;
+	FormFieldSet searchFields;
+	FormFieldSet numbersFields;
+	FormFieldSet messageUserFields;
+	FormFieldSet messageMessageFields;
 
-	@Override
-	public
-	void prepare () {
+	ChatBroadcastSendForm form;
+	Map<String,Object> formHints;
+	Optional<UpdateResultSet> updateResults;
 
-		@SuppressWarnings ("unchecked")
-		Map<String,String> paramsTemp =
-			(Map<String,String>)
-			requestContext.request (
-				"chatBroadcastParams");
-
-		params =
-			paramsTemp;
-
-		chat =
-			chatHelper.find (
-				requestContext.stuffInt (
-					"chatId"));
-
-		fromUser =
-			chatUserHelper.findByCode (
-				chat,
-				params.get (
-					"fromUserCode"));
-
-		search =
-			equal (
-				requestContext.getForm (
-					"search"),
-				"true");
-
-	}
+	// details
 
 	@Override
 	public
@@ -111,6 +100,62 @@ class ChatBroadcastVerifyPart
 
 	}
 
+	// implementation
+
+	@Override
+	public
+	void prepare () {
+
+		chat =
+			chatHelper.find (
+				requestContext.stuffInt (
+					"chatId"));
+
+		searchFields =
+			chatBroadcastConsoleModule.formFieldSets ().get (
+				"send-search");
+
+		numbersFields =
+			chatBroadcastConsoleModule.formFieldSets ().get (
+				"send-numbers");
+
+		messageUserFields =
+			chatBroadcastConsoleModule.formFieldSets ().get (
+				"send-message-user");
+
+		messageMessageFields =
+			chatBroadcastConsoleModule.formFieldSets ().get (
+				"send-message-message");
+
+		form =
+			(ChatBroadcastSendForm)
+			requestContext.request (
+				"chatBroadcastForm");
+
+		formHints =
+			ImmutableMap.<String,Object>builder ()
+
+			.put (
+				"chat",
+				chatHelper.find (
+					requestContext.stuffInt (
+						"chatId")))
+
+			.build ();
+
+		updateResults =
+			Optional.fromNullable (
+				(UpdateResultSet)
+				requestContext.request (
+					"chatBroadcastUpdates"));
+
+		fromUser =
+			chatUserHelper.findByCode (
+				chat,
+				form.fromUser ());
+
+	}
+
 	@Override
 	public
 	void renderHtmlBodyContent () {
@@ -120,41 +165,69 @@ class ChatBroadcastVerifyPart
 		printFormat (
 			"<form method=\"post\">\n");
 
-		printFormat (
-			"<p><input",
-			" type=\"submit\"",
-			" name=\"send\"",
-			" value=\"send\"",
-			">\n",
+		// always hidden
 
-			"<input",
-			" type=\"submit\"",
-			" name=\"back\"",
-			" value=\"back\"",
-			"></p>\n");
+		formFieldLogic.outputFormAlwaysHidden (
+			requestContext,
+			formatWriter,
+			searchFields,
+			updateResults,
+			form,
+			formHints,
+			FormType.search);
 
-		for (Map.Entry<String,String> entry
-				: params.entrySet ()) {
+		formFieldLogic.outputFormAlwaysHidden (
+			requestContext,
+			formatWriter,
+			numbersFields,
+			updateResults,
+			form,
+			formHints,
+			FormType.search);
 
-			if (
-				in (
-					entry.getKey (),
-					"verify",
-					"message")
-			) {
-				continue;
-			}
+		formFieldLogic.outputFormAlwaysHidden (
+			requestContext,
+			formatWriter,
+			messageUserFields,
+			updateResults,
+			form,
+			formHints,
+			FormType.search);
 
-			printFormat (
-				"<input",
-				" type=\"hidden\"",
-				" name=\"%h\"",
-				entry.getKey (),
-				" value=\"%h\"",
-				entry.getValue (),
-				">\n");
+		formFieldLogic.outputFormAlwaysHidden (
+			requestContext,
+			formatWriter,
+			messageMessageFields,
+			updateResults,
+			form,
+			formHints,
+			FormType.search);
 
-		}
+		// temporarily hidden
+
+		formFieldLogic.outputFormTemporarilyHidden (
+			requestContext,
+			formatWriter,
+			searchFields,
+			form,
+			formHints,
+			FormType.search);
+
+		formFieldLogic.outputFormTemporarilyHidden (
+			requestContext,
+			formatWriter,
+			numbersFields,
+			form,
+			formHints,
+			FormType.search);
+
+		formFieldLogic.outputFormTemporarilyHidden (
+			requestContext,
+			formatWriter,
+			messageUserFields,
+			form,
+			formHints,
+			FormType.search);
 
 		// message info
 
@@ -179,62 +252,39 @@ class ChatBroadcastVerifyPart
 			"</tr>\n");
 
 		printFormat (
-			"<tr> <th>From user info</th> <td>%h</td> </tr>\n",
+			"<tr>\n",
+			"<th>From user info</th>\n",
+			"<td>%h</td>\n",
 			fromUser.getInfoText () != null
 				? fromUser.getInfoText ().getText ()
-				: "-");
-
-		String prefix =
-			fromUser.getName () != null
-				? stringFormat (
-					"From %s %s: ",
-					fromUser.getName (),
-					fromUser.getCode ())
-				: stringFormat (
-					"From %s: ",
-					fromUser.getCode ());
-
-		String charCountId =
-			stringFormat (
-				"gsmCharCount-%d",
-				requestContext.requestUnique ());
-
-		printFormat (
-			"<tr>\n",
-			"<th>Message</th>\n",
-			"<td>%s</td>\n",
-			stringFormat (
-				"%h (%s)<br>%s",
-				prefix,
-				stringFormat (
-					"<span id=\"%h\">-</span>",
-					charCountId),
-				stringFormat (
-					"<textarea",
-					" class=\"gsmCharCount\"",
-					" name=\"message\"",
-					" rows=\"6\"",
-					" cols=\"60\"",
-					" data-char-count-max=\"%h\"",
-					160 - Gsm.length (prefix),
-					" data-char-count-id=\"%h\">",
-					charCountId,
-					"%h</textarea>",
-					emptyStringIfNull (
-						params.get (
-							"message")))),
+				: "-",
 			"</tr>\n");
+
+		formFieldLogic.outputFormRows (
+			requestContext,
+			formatWriter,
+			messageMessageFields,
+			Optional.absent (),
+			form,
+			formHints,
+			FormType.search);
 
 		printFormat (
 			"</table>\n");
 
 		printFormat (
-			"<input",
-			" type=\"hidden\"",
-			" name=\"prefix\"",
-			" value=\"%h\"",
-			prefix,
+			"<p><input",
+			" type=\"submit\"",
+			" name=\"send\"",
+			" value=\"send\"",
 			">\n");
+
+		printFormat (
+			"<input",
+			" type=\"submit\"",
+			" name=\"back\"",
+			" value=\"back\"",
+			"></p>\n");
 
 		printFormat (
 			"</form>\n");
@@ -247,13 +297,14 @@ class ChatBroadcastVerifyPart
 		@SuppressWarnings ("unchecked")
 		List<Integer> chatUserIds =
 			(List<Integer>)
-			requestContext.request ("chatBroadcastChatUserIds");
+			requestContext.request (
+				"chatBroadcastChatUserIds");
 
 		printFormat (
 			"<p>%d recipients in total.</p>\n",
 			chatUserIds.size ());
 
-		if (search) {
+		if (form.search ()) {
 
 			printFormat (
 				"<p>The actual number of recipients may change slightly on ",

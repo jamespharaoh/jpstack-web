@@ -920,7 +920,11 @@ class ChatUserDaoHibernate
 
 			.createAlias (
 				"_chatUser.chat",
-				"_chat");
+				"_chat")
+
+			.createAlias (
+				"_chatUser.number",
+				"_number");
 
 		if (
 			isNotNull (
@@ -936,20 +940,48 @@ class ChatUserDaoHibernate
 
 		if (
 			isNotNull (
-				search.lastJoin ())
+				search.type ())
 		) {
 
 			criteria.add (
-				Restrictions.ge (
-					"_chatUser.lastJoin",
-					instantToDate (
-						search.lastJoin ().getStart ())));
+				Restrictions.eq (
+					"_chatUser.type",
+					search.type ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.code ())
+		) {
 
 			criteria.add (
-				Restrictions.lt (
-					"_chatUser.lastJoin",
-					instantToDate (
-						search.lastJoin ().getEnd ())));
+				Restrictions.eq (
+					"_chatUser.code",
+					search.code ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.blockAll ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatUser.blockAll",
+					search.blockAll ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.deleted ())
+		) {
+
+			criteria.add (
+				Restrictions.isNotNull (
+					"_chatUser.number"));
 
 		}
 
@@ -979,24 +1011,238 @@ class ChatUserDaoHibernate
 
 		if (
 			isNotNull (
-				search.blockAll ())
+				search.numberLike ())
 		) {
 
 			criteria.add (
-				Restrictions.eq (
-					"_chatUser.blockAll",
-					search.blockAll ()));
+				Restrictions.like (
+					"_number.number",
+					search.numberLike ()));
 
 		}
 
 		if (
 			isNotNull (
-				search.deleted ())
+				search.name ())
 		) {
 
 			criteria.add (
-				Restrictions.isNotNull (
-					"_chatUser.number"));
+				Restrictions.ilike (
+					"_chatUser.name",
+					search.numberLike ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.info ())
+		) {
+
+			criteria.createAlias (
+				"_chatUser.infoText",
+				"_infoText");
+
+			criteria.add (
+				Restrictions.ilike (
+					"_infoText.text",
+					search.info ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.location ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatuser.locationPlace",
+					search.location ()
+			).ignoreCase ());
+
+		}
+
+		if (
+			isNotNull (
+				search.hasPicture ())
+		) {
+
+			criteria.add (
+				search.hasPicture ()
+					? Restrictions.isNotNull (
+						"_chatUser.mainChatUserImage")
+					: Restrictions.isNull (
+						"_chatUser.mainChatUserImage"));
+
+		}
+
+		if (
+			isNotNull (
+				search.hasVideo ())
+		) {
+
+			criteria.add (
+				search.hasVideo ()
+					? Restrictions.isNotNull (
+						"_chatUser.mainChatUserVideo")
+					: Restrictions.isNull (
+						"_chatUser.mainChatUserVideo"));
+
+		}
+
+		if (
+			isNotNull (
+				search.adultVerified ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatUser.adultVerified",
+					search.adultVerified ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.creditMode ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatUser.creditMode",
+					search.creditMode ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.creditFailed ())
+		) {
+
+			criteria.add (
+				Restrictions.ge (
+					"_chatUser.creditFailed",
+					search.creditFailed ().getMinimum ()));
+
+			criteria.add (
+				Restrictions.le (
+					"_chatUser.creditFailed",
+					search.creditFailed ().getMaximum ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.creditNoReports ())
+		) {
+
+			criteria.add (
+				Restrictions.ge (
+					"_chatUser.creditSent",
+					search.creditNoReports ().getMinimum ()));
+
+			criteria.add (
+				Restrictions.le (
+					"_chatUser.creditSent",
+					search.creditNoReports ().getMaximum ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.valueSinceEver ())
+		) {
+
+			criteria.add (
+				Restrictions.ge (
+					"_chatUser.valueSinceEver",
+					search.valueSinceEver ().getMinimum ()));
+
+			criteria.add (
+				Restrictions.le (
+					"_chatUser.valueSinceEver",
+					search.valueSinceEver ().getMaximum ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.firstJoin ())
+		) {
+
+			criteria.add (
+				Restrictions.ge (
+					"_chatUser.firstJoin",
+					instantToDate (
+						search.firstJoin ().getStart ())));
+
+			criteria.add (
+				Restrictions.lt (
+					"_chatUser.firstJoin",
+					instantToDate (
+						search.firstJoin ().getEnd ())));
+
+		}
+
+		if (
+			isNotNull (
+				search.lastAction ())
+		) {
+
+			criteria.add (
+				Restrictions.ge (
+					"_chatUser.lastAction",
+					instantToDate (
+						search.lastAction ().getStart ())));
+
+			criteria.add (
+				Restrictions.lt (
+					"_chatUser.lastAction",
+					instantToDate (
+						search.lastAction ().getEnd ())));
+
+		}
+
+		if (
+			isNotNull (
+				search.lastJoin ())
+		) {
+
+			criteria.add (
+				Restrictions.ge (
+					"_chatUser.lastJoin",
+					instantToDate (
+						search.lastJoin ().getStart ())));
+
+			criteria.add (
+				Restrictions.lt (
+					"_chatUser.lastJoin",
+					instantToDate (
+						search.lastJoin ().getEnd ())));
+
+		}
+
+		if (
+			isNotNull (
+				search.datingMode ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatUser.dateMode",
+					search.datingMode ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.deliveryMethodIn ())
+		) {
+
+			criteria.add (
+				Restrictions.in (
+					"_chatUser.deliveryMethod",
+					search.deliveryMethodIn ()));
 
 		}
 

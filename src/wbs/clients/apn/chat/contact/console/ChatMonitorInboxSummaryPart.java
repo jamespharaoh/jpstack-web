@@ -412,18 +412,24 @@ class ChatMonitorInboxSummaryPart
 
 		printFormat (
 			"<tr>\n",
-
 			"<th>Prefs</th>\n",
 
-			"<td>%h %h</td>\n",
+			"<td>%h %h (%h)</td>\n",
 			ifNull (monitorChatUser.getOrient (), "unknown"),
 			ifNull (monitorChatUser.getGender (), "something"),
+			monitorChatUser.getCategory () != null
+				? monitorChatUser.getCategory ().getName ()
+				: "no category",
 
-			"<td>%h %h</td>\n",
+			"<td>%h %h (%h)</td>\n",
 			ifNull (userChatUser.getOrient (), "unknown"),
 			ifNull (userChatUser.getGender (), "something"),
+			userChatUser.getCategory () != null
+				? userChatUser.getCategory ().getName ()
+				: "no category",
 
 			"</tr>\n");
+
 	}
 
 	void goCode () {

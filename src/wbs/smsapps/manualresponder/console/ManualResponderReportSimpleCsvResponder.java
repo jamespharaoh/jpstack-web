@@ -10,6 +10,7 @@ import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -94,7 +95,8 @@ class ManualResponderReportSimpleCsvResponder
 		formFieldLogic.update (
 			requestContext,
 			searchFormFieldSet,
-			searchForm);
+			searchForm,
+			ImmutableMap.of ());
 
 		reports =
 			manualResponderReportHelper.findByProcessedTime (
@@ -137,7 +139,8 @@ class ManualResponderReportSimpleCsvResponder
 				formatWriter,
 				ImmutableList.of (
 					resultsFormFieldSet),
-				report);
+				report,
+				ImmutableMap.of ());
 
 		}
 

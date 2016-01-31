@@ -2,6 +2,9 @@ package wbs.platform.media.console;
 
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.successResult;
+
+import java.util.Map;
+
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
@@ -21,6 +24,7 @@ class ImageCsvFormFieldInterfaceMapping<Container>
 	public
 	Either<Optional<MediaRec>,String> interfaceToGeneric (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		throw new UnsupportedOperationException ();
@@ -31,6 +35,7 @@ class ImageCsvFormFieldInterfaceMapping<Container>
 	public
 	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> genericValue) {
 
 		if (

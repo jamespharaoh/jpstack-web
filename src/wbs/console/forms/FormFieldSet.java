@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.contains;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +28,10 @@ public
 class FormFieldSet {
 
 	// properties
+
+	@DataAttribute
+	@Getter @Setter
+	String name;
 
 	@DataAttribute
 	@Getter @Setter
@@ -105,7 +110,11 @@ class FormFieldSet {
 					formField.name ())
 			) {
 
-				throw new RuntimeException ();
+				throw new RuntimeException (
+					stringFormat (
+						"Duplicated field name: %s.%s",
+						name (),
+						formField.name ()));
 
 			}
 

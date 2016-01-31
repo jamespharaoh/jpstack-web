@@ -36,6 +36,9 @@ class TextFormFieldBuilder {
 	Provider<DynamicFormFieldAccessor> dynamicFormFieldAccessorProvider;
 
 	@Inject
+	Provider<HiddenFormField> hiddenFormFieldProvider;
+
+	@Inject
 	Provider<IdentityFormFieldInterfaceMapping>
 	identityFormFieldInterfaceMappingProvider;
 
@@ -88,6 +91,11 @@ class TextFormFieldBuilder {
 		Boolean readOnly =
 			ifNull (
 				textFormFieldSpec.readOnly (),
+				false);
+
+		Boolean hidden =
+			ifNull (
+				textFormFieldSpec.hidden (),
 				false);
 
 		Boolean nullable =
@@ -203,7 +211,26 @@ class TextFormFieldBuilder {
 
 		// form field
 
-		if (readOnly) {
+		if (hidden) {
+
+			formFieldSet.addFormField (
+				hiddenFormFieldProvider.get ()
+
+				.name (
+					name)
+
+				.accessor (
+					accessor)
+
+				.nativeMapping (
+					nativeMapping)
+
+				.csvMapping (
+					interfaceMapping)
+
+			);
+
+		} else if (readOnly) {
 
 			formFieldSet.addFormField (
 				readOnlyFormFieldProvider.get ()

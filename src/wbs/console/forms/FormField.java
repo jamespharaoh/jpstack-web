@@ -42,6 +42,15 @@ interface FormField<Container,Generic,Native,Interface> {
 	Set<ScriptRef> scriptRefs ();
 
 	default
+	boolean canView (
+			@NonNull Container container,
+			@NonNull Map<String,Object> hints) {
+
+		return true;
+
+	}
+
+	default
 	void init (
 			String fieldSetName) {
 
@@ -51,62 +60,90 @@ interface FormField<Container,Generic,Native,Interface> {
 
 	default
 	void renderTableCellList (
-			FormatWriter out,
-			Container object,
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			boolean link,
 			int colspan) {
 
-		throw new UnsupportedOperationException ();
+		doNothing ();
 
 	}
 
 	default
 	void renderTableCellProperties (
-			@NonNull FormatWriter out,
-			@NonNull Container object,
-			@NonNull Map<String,Object> hints) {
+			FormatWriter htmlWriter,
+			Container container,
+			Map<String,Object> hints) {
 
-		throw new UnsupportedOperationException ();
+		doNothing ();
+
+	}
+
+	default
+	void renderFormAlwaysHidden (
+			FormFieldSubmission submission,
+			FormatWriter htmlWriter,
+			Container container,
+			Map<String,Object> hints,
+			FormType formType) {
+
+		doNothing ();
+
+	}
+
+	default
+	void renderFormTemporarilyHidden (
+			FormFieldSubmission submission,
+			FormatWriter htmlWriter,
+			Container container,
+			Map<String,Object> hints,
+			FormType formType) {
+
+		doNothing ();
 
 	}
 
 	default
 	void renderFormRow (
-			@NonNull FormFieldSubmission submission,
-			FormatWriter out,
-			Container object,
+			FormFieldSubmission submission,
+			FormatWriter htmlWriter,
+			Container container,
 			Map<String,Object> hints,
 			Optional<String> error,
 			FormType formType) {
 
-		throw new UnsupportedOperationException ();
+		doNothing ();
 
 	}
 
 	default
 	void renderFormReset (
-			FormatWriter out,
-			String indent,
-			Container container,
-			FormType formType) {
+			@NonNull FormatWriter htmlWriter,
+			@NonNull String indent,
+			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
+			@NonNull FormType formType) {
 
-		throw new UnsupportedOperationException ();
+		doNothing ();
 
 	}
 
 	default
 	void renderCsvRow (
-			FormatWriter out,
-			Container object) {
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map<String,Object> hints) {
 
-		throw new UnsupportedOperationException ();
+		doNothing ();
 
 	}
 
 	default
 	UpdateResult<Generic,Native> update (
-			FormFieldSubmission submission,
-			Container container) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull Container container,
+			@NonNull Map<String,Object> hints) {
 
 		throw new UnsupportedOperationException ();
 
@@ -120,7 +157,7 @@ interface FormField<Container,Generic,Native,Interface> {
 			Optional<Object> objectRef,
 			Optional<String> objectType) {
 
-		throw new UnsupportedOperationException ();
+		doNothing ();
 
 	}
 

@@ -93,7 +93,8 @@ class ManualResponderReportSimplePart
 		formFieldLogic.update (
 			requestContext,
 			searchFormFieldSet,
-			searchForm);
+			searchForm,
+			ImmutableMap.of ());
 
 		// perform search
 
@@ -184,7 +185,8 @@ class ManualResponderReportSimplePart
 				formatWriter,
 				resultsFormFieldSet,
 				report,
-			   true);
+				ImmutableMap.of (),
+				true);
 
 			printFormat (
 				"</tr>\n");

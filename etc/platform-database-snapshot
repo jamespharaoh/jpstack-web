@@ -28,8 +28,9 @@ elif ! test -e "$basebackup-$yesterday"; then
 
 		echo "========== BEGIN BACKUP =========="
 
-		ssh ubuntu@zuri-platform-database-32bit \
-			"psql txt2 -c \"select pg_start_backup ('$today');\""
+		lxc-attach --name "zuri-platform-database-32bit" -- \
+		sudo -H -u "ubuntu" \
+		psql "txt2" -c "select pg_start_backup ('$today');"
 
 		echo "========== PERFORM BACKUP =========="
 
@@ -57,8 +58,9 @@ elif ! test -e "$basebackup-$yesterday"; then
 
 		echo "========== END BACKUP =========="
 
-		ssh ubuntu@zuri-platform-database-32bit \
-			"psql txt2 -c \"select pg_stop_backup ();\""
+		lxc-attach --name "zuri-platform-database-32bit" -- \
+		sudo -H -u "ubuntu" \
+		psql "txt2" -c "select pg_stop_backup ();"
 
 		echo "========== DONE =========="
 
@@ -72,9 +74,9 @@ elif ! test -e "$dump-$yesterday"; then
 
 		{
 
-			lxc-attach -n zuri-platform-database-32bit -- \
-			sudo -H -u ubuntu -- \
-			pg_dump txt2 \
+			lxc-attach --name "zuri-platform-database-32bit" -- \
+			sudo -H -u "ubuntu" -- \
+			pg_dump "txt2" \
 
 		} | {
 

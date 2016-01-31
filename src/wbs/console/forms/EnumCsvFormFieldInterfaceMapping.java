@@ -3,6 +3,9 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.successResult;
+
+import java.util.Map;
+
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
@@ -20,6 +23,7 @@ class EnumCsvFormFieldInterfaceMapping<Container,Generic extends Enum<Generic>>
 	public
 	Either<Optional<Generic>,String> interfaceToGeneric (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		throw new UnsupportedOperationException ();
@@ -30,6 +34,7 @@ class EnumCsvFormFieldInterfaceMapping<Container,Generic extends Enum<Generic>>
 	public
 	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Generic> genericValue) {
 
 		if (

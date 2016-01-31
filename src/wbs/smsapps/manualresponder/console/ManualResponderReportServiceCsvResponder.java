@@ -13,6 +13,8 @@ import javax.inject.Named;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
+import com.google.common.collect.ImmutableMap;
+
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
@@ -101,7 +103,8 @@ class ManualResponderReportServiceCsvResponder
 		formFieldLogic.update (
 			requestContext,
 			searchFormFieldSet,
-			searchForm);
+			searchForm,
+			ImmutableMap.of ());
 
 		reports =
 			manualResponderReportHelper.findByProcessedTime (

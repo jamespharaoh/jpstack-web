@@ -95,6 +95,10 @@ interface ConsoleRequestContext {
 
 	Map<String,String> requestFormData ();
 
+	void formData (
+			String name,
+			String value);
+
 	String magicTdCheck (
 			String name,
 			String label,

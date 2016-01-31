@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.booleanToString;
+import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isPresent;
@@ -46,118 +47,33 @@ class YesNoFormFieldRenderer<Container>
 	@Getter @Setter
 	String noLabel;
 
-	// details
-
-	@Getter
-	boolean fileUpload = false;
-
 	// implementation
 
 	@Override
 	public
-	void renderTableCellList (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Optional<Boolean> interfaceValue,
-			boolean link,
-			int colspan) {
-
-		out.writeFormat (
-			"<td",
-			colspan > 1
-				? stringFormat (
-					" colspan=\"%h\"",
-					colspan)
-				: "",
-			">%s</td>\n",
-			interfaceToHtmlSimple (
-				container,
-				interfaceValue,
-				link));
-
-	}
-
-	@Override
-	public
-	void renderTableCellProperties (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Boolean> interfaceValue) {
-
-		out.writeFormat (
-			"<td>%s</td>\n",
-			interfaceToHtmlComplex (
-				container,
-				interfaceValue));
-
-	}
-
-	@Override
-	public
-	void renderTableRow (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Boolean> interfaceValue) {
-
-		out.writeFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
-			label ());
-
-		renderTableCellProperties (
-			out,
-			container,
-			hints,
-			interfaceValue);
-
-		out.writeFormat (
-			"</tr>\n");
-
-	}
-
-	@Override
-	public
-	void renderFormRow (
+	void renderFormTemporarilyHidden (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Boolean> interfaceValue,
-			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
 
-		out.writeFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
-			label (),
-			"<td>");
+		htmlWriter.writeFormat (
+			"<input",
+			" type=\"hidden\"",
+			" name=\"%h\"",
+			name (),
+			" value=\"%h\"",
+			booleanToString (
+				interfaceValue.orNull (),
+				"yes",
+				"no",
+				"none"),
+			">\n");
 
-		renderFormInput (
-			submission,
-			out,
-			container,
-			hints,
-			interfaceValue,
-			formType);
-
-		if (
-			isPresent (
-				error)
-		) {
-
-			out.writeFormat (
-				"<br>\n",
-				"%h",
-				error.get ());
-
-		}
-
-		out.writeFormat (
-			"</td>\n",
-			"</tr>\n");
-
+		doNothing ();
+		
 	}
 
 	@Override

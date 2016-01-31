@@ -1,12 +1,10 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.camelToHyphen;
-import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.hyphenToCamel;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
@@ -48,133 +46,30 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	@Getter @Setter
 	EnumConsoleHelper<Interface> enumConsoleHelper;
 
-	// details
-
-	@Getter
-	boolean fileUpload = false;
-
 	// implementation
 
 	@Override
-	public
-	void renderTableCellList (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Optional<Interface> interfaceValue,
-			boolean link,
-			int colspan) {
-
-		Optional<String> htmlClass =
-			interfaceValue.isPresent ()
-				? enumConsoleHelper.htmlClass (
-					interfaceValue.get ())
-				: Optional.<String>absent ();
-
-		out.writeFormat (
-			"<td",
-
-			colspan > 1
-				? stringFormat (
-					" colspan=\"%h\"",
-					colspan)
-				: "",
-
-			htmlClass.isPresent ()
-				? stringFormat (
-					" class=\"%h\"",
-					htmlClass.get ())
-				: "",
-
-			">%h</td>\n",
-			interfaceValue.isPresent ()
-				? camelToSpaces (
-					interfaceValue.get ().toString ())
-				: "");
-
-	}
-
-	@Override
-	public
-	void renderTableCellProperties (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue) {
-
-		out.writeFormat (
-			"<td>%h</td>\n",
-			interfaceValue.isPresent ()
-				? camelToSpaces (
-					interfaceValue.get ().toString ())
-				: "");
-
-	}
-
-	@Override
-	public
-	void renderTableRow (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue) {
-
-		out.writeFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
-			label ());
-
-		renderTableCellProperties (
-			out,
-			container,
-			hints,
-			interfaceValue);
-
-		out.writeFormat (
-			"</tr>\n");
-
-	}
-
-	@Override
-	public
-	void renderFormRow (
+	public 
+	void renderFormTemporarilyHidden (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
-			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
 
-		out.writeFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
-			label (),
-			"<td>");
-
-		renderFormInput (
-			submission,
-			out,
-			container,
-			hints,
-			interfaceValue,
-			formType);
-
-		if (
-			isPresent (
-				error)
-		) {
-
-			out.writeFormat (
-				"<br>\n",
-				"%h",
-				error.get ());
-
-		}
-
-		out.writeFormat (
-			"</td>\n",
-			"</tr>\n");
-
+		htmlWriter.writeFormat (
+			"<input",
+			" type=\"hidden\"",
+			" name=\"%h\"",
+			name (),
+			" value=\"%h\"",
+			interfaceValue.isPresent ()
+				? camelToHyphen (
+					interfaceValue.get ().name ())
+				: "none",
+			">\n");
+		
 	}
 
 	@Override

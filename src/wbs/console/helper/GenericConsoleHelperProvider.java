@@ -1,5 +1,6 @@
 package wbs.console.helper;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
@@ -436,6 +437,12 @@ class GenericConsoleHelperProvider
 	boolean canView (
 			Record object) {
 
+		// types are always visible
+
+		if (objectHelper.type ()) {
+			return true;
+		}
+
 		// view privs
 
 		if (viewPrivKeySpecs != null) {
@@ -466,7 +473,18 @@ class GenericConsoleHelperProvider
 
 		// view delegate
 
-		if (viewDelegateField != null) {
+		if (
+			isNotNull (
+				viewDelegateField)
+		) {
+
+			if (
+				equal (
+					viewDelegateField,
+					"public")
+			) {
+				return true;
+			}
 
 			Record<?> delegate =
 				(Record)
@@ -491,12 +509,6 @@ class GenericConsoleHelperProvider
 
 			}
 
-		}
-
-		// types are always visible
-
-		if (objectHelper.type ()) {
-			return true;
 		}
 
 		// default

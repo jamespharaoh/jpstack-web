@@ -25,6 +25,7 @@ import lombok.experimental.Accessors;
 import org.joda.time.Interval;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleContext;
@@ -700,6 +701,7 @@ class ObjectListPart<
 				formatWriter,
 				formFieldSet,
 				object,
+				ImmutableMap.of (),
 				false);
 
 			printFormat (

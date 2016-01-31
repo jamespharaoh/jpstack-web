@@ -1,11 +1,16 @@
 package wbs.clients.apn.chat.user.core.model;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import org.apache.commons.lang3.Range;
 import org.joda.time.Interval;
+
+import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
+import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 
 @Accessors (fluent = true)
 @Data
@@ -15,12 +20,39 @@ class ChatUserSearch
 
 	Integer chatId;
 
-	Interval lastJoin;
+	ChatUserType type;
+
+	String code;
+
+	Boolean blockAll;
+	Boolean deleted;
 
 	Gender gender;
 	Orient orient;
 
-	Boolean blockAll;
-	Boolean deleted;
+	String numberLike;
+
+	String name;
+	String info;
+	String location;
+
+	Boolean hasPicture;
+	Boolean hasVideo;
+
+	Boolean adultVerified;
+
+	ChatUserCreditMode creditMode;
+
+	Range<Long> creditFailed;
+	Range<Long> creditNoReports;
+	Range<Long> valueSinceEver;
+
+	Interval firstJoin;
+	Interval lastAction;
+	Interval lastJoin;
+
+	ChatUserDateMode datingMode;
+
+	Collection<ChatMessageMethod> deliveryMethodIn;
 
 }

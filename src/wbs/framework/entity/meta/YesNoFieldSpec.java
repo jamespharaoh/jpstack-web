@@ -31,4 +31,7 @@ class YesNoFieldSpec
 		name = "column")
 	String columnName;
 
+	@DataAttribute
+	Boolean hidden;
+
 }

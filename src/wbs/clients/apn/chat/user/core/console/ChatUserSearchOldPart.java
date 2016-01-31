@@ -18,9 +18,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 
-@PrototypeComponent ("chatUserSearchPart")
+@PrototypeComponent ("chatUserSearchOldPart")
 public
-class ChatUserSearchPart
+class ChatUserSearchOldPart
 	extends AbstractPagePart {
 
 	// dependencies
@@ -93,15 +93,16 @@ class ChatUserSearchPart
 			" method=\"post\"",
 			" action=\"%h\"",
 			requestContext.resolveLocalUrl (
-				"/chatUser.search"),
+				"/chatUser.search.old"),
 			">\n");
 
 		printFormat (
 			"<p><input",
 			" type=\"submit\"",
 			" value=\"search\"",
-			">\n",
+			">\n");
 
+		printFormat (
 			"<input",
 			" type=\"button\"",
 			" value=\"clear form\"",

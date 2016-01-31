@@ -2,6 +2,8 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.successResult;
 
+import java.util.Map;
+
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
@@ -19,6 +21,7 @@ class IdentityFormFieldInterfaceMapping<Container,Type>
 	public
 	Either<Optional<Type>,String> interfaceToGeneric (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Type> value) {
 
 		return successResult (
@@ -30,6 +33,7 @@ class IdentityFormFieldInterfaceMapping<Container,Type>
 	public
 	Either<Optional<Type>,String> genericToInterface (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Type> value) {
 
 		return successResult (

@@ -1,5 +1,7 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import java.util.Map;
 
 import com.google.common.base.Optional;
@@ -12,46 +14,29 @@ import wbs.framework.utils.etc.FormatWriter;
 public
 interface FormFieldRenderer<Container,Interface> {
 
-	boolean fileUpload ();
+	default
+	boolean fileUpload () {
+		return false;
+	}
 
-	void renderTableCellProperties (
-			FormatWriter out,
-			Container container,
-			Map<String,Object> hints,
-			Optional<Interface> interfaceValue);
-
-	void renderTableCellList (
-			FormatWriter out,
-			Container container,
-			Optional<Interface> interfaceValue,
-			boolean link,
-			int colspan);
-
-	void renderTableRow (
-			FormatWriter out,
-			Container container,
-			Map<String,Object> hints,
-			Optional<Interface> interfaceValue);
-
-	void renderFormRow (
+	void renderFormTemporarilyHidden (
 			FormFieldSubmission submission,
-			FormatWriter out,
+			FormatWriter htmlWriter,
 			Container container,
 			Map<String,Object> hints,
 			Optional<Interface> interfaceValue,
-			Optional<String> error,
 			FormType formType);
 
 	void renderFormInput (
 			FormFieldSubmission submission,
-			FormatWriter out,
+			FormatWriter htmlWriter,
 			Container container,
 			Map<String,Object> hints,
 			Optional<Interface> interfaceValue,
 			FormType formType);
 
 	void renderFormReset (
-			FormatWriter out,
+			FormatWriter htmlWriter,
 			String indent,
 			Container container,
 			Optional<Interface> interfaceValue,
@@ -62,6 +47,28 @@ interface FormFieldRenderer<Container,Interface> {
 
 	Either<Optional<Interface>,String> formToInterface (
 			FormFieldSubmission submission);
+
+	default
+	String interfaceToHtmlTableCell (
+			Container container,
+			Optional<Interface> interfaceValue,
+			boolean link,
+			int colspan) {
+
+		return stringFormat (
+			"<td",
+			colspan != 1
+				? stringFormat (
+					" colspan=\"%h\"",
+					colspan)
+				: "",
+			">%s</td>",
+			interfaceToHtmlSimple (
+				container,
+				interfaceValue,
+				link));
+
+	}
 
 	String interfaceToHtmlSimple (
 			Container container,

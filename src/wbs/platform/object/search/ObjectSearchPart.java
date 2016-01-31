@@ -170,7 +170,8 @@ class ObjectSearchPart
 			"\t\t",
 			formFieldSet,
 			FormType.search,
-			search);
+			search,
+			ImmutableMap.of ());
 
 		printFormat (
 			"\t}\n");

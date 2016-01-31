@@ -35,12 +35,25 @@
 
 		<list>
 
-			<context-tab-action-page
-				name="search"/>
+			<section
+				name="search"
+				label="Search">
 
-			<context-tab-responder
-				name="searchResults"
-				tab="chatUser.search"/>
+				<object-search-page
+					name="new"
+					tab-label="New"
+					search-fields="search"
+					results-fields="results"
+					priv-key="chat.supervisor"/>
+
+				<context-tab-action-page
+					name="old"/>
+	
+				<context-tab-responder
+					name="oldResults"
+					tab="chatUser.search.old"/>
+
+			</section>
 
 			<context-tab-responder-page
 				name="online"/>
@@ -81,6 +94,85 @@
 		</object>
 
 	</object-context>
+
+	<field-set
+		name="search"
+		class="wbs.clients.apn.chat.user.core.model.ChatUserSearch">
+
+		<enum-field
+			name="type"
+			helper="chatUserTypeConsoleHelper"
+			nullable="yes"/>
+
+		<text-field
+			name="code"
+			nullable="yes"/>
+
+		<enum-field
+			name="gender"
+			helper="genderConsoleHelper"
+			nullable="yes"/>
+
+		<enum-field
+			name="orient"
+			helper="orientConsoleHelper"
+			nullable="yes"/>
+
+		<text-field
+			name="numberLike"
+			label="Number"
+			nullable="yes"/>
+
+		<!-- TODO include deleted -->
+
+		<text-field
+			name="name"
+			nullable="yes"/>
+
+		<text-field
+			name="info"
+			nullable="yes"/>
+
+		<text-field
+			name="location"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="hasPicture"/>
+
+		<yes-no-field
+			name="hasVideo"/>
+
+		<yes-no-field
+			name="adultVerified"/>
+
+		<enum-field
+			name="creditMode"
+			helper="chatUserCreditModeConsoleHelper"/>
+
+		<currency-field
+			name="creditFailed"
+			currency="chat.currency"/>
+
+<!--
+Credit failed 	to
+Credit no reports 	to
+Total spent 	to
+First join 	to
+Dating mode 	
+Online 	
+Output 	
+Order 	
+Max results 	
+-->
+
+	</field-set>
+
+	<field-set
+		name="results"
+		object-name="chatUser">
+
+	</field-set>
 
 	<field-set
 		name="create"

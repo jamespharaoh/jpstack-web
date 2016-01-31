@@ -102,7 +102,8 @@ class ManualResponderReportServicePart
 		formFieldLogic.update (
 			requestContext,
 			searchFormFieldSet,
-			searchForm);
+			searchForm,
+			ImmutableMap.of ());
 
 		// perform search
 

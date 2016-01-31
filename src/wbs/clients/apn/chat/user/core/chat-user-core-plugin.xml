@@ -39,10 +39,11 @@
 		<bean class="console.ChatUserNotesPart"/>
 		<bean class="console.ChatUserNumberLinkProvider"/>
 		<bean class="console.ChatUserOnlinePart"/>
-		<bean class="console.ChatUserSearchAction"/>
-		<bean class="console.ChatUserSearchPart"/>
-		<bean class="console.ChatUserSearchResultsPart"/>
+		<bean class="console.ChatUserSearchOldAction"/>
+		<bean class="console.ChatUserSearchOldPart"/>
+		<bean class="console.ChatUserSearchOldResultsPart"/>
 		<bean class="console.ChatUserSummaryPart"/>
+		<bean class="console.ChatUserTypeConsoleHelper"/>
 	</layer>
 
 	<layer name="daemon">

@@ -127,7 +127,13 @@ class FormFieldSetBuilder {
 				consoleHelper);
 
 		FormFieldSet formFieldSet =
-			new FormFieldSet ();
+			new FormFieldSet ()
+
+			.name (
+				joinWithSeparator (
+					".",
+					spec.consoleModule ().name (),
+					spec.name ()));
 
 		builder.descend (
 			formFieldBuilderContext,

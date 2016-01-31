@@ -4,6 +4,8 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.successResult;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import lombok.Getter;
@@ -41,6 +43,7 @@ class ObjectCsvFormFieldInterfaceMapping<Container,Generic extends Record<Generi
 	public
 	Either<Optional<Generic>,String> interfaceToGeneric (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		throw new UnsupportedOperationException ();
@@ -51,6 +54,7 @@ class ObjectCsvFormFieldInterfaceMapping<Container,Generic extends Record<Generi
 	public
 	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Generic> genericValue) {
 
 		if (

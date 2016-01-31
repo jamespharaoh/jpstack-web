@@ -34,9 +34,15 @@ class YesNoFormFieldSpec {
 	Boolean readOnly;
 
 	@DataAttribute
+	Boolean hidden;
+
+	@DataAttribute
 	String yesLabel;
 
 	@DataAttribute
 	String noLabel;
+
+	@DataAttribute
+	String viewPriv;
 
 }

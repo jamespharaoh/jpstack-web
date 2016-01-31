@@ -129,7 +129,7 @@ class ConsoleObjectManagerImplementation
 			int colspan) {
 
 		if (object == null)
-			return "<td>-</td>";
+			return "<td>&mdash;</td>";
 
 		ConsoleHelper<?> objectHelper =
 			findConsoleHelper (

@@ -7,6 +7,8 @@ import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import lombok.Getter;
@@ -49,6 +51,7 @@ class TimestampFromFormFieldInterfaceMapping<Container>
 	public
 	Either<Optional<Instant>,String> interfaceToGeneric (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue) {
 
 		if (
@@ -97,6 +100,7 @@ class TimestampFromFormFieldInterfaceMapping<Container>
 	public
 	Either<Optional<String>,String> genericToInterface (
 			@NonNull Container container,
+			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Instant> genericValue) {
 
 		if (

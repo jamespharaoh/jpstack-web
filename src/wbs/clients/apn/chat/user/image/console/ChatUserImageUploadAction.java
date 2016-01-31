@@ -16,6 +16,7 @@ import javax.inject.Named;
 import lombok.Cleanup;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -111,7 +112,8 @@ class ChatUserImageUploadAction
 		formFieldLogic.update (
 			requestContext,
 			formFieldSet,
-			uploadForm);
+			uploadForm,
+			ImmutableMap.of ());
 
 		String resultType;
 		String extension;

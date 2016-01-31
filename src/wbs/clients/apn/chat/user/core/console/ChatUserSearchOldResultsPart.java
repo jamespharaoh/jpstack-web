@@ -37,9 +37,9 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
 
-@PrototypeComponent ("chatUserSearchResultsPart")
+@PrototypeComponent ("chatUserSearchOldResultsPart")
 public
-class ChatUserSearchResultsPart
+class ChatUserSearchOldResultsPart
 	extends AbstractPagePart {
 
 	// dependencies

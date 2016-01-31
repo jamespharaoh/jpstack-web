@@ -36,6 +36,11 @@
 			template="yes"/>
 
 		<priv-type
+			name="View"
+			description="View all contents of a slice"
+			template="yes"/>
+
+		<priv-type
 			name="Supervisor"
 			description="View supervisor reports for a slice"
 			template="yes"/>

@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
@@ -79,7 +80,8 @@ class ContextFormActionAction<FormState>
 			formFieldLogic.update (
 				requestContext,
 				fields,
-				formState);
+				formState,
+				ImmutableMap.of ());
 
 		if (updateResultSet.errorCount () > 0) {
 			return null;

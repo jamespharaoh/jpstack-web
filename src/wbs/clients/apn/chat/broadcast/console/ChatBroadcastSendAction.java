@@ -1,21 +1,23 @@
 package wbs.clients.apn.chat.broadcast.console;
 
 import static wbs.framework.utils.etc.Misc.allOf;
+import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.Misc.moreThanZero;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 
+import org.apache.commons.lang3.Range;
 import org.apache.log4j.Level;
 
 import com.google.common.collect.ImmutableList;
@@ -35,20 +37,14 @@ import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
-import wbs.clients.apn.chat.user.core.model.Gender;
-import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.console.action.ConsoleAction;
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.param.CheckboxParamChecker;
-import wbs.console.param.EnumParamChecker;
-import wbs.console.param.IntegerParamChecker;
-import wbs.console.param.ParamChecker;
-import wbs.console.param.ParamCheckerSet;
-import wbs.console.param.RegexpParamChecker;
-import wbs.console.param.TimestampFromParamChecker;
-import wbs.console.param.TimestampToParamChecker;
-import wbs.console.param.YesNoParamChecker;
+import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -87,6 +83,9 @@ class ChatBroadcastSendAction
 	@Inject
 	BatchLogic batchLogic;
 
+	@Inject @Named
+	ConsoleModule chatBroadcastConsoleModule;
+
 	@Inject
 	ChatBroadcastObjectHelper chatBroadcastHelper;
 
@@ -116,6 +115,9 @@ class ChatBroadcastSendAction
 
 	@Inject
 	Database database;
+
+	@Inject
+	FormFieldLogic formFieldLogic;
 
 	@Inject
 	MagicNumberLogic magicNumberLogic;
@@ -168,6 +170,12 @@ class ChatBroadcastSendAction
 	public
 	Responder goReal () {
 
+		boolean verify =
+			requestContext.getForm ("verify") != null;
+
+		boolean send =
+			requestContext.getForm ("send") != null;
+
 		ProfileLogger profileLogger =
 			new ProfileLogger (
 				log,
@@ -176,74 +184,146 @@ class ChatBroadcastSendAction
 
 		try {
 
-			// save params in session
+			@Cleanup
+			Transaction transaction =
+				database.beginReadWrite (
+					this);
 
-			profileLogger.lap (
-				"params");
+			// load form
 
-			Map<String,String> sessionParams =
-				requestContext.parameterMapSimple ();
+			FormFieldSet searchFields =
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-search");
 
-			if (requestContext.getForm ("searchOn") != null) {
+			FormFieldSet numbersFields =
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-numbers");
 
-				sessionParams.put (
-					"search",
-					"true");
+			FormFieldSet messageUserFields =
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-message-user");
+
+			FormFieldSet messageMessageFields =
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-message-message");
+
+			ChatBroadcastSendForm form =
+				new ChatBroadcastSendForm ()
+
+				.search (
+					requestContext.getForm ("search") != null)
+			
+				.includeBlocked (
+					false)
+
+				.includeOptedOut (
+					false);
+
+			Map<String,Object> formHints =
+				ImmutableMap.<String,Object>builder ()
+	
+				.put (
+					"chat",
+					chatHelper.find (
+						requestContext.stuffInt (
+							"chatId")))
+	
+				.build ();
+
+			UpdateResultSet updateResults =
+				new UpdateResultSet ();
+
+			formFieldLogic.update (
+				requestContext,
+				searchFields,
+				verify
+					? updateResults
+					: new UpdateResultSet (),
+				form,
+				formHints);
+
+			formFieldLogic.update (
+				requestContext,
+				numbersFields,
+				verify
+					? updateResults
+					: new UpdateResultSet (),
+				form,
+				formHints);
+
+			formFieldLogic.update (
+				requestContext,
+				messageUserFields,
+				verify
+					? updateResults
+					: new UpdateResultSet (),
+				form,
+				formHints);
+
+			formFieldLogic.update (
+				requestContext,
+				messageMessageFields,
+				send
+					? updateResults
+					: new UpdateResultSet (),
+				form,
+				formHints);
+
+			requestContext.request (
+				"chatBroadcastForm",
+				form);
+
+			// enable or disable search
+
+			if (
+				isNotNull (
+					requestContext.getForm (
+						"searchOn"))
+			) {
+
+				form.search (
+					true);
+	
+				return null;
+	
+			}
+	
+			if (
+				isNotNull (
+					requestContext.getForm (
+						"searchOff"))
+			) {
+	
+				form.search (
+					false);
+	
+				return null;
+	
+			}
+
+			// report errors
+
+			if (
+				moreThanZero (
+					updateResults.errorCount ())
+			) {
+						
+				formFieldLogic.reportErrors (
+					requestContext,
+					updateResults);
+				
+				return null;
 
 			}
 
-			if (requestContext.getForm ("searchOff") != null) {
+			// do some work
 
-				sessionParams.put (
-					"search",
-					"false");
-
-			}
-
-			requestContext.session (
-				"chatBroadcastParams",
-				(Serializable)
-				sessionParams);
-
-			boolean verify =
-				requestContext.getForm ("verify") != null;
-
-			boolean send =
-				requestContext.getForm ("send") != null;
-
-			if (verify || send) {
-
-				// verify params
-
-				profileLogger.lap ("verify params");
-
-				ParamCheckerSet paramChecker =
-					send
-						? sendParamChecker
-						: verifyParamChecker;
-
-				Map<String,Object> params =
-					paramChecker.apply (requestContext);
-
-				if (params == null) {
-
-					return responder (
-						"chatBroadcastSendResponder");
-
-				}
-
-				boolean search =
-					(Boolean) params.get ("search");
+			if (send || verify) {
 
 				// start transaction
 
 				profileLogger.lap (
 					"start transaction");
-
-				@Cleanup
-				Transaction transaction =
-					database.beginReadWrite (
-						this);
 
 				ChatRec chat =
 					chatHelper.find (
@@ -256,21 +336,29 @@ class ChatBroadcastSendAction
 				ChatUserRec fromChatUser =
 					chatUserHelper.findByCode (
 						chat,
-						(String) params.get (
-							"fromUserCode"));
+						form.fromUser ());
 
 				if (fromChatUser == null) {
 
 					requestContext.addError (
 						stringFormat (
 							"Chat user not found: %s",
-							params.get (
-								"fromUserCode")));
+							form.fromUser ()));
 
 					return responder (
 						"chatBroadcastSendResponder");
 
 				}
+
+				form.prefix (
+					fromChatUser.getName () != null
+						? stringFormat (
+							"From %s %s: ",
+							fromChatUser.getName (),
+							fromChatUser.getCode ())
+						: stringFormat (
+							"From %s: ",
+							fromChatUser.getCode ()));
 
 				if (fromChatUser.getType () != ChatUserType.monitor) {
 
@@ -289,91 +377,54 @@ class ChatBroadcastSendAction
 				List<Integer> allChatUserIds =
 					new ArrayList<Integer> ();
 
-				if (search) {
+				if (form.search ()) {
 
 					profileLogger.lap ("perform search");
 
-					Map<String,Object> searchMap =
-						new LinkedHashMap<String,Object> ();
+					ChatUserSearch search =
+						new ChatUserSearch ()
 
-					searchMap.put ("chatId", chat.getId ());
-					searchMap.put ("type", ChatUserType.user);
-					searchMap.put ("notDeleted", true);
-					searchMap.put ("number", "447_________");
+						.chatId (
+							chat.getId ())
 
-					searchMap.put ("deliveryMethodIn",
-						ImmutableList.<ChatMessageMethod>of (
-							ChatMessageMethod.sms));
+						.type (
+							ChatUserType.user)
 
-					// TODO block all?
+						.deleted (
+							false)
 
-					if (params.get ("searchLastActionFrom") != null) {
+						.numberLike (
+							"447_________")
 
-						searchMap.put (
-							"lastActionAfter",
-							params.get ("searchLastActionFrom"));
+						.deliveryMethodIn (
+							ImmutableList.of (
+								ChatMessageMethod.sms))
 
-					}
+						// TODO block all? done later...
 
-					if (params.get ("searchLastActionTo") != null) {
+						.lastAction (
+							form.lastAction ())
 
-						searchMap.put (
-							"lastActionBefore",
-							params.get ("searchLastActionTo"));
+						.gender (
+							form.gender ())							
 
-					}
+						.orient (
+							form.orient ())
 
-					if (params.get ("searchGender") != null) {
+						.hasPicture (
+							form.hasPicture ())
 
-						searchMap.put (
-							"gender",
-							params.get ("searchGender"));
-
-					}
-
-					if (params.get ("searchOrient") != null) {
-
-						searchMap.put (
-							"orient",
-							params.get ("searchOrient"));
-
-					}
-
-					if (params.get ("searchPicture") != null) {
-
-						searchMap.put (
-							"hasImage",
-							params.get ("searchPicture"));
-
-					}
-
-					if (params.get ("searchAdult") != null) {
-
-						searchMap.put (
-							"adultVerified",
-							params.get ("searchAdult"));
-
-					}
-
-					if (params.get ("searchSpendMin") != null) {
-
-						searchMap.put (
-							"valueSinceEverGte",
-							((Long) params.get ("searchSpendMin")) * 100);
-
-					}
-
-					if (params.get ("searchSpendMax") != null) {
-
-						searchMap.put (
-							"valueSinceEverLte",
-							((Long) params.get ("searchSpendMax")) * 100);
-
-					}
+						.adultVerified (
+							form.isAdult ())
+							
+						.valueSinceEver (
+							Range.between (
+								form.minimumSpend (),
+								form.maximumSpend ()));
 
 					allChatUserIds =
 						chatUserHelper.searchIds (
-							searchMap);
+							search);
 
 					log.debug (
 						stringFormat (
@@ -384,7 +435,7 @@ class ChatBroadcastSendAction
 
 				// check numbers
 
-				if (! search) {
+				if (! form.search ()) {
 
 					profileLogger.lap ("check numbers");
 
@@ -453,13 +504,15 @@ class ChatBroadcastSendAction
 
 				boolean includeBlocked =
 					allOf (
-						requestContext.canContext ("chat.manage"),
-						(Boolean) params.get ("includeBlocked"));
+						requestContext.canContext (
+							"chat.manage"),
+						form.includeBlocked ());
 
 				boolean includeOptedOut =
 					allOf (
-						requestContext.canContext ("chat.manage"),
-						(Boolean) params.get ("includeOptedOut"));
+						requestContext.canContext (
+							"chat.manage"),
+						form.includeOptedOut ());
 
 				for (
 					Integer chatUserId
@@ -524,10 +577,6 @@ class ChatBroadcastSendAction
 				// show verify page
 
 				requestContext.request (
-					"chatBroadcastParams",
-					sessionParams);
-
-				requestContext.request (
 					"chatBroadcastChatUserIds",
 					remainingChatUserIds);
 
@@ -535,7 +584,8 @@ class ChatBroadcastSendAction
 
 					profileLogger.end ();
 
-					return responder ("chatBroadcastVerifyResponder");
+					return responder (
+						"chatBroadcastVerifyResponder");
 
 				}
 
@@ -550,8 +600,8 @@ class ChatBroadcastSendAction
 
 				String messageString =
 					joinWithoutSeparator (
-						(String) params.get ("prefix"),
-						(String) params.get ("message"));
+						form.prefix (),
+						form.message ());
 
 				int messageLength =
 					Gsm.length (
@@ -561,14 +611,6 @@ class ChatBroadcastSendAction
 
 					requestContext.addError (
 						"Message is over 160 characters");
-
-					requestContext.request (
-						"chatBroadcastParams",
-						sessionParams);
-
-					requestContext.request (
-						"chatBroadcastChatUserIds",
-						remainingChatUserIds);
 
 					return null;
 
@@ -610,89 +652,41 @@ class ChatBroadcastSendAction
 						remainingChatUserIds.size ())
 
 					.setSearch (
-						search);
+						form.search ());
 
-				if (search) {
+				if (form.search ()) {
 
-					if (params.get ("searchLastActionFrom") != null) {
+					chatBroadcast
 
-						chatBroadcast
+						.setSearchLastActionFrom (
+							form.lastAction () != null
+								? instantToDate (
+									form.lastAction ().getStart ())
+								: null)
 
-							.setSearchLastActionFrom (
-								(Date)
-								params.get ("searchLastActionFrom"));
+						.setSearchLastActionTo (
+							form.lastAction () != null
+								? instantToDate (
+									form.lastAction ().getEnd ())
+								: null)
 
-					}
+						.setSearchGender (
+							form.gender ())
 
-					if (params.get ("searchLastActionTo") != null) {
+						.setSearchOrient (
+							form.orient ())
 
-						chatBroadcast
+						.setSearchPicture (
+							form.hasPicture ())
 
-							.setSearchLastActionTo (
-								(Date)
-								params.get ("searchLastActionTo"));
+						.setSearchAdult (
+							form.isAdult ())
 
-					}
+						.setSearchSpendMin (
+							form.minimumSpend ())
 
-					if (params.get ("searchGender") != null) {
-
-						chatBroadcast
-
-							.setSearchGender (
-								(Gender)
-								params.get ("searchGender"));
-
-					}
-
-					if (params.get ("searchOrient") != null) {
-
-						chatBroadcast
-
-							.setSearchOrient (
-								(Orient)
-								params.get ("searchOrient"));
-
-					}
-
-					if (params.get ("searchPicture") != null) {
-
-						chatBroadcast
-
-							.setSearchPicture (
-								(Boolean)
-								params.get ("searchPicture"));
-
-					}
-
-					if (params.get ("searchAdult") != null) {
-
-						chatBroadcast
-
-							.setSearchAdult (
-								(Boolean)
-								params.get ("searchAdult"));
-
-					}
-
-					if (params.get ("searchSpendMin") != null) {
-
-						chatBroadcast
-
-							.setSearchSpendMin (
-								(Long)
-								params.get ("searchSpendMin"));
-
-					}
-
-					if (params.get ("searchSpendMax") != null) {
-
-						chatBroadcast
-
-							.setSearchSpendMax (
-								(Long)
-								params.get ("searchSpendMax"));
-
-					}
+						.setSearchSpendMax (
+							form.maximumSpend ());
 
 				}
 
@@ -786,11 +780,13 @@ class ChatBroadcastSendAction
 						"Message sent to %d users",
 						remainingChatUserIds.size ()));
 
-				return responder ("chatBroadcastSendResponder");
+				return responder (
+					"chatBroadcastSendResponder");
 
 			}
 
-			return responder ("chatBroadcastSendResponder");
+			return responder (
+				"chatBroadcastSendResponder");
 
 		} catch (RuntimeException exception) {
 
@@ -801,109 +797,5 @@ class ChatBroadcastSendAction
 		}
 
 	}
-
-	// params
-
-	final static
-	ParamCheckerSet verifyParamChecker =
-		new ParamCheckerSet (
-			new ImmutableMap.Builder<String,ParamChecker<?>> ()
-
-		.put (
-			"search",
-			new YesNoParamChecker (
-				"Invalid search enabled",
-				true))
-
-		.put (
-			"searchLastActionFrom",
-			new TimestampFromParamChecker (
-				"Invalid last action from",
-				false))
-
-		.put (
-			"searchLastActionTo",
-			new TimestampToParamChecker (
-				"Invalid last action to",
-				false))
-
-		.put (
-			"searchGender",
-			new EnumParamChecker<Gender> (
-				"Invalid gender",
-				false,
-				Gender.class))
-
-		.put (
-			"searchOrient",
-			new EnumParamChecker<Orient> (
-				"Invalid orient",
-				false,
-				Orient.class))
-
-		.put (
-			"searchPicture",
-			new YesNoParamChecker (
-				"Invalid picture",
-				false))
-
-		.put (
-			"searchAdult",
-			new YesNoParamChecker (
-				"Invalid adult",
-				false))
-
-		.put (
-			"searchSpendMin",
-			new IntegerParamChecker (
-				"Invalid search spend minimum",
-				false))
-
-		.put (
-			"searchSpendMax",
-			new IntegerParamChecker (
-				"Invalid search spend maximum",
-				false))
-
-		.put (
-			"fromUserCode",
-			new RegexpParamChecker (
-				"Invalid user code",
-				"^\\d{6}$"))
-
-		.put (
-			"includeBlocked",
-			new CheckboxParamChecker (
-				"Internal error"))
-
-		.put (
-			"includeOptedOut",
-			new CheckboxParamChecker (
-				"Internal error"))
-
-		.build ());
-
-	final static
-	ParamCheckerSet sendParamChecker =
-
-		new ParamCheckerSet (
-			new ImmutableMap.Builder<String,ParamChecker<?>> ()
-
-		.putAll (
-			verifyParamChecker.getParamCheckers ())
-
-		.put (
-			"prefix",
-			new RegexpParamChecker (
-				"Invalid prefix",
-				"^From .+: $"))
-
-		.put (
-			"message",
-			new RegexpParamChecker (
-				"Invalid message",
-				".+"))
-
-		.build ());
 
 }

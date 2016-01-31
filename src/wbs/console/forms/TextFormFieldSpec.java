@@ -32,6 +32,9 @@ class TextFormFieldSpec {
 	Boolean readOnly;
 
 	@DataAttribute
+	Boolean hidden;
+
+	@DataAttribute
 	Boolean nullable;
 
 	@DataAttribute

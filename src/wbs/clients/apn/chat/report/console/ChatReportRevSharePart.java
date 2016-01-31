@@ -164,7 +164,8 @@ class ChatReportRevSharePart
 		formFieldLogic.update (
 			requestContext,
 			searchFields,
-			form);
+			form,
+			ImmutableMap.of ());
 
 		chat =
 			chatHelper.find (
@@ -752,6 +753,7 @@ class ChatReportRevSharePart
 				formatWriter,
 				resultsFields,
 				chatReport,
+				ImmutableMap.of (),
 				true);
 
 			printFormat (
@@ -770,6 +772,7 @@ class ChatReportRevSharePart
 				formatWriter,
 				resultsFields,
 				totalReport,
+				ImmutableMap.of (),
 				true);
 
 		printFormat (

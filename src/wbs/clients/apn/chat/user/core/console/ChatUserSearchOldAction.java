@@ -43,9 +43,9 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 
-@PrototypeComponent ("chatUserSearchAction")
+@PrototypeComponent ("chatUserSearchOldAction")
 public
-class ChatUserSearchAction
+class ChatUserSearchOldAction
 	extends ConsoleAction {
 
 	// dependencies
@@ -69,7 +69,7 @@ class ChatUserSearchAction
 	Responder backupResponder () {
 
 		return responder (
-			"chatUserSearchResponder");
+			"chatUserSearchOldResponder");
 
 	}
 
@@ -471,7 +471,8 @@ class ChatUserSearchAction
 
 			// no users found, back to search page
 
-			requestContext.addError ("Search produced no results");
+			requestContext.addError (
+				"Search produced no results");
 
 			return null;
 
@@ -483,7 +484,8 @@ class ChatUserSearchAction
 				"chatUserSearchResult",
 				chatUserIds);
 
-			return responder ("chatUserImageZipResponder");
+			return responder (
+				"chatUserImageZipResponder");
 
 		} else {
 
@@ -511,7 +513,8 @@ class ChatUserSearchAction
 					targetContext,
 					"/" + chatUserId);
 
-				return responder ("chatUserSummaryResponder");
+				return responder (
+					"chatUserSummaryResponder");
 
 			} else {
 
@@ -524,7 +527,8 @@ class ChatUserSearchAction
 					"chatUserSearchResult",
 					chatUserIds);
 
-				return responder ("chatUserSearchResultsResponder");
+				return responder (
+					"chatUserSearchOldResultsResponder");
 
 			}
 

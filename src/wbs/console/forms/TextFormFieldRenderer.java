@@ -3,7 +3,6 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 
@@ -47,11 +46,6 @@ class TextFormFieldRenderer<Container>
 	Map<String,String> presets =
 		new LinkedHashMap<> ();
 
-	// details
-
-	@Getter
-	boolean fileUpload = false;
-
 	// utilities
 
 	public
@@ -70,117 +64,32 @@ class TextFormFieldRenderer<Container>
 
 	@Override
 	public
-	void renderTableCellList (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue,
-			boolean link,
-			int colspan) {
-
-		out.writeFormat (
-			"<td",
-
-			colspan > 1
-				? stringFormat (
-					" colspan=\"%h\"",
-					colspan)
-				: "",
-
-			"%s",
-			align != null
-				? stringFormat (
-					" style=\"text-align: %h\"",
-					align.toString ())
-				: "",
-
-			">%s</td>\n",
-			interfaceToHtmlSimple (
-				container,
-				interfaceValue,
-				link));
-
-	}
-
-	@Override
-	public
-	void renderTableCellProperties (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
-
-		out.writeFormat (
-			"<td>%s</td>\n",
-			interfaceToHtmlComplex (
-				container,
-				interfaceValue));
-
-	}
-
-	@Override
-	public
-	void renderTableRow (
-			@NonNull FormatWriter out,
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
-
-		out.writeFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
-			label ());
-
-		renderTableCellProperties (
-			out,
-			container,
-			hints,
-			interfaceValue);
-
-		out.writeFormat (
-			"</tr>\n");
-
-	}
-
-	@Override
-	public
-	void renderFormRow (
+	void renderFormTemporarilyHidden (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
-			@NonNull Optional<String> error,
 			@NonNull FormType formType) {
 
-		out.writeFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
-			label (),
-			"<td>");
-
-		renderFormInput (
-			submission,
-			out,
-			container,
-			hints,
-			interfaceValue,
-			formType);
-
 		if (
-			isPresent (
-				error)
+			formValuePresent (
+				submission)
 		) {
-
-			out.writeFormat (
-				"<br>\n",
-				"%h",
-				error.get ());
-
+			interfaceValue =
+				Optional.of (
+					formValue (
+						submission));
 		}
 
-		out.writeFormat (
-			"</td>\n",
-			"</tr>\n");
+		htmlWriter.writeFormat (
+			"<input",
+			" type=\"hidden\"",
+			" name=\"%h\"",
+			name (),
+			" value=\"%h\"",
+			interfaceValue.or (""),
+			">\n");
 
 	}
 
