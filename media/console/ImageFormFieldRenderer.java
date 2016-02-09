@@ -74,7 +74,8 @@ class ImageFormFieldRenderer<Container>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		doNothing ();
 
@@ -88,7 +89,8 @@ class ImageFormFieldRenderer<Container>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		if (interfaceValue.isPresent ()) {
 
@@ -104,7 +106,8 @@ class ImageFormFieldRenderer<Container>
 		out.writeFormat (
 			"<input",
 			" type=\"file\"",
-			" name=\"%h\"",
+			" name=\"%h-%h\"",
+			formName,
 			name (),
 			"><br>\n");
 
@@ -116,7 +119,8 @@ class ImageFormFieldRenderer<Container>
 			out.writeFormat (
 				"<input",
 				" type=\"submit\"",
-				" name=\"%h-remove\"",
+				" name=\"%h-%h-remove\"",
+				formName,
 				name (),
 				" value=\"remove image\"",
 				">\n");
@@ -132,16 +136,19 @@ class ImageFormFieldRenderer<Container>
 			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<MediaRec> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		javascriptWriter.writeFormat (
-			"%s$(\"#%j\").replaceWith (\n",
+			"%s$(\"#%j-%j\").replaceWith (\n",
 			indent,
+			formName,
 			name);
 
 		javascriptWriter.writeFormat (
-			"%s\t$(\"#%j\").clone (true));\n",
+			"%s\t$(\"#%j-%j\").clone (true));\n",
 			indent,
+			formName,
 			name);
 
 	}
@@ -149,13 +156,15 @@ class ImageFormFieldRenderer<Container>
 	@Override
 	public
 	boolean formValuePresent (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return (
 
 			submission.hasParameter (
 				stringFormat (
-					"%s-remove",
+					"%s-%s-remove",
+					formName,
 					name ()))
 
 		) || (
@@ -175,12 +184,14 @@ class ImageFormFieldRenderer<Container>
 	}
 
 	MediaRec formValue (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		if (
 			submission.hasParameter (
 				stringFormat (
-					"%s-remove",
+					"%s-%s-remove",
+					formName,
 					name ()))
 		) {
 			return null;
@@ -188,7 +199,10 @@ class ImageFormFieldRenderer<Container>
 
 		FileItem fileItem =
 			submission.fileItem (
-				name ());
+				stringFormat (
+					"%s-%s",
+					formName,
+					name ()));
 
 		try {
 
@@ -213,12 +227,14 @@ class ImageFormFieldRenderer<Container>
 	@Override
 	public
 	Either<Optional<MediaRec>,String> formToInterface (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return successResult (
 			Optional.fromNullable (
 				formValue (
-					submission)));
+					submission,
+					formName)));
 
 	}
 

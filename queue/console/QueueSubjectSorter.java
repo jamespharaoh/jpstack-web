@@ -2,9 +2,9 @@ package wbs.platform.queue.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.notIn;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -29,9 +29,11 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemState;
+import wbs.platform.queue.model.QueueObjectHelper;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectObjectHelper;
 import wbs.platform.queue.model.QueueSubjectRec;
+import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
 
 @Accessors (fluent = true)
@@ -43,6 +45,9 @@ class QueueSubjectSorter {
 	PrivChecker privChecker;
 
 	@Inject
+	QueueObjectHelper queueHelper;
+
+	@Inject
 	QueueItemObjectHelper queueItemHelper;
 
 	@Inject
@@ -50,6 +55,9 @@ class QueueSubjectSorter {
 
 	@Inject
 	QueueSubjectObjectHelper queueSubjectHelper;
+
+	@Inject
+	UserConsoleHelper userHelper;
 
 	// inputs
 
@@ -111,8 +119,38 @@ class QueueSubjectSorter {
 		Map<QueueRec,QueueInfo> allQueueInfos =
 			new HashMap<QueueRec,QueueInfo> ();
 
-		for (QueueSubjectRec subject
-				: queueSubjects) {
+		// pre-fetch interesting data
+
+/*
+		queueHelper.find (
+			queueSubjects.stream ()
+				.map (QueueSubjectRec::getId)
+				.map (value -> (long) (int) value)
+				.collect (Collectors.toSet ())
+				.stream ()
+				.collect (Collectors.toList ()));
+
+		Map<Pair<Long,Long>,QueueItemRec> queueItemsByIndex =
+			queueItemHelper.findActive ().stream ()
+
+			.filter (
+				queueItem -> queueItem.getQueueSubject () != null)
+
+			.collect (
+				Collectors.<QueueItemRec,Pair<Long,Long>,QueueItemRec>toMap (
+					queueItem -> Pair.of (
+						(long) (int) queueItem.getQueueSubject ().getId (),
+						(long) (int) queueItem.getIndex ()),
+					queueItem -> queueItem));
+
+		userHelper.findAll ();
+
+*/
+
+		for (
+			QueueSubjectRec subject
+				: queueSubjects
+		) {
 
 			QueueRec queue =
 				subject.getQueue ();
@@ -125,7 +163,8 @@ class QueueSubjectSorter {
 			// find or create queue info
 
 			QueueInfo queueInfo =
-				allQueueInfos.get (queue);
+				allQueueInfos.get (
+					queue);
 
 			if (queueInfo == null) {
 
@@ -156,14 +195,25 @@ class QueueSubjectSorter {
 				+ subject.getTotalItems ()
 				- subject.getActiveItems ();
 
+/*
+			QueueItemRec item =
+				queueItemsByIndex.get (
+					Pair.of (
+						(long) (int) subject.getId (),
+						(long) (int) nextItemIndex));
+*/
+
 			QueueItemRec item =
 				queueItemHelper.findByIndex (
 					subject,
 					nextItemIndex);
 
-			if (! in (item.getState (),
+			if (
+				notIn (
+					item.getState (),
 					QueueItemState.pending,
-					QueueItemState.claimed)) {
+					QueueItemState.claimed)
+			) {
 
 				throw new RuntimeException (
 					stringFormat (
@@ -311,7 +361,10 @@ class QueueSubjectSorter {
 			new ArrayList<SubjectInfo> (
 				allSubjectInfos.size ());
 
-		for (SubjectInfo subjectInfo : allSubjectInfos) {
+		for (
+			SubjectInfo subjectInfo
+				: allSubjectInfos
+		) {
 
 			if (user != null && ! subjectInfo.available)
 				continue;
@@ -332,7 +385,10 @@ class QueueSubjectSorter {
 			new ArrayList<QueueInfo> (
 				allQueueInfos.size ());
 
-		for (QueueInfo queueInfo : allQueueInfos.values ()) {
+		for (
+			QueueInfo queueInfo
+				: allQueueInfos.values ()
+		) {
 
 			if (user != null && queueInfo.availableItems == 0)
 				continue;

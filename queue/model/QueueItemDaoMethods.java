@@ -30,6 +30,8 @@ interface QueueItemDaoMethods {
 			QueueSubjectRec queueSubject,
 			int index);
 
+	List<QueueItemRec> findActive ();
+
 	List<QueueItemRec> findByCreatedTime (
 			Interval createdTimeInterval);
 
