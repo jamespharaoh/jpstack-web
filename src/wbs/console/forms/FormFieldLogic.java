@@ -38,7 +38,8 @@ class FormFieldLogic {
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map<String,Object> hints,
+			@NonNull String formName) {
 
 		UpdateResultSet updateResultSet =
 			new UpdateResultSet ();
@@ -48,7 +49,8 @@ class FormFieldLogic {
 			formFieldSet,
 			updateResultSet,
 			container,
-			hints);
+			hints,
+			formName);
 
 		return updateResultSet;
 
@@ -60,7 +62,8 @@ class FormFieldLogic {
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull UpdateResultSet updateResults,
 			@NonNull Object container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map<String,Object> hints,
+			@NonNull String formName) {
 
 		update (
 			requestContextToSubmission (
@@ -68,7 +71,8 @@ class FormFieldLogic {
 			formFieldSet,
 			updateResults,
 			container,
-			hints);
+			hints,
+			formName);
 
 	}
 
@@ -78,7 +82,8 @@ class FormFieldLogic {
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull UpdateResultSet updateResults,
 			@NonNull Object container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map<String,Object> hints,
+			@NonNull String formName) {
 
 		for (
 			FormField formField
@@ -92,7 +97,8 @@ class FormFieldLogic {
 				formField.update (
 					submission,
 					container,
-					hints);
+					hints,
+					formName);
 
 			if (
 				isPresent (
@@ -209,7 +215,8 @@ class FormFieldLogic {
 			@NonNull Object container,
 			@NonNull PermanentRecord<?> linkObject,
 			@NonNull Optional<Object> objectRef,
-			@NonNull Optional<String> objectType) {
+			@NonNull Optional<String> objectType,
+			@NonNull String formName) {
 
 		for (
 			Map.Entry updateResultEntry
@@ -326,7 +333,8 @@ class FormFieldLogic {
 			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object,
 			@NonNull Map<String,Object> hints,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		outputFormRows (
 			requestContextToSubmission (
@@ -336,7 +344,8 @@ class FormFieldLogic {
 			updateResultSet,
 			object,
 			hints,
-			formType);
+			formType,
+			formName);
 
 	}
 
@@ -348,7 +357,8 @@ class FormFieldLogic {
 			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object,
 			@NonNull Map<String,Object> hints,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		outputFormAlwaysHidden (
 			requestContextToSubmission (
@@ -358,7 +368,8 @@ class FormFieldLogic {
 			updateResultSet,
 			object,
 			hints,
-			formType);
+			formType,
+			formName);
 
 	}
 
@@ -370,7 +381,8 @@ class FormFieldLogic {
 			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object,
 			@NonNull Map<String,Object> hints,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		for (
 			FormField formField
@@ -394,7 +406,10 @@ class FormFieldLogic {
 			) {
 
 				updateResultSet.get ().updateResults ().get (
-					formField.name ());
+					stringFormat (
+						"%s-%s",
+						formName,
+						formField.name ()));
 
 			}
 
@@ -403,7 +418,8 @@ class FormFieldLogic {
 				htmlWriter,
 				object,
 				hints,
-				formType);
+				formType,
+				formName);
 
 		}
 
@@ -416,7 +432,8 @@ class FormFieldLogic {
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object object,
 			@NonNull Map<String,Object> hints,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		outputFormTemporarilyHidden (
 			requestContextToSubmission (
@@ -425,7 +442,8 @@ class FormFieldLogic {
 			formFieldSet,
 			object,
 			hints,
-			formType);
+			formType,
+			formName);
 
 	}
 
@@ -436,7 +454,8 @@ class FormFieldLogic {
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object object,
 			@NonNull Map<String,Object> hints,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		for (
 			FormField formField
@@ -459,7 +478,8 @@ class FormFieldLogic {
 				htmlWriter,
 				object,
 				hints,
-				formType);
+				formType,
+				formName);
 
 		}
 
@@ -473,7 +493,8 @@ class FormFieldLogic {
 			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object,
 			@NonNull Map<String,Object> hints,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		for (
 			FormField formField
@@ -500,7 +521,10 @@ class FormFieldLogic {
 
 				UpdateResult updateResult =
 					updateResultSet.get ().updateResults ().get (
-						formField.name ());
+						stringFormat (
+							"%s-%s",
+							formField,
+							formField.name ()));
 
 				error =
 					updateResult.error ();
@@ -518,7 +542,8 @@ class FormFieldLogic {
 				object,
 				hints,
 				error,
-				formType);
+				formType,
+				formName);
 
 		}
 
@@ -531,7 +556,8 @@ class FormFieldLogic {
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull FormType formType,
 			@NonNull Object object,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map<String,Object> hints,
+			@NonNull String formName) {
 
 		for (
 			FormField formField
@@ -546,7 +572,8 @@ class FormFieldLogic {
 				indent,
 				object,
 				hints,
-				formType);
+				formType,
+				formName);
 
 		}
 
@@ -562,7 +589,8 @@ class FormFieldLogic {
 			@NonNull Map<String,Object> hints,
 			@NonNull String actionUrl,
 			@NonNull String submitButtonLabel,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		outputFormTable (
 			requestContextToSubmission (
@@ -574,7 +602,8 @@ class FormFieldLogic {
 			hints,
 			actionUrl,
 			submitButtonLabel,
-			formType);
+			formType,
+			formName);
 
 	}
 
@@ -588,7 +617,8 @@ class FormFieldLogic {
 			@NonNull Map<String,Object> hints,
 			@NonNull String actionUrl,
 			@NonNull String submitButtonLabel,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		htmlWriter.writeFormat (
 			"<form",
@@ -607,7 +637,8 @@ class FormFieldLogic {
 			updateResultSet,
 			object,
 			hints,
-			formType);
+			formType,
+			formName);
 
 		htmlWriter.writeFormat (
 			"</table>\n");

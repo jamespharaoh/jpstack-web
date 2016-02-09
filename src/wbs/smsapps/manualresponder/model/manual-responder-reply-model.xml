@@ -27,6 +27,12 @@
 		<reference-field
 			type="text"/>
 
+		<integer-field
+			name="numFreeMessages"/>
+
+		<integer-field
+			name="numBilledMessages"/>
+
 	</fields>
 
 	<collections>

@@ -35,6 +35,6 @@ exec java $JAVA_OPTS \
 	wbs-apn \
 	wbs.apn \
 	utils,config,data,entity,schema,sql,model,hibernate,object,logic,daemon,model-meta \
-	hades,hibernate \
+	hades,hibernate,daemon \
 	wbs.platform.daemon.DaemonRunner \
 	runDaemon

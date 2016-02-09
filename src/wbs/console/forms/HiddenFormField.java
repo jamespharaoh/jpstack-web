@@ -6,6 +6,7 @@ import static wbs.framework.utils.etc.Misc.isError;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.split;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -157,7 +158,8 @@ class HiddenFormField<Container,Generic,Native>
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		Optional<Native> nativeValue =
 			requiredValue (
@@ -180,20 +182,23 @@ class HiddenFormField<Container,Generic,Native>
 
 		if (
 			formValuePresent (
-				submission)
+				submission,
+				formName)
 		) {
 
 			interfaceValue =
 				Optional.of (
 					formToInterface (
-						submission));
+						submission,
+						formName));
 
 		}
 
 		htmlWriter.writeFormat (
 			"<input",
 			" type=\"hidden\"",
-			" name=\"%h\"",
+			" name=\"%h-%h\"",
+			formName,
 			name (),
 			" value=\"%h\"",
 			interfaceValue.or (""),
@@ -206,13 +211,15 @@ class HiddenFormField<Container,Generic,Native>
 	UpdateResult<Generic,Native> update (
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map<String,Object> hints,
+			@NonNull String formName) {
 
 		// do nothing if no value present in form
 
 		if (
 			! formValuePresent (
-				submission)
+				submission,
+				formName)
 		) {
 
 			return new UpdateResult<Generic,Native> ()
@@ -229,7 +236,8 @@ class HiddenFormField<Container,Generic,Native>
 
 		String newInterfaceValue =
 			formToInterface (
-				submission);
+				submission,
+				formName);
 
 		// convert to generic
 
@@ -326,19 +334,27 @@ class HiddenFormField<Container,Generic,Native>
 
 	private
 	boolean formValuePresent (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return submission.hasParameter (
-			name ());
+			stringFormat (
+				"%h-%h",
+				formName,
+				name ()));
 
 	}
 
 	private
 	String formToInterface (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return submission.parameter (
-			name ());
+			stringFormat (
+				"%h-%h",
+				formName,
+				name ()));
 
 	}
 

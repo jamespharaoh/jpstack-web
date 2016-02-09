@@ -56,12 +56,14 @@ class YesNoFormFieldRenderer<Container>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Boolean> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		htmlWriter.writeFormat (
 			"<input",
 			" type=\"hidden\"",
-			" name=\"%h\"",
+			" name=\"%h-%h\"",
+			formName,
 			name (),
 			" value=\"%h\"",
 			booleanToString (
@@ -83,23 +85,29 @@ class YesNoFormFieldRenderer<Container>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Boolean> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		Optional<Boolean> currentValue =
 			formValuePresent (
-					submission)
+					submission,
+					formName)
 				? Optional.fromNullable (
 					stringToBoolean (
 						formValue (
-							submission),
+							submission,
+							formName),
 						"yes",
 						"no",
 						"none"))
 				: interfaceValue;
 
 		htmlWriter.writeFormat (
-			"<select name=\"%h\">",
-			name ());
+			"<select",
+			" name=\"%h-%h\"",
+			formName,
+			name (),
+			">");
 
 		if (
 
@@ -156,7 +164,8 @@ class YesNoFormFieldRenderer<Container>
 			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<Boolean> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		if (
 			in (
@@ -167,8 +176,9 @@ class YesNoFormFieldRenderer<Container>
 		) {
 
 			javascriptWriter.writeFormat (
-				"%s$(\"#%j\").val (\"none\");\n",
+				"%s$(\"#%j-%j\").val (\"none\");\n",
 				indent,
+				formName,
 				name);
 
 		} else if (
@@ -178,8 +188,9 @@ class YesNoFormFieldRenderer<Container>
 		) {
 
 			javascriptWriter.writeFormat (
-				"%s$(\"#%j\").val (%s);\n",
+				"%s$(\"#%j-%j\").val (%s);\n",
 				indent,
+				formName,
 				name,
 				booleanToString (
 					interfaceValue.orNull (),
@@ -198,29 +209,39 @@ class YesNoFormFieldRenderer<Container>
 	@Override
 	public
 	boolean formValuePresent (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return submission.hasParameter (
-			name ());
+			stringFormat (
+				"%s-%s",
+				formName,
+				name ()));
 
 	}
 
 	String formValue (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return submission.parameter (
-			name ());
+			stringFormat (
+				"%s-%s",
+				formName,
+				name ()));
 
 	}
 
 	@Override
 	public
 	Either<Optional<Boolean>,String> formToInterface (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		String formValue =
 			formValue (
-				submission);
+				submission,
+				formName);
 
 		return successResult (
 			Optional.fromNullable (

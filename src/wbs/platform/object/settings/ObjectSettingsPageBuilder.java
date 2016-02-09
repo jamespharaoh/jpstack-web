@@ -205,7 +205,7 @@ class ObjectSettingsPageBuilder<
 							consoleHelper)
 
 						.consoleHelper (
-								consoleHelper)
+							consoleHelper)
 
 						.formFieldSet (
 							formFieldSet)

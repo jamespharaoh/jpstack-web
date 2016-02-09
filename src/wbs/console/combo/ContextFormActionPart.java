@@ -83,7 +83,8 @@ class ContextFormActionPart<FormState>
 			requestContext.resolveLocalUrl (
 				localFile),
 			submitLabel,
-			FormType.perform);
+			FormType.perform,
+			"action");
 
 	}
 

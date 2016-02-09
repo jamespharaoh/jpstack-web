@@ -49,7 +49,8 @@ class SubscriptionNumberAddRemovePart
 			requestContext,
 			addRemoveFormFieldSet,
 			addRemoveForm,
-			ImmutableMap.of ());
+			ImmutableMap.of (),
+			"update");
 
 	}
 
@@ -75,7 +76,8 @@ class SubscriptionNumberAddRemovePart
 			Optional.absent (),
 			addRemoveForm,
 			ImmutableMap.of (),
-			FormType.perform);
+			FormType.perform,
+			"update");
 
 		printFormat (
 			"</table>\n");

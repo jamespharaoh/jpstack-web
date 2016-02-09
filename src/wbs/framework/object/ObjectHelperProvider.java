@@ -56,6 +56,9 @@ interface ObjectHelperProvider {
 	Record<?> find (
 			long id);
 
+	List<Record<?>> find (
+			List<Long> ids);
+
 	Record<?> findByParentAndCode (
 			GlobalId parentGlobalId,
 			String code);

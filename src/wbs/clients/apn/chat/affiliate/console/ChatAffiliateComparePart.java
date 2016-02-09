@@ -156,8 +156,10 @@ class ChatAffiliateComparePart
 			chatAffiliateWithNewUserCounts.addAll (
 				map.values ());
 
-			for (ChatAffiliateWithNewUserCount chatAffiliateWithNewUserCount
-					: map.values ()) {
+			for (
+				ChatAffiliateWithNewUserCount chatAffiliateWithNewUserCount
+					: map.values ()
+			) {
 
 				ChatAffiliateRec chatAffiliate =
 					chatAffiliateWithNewUserCount.chatAffiliate;

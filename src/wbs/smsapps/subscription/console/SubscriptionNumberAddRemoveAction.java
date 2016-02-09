@@ -121,7 +121,8 @@ class SubscriptionNumberAddRemoveAction
 			requestContext,
 			addRemoveFormFieldSet,
 			addRemoveForm,
-			ImmutableMap.of ());
+			ImmutableMap.of (),
+			"update");
 
 		// parse numbers
 

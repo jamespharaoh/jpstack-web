@@ -221,7 +221,8 @@ class ObjectSettingsPart<
 			updateResultSet,
 			object,
 			ImmutableMap.of (),
-			FormType.update);
+			FormType.update,
+			"settings");
 
 		printFormat (
 			"</table>");

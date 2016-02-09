@@ -103,7 +103,8 @@ class ManualResponderReportServicePart
 			requestContext,
 			searchFormFieldSet,
 			searchForm,
-			ImmutableMap.of ());
+			ImmutableMap.of (),
+			"report");
 
 		// perform search
 
@@ -174,7 +175,8 @@ class ManualResponderReportServicePart
 			Optional.absent (),
 			searchForm,
 			ImmutableMap.of (),
-			FormType.search);
+			FormType.search,
+			"report");
 
 		printFormat (
 			"<tr>\n",

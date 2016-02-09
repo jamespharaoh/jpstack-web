@@ -165,7 +165,8 @@ class ChatReportRevSharePart
 			requestContext,
 			searchFields,
 			form,
-			ImmutableMap.of ());
+			ImmutableMap.of (),
+			"search");
 
 		chat =
 			chatHelper.find (
@@ -700,7 +701,8 @@ class ChatReportRevSharePart
 			Optional.absent (),
 			form,
 			ImmutableMap.of (),
-			FormType.search);
+			FormType.search,
+			"search");
 
 		printFormat (
 			"<tr>\n",

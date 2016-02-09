@@ -270,7 +270,8 @@ class ObjectCreatePart<
 			stringFormat (
 				"create %h",
 				consoleHelper.shortName ()),
-			FormType.create);
+			FormType.create,
+			"create");
 
 	}
 

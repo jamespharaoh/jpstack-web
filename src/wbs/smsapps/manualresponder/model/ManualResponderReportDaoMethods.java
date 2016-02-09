@@ -16,4 +16,8 @@ interface ManualResponderReportDaoMethods {
 			UserRec processedByUser,
 			Interval processedTimeInterval);
 
+	Long countByProcessedTime (
+			UserRec processedByUser,
+			Interval processedTimeInterval);
+
 }

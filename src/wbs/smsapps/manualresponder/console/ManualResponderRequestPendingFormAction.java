@@ -36,6 +36,8 @@ import wbs.sms.gsm.Gsm;
 import wbs.sms.gsm.MessageSplitter;
 import wbs.sms.keyword.logic.KeywordLogic;
 import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.route.core.model.RouteRec;
+import wbs.sms.route.router.logic.RouterLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
@@ -77,6 +79,9 @@ class ManualResponderRequestPendingFormAction
 
 	@Inject
 	QueueLogic queueLogic;
+
+	@Inject
+	RouterLogic routerLogic;
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
@@ -274,7 +279,7 @@ class ManualResponderRequestPendingFormAction
 		// split message and apply templates
 
 		List<String> messageParts;
-		int effectiveParts;
+		long effectiveParts;
 
 		if (
 			template.getSplitLong ()
@@ -338,15 +343,19 @@ class ManualResponderRequestPendingFormAction
 
 			}
 
+			long singleMessageLength =
+				Gsm.length (
+					singleMessage);
+
 			messageParts =
 				Collections.singletonList (
 					singleMessage);
 
 			// work out effective parts
 
-			if (messageParts.size () <= 160) {
+			if (singleMessageLength <= 160l) {
 
-				effectiveParts = 1;
+				effectiveParts = 1l;
 
 			} else {
 
@@ -356,14 +365,14 @@ class ManualResponderRequestPendingFormAction
 						.getNetwork ()
 						.getShortMultipartMessages ();
 
-				int maxLengthPerMultipartMessage =
+				long maxLengthPerMultipartMessage =
 					shortMessageParts
-						? 134
-						: 153;
+						? 134l
+						: 153l;
 
 				effectiveParts = (
-					singleMessage.length () - 1
-				) / maxLengthPerMultipartMessage + 1;
+					singleMessageLength - 1l
+				) / maxLengthPerMultipartMessage + 1l;
 
 			}
 
@@ -415,6 +424,12 @@ class ManualResponderRequestPendingFormAction
 
 		}
 
+		// resolve route
+
+		RouteRec route =
+			routerLogic.resolveRouter (
+				template.getRouter ());
+
 		// create reply
 
 		ManualResponderReplyRec reply =
@@ -433,6 +448,16 @@ class ManualResponderRequestPendingFormAction
 			.setTimestamp (
 				instantToDate (
 					transaction.now ()))
+
+			.setNumFreeMessages (
+				route.getOutCharge () == 0
+					? effectiveParts
+					: 0l)
+
+			.setNumBilledMessages (
+				route.getOutCharge () > 0
+					? effectiveParts
+					: 0l)
 
 		);
 
@@ -489,6 +514,24 @@ class ManualResponderRequestPendingFormAction
 
 		}
 
+		// update request
+
+		request
+
+			.setNumFreeMessages (
+				+ request.getNumFreeMessages ()
+				+ route.getOutCharge () == 0
+					? effectiveParts
+					: 0l)
+
+			.setNumBilledMessages (
+				+ request.getNumBilledMessages ()
+				+ route.getOutCharge () > 0
+					? effectiveParts
+					: 0l);
+
+		// check if we can send again
+
 		if (manualResponder.getCanSendMultiple ()) {
 
 			sendAgain = true;
@@ -506,7 +549,13 @@ class ManualResponderRequestPendingFormAction
 			request
 
 				.setPending (
-					false);
+					false)
+
+				.setUser (
+					myUser)
+
+				.setProcessedTime (
+					transaction.now ());
 
 		}
 

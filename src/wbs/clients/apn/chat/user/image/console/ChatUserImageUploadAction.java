@@ -113,7 +113,8 @@ class ChatUserImageUploadAction
 			requestContext,
 			formFieldSet,
 			uploadForm,
-			ImmutableMap.of ());
+			ImmutableMap.of (),
+			"upload");
 
 		String resultType;
 		String extension;

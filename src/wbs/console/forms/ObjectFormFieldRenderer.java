@@ -1,14 +1,15 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -73,9 +74,20 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
-		doNothing ();
+		htmlWriter.writeFormat (
+			"<input",
+			" type=\"hidden\"",
+			" name=\"%h-%h\"",
+			formName,
+			name (),
+			" value=\"%h\"",
+			interfaceValue.isPresent ()
+				? interfaceValue.get ().getId ()
+				: "none",
+			">\n");
 
 	}
 
@@ -87,7 +99,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		// lookup root
 
@@ -114,10 +127,12 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		Optional<Interface> currentValue =
 			formValuePresent (
-					submission)
+					submission,
+					formName)
 				? requiredSuccess (
 					formToInterface (
-						submission))
+						submission,
+						formName))
 				: interfaceValue;
 
 		// get a list of options
@@ -130,18 +145,28 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		List<Record<?>> filteredOptions =
 			allOptions.stream ()
 
+.sorted (Comparator.comparing (Record::getId))
+
+.map (item -> { System.out.print ("\nOPTION " + item.getId ()); return item; })
+
 			.filter (
 				root.isPresent ()
 					? item -> objectManager.isParent (item, root.get ())
 					: item -> true)
+
+.map (item -> { System.out.print (" root-ok"); return item; })
 
 			.filter (
 				item ->
 					objectManager.canView (item)
 					|| equal (item, interfaceValue.orNull ()))
 
+.map (item -> { System.out.print (" view-ok"); return item; })
+
 			.collect (
 				Collectors.toList ());
+
+System.out.print ("\n");
 
 		// sort options by path
 
@@ -163,9 +188,11 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		out.writeFormat (
 			"<select",
-			" id=\"%h\"",
+			" id=\"%h-%h\"",
+			formName,
 			name,
-			" name=\"%h\"",
+			" name=\"%h-%h\"",
+			formName,
 			name,
 			">\n");
 
@@ -252,7 +279,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<Interface> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		if (
 			in (
@@ -263,8 +291,9 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		) {
 
 			javascriptWriter.writeFormat (
-				"%s$(\"#%j\").val (\"none\");\n",
+				"%s$(\"#%j-%j\").val (\"none\");\n",
 				indent,
+				formName,
 				name);
 
 		} else if (
@@ -274,8 +303,9 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		) {
 
 			javascriptWriter.writeFormat (
-				"%s$(\"#%j\").val (\"%h\");\n",
+				"%s$(\"#%j-%j\").val (\"%h\");\n",
 				indent,
+				formName,
 				name,
 				interfaceValue.isPresent ()
 					? interfaceValue.get ().getId ()
@@ -292,12 +322,16 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Override
 	public
 	boolean formValuePresent (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return (
 
 			submission.hasParameter (
-				name ())
+				stringFormat (
+					"%s-%s",
+					formName,
+					name ()))
 
 		);
 
@@ -306,11 +340,15 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	@Override
 	public
 	Either<Optional<Interface>,String> formToInterface (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		String param =
 			submission.parameter (
-				name ());
+				stringFormat (
+					"%s-%s",
+					formName,
+					name ()));
 
 		if (
 			equal (

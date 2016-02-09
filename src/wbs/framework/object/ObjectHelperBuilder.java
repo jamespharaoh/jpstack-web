@@ -731,6 +731,16 @@ class ObjectHelperBuilder {
 
 			@Override
 			public
+			List find (
+					List ids) {
+
+				return objectHelperProvider
+					.find (ids);
+
+			}
+
+			@Override
+			public
 			Record<?> findByCode (
 					@NonNull GlobalId ancestorGlobalId,
 					@NonNull String... codes) {

@@ -36,7 +36,7 @@
 
 		<timestamp-field
 			name="processedTime"
-			column-type="postgresql"/>
+			column-type="iso"/>
 
 		<string-field
 			name="timestring"/>

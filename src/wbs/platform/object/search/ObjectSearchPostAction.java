@@ -230,7 +230,8 @@ class ObjectSearchPostAction
 				requestContext,
 				searchFormFieldSet,
 				search,
-				ImmutableMap.of ());
+				ImmutableMap.of (),
+				"search");
 
 		if (updateResultSet.errorCount () > 0) {
 

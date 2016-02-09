@@ -20,10 +20,13 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 import org.joda.time.Interval;
 
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.queue.model.QueueItemDao;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemSearch;
+import wbs.platform.queue.model.QueueItemState;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.queue.model.UserQueueReport;
@@ -162,6 +165,29 @@ class QueueItemDaoHibernate
 			.setInteger (
 				"index",
 				index)
+
+			.list ());
+
+	}
+
+	@Override
+	public 
+	List<QueueItemRec> findActive () {
+
+		return findMany (
+			QueueItemRec.class,
+			
+			createCriteria (
+				QueueItemRec.class,
+				"_queueItem")
+
+			.add (
+				Restrictions.in (
+					"_queueItem.state",
+					ImmutableList.of (
+						QueueItemState.pending,
+						QueueItemState.waiting,
+						QueueItemState.claimed)))
 
 			.list ());
 

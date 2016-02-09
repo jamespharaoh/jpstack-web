@@ -465,7 +465,8 @@ class ChatUserDaoHibernate
 
 				criteria.createAlias (
 					"infoText",
-					"_infoText");
+					"_infoText",
+					JoinType.LEFT_OUTER_JOIN);
 
 				criteria.add (
 					Restrictions.ilike (
@@ -616,7 +617,8 @@ class ChatUserDaoHibernate
 
 				criteria.createAlias (
 					"_chatUser.chatAffiliate",
-					"_chatAffiliate");
+					"_chatAffiliate",
+					JoinType.LEFT_OUTER_JOIN);
 
 				criteria.add (
 					Restrictions.eq (
@@ -924,7 +926,8 @@ class ChatUserDaoHibernate
 
 			.createAlias (
 				"_chatUser.number",
-				"_number");
+				"_number",
+				JoinType.LEFT_OUTER_JOIN);
 
 		if (
 			isNotNull (
@@ -980,8 +983,21 @@ class ChatUserDaoHibernate
 		) {
 
 			criteria.add (
-				Restrictions.isNotNull (
-					"_chatUser.number"));
+				search.deleted ()
+
+				? Restrictions.isNull (
+					"_chatUser.number")
+
+				: Restrictions.or (
+
+					Restrictions.eq (
+						"_chatUser.type",
+						ChatUserType.monitor),
+
+					Restrictions.isNotNull (
+						"_chatUser.number"))
+
+			);
 
 		}
 
@@ -1006,6 +1022,32 @@ class ChatUserDaoHibernate
 				Restrictions.eq (
 					"_chatUser.orient",
 					search.orient ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.hasCategory ())
+		) {
+
+			criteria.add (
+				search.hasCategory ()
+					? Restrictions.isNotNull (
+						"_chatUser.category")
+					: Restrictions.isNull (
+						"_chatUser.category"));
+
+		}
+
+		if (
+			isNotNull (
+				search.categoryId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatUser.category.id",
+					search.categoryId ()));
 
 		}
 
@@ -1040,7 +1082,8 @@ class ChatUserDaoHibernate
 
 			criteria.createAlias (
 				"_chatUser.infoText",
-				"_infoText");
+				"_infoText",
+				JoinType.LEFT_OUTER_JOIN);
 
 			criteria.add (
 				Restrictions.ilike (

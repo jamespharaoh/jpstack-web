@@ -129,7 +129,8 @@ class ImChatCustomerCreditPart
 			requestContext.resolveLocalUrl (
 				"/imChatCustomer.credit"),
 			"apply credit",
-			FormType.perform);
+			FormType.perform,
+			"credit");
 
 		printFormat (
 			"<h2>Recent credit history</h2>\n");

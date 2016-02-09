@@ -3,7 +3,6 @@ package wbs.smsapps.manualresponder.console;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -26,7 +25,6 @@ import wbs.platform.status.console.StatusLine;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 import wbs.smsapps.manualresponder.model.ManualResponderReportObjectHelper;
-import wbs.smsapps.manualresponder.model.ManualResponderReportRec;
 
 @SingletonComponent ("manualResponderStatusLine")
 public
@@ -142,24 +140,12 @@ class ManualResponderStatusLine
 						.toDateTimeAtStartOfDay ()
 						.toInstant ();
 
-				Long total = 0l;
-
-				List<ManualResponderReportRec> reports =
-					manualResponderReportHelper.findByProcessedTime (
+				Long total =
+					manualResponderReportHelper.countByProcessedTime (
 						myUser,
 						new Interval (
 							startOfDay,
 							transaction.now ()));
-
-				for (
-					ManualResponderReportRec report
-						: reports
-				) {
-
-					total +=
-						report.getNum ();
-
-				}
 
 				return total;
 
@@ -199,24 +185,12 @@ class ManualResponderStatusLine
 						.plusHours (hourOfDay)
 						.toInstant ();
 
-				Long total = 0l;
-
-				List<ManualResponderReportRec> reports =
-					manualResponderReportHelper.findByProcessedTime (
+				Long total =
+					manualResponderReportHelper.countByProcessedTime (
 						myUser,
 						new Interval (
 							startOfHour,
 							transaction.now ()));
-
-				for (
-					ManualResponderReportRec report
-						: reports
-				) {
-
-					total +=
-						report.getNum ();
-
-				}
 
 				return total;
 

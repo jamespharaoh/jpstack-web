@@ -108,12 +108,20 @@ end
 create_xml \
 	"console-web-xml",
 	"console/web-live.xml",
-	"mode" => "live"
+	"mode" => "live",
+	"config" => "console"
+
+create_xml \
+	"console-web-xml",
+	"console/web-live-test.xml",
+	"mode" => "live",
+	"config" => "console-test"
 
 create_xml \
 	"console-web-xml",
 	"console/web-test.xml",
-	"mode" => "test"
+	"mode" => "test",
+	"config" => "console"
 
 create_xml \
 	"api-web-xml",

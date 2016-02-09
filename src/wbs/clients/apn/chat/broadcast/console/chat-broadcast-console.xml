@@ -47,6 +47,12 @@
 			helper="orientConsoleHelper"
 			nullable="yes"/>
 
+		<object-field
+			name="categoryId"
+			object-type="chatCategory"
+			root-field="chat"
+			nullable="yes"/>
+
 		<yes-no-field
 			name="hasPicture"
 			label="Picture"
@@ -110,19 +116,44 @@
 			char-count-function="gsmCharCountNew"
 			char-count-data="{ maxReduceField: 'prefix' }"/>
 
-<!--
-	<td>From Opal 276831:  (
-		<span id="gsmCharCount-0">-</span>
-	)<br>
-	<textarea
-		class="gsmCharCount"
-		name="message"
-		rows="6"
-		cols="60"
-		data-char-count-max="142"
-		data-char-count-id="gsmCharCount-0"></textarea>
-	</td>
--->
+	</field-set>
+
+	<field-set
+		name="verify-user"
+		object-name="chatUser">
+
+		<object-field
+			name="number"
+			object-type="number"/>
+
+		<code-field/>
+
+		<text-field
+			name="name"/>
+
+		<timestamp-field
+			name="lastAction"/>
+
+		<enum-field
+			name="gender"
+			helper="genderConsoleHelper"/>
+
+		<enum-field
+			name="orient"
+			helper="orientConsoleHelper"/>
+
+		<object-field
+			name="category"
+			root-field="chat"/>
+
+		<image-field
+			name="picture"
+			field="mainChatUserImage.media"
+			label="Pic"/>
+
+		<yes-no-field
+			name="adultVerified"
+			label="Adult"/>
 
 	</field-set>
 

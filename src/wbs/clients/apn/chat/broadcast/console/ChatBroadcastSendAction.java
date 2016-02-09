@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.broadcast.console;
 
 import static wbs.framework.utils.etc.Misc.allOf;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
@@ -210,9 +211,6 @@ class ChatBroadcastSendAction
 			ChatBroadcastSendForm form =
 				new ChatBroadcastSendForm ()
 
-				.search (
-					requestContext.getForm ("search") != null)
-
 				.includeBlocked (
 					false)
 
@@ -240,7 +238,8 @@ class ChatBroadcastSendAction
 					? updateResults
 					: new UpdateResultSet (),
 				form,
-				formHints);
+				formHints,
+				"send");
 
 			formFieldLogic.update (
 				requestContext,
@@ -249,7 +248,8 @@ class ChatBroadcastSendAction
 					? updateResults
 					: new UpdateResultSet (),
 				form,
-				formHints);
+				formHints,
+				"send");
 
 			formFieldLogic.update (
 				requestContext,
@@ -258,7 +258,8 @@ class ChatBroadcastSendAction
 					? updateResults
 					: new UpdateResultSet (),
 				form,
-				formHints);
+				formHints,
+				"send");
 
 			formFieldLogic.update (
 				requestContext,
@@ -267,7 +268,8 @@ class ChatBroadcastSendAction
 					? updateResults
 					: new UpdateResultSet (),
 				form,
-				formHints);
+				formHints,
+				"send");
 
 			requestContext.request (
 				"chatBroadcastForm",
@@ -284,6 +286,10 @@ class ChatBroadcastSendAction
 				form.search (
 					true);
 
+				requestContext.formData (
+					"search",
+					"yes");
+
 				return null;
 
 			}
@@ -296,6 +302,10 @@ class ChatBroadcastSendAction
 
 				form.search (
 					false);
+
+				requestContext.formData (
+					"search",
+					"no");
 
 				return null;
 
@@ -411,6 +421,13 @@ class ChatBroadcastSendAction
 						.orient (
 							form.orient ())
 
+						.hasCategory (
+							isNotNull (
+								form.categoryId))
+
+						.categoryId (
+							form.categoryId ())
+
 						.hasPicture (
 							form.hasPicture ())
 
@@ -419,8 +436,12 @@ class ChatBroadcastSendAction
 
 						.valueSinceEver (
 							Range.between (
-								form.minimumSpend (),
-								form.maximumSpend ()));
+								ifNull (
+									form.minimumSpend (),
+									Long.MIN_VALUE),
+								ifNull (
+									form.maximumSpend (),
+									Long.MAX_VALUE)));
 
 					allChatUserIds =
 						chatUserHelper.searchIds (
@@ -444,7 +465,9 @@ class ChatBroadcastSendAction
 						List<String> allNumbers =
 							numberFormatLogic.parseLines (
 								chat.getNumberFormat (),
-								(String) requestContext.getForm ("numbers"));
+								(String)
+								requestContext.getForm (
+									"numbers"));
 
 						int loop0 = 0;
 
@@ -484,7 +507,8 @@ class ChatBroadcastSendAction
 						requestContext.addError (
 							"Invalid mobile number");
 
-						return responder ("chatBroadcastSendResponder");
+						return responder (
+							"chatBroadcastSendResponder");
 
 					}
 
@@ -779,6 +803,20 @@ class ChatBroadcastSendAction
 					stringFormat (
 						"Message sent to %d users",
 						remainingChatUserIds.size ()));
+
+				requestContext.request (
+					"chatBroadcastForm",
+					new ChatBroadcastSendForm ()
+	
+					.includeBlocked (
+						false)
+
+					.includeOptedOut (
+						false)
+
+				);
+
+				requestContext.setEmptyFormData ();
 
 				return responder (
 					"chatBroadcastSendResponder");

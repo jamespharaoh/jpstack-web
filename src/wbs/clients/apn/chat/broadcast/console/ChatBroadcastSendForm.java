@@ -22,6 +22,8 @@ class ChatBroadcastSendForm {
 	Gender gender;
 	Orient orient;
 
+	Integer categoryId;
+
 	Boolean hasPicture;
 	Boolean isAdult;
 

@@ -1,9 +1,10 @@
 package wbs.smsapps.manualresponder.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.util.List;
 
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
 
@@ -32,14 +33,12 @@ class ManualResponderReportDaoHibernate
 			.add (
 				Restrictions.ge (
 					"_manualResponderReport.processedTime",
-					instantToDate (
-						processedTimeInterval.getStart ().toInstant ())))
+					processedTimeInterval.getStart ().toInstant ()))
 
 			.add (
 				Restrictions.lt (
 					"_manualResponderReport.processedTime",
-					instantToDate (
-						processedTimeInterval.getEnd ().toInstant ())))
+					processedTimeInterval.getEnd ().toInstant ()))
 
 			.list ());
 
@@ -66,16 +65,55 @@ class ManualResponderReportDaoHibernate
 			.add (
 				Restrictions.ge (
 					"_manualResponderReport.processedTime",
-					instantToDate (
-						processedTimeInterval.getStart ().toInstant ())))
+					processedTimeInterval.getStart ().toInstant ()))
 
 			.add (
 				Restrictions.lt (
 					"_manualResponderReport.processedTime",
-					instantToDate (
-						processedTimeInterval.getEnd ().toInstant ())))
+					processedTimeInterval.getEnd ().toInstant ()))
 
 			.list ());
+
+	}
+
+	@Override
+	public
+	Long countByProcessedTime (
+			UserRec processedByUser,
+			Interval processedTimeInterval) {
+
+		Long value =
+			findOne (
+				Long.class,
+
+			createCriteria (
+				ManualResponderReportRec.class,
+				"_manualResponderReport")
+
+			.add (
+				Restrictions.eq (
+					"_manualResponderReport.processedByUser",
+					processedByUser))
+
+			.add (
+				Restrictions.ge (
+					"_manualResponderReport.processedTime",
+					processedTimeInterval.getStart ().toInstant ()))
+
+			.add (
+				Restrictions.lt (
+					"_manualResponderReport.processedTime",
+					processedTimeInterval.getEnd ().toInstant ()))
+
+			.setProjection (
+				Projections.sum (
+					"num"))
+
+			.list ());
+
+		return ifNull (
+			value,
+			0l);
 
 	}
 

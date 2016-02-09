@@ -1,10 +1,13 @@
 package wbs.framework.hibernate;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -20,6 +23,8 @@ import org.hibernate.ReplicationMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+
+import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.entity.model.Model;
@@ -436,6 +441,50 @@ class HibernateHelperProviderBuilder {
 				session.get (
 					objectClass (),
 					(int) id);
+
+		}
+
+		@Override
+		public
+		List<Record<?>> find (
+				List<Long> ids) {
+
+			if (
+				isEmpty (
+					ids)
+			) {
+				return ImmutableList.of ();
+			}
+
+			Session session =
+				hibernateDatabase.currentSession ();
+
+			Criteria criteria =
+				session.createCriteria (
+					objectClass ());
+
+			List<Integer> intIds =
+				ids.stream ()
+					.map (id -> (int) (long) (Long) id)
+					.collect (Collectors.toList ());
+
+			criteria.add (
+				Restrictions.in (
+					"id",
+					intIds));
+
+			List<Record<?>> records =
+				criteria.list ();
+
+			Map<Integer,Record<?>> recordsById =
+				records.stream ()
+					.collect (Collectors.toMap (
+						Record::getId,
+						record -> record));
+
+			return intIds.stream ()
+				.map (recordsById::get)
+				.collect (Collectors.toList ());
 
 		}
 

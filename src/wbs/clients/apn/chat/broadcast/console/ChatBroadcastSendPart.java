@@ -146,7 +146,8 @@ class ChatBroadcastSendPart
 			updateResults,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
 			requestContext,
@@ -155,7 +156,8 @@ class ChatBroadcastSendPart
 			updateResults,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
 			requestContext,
@@ -164,7 +166,8 @@ class ChatBroadcastSendPart
 			updateResults,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
 			requestContext,
@@ -173,7 +176,8 @@ class ChatBroadcastSendPart
 			updateResults,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		if (! form.search ()) {
 
@@ -187,7 +191,8 @@ class ChatBroadcastSendPart
 				updateResults,
 				form,
 				formHints,
-				FormType.search);
+				FormType.search,
+				"send");
 
 			printFormat (
 				"</table>\n");
@@ -205,7 +210,8 @@ class ChatBroadcastSendPart
 				searchFields,
 				form,
 				formHints,
-				FormType.search);
+				FormType.search,
+				"send");
 
 		}
 
@@ -221,7 +227,8 @@ class ChatBroadcastSendPart
 				updateResults,
 				form,
 				formHints,
-				FormType.search);
+				FormType.search,
+				"send");
 
 			printFormat (
 				"</table>\n");
@@ -239,7 +246,8 @@ class ChatBroadcastSendPart
 				numbersFields,
 				form,
 				formHints,
-				FormType.search);
+				FormType.search,
+				"send");
 
 		}
 
@@ -256,7 +264,8 @@ class ChatBroadcastSendPart
 			updateResults,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		printFormat (
 			"</table>\n");
@@ -274,7 +283,8 @@ class ChatBroadcastSendPart
 			messageMessageFields,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		printFormat (
 			"</form>\n");

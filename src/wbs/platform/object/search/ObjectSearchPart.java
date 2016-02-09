@@ -1,8 +1,10 @@
 package wbs.platform.object.search;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -21,10 +23,12 @@ import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.ConsoleHelperRegistry;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchPart")
@@ -33,6 +37,9 @@ class ObjectSearchPart
 	extends AbstractPagePart {
 
 	// dependencies
+
+	@Inject
+	ConsoleHelperRegistry consoleHelperRegistry;
 
 	@Inject
 	FormFieldLogic formFieldLogic;
@@ -58,6 +65,7 @@ class ObjectSearchPart
 
 	Object search;
 	Optional<UpdateResultSet> updateResultSet;
+	Map<String,Object> formHints;
 
 	// details
 
@@ -112,6 +120,36 @@ class ObjectSearchPart
 				requestContext.request (
 					"objectSearchUpdateResultSet"));
 
+		ImmutableMap.Builder<String,Object> formHintsBuilder =
+			ImmutableMap.builder ();
+
+		if (consoleHelper.parentExists ()) {
+
+			ConsoleHelper<?> parentHelper =
+				consoleHelperRegistry.findByObjectClass (
+					consoleHelper.parentClass ());
+
+			Record<?> parent =
+				parentHelper.find (
+					requestContext.stuffInt (
+						parentHelper.idKey ()));
+
+			if (
+				isNotNull (
+					parent)
+			) {
+
+				formHintsBuilder.put (
+					consoleHelper.parentFieldName (),
+					parent);
+
+			}					
+
+		}
+	
+		formHints =
+			formHintsBuilder.build ();		
+
 	}
 
 	@Override
@@ -137,8 +175,9 @@ class ObjectSearchPart
 			formFieldSet,
 			updateResultSet,
 			search,
-			ImmutableMap.of (),
-			FormType.search);
+			formHints,
+			FormType.search,
+			"search");
 
 		printFormat (
 			"</table>\n");
@@ -171,7 +210,8 @@ class ObjectSearchPart
 			formFieldSet,
 			FormType.search,
 			search,
-			ImmutableMap.of ());
+			formHints,
+			"search");
 
 		printFormat (
 			"\t}\n");

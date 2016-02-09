@@ -348,7 +348,8 @@ class ObjectTicketCreateAction<
 				requestContext,
 				formFieldSet,
 				ticket,
-				ImmutableMap.of ());
+				ImmutableMap.of (),
+				"create");
 
 		if (updateResultSet.errorCount () > 0) {
 
@@ -423,7 +424,8 @@ class ObjectTicketCreateAction<
 				ticket,
 				(PermanentRecord<?>) ticket,
 				Optional.<Object>absent (),
-				Optional.<String>absent ());
+				Optional.<String>absent (),
+				"create");
 
 		} else {
 
@@ -435,7 +437,8 @@ class ObjectTicketCreateAction<
 				Optional.of (
 					objectRef),
 				Optional.of (
-					consoleHelper.shortName ()));
+					consoleHelper.shortName ()),
+				"create");
 
 		}
 

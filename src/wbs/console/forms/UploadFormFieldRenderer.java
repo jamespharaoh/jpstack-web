@@ -53,7 +53,8 @@ class UploadFormFieldRenderer<Container>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<FileUpload> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		doNothing ();
 
@@ -67,12 +68,14 @@ class UploadFormFieldRenderer<Container>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<FileUpload> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		out.writeFormat (
 			"<input",
 			" type=\"file\"",
-			" name=\"%h\"",
+			" name=\"%h-%h\"",
+			formName,
 			name (),
 			">\n");
 
@@ -85,16 +88,19 @@ class UploadFormFieldRenderer<Container>
 			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<FileUpload> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		javascriptWriter.writeFormat (
-			"%s$(\"#%j\").replaceWith (\n",
+			"%s$(\"#%j-%j\").replaceWith (\n",
 			indent,
+			formName,
 			name);
 
 		javascriptWriter.writeFormat (
-			"%s\t$(\"#%j\").clone (true));\n",
+			"%s\t$(\"#%j-%j\").clone (true));\n",
 			indent,
+			formName,
 			name);
 
 	}
@@ -102,25 +108,33 @@ class UploadFormFieldRenderer<Container>
 	@Override
 	public
 	boolean formValuePresent (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return (
 
 			submission.multipart ()
 
 			&& submission.hasFileItem (
-				name ())
+				stringFormat (
+					"%s-%s",
+					formName,
+					name ()))
 
 		);
 
 	}
 
 	FileUpload formValue (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		FileItem fileItem =
 			submission.fileItem (
-				name ());
+				stringFormat (
+					"%s-%s",
+					formName,
+					name ()));
 
 		try {
 
@@ -148,12 +162,14 @@ class UploadFormFieldRenderer<Container>
 	@Override
 	public
 	Either<Optional<FileUpload>,String> formToInterface (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return successResult (
 			Optional.fromNullable (
 				formValue (
-					submission)));
+					submission,
+					formName)));
 
 	}
 

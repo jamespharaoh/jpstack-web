@@ -62,7 +62,8 @@ class ChatUserImageUploadPart
 				requestContext,
 				formFieldSet,
 				uploadForm,
-				ImmutableMap.of ());
+				ImmutableMap.of (),
+				"upload");
 
 		}
 
@@ -96,7 +97,8 @@ class ChatUserImageUploadPart
 			Optional.absent (),
 			uploadForm,
 			ImmutableMap.of (),
-			FormType.perform);
+			FormType.perform,
+			"upload");
 
 		printFormat (
 			"</table>\n");

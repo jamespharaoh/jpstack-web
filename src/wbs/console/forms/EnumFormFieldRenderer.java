@@ -56,12 +56,14 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		htmlWriter.writeFormat (
 			"<input",
 			" type=\"hidden\"",
-			" name=\"%h\"",
+			" name=\"%h-%h\"",
+			formName,
 			name (),
 			" value=\"%h\"",
 			interfaceValue.isPresent ()
@@ -80,21 +82,26 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		Optional<Interface> currentValue =
 			formValuePresent (
-					submission)
+					submission,
+					formName)
 				? requiredSuccess (
 					formToInterface (
-						submission))
+						submission,
+						formName))
 				: interfaceValue;
 
 		htmlWriter.writeFormat (
 			"<select",
-			" id=\"%h\"",
+			" id=\"%h-%h\"",
+			formName,
 			name,
-			" name=\"%h\"",
+			" name=\"%h-%h\"",
+			formName,
 			name,
 			">\n");
 
@@ -159,7 +166,8 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<Interface> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		if (
 			in (
@@ -170,8 +178,9 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 		) {
 
 			javascriptWriter.writeFormat (
-				"%s$(\"#%j\").val (\"none\");\n",
+				"%s$(\"#%j-%j\").val (\"none\");\n",
 				indent,
+				formName,
 				name);
 
 		} else if (
@@ -181,8 +190,9 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 		) {
 
 			javascriptWriter.writeFormat (
-				"%s$(\"#%j\").val (\"%h\");\n",
+				"%s$(\"#%j-%j\").val (\"%h\");\n",
 				indent,
+				formName,
 				name,
 				interfaceValue.isPresent ()
 					? camelToHyphen (
@@ -200,21 +210,29 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	@Override
 	public
 	boolean formValuePresent (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return submission.hasParameter (
-			name ());
+			stringFormat (
+				"%s-%s",
+				formName,
+				name ()));
 
 	}
 
 	@Override
 	public
 	Either<Optional<Interface>,String> formToInterface (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		String parameterValue =
 			submission.parameter (
-				name ());
+				stringFormat (
+					"%s-%s",
+					formName,
+					name ()));
 
 		if (
 			equal (

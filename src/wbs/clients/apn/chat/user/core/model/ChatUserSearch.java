@@ -31,6 +31,8 @@ class ChatUserSearch
 
 	Gender gender;
 	Orient orient;
+
+	Boolean hasCategory;
 	Integer categoryId;
 
 	String name;

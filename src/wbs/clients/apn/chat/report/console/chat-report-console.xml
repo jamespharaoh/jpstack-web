@@ -214,10 +214,14 @@
 		name="admin-credit-results"
 		object-name="chatUserCredit">
 
-		<id-field/>
+		<object-field
+			name="chat"
+			field="chatUser.chat"
+			object-type="chat"/>
 
 		<code-field
-			delegate="chatUser"/>
+			delegate="chatUser"
+			label="User"/>
 
 		<timestamp-field
 			name="timestamp"/>

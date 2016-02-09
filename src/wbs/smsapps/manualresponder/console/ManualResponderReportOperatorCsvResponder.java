@@ -100,7 +100,8 @@ class ManualResponderReportOperatorCsvResponder
 			requestContext,
 			searchFormFieldSet,
 			searchForm,
-			ImmutableMap.of ());
+			ImmutableMap.of (),
+			"report");
 
 		reports =
 			manualResponderReportHelper.findByProcessedTime (

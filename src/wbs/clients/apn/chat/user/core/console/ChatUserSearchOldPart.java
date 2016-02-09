@@ -18,6 +18,7 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 
+@Deprecated
 @PrototypeComponent ("chatUserSearchOldPart")
 public
 class ChatUserSearchOldPart

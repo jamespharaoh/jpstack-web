@@ -1,11 +1,9 @@
 package wbs.clients.apn.chat.broadcast.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
-import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -69,6 +67,7 @@ class ChatBroadcastVerifyPart
 	FormFieldSet numbersFields;
 	FormFieldSet messageUserFields;
 	FormFieldSet messageMessageFields;
+	FormFieldSet verifyUserFields;
 
 	ChatBroadcastSendForm form;
 	Map<String,Object> formHints;
@@ -127,6 +126,10 @@ class ChatBroadcastVerifyPart
 			chatBroadcastConsoleModule.formFieldSets ().get (
 				"send-message-message");
 
+		verifyUserFields =
+			chatBroadcastConsoleModule.formFieldSets ().get (
+				"verify-user");
+
 		form =
 			(ChatBroadcastSendForm)
 			requestContext.request (
@@ -174,7 +177,8 @@ class ChatBroadcastVerifyPart
 			updateResults,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
 			requestContext,
@@ -183,7 +187,8 @@ class ChatBroadcastVerifyPart
 			updateResults,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
 			requestContext,
@@ -192,7 +197,8 @@ class ChatBroadcastVerifyPart
 			updateResults,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
 			requestContext,
@@ -201,7 +207,8 @@ class ChatBroadcastVerifyPart
 			updateResults,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		// temporarily hidden
 
@@ -211,7 +218,8 @@ class ChatBroadcastVerifyPart
 			searchFields,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		formFieldLogic.outputFormTemporarilyHidden (
 			requestContext,
@@ -219,7 +227,8 @@ class ChatBroadcastVerifyPart
 			numbersFields,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		formFieldLogic.outputFormTemporarilyHidden (
 			requestContext,
@@ -227,7 +236,8 @@ class ChatBroadcastVerifyPart
 			messageUserFields,
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		// message info
 
@@ -267,7 +277,8 @@ class ChatBroadcastVerifyPart
 			Optional.absent (),
 			form,
 			formHints,
-			FormType.search);
+			FormType.search,
+			"send");
 
 		printFormat (
 			"</table>\n");
@@ -312,86 +323,17 @@ class ChatBroadcastVerifyPart
 
 		}
 
-		printFormat (
-			"<table class=\"list\">\n");
+		List<ChatUserRec> chatUsers =
+			chatUserHelper.find (
+				chatUserIds.stream ()
+					.map (value -> (long) (int) value)
+					.collect (Collectors.toList ()));
 
-		printFormat (
-			"<tr>\n",
-			"<th>Number</th>\n",
-			"<th>Code</th>\n",
-			"<th>Name</th>\n",
-			"<th>Last action</th>\n",
-			"<th>Gender</th>\n",
-			"<th>Orient</th>\n",
-			"<th>Pic</th>\n",
-			"<th>Adult</th>\n",
-			"</tr>\n");
-
-		int loop = 0;
-
-		for (Integer chatUserId
-				: chatUserIds) {
-
-			ChatUserRec chatUser =
-				chatUserHelper.find (chatUserId);
-
-			printFormat (
-				"<tr>\n");
-
-			printFormat (
-				"<td>%h</td>\n",
-				chatUser.getNumber ().getNumber ());
-
-			printFormat (
-				"<td>%h</td>\n",
-				chatUser.getCode ());
-
-			printFormat (
-				"<td>%h</td>\n",
-				emptyStringIfNull (
-					chatUser.getName ()));
-
-			printFormat (
-				"<td>%h</td>\n",
-				timeFormatter.instantToTimestampString (
-					chatMiscLogic.timezone (
-						chat),
-					dateToInstant (
-						chatUser.getLastAction ())));
-
-			printFormat (
-				"<td>%h</td>\n",
-				chatUser.getGender ());
-
-			printFormat (
-				"<td>%h</td>\n",
-				chatUser.getOrient ());
-
-			printFormat (
-				"<td>%h</td>\n",
-				chatUser.getMainChatUserImage () != null
-					? "yes"
-					: "no");
-
-			printFormat (
-				"<td>%h</td>\n",
-				chatUser.getAdultVerified ()
-					? "yes"
-					: "no");
-
-			printFormat (
-				"</tr>\n");
-
-			if (++ loop % 128 == 0) {
-
-				database.clear ();
-
-			}
-
-		}
-
-		printFormat (
-			"</table>\n");
+		formFieldLogic.outputListTable (
+			formatWriter,
+			verifyUserFields,
+			chatUsers,
+			false);
 
 	}
 

@@ -142,7 +142,8 @@ class ObjectSettingsAction<
 				requestContext,
 				formFieldSet,
 				object,
-				ImmutableMap.of ());
+				ImmutableMap.of (),
+				"settings");
 
 		if (updateResultSet.errorCount () > 0) {
 
@@ -177,7 +178,8 @@ class ObjectSettingsAction<
 				object,
 				(PermanentRecord<?>) object,
 				Optional.<Object>absent (),
-				Optional.<String>absent ());
+				Optional.<String>absent (),
+				"settings");
 
 		} else {
 
@@ -198,7 +200,8 @@ class ObjectSettingsAction<
 				Optional.of (
 					objectRef),
 				Optional.of (
-					objectType));
+					objectType),
+				"settings");
 
 		}
 

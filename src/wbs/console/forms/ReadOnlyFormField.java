@@ -5,7 +5,6 @@ import static wbs.framework.utils.etc.Misc.eitherGetLeft;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.split;
@@ -168,7 +167,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		Optional<Native> nativeValue =
 			requiredValue (
@@ -192,9 +192,11 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 		htmlWriter.writeFormat (
 			"<input",
 			" type=\"hidden\"",
-			" id=\"%h\"",
+			" id=\"%h-%h\"",
+			formName,
 			name (),
-			" name=\"%h\"",
+			" name=\"%h-%h\"",
+			formName,
 			name (),
 			" value=\"%h\"",
 			interfaceValue.isPresent ()
@@ -286,7 +288,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> error,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		Optional<Native> nativeValue =
 			requiredValue (
@@ -311,29 +314,11 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			"<tr>\n",
 			"<th>%h</th>\n",
 			label (),
-			"<td>");
-
-		renderer.renderFormInput (
-			submission,
-			htmlWriter,
-			container,
-			hints,
-			interfaceValue,
-			formType);
-
-		if (
-			isPresent (
-				error)
-		) {
-
-			htmlWriter.writeFormat (
-				"<br>\n",
-				"%h",
-				error.get ());
-
-		}
-
-		htmlWriter.writeFormat (
+			"<td>%s",
+			renderer.interfaceToHtmlComplex (
+				container,
+				hints,
+				interfaceValue),
 			"</td>\n",
 			"</tr>\n");
 
@@ -346,7 +331,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 	}
 
@@ -402,7 +388,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	UpdateResult<Generic,Native> update (
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map<String,Object> hints,
+			@NonNull String formName) {
 
 		return new UpdateResult<Generic,Native> ()
 

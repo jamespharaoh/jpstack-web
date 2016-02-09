@@ -38,6 +38,21 @@
 			type="queueItem"
 			nullable="yes"/>
 
+		<!-- statistics -->
+
+		<integer-field
+			name="numFreeMessages"
+			default="0"/>
+
+		<integer-field
+			name="numBilledMessages"
+			default="0"/>
+
+		<timestamp-field
+			name="processedTime"
+			column-type="iso"
+			nullable="yes"/>
+
 	</fields>
 
 	<collections>

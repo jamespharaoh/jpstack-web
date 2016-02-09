@@ -66,22 +66,26 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		if (
 			formValuePresent (
-				submission)
+				submission,
+				formName)
 		) {
 			interfaceValue =
 				Optional.of (
 					formValue (
-						submission));
+						submission,
+						formName));
 		}
 
 		htmlWriter.writeFormat (
 			"<input",
 			" type=\"hidden\"",
-			" name=\"%h\"",
+			" name=\"%h-%h\"",
+			formName,
 			name (),
 			" value=\"%h\"",
 			interfaceValue.or (""),
@@ -97,17 +101,20 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		out.writeFormat (
 			"<textarea",
-			" id=\"field_%h\"",
+			" id=\"%h-%h\"",
+			formName,
 			name (),
 			" rows=\"%h\"",
 			rows (),
 			" cols=\"%h\"",
 			cols (),
-			" name=\"%h\"",
+			" name=\"%h-%h\"",
+			formName,
 			name ());
 
 		if (charCountFunction != null) {
@@ -116,7 +123,10 @@ class TextAreaFormFieldRenderer<Container,Parent>
 				stringFormat (
 					"%s (this, document.getElementById ('%j'), %s);",
 					charCountFunction,
-					"chars_" + name (),
+					stringFormat (
+						"%s-%s-chargs",
+						formName,
+						name ()),
 					ifNull (
 						charCountData,
 						"undefined"));
@@ -132,9 +142,11 @@ class TextAreaFormFieldRenderer<Container,Parent>
 		out.writeFormat (
 			">%h</textarea>",
 			formValuePresent (
-					submission)
+					submission,
+					formName)
 				? formValue (
-					submission)
+					submission,
+					formName)
 				: interfaceValue.or (
 					""));
 
@@ -145,8 +157,11 @@ class TextAreaFormFieldRenderer<Container,Parent>
 
 			out.writeFormat (
 				"<span",
-				" id=\"chars_%h\"",
-				name (),
+				" id=\"%h\"",
+				stringFormat (
+					"%s-%s-chars",
+					formName,
+					name ()),
 				">&nbsp;</span>");
 
 		}
@@ -311,7 +326,8 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		if (
 			in (
@@ -322,8 +338,9 @@ class TextAreaFormFieldRenderer<Container,Parent>
 		) {
 
 			javascriptWriter.writeFormat (
-				"%s$(\"#%j\").val (\"\");\n",
+				"%s$(\"#%j-%j\").val (\"\");\n",
 				indent,
+				formName,
 				name);
 
 		} else if (
@@ -333,8 +350,9 @@ class TextAreaFormFieldRenderer<Container,Parent>
 		) {
 
 			javascriptWriter.writeFormat (
-				"%s$(\"#%j\").val (\"%j\");\n",
+				"%s$(\"#%j-%j\").val (\"%j\");\n",
 				indent,
+				formName,
 				name,
 				interfaceValue.or (""));
 
@@ -349,30 +367,42 @@ class TextAreaFormFieldRenderer<Container,Parent>
 	@Override
 	public
 	boolean formValuePresent (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return submission.hasParameter (
-			name ());
+			stringFormat (
+				"%s-%s",
+				formName,
+				name ()));
 
 	}
 
 	String formValue (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return submission.parameter (
-			name ());
+			stringFormat (
+				"%s-%s",
+				formName,
+				name ()));
 
 	}
 
 	@Override
 	public
 	Either<Optional<String>,String> formToInterface (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return successResult (
 			Optional.fromNullable (
 				submission.parameter (
-					name ())));
+					stringFormat (
+						"%s-%s",
+						formName,
+						name ()))));
 
 	}
 

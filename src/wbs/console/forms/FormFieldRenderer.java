@@ -25,7 +25,8 @@ interface FormFieldRenderer<Container,Interface> {
 			Container container,
 			Map<String,Object> hints,
 			Optional<Interface> interfaceValue,
-			FormType formType);
+			FormType formType,
+			String formName);
 
 	void renderFormInput (
 			FormFieldSubmission submission,
@@ -33,20 +34,24 @@ interface FormFieldRenderer<Container,Interface> {
 			Container container,
 			Map<String,Object> hints,
 			Optional<Interface> interfaceValue,
-			FormType formType);
+			FormType formType,
+			String formName);
 
 	void renderFormReset (
 			FormatWriter htmlWriter,
 			String indent,
 			Container container,
 			Optional<Interface> interfaceValue,
-			FormType formType);
+			FormType formType,
+			String formName);
 
 	boolean formValuePresent (
-			FormFieldSubmission submission);
+			FormFieldSubmission submission,
+			String formName);
 
 	Either<Optional<Interface>,String> formToInterface (
-			FormFieldSubmission submission);
+			FormFieldSubmission submission,
+			String formName);
 
 	default
 	String interfaceToHtmlTableCell (

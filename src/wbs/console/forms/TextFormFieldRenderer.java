@@ -74,22 +74,26 @@ class TextFormFieldRenderer<Container>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		if (
 			formValuePresent (
-				submission)
+				submission,
+				formName)
 		) {
 			interfaceValue =
 				Optional.of (
 					formValue (
-						submission));
+						submission,
+						formName));
 		}
 
 		htmlWriter.writeFormat (
 			"<input",
 			" type=\"hidden\"",
-			" name=\"%h\"",
+			" name=\"%h-%h\"",
+			formName,
 			name (),
 			" value=\"%h\"",
 			interfaceValue.or (""),
@@ -105,20 +109,25 @@ class TextFormFieldRenderer<Container>
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		out.writeFormat (
 			"<input",
 			" type=\"text\"",
-			" id=\"%h\"",
+			" id=\"%h-%h\"",
+			formName,
 			name (),
-			" name=\"%h\"",
+			" name=\"%h-%h\"",
+			formName,
 			name (),
 			" value=\"%h\"",
 			formValuePresent (
-					submission)
+					submission,
+					formName)
 				? formValue (
-					submission)
+					submission,
+					formName)
 				: interfaceValue.or (
 					""),
 			" size=\"%h\"",
@@ -139,14 +148,23 @@ class TextFormFieldRenderer<Container>
 			) {
 
 				out.writeFormat (
-					"\n<button",
-					" onclick=\"%h\"",
+					"\n<input",
+					" type=\"button\"",
+					" name=\"%h\"",
 					stringFormat (
-						"$('#%j').val ('%j'); return false",
+						"%s-%s-%s",
+						formName,
 						name (),
 						presetEntry.getValue ()),
-					">%h</button>",
-					presetEntry.getKey ());
+					" onclick=\"%h\"",
+					stringFormat (
+						"$('#%j-%j').val ('%j'); return false",
+						formName,
+						name (),
+						presetEntry.getValue ()),
+					" value=\"%h\"",
+					presetEntry.getKey (),
+					">");
 
 			}
 
@@ -161,7 +179,8 @@ class TextFormFieldRenderer<Container>
 			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
-			@NonNull FormType formType) {
+			@NonNull FormType formType,
+			@NonNull String formName) {
 
 		if (
 			in (
@@ -172,8 +191,9 @@ class TextFormFieldRenderer<Container>
 		) {
 
 			javascriptWriter.writeFormat (
-				"%s$(\"#%j\").val (\"\");\n",
+				"%s$(\"#%j-%j\").val (\"\");\n",
 				indent,
+				formName,
 				name);
 
 		} else if (
@@ -183,8 +203,9 @@ class TextFormFieldRenderer<Container>
 		) {
 
 			javascriptWriter.writeFormat (
-				"%s$(\"#%j\").val (\"%j\");\n",
+				"%s$(\"#%j-%j\").val (\"%j\");\n",
 				indent,
+				formName,
 				name,
 				interfaceValue.or (""));
 
@@ -199,29 +220,39 @@ class TextFormFieldRenderer<Container>
 	@Override
 	public
 	boolean formValuePresent (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return submission.hasParameter (
-			name ());
+			stringFormat (
+				"%s-%s",
+				formName,
+				name ()));
 
 	}
 
 	String formValue (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		return submission.parameter (
-			name ());
+			stringFormat (
+				"%s-%s",
+				formName,
+				name ()));
 
 	}
 
 	@Override
 	public
 	Either<Optional<String>,String> formToInterface (
-			@NonNull FormFieldSubmission submission) {
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
 
 		String formValue =
 			formValue (
-				submission);
+				submission,
+				formName);
 
 		if (
 
