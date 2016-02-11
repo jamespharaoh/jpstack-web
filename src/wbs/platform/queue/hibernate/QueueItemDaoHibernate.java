@@ -171,12 +171,12 @@ class QueueItemDaoHibernate
 	}
 
 	@Override
-	public 
+	public
 	List<QueueItemRec> findActive () {
 
 		return findMany (
 			QueueItemRec.class,
-			
+
 			createCriteria (
 				QueueItemRec.class,
 				"_queueItem")

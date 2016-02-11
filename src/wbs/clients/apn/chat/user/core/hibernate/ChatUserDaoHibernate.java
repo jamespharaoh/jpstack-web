@@ -1071,7 +1071,7 @@ class ChatUserDaoHibernate
 			criteria.add (
 				Restrictions.ilike (
 					"_chatUser.name",
-					search.numberLike ()));
+					search.name ()));
 
 		}
 

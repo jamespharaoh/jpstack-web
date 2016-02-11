@@ -144,6 +144,14 @@ interface FormField<Container,Generic,Native,Interface> {
 	}
 
 	default
+	void implicit (
+			@NonNull Container container) {
+
+		doNothing ();
+
+	}
+
+	default
 	UpdateResult<Generic,Native> update (
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,

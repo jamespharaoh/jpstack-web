@@ -51,6 +51,7 @@ import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.messageset.logic.MessageSetLogic;
+import wbs.sms.messageset.model.MessageSetObjectHelper;
 import wbs.smsapps.photograbber.model.PhotoGrabberRec;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestObjectHelper;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestRec;
@@ -81,6 +82,9 @@ class PhotoGrabberCommand
 
 	@Inject
 	Provider<MessageSender> messageSender;
+
+	@Inject
+	MessageSetObjectHelper messageSetHelper;
 
 	@Inject
 	MessageSetLogic messageSetLogic;
@@ -197,7 +201,7 @@ class PhotoGrabberCommand
 				photoGrabberRequest);
 
 			messageSetLogic.sendMessageSet (
-				messageSetLogic.findMessageSet (
+				messageSetHelper.findByCode (
 					photoGrabber,
 					"photo_grabber_not_found"),
 				message.getThreadId (),
@@ -231,7 +235,7 @@ class PhotoGrabberCommand
 				photoGrabberRequest);
 
 			messageSetLogic.sendMessageSet (
-				messageSetLogic.findMessageSet (
+				messageSetHelper.findByCode (
 					photoGrabber,
 					"photo_grabber_not_found"),
 				message.getThreadId (),

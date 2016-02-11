@@ -75,14 +75,6 @@
 			currency="chat.currency"
 			nullable="yes"/>
 
-		<yes-no-field
-			name="includeBlocked"
-			view-priv="chat:supervisor"/>
-
-		<yes-no-field
-			name="includeOptedOut"
-			view-priv="chat:supervisor"/>
-
 	</field-set>
 
 	<field-set
@@ -91,6 +83,20 @@
 
 		<text-area-field
 			name="numbers"/>
+
+	</field-set>
+
+	<field-set
+		name="send-common"
+		class="wbs.clients.apn.chat.broadcast.console.ChatBroadcastSendForm">
+
+		<yes-no-field
+			name="includeBlocked"
+			view-priv="chat:supervisor"/>
+
+		<yes-no-field
+			name="includeOptedOut"
+			view-priv="chat:supervisor"/>
 
 	</field-set>
 

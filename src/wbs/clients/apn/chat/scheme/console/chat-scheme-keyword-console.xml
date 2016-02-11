@@ -134,27 +134,32 @@
 
 		<enum-field
 			name="joinType"
-			helper="chatKeywordJoinTypeConsoleHelper"/>
+			helper="chatKeywordJoinTypeConsoleHelper"
+			nullable="yes"/>
 
 		<enum-field
 			name="joinGender"
-			helper="genderConsoleHelper"/>
+			helper="genderConsoleHelper"
+			nullable="yes"/>
 
 		<enum-field
 			name="joinOrient"
-			helper="orientConsoleHelper"/>
+			helper="orientConsoleHelper"
+			nullable="yes"/>
 
 		<object-field
 			name="joinChatAffiliate"
 			object-type="chatAffiliate"
-			root-field="chatScheme"/>
+			root-field="chatScheme"
+			nullable="yes"/>
 
 		<yes-no-field
 			name="confirmCharges"/>
 
 		<object-field
 			name="command"
-			object-type="command"/>
+			object-type="command"
+			nullable="yes"/>
 
 		<yes-no-field
 			name="noCreditCheck"/>

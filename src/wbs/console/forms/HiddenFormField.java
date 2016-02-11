@@ -3,6 +3,7 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.eitherGetLeft;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isError;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.split;
@@ -67,7 +68,7 @@ class HiddenFormField<Container,Generic,Native>
 
 	@DataAttribute
 	@Getter @Setter
-	String label;
+	Optional<Optional<Generic>> implicitValue;
 
 	@DataAttribute
 	@Getter @Setter
@@ -203,6 +204,30 @@ class HiddenFormField<Container,Generic,Native>
 			" value=\"%h\"",
 			interfaceValue.or (""),
 			">\n");
+
+	}
+
+	@Override
+	public
+	void implicit (
+			@NonNull Container container) {
+
+		if (
+			isNotPresent (
+				implicitValue)
+		) {
+			return;
+		}
+
+		Optional<Native> nativeValue =
+			requiredValue (
+				nativeMapping.genericToNative (
+					container,
+					implicitValue.get ()));
+
+		accessor.write (
+			container,
+			nativeValue);
 
 	}
 

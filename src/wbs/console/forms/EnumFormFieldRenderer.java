@@ -251,7 +251,10 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 						enumConsoleHelper.enumClass (),
 						hyphenToCamel (
 							submission.parameter (
-								name ())))));
+								stringFormat (
+									"%s-%s",
+									formName,
+									name ()))))));
 
 		}
 

@@ -118,7 +118,8 @@ class ImChatCustomerCreditAction
 
 			formFieldLogic.reportErrors (
 				requestContext,
-				updateResultSet);
+				updateResultSet,
+				"credit");
 
 			return null;
 

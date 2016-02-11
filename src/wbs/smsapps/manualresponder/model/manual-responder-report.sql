@@ -10,9 +10,9 @@ AS SELECT
 	req.queue_item_id as queue_item_id,
 	req.timestamp AS request_time,
 	req.processed_time AS processed_time,
-	
+
 	to_char (req.timestamp, 'YYYY-MM-DD HH24:MI:SS') AS timestring,
-	
+
 	req.num_billed_messages :: bigint as num
 
 FROM manual_responder_request AS req;

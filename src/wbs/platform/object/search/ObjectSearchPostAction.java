@@ -193,6 +193,10 @@ class ObjectSearchPostAction
 
 		}
 
+		fieldsLogic.implicit (
+			searchFormFieldSet,
+			search);
+
 		consoleHelper.consoleHooks ().applySearchFilter (
 			search);
 
@@ -237,7 +241,8 @@ class ObjectSearchPostAction
 
 			fieldsLogic.reportErrors (
 				requestContext,
-				updateResultSet);
+				updateResultSet,
+				"search");
 
 			requestContext.request (
 				"objectSearchUpdateResultSet",
@@ -283,8 +288,6 @@ class ObjectSearchPostAction
 					search);
 
 		}
-
-System.out.println ("IT IS: " + resultsDaoMethodName);
 
 		if (objectIds.isEmpty ()) {
 

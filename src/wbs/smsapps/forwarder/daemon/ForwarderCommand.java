@@ -25,6 +25,7 @@ import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.messageset.logic.MessageSetLogic;
+import wbs.sms.messageset.model.MessageSetObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderRec;
@@ -54,6 +55,9 @@ class ForwarderCommand
 
 	@Inject
 	MessageObjectHelper messageHelper;
+
+	@Inject
+	MessageSetObjectHelper messageSetHelper;
 
 	@Inject
 	MessageSetLogic messageSetLogic;
@@ -130,7 +134,7 @@ class ForwarderCommand
 		);
 
 		messageSetLogic.sendMessageSet (
-			messageSetLogic.findMessageSet (
+			messageSetHelper.findByCode (
 				forwarder,
 				"forwarder"),
 			message.getThreadId (),

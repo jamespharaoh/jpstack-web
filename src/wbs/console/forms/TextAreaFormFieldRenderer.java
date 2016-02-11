@@ -124,7 +124,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 					"%s (this, document.getElementById ('%j'), %s);",
 					charCountFunction,
 					stringFormat (
-						"%s-%s-chargs",
+						"%s-%s-chars",
 						formName,
 						name ()),
 					ifNull (

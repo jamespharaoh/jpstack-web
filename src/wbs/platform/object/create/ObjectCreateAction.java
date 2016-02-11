@@ -242,7 +242,8 @@ class ObjectCreateAction<
 
 			formFieldLogic.reportErrors (
 				requestContext,
-				updateResultSet);
+				updateResultSet,
+				"create");
 
 			requestContext.request (
 				"objectCreateUpdateResultSet",
@@ -429,7 +430,9 @@ class ObjectCreateAction<
 			parentId =
 				toInteger (
 					requestContext.getForm (
-						consoleHelper.parentFieldName ()));
+						stringFormat (
+							"create-%s",
+							consoleHelper.parentFieldName ())));
 
 		}
 

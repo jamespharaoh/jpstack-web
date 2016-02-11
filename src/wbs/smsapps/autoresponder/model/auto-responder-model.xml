@@ -34,6 +34,10 @@
 			type="numberList"
 			nullable="yes"/>
 
+		<yes-no-field
+			name="sequenceResponses"
+			default="no"/>
+
 	</fields>
 
 	<priv-types>
@@ -70,6 +74,14 @@
 			description="Request a response from an auto-responder"/>
 
 	</command-types>
+
+	<delivery-types>
+
+		<delivery-type
+			name="Auto responder"
+			description="Messages sent by a auto-responder service"/>
+
+	</delivery-types>
 
 	<service-types>
 

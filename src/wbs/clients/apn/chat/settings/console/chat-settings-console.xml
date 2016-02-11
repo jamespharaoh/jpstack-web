@@ -137,7 +137,8 @@
 
 		<object-field
 			name="locator"
-			object-type="locator"/>
+			object-type="locator"
+			nullable="yes"/>
 
 		<seconds-field
 			name="timeJoinOutboundMin"
@@ -211,7 +212,8 @@
 		<object-field
 			name="adultAdsChat"
 			label="Adult ads chat service"
-			object-type="chat"/>
+			object-type="chat"
+			nullable="yes"/>
 
 		<seconds-field
 			name="adultAdsTime"/>

@@ -200,6 +200,10 @@ class ChatBroadcastSendAction
 				chatBroadcastConsoleModule.formFieldSets ().get (
 					"send-numbers");
 
+			FormFieldSet commonFields =
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-common");
+
 			FormFieldSet messageUserFields =
 				chatBroadcastConsoleModule.formFieldSets ().get (
 					"send-message-user");
@@ -253,6 +257,16 @@ class ChatBroadcastSendAction
 
 			formFieldLogic.update (
 				requestContext,
+				commonFields,
+				verify
+					? updateResults
+					: new UpdateResultSet (),
+				form,
+				formHints,
+				"send");
+
+			formFieldLogic.update (
+				requestContext,
 				messageUserFields,
 				verify
 					? updateResults
@@ -287,7 +301,7 @@ class ChatBroadcastSendAction
 					true);
 
 				requestContext.formData (
-					"search",
+					"send-search",
 					"yes");
 
 				return null;
@@ -304,7 +318,7 @@ class ChatBroadcastSendAction
 					false);
 
 				requestContext.formData (
-					"search",
+					"send-search",
 					"no");
 
 				return null;
@@ -320,7 +334,8 @@ class ChatBroadcastSendAction
 
 				formFieldLogic.reportErrors (
 					requestContext,
-					updateResults);
+					updateResults,
+					"send");
 
 				return null;
 
@@ -465,9 +480,7 @@ class ChatBroadcastSendAction
 						List<String> allNumbers =
 							numberFormatLogic.parseLines (
 								chat.getNumberFormat (),
-								(String)
-								requestContext.getForm (
-									"numbers"));
+								form.numbers ());
 
 						int loop0 = 0;
 
@@ -785,7 +798,7 @@ class ChatBroadcastSendAction
 
 					// make sure we don't run out of memory
 
-					if (++ loop3 % 128 == 0) {
+					if (++ loop3 % 1024 == 0) {
 
 						database.flushAndClear ();
 
@@ -807,7 +820,7 @@ class ChatBroadcastSendAction
 				requestContext.request (
 					"chatBroadcastForm",
 					new ChatBroadcastSendForm ()
-	
+
 					.includeBlocked (
 						false)
 

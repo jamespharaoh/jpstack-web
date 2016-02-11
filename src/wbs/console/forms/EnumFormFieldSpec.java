@@ -29,38 +29,16 @@ class EnumFormFieldSpec {
 	@DataAttribute
 	Boolean readOnly;
 
+	@DataAttribute
+	Boolean hidden;
+
 	@DataAttribute (
 		name = "helper",
 		required = true)
 	String helperBeanName;
 
-	/*
-	@Override
-	protected
-	void doFormInputValue (
-			PrintWriter out,
-			Object object,
-			Enum<?> value,
-			String formValue) {
-
-
-	}
-
-	@Override
-	public
-	void doCell (
-			PrintWriter out,
-			Object object,
-			boolean link) {
-
-		Enum<?> value =
-			getPropertyFromObject (object);
-
-		out.write (sf (
-			"%s\n",
-			enumHelper.toTd (value)));
-
-	}
-	*/
+	@DataAttribute (
+		name = "implicit")
+	String implicitValue;
 
 }

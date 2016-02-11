@@ -9,7 +9,6 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -145,28 +144,18 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		List<Record<?>> filteredOptions =
 			allOptions.stream ()
 
-.sorted (Comparator.comparing (Record::getId))
-
-.map (item -> { System.out.print ("\nOPTION " + item.getId ()); return item; })
-
 			.filter (
 				root.isPresent ()
 					? item -> objectManager.isParent (item, root.get ())
 					: item -> true)
-
-.map (item -> { System.out.print (" root-ok"); return item; })
 
 			.filter (
 				item ->
 					objectManager.canView (item)
 					|| equal (item, interfaceValue.orNull ()))
 
-.map (item -> { System.out.print (" view-ok"); return item; })
-
 			.collect (
 				Collectors.toList ());
-
-System.out.print ("\n");
 
 		// sort options by path
 

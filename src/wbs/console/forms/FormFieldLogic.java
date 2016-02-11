@@ -3,7 +3,9 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -14,8 +16,10 @@ import java.util.Map;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -28,10 +32,31 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.PermanentRecord;
 import wbs.framework.utils.etc.FormatWriter;
 
+@Log4j
 @SingletonComponent ("fieldsLogic")
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 public
 class FormFieldLogic {
+
+	public
+	void implicit (
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Object container) {
+
+		for (
+			FormField formField
+				: formFieldSet.formFields ()
+		) {
+
+			if (formField.virtual ())
+				continue;
+
+			formField.implicit (
+				container);
+
+		}
+
+	}
 
 	public
 	UpdateResultSet update (
@@ -116,7 +141,9 @@ class FormFieldLogic {
 			}
 
 			updateResults.updateResults ().put (
-				formField.name (),
+				Pair.of (
+					formName,
+					formField.name ()),
 				updateResult);
 
 		}
@@ -126,18 +153,27 @@ class FormFieldLogic {
 	public
 	void reportErrors (
 			@NonNull ConsoleRequestContext requestContext,
-			@NonNull UpdateResultSet updateResultSet) {
+			@NonNull UpdateResultSet updateResultSet,
+			@NonNull String formName) {
 
 		List<String> errorFieldNames =
 			new ArrayList<String> ();
 
 		for (
-			Map.Entry<String,UpdateResult<?,?>> updateResultEntry
+			Map.Entry<Pair<String,String>,UpdateResult<?,?>> updateResultEntry
 				: updateResultSet.updateResults ().entrySet ()
 		) {
 
+			if (
+				notEqual (
+					updateResultEntry.getKey ().getLeft (),
+					formName)
+			) {
+				continue;
+			}
+
 			String formFieldName =
-				updateResultEntry.getKey ();
+				updateResultEntry.getKey ().getRight ();
 
 			UpdateResult updateResult =
 				updateResultEntry.getValue ();
@@ -219,14 +255,21 @@ class FormFieldLogic {
 			@NonNull String formName) {
 
 		for (
-			Map.Entry updateResultEntry
+			Map.Entry<Pair<String,String>,UpdateResult<?,?>> updateResultEntry
 				: updateResultSet.updateResults ().entrySet ()
 		) {
 
+			if (
+				notEqual (
+					updateResultEntry.getKey ().getLeft (),
+					formName)
+			) {
+				continue;
+			}
+
 			FormField formField =
 				formFieldSet.formField (
-					(String)
-					updateResultEntry.getKey ());
+					updateResultEntry.getKey ().getRight ());
 
 			UpdateResult updateResult =
 				(UpdateResult)
@@ -523,11 +566,29 @@ class FormFieldLogic {
 					updateResultSet.get ().updateResults ().get (
 						stringFormat (
 							"%s-%s",
-							formField,
+							formName,
 							formField.name ()));
 
-				error =
-					updateResult.error ();
+				if (
+					isNull (
+						updateResult)
+				) {
+
+					log.error (
+						stringFormat (
+							"Unable to find update result for %s-%s",
+							formName,
+							formField.name ()));
+
+					error =
+						Optional.absent ();
+
+				} else {
+
+					error =
+						updateResult.error ();
+
+				}
 
 			} else {
 
@@ -874,8 +935,8 @@ class FormFieldLogic {
 	public static
 	class UpdateResultSet {
 
-		Map<String,UpdateResult<?,?>> updateResults =
-			new LinkedHashMap<String,UpdateResult<?,?>> ();
+		Map<Pair<String,String>,UpdateResult<?,?>> updateResults =
+			new LinkedHashMap<> ();
 
 		int errorCount;
 		int updateCount;

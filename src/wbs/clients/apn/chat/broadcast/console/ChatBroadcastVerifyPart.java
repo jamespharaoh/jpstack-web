@@ -65,6 +65,7 @@ class ChatBroadcastVerifyPart
 
 	FormFieldSet searchFields;
 	FormFieldSet numbersFields;
+	FormFieldSet commonFields;
 	FormFieldSet messageUserFields;
 	FormFieldSet messageMessageFields;
 	FormFieldSet verifyUserFields;
@@ -117,6 +118,10 @@ class ChatBroadcastVerifyPart
 		numbersFields =
 			chatBroadcastConsoleModule.formFieldSets ().get (
 				"send-numbers");
+
+		commonFields =
+			chatBroadcastConsoleModule.formFieldSets ().get (
+				"send-common");
 
 		messageUserFields =
 			chatBroadcastConsoleModule.formFieldSets ().get (
@@ -193,6 +198,16 @@ class ChatBroadcastVerifyPart
 		formFieldLogic.outputFormAlwaysHidden (
 			requestContext,
 			formatWriter,
+			commonFields,
+			updateResults,
+			form,
+			formHints,
+			FormType.search,
+			"send");
+
+		formFieldLogic.outputFormAlwaysHidden (
+			requestContext,
+			formatWriter,
 			messageUserFields,
 			updateResults,
 			form,
@@ -225,6 +240,15 @@ class ChatBroadcastVerifyPart
 			requestContext,
 			formatWriter,
 			numbersFields,
+			form,
+			formHints,
+			FormType.search,
+			"send");
+
+		formFieldLogic.outputFormTemporarilyHidden (
+			requestContext,
+			formatWriter,
+			commonFields,
 			form,
 			formHints,
 			FormType.search,

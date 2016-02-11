@@ -48,6 +48,7 @@ class ChatBroadcastSendPart
 
 	FormFieldSet searchFields;
 	FormFieldSet numbersFields;
+	FormFieldSet commonFields;
 	FormFieldSet messageUserFields;
 	FormFieldSet messageMessageFields;
 
@@ -94,6 +95,10 @@ class ChatBroadcastSendPart
 		numbersFields =
 			chatBroadcastConsoleModule.formFieldSets ().get (
 				"send-numbers");
+
+		commonFields =
+			chatBroadcastConsoleModule.formFieldSets ().get (
+				"send-common");
 
 		messageUserFields =
 			chatBroadcastConsoleModule.formFieldSets ().get (
@@ -162,6 +167,16 @@ class ChatBroadcastSendPart
 		formFieldLogic.outputFormAlwaysHidden (
 			requestContext,
 			formatWriter,
+			commonFields,
+			updateResults,
+			form,
+			formHints,
+			FormType.search,
+			"send");
+
+		formFieldLogic.outputFormAlwaysHidden (
+			requestContext,
+			formatWriter,
 			messageUserFields,
 			updateResults,
 			form,
@@ -188,6 +203,16 @@ class ChatBroadcastSendPart
 				requestContext,
 				formatWriter,
 				numbersFields,
+				updateResults,
+				form,
+				formHints,
+				FormType.search,
+				"send");
+
+			formFieldLogic.outputFormRows (
+				requestContext,
+				formatWriter,
+				commonFields,
 				updateResults,
 				form,
 				formHints,
@@ -224,6 +249,16 @@ class ChatBroadcastSendPart
 				requestContext,
 				formatWriter,
 				searchFields,
+				updateResults,
+				form,
+				formHints,
+				FormType.search,
+				"send");
+
+			formFieldLogic.outputFormRows (
+				requestContext,
+				formatWriter,
+				commonFields,
 				updateResults,
 				form,
 				formHints,

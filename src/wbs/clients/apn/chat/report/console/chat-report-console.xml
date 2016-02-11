@@ -136,6 +136,12 @@
 		name="recent-user-search"
 		class="wbs.clients.apn.chat.user.core.model.ChatUserSearch">
 
+		<enum-field
+			name="type"
+			helper="chatUserTypeConsoleHelper"
+			hidden="yes"
+			implicit="user"/>
+
 		<interval-field
 			name="lastJoin"
 			nullable="yes"/>

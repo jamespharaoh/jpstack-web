@@ -10,6 +10,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -227,6 +229,9 @@ class TextFormFieldBuilder {
 
 				.csvMapping (
 					interfaceMapping)
+
+				.implicitValue (
+					Optional.absent ())
 
 			);
 

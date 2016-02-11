@@ -6,8 +6,13 @@
 		<plugin-dependency name="sms-apps-common"/>
 	</plugin-dependencies>
 
+	<sql-scripts>
+		<sql-schema name="manual-responder"/>
+	</sql-scripts>
+
 	<models>
 		<model name="autoResponder"/>
+		<model name="autoResponderRequest"/>
 	</models>
 
 	<layer name="console">
@@ -16,6 +21,7 @@
 
 	<layer name="daemon">
 		<bean class="daemon.AutoResponderCommand"/>
+		<bean class="daemon.AutoResponderDelivery"/>
 	</layer>
 
 	<fixtures>

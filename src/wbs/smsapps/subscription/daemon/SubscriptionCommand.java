@@ -32,7 +32,6 @@ import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.message.outbox.logic.MessageSender;
-import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.subscription.logic.SubscriptionLogic;
 import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
@@ -74,9 +73,6 @@ class SubscriptionCommand
 
 	@Inject
 	MessageObjectHelper messageHelper;
-
-	@Inject
-	MessageSetLogic messageSetLogic;
 
 	@Inject
 	ObjectManager objectManager;

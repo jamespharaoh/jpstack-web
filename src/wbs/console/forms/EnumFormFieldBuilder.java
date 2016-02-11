@@ -3,12 +3,15 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.toEnum;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.EnumConsoleHelper;
@@ -43,6 +46,10 @@ class EnumFormFieldBuilder {
 	@Inject
 	Provider<EnumFormFieldRenderer>
 	enumFormFieldRendererProvider;
+
+	@Inject
+	Provider<HiddenFormField>
+	hiddenFormFieldProvider;
 
 	@Inject
 	Provider<IdentityFormFieldInterfaceMapping>
@@ -108,11 +115,24 @@ class EnumFormFieldBuilder {
 				spec.nullable (),
 				false);
 
+		Boolean hidden =
+			ifNull (
+				spec.hidden (),
+				false);
 
 		EnumConsoleHelper enumConsoleHelper =
 			applicationContext.getBean (
 				spec.helperBeanName (),
 				EnumConsoleHelper.class);
+
+		Optional<Optional<Object>> implicitValue =
+			spec.implicitValue () != null
+				? Optional.of (
+					Optional.<Object>of (
+						toEnum (
+							enumConsoleHelper.enumClass (),
+							spec.implicitValue ())))
+				: Optional.absent ();
 
 		// accessor
 
@@ -184,7 +204,29 @@ class EnumFormFieldBuilder {
 
 		// form field
 
-		if (readOnly) {
+		if (hidden) {
+
+			formFieldSet.addFormField (
+				hiddenFormFieldProvider.get ()
+
+				.name (
+					name)
+
+				.accessor (
+					accessor)
+
+				.nativeMapping (
+					nativeMapping)
+
+				.csvMapping (
+					csvMapping)
+
+				.implicitValue (
+					implicitValue)
+
+			);
+
+		} else if (readOnly) {
 
 			formFieldSet.addFormField (
 				readOnlyFormFieldProvider.get ()

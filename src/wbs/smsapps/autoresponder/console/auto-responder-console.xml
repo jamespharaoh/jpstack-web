@@ -92,6 +92,9 @@
 			name="addToNumberList"
 			object-type="numberList"/>
 
+		<yes-no-field
+			name="sequenceResponses"/>
+
 	</field-set>
 
 	<field-set
@@ -110,7 +113,12 @@
 
 		<object-field
 			name="addToNumberList"
-			object-type="numberList"/>
+			object-type="numberList"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="sequenceResponses"
+			nullable="no"/>
 
 	</field-set>
 

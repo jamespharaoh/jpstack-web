@@ -3,6 +3,7 @@ package wbs.smsapps.autoresponder.daemon;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.utils.EmailLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -26,11 +28,15 @@ import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
-import wbs.sms.messageset.logic.MessageSetLogic;
+import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.messageset.model.MessageSetMessageRec;
+import wbs.sms.messageset.model.MessageSetObjectHelper;
 import wbs.sms.messageset.model.MessageSetRec;
 import wbs.sms.number.list.logic.NumberListLogic;
 import wbs.smsapps.autoresponder.model.AutoResponderObjectHelper;
 import wbs.smsapps.autoresponder.model.AutoResponderRec;
+import wbs.smsapps.autoresponder.model.AutoResponderRequestObjectHelper;
+import wbs.smsapps.autoresponder.model.AutoResponderRequestRec;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("autoResponderCommand")
@@ -42,6 +48,9 @@ class AutoResponderCommand
 
 	@Inject
 	AutoResponderObjectHelper autoResponderHelper;
+
+	@Inject
+	AutoResponderRequestObjectHelper autoResponderRequestHelper;
 
 	@Inject
 	CommandObjectHelper commandHelper;
@@ -59,7 +68,7 @@ class AutoResponderCommand
 	MessageObjectHelper messageHelper;
 
 	@Inject
-	MessageSetLogic messageSetLogic;
+	MessageSetObjectHelper messageSetHelper;
 
 	@Inject
 	NumberListLogic numberListLogic;
@@ -69,6 +78,11 @@ class AutoResponderCommand
 
 	@Inject
 	WbsConfig wbsConfig;
+
+	// prototype dependencies
+
+	@Inject
+	Provider<MessageSender> messageSenderProvider;
 
 	// properties
 
@@ -100,7 +114,10 @@ class AutoResponderCommand
 	public
 	InboxAttemptRec handle () {
 
-		MessageRec message =
+		Transaction transaction =
+			database.currentTransaction ();
+
+		MessageRec receivedMessage =
 			inbox.getMessage ();
 
 		AutoResponderRec autoResponder =
@@ -112,18 +129,75 @@ class AutoResponderCommand
 				autoResponder,
 				"default");
 
-		// send message set
+		// create request
+
+		AutoResponderRequestRec request =
+			autoResponderRequestHelper.insert (
+				autoResponderRequestHelper.createInstance ()
+
+			.setAutoResponder (
+				autoResponder)
+
+			.setTimestamp (
+				transaction.now ())
+
+			.setNumber (
+				receivedMessage.getNumber ())
+
+			.setReceivedMessage (
+				receivedMessage)
+
+		);
+
+		// send responses
 
 		MessageSetRec messageSet =
-			messageSetLogic.findMessageSet (
+			messageSetHelper.findByCode (
 				autoResponder,
 				"default");
 
-		messageSetLogic.sendMessageSet (
-			messageSet,
-			message.getThreadId (),
-			message.getNumber (),
-			defaultService);
+		for (
+			MessageSetMessageRec messageSetMessage
+				: messageSet.getMessages ()
+		) {
+
+			MessageRec sentMessage =
+				messageSenderProvider.get ()
+
+				.threadId (
+					receivedMessage.getThreadId ())
+
+				.number (
+					receivedMessage.getNumber ())
+
+				.messageString (
+					messageSetMessage.getMessage ())
+
+				.numFrom (
+					messageSetMessage.getNumber ())
+
+				.route (
+					messageSetMessage.getRoute ())
+
+				.service (
+					defaultService)
+
+				.sendNow (
+					! autoResponder.getSequenceResponses ()
+					|| messageSetMessage.getIndex () == 0)
+
+				.deliveryTypeCode (
+					"auto_responder")
+
+				.ref (
+					(long) (int) request.getId ())
+
+				.send ();
+
+			request.getSentMessages ().add (
+				sentMessage);
+
+		}
 
 		// send email
 
@@ -136,7 +210,7 @@ class AutoResponderCommand
 				ImmutableList.of (
 					autoResponder.getEmailAddress ()),
 				"Auto responder " + autoResponder.getDescription (),
-				message.getText ().getText ());
+				receivedMessage.getText ().getText ());
 
 		}
 
@@ -149,8 +223,8 @@ class AutoResponderCommand
 
 			numberListLogic.addDueToMessage (
 				autoResponder.getAddToNumberList (),
-				message.getNumber (),
-				message,
+				receivedMessage.getNumber (),
+				receivedMessage,
 				defaultService);
 
 		}

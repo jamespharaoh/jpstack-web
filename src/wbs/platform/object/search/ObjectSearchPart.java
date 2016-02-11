@@ -129,26 +129,30 @@ class ObjectSearchPart
 				consoleHelperRegistry.findByObjectClass (
 					consoleHelper.parentClass ());
 
-			Record<?> parent =
-				parentHelper.find (
-					requestContext.stuffInt (
-						parentHelper.idKey ()));
+			Integer parentId =
+				requestContext.stuffInt (
+					parentHelper.idKey ());
 
 			if (
 				isNotNull (
-					parent)
+					parentId)
 			) {
+
+				Record<?> parent =
+					parentHelper.find (
+						requestContext.stuffInt (
+							parentHelper.idKey ()));
 
 				formHintsBuilder.put (
 					consoleHelper.parentFieldName (),
 					parent);
 
-			}					
+			}
 
 		}
-	
+
 		formHints =
-			formHintsBuilder.build ();		
+			formHintsBuilder.build ();
 
 	}
 
