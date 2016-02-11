@@ -149,7 +149,8 @@ class ObjectSettingsAction<
 
 			formFieldLogic.reportErrors (
 				requestContext,
-				updateResultSet);
+				updateResultSet,
+				"settings");
 
 			requestContext.request (
 				"objectSettingsUpdateResultSet",
