@@ -555,7 +555,8 @@ class ChatMonitorInboxSummaryPart
 					monitorChatUser.getDob ().toDateTimeAtStartOfDay (
 						DateTimeZone.forID (
 							chat.getTimezone ())),
-					now));
+					now
+				).getYears ());
 
 		} else {
 
@@ -577,7 +578,8 @@ class ChatMonitorInboxSummaryPart
 					userChatUser.getDob ().toDateTimeAtStartOfDay (
 						DateTimeZone.forID (
 							chat.getTimezone ())),
-					now));
+					now
+				).getYears ());
 
 		} else {
 
