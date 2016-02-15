@@ -74,7 +74,8 @@ class CurrencyFormFieldInterfaceMapping<Container>
 			(CurrencyRec)
 			objectManager.dereference (
 				container,
-				currencyPath);
+				currencyPath,
+				hints);
 
 		if (
 			isNull (
@@ -143,7 +144,8 @@ class CurrencyFormFieldInterfaceMapping<Container>
 			(CurrencyRec)
 			objectManager.dereference (
 				container,
-				currencyPath);
+				currencyPath,
+				hints);
 
 		if (genericValue.get () == 0 && blankIfZero) {
 
