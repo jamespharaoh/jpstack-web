@@ -483,7 +483,7 @@ class MediaConsoleLogicImplementation
 				" alt=\"%h\"",
 				media.getFilename (),
 
-				"\">");
+				">");
 
 		}
 

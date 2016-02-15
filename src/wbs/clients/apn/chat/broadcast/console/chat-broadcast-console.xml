@@ -120,7 +120,7 @@
 		<text-area-field
 			name="message"
 			char-count-function="gsmCharCountNew"
-			char-count-data="{ maxReduceField: 'prefix' }"/>
+			char-count-data="{ maxReduceField: 'send-prefix' }"/>
 
 	</field-set>
 
