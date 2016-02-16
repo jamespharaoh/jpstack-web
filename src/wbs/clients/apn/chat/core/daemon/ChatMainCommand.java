@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.core.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notIn;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -547,13 +548,17 @@ class ChatMainCommand
 			return Optional.<InboxAttemptRec>absent ();
 		}
 
-		LocalDate dateOfBirth =
+		Optional<LocalDate> dateOfBirth =
 			DateFinder.find (
 				rest,
 				1915);
 
-		if (dateOfBirth == null)
-			return Optional.<InboxAttemptRec>absent ();
+		if (
+			isNotPresent (
+				dateOfBirth)
+		) {
+			return Optional.absent ();
+		}
 
 		return Optional.of (
 			chatJoinerProvider.get ()

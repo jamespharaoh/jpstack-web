@@ -42,6 +42,10 @@
 			name="customisable"
 			default="no"/>
 
+		<yes-no-field
+			name="hidden"
+			default="no"/>
+
 		<reference-field
 			name="replyKeywordSet"
 			type="keywordSet"

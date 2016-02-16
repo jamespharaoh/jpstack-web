@@ -22,6 +22,10 @@
 		<model name="manualResponderReport"/>
 	</models>
 
+	<layer name="logic">
+		<bean class="logic.ManualResponderLogicImplementation"/>
+	</layer>
+
 	<layer name="console">
 		<bean class="console.ManualResponderRequestPendingFormAction"/>
 		<bean class="console.ManualResponderRequestPendingFormResponder"/>

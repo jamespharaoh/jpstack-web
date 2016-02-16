@@ -8,14 +8,14 @@ import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleObjectManager;
@@ -33,11 +33,11 @@ import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.gsm.Gsm;
-import wbs.sms.gsm.MessageSplitter;
 import wbs.sms.keyword.logic.KeywordLogic;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
+import wbs.smsapps.manualresponder.logic.ManualResponderLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
@@ -67,6 +67,9 @@ class ManualResponderRequestPendingFormAction
 
 	@Inject
 	KeywordLogic keywordLogic;
+
+	@Inject
+	ManualResponderLogic manualResponderLogic;
 
 	@Inject
 	ManualResponderReplyObjectHelper manualResponderReplyHelper;
@@ -276,107 +279,28 @@ class ManualResponderRequestPendingFormAction
 			textHelper.findOrCreate (
 				messageString);
 
-		// split message and apply templates
+		boolean shortMessageParts =
+			request
+				.getNumber ()
+				.getNetwork ()
+				.getShortMultipartMessages ();
 
-		List<String> messageParts;
-		long effectiveParts;
+		long maxLengthPerMultipartMessage =
+			shortMessageParts
+				? 134l
+				: 153l;
 
-		if (
-			template.getSplitLong ()
-		) {
+		Pair<List<String>,Long> splitResult =
+			manualResponderLogic.splitMessage (
+				template,
+				maxLengthPerMultipartMessage,
+				messageString);
 
-			// split message
+		List<String> messageParts =
+			splitResult.getLeft ();
 
-			MessageSplitter.Templates messageSplitterTemplates;
-
-			if (
-				template.getApplyTemplates ()
-			) {
-
-				// use configured templates
-
-				messageSplitterTemplates =
-					new MessageSplitter.Templates (
-						template.getSingleTemplate (),
-						template.getFirstTemplate (),
-						template.getMiddleTemplate (),
-						template.getLastTemplate ());
-
-			} else {
-
-				// just split message
-
-				messageSplitterTemplates =
-					new MessageSplitter.Templates (
-						"{message}",
-						"{message}",
-						"{message}",
-						"{message}");
-
-			}
-
-			messageParts =
-				MessageSplitter.split (
-					messageString,
-					messageSplitterTemplates);
-
-			effectiveParts =
-				messageParts.size ();
-
-		} else {
-
-			// don't split message, apply template if enabled
-
-			String singleMessage;
-
-			if (template.getApplyTemplates ()) {
-
-				singleMessage =
-					template.getSingleTemplate ().replaceAll (
-						Pattern.quote ("{message}"),
-						messageString);
-
-			} else {
-
-				singleMessage =
-					messageString;
-
-			}
-
-			long singleMessageLength =
-				Gsm.length (
-					singleMessage);
-
-			messageParts =
-				Collections.singletonList (
-					singleMessage);
-
-			// work out effective parts
-
-			if (singleMessageLength <= 160l) {
-
-				effectiveParts = 1l;
-
-			} else {
-
-				boolean shortMessageParts =
-					request
-						.getNumber ()
-						.getNetwork ()
-						.getShortMultipartMessages ();
-
-				long maxLengthPerMultipartMessage =
-					shortMessageParts
-						? 134l
-						: 153l;
-
-				effectiveParts = (
-					singleMessageLength - 1l
-				) / maxLengthPerMultipartMessage + 1l;
-
-			}
-
-		}
+		long effectiveParts =
+			splitResult.getRight ();
 
 		// enforce minimum parts
 

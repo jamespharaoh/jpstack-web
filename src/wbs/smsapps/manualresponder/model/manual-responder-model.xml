@@ -59,6 +59,25 @@
 			type="smsCustomerManager"
 			nullable="yes"/>
 
+		<integer-field
+			name="requiredAge"
+			nullable="yes"/>
+
+		<reference-field
+			name="dateOfBirthTemplate"
+			type="manualResponderTemplate"
+			nullable="yes"/>
+
+		<reference-field
+			name="dateOfBirthErrorTemplate"
+			type="manualResponderTemplate"
+			nullable="yes"/>
+
+		<reference-field
+			name="tooYoungTemplate"
+			type="manualResponderTemplate"
+			nullable="yes"/>
+
 	</fields>
 
 	<collections>

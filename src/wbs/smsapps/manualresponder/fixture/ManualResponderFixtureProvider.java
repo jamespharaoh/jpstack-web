@@ -128,6 +128,7 @@ class ManualResponderFixtureProvider
 			.setCurrency (
 				currencyHelper.findByCode (
 					GlobalId.root,
+					"test",
 					"gbp"))
 
 		);

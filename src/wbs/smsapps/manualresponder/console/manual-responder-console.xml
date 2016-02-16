@@ -117,6 +117,24 @@
 			name="smsCustomerManager"
 			object-type="smsCustomerManager"/>
 
+		<integer-field
+			name="requiredAge"/>
+
+		<object-field
+			name="dateOfBirthTemplate"
+			object-type="manualResponderTemplate"
+			root-field="this"/>
+
+		<object-field
+			name="dateOfBirthErrorTemplate"
+			object-type="manualResponderTemplate"
+			root-field="this"/>
+
+		<object-field
+			name="tooYoungTemplate"
+			object-type="manualResponderTemplate"
+			root-field="this"/>
+
 	</field-set>
 
 	<field-set
@@ -165,6 +183,28 @@
 			name="smsCustomerManager"
 			object-type="smsCustomerManager"
 			nullable="yes"/>
+
+		<integer-field
+			name="requiredAge"
+			nullable="yes"/>
+
+		<object-field
+			name="dateOfBirthTemplate"
+			object-type="manualResponderTemplate"
+			nullable="yes"
+			root-field="this"/>
+
+		<object-field
+			name="dateOfBirthErrorTemplate"
+			object-type="manualResponderTemplate"
+			nullable="yes"
+			root-field="this"/>
+
+		<object-field
+			name="tooYoungTemplate"
+			object-type="manualResponderTemplate"
+			nullable="yes"
+			root-field="this"/>
 
 	</field-set>
 

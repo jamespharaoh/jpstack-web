@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -122,7 +123,7 @@ class ManualResponderRequestPendingSummaryPart
 	NumberRec number;
 	NetworkRec network;
 
-	List<ManualResponderRequestRec> oldManualResponderRequests;
+	List<ManualResponderRequestRec> oldRequests;
 	List<RouteBillInfo> routeBillInfos;
 
 	// details
@@ -340,14 +341,14 @@ class ManualResponderRequestPendingSummaryPart
 		profileLogger.lap (
 			"load request history");
 
-		oldManualResponderRequests =
+		oldRequests =
 			manualResponderRequestHelper.findRecentLimit (
 				manualResponder,
 				manualResponderRequest.getNumber (),
 				maxResults + 1);
 
 		Collections.sort (
-			oldManualResponderRequests);
+			oldRequests);
 
 		profileLogger.end ();
 
@@ -413,9 +414,11 @@ class ManualResponderRequestPendingSummaryPart
 			manualResponder.getDescription (),
 			"</tr>\n");
 
-		if (privChecker.can (
+		if (
+			privChecker.can (
 				manualResponder,
-				"number")) {
+				"number")
+		) {
 
 			printFormat (
 				"<tr>\n",
@@ -434,6 +437,25 @@ class ManualResponderRequestPendingSummaryPart
 			objectManager.tdForObjectMiniLink (
 				network),
 			"</tr>\n");
+
+		if (
+
+			isNotNull (
+				smsCustomer)
+
+			&& isNotNull (
+				smsCustomer.getDateOfBirth ())
+
+		) {
+
+			printFormat (
+				"<tr>\n",
+				"<th>Date of birth</th>\n",
+				"<td>%h</td>\n",
+				smsCustomer.getDateOfBirth (),
+				"</tr>\n");
+
+		}
 
 		printFormat (
 			"<tr>\n",
@@ -679,7 +701,7 @@ class ManualResponderRequestPendingSummaryPart
 
 	void goRequestHistory () {
 
-		if (oldManualResponderRequests.isEmpty ())
+		if (oldRequests.isEmpty ())
 			return;
 
 		// title
@@ -689,7 +711,7 @@ class ManualResponderRequestPendingSummaryPart
 
 		// warning if we have omitted old requests
 
-		if (oldManualResponderRequests.size () > maxResults) {
+		if (oldRequests.size () > maxResults) {
 
 			printFormat (
 				"<p class=\"warning\">%h</p>\n",
@@ -714,16 +736,20 @@ class ManualResponderRequestPendingSummaryPart
 
 		// iterate requests
 
-		for (ManualResponderRequestRec oldManualResponderRequest
-				: oldManualResponderRequests) {
+		for (
+			ManualResponderRequestRec oldRequest
+				: oldRequests
+		) {
 
 			printFormat (
 				"<tr class=\"sep\">\n");
 
 			// iterate replies, which are shown before their requests
 
-			for (ManualResponderReplyRec oldReply
-					: oldManualResponderRequest.getReplies ()) {
+			for (
+				ManualResponderReplyRec oldReply
+					: oldRequest.getReplies ()
+			) {
 
 				// print reply
 
@@ -753,7 +779,9 @@ class ManualResponderRequestPendingSummaryPart
 
 				printFormat (
 					"<td>%h</td>\n",
-					oldReply.getUser ().getUsername ());
+					oldReply.getUser () != null
+						? oldReply.getUser ().getUsername ()
+						: "-");
 
 				printFormat (
 					"</tr>\n");
@@ -772,11 +800,11 @@ class ManualResponderRequestPendingSummaryPart
 				timeFormatter.instantToTimestampString (
 					timeFormatter.defaultTimezone (),
 					dateToInstant (
-						oldManualResponderRequest.getTimestamp ())));
+						oldRequest.getTimestamp ())));
 
 			printFormat (
 				"<td>%h</td>\n",
-				oldManualResponderRequest
+				oldRequest
 					.getMessage ()
 					.getText ()
 					.getText ());
@@ -788,7 +816,7 @@ class ManualResponderRequestPendingSummaryPart
 
 			for (
 				MediaRec media
-					: oldManualResponderRequest.getMessage ().getMedias ()
+					: oldRequest.getMessage ().getMedias ()
 			) {
 
 				if (
@@ -812,8 +840,8 @@ class ManualResponderRequestPendingSummaryPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				oldManualResponderRequest.getUser () != null
-					? oldManualResponderRequest.getUser ().getUsername ()
+				oldRequest.getUser () != null
+					? oldRequest.getUser ().getUsername ()
 					: "");
 
 			printFormat (

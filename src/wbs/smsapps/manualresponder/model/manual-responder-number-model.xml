@@ -16,11 +16,21 @@
 		<identity-reference-field
 			type="number"/>
 
-		<!-- state -->
+		<!-- data -->
 
 		<reference-field
 			type="smsCustomer"
 			nullable="yes"/>
+
+		<!-- state -->
+
+		<yes-no-field
+			name="expectDateOfBirth"
+			default="no"/>
+
+		<yes-no-field
+			name="bypassDateOfBirth"
+			default="no"/>
 
 		<!-- settings -->
 

@@ -60,10 +60,10 @@ class ManualResponderRequestPendingFormResponder
 
 	// state
 
-	ManualResponderRequestRec manualResponderRequest;
+	ManualResponderRequestRec request;
 	ManualResponderRec manualResponder;
 	NumberRec number;
-	Set<ManualResponderTemplateRec> manualResponderTemplates;
+	Set<ManualResponderTemplateRec> templates;
 	String summaryUrl;
 
 	boolean canIgnore;
@@ -112,31 +112,37 @@ class ManualResponderRequestPendingFormResponder
 
 		super.prepare ();
 
-		manualResponderRequest =
+		request =
 			manualResponderRequestHelper.find (
-				requestContext.stuffInt ("manualResponderRequestId"));
+				requestContext.stuffInt (
+					"manualResponderRequestId"));
 
 		manualResponder =
-			manualResponderRequest.getManualResponder ();
+			request.getManualResponder ();
 
 		number =
-			manualResponderRequest.getNumber ();
+			request.getNumber ();
 
-		manualResponderTemplates =
+		templates =
 			new TreeSet<ManualResponderTemplateRec> ();
 
 		for (
-			ManualResponderTemplateRec manualResponderTemplate
+			ManualResponderTemplateRec template
 				: manualResponder.getTemplates ()
 		) {
 
-			if (manualResponderTemplate.getRouter () == null)
+			if (template.getRouter () == null) {
 				continue;
+			}
 
-			if (manualResponderTemplate.getRules () != null) {
+			if (template.getHidden ()) {
+				continue;
+			}
+
+			if (template.getRules () != null) {
 
 				String rules =
-					manualResponderTemplate.getRules ();
+					template.getRules ();
 
 				Pattern networkIsRulesPattern =
 					Pattern.compile (
@@ -188,8 +194,8 @@ class ManualResponderRequestPendingFormResponder
 
 			}
 
-			manualResponderTemplates.add (
-				manualResponderTemplate);
+			templates.add (
+				template);
 
 		}
 
@@ -198,7 +204,7 @@ class ManualResponderRequestPendingFormResponder
 				stringFormat (
 					"/manualResponderRequest.pending",
 					"/%u",
-					manualResponderRequest.getId (),
+					request.getId (),
 					"/manualResponderRequest.pending.summary"));
 
 		manager =
@@ -211,10 +217,10 @@ class ManualResponderRequestPendingFormResponder
 			manualResponder.getCanIgnore ();
 
 		gotTemplates =
-			! manualResponderTemplates.isEmpty ();
+			! templates.isEmpty ();
 
 		Set<ManualResponderReplyRec> manualResponderReplies =
-			manualResponderRequest.getReplies ();
+			request.getReplies ();
 
 		alreadyReplied =
 			! manualResponderReplies.isEmpty ();
@@ -252,18 +258,18 @@ class ManualResponderRequestPendingFormResponder
 
 		goLinks ();
 
-		if (manualResponderRequest == null) {
+		if (request == null) {
 
 			goNotFound ();
 
-		} else if (! manualResponderRequest.getPending ()) {
+		} else if (! request.getPending ()) {
 
 			goNotPending ();
 
 		} else if (
 
 			! privChecker.can (
-				manualResponderRequest.getManualResponder (),
+				request.getManualResponder (),
 				"reply")
 
 		) {
@@ -274,16 +280,16 @@ class ManualResponderRequestPendingFormResponder
 
 			allOf (
 
-				manualResponderTemplates.isEmpty (),
+				templates.isEmpty (),
 
 				not (
-					manualResponderRequest
+					request
 						.getManualResponder ()
 						.getCanIgnore ()),
 
 				not (
 					privChecker.can (
-						manualResponderRequest
+						request
 							.getManualResponder (),
 						"manage")))
 
@@ -310,7 +316,7 @@ class ManualResponderRequestPendingFormResponder
 				stringFormat (
 					"/manualResponderRequest.pending",
 					"/%u",
-					manualResponderRequest.getId (),
+					request.getId (),
 					"/manualResponderRequest.pending.form")),
 			" method=\"post\"",
 			">\n");
@@ -350,7 +356,7 @@ class ManualResponderRequestPendingFormResponder
 		for (
 
 			ManualResponderTemplateRec template
-				: manualResponderTemplates
+				: templates
 
 		) {
 
@@ -399,7 +405,7 @@ class ManualResponderRequestPendingFormResponder
 			160,
 
 			" data-template-max-for-message-part=\"%h\"",
-			manualResponderRequest
+			request
 					.getNumber ()
 					.getNetwork ()
 					.getShortMultipartMessages ()

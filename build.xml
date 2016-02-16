@@ -908,7 +908,7 @@
       <script name="src/wbs/sms/tracker/model/sms-simple-tracker.sql"/>
       <script name="src/wbs/sms/tracker/model/sms-tracker.sql"/>
       <script name="src/wbs/sms/customer/model/sms-customer.sql"/>
-      <script name="src/wbs/smsapps/autoresponder/model/manual-responder.sql"/>
+      <script name="src/wbs/smsapps/autoresponder/model/auto-responder.sql"/>
       <script name="src/wbs/smsapps/forwarder/model/forwarder.sql"/>
       <script name="src/wbs/smsapps/manualresponder/model/manual-responder.sql"/>
       <script name="src/wbs/smsapps/manualresponder/model/manual-responder-report.sql"/>

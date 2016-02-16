@@ -91,6 +91,9 @@
 		<yes-no-field
 			name="customisable"/>
 
+		<yes-no-field
+			name="hidden"/>
+
 		<object-field
 			name="replyKeywordSet"
 			object-type="keywordSet"/>
@@ -152,6 +155,9 @@
 
 		<yes-no-field
 			name="customisable"/>
+
+		<yes-no-field
+			name="hidden"/>
 
 		<object-field
 			name="replyKeywordSet"
@@ -217,6 +223,9 @@
 
 		<yes-no-field
 			name="customisable"/>
+
+		<yes-no-field
+			name="hidden"/>
 
 		<object-field
 			name="replyKeywordSet"

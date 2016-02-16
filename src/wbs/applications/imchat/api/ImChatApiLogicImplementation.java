@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
@@ -22,6 +22,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -567,13 +568,13 @@ class ImChatApiLogicImplementation
 
 				}
 
-				LocalDate dateOfBirth =
+				Optional<LocalDate> dateOfBirth =
 					DateFinder.find (
 						stringValue,
 						1915);
 
 				if (
-					isNull (
+					isNotPresent (
 						dateOfBirth)
 				) {
 
@@ -588,7 +589,7 @@ class ImChatApiLogicImplementation
 
 				Integer ageInYears =
 					Years.yearsBetween (
-						dateOfBirth.toDateTimeAtStartOfDay (
+						dateOfBirth.get ().toDateTimeAtStartOfDay (
 							DateTimeZone.forID (
 								"Europe/London")),
 						transaction.now ()

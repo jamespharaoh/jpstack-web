@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.user.join.daemon;
 
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -305,17 +306,20 @@ class ChatJoiner {
 		Transaction transaction =
 			database.currentTransaction ();
 
-		LocalDate dateOfBirth =
+		Optional<LocalDate> dateOfBirth =
 			DateFinder.find (
 				rest,
 				1915);
 
-		if (dateOfBirth != null) {
+		if (
+			isPresent (
+				dateOfBirth)
+		) {
 
 			chatUser
 
 				.setDob (
-					dateOfBirth);
+					dateOfBirth.get ());
 
 		} else {
 

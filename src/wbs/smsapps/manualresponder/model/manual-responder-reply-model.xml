@@ -22,7 +22,8 @@
 			column-type="postgresql"/>
 
 		<reference-field
-			type="user"/>
+			type="user"
+			nullable="yes"/>
 
 		<reference-field
 			type="text"/>

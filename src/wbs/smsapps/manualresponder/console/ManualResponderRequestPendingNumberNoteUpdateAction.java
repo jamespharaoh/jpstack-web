@@ -115,25 +115,9 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 		// find or create number
 
 		ManualResponderNumberRec manualResponderNumber =
-			manualResponderNumberHelper.find (
+			manualResponderNumberHelper.findOrCreate (
 				manualResponder,
 				number);
-
-		if (manualResponderNumber == null) {
-
-			manualResponderNumber =
-				manualResponderNumberHelper.insert (
-					manualResponderNumberHelper.createInstance ()
-
-				.setManualResponder (
-					manualResponder)
-
-				.setNumber (
-					number)
-
-			);
-
-		}
 
 		// find old and new value
 
