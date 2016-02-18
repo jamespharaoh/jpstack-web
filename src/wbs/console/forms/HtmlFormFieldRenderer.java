@@ -11,8 +11,6 @@ import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
 
-import fj.data.Either;
-
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
@@ -89,34 +87,16 @@ class HtmlFormFieldRenderer<Container>
 
 	@Override
 	public
-	String interfaceToHtmlSimple (
+	void renderHtmlSimple (
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
 			boolean link) {
 
-		return interfaceValue.or ("");
-
-	}
-
-	@Override
-	public
-	String interfaceToHtmlComplex (
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
-
-		return interfaceValue.or ("");
-
-	}
-
-	@Override
-	public
-	Either<Optional<String>,String> formToInterface (
-			@NonNull FormFieldSubmission submission,
-			@NonNull String formName) {
-
-		throw new UnsupportedOperationException ();
+		htmlWriter.writeFormat (
+			"%s",
+			interfaceValue.or (""));
 
 	}
 

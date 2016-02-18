@@ -1,12 +1,18 @@
 package wbs.platform.queue.console;
 
 import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.millisToInstant;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -157,8 +163,10 @@ class QueueHomeResponder
 		queueInfos =
 			new ArrayList<QueueInfo> ();
 
-		for (QueueInfo queueInfo
-				: queueInfosTemp) {
+		for (
+			QueueInfo queueInfo
+				: queueInfosTemp
+		) {
 
 			if (queueInfo.availableItems () == 0)
 				continue;
@@ -179,6 +187,112 @@ class QueueHomeResponder
 			"<script type=\"text/javascript\">\n",
 			"top.show_inbox (true)\n",
 			"</script>\n");
+
+		// collect list of queues for stylesheet
+
+		Set<QueueRec> queues =
+			new HashSet<QueueRec> ();
+
+		// unclaimed items
+
+		for (
+			QueueInfo queueInfo
+				: queueInfos
+		) {
+
+			if (queueInfo.availableItems () == 0)
+				continue;
+
+			queues.add (
+				queueInfo.queue ());
+
+		}
+
+		// claimed items
+
+		for (
+			QueueItemClaimRec queueItemClaim
+				: myClaimedItems
+		) {
+
+			QueueItemRec queueItem =
+				queueItemClaim.getQueueItem ();
+
+			QueueSubjectRec queueSubject =
+				queueItem.getQueueSubject ();
+
+			QueueRec queue =
+				queueSubject.getQueue ();
+
+			queues.add (
+				queue);
+
+		}
+
+		// output styles
+
+		if (
+			isNotEmpty (
+				queues)
+		) {
+
+			printFormat (
+				"<style type=\"text/css\">\n");
+
+			for (
+				QueueRec queue
+					: queues.stream ()
+						.sorted ()
+						.collect (Collectors.toList ())
+			) {
+
+				if (
+
+					isNull (
+						queue.getBackgroundColour ())
+
+					&& isNull (
+						queue.getForegroundColour ())
+
+				) {
+					continue;
+				}
+
+				printFormat (
+					"\ttable.list tr.queue-%h td {\n",
+					queue.getId ());
+
+				if (
+					isNotNull (
+						queue.getBackgroundColour ())
+				) {
+
+					printFormat (
+						"\t\tbackground-color: %s;\n",
+						queue.getBackgroundColour ());
+
+				}
+
+				if (
+					isNotNull (
+						queue.getForegroundColour ())
+				) {
+
+					printFormat (
+						"\t\tcolor: %s;\n",
+						queue.getForegroundColour ());
+
+				}
+
+				printFormat (
+					"\t}\n");
+
+			}
+
+			printFormat (
+				"</style>\n");
+
+		}
 
 	}
 
@@ -203,9 +317,21 @@ class QueueHomeResponder
 			"<div style=\"display:none\">\n");
 
 		printFormat (
-			"<p class=\"optionSet\">\n",
-			"<span class=\"optionSetName\"></span>\n",
-			"<span class=\"optionSetOptions\"></span>\n",
+			"<p",
+			" class=\"optionSet\"",
+			">\n");
+
+		printFormat (
+			"<span",
+			" class=\"optionSetName\"",
+			"></span>\n");
+
+		printFormat (
+			"<span",
+			" class=\"optionSetOptions\"",
+			"></span>\n");
+
+		printFormat (
 			"</p>\n");
 
 		printFormat (
@@ -224,8 +350,16 @@ class QueueHomeResponder
 
 		printFormat (
 			"<p>",
-			"<span class=\"disabledInfo\"></span> ",
-			"(<a href=\"javascript:void(0)\" class=\"showHideLink\"></a>)",
+
+			"<span",
+			" class=\"disabledInfo\"",
+			"></span> ",
+
+			"(<a",
+			" href=\"javascript:void(0)\"",
+			" class=\"showHideLink\"",
+			"></a>)",
+
 			"</p>\n");
 
 		// queue items
@@ -272,9 +406,25 @@ class QueueHomeResponder
 					SliceRec.class,
 					queue);
 
+			String parentTypeCode =
+				objectManager.getObjectTypeCode (
+					parent);
+
+			String parentCode =
+				objectManager.getCode (
+					parent);
+
 			printFormat (
 				"<tr",
-				" class=\"queueItemRow\"",
+
+				" class=\"%h\"",
+				joinWithSpace (
+
+					"queueItemRow",
+
+					stringFormat (
+						"queue-%h",
+						queue.getId ())),
 
 				" style=\"%h\"",
 				queueOptionsEnabled
@@ -282,10 +432,10 @@ class QueueHomeResponder
 					: "",
 
 				" data-parent-object-type-code=\"%h\"",
-				objectManager.getObjectTypeCode (parent),
+				parentTypeCode,
 
 				" data-parent-object-code=\"%h\"",
-				objectManager.getCode (parent),
+				parentCode,
 
 				" data-queue-type-code=\"%h\"",
 				queue.getQueueType ().getCode (),
@@ -344,10 +494,13 @@ class QueueHomeResponder
 				queueInfo.availableItems ());
 
 			printFormat (
-				"<td class=\"queueItemOldest\">%s</td>\n",
+				"<td",
+				" class=\"queueItemOldest\"",
+				">%s</td>\n",
 				Html.encodeNonBreakingWhitespace (
 					requestContext.prettyDateDiff (
-						millisToInstant (queueInfo.oldestAvailable ()),
+						millisToInstant (
+							queueInfo.oldestAvailable ()),
 						now)));
 
 			printFormat (
@@ -404,7 +557,13 @@ class QueueHomeResponder
 
 			printFormat (
 				"<tr",
-				" class=\"magic-table-row\"",
+
+				" class=\"%h\"",
+				joinWithSpace (
+					"magic-table-row",
+					stringFormat (
+						"queue-%h",
+						queue.getId ())),
 
 				" data-target-href=\"%h\"",
 				requestContext.resolveApplicationUrl (

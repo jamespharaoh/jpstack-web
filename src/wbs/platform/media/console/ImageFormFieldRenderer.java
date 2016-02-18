@@ -85,7 +85,7 @@ class ImageFormFieldRenderer<Container>
 	public
 	void renderFormInput (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue,
@@ -94,16 +94,18 @@ class ImageFormFieldRenderer<Container>
 
 		if (interfaceValue.isPresent ()) {
 
-			out.writeFormat (
-				"%s<br>\n",
-				interfaceToHtmlComplex (
-					container,
-					hints,
-					interfaceValue));
+			renderHtmlComplex (
+				htmlWriter,
+				container,
+				hints,
+				interfaceValue);
+
+			htmlWriter.writeFormat (
+				"<br>\n");
 
 		}
 
-		out.writeFormat (
+		htmlWriter.writeFormat (
 			"<input",
 			" type=\"file\"",
 			" name=\"%h-%h\"",
@@ -116,7 +118,7 @@ class ImageFormFieldRenderer<Container>
 			&& nullable ()
 		) {
 
-			out.writeFormat (
+			htmlWriter.writeFormat (
 				"<input",
 				" type=\"submit\"",
 				" name=\"%h-%h-remove\"",
@@ -240,69 +242,57 @@ class ImageFormFieldRenderer<Container>
 
 	@Override
 	public
-	String interfaceToHtmlSimple (
+	void renderHtmlSimple (
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue,
 			boolean link) {
 
 		if (! interfaceValue.isPresent ()) {
-			return "";
+			return;
 		}
 
-		StringBuilder stringBuilder =
-			new StringBuilder ();
-
-		stringBuilder.append (
-			stringFormat (
-				"%s",
-				mediaConsoleLogic.mediaThumb32 (
-					interfaceValue.get ())));
+		htmlWriter.writeFormat (
+			"%s",
+			mediaConsoleLogic.mediaThumb32 (
+				interfaceValue.get ()));
 
 		if (showFilename) {
 
-			stringBuilder.append (
-				stringFormat (
-					"\n%h",
-					interfaceValue.get ().getFilename ()));
+			htmlWriter.writeFormat (
+				"\n%h",
+				interfaceValue.get ().getFilename ());
 
 		}
-
-		return stringBuilder.toString ();
 
 	}
 
 	@Override
 	public
-	String interfaceToHtmlComplex (
+	void renderHtmlComplex (
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue) {
 
 		if (! interfaceValue.isPresent ()) {
-			return "";
+			return;
 		}
 
-		StringBuilder stringBuilder =
-			new StringBuilder ();
-
-		stringBuilder.append (
-			stringFormat (
-				"%s",
-				mediaConsoleLogic.mediaThumb100 (
-					interfaceValue.get ())));
+		htmlWriter.writeFormat (
+			"%s",
+			mediaConsoleLogic.mediaThumb100 (
+				interfaceValue.get ()));
 
 		if (showFilename) {
 
-			stringBuilder.append (
-				stringFormat (
-					"<br>\n%h (%h bytes)",
-					interfaceValue.get ().getFilename (),
-					interfaceValue.get ().getContent ().getData ().length));
+			htmlWriter.writeFormat (
+				"<br>\n%h (%h bytes)",
+				interfaceValue.get ().getFilename (),
+				interfaceValue.get ().getContent ().getData ().length);
 
 		}
-
-		return stringBuilder.toString ();
 
 	}
 

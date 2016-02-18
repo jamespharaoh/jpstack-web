@@ -175,35 +175,21 @@ class UploadFormFieldRenderer<Container>
 
 	@Override
 	public
-	String interfaceToHtmlSimple (
+	void renderHtmlSimple (
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<FileUpload> interfaceValue,
 			boolean link) {
 
-		if (! interfaceValue.isPresent ()) {
-			return "";
+		if (interfaceValue.isPresent ()) {
+
+			htmlWriter.writeFormat (
+				"%h (%h bytes)",
+				interfaceValue.get ().name (),
+				interfaceValue.get ().data ().length);
+
 		}
-
-		return stringFormat (
-			"%h (%h bytes)",
-			interfaceValue.get ().name (),
-			interfaceValue.get ().data ().length);
-
-	}
-
-	@Override
-	public
-	String interfaceToHtmlComplex (
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<FileUpload> interfaceValue) {
-
-		return interfaceToHtmlSimple (
-			container,
-			hints,
-			interfaceValue,
-			true);
 
 	}
 

@@ -212,11 +212,13 @@ class ImChatCoreFixtureProvider
 			.setBillingCurrency (
 				currencyHelper.findByCode (
 					GlobalId.root,
+					"test",
 					"gbp"))
 
 			.setCreditCurrency (
 				currencyHelper.findByCode (
 					GlobalId.root,
+					"test",
 					"credit"))
 
 			.setMessageTemplateDatabase (

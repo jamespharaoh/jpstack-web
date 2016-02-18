@@ -1,5 +1,7 @@
 package wbs.smsapps.manualresponder.daemon;
 
+import static wbs.framework.utils.etc.Misc.earlierThan;
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
@@ -14,6 +16,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import org.joda.time.DateTimeZone;
+import org.joda.time.Days;
+import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
@@ -131,6 +135,7 @@ class ManualResponderCommand
 	ServiceRec defaultService;
 	Optional<SmsCustomerRec> smsCustomer;
 	ManualResponderRequestRec request;
+	Instant previousRequestTime;
 
 	// implementation
 
@@ -222,6 +227,21 @@ class ManualResponderCommand
 				false)
 
 		);
+
+		// update number statistics
+
+		previousRequestTime =
+			manualResponderNumber.getLastRequest ();
+
+		manualResponderNumber
+
+			.setFirstRequest (
+				ifNull (
+					manualResponderNumber.getFirstRequest (),
+					transaction.now ()))
+
+			.setLastRequest (
+				transaction.now ());
 
 		// handle message as appropriate
 
@@ -349,8 +369,22 @@ class ManualResponderCommand
 			// ask for age
 
 			if (
+
 				isNull (
 					smsCustomer.get ().getDateOfBirth ())
+
+				&& (
+
+					isNull (
+						previousRequestTime)
+
+					|| earlierThan (
+						previousRequestTime,
+						transaction.now ().minus (
+							Days.days (30).toStandardDuration ()))
+
+				)
+
 			) {
 				return handleNeedDateOfBirth ();
 			}

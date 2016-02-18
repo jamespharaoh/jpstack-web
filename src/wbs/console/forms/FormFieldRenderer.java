@@ -1,8 +1,8 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import java.util.Map;
+
+import lombok.NonNull;
 
 import com.google.common.base.Optional;
 
@@ -45,47 +45,75 @@ interface FormFieldRenderer<Container,Interface> {
 			FormType formType,
 			String formName);
 
-	boolean formValuePresent (
-			FormFieldSubmission submission,
-			String formName);
-
-	Either<Optional<Interface>,String> formToInterface (
-			FormFieldSubmission submission,
-			String formName);
-
 	default
-	String interfaceToHtmlTableCell (
+	void renderHtmlTableCell (
+			FormatWriter htmlWriter,
 			Container container,
 			Map<String,Object> hints,
 			Optional<Interface> interfaceValue,
 			boolean link,
 			int colspan) {
 
-		return stringFormat (
-			"<td",
-			colspan != 1
-				? stringFormat (
-					" colspan=\"%h\"",
-					colspan)
-				: "",
-			">%s</td>",
-			interfaceToHtmlSimple (
-				container,
-				hints,
-				interfaceValue,
-				link));
+		htmlWriter.writeFormat (
+			"<td");
+
+		if (colspan != 1) {
+
+			htmlWriter.writeFormat (
+				" colspan=\"%h\"",
+				colspan);
+
+		}
+
+		htmlWriter.writeFormat (
+			">");
+
+		renderHtmlSimple (
+			htmlWriter,
+			container,
+			hints,
+			interfaceValue,
+			link);
+
+		htmlWriter.writeFormat (
+			"</td>");
 
 	}
 
-	String interfaceToHtmlSimple (
+	void renderHtmlSimple (
+			FormatWriter htmlWriter,
 			Container container,
 			Map<String,Object> hints,
 			Optional<Interface> interfaceValue,
 			boolean link);
 
-	String interfaceToHtmlComplex (
+	default
+	void renderHtmlComplex (
+			FormatWriter htmlWriter,
 			Container container,
 			Map<String,Object> hints,
-			Optional<Interface> interfaceValue);
+			Optional<Interface> interfaceValue) {
+
+		renderHtmlSimple (
+			htmlWriter,
+			container,
+			hints,
+			interfaceValue,
+			true);
+
+	}
+
+	boolean formValuePresent (
+			FormFieldSubmission submission,
+			String formName);
+
+	default
+	Either<Optional<Interface>,String> formToInterface (
+			@NonNull FormFieldSubmission submission,
+			@NonNull String formName) {
+
+		throw new UnsupportedOperationException ();
+
+	}
 
 }

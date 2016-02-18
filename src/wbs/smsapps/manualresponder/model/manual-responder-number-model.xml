@@ -22,6 +22,18 @@
 			type="smsCustomer"
 			nullable="yes"/>
 
+		<!-- statistics -->
+
+		<timestamp-field
+			name="firstRequest"
+			column-type="iso"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="lastRequest"
+			column-type="iso"
+			nullable="yes"/>
+
 		<!-- state -->
 
 		<yes-no-field

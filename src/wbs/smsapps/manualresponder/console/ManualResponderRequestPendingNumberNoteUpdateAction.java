@@ -1,6 +1,9 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.trim;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,6 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleObjectManager;
@@ -24,6 +28,7 @@ import wbs.platform.text.model.TextRec;
 import wbs.platform.text.web.TextResponder;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+import wbs.sms.customer.model.SmsCustomerRec;
 import wbs.sms.number.core.console.NumberConsoleHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
@@ -33,6 +38,8 @@ import wbs.smsapps.manualresponder.model.ManualResponderRec;
 public
 class ManualResponderRequestPendingNumberNoteUpdateAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ConsoleObjectManager objectManager;
@@ -61,17 +68,35 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 	@Inject
 	UserObjectHelper userHelper;
 
-	@Inject Provider<TextResponder> textResponder;
+	// prototype dependencies
+
+	@Inject
+	Provider<TextResponder> textResponder;
 
 	static
 	Pattern idPattern =
-		Pattern.compile ("manualResponderNumberNote([0-9]+)");
+		Pattern.compile (
+			"manualResponderNumberNote([0-9]+)");
+
+	// details
 
 	@Override
 	protected
 	Responder backupResponder () {
 		return null;
 	}
+
+	// state
+
+	String valueParam;
+
+	UserRec myUser;
+	ManualResponderRec manualResponder;
+	NumberRec number;
+	ManualResponderNumberRec manualResponderNumber;
+	SmsCustomerRec customer;
+
+	// implementation
 
 	@Override
 	protected
@@ -83,15 +108,21 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 			idPattern.matcher (
 				requestContext.parameter ("id"));
 
-		if (! idMatcher.matches ())
+		if (! idMatcher.matches ()) {
+
 			throw new RuntimeException (
 				"Invalid id in post");
 
-		int numberId =
-			Integer.parseInt (idMatcher.group (1));
+		}
 
-		String valueParam =
-			requestContext.parameter ("value").trim ();
+		int numberId =
+			Integer.parseInt (
+				idMatcher.group (1));
+
+		valueParam =
+			trim (
+				requestContext.parameter (
+					"value"));
 
 		// start transaction
 
@@ -100,24 +131,53 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 			database.beginReadWrite (
 				this);
 
-		UserRec myUser =
+		myUser =
 			userHelper.find (
 				requestContext.userId ());
 
-		ManualResponderRec manualResponder =
+		manualResponder =
 			manualResponderHelper.find (
-				requestContext.stuffInt ("manualResponderId"));
+				requestContext.stuffInt (
+					"manualResponderId"));
 
-		NumberRec number =
+		number =
 			numberHelper.find (
 				numberId);
 
 		// find or create number
 
-		ManualResponderNumberRec manualResponderNumber =
+		manualResponderNumber =
 			manualResponderNumberHelper.findOrCreate (
 				manualResponder,
 				number);
+
+		customer =
+			manualResponderNumber.getSmsCustomer ();
+
+		if (
+
+			isNull (
+				customer)
+
+			|| isNotNull (
+				manualResponderNumber.getNotesText ())
+
+		) {
+
+			return updateNumber (
+				transaction);
+
+		} else {
+
+			return updateCustomer (
+				transaction);
+
+		}
+
+	}
+
+	Responder updateNumber (
+			@NonNull Transaction transaction) {
 
 		// find old and new value
 
@@ -127,15 +187,21 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 		TextRec newValue =
 			valueParam.isEmpty ()
 				? null
-				: textHelper.findOrCreate (valueParam);
+				: textHelper.findOrCreate (
+					valueParam);
 
-		if (equal (oldValue, newValue)) {
+		if (
+			equal (
+				oldValue,
+				newValue)
+		) {
 
 			return textResponder.get ()
+
 				.text (
 					newValue != null
-						? Html.newlineToBr (Html.encode (
-							newValue.getText ()))
+						? Html.encodeNewlineToBr (
+							newValue.getText ())
 						: "");
 
 		}
@@ -143,7 +209,9 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 		// update note
 
 		manualResponderNumber
-			.setNotesText (newValue);
+
+			.setNotesText (
+				newValue);
 
 		// create event
 
@@ -171,10 +239,83 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 		transaction.commit ();
 
 		return textResponder.get ()
+
 			.text (
 				newValue != null
-					? Html.newlineToBr (Html.encode (
-						newValue.getText ()))
+					? Html.encodeNewlineToBr (
+						newValue.getText ())
+					: "");
+
+	}
+
+	Responder updateCustomer (
+			@NonNull Transaction transaction) {
+
+		// find old and new value
+
+		TextRec oldValue =
+			customer.getNotesText ();
+
+		TextRec newValue =
+			valueParam.isEmpty ()
+				? null
+				: textHelper.findOrCreate (
+					valueParam);
+
+		if (
+			equal (
+				oldValue,
+				newValue)
+		) {
+
+			return textResponder.get ()
+
+				.text (
+					newValue != null
+						? Html.encodeNewlineToBr (
+							newValue.getText ())
+						: "");
+
+		}
+
+		// update note
+
+		customer
+
+			.setNotesText (
+				newValue);
+
+		// create event
+
+		if (newValue != null) {
+
+			eventLogic.createEvent (
+				"object_field_updated",
+				myUser,
+				"notesText",
+				customer,
+				newValue);
+
+		} else {
+
+			eventLogic.createEvent (
+				"object_field_nulled",
+				myUser,
+				"notesText",
+				customer);
+
+		}
+
+		// finish off
+
+		transaction.commit ();
+
+		return textResponder.get ()
+
+			.text (
+				newValue != null
+					? Html.encodeNewlineToBr (
+						newValue.getText ())
 					: "");
 
 	}

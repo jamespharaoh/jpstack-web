@@ -277,30 +277,16 @@ class TextFormFieldRenderer<Container>
 
 	@Override
 	public
-	String interfaceToHtmlSimple (
+	void renderHtmlSimple (
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
 			boolean link) {
 
-		return stringFormat (
+		htmlWriter.writeFormat (
 			"%h",
 			interfaceValue.or (""));
-
-	}
-
-	@Override
-	public
-	String interfaceToHtmlComplex (
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
-
-		return interfaceToHtmlSimple (
-			container,
-			hints,
-			interfaceValue,
-			true);
 
 	}
 

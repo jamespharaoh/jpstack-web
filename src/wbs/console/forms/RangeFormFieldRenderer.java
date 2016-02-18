@@ -6,7 +6,6 @@ import static wbs.framework.utils.etc.Misc.getValue;
 import static wbs.framework.utils.etc.Misc.isError;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Map;
@@ -253,64 +252,66 @@ class RangeFormFieldRenderer<
 
 	@Override
 	public
-	String interfaceToHtmlSimple (
+	void renderHtmlSimple (
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Range<Interface>> interfaceValue,
 			boolean link) {
 
-		return stringFormat (
-			"%s to %s",
+		minimum.renderHtmlSimple (
+			htmlWriter,
+			container,
+			hints,
+			interfaceValue.isPresent ()
+				? Optional.of (
+					interfaceValue.get ().getMinimum ())
+				: Optional.absent (),
+			link);
 
-			minimum.interfaceToHtmlSimple (
-				container,
-				hints,
-				interfaceValue.isPresent ()
-					? Optional.of (
-						interfaceValue.get ().getMinimum ())
-					: Optional.absent (),
-				link),
+		htmlWriter.writeFormat (
+			" to ");
 
-			maximum.interfaceToHtmlSimple (
-				container,
-				hints,
-				interfaceValue.isPresent ()
-					? Optional.of (
-						interfaceValue.get ().getMinimum ())
-					: Optional.absent (),
-				link)
-
-		);
+		maximum.renderHtmlSimple (
+			htmlWriter,
+			container,
+			hints,
+			interfaceValue.isPresent ()
+				? Optional.of (
+					interfaceValue.get ().getMinimum ())
+				: Optional.absent (),
+			link);
 
 	}
 
 	@Override
 	public
-	String interfaceToHtmlComplex (
+	void renderHtmlComplex (
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Range<Interface>> interfaceValue) {
 
-		return stringFormat (
-			"%s to %s",
+		minimum.renderHtmlComplex (
+			htmlWriter,
+			container,
+			hints,
+			interfaceValue.isPresent ()
+				? Optional.of (
+					interfaceValue.get ().getMinimum ())
+				: Optional.absent ());
 
-			minimum.interfaceToHtmlComplex (
-				container,
-				hints,
-				interfaceValue.isPresent ()
-					? Optional.of (
-						interfaceValue.get ().getMinimum ())
-					: Optional.absent ()),
+		htmlWriter.writeFormat (
+			" to ");
 
-			maximum.interfaceToHtmlComplex (
-				container,
-				hints,
-				interfaceValue.isPresent ()
-					? Optional.of (
-						interfaceValue.get ().getMinimum ())
-					: Optional.absent ())
-
-		);
+		maximum.renderHtmlComplex (
+			htmlWriter,
+			container,
+			hints,
+			interfaceValue.isPresent ()
+				? Optional.of (
+					interfaceValue.get ().getMinimum ())
+				: Optional.absent ());
 
 	}
 

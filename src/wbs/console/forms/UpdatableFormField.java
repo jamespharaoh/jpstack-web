@@ -212,14 +212,13 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 						hints,
 						genericValue)));
 
-		htmlWriter.writeFormat (
-			"%s",
-			renderer.interfaceToHtmlTableCell (
-				container,
-				hints,
-				interfaceValue,
-				link,
-				colspan));
+		renderer.renderHtmlTableCell (
+			htmlWriter,
+			container,
+			hints,
+			interfaceValue,
+			link,
+			colspan);
 
 	}
 
@@ -249,12 +248,13 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 						hints,
 						genericValue)));
 
-		htmlWriter.writeFormat (
-			"<td>%s</td>\n",
-			renderer.interfaceToHtmlComplex (
-				container,
-				hints,
-				interfaceValue));
+		renderer.renderHtmlTableCell (
+			htmlWriter,
+			container,
+			hints,
+			interfaceValue,
+			true,
+			1);
 
 	}
 

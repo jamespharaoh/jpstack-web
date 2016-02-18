@@ -84,11 +84,16 @@
 			<object-summary-page
 				fields="summary"/>
 
+			<object-settings-page
+				fields="settings"/>
+
 			<context-link
 				name="item"
 				link="queueItem"
 				label="Items"
 				priv-key="queue.manage"/>
+
+			<object-events-page/>
 
 		</object>
 
@@ -101,6 +106,26 @@
 		<id-field/>
 		<parent-field/>
 		<code-field/>
+
+		<text-field
+			name="backgroundColour"/>
+
+		<text-field
+			name="foregroundColour"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="queue">
+
+		<text-field
+			name="backgroundColour"
+			nullable="yes"/>
+
+		<text-field
+			name="foregroundColour"
+			nullable="yes"/>
 
 	</field-set>
 

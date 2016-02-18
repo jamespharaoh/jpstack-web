@@ -289,6 +289,7 @@ class ChatCoreFixtureProvider
 			.setCurrency (
 				currencyHelper.findByCode (
 					GlobalId.root,
+					"test",
 					"gbp"))
 
 			.setGazetteer (

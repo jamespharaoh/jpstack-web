@@ -368,7 +368,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 	@Override
 	public
-	String interfaceToHtmlSimple (
+	void renderHtmlSimple (
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
@@ -401,15 +402,18 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 				interfaceValue)
 		) {
 
-			return objectManager.objectPath (
-				interfaceValue.get (),
-				root,
-				true,
-				link);
+			htmlWriter.writeFormat (
+				"%h",
+				objectManager.objectPath (
+					interfaceValue.get (),
+					root,
+					true,
+					false));
 
 		} else {
 
-			return "&mdash;";
+			htmlWriter.writeFormat (
+				"&mdash;");
 
 		}
 
@@ -417,16 +421,44 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 	@Override
 	public
-	String interfaceToHtmlComplex (
+	void renderHtmlTableCell (
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue) {
+			@NonNull Optional<Interface> interfaceValue,
+			boolean link,
+			int colspan) {
 
-		return interfaceToHtmlSimple (
-			container,
-			hints,
-			interfaceValue,
-			true);
+		// work out root
+
+		Optional<Record<?>> root;
+
+		if (rootFieldName != null) {
+
+			root =
+				Optional.of (
+					(Record<?>)
+					objectManager.dereference (
+						container,
+						rootFieldName));
+
+		} else {
+
+			root =
+				Optional.absent ();
+
+		}
+
+		// render table cell
+
+		htmlWriter.writeFormat (
+			"%s",
+			objectManager.tdForObject (
+				interfaceValue.orNull (),
+				root.orNull (),
+				mini,
+				link,
+				colspan));
 
 	}
 

@@ -234,14 +234,13 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 						hints,
 						genericValue)));
 
-		htmlWriter.writeFormat (
-			"%s\n",
-			renderer.interfaceToHtmlTableCell (
-				container,
-				hints,
-				interfaceValue,
-				link,
-				colspan));
+		renderer.renderHtmlTableCell (
+			htmlWriter,
+			container,
+			hints,
+			interfaceValue,
+			link,
+			colspan);
 
 	}
 
@@ -271,12 +270,13 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 						hints,
 						genericValue)));
 
-		htmlWriter.writeFormat (
-			"<td>%s</td>\n",
-			renderer.interfaceToHtmlComplex (
-				container,
-				hints,
-				interfaceValue));
+		renderer.renderHtmlTableCell (
+			htmlWriter,
+			container,
+			hints,
+			interfaceValue,
+			true,
+			1);
 
 	}
 
@@ -314,11 +314,15 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 			"<tr>\n",
 			"<th>%h</th>\n",
 			label (),
-			"<td>%s",
-			renderer.interfaceToHtmlComplex (
-				container,
-				hints,
-				interfaceValue),
+			"<td>");
+
+		renderer.renderHtmlComplex (
+			htmlWriter,
+			container,
+			hints,
+			interfaceValue);
+
+		htmlWriter.writeFormat (
 			"</td>\n",
 			"</tr>\n");
 

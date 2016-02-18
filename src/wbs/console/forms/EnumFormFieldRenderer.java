@@ -262,32 +262,18 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 
 	@Override
 	public
-	String interfaceToHtmlSimple (
+	void renderHtmlSimple (
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Interface> interfaceValue,
 			boolean link) {
 
-		return stringFormat (
+		htmlWriter.writeFormat (
 			"%h",
 			interfaceValue.isPresent ()
 				? interfaceValue.get ().toString ()
 				: "");
-
-	}
-
-	@Override
-	public
-	String interfaceToHtmlComplex (
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue) {
-
-		return interfaceToHtmlSimple (
-			container,
-			hints,
-			interfaceValue,
-			true);
 
 	}
 

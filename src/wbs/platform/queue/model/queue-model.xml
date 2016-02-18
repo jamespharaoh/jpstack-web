@@ -23,6 +23,16 @@
 		<type-field
 			type="queueType"/>
 
+		<!-- settings -->
+
+		<string-field
+			name="backgroundColour"
+			nullable="yes"/>
+
+		<string-field
+			name="foregroundColour"
+			nullable="yes"/>
+
 	</fields>
 
 	<collections>

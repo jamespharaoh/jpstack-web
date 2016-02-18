@@ -255,34 +255,20 @@ class YesNoFormFieldRenderer<Container>
 
 	@Override
 	public
-	String interfaceToHtmlSimple (
+	void renderHtmlSimple (
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<Boolean> genericValue,
 			boolean link) {
 
-		return stringFormat (
+		htmlWriter.writeFormat (
 			"%h",
 			booleanToString (
 				genericValue.orNull (),
 				yesLabel (),
 				noLabel (),
 				"-"));
-
-	}
-
-	@Override
-	public
-	String interfaceToHtmlComplex (
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Boolean> genericValue) {
-
-		return interfaceToHtmlSimple (
-			container,
-			hints,
-			genericValue,
-			true);
 
 	}
 

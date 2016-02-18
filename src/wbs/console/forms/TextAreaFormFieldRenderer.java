@@ -408,31 +408,19 @@ class TextAreaFormFieldRenderer<Container,Parent>
 
 	@Override
 	public
-	String interfaceToHtmlSimple (
+	void renderHtmlSimple (
+			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<String> interfaceValue,
 			boolean link) {
 
-		return Html.newlineToBr (
+		htmlWriter.writeFormat (
+			"%s",
+			Html.newlineToBr (
 			stringFormat (
 				"%h",
-				interfaceValue.or ("")));
-
-	}
-
-	@Override
-	public
-	String interfaceToHtmlComplex (
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
-
-		return interfaceToHtmlSimple (
-			container,
-			hints,
-			interfaceValue,
-			true);
+				interfaceValue.or (""))));
 
 	}
 

@@ -578,6 +578,40 @@ class ManualResponderRequestPendingSummaryPart
 		printFormat (
 			"<h2>Notes</h2>\n");
 
+		String notes;
+
+		if (
+
+			isNotNull (
+				manualResponderNumber)
+
+			&& isNotNull (
+				manualResponderNumber.getNotesText ())
+
+		) {
+
+			notes =
+				manualResponderNumber.getNotesText ().getText ();
+
+		} else if (
+
+			isNotNull (
+				smsCustomer)
+
+			&& isNotNull (
+				smsCustomer.getNotesText ())
+
+		) {
+
+			notes =
+				smsCustomer.getNotesText ().getText ();
+
+		} else {
+
+			notes = "";
+
+		}
+
 		printFormat (
 			"<p",
 			" id=\"%h\"",
@@ -588,10 +622,7 @@ class ManualResponderRequestPendingSummaryPart
 			">%s</p>\n",
 			Html.newlineToBr (
 				Html.encode (
-					manualResponderNumber != null &&
-					manualResponderNumber.getNotesText () != null
-						? manualResponderNumber.getNotesText ().getText ()
-						: "")));
+					notes)));
 
 	}
 
