@@ -193,12 +193,14 @@
 		<object-field
 			name="mmsKeywordSet"
 			label="MMS keyword set"
-			object-type="keywordSet"/>
+			object-type="keywordSet"
+			nullable="yes"/>
 
 		<object-field
 			name="wapRouter"
 			label="WAP router"
-			object-type="router"/>
+			object-type="router"
+			nullable="yes"/>
 
 		<integer-field
 			name="initialCredit"/>
