@@ -27,17 +27,18 @@
 	</layer>
 
 	<layer name="console">
+		<bean class="console.ManualResponderNumberConsoleHooks"/>
+		<bean class="console.ManualResponderQueueConsolePlugin"/>
 		<bean class="console.ManualResponderRequestPendingFormAction"/>
 		<bean class="console.ManualResponderRequestPendingFormResponder"/>
 		<bean class="console.ManualResponderRequestPendingNumberNoteUpdateAction"/>
 		<bean class="console.ManualResponderRequestPendingSummaryPart"/>
-		<bean class="console.ManualResponderQueueConsolePlugin"/>
-		<bean class="console.ManualResponderReportSimplePart"/>
-		<bean class="console.ManualResponderReportSimpleCsvResponder"/>
-		<bean class="console.ManualResponderReportServicePart"/>
-		<bean class="console.ManualResponderReportServiceCsvResponder"/>
-		<bean class="console.ManualResponderReportOperatorPart"/>
-		<bean class="console.ManualResponderReportOperatorCsvResponder"/>
+		<bean class="console.ManualResponderSharedReportOperatorCsvResponder"/>
+		<bean class="console.ManualResponderSharedReportOperatorPart"/>
+		<bean class="console.ManualResponderSharedReportServiceCsvResponder"/>
+		<bean class="console.ManualResponderSharedReportServicePart"/>
+		<bean class="console.ManualResponderSharedReportSimpleCsvResponder"/>
+		<bean class="console.ManualResponderSharedReportSimplePart"/>
 		<bean class="console.ManualResponderStatusLine"/>
 		<bean class="console.ManualResponderStatusLinePart"/>
 	</layer>
@@ -56,8 +57,8 @@
 		<console-module name="manual-responder-number"/>
 		<console-module name="manual-responder-request"/>
 		<console-module name="manual-responder-request-pending"/>
+		<console-module name="manual-responder-shared-report" />
 		<console-module name="manual-responder-template"/>
-		<console-module name="manual-responder-report" />
 	</console-modules>
 
 </plugin>

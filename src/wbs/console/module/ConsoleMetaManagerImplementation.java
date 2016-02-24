@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -40,8 +39,6 @@ import wbs.framework.data.tools.DataToXml;
 public
 class ConsoleMetaManagerImplementation
 	implements ConsoleMetaManager {
-
-int debug;
 
 	// prototype dependencies
 
@@ -212,18 +209,6 @@ int debug;
 	List<ResolvedConsoleContextExtensionPoint> resolveExtensionPoint (
 			@NonNull String name) {
 
-if (
-	in (
-		name,
-		"chatAffiliate:list",
-		"chatUser:list")
-) {
-	debug ++;
-}
-
-if (debug > 0)
-System.out.println ("=========== START ==========");
-
 		List<ResolvedConsoleContextExtensionPoint> resolvedExtensionPoints =
 			new ArrayList<ResolvedConsoleContextExtensionPoint> ();
 
@@ -238,12 +223,6 @@ System.out.println ("=========== START ==========");
 		) {
 
 			if (extensionPoint.root ()) {
-
-if (debug > 0) {
-System.out.println ("- root extension point: " + extensionPoint.name ());
-for (String parent : extensionPoint.parentContextNames ())
-System.out.println ("  parent: " + parent);
-}
 
 				resolvedExtensionPoints.add (
 					new ResolvedConsoleContextExtensionPoint ()
@@ -271,9 +250,6 @@ System.out.println ("  parent: " + parent);
 
 			} else if (extensionPoint.nested ()) {
 
-if (debug > 0)
-System.out.println ("- nested extension point: " + extensionPoint.name ());
-
 				if (
 					equal (
 						extensionPoint.name (),
@@ -299,18 +275,6 @@ System.out.println ("- nested extension point: " + extensionPoint.name ());
 
 		}
 
-if (debug > 0)
-System.out.println ("=========== END ==========");
-
-if (
-	in (
-		name,
-		"chatAffiliate:list",
-		"chatUser:list")
-) {
-	debug --;
-}
-
 		return resolvedExtensionPoints;
 
 	}
@@ -326,24 +290,15 @@ if (
 				: contextLinkNames
 		) {
 
-if (debug > 0)
-System.out.println ("  link: " + contextLinkName);
-
 			for (
 				ResolvedConsoleContextLink resolvedContextLink
 					: resolveContextLink (contextLinkName)
 			) {
 
-if (debug > 0)
-System.out.println ("    resolved link: " + resolvedContextLink.name () + "." + resolvedContextLink.localName ());
-
 				for (
 					String parentContextName
 						: resolvedContextLink.parentContextNames ()
 				) {
-
-if (debug > 0)
-System.out.println ("      resolved context: " + parentContextName + "." + resolvedContextLink.localName ());
 
 					ConsoleContextHint contextHint =
 						contextHints.get (
@@ -410,17 +365,11 @@ System.out.println ("      resolved context: " + parentContextName + "." + resol
 				: contextLinksForName
 		) {
 
-if (debug > 0)
-System.out.println ("      * resolving link: " + contextLink.linkName () + " / " + contextLink.localName ());
-
 			for (
 				ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 					: resolveExtensionPoint (
 						contextLink.extensionPointName ())
 			) {
-
-if (debug > 0)
-System.out.println ("        - extension point: " + resolvedExtensionPoint.name ());
 
 				// generate
 

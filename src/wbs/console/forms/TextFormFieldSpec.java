@@ -22,6 +22,10 @@ class TextFormFieldSpec {
 		required = true)
 	String name;
 
+	@DataAttribute (
+		name = "field")
+	String fieldName;
+
 	@Getter @Setter
 	boolean dynamic;
 

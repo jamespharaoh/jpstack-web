@@ -14,6 +14,11 @@
 			delegate="manualResponder"
 			field="id"/>
 
+		<priv-key
+			name="manualResponderNumber.manage"
+			delegate="manualResponder"
+			priv="manage"/>
+
 		<run-post-processor
 			name="manualResponder"/>
 
@@ -23,16 +28,81 @@
 		name="manualResponderNumber"
 		object-name="manualResponderNumber">
 
+		<list>
+
+			<object-search-page
+				search-fields="search-form"
+				results-fields="search-results"/>
+
+		</list>
+
 		<object>
 
 			<object-summary-page
 				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
 
 			<object-events-page/>
 
 		</object>
 
 	</object-context>
+
+	<field-set
+		name="search-form"
+		class="wbs.smsapps.manualresponder.model.ManualResponderNumberSearch">
+
+		<text-field
+			name="number"
+			nullable="yes"/>
+
+		<interval-field
+			name="firstRequest"
+			nullable="yes"/>
+
+		<interval-field
+			name="lastRequest"
+			nullable="yes"/>
+
+		<text-field
+			name="notes"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="search-results"
+		object-name="manualResponderNumber">
+
+		<object-field
+			name="number"
+			object-type="number"/>
+
+		<object-field
+			name="smsCustomer"
+			label="Customer"
+			object-type="smsCustomer"
+			root-field="manualResponder.smsCustomerManager"/>
+
+		<integer-field
+			name="numRequests"
+			label="Requests"/>
+
+		<timestamp-field
+			name="firstRequest"
+			label="First"/>
+
+		<timestamp-field
+			name="lastRequest"
+			label="Last"/>
+
+		<text-field
+			name="notesText"
+			label="Notes"/>
+
+	</field-set>
 
 	<field-set
 		name="summary"
@@ -44,6 +114,34 @@
 		<object-field
 			name="number"
 			object-type="number"/>
+
+		<object-field
+			name="smsCustomer"
+			label="Customer"
+			object-type="smsCustomer"
+			root-field="manualResponder.smsCustomerManager"/>
+
+		<integer-field
+			name="numRequests"
+			label="Requests"/>
+
+		<timestamp-field
+			name="firstRequest"
+			label="First"/>
+
+		<timestamp-field
+			name="lastRequest"
+			label="Last"/>
+
+		<text-area-field
+			name="notesText"
+			label="Notes"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="manualResponderNumber">
 
 		<text-area-field
 			name="notesText"

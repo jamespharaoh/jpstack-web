@@ -19,8 +19,8 @@
 		<Connector port="8080" protocol="HTTP/1.1" connectionTimeout="20000" redirectPort="8443"/>
 		<Engine name="console-engine" defaultHost="localhost">
 			<Realm className="org.apache.catalina.realm.UserDatabaseRealm" resourceName="UserDatabase"/>
-			<Host name="localhost" appBase="apps/console" unpackWARs="false" autoDeploy="false" xmlValidation="false" xmlNamespaceAware="false">
-				<context docBase="ROOT" path="/" reloadable="true"/>
+			<Host name="localhost" appBase="apps/console" unpackWARs="false" autoDeploy="false">
+				<Context docBase="ROOT" path="/" reloadable="true"/>
 			</Host>
 		</Engine>
 	</Service>
@@ -29,8 +29,8 @@
 		<Connector port="8081" protocol="HTTP/1.1" connectionTimeout="20000" redirectPort="8444"/>
 		<Engine name="api-engine" defaultHost="localhost">
 			<Realm className="org.apache.catalina.realm.UserDatabaseRealm" resourceName="UserDatabase"/>
-			<Host name="localhost" appBase="apps/api" unpackWARs="false" autoDeploy="false" xmlValidation="false" xmlNamespaceAware="false">
-				<context docBase="ROOT" path="/" reloadable="true"/>
+			<Host name="localhost" appBase="apps/api" unpackWARs="false" autoDeploy="false">
+				<Context docBase="ROOT" path="/" reloadable="true"/>
 			</Host>
 		</Engine>
 	</Service>

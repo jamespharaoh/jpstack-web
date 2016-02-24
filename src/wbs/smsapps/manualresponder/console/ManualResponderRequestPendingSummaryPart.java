@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -24,14 +26,18 @@ import org.apache.log4j.Level;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryEditableScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.misc.TimeFormatter;
+import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -81,10 +87,16 @@ class ManualResponderRequestPendingSummaryPart
 	CurrencyLogic currencyLogic;
 
 	@Inject
+	FormFieldLogic formFieldLogic;
+
+	@Inject
 	ManualResponderNumberObjectHelper manualResponderNumberHelper;
 
 	@Inject
 	ManualResponderRequestObjectHelper manualResponderRequestHelper;
+
+	@Inject @Named
+	ConsoleModule manualResponderRequestPendingConsoleModule;
 
 	@Inject
 	MediaConsoleLogic mediaConsoleLogic;
@@ -111,6 +123,8 @@ class ManualResponderRequestPendingSummaryPart
 	TimeFormatter timeFormatter;
 
 	// state
+
+	FormFieldSet customerDetailsFields;
 
 	ManualResponderRequestRec manualResponderRequest;
 	ManualResponderNumberRec manualResponderNumber;
@@ -156,6 +170,10 @@ class ManualResponderRequestPendingSummaryPart
 	@Override
 	public
 	void prepare () {
+
+		customerDetailsFields =
+			manualResponderRequestPendingConsoleModule.formFieldSets ().get (
+				"customer-details");
 
 		ProfileLogger profileLogger =
 			new ProfileLogger (
@@ -368,11 +386,30 @@ class ManualResponderRequestPendingSummaryPart
 		printFormat (
 			"<div class=\"manual-responder-request-pending-summary\">\n");
 
-		goSummary ();
+		printFormat (
+			"<div class=\"layout-container\">\n",
+			"<table class=\"layout\">\n",
+			"<tbody>\n",
+			"<tr>\n",
+			"<td style=\"width: 50%%\">\n");
+
+		goRequestDetails ();
+
+		printFormat (
+			"</td>\n",
+			"<td style=\"width: 50%%\">\n");
+
+		goCustomerDetails ();
+		goNotes ();
+
+		printFormat (
+			"</td>\n",
+			"</tr>\n",
+			"</tbody>\n",
+			"</table>\n",
+			"</div>\n");
 
 		goBillHistory ();
-
-		goNotes ();
 
 		goOperatorInfo ();
 
@@ -385,17 +422,10 @@ class ManualResponderRequestPendingSummaryPart
 
 	}
 
-	void goSummary () {
+	void goRequestDetails () {
 
 		printFormat (
 			"<table class=\"details\">\n");
-
-		printFormat (
-			"<tr>\n",
-			"<th>ID</th>\n",
-			"<td>%h</td>\n",
-			manualResponderRequest.getId (),
-			"</tr>\n");
 
 		printFormat (
 			"<tr>\n",
@@ -435,25 +465,6 @@ class ManualResponderRequestPendingSummaryPart
 			objectManager.tdForObjectMiniLink (
 				network),
 			"</tr>\n");
-
-		if (
-
-			isNotNull (
-				smsCustomer)
-
-			&& isNotNull (
-				smsCustomer.getDateOfBirth ())
-
-		) {
-
-			printFormat (
-				"<tr>\n",
-				"<th>Date of birth</th>\n",
-				"<td>%h</td>\n",
-				smsCustomer.getDateOfBirth (),
-				"</tr>\n");
-
-		}
 
 		printFormat (
 			"<tr>\n",
@@ -522,59 +533,36 @@ class ManualResponderRequestPendingSummaryPart
 
 	}
 
-	void goBillHistory () {
-
-		if (! manualResponder.getShowDailyBillInfo ())
-			return;
-
-		if (routeBillInfos.isEmpty ())
-			return;
+	void goCustomerDetails () {
 
 		printFormat (
-			"<h2>Bill history for today</h2>\n");
+			"<h3>Customer details</h3>\n");
 
-		printFormat (
-			"<table class=\"list\">\n");
-
-		printFormat (
-			"<tr>\n",
-			"<th>Route</th>\n",
-			"<th>All services</th>\n",
-			"<th>This service</th>\n",
-			"</tr>\n");
-
-		for (RouteBillInfo routeBillInfo
-				: routeBillInfos) {
+		if (
+			isNull (
+				smsCustomer)
+		) {
 
 			printFormat (
-				"<tr>\n",
+				"<p>Customer management is not configured for this ",
+				"manual responder service.</p>\n");
 
-				"<td>%h</td>\n",
-				routeBillInfo.route ().getCode (),
-
-				"<td>%s</td>\n",
-				currencyLogic.formatHtml (
-					manualResponder.getCurrency (),
-					Long.valueOf(routeBillInfo.total ())),
-
-				"<td>%s</td>\n",
-				currencyLogic.formatHtml (
-					manualResponder.getCurrency (),
-					Long.valueOf(routeBillInfo.thisService ())),
-
-				"</tr>\n");
+			return;
 
 		}
 
-		printFormat (
-			"</table>\n");
+		formFieldLogic.outputDetailsTable (
+			formatWriter,
+			customerDetailsFields,
+			smsCustomer,
+			ImmutableMap.<String,Object>of ());
 
 	}
 
 	void goNotes () {
 
 		printFormat (
-			"<h2>Notes</h2>\n");
+			"<h3>Notes</h3>\n");
 
 		String notes;
 
@@ -621,6 +609,55 @@ class ManualResponderRequestPendingSummaryPart
 			Html.newlineToBr (
 				Html.encode (
 					notes)));
+
+	}
+
+	void goBillHistory () {
+
+		if (! manualResponder.getShowDailyBillInfo ())
+			return;
+
+		if (routeBillInfos.isEmpty ())
+			return;
+
+		printFormat (
+			"<h2>Bill history for today</h2>\n");
+
+		printFormat (
+			"<table class=\"list\">\n");
+
+		printFormat (
+			"<tr>\n",
+			"<th>Route</th>\n",
+			"<th>All services</th>\n",
+			"<th>This service</th>\n",
+			"</tr>\n");
+
+		for (RouteBillInfo routeBillInfo
+				: routeBillInfos) {
+
+			printFormat (
+				"<tr>\n",
+
+				"<td>%h</td>\n",
+				routeBillInfo.route ().getCode (),
+
+				"<td>%s</td>\n",
+				currencyLogic.formatHtml (
+					manualResponder.getCurrency (),
+					Long.valueOf(routeBillInfo.total ())),
+
+				"<td>%s</td>\n",
+				currencyLogic.formatHtml (
+					manualResponder.getCurrency (),
+					Long.valueOf(routeBillInfo.thisService ())),
+
+				"</tr>\n");
+
+		}
+
+		printFormat (
+			"</table>\n");
 
 	}
 

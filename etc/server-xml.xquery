@@ -53,13 +53,11 @@
 				name="localhost"
 				appBase="apps/console"
 				unpackWARs="false"
-				autoDeploy="false"
-				xmlValidation="false"
-				xmlNamespaceAware="false">
+				autoDeploy="false">
 
-				<context
+				<Context
 					docBase="ROOT"
-					path="/"
+					path=""
 					reloadable="true"/>
 
 			</Host>
@@ -94,13 +92,11 @@
 				name="localhost"
 				appBase="apps/api"
 				unpackWARs="false"
-				autoDeploy="false"
-				xmlValidation="false"
-				xmlNamespaceAware="false">
+				autoDeploy="false">
 
-				<context
+				<Context
 					docBase="ROOT"
-					path="/"
+					path=""
 					reloadable="true"/>
 
 			</Host>

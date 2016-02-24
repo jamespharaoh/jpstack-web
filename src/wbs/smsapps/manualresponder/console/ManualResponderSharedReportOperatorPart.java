@@ -23,13 +23,13 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.UrlParams;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.smsapps.manualresponder.console.ManualResponderReportSimplePart.SearchForm;
+import wbs.smsapps.manualresponder.console.ManualResponderSharedReportSimplePart.SearchForm;
 import wbs.smsapps.manualresponder.model.ManualResponderReportObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReportRec;
 
-@PrototypeComponent ("manualResponderReportOperatorPart")
+@PrototypeComponent ("manualResponderSharedReportOperatorPart")
 public
-class ManualResponderReportOperatorPart
+class ManualResponderSharedReportOperatorPart
 	extends AbstractPagePart {
 
 	// dependencies
@@ -41,7 +41,7 @@ class ManualResponderReportOperatorPart
 	FormFieldLogic formFieldLogic;
 
 	@Inject @Named
-	ConsoleModule manualResponderReportConsoleModule;
+	ConsoleModule manualResponderSharedReportConsoleModule;
 
 	@Inject
 	ManualResponderReportObjectHelper manualResponderReportHelper;
@@ -75,11 +75,11 @@ class ManualResponderReportOperatorPart
 	void prepare () {
 
 		searchFormFieldSet =
-			manualResponderReportConsoleModule.formFieldSets ().get (
+			manualResponderSharedReportConsoleModule.formFieldSets ().get (
 				"simpleReportSearch");
 
 		resultsFormFieldSet =
-			manualResponderReportConsoleModule.formFieldSets ().get (
+			manualResponderSharedReportConsoleModule.formFieldSets ().get (
 				"simpleReportResults");
 
 		// get search form
@@ -173,7 +173,7 @@ class ManualResponderReportOperatorPart
 			" href=\"%h\"",
 			urlParams.toUrl (
 				requestContext.resolveLocalUrl (
-					"/manualResponderReport.operatorCsv")),
+					"/manualResponderSharedReport.operatorCsv")),
 			">Download CSV File</a></p>\n");
 
 		List<Integer> users =
@@ -264,7 +264,7 @@ class ManualResponderReportOperatorPart
 			" href=\"%h\"",
 			urlParams.toUrl (
 				requestContext.resolveLocalUrl (
-					"/manualResponderReport.operatorCsv")),
+					"/manualResponderSharedReport.operatorCsv")),
 			">Download CSV File</a></p>\n");
 
 	}

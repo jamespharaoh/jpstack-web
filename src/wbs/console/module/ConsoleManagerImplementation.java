@@ -219,8 +219,6 @@ class ConsoleManagerImplementation
 
 		if (errors != 0) {
 
-			log.error ("TESTING");
-
 			throw new RuntimeException (
 				stringFormat (
 					"%s initialising context manager",

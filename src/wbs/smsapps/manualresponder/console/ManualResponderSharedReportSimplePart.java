@@ -27,9 +27,9 @@ import wbs.framework.web.UrlParams;
 import wbs.smsapps.manualresponder.model.ManualResponderReportObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReportRec;
 
-@PrototypeComponent ("manualResponderReportSimplePart")
+@PrototypeComponent ("manualResponderSharedReportSimplePart")
 public
-class ManualResponderReportSimplePart
+class ManualResponderSharedReportSimplePart
 	extends AbstractPagePart {
 
 	// dependencies
@@ -38,7 +38,7 @@ class ManualResponderReportSimplePart
 	FormFieldLogic formFieldLogic;
 
 	@Inject @Named
-	ConsoleModule manualResponderReportConsoleModule;
+	ConsoleModule manualResponderSharedReportConsoleModule;
 
 	@Inject
 	ManualResponderReportObjectHelper manualResponderReportHelper;
@@ -66,11 +66,11 @@ class ManualResponderReportSimplePart
 	void prepare () {
 
 		searchFormFieldSet =
-			manualResponderReportConsoleModule.formFieldSets ().get (
+			manualResponderSharedReportConsoleModule.formFieldSets ().get (
 				"simpleReportSearch");
 
 		resultsFormFieldSet =
-			manualResponderReportConsoleModule.formFieldSets ().get (
+			manualResponderSharedReportConsoleModule.formFieldSets ().get (
 				"simpleReportResults");
 
 		// get search form
@@ -165,7 +165,7 @@ class ManualResponderReportSimplePart
 			" href=\"%h\"",
 			urlParams.toUrl (
 				requestContext.resolveLocalUrl (
-					"/manualResponderReport.simpleCsv")),
+					"/manualResponderSharedReport.simpleCsv")),
 			">Download CSV File</a></p>\n");
 
 		printFormat (
@@ -204,7 +204,7 @@ class ManualResponderReportSimplePart
 			" href=\"%h\"",
 			urlParams.toUrl (
 				requestContext.resolveLocalUrl (
-					"/manualResponderReport.simpleCsv")),
+					"/manualResponderSharedReport.simpleCsv")),
 			">Download CSV File</a></p>\n");
 
 	}

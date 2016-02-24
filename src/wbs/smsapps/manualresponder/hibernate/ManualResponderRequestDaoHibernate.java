@@ -1,5 +1,7 @@
 package wbs.smsapps.manualresponder.hibernate;
 
+import static wbs.framework.utils.etc.Misc.instantToDate;
+
 import java.util.List;
 
 import lombok.NonNull;
@@ -76,7 +78,11 @@ class ManualResponderRequestDaoHibernate
 				"_manualResponderRequest")
 
 			.createAlias (
-				"_manualResponderRequest.manualResponder",
+				"_manualResponderRequest.manualResponderNumber",
+				"_manualResponderNumber")
+
+			.createAlias (
+				"_manualResponderNumber.manualResponder",
 				"_manualResponder")
 
 			.createAlias (
@@ -106,7 +112,8 @@ class ManualResponderRequestDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_manualResponderRequest.timestamp",
-					search.timestampAfter ()));
+					instantToDate (
+						search.timestampAfter ())));
 
 		}
 
@@ -115,7 +122,8 @@ class ManualResponderRequestDaoHibernate
 			criteria.add (
 				Restrictions.lt (
 					"_manualResponderRequest.timestamp",
-					search.timestampBefore ()));
+					instantToDate (
+						search.timestampBefore ())));
 
 		}
 

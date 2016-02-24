@@ -22,13 +22,13 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.smsapps.manualresponder.console.ManualResponderReportSimplePart.SearchForm;
+import wbs.smsapps.manualresponder.console.ManualResponderSharedReportSimplePart.SearchForm;
 import wbs.smsapps.manualresponder.model.ManualResponderReportObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReportRec;
 
-@PrototypeComponent ("manualResponderReportOperatorCsvResponder")
+@PrototypeComponent ("manualResponderSharedReportOperatorCsvResponder")
 public
-class ManualResponderReportOperatorCsvResponder
+class ManualResponderSharedReportOperatorCsvResponder
 	extends ConsoleResponder {
 
 	// dependencies
@@ -37,7 +37,7 @@ class ManualResponderReportOperatorCsvResponder
 	FormFieldLogic formFieldLogic;
 
 	@Inject @Named
-	ConsoleModule manualResponderReportConsoleModule;
+	ConsoleModule manualResponderSharedReportConsoleModule;
 
 	@Inject
 	ManualResponderReportObjectHelper manualResponderReportHelper;
@@ -74,11 +74,11 @@ class ManualResponderReportOperatorCsvResponder
 	void prepare () {
 
 		searchFormFieldSet =
-			manualResponderReportConsoleModule.formFieldSets ().get (
+			manualResponderSharedReportConsoleModule.formFieldSets ().get (
 				"simpleReportSearch");
 
 		resultsFormFieldSet =
-			manualResponderReportConsoleModule.formFieldSets ().get (
+			manualResponderSharedReportConsoleModule.formFieldSets ().get (
 				"simpleReportCsv");
 
 		LocalDate today =

@@ -3,6 +3,7 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,10 @@ class TextFormFieldBuilder {
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
+
+	@Inject
+	Provider<DereferenceFormFieldAccessor>
+	dereferenceFormFieldAccessorProvider;
 
 	@Inject
 	Provider<DynamicFormFieldAccessor> dynamicFormFieldAccessorProvider;
@@ -70,7 +75,7 @@ class TextFormFieldBuilder {
 	FormFieldBuilderContext context;
 
 	@BuilderSource
-	TextFormFieldSpec textFormFieldSpec;
+	TextFormFieldSpec spec;
 
 	@BuilderTarget
 	FormFieldSet formFieldSet;
@@ -83,31 +88,36 @@ class TextFormFieldBuilder {
 			Builder builder) {
 
 		String name =
-			textFormFieldSpec.name ();
+			spec.name ();
+
+		String fieldName =
+			ifNull (
+				spec.fieldName (),
+				name);
 
 		String label =
 			ifNull (
-				textFormFieldSpec.label (),
+				spec.label (),
 				capitalise (camelToSpaces (name)));
 
 		Boolean readOnly =
 			ifNull (
-				textFormFieldSpec.readOnly (),
+				spec.readOnly (),
 				false);
 
 		Boolean hidden =
 			ifNull (
-				textFormFieldSpec.hidden (),
+				spec.hidden (),
 				false);
 
 		Boolean nullable =
 			ifNull (
-				textFormFieldSpec.nullable (),
+				spec.nullable (),
 				false);
 
 		Boolean dynamic =
 			ifNull (
-				textFormFieldSpec.dynamic (),
+				spec.dynamic (),
 				false);
 
 		// field type
@@ -142,13 +152,24 @@ class TextFormFieldBuilder {
 				.nativeClass (
 					propertyClass);
 
+		} else if (
+			isNotNull (
+				spec.fieldName ())
+		) {
+
+			accessor =
+				dereferenceFormFieldAccessorProvider.get ()
+
+				.path (
+					fieldName);
+
 		} else {
 
 			accessor =
 				simpleFormFieldAccessorProvider.get ()
 
 				.name (
-					name)
+					fieldName)
 
 				.nativeClass (
 					propertyClass);

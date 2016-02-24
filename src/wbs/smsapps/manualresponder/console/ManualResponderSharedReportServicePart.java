@@ -22,14 +22,14 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.UrlParams;
-import wbs.smsapps.manualresponder.console.ManualResponderReportSimplePart.SearchForm;
+import wbs.smsapps.manualresponder.console.ManualResponderSharedReportSimplePart.SearchForm;
 import wbs.smsapps.manualresponder.model.ManualResponderObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReportObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReportRec;
 
-@PrototypeComponent ("manualResponderReportServicePart")
+@PrototypeComponent ("manualResponderSharedReportServicePart")
 public
-class ManualResponderReportServicePart
+class ManualResponderSharedReportServicePart
 	extends AbstractPagePart {
 
 	// dependencies
@@ -44,7 +44,7 @@ class ManualResponderReportServicePart
 	ManualResponderObjectHelper manualResponderHelper;
 
 	@Inject @Named
-	ConsoleModule manualResponderReportConsoleModule;
+	ConsoleModule manualResponderSharedReportConsoleModule;
 
 	@Inject
 	ManualResponderReportObjectHelper manualResponderReportHelper;
@@ -75,11 +75,11 @@ class ManualResponderReportServicePart
 	void prepare () {
 
 		searchFormFieldSet =
-			manualResponderReportConsoleModule.formFieldSets ().get (
+			manualResponderSharedReportConsoleModule.formFieldSets ().get (
 				"simpleReportSearch");
 
 		resultsFormFieldSet =
-			manualResponderReportConsoleModule.formFieldSets ().get (
+			manualResponderSharedReportConsoleModule.formFieldSets ().get (
 				"simpleReportResults");
 
 		// get search form
@@ -214,7 +214,7 @@ class ManualResponderReportServicePart
 			" href=\"%h\"",
 			urlParams.toUrl (
 				requestContext.resolveLocalUrl (
-					"/manualResponderReport.serviceCsv")),
+					"/manualResponderSharedReport.serviceCsv")),
 			">Download CSV File</a></p>\n");
 
 		List<Integer> services =
@@ -300,7 +300,7 @@ class ManualResponderReportServicePart
 			" href=\"%h\"",
 			urlParams.toUrl (
 				requestContext.resolveLocalUrl (
-					"/manualResponderReport.serviceCsv")),
+					"/manualResponderSharedReport.serviceCsv")),
 			">Download CSV File</a></p>\n");
 
 	}

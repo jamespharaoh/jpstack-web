@@ -2,6 +2,7 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
@@ -433,7 +434,15 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		Optional<Record<?>> root;
 
-		if (rootFieldName != null) {
+		if (
+
+			isPresent (
+				interfaceValue)
+
+			&& isNotNull (
+				rootFieldName)
+
+		) {
 
 			root =
 				Optional.of (

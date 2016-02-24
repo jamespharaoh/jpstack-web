@@ -87,19 +87,11 @@ class ConsoleContextSectionBuilder<
 
 		buildContextTypes ();
 
-System.out.println ("DOING " + name);
-System.out.println ("- extension " + container.extensionPointName ());
-
 		for (
 			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
 					container.extensionPointName ())
 		) {
-
-System.out.println ("  - resolved: " + resolvedExtensionPoint.name ());
-for (String parentName : resolvedExtensionPoint.parentContextNames ()) {
-System.out.println ("    - parent: " + parentName);
-}
 
 			buildResolvedContexts (
 				resolvedExtensionPoint);

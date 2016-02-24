@@ -2,7 +2,6 @@ package wbs.console.object;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.maybeList;
@@ -378,10 +377,6 @@ class ObjectContextBuilder<
 			String parentContextName
 				: resolvedContextLink.parentContextNames ()
 		) {
-
-if (equal (spec.consoleModuleSpec ().name (), "chat-user")) {
-	System.out.println ("CHAT USER: " + parentContextName);
-}
 
 			String resolvedContextName =
 				stringFormat (

@@ -16,7 +16,6 @@
 			name="manualResponder.stats"
 			priv="stats"/>
 
-
 		<context-stuff
 			name="manualResponderName"
 			field="name"/>
@@ -35,10 +34,9 @@
 			<object-create-page/>
 
 			<context-link
-				name="report"
-				link="manualResponderReport"
-				label="Reports"
-				priv-key="manualResponder.manage"/>
+				name="sharedReport"
+				link="manualResponderSharedReport"
+				label="Shared reports"/>
 
 		</list>
 
@@ -47,24 +45,49 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"/>
+			<section
+				name="settings"
+				label="Settings">
 
-			<context-link
-				name="template"
-				link="manualResponderTemplate"
-				label="Templates"
-				priv-key="manualResponder.manage"/>
+				<object-settings-page
+					short-name="general"
+					fields="settings"/>
 
-			<context-link
-				name="request"
-				link="manualResponderRequest"
-				label="Requests"
-				priv-key="manualResponder.manage"/>
+				<context-link
+					name="template"
+					link="manualResponderTemplate"
+					label="Templates"
+					priv-key="manualResponder.manage"/>
 
-			<object-sms-messages-page/>
+			</section>
 
-			<object-sms-stats-page/>
+			<section
+				name="admin"
+				label="Admin">
+
+				<context-link
+					name="number"
+					link="manualResponderNumber"
+					label="Numbers"
+					priv-key="manualResponder.manage"/>
+
+				<context-link
+					name="request"
+					link="manualResponderRequest"
+					label="Requests"
+					priv-key="manualResponder.manage"/>
+
+			</section>
+
+			<section
+				name="report"
+				label="Reports">
+
+				<object-sms-stats-page/>
+
+				<object-sms-messages-page/>
+
+			</section>
 
 			<object-events-page/>
 
