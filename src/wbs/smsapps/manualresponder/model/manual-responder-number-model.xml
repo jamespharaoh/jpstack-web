@@ -34,6 +34,10 @@
 			column-type="iso"
 			nullable="yes"/>
 
+		<integer-field
+			name="numRequests"
+			default="0"/>
+
 		<!-- state -->
 
 		<yes-no-field

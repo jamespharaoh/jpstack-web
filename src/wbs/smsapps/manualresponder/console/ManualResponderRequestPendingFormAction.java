@@ -38,6 +38,7 @@ import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
 import wbs.smsapps.manualresponder.logic.ManualResponderLogic;
+import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
@@ -218,8 +219,11 @@ class ManualResponderRequestPendingFormAction
 			manualResponderRequestHelper.find (
 				manualResponderRequestId);
 
+		ManualResponderNumberRec manualResponderNumber =
+			request.getManualResponderNumber ();
+
 		ManualResponderRec manualResponder =
-			request.getManualResponder ();
+			manualResponderNumber.getManualResponder ();
 
 		ManualResponderTemplateRec template =
 			manualResponderTemplateHelper.find (

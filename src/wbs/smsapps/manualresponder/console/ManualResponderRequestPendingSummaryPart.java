@@ -171,8 +171,11 @@ class ManualResponderRequestPendingSummaryPart
 				requestContext.stuffInt (
 					"manualResponderRequestId"));
 
+		manualResponderNumber =
+			manualResponderRequest.getManualResponderNumber ();
+
 		manualResponder =
-			manualResponderRequest.getManualResponder ();
+			manualResponderNumber.getManualResponder ();
 
 		message =
 			manualResponderRequest.getMessage ();
@@ -182,11 +185,6 @@ class ManualResponderRequestPendingSummaryPart
 
 		network =
 			number.getNetwork ();
-
-		manualResponderNumber =
-			manualResponderNumberHelper.find (
-				manualResponder,
-				number);
 
 		smsCustomer =
 			manualResponderNumber != null

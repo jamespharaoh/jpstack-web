@@ -11,16 +11,18 @@
 		<!-- identity -->
 
 		<parent-field
-			type="manualResponder"/>
+			type="manualResponderNumber"/>
+
+		<index-field/>
+
+		<timestamp-field
+			name="timestamp"
+			column-type="postgresql"/>
 
 		<!-- data -->
 
 		<reference-field
 			type="message"/>
-
-		<timestamp-field
-			name="timestamp"
-			column-type="postgresql"/>
 
 		<reference-field
 			type="user"

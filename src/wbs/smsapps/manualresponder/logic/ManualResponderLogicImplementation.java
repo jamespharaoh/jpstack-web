@@ -27,6 +27,7 @@ import wbs.sms.keyword.logic.KeywordLogic;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
+import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
@@ -180,8 +181,11 @@ class ManualResponderLogicImplementation
 		Transaction transaction =
 			database.currentTransaction ();
 
+		ManualResponderNumberRec manualResponderNumber =
+			request.getManualResponderNumber ();
+
 		ManualResponderRec manualResponder =
-			request.getManualResponder ();
+			manualResponderNumber.getManualResponder ();
 
 		// split message
 

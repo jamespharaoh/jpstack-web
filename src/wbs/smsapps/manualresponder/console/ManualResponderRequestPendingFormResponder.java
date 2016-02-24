@@ -1,7 +1,9 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.framework.utils.etc.Misc.allOf;
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.not;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Set;
@@ -23,10 +25,10 @@ import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberObjectHelper;
+import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
@@ -61,8 +63,8 @@ class ManualResponderRequestPendingFormResponder
 	// state
 
 	ManualResponderRequestRec request;
+	ManualResponderNumberRec manualResponderNumber;
 	ManualResponderRec manualResponder;
-	NumberRec number;
 	Set<ManualResponderTemplateRec> templates;
 	String summaryUrl;
 
@@ -117,11 +119,11 @@ class ManualResponderRequestPendingFormResponder
 				requestContext.stuffInt (
 					"manualResponderRequestId"));
 
-		manualResponder =
-			request.getManualResponder ();
+		manualResponderNumber =
+			request.getManualResponderNumber ();
 
-		number =
-			request.getNumber ();
+		manualResponder =
+			manualResponderNumber.getManualResponder ();
 
 		templates =
 			new TreeSet<ManualResponderTemplateRec> ();
@@ -158,8 +160,16 @@ class ManualResponderRequestPendingFormResponder
 						Integer.parseInt (
 							networkIsRulesMatcher.group (1));
 
-					if (number.getNetwork ().getId () != networkId)
+					if (
+						notEqual (
+							manualResponderNumber
+								.getNumber ()
+								.getNetwork ()
+								.getId (),
+							networkId)
+					) {
 						continue;
+					}
 
 				}
 
@@ -177,8 +187,16 @@ class ManualResponderRequestPendingFormResponder
 						Integer.parseInt (
 							networkIsNotRulesMatcher.group (1));
 
-					if (number.getNetwork ().getId () == networkId)
+					if (
+						equal (
+							manualResponderNumber
+								.getNumber ()
+								.getNetwork ()
+								.getId (),
+							networkId)
+					) {
 						continue;
+					}
 
 				}
 
@@ -269,7 +287,7 @@ class ManualResponderRequestPendingFormResponder
 		} else if (
 
 			! privChecker.can (
-				request.getManualResponder (),
+				manualResponder,
 				"reply")
 
 		) {
@@ -283,14 +301,11 @@ class ManualResponderRequestPendingFormResponder
 				templates.isEmpty (),
 
 				not (
-					request
-						.getManualResponder ()
-						.getCanIgnore ()),
+					manualResponder.getCanIgnore ()),
 
 				not (
 					privChecker.can (
-						request
-							.getManualResponder (),
+						manualResponder,
 						"manage")))
 
 		) {

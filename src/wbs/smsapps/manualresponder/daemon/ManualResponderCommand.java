@@ -210,8 +210,12 @@ class ManualResponderCommand
 			manualResponderRequestHelper.insert (
 				manualResponderRequestHelper.createInstance ()
 
-			.setManualResponder (
-				manualResponder)
+			.setManualResponderNumber (
+				manualResponderNumber)
+
+			.setIndex (
+				(int) (long)
+				manualResponderNumber.getNumRequests ())
 
 			.setMessage (
 				message)
@@ -241,7 +245,10 @@ class ManualResponderCommand
 					transaction.now ()))
 
 			.setLastRequest (
-				transaction.now ());
+				transaction.now ())
+
+			.setNumRequests (
+				manualResponderNumber.getNumRequests () + 1);
 
 		// handle message as appropriate
 

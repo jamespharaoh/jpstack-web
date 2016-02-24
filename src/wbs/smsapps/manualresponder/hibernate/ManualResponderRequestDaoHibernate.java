@@ -35,9 +35,13 @@ class ManualResponderRequestDaoHibernate
 				ManualResponderRequestRec.class,
 				"_manualResponderRequest")
 
+			.createAlias (
+				"_manualResponderRequest.manualResponderNumber",
+				"_manualResponderNumber")
+
 			.add (
 				Restrictions.eq (
-					"_manualResponderRequest.manualResponder",
+					"_manualResponderNumber.manualResponder",
 					manualResponder))
 
 			.add (
