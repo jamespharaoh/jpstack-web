@@ -8,6 +8,7 @@ import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.lessThan;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
 
@@ -22,11 +23,15 @@ import org.joda.time.LocalDate;
 import org.joda.time.Years;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
+import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.utils.EmailLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -67,6 +72,9 @@ class ManualResponderCommand
 	Database database;
 
 	@Inject
+	EmailLogic emailLogic;
+
+	@Inject
 	InboxLogic inboxLogic;
 
 	@Inject
@@ -98,6 +106,12 @@ class ManualResponderCommand
 
 	@Inject
 	SmsCustomerLogic smsCustomerLogic;
+
+	@Inject
+	TimeFormatter timeFormatter;
+
+	@Inject
+	WbsConfig wbsConfig;
 
 	// properties
 
@@ -287,7 +301,43 @@ class ManualResponderCommand
 			isNotPresent (
 				dateOfBirth)
 		) {
+
+			emailLogic.sendSystemEmail (
+				ImmutableList.of (
+					wbsConfig.developerEmailAddress ()),
+				"DOB error",
+				stringFormat (
+
+					"********** %s DOB ERROR **********\n",
+					wbsConfig.name ().toUpperCase (),
+					"\n",
+
+					"Application:  manual responder\n",
+					"Service:      %s.%s\n",
+					manualResponder.getSlice ().getCode (),
+					manualResponder.getCode (),
+					"Timestamp:    %s\n",
+					timeFormatter.instantToTimestampString (
+						timeFormatter.defaultTimezone (),
+						transaction.now ()),
+					"\n",
+
+					"Message ID:   %s\n",
+					message.getId (),
+					"Route:        %s.%s\n",
+					message.getRoute ().getSlice ().getCode (),
+					message.getRoute ().getCode (),
+					"Number from:  %s\n",
+					message.getNumFrom (),
+					"Number to:    %s\n",
+					message.getNumTo (),
+					"Full message: %s\n",
+					message.getText ().getText (),
+					"Message rest: %s\n",
+					rest));
+
 			return handleDateOfBirthError ();
+
 		}
 
 		// store date of birth
@@ -388,7 +438,7 @@ class ManualResponderCommand
 					|| earlierThan (
 						previousRequestTime,
 						transaction.now ().minus (
-							Days.days (30).toStandardDuration ()))
+							Days.days (180).toStandardDuration ()))
 
 				)
 
@@ -398,20 +448,27 @@ class ManualResponderCommand
 
 			// error if too young
 
-			Integer age =
-				Years.yearsBetween (
-					smsCustomer.get ().getDateOfBirth ().toDateTimeAtStartOfDay (
-						DateTimeZone.forID (
-							"Europe/London")),
-					transaction.now ()
-				).getYears ();
-
 			if (
-				lessThan (
-					age,
-					manualResponder.getRequiredAge ())
+				isNotNull (
+					smsCustomer.get ().getDateOfBirth ())
 			) {
-				return handleTooYoungError ();
+
+				Integer age =
+					Years.yearsBetween (
+						smsCustomer.get ().getDateOfBirth ().toDateTimeAtStartOfDay (
+							DateTimeZone.forID (
+								"Europe/London")),
+						transaction.now ()
+					).getYears ();
+
+				if (
+					lessThan (
+						age,
+						manualResponder.getRequiredAge ())
+				) {
+					return handleTooYoungError ();
+				}
+
 			}
 
 		}

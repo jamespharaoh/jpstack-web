@@ -902,13 +902,10 @@ class ManualResponderRequestPendingSummaryPart
 			printFormat (
 				"</td>\n");
 
-			// print request user
+			// leave request user blank
 
 			printFormat (
-				"<td>%h</td>\n",
-				oldRequest.getUser () != null
-					? oldRequest.getUser ().getUsername ()
-					: "");
+				"<td></td>\n");
 
 			printFormat (
 				"</tr>\n");

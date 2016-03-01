@@ -673,6 +673,12 @@ class ImChatCoreFixtureProvider
 			.setPassword (
 				"topsecret")
 
+			.setFirstSession (
+				transaction.now ())
+
+			.setLastSession (
+				transaction.now ())
+
 		);
 
 		// im chat conversation

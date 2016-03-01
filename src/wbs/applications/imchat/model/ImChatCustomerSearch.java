@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import org.joda.time.Interval;
+
 @Accessors (fluent = true)
 @Data
 @EqualsAndHashCode
@@ -20,12 +22,16 @@ class ImChatCustomerSearch
 	String code;
 	String email;
 
+	Interval firstSession;
+	Interval lastSession;
+
 	Order order =
 		Order.timestampDesc;
 
 	public static
 	enum Order {
-		timestampDesc
+		timestampDesc,
+		totalPurchaseDesc;
 	}
 
 }

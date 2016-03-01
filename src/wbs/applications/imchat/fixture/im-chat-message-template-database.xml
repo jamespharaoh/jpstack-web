@@ -187,11 +187,35 @@
 			Purchase credit
 		</field>
 
-		<field name="Introduction">
-			In order to make a payment, you will be taken to Paypal's secure
-			payment gateway. Please be patient, since these pages can take a
-			long time to load.
+		<field name="Advert"><![CDATA[
+
+			<p>This is the advert. Yay!</p>
+
+			<p><img src="/psychic-living/oops.jpg"></p>
+
+		]]></field>
+
+		<field name="Advert width">
+			300px
 		</field>
+
+		<field name="Advert offset">
+			310px
+		</field>
+
+		<field name="Introduction"><![CDATA[
+
+			<p>In order to make a payment, you will be taken to Paypal's secure
+			payment gateway. Please be patient, since these pages can take a
+			long time to load.</p>
+
+		]]></field>
+
+		<field name="Payment inline"><![CDATA[
+
+			<p><img src="/psychic-living/paypal-large.jpg"></p>
+
+		]]></field>
 
 		<field name="No credit message">
 			You do not currently have any credit. You must purchase at least
@@ -207,6 +231,34 @@
 		<field name="Sufficient credit message">
 			You currently have a credit balance of ${currentBalance}. The
 			minimum credit required for this service is ${minimumBalance}.
+		</field>
+
+		<field name="Name background colour">
+			#ffff00
+		</field>
+
+		<field name="Name foreground colour">
+			#0000ff
+		</field>
+
+		<field name="Name icon url">
+			/psychic-living/bubble.png
+		</field>
+
+		<field name="Description background colour">
+			#ff00ff
+		</field>
+
+		<field name="Desciption foreground colour">
+			#00ff00
+		</field>
+
+		<field name="Content background colour">
+			#00ffff
+		</field>
+
+		<field name="Content foreground colour">
+			#ff0000
 		</field>
 
 		<field name="Make purchase button label">

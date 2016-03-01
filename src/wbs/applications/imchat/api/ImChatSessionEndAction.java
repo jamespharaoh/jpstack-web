@@ -120,7 +120,10 @@ class ImChatSessionEndAction
 		customer
 
 			.setActiveSession (
-				null);
+				null)
+
+			.setLastSession (
+				transaction.now ());
 
 		// create response
 

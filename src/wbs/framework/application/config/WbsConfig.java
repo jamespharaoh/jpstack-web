@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import com.google.common.collect.ImmutableList;
@@ -21,7 +22,7 @@ import wbs.framework.data.tools.DataFromXml;
 public
 class WbsConfig {
 
-	// attributes
+	// general information
 
 	@DataAttribute (
 		required = true)
@@ -50,6 +51,8 @@ class WbsConfig {
 	@DataAttribute (
 		required = true)
 	String defaultSlice;
+
+	// email settings
 
 	@DataAttribute (
 		required = true)
@@ -85,7 +88,15 @@ class WbsConfig {
 
 	@DataAttribute (
 		required = true)
+	String developerEmailAddress;
+
+	// security
+
+	@DataAttribute (
+		required = true)
 	String cryptorSeed;
+
+	// test and development
 
 	@DataChildren (
 		childrenElement = "test-users",
@@ -98,7 +109,7 @@ class WbsConfig {
 
 	public static
 	WbsConfig readFilename (
-			String filename) {
+			@NonNull String filename) {
 
 		DataFromXml dataFromXml =
 			new DataFromXml ()

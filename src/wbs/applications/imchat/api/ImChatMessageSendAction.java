@@ -244,6 +244,13 @@ class ImChatMessageSendAction
 			.setQueueItem (
 				queueItem);
 
+		// update customer
+
+		customer
+
+			.setLastSession (
+				transaction.now ());
+
 		// create response
 
 		ImChatMessageSendSuccess successResponse =

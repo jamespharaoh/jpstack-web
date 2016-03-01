@@ -95,12 +95,68 @@ class ImChatCustomerDaoHibernate
 
 		}
 
-		// add default order
+		if (
+			isNotNull (
+				imChatCustomerSearch.firstSession ())
+		) {
 
-		criteria
+			criteria.add (
+				Restrictions.ge (
+					"_imChatCustomer.firstSession",
+					imChatCustomerSearch.firstSession ().getStart ()));
 
-			.addOrder (
-				Order.asc ("_imChatCustomer.code"));
+			criteria.add (
+				Restrictions.lt (
+					"_imChatCustomer.firstSession",
+					imChatCustomerSearch.firstSession ().getEnd ()));
+
+		}
+
+		if (
+			isNotNull (
+				imChatCustomerSearch.lastSession ())
+		) {
+
+			criteria.add (
+				Restrictions.ge (
+					"_imChatCustomer.lastSession",
+					imChatCustomerSearch.lastSession ().getStart ()));
+
+			criteria.add (
+				Restrictions.lt (
+					"_imChatCustomer.lastSession",
+					imChatCustomerSearch.lastSession ().getEnd ()));
+
+		}
+
+		// set order
+
+		switch (imChatCustomerSearch.order ()) {
+
+		case timestampDesc:
+
+			criteria
+
+				.addOrder (
+					Order.asc ("_imChatCustomer.code"));
+
+			break;
+
+		case totalPurchaseDesc:
+
+			criteria
+
+				.addOrder (
+					Order.asc ("_imChatCustomer.totalPurchase"));
+
+			break;
+
+		default:
+
+			throw new RuntimeException (
+				"should never happen");
+
+		}
 
 		// set to return ids only
 

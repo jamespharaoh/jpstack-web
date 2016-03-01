@@ -249,7 +249,14 @@ class ImChatPurchaseConfirmAction
 
 			.setBalance (
 				+ customer.getBalance ()
-				+ purchase.getValue ());
+				+ purchase.getValue ())
+
+			.setTotalPurchase (
+				+ customer.getTotalPurchase ()
+				+ purchase.getValue ())
+
+			.setLastSession (
+				transaction.now ());
 
 		// create response
 

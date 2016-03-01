@@ -92,6 +92,18 @@
 			name="email"
 			nullable="yes"/>
 
+		<interval-field
+			name="firstSession"
+			nullable="yes"/>
+
+		<interval-field
+			name="lastSession"
+			nullable="yes"/>
+
+		<enum-field
+			name="order"
+			helper="imChatCustomerSearchOrderConsoleHelper"/>
+
 	</field-set>
 
 	<field-set

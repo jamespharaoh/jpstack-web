@@ -170,7 +170,11 @@ class ImChatCustomerCreditAction
 
 			.setBalance (
 				+ request.customer ().getBalance ()
-				+ request.creditAmount ());
+				+ request.creditAmount ())
+
+			.setTotalPurchase (
+				+ request.customer ().getTotalPurchase ()
+				+ request.billAmount ());
 
 		// complete transaction
 

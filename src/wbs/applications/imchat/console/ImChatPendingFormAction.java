@@ -314,6 +314,12 @@ class ImChatPendingFormAction
 					+ customer.getBalance ()
 					- ifNull (
 						operatorMessage.getPrice (),
+						0l))
+
+				.setTotalSpend (
+					+ customer.getTotalSpend ()
+					+ ifNull (
+						operatorMessage.getPrice (),
 						0l));
 
 		} else {

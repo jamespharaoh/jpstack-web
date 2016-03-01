@@ -173,7 +173,10 @@ class ImChatSessionStartAction
 		customer
 
 			.setActiveSession (
-				session);
+				session)
+
+			.setLastSession (
+				transaction.now ());
 
 		// create response
 

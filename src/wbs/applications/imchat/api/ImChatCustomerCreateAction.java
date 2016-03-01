@@ -182,6 +182,12 @@ class ImChatCustomerCreateAction
 			.setPassword (
 				createRequest.password ())
 
+			.setFirstSession (
+				transaction.now ())
+
+			.setLastSession (
+				transaction.now ())
+
 		);
 
 		// update details

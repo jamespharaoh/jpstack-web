@@ -58,6 +58,22 @@
 			name="balance"
 			default="0"/>
 
+		<integer-field
+			name="totalPurchase"
+			default="0"/>
+
+		<integer-field
+			name="totalSpend"
+			default="0"/>
+
+		<timestamp-field
+			name="firstSession"
+			column-type="iso"/>
+
+		<timestamp-field
+			name="lastSession"
+			column-type="iso"/>
+
 		<!-- data -->
 
 		<reference-field

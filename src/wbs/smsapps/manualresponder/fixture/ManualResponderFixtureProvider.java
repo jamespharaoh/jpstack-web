@@ -10,6 +10,7 @@ import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.customer.model.SmsCustomerManagerObjectHelper;
 import wbs.sms.keyword.model.KeywordObjectHelper;
 import wbs.sms.keyword.model.KeywordSetObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
@@ -57,6 +58,9 @@ class ManualResponderFixtureProvider
 
 	@Inject
 	SliceObjectHelper sliceHelper;
+
+	@Inject
+	SmsCustomerManagerObjectHelper smsCustomerManagerHelper;
 
 	// implementation
 
@@ -130,6 +134,15 @@ class ManualResponderFixtureProvider
 					GlobalId.root,
 					"test",
 					"gbp"))
+
+			.setSmsCustomerManager (
+				smsCustomerManagerHelper.findByCode (
+					GlobalId.root,
+					"test",
+					"customer_manager"))
+
+			.setRequiredAge (
+				18l)
 
 		);
 
@@ -397,7 +410,7 @@ class ManualResponderFixtureProvider
 				1l)
 
 			.setNumber (
-  				"free")
+  				"inbound")
 
 			.setRouter (
 				routerHelper.findByCode (
@@ -408,6 +421,153 @@ class ManualResponderFixtureProvider
 					"static"))
 
 		);
+
+		manualResponder.setDateOfBirthTemplate (
+			manualResponderTemplateHelper.insert (
+				manualResponderTemplateHelper.createInstance ()
+
+			.setManualResponder (
+				manualResponder)
+
+			.setCode (
+				"welcome")
+
+			.setName (
+				"Welcome")
+
+			.setDescription (
+				"Welcome")
+
+			.setCustomisable (
+				false)
+
+			.setDefaultText (
+				"Welcome, please provide with name and date of birth")
+
+			.setMaximumMessages (
+				1l)
+
+			.setMinimumMessageParts (
+				1l)
+
+			.setNumber (
+  				"inbound")
+
+			.setRouter (
+				routerHelper.findByCode (
+					routeHelper.findByCode (
+						GlobalId.root,
+						"test",
+						"free"),
+					"static"))
+
+			.setReplyKeywordSet (
+				keywordSetHelper.findByCode (
+					GlobalId.root,
+					"test",
+					"inbound"))
+
+		));
+
+		manualResponder.setDateOfBirthErrorTemplate (
+			manualResponderTemplateHelper.insert (
+				manualResponderTemplateHelper.createInstance ()
+
+			.setManualResponder (
+				manualResponder)
+
+			.setCode (
+				"date_of_birth_error")
+
+			.setName (
+				"Date of birth error")
+
+			.setDescription (
+				"Date of birth error")
+
+			.setCustomisable (
+				false)
+
+			.setHidden (
+				true)
+
+			.setDefaultText (
+				"Your message was not understood, please try again")
+
+			.setMaximumMessages (
+				1l)
+
+			.setMinimumMessageParts (
+				1l)
+
+			.setNumber (
+  				"inbound")
+
+			.setRouter (
+				routerHelper.findByCode (
+					routeHelper.findByCode (
+						GlobalId.root,
+						"test",
+						"free"),
+					"static"))
+
+			.setReplyKeywordSet (
+				keywordSetHelper.findByCode (
+					GlobalId.root,
+					"test",
+					"inbound"))
+
+		));
+
+		manualResponder.setTooYoungTemplate (
+			manualResponderTemplateHelper.insert (
+				manualResponderTemplateHelper.createInstance ()
+
+			.setManualResponder (
+				manualResponder)
+
+			.setCode (
+				"too_young")
+
+			.setName (
+				"Too young")
+
+			.setDescription (
+				"Too young")
+
+			.setCustomisable (
+				false)
+
+			.setHidden (
+				true)
+
+			.setDefaultText (
+				"Sorry, you are too young to use this service")
+
+			.setMaximumMessages (
+				1l)
+
+			.setMinimumMessageParts (
+				1l)
+
+			.setNumber (
+  				"inbound")
+
+			.setRouter (
+				routerHelper.findByCode (
+					routeHelper.findByCode (
+						GlobalId.root,
+						"test",
+						"free"),
+					"static"))
+
+			.setReplyKeywordSet (
+				keywordSetHelper.findByCode (
+					GlobalId.root,
+					"test",
+					"inbound"))
+
+		));
 
 	}
 
