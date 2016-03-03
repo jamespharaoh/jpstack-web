@@ -1,5 +1,7 @@
 package wbs.platform.object.settings;
 
+import static wbs.framework.utils.etc.Misc.optionalCast;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -97,8 +99,8 @@ class ObjectSettingsPart<
 	void prepare () {
 
 		updateResultSet =
-			Optional.fromNullable (
-				(UpdateResultSet)
+			optionalCast (
+				UpdateResultSet.class,
 				requestContext.request (
 					"objectSettingsUpdateResultSet"));
 

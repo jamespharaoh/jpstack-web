@@ -100,8 +100,7 @@ class MediaConsoleLogicImplementation
 		) {
 
 			Integer playerCount =
-				(Integer)
-				requestContext.request (
+				requestContext.requestIntRequired (
 					PLAYER_COUNT_KEY);
 
 			StringBuilder stringBuilder =
@@ -165,8 +164,8 @@ class MediaConsoleLogicImplementation
 		) {
 
 			Integer playerCount =
-				(Integer)
-				requestContext.request (PLAYER_COUNT_KEY);
+				requestContext.requestIntRequired (
+					PLAYER_COUNT_KEY);
 
 			StringBuilder stringBuilder =
 				new StringBuilder ();

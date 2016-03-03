@@ -50,8 +50,7 @@ class ChatUserImageUploadErrorPage
 
 		imageUploadToken =
 			chatUserImageUploadTokenHelper.findByToken (
-				(String)
-				requestContext.request (
+				requestContext.requestStringRequired (
 					"chatUserImageUploadToken"));
 
 		chatUser =

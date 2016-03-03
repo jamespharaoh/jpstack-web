@@ -19,6 +19,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.log4j.Logger;
 
+import com.google.common.base.Optional;
+
 public
 interface RequestContext {
 
@@ -29,9 +31,6 @@ interface RequestContext {
 	ServletContext context ();
 
 	Object context (
-			String key);
-
-	Object request (
 			String key);
 
 	String applicationPathPrefix ();
@@ -69,13 +68,6 @@ interface RequestContext {
 	Reader reader ()
 		throws IOException;
 
-	Integer requestInt (
-			String key);
-
-	int requestInt (
-			String key,
-			int defaultValue);
-
 	RequestDispatcher requestDispatcher (
 			String path);
 
@@ -104,10 +96,6 @@ interface RequestContext {
 	void sendRedirect (
 			String location)
 		throws IOException;
-
-	void request (
-			String key,
-			Object value);
 
 	void session (
 			String key,
@@ -170,5 +158,29 @@ interface RequestContext {
 
 	InputStream resourceAsStream (
 			String path);
+
+	// request attributes
+
+	void request (
+			String key,
+			Object value);
+
+	Optional<Object> request (
+			String key);
+
+	Object requestRequired (
+			String key);
+
+	Optional<String> requestString (
+			String key);
+
+	String requestStringRequired (
+			String key);
+
+	Optional<Integer> requestInt (
+			String key);
+
+	Integer requestIntRequired (
+			String key);
 
 }

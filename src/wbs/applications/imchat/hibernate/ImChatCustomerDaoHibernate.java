@@ -138,7 +138,7 @@ class ImChatCustomerDaoHibernate
 			criteria
 
 				.addOrder (
-					Order.asc ("_imChatCustomer.code"));
+					Order.desc ("_imChatCustomer.lastSession"));
 
 			break;
 
@@ -147,7 +147,16 @@ class ImChatCustomerDaoHibernate
 			criteria
 
 				.addOrder (
-					Order.asc ("_imChatCustomer.totalPurchase"));
+					Order.desc ("_imChatCustomer.totalPurchase"));
+
+			break;
+
+		case balanceDesc:
+
+			criteria
+
+				.addOrder (
+					Order.desc ("_imChatCustomer.balance"));
 
 			break;
 

@@ -75,7 +75,8 @@ class G8waveInFile
 		// get request stuff
 
 		int routeId =
-			requestContext.requestInt ("route_id");
+			requestContext.requestIntRequired (
+				"route_id");
 
 		// get params in local variables
 

@@ -229,10 +229,12 @@ class ChatApiServletModule
 				IOException {
 
 			String format =
-				(String) requestContext.request ("format");
+				requestContext.requestStringRequired (
+					"format");
 
-			int mediaId =
-				requestContext.requestInt ("mediaId");
+			Integer mediaId =
+				requestContext.requestIntRequired (
+					"mediaId");
 
 			@Cleanup
 			Transaction transaction =

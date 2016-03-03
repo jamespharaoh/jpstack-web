@@ -2,7 +2,10 @@ package wbs.framework.web;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.Misc.optionalCast;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -34,6 +37,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.log4j.Logger;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -281,41 +285,6 @@ class RequestContextImplementation
 		throws IOException {
 
 		return request ().getReader ();
-
-	}
-
-	@Override
-	public
-	Object request (
-			String key) {
-
-		return request ().getAttribute (key);
-
-	}
-
-	@Override
-	public
-	Integer requestInt (
-			String key) {
-
-		return (Integer)
-			request (key);
-
-	}
-
-	@Override
-	public
-	int requestInt (
-			String key,
-			int defaultValue) {
-
-		Integer intObject = (Integer)
-			requestInt (key);
-
-		if (intObject != null)
-			return intObject.intValue ();
-
-		return defaultValue;
 
 	}
 
@@ -887,6 +856,174 @@ class RequestContextImplementation
 		return joinWithoutSeparator (
 			applicationPathPrefix (),
 			applicationUrl);
+
+	}
+
+	// request attributes
+
+	@Override
+	public
+	Optional<Object> request (
+			@NonNull String key) {
+
+		return Optional.fromNullable (
+			request ().getAttribute (
+				key));
+
+	}
+
+	@Override
+	public
+	Object requestRequired (
+			@NonNull String key) {
+
+		Object requestValue =
+			request ().getAttribute (
+				key);
+
+		if (
+			isNull (
+				requestValue)
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"No such request attribute: %s",
+					key));
+
+		}
+
+		return requestValue;
+
+	}
+
+	@Override
+	public
+	Optional<Integer> requestInt (
+			@NonNull String key) {
+
+		return optionalCast (
+			Integer.class,
+			request (
+				key));
+
+	}
+
+	@Override
+	public
+	Integer requestIntRequired (
+			@NonNull String key) {
+
+		Object requestValue =
+			request ().getAttribute (
+				key);
+
+		if (
+			isNull (
+				requestValue)
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"No such request attribute: %s",
+					key));
+
+		}
+
+		if (
+			isNotInstanceOf (
+				Integer.class,
+				requestValue)
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Request attribute '%s' expected to be integer but is '%s'",
+					key,
+					requestValue.getClass ().getSimpleName ()));
+
+		}
+
+		return (Integer)
+			requestValue;
+
+	}
+
+	@Override
+	public
+	Optional<String> requestString (
+			@NonNull String key) {
+
+		Object requestValue =
+			request ().getAttribute (
+				key);
+
+		if (
+			isNull (
+				requestValue)
+		) {
+
+			return Optional.absent ();
+
+		}
+
+		if (
+			isNotInstanceOf (
+				String.class,
+				requestValue)
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Request attribute '%s' expected to be string but is '%s'",
+					key,
+					requestValue.getClass ().getSimpleName ()));
+
+		}
+
+		return Optional.of (
+			(String)
+			requestValue);
+
+	}
+
+	@Override
+	public
+	String requestStringRequired (
+			@NonNull String key) {
+
+		Object requestValue =
+			request ().getAttribute (
+				key);
+
+		if (
+			isNull (
+				requestValue)
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"No such request attribute: %s",
+					key));
+
+		}
+
+		if (
+			isNotInstanceOf (
+				String.class,
+				requestValue)
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Request attribute '%s' expected to be string but is '%s'",
+					key,
+					requestValue.getClass ().getSimpleName ()));
+
+		}
+
+		return (String)
+			requestValue;
 
 	}
 

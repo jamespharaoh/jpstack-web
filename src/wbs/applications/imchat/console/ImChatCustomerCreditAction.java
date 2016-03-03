@@ -1,6 +1,7 @@
 package wbs.applications.imchat.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.ifNotPresent;
+import static wbs.framework.utils.etc.Misc.optionalCast;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -8,6 +9,7 @@ import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.console.action.ConsoleAction;
@@ -87,13 +89,15 @@ class ImChatCustomerCreditAction
 				"credit-request");
 
 		ImChatCustomerCreditRequest request =
-			ifNull (
+			ifNotPresent (
 
-			(ImChatCustomerCreditRequest)
-			requestContext.request (
-				"imChatCustomerCreditRequest"),
+			optionalCast (
+				ImChatCustomerCreditRequest.class,
+				requestContext.request (
+					"imChatCustomerCreditRequest")),
 
-			new ImChatCustomerCreditRequest ()
+			Optional.of (
+				new ImChatCustomerCreditRequest ())
 
 		);
 

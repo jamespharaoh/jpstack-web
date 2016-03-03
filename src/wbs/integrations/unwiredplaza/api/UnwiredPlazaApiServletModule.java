@@ -129,7 +129,8 @@ class UnwiredPlazaApiServletModule
 					this);
 
 			int routeId =
-				requestContext.requestInt ("routeId");
+				requestContext.requestIntRequired (
+					"routeId");
 
 			Integer id =
 				Integer.parseInt (requestContext.parameter ("id"));

@@ -36,9 +36,6 @@ interface ConsoleRequestContext {
 	HttpServletRequest request ();
 	HttpServletResponse response ();
 
-	Object request (
-			String key);
-
 	String servletPath ();
 
 	void addError (
@@ -156,10 +153,6 @@ interface ConsoleRequestContext {
 	String prettySecsInterval (
 			Integer interval);
 
-	void request (
-			String key,
-			Object value);
-
 	void formData (
 			Map<String,String> newFormData);
 
@@ -233,9 +226,6 @@ interface ConsoleRequestContext {
 			String key,
 			String defaultValue);
 
-	int requestInt (
-			String key);
-
 	int parameterInt (
 			String key);
 
@@ -278,7 +268,33 @@ interface ConsoleRequestContext {
 	String fileItemField (
 			 String name);
 
+	// http headers
+
 	Optional<String> header (
 			String name);
+
+	// request attributes
+
+	void request (
+			String key,
+			Object value);
+
+	Optional<?> request (
+			String key);
+
+	Object requestRequired (
+			String key);
+
+	Optional<Integer> requestInt (
+			String key);
+
+	Integer requestIntRequired (
+			String key);
+
+	Optional<String> requestString (
+			String key);
+
+	String requestStringRequired (
+			String key);
 
 }

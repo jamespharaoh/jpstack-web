@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -2569,6 +2570,179 @@ class Misc {
 		return longValue == null
 			? null
 			: (int) (long) longValue;
+
+	}
+
+	@SafeVarargs
+	public static <Type>
+	Type ifNotPresent (
+			@NonNull Optional<Type>... optionalValues) {
+
+		for (
+			Optional<Type> optionalValue
+				: optionalValues
+		) {
+
+			if (
+				isPresent (
+					optionalValue)
+			) {
+
+				return optionalValue.get ();
+
+			}
+
+		}
+
+		throw new IllegalArgumentException ();
+
+	}
+
+	public static <Type>
+	Type ifNotPresent (
+			@NonNull Optional<? extends Type> optionalValueOne) {
+
+		if (
+			isPresent (
+				optionalValueOne)
+		) {
+
+			return optionalValueOne.get ();
+
+		}
+
+		throw new IllegalArgumentException ();
+
+	}
+
+	public static <Type>
+	Type ifNotPresent (
+			@NonNull Optional<? extends Type> optionalValueOne,
+			@NonNull Optional<? extends Type> optionalValueTwo) {
+
+		if (
+			isPresent (
+				optionalValueOne)
+		) {
+
+			return optionalValueOne.get ();
+
+		}
+
+		if (
+			isPresent (
+				optionalValueTwo)
+		) {
+
+			return optionalValueTwo.get ();
+
+		}
+
+		throw new IllegalArgumentException ();
+
+	}
+
+	public static <Type>
+	Type ifNotPresent (
+			@NonNull Optional<? extends Type> optionalValueOne,
+			@NonNull Optional<? extends Type> optionalValueTwo,
+			@NonNull Optional<? extends Type> optionalValueThree) {
+
+		if (
+			isPresent (
+				optionalValueOne)
+		) {
+
+			return optionalValueOne.get ();
+
+		}
+
+		if (
+			isPresent (
+				optionalValueTwo)
+		) {
+
+			return optionalValueTwo.get ();
+
+		}
+
+		if (
+			isPresent (
+				optionalValueThree)
+		) {
+
+			return optionalValueThree.get ();
+
+		}
+
+		throw new IllegalArgumentException ();
+
+	}
+
+	public static <Type>
+	Type cast (
+			@NonNull Class<Type> classToCastTo,
+			@NonNull Object value) {
+
+		return classToCastTo.cast (
+			value);
+
+	}
+
+	public static <Type>
+	Optional<Type> optionalCast (
+			@NonNull Class<Type> classToCastTo,
+			@NonNull Optional<?> optionalValue) {
+
+		if (
+			isPresent (
+				optionalValue)
+		) {
+
+			if (
+				isInstanceOf (
+					classToCastTo,
+					optionalValue.get ())
+			) {
+
+				return Optional.of (
+					cast (
+						classToCastTo,
+						optionalValue.get ()));
+
+			} else {
+
+				throw new ClassCastException ();
+
+			}
+
+		} else {
+
+			return Optional.<Type>absent ();
+
+		}
+
+	}
+
+	public static <Type>
+	Optional<Type> optionalMap (
+			@NonNull Optional<Type> optionalValue,
+			@NonNull Function<? super Type,? extends Type> mappingFunction) {
+
+		if (
+			isPresent (
+				optionalValue)
+		) {
+
+			return Optional.of (
+				mappingFunction.apply (
+					optionalValue.get ()));
+
+		} else {
+
+			return Optional.absent ();
+
+		}
 
 	}
 

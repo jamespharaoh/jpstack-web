@@ -409,7 +409,8 @@ logger.error ("Got item");
 
 			RouteRec route =
 				routeHelper.find (
-					requestContext.requestInt ("routeId"));
+					requestContext.requestIntRequired (
+						"routeId"));
 
 			inboxLogic.inboxInsert (
 				Optional.of (guid),

@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.broadcast.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.ifNotPresent;
 
 import java.util.Map;
 import java.util.Set;
@@ -109,16 +109,17 @@ class ChatBroadcastSendPart
 				"send-message-message");
 
 		form =
-			ifNull (
-				(ChatBroadcastSendForm)
+			(ChatBroadcastSendForm)
+			ifNotPresent (
 				requestContext.request (
 					"chatBroadcastForm"),
-				new ChatBroadcastSendForm ());
+				Optional.<ChatBroadcastSendForm>of (
+					new ChatBroadcastSendForm ()));
 
 		updateResults =
 			Optional.fromNullable (
 				(UpdateResultSet)
-				requestContext.request (
+				requestContext.requestRequired (
 					"chatBroadcastUpdates"));
 
 		formHints =

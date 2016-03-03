@@ -68,7 +68,8 @@ class BroadcastSystemsReportFile
 			Data data) {
 
 		data.routeId =
-			requestContext.requestInt ("routeId");
+			requestContext.requestIntRequired (
+				"routeId");
 
 		data.transactionId =
 			requestContext.parameter ("message_id");

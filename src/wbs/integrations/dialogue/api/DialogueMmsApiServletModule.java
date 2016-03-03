@@ -208,7 +208,7 @@ class DialogueMmsApiServletModule
 
 			RouteRec route =
 				routeHelper.find (
-					requestContext.requestInt (
+					requestContext.requestIntRequired (
 						"routeId"));
 
 			Instant mmsDate =

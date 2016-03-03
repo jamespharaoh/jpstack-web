@@ -51,7 +51,7 @@ class ChatUserImageUploadSuccessPage
 		imageUploadToken =
 			chatUserImageUploadTokenHelper.findByToken (
 				(String)
-				requestContext.request (
+				requestContext.requestRequired (
 					"chatUserImageUploadToken"));
 
 		chatUser =

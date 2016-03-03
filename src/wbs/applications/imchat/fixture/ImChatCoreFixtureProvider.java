@@ -155,9 +155,9 @@ class ImChatCoreFixtureProvider
 
 		);
 
-		// message template database
+		// message template databases
 
-		MessageTemplateDatabaseRec messageTemplateDatabase =
+		MessageTemplateDatabaseRec primaryMessageTemplateDatabase =
 			messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
 				sliceHelper.findByCode (
 					GlobalId.root,
@@ -170,7 +170,33 @@ class ImChatCoreFixtureProvider
 			messageTemplateSetHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
-				messageTemplateDatabase)
+				primaryMessageTemplateDatabase)
+
+			.setCode (
+				"default")
+
+			.setName (
+				"Default")
+
+			.setDescription (
+				"")
+
+		);
+
+		MessageTemplateDatabaseRec embeddedMessageTemplateDatabase =
+			messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
+				sliceHelper.findByCode (
+					GlobalId.root,
+					"test"),
+				joinWithSlash (
+					"/wbs/applications/imchat/fixture",
+					"im-chat-embedded-message-template-database.xml"));
+
+		messageTemplateSetHelper.insert (
+			messageTemplateSetHelper.createInstance ()
+
+			.setMessageTemplateDatabase (
+				embeddedMessageTemplateDatabase)
 
 			.setCode (
 				"default")
@@ -222,7 +248,7 @@ class ImChatCoreFixtureProvider
 					"credit"))
 
 			.setMessageTemplateDatabase (
-				messageTemplateDatabase)
+				primaryMessageTemplateDatabase)
 
 			.setPreferredQueueTime (
 				5l * 60l)

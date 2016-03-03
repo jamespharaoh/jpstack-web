@@ -133,12 +133,14 @@ class Oxygen8InboundMmsAction
 		// route id
 
 		routeId =
-			requestContext.requestInt ("routeId");
+			requestContext.requestIntRequired (
+				"routeId");
 
 		// message id
 
 		mmsMessageId =
-			requestContext.header ("X-Mms-Message-Id");
+			requestContext.header (
+				"X-Mms-Message-Id");
 
 		if (mmsMessageId == null) {
 
@@ -158,7 +160,8 @@ class Oxygen8InboundMmsAction
 		// message type
 
 		mmsMessageType =
-			requestContext.header ("X-Mms-Message-Type");
+			requestContext.header (
+				"X-Mms-Message-Type");
 
 		if (mmsMessageType == null) {
 

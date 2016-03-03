@@ -101,8 +101,7 @@ class ImChatEventPostAction
 		ImChatRec imChat =
 			imChatHelper.find (
 				Integer.parseInt (
-					(String)
-					requestContext.request (
+					requestContext.requestStringRequired (
 						"imChatId")));
 
 		// write events

@@ -127,6 +127,19 @@
 			name="balance"
 			currency="imChat.creditCurrency"/>
 
+		<currency-field
+			name="totalSpend"
+			label="Spend"
+			currency="imChat.creditCurrency"/>
+
+		<currency-field
+			name="totalPurchase"
+			label="Purchase"
+			currency="imChat.billingCurrency"/>
+
+		<timestamp-field
+			name="lastSession"/>
+
 	</field-set>
 
 	<field-set

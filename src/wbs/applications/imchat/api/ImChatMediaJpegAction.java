@@ -89,8 +89,7 @@ class ImChatMediaJpegAction
 		MediaRec media =
 			mediaHelper.find (
 				Integer.parseInt (
-					(String)
-					requestContext.request (
+					requestContext.requestStringRequired (
 						"mediaId")));
 
 		if (media == null) {
@@ -109,7 +108,7 @@ class ImChatMediaJpegAction
 		if (
 			notEqual (
 				hash.toString (),
-				requestContext.request (
+				requestContext.requestStringRequired (
 					"mediaContentHash"))
 		) {
 			throw new PageNotFoundException ();

@@ -172,8 +172,7 @@ class SmsArenaDlrDispatchAction
 			RouteRec route =
 				routeHelper.find (
 					Integer.parseInt (
-						(String)
-						requestContext.request (
+						requestContext.requestStringRequired (
 							"routeId")));
 
 			SmsArenaRouteInRec smsArenaRouteIn =
@@ -229,8 +228,7 @@ class SmsArenaDlrDispatchAction
 			RouteRec route =
 				routeHelper.find (
 					Integer.parseInt (
-						(String)
-						requestContext.request (
+						requestContext.requestStringRequired (
 							"routeId")));
 
 			smsArenaDlrReportLogHelper.insert (

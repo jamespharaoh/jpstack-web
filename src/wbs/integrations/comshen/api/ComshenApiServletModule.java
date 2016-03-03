@@ -89,7 +89,8 @@ class ComshenApiServletModule
 					this);
 
 			int routeId =
-				requestContext.requestInt ("routeId");
+				requestContext.requestIntRequired (
+					"routeId");
 
 			String idParam =
 				requestContext.parameter ("id");

@@ -63,7 +63,8 @@ class TxtNationRouteInFile
 	void doPost () {
 
 		int routeId =
-			requestContext.requestInt ("routeId");
+			requestContext.requestIntRequired (
+				"routeId");
 
 		String actionParam =
 			requestContext.parameter ("action");

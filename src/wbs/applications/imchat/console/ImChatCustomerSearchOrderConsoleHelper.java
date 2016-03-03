@@ -23,6 +23,10 @@ class ImChatCustomerSearchOrderConsoleHelper
 			ImChatCustomerSearch.Order.totalPurchaseDesc,
 			"highest purchase");
 
+		add (
+			ImChatCustomerSearch.Order.balanceDesc,
+			"highest balance");
+
 	}
 
 }

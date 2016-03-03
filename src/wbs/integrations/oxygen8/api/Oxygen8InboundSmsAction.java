@@ -217,7 +217,7 @@ class Oxygen8InboundSmsAction
 
 			.setRoute (
 				routeHelper.find (
-					requestContext.requestInt (
+					requestContext.requestIntRequired (
 						"routeId")))
 
 			.setType (
@@ -238,25 +238,32 @@ class Oxygen8InboundSmsAction
 	void processRequest () {
 
 		routeId =
-			requestContext.requestInt ("routeId");
+			requestContext.requestIntRequired (
+				"routeId");
 
 		channel =
-			requestContext.parameter ("Channel");
+			requestContext.parameter (
+				"Channel");
 
 		reference =
-			requestContext.parameter ("Reference");
+			requestContext.parameter (
+				"Reference");
 
 		trigger =
-			requestContext.parameter ("Trigger");
+			requestContext.parameter (
+				"Trigger");
 
 		shortcode =
-			requestContext.parameter ("Shortcode");
+			requestContext.parameter (
+				"Shortcode");
 
 		msisdn =
-			requestContext.parameter ("MSISDN");
+			requestContext.parameter (
+				"MSISDN");
 
 		rawContent =
-			requestContext.parameter ("Content");
+			requestContext.parameter (
+				"Content");
 
 		dataType =
 			Integer.parseInt (

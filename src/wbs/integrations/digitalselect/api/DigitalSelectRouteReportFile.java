@@ -59,7 +59,8 @@ class DigitalSelectRouteReportFile
 		throws IOException {
 
 		int routeId =
-			requestContext.requestInt ("routeId");
+			requestContext.requestIntRequired (
+				"routeId");
 
 		String msgidParam =
 			requestContext.parameter ("msgid");

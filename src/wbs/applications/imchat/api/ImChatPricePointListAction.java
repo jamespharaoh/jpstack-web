@@ -71,8 +71,7 @@ class ImChatPricePointListAction
 		ImChatRec imChat =
 			imChatHelper.find (
 				Integer.parseInt (
-					(String)
-					requestContext.request (
+					requestContext.requestStringRequired (
 						"imChatId")));
 
 		// retrieve price points

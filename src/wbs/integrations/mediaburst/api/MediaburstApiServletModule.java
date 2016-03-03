@@ -202,7 +202,8 @@ class MediaburstApiServletModule
 			// get request stuff
 
 			int routeId =
-				requestContext.requestInt ("routeId");
+				requestContext.requestIntRequired (
+					"routeId");
 
 			// get params in local variables
 
@@ -375,7 +376,8 @@ class MediaburstApiServletModule
 
 			RouteRec route =
 				routeHelper.find (
-					requestContext.requestInt ("routeId"));
+					requestContext.requestIntRequired (
+						"routeId"));
 
 			String statusParam =
 				requestContext.parameter ("status").toLowerCase ();

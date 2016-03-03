@@ -130,7 +130,8 @@ class HybyteApiServletModule
 				// get ids
 
 				int routeId =
-					requestContext.requestInt ("routeId");
+					requestContext.requestIntRequired (
+						"routeId");
 
 				// process xml
 
@@ -355,14 +356,16 @@ class HybyteApiServletModule
 
 			HybyteRouteOutRec hybyteRouteOut =
 				hybyteRouteOutHelper.find (
-					requestContext.requestInt ("routeId"));
+					requestContext.requestIntRequired (
+						"routeId"));
 
 			if (hybyteRouteOut == null) {
 
 				throw new RuntimeException (
 					stringFormat (
 						"No such hybyte route out: %s",
-						requestContext.requestInt("routeId")));
+						requestContext.requestInt (
+							"routeId")));
 
 			}
 

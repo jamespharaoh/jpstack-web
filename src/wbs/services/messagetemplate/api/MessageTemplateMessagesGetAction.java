@@ -1,32 +1,29 @@
-package wbs.applications.imchat.api;
+package wbs.services.messagetemplate.api;
 
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.joinWithFullStop;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
-
-import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
-
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import com.google.common.collect.ImmutableMap;
 
-import wbs.applications.imchat.model.ImChatObjectHelper;
-import wbs.applications.imchat.model.ImChatRec;
+import wbs.applications.imchat.api.ImChatMessageTemplateSetGetSuccess;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.record.GlobalId;
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
+import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.scaffold.model.SliceRec;
+import wbs.services.messagetemplate.model.MessageTemplateDatabaseObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
@@ -35,9 +32,9 @@ import wbs.services.messagetemplate.model.MessageTemplateFieldValueRec;
 import wbs.services.messagetemplate.model.MessageTemplateSetObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateSetRec;
 
-@PrototypeComponent ("imChatMessageTemplateSetGetAction")
+@PrototypeComponent ("messageTemplateMessagesGetAction")
 public
-class ImChatMessageTemplateSetGetAction
+class MessageTemplateMessagesGetAction
 	implements Action {
 
 	// dependencies
@@ -46,16 +43,16 @@ class ImChatMessageTemplateSetGetAction
 	Database database;
 
 	@Inject
-	ImChatApiLogic imChatApiLogic;
-
-	@Inject
-	ImChatObjectHelper imChatHelper;
+	MessageTemplateDatabaseObjectHelper messageTemplateDatabaseHelper;
 
 	@Inject
 	MessageTemplateSetObjectHelper messageTemplateSetHelper;
 
 	@Inject
 	RequestContext requestContext;
+
+	@Inject
+	SliceObjectHelper sliceHelper;
 
 	// prototype dependencies
 
@@ -65,24 +62,8 @@ class ImChatMessageTemplateSetGetAction
 	// implementation
 
 	@Override
-	@SneakyThrows (IOException.class)
 	public
 	Responder handle () {
-
-		DataFromJson dataFromJson =
-			new DataFromJson ();
-
-		// decode request
-
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
-
-		ImChatMessageTemplateSetGetRequest request =
-			dataFromJson.fromJson (
-				ImChatMessageTemplateSetGetRequest.class,
-				jsonValue);
 
 		// begin transaction
 
@@ -91,44 +72,39 @@ class ImChatMessageTemplateSetGetAction
 			database.beginReadOnly (
 				this);
 
-		// lookup message template set
+		// lookup message template stuff
 
-		ImChatRec imChat =
-			imChatHelper.find (
-				Integer.parseInt (
-					requestContext.requestStringRequired (
-						"imChatId")));
-
-		MessageTemplateSetRec messageTemplateSet =
-			messageTemplateSetHelper.findByCode (
-				imChat.getMessageTemplateDatabase (),
-				request.code ());
+		SliceRec slice =
+			sliceHelper.findByCode (
+				GlobalId.root,
+				requestContext.requestStringRequired (
+					"sliceCode"));
 
 		MessageTemplateDatabaseRec messageTemplateDatabase =
-			messageTemplateSet.getMessageTemplateDatabase ();
+			messageTemplateDatabaseHelper.findByCode (
+				slice,
+				requestContext.requestStringRequired (
+					"messageTemplateDatabaseCode"));
 
 		if (
 			isNull (
-				messageTemplateSet)
+				messageTemplateDatabase)
 		) {
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"code-invalid")
-
-				.message (
-					"The set code provided is incorrect or the set is no " +
-					"longer active");
-
-			return jsonResponderProvider.get ()
-
-				.value (
-					failureResponse);
+			throw new RuntimeException (
+				stringFormat (
+					"Message template database not found: %s.%s",
+					slice.getCode (),
+					requestContext.requestStringRequired (
+						"messageTemplateDatabaseCode")));
 
 		}
 
+		MessageTemplateSetRec messageTemplateSet =
+			messageTemplateSetHelper.findByCode (
+				messageTemplateDatabase,
+				requestContext.requestStringRequired (
+					"messageTemplateSetCode"));
 		// create response
 
 		ImmutableMap.Builder<String,String> messagesBuilder =

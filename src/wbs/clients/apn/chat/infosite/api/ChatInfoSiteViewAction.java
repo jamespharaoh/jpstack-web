@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.infosite.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.notEqual;
 
 import javax.inject.Inject;
 
@@ -40,7 +40,8 @@ class ChatInfoSiteViewAction
 
 		ChatInfoSiteRec infoSite =
 			chatInfoSiteHelper.find (
-				requestContext.requestInt ("chatInfoSiteId"));
+				requestContext.requestIntRequired (
+					"chatInfoSiteId"));
 
 		// update first view time
 
@@ -49,12 +50,15 @@ class ChatInfoSiteViewAction
 
 		// check the token
 
-		if (! equal (
-			infoSite.getToken (),
-			requestContext.request ("chatInfoSiteToken"))
+		if (
+			notEqual (
+				infoSite.getToken (),
+				requestContext.requestStringRequired (
+					"chatInfoSiteToken"))
 		) {
 
-			throw new RuntimeException ("Token mismatch");
+			throw new RuntimeException (
+				"Token mismatch");
 
 		}
 

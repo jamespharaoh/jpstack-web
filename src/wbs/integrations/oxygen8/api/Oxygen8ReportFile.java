@@ -76,7 +76,8 @@ class Oxygen8ReportFile
 			State state) {
 
 		state.routeId =
-			requestContext.requestInt ("routeId");
+			requestContext.requestIntRequired (
+				"routeId");
 
 		state.reference =
 			requestContext.parameter ("Reference");

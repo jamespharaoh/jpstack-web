@@ -59,8 +59,7 @@ class ImChatServiceGetAction
 		ImChatRec imChat =
 			imChatHelper.find (
 				Integer.parseInt (
-					(String)
-					requestContext.request (
+					requestContext.requestStringRequired (
 						"imChatId")));
 
 		// create response

@@ -31,7 +31,8 @@ class ImChatCustomerSearch
 	public static
 	enum Order {
 		timestampDesc,
-		totalPurchaseDesc;
+		totalPurchaseDesc,
+		balanceDesc;
 	}
 
 }

@@ -43,8 +43,7 @@ class ChatUserImageUploadViewAction
 
 		ChatUserImageUploadTokenRec imageUploadToken =
 			chatUserImageUploadTokenHelper.findByToken (
-				(String)
-				requestContext.request (
+				requestContext.requestStringRequired (
 					"chatUserImageUploadToken"));
 
 		// check the expiry time

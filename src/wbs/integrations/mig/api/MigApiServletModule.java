@@ -182,7 +182,8 @@ class MigApiServletModule
 				// get request stuff
 
 				int routeId =
-					requestContext.requestInt ("routeId");
+					requestContext.requestIntRequired (
+						"routeId");
 
 				// get params in local variables
 				// String ifVersion = requestContext.getParameter ("IFVERSION");
@@ -311,7 +312,8 @@ class MigApiServletModule
 				// get request stuff
 
 				int routeId =
-					requestContext.requestInt ("routeId");
+					requestContext.requestIntRequired (
+						"routeId");
 
 				// String ifVersion = requestContext.getParameter ("IFVERSION");
 				String statusType = requestContext.parameter("STATUSTYPE");

@@ -45,13 +45,13 @@ class ChatInfoSiteViewResponder
 
 		infoSite =
 			chatInfoSiteHelper.find (
-				requestContext.requestInt (
+				requestContext.requestIntRequired (
 					"chatInfoSiteId"));
 
 		if (
 			notEqual (
 				infoSite.getToken (),
-				requestContext.request (
+				requestContext.requestStringRequired (
 					"chatInfoSiteToken"))
 		) {
 

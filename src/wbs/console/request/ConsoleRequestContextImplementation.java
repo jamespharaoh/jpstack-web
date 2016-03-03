@@ -1,8 +1,10 @@
 package wbs.console.request;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifNotPresent;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.pluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -49,6 +51,7 @@ import wbs.console.tab.TabList;
 import wbs.framework.application.annotations.ProxiedRequestComponent;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
+import wbs.framework.utils.etc.Misc;
 import wbs.framework.web.RequestContext;
 
 /**
@@ -102,16 +105,6 @@ class ConsoleRequestContextImplementation
 
 		return (Integer)
 			session ("myUserId");
-
-	}
-
-	@Override
-	public
-	Object request (
-			@NonNull String key) {
-
-		return requestContext
-			.request (key);
 
 	}
 
@@ -626,7 +619,8 @@ class ConsoleRequestContextImplementation
 	TabContext tabContext () {
 
 		return (TabContext)
-			request ("tabContext");
+			requestRequired (
+				"tabContext");
 
 	}
 
@@ -856,12 +850,17 @@ class ConsoleRequestContextImplementation
 	Map<String,String> getFormData () {
 
 		@SuppressWarnings ("unchecked")
-		Map<String,String> formData =
-			(Map<String,String>)
-			request ("formData");
+		Optional<Map<String,String>> formData =
+			(Optional<Map<String,String>>)
+			request (
+				"formData");
 
-		if (formData != null)
-			return formData;
+		if (
+			isPresent (
+				formData)
+		) {
+			return formData.get ();
+		}
 
 		return requestFormData ();
 
@@ -910,7 +909,8 @@ class ConsoleRequestContextImplementation
 	ConsoleContext consoleContext () {
 
 		return (ConsoleContext)
-			request ("context");
+			requestRequired (
+				"context");
 
 	}
 
@@ -919,7 +919,8 @@ class ConsoleRequestContextImplementation
 	ConsoleContextStuff contextStuff () {
 
 		return (ConsoleContextStuff)
-			request ("contextStuff");
+			requestRequired (
+				"contextStuff");
 
 	}
 
@@ -968,16 +969,24 @@ class ConsoleRequestContextImplementation
 	int requestUnique () {
 
 		Integer unique =
-			(Integer) request ("unique");
+			ifNotPresent (
 
-		if (unique == null)
-			unique = 0;
-		else
-			unique = unique + 1;
+			Misc.<Integer>optionalMap (
+				requestInt (
+					"unique"),
+				value -> value + 1),
 
-		request ("unique", unique);
+			Optional.of (
+				0)
+
+		);
+
+		request (
+			"unique",
+			unique);
 
 		return unique;
+
 	}
 
 	@Override
@@ -1117,7 +1126,7 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	int requestInt (
+	Optional<Integer> requestInt (
 			@NonNull String key) {
 
 		return requestContext.requestInt (
@@ -1271,6 +1280,58 @@ class ConsoleRequestContextImplementation
 		return Optional.fromNullable (
 			requestContext.header (
 				name));
+
+	}
+
+	// request attributes
+
+	@Override
+	public
+	Optional<?> request (
+			@NonNull String key) {
+
+		return requestContext.request (
+			key);
+
+	}
+
+	@Override
+	public
+	Object requestRequired (
+			@NonNull String key) {
+
+		return requestContext.requestRequired (
+			key);
+
+	}
+
+	@Override
+	public
+	Integer requestIntRequired (
+			@NonNull String key) {
+
+		return requestContext.requestIntRequired (
+			key);
+
+	}
+
+	@Override
+	public
+	Optional<String> requestString (
+			@NonNull String key) {
+
+		return requestContext.requestString (
+			key);
+
+	}
+
+	@Override
+	public
+	String requestStringRequired (
+			@NonNull String key) {
+
+		return requestContext.requestStringRequired (
+			key);
 
 	}
 

@@ -91,8 +91,7 @@ class ImChatConditionsAcceptAction
 		ImChatRec imChat =
 			imChatHelper.find (
 				Integer.parseInt (
-					(String)
-					requestContext.request (
+					requestContext.requestStringRequired (
 						"imChatId")));
 
 		// lookup session
