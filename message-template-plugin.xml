@@ -26,11 +26,19 @@
 		<bean class="logic.MessageTemplateLogicImplementation"/>
 	</layer>
 
+	<layer name="api">
+		<bean class="api.MessageTemplateMessagesGetAction"/>
+	</layer>
+
 	<layer name="console">
 		<bean class="console.MessageTemplateEntryValueFieldsProvider"/>
 		<bean class="console.MessageTemplateEntryValueFieldsProvider$Config"/>
 		<bean class="console.MessageTemplateEntryValueFormFieldDataProvider"/>
 	</layer>
+
+	<api-modules>
+		<api-module name="message-template"/>
+	</api-modules>
 
 	<console-modules>
 		<console-module name="message-template-database"/>
