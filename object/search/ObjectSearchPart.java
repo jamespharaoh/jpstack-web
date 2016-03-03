@@ -2,6 +2,7 @@ package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.optionalCast;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -115,8 +116,8 @@ class ObjectSearchPart
 		}
 
 		updateResultSet =
-			Optional.fromNullable (
-				(UpdateResultSet)
+			optionalCast (
+				UpdateResultSet.class,
 				requestContext.request (
 					"objectSearchUpdateResultSet"));
 

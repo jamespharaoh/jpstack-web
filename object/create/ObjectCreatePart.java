@@ -1,5 +1,6 @@
 package wbs.platform.object.create;
 
+import static wbs.framework.utils.etc.Misc.optionalCast;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.LinkedHashMap;
@@ -115,8 +116,8 @@ class ObjectCreatePart<
 		// get update results
 
 		updateResultSet =
-			Optional.fromNullable (
-				(UpdateResultSet)
+			optionalCast (
+				UpdateResultSet.class,
 				requestContext.request (
 					"objectCreateUpdateResultSet"));
 
