@@ -1,5 +1,6 @@
 package wbs.services.messagetemplate.api;
 
+import static wbs.framework.utils.etc.Misc.hyphenToUnderscore;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.joinWithFullStop;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -77,14 +78,16 @@ class MessageTemplateMessagesGetAction
 		SliceRec slice =
 			sliceHelper.findByCode (
 				GlobalId.root,
-				requestContext.requestStringRequired (
-					"sliceCode"));
+				hyphenToUnderscore (
+					requestContext.requestStringRequired (
+						"sliceCode")));
 
 		MessageTemplateDatabaseRec messageTemplateDatabase =
 			messageTemplateDatabaseHelper.findByCode (
 				slice,
-				requestContext.requestStringRequired (
-					"messageTemplateDatabaseCode"));
+				hyphenToUnderscore (
+					requestContext.requestStringRequired (
+						"messageTemplateDatabaseCode")));
 
 		if (
 			isNull (
@@ -103,8 +106,10 @@ class MessageTemplateMessagesGetAction
 		MessageTemplateSetRec messageTemplateSet =
 			messageTemplateSetHelper.findByCode (
 				messageTemplateDatabase,
-				requestContext.requestStringRequired (
-					"messageTemplateSetCode"));
+				hyphenToUnderscore (
+					requestContext.requestStringRequired (
+						"messageTemplateSetCode")));
+
 		// create response
 
 		ImmutableMap.Builder<String,String> messagesBuilder =

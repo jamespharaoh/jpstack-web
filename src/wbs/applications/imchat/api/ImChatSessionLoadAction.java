@@ -1,12 +1,9 @@
 package wbs.applications.imchat.api;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -54,7 +51,6 @@ class ImChatSessionLoadAction
 	// implementation
 
 	@Override
-	@SneakyThrows (IOException.class)
 	public
 	Responder handle () {
 

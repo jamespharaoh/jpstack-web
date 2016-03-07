@@ -4,6 +4,9 @@ public
 interface TextObjectHelperMethods {
 
 	TextRec findOrCreate (
-			String textValue);
+			String stringValue);
+
+	TextRec findOrCreateMapNull (
+			String stringValue);
 
 }

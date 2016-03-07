@@ -4,13 +4,10 @@ import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.joinWithFullStop;
 import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -65,7 +62,6 @@ class ImChatMessageTemplateSetGetAction
 	// implementation
 
 	@Override
-	@SneakyThrows (IOException.class)
 	public
 	Responder handle () {
 

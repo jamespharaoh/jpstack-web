@@ -9,13 +9,10 @@ import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.objectToString;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -72,7 +69,6 @@ class ImChatEventPostAction
 	// implementation
 
 	@Override
-	@SneakyThrows (IOException.class)
 	public
 	Responder handle () {
 

@@ -21,6 +21,9 @@ class ImChatCustomerCreateRequest {
 	@DataAttribute
 	String password;
 
+	@DataAttribute
+	String userAgent;
+
 	@DataChildren
 	Map<String,String> details;
 

@@ -65,8 +65,7 @@ interface RequestContext {
 
 	String pathInfo ();
 
-	Reader reader ()
-		throws IOException;
+	Reader reader ();
 
 	RequestDispatcher requestDispatcher (
 			String path);
@@ -158,6 +157,8 @@ interface RequestContext {
 
 	InputStream resourceAsStream (
 			String path);
+
+	String realIp ();
 
 	// request attributes
 

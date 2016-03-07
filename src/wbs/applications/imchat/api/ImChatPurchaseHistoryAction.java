@@ -2,14 +2,12 @@ package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.isNull;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -68,7 +66,6 @@ class ImChatPurchaseHistoryAction
 	// implementation
 
 	@Override
-	@SneakyThrows (IOException.class)
 	public
 	Responder handle () {
 

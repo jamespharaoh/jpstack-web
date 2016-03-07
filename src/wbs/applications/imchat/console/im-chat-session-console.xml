@@ -65,6 +65,14 @@
 		<yes-no-field
 			name="active"/>
 
+		<text-field
+			name="userAgentText"
+			label="User agent"/>
+
+		<text-field
+			name="ipAddress"
+			label="IP address"/>
+
 	</field-set>
 
 	<field-set
@@ -89,6 +97,14 @@
 
 		<yes-no-field
 			name="active"/>
+
+		<text-field
+			name="userAgentText"
+			label="User agent"/>
+
+		<text-field
+			name="ipAddress"
+			label="IP address"/>
 
 	</field-set>
 

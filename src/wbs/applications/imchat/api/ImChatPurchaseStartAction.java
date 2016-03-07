@@ -1,27 +1,28 @@
 package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.hyphenToUnderscore;
+import static wbs.framework.utils.etc.Misc.isPresent;
 
-import java.io.IOException;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import com.google.common.base.Optional;
 
+import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatPricePointObjectHelper;
 import wbs.applications.imchat.model.ImChatPricePointRec;
 import wbs.applications.imchat.model.ImChatPurchaseObjectHelper;
 import wbs.applications.imchat.model.ImChatPurchaseRec;
+import wbs.applications.imchat.model.ImChatPurchaseState;
 import wbs.applications.imchat.model.ImChatRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
 import wbs.applications.imchat.model.ImChatSessionRec;
@@ -62,6 +63,9 @@ class ImChatPurchaseStartAction
 	ImChatObjectHelper imChatHelper;
 
 	@Inject
+	ImChatCustomerObjectHelper imChatCustomerHelper;
+
+	@Inject
 	ImChatPricePointObjectHelper imChatPricePointHelper;
 
 	@Inject
@@ -90,27 +94,69 @@ class ImChatPurchaseStartAction
 	@Inject
 	Provider<JsonResponder> jsonResponderProvider;
 
+	// state
+
+	ImChatPurchaseStartRequest purchaseRequest;
+
+	Boolean imChatDevelopmentMode;
+
+	Integer customerId;
+	ImChatCustomerData customerData;
+
+	Map<String,String> paypalExpressCheckoutProperties;
+
+	Integer purchaseId;
+	String purchasePriceString;
+	String purchaseSuccessUrl;
+	String purchaseFailureUrl;
+	String purchaseCheckoutUrl;
+
+	Optional<String> redirectUrl;
+
 	// implementation
 
 	@Override
-	@SneakyThrows (IOException.class)
 	public
 	Responder handle () {
 
+		decodeRequest ();
+
+		Optional<Responder> createPurchaseResult =
+			createPurchase ();
+
+		if (
+			isPresent (
+				createPurchaseResult)
+		) {
+			return createPurchaseResult.get ();
+		}
+
+		makeApiCall ();
+
+		updatePurchase ();
+
+		return createResponse ();
+
+	}
+
+	void decodeRequest () {
+
 		DataFromJson dataFromJson =
 			new DataFromJson ();
-
-		// decode request
 
 		JSONObject jsonValue =
 			(JSONObject)
 			JSONValue.parse (
 				requestContext.reader ());
 
-		ImChatPurchaseStartRequest purchaseRequest =
+		purchaseRequest =
 			dataFromJson.fromJson (
 				ImChatPurchaseStartRequest.class,
 				jsonValue);
+
+	}
+
+	Optional<Responder> createPurchase () {
 
 		// begin transaction
 
@@ -124,6 +170,9 @@ class ImChatPurchaseStartAction
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));
+
+		imChatDevelopmentMode =
+			imChat.getDevelopmentMode ();
 
 		// lookup session and customer
 
@@ -146,17 +195,23 @@ class ImChatPurchaseStartAction
 					"The session secret is invalid or the session is no " +
 					"longer active");
 
-			return jsonResponderProvider.get ()
+			return Optional.of (
+				jsonResponderProvider.get ()
 
 				.value (
-					failureResponse);
+					failureResponse)
+
+			);
 
 		}
 
 		// get customer
 
 		ImChatCustomerRec customer =
-				session.getImChatCustomer ();
+			session.getImChatCustomer ();
+
+		customerId =
+			customer.getId ();
 
 		// lookup price point
 
@@ -181,8 +236,13 @@ class ImChatPurchaseStartAction
 				.message (
 					"The price point id is invalid");
 
-			return jsonResponderProvider.get ()
-				.value (failureResponse);
+			return Optional.of (
+				jsonResponderProvider.get ()
+
+				.value (
+					failureResponse)
+
+			);
 
 		}
 
@@ -190,6 +250,10 @@ class ImChatPurchaseStartAction
 
 		PaypalAccountRec paypalAccount =
 			imChat.getPaypalAccount ();
+
+		paypalExpressCheckoutProperties =
+			paypalLogic.expressCheckoutProperties (
+				paypalAccount);
 
 		// create paypal payment
 
@@ -239,8 +303,14 @@ class ImChatPurchaseStartAction
 			.setToken (
 				randomLogic.generateLowercase (20))
 
+			.setImChatSession (
+				session)
+
 			.setImChatPricePoint (
 				pricePoint)
+
+			.setState (
+				ImChatPurchaseState.creating)
 
 			.setPrice (
 				customer.getDeveloperMode ()
@@ -263,6 +333,27 @@ class ImChatPurchaseStartAction
 
 		);
 
+		purchaseId =
+			purchase.getId ();
+
+		purchasePriceString =
+			currencyLogic.formatSimple (
+				imChat.getBillingCurrency (),
+				purchase.getPrice ());
+
+		purchaseSuccessUrl =
+			purchaseRequest.successUrl ().replace (
+				"{token}",
+				purchase.getToken ());
+
+		purchaseFailureUrl =
+			purchaseRequest.failureUrl ().replace (
+				"{token}",
+				purchase.getToken ());
+
+		purchaseCheckoutUrl =
+			paypalAccount.getCheckoutUrl ();
+
 		// update customer
 
 		customer
@@ -276,11 +367,19 @@ class ImChatPurchaseStartAction
 						+ pricePoint.getValue ()
 					: customer.getBalance ());
 
+		// commit and return
+
+		transaction.commit ();
+
+		return Optional.absent ();
+
+	}
+
+	void makeApiCall () {
+
 		// update paypal
 
-		Optional<String> redirectUrl;
-
-		if (imChat.getDevelopmentMode ()) {
+		if (imChatDevelopmentMode) {
 
 			redirectUrl =
 				Optional.of (
@@ -288,46 +387,98 @@ class ImChatPurchaseStartAction
 
 		} else {
 
-			Map<String,String> expressCheckoutProperties =
-				paypalLogic.expressCheckoutProperties (
-					paypalAccount);
-
 			redirectUrl =
 				paypalApi.setExpressCheckout (
-					currencyLogic.formatSimple (
-						imChat.getBillingCurrency (),
-						purchase.getPrice ()),
-					purchaseRequest.successUrl ().replace (
-						"{token}",
-						purchase.getToken ()),
-					purchaseRequest.failureUrl ().replace (
-						"{token}",
-						purchase.getToken ()),
-					paypalAccount.getCheckoutUrl (),
-					expressCheckoutProperties);
+					purchasePriceString,
+					purchaseSuccessUrl,
+					purchaseFailureUrl,
+					purchaseCheckoutUrl,
+					paypalExpressCheckoutProperties);
 
 		}
 
-		// create response
+	}
 
-		ImChatPurchaseStartSuccess successResponse =
-			new ImChatPurchaseStartSuccess ()
+	void updatePurchase () {
 
-			.redirectUrl (
-				redirectUrl.get ())
+		// begin transaction
 
-			.customer (
-				imChatApiLogic.customerData (
-					customer));
+		@Cleanup
+		Transaction transaction =
+			database.beginReadWrite (
+				this);
 
-		// commit and return
+		// update purchase
+
+		ImChatPurchaseRec purchase =
+			imChatPurchaseHelper.find (
+				purchaseId);
+
+		purchase
+
+			.setState (
+				redirectUrl.isPresent ()
+					? ImChatPurchaseState.created
+					: ImChatPurchaseState.createFailed);
+
+		// process customer
+
+		ImChatCustomerRec customer =
+			imChatCustomerHelper.find (
+				customerId);
+
+		customerData =
+			imChatApiLogic.customerData (
+				customer);
+
+		// commit transaction
 
 		transaction.commit ();
 
-		return jsonResponderProvider.get ()
+	}
 
-			.value (
-				successResponse);
+	Responder createResponse () {
+
+		if (
+			isPresent (
+				redirectUrl)
+		) {
+
+			// create response
+
+			ImChatPurchaseStartSuccess successResponse =
+				new ImChatPurchaseStartSuccess ()
+
+				.redirectUrl (
+					redirectUrl.get ())
+
+				.customer (
+					customerData);
+
+			// return
+
+			return jsonResponderProvider.get ()
+
+				.value (
+					successResponse);
+
+		} else {
+
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
+
+				.reason (
+					"unknown-error")
+
+				.message (
+					"The payment attempt failed for an unknown reason");
+
+			return jsonResponderProvider.get ()
+
+				.value (
+					failureResponse);
+
+		}
 
 	}
 

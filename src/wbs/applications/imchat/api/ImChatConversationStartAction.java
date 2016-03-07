@@ -3,13 +3,10 @@ package wbs.applications.imchat.api;
 import static wbs.framework.utils.etc.Misc.hyphenToUnderscore;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -72,7 +69,6 @@ class ImChatConversationStartAction
 	// implementation
 
 	@Override
-	@SneakyThrows (IOException.class)
 	public
 	Responder handle () {
 
@@ -172,7 +168,19 @@ class ImChatConversationStartAction
 				customer.getCurrentConversation ())
 		) {
 
-			throw new RuntimeException ();
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
+
+				.reason (
+					"conversation-already")
+
+				.message (
+					"There is already a conversation in progres");
+
+			return jsonResponderProvider.get ()
+
+				.value (
+					failureResponse);
 
 		}
 

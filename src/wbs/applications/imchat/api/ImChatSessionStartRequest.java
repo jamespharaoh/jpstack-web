@@ -18,4 +18,7 @@ class ImChatSessionStartRequest {
 	@DataAttribute
 	String password;
 
+	@DataAttribute
+	String userAgent;
+
 }

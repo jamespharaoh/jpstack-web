@@ -16,6 +16,7 @@
 
 		<enum-type name="imChatCustomerDetailDataType"/>
 		<enum-type name="imChatProfileState"/>
+		<enum-type name="imChatPurchaseState"/>
 
 		<model name="imChat"/>
 		<model name="imChatCustomer"/>

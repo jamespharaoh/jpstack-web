@@ -16,6 +16,10 @@
 			#00aabf
 		</field>
 
+		<field name="Heading font family">
+			Verdana, sans-serif
+		</field>
+
 		<field name="Heading font size">
 			140%
 		</field>
@@ -62,6 +66,10 @@
 
 		<field name="Highlight background colour">
 			#00aabf
+		</field>
+
+		<field name="Heading font family">
+			Verdana, sans-serif
 		</field>
 
 		<field name="Heading font size">
@@ -130,6 +138,22 @@
 
 		<field name="Title">
 			Psychic reader profiles
+		</field>
+
+		<field name="Advert"><![CDATA[
+
+			<p>This is the advert. Yay!</p>
+
+			<p><img src="/psychic-living/oops.jpg"></p>
+
+		]]></field>
+
+		<field name="Advert width">
+			300px
+		</field>
+
+		<field name="Advert offset">
+			310px
 		</field>
 
 		<field name="Introduction">
@@ -261,6 +285,10 @@
 			#ff0000
 		</field>
 
+		<field name="Border colour">
+			#cccccc
+		</field>
+
 		<field name="Make purchase button label">
 			Make purchase
 		</field>
@@ -306,6 +334,18 @@
 
 		<field name="Message field placeholder">
 			Please type your message here
+		</field>
+
+		<field name="Send button background colour">
+			#00bcd4
+		</field>
+
+		<field name="Send button highlight background colour">
+			#00cce6
+		</field>
+
+		<field name="Send button foreground colour">
+			#ffffff
 		</field>
 
 		<field name="Send button label">

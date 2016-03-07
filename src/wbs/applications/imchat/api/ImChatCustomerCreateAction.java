@@ -2,7 +2,6 @@ package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,7 +10,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -31,6 +29,7 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
+import wbs.platform.text.model.TextObjectHelper;
 
 @PrototypeComponent ("imChatCustomerCreateAction")
 public
@@ -60,6 +59,9 @@ class ImChatCustomerCreateAction
 	@Inject
 	RequestContext requestContext;
 
+	@Inject
+	TextObjectHelper textHelper;
+
 	// prototype dependencies
 
 	@Inject
@@ -68,7 +70,6 @@ class ImChatCustomerCreateAction
 	// implementation
 
 	@Override
-	@SneakyThrows (IOException.class)
 	public
 	Responder handle () {
 
@@ -240,6 +241,13 @@ class ImChatCustomerCreateAction
 
 			.setUpdateTime (
 				transaction.now ())
+
+			.setUserAgentText (
+				textHelper.findOrCreateMapNull (
+					createRequest.userAgent ()))
+
+			.setIpAddress (
+				requestContext.realIp ())
 
 		);
 

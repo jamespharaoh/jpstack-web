@@ -15,7 +15,16 @@
 
 		<index-field/>
 
+		<!-- state -->
+
+		<enum-field
+			name="state"
+			type="imChatPurchaseState"/>
+
 		<!-- data -->
+
+		<reference-field
+			type="imChatSession"/>
 
 		<reference-field
 			type="imChatPricePoint"/>

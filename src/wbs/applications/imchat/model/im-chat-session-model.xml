@@ -31,6 +31,16 @@
 			column-type="iso"
 			nullable="yes"/>
 
+		<!-- data -->
+
+		<reference-field
+			name="userAgentText"
+			type="text"
+			nullable="yes"/>
+
+		<string-field
+			name="ipAddress"/>
+
 		<!-- state -->
 
 		<yes-no-field

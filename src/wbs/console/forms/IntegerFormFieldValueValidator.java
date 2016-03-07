@@ -1,7 +1,6 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;

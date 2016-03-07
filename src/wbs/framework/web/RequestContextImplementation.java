@@ -42,6 +42,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.ProxiedRequestComponent;
+import wbs.framework.utils.etc.RuntimeIoException;
 
 @Accessors (fluent = true)
 @ProxiedRequestComponent (
@@ -281,10 +282,18 @@ class RequestContextImplementation
 
 	@Override
 	public
-	Reader reader ()
-		throws IOException {
+	Reader reader () {
 
-		return request ().getReader ();
+		try {
+
+			return request ().getReader ();
+
+		} catch (IOException exception) {
+
+			throw new RuntimeIoException (
+				exception);
+
+		}
 
 	}
 
@@ -856,6 +865,15 @@ class RequestContextImplementation
 		return joinWithoutSeparator (
 			applicationPathPrefix (),
 			applicationUrl);
+
+	}
+
+	@Override
+	public
+	String realIp () {
+
+		return header (
+			"X-Real-IP");
 
 	}
 

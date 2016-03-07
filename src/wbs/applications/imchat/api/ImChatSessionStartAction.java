@@ -2,13 +2,10 @@ package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.notEqual;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -28,6 +25,7 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
+import wbs.platform.text.model.TextObjectHelper;
 
 @PrototypeComponent ("imChatSessionStartAction")
 public
@@ -57,6 +55,9 @@ class ImChatSessionStartAction
 	@Inject
 	RequestContext requestContext;
 
+	@Inject
+	TextObjectHelper textHelper;
+
 	// prototype dependencies
 
 	@Inject
@@ -65,7 +66,6 @@ class ImChatSessionStartAction
 	// implementation
 
 	@Override
-	@SneakyThrows (IOException.class)
 	public
 	Responder handle () {
 
@@ -166,6 +166,13 @@ class ImChatSessionStartAction
 
 			.setUpdateTime (
 				transaction.now ())
+
+			.setUserAgentText (
+				textHelper.findOrCreateMapNull (
+					startRequest.userAgent ()))
+
+			.setIpAddress (
+				requestContext.realIp ())
 
 		);
 

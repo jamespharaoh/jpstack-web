@@ -27,8 +27,10 @@ import wbs.applications.imchat.model.ImChatProfileObjectHelper;
 import wbs.applications.imchat.model.ImChatProfileRec;
 import wbs.applications.imchat.model.ImChatProfileState;
 import wbs.applications.imchat.model.ImChatPurchaseObjectHelper;
+import wbs.applications.imchat.model.ImChatPurchaseState;
 import wbs.applications.imchat.model.ImChatRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
+import wbs.applications.imchat.model.ImChatSessionRec;
 import wbs.applications.imchat.model.ImChatTemplateObjectHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -43,6 +45,7 @@ import wbs.platform.media.model.MediaRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.text.model.TextObjectHelper;
 import wbs.services.messagetemplate.logic.MessageTemplateLogic;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
 import wbs.services.messagetemplate.model.MessageTemplateSetObjectHelper;
@@ -113,6 +116,9 @@ class ImChatCoreFixtureProvider
 
 	@Inject
 	SliceObjectHelper sliceHelper;
+
+	@Inject
+	TextObjectHelper textHelper;
 
 	// implementation
 
@@ -738,8 +744,9 @@ class ImChatCoreFixtureProvider
 
 		// im chat session
 
-		imChatSessionHelper.insert (
-			imChatSessionHelper.createInstance ()
+		ImChatSessionRec imChatSession =
+			imChatSessionHelper.insert (
+				imChatSessionHelper.createInstance ()
 
 			.setImChatCustomer (
 				imChatCustomer)
@@ -759,6 +766,13 @@ class ImChatCoreFixtureProvider
 			.setActive (
 				true)
 
+			.setUserAgentText (
+				textHelper.findOrCreate (
+					"User agent"))
+
+			.setIpAddress (
+				"1.2.3.4")
+
 		);
 
 		// im chat purchase
@@ -773,8 +787,14 @@ class ImChatCoreFixtureProvider
 				(int) (long)
 				imChatCustomer.getNumPurchases ())
 
+			.setImChatSession (
+				imChatSession)
+
 			.setImChatPricePoint (
 				basicPricePoint)
+
+			.setState (
+				ImChatPurchaseState.unknown)
 
 			.setPrice (
 				599l)

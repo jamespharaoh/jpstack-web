@@ -1,13 +1,13 @@
 package wbs.applications.imchat.api;
 
-import java.io.IOException;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -63,7 +63,6 @@ class ImChatMessageListAction
 	// implementation
 
 	@Override
-	@SneakyThrows (IOException.class)
 	public
 	Responder handle () {
 
@@ -126,6 +125,27 @@ class ImChatMessageListAction
 			imChatConversationHelper.findByIndex (
 				customer,
 				request.conversationIndex ());
+
+		if (
+			isNotNull (
+				conversation.getEndTime ())
+		) {
+
+			ImChatFailure failureResponse =
+				new ImChatFailure ()
+
+				.reason (
+					"conversation-ended")
+
+				.message (
+					"This conversation has already ended");
+
+			return jsonResponderProvider.get ()
+
+				.value (
+					failureResponse);
+
+		}
 
 		// retrieve messages
 
