@@ -1,6 +1,7 @@
 package wbs.platform.text.model;
 
 import static wbs.framework.utils.etc.Misc.contains;
+import static wbs.framework.utils.etc.Misc.isNull;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -50,15 +51,10 @@ class TextObjectHelperImplementation
 	@Override
 	public
 	TextRec findOrCreate (
-			@NonNull String textValue) {
+			@NonNull String stringValue) {
 
 		TextObjectHelper textHelper =
 			textHelperProvider.get ();
-
-		// null maps to null
-
-		//if (textValue == null)
-		//	return null;
 
 		// get cache
 
@@ -82,7 +78,7 @@ class TextObjectHelperImplementation
 
 		TextRec text =
 			textCache.byText.get (
-				textValue);
+				stringValue);
 
 		if (text != null)
 			return text;
@@ -95,18 +91,18 @@ class TextObjectHelperImplementation
 
 			|| contains (
 				existingTexts,
-				textValue.hashCode ())
+				stringValue.hashCode ())
 
 		) {
 
 			text =
 				textHelper.findByText (
-					textValue);
+					stringValue);
 
 			if (text != null) {
 
 				textCache.byText.put (
-					textValue,
+					stringValue,
 					text);
 
 				return text;
@@ -116,10 +112,10 @@ class TextObjectHelperImplementation
 		} else if (optimistic) {
 
 			existingTexts.add (
-				textValue.hashCode ());
+				stringValue.hashCode ());
 
 			existingTextsList.add (
-				textValue.hashCode ());
+				stringValue.hashCode ());
 
 			existingTexts.remove (
 				existingTextsList.remove (0));
@@ -133,15 +129,32 @@ class TextObjectHelperImplementation
 				textHelper.createInstance ()
 
 			.setText (
-				textValue)
+				stringValue)
 
 		);
 
 		textCache.byText.put (
-			textValue,
+			stringValue,
 			text);
 
 		return text;
+
+	}
+
+	@Override
+	public
+	TextRec findOrCreateMapNull (
+			String stringValue) {
+
+		if (
+			isNull (
+				stringValue)
+		) {
+			return null;
+		}
+
+		return findOrCreate (
+			stringValue);
 
 	}
 

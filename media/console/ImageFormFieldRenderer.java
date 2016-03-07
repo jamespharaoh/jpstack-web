@@ -174,11 +174,17 @@ class ImageFormFieldRenderer<Container>
 			submission.multipart ()
 
 			&& submission.hasFileItem (
-				name ())
+				stringFormat (
+					"%s-%s",
+					formName,
+					name ()))
 
 			&& moreThanZero (
 				submission.fileItem (
-					name ()
+					stringFormat (
+						"%s-%s",
+						formName,
+						name ())
 				).getSize ())
 
 		);
