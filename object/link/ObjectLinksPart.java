@@ -151,7 +151,8 @@ class ObjectLinksPart
 				requestContext.magicTdCheck (
 					"link_" + targetObject.getId (),
 					"member",
-					contextLinks.contains (targetObject)),
+					contextLinks.contains (
+						targetObject)),
 
 				"</tr>\n");
 
