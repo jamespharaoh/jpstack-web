@@ -146,7 +146,8 @@ class ChatUserSearchOldResultsPart
 
 		List<?> chatUserSearchResult =
 			(List<?>)
-			requestContext.request ("chatUserSearchResult");
+			requestContext.requestRequired (
+				"chatUserSearchResult");
 
 		chatUsers =
 			new ArrayList<ChatUserRec> ();

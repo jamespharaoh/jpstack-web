@@ -334,7 +334,7 @@ class ChatBroadcastVerifyPart
 		@SuppressWarnings ("unchecked")
 		List<Integer> chatUserIds =
 			(List<Integer>)
-			requestContext.request (
+			requestContext.requestRequired (
 				"chatBroadcastChatUserIds");
 
 		printFormat (

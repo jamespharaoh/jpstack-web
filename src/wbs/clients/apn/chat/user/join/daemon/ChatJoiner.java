@@ -20,6 +20,7 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
@@ -48,10 +49,13 @@ import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.info.logic.ChatInfoLogic;
+import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.event.logic.EventLogic;
@@ -133,6 +137,9 @@ class ChatJoiner {
 	DeliveryObjectHelper deliveryHelper;
 
 	@Inject
+	EmailLogic emailLogic;
+
+	@Inject
 	EventLogic eventLogic;
 
 	@Inject
@@ -152,6 +159,12 @@ class ChatJoiner {
 
 	@Inject
 	TextObjectHelper textHelper;
+
+	@Inject
+	TimeFormatter timeFormatter;
+
+	@Inject
+	WbsConfig wbsConfig;
 
 	// properties
 
@@ -341,6 +354,40 @@ class ChatJoiner {
 						rest))
 
 			);
+
+			emailLogic.sendSystemEmail (
+				ImmutableList.of (
+					wbsConfig.developerEmailAddress ()),
+				"DOB error",
+				stringFormat (
+
+					"********** %s DOB ERROR **********\n",
+					wbsConfig.name ().toUpperCase (),
+					"\n",
+
+					"Application:  chat\n",
+					"Service:      %s.%s\n",
+					chat.getSlice ().getCode (),
+					chat.getCode (),
+					"Timestamp:    %s\n",
+					timeFormatter.instantToTimestampString (
+						timeFormatter.defaultTimezone (),
+						transaction.now ()),
+					"\n",
+
+					"Message ID:   %s\n",
+					message.getId (),
+					"Route:        %s.%s\n",
+					message.getRoute ().getSlice ().getCode (),
+					message.getRoute ().getCode (),
+					"Number from:  %s\n",
+					message.getNumFrom (),
+					"Number to:    %s\n",
+					message.getNumTo (),
+					"Full message: %s\n",
+					message.getText ().getText (),
+					"Message rest: %s\n",
+					rest));
 
 		}
 

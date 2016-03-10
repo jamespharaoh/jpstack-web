@@ -72,9 +72,6 @@ interface ConsoleRequestContext {
 	Serializable session (
 			String key);
 
-	void copyIntParamToSession (
-			String name);
-
 	void flushNotices ();
 
 	void flushNotices (

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 import lombok.Data;
 import lombok.NonNull;
@@ -681,11 +682,26 @@ class FormFieldLogic {
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
+		String enctype = (
+			(BooleanSupplier)
+			() -> {
+				try {
+					return formFieldSet.fileUpload ();
+				} catch (Exception exception) {
+					return false;
+				}
+			}
+		).getAsBoolean ()
+			? "multipart/form-data"
+			: "application/x-www-form-urlencoded";
+
 		htmlWriter.writeFormat (
 			"<form",
 			" method=\"post\"",
 			" action=\"%h\"",
 			actionUrl,
+			" enctype=\"%h\"",
+			enctype,
 			">\n");
 
 		htmlWriter.writeFormat (

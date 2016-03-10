@@ -64,6 +64,10 @@
 			name="value"
 			currency="imChatCustomer.imChat.creditCurrency"/>
 
+		<enum-field
+			name="state"
+			helper="imChatPurchaseStateConsoleHelper"/>
+
 		<timestamp-field
 			name="createdTime"
 			label="Created"/>
@@ -101,6 +105,10 @@
 		<currency-field
 			name="value"
 			currency="imChatCustomer.imChat.creditCurrency"/>
+
+		<enum-field
+			name="state"
+			helper="imChatPurchaseStateConsoleHelper"/>
 
 		<timestamp-field
 			name="createdTime"/>

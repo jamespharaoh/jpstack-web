@@ -6,6 +6,7 @@ import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.Misc.orNull;
 import static wbs.framework.utils.etc.Misc.pluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -159,7 +160,10 @@ class ConsoleRequestContextImplementation
 
 		@SuppressWarnings ("unchecked")
 		List<String> scripts =
-			(List<String>) request ("scripts");
+			(List<String>)
+			orNull (
+				request (
+					"scripts"));
 
 		if (scripts == null) {
 
@@ -172,7 +176,8 @@ class ConsoleRequestContextImplementation
 
 		}
 
-		scripts.add (script);
+		scripts.add (
+			script);
 
 	}
 
@@ -249,28 +254,6 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	void copyIntParamToSession (
-			@NonNull String name) {
-
-		String str =
-			parameter (name);
-
-		if (str == null)
-			return;
-
-		try {
-
-			session (
-				name,
-				new Integer (str));
-
-		} catch (NumberFormatException e) {
-		}
-
-	}
-
-	@Override
-	public
 	void flushNotices () {
 
 		flushNotices (
@@ -309,8 +292,11 @@ class ConsoleRequestContextImplementation
 			writer ();
 
 		@SuppressWarnings ("unchecked")
-		List<String> scripts = (List<String>)
-			request ("scripts");
+		List<String> scripts =
+			(List<String>)
+			orNull (
+				request (
+					"scripts"));
 
 		if (scripts == null)
 			return;

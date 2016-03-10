@@ -443,6 +443,15 @@ class GenericConsoleHelperProvider
 			return true;
 		}
 
+		// objects with cryptors are always visible
+
+		if (
+			isNotNull (
+				cryptor)
+		) {
+			return true;
+		}
+
 		// view privs
 
 		if (viewPrivKeySpecs != null) {

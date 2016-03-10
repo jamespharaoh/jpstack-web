@@ -1546,6 +1546,31 @@ class Misc {
 	}
 
 	public static
+	String joinWithPipe (
+			@NonNull List<String> parts) {
+
+		return joinWithSeparator (
+			"|",
+			"",
+			parts,
+			"");
+
+	}
+
+	public static
+	String joinWithPipe (
+			@NonNull String... parts) {
+
+		return joinWithSeparator (
+			"|",
+			"",
+			Arrays.asList (
+				parts),
+			"");
+
+	}
+
+	public static
 	String prettySize (
 			int bytes) {
 
