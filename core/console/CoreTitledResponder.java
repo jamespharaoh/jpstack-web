@@ -160,7 +160,7 @@ class CoreTitledResponder
 				"<p>Unable to show page contents.</p>\n");
 
 			if (
-				privChecker.can (
+				privChecker.canRecursive (
 					GlobalId.root,
 					"debug")
 			) {

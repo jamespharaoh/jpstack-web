@@ -33,6 +33,12 @@
 			type="objectType"
 			column="ref_object_type_id"/>
 
+		<!-- settings -->
+
+		<integer-field
+			name="defaultPriority"
+			nullable="yes"/>
+
 	</fields>
 
 </model-meta>

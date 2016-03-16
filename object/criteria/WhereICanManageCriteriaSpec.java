@@ -28,7 +28,7 @@ class WhereICanManageCriteriaSpec
 			ConsoleHelper<?> objectHelper,
 			Record<?> object) {
 
-		return privChecker.can (
+		return privChecker.canRecursive (
 			object,
 			"manage");
 

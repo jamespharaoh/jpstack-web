@@ -1,7 +1,11 @@
 package wbs.platform.queue.logic;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -11,6 +15,10 @@ import javax.inject.Inject;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+
+import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
@@ -30,6 +38,7 @@ import wbs.platform.queue.model.QueueSubjectObjectHelper;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.queue.model.QueueTypeObjectHelper;
 import wbs.platform.queue.model.QueueTypeRec;
+import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserRec;
 
 @Log4j
@@ -237,6 +246,11 @@ class QueueLogicImplementation
 					: instantToDate (
 						transaction.now ()))
 
+			.setPriority (
+				ifNull (
+					queue.getDefaultPriority (),
+					0l))
+
 		);
 
 		// update queue subject
@@ -248,6 +262,32 @@ class QueueLogicImplementation
 
 			.setActiveItems (
 				queueSubject.getActiveItems () + 1);
+
+		// update slice
+
+		Optional<SliceRec> optionalSlice =
+			objectManager.getAncestor (
+				SliceRec.class,
+				queue);
+
+		if (
+			isNotPresent (
+				optionalSlice)
+		) {
+
+			log.warn (
+				stringFormat (
+					"Unable to determine slice for queue %s",
+					queue.getId ()));
+
+		}
+
+		optionalSlice.get ()
+
+			.setCurrentQueueInactivityTime (
+				ifNull (
+					optionalSlice.get ().getCurrentQueueInactivityTime (),
+					transaction.now ()));
 
 		// and return
 
@@ -523,6 +563,13 @@ class QueueLogicImplementation
 			.setPreferredUser (
 				user);
 
+		// update slice
+
+		user.getSlice ()
+
+			.setCurrentQueueInactivityTime (
+				null);
+
 		// activate next queue item (if any)
 
 		if (queueSubject.getActiveItems () > 0) {
@@ -563,6 +610,38 @@ class QueueLogicImplementation
 				- queueSubject.getActiveItems ()),
 			(int) (long) (
 				queueSubject.getTotalItems ()));
+
+	}
+
+	@Override
+	public
+	boolean sliceHasQueueActivity (
+			@NonNull SliceRec slice) {
+
+		Transaction transaction =
+			database.currentTransaction ();
+
+		// active if no config or stats
+
+		if (
+
+			isNull (
+				slice.getQueueOverflowInactivityTime ())
+
+			|| isNull (
+				slice.getCurrentQueueInactivityTime ())
+
+		) {
+			return true;
+		}
+
+		// check for recent activity
+
+		return laterThan (
+			slice.getCurrentQueueInactivityTime ().plus (
+				Duration.standardSeconds (
+					slice.getQueueOverflowInactivityTime ())),
+			transaction.now ());
 
 	}
 

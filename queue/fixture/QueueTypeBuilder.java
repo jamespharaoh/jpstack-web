@@ -167,6 +167,9 @@ class QueueTypeBuilder {
 			.setRefType (
 				refType)
 
+			.setDefaultPriority (
+				spec.defaultPriority ())
+
 		);
 
 		// commit transaction

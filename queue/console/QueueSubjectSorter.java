@@ -3,8 +3,10 @@ package wbs.platform.queue.console;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.notIn;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -26,6 +28,8 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.object.ObjectManager;
+import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemState;
@@ -33,6 +37,7 @@ import wbs.platform.queue.model.QueueObjectHelper;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectObjectHelper;
 import wbs.platform.queue.model.QueueSubjectRec;
+import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
 
@@ -40,6 +45,11 @@ import wbs.platform.user.model.UserRec;
 @PrototypeComponent ("queueSubjectSorter")
 public
 class QueueSubjectSorter {
+
+	// dependencies
+
+	@Inject
+	ObjectManager objectManager;
 
 	@Inject
 	PrivChecker privChecker;
@@ -49,6 +59,9 @@ class QueueSubjectSorter {
 
 	@Inject
 	QueueItemObjectHelper queueItemHelper;
+
+	@Inject
+	QueueLogic queueLogic;
 
 	@Inject
 	QueueManager queueManager;
@@ -155,10 +168,65 @@ class QueueSubjectSorter {
 			QueueRec queue =
 				subject.getQueue ();
 
+			SliceRec slice =
+				optionalRequired (
+					objectManager.getAncestor (
+						SliceRec.class,
+						queue));
+
 			// check permissions
 
-			if (! privChecker.can (queue, "reply"))
+			boolean canReplyExplicit =
+				privChecker.canSimple (
+					queue,
+					"reply");
+
+			boolean canReplyImplicit =
+				privChecker.canRecursive (
+					queue,
+					"reply");
+
+			boolean canReplyOverflowExplicit =
+				privChecker.canSimple (
+					queue,
+					"reply_overflow");
+
+			boolean canReplyOverflowImplicit =
+				privChecker.canRecursive (
+					queue,
+					"reply_overflow");
+
+boolean debug =
+	equal (
+		slice.getCode (),
+		"demo")
+	&& (
+		isNotNull (
+			user)
+		&& equal (
+			user.getUsername (),
+			"james_test")
+	);
+
+if (debug)
+System.out.println (
+	stringFormat (
+		"PRIVS: reply %s %s, reply overflow %s %s %s",
+		canReplyExplicit ? "explicit" : "-",
+		canReplyImplicit? "implicit" : "-",
+		canReplyOverflowExplicit ? "explicit" : "-",
+		canReplyOverflowImplicit ? "implicit" : "-",
+		canReplyOverflowExplicit && ! canReplyExplicit ? "OVERFLOW" : ""));
+
+			if (
+				! canReplyImplicit
+				&& ! canReplyOverflowImplicit
+			) {
+if (debug)
+System.out.println (
+	"SKIP BECAUSE NO IMPLICIT PRIVS");
 				continue;
+			}
 
 			// find or create queue info
 
@@ -226,8 +294,19 @@ class QueueSubjectSorter {
 			long createdTime =
 				item.getCreatedTime ().getTime ();
 
-			if (createdTime < queueInfo.oldest)
-				queueInfo.oldest = createdTime;
+			if (item.getPriority () < queueInfo.highestPriority) {
+
+				queueInfo.highestPriority =
+					item.getPriority ();
+
+			}
+
+			if (createdTime < queueInfo.oldest) {
+
+				queueInfo.oldest =
+					createdTime;
+
+			}
 
 			// create subject info
 
@@ -250,8 +329,19 @@ class QueueSubjectSorter {
 				+ subject.getActiveItems ()
 				- 1;
 
-			if (createdTime < queueInfo.oldestWaiting)
-				queueInfo.oldestWaiting = createdTime;
+			if (createdTime < queueInfo.oldestWaiting) {
+
+				queueInfo.oldestWaiting =
+					createdTime;
+
+			}
+
+			if (item.getPriority () < queueInfo.highestPriorityWaiting) {
+
+				queueInfo.highestPriorityWaiting =
+					item.getPriority ();
+
+			}
 
 			// if the item is claimed then the subject is not available to the
 			// user
@@ -276,8 +366,19 @@ class QueueSubjectSorter {
 
 				}
 
-				if (createdTime < queueInfo.oldestClaimed)
-					queueInfo.oldestClaimed = createdTime;
+				if (createdTime < queueInfo.oldestClaimed) {
+
+					queueInfo.oldestClaimed =
+						createdTime;
+
+				}
+
+				if (item.getPriority () < queueInfo.highestPriorityClaimed) {
+
+					queueInfo.highestPriorityClaimed =
+						item.getPriority ();
+
+				}
 
 				subjectInfo.claimed = true;
 
@@ -310,17 +411,44 @@ class QueueSubjectSorter {
 
 			}
 
-			// work out if we should hide because of being preferred
+			// handle failover
 
-			if (preferred) {
+			if (
 
-				long preferredTime =
-					+ item.getPendingTime ().getTime ()
-					+ queueInfo.delay;
+				(
+					canReplyOverflowExplicit
+					&& ! canReplyExplicit
+				)
 
-				if (now < preferredTime)
+				&& queueLogic.sliceHasQueueActivity (
+					slice)
+
+			) {
+
+				if (
+					isNull (
+						slice.getQueueOverflowResponseTime ())
+				) {
+
+System.out.println (
+	"ACTIVITY DETECTED, AUTOMATIC HIDE");
+
 					subjectInfo.hiddenPreferred = true;
 
+				} else {
+
+System.out.println (
+	"ACTIVITY DETECTED, MODIFY EFFECTIVE TIME");
+
+					subjectInfo.effectiveTime +=
+						slice.getQueueOverflowResponseTime () * 1000;
+
+				}
+
+			}
+
+			if (now < subjectInfo.effectiveTime) {
+				subjectInfo.hiddenPreferred = true;
 			}
 
 			// count hidden preferred items
@@ -348,8 +476,19 @@ class QueueSubjectSorter {
 			availableItems ++;
 			queueInfo.availableItems ++;
 
-			if (createdTime < queueInfo.oldestAvailable)
-				queueInfo.oldestAvailable = createdTime;
+			if (createdTime < queueInfo.oldestAvailable) {
+
+				queueInfo.oldestAvailable =
+					createdTime;
+
+			}
+
+			if (item.getPriority () < queueInfo.highestPriorityAvailable) {
+
+				queueInfo.highestPriorityAvailable =
+					item.getPriority ();
+
+			}
 
 			subjectInfo.available = true;
 
@@ -423,10 +562,16 @@ class QueueSubjectSorter {
 		int totalItems = 0;
 
 		@Getter
+		long highestPriority = Long.MAX_VALUE;
+
+		@Getter
 		long oldest = Long.MAX_VALUE;
 
 		@Getter
 		int waitingItems = 0;
+
+		@Getter
+		long highestPriorityWaiting = Long.MAX_VALUE;
 
 		@Getter
 		long oldestWaiting = Long.MAX_VALUE;
@@ -436,6 +581,9 @@ class QueueSubjectSorter {
 
 		@Getter
 		int availableSubjects = 0;
+
+		@Getter
+		long highestPriorityAvailable = Long.MAX_VALUE;
 
 		@Getter
 		long oldestAvailable = Long.MAX_VALUE;
@@ -451,6 +599,9 @@ class QueueSubjectSorter {
 
 		@Getter
 		int claimedSubjects = 0;
+
+		@Getter
+		long highestPriorityClaimed = Long.MAX_VALUE;
 
 		@Getter
 		long oldestClaimed = Long.MAX_VALUE;
@@ -475,8 +626,19 @@ class QueueSubjectSorter {
 					QueueInfo right) {
 
 				return new CompareToBuilder ()
-					.append (left.oldestAvailable, right.oldestAvailable)
-					.append (left.queue, right.queue)
+
+					.append (
+						left.highestPriorityAvailable,
+						right.highestPriorityAvailable)
+
+					.append (
+						left.oldestAvailable,
+						right.oldestAvailable)
+
+					.append (
+						left.queue,
+						right.queue)
+
 					.toComparison ();
 
 			}
@@ -494,8 +656,19 @@ class QueueSubjectSorter {
 					QueueInfo right) {
 
 				return new CompareToBuilder ()
-					.append (left.oldest, right.oldest)
-					.append (left.queue, right.queue)
+
+					.append (
+						left.highestPriority,
+						right.highestPriority)
+
+					.append (
+						left.oldest,
+						right.oldest)
+
+					.append (
+						left.queue,
+						right.queue)
+
 					.toComparison ();
 
 			}
@@ -537,8 +710,15 @@ class QueueSubjectSorter {
 					SubjectInfo right) {
 
 				return new CompareToBuilder ()
-					.append (left.effectiveTime, right.effectiveTime)
-					.append (left.subject, right.subject)
+
+					.append (
+						left.effectiveTime,
+						right.effectiveTime)
+
+					.append (
+						left.subject,
+						right.subject)
+
 					.toComparison ();
 
 			}
@@ -556,10 +736,15 @@ class QueueSubjectSorter {
 					SubjectInfo right) {
 
 				return new CompareToBuilder ()
+
 					.append (
 						left.item.getCreatedTime (),
 						right.item.getCreatedTime ())
-					.append (left.subject, right.subject)
+
+					.append (
+						left.subject,
+						right.subject)
+
 					.toComparison ();
 
 			}

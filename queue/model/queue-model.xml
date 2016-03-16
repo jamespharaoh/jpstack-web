@@ -33,6 +33,11 @@
 			name="foregroundColour"
 			nullable="yes"/>
 
+		<integer-field
+			name="defaultPriority"
+			column="priority"
+			nullable="yes"/>
+
 	</fields>
 
 	<collections>
@@ -48,6 +53,11 @@
 		<priv-type
 			name="Reply"
 			description="Reply to items in a queue"
+			template="yes"/>
+
+		<priv-type
+			name="Reply overflow"
+			description="Reply to overflow items in a queue"
 			template="yes"/>
 
 	</priv-types>

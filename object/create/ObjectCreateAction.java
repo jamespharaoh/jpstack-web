@@ -184,7 +184,7 @@ class ObjectCreateAction<
 						createPrivDelegate)
 					: parent;
 
-			if (! privChecker.can (
+			if (! privChecker.canRecursive (
 					createDelegate,
 					createPrivCode)) {
 

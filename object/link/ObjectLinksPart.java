@@ -131,7 +131,7 @@ class ObjectLinksPart
 				: targetObjects
 		) {
 
-			if (! privChecker.can (
+			if (! privChecker.canRecursive (
 					targetObject,
 					"manage"))
 				continue;
@@ -170,7 +170,7 @@ class ObjectLinksPart
 		for (Record<?> targetObject
 				: targetObjects) {
 
-			if (! privChecker.can (
+			if (! privChecker.canRecursive (
 					targetObject,
 					"manage"))
 				continue;

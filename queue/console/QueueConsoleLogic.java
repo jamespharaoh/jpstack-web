@@ -58,6 +58,8 @@ class QueueConsoleLogic {
 	@Inject
 	QueueItemObjectHelper queueItemHelper;
 
+	// prototype dependencies
+
 	@Inject
 	Provider<QueueSubjectSorter> queueSubjectSorter;
 
@@ -227,6 +229,13 @@ class QueueConsoleLogic {
 			.setQueueItemClaim (
 				queueItemClaim);
 
+		// update slice
+
+		user.getSlice ()
+
+			.setCurrentQueueInactivityTime (
+				null);
+
 		// and return
 
 		return queueItem;
@@ -288,6 +297,13 @@ class QueueConsoleLogic {
 				QueueItemState.pending)
 
 			.setQueueItemClaim (
+				null);
+
+		// update slice
+
+		user.getSlice ()
+
+			.setCurrentQueueInactivityTime (
 				null);
 
 	}
@@ -367,6 +383,13 @@ class QueueConsoleLogic {
 
 			.setQueueItemClaim (
 				queueItemClaim);
+
+		// update slice
+
+		newUser.getSlice ()
+
+			.setCurrentQueueInactivityTime (
+				null);
 
 	}
 

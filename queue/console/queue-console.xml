@@ -113,6 +113,9 @@
 		<text-field
 			name="foregroundColour"/>
 
+		<integer-field
+			name="defaultPriority"/>
+
 	</field-set>
 
 	<field-set
@@ -125,6 +128,10 @@
 
 		<text-field
 			name="foregroundColour"
+			nullable="yes"/>
+
+		<integer-field
+			name="defaultPriority"
 			nullable="yes"/>
 
 	</field-set>
