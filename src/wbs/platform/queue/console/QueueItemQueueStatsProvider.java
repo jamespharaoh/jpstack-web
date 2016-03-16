@@ -113,7 +113,7 @@ class QueueItemQueueStatsProvider
 			Record<?> parent =
 				objectManager.getParent (queue);
 
-			if (! privChecker.can (
+			if (! privChecker.canRecursive (
 					parent,
 					"supervisor"))
 				continue;
@@ -174,7 +174,7 @@ class QueueItemQueueStatsProvider
 			Record<?> parent =
 				objectManager.getParent (queue);
 
-			if (! privChecker.can (
+			if (! privChecker.canRecursive (
 					parent,
 					"supervisor"))
 				continue;

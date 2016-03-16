@@ -314,7 +314,7 @@ class GenericConsoleHelperProvider
 					: object;
 
 			if (
-				privChecker.can (
+				privChecker.canRecursive (
 					privObject,
 					privKeySpec.privName ())
 			) {
@@ -469,7 +469,7 @@ class GenericConsoleHelperProvider
 						: object;
 
 				if (
-					privChecker.get ().can (
+					privChecker.get ().canRecursive (
 						privObject,
 						privKeySpec.privName ())
 				) {
@@ -503,7 +503,7 @@ class GenericConsoleHelperProvider
 
 			if (viewDelegatePrivCode != null) {
 
-				return privChecker.get ().can (
+				return privChecker.get ().canRecursive (
 					delegate,
 					viewDelegatePrivCode);
 
@@ -522,7 +522,7 @@ class GenericConsoleHelperProvider
 
 		// default
 
-		return privChecker.get ().can (object);
+		return privChecker.get ().canRecursive (object);
 
 	}
 

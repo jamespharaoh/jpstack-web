@@ -116,7 +116,7 @@ class HiddenFormField<Container,Generic,Native>
 			String privCode =
 				privParts.get (0);
 
-			return privChecker.can (
+			return privChecker.canRecursive (
 				(Record<?>)
 				container,
 				privCode);
@@ -140,7 +140,7 @@ class HiddenFormField<Container,Generic,Native>
 					delegatePath,
 					hints);
 
-			return privChecker.can (
+			return privChecker.canRecursive (
 				delegate,
 				privCode);
 

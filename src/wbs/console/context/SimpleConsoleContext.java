@@ -134,7 +134,7 @@ class SimpleConsoleContext
 					"root"))
 				throw new RuntimeException ();
 
-			if (privChecker.can (
+			if (privChecker.canRecursive (
 					GlobalId.root,
 					privKeySpec.privName ())) {
 

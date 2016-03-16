@@ -128,7 +128,7 @@ class BroadcastNumbersAction
 
 		// check permissions
 
-		if (! privChecker.can (
+		if (! privChecker.canRecursive (
 				broadcastConfig,
 				"manage"))
 			throw new RuntimeException ();

@@ -43,4 +43,7 @@ class QueueTypeSpec {
 		required = true)
 	String supervisorPriv;
 
+	@DataAttribute
+	Long defaultPriority;
+
 }

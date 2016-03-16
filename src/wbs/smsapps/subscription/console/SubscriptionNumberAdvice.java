@@ -80,7 +80,7 @@ class SubscriptionNumberAdvice
 	public
 	boolean canView () {
 
-		return privChecker.can (
+		return privChecker.canRecursive (
 			subscriptionSub
 				.getSubscriptionNumber ()
 				.getSubscription (),

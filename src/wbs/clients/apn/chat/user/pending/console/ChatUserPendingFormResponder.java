@@ -262,7 +262,7 @@ class ChatUserPendingFormResponder
 				"<p>No info to approve</p>\n");
 
 			if (
-				privChecker.can (
+				privChecker.canRecursive (
 					GlobalId.root,
 					"manage")
 			) {

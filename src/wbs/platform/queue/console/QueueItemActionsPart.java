@@ -79,7 +79,7 @@ class QueueItemActionsPart
 				supervisorParts [0]);
 
 		canSupervise =
-			privChecker.can (
+			privChecker.canRecursive (
 				supervisorDelegate,
 				supervisorParts [1]);
 

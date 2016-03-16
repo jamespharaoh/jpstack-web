@@ -66,7 +66,7 @@ class ChatStatisticsPart
 		for (ChatAffiliateUsersSummaryRec chatAffiliateUsersSummary
 				: chatAffiliateUsersSummaries) {
 
-			if (! privChecker.can (
+			if (! privChecker.canRecursive (
 					chatAffiliateUsersSummary.getChatAffiliate (),
 					"chat_user_view"))
 				continue;
@@ -122,7 +122,7 @@ class ChatStatisticsPart
 	void renderHtmlBodyContent () {
 
 		if (numAffiliates == 0
-				&& ! privChecker.can (chat, "monitor"))
+				&& ! privChecker.canRecursive (chat, "monitor"))
 			return;
 
 		if (numAffiliates > 0) {
@@ -133,7 +133,7 @@ class ChatStatisticsPart
 
 		}
 
-		if (! privChecker.can (chat, "monitor")) {
+		if (! privChecker.canRecursive (chat, "monitor")) {
 
 			printFormat (
 				"<h2>Users</h2>\n");

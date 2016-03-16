@@ -167,7 +167,7 @@ class ChatAffiliateCreateOldAction
 
 		// check permissions
 
-		if (! privChecker.can (
+		if (! privChecker.canRecursive (
 				chatScheme,
 				"affiliate_create")) {
 

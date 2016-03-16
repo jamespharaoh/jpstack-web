@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -13,11 +14,10 @@ import javax.inject.Named;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
-import com.google.common.collect.ImmutableMap;
-
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
+import wbs.console.priv.PrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -41,6 +41,9 @@ class ManualResponderSharedReportOperatorCsvResponder
 
 	@Inject
 	ManualResponderReportObjectHelper manualResponderReportHelper;
+
+	@Inject
+	PrivChecker privChecker;
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -96,18 +99,29 @@ class ManualResponderSharedReportOperatorCsvResponder
 			.end (
 				todayInterval.getEnd ().toInstant ());
 
-		formFieldLogic.update (
-			requestContext,
-			searchFormFieldSet,
-			searchForm,
-			ImmutableMap.of (),
-			"report");
-
 		reports =
 			manualResponderReportHelper.findByProcessedTime (
 				new Interval (
 					searchForm.start (),
 					searchForm.end ()));
+		reports =
+			manualResponderReportHelper.findByProcessedTime (
+				new Interval (
+					searchForm.start (),
+					searchForm.end ()))
+
+			.stream ()
+
+			.filter (report ->
+				privChecker.canRecursive (
+					report.getManualResponder (),
+					"supervisor")
+				|| privChecker.canRecursive (
+					report.getProcessedByUser (),
+					"manage"))
+
+			.collect (
+				Collectors.toList ());
 
 	}
 

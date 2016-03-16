@@ -98,11 +98,6 @@ class ChatHelpLogLogicImplementation
 					chatUser.getCode (),
 					text);
 
-			queueItem
-
-				.setPriority (
-					-10l);
-
 			chatHelpLog
 
 				.setQueueItem (

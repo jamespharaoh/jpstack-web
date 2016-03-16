@@ -10,6 +10,8 @@
 		<description-field/>
 		<deleted-field/>
 
+		<!-- settings -->
+
 		<string-field
 			name="filter"
 			nullable="yes"/>
@@ -25,6 +27,21 @@
 		<integer-field
 			name="defaultHourOffset"
 			default="0"/>
+
+		<integer-field
+			name="queueOverflowInactivityTime"
+			nullable="yes"/>
+
+		<integer-field
+			name="queueOverflowResponseTime"
+			nullable="yes"/>
+
+		<!-- statistics -->
+
+		<timestamp-field
+			name="currentQueueInactivityTime"
+			column-type="iso"
+			nullable="yes"/>
 
 	</fields>
 

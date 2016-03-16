@@ -81,7 +81,7 @@ class ChatMessageUserStatsProvider
 
 		for (ChatRec chat : chats) {
 
-			if (! privChecker.can (
+			if (! privChecker.canRecursive (
 					chat,
 					"supervisor"))
 				continue;

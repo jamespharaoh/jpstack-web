@@ -113,7 +113,8 @@ class UserPrivData {
 	public
 	boolean canList (
 			@NonNull GlobalId parentObjectId,
-			@NonNull Collection<String> privCodes) {
+			@NonNull Collection<String> privCodes,
+			@NonNull Boolean recurse) {
 
 		ObjectData objectData =
 			sharedData.objectDatasByObjectId.get (
@@ -137,7 +138,9 @@ class UserPrivData {
 
 		if (
 
-			isNotNull (
+			recurse
+
+			&& isNotNull (
 				objectData.managePrivId)
 
 			&& canChain (
@@ -175,6 +178,7 @@ class UserPrivData {
 
 					String objectTypeCode =
 						sharedData.objectTypeCodesById.get (
+							(int) (long)
 							parentObjectId.typeId ());
 
 					if (
@@ -200,8 +204,25 @@ class UserPrivData {
 
 				}
 
-				if (canChain (privId))
-					return true;
+				if (recurse) {
+
+					if (
+						canChain (
+							privId)
+					) {
+						return true;
+					}
+
+				} else {
+
+					if (
+						canSingle (
+							privId)
+					) {
+						return true;
+					}
+
+				}
 
 			}
 
@@ -214,8 +235,12 @@ class UserPrivData {
 					: objectData.privIdsByCode.values ()
 			) {
 
-				if (canSingle (privId))
+				if (
+					canSingle (
+						privId)
+				) {
 					return true;
+				}
 
 			}
 
@@ -245,8 +270,7 @@ class UserPrivData {
 			new HashMap<Integer,Integer> ();
 
 		public
-		Map<Integer,String> objectTypeCodesById =
-			new HashMap<Integer,String> ();
+		Map<Integer,String> objectTypeCodesById;
 
 	}
 

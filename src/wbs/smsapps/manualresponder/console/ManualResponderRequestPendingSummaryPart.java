@@ -443,7 +443,7 @@ class ManualResponderRequestPendingSummaryPart
 			"</tr>\n");
 
 		if (
-			privChecker.can (
+			privChecker.canRecursive (
 				manualResponder,
 				"number")
 		) {

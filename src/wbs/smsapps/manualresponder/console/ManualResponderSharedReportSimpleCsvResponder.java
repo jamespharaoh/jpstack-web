@@ -2,6 +2,7 @@ package wbs.smsapps.manualresponder.console;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -15,6 +16,7 @@ import com.google.common.collect.ImmutableMap;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
+import wbs.console.priv.PrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -39,6 +41,9 @@ class ManualResponderSharedReportSimpleCsvResponder
 
 	@Inject @Named
 	ConsoleModule manualResponderSharedReportConsoleModule;
+
+	@Inject
+	PrivChecker privChecker;
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -103,7 +108,20 @@ class ManualResponderSharedReportSimpleCsvResponder
 			manualResponderReportHelper.findByProcessedTime (
 				new Interval (
 					searchForm.start (),
-					searchForm.end ()));
+					searchForm.end ()))
+
+			.stream ()
+
+			.filter (report ->
+				privChecker.canRecursive (
+					report.getManualResponder (),
+					"supervisor")
+				|| privChecker.canRecursive (
+					report.getProcessedByUser (),
+					"manage"))
+
+			.collect (
+				Collectors.toList ());
 
 	}
 

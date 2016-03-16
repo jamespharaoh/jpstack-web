@@ -66,7 +66,7 @@ class ChatAffiliateCreateOldPart
 				: chat.getChatSchemes ()
 		) {
 
-			if (! privChecker.can (chatScheme, "affiliate_create"))
+			if (! privChecker.canRecursive (chatScheme, "affiliate_create"))
 				continue;
 
 			chatSchemes.put (

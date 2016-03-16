@@ -2,6 +2,7 @@ package wbs.smsapps.manualresponder.console;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,6 +21,7 @@ import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.PrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.UrlParams;
 import wbs.platform.user.model.UserObjectHelper;
@@ -48,6 +50,9 @@ class ManualResponderSharedReportOperatorPart
 
 	@Inject
 	ConsoleObjectManager objectManager;
+
+	@Inject
+	PrivChecker privChecker;
 
 	@Inject
 	TimeFormatter timeFormatter;
@@ -112,7 +117,20 @@ class ManualResponderSharedReportOperatorPart
 			manualResponderReportHelper.findByProcessedTime (
 				new Interval (
 					searchForm.start (),
-					searchForm.end ()));
+					searchForm.end ()))
+
+			.stream ()
+
+			.filter (report ->
+				privChecker.canRecursive (
+					report.getManualResponder (),
+					"supervisor")
+				|| privChecker.canRecursive (
+					report.getProcessedByUser (),
+					"manage"))
+
+			.collect (
+				Collectors.toList ());
 
 	}
 

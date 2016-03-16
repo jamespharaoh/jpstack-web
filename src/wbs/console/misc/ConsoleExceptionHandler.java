@@ -177,7 +177,7 @@ class ConsoleExceptionHandler
 				printFormat (
 					"</form>\n");
 
-				if (privChecker.can (
+				if (privChecker.canRecursive (
 						GlobalId.root,
 						"debug")) {
 

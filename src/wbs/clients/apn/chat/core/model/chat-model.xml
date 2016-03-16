@@ -372,7 +372,8 @@
 			subject="chatUser"
 			ref="chatHelpLog"
 			preferred-user-delay="helpQueuePreferredTime"
-			supervisor-priv="this:supervisor"/>
+			supervisor-priv="this:supervisor"
+			default-priority="-10"/>
 
 		<queue-type
 			name="Chat gay female"
@@ -460,7 +461,8 @@
 			subject="chatUser"
 			ref="chatMessage"
 			preferred-user-delay="messageQueuePreferredTime"
-			supervisor-priv="this:supervisor"/>
+			supervisor-priv="this:supervisor"
+			default-priority="-10"/>
 
 		<queue-type
 			name="User"
@@ -468,7 +470,8 @@
 			subject="chatUser"
 			ref="chatUser"
 			preferred-user-delay="infoQueuePreferredTime"
-			supervisor-priv="this:supervisor"/>
+			supervisor-priv="this:supervisor"
+			default-priority="-5"/>
 
 	</queue-types>
 

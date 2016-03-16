@@ -434,7 +434,7 @@ class ImChatPendingFormResponder
 	void renderIgnore () {
 
 		if (
-			! privChecker.can (
+			! privChecker.canRecursive (
 				imChat,
 				"supervisor")
 		) {

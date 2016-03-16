@@ -213,7 +213,7 @@ class ObjectTicketCreateAction<
 						createPrivDelegate)
 					: ticketManager;
 
-			if (! privChecker.can (
+			if (! privChecker.canRecursive (
 					createDelegate,
 					createPrivCode)) {
 

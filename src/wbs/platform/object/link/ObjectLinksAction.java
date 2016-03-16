@@ -171,7 +171,7 @@ class ObjectLinksAction
 					targetObject,
 					targetLinkField);
 
-			if (! privChecker.can (
+			if (! privChecker.canRecursive (
 					targetObject,
 					"manage"))
 				continue;

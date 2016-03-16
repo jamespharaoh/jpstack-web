@@ -52,7 +52,7 @@ class ChatUserInitiationLogConsoleHooks
 		) {
 
 			 if (
-			 	! privChecker.can (
+			 	! privChecker.canRecursive (
 			 		chat,
 			 		"supervisor")
 			 ) {

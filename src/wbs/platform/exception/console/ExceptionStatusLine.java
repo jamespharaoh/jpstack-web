@@ -61,7 +61,7 @@ class ExceptionStatusLine
 
 		// count exceptions (if visible)
 
-		if (privChecker.can (
+		if (privChecker.canRecursive (
 				GlobalId.root,
 				"alert")) {
 

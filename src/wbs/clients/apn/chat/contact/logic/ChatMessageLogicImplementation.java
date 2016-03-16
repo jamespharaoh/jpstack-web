@@ -672,11 +672,6 @@ class ChatMessageLogicImplementation
 							fromUser),
 						chatMessage.getOriginalText ().getText ());
 
-				queueItem
-
-					.setPriority (
-						-10l);
-
 				chatMessage
 
 					.setQueueItem (

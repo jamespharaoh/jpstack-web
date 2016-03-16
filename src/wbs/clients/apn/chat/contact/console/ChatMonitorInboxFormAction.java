@@ -193,7 +193,7 @@ class ChatMonitorInboxFormAction
 
 			// check if they can ignore
 
-			if (! privChecker.can (
+			if (! privChecker.canRecursive (
 					chat,
 					"manage")) {
 

@@ -70,7 +70,7 @@ class UserPasswordAction
 		// check privs
 
 		if (user.getId () != requestContext.userId ()
-			&& ! privChecker.can (user, "manage")) {
+			&& ! privChecker.canRecursive (user, "manage")) {
 
 			requestContext.addError (
 				"Access denied");

@@ -6,6 +6,7 @@ import wbs.framework.record.Record;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
+import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserRec;
 
 public
@@ -46,5 +47,8 @@ interface QueueLogic {
 
 	List<QueueItemRec> getActiveQueueItems (
 			QueueSubjectRec queueSubject);
+
+	boolean sliceHasQueueActivity (
+			SliceRec slice);
 
 }

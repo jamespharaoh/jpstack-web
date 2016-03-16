@@ -57,7 +57,7 @@ class ParentFormFieldConstraintValidator<
 				: nativeValue.get ();
 
 		if (
-			! privChecker.can (
+			! privChecker.canRecursive (
 				privDelegate,
 				createPrivCode)
 		) {

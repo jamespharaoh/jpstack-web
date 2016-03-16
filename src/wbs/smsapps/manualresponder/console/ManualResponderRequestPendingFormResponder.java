@@ -226,7 +226,7 @@ class ManualResponderRequestPendingFormResponder
 					"/manualResponderRequest.pending.summary"));
 
 		manager =
-			privChecker.can (
+			privChecker.canRecursive (
 				manualResponder,
 				"manage");
 
@@ -286,7 +286,7 @@ class ManualResponderRequestPendingFormResponder
 
 		} else if (
 
-			! privChecker.can (
+			! privChecker.canRecursive (
 				manualResponder,
 				"reply")
 
@@ -304,7 +304,7 @@ class ManualResponderRequestPendingFormResponder
 					manualResponder.getCanIgnore ()),
 
 				not (
-					privChecker.can (
+					privChecker.canRecursive (
 						manualResponder,
 						"manage")))
 

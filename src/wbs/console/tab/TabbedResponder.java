@@ -319,7 +319,7 @@ class TabbedResponder
 			printFormat (
 				"<p>Unable to show page contents.</p>\n");
 
-			if (privChecker.can (
+			if (privChecker.canRecursive (
 					GlobalId.root,
 					"debug")) {
 

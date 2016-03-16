@@ -62,7 +62,7 @@ class QueueItemConsoleHooks
 					queue);
 
 			 if (
-			 	! privChecker.can (
+			 	! privChecker.canRecursive (
 			 		queueParent,
 			 		"manage")
 			 ) {

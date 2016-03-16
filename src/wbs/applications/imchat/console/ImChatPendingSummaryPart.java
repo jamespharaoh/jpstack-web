@@ -163,7 +163,7 @@ class ImChatPendingSummaryPart
 		// misc
 
 		canSupervise =
-			privChecker.can (
+			privChecker.canRecursive (
 				imChat,
 				"supervisor");
 

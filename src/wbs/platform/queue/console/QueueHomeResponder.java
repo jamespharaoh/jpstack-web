@@ -372,9 +372,11 @@ class QueueHomeResponder
 		printFormat (
 			"<tr>\n",
 			"<th>Claim</th>\n",
+			"<th>Type</th>\n",
 			"<th>Object</th>\n",
 			"<th>Queue</th>\n",
 			"<th>Num</th>\n",
+			"<th>Pri</th>\n",
 			"<th>Oldest</th>\n",
 			"</tr>\n");
 
@@ -480,9 +482,12 @@ class QueueHomeResponder
 
 			printFormat (
 				"<td>%h</td>\n",
-				objectManager.objectPath (
-					objectManager.getParent (
-						queue),
+				parentTypeCode);
+
+			printFormat (
+				"<td>%h</td>\n",
+				objectManager.objectPathMini (
+					parent,
 					myUser.getSlice ()));
 
 			printFormat (
@@ -492,6 +497,10 @@ class QueueHomeResponder
 			printFormat (
 				"<td>%h</td>\n",
 				queueInfo.availableItems ());
+
+			printFormat (
+				"<td>%h</td>\n",
+				queueInfo.highestPriorityAvailable ());
 
 			printFormat (
 				"<td",

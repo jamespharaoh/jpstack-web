@@ -62,7 +62,7 @@ class ErrorResponder
 
 		if (
 			exception != null
-			&& privChecker.can (
+			&& privChecker.canRecursive (
 				GlobalId.root,
 				"debug")
 		) {

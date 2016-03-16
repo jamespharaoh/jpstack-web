@@ -78,7 +78,7 @@ class QueueUsersPart
 			Record<?> parent =
 				objectManager.getParent (queue);
 
-			if (! privChecker.can (
+			if (! privChecker.canRecursive (
 					parent,
 					"manage"))
 				continue;

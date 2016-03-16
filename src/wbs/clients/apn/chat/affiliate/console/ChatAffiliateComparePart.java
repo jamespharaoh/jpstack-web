@@ -151,7 +151,7 @@ class ChatAffiliateComparePart
 		chatAffiliateWithNewUserCounts =
 			new ArrayList<ChatAffiliateWithNewUserCount> ();
 
-		if (privChecker.can (chat, "stats")) {
+		if (privChecker.canRecursive (chat, "stats")) {
 
 			chatAffiliateWithNewUserCounts.addAll (
 				map.values ());
@@ -164,7 +164,7 @@ class ChatAffiliateComparePart
 				ChatAffiliateRec chatAffiliate =
 					chatAffiliateWithNewUserCount.chatAffiliate;
 
-				if (! privChecker.can (chatAffiliate, "stats"))
+				if (! privChecker.canRecursive (chatAffiliate, "stats"))
 					continue;
 
 				chatAffiliateWithNewUserCounts.add (

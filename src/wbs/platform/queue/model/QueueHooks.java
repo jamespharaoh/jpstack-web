@@ -109,6 +109,9 @@ class QueueHooks
 				.setParentId (
 					parent.getId ())
 
+				.setDefaultPriority (
+					queueType.getDefaultPriority ())
+
 			);
 
 

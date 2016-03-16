@@ -67,7 +67,7 @@ class PrivCheckerImplementation
 
 	@Override
 	public
-	boolean can (
+	boolean canRecursive (
 			int privId) {
 
 		return userPrivData.canNormal (
@@ -77,19 +77,20 @@ class PrivCheckerImplementation
 
 	@Override
 	public
-	boolean can (
+	boolean canRecursive (
 			GlobalId parentGlobalId,
 			String... privCodes) {
 
 		return userPrivData.canList (
 			parentGlobalId,
-			Arrays.asList (privCodes));
+			Arrays.asList (privCodes),
+			true);
 
 	}
 
 	@Override
 	public
-	boolean can (
+	boolean canRecursive (
 			Class<? extends Record<?>> parentClass,
 			int parentId,
 			String... privCodes) {
@@ -102,13 +103,15 @@ class PrivCheckerImplementation
 			new GlobalId (
 				parentTypeId,
 				parentId),
-			Arrays.asList (privCodes));
+			Arrays.asList (
+				privCodes),
+			true);
 
 	}
 
 	@Override
 	public
-	boolean can (
+	boolean canRecursive (
 			@NonNull Record<?> parentObject,
 			@NonNull String... privCodes) {
 
@@ -120,13 +123,35 @@ class PrivCheckerImplementation
 			new GlobalId (
 				parentObjectTypeId,
 				parentObject.getId ()),
-			Arrays.asList (privCodes));
+			Arrays.asList (
+				privCodes),
+			true);
 
 	}
 
 	@Override
 	public
-	boolean can (
+	boolean canSimple (
+			@NonNull Record<?> parentObject,
+			@NonNull String... privCodes) {
+
+		int parentObjectTypeId =
+			userPrivData.coreGetObjectTypeId (
+				parentObject.getClass ());
+
+		return userPrivData.canList (
+			new GlobalId (
+				parentObjectTypeId,
+				parentObject.getId ()),
+			Arrays.asList (
+				privCodes),
+			false);
+
+	}
+
+	@Override
+	public
+	boolean canRecursive (
 			Map<Object,Collection<String>> map) {
 
 		for (Map.Entry<Object,Collection<String>> ent
@@ -172,7 +197,8 @@ class PrivCheckerImplementation
 
 				&& userPrivData.canList (
 					parentObjectId,
-					privCodes)
+					privCodes,
+					true)
 
 			) {
 				return true;
@@ -185,7 +211,9 @@ class PrivCheckerImplementation
 
 				&& userPrivData.canList (
 					parentObjectId,
-					Collections.<String>emptyList ())
+					Collections.<String>emptyList (),
+					true)
+
 			) {
 				return true;
 			}

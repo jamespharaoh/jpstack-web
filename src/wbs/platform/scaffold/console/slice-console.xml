@@ -60,6 +60,8 @@
 		<description-field/>
 		<deleted-field/>
 
+		<!-- settings -->
+
 		<text-field
 			name="adminEmail"/>
 
@@ -71,6 +73,17 @@
 
 		<text-area-field
 			name="filter"/>
+
+		<seconds-field
+			name="queueOverflowInactivityTime"/>
+
+		<seconds-field
+			name="queueOverflowResponseTime"/>
+
+		<!-- statistics -->
+
+		<timestamp-field
+			name="currentQueueInactivityTime"/>
 
 	</field-set>
 
@@ -94,6 +107,14 @@
 
 		<text-field
 			name="supervisorConfigNames"
+			nullable="yes"/>
+
+		<seconds-field
+			name="queueOverflowInactivityTime"
+			nullable="yes"/>
+
+		<seconds-field
+			name="queueOverflowResponseTime"
 			nullable="yes"/>
 
 		<text-area-field

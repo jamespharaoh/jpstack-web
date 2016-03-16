@@ -141,7 +141,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			String privCode =
 				privParts.get (0);
 
-			return privChecker.can (
+			return privChecker.canRecursive (
 				(Record<?>)
 				container,
 				privCode);
@@ -165,7 +165,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 					delegatePath,
 					hints);
 
-			return privChecker.can (
+			return privChecker.canRecursive (
 				delegate,
 				privCode);
 

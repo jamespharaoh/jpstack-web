@@ -104,7 +104,7 @@ class QueueItemUserStatsProvider
 				objectManager.getParent (queue);
 
 			if (
-				! privChecker.can (
+				! privChecker.canRecursive (
 					parent,
 					"supervisor")
 			) {

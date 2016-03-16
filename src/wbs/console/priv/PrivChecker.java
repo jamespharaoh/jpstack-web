@@ -9,23 +9,27 @@ import wbs.framework.record.Record;
 public
 interface PrivChecker {
 
-	boolean can (
+	boolean canRecursive (
 		int privId);
 
-	boolean can (
+	boolean canRecursive (
 		GlobalId parentObjectId,
 		String... privCodes);
 
-	boolean can (
+	boolean canRecursive (
 		Class<? extends Record<?>> parentObjectClass,
 		int parentObjectId,
 		String... privCodes);
 
-	boolean can (
+	boolean canRecursive (
 		Record<?> object,
 		String... privCodes);
 
-	boolean can (
+	boolean canSimple (
+		Record<?> object,
+		String... privCodes);
+
+	boolean canRecursive (
 		Map<Object,Collection<String>> map);
 
 	boolean canGrant (

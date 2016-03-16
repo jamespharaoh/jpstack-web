@@ -136,7 +136,7 @@ class ChatUserNumberLinkProvider
 				public
 				boolean canView () {
 
-					return privChecker.can (
+					return privChecker.canRecursive (
 						chatUser.getChat (),
 						"user_create",
 						"chat_user_view",
@@ -205,7 +205,7 @@ class ChatUserNumberLinkProvider
 					public
 					boolean canView () {
 
-						return privChecker.can (
+						return privChecker.canRecursive (
 							chatUser.getChat (),
 							"user_create",
 							"user_view",
@@ -290,7 +290,7 @@ class ChatUserNumberLinkProvider
 					public
 					boolean canView () {
 
-						return privChecker.can (
+						return privChecker.canRecursive (
 							chatUser.getChat (),
 							"user_create",
 							"user_view",
