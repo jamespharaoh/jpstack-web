@@ -1,5 +1,9 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import javax.inject.Inject;
 
 import lombok.Getter;
@@ -11,6 +15,7 @@ import com.google.common.base.Optional;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.etc.BeanLogic;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("dereferenceFormFieldacessor")
@@ -27,6 +32,9 @@ class DereferenceFormFieldAccessor<Container,Native>
 
 	@Getter @Setter
 	String path;
+
+	@Getter @Setter
+	Class<?> nativeClass;
 
 	// implementation
 
@@ -50,10 +58,59 @@ class DereferenceFormFieldAccessor<Container,Native>
 	@Override
 	public
 	void write (
-			@NonNull Container principalContainer,
+			@NonNull Container container,
 			@NonNull Optional<Native> nativeValue) {
 
-		throw new RuntimeException ();
+		if (
+
+			path.indexOf ('.') >= 0
+
+			|| in (
+				nativeValue,
+				"this",
+				"parent",
+				"grandparent",
+				"greatgrandparent",
+				"root")
+
+		) {
+
+			throw new RuntimeException ();
+
+		}
+
+		// sanity check native type
+
+		if (
+
+			nativeValue.isPresent ()
+
+			&& isNotNull (
+				nativeClass)
+
+			&& ! nativeClass.isInstance (
+				nativeValue.get ())
+
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Field %s.%s ",
+					container.getClass ().getSimpleName (),
+					path,
+					"is %s, ",
+					nativeClass.getSimpleName (),
+					"attempted to write %s",
+					nativeValue.get ().getClass ().getSimpleName ()));
+
+		}
+
+		// set property
+
+		BeanLogic.setProperty (
+			container,
+			path,
+			nativeValue.orNull ());
 
 	}
 

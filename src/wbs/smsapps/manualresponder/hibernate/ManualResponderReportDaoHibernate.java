@@ -1,23 +1,9 @@
 package wbs.smsapps.manualresponder.hibernate;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-
-import java.util.List;
-
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.joda.time.Interval;
-
-import wbs.framework.hibernate.HibernateDao;
-import wbs.platform.user.model.UserRec;
-import wbs.smsapps.manualresponder.model.ManualResponderReportDao;
-import wbs.smsapps.manualresponder.model.ManualResponderReportRec;
-
 public
-class ManualResponderReportDaoHibernate
-	extends HibernateDao
-	implements ManualResponderReportDao {
+class ManualResponderReportDaoHibernate {
 
+	/*
 	@Override
 	public
 	List<ManualResponderReportRec> findByProcessedTime (
@@ -116,5 +102,6 @@ class ManualResponderReportDaoHibernate
 			0l);
 
 	}
+	*/
 
 }

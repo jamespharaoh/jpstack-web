@@ -10,7 +10,6 @@
 
 	<sql-scripts>
 		<sql-schema name="manual-responder"/>
-		<sql-schema name="manual-responder-report"/>
 	</sql-scripts>
 
 	<models>
@@ -19,7 +18,6 @@
 		<model name="manualResponderRequest"/>
 		<model name="manualResponderReply"/>
 		<model name="manualResponderTemplate"/>
-		<model name="manualResponderReport"/>
 	</models>
 
 	<layer name="logic">
@@ -29,16 +27,11 @@
 	<layer name="console">
 		<bean class="console.ManualResponderNumberConsoleHooks"/>
 		<bean class="console.ManualResponderQueueConsolePlugin"/>
+		<bean class="console.ManualResponderRequestConsoleHooks"/>
 		<bean class="console.ManualResponderRequestPendingFormAction"/>
 		<bean class="console.ManualResponderRequestPendingFormResponder"/>
 		<bean class="console.ManualResponderRequestPendingNumberNoteUpdateAction"/>
 		<bean class="console.ManualResponderRequestPendingSummaryPart"/>
-		<bean class="console.ManualResponderSharedReportOperatorCsvResponder"/>
-		<bean class="console.ManualResponderSharedReportOperatorPart"/>
-		<bean class="console.ManualResponderSharedReportServiceCsvResponder"/>
-		<bean class="console.ManualResponderSharedReportServicePart"/>
-		<bean class="console.ManualResponderSharedReportSimpleCsvResponder"/>
-		<bean class="console.ManualResponderSharedReportSimplePart"/>
 		<bean class="console.ManualResponderStatusLine"/>
 		<bean class="console.ManualResponderStatusLinePart"/>
 	</layer>

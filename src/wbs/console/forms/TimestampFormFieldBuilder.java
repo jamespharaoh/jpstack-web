@@ -3,6 +3,7 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -39,6 +40,10 @@ class TimestampFormFieldBuilder {
 	@Inject
 	Provider<DateFormFieldNativeMapping>
 	dateFormFieldNativeMappingProvider;
+
+	@Inject
+	Provider<DereferenceFormFieldAccessor>
+	dereferenceFormFieldAccessorProvider;
 
 	@Inject
 	Provider<IdentityFormFieldNativeMapping>
@@ -93,6 +98,11 @@ class TimestampFormFieldBuilder {
 		String name =
 			spec.name ();
 
+		String fieldName =
+			ifNull (
+				spec.fieldName (),
+				name);
+
 		String label =
 			ifNull (
 				spec.label (),
@@ -113,34 +123,51 @@ class TimestampFormFieldBuilder {
 				spec.format (),
 				TimestampFormFieldSpec.Format.timestamp);
 
-		// accessor and native mapping
+		// accessor
 
 		Class<?> propertyClass =
 			BeanLogic.propertyClassForClass (
 				context.containerClass (),
-				name);
+				fieldName);
 
-		FormFieldAccessor formFieldAccessor;
-		FormFieldNativeMapping formFieldNativeMapping;
+		FormFieldAccessor accessor;
+
+		if (
+			isNotNull (
+				spec.fieldName ())
+		) {
+
+			accessor =
+				dereferenceFormFieldAccessorProvider.get ()
+
+				.path (
+					fieldName);
+
+		} else {
+
+			accessor =
+				simpleFormFieldAccessorProvider.get ()
+
+				.name (
+					fieldName)
+
+				.nativeClass (
+					propertyClass);
+
+		}
+
+		// native mapping
+
+		FormFieldNativeMapping nativeMapping;
 
 		if (propertyClass == Instant.class) {
 
-			formFieldAccessor =
-				simpleFormFieldAccessorProvider.get ()
-					.name (name)
-					.nativeClass (Instant.class);
-
-			formFieldNativeMapping =
+			nativeMapping =
 				identityFormFieldNativeMappingProvider.get ();
 
 		} else if (propertyClass == Date.class) {
 
-			formFieldAccessor =
-				simpleFormFieldAccessorProvider.get ()
-					.name (name)
-					.nativeClass (Date.class);
-
-			formFieldNativeMapping =
+			nativeMapping =
 				dateFormFieldNativeMappingProvider.get ();
 
 		} else {
@@ -219,10 +246,10 @@ class TimestampFormFieldBuilder {
 					label)
 
 				.accessor (
-					formFieldAccessor)
+					accessor)
 
 				.nativeMapping (
-					formFieldNativeMapping)
+					nativeMapping)
 
 				.interfaceMapping (
 					interfaceMapping)
@@ -248,10 +275,10 @@ class TimestampFormFieldBuilder {
 					label)
 
 				.accessor (
-					formFieldAccessor)
+					accessor)
 
 				.nativeMapping (
-					formFieldNativeMapping)
+					nativeMapping)
 
 				.valueValidators (
 					valueValidators)

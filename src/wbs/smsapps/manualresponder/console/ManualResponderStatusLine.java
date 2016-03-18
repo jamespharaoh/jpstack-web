@@ -1,8 +1,10 @@
 package wbs.smsapps.manualresponder.console;
 
+import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -24,7 +26,9 @@ import wbs.platform.misc.CachedGetter;
 import wbs.platform.status.console.StatusLine;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
-import wbs.smsapps.manualresponder.model.ManualResponderReportObjectHelper;
+import wbs.smsapps.manualresponder.model.ManualResponderOperatorReport;
+import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
+import wbs.smsapps.manualresponder.model.ManualResponderRequestSearch;
 
 @SingletonComponent ("manualResponderStatusLine")
 public
@@ -37,7 +41,7 @@ class ManualResponderStatusLine
 	Database database;
 
 	@Inject
-	ManualResponderReportObjectHelper manualResponderReportHelper;
+	ManualResponderRequestObjectHelper manualResponderRequestHelper;
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -140,14 +144,36 @@ class ManualResponderStatusLine
 						.toDateTimeAtStartOfDay ()
 						.toInstant ();
 
-				Long total =
-					manualResponderReportHelper.countByProcessedTime (
-						myUser,
+				List<ManualResponderOperatorReport> reports =
+					manualResponderRequestHelper.searchOperatorReports (
+						new ManualResponderRequestSearch ()
+
+					.processedByUserId (
+						myUser.getId ())
+
+					.processedTime (
 						new Interval (
 							startOfDay,
-							transaction.now ()));
+							transaction.now ()))
 
-				return total;
+				);
+
+				if (reports.size () > 1) {
+					throw new RuntimeException ();
+				}
+
+				if (
+					isEmpty (
+						reports)
+				) {
+
+					return 0l;
+
+				} else {
+
+					return reports.get (0).numBilled ();
+
+				}
 
 			}
 
@@ -185,14 +211,36 @@ class ManualResponderStatusLine
 						.plusHours (hourOfDay)
 						.toInstant ();
 
-				Long total =
-					manualResponderReportHelper.countByProcessedTime (
-						myUser,
+				List<ManualResponderOperatorReport> reports =
+					manualResponderRequestHelper.searchOperatorReports (
+						new ManualResponderRequestSearch ()
+
+					.processedByUserId (
+						myUser.getId ())
+
+					.processedTime (
 						new Interval (
 							startOfHour,
-							transaction.now ()));
+							transaction.now ()))
 
-				return total;
+				);
+
+				if (reports.size () > 1) {
+					throw new RuntimeException ();
+				}
+
+				if (
+					isEmpty (
+						reports)
+				) {
+
+					return 0l;
+
+				} else {
+
+					return reports.get (0).numBilled ();
+
+				}
 
 			}
 

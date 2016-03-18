@@ -52,14 +52,8 @@
 			label="Number"
 			nullable="yes"/>
 
-		<timestamp-field
-			name="timestampAfter"
-			label="Time from"
-			nullable="yes"/>
-
-		<timestamp-field
-			name="timestampBefore"
-			label="Time to"
+		<interval-field
+			name="createdTime"
 			nullable="yes"/>
 
 	</field-set>

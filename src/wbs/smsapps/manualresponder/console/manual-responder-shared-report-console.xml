@@ -1,117 +1,171 @@
 <console-module
 	name="manual-responder-shared-report">
 
-	<console-helper-provider
-		object-name="manualResponderReport"
-		view-priv="manualResponder:manage"
-		id-key="manualResponderRequestId">
-
-		<context-stuff
-			name="manualResponderRequestId"
-			field="id"/>
-
-		<run-post-processor
-			name="manualResponderRequest"/>
-
-	</console-helper-provider>
-
 	<simple-context
 		name="manualResponderSharedReport">
 
-		<context-tab-page
+		<object-search-page
 			name="simple"
-			title="Simple"/>
+			tab-label="Simple"
+			object-type="manualResponderRequest"
+			search-class="wbs.smsapps.manualresponder.model.ManualResponderRequestSearch"
+			search-fields="simple-report-search"
+			results-fields="simple-report-results"/>
 
-		<context-responder-page
-			name="simpleCsv"/>
-
-		<context-tab-page
+		<object-search-page
 			name="service"
-			title="Service"/>
+			tab-label="Service"
+			object-type="manualResponderRequest"
+			search-class="wbs.smsapps.manualresponder.model.ManualResponderRequestSearch"
+			search-fields="service-report-search"
+			search-dao-method="searchServiceReportIds"
+			results-class="wbs.smsapps.manualresponder.model.ManualResponderServiceReport"
+			results-fields="service-report-results"
+			results-dao-method="searchServiceReports"/>
 
-		<context-responder-page
-			name="serviceCsv"/>
-
-		<context-tab-page
+		<object-search-page
 			name="operator"
-			title="Operator"/>
-
-		<context-responder-page
-			name="operatorCsv"/>
+			tab-label="Operator"
+			object-type="manualResponderRequest"
+			search-class="wbs.smsapps.manualresponder.model.ManualResponderRequestSearch"
+			search-fields="operator-report-search"
+			search-dao-method="searchOperatorReportIds"
+			results-class="wbs.smsapps.manualresponder.model.ManualResponderOperatorReport"
+			results-fields="operator-report-results"
+			results-dao-method="searchOperatorReports"/>
 
 	</simple-context>
 
+	<!-- simple report fields -->
+
 	<field-set
-		name="simpleReportSearch"
-		class="wbs.smsapps.manualresponder.console.ManualResponderSharedReportSimplePart$SearchForm">
+		name="simple-report-search"
+		class="wbs.smsapps.manualresponder.model.ManualResponderRequestSearch">
 
-		<timestamp-from-field
-			name="start"/>
+		<interval-field
+			name="processedTime"
+			nullable="yes"/>
 
-		<timestamp-to-field
-			name="end"/>
+		<interval-field
+			name="createdTime"
+			nullable="yes"/>
 
 	</field-set>
 
 	<field-set
-		name="simpleReportResults"
-		object-name="manualResponderReport">
+		name="simple-report-results"
+		object-name="manualResponderRequest">
 
 		<object-field
-			name="manualResponderRequest"
-			label="Request"
-			object-type="manualResponderRequest"/>
+			name="Request"
+			object-type="manualResponderRequest"
+			field="this"/>
 
-		<text-field
-			name="timestring"
-			label="TimeStamp" />
+		<timestamp-field
+			name="createdTime"
+			field="timestamp"/>
+
+		<timestamp-field
+			name="processedTime"/>
+
+		<object-field
+			name="user"/>
+
+		<integer-field
+			name="numBilledMessages"
+			label="Billed"/>
+
+		<integer-field
+			name="numFreeMessages"
+			label="Free"/>
+
+	</field-set>
+
+	<!-- service report fields -->
+
+	<field-set
+		name="service-report-search"
+		class="wbs.smsapps.manualresponder.model.ManualResponderRequestSearch">
+
+		<object-field
+			name="operatorSlice"
+			field="processedByUserSliceId"
+			object-type="slice"
+			nullable="yes"/>
+
+		<interval-field
+			name="processedTime"
+			nullable="yes"/>
+
+		<interval-field
+			name="createdTime"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="service-report-results"
+		class="wbs.smsapps.manualresponder.model.ManualResponderServiceReport">
+
+		<object-field
+			name="manualResponder"
+			object-type="manualResponder"/>
+
+		<integer-field
+			name="numBilled"
+			label="Billed"/>
+
+		<integer-field
+			name="numFree"
+			label="Free"/>
+
+		<integer-field
+			name="numTotal"
+			label="Total"/>
+
+	</field-set>
+
+	<!-- operator report -->
+
+	<field-set
+		name="operator-report-search"
+		class="wbs.smsapps.manualresponder.model.ManualResponderRequestSearch">
+
+		<object-field
+			name="serviceSlice"
+			field="manualResponderSliceId"
+			object-type="slice"
+			nullable="yes"/>
+
+		<interval-field
+			name="processedTime"
+			nullable="yes"/>
+
+		<interval-field
+			name="createdTime"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="operator-report-results"
+		class="wbs.smsapps.manualresponder.model.ManualResponderOperatorReport">
 
 		<object-field
 			name="user"
 			object-type="user"/>
 
 		<integer-field
-			name="num"
-			label="Messages"/>
-
-	</field-set>
-
-	<!--
-	<field-set
-		name="serviceReportResults"
-		object-name="wbs.smsapps.manualresponder.console.ManualResponderReportServicePart$ServiceCountForm">
-
-		<text-field
-			name="service"
-			label="Service" />
-
+			name="numBilled"
+			label="Billed"/>
 
 		<integer-field
-			name="num"
-			label="Count"/>
-
-	</field-set>
-	-->
-
-	<field-set
-		name="simpleReportCsv"
-		object-name="manualResponderReport">
-
-		 <code-field
-			delegate="manualResponder"
-			label="Service"/>
-
-		<text-field
-			name="timestring"
-			label="Timestamp"/>
-
-		<code-field
-			delegate="user"
-			label="User"/>
+			name="numFree"
+			label="Free"/>
 
 		<integer-field
-			name="num"
-			label="Messages"/>
+			name="numTotal"
+			label="Total"/>
 
 	</field-set>
 

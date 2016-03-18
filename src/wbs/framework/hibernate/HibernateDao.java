@@ -1,12 +1,18 @@
 package wbs.framework.hibernate;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import lombok.extern.log4j.Log4j;
 
 import org.hibernate.Criteria;
 import org.hibernate.LockOptions;
@@ -15,6 +21,7 @@ import org.hibernate.Session;
 
 import wbs.framework.record.IdObject;
 
+@Log4j
 public abstract
 class HibernateDao {
 
@@ -205,6 +212,21 @@ class HibernateDao {
 		List<Record> ret =
 			(List<Record>) list;
 
+		if (
+
+			isNotEmpty (
+				list)
+
+			&& isNotInstanceOf (
+				theClass,
+				list.get (0))
+
+		) {
+
+			throw new ClassCastException ();
+
+		}
+
 		return ret;
 
 	}
@@ -290,7 +312,13 @@ class HibernateDao {
 					object)
 			) {
 
-				throw new RuntimeException ();
+				log.warn (
+					stringFormat (
+						"%s with id %s not found",
+						rowTypeClass.getSimpleName (),
+						ifNull (
+							objectId,
+							"null")));
 
 			}
 

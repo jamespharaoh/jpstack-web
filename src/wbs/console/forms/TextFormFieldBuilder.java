@@ -129,11 +129,12 @@ class TextFormFieldBuilder {
 			propertyClass =
 				BeanLogic.propertyClassForClass (
 					context.containerClass (),
-					name);
+					fieldName);
 
 		} else {
 
-			propertyClass = String.class;
+			propertyClass =
+				String.class;
 
 		}
 
