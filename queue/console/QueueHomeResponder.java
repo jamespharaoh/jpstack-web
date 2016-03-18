@@ -498,9 +498,23 @@ class QueueHomeResponder
 				"<td>%h</td>\n",
 				queueInfo.availableItems ());
 
-			printFormat (
-				"<td>%h</td>\n",
-				queueInfo.highestPriorityAvailable ());
+			if (
+				privChecker.canRecursive (
+					objectManager.getParent (
+						queueInfo.queue ()),
+					"supervisor")
+			) {
+
+				printFormat (
+					"<td>%h</td>\n",
+					queueInfo.highestPriorityAvailable ());
+
+			} else {
+
+				printFormat (
+					"<td></td>\n");
+
+			}
 
 			printFormat (
 				"<td",

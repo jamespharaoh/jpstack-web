@@ -66,6 +66,11 @@
 			description="Full control of a user"
 			template="yes"/>
 
+		<priv-type
+			name="Supervisor"
+			description="View supervisor reports for a user"
+			template="yes"/>
+
 	</priv-types>
 
 	<event-types>
