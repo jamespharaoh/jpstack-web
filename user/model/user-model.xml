@@ -35,6 +35,12 @@
 		<yes-no-field
 			name="active"/>
 
+		<string-field
+			name="defaultTimezone"
+			nullable="yes"/>
+
+		<!-- statistics -->
+
 		<slave-field
 			type="userOnline"/>
 

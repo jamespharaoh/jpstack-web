@@ -1,5 +1,7 @@
 package wbs.platform.user.console;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
+
 import javax.inject.Inject;
 
 import org.joda.time.DateTimeZone;
@@ -7,6 +9,7 @@ import org.joda.time.DateTimeZone;
 import wbs.console.forms.FormFieldPreferencesProvider;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.platform.user.model.UserRec;
 
 @SingletonComponent ("userFormFieldPreferencesProvider")
@@ -21,6 +24,9 @@ class UserFormFieldPreferencesProvider
 
 	@Inject
 	UserConsoleHelper userHelper;
+
+	@Inject
+	WbsConfig wbsConfig;
 
 	// implementation
 
@@ -40,8 +46,15 @@ class UserFormFieldPreferencesProvider
 	public
 	DateTimeZone timeZone () {
 
+		UserRec user =
+			getUser ();
+
 		return DateTimeZone.forID (
-			"Europe/London");
+			ifNull (
+				user.getDefaultTimezone (),
+				user.getSlice ().getDefaultTimezone (),
+				wbsConfig.defaultTimezone (),
+				DateTimeZone.getDefault ().getID ()));
 
 	}
 

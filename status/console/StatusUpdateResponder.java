@@ -1,5 +1,6 @@
 package wbs.platform.status.console;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -18,14 +19,21 @@ import wbs.console.misc.TimeFormatter;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.platform.scaffold.console.RootConsoleHelper;
+import wbs.platform.scaffold.model.RootRec;
 
 @PrototypeComponent ("statusUpdateResponder")
 public
 class StatusUpdateResponder
 	extends ConsoleResponder {
 
+	// dependencies
+
 	@Inject
 	ConsoleRequestContext requestContext;
+
+	@Inject
+	RootConsoleHelper rootHelper;
 
 	@Inject
 	StatusLineManager statusLineManager;
@@ -33,11 +41,19 @@ class StatusUpdateResponder
 	@Inject
 	TimeFormatter timeFormatter;
 
+	// state
+
+	RootRec root;
 	String javascript;
+
+	// implementation
 
 	@Override
 	protected
 	void prepare () {
+
+		root =
+			rootHelper.find (0);
 
 		if (requestContext.userId () == null) {
 
@@ -62,12 +78,32 @@ class StatusUpdateResponder
 		printWriter.print (
 			stringFormat (
 				"updateTimestamp ('%j');\n",
-				timeFormatter.instantToTimestampString (
+				timeFormatter.instantToTimestampTimezoneString (
 					timeFormatter.defaultTimezone (),
 					Instant.now ())));
 
-		for (StatusLine statusLine
-				: statusLineManager.getStatusLines ()) {
+		if (
+			isNotNull (
+				root.getNotice ())
+		) {
+
+			printWriter.print (
+				stringFormat (
+					"updateNotice ('%j');\n",
+					root.getNotice ()));
+
+		} else {
+
+			printWriter.print (
+				stringFormat (
+					"updateNotice (undefined);\n"));
+
+		}
+
+		for (
+			StatusLine statusLine
+				: statusLineManager.getStatusLines ()
+		) {
 
 			printWriter.print (
 				statusLine.getUpdateScript ());

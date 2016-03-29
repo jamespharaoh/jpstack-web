@@ -7,6 +7,10 @@
 		<assigned-id-field/>
 		<code-field/>
 
+		<string-field
+			name="notice"
+			nullable="yes"/>
+
 	</fields>
 
 	<priv-types>
