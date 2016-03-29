@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import org.joda.time.Interval;
+import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
 @Data
@@ -22,8 +22,8 @@ class ImChatCustomerSearch
 	String code;
 	String email;
 
-	Interval firstSession;
-	Interval lastSession;
+	TextualInterval firstSession;
+	TextualInterval lastSession;
 
 	Order order =
 		Order.timestampDesc;

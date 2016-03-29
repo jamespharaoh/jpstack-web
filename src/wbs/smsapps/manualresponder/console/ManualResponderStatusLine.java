@@ -17,11 +17,13 @@ import lombok.experimental.Accessors;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
+import wbs.console.misc.TimeFormatter;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.TextualInterval;
 import wbs.platform.misc.CachedGetter;
 import wbs.platform.status.console.StatusLine;
 import wbs.platform.user.model.UserObjectHelper;
@@ -45,6 +47,9 @@ class ManualResponderStatusLine
 
 	@Inject
 	ConsoleRequestContext requestContext;
+
+	@Inject
+	TimeFormatter timeFormatter;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -152,9 +157,11 @@ class ManualResponderStatusLine
 						myUser.getId ())
 
 					.processedTime (
-						new Interval (
-							startOfDay,
-							transaction.now ()))
+						TextualInterval.forInterval (
+							timeFormatter.defaultTimezone (),
+							new Interval (
+								startOfDay,
+								transaction.now ())))
 
 				);
 
@@ -219,9 +226,11 @@ class ManualResponderStatusLine
 						myUser.getId ())
 
 					.processedTime (
-						new Interval (
-							startOfHour,
-							transaction.now ()))
+						TextualInterval.forInterval (
+							timeFormatter.defaultTimezone (),
+							new Interval (
+								startOfHour,
+								transaction.now ())))
 
 				);
 

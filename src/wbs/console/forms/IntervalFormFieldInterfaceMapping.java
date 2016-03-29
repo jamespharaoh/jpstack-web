@@ -53,7 +53,7 @@ class IntervalFormFieldInterfaceMapping<Container>
 
 		return successResult (
 			Optional.of (
-				genericValue.get ().textualValue ()));
+				genericValue.get ().genericText ()));
 
 	}
 

@@ -2,6 +2,7 @@ package wbs.framework.utils;
 
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.lowercase;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.split;
@@ -15,8 +16,10 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -33,7 +36,8 @@ import com.google.common.collect.ImmutableList;
 public
 class TextualInterval {
 
-	String textualValue;
+	String sourceText;
+	String genericText;
 	Interval value;
 
 	public static
@@ -104,14 +108,14 @@ class TextualInterval {
 	}
 
 	public static
-	Optional<Interval> parsePartial (
-			@NonNull DateTimeZone timeZone,
+	Optional<Pair<Interval,String>> parsePartialSymbolic (
+			@NonNull DateTimeZone timezone,
 			@NonNull String string,
 			@NonNull Integer hourOffset) {
 
 		DateTime now =
 			DateTime.now (
-				timeZone);
+				timezone);
 
 		LocalDate today =
 			now.getHourOfDay () >= hourOffset
@@ -131,13 +135,16 @@ class TextualInterval {
 				today.plusDays (1);
 
 			return Optional.of (
-				new Interval (
-					today.toDateTime (
-						new LocalTime (hourOffset, 0),
-						timeZone),
-					tomorrow.toDateTime (
-						new LocalTime (hourOffset, 0),
-						timeZone)));
+				Pair.of (
+					new Interval (
+						today.toDateTime (
+							new LocalTime (hourOffset, 0),
+							timezone),
+						tomorrow.toDateTime (
+							new LocalTime (hourOffset, 0),
+							timezone)),
+					today.toString (
+						dateFormat)));
 
 		case "yesterday":
 
@@ -145,13 +152,16 @@ class TextualInterval {
 				today.minusDays (1);
 
 			return Optional.of (
-				new Interval (
-					yesterday.toDateTime (
-						new LocalTime (hourOffset, 0),
-						timeZone),
-					today.toDateTime (
-						new LocalTime (hourOffset, 0),
-						timeZone)));
+				Pair.of (
+					new Interval (
+						yesterday.toDateTime (
+							new LocalTime (hourOffset, 0),
+							timezone),
+						today.toDateTime (
+							new LocalTime (hourOffset, 0),
+							timezone)),
+					yesterday.toString (
+						dateFormat)));
 
 		case "this month":
 
@@ -159,13 +169,16 @@ class TextualInterval {
 				thisMonth.plusMonths (1);
 
 			return Optional.of (
-				new Interval (
-					thisMonth.toLocalDate (1).toDateTime (
-						new LocalTime (hourOffset, 0),
-						timeZone),
-					nextMonth.toLocalDate (1).toDateTime (
-						new LocalTime (hourOffset, 0),
-						timeZone)));
+				Pair.of (
+					new Interval (
+						thisMonth.toLocalDate (1).toDateTime (
+							new LocalTime (hourOffset, 0),
+							timezone),
+						nextMonth.toLocalDate (1).toDateTime (
+							new LocalTime (hourOffset, 0),
+							timezone)),
+					nextMonth.toString (
+						monthFormat)));
 
 		case "last month":
 
@@ -173,15 +186,28 @@ class TextualInterval {
 				thisMonth.minusMonths (1);
 
 			return Optional.of (
-				new Interval (
-					lastMonth.toLocalDate (1).toDateTime (
-						new LocalTime (hourOffset, 0),
-						timeZone),
-					thisMonth.toLocalDate (1).toDateTime (
-						new LocalTime (hourOffset, 0),
-						timeZone)));
+				Pair.of (
+					new Interval (
+						lastMonth.toLocalDate (1).toDateTime (
+							new LocalTime (hourOffset, 0),
+							timezone),
+						thisMonth.toLocalDate (1).toDateTime (
+							new LocalTime (hourOffset, 0),
+							timezone)),
+					lastMonth.toString (
+						monthFormat)));
 
 		}
+
+		return Optional.absent ();
+
+	}
+
+	public static
+	Optional<Pair<Interval,String>> parsePartialNumeric (
+			@NonNull DateTimeZone timeZone,
+			@NonNull String string,
+			@NonNull Integer hourOffset) {
 
 		int fromYear = 0;
 		int fromMonth = 1;
@@ -318,9 +344,11 @@ class TextualInterval {
 			}
 
 			return Optional.of (
-				new Interval (
-					fromDateTime,
-					toDateTime));
+				Pair.of (
+					new Interval (
+						fromDateTime,
+						toDateTime),
+					string));
 
 		}
 
@@ -329,22 +357,58 @@ class TextualInterval {
 	}
 
 	public static
-	Optional<TextualInterval> parse (
+	Optional<Pair<Interval,String>> parsePartial (
 			@NonNull DateTimeZone timeZone,
 			@NonNull String string,
 			@NonNull Integer hourOffset) {
 
+		Optional<Pair<Interval,String>> symbolicResult =
+			parsePartialSymbolic (
+				timeZone,
+				string,
+				hourOffset);
+
+		if (
+			isPresent (
+				symbolicResult)
+		) {
+			return symbolicResult;
+		}
+
+		Optional<Pair<Interval,String>> numericResult =
+			parsePartialNumeric (
+				timeZone,
+				string,
+				hourOffset);
+
+		if (
+			isPresent (
+				numericResult)
+		) {
+			return numericResult;
+		}
+
+		return Optional.absent ();
+
+	}
+
+	public static
+	Optional<TextualInterval> parse (
+			@NonNull DateTimeZone timezone,
+			@NonNull String source,
+			@NonNull Integer hourOffset) {
+
 		List<String> parts =
 			split (
-				string,
+				source,
 				" to ");
 
 		if (parts.size () == 1) {
 
-			Optional<Interval> optionalInterval =
+			Optional<Pair<Interval,String>> optionalInterval =
 				parsePartial (
-					timeZone,
-					string.trim (),
+					timezone,
+					source.trim (),
 					hourOffset);
 
 			if (
@@ -356,14 +420,15 @@ class TextualInterval {
 
 			return Optional.of (
 				new TextualInterval (
-					string.trim (),
-					optionalInterval.get ()));
+					source.trim (),
+					optionalInterval.get ().getRight (),
+					optionalInterval.get ().getLeft ()));
 
 		} else if (parts.size () == 2) {
 
-			Optional<Interval> optionalFirstInterval =
+			Optional<Pair<Interval,String>> optionalFirstInterval =
 				parsePartial (
-					timeZone,
+					timezone,
 					parts.get (0).trim (),
 					hourOffset);
 
@@ -374,9 +439,9 @@ class TextualInterval {
 				return Optional.absent ();
 			}
 
-			Optional<Interval> optionalSecondInterval =
+			Optional<Pair<Interval,String>> optionalSecondInterval =
 				parsePartial (
-					timeZone,
+					timezone,
 					parts.get (1).trim (),
 					hourOffset);
 
@@ -387,12 +452,19 @@ class TextualInterval {
 				return Optional.absent ();
 			}
 
+			Interval interval =
+				new Interval (
+					optionalFirstInterval.get ().getLeft ().getStart (),
+					optionalSecondInterval.get ().getLeft ().getEnd ());
+
 			return Optional.of (
 				new TextualInterval (
-					string.trim (),
-					new Interval (
-						optionalFirstInterval.get ().getStart (),
-						optionalSecondInterval.get ().getEnd ())));
+					source.trim (),
+					stringFormat (
+						"%s to %s",
+						optionalFirstInterval.get ().getRight (),
+						optionalSecondInterval.get ().getRight ()),
+					interval));
 
 		} else {
 
@@ -418,48 +490,88 @@ class TextualInterval {
 
 	public static
 	TextualInterval forInterval (
-			@NonNull DateTimeZone timeZone,
+			@NonNull DateTimeZone timezone,
 			@NonNull Interval interval) {
 
 		// TODO make this cleverer
 
+		String intervalString =
+			intervalToString (
+				timezone,
+				interval);
+
 		return new TextualInterval (
-			stringFormat (
-				"%s to %s",
-				formatInstant (
-					timeZone,
-					interval.getStart ()),
-				formatInstant (
-					timeZone,
-					interval.getEnd ())),
+			intervalString,
+			intervalString,
 			interval);
 
 	}
 
 	public static
+	String intervalToString (
+			@NonNull DateTimeZone timezone,
+			@NonNull Interval interval) {
+
+		return stringFormat (
+			"%s to %s",
+			formatInstant (
+				timezone,
+				interval.getStart ()),
+			formatInstant (
+				timezone,
+				interval.getEnd ()));
+
+	}
+
+	public static
 	String formatInstant (
-			@NonNull DateTimeZone timeZone,
+			@NonNull DateTimeZone timezone,
 			@NonNull ReadableInstant instant) {
 
 		DateTime dateTime =
 			new DateTime (
 				instant,
-				timeZone);
+				timezone);
 
 		return dateTime.toString (
 			timestampFormat);
 
 	}
 
+	// accessors
+
+	public
+	Instant start () {
+		return value.getStart ().toInstant ();
+	}
+
+	public
+	Instant end () {
+		return value.getEnd ().toInstant ();
+	}
+
+	// data
+
 	private final static
 	DateTimeFormatter timestampFormat =
 		DateTimeFormat
 
 		.forPattern (
-			"yyyy-MM-dd HH:mm:ss")
+			"yyyy-MM-dd HH:mm:ss");
 
-		.withZone (
-			DateTimeZone.getDefault ());
+	public final static
+	DateTimeFormatter dateFormat =
+		DateTimeFormat
+
+		.forPattern (
+			"yyyy-MM-dd");
+
+	public final static
+	DateTimeFormatter monthFormat =
+		DateTimeFormat
+
+		.forPattern (
+			"yyyy-MM");
 
 	private final static
 	List<Pattern> partialPatterns =

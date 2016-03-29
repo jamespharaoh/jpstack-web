@@ -2,6 +2,7 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.utils.TextualInterval;
 import wbs.framework.utils.etc.BeanLogic;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -43,6 +45,10 @@ class IntervalFormFieldBuilder {
 	@Inject
 	Provider<DereferenceFormFieldAccessor>
 	dereferenceFormFieldAccessorProvider;
+
+	@Inject
+	Provider<IdentityFormFieldNativeMapping>
+	identityFormFieldNativeMappingProvider;
 
 	@Inject
 	Provider<IntervalFormFieldNativeMapping>
@@ -166,10 +172,23 @@ class IntervalFormFieldBuilder {
 
 		FormFieldNativeMapping nativeMapping;
 
-		if (propertyClass.get () == Interval.class) {
+		if (
+			equal (
+				propertyClass.get (),
+				Interval.class)
+		) {
 
 			nativeMapping =
 				intervalFormFieldNativeMappingProvider.get ();
+
+		} else if (
+			equal (
+				propertyClass.get (),
+				TextualInterval.class)
+		) {
+
+			nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
 
 		} else {
 

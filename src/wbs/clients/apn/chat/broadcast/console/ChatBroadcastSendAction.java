@@ -45,12 +45,14 @@ import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
+import wbs.framework.utils.TextualInterval;
 import wbs.framework.utils.etc.ProfileLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
@@ -143,6 +145,9 @@ class ChatBroadcastSendAction
 
 	@Inject
 	TextObjectHelper textHelper;
+
+	@Inject
+	TimeFormatter timeFormatter;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -428,7 +433,9 @@ class ChatBroadcastSendAction
 						// TODO block all? done later...
 
 						.lastAction (
-							form.lastAction ())
+							TextualInterval.forInterval (
+								timeFormatter.defaultTimezone (),
+								form.lastAction ()))
 
 						.gender (
 							form.gender ())

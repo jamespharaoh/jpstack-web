@@ -6,7 +6,7 @@ import java.util.Collection;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import org.joda.time.Interval;
+import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
 @Data
@@ -14,7 +14,7 @@ public
 class QueueItemSearch
 	implements Serializable {
 
-	Interval createdTime;
+	TextualInterval createdTime;
 
 	Integer processedUserId;
 

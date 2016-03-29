@@ -1,6 +1,10 @@
 package wbs.console.misc;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
+
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 import lombok.NonNull;
 
@@ -14,48 +18,19 @@ import org.joda.time.format.DateTimeFormatter;
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.config.WbsConfig;
 
 @SingletonComponent ("timeFormatter")
 public
 class TimeFormatterImplementation
 	implements TimeFormatter {
 
-	public final static
-	DateTimeFormatter timestampFormat =
-		DateTimeFormat
-			.forPattern ("yyyy-MM-dd HH:mm:ss")
-			.withZone (DateTimeZone.getDefault ());
+	// dependencies
 
-	public final static
-	DateTimeFormatter timestampTimezoneFormat =
-		DateTimeFormat
-			.forPattern ("yyyy-MM-dd HH:mm:ss ZZZ")
-			.withZone (DateTimeZone.getDefault ());
+	@Inject
+	WbsConfig wbsConfig;
 
-	public final static
-	DateTimeFormatter timeFormat =
-		DateTimeFormat
-			.forPattern ("HH:mm:ss")
-			.withZone (DateTimeZone.getDefault ());
-
-	public final static
-	DateTimeFormatter longDateFormat =
-		DateTimeFormat
-			.forPattern ("EEEE, d MMMM yyyy")
-			.withZone (DateTimeZone.getDefault ());
-
-	public final static
-	DateTimeFormatter shortDateFormat =
-		DateTimeFormat
-			.forPattern ("yyyy-MM-dd")
-			.withZone (DateTimeZone.getDefault ());
-
-	public final static
-	DateTimeFormatter httpTimestampFormat =
-		DateTimeFormat
-			.forPattern ("EEE, dd MMM yyyyy HH:mm:ss z")
-			.withLocale (Locale.US)
-			.withZoneUTC ();
+	// implementation
 
 	@Override
 	public
@@ -64,6 +39,18 @@ class TimeFormatterImplementation
 			@NonNull Instant instant) {
 
 		return timestampFormat
+			.withZone (timeZone)
+			.print (instant);
+
+	}
+
+	@Override
+	public
+	String instantToTimestampTimezoneString (
+			@NonNull DateTimeZone timeZone,
+			@NonNull Instant instant) {
+
+		return timestampTimezoneFormat
 			.withZone (timeZone)
 			.print (instant);
 
@@ -150,6 +137,16 @@ class TimeFormatterImplementation
 
 	@Override
 	public
+	String dateTimeToTimezoneString (
+			@NonNull DateTime dateTime) {
+
+		return timezoneFormat.print (
+			dateTime);
+
+	}
+
+	@Override
+	public
 	Optional<LocalDate> dateStringToLocalDate (
 			@NonNull String string) {
 
@@ -191,7 +188,10 @@ class TimeFormatterImplementation
 	public
 	DateTimeZone defaultTimezone () {
 
-		return DateTimeZone.getDefault ();
+		return timezone (
+			ifNull (
+				wbsConfig.defaultTimezone (),
+				DateTimeZone.getDefault ().getID ()));
 
 	}
 
@@ -204,5 +204,44 @@ class TimeFormatterImplementation
 			name);
 
 	}
+
+	// data
+
+	public final static
+	DateTimeFormatter timestampFormat =
+		DateTimeFormat
+			.forPattern ("yyyy-MM-dd HH:mm:ss");
+
+	public final static
+	DateTimeFormatter timestampTimezoneFormat =
+		DateTimeFormat
+			.forPattern ("yyyy-MM-dd HH:mm:ss z");
+
+	public final static
+	DateTimeFormatter timeFormat =
+		DateTimeFormat
+			.forPattern ("HH:mm:ss");
+
+	public final static
+	DateTimeFormatter longDateFormat =
+		DateTimeFormat
+			.forPattern ("EEEE, d MMMM yyyy");
+
+	public final static
+	DateTimeFormatter shortDateFormat =
+		DateTimeFormat
+			.forPattern ("yyyy-MM-dd");
+
+	public final static
+	DateTimeFormatter timezoneFormat =
+		DateTimeFormat
+			.forPattern ("z");
+
+	public final static
+	DateTimeFormatter httpTimestampFormat =
+		DateTimeFormat
+			.forPattern ("EEE, dd MMM yyyyy HH:mm:ss z")
+			.withLocale (Locale.US)
+			.withZoneUTC ();
 
 }

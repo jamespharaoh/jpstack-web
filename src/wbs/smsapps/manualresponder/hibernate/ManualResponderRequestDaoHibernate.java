@@ -174,13 +174,13 @@ class ManualResponderRequestDaoHibernate
 				Restrictions.ge (
 					"_manualResponderRequest.timestamp",
 					instantToDate (
-						search.createdTime ().getStart ().toInstant ())));
+						search.createdTime ().start ())));
 
 			criteria.add (
 				Restrictions.lt (
 					"_manualResponderRequest.timestamp",
 					instantToDate (
-						search.createdTime ().getEnd ().toInstant ())));
+						search.createdTime ().end ())));
 
 		}
 
@@ -192,12 +192,12 @@ class ManualResponderRequestDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_manualResponderRequest.processedTime",
-					search.processedTime ().getStart ().toInstant ()));
+					search.processedTime ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_manualResponderRequest.processedTime",
-					search.processedTime ().getEnd ().toInstant ()));
+					search.processedTime ().end ()));
 
 		}
 

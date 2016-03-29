@@ -2,6 +2,7 @@ package wbs.console.supervisor;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -15,7 +16,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.joda.time.Instant;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.LocalTime;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -23,6 +26,7 @@ import com.google.common.collect.ImmutableSet;
 
 import wbs.console.html.ObsoleteDateField;
 import wbs.console.html.ObsoleteDateLinks;
+import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.part.PagePart;
@@ -58,6 +62,9 @@ class SupervisorPart
 	@Inject
 	SupervisorHelper supervisorHelper;
 
+	@Inject
+	TimeFormatter timeFormatter;
+
 	// properties
 
 	@Getter @Setter
@@ -76,8 +83,8 @@ class SupervisorPart
 
 	ObsoleteDateField dateField;
 
-	Instant startTime;
-	Instant endTime;
+	DateTime startTime;
+	DateTime endTime;
 
 	StatsPeriod statsPeriod;
 
@@ -209,22 +216,27 @@ class SupervisorPart
 
 		startTime =
 			dateField.date
-				.toDateTimeAtStartOfDay ()
-				.plusHours (
+
+			.toDateTime (
+				new LocalTime (
 					ifNull (
 						supervisorConfig.spec ().offsetHours (),
-						0))
-				.toInstant ();
+						0),
+					0),
+				timeFormatter.defaultTimezone ());
 
 		endTime =
 			dateField.date
-				.plusDays (1)
-				.toDateTimeAtStartOfDay ()
-				.plusHours (
+
+			.plusDays (1)
+
+			.toDateTime (
+				new LocalTime (
 					ifNull (
 						supervisorConfig.spec ().offsetHours (),
-						0))
-				.toInstant ();
+						0),
+					0),
+				timeFormatter.defaultTimezone ());
 
 	}
 
@@ -460,6 +472,32 @@ class SupervisorPart
 			localUrl,
 			requestContext.getFormData (),
 			dateField.date);
+
+		// warning if time change
+
+		int hoursInDay =
+			new Duration (
+				startTime,
+				endTime)
+			.toStandardHours ().getHours ();
+
+		if (
+			notEqual (
+				hoursInDay,
+				24)
+		) {
+
+			printFormat (
+				"<p class=\"warning\">This day contains %h ",
+				hoursInDay,
+				"hours due to a time change from %h ",
+				timeFormatter.dateTimeToTimezoneString (
+					startTime),
+				"to %h</p>\n",
+				timeFormatter.dateTimeToTimezoneString (
+					endTime));
+
+		}
 
 		// page parts
 

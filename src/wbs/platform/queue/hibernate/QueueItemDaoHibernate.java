@@ -72,13 +72,13 @@ class QueueItemDaoHibernate
 				Restrictions.ge (
 					"_queueItem.createdTime",
 					instantToDate (
-						search.createdTime ().getStart ())));
+						search.createdTime ().start ())));
 
 			criteria.add (
 				Restrictions.lt (
 					"_queueItem.createdTime",
 					instantToDate (
-						search.createdTime ().getEnd ())));
+						search.createdTime ().end ())));
 
 		}
 

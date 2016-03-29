@@ -591,7 +591,7 @@ class ImChatApiLogicImplementation
 					Years.yearsBetween (
 						dateOfBirth.get ().toDateTimeAtStartOfDay (
 							DateTimeZone.forID (
-								"Europe/London")),
+								wbsConfig.defaultTimezone ())),
 						transaction.now ()
 					).getYears ();
 

@@ -1,20 +1,33 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.isNotPresent;
+
+import javax.inject.Inject;
+
 import lombok.NonNull;
 
-import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.framework.utils.TextualInterval;
 
 @PrototypeComponent ("intervalFormFieldNativeMapping")
 public
 class IntervalFormFieldNativeMapping<Container>
 	implements FormFieldNativeMapping<Container,TextualInterval,Interval> {
+
+	// dependencies
+
+	@Inject
+	FormFieldPreferencesProvider formFieldPreferences;
+
+	@Inject
+	WbsConfig wbsConfig;
+
+	// implementation
 
 	@Override
 	public
@@ -57,8 +70,7 @@ class IntervalFormFieldNativeMapping<Container>
 
 		return Optional.of (
 			TextualInterval.forInterval (
-				DateTimeZone.forID (
-					"Europe/London"),
+				formFieldPreferences.timeZone (),
 				nativeValue.get ()));
 
 	}

@@ -97,13 +97,13 @@ class ChatUserCreditDaoHibernate
 				Restrictions.ge (
 					"_chatUserCredit.timestamp",
 					instantToDate (
-						search.timestamp ().getStart ())));
+						search.timestamp ().start ())));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUserCredit.timestamp",
 					instantToDate (
-						search.timestamp ().getEnd ())));
+						search.timestamp ().end ())));
 
 		}
 

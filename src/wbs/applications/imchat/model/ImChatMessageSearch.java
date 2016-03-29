@@ -5,7 +5,7 @@ import java.io.Serializable;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import org.joda.time.Interval;
+import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
 @Data
@@ -15,6 +15,6 @@ class ImChatMessageSearch
 
 	Integer imChatId;
 
-	Interval timestamp;
+	TextualInterval timestamp;
 
 }

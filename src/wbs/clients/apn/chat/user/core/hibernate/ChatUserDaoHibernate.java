@@ -1229,13 +1229,13 @@ class ChatUserDaoHibernate
 				Restrictions.ge (
 					"_chatUser.firstJoin",
 					instantToDate (
-						search.firstJoin ().getStart ())));
+						search.firstJoin ().start ())));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUser.firstJoin",
 					instantToDate (
-						search.firstJoin ().getEnd ())));
+						search.firstJoin ().end ())));
 
 		}
 
@@ -1248,13 +1248,13 @@ class ChatUserDaoHibernate
 				Restrictions.ge (
 					"_chatUser.lastAction",
 					instantToDate (
-						search.lastAction ().getStart ())));
+						search.lastAction ().start ())));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUser.lastAction",
 					instantToDate (
-						search.lastAction ().getEnd ())));
+						search.lastAction ().end ())));
 
 		}
 
@@ -1267,13 +1267,13 @@ class ChatUserDaoHibernate
 				Restrictions.ge (
 					"_chatUser.lastJoin",
 					instantToDate (
-						search.lastJoin ().getStart ())));
+						search.lastJoin ().start ())));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUser.lastJoin",
 					instantToDate (
-						search.lastJoin ().getEnd ())));
+						search.lastJoin ().end ())));
 
 		}
 

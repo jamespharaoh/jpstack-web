@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import org.joda.time.Interval;
+import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
 @Data
@@ -23,8 +23,8 @@ class ManualResponderRequestSearch
 
 	String numberLike;
 
-	Interval createdTime;
-	Interval processedTime;
+	TextualInterval createdTime;
+	TextualInterval processedTime;
 
 	Integer processedByUserId;
 	Integer processedByUserSliceId;

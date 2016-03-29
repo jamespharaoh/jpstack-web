@@ -14,6 +14,7 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
+import org.joda.time.ReadableInstant;
 
 import wbs.framework.application.annotations.SingletonComponent;
 
@@ -105,21 +106,36 @@ class StatsConsoleLogic {
 	public
 	StatsPeriod createStatsPeriod (
 			StatsGranularity granularity,
-			Instant startTime,
-			Instant endTime,
+			ReadableInstant startTime,
+			ReadableInstant endTime,
 			Integer offset) {
 
 		StatsPeriod ret =
 			new StatsPeriod ()
-				.granularity (granularity)
-				.startTime (startTime)
-				.endTime (endTime)
-				.offset (offset);
+
+			.granularity (
+				granularity)
+
+			.startTime (
+				startTime.toInstant ())
+
+			.endTime (
+				endTime.toInstant ())
+
+			.offset (
+				offset);
 
 		for (
-			DateTime hour = startTime.toDateTime ();
-			hour.isBefore (endTime);
-			hour = hour.plusHours (1)
+
+			DateTime hour =
+				startTime.toInstant ().toDateTime ();
+
+			hour.isBefore (
+				endTime);
+
+			hour =
+				hour.plusHours (1)
+
 		) {
 
 			ret.steps ().add (

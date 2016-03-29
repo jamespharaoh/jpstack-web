@@ -52,6 +52,9 @@ class WbsConfig {
 		required = true)
 	String defaultSlice;
 
+	@DataAttribute
+	String defaultTimezone;
+
 	// email settings
 
 	@DataAttribute (

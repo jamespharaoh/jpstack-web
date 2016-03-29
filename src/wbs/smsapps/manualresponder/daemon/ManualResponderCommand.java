@@ -457,7 +457,7 @@ class ManualResponderCommand
 					Years.yearsBetween (
 						smsCustomer.get ().getDateOfBirth ().toDateTimeAtStartOfDay (
 							DateTimeZone.forID (
-								"Europe/London")),
+								wbsConfig.defaultTimezone ())),
 						transaction.now ()
 					).getYears ();
 

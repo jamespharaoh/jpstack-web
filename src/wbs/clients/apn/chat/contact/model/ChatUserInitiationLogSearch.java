@@ -6,7 +6,7 @@ import java.util.Collection;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import org.joda.time.Interval;
+import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
 @Data
@@ -16,7 +16,7 @@ class ChatUserInitiationLogSearch
 
 	Integer chatId;
 
-	Interval timestamp;
+	TextualInterval timestamp;
 
 	ChatUserInitiationReason reason;
 

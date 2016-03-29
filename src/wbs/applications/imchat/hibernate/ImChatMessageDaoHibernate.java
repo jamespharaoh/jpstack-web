@@ -76,12 +76,12 @@ class ImChatMessageDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_imChatMessage.timestamp",
-					search.timestamp ().getStart ().toInstant ()));
+					search.timestamp ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_imChatMessage.timestamp",
-					search.timestamp ().getEnd ().toInstant ()));
+					search.timestamp ().end ()));
 
 		}
 

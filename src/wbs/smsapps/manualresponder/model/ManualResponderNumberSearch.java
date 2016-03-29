@@ -5,7 +5,7 @@ import java.io.Serializable;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import org.joda.time.Interval;
+import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
 @Data
@@ -17,8 +17,8 @@ class ManualResponderNumberSearch
 
 	String number;
 
-	Interval firstRequest;
-	Interval lastRequest;
+	TextualInterval firstRequest;
+	TextualInterval lastRequest;
 
 	String notes;
 

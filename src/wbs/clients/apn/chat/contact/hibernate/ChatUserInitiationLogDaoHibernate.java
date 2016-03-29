@@ -99,13 +99,13 @@ class ChatUserInitiationLogDaoHibernate
 				Restrictions.ge (
 					"_chatUserInitiationLog.timestamp",
 					instantToDate (
-						search.timestamp ().getStart ())));
+						search.timestamp ().start ())));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUserInitiationLog.timestamp",
 					instantToDate (
-						search.timestamp ().getEnd ())));
+						search.timestamp ().end ())));
 
 		}
 

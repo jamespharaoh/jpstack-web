@@ -10,7 +10,13 @@ import com.google.common.base.Optional;
 public
 interface TimeFormatter {
 
+	// instant to string
+
 	String instantToTimestampString (
+			DateTimeZone timeZone,
+			Instant instant);
+
+	String instantToTimestampTimezoneString (
 			DateTimeZone timeZone,
 			Instant instant);
 
@@ -29,15 +35,31 @@ interface TimeFormatter {
 	String instantToHttpTimestampString (
 			Instant instant);
 
+	// string to instant
+
 	Instant timestampStringToInstant (
 			DateTimeZone timeZone,
 			String string);
 
+	// datetime to string
+
 	String dateTimeToTimestampTimezoneString (
 			DateTime dateTime);
 
+	String dateTimeToTimezoneString (
+			DateTime dateTime);
+
+	// string to datetime
+
+	DateTime timestampTimezoneToDateTime (
+			String string);
+
+	// local date to string
+
 	String localDateToDateString (
 			LocalDate localDate);
+
+	// string to local date
 
 	Optional<LocalDate> dateStringToLocalDate (
 			String string);
@@ -45,8 +67,7 @@ interface TimeFormatter {
 	LocalDate dateStringToLocalDateRequired (
 			String string);
 
-	DateTime timestampTimezoneToDateTime (
-			String string);
+	// time zones
 
 	DateTimeZone defaultTimezone ();
 

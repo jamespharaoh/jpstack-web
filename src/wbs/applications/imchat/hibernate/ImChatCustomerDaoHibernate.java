@@ -103,12 +103,12 @@ class ImChatCustomerDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_imChatCustomer.firstSession",
-					imChatCustomerSearch.firstSession ().getStart ()));
+					imChatCustomerSearch.firstSession ().value ().getStart ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_imChatCustomer.firstSession",
-					imChatCustomerSearch.firstSession ().getEnd ()));
+					imChatCustomerSearch.firstSession ().value ().getEnd ()));
 
 		}
 
@@ -120,12 +120,12 @@ class ImChatCustomerDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_imChatCustomer.lastSession",
-					imChatCustomerSearch.lastSession ().getStart ()));
+					imChatCustomerSearch.lastSession ().value ().getStart ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_imChatCustomer.lastSession",
-					imChatCustomerSearch.lastSession ().getEnd ()));
+					imChatCustomerSearch.lastSession ().value ().getEnd ()));
 
 		}
 

@@ -2,12 +2,15 @@ package wbs.console.supervisor;
 
 import java.text.SimpleDateFormat;
 
+import javax.inject.Inject;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.joda.time.DateTime;
+import org.joda.time.Instant;
 
+import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.reporting.StatsPeriod;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -17,6 +20,11 @@ import wbs.framework.application.annotations.PrototypeComponent;
 public
 class SupervisorTableHeadingPart
 	extends AbstractPagePart {
+
+	// dependencies
+
+	@Inject
+	TimeFormatter timeFormatter;
 
 	// properties
 
@@ -65,23 +73,18 @@ class SupervisorTableHeadingPart
 			"<th>%h</th>\n",
 			supervisorTableHeadingSpec.groupLabel ());
 
-		DateTime hourStart =
-			statsPeriod
-				.startTime ()
-				.toDateTime ();
-
 		for (
-			int hour = 0;
-			hour < statsPeriod.size ();
-			hour ++
+			Instant step
+				: statsPeriod.steps ()
 		) {
 
 			printFormat (
 				"<th>%h</th>\n",
-				hourFormat.format (hourStart.toDate ()));
-
-			hourStart =
-				hourStart.plusHours (1);
+				String.format (
+					"%02d",
+					step.toDateTime (
+							timeFormatter.defaultTimezone ())
+						.getHourOfDay ()));
 
 		}
 

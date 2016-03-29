@@ -7,10 +7,10 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.Range;
-import org.joda.time.Interval;
 
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
+import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
 @Data
@@ -52,9 +52,9 @@ class ChatUserSearch
 	Range<Long> creditNoReports;
 	Range<Long> valueSinceEver;
 
-	Interval firstJoin;
-	Interval lastAction;
-	Interval lastJoin;
+	TextualInterval firstJoin;
+	TextualInterval lastAction;
+	TextualInterval lastJoin;
 
 	ChatUserDateMode datingMode;
 
