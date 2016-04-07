@@ -6,6 +6,7 @@ import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.moreThanZero;
+import static wbs.framework.utils.etc.Misc.orNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.Range;
 import org.apache.log4j.Level;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -433,9 +435,11 @@ class ChatBroadcastSendAction
 						// TODO block all? done later...
 
 						.lastAction (
-							TextualInterval.forInterval (
-								timeFormatter.defaultTimezone (),
-								form.lastAction ()))
+							orNull (
+								TextualInterval.forInterval (
+									timeFormatter.defaultTimezone (),
+									Optional.fromNullable (
+										form.lastAction ()))))
 
 						.gender (
 							form.gender ())

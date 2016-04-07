@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.joda.time.LocalTime;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ObsoleteDateField;
@@ -69,9 +70,11 @@ class QueueSupervisorItemsPart
 			userHelper.find (userId);
 
 		DateTime startTime =
-			dateField.date
-				.toDateTimeAtStartOfDay ()
-				.plusHours (hour);
+			dateField.date.toDateTime (
+				new LocalTime (
+					hour,
+					0),
+				timeFormatter.defaultTimezone ());
 
 		queueItems =
 			new TreeSet<QueueItemRec> (

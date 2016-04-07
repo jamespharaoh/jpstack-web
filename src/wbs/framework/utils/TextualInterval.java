@@ -508,6 +508,29 @@ class TextualInterval {
 	}
 
 	public static
+	Optional<TextualInterval> forInterval (
+			@NonNull DateTimeZone timezone,
+			@NonNull Optional<Interval> interval) {
+
+		if (
+			isPresent (
+				interval)
+		) {
+
+			return Optional.of (
+				forInterval (
+					timezone,
+					interval.get ()));
+
+		} else {
+
+			return Optional.absent ();
+
+		}
+
+	}
+
+	public static
 	String intervalToString (
 			@NonNull DateTimeZone timezone,
 			@NonNull Interval interval) {
