@@ -28,6 +28,7 @@ import com.google.common.collect.ImmutableMap;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.utils.etc.Html;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutRec;
 import wbs.platform.exception.logic.ExceptionLogLogic;
@@ -135,11 +136,13 @@ class BroadcastSystemsSender2
 
 		String urlString =
 			stringFormat (
-				"%s/%u/SendUTF8/%u/%u/%s",
+				"%s/%u/SendUTF8/%s/%s/%s",
 				broadcastSystemsRouteOut.getBaseUrl (),
 				broadcastSystemsRouteOut.getToken (),
-				message.getNumFrom (),
-				message.getNumTo (),
+				Html.urlPathElementEncode (
+					message.getNumFrom ()),
+				Html.urlPathElementEncode (
+					message.getNumTo ()),
 				Base64.encodeBase64String (
 					stringToBytes (
 						message.getText ().getText (),

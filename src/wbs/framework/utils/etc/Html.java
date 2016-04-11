@@ -1,6 +1,7 @@
 package wbs.framework.utils.etc;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.replaceAll;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.PrintWriter;
@@ -9,7 +10,6 @@ import java.net.URLEncoder;
 import java.util.Map;
 
 import lombok.NonNull;
-import lombok.SneakyThrows;
 
 public
 class Html {
@@ -462,15 +462,44 @@ class Html {
 
 	}
 
-	@SneakyThrows (UnsupportedEncodingException.class)
 	public static
-	String urlEncode (
-			String source) {
+	String urlQueryParameterEncode (
+			@NonNull String source) {
 
-		return URLEncoder.encode (
-			source,
-			"utf-8");
+		try {
 
+			return URLEncoder.encode (
+				source,
+				"utf-8");
+
+		} catch (UnsupportedEncodingException exception) {
+
+			throw new RuntimeException (
+				exception);
+
+		}
+
+	}
+
+	public static
+	String urlPathElementEncode (
+			@NonNull String source) {
+
+		try {
+
+			return replaceAll (
+				URLEncoder.encode (
+					source,
+					"utf-8"),
+				"+",
+				"%20");
+
+		} catch (UnsupportedEncodingException exception) {
+
+			throw new RuntimeException (
+				exception);
+
+		}
 	}
 
 	public static <Key>

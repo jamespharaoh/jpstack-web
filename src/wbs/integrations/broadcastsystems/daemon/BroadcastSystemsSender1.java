@@ -173,7 +173,7 @@ class BroadcastSystemsSender1
 				state.bsRouteOut.getToken (),
 				state.message.getNumFrom (),
 				state.message.getNumTo (),
-				Html.urlEncode (state.message.getText ().getText ())
+				Html.urlQueryParameterEncode (state.message.getText ().getText ())
 					.replace ("+", "%20"));
 
 		URL url =

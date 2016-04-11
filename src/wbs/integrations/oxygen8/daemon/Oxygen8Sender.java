@@ -439,7 +439,7 @@ class Oxygen8Sender
 					'=');
 
 				paramsString.append (
-					Html.urlEncode (
+					Html.urlQueryParameterEncode (
 						paramEntry.getValue ()));
 
 			}

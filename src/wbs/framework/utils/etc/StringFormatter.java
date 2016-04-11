@@ -290,7 +290,7 @@ class StringFormatter {
 		String convert (
 				@NonNull Object argument) {
 
-			return Html.urlEncode (
+			return Html.urlQueryParameterEncode (
 				argument.toString ());
 
 		}

@@ -263,7 +263,7 @@ class SmsArenaSender
 				'=');
 
 			paramsString.append (
-				Html.urlEncode (
+				Html.urlQueryParameterEncode (
 					paramEntry.getValue ()));
 
 		}
