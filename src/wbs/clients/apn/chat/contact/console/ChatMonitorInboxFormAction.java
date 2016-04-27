@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
@@ -24,7 +23,7 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -34,8 +33,8 @@ import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 import wbs.sms.gsm.Gsm;
 
 @PrototypeComponent ("chatMonitorInboxFormAction")
@@ -76,7 +75,7 @@ class ChatMonitorInboxFormAction
 	Database database;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	QueueLogic queueLogic;
@@ -86,6 +85,9 @@ class ChatMonitorInboxFormAction
 
 	@Inject
 	TextObjectHelper textHelper;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -185,10 +187,6 @@ class ChatMonitorInboxFormAction
 		ChatRec chat =
 			userChatUser.getChat ();
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		if (ignore) {
 
 			// check if they can ignore
@@ -254,8 +252,7 @@ class ChatMonitorInboxFormAction
 					userChatUser)
 
 				.setTimestamp (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setOriginalText (
 					textRec)
@@ -271,7 +268,7 @@ class ChatMonitorInboxFormAction
 						: ChatMessageStatus.sent)
 
 				.setSender (
-					myUser)
+					userConsoleLogic.userRequired ())
 
 			);
 
@@ -297,8 +294,7 @@ class ChatMonitorInboxFormAction
 			chatContact
 
 				.setLastDeliveredMessageTime (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 			// update chat user stats
 
@@ -307,8 +303,7 @@ class ChatMonitorInboxFormAction
 				userChatUser
 
 					.setLastReceive (
-						instantToDate (
-							transaction.now ()));
+						transaction.now ());
 
 			}
 
@@ -336,8 +331,7 @@ class ChatMonitorInboxFormAction
 			monitorChatUser
 
 				.setLastAction (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 			// create a note
 
@@ -356,11 +350,10 @@ class ChatMonitorInboxFormAction
 						text)
 
 					.setTimestamp (
-						instantToDate (
-							transaction.now ()))
+						transaction.now ())
 
 					.setConsoleUser (
-						myUser)
+						userConsoleLogic.userRequired ())
 
 					.setChat (
 						userChatUser.getChat ())
@@ -375,7 +368,7 @@ class ChatMonitorInboxFormAction
 
 		queueLogic.processQueueItem (
 			chatMonitorInbox.getQueueItem (),
-			myUser);
+			userConsoleLogic.userRequired ());
 
 		chatMonitorInboxHelper.remove (
 			chatMonitorInbox);

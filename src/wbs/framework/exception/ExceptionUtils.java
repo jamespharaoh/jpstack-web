@@ -1,7 +1,7 @@
 package wbs.framework.exception;
 
 public
-interface ExceptionLogic {
+interface ExceptionUtils {
 
 	String throwableSummary (
 			Throwable throwable);

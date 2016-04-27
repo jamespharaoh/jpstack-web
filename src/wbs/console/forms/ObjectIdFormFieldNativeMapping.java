@@ -1,5 +1,6 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.Misc.equal;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -14,13 +15,16 @@ import wbs.framework.record.Record;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectIdFormFieldNativeMapping")
 public
-class ObjectIdFormFieldNativeMapping<Container,Type extends Record<Type>>
-	implements FormFieldNativeMapping<Container,Type,Integer> {
+class ObjectIdFormFieldNativeMapping<Container,Type extends Record<Type>,Native>
+	implements FormFieldNativeMapping<Container,Type,Native> {
 
 	// properties
 
 	@Getter @Setter
 	ConsoleHelper<Type> consoleHelper;
+
+	@Getter @Setter
+	Class<Native> propertyClass;
 
 	// implementation
 
@@ -28,15 +32,43 @@ class ObjectIdFormFieldNativeMapping<Container,Type extends Record<Type>>
 	public
 	Optional<Type> nativeToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<Integer> nativeValue) {
+			@NonNull Optional<Native> nativeValue) {
 
 		if (! nativeValue.isPresent ()) {
 			return Optional.<Type>absent ();
 		}
 
+		Integer objectId;
+
+		if (
+			equal (
+				propertyClass,
+				Integer.class)
+		) {
+
+			objectId =
+				(Integer)
+				nativeValue.get ();
+
+		} else if (
+			equal (
+				propertyClass,
+				Long.class)
+		) {
+
+			objectId =
+				(int) (long) (Long)
+				nativeValue.get ();
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
+
 		Type genericValue =
 			consoleHelper.find (
-				nativeValue.get ());
+				objectId);
 
 		if (genericValue == null)
 			throw new RuntimeException ();
@@ -48,16 +80,40 @@ class ObjectIdFormFieldNativeMapping<Container,Type extends Record<Type>>
 
 	@Override
 	public
-	Optional<Integer> genericToNative (
+	Optional<Native> genericToNative (
 			@NonNull Container container,
 			@NonNull Optional<Type> genericValue) {
 
 		if (! genericValue.isPresent ()) {
-			return Optional.<Integer>absent ();
+			return Optional.<Native>absent ();
 		}
 
-		return Optional.of (
-			genericValue.get ().getId ());
+		if (
+			equal (
+				propertyClass,
+				Integer.class)
+		) {
+
+			return Optional.of (
+				propertyClass.cast (
+					genericValue.get ().getId ()));
+
+		} else if (
+			equal (
+				propertyClass,
+				Long.class)
+		) {
+
+			return Optional.of (
+				propertyClass.cast (
+					(long) (int)
+					genericValue.get ().getId ()));
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 	}
 

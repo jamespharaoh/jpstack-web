@@ -2,6 +2,8 @@ package wbs.clients.apn.chat.user.core.console;
 
 import java.util.Comparator;
 
+import lombok.NonNull;
+
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 
@@ -11,18 +13,25 @@ class ChatUserOnlineComparator
 
 	private
 	long order (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
 
-		if (chatUser.getLastAction () != null)
-			return chatUser.getLastAction ().getTime ();
+		if (chatUser.getLastAction () != null) {
 
-		if (chatUser.getType () == ChatUserType.user)
+			return chatUser.getLastAction ().getMillis ();
+
+		} else if (chatUser.getType () == ChatUserType.user) {
+
 			return -1L;
 
-		if (chatUser.getType () == ChatUserType.monitor)
+		} else if (chatUser.getType () == ChatUserType.monitor) {
+		
 			return -2L;
+		
+		} else {
 
-		throw new RuntimeException ();
+			throw new RuntimeException ();
+
+		}
 
 	}
 

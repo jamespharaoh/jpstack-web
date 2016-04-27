@@ -508,6 +508,22 @@ class TextualInterval {
 	}
 
 	public static
+	TextualInterval forInterval (
+			@NonNull DateTimeZone timezone,
+			@NonNull LocalDate startDate,
+			@NonNull LocalDate endDate) {
+
+		return forInterval (
+			timezone,
+			new Interval (
+				startDate.toDateTimeAtStartOfDay(
+					timezone),
+				endDate.toDateTimeAtStartOfDay (
+					timezone)));
+
+	}
+
+	public static
 	Optional<TextualInterval> forInterval (
 			@NonNull DateTimeZone timezone,
 			@NonNull Optional<Interval> interval) {

@@ -2,7 +2,6 @@ package wbs.services.messagetemplate.fixture;
 
 import javax.inject.Inject;
 
-import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
@@ -30,9 +29,6 @@ class MessageTemplateFixtureProvider
 	implements FixtureProvider {
 
 	// dependencies
-
-	@Inject
-	ImChatObjectHelper imChatHelper;
 
 	@Inject
 	MenuGroupObjectHelper menuGroupHelper;

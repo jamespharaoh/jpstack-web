@@ -15,6 +15,7 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
+import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TextualInterval;
 
@@ -26,7 +27,7 @@ class IntervalFormFieldInterfaceMapping<Container>
 	// dependencies
 
 	@Inject
-	FormFieldPreferencesProvider formFieldPreferences;
+	ConsoleUserHelper formFieldPreferences;
 
 	// implementation
 
@@ -80,7 +81,7 @@ class IntervalFormFieldInterfaceMapping<Container>
 
 		Optional<TextualInterval> optionalInterval =
 			TextualInterval.parse (
-				formFieldPreferences.timeZone (),
+				formFieldPreferences.timezone (),
 				interfaceValue.get (),
 				formFieldPreferences.hourOffset ());
 

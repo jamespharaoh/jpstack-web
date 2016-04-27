@@ -23,7 +23,7 @@ import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Instant;
 
-import wbs.console.priv.PrivDataLoader;
+import wbs.console.priv.UserPrivDataLoader;
 import wbs.console.priv.UserPrivData;
 import wbs.console.priv.UserPrivData.ObjectData;
 import wbs.console.priv.UserPrivData.PrivPair;
@@ -50,7 +50,7 @@ import wbs.platform.user.model.UserRec;
 @SingletonComponent ("privDataLoader")
 public
 class PrivDataLoaderImplementation
-	implements PrivDataLoader {
+	implements UserPrivDataLoader {
 
 	// dependencies
 
@@ -84,8 +84,8 @@ class PrivDataLoaderImplementation
 
 	UpdateGetter<SharedData> privDataCache;
 
-	Map<Integer,UpdateGetter<UserData>> userDataCachesByUserId =
-		new HashMap<Integer,UpdateGetter<UserData>>();
+	Map<Long,UpdateGetter<UserData>> userDataCachesByUserId =
+		new HashMap<Long,UpdateGetter<UserData>>();
 
 	// lifecycle
 
@@ -113,10 +113,11 @@ class PrivDataLoaderImplementation
 
 	private
 	UserData getUserData (
-			int userId) {
+			Long userId) {
 
 		Provider<UserData> userDataCache =
-			getUserDataCache (userId);
+			getUserDataCache (
+				userId);
 
 		return userDataCache.get ();
 
@@ -125,7 +126,7 @@ class PrivDataLoaderImplementation
 	@Override
 	public
 	UserPrivData getUserPrivData (
-			int userId) {
+			Long userId) {
 
 		UserPrivData ret =
 			new UserPrivData ();
@@ -134,7 +135,8 @@ class PrivDataLoaderImplementation
 			getPrivData ();
 
 		ret.userData =
-			getUserData (userId);
+			getUserData (
+				userId);
 
 		return ret;
 
@@ -153,16 +155,18 @@ class PrivDataLoaderImplementation
 
 	private synchronized
 	UpdateGetter<UserData> getUserDataCache (
-			int userId) {
+			Long userId) {
 
 		UpdateGetter<UserData> ret =
-			userDataCachesByUserId.get (userId);
+			userDataCachesByUserId.get (
+				userId);
 
 		if (ret == null) {
 
 			ret =
 				updateManager.makeUpdateGetterAdaptor (
-					new UserDataReloader (userId),
+					new UserDataReloader (
+						userId),
 					reloadTimeSeconds * 1000,
 					"user_privs",
 					userId);
@@ -456,13 +460,14 @@ class PrivDataLoaderImplementation
 		implements Provider<UserData> {
 
 		private final
-		int userId;
+		Long userId;
 
 		private
 		UserDataReloader (
-				int newUserId) {
+				Long newUserId) {
 
-			userId = newUserId;
+			userId =
+				newUserId;
 
 		}
 

@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.sms.number.core.console.NumberPlugin;
@@ -22,7 +22,7 @@ class SubscriptionNumberAdvice
 	implements NumberPlugin.Link {
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Getter @Setter
 	SubscriptionNumberLinkProvider provider;

@@ -6,7 +6,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.sms.number.core.console.NumberPlugin;
@@ -22,7 +22,7 @@ class SubscriptionNumberLinkProvider
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	SubscriptionSubObjectHelper subscriptionSubHelper;

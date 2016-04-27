@@ -81,7 +81,10 @@
 			name="queueOverflowInactivityTime"/>
 
 		<seconds-field
-			name="queueOverflowResponseTime"/>
+			name="queueOverflowOverloadTime"/>
+
+		<seconds-field
+			name="queueOverflowGraceTime"/>
 
 		<!-- statistics -->
 
@@ -121,7 +124,11 @@
 			nullable="yes"/>
 
 		<seconds-field
-			name="queueOverflowResponseTime"
+			name="queueOverflowOverloadTime"
+			nullable="yes"/>
+
+		<seconds-field
+			name="queueOverflowGraceTime"
 			nullable="yes"/>
 
 		<text-area-field

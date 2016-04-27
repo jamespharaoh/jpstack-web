@@ -1,9 +1,9 @@
 package wbs.platform.queue.model;
 
-import java.util.Date;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Instant;
 
 import wbs.framework.record.IdObject;
 import wbs.platform.user.model.UserRec;
@@ -18,8 +18,8 @@ class UserQueueReport
 
 	Long messageCount;
 
-	Date firstMessage;
-	Date lastMessage;
+	Instant firstMessage;
+	Instant lastMessage;
 
 	Long timeToProcess;
 

@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.supervisor.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.earlierThan;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,7 +21,7 @@ import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageSearch;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;
 import wbs.console.reporting.StatsGranularity;
@@ -41,7 +41,7 @@ class ChatMessageUserStatsProvider
 	ChatMessageObjectHelper chatMessageHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Override
 	public
@@ -147,8 +147,7 @@ class ChatMessageUserStatsProvider
 		) {
 
 			Instant chatMessageTimestamp =
-				dateToInstant (
-					chatMessage.getTimestamp ());
+				chatMessage.getTimestamp ();
 
 			int hour =
 				period.assign (
@@ -223,12 +222,9 @@ class ChatMessageUserStatsProvider
 
 						// reverse message is older
 
-						|| inverseChatContact
-							.getLastDeliveredMessageTime ()
-							.getTime ()
-						< chatMessage
-							.getTimestamp ()
-							.getTime ()
+						|| earlierThan (
+							inverseChatContact.getLastDeliveredMessageTime (),
+							chatMessage.getTimestamp ())
 
 					)
 

@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -19,8 +18,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @Log4j
 @PrototypeComponent ("chatMonitorInboxAddNoteAction")
@@ -37,11 +36,11 @@ class ChatMonitorInboxAddNoteAction
 	@Inject
 	Database database;
 
-	//@Inject
-	//ConsoleObjectManager objectManager;
-
 	@Inject
 	ConsoleRequestContext requestContext;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -66,10 +65,6 @@ class ChatMonitorInboxAddNoteAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		ChatMonitorInboxRec chatMonitorInbox =
 			chatMonitorInboxHelper.find (
@@ -107,11 +102,10 @@ class ChatMonitorInboxAddNoteAction
 					newNote)
 
 				.setTimestamp (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setConsoleUser (
-					myUser));
+					userConsoleLogic.userRequired ()));
 
 		}
 

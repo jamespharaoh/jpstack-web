@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
-import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.dateToInstantNullSafe;
+import static wbs.framework.utils.etc.Misc.instantToDateNullSafe;
 
 import java.util.Date;
 
@@ -33,7 +33,7 @@ class DateFormFieldNativeMapping<Container>
 		}
 
 		return Optional.of (
-			instantToDate (
+			instantToDateNullSafe (
 				genericValue.get ()));
 
 	}
@@ -49,7 +49,7 @@ class DateFormFieldNativeMapping<Container>
 		}
 
 		return Optional.of (
-			dateToInstant (
+			dateToInstantNullSafe (
 				nativeValue.get ()));
 
 	}

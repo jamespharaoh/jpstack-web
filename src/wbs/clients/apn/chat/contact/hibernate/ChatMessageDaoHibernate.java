@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.contact.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.List;
+
+import lombok.NonNull;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
@@ -19,6 +19,7 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 import wbs.platform.user.model.UserRec;
 
 @SingletonComponent ("chatMessageDao")
@@ -77,10 +78,10 @@ class ChatMessageDaoHibernate
 				"chat",
 				chat)
 
-			.setTimestamp (
+			.setParameter (
 				"timestamp",
-				instantToDate (
-					timestamp))
+				timestamp,
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.list ()
 
@@ -144,15 +145,15 @@ class ChatMessageDaoHibernate
 				"senderUser",
 				senderUser)
 
-			.setTimestamp (
+			.setParameter (
 				"timestampStart",
-				instantToDate (
-					timestampInterval.getStart ()))
+				timestampInterval.getStart (),
+				TimestampWithTimezoneUserType.INSTANCE)
 
-			.setTimestamp (
+			.setParameter (
 				"timestampEnd",
-				instantToDate (
-					timestampInterval.getEnd ()))
+				timestampInterval.getEnd (),
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.list ());
 
@@ -210,14 +211,27 @@ class ChatMessageDaoHibernate
 	@Override
 	public
 	List<ChatMessageRec> search (
-			ChatMessageSearch search) {
+			@NonNull ChatMessageSearch search) {
 
 		Criteria criteria =
-			createCriteria (ChatMessageRec.class)
-				.createAlias ("chat", "_chat")
-				.createAlias ("fromUser", "_fromUser")
-				.createAlias ("toUser", "_toUser")
-				.createAlias ("originalText", "_originalText");
+			createCriteria (
+				ChatMessageRec.class)
+
+			.createAlias (
+				"chat",
+				"_chat")
+
+			.createAlias (
+				"fromUser",
+				"_fromUser")
+
+			.createAlias (
+				"toUser",
+				"_toUser")
+
+			.createAlias (
+				"originalText",
+				"_originalText");
 
 		if (search.chatId () != null) {
 
@@ -260,7 +274,7 @@ class ChatMessageDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"timestamp",
-					search.timestampAfter ().toDate ()));
+					search.timestampAfter ()));
 
 		}
 
@@ -269,7 +283,7 @@ class ChatMessageDaoHibernate
 			criteria.add (
 				Restrictions.lt (
 					"timestamp",
-					search.timestampBefore ().toDate ()));
+					search.timestampBefore ()));
 
 		}
 

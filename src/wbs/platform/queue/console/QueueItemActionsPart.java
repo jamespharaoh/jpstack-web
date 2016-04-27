@@ -7,14 +7,13 @@ import javax.inject.Inject;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.queue.metamodel.QueueTypeSpec;
 import wbs.platform.queue.model.QueueItemRec;
-import wbs.platform.user.console.UserConsoleHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("queueItemActionsPart")
 public
@@ -30,7 +29,7 @@ class QueueItemActionsPart
 	ObjectTypeConsoleHelper objectTypeHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	QueueConsoleLogic queueConsoleLogic;
@@ -39,13 +38,12 @@ class QueueItemActionsPart
 	QueueItemConsoleHelper queueItemHelper;
 
 	@Inject
-	UserConsoleHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// state
 
 	QueueTypeSpec queueTypeSpec;
 
-	UserRec myUser;
 	QueueItemRec queueItem;
 
 	boolean canSupervise;
@@ -55,10 +53,6 @@ class QueueItemActionsPart
 	@Override
 	public
 	void prepare () {
-
-		myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		queueItem =
 			queueItemHelper.find (
@@ -115,7 +109,7 @@ class QueueItemActionsPart
 			if (
 				equal (
 					queueItem.getQueueItemClaim ().getUser (),
-					myUser)
+					userConsoleLogic.userRequired ())
 			) {
 
 				printFormat (

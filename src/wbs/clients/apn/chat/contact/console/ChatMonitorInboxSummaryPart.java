@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
@@ -51,11 +50,11 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryEditableScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.sms.gazetteer.logic.GazetteerLogic;
@@ -105,7 +104,7 @@ class ChatMonitorInboxSummaryPart
 
 	// state
 
-	DateTimeZone timeZone;
+	DateTimeZone chatTimezone;
 	Instant now;
 
 	ChatMonitorInboxRec monitorInbox;
@@ -183,7 +182,7 @@ class ChatMonitorInboxSummaryPart
 		ChatSchemeRec chatScheme =
 			userChatUser.getChatScheme ();
 
-		timeZone =
+		chatTimezone =
 			DateTimeZone.forID (
 				chatScheme.getTimezone ());
 
@@ -549,7 +548,7 @@ class ChatMonitorInboxSummaryPart
 
 			printFormat (
 				"<td>%h (%h)</td>\n",
-				timeFormatter.localDateToDateString (
+				timeFormatter.dateString (
 					monitorChatUser.getDob ()),
 				Years.yearsBetween (
 					monitorChatUser.getDob ().toDateTimeAtStartOfDay (
@@ -572,7 +571,7 @@ class ChatMonitorInboxSummaryPart
 
 			printFormat (
 				"<td>%h (%h)</td>\n",
-				timeFormatter.localDateToDateString (
+				timeFormatter.dateString (
 					userChatUser.getDob ()),
 				Years.yearsBetween (
 					userChatUser.getDob ().toDateTimeAtStartOfDay (
@@ -741,10 +740,9 @@ class ChatMonitorInboxSummaryPart
 					noteInfo.append (", ");
 
 				noteInfo.append (
-					timeFormatter.instantToTimestampString (
-						timeZone,
-						dateToInstant (
-							note.getTimestamp ())));
+					timeFormatter.timestampTimezoneString (
+						chatTimezone,
+						note.getTimestamp ()));
 
 			}
 
@@ -864,12 +862,11 @@ class ChatMonitorInboxSummaryPart
 			" value=\"%h\"",
 			requestContext.parameter ("alarmDate") != null
 				? requestContext.parameter ("alarmDate")
-				: timeFormatter.instantToDateStringShort (
-					timeZone,
+				: timeFormatter.dateStringShort (
+					chatTimezone,
 					alarm == null
 						? now
-						: dateToInstant (
-							alarm.getAlarmTime ())),
+						: alarm.getAlarmTime ()),
 			">\n");
 
 		printFormat (
@@ -880,12 +877,11 @@ class ChatMonitorInboxSummaryPart
 			" value=\"%h\"",
 			requestContext.parameter ("alarmTime") != null
 				? requestContext.parameter ("alarmTime")
-				: timeFormatter.instantToTimeString (
-					timeZone,
+				: timeFormatter.timeString (
+					chatTimezone,
 					alarm == null
 						? now
-						: dateToInstant (
-							alarm.getAlarmTime ())),
+						: alarm.getAlarmTime ()),
 			">\n");
 
 		printFormat (
@@ -932,10 +928,9 @@ class ChatMonitorInboxSummaryPart
 						"padding: 2px 10px"),
 
 					">set for %h, %h</span>",
-					timeFormatter.instantToTimestampString (
-						timeZone,
-						dateToInstant (
-							alarm.getAlarmTime ())),
+					timeFormatter.timestampTimezoneString (
+						chatTimezone,
+						alarm.getAlarmTime ()),
 					alarm.getSticky ()
 						? "sticky"
 						: "not sticky"));
@@ -982,10 +977,11 @@ class ChatMonitorInboxSummaryPart
 			}
 
 			LocalDate newDate =
-				dateToInstant (
-					chatMessage.getTimestamp ())
+				chatMessage.getTimestamp ()
+
 				.toDateTime (
-					timeZone)
+					chatTimezone)
+
 				.toLocalDate ();
 
 			if (
@@ -1005,10 +1001,9 @@ class ChatMonitorInboxSummaryPart
 					"<tr style=\"font-weight: bold\">\n",
 
 					"<td colspan=\"3\">%h</td>\n",
-					timeFormatter.instantToDateStringLong (
-						timeZone,
-						dateToInstant (
-							chatMessage.getTimestamp ())));
+					timeFormatter.dateStringLong (
+						chatTimezone,
+						chatMessage.getTimestamp ()));
 
 			}
 
@@ -1023,10 +1018,9 @@ class ChatMonitorInboxSummaryPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimeString (
-					timeZone,
-					dateToInstant (
-						chatMessage.getTimestamp ())));
+				timeFormatter.timeString (
+					chatTimezone,
+					chatMessage.getTimestamp ()));
 
 			printFormat (
 				"<td>%h</td>\n",

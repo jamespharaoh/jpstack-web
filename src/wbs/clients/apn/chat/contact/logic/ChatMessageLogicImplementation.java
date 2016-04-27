@@ -1,10 +1,9 @@
 package wbs.clients.apn.chat.contact.logic;
 
 import static wbs.framework.utils.etc.Misc.allOf;
-import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isoDate;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -63,7 +62,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
 import wbs.integrations.jigsaw.api.JigsawApi;
@@ -132,7 +131,7 @@ class ChatMessageLogicImplementation
 	ExceptionLogger exceptionLogger;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionUtils exceptionLogic;
 
 	@Inject
 	ObjectManager objectManager;
@@ -305,12 +304,10 @@ class ChatMessageLogicImplementation
 		fromUser
 
 			.setLastSend (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setLastAction (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		// reschedule the next ad
 
@@ -328,8 +325,9 @@ class ChatMessageLogicImplementation
 
 			alarm != null
 
-			&& dateToInstant (alarm.getResetTime ())
-				.isBefore (transaction.now ())
+			&& earlierThan (
+				alarm.getResetTime (),
+				transaction.now ())
 
 			&& alarm.getSticky () == false
 
@@ -351,8 +349,7 @@ class ChatMessageLogicImplementation
 					ChatUserInitiationReason.alarmCancel)
 
 				.setTimestamp (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setAlarmTime (
 					alarm.getAlarmTime ()));
@@ -364,10 +361,9 @@ class ChatMessageLogicImplementation
 		fromUser
 
 			.setNextQuietOutbound (
-				instantToDate (
-					transaction.now ().plus (
-						Duration.standardSeconds (
-							fromUser.getChat ().getTimeQuietOutbound ()))));
+				transaction.now ().plus (
+					Duration.standardSeconds (
+						fromUser.getChat ().getTimeQuietOutbound ())));
 
 		// unschedule any join outbound
 
@@ -412,8 +408,7 @@ class ChatMessageLogicImplementation
 				toUser)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setThreadId (
 				threadId.orNull ())
@@ -457,8 +452,7 @@ class ChatMessageLogicImplementation
 
 				fromUser.getLastJoinHint () == null
 
-				|| dateToInstant (
-						fromUser.getLastJoinHint ())
+				|| fromUser.getLastJoinHint ()
 					.plus (
 						Duration.standardHours (12))
 					.isBefore (
@@ -482,8 +476,7 @@ class ChatMessageLogicImplementation
 			fromUser
 
 				.setLastJoinHint (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 		}
 
@@ -540,8 +533,7 @@ class ChatMessageLogicImplementation
 		toUser
 
 			.setLastReceive (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		// subtract credit etc
 
@@ -588,8 +580,7 @@ class ChatMessageLogicImplementation
 			chatUserContact
 
 				.setLastDeliveredMessageTime (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 		// if either are not adult
 
@@ -622,8 +613,7 @@ class ChatMessageLogicImplementation
 				chatUserContact
 
 					.setLastDeliveredMessageTime (
-						instantToDate (
-							transaction.now ()));
+						transaction.now ());
 
 				break;
 
@@ -641,8 +631,7 @@ class ChatMessageLogicImplementation
 				chatUserContact
 
 					.setLastDeliveredMessageTime (
-						instantToDate (
-							transaction.now ()));
+						transaction.now ());
 
 				chatUserRejectionCountInc (
 					fromUser,
@@ -968,7 +957,8 @@ class ChatMessageLogicImplementation
 
 			.addMessageCustomProperty (
 				"timestamp",
-				isoDate (chatMessage.getTimestamp ()))
+				isoDate (
+					chatMessage.getTimestamp ()))
 
 			.messageBadge (
 				messages.size ())
@@ -997,7 +987,7 @@ class ChatMessageLogicImplementation
 				exceptionLogic.throwableDump (
 					exception),
 
-				Optional.<Integer>absent (),
+				Optional.absent (),
 				GenericExceptionResolution.ignoreWithNoWarning);
 
 			success = false;
@@ -1061,7 +1051,7 @@ class ChatMessageLogicImplementation
 				exceptionLogic.throwableDump (
 					exception),
 
-				Optional.<Integer>absent (),
+				Optional.absent (),
 				GenericExceptionResolution.ignoreWithNoWarning);
 
 			success = false;
@@ -1097,7 +1087,7 @@ class ChatMessageLogicImplementation
 				exceptionLogic.throwableDump (
 					exception),
 
-				Optional.<Integer>absent (),
+				Optional.absent (),
 				GenericExceptionResolution.ignoreWithNoWarning);
 
 			success = false;
@@ -1152,8 +1142,7 @@ class ChatMessageLogicImplementation
 				userChatUser)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 		);
 
@@ -1292,7 +1281,7 @@ class ChatMessageLogicImplementation
 					exceptionLogic.throwableDump (
 						exception)),
 
-				Optional.<Integer>absent (),
+				Optional.absent (),
 				GenericExceptionResolution.ignoreWithNoWarning);
 
 			return false;

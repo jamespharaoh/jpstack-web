@@ -17,13 +17,15 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatUserAdminDobAction")
 public
 class ChatUserAdminDobAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
@@ -38,13 +40,20 @@ class ChatUserAdminDobAction
 	EventLogic eventLogic;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
 	Responder backupResponder () {
 		return responder ("chatUserAdminDobResponder");
 	}
+
+	// implementation
 
 	@Override
 	public
@@ -93,10 +102,6 @@ class ChatUserAdminDobAction
 
 		// lookup database stuff
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		ChatUserRec chatUser =
 			chatUserHelper.find (
 				chatUserId);
@@ -109,7 +114,7 @@ class ChatUserAdminDobAction
 
 		eventLogic.createEvent (
 			"chat_user_dob",
-			myUser,
+			userConsoleLogic.userRequired (),
 			chatUser,
 			dobString);
 

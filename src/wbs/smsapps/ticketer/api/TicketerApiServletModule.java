@@ -1,16 +1,17 @@
 package wbs.smsapps.ticketer.api;
 
+import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.equal;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+
+import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -283,21 +284,17 @@ class TicketerApiServletModule
 
 				// new ticket
 
-				Calendar calendar =
-					Calendar.getInstance ();
+				ticket
 
-				Date now =
-					calendar.getTime ();
+					.setRetrievedTime (
+						transaction.now ())
 
-				calendar.add (
-					Calendar.SECOND,
-					(int) (long)
-					ticketer.getDuration ());
+					.setExpiresTime (
+						transaction.now ().plus (
+							Duration.standardSeconds (
+								ticketer.getDuration ())));
 
-				Date then = calendar.getTime();
-				ticket.setRetrievedTime(now);
-				ticket.setExpiresTime(then);
-				transaction.commit();
+				transaction.commit ();
 
 				return ImmutableMap.<String,Object>builder ()
 					.put ("status", stTicketValidTemporary)
@@ -312,14 +309,14 @@ class TicketerApiServletModule
 
 				// old ticket
 
-				long remaining = (
-					ticket.getExpiresTime ().getTime ()
-						- transaction.now ().getMillis ()
-				) / 1000;
+				boolean expired =
+					earlierThan (
+						ticket.getExpiresTime (),
+						transaction.now ());
 
 				transaction.commit ();
 
-				if (remaining <= 0) {
+				if (expired) {
 
 					return ImmutableMap.<String,Object>builder ()
 						.put ("status", stTicketExpired)
@@ -360,7 +357,7 @@ class TicketerApiServletModule
 					"webapi",
 					requestContext.requestUri (),
 					exception,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
 				requestContext.status (500);

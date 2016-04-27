@@ -13,7 +13,7 @@ import com.google.common.collect.Lists;
 
 import wbs.console.context.ConsoleContextScriptRef;
 import wbs.console.html.ScriptRef;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
@@ -37,7 +37,7 @@ class TicketPendingFormResponder
 	TicketObjectHelper ticketHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	// state
 

@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
@@ -20,8 +19,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatUserAdminNameAction")
 public
@@ -41,6 +40,9 @@ class ChatUserAdminNameAction
 
 	@Inject
 	Database database;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -97,10 +99,6 @@ class ChatUserAdminNameAction
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		if (
 			notEqual (
 				chatUser.getName (),
@@ -115,8 +113,7 @@ class ChatUserAdminNameAction
 					chatUser)
 
 				.setCreationTime (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setOriginalName (
 					chatUser.getName ())
@@ -125,7 +122,7 @@ class ChatUserAdminNameAction
 					name)
 
 				.setModerator (
-					myUser)
+					userConsoleLogic.userRequired ())
 
 				.setStatus (
 					ChatUserInfoStatus.console)

@@ -7,6 +7,10 @@
 		<model name="slice"/>
 	</models>
 
+	<layer name="logic">
+		<bean class="logic.SliceLogicImplementation"/>
+	</layer>
+
 	<fixtures>
 		<fixture name="root"/>
 		<fixture name="slice"/>

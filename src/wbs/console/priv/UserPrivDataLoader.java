@@ -1,12 +1,12 @@
 package wbs.console.priv;
 
 public
-interface PrivDataLoader {
+interface UserPrivDataLoader {
 
 	void refresh ();
 
 	UserPrivData getUserPrivData (
-			int userId);
+			Long userId);
 
 	public static
 	class UnknownObjectException

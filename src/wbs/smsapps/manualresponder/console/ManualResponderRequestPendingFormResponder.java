@@ -19,7 +19,7 @@ import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -52,7 +52,7 @@ class ManualResponderRequestPendingFormResponder
 	ManualResponderRequestObjectHelper manualResponderRequestHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	ConsoleRequestContext requestContext;

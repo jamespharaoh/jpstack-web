@@ -1,6 +1,5 @@
 package wbs.platform.queue.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -71,14 +70,12 @@ class QueueItemDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_queueItem.createdTime",
-					instantToDate (
-						search.createdTime ().start ())));
+					search.createdTime ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_queueItem.createdTime",
-					instantToDate (
-						search.createdTime ().end ())));
+					search.createdTime ().end ()));
 
 		}
 
@@ -208,14 +205,12 @@ class QueueItemDaoHibernate
 			.add (
 				Restrictions.ge (
 					"_queueItem.createdTime",
-					instantToDate (
-						createdTimeInterval.getStart ().toInstant ())))
+					createdTimeInterval.getStart ().toInstant ()))
 
 			.add (
 				Restrictions.lt (
 					"_queueItem.createdTime",
-					instantToDate (
-						createdTimeInterval.getEnd ().toInstant ())))
+					createdTimeInterval.getEnd ().toInstant ()))
 
 			.list ());
 
@@ -246,14 +241,12 @@ class QueueItemDaoHibernate
 			.add (
 				Restrictions.ge (
 					"_queueItem.createdTime",
-					instantToDate (
-						createdTimeInterval.getStart ().toInstant ())))
+					createdTimeInterval.getStart ().toInstant ()))
 
 			.add (
 				Restrictions.lt (
 					"_queueItem.createdTime",
-					instantToDate (
-						createdTimeInterval.getEnd ().toInstant ())))
+					createdTimeInterval.getEnd ().toInstant ()))
 
 			.list ());
 

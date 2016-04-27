@@ -2,11 +2,6 @@
 	name="console-misc"
 	package="wbs.console.misc">
 
-	<layer name="logic">
-		<bean class="IntervalFormatterImplementation"/>
-		<bean class="TimeFormatterImplementation"/>
-	</layer>
-
 	<layer name="console">
 		<bean class="ConsoleExceptionHandler"/>
 	</layer>

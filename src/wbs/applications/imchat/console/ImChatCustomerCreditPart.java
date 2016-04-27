@@ -129,6 +129,7 @@ class ImChatCustomerCreditPart
 			updateResultSet,
 			request,
 			ImmutableMap.of (),
+			"post",
 			requestContext.resolveLocalUrl (
 				"/imChatCustomer.credit"),
 			"apply credit",

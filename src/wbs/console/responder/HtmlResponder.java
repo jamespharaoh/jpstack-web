@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableSet;
 
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
-import wbs.console.misc.TimeFormatter;
+import wbs.framework.utils.TimeFormatter;
 
 public abstract
 class HtmlResponder
@@ -92,7 +92,7 @@ class HtmlResponder
 
 		requestContext.setHeader (
 			"Expiry",
-			timeFormatter.instantToHttpTimestampString (
+			timeFormatter.httpTimestampString (
 				Instant.now ()));
 
 	}

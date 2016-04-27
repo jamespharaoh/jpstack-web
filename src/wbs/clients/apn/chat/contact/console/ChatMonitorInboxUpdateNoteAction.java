@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.contact.console;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -20,14 +21,16 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.web.Responder;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @Log4j
 @PrototypeComponent ("chatMonitorInboxUpdateNoteAction")
 public
 class ChatMonitorInboxUpdateNoteAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ChatContactNoteObjectHelper chatContactNoteHelper;
@@ -45,7 +48,12 @@ class ChatMonitorInboxUpdateNoteAction
 	ObjectManager objectManager;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
@@ -72,13 +80,10 @@ class ChatMonitorInboxUpdateNoteAction
 			database.beginReadWrite (
 				this);
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		ChatMonitorInboxRec chatMonitorInbox =
 			chatMonitorInboxHelper.find (
-				requestContext.stuffInt ("chatMonitorInboxId"));
+				requestContext.stuffInt (
+					"chatMonitorInboxId"));
 
 		ChatUserRec monitorChatUser =
 			chatMonitorInbox.getMonitorChatUser ();
@@ -87,7 +92,11 @@ class ChatMonitorInboxUpdateNoteAction
 			chatContactNoteHelper.find (
 				Integer.parseInt (id));
 
-		if (requestContext.getForm ("deleteNote") != null) {
+		if (
+			isNotNull (
+				requestContext.getForm (
+					"deleteNote"))
+		) {
 
 			log.info (
 				stringFormat (
@@ -99,10 +108,15 @@ class ChatMonitorInboxUpdateNoteAction
 
 			transaction.commit ();
 
-			requestContext.addNotice ("Note deleted");
+			requestContext.addNotice (
+				"Note deleted");
 
-		} else if (requestContext.getForm ("pegNote") != null) {
+		} else if (
+			isNotNull (
+				requestContext.getForm (
+					"pegNote"))
 
+		) {
 			note.setPegged (true);
 
 			transaction.commit ();
@@ -110,12 +124,17 @@ class ChatMonitorInboxUpdateNoteAction
 			log.info (
 				stringFormat (
 					"User %s pegged chat user contact note %s",
-					myUser.getId (),
+					userConsoleLogic.userIdRequired (),
 					note.getId ()));
 
-			requestContext.addNotice ("Note pegged");
+			requestContext.addNotice (
+				"Note pegged");
 
-		} else if (requestContext.getForm ("unpegNote") != null) {
+		} else if (
+			isNotNull (
+				requestContext.getForm (
+					"unpegNote"))
+		) {
 
 			note.setPegged (false);
 
@@ -124,14 +143,16 @@ class ChatMonitorInboxUpdateNoteAction
 			log.info (
 				stringFormat (
 					"User %s unpegged chat user contact note %s",
-					myUser.getId (),
+					userConsoleLogic.userIdRequired (),
 					note.getId ()));
 
-			requestContext.addNotice ("Note unpegged");
+			requestContext.addNotice (
+				"Note unpegged");
 
 		} else {
 
 			throw new RuntimeException ();
+
 		}
 
 		return null;

@@ -1,5 +1,12 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.Misc.getStaticMethodRequired;
+import lombok.NonNull;
+
+import org.joda.time.ReadableInstant;
+
+import com.google.common.collect.ImmutableList;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -9,6 +16,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.entity.meta.TimestampFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.etc.Misc;
 
 @PrototypeComponent ("timestampFieldWriter")
 @ModelWriter
@@ -31,7 +39,7 @@ class TimestampFieldWriter {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		// write field
 
@@ -44,30 +52,20 @@ class TimestampFieldWriter {
 
 			.propertyNameFormat (
 				"%s",
-				spec.name ());
+				spec.name ())
 
-		switch (spec.columnType ()) {
+			.typeNameFormat (
+				"Instant")
 
-		case sql:
-		case iso:
+			.setterTypeNameFormat (
+				"ReadableInstant")
 
-			propertyWriter.typeNameFormat (
-				"Instant");
-
-			break;
-
-		case postgresql:
-
-			propertyWriter.typeNameFormat (
-				"Date");
-
-			break;
-
-		default:
-
-			throw new RuntimeException ();
-
-		}
+			.setterConversion (
+				getStaticMethodRequired (
+					Misc.class,
+					"toInstantNullSafe",
+					ImmutableList.of (
+						ReadableInstant.class)));
 
 		propertyWriter.write (
 			javaWriter,

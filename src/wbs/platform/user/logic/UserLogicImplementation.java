@@ -2,7 +2,6 @@ package wbs.platform.user.logic;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.hashSha1;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -82,8 +81,7 @@ class UserLogicImplementation
 				user)
 
 			.setStartTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setUserAgent (
 				textHelper.findOrCreate (
@@ -103,8 +101,7 @@ class UserLogicImplementation
 				sessionId)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setUserSession (
 				session)
@@ -146,7 +143,7 @@ class UserLogicImplementation
 
 	@Override
 	public
-	Integer userLogonTry (
+	Long userLogonTry (
 			@NonNull String sliceCode,
 			@NonNull String username,
 			@NonNull String password,
@@ -192,7 +189,8 @@ class UserLogicImplementation
 
 		// and return
 
-		return user.getId ();
+		return (long) (int)
+			user.getId ();
 
 	}
 

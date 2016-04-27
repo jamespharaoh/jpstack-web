@@ -1,6 +1,5 @@
 package wbs.smsapps.manualresponder.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
@@ -173,14 +172,12 @@ class ManualResponderRequestDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_manualResponderRequest.timestamp",
-					instantToDate (
-						search.createdTime ().start ())));
+					search.createdTime ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_manualResponderRequest.timestamp",
-					instantToDate (
-						search.createdTime ().end ())));
+					search.createdTime ().end ()));
 
 		}
 

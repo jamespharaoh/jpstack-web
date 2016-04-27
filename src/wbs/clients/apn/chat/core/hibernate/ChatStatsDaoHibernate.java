@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.core.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.List;
 
 import org.joda.time.Interval;
@@ -10,6 +8,7 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.core.model.ChatStatsDao;
 import wbs.clients.apn.chat.core.model.ChatStatsRec;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 
 public
 class ChatStatsDaoHibernate
@@ -35,15 +34,15 @@ class ChatStatsDaoHibernate
 				"chat",
 				chat)
 
-			.setTimestamp (
+			.setParameter (
 				"date1",
-				instantToDate (
-					timestampInterval.getStart ()))
+				timestampInterval.getStart (),
+				TimestampWithTimezoneUserType.INSTANCE)
 
-			.setTimestamp (
+			.setParameter (
 				"date2",
-				instantToDate (
-					timestampInterval.getEnd ()))
+				timestampInterval.getEnd (),
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.list ()
 

@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Properties;
 import java.util.Set;
 
@@ -135,7 +136,7 @@ class HibernateEnumType<EnumType extends Enum<?>>
 
 			statement.setNull (
 				index,
-				1111);
+				Types.OTHER);
 
 			return;
 
@@ -151,7 +152,7 @@ class HibernateEnumType<EnumType extends Enum<?>>
 		statement.setObject (
 			index,
 			key,
-			1111);
+			Types.OTHER);
 
 	}
 

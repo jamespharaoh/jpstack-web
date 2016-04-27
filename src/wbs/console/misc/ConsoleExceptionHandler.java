@@ -16,14 +16,12 @@ import javax.servlet.ServletException;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
-import com.google.common.base.Optional;
-
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ErrorResponder;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.StringFormatter;
@@ -44,16 +42,19 @@ class ConsoleExceptionHandler
 	ExceptionLogger exceptionLogger;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionUtils exceptionLogic;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	Provider<ErrorResponder> errorPage;
 
 	@Inject
 	ConsoleRequestContext consoleRequestContext;
+
+	@Inject
+	ConsoleUserHelper consoleUserHelper;
 
 	// state
 
@@ -99,8 +100,7 @@ class ConsoleExceptionHandler
 					requestContext.method (),
 					requestContext.requestUri ()),
 				throwable,
-				Optional.fromNullable (
-					requestContext.userId ()),
+				consoleUserHelper.loggedInUserId (),
 				GenericExceptionResolution.ignoreWithUserWarning);
 
 		} catch (RuntimeException localException) {

@@ -11,7 +11,7 @@ import lombok.Cleanup;
 import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -19,7 +19,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
@@ -65,10 +65,13 @@ class BroadcastNumbersAction
 	NumberObjectHelper numberHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	ConsoleRequestContext requestContext;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserConsoleHelper userHelper;
@@ -95,13 +98,10 @@ class BroadcastNumbersAction
 			database.beginReadWrite (
 				this);
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		BroadcastRec broadcast =
 			broadcastHelper.find (
-				requestContext.stuffInt ("broadcastId"));
+				requestContext.stuffInt (
+					"broadcastId"));
 
 		BroadcastConfigRec broadcastConfig =
 			broadcast.getBroadcastConfig ();
@@ -156,7 +156,7 @@ class BroadcastNumbersAction
 				broadcastLogic.addNumbers (
 					broadcast,
 					numbers,
-					myUser);
+					userConsoleLogic.userRequired ());
 
 		} else {
 
@@ -207,7 +207,7 @@ class BroadcastNumbersAction
 							BroadcastNumberState.removed)
 
 						.setRemovedByUser (
-							myUser);
+							userConsoleLogic.userRequired ());
 
 					broadcast
 
@@ -232,7 +232,7 @@ class BroadcastNumbersAction
 							BroadcastNumberState.removed)
 
 						.setRemovedByUser (
-							myUser);
+							userConsoleLogic.userRequired ());
 
 					broadcast
 
@@ -261,7 +261,7 @@ class BroadcastNumbersAction
 
 			eventLogic.createEvent (
 				"broadcast_numbers_added",
-				myUser,
+				userConsoleLogic.userRequired (),
 				addResult.numAdded (),
 				broadcast);
 
@@ -271,7 +271,7 @@ class BroadcastNumbersAction
 
 			eventLogic.createEvent (
 				"broadcast_numbers_removed",
-				myUser,
+				userConsoleLogic.userRequired (),
 				numRemoved,
 				broadcast);
 

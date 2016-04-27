@@ -10,6 +10,7 @@ import org.joda.time.Interval;
 
 import com.google.common.base.Optional;
 
+import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.utils.TextualInterval;
@@ -22,7 +23,7 @@ class IntervalFormFieldNativeMapping<Container>
 	// dependencies
 
 	@Inject
-	FormFieldPreferencesProvider formFieldPreferences;
+	ConsoleUserHelper formFieldPreferences;
 
 	@Inject
 	WbsConfig wbsConfig;
@@ -70,7 +71,7 @@ class IntervalFormFieldNativeMapping<Container>
 
 		return Optional.of (
 			TextualInterval.forInterval (
-				formFieldPreferences.timeZone (),
+				formFieldPreferences.timezone (),
 				nativeValue.get ()));
 
 	}

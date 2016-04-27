@@ -1,6 +1,5 @@
 package wbs.smsapps.manualresponder.logic;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import java.util.Collections;
@@ -235,8 +234,7 @@ class ManualResponderLogicImplementation
 				messageText)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setNumFreeMessages (
 				route.getOutCharge () == 0

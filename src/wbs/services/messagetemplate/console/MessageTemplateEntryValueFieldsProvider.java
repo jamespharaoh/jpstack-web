@@ -11,6 +11,7 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
+import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.ScriptRefFormFieldSpec;
 import wbs.console.forms.TextAreaFormFieldSpec;
@@ -21,7 +22,6 @@ import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
 import wbs.services.messagetemplate.model.MessageTemplateFieldTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateSetRec;
-import wbs.services.ticket.core.console.FieldsProvider;
 
 @PrototypeComponent ("messageTemplateEntryFieldsProvider")
 public

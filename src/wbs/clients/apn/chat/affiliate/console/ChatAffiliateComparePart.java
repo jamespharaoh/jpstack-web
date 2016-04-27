@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.affiliate.console;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,10 +19,10 @@ import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
-import wbs.console.misc.IntervalFormatter;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.IntervalFormatter;
 
 @PrototypeComponent ("chatAffiliateComparePart")
 public
@@ -43,7 +41,7 @@ class ChatAffiliateComparePart
 	IntervalFormatter intervalFormatter;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	// state
 
@@ -108,8 +106,7 @@ class ChatAffiliateComparePart
 
 			.put (
 				"firstJoinAfter",
-				instantToDate (
-					firstJoinAfter))
+				firstJoinAfter)
 
 			.build ());
 

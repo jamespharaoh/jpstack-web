@@ -13,7 +13,6 @@ import lombok.Cleanup;
 
 import com.google.common.collect.ImmutableMap;
 
-import wbs.applications.imchat.api.ImChatMessageTemplateSetGetSuccess;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -163,8 +162,8 @@ class MessageTemplateMessagesGetAction
 
 		}
 
-		ImChatMessageTemplateSetGetSuccess successResponse =
-			new ImChatMessageTemplateSetGetSuccess ()
+		MessageTemplateSetGetSuccess successResponse =
+			new MessageTemplateSetGetSuccess ()
 
 			.messages (
 				messagesBuilder.build ());

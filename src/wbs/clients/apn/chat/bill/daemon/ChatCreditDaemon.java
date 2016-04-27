@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.bill.daemon;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -108,9 +107,8 @@ class ChatCreditDaemon
 				this);
 
 		Instant threeMonthsAgo =
-			transaction
-				.now ()
-				.minus (Duration.standardDays (90));
+			transaction.now ().minus (
+				Duration.standardDays (90));
 
 		log.debug (
 			stringFormat (
@@ -119,8 +117,7 @@ class ChatCreditDaemon
 
 		List<ChatUserRec> users =
 			chatUserHelper.findWantingBill (
-				instantToDate (
-					threeMonthsAgo));
+				threeMonthsAgo);
 
 		transaction.close ();
 

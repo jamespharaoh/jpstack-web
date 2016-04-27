@@ -16,6 +16,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.logic.UserLogic;
 
 @Log4j
@@ -34,6 +35,9 @@ class CoreLogonAction
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserLogic userLogic;
@@ -84,7 +88,7 @@ class CoreLogonAction
 
 		// attempt logon
 
-		Integer userId =
+		Long userId =
 			userLogic.userLogonTry (
 				slice.toLowerCase (),
 				username.toLowerCase (),
@@ -122,13 +126,13 @@ class CoreLogonAction
 				username,
 				userId));
 
-		requestContext.session (
-			"myUserId",
+		userConsoleLogic.login (
 			userId);
 
 		// and redirect to the console proper
 
-		return responder ("coreRedirectResponder");
+		return responder (
+			"coreRedirectResponder");
 
 	}
 

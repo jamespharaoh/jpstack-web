@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="wbs-hades" basedir="." default="build">
+<project name="wbs-hades" basedir="." default="build" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle.ant">
   <property environment="env"/>
   <property file="${env.WBS_BUILD_PROPERTIES}"/>
   <path id="classpath">
@@ -146,7 +146,6 @@
       <fileset dir="src/wbs/platform/user/console/files"/>
       <fileset dir="src/wbs/platform/updatelog/console/files"/>
       <fileset dir="src/wbs/platform/postgresql/console/files"/>
-      <fileset dir="src/wbs/platform/daemon/console/files"/>
       <fileset dir="src/wbs/platform/rpc/console/files"/>
       <fileset dir="src/wbs/platform/common/console/files"/>
       <fileset dir="src/wbs/sms/core/console/files"/>
@@ -319,7 +318,6 @@
       <fileset dir="src/wbs/platform/user/api/files"/>
       <fileset dir="src/wbs/platform/updatelog/api/files"/>
       <fileset dir="src/wbs/platform/postgresql/api/files"/>
-      <fileset dir="src/wbs/platform/daemon/api/files"/>
       <fileset dir="src/wbs/platform/rpc/api/files"/>
       <fileset dir="src/wbs/platform/common/api/files"/>
       <fileset dir="src/wbs/sms/core/api/files"/>
@@ -526,7 +524,6 @@
       <fileset dir="src/wbs/platform/user/console/files"/>
       <fileset dir="src/wbs/platform/updatelog/console/files"/>
       <fileset dir="src/wbs/platform/postgresql/console/files"/>
-      <fileset dir="src/wbs/platform/daemon/console/files"/>
       <fileset dir="src/wbs/platform/rpc/console/files"/>
       <fileset dir="src/wbs/platform/common/console/files"/>
       <fileset dir="src/wbs/sms/core/console/files"/>
@@ -699,7 +696,6 @@
       <fileset dir="src/wbs/platform/user/api/files"/>
       <fileset dir="src/wbs/platform/updatelog/api/files"/>
       <fileset dir="src/wbs/platform/postgresql/api/files"/>
-      <fileset dir="src/wbs/platform/daemon/api/files"/>
       <fileset dir="src/wbs/platform/rpc/api/files"/>
       <fileset dir="src/wbs/platform/common/api/files"/>
       <fileset dir="src/wbs/sms/core/api/files"/>
@@ -911,7 +907,6 @@
       <script name="src/wbs/smsapps/autoresponder/model/auto-responder.sql"/>
       <script name="src/wbs/smsapps/forwarder/model/forwarder.sql"/>
       <script name="src/wbs/smsapps/manualresponder/model/manual-responder.sql"/>
-      <script name="src/wbs/smsapps/manualresponder/model/manual-responder-report.sql"/>
       <script name="src/wbs/clients/apn/chat/core/model/chat-stats.sql"/>
       <script name="src/wbs/clients/apn/chat/affiliate/model/chat-affiliate-users-summary.sql"/>
       <script name="src/wbs/clients/apn/chat/broadcast/model/chat-broadcast.sql"/>
@@ -947,7 +942,7 @@
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="utils,config,data,entity,model-meta,schema,sql,schema-tool"/>
-      <arg value="test"/>
+      <arg value="script"/>
       <arg value="wbs.framework.schema.tool.SchemaTool"/>
       <arg value="schemaCreate"/>
     </java>
@@ -957,7 +952,7 @@
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="utils,config,data,entity,schema,sql,model,model-meta,hibernate,object,logic,fixture"/>
-      <arg value="test,hibernate"/>
+      <arg value="script,hibernate"/>
       <arg value="wbs.framework.entity.meta.ModelFixtureCreator"/>
       <arg value="runModelFixtureCreators"/>
     </java>
@@ -965,10 +960,15 @@
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="utils,config,data,entity,schema,sql,model,model-meta,hibernate,object,logic,fixture"/>
-      <arg value="test,hibernate"/>
+      <arg value="script,hibernate"/>
       <arg value="wbs.framework.fixtures.FixturesTool"/>
       <arg value="runFixtureProviders"/>
     </java>
+  </target>
+  <target name="just-code-style">
+    <cs:checkstyle config="etc/style.xml" classpathref="classpath">
+      <fileset dir="src" includes="**/*.java"/>
+    </cs:checkstyle>
   </target>
 </project>
 

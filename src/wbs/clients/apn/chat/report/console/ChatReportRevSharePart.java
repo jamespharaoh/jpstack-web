@@ -38,10 +38,10 @@ import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
@@ -49,10 +49,12 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.hibernate.HibernateDatabase;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.utils.TextualInterval;
 import wbs.platform.affiliate.console.AffiliateConsoleHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.scaffold.model.RootRec;
 import wbs.platform.service.model.ServiceRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.message.stats.console.MessageStatsConsoleHelper;
 import wbs.sms.message.stats.model.MessageStatsData;
 import wbs.sms.message.stats.model.MessageStatsRec;
@@ -115,8 +117,11 @@ class ChatReportRevSharePart
 	@Inject
 	ObjectManager objectManager;
 
+	//@Inject
+	//TimeFormatter timeFormatter;
+
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	// state
 
@@ -381,21 +386,16 @@ class ChatReportRevSharePart
 
 		List<ChatUserRec> joiners =
 			chatUserHelper.search (
-				ImmutableMap.<String,Object>builder ()
+				new ChatUserSearch ()
 
-			.put (
-				"chatId",
+			.chatId (
 				chat.getId ())
 
-			.put (
-				"firstJoinAfter",
-				startDate.toDate ())
-
-			.put (
-				"firstJoinBefore",
-				endDate.toDate ())
-
-			.build ()
+			.firstJoin (
+				TextualInterval.forInterval (
+					userConsoleLogic.timezone (),
+					startDate,
+					endDate))
 
 		);
 

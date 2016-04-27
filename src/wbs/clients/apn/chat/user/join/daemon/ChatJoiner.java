@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.user.join.daemon;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -49,7 +49,6 @@ import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.info.logic.ChatInfoLogic;
-import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -57,6 +56,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.RandomLogic;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -346,8 +346,7 @@ class ChatJoiner {
 					message)
 
 				.setTimestamp (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setFailingText (
 					textHelper.findOrCreate (
@@ -370,8 +369,12 @@ class ChatJoiner {
 					chat.getSlice ().getCode (),
 					chat.getCode (),
 					"Timestamp:    %s\n",
-					timeFormatter.instantToTimestampString (
-						timeFormatter.defaultTimezone (),
+					timeFormatter.timestampTimezoneString (
+						timeFormatter.timezone (
+							ifNull (
+								chat.getTimezone (),
+								chat.getSlice ().getDefaultTimezone (),
+								wbsConfig.defaultTimezone ())),
 						transaction.now ()),
 					"\n",
 
@@ -1071,8 +1074,7 @@ class ChatJoiner {
 			chatUser
 
 				.setNextRegisterHelp (
-					instantToDate (
-						nextRegisterHelpTime));
+					nextRegisterHelpTime);
 
 		}
 
@@ -1081,8 +1083,7 @@ class ChatJoiner {
 		chatUser
 
 			.setLastAction (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		chatUserLogic.scheduleAd (
 			chatUser);
@@ -1148,8 +1149,7 @@ class ChatJoiner {
 		chatUser
 
 			.setNextQuietOutbound (
-				instantToDate (
-					nextQuietOutboundTime));
+				nextQuietOutboundTime);
 
 		// schedule next join outbound message
 
@@ -1165,8 +1165,7 @@ class ChatJoiner {
 		chatUser
 
 			.setNextJoinOutbound (
-				instantToDate (
-					nextJoinOutboundTime));
+				nextJoinOutboundTime);
 
 		// bring them into dating if appropriate
 

@@ -944,11 +944,11 @@ class SessionFactoryBeanFactory
 
 			.addAttribute (
 				"name",
-				modelField.name ());
+				modelField.name ())
 
-//			.addAttribute (
-//				"constrained",
-//				"true");
+			.addAttribute (
+				"lazy",
+				"proxy");
 
 	}
 

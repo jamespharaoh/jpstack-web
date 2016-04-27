@@ -10,11 +10,13 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -36,8 +38,12 @@ import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
+import org.joda.time.LocalDate;
 import org.joda.time.ReadableInstant;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -47,10 +53,6 @@ import fj.data.Either;
 // TODO lots to deprecate here
 public
 class Misc {
-
-	private final static
-	TimeZone gmt =
-		TimeZone.getTimeZone ("gmt");
 
 	public final static
 	SimpleDateFormat timestampFormatSeconds =
@@ -387,13 +389,18 @@ class Misc {
 
 	}
 
-	static SimpleDateFormat isoDateFormat = new SimpleDateFormat ("yyyy-MM-dd'T'HH:mm:ss'Z'");
-	static {
-		isoDateFormat.setTimeZone (gmt);
-	}
+	static DateTimeFormatter isoDateFormat =
+		DateTimeFormat.forPattern (
+				"yyyy-MM-dd'T'HH:mm:ss'Z'")
+			.withZoneUTC ();
 
-	public static String isoDate (Date date) {
-		return isoDateFormat.format (date);
+	public static
+	String isoDate (
+			@NonNull Instant instant) {
+
+		return instant.toString (
+			isoDateFormat);
+
 	}
 
 	/**
@@ -423,6 +430,26 @@ class Misc {
 
 			return left.get ().equals (
 				right);
+
+		} else {
+
+			return false;
+
+		}
+
+	}
+
+	@SafeVarargs
+	public static <Type>
+	boolean optionalIn (
+			@NonNull Optional<Type> left,
+			@NonNull Type... rights) {
+
+		if (left.isPresent ()) {
+
+			return in (
+				left.get (),
+				rights);
 
 		} else {
 
@@ -1688,7 +1715,25 @@ class Misc {
 	}
 
 	public static
-	Instant dateToInstant (
+	Instant toInstant (
+			@NonNull ReadableInstant readableInstant) {
+
+		return readableInstant.toInstant ();
+
+	}
+
+	public static
+	Instant toInstantNullSafe (
+			ReadableInstant readableInstant) {
+
+		return readableInstant != null
+			? readableInstant.toInstant ()
+			: null;
+
+	}
+
+	public static
+	Instant dateToInstantNullSafe (
 			Date date) {
 
 		if (date == null)
@@ -1700,7 +1745,7 @@ class Misc {
 	}
 
 	public static
-	Date instantToDate (
+	Date instantToDateNullSafe (
 			ReadableInstant instant) {
 
 		if (instant == null)
@@ -1725,6 +1770,24 @@ class Misc {
 
 		return new Instant (
 			seconds * 1000);
+
+	}
+
+	public static
+	Timestamp toSqlTimestamp (
+			@NonNull ReadableInstant instant) {
+
+		return new Timestamp (
+			instant.getMillis ());
+
+	}
+
+	public static
+	Instant toInstant (
+			@NonNull Timestamp timestamp) {
+
+		return millisToInstant (
+			timestamp.getTime ());
 
 	}
 
@@ -1765,10 +1828,13 @@ class Misc {
 				noString))
 			return false;
 
-		if (equal (
+		if (
+			equal (
 				string,
-				nullString))
+				nullString)
+		) {
 			return null;
+		}
 
 		throw new RuntimeException (
 			stringFormat (
@@ -2433,6 +2499,28 @@ class Misc {
 	}
 
 	public static
+	Method getDeclaredMethodRequired (
+			@NonNull Class<?> objectClass,
+			@NonNull String name,
+			@NonNull List<Class<?>> parameterTypes) {
+
+		try {
+
+			return objectClass.getDeclaredMethod (
+				name,
+				parameterTypes.toArray (
+					new Class<?> [0]));
+
+		} catch (NoSuchMethodException exception) {
+
+			throw new RuntimeException (
+				exception);
+
+		}
+
+	}
+
+	public static
 	Object methodInvoke (
 			@NonNull Method method,
 			@NonNull Object target,
@@ -2768,6 +2856,54 @@ class Misc {
 			return Optional.absent ();
 
 		}
+
+	}
+
+	public static
+	boolean isNotStatic (
+			@NonNull Method method) {
+
+		return ! Modifier.isStatic (
+			method.getModifiers ());
+
+	}
+
+	public static
+	Method getStaticMethodRequired (
+			@NonNull Class<?> containingClass,
+			@NonNull String methodName,
+			@NonNull List<Class<?>> parameterTypes) {
+
+		Method method =
+			getDeclaredMethodRequired (
+				containingClass,
+				methodName,
+				parameterTypes);
+
+		if (
+			isNotStatic (
+				method)
+		) {
+			throw new RuntimeException ();
+		}
+
+		return method;
+
+	}
+
+	public static
+	LocalDate localDate (
+			@NonNull ReadableInstant instant,
+			@NonNull DateTimeZone timezone) {
+
+		return instant
+
+			.toInstant ()
+
+			.toDateTime (
+				timezone)
+
+			.toLocalDate ();
 
 	}
 

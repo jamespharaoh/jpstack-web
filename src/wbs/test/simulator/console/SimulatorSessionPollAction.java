@@ -17,13 +17,13 @@ import org.json.simple.JSONValue;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.Responder;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.test.simulator.model.SimulatorEventObjectHelper;
 import wbs.test.simulator.model.SimulatorEventRec;
 
@@ -44,7 +44,7 @@ class SimulatorSessionPollAction
 	SimulatorEventObjectHelper simulatorEventHelper;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	// prototype dependencies
 
@@ -103,14 +103,12 @@ class SimulatorSessionPollAction
 
 				.put (
 					"date",
-					timeFormatter.instantToDateStringShort (
-						timeFormatter.defaultTimezone (),
+					userConsoleLogic.dateStringShort (
 						event.getTimestamp ()))
 
 				.put (
 					"time",
-					timeFormatter.instantToTimeString (
-						timeFormatter.defaultTimezone (),
+					userConsoleLogic.timeString (
 						event.getTimestamp ()))
 
 				.put (

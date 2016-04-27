@@ -12,14 +12,14 @@ interface GenericExceptionLogger<Resolution> {
 			String source,
 			String summary,
 			String dump,
-			Optional<Integer> userId,
+			Optional<Long> userId,
 			Resolution resolution);
 
 	Record<?> logThrowable (
 			String typeCode,
 			String source,
 			Throwable throwable,
-			Optional<Integer> userId,
+			Optional<Long> userId,
 			Resolution resolution);
 
 	Record<?> logThrowableWithSummary (
@@ -27,7 +27,7 @@ interface GenericExceptionLogger<Resolution> {
 			String source,
 			String summary,
 			Throwable throwable,
-			Optional<Integer> userId,
+			Optional<Long> userId,
 			Resolution resolution);
 
 }

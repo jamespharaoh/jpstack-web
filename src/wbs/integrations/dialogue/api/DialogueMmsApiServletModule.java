@@ -1,6 +1,6 @@
 package wbs.integrations.dialogue.api;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.dateToInstantNullSafe;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.nullIf;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -212,7 +212,7 @@ class DialogueMmsApiServletModule
 						"routeId"));
 
 			Instant mmsDate =
-				dateToInstant (
+				dateToInstantNullSafe (
 					getDateFormat ().parse (
 						requestContext.header (
 							"x-mms-date")));

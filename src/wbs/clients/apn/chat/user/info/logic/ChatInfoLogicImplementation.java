@@ -1,8 +1,6 @@
 package wbs.clients.apn.chat.user.info.logic;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
@@ -49,7 +47,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -112,7 +110,7 @@ class ChatInfoLogicImplementation
 	ExceptionLogger exceptionLogger;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionUtils exceptionLogic;
 
 	@Inject
 	LocatorLogic locatorLogic;
@@ -165,8 +163,7 @@ class ChatInfoLogicImplementation
 		thisUser
 
 			.setLastInfo (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		// update contact record with last info stats
 
@@ -178,8 +175,7 @@ class ChatInfoLogicImplementation
 		contact
 
 			.setLastInfoTime (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		// work out distance
 
@@ -245,7 +241,7 @@ class ChatInfoLogicImplementation
 				exceptionLogic.throwableDump (
 					exception),
 
-				Optional.<Integer>absent (),
+				Optional.absent (),
 				GenericExceptionResolution.ignoreWithNoWarning);
 
 			return;
@@ -470,8 +466,7 @@ class ChatInfoLogicImplementation
 		thisUser
 
 			.setLastPic (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		// flush to generate id
 
@@ -611,8 +606,7 @@ class ChatInfoLogicImplementation
 		thisUser
 
 			.setLastPic (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		// now add a help message on the end
 
@@ -732,8 +726,7 @@ class ChatInfoLogicImplementation
 			contact
 
 				.setLastPicTime (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 		}
 
@@ -789,8 +782,7 @@ class ChatInfoLogicImplementation
 			contact
 
 				.setLastVideoTime (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 			i ++;
 
@@ -809,8 +801,7 @@ class ChatInfoLogicImplementation
 		thisUser
 
 			.setLastPic (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		// now add a help message on the end
 
@@ -1135,8 +1126,7 @@ class ChatInfoLogicImplementation
 						chatUserContact.getLastInfoTime ())
 
 					&& laterThan (
-						dateToInstant (
-							chatUserContact.getLastInfoTime ()),
+						chatUserContact.getLastInfoTime (),
 						cutoffTime)
 
 				) {
@@ -1149,8 +1139,7 @@ class ChatInfoLogicImplementation
 						chatUserContact.getLastDeliveredMessageTime ())
 
 					&& laterThan (
-						dateToInstant (
-							chatUserContact.getLastDeliveredMessageTime ()),
+						chatUserContact.getLastDeliveredMessageTime (),
 						cutoffTime)
 
 				) {
@@ -1163,8 +1152,7 @@ class ChatInfoLogicImplementation
 						chatUserContact.getLastPicTime ())
 
 					&& laterThan (
-						dateToInstant (
-							chatUserContact.getLastPicTime ()),
+						chatUserContact.getLastPicTime (),
 						cutoffTime)
 
 				) {
@@ -1283,8 +1271,7 @@ class ChatInfoLogicImplementation
 					chatContact.getLastPicTime ())
 
 				&& laterThan (
-					dateToInstant (
-						chatContact.getLastPicTime ()),
+					chatContact.getLastPicTime (),
 					cutoffTime)
 
 			) {
@@ -1392,8 +1379,7 @@ class ChatInfoLogicImplementation
 					chatContact.getLastVideoTime ())
 
 				&& laterThan (
-					dateToInstant (
-						chatContact.getLastVideoTime ()),
+					chatContact.getLastVideoTime (),
 					cutoffTime)
 
 			) {
@@ -1456,8 +1442,7 @@ class ChatInfoLogicImplementation
 				chatUser)
 
 			.setCreationTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setOriginalText (
 				newInfoText)
@@ -1524,8 +1509,7 @@ class ChatInfoLogicImplementation
 		chatUser
 
 			.setLastNameHint (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 	}
 
@@ -1554,8 +1538,7 @@ class ChatInfoLogicImplementation
 		chatUser
 
 			.setLastPicHint (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 	}
 
@@ -1584,8 +1567,7 @@ class ChatInfoLogicImplementation
 		chatUser
 
 			.setLastPicHint (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 	}
 

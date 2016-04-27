@@ -1,8 +1,6 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.earlierThan;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -111,9 +109,7 @@ class ChatMonitorSwapDaemon
 					chat.getLastMonitorSwap ())
 
 				|| earlierThan (
-					dateToInstant (
-						chat.getLastMonitorSwap ()
-					).plus (
+					chat.getLastMonitorSwap ().plus (
 						chat.getTimeMonitorSwap () * 1000),
 					transaction.now ())
 
@@ -154,7 +150,7 @@ class ChatMonitorSwapDaemon
 					gender.toString (),
 					orient.toString ()),
 				exception,
-				Optional.<Integer>absent (),
+				Optional.absent (),
 				GenericExceptionResolution.tryAgainLater);
 
 		}
@@ -178,8 +174,7 @@ class ChatMonitorSwapDaemon
 		chat
 
 			.setLastMonitorSwap (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		// fetch all appropriate monitors
 

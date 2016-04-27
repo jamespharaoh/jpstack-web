@@ -14,13 +14,15 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatUserAdminDeleteAction")
 public
 class ChatUserAdminDeleteAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
@@ -35,15 +37,23 @@ class ChatUserAdminDeleteAction
 	EventLogic eventLogic;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
 	Responder backupResponder () {
 
-		return responder ("chatUserAdminDeleteResponder");
+		return responder (
+			"chatUserAdminDeleteResponder");
 
 	}
+
+	// implementation
 
 	@Override
 	protected
@@ -53,10 +63,6 @@ class ChatUserAdminDeleteAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec user =
-			userHelper.find (
-				requestContext.userId ());
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (
@@ -78,7 +84,7 @@ class ChatUserAdminDeleteAction
 
 			eventLogic.createEvent (
 				"chat_user_delete",
-				user,
+				userConsoleLogic.userRequired (),
 				chatUser);
 
 			transaction.commit ();
@@ -118,7 +124,7 @@ class ChatUserAdminDeleteAction
 
 			eventLogic.createEvent (
 				"chat_user_undelete",
-				user,
+				userConsoleLogic.userRequired (),
 				chatUser);
 
 			transaction.commit ();

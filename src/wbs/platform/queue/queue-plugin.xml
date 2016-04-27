@@ -29,6 +29,7 @@
 	<layer name="console">
 		<bean class="console.QueueClaimAction"/>
 		<bean class="console.QueueConsoleLogic"/>
+		<bean class="console.QueueDebugPart"/>
 		<bean class="console.QueueFilterResponder"/>
 		<bean class="console.QueueHomeResponder"/>
 		<bean class="console.QueueItemAction"/>

@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.spacify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -28,6 +27,7 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.sms.gazetteer.logic.GazetteerLogic;
@@ -63,6 +63,9 @@ class ChatUserOnlinePart
 
 	@Inject
 	MediaConsoleLogic mediaConsoleLogic;
+
+	@Inject
+	TimeFormatter timeFormatter;
 
 	// state
 
@@ -249,9 +252,8 @@ class ChatUserOnlinePart
 				printFormat (
 					"<td>%s</td>\n",
 					Html.encodeNonBreakingWhitespace (
-						requestContext.prettyDateDiff (
-							dateToInstant (
-								chatUser.getLastAction ()),
+						timeFormatter.prettyDuration (
+							chatUser.getLastAction (),
 							transaction.now ())));
 
 			} else {

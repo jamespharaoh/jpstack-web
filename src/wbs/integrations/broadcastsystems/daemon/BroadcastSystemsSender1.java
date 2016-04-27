@@ -244,7 +244,7 @@ class BroadcastSystemsSender1
 						state.messageId),
 					"Success response did not match",
 					responseString,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.ignoreWithLoggedWarning);
 
 				return null;
@@ -273,7 +273,7 @@ class BroadcastSystemsSender1
 						state.messageId),
 					"Failure response did not match",
 					responseString,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.ignoreWithLoggedWarning);
 
 				throw tempFailure (

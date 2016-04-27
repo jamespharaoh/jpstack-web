@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.optionalEquals;
+import static wbs.framework.utils.etc.Misc.optionalIn;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -223,9 +223,10 @@ class ObjectFormFieldBuilder {
 
 		if (
 
-			optionalEquals (
+			optionalIn (
 				propertyClass,
-				Integer.class)
+				Integer.class,
+				Long.class)
 
 		) {
 
@@ -233,7 +234,10 @@ class ObjectFormFieldBuilder {
 				objectIdFormFieldNativeMappingProvider.get ()
 
 				.consoleHelper (
-					consoleHelper.orNull ());
+					consoleHelper.orNull ())
+
+				.propertyClass (
+					propertyClass.get ());
 
 		} else {
 

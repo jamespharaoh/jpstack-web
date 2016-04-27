@@ -1,7 +1,5 @@
 package wbs.smsapps.forwarder.daemon;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.Collection;
 
 import javax.inject.Inject;
@@ -141,8 +139,7 @@ class ForwarderDelivery
 					delivery.getNewMessageStatus ())
 
 				.setCreatedTime (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 			);
 
@@ -157,8 +154,7 @@ class ForwarderDelivery
 						forwarderMessageOutReport.getIndex ())
 
 					.setReportRetryTime (
-						instantToDate (
-							transaction.now ()))
+						transaction.now ())
 
 					.setReportTries (
 						0l);

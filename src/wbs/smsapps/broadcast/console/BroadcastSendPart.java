@@ -2,11 +2,9 @@ package wbs.smsapps.broadcast.console;
 
 import javax.inject.Inject;
 
-import org.joda.time.Instant;
-
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.smsapps.broadcast.model.BroadcastRec;
 
 @PrototypeComponent ("broadcastSendPart")
@@ -20,7 +18,7 @@ class BroadcastSendPart
 	BroadcastConsoleHelper broadcastHelper;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	// state
 
@@ -175,9 +173,8 @@ class BroadcastSendPart
 				" type=\"text\"",
 				" name=\"timestamp\"",
 				" value=\"%h\"",
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
-					Instant.now ()),
+				userConsoleLogic.timestampWithTimezoneString (
+					transaction.now ()),
 				"></p>\n",
 
 				"<p><input",

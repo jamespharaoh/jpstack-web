@@ -1,6 +1,6 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.equal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,14 +18,15 @@ import org.joda.time.Instant;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimRec;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
-import wbs.platform.user.model.UserObjectHelper;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("queueUsersPart")
@@ -33,32 +34,32 @@ public
 class QueueUsersPart
 	extends AbstractPagePart {
 
+	// dependencies
+
 	@Inject
 	ConsoleObjectManager objectManager;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	QueueItemClaimObjectHelper queueItemClaimHelper;
 
 	@Inject
-	UserObjectHelper userHelper;
+	TimeFormatter timeFormatter;
 
-	UserRec myUser;
+	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	// state
+
 	List<UserData> userDatas;
-	Instant now;
+
+	// implementation
 
 	@Override
 	public
 	void prepare () {
-
-		now =
-			Instant.now ();
-
-		myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		Map<Integer,UserData> temp =
 			new HashMap<Integer,UserData> ();
@@ -66,8 +67,10 @@ class QueueUsersPart
 		List<QueueItemClaimRec> queueItemClaims =
 			queueItemClaimHelper.findClaimed ();
 
-		for (QueueItemClaimRec queueItemClaim
-				: queueItemClaims) {
+		for (
+			QueueItemClaimRec queueItemClaim
+				: queueItemClaims
+		) {
 
 			QueueItemRec queueItem =
 				queueItemClaim.getQueueItem ();
@@ -84,7 +87,7 @@ class QueueUsersPart
 				continue;
 
 			Instant createdTime =
-				dateToInstant (queueItem.getCreatedTime ());
+				queueItem.getCreatedTime ();
 
 			UserData line =
 				temp.get (queueItemClaim.getUser ().getId ());
@@ -148,9 +151,15 @@ class QueueUsersPart
 
 			printFormat (
 				"<td>%s</td>\n",
-				requestContext.prettyDateDiff (userData.oldest, now));
+				timeFormatter.prettyDuration (
+					userData.oldest,
+					transaction.now ()));
 
-			if (userData.user == myUser) {
+			if (
+				equal (
+					userData.user,
+					userConsoleLogic.userRequired ())
+			) {
 
 				printFormat (
 					"<td></td>\n");

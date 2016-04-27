@@ -1,11 +1,9 @@
 package wbs.smsapps.autoresponder.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.simplify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -14,9 +12,12 @@ import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
 
-import wbs.console.misc.IntervalFormatter;
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.IntervalFormatter;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.sms.message.core.model.MessageDirection;
@@ -90,17 +91,15 @@ class AutoResponderVotesPart
 
 		// workout start time
 
-		Calendar calendar =
-			Calendar.getInstance ();
-
-		calendar.add (
-			Calendar.SECOND,
-			- timePeriodSeconds);
+		Instant startTime =
+			transaction.now ().minus (
+				Duration.standardSeconds (
+					timePeriodSeconds));
 
 		log.info (
 			stringFormat (
 				"Searching from %s",
-				calendar.getTime ()));
+				startTime));
 
 		// retrieve messages
 
@@ -111,8 +110,7 @@ class AutoResponderVotesPart
 				autoResponderService.getId ())
 
 			.createdTimeAfter (
-				dateToInstant (
-					calendar.getTime ()))
+				startTime)
 
 			.direction (
 				MessageDirection.in);

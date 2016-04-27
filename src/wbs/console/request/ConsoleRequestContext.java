@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
@@ -93,17 +92,20 @@ interface ConsoleRequestContext {
 			String name,
 			String value);
 
+	@Deprecated
 	String magicTdCheck (
 			String name,
 			String label,
 			boolean value,
 			int colspan);
 
+	@Deprecated
 	String magicTdCheck (
 			String name,
 			String label,
 			boolean value);
 
+	@Deprecated
 	void magicTdRadio (
 			String name,
 			String value,
@@ -111,6 +113,7 @@ interface ConsoleRequestContext {
 			boolean selected,
 			Map<String,Object> options);
 
+	@Deprecated
 	void magicTdRadio (
 			String name,
 			String value,
@@ -133,22 +136,6 @@ interface ConsoleRequestContext {
 
 	String resolveLocalUrl (
 			String wantedPath);
-
-	String prettyDateDiff (
-			Instant before,
-			Instant after);
-
-	String prettyMsInterval (
-			Long interval);
-
-	String prettyMsInterval (
-			Integer interval);
-
-	String prettySecsInterval (
-			Long interval);
-
-	String prettySecsInterval (
-			Integer interval);
 
 	void formData (
 			Map<String,String> newFormData);
@@ -239,8 +226,6 @@ interface ConsoleRequestContext {
 
 	InputStream getResourceAsStream (
 			String path);
-
-	Integer userId ();
 
 	String realPath (
 			String string);

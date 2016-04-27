@@ -22,8 +22,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.queue.logic.QueueLogic;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("imChatPendingFormAction")
 public
@@ -51,7 +50,7 @@ class ImChatPendingFormAction
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// details
 
@@ -76,12 +75,6 @@ class ImChatPendingFormAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		// find user
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		// find message
 
@@ -270,7 +263,7 @@ class ImChatPendingFormAction
 					conversation.getNumMessages ())
 
 				.setSenderUser (
-					myUser)
+					userConsoleLogic.userRequired ())
 
 				.setTimestamp (
 					transaction.now ())
@@ -337,7 +330,7 @@ class ImChatPendingFormAction
 
 		queueLogic.processQueueItem (
 			customerMessage.getQueueItem (),
-			myUser);
+			userConsoleLogic.userRequired ());
 
 		// done
 

@@ -10,11 +10,16 @@
   <classpathentry kind="lib" path="binaries/libraries/FastInfoset-jar-1.2.13.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/activation-jar-1.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/animal-sniffer-annotations-jar-1.14.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/ant-jar-1.9.2.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/ant-source-1.9.2.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/ant-launcher-jar-1.9.2.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/ant-jar-1.9.6.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/ant-source-1.9.6.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/ant-launcher-jar-1.9.6.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/antlr-jar-2.7.7.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/antlr4-runtime-jar-4.5.2-1.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/checkstyle-jar-6.17.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/checkstyle-source-6.17.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/classmate-bundle-1.1.0.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/commons-beanutils-jar-1.9.2.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/commons-cli-jar-1.3.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/commons-codec-jar-1.9.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/commons-collections-jar-3.2.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/commons-compress-jar-1.10.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/commons-csv-jar-1.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/commons-fileupload-jar-1.3.1.jar" sourcepath="/home/vagrant/wbs-hades/binaries/libraries/commons-fileupload-source-1.3.1.jar"/>

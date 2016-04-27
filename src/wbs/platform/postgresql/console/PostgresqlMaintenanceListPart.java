@@ -1,6 +1,5 @@
 package wbs.platform.postgresql.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -11,16 +10,19 @@ import java.util.TreeSet;
 
 import javax.inject.Inject;
 
+import org.joda.time.Duration;
+
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.etc.Misc;
 import wbs.platform.postgresql.model.PostgresqlMaintenanceFrequency;
 import wbs.platform.postgresql.model.PostgresqlMaintenanceRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("postgresqlMaintenanceListPart")
 public
@@ -33,7 +35,7 @@ class PostgresqlMaintenanceListPart
 	PostgresqlMaintenanceConsoleHelper postgresqlMaintenanceHelper;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	// state
 
@@ -121,21 +123,26 @@ class PostgresqlMaintenanceListPart
 			printFormat (
 				"<tr class=\"sep\">\n");
 
-			long totalDuration = 0;
+			Duration totalDuration =
+				maintenancesByFrequency.get (
+					frequency)
 
-			for (
-				PostgresqlMaintenanceRec maintenance
-					: maintenancesByFrequency.get (
-						frequency)
-			) {
+				.stream ()
 
-				if (maintenance.getLastDuration () == null)
-					continue;
+				.map (
+					PostgresqlMaintenanceRec::getLastDuration)
 
-				totalDuration +=
-					maintenance.getLastDuration ();
+				.filter (
+					Misc::isNotNull)
 
-			}
+				.map (
+					Duration::new)
+
+				.reduce ((left, right) ->
+					left.plus (right))
+
+				.orElse (
+					Duration.ZERO);
 
 			printFormat (
 				"<tr style=\"font-weight: bold\">\n");
@@ -146,7 +153,7 @@ class PostgresqlMaintenanceListPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				requestContext.prettyMsInterval (
+				userConsoleLogic.prettyDuration (
 					totalDuration));
 
 			printFormat (
@@ -183,17 +190,16 @@ class PostgresqlMaintenanceListPart
 				printFormat (
 					"<td>%h</td>\n",
 					ifNull (
-						timeFormatter.instantToTimestampString (
-							timeFormatter.defaultTimezone (),
-							dateToInstant (
-								postgresqlMaintenance.getLastRun ())),
+						userConsoleLogic.timestampWithTimezoneString (
+							postgresqlMaintenance.getLastRun ()),
 						"-"));
 
 				printFormat (
 					"<td>%h</td>\n",
 					ifNull (
-						requestContext.prettyMsInterval (
-							postgresqlMaintenance.getLastDuration ()),
+						userConsoleLogic.prettyDuration (
+							new Duration (
+								postgresqlMaintenance.getLastDuration ())),
 						"-"));
 
 				printFormat (

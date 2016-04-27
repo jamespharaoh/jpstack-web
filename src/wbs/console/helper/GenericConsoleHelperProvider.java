@@ -23,7 +23,7 @@ import lombok.extern.log4j.Log4j;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.context.ConsoleContextStuffSpec;
 import wbs.console.module.ConsoleManager;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.request.Cryptor;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -65,7 +65,7 @@ class GenericConsoleHelperProvider
 	Provider<ConsoleRequestContext> requestContext;
 
 	@Inject
-	Provider<PrivChecker> privChecker;
+	Provider<UserPrivChecker> privChecker;
 
 	// required properties
 
@@ -297,8 +297,8 @@ class GenericConsoleHelperProvider
 
 		// set privs
 
-		PrivChecker privChecker =
-			(PrivChecker)
+		UserPrivChecker privChecker =
+			(UserPrivChecker)
 			this.privChecker.get ();
 
 		for (

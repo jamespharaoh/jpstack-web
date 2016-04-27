@@ -10,8 +10,7 @@ import javax.servlet.ServletException;
 
 import lombok.extern.log4j.Log4j;
 
-import com.google.common.base.Optional;
-
+import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.part.NotFoundPart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.tab.Tab;
@@ -31,7 +30,7 @@ class ConsoleNotFoundHandler
 	// dependencies
 
 	@Inject
-	ConsoleRequestContext requestContext;
+	ConsoleUserHelper consoleUserHelper;
 
 	@Inject
 	ExceptionLogger exceptionLogger;
@@ -41,6 +40,11 @@ class ConsoleNotFoundHandler
 
 	@Inject
 	Provider<NotFoundPart> notFoundPart;
+
+	@Inject
+	ConsoleRequestContext requestContext;
+
+	// prototype dependencies
 
 	@Inject
 	Provider<TabbedResponder> tabbedPage;
@@ -90,8 +94,7 @@ class ConsoleNotFoundHandler
 				path,
 				"Not found",
 				"The specified path was not found",
-				Optional.fromNullable (
-					requestContext.userId ()),
+				consoleUserHelper.loggedInUserId (),
 				GenericExceptionResolution.ignoreWithUserWarning);
 
 		} catch (RuntimeException exception) {

@@ -6,9 +6,9 @@ import javax.inject.Inject;
 
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatUserAdminDobPart")
 public
@@ -59,7 +59,7 @@ class ChatUserAdminDobPart
 			" value=\"%h\"></p>\n",
 			ifNull (
 				requestContext.getForm ("dob"),
-				timeFormatter.localDateToDateString (
+				timeFormatter.dateString (
 					chatUser.getDob ()),
 				""));
 

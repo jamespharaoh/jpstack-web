@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
@@ -25,8 +24,8 @@ import wbs.framework.web.Responder;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 
 @PrototypeComponent ("chatUserAdminInfoAction")
@@ -59,6 +58,9 @@ class ChatUserAdminInfoAction
 
 	@Inject
 	TextObjectHelper textHelper;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -118,10 +120,6 @@ class ChatUserAdminInfoAction
 
 		// load database objects
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		ChatUserRec chatUser =
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
@@ -147,8 +145,7 @@ class ChatUserAdminInfoAction
 					chatUser)
 
 				.setCreationTime (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setOriginalText (
 					oldInfoText)
@@ -160,7 +157,7 @@ class ChatUserAdminInfoAction
 					ChatUserInfoStatus.console)
 
 				.setModerator (
-					myUser)
+					userConsoleLogic.userRequired ())
 
 				.setEditReason (
 					editReason)

@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.supervisor.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -24,9 +23,9 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
@@ -172,11 +171,10 @@ class ChatSupervisorMessagesPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimeString (
+				timeFormatter.timeString (
 					chatMiscLogic.timezone (
 						chat),
-					dateToInstant (
-						chatMessage.getTimestamp ())));
+					chatMessage.getTimestamp ()));
 
 			printFormat (
 				"<td>%h</td>\n",

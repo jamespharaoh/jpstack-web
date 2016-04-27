@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.bill.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import java.util.List;
@@ -18,6 +17,7 @@ import wbs.clients.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditSearch;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 
 public
 class ChatUserCreditDaoHibernate
@@ -43,15 +43,15 @@ class ChatUserCreditDaoHibernate
 				"chat",
 				chat)
 
-			.setTimestamp (
+			.setParameter (
 				"timestampFrom",
-				instantToDate (
-					timestampInterval.getStart ()))
+				timestampInterval.getStart (),
+				TimestampWithTimezoneUserType.INSTANCE)
 
-			.setTimestamp (
+			.setParameter (
 				"timestampTo",
-				instantToDate (
-					timestampInterval.getEnd ()))
+				timestampInterval.getEnd (),
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.list ());
 
@@ -96,14 +96,12 @@ class ChatUserCreditDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_chatUserCredit.timestamp",
-					instantToDate (
-						search.timestamp ().start ())));
+					search.timestamp ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUserCredit.timestamp",
-					instantToDate (
-						search.timestamp ().end ())));
+					search.timestamp ().end ()));
 
 		}
 

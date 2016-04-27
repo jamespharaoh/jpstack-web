@@ -28,8 +28,8 @@ import com.google.common.base.Optional;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.utils.ThreadManager;
 import wbs.platform.daemon.AbstractDaemonService;
-import wbs.platform.daemon.ThreadManager;
 
 @Log4j
 @SingletonComponent ("pgMaint")
@@ -222,7 +222,7 @@ class PostgresqlMaintenanceDaemon
 						"daemon",
 						getClass ().getSimpleName (),
 						exception,
-						Optional.<Integer>absent (),
+						Optional.absent (),
 						GenericExceptionResolution.tryAgainLater);
 
 				}
@@ -235,7 +235,7 @@ class PostgresqlMaintenanceDaemon
 				"daemon",
 				getClass ().getSimpleName (),
 				exception,
-				Optional.<Integer>absent (),
+				Optional.absent (),
 				GenericExceptionResolution.tryAgainLater);
 
 		}

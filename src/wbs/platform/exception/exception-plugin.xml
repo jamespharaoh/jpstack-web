@@ -8,17 +8,13 @@
 	</sql-scripts>
 
 	<models>
-
 		<enum-type name="concreteExceptionResolution"/>
-
 		<model name="exceptionLog"/>
 		<model name="exceptionLogType"/>
-
 	</models>
 
 	<layer name="logic">
 		<bean class="logic.ExceptionLogLogicImplementation"/>
-		<bean class="logic.ExceptionLoggerImplementation"/>
 	</layer>
 
 	<layer name="daemon">

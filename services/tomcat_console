@@ -5,7 +5,10 @@ tomcat_console_stop_timeout=15
 tomcat_console_kill_timeout=5
 
 function tomcat_console_is_running_1 {
-	ps ax | grep Dcatalina.base=/home/ubuntu/tomcat-console | grep -v grep >/dev/null
+	ps ax \
+		| grep -- -Dcatalina.base=/home/ubuntu/tomcat-console \
+		| grep -v console-test \
+		| grep -v grep >/dev/null
 }
 
 function tomcat_console_is_running_2 {

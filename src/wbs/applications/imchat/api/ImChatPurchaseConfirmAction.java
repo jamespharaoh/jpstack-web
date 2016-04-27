@@ -247,9 +247,13 @@ class ImChatPurchaseConfirmAction
 				+ customer.getBalance ()
 				+ purchase.getValue ())
 
-			.setTotalPurchase (
-				+ customer.getTotalPurchase ()
+			.setTotalPurchaseValue (
+				+ customer.getTotalPurchaseValue ()
 				+ purchase.getValue ())
+
+			.setTotalPurchasePrice (
+				+ customer.getTotalPurchasePrice ()
+				+ purchase.getPrice ())
 
 			.setLastSession (
 				transaction.now ());

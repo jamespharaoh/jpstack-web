@@ -15,8 +15,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.gsm.Gsm;
 
 @PrototypeComponent ("chatUserHelpFormAction")
@@ -37,7 +36,7 @@ class ChatUserHelpFormAction
 	Database database;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	@Override
 	public
@@ -78,10 +77,6 @@ class ChatUserHelpFormAction
 
 		// get objects
 
-		UserRec user =
-			userHelper.find (
-				requestContext.userId ());
-
 		ChatUserRec chatUser =
 			chatUserHelper.find (
 				requestContext.stuffInt (
@@ -90,7 +85,7 @@ class ChatUserHelpFormAction
 		// send message
 
 		chatHelpLogic.sendHelpMessage (
-			user,
+			userConsoleLogic.userRequired (),
 			chatUser,
 			text,
 			Optional.<Long>absent (),

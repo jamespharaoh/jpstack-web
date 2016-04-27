@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.toStringNull;
 
@@ -12,9 +11,9 @@ import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateLogRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatUserAdminDatePart")
 public
@@ -177,8 +176,10 @@ class ChatUserAdminDatePart
 			"<th>Number</th>\n",
 			"</tr>\n");
 
-		for (ChatUserDateLogRec chatUserDateLogRec
-				: chatUser.getChatUserDateLogs ()) {
+		for (
+			ChatUserDateLogRec chatUserDateLogRec
+				: chatUser.getChatUserDateLogs ()
+		) {
 
 			printFormat (
 				"<tr>\n");
@@ -186,11 +187,10 @@ class ChatUserAdminDatePart
 			printFormat (
 				"<td>%h</td>\n",
 				chatUserDateLogRec.getTimestamp () != null
-					? timeFormatter.instantToTimestampString (
+					? timeFormatter.timestampTimezoneString (
 						chatUserLogic.timezone (
 							chatUser),
-						dateToInstant (
-							chatUserDateLogRec.getTimestamp ()))
+						chatUserDateLogRec.getTimestamp ())
 					: "-");
 
 			if (chatUserDateLogRec.getUser () != null) {

@@ -7,7 +7,6 @@ import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -2588,7 +2587,7 @@ class ChatApiServletModule
 			chatUser
 
 				.setLastMessagePoll (
-					instantToDate (now));
+					now);
 
 			// update the last poll message id
 
@@ -2682,19 +2681,33 @@ class ChatApiServletModule
 					Rpc.rpcStruct (
 						"message",
 
-						Rpc.rpcElem ("id", message.getId ()),
+						Rpc.rpcElem (
+							"id",
+							message.getId ()),
 
-						Rpc.rpcElem ("delivery-id", message.getDeliveryId ()),
+						Rpc.rpcElem (
+							"delivery-id",
+							message.getDeliveryId ()),
 
-						Rpc.rpcElem ("from-type", message.getFromUser ().getType ().toString ()),
+						Rpc.rpcElem (
+							"from-type",
+							message.getFromUser ().getType ().toString ()),
 
-						Rpc.rpcElem ("from-code", message.getFromUser ().getCode ()),
+						Rpc.rpcElem (
+							"from-code",
+							message.getFromUser ().getCode ()),
 
-						Rpc.rpcElem ("to-code", message.getToUser ().getCode ()),
+						Rpc.rpcElem (
+							"to-code",
+							message.getToUser ().getCode ()),
 
-						Rpc.rpcElem ("timestamp", message.getTimestamp ().getTime ()),
+						Rpc.rpcElem (
+							"timestamp",
+							message.getTimestamp ().getMillis ()),
 
-						Rpc.rpcElem ("text", message.getEditedText ().getText ()));
+						Rpc.rpcElem (
+							"text",
+							message.getEditedText ().getText ()));
 
 				if (! message.getMedias ().isEmpty ()) {
 
@@ -3158,7 +3171,7 @@ class ChatApiServletModule
 
 						Rpc.rpcElem (
 							"creation-time",
-							chatUserImage.getTimestamp ().getTime ()));
+							chatUserImage.getTimestamp ().getMillis ()));
 
 				if (chatUserImage.getFullMedia () != null) {
 
@@ -3172,7 +3185,9 @@ class ChatApiServletModule
 				if (chatUserImage.getModerationTime () != null) {
 
 					respImage.add (
-						Rpc.rpcElem ("moderation-time", chatUserImage.getModerationTime ().getTime ()));
+						Rpc.rpcElem (
+							"moderation-time",
+							chatUserImage.getModerationTime ().getMillis ()));
 
 				}
 
@@ -3184,11 +3199,11 @@ class ChatApiServletModule
 			respOtherImages =
 				Rpc.rpcList ("other-images", "image", RpcType.rStructure);
 
-			for (ChatUserImageRec cui : chatUser.getChatUserImages ()) {
+			for (ChatUserImageRec chatUserImage : chatUser.getChatUserImages ()) {
 
-				if (cui.getType () != type) continue;
+				if (chatUserImage.getType () != type) continue;
 
-				if (! in (cui.getStatus (),
+				if (! in (chatUserImage.getStatus (),
 						ChatUserInfoStatus.moderatorPending,
 						ChatUserInfoStatus.moderatorRejected))
 					continue;
@@ -3200,44 +3215,55 @@ class ChatApiServletModule
 
 						Rpc.rpcElem (
 							"image-id",
-							cui.getId ()),
+							chatUserImage.getId ()),
 
 						Rpc.rpcElem (
 							"media-id",
-							cui.getMedia ().getId ()),
+							chatUserImage.getMedia ().getId ()),
 
 						Rpc.rpcElem (
 							"classification",
-							cui.getClassification ()),
+							chatUserImage.getClassification ()),
 
 						Rpc.rpcElem (
 							"selected",
-							cui == chatUserLogic.getMainChatUserImageByType (
+							chatUserImage == chatUserLogic.getMainChatUserImageByType (
 								chatUser,
 								type)),
 
 						Rpc.rpcElem (
 							"status",
 							chatUserInfoStatusMuneMap.get (
-								cui.getStatus ())),
+								chatUserImage.getStatus ())),
 
 						Rpc.rpcElem (
 							"creation-time",
-							cui.getTimestamp ().getTime ()));
+							chatUserImage.getTimestamp ().getMillis ()));
 
-				if (cui.getFullMedia () != null) {
+				if (chatUserImage.getFullMedia () != null) {
 
 					respImage.add (
-						Rpc.rpcElem ("full-media-id", cui.getFullMedia ().getId ()),
-						Rpc.rpcElem ("full-media-filename", cui.getFullMedia ().getFilename ()),
-						Rpc.rpcElem ("full-media-mime-type", cui.getFullMedia ().getMediaType ().getMimeType ()));
+
+						Rpc.rpcElem (
+							"full-media-id",
+							chatUserImage.getFullMedia ().getId ()),
+
+						Rpc.rpcElem (
+							"full-media-filename",
+							chatUserImage.getFullMedia ().getFilename ()),
+
+						Rpc.rpcElem (
+							"full-media-mime-type",
+							chatUserImage.getFullMedia ().getMediaType ().getMimeType ()));
 
 				}
 
-				if (cui.getModerationTime () != null) {
+				if (chatUserImage.getModerationTime () != null) {
 
 					respImage.add (
-						Rpc.rpcElem ("moderation-time", cui.getModerationTime ().getTime ()));
+						Rpc.rpcElem (
+							"moderation-time",
+							chatUserImage.getModerationTime ().getMillis ()));
 
 				}
 
@@ -3430,8 +3456,7 @@ class ChatApiServletModule
 						chatUser)
 
 					.setTimestamp (
-						instantToDate (
-							transaction.now ()))
+						transaction.now ())
 
 					.setCreditAmount (
 						ifNull (

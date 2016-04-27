@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.help.logic;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import javax.inject.Inject;
 
 import lombok.NonNull;
@@ -66,8 +64,7 @@ class ChatHelpLogLogicImplementation
 				chatUser)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setMessage (
 				message)
@@ -129,8 +126,7 @@ class ChatHelpLogLogicImplementation
 				chatUser)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setReplyTo (
 				replyTo.orNull ())

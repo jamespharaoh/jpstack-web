@@ -10,7 +10,6 @@ import lombok.Cleanup;
 import org.joda.time.Instant;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -18,7 +17,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.smsapps.subscription.logic.SubscriptionLogic;
 import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionSendRec;
@@ -50,7 +49,7 @@ class SubscriptionSendControlAction
 	SubscriptionSendConsoleHelper subscriptionSendHelper;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserConsoleHelper userHelper;
@@ -76,10 +75,6 @@ class SubscriptionSendControlAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		SubscriptionSendRec subscriptionSend =
 			subscriptionSendHelper.find (
@@ -108,7 +103,7 @@ class SubscriptionSendControlAction
 			subscriptionLogic.scheduleSend (
 				subscriptionSend,
 				transaction.now (),
-				myUser);
+				userConsoleLogic.userRequired ());
 
 			transaction.commit ();
 
@@ -142,8 +137,7 @@ class SubscriptionSendControlAction
 			try {
 
 				scheduledTime =
-					timeFormatter.timestampStringToInstant (
-						timeFormatter.defaultTimezone (),
+					userConsoleLogic.timestampStringToInstant (
 						requestContext.parameter ("timestamp"));
 
 			} catch (Exception exception) {
@@ -158,7 +152,7 @@ class SubscriptionSendControlAction
 			subscriptionLogic.scheduleSend (
 				subscriptionSend,
 				scheduledTime,
-				myUser);
+				userConsoleLogic.userRequired ());
 
 			transaction.commit ();
 
@@ -204,7 +198,7 @@ class SubscriptionSendControlAction
 
 			eventLogic.createEvent (
 				"subscription_send_unscheduled",
-				myUser,
+				userConsoleLogic.userRequired (),
 				subscriptionSend);
 
 			transaction.commit ();
@@ -259,7 +253,7 @@ class SubscriptionSendControlAction
 
 				eventLogic.createEvent (
 					"subscription_send_cancelled",
-					myUser,
+					userConsoleLogic.userRequired (),
 					subscriptionSend);
 
 				transaction.commit ();
@@ -284,7 +278,7 @@ class SubscriptionSendControlAction
 
 				eventLogic.createEvent (
 					"subscription_send_cancelled",
-					myUser,
+					userConsoleLogic.userRequired (),
 					subscriptionSend);
 
 				transaction.commit ();

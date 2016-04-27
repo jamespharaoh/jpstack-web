@@ -2,8 +2,8 @@
 	name="framework-exception"
 	package="wbs.framework.exception">
 
-	<layer name="logic">
-		<bean class="ExceptionLogicImplementation"/>
+	<layer name="utils">
+		<bean class="ExceptionUtilsImplementation"/>
 	</layer>
 
 </plugin>

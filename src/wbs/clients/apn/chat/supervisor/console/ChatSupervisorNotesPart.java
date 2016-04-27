@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.supervisor.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -14,10 +12,10 @@ import wbs.clients.apn.chat.core.console.ChatConsoleHelper;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.reporting.StatsPeriod;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatSupervisorNotesPart")
@@ -113,11 +111,10 @@ class ChatSupervisorNotesPart
 					chatContactNote.getConsoleUser ()),
 
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimestampString (
+				timeFormatter.timestampTimezoneString (
 					chatMiscLogic.timezone (
 						chat),
-					dateToInstant (
-						chatContactNote.getTimestamp ())),
+					chatContactNote.getTimestamp ()),
 
 				"</tr>\n");
 

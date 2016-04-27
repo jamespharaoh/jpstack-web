@@ -102,12 +102,12 @@ class ManualResponderNumberDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_manualResponderNumber.firstRequest",
-					search.firstRequest ().value ().getStart ().toInstant ()));
+					search.firstRequest ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_manualResponderNumber.firstRequest",
-					search.firstRequest ().value ().getEnd ().toInstant ()));
+					search.firstRequest ().end ()));
 
 		}
 
@@ -119,12 +119,12 @@ class ManualResponderNumberDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_manualResponderNumber.lastRequest",
-					search.lastRequest ().value ().getStart ().toInstant ()));
+					search.lastRequest ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_manualResponderNumber.lastRequest",
-					search.lastRequest ().value ().getEnd ().toInstant ()));
+					search.lastRequest ().end ()));
 
 		}
 

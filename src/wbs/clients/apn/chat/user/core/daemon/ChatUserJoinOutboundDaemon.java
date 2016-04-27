@@ -1,8 +1,6 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.earlierThan;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -118,7 +116,7 @@ class ChatUserJoinOutboundDaemon
 						"chat user ",
 						chatUser.getId ()),
 					exception,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}
@@ -150,8 +148,7 @@ class ChatUserJoinOutboundDaemon
 
 			|| earlierThan (
 				transaction.now (),
-				dateToInstant (
-					user.getNextJoinOutbound ()))
+				user.getNextJoinOutbound ())
 
 		) {
 
@@ -206,8 +203,7 @@ class ChatUserJoinOutboundDaemon
 				ChatUserInitiationReason.joinUser)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 		);
 

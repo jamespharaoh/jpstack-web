@@ -39,7 +39,7 @@ import wbs.console.misc.JqueryEditableScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 
@@ -63,7 +63,7 @@ class ImChatPendingSummaryPart
 	ImChatMessageObjectHelper imChatMessageHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	// state
 

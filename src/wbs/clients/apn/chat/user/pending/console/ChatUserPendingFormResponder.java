@@ -23,7 +23,7 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -48,7 +48,7 @@ class ChatUserPendingFormResponder
 	ChatUserLogic chatUserLogic;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	ConsoleRequestContext requestContext;

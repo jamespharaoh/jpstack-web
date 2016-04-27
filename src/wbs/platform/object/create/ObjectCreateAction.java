@@ -1,7 +1,9 @@
 package wbs.platform.object.create;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.instantToDateNullSafe;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toInteger;
 
@@ -22,13 +24,14 @@ import com.google.common.collect.ImmutableMap;
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
+import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -41,9 +44,7 @@ import wbs.platform.event.logic.EventLogic;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
-import wbs.services.ticket.core.console.FieldsProvider;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCreateAction")
@@ -75,7 +76,7 @@ class ObjectCreateAction<
 	ObjectTypeObjectHelper objectTypeHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -87,7 +88,7 @@ class ObjectCreateAction<
 	TextObjectHelper textHelper;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// properties
 
@@ -162,20 +163,23 @@ class ObjectCreateAction<
 			database.beginReadWrite (
 				this);
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		// determine parent
 
 		determineParent ();
 
-		if (parent == null)
+		if (
+			isNull (
+				parent)
+		) {
 			return null;
+		}
 
 		// check permissions
 
-		if (createPrivCode != null) {
+		if (
+			isNotNull (
+				createPrivCode)
+		) {
 
 			Record<?> createDelegate =
 				createPrivDelegate != null
@@ -184,9 +188,11 @@ class ObjectCreateAction<
 						createPrivDelegate)
 					: parent;
 
-			if (! privChecker.canRecursive (
+			if (
+				! privChecker.canRecursive (
 					createDelegate,
-					createPrivCode)) {
+					createPrivCode)
+			) {
 
 				requestContext.addError (
 					"Permission denied");
@@ -204,8 +210,14 @@ class ObjectCreateAction<
 
 		// set parent
 
-		if (parent != null
-				&& ! parentHelper.isRoot ()) {
+		if (
+
+			isNotNull (
+				parent)
+
+			&& ! parentHelper.isRoot ()
+
+		) {
 
 			consoleHelper.setParent (
 				object,
@@ -274,7 +286,7 @@ class ObjectCreateAction<
 				BeanLogic.setProperty (
 					object,
 					createTimeFieldName,
-					instantToDate (
+					instantToDateNullSafe (
 						transaction.now ()));
 
 			} else {
@@ -292,7 +304,7 @@ class ObjectCreateAction<
 			BeanLogic.setProperty (
 				object,
 				createUserFieldName,
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		}
 
@@ -322,7 +334,7 @@ class ObjectCreateAction<
 
 			eventLogic.createEvent (
 				"object_created_in",
-				myUser,
+				userConsoleLogic.userRequired (),
 				objectRef,
 				consoleHelper.shortName (),
 				parent);
@@ -331,7 +343,7 @@ class ObjectCreateAction<
 
 			eventLogic.createEvent (
 				"object_created",
-				myUser,
+				userConsoleLogic.userRequired (),
 				object,
 				parent);
 

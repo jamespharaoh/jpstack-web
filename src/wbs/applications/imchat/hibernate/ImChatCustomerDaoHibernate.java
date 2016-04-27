@@ -1,6 +1,7 @@
 package wbs.applications.imchat.hibernate;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.toInstant;
 
 import java.util.List;
 
@@ -103,12 +104,12 @@ class ImChatCustomerDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_imChatCustomer.firstSession",
-					imChatCustomerSearch.firstSession ().value ().getStart ()));
+					imChatCustomerSearch.firstSession ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_imChatCustomer.firstSession",
-					imChatCustomerSearch.firstSession ().value ().getEnd ()));
+					imChatCustomerSearch.firstSession ().end ()));
 
 		}
 
@@ -120,12 +121,14 @@ class ImChatCustomerDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_imChatCustomer.lastSession",
-					imChatCustomerSearch.lastSession ().value ().getStart ()));
+					toInstant (
+						imChatCustomerSearch.lastSession ().start ())));
 
 			criteria.add (
 				Restrictions.lt (
 					"_imChatCustomer.lastSession",
-					imChatCustomerSearch.lastSession ().value ().getEnd ()));
+					toInstant (
+						imChatCustomerSearch.lastSession ().end ())));
 
 		}
 
@@ -138,7 +141,8 @@ class ImChatCustomerDaoHibernate
 			criteria
 
 				.addOrder (
-					Order.desc ("_imChatCustomer.lastSession"));
+					Order.desc (
+						"_imChatCustomer.lastSession"));
 
 			break;
 
@@ -147,7 +151,8 @@ class ImChatCustomerDaoHibernate
 			criteria
 
 				.addOrder (
-					Order.desc ("_imChatCustomer.totalPurchase"));
+					Order.desc (
+						"_imChatCustomer.totalPurchase"));
 
 			break;
 
@@ -156,7 +161,8 @@ class ImChatCustomerDaoHibernate
 			criteria
 
 				.addOrder (
-					Order.desc ("_imChatCustomer.balance"));
+					Order.desc (
+						"_imChatCustomer.balance"));
 
 			break;
 

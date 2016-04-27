@@ -13,6 +13,13 @@
 			name="ant"
 			rev="1.9.2"/>
 
+		<!-- check style -->
+
+		<dependency
+			org="com.puppycrawl.tools"
+			name="checkstyle"
+			rev="6.17" />
+
 		<!-- commons -->
 
 		<dependency

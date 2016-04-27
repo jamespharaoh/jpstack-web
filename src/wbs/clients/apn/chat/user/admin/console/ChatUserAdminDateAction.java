@@ -17,13 +17,15 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatUserAdminDateAction")
 public
 class ChatUserAdminDateAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ChatDateLogic chatDateLogic;
@@ -38,14 +40,23 @@ class ChatUserAdminDateAction
 	Database database;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
 	Responder backupResponder () {
-		return responder ("chatUserAdminDateResponder");
+
+		return responder (
+			"chatUserAdminDateResponder");
 
 	}
+
+	// implementation
 
 	@Override
 	public
@@ -127,13 +138,9 @@ class ChatUserAdminDateAction
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		chatDateLogic.userDateStuff (
 			chatUser,
-			myUser,
+			userConsoleLogic.userRequired (),
 			null,
 			dateMode,
 			radius,

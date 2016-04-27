@@ -666,4 +666,15 @@
 
 	</event-types>
 
+	<priv-types>
+
+		<!-- chat -->
+
+		<priv-type
+			name="Chat user create"
+			description="Create a new user for an SMS chat service"
+			template="yes"/>
+
+	</priv-types>
+
 </model-meta>

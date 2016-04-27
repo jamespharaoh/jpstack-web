@@ -17,7 +17,6 @@ import lombok.experimental.Accessors;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -26,8 +25,8 @@ import wbs.framework.database.Transaction;
 import wbs.framework.utils.TextualInterval;
 import wbs.platform.misc.CachedGetter;
 import wbs.platform.status.console.StatusLine;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 import wbs.smsapps.manualresponder.model.ManualResponderOperatorReport;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestSearch;
@@ -49,7 +48,7 @@ class ManualResponderStatusLine
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -61,8 +60,8 @@ class ManualResponderStatusLine
 
 	// state
 
-	Map<Integer,PerOperatorCaches> cachesByUserId =
-		new HashMap<Integer,PerOperatorCaches> ();
+	Map<Long,PerOperatorCaches> cachesByUserId =
+		new HashMap<> ();
 
 	// details
 
@@ -90,7 +89,7 @@ class ManualResponderStatusLine
 
 		PerOperatorCaches caches =
 			cachesByUserId.get (
-				requestContext.userId ());
+				userConsoleLogic.userIdRequired ());
 
 		if (caches == null) {
 
@@ -98,10 +97,10 @@ class ManualResponderStatusLine
 				new PerOperatorCaches ()
 
 				.operatorUserId (
-					requestContext.userId ());
+					userConsoleLogic.userIdRequired ());
 
 			cachesByUserId.put (
-				requestContext.userId (),
+				userConsoleLogic.userIdRequired (),
 				caches);
 
 		}
@@ -121,7 +120,7 @@ class ManualResponderStatusLine
 	class PerOperatorCaches {
 
 		@Getter @Setter
-		Integer operatorUserId;
+		Long operatorUserId;
 
 		class NumTodayCache
 			extends CachedGetter<Long> {
@@ -138,10 +137,6 @@ class ManualResponderStatusLine
 				Transaction transaction =
 					database.currentTransaction ();
 
-				UserRec myUser =
-					userHelper.find (
-						requestContext.userId ());
-
 				Instant startOfDay =
 					transaction.now ()
 						.toDateTime ()
@@ -154,11 +149,12 @@ class ManualResponderStatusLine
 						new ManualResponderRequestSearch ()
 
 					.processedByUserId (
-						myUser.getId ())
+						(int) (long)
+						userConsoleLogic.userIdRequired ())
 
 					.processedTime (
 						TextualInterval.forInterval (
-							timeFormatter.defaultTimezone (),
+							userConsoleLogic.timezone (),
 							new Interval (
 								startOfDay,
 								transaction.now ())))
@@ -201,10 +197,6 @@ class ManualResponderStatusLine
 				Transaction transaction =
 					database.currentTransaction ();
 
-				UserRec myUser =
-					userHelper.find (
-						requestContext.userId ());
-
 				Integer hourOfDay =
 					transaction.now ()
 						.toDateTime ()
@@ -223,11 +215,12 @@ class ManualResponderStatusLine
 						new ManualResponderRequestSearch ()
 
 					.processedByUserId (
-						myUser.getId ())
+						(int) (long)
+						userConsoleLogic.userIdRequired ())
 
 					.processedTime (
 						TextualInterval.forInterval (
-							timeFormatter.defaultTimezone (),
+							userConsoleLogic.timezone (),
 							new Interval (
 								startOfHour,
 								transaction.now ())))

@@ -23,7 +23,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("imChatCustomerCreditAction")
 public
@@ -49,6 +49,9 @@ class ImChatCustomerCreditAction
 
 	@Inject
 	ConsoleRequestContext requestContext;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserConsoleHelper userHelper;
@@ -77,10 +80,6 @@ class ImChatCustomerCreditAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		// process form fields
 
@@ -145,7 +144,7 @@ class ImChatCustomerCreditAction
 				transaction.now ())
 
 			.setUser (
-				myUser)
+				userConsoleLogic.userRequired ())
 
 			.setReason (
 				request.reason ())
@@ -176,8 +175,12 @@ class ImChatCustomerCreditAction
 				+ request.customer ().getBalance ()
 				+ request.creditAmount ())
 
-			.setTotalPurchase (
-				+ request.customer ().getTotalPurchase ()
+			.setTotalPurchaseValue (
+				+ request.customer ().getTotalPurchaseValue ()
+				+ request.creditAmount ())
+
+			.setTotalPurchasePrice (
+				+ request.customer ().getTotalPurchasePrice ()
 				+ request.billAmount ());
 
 		// complete transaction

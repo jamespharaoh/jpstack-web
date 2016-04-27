@@ -61,11 +61,14 @@ class ChatUserImageZipResponder
 		zipOutputStream.setMethod (
 			ZipOutputStream.STORED);
 
-		for (ChatUserRec chatUser
-				: chatUsers) {
+		for (
+			ChatUserRec chatUser
+				: chatUsers
+		) {
 
-			ZipEntry zent =
-				new ZipEntry (chatUser.getCode () + ".jpg");
+			ZipEntry zipEntry =
+				new ZipEntry (
+					chatUser.getCode () + ".jpg");
 
 			ChatUserImageRec chatUserImage =
 				chatUser.getChatUserImageList ().get (0);
@@ -73,12 +76,21 @@ class ChatUserImageZipResponder
 			byte[] data =
 				chatUserImage.getMedia ().getContent ().getData ();
 
-			zent.setSize (data.length);
-			zent.setCrc (getCrc32 (data));
-			zent.setTime (chatUserImage.getTimestamp ().getTime ());
+			zipEntry.setSize (
+				data.length);
 
-			zipOutputStream.putNextEntry (zent);
-			zipOutputStream.write (data);
+			zipEntry.setCrc (
+				getCrc32 (data));
+
+			zipEntry.setTime (
+				chatUserImage.getTimestamp ().getMillis ());
+
+			zipOutputStream.putNextEntry (
+				zipEntry);
+
+			zipOutputStream.write (
+				data);
+
 			zipOutputStream.closeEntry ();
 
 		}

@@ -20,8 +20,8 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.console.misc.IntervalFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.IntervalFormatter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("secondsFormFieldInterfaceMapping")

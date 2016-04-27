@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableSet;
 
 import wbs.console.html.ObsoleteDateField;
 import wbs.console.html.ObsoleteDateLinks;
-import wbs.console.misc.TimeFormatter;
+import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.part.PagePart;
@@ -63,7 +63,7 @@ class SupervisorPart
 	SupervisorHelper supervisorHelper;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	ConsoleUserHelper consoleUserHelper;
 
 	// properties
 
@@ -223,7 +223,7 @@ class SupervisorPart
 						supervisorConfig.spec ().offsetHours (),
 						0),
 					0),
-				timeFormatter.defaultTimezone ());
+				consoleUserHelper.timezone ());
 
 		endTime =
 			dateField.date
@@ -236,7 +236,7 @@ class SupervisorPart
 						supervisorConfig.spec ().offsetHours (),
 						0),
 					0),
-				timeFormatter.defaultTimezone ());
+				consoleUserHelper.timezone ());
 
 	}
 
@@ -491,10 +491,10 @@ class SupervisorPart
 				"<p class=\"warning\">This day contains %h ",
 				hoursInDay,
 				"hours due to a time change from %h ",
-				timeFormatter.dateTimeToTimezoneString (
+				consoleUserHelper.timezoneString (
 					startTime),
 				"to %h</p>\n",
-				timeFormatter.dateTimeToTimezoneString (
+				consoleUserHelper.timezoneString (
 					endTime));
 
 		}

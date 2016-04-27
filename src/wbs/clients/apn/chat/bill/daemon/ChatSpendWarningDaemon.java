@@ -112,7 +112,7 @@ class ChatSpendWarningDaemon
 					"daemon",
 					"ChatSpendWarningDaemon",
 					exception,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}

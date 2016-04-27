@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.graphs.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -125,8 +123,7 @@ class ChatGraphsDailyUsersImageResponder
 				: chatUserSessions) {
 
 			int index =
-				+ dateToInstant (
-						chatUserSession.getStartTime ())
+				+ chatUserSession.getStartTime ()
 					.toDateTime (
 						timezone)
 					.getDayOfMonth ()

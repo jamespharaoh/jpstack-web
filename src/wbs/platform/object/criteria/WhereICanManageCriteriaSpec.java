@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.module.ConsoleModuleData;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.record.Record;
@@ -20,7 +20,7 @@ class WhereICanManageCriteriaSpec
 	implements CriteriaSpec {
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Override
 	public

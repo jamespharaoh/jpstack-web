@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.broadcast.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -14,10 +13,10 @@ import wbs.clients.apn.chat.broadcast.model.ChatBroadcastRec;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.currency.logic.CurrencyLogic;
 
 @PrototypeComponent ("chatBroadcastListPart")
@@ -102,7 +101,7 @@ class ChatBroadcastListPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimestampString (
+				timeFormatter.timestampTimezoneString (
 					chatMiscLogic.timezone (
 						chat),
 					chatBroadcast.getCreatedTime ()));
@@ -164,38 +163,34 @@ class ChatBroadcastListPart
 			searchParams.add (
 				stringFormat (
 					"last action %s to %s",
-					timeFormatter.instantToTimestampString (
+					timeFormatter.timestampTimezoneString (
 						chatMiscLogic.timezone (
 							chat),
-						dateToInstant (
-							chatBroadcast.getSearchLastActionFrom ())),
-					timeFormatter.instantToTimestampString (
+						chatBroadcast.getSearchLastActionFrom ()),
+					timeFormatter.timestampTimezoneString (
 						chatMiscLogic.timezone (
 							chat),
-						dateToInstant (
-							chatBroadcast.getSearchLastActionTo ()))));
+						chatBroadcast.getSearchLastActionTo ())));
 
 		} else if (chatBroadcast.getSearchLastActionFrom () != null) {
 
 			searchParams.add (
 				stringFormat (
 					"last action from %s",
-					timeFormatter.instantToTimestampString (
+					timeFormatter.timestampTimezoneString (
 						chatMiscLogic.timezone (
 							chat),
-						dateToInstant (
-							chatBroadcast.getSearchLastActionFrom ()))));
+						chatBroadcast.getSearchLastActionFrom ())));
 
 		} else if (chatBroadcast.getSearchLastActionTo () != null) {
 
 			searchParams.add (
 				stringFormat (
 					"last action to %s",
-					timeFormatter.instantToTimestampString (
+					timeFormatter.timestampTimezoneString (
 						chatMiscLogic.timezone (
 							chat),
-						dateToInstant (
-							chatBroadcast.getSearchLastActionTo ()))));
+						chatBroadcast.getSearchLastActionTo ())));
 
 		}
 

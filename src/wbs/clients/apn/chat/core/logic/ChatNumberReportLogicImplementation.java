@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.core.logic;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -70,10 +70,9 @@ class ChatNumberReportLogicImplementation
 					numberReportRec.getLastSuccess (),
 					number.getNumber ()));
 
-			return dateToInstant (
-					numberReportRec.getLastSuccess ())
-				.isAfter (
-					sixMonthsAgo);
+			return laterThan (
+				numberReportRec.getLastSuccess (),
+				sixMonthsAgo);
 
 		}
 
@@ -85,10 +84,9 @@ class ChatNumberReportLogicImplementation
 					numberReportRec.getFirstFailure (),
 					number.getNumber ()));
 
-			return dateToInstant (
-					numberReportRec.getFirstFailure ())
-				.isAfter (
-					sixMonthsAgo);
+			return laterThan (
+				numberReportRec.getFirstFailure (),
+				sixMonthsAgo);
 
 		}
 

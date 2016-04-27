@@ -1,9 +1,11 @@
-package wbs.console.misc;
+package wbs.framework.utils;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
+import org.joda.time.ReadableDuration;
+import org.joda.time.ReadableInstant;
 
 import com.google.common.base.Optional;
 
@@ -12,28 +14,28 @@ interface TimeFormatter {
 
 	// instant to string
 
-	String instantToTimestampString (
+	String timestampString (
 			DateTimeZone timeZone,
-			Instant instant);
+			ReadableInstant instant);
 
-	String instantToTimestampTimezoneString (
+	String timestampTimezoneString (
 			DateTimeZone timeZone,
-			Instant instant);
+			ReadableInstant instant);
 
-	String instantToDateStringLong (
+	String dateStringLong (
 			DateTimeZone timeZone,
-			Instant instant);
+			ReadableInstant instant);
 
-	String instantToTimeString (
+	String timeString (
 			DateTimeZone timeZone,
-			Instant instant);
+			ReadableInstant instant);
 
-	String instantToDateStringShort (
+	String dateStringShort (
 			DateTimeZone timeZone,
-			Instant instant);
+			ReadableInstant instant);
 
-	String instantToHttpTimestampString (
-			Instant instant);
+	String httpTimestampString (
+			ReadableInstant instant);
 
 	// string to instant
 
@@ -43,10 +45,10 @@ interface TimeFormatter {
 
 	// datetime to string
 
-	String dateTimeToTimestampTimezoneString (
+	String timestampTimezoneString (
 			DateTime dateTime);
 
-	String dateTimeToTimezoneString (
+	String timezoneString (
 			DateTime dateTime);
 
 	// string to datetime
@@ -56,7 +58,7 @@ interface TimeFormatter {
 
 	// local date to string
 
-	String localDateToDateString (
+	String dateString (
 			LocalDate localDate);
 
 	// string to local date
@@ -67,9 +69,16 @@ interface TimeFormatter {
 	LocalDate dateStringToLocalDateRequired (
 			String string);
 
-	// time zones
+	// duration to string
 
-	DateTimeZone defaultTimezone ();
+	String prettyDuration (
+			ReadableInstant start,
+			ReadableInstant end);
+
+	String prettyDuration (
+			ReadableDuration interval);
+
+	// time zones
 
 	DateTimeZone timezone (
 			String name);

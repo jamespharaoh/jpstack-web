@@ -6,10 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.record.GlobalId;
 
 @Accessors (fluent = true)
@@ -21,10 +21,10 @@ class ErrorResponder
 	// dependencies
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionUtils exceptionLogic;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	ConsoleRequestContext requestContext;

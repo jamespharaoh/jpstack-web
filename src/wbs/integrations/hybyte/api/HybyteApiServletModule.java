@@ -31,7 +31,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.PathHandler;
@@ -74,7 +74,7 @@ class HybyteApiServletModule
 	ExceptionLogger exceptionLogger;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionUtils exceptionLogic;
 
 	@Inject
 	HybyteNetworkObjectHelper hybyteNetworkHelper;
@@ -245,7 +245,7 @@ class HybyteApiServletModule
 					exceptionLogic.throwableSummary (
 						exception),
 					stringBuilder.toString (),
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
 				throw new RuntimeException (

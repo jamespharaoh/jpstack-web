@@ -466,7 +466,7 @@ class UpdateManager {
 			Provider<? extends T> getter,
 			long reloadTimeMs,
 			String table,
-			int ref) {
+			long ref) {
 
 		return new UpdateGetterAdaptor<T> (
 			getter,
@@ -491,7 +491,7 @@ class UpdateManager {
 		Provider<? extends T> getter;
 		long reloadTimeMs;
 		String table;
-		int ref;
+		long ref;
 
 		boolean forceUpdate = false;
 
@@ -506,7 +506,7 @@ class UpdateManager {
 				Provider<? extends T> newGetter,
 				long newReloadTimeMs,
 				String newTable,
-				int newRef) {
+				long newRef) {
 
 			getter = newGetter;
 			reloadTimeMs = newReloadTimeMs;

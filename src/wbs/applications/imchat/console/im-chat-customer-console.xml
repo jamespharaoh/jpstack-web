@@ -133,7 +133,7 @@
 			currency="imChat.creditCurrency"/>
 
 		<currency-field
-			name="totalPurchase"
+			name="totalPurchasePrice"
 			label="Purchase"
 			currency="imChat.billingCurrency"/>
 

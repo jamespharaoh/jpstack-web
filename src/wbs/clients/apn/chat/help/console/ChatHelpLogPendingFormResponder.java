@@ -14,7 +14,7 @@ import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -36,7 +36,7 @@ class ChatHelpLogPendingFormResponder
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	// state
 

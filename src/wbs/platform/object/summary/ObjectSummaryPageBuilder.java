@@ -19,6 +19,7 @@ import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.forms.CodeFormFieldSpec;
 import wbs.console.forms.DescriptionFormFieldSpec;
+import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.IdFormFieldSpec;
 import wbs.console.forms.NameFormFieldSpec;
@@ -42,7 +43,6 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.record.Record;
-import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryPageBuilder")

@@ -4,6 +4,8 @@
 
 	<layer name="utils">
 		<bean class="RandomLogicImplementation"/>
+		<bean class="TimeFormatterImplementation"/>
+		<bean class="IntervalFormatterImplementation"/>
 	</layer>
 
 	<layer name="logic">

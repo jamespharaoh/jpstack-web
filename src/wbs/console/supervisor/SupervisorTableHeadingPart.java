@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 
-import wbs.console.misc.TimeFormatter;
+import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.reporting.StatsPeriod;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -24,7 +24,7 @@ class SupervisorTableHeadingPart
 	// dependencies
 
 	@Inject
-	TimeFormatter timeFormatter;
+	ConsoleUserHelper consoleUserHelper;
 
 	// properties
 
@@ -82,8 +82,9 @@ class SupervisorTableHeadingPart
 				"<th>%h</th>\n",
 				String.format (
 					"%02d",
-					step.toDateTime (
-							timeFormatter.defaultTimezone ())
+					step
+						.toDateTime (
+							consoleUserHelper.timezone ())
 						.getHourOfDay ()));
 
 		}

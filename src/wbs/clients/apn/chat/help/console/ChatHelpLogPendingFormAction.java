@@ -16,8 +16,8 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.logic.QueueLogic;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 import wbs.sms.gsm.Gsm;
 
 @PrototypeComponent ("chatHelpLogPendingFormAction")
@@ -41,6 +41,9 @@ class ChatHelpLogPendingFormAction
 
 	@Inject
 	Database database;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -104,16 +107,12 @@ class ChatHelpLogPendingFormAction
 		ChatUserRec chatUser =
 			helpRequest.getChatUser ();
 
-		UserRec user =
-			userHelper.find (
-				requestContext.userId ());
-
 		// send message
 
 		if (! ignore) {
 
 			chatHelpLogic.sendHelpMessage (
-				user,
+				userConsoleLogic.userRequired (),
 				chatUser,
 				text,
 				Optional.of (
@@ -127,7 +126,7 @@ class ChatHelpLogPendingFormAction
 
 		queueLogic.processQueueItem (
 			helpRequest.getQueueItem (),
-			user);
+			userConsoleLogic.userRequired ());
 
 		transaction.commit ();
 

@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -24,13 +22,15 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatUserAdminBillAction")
 public
 class ChatUserAdminBillAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ChatCreditLogic chatCreditLogic;
@@ -51,13 +51,20 @@ class ChatUserAdminBillAction
 	Database database;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
 	Responder backupResponder () {
 		return responder ("chatUserAdminBillResponder");
 	}
+
+	// implementation
 
 	@Override
 	public
@@ -76,10 +83,6 @@ class ChatUserAdminBillAction
 		ChatUserRec chatUser =
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		// lock prevents race condition between limit check and update
 
@@ -150,11 +153,10 @@ class ChatUserAdminBillAction
 				chatUser)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setUser (
-				myUser)
+				userConsoleLogic.userRequired ())
 
 		);
 

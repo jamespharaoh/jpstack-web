@@ -649,6 +649,7 @@ class FormFieldLogic {
 			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object,
 			@NonNull Map<String,Object> hints,
+			@NonNull String method,
 			@NonNull String actionUrl,
 			@NonNull String submitButtonLabel,
 			@NonNull FormType formType,
@@ -662,6 +663,7 @@ class FormFieldLogic {
 			updateResultSet,
 			object,
 			hints,
+			method,
 			actionUrl,
 			submitButtonLabel,
 			formType,
@@ -677,6 +679,7 @@ class FormFieldLogic {
 			@NonNull Optional<UpdateResultSet> updateResultSet,
 			@NonNull Object object,
 			@NonNull Map<String,Object> hints,
+			@NonNull String method,
 			@NonNull String actionUrl,
 			@NonNull String submitButtonLabel,
 			@NonNull FormType formType,
@@ -697,7 +700,8 @@ class FormFieldLogic {
 
 		htmlWriter.writeFormat (
 			"<form",
-			" method=\"post\"",
+			" method=\"%h\"",
+			method,
 			" action=\"%h\"",
 			actionUrl,
 			" enctype=\"%h\"",

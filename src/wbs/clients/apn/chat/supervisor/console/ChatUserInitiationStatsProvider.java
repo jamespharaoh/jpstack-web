@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.supervisor.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -81,8 +79,7 @@ class ChatUserInitiationStatsProvider
 			// work out which hour
 
 			Instant timestamp =
-				dateToInstant (
-					log.getTimestamp ());
+				log.getTimestamp ();
 
 			int hour =
 				period.assign (timestamp);

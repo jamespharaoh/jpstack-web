@@ -80,6 +80,7 @@ class ContextFormActionPart<FormState>
 			Optional.absent (),
 			formState,
 			ImmutableMap.of (),
+			"post",
 			requestContext.resolveLocalUrl (
 				localFile),
 			submitLabel,

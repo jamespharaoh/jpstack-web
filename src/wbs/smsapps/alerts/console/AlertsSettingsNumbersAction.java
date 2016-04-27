@@ -20,7 +20,7 @@ import lombok.Cleanup;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -28,7 +28,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.number.core.console.NumberConsoleHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.alerts.model.AlertsNumberRec;
@@ -57,10 +57,13 @@ class AlertsSettingsNumbersAction
 	NumberConsoleHelper numberHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	ConsoleRequestContext requestContext;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserConsoleHelper userHelper;
@@ -99,10 +102,6 @@ class AlertsSettingsNumbersAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		AlertsSettingsRec alertsSettings =
 			alertsSettingsHelper.find (
@@ -143,7 +142,7 @@ class AlertsSettingsNumbersAction
 
 				eventLogic.createEvent (
 					"alerts_number_deleted",
-					myUser,
+					userConsoleLogic.userRequired (),
 					alertsNumber.getId (),
 					alertsSettings);
 
@@ -182,7 +181,7 @@ class AlertsSettingsNumbersAction
 
 				eventLogic.createEvent (
 					"alerts_number_updated",
-					myUser,
+					userConsoleLogic.userRequired (),
 					"name",
 					alertsNumber.getId (),
 					alertsSettings,
@@ -215,7 +214,7 @@ class AlertsSettingsNumbersAction
 
 				eventLogic.createEvent (
 					"alerts_number_updated",
-					myUser,
+					userConsoleLogic.userRequired (),
 					"number",
 					alertsNumber.getId (),
 					alertsSettings,
@@ -253,7 +252,7 @@ class AlertsSettingsNumbersAction
 
 				eventLogic.createEvent (
 					"alerts_number_updated",
-					myUser,
+					userConsoleLogic.userRequired (),
 					"enabled",
 					alertsNumber.getId (),
 					alertsSettings,
@@ -350,13 +349,13 @@ class AlertsSettingsNumbersAction
 
 			eventLogic.createEvent (
 				"alerts_number_created",
-				myUser,
+				userConsoleLogic.userRequired (),
 				alertsNumber.getId (),
 				alertsSettings);
 
 			eventLogic.createEvent (
 				"alerts_number_updated",
-				myUser,
+				userConsoleLogic.userRequired (),
 				"name",
 				alertsNumber.getId (),
 				alertsSettings,
@@ -364,7 +363,7 @@ class AlertsSettingsNumbersAction
 
 			eventLogic.createEvent (
 				"alerts_number_updated",
-				myUser,
+				userConsoleLogic.userRequired (),
 				"number",
 				alertsNumber.getId (),
 				alertsSettings,
@@ -372,7 +371,7 @@ class AlertsSettingsNumbersAction
 
 			eventLogic.createEvent (
 				"alerts_number_updated",
-				myUser,
+				userConsoleLogic.userRequired (),
 				"enabled",
 				alertsNumber.getId (),
 				alertsSettings,

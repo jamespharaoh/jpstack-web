@@ -2,7 +2,6 @@ package wbs.clients.apn.chat.user.image.console;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
@@ -36,8 +35,8 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatUserImageUploadAction")
 public
@@ -69,6 +68,9 @@ class ChatUserImageUploadAction
 
 	@Inject
 	ConsoleRequestContext requestContext;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -209,10 +211,6 @@ class ChatUserImageUploadAction
 				requestContext.stuffInt (
 					"chatUserId"));
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		// create media
 
 		MediaRec media =
@@ -246,15 +244,13 @@ class ChatUserImageUploadAction
 				ChatUserInfoStatus.console)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setModerator (
-				myUser)
+				userConsoleLogic.userRequired ())
 
 			.setModerationTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setType (
 				chatUserImageType)

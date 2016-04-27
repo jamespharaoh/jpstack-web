@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.millisToInstant;
 
@@ -22,11 +21,11 @@ import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatUserAdminBillPart")
 public
@@ -212,18 +211,16 @@ class ChatUserAdminBillPart
 				"<tr>\n",
 
 				"<td>%h</td>\n",
-				timeFormatter.instantToDateStringShort (
+				timeFormatter.dateStringShort (
 					chatUserLogic.timezone (
 						chatUser),
-					dateToInstant (
-						billLog.getTimestamp ())),
+					billLog.getTimestamp ()),
 
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimeString (
+				timeFormatter.timeString (
 					chatUserLogic.timezone (
 						chatUser),
-					dateToInstant (
-						billLog.getTimestamp ())),
+					billLog.getTimestamp ()),
 
 				"%s\n",
 				consoleObjectManager.tdForObjectMiniLink (

@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.supervisor.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
-
 import java.util.List;
 import java.util.Map;
 
@@ -81,8 +79,7 @@ class ChatMessageStatsProvider
 		) {
 
 			Instant chatMessageTimestamp =
-				dateToInstant (
-					chatMessage.getTimestamp ());
+				chatMessage.getTimestamp ();
 
 			int hour =
 				period.assign (

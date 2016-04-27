@@ -1,6 +1,5 @@
-package wbs.services.ticket.core.console;
+package wbs.console.forms;
 
-import wbs.console.forms.FormFieldSet;
 import wbs.framework.record.Record;
 
 public

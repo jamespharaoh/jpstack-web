@@ -13,6 +13,7 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
+import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.IntegerFormFieldSpec;
 import wbs.console.forms.ObjectFormFieldSpec;

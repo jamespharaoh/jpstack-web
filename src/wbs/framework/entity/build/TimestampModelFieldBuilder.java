@@ -26,6 +26,7 @@ import wbs.framework.entity.meta.TimestampFieldSpec;
 import wbs.framework.entity.meta.TimestampFieldSpec.ColumnType;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
+import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 
 @PrototypeComponent ("timestampModelFieldBuilder")
 @ModelBuilder
@@ -130,16 +131,17 @@ class TimestampModelFieldBuilder {
 
 		.put (
 			ColumnType.sql,
-			Optional.<Class<?>>of (
+			Optional.of (
 				PersistentInstantAsTimestamp.class))
 
 		.put (
 			ColumnType.postgresql,
-			Optional.<Class<?>>absent ())
+			Optional.of (
+				TimestampWithTimezoneUserType.class))
 
 		.put (
 			ColumnType.iso,
-			Optional.<Class<?>>of (
+			Optional.of (
 				PersistentInstantAsString.class))
 
 		.build ();
@@ -150,16 +152,16 @@ class TimestampModelFieldBuilder {
 
 		.put (
 			ColumnType.sql,
-			Optional.<String>absent ())
+			Optional.absent ())
 
 		.put (
 			ColumnType.postgresql,
-			Optional.<String>of (
+			Optional.of (
 				"timestamp with time zone"))
 
 		.put (
 			ColumnType.iso,
-			Optional.<String>absent ())
+			Optional.absent ())
 
 		.build ();
 

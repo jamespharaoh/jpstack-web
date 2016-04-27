@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 
 import javax.inject.Inject;
 
@@ -29,14 +28,16 @@ import wbs.framework.web.Responder;
 import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 import wbs.sms.gsm.Gsm;
 
 @PrototypeComponent ("chatMessagePendingFormAction")
 public
 class ChatMessagePendingFormAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ChatContactObjectHelper chatContactHelper;
@@ -69,7 +70,12 @@ class ChatMessagePendingFormAction
 	TextObjectHelper textHelper;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
@@ -127,10 +133,6 @@ class ChatMessagePendingFormAction
 		ChatRec chat =
 			chatMessage.getChat ();
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		// check message is ok
 
 		if (requestContext.parameter ("sendWithoutApproval") == null) {
@@ -173,18 +175,17 @@ class ChatMessagePendingFormAction
 
 		queueLogic.processQueueItem (
 			chatMessage.getQueueItem (),
-			myUser);
+			userConsoleLogic.userRequired ());
 
 		// update the chat message
 
 		chatMessage
 
 			.setModerator (
-				myUser)
+				userConsoleLogic.userRequired ())
 
 			.setModeratorTimestamp (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		if (
 			equal (
@@ -252,8 +253,7 @@ class ChatMessagePendingFormAction
 		chatContact
 
 			.setLastDeliveredMessageTime (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		// and send it
 
@@ -332,10 +332,6 @@ class ChatMessagePendingFormAction
 			chatMessageHelper.find (
 				requestContext.stuffInt ("chatMessageId"));
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		// confirm message status
 
 		if (chatMessage.getStatus () != ChatMessageStatus.moderatorPending) {
@@ -351,14 +347,14 @@ class ChatMessagePendingFormAction
 
 		queueLogic.processQueueItem (
 			chatMessage.getQueueItem (),
-			myUser);
+			userConsoleLogic.userRequired ());
 
 		// update the chatMessage
 
 		chatMessage
 
 			.setModerator (
-				myUser)
+				userConsoleLogic.userRequired ())
 
 			.setStatus (
 				ChatMessageStatus.moderatorRejected)
@@ -369,7 +365,7 @@ class ChatMessagePendingFormAction
 		// and send help message
 
 		chatHelpLogic.sendHelpMessage (
-			myUser,
+			userConsoleLogic.userRequired (),
 			chatMessage.getFromUser (),
 			messageParam,
 			Optional.of (

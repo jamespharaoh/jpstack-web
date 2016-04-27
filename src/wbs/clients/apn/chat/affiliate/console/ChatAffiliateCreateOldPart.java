@@ -16,7 +16,7 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @PrototypeComponent ("chatAffiliateCreateOldPart")
@@ -42,7 +42,7 @@ class ChatAffiliateCreateOldPart
 	OrientConsoleHelper orientConsoleHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	// state
 

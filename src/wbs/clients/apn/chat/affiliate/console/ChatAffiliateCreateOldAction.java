@@ -27,8 +27,8 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
-import wbs.console.priv.PrivChecker;
-import wbs.console.priv.PrivDataLoader;
+import wbs.console.priv.UserPrivChecker;
+import wbs.console.priv.UserPrivDataLoader;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -75,10 +75,10 @@ class ChatAffiliateCreateOldAction
 	KeywordLogic keywordLogic;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
-	PrivDataLoader privDataLoader;
+	UserPrivDataLoader privDataLoader;
 
 	// details
 

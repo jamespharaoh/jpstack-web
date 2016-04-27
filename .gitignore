@@ -10,7 +10,7 @@
 /c/modeminit
 /c/socktest
 /.Trash-*
-/hs_error_*
+/hs_err_*.log
 
 # cabal
 /.cabal-sandbox

@@ -36,11 +36,11 @@ import wbs.applications.imchat.model.ImChatPricePointRec;
 import wbs.applications.imchat.model.ImChatProfileRec;
 import wbs.applications.imchat.model.ImChatPurchaseRec;
 import wbs.applications.imchat.model.ImChatRec;
-import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.media.model.ContentRec;
@@ -484,8 +484,11 @@ class ImChatApiLogicImplementation
 					purchase.getValue ()))
 
 			.timestampString (
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
+				timeFormatter.timestampString (
+					timeFormatter.timezone (
+						ifNull (
+							imChat.getSlice ().getDefaultTimezone (),
+							wbsConfig.defaultTimezone ())),
 					purchase.getCreatedTime ()));
 
 	}

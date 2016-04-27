@@ -1,7 +1,5 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +12,7 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;
 import wbs.console.reporting.StatsGranularity;
@@ -38,7 +36,7 @@ class QueueItemQueueStatsProvider
 	ConsoleObjectManager objectManager;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	QueueItemObjectHelper queueItemHelper;
@@ -120,8 +118,7 @@ class QueueItemQueueStatsProvider
 
 			int hour =
 				statsPeriod.assign (
-					dateToInstant (
-						queueItem.getCreatedTime ()));
+					queueItem.getCreatedTime ());
 
 			if (! queueIds.contains (
 					queue.getId ())) {
@@ -181,8 +178,7 @@ class QueueItemQueueStatsProvider
 
 			int hour =
 				statsPeriod.assign (
-					dateToInstant (
-						queueItem.getProcessedTime ()));
+					queueItem.getProcessedTime ());
 
 			if (! queueIds.contains (
 					queue.getId ())) {

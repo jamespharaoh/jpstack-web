@@ -16,13 +16,14 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.console.action.ConsoleAction;
+import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -36,9 +37,7 @@ import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
-import wbs.services.ticket.core.console.FieldsProvider;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.services.ticket.core.console.TicketConsoleHelper;
 import wbs.services.ticket.core.console.TicketFieldValueConsoleHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
@@ -77,7 +76,7 @@ class ObjectTicketCreateAction<
 	ObjectTypeObjectHelper objectTypeHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	QueueLogic queueLogic;
@@ -101,7 +100,7 @@ class ObjectTicketCreateAction<
 	TicketConsoleHelper ticketHelper;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// properties
 
@@ -179,10 +178,6 @@ class ObjectTicketCreateAction<
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		// find context object
 
@@ -380,7 +375,7 @@ class ObjectTicketCreateAction<
 			BeanLogic.setProperty (
 				ticket,
 				createUserFieldName,
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		}
 
@@ -400,7 +395,7 @@ class ObjectTicketCreateAction<
 
 			eventLogic.createEvent (
 				"object_created_in",
-				myUser,
+				userConsoleLogic.userRequired (),
 				objectRef,
 				consoleHelper.shortName (),
 				ticketManager);
@@ -409,7 +404,7 @@ class ObjectTicketCreateAction<
 
 			eventLogic.createEvent (
 				"object_created",
-				myUser,
+				userConsoleLogic.userRequired (),
 				ticket,
 				ticketManager);
 

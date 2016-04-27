@@ -9,7 +9,6 @@ import javax.inject.Provider;
 
 import org.joda.time.Instant;
 
-import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -62,9 +61,6 @@ class SubscriptionLogicImplementation
 
 	@Inject
 	SubscriptionSendPartObjectHelper subscriptionSendPartHelper;
-
-	@Inject
-	TimeFormatter timeFormatter;
 
 	// prototype dependencies
 
@@ -375,9 +371,7 @@ class SubscriptionLogicImplementation
 			"subscription_send_scheduled",
 			user,
 			subscriptionSend,
-			timeFormatter.instantToTimestampString (
-				timeFormatter.defaultTimezone (),
-				transaction.now ()));
+			transaction.now ());
 
 	}
 

@@ -18,8 +18,8 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("dateFormFieldInterfaceMapping")
 public
@@ -56,7 +56,7 @@ class DateFormFieldInterfaceMapping<Container>
 
 		return successResult (
 			Optional.of (
-				timeFormatter.localDateToDateString (
+				timeFormatter.dateString (
 					genericValue.get ())));
 
 	}

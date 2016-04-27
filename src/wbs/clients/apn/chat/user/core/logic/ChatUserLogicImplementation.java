@@ -1,13 +1,13 @@
 package wbs.clients.apn.chat.user.core.logic;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.localDate;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -49,7 +49,6 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageObjectHelper;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -60,6 +59,7 @@ import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.RandomLogic;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.event.logic.EventLogic;
@@ -237,8 +237,7 @@ class ChatUserLogicImplementation
 			chatUserSession
 
 				.setEndTime (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setAutomatic (
 					automatic);
@@ -291,16 +290,16 @@ class ChatUserLogicImplementation
 		if (chatUser.getLastJoin () != null) {
 
 			startDate =
-				dateToInstant (chatUser.getLastJoin ())
-					.toDateTime (timezone)
-					.toLocalDate ();
+				localDate (
+					chatUser.getLastJoin (),
+					timezone);
 
 		} else {
 
 			startDate =
-				dateToInstant (chatUser.getLastAction ())
-					.toDateTime (timezone)
-					.toLocalDate ();
+				localDate (
+					chatUser.getLastAction (),
+					timezone);
 
 		}
 
@@ -333,8 +332,7 @@ class ChatUserLogicImplementation
 			chatUser
 
 				.setNextAd (
-					instantToDate (
-						firstAdTime));
+					firstAdTime);
 
 			return;
 
@@ -367,8 +365,7 @@ class ChatUserLogicImplementation
 				chatUser
 
 					.setNextAd (
-						instantToDate (
-							nextAdTime));
+						nextAdTime);
 
 				return;
 
@@ -607,12 +604,10 @@ class ChatUserLogicImplementation
 				true)
 
 			.setNextAdultAd (
-				instantToDate (
-					nextAdultAdTime))
+				nextAdultAdTime)
 
 			.setAdultExpiry (
-				instantToDate (
-					adultExpiryTime));
+				adultExpiryTime);
 
 	}
 
@@ -654,8 +649,7 @@ class ChatUserLogicImplementation
 				randomLogic.generateNumericNoZero (6))
 
 			.setCreated (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setType (
 				ChatUserType.monitor)
@@ -732,8 +726,7 @@ class ChatUserLogicImplementation
 				fullMedia)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setMessage (
 				message.orNull ())
@@ -1223,7 +1216,7 @@ class ChatUserLogicImplementation
 						"logic",
 						"ChatUserLogic.setPlace",
 						exception,
-						Optional.<Integer>absent (),
+						Optional.absent (),
 						GenericExceptionResolution.ignoreWithLoggedWarning);
 
 				}
@@ -1271,8 +1264,7 @@ class ChatUserLogicImplementation
 				gazetteerEntry.getLongLat ())
 
 			.setLocationTime (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		// create event
 
@@ -1588,8 +1580,10 @@ class ChatUserLogicImplementation
 
 		ChatUserImageRec ret = null;
 
-		for (ChatUserImageRec chatUserImage
-				: chatUser.getChatUserImages ()) {
+		for (
+			ChatUserImageRec chatUserImage
+				: chatUser.getChatUserImages ()
+		) {
 
 			if (! equal (
 					chatUserImage.getType (),
@@ -1600,10 +1594,21 @@ class ChatUserLogicImplementation
 					!= ChatUserInfoStatus.moderatorPending)
 				continue;
 
-			if (ret == null
-					|| ret.getTimestamp ().getTime ()
-						< chatUserImage.getTimestamp ().getTime ())
-				ret = chatUserImage;
+			if (
+
+				isNull (
+					ret)
+
+				|| earlierThan (
+					ret.getTimestamp (),
+					chatUserImage.getTimestamp ())
+
+			) {
+
+				ret =
+					chatUserImage;
+
+			}
 
 		}
 

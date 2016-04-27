@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -14,8 +12,17 @@ public abstract
 class ConsoleResponder
 	implements Responder {
 
+	// dependencies
+
 	@Inject
 	Database database;
+
+	// state
+
+	protected
+	Transaction transaction;
+
+	// implementation
 
 	protected
 	void setup ()
@@ -41,15 +48,26 @@ class ConsoleResponder
 	void execute ()
 		throws IOException {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				this);
+		try (
+			Transaction transaction =
+				database.beginReadOnly (
+					this)
+		) {
 
-		setup ();
-		prepare ();
-		setHtmlHeaders ();
-		render ();
+			this.transaction =
+				transaction;
+
+			setup ();
+			prepare ();
+			setHtmlHeaders ();
+			render ();
+
+		} finally {
+
+			this.transaction =
+				null;
+
+		}
 
 	}
 

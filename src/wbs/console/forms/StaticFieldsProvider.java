@@ -1,8 +1,7 @@
-package wbs.services.ticket.core.console;
+package wbs.console.forms;
 
 import lombok.NonNull;
 
-import wbs.console.forms.FormFieldSet;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 

@@ -14,7 +14,7 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
@@ -33,12 +33,14 @@ class UserPrivsSummaryPart
 	ObjectManager objectManager;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
 
-	UserRec myUser;
 	Set<PrivStuff> privStuffs;
 
 	@Override
@@ -54,10 +56,6 @@ class UserPrivsSummaryPart
 					"userId"));
 
 		// load up some info about the acting user
-
-		myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		for (
 			UserPrivRec userPriv
@@ -88,7 +86,7 @@ class UserPrivsSummaryPart
 			privStuff.path =
 				objectManager.objectPath (
 					parent,
-					myUser.getSlice ());
+					userConsoleLogic.sliceRequired ());
 
 			privStuff.privCode =
 				priv.getCode ();
@@ -132,7 +130,7 @@ class UserPrivsSummaryPart
 					privStuff.path =
 						objectManager.objectPath (
 							parent,
-							myUser.getSlice ());
+							userConsoleLogic.sliceRequired ());
 
 					privStuff.privCode =
 						priv.getCode ();

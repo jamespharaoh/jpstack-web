@@ -1,8 +1,6 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.earlierThan;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -119,7 +117,7 @@ class ChatUserQuietDaemon
 					"daemon",
 					"Chat daemon",
 					exception,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}
@@ -156,8 +154,7 @@ class ChatUserQuietDaemon
 
 			|| earlierThan (
 				transaction.now (),
-				dateToInstant (
-					user.getNextQuietOutbound ()))
+				user.getNextQuietOutbound ())
 
 		) {
 			return;
@@ -259,8 +256,7 @@ class ChatUserQuietDaemon
 				ChatUserInitiationReason.quietUser)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 		);
 

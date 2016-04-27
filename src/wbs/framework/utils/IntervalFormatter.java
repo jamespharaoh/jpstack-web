@@ -1,4 +1,4 @@
-package wbs.console.misc;
+package wbs.framework.utils;
 
 import com.google.common.base.Optional;
 

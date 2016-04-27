@@ -15,10 +15,10 @@ import org.hibernate.exception.ConstraintViolationException;
 import wbs.framework.application.annotations.SingletonComponent;
 
 @Log4j
-@SingletonComponent ("exceptionLogic")
+@SingletonComponent ("exceptionUtils")
 public
-class ExceptionLogicImplementation
-	implements ExceptionLogic {
+class ExceptionUtilsImplementation
+	implements ExceptionUtils {
 
 	@Override
 	public

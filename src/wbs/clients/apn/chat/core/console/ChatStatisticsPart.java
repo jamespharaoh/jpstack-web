@@ -11,7 +11,7 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUsersSummaryObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUsersSummaryRec;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @PrototypeComponent ("chatStatisticsPart")
@@ -29,7 +29,7 @@ class ChatStatisticsPart
 	ChatUsersSummaryObjectHelper chatUsersSummaryHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	ChatRec chat;
 	ChatUsersSummaryRec users;

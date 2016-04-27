@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.date.daemon;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNull;
@@ -130,7 +129,7 @@ class ChatDateDaemon
 					"daemon",
 					"Chat daemon dating",
 					exception,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}
@@ -417,7 +416,7 @@ class ChatDateDaemon
 					"daemon",
 					"Chat daemon dating",
 					exception,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}
@@ -811,8 +810,7 @@ class ChatDateDaemon
 					if (
 						contact.getLastPicTime () != null
 						&& compareTime.isBefore (
-							dateToInstant (
-								contact.getLastPicTime ()))
+							contact.getLastPicTime ())
 					) {
 
 						dateUserStats.numAlreadySent ++;
@@ -828,15 +826,13 @@ class ChatDateDaemon
 						(
 							contact.getLastPicTime () != null
 							&& compareTime.isBefore (
-								dateToInstant (
-									contact.getLastPicTime ()))
+								contact.getLastPicTime ())
 						)
 
 						|| (
 							contact.getLastInfoTime () != null
 							&& compareTime.isBefore (
-								dateToInstant (
-									contact.getLastInfoTime ()))
+								contact.getLastInfoTime ())
 						)
 
 					) {

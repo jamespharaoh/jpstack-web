@@ -22,7 +22,7 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.console.misc.TimeFormatter;
+import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TextualInterval;
 
@@ -35,10 +35,7 @@ class TimestampToFormFieldInterfaceMapping<Container>
 	// dependencies
 
 	@Inject
-	FormFieldPreferencesProvider formFieldPreferences;
-
-	@Inject
-	TimeFormatter timeFormatter;
+	ConsoleUserHelper formFieldPreferences;
 
 	// properties
 
@@ -72,11 +69,9 @@ class TimestampToFormFieldInterfaceMapping<Container>
 
 		try {
 
-			// TODO timezone should not be hardcoded
-
 			TextualInterval interval =
 				TextualInterval.parseRequired (
-					formFieldPreferences.timeZone (),
+					formFieldPreferences.timezone (),
 					interfaceValue.get (),
 					formFieldPreferences.hourOffset ());
 
@@ -114,8 +109,7 @@ class TimestampToFormFieldInterfaceMapping<Container>
 
 		return successResult (
 			Optional.of (
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
+				formFieldPreferences.timestampWithTimezoneString (
 					genericValue.get ())));
 
 	}

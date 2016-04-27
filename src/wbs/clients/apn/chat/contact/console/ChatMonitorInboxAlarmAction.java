@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -10,6 +9,7 @@ import javax.servlet.ServletException;
 import lombok.Cleanup;
 
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.Seconds;
 
@@ -23,16 +23,16 @@ import wbs.clients.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.TextualInterval;
+import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.TimeFormatException;
 import wbs.framework.web.Responder;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatMonitorInboxAlarmAction")
 public
@@ -58,6 +58,9 @@ class ChatMonitorInboxAlarmAction
 
 	@Inject
 	TimeFormatter timeFormatter;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -90,10 +93,6 @@ class ChatMonitorInboxAlarmAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		ChatMonitorInboxRec chatMonitorInbox =
 			chatMonitorInboxHelper.find (
@@ -161,7 +160,7 @@ class ChatMonitorInboxAlarmAction
 						0);
 
 				alarmTime =
-					interval.value ().getStart ().toInstant ();
+					interval.start ();
 
 			} catch (TimeFormatException exception) {
 
@@ -197,8 +196,9 @@ class ChatMonitorInboxAlarmAction
 				requestContext.addError (
 					stringFormat (
 						"Alarm time exceeds maximum of %s",
-						requestContext.prettySecsInterval (
-							chat.getMaxAlarmTime ())));
+						timeFormatter.prettyDuration (
+							Duration.standardSeconds (
+								chat.getMaxAlarmTime ()))));
 
 				return null;
 
@@ -228,11 +228,10 @@ class ChatMonitorInboxAlarmAction
 					ChatUserInitiationReason.alarmCancel)
 
 				.setTimestamp (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setMonitorUser (
-					myUser)
+					userConsoleLogic.userRequired ())
 
 				.setAlarmTime (
 					chatUserAlarm.getAlarmTime ())
@@ -267,14 +266,11 @@ class ChatMonitorInboxAlarmAction
 			chatUserAlarm
 
 				.setAlarmTime (
-					instantToDate (
-						alarmTime))
+					alarmTime)
 
 				.setResetTime (
-					instantToDate (
-						transaction.now ()
-							.toDateTime ()
-							.plusHours (1)))
+					transaction.now ().plus (
+						Duration.standardHours (1)))
 
 				.setSticky (
 					sticky);
@@ -303,15 +299,13 @@ class ChatMonitorInboxAlarmAction
 					ChatUserInitiationReason.alarmSet)
 
 				.setAlarmTime (
-					instantToDate (
-						alarmTime))
+					alarmTime)
 
 				.setTimestamp (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setMonitorUser (
-					myUser)
+					userConsoleLogic.userRequired ())
 
 			);
 

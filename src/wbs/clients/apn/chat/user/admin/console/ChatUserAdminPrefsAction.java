@@ -18,8 +18,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("chatUserAdminPrefsAction")
 public
@@ -41,7 +40,7 @@ class ChatUserAdminPrefsAction
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// details
 
@@ -92,10 +91,6 @@ class ChatUserAdminPrefsAction
 				this);
 
 		// lookup database stuff
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (
@@ -159,7 +154,7 @@ class ChatUserAdminPrefsAction
 
 			eventLogic.createEvent (
 				"chat_user_prefs",
-				myUser,
+				userConsoleLogic.userRequired (),
 				chatUser,
 				chatUser.getGender ().toString (),
 				chatUser.getOrient ().toString ());

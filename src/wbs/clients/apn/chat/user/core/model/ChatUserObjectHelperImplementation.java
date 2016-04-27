@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.core.model;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -168,8 +167,7 @@ class ChatUserObjectHelperImplementation
 				randomLogic.generateNumericNoZero (6))
 
 			.setCreated (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setNumber (
 				number)

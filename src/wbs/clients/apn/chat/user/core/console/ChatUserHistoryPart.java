@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.spacify;
@@ -19,9 +18,9 @@ import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.Html;
 
 @PrototypeComponent ("chatUserHistoryPart")
@@ -127,9 +126,12 @@ class ChatUserHistoryPart
 					: otherUser.getCode ();
 
 			LocalDate nextDate =
-				dateToInstant (chatMessage.getTimestamp ())
-					.toDateTime (timezone)
-					.toLocalDate ();
+				chatMessage.getTimestamp ()
+
+				.toDateTime (
+					timezone)
+
+				.toLocalDate ();
 
 			if (
 				notEqual (
@@ -146,11 +148,10 @@ class ChatUserHistoryPart
 					"<tr style=\"font-weight: bold\">\n",
 
 					"<td colspan=\"5\">%h</td>\n",
-					timeFormatter.instantToDateStringLong (
+					timeFormatter.dateStringLong (
 						chatUserLogic.timezone (
 							chatUser),
-						dateToInstant (
-							chatMessage.getTimestamp ())),
+						chatMessage.getTimestamp ()),
 
 					"</tr>\n");
 
@@ -181,11 +182,10 @@ class ChatUserHistoryPart
 				color,
 
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimeString (
+				timeFormatter.timeString (
 					chatUserLogic.timezone (
 						chatUser),
-					dateToInstant (
-						chatMessage.getTimestamp ())),
+					chatMessage.getTimestamp ()),
 
 				"<td>%s</td>\n",
 				Html.nonBreakingWhitespace (

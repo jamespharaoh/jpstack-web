@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.core.logic;
 
+import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -42,12 +43,12 @@ import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.clients.apn.chat.user.info.model.ChatUserNameObjectHelper;
 import wbs.clients.apn.chat.user.info.model.ChatUserNameRec;
-import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.media.logic.MediaLogic;
@@ -375,18 +376,15 @@ class ChatMiscLogicImplementation
 				false)
 
 			.setLastJoin (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setLastAction (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setFirstJoin (
 				ifNull (
 					chatUser.getFirstJoin (),
-					instantToDate (
-						transaction.now ())))
+					transaction.now ()))
 
 			.setNextRegisterHelp (
 				null)
@@ -410,8 +408,7 @@ class ChatMiscLogicImplementation
 					chatUser)
 
 				.setStartTime (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 			);
 
@@ -443,8 +440,10 @@ class ChatMiscLogicImplementation
 
 				chatUser.getLocationTime () == null
 
-				|| chatUser.getLocationTime ().getTime ()
-					< System.currentTimeMillis () - 1000 * 60 * 60
+				|| earlierThan (
+					chatUser.getLocationTime (),
+					transaction.now ().minus (
+						Duration.standardHours (1)))
 
 			)
 
@@ -506,8 +505,7 @@ class ChatMiscLogicImplementation
 							longLat)
 
 						.setLocationTime (
-							instantToDate (
-								transaction.now ()));
+							transaction.now ());
 
 					LocatorRec locator =
 						locatorHelper.find (
@@ -675,8 +673,7 @@ class ChatMiscLogicImplementation
 				chatUser)
 
 			.setCreationTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setOriginalName (
 				name)

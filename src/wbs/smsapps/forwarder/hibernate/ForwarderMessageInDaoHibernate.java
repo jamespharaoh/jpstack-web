@@ -1,12 +1,11 @@
 package wbs.smsapps.forwarder.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.List;
 
 import org.joda.time.Instant;
 
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 import wbs.smsapps.forwarder.model.ForwarderMessageInDaoMethods;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
 import wbs.smsapps.forwarder.model.ForwarderRec;
@@ -37,10 +36,10 @@ class ForwarderMessageInDaoHibernate
 				"forwarder",
 				forwarder)
 
-			.setTimestamp (
+			.setParameter (
 				"now",
-				instantToDate (
-					now))
+				now,
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.setMaxResults (1)
 
@@ -62,10 +61,10 @@ class ForwarderMessageInDaoHibernate
 				"WHERE forwarderMessageIn.sendQueue = true " +
 					"AND forwarderMessageIn.retryTime < :now")
 
-			.setTimestamp (
+			.setParameter (
 				"now",
-				instantToDate (
-					now))
+				now,
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.setMaxResults (
 				maxResults)

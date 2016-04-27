@@ -214,7 +214,7 @@ class ChatUserImageUploadPostAction
 				"webapi",
 				requestContext.requestPath (),
 				exception,
-				Optional.<Integer>absent (),
+				Optional.absent (),
 				GenericExceptionResolution.ignoreWithUserWarning);
 
 			// start new transaction

@@ -663,7 +663,7 @@ writeBuildFile world = do
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
 					makeArgValue "utils,config,data,entity,model-meta,schema,sql,schema-tool",
-					makeArgValue "test",
+					makeArgValue "script",
 					makeArgValue "wbs.framework.schema.tool.SchemaTool",
 					makeArgValue "schemaCreate"
 				]
@@ -687,7 +687,7 @@ writeBuildFile world = do
 					makeArgValue "wbs.test",
 					makeArgValue ("utils,config,data,entity,schema,sql," ++
 						"model,model-meta,hibernate,object,logic,fixture"),
-					makeArgValue "test,hibernate",
+					makeArgValue "script,hibernate",
 					makeArgValue "wbs.framework.entity.meta.ModelFixtureCreator",
 					makeArgValue "runModelFixtureCreators"
 				],
@@ -702,11 +702,26 @@ writeBuildFile world = do
 					makeArgValue "wbs.test",
 					makeArgValue ("utils,config,data,entity,schema,sql," ++
 						"model,model-meta,hibernate,object,logic,fixture"),
-					makeArgValue "test,hibernate",
+					makeArgValue "script,hibernate",
 					makeArgValue "wbs.framework.fixtures.FixturesTool",
 					makeArgValue "runFixtureProviders"
 				]
 
+			]
+		]
+
+	let makeCodeStyleTargets =
+		[
+			makeSimpleTarget "code-style" [
+				mkelem "cs:checkstyle" [
+					sattr "config" "etc/style.xml",
+					sattr "classpathref" "classpath"
+				] [
+					mkelem "fileset" [
+						sattr "dir" "src",
+						sattr "includes" "**/*.java"
+					] []
+				]
 			]
 		]
 
@@ -715,7 +730,8 @@ writeBuildFile world = do
 			mkelem "project" [
 				sattr "name" $ bldName buildConfig,
 				sattr "basedir" ".",
-				sattr "default" "build"
+				sattr "default" "build",
+				sattr "xmlns:cs" "antlib:com.puppycrawl.tools.checkstyle.ant"
 			] (
 				makeProperties ++
 				makeClasspath ++
@@ -730,7 +746,8 @@ writeBuildFile world = do
 				makeSqlTargets ++
 				makeGenerateTargets ++
 				makeSchemaTargets ++
-				makeFixtureTargets
+				makeFixtureTargets ++
+				makeCodeStyleTargets
 			)
 		]
 

@@ -14,6 +14,8 @@ import javax.inject.Provider;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import org.joda.time.Duration;
+
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -140,7 +142,7 @@ class QueueManager {
 	}
 
 	public
-	long getPreferredUserDelay (
+	Duration getPreferredUserDelay (
 			@NonNull QueueRec queue) {
 
 		Record<?> queueParent =
@@ -156,7 +158,7 @@ class QueueManager {
 				queueTypeSpec.preferredUserDelay (),
 				"0")
 		) {
-			return 0l;
+			return Duration.ZERO;
 		}
 
 		Long preferredUserDelay =
@@ -165,7 +167,8 @@ class QueueManager {
 				queueParent,
 				queueTypeSpec.preferredUserDelay ());
 
-		return preferredUserDelay * 1000l;
+		return Duration.standardSeconds (
+			preferredUserDelay);
 
 	}
 

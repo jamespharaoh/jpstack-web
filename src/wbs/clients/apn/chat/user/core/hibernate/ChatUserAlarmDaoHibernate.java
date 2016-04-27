@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.user.core.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.List;
 
 import org.joda.time.Instant;
@@ -10,6 +8,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserAlarmDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 
 public
 class ChatUserAlarmDaoHibernate
@@ -28,10 +27,10 @@ class ChatUserAlarmDaoHibernate
 				"FROM ChatUserAlarmRec cua " +
 				"WHERE cua.alarmTime <= :now")
 
-			.setTimestamp (
+			.setParameter (
 				"now",
-				instantToDate (
-					now))
+				now,
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.list ());
 

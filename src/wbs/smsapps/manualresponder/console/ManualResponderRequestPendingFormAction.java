@@ -1,7 +1,6 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
@@ -28,8 +27,7 @@ import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.gsm.Gsm;
@@ -94,7 +92,7 @@ class ManualResponderRequestPendingFormAction
 	TextObjectHelper textHelper;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// prototype dependencies
 
@@ -160,15 +158,11 @@ class ManualResponderRequestPendingFormAction
 			manualResponderRequestHelper.find (
 				manualResponderRequestId);
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		// remove queue item
 
 		queueLogic.processQueueItem (
 			manualResponderRequest.getQueueItem (),
-			myUser);
+			userConsoleLogic.userRequired ());
 
 		// mark request as not pending
 
@@ -228,10 +222,6 @@ class ManualResponderRequestPendingFormAction
 		ManualResponderTemplateRec template =
 			manualResponderTemplateHelper.find (
 				templateId);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		// consistency checks
 
@@ -368,14 +358,13 @@ class ManualResponderRequestPendingFormAction
 				request)
 
 			.setUser (
-				myUser)
+				userConsoleLogic.userRequired ())
 
 			.setText (
 				messageText)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setNumFreeMessages (
 				route.getOutCharge () == 0
@@ -421,7 +410,7 @@ class ManualResponderRequestPendingFormAction
 					"default")
 
 				.user (
-					myUser)
+					userConsoleLogic.userRequired ())
 
 				.deliveryTypeCode (
 					"manual_responder")
@@ -470,7 +459,7 @@ class ManualResponderRequestPendingFormAction
 
 			queueLogic.processQueueItem (
 				request.getQueueItem (),
-				myUser);
+				userConsoleLogic.userRequired ());
 
 			// update request
 
@@ -480,7 +469,7 @@ class ManualResponderRequestPendingFormAction
 					false)
 
 				.setUser (
-					myUser)
+					userConsoleLogic.userRequired ())
 
 				.setProcessedTime (
 					transaction.now ());

@@ -1,7 +1,5 @@
 package wbs.smsapps.forwarder.api;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -256,8 +254,7 @@ class ForwarderUnqueueExRpcHandler
 			unqueueExReport.fmOutReport
 
 				.setProcessedTime (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 			ForwarderMessageOutRec forwarderMessageOut =
 				unqueueExReport.fmOutReport
@@ -318,8 +315,7 @@ class ForwarderUnqueueExRpcHandler
 			unqueueExMessage.forwarderMessageIn
 
 				.setProcessedTime (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setPending (
 					false)

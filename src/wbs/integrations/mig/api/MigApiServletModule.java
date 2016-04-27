@@ -1,7 +1,5 @@
 package wbs.integrations.mig.api;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
@@ -24,7 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.PathHandler;
@@ -71,7 +69,7 @@ class MigApiServletModule
 	ExceptionLogger exceptionLogger;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionUtils exceptionLogic;
 
 	@Inject
 	InboxLogic inboxLogic;
@@ -262,7 +260,7 @@ class MigApiServletModule
 					exceptionLogic.throwableSummary (
 						exception),
 					getException (exception, requestContext),
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
 				PrintWriter out =
@@ -476,8 +474,7 @@ class MigApiServletModule
 							numberReportRec
 
 								.setPermanentFailureReceived (
-									instantToDate (
-										transaction.now ()))
+									transaction.now ())
 
 								.setPermanentFailureCount (
 									numberReportRec.getPermanentFailureCount () + 1);
@@ -518,7 +515,7 @@ class MigApiServletModule
 					getException (
 						exception,
 						requestContext),
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
 				PrintWriter out =

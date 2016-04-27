@@ -2,7 +2,6 @@ package wbs.clients.apn.chat.user.pending.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isZero;
 import static wbs.framework.utils.etc.Misc.moreThan;
@@ -49,6 +48,7 @@ import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
@@ -100,6 +100,9 @@ class ChatUserPendingFormAction
 
 	@Inject
 	TextObjectHelper textHelper;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -182,14 +185,10 @@ class ChatUserPendingFormAction
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		Responder responder =
 			updateQueueItem (
 				chatUser,
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		transaction.commit ();
 
@@ -209,11 +208,8 @@ class ChatUserPendingFormAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (
-				requestContext.stuffInt ("chatUserId"));
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		// confirm there is something to approve
 
@@ -245,7 +241,7 @@ class ChatUserPendingFormAction
 		chatUserName
 
 			.setModerator (
-				myUser)
+				userConsoleLogic.userRequired ())
 
 			.setStatus (
 				equal (
@@ -255,8 +251,7 @@ class ChatUserPendingFormAction
 					: ChatUserInfoStatus.moderatorEdited)
 
 			.setModerationTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setEditedName (
 				requestContext.parameter ("name"));
@@ -274,7 +269,7 @@ class ChatUserPendingFormAction
 		Responder responder =
 			updateQueueItem (
 				chatUser,
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		transaction.commit ();
 
@@ -302,10 +297,6 @@ class ChatUserPendingFormAction
 		ChatUserRec chatUser =
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		// confirm there is something to approve
 
@@ -337,7 +328,7 @@ class ChatUserPendingFormAction
 		chatUserInfo
 
 			.setModerator (
-				myUser)
+				userConsoleLogic.userRequired ())
 
 			.setStatus (
 				equal (
@@ -347,8 +338,7 @@ class ChatUserPendingFormAction
 					: ChatUserInfoStatus.moderatorEdited)
 
 			.setModerationTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setEditedText (
 				textHelper.findOrCreate (
@@ -367,7 +357,7 @@ class ChatUserPendingFormAction
 		Responder responder =
 			updateQueueItem (
 				chatUser,
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		transaction.commit ();
 
@@ -401,10 +391,6 @@ class ChatUserPendingFormAction
 		ChatUserRec chatUser =
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		// confirm there is something to approve
 
@@ -447,14 +433,13 @@ class ChatUserPendingFormAction
 		chatUserImage
 
 			.setModerator (
-				myUser)
+				userConsoleLogic.userRequired ())
 
 			.setStatus (
 				ChatUserInfoStatus.moderatorApproved)
 
 			.setModerationTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setIndex (
 				(long)
@@ -499,7 +484,7 @@ class ChatUserPendingFormAction
 		responder =
 			updateQueueItem (
 				chatUser,
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		transaction.commit ();
 
@@ -551,10 +536,6 @@ class ChatUserPendingFormAction
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		if (chatUser.getNewChatUserName() == null) {
 
 			requestContext.addError (
@@ -577,11 +558,10 @@ class ChatUserPendingFormAction
 				ChatUserInfoStatus.moderatorRejected)
 
 			.setModerationTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setModerator (
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		chatUser
 
@@ -591,7 +571,7 @@ class ChatUserPendingFormAction
 		// send rejection
 
 		sendRejection (
-			myUser,
+			userConsoleLogic.userRequired (),
 			chatUser,
 			Optional.fromNullable (
 				chatUserName.getThreadId ()),
@@ -600,7 +580,7 @@ class ChatUserPendingFormAction
 		Responder responder =
 			updateQueueItem (
 				chatUser,
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		transaction.commit ();
 
@@ -648,10 +628,6 @@ class ChatUserPendingFormAction
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		// confirm there is something to approve
 
 		if (chatUser.getNewChatUserInfo () == null) {
@@ -685,11 +661,10 @@ class ChatUserPendingFormAction
 				ChatUserInfoStatus.moderatorRejected)
 
 			.setModerationTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setModerator (
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		// update chat user
 
@@ -701,7 +676,7 @@ class ChatUserPendingFormAction
 		// send rejection
 
 		sendRejection (
-			myUser,
+			userConsoleLogic.userRequired (),
 			chatUser,
 			Optional.fromNullable (
 				chatUserInfo.getThreadId ()),
@@ -710,7 +685,7 @@ class ChatUserPendingFormAction
 		Responder responder =
 			updateQueueItem (
 				chatUser,
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		transaction.commit ();
 
@@ -763,8 +738,7 @@ class ChatUserPendingFormAction
 					chatUser)
 
 				.setTimestamp (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setChat (
 					chat)
@@ -881,10 +855,6 @@ class ChatUserPendingFormAction
 		ChatRec chat =
 			chatUser.getChat ();
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		ChatUserImageRec chatUserImage =
 			chatUserLogic.chatUserPendingImage (
 				chatUser,
@@ -915,11 +885,10 @@ class ChatUserPendingFormAction
 				ChatUserInfoStatus.moderatorRejected)
 
 			.setModerationTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setModerator (
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		// send message
 
@@ -953,14 +922,13 @@ class ChatUserPendingFormAction
 					chatUser)
 
 				.setTimestamp (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setChat (
 					chat)
 
 				.setSender (
-					myUser)
+					userConsoleLogic.userRequired ())
 
 				.setChat (
 					chat)
@@ -1003,7 +971,7 @@ class ChatUserPendingFormAction
 			chatUser,
 			Optional.<ChatHelpLogRec>absent (),
 			Optional.of (
-				myUser),
+				userConsoleLogic.userRequired ()),
 			message,
 			Optional.fromNullable (
 				chatMessage),
@@ -1018,7 +986,7 @@ class ChatUserPendingFormAction
 		Responder responder =
 			updateQueueItem (
 				chatUser,
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		// wrap up
 

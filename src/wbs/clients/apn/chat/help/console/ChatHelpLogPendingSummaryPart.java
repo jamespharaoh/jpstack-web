@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.help.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 
@@ -18,11 +17,11 @@ import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.message.core.console.MessageConsoleLogic;
 
 @PrototypeComponent ("chatHelpLogPendingSummaryPart")
@@ -51,7 +50,7 @@ class ChatHelpLogPendingSummaryPart
 	MessageConsoleLogic messageConsoleLogic;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	// state
 
@@ -232,7 +231,7 @@ class ChatHelpLogPendingSummaryPart
 		) {
 
 			LocalDate nextDate =
-				dateToInstant (chatHelpLog.getTimestamp ())
+				chatHelpLog.getTimestamp ()
 					.toDateTime (timezone)
 					.toLocalDate ();
 
@@ -253,10 +252,8 @@ class ChatHelpLogPendingSummaryPart
 
 				printFormat (
 					"<td colspan=\"5\">%h</td>\n",
-					timeFormatter.instantToDateStringLong (
-						timezone,
-						dateToInstant (
-							chatHelpLog.getTimestamp ())));
+					userConsoleLogic.dateStringLong (
+						chatHelpLog.getTimestamp ()));
 
 				printFormat (
 					"</tr>\n");
@@ -278,10 +275,8 @@ class ChatHelpLogPendingSummaryPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimeString (
-					timezone,
-					dateToInstant (
-						chatHelpLog.getTimestamp ())));
+				userConsoleLogic.timeString (
+					chatHelpLog.getTimestamp ()));
 
 			printFormat (
 				"<td>%h</td>\n",

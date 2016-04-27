@@ -1,4 +1,4 @@
-package wbs.console.misc;
+package wbs.framework.utils;
 
 import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;

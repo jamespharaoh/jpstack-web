@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.core.fixture;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -451,8 +450,7 @@ class ChatCoreFixtureProvider
 					code)
 
 				.setCreated (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setChatScheme (
 					leftChatScheme)
@@ -500,8 +498,7 @@ class ChatCoreFixtureProvider
 					code)
 
 				.setCreated (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setType (
 					ChatUserType.monitor)
@@ -547,9 +544,8 @@ class ChatCoreFixtureProvider
 						chatUsers))
 
 				.setTimestamp (
-					instantToDate (
-						pastInstant (
-							transaction.now ())))
+					pastInstant (
+						transaction.now ()))
 
 				.setSource (
 					ChatMessageMethod.api)
@@ -604,9 +600,8 @@ class ChatCoreFixtureProvider
 						chatMonitors))
 
 				.setTimestamp (
-					instantToDate (
-						pastInstant (
-							transaction.now ())))
+					pastInstant (
+						transaction.now ()))
 
 				.setMethod (
 					ChatMessageMethod.api)
@@ -658,9 +653,8 @@ class ChatCoreFixtureProvider
 						chatUsers))
 
 				.setTimestamp (
-					instantToDate (
-						pastInstant (
-							transaction.now ())))
+					pastInstant (
+						transaction.now ()))
 
 				.setSender (
 					randomLogic.sample (

@@ -2,7 +2,6 @@ package wbs.test.simulator.console;
 
 import static wbs.framework.utils.etc.Misc.doesNotStartWith;
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toBoolean;
 import static wbs.framework.utils.etc.Misc.toInteger;
@@ -34,6 +33,7 @@ import wbs.platform.media.model.MediaRec;
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.console.SliceConsoleHelper;
 import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.InboxLogic;
@@ -104,6 +104,9 @@ class SimulatorSessionCreateEventAction
 	@Inject
 	TextObjectHelper textHelper;
 
+	@Inject
+	UserConsoleLogic userConsoleLogic;
+
 	// prototype dependencies
 
 	@Inject
@@ -163,7 +166,7 @@ class SimulatorSessionCreateEventAction
 				requestContext.requestPath (),
 				exception,
 				Optional.of (
-					requestContext.userId ()),
+					userConsoleLogic.userIdRequired ()),
 				GenericExceptionResolution.ignoreWithUserWarning);
 
 			return jsonResponder.get ()
@@ -364,8 +367,7 @@ System.out.println (
 			success
 				? MessageStatus.delivered
 				: MessageStatus.undelivered,
-			instantToDate (
-				transaction.now ()),
+			transaction.now (),
 			null);
 
 		// create event data

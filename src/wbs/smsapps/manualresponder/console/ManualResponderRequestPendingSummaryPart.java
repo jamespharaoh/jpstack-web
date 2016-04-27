@@ -1,6 +1,5 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
@@ -36,10 +35,9 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryEditableScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 import wbs.framework.utils.etc.ProfileLogger;
@@ -49,6 +47,7 @@ import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.customer.model.SmsCustomerRec;
 import wbs.sms.customer.model.SmsCustomerSessionObjectHelper;
 import wbs.sms.customer.model.SmsCustomerSessionRec;
@@ -108,7 +107,7 @@ class ManualResponderRequestPendingSummaryPart
 	MessageObjectHelper messageHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	RouterLogic routerLogic;
@@ -120,7 +119,7 @@ class ManualResponderRequestPendingSummaryPart
 	SmsCustomerSessionObjectHelper smsCustomerSessionHelper;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	// state
 
@@ -276,8 +275,7 @@ class ManualResponderRequestPendingSummaryPart
 					route.getId ())
 
 				.createdTimeAfter (
-					dateToInstant (
-						startOfToday.toDate ()))
+					startOfToday)
 
 				.direction (
 					MessageDirection.out);
@@ -702,8 +700,7 @@ class ManualResponderRequestPendingSummaryPart
 			"<tr>\n",
 			"<th>Start time</th>\n",
 			"<td>%h</td>\n",
-			timeFormatter.instantToTimestampString (
-				timeFormatter.defaultTimezone (),
+			userConsoleLogic.timestampWithTimezoneString (
 				smsCustomerSession.getStartTime ()),
 			"</tr>\n");
 
@@ -713,8 +710,7 @@ class ManualResponderRequestPendingSummaryPart
 				"<tr>\n",
 				"<th>End time</th>\n",
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
+				userConsoleLogic.timestampWithTimezoneString (
 					smsCustomerSession.getStartTime ()),
 				"</tr>\n");
 
@@ -730,12 +726,10 @@ class ManualResponderRequestPendingSummaryPart
 					.getWelcomeMessage ()
 					.getText ()
 					.getText (),
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
-					dateToInstant (
-						smsCustomerSession
-							.getWelcomeMessage ()
-							.getCreatedTime ())),
+				userConsoleLogic.timestampWithTimezoneString (
+					smsCustomerSession
+						.getWelcomeMessage ()
+						.getCreatedTime ()),
 				"</tr>\n");
 
 		}
@@ -750,12 +744,10 @@ class ManualResponderRequestPendingSummaryPart
 					.getWarningMessage ()
 					.getText ()
 					.getText (),
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
-					dateToInstant (
-						smsCustomerSession
-							.getWarningMessage ()
-							.getCreatedTime ())),
+				userConsoleLogic.timestampWithTimezoneString (
+					smsCustomerSession
+						.getWarningMessage ()
+						.getCreatedTime ()),
 				"</tr>\n");
 
 		}
@@ -830,10 +822,8 @@ class ManualResponderRequestPendingSummaryPart
 				printFormat (
 					"<td>%s</td>\n",
 					ifNull (
-						timeFormatter.instantToTimestampString (
-							timeFormatter.defaultTimezone (),
-							dateToInstant (
-								oldReply.getTimestamp ())),
+						userConsoleLogic.timestampWithTimezoneString (
+							oldReply.getTimestamp ()),
 						"-"));
 
 				printFormat (
@@ -863,10 +853,8 @@ class ManualResponderRequestPendingSummaryPart
 
 			printFormat (
 				"<td colspan=\"2\">%h</td>\n",
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
-					dateToInstant (
-						oldRequest.getTimestamp ())));
+				userConsoleLogic.timestampWithTimezoneString (
+					oldRequest.getTimestamp ()));
 
 			printFormat (
 				"<td>%h</td>\n",

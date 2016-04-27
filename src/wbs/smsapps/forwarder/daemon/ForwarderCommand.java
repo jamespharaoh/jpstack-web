@@ -1,7 +1,5 @@
 package wbs.smsapps.forwarder.daemon;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import javax.inject.Inject;
 
 import lombok.Getter;
@@ -128,8 +126,7 @@ class ForwarderCommand
 				forwarder.getUrl ().length () > 0)
 
 			.setRetryTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 		);
 

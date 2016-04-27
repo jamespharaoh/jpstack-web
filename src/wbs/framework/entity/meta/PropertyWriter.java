@@ -1,7 +1,13 @@
 package wbs.framework.entity.meta;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormatArray;
+
+import java.lang.reflect.Method;
+
+import lombok.NonNull;
 
 import wbs.framework.utils.etc.FormatWriter;
 
@@ -12,6 +18,8 @@ class PropertyWriter {
 
 	String thisClassName;
 	String typeName;
+	String setterTypeName;
+	String setterConversion;
 	String propertyName;
 	String defaultValue;
 
@@ -44,6 +52,49 @@ class PropertyWriter {
 				arguments);
 
 		return this;
+
+	}
+
+	public
+	PropertyWriter setterTypeNameFormat (
+			@NonNull Object... arguments) {
+
+		if (setterTypeName != null) {
+			throw new IllegalStateException ();
+		}
+
+		setterTypeName =
+			stringFormatArray (
+				arguments);
+
+		return this;
+
+	}
+
+	public
+	PropertyWriter setterConversionFormat (
+			@NonNull Object... arguments) {
+
+		if (setterConversion != null) {
+			throw new IllegalStateException ();
+		}
+
+		setterConversion =
+			stringFormatArray (
+				arguments);
+
+		return this;
+
+	}
+
+	public
+	PropertyWriter setterConversion (
+			@NonNull Method method) {
+
+		return setterConversionFormat (
+			"%s.%s",
+			method.getDeclaringClass ().getName (),
+			method.getName ());
 
 	}
 
@@ -153,7 +204,9 @@ class PropertyWriter {
 		javaWriter.writeFormat (
 			"%s\t\t%s %s) {\n",
 			indent,
-			typeName,
+			ifNull (
+				setterTypeName,
+				typeName),
 			propertyName);
 
 		javaWriter.writeFormat (
@@ -164,10 +217,29 @@ class PropertyWriter {
 			indent,
 			propertyName);
 
-		javaWriter.writeFormat (
-			"%s\t\t%s;\n",
-			indent,
-			propertyName);
+		if (
+			isNotNull (
+				setterConversion)
+		) {
+
+			javaWriter.writeFormat (
+				"%s\t\t%s (\n",
+				indent,
+				setterConversion);
+
+			javaWriter.writeFormat (
+				"%s\t\t\t%s);\n",
+				indent,
+				propertyName);
+
+		} else {
+
+			javaWriter.writeFormat (
+				"%s\t\t%s;\n",
+				indent,
+				propertyName);
+
+		}
 
 		javaWriter.writeFormat (
 			"\n");

@@ -1,6 +1,5 @@
 package wbs.platform.event.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import java.util.List;
@@ -44,8 +43,7 @@ class EventDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_event.timestamp",
-					instantToDate (
-						eventSearch.timestampAfter ())));
+					eventSearch.timestampAfter ()));
 
 		}
 
@@ -57,8 +55,7 @@ class EventDaoHibernate
 			criteria.add (
 				Restrictions.lt (
 					"_event.timestamp",
-					instantToDate (
-						eventSearch.timestampBefore ())));
+					eventSearch.timestampBefore ()));
 
 		}
 

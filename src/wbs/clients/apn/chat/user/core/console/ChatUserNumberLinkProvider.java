@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +13,7 @@ import com.google.common.collect.ImmutableMap;
 import wbs.clients.apn.chat.user.core.model.ChatUserDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.Record;
@@ -37,7 +35,7 @@ class ChatUserNumberLinkProvider
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Override
 	public
@@ -104,8 +102,7 @@ class ChatUserNumberLinkProvider
 				@Override
 				public
 				Instant getStartTime () {
-					return dateToInstant (
-						chatUser.getFirstJoin ());
+					return chatUser.getFirstJoin ();
 				}
 
 				@Override
@@ -173,8 +170,7 @@ class ChatUserNumberLinkProvider
 					@Override
 					public
 					Instant getStartTime () {
-						return dateToInstant (
-							chatUser.getLastJoin ());
+						return chatUser.getLastJoin ();
 					}
 
 					@Override
@@ -244,8 +240,7 @@ class ChatUserNumberLinkProvider
 					@Override
 					public
 					Instant getStartTime () {
-						return dateToInstant (
-							chatUser.getLastJoin ());
+						return chatUser.getLastJoin ();
 					}
 
 					@Override

@@ -10,12 +10,10 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 
-import org.joda.time.DateTime;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.web.Action;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
@@ -42,7 +40,7 @@ class SmsArenaDlrDispatchAction
 	Database database;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionUtils exceptionLogic;
 
 	@Inject
 	ReportLogic reportLogic;
@@ -193,7 +191,7 @@ class SmsArenaDlrDispatchAction
 				route,
 				id,
 				reportCode.getMessageStatus (),
-				DateTime.now().toDate(),
+				transaction.now (),
 				null);
 
 			transaction.commit ();

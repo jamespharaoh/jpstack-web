@@ -21,8 +21,7 @@ import wbs.framework.record.MinorRecord;
 import wbs.framework.record.Record;
 import wbs.framework.record.RootRecord;
 import wbs.platform.event.logic.EventLogic;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("createUpdateEventFormFieldUpdateHook")
@@ -39,7 +38,7 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// properties
 
@@ -56,12 +55,6 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 			@NonNull Record<?> linkObject,
 			@NonNull Optional<Object> objectRef,
 			@NonNull Optional<String> objectType) {
-
-		// lookup user
-
-		UserRec user =
-			userHelper.find (
-				requestContext.userId ());
 
 		// determine if it's an admin event
 
@@ -99,7 +92,7 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 
 				eventLogic.createEvent (
 					adminPrefix + "object_field_updated_in",
-					user,
+					userConsoleLogic.userRequired (),
 					fieldName,
 					objectRef.get (),
 					objectType.get (),
@@ -110,7 +103,7 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 
 				eventLogic.createEvent (
 					adminPrefix + "object_field_nulled_in",
-					user,
+					userConsoleLogic.userRequired (),
 					fieldName,
 					objectRef.get (),
 					objectType.get (),
@@ -124,7 +117,7 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 
 				eventLogic.createEvent (
 					adminPrefix + "object_field_updated",
-					user,
+					userConsoleLogic.userRequired (),
 					fieldName,
 					linkObject,
 					updateResult.newNativeValue ().get ());
@@ -133,7 +126,7 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 
 				eventLogic.createEvent (
 					adminPrefix + "object_field_nulled",
-					user,
+					userConsoleLogic.userRequired (),
 					fieldName,
 					linkObject);
 

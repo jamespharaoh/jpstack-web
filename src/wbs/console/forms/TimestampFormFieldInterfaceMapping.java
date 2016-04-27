@@ -23,7 +23,7 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.console.misc.TimeFormatter;
+import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
@@ -35,7 +35,7 @@ class TimestampFormFieldInterfaceMapping<Container>
 	// dependencies
 
 	@Inject
-	TimeFormatter timeFormatter;
+	ConsoleUserHelper preferences;
 
 	// properties
 
@@ -82,8 +82,7 @@ class TimestampFormFieldInterfaceMapping<Container>
 
 				return successResult (
 					Optional.of (
-						timeFormatter.timestampStringToInstant (
-							timeFormatter.defaultTimezone (),
+						preferences.timestampStringToInstant (
 							interfaceValue.get ())));
 
 			} catch (IllegalArgumentException exception) {
@@ -123,24 +122,21 @@ class TimestampFormFieldInterfaceMapping<Container>
 
 			return successResult (
 				Optional.of (
-					timeFormatter.instantToTimestampString (
-						timeFormatter.defaultTimezone (),
+					preferences.timestampWithTimezoneString (
 						genericValue.get ())));
 
 		case date:
 
 			return successResult (
 				Optional.of (
-					timeFormatter.instantToDateStringShort (
-						timeFormatter.defaultTimezone (),
+					preferences.dateStringShort (
 						genericValue.get ())));
 
 		case time:
 
 			return successResult (
 				Optional.of (
-					timeFormatter.instantToTimeString (
-						timeFormatter.defaultTimezone (),
+					preferences.timeString (
 						genericValue.get ())));
 
 		default:

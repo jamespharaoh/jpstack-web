@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -13,15 +12,13 @@ import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.action.ConsoleAction;
-import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.etc.Misc;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("chatUserAdminOnlineAction")
 public
@@ -37,16 +34,13 @@ class ChatUserAdminOnlineAction
 	ChatUserConsoleHelper chatUserHelper;
 
 	@Inject
-	ConsoleRequestContext requestContext;
-
-	@Inject
 	Database database;
 
 	@Inject
 	EventLogic eventLogic;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// details
 
@@ -72,16 +66,13 @@ class ChatUserAdminOnlineAction
 			database.beginReadWrite (
 				this);
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		ChatUserRec chatUser =
 			chatUserHelper.find (
 				requestContext.stuffInt ("chatUserId"));
 
 		String userType =
-			Misc.capitalise (chatUser.getType ().name ());
+			Misc.capitalise (
+				chatUser.getType ().name ());
 
 		if (requestContext.parameter ("online") != null) {
 
@@ -114,7 +105,7 @@ class ChatUserAdminOnlineAction
 
 				eventLogic.createEvent (
 					"chat_user_online",
-					myUser,
+					userConsoleLogic.userRequired (),
 					chatUser);
 
 				transaction.commit ();
@@ -140,8 +131,7 @@ class ChatUserAdminOnlineAction
 			chatUser
 
 				.setLastAction (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 			chatMiscLogic.userJoin (
 				chatUser,
@@ -151,7 +141,7 @@ class ChatUserAdminOnlineAction
 
 			eventLogic.createEvent (
 				"chat_user_online",
-				myUser,
+				userConsoleLogic.userRequired (),
 				chatUser);
 
 			transaction.commit ();
@@ -194,7 +184,7 @@ class ChatUserAdminOnlineAction
 
 			eventLogic.createEvent (
 				"chat_user_offline",
-				myUser,
+				userConsoleLogic.userRequired (),
 				chatUser);
 
 			transaction.commit ();

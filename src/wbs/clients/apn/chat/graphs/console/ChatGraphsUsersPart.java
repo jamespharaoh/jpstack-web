@@ -6,9 +6,9 @@ import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
 
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatGraphsUsersPart")
 public
@@ -33,7 +33,7 @@ class ChatGraphsUsersPart
 				LocalDate.now ();
 
 			dateString =
-				timeFormatter.localDateToDateString (
+				timeFormatter.dateString (
 					date);
 
 		} else {
@@ -86,25 +86,25 @@ class ChatGraphsUsersPart
 				"<a href=\"%h\">Prev week</a>\n",
 				stringFormat (
 					"?date=%u",
-					timeFormatter.localDateToDateString (
+					timeFormatter.dateString (
 						date.minusWeeks (1))),
 
 				"<a href=\"%h\">Prev day</a>\n",
 				stringFormat (
 					"?date=%h",
-					timeFormatter.localDateToDateString (
+					timeFormatter.dateString (
 						date.minusDays (1))),
 
 				"<a href=\"%h\">Next day</a>\n",
 				stringFormat (
 					"?date=%u",
-					timeFormatter.localDateToDateString (
+					timeFormatter.dateString (
 						date.plusDays (1))),
 
 				"<a href=\"%h\">Next week</a>",
 				stringFormat (
 					"?date=%u",
-					timeFormatter.localDateToDateString (
+					timeFormatter.dateString (
 						date.plusWeeks (1))),
 
 				"</p>\n");

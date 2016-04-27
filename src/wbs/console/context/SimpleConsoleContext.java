@@ -14,7 +14,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.PrivKeySpec;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -33,7 +33,7 @@ class SimpleConsoleContext
 	// dependencies
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	// properties
 

@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.supervisor.console;
 
 import static wbs.framework.utils.etc.Misc.anyOf;
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.spacify;
@@ -25,9 +24,9 @@ import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.media.console.MediaConsoleLogic;
 
 @PrototypeComponent ("chatSupervisorConversationPart")
@@ -60,7 +59,7 @@ class ChatSupervisorConversationPart
 
 	// state
 
-	DateTimeZone timeZone;
+	DateTimeZone chatTimezone;
 
 	ChatRec chat;
 	ChatUserRec userChatUser;
@@ -118,8 +117,8 @@ class ChatSupervisorConversationPart
 		ChatSchemeRec chatScheme =
 			userChatUser.getChatScheme ();
 
-		timeZone =
-			DateTimeZone.forID (
+		chatTimezone =
+			timeFormatter.timezone (
 				chatScheme.getTimezone ());
 
 		chatMessages =
@@ -250,14 +249,17 @@ class ChatSupervisorConversationPart
 
 		LocalDate previousDate = null;
 
-		for (ChatMessageRec chatMessage
-				: chatMessages) {
+		for (
+			ChatMessageRec chatMessage
+				: chatMessages
+		) {
 
 			LocalDate nextDate =
-				dateToInstant (
-					chatMessage.getTimestamp ())
+				chatMessage.getTimestamp ()
+
 				.toDateTime (
 					timezone)
+
 				.toLocalDate ();
 
 			if (
@@ -273,10 +275,9 @@ class ChatSupervisorConversationPart
 					"<tr style=\"font-weight: bold\">\n",
 
 					"<td colspan=\"3\">%h</td>\n",
-					timeFormatter.instantToDateStringLong (
-						timeZone,
-						dateToInstant (
-							chatMessage.getTimestamp ())),
+					timeFormatter.dateStringLong (
+						chatTimezone,
+						chatMessage.getTimestamp ()),
 
 					"</td>\n",
 
@@ -295,10 +296,9 @@ class ChatSupervisorConversationPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimeString (
-					timeZone,
-					dateToInstant (
-						chatMessage.getTimestamp ())));
+				timeFormatter.timeString (
+					chatTimezone,
+					chatMessage.getTimestamp ()));
 
 			printFormat (
 				"<td>%h</td>\n",

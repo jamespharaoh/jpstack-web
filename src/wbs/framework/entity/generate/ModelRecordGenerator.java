@@ -161,7 +161,8 @@ class ModelRecordGenerator {
 			org.apache.commons.lang3.builder.CompareToBuilder.class,
 
 			org.joda.time.Instant.class,
-			org.joda.time.LocalDate.class
+			org.joda.time.LocalDate.class,
+			org.joda.time.ReadableInstant.class
 
 		);
 

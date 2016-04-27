@@ -2,7 +2,6 @@ package wbs.clients.apn.chat.broadcast.console;
 
 import static wbs.framework.utils.etc.Misc.allOf;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.moreThanZero;
@@ -47,7 +46,6 @@ import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -61,8 +59,8 @@ import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.service.console.ServiceConsoleHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.gsm.Gsm;
 import wbs.sms.magicnumber.logic.MagicNumberLogic;
@@ -149,7 +147,7 @@ class ChatBroadcastSendAction
 	TextObjectHelper textHelper;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -437,7 +435,7 @@ class ChatBroadcastSendAction
 						.lastAction (
 							orNull (
 								TextualInterval.forInterval (
-									timeFormatter.defaultTimezone (),
+									userConsoleLogic.timezone (),
 									Optional.fromNullable (
 										form.lastAction ()))))
 
@@ -642,10 +640,6 @@ class ChatBroadcastSendAction
 				profileLogger.lap (
 					"perform send");
 
-				UserRec myUser =
-					userHelper.find (
-						requestContext.userId ());
-
 				String messageString =
 					joinWithoutSeparator (
 						form.prefix (),
@@ -678,10 +672,10 @@ class ChatBroadcastSendAction
 						ChatBroadcastState.sending)
 
 					.setCreatedUser (
-						myUser)
+						userConsoleLogic.userRequired ())
 
 					.setSentUser (
-						myUser)
+						userConsoleLogic.userRequired ())
 
 					.setCreatedTime (
 						transaction.now ())
@@ -708,14 +702,12 @@ class ChatBroadcastSendAction
 
 						.setSearchLastActionFrom (
 							form.lastAction () != null
-								? instantToDate (
-									form.lastAction ().getStart ())
+								? form.lastAction ().getStart ()
 								: null)
 
 						.setSearchLastActionTo (
 							form.lastAction () != null
-								? instantToDate (
-									form.lastAction ().getEnd ())
+								? form.lastAction ().getEnd ()
 								: null)
 
 						.setSearchGender (
@@ -803,7 +795,7 @@ class ChatBroadcastSendAction
 							ChatBroadcastNumberState.accepted)
 
  						.setAddedByUser (
- 							myUser)
+ 							userConsoleLogic.userRequired ())
 
 					);
 

@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -21,9 +20,9 @@ import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.sms.gazetteer.logic.GazetteerLogic;
@@ -181,7 +180,7 @@ class ChatUserSummaryPart
 
 			"<td>%h</td>\n",
 			chatUser.getDob () != null
-				? timeFormatter.localDateToDateString (
+				? timeFormatter.dateString (
 					chatUser.getDob ())
 				: "-",
 
@@ -237,41 +236,36 @@ class ChatUserSummaryPart
 			"</tr>\n");
 
 		printFormat (
-			"<tr> <th>Online</th> <td>%h</td> </tr>\n",
-				chatUser.getOnline() ? "yes" : "no");
+			"<tr>\n",
+			"<th>Online</th>\n",
+			"<td>%h</td>\n",
+			chatUser.getOnline() ? "yes" : "no",
+			"</tr>\n");
 
 		if (isUser) {
 
 			printFormat (
 				"<tr>\n",
-
 				"<th>First join</th>\n",
-
 				"<td>%h</td>\n",
 				chatUser.getFirstJoin () != null
-					? timeFormatter.instantToTimestampString (
+					? timeFormatter.timestampTimezoneString (
 						chatUserLogic.timezone (
 							chatUser),
-						dateToInstant (
-							chatUser.getFirstJoin ()))
+						chatUser.getFirstJoin ())
 					: "-",
-
 				"</tr>\n");
 
 			printFormat (
 				"<tr>\n",
-
 				"<th>Last join</th>\n",
-
 				"<td>%h</td>\n",
 				chatUser.getLastJoin () != null
-					? timeFormatter.instantToTimestampString (
+					? timeFormatter.timestampTimezoneString (
 						chatUserLogic.timezone (
 							chatUser),
-						dateToInstant (
-							chatUser.getLastJoin ()))
+						chatUser.getLastJoin ())
 					: "-",
-
 				"</tr>\n");
 
 		}
@@ -279,8 +273,8 @@ class ChatUserSummaryPart
 		if (isUser) {
 
 			ChatSchemeChargesRec charges =
-				chatUser.getChatScheme () != null ?
-					chatUser.getChatScheme ().getCharges ()
+				chatUser.getChatScheme () != null
+					? chatUser.getChatScheme ().getCharges ()
 					: null;
 
 			printFormat (

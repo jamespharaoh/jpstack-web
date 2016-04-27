@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.util.Set;
@@ -17,9 +16,9 @@ import wbs.clients.apn.chat.user.info.model.ChatUserInfoRec;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatUserAdminInfoPart")
 public
@@ -169,18 +168,19 @@ class ChatUserAdminInfoPart
 			"<th>Moderator</th>\n",
 			"</tr>\n");
 
-		for (ChatUserInfoRec chatUserInfo
-				: chatUserInfos) {
+		for (
+			ChatUserInfoRec chatUserInfo
+				: chatUserInfos
+		) {
 
 			printFormat (
 				"<tr>\n",
 
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimestampString (
+				timeFormatter.timestampTimezoneString (
 					chatUserLogic.timezone (
 						chatUser),
-					dateToInstant (
-						chatUserInfo.getCreationTime ())),
+					chatUserInfo.getCreationTime ()),
 
 				"<td>%h</td>\n",
 				chatUserInfo.getOriginalText () != null

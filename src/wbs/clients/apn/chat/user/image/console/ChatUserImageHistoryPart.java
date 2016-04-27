@@ -17,8 +17,7 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.media.console.MediaConsoleLogic;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("chatUserImageHistoryPart")
 public
@@ -35,12 +34,11 @@ class ChatUserImageHistoryPart
 	MediaConsoleLogic mediaConsoleLogic;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	ChatUserImageType type;
 	ChatUserRec chatUser;
 	Set<ChatUserImageRec> chatUserImages;
-	UserRec myUser;
 
 	@Override
 	public
@@ -68,10 +66,6 @@ class ChatUserImageHistoryPart
 				iterator.remove ();
 
 		}
-
-		myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 	}
 
@@ -139,7 +133,7 @@ class ChatUserImageHistoryPart
 				"<td>%h</td>\n",
 				objectManager.objectPathMini (
 					chatUserImage.getModerator (),
-					myUser.getSlice ()));
+					userConsoleLogic.sliceRequired ()));
 
 			printFormat (
 				"<td>%h</td>\n",

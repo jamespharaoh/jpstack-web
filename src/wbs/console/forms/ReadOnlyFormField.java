@@ -26,7 +26,7 @@ import com.google.common.base.Optional;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
@@ -47,7 +47,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 	ConsoleObjectManager objectManager;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	// properties
 

@@ -25,7 +25,7 @@ interface UserLogic {
 	void userLogoff (
 			UserRec user);
 
-	Integer userLogonTry (
+	Long userLogonTry (
 			String sliceCode,
 			String username,
 			String password,

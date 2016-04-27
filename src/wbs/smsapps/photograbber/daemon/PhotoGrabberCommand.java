@@ -1,7 +1,6 @@
 package wbs.smsapps.photograbber.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -168,8 +167,7 @@ class PhotoGrabberCommand
 				mediaRef)
 
 			.setRequestTime (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		String mediaUrl;
 

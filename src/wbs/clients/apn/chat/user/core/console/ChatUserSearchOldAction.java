@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.user.core.console;
 
+import static wbs.framework.utils.etc.Misc.dateToInstantNullSafe;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.toBoolean;
@@ -17,6 +18,7 @@ import javax.inject.Inject;
 import lombok.Cleanup;
 
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -212,15 +214,17 @@ class ChatUserSearchOldAction
 			params.get (
 				"valueSinceEverLte");
 
-		Date searchFirstJoinGte =
-			(Date)
-			params.get (
-				"firstJoinGte");
+		Instant searchFirstJoinGte =
+			dateToInstantNullSafe (
+				(Date)
+				params.get (
+					"firstJoinGte"));
 
-		Date searchFirstJoinLte =
-			(Date)
-			params.get (
-				"firstJoinLte");
+		Instant searchFirstJoinLte =
+			dateToInstantNullSafe (
+				(Date)
+				params.get (
+					"firstJoinLte"));
 
 		Long limit =
 			(Long) params.get (

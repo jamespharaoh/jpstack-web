@@ -27,7 +27,7 @@ import fj.data.Either;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
@@ -47,7 +47,7 @@ class HiddenFormField<Container,Generic,Native>
 	ConsoleObjectManager objectManager;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	// properties
 

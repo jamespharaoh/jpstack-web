@@ -7,7 +7,6 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.orNull;
-import static wbs.framework.utils.etc.Misc.pluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -35,7 +34,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.fileupload.FileItem;
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
@@ -45,7 +43,7 @@ import com.google.common.collect.Maps;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.priv.PrivDataLoader;
+import wbs.console.priv.UserPrivDataLoader;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
 import wbs.console.tab.TabList;
@@ -80,7 +78,7 @@ class ConsoleRequestContextImplementation
 	ConsoleObjectManager objectManager;
 
 	@Inject
-	PrivDataLoader privChecker;
+	UserPrivDataLoader privChecker;
 
 	@Inject
 	RequestContext requestContext;
@@ -99,15 +97,6 @@ class ConsoleRequestContextImplementation
 	// TODO remove anything which doesn't belong here
 
 	// TODO use spring scopes to make much of this redundant
-
-	@Override
-	public
-	Integer userId () {
-
-		return (Integer)
-			session ("myUserId");
-
-	}
 
 	@Override
 	public
@@ -650,151 +639,6 @@ class ConsoleRequestContextImplementation
 			return wantedPath.substring (1);
 
 		}
-
-	}
-
-	@Override
-	public
-	String prettyDateDiff (
-			Instant before,
-			Instant after) {
-
-		if (before == null || after == null)
-			return null;
-
-		return prettyMsInterval (
-			+ after.getMillis ()
-			- before.getMillis ());
-
-	}
-
-	@Override
-	public
-	String prettyMsInterval (
-			Long interval) {
-
-		if (interval == null) {
-
-			return null;
-
-		} else if (interval < 2 * 1000L) {
-
-			return pluralise (
-				interval,
-				"millisecond");
-
-		} else if (interval < 2 * 60000L) {
-
-			return pluralise (
-				interval / 1000L,
-				"second");
-
-		} else if (interval < 2 * 3600000L) {
-
-			return pluralise (
-				interval / 60000L,
-				"minute");
-
-		} else if (interval < 2 * 86400000L) {
-
-			return pluralise (
-				interval / 3600000L,
-				"hour");
-
-		} else if (interval < 2 * 2678400000L) {
-
-			return pluralise (
-				interval / 86400000L,
-				"day");
-
-		} else if (interval < 2 * 31557600000L) {
-
-			return pluralise (
-				interval / 2592000000L,
-				"month");
-
-		} else {
-
-			return pluralise (
-				interval / 31556736000L,
-				"year");
-
-		}
-
-	}
-
-	@Override
-	public
-	String prettyMsInterval (
-			Integer interval) {
-
-		if (interval == null)
-			return null;
-
-		return prettyMsInterval (
-			(long) interval);
-
-	}
-
-	@Override
-	public
-	String prettySecsInterval (
-			Long interval) {
-
-		if (interval == null) {
-
-			return null;
-
-		} else if (interval < 2 * 60L) {
-
-			return pluralise (
-				interval,
-				"second");
-
-		} else if (interval < 2 * 3600L) {
-
-			return pluralise (
-				interval / 60L,
-				"minute");
-
-		} else if (interval < 2 * 86400L) {
-
-			return pluralise (
-				interval / 3600L,
-				"hour");
-
-		} else if (interval < 2 * 2678400L) {
-
-			return pluralise (
-				interval / 86400L,
-				"day");
-
-		} else if (interval < 2 * 31557600L) {
-
-			return pluralise (
-				interval / 2592000L,
-				"month");
-
-		} else {
-
-			return pluralise (
-				interval / 31556736L,
-				"year");
-
-		}
-
-	}
-
-	@Override
-	public
-	String prettySecsInterval (
-			Integer interval) {
-
-		if (interval == null)
-			return null;
-
-		return prettySecsInterval (
-			(long) interval);
 
 	}
 

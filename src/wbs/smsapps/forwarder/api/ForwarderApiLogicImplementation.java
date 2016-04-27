@@ -1,17 +1,17 @@
 package wbs.smsapps.forwarder.api;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import org.joda.time.Duration;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
@@ -142,8 +142,7 @@ class ForwarderApiLogicImplementation
 				null)
 
 			.setProcessedTime (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		return textResponder.get ()
 
@@ -181,15 +180,11 @@ class ForwarderApiLogicImplementation
 
 		}
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		forwarderMessageIn
 
-		calendar.add (
-			Calendar.MINUTE,
-			10);
-
-		forwarderMessageIn.setBorrowedTime (
-			calendar.getTime ());
+			.setBorrowedTime (
+				transaction.now ().plus (
+					Duration.standardMinutes (10)));
 
 		return textResponder.get ()
 			.text (
@@ -253,8 +248,7 @@ class ForwarderApiLogicImplementation
 					null)
 
 				.setProcessedTime (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 		}
 

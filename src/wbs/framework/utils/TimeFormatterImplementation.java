@@ -1,42 +1,37 @@
-package wbs.console.misc;
+package wbs.framework.utils;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.pluralise;
 
 import java.util.Locale;
-
-import javax.inject.Inject;
 
 import lombok.NonNull;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
+import org.joda.time.ReadableDuration;
+import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.config.WbsConfig;
 
 @SingletonComponent ("timeFormatter")
 public
 class TimeFormatterImplementation
 	implements TimeFormatter {
 
-	// dependencies
-
-	@Inject
-	WbsConfig wbsConfig;
-
 	// implementation
 
 	@Override
 	public
-	String instantToTimestampString (
+	String timestampString (
 			@NonNull DateTimeZone timeZone,
-			@NonNull Instant instant) {
+			@NonNull ReadableInstant instant) {
 
 		return timestampFormat
 			.withZone (timeZone)
@@ -46,9 +41,9 @@ class TimeFormatterImplementation
 
 	@Override
 	public
-	String instantToTimestampTimezoneString (
+	String timestampTimezoneString (
 			@NonNull DateTimeZone timeZone,
-			@NonNull Instant instant) {
+			@NonNull ReadableInstant instant) {
 
 		return timestampTimezoneFormat
 			.withZone (timeZone)
@@ -58,9 +53,9 @@ class TimeFormatterImplementation
 
 	@Override
 	public
-	String instantToDateStringLong (
+	String dateStringLong (
 			@NonNull DateTimeZone timeZone,
-			@NonNull Instant instant) {
+			@NonNull ReadableInstant instant) {
 
 		return longDateFormat
 			.withZone (timeZone)
@@ -70,9 +65,9 @@ class TimeFormatterImplementation
 
 	@Override
 	public
-	String instantToTimeString (
+	String timeString (
 			@NonNull DateTimeZone timeZone,
-			@NonNull Instant instant) {
+			@NonNull ReadableInstant instant) {
 
 		return timeFormat
 			.withZone (timeZone)
@@ -82,9 +77,9 @@ class TimeFormatterImplementation
 
 	@Override
 	public
-	String instantToDateStringShort (
+	String dateStringShort (
 			@NonNull DateTimeZone timeZone,
-			@NonNull Instant instant) {
+			@NonNull ReadableInstant instant) {
 
 		return shortDateFormat
 			.withZone (timeZone)
@@ -94,8 +89,8 @@ class TimeFormatterImplementation
 
 	@Override
 	public
-	String instantToHttpTimestampString (
-			@NonNull Instant instant) {
+	String httpTimestampString (
+			@NonNull ReadableInstant instant) {
 
 		return httpTimestampFormat
 			.print (instant);
@@ -117,7 +112,7 @@ class TimeFormatterImplementation
 
 	@Override
 	public
-	String localDateToDateString (
+	String dateString (
 			@NonNull LocalDate localDate) {
 
 		return shortDateFormat.print (
@@ -127,7 +122,7 @@ class TimeFormatterImplementation
 
 	@Override
 	public
-	String dateTimeToTimestampTimezoneString (
+	String timestampTimezoneString (
 			@NonNull DateTime dateTime) {
 
 		return timestampTimezoneFormat.print (
@@ -137,7 +132,7 @@ class TimeFormatterImplementation
 
 	@Override
 	public
-	String dateTimeToTimezoneString (
+	String timezoneString (
 			@NonNull DateTime dateTime) {
 
 		return timezoneFormat.print (
@@ -174,6 +169,77 @@ class TimeFormatterImplementation
 
 	}
 
+	// duration
+
+	@Override
+	public 
+	String prettyDuration (
+			@NonNull ReadableInstant start,
+			@NonNull ReadableInstant end) {
+
+		return prettyDuration (
+			new Duration (
+				start,
+				end));
+
+	}
+
+	@Override
+	public 
+	String prettyDuration (
+			@NonNull ReadableDuration interval) {
+
+		long millis =
+			interval.getMillis ();
+
+		if (millis < 2 * 1000L) {
+
+			return pluralise (
+				millis,
+				"millisecond");
+
+		} else if (millis < 2 * 60000L) {
+
+			return pluralise (
+				millis / 1000L,
+				"second");
+
+		} else if (millis < 2 * 3600000L) {
+
+			return pluralise (
+				millis / 60000L,
+				"minute");
+
+		} else if (millis < 2 * 86400000L) {
+
+			return pluralise (
+				millis / 3600000L,
+				"hour");
+
+		} else if (millis < 2 * 2678400000L) {
+
+			return pluralise (
+				millis / 86400000L,
+				"day");
+
+		} else if (millis < 2 * 31557600000L) {
+
+			return pluralise (
+				millis / 2592000000L,
+				"month");
+
+		} else {
+
+			return pluralise (
+				millis / 31556736000L,
+				"year");
+
+		}
+
+	}
+
+	// time zone
+
 	@Override
 	public
 	DateTime timestampTimezoneToDateTime (
@@ -184,6 +250,7 @@ class TimeFormatterImplementation
 
 	}
 
+	/*
 	@Override
 	public
 	DateTimeZone defaultTimezone () {
@@ -194,6 +261,7 @@ class TimeFormatterImplementation
 				DateTimeZone.getDefault ().getID ()));
 
 	}
+	*/
 
 	@Override
 	public

@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -117,7 +116,7 @@ class ChatUserAlarmDaemon
 						"chatUserAlarm %s",
 						alarm.getId ()),
 					exception,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}
@@ -199,8 +198,7 @@ class ChatUserAlarmDaemon
 				reason)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setAlarmTime (
 				alarm.getAlarmTime ()));

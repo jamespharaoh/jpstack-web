@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 import com.google.common.base.Optional;
 
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 
@@ -31,7 +31,7 @@ class ParentFormFieldConstraintValidator<
 	ConsoleObjectManager objectManager;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	// properties
 

@@ -1,6 +1,6 @@
 package wbs.platform.event.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
+import static wbs.framework.utils.etc.Misc.instantToDateNullSafe;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Calendar;
@@ -16,7 +16,6 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
@@ -24,6 +23,7 @@ import wbs.framework.utils.etc.Html;
 import wbs.platform.event.model.EventLinkObjectHelper;
 import wbs.platform.event.model.EventLinkRec;
 import wbs.platform.event.model.EventRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectEventsPart")
@@ -44,7 +44,7 @@ class ObjectEventsPart
 	ConsoleObjectManager objectManager;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	// properties
 
@@ -124,7 +124,8 @@ class ObjectEventsPart
 			Calendar.getInstance ();
 
 		calendar.setTime (
-			event.getTimestamp ());
+			instantToDateNullSafe (
+				event.getTimestamp ()));
 
 		int newDayNumber =
 			(calendar.get (Calendar.YEAR) << 9)
@@ -139,10 +140,8 @@ class ObjectEventsPart
 				"<tr style=\"font-weight: bold\">\n",
 
 				"<td colspan=\"2\">%h</td>\n",
-				timeFormatter.instantToDateStringLong (
-					timeFormatter.defaultTimezone (),
-					dateToInstant (
-						event.getTimestamp ())),
+				userConsoleLogic.dateStringLong (
+					event.getTimestamp ()),
 
 				"</tr>\n");
 
@@ -177,10 +176,8 @@ class ObjectEventsPart
 
 			"<td>%s</td>\n",
 			Html.encodeNonBreakingWhitespace (
-				timeFormatter.instantToTimeString (
-					timeFormatter.defaultTimezone (),
-					dateToInstant (
-						event.getTimestamp ()))),
+				userConsoleLogic.timeString (
+					event.getTimestamp ())),
 
 			"<td>%s</td>\n",
 			text,

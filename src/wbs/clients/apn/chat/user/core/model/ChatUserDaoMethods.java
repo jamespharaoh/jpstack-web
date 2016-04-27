@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.core.model;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +32,7 @@ interface ChatUserDaoMethods {
 			ChatCategoryRec category);
 
 	List<ChatUserRec> findWantingBill (
-			Date date);
+			Instant date);
 
 	List<ChatUserRec> findWantingWarning ();
 

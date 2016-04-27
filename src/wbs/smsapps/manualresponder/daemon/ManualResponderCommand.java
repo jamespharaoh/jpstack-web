@@ -2,7 +2,6 @@ package wbs.smsapps.manualresponder.daemon;
 
 import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
@@ -25,13 +24,13 @@ import org.joda.time.Years;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
-import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.EmailLogic;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -235,8 +234,7 @@ class ManualResponderCommand
 				message)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setNumber (
 				message.getNumber ())
@@ -317,8 +315,11 @@ class ManualResponderCommand
 					manualResponder.getSlice ().getCode (),
 					manualResponder.getCode (),
 					"Timestamp:    %s\n",
-					timeFormatter.instantToTimestampString (
-						timeFormatter.defaultTimezone (),
+					timeFormatter.timestampString (
+						timeFormatter.timezone (
+							ifNull (
+								manualResponder.getSlice ().getDefaultTimezone (),
+								wbsConfig.defaultTimezone ())),
 						transaction.now ()),
 					"\n",
 

@@ -13,15 +13,21 @@ public abstract
 class ConsolePrintResponder
 	extends ConsoleResponder {
 
+	// dependencies
+
 	@Inject
 	protected
 	ConsoleRequestContext requestContext;
+
+	// state
 
 	protected
 	FormatWriter formatWriter;
 
 	protected
 	PrintWriter printWriter;
+
+	// implenentation
 
 	@Override
 	protected

@@ -26,11 +26,11 @@ import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
+import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatBroadcastVerifyPart")
 public

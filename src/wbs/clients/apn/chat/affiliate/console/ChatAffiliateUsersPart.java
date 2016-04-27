@@ -57,24 +57,33 @@ class ChatAffiliateUsersPart
 			"<th>Online</th>\n",
 			"</tr>\n");
 
-		for (ChatUserRec chatUser
-				: chatUsers) {
+		for (
+			ChatUserRec chatUser
+				: chatUsers
+		) {
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUser.getCode (),
+				chatUser.getCode ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUser.getName (),
+				chatUser.getName ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUser.getInfoText (),
+				chatUser.getInfoText ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUser.getOnline () ? "yes" : "no",
+				chatUser.getOnline ()
+					? "yes"
+					: "no");
 
+			printFormat (
 				"</tr>");
 
 		}

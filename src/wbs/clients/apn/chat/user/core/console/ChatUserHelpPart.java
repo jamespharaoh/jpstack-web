@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -16,9 +15,9 @@ import org.joda.time.LocalDate;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.Html;
 import wbs.sms.message.core.console.MessageConsoleLogic;
 
@@ -104,13 +103,18 @@ class ChatUserHelpPart
 			chatUserLogic.timezone (
 				chatUser);
 
-		for (ChatHelpLogRec chatHelpLog
-				: chatHelpLogs) {
+		for (
+			ChatHelpLogRec chatHelpLog
+				: chatHelpLogs
+		) {
 
 			LocalDate nextDate =
-				dateToInstant (chatHelpLog.getTimestamp ())
-					.toDateTime (timezone)
-					.toLocalDate ();
+				chatHelpLog.getTimestamp ()
+
+				.toDateTime (
+					timezone)
+
+				.toLocalDate ();
 
 			if (
 				notEqual (
@@ -128,11 +132,10 @@ class ChatUserHelpPart
 					"<tr style=\"font-weight: bold\">\n",
 
 					"<td colspan=\"5\">%h</td>\n",
-					timeFormatter.instantToDateStringLong (
+					timeFormatter.dateStringLong (
 						chatUserLogic.timezone (
 							chatUser),
-						dateToInstant (
-							chatHelpLog.getTimestamp ())),
+						chatHelpLog.getTimestamp ()),
 
 					"</tr>\n");
 
@@ -155,11 +158,10 @@ class ChatUserHelpPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimeString (
+				timeFormatter.timeString (
 					chatUserLogic.timezone (
 						chatUser),
-					dateToInstant (
-						chatHelpLog.getTimestamp ())));
+					chatHelpLog.getTimestamp ()));
 
 			printFormat (
 				"<td>%h</td>\n",

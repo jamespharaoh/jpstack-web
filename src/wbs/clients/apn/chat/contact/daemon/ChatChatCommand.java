@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.contact.daemon;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -184,8 +183,7 @@ class ChatChatCommand
 					toChatUser)
 
 				.setTimestamp (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 			);
 

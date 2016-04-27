@@ -13,9 +13,9 @@ import wbs.clients.apn.chat.user.core.model.ChatUserNoteRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatUserNotesPart")
 public
@@ -132,7 +132,7 @@ class ChatUserNotesPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimestampString (
+				timeFormatter.timestampTimezoneString (
 					chatUserLogic.timezone (
 						chatUser),
 					chatUserNote.getTimestamp ()));

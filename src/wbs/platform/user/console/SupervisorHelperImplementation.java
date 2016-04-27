@@ -11,8 +11,6 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.supervisor.SupervisorHelper;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.scaffold.model.SliceRec;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @SingletonComponent ("supervisorHelper")
 public
@@ -25,7 +23,7 @@ class SupervisorHelperImplementation
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// implementation
 
@@ -33,12 +31,8 @@ class SupervisorHelperImplementation
 	public
 	List<String> getSupervisorConfigNames () {
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		SliceRec slice =
-			myUser.getSlice ();
+			userConsoleLogic.sliceRequired ();
 
 		List<String> supervisorConfigNames =
 			slice.getSupervisorConfigNames () != null

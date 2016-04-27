@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.contact.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
@@ -21,6 +20,7 @@ import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogSearch;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 
 public
 class ChatUserInitiationLogDaoHibernate
@@ -46,15 +46,15 @@ class ChatUserInitiationLogDaoHibernate
 				"chat",
 				chat)
 
-			.setTimestamp (
+			.setParameter (
 				"startTime",
-				instantToDate (
-					timestampInterval.getStart ()))
+				timestampInterval.getStart (),
+				TimestampWithTimezoneUserType.INSTANCE)
 
-			.setDate (
+			.setParameter (
 				"endTime",
-				instantToDate (
-					timestampInterval.getEnd ()))
+				timestampInterval.getEnd (),
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.list ());
 
@@ -98,14 +98,12 @@ class ChatUserInitiationLogDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_chatUserInitiationLog.timestamp",
-					instantToDate (
-						search.timestamp ().start ())));
+					search.timestamp ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUserInitiationLog.timestamp",
-					instantToDate (
-						search.timestamp ().end ())));
+					search.timestamp ().end ()));
 
 		}
 

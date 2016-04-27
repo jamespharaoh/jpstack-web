@@ -15,6 +15,7 @@ import lombok.extern.log4j.Log4j;
 import wbs.framework.application.scaffold.PluginFixtureSpec;
 import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.application.scaffold.PluginSpec;
+import wbs.framework.application.tools.BackgroundProcess;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 
@@ -35,11 +36,22 @@ class FixturesTool {
 	@Inject
 	Map<Class<?>,Provider<FixtureProvider>> fixtureProviderProvidersByClass;
 
+	@Inject
+	List<BackgroundProcess> backgroundProcesses;
+
 	// implementation
 
 	public
 	void runFixtureProviders (
 			List<String> arguments) {
+
+		log.info (
+			stringFormat (
+				"Disabling background processes"));
+
+		backgroundProcesses.forEach (process ->
+			process.runAutomatically (
+				false));
 
 		log.info (
 			stringFormat (

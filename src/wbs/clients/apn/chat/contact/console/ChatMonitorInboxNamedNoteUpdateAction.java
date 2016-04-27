@@ -29,8 +29,8 @@ import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.text.web.TextResponder;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatMonitorInboxNamedNoteUpdateAction")
 public
@@ -62,6 +62,9 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 	@Inject
 	TextObjectHelper textHelper;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -120,10 +123,6 @@ class ChatMonitorInboxNamedNoteUpdateAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		ChatMonitorInboxRec monitorInbox =
 			chatMonitorInboxHelper.find (
@@ -222,7 +221,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 					newText)
 
 				.setUser (
-					myUser)
+					userConsoleLogic.userRequired ())
 
 				.setTimestamp (
 					transaction.now ())
@@ -237,7 +236,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 					newText)
 
 				.setUser (
-					myUser)
+					userConsoleLogic.userRequired ())
 
 				.setTimestamp (
 					transaction.now ());
@@ -254,7 +253,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 				newText)
 
 			.setUser (
-				myUser)
+				userConsoleLogic.userRequired ())
 
 			.setTimestamp (
 				transaction.now ())

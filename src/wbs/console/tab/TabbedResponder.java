@@ -19,18 +19,18 @@ import lombok.experimental.Accessors;
 
 import org.apache.log4j.Logger;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
+import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.part.PagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.record.GlobalId;
 
@@ -49,10 +49,13 @@ class TabbedResponder
 	ExceptionLogger exceptionLogger;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionUtils exceptionLogic;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
+
+	@Inject
+	ConsoleUserHelper consoleUserHelper;
 
 	// properties
 
@@ -195,8 +198,7 @@ class TabbedResponder
 					"console",
 					path,
 					exception,
-					Optional.fromNullable (
-						requestContext.userId ()),
+					consoleUserHelper.loggedInUserId (),
 					GenericExceptionResolution.ignoreWithUserWarning);
 
 				// and remember we had a problem

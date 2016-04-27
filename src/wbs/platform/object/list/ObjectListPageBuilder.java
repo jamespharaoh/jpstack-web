@@ -21,8 +21,10 @@ import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.forms.CodeFormFieldSpec;
 import wbs.console.forms.DescriptionFormFieldSpec;
+import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.NameFormFieldSpec;
+import wbs.console.forms.StaticFieldsProvider;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
@@ -43,8 +45,6 @@ import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
 import wbs.platform.object.criteria.WhereICanManageCriteriaSpec;
 import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
 import wbs.platform.scaffold.model.SliceRec;
-import wbs.services.ticket.core.console.FieldsProvider;
-import wbs.services.ticket.core.console.StaticFieldsProvider;
 
 @PrototypeComponent ("objectListPageBuilder")
 @ConsoleModuleBuilderHandler

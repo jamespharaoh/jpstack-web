@@ -15,13 +15,15 @@ import wbs.framework.web.Responder;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatUserNotesAction")
 public
 class ChatUserNotesAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
@@ -42,13 +44,20 @@ class ChatUserNotesAction
 	TextObjectHelper textHelper;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
 	Responder backupResponder () {
 		return responder ("chatUserNotesResponder");
 	}
+
+	// implementation
 
 	@Override
 	protected
@@ -58,10 +67,6 @@ class ChatUserNotesAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec user =
-			userHelper.find (
-				requestContext.userId ());
 
 		ChatUserRec chatUser =
 			chatUserHelper.find (
@@ -92,7 +97,7 @@ class ChatUserNotesAction
 				transaction.now ())
 
 			.setUser (
-				user)
+				userConsoleLogic.userRequired ())
 
 			.setText (
 				noteText)
@@ -103,7 +108,8 @@ class ChatUserNotesAction
 
 		transaction.commit ();
 
-		requestContext.addNotice ("Note added");
+		requestContext.addNotice (
+			"Note added");
 
 		return null;
 

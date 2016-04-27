@@ -17,13 +17,15 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatUserAdminCreditModeAction")
 public
 class ChatUserAdminCreditModeAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ChatUserLogic chatUserLogic;
@@ -41,13 +43,20 @@ class ChatUserAdminCreditModeAction
 	EventLogic eventLogic;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
 	Responder backupResponder () {
 		return responder ("chatUserAdminCreditModeResponder");
 	}
+
+	// implementation
 
 	@Override
 	public
@@ -93,10 +102,6 @@ class ChatUserAdminCreditModeAction
 		ChatUserCreditMode oldCreditMode =
 			chatUser.getCreditMode ();
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		// if it changed
 
 		if (newCreditMode != oldCreditMode) {
@@ -111,7 +116,7 @@ class ChatUserAdminCreditModeAction
 
 			eventLogic.createEvent (
 				"chat_user_credit_mode",
-				myUser,
+				userConsoleLogic.userRequired (),
 				chatUser,
 				oldCreditMode.toString (),
 				newCreditMode.toString ());

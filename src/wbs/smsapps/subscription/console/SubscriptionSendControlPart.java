@@ -4,9 +4,9 @@ import javax.inject.Inject;
 
 import org.joda.time.Instant;
 
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.smsapps.subscription.model.SubscriptionSendRec;
 
 @PrototypeComponent ("subscriptionSendControlPart")
@@ -20,7 +20,7 @@ class SubscriptionSendControlPart
 	SubscriptionSendConsoleHelper subscriptionSendHelper;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	// state
 
@@ -146,8 +146,7 @@ class SubscriptionSendControlPart
 			" type=\"text\"",
 			" name=\"timestamp\"",
 			" value=\"%h\"",
-			timeFormatter.instantToTimestampString (
-				timeFormatter.defaultTimezone (),
+			userConsoleLogic.timestampWithTimezoneString (
 				Instant.now ()),
 			"></p>\n",
 

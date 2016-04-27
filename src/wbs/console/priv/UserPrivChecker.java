@@ -7,7 +7,7 @@ import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 
 public
-interface PrivChecker {
+interface UserPrivChecker {
 
 	boolean canRecursive (
 		int privId);
@@ -26,7 +26,11 @@ interface PrivChecker {
 		String... privCodes);
 
 	boolean canSimple (
-		Record<?> object,
+		GlobalId parentObjectId,
+		String... privCodes);
+
+	boolean canSimple (
+		Record<?> parentObject,
 		String... privCodes);
 
 	boolean canRecursive (

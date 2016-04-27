@@ -17,9 +17,9 @@ import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.core.model.ChatStatsObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatStatsRec;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.graph.console.GraphScale;
 
 @PrototypeComponent ("chatGraphsUsersImageResponder")
@@ -245,7 +245,7 @@ class ChatGraphsUsersImageResponder
 				+ (int) (1
 					* (double) plotWidth
 					* (double) (
-						+ chatStats.getTimestamp ().getTime ()
+						+ chatStats.getTimestamp ().getMillis ()
 						- minTime.getMillis ())
 					/ (double) (
 						+ maxTime.getMillis ()

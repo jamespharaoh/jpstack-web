@@ -15,6 +15,8 @@ import com.google.common.collect.ImmutableSet;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.FormatWriterWriter;
 
@@ -22,9 +24,17 @@ public
 class AbstractPagePart
 	implements PagePart {
 
+	// dependencies
+
+	@Inject
+	protected
+	Database database;
+
 	@Inject
 	protected
 	ConsoleRequestContext requestContext;
+
+	// state
 
 	protected
 	Map<String,Object> parameters;
@@ -35,8 +45,13 @@ class AbstractPagePart
 	protected
 	FormatWriter formatWriter;
 
+	protected
+	Transaction transaction;
+
 	private
 	boolean withMarkup = false;
+
+	// accessors
 
 	public
 	boolean isWithMarkup () {
@@ -52,6 +67,8 @@ class AbstractPagePart
 			withMarkup;
 
 	}
+
+	// details
 
 	@Override
 	public
@@ -92,6 +109,9 @@ class AbstractPagePart
 		formatWriter =
 			new FormatWriterWriter (
 				printWriter);
+
+		transaction =
+			database.currentTransaction ();
 
 	}
 

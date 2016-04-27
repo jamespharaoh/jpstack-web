@@ -1,13 +1,11 @@
 package wbs.clients.apn.chat.user.core.hibernate;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +39,7 @@ import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 import wbs.sms.number.core.model.NumberRec;
 
 public
@@ -105,7 +104,7 @@ class ChatUserDaoHibernate
 	@Override
 	public
 	List<ChatUserRec> findWantingBill (
-			@NonNull Date date) {
+			@NonNull Instant startTime) {
 
 		return findMany (
 			ChatUserRec.class,
@@ -128,9 +127,10 @@ class ChatUserDaoHibernate
 				ChatUserCreditMode.strict,
 				ChatUserCreditModeType.INSTANCE)
 
-			.setTimestamp (
+			.setParameter (
 				"date",
-				date)
+				startTime,
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.list ());
 
@@ -186,10 +186,10 @@ class ChatUserDaoHibernate
 				"FROM ChatUserRec cu " +
 				"WHERE cu.adultExpiry < :now")
 
-			.setTimestamp (
+			.setParameter (
 				"now",
-				instantToDate (
-					now))
+				now,
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.setMaxResults (
 				maxResults)
@@ -313,10 +313,10 @@ class ChatUserDaoHibernate
 				"FROM ChatUserRec cu " +
 				"WHERE cu.nextJoinOutbound <= :now")
 
-			.setTimestamp (
+			.setParameter (
 				"now",
-				instantToDate (
-					now))
+				now,
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.list ());
 
@@ -334,10 +334,10 @@ class ChatUserDaoHibernate
 				"FROM ChatUserRec cu " +
 				"WHERE cu.nextAdultAd < :now ")
 
-			.setTimestamp (
+			.setParameter (
 				"now",
-				instantToDate (
-					now))
+				now,
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.list ());
 
@@ -798,11 +798,6 @@ class ChatUserDaoHibernate
 					"onlineAfter")
 			) {
 
-				Date dateValue =
-					instantToDate (
-						(Instant)
-						value);
-
 				DetachedCriteria onlineAfterCriteria =
 					DetachedCriteria
 
@@ -819,7 +814,7 @@ class ChatUserDaoHibernate
 						Restrictions.or (
 							Restrictions.ge (
 								"_chatUserSession.endTime",
-								dateValue),
+								value),
 							Restrictions.isNull (
 								"_chatUserSession.endTime")))
 
@@ -1228,14 +1223,12 @@ class ChatUserDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_chatUser.firstJoin",
-					instantToDate (
-						search.firstJoin ().start ())));
+					search.firstJoin ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUser.firstJoin",
-					instantToDate (
-						search.firstJoin ().end ())));
+					search.firstJoin ().end ()));
 
 		}
 
@@ -1247,14 +1240,12 @@ class ChatUserDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_chatUser.lastAction",
-					instantToDate (
-						search.lastAction ().start ())));
+					search.lastAction ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUser.lastAction",
-					instantToDate (
-						search.lastAction ().end ())));
+					search.lastAction ().end ()));
 
 		}
 
@@ -1266,14 +1257,12 @@ class ChatUserDaoHibernate
 			criteria.add (
 				Restrictions.ge (
 					"_chatUser.lastJoin",
-					instantToDate (
-						search.lastJoin ().start ())));
+					search.lastJoin ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_chatUser.lastJoin",
-					instantToDate (
-						search.lastJoin ().end ())));
+					search.lastJoin ().end ()));
 
 		}
 
@@ -1371,10 +1360,10 @@ class ChatUserDaoHibernate
 				"FROM ChatUserRec chatUser " +
 				"WHERE chatUser.nextAd < :now ")
 
-			.setTimestamp (
+			.setParameter (
 				"now",
-				instantToDate (
-					now))
+				now,
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.list ());
 
@@ -1392,10 +1381,10 @@ class ChatUserDaoHibernate
 				"FROM ChatUserRec cu " +
 				"WHERE cu.nextQuietOutbound <= :now")
 
-			.setTimestamp (
+			.setParameter (
 				"now",
-				instantToDate (
-					now))
+				now,
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.list ());
 

@@ -16,8 +16,8 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatUserAdminBarringAction")
 public
@@ -40,7 +40,12 @@ class ChatUserAdminBarringAction
 	EventLogic eventLogic;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
@@ -49,6 +54,8 @@ class ChatUserAdminBarringAction
 		return responder ("chatUserAdminBarringResponder");
 
 	}
+
+	// implementation
 
 	@Override
 	public
@@ -99,10 +106,6 @@ class ChatUserAdminBarringAction
 
 		// lookup database stuff
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		ChatUserRec chatUser =
 			chatUserHelper.find (
 				chatUserId);
@@ -132,7 +135,7 @@ class ChatUserAdminBarringAction
 
 			eventLogic.createEvent (
 				eventType,
-				myUser,
+				userConsoleLogic.userRequired (),
 				chatUser,
 				reason);
 

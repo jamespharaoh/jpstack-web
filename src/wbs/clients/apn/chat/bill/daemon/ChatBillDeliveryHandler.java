@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.bill.daemon;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -209,8 +208,7 @@ class ChatBillDeliveryHandler
 				.toInstant ();
 
 		Instant messageSentTime =
-			dateToInstant (
-				message.getCreatedTime ());
+			message.getCreatedTime ();
 
 		boolean sentToday =
 			messageSentTime.isAfter (

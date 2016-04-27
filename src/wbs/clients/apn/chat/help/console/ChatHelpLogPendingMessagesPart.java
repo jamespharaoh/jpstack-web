@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.help.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -10,9 +8,9 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.service.console.ServiceConsoleHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -142,11 +140,10 @@ class ChatHelpLogPendingMessagesPart
 				message.getNumTo (),
 
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimestampString (
+				timeFormatter.timestampTimezoneString (
 					chatUserLogic.timezone (
 						chatUser),
-					dateToInstant (
-						message.getCreatedTime ())),
+					message.getCreatedTime ()),
 
 				"<td>%h</td>\n",
 				message.getCharge (),
@@ -158,7 +155,8 @@ class ChatHelpLogPendingMessagesPart
 				rowClass,
 
 				"<td colspan=\"4\">%s</td>\n",
-				Html.newlineToBr (Html.encode (message.getText ())),
+				Html.encodeNewlineToBr (
+					message.getText ().getText ()),
 
 				"</tr>\n");
 

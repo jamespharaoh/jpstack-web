@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isEmpty;
@@ -16,6 +15,9 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
@@ -153,9 +155,7 @@ class ChatUserOnlineDaemon
 					chatUser.getLastAction ())
 
 				|| earlierThan (
-					dateToInstant (
-						chatUser.getLastAction ()
-					).plus (
+					chatUser.getLastAction ().plus (
 						chat.getTimeLogoff () * 1000),
 					transaction.now ())
 
@@ -181,17 +181,19 @@ class ChatUserOnlineDaemon
 
 		// see if they need logging off after the web logoff time
 
-		long webLogoffTime =
-			+ transaction.now ().getMillis ()
-			- chat.getTimeWebLogoff () * 1000;
+		Instant webLogoffTime =
+			transaction.now ().minus (
+				Duration.standardSeconds (
+					chat.getTimeWebLogoff ()));
 
 		if (
 
 			chatUser.getDeliveryMethod ()
 				!= ChatMessageMethod.sms
 
-			&& chatUser.getLastMessagePoll ().getTime ()
-				< webLogoffTime
+			&& earlierThan (
+				chatUser.getLastMessagePoll (),
+				webLogoffTime)
 
 		) {
 
@@ -267,9 +269,7 @@ class ChatUserOnlineDaemon
 					chatUser.getLastSend ())
 
 				|| earlierThan (
-					dateToInstant (
-						chatUser.getLastSend ()
-					).plus (
+					chatUser.getLastSend ().plus (
 						chat.getTimeSend () * 1000),
 					transaction.now ())
 
@@ -281,9 +281,7 @@ class ChatUserOnlineDaemon
 					chatUser.getLastReceive ())
 
 				|| earlierThan (
-					dateToInstant (
-						chatUser.getLastReceive ()
-					).plus (
+					chatUser.getLastReceive ().plus (
 						chat.getTimeReceive () * 1000),
 					transaction.now ())
 
@@ -295,9 +293,7 @@ class ChatUserOnlineDaemon
 					chatUser.getLastInfo ())
 
 				|| earlierThan (
-					dateToInstant (
-						chatUser.getLastInfo ()
-					).plus (
+					chatUser.getLastInfo ().plus (
 						chat.getTimeInfo () * 1000),
 					transaction.now ()))
 
@@ -307,9 +303,7 @@ class ChatUserOnlineDaemon
 					chatUser.getLastPic ())
 
 				|| earlierThan (
-					dateToInstant (
-						chatUser.getLastPic ()
-					).plus (
+					chatUser.getLastPic ().plus (
 						chat.getTimeInfo () * 1000),
 					transaction.now ()))
 
@@ -360,18 +354,16 @@ class ChatUserOnlineDaemon
 					chatUser.getLastNameHint ())
 
 				|| earlierThan (
-					dateToInstant (
-						chatUser.getLastNameHint ()
-					).plus (chat.getTimeName () * 1000),
+					chatUser.getLastNameHint ().plus (
+						chat.getTimeName () * 1000),
 					transaction.now ()))
 
 			&& isNotNull (
 				chatUser.getLastJoin ())
 
 			&& earlierThan (
-				dateToInstant (
-					chatUser.getLastJoin ()
-				).plus (chat.getTimeNameJoin () * 1000),
+				chatUser.getLastJoin ().plus (
+					chat.getTimeNameJoin () * 1000),
 				transaction.now ())
 
 		) {
@@ -416,18 +408,16 @@ class ChatUserOnlineDaemon
 					chatUser.getLastPicHint ())
 
 				|| earlierThan (
-					dateToInstant (
-						chatUser.getLastPicHint ()
-					).plus (chat.getTimePicHint () * 1000),
+					chatUser.getLastPicHint ().plus (
+						chat.getTimePicHint () * 1000),
 					transaction.now ()))
 
 			&& isNotNull (
 				chatUser.getLastJoin ())
 
 			&& earlierThan (
-				dateToInstant (
-					chatUser.getLastJoin ()
-				).plus (15 * 60 * 1000),
+				chatUser.getLastJoin ().plus (
+					15 * 60 * 1000),
 				transaction.now ())
 
 		) {
@@ -455,9 +445,7 @@ class ChatUserOnlineDaemon
 					chatUser.getLastPicHint ())
 
 				|| earlierThan (
-					dateToInstant (
-						chatUser.getLastPicHint ()
-					).plus (
+					chatUser.getLastPicHint ().plus (
 						chat.getTimePicHint () * 1000),
 					transaction.now ()))
 
@@ -467,9 +455,7 @@ class ChatUserOnlineDaemon
 					chatUser.getLastPic ())
 
 				|| earlierThan (
-					dateToInstant (
-						chatUser.getLastPic ()
-					).plus (
+					chatUser.getLastPic ().plus (
 						chat.getTimePicHint () * 1000),
 					transaction.now ()))
 
@@ -477,9 +463,8 @@ class ChatUserOnlineDaemon
 				chatUser.getLastJoin ())
 
 			&& earlierThan (
-				dateToInstant (
-					chatUser.getLastJoin ()
-				).plus (15 * 60 * 1000),
+				chatUser.getLastJoin ().plus (
+					15 * 60 * 1000),
 				transaction.now ())
 
 		) {

@@ -1,10 +1,8 @@
 package wbs.clients.apn.chat.bill.logic;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.laterThan;
@@ -807,8 +805,7 @@ class ChatCreditLogicImplementation
 				chatUser.getLastBillSent ())
 
 			&& laterThan (
-				dateToInstant (
-					chatUser.getLastBillSent ()),
+				chatUser.getLastBillSent (),
 				startOfToday)
 
 		) {
@@ -1037,8 +1034,7 @@ class ChatCreditLogicImplementation
 		chatUser
 
 			.setLastBillSent (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		log.info (
 			stringFormat (
@@ -1173,8 +1169,7 @@ class ChatCreditLogicImplementation
 				chatUser.getLastCreditHint ())
 
 			|| earlierThan (
-				dateToInstant (
-					chatUser.getLastCreditHint ()),
+				chatUser.getLastCreditHint (),
 				transaction.now ().minus (
 					1000 * 60 * 60 * 24))
 
@@ -1281,8 +1276,7 @@ class ChatCreditLogicImplementation
 			chatUser
 
 				.setLastCreditHint (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 		}
 
@@ -1332,8 +1326,7 @@ class ChatCreditLogicImplementation
 				chatUser)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setOldCreditLimit (
 				chatUser.getCreditLimit ())

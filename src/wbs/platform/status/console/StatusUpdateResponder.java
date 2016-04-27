@@ -15,12 +15,16 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.joda.time.Instant;
 
-import wbs.console.misc.TimeFormatter;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.model.RootRec;
+import wbs.platform.scaffold.model.SliceRec;
+import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.model.UserObjectHelper;
+import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("statusUpdateResponder")
 public
@@ -39,11 +43,20 @@ class StatusUpdateResponder
 	StatusLineManager statusLineManager;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
+	UserObjectHelper userHelper;
+
+	@Inject
+	WbsConfig wbsConfig;
 
 	// state
 
 	RootRec root;
+	UserRec user;
+	SliceRec slice;
+
 	String javascript;
 
 	// implementation
@@ -52,10 +65,9 @@ class StatusUpdateResponder
 	protected
 	void prepare () {
 
-		root =
-			rootHelper.find (0);
+		// redirect to login page if not logged in
 
-		if (requestContext.userId () == null) {
+		if (userConsoleLogic.notLoggedIn ()) {
 
 			javascript =
 				stringFormat (
@@ -66,6 +78,11 @@ class StatusUpdateResponder
 			return;
 
 		}
+
+		// find objects
+
+		root =
+			rootHelper.find (0);
 
 		// create the html
 
@@ -78,9 +95,8 @@ class StatusUpdateResponder
 		printWriter.print (
 			stringFormat (
 				"updateTimestamp ('%j');\n",
-				timeFormatter.instantToTimestampTimezoneString (
-					timeFormatter.defaultTimezone (),
-					Instant.now ())));
+				userConsoleLogic.timestampWithTimezoneString (
+					transaction.now ())));
 
 		if (
 			isNotNull (
@@ -132,7 +148,7 @@ class StatusUpdateResponder
 
 		requestContext.setHeader (
 			"Expiry",
-			timeFormatter.instantToHttpTimestampString (
+			userConsoleLogic.httpTimestampString (
 				Instant.now ()));
 
 	}

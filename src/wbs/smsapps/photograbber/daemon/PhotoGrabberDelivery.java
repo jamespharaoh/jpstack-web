@@ -1,7 +1,5 @@
 package wbs.smsapps.photograbber.daemon;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.Collection;
 import java.util.Collections;
 
@@ -94,8 +92,7 @@ class PhotoGrabberDelivery
 		photoGrabberRequest
 
 			.setResponseTime (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		PhotoGrabberRec photoGrabber =
 			photoGrabberRequest.getPhotoGrabber ();

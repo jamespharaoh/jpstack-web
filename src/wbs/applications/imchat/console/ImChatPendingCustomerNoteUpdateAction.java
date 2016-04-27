@@ -23,7 +23,7 @@ import wbs.platform.text.console.TextConsoleHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.text.web.TextResponder;
 import wbs.platform.user.console.UserConsoleHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("imChatPendingCustomerNoteUpdateAction")
 public
@@ -51,12 +51,12 @@ class ImChatPendingCustomerNoteUpdateAction
 	Provider<TextResponder> textResponderProvider;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserConsoleHelper userHelper;
 
-	/*
-	@Inject
-	ConsoleObjectManager objectManager;
-	*/
+	// details
 
 	@Override
 	protected
@@ -81,10 +81,6 @@ class ImChatPendingCustomerNoteUpdateAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		ImChatMessageRec message =
 			imChatMessageHelper.find (
@@ -137,7 +133,7 @@ class ImChatPendingCustomerNoteUpdateAction
 
 			eventLogic.createEvent (
 				"object_field_updated",
-				myUser,
+				userConsoleLogic.userRequired (),
 				"notesText",
 				customer,
 				newValue);
@@ -146,7 +142,7 @@ class ImChatPendingCustomerNoteUpdateAction
 
 			eventLogic.createEvent (
 				"object_field_nulled",
-				myUser,
+				userConsoleLogic.userRequired (),
 				"notesText",
 				customer);
 

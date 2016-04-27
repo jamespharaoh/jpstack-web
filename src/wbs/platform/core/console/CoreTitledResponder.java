@@ -12,17 +12,16 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import com.google.common.base.Optional;
-
 import wbs.console.html.ScriptRef;
 import wbs.console.part.PagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.record.GlobalId;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("coreTitledResponder")
@@ -36,10 +35,13 @@ class CoreTitledResponder
 	ExceptionLogger exceptionLogger;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionUtils exceptionLogic;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	// properties
 
@@ -103,8 +105,7 @@ class CoreTitledResponder
 					"console",
 					path,
 					exception,
-					Optional.fromNullable (
-						requestContext.userId ()),
+					userConsoleLogic.userId (),
 					GenericExceptionResolution.ignoreWithUserWarning);
 
 				// and remember we had a problem

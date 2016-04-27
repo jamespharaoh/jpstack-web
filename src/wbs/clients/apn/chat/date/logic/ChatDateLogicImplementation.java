@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.date.logic;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.prettyHour;
 
 import java.util.Collections;
@@ -77,8 +76,7 @@ class ChatDateLogicImplementation
 		chatUser
 
 			.setLastDateHint (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 	}
 
@@ -109,8 +107,7 @@ class ChatDateLogicImplementation
 		chatUser
 
 			.setLastDateHint (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 	}
 
@@ -226,8 +223,7 @@ class ChatDateLogicImplementation
 				chatUser.getDateDailyMax ())
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 		);
 
@@ -292,8 +288,7 @@ class ChatDateLogicImplementation
 			chatUser
 
 				.setFirstJoin (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 		}
 

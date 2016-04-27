@@ -375,19 +375,9 @@ class ConsoleObjectManagerImplementation
 	boolean canView (
 			Record<?> object) {
 
-		if (log.isDebugEnabled ()) {
-
-			log.debug (
-				stringFormat (
-					"canView (%s) userId=%s",
-					objectManager.objectPath (
-						object),
-					requestContext.userId ()));
-
-		}
-
 		ConsoleHelper<?> objectHelper =
-			findConsoleHelper (object);
+			findConsoleHelper (
+				object);
 
 		return objectHelper.canView (
 			object);

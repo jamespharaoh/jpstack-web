@@ -17,8 +17,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.queue.logic.QueueLogic;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketTemplateRec;
 
@@ -51,7 +50,7 @@ class TicketPendingFormAction
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// details
 
@@ -75,12 +74,6 @@ class TicketPendingFormAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		// find user
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		// find message
 
@@ -114,7 +107,7 @@ class TicketPendingFormAction
 
 		queueLogic.processQueueItem (
 			ticket.getQueueItem (),
-			myUser);
+			userConsoleLogic.userRequired ());
 
 		ticket
 

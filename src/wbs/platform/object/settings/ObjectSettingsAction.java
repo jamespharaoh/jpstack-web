@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableMap;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContextBuilderContainer;
+import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
@@ -28,7 +29,6 @@ import wbs.framework.record.PermanentRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
-import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsAction")

@@ -22,8 +22,8 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("timestampTimezoneFormFieldInterfaceMapping")
@@ -101,7 +101,7 @@ class TimestampTimezoneFormFieldInterfaceMapping<Container>
 
 		return successResult (
 			Optional.of (
-				timeFormatter.dateTimeToTimestampTimezoneString (
+				timeFormatter.timestampTimezoneString (
 					genericValue.get ())));
 
 	}

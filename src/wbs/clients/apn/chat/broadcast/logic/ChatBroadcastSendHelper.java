@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.broadcast.logic;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -384,8 +383,7 @@ class ChatBroadcastSendHelper
 				toChatUser)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setOriginalText (
 				chatBroadcast.getText ())

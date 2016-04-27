@@ -12,6 +12,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.console.forms.FormField.FormType;
+import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
@@ -20,7 +21,6 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
-import wbs.services.ticket.core.console.FieldsProvider;
 import wbs.services.ticket.core.console.TicketConsoleHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;

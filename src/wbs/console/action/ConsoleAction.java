@@ -12,9 +12,8 @@ import lombok.extern.log4j.Log4j;
 
 import org.hibernate.exception.LockAcquisitionException;
 
-import com.google.common.base.Optional;
-
 import wbs.console.misc.ConsoleExceptionHandler;
+import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.context.ApplicationContext;
@@ -31,18 +30,27 @@ class ConsoleAction
 	// dependencies
 
 	@Inject
+	protected
 	ApplicationContext applicationContext;
 
 	@Inject
+	protected
 	ConsoleExceptionHandler consoleExceptionHandler;
 
 	@Inject
+	protected
 	ConsoleManager consoleManager;
 
 	@Inject
+	protected
+	ConsoleUserHelper consoleUserHelper;
+
+	@Inject
+	protected
 	ExceptionLogger exceptionLogger;
 
 	@Inject
+	protected
 	ConsoleRequestContext requestContext;
 
 	// details
@@ -166,8 +174,7 @@ class ConsoleAction
 				"console",
 				requestContext.requestPath (),
 				exceptionFromBackupResponder,
-				Optional.fromNullable (
-					requestContext.userId ()),
+				consoleUserHelper.loggedInUserId (),
 				GenericExceptionResolution.ignoreWithUserWarning);
 
 		}
@@ -198,8 +205,7 @@ class ConsoleAction
 			"console",
 			requestContext.requestPath (),
 			throwable,
-			Optional.fromNullable (
-				requestContext.userId ()),
+			consoleUserHelper.loggedInUserId (),
 			GenericExceptionResolution.ignoreWithUserWarning);
 
 		// give the user an error message

@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.joinWithSpace;
@@ -30,10 +29,10 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.misc.PageBuilder;
 import wbs.console.misc.Percentager;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
 
@@ -396,11 +395,10 @@ class ChatUserSearchOldResultsPart
 			pageBuilder.writer ().writeFormat (
 				"<td>%h</td>\n",
 				chatUser.getLastAction () != null
-					? timeFormatter.instantToDateStringShort (
+					? timeFormatter.dateStringShort (
 						chatUserLogic.timezone (
 							chatUser),
-						dateToInstant (
-							chatUser.getLastAction ()))
+						chatUser.getLastAction ())
 					: "-");
 
 			pageBuilder.writer ().writeFormat (

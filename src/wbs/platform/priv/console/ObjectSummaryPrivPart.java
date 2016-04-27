@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
@@ -39,7 +39,7 @@ class ObjectSummaryPrivPart
 	ConsoleObjectManager objectManager;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	UserObjectHelper userHelper;;

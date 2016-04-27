@@ -26,8 +26,7 @@ import wbs.platform.event.logic.EventLogic;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.text.web.TextResponder;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.customer.model.SmsCustomerRec;
 import wbs.sms.number.core.console.NumberConsoleHelper;
 import wbs.sms.number.core.model.NumberRec;
@@ -66,7 +65,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 	TextObjectHelper textHelper;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// prototype dependencies
 
@@ -90,7 +89,6 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 	String valueParam;
 
-	UserRec myUser;
 	ManualResponderRec manualResponder;
 	NumberRec number;
 	ManualResponderNumberRec manualResponderNumber;
@@ -130,10 +128,6 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		manualResponder =
 			manualResponderHelper.find (
@@ -219,7 +213,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 			eventLogic.createEvent (
 				"object_field_updated",
-				myUser,
+				userConsoleLogic.userRequired (),
 				"notesText",
 				manualResponderNumber,
 				newValue);
@@ -228,7 +222,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 			eventLogic.createEvent (
 				"object_field_nulled",
-				myUser,
+				userConsoleLogic.userRequired (),
 				"notesText",
 				manualResponderNumber);
 
@@ -291,7 +285,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 			eventLogic.createEvent (
 				"object_field_updated",
-				myUser,
+				userConsoleLogic.userRequired (),
 				"notesText",
 				customer,
 				newValue);
@@ -300,7 +294,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 			eventLogic.createEvent (
 				"object_field_nulled",
-				myUser,
+				userConsoleLogic.userRequired (),
 				"notesText",
 				customer);
 

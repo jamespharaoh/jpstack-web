@@ -15,8 +15,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.platform.event.logic.EventLogic;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("createNameEventFormFieldUpdateHook")
 public
@@ -32,7 +31,7 @@ class NameFormFieldUpdateHook
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// implementation
 
@@ -44,10 +43,6 @@ class NameFormFieldUpdateHook
 			@NonNull Record<?> linkObject,
 			@NonNull Optional<Object> objectRef,
 			@NonNull Optional<String> objectType) {
-
-		UserRec user =
-			userHelper.find (
-				requestContext.userId ());
 
 		// don't create event on initial creation
 
@@ -76,7 +71,7 @@ class NameFormFieldUpdateHook
 
 			eventLogic.createEvent (
 				"object_name_changed_in",
-				user,
+				userConsoleLogic.userRequired (),
 				objectRef.get (),
 				objectType.get (),
 				linkObject,
@@ -87,7 +82,7 @@ class NameFormFieldUpdateHook
 
 				eventLogic.createEvent (
 					"object_code_changed_in",
-					user,
+					userConsoleLogic.userRequired (),
 					objectRef.get (),
 					objectType.get (),
 					linkObject,
@@ -100,7 +95,7 @@ class NameFormFieldUpdateHook
 
 			eventLogic.createEvent (
 				"object_name_changed",
-				user,
+				userConsoleLogic.userRequired (),
 				linkObject,
 				updateResult.oldNativeValue ().get (),
 				updateResult.newNativeValue ().get ());
@@ -109,7 +104,7 @@ class NameFormFieldUpdateHook
 
 				eventLogic.createEvent (
 					"object_code_changed",
-					user,
+					userConsoleLogic.userRequired (),
 					linkObject,
 					oldCode,
 					newCode);

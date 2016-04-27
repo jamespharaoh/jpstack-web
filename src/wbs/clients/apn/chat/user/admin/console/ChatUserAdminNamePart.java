@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import javax.inject.Inject;
@@ -11,9 +10,9 @@ import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.info.model.ChatUserNameRec;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatUserAdminNamePart")
 public
@@ -135,11 +134,10 @@ class ChatUserAdminNamePart
 				"<tr>\n",
 
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimestampString (
+				timeFormatter.timestampTimezoneString (
 					chatUserLogic.timezone (
 						chatUser),
-					dateToInstant (
-						chatUserName.getCreationTime ())),
+					chatUserName.getCreationTime ()),
 
 				"<td>%h</td>\n",
 				chatUserName.getOriginalName (),

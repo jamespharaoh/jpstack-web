@@ -59,7 +59,11 @@
 			default="0"/>
 
 		<integer-field
-			name="totalPurchase"
+			name="totalPurchaseValue"
+			default="0"/>
+
+		<integer-field
+			name="totalPurchasePrice"
 			default="0"/>
 
 		<integer-field

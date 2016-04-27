@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.contact.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.List;
+
+import lombok.NonNull;
 
 import org.joda.time.Interval;
 
@@ -11,6 +11,7 @@ import wbs.clients.apn.chat.contact.model.ChatContactNoteRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 
 public
 class ChatContactNoteDaoHibernate
@@ -20,8 +21,8 @@ class ChatContactNoteDaoHibernate
 	@Override
 	public
 	List<ChatContactNoteRec> findByTimestamp (
-			ChatRec chat,
-			Interval timestampInterval) {
+			@NonNull ChatRec chat,
+			@NonNull Interval timestampInterval) {
 
 		return findMany (
 			ChatContactNoteRec.class,
@@ -37,15 +38,15 @@ class ChatContactNoteDaoHibernate
 				"chat",
 				chat)
 
-			.setTimestamp (
+			.setParameter (
 				"start",
-				instantToDate (
-					timestampInterval.getStart ()))
+				timestampInterval.getStart (),
+				TimestampWithTimezoneUserType.INSTANCE)
 
-			.setTimestamp (
+			.setParameter (
 				"end",
-				instantToDate (
-					timestampInterval.getEnd ()))
+				timestampInterval.getEnd (),
+				TimestampWithTimezoneUserType.INSTANCE)
 
 			.list ()
 

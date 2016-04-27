@@ -17,7 +17,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.message.core.model.MessageRec;
 
 @PrototypeComponent ("chatUserAdminLocationFormActionHelper")
@@ -35,6 +35,9 @@ class ChatUserAdminLocationFormActionHelper
 
 	@Inject
 	ConsoleRequestContext requestContext;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserConsoleHelper userHelper;
@@ -95,10 +98,6 @@ class ChatUserAdminLocationFormActionHelper
 
 		// perform update
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		ChatUserRec chatUser =
 			chatUserHelper.find (
 				requestContext.stuffInt (
@@ -109,7 +108,8 @@ class ChatUserAdminLocationFormActionHelper
 				chatUser,
 				formState.newLocationName (),
 				Optional.<MessageRec>absent (),
-				Optional.of (myUser));
+				Optional.of (
+					userConsoleLogic.userRequired ()));
 
 		// handle location not found
 

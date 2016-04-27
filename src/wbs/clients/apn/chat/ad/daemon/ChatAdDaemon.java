@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.ad.daemon;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -153,7 +152,7 @@ class ChatAdDaemon
 					"daemon",
 					"ChatAdDaemon",
 					exception,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}
@@ -189,8 +188,7 @@ class ChatAdDaemon
 
 		if (
 			laterThan (
-				dateToInstant (
-					chatUser.getNextAd ()),
+				chatUser.getNextAd (),
 				transaction.now ())
 		) {
 			return;

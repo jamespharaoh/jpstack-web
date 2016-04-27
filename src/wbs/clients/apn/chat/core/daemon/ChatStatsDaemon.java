@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.core.daemon;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -178,8 +176,7 @@ class ChatStatsDaemon
 				chat)
 
 			.setTimestamp (
-				instantToDate (
-					timestamp))
+				timestamp)
 
 			.setNumUsers (
 				numUsers)

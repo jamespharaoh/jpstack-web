@@ -1,33 +1,38 @@
-package wbs.platform.daemon;
+package wbs.framework.utils;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.concurrent.ThreadFactory;
-
 import javax.inject.Inject;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 
+@Accessors (fluent = true)
 @Log4j
-@SingletonComponent ("threadManager")
 public
-class ThreadManager
-	implements ThreadFactory {
+class ThreadManagerImplementation
+	implements ThreadManager {
 
-	public
-	ThreadManager () {
-	}
+	// dependencies
 
 	@Inject
 	ExceptionLogger exceptionLogger;
+
+	// properties
+
+	@Getter @Setter
+	String exceptionTypeCode; 
+
+	// implementation
 
 	/**
 	 * Thread class which provides the desired functionality.
@@ -92,12 +97,12 @@ class ThreadManager
 			try {
 
 				exceptionLogger.logThrowable (
-					"daemon",
+					exceptionTypeCode,
 					stringFormat (
-						"Daemon thread %s",
+						"Thread %s",
 						getName ()),
 					throwable,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					resolution);
 
 			} catch (Throwable exception) {
@@ -138,6 +143,7 @@ class ThreadManager
 	 * Create and return a managed thread, using the given Runnable as the
 	 * target.
 	 */
+	@Override
 	public
 	Thread makeThread (
 			@NonNull Runnable target) {
@@ -148,17 +154,58 @@ class ThreadManager
 	}
 
 	/**
+	 * Create, start and return a managed thread, using the given Runnable as
+	 * the target.
+	 */
+	@Override
+	public
+	Thread startThread (
+			@NonNull Runnable target) {
+
+		Thread thread =
+			makeThread (
+				target);
+
+		thread.start ();
+
+		return thread;
+
+	}
+
+	/**
 	 * Create and return a managed thread, using the given Runnable as the
 	 * target, and with the given name.
 	 */
+	@Override
 	public
 	Thread makeThread (
-			Runnable target,
-			String name) {
+			@NonNull Runnable target,
+			@NonNull String name) {
 
 		return new ManagedThread (
 			target,
 			name);
+
+	}
+
+	/**
+	 * Create, start and return a managed thread, using the given Runnable as
+	 * the target, and with the given name.
+	 */
+	@Override
+	public
+	Thread startThread (
+			@NonNull Runnable target,
+			@NonNull String name) {
+
+		Thread thread =
+			makeThread (
+				target,
+				name);
+
+		thread.start ();
+
+		return thread;
 
 	}
 

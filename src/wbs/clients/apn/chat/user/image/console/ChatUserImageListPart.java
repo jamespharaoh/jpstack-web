@@ -17,8 +17,8 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.platform.media.console.MediaConsoleLogic;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatUserImageListPart")
 public
@@ -40,6 +40,9 @@ class ChatUserImageListPart
 	ConsoleObjectManager objectManager;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserObjectHelper userHelper;
 
 	// state
@@ -47,7 +50,6 @@ class ChatUserImageListPart
 	ChatUserImageType type;
 	ChatUserRec chatUser;
 	List<ChatUserImageRec> chatUserImages;
-	UserRec myUser;
 
 	// implementation
 
@@ -89,10 +91,6 @@ class ChatUserImageListPart
 					type));
 
 		}
-
-		myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 	}
 
@@ -182,7 +180,7 @@ class ChatUserImageListPart
 				"<td>%h</td>\n",
 				objectManager.objectPathMini (
 					chatUserImage.getModerator (),
-					myUser.getSlice ()));
+					userConsoleLogic.sliceRequired ()));
 
 			printFormat (
 				"<td>%h</td>\n",

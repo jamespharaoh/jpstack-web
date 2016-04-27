@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Map;
@@ -25,13 +24,15 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("chatUserAdminCreditAction")
 public
 class ChatUserAdminCreditAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
@@ -46,7 +47,12 @@ class ChatUserAdminCreditAction
 	Database database;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
@@ -56,6 +62,8 @@ class ChatUserAdminCreditAction
 			"chatUserAdminCreditResponder");
 
 	}
+
+	// implementation
 
 	@Override
 	public
@@ -107,10 +115,6 @@ class ChatUserAdminCreditAction
 				requestContext.stuffInt (
 					"chatUserId"));
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		ChatUserCreditRec chatUserCredit =
 			chatUserCreditHelper.insert (
 				chatUserCreditHelper.createInstance ()
@@ -119,8 +123,7 @@ class ChatUserAdminCreditAction
 				chatUser)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setCreditAmount (
 				creditAmount)
@@ -129,7 +132,7 @@ class ChatUserAdminCreditAction
 				billAmount)
 
 			.setUser (
-				myUser)
+				userConsoleLogic.userRequired ())
 
 			.setGift (
 				billAmount == 0)

@@ -9,7 +9,7 @@ import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogSearch;
 import wbs.clients.apn.chat.core.console.ChatConsoleHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.console.helper.ConsoleHooks;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("chatUserInitiationLogConsoleHooks")
@@ -23,7 +23,7 @@ class ChatUserInitiationLogConsoleHooks
 	ChatConsoleHelper chatHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	// implementation
 

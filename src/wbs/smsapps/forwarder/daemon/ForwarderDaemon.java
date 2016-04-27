@@ -1,6 +1,6 @@
 package wbs.smsapps.forwarder.daemon;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
+import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -13,7 +13,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -22,7 +21,10 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
@@ -57,8 +59,8 @@ class ForwarderDaemon
 
 	// state
 
-	QueueBuffer<Integer,ForwarderMessageInRec> buffer =
-		new QueueBuffer<Integer,ForwarderMessageInRec> (
+	QueueBuffer<Integer,Integer> buffer =
+		new QueueBuffer<Integer,Integer> (
 			bufferSize);
 
 	private
@@ -121,7 +123,7 @@ class ForwarderDaemon
 
 				buffer.add (
 					forwarderMessageIn.getId (),
-					forwarderMessageIn);
+					forwarderMessageIn.getId ());
 
 			}
 
@@ -351,12 +353,16 @@ class ForwarderDaemon
 
 		private
 		boolean doSend (
-				ForwarderMessageInRec forwarderMessageIn) {
+				@NonNull ForwarderMessageInRec forwarderMessageIn) {
 
-			if (forwarderMessageIn.getForwarder ().getUrl ().length () == 0
-					|| forwarderMessageIn.getForwarder ().getUrlParams ().length () == 0)
+			if (
+				forwarderMessageIn.getForwarder ().getUrl ().length () == 0
+				|| forwarderMessageIn.getForwarder ().getUrlParams ().length () == 0
+			) {
 
 				return false;
+
+			}
 
 			try {
 
@@ -392,7 +398,16 @@ class ForwarderDaemon
 
 		private
 		void doMessage (
-				ForwarderMessageInRec forwarderMessageIn) {
+				@NonNull Integer forwarderMessageInId) {
+
+			@Cleanup
+			Transaction checkTransaction =
+				database.beginReadWrite (
+					this);
+
+			ForwarderMessageInRec forwarderMessageIn =
+				forwarderMessageInHelper.find (
+					forwarderMessageInId);
 
 			// check if we should cancel it
 
@@ -401,48 +416,44 @@ class ForwarderDaemon
 					.getForwarder ()
 					.getInboundTimeoutSecs ();
 
-			if (timeout > 0) {
+			if (
 
-				Calendar calendar =
-					new GregorianCalendar ();
+				timeout > 0
 
-				calendar.setTime (
-					forwarderMessageIn.getCreatedTime ());
+				&& earlierThan (
+					forwarderMessageIn.getCreatedTime ().plus (
+						Duration.standardSeconds (
+							timeout)),
+					checkTransaction.now ())
+			) {
 
-				calendar.add (
-					Calendar.SECOND,
-					(int) timeout);
+				forwarderMessageIn =
+					forwarderMessageInHelper.find (
+						forwarderMessageIn.getId ());
 
-				if (calendar.getTime ().getTime ()
-						< System.currentTimeMillis()) {
+				forwarderMessageIn
 
-					@Cleanup
-					Transaction transaction =
-						database.beginReadWrite (
-							this);
+					.setCancelledTime (
+						checkTransaction.now ());
 
-					forwarderMessageIn =
-						forwarderMessageInHelper.find (
-							forwarderMessageIn.getId ());
+				checkTransaction.commit ();
 
-					forwarderMessageIn
+				return;
 
-						.setCancelledTime (
-							instantToDate (
-								transaction.now ()));
+			} else {
 
-					transaction.commit ();
-
-				}
+				checkTransaction.commit ();
 
 			}
+
+			// send it
 
 			boolean success =
 				doSend (
 					forwarderMessageIn);
 
 			@Cleanup
-			Transaction transaction =
+			Transaction resultTransaction =
 				database.beginReadWrite (
 					this);
 
@@ -450,7 +461,7 @@ class ForwarderDaemon
 				forwarderMessageIn.getId (),
 				success);
 
-			transaction.commit ();
+			resultTransaction.commit ();
 
 		}
 
@@ -480,8 +491,7 @@ class ForwarderDaemon
 						false)
 
 					.setProcessedTime (
-						instantToDate (
-							transaction.now ()))
+						transaction.now ())
 
 					.setRetryTime (
 						null);
@@ -494,7 +504,10 @@ class ForwarderDaemon
 				calendar.add (Calendar.MINUTE, 1);
 
 				forwarderMessageIn
-					.setRetryTime (calendar.getTime ());
+
+					.setRetryTime (
+						transaction.now ().plus (
+							Duration.standardMinutes (1)));
 
 			}
 
@@ -506,11 +519,12 @@ class ForwarderDaemon
 
 			while (true) {
 
-				ForwarderMessageInRec forwarderMessageIn;
+				Integer forwarderMessageInId;
 
 				try {
 
-					forwarderMessageIn = buffer.next ();
+					forwarderMessageInId =
+						buffer.next ();
 
 				} catch (InterruptedException exception) {
 
@@ -519,10 +533,10 @@ class ForwarderDaemon
 				}
 
 				doMessage (
-					forwarderMessageIn);
+					forwarderMessageInId);
 
 				buffer.remove (
-					forwarderMessageIn.getId ());
+					forwarderMessageInId);
 
 			}
 

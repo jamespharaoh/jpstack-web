@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.adult.daemon;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.Collections;
 
 import javax.inject.Inject;
@@ -175,8 +173,7 @@ class ChatAdultVerifyCommand
 					chatUser)
 
 				.setTimestamp (
-					instantToDate (
-						transaction.now ()))
+					transaction.now ())
 
 				.setCreditAmount (
 					credit)

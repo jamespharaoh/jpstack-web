@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import lombok.Cleanup;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -19,6 +19,7 @@ import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.console.PrivConsoleHelper;
 import wbs.platform.priv.model.PrivRec;
 import wbs.platform.updatelog.logic.UpdateManager;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
@@ -26,6 +27,8 @@ import wbs.platform.user.model.UserRec;
 public
 class GroupPrivsAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -40,7 +43,7 @@ class GroupPrivsAction
 	GroupConsoleHelper groupHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	PrivConsoleHelper privHelper;
@@ -49,13 +52,20 @@ class GroupPrivsAction
 	UpdateManager updateManager;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
 	Responder backupResponder () {
 		return responder ("groupPrivsResponder");
 	}
+
+	// implementation
 
 	@Override
 	public
@@ -68,10 +78,6 @@ class GroupPrivsAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		GroupRec group =
 			groupHelper.find (
@@ -100,20 +106,33 @@ class GroupPrivsAction
 			if (! privChecker.canGrant (priv.getId ()))
 				continue;
 
-			if (!oldCan && newCan) {
+			if (! oldCan && newCan) {
 
-				group.getPrivs().add(priv);
-				eventLogic.createEvent("group_grant", myUser, priv,
-						group);
-				numGranted++;
+				group.getPrivs ().add (
+					priv);
+
+				eventLogic.createEvent (
+					"group_grant",
+					userConsoleLogic.userRequired (),
+					priv,
+					group);
+
+				numGranted ++;
 
 			} else if (oldCan && !newCan) {
 
 				group.getPrivs().remove(priv);
-				eventLogic.createEvent("group_revoke", myUser, priv,
-						group);
+
+				eventLogic.createEvent (
+					"group_revoke",
+					userConsoleLogic.userRequired (),
+					priv,
+					group);
+
 				numRevoked++;
+
 			}
+
 		}
 
 		for (UserRec user

@@ -1,5 +1,6 @@
 package wbs.applications.imchat.logic;
 
+import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -17,11 +18,12 @@ import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;
 import wbs.applications.imchat.model.ImChatProfileRec;
 import wbs.applications.imchat.model.ImChatRec;
-import wbs.console.misc.TimeFormatter;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.EmailLogic;
+import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.FormatWriterWriter;
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -44,6 +46,9 @@ class ImChatLogicImplementation
 
 	@Inject
 	TimeFormatter timeFormatter;
+
+	@Inject
+	WbsConfig wbsConfig;
 
 	// implementation
 
@@ -126,8 +131,11 @@ class ImChatLogicImplementation
 
 			formatWriter.writeFormat (
 				"%s %s:\n",
-				timeFormatter.instantToTimeString (
-					timeFormatter.defaultTimezone (),
+				timeFormatter.timeString (
+					timeFormatter.timezone (
+						ifNull (
+							imChat.getSlice ().getDefaultTimezone (),
+							wbsConfig.defaultTimezone ())),
 					message.getTimestamp ()),
 				message.getSenderUser () != null
 					? profile.getPublicName ()

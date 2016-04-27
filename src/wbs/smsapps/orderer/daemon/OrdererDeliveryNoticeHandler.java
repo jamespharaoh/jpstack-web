@@ -1,7 +1,5 @@
 package wbs.smsapps.orderer.daemon;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.Collection;
 
 import javax.inject.Inject;
@@ -103,8 +101,7 @@ class OrdererDeliveryNoticeHandler
 		order
 
 			.setDeliveredTime (
-				instantToDate (
-					transaction.now ()));
+				transaction.now ());
 
 		// construct the message
 

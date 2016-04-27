@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.graphs.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +127,7 @@ class ChatGraphsJoinersImageResponder
 					chatUserId);
 
 			int index =
-				+ dateToInstant (chatUser.getFirstJoin ())
+				+ chatUser.getFirstJoin ()
 					.toDateTime (timezone)
 					.getDayOfMonth ()
 				- 1;
