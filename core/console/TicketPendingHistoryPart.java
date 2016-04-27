@@ -10,7 +10,7 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.services.ticket.core.model.TicketNoteRec;
 import wbs.services.ticket.core.model.TicketObjectHelper;
@@ -40,7 +40,7 @@ class TicketPendingHistoryPart
 	TicketObjectHelper ticketHelper;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	// state
 

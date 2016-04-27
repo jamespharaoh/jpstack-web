@@ -15,7 +15,6 @@ import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
-import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -30,7 +29,6 @@ import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
-import wbs.sms.command.model.CommandObjectHelper;
 
 @Log4j
 @SingletonComponent ("ticketStateTimeDaemon")
@@ -42,12 +40,6 @@ class TicketStateTimeDaemon
 
 	@Inject
 	TicketObjectHelper ticketHelper;
-
-	@Inject
-	ChatUserLogic chatUserLogic;
-
-	@Inject
-	CommandObjectHelper commandHelper;
 
 	@Inject
 	Database database;
@@ -144,7 +136,7 @@ class TicketStateTimeDaemon
 					"daemon",
 					"TicketStateTimeDaemon",
 					exception,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}
