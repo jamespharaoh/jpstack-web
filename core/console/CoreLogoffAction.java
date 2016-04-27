@@ -10,6 +10,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.logic.UserLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
@@ -31,6 +32,9 @@ class CoreLogoffAction
 	UserObjectHelper userHelper;
 
 	@Inject
+	UserConsoleLogic userConsoleLogic;
+
+	@Inject
 	UserLogic userLogic;
 
 	// details
@@ -38,7 +42,10 @@ class CoreLogoffAction
 	@Override
 	public
 	Responder backupResponder () {
-		return responder ("coreRedirectResponder");
+	
+		return responder (
+			"coreRedirectResponder");
+	
 	}
 
 	// implementation
@@ -47,11 +54,12 @@ class CoreLogoffAction
 	public
 	Responder goReal () {
 
-		Integer userId =
-			requestContext.userId ();
-
-		if (userId == null)
+		if (! userConsoleLogic.loggedIn ()) {
 			return null;
+		}
+
+		Long userId =
+			userConsoleLogic.userIdRequired ();
 
 		@Cleanup
 		Transaction transaction =
@@ -59,9 +67,11 @@ class CoreLogoffAction
 				this);
 
 		UserRec user =
-			userHelper.find (userId);
+			userHelper.find (
+				userId);
 
-		userLogic.userLogoff (user);
+		userLogic.userLogoff (
+			user);
 
 		transaction.commit ();
 

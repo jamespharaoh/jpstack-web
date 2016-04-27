@@ -1,7 +1,6 @@
 package wbs.platform.exception.logic;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Map;
@@ -16,7 +15,7 @@ import com.google.common.collect.ImmutableMap;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogicImplementation;
+import wbs.framework.exception.ExceptionUtilsImplementation;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.record.GlobalId;
 import wbs.platform.exception.model.ConcreteExceptionResolution;
@@ -55,7 +54,7 @@ class ExceptionLogLogicImplementation
 			@NonNull String source,
 			@NonNull String summary,
 			@NonNull String dump,
-			@NonNull Optional<Integer> userId,
+			@NonNull Optional<Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
 		Transaction transaction =
@@ -91,8 +90,7 @@ class ExceptionLogLogicImplementation
 				exceptionLogHelper.createInstance ()
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setType (
 				exceptionLogType)
@@ -101,14 +99,14 @@ class ExceptionLogLogicImplementation
 				source)
 
 			.setSummary (
-				ExceptionLogicImplementation.substituteNuls (
+				ExceptionUtilsImplementation.substituteNuls (
 					summary))
 
 			.setUser (
 				user)
 
 			.setDump (
-				ExceptionLogicImplementation.substituteNuls (
+				ExceptionUtilsImplementation.substituteNuls (
 					dump))
 
 			.setFatal (

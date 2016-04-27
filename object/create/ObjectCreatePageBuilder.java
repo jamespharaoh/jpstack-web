@@ -17,6 +17,7 @@ import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.forms.CodeFormFieldSpec;
 import wbs.console.forms.DescriptionFormFieldSpec;
+import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.NameFormFieldSpec;
 import wbs.console.forms.ParentFormFieldSpec;
@@ -38,7 +39,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.record.Record;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
-import wbs.services.ticket.core.console.FieldsProvider;
 
 @PrototypeComponent ("objectCreatePageBuilder")
 @ConsoleModuleBuilderHandler
@@ -338,7 +338,7 @@ class ObjectCreatePageBuilder<
 			ifNull (
 				spec.createPrivCode (),
 				stringFormat (
-					"%s.create",
+					"%s_create",
 					consoleHelper.objectTypeCode ()));
 
 		formFieldSet =

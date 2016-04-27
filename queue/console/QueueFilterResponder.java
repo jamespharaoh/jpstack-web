@@ -11,21 +11,23 @@ import lombok.Cleanup;
 
 import org.joda.time.Instant;
 
-import wbs.console.misc.TimeFormatter;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.TimeFormatter;
 import wbs.framework.web.Responder;
-import wbs.platform.scaffold.model.SliceObjectHelper;
-import wbs.platform.scaffold.model.SliceRec;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("queueFilterResponder")
 public
 class QueueFilterResponder
-	implements  Responder {
+	implements Responder {
+
+	// dependencies
+
+	@Inject
+	Database database;
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -34,13 +36,9 @@ class QueueFilterResponder
 	TimeFormatter timeFormatter;
 
 	@Inject
-	SliceObjectHelper sliceHelper;
+	UserConsoleLogic userConsoleLogic;
 
-	@Inject
-	UserObjectHelper userHelper;
-
-	@Inject
-	Database database;
+	// implementation
 
 	@Override
 	public
@@ -57,7 +55,7 @@ class QueueFilterResponder
 
 		requestContext.setHeader (
 			"Expiry",
-			timeFormatter.instantToHttpTimestampString (
+			timeFormatter.httpTimestampString (
 				Instant.now ()));
 
 		@Cleanup
@@ -65,16 +63,9 @@ class QueueFilterResponder
 			database.beginReadOnly (
 				this);
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
-		SliceRec currentSlice =
-			myUser.getSlice ();
-
 		String filter =
 			ifNull (
-				currentSlice.getFilter (),
+				userConsoleLogic.sliceRequired ().getFilter (),
 				defaultFilter);
 
 		requestContext.outputStream ().write (

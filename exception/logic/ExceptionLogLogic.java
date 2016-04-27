@@ -13,7 +13,7 @@ interface ExceptionLogLogic {
 			String source,
 			String summary,
 			String dump,
-			Optional<Integer> userId,
+			Optional<Long> userId,
 			GenericExceptionResolution resolution);
 
 }

@@ -11,18 +11,16 @@ import lombok.extern.log4j.Log4j;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionLogic;
+import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.platform.exception.model.ExceptionLogRec;
 
-@SingletonComponent ("exceptionLogger")
 @Log4j
 public
-class ExceptionLoggerImplementation
+class PlatformExceptionLogger
 	implements ExceptionLogger {
 
 	// dependencies
@@ -34,7 +32,7 @@ class ExceptionLoggerImplementation
 	ExceptionLogLogic exceptionLogLogic;
 
 	@Inject
-	ExceptionLogic exceptionLogic;
+	ExceptionUtils exceptionLogic;
 
 	// implementation
 
@@ -45,7 +43,7 @@ class ExceptionLoggerImplementation
 			final @NonNull String source,
 			final @NonNull String summary,
 			final @NonNull String dump,
-			final @NonNull Optional<Integer> userId,
+			final @NonNull Optional<Long> userId,
 			final @NonNull GenericExceptionResolution resolution) {
 
 		return logExceptionWrapped (
@@ -78,7 +76,7 @@ class ExceptionLoggerImplementation
 			final @NonNull String typeCode,
 			final @NonNull String source,
 			final @NonNull Throwable throwable,
-			final @NonNull Optional<Integer> userId,
+			final @NonNull Optional<Long> userId,
 			final @NonNull GenericExceptionResolution resolution) {
 
 		return logExceptionWrapped (
@@ -112,7 +110,7 @@ class ExceptionLoggerImplementation
 			final @NonNull String source,
 			final @NonNull String summary,
 			final @NonNull Throwable throwable,
-			final @NonNull Optional<Integer> userId,
+			final @NonNull Optional<Long> userId,
 			final @NonNull GenericExceptionResolution resolution) {
 
 		return logExceptionWrapped (
@@ -147,7 +145,7 @@ class ExceptionLoggerImplementation
 	ExceptionLogRec logExceptionWrapped (
 			@NonNull String typeCode,
 			@NonNull String source,
-			@NonNull Optional<Integer> userId,
+			@NonNull Optional<Long> userId,
 			@NonNull Provider<ExceptionLogRec> target) {
 
 		try {
@@ -178,7 +176,7 @@ class ExceptionLoggerImplementation
 							furtherException)),
 					exceptionLogic.throwableDump (
 						furtherException),
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.fatalError);
 
 			} catch (Exception yetAnotherException) {
@@ -201,7 +199,7 @@ class ExceptionLoggerImplementation
 			@NonNull String source,
 			@NonNull String summary,
 			@NonNull String dump,
-			@NonNull Optional<Integer> userId,
+			@NonNull Optional<Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
 		@Cleanup

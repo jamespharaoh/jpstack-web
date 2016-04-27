@@ -1,5 +1,7 @@
 package wbs.platform.queue.console;
 
+import static wbs.framework.utils.etc.Misc.notEqual;
+
 import javax.inject.Inject;
 
 import lombok.Cleanup;
@@ -11,8 +13,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.model.QueueItemRec;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("queueUnclaimAction")
 public
@@ -34,7 +35,7 @@ class QueueUnclaimAction
 	QueueConsoleLogic queueConsoleLogic;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// details
 
@@ -62,11 +63,11 @@ class QueueUnclaimAction
 		QueueItemRec queueItem =
 			queueItemHelper.find (queueItemId);
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
-		if (queueItem.getQueueItemClaim ().getUser () != myUser) {
+		if (
+			notEqual (
+				queueItem.getQueueItemClaim ().getUser (),
+				userConsoleLogic.userRequired ())
+		) {
 
 			requestContext.addError (
 				"Queue item is not claimed by you");
@@ -77,7 +78,7 @@ class QueueUnclaimAction
 
 		queueConsoleLogic.unclaimQueueItem (
 			queueItem,
-			myUser);
+			userConsoleLogic.userRequired ());
 
 		transaction.commit ();
 

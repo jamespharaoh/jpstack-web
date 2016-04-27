@@ -17,6 +17,7 @@ import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
 
+import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
@@ -25,12 +26,11 @@ import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 import wbs.platform.scaffold.model.RootObjectHelper;
-import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCreatePart")
@@ -50,7 +50,7 @@ class ObjectCreatePart<
 	ConsoleObjectManager objectManager;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	RootObjectHelper rootHelper;
@@ -266,6 +266,7 @@ class ObjectCreatePart<
 			updateResultSet,
 			object,
 			hints,
+			"post",
 			requestContext.resolveLocalUrl (
 				"/" + localFile),
 			stringFormat (

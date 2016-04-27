@@ -62,6 +62,9 @@
 
 			</section>
 
+			<context-tab-page
+				name="debug"/>
+
 			<context-responder-page
 				name="home"/>
 
@@ -220,6 +223,30 @@
 		<seconds-field
 			name="timeToProcess"
 			format="numeric"/>
+
+	</field-set>
+
+	<field-set
+		name="queue-debug-form"
+		class="wbs.platform.queue.console.QueueDebugForm">
+
+		<object-field
+			name="userId"
+			object-type="user"
+			nullable="no"/>
+
+		<object-field
+			name="sliceId"
+			object-type="slice"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="allItems"
+			nullable="no"/>
+
+		<yes-no-field
+			name="claimedItems"
+			nullable="no"/>
 
 	</field-set>
 

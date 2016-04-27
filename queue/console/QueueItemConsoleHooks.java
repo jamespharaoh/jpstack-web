@@ -7,7 +7,7 @@ import lombok.NonNull;
 import com.google.common.collect.ImmutableList;
 
 import wbs.console.helper.ConsoleHooks;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
@@ -26,7 +26,7 @@ class QueueItemConsoleHooks
 	ObjectManager objectManager;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	QueueConsoleHelper queueHelper;

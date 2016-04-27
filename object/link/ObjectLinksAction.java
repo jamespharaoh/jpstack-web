@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleHelper;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -30,14 +30,15 @@ import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.updatelog.logic.UpdateManager;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectLinksAction")
 public
 class ObjectLinksAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ConsoleRequestContext requestContext;
@@ -49,13 +50,15 @@ class ObjectLinksAction
 	EventLogic eventLogic;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	UpdateManager updateManager;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
+
+	// properties
 
 	@Getter @Setter
 	String responderName;
@@ -90,6 +93,8 @@ class ObjectLinksAction
 	@Getter @Setter
 	String successNotice;
 
+	// details
+
 	public static
 	enum EventOrder {
 		contextThenTarget,
@@ -100,6 +105,8 @@ class ObjectLinksAction
 	Pattern oldGroupPattern =
 		Pattern.compile ("(\\d+),(true|false)");
 
+	// implementation
+
 	@Override
 	public
 	Responder goReal () {
@@ -108,10 +115,6 @@ class ObjectLinksAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		Record<?> contextObject =
 			contextHelper.lookupObject (
@@ -196,7 +199,7 @@ class ObjectLinksAction
 
 					eventLogic.createEvent (
 						addEventName,
-						myUser,
+						userConsoleLogic.userRequired (),
 						contextObject,
 						targetObject);
 
@@ -206,7 +209,7 @@ class ObjectLinksAction
 
 					eventLogic.createEvent (
 						addEventName,
-						myUser,
+						userConsoleLogic.userRequired (),
 						targetObject,
 						contextObject);
 
@@ -234,7 +237,7 @@ class ObjectLinksAction
 
 					eventLogic.createEvent (
 						removeEventName,
-						myUser,
+						userConsoleLogic.userRequired (),
 						contextObject,
 						targetObject);
 
@@ -244,7 +247,7 @@ class ObjectLinksAction
 
 					eventLogic.createEvent (
 						removeEventName,
-						myUser,
+						userConsoleLogic.userRequired (),
 						targetObject,
 						contextObject);
 

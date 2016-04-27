@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
+import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
@@ -41,12 +42,11 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 import wbs.platform.object.criteria.CriteriaSpec;
-import wbs.services.ticket.core.console.FieldsProvider;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectListPart")
@@ -69,7 +69,7 @@ class ObjectListPart<
 	FormFieldLogic formFieldLogic;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	// properties
 

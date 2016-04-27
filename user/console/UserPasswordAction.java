@@ -1,5 +1,7 @@
 package wbs.platform.user.console;
 
+import static wbs.framework.utils.etc.Misc.notEqual;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -10,7 +12,7 @@ import lombok.Cleanup;
 import org.apache.commons.codec.binary.Base64;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -25,6 +27,8 @@ public
 class UserPasswordAction
 	extends ConsoleAction {
 
+	// dependencies
+
 	@Inject
 	ConsoleRequestContext requestContext;
 
@@ -35,10 +39,15 @@ class UserPasswordAction
 	EventLogic eventLogic;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public
@@ -65,12 +74,22 @@ class UserPasswordAction
 
 		UserRec user =
 			userHelper.find (
-				requestContext.stuffInt ("userId"));
+				requestContext.stuffInt (
+					"userId"));
 
 		// check privs
 
-		if (user.getId () != requestContext.userId ()
-			&& ! privChecker.canRecursive (user, "manage")) {
+		if (
+
+			notEqual (
+				user,
+				userConsoleLogic.userRequired ())
+
+			&& ! privChecker.canRecursive (
+				user,
+				"manage")
+
+		) {
 
 			requestContext.addError (
 				"Access denied");
@@ -133,13 +152,9 @@ class UserPasswordAction
 
 		// create an event
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		eventLogic.createEvent (
 			"user_password_reset",
-			myUser,
+			userConsoleLogic.userRequired (),
 			user);
 
 		transaction.commit ();

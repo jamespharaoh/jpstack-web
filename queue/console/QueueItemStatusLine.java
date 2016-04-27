@@ -9,8 +9,7 @@ import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.status.console.StatusLine;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @SingletonComponent ("queueItemStatusLine")
 public
@@ -23,7 +22,7 @@ class QueueItemStatusLine
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// prototype dependencies
 
@@ -53,20 +52,19 @@ class QueueItemStatusLine
 	public
 	String getUpdateScript () {
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
-		QueueSubjectSorter sortedSubjects =
+		SortedQueueSubjects sortedSubjects =
 			queueSubjectSorter.get ()
-				.user (myUser)
-				.sort ();
+
+			.user (
+				userConsoleLogic.userRequired ())
+
+			.sort ();
 
 		// return
 
 		return stringFormat (
 			"updateQueueItems (%s, %s);\n",
-			sortedSubjects.availableItems (),
+			sortedSubjects.totalAvailableItems (),
 			sortedSubjects.userClaimedItems ());
 
 	}

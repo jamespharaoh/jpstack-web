@@ -16,7 +16,7 @@ import com.google.common.collect.ImmutableSet;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.GlobalId;
@@ -38,7 +38,7 @@ class GroupPrivsPart
 	ObjectManager objectManager;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	PrivConsoleHelper privHelper;

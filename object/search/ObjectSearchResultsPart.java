@@ -1,6 +1,5 @@
 package wbs.platform.object.search;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
@@ -16,7 +15,6 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -45,13 +43,13 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.IdObject;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchResultsPart")
@@ -71,7 +69,7 @@ class ObjectSearchResultsPart
 	ConsoleObjectManager objectManager;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	// properties
 
@@ -446,38 +444,11 @@ class ObjectSearchResultsPart
 
 			) {
 
-				Instant rowTimestamp;
-
-				if (
-					equal (
-						consoleHelper.timestampField ().valueType (),
-						Date.class)
-				) {
-
-					rowTimestamp =
-						dateToInstant (
-							(Date)
-							BeanLogic.getProperty (
-								object,
-								consoleHelper.timestampField ().name ()));
-
-				} else if (
-					equal (
-						consoleHelper.timestampField ().valueType (),
-						Instant.class)
-				) {
-
-					rowTimestamp =
-						(Instant)
-						BeanLogic.getProperty (
-							object,
-							consoleHelper.timestampField ().name ());
-
-				} else {
-
-					throw new RuntimeException ();
-
-				}
+				Instant rowTimestamp =
+					(Instant)
+					BeanLogic.getProperty (
+						object,
+						consoleHelper.timestampField ().name ());
 
 				LocalDate rowDate =
 					rowTimestamp.toDateTime ().toLocalDate ();
@@ -500,8 +471,7 @@ class ObjectSearchResultsPart
 					printFormat (
 						"<td colspan=\"%h\">%h</td>\n",
 						formFieldSet.formFields ().size (),
-						timeFormatter.instantToDateStringLong (
-							timeFormatter.defaultTimezone (),
+						userConsoleLogic.dateStringLong (
 							rowTimestamp));
 
 					printFormat (

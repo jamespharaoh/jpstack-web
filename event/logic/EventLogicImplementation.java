@@ -1,6 +1,5 @@
 package wbs.platform.event.logic;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -85,8 +84,7 @@ class EventLogicImplementation
 				eventType)
 
 			.setTimestamp (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 		);
 

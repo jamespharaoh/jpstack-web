@@ -1,7 +1,5 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
-
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -13,7 +11,6 @@ import org.joda.time.LocalTime;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ObsoleteDateField;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
@@ -21,6 +18,7 @@ import wbs.platform.queue.model.QueueItemProcessedTimeComparator;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleHelper;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("queueSupervisorItemsPart")
@@ -37,7 +35,7 @@ class QueueSupervisorItemsPart
 	QueueItemConsoleHelper queueItemHelper;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserConsoleHelper userHelper;
@@ -74,7 +72,7 @@ class QueueSupervisorItemsPart
 				new LocalTime (
 					hour,
 					0),
-				timeFormatter.defaultTimezone ());
+				userConsoleLogic.timezone ());
 
 		queueItems =
 			new TreeSet<QueueItemRec> (
@@ -156,24 +154,18 @@ class QueueSupervisorItemsPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
-					dateToInstant (
-						queueItem.getCreatedTime ())));
+				userConsoleLogic.timestampWithTimezoneString (
+					queueItem.getCreatedTime ()));
 
 			printFormat (
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
-					dateToInstant (
-						queueItem.getPendingTime ())));
+				userConsoleLogic.timestampWithTimezoneString (
+					queueItem.getPendingTime ()));
 
 			printFormat (
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
-					dateToInstant (
-						queueItem.getProcessedTime ())));
+				userConsoleLogic.timestampWithTimezoneString (
+					queueItem.getProcessedTime ()));
 
 			printFormat (
 				"</tr>\n");

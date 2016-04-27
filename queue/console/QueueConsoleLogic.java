@@ -2,7 +2,6 @@ package wbs.platform.queue.console;
 
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import static wbs.framework.utils.etc.Misc.camelToUnderscore;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.joinWithFullStop;
@@ -16,6 +15,9 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
+import org.joda.time.Instant;
+
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -35,6 +37,7 @@ import wbs.platform.queue.model.QueueItemState;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.queue.model.QueueTypeRec;
+import wbs.platform.scaffold.logic.SliceLogic;
 import wbs.platform.user.model.UserRec;
 
 @SingletonComponent ("queueConsoleLogic")
@@ -57,6 +60,9 @@ class QueueConsoleLogic {
 
 	@Inject
 	QueueItemObjectHelper queueItemHelper;
+
+	@Inject
+	SliceLogic sliceLogic;
 
 	// prototype dependencies
 
@@ -169,17 +175,22 @@ class QueueConsoleLogic {
 
 		// find the next waiting item
 
-		QueueSubjectSorter sorter =
+		SortedQueueSubjects subjects =
 			queueSubjectSorter.get ()
-				.queue (queue)
-				.user (user)
-				.sort ();
 
-		if (sorter.subjects ().isEmpty ())
+			.queue (
+				queue)
+
+			.user (
+				user)
+
+			.sort ();
+
+		if (subjects.availableSubjects ().isEmpty ())
 			return null;
 
 		QueueSubjectRec queueSubject =
-			sorter.subjects ().get (0).subject ();
+			subjects.availableSubjects ().get (0).subject ();
 
 		long nextQueueItemId =
 			+ queueSubject.getTotalItems ()
@@ -211,8 +222,7 @@ class QueueConsoleLogic {
 				user)
 
 			.setStartTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setStatus (
 				QueueItemClaimStatus.claimed)
@@ -231,10 +241,9 @@ class QueueConsoleLogic {
 
 		// update slice
 
-		user.getSlice ()
-
-			.setCurrentQueueInactivityTime (
-				null);
+		sliceLogic.updateSliceInactivityTimestamp (
+			user.getSlice (),
+			Optional.<Instant>absent ());
 
 		// and return
 
@@ -283,8 +292,7 @@ class QueueConsoleLogic {
 		queueItem.getQueueItemClaim ()
 
 			.setEndTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setStatus (
 				QueueItemClaimStatus.unclaimed);
@@ -301,10 +309,9 @@ class QueueConsoleLogic {
 
 		// update slice
 
-		user.getSlice ()
-
-			.setCurrentQueueInactivityTime (
-				null);
+		sliceLogic.updateSliceInactivityTimestamp (
+			user.getSlice (),
+			Optional.<Instant>absent ());
 
 	}
 
@@ -350,8 +357,7 @@ class QueueConsoleLogic {
 		queueItem.getQueueItemClaim ()
 
 			.setEndTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setStatus (
 				QueueItemClaimStatus.forcedUnclaim);
@@ -369,8 +375,7 @@ class QueueConsoleLogic {
 				newUser)
 
 			.setStartTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setStatus (
 				QueueItemClaimStatus.claimed)
@@ -386,10 +391,9 @@ class QueueConsoleLogic {
 
 		// update slice
 
-		newUser.getSlice ()
-
-			.setCurrentQueueInactivityTime (
-				null);
+		sliceLogic.updateSliceInactivityTimestamp (
+			newUser.getSlice (),
+			Optional.<Instant>absent ());
 
 	}
 

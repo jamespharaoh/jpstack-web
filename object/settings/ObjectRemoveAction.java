@@ -25,8 +25,7 @@ import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.Record;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectRemoveAction")
@@ -52,7 +51,7 @@ class ObjectRemoveAction
 	EventLogic eventLogic;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// properties
 
@@ -93,10 +92,6 @@ class ObjectRemoveAction
 			database.beginReadWrite (
 				this);
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		EphemeralRecord<?> ephemeralObject =
 			(EphemeralRecord<?>)
 			objectHelper.lookupObject (
@@ -111,7 +106,7 @@ class ObjectRemoveAction
 
 		eventLogic.createEvent (
 			"object_removed_in",
-			myUser,
+			userConsoleLogic.userRequired (),
 			objectHelper.getCode (ephemeralObject),
 			objectHelper.shortName (),
 			parentObject);
@@ -123,18 +118,15 @@ class ObjectRemoveAction
 				"%s deleted",
 				capitalise (objectHelper.friendlyName ())));
 
-System.out.println ("LOOKING FOR CONTEXT TYPE " + nextContextTypeName);
 		ConsoleContextType targetContextType =
 			consoleManager.contextType (
 				nextContextTypeName,
 				true);
-System.out.println ("GOT CONTEXT TYPE " + targetContextType);
 
 		ConsoleContext targetContext =
 			consoleManager.relatedContextRequired (
 				requestContext.consoleContext (),
 				targetContextType);
-System.out.println ("GOT CONTEXT " + targetContext);
 
 		consoleManager.changeContext (
 			targetContext,

@@ -6,11 +6,11 @@ import javax.inject.Inject;
 
 import org.joda.time.Instant;
 
-import wbs.console.misc.TimeFormatter;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsolePrintResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
+import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("coreFrameSetResponder")
 public
@@ -57,7 +57,7 @@ class CoreFrameSetResponder
 
 		requestContext.setHeader (
 			"Expiry",
-			timeFormatter.instantToHttpTimestampString (
+			timeFormatter.httpTimestampString (
 				Instant.now ()));
 
 	}

@@ -9,6 +9,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
+import wbs.framework.utils.ThreadManager;
+
 import lombok.extern.log4j.Log4j;
 
 /**

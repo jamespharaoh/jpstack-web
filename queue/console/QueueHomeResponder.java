@@ -1,11 +1,9 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.joinWithSpace;
-import static wbs.framework.utils.etc.Misc.millisToInstant;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -17,8 +15,6 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.joda.time.Instant;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
@@ -26,8 +22,7 @@ import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
-import wbs.console.misc.TimeFormatter;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -41,8 +36,8 @@ import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.scaffold.model.SliceRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("queueHomeResponder")
 public
@@ -52,7 +47,7 @@ class QueueHomeResponder
 	// dependencies
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	ObjectManager objectManager;
@@ -64,7 +59,7 @@ class QueueHomeResponder
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -78,8 +73,6 @@ class QueueHomeResponder
 
 	boolean queueOptionsEnabled = true;
 
-	Instant now;
-	UserRec myUser;
 	List<QueueItemClaimRec> myClaimedItems;
 	List<QueueInfo> queueInfos;
 
@@ -141,24 +134,21 @@ class QueueHomeResponder
 	protected
 	void prepare () {
 
-		now =
-			Instant.now ();
-
-		myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		myClaimedItems =
 			queueItemClaimHelper.findClaimed (
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		// load queue list
 
 		List<QueueInfo> queueInfosTemp =
 			queueSubjectSorter.get ()
-				.user (myUser)
-				.sort ()
-				.queues ();
+
+			.user (
+				userConsoleLogic.userRequired ())
+
+			.sort ()
+
+			.availableQueues ();
 
 		queueInfos =
 			new ArrayList<QueueInfo> ();
@@ -488,7 +478,7 @@ class QueueHomeResponder
 				"<td>%h</td>\n",
 				objectManager.objectPathMini (
 					parent,
-					myUser.getSlice ()));
+					userConsoleLogic.sliceRequired ()));
 
 			printFormat (
 				"<td>%h</td>\n",
@@ -521,10 +511,9 @@ class QueueHomeResponder
 				" class=\"queueItemOldest\"",
 				">%s</td>\n",
 				Html.encodeNonBreakingWhitespace (
-					requestContext.prettyDateDiff (
-						millisToInstant (
-							queueInfo.oldestAvailable ()),
-						now)));
+					userConsoleLogic.prettyDuration (
+						queueInfo.oldestAvailable (),
+						transaction.now ())));
 
 			printFormat (
 				"</tr>\n");
@@ -630,17 +619,15 @@ class QueueHomeResponder
 				objectManager.objectPath (
 					objectManager.getParent (
 						queue),
-					myUser.getSlice ()));
+					userConsoleLogic.sliceRequired ()));
 
 			printFormat (
 				"<td>%h</td>\n",
 				queue.getCode (),
 
 				"<td>%h</td>\n",
-				timeFormatter.instantToTimestampString (
-					timeFormatter.defaultTimezone (),
-					dateToInstant (
-						queueItem.getCreatedTime ())),
+				userConsoleLogic.timestampWithTimezoneString (
+					queueItem.getCreatedTime ()),
 
 				"<td>%h</td>\n",
 				queueItem.getSource (),

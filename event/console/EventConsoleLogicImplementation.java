@@ -14,7 +14,6 @@ import lombok.Cleanup;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
-import wbs.console.misc.TimeFormatter;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -31,6 +30,7 @@ import wbs.platform.event.model.EventTypeRec;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @SingletonComponent ("eventConsoleLogic")
 public
@@ -52,7 +52,7 @@ class EventConsoleLogicImplementation
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	TimeFormatter timeFormatter;
+	UserConsoleLogic userConsoleLogic;
 
 	// prototype dependencies
 
@@ -183,8 +183,7 @@ class EventConsoleLogicImplementation
 				text =
 					text.replaceAll (
 						"%" + eventLink.getIndex (),
-						timeFormatter.instantToTimestampString (
-							timeFormatter.defaultTimezone (),
+						userConsoleLogic.timestampWithTimezoneString (
 							millisToInstant (
 								eventLink.getRefId ())));
 

@@ -12,8 +12,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("queueClaimAction")
 public
@@ -38,7 +37,7 @@ class QueueClaimAction
 	QueueManager queuePageFactoryManager;
 
 	@Inject
-	UserObjectHelper userHelper;
+	UserConsoleLogic userConsoleLogic;
 
 	// details
 
@@ -67,14 +66,10 @@ class QueueClaimAction
 			queueHelper.find (
 				queueId);
 
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
-
 		QueueItemRec queueItem =
 			queueConsoleLogic.claimQueueItem (
 				queue,
-				myUser);
+				userConsoleLogic.userRequired ());
 
 		if (queueItem == null) {
 

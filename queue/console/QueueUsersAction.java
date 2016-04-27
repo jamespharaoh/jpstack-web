@@ -17,6 +17,7 @@ import wbs.framework.web.Responder;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimRec;
 import wbs.platform.queue.model.QueueItemRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
@@ -38,6 +39,9 @@ class QueueUsersAction
 
 	@Inject
 	QueueConsoleLogic queueConsoleLogic;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -80,10 +84,8 @@ class QueueUsersAction
 		// load stuff
 
 		UserRec theUser =
-			userHelper.find (userId);
-
-		UserRec myUser =
-			userHelper.find (requestContext.userId ());
+			userHelper.find (
+				userId);
 
 		// load items
 
@@ -107,7 +109,7 @@ class QueueUsersAction
 				queueConsoleLogic.reclaimQueueItem (
 					queueItem,
 					theUser,
-					myUser);
+					userConsoleLogic.userRequired ());
 
 			} else {
 

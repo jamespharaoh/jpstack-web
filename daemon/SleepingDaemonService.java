@@ -84,7 +84,7 @@ class SleepingDaemonService
 					generalErrorSource (),
 					generalErrorSummary (),
 					exception,
-					Optional.<Integer>absent (),
+					Optional.absent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}

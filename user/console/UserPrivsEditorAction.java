@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import lombok.Cleanup;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -38,13 +38,16 @@ class UserPrivsEditorAction
 	EventLogic eventLogic;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	PrivConsoleHelper privHelper;
 
 	@Inject
 	UpdateManager updateManager;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -70,10 +73,6 @@ class UserPrivsEditorAction
 		Transaction transaction =
 			database.beginReadWrite (
 				this);
-
-		UserRec myUser =
-			userHelper.find (
-				requestContext.userId ());
 
 		UserRec user =
 			userHelper.find (
@@ -197,7 +196,7 @@ class UserPrivsEditorAction
 						: (grant
 							? "user_revoke_grant"
 							: "user_revoke"),
-					myUser,
+					userConsoleLogic.userRequired (),
 					priv,
 					user);
 

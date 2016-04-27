@@ -19,7 +19,7 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
@@ -37,7 +37,7 @@ class ObjectLinksPart
 	FormFieldLogic formFieldLogic;
 
 	@Inject
-	PrivChecker privChecker;
+	UserPrivChecker privChecker;
 
 	@Inject
 	UserObjectHelper userHelper;

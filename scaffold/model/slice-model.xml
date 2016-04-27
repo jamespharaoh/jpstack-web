@@ -33,7 +33,12 @@
 			nullable="yes"/>
 
 		<integer-field
-			name="queueOverflowResponseTime"
+			name="queueOverflowOverloadTime"
+			column="queue_overflow_response_time"
+			nullable="yes"/>
+
+		<integer-field
+			name="queueOverflowGraceTime"
 			nullable="yes"/>
 
 		<string-field
@@ -41,6 +46,11 @@
 			nullable="yes"/>
 
 		<!-- statistics -->
+
+		<timestamp-field
+			name="currentQueueInactivityUpdateTime"
+			column-type="iso"
+			nullable="yes"/>
 
 		<timestamp-field
 			name="currentQueueInactivityTime"

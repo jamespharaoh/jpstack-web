@@ -1,6 +1,5 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.Misc.millisToInstant;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -9,8 +8,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.Instant;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -23,6 +20,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.model.QueueRec;
 
@@ -40,11 +38,15 @@ class QueueListActivePart
 	ConsoleObjectManager objectManager;
 
 	@Inject
+	TimeFormatter timeFormatter;
+
+	// prototype dependencies
+
+	@Inject
 	Provider<QueueSubjectSorter> queueSubjectSorter;
 
 	// state
 
-	Instant now;
 	List<QueueInfo> queueInfos;
 
 	// details
@@ -74,13 +76,12 @@ class QueueListActivePart
 	public
 	void prepare () {
 
-		now =
-			Instant.now ();
-
 		List<QueueInfo> queueInfosTemp =
 			queueSubjectSorter.get ()
-				.sort ()
-				.queues ();
+
+			.sort ()
+
+			.availableQueues ();
 
 		queueInfos =
 			new ArrayList<QueueInfo> ();
@@ -173,10 +174,9 @@ class QueueListActivePart
 			printFormat (
 				"<td>%h</td>\n",
 				queueInfo.availableItems () > 0
-					? requestContext.prettyDateDiff (
-						millisToInstant (
-							queueInfo.oldestAvailable ()),
-						now)
+					? timeFormatter.prettyDuration (
+						queueInfo.oldestAvailable (),
+						transaction.now ())
 					: "-");
 
 			// claimed
@@ -188,23 +188,23 @@ class QueueListActivePart
 			printFormat (
 				"<td>%h</td>\n",
 				queueInfo.claimedItems () > 0
-					? requestContext.prettyDateDiff (
-						millisToInstant (queueInfo.oldestClaimed ()),
-						now)
+					? timeFormatter.prettyDuration (
+						queueInfo.oldestClaimed (),
+						transaction.now ())
 					: "-");
 
 			// preferred
 
 			printFormat (
 				"<td>%h</td>\n",
-				queueInfo.preferredItems ());
+				queueInfo.totalUnavailableItems ());
 
 			printFormat (
 				"<td>%h</td>\n",
-				queueInfo.preferredItems () > 0
-					? requestContext.prettyDateDiff (
-						millisToInstant (queueInfo.oldestPreferred ()),
-						now)
+				queueInfo.totalUnavailableItems () > 0
+					? timeFormatter.prettyDuration (
+						queueInfo.oldestUnavailable (),
+						transaction.now ())
 					: "-");
 
 			// waiting
@@ -216,10 +216,9 @@ class QueueListActivePart
 			printFormat (
 				"<td>%h</td>\n",
 				queueInfo.waitingItems () > 0
-					? requestContext.prettyDateDiff (
-						millisToInstant (
-							queueInfo.oldestWaiting ()),
-						now)
+					? timeFormatter.prettyDuration (
+						queueInfo.oldestWaiting (),
+						transaction.now ())
 					: "-");
 
 			// total
@@ -231,9 +230,9 @@ class QueueListActivePart
 			printFormat (
 				"<td>%h</td>\n",
 				queueInfo.totalItems () > 0
-					? requestContext.prettyDateDiff (
-						millisToInstant (queueInfo.oldest ()),
-						now)
+					? timeFormatter.prettyDuration (
+						queueInfo.oldest (),
+						transaction.now ())
 					: "-");
 
 			printFormat (

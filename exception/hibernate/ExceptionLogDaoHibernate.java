@@ -1,7 +1,5 @@
 package wbs.platform.exception.hibernate;
 
-import static wbs.framework.utils.etc.Misc.instantToDate;
-
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -162,8 +160,7 @@ class ExceptionLogDaoHibernate
 			.add (
 				Restrictions.lt (
 					"_exceptionLog.timestamp",
-					instantToDate (
-						cutoffTime)))
+					cutoffTime))
 
 			.addOrder (
 				Order.asc (

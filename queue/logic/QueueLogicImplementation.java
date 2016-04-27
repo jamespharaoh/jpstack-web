@@ -2,7 +2,6 @@ package wbs.platform.queue.logic;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.laterThan;
@@ -17,6 +16,7 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
@@ -38,6 +38,7 @@ import wbs.platform.queue.model.QueueSubjectObjectHelper;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.queue.model.QueueTypeObjectHelper;
 import wbs.platform.queue.model.QueueTypeRec;
+import wbs.platform.scaffold.logic.SliceLogic;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserRec;
 
@@ -69,6 +70,9 @@ class QueueLogicImplementation
 
 	@Inject
 	QueueTypeObjectHelper queueTypeHelper;
+
+	@Inject
+	SliceLogic sliceLogic;
 
 	// implementation
 
@@ -237,14 +241,12 @@ class QueueLogicImplementation
 					: QueueItemState.pending)
 
 			.setCreatedTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setPendingTime (
 				waiting
 					? null
-					: instantToDate (
-						transaction.now ()))
+					: transaction.now ())
 
 			.setPriority (
 				ifNull (
@@ -282,12 +284,10 @@ class QueueLogicImplementation
 
 		}
 
-		optionalSlice.get ()
-
-			.setCurrentQueueInactivityTime (
-				ifNull (
-					optionalSlice.get ().getCurrentQueueInactivityTime (),
-					transaction.now ()));
+		sliceLogic.updateSliceInactivityTimestamp (
+			optionalSlice.get (),
+			Optional.of (
+				transaction.now ()));
 
 		// and return
 
@@ -410,8 +410,7 @@ class QueueLogicImplementation
 		queueItem.getQueueItemClaim ()
 
 			.setEndTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setStatus (
 				QueueItemClaimStatus.cancelled);
@@ -424,8 +423,7 @@ class QueueLogicImplementation
 				QueueItemState.cancelled)
 
 			.setCancelledTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setQueueItemClaim (
 				null);
@@ -459,8 +457,7 @@ class QueueLogicImplementation
 					QueueItemState.pending)
 
 				.setPendingTime (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 		}
 
@@ -525,8 +522,7 @@ class QueueLogicImplementation
 		queueItem.getQueueItemClaim ()
 
 			.setEndTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setStatus (
 				QueueItemClaimStatus.processed);
@@ -539,8 +535,7 @@ class QueueLogicImplementation
 				QueueItemState.processed)
 
 			.setProcessedTime (
-				instantToDate (
-					transaction.now ()))
+				transaction.now ())
 
 			.setProcessedUser (
 				user)
@@ -565,10 +560,9 @@ class QueueLogicImplementation
 
 		// update slice
 
-		user.getSlice ()
-
-			.setCurrentQueueInactivityTime (
-				null);
+		sliceLogic.updateSliceInactivityTimestamp (
+			user.getSlice (),
+			Optional.<Instant>absent ());
 
 		// activate next queue item (if any)
 
@@ -592,8 +586,7 @@ class QueueLogicImplementation
 					QueueItemState.pending)
 
 				.setPendingTime (
-					instantToDate (
-						transaction.now ()));
+					transaction.now ());
 
 		}
 

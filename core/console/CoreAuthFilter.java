@@ -1,10 +1,8 @@
 package wbs.platform.core.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstant;
 import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.instantToDate;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.millisToInstant;
 import static wbs.framework.utils.etc.Misc.notEqual;
@@ -28,12 +26,13 @@ import org.joda.time.Instant;
 
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
-import wbs.console.priv.PrivChecker;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.logic.UserLogic;
 import wbs.platform.user.model.UserOnlineObjectHelper;
 import wbs.platform.user.model.UserOnlineRec;
@@ -45,22 +44,25 @@ class CoreAuthFilter
 	implements Filter {
 
 	@Inject
-	ConsoleRequestContext requestContext;
-
-	@Inject
 	Provider<ConsoleManager> consoleManagerProvider;
 
 	@Inject
 	Database database;
 
 	@Inject
-	PrivChecker userPrivChecker;
+	ConsoleRequestContext requestContext;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserLogic userLogic;
 
 	@Inject
 	UserOnlineObjectHelper userOnlineHelper;
+
+	@Inject
+	UserPrivChecker userPrivChecker;
 
 	final static
 	int reloadTime = 10 * 1000;
@@ -72,7 +74,7 @@ class CoreAuthFilter
 		millisToInstant (
 			0);
 
-	Map<Integer,String> onlineSessionIdsByUserId;
+	Map<Long,String> onlineSessionIdsByUserId;
 
 	Map<String,Instant> activeSessions =
 		new HashMap<String,Instant> ();
@@ -86,7 +88,7 @@ class CoreAuthFilter
 				this);
 
 		onlineSessionIdsByUserId =
-			new HashMap<Integer,String> ();
+			new HashMap<Long,String> ();
 
 		for (
 			UserOnlineRec online
@@ -106,9 +108,8 @@ class CoreAuthFilter
 				online
 
 					.setTimestamp (
-						instantToDate (
-							activeSessions.get (
-								online.getSessionId ())));
+						activeSessions.get (
+							online.getSessionId ()));
 
 			// check if he has been disabled or timed out
 
@@ -117,9 +118,7 @@ class CoreAuthFilter
 				! user.getActive ()
 
 				|| earlierThan (
-					dateToInstant (
-						online.getTimestamp ()
-					).plus (
+					online.getTimestamp ().plus (
 						logoffTime),
 					transaction.now ())
 
@@ -135,7 +134,7 @@ class CoreAuthFilter
 			// ok put him in the ok list
 
 			onlineSessionIdsByUserId.put (
-				user.getId (),
+				(long) (int) user.getId (),
 				online.getSessionId ());
 
 		}
@@ -161,8 +160,10 @@ class CoreAuthFilter
 
 		// check there is a user id
 
-		if (requestContext.userId () == null)
+		if (userConsoleLogic.notLoggedIn ()) {
+System.out.println ("NOT LOGGED IN");
 			return false;
+		}
 
 		// reload if overdue or not done yet, always for root path
 
@@ -198,7 +199,7 @@ class CoreAuthFilter
 		if (
 			notEqual (
 				onlineSessionIdsByUserId.get (
-					requestContext.userId ()),
+					userConsoleLogic.userIdRequired ()),
 				requestContext.sessionId ())
 		) {
 
@@ -213,7 +214,7 @@ class CoreAuthFilter
 			if (
 				notEqual (
 					onlineSessionIdsByUserId.get (
-						requestContext.userId ()),
+						userConsoleLogic.userIdRequired ()),
 					requestContext.sessionId ())
 			) {
 				return false;
