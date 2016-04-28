@@ -722,7 +722,13 @@ class ChatCreditLogicImplementation
 
 		}
 
-		if (chatUser.getBlockAll ()) {
+		if (
+
+			chatUser.getBlockAll ()
+
+			&& ! chatUser.getChat ().getBillBlockedUsers ()
+
+		) {
 
 			log.debug (
 				stringFormat (
@@ -735,7 +741,11 @@ class ChatCreditLogicImplementation
 
 		// check they are on strict billing
 
-		if (chatUser.getCreditMode () != ChatUserCreditMode.strict) {
+		if (
+			notEqual (
+				chatUser.getCreditMode (),
+				ChatUserCreditMode.strict)
+		) {
 
 			log.debug (
 				stringFormat (

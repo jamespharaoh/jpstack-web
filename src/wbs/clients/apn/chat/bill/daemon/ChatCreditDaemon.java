@@ -3,6 +3,7 @@ package wbs.clients.apn.chat.bill.daemon;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -115,22 +116,32 @@ class ChatCreditDaemon
 				"Chat billing after %s",
 				threeMonthsAgo));
 
-		List<ChatUserRec> users =
+		List<Integer> chatUserIds =
 			chatUserHelper.findWantingBill (
-				threeMonthsAgo);
+				threeMonthsAgo)
+
+			.stream ()
+
+			.map (
+				ChatUserRec::getId)
+
+			.collect (
+				Collectors.toList ());
 
 		transaction.close ();
 
 		log.debug (
 			stringFormat (
 				"Chat billing after %s",
-				users.size ()));
+				chatUserIds.size ()));
 
-		for (ChatUserRec chatUser
-				: users) {
+		for (
+			Integer chatUserId
+				: chatUserIds
+		) {
 
 			doUserCredit (
-				chatUser.getId ());
+				chatUserId);
 
 		}
 

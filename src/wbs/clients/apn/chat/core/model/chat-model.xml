@@ -195,6 +195,12 @@
 			name="adCount"
 			default="0"/>
 
+		<yes-no-field
+			name="billBlockedUsers"
+			default="no"/>
+
+		<!-- queue preferred times -->
+
 		<integer-field
 			name="chatQueuePreferredTime"
 			default="0"/>
