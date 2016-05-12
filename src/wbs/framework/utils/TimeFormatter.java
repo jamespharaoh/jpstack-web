@@ -3,6 +3,7 @@ package wbs.framework.utils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.ReadableDuration;
 import org.joda.time.ReadableInstant;
@@ -37,11 +38,27 @@ interface TimeFormatter {
 	String httpTimestampString (
 			ReadableInstant instant);
 
+	// instant to iso string
+
+	String timestampSecondStringIso (
+			ReadableInstant instant);
+
+	String timestampMinuteStringIso (
+			ReadableInstant instant);
+
+	String timestampHourStringIso (
+			ReadableInstant instant);
+
 	// string to instant
 
 	Instant timestampStringToInstant (
 			DateTimeZone timeZone,
 			String string);
+
+	// iso string to interval
+
+	Interval isoStringToInterval (
+			String isoString);
 
 	// datetime to string
 

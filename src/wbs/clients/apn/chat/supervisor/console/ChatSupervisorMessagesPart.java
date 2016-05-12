@@ -8,9 +8,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.joda.time.DateTime;
 import org.joda.time.Interval;
-import org.joda.time.LocalDate;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -26,6 +24,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TimeFormatter;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
@@ -50,6 +49,9 @@ class ChatSupervisorMessagesPart
 
 	@Inject
 	TimeFormatter timeFormatter;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	@Inject
 	UserObjectHelper userHelper;
@@ -89,25 +91,18 @@ class ChatSupervisorMessagesPart
 
 		chat =
 			chatHelper.find (
-				requestContext.stuffInt ("chatId"));
+				requestContext.stuffInt (
+					"chatId"));
 
-		int hour =
-			Integer.parseInt (
-				requestContext.parameter ("hour"));
+		Interval interval =
+			timeFormatter.isoStringToInterval (
+				requestContext.parameter (
+					"interval"));
 
 		int senderUserId =
 			Integer.parseInt (
-				requestContext.parameter ("user_id"));
-
-		LocalDate date =
-			LocalDate.parse (
-				requestContext.parameter ("date"));
-
-		DateTime startTime =
-			date.toDateTimeAtStartOfDay ().plusHours (hour);
-
-		DateTime endTime =
-			startTime.plusHours (1);
+				requestContext.parameter (
+					"user_id"));
 
 		UserRec senderUser =
 			userHelper.find (
@@ -117,9 +112,7 @@ class ChatSupervisorMessagesPart
 			chatMessageHelper.findBySenderAndTimestamp (
 				chat,
 				senderUser,
-				new Interval (
-					startTime,
-					endTime));
+				interval);
 
 		Collections.sort (
 			chatMessages);
@@ -171,9 +164,7 @@ class ChatSupervisorMessagesPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				timeFormatter.timeString (
-					chatMiscLogic.timezone (
-						chat),
+				userConsoleLogic.timeString (
 					chatMessage.getTimestamp ()));
 
 			printFormat (

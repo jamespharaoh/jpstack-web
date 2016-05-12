@@ -39,13 +39,15 @@
 
 		<integer-stats-formatter
 			name="userQueueItems"
-			target-base="queue.supervisorItems"
-			target-group-param="userId"
-			target-step-param="hour">
+			target-base="queue.supervisorItems">
 
 			<target-param
-				name="date"
-				value="{dateYmd}"/>
+				name="userId"
+				value="{group}"/>
+
+			<target-param
+				name="interval"
+				value="{interval}"/>
 
 		</integer-stats-formatter>
 

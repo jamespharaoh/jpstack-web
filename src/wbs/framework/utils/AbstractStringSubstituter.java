@@ -5,6 +5,8 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.NonNull;
+
 public abstract
 class AbstractStringSubstituter {
 
@@ -18,10 +20,11 @@ class AbstractStringSubstituter {
 
 	public
 	String substitute (
-			String input) {
+			@NonNull String input) {
 
 		Matcher matcher =
-			paramPattern.matcher (input);
+			paramPattern.matcher (
+				input);
 
 		StringBuffer stringBuffer =
 			new StringBuffer ();

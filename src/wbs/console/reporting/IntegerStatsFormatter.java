@@ -1,5 +1,9 @@
 package wbs.console.reporting;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.isZero;
+import static wbs.framework.utils.etc.Misc.mapEntry;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.LinkedHashMap;
@@ -8,13 +12,18 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.joda.time.LocalDate;
+import org.joda.time.Instant;
+
+import com.google.common.base.Optional;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.StringSubstituter;
+import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.Html;
 import wbs.framework.web.UrlParams;
 
@@ -29,16 +38,13 @@ class IntegerStatsFormatter
 	@Inject
 	ConsoleRequestContext requestContext;
 
+	@Inject
+	TimeFormatter timeFormatter;
+
 	// properties
 
 	@Getter @Setter
 	String targetBase;
-
-	@Getter @Setter
-	String targetGroupParamName;
-
-	@Getter @Setter
-	String targetStepParamName;
 
 	@Getter @Setter
 	Map<String,String> targetParams =
@@ -48,8 +54,8 @@ class IntegerStatsFormatter
 
 	public
 	IntegerStatsFormatter addTargetParam (
-			String name,
-			String value) {
+			@NonNull String name,
+			@NonNull String value) {
 
 		targetParams.put (
 			name,
@@ -62,17 +68,31 @@ class IntegerStatsFormatter
 	@Override
 	public
 	String format (
-			Object group,
-			String step,
-			Object value) {
+			@NonNull Object group,
+			@NonNull StatsPeriod period,
+			@NonNull Integer step,
+			@NonNull Optional<Object> value) {
+
+		Instant instant =
+			period.step (
+				step);
 
 		Integer intValue =
-			(Integer) value;
+			(Integer)
+			value.or (0);
 
-		if (intValue == null || intValue == 0)
-			return "<td></td>";
+		// empty cell for missing or zero value
 
-		if (targetBase == null) {
+		if (intValue == 0) {
+			return "<td></td>\n";
+		}
+
+		// simple cell if no link
+
+		if (
+			isNull (
+				targetBase)
+		) {
 
 			return stringFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
@@ -80,37 +100,42 @@ class IntegerStatsFormatter
 
 		}
 
+		// work out link etc
+
 		UrlParams urlParams =
 			new UrlParams ();
 
-		if (targetParams != null) {
+		if (
+			isNotNull (
+				targetParams)
+		) {
 
-			for (Map.Entry<String,String> entry
-					: targetParams.entrySet ()) {
+			StringSubstituter substituter =
+				new StringSubstituter ()
 
-				// TODO this is so wrong
+				.param (
+					"group",
+					group.toString ())
 
-				urlParams.set (
-					entry.getKey (),
-					entry.getValue ().replace (
-						"{dateYmd}",
-						requestContext.parameter (
-							"date",
-							LocalDate.now ().toString ())));
+				.param (
+					"interval",
+					timeFormatter.timestampHourStringIso (
+						instant));
 
-			}
+			targetParams.entrySet ().stream ()
+				
+				.map (paramEntry ->
+					mapEntry (
+						paramEntry.getKey (),
+						substituter.substitute (
+							paramEntry.getValue ())))
+
+				.forEach (paramEntry ->
+					urlParams.add (
+						paramEntry.getKey (),
+						paramEntry.getValue ()));
 
 		}
-
-		if (targetGroupParamName != null)
-			urlParams.set (
-				targetGroupParamName,
-				group.toString ());
-
-		if (targetStepParamName != null)
-			urlParams.set (
-				targetStepParamName,
-				step);
 
 		return stringFormat (
 			"%s%h</td>\n",
@@ -129,18 +154,25 @@ class IntegerStatsFormatter
 	@Override
 	public
 	String formatTotal (
-			Object group,
-			Object value) {
+			@NonNull Object group,
+			@NonNull Optional<Object> value) {
 
-		Integer intValue =
-			(Integer) value;
+		Integer integerValue =
+			(Integer)
+			value.or (0);
 
-		if (intValue == null || intValue == 0)
+		if (
+			isZero (
+				integerValue)
+		) {
 			return "<td></td>";
+		}
 
 		return stringFormat (
-			"<td style=\"text-align: right\">%h</td>\n",
-			intValue);
+			"<td",
+			" style=\"text-align: right\"",
+			">%h</td>\n",
+			integerValue);
 
 	}
 

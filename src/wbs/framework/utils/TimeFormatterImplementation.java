@@ -1,6 +1,7 @@
 package wbs.framework.utils;
 
 import static wbs.framework.utils.etc.Misc.pluralise;
+import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Locale;
 
@@ -10,6 +11,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.ReadableDuration;
 import org.joda.time.ReadableInstant;
@@ -107,6 +109,71 @@ class TimeFormatterImplementation
 			.withZone (timeZone)
 			.parseDateTime (string)
 			.toInstant ();
+
+	}
+
+	@Override
+	public 
+	String timestampHourStringIso (
+			@NonNull ReadableInstant instant) {
+
+		return timestampHourIsoFormat.print (
+			instant);
+
+	}
+
+	@Override
+	public 
+	String timestampMinuteStringIso (
+			@NonNull ReadableInstant instant) {
+
+		return timestampMinuteIsoFormat.print (
+			instant);
+
+	}
+
+	@Override
+	public 
+	String timestampSecondStringIso (
+			@NonNull ReadableInstant instant) {
+
+		return timestampSecondIsoFormat.print (
+			instant);
+
+	}
+
+	@Override
+	public 
+	Interval isoStringToInterval (
+			@NonNull String isoString) {
+
+		switch (isoString.length ()) {
+
+		case 14:
+
+			Instant startOfHour =
+				timestampHourIsoFormat.parseDateTime (
+					isoString)
+
+				.toInstant ();
+
+			Instant endOfHour =
+				startOfHour.plus (
+					Duration.standardHours (1));
+
+			return new Interval (
+				startOfHour,
+				endOfHour);
+
+		default:
+
+			throw new RuntimeException (
+				stringFormat (
+					"Don't understand how to parse '%s' (length is %s)",
+					isoString,
+					isoString.length ()));
+
+		}
 
 	}
 
@@ -277,39 +344,70 @@ class TimeFormatterImplementation
 
 	public final static
 	DateTimeFormatter timestampFormat =
-		DateTimeFormat
-			.forPattern ("yyyy-MM-dd HH:mm:ss");
+
+		DateTimeFormat.forPattern (
+			"yyyy-MM-dd HH:mm:ss");
 
 	public final static
 	DateTimeFormatter timestampTimezoneFormat =
-		DateTimeFormat
-			.forPattern ("yyyy-MM-dd HH:mm:ss z");
+
+		DateTimeFormat.forPattern (
+			"yyyy-MM-dd HH:mm:ss z");
 
 	public final static
 	DateTimeFormatter timeFormat =
-		DateTimeFormat
-			.forPattern ("HH:mm:ss");
+
+		DateTimeFormat.forPattern (
+			"HH:mm:ss");
 
 	public final static
 	DateTimeFormatter longDateFormat =
-		DateTimeFormat
-			.forPattern ("EEEE, d MMMM yyyy");
+
+		DateTimeFormat.forPattern (
+			"EEEE, d MMMM yyyy");
 
 	public final static
 	DateTimeFormatter shortDateFormat =
-		DateTimeFormat
-			.forPattern ("yyyy-MM-dd");
+
+		DateTimeFormat.forPattern (
+			"yyyy-MM-dd");
 
 	public final static
 	DateTimeFormatter timezoneFormat =
-		DateTimeFormat
-			.forPattern ("z");
+
+		DateTimeFormat.forPattern (
+			"z");
 
 	public final static
 	DateTimeFormatter httpTimestampFormat =
-		DateTimeFormat
-			.forPattern ("EEE, dd MMM yyyyy HH:mm:ss z")
-			.withLocale (Locale.US)
-			.withZoneUTC ();
+
+		DateTimeFormat.forPattern (
+			"EEE, dd MMM yyyyy HH:mm:ss z")
+
+		.withLocale (
+			Locale.US)
+
+		.withZoneUTC ();
+
+	public final static
+	DateTimeFormatter timestampHourIsoFormat =
+		DateTimeFormat.forPattern (
+			"yyyy-MM-dd'T'HH'Z'")
+
+		.withZoneUTC ();
+
+	public final static
+	DateTimeFormatter timestampMinuteIsoFormat =
+		DateTimeFormat.forPattern (
+			"yyyy-MM-dd'T'HH::mm'Z'")
+
+		.withZoneUTC ();
+
+	public final static
+	DateTimeFormatter timestampSecondIsoFormat =
+		DateTimeFormat.forPattern (
+			"yyyy-MM-dd'T'HH:mm:ss'Z'")
+
+		.withZoneUTC ();
 
 }

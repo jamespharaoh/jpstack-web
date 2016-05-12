@@ -46,22 +46,20 @@ class SupervisorIntegerStatsFormatterBuilder {
 		String targetBase =
 			spec.targetBase ();
 
-		String targetGroupParamName =
-			spec.targetGroupParamName ();
-
-		String targetStepParamName =
-			spec.targetStepParamName ();
-
 		Map<String,String> targetParams =
 			spec.targetParams ();
 
 		supervisorConfigBuilder.statsFormattersByName.put (
 			name,
 			integerStatsFormatter.get ()
-				.targetBase (targetBase)
-				.targetGroupParamName (targetGroupParamName)
-				.targetStepParamName (targetStepParamName)
-				.targetParams (targetParams));
+
+			.targetBase (
+				targetBase)
+
+			.targetParams (
+				targetParams)
+
+		);
 
 	}
 

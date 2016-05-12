@@ -1,15 +1,18 @@
 package wbs.console.reporting;
 
+import com.google.common.base.Optional;
+
 public
 interface StatsFormatter {
 
 	String format (
 			Object group,
-			String step,
-			Object value);
+			StatsPeriod period,
+			Integer step,
+			Optional<Object> value);
 
 	String formatTotal (
 			Object group,
-			Object value);
+			Optional<Object> value);
 
 }

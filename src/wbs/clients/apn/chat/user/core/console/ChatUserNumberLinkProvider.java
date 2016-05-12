@@ -25,6 +25,8 @@ public
 class ChatUserNumberLinkProvider
 	implements NumberPlugin {
 
+	// dependencies
+
 	@Inject
 	ChatUserDao chatUserDao;
 
@@ -37,11 +39,15 @@ class ChatUserNumberLinkProvider
 	@Inject
 	UserPrivChecker privChecker;
 
+	// details
+
 	@Override
 	public
 	String getName () {
 		return "chatUser";
 	}
+
+	// implementation
 
 	@Override
 	public
@@ -135,7 +141,7 @@ class ChatUserNumberLinkProvider
 
 					return privChecker.canRecursive (
 						chatUser.getChat (),
-						"user_create",
+						"chat_user_create",
 						"chat_user_view",
 						"user_admin",
 						"user_credit");
@@ -203,8 +209,8 @@ class ChatUserNumberLinkProvider
 
 						return privChecker.canRecursive (
 							chatUser.getChat (),
-							"user_create",
-							"user_view",
+							"chat_user_create",
+							"chat_user_view",
 							"user_admin",
 							"user_credit");
 
@@ -287,8 +293,8 @@ class ChatUserNumberLinkProvider
 
 						return privChecker.canRecursive (
 							chatUser.getChat (),
-							"user_create",
-							"user_view",
+							"chat_user_create",
+							"chat_user_view",
 							"user_admin",
 							"user_credit");
 

@@ -3,6 +3,8 @@ package wbs.framework.utils;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.NonNull;
+
 public
 class StringSubstituter
 	extends AbstractStringSubstituter {
@@ -13,10 +15,12 @@ class StringSubstituter
 
 	public
 	StringSubstituter param (
-			String name,
-			String value) {
+			@NonNull String name,
+			@NonNull String value) {
 
-		params.put (name, value);
+		params.put (
+			name,
+			value);
 
 		return this;
 
@@ -25,9 +29,10 @@ class StringSubstituter
 	@Override
 	protected
 	String getSubstitute (
-			String name) {
+			@NonNull String name) {
 
-		return params.get (name);
+		return params.get (
+			name);
 
 	}
 

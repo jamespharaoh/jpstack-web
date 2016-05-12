@@ -16,6 +16,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.ReadableInstant;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("statsConsoleLogic")
@@ -79,10 +81,10 @@ class StatsConsoleLogic {
 				out.write (
 					formatter.format (
 						group,
-						Integer.toString (
-							step +
-							period.offset ()),
-						combinedValue));
+						period,
+						step,
+						Optional.fromNullable (
+							combinedValue)));
 
 			}
 
@@ -93,7 +95,8 @@ class StatsConsoleLogic {
 			out.write (
 				formatter.formatTotal (
 					group,
-					totalValue));
+					Optional.fromNullable (
+						totalValue)));
 
 			out.write (
 				stringFormat (

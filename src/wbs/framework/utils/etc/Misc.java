@@ -18,6 +18,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -2904,6 +2905,17 @@ class Misc {
 				timezone)
 
 			.toLocalDate ();
+
+	}
+
+	public static <Key,Value>
+	Map.Entry<Key,Value> mapEntry (
+			@NonNull Key key,
+			@NonNull Value value) {
+
+		return new AbstractMap.SimpleEntry<Key,Value> (
+			key,
+			value);
 
 	}
 

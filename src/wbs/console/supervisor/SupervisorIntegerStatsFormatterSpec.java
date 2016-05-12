@@ -31,14 +31,6 @@ class SupervisorIntegerStatsFormatterSpec {
 	@DataAttribute
 	String targetBase;
 
-	@DataAttribute (
-		name = "target-group-param")
-	String targetGroupParamName;
-
-	@DataAttribute (
-		name = "target-step-param")
-	String targetStepParamName;
-
 	@DataChildren (
 		direct = true,
 		childElement = "target-param",

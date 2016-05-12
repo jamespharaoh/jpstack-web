@@ -55,13 +55,15 @@
 
 		<integer-stats-formatter
 			name="userMessages"
-			target-base="chat.supervisorMessages"
-			target-group-param="user_id"
-			target-step-param="hour">
+			target-base="chat.supervisorMessages">
 
 			<target-param
-				name="date"
-				value="{dateYmd}"/>
+				name="user_id"
+				value="{group}"/>
+
+			<target-param
+				name="interval"
+				value="{interval}"/>
 
 		</integer-stats-formatter>
 
