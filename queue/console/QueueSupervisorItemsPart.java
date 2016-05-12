@@ -5,15 +5,13 @@ import java.util.TreeSet;
 
 import javax.inject.Inject;
 
-import org.joda.time.DateTime;
 import org.joda.time.Interval;
-import org.joda.time.LocalTime;
 
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.html.ObsoleteDateField;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
+import wbs.framework.utils.TimeFormatter;
 import wbs.platform.queue.model.QueueItemProcessedTimeComparator;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
@@ -35,6 +33,9 @@ class QueueSupervisorItemsPart
 	QueueItemConsoleHelper queueItemHelper;
 
 	@Inject
+	TimeFormatter timeFormatter;
+
+	@Inject
 	UserConsoleLogic userConsoleLogic;
 
 	@Inject
@@ -52,27 +53,19 @@ class QueueSupervisorItemsPart
 	public
 	void prepare () {
 
-		ObsoleteDateField dateField =
-			ObsoleteDateField.parse (
-				requestContext.parameter ("date"));
-
-		int hour =
-			Integer.parseInt (
-				requestContext.parameter ("hour"));
+		Interval interval =
+			timeFormatter.isoStringToInterval (
+				requestContext.parameter (
+					"interval"));
 
 		int userId =
 			Integer.parseInt (
-				requestContext.parameter ("userId"));
+				requestContext.parameter (
+					"userId"));
 
 		user =
-			userHelper.find (userId);
-
-		DateTime startTime =
-			dateField.date.toDateTime (
-				new LocalTime (
-					hour,
-					0),
-				userConsoleLogic.timezone ());
+			userHelper.find (
+				userId);
 
 		queueItems =
 			new TreeSet<QueueItemRec> (
@@ -81,9 +74,7 @@ class QueueSupervisorItemsPart
 		queueItems.addAll (
 			queueItemHelper.findByProcessedTime (
 				user,
-				new Interval (
-					startTime,
-					startTime.plusHours (1))));
+				interval));
 
 	}
 
