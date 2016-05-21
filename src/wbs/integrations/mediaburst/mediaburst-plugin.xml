@@ -7,6 +7,10 @@
 		<model name="mediaburstNetwork"/>
 	</models>
 
+	<fixtures>
+		<fixture name="mediaburst"/>
+	</fixtures>
+
 	<layer name="api">
 		<bean class="api.MediaburstApiServletModule"/>
 		<bean class="api.MediaburstProteusApiServletModule"/>
@@ -15,5 +19,11 @@
 	<layer name="daemon">
 		<bean class="daemon.MediaburstProteusSender"/>
 	</layer>
+
+	<console-modules>
+		<console-module name="mediaburst"/>
+		<console-module name="mediaburst-network"/>
+		<console-module name="mediaburst-proteus-route-out"/>
+	</console-modules>
 
 </plugin>

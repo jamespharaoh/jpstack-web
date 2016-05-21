@@ -296,20 +296,20 @@ class MediaburstProteusSender
 
 	public
 	void sendRequest (
-			State po,
-			OutputStream out)
+			State state,
+			OutputStream outputStream)
 		throws IOException {
 
-		Document doc =
-			createXml( po);
-
-		log.debug("Sending: " + doc.toXML());
+		Document document =
+			createXml (
+				state);
 
 		Serializer ser =
-			new Serializer (out);
+			new Serializer (
+				outputStream);
 
 		ser.write (
-			doc);
+			document);
 
 	}
 
@@ -362,7 +362,7 @@ class MediaburstProteusSender
 							"DlrUrl",
 							stringFormat (
 								"%s",
-								wbsConfig.httpUserAgent (),
+								wbsConfig.apiUrl (),
 								"/mediaburst",
 								"/proteus",
 								"/route",
