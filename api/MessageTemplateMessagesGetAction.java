@@ -82,7 +82,7 @@ class MessageTemplateMessagesGetAction
 						"sliceCode")));
 
 		MessageTemplateDatabaseRec messageTemplateDatabase =
-			messageTemplateDatabaseHelper.findByCode (
+			messageTemplateDatabaseHelper.findByCodeOrNull (
 				slice,
 				hyphenToUnderscore (
 					requestContext.requestStringRequired (
@@ -103,7 +103,7 @@ class MessageTemplateMessagesGetAction
 		}
 
 		MessageTemplateSetRec messageTemplateSet =
-			messageTemplateSetHelper.findByCode (
+			messageTemplateSetHelper.findByCodeOrNull (
 				messageTemplateDatabase,
 				hyphenToUnderscore (
 					requestContext.requestStringRequired (
