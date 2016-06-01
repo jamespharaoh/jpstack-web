@@ -75,7 +75,7 @@ class MessageTemplateMessagesGetAction
 		// lookup message template stuff
 
 		SliceRec slice =
-			sliceHelper.findByCode (
+			sliceHelper.findByCodeOrNull (
 				GlobalId.root,
 				hyphenToUnderscore (
 					requestContext.requestStringRequired (
