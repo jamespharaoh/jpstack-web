@@ -159,7 +159,7 @@ class ObjectLinksAction
 				matcher.group (2).equals ("true");
 
 			boolean newIsMember =
-				requestContext.parameter ("link_" + linkId) != null;
+				requestContext.parameterOrNull ("link_" + linkId) != null;
 
 			if (oldIsMember == newIsMember)
 				continue;

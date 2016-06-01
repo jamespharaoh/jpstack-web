@@ -50,7 +50,7 @@ class ServiceObjectHelperImplementation
 		// lookup existing service
 
 		ServiceRec service =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				parent,
 				code);
 
@@ -65,7 +65,7 @@ class ServiceObjectHelperImplementation
 					parent));
 
 		ServiceTypeRec serviceType =
-			serviceTypeHelper.findByCode (
+			serviceTypeHelper.findByCodeOrNull (
 				parentType,
 				typeCode);
 

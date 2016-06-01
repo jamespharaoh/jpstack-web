@@ -64,13 +64,13 @@ class QueueUsersAction
 
 		int userId =
 			Integer.parseInt (
-				requestContext.parameter ("userId"));
+				requestContext.parameterOrNull ("userId"));
 
 		boolean reclaim;
 
-		if (requestContext.parameter ("reclaim") != null) {
+		if (requestContext.parameterOrNull ("reclaim") != null) {
 			reclaim = true;
-		} else if (requestContext.parameter ("unclaim") != null) {
+		} else if (requestContext.parameterOrNull ("unclaim") != null) {
 			reclaim = false;
 		} else {
 			throw new RuntimeException ();

@@ -180,7 +180,7 @@ class ObjectSearchResultsPart
 
 		if (
 			equal (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"page"),
 				"all")
 		) {
@@ -193,7 +193,7 @@ class ObjectSearchResultsPart
 
 			pageNumber =
 				Integer.parseInt (
-					requestContext.parameter (
+					requestContext.parameterOrDefault (
 						"page",
 						"0"));
 

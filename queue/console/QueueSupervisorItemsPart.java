@@ -55,12 +55,12 @@ class QueueSupervisorItemsPart
 
 		Interval interval =
 			timeFormatter.isoStringToInterval (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"interval"));
 
 		int userId =
 			Integer.parseInt (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"userId"));
 
 		user =

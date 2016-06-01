@@ -41,7 +41,7 @@ class QueueItemAction
 
 		int queueItemId =
 			Integer.parseInt (
-				requestContext.parameter ("id"));
+				requestContext.parameterOrNull ("id"));
 
 		@Cleanup
 		Transaction transaction =

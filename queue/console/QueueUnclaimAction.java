@@ -53,7 +53,7 @@ class QueueUnclaimAction
 
 		int queueItemId =
 			Integer.parseInt (
-				requestContext.parameter ("queueItemId"));
+				requestContext.parameterOrNull ("queueItemId"));
 
 		@Cleanup
 		Transaction transaction =

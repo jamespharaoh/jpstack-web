@@ -161,7 +161,7 @@ class UserLogicImplementation
 			return null;
 
 		UserRec user =
-			userHelper.findByCode (
+			userHelper.findByCodeOrNull (
 				slice,
 				username);
 
