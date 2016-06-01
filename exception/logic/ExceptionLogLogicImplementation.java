@@ -63,7 +63,7 @@ class ExceptionLogLogicImplementation
 		// lookup type
 
 		ExceptionLogTypeRec exceptionLogType =
-			exceptionLogTypeHelper.findByCode (
+			exceptionLogTypeHelper.findByCodeOrNull (
 				GlobalId.root,
 				typeCode);
 

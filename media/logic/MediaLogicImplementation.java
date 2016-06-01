@@ -728,7 +728,7 @@ class MediaLogicImplementation
 			@NonNull String mimeType) {
 
 		MediaTypeRec mediaType =
-			mediaTypeHelper.findByCode (
+			mediaTypeHelper.findByCodeOrNull (
 				GlobalId.root,
 				mimeType);
 

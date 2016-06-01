@@ -36,7 +36,7 @@ class PlatformCommonFixtureProvider
 			menuGroupHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCode (
+				sliceHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test"))
 
@@ -62,7 +62,7 @@ class PlatformCommonFixtureProvider
 				menuGroupHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCode (
+				sliceHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test"))
 

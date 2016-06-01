@@ -47,12 +47,12 @@ class UserFixtureProvider
 	void createFixtures () {
 
 		PrivRec rootManagePriv =
-			privHelper.findByCode (
+			privHelper.findByCodeOrNull (
 				GlobalId.root,
 				"manage");
 
 		SliceRec testSlice =
-			sliceHelper.findByCode (
+			sliceHelper.findByCodeOrNull (
 				GlobalId.root,
 				"test");
 
@@ -106,7 +106,7 @@ class UserFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCode (
+				menuGroupHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"system"))

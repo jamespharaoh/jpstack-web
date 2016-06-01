@@ -89,7 +89,7 @@ class CoreSidebarMenuResponder
 			userConsoleLogic.userRequired ();
 
 		SliceRec apnSlice =
-			sliceHelper.findByCode (
+			sliceHelper.findByCodeOrNull (
 				GlobalId.root,
 				"apn");
 
@@ -105,7 +105,7 @@ class CoreSidebarMenuResponder
 
 			menuGroups =
 				menuGroupHelper.findByParent (
-					sliceHelper.findByCode (
+					sliceHelper.findByCodeOrNull (
 						GlobalId.root,
 						"apn"));
 
