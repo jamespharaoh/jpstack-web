@@ -117,7 +117,7 @@ class ObjectTicketCreatePart<
 		) {
 
 			TicketFieldTypeRec ticketFieldType =
-				ticketFieldTypeHelper.findByCode (
+				ticketFieldTypeHelper.findByCodeOrNull (
 					ticketManager,
 					ticketFieldSpec.fieldTypeCode ());
 

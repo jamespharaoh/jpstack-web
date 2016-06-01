@@ -88,7 +88,7 @@ class TicketFixtureProvider
 			menuHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCodeOrNull (
+				menuGroupHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"facility"))
@@ -121,7 +121,7 @@ class TicketFixtureProvider
 				ticketManagerHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"))
 
@@ -409,7 +409,7 @@ class TicketFixtureProvider
 				TicketFieldDataType.object)
 
 			.setObjectType (
-				objectTypeHelper.findByCodeOrNull (
+				objectTypeHelper.findByCodeRequired (
 					GlobalId.root,
 					"chat_user"))
 
