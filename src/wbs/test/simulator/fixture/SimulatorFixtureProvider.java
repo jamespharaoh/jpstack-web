@@ -75,7 +75,7 @@ class SimulatorFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCode (
+				menuGroupHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"test"))
@@ -113,7 +113,7 @@ class SimulatorFixtureProvider
 				simulatorHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCode (
+				sliceHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test"))
 
@@ -131,7 +131,7 @@ class SimulatorFixtureProvider
 		// free route
 
 		RouteRec freeRoute =
-			routeHelper.findByCode (
+			routeHelper.findByCodeOrNull (
 				GlobalId.root,
 				"test",
 				"free");
@@ -139,14 +139,14 @@ class SimulatorFixtureProvider
 		freeRoute
 
 			.setSender (
-				senderHelper.findByCode (
+				senderHelper.findByCodeOrNull (
 					GlobalId.root,
 					"simulator"));
 
 		// bill route
 
 		RouteRec billRoute =
-			routeHelper.findByCode (
+			routeHelper.findByCodeOrNull (
 				GlobalId.root,
 				"test",
 				"bill");
@@ -154,7 +154,7 @@ class SimulatorFixtureProvider
 		billRoute
 
 			.setSender (
-				senderHelper.findByCode (
+				senderHelper.findByCodeOrNull (
 					GlobalId.root,
 					"simulator"));
 
@@ -188,7 +188,7 @@ class SimulatorFixtureProvider
 		// inbound route
 
 		RouteRec inboundRoute =
-			routeHelper.findByCode (
+			routeHelper.findByCodeOrNull (
 				GlobalId.root,
 				"test",
 				"inbound");
@@ -225,7 +225,7 @@ class SimulatorFixtureProvider
 				transaction.now ())
 
 			.setCreatedUser (
-				userHelper.findByCode (
+				userHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"test0"))

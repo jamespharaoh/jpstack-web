@@ -982,7 +982,7 @@ class ForwarderLogicImplementation
 					service,
 					null,
 					null,
-					deliveryTypeHelper.findByCode (
+					deliveryTypeHelper.findByCodeOrNull (
 						GlobalId.root,
 						"forwarder"),
 					(long) (int)

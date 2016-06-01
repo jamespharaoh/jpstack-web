@@ -31,7 +31,7 @@ class OrdererFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCode (
+				menuGroupHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"facility"))

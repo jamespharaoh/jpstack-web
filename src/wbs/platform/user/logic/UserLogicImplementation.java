@@ -153,7 +153,7 @@ class UserLogicImplementation
 		// lookup the user
 
 		SliceRec slice =
-			sliceHelper.findByCode (
+			sliceHelper.findByCodeOrNull (
 				GlobalId.root,
 				sliceCode);
 

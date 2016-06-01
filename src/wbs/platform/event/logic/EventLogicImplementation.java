@@ -61,7 +61,7 @@ class EventLogicImplementation
 		// lookup type
 
 		EventTypeRec eventType =
-			eventTypeHelper.findByCode (
+			eventTypeHelper.findByCodeOrNull (
 				GlobalId.root,
 				typeCode);
 

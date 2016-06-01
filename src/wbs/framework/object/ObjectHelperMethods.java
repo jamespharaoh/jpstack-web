@@ -2,6 +2,8 @@ package wbs.framework.object;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
@@ -74,7 +76,16 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 			Record<?> parent,
 			String... code);
 
-	RecordType findByCode (
+	Optional<RecordType> findByCode (
+			GlobalId parentGlobalId,
+			String... code);
+
+	RecordType findByCodeRequired (
+			GlobalId parentGlobalId,
+			String... code);
+
+	@Deprecated
+	RecordType findByCodeOrNull (
 			GlobalId parentGlobalId,
 			String... code);
 

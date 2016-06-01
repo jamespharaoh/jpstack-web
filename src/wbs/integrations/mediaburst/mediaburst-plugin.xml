@@ -2,6 +2,11 @@
 	name="mediaburst"
 	package="wbs.integrations.mediaburst">
 
+	<plugin-dependencies>
+		<plugin-dependency name="integrations-common"/>
+		<plugin-dependency name="scaffold"/>
+	</plugin-dependencies>
+
 	<models>
 		<model name="mediaburstProteusRouteOut"/>
 		<model name="mediaburstNetwork"/>

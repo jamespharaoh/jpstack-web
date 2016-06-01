@@ -120,7 +120,7 @@ class QueueTypeBuilder {
 					parent.name ()));
 
 		ObjectTypeRec parentType =
-			objectTypeHelper.findByCode (
+			objectTypeHelper.findByCodeOrNull (
 				GlobalId.root,
 				parentTypeCode);
 
@@ -131,7 +131,7 @@ class QueueTypeBuilder {
 				spec.subject ());
 
 		ObjectTypeRec subjectType =
-			objectTypeHelper.findByCode (
+			objectTypeHelper.findByCodeOrNull (
 				GlobalId.root,
 				subjectTypeCode);
 
@@ -142,7 +142,7 @@ class QueueTypeBuilder {
 				spec.ref ());
 
 		ObjectTypeRec refType =
-			objectTypeHelper.findByCode (
+			objectTypeHelper.findByCodeOrNull (
 				GlobalId.root,
 				refTypeCode);
 

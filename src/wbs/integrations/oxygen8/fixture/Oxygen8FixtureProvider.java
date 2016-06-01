@@ -31,7 +31,7 @@ class Oxygen8FixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCode (
+				menuGroupHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"integration"))

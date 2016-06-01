@@ -85,7 +85,7 @@ class SubscriptionFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCode (
+				menuGroupHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"facility"))
@@ -115,7 +115,7 @@ class SubscriptionFixtureProvider
 				subscriptionHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCode (
+				sliceHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test"))
 
@@ -129,7 +129,7 @@ class SubscriptionFixtureProvider
 				"Test subscription")
 
 			.setBilledRoute (
-				routeHelper.findByCode (
+				routeHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"bill"))
@@ -143,7 +143,7 @@ class SubscriptionFixtureProvider
 
 			.setFreeRouter (
 				routerHelper.findByCode (
-					routeHelper.findByCode (
+					routeHelper.findByCodeOrNull (
 						GlobalId.root,
 						"test",
 						"free"),
@@ -169,7 +169,7 @@ class SubscriptionFixtureProvider
 		);
 
 		KeywordSetRec inboundKeywordSet =
-			keywordSetHelper.findByCode (
+			keywordSetHelper.findByCodeOrNull (
 				GlobalId.root,
 				"test",
 				"inbound");

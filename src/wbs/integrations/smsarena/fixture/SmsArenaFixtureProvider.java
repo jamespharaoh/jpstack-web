@@ -66,7 +66,7 @@ class SmsArenaFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCode (
+				menuGroupHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"integration"))
@@ -96,7 +96,7 @@ class SmsArenaFixtureProvider
 				routeHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCode (
+				sliceHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test"))
 
@@ -116,7 +116,7 @@ class SmsArenaFixtureProvider
 				true)
 
 			.setSender (
-				senderHelper.findByCode (
+				senderHelper.findByCodeOrNull (
 					GlobalId.root,
 					"sms_arena"))
 

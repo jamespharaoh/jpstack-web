@@ -142,7 +142,7 @@ class ObjectManagerImplementation
 	ObjectHelper<?> objectHelperForClass (
 			@NonNull Class<?> objectClass) {
 
-		return objectHelperManager.forObjectClass (
+		return objectHelperManager.forObjectClassRequired (
 			objectClass);
 
 	}
@@ -373,7 +373,7 @@ class ObjectManagerImplementation
 			objectHelperForClass (objectClass);
 
 		return objectClass.cast (
-			objectHelper.findByCode (
+			objectHelper.findByCodeOrNull (
 				parentGlobalId,
 				code));
 

@@ -1449,7 +1449,7 @@ class ChatApiServletModule
 			if (schemeCode != null) {
 
 				ChatSchemeRec scheme =
-					chatSchemeHelper.findByCode (
+					chatSchemeHelper.findByCodeOrNull (
 						objectManager.getGlobalId (chat),
 						schemeCode);
 

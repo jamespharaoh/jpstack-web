@@ -131,7 +131,7 @@ class ChatCoreFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCode (
+				menuGroupHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"facility"))
@@ -163,7 +163,7 @@ class ChatCoreFixtureProvider
 				routeHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCode (
+				sliceHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test"))
 
@@ -192,7 +192,7 @@ class ChatCoreFixtureProvider
 				true)
 
 			.setSender (
-				senderHelper.findByCode (
+				senderHelper.findByCodeOrNull (
 					GlobalId.root,
 					"simulator"))
 
@@ -203,7 +203,7 @@ class ChatCoreFixtureProvider
 				routeHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCode (
+				sliceHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test"))
 
@@ -223,7 +223,7 @@ class ChatCoreFixtureProvider
 				true)
 
 			.setSender (
-				senderHelper.findByCode (
+				senderHelper.findByCodeOrNull (
 					GlobalId.root,
 					"simulator"))
 
@@ -236,7 +236,7 @@ class ChatCoreFixtureProvider
 				"static");
 
 		CommandRec magicCommand =
-			commandHelper.findByCode (
+			commandHelper.findByCodeOrNull (
 				GlobalId.root,
 				"magic_number");
 
@@ -244,7 +244,7 @@ class ChatCoreFixtureProvider
 			routeHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCode (
+				sliceHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test"))
 
@@ -272,7 +272,7 @@ class ChatCoreFixtureProvider
 				chatHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCode (
+				sliceHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test"))
 
@@ -286,13 +286,13 @@ class ChatCoreFixtureProvider
 				"Test")
 
 			.setCurrency (
-				currencyHelper.findByCode (
+				currencyHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"gbp"))
 
 			.setGazetteer (
-				gazetteerHelper.findByCode (
+				gazetteerHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"test"))
@@ -433,7 +433,7 @@ class ChatCoreFixtureProvider
 					numberString)
 
 				.setNetwork (
-					networkHelper.findByCode (
+					networkHelper.findByCodeOrNull (
 						GlobalId.root,
 						"unknown"))
 

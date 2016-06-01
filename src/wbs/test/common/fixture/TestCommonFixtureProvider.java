@@ -31,7 +31,7 @@ class TestCommonFixtureProvider
 			menuGroupHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCode (
+				sliceHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test"))
 

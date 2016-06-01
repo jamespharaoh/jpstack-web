@@ -957,7 +957,7 @@ class ChatUserLogicImplementation
 		} else {
 
 			MediaTypeRec mediaType =
-				mediaTypeHelper.findByCode (
+				mediaTypeHelper.findByCodeOrNull (
 					GlobalId.root,
 					mimeType);
 
@@ -1164,7 +1164,7 @@ class ChatUserLogicImplementation
 			SliceRec slice =
 				chat.getSlice ().getAdminEmail () != null
 					? chat.getSlice ()
-					: sliceHelper.findByCode (
+					: sliceHelper.findByCodeOrNull (
 						GlobalId.root,
 						wbsConfig.defaultSlice ());
 

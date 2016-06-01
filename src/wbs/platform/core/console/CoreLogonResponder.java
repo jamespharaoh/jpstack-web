@@ -92,7 +92,7 @@ class CoreLogonResponder
 
 			slice =
 				Optional.of (
-					sliceHelper.findByCode (
+					sliceHelper.findByCodeOrNull (
 						GlobalId.root,
 						sliceCode.get ()));
 
@@ -151,7 +151,7 @@ class CoreLogonResponder
 				usernameParts [1];
 
 			UserRec user =
-				userHelper.findByCode (
+				userHelper.findByCodeOrNull (
 					GlobalId.root,
 					sliceCode,
 					userCode);

@@ -499,7 +499,7 @@ class ChatBroadcastSendAction
 						) {
 
 							NumberRec numberRec =
-								numberHelper.findByCode (
+								numberHelper.findByCodeOrNull (
 									GlobalId.root,
 									number);
 
@@ -758,7 +758,7 @@ class ChatBroadcastSendAction
 						batchSubject.getCode ())
 
 					.setParentType (
-						objectTypeHelper.findByCode (
+						objectTypeHelper.findByCodeOrNull (
 							GlobalId.root,
 							"chat_broadcast"))
 

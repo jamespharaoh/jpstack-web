@@ -3,7 +3,11 @@ package wbs.framework.object;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.joinWithFullStop;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
+import static wbs.framework.utils.etc.Misc.optionalOrNull;
+import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.lang.reflect.Constructor;
@@ -29,6 +33,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -177,13 +182,16 @@ class ObjectHelperBuilder {
 	}
 
 	public
-	ObjectHelper<?> forObjectClass (
-			Class<?> objectClassParam) {
+	ObjectHelper<?> forObjectClassRequired (
+			@NonNull Class<?> objectClassParam) {
 
 		Class<?> objectClass =
 			objectClassParam;
 
-		while (Record.class.isAssignableFrom (objectClass)) {
+		while (
+			Record.class.isAssignableFrom (
+				objectClass)
+		) {
 
 			ObjectHelper<?> objectHelper =
 				byObjectClass.get (objectClass);
@@ -741,26 +749,27 @@ class ObjectHelperBuilder {
 
 			@Override
 			public
-			Record<?> findByCode (
+			Optional<Record<?>> findByCode (
 					@NonNull GlobalId ancestorGlobalId,
 					@NonNull String... codes) {
 
 				if (codes.length == 1) {
 
-					return objectHelperProvider.findByParentAndCode (
-						ancestorGlobalId,
-						codes [0]);
+					return Optional.fromNullable (
+						objectHelperProvider.findByParentAndCode (
+							ancestorGlobalId,
+							codes [0]));
 
 				}
 
 				if (codes.length > 1) {
 
 					ObjectHelper<?> parentHelper =
-						forObjectClass (
+						forObjectClassRequired (
 							parentClass ());
 
 					Record<?> parent =
-						parentHelper.findByCode (
+						parentHelper.findByCodeRequired (
 							ancestorGlobalId,
 							Arrays.copyOfRange (
 								codes,
@@ -772,9 +781,10 @@ class ObjectHelperBuilder {
 							parentHelper.objectTypeId (),
 							parent.getId ());
 
-					return objectHelperProvider.findByParentAndCode (
-						parentGlobalId,
-						codes [1]);
+					return Optional.fromNullable (
+						objectHelperProvider.findByParentAndCode (
+							parentGlobalId,
+							codes [1]));
 
 				}
 
@@ -785,12 +795,56 @@ class ObjectHelperBuilder {
 
 			@Override
 			public
+			Record<?> findByCodeRequired (
+					@NonNull GlobalId ancestorGlobalId,
+					@NonNull String... codes) {
+
+				Optional<Record<?>> recordOptional =
+					findByCode (
+						ancestorGlobalId,
+						codes);
+
+				if (
+					isNotPresent (
+						recordOptional)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"No such object %s ",
+							joinWithFullStop (
+								codes),
+							"with parent %s",
+							ancestorGlobalId));
+
+				}
+
+				return optionalRequired (
+					recordOptional);
+
+			}
+
+			@Override
+			public
+			Record<?> findByCodeOrNull (
+					@NonNull GlobalId ancestorGlobalId,
+					@NonNull String... codes) {
+
+				return optionalOrNull (
+					findByCode (
+						ancestorGlobalId,
+						codes));
+
+			}
+
+			@Override
+			public
 			Record findByIndex (
 					@NonNull Record parent,
 					@NonNull Long index) {
 
 				ObjectHelper<?> parentHelper =
-					forObjectClass (
+					forObjectClassRequired (
 						parent.getClass ());
 
 				GlobalId parentGlobalId =
@@ -830,7 +884,7 @@ class ObjectHelperBuilder {
 					@NonNull String typeCode) {
 
 				ObjectHelper<?> parentHelper =
-					forObjectClass (parent.getClass ());
+					forObjectClassRequired (parent.getClass ());
 
 				GlobalId parentGlobalId =
 					new GlobalId (
@@ -1323,7 +1377,7 @@ class ObjectHelperBuilder {
 					@NonNull Record parent) {
 
 				ObjectHelper<?> parentHelper =
-					forObjectClass (
+					forObjectClassRequired (
 						parent.getClass ());
 
 				return parentHelper.getChildren (
@@ -1524,7 +1578,7 @@ class ObjectHelperBuilder {
 					@NonNull String... codes) {
 
 				ObjectHelper<?> parentHelper =
-					forObjectClass (
+					forObjectClassRequired (
 						parent.getClass ());
 
 				GlobalId parentGlobalId =
@@ -1532,7 +1586,7 @@ class ObjectHelperBuilder {
 						parentHelper.objectTypeId (),
 						parent.getId ());
 
-				return findByCode (
+				return findByCodeOrNull (
 					parentGlobalId,
 					codes);
 
@@ -1546,7 +1600,7 @@ class ObjectHelperBuilder {
 					@NonNull String... codes) {
 
 				ObjectHelper<?> parentHelper =
-					forObjectClass (parent.getClass ());
+					forObjectClassRequired (parent.getClass ());
 
 				GlobalId parentGlobalId =
 					new GlobalId (
@@ -1602,7 +1656,7 @@ class ObjectHelperBuilder {
 					@NonNull Long indexEnd) {
 
 				ObjectHelper<?> parentHelper =
-					forObjectClass (
+					forObjectClassRequired (
 						parent.getClass ());
 
 				GlobalId parentGlobalId =

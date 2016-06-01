@@ -2167,6 +2167,14 @@ class Misc {
 	}
 
 	public static <Type>
+	Type optionalOrNull (
+			@NonNull Optional<Type> optional) {
+
+		return optional.orNull ();
+
+	}
+
+	public static <Type>
 	Optional<Type> requiredOptional (
 			@NonNull Optional<Type> optional) {
 

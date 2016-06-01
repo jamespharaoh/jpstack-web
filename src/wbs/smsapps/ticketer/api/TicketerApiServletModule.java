@@ -224,7 +224,7 @@ class TicketerApiServletModule
 					this);
 
 			SliceRec slice =
-				sliceHelper.findByCode (
+				sliceHelper.findByCodeOrNull (
 					GlobalId.root,
 					sliceParam);
 
@@ -252,7 +252,7 @@ class TicketerApiServletModule
 			}
 
 			NumberRec number =
-				numberHelper.findByCode (
+				numberHelper.findByCodeOrNull (
 					GlobalId.root,
 					numberParam);
 

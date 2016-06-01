@@ -41,7 +41,7 @@ class GroupFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCode (
+				menuGroupHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"system"))
@@ -78,7 +78,7 @@ class GroupFixtureProvider
 				groupHelper.createInstance ()
 
 				.setSlice (
-					sliceHelper.findByCode (
+					sliceHelper.findByCodeOrNull (
 						GlobalId.root,
 						"test"))
 

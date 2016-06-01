@@ -75,7 +75,7 @@ class ForwarderApiLogicImplementation
 		// find the forwarder
 
 		SliceRec slice =
-			sliceHelper.findByCode (
+			sliceHelper.findByCodeOrNull (
 				GlobalId.root,
 				sliceCode);
 
@@ -339,7 +339,7 @@ class ForwarderApiLogicImplementation
 		// lookup slice
 
 		SliceRec slice =
-			sliceHelper.findByCode (
+			sliceHelper.findByCodeOrNull (
 				GlobalId.root,
 				sliceCode);
 

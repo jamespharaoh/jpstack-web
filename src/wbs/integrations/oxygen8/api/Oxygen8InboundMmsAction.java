@@ -373,7 +373,7 @@ class Oxygen8InboundMmsAction
 			throw new RuntimeException ();
 
 		MessageTypeRec mmsMessageType =
-			messageTypeHelper.findByCode (
+			messageTypeHelper.findByCodeOrNull (
 				GlobalId.root,
 				"mms");
 

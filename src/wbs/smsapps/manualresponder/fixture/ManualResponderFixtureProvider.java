@@ -81,7 +81,7 @@ class ManualResponderFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCode (
+				menuGroupHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"facility"))
@@ -116,7 +116,7 @@ class ManualResponderFixtureProvider
 				manualResponderHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCode (
+				sliceHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test"))
 
@@ -130,13 +130,13 @@ class ManualResponderFixtureProvider
 				"Test manual responder")
 
 			.setCurrency (
-				currencyHelper.findByCode (
+				currencyHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"gbp"))
 
 			.setSmsCustomerManager (
-				smsCustomerManagerHelper.findByCode (
+				smsCustomerManagerHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"customer_manager"))
@@ -150,7 +150,7 @@ class ManualResponderFixtureProvider
 			keywordHelper.createInstance ()
 
 			.setKeywordSet (
-				keywordSetHelper.findByCode (
+				keywordSetHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"inbound"))
@@ -209,7 +209,7 @@ class ManualResponderFixtureProvider
 
 			.setRouter (
 				routerHelper.findByCode (
-					routeHelper.findByCode (
+					routeHelper.findByCodeOrNull (
 						GlobalId.root,
 						"test",
 						"free"),
@@ -264,7 +264,7 @@ class ManualResponderFixtureProvider
 
 			.setRouter (
 				routerHelper.findByCode (
-					routeHelper.findByCode (
+					routeHelper.findByCodeOrNull (
 						GlobalId.root,
 						"test",
 						"bill"),
@@ -319,7 +319,7 @@ class ManualResponderFixtureProvider
 
 			.setRouter (
 				routerHelper.findByCode (
-					routeHelper.findByCode (
+					routeHelper.findByCodeOrNull (
 						GlobalId.root,
 						"test",
 						"bill"),
@@ -374,7 +374,7 @@ class ManualResponderFixtureProvider
 
 			.setRouter (
 				routerHelper.findByCode (
-					routeHelper.findByCode (
+					routeHelper.findByCodeOrNull (
 						GlobalId.root,
 						"test",
 						"bill"),
@@ -414,7 +414,7 @@ class ManualResponderFixtureProvider
 
 			.setRouter (
 				routerHelper.findByCode (
-					routeHelper.findByCode (
+					routeHelper.findByCodeOrNull (
 						GlobalId.root,
 						"test",
 						"free"),
@@ -455,14 +455,14 @@ class ManualResponderFixtureProvider
 
 			.setRouter (
 				routerHelper.findByCode (
-					routeHelper.findByCode (
+					routeHelper.findByCodeOrNull (
 						GlobalId.root,
 						"test",
 						"free"),
 					"static"))
 
 			.setReplyKeywordSet (
-				keywordSetHelper.findByCode (
+				keywordSetHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"inbound"))
@@ -505,14 +505,14 @@ class ManualResponderFixtureProvider
 
 			.setRouter (
 				routerHelper.findByCode (
-					routeHelper.findByCode (
+					routeHelper.findByCodeOrNull (
 						GlobalId.root,
 						"test",
 						"free"),
 					"static"))
 
 			.setReplyKeywordSet (
-				keywordSetHelper.findByCode (
+				keywordSetHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"inbound"))
@@ -555,14 +555,14 @@ class ManualResponderFixtureProvider
 
 			.setRouter (
 				routerHelper.findByCode (
-					routeHelper.findByCode (
+					routeHelper.findByCodeOrNull (
 						GlobalId.root,
 						"test",
 						"free"),
 					"static"))
 
 			.setReplyKeywordSet (
-				keywordSetHelper.findByCode (
+				keywordSetHelper.findByCodeOrNull (
 					GlobalId.root,
 					"test",
 					"inbound"))
