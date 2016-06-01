@@ -225,7 +225,7 @@ class CoreLogonResponder
 				" type=\"text\"",
 				" name=\"slice\"",
 				" value=\"%h\"",
-				requestContext.parameter (
+				requestContext.parameterOrDefault (
 					"slice",
 					wbsConfig.defaultSlice ()),
 				" size=\"32\"",
@@ -245,7 +245,7 @@ class CoreLogonResponder
 			" type=\"text\"",
 			" name=\"username\"",
 			" value=\"%h\"",
-			requestContext.parameter (
+			requestContext.parameterOrDefault (
 				"username",
 				""),
 			" size=\"32\"",

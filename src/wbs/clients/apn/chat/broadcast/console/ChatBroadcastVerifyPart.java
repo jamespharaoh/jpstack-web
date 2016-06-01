@@ -160,7 +160,7 @@ class ChatBroadcastVerifyPart
 					"chatBroadcastUpdates"));
 
 		fromUser =
-			chatUserHelper.findByCode (
+			chatUserHelper.findByCodeOrNull (
 				chat,
 				form.fromUser ());
 

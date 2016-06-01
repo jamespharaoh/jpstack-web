@@ -162,7 +162,7 @@ class SubscriptionNumberAddRemoveAction
 
 		if (
 			isNotNull (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"add"))
 		) {
 
@@ -300,7 +300,7 @@ class SubscriptionNumberAddRemoveAction
 
 		if (
 			isNotNull (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"remove"))
 		) {
 

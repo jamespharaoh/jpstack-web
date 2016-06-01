@@ -113,7 +113,7 @@ class ChatHelpCommand
 				command);
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 
@@ -166,10 +166,10 @@ class ChatHelpCommand
 				Optional.of (
 					message.getThreadId ()),
 				"help_error",
-				commandHelper.findByCode (
+				commandHelper.findByCodeRequired (
 					chat,
 					"magic"),
-				(long) commandHelper.findByCode (
+				(long) commandHelper.findByCodeRequired (
 					chat,
 					"help"
 				).getId (),
@@ -184,7 +184,7 @@ class ChatHelpCommand
 				chatUser,
 				message,
 				rest,
-				commandHelper.findByCode (
+				commandHelper.findByCodeRequired (
 					chat,
 					"help"),
 				true);

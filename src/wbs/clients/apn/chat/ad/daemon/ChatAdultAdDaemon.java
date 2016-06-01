@@ -318,7 +318,7 @@ class ChatAdultAdDaemon
 			chat.getAdultAdsChat ().getChatSchemes ().iterator ().next ();
 
 		ServiceRec systemService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				"system");
 

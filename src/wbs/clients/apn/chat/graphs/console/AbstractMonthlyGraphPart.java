@@ -38,7 +38,7 @@ class AbstractMonthlyGraphPart
 
 		yearMonth =
 			YearMonth.parse (
-				requestContext.parameter ("month"));
+				requestContext.parameterOrNull ("month"));
 	}
 
 	@Override

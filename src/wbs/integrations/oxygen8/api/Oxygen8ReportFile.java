@@ -119,7 +119,7 @@ class Oxygen8ReportFile
 		}
 
 		Oxygen8ReportCodeRec reportCode =
-			oxygen8ReportCodeHelper.findByCode (
+			oxygen8ReportCodeHelper.findByCodeOrNull (
 				routeOut.getOxygen8Config (),
 				state.status);
 

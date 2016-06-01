@@ -47,7 +47,7 @@ class PaypalFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCodeOrNull (
+				menuGroupHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"integration"))
@@ -118,7 +118,7 @@ class PaypalFixtureProvider
 			paypalAccountHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"))
 

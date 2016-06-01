@@ -85,7 +85,7 @@ class SubscriptionFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCodeOrNull (
+				menuGroupHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"facility"))
@@ -115,7 +115,7 @@ class SubscriptionFixtureProvider
 				subscriptionHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"))
 
@@ -129,7 +129,7 @@ class SubscriptionFixtureProvider
 				"Test subscription")
 
 			.setBilledRoute (
-				routeHelper.findByCodeOrNull (
+				routeHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"bill"))
@@ -142,8 +142,8 @@ class SubscriptionFixtureProvider
 					"Billed message"))
 
 			.setFreeRouter (
-				routerHelper.findByCode (
-					routeHelper.findByCodeOrNull (
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
 						GlobalId.root,
 						"test",
 						"free"),
@@ -169,7 +169,7 @@ class SubscriptionFixtureProvider
 		);
 
 		KeywordSetRec inboundKeywordSet =
-			keywordSetHelper.findByCodeOrNull (
+			keywordSetHelper.findByCodeRequired (
 				GlobalId.root,
 				"test",
 				"inbound");
@@ -187,7 +187,7 @@ class SubscriptionFixtureProvider
 				"Subscription subscribe")
 
 			.setCommand (
-				commandHelper.findByCode (
+				commandHelper.findByCodeRequired (
 					subscription,
 					"subscribe"))
 
@@ -206,7 +206,7 @@ class SubscriptionFixtureProvider
 				"Subscription unsubscribe")
 
 			.setCommand (
-				commandHelper.findByCode (
+				commandHelper.findByCodeRequired (
 					subscription,
 					"unsubscribe"))
 
@@ -292,7 +292,7 @@ class SubscriptionFixtureProvider
 					affiliateSpecEntry.getValue ())
 
 				.setCommand (
-					commandHelper.findByCode (
+					commandHelper.findByCodeRequired (
 						affiliate,
 						"subscribe"))
 

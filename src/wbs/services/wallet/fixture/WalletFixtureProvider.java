@@ -48,7 +48,7 @@ class WalletFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCodeOrNull (
+				menuGroupHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"facility"))
@@ -78,7 +78,7 @@ class WalletFixtureProvider
 				walletServiceHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"))
 

@@ -61,7 +61,14 @@ interface ConsoleRequestContext {
 	String resolveContextUrl (
 			String contextUrl);
 
-	String parameter (
+	@Deprecated
+	String parameterOrNull (
+			String key);
+
+	String parameterRequired (
+			String key);
+
+	String parameterOrEmptyString (
 			String key);
 
 	void session (
@@ -206,7 +213,10 @@ interface ConsoleRequestContext {
 	OutputStream outputStream ()
 		throws IOException;
 
-	String parameter (
+	Optional<String> parameter (
+			String key);
+
+	String parameterOrDefault (
 			String key,
 			String defaultValue);
 

@@ -1,6 +1,7 @@
 package wbs.smsapps.forwarder.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -12,6 +13,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.joda.time.Duration;
+
+import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
@@ -72,28 +75,55 @@ class ForwarderApiLogicImplementation
 			ForwarderNotFoundException,
 			IncorrectPasswordException {
 
-		// find the forwarder
+		// find the slice
 
-		SliceRec slice =
-			sliceHelper.findByCodeOrNull (
+		Optional<SliceRec> sliceOptional =
+			sliceHelper.findByCode (
 				GlobalId.root,
 				sliceCode);
 
-		if (slice == null)
+		if (
+			isNotPresent (
+				sliceOptional)
+		) {
+
 			throw new ForwarderNotFoundException ();
 
-		ForwarderRec forwarder =
+		}
+
+		SliceRec slice =
+			sliceOptional.get ();
+
+		// find the forwarder
+
+		Optional<ForwarderRec> forwarderOptional =
 			forwarderHelper.findByCode (
 				slice,
 				code);
 
-		if (forwarder == null)
+		if (
+			isNotPresent (
+				forwarderOptional)
+		) {
+			
 			throw new ForwarderNotFoundException ();
+
+		}
+
+		ForwarderRec forwarder =
+			forwarderOptional.get ();
 
 		// check the password
 
-		if (! forwarder.getPassword ().equals (password))
+		if (
+			notEqual (
+				forwarder.getPassword (),
+				password)
+		) {
+
 			throw new IncorrectPasswordException ();
+
+		}
 
 		// return
 
@@ -101,7 +131,7 @@ class ForwarderApiLogicImplementation
 
 	}
 
-	// ============================================================ control action get
+	// control action get
 
 	/**
 	 * Given a forwarderId, gets and unqueues the next message, and outputs it
@@ -338,12 +368,15 @@ class ForwarderApiLogicImplementation
 
 		// lookup slice
 
-		SliceRec slice =
-			sliceHelper.findByCodeOrNull (
+		Optional<SliceRec> sliceOptional =
+			sliceHelper.findByCode (
 				GlobalId.root,
 				sliceCode);
 
-		if (slice == null) {
+		if (
+			isNotPresent (
+				sliceOptional)
+		) {
 
 			throw new RpcException (
 				Rpc.rpcError (
@@ -354,14 +387,20 @@ class ForwarderApiLogicImplementation
 
 		}
 
+		SliceRec slice =
+			sliceOptional.get ();
+
 		// lookup forwarder
 
-		ForwarderRec forwarder =
+		Optional<ForwarderRec> forwarderOptional =
 			forwarderHelper.findByCode (
 				slice,
 				forwarderCode);
 
-		if (forwarder == null) {
+		if (
+			isNotPresent (
+				forwarderOptional)
+		) {
 
 			throw new RpcException (
 				Rpc.rpcError (
@@ -372,11 +411,16 @@ class ForwarderApiLogicImplementation
 
 		}
 
+		ForwarderRec forwarder =
+			forwarderOptional.get ();
+
 		// check password
 
-		if (! equal (
+		if (
+			notEqual (
 				forwarder.getPassword (),
-				password)) {
+				password)
+		) {
 
 			throw new RpcException (
 				Rpc.rpcError (

@@ -1450,7 +1450,7 @@ class ChatApiServletModule
 
 				ChatSchemeRec scheme =
 					chatSchemeHelper.findByCodeOrNull (
-						objectManager.getGlobalId (chat),
+						chat,
 						schemeCode);
 
 				if (scheme == null) {
@@ -1465,7 +1465,7 @@ class ChatApiServletModule
 				}
 
 				ChatAffiliateRec affiliate =
-					chatAffiliateHelper.findByCode (
+					chatAffiliateHelper.findByCodeOrNull (
 						scheme,
 						affiliateCode);
 
@@ -2226,7 +2226,7 @@ class ChatApiServletModule
 					numberRec);
 
 			ChatUserRec toUser =
-				chatUserHelper.findByCode (
+				chatUserHelper.findByCodeOrNull (
 					chat,
 					toCode);
 

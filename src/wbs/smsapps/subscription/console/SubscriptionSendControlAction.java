@@ -82,7 +82,7 @@ class SubscriptionSendControlAction
 					"subscriptionSendId"));
 
 		if (
-			requestContext.parameter ("send")
+			requestContext.parameterOrNull ("send")
 				!= null
 		) {
 
@@ -115,7 +115,7 @@ class SubscriptionSendControlAction
 		}
 
 		if (
-			requestContext.parameter ("schedule") != null
+			requestContext.parameterOrNull ("schedule") != null
 		) {
 
 			if (
@@ -138,7 +138,7 @@ class SubscriptionSendControlAction
 
 				scheduledTime =
 					userConsoleLogic.timestampStringToInstant (
-						requestContext.parameter ("timestamp"));
+						requestContext.parameterOrNull ("timestamp"));
 
 			} catch (Exception exception) {
 
@@ -164,7 +164,7 @@ class SubscriptionSendControlAction
 		}
 
 		if (
-			requestContext.parameter ("unschedule")
+			requestContext.parameterOrNull ("unschedule")
 				!= null
 		) {
 
@@ -211,7 +211,7 @@ class SubscriptionSendControlAction
 		}
 
 		if (
-			requestContext.parameter ("cancel")
+			requestContext.parameterOrNull ("cancel")
 				!= null
 		) {
 

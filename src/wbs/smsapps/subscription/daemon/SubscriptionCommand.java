@@ -206,7 +206,7 @@ class SubscriptionCommand
 		) {
 
 			SubscriptionKeywordRec subscriptionKeyword =
-				subscriptionKeywordHelper.findByCode (
+				subscriptionKeywordHelper.findByCodeOrNull (
 					subscription,
 					keywordMatch.simpleKeyword ());
 
@@ -405,12 +405,12 @@ class SubscriptionCommand
 				subscription.getFreeRouter ())
 
 			.service (
-				serviceHelper.findByCode (
+				serviceHelper.findByCodeOrNull (
 					subscriptionList,
 					"default"))
 
 			.affiliate (
-				affiliateHelper.findByCode (
+				affiliateHelper.findByCodeOrNull (
 					subscriptionAffiliate,
 					"default"))
 

@@ -171,7 +171,7 @@ class ChatMainCommand
 			@NonNull String code,
 			@NonNull String rest) {
 
-		ChatUserRec toUser =
+		Optional<ChatUserRec> toUserOptional =
 			chatUserHelper.findByCode (
 				chat,
 				code);
@@ -179,7 +179,10 @@ class ChatMainCommand
 		ChatSchemeRec userChatScheme =
 			fromChatUser.getChatScheme ();
 
-		if (toUser == null) {
+		if (
+			isNotPresent (
+				toUserOptional)
+		) {
 
 			log.debug (
 				stringFormat (
@@ -190,7 +193,7 @@ class ChatMainCommand
 			return inboxLogic.inboxProcessed (
 				inbox,
 				Optional.of (
-					serviceHelper.findByCode (
+					serviceHelper.findByCodeRequired (
 						chat,
 						"default")),
 				Optional.of (
@@ -199,6 +202,9 @@ class ChatMainCommand
 				command);
 
 		}
+
+		ChatUserRec toUser =
+			toUserOptional.get ();
 
 		log.debug (
 			stringFormat (
@@ -237,10 +243,10 @@ class ChatMainCommand
 				Optional.of (
 					smsMessage.getThreadId ()),
 				"dob_request",
-				commandHelper.findByCode (
+				commandHelper.findByCodeRequired (
 					chat,
 					"magic"),
-				(long) commandHelper.findByCode (
+				(long) commandHelper.findByCodeRequired (
 					userChatScheme,
 					"chat_dob"
 				).getId (),
@@ -252,7 +258,7 @@ class ChatMainCommand
 		return inboxLogic.inboxProcessed (
 			inbox,
 			Optional.of (
-				serviceHelper.findByCode (
+				serviceHelper.findByCodeRequired (
 					chat,
 					"default")),
 			Optional.of (
@@ -270,12 +276,15 @@ class ChatMainCommand
 			@NonNull String keyword,
 			@NonNull String rest) {
 
-		ChatSchemeKeywordRec chatSchemeKeyword =
+		Optional<ChatSchemeKeywordRec> chatSchemeKeywordOptional =
 			chatSchemeKeywordHelper.findByCode (
 				commandChatScheme,
 				keyword);
 
-		if (chatSchemeKeyword == null) {
+		if (
+			isNotPresent (
+				chatSchemeKeywordOptional)
+		) {
 
 			log.debug (
 				stringFormat (
@@ -286,6 +295,9 @@ class ChatMainCommand
 			return Optional.<InboxAttemptRec>absent ();
 
 		}
+
+		ChatSchemeKeywordRec chatSchemeKeyword =
+			chatSchemeKeywordOptional.get ();
 
 		if (chatSchemeKeyword.getJoinType () != null) {
 
@@ -395,12 +407,15 @@ class ChatMainCommand
 			@NonNull String keyword,
 			@NonNull String rest) {
 
-		ChatKeywordRec chatKeyword =
+		Optional<ChatKeywordRec> chatKeywordOptional =
 			chatKeywordHelper.findByCode (
 				chat,
 				keyword);
 
-		if (chatKeyword == null) {
+		if (
+			isNotPresent (
+				chatKeywordOptional)
+		) {
 
 			log.debug (
 				stringFormat (
@@ -411,6 +426,9 @@ class ChatMainCommand
 			return Optional.<InboxAttemptRec>absent ();
 
 		}
+
+		ChatKeywordRec chatKeyword =
+			chatKeywordOptional.get ();
 
 		if (chatKeyword.getJoinType () != null) {
 
@@ -708,7 +726,7 @@ class ChatMainCommand
 				return inboxLogic.inboxProcessed (
 					inbox,
 					Optional.of (
-						serviceHelper.findByCode (
+						serviceHelper.findByCodeRequired (
 							chat,
 							"default")),
 					Optional.of (
@@ -764,7 +782,7 @@ class ChatMainCommand
 			return inboxLogic.inboxProcessed (
 				inbox,
 				Optional.of (
-					serviceHelper.findByCode (
+					serviceHelper.findByCodeRequired (
 						chat,
 						"default")),
 				Optional.of (
@@ -794,7 +812,7 @@ class ChatMainCommand
 				inboxLogic.inboxNotProcessed (
 					inbox,
 					Optional.of (
-						serviceHelper.findByCode (
+						serviceHelper.findByCodeRequired (
 							chat,
 							"default")),
 					Optional.of (
@@ -833,7 +851,7 @@ class ChatMainCommand
 				inboxLogic.inboxProcessed (
 					inbox,
 					Optional.of (
-						serviceHelper.findByCode (
+						serviceHelper.findByCodeRequired (
 							chat,
 							"default")),
 					Optional.of (

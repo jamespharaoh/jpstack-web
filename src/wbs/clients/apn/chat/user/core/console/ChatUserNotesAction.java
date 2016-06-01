@@ -75,7 +75,7 @@ class ChatUserNotesAction
 		// check params
 
 		String noteString =
-			requestContext.parameter ("note");
+			requestContext.parameterOrNull ("note");
 
 		if (noteString.trim ().length () == 0) {
 			requestContext.addError ("Please enter a note");

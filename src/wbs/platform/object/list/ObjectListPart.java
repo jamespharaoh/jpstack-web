@@ -177,7 +177,7 @@ class ObjectListPart<
 
 			dateField =
 				ObsoleteDateField.parse (
-					requestContext.parameter ("date"));
+					requestContext.parameterOrNull ("date"));
 
 			if (dateField.date == null) {
 
@@ -195,7 +195,7 @@ class ObjectListPart<
 	void prepareTabSpec () {
 
 		String currentTabName =
-			requestContext.parameter (
+			requestContext.parameterOrDefault (
 				"tab",
 				listTabSpecs.values ().iterator ().next ().name ());
 

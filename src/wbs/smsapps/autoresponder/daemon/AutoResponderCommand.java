@@ -125,7 +125,7 @@ class AutoResponderCommand
 				command.getParentId ());
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				autoResponder,
 				"default");
 
@@ -152,7 +152,7 @@ class AutoResponderCommand
 		// send responses
 
 		MessageSetRec messageSet =
-			messageSetHelper.findByCode (
+			messageSetHelper.findByCodeOrNull (
 				autoResponder,
 				"default");
 

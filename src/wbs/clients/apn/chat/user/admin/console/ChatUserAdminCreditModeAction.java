@@ -79,7 +79,7 @@ class ChatUserAdminCreditModeAction
 		ChatUserCreditMode newCreditMode =
 			toEnum (
 				ChatUserCreditMode.class,
-				requestContext.parameter ("creditMode"));
+				requestContext.parameterOrNull ("creditMode"));
 
 		if (newCreditMode == null) {
 

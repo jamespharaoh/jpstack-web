@@ -124,17 +124,17 @@ class ChatMonitorInboxAlarmAction
 
 		boolean save =
 			isNotNull (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"alarmSet"));
 
 		boolean clear =
 			isNotNull (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"alarmCancel"));
 
 		boolean sticky =
 			Boolean.parseBoolean (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"alarmSticky"));
 
 		Instant alarmTime = null;
@@ -148,9 +148,9 @@ class ChatMonitorInboxAlarmAction
 				String timestampString =
 					stringFormat (
 						"%s %s",
-						requestContext.parameter (
+						requestContext.parameterOrNull (
 							"alarmDate"),
-						requestContext.parameter (
+						requestContext.parameterOrNull (
 							"alarmTime"));
 
 				TextualInterval interval =

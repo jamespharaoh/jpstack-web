@@ -62,27 +62,27 @@ class ChatSettingsMonitorsAction
 
 			gayMale =
 				Integer.parseInt (
-					requestContext.parameter ("gayMale"));
+					requestContext.parameterOrNull ("gayMale"));
 
 			gayFemale =
 				Integer.parseInt (
-					requestContext.parameter ("gayFemale"));
+					requestContext.parameterOrNull ("gayFemale"));
 
 			biMale =
 				Integer.parseInt (
-					requestContext.parameter ("biMale"));
+					requestContext.parameterOrNull ("biMale"));
 
 			biFemale =
 				Integer.parseInt (
-					requestContext.parameter ("biFemale"));
+					requestContext.parameterOrNull ("biFemale"));
 
 			straightMale =
 				Integer.parseInt (
-					requestContext.parameter ("straightMale"));
+					requestContext.parameterOrNull ("straightMale"));
 
 			straightFemale =
 				Integer.parseInt (
-					requestContext.parameter ("straightFemale"));
+					requestContext.parameterOrNull ("straightFemale"));
 
 		} catch (NumberFormatException exception) {
 

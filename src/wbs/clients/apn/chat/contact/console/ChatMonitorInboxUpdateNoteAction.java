@@ -70,7 +70,7 @@ class ChatMonitorInboxUpdateNoteAction
 		throws ServletException {
 
 		String id =
-			requestContext.parameter ("id");
+			requestContext.parameterOrNull ("id");
 
 		if (id == null)
 			throw new RuntimeException ();

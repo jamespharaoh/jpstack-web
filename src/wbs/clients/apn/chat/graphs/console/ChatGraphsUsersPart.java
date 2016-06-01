@@ -25,7 +25,7 @@ class ChatGraphsUsersPart
 		LocalDate date;
 
 		String dateString =
-			requestContext.parameter ("date");
+			requestContext.parameterOrNull ("date");
 
 		if (dateString == null) {
 

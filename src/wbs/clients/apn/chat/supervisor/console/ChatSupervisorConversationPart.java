@@ -79,12 +79,12 @@ class ChatSupervisorConversationPart
 
 		int chatUserId1 =
 			Integer.parseInt (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"chatUserId1"));
 
 		int chatUserId2 =
 			Integer.parseInt (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"chatUserId2"));
 
 		userChatUser =

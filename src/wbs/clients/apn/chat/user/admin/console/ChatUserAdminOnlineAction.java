@@ -74,7 +74,7 @@ class ChatUserAdminOnlineAction
 			Misc.capitalise (
 				chatUser.getType ().name ());
 
-		if (requestContext.parameter ("online") != null) {
+		if (requestContext.parameterOrNull ("online") != null) {
 
 			if (chatUser.getOnline ()) {
 
@@ -153,7 +153,7 @@ class ChatUserAdminOnlineAction
 
 		}
 
-		if (requestContext.parameter ("offline") != null) {
+		if (requestContext.parameterOrNull ("offline") != null) {
 
 			if (! chatUser.getOnline ()) {
 

@@ -423,8 +423,8 @@ class ChatMiscLogicImplementation
 				Optional.fromNullable (
 					threadId),
 				"logon",
-				commandHelper.findByCode (chat, "magic"),
-				(long) commandHelper.findByCode (chat, "help").getId (),
+				commandHelper.findByCodeOrNull (chat, "magic"),
+				(long) commandHelper.findByCodeOrNull (chat, "help").getId (),
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -458,7 +458,7 @@ class ChatMiscLogicImplementation
 			locatorManager.locate (
 				chat.getLocator ().getId (),
 				chatUser.getNumber ().getId (),
-				serviceHelper.findByCode (chat, "default").getId (),
+				serviceHelper.findByCodeOrNull (chat, "default").getId (),
 				chatUserLogic.getAffiliateId (chatUser),
 				new LocatorManager.AbstractCallback () {
 
@@ -554,7 +554,7 @@ class ChatMiscLogicImplementation
 					Optional.fromNullable (
 						threadId),
 					"date_stop_hint",
-					commandHelper.findByCode (chat, "help"),
+					commandHelper.findByCodeOrNull (chat, "help"),
 					0l,
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
@@ -723,8 +723,8 @@ class ChatMiscLogicImplementation
 				Optional.of (
 					threadId),
 				"name_confirm",
-				commandHelper.findByCode (chat, "magic"),
-				(long) commandHelper.findByCode (chat, "name").getId (),
+				commandHelper.findByCodeOrNull (chat, "magic"),
+				(long) commandHelper.findByCodeOrNull (chat, "name").getId (),
 				TemplateMissing.error,
 				ImmutableMap.<String,String>builder ()
 					.put ("newName", name)

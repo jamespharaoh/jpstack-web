@@ -173,7 +173,7 @@ class ManualResponderCommand
 				message.getNumber ());
 
 		defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				manualResponder,
 				"default");
 

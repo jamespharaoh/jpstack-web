@@ -97,7 +97,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 		Matcher idMatcher =
 			idPattern.matcher (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"id"));
 
 		if (! idMatcher.matches ()) {
@@ -115,7 +115,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 			idMatcher.group (2);
 
 		String newValue =
-			requestContext.parameter ("value").trim ();
+			requestContext.parameterOrNull ("value").trim ();
 
 		// start transaction
 

@@ -1,7 +1,8 @@
 package wbs.clients.apn.chat.affiliate.console;
 
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.Misc.toInteger;
@@ -10,6 +11,8 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.experimental.Accessors;
+
+import com.google.common.base.Optional;
 
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.core.console.ChatConsoleHelper;
@@ -98,7 +101,8 @@ class ChatAffiliateCreateOldAction
 	Responder goReal () {
 
 		String name =
-			requestContext.parameter ("name");
+			requestContext.parameterRequired (
+				"name");
 
 		String code =
 			simplifyToCodeRequired (
@@ -106,7 +110,7 @@ class ChatAffiliateCreateOldAction
 
 		Integer chatSchemeId =
 			toInteger (
-				requestContext.parameter (
+				requestContext.parameterRequired (
 					"chatScheme"));
 
 		if (chatSchemeId == null) {
@@ -122,10 +126,15 @@ class ChatAffiliateCreateOldAction
 		for (int i = 0; i < 3; i++) {
 
 			String keyword =
-				requestContext.parameter ("keyword" + i);
+				requestContext.parameterRequired (
+					"keyword" + i);
 
-			if (keyword.length () == 0)
+			if (
+				isEmpty (
+					keyword)
+			) {
 				continue;
+			}
 
 			if (! keywordLogic.checkKeyword (keyword)) {
 
@@ -136,9 +145,11 @@ class ChatAffiliateCreateOldAction
 
 			}
 
-			if (in (requestContext.parameter ("joinType" + i),
-					null,
-					"")) {
+			if (
+				isEmpty (
+					requestContext.parameterRequired (
+						"joinType" + i))
+			) {
 
 				requestContext.addError (
 					"Please specify a join type for each keyword");
@@ -179,12 +190,15 @@ class ChatAffiliateCreateOldAction
 
 		// check uniqueness of code
 
-		ChatAffiliateRec existingChatAffiliate =
+		Optional<ChatAffiliateRec> existingChatAffiliateOptional =
 			chatAffiliateHelper.findByCode (
 				chatScheme,
 				code);
 
-		if (existingChatAffiliate != null) {
+		if (
+			isPresent (
+				existingChatAffiliateOptional)
+		) {
 
 			requestContext.addError (
 				stringFormat (
@@ -199,17 +213,25 @@ class ChatAffiliateCreateOldAction
 		for (int i = 0; i < 3; i++) {
 
 			String keyword =
-				requestContext.parameter ("keyword" + i);
+				requestContext.parameterRequired (
+					"keyword" + i);
 
-			if (keyword.length () == 0)
+			if (
+				isEmpty (
+					keyword)
+			) {
 				continue;
+			}
 
-			ChatKeywordRec chatKeyword =
+			Optional<ChatKeywordRec> existingChatKeywordOptional =
 				chatKeywordHelper.findByCode (
 					chat,
 					keyword);
 
-			if (chatKeyword != null) {
+			if (
+				isPresent (
+					existingChatKeywordOptional)
+			) {
 
 				requestContext.addError (
 					stringFormat (
@@ -219,12 +241,15 @@ class ChatAffiliateCreateOldAction
 				return null;
 			}
 
-			ChatSchemeKeywordRec chatSchemeKeyword =
+			Optional<ChatSchemeKeywordRec> existingChatSchemeKeywordOptional =
 				chatSchemeKeywordHelper.findByCode (
 					chatScheme,
 					keyword);
 
-			if (chatSchemeKeyword != null) {
+			if (
+				isPresent (
+					existingChatSchemeKeywordOptional)
+			) {
 
 				requestContext.addError (
 					stringFormat (
@@ -253,7 +278,7 @@ class ChatAffiliateCreateOldAction
 				code)
 
 			.setDescription (
-				requestContext.parameter (
+				requestContext.parameterRequired (
 					"description"))
 
 		);
@@ -263,11 +288,15 @@ class ChatAffiliateCreateOldAction
 		for (int index = 0; index < 3; index ++) {
 
 			String keyword =
-				requestContext.parameter (
+				requestContext.parameterRequired (
 					"keyword" + index);
 
-			if (keyword.length () == 0)
+			if (
+				isEmpty (
+					keyword)
+			) {
 				continue;
+			}
 
 			chatSchemeKeywordHelper.insert (
 				chatSchemeKeywordHelper.createInstance ()
@@ -281,19 +310,19 @@ class ChatAffiliateCreateOldAction
 				.setJoinType (
 					toEnum (
 						ChatKeywordJoinType.class,
-						requestContext.parameter (
+						requestContext.parameterRequired (
 							"joinType" + index)))
 
 				.setJoinGender (
 					toEnum (
 						Gender.class,
-						requestContext.parameter (
+						requestContext.parameterRequired (
 							"gender" + index)))
 
 				.setJoinOrient (
 					toEnum (
 						Orient.class,
-						requestContext.parameter (
+						requestContext.parameterRequired (
 							"orient" + index)))
 
 				.setJoinChatAffiliate (

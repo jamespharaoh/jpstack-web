@@ -228,7 +228,7 @@ class ChatMessagePendingFormResponder
 			" cols=\"48\"",
 			">%h</textarea></td>\n",
 			ifNull (
-				requestContext.parameter ("message"),
+				requestContext.parameterOrNull ("message"),
 				chatMessage.getOriginalText ().getText ()),
 
 			"</tr>\n");
@@ -275,7 +275,7 @@ class ChatMessagePendingFormResponder
 
 		if (
 			isNotNull (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"reject"))
 		) {
 
@@ -285,7 +285,7 @@ class ChatMessagePendingFormResponder
 				"showReject ();\n",
 
 				"document.getElementById ('message').value = '%j';\n",
-				requestContext.parameter ("message"),
+				requestContext.parameterOrNull ("message"),
 
 				"</script>\n");
 

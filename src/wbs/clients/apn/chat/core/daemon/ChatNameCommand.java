@@ -120,7 +120,7 @@ class ChatNameCommand
 				command);
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				"default");
 
@@ -181,8 +181,8 @@ class ChatNameCommand
 				Optional.of (
 					message.getThreadId ()),
 				"name_error",
-				commandHelper.findByCode (chat, "magic"),
-				(long) commandHelper.findByCode (chat, "name").getId (),
+				commandHelper.findByCodeOrNull (chat, "magic"),
+				(long) commandHelper.findByCodeOrNull (chat, "name").getId (),
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 

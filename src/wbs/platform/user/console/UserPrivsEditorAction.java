@@ -80,7 +80,7 @@ class UserPrivsEditorAction
 
 		Matcher matcher =
 			privDataPattern.matcher (
-				requestContext.parameter ("privdata"));
+				requestContext.parameterOrNull ("privdata"));
 
 		while (matcher.find ()) {
 

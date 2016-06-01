@@ -60,10 +60,10 @@ class UserPasswordAction
 	Responder goReal () {
 
 		String password1 =
-			requestContext.parameter ("password_1");
+			requestContext.parameterOrNull ("password_1");
 
 		String password2 =
-			requestContext.parameter ("password_2");
+			requestContext.parameterOrNull ("password_2");
 
 		@Cleanup
 		Transaction transaction =

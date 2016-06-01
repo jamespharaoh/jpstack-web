@@ -83,7 +83,7 @@ class QueueLogicImplementation
 			@NonNull String code) {
 
 		QueueRec queue =
-			queueHelper.findByCode (
+			queueHelper.findByCodeOrNull (
 				parentObject,
 				code);
 
@@ -126,7 +126,7 @@ class QueueLogicImplementation
 		if (queue == null) {
 
 			QueueTypeRec queueType =
-				queueTypeHelper.findByCode (
+				queueTypeHelper.findByCodeOrNull (
 					parentType,
 					queueTypeCode);
 

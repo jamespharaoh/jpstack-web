@@ -2,6 +2,8 @@ package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.hyphenToUnderscore;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.notEqual;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -10,6 +12,8 @@ import lombok.Cleanup;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+
+import com.google.common.base.Optional;
 
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
@@ -133,16 +137,23 @@ class ImChatConversationStartAction
 
 		// lookup profile
 
-		ImChatProfileRec profile =
+		Optional<ImChatProfileRec> profileOptional =
 			imChatProfileHelper.findByCode (
 				imChat,
 				hyphenToUnderscore (
 					startRequest.profileCode ()));
 
 		if (
-			profile == null
-			|| profile.getDeleted ()
-			|| profile.getImChat () != imChat
+
+			isNotPresent (
+				profileOptional)
+
+			|| profileOptional.get ().getDeleted ()
+
+			|| notEqual (
+				profileOptional.get ().getImChat (),
+				imChat)
+
 		) {
 
 			ImChatFailure failureResponse =
@@ -160,6 +171,9 @@ class ImChatConversationStartAction
 					failureResponse);
 
 		}
+
+		ImChatProfileRec profile =
+			profileOptional.get ();
 
 		// check state
 

@@ -61,7 +61,7 @@ class AutoResponderVotesPart
 		// check units
 
 		timePeriodString =
-			requestContext.parameter (
+			requestContext.parameterOrDefault (
 				"timePeriod",
 				"12 hours");
 
@@ -85,7 +85,7 @@ class AutoResponderVotesPart
 				requestContext.stuffInt ("autoResponderId"));
 
 		ServiceRec autoResponderService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				autoResponder,
 				"default");
 

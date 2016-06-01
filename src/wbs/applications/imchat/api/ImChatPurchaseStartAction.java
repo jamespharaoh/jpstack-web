@@ -1,7 +1,9 @@
 package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.hyphenToUnderscore;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.util.Map;
 
@@ -215,16 +217,23 @@ class ImChatPurchaseStartAction
 
 		// lookup price point
 
-		ImChatPricePointRec pricePoint =
+		Optional<ImChatPricePointRec> pricePointOptional =
 			imChatPricePointHelper.findByCode (
 				imChat,
 				hyphenToUnderscore (
 					purchaseRequest.pricePointCode ()));
 
 		if (
-			pricePoint == null
-			|| pricePoint.getImChat () != imChat
-			|| pricePoint.getDeleted ()
+
+			isNotPresent (
+				pricePointOptional)
+
+			|| notEqual (
+				pricePointOptional.get ().getImChat (),
+				imChat)
+
+			|| pricePointOptional.get ().getDeleted ()
+
 		) {
 
 			ImChatFailure failureResponse =
@@ -245,6 +254,9 @@ class ImChatPurchaseStartAction
 			);
 
 		}
+
+		ImChatPricePointRec pricePoint =
+			pricePointOptional.get ();
 
 		// get paypal account
 

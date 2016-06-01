@@ -118,17 +118,17 @@ class ChatMonitorInboxFormAction
 		// get params
 
 		String text =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"text");
 
 		boolean ignore =
 			isNotNull (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"ignore"));
 
 		boolean note =
 			isNotNull (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"sendAndNote"));
 
 		// check params

@@ -136,7 +136,7 @@ class ImChatCoreFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCodeOrNull (
+				menuGroupHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"facility"))
@@ -165,7 +165,7 @@ class ImChatCoreFixtureProvider
 
 		MessageTemplateDatabaseRec primaryMessageTemplateDatabase =
 			messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"),
 				joinWithSlash (
@@ -191,7 +191,7 @@ class ImChatCoreFixtureProvider
 
 		MessageTemplateDatabaseRec embeddedMessageTemplateDatabase =
 			messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"),
 				joinWithSlash (
@@ -222,7 +222,7 @@ class ImChatCoreFixtureProvider
 				imChatHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"))
 
@@ -236,19 +236,19 @@ class ImChatCoreFixtureProvider
 				"Test IM chat")
 
 			.setPaypalAccount (
-				paypalAccountHelper.findByCodeOrNull (
+				paypalAccountHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"wbs_sandbox"))
 
 			.setBillingCurrency (
-				currencyHelper.findByCodeOrNull (
+				currencyHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"gbp"))
 
 			.setCreditCurrency (
-				currencyHelper.findByCodeOrNull (
+				currencyHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"credit"))

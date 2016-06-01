@@ -241,7 +241,7 @@ class ChatSendLogicImplementation
 		}
 
 		ServiceRec service =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				serviceCode);
 
@@ -359,7 +359,7 @@ class ChatSendLogicImplementation
 			sendMessageRbFree (
 				chatUser,
 				threadId,
-				serviceHelper.findByCode (
+				serviceHelper.findByCodeOrNull (
 					chat,
 					"system"),
 				finalText);
@@ -485,7 +485,7 @@ class ChatSendLogicImplementation
 		// send it
 
 		ServiceRec systemService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				"system");
 
@@ -632,7 +632,7 @@ class ChatSendLogicImplementation
 				threadId,
 				text,
 				magicCommand,
-				serviceHelper.findByCode (
+				serviceHelper.findByCodeOrNull (
 					chat,
 					"system"),
 				magicRef);
@@ -647,7 +647,7 @@ class ChatSendLogicImplementation
 			Optional.<ChatMessageRec>absent (),
 			finalText,
 			Optional.of (
-				magicCommand == commandHelper.findByCode (chat, "magic")
+				magicCommand == commandHelper.findByCodeOrNull (chat, "magic")
 					? commandHelper.find (magicRef)
 					: magicCommand));
 

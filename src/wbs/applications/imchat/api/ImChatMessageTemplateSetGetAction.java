@@ -1,6 +1,6 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.joinWithFullStop;
 import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
 
@@ -12,6 +12,7 @@ import lombok.Cleanup;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.applications.imchat.model.ImChatObjectHelper;
@@ -95,17 +96,14 @@ class ImChatMessageTemplateSetGetAction
 					requestContext.requestStringRequired (
 						"imChatId")));
 
-		MessageTemplateSetRec messageTemplateSet =
+		Optional<MessageTemplateSetRec> messageTemplateSetOptional =
 			messageTemplateSetHelper.findByCode (
 				imChat.getMessageTemplateDatabase (),
 				request.code ());
 
-		MessageTemplateDatabaseRec messageTemplateDatabase =
-			messageTemplateSet.getMessageTemplateDatabase ();
-
 		if (
-			isNull (
-				messageTemplateSet)
+			isNotPresent (
+				messageTemplateSetOptional)
 		) {
 
 			ImChatFailure failureResponse =
@@ -124,6 +122,12 @@ class ImChatMessageTemplateSetGetAction
 					failureResponse);
 
 		}
+
+		MessageTemplateSetRec messageTemplateSet =
+			messageTemplateSetOptional.get ();
+
+		MessageTemplateDatabaseRec messageTemplateDatabase =
+			messageTemplateSet.getMessageTemplateDatabase ();
 
 		// create response
 

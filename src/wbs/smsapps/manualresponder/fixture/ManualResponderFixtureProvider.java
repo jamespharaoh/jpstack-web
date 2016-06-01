@@ -81,7 +81,7 @@ class ManualResponderFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCodeOrNull (
+				menuGroupHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"facility"))
@@ -116,7 +116,7 @@ class ManualResponderFixtureProvider
 				manualResponderHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"))
 
@@ -130,13 +130,13 @@ class ManualResponderFixtureProvider
 				"Test manual responder")
 
 			.setCurrency (
-				currencyHelper.findByCodeOrNull (
+				currencyHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"gbp"))
 
 			.setSmsCustomerManager (
-				smsCustomerManagerHelper.findByCodeOrNull (
+				smsCustomerManagerHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"customer_manager"))
@@ -150,7 +150,7 @@ class ManualResponderFixtureProvider
 			keywordHelper.createInstance ()
 
 			.setKeywordSet (
-				keywordSetHelper.findByCodeOrNull (
+				keywordSetHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"inbound"))
@@ -162,7 +162,7 @@ class ManualResponderFixtureProvider
 				"Test manual responder")
 
 			.setCommand (
-				commandHelper.findByCode (
+				commandHelper.findByCodeRequired (
 					manualResponder,
 					"default"))
 
@@ -208,8 +208,8 @@ class ManualResponderFixtureProvider
 				"free")
 
 			.setRouter (
-				routerHelper.findByCode (
-					routeHelper.findByCodeOrNull (
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
 						GlobalId.root,
 						"test",
 						"free"),
@@ -263,8 +263,8 @@ class ManualResponderFixtureProvider
 				"bill")
 
 			.setRouter (
-				routerHelper.findByCode (
-					routeHelper.findByCodeOrNull (
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
 						GlobalId.root,
 						"test",
 						"bill"),
@@ -318,8 +318,8 @@ class ManualResponderFixtureProvider
 				"bill")
 
 			.setRouter (
-				routerHelper.findByCode (
-					routeHelper.findByCodeOrNull (
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
 						GlobalId.root,
 						"test",
 						"bill"),
@@ -373,8 +373,8 @@ class ManualResponderFixtureProvider
 				"bill")
 
 			.setRouter (
-				routerHelper.findByCode (
-					routeHelper.findByCodeOrNull (
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
 						GlobalId.root,
 						"test",
 						"bill"),
@@ -413,8 +413,8 @@ class ManualResponderFixtureProvider
   				"inbound")
 
 			.setRouter (
-				routerHelper.findByCode (
-					routeHelper.findByCodeOrNull (
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
 						GlobalId.root,
 						"test",
 						"free"),
@@ -454,15 +454,15 @@ class ManualResponderFixtureProvider
   				"inbound")
 
 			.setRouter (
-				routerHelper.findByCode (
-					routeHelper.findByCodeOrNull (
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
 						GlobalId.root,
 						"test",
 						"free"),
 					"static"))
 
 			.setReplyKeywordSet (
-				keywordSetHelper.findByCodeOrNull (
+				keywordSetHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"inbound"))
@@ -504,15 +504,15 @@ class ManualResponderFixtureProvider
   				"inbound")
 
 			.setRouter (
-				routerHelper.findByCode (
-					routeHelper.findByCodeOrNull (
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
 						GlobalId.root,
 						"test",
 						"free"),
 					"static"))
 
 			.setReplyKeywordSet (
-				keywordSetHelper.findByCodeOrNull (
+				keywordSetHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"inbound"))
@@ -554,15 +554,15 @@ class ManualResponderFixtureProvider
   				"inbound")
 
 			.setRouter (
-				routerHelper.findByCode (
-					routeHelper.findByCodeOrNull (
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
 						GlobalId.root,
 						"test",
 						"free"),
 					"static"))
 
 			.setReplyKeywordSet (
-				keywordSetHelper.findByCodeOrNull (
+				keywordSetHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"inbound"))

@@ -66,7 +66,9 @@ class ChatDateLogicImplementation
 			chatUser,
 			Optional.<Long>absent (),
 			"date_hint_photo",
-			commandHelper.findByCode (chat, "date_join_photo"),
+			commandHelper.findByCodeRequired (
+				chat,
+				"date_join_photo"),
 			0l,
 			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
@@ -97,8 +99,13 @@ class ChatDateLogicImplementation
 			chatUser,
 			Optional.<Long>absent (),
 			"date_hint_upgrade",
-			commandHelper.findByCode (chat, "magic"),
-			(long) commandHelper.findByCode (chat, "date_join_photo").getId (),
+			commandHelper.findByCodeRequired (
+				chat,
+				"magic"),
+			(long) commandHelper.findByCodeRequired (
+				chat,
+				"date_join_photo"
+			).getId (),
 			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
 
@@ -255,8 +262,13 @@ class ChatDateLogicImplementation
 				Optional.of (
 					message.getThreadId ()),
 				code,
-				commandHelper.findByCode (chat, "magic"),
-				(long) commandHelper.findByCode (chat, "help").getId (),
+				commandHelper.findByCodeRequired (
+					chat,
+					"magic"),
+				(long) commandHelper.findByCodeRequired (
+					chat,
+					"help"
+				).getId (),
 				TemplateMissing.ignore,
 				ImmutableMap.<String,String>builder ()
 

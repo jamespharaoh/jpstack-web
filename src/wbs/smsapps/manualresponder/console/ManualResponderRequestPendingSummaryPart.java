@@ -253,7 +253,7 @@ class ManualResponderRequestPendingSummaryPart
 				.toInstant ();
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				manualResponder,
 				"default");
 

@@ -49,7 +49,7 @@ class ParamCheckerSet {
 
 				Object value =
 					paramChecker.get (
-						requestContext.parameter (key));
+						requestContext.parameterOrNull (key));
 
 				if (ret != null)
 					ret.put (key, value);

@@ -860,8 +860,8 @@ class ChatMonitorInboxSummaryPart
 			" name=\"alarmDate\"",
 			" size=\"12\"",
 			" value=\"%h\"",
-			requestContext.parameter ("alarmDate") != null
-				? requestContext.parameter ("alarmDate")
+			requestContext.parameterOrNull ("alarmDate") != null
+				? requestContext.parameterOrNull ("alarmDate")
 				: timeFormatter.dateStringShort (
 					chatTimezone,
 					alarm == null
@@ -875,8 +875,8 @@ class ChatMonitorInboxSummaryPart
 			" name=\"alarmTime\"",
 			" size=\"10\"",
 			" value=\"%h\"",
-			requestContext.parameter ("alarmTime") != null
-				? requestContext.parameter ("alarmTime")
+			requestContext.parameterOrNull ("alarmTime") != null
+				? requestContext.parameterOrNull ("alarmTime")
 				: timeFormatter.timeString (
 					chatTimezone,
 					alarm == null
@@ -888,9 +888,9 @@ class ChatMonitorInboxSummaryPart
 			"%s",
 			Html.selectYesNo (
 				"alarmSticky",
-				requestContext.parameter ("alarmSticky") != null
+				requestContext.parameterOrNull ("alarmSticky") != null
 					? Boolean.parseBoolean (
-						requestContext.parameter ("alarmSticky"))
+						requestContext.parameterOrNull ("alarmSticky"))
 					: alarm != null
 						? alarm.getSticky ()
 						: true,

@@ -100,7 +100,7 @@ class ChatBlockAllCommand
 				command.getParentId ());
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 

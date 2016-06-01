@@ -135,7 +135,7 @@ class SubscriptionLogicImplementation
 				subscription.getFreeRouter ())
 
 			.service (
-				serviceHelper.findByCode (
+				serviceHelper.findByCodeOrNull (
 					subscriptionList,
 					"default"))
 
@@ -143,7 +143,7 @@ class SubscriptionLogicImplementation
 				subscriptionSend.getBatch ())
 
 			.affiliate (
-				affiliateHelper.findByCode (
+				affiliateHelper.findByCodeOrNull (
 					subscriptionAffiliate,
 					"default"))
 
@@ -282,14 +282,14 @@ class SubscriptionLogicImplementation
 					subscription.getBilledRoute ())
 
 				.service (
-					serviceHelper.findByCode (
+					serviceHelper.findByCodeOrNull (
 						ifNull (
 							subscriptionList,
 							subscription),
 						"default"))
 
 				.affiliate (
-					affiliateHelper.findByCode (
+					affiliateHelper.findByCodeOrNull (
 						ifNull (
 							subscriptionAffiliate,
 							subscription),

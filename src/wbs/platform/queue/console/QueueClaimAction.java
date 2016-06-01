@@ -55,7 +55,7 @@ class QueueClaimAction
 
 		int queueId =
 			Integer.parseInt (
-				requestContext.parameter ("queue_id"));
+				requestContext.parameterOrNull ("queue_id"));
 
 		@Cleanup
 		Transaction transaction =

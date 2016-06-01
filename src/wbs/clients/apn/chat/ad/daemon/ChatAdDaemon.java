@@ -319,7 +319,7 @@ class ChatAdDaemon
 						messageString);
 
 				ServiceRec adService =
-					serviceHelper.findByCode (
+					serviceHelper.findByCodeRequired (
 						chat,
 						"ad");
 
@@ -327,11 +327,11 @@ class ChatAdDaemon
 					chatUser,
 					Optional.<Long>absent (),
 					messageText,
-					commandHelper.findByCode (
+					commandHelper.findByCodeRequired (
 						chat,
 						"magic"),
 					adService,
-					(long) commandHelper.findByCode (
+					(long) commandHelper.findByCodeRequired (
 						chat,
 						"join_next"
 					).getId ());

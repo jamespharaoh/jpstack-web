@@ -67,7 +67,7 @@ class ChatHelpLogPendingMessagesPart
 			chatUser.getChat ();
 
 		ServiceRec service =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				"default");
 

@@ -75,7 +75,7 @@ class BroadcastSendAction
 		BroadcastConfigRec broadcastConfig =
 			broadcast.getBroadcastConfig ();
 
-		if (requestContext.parameter ("send") != null) {
+		if (requestContext.parameterOrNull ("send") != null) {
 
 			if (broadcast.getState () != BroadcastState.unsent) {
 
@@ -126,7 +126,7 @@ class BroadcastSendAction
 
 		}
 
-		if (requestContext.parameter ("schedule") != null) {
+		if (requestContext.parameterOrNull ("schedule") != null) {
 
 			if (broadcast.getState () != BroadcastState.unsent) {
 
@@ -146,7 +146,7 @@ class BroadcastSendAction
 				scheduledTime =
 					timeFormatter.timestampStringToInstant (
 						userConsoleLogic.timezone (),
-						requestContext.parameter ("timestamp"));
+						requestContext.parameterOrNull ("timestamp"));
 
 			} catch (Exception exception) {
 
@@ -191,7 +191,7 @@ class BroadcastSendAction
 
 		}
 
-		if (requestContext.parameter ("unschedule") != null) {
+		if (requestContext.parameterOrNull ("unschedule") != null) {
 
 			if (broadcast.getState () != BroadcastState.scheduled) {
 
@@ -229,7 +229,7 @@ class BroadcastSendAction
 
 		}
 
-		if (requestContext.parameter ("cancel") != null) {
+		if (requestContext.parameterOrNull ("cancel") != null) {
 
 			if (broadcast.getState ()
 					== BroadcastState.partiallySent) {

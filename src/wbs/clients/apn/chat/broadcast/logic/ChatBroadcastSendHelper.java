@@ -333,13 +333,13 @@ class ChatBroadcastSendHelper
 
 		ServiceRec broadcastService =
 			requiredValue (
-				serviceHelper.findByCode (
+				serviceHelper.findByCodeRequired (
 					chat,
 					"broadcast"));
 
 		BatchRec batch =
 			requiredValue (
-				batchHelper.findByCode (
+				batchHelper.findByCodeRequired (
 					chatBroadcast,
 					"broadcast"));
 
@@ -354,7 +354,7 @@ class ChatBroadcastSendHelper
 			magicNumberLogic.sendMessage (
 				chatScheme.getMagicNumberSet (),
 				toChatUser.getNumber (),
-				commandHelper.findByCode (
+				commandHelper.findByCodeRequired (
 					chat,
 					"chat"),
 				fromChatUser.getId (),

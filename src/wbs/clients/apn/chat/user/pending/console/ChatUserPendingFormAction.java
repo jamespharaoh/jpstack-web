@@ -135,37 +135,37 @@ class ChatUserPendingFormAction
 
 		// delegate appropriately
 
-		if (requestContext.parameter ("chatUserDismiss") != null)
+		if (requestContext.parameterOrNull ("chatUserDismiss") != null)
 			return goDismiss ();
 
-		if (requestContext.parameter ("chatUserNameApprove") != null)
+		if (requestContext.parameterOrNull ("chatUserNameApprove") != null)
 			return goApproveName ();
 
-		if (requestContext.parameter ("chatUserInfoApprove") != null)
+		if (requestContext.parameterOrNull ("chatUserInfoApprove") != null)
 			return goApproveInfo ();
 
-		if (requestContext.parameter ("chatUserImageApprove") != null)
+		if (requestContext.parameterOrNull ("chatUserImageApprove") != null)
 			return goApproveImage (PendingMode.image);
 
-		if (requestContext.parameter ("chatUserVideoApprove") != null)
+		if (requestContext.parameterOrNull ("chatUserVideoApprove") != null)
 			return goApproveImage (PendingMode.video);
 
-		if (requestContext.parameter ("chatUserAudioApprove") != null)
+		if (requestContext.parameterOrNull ("chatUserAudioApprove") != null)
 			return goApproveImage (PendingMode.audio);
 
-		if (requestContext.parameter("chatUserNameReject") != null)
+		if (requestContext.parameterOrNull("chatUserNameReject") != null)
 			return goRejectName ();
 
-		if (requestContext.parameter("chatUserInfoReject") != null)
+		if (requestContext.parameterOrNull("chatUserInfoReject") != null)
 			return goRejectInfo ();
 
-		if (requestContext.parameter("chatUserImageReject") != null)
+		if (requestContext.parameterOrNull("chatUserImageReject") != null)
 			return goRejectImage (PendingMode.image);
 
-		if (requestContext.parameter ("chatUserVideoReject") != null)
+		if (requestContext.parameterOrNull ("chatUserVideoReject") != null)
 			return goRejectImage (PendingMode.video);
 
-		if (requestContext.parameter ("chatUserAudioReject") != null)
+		if (requestContext.parameterOrNull ("chatUserAudioReject") != null)
 			return goRejectImage (PendingMode.audio);
 
 		throw new RuntimeException (
@@ -245,7 +245,7 @@ class ChatUserPendingFormAction
 
 			.setStatus (
 				equal (
-						requestContext.parameter ("name"),
+						requestContext.parameterOrNull ("name"),
 						chatUserName.getOriginalName ())
 					? ChatUserInfoStatus.moderatorApproved
 					: ChatUserInfoStatus.moderatorEdited)
@@ -254,7 +254,7 @@ class ChatUserPendingFormAction
 				transaction.now ())
 
 			.setEditedName (
-				requestContext.parameter ("name"));
+				requestContext.parameterOrNull ("name"));
 
 		chatUser
 
@@ -332,7 +332,7 @@ class ChatUserPendingFormAction
 
 			.setStatus (
 				equal (
-						requestContext.parameter ("info"),
+						requestContext.parameterOrNull ("info"),
 						chatUserInfo.getOriginalText ().getText ())
 					? ChatUserInfoStatus.moderatorApproved
 					: ChatUserInfoStatus.moderatorEdited)
@@ -342,7 +342,7 @@ class ChatUserPendingFormAction
 
 			.setEditedText (
 				textHelper.findOrCreate (
-					requestContext.parameter ("info")));
+					requestContext.parameterOrNull ("info")));
 
 		chatUser
 
@@ -446,7 +446,7 @@ class ChatUserPendingFormAction
 				list.size ())
 
 			.setClassification (
-				requestContext.parameter ("classification"));
+				requestContext.parameterOrNull ("classification"));
 
 		// update main image if not in append mode
 
@@ -505,7 +505,7 @@ class ChatUserPendingFormAction
 		// get params
 
 		String messageParam =
-			requestContext.parameter ("message").trim ();
+			requestContext.parameterOrNull ("message").trim ();
 
 		if (Gsm.length (messageParam) == 0) {
 
@@ -597,7 +597,7 @@ class ChatUserPendingFormAction
 		// get params
 
 		String messageParam =
-			requestContext.parameter ("message").trim ();
+			requestContext.parameterOrNull ("message").trim ();
 
 		if (Gsm.length (messageParam) == 0) {
 
@@ -774,10 +774,10 @@ class ChatUserPendingFormAction
 					chatUser,
 					threadId,
 					messageText,
-					commandHelper.findByCode (
+					commandHelper.findByCodeOrNull (
 						chat,
 						"join_info"),
-					serviceHelper.findByCode (
+					serviceHelper.findByCodeOrNull (
 						chat,
 						"system"),
 					0l);
@@ -796,7 +796,7 @@ class ChatUserPendingFormAction
 			chatMessage,
 			messageParam,
 			Optional.of (
-				commandHelper.findByCode (
+				commandHelper.findByCodeOrNull (
 					chat,
 					"join_info")));
 
@@ -810,7 +810,7 @@ class ChatUserPendingFormAction
 
 		String messageParam =
 			trim (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"message"));
 
 		if (
@@ -956,10 +956,10 @@ class ChatUserPendingFormAction
 					chatUser,
 					Optional.<Long>absent (),
 					messageParam,
-					commandHelper.findByCode (
+					commandHelper.findByCodeOrNull (
 						chat,
 						mode.commandCode ()),
-					serviceHelper.findByCode (
+					serviceHelper.findByCodeOrNull (
 						chat,
 						"system"));
 
@@ -977,7 +977,7 @@ class ChatUserPendingFormAction
 				chatMessage),
 			messageParam,
 			Optional.of (
-				commandHelper.findByCode (
+				commandHelper.findByCodeOrNull (
 					chat,
 					mode.commandCode ())));
 

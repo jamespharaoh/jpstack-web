@@ -65,26 +65,26 @@ class ChatUserAdminDateAction
 		ChatUserDateMode dateMode =
 			toEnum (
 				ChatUserDateMode.class,
-				requestContext.parameter ("dateMode"));
+				requestContext.parameterOrNull ("dateMode"));
 
 		Long radius =
 			toLong (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"radius"));
 
 		Long startHour =
 			toLong (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"startHour"));
 
 		Long endHour =
 			toLong (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"endHour"));
 
 		Long dailyMax =
 			toLong (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"dailyMax"));
 
 		if (radius == null

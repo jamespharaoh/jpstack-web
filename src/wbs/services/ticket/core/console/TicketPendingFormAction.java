@@ -90,7 +90,7 @@ class TicketPendingFormAction
 		// select template
 
 		String templateString =
-			requestContext.parameter ("template");
+			requestContext.parameterOrNull ("template");
 
 		TicketTemplateRec template;
 
@@ -117,7 +117,7 @@ class TicketPendingFormAction
 		// update ticket timestamp
 
 		String timpestampString =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				stringFormat (
 					"timestamp-%s",
 					template.getTicketState ().getId ()));
@@ -157,7 +157,7 @@ class TicketPendingFormAction
 		// check if a new note was added
 
 		String noteText =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"note-text");
 
 		if (!noteText.isEmpty()) {

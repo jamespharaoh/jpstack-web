@@ -1573,7 +1573,50 @@ class ObjectHelperBuilder {
 
 			@Override
 			public
-			Record findByCode (
+			Optional<Record<?>> findByCode (
+					@NonNull Record parent,
+					@NonNull String... codes) {
+
+				ObjectHelper<?> parentHelper =
+					forObjectClassRequired (
+						parent.getClass ());
+
+				GlobalId parentGlobalId =
+					new GlobalId (
+						parentHelper.objectTypeId (),
+						parent.getId ());
+
+				return findByCode (
+					parentGlobalId,
+					codes);
+
+			}
+
+			@Override
+			public
+			Record<?> findByCodeRequired (
+					@NonNull Record parent,
+					@NonNull String... codes) {
+
+				ObjectHelper<?> parentHelper =
+					forObjectClassRequired (
+						parent.getClass ());
+
+				GlobalId parentGlobalId =
+					new GlobalId (
+						parentHelper.objectTypeId (),
+						parent.getId ());
+
+				return optionalRequired (
+					findByCode (
+						parentGlobalId,
+						codes));
+
+			}
+
+			@Override
+			public
+			Record findByCodeOrNull (
 					@NonNull Record parent,
 					@NonNull String... codes) {
 

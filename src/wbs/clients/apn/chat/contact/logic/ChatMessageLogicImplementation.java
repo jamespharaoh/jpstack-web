@@ -468,8 +468,8 @@ class ChatMessageLogicImplementation
 				fromUser,
 				threadId,
 				"logon_hint",
-				commandHelper.findByCode (chat, "magic"),
-				(long) commandHelper.findByCode (chat, "help").getId (),
+				commandHelper.findByCodeOrNull (chat, "magic"),
+				(long) commandHelper.findByCodeOrNull (chat, "help").getId (),
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -1313,10 +1313,10 @@ class ChatMessageLogicImplementation
 				Optional.fromNullable (
 					chatMessage.getThreadId ()),
 				textParts,
-				commandHelper.findByCode (
+				commandHelper.findByCodeOrNull (
 					chat,
 					"chat"),
-				serviceHelper.findByCode (
+				serviceHelper.findByCodeOrNull (
 					chat,
 					serviceCode),
 				(long) fromUser.getId (),

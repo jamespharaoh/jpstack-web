@@ -59,7 +59,7 @@ class ChatMonitorInboxAddNoteAction
 		throws ServletException {
 
 		String newNote =
-			requestContext.parameter ("moreNotes");
+			requestContext.parameterOrNull ("moreNotes");
 
 		@Cleanup
 		Transaction transaction =

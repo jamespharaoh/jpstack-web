@@ -73,7 +73,7 @@ class ChatUserAdminDeleteAction
 			return null;
 		}
 
-		if (requestContext.parameter ("deleteUser") != null) {
+		if (requestContext.parameterOrNull ("deleteUser") != null) {
 
 			if (chatUser.getNumber () == null) {
 				requestContext.addWarning ("User is already deleted");
@@ -94,7 +94,7 @@ class ChatUserAdminDeleteAction
 			return null;
 		}
 
-		if (requestContext.parameter ("undeleteUser") != null) {
+		if (requestContext.parameterOrNull ("undeleteUser") != null) {
 
 			if (chatUser.getNumber () != null) {
 				requestContext.addWarning ("User is not deleted");

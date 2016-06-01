@@ -117,7 +117,7 @@ class ChatPhotoCommand
 				command);
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				"default");
 
@@ -157,7 +157,7 @@ class ChatPhotoCommand
 				rest.trim ();
 
 			ChatUserRec photoUser =
-				chatUserHelper.findByCode (
+				chatUserHelper.findByCodeOrNull (
 					chat,
 					text);
 
@@ -186,10 +186,10 @@ class ChatPhotoCommand
 					Optional.of (
 						message.getThreadId ()),
 					"request_photo_error",
-					commandHelper.findByCode (
+					commandHelper.findByCodeOrNull (
 						chat,
 						"magic"),
-					(long) commandHelper.findByCode (
+					(long) commandHelper.findByCodeOrNull (
 						chat,
 						"help"
 					).getId (),
@@ -205,10 +205,10 @@ class ChatPhotoCommand
 					Optional.of (
 						message.getThreadId ()),
 					"no_photo_error",
-					commandHelper.findByCode (
+					commandHelper.findByCodeOrNull (
 						chat,
 						"magic"),
-					(long) commandHelper.findByCode (
+					(long) commandHelper.findByCodeOrNull (
 						chat,
 						"help"
 					).getId (),

@@ -115,7 +115,7 @@ class BroadcastNumbersAction
 			numbers =
 				numberFormatLogic.parseLines (
 					broadcastConfig.getNumberFormat (),
-					requestContext.parameter ("numbers"));
+					requestContext.parameterOrNull ("numbers"));
 
 		} catch (WbsNumberFormatException exception) {
 
@@ -150,7 +150,7 @@ class BroadcastNumbersAction
 
 		BroadcastLogic.AddResult addResult;
 
-		if (requestContext.parameter ("add") != null) {
+		if (requestContext.parameterOrNull ("add") != null) {
 
 			addResult =
 				broadcastLogic.addNumbers (
@@ -170,7 +170,7 @@ class BroadcastNumbersAction
 		int numAlreadyRemoved = 0;
 		int numRemoved = 0;
 
-		if (requestContext.parameter ("remove") != null) {
+		if (requestContext.parameterOrNull ("remove") != null) {
 
 			for (String numberString : numbers) {
 

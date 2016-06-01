@@ -106,18 +106,18 @@ class ChatUserSearchOldAction
 		ChatUserType searchType =
 			toEnum (
 				ChatUserType.class,
-				requestContext.parameter ("type"));
+				requestContext.parameterOrNull ("type"));
 
 		String searchCode =
 			nullIfEmptyString (
-				requestContext.parameter ("code"));
+				requestContext.parameterOrNull ("code"));
 
 		String searchNumber =
 			nullIfEmptyString (
-				requestContext.parameter ("number"));
+				requestContext.parameterOrNull ("number"));
 
 		boolean searchIncludeDeleted =
-			requestContext.parameter ("includeDeleted") != null;
+			requestContext.parameterOrNull ("includeDeleted") != null;
 
 		Gender searchGender =
 			(Gender)
@@ -129,59 +129,59 @@ class ChatUserSearchOldAction
 
 		String searchName =
 			nullIfEmptyString (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"name"));
 
 		String searchLocation =
 			nullIfEmptyString (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"location"));
 
 		String searchInfo =
 			nullIfEmptyString (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"info"));
 
 		Boolean searchPicture =
 			toBoolean (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"picture"));
 
 		Boolean searchVideo =
 			toBoolean (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"video"));
 
 		Boolean searchAdultVerified =
 			toBoolean (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"adultVerified"));
 
 		ChatUserCreditMode searchCreditMode =
 			toEnum (
 				ChatUserCreditMode.class,
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"creditMode"));
 
 		ChatUserDateMode searchDateMode =
 			toEnum (
 				ChatUserDateMode.class,
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"dateMode"));
 
 		Integer searchOnline =
 			toInteger (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"online"));
 
 		String searchOutput =
 			nullIfEmptyString (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"output"));
 
 		String searchOrder =
 			nullIfEmptyString (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"order"));
 
 		Long searchCreditFailedGte =

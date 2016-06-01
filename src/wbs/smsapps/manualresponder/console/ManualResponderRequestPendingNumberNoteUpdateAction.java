@@ -104,7 +104,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 		Matcher idMatcher =
 			idPattern.matcher (
-				requestContext.parameter ("id"));
+				requestContext.parameterOrNull ("id"));
 
 		if (! idMatcher.matches ()) {
 
@@ -119,7 +119,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 		valueParam =
 			trim (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"value"));
 
 		// start transaction

@@ -57,7 +57,7 @@ class ChatAffiliateComparePart
 		// check units
 
 		timePeriodString =
-			requestContext.parameter (
+			requestContext.parameterOrDefault (
 				"timePeriod",
 				"7 days");
 

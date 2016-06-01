@@ -112,7 +112,7 @@ class ChatCheckCreditCommand
 				command);
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				"default");
 

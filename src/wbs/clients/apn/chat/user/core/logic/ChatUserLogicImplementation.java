@@ -159,7 +159,7 @@ class ChatUserLogicImplementation
 
 		if (chatUser.getChatAffiliate () != null) {
 
-			return affiliateHelper.findByCode (
+			return affiliateHelper.findByCodeRequired (
 				chatUser.getChatAffiliate (),
 				"default");
 
@@ -167,7 +167,7 @@ class ChatUserLogicImplementation
 
 		if (chatUser.getChatScheme () != null) {
 
-			return affiliateHelper.findByCode (
+			return affiliateHelper.findByCodeRequired (
 				chatUser.getChatScheme (),
 				"default");
 
@@ -957,7 +957,7 @@ class ChatUserLogicImplementation
 		} else {
 
 			MediaTypeRec mediaType =
-				mediaTypeHelper.findByCodeOrNull (
+				mediaTypeHelper.findByCodeRequired (
 					GlobalId.root,
 					mimeType);
 
@@ -1150,7 +1150,7 @@ class ChatUserLogicImplementation
 		) {
 
 			gazetteerEntry =
-				gazetteerEntryHelper.findByCode (
+				gazetteerEntryHelper.findByCodeRequired (
 					chat.getGazetteer (),
 					match.simpleKeyword ());
 
@@ -1164,7 +1164,7 @@ class ChatUserLogicImplementation
 			SliceRec slice =
 				chat.getSlice ().getAdminEmail () != null
 					? chat.getSlice ()
-					: sliceHelper.findByCodeOrNull (
+					: sliceHelper.findByCodeRequired (
 						GlobalId.root,
 						wbsConfig.defaultSlice ());
 

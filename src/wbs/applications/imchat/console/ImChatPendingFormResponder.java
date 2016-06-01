@@ -1,6 +1,5 @@
 package wbs.applications.imchat.console;
 
-import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -305,9 +304,8 @@ class ImChatPendingFormResponder
 			" cols=\"48\"",
 			" style=\"display: none\"",
 			">%h</textarea><br>\n",
-			emptyStringIfNull (
-				requestContext.parameter (
-					"message-bill")),
+			requestContext.parameterOrEmptyString (
+				"message-bill"),
 			"<span",
 			" class=\"template-chars\"",
 			" style=\"display: none\"",
@@ -365,9 +363,8 @@ class ImChatPendingFormResponder
 			" cols=\"48\"",
 			" style=\"display: none\"",
 			">%h</textarea><br>\n",
-			emptyStringIfNull (
-				requestContext.parameter (
-					"message-free")),
+			requestContext.parameterOrEmptyString (
+				"message-free"),
 			"<span",
 			" class=\"template-chars\"",
 			" style=\"display: none\"",

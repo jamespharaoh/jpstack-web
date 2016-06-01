@@ -162,17 +162,17 @@ class ChatPromoCommand
 				chatUser);
 
 		CommandRec magicCommand =
-			commandHelper.findByCode (
+			commandHelper.findByCodeOrNull (
 				chat,
 				"magic");
 
 		CommandRec helpCommand =
-			commandHelper.findByCode (
+			commandHelper.findByCodeOrNull (
 				chat,
 				"help");
 
 		ServiceRec promoService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				"promo");
 

@@ -96,7 +96,7 @@ class ChatUserAdminInfoAction
 		ChatUserEditReason editReason =
 			toEnum (
 				ChatUserEditReason.class,
-				requestContext.parameter ("editReason"));
+				requestContext.parameterOrNull ("editReason"));
 
 		if (editReason == null) {
 
@@ -109,7 +109,7 @@ class ChatUserAdminInfoAction
 
 		String newInfo =
 			nullIfEmptyString (
-				requestContext.parameter ("info"));
+				requestContext.parameterOrNull ("info"));
 
 		// transaction...
 
@@ -187,9 +187,9 @@ class ChatUserAdminInfoAction
 					chatUser,
 					null,
 					messageText,
-					commandHelper.findByCode (chat, "magic"),
-					serviceHelper.findByCode (chat, "system"),
-					(long) commandHelper.findByCode (chat, "join_info").getId ());
+					commandHelper.findByCodeOrNull (chat, "magic"),
+					serviceHelper.findByCodeOrNull (chat, "system"),
+					(long) commandHelper.findByCodeOrNull (chat, "join_info").getId ());
 
 			}
 

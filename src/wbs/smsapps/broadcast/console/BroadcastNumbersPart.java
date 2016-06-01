@@ -80,7 +80,7 @@ class BroadcastNumbersPart
 			" cols=\"60\"",
 			">%h</textarea></p>\n",
 			emptyStringIfNull (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"numbers")));
 
 		printFormat (

@@ -63,15 +63,15 @@ class CoreLogonAction
 
 		@NonNull
 		String slice =
-			requestContext.parameter ("slice");
+			requestContext.parameterOrNull ("slice");
 
 		@NonNull
 		String username =
-			requestContext.parameter ("username");
+			requestContext.parameterOrNull ("username");
 
 		@NonNull
 		String password =
-			requestContext.parameter ("password");
+			requestContext.parameterOrNull ("password");
 
 		// check we got the right params
 

@@ -68,11 +68,11 @@ class ChatUserAdminPrefsAction
 
 		String genderParam =
 			nullIfEmptyString (
-				requestContext.parameter ("gender"));
+				requestContext.parameterOrNull ("gender"));
 
 		String orientParam =
 			nullIfEmptyString (
-				requestContext.parameter ("orient"));
+				requestContext.parameterOrNull ("orient"));
 
 		// check params
 

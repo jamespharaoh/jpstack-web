@@ -1,9 +1,11 @@
 package wbs.console.request;
 
+import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNotPresent;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.orNull;
@@ -20,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -211,7 +214,54 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	String parameter (
+	Optional<String> parameter (
+			@NonNull String key) {
+
+		return Optional.fromNullable (
+			requestContext.parameter (
+				key));
+
+	}
+
+	@Override
+	public
+	String parameterRequired (
+			@NonNull String key) {
+
+		String value =
+			requestContext.parameter (
+				key);
+
+		if (
+			isNull (
+				value)
+		) {
+
+			throw new NoSuchElementException (
+				stringFormat (
+					"Required request parameter '%s' is not present",
+					key));
+
+		}
+
+		return value;
+
+	}
+
+	@Override
+	public
+	String parameterOrEmptyString (
+			@NonNull String key) {
+
+		return emptyStringIfNull (
+			requestContext.parameter (
+				key));
+
+	}
+
+	@Override
+	public
+	String parameterOrNull (
 			@NonNull String key) {
 
 		return requestContext
@@ -943,7 +993,7 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	String parameter (
+	String parameterOrDefault (
 			@NonNull String key,
 			String defaultValue) {
 

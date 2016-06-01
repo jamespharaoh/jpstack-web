@@ -357,7 +357,7 @@ class ManualResponderRequestPendingFormResponder
 		int selectedTemplateId = -1;
 
 		String templateIdString =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"template-id");
 
 		if (templateIdString != null) {
@@ -496,7 +496,7 @@ class ManualResponderRequestPendingFormResponder
 				" cols=\"48\"",
 
 				">%h</textarea><br>\n",
-				requestContext.parameter (
+				requestContext.parameterOrDefault (
 					"message-" + template.getId (),
 					template.getDefaultText ()),
 

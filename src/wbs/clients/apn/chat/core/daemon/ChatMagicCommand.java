@@ -103,7 +103,7 @@ class ChatMagicCommand
 				continue;
 
 			ChatKeywordRec chatKeyword =
-				chatKeywordHelper.findByCode (
+				chatKeywordHelper.findByCodeOrNull (
 					chat,
 					match.simpleKeyword ());
 

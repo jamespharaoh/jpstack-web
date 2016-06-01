@@ -161,7 +161,7 @@ class SupervisorPart
 				supervisorConfigsBuilder.build ();
 
 			selectedSupervisorConfigName =
-				requestContext.parameter (
+				requestContext.parameterOrDefault (
 					"config",
 					supervisorConfigNames.isEmpty ()
 						? null
@@ -203,7 +203,7 @@ class SupervisorPart
 
 		dateField =
 			ObsoleteDateField.parse (
-				requestContext.parameter ("date"));
+				requestContext.parameterOrNull ("date"));
 
 		if (dateField.date == null) {
 

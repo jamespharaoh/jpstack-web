@@ -91,7 +91,7 @@ class ChatMessagePendingFormAction
 
 		int chatMessageId =
 			Integer.parseInt (
-				requestContext.parameter ("chat_message_id"));
+				requestContext.parameterOrNull ("chat_message_id"));
 
 		requestContext.request (
 			"chatMessageId",
@@ -99,11 +99,11 @@ class ChatMessagePendingFormAction
 
 		// delegate appropriately
 
-		if (requestContext.parameter ("send") != null
-				|| requestContext.parameter ("sendWithoutApproval") != null)
+		if (requestContext.parameterOrNull ("send") != null
+				|| requestContext.parameterOrNull ("sendWithoutApproval") != null)
 			return goSend ();
 
-		if (requestContext.parameter ("reject") != null)
+		if (requestContext.parameterOrNull ("reject") != null)
 			return goReject ();
 
 		throw new RuntimeException (
@@ -117,7 +117,7 @@ class ChatMessagePendingFormAction
 		// get params
 
 		String messageParam =
-			requestContext.parameter ("message");
+			requestContext.parameterOrNull ("message");
 
 		@Cleanup
 		Transaction transaction =
@@ -135,7 +135,7 @@ class ChatMessagePendingFormAction
 
 		// check message is ok
 
-		if (requestContext.parameter ("sendWithoutApproval") == null) {
+		if (requestContext.parameterOrNull ("sendWithoutApproval") == null) {
 
 			ChatMessageLogic.ApprovalResult approvalResult =
 				chatMessageLogic.checkForApproval (
@@ -300,7 +300,7 @@ class ChatMessagePendingFormAction
 		// get params
 
 		String messageParam =
-			requestContext.parameter ("message")
+			requestContext.parameterOrNull ("message")
 				.trim ();
 
 		if (Gsm.length(messageParam) == 0) {

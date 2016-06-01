@@ -306,7 +306,7 @@ class ManualResponderLogicImplementation
 		) {
 
 			CommandRec command =
-				commandHelper.findByCode (
+				commandHelper.findByCodeOrNull (
 					manualResponder,
 					"default");
 

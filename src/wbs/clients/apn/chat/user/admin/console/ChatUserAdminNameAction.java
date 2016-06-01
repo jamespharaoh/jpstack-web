@@ -77,7 +77,7 @@ class ChatUserAdminNameAction
 		ChatUserEditReason editReason =
 			toEnum (
 				ChatUserEditReason.class,
-				requestContext.parameter("editReason"));
+				requestContext.parameterOrNull("editReason"));
 
 		if (editReason == null) {
 			requestContext.addError ("Please select a valid reason");
@@ -85,7 +85,7 @@ class ChatUserAdminNameAction
 		}
 
 		String name =
-			requestContext.parameter ("name");
+			requestContext.parameterOrNull ("name");
 
 		if (name.equals (""))
 			name = null;

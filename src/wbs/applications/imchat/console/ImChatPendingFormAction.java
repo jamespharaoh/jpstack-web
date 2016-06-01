@@ -100,7 +100,7 @@ class ImChatPendingFormAction
 		// select template
 
 		String templateString =
-			requestContext.parameter (
+			requestContext.parameterRequired (
 				"template");
 
 		boolean bill;
@@ -124,7 +124,7 @@ class ImChatPendingFormAction
 			template = null;
 
 			messageText =
-				requestContext.parameter (
+				requestContext.parameterRequired (
 					"message-bill");
 
 			minLength =
@@ -144,7 +144,7 @@ class ImChatPendingFormAction
 			template = null;
 
 			messageText =
-				requestContext.parameter (
+				requestContext.parameterRequired (
 					"message-free");
 
 			minLength =

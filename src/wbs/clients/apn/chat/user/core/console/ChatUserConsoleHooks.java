@@ -84,7 +84,7 @@ class ChatUserConsoleHooks
 			gazetteerEntryHelperProvider.get ();
 
 		GazetteerEntryRec gazetteerEntry =
-			gazetteerEntryHelper.findByCode (
+			gazetteerEntryHelper.findByCodeOrNull (
 				chatUser.getChat ().getGazetteer (),
 				chatUser.getLocationPlace ());
 

@@ -131,7 +131,7 @@ class ChatDateStopCommand
 			chatScheme.getChat ();
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				"default");
 

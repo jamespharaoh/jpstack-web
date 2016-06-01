@@ -106,7 +106,7 @@ class ForwarderCommand
 			inbox.getMessage ();
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				forwarder,
 				"default");
 
@@ -131,7 +131,7 @@ class ForwarderCommand
 		);
 
 		messageSetLogic.sendMessageSet (
-			messageSetHelper.findByCode (
+			messageSetHelper.findByCodeOrNull (
 				forwarder,
 				"forwarder"),
 			message.getThreadId (),

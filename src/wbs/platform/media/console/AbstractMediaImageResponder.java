@@ -62,7 +62,7 @@ class AbstractMediaImageResponder
 	void transform () {
 
 		String rotate =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"rotate");
 
 		if (

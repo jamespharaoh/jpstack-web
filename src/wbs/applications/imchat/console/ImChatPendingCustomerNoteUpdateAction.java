@@ -72,7 +72,7 @@ class ImChatPendingCustomerNoteUpdateAction
 
 		String valueParam =
 			trim (
-				requestContext.parameter (
+				requestContext.parameterRequired (
 					"value"));
 
 		// start transaction

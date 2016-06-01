@@ -78,15 +78,15 @@ class ChatUserAdminBarringAction
 
 		String barOn =
 			nullIfEmptyString (
-				requestContext.parameter ("bar_on"));
+				requestContext.parameterOrNull ("bar_on"));
 
 		String barOff =
 			nullIfEmptyString (
-				requestContext.parameter ("bar_off"));
+				requestContext.parameterOrNull ("bar_off"));
 
 		String reason =
 			nullIfEmptyString (
-				requestContext.parameter ("reason"));
+				requestContext.parameterOrNull ("reason"));
 
 		// check params
 

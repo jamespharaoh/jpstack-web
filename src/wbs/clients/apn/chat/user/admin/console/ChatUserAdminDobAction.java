@@ -68,7 +68,7 @@ class ChatUserAdminDobAction
 
 		String dobString =
 			nullIfEmptyString (
-				requestContext.parameter ("dob"));
+				requestContext.parameterOrNull ("dob"));
 
 		if (dobString == null) {
 

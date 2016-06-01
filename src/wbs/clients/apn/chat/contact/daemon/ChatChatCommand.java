@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.contact.daemon;
 
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -160,7 +161,7 @@ class ChatChatCommand
 			database.currentTransaction ();
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 
@@ -198,17 +199,17 @@ class ChatChatCommand
 					toChatUser.getCode ()));
 
 		CommandRec magicCommand =
-			commandHelper.findByCode (
+			commandHelper.findByCodeRequired (
 				chat,
 				"magic");
 
 		CommandRec helpCommand =
-			commandHelper.findByCode (
+			commandHelper.findByCodeRequired (
 				chat,
 				"help");
 
 		ServiceRec systemService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"system");
 
@@ -244,7 +245,7 @@ class ChatChatCommand
 	InboxAttemptRec doChat () {
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 
@@ -308,14 +309,21 @@ class ChatChatCommand
 			String keyword,
 			String rest) {
 
-		ChatKeywordRec chatKeyword =
+		Optional<ChatKeywordRec> chatKeywordOptional =
 			chatKeywordHelper.findByCode (
 				chat,
 				Gsm.toSimpleAlpha (keyword));
 
-		if (chatKeyword == null)
+		if (
+			isNotPresent (
+				chatKeywordOptional)
+		) {
 			return Optional.<InboxAttemptRec>absent ();
+		}
 
+		ChatKeywordRec chatKeyword =
+			chatKeywordOptional.get ();
+		
 		if (chatKeyword.getChatBlock ()) {
 
 			return Optional.of (

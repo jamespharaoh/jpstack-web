@@ -65,10 +65,10 @@ class ChatHelpLogPendingFormAction
 		// get params
 
 		String text =
-			requestContext.parameter ("text");
+			requestContext.parameterOrNull ("text");
 
 		boolean ignore =
-			requestContext.parameter ("ignore") != null;
+			requestContext.parameterOrNull ("ignore") != null;
 
 		// check params
 

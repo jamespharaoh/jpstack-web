@@ -51,7 +51,7 @@ class ChatUserHelpFormAction
 		// get parameters
 
 		String text =
-			requestContext.parameter("text");
+			requestContext.parameterOrNull("text");
 
 		// check parameters
 

@@ -131,7 +131,7 @@ class ChatCoreFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				menuGroupHelper.findByCodeOrNull (
+				menuGroupHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"facility"))
@@ -163,7 +163,7 @@ class ChatCoreFixtureProvider
 				routeHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"))
 
@@ -192,7 +192,7 @@ class ChatCoreFixtureProvider
 				true)
 
 			.setSender (
-				senderHelper.findByCodeOrNull (
+				senderHelper.findByCodeRequired (
 					GlobalId.root,
 					"simulator"))
 
@@ -203,7 +203,7 @@ class ChatCoreFixtureProvider
 				routeHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"))
 
@@ -223,7 +223,7 @@ class ChatCoreFixtureProvider
 				true)
 
 			.setSender (
-				senderHelper.findByCodeOrNull (
+				senderHelper.findByCodeRequired (
 					GlobalId.root,
 					"simulator"))
 
@@ -236,7 +236,7 @@ class ChatCoreFixtureProvider
 				"static");
 
 		CommandRec magicCommand =
-			commandHelper.findByCodeOrNull (
+			commandHelper.findByCodeRequired (
 				GlobalId.root,
 				"magic_number");
 
@@ -244,7 +244,7 @@ class ChatCoreFixtureProvider
 			routeHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"))
 
@@ -272,7 +272,7 @@ class ChatCoreFixtureProvider
 				chatHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"))
 
@@ -286,13 +286,13 @@ class ChatCoreFixtureProvider
 				"Test")
 
 			.setCurrency (
-				currencyHelper.findByCodeOrNull (
+				currencyHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"gbp"))
 
 			.setGazetteer (
-				gazetteerHelper.findByCodeOrNull (
+				gazetteerHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
 					"test"))
@@ -433,7 +433,7 @@ class ChatCoreFixtureProvider
 					numberString)
 
 				.setNetwork (
-					networkHelper.findByCodeOrNull (
+					networkHelper.findByCodeRequired (
 						GlobalId.root,
 						"unknown"))
 

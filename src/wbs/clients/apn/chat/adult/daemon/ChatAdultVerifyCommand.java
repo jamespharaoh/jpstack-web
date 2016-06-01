@@ -116,7 +116,7 @@ class ChatAdultVerifyCommand
 				command.getParentId ());
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				"default");
 

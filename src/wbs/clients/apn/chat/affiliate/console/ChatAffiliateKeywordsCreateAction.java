@@ -68,7 +68,7 @@ class ChatAffiliateKeywordsCreateAction
 
 		String keyword =
 			requestContext
-				.parameter ("keyword")
+				.parameterOrNull ("keyword")
 				.toLowerCase ();
 
 		if (! keywordLogic.checkKeyword (keyword)) {
@@ -83,7 +83,7 @@ class ChatAffiliateKeywordsCreateAction
 		ChatKeywordJoinType joinType =
 			toEnum (
 				ChatKeywordJoinType.class,
-				requestContext.parameter ("joinType"));
+				requestContext.parameterOrNull ("joinType"));
 
 		if (joinType == null) {
 			requestContext.addError ("Please specify a join type");
@@ -93,12 +93,12 @@ class ChatAffiliateKeywordsCreateAction
 		Gender gender =
 			toEnum (
 				Gender.class,
-				requestContext.parameter ("gender"));
+				requestContext.parameterOrNull ("gender"));
 
 		Orient orient =
 			toEnum (
 				Orient.class,
-				requestContext.parameter ("orient"));
+				requestContext.parameterOrNull ("orient"));
 
 		@Cleanup
 		Transaction transaction =
@@ -113,7 +113,7 @@ class ChatAffiliateKeywordsCreateAction
 			chatAffiliate.getChatScheme ();
 
 		ChatKeywordRec chatKeyword =
-			chatKeywordHelper.findByCode (
+			chatKeywordHelper.findByCodeOrNull (
 				chatScheme.getChat (),
 				keyword);
 
@@ -127,7 +127,7 @@ class ChatAffiliateKeywordsCreateAction
 		}
 
 		ChatSchemeKeywordRec chatSchemeKeyword =
-			chatSchemeKeywordHelper.findByCode (
+			chatSchemeKeywordHelper.findByCodeOrNull (
 				chatScheme,
 				keyword);
 

@@ -67,17 +67,17 @@ class ChatHelpLogicImplementation
 			chatUser.getChat ();
 
 		CommandRec magicCommand =
-			commandHelper.findByCode (
+			commandHelper.findByCodeRequired (
 				chat,
 				"magic");
 
 		CommandRec helpCommand =
-			commandHelper.findByCode (
+			commandHelper.findByCodeRequired (
 				chat,
 				"help");
 
 		ServiceRec helpService  =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"help");
 

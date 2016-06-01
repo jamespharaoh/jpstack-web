@@ -673,7 +673,7 @@ class AlertsDaemon
 					alertsNumber.getNumber ().getNumber ()));
 
 			ServiceRec alertsService =
-				serviceHelper.findByCode (
+				serviceHelper.findByCodeOrNull (
 					alertsSettings,
 					"alerts");
 

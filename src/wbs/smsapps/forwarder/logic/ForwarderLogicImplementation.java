@@ -369,7 +369,7 @@ class ForwarderLogicImplementation
 			} else if (part.routeCode != null) {
 
 				part.forwarderRoute =
-					forwarderRouteHelper.findByCode (
+					forwarderRouteHelper.findByCodeOrNull (
 						work.template.forwarder,
 						part.routeCode);
 
@@ -982,7 +982,7 @@ class ForwarderLogicImplementation
 					service,
 					null,
 					null,
-					deliveryTypeHelper.findByCodeOrNull (
+					deliveryTypeHelper.findByCodeRequired (
 						GlobalId.root,
 						"forwarder"),
 					(long) (int)

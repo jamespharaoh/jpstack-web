@@ -183,7 +183,7 @@ class SmsArenaDlrDispatchAction
 			// get the code and create the report
 
 			SmsArenaReportCodeRec reportCode =
-				smsArenaReportCodeHelper.findByCode (
+				smsArenaReportCodeHelper.findByCodeOrNull (
 					smsArenaRouteIn.getSmsArenaConfig (),
 					dlr);
 

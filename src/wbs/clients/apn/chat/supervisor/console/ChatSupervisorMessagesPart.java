@@ -96,12 +96,12 @@ class ChatSupervisorMessagesPart
 
 		Interval interval =
 			timeFormatter.isoStringToInterval (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"interval"));
 
 		int senderUserId =
 			Integer.parseInt (
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"user_id"));
 
 		UserRec senderUser =

@@ -121,7 +121,7 @@ class ManualResponderRequestPendingFormAction
 				"manualResponderRequestId");
 
 		String templateIdStr =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"template-id");
 
 		boolean ignore =
@@ -199,7 +199,7 @@ class ManualResponderRequestPendingFormAction
 		// get message
 
 		String messageParam =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"message-" + templateId);
 
 		// begin transaction
@@ -484,7 +484,7 @@ class ManualResponderRequestPendingFormAction
 		) {
 
 			CommandRec command =
-				commandHelper.findByCode (
+				commandHelper.findByCodeOrNull (
 					manualResponder,
 					"default");
 

@@ -274,8 +274,12 @@ class ChatInfoLogicImplementation
 			Optional.fromNullable (
 				threadId),
 			textParts,
-			commandHelper.findByCode (chat, "chat"),
-			serviceHelper.findByCode (chat, serviceCode),
+			commandHelper.findByCodeRequired (
+				chat,
+				"chat"),
+			serviceHelper.findByCodeRequired (
+				chat,
+				serviceCode),
 			(long) otherUser.getId (),
 			Optional.<UserRec>absent ());
 
@@ -343,7 +347,7 @@ class ChatInfoLogicImplementation
 			magicNumberLogic.allocateMagicNumber (
 				chatScheme.getMagicNumberSet (),
 				thisUser.getNumber (),
-				commandHelper.findByCode (
+				commandHelper.findByCodeRequired (
 					chat,
 					"chat"),
 				otherUser.getId ());
@@ -515,10 +519,13 @@ class ChatInfoLogicImplementation
 				.replace ("{link}", link);
 
 		ServiceRec infoSiteService =
-			serviceHelper.findByCode (chat, "info_site");
+			serviceHelper.findByCodeRequired (
+				chat,
+				"info_site");
 
 		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (thisUser);
+			chatUserLogic.getAffiliate (
+				thisUser);
 
 		messageSender.get ()
 
@@ -632,7 +639,7 @@ class ChatInfoLogicImplementation
 				: "online_image";
 
 		ServiceRec service =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				serviceCode);
 
@@ -828,7 +835,7 @@ class ChatInfoLogicImplementation
 				: "online_video";
 
 		ServiceRec service =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				thisUser.getChat (),
 				serviceCode);
 
@@ -1499,8 +1506,13 @@ class ChatInfoLogicImplementation
 			chatUser,
 			Optional.<Long>absent (),
 			"name_hint",
-			commandHelper.findByCode (chat, "magic"),
-			(long) commandHelper.findByCode (chat, "name").getId (),
+			commandHelper.findByCodeRequired (
+				chat,
+				"magic"),
+			(long) commandHelper.findByCodeRequired (
+				chat,
+				"name"
+			).getId (),
 			TemplateMissing.error,
 			Collections.<String,String>emptyMap ());
 
@@ -1530,7 +1542,7 @@ class ChatInfoLogicImplementation
 			chatUser,
 			Optional.<Long>absent (),
 			"photo_hint",
-			commandHelper.findByCode (chat, "set_photo"),
+			commandHelper.findByCodeOrNull (chat, "set_photo"),
 			TemplateMissing.error);
 
 		// and update the chat user
@@ -1559,7 +1571,7 @@ class ChatInfoLogicImplementation
 			chatUser,
 			Optional.<Long>absent (),
 			"photo_hint_2",
-			commandHelper.findByCode (chat, "set_photo"),
+			commandHelper.findByCodeOrNull (chat, "set_photo"),
 			TemplateMissing.error);
 
 		// and update the chat user

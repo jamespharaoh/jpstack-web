@@ -238,7 +238,7 @@ class TicketerApiServletModule
 			}
 
 			TicketerRec ticketer =
-				ticketerHelper.findByCode (
+				ticketerHelper.findByCodeOrNull (
 					slice,
 					codeParam);
 

@@ -364,7 +364,7 @@ class ChatBroadcastSendAction
 				profileLogger.lap ("lookup user");
 
 				ChatUserRec fromChatUser =
-					chatUserHelper.findByCode (
+					chatUserHelper.findByCodeOrNull (
 						chat,
 						form.fromUser ());
 

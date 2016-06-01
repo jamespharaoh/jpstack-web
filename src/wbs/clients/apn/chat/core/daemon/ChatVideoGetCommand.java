@@ -137,7 +137,7 @@ class ChatVideoGetCommand
 				command);
 
 		ServiceRec defaultService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				"default");
 
@@ -219,7 +219,7 @@ class ChatVideoGetCommand
 			// find other user and ensure they have video
 
 			ChatUserRec otherUser =
-				chatUserHelper.findByCode (
+				chatUserHelper.findByCodeOrNull (
 					chat,
 					text);
 

@@ -997,7 +997,7 @@ class ChatCreditLogicImplementation
 		// and send it
 
 		ServiceRec billService =
-			serviceHelper.findByCode (
+			serviceHelper.findByCodeOrNull (
 				chat,
 				"bill");
 
