@@ -6,16 +6,21 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import lombok.Cleanup;
+
+import com.google.common.base.Optional;
 
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
+import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.platform.object.core.model.ObjectTypeDao;
 import wbs.platform.object.core.model.ObjectTypeRec;
+import wbs.platform.scaffold.model.SliceRec;
 
 public
 class QueueHooks
@@ -31,6 +36,11 @@ class QueueHooks
 
 	@Inject
 	QueueTypeDao queueTypeDao;
+
+	// indirect dependencies
+
+	@Inject
+	Provider<ObjectManager> objectManagerProvider;
 
 	// state
 
@@ -81,6 +91,14 @@ class QueueHooks
 				parentHelper.objectTypeId ()))
 			return;
 
+		ObjectManager objectManager =
+			objectManagerProvider.get ();
+
+		Optional<SliceRec> slice =
+			objectManager.getAncestor (
+				SliceRec.class,
+				parent);
+
 		ObjectTypeRec parentType =
 			objectTypeDao.findById (
 				parentHelper.objectTypeId ());
@@ -108,6 +126,9 @@ class QueueHooks
 
 				.setParentId (
 					parent.getId ())
+
+				.setSlice (
+					slice.orNull ())
 
 				.setDefaultPriority (
 					queueType.getDefaultPriority ())
