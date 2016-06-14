@@ -49,7 +49,7 @@ elif ! test -e "$basebackup-$yesterday"; then
 
 			sudo -u ubuntu -- \
 			zbackup \
-				--non-encrypted \
+				--password-file "/backup/password" \
 				--silent \
 				backup \
 				"$basebackup-$today"
@@ -82,7 +82,7 @@ elif ! test -e "$dump-$yesterday"; then
 
 			sudo -u ubuntu -- \
 			zbackup \
-				--non-encrypted \
+				--password-file "/backup/password" \
 				--silent \
 				backup \
 				"$dump-$today"
