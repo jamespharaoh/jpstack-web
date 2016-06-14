@@ -18,6 +18,11 @@
 
 		<code-field/>
 
+		<!-- cached identity -->
+
+		<reference-field
+			type="slice"/>
+
 		<!-- details -->
 
 		<type-field
