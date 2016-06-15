@@ -181,7 +181,7 @@ class QueueConsoleLogic {
 			.queue (
 				queue)
 
-			.user (
+			.effectiveUser (
 				user)
 
 			.sort ();

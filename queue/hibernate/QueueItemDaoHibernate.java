@@ -64,6 +64,30 @@ class QueueItemDaoHibernate
 
 		if (
 			isNotNull (
+				search.sliceId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_queue.slice.id",
+					search.sliceId ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.parentTypeId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_queue.parentType.id",
+					search.parentTypeId ()));
+
+		}
+
+		if (
+			isNotNull (
 				search.createdTime ())
 		) {
 
