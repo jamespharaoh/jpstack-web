@@ -460,6 +460,26 @@ class Misc {
 
 	}
 
+	@SafeVarargs
+	public static <Type>
+	boolean optionalNotIn (
+			@NonNull Optional<Type> left,
+			@NonNull Type... rights) {
+
+		if (left.isPresent ()) {
+
+			return ! in (
+				left.get (),
+				rights);
+
+		} else {
+
+			return true;
+
+		}
+
+	}
+
 	public static
 	boolean notEqual (
 			Object left,
@@ -645,8 +665,8 @@ class Misc {
 	@SafeVarargs
 	public static <Type>
 	boolean notIn (
-			Type left,
-			Type... rights) {
+			@NonNull Type left,
+			@NonNull Type... rights) {
 
 		return ! in (
 			left,

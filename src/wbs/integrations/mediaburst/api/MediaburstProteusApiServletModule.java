@@ -160,7 +160,7 @@ class MediaburstProteusApiServletModule
 			reportLogic.deliveryReport (
 				route,
 				reportRequestResult.otherId,
-				Optional.of (
+				Optional.fromNullable (
 					reportRequestResult.status),
 				null,
 				messageReportCode);
