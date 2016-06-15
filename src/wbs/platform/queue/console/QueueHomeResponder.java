@@ -143,7 +143,7 @@ class QueueHomeResponder
 		List<QueueInfo> queueInfosTemp =
 			queueSubjectSorter.get ()
 
-			.user (
+			.effectiveUser (
 				userConsoleLogic.userRequired ())
 
 			.sort ()
@@ -623,18 +623,22 @@ class QueueHomeResponder
 
 			printFormat (
 				"<td>%h</td>\n",
-				queue.getCode (),
+				queue.getCode ());
 
+			printFormat (
 				"<td>%h</td>\n",
 				userConsoleLogic.timestampWithTimezoneString (
-					queueItem.getCreatedTime ()),
+					queueItem.getCreatedTime ()));
 
+			printFormat (
 				"<td>%h</td>\n",
-				queueItem.getSource (),
+				queueItem.getSource ());
 
+			printFormat (
 				"<td>%h</td>\n",
-				queueItem.getDetails (),
+				queueItem.getDetails ());
 
+			printFormat (
 				"</tr>\n");
 
 			if (maxItems-- == 0)

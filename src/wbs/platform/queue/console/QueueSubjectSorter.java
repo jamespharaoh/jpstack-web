@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
@@ -40,6 +41,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.record.Record;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
@@ -63,6 +65,9 @@ class QueueSubjectSorter {
 
 	@Inject
 	ObjectManager objectManager;
+
+	@Inject
+	UserPrivChecker loggedInUserPrivChecker;
 
 	@Inject
 	QueueObjectHelper queueHelper;
@@ -90,11 +95,11 @@ class QueueSubjectSorter {
 	QueueRec queue;
 
 	@Setter
-	UserRec user;
+	UserRec effectiveUser;
 
 	// state
 
-	UserPrivChecker privChecker;
+	UserPrivChecker effectiveUserPrivChecker;
 
 	Transaction transaction;
 
@@ -112,14 +117,21 @@ class QueueSubjectSorter {
 	public
 	SortedQueueSubjects sort () {
 
-		privChecker =
-			userPrivCheckerBuilderProvider.get ()
+		if (
+			isNotNull (
+				effectiveUser)
+		) {
 
-			.userId (
-				(long) (int)
-				user.getId ())
+			effectiveUserPrivChecker =
+				userPrivCheckerBuilderProvider.get ()
+	
+				.userId (
+					(long) (int)
+					effectiveUser.getId ())
+	
+				.build ();
 
-			.build ();
+		}
 
 		transaction =
 			database.currentTransaction ();
@@ -139,10 +151,10 @@ class QueueSubjectSorter {
 
 			.filter (
 				subjectInfo ->
-					user == null || subjectInfo.available)
+					effectiveUser == null || subjectInfo.available)
 
 			.sorted (
-				user != null
+				effectiveUser != null
 					? SubjectInfo.effectiveTimeComparator
 					: SubjectInfo.createdTimeComparator)
 
@@ -155,7 +167,7 @@ class QueueSubjectSorter {
 			queueInfos.values ().stream ()
 
 			.sorted (
-				user != null
+				effectiveUser != null
 					? QueueInfo.oldestAvailableComparator
 					: QueueInfo.oldestComparator)
 
@@ -172,7 +184,7 @@ class QueueSubjectSorter {
 			result.allQueues.stream ()
 
 			.filter (queueInfo ->
-				user == null || queueInfo.availableItems > 0)
+				effectiveUser == null || queueInfo.availableItems > 0)
 
 			.collect (
 				Collectors.toList ());
@@ -182,7 +194,7 @@ class QueueSubjectSorter {
 		result.allQueues.forEach (queueInfo ->
 			Collections.sort (
 				queueInfo.subjectInfos,
-				user != null
+				effectiveUser != null
 					? SubjectInfo.effectiveTimeComparator
 					: SubjectInfo.createdTimeComparator));
 
@@ -315,7 +327,7 @@ class QueueSubjectSorter {
 
 			&& equal (
 				subjectInfo.preferredUser,
-				user)
+				effectiveUser)
 
 		);
 
@@ -325,7 +337,7 @@ class QueueSubjectSorter {
 
 			&& notEqual (
 				subjectInfo.preferredUser,
-				user)
+				effectiveUser)
 
 		);
 
@@ -471,22 +483,22 @@ class QueueSubjectSorter {
 		// check permissions
 
 		queueInfo.canReplyExplicit =
-			privChecker.canSimple (
+			checkPrivExplicit (
 				queue,
 				"reply");
 
 		queueInfo.canReplyImplicit =
-			privChecker.canRecursive (
+			checkPrivImplicit (
 				queue,
 				"reply");
 
 		queueInfo.canReplyOverflowExplicit =
-			privChecker.canSimple (
+			checkPrivExplicit (
 				queue,
 				"reply_overflow");
 
 		queueInfo.canReplyOverflowImplicit =
-			privChecker.canRecursive (
+			checkPrivImplicit (
 				queue,
 				"reply_overflow");
 
@@ -503,6 +515,66 @@ class QueueSubjectSorter {
 		// return
 
 		return queueInfo;
+
+	}
+
+	private
+	boolean checkPrivExplicit (
+			@NonNull Record<?> parent,
+			@NonNull String privCode) {
+
+		if (
+			! loggedInUserPrivChecker.canRecursive (
+				parent,
+				"reply")
+		) {
+			return false;
+		}
+
+		if (
+			isNull (
+				effectiveUser)
+		) {
+
+			return true;
+
+		} else {
+
+			return effectiveUserPrivChecker.canSimple (
+				parent,
+				privCode);
+
+		}
+
+	}
+
+	private
+	boolean checkPrivImplicit (
+			@NonNull Record<?> parent,
+			@NonNull String privCode) {
+
+		if (
+			! loggedInUserPrivChecker.canRecursive (
+				parent,
+				"reply")
+		) {
+			return false;
+		}
+
+		if (
+			isNull (
+				effectiveUser)
+		) {
+
+			return true;
+
+		} else {
+
+			return effectiveUserPrivChecker.canRecursive (
+				parent,
+				privCode);
+
+		}
 
 	}
 
@@ -634,9 +706,9 @@ class QueueSubjectSorter {
 		queueInfo.claimedItems ++;
 
 		if (
-			user != null
+			effectiveUser != null
 			&& equal (
-				user,
+				effectiveUser,
 				subjectInfo.item.getQueueItemClaim ().getUser ())
 		) {
 

@@ -55,7 +55,7 @@ class QueueItemStatusLine
 		SortedQueueSubjects sortedSubjects =
 			queueSubjectSorter.get ()
 
-			.user (
+			.effectiveUser (
 				userConsoleLogic.userRequired ())
 
 			.sort ();

@@ -101,7 +101,7 @@ class QueueDebugPart
 		SortedQueueSubjects sortedQueueSubjects =
 			queueSubjectSorterProvider.get ()
 
-			.user (
+			.effectiveUser (
 				userHelper.find (
 					form.userId ()))
 

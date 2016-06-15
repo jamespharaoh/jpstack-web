@@ -14,6 +14,10 @@ public
 class QueueItemSearch
 	implements Serializable {
 
+	Integer sliceId;
+
+	Integer parentTypeId;
+
 	TextualInterval createdTime;
 
 	Integer processedUserId;

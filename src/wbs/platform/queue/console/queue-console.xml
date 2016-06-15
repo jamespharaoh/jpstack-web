@@ -143,6 +143,16 @@
 		name="queue-item-report-search"
 		class="wbs.platform.queue.model.QueueItemSearch">
 
+		<object-field
+			name="sliceId"
+			object-type="slice"
+			nullable="yes"/>
+
+		<object-field
+			name="parentTypeId"
+			object-type="objectType"
+			nullable="yes"/>
+
 		<interval-field
 			name="createdTime"
 			label="Created time"/>
