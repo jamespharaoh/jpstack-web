@@ -10,6 +10,8 @@ import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -131,7 +133,8 @@ class BroadcastSystemsReportFile
 		reportLogic.deliveryReport (
 			route,
 			data.transactionId,
-			data.status,
+			Optional.of (
+				data.status),
 			null,
 			reportCode);
 

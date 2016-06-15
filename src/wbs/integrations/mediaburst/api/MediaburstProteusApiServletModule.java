@@ -16,6 +16,7 @@ import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Nodes;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -159,7 +160,8 @@ class MediaburstProteusApiServletModule
 			reportLogic.deliveryReport (
 				route,
 				reportRequestResult.otherId,
-				reportRequestResult.status,
+				Optional.of (
+					reportRequestResult.status),
 				null,
 				messageReportCode);
 

@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -138,7 +139,8 @@ class ComshenApiServletModule
 			reportLogic.deliveryReport (
 				route,
 				idParam,
-				result,
+				Optional.of (
+					result),
 				null,
 				messageReportCode);
 

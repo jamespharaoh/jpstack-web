@@ -35,7 +35,7 @@ import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("queueDebugPart")
-public 
+public
 class QueueDebugPart
 	extends AbstractPagePart {
 
@@ -78,7 +78,7 @@ class QueueDebugPart
 	// implementation
 
 	@Override
-	public 
+	public
 	void prepare () {
 
 		formFields =
@@ -89,7 +89,7 @@ class QueueDebugPart
 			new QueueDebugForm ()
 
 			.userId (
-				userConsoleLogic.userIdRequired ()); 
+				userConsoleLogic.userIdRequired ());
 
 		formFieldLogic.update (
 			requestContext,
@@ -121,7 +121,7 @@ class QueueDebugPart
 	}
 
 	@Override
-	public 
+	public
 	void renderHtmlBodyContent () {
 
 		formFieldLogic.outputFormTable (
@@ -200,7 +200,7 @@ class QueueDebugPart
 				if (row == 0) {
 
 					// queue
-		
+
 					printFormat (
 						"<td",
 						" rowspan=\"%h\"",
@@ -210,13 +210,13 @@ class QueueDebugPart
 						objectManager.localLink (
 							queueInfo.slice ()),
 						queueInfo.slice ().getCode ());
-		
+
 					printFormat (
 						"Type: <a href=\"%h\">%h</a><br>\n",
-						objectManager.localLink ( 
+						objectManager.localLink (
 							queueParentType),
 						queueParentType.getCode ());
-		
+
 					printFormat (
 						"Service: <a href=\"%h\">%h</a><br>\n",
 						objectManager.localLink (
@@ -224,13 +224,13 @@ class QueueDebugPart
 						objectManager.objectPathMini (
 							queueParent,
 							queueInfo.slice ()));
-		
+
 					printFormat (
 						"Queue: <a href=\"%h\">%h</a><br>\n",
-						objectManager.localLink ( 
+						objectManager.localLink (
 							queueInfo.queue ()),
 						queueInfo.queue ().getCode ());
-		
+
 					printFormat (
 						"Reply priv: %h<br>\n",
 						queueInfo.canReplyExplicit ()
@@ -238,7 +238,7 @@ class QueueDebugPart
 							: queueInfo.canReplyImplicit ()
 								? "implicit"
 								: "no");
-		
+
 					printFormat (
 						"Reply overflow priv: %h<br>\n",
 						queueInfo.canReplyOverflowExplicit ()
@@ -246,15 +246,15 @@ class QueueDebugPart
 							: queueInfo.canReplyOverflowImplicit ()
 								? "implicit"
 								: "no");
-		
+
 					printFormat (
 						"Is overflow user: %h</td>\n",
 						queueInfo.isOverflowUser ()
 							? "yes"
 							: "no");
-		
+
 					// operator activity
-		
+
 					printFormat (
 						"<td",
 						" rowspan=\"%h\"",
@@ -263,14 +263,14 @@ class QueueDebugPart
 						">Last update: %h<br>\n",
 						userConsoleLogic.timestampWithoutTimezoneString (
 							queueInfo.slice ().getCurrentQueueInactivityUpdateTime ()));
-		
+
 					printFormat (
 						"Inactive since: %h<br>\n",
 						queueInfo.slice ().getCurrentQueueInactivityTime () != null
 							? userConsoleLogic.timestampWithoutTimezoneString (
 								queueInfo.slice ().getCurrentQueueInactivityTime ())
 							: "none");
-		
+
 					printFormat (
 						"Configured inactivity time: %h<br>\n",
 						queueInfo.slice ().getQueueOverflowInactivityTime () != null
@@ -278,7 +278,7 @@ class QueueDebugPart
 								Duration.standardSeconds (
 									queueInfo.slice ().getQueueOverflowInactivityTime ()))
 							: "disabled");
-		
+
 					printFormat (
 						"Actual inactivity time: %h<br>\n",
 						queueInfo.slice ().getCurrentQueueInactivityTime () != null
@@ -286,7 +286,7 @@ class QueueDebugPart
 								queueInfo.slice ().getCurrentQueueInactivityTime (),
 								transaction.now ())
 							: "none");
-		
+
 					printFormat (
 						"Conclusion: %h</td>",
 						queueInfo.slice ().getCurrentQueueInactivityTime () != null
@@ -319,9 +319,9 @@ class QueueDebugPart
 				printFormat (
 					"</tr>\n",
 					"<tr>\n");
-	
+
 				// preferred user
-	
+
 				printFormat (
 					"<td",
 					" style=\"vertical-align: top\"",
@@ -336,27 +336,27 @@ class QueueDebugPart
 								objectManager.objectPathMini (
 									subjectInfo.preferredUser ()))
 						: "nobody");
-	
+
 				printFormat (
 					"Preferred by overflow user: %h<br>\n",
 					subjectInfo.preferredByOverflowOperator ()
 						? "yes"
 						: "no");
-	
+
 				printFormat (
 					"Configured delay: %h<br>\n",
 					userConsoleLogic.prettyDuration (
 						queueInfo.configuredPreferredUserDelay ()));
-	
+
 				printFormat (
 					"Actual delay: %h</td>\n",
 					subjectInfo.actualPreferredUserDelay () != null
 						? userConsoleLogic.prettyDuration (
 							subjectInfo.actualPreferredUserDelay ())
 						: "none");
-	
+
 				// overflow
-	
+
 				printFormat (
 					"<td",
 					" style=\"vertical-align: top\"",
@@ -366,7 +366,7 @@ class QueueDebugPart
 							Duration.standardSeconds (
 								queueInfo.slice ().getQueueOverflowGraceTime ()))
 						: "none");
-	
+
 				printFormat (
 					"Configured overload time: %h<br>\n",
 					queueInfo.slice ().getQueueOverflowOverloadTime () != null
@@ -374,26 +374,26 @@ class QueueDebugPart
 							Duration.standardSeconds (
 								queueInfo.slice ().getQueueOverflowOverloadTime ()))
 						: "none");
-	
+
 				printFormat (
 					"Is overflow user: %h<br>\n",
 					queueInfo.isOverflowUser ()
 						? "yes"
 						: "no");
-	
+
 				printFormat (
 					"Own operators active: %h<br>",
 					queueInfo.ownOperatorsActive ()
 						? "yes"
 						: "no");
-	
+
 				printFormat (
 					"Actual overflow delay: %h</td>\n",
 					subjectInfo.overflowDelay () != null
 						? userConsoleLogic.prettyDuration (
 							subjectInfo.overflowDelay ())
 						: "none");
-	
+
 				// conclusion
 
 				printFormat (
@@ -413,7 +413,7 @@ class QueueDebugPart
 						? userConsoleLogic.prettyDuration (
 							subjectInfo.actualPreferredUserDelay ())
 						: "none");
-	
+
 				if (subjectInfo.overflowDelay != null) {
 
 					printFormat (
@@ -432,7 +432,7 @@ class QueueDebugPart
 						"Overflow delay: none<br>\n");
 
 				}
-	
+
 				printFormat (
 					"Effective time: %h<br>\n",
 					userConsoleLogic.timestampWithoutTimezoneString (
@@ -446,7 +446,7 @@ class QueueDebugPart
 							subjectInfo.claimedByUser ()),
 						objectManager.objectPathMini (
 							subjectInfo.claimedByUser ()));
-	
+
 				} else {
 
 					printFormat (
@@ -455,33 +455,33 @@ class QueueDebugPart
 				}
 
 				if (subjectInfo.available ()) {
-	
+
 					printFormat (
 						"Available: yes, for %h</td>\n",
 						userConsoleLogic.prettyDuration (
 							subjectInfo.effectiveTime (),
 							transaction.now ()));
-	
+
 				} else if (subjectInfo.claimed ()) {
-	
+
 					printFormat (
 						"Available: no, already claimed</td>\n");
-	
+
 				} else {
-	
+
 					printFormat (
 						"Available: no, for %h</td>\n",
 						userConsoleLogic.prettyDuration (
 							transaction.now (),
 							subjectInfo.effectiveTime ()));
-	
+
 				}
-	
+
 				printFormat (
 					"</tr>\n");
 
 				row ++;
-				
+
 			}
 
 		}

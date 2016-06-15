@@ -369,7 +369,8 @@ class DialogueMmsApiServletModule
 
 			reportLogic.deliveryReport (
 				message,
-				newMessageStatus,
+				Optional.of (
+					newMessageStatus),
 				null,
 				messageReportCode);
 

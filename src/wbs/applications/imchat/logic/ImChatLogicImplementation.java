@@ -11,6 +11,7 @@ import lombok.NonNull;
 
 import org.apache.commons.io.output.StringBuilderWriter;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import wbs.applications.imchat.model.ImChatConversationRec;
@@ -23,10 +24,13 @@ import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.EmailLogic;
+import wbs.framework.utils.RandomLogic;
 import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.FormatWriterWriter;
 import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.event.logic.EventLogic;
+import wbs.platform.user.model.UserRec;
 
 @SingletonComponent ("imChatLogic")
 public
@@ -43,6 +47,12 @@ class ImChatLogicImplementation
 
 	@Inject
 	EmailLogic emailLogic;
+
+	@Inject
+	EventLogic eventLogic;
+
+	@Inject
+	RandomLogic randomLogic;
 
 	@Inject
 	TimeFormatter timeFormatter;
@@ -175,6 +185,64 @@ class ImChatLogicImplementation
 				"Your recent conversation with %s",
 				profile.getPublicName ()),
 			stringBuilder.toString ());
+
+	}
+
+	@Override
+	public
+	void customerPasswordGenerate (
+			@NonNull ImChatCustomerRec customer,
+			@NonNull Optional<UserRec> consoleUser) {
+
+		ImChatRec imChat =
+			customer.getImChat ();
+
+		// generate new password
+
+		String newPassword =
+			randomLogic.generateLowercase (12);
+
+		// update customer password
+
+		customer
+
+			.setPassword (
+				newPassword);
+
+		// send new password via mail
+
+		emailLogic.sendEmail (
+			imChat.getEmailFromName (),
+			imChat.getEmailFromAddress (),
+			imChat.getEmailReplyToAddress (),
+			ImmutableList.of (
+				customer.getEmail ()),
+			imChat.getEmailSubjectForgotPassword (),
+			stringFormat (
+				"Please log on with your new password:\n",
+				"\n",
+				"%s\n",
+				newPassword));
+
+		// create log
+
+		if (
+			isNotNull (
+				consoleUser)
+		) {
+
+			eventLogic.createEvent (
+				"im_chat_customer_generated_password_from_console",
+				consoleUser.get (),
+				customer);
+
+		} else {
+
+			eventLogic.createEvent (
+				"im_chat_customer_forgotten_password",
+				customer);
+
+		}
 
 	}
 

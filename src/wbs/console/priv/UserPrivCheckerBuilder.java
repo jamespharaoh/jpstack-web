@@ -21,7 +21,7 @@ import wbs.framework.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("privCheckerBuilder")
-public 
+public
 class UserPrivCheckerBuilder {
 
 	// dependencies
@@ -61,36 +61,36 @@ class UserPrivCheckerBuilder {
 		public
 		boolean canRecursive (
 				int privId) {
-	
+
 			return userPrivData.canNormal (
 				privId);
-	
+
 		}
-	
+
 		@Override
 		public
 		boolean canRecursive (
 				GlobalId parentGlobalId,
 				String... privCodes) {
-	
+
 			return userPrivData.canList (
 				parentGlobalId,
 				Arrays.asList (privCodes),
 				true);
-	
+
 		}
-	
+
 		@Override
 		public
 		boolean canRecursive (
 				Class<? extends Record<?>> parentClass,
 				int parentId,
 				String... privCodes) {
-	
+
 			int parentTypeId =
 				userPrivData.coreGetObjectTypeId (
 					parentClass);
-	
+
 			return userPrivData.canList (
 				new GlobalId (
 					parentTypeId,
@@ -98,19 +98,19 @@ class UserPrivCheckerBuilder {
 				Arrays.asList (
 					privCodes),
 				true);
-	
+
 		}
-	
+
 		@Override
 		public
 		boolean canRecursive (
 				@NonNull Record<?> parentObject,
 				@NonNull String... privCodes) {
-	
+
 			int parentObjectTypeId =
 				userPrivData.coreGetObjectTypeId (
 					parentObject.getClass ());
-	
+
 			return userPrivData.canList (
 				new GlobalId (
 					parentObjectTypeId,
@@ -118,32 +118,32 @@ class UserPrivCheckerBuilder {
 				Arrays.asList (
 					privCodes),
 				true);
-	
+
 		}
-	
+
 		@Override
 		public
 		boolean canSimple (
 				GlobalId parentGlobalId,
 				String... privCodes) {
-	
+
 			return userPrivData.canList (
 				parentGlobalId,
 				Arrays.asList (privCodes),
 				false);
-	
+
 		}
-	
+
 		@Override
 		public
 		boolean canSimple (
 				@NonNull Record<?> parentObject,
 				@NonNull String... privCodes) {
-	
+
 			int parentObjectTypeId =
 				userPrivData.coreGetObjectTypeId (
 					parentObject.getClass ());
-	
+
 			return userPrivData.canList (
 				new GlobalId (
 					parentObjectTypeId,
@@ -151,111 +151,111 @@ class UserPrivCheckerBuilder {
 				Arrays.asList (
 					privCodes),
 				false);
-	
+
 		}
-	
+
 		@Override
 		public
 		boolean canRecursive (
 				Map<Object,Collection<String>> map) {
-	
+
 			for (Map.Entry<Object,Collection<String>> ent
 					: map.entrySet ()) {
-	
+
 				Object key =
 					ent.getKey ();
-	
+
 				Collection<String> privCodes =
 					ent.getValue ();
-	
+
 				GlobalId parentObjectId;
-	
+
 				if (key instanceof GlobalId) {
-	
+
 					parentObjectId =
 						(GlobalId) key;
-	
+
 				} else if (key instanceof Record) {
-	
+
 					Record<?> parentObject =
 						(Record<?>) key;
-	
+
 					int parentObjectTypeId =
 						userPrivData.coreGetObjectTypeId (
 							parentObject.getClass ());
-	
+
 					parentObjectId =
 						new GlobalId (
 							parentObjectTypeId,
 							parentObject.getId ());
-	
+
 				} else {
-	
+
 					throw new IllegalArgumentException ();
-	
+
 				}
-	
+
 				if (
-	
+
 					isNotNull (
 						privCodes)
-	
+
 					&& userPrivData.canList (
 						parentObjectId,
 						privCodes,
 						true)
-	
+
 				) {
 					return true;
 				}
-	
+
 				if (
-	
+
 					isNull (
 						privCodes)
-	
+
 					&& userPrivData.canList (
 						parentObjectId,
 						Collections.<String>emptyList (),
 						true)
-	
+
 				) {
 					return true;
 				}
-	
+
 			}
-	
+
 			return false;
-	
+
 		}
-	
+
 		@Override
 		public
 		boolean canGrant (
 				int privId) {
-	
+
 			Integer managePrivId =
 				userPrivData.sharedData.managePrivIds.get (
 					privId);
-	
+
 			return (
-	
+
 				isNotNull (
 					managePrivId)
-	
+
 				&& userPrivData.canChain (
 					managePrivId)
-	
+
 			);
-	
+
 		}
-	
+
 		@Override
 		public
 		void refresh () {
 
 			throw new UnsupportedOperationException ();
-	
+
 		}
 
 	}

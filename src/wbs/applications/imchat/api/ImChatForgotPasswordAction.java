@@ -1,7 +1,5 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -10,8 +8,9 @@ import lombok.Cleanup;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Optional;
 
+import wbs.applications.imchat.logic.ImChatLogic;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
@@ -21,8 +20,6 @@ import wbs.framework.application.config.WbsConfig;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.EmailLogic;
-import wbs.framework.utils.RandomLogic;
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
@@ -39,10 +36,10 @@ class ImChatForgotPasswordAction
 	Database database;
 
 	@Inject
-	EmailLogic emailLogic;
+	ImChatApiLogic imChatApiLogic;
 
 	@Inject
-	ImChatApiLogic imChatApiLogic;
+	ImChatLogic imChatLogic;
 
 	@Inject
 	ImChatCustomerObjectHelper imChatCustomerHelper;
@@ -52,9 +49,6 @@ class ImChatForgotPasswordAction
 
 	@Inject
 	RequestContext requestContext;
-
-	@Inject
-	RandomLogic randomLogic;
 
 	@Inject
 	WbsConfig wbsConfig;
@@ -100,12 +94,12 @@ class ImChatForgotPasswordAction
 
 		// check for existing
 
-		ImChatCustomerRec imChatcustomer =
+		ImChatCustomerRec imChatCustomer =
 			imChatCustomerHelper.findByEmail (
 				imChat,
 				forgotPasswordRequest.email ());
 
-		if (imChatcustomer == null) {
+		if (imChatCustomer == null) {
 
 			ImChatFailure failureResponse =
 				new ImChatFailure ()
@@ -125,30 +119,9 @@ class ImChatForgotPasswordAction
 
 		// generate new password
 
-		String newPassword =
-			randomLogic.generateLowercase (12);
-
-		// update customer password
-
-		imChatcustomer
-
-			.setPassword (
-				newPassword);
-
-		// send new password via mail
-
-		emailLogic.sendEmail (
-			imChat.getEmailFromName (),
-			imChat.getEmailFromAddress (),
-			imChat.getEmailReplyToAddress (),
-			ImmutableList.of (
-				forgotPasswordRequest.email ()),
-			imChat.getEmailSubjectForgotPassword (),
-			stringFormat (
-				"Please log on with your new password:\n",
-				"\n",
-				"%s\n",
-				newPassword));
+		imChatLogic.customerPasswordGenerate (
+			imChatCustomer,
+			Optional.absent ());
 
 		// create response
 

@@ -24,9 +24,9 @@ class ChatUserOnlineComparator
 			return -1L;
 
 		} else if (chatUser.getType () == ChatUserType.monitor) {
-		
+
 			return -2L;
-		
+
 		} else {
 
 			throw new RuntimeException ();

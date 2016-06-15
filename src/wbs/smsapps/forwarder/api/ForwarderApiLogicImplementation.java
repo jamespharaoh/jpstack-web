@@ -105,7 +105,7 @@ class ForwarderApiLogicImplementation
 			isNotPresent (
 				forwarderOptional)
 		) {
-			
+
 			throw new ForwarderNotFoundException ();
 
 		}

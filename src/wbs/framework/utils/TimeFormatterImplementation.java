@@ -113,7 +113,7 @@ class TimeFormatterImplementation
 	}
 
 	@Override
-	public 
+	public
 	String timestampHourStringIso (
 			@NonNull ReadableInstant instant) {
 
@@ -123,7 +123,7 @@ class TimeFormatterImplementation
 	}
 
 	@Override
-	public 
+	public
 	String timestampMinuteStringIso (
 			@NonNull ReadableInstant instant) {
 
@@ -133,7 +133,7 @@ class TimeFormatterImplementation
 	}
 
 	@Override
-	public 
+	public
 	String timestampSecondStringIso (
 			@NonNull ReadableInstant instant) {
 
@@ -143,7 +143,7 @@ class TimeFormatterImplementation
 	}
 
 	@Override
-	public 
+	public
 	Interval isoStringToInterval (
 			@NonNull String isoString) {
 
@@ -239,7 +239,7 @@ class TimeFormatterImplementation
 	// duration
 
 	@Override
-	public 
+	public
 	String prettyDuration (
 			@NonNull ReadableInstant start,
 			@NonNull ReadableInstant end) {
@@ -252,7 +252,7 @@ class TimeFormatterImplementation
 	}
 
 	@Override
-	public 
+	public
 	String prettyDuration (
 			@NonNull ReadableDuration interval) {
 

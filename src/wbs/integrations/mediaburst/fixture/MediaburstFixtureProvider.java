@@ -9,7 +9,7 @@ import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 
 @PrototypeComponent ("mediaburstFixtureProvider")
-public 
+public
 class MediaburstFixtureProvider
 	implements FixtureProvider {
 

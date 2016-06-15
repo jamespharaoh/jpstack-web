@@ -12,7 +12,7 @@ import com.google.common.base.Optional;
 import wbs.framework.record.Record;
 
 @Log4j
-public 
+public
 class SimpleExceptionLogger
 	implements ExceptionLogger {
 
@@ -24,7 +24,7 @@ class SimpleExceptionLogger
 	// implementation
 
 	@Override
-	public 
+	public
 	Record<?> logSimple (
 			@NonNull String typeCode,
 			@NonNull String source,

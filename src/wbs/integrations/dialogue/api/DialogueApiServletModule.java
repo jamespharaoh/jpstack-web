@@ -494,7 +494,8 @@ class DialogueApiServletModule
 
 			reportLogic.deliveryReport (
 				messageId,
-				newMessageStatus,
+				Optional.of (
+					newMessageStatus),
 				null,
 				messageReportCode);
 

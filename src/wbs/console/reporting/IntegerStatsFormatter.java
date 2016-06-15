@@ -123,7 +123,7 @@ class IntegerStatsFormatter
 						instant));
 
 			targetParams.entrySet ().stream ()
-				
+
 				.map (paramEntry ->
 					mapEntry (
 						paramEntry.getKey (),

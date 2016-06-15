@@ -10,6 +10,8 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -183,14 +185,15 @@ class SmsArenaDlrDispatchAction
 			// get the code and create the report
 
 			SmsArenaReportCodeRec reportCode =
-				smsArenaReportCodeHelper.findByCodeOrNull (
+				smsArenaReportCodeHelper.findByCodeRequired (
 					smsArenaRouteIn.getSmsArenaConfig (),
 					dlr);
 
 			reportLogic.deliveryReport (
 				route,
 				id,
-				reportCode.getMessageStatus (),
+				Optional.of (
+					reportCode.getMessageStatus ()),
 				transaction.now (),
 				null);
 

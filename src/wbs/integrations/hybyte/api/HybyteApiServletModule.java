@@ -408,9 +408,10 @@ class HybyteApiServletModule
 					reportLogic.deliveryReport (
 						hybyteRouteOut.getRoute (),
 						req.otherId,
-						req.success
-							? MessageStatus.delivered
-							: MessageStatus.undelivered,
+						Optional.of (
+							req.success
+								? MessageStatus.delivered
+								: MessageStatus.undelivered),
 						null,
 						messageReportCode);
 
@@ -427,9 +428,10 @@ class HybyteApiServletModule
 						reportLogic.deliveryReport (
 							hybyteRouteOut.getFreeRoute ().getRoute (),
 							req.otherId,
-							req.success
-								? MessageStatus.delivered
-								: MessageStatus.undelivered,
+							Optional.of (
+								req.success
+									? MessageStatus.delivered
+									: MessageStatus.undelivered),
 							null,
 							messageReportCode);
 

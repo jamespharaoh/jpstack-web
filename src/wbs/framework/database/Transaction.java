@@ -3,7 +3,7 @@ package wbs.framework.database;
 import org.joda.time.Instant;
 
 public
-interface Transaction 
+interface Transaction
 	extends AutoCloseable {
 
 	class IdGenerator {

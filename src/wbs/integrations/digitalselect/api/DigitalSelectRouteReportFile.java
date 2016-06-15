@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -115,7 +116,8 @@ class DigitalSelectRouteReportFile
 			reportLogic.deliveryReport (
 				digitalSelectRouteOut.getRoute (),
 				msgidParam,
-				newMessageStatus,
+				Optional.of (
+					newMessageStatus),
 				null,
 				null);
 

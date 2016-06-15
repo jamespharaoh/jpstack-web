@@ -437,7 +437,8 @@ class MigApiServletModule
 
 				reportLogic.deliveryReport (
 					message,
-					newMessageStatus,
+					Optional.of (
+						newMessageStatus),
 					null,
 					reportCode);
 

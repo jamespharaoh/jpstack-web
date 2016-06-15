@@ -124,11 +124,11 @@ class QueueSubjectSorter {
 
 			effectiveUserPrivChecker =
 				userPrivCheckerBuilderProvider.get ()
-	
+
 				.userId (
 					(long) (int)
 					effectiveUser.getId ())
-	
+
 				.build ();
 
 		}
@@ -268,7 +268,7 @@ class QueueSubjectSorter {
 		updateQueueInfo (
 			queueInfo,
 			subjectInfo);
-		
+
 		// count hidden or available items
 
 		if (subjectInfo.available) {
@@ -345,7 +345,7 @@ class QueueSubjectSorter {
 
 			UserPrivChecker preferredUserPrivChecker =
 				userPrivCheckerBuilderProvider.get ()
-	
+
 				.userId (
 					(long) (int)
 					subjectInfo.preferredUser.getId ())
@@ -372,7 +372,7 @@ class QueueSubjectSorter {
 			subjectInfo.preferredByOverflowOperator = false;
 			subjectInfo.preferredByOwnOperator = false;
 
-		} 
+		}
 
 		// extend effective time due to preferred user
 
@@ -407,7 +407,7 @@ class QueueSubjectSorter {
 						ifNull (
 							queueInfo.slice.getQueueOverflowGraceTime (),
 							0l));
-					
+
 				subjectInfo.effectiveTime =
 					subjectInfo.effectiveTime.plus (
 						subjectInfo.overflowDelay);
@@ -437,7 +437,7 @@ class QueueSubjectSorter {
 		) {
 
 			subjectInfo.claimed = true;
-	
+
 			subjectInfo.claimedByUser =
 				subjectInfo.item.getQueueItemClaim ().getUser ();
 
@@ -583,7 +583,7 @@ class QueueSubjectSorter {
 			@NonNull QueueInfo queueInfo,
 			@NonNull SubjectInfo subjectInfo) {
 
-		// check 
+		// check
 
 		Instant createdTime =
 			subjectInfo.createdTime;

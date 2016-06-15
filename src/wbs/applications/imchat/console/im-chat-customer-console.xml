@@ -49,8 +49,19 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"/>
+			<section
+				name="settings"
+				label="Settings">
+
+				<object-settings-page
+					fields="settings"
+					short-name="general"/>
+
+				<context-tab-action-page
+					name="password"
+					priv-key="imChatCustomer.supervisor"/>
+
+			</section>
 
 			<context-tab-action-page
 				name="credit"

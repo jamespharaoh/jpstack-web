@@ -30,7 +30,7 @@ class ThreadManagerImplementation
 	// properties
 
 	@Getter @Setter
-	String exceptionTypeCode; 
+	String exceptionTypeCode;
 
 	// implementation
 

@@ -78,6 +78,8 @@
 		<bean class="console.ImChatCustomerCreditAction"/>
 		<bean class="console.ImChatCustomerCreditPart"/>
 		<bean class="console.ImChatCustomerSearchOrderConsoleHelper"/>
+		<bean class="console.ImChatCustomerSettingsPasswordAction"/>
+		<bean class="console.ImChatCustomerSettingsPasswordPart"/>
 		<bean class="console.ImChatQueueConsole"/>
 		<bean class="console.ImChatPendingCustomerNoteUpdateAction"/>
 		<bean class="console.ImChatPendingFormAction"/>

@@ -6,7 +6,7 @@ import wbs.framework.utils.TimezoneTimeFormatter;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserRec;
 
-public 
+public
 interface UserConsoleLogic
 	extends TimezoneTimeFormatter {
 

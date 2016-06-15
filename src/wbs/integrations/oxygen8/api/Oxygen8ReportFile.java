@@ -10,6 +10,8 @@ import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -119,30 +121,9 @@ class Oxygen8ReportFile
 		}
 
 		Oxygen8ReportCodeRec reportCode =
-			oxygen8ReportCodeHelper.findByCodeOrNull (
+			oxygen8ReportCodeHelper.findByCodeRequired (
 				routeOut.getOxygen8Config (),
 				state.status);
-
-		if (reportCode == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Unrecognised report status %s",
-					state.status));
-
-		}
-
-		/*
-		MessageReportCodeRec reportCode =
-			messageReportCodeHelper.findOrCreate (
-				state.status.hashCode (),
-				null,
-				null,
-				MessageReportCodeType.oxygen8,
-				state.reportCode.getMessageStatus ().isGoodType (),
-				! state.reportCode.getMessageStatus ().isPending (),
-				state.status);
-		*/
 
 		RouteRec route =
 			routeHelper.find (
@@ -151,7 +132,8 @@ class Oxygen8ReportFile
 		reportLogic.deliveryReport (
 			route,
 			state.reference,
-			reportCode.getMessageStatus (),
+			Optional.of (
+				reportCode.getMessageStatus ()),
 			null,
 			null);
 

@@ -11,7 +11,7 @@ import org.joda.time.ReadableInstant;
 
 import com.google.common.base.Optional;
 
-public 
+public
 interface TimezoneTimeFormatter {
 
 	// details
@@ -97,10 +97,10 @@ interface TimezoneTimeFormatter {
 	default
 	String timestampTimezoneString (
 			@NonNull DateTime dateTime) {
-	
+
 		return timeFormatter ().timestampTimezoneString (
 			dateTime);
-	
+
 	}
 
 	default

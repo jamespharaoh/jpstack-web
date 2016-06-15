@@ -118,6 +118,16 @@
 			text="%0 set value for %1 to %2"
 			admin="no"/>
 
+		<event-type
+			name="Im Chat customer forgotten password"
+			text="%0 requested a new password via the API"
+			admin="no"/>
+
+		<event-type
+			name="Im Chat customer generated password from console"
+			text="%0 requested a new password for %0 via the admin console"
+			admin="no"/>
+
 	</event-types>
 
 </model-meta>

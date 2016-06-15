@@ -442,7 +442,8 @@ class MediaburstApiServletModule
 					reportLogic.deliveryReport (
 						route,
 						requestContext.parameter ("msg_id"),
-						newMessageStatus,
+						Optional.of (
+							newMessageStatus),
 						null,
 						messageReportCode);
 

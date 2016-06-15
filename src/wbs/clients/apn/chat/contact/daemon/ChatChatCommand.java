@@ -323,7 +323,7 @@ class ChatChatCommand
 
 		ChatKeywordRec chatKeyword =
 			chatKeywordOptional.get ();
-		
+
 		if (chatKeyword.getChatBlock ()) {
 
 			return Optional.of (

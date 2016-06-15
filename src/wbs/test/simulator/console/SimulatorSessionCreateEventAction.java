@@ -355,18 +355,23 @@ System.out.println (
 					"simulatorSessionId"));
 
 		Integer messageId =
-			toInteger (requestContext.getForm ("messageId"));
+			toInteger (
+				requestContext.getForm (
+					"messageId"));
 
 		Boolean success =
-			toBoolean (requestContext.getForm ("success"));
+			toBoolean (
+				requestContext.getForm (
+					"success"));
 
 		// submit delivery report
 
 		reportLogic.deliveryReport (
 			messageId,
-			success
-				? MessageStatus.delivered
-				: MessageStatus.undelivered,
+			Optional.of (
+				success
+					? MessageStatus.delivered
+					: MessageStatus.undelivered),
 			transaction.now (),
 			null);
 
