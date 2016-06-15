@@ -1,16 +1,20 @@
 package wbs.platform.event.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.instantToDateNullSafe;
 import static wbs.framework.utils.etc.Misc.millisToInstant;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
@@ -22,6 +26,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.PermanentRecord;
 import wbs.framework.record.Record;
+import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.event.model.EventLinkRec;
@@ -32,6 +37,7 @@ import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.console.UserConsoleLogic;
 
+@Log4j
 @SingletonComponent ("eventConsoleLogic")
 public
 class EventConsoleLogicImplementation
@@ -280,6 +286,114 @@ class EventConsoleLogicImplementation
 			return "NULL";
 
 		throw new IllegalArgumentException ();
+
+	}
+
+	@Override
+	public
+	void renderEventsTable (
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Iterable<EventRec> events) {
+
+		htmlWriter.writeFormat (
+			"<table class=\"list\">");
+
+		htmlWriter.writeFormat (
+			"<tr>\n",
+			"<th>Time</th>\n",
+			"<th>Details</th>\n",
+			"</tr>");
+
+		int dayNumber = 0;
+
+		for (
+			EventRec event
+				: events
+		) {
+
+			Calendar calendar =
+				Calendar.getInstance ();
+
+			calendar.setTime (
+				instantToDateNullSafe (
+					event.getTimestamp ()));
+
+			int newDayNumber =
+				(calendar.get (Calendar.YEAR) << 9)
+					+ calendar.get (Calendar.DAY_OF_YEAR);
+
+			if (newDayNumber != dayNumber) {
+
+				htmlWriter.writeFormat (
+					"<tr class=\"sep\">\n");
+
+				htmlWriter.writeFormat (
+					"<tr style=\"font-weight: bold\">\n",
+
+					"<td colspan=\"2\">%h</td>\n",
+					userConsoleLogic.dateStringLong (
+						event.getTimestamp ()),
+
+					"</tr>\n");
+
+				dayNumber =
+					newDayNumber;
+
+			}
+
+			renderEventRow (
+				htmlWriter,
+				event);
+
+		}
+
+		htmlWriter.writeFormat (
+			"</table>\n");
+
+	}
+
+	@Override
+	public
+	void renderEventRow (
+			@NonNull FormatWriter htmlWriter,
+			@NonNull EventRec event) {
+
+		String text;
+
+		try {
+
+			text =
+				eventText (
+					event);
+
+		} catch (Exception exception) {
+
+			log.error (
+				stringFormat (
+					"Error displaying event %s",
+					event.getId ()),
+				exception);
+
+			text =
+				"(error displaying this event)";
+
+		}
+
+		htmlWriter.writeFormat (
+			"<tr>\n");
+
+		htmlWriter.writeFormat (
+			"<td>%s</td>\n",
+			Html.encodeNonBreakingWhitespace (
+				userConsoleLogic.timeString (
+					event.getTimestamp ())));
+
+		htmlWriter.writeFormat (
+			"<td>%s</td>\n",
+			text);
+
+		htmlWriter.writeFormat (
+			"</tr>\n");
 
 	}
 

@@ -9,7 +9,7 @@ import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.console.QueueSubjectSorter.SubjectInfo;
 
 @Accessors (fluent = true)
-public 
+public
 class SortedQueueSubjects {
 
 	@Getter

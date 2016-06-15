@@ -34,7 +34,7 @@ import wbs.platform.scaffold.model.SliceRec;
 
 @Accessors (fluent = true)
 @SingletonComponent ("sliceLogic")
-public 
+public
 class SliceLogicImplementation
 	implements
 		BackgroundProcess,
@@ -91,7 +91,7 @@ class SliceLogicImplementation
 
 				if (runAutomatically) {
 					runNow ();
-				}					
+				}
 
 			} catch (InterruptedException exception) {
 

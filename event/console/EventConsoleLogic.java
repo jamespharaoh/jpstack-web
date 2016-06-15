@@ -5,6 +5,7 @@ import javax.inject.Provider;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.PagePart;
 import wbs.framework.record.PermanentRecord;
+import wbs.framework.utils.etc.FormatWriter;
 import wbs.platform.event.model.EventRec;
 
 public
@@ -21,5 +22,13 @@ interface EventConsoleLogic {
 
 	String objectToHtml (
 			Object object);
+
+	void renderEventsTable (
+			FormatWriter htmlWriter,
+			Iterable<EventRec> events);
+
+	void renderEventRow (
+			FormatWriter htmlWriter,
+			EventRec event);
 
 }

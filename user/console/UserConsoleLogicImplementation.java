@@ -22,7 +22,7 @@ import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserRec;
 
 @SingletonComponent ("userConsoleLogic")
-public 
+public
 class UserConsoleLogicImplementation
 	implements
 		ConsoleUserHelper,
@@ -53,7 +53,7 @@ class UserConsoleLogicImplementation
 	}
 
 	@Override
-	public 
+	public
 	Optional<UserRec> user () {
 
 		return loggedIn ()
@@ -74,7 +74,7 @@ class UserConsoleLogicImplementation
 	}
 
 	@Override
-	public 
+	public
 	Optional<SliceRec> slice () {
 
 		return loggedIn ()
@@ -93,7 +93,7 @@ class UserConsoleLogicImplementation
 	}
 
 	@Override
-	public 
+	public
 	Optional<Long> userId () {
 
 		return Optional.fromNullable (
@@ -104,7 +104,7 @@ class UserConsoleLogicImplementation
 	}
 
 	@Override
-	public 
+	public
 	Long userIdRequired () {
 
 		return requiredValue (
@@ -115,7 +115,7 @@ class UserConsoleLogicImplementation
 	}
 
 	@Override
-	public 
+	public
 	Optional<Long> sliceId () {
 
 		return loggedIn ()
@@ -127,7 +127,7 @@ class UserConsoleLogicImplementation
 	}
 
 	@Override
-	public 
+	public
 	Long sliceIdRequired () {
 
 		return (long) (int)
@@ -180,19 +180,19 @@ class UserConsoleLogicImplementation
 	}
 
 	@Override
-	public 
+	public
 	Optional<Long> loggedInUserId () {
-		return userId (); 
+		return userId ();
 	}
 
 	@Override
-	public 
+	public
 	Long loggedInUserIdRequired () {
 		return userIdRequired ();
 	}
 
 	@Override
-	public 
+	public
 	void login (
 			@NonNull Long userId) {
 
@@ -203,7 +203,7 @@ class UserConsoleLogicImplementation
 	}
 
 	@Override
-	public 
+	public
 	void logout () {
 
 		requestContext.session (

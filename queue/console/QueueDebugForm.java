@@ -5,7 +5,7 @@ import lombok.experimental.Accessors;
 
 @Accessors (fluent = true)
 @Data
-public 
+public
 class QueueDebugForm {
 
 	Long userId;

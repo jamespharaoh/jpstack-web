@@ -42,10 +42,10 @@ class CoreLogoffAction
 	@Override
 	public
 	Responder backupResponder () {
-	
+
 		return responder (
 			"coreRedirectResponder");
-	
+
 	}
 
 	// implementation
