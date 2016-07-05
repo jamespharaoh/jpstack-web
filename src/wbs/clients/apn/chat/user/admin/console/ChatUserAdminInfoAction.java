@@ -121,7 +121,7 @@ class ChatUserAdminInfoAction
 		// load database objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		ChatRec chat =

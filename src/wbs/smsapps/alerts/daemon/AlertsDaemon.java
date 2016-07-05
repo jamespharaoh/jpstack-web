@@ -213,7 +213,7 @@ class AlertsDaemon
 				this);
 
 		AlertsSettingsRec alertsSettings =
-			alertsSettingsHelper.find (
+			alertsSettingsHelper.findOrNull (
 				alertsSettingsId);
 
 		// check it's still pending

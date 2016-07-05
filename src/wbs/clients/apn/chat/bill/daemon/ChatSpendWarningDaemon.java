@@ -130,7 +130,7 @@ class ChatSpendWarningDaemon
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (chatUserId);
+			chatUserHelper.findOrNull (chatUserId);
 
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();

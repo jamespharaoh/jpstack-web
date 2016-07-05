@@ -30,7 +30,7 @@ class AlertsSettingsNumbersPart
 	void prepare () {
 
 		alertsSettings =
-			alertsSettingsHelper.find (
+			alertsSettingsHelper.findOrNull (
 				requestContext.stuffInt (
 					"alertsSettingsId"));
 

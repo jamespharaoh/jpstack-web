@@ -78,7 +78,7 @@ class ChatUserHelpFormAction
 		// get objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatUserId"));
 

@@ -28,7 +28,7 @@ class SimulatorSessionNumberObjectHelperImplementation
 		// find existing
 
 		SimulatorSessionNumberRec existingSimulatorSessionNumber =
-			simulatorSessionNumberHelper.find (
+			simulatorSessionNumberHelper.findOrNull (
 				number.getId ());
 
 		if (existingSimulatorSessionNumber != null)

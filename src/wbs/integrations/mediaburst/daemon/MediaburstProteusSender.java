@@ -92,7 +92,7 @@ class MediaburstProteusSender
 		// lookup proteus route
 
 		proteusOutbox.proteusRouteOut =
-			mediaburstProteusRouteOutHelper.find (
+			mediaburstProteusRouteOutHelper.findOrNull (
 				proteusOutbox.route.getId ());
 
 		if (proteusOutbox.proteusRouteOut == null) {
@@ -127,7 +127,7 @@ class MediaburstProteusSender
 			// lookup mediaburst network
 
 			proteusOutbox.mediaburstNetwork =
-				mediaburstNetworkHelper.find (
+				mediaburstNetworkHelper.findOrNull (
 					network.getId ());
 
 			if (proteusOutbox.mediaburstNetwork == null) {
@@ -168,7 +168,7 @@ class MediaburstProteusSender
 			// load wap push stuff
 
 			proteusOutbox.wapPushMessage =
-				wapPushMessageHelper.find (
+				wapPushMessageHelper.findOrNull (
 					outbox.getId ());
 
 			if (proteusOutbox.wapPushMessage == null) {

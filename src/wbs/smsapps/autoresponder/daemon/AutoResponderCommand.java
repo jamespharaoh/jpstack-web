@@ -121,7 +121,7 @@ class AutoResponderCommand
 			inbox.getMessage ();
 
 		AutoResponderRec autoResponder =
-			autoResponderHelper.find (
+			autoResponderHelper.findOrNull (
 				command.getParentId ());
 
 		ServiceRec defaultService =

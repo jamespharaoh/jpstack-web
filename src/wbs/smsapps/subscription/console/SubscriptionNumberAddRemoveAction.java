@@ -99,7 +99,7 @@ class SubscriptionNumberAddRemoveAction
 				this);
 
 		SubscriptionRec subscription =
-			subscriptionHelper.find (
+			subscriptionHelper.findOrNull (
 				requestContext.stuffInt (
 					"subscriptionId"));
 

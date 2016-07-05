@@ -330,7 +330,7 @@ class ForwarderLogicImplementation
 		if (work.template.fmInId != null) {
 
 			work.template.fmIn =
-				forwarderMessageInHelper.find (
+				forwarderMessageInHelper.findOrNull (
 					work.template.fmInId);
 
 			if (work.template.fmIn == null) {
@@ -452,7 +452,7 @@ class ForwarderLogicImplementation
 							"Network ID 0 should not be specified");
 
 				part.network =
-					networkHelper.find (
+					networkHelper.findOrNull (
 						part.networkId);
 
 				if (part.network == null) {
@@ -789,7 +789,7 @@ class ForwarderLogicImplementation
 
 		WapPushMessageRec wapPushMessage =
 			url != null
-				? wapPushMessageHelper.find (
+				? wapPushMessageHelper.findOrNull (
 					message.getId ())
 				: null;
 

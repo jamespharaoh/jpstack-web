@@ -66,10 +66,18 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 
 	// data access
 
-	RecordType find (
+	Optional<RecordType> find (
 			long id);
 
-	List<RecordType> find (
+	RecordType findRequired (
+			long id);
+
+	@Deprecated
+	RecordType findOrNull (
+			long id);
+
+	@Deprecated
+	List<RecordType> findManyOrNull (
 			List<Long> ids);
 
 	Optional<RecordType> findByCode (

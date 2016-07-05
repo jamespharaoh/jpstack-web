@@ -95,7 +95,7 @@ class MigSender
 		// lookup mig route
 
 		migOutbox.migRouteOut =
-			migRouteOutHelper.find (
+			migRouteOutHelper.findOrNull (
 				migOutbox.route.getId ());
 
 		if (migOutbox.migRouteOut == null) {
@@ -124,7 +124,7 @@ class MigSender
 				"wap_push")) {
 
 			migOutbox.wapPushMessage =
-				wapPushMessageHelper.find (
+				wapPushMessageHelper.findOrNull (
 					outbox.getId ());
 
 			if (migOutbox.wapPushMessage == null) {

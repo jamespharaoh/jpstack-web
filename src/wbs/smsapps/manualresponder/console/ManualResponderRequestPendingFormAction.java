@@ -155,7 +155,7 @@ class ManualResponderRequestPendingFormAction
 				this);
 
 		ManualResponderRequestRec manualResponderRequest =
-			manualResponderRequestHelper.find (
+			manualResponderRequestHelper.findOrNull (
 				manualResponderRequestId);
 
 		// remove queue item
@@ -210,7 +210,7 @@ class ManualResponderRequestPendingFormAction
 				this);
 
 		ManualResponderRequestRec request =
-			manualResponderRequestHelper.find (
+			manualResponderRequestHelper.findOrNull (
 				manualResponderRequestId);
 
 		ManualResponderNumberRec manualResponderNumber =
@@ -220,7 +220,7 @@ class ManualResponderRequestPendingFormAction
 			manualResponderNumber.getManualResponder ();
 
 		ManualResponderTemplateRec template =
-			manualResponderTemplateHelper.find (
+			manualResponderTemplateHelper.findOrNull (
 				templateId);
 
 		// consistency checks

@@ -127,7 +127,7 @@ class BroadcastSystemsReportFile
 				data.statusCode);
 
 		RouteRec route =
-			routeHelper.find (
+			routeHelper.findOrNull (
 				data.routeId);
 
 		reportLogic.deliveryReport (

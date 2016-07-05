@@ -136,7 +136,7 @@ class ChatUserAlarmDaemon
 		// find the alarm and stuff
 
 		ChatUserAlarmRec alarm =
-			chatUserAlarmHelper.find (
+			chatUserAlarmHelper.findOrNull (
 				alarmId);
 
 		ChatUserRec user =

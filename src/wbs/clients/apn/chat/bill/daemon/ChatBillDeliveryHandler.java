@@ -159,7 +159,7 @@ class ChatBillDeliveryHandler
 				this);
 
 		DeliveryRec delivery =
-			deliveryHelper.find (
+			deliveryHelper.findOrNull (
 				deliveryId);
 
 		MessageRec message =
@@ -169,7 +169,7 @@ class ChatBillDeliveryHandler
 			message.getDeliveryType ();
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				message.getRef ());
 
 		// work out strict mode

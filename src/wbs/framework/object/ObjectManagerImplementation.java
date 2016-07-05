@@ -428,7 +428,7 @@ class ObjectManagerImplementation
 				(int) (long)
 				objectGlobalId.typeId ());
 
-		return objectHelper.find (
+		return objectHelper.findOrNull (
 			objectGlobalId.objectId ());
 
 	}
@@ -626,7 +626,7 @@ class ObjectManagerImplementation
 			) {
 
 				object =
-					rootHelper.find (0);
+					rootHelper.findOrNull (0);
 
 			} else if (
 				equal (

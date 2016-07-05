@@ -81,7 +81,7 @@ class ChatUserAdminInfoPart
 			requestContext.stuffInt ("chatUserId");
 
 		chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				chatUserId);
 	}
 

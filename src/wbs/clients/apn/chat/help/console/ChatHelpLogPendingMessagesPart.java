@@ -56,7 +56,7 @@ class ChatHelpLogPendingMessagesPart
 	void prepare () {
 
 		chatHelpLog =
-			chatHelpLogHelper.find (
+			chatHelpLogHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatHelpLogId"));
 

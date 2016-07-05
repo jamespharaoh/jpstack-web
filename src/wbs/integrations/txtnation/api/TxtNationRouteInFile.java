@@ -105,7 +105,7 @@ class TxtNationRouteInFile
 				this);
 
 		TxtNationRouteInRec txtNationRouteIn =
-			txtNationRouteInHelper.find (
+			txtNationRouteInHelper.findOrNull (
 				routeId);
 
 		if (txtNationRouteIn == null) {

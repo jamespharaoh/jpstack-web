@@ -99,7 +99,7 @@ class ForwarderCommand
 			database.currentTransaction ();
 
 		ForwarderRec forwarder =
-			forwarderHelper.find (
+			forwarderHelper.findOrNull (
 				command.getParentId ());
 
 		MessageRec message =

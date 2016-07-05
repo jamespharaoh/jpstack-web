@@ -127,12 +127,12 @@ class G8waveInFile
 		// load the stuff
 
 		RouteRec route =
-			routeHelper.find (routeId);
+			routeHelper.findOrNull (routeId);
 
 		NetworkRec network =
 			networkId == null
 				? null
-				: networkHelper.find (networkId);
+				: networkHelper.findOrNull (networkId);
 
 		// insert the message
 

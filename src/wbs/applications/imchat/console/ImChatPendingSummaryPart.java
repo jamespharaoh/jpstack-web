@@ -144,7 +144,7 @@ class ImChatPendingSummaryPart
 		// load data
 
 		message =
-			imChatMessageHelper.find (
+			imChatMessageHelper.findOrNull (
 				requestContext.stuffInt (
 					"imChatMessageId"));
 

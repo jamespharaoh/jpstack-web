@@ -99,7 +99,7 @@ class DialogueLocator
 				this);
 
 		LocatorRec locator =
-			locatorHelper.find (
+			locatorHelper.findOrNull (
 				locatorId);
 
 		DialogueLocatorRec dialogueLocator =

@@ -128,7 +128,7 @@ class ChatBroadcastSendPart
 
 			.put (
 				"chat",
-				chatHelper.find (
+				chatHelper.findOrNull (
 					requestContext.stuffInt (
 						"chatId")))
 

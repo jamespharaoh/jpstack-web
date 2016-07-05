@@ -47,7 +47,7 @@ class ImChatCustomerSettingsPasswordPart
 		// get customer
 
 		customer =
-			imChatCustomerHelper.find (
+			imChatCustomerHelper.findOrNull (
 				requestContext.stuffInt (
 					"imChatCustomerId"));
 

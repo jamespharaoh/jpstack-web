@@ -31,7 +31,7 @@ class ChatNoteNamesPart
 	void prepare () {
 
 		ChatRec chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt ("chatId"));
 
 		noteNames =

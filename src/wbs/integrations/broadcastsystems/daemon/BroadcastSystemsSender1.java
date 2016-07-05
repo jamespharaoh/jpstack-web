@@ -82,7 +82,7 @@ class BroadcastSystemsSender1
 		// lookup route out
 
 		state.bsRouteOut =
-			broadcastSystemsRouteOutHelper.find (
+			broadcastSystemsRouteOutHelper.findOrNull (
 				state.route.getId ());
 
 		if (state.bsRouteOut == null) {

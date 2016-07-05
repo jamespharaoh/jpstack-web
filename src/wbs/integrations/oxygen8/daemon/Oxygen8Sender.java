@@ -93,7 +93,7 @@ class Oxygen8Sender
 		// lookup route out
 
 		Oxygen8RouteOutRec oxygen8RouteOut =
-			oxygen8RouteOutHelper.find (
+			oxygen8RouteOutHelper.findOrNull (
 				route.getId ());
 
 		if (oxygen8RouteOut == null) {

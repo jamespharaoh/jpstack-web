@@ -69,11 +69,11 @@ class OrdererDeliveryNoticeHandler
 				this);
 
 		DeliveryRec delivery =
-			deliveryHelper.find (
+			deliveryHelper.findOrNull (
 				deliveryId);
 
 		OrdererOrderRec order =
-			ordererOrderHelper.find (
+			ordererOrderHelper.findOrNull (
 				delivery.getMessage ().getRef ());
 
 		OrdererRec orderer =

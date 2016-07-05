@@ -81,7 +81,7 @@ class SimulatorSender
 				this);
 
 		MessageRec message =
-			messageHelper.find (
+			messageHelper.findOrNull (
 				messageId);
 
 		RouteRec route =
@@ -124,7 +124,7 @@ class SimulatorSender
 		// lookup session
 
 		SimulatorSessionNumberRec simulatorSessionNumber =
-			simulatorSessionNumberHelper.find (
+			simulatorSessionNumberHelper.findOrNull (
 				message.getNumber ().getId ());
 
 		if (simulatorSessionNumber == null) {

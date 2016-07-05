@@ -67,7 +67,7 @@ class ChatUserAdminOnlineAction
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		String userType =

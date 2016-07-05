@@ -648,7 +648,7 @@ class ChatSendLogicImplementation
 			finalText,
 			Optional.of (
 				magicCommand == commandHelper.findByCodeOrNull (chat, "magic")
-					? commandHelper.find (magicRef)
+					? commandHelper.findOrNull (magicRef)
 					: magicCommand));
 
 		return Optional.of (

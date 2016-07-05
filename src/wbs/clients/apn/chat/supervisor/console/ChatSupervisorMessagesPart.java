@@ -90,7 +90,7 @@ class ChatSupervisorMessagesPart
 	void prepare () {
 
 		chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatId"));
 
@@ -105,7 +105,7 @@ class ChatSupervisorMessagesPart
 					"user_id"));
 
 		UserRec senderUser =
-			userHelper.find (
+			userHelper.findOrNull (
 				senderUserId);
 
 		chatMessages =

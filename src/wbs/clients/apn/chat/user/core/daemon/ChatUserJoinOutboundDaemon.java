@@ -136,7 +136,7 @@ class ChatUserJoinOutboundDaemon
 		// find the user
 
 		ChatUserRec user =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				chatUserId);
 
 		// check and clear the outbound message flag

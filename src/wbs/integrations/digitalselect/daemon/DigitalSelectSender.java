@@ -70,7 +70,7 @@ class DigitalSelectSender
 			database.currentTransaction ();
 
 		DigitalSelectRouteOutRec digitalSelectRouteOut =
-			digitalSelectRouteOutHelper.find (
+			digitalSelectRouteOutHelper.findOrNull (
 				outbox.getRoute ().getId ());
 
 		if (digitalSelectRouteOut == null) {

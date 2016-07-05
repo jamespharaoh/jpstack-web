@@ -1581,7 +1581,7 @@ class ForwarderApiModule
 				if (queryExMessage.serverId != null) {
 
 					queryExMessage.fmOut =
-						forwarderMessageOutHelper.find (
+						forwarderMessageOutHelper.findOrNull (
 							queryExMessage.serverId);
 
 				}

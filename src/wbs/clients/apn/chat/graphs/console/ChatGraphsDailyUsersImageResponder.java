@@ -81,7 +81,7 @@ class ChatGraphsDailyUsersImageResponder
 			maxTime);
 
 		ChatRec chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatId"));
 

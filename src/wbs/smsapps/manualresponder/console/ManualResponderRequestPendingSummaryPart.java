@@ -184,7 +184,7 @@ class ManualResponderRequestPendingSummaryPart
 			"load basics");
 
 		manualResponderRequest =
-			manualResponderRequestHelper.find (
+			manualResponderRequestHelper.findOrNull (
 				requestContext.stuffInt (
 					"manualResponderRequestId"));
 

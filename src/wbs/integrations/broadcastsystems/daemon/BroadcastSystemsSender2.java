@@ -85,7 +85,7 @@ class BroadcastSystemsSender2
 			outbox.getRoute ();
 
 		BroadcastSystemsRouteOutRec broadcastSystemsRouteOut =
-			broadcastSystemsRouteOutHelper.find (
+			broadcastSystemsRouteOutHelper.findOrNull (
 				route.getId ());
 
 		if (broadcastSystemsRouteOut == null) {

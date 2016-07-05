@@ -166,11 +166,11 @@ class ChatAffiliateCreateOldAction
 				this);
 
 		ChatRec chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt ("chatId"));
 
 		ChatSchemeRec chatScheme =
-			chatSchemeHelper.find (
+			chatSchemeHelper.findOrNull (
 				chatSchemeId);
 
 		if (chatScheme.getChat () != chat)

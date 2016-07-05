@@ -84,7 +84,7 @@ class ChatCreditDaemon
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				chatUserId);
 
 		chatCreditLogic.userBill (

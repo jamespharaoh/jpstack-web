@@ -69,7 +69,7 @@ class BroadcastSendAction
 				this);
 
 		BroadcastRec broadcast =
-			broadcastHelper.find (
+			broadcastHelper.findOrNull (
 				requestContext.stuffInt ("broadcastId"));
 
 		BroadcastConfigRec broadcastConfig =

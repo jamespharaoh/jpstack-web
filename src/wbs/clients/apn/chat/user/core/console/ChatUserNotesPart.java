@@ -52,7 +52,7 @@ class ChatUserNotesPart
 	void prepare () {
 
 		chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		chatUserNotes =

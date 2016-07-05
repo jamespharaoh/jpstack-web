@@ -119,7 +119,7 @@ class ChatUserPendingFormAction
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		return nextResponder (
@@ -182,7 +182,7 @@ class ChatUserPendingFormAction
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		Responder responder =
@@ -207,7 +207,7 @@ class ChatUserPendingFormAction
 		// get database objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatUserId"));
 
@@ -295,7 +295,7 @@ class ChatUserPendingFormAction
 		// get database objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		// confirm there is something to approve
@@ -389,7 +389,7 @@ class ChatUserPendingFormAction
 		// get database objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		// confirm there is something to approve
@@ -533,7 +533,7 @@ class ChatUserPendingFormAction
 		// get database objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		if (chatUser.getNewChatUserName() == null) {
@@ -625,7 +625,7 @@ class ChatUserPendingFormAction
 		// get database objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		// confirm there is something to approve
@@ -848,7 +848,7 @@ class ChatUserPendingFormAction
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatUserId"));
 

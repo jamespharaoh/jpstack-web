@@ -91,7 +91,7 @@ class ImChatMessageTemplateSetGetAction
 		// lookup message template set
 
 		ImChatRec imChat =
-			imChatHelper.find (
+			imChatHelper.findOrNull (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));

@@ -405,7 +405,7 @@ class ChatChatCommand
 	InboxAttemptRec handle () {
 
 		chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				command.getParentId ());
 
 		message =
@@ -421,7 +421,7 @@ class ChatChatCommand
 				fromChatUser);
 
 		toChatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				commandRef.get ());
 
 		// treat as join if the user has no affiliate

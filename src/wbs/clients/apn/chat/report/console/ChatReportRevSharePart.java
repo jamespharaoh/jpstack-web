@@ -174,7 +174,7 @@ class ChatReportRevSharePart
 			"search");
 
 		chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt ("chatId"));
 
 		totalReport =

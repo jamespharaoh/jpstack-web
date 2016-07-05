@@ -256,7 +256,7 @@ class ForwarderApiLogicImplementation
 		// find the message
 
 		ForwarderMessageInRec forwarderMessageIn =
-			forwarderMessageInHelper.find (
+			forwarderMessageInHelper.findOrNull (
 				forwarderMessageInId);
 
 		if (forwarderMessageIn.getForwarder () != forwarder)

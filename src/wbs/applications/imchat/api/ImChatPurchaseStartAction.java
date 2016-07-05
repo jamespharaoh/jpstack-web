@@ -168,7 +168,7 @@ class ImChatPurchaseStartAction
 				this);
 
 		ImChatRec imChat =
-			imChatHelper.find (
+			imChatHelper.findOrNull (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));
@@ -423,7 +423,7 @@ class ImChatPurchaseStartAction
 		// update purchase
 
 		ImChatPurchaseRec purchase =
-			imChatPurchaseHelper.find (
+			imChatPurchaseHelper.findOrNull (
 				purchaseId);
 
 		purchase
@@ -436,7 +436,7 @@ class ImChatPurchaseStartAction
 		// process customer
 
 		ImChatCustomerRec customer =
-			imChatCustomerHelper.find (
+			imChatCustomerHelper.findOrNull (
 				customerId);
 
 		customerData =

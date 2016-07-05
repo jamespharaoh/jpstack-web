@@ -101,7 +101,7 @@ class ChatHelpLogPendingFormAction
 		// load objects from database
 
 		ChatHelpLogRec helpRequest =
-			chatHelpLogHelper.find (
+			chatHelpLogHelper.findOrNull (
 				requestContext.stuffInt ("chatHelpLogId"));
 
 		ChatUserRec chatUser =

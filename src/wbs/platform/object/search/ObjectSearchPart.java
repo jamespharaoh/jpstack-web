@@ -140,7 +140,7 @@ class ObjectSearchPart
 			) {
 
 				Record<?> parent =
-					parentHelper.find (
+					parentHelper.findOrNull (
 						requestContext.stuffInt (
 							parentHelper.idKey ()));
 

@@ -148,7 +148,7 @@ class HybyteApiServletModule
 				// lookup route
 
 				HybyteRouteRec hybyteRoute =
-					hybyteRouteHelper.find (
+					hybyteRouteHelper.findOrNull (
 						routeId);
 
 				log.debug (
@@ -355,7 +355,7 @@ class HybyteApiServletModule
 			// get route
 
 			HybyteRouteOutRec hybyteRouteOut =
-				hybyteRouteOutHelper.find (
+				hybyteRouteOutHelper.findOrNull (
 					requestContext.requestIntRequired (
 						"routeId"));
 

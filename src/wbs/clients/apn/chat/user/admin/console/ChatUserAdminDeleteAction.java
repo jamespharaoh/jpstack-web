@@ -65,7 +65,7 @@ class ChatUserAdminDeleteAction
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		if (chatUser.getType () != ChatUserType.user) {

@@ -26,7 +26,7 @@ class BroadcastNumbersPart
 	void prepare () {
 
 		broadcast =
-			broadcastHelper.find (
+			broadcastHelper.findOrNull (
 				requestContext.stuffInt (
 					"broadcastId"));
 

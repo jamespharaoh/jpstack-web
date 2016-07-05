@@ -107,7 +107,7 @@ class ChatUserAdminBarringAction
 		// lookup database stuff
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				chatUserId);
 
 		// do the work

@@ -77,7 +77,7 @@ class SubscriptionSendControlAction
 				this);
 
 		SubscriptionSendRec subscriptionSend =
-			subscriptionSendHelper.find (
+			subscriptionSendHelper.findOrNull (
 				requestContext.stuffInt (
 					"subscriptionSendId"));
 

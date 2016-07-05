@@ -78,7 +78,7 @@ class TicketPendingFormAction
 		// find message
 
 		TicketRec ticket =
-			ticketHelper.find (
+			ticketHelper.findOrNull (
 				requestContext.stuffInt (
 					"ticketId"));
 
@@ -97,7 +97,7 @@ class TicketPendingFormAction
 		// action to be performed
 
 		template =
-			ticketTemplateHelper.find (
+			ticketTemplateHelper.findOrNull (
 				toInteger (templateString));
 
 		if (template == null)

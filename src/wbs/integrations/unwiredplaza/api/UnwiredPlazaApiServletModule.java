@@ -170,7 +170,7 @@ class UnwiredPlazaApiServletModule
 				statusResults.get (status);
 
 			RouteRec route =
-				routeHelper.find (
+				routeHelper.findOrNull (
 					routeId);
 
 			if (route == null) {

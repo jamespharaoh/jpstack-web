@@ -154,7 +154,7 @@ class ChatStatsDaemon
 				this);
 
 		ChatRec chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				chatId);
 
 		long numUsers =

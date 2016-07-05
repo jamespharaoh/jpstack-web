@@ -98,7 +98,7 @@ class Oxygen8ReportFile
 				this);
 
 		Oxygen8RouteOutRec routeOut =
-			oxygen8RouteOutCodeHelper.find (
+			oxygen8RouteOutCodeHelper.findOrNull (
 				state.routeId);
 
 		if (routeOut == null) {
@@ -126,7 +126,7 @@ class Oxygen8ReportFile
 				state.status);
 
 		RouteRec route =
-			routeHelper.find (
+			routeHelper.findOrNull (
 				state.routeId);
 
 		reportLogic.deliveryReport (

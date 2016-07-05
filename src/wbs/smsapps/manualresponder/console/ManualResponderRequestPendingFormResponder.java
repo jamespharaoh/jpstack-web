@@ -115,7 +115,7 @@ class ManualResponderRequestPendingFormResponder
 		super.prepare ();
 
 		request =
-			manualResponderRequestHelper.find (
+			manualResponderRequestHelper.findOrNull (
 				requestContext.stuffInt (
 					"manualResponderRequestId"));
 

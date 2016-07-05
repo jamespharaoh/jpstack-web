@@ -103,7 +103,7 @@ class ChatUserAdminDobAction
 		// lookup database stuff
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				chatUserId);
 
 		// update chat user

@@ -199,7 +199,7 @@ class MigApiServletModule
 				// String retryCount = requestContext.getParameter ("RETRYCOUNT");
 
 				MigRouteInRec migRouteIn =
-					migRouteInHelper.find (
+					migRouteInHelper.findOrNull (
 						routeId);
 
 				if (migRouteIn == null) {
@@ -224,7 +224,7 @@ class MigApiServletModule
 				}
 
 				RouteRec route =
-					routeHelper.find (routeId);
+					routeHelper.findOrNull (routeId);
 
 				// insert the message
 
@@ -364,7 +364,7 @@ class MigApiServletModule
 				// lookup the message
 
 				RouteRec route =
-					routeHelper.find (
+					routeHelper.findOrNull (
 						routeId);
 
 				MessageRec message = null;
@@ -372,7 +372,7 @@ class MigApiServletModule
 				if (messageID != null) {
 
 					message =
-						messageHelper.find (
+						messageHelper.findOrNull (
 							Integer.parseInt (messageID));
 
 				} else if (guid != null) {
@@ -452,7 +452,7 @@ class MigApiServletModule
 						&& message.getCharge () > 0) {
 
 					ChatUserNumberReportRec numberReportRec =
-						chatUserNumberReportHelper.find (
+						chatUserNumberReportHelper.findOrNull (
 							message.getNumber ().getId ());
 
 					// undelivered

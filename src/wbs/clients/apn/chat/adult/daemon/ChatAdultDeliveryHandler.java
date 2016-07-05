@@ -70,7 +70,7 @@ class ChatAdultDeliveryHandler
 				this);
 
 		DeliveryRec delivery =
-			deliveryHelper.find (
+			deliveryHelper.findOrNull (
 				deliveryId);
 
 		MessageRec message =
@@ -80,7 +80,7 @@ class ChatAdultDeliveryHandler
 			message.getDeliveryType ();
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				delivery.getMessage ().getRef ());
 
 		// work out if it is a join

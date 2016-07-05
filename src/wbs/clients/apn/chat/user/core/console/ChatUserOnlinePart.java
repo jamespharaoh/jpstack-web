@@ -107,7 +107,7 @@ class ChatUserOnlinePart
 			database.currentTransaction ();
 
 		ChatRec chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt ("chatId"));
 
 		users =

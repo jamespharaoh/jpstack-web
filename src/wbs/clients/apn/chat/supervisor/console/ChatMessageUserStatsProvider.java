@@ -58,7 +58,7 @@ class ChatMessageUserStatsProvider
 		if (conditions.containsKey ("chatId")) {
 
 			ChatRec chat =
-				chatHelper.find (
+				chatHelper.findOrNull (
 					(Integer) conditions.get ("chatId"));
 
 			if (chat == null)

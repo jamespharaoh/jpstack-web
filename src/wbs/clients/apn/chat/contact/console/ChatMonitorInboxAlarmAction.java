@@ -95,7 +95,7 @@ class ChatMonitorInboxAlarmAction
 				this);
 
 		ChatMonitorInboxRec chatMonitorInbox =
-			chatMonitorInboxHelper.find (
+			chatMonitorInboxHelper.findOrNull (
 				requestContext .stuffInt (
 					"chatMonitorInboxId"));
 

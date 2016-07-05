@@ -81,7 +81,7 @@ class DialogueMmsSender
 			outbox;
 
 		dialogueMmsOutbox.dialogueMmsRoute =
-			dialogueMmsRouteHelper.find (
+			dialogueMmsRouteHelper.findOrNull (
 				outbox.getRoute ().getId ());
 
 		if (dialogueMmsOutbox.dialogueMmsRoute == null) {

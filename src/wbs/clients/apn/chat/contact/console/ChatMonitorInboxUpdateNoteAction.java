@@ -81,7 +81,7 @@ class ChatMonitorInboxUpdateNoteAction
 				this);
 
 		ChatMonitorInboxRec chatMonitorInbox =
-			chatMonitorInboxHelper.find (
+			chatMonitorInboxHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatMonitorInboxId"));
 
@@ -89,7 +89,7 @@ class ChatMonitorInboxUpdateNoteAction
 			chatMonitorInbox.getMonitorChatUser ();
 
 		ChatContactNoteRec note =
-			chatContactNoteHelper.find (
+			chatContactNoteHelper.findOrNull (
 				Integer.parseInt (id));
 
 		if (

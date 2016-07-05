@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.joinWithFullStop;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.optionalOrNull;
@@ -729,7 +730,46 @@ class ObjectHelperBuilder {
 
 			@Override
 			public
-			Record<?> find (
+			Optional<Record<?>> find (
+					long id) {
+
+				return Optional.fromNullable (
+					objectHelperProvider.find (
+						id));
+
+			}
+
+			@Override
+			public
+			Record<?> findRequired (
+					long id) {
+
+				Record<?> record =
+					objectHelperProvider.find (
+						id);
+
+				if (
+					isNull (
+						record)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"%s with id %s not found",
+							capitalise (
+								camelToSpaces (
+									model ().objectName ())),
+							id));
+
+				}
+
+				return record;
+
+			}
+
+			@Override
+			public
+			Record<?> findOrNull (
 					long id) {
 
 				return objectHelperProvider
@@ -739,7 +779,7 @@ class ObjectHelperBuilder {
 
 			@Override
 			public
-			List find (
+			List findManyOrNull (
 					List ids) {
 
 				return objectHelperProvider
@@ -1166,7 +1206,7 @@ class ObjectHelperBuilder {
 				) {
 
 					objectsBuilder.add (
-						find (
+						findOrNull (
 							objectId));
 
 				}
@@ -1295,7 +1335,7 @@ class ObjectHelperBuilder {
 
 				} else if (model.isRooted ()) {
 
-					return rootObjectHelper.find (0);
+					return rootObjectHelper.findOrNull (0);
 
 				} else if (model.canGetParent ()) {
 

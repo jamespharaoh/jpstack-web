@@ -44,10 +44,10 @@ class Oxygen8RouteSummaryAdditionalPart
 			requestContext.stuffInt ("routeId");
 
 		route =
-			routeHelper.find (routeId);
+			routeHelper.findOrNull (routeId);
 
 		oxygen8RouteOut =
-			oxygen8RouteOutHelper.find (
+			oxygen8RouteOutHelper.findOrNull (
 				routeId);
 
 	}

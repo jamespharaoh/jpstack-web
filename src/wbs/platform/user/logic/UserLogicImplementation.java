@@ -116,7 +116,7 @@ class UserLogicImplementation
 			@NonNull UserRec user) {
 
 		UserOnlineRec userOnline =
-			userOnlineHelper.find (
+			userOnlineHelper.findOrNull (
 				user.getId ());
 
 		if (userOnline == null)

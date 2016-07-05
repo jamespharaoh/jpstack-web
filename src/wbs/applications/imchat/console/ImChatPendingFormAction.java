@@ -79,7 +79,7 @@ class ImChatPendingFormAction
 		// find message
 
 		ImChatMessageRec customerMessage =
-			imChatMessageHelper.find (
+			imChatMessageHelper.findOrNull (
 				requestContext.stuffInt (
 					"imChatMessageId"));
 
@@ -174,7 +174,7 @@ class ImChatPendingFormAction
 			ignore = false;
 
 			template =
-				imChatTemplateHelper.find (
+				imChatTemplateHelper.findOrNull (
 					toInteger (
 						templateString));
 

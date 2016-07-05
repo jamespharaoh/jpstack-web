@@ -73,7 +73,7 @@ class ImChatCustomerSettingsPasswordAction
 		// find customer
 
 		ImChatCustomerRec customer =
-			imChatCustomerHelper.find (
+			imChatCustomerHelper.findOrNull (
 				requestContext.stuffInt (
 					"imChatCustomerId"));
 

@@ -473,7 +473,7 @@ class ChatMiscLogicImplementation
 							this);
 
 					ChatUserRec chatUser =
-						chatUserHelper.find (
+						chatUserHelper.findOrNull (
 							chatUserId);
 
 					if (longLat == null) {
@@ -508,7 +508,7 @@ class ChatMiscLogicImplementation
 							transaction.now ());
 
 					LocatorRec locator =
-						locatorHelper.find (
+						locatorHelper.findOrNull (
 							locatorId);
 
 					eventLogic.createEvent (

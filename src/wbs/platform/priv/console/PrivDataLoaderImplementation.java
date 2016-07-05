@@ -498,7 +498,7 @@ class PrivDataLoaderImplementation
 			// get user
 
 			UserRec user =
-				userHelper.find (userId);
+				userHelper.findOrNull (userId);
 
 			// do user-specific privs
 

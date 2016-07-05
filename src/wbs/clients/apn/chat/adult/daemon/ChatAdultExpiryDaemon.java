@@ -120,7 +120,7 @@ class ChatAdultExpiryDaemon
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				chatUserId);
 
 		ChatSchemeRec chatScheme =

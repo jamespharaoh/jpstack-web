@@ -72,7 +72,7 @@ class ChatMonitorInboxFormResponder
 	void prepare () {
 
 		chatMonitorInbox =
-			chatMonitorInboxHelper.find (
+			chatMonitorInboxHelper.findOrNull (
 				requestContext.stuffInt ("chatMonitorInboxId"));
 
 		if (chatMonitorInbox == null) {

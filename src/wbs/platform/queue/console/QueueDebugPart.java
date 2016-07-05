@@ -102,7 +102,7 @@ class QueueDebugPart
 			queueSubjectSorterProvider.get ()
 
 			.effectiveUser (
-				userHelper.find (
+				userHelper.findOrNull (
 					form.userId ()))
 
 			.sort ();
@@ -174,7 +174,7 @@ class QueueDebugPart
 					queueInfo.queue ());
 
 			ObjectTypeRec queueParentType =
-				objectTypeHelper.find (
+				objectTypeHelper.findOrNull (
 					objectManager.getObjectTypeId (
 						queueParent));
 

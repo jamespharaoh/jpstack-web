@@ -55,7 +55,7 @@ class ChatAffiliateCreateOldPart
 	void prepare () {
 
 		ChatRec chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt ("chatId"));
 
 		chatSchemes =

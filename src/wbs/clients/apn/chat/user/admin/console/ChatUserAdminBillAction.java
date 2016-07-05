@@ -81,7 +81,7 @@ class ChatUserAdminBillAction
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		// lock prevents race condition between limit check and update

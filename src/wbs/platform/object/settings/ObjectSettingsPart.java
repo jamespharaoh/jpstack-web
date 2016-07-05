@@ -137,7 +137,7 @@ class ObjectSettingsPart<
 		if (parentHelper.isRoot ()) {
 
 			parent =
-				parentHelper.find (
+				parentHelper.findOrNull (
 					0);
 
 			return;
@@ -153,7 +153,7 @@ class ObjectSettingsPart<
 			// use specific parent
 
 			parent =
-				parentHelper.find (
+				parentHelper.findOrNull (
 					parentId);
 
 			return;

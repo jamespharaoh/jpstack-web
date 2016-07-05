@@ -17,6 +17,7 @@ import lombok.Cleanup;
 import com.google.common.base.Optional;
 
 import wbs.api.mvc.ApiAction;
+import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -52,6 +53,9 @@ class Oxygen8InboundSmsAction
 
 	@Inject
 	InboxLogic inboxLogic;
+
+	@Inject
+	ConsoleObjectManager objectManager;
 
 	@Inject
 	Oxygen8InboundLogObjectHelper oxygen8InboundLogHelper;
@@ -216,7 +220,7 @@ class Oxygen8InboundSmsAction
 			oxygen8InboundLogHelper.createInstance ()
 
 			.setRoute (
-				routeHelper.find (
+				routeHelper.findRequired (
 					requestContext.requestIntRequired (
 						"routeId")))
 
@@ -313,15 +317,12 @@ class Oxygen8InboundSmsAction
 				this);
 
 		RouteRec route =
-			routeHelper.find (
+			routeHelper.findRequired (
 				routeId);
 
 		Oxygen8RouteInRec oxygen8RouteIn =
-			oxygen8RouteInHelper.find (
+			oxygen8RouteInHelper.findRequired (
 				route.getId ());
-
-		if (oxygen8RouteIn == null)
-			throw new RuntimeException ();
 
 		Oxygen8ConfigRec oxygen8Config =
 			oxygen8RouteIn.getOxygen8Config ();

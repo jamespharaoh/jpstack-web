@@ -60,7 +60,7 @@ class ServiceObjectHelperImplementation
 		// create new service
 
 		ObjectTypeRec parentType =
-			objectTypeHelper.find (
+			objectTypeHelper.findOrNull (
 				objectManager.getObjectTypeId (
 					parent));
 

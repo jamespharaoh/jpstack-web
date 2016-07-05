@@ -170,13 +170,13 @@ class SmsArenaDlrDispatchAction
 			// find the route
 
 			RouteRec route =
-				routeHelper.find (
+				routeHelper.findOrNull (
 					Integer.parseInt (
 						requestContext.requestStringRequired (
 							"routeId")));
 
 			SmsArenaRouteInRec smsArenaRouteIn =
-				smsArenaRouteInHelper.find (
+				smsArenaRouteInHelper.findOrNull (
 					route.getId ());
 
 			if (smsArenaRouteIn == null)
@@ -227,7 +227,7 @@ class SmsArenaDlrDispatchAction
 					this);
 
 			RouteRec route =
-				routeHelper.find (
+				routeHelper.findOrNull (
 					Integer.parseInt (
 						requestContext.requestStringRequired (
 							"routeId")));

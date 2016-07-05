@@ -44,7 +44,7 @@ class ChatMessagePendingFormResponder
 	void prepare () {
 
 		chatMessage =
-			chatMessageHelper.find (
+			chatMessageHelper.findOrNull (
 				requestContext.stuffInt ("chatMessageId"));
 
 		chatHelpTemplates =

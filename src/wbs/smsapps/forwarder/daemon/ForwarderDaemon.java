@@ -406,7 +406,7 @@ class ForwarderDaemon
 					this);
 
 			ForwarderMessageInRec forwarderMessageIn =
-				forwarderMessageInHelper.find (
+				forwarderMessageInHelper.findOrNull (
 					forwarderMessageInId);
 
 			// check if we should cancel it
@@ -428,7 +428,7 @@ class ForwarderDaemon
 			) {
 
 				forwarderMessageIn =
-					forwarderMessageInHelper.find (
+					forwarderMessageInHelper.findOrNull (
 						forwarderMessageIn.getId ());
 
 				forwarderMessageIn
@@ -474,7 +474,7 @@ class ForwarderDaemon
 				database.currentTransaction ();
 
 			ForwarderMessageInRec forwarderMessageIn =
-				forwarderMessageInHelper.find (
+				forwarderMessageInHelper.findOrNull (
 					forwarderMessageInId);
 
 			if (! forwarderMessageIn.getPending ())

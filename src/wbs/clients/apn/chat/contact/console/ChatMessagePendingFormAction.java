@@ -127,7 +127,7 @@ class ChatMessagePendingFormAction
 		// get database objects
 
 		ChatMessageRec chatMessage =
-			chatMessageHelper.find (
+			chatMessageHelper.findOrNull (
 				requestContext.stuffInt ("chatMessageId"));
 
 		ChatRec chat =
@@ -329,7 +329,7 @@ class ChatMessagePendingFormAction
 		// get database objects
 
 		ChatMessageRec chatMessage =
-			chatMessageHelper.find (
+			chatMessageHelper.findOrNull (
 				requestContext.stuffInt ("chatMessageId"));
 
 		// confirm message status

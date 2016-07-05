@@ -59,7 +59,7 @@ class ChatSupervisorNotesPart
 			parameters.get ("statsPeriod");
 
 		chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt ("chatId"));
 
 		// get notes

@@ -73,7 +73,7 @@ class ChatSupervisorConversationPart
 	void prepare () {
 
 		chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatId"));
 
@@ -88,11 +88,11 @@ class ChatSupervisorConversationPart
 					"chatUserId2"));
 
 		userChatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				chatUserId1);
 
 		monitorChatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				chatUserId2);
 
 		if (

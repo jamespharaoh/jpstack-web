@@ -322,7 +322,7 @@ class ConsoleHelperBuilder {
 			}
 
 			Record<?> object =
-				objectHelper.find (id);
+				objectHelper.findOrNull (id);
 
 			return object;
 
@@ -339,7 +339,7 @@ class ConsoleHelperBuilder {
 		Record<?> findEntity (
 				int id) {
 
-			return objectHelper.find (id);
+			return objectHelper.findOrNull (id);
 
 		}
 

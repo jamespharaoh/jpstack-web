@@ -54,7 +54,7 @@ class MigLogicImplementation
 				destAddress);
 
 		MigNetworkRec currentNetwork =
-			migNetworkHelper.find (
+			migNetworkHelper.findOrNull (
 				number.getNetwork ().getId ());
 
 		if (currentNetwork != null

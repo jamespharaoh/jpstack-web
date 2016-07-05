@@ -77,7 +77,7 @@ class ChatGraphsJoinersImageResponder
 			contextStuff.get ("chatId");
 
 		ChatRec chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				chatId);
 
 		Map<String,Object> searchMap =
@@ -123,7 +123,7 @@ class ChatGraphsJoinersImageResponder
 				: chatUserIds) {
 
 			ChatUserRec chatUser =
-				chatUserHelper.find (
+				chatUserHelper.findOrNull (
 					chatUserId);
 
 			int index =

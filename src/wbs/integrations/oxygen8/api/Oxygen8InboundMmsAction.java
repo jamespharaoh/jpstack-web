@@ -352,7 +352,7 @@ class Oxygen8InboundMmsAction
 		// lookup route
 
 		RouteRec route =
-			routeHelper.find (
+			routeHelper.findOrNull (
 				routeId);
 
 		if (route == null)
@@ -361,7 +361,7 @@ class Oxygen8InboundMmsAction
 		// lookup oxygen8 route
 
 		Oxygen8RouteInRec oxygen8RouteIn =
-			oxygen8RouteInHelper.find (
+			oxygen8RouteInHelper.findOrNull (
 				route.getId ());
 
 		if (oxygen8RouteIn == null)
@@ -403,7 +403,7 @@ class Oxygen8InboundMmsAction
 		*/
 
 		NetworkRec network =
-			networkHelper.find (0);
+			networkHelper.findOrNull (0);
 
 		// insert message
 

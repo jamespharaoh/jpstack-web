@@ -73,7 +73,7 @@ class TicketPendingHistoryPart
 		// load data
 
 		ticket =
-			ticketHelper.find (
+			ticketHelper.findOrNull (
 				requestContext.stuffInt ("ticketId"));
 	}
 

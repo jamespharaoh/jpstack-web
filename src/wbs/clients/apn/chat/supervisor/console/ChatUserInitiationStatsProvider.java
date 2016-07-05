@@ -58,7 +58,7 @@ class ChatUserInitiationStatsProvider
 		// retrieve messages
 
 		ChatRec chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				(Integer) conditions.get ("chatId"));
 
 		List<ChatUserInitiationLogRec> logs =

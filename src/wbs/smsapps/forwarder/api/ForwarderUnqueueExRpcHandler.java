@@ -175,7 +175,7 @@ class ForwarderUnqueueExRpcHandler
 			// lookup the message
 
 			unqueueExMessage.forwarderMessageIn =
-				forwarderMessageInHelper.find (
+				forwarderMessageInHelper.findOrNull (
 					unqueueExMessage.serverId);
 
 			if (unqueueExMessage.forwarderMessageIn != null) {
@@ -202,7 +202,7 @@ class ForwarderUnqueueExRpcHandler
 			// lookup the report
 
 			unqueueExReport.fmOutReport =
-				forwarderMessageOutReportHelper.find (
+				forwarderMessageOutReportHelper.findOrNull (
 					unqueueExReport.reportId);
 
 			if (unqueueExReport.fmOutReport != null) {

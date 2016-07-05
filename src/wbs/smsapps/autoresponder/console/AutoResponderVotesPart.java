@@ -81,7 +81,7 @@ class AutoResponderVotesPart
 		// lookup objects
 
 		AutoResponderRec autoResponder =
-			autoResponderHelper.find (
+			autoResponderHelper.findOrNull (
 				requestContext.stuffInt ("autoResponderId"));
 
 		ServiceRec autoResponderService =

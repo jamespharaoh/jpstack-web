@@ -39,7 +39,7 @@ class ChatInfoSiteViewAction
 				this);
 
 		ChatInfoSiteRec infoSite =
-			chatInfoSiteHelper.find (
+			chatInfoSiteHelper.findOrNull (
 				requestContext.requestIntRequired (
 					"chatInfoSiteId"));
 

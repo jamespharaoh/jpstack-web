@@ -62,7 +62,7 @@ class ChatNoteNamesAction
 				this);
 
 		ChatRec chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt ("chatId"));
 
 		List<ChatNoteNameRec> chatNoteNames =

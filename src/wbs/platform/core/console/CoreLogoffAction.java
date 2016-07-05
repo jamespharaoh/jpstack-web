@@ -67,7 +67,7 @@ class CoreLogoffAction
 				this);
 
 		UserRec user =
-			userHelper.find (
+			userHelper.findOrNull (
 				userId);
 
 		userLogic.userLogoff (

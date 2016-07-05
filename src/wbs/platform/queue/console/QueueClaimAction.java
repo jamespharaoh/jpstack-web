@@ -63,7 +63,7 @@ class QueueClaimAction
 				this);
 
 		QueueRec queue =
-			queueHelper.find (
+			queueHelper.findOrNull (
 				queueId);
 
 		QueueItemRec queueItem =

@@ -32,7 +32,7 @@ class AlertsSubjectsPart
 	void prepare () {
 
 		AlertsSettingsRec alertsSettings =
-			alertsSettingsHelper.find (
+			alertsSettingsHelper.findOrNull (
 				requestContext.stuffInt ("alertsSettingsId"));
 
 		alertsSubjects =

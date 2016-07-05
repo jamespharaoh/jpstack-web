@@ -56,7 +56,7 @@ class ChatStatisticsPart
 	void prepare () {
 
 		chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt ("chatId"));
 
 		List<ChatAffiliateUsersSummaryRec> chatAffiliateUsersSummaries =
@@ -112,7 +112,7 @@ class ChatStatisticsPart
 		}
 
 		users =
-			chatUsersSummaryHelper.find (
+			chatUsersSummaryHelper.findOrNull (
 				chat.getId ());
 
 	}

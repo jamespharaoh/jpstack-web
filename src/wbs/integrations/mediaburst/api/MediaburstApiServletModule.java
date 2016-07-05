@@ -248,12 +248,12 @@ class MediaburstApiServletModule
 			// load the stuff
 
 			RouteRec route =
-				routeHelper.find (routeId);
+				routeHelper.findOrNull (routeId);
 
 			NetworkRec network =
 				networkId == null
 					? null
-					: networkHelper.find (networkId);
+					: networkHelper.findOrNull (networkId);
 
 			// check for concatenation
 
@@ -375,7 +375,7 @@ class MediaburstApiServletModule
 					this);
 
 			RouteRec route =
-				routeHelper.find (
+				routeHelper.findOrNull (
 					requestContext.requestIntRequired (
 						"routeId"));
 

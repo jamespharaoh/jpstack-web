@@ -64,7 +64,7 @@ class QueueSupervisorItemsPart
 					"userId"));
 
 		user =
-			userHelper.find (
+			userHelper.findOrNull (
 				userId);
 
 		queueItems =

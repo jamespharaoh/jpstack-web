@@ -434,7 +434,7 @@ class ChatJoiner {
 
 			chatUserLogic.setAffiliate (
 				chatUser,
-				chatAffiliateHelper.find (
+				chatAffiliateHelper.findOrNull (
 					chatAffiliateId),
 				Optional.<MessageRec>fromNullable (
 					message));
@@ -447,7 +447,7 @@ class ChatJoiner {
 
 			chatUserLogic.setScheme (
 				chatUser,
-				chatSchemeHelper.find (
+				chatSchemeHelper.findOrNull (
 					chatSchemeId));
 
 		}
@@ -1028,7 +1028,7 @@ class ChatJoiner {
 				: null;
 
 		chat =
-			chatHelper.find (chatId);
+			chatHelper.findOrNull (chatId);
 
 		// create chat user
 

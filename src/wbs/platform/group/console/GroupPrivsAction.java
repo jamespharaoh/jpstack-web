@@ -80,7 +80,7 @@ class GroupPrivsAction
 				this);
 
 		GroupRec group =
-			groupHelper.find (
+			groupHelper.findOrNull (
 				requestContext.stuffInt ("groupId"));
 
 		Matcher matcher =
@@ -96,7 +96,7 @@ class GroupPrivsAction
 				matcher.group (2).equals ("1");
 
 			PrivRec priv =
-				privHelper.find (privId);
+				privHelper.findOrNull (privId);
 
 			boolean oldCan =
 				group.getPrivs ().contains (priv);

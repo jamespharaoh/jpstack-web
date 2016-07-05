@@ -65,7 +65,7 @@ class PhotoGrabberDelivery
 				this);
 
 		DeliveryRec delivery =
-			deliveryHelper.find (
+			deliveryHelper.findOrNull (
 				deliveryId);
 
 		MessageRec message =

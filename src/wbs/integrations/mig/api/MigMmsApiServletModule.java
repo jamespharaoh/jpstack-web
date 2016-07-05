@@ -408,7 +408,7 @@ logger.error ("Got item");
 					sender);
 
 			RouteRec route =
-				routeHelper.find (
+				routeHelper.findOrNull (
 					requestContext.requestIntRequired (
 						"routeId"));
 

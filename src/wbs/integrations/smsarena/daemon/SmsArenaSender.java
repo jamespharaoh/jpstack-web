@@ -84,7 +84,7 @@ class SmsArenaSender
 			outbox.getRoute ();
 
 		SmsArenaRouteOutRec smsArenaRouteOut =
-				smsArenaRouteOutHelper.find (
+				smsArenaRouteOutHelper.findOrNull (
 				route.getId ());
 
 		if (smsArenaRouteOut == null) {

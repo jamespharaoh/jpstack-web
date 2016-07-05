@@ -207,7 +207,7 @@ class DialogueMmsApiServletModule
 					"x-mms-recipient-address");
 
 			RouteRec route =
-				routeHelper.find (
+				routeHelper.findOrNull (
 					requestContext.requestIntRequired (
 						"routeId"));
 
@@ -308,7 +308,7 @@ class DialogueMmsApiServletModule
 			}
 
 			MessageRec message =
-				messageHelper.find (
+				messageHelper.findOrNull (
 					messageId);
 
 			if (message == null) {

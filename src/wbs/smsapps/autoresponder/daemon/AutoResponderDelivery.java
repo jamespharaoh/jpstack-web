@@ -73,7 +73,7 @@ class AutoResponderDelivery
 				this);
 
 		DeliveryRec delivery =
-			deliveryHelper.find (
+			deliveryHelper.findOrNull (
 				deliveryId);
 
 		if (delivery.getNewMessageStatus ().isGoodType ()) {
@@ -82,7 +82,7 @@ class AutoResponderDelivery
 				delivery.getMessage ();
 
 			AutoResponderRequestRec request =
-				autoResponderRequestHelper.find (
+				autoResponderRequestHelper.findOrNull (
 					deliveryMessage.getRef ());
 
 			Integer deliveryMessageIndex =
@@ -116,7 +116,7 @@ class AutoResponderDelivery
 				delivery.getMessage ();
 
 			AutoResponderRequestRec request =
-				autoResponderRequestHelper.find (
+				autoResponderRequestHelper.findOrNull (
 					deliveryMessage.getRef ());
 
 			Integer deliveryMessageIndex =

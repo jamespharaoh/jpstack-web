@@ -33,7 +33,7 @@ class SubscriptionSendControlPart
 	void prepare () {
 
 		subscriptionSend =
-			subscriptionSendHelper.find (
+			subscriptionSendHelper.findOrNull (
 				requestContext.stuffInt (
 					"subscriptionSendId"));
 

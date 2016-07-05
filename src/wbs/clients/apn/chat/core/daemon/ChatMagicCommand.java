@@ -126,7 +126,7 @@ class ChatMagicCommand
 		// use the default command
 
 		CommandRec defaultCommand =
-			commandHelper.find (
+			commandHelper.findOrNull (
 				commandRef.get ());
 
 		return commandManagerProvider.get ().handle (

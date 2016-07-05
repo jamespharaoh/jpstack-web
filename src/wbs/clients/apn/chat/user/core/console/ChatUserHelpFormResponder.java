@@ -27,7 +27,7 @@ class ChatUserHelpFormResponder
 	void prepare () {
 
 		chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 	}
 

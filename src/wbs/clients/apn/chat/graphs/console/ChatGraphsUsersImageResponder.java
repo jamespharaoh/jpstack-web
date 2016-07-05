@@ -72,7 +72,7 @@ class ChatGraphsUsersImageResponder
 	void prepareData () {
 
 		chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatId"));
 

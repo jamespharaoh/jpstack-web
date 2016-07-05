@@ -175,7 +175,7 @@ class ChatMonitorInboxFormAction
 				this);
 
 		ChatMonitorInboxRec chatMonitorInbox =
-			chatMonitorInboxHelper.find (
+			chatMonitorInboxHelper.findOrNull (
 				monitorInboxId);
 
 		ChatUserRec monitorChatUser =

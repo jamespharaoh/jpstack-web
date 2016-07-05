@@ -231,7 +231,7 @@ class ChatBroadcastSendAction
 
 				.put (
 					"chat",
-					chatHelper.find (
+					chatHelper.findOrNull (
 						requestContext.stuffInt (
 							"chatId")))
 
@@ -356,7 +356,7 @@ class ChatBroadcastSendAction
 					"start transaction");
 
 				ChatRec chat =
-					chatHelper.find (
+					chatHelper.findOrNull (
 						requestContext.stuffInt ("chatId"));
 
 				// lookup user
@@ -566,7 +566,7 @@ class ChatBroadcastSendAction
 				) {
 
 					ChatUserRec chatUser =
-						chatUserHelper.find (
+						chatUserHelper.findOrNull (
 							chatUserId);
 
 					if (
@@ -777,7 +777,7 @@ class ChatBroadcastSendAction
 				) {
 
 					ChatUserRec toChatUser =
-						chatUserHelper.find (
+						chatUserHelper.findOrNull (
 							toChatUserId);
 
 					// record this number in the broadcast

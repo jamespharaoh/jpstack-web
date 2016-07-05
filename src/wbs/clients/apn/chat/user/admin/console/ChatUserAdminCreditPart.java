@@ -41,7 +41,7 @@ class ChatUserAdminCreditPart
 	void prepare () {
 
 		chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatUserId"));
 

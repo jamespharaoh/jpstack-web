@@ -169,7 +169,7 @@ class ChatMonitorInboxSummaryPart
 			transaction.now ();
 
 		monitorInbox =
-			chatMonitorInboxHelper.find (
+			chatMonitorInboxHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatMonitorInboxId"));
 

@@ -64,13 +64,13 @@ class ForwarderDelivery
 		// get the delivery
 
 		DeliveryRec delivery =
-			deliveryHelper.find (
+			deliveryHelper.findOrNull (
 				deliveryId);
 
 		// lookup the forwarder message out
 
 		ForwarderMessageOutRec forwarderMessageOut =
-			forwarderMessageOutHelper.find (
+			forwarderMessageOutHelper.findOrNull (
 				delivery.getMessage ().getRef ());
 
 		// unhold / cancel next message(s) if required

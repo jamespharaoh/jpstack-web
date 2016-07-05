@@ -165,7 +165,7 @@ class ObjectLinksAction
 				continue;
 
 			Record<?> targetObject =
-				targetHelper.find (linkId);
+				targetHelper.findOrNull (linkId);
 
 			@SuppressWarnings ("unchecked")
 			Set<Record<?>> targetLinks =

@@ -104,7 +104,7 @@ class AlertsSettingsNumbersAction
 				this);
 
 		AlertsSettingsRec alertsSettings =
-			alertsSettingsHelper.find (
+			alertsSettingsHelper.findOrNull (
 				requestContext.stuffInt (
 					"alertsSettingsId"));
 

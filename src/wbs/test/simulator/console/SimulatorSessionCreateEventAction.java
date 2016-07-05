@@ -202,7 +202,7 @@ System.out.println (
 		"simulatorSessionId"));
 
 		SimulatorSessionRec simulatorSession =
-			simulatorSessionHelper.find (
+			simulatorSessionHelper.findOrNull (
 				requestContext.stuffInt (
 					"simulatorSessionId"));
 
@@ -222,7 +222,7 @@ System.out.println (
 			requestContext.getForm ("message");
 
 		NetworkRec network =
-			networkHelper.find (
+			networkHelper.findOrNull (
 				toInteger (
 					requestContext.getForm ("networkId")));
 
@@ -350,7 +350,7 @@ System.out.println (
 				this);
 
 		SimulatorSessionRec simulatorSession =
-			simulatorSessionHelper.find (
+			simulatorSessionHelper.findOrNull (
 				requestContext.stuffInt (
 					"simulatorSessionId"));
 

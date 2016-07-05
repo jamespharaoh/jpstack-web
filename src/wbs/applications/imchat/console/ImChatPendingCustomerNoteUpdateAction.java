@@ -83,7 +83,7 @@ class ImChatPendingCustomerNoteUpdateAction
 				this);
 
 		ImChatMessageRec message =
-			imChatMessageHelper.find (
+			imChatMessageHelper.findOrNull (
 				requestContext.stuffInt (
 					"imChatMessageId"));
 

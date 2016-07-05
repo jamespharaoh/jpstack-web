@@ -103,7 +103,7 @@ class ComshenApiServletModule
 				requestContext.parameter ("err");
 
 			RouteRec route =
-				routeHelper.find (routeId);
+				routeHelper.findOrNull (routeId);
 
 			if (route == null) {
 

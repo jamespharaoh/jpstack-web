@@ -27,7 +27,7 @@ class LockLogicImplementation
 			& 0x3fff;
 
 		LockRec lock =
-			lockHelper.find (
+			lockHelper.findOrNull (
 				lockId);
 
 		lockHelper.lock (

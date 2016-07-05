@@ -124,7 +124,7 @@ class ChatDateStopCommand
 		}
 
 		ChatSchemeRec chatScheme =
-			chatSchemeHelper.find (
+			chatSchemeHelper.findOrNull (
 				command.getParentId ());
 
 		ChatRec chat =

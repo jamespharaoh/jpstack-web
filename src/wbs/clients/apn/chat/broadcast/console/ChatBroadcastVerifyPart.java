@@ -109,7 +109,7 @@ class ChatBroadcastVerifyPart
 	void prepare () {
 
 		chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatId"));
 
@@ -147,7 +147,7 @@ class ChatBroadcastVerifyPart
 
 			.put (
 				"chat",
-				chatHelper.find (
+				chatHelper.findOrNull (
 					requestContext.stuffInt (
 						"chatId")))
 
@@ -350,7 +350,7 @@ class ChatBroadcastVerifyPart
 		}
 
 		List<ChatUserRec> chatUsers =
-			chatUserHelper.find (
+			chatUserHelper.findManyOrNull (
 				chatUserIds.stream ()
 					.map (value -> (long) (int) value)
 					.collect (Collectors.toList ()));

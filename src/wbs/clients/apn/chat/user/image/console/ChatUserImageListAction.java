@@ -84,7 +84,7 @@ class ChatUserImageListAction
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		ChatUserImageType type =

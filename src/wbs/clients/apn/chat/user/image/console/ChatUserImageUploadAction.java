@@ -207,7 +207,7 @@ class ChatUserImageUploadAction
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatUserId"));
 

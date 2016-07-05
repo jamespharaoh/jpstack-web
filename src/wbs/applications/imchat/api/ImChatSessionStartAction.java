@@ -92,7 +92,7 @@ class ImChatSessionStartAction
 				this);
 
 		ImChatRec imChat =
-			imChatHelper.find (
+			imChatHelper.findOrNull (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));

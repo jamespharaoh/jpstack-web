@@ -36,11 +36,11 @@ class ChatUserImageViewPart
 	void prepare () {
 
 		chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		image =
-			chatUserImageHelper.find (
+			chatUserImageHelper.findOrNull (
 				requestContext.parameterInt ("chatUserImageId"));
 
 		if (image.getChatUser () != chatUser)

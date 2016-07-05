@@ -48,7 +48,7 @@ class ChatNumberReportLogicImplementation
 				.minus (Duration.standardDays (365 / 2));
 
 		ChatUserNumberReportRec numberReportRec =
-			chatUserNumberReportHelper.find (
+			chatUserNumberReportHelper.findOrNull (
 				number.getId ());
 
 		if (numberReportRec == null) {
@@ -102,7 +102,7 @@ class ChatNumberReportLogicImplementation
 			NumberRec number) {
 
 		ChatUserNumberReportRec numberReportRec =
-			chatUserNumberReportHelper.find (
+			chatUserNumberReportHelper.findOrNull (
 				number.getId ());
 
 		if (numberReportRec == null) {

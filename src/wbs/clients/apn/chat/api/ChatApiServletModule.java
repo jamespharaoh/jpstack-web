@@ -241,7 +241,7 @@ class ChatApiServletModule
 					this);
 
 			MediaRec media =
-				mediaHelper.find (
+				mediaHelper.findOrNull (
 					mediaId);
 
 			if (media == null) {
@@ -701,7 +701,7 @@ class ChatApiServletModule
 			if (number != null) {
 
 				ChatRec chat =
-					chatHelper.find (
+					chatHelper.findOrNull (
 						chatId);
 
 				NumberRec numberRec =
@@ -810,7 +810,7 @@ class ChatApiServletModule
 			for (Integer userId : userIds) {
 
 				ChatUserRec user =
-					chatUserHelper.find (
+					chatUserHelper.findOrNull (
 						userId);
 
 				// ignore system chat user, unless they are asked for specifically
@@ -1231,7 +1231,7 @@ class ChatApiServletModule
 			) {
 
 				MediaRec mediaRec =
-					mediaHelper.find (
+					mediaHelper.findOrNull (
 						mediaId);
 
 				RpcStructure media =
@@ -1434,7 +1434,7 @@ class ChatApiServletModule
 				Transaction transaction) {
 
 			ChatRec chat =
-				chatHelper.find (
+				chatHelper.findOrNull (
 					chatId);
 
 			NumberRec numberRec =
@@ -2034,7 +2034,7 @@ class ChatApiServletModule
 				Transaction transaction) {
 
 			ChatRec chat =
-				chatHelper.find (chatId);
+				chatHelper.findOrNull (chatId);
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
@@ -2213,7 +2213,7 @@ class ChatApiServletModule
 		void doIt () {
 
 			ChatRec chat =
-				chatHelper.find (
+				chatHelper.findOrNull (
 					chatId);
 
 			NumberRec numberRec =
@@ -2481,7 +2481,7 @@ class ChatApiServletModule
 				Instant now) {
 
 			ChatRec chat =
-				chatHelper.find (chatId);
+				chatHelper.findOrNull (chatId);
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
@@ -2869,7 +2869,7 @@ class ChatApiServletModule
 				Transaction transaction) {
 
 			ChatRec chat =
-				chatHelper.find (
+				chatHelper.findOrNull (
 					chatId);
 
 			NumberRec numberRec =
@@ -3038,7 +3038,7 @@ class ChatApiServletModule
 				) {
 
 					ChatUserImageRec image =
-						chatUserImageHelper.find (
+						chatUserImageHelper.findOrNull (
 							chatUserImageId);
 
 					image.setIndex (
@@ -3383,7 +3383,7 @@ class ChatApiServletModule
 				Transaction transaction) {
 
 			ChatRec chat =
-				chatHelper.find (
+				chatHelper.findOrNull (
 					chatId);
 
 			NumberRec numberRec =

@@ -79,14 +79,14 @@ class SubscriptionDeliveryNoticeHandler
 				this);
 
 		DeliveryRec delivery =
-			deliveryHelper.find (
+			deliveryHelper.findOrNull (
 				deliveryId);
 
 		MessageRec message =
 			delivery.getMessage ();
 
 		SubscriptionBillRec subscriptionBill =
-			subscriptionBillHelper.find (
+			subscriptionBillHelper.findOrNull (
 				message.getRef ());
 
 		SubscriptionNumberRec subscriptionNumber =

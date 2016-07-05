@@ -246,7 +246,7 @@ class GenericConsoleHelperProvider
 			contextStuff.get (idKey ());
 
 		Record<?> object =
-			objectHelper.find (id);
+			objectHelper.findOrNull (id);
 
 		// set context stuff
 
@@ -536,7 +536,7 @@ class GenericConsoleHelperProvider
 			contextStuff.get (idKey);
 
 		Record<?> object =
-			objectHelper.find (objectId);
+			objectHelper.findOrNull (objectId);
 
 		return object;
 

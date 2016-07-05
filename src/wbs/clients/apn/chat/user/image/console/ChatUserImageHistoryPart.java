@@ -50,7 +50,7 @@ class ChatUserImageHistoryPart
 				(String) requestContext.stuff ("chatUserImageType"));
 
 		chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		chatUserImages =

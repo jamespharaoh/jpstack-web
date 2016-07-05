@@ -130,12 +130,12 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 				this);
 
 		manualResponder =
-			manualResponderHelper.find (
+			manualResponderHelper.findOrNull (
 				requestContext.stuffInt (
 					"manualResponderId"));
 
 		number =
-			numberHelper.find (
+			numberHelper.findOrNull (
 				numberId);
 
 		// find or create number

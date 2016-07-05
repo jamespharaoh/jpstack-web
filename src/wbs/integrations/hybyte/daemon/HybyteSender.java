@@ -99,7 +99,7 @@ class HybyteSender
 		// lookup hybyte route
 
 		hybyteOutbox.hybyteRouteOut =
-			hybyteRouteOutHelper.find (
+			hybyteRouteOutHelper.findOrNull (
 				hybyteOutbox.route.getId ());
 
 		if (hybyteOutbox.hybyteRouteOut == null) {
@@ -121,7 +121,7 @@ class HybyteSender
 			// lookup hybyte network
 
 			hybyteOutbox.hybyteNetwork =
-				hybyteNetworkHelper.find (
+				hybyteNetworkHelper.findOrNull (
 					network.getId ());
 
 		}
@@ -149,7 +149,7 @@ class HybyteSender
 				"wap_push")) {
 
 			hybyteOutbox.wapPushMessage =
-				wapPushMessageHelper.find (
+				wapPushMessageHelper.findOrNull (
 					outbox.getId ());
 
 			if (hybyteOutbox.wapPushMessage == null) {

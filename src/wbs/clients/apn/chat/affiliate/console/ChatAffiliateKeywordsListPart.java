@@ -31,7 +31,7 @@ class ChatAffiliateKeywordsListPart
 	void prepare () {
 
 		ChatAffiliateRec chatAffiliate =
-			chatAffiliateHelper.find (
+			chatAffiliateHelper.findOrNull (
 				requestContext.stuffInt ("chatAffiliateId"));
 
 		chatSchemeKeywords =

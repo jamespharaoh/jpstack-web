@@ -67,7 +67,7 @@ class ObjectIdFormFieldNativeMapping<Container,Type extends Record<Type>,Native>
 		}
 
 		Type genericValue =
-			consoleHelper.find (
+			consoleHelper.findOrNull (
 				objectId);
 
 		if (genericValue == null)

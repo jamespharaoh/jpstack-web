@@ -56,7 +56,7 @@ class ChatBroadcastListPart
 	void prepare () {
 
 		chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt ("chatId"));
 
 		broadcasts =

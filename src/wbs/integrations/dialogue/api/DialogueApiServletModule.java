@@ -292,12 +292,12 @@ class DialogueApiServletModule
 					this);
 
 			RouteRec route =
-				routeHelper.find (routeId);
+				routeHelper.findOrNull (routeId);
 
 			NetworkRec network =
 				networkId == null
 					? null
-					: networkHelper.find (networkId);
+					: networkHelper.findOrNull (networkId);
 
 			// if it's a concatenated message...
 

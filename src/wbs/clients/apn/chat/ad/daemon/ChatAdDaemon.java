@@ -178,7 +178,7 @@ class ChatAdDaemon
 		// find the user
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				chatUserId);
 
 		ChatRec chat =

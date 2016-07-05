@@ -53,7 +53,7 @@ class ChatInfoSiteRespondAction
 				this);
 
 		ChatInfoSiteRec infoSite =
-			chatInfoSiteHelper.find (
+			chatInfoSiteHelper.findOrNull (
 				requestContext.requestIntRequired (
 					"chatInfoSiteId"));
 
@@ -70,7 +70,7 @@ class ChatInfoSiteRespondAction
 		}
 
 		ChatUserRec otherUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.parameterInt (
 					"otherUserId"));
 

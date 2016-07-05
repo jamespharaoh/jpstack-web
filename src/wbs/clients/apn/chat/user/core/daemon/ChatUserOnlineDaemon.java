@@ -131,7 +131,7 @@ class ChatUserOnlineDaemon
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (chatUserId);
+			chatUserHelper.findOrNull (chatUserId);
 
 		ChatRec chat =
 			chatUser.getChat ();

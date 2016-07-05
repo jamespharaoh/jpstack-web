@@ -109,7 +109,7 @@ class ImChatConversationEmailDaemon
 				this);
 
 		ImChatConversationRec conversation =
-			imChatConversationHelper.find (
+			imChatConversationHelper.findOrNull (
 				conversationId);
 
 		if (
@@ -132,7 +132,7 @@ class ImChatConversationEmailDaemon
 				this);
 
 		conversation =
-			imChatConversationHelper.find (
+			imChatConversationHelper.findOrNull (
 				conversationId);
 
 		imChatLogic.conversationEmailSend (

@@ -3,6 +3,7 @@ package wbs.smsapps.ticketer.api;
 import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 
 import java.util.Map;
 
@@ -223,12 +224,35 @@ class TicketerApiServletModule
 				database.beginReadWrite (
 					this);
 
-			SliceRec slice =
-				sliceHelper.findByCodeOrNull (
+			Optional<SliceRec> sliceOptional =
+				sliceHelper.findByCode (
 					GlobalId.root,
 					sliceParam);
 
-			if (slice == null) {
+			if (
+				isNotPresent (
+					sliceOptional)
+			) {
+
+				return makeError (
+					stTicketerInvalid,
+					"ticketer-invalid",
+					"Params slice/code are not valid\n");
+
+			}
+
+			SliceRec slice =
+				sliceOptional.get ();
+
+			Optional<TicketerRec> ticketerOptional =
+				ticketerHelper.findByCode (
+					slice,
+					codeParam);
+
+			if (
+				isNotPresent (
+					ticketerOptional)
+			) {
 
 				return makeError (
 					stTicketerInvalid,
@@ -238,25 +262,17 @@ class TicketerApiServletModule
 			}
 
 			TicketerRec ticketer =
-				ticketerHelper.findByCodeOrNull (
-					slice,
-					codeParam);
+				ticketerOptional.get ();
 
-			if (ticketer == null) {
-
-				return makeError (
-					stTicketerInvalid,
-					"ticketer-invalid",
-					"Params slice/code are not valid\n");
-
-			}
-
-			NumberRec number =
-				numberHelper.findByCodeOrNull (
+			Optional<NumberRec> numberOptional =
+				numberHelper.findByCode (
 					GlobalId.root,
 					numberParam);
 
-			if (number == null) {
+			if (
+				isNotPresent (
+					numberOptional)
+			) {
 
 				return makeError (
 					stTicketInvalid,
@@ -264,6 +280,9 @@ class TicketerApiServletModule
 					"Ticket is not valid");
 
 			}
+
+			NumberRec number =
+				numberOptional.get ();
 
 			TicketerTicketRec ticket =
 				ticketerTicketHelper.findByTicket (

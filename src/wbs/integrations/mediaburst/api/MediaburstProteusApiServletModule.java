@@ -153,7 +153,7 @@ class MediaburstProteusApiServletModule
 					reportRequestResult.statusString);
 
 			RouteRec route =
-				routeHelper.find (
+				routeHelper.findOrNull (
 					requestContext.requestIntRequired (
 						"routeId"));
 

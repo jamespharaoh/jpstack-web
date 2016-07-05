@@ -86,7 +86,7 @@ class ImChatCustomerCreditPart
 		);
 
 		request.customer (
-			imChatCustomerHelper.find (
+			imChatCustomerHelper.findOrNull (
 				requestContext.stuffInt (
 					"imChatCustomerId")));
 

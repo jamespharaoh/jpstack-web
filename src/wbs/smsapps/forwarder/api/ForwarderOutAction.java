@@ -230,7 +230,7 @@ class ForwarderOutAction
 			if (inId != null) {
 
 				forwarderMessageIn =
-					forwarderMessageInHelper.find (
+					forwarderMessageInHelper.findOrNull (
 						inId);
 
 				if (forwarderMessageIn == null

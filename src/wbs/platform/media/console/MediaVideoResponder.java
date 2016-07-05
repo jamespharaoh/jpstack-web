@@ -47,7 +47,7 @@ class MediaVideoResponder
 			requestContext.stuffInt ("mediaId");
 
 		MediaRec media =
-			mediaHelper.find (mediaId);
+			mediaHelper.findOrNull (mediaId);
 
 		data =
 			runFilter (

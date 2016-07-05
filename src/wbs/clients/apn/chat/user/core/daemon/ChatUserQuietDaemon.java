@@ -138,7 +138,7 @@ class ChatUserQuietDaemon
 		// find the user
 
 		ChatUserRec user =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				chatUserId);
 
 		String userPath =

@@ -96,7 +96,7 @@ class ChatBlockAllCommand
 	InboxAttemptRec handle () {
 
 		ChatRec chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				command.getParentId ());
 
 		ServiceRec defaultService =

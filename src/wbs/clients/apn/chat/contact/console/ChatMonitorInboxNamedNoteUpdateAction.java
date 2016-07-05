@@ -125,12 +125,12 @@ class ChatMonitorInboxNamedNoteUpdateAction
 				this);
 
 		ChatMonitorInboxRec monitorInbox =
-			chatMonitorInboxHelper.find (
+			chatMonitorInboxHelper.findOrNull (
 				requestContext.stuffInt (
 					"chatMonitorInboxId"));
 
 		ChatNoteNameRec chatNoteName =
-			chatNoteNameHelper.find (
+			chatNoteNameHelper.findOrNull (
 				noteNameId);
 
 		// work out which user is which

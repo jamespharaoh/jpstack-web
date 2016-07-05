@@ -81,7 +81,7 @@ class ChatUserNumberLinkProvider
 		) {
 
 			final ChatUserRec chatUser =
-				chatUserHelper.find (
+				chatUserHelper.findOrNull (
 					chatUserId);
 
 			advices.add (

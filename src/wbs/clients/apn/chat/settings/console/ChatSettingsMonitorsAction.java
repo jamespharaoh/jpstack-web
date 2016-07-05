@@ -99,7 +99,7 @@ class ChatSettingsMonitorsAction
 				this);
 
 		ChatRec chat =
-			chatHelper.find (
+			chatHelper.findOrNull (
 				requestContext.stuffInt ("chatId"));
 
 		chatMiscLogic.monitorsToTarget (

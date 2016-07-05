@@ -64,7 +64,7 @@ class ChatUserImageListPart
 				requestContext.stuff ("chatUserImageType"));
 
 		chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		switch (type) {

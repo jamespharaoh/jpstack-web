@@ -112,7 +112,7 @@ class ImChatPurchaseGetConfirmationAction
 				this);
 
 		ImChatRec imChat =
-			imChatHelper.find (
+			imChatHelper.findOrNull (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));

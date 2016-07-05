@@ -135,7 +135,7 @@ class ChatUserAdminDateAction
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.find (
+			chatUserHelper.findOrNull (
 				requestContext.stuffInt ("chatUserId"));
 
 		chatDateLogic.userDateStuff (

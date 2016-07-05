@@ -67,7 +67,7 @@ class ImChatMediaOriginalJpegAction
 		// retrieve media data
 
 		MediaRec media =
-			mediaHelper.find (
+			mediaHelper.findOrNull (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"mediaId")));

@@ -42,7 +42,7 @@ class ChatInfoSiteImageResponder
 	void prepare () {
 
 		infoSite =
-			chatInfoSiteHelper.find (
+			chatInfoSiteHelper.findOrNull (
 				requestContext.requestIntRequired (
 					"chatInfoSiteId"));
 

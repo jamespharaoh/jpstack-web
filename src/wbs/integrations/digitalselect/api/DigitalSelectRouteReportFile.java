@@ -96,7 +96,7 @@ class DigitalSelectRouteReportFile
 				this);
 
 		DigitalSelectRouteOutRec digitalSelectRouteOut =
-			digitalSelectRouteOutHelper.find (
+			digitalSelectRouteOutHelper.findOrNull (
 				routeId);
 
 		if (digitalSelectRouteOut == null) {

@@ -94,7 +94,7 @@ class ImChatPendingFormResponder
 		super.prepare ();
 
 		message =
-			imChatMessageHelper.find (
+			imChatMessageHelper.findOrNull (
 				requestContext.stuffInt (
 					"imChatMessageId"));
 
