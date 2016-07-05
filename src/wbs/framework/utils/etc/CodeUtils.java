@@ -86,12 +86,42 @@ class CodeUtils {
 
 	}
 
+	public static
+	boolean isValidRelaxedCode (
+			@NonNull String string) {
+
+		Matcher matcher =
+			relaxedCodePattern.matcher (
+				string);
+
+		return matcher.matches ();
+
+	}
+
+	public static
+	boolean isNotValidRelaxedCode (
+			@NonNull String string) {
+
+		return ! isValidRelaxedCode (
+			string);
+
+	}
+
 	public static final
 	Pattern codePattern =
 		Pattern.compile (
 			joinWithoutSeparator (
 				"^",
 				"([a-z][a-z0-9]*)",
+				"(_([a-z0-9]+))*",
+				"$"));
+
+	public static final
+	Pattern relaxedCodePattern =
+		Pattern.compile (
+			joinWithoutSeparator (
+				"^",
+				"([a-z0-9]+)",
 				"(_([a-z0-9]+))*",
 				"$"));
 

@@ -6,10 +6,13 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import com.google.common.collect.ImmutableMap;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleHelper;
@@ -141,8 +144,12 @@ class CodeFormFieldBuilder {
 
 		Pattern pattern =
 			spec.pattern () != null
-				? Pattern.compile (
+				? namedPatterns.containsKey (
 					spec.pattern ())
+					? namedPatterns.get (
+						spec.pattern ())
+					: Pattern.compile (
+						spec.pattern ())
 				: CodeUtils.codePattern;
 
 		// accessor
@@ -292,5 +299,15 @@ class CodeFormFieldBuilder {
 		}
 
 	}
+
+	public final static
+	Map<String,Pattern> namedPatterns =
+		ImmutableMap.<String,Pattern>builder ()
+
+		.put (
+			"relaxed",
+			CodeUtils.relaxedCodePattern)
+
+		.build ();
 
 }
