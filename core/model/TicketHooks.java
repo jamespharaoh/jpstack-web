@@ -124,7 +124,7 @@ class TicketHooks
 						objectType.getId ());
 
 				Object object =
-					objectHelper.find (
+					objectHelper.findOrNull (
 						objectId);
 
 				return object;

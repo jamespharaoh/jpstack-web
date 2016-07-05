@@ -75,7 +75,7 @@ class TicketPendingFormResponder
 		super.prepare ();
 
 		ticket =
-			ticketHelper.find (
+			ticketHelper.findOrNull (
 				requestContext.stuffInt ("ticketId"));
 
 		ticketState =

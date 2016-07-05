@@ -91,7 +91,7 @@ class ObjectTicketCreatePart<
 		// find context object
 
 		Record<?> contextObject =
-			consoleHelper.find (
+			consoleHelper.findOrNull (
 				requestContext.stuffInt (
 					consoleHelper.idKey ()));
 

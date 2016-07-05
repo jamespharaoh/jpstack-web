@@ -162,7 +162,7 @@ class TicketStateTimeDaemon
 		// find the ticket
 
 		TicketRec ticket =
-			ticketHelper.find (
+			ticketHelper.findOrNull (
 				ticketId);
 
 		// check if the ticket is already in a queue
