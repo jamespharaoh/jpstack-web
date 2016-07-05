@@ -157,7 +157,7 @@ class ObjectCreatePart<
 			@SuppressWarnings ("unchecked")
 			ParentType parentTemp =
 				(ParentType)
-				rootHelper.find (
+				rootHelper.findOrNull (
 					0);
 
 			parent =
@@ -176,7 +176,7 @@ class ObjectCreatePart<
 			// use specific parent
 
 			parent =
-				parentHelper.find (
+				parentHelper.findOrNull (
 					parentId);
 
 			return;
@@ -205,21 +205,21 @@ class ObjectCreatePart<
 
 			hints.put (
 				"grandparent",
-				grandParentHelper.find (
+				grandParentHelper.findOrNull (
 					grandParentId));
 
 			hints.put (
 				stringFormat (
 					"%s.parent",
 					consoleHelper.parentFieldName ()),
-				grandParentHelper.find (
+				grandParentHelper.findOrNull (
 					grandParentId));
 
 			hints.put (
 				stringFormat (
 					"parent.%s",
 					parentHelper.parentFieldName ()),
-				grandParentHelper.find (
+				grandParentHelper.findOrNull (
 					grandParentId));
 
 			hints.put (
@@ -227,7 +227,7 @@ class ObjectCreatePart<
 					"%s.%s",
 					consoleHelper.parentFieldName (),
 					parentHelper.parentFieldName ()),
-				grandParentHelper.find (
+				grandParentHelper.findOrNull (
 					grandParentId));
 
 			return;

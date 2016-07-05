@@ -43,7 +43,7 @@ class MediaAudioResponder
 			requestContext.stuffInt ("mediaId");
 
 		MediaRec media =
-			mediaHelper.find (mediaId);
+			mediaHelper.findOrNull (mediaId);
 
 		data =
 			media.getContent ().getData ();

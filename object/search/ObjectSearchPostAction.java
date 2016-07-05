@@ -339,7 +339,7 @@ class ObjectSearchPostAction
 			} else {
 
 				Record<?> object =
-					consoleHelper.find (
+					consoleHelper.findOrNull (
 						objectIds.get (0));
 
 				return redirectResponderProvider.get ()

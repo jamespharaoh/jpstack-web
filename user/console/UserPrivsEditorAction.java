@@ -75,7 +75,7 @@ class UserPrivsEditorAction
 				this);
 
 		UserRec user =
-			userHelper.find (
+			userHelper.findOrNull (
 				requestContext.stuffInt ("userId"));
 
 		Matcher matcher =
@@ -94,7 +94,7 @@ class UserPrivsEditorAction
 				matcher.group (3).equals ("1");
 
 			PrivRec priv =
-				privHelper.find (privId);
+				privHelper.findOrNull (privId);
 
 			UserPrivRec userPriv =
 				userPrivHelper.find (

@@ -82,7 +82,7 @@ class ObjectSummaryFieldsPart<
 		if (parentHelper.isRoot ()) {
 
 			parent =
-				parentHelper.find (
+				parentHelper.findOrNull (
 					0);
 
 			return;
@@ -98,7 +98,7 @@ class ObjectSummaryFieldsPart<
 			// use specific parent
 
 			parent =
-				parentHelper.find (
+				parentHelper.findOrNull (
 					parentId);
 
 			return;

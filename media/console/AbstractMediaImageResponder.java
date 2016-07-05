@@ -50,7 +50,7 @@ class AbstractMediaImageResponder
 	void prepare () {
 
 		media =
-			mediaHelper.find (
+			mediaHelper.findOrNull (
 				requestContext.stuffInt (
 					"mediaId"));
 

@@ -73,7 +73,7 @@ class UserPasswordAction
 		// load user
 
 		UserRec user =
-			userHelper.find (
+			userHelper.findOrNull (
 				requestContext.stuffInt (
 					"userId"));
 

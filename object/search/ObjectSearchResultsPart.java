@@ -152,7 +152,7 @@ class ObjectSearchResultsPart
 			if (currentObjectId != null) {
 
 				currentObject =
-					consoleHelper.find (
+					consoleHelper.findOrNull (
 						currentObjectId);
 
 			}
@@ -250,7 +250,7 @@ class ObjectSearchResultsPart
 			) {
 
 				objects.add (
-					consoleHelper.find (
+					consoleHelper.findOrNull (
 						objectId));
 
 			}

@@ -228,7 +228,7 @@ class ObjectSettingsAction<
 		if (parentHelper.isRoot ()) {
 
 			parent =
-				parentHelper.find (
+				parentHelper.findOrNull (
 					0);
 
 			return;
@@ -244,7 +244,7 @@ class ObjectSettingsAction<
 			// use specific parent
 
 			parent =
-				parentHelper.find (
+				parentHelper.findOrNull (
 					parentId);
 
 			return;

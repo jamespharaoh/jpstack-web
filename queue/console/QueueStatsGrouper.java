@@ -41,7 +41,7 @@ class QueueStatsGrouper
 			Object group) {
 
 		QueueRec queue =
-			queueHelper.find (
+			queueHelper.findOrNull (
 				(Integer) group);
 
 		return consoleObjectManager.tdForObjectMiniLink (
@@ -64,7 +64,7 @@ class QueueStatsGrouper
 				(Integer) group;
 
 			queues.add (
-				queueHelper.find (queueId));
+				queueHelper.findOrNull (queueId));
 
 		}
 

@@ -80,7 +80,7 @@ class ExceptionLogLogicImplementation
 
 		UserRec user =
 			userId.isPresent ()
-				? userHelper.find (userId.get ())
+				? userHelper.findOrNull (userId.get ())
 				: null;
 
 		// create exception log

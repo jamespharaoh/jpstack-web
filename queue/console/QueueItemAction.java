@@ -49,7 +49,7 @@ class QueueItemAction
 				this);
 
 		QueueItemRec queueItem =
-			queueItemHelper.find (queueItemId);
+			queueItemHelper.findOrNull (queueItemId);
 
 		if (queueItem == null) {
 

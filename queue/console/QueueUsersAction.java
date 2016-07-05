@@ -84,7 +84,7 @@ class QueueUsersAction
 		// load stuff
 
 		UserRec theUser =
-			userHelper.find (
+			userHelper.findOrNull (
 				userId);
 
 		// load items

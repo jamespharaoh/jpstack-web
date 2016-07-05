@@ -131,7 +131,7 @@ class SliceLogicImplementation
 		) {
 
 			SliceRec slice =
-				sliceHelper.find (
+				sliceHelper.findOrNull (
 					sliceId);
 
 			// perform update

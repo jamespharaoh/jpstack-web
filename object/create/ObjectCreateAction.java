@@ -419,7 +419,7 @@ class ObjectCreateAction<
 			@SuppressWarnings ("unchecked")
 			ParentType parentTemp1 =
 				(ParentType)
-				rootHelper.find (
+				rootHelper.findOrNull (
 					0);
 
 			parent =
@@ -462,7 +462,7 @@ class ObjectCreateAction<
 		// retrieve from database
 
 		parent =
-			parentHelper.find (
+			parentHelper.findOrNull (
 				parentId);
 
 		if (parent == null) {

@@ -42,7 +42,7 @@ class UserStatsGrouper
 			Object group) {
 
 		UserRec user =
-			userHelper.find (
+			userHelper.findOrNull (
 				(Integer) group);
 
 		return consoleObjectManager.tdForObjectMiniLink (
@@ -65,7 +65,7 @@ class UserStatsGrouper
 				(Integer) group;
 
 			users.add (
-				userHelper.find (userId));
+				userHelper.findOrNull (userId));
 
 		}
 

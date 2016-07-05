@@ -61,7 +61,7 @@ class QueueUnclaimAction
 				this);
 
 		QueueItemRec queueItem =
-			queueItemHelper.find (queueItemId);
+			queueItemHelper.findOrNull (queueItemId);
 
 		if (
 			notEqual (

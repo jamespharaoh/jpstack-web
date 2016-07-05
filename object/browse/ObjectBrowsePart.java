@@ -122,7 +122,7 @@ class ObjectBrowsePart
 		if (objectId != null) {
 
 			currentObject =
-				consoleHelper.find (
+				consoleHelper.findOrNull (
 					objectId);
 
 		}

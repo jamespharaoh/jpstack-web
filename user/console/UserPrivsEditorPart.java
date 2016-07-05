@@ -111,7 +111,7 @@ class UserPrivsEditorPart
 		// and fill the current priv data sets
 
 		UserRec user =
-			userHelper.find (
+			userHelper.findOrNull (
 				requestContext.stuffInt ("userId"));
 
 		for (UserPrivRec userPriv

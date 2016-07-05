@@ -112,7 +112,7 @@ class QueueLogicImplementation
 				parent);
 
 		ObjectTypeRec parentType =
-			objectTypeHelper.find (
+			objectTypeHelper.findOrNull (
 				parentHelper.objectTypeId ());
 
 		// lookup existing queue

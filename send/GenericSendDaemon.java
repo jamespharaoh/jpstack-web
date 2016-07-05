@@ -138,7 +138,7 @@ class GenericSendDaemon<
 				this);
 
 		Job job =
-			helper ().jobHelper ().find (
+			helper ().jobHelper ().findOrNull (
 				jobId);
 
 		Service service =

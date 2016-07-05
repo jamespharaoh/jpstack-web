@@ -215,7 +215,7 @@ class ObjectListPart<
 		if (objectId != null) {
 
 			currentObject =
-				consoleHelper.find (
+				consoleHelper.findOrNull (
 					objectId);
 
 		}
@@ -242,7 +242,7 @@ class ObjectListPart<
 			if (parentId != null) {
 
 				parent =
-					parentHelper.find (
+					parentHelper.findOrNull (
 						parentId);
 
 				prepareAllObjectsViaParent (
@@ -348,7 +348,7 @@ class ObjectListPart<
 				currentListBrowserSpec.get ();
 
 			Record<?> grandParentObject =
-				grandParentHelper.find (
+				grandParentHelper.findOrNull (
 					grandParentId);
 
 			if (grandParentObject == null) {
