@@ -92,7 +92,7 @@ class CoreLogonResponder
 
 			slice =
 				Optional.of (
-					sliceHelper.findByCodeOrNull (
+					sliceHelper.findByCodeRequired (
 						GlobalId.root,
 						sliceCode.get ()));
 
@@ -150,14 +150,18 @@ class CoreLogonResponder
 			String userCode =
 				usernameParts [1];
 
-			UserRec user =
-				userHelper.findByCodeOrNull (
+			Optional<UserRec> userOptional =
+				userHelper.findByCode (
 					GlobalId.root,
 					sliceCode,
 					userCode);
 
-			if (user == null)
+			if (
+				isNotPresent (
+					userOptional)
+			) {
 				continue;
+			}
 
 			printFormat (
 				"<button",

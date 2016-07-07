@@ -2,6 +2,7 @@ package wbs.platform.user.logic;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.hashSha1;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -17,7 +18,6 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
 import wbs.platform.scaffold.model.SliceObjectHelper;
-import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserOnlineObjectHelper;
@@ -115,12 +115,19 @@ class UserLogicImplementation
 	void userLogoff (
 			@NonNull UserRec user) {
 
-		UserOnlineRec userOnline =
-			userOnlineHelper.findOrNull (
+		Optional<UserOnlineRec> userOnlineOptional =
+			userOnlineHelper.find (
 				user.getId ());
 
-		if (userOnline == null)
+		if (
+			isNotPresent (
+				userOnlineOptional)
+		) {
 			return;
+		}
+
+		UserOnlineRec userOnline =
+			userOnlineOptional.get ();
 
 		// end the session log
 
@@ -152,21 +159,21 @@ class UserLogicImplementation
 
 		// lookup the user
 
-		SliceRec slice =
-			sliceHelper.findByCodeOrNull (
+		Optional<UserRec> userOptional =
+			userHelper.findByCode (
 				GlobalId.root,
-				sliceCode);
-
-		if (slice == null)
-			return null;
-
-		UserRec user =
-			userHelper.findByCodeOrNull (
-				slice,
+				sliceCode,
 				username);
 
-		if (user == null)
+		if (
+			isNotPresent (
+				userOptional)
+		) {
 			return null;
+		}
+
+		UserRec user =
+			userOptional.get ();
 
 		// check password
 

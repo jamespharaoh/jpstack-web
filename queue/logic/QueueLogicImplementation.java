@@ -23,11 +23,9 @@ import com.google.common.base.Optional;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
-import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.queue.model.QueueItemClaimStatus;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
@@ -82,98 +80,9 @@ class QueueLogicImplementation
 			@NonNull Record<?> parentObject,
 			@NonNull String code) {
 
-		QueueRec queue =
-			queueHelper.findByCodeOrNull (
-				parentObject,
-				code);
-
-		if (queue == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Can't find queue %s for %s",
-					code,
-					objectManager.objectPath (parentObject)));
-
-		}
-
-		return queue;
-	}
-
-	@Override
-	public
-	QueueRec findOrCreateQueue (
-			@NonNull Record<?> parent,
-			@NonNull String queueTypeCode,
-			@NonNull String code) {
-
-		ObjectHelper<?> parentHelper =
-			objectManager.objectHelperForObject (
-				parent);
-
-		ObjectTypeRec parentType =
-			objectTypeHelper.findOrNull (
-				parentHelper.objectTypeId ());
-
-		// lookup existing queue
-
-		QueueRec queue =
-			objectManager.findChildByCode (
-				QueueRec.class,
-				parent,
-				code);
-
-		if (queue == null) {
-
-			QueueTypeRec queueType =
-				queueTypeHelper.findByCodeOrNull (
-					parentType,
-					queueTypeCode);
-
-			if (queueType == null) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"No such queue type %s for object type %s",
-						queueTypeCode,
-						parentHelper.objectName ()));
-
-			}
-
-			String objectPath =
-				objectManager.objectPathMini (
-					parent);
-
-			log.info (
-				stringFormat (
-					"Creating new queue %s of type %s on %s",
-					code,
-					queueTypeCode,
-					objectPath));
-
-			// create new queue
-
-			queue =
-				queueHelper.insert (
-					queueHelper.createInstance ()
-
-				.setCode (
-					code)
-
-				.setQueueType (
-					queueType)
-
-				.setParentType (
-					parentType)
-
-				.setParentId (
-					parent.getId ())
-
-			);
-
-		}
-
-		return queue;
+		return queueHelper.findByCodeRequired (
+			parentObject,
+			code);
 
 	}
 
