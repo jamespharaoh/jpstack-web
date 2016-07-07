@@ -96,7 +96,7 @@ class ImChatMessageSendAction
 				this);
 
 		ImChatRec imChat =
-			imChatHelper.findOrNull (
+			imChatHelper.findRequired (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));

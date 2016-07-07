@@ -1,7 +1,6 @@
 package wbs.platform.exception.logic;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Map;
 
@@ -63,24 +62,16 @@ class ExceptionLogLogicImplementation
 		// lookup type
 
 		ExceptionLogTypeRec exceptionLogType =
-			exceptionLogTypeHelper.findByCodeOrNull (
+			exceptionLogTypeHelper.findByCodeRequired (
 				GlobalId.root,
 				typeCode);
-
-		if (exceptionLogType == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Unknown exception type: %s",
-					typeCode));
-
-		}
 
 		// lookup user
 
 		UserRec user =
 			userId.isPresent ()
-				? userHelper.findOrNull (userId.get ())
+				? userHelper.findRequired (
+					userId.get ())
 				: null;
 
 		// create exception log

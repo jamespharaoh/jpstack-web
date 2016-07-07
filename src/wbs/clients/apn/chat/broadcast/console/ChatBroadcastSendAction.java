@@ -3,6 +3,7 @@ package wbs.clients.apn.chat.broadcast.console;
 import static wbs.framework.utils.etc.Misc.allOf;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.moreThanZero;
 import static wbs.framework.utils.etc.Misc.orNull;
@@ -231,7 +232,7 @@ class ChatBroadcastSendAction
 
 				.put (
 					"chat",
-					chatHelper.findOrNull (
+					chatHelper.findRequired (
 						requestContext.stuffInt (
 							"chatId")))
 
@@ -356,19 +357,24 @@ class ChatBroadcastSendAction
 					"start transaction");
 
 				ChatRec chat =
-					chatHelper.findOrNull (
-						requestContext.stuffInt ("chatId"));
+					chatHelper.findRequired (
+						requestContext.stuffInt (
+							"chatId"));
 
 				// lookup user
 
-				profileLogger.lap ("lookup user");
+				profileLogger.lap (
+					"lookup user");
 
-				ChatUserRec fromChatUser =
-					chatUserHelper.findByCodeOrNull (
+				Optional<ChatUserRec> fromChatUserOptional =
+					chatUserHelper.findByCode (
 						chat,
 						form.fromUser ());
 
-				if (fromChatUser == null) {
+				if (
+					isNotPresent (
+						fromChatUserOptional)
+				) {
 
 					requestContext.addError (
 						stringFormat (
@@ -379,6 +385,9 @@ class ChatBroadcastSendAction
 						"chatBroadcastSendResponder");
 
 				}
+
+				ChatUserRec fromChatUser =
+					fromChatUserOptional.get ();
 
 				form.prefix (
 					fromChatUser.getName () != null
@@ -498,18 +507,22 @@ class ChatBroadcastSendAction
 								: allNumbers
 						) {
 
-							NumberRec numberRec =
-								numberHelper.findByCodeOrNull (
+							Optional<NumberRec> numberOptional =
+								numberHelper.findByCode (
 									GlobalId.root,
 									number);
 
-							if (numberRec == null)
+							if (
+								isNotPresent (
+									numberOptional)
+							) {
 								continue;
+							}
 
 							ChatUserRec chatUser =
 								chatUserHelper.find (
 									chat,
-									numberRec);
+									numberOptional.get ());
 
 							if (chatUser == null)
 								continue;
@@ -566,7 +579,7 @@ class ChatBroadcastSendAction
 				) {
 
 					ChatUserRec chatUser =
-						chatUserHelper.findOrNull (
+						chatUserHelper.findRequired (
 							chatUserId);
 
 					if (
@@ -758,7 +771,7 @@ class ChatBroadcastSendAction
 						batchSubject.getCode ())
 
 					.setParentType (
-						objectTypeHelper.findByCodeOrNull (
+						objectTypeHelper.findByCodeRequired (
 							GlobalId.root,
 							"chat_broadcast"))
 
@@ -777,7 +790,7 @@ class ChatBroadcastSendAction
 				) {
 
 					ChatUserRec toChatUser =
-						chatUserHelper.findOrNull (
+						chatUserHelper.findRequired (
 							toChatUserId);
 
 					// record this number in the broadcast

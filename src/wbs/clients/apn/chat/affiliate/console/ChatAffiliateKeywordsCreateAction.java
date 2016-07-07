@@ -83,7 +83,8 @@ class ChatAffiliateKeywordsCreateAction
 		ChatKeywordJoinType joinType =
 			toEnum (
 				ChatKeywordJoinType.class,
-				requestContext.parameterOrNull ("joinType"));
+				requestContext.parameterOrNull (
+					"joinType"));
 
 		if (joinType == null) {
 			requestContext.addError ("Please specify a join type");
@@ -106,8 +107,9 @@ class ChatAffiliateKeywordsCreateAction
 				this);
 
 		ChatAffiliateRec chatAffiliate =
-			chatAffiliateHelper.findOrNull (
-				requestContext.stuffInt ("chatAffiliateId"));
+			chatAffiliateHelper.findRequired (
+				requestContext.stuffInt (
+					"chatAffiliateId"));
 
 		ChatSchemeRec chatScheme =
 			chatAffiliate.getChatScheme ();

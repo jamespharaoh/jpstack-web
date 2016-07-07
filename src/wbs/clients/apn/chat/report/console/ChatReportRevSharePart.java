@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.report.console;
 
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -174,8 +175,9 @@ class ChatReportRevSharePart
 			"search");
 
 		chat =
-			chatHelper.findOrNull (
-				requestContext.stuffInt ("chatId"));
+			chatHelper.findRequired (
+				requestContext.stuffInt (
+					"chatId"));
 
 		totalReport =
 			new ChatReportRevShareItem ()
@@ -625,13 +627,20 @@ class ChatReportRevSharePart
 
 	void addChatMessages () {
 
-		ChatMonthCostRec chatMonthCost =
-			chatMonthCostHelper.findByCodeOrNull (
+		Optional<ChatMonthCostRec> chatMonthCostOptional =
+			chatMonthCostHelper.findByCode (
 				chat,
 				form.month ());
 
-		if (chatMonthCost == null)
+		if (
+			isNotPresent (
+				chatMonthCostOptional)
+		) {
 			return;
+		}
+
+		ChatMonthCostRec chatMonthCost =
+			chatMonthCostOptional.get ();
 
 		List<ChatMessageRec> chatMessages =
 			chatMessageHelper.search (

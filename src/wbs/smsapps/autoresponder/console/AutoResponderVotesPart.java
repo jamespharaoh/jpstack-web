@@ -18,8 +18,10 @@ import org.joda.time.Instant;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.IntervalFormatter;
+import wbs.framework.utils.TextualInterval;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.message.core.model.MessageDirection;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
@@ -46,6 +48,9 @@ class AutoResponderVotesPart
 
 	@Inject
 	ServiceObjectHelper serviceHelper;
+
+	@Inject
+	UserConsoleLogic userConsoleLogic;
 
 	// state
 
@@ -81,11 +86,12 @@ class AutoResponderVotesPart
 		// lookup objects
 
 		AutoResponderRec autoResponder =
-			autoResponderHelper.findOrNull (
-				requestContext.stuffInt ("autoResponderId"));
+			autoResponderHelper.findRequired (
+				requestContext.stuffInt (
+					"autoResponderId"));
 
 		ServiceRec autoResponderService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				autoResponder,
 				"default");
 
@@ -109,8 +115,10 @@ class AutoResponderVotesPart
 			.serviceId (
 				autoResponderService.getId ())
 
-			.createdTimeAfter (
-				startTime)
+			.createdTime (
+				TextualInterval.after (
+					userConsoleLogic.timezone (),
+					startTime))
 
 			.direction (
 				MessageDirection.in);

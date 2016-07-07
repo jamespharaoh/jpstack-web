@@ -39,6 +39,7 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.TextualInterval;
 import wbs.framework.utils.etc.Html;
 import wbs.framework.utils.etc.ProfileLogger;
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -184,7 +185,7 @@ class ManualResponderRequestPendingSummaryPart
 			"load basics");
 
 		manualResponderRequest =
-			manualResponderRequestHelper.findOrNull (
+			manualResponderRequestHelper.findRequired (
 				requestContext.stuffInt (
 					"manualResponderRequestId"));
 
@@ -253,14 +254,17 @@ class ManualResponderRequestPendingSummaryPart
 				.toInstant ();
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				manualResponder,
 				"default");
 
 		routeBillInfos =
 			new ArrayList<RouteBillInfo> ();
 
-		for (RouteRec route : routes) {
+		for (
+			RouteRec route
+				: routes
+		) {
 
 			int total = 0;
 			int thisService = 0;
@@ -274,8 +278,10 @@ class ManualResponderRequestPendingSummaryPart
 				.routeId (
 					route.getId ())
 
-				.createdTimeAfter (
-					startOfToday)
+				.createdTime (
+					TextualInterval.after (
+						userConsoleLogic.timezone (),
+						startOfToday))
 
 				.direction (
 					MessageDirection.out);

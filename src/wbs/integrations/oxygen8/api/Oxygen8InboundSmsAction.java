@@ -17,11 +17,11 @@ import lombok.Cleanup;
 import com.google.common.base.Optional;
 
 import wbs.api.mvc.ApiAction;
-import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionUtils;
+import wbs.framework.object.ObjectManager;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.integrations.oxygen8.model.Oxygen8ConfigRec;
@@ -55,7 +55,7 @@ class Oxygen8InboundSmsAction
 	InboxLogic inboxLogic;
 
 	@Inject
-	ConsoleObjectManager objectManager;
+	ObjectManager objectManager;
 
 	@Inject
 	Oxygen8InboundLogObjectHelper oxygen8InboundLogHelper;

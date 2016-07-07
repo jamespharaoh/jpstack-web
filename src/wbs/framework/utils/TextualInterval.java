@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.lowercase;
+import static wbs.framework.utils.etc.Misc.millisToInstant;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.split;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -504,6 +505,34 @@ class TextualInterval {
 			intervalString,
 			intervalString,
 			interval);
+
+	}
+
+	public static
+	TextualInterval after (
+			@NonNull DateTimeZone timezone,
+			@NonNull Instant startTime) {
+
+		return forInterval (
+			timezone,
+			new Interval (
+				startTime,
+				millisToInstant (
+					Long.MAX_VALUE)));
+
+	}
+
+	public static
+	TextualInterval before (
+			@NonNull DateTimeZone timezone,
+			@NonNull Instant endTime) {
+
+		return forInterval (
+			timezone,
+			new Interval (
+				millisToInstant (
+					Long.MIN_VALUE),
+				endTime));
 
 	}
 

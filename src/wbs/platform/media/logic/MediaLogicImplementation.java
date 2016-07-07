@@ -727,19 +727,9 @@ class MediaLogicImplementation
 	MediaTypeRec findMediaTypeRequired (
 			@NonNull String mimeType) {
 
-		MediaTypeRec mediaType =
-			mediaTypeHelper.findByCodeOrNull (
-				GlobalId.root,
-				mimeType);
-
-		if (mediaType == null) {
-
-			throw new RuntimeException (
-				"Unkown mime type: " + mimeType);
-
-		}
-
-		return mediaType;
+		return mediaTypeHelper.findByCodeRequired (
+			GlobalId.root,
+			mimeType);
 
 	}
 

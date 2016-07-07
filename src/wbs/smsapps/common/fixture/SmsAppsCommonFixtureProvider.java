@@ -31,7 +31,7 @@ class SmsAppsCommonFixtureProvider
 			menuGroupHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeOrNull (
+				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"))
 

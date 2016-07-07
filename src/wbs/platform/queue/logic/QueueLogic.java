@@ -36,11 +36,6 @@ interface QueueLogic {
 			Record<?> parentObject,
 			String code);
 
-	QueueRec findOrCreateQueue (
-			Record<?> parent,
-			String typeCode,
-			String code);
-
 	QueueSubjectRec findOrCreateQueueSubject (
 			QueueRec queue,
 			Record<?> object);

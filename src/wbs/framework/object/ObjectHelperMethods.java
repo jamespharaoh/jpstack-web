@@ -2,6 +2,8 @@ package wbs.framework.object;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.base.Optional;
 
 import wbs.framework.record.EphemeralRecord;
@@ -69,6 +71,7 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	Optional<RecordType> find (
 			long id);
 
+	@Nonnull
 	RecordType findRequired (
 			long id);
 

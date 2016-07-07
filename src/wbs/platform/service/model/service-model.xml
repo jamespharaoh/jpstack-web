@@ -18,6 +18,12 @@
 
 		<code-field/>
 
+		<!-- cached identity -->
+
+		<reference-field
+			type="slice"
+			nullable="yes"/>
+
 		<!-- details -->
 
 		<type-field

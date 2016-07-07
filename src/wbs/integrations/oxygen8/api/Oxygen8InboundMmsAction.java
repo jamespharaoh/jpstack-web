@@ -352,16 +352,13 @@ class Oxygen8InboundMmsAction
 		// lookup route
 
 		RouteRec route =
-			routeHelper.findOrNull (
+			routeHelper.findRequired (
 				routeId);
-
-		if (route == null)
-			throw new RuntimeException ();
 
 		// lookup oxygen8 route
 
 		Oxygen8RouteInRec oxygen8RouteIn =
-			oxygen8RouteInHelper.findOrNull (
+			oxygen8RouteInHelper.findRequired (
 				route.getId ());
 
 		if (oxygen8RouteIn == null)
@@ -373,7 +370,7 @@ class Oxygen8InboundMmsAction
 			throw new RuntimeException ();
 
 		MessageTypeRec mmsMessageType =
-			messageTypeHelper.findByCodeOrNull (
+			messageTypeHelper.findByCodeRequired (
 				GlobalId.root,
 				"mms");
 
@@ -403,7 +400,8 @@ class Oxygen8InboundMmsAction
 		*/
 
 		NetworkRec network =
-			networkHelper.findOrNull (0);
+			networkHelper.findRequired (
+				0);
 
 		// insert message
 
