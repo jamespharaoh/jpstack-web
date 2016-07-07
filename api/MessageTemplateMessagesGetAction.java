@@ -1,7 +1,7 @@
 package wbs.services.messagetemplate.api;
 
 import static wbs.framework.utils.etc.Misc.hyphenToUnderscore;
-import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.joinWithFullStop;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
@@ -11,6 +11,7 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -22,7 +23,6 @@ import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.scaffold.model.SliceObjectHelper;
-import wbs.platform.scaffold.model.SliceRec;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
@@ -74,33 +74,37 @@ class MessageTemplateMessagesGetAction
 
 		// lookup message template stuff
 
-		SliceRec slice =
-			sliceHelper.findByCodeOrNull (
-				GlobalId.root,
-				hyphenToUnderscore (
-					requestContext.requestStringRequired (
-						"sliceCode")));
+		String sliceCode =
+			hyphenToUnderscore (
+				requestContext.requestStringRequired (
+					"sliceCode"));
 
-		MessageTemplateDatabaseRec messageTemplateDatabase =
-			messageTemplateDatabaseHelper.findByCodeOrNull (
-				slice,
-				hyphenToUnderscore (
-					requestContext.requestStringRequired (
-						"messageTemplateDatabaseCode")));
+		String messageTemplateDatabaseCode =
+			hyphenToUnderscore (
+				requestContext.requestStringRequired (
+					"messageTemplateDatabaseCode"));
+
+		Optional<MessageTemplateDatabaseRec> messageTemplateDatabaseOptional =
+			messageTemplateDatabaseHelper.findByCode (
+				GlobalId.root,
+				sliceCode,
+				messageTemplateDatabaseCode);
 
 		if (
-			isNull (
-				messageTemplateDatabase)
+			isNotPresent (
+				messageTemplateDatabaseOptional)
 		) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Message template database not found: %s.%s",
-					slice.getCode (),
-					requestContext.requestStringRequired (
-						"messageTemplateDatabaseCode")));
+					sliceCode,
+					messageTemplateDatabaseCode));
 
 		}
+
+		MessageTemplateDatabaseRec messageTemplateDatabase =
+			messageTemplateDatabaseOptional.get ();
 
 		MessageTemplateSetRec messageTemplateSet =
 			messageTemplateSetHelper.findByCodeOrNull (
