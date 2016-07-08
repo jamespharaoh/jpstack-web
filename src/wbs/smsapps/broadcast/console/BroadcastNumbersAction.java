@@ -1,5 +1,6 @@
 package wbs.smsapps.broadcast.console;
 
+import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -244,10 +245,11 @@ class BroadcastNumbersAction
 
 					numRemoved ++;
 
+					break;
+
 				case sent:
 
-					throw new RuntimeException (
-						"Should never happen");
+					shouldNeverHappen ();
 
 				}
 

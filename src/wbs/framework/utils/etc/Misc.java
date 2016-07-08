@@ -2947,4 +2947,12 @@ class Misc {
 
 	}
 
+	public static
+	void shouldNeverHappen () {
+
+		throw new RuntimeException (
+			"Should never happen");
+
+	}
+
 }
