@@ -107,7 +107,7 @@ class MessageTemplateMessagesGetAction
 			messageTemplateDatabaseOptional.get ();
 
 		MessageTemplateSetRec messageTemplateSet =
-			messageTemplateSetHelper.findByCodeOrNull (
+			messageTemplateSetHelper.findByCodeRequired (
 				messageTemplateDatabase,
 				hyphenToUnderscore (
 					requestContext.requestStringRequired (
