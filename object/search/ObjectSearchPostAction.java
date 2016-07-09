@@ -126,7 +126,11 @@ class ObjectSearchPostAction
 
 		// handle new/repeat search buttons
 
-		if (requestContext.parameterOrNull ("new-search") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"new-search"))
+		) {
 
 			requestContext.session (
 				sessionKey + "Results",
@@ -140,7 +144,11 @@ class ObjectSearchPostAction
 
 		}
 
-		if (requestContext.parameterOrNull ("repeat-search") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"repeat-search"))
+		) {
 
 			requestContext.session (
 				sessionKey + "Results",
@@ -149,8 +157,8 @@ class ObjectSearchPostAction
 		}
 
 		if (
-			isNotNull (
-				requestContext.parameterOrNull (
+			isPresent (
+				requestContext.parameter (
 					"download-csv"))
 		) {
 
@@ -339,8 +347,9 @@ class ObjectSearchPostAction
 			} else {
 
 				Record<?> object =
-					consoleHelper.findOrNull (
-						objectIds.get (0));
+					consoleHelper.findRequired (
+						objectIds.get (
+							0));
 
 				return redirectResponderProvider.get ()
 

@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -159,13 +160,16 @@ class ObjectLinksAction
 				matcher.group (2).equals ("true");
 
 			boolean newIsMember =
-				requestContext.parameterOrNull ("link_" + linkId) != null;
+				isPresent (
+					requestContext.parameter (
+						"link_" + linkId));
 
 			if (oldIsMember == newIsMember)
 				continue;
 
 			Record<?> targetObject =
-				targetHelper.findOrNull (linkId);
+				targetHelper.findRequired (
+					linkId);
 
 			@SuppressWarnings ("unchecked")
 			Set<Record<?>> targetLinks =
@@ -174,10 +178,13 @@ class ObjectLinksAction
 					targetObject,
 					targetLinkField);
 
-			if (! privChecker.canRecursive (
+			if (
+				! privChecker.canRecursive (
 					targetObject,
-					"manage"))
+					"manage")
+			) {
 				continue;
+			}
 
 			if (
 

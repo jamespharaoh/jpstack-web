@@ -61,18 +61,9 @@ class EventLogicImplementation
 		// lookup type
 
 		EventTypeRec eventType =
-			eventTypeHelper.findByCodeOrNull (
+			eventTypeHelper.findByCodeRequired (
 				GlobalId.root,
 				typeCode);
-
-		if (eventType == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"EventType not found: %s",
-					typeCode));
-
-		}
 
 		// create event
 

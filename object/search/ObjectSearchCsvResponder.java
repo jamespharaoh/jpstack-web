@@ -191,7 +191,7 @@ class ObjectSearchCsvResponder
 				) {
 
 					objects.add (
-						consoleHelper.findOrNull (
+						consoleHelper.findRequired (
 							objectId));
 
 				}
