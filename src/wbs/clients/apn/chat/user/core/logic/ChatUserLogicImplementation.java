@@ -1142,24 +1142,32 @@ class ChatUserLogicImplementation
 
 		// try and find the place
 
-		GazetteerEntryRec gazetteerEntry = null;
+		Optional<GazetteerEntryRec> gazetteerEntryOptional =
+			Optional.absent ();
 
 		for (
 			KeywordFinder.Match match
 				: keywordFinder.find (place)
 		) {
 
-			gazetteerEntry =
-				gazetteerEntryHelper.findByCodeRequired (
+			gazetteerEntryOptional =
+				gazetteerEntryHelper.findByCode (
 					chat.getGazetteer (),
 					match.simpleKeyword ());
 
-			if (gazetteerEntry != null)
+			if (
+				isPresent (
+					gazetteerEntryOptional)
+			) {
 				break;
+			}
 
 		}
 
-		if (gazetteerEntry == null) {
+		if (
+			isNotPresent (
+				gazetteerEntryOptional)
+		) {
 
 			SliceRec slice =
 				chat.getSlice ().getAdminEmail () != null
@@ -1226,6 +1234,9 @@ class ChatUserLogicImplementation
 			return false;
 
 		}
+
+		GazetteerEntryRec gazetteerEntry =
+			gazetteerEntryOptional.get ();
 
 		// update the user
 

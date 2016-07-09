@@ -860,7 +860,7 @@ class ChatJoiner {
 				Optional.of (
 					message.getThreadId ()),
 				"gender_request",
-				commandHelper.findByCodeOrNull (
+				commandHelper.findByCodeRequired (
 					chatUser.getChatScheme (),
 					joinTypeIsChat (joinType)
 						? "chat_gender"
@@ -882,7 +882,7 @@ class ChatJoiner {
 				Optional.of (
 					message.getThreadId ()),
 				"gender_other_request",
-				commandHelper.findByCodeOrNull (
+				commandHelper.findByCodeRequired (
 					chatUser.getChatScheme (),
 					joinTypeIsChat (joinType)
 						? "chat_gender_other"
@@ -907,7 +907,7 @@ class ChatJoiner {
 				Optional.of (
 					message.getThreadId ()),
 				"info_request",
-				commandHelper.findByCodeOrNull (
+				commandHelper.findByCodeRequired (
 					chatUser.getChatScheme (),
 					joinTypeIsChat (joinType)
 						? "chat_info"
@@ -939,7 +939,7 @@ class ChatJoiner {
 			Optional.of (
 				message.getThreadId ()),
 			"location_request",
-			commandHelper.findByCodeOrNull (
+			commandHelper.findByCodeRequired (
 				chatUser.getChatScheme (),
 				joinTypeIsChat (joinType)
 					? "chat_location"
@@ -1004,7 +1004,7 @@ class ChatJoiner {
 		handleWithState ();
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 
@@ -1034,7 +1034,8 @@ class ChatJoiner {
 				: null;
 
 		chat =
-			chatHelper.findOrNull (chatId);
+			chatHelper.findRequired (
+				chatId);
 
 		// create chat user
 
@@ -1184,7 +1185,9 @@ class ChatJoiner {
 					Optional.of (
 						message.getThreadId ()),
 					"date_joined",
-					commandHelper.findByCodeOrNull (chat, "help"),
+					commandHelper.findByCodeRequired (
+						chat,
+						"help"),
 					0l,
 					TemplateMissing.ignore,
 					Collections.<String,String>emptyMap ());
@@ -1244,7 +1247,9 @@ class ChatJoiner {
 					Optional.of (
 						message.getThreadId ()),
 					"more_photos_error",
-					commandHelper.findByCodeOrNull (chat, "help"),
+					commandHelper.findByCodeRequired (
+						chat,
+						"help"),
 					0l,
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
@@ -1267,7 +1272,9 @@ class ChatJoiner {
 					Optional.of (
 						message.getThreadId ()),
 					"more_videos_error",
-					commandHelper.findByCodeOrNull (chat, "help"),
+					commandHelper.findByCodeRequired (
+						chat,
+						"help"),
 					0l,
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
@@ -1302,7 +1309,9 @@ class ChatJoiner {
 					Optional.of (
 						message.getThreadId ()),
 					"more_error",
-					commandHelper.findByCodeOrNull (chat, "help"),
+					commandHelper.findByCodeRequired (
+						chat,
+						"help"),
 					0l,
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
