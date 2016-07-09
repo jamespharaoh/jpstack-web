@@ -11,8 +11,8 @@ import lombok.experimental.Accessors;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FieldsProvider;
+import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
@@ -91,7 +91,7 @@ class ObjectTicketCreatePart<
 		// find context object
 
 		Record<?> contextObject =
-			consoleHelper.findOrNull (
+			consoleHelper.findRequired (
 				requestContext.stuffInt (
 					consoleHelper.idKey ()));
 
@@ -117,16 +117,9 @@ class ObjectTicketCreatePart<
 		) {
 
 			TicketFieldTypeRec ticketFieldType =
-				ticketFieldTypeHelper.findByCodeOrNull (
+				ticketFieldTypeHelper.findByCodeRequired (
 					ticketManager,
 					ticketFieldSpec.fieldTypeCode ());
-
-			if (ticketFieldType == null) {
-
-				throw new RuntimeException (
-					"Field type does not exist");
-
-			}
 
 			TicketFieldValueRec ticketFieldValue =
 				ticketFieldValueHelper.createInstance ()

@@ -81,7 +81,7 @@ class TicketHooks
 		// find the ticket field type
 
 		TicketFieldTypeRec ticketFieldType =
-			ticketFieldTypeHelper.get ().findByCodeOrNull (
+			ticketFieldTypeHelper.get ().findByCodeRequired (
 				ticket.getTicketManager (),
 				name);
 
@@ -124,7 +124,7 @@ class TicketHooks
 						objectType.getId ());
 
 				Object object =
-					objectHelper.findOrNull (
+					objectHelper.findRequired (
 						objectId);
 
 				return object;
@@ -155,7 +155,7 @@ class TicketHooks
 		// find the ticket field type
 
 		TicketFieldTypeRec ticketFieldType =
-			ticketFieldTypeHelper.get ().findByCodeOrNull (
+			ticketFieldTypeHelper.get ().findByCodeRequired (
 				ticket.getTicketManager (),
 				name);
 
