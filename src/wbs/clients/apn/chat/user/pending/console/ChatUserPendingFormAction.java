@@ -1,8 +1,11 @@
 package wbs.clients.apn.chat.user.pending.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.isZero;
 import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
@@ -119,8 +122,9 @@ class ChatUserPendingFormAction
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		return nextResponder (
 			chatUser);
@@ -135,38 +139,111 @@ class ChatUserPendingFormAction
 
 		// delegate appropriately
 
-		if (requestContext.parameterOrNull ("chatUserDismiss") != null)
+		if (
+			isPresent (
+				requestContext.parameter (
+					"chatUserDismiss"))
+		) {
 			return goDismiss ();
+		}
 
-		if (requestContext.parameterOrNull ("chatUserNameApprove") != null)
+		if (
+			isPresent (
+				requestContext.parameter (
+					"chatUserNameApprove"))
+		) {
 			return goApproveName ();
+		}
 
-		if (requestContext.parameterOrNull ("chatUserInfoApprove") != null)
+		if (
+			isPresent (
+				requestContext.parameter (
+					"chatUserInfoApprove"))
+		) {
 			return goApproveInfo ();
+		}
 
-		if (requestContext.parameterOrNull ("chatUserImageApprove") != null)
-			return goApproveImage (PendingMode.image);
+		if (
+			isPresent (
+				requestContext.parameter (
+					"chatUserImageApprove"))
+		) {
 
-		if (requestContext.parameterOrNull ("chatUserVideoApprove") != null)
-			return goApproveImage (PendingMode.video);
+			return goApproveImage (
+				PendingMode.image);
 
-		if (requestContext.parameterOrNull ("chatUserAudioApprove") != null)
-			return goApproveImage (PendingMode.audio);
+		}
 
-		if (requestContext.parameterOrNull("chatUserNameReject") != null)
+		if (
+			isPresent (
+				requestContext.parameter (
+					"chatUserVideoApprove"))
+		) {
+
+			return goApproveImage (
+				PendingMode.video);
+
+		}
+
+		if (
+			isPresent (
+				requestContext.parameter (
+					"chatUserAudioApprove"))
+		) {
+
+			return goApproveImage (
+				PendingMode.audio);
+
+		}
+
+		if (
+			isPresent (
+				requestContext.parameter (
+					"chatUserNameReject"))
+		) {
 			return goRejectName ();
+		}
 
-		if (requestContext.parameterOrNull("chatUserInfoReject") != null)
+		if (
+			isPresent (
+				requestContext.parameter (
+					"chatUserInfoReject"))
+		) {
 			return goRejectInfo ();
+		}
 
-		if (requestContext.parameterOrNull("chatUserImageReject") != null)
-			return goRejectImage (PendingMode.image);
+		if (
+			isPresent (
+				requestContext.parameter (
+					"chatUserImageReject"))
+		) {
 
-		if (requestContext.parameterOrNull ("chatUserVideoReject") != null)
-			return goRejectImage (PendingMode.video);
+			return goRejectImage (
+				PendingMode.image);
 
-		if (requestContext.parameterOrNull ("chatUserAudioReject") != null)
-			return goRejectImage (PendingMode.audio);
+		}
+
+		if (
+			isPresent (
+				requestContext.parameter (
+					"chatUserVideoReject"))
+		) {
+
+			return goRejectImage (
+				PendingMode.video);
+
+		}
+
+		if (
+			isPresent (
+				requestContext.parameter (
+					"chatUserAudioReject"))
+		) {
+
+			return goRejectImage (
+				PendingMode.audio);
+
+		}
 
 		throw new RuntimeException (
 			"Invalid parameters");
@@ -182,8 +259,9 @@ class ChatUserPendingFormAction
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		Responder responder =
 			updateQueueItem (
@@ -207,7 +285,7 @@ class ChatUserPendingFormAction
 		// get database objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				requestContext.stuffInt (
 					"chatUserId"));
 
@@ -238,28 +316,33 @@ class ChatUserPendingFormAction
 
 		}
 
+		String editedName =
+			requestContext.parameterRequired (
+				"name");
+
 		chatUserName
 
 			.setModerator (
 				userConsoleLogic.userRequired ())
 
 			.setStatus (
-				equal (
-						requestContext.parameterOrNull ("name"),
-						chatUserName.getOriginalName ())
-					? ChatUserInfoStatus.moderatorApproved
-					: ChatUserInfoStatus.moderatorEdited)
+				ifElse (
+					equal (
+						editedName,
+						chatUserName.getOriginalName ()),
+					() -> ChatUserInfoStatus.moderatorApproved,
+					() -> ChatUserInfoStatus.moderatorEdited))
 
 			.setModerationTime (
 				transaction.now ())
 
 			.setEditedName (
-				requestContext.parameterOrNull ("name"));
+				editedName);
 
 		chatUser
 
 			.setName (
-				chatUserName.getEditedName ())
+				editedName)
 
 			.setNewChatUserName (
 				null);
@@ -295,12 +378,16 @@ class ChatUserPendingFormAction
 		// get database objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		// confirm there is something to approve
 
-		if (chatUser.getNewChatUserInfo() == null) {
+		if (
+			isNull (
+				chatUser.getNewChatUserInfo ())
+		) {
 
 			requestContext.addError (
 				"No info to approve");
@@ -325,29 +412,37 @@ class ChatUserPendingFormAction
 
 		}
 
+		String editedInfo =
+			requestContext.parameterRequired (
+				"info");
+
+		TextRec editedText =
+			textHelper.findOrCreate (
+				editedInfo);
+
 		chatUserInfo
 
 			.setModerator (
 				userConsoleLogic.userRequired ())
 
 			.setStatus (
-				equal (
-						requestContext.parameterOrNull ("info"),
-						chatUserInfo.getOriginalText ().getText ())
-					? ChatUserInfoStatus.moderatorApproved
-					: ChatUserInfoStatus.moderatorEdited)
+				ifElse (
+					equal (
+						editedInfo,
+						chatUserInfo.getOriginalText ().getText ()),
+					() -> ChatUserInfoStatus.moderatorApproved,
+					() -> ChatUserInfoStatus.moderatorEdited))
 
 			.setModerationTime (
 				transaction.now ())
 
 			.setEditedText (
-				textHelper.findOrCreate (
-					requestContext.parameterOrNull ("info")));
+				editedText);
 
 		chatUser
 
 			.setInfoText (
-				chatUserInfo.getEditedText ())
+				editedText)
 
 			.setNewChatUserInfo (
 				null);
@@ -389,8 +484,9 @@ class ChatUserPendingFormAction
 		// get database objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		// confirm there is something to approve
 
@@ -446,7 +542,8 @@ class ChatUserPendingFormAction
 				list.size ())
 
 			.setClassification (
-				requestContext.parameterOrNull ("classification"));
+				requestContext.parameterRequired (
+					"classification"));
 
 		// update main image if not in append mode
 
@@ -505,7 +602,9 @@ class ChatUserPendingFormAction
 		// get params
 
 		String messageParam =
-			requestContext.parameterOrNull ("message").trim ();
+			trim (
+				requestContext.parameterRequired (
+					"message"));
 
 		if (Gsm.length (messageParam) == 0) {
 
@@ -533,10 +632,14 @@ class ChatUserPendingFormAction
 		// get database objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
-		if (chatUser.getNewChatUserName() == null) {
+		if (
+			isNull (
+				chatUser.getNewChatUserName ())
+		) {
 
 			requestContext.addError (
 				"No name to approve");
@@ -597,7 +700,9 @@ class ChatUserPendingFormAction
 		// get params
 
 		String messageParam =
-			requestContext.parameterOrNull ("message").trim ();
+			trim (
+				requestContext.parameterRequired (
+					"message"));
 
 		if (Gsm.length (messageParam) == 0) {
 
@@ -625,12 +730,16 @@ class ChatUserPendingFormAction
 		// get database objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		// confirm there is something to approve
 
-		if (chatUser.getNewChatUserInfo () == null) {
+		if (
+			isNull (
+				chatUser.getNewChatUserInfo ())
+		) {
 
 			requestContext.addError (
 				"No info to approve");
@@ -774,10 +883,10 @@ class ChatUserPendingFormAction
 					chatUser,
 					threadId,
 					messageText,
-					commandHelper.findByCodeOrNull (
+					commandHelper.findByCodeRequired (
 						chat,
 						"join_info"),
-					serviceHelper.findByCodeOrNull (
+					serviceHelper.findByCodeRequired (
 						chat,
 						"system"),
 					0l);
@@ -796,7 +905,7 @@ class ChatUserPendingFormAction
 			chatMessage,
 			messageParam,
 			Optional.of (
-				commandHelper.findByCodeOrNull (
+				commandHelper.findByCodeRequired (
 					chat,
 					"join_info")));
 
@@ -810,7 +919,7 @@ class ChatUserPendingFormAction
 
 		String messageParam =
 			trim (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"message"));
 
 		if (
@@ -848,7 +957,7 @@ class ChatUserPendingFormAction
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				requestContext.stuffInt (
 					"chatUserId"));
 
@@ -956,10 +1065,10 @@ class ChatUserPendingFormAction
 					chatUser,
 					Optional.<Long>absent (),
 					messageParam,
-					commandHelper.findByCodeOrNull (
+					commandHelper.findByCodeRequired (
 						chat,
 						mode.commandCode ()),
-					serviceHelper.findByCodeOrNull (
+					serviceHelper.findByCodeRequired (
 						chat,
 						"system"));
 
@@ -977,7 +1086,7 @@ class ChatUserPendingFormAction
 				chatMessage),
 			messageParam,
 			Optional.of (
-				commandHelper.findByCodeOrNull (
+				commandHelper.findByCodeRequired (
 					chat,
 					mode.commandCode ())));
 

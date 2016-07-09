@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -423,6 +424,23 @@ class Misc {
 	}
 
 	public static <Type>
+	Optional<Type> optionalToGoogle (
+			@NonNull java.util.Optional<Type> javaOptional) {
+
+		if (javaOptional.isPresent ()) {
+
+			return Optional.of (
+				javaOptional.get ());
+
+		} else {
+
+			return Optional.absent ();
+
+		}
+
+	}
+
+	public static <Type>
 	boolean optionalEquals (
 			@NonNull Optional<Type> left,
 			@NonNull Type right) {
@@ -538,6 +556,24 @@ class Misc {
 			@NonNull Object object2) {
 
 		return object1 != object2;
+
+	}
+
+	public static <Type>
+	Type ifElse (
+			@NonNull Boolean condition,
+			@NonNull Supplier<Type> trueValue,
+			@NonNull Supplier<Type> falseValue) {
+
+		if (condition) {
+
+			return trueValue.get ();
+
+		} else {
+
+			return falseValue.get ();
+
+		}
 
 	}
 

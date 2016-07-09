@@ -423,8 +423,12 @@ class ChatMiscLogicImplementation
 				Optional.fromNullable (
 					threadId),
 				"logon",
-				commandHelper.findByCodeOrNull (chat, "magic"),
-				(long) commandHelper.findByCodeOrNull (chat, "help").getId (),
+				commandHelper.findByCodeRequired (
+					chat,
+					"magic"),
+				(long) commandHelper.findByCodeRequired (
+					chat,
+					"help").getId (),
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -458,7 +462,9 @@ class ChatMiscLogicImplementation
 			locatorManager.locate (
 				chat.getLocator ().getId (),
 				chatUser.getNumber ().getId (),
-				serviceHelper.findByCodeOrNull (chat, "default").getId (),
+				serviceHelper.findByCodeRequired (
+					chat,
+					"default").getId (),
 				chatUserLogic.getAffiliateId (chatUser),
 				new LocatorManager.AbstractCallback () {
 
@@ -473,7 +479,7 @@ class ChatMiscLogicImplementation
 							this);
 
 					ChatUserRec chatUser =
-						chatUserHelper.findOrNull (
+						chatUserHelper.findRequired (
 							chatUserId);
 
 					if (longLat == null) {
@@ -508,7 +514,7 @@ class ChatMiscLogicImplementation
 							transaction.now ());
 
 					LocatorRec locator =
-						locatorHelper.findOrNull (
+						locatorHelper.findRequired (
 							locatorId);
 
 					eventLogic.createEvent (
@@ -554,7 +560,9 @@ class ChatMiscLogicImplementation
 					Optional.fromNullable (
 						threadId),
 					"date_stop_hint",
-					commandHelper.findByCodeOrNull (chat, "help"),
+					commandHelper.findByCodeRequired (
+						chat,
+						"help"),
 					0l,
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
@@ -723,8 +731,12 @@ class ChatMiscLogicImplementation
 				Optional.of (
 					threadId),
 				"name_confirm",
-				commandHelper.findByCodeOrNull (chat, "magic"),
-				(long) commandHelper.findByCodeOrNull (chat, "name").getId (),
+				commandHelper.findByCodeRequired (
+					chat,
+					"magic"),
+				(long) commandHelper.findByCodeRequired (
+					chat,
+					"name").getId (),
 				TemplateMissing.error,
 				ImmutableMap.<String,String>builder ()
 					.put ("newName", name)

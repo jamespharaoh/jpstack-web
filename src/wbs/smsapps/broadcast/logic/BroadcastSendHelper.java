@@ -299,12 +299,12 @@ class BroadcastSendHelper
 		// send the message
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				broadcastConfig,
 				"default");
 
 		BatchRec broadcastBatch =
-			batchHelper.findByCodeOrNull (
+			batchHelper.findByCodeRequired (
 				broadcast,
 				"broadcast");
 

@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -137,7 +139,7 @@ class ChatVideoGetCommand
 				command);
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 
@@ -218,14 +220,18 @@ class ChatVideoGetCommand
 
 			// find other user and ensure they have video
 
-			ChatUserRec otherUser =
-				chatUserHelper.findByCodeOrNull (
+			Optional<ChatUserRec> otherUserOptional =
+				chatUserHelper.findByCode (
 					chat,
 					text);
 
 			if (
-				otherUser == null
-				|| otherUser.getChatUserVideoList ().isEmpty ()
+
+				isNotPresent (
+					otherUserOptional)
+
+				|| otherUserOptional.get ().getChatUserVideoList ().isEmpty ()
+
 			) {
 
 				chatSendLogic.sendSystemRbFree (
@@ -242,6 +248,9 @@ class ChatVideoGetCommand
 					command);
 
 			}
+
+			ChatUserRec otherUser =
+				otherUserOptional.get ();
 
 			// send the reply
 

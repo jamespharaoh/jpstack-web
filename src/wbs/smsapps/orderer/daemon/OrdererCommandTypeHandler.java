@@ -113,7 +113,7 @@ class OrdererCommandTypeHandler
 				command);
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				orderer,
 				"default");
 
@@ -126,7 +126,7 @@ class OrdererCommandTypeHandler
 		// set the message service
 
 		message.setService (
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				orderer,
 				"default"));
 

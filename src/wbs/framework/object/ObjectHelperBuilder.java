@@ -2,10 +2,16 @@ package wbs.framework.object;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.joinWithFullStop;
+import static wbs.framework.utils.etc.Misc.joinWithSeparator;
+import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.optionalOrNull;
 import static wbs.framework.utils.etc.Misc.optionalRequired;
@@ -21,6 +27,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -779,11 +787,93 @@ class ObjectHelperBuilder {
 
 			@Override
 			public
-			List findManyOrNull (
-					List ids) {
+			List findManyRequired (
+					@NonNull List ids) {
 
-				return objectHelperProvider
-					.find (ids);
+				@SuppressWarnings ("unchecked")
+				List<Long> longIds =
+					(List<Long>)
+					ids;
+
+				List<Record<?>> objects =
+					objectHelperProvider.findMany (
+						longIds);
+
+				List<Long> missingIds =
+					new ArrayList<Long> ();
+
+				for (
+					int index = 0;
+					index < ids.size ();
+					index ++
+				) {
+
+					if (
+						isNotNull (
+							objects.get (
+								index))
+					) {
+						continue;
+					}
+
+					missingIds.add (
+						longIds.get (
+							index));
+
+				}
+
+				if (
+					isEmpty (
+						missingIds)
+				) {
+
+					return objects;
+
+				} else if (
+					equal (
+						missingIds.size (),
+						1)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"No such %s with id %s",
+							camelToSpaces (
+								model.objectName ()),
+							missingIds.get (0)));
+
+				} else if (
+					lessThan (
+						missingIds.size (),
+						6)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"No such %s with ids %s",
+							camelToSpaces (
+								model.objectName ()),
+							joinWithSeparator (
+								", ",
+								missingIds.stream ()
+									.map (longValue -> longValue.toString ())
+									.collect (Collectors.toList ()))));
+
+				} else {
+
+					throw new RuntimeException (
+						stringFormat (
+							"No such %s with ids %s (and %s others)",
+							camelToSpaces (
+								model.objectName ()),
+							joinWithSeparator (
+								", ",
+								missingIds.subList (0, 5).stream ()
+									.map (longValue -> longValue.toString ())
+									.collect (Collectors.toList ())),
+							missingIds.size () - 5));
+
+				}
 
 			}
 
@@ -874,6 +964,122 @@ class ObjectHelperBuilder {
 					findByCode (
 						ancestorGlobalId,
 						codes));
+
+			}
+
+			@Override
+			public
+			Record<?> findByCodeOrThrow (
+					@NonNull GlobalId ancestorGlobalId,
+					@NonNull String code,
+					@NonNull Supplier orThrow) {
+
+				Optional<Record<?>> recordOptional =
+					findByCode (
+						ancestorGlobalId,
+						code);
+
+				if (
+					isPresent (
+						recordOptional)
+				) {
+
+					return recordOptional.get ();
+
+				} else {
+
+					throw (RuntimeException)
+						orThrow.get ();
+
+				}
+
+			}
+
+			@Override
+			public
+			Record<?> findByCodeOrThrow (
+					@NonNull Record ancestor,
+					@NonNull String code,
+					@NonNull Supplier orThrow) {
+
+				Optional<Record<?>> recordOptional =
+					findByCode (
+						ancestor,
+						code);
+
+				if (
+					isPresent (
+						recordOptional)
+				) {
+
+					return recordOptional.get ();
+
+				} else {
+
+					throw (RuntimeException)
+						orThrow.get ();
+
+				}
+
+			}
+
+			@Override
+			public
+			Record<?> findByCodeOrThrow (
+					@NonNull GlobalId ancestorGlobalId,
+					@NonNull String code0,
+					@NonNull String code1,
+					@NonNull Supplier orThrow) {
+
+				Optional<Record<?>> recordOptional =
+					findByCode (
+						ancestorGlobalId,
+						code0,
+						code1);
+
+				if (
+					isPresent (
+						recordOptional)
+				) {
+
+					return recordOptional.get ();
+
+				} else {
+
+					throw (RuntimeException)
+						orThrow.get ();
+
+				}
+
+			}
+
+			@Override
+			public
+			Record<?> findByCodeOrThrow (
+					@NonNull Record ancestor,
+					@NonNull String code0,
+					@NonNull String code1,
+					@NonNull Supplier orThrow) {
+
+				Optional<Record<?>> recordOptional =
+					findByCode (
+						ancestor,
+						code0,
+						code1);
+
+				if (
+					isPresent (
+						recordOptional)
+				) {
+
+					return recordOptional.get ();
+
+				} else {
+
+					throw (RuntimeException)
+						orThrow.get ();
+
+				}
 
 			}
 
@@ -1335,7 +1541,8 @@ class ObjectHelperBuilder {
 
 				} else if (model.isRooted ()) {
 
-					return rootObjectHelper.findOrNull (0);
+					return rootObjectHelper.findRequired (
+						0);
 
 				} else if (model.canGetParent ()) {
 

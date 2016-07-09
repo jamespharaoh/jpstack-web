@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.contact.logic;
 
+import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collection;
@@ -241,7 +243,7 @@ class ChatSendLogicImplementation
 		}
 
 		ServiceRec service =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				serviceCode);
 
@@ -359,7 +361,7 @@ class ChatSendLogicImplementation
 			sendMessageRbFree (
 				chatUser,
 				threadId,
-				serviceHelper.findByCodeOrNull (
+				serviceHelper.findByCodeRequired (
 					chat,
 					"system"),
 				finalText);
@@ -485,7 +487,7 @@ class ChatSendLogicImplementation
 		// send it
 
 		ServiceRec systemService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"system");
 
@@ -632,7 +634,7 @@ class ChatSendLogicImplementation
 				threadId,
 				text,
 				magicCommand,
-				serviceHelper.findByCodeOrNull (
+				serviceHelper.findByCodeRequired (
 					chat,
 					"system"),
 				magicRef);
@@ -647,9 +649,15 @@ class ChatSendLogicImplementation
 			Optional.<ChatMessageRec>absent (),
 			finalText,
 			Optional.of (
-				magicCommand == commandHelper.findByCodeOrNull (chat, "magic")
-					? commandHelper.findOrNull (magicRef)
-					: magicCommand));
+				ifElse (
+					equal (
+						magicCommand,
+						commandHelper.findByCodeRequired (
+							chat,
+							"magic")),
+					() -> commandHelper.findRequired (
+						magicRef),
+					() -> magicCommand)));
 
 		return Optional.of (
 			message);

@@ -133,7 +133,7 @@ class ChatSetPhotoCommand
 		}
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 
@@ -175,8 +175,12 @@ class ChatSetPhotoCommand
 				chatUser,
 				Optional.<Long>absent (),
 				"photo_confirm",
-				commandHelper.findByCodeOrNull (chat, "magic"),
-				(long) commandHelper.findByCodeOrNull (chat, "help").getId (),
+				commandHelper.findByCodeRequired (
+					chat,
+					"magic"),
+				(long) commandHelper.findByCodeRequired (
+					chat,
+					"help").getId (),
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
@@ -220,7 +224,9 @@ class ChatSetPhotoCommand
 				chatUser,
 				Optional.of (message.getThreadId ()),
 				"photo_error",
-				commandHelper.findByCodeOrNull (chat, "set_photo"),
+				commandHelper.findByCodeRequired (
+					chat,
+					"set_photo"),
 				TemplateMissing.error);
 
 		}

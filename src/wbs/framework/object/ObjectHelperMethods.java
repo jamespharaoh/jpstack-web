@@ -1,6 +1,7 @@
 package wbs.framework.object;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
@@ -79,8 +80,7 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	RecordType findOrNull (
 			long id);
 
-	@Deprecated
-	List<RecordType> findManyOrNull (
+	List<RecordType> findManyRequired (
 			List<Long> ids);
 
 	Optional<RecordType> findByCode (
@@ -103,6 +103,28 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	RecordType findByCodeRequired (
 			GlobalId parentGlobalId,
 			String... code);
+
+	RecordType findByCodeOrThrow (
+			GlobalId parentGlobalId,
+			String code,
+			Supplier<RuntimeException> orThrow);
+
+	RecordType findByCodeOrThrow (
+			Record<?> parent,
+			String code,
+			Supplier<RuntimeException> orThrow);
+
+	RecordType findByCodeOrThrow (
+			GlobalId parentGlobalId,
+			String code0,
+			String code1,
+			Supplier<RuntimeException> orThrow);
+
+	RecordType findByCodeOrThrow (
+			Record<?> parent,
+			String code0,
+			String code1,
+			Supplier<RuntimeException> orThrow);
 
 	@Deprecated
 	RecordType findByCodeOrNull (

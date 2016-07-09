@@ -5,6 +5,8 @@ import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.optionalCast;
+import static wbs.framework.utils.etc.Misc.optionalOrNull;
 import static wbs.framework.utils.etc.Misc.split;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.underscoreToCamel;
@@ -16,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
@@ -232,7 +235,7 @@ class GenericConsoleHelperProvider
 	@Override
 	public
 	void postProcess (
-			ConsoleContextStuff contextStuff) {
+			@NonNull ConsoleContextStuff contextStuff) {
 
 		log.debug (
 			stringFormat (
@@ -246,7 +249,8 @@ class GenericConsoleHelperProvider
 			contextStuff.get (idKey ());
 
 		Record<?> object =
-			objectHelper.findOrNull (id);
+			objectHelper.findRequired (
+				id);
 
 		// set context stuff
 
@@ -529,14 +533,19 @@ class GenericConsoleHelperProvider
 	@Override
 	public
 	Record<?> lookupObject (
-			ConsoleContextStuff contextStuff) {
+			@NonNull ConsoleContextStuff contextStuff) {
 
 		int objectId =
 			(Integer)
-			contextStuff.get (idKey);
+			contextStuff.get (
+				idKey);
 
 		Record<?> object =
-			objectHelper.findOrNull (objectId);
+			optionalOrNull (
+				optionalCast (
+					Record.class,
+					objectHelper.find (
+						objectId)));
 
 		return object;
 

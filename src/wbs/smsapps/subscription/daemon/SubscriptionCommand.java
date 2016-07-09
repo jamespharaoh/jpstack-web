@@ -2,7 +2,9 @@ package wbs.smsapps.subscription.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.optionalToGoogle;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -199,28 +201,48 @@ class SubscriptionCommand
 
 	void matchKeyword () {
 
-		for (
-			KeywordFinder.Match keywordMatch
-				: keywordFinder.find (
-					rest)
-		) {
+		Optional<SubscriptionKeywordRec> subscriptionKeywordOptional =
+			optionalToGoogle (
 
-			SubscriptionKeywordRec subscriptionKeyword =
-				subscriptionKeywordHelper.findByCodeOrNull (
+			keywordFinder.find (
+				rest)
+
+			.stream ()
+
+			.map (match ->
+				subscriptionKeywordHelper.findByCode (
 					subscription,
-					keywordMatch.simpleKeyword ());
+					match.simpleKeyword ()))
 
-			subscriptionAffiliate =
-				ifNull (
-					subscriptionAffiliate,
-					subscriptionKeyword.getSubscriptionAffiliate ());
+			.filter (
+				Optional::isPresent)
 
-			subscriptionList =
-				ifNull (
-					subscriptionList,
-					subscriptionKeyword.getSubscriptionList ());
+			.map (
+				Optional::get)
 
+			.findFirst ()
+
+		);
+
+		if (
+			isNotPresent (
+				subscriptionKeywordOptional)
+		) {
+			return;
 		}
+
+		SubscriptionKeywordRec subscriptionKeyword =
+			subscriptionKeywordOptional.get ();
+
+		subscriptionAffiliate =
+			ifNull (
+				subscriptionAffiliate,
+				subscriptionKeyword.getSubscriptionAffiliate ());
+
+		subscriptionList =
+			ifNull (
+				subscriptionList,
+				subscriptionKeyword.getSubscriptionList ());
 
 	}
 
@@ -405,12 +427,12 @@ class SubscriptionCommand
 				subscription.getFreeRouter ())
 
 			.service (
-				serviceHelper.findByCodeOrNull (
+				serviceHelper.findByCodeRequired (
 					subscriptionList,
 					"default"))
 
 			.affiliate (
-				affiliateHelper.findByCodeOrNull (
+				affiliateHelper.findByCodeRequired (
 					subscriptionAffiliate,
 					"default"))
 
@@ -420,8 +442,10 @@ class SubscriptionCommand
 
 		return inboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (response.getService ()),
-			Optional.of (response.getAffiliate ()),
+			Optional.of (
+				response.getService ()),
+			Optional.of (
+				response.getAffiliate ()),
 			command);
 
 	}

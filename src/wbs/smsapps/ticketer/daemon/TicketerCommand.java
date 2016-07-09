@@ -103,7 +103,7 @@ class TicketerCommand
 		// set inbound message stuff
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				ticketer,
 				"default");
 

@@ -121,11 +121,11 @@ class AutoResponderCommand
 			inbox.getMessage ();
 
 		AutoResponderRec autoResponder =
-			autoResponderHelper.findOrNull (
+			autoResponderHelper.findRequired (
 				command.getParentId ());
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				autoResponder,
 				"default");
 
@@ -152,7 +152,7 @@ class AutoResponderCommand
 		// send responses
 
 		MessageSetRec messageSet =
-			messageSetHelper.findByCodeOrNull (
+			messageSetHelper.findByCodeRequired (
 				autoResponder,
 				"default");
 

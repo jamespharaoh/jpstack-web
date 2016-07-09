@@ -124,14 +124,14 @@ class ChatDateStopCommand
 		}
 
 		ChatSchemeRec chatScheme =
-			chatSchemeHelper.findOrNull (
+			chatSchemeHelper.findRequired (
 				command.getParentId ());
 
 		ChatRec chat =
 			chatScheme.getChat ();
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 

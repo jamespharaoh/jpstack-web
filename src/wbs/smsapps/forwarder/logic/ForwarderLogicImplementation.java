@@ -1,6 +1,9 @@
 package wbs.smsapps.forwarder.logic;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifElse;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.util.ArrayList;
@@ -329,22 +332,32 @@ class ForwarderLogicImplementation
 
 		if (work.template.fmInId != null) {
 
-			work.template.fmIn =
-				forwarderMessageInHelper.findOrNull (
+			Optional<ForwarderMessageInRec> messageInOptional =
+				forwarderMessageInHelper.find (
 					work.template.fmInId);
 
-			if (work.template.fmIn == null) {
+			if (
+				isNotPresent (
+					messageInOptional)
+			) {
 
 				work.template.errors.add (
 					"Reply-to-message-id is invalid: " +
 					work.template.fmInId);
 
-				if (work.template.sendError == null)
-					work.template.sendError = SendError.invalidReplyToMessageId;
+				if (work.template.sendError == null) {
+
+					work.template.sendError =
+						SendError.invalidReplyToMessageId;
+
+				}
 
 				work.ret = false;
 
 			}
+
+			work.template.fmIn =
+				messageInOptional.get ();
 
 		}
 
@@ -368,17 +381,26 @@ class ForwarderLogicImplementation
 
 			} else if (part.routeCode != null) {
 
-				part.forwarderRoute =
-					forwarderRouteHelper.findByCodeOrNull (
+				Optional<ForwarderRouteRec> forwarderRouteOptional =
+					forwarderRouteHelper.findByCode (
 						work.template.forwarder,
 						part.routeCode);
 
-				if (part.forwarderRoute == null)
+				if (
+					isNotPresent (
+						forwarderRouteOptional)
+				) {
+
 					sendTemplateCheckError (
 						work,
 						part,
 						SendError.invalidRoute,
 						"Route not recognised: " + part.routeCode);
+
+				}
+
+				part.forwarderRoute =
+					forwarderRouteOptional.get ();
 
 				part.routeCode = null;
 
@@ -442,20 +464,37 @@ class ForwarderLogicImplementation
 			// check network
 			int networkCount = (part.networkId != null ? 1 : 0)
 					+ (part.network != null ? 1 : 0);
-			if (networkCount > 1)
-				throw new RuntimeException(
-						"Cannot specify networkId and network");
-			if (part.networkId != null) {
-				if (part.networkId == 0)
-					sendTemplateCheckError(work, part,
-							SendError.invalidNetworkId,
-							"Network ID 0 should not be specified");
 
-				part.network =
-					networkHelper.findOrNull (
+			if (networkCount > 1) {
+
+				throw new RuntimeException (
+					"Cannot specify networkId and network");
+
+			}
+
+			if (
+				isNotNull (
+					part.networkId)
+			) {
+
+				if (part.networkId == 0) {
+
+					sendTemplateCheckError (
+						work,
+						part,
+						SendError.invalidNetworkId,
+						"Network ID 0 should not be specified");
+
+				}
+
+				Optional<NetworkRec> networkOptional =
+					networkHelper.find (
 						part.networkId);
 
-				if (part.network == null) {
+				if (
+					isNotPresent (
+						networkOptional)
+				) {
 
 					sendTemplateCheckError (
 						work,
@@ -464,6 +503,9 @@ class ForwarderLogicImplementation
 						"Network ID not recognised: " + part.networkId);
 
 				}
+
+				part.network =
+					networkOptional.get ();
 
 			}
 
@@ -788,10 +830,12 @@ class ForwarderLogicImplementation
 			forwarderMessaeOut.getMessage ();
 
 		WapPushMessageRec wapPushMessage =
-			url != null
-				? wapPushMessageHelper.findOrNull (
-					message.getId ())
-				: null;
+			ifElse (
+				isNotNull (
+					url),
+				() -> wapPushMessageHelper.findRequired (
+					message.getId ()),
+				() -> null);
 
 		if (
 

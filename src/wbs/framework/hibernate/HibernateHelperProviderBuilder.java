@@ -446,7 +446,7 @@ class HibernateHelperProviderBuilder {
 
 		@Override
 		public
-		List<Record<?>> find (
+		List<Record<?>> findMany (
 				List<Long> ids) {
 
 			if (

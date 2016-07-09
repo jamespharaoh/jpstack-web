@@ -639,7 +639,7 @@ class ChatInfoLogicImplementation
 				: "online_image";
 
 		ServiceRec service =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				serviceCode);
 
@@ -835,7 +835,7 @@ class ChatInfoLogicImplementation
 				: "online_video";
 
 		ServiceRec service =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				thisUser.getChat (),
 				serviceCode);
 
@@ -1542,7 +1542,9 @@ class ChatInfoLogicImplementation
 			chatUser,
 			Optional.<Long>absent (),
 			"photo_hint",
-			commandHelper.findByCodeOrNull (chat, "set_photo"),
+			commandHelper.findByCodeRequired (
+				chat,
+				"set_photo"),
 			TemplateMissing.error);
 
 		// and update the chat user
@@ -1571,7 +1573,9 @@ class ChatInfoLogicImplementation
 			chatUser,
 			Optional.<Long>absent (),
 			"photo_hint_2",
-			commandHelper.findByCodeOrNull (chat, "set_photo"),
+			commandHelper.findByCodeRequired (
+				chat,
+				"set_photo"),
 			TemplateMissing.error);
 
 		// and update the chat user

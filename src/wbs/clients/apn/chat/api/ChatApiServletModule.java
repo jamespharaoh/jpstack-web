@@ -8,6 +8,8 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -34,6 +36,7 @@ import javax.inject.Provider;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.http.HttpStatus;
@@ -240,11 +243,14 @@ class ChatApiServletModule
 				database.beginReadOnly (
 					this);
 
-			MediaRec media =
-				mediaHelper.findOrNull (
+			Optional<MediaRec> mediaOptional =
+				mediaHelper.find (
 					mediaId);
 
-			if (media == null) {
+			if (
+				isNotPresent (
+					mediaOptional)
+			) {
 
 				requestContext.status (
 					HttpStatus.SC_NOT_FOUND);
@@ -252,6 +258,9 @@ class ChatApiServletModule
 				return;
 
 			}
+
+			MediaRec media =
+				mediaOptional.get ();
 
 			byte[] data =
 				media.getContent ().getData ();
@@ -701,7 +710,7 @@ class ChatApiServletModule
 			if (number != null) {
 
 				ChatRec chat =
-					chatHelper.findOrNull (
+					chatHelper.findRequired (
 						chatId);
 
 				NumberRec numberRec =
@@ -807,17 +816,32 @@ class ChatApiServletModule
 					"profile",
 					RpcType.rStructure);
 
-			for (Integer userId : userIds) {
+			for (
+				Integer userId
+					: userIds
+			) {
 
 				ChatUserRec user =
-					chatUserHelper.findOrNull (
+					chatUserHelper.findRequired (
 						userId);
 
 				// ignore system chat user, unless they are asked for specifically
-				if (myUser != null
-						&& user == myUser.getChat ().getSystemChatUser ()
-						&& codes != null)
+
+				if (
+
+					isNotNull (
+						myUser)
+
+					&& equal (
+						user,
+						myUser.getChat ().getSystemChatUser ())
+
+					&& isNotNull (
+						codes)
+
+				) {
 					continue;
+				}
 
 				// ignore specifically excluded users, unless specifically requested
 				if (user.getHiddenFromChatTube ()
@@ -1230,16 +1254,31 @@ class ChatApiServletModule
 					: mediaIds
 			) {
 
-				MediaRec mediaRec =
-					mediaHelper.findOrNull (
+				Optional<MediaRec> mediaRecOptional =
+					mediaHelper.find (
 						mediaId);
 
 				RpcStructure media =
-					Rpc.rpcStruct ("media",
-						Rpc.rpcElem ("mediaId", mediaId),
-						Rpc.rpcElem ("found", mediaRec != null));
 
-				if (mediaRec != null) {
+					Rpc.rpcStruct (
+						"media",
+
+						Rpc.rpcElem (
+							"mediaId",
+							mediaId),
+
+						Rpc.rpcElem (
+							"found",
+							isPresent (
+								mediaRecOptional)));
+
+				if (
+					isPresent (
+						mediaRecOptional)
+				) {
+
+					MediaRec mediaRec =
+						mediaRecOptional.get ();
 
 					media.add (
 						Rpc.rpcElem (
@@ -1431,10 +1470,10 @@ class ChatApiServletModule
 
 		private
 		void doUpdates (
-				Transaction transaction) {
+				@NonNull Transaction transaction) {
 
 			ChatRec chat =
-				chatHelper.findOrNull (
+				chatHelper.findRequired (
 					chatId);
 
 			NumberRec numberRec =
@@ -1449,36 +1488,26 @@ class ChatApiServletModule
 			if (schemeCode != null) {
 
 				ChatSchemeRec scheme =
-					chatSchemeHelper.findByCodeOrNull (
+					chatSchemeHelper.findByCodeOrThrow (
 						chat,
-						schemeCode);
-
-				if (scheme == null) {
-
-					throw new RpcException (
-						Rpc.rpcError (
-							"chat-profile-response",
-							stAffiliateNotFound,
-							"affiliate-not-found",
-							"The affiliate specified can not be found"));
-
-				}
+						schemeCode,
+						() -> new RpcException (
+							Rpc.rpcError (
+								"chat-profile-response",
+								stAffiliateNotFound,
+								"affiliate-not-found",
+								"The affiliate specified can not be found")));
 
 				ChatAffiliateRec affiliate =
-					chatAffiliateHelper.findByCodeOrNull (
+					chatAffiliateHelper.findByCodeOrThrow (
 						scheme,
-						affiliateCode);
-
-				if (affiliate == null) {
-
-					throw new RpcException (
-						Rpc.rpcError (
-							"chat-profile-response",
-							stAffiliateNotFound,
-							"affiliate-not-found",
-							"The affiliate specified can not be found"));
-
-				}
+						affiliateCode,
+						() -> new RpcException (
+							Rpc.rpcError (
+								"chat-profile-response",
+								stAffiliateNotFound,
+								"affiliate-not-found",
+								"The affiliate specified can not be found")));
 
 				chatUserLogic.setAffiliate (
 					chatUser,
@@ -2031,10 +2060,11 @@ class ChatApiServletModule
 
 		private
 		void doUpdates (
-				Transaction transaction) {
+				@NonNull Transaction transaction) {
 
 			ChatRec chat =
-				chatHelper.findOrNull (chatId);
+				chatHelper.findRequired (
+					chatId);
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
@@ -2213,7 +2243,7 @@ class ChatApiServletModule
 		void doIt () {
 
 			ChatRec chat =
-				chatHelper.findOrNull (
+				chatHelper.findRequired (
 					chatId);
 
 			NumberRec numberRec =
@@ -2226,7 +2256,7 @@ class ChatApiServletModule
 					numberRec);
 
 			ChatUserRec toUser =
-				chatUserHelper.findByCodeOrNull (
+				chatUserHelper.findByCodeRequired (
 					chat,
 					toCode);
 
@@ -2481,7 +2511,8 @@ class ChatApiServletModule
 				Instant now) {
 
 			ChatRec chat =
-				chatHelper.findOrNull (chatId);
+				chatHelper.findRequired (
+					chatId);
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
@@ -2869,7 +2900,7 @@ class ChatApiServletModule
 				Transaction transaction) {
 
 			ChatRec chat =
-				chatHelper.findOrNull (
+				chatHelper.findRequired (
 					chatId);
 
 			NumberRec numberRec =
@@ -3038,7 +3069,7 @@ class ChatApiServletModule
 				) {
 
 					ChatUserImageRec image =
-						chatUserImageHelper.findOrNull (
+						chatUserImageHelper.findRequired (
 							chatUserImageId);
 
 					image.setIndex (
@@ -3383,7 +3414,7 @@ class ChatApiServletModule
 				Transaction transaction) {
 
 			ChatRec chat =
-				chatHelper.findOrNull (
+				chatHelper.findRequired (
 					chatId);
 
 			NumberRec numberRec =
