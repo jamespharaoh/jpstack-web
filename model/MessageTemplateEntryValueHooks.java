@@ -61,7 +61,7 @@ class MessageTemplateEntryValueHooks
 		// find the ticket field type
 
 		MessageTemplateFieldTypeRec fieldType =
-			messageTemplateFieldTypeHelper.findByCodeOrNull (
+			messageTemplateFieldTypeHelper.findByCodeRequired (
 				entryType,
 				name);
 
@@ -112,7 +112,7 @@ class MessageTemplateEntryValueHooks
 		// find the ticket field type
 
 		MessageTemplateFieldTypeRec fieldType =
-			messageTemplateFieldTypeHelper.findByCodeOrNull (
+			messageTemplateFieldTypeHelper.findByCodeRequired (
 				entryType,
 				name);
 
