@@ -82,17 +82,12 @@ class BroadcastSystemsSender1
 		// lookup route out
 
 		state.bsRouteOut =
-			broadcastSystemsRouteOutHelper.findOrNull (
-				state.route.getId ());
-
-		if (state.bsRouteOut == null) {
-
-			throw tempFailure (
-				stringFormat (
-					"Broadcast systems outbound route not found for %s",
-					state.route.getCode ()));
-
-		}
+			broadcastSystemsRouteOutHelper.findOrThrow (
+				state.route.getId (),
+				() -> tempFailure (
+					stringFormat (
+						"Broadcast systems outbound route not found for %s",
+						state.route.getCode ())));
 
 		// load lazy stuff
 

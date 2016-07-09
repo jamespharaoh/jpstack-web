@@ -112,11 +112,11 @@ class ChatAdultVerifyCommand
 			database.currentTransaction ();
 
 		ChatRec chat =
-			chatHelper.findOrNull (
+			chatHelper.findRequired (
 				command.getParentId ());
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 
@@ -158,7 +158,7 @@ class ChatAdultVerifyCommand
 		// credit the user
 
 		ChatSchemeChargesRec chatSchemeCharges =
-			chatSchemeChargesHelper.findOrNull (
+			chatSchemeChargesHelper.findRequired (
 				chatUser.getChatScheme ().getId ());
 
 		long credit =

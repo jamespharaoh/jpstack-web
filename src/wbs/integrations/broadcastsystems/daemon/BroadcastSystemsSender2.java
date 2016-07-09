@@ -1,5 +1,6 @@
 package wbs.integrations.broadcastsystems.daemon;
 
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBytes;
@@ -23,6 +24,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -84,11 +86,14 @@ class BroadcastSystemsSender2
 		RouteRec route =
 			outbox.getRoute ();
 
-		BroadcastSystemsRouteOutRec broadcastSystemsRouteOut =
-			broadcastSystemsRouteOutHelper.findOrNull (
+		Optional<BroadcastSystemsRouteOutRec> broadcastSystemsRouteOutOptional =
+			broadcastSystemsRouteOutHelper.find(
 				route.getId ());
 
-		if (broadcastSystemsRouteOut == null) {
+		if (
+			isNotPresent (
+				broadcastSystemsRouteOutOptional)
+		) {
 
 			return new SetupSendResult ()
 
@@ -103,6 +108,9 @@ class BroadcastSystemsSender2
 							route)));
 
 		}
+
+		BroadcastSystemsRouteOutRec broadcastSystemsRouteOut =
+			broadcastSystemsRouteOutOptional.get ();
 
 		// check message type
 

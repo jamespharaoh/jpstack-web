@@ -613,34 +613,6 @@ class ConsoleObjectManagerImplementation
 	}
 
 	@Override
-	public <ObjectType extends Record<?>>
-	ObjectType findChildByCode (
-			Class<ObjectType> objectClass,
-			GlobalId parentGlobalId,
-			String code) {
-
-		return objectManager.findChildByCode (
-			objectClass,
-			parentGlobalId,
-			code);
-
-	}
-
-	@Override
-	public <ObjectType extends Record<?>>
-	ObjectType findChildByCode (
-			Class<ObjectType> objectClass,
-			Record<?> parent,
-			String code) {
-
-		return objectManager.findChildByCode (
-			objectClass,
-			parent,
-			code);
-
-	}
-
-	@Override
 	public
 	Record<?> findObject (
 			GlobalId objectGlobalId) {

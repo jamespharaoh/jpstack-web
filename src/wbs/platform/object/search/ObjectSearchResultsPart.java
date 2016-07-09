@@ -9,6 +9,7 @@ import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.methodInvoke;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.optionalIf;
+import static wbs.framework.utils.etc.Misc.optionalOrNull;
 import static wbs.framework.utils.etc.Misc.presentInstances;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -152,7 +153,7 @@ class ObjectSearchResultsPart
 			if (currentObjectId != null) {
 
 				currentObject =
-					consoleHelper.findOrNull (
+					consoleHelper.findRequired (
 						currentObjectId);
 
 			}
@@ -180,8 +181,9 @@ class ObjectSearchResultsPart
 
 		if (
 			equal (
-				requestContext.parameterOrNull (
-					"page"),
+				requestContext.parameterOrDefault (
+					"page",
+					"0"),
 				"all")
 		) {
 
@@ -250,8 +252,9 @@ class ObjectSearchResultsPart
 			) {
 
 				objects.add (
-					consoleHelper.findOrNull (
-						objectId));
+					optionalOrNull (
+						consoleHelper.find (
+							objectId)));
 
 			}
 

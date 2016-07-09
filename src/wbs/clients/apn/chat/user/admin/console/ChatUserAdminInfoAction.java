@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
+import static wbs.framework.record.IdObject.objectId;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
 import javax.inject.Inject;
@@ -96,7 +96,8 @@ class ChatUserAdminInfoAction
 		ChatUserEditReason editReason =
 			toEnum (
 				ChatUserEditReason.class,
-				requestContext.parameterOrNull ("editReason"));
+				requestContext.parameterRequired (
+					"editReason"));
 
 		if (editReason == null) {
 
@@ -108,8 +109,8 @@ class ChatUserAdminInfoAction
 		}
 
 		String newInfo =
-			nullIfEmptyString (
-				requestContext.parameterOrNull ("info"));
+			requestContext.parameterOrEmptyString (
+				"info");
 
 		// transaction...
 
@@ -121,8 +122,9 @@ class ChatUserAdminInfoAction
 		// load database objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -187,9 +189,16 @@ class ChatUserAdminInfoAction
 					chatUser,
 					null,
 					messageText,
-					commandHelper.findByCodeOrNull (chat, "magic"),
-					serviceHelper.findByCodeOrNull (chat, "system"),
-					(long) commandHelper.findByCodeOrNull (chat, "join_info").getId ());
+					commandHelper.findByCodeRequired (
+						chat,
+						"magic"),
+					serviceHelper.findByCodeRequired (
+						chat,
+						"system"),
+					objectId (
+						commandHelper.findByCodeRequired (
+							chat,
+							"join_info")));
 
 			}
 

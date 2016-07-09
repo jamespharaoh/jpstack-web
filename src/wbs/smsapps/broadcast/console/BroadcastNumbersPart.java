@@ -26,7 +26,7 @@ class BroadcastNumbersPart
 	void prepare () {
 
 		broadcast =
-			broadcastHelper.findOrNull (
+			broadcastHelper.findRequired (
 				requestContext.stuffInt (
 					"broadcastId"));
 
@@ -80,7 +80,7 @@ class BroadcastNumbersPart
 			" cols=\"60\"",
 			">%h</textarea></p>\n",
 			emptyStringIfNull (
-				requestContext.parameterOrNull (
+				requestContext.parameterOrEmptyString (
 					"numbers")));
 
 		printFormat (

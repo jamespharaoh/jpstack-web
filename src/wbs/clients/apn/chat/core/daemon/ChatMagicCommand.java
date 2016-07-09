@@ -1,5 +1,8 @@
 package wbs.clients.apn.chat.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -102,20 +105,26 @@ class ChatMagicCommand
 			if (! rest.isEmpty ())
 				continue;
 
-			ChatKeywordRec chatKeyword =
-				chatKeywordHelper.findByCodeOrNull (
+			Optional<ChatKeywordRec> chatKeywordOptional =
+				chatKeywordHelper.findByCode (
 					chat,
 					match.simpleKeyword ());
 
 			if (
-				chatKeyword != null
-				&& chatKeyword.getGlobal ()
-				&& chatKeyword.getCommand () != null
+
+				isPresent (
+					chatKeywordOptional)
+
+				&& chatKeywordOptional.get ().getGlobal ()
+
+				&& isNotNull (
+					chatKeywordOptional.get ().getCommand ())
+
 			) {
 
 				return commandManagerProvider.get ().handle (
 					inbox,
-					chatKeyword.getCommand (),
+					chatKeywordOptional.get ().getCommand (),
 					Optional.<Long>absent (),
 					"");
 
@@ -126,7 +135,7 @@ class ChatMagicCommand
 		// use the default command
 
 		CommandRec defaultCommand =
-			commandHelper.findOrNull (
+			commandHelper.findRequired (
 				commandRef.get ());
 
 		return commandManagerProvider.get ().handle (

@@ -213,7 +213,7 @@ class AlertsDaemon
 				this);
 
 		AlertsSettingsRec alertsSettings =
-			alertsSettingsHelper.findOrNull (
+			alertsSettingsHelper.findRequired (
 				alertsSettingsId);
 
 		// check it's still pending
@@ -673,7 +673,7 @@ class AlertsDaemon
 					alertsNumber.getNumber ().getNumber ()));
 
 			ServiceRec alertsService =
-				serviceHelper.findByCodeOrNull (
+				serviceHelper.findByCodeRequired (
 					alertsSettings,
 					"alerts");
 

@@ -1,6 +1,7 @@
 package wbs.console.helper;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.optionalOrNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.lang.reflect.Constructor;
@@ -322,7 +323,8 @@ class ConsoleHelperBuilder {
 			}
 
 			Record<?> object =
-				objectHelper.findOrNull (id);
+				objectHelper.findRequired (
+					id);
 
 			return object;
 
@@ -339,7 +341,9 @@ class ConsoleHelperBuilder {
 		Record<?> findEntity (
 				int id) {
 
-			return objectHelper.findOrNull (id);
+			return optionalOrNull (
+				objectHelper.find (
+					id));
 
 		}
 

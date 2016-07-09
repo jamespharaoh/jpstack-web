@@ -56,7 +56,7 @@ class ChatHelpLogPendingMessagesPart
 	void prepare () {
 
 		chatHelpLog =
-			chatHelpLogHelper.findOrNull (
+			chatHelpLogHelper.findRequired (
 				requestContext.stuffInt (
 					"chatHelpLogId"));
 
@@ -67,7 +67,7 @@ class ChatHelpLogPendingMessagesPart
 			chatUser.getChat ();
 
 		ServiceRec service =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 

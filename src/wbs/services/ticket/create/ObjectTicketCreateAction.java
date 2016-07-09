@@ -182,7 +182,7 @@ class ObjectTicketCreateAction<
 		// find context object
 
 		Record<?> contextObject =
-			consoleHelper.findOrNull (
+			consoleHelper.findRequired (
 				requestContext.stuffInt (
 					consoleHelper.idKey ()));
 
@@ -235,16 +235,9 @@ class ObjectTicketCreateAction<
 		) {
 
 			TicketFieldTypeRec ticketFieldType =
-				ticketFieldTypeHelper.findByCodeOrNull (
+				ticketFieldTypeHelper.findByCodeRequired (
 					ticketManager,
 					ticketFieldSpec.fieldTypeCode ());
-
-			if (ticketFieldType == null) {
-
-				throw new RuntimeException (
-					"Field type does not exist");
-
-			}
 
 			TicketFieldValueRec ticketFieldValue =
 				ticketFieldValueHelper.createInstance ()

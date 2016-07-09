@@ -30,8 +30,9 @@ class ChatAffiliateUsersPart
 	void prepare () {
 
 		ChatAffiliateRec chatAffiliate =
-			chatAffiliateHelper.findOrNull (
-				requestContext.stuffInt ("chatAffiliateId"));
+			chatAffiliateHelper.findRequired (
+				requestContext.stuffInt (
+					"chatAffiliateId"));
 
 		chatUsers =
 			chatUserHelper.find (

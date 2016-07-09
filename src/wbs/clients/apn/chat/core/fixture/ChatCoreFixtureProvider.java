@@ -43,6 +43,7 @@ import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.sms.route.router.model.RouterObjectHelper;
 import wbs.sms.route.router.model.RouterRec;
 import wbs.sms.route.sender.model.SenderObjectHelper;
 
@@ -100,6 +101,9 @@ class ChatCoreFixtureProvider
 
 	@Inject
 	RouteObjectHelper routeHelper;
+
+	@Inject
+	RouterObjectHelper routerHelper;
 
 	@Inject
 	SenderObjectHelper senderHelper;
@@ -230,8 +234,7 @@ class ChatCoreFixtureProvider
 		);
 
 		RouterRec freeRouter =
-			objectManager.findChildByCode (
-				RouterRec.class,
+			routerHelper.findByCodeRequired (
 				freeRoute,
 				"static");
 

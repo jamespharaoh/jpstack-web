@@ -1,6 +1,8 @@
 package wbs.smsapps.broadcast.console;
 
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -69,15 +71,24 @@ class BroadcastSendAction
 				this);
 
 		BroadcastRec broadcast =
-			broadcastHelper.findOrNull (
-				requestContext.stuffInt ("broadcastId"));
+			broadcastHelper.findRequired (
+				requestContext.stuffInt (
+					"broadcastId"));
 
 		BroadcastConfigRec broadcastConfig =
 			broadcast.getBroadcastConfig ();
 
-		if (requestContext.parameterOrNull ("send") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"send"))
+		) {
 
-			if (broadcast.getState () != BroadcastState.unsent) {
+			if (
+				notEqual (
+					broadcast.getState (),
+					BroadcastState.unsent)
+			) {
 
 				requestContext.addError (
 					stringFormat (
@@ -126,7 +137,11 @@ class BroadcastSendAction
 
 		}
 
-		if (requestContext.parameterOrNull ("schedule") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"schedule"))
+		) {
 
 			if (broadcast.getState () != BroadcastState.unsent) {
 
@@ -146,7 +161,8 @@ class BroadcastSendAction
 				scheduledTime =
 					timeFormatter.timestampStringToInstant (
 						userConsoleLogic.timezone (),
-						requestContext.parameterOrNull ("timestamp"));
+						requestContext.parameterRequired (
+							"timestamp"));
 
 			} catch (Exception exception) {
 
@@ -191,7 +207,11 @@ class BroadcastSendAction
 
 		}
 
-		if (requestContext.parameterOrNull ("unschedule") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"unschedule"))
+		) {
 
 			if (broadcast.getState () != BroadcastState.scheduled) {
 
@@ -229,7 +249,11 @@ class BroadcastSendAction
 
 		}
 
-		if (requestContext.parameterOrNull ("cancel") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"cancel"))
+		) {
 
 			if (broadcast.getState ()
 					== BroadcastState.partiallySent) {

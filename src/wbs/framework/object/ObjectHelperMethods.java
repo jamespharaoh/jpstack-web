@@ -80,6 +80,10 @@ interface ObjectHelperMethods<RecordType extends Record<RecordType>> {
 	RecordType findOrNull (
 			long id);
 
+	RecordType findOrThrow (
+			long id,
+			Supplier<RuntimeException> orThrow);
+
 	List<RecordType> findManyRequired (
 			List<Long> ids);
 

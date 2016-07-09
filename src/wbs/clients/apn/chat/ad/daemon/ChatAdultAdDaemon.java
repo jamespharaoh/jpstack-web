@@ -168,7 +168,7 @@ class ChatAdultAdDaemon
 		// find the user
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				chatUserId);
 
 		ChatRec chat =
@@ -318,7 +318,7 @@ class ChatAdultAdDaemon
 			chat.getAdultAdsChat ().getChatSchemes ().iterator ().next ();
 
 		ServiceRec systemService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"system");
 

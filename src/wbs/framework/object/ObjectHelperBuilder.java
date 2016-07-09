@@ -787,6 +787,32 @@ class ObjectHelperBuilder {
 
 			@Override
 			public
+			Record findOrThrow (
+					long id,
+					@NonNull Supplier orThrow) {
+
+				Record<?> object =
+					objectHelperProvider.find (
+						id);
+
+				if (
+					isNotNull (
+						object)
+				) {
+
+					return object;
+
+				} else {
+
+					throw (RuntimeException)
+						orThrow.get ();
+
+				}
+
+			}
+
+			@Override
+			public
 			List findManyRequired (
 					@NonNull List ids) {
 

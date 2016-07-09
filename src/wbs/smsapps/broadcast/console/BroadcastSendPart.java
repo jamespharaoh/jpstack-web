@@ -31,8 +31,9 @@ class BroadcastSendPart
 	void prepare () {
 
 		broadcast =
-			broadcastHelper.findOrNull (
-				requestContext.stuffInt ("broadcastId"));
+			broadcastHelper.findRequired (
+				requestContext.stuffInt (
+					"broadcastId"));
 
 	}
 

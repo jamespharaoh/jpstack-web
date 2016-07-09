@@ -2,6 +2,7 @@ package wbs.platform.core.console;
 
 import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.optionalOrNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -89,9 +90,10 @@ class CoreSidebarMenuResponder
 			userConsoleLogic.userRequired ();
 
 		SliceRec apnSlice =
-			sliceHelper.findByCodeOrNull (
-				GlobalId.root,
-				"apn");
+			optionalOrNull (
+				sliceHelper.findByCode (
+					GlobalId.root,
+					"apn"));
 
 		if (
 
@@ -105,7 +107,7 @@ class CoreSidebarMenuResponder
 
 			menuGroups =
 				menuGroupHelper.findByParent (
-					sliceHelper.findByCodeOrNull (
+					sliceHelper.findByCodeRequired (
 						GlobalId.root,
 						"apn"));
 

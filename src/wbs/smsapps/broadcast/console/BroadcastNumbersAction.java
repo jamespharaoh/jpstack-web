@@ -1,5 +1,6 @@
 package wbs.smsapps.broadcast.console;
 
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -100,7 +101,7 @@ class BroadcastNumbersAction
 				this);
 
 		BroadcastRec broadcast =
-			broadcastHelper.findOrNull (
+			broadcastHelper.findRequired (
 				requestContext.stuffInt (
 					"broadcastId"));
 
@@ -116,7 +117,8 @@ class BroadcastNumbersAction
 			numbers =
 				numberFormatLogic.parseLines (
 					broadcastConfig.getNumberFormat (),
-					requestContext.parameterOrNull ("numbers"));
+					requestContext.parameterRequired (
+						"numbers"));
 
 		} catch (WbsNumberFormatException exception) {
 
@@ -151,7 +153,11 @@ class BroadcastNumbersAction
 
 		BroadcastLogic.AddResult addResult;
 
-		if (requestContext.parameterOrNull ("add") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"add"))
+		) {
 
 			addResult =
 				broadcastLogic.addNumbers (
@@ -171,9 +177,16 @@ class BroadcastNumbersAction
 		int numAlreadyRemoved = 0;
 		int numRemoved = 0;
 
-		if (requestContext.parameterOrNull ("remove") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"remove"))
+		) {
 
-			for (String numberString : numbers) {
+			for (
+				String numberString
+					: numbers
+			) {
 
 				NumberRec numberRecord =
 					numberHelper.findOrCreate (

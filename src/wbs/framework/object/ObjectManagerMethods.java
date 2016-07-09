@@ -57,18 +57,6 @@ interface ObjectManagerMethods {
 	Record<?> findObject (
 			GlobalId objectGlobalId);
 
-	public <ObjectType extends Record<?>>
-	ObjectType findChildByCode (
-			Class<ObjectType> objectClass,
-			GlobalId parentGlobalId,
-			String code);
-
-	public <ObjectType extends Record<?>>
-	ObjectType findChildByCode (
-			Class<ObjectType> objectClass,
-			Record<?> parent,
-			String code);
-
 	<ObjectType extends Record<?>>
 	ObjectType update (
 			ObjectType object);

@@ -3,6 +3,7 @@ package wbs.framework.object;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.optionalOrNull;
 import static wbs.framework.utils.etc.Misc.split;
 import static wbs.framework.utils.etc.Misc.startsWith;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -364,37 +365,6 @@ class ObjectManagerImplementation
 
 	@Override
 	public <RecordType extends Record<?>>
-	RecordType findChildByCode (
-			@NonNull Class<RecordType> objectClass,
-			@NonNull GlobalId parentGlobalId,
-			@NonNull String code) {
-
-		ObjectHelper<?> objectHelper =
-			objectHelperForClass (objectClass);
-
-		return objectClass.cast (
-			objectHelper.findByCodeOrNull (
-				parentGlobalId,
-				code));
-
-	}
-
-	@Override
-	public <RecordType extends Record<?>>
-	RecordType findChildByCode (
-			@NonNull Class<RecordType> objectClass,
-			@NonNull Record<?> parent,
-			@NonNull String code) {
-
-		return findChildByCode (
-			objectClass,
-			getGlobalId (parent),
-			code);
-
-	}
-
-	@Override
-	public <RecordType extends Record<?>>
 	RecordType update (
 			@NonNull RecordType object) {
 
@@ -428,8 +398,9 @@ class ObjectManagerImplementation
 				(int) (long)
 				objectGlobalId.typeId ());
 
-		return objectHelper.findOrNull (
-			objectGlobalId.objectId ());
+		return optionalOrNull (
+			objectHelper.find (
+				objectGlobalId.objectId ()));
 
 	}
 
@@ -626,7 +597,8 @@ class ObjectManagerImplementation
 			) {
 
 				object =
-					rootHelper.findOrNull (0);
+					rootHelper.findRequired (
+						0);
 
 			} else if (
 				equal (

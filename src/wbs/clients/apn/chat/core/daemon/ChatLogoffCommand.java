@@ -114,7 +114,7 @@ class ChatLogoffCommand
 				command);
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 
