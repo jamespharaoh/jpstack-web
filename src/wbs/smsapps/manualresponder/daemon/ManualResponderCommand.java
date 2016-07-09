@@ -7,6 +7,8 @@ import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.lessThan;
+import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -29,6 +31,7 @@ import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.record.Record;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.TimeFormatter;
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -50,6 +53,7 @@ import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.number.list.logic.NumberListLogic;
 import wbs.smsapps.manualresponder.logic.ManualResponderLogic;
+import wbs.smsapps.manualresponder.model.ManualResponderAffiliateRec;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
@@ -133,7 +137,8 @@ class ManualResponderCommand
 	String[] getCommandTypes () {
 
 		return new String [] {
-			"manual_responder.default"
+			"manual_responder.default",
+			"manual_responder_affiliate.default",
 		};
 
 	}
@@ -143,6 +148,7 @@ class ManualResponderCommand
 	Transaction transaction;
 
 	ManualResponderRec manualResponder;
+	ManualResponderAffiliateRec manualResponderAffiliate;
 	MessageRec message;
 	ManualResponderNumberRec manualResponderNumber;
 	ServiceRec defaultService;
@@ -159,10 +165,30 @@ class ManualResponderCommand
 		transaction =
 			database.currentTransaction ();
 
-		manualResponder =
-			(ManualResponderRec) (Object)
+		Record<?> commandParent =
 			objectManager.getParent (
 				command);
+
+		if (commandParent instanceof ManualResponderRec) {
+
+			manualResponder =
+				(ManualResponderRec)
+				commandParent;
+
+		} else if (commandParent instanceof ManualResponderAffiliateRec) {
+
+			manualResponderAffiliate =
+				(ManualResponderAffiliateRec)
+				commandParent;
+
+			manualResponder =
+				manualResponderAffiliate.getManualResponder ();
+
+		} else {
+
+			shouldNeverHappen ();
+
+		}
 
 		message =
 			inbox.getMessage ();
@@ -173,7 +199,7 @@ class ManualResponderCommand
 				message.getNumber ());
 
 		defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				manualResponder,
 				"default");
 
@@ -214,6 +240,38 @@ class ManualResponderCommand
 
 			smsCustomer =
 				Optional.absent ();
+
+		}
+
+		// assign affiliate if appropriate
+
+		if (
+
+			isNotNull (
+				manualResponder.getSmsCustomerManager ())
+
+			&& isNotNull (
+				manualResponderAffiliate)
+
+		) {
+
+			if (
+				notEqual (
+					manualResponder
+						.getSmsCustomerManager (),
+					manualResponderAffiliate
+						.getSmsCustomerAffiliate ()
+						.getSmsCustomerManager ())
+			) {
+
+				shouldNeverHappen ();
+
+			}
+
+			smsCustomerLogic.customerAffiliateUpdate (
+				smsCustomer.get (),
+				manualResponderAffiliate.getSmsCustomerAffiliate (),
+				message);
 
 		}
 

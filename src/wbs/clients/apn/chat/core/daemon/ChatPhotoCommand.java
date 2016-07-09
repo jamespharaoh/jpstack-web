@@ -1,5 +1,8 @@
 package wbs.clients.apn.chat.core.daemon;
 
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isNull;
+
 import java.util.Collections;
 
 import javax.inject.Inject;
@@ -156,8 +159,8 @@ class ChatPhotoCommand
 			String text =
 				rest.trim ();
 
-			ChatUserRec photoUser =
-				chatUserHelper.findByCodeOrNull (
+			Optional<ChatUserRec> photoUserOptional =
+				chatUserHelper.findByCode (
 					chat,
 					text);
 
@@ -172,10 +175,11 @@ class ChatPhotoCommand
 
 			} else if (
 
-				photoUser == null
+				isNotPresent (
+					photoUserOptional)
 
 				|| ! chatUserLogic.valid (
-					photoUser)
+					photoUserOptional.get ())
 
 			) {
 
@@ -196,7 +200,10 @@ class ChatPhotoCommand
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
-			} else if (photoUser.getMainChatUserImage () == null) {
+			} else if (
+				isNull (
+					photoUserOptional.get ().getMainChatUserImage ())
+			) {
 
 				// send no such photo error
 
@@ -221,7 +228,7 @@ class ChatPhotoCommand
 
 				chatInfoLogic.sendRequestedUserPicandOtherUserPics (
 					chatUser,
-					photoUser,
+					photoUserOptional.get (),
 					2,
 					message.getThreadId ());
 

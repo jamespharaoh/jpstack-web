@@ -147,7 +147,7 @@ class PhotoGrabberCommand
 			inbox.getMessage ();
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				photoGrabber,
 				"default");
 
@@ -199,7 +199,7 @@ class PhotoGrabberCommand
 				photoGrabberRequest);
 
 			messageSetLogic.sendMessageSet (
-				messageSetHelper.findByCodeOrNull (
+				messageSetHelper.findByCodeRequired (
 					photoGrabber,
 					"photo_grabber_not_found"),
 				message.getThreadId (),
@@ -233,7 +233,7 @@ class PhotoGrabberCommand
 				photoGrabberRequest);
 
 			messageSetLogic.sendMessageSet (
-				messageSetHelper.findByCodeOrNull (
+				messageSetHelper.findByCodeRequired (
 					photoGrabber,
 					"photo_grabber_not_found"),
 				message.getThreadId (),

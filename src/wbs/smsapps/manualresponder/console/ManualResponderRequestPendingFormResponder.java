@@ -2,6 +2,7 @@ package wbs.smsapps.manualresponder.console;
 
 import static wbs.framework.utils.etc.Misc.allOf;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.not;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -13,6 +14,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
@@ -115,7 +117,7 @@ class ManualResponderRequestPendingFormResponder
 		super.prepare ();
 
 		request =
-			manualResponderRequestHelper.findOrNull (
+			manualResponderRequestHelper.findRequired (
 				requestContext.stuffInt (
 					"manualResponderRequestId"));
 
@@ -356,23 +358,24 @@ class ManualResponderRequestPendingFormResponder
 
 		int selectedTemplateId = -1;
 
-		String templateIdString =
-			requestContext.parameterOrNull (
+		Optional<String> templateIdStringOptional =
+			requestContext.parameter (
 				"template-id");
 
-		if (templateIdString != null) {
+		if (
+			isPresent (
+				templateIdStringOptional)
+		) {
 
 			selectedTemplateId =
 				Integer.parseInt (
-					templateIdString);
+					templateIdStringOptional.get ());
 
 		}
 
 		for (
-
 			ManualResponderTemplateRec template
 				: templates
-
 		) {
 
 			goTemplate (

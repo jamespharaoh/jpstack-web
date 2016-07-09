@@ -59,6 +59,12 @@
 					label="Templates"
 					priv-key="manualResponder.manage"/>
 
+				<context-link
+					name="affiliate"
+					link="manualResponderAffiliate"
+					label="Affiliates"
+					priv-key="manualResponder.manage"/>
+
 			</section>
 
 			<section

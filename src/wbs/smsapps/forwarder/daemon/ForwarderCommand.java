@@ -99,14 +99,14 @@ class ForwarderCommand
 			database.currentTransaction ();
 
 		ForwarderRec forwarder =
-			forwarderHelper.findOrNull (
+			forwarderHelper.findRequired (
 				command.getParentId ());
 
 		MessageRec message =
 			inbox.getMessage ();
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				forwarder,
 				"default");
 
@@ -131,7 +131,7 @@ class ForwarderCommand
 		);
 
 		messageSetLogic.sendMessageSet (
-			messageSetHelper.findByCodeOrNull (
+			messageSetHelper.findByCodeRequired (
 				forwarder,
 				"forwarder"),
 			message.getThreadId (),

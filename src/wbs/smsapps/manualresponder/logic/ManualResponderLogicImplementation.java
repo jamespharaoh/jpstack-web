@@ -1,6 +1,8 @@
 package wbs.smsapps.manualresponder.logic;
 
+import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.optionalOrNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,13 +15,17 @@ import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
+import wbs.sms.customer.logic.SmsCustomerLogic;
 import wbs.sms.gsm.Gsm;
 import wbs.sms.gsm.MessageSplitter;
 import wbs.sms.keyword.logic.KeywordLogic;
@@ -54,6 +60,9 @@ class ManualResponderLogicImplementation
 
 	@Inject
 	RouterLogic routerLogic;
+
+	@Inject
+	SmsCustomerLogic smsCustomerLogic;
 
 	@Inject
 	TextObjectHelper textHelper;
@@ -279,6 +288,11 @@ class ManualResponderLogicImplementation
 					manualResponder,
 					"default")
 
+				.affiliate (
+					optionalOrNull (
+						customerAffiliate (
+							manualResponderNumber)))
+
 				.deliveryTypeCode (
 					"manual_responder")
 
@@ -306,7 +320,7 @@ class ManualResponderLogicImplementation
 		) {
 
 			CommandRec command =
-				commandHelper.findByCodeOrNull (
+				commandHelper.findByCodeRequired (
 					manualResponder,
 					"default");
 
@@ -316,6 +330,20 @@ class ManualResponderLogicImplementation
 				command);
 
 		}
+
+	}
+
+	@Override
+	public
+	Optional<AffiliateRec> customerAffiliate (
+			@NonNull ManualResponderNumberRec number) {
+
+		return ifElse (
+			isNotNull (
+				number.getSmsCustomer ()),
+			() -> smsCustomerLogic.customerAffiliate (
+				number.getSmsCustomer ()),
+			() -> Optional.<AffiliateRec>absent ());
 
 	}
 

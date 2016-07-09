@@ -104,7 +104,8 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 		Matcher idMatcher =
 			idPattern.matcher (
-				requestContext.parameterOrNull ("id"));
+				requestContext.parameterRequired (
+					"id"));
 
 		if (! idMatcher.matches ()) {
 
@@ -119,7 +120,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 		valueParam =
 			trim (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"value"));
 
 		// start transaction
@@ -130,12 +131,12 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 				this);
 
 		manualResponder =
-			manualResponderHelper.findOrNull (
+			manualResponderHelper.findRequired (
 				requestContext.stuffInt (
 					"manualResponderId"));
 
 		number =
-			numberHelper.findOrNull (
+			numberHelper.findRequired (
 				numberId);
 
 		// find or create number

@@ -128,7 +128,7 @@ class ChatUserImageUploadCommand
 				messageIn);
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 
@@ -149,12 +149,12 @@ class ChatUserImageUploadCommand
 		// send message
 
 		CommandRec magicCommand =
-			commandHelper.findByCodeOrNull (
+			commandHelper.findByCodeRequired (
 				chat,
 				"magic");
 
 		CommandRec helpCommand =
-			commandHelper.findByCodeOrNull (
+			commandHelper.findByCodeRequired (
 				chat,
 				"help");
 

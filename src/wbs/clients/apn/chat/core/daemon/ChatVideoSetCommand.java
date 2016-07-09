@@ -112,7 +112,7 @@ class ChatVideoSetCommand
 				command);
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 
@@ -137,10 +137,12 @@ class ChatVideoSetCommand
 			command,
 			false);
 
-		if (chatUserLogic.setVideo (
+		if (
+			chatUserLogic.setVideo (
 				chatUser,
 				message,
-				false)) {
+				false)
+		) {
 
 			// send a message
 

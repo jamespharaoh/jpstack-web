@@ -73,7 +73,7 @@ class ManualResponderDelivery
 				this);
 
 		DeliveryRec delivery =
-			deliveryHelper.findOrNull (
+			deliveryHelper.findRequired (
 				deliveryId);
 
 		if (delivery.getNewMessageStatus ().isGoodType ()) {
@@ -82,7 +82,7 @@ class ManualResponderDelivery
 				delivery.getMessage ();
 
 			ManualResponderReplyRec reply =
-				manualResponderReplyHelper.findOrNull (
+				manualResponderReplyHelper.findRequired (
 					deliveryMessage.getRef ());
 
 			Integer deliveryMessageIndex =
@@ -116,7 +116,7 @@ class ManualResponderDelivery
 				delivery.getMessage ();
 
 			ManualResponderReplyRec reply =
-				manualResponderReplyHelper.findOrNull (
+				manualResponderReplyHelper.findRequired (
 					deliveryMessage.getRef ());
 
 			Integer deliveryMessageIndex =

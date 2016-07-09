@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.core.daemon;
 
+import static wbs.framework.record.IdObject.objectId;
+
 import java.util.Collections;
 
 import javax.inject.Inject;
@@ -120,7 +122,7 @@ class ChatNameCommand
 				command);
 
 		ServiceRec defaultService =
-			serviceHelper.findByCodeOrNull (
+			serviceHelper.findByCodeRequired (
 				chat,
 				"default");
 
@@ -181,8 +183,13 @@ class ChatNameCommand
 				Optional.of (
 					message.getThreadId ()),
 				"name_error",
-				commandHelper.findByCodeOrNull (chat, "magic"),
-				(long) commandHelper.findByCodeOrNull (chat, "name").getId (),
+				commandHelper.findByCodeRequired (
+					chat,
+					"magic"),
+				objectId (
+					commandHelper.findByCodeRequired (
+						chat,
+						"name")),
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 

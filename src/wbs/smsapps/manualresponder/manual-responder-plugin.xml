@@ -14,6 +14,7 @@
 
 	<models>
 		<model name="manualResponder"/>
+		<model name="manualResponderAffiliate"/>
 		<model name="manualResponderNumber"/>
 		<model name="manualResponderRequest"/>
 		<model name="manualResponderReply"/>
@@ -47,6 +48,7 @@
 
 	<console-modules>
 		<console-module name="manual-responder"/>
+		<console-module name="manual-responder-affiliate"/>
 		<console-module name="manual-responder-number"/>
 		<console-module name="manual-responder-request"/>
 		<console-module name="manual-responder-request-pending"/>

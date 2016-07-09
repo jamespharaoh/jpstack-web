@@ -1,10 +1,13 @@
 package wbs.clients.apn.chat.affiliate.console;
 
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+
+import com.google.common.base.Optional;
 
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.keyword.console.ChatKeywordConsoleHelper;
@@ -68,8 +71,11 @@ class ChatAffiliateKeywordsCreateAction
 
 		String keyword =
 			requestContext
-				.parameterOrNull ("keyword")
-				.toLowerCase ();
+
+			.parameterRequired (
+				"keyword")
+
+			.toLowerCase ();
 
 		if (! keywordLogic.checkKeyword (keyword)) {
 
@@ -83,23 +89,29 @@ class ChatAffiliateKeywordsCreateAction
 		ChatKeywordJoinType joinType =
 			toEnum (
 				ChatKeywordJoinType.class,
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"joinType"));
 
 		if (joinType == null) {
-			requestContext.addError ("Please specify a join type");
+
+			requestContext.addError (
+				"Please specify a join type");
+
 			return null;
+
 		}
 
 		Gender gender =
 			toEnum (
 				Gender.class,
-				requestContext.parameterOrNull ("gender"));
+				requestContext.parameterRequired (
+					"gender"));
 
 		Orient orient =
 			toEnum (
 				Orient.class,
-				requestContext.parameterOrNull ("orient"));
+				requestContext.parameterRequired (
+					"orient"));
 
 		@Cleanup
 		Transaction transaction =
@@ -114,12 +126,15 @@ class ChatAffiliateKeywordsCreateAction
 		ChatSchemeRec chatScheme =
 			chatAffiliate.getChatScheme ();
 
-		ChatKeywordRec chatKeyword =
-			chatKeywordHelper.findByCodeOrNull (
+		Optional<ChatKeywordRec> chatKeywordOptional =
+			chatKeywordHelper.findByCode (
 				chatScheme.getChat (),
 				keyword);
 
-		if (chatKeyword != null) {
+		if (
+			isPresent (
+				chatKeywordOptional)
+		) {
 
 			requestContext.addError (
 				"Global keyword already exists: " + keyword);
@@ -128,12 +143,15 @@ class ChatAffiliateKeywordsCreateAction
 
 		}
 
-		ChatSchemeKeywordRec chatSchemeKeyword =
-			chatSchemeKeywordHelper.findByCodeOrNull (
+		Optional<ChatSchemeKeywordRec> chatSchemeKeywordOptional =
+			chatSchemeKeywordHelper.findByCode (
 				chatScheme,
 				keyword);
 
-		if (chatSchemeKeyword != null) {
+		if (
+			isPresent (
+				chatSchemeKeywordOptional)
+		) {
 
 			requestContext.addError (
 				"Keyword already exists: " + keyword);

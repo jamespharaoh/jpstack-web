@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.optionalOrNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -121,7 +122,7 @@ class ManualResponderRequestPendingFormAction
 				"manualResponderRequestId");
 
 		String templateIdStr =
-			requestContext.parameterOrNull (
+			requestContext.parameterRequired (
 				"template-id");
 
 		boolean ignore =
@@ -155,7 +156,7 @@ class ManualResponderRequestPendingFormAction
 				this);
 
 		ManualResponderRequestRec manualResponderRequest =
-			manualResponderRequestHelper.findOrNull (
+			manualResponderRequestHelper.findRequired (
 				manualResponderRequestId);
 
 		// remove queue item
@@ -199,7 +200,7 @@ class ManualResponderRequestPendingFormAction
 		// get message
 
 		String messageParam =
-			requestContext.parameterOrNull (
+			requestContext.parameterRequired (
 				"message-" + templateId);
 
 		// begin transaction
@@ -210,7 +211,7 @@ class ManualResponderRequestPendingFormAction
 				this);
 
 		ManualResponderRequestRec request =
-			manualResponderRequestHelper.findOrNull (
+			manualResponderRequestHelper.findRequired (
 				manualResponderRequestId);
 
 		ManualResponderNumberRec manualResponderNumber =
@@ -220,7 +221,7 @@ class ManualResponderRequestPendingFormAction
 			manualResponderNumber.getManualResponder ();
 
 		ManualResponderTemplateRec template =
-			manualResponderTemplateHelper.findOrNull (
+			manualResponderTemplateHelper.findRequired (
 				templateId);
 
 		// consistency checks
@@ -409,6 +410,11 @@ class ManualResponderRequestPendingFormAction
 					manualResponder,
 					"default")
 
+				.affiliate (
+					optionalOrNull (
+						manualResponderLogic.customerAffiliate (
+							manualResponderNumber)))
+
 				.user (
 					userConsoleLogic.userRequired ())
 
@@ -484,7 +490,7 @@ class ManualResponderRequestPendingFormAction
 		) {
 
 			CommandRec command =
-				commandHelper.findByCodeOrNull (
+				commandHelper.findByCodeRequired (
 					manualResponder,
 					"default");
 
