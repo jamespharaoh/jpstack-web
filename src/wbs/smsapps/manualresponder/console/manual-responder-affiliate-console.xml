@@ -2,11 +2,12 @@
 	name="manual-responder-affiliate">
 
 	<console-helper-provider
-		object-name="manualResponderAffiliate">
+		object-name="manualResponderAffiliate"
+		view-priv="manualResponder:manage">
 
 		<priv-key
 			name="manualResponderAffiliate.manage"
-			priv="manualResopnder:manage"/>
+			priv="manualResponder:manage"/>
 
 		<context-stuff
 			name="manualResponderAffiliateName"

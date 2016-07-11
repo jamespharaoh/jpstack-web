@@ -200,8 +200,9 @@ class ManualResponderRequestPendingFormAction
 		// get message
 
 		String messageParam =
-			requestContext.parameterRequired (
-				"message-" + templateId);
+			optionalOrNull (
+				requestContext.parameter (
+					"message-" + templateId));
 
 		// begin transaction
 

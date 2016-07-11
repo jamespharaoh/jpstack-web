@@ -428,8 +428,10 @@ class ManualResponderCommand
 
 		return inboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (defaultService),
-			Optional.<AffiliateRec>absent (),
+			Optional.of (
+				defaultService),
+			manualResponderLogic.customerAffiliate (
+				manualResponderNumber),
 			command);
 
 	}
@@ -447,8 +449,10 @@ class ManualResponderCommand
 
 		return inboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (defaultService),
-			Optional.<AffiliateRec>absent (),
+			Optional.of (
+				defaultService),
+			manualResponderLogic.customerAffiliate (
+				manualResponderNumber),
 			command);
 
 	}
@@ -461,8 +465,10 @@ class ManualResponderCommand
 
 		return inboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (defaultService),
-			Optional.<AffiliateRec>absent (),
+			Optional.of (
+				defaultService),
+			manualResponderLogic.customerAffiliate (
+				manualResponderNumber),
 			command);
 
 	}
@@ -576,8 +582,10 @@ class ManualResponderCommand
 
 		return inboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (defaultService),
-			Optional.<AffiliateRec>absent (),
+			Optional.of (
+				defaultService),
+			manualResponderLogic.customerAffiliate (
+				manualResponderNumber),
 			command);
 
 	}
