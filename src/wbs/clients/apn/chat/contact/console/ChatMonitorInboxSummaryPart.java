@@ -169,9 +169,9 @@ class ChatMonitorInboxSummaryPart
 			transaction.now ();
 
 		monitorInbox =
-			chatMonitorInboxHelper.findOrNull (
+			chatMonitorInboxHelper.findRequired (
 				requestContext.stuffInt (
-					"chatMonitorInboxId"));
+ 					"chatMonitorInboxId"));
 
 		monitorChatUser =
 			monitorInbox.getMonitorChatUser ();
@@ -860,13 +860,13 @@ class ChatMonitorInboxSummaryPart
 			" name=\"alarmDate\"",
 			" size=\"12\"",
 			" value=\"%h\"",
-			requestContext.parameterOrNull ("alarmDate") != null
-				? requestContext.parameterOrNull ("alarmDate")
-				: timeFormatter.dateStringShort (
+			requestContext.parameterOrElse (
+				"alarmDate",
+				() -> timeFormatter.dateStringShort (
 					chatTimezone,
 					alarm == null
 						? now
-						: alarm.getAlarmTime ()),
+						: alarm.getAlarmTime ())),
 			">\n");
 
 		printFormat (

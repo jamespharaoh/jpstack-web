@@ -168,7 +168,7 @@ class ChatMonitorSwapDaemon
 				this);
 
 		ChatRec chat =
-			chatHelper.findOrNull (
+			chatHelper.findRequired (
 				chatId);
 
 		chat

@@ -2231,6 +2231,23 @@ class Misc {
 	}
 
 	public static <Type>
+	Type optionalOrElse (
+			@NonNull Optional<Type> optional,
+			@NonNull Supplier<Type> orElse) {
+
+		if (optional.isPresent ()) {
+
+			return optional.get ();
+
+		} else {
+
+			return orElse.get ();
+
+		}
+
+	}
+
+	public static <Type>
 	Optional<Type> requiredOptional (
 			@NonNull Optional<Type> optional) {
 

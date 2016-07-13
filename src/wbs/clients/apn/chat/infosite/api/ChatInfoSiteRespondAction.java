@@ -71,7 +71,7 @@ class ChatInfoSiteRespondAction
 
 		ChatUserRec otherUser =
 			chatUserHelper.findOrNull (
-				requestContext.parameterInt (
+				requestContext.parameterInteger (
 					"otherUserId"));
 
 		chatMessageLogic.chatMessageSendFromUser (

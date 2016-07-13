@@ -51,38 +51,38 @@ class ChatSettingsMonitorsAction
 
 		}
 
-		int gayMale;
-		int gayFemale;
-		int biMale;
-		int biFemale;
-		int straightMale;
-		int straightFemale;
+		long gayMale;
+		long gayFemale;
+		long biMale;
+		long biFemale;
+		long straightMale;
+		long straightFemale;
 
 		try {
 
 			gayMale =
-				Integer.parseInt (
-					requestContext.parameterOrNull ("gayMale"));
+				requestContext.parameterInteger (
+					"gayMale");
 
 			gayFemale =
-				Integer.parseInt (
-					requestContext.parameterOrNull ("gayFemale"));
+				requestContext.parameterInteger (
+					"gayFemale");
 
 			biMale =
-				Integer.parseInt (
-					requestContext.parameterOrNull ("biMale"));
+				requestContext.parameterInteger (
+					"biMale");
 
 			biFemale =
-				Integer.parseInt (
-					requestContext.parameterOrNull ("biFemale"));
+				requestContext.parameterInteger (
+					"biFemale");
 
 			straightMale =
-				Integer.parseInt (
-					requestContext.parameterOrNull ("straightMale"));
+				requestContext.parameterInteger (
+					"straightMale");
 
 			straightFemale =
-				Integer.parseInt (
-					requestContext.parameterOrNull ("straightFemale"));
+				requestContext.parameterInteger (
+					"straightFemale");
 
 		} catch (NumberFormatException exception) {
 
@@ -99,8 +99,9 @@ class ChatSettingsMonitorsAction
 				this);
 
 		ChatRec chat =
-			chatHelper.findOrNull (
-				requestContext.stuffInt ("chatId"));
+			chatHelper.findRequired (
+				requestContext.stuffInt (
+					"chatId"));
 
 		chatMiscLogic.monitorsToTarget (
 			chat,

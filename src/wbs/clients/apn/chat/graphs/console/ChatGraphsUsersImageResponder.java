@@ -72,7 +72,7 @@ class ChatGraphsUsersImageResponder
 	void prepareData () {
 
 		chat =
-			chatHelper.findOrNull (
+			chatHelper.findRequired (
 				requestContext.stuffInt (
 					"chatId"));
 
@@ -84,8 +84,10 @@ class ChatGraphsUsersImageResponder
 
 			date =
 				timeFormatter
-					.dateStringToLocalDateRequired (
-						requestContext.parameterOrNull ("date"));
+
+				.dateStringToLocalDateRequired (
+					requestContext.parameterRequired (
+						"date"));
 
 			minTime =
 				date

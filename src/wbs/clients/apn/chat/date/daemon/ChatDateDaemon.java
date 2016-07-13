@@ -182,7 +182,8 @@ class ChatDateDaemon
 				this);
 
 		ChatRec chat =
-			chatHelper.findOrNull (chatId);
+			chatHelper.findRequired (
+				chatId);
 
 		log.info (
 			stringFormat (
@@ -278,11 +279,12 @@ class ChatDateDaemon
 		) {
 
 			ChatUserRec chatUser =
-				chatUserHelper.findOrNull (
+				chatUserHelper.findRequired (
 					chatUserId);
 
 			otherUserInfos.add (
-				new DatingUserInfo (chatUser));
+				new DatingUserInfo (
+					chatUser));
 
 		}
 
@@ -445,7 +447,7 @@ class ChatDateDaemon
 				this);
 
 		ChatUserRec thisUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				thisUserId);
 
 		ChatRec chat =
@@ -681,7 +683,7 @@ class ChatDateDaemon
 				break;
 
 			ChatUserRec otherUser =
-				chatUserHelper.findOrNull (
+				chatUserHelper.findRequired (
 					datingUserDistance.id);
 
 			if (otherUser.getInfoText () == null)

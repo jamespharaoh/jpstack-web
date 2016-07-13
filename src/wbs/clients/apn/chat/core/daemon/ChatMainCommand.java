@@ -613,7 +613,7 @@ class ChatMainCommand
 				inbox.getId ()));
 
 		commandChatScheme =
-			chatSchemeHelper.findOrNull (
+			chatSchemeHelper.findRequired (
 				command.getParentId ());
 
 		chat =

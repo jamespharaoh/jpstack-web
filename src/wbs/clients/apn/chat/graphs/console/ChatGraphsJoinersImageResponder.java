@@ -74,10 +74,11 @@ class ChatGraphsJoinersImageResponder
 
 		Integer chatId =
 			(Integer)
-			contextStuff.get ("chatId");
+			contextStuff.get (
+				"chatId");
 
 		ChatRec chat =
-			chatHelper.findOrNull (
+			chatHelper.findRequired (
 				chatId);
 
 		Map<String,Object> searchMap =
@@ -101,7 +102,8 @@ class ChatGraphsJoinersImageResponder
 
 		Integer chatAffiliateId =
 			(Integer)
-			contextStuff.get ("chatAffiliateId");
+			contextStuff.get (
+				"chatAffiliateId");
 
 		if (chatAffiliateId != null) {
 
@@ -119,11 +121,13 @@ class ChatGraphsJoinersImageResponder
 			chatMiscLogic.timezone (
 				chat);
 
-		for (Integer chatUserId
-				: chatUserIds) {
+		for (
+			Integer chatUserId
+				: chatUserIds
+		) {
 
 			ChatUserRec chatUser =
-				chatUserHelper.findOrNull (
+				chatUserHelper.findRequired (
 					chatUserId);
 
 			int index =

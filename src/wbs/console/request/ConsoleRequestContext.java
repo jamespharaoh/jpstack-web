@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
@@ -220,7 +221,11 @@ interface ConsoleRequestContext {
 			String key,
 			String defaultValue);
 
-	int parameterInt (
+	String parameterOrElse (
+			String key,
+			Supplier<String> orElse);
+
+	long parameterInteger (
 			String key);
 
 	String sessionId ();

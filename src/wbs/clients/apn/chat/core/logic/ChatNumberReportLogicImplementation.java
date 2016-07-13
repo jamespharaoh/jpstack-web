@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.core.logic;
 
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -10,6 +11,8 @@ import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
+
+import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
@@ -47,11 +50,14 @@ class ChatNumberReportLogicImplementation
 				.now ()
 				.minus (Duration.standardDays (365 / 2));
 
-		ChatUserNumberReportRec numberReportRec =
-			chatUserNumberReportHelper.findOrNull (
+		Optional<ChatUserNumberReportRec> numberReportOptional =
+			chatUserNumberReportHelper.find (
 				number.getId ());
 
-		if (numberReportRec == null) {
+		if (
+			isNotPresent (
+				numberReportOptional)
+		) {
 
 			// no DR yet for this number
 
@@ -62,36 +68,42 @@ class ChatNumberReportLogicImplementation
 
 		}
 
-		if (numberReportRec.getLastSuccess () != null) {
+		ChatUserNumberReportRec numberReport =
+			numberReportOptional.get ();
+
+		if (numberReport.getLastSuccess () != null) {
 
 			log.debug (
 				stringFormat (
 					"REPORT LAST SUCCESS %s %s",
-					numberReportRec.getLastSuccess (),
+					numberReport.getLastSuccess (),
 					number.getNumber ()));
 
 			return laterThan (
-				numberReportRec.getLastSuccess (),
+				numberReport.getLastSuccess (),
 				sixMonthsAgo);
 
 		}
 
-		if (numberReportRec.getFirstFailure () != null) {
+		if (numberReport.getFirstFailure () != null) {
 
 			log.debug (
 				stringFormat (
 					"REPORT FIRST FAILURE %s %s",
-					numberReportRec.getFirstFailure (),
+					numberReport.getFirstFailure (),
 					number.getNumber ()));
 
 			return laterThan (
-				numberReportRec.getFirstFailure (),
+				numberReport.getFirstFailure (),
 				sixMonthsAgo);
 
 		}
 
 		// shouldn't happen
-		log.debug ("REPORT ERROR " + number.getNumber ());
+
+		log.debug (
+			"REPORT ERROR " + number.getNumber ());
+
 		return true;
 
 	}
@@ -99,13 +111,16 @@ class ChatNumberReportLogicImplementation
 	@Override
 	public
 	boolean isNumberReportPastPermanentDeliveryConstraint (
-			NumberRec number) {
+			@NonNull NumberRec number) {
 
-		ChatUserNumberReportRec numberReportRec =
-			chatUserNumberReportHelper.findOrNull (
+		Optional<ChatUserNumberReportRec> numberReportOptional =
+			chatUserNumberReportHelper.find (
 				number.getId ());
 
-		if (numberReportRec == null) {
+		if (
+			isNotPresent (
+				numberReportOptional)
+		) {
 
 			// no DR yet for this number
 
@@ -115,10 +130,13 @@ class ChatNumberReportLogicImplementation
 
 		}
 
-		if (numberReportRec.getPermanentFailureReceived () != null) {
+		ChatUserNumberReportRec numberReport =
+			numberReportOptional.get ();
+
+		if (numberReport.getPermanentFailureReceived () != null) {
 
 			long count =
-				numberReportRec.getPermanentFailureCount ();
+				numberReport.getPermanentFailureCount ();
 
 			log.debug ("REPORT PERMANENT COUNT " + count + " "
 					+ number.getNumber ());

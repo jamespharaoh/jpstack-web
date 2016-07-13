@@ -31,8 +31,9 @@ class ChatNoteNamesPart
 	void prepare () {
 
 		ChatRec chat =
-			chatHelper.findOrNull (
-				requestContext.stuffInt ("chatId"));
+			chatHelper.findRequired (
+				requestContext.stuffInt (
+					"chatId"));
 
 		noteNames =
 			chatNoteNameHelper.findNotDeleted (

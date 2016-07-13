@@ -58,8 +58,10 @@ class ChatUserInitiationStatsProvider
 		// retrieve messages
 
 		ChatRec chat =
-			chatHelper.findOrNull (
-				(Integer) conditions.get ("chatId"));
+			chatHelper.findRequired (
+				(Integer)
+				conditions.get (
+					"chatId"));
 
 		List<ChatUserInitiationLogRec> logs =
 			chatUserInitiationLogHelper.findByTimestamp (

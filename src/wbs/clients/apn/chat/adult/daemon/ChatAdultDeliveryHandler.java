@@ -70,7 +70,7 @@ class ChatAdultDeliveryHandler
 				this);
 
 		DeliveryRec delivery =
-			deliveryHelper.findOrNull (
+			deliveryHelper.findRequired (
 				deliveryId);
 
 		MessageRec message =
@@ -80,22 +80,26 @@ class ChatAdultDeliveryHandler
 			message.getDeliveryType ();
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				delivery.getMessage ().getRef ());
 
 		// work out if it is a join
 
 		boolean join;
 
-		if (equal (
+		if (
+			equal (
 				deliveryType.getCode (),
-				"chat_adult")) {
+				"chat_adult")
+		) {
 
 			join = false;
 
-		} else if (equal (
+		} else if (
+			equal (
 				deliveryType.getCode (),
-				"chat_adult_join")) {
+				"chat_adult_join")
+		) {
 
 			join = true;
 

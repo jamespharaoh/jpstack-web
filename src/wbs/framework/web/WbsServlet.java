@@ -1,5 +1,6 @@
 package wbs.framework.web;
 
+import static wbs.framework.utils.etc.Misc.lowercase;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -35,6 +36,29 @@ class WbsServlet
 	protected
 	RequestContext requestContext;
 
+	private
+	ActiveTask startTask () {
+
+		return activityManager.start (
+			"web request",
+			this,
+			ImmutableMap.<String,Object>builder ()
+
+			.put (
+				"method",
+				lowercase (
+					requestContext.method ()))
+
+			.put (
+				"request path",
+				requestContext.requestPath ())
+
+			.build ()
+
+		);
+
+	}
+
 	protected
 	void doGet ()
 		throws
@@ -43,11 +67,7 @@ class WbsServlet
 
 		@Cleanup
 		ActiveTask activeTask =
-			activityManager.start (
-				"web request",
-				this,
-				ImmutableMap.<String,Object>builder ()
-					.build ());
+			startTask ();
 
 		try {
 
@@ -84,6 +104,10 @@ class WbsServlet
 			ServletException,
 			IOException {
 
+		@Cleanup
+		ActiveTask activeTask =
+			startTask ();
+
 		try {
 
 			WebFile file =
@@ -113,6 +137,10 @@ class WbsServlet
 		throws
 			ServletException,
 			IOException {
+
+		@Cleanup
+		ActiveTask activeTask =
+			startTask ();
 
 		try {
 

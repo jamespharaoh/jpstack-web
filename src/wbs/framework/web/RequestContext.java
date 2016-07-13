@@ -50,7 +50,7 @@ interface RequestContext {
 			String key,
 			String defaultValue);
 
-	int parameterInt (
+	long parameterInteger (
 			String key);
 
 	Map<String,List<String>> parameterMap ();

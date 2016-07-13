@@ -138,11 +138,12 @@ class RequestContextImplementation
 
 	@Override
 	public
-	int parameterInt (
-			String key) {
+	long parameterInteger (
+			@NonNull String key) {
 
-		return Integer.parseInt (
-			parameter (key));
+		return Long.parseLong (
+			parameter (
+				key));
 
 	}
 

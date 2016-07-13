@@ -600,7 +600,7 @@ class ChatMiscLogicImplementation
 			ChatRec chat,
 			Gender gender,
 			Orient orient,
-			int target) {
+			long target) {
 
 		// fetch all appropriate monitors
 

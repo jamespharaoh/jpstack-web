@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -266,6 +267,31 @@ class ConsoleRequestContextImplementation
 
 		return requestContext
 			.parameter (key);
+
+	}
+
+	@Override
+	public
+	String parameterOrElse (
+			@NonNull String key,
+			@NonNull Supplier<String> orElse) {
+
+		String value =
+			requestContext.parameter (
+				key);
+
+		if (
+			isNotNull (
+				value)
+		) {
+
+			return value;
+
+		} else {
+
+			return orElse.get ();
+
+		}
 
 	}
 
@@ -1016,11 +1042,11 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	int parameterInt (
+	long parameterInteger (
 			@NonNull String key) {
 
-		return requestContext
-			.parameterInt (key);
+		return requestContext.parameterInteger (
+			key);
 
 	}
 

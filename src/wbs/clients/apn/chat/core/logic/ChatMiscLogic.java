@@ -59,7 +59,7 @@ interface ChatMiscLogic {
 			ChatRec chat,
 			Gender gender,
 			Orient orient,
-			int target);
+			long target);
 
 	void userAutoJoin (
 			ChatUserRec chatUser,
