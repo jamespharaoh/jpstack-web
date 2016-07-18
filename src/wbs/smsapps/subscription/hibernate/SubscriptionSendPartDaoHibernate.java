@@ -1,5 +1,7 @@
 package wbs.smsapps.subscription.hibernate;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.hibernate.HibernateDao;
@@ -16,10 +18,11 @@ class SubscriptionSendPartDaoHibernate
 	@Override
 	public
 	SubscriptionSendPartRec find (
-			SubscriptionSendRec subscriptionSend,
-			SubscriptionListRec subscriptionList) {
+			@NonNull SubscriptionSendRec subscriptionSend,
+			@NonNull SubscriptionListRec subscriptionList) {
 
 		return findOne (
+			"find (subscriptionSend, subscriptionList)",
 			SubscriptionSendPartRec.class,
 
 			createCriteria (
@@ -36,7 +39,7 @@ class SubscriptionSendPartDaoHibernate
 					"_subscriptionSendPart.subscriptionList",
 					subscriptionList))
 
-			.list ());
+		);
 
 	}
 

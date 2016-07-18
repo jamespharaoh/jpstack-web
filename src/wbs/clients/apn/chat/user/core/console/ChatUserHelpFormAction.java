@@ -51,7 +51,8 @@ class ChatUserHelpFormAction
 		// get parameters
 
 		String text =
-			requestContext.parameterOrNull("text");
+			requestContext.parameterRequired (
+				"text");
 
 		// check parameters
 
@@ -73,12 +74,13 @@ class ChatUserHelpFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserHelpFormAction.goReal ()",
 				this);
 
 		// get objects
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				requestContext.stuffInt (
 					"chatUserId"));
 

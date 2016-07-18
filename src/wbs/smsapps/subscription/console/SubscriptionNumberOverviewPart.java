@@ -28,7 +28,7 @@ class SubscriptionNumberOverviewPart
 	void prepare () {
 
 		subscription =
-			subscriptionHelper.findOrNull (
+			subscriptionHelper.findRequired (
 				requestContext.stuffInt (
 					"subscriptionId"));
 

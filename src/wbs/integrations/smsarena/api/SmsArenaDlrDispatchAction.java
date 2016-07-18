@@ -10,8 +10,6 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 
-import com.google.common.base.Optional;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -89,118 +87,7 @@ class SmsArenaDlrDispatchAction
 
 		try {
 
-			// output
-
-			debugLog.append (
-				stringFormat (
-					"%s %s\n",
-					requestContext.method (),
-					requestContext.requestUri ()));
-
-			// output headers
-
-			for (
-				Map.Entry<String,List<String>> headerEntry
-					: requestContext.headerMap ().entrySet ()
-			) {
-
-				for (
-					String headerValue
-						: headerEntry.getValue ()
-				) {
-
-					debugLog.append (
-						stringFormat (
-							"%s = %s\n",
-							headerEntry.getKey (),
-							headerValue));
-
-				}
-
-			}
-
-			debugLog.append (
-				stringFormat (
-					"\n"));
-
-			// output params
-
-			for (
-				Map.Entry<String,List<String>> parameterEntry
-					: requestContext.parameterMap ().entrySet ()
-			) {
-
-				for (
-					String parameterValue
-						: parameterEntry.getValue ()
-				) {
-
-					debugLog.append (
-						stringFormat (
-							"%s = %s\n",
-							parameterEntry.getKey (),
-							parameterValue));
-
-				}
-
-			}
-
-			debugLog.append (
-				stringFormat (
-					"\n"));
-
-			// get request parameters
-
-			id =
-				requestContext.parameter ("id");
-
-			dlr =
-				requestContext.parameter ("dlr");
-
-			desc =
-				requestContext.parameter ("desc");
-
-			// begin transaction
-
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					this);
-
-			// find the route
-
-			RouteRec route =
-				routeHelper.findOrNull (
-					Integer.parseInt (
-						requestContext.requestStringRequired (
-							"routeId")));
-
-			SmsArenaRouteInRec smsArenaRouteIn =
-				smsArenaRouteInHelper.findOrNull (
-					route.getId ());
-
-			if (smsArenaRouteIn == null)
-				throw new RuntimeException ();
-
-			// get the code and create the report
-
-			SmsArenaReportCodeRec reportCode =
-				smsArenaReportCodeHelper.findByCodeRequired (
-					smsArenaRouteIn.getSmsArenaConfig (),
-					dlr);
-
-			reportLogic.deliveryReport (
-				route,
-				id,
-				Optional.of (
-					reportCode.getMessageStatus ()),
-				transaction.now (),
-				null);
-
-			transaction.commit ();
-
-			return textResponderProvider.get ()
-					.text ("success");
+			return handleDispatch ();
 
 		} catch (RuntimeException exception) {
 
@@ -219,39 +106,162 @@ class SmsArenaDlrDispatchAction
 
 		} finally {
 
-			// create the log for the delivery report
-
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					this);
-
-			RouteRec route =
-				routeHelper.findOrNull (
-					Integer.parseInt (
-						requestContext.requestStringRequired (
-							"routeId")));
-
-			smsArenaDlrReportLogHelper.insert (
-				smsArenaDlrReportLogHelper.createInstance ()
-
-				.setRoute (
-					route)
-
-				.setType (
-					SmsArenaDlrReportLogType.smsDelivery)
-
-				.setTimestamp (
-					transaction.now ())
-
-				.setDetails (
-					debugLog.toString ())
-
-			);
-
-			transaction.commit ();
+			writeLog ();
 
 		}
+
+	}
+
+	private
+	Responder handleDispatch () {
+
+		// output
+
+		debugLog.append (
+			stringFormat (
+				"%s %s\n",
+				requestContext.method (),
+				requestContext.requestUri ()));
+
+		// output headers
+
+		for (
+			Map.Entry<String,List<String>> headerEntry
+				: requestContext.headerMap ().entrySet ()
+		) {
+
+			for (
+				String headerValue
+					: headerEntry.getValue ()
+			) {
+
+				debugLog.append (
+					stringFormat (
+						"%s = %s\n",
+						headerEntry.getKey (),
+						headerValue));
+
+			}
+
+		}
+
+		debugLog.append (
+			stringFormat (
+				"\n"));
+
+		// output params
+
+		for (
+			Map.Entry<String,List<String>> parameterEntry
+				: requestContext.parameterMap ().entrySet ()
+		) {
+
+			for (
+				String parameterValue
+					: parameterEntry.getValue ()
+			) {
+
+				debugLog.append (
+					stringFormat (
+						"%s = %s\n",
+						parameterEntry.getKey (),
+						parameterValue));
+
+			}
+
+		}
+
+		debugLog.append (
+			stringFormat (
+				"\n"));
+
+		// get request parameters
+
+		id =
+			requestContext.parameter ("id");
+
+		dlr =
+			requestContext.parameter ("dlr");
+
+		desc =
+			requestContext.parameter ("desc");
+
+		// begin transaction
+
+		@Cleanup
+		Transaction transaction =
+			database.beginReadWrite (
+				"SmsArenaDlrDispatchAction.handleDispatch ()",
+				this);
+
+		// find the route
+
+		RouteRec route =
+			routeHelper.findRequired (
+				Integer.parseInt (
+					requestContext.requestStringRequired (
+						"routeId")));
+
+		SmsArenaRouteInRec smsArenaRouteIn =
+			smsArenaRouteInHelper.findRequired (
+				route.getId ());
+
+		// get the code and create the report
+
+		SmsArenaReportCodeRec reportCode =
+			smsArenaReportCodeHelper.findByCodeRequired (
+				smsArenaRouteIn.getSmsArenaConfig (),
+				dlr);
+
+		reportLogic.deliveryReport (
+			route,
+			id,
+			reportCode.getMessageStatus (),
+			transaction.now (),
+			null);
+
+		transaction.commit ();
+
+		return textResponderProvider.get ()
+				.text ("success");
+
+	}
+
+	private
+	void writeLog () {
+
+		// create the log for the delivery report
+
+		@Cleanup
+		Transaction transaction =
+			database.beginReadWrite (
+				"SmsArenaDlrDispatchAction.writeLog ()",
+				this);
+
+		RouteRec route =
+			routeHelper.findRequired (
+				Integer.parseInt (
+					requestContext.requestStringRequired (
+						"routeId")));
+
+		smsArenaDlrReportLogHelper.insert (
+			smsArenaDlrReportLogHelper.createInstance ()
+
+			.setRoute (
+				route)
+
+			.setType (
+				SmsArenaDlrReportLogType.smsDelivery)
+
+			.setTimestamp (
+				transaction.now ())
+
+			.setDetails (
+				debugLog.toString ())
+
+		);
+
+		transaction.commit ();
 
 	}
 

@@ -73,8 +73,9 @@ class ChatHelpLogPendingFormResponder
 	void prepare () {
 
 		chatHelpLog =
-			chatHelpLogHelper.findOrNull (
-				requestContext.stuffInt ("chatHelpLogId"));
+			chatHelpLogHelper.findRequired (
+				requestContext.stuffInt (
+					"chatHelpLogId"));
 
 		chatHelpTemplates =
 			chatHelpTemplateHelper.findByParentAndType (

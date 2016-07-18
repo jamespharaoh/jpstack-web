@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.graphs.console;
 
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -23,20 +24,17 @@ class ChatGraphsUsersPart
 	void renderHtmlBodyContent () {
 
 		LocalDate date;
+		String dateString;
 
-		String dateString =
-			requestContext.parameterOrNull ("date");
-
-		if (dateString == null) {
-
-			date =
-				LocalDate.now ();
+		if (
+			isPresent (
+				requestContext.parameter (
+					"date"))
+		) {
 
 			dateString =
-				timeFormatter.dateString (
-					date);
-
-		} else {
+				requestContext.parameterRequired (
+					"date");
 
 			try {
 
@@ -49,6 +47,15 @@ class ChatGraphsUsersPart
 				date = null;
 
 			}
+
+		} else {
+
+			date =
+				LocalDate.now ();
+
+			dateString =
+				timeFormatter.dateString (
+					date);
 
 		}
 

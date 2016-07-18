@@ -2,6 +2,7 @@ package wbs.framework.hibernate;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -26,6 +28,8 @@ import org.hibernate.criterion.Restrictions;
 
 import com.google.common.collect.ImmutableList;
 
+import wbs.framework.activitymanager.ActiveTask;
+import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.entity.model.Model;
 import wbs.framework.object.ObjectHelper;
@@ -45,6 +49,9 @@ public
 class HibernateHelperProviderBuilder {
 
 	// dependencies
+
+	@Inject
+	ActivityManager activityManager;
 
 	@Inject
 	HibernateDatabase hibernateDatabase;
@@ -447,7 +454,7 @@ class HibernateHelperProviderBuilder {
 		@Override
 		public
 		List<Record<?>> findMany (
-				List<Long> ids) {
+				@NonNull List<Long> ids) {
 
 			if (
 				isEmpty (
@@ -455,6 +462,12 @@ class HibernateHelperProviderBuilder {
 			) {
 				return ImmutableList.of ();
 			}
+
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"findMany",
+					"list of %s ids");
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -465,8 +478,12 @@ class HibernateHelperProviderBuilder {
 
 			List<Integer> intIds =
 				ids.stream ()
-					.map (id -> (int) (long) (Long) id)
-					.collect (Collectors.toList ());
+
+				.map (
+					id -> (int) (long) (Long) id)
+
+				.collect (
+					Collectors.toList ());
 
 			criteria.add (
 				Restrictions.in (
@@ -478,13 +495,19 @@ class HibernateHelperProviderBuilder {
 
 			Map<Integer,Record<?>> recordsById =
 				records.stream ()
-					.collect (Collectors.toMap (
+
+				.collect (
+					Collectors.toMap (
 						Record::getId,
 						record -> record));
 
 			return intIds.stream ()
-				.map (recordsById::get)
-				.collect (Collectors.toList ());
+
+				.map (
+					recordsById::get)
+
+				.collect (
+					Collectors.toList ());
 
 		}
 
@@ -493,6 +516,13 @@ class HibernateHelperProviderBuilder {
 		Record<?> findByParentAndCode (
 				@NonNull GlobalId parentGlobalId,
 				@NonNull String code) {
+
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"findByParentAndCode",
+					parentGlobalId.toString (),
+					code);
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -656,6 +686,13 @@ class HibernateHelperProviderBuilder {
 
 			}
 
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"findByParentAndIndex",
+					parentGlobalId.toString (),
+					index.toString ());
+
 			if (model.isRooted ()) {
 
 				if (
@@ -797,6 +834,14 @@ class HibernateHelperProviderBuilder {
 				@NonNull GlobalId parentGlobalId,
 				@NonNull String typeCode,
 				@NonNull String code) {
+
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"findByParentAndTypeAndCode",
+					parentGlobalId.toString (),
+					typeCode,
+					code);
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -984,6 +1029,11 @@ class HibernateHelperProviderBuilder {
 			Session session =
 				hibernateDatabase.currentSession ();
 
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"findAll");
+
 			return session.createQuery (
 				"FROM " + objectClass ().getName ())
 
@@ -995,6 +1045,12 @@ class HibernateHelperProviderBuilder {
 		public
 		List<Record<?>> findAllByParent (
 				@NonNull GlobalId parentGlobalId) {
+
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"findAllByParent",
+					parentGlobalId.toString ());
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -1174,6 +1230,14 @@ class HibernateHelperProviderBuilder {
 				@NonNull Long indexStart,
 				@NonNull Long indexEnd) {
 
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"findByParentAndIndexRange",
+					parentGlobalId.toString (),
+					indexStart.toString (),
+					indexEnd.toString ());
+
 			Session session =
 				hibernateDatabase.currentSession ();
 
@@ -1228,6 +1292,12 @@ class HibernateHelperProviderBuilder {
 		Record insert (
 				@NonNull Record object) {
 
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"insert",
+					"...");
+
 			objectHooks.beforeInsert (
 				object);
 
@@ -1248,6 +1318,14 @@ class HibernateHelperProviderBuilder {
 		public
 		Record insertSpecial (
 				@NonNull Record object) {
+
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"insertSpecial",
+					stringFormat (
+						"id = %s",
+						object.getId ()));
 
 			objectHooks.beforeInsert (
 				object);
@@ -1271,6 +1349,14 @@ class HibernateHelperProviderBuilder {
 		Record update (
 				@NonNull Record object) {
 
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"update",
+					stringFormat (
+						"id = %s",
+						object.getId()));
+
 			objectHooks.beforeUpdate (
 				object);
 
@@ -1282,6 +1368,14 @@ class HibernateHelperProviderBuilder {
 		public <ObjectType extends EphemeralRecord<?>>
 		ObjectType remove (
 				@NonNull ObjectType object) {
+
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"remove",
+					stringFormat (
+						"id = %s",
+						object.getId ()));
 
 			Session session =
 				hibernateDatabase.currentSession ();
@@ -1431,6 +1525,13 @@ class HibernateHelperProviderBuilder {
 				@NonNull GlobalId parentGlobalId,
 				@NonNull String typeCode) {
 
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"findAllByParentAndType",
+					parentGlobalId.toString (),
+					typeCode);
+
 			Session session =
 				hibernateDatabase.currentSession ();
 
@@ -1557,6 +1658,14 @@ class HibernateHelperProviderBuilder {
 		RecordType lock (
 				@NonNull RecordType object) {
 
+			@Cleanup
+			ActiveTask activeTask =
+				startTask (
+					"lock",
+					stringFormat (
+						"id = %s",
+						object.getId ()));
+
 			Session session =
 				hibernateDatabase.currentSession ();
 
@@ -1593,6 +1702,24 @@ class HibernateHelperProviderBuilder {
 				object,
 				name,
 				value);
+
+		}
+
+		private
+		ActiveTask startTask (
+				@NonNull String methodName,
+				@NonNull String... arguments) {
+
+			return activityManager.start (
+				"hibernate",
+				stringFormat (
+					"%sHelperProvider.%s (%s)",
+					objectName (),
+					methodName,
+					joinWithSeparator (
+						", ",
+						arguments)),
+				this);
 
 		}
 

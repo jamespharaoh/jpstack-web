@@ -70,6 +70,7 @@ class AutoResponderDelivery
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"AutoResponderDelivery.handle (deliveryId, ref)",
 				this);
 
 		DeliveryRec delivery =

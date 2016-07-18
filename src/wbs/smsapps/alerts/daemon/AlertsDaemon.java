@@ -1,13 +1,15 @@
 package wbs.smsapps.alerts.daemon;
 
+import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -126,13 +128,8 @@ class AlertsDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"AlertsDaemon.runOnce ()",
 				this);
-
-		List<AlertsSettingsRec> alertsSettingss =
-			alertsSettingsHelper.findAll ();
-
-		List<Integer> alertsSettingsIds =
-			new ArrayList<Integer> ();
 
 		// work out current minute
 
@@ -145,21 +142,35 @@ class AlertsDaemon
 
 		// find alerts settings pending
 
-		for (AlertsSettingsRec alertsSettings
-				: alertsSettingss) {
+		List<Integer> alertsSettingsIds =
+			alertsSettingsHelper.findAll ().stream ()
 
-			if (! alertsSettings.getEnabled ())
-				continue;
+			.filter (
+				alertsSettings ->
+					! alertsSettings.getDeleted ())
 
-			if (alertsSettings.getLastStatusCheck () != null
-					&& alertsSettings.getLastStatusCheck ().isAfter (
-						currentMinute))
-				continue;
+			.filter (
+				alertsSettings ->
+					alertsSettings.getEnabled ())
 
-			alertsSettingsIds.add (
-				alertsSettings.getId ());
+			.filter (
+				alertsSettings ->
 
-		}
+				isNull (
+					alertsSettings.getLastStatusCheck ())
+
+				|| earlierThan (
+					alertsSettings.getLastStatusCheck (),
+					currentMinute)
+
+			)
+
+			.map (
+				alertsSettings ->
+					alertsSettings.getId ())
+
+			.collect (
+				Collectors.toList ());
 
 		transaction.close ();
 
@@ -210,6 +221,7 @@ class AlertsDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"AlertsDaemon.runOnce ()",
 				this);
 
 		AlertsSettingsRec alertsSettings =

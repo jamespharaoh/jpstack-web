@@ -81,17 +81,12 @@ class DialogueMmsSender
 			outbox;
 
 		dialogueMmsOutbox.dialogueMmsRoute =
-			dialogueMmsRouteHelper.findOrNull (
-				outbox.getRoute ().getId ());
-
-		if (dialogueMmsOutbox.dialogueMmsRoute == null) {
-
-			throw tempFailure (
-				stringFormat (
-					"No Dialogue MMS route for message %s",
-					outbox.getMessage ().getId ()));
-
-		}
+			dialogueMmsRouteHelper.findOrThrow (
+				outbox.getRoute ().getId (),
+				() -> tempFailure (
+					stringFormat (
+						"No Dialogue MMS route for message %s",
+						outbox.getMessage ().getId ())));
 
 		// initialise any lazy proxies
 

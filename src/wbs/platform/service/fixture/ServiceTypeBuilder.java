@@ -109,6 +109,7 @@ class ServiceTypeBuilder {
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ServiceTypeBuilder.createServiceType ()",
 				this);
 
 		// lookup parent type

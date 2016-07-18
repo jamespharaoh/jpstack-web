@@ -78,6 +78,7 @@ class ChatJoinTimeoutDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatJoinTimeoutDaemon.runOnce ()",
 				this);
 
 		for (

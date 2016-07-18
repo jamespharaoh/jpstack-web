@@ -66,10 +66,11 @@ class ImChatPricePointListAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ImChatPricePointListAction.handle ()",
 				this);
 
 		ImChatRec imChat =
-			imChatHelper.findOrNull (
+			imChatHelper.findRequired (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));

@@ -17,7 +17,6 @@ import wbs.clients.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditSearch;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.framework.hibernate.HibernateDao;
-import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 
 public
 class ChatUserCreditDaoHibernate
@@ -27,33 +26,37 @@ class ChatUserCreditDaoHibernate
 	@Override
 	public
 	List<ChatUserCreditRec> findByTimestamp (
-			ChatRec chat,
-			Interval timestampInterval) {
+			@NonNull ChatRec chat,
+			@NonNull Interval timestamp) {
 
 		return findMany (
+			"findByTimestamp (chat, timestamp)",
 			ChatUserCreditRec.class,
 
-			createQuery (
-				"FROM ChatUserCreditRec chatUserCredit " +
-				"WHERE chatUserCredit.chatUser.chat = :chat " +
-				"AND chatUserCredit.timestamp >= :timestampFrom " +
-				"AND chatUserCredit.timestamp < :timestampTo")
+			createCriteria (
+				ChatUserCreditRec.class,
+				"_chatUserCredit")
 
-			.setEntity (
-				"chat",
-				chat)
+			.createAlias (
+				"_chatUserCredit.chatUser",
+				"_chatUser")
 
-			.setParameter (
-				"timestampFrom",
-				timestampInterval.getStart (),
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"_chatUser.chat",
+					chat))
 
-			.setParameter (
-				"timestampTo",
-				timestampInterval.getEnd (),
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.ge (
+					"_chatUserCredit.timestamp",
+					timestamp.getStart ()))
 
-			.list ());
+			.add (
+				Restrictions.lt (
+					"_chatUserCredit.timestamp",
+					timestamp.getEnd ()))
+
+		);
 
 	}
 
@@ -127,8 +130,9 @@ class ChatUserCreditDaoHibernate
 			Projections.id ());
 
 		return findMany (
+			"search (search)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 

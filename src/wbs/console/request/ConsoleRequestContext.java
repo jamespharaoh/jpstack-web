@@ -167,10 +167,13 @@ interface ConsoleRequestContext {
 
 	ConsoleContextStuff contextStuff ();
 
+	Object stuff (
+			String key);
+
 	Integer stuffInt (
 			String key);
 
-	Object stuff (
+	String stuffString (
 			String key);
 
 	boolean canContext (

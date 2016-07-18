@@ -73,26 +73,24 @@ class ChatSupervisorConversationPart
 	void prepare () {
 
 		chat =
-			chatHelper.findOrNull (
+			chatHelper.findRequired (
 				requestContext.stuffInt (
 					"chatId"));
 
-		int chatUserId1 =
-			Integer.parseInt (
-				requestContext.parameterOrNull (
-					"chatUserId1"));
+		long chatUserId1 =
+			requestContext.parameterInteger (
+				"chatUserId1");
 
-		int chatUserId2 =
-			Integer.parseInt (
-				requestContext.parameterOrNull (
-					"chatUserId2"));
+		long chatUserId2 =
+			requestContext.parameterInteger (
+				"chatUserId2");
 
 		userChatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				chatUserId1);
 
 		monitorChatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				chatUserId2);
 
 		if (
@@ -125,12 +123,12 @@ class ChatSupervisorConversationPart
 			new ArrayList<ChatMessageRec> ();
 
 		chatMessages.addAll (
-			chatMessageHelper.find (
+			chatMessageHelper.findFromTo (
 				userChatUser,
 				monitorChatUser));
 
 		chatMessages.addAll (
-			chatMessageHelper.find (
+			chatMessageHelper.findFromTo (
 				monitorChatUser,
 				userChatUser));
 

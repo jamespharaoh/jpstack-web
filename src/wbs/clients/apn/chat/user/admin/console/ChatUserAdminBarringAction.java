@@ -78,15 +78,18 @@ class ChatUserAdminBarringAction
 
 		String barOn =
 			nullIfEmptyString (
-				requestContext.parameterOrNull ("bar_on"));
+				requestContext.parameterRequired (
+					"bar_on"));
 
 		String barOff =
 			nullIfEmptyString (
-				requestContext.parameterOrNull ("bar_off"));
+				requestContext.parameterRequired (
+					"bar_off"));
 
 		String reason =
 			nullIfEmptyString (
-				requestContext.parameterOrNull ("reason"));
+				requestContext.parameterRequired (
+					"reason"));
 
 		// check params
 
@@ -102,12 +105,13 @@ class ChatUserAdminBarringAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserAdminBarringAction.goReal ()",
 				this);
 
 		// lookup database stuff
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				chatUserId);
 
 		// do the work

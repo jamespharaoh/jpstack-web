@@ -73,8 +73,10 @@ class TicketPendingHistoryPart
 		// load data
 
 		ticket =
-			ticketHelper.findOrNull (
-				requestContext.stuffInt ("ticketId"));
+			ticketHelper.findRequired (
+				requestContext.stuffInt (
+					"ticketId"));
+
 	}
 
 	@Override

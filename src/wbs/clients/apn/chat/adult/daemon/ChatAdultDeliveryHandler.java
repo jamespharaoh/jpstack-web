@@ -67,6 +67,7 @@ class ChatAdultDeliveryHandler
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatAdultDeliveryHandler.handle (deliveryId, ref)",
 				this);
 
 		DeliveryRec delivery =

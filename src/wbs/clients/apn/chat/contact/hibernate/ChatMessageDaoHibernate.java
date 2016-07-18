@@ -19,7 +19,6 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
-import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 import wbs.platform.user.model.UserRec;
 
 @SingletonComponent ("chatMessageDao")
@@ -31,59 +30,58 @@ class ChatMessageDaoHibernate
 	@Override
 	public
 	ChatMessageRec findSignup (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
 
 		return findOne (
+			"findSignup (chatUser)",
 			ChatMessageRec.class,
 
-			createQuery (
-				"FROM ChatMessageRec message " +
-				"WHERE message.status = :status " +
-					"AND message.fromUser = :chatUser")
+			createCriteria (
+				ChatMessageRec.class,
+				"_chatMessage")
 
-			.setParameter (
-				"status",
-				ChatMessageStatus.signup,
-				ChatMessageStatusType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"_chatMessage.fromUser",
+					chatUser))
 
-			.setEntity (
-				"chatUser",
-				chatUser)
+			.add (
+				Restrictions.eq (
+					"_chatMessage.status",
+					ChatMessageStatus.signup))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatMessageRec> findSignupTimeout (
-			ChatRec chat,
-			Instant timestamp) {
+			@NonNull ChatRec chat,
+			@NonNull Instant timestamp) {
 
 		return findMany (
+			"findSignupTimeout (chat, timestamp)",
 			ChatMessageRec.class,
 
-			createQuery (
-				"FROM ChatMessageRec message " +
-				"WHERE message.status = :status " +
-					"AND message.chat = :chat " +
-					"AND message.timestamp < :timestamp")
+			createCriteria (
+				ChatMessageRec.class,
+				"_chatMessage")
 
-			.setParameter (
-				"status",
-				ChatMessageStatus.signup,
-				ChatMessageStatusType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"_chatMessage.chat",
+					chat))
 
-			.setEntity (
-				"chat",
-				chat)
+			.add (
+				Restrictions.eq (
+					"_chatMessage.status",
+					ChatMessageStatus.signup))
 
-			.setParameter (
-				"timestamp",
-				timestamp,
-				TimestampWithTimezoneUserType.INSTANCE)
-
-			.list ()
+			.add (
+				Restrictions.lt (
+					"_chatMessage.timestamp",
+					timestamp))
 
 		);
 
@@ -92,119 +90,141 @@ class ChatMessageDaoHibernate
 	@Override
 	public
 	List<ChatMessageRec> findLimit (
-			ChatUserRec fromChatUser,
-			ChatUserRec toChatUser,
+			@NonNull ChatUserRec fromChatUser,
+			@NonNull ChatUserRec toChatUser,
 			int maxResults) {
 
 		return findMany (
+			"findLimit (fromChatUser, toChatUser)",
 			ChatMessageRec.class,
 
-			createQuery (
-				"FROM ChatMessageRec cm " +
-				"WHERE cm.fromUser = :fromChatUser " +
-					"AND cm.toUser = :toChatUser " +
-				"ORDER BY cm.timestamp DESC")
+			createCriteria (
+				ChatMessageRec.class,
+				"_chatMessage")
 
-			.setEntity (
-				"fromChatUser",
-				fromChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatMessage.fromUser",
+					fromChatUser))
 
-			.setEntity (
-				"toChatUser",
-				toChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatMessage.toUser",
+					toChatUser))
+
+			.addOrder (
+				Order.desc (
+					"_chatMessage.timestamp"))
 
 			.setMaxResults (
 				maxResults)
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatMessageRec> findBySenderAndTimestamp (
-			ChatRec chat,
-			UserRec senderUser,
-			Interval timestampInterval) {
+			@NonNull ChatRec chat,
+			@NonNull UserRec senderUser,
+			@NonNull Interval timestamp) {
 
 		return findMany (
+			"findBySenderAndTimestamp (chat, senderUser, timestampInterval)",
 			ChatMessageRec.class,
 
-			createQuery (
-				"FROM ChatMessageRec chatMessage " +
-				"WHERE chatMessage.chat = :chat " +
-					"AND chatMessage.sender = :senderUser " +
-					"AND chatMessage.timestamp >= :timestampStart " +
-					"AND chatMessage.timestamp < :timestampEnd")
+			createCriteria (
+				ChatMessageRec.class,
+				"_chatMessage")
 
-			.setEntity (
-				"chat",
-				chat)
+			.add (
+				Restrictions.eq (
+					"_chatMessage.chat",
+					chat))
 
-			.setEntity (
-				"senderUser",
-				senderUser)
+			.add (
+				Restrictions.eq (
+					"_chatMessage.sender",
+					senderUser))
 
-			.setParameter (
-				"timestampStart",
-				timestampInterval.getStart (),
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.ge (
+					"_chatMessage.timestamp",
+					timestamp.getStart ()))
 
-			.setParameter (
-				"timestampEnd",
-				timestampInterval.getEnd (),
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.lt (
+					"_chatMessage.timestamp",
+					timestamp.getEnd ()))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatMessageRec> find (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
 
 		return findMany (
+			"find (chatUser)",
 			ChatMessageRec.class,
 
-			createQuery (
-				"FROM ChatMessageRec cm " +
-				"WHERE cm.fromUser = :chatUser " +
-					"OR cm.toUser = :chatUser " +
-				"ORDER BY cm.timestamp DESC")
+			createCriteria (
+				ChatMessageRec.class,
+				"_chatMessage")
 
-			.setEntity (
-				"chatUser",
-				chatUser)
+			.add (
+				Restrictions.or (
 
-			.list ());
+				Restrictions.eq (
+					"_chatMessage.fromUser",
+					chatUser),
+
+				Restrictions.eq (
+					"_chatMessage.toUser",
+					chatUser)
+
+			))
+
+			.addOrder (
+				Order.desc (
+					"_chatMessage.timestamp"))
+
+		);
 
 	}
 
 	@Override
 	public
-	List<ChatMessageRec> find (
-			ChatUserRec fromChatUser,
-			ChatUserRec toChatUser) {
+	List<ChatMessageRec> findFromTo (
+			@NonNull ChatUserRec fromChatUser,
+			@NonNull ChatUserRec toChatUser) {
 
 		return findMany (
+			"findFromTo (fromChatUser, toChatUser)",
 			ChatMessageRec.class,
 
-			createQuery (
-				"FROM ChatMessageRec chatMessage " +
-				"WHERE chatMessage.fromUser = :fromChatUser " +
-					"AND chatMessage.toUser = :toChatUser " +
-				"ORDER BY chatMessage.timestamp DESC")
+			createCriteria (
+				ChatMessageRec.class,
+				"_chatMessage")
 
-			.setEntity (
-				"fromChatUser",
-				fromChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatMessage.fromUser",
+					fromChatUser))
 
-			.setEntity (
-				"toChatUser",
-				toChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatMessage.toUser",
+					toChatUser))
 
-			.list ());
+			.addOrder (
+				Order.desc (
+					"_chatMessage.timestamp"))
+
+		);
 
 	}
 
@@ -369,17 +389,19 @@ class ChatMessageDaoHibernate
 		}
 
 		return findMany (
+			"search (search)",
 			ChatMessageRec.class,
-			criteria.list ());
+			criteria);
 
 	}
 
 	@Override
 	public
 	int count (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
 
 		return (int) (long) findOne (
+			"count (chatUser)",
 			Long.class,
 
 			createCriteria (
@@ -398,17 +420,18 @@ class ChatMessageDaoHibernate
 			.setProjection (
 				Projections.rowCount ())
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatMessageRec> findLimit (
-			ChatUserRec chatUser,
+			@NonNull ChatUserRec chatUser,
 			int maxResults) {
 
 		return findMany (
+			"findLimit (chatUser, maxResults)",
 			ChatMessageRec.class,
 
 			createCriteria (
@@ -431,7 +454,7 @@ class ChatMessageDaoHibernate
 			.setMaxResults (
 				maxResults)
 
-			.list ());
+		);
 
 	}
 

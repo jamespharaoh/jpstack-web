@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.user.image.hibernate;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Restrictions;
 
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenDao;
@@ -14,9 +16,10 @@ class ChatUserImageUploadTokenDaoHibernate
 	@Override
 	public
 	ChatUserImageUploadTokenRec findByToken (
-			String token) {
+			@NonNull String token) {
 
 		return findOne (
+			"findByToken (token)",
 			ChatUserImageUploadTokenRec.class,
 
 			createCriteria (
@@ -27,7 +30,7 @@ class ChatUserImageUploadTokenDaoHibernate
 					"token",
 					token))
 
-			.list ());
+		);
 
 	}
 

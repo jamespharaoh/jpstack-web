@@ -121,6 +121,7 @@ class SliceLogicImplementation
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"SliceLogicImplementation.runNow ()",
 				this);
 
 		// iterate slices
@@ -131,7 +132,7 @@ class SliceLogicImplementation
 		) {
 
 			SliceRec slice =
-				sliceHelper.findOrNull (
+				sliceHelper.findRequired (
 					sliceId);
 
 			// perform update

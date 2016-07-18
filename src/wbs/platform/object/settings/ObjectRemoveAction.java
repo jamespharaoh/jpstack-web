@@ -90,6 +90,7 @@ class ObjectRemoveAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ObjectRemoveAction.goReal ()",
 				this);
 
 		EphemeralRecord<?> ephemeralObject =
@@ -116,7 +117,8 @@ class ObjectRemoveAction
 		requestContext.addNotice (
 			stringFormat (
 				"%s deleted",
-				capitalise (objectHelper.friendlyName ())));
+				capitalise (
+					objectHelper.friendlyName ())));
 
 		ConsoleContextType targetContextType =
 			consoleManager.contextType (

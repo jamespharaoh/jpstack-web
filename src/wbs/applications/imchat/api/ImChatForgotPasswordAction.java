@@ -84,10 +84,11 @@ class ImChatForgotPasswordAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ImChatForgotPasswordAction.handle ()",
 				this);
 
 		ImChatRec imChat =
-			imChatHelper.findOrNull (
+			imChatHelper.findRequired (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));

@@ -96,10 +96,11 @@ class ImChatConversationStartAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ImChatConversationStartAction.handle ()",
 				this);
 
 		ImChatRec imChat =
-			imChatHelper.findOrNull (
+			imChatHelper.findRequired (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));

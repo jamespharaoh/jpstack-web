@@ -6,8 +6,14 @@ public
 interface ActivityManager {
 
 	ActiveTask start (
-			String taskName,
+			String taskType,
+			String summary,
 			Object owner,
-			Map<String,Object> parameters);
+			Map<String,String> parameters);
+
+	ActiveTask start (
+			String taskType,
+			String summary,
+			Object owner);
 
 }

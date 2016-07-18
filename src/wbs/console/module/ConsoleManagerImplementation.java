@@ -1133,6 +1133,7 @@ class ConsoleManagerImplementation
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ConsoleManager.chatContext (...)",
 				this);
 
 		context.initContext (
@@ -1220,6 +1221,7 @@ class ConsoleManagerImplementation
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ConsoleManagerImplementation.fileForPath (path)",
 				this);
 
 		PathSupply pathParts =

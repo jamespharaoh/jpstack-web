@@ -81,16 +81,19 @@ class ChatUserImageListAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserImageListAction.goReal ()",
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		ChatUserImageType type =
 			toEnum (
 				ChatUserImageType.class,
-				(String) requestContext.stuff ("chatUserImageType"));
+				(String) requestContext.stuff (
+					"chatUserImageType"));
 
 		List<ChatUserImageRec> list =
 			chatUserLogic.getChatUserImageListByType (

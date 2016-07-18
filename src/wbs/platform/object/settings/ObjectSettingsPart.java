@@ -1,5 +1,6 @@
 package wbs.platform.object.settings;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.optionalCast;
 
 import java.util.LinkedHashSet;
@@ -14,8 +15,8 @@ import lombok.experimental.Accessors;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FieldsProvider;
+import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
@@ -137,7 +138,7 @@ class ObjectSettingsPart<
 		if (parentHelper.isRoot ()) {
 
 			parent =
-				parentHelper.findOrNull (
+				parentHelper.findRequired (
 					0);
 
 			return;
@@ -148,12 +149,15 @@ class ObjectSettingsPart<
 			requestContext.stuffInt (
 				parentHelper.idKey ());
 
-		if (parentId != null) {
+		if (
+			isNotNull (
+				parentId)
+		) {
 
 			// use specific parent
 
 			parent =
-				parentHelper.findOrNull (
+				parentHelper.findRequired (
 					parentId);
 
 			return;

@@ -5,6 +5,8 @@ import static wbs.framework.utils.etc.Misc.toInstant;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -24,10 +26,11 @@ class ImChatCustomerDaoHibernate
 	@Override
 	public
 	ImChatCustomerRec findByEmail (
-			ImChatRec imChat,
-			String email) {
+			@NonNull ImChatRec imChat,
+			@NonNull String email) {
 
 		return findOne (
+			"findByEmail (imChat, email)",
 			ImChatCustomerRec.class,
 
 			createCriteria (
@@ -44,7 +47,7 @@ class ImChatCustomerDaoHibernate
 					"_imChatCustomer.email",
 					email))
 
-			.list ());
+		);
 
 	}
 
@@ -183,8 +186,9 @@ class ImChatCustomerDaoHibernate
 		// perform and return
 
 		return findMany (
+			"searchIds (imCustomerSearch)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 

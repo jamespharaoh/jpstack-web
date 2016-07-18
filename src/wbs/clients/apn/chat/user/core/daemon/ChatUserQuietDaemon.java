@@ -89,6 +89,7 @@ class ChatUserQuietDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ChatUserQuietDaemon.runOnce ()",
 				this);
 
 		// get a list of users who are past their outbound timestamp
@@ -133,12 +134,13 @@ class ChatUserQuietDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserQuietDaemon.doUser (chatUserId)",
 				this);
 
 		// find the user
 
 		ChatUserRec user =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				chatUserId);
 
 		String userPath =

@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -118,17 +118,17 @@ class ChatMonitorInboxFormAction
 		// get params
 
 		String text =
-			requestContext.parameterOrNull (
+			requestContext.parameterRequired (
 				"text");
 
 		boolean ignore =
-			isNotNull (
-				requestContext.parameterOrNull (
+			isPresent (
+				requestContext.parameter (
 					"ignore"));
 
 		boolean note =
-			isNotNull (
-				requestContext.parameterOrNull (
+			isPresent (
+				requestContext.parameter (
 					"sendAndNote"));
 
 		// check params
@@ -172,10 +172,11 @@ class ChatMonitorInboxFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatMonitorInboxFormAction.goReal ()",
 				this);
 
 		ChatMonitorInboxRec chatMonitorInbox =
-			chatMonitorInboxHelper.findOrNull (
+			chatMonitorInboxHelper.findRequired (
 				monitorInboxId);
 
 		ChatUserRec monitorChatUser =

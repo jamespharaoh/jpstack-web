@@ -41,24 +41,18 @@ class QueueItemAction
 
 		int queueItemId =
 			Integer.parseInt (
-				requestContext.parameterOrNull ("id"));
+				requestContext.parameterRequired (
+					"id"));
 
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"QueueItemAction.goReal ()",
 				this);
 
 		QueueItemRec queueItem =
-			queueItemHelper.findOrNull (queueItemId);
-
-		if (queueItem == null) {
-
-			requestContext.addError (
-				"Queue item not found");
-
-			return null;
-
-		}
+			queueItemHelper.findRequired (
+				queueItemId);
 
 		return queuePageFactoryManager.getItemResponder (
 			requestContext,

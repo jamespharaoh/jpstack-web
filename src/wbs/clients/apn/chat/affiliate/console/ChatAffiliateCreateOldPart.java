@@ -55,8 +55,9 @@ class ChatAffiliateCreateOldPart
 	void prepare () {
 
 		ChatRec chat =
-			chatHelper.findOrNull (
-				requestContext.stuffInt ("chatId"));
+			chatHelper.findRequired (
+				requestContext.stuffInt (
+					"chatId"));
 
 		chatSchemes =
 			new TreeMap<String,Integer> ();
@@ -66,8 +67,13 @@ class ChatAffiliateCreateOldPart
 				: chat.getChatSchemes ()
 		) {
 
-			if (! privChecker.canRecursive (chatScheme, "affiliate_create"))
+			if (
+				! privChecker.canRecursive (
+					chatScheme,
+					"affiliate_create")
+			) {
 				continue;
+			}
 
 			chatSchemes.put (
 				objectManager.objectPathMini (

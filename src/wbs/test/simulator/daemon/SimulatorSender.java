@@ -78,10 +78,11 @@ class SimulatorSender
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"SimulatorSender.sendMessage (messageId)",
 				this);
 
 		MessageRec message =
-			messageHelper.findOrNull (
+			messageHelper.findRequired (
 				messageId);
 
 		RouteRec route =
@@ -124,15 +125,10 @@ class SimulatorSender
 		// lookup session
 
 		SimulatorSessionNumberRec simulatorSessionNumber =
-			simulatorSessionNumberHelper.findOrNull (
-				message.getNumber ().getId ());
-
-		if (simulatorSessionNumber == null) {
-
-			throw permFailure (
-				"No session for number");
-
-		}
+			simulatorSessionNumberHelper.findOrThrow (
+				message.getNumber ().getId (),
+				() -> permFailure (
+					"No session for number"));
 
 		// create event
 

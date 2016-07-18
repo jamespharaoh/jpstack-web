@@ -74,12 +74,13 @@ class ImChatPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ImChatPendingFormAction.goReal ()",
 				this);
 
 		// find message
 
 		ImChatMessageRec customerMessage =
-			imChatMessageHelper.findOrNull (
+			imChatMessageHelper.findRequired (
 				requestContext.stuffInt (
 					"imChatMessageId"));
 
@@ -174,12 +175,9 @@ class ImChatPendingFormAction
 			ignore = false;
 
 			template =
-				imChatTemplateHelper.findOrNull (
+				imChatTemplateHelper.findRequired (
 					toInteger (
 						templateString));
-
-			if (template == null)
-				throw new RuntimeException ();
 
 			if (template.getImChat () != imChat)
 				throw new RuntimeException ();

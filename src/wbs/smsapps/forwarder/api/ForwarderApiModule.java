@@ -1,6 +1,9 @@
 package wbs.smsapps.forwarder.api;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.optionalOrNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.BufferedInputStream;
@@ -351,6 +354,7 @@ class ForwarderApiModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"ForwarderApiModule.SendRpcHandler.handle (source)",
 					this);
 
 			// authenticate
@@ -691,6 +695,7 @@ class ForwarderApiModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"ForwarderApiModule.SendExRpcHandler.handle (source)",
 					this);
 
 			// authenticate
@@ -1489,6 +1494,7 @@ class ForwarderApiModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"ForwarderApiModule.QueryExRpcHandler.handle (source)",
 					this);
 
 			// authenticate
@@ -1581,13 +1587,21 @@ class ForwarderApiModule
 				if (queryExMessage.serverId != null) {
 
 					queryExMessage.fmOut =
-						forwarderMessageOutHelper.findOrNull (
-							queryExMessage.serverId);
+						optionalOrNull (
+							forwarderMessageOutHelper.find (
+								queryExMessage.serverId));
 
 				}
 
-				if (queryExMessage.clientId != null
-						&& queryExMessage.fmOut == null) {
+				if (
+
+					isNotNull (
+						queryExMessage.clientId)
+
+					&& isNull (
+						queryExMessage.fmOut)
+
+				) {
 
 					queryExMessage.fmOut =
 						forwarderMessageOutHelper.findByOtherId (
@@ -1825,6 +1839,7 @@ class ForwarderApiModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadOnly (
+					"ForwarderApiModule.PeekExRpcHandler.handle (source)",
 					this);
 
 			// authenticate

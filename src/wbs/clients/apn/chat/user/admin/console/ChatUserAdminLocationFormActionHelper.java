@@ -55,10 +55,10 @@ class ChatUserAdminLocationFormActionHelper
 	@Override
 	public
 	void updatePassiveFormState (
-			ChatUserAdminLocationForm formState) {
+			@NonNull ChatUserAdminLocationForm formState) {
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				requestContext.stuffInt (
 					"chatUserId"));
 
@@ -99,7 +99,7 @@ class ChatUserAdminLocationFormActionHelper
 		// perform update
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				requestContext.stuffInt (
 					"chatUserId"));
 

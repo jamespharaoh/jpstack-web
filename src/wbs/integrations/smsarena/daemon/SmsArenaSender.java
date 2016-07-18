@@ -1,6 +1,7 @@
 package wbs.integrations.smsarena.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToUrl;
@@ -21,6 +22,7 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONObject;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -83,11 +85,14 @@ class SmsArenaSender
 		RouteRec route =
 			outbox.getRoute ();
 
-		SmsArenaRouteOutRec smsArenaRouteOut =
-				smsArenaRouteOutHelper.findOrNull (
+		Optional<SmsArenaRouteOutRec> smsArenaRouteOutOptional =
+				smsArenaRouteOutHelper.find (
 				route.getId ());
 
-		if (smsArenaRouteOut == null) {
+		if (
+			isNotPresent (
+				smsArenaRouteOutOptional)
+		) {
 
 			return new SetupSendResult ()
 
@@ -102,6 +107,9 @@ class SmsArenaSender
 							route)));
 
 		}
+
+		SmsArenaRouteOutRec smsArenaRouteOut =
+			smsArenaRouteOutOptional.get ();
 
 		// check message type
 

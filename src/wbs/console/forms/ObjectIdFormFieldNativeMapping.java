@@ -66,15 +66,9 @@ class ObjectIdFormFieldNativeMapping<Container,Type extends Record<Type>,Native>
 
 		}
 
-		Type genericValue =
-			consoleHelper.findOrNull (
-				objectId);
-
-		if (genericValue == null)
-			throw new RuntimeException ();
-
 		return Optional.of (
-			genericValue);
+			consoleHelper.findRequired (
+				objectId));
 
 	}
 

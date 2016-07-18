@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.user.core.console;
 
 import static wbs.framework.utils.etc.Misc.dateToInstantNullSafe;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.toBoolean;
 import static wbs.framework.utils.etc.Misc.toEnum;
@@ -84,6 +85,7 @@ class ChatUserSearchOldAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ChatUserSearchOldAction.goReal ()",
 				this);
 
 		// save session
@@ -106,18 +108,23 @@ class ChatUserSearchOldAction
 		ChatUserType searchType =
 			toEnum (
 				ChatUserType.class,
-				requestContext.parameterOrNull ("type"));
+				requestContext.parameterRequired (
+					"type"));
 
 		String searchCode =
 			nullIfEmptyString (
-				requestContext.parameterOrNull ("code"));
+				requestContext.parameterRequired (
+					"code"));
 
 		String searchNumber =
 			nullIfEmptyString (
-				requestContext.parameterOrNull ("number"));
+				requestContext.parameterRequired (
+					"number"));
 
 		boolean searchIncludeDeleted =
-			requestContext.parameterOrNull ("includeDeleted") != null;
+			isPresent (
+				requestContext.parameter (
+					"includeDeleted"));
 
 		Gender searchGender =
 			(Gender)
@@ -129,59 +136,59 @@ class ChatUserSearchOldAction
 
 		String searchName =
 			nullIfEmptyString (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"name"));
 
 		String searchLocation =
 			nullIfEmptyString (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"location"));
 
 		String searchInfo =
 			nullIfEmptyString (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"info"));
 
 		Boolean searchPicture =
 			toBoolean (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"picture"));
 
 		Boolean searchVideo =
 			toBoolean (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"video"));
 
 		Boolean searchAdultVerified =
 			toBoolean (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"adultVerified"));
 
 		ChatUserCreditMode searchCreditMode =
 			toEnum (
 				ChatUserCreditMode.class,
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"creditMode"));
 
 		ChatUserDateMode searchDateMode =
 			toEnum (
 				ChatUserDateMode.class,
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"dateMode"));
 
 		Integer searchOnline =
 			toInteger (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"online"));
 
 		String searchOutput =
 			nullIfEmptyString (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"output"));
 
 		String searchOrder =
 			nullIfEmptyString (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"order"));
 
 		Long searchCreditFailedGte =

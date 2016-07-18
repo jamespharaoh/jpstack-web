@@ -1,5 +1,9 @@
 package wbs.integrations.mig.hibernate;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.integrations.mig.model.MigNetworkDao;
 import wbs.integrations.mig.model.MigNetworkRec;
@@ -12,21 +16,27 @@ class MigNetworkDaoHibernate
 	@Override
 	public
 	MigNetworkRec findBySuffix (
-			String suffix) {
+			@NonNull String suffix) {
 
 		return findOne (
+			"findBySuffix (suffix)",
 			MigNetworkRec.class,
 
-			createQuery (
-				"FROM MigNetworkRec network " +
-				"WHERE network.suffix = :suffix " +
-					"AND virtual = false")
+			createCriteria (
+				MigNetworkRec.class,
+				"_migNetwork")
 
-			.setString (
-				"suffix",
-				suffix)
+			.add (
+				Restrictions.eq (
+					"_migNetwork.suffix",
+					suffix))
 
-			.list ());
+			.add (
+				Restrictions.eq (
+					"_migNetwork.virtual",
+					false))
+
+		);
 
 	}
 

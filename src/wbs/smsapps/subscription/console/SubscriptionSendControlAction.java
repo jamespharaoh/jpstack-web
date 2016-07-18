@@ -1,6 +1,7 @@
 package wbs.smsapps.subscription.console;
 
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -74,16 +75,18 @@ class SubscriptionSendControlAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"SubscriptionSendControlAction.goReal ()",
 				this);
 
 		SubscriptionSendRec subscriptionSend =
-			subscriptionSendHelper.findOrNull (
+			subscriptionSendHelper.findRequired (
 				requestContext.stuffInt (
 					"subscriptionSendId"));
 
 		if (
-			requestContext.parameterOrNull ("send")
-				!= null
+			isPresent (
+				requestContext.parameter (
+					"send"))
 		) {
 
 			if (
@@ -115,7 +118,9 @@ class SubscriptionSendControlAction
 		}
 
 		if (
-			requestContext.parameterOrNull ("schedule") != null
+			isPresent (
+				requestContext.parameter (
+					"schedule"))
 		) {
 
 			if (
@@ -138,7 +143,8 @@ class SubscriptionSendControlAction
 
 				scheduledTime =
 					userConsoleLogic.timestampStringToInstant (
-						requestContext.parameterOrNull ("timestamp"));
+						requestContext.parameterRequired (
+							"timestamp"));
 
 			} catch (Exception exception) {
 
@@ -164,8 +170,9 @@ class SubscriptionSendControlAction
 		}
 
 		if (
-			requestContext.parameterOrNull ("unschedule")
-				!= null
+			isPresent (
+				requestContext.parameter (
+					"unschedule"))
 		) {
 
 			if (
@@ -211,8 +218,9 @@ class SubscriptionSendControlAction
 		}
 
 		if (
-			requestContext.parameterOrNull ("cancel")
-				!= null
+			isPresent (
+				requestContext.parameter (
+					"cancel"))
 		) {
 
 			if (

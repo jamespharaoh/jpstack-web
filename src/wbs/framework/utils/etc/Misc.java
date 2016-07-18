@@ -2107,9 +2107,17 @@ class Misc {
 
 	public static
 	boolean isEmpty (
-			Collection<?> collection) {
+			@NonNull Collection<?> collection) {
 
 		return collection.isEmpty ();
+
+	}
+
+	public static
+	boolean isEmpty (
+			@NonNull Map<?,?> map) {
+
+		return map.isEmpty ();
 
 	}
 
@@ -3001,7 +3009,7 @@ class Misc {
 	}
 
 	public static
-	void shouldNeverHappen () {
+	RuntimeException shouldNeverHappen () {
 
 		throw new RuntimeException (
 			"Should never happen");

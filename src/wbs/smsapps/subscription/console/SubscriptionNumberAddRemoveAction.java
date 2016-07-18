@@ -3,6 +3,7 @@ package wbs.smsapps.subscription.console;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.moreThanZero;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -96,10 +97,11 @@ class SubscriptionNumberAddRemoveAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"SubscriptionNumberAddRemoveAction.goReal ()",
 				this);
 
 		SubscriptionRec subscription =
-			subscriptionHelper.findOrNull (
+			subscriptionHelper.findRequired (
 				requestContext.stuffInt (
 					"subscriptionId"));
 
@@ -161,8 +163,8 @@ class SubscriptionNumberAddRemoveAction
 		// add numbers
 
 		if (
-			isNotNull (
-				requestContext.parameterOrNull (
+			isPresent (
+				requestContext.parameter (
 					"add"))
 		) {
 
@@ -299,8 +301,8 @@ class SubscriptionNumberAddRemoveAction
 		// remove numbers
 
 		if (
-			isNotNull (
-				requestContext.parameterOrNull (
+			isPresent (
+				requestContext.parameter (
 					"remove"))
 		) {
 

@@ -2,10 +2,13 @@ package wbs.smsapps.forwarder.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.Instant;
 
 import wbs.framework.hibernate.HibernateDao;
-import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 import wbs.smsapps.forwarder.model.ForwarderMessageInDaoMethods;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
 import wbs.smsapps.forwarder.model.ForwarderRec;
@@ -18,84 +21,113 @@ class ForwarderMessageInDaoHibernate
 	@Override
 	public
 	ForwarderMessageInRec findNext (
-			Instant now,
-			ForwarderRec forwarder) {
+			@NonNull Instant now,
+			@NonNull ForwarderRec forwarder) {
 
 		return findOne (
+			"findNext (now, forwarder)",
 			ForwarderMessageInRec.class,
 
-			createQuery(
-				"FROM ForwarderMessageInRec forwarderMessageIn " +
-				"WHERE forwarderMessageIn.forwarder = :forwarder " +
-					"AND forwarderMessageIn.pending = true " +
-					"AND (forwarderMessageIn.borrowedTime IS NULL " +
-						"OR forwarderMessageIn.borrowedTime < :now) " +
-				"ORDER BY forwarderMessageIn.createdTime")
+			createCriteria (
+				ForwarderMessageInRec.class,
+				"_forwarderMessageIn")
 
-			.setEntity (
-				"forwarder",
-				forwarder)
+			.add (
+				Restrictions.eq (
+					"_forwarderMessageIn.forwarder",
+					forwarder))
 
-			.setParameter (
-				"now",
-				now,
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"_forwarderMessageIn.pending",
+					true))
 
-			.setMaxResults (1)
+			.add (
+				Restrictions.or (
 
-			.list ());
+				Restrictions.isNull (
+					"_forwarderMessageIn.borrowedTime"),
+
+				Restrictions.le (
+					"_forwarderMessageIn.borrowedTime",
+					now)
+
+			))
+
+			.addOrder (
+				Order.asc (
+					"_forwarderMessageIn.createdTime"))
+
+			.setMaxResults (
+				1)
+
+		);
 
 	}
 
 	@Override
 	public
-	List<ForwarderMessageInRec> findNexts (
-			Instant now,
+	List<ForwarderMessageInRec> findNextLimit (
+			@NonNull Instant now,
 			int maxResults) {
 
 		return findMany (
+			"findNextLimit (now, maxResults)",
 			ForwarderMessageInRec.class,
 
-			createQuery (
-				"FROM ForwarderMessageInRec forwarderMessageIn " +
-				"WHERE forwarderMessageIn.sendQueue = true " +
-					"AND forwarderMessageIn.retryTime < :now")
+			createCriteria (
+				ForwarderMessageInRec.class,
+				"_forwarderMessageIn")
 
-			.setParameter (
-				"now",
-				now,
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"_forwarderMessageIn.sendQueue",
+					true))
+
+			.add (
+				Restrictions.lt (
+					"_forwarderMessageIn.retryTime",
+					now))
 
 			.setMaxResults (
 				maxResults)
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
-	List<ForwarderMessageInRec>
-	findPendingLimit (
-			ForwarderRec forwarder,
+	List<ForwarderMessageInRec> findPendingLimit (
+			@NonNull ForwarderRec forwarder,
 			int maxResults) {
 
 		return findMany (
+			"findPendingLimit (forwarder, maxResults)",
 			ForwarderMessageInRec.class,
 
-			createQuery (
-				"FROM ForwarderMessageInRec forwarderMessageIn " +
-				"WHERE forwarderMessageIn.pending = true " +
-					"AND forwarderMessageIn.forwarder = :forwarder " +
-				"ORDER BY forwarderMessageIn.id")
+			createCriteria (
+				ForwarderMessageInRec.class,
+				"_forwarderMessageIn")
 
-			.setEntity (
-				"forwarder",
-				forwarder)
+			.add (
+				Restrictions.eq (
+					"_forwarderMessageIn.pending",
+					true))
 
-			.setMaxResults (maxResults)
+			.add (
+				Restrictions.eq (
+					"_forwarderMessageIn.forwarder",
+					forwarder))
 
-			.list ());
+			.addOrder (
+				Order.asc (
+					"_forwarderMessageIn.id"))
+
+			.setMaxResults (
+				maxResults)
+
+		);
 
 	}
 

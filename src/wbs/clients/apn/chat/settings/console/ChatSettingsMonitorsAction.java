@@ -96,6 +96,7 @@ class ChatSettingsMonitorsAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatSettingsMonitorsAction.goReal ()",
 				this);
 
 		ChatRec chat =

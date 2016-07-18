@@ -1,13 +1,17 @@
 package wbs.framework.dbpool;
 
+import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
+
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,12 +20,17 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.sql.DataSource;
 
+import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import wbs.framework.activitymanager.ActiveTask;
+import wbs.framework.activitymanager.ActivityManager;
 
 /**
  * TODO a maximum connection life would be nice
@@ -40,6 +49,13 @@ public
 class DbPool
 	implements DataSource {
 
+	// dependencies
+
+	@Inject
+	ActivityManager activityManager;
+
+	// state
+
 	Class<?> proxyClass;
 
 	Constructor<?> proxyConstructor;
@@ -53,11 +69,15 @@ class DbPool
 
 		proxyClass =
 			Proxy.getProxyClass (
-			Connection.class.getClassLoader (),
-				new Class [] { Connection.class });
+			getClass ().getClassLoader (),
+				new Class [] {
+					Connection.class,
+					WbsConnection.class,
+				});
 
 		proxyConstructor =
-			proxyClass.getConstructor (InvocationHandler.class);
+			proxyClass.getConstructor (
+				InvocationHandler.class);
 
 	}
 
@@ -114,8 +134,17 @@ class DbPool
 
 			// wait for a connection
 
-			while (idleConnections.isEmpty ()
-					&& usedConnections.size () == maxConnections) {
+			while (
+				idleConnections.isEmpty ()
+				&& usedConnections.size () == maxConnections
+			) {
+
+				@Cleanup
+				ActiveTask activeTask =
+					activityManager.start (
+						"database",
+						"DbPool.getConnection () - waiting",
+						this);
 
 				try {
 
@@ -145,20 +174,34 @@ class DbPool
 
 			// we are going to create a new one
 
-			connectionStuff = new ConnectionStuff ();
-			usedConnections.add (connectionStuff);
+			connectionStuff =
+				new ConnectionStuff ();
+
+			usedConnections.add (
+				connectionStuff);
 
 		}
 
 		// create a new connection
 
-		connectionStuff.realConnection =
-			dataSource.getConnection ();
+		{
 
-		connectionStuff.realConnection.setTransactionIsolation (
-			Connection.TRANSACTION_SERIALIZABLE);
+			@Cleanup
+			ActiveTask activeTask =
+				activityManager.start (
+					"database",
+					"DbPool.getConnection () - connecting",
+					this);
 
-		return connectionStuff.createClientConnection ();
+			connectionStuff.realConnection =
+				dataSource.getConnection ();
+
+			connectionStuff.realConnection.setTransactionIsolation (
+				Connection.TRANSACTION_SERIALIZABLE);
+
+			return connectionStuff.createClientConnection ();
+
+		}
 
 	}
 
@@ -312,7 +355,9 @@ class DbPool
 			InvocationHandler {
 
 		int serial = nextSerial++;
+
 		long idleExpiryTime;
+		long serverProcessId;
 
 		Connection realConnection;
 
@@ -338,11 +383,13 @@ class DbPool
 
 				clientConnection =
 					(Connection)
-					proxyConstructor.newInstance (this);
+					proxyConstructor.newInstance (
+						this);
 
 			} catch (Exception exception) {
 
-				throw new RuntimeException (exception);
+				throw new RuntimeException (
+					exception);
 
 			}
 
@@ -353,6 +400,38 @@ class DbPool
 				Thread.currentThread ().getStackTrace ();
 
 			return clientConnection;
+
+		}
+
+		void fetchServerProcessId () {
+
+			try {
+
+				@Cleanup
+				Statement statement =
+					realConnection.createStatement ();
+
+				@Cleanup
+				ResultSet resultSet =
+					statement.executeQuery (
+						"SELECT pg_backend_pid ()");
+
+				if (! resultSet.next ()) {
+
+					shouldNeverHappen ();
+
+				}
+
+				serverProcessId =
+					resultSet.getLong (
+						1);
+
+			} catch (SQLException exception) {
+
+				throw new RuntimeException (
+					exception);
+
+			}
 
 		}
 
@@ -403,29 +482,52 @@ class DbPool
 		Object invoke (
 				Object proxy,
 				Method method,
-				Object[] args)
+				Object[] arguments)
 			throws Throwable {
 
 			if (proxy != clientConnection)
 				return null;
 
-			if ("close".equals (method.getName ())) {
+			Class<?> declaringClass =
+				method.getDeclaringClass ();
 
-				realConnection.setAutoCommit (true);
+			if (declaringClass == WbsConnection.class) {
 
-				release ();
+				switch (method.getName ()) {
 
-				return null;
+				case "serverProcessId":
 
-			} else if ("isClosed".equals (method.getName ())) {
+					return serverProcessId;
 
-				return proxy != clientConnection;
+				default:
+
+					throw shouldNeverHappen ();
+
+				}
 
 			} else {
 
-				return method.invoke (
-					realConnection,
-					args);
+				switch (method.getName ()) {
+
+				case "close":
+
+					realConnection.setAutoCommit (true);
+
+					release ();
+
+					return null;
+
+				case "isClosed":
+
+					return proxy != clientConnection;
+
+				default:
+
+					return method.invoke (
+						realConnection,
+						arguments);
+
+				}
 
 			}
 

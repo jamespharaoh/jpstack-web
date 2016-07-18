@@ -95,15 +95,12 @@ class MigSender
 		// lookup mig route
 
 		migOutbox.migRouteOut =
-			migRouteOutHelper.findOrNull (
-				migOutbox.route.getId ());
-
-		if (migOutbox.migRouteOut == null) {
-
-			throw tempFailure (
-				"MIG outbound route not found for " + migOutbox.route.getCode ());
-
-		}
+			migRouteOutHelper.findOrThrow (
+				migOutbox.route.getId (),
+				() -> tempFailure (
+					stringFormat (
+						"MIG outbound route not found for %s",
+						migOutbox.route.getCode ())));
 
 		// load lazy stuff
 
@@ -124,17 +121,12 @@ class MigSender
 				"wap_push")) {
 
 			migOutbox.wapPushMessage =
-				wapPushMessageHelper.findOrNull (
-					outbox.getId ());
-
-			if (migOutbox.wapPushMessage == null) {
-
-				throw tempFailure (
-					stringFormat (
-						"Wap push message not found for message %d",
-						outbox.getId ()));
-
-			}
+				wapPushMessageHelper.findOrThrow (
+					outbox.getId (),
+					() -> tempFailure (
+						stringFormat (
+							"Wap push message not found for message %d",
+							outbox.getId ())));
 
 			migOutbox.wapPushMessage.getUrlText ().getText ();
 			migOutbox.wapPushMessage.getTextText ().getText ();

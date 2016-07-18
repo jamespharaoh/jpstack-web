@@ -115,6 +115,7 @@ class EventConsoleLogicImplementation
 				@Cleanup
 				Transaction transaction =
 					database.beginReadOnly (
+						"ObjectEventsPartFactory.get ()",
 						this);
 
 				PermanentRecord<?> object =

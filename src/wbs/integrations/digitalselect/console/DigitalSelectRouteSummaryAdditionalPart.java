@@ -39,11 +39,12 @@ class DigitalSelectRouteSummaryAdditionalPart
 	void prepare () {
 
 		route =
-			routeHelper.findOrNull (
-				requestContext.stuffInt ("routeId"));
+			routeHelper.findRequired (
+				requestContext.stuffInt (
+					"routeId"));
 
 		digitalSelectRouteOut =
-			digitalSelectRouteOutHelper.findOrNull (
+			digitalSelectRouteOutHelper.findRequired (
 				route.getId ());
 
 	}

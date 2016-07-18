@@ -157,7 +157,7 @@ class ChatUserSearchOldResultsPart
 		) {
 
 			chatUsers.add (
-				chatUserHelper.findOrNull (
+				chatUserHelper.findRequired (
 					(Integer)
 					chatUserIdObject));
 

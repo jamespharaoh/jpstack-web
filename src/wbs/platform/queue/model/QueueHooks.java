@@ -1,14 +1,18 @@
 package wbs.platform.queue.model;
 
-import java.util.HashSet;
+import static wbs.framework.utils.etc.Misc.doesNotContain;
+
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import com.google.common.base.Optional;
 
@@ -44,8 +48,8 @@ class QueueHooks
 
 	// state
 
-	Set<Integer> parentObjectTypeIds =
-		new HashSet<Integer> ();
+	Map<Long,List<Long>> queueTypeIdsByParentTypeId =
+		new HashMap<> ();
 
 	// lifecycle
 
@@ -56,40 +60,45 @@ class QueueHooks
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"queueTypeHooks.init ()",
 				this);
 
-		List<ObjectTypeRec> objectTypes =
-			objectTypeDao.findAll ();
+		// preload object types
 
-		for (
-			ObjectTypeRec objectType
-				: objectTypes
-		) {
+		objectTypeDao.findAll ();
 
-			List<QueueTypeRec> queueTypes =
-				queueTypeDao.findByParentObjectType (
-					objectType);
+		// load queue types and construct index
 
-			if (queueTypes.isEmpty ())
-				continue;
+		queueTypeIdsByParentTypeId =
+			queueTypeDao.findAll ().stream ()
 
-			parentObjectTypeIds.add (
-				objectType.getId ());
-
-		}
+			.collect (
+				Collectors.groupingBy (
+					queueType -> (long)
+						queueType.getParentType ().getId (),
+					Collectors.mapping (
+						queueType -> (long)
+							queueType.getId (),
+						Collectors.toList ())));
 
 	}
+
+	// implementation
 
 	@Override
 	public
 	void createSingletons (
-			ObjectHelper<QueueRec> queueHelper,
-			ObjectHelper<?> parentHelper,
-			Record<?> parent) {
+			@NonNull ObjectHelper<QueueRec> queueHelper,
+			@NonNull ObjectHelper<?> parentHelper,
+			@NonNull Record<?> parent) {
 
-		if (! parentObjectTypeIds.contains (
-				parentHelper.objectTypeId ()))
+		if (
+			doesNotContain (
+				queueTypeIdsByParentTypeId.keySet (),
+				(long) parentHelper.objectTypeId ())
+		) {
 			return;
+		}
 
 		ObjectManager objectManager =
 			objectManagerProvider.get ();
@@ -103,14 +112,15 @@ class QueueHooks
 			objectTypeDao.findById (
 				parentHelper.objectTypeId ());
 
-		List<QueueTypeRec> queueTypes =
-			queueTypeDao.findByParentObjectType (
-				parentType);
-
 		for (
-			QueueTypeRec queueType
-				: queueTypes
+			Long queueTypeId
+				: queueTypeIdsByParentTypeId.get (
+					(long) parentHelper.objectTypeId ())
 		) {
+
+			QueueTypeRec queueType =
+				queueTypeDao.findRequired (
+					queueTypeId);
 
 			queueHelper.insert (
 				queueHelper.createInstance ()

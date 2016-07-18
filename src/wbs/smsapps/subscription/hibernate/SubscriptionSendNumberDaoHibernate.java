@@ -2,6 +2,8 @@ package wbs.smsapps.subscription.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.hibernate.HibernateDao;
@@ -18,10 +20,11 @@ class SubscriptionSendNumberDaoHibernate
 	@Override
 	public
 	List<SubscriptionSendNumberRec> findQueuedLimit (
-			SubscriptionSendRec subscriptionSend,
+			@NonNull SubscriptionSendRec subscriptionSend,
 			int maxResults) {
 
 		return findMany (
+			"findQueuedLimit (subscriptionSend, maxResults)",
 			SubscriptionSendNumberRec.class,
 
 			createCriteria (
@@ -41,7 +44,7 @@ class SubscriptionSendNumberDaoHibernate
 			.setMaxResults (
 				maxResults)
 
-			.list ());
+		);
 
 	}
 

@@ -70,6 +70,7 @@ class ManualResponderDelivery
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ManualResopnderDelivery.handle (deliveryId, ref)",
 				this);
 
 		DeliveryRec delivery =

@@ -289,21 +289,25 @@ class DialogueApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"DialogueApiServletModule.inFile.doPost ()",
 					this);
 
 			RouteRec route =
-				routeHelper.findOrNull (routeId);
+				routeHelper.findRequired (
+					routeId);
 
 			NetworkRec network =
 				networkId == null
 					? null
-					: networkHelper.findOrNull (networkId);
+					: networkHelper.findRequired (
+						networkId);
 
 			// if it's a concatenated message...
 
 			ConcatenatedInformationElement concat =
 				userDataHeader != null
-					? userDataHeader.find (ConcatenatedInformationElement.class)
+					? userDataHeader.find (
+						ConcatenatedInformationElement.class)
 					: null;
 
 			if (concat != null) {
@@ -477,6 +481,7 @@ class DialogueApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"DialogueApiServletModule.reportAction.handle ()",
 					this);
 
 			Long statusType = null;
@@ -494,8 +499,7 @@ class DialogueApiServletModule
 
 			reportLogic.deliveryReport (
 				messageId,
-				Optional.of (
-					newMessageStatus),
+				newMessageStatus,
 				null,
 				messageReportCode);
 

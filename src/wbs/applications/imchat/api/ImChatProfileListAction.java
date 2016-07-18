@@ -60,10 +60,11 @@ class ImChatProfileListAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ImChatProfileListAction.handle ()",
 				this);
 
 		ImChatRec imChat =
-			imChatHelper.findOrNull (
+			imChatHelper.findRequired (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));

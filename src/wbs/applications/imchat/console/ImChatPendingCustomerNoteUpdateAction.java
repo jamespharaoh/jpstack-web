@@ -80,10 +80,11 @@ class ImChatPendingCustomerNoteUpdateAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ImChatPendingCustomerNoteUpdateAction.goReal ()",
 				this);
 
 		ImChatMessageRec message =
-			imChatMessageHelper.findOrNull (
+			imChatMessageHelper.findRequired (
 				requestContext.stuffInt (
 					"imChatMessageId"));
 

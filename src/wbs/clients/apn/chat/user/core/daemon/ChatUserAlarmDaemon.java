@@ -88,6 +88,7 @@ class ChatUserAlarmDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ChatUserAlarmDaemon.runOnce ()",
 				this);
 
 		List<ChatUserAlarmRec> alarms =
@@ -131,6 +132,7 @@ class ChatUserAlarmDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserAlarmDaemon.doOneAlarm (alarmId)",
 				this);
 
 		// find the alarm and stuff

@@ -47,11 +47,14 @@ class ChatUserImageHistoryPart
 		type =
 			toEnum (
 				ChatUserImageType.class,
-				(String) requestContext.stuff ("chatUserImageType"));
+				(String)
+				requestContext.stuff (
+					"chatUserImageType"));
 
 		chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		chatUserImages =
 			new TreeSet<ChatUserImageRec> (

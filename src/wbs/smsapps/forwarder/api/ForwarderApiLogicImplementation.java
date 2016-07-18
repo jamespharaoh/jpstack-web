@@ -12,6 +12,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
@@ -230,8 +232,8 @@ class ForwarderApiLogicImplementation
 	@Override
 	public
 	Responder controlActionUnqueue (
-			RequestContext requestContext,
-			ForwarderRec forwarder)
+			@NonNull RequestContext requestContext,
+			@NonNull ForwarderRec forwarder)
 		throws ReportableException {
 
 		Transaction transaction =
@@ -246,7 +248,9 @@ class ForwarderApiLogicImplementation
 		if (tempString == null) {
 
 			return textResponder.get ()
-				.text ("ERROR\nNo id supplied\n");
+
+				.text (
+					"ERROR\nNo id supplied\n");
 
 		}
 
@@ -255,12 +259,28 @@ class ForwarderApiLogicImplementation
 
 		// find the message
 
-		ForwarderMessageInRec forwarderMessageIn =
-			forwarderMessageInHelper.findOrNull (
+		Optional<ForwarderMessageInRec> forwarderMessageInOptional =
+			forwarderMessageInHelper.find (
 				forwarderMessageInId);
 
-		if (forwarderMessageIn.getForwarder () != forwarder)
-			throw new ReportableException ("Message not found");
+		if (
+
+			isNotPresent (
+				forwarderMessageInOptional)
+
+			|| notEqual (
+				forwarderMessageInOptional.get ().getForwarder (),
+				forwarder)
+
+		) {
+
+			throw new ReportableException (
+				"Message not found");
+
+		}
+
+		ForwarderMessageInRec forwarderMessageIn =
+			forwarderMessageInOptional.get ();
 
 		// update it
 

@@ -51,6 +51,7 @@ import wbs.sms.message.inbox.daemon.CommandManager;
 import wbs.sms.message.inbox.logic.InboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
+import wbs.sms.message.outbox.model.FailedMessageObjectHelper;
 
 @Accessors (fluent = true)
 @Log4j
@@ -96,6 +97,9 @@ class ChatChatCommand
 
 	@Inject
 	Database database;
+
+	@Inject
+	FailedMessageObjectHelper failedMessageHelper;
 
 	@Inject
 	KeywordFinder keywordFinder;
@@ -261,15 +265,17 @@ class ChatChatCommand
 
 			return inboxLogic.inboxProcessed (
 				inbox,
-				Optional.of (defaultService),
-				Optional.of (affiliate),
+				Optional.of (
+					defaultService),
+				Optional.of (
+					affiliate),
 				command);
 
 		}
 
 		// process inbox
 
-		String rejected =
+		String rejectedReason =
 			chatMessageLogic.chatMessageSendFromUser (
 				fromChatUser,
 				toChatUser,
@@ -279,8 +285,18 @@ class ChatChatCommand
 				ChatMessageMethod.sms,
 				ImmutableList.<MediaRec>of ());
 
-		if (rejected != null)
-			message.setNotes (rejected);
+		if (rejectedReason != null) {
+
+			failedMessageHelper.insert (
+				failedMessageHelper.createInstance ()
+
+				.setMessage (
+					message)
+
+				.setError (
+					rejectedReason));
+
+		}
 
 		// do auto join
 
@@ -405,7 +421,7 @@ class ChatChatCommand
 	InboxAttemptRec handle () {
 
 		chat =
-			chatHelper.findOrNull (
+			chatHelper.findRequired (
 				command.getParentId ());
 
 		message =
@@ -421,7 +437,7 @@ class ChatChatCommand
 				fromChatUser);
 
 		toChatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				commandRef.get ());
 
 		// treat as join if the user has no affiliate

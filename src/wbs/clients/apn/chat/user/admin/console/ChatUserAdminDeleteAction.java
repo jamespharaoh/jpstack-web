@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.user.admin.console;
 
+import static wbs.framework.utils.etc.Misc.isPresent;
+
 import javax.inject.Inject;
 
 import lombok.Cleanup;
@@ -62,22 +64,36 @@ class ChatUserAdminDeleteAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserAdminDeleteAction.goReal ()",
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		if (chatUser.getType () != ChatUserType.user) {
-			requestContext.addError ("User is a monitor");
+
+			requestContext.addError (
+				"User is a monitor");
+
 			return null;
+
 		}
 
-		if (requestContext.parameterOrNull ("deleteUser") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"deleteUser"))
+		) {
 
 			if (chatUser.getNumber () == null) {
-				requestContext.addWarning ("User is already deleted");
+
+				requestContext.addWarning (
+					"User is already deleted");
+
 				return null;
+
 			}
 
 			chatUser.setNumber (null);
@@ -94,7 +110,11 @@ class ChatUserAdminDeleteAction
 			return null;
 		}
 
-		if (requestContext.parameterOrNull ("undeleteUser") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"undeleteUser"))
+		) {
 
 			if (chatUser.getNumber () != null) {
 				requestContext.addWarning ("User is not deleted");

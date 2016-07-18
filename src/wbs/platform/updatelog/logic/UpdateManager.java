@@ -265,6 +265,7 @@ class UpdateManager {
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"UpdateManager.getVersionDb (table, ref)",
 				this);
 
 		refreshMaster ();

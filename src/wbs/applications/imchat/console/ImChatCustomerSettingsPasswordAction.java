@@ -68,12 +68,13 @@ class ImChatCustomerSettingsPasswordAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ImChaCustomerSettingsPasswordAction.goReal ()",
 				this);
 
 		// find customer
 
 		ImChatCustomerRec customer =
-			imChatCustomerHelper.findOrNull (
+			imChatCustomerHelper.findRequired (
 				requestContext.stuffInt (
 					"imChatCustomerId"));
 

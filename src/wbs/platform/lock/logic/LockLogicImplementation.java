@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.lock.model.LockObjectHelper;
 import wbs.platform.lock.model.LockRec;
@@ -19,7 +21,7 @@ class LockLogicImplementation
 	@Override
 	public
 	void magicLock (
-			Object... objects) {
+			@NonNull Object... objects) {
 
 		int lockId =
 			Arrays.hashCode (
@@ -27,7 +29,7 @@ class LockLogicImplementation
 			& 0x3fff;
 
 		LockRec lock =
-			lockHelper.findOrNull (
+			lockHelper.findRequired (
 				lockId);
 
 		lockHelper.lock (

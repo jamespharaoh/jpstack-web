@@ -1,5 +1,9 @@
 package wbs.integrations.hybyte.hibernate;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.integrations.hybyte.model.HybyteNetworkDao;
 import wbs.integrations.hybyte.model.HybyteNetworkRec;
@@ -12,20 +16,22 @@ class HybyteNetworkDaoHibernate
 	@Override
 	public
 	HybyteNetworkRec findByInText (
-			String inText) {
+			@NonNull String inText) {
 
 		return findOne (
+			"findByInText (inText)",
 			HybyteNetworkRec.class,
 
-			createQuery (
-				"FROM HybyteNetworkRec hybyteNetwork " +
-				"WHERE hybyteNetwork.inText = :inText")
+			createCriteria (
+				HybyteNetworkRec.class,
+				"_hybyteNetwork")
 
-			.setString (
-				"inText",
-				inText)
+			.add (
+				Restrictions.eq (
+					"_hybyteNetwork.inText",
+					inText))
 
-			.list ());
+		);
 
 	}
 

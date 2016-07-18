@@ -90,6 +90,7 @@ class ChatAdultExpiryDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ChatAdultExpiryDaemon.runOnce ()",
 				this);
 
 		List<ChatUserRec> chatUsers =
@@ -117,10 +118,11 @@ class ChatAdultExpiryDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatAdultExpiryDaemon.runOnce ()",
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				chatUserId);
 
 		ChatSchemeRec chatScheme =

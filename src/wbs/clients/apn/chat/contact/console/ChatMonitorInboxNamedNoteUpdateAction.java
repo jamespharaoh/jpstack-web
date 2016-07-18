@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.trim;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -97,7 +98,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 		Matcher idMatcher =
 			idPattern.matcher (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"id"));
 
 		if (! idMatcher.matches ()) {
@@ -115,22 +116,25 @@ class ChatMonitorInboxNamedNoteUpdateAction
 			idMatcher.group (2);
 
 		String newValue =
-			requestContext.parameterOrNull ("value").trim ();
+			trim (
+				requestContext.parameterRequired (
+					"value"));
 
 		// start transaction
 
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatMonitorInboxNamedNoteUpdateAction.goReal ()",
 				this);
 
 		ChatMonitorInboxRec monitorInbox =
-			chatMonitorInboxHelper.findOrNull (
+			chatMonitorInboxHelper.findRequired (
 				requestContext.stuffInt (
 					"chatMonitorInboxId"));
 
 		ChatNoteNameRec chatNoteName =
-			chatNoteNameHelper.findOrNull (
+			chatNoteNameHelper.findRequired (
 				noteNameId);
 
 		// work out which user is which

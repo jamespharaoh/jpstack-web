@@ -149,6 +149,7 @@ class ChatDateDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ChatDateDaemon.doRun ()",
 				this);
 
 		List<Integer> chatIds =
@@ -179,6 +180,7 @@ class ChatDateDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ChatDateDaemon.doChat (chatId)",
 				this);
 
 		ChatRec chat =
@@ -444,6 +446,7 @@ class ChatDateDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatDateDaemon.doUser (otherUserInfos, thisUserId)",
 				this);
 
 		ChatUserRec thisUser =

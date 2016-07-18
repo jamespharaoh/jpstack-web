@@ -54,10 +54,11 @@ class ImChatServiceGetAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ImChatServiceGetAction.handle ()",
 				this);
 
 		ImChatRec imChat =
-			imChatHelper.findOrNull (
+			imChatHelper.findRequired (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));

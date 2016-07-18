@@ -59,16 +59,18 @@ class ChatMonitorInboxAddNoteAction
 		throws ServletException {
 
 		String newNote =
-			requestContext.parameterOrNull ("moreNotes");
+			requestContext.parameterRequired ("moreNotes");
 
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatMonitorInboxAddNoteAction.goReal ()",
 				this);
 
 		ChatMonitorInboxRec chatMonitorInbox =
-			chatMonitorInboxHelper.findOrNull (
-				requestContext.stuffInt ("chatMonitorInboxId"));
+			chatMonitorInboxHelper.findRequired (
+				requestContext.stuffInt (
+					"chatMonitorInboxId"));
 
 		ChatUserRec userChatUser =
 			chatMonitorInbox.getUserChatUser ();

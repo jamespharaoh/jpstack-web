@@ -71,6 +71,7 @@ class QueueItemActionsAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"QueueItemActionsAction.goReal ()",
 				this);
 
 		/*

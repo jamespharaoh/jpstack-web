@@ -62,10 +62,11 @@ class PhotoGrabberDelivery
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"PhotoGrabberDelivery.handle (deliveryId, ref)",
 				this);
 
 		DeliveryRec delivery =
-			deliveryHelper.findOrNull (
+			deliveryHelper.findRequired (
 				deliveryId);
 
 		MessageRec message =

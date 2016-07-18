@@ -2,6 +2,8 @@ package wbs.integrations.oxygen8.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -22,7 +24,7 @@ class Oxygen8InboundLogDaoHibernate
 	@Override
 	public
 	List<Integer> searchIds (
-			Oxygen8InboundLogSearch search) {
+			@NonNull Oxygen8InboundLogSearch oxygen8InboundLogSearch) {
 
 		Criteria criteria =
 			createCriteria (
@@ -31,43 +33,43 @@ class Oxygen8InboundLogDaoHibernate
 
 		// restrict by route
 
-		if (search.getRouteId () != null) {
+		if (oxygen8InboundLogSearch.getRouteId () != null) {
 
 			criteria.add (
 				Restrictions.eq (
 					"_oxygen8InboundLog.route.id",
-					search.getRouteId ()));
+					oxygen8InboundLogSearch.getRouteId ()));
 
 		}
 
 		// restrict by timestamp
 
-		if (search.getTimestampAfter () != null) {
+		if (oxygen8InboundLogSearch.getTimestampAfter () != null) {
 
 			criteria.add (
 				Restrictions.ge (
 					"_oxygen8InboundLog.timestamp",
-					search.getTimestampAfter ()));
+					oxygen8InboundLogSearch.getTimestampAfter ()));
 
 		}
 
-		if (search.getTimestampBefore () != null) {
+		if (oxygen8InboundLogSearch.getTimestampBefore () != null) {
 
 			criteria.add (
 				Restrictions.lt (
 					"_oxygen8InboundLog.timestamp",
-					search.getTimestampBefore ()));
+					oxygen8InboundLogSearch.getTimestampBefore ()));
 
 		}
 
 		// restrict by details
 
-		if (search.getDetails () != null) {
+		if (oxygen8InboundLogSearch.getDetails () != null) {
 
 			criteria.add (
 				Restrictions.ilike (
 					"_oxygen8InboundLog.details",
-					search.getDetails ()));
+					oxygen8InboundLogSearch.getDetails ()));
 
 		}
 
@@ -88,8 +90,9 @@ class Oxygen8InboundLogDaoHibernate
 		// perform and return
 
 		return findMany (
+			"searchIds (oxygen8InboundLogSearch)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 

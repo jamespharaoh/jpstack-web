@@ -2,6 +2,11 @@ package wbs.smsapps.forwarder.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutDao;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
@@ -15,53 +20,66 @@ class ForwarderMessageOutDaoHibernate
 	@Override
 	public
 	ForwarderMessageOutRec findByOtherId (
-			ForwarderRec forwarder,
-			String otherId) {
+			@NonNull ForwarderRec forwarder,
+			@NonNull String otherId) {
 
 		return findOne (
+			"findByOtherId (forwarder, otherId)",
 			ForwarderMessageOutRec.class,
 
-			createQuery (
-				"FROM ForwarderMessageOutRec fmo " +
-				"WHERE fmo.forwarder = :forwarder " +
-				"AND fmo.otherId = :otherId")
+			createCriteria (
+				ForwarderMessageOutRec.class,
+				"_forwarderMessageOut")
 
-			.setEntity (
-				"forwarder",
-				forwarder)
+			.add (
+				Restrictions.eq (
+					"_forwarderMessageOut.forwarder",
+					forwarder))
 
-			.setString (
-				"otherId",
-				otherId)
+			.add (
+				Restrictions.eq (
+					"_forwarderMessageOut.otherId",
+					otherId))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ForwarderMessageOutRec> findPendingLimit (
-			ForwarderRec forwarder,
+			@NonNull ForwarderRec forwarder,
 			int maxResults) {
 
 		return findMany (
+			"findPendingLimit (forwarder, maxResults)",
 			ForwarderMessageOutRec.class,
 
-			createQuery (
-				"SELECT fmo " +
-				"FROM ForwarderMessageOutRec fmo " +
-				"WHERE fmo.forwarder = :forwarder " +
-					"AND fmo.reportIndexPending IS NOT NULL " +
-				"ORDER BY fmo.forwarder, fmo.id")
+			createCriteria (
+				ForwarderMessageOutRec.class,
+				"_forwarderMessageOut")
 
-			.setEntity (
-				"forwarder",
-				forwarder)
+			.add (
+				Restrictions.eq (
+					"_forwarderMessageOut.forwarder",
+					forwarder))
+
+			.add (
+				Restrictions.isNotNull (
+					"_forwarderMessageOut.reportIndexPending"))
+
+			.addOrder (
+				Order.asc (
+					"_forwarderMessageOut.forwarder"))
+
+			.addOrder (
+				Order.asc (
+					"_forwarderMessageOut.id"))
 
 			.setMaxResults (
 				maxResults)
 
-			.list ());
+		);
 
 	}
 

@@ -61,6 +61,7 @@ class QueueFilterResponder
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"QueueFilterResponder.execute ()",
 				this);
 
 		String filter =

@@ -67,8 +67,9 @@ class ChatHelpLogPendingSummaryPart
 	void prepare () {
 
 		chatHelpLog =
-			chatHelpLogHelper.findOrNull (
-				requestContext.stuffInt ("chatHelpLogId"));
+			chatHelpLogHelper.findRequired (
+				requestContext.stuffInt (
+					"chatHelpLogId"));
 
 		chatUser =
 			chatHelpLog.getChatUser ();

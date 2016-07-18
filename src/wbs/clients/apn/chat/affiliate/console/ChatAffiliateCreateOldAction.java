@@ -163,14 +163,16 @@ class ChatAffiliateCreateOldAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatAffiliateCreateOldAction.goReal ()",
 				this);
 
 		ChatRec chat =
-			chatHelper.findOrNull (
-				requestContext.stuffInt ("chatId"));
+			chatHelper.findRequired (
+				requestContext.stuffInt (
+					"chatId"));
 
 		ChatSchemeRec chatScheme =
-			chatSchemeHelper.findOrNull (
+			chatSchemeHelper.findRequired (
 				chatSchemeId);
 
 		if (chatScheme.getChat () != chat)

@@ -59,18 +59,19 @@ class ForwarderDelivery
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ForwarderDelivery.handle (deliveryId, ref)",
 				this);
 
 		// get the delivery
 
 		DeliveryRec delivery =
-			deliveryHelper.findOrNull (
+			deliveryHelper.findRequired (
 				deliveryId);
 
 		// lookup the forwarder message out
 
 		ForwarderMessageOutRec forwarderMessageOut =
-			forwarderMessageOutHelper.findOrNull (
+			forwarderMessageOutHelper.findRequired (
 				delivery.getMessage ().getRef ());
 
 		// unhold / cancel next message(s) if required

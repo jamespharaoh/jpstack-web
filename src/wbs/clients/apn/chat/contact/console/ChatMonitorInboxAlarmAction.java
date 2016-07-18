@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -92,11 +92,12 @@ class ChatMonitorInboxAlarmAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatMonitorInboxAlarmAction.goReal ()",
 				this);
 
 		ChatMonitorInboxRec chatMonitorInbox =
-			chatMonitorInboxHelper.findOrNull (
-				requestContext .stuffInt (
+			chatMonitorInboxHelper.findRequired (
+				requestContext.stuffInt (
 					"chatMonitorInboxId"));
 
 		ChatUserRec userChatUser =
@@ -123,18 +124,18 @@ class ChatMonitorInboxAlarmAction
 		// pull in parameters
 
 		boolean save =
-			isNotNull (
-				requestContext.parameterOrNull (
+			isPresent (
+				requestContext.parameter (
 					"alarmSet"));
 
 		boolean clear =
-			isNotNull (
-				requestContext.parameterOrNull (
+			isPresent (
+				requestContext.parameter (
 					"alarmCancel"));
 
 		boolean sticky =
 			Boolean.parseBoolean (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"alarmSticky"));
 
 		Instant alarmTime = null;
@@ -148,9 +149,9 @@ class ChatMonitorInboxAlarmAction
 				String timestampString =
 					stringFormat (
 						"%s %s",
-						requestContext.parameterOrNull (
+						requestContext.parameterRequired (
 							"alarmDate"),
-						requestContext.parameterOrNull (
+						requestContext.parameterRequired (
 							"alarmTime"));
 
 				TextualInterval interval =

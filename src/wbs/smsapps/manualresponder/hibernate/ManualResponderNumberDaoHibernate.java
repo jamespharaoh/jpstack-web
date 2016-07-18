@@ -28,26 +28,28 @@ class ManualResponderNumberDaoHibernate
 	@Override
 	public
 	ManualResponderNumberRec find (
-			ManualResponderRec manualResponder,
-			NumberRec number) {
+			@NonNull ManualResponderRec manualResponder,
+			@NonNull NumberRec number) {
 
 		return findOne (
+			"findOne (manualResponder, number)",
 			ManualResponderNumberRec.class,
 
-			createQuery (
-				"FROM ManualResponderNumberRec manualResponderNumber " +
-				"WHERE manualResponderNumber.manualResponder = :manualResponder " +
-					"AND manualResponderNumber.number = :number")
+			createCriteria (
+				ManualResponderNumberRec.class,
+				"_manualResponderNumber")
 
-			.setEntity (
-				"manualResponder",
-				manualResponder)
+			.add (
+				Restrictions.eq (
+					"_manualResponderNumber.manualResponder",
+					manualResponder))
 
-			.setEntity (
-				"number",
-				number)
+			.add (
+				Restrictions.eq (
+					"_manualResponderNumber.number",
+					number))
 
-			.list ());
+		);
 
 	}
 
@@ -150,8 +152,9 @@ class ManualResponderNumberDaoHibernate
 			Projections.id ());
 
 		return findMany (
+			"searchIds (search)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 

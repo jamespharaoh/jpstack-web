@@ -70,6 +70,7 @@ class ImChatSessionEndAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ImChatSessionEndAction.handle ()",
 				this);
 
 		// lookup session

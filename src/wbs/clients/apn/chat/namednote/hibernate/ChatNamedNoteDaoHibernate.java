@@ -2,6 +2,10 @@ package wbs.clients.apn.chat.namednote.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.clients.apn.chat.namednote.model.ChatNamedNoteDao;
 import wbs.clients.apn.chat.namednote.model.ChatNamedNoteRec;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameRec;
@@ -18,58 +22,62 @@ public
 	@Override
 	public
 	ChatNamedNoteRec find (
-			ChatUserRec thisChatUser,
-			ChatUserRec otherChatUser,
-			ChatNoteNameRec chatNoteName) {
+			@NonNull ChatUserRec thisChatUser,
+			@NonNull ChatUserRec otherChatUser,
+			@NonNull ChatNoteNameRec chatNoteName) {
 
 		return findOne (
+			"find (thisChatUser, otherChatUser, chatNoteName",
 			ChatNamedNoteRec.class,
 
-			createQuery (
-				"FROM ChatNamedNoteRec namedNote " +
-				"WHERE namedNote.thisUser = :thisChatUser " +
-					"AND namedNote.otherUser = :otherChatUser " +
-					"AND namedNote.chatNoteName = :chatNoteName")
+			createCriteria (
+				ChatNamedNoteRec.class,
+				"_chatNamedNote")
 
-			.setEntity (
-				"thisChatUser",
-				thisChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatNamedNote.thisUser",
+					thisChatUser))
 
-			.setEntity (
-				"otherChatUser",
-				otherChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatNamedNote.otherUser",
+					otherChatUser))
 
-			.setEntity (
-				"chatNoteName",
-				chatNoteName)
+			.add (
+				Restrictions.eq (
+					"_chatNamedNote.chatNoteName",
+					chatNoteName))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatNamedNoteRec> find (
-			ChatUserRec thisChatUser,
-			ChatUserRec otherChatUser) {
+			@NonNull ChatUserRec thisChatUser,
+			@NonNull ChatUserRec otherChatUser) {
 
 		return findMany (
+			"find (thisChatUser, otherChatUser)",
 			ChatNamedNoteRec.class,
 
-			createQuery (
-				"FROM ChatNamedNoteRec namedNote " +
-				"WHERE namedNote.thisUser = :thisChatUser " +
-					"AND namedNote.otherUser = :otherChatUser")
+			createCriteria (
+				ChatNamedNoteRec.class,
+				"_chatNamedNote")
 
-			.setEntity (
-				"thisChatUser",
-				thisChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatNamedNote.thisUser",
+					thisChatUser))
 
-			.setEntity (
-				"otherChatUser",
-				otherChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatNamedNote.otherUser",
+					otherChatUser))
 
-			.list ());
+		);
 
 	}
 

@@ -56,8 +56,9 @@ class ChatBroadcastListPart
 	void prepare () {
 
 		chat =
-			chatHelper.findOrNull (
-				requestContext.stuffInt ("chatId"));
+			chatHelper.findRequired (
+				requestContext.stuffInt (
+					"chatId"));
 
 		broadcasts =
 			chatBroadcastHelper.findRecentWindow (

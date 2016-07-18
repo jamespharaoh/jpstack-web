@@ -1,5 +1,9 @@
 package wbs.smsapps.photograbber.hibernate;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestDao;
@@ -13,20 +17,22 @@ class PhotoGrabberRequestDaoHibernate
 	@Override
 	public
 	PhotoGrabberRequestRec findByBilledMessage (
-			MessageRec billedMessage) {
+			@NonNull MessageRec billedMessage) {
 
 		return findOne (
+			"findByBilledMessage (billedMessage)",
 			PhotoGrabberRequestRec.class,
 
-			createQuery (
-				"FROM PhotoGrabberRequestRec pgr " +
-				"WHERE pgr.billedMessage = :billedMessage")
+			createCriteria (
+				PhotoGrabberRequestRec.class,
+				"_photoGrabberRequest")
 
-			.setEntity (
-				"billedMessage",
-				billedMessage)
+			.add (
+				Restrictions.eq (
+					"_photoGrabberRequest.billedMessage",
+					billedMessage))
 
-			.list ());
+		);
 
 	}
 

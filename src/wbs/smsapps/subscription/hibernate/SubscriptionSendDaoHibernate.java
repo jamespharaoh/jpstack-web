@@ -2,6 +2,8 @@ package wbs.smsapps.subscription.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Instant;
 
@@ -20,6 +22,7 @@ class SubscriptionSendDaoHibernate
 	List<SubscriptionSendRec> findSending () {
 
 		return findMany (
+			"findSending ()",
 			SubscriptionSendRec.class,
 
 			createCriteria (
@@ -31,16 +34,17 @@ class SubscriptionSendDaoHibernate
 					"_subscriptionSend.state",
 					SubscriptionSendState.sending))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<SubscriptionSendRec> findScheduled (
-			Instant now) {
+			@NonNull Instant now) {
 
 		return findMany (
+			"findScheduled (now)",
 			SubscriptionSendRec.class,
 
 			createCriteria (
@@ -57,7 +61,7 @@ class SubscriptionSendDaoHibernate
 					"_subscriptionSend.scheduledForTime",
 					now))
 
-			.list ());
+		);
 
 	}
 

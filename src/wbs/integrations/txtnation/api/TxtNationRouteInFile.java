@@ -102,20 +102,16 @@ class TxtNationRouteInFile
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"TxtNationRouteInFile.doPost ()",
 				this);
 
 		TxtNationRouteInRec txtNationRouteIn =
-			txtNationRouteInHelper.findOrNull (
-				routeId);
-
-		if (txtNationRouteIn == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"No txtNation inbound route info for route %s",
-					txtNationRouteIn));
-
-		}
+			txtNationRouteInHelper.findOrThrow (
+				routeId,
+				() -> new RuntimeException (
+					stringFormat (
+						"No txtNation inbound route info for route %s",
+						routeId)));
 
 		// sanity checks
 

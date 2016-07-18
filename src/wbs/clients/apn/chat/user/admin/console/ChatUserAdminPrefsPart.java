@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.user.admin.console;
 
+import static wbs.framework.utils.etc.Misc.isNull;
+
 import javax.inject.Inject;
 
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -24,17 +26,27 @@ class ChatUserAdminPrefsPart
 	void prepare () {
 
 		chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent () {
 
-		if (chatUser == null
-				|| chatUser.getGender () == null
-				|| chatUser.getOrient () == null) {
+		if (
+
+			isNull (
+				chatUser)
+
+			|| isNull (
+				chatUser.getGender ())
+
+			|| isNull (
+				chatUser.getOrient ())
+
+		) {
 
 			requestContext.addError (
 				"Cannot change prefs for this user");

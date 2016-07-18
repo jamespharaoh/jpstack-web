@@ -85,6 +85,7 @@ class CoreAuthFilter
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"CoreAuthFilter.reload ()",
 				this);
 
 		onlineSessionIdsByUserId =

@@ -2,6 +2,8 @@ package wbs.clients.apn.chat.broadcast.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Instant;
@@ -22,11 +24,12 @@ class ChatBroadcastDaoHibernate
 	@Override
 	public
 	List<ChatBroadcastRec> findRecentWindow (
-			ChatRec chat,
+			@NonNull ChatRec chat,
 			int firstResult,
 			int maxResults) {
 
 		return findMany (
+			"findManyWindow (chat, firstResult, maxResults)",
 			ChatBroadcastRec.class,
 
 			createCriteria (
@@ -48,7 +51,7 @@ class ChatBroadcastDaoHibernate
 			.setMaxResults (
 				maxResults)
 
-			.list ());
+		);
 
 	}
 
@@ -57,6 +60,7 @@ class ChatBroadcastDaoHibernate
 	List<ChatBroadcastRec> findSending () {
 
 		return findMany (
+			"findSending",
 			ChatBroadcastRec.class,
 
 			createCriteria (
@@ -68,16 +72,17 @@ class ChatBroadcastDaoHibernate
 					"_chatBroadcast.state",
 					ChatBroadcastState.sending))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatBroadcastRec> findScheduled (
-			Instant scheduledTime) {
+			@NonNull Instant scheduledTime) {
 
 		return findMany (
+			"findScheduled (scheduledTime)",
 			ChatBroadcastRec.class,
 
 			createCriteria (
@@ -94,7 +99,7 @@ class ChatBroadcastDaoHibernate
 					"_chatBroadcast.scheduledTime",
 					scheduledTime))
 
-			.list ());
+		);
 
 	}
 

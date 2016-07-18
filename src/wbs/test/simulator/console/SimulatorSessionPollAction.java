@@ -66,14 +66,19 @@ class SimulatorSessionPollAction
 	Responder goReal () {
 
 		int lastId =
-			toInteger (requestContext.getForm ("last"));
+			toInteger (
+				requestContext.getForm (
+					"last"));
 
 		int limit =
-			toInteger (requestContext.getForm ("limit"));
+			toInteger (
+				requestContext.getForm (
+					"limit"));
 
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"SimulatorSessionPollAction.goReal ()",
 				this);
 
 		List<SimulatorEventRec> events =

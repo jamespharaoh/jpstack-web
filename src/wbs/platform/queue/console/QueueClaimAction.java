@@ -55,15 +55,17 @@ class QueueClaimAction
 
 		int queueId =
 			Integer.parseInt (
-				requestContext.parameterOrNull ("queue_id"));
+				requestContext.parameterRequired (
+					"queue_id"));
 
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"QueueClaimAction.goReal ()",
 				this);
 
 		QueueRec queue =
-			queueHelper.findOrNull (
+			queueHelper.findRequired (
 				queueId);
 
 		QueueItemRec queueItem =

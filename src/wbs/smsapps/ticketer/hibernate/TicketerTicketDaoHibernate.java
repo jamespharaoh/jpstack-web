@@ -1,5 +1,9 @@
 package wbs.smsapps.ticketer.hibernate;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.ticketer.model.TicketerRec;
@@ -14,32 +18,34 @@ class TicketerTicketDaoHibernate
 	@Override
 	public
 	TicketerTicketRec findByTicket (
-			TicketerRec ticketer,
-			NumberRec number,
-			String ticket) {
+			@NonNull TicketerRec ticketer,
+			@NonNull NumberRec number,
+			@NonNull String ticket) {
 
 		return findOne (
+			"findByTicket (ticketer, number, ticket)",
 			TicketerTicketRec.class,
 
-			createQuery (
-				"FROM TicketerTicketRec ticketerTicket" +
-				"WHERE ticketerTicket.ticketer = :ticketer " +
-					"AND ticketerTicket.number = :number " +
-					"AND ticketerTicket.ticket = :ticket")
+			createCriteria (
+				TicketerTicketRec.class,
+				"_ticketerTicket")
 
-			.setEntity (
-				"ticketer",
-				ticketer)
+			.add (
+				Restrictions.eq (
+					"_ticketerTicket.ticketer",
+					ticketer))
 
-			.setEntity (
-				"number",
-				number)
+			.add (
+				Restrictions.eq (
+					"_ticketerTicket.number",
+					number))
 
-			.setString (
-				"ticket",
-				ticket)
+			.add (
+				Restrictions.eq (
+					"_ticketerTicket.ticket",
+					ticket))
 
-			.list ());
+		);
 
 	}
 

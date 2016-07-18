@@ -82,7 +82,7 @@ class ActivityDumper {
 
 	void runOnce () {
 
-		activityManager.dump ();
+		activityManager.logActiveTasks ();
 
 	}
 

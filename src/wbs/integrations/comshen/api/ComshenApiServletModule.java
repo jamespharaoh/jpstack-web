@@ -9,7 +9,6 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -87,6 +86,7 @@ class ComshenApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"ComshenApiServletModule.reportFile.doGet ()",
 					this);
 
 			int routeId =
@@ -94,28 +94,24 @@ class ComshenApiServletModule
 					"routeId");
 
 			String idParam =
-				requestContext.parameter ("id");
+				requestContext.parameter (
+					"id");
 
 			String statParam =
-				requestContext.parameter ("stat");
+				requestContext.parameter (
+					"stat");
 
 			String errParam =
-				requestContext.parameter ("err");
+				requestContext.parameter (
+					"err");
 
 			RouteRec route =
-				routeHelper.findOrNull (routeId);
-
-			if (route == null) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"Route not found: %s",
-						routeId));
-
-			}
+				routeHelper.findRequired (
+					routeId);
 
 			MessageStatus result =
-				statToResult.get (statParam);
+				statToResult.get (
+					statParam);
 
 			// update message report code
 
@@ -139,8 +135,7 @@ class ComshenApiServletModule
 			reportLogic.deliveryReport (
 				route,
 				idParam,
-				Optional.of (
-					result),
+				result,
 				null,
 				messageReportCode);
 

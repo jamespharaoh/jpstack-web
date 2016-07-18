@@ -90,23 +90,19 @@ class ChatSupervisorMessagesPart
 	void prepare () {
 
 		chat =
-			chatHelper.findOrNull (
+			chatHelper.findRequired (
 				requestContext.stuffInt (
 					"chatId"));
 
 		Interval interval =
 			timeFormatter.isoStringToInterval (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"interval"));
 
-		int senderUserId =
-			Integer.parseInt (
-				requestContext.parameterOrNull (
-					"user_id"));
-
 		UserRec senderUser =
-			userHelper.findOrNull (
-				senderUserId);
+			userHelper.findRequired (
+				requestContext.parameterInteger (
+					"user_id"));
 
 		chatMessages =
 			chatMessageHelper.findBySenderAndTimestamp (

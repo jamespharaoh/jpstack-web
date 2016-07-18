@@ -74,8 +74,9 @@ class ChatUserAdminBillPart
 			database.currentTransaction ();
 
 		chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		if (
 			equal (

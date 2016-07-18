@@ -73,7 +73,7 @@ class ChatContactObjectHelperImplementation
 			// look for existing
 
 			chatContact =
-				chatContactHelper.find (
+				chatContactHelper.findNoFlush (
 					fromUser,
 					toUser);
 
@@ -108,7 +108,7 @@ class ChatContactObjectHelperImplementation
 		} else {
 
 			inverseChatContact =
-				chatContactHelper.find (
+				chatContactHelper.findNoFlush (
 					toUser,
 					fromUser);
 

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -54,7 +55,16 @@ class ObjectHelperProviderManager {
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ObjectHelperProviderManager.init ()",
 				this);
+
+		Map<String,ObjectTypeEntry> objectTypesByCode =
+			objectTypeRegistry.findAll ().stream ()
+
+			.collect (
+				Collectors.toMap (
+					objectType -> objectType.getCode (),
+					objectType -> objectType));
 
 		for (
 			Map.Entry<String,ObjectHelperProvider> entry
@@ -73,14 +83,17 @@ class ObjectHelperProviderManager {
 
 			// check for dupes
 
-			if (objectHelperProvidersByObjectClass.containsKey (
-					objectHelperProvider.objectClass ()))
+			if (
+				objectHelperProvidersByObjectClass.containsKey (
+					objectHelperProvider.objectClass ())
+			) {
 				throw new RuntimeException ();
+			}
 
 			// find object type
 
 			ObjectTypeEntry objectType =
-				objectTypeRegistry.findByCode (
+				objectTypesByCode.get (
 					objectHelperProvider.objectTypeCode ());
 
 			if (objectType == null) {

@@ -89,6 +89,7 @@ class ChatMonitorSwapDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ChatMonitorSwapDaemon.runOnce ()",
 				this);
 
 		List<ChatRec> chats =
@@ -165,6 +166,7 @@ class ChatMonitorSwapDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatMonitorSwapDaemon.doMonitorSwapReal (chatId, gender, orient)",
 				this);
 
 		ChatRec chat =

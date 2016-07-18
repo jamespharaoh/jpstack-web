@@ -194,6 +194,7 @@ class ChatBroadcastSendAction
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"ChatBroadcastSendAction.goReal ()",
 					this);
 
 			// load form

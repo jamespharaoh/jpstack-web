@@ -89,6 +89,7 @@ class ChatSpendWarningDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ChatSpendWarningDaemon.runOnce ()",
 				this);
 
 		List<ChatUserRec> chatUsers =
@@ -127,10 +128,12 @@ class ChatSpendWarningDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatSpendWarningDaemon.doUser (chatUserId)",
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (chatUserId);
+			chatUserHelper.findRequired (
+				chatUserId);
 
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();

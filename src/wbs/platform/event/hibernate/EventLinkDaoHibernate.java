@@ -2,6 +2,8 @@ package wbs.platform.event.hibernate;
 
 import java.util.List;
 
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.event.model.EventLinkDao;
 import wbs.platform.event.model.EventLinkRec;
@@ -18,24 +20,24 @@ class EventLinkDaoHibernate
 			long refId) {
 
 		return findMany (
+			"findByTypeAndRef (typeId, refId)",
 			EventLinkRec.class,
 
-			createQuery (
-				"FROM EventLinkRec el " +
-				"WHERE el.typeId = :typeId " +
-				"AND el.refId = :refId")
+			createCriteria (
+				EventLinkRec.class,
+				"_eventLink")
 
-			.setInteger (
-				"typeId",
-				(int) (long)
-				typeId)
+			.add (
+				Restrictions.eq (
+					"_eventLink.typeId",
+					typeId))
 
-			.setInteger (
-				"refId",
-				(int) (long)
-				refId)
+			.add (
+				Restrictions.eq (
+					"_eventLink.refId",
+					refId))
 
-			.list ());
+		);
 
 	}
 

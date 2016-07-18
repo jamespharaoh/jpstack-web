@@ -1,5 +1,8 @@
 package wbs.clients.apn.chat.user.core.console;
 
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.trim;
+
 import javax.inject.Inject;
 
 import lombok.Cleanup;
@@ -66,20 +69,31 @@ class ChatUserNotesAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserNotesAction.goReal ()",
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		// check params
 
 		String noteString =
-			requestContext.parameterOrNull ("note");
+			trim (
+				requestContext.parameterRequired (
+					"note"));
 
-		if (noteString.trim ().length () == 0) {
-			requestContext.addError ("Please enter a note");
+		if (
+			isEmpty (
+				noteString)
+		) {
+
+			requestContext.addError (
+				"Please enter a note");
+
 			return null;
+
 		}
 
 		// create note

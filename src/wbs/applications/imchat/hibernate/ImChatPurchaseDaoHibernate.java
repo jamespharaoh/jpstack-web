@@ -1,5 +1,7 @@
 package wbs.applications.imchat.hibernate;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Restrictions;
 
 import wbs.applications.imchat.model.ImChatPurchaseDao;
@@ -14,9 +16,10 @@ class ImChatPurchaseDaoHibernate
 	@Override
 	public
 	ImChatPurchaseRec findByToken (
-			String token) {
+			@NonNull String token) {
 
 		return findOne (
+			"findByToken (token)",
 			ImChatPurchaseRec.class,
 
 			createCriteria (
@@ -28,7 +31,7 @@ class ImChatPurchaseDaoHibernate
 					"_imChatPurchase.token",
 					token))
 
-			.list ());
+		);
 
 	}
 

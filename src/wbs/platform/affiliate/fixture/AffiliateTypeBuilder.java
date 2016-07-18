@@ -109,6 +109,7 @@ class AffiliateTypeBuilder {
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"AffiliateTypeBuilder.createAffiliateType ()",
 				this);
 
 		// lookup parent type

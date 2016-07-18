@@ -65,26 +65,27 @@ class ChatUserAdminDateAction
 		ChatUserDateMode dateMode =
 			toEnum (
 				ChatUserDateMode.class,
-				requestContext.parameterOrNull ("dateMode"));
+				requestContext.parameterRequired (
+					"dateMode"));
 
 		Long radius =
 			toLong (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"radius"));
 
 		Long startHour =
 			toLong (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"startHour"));
 
 		Long endHour =
 			toLong (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"endHour"));
 
 		Long dailyMax =
 			toLong (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"dailyMax"));
 
 		if (radius == null
@@ -132,11 +133,13 @@ class ChatUserAdminDateAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserAdminDateAction.goReal ()",
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		chatDateLogic.userDateStuff (
 			chatUser,
@@ -151,7 +154,8 @@ class ChatUserAdminDateAction
 
 		transaction.commit ();
 
-		requestContext.addNotice ("Dating settings updated");
+		requestContext.addNotice (
+			"Dating settings updated");
 
 		return null;
 	}

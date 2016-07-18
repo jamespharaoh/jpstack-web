@@ -1,5 +1,7 @@
 package wbs.applications.imchat.hibernate;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Restrictions;
 
 import wbs.applications.imchat.model.ImChatSessionDao;
@@ -14,9 +16,10 @@ class ImChatSessionDaoHibernate
 	@Override
 	public
 	ImChatSessionRec findBySecret (
-			String secret) {
+			@NonNull String secret) {
 
 		return findOne (
+			"findBySecret (secret)",
 			ImChatSessionRec.class,
 
 			createCriteria (
@@ -28,7 +31,7 @@ class ImChatSessionDaoHibernate
 					"_imChatSession.secret",
 					secret))
 
-			.list ());
+		);
 
 	}
 

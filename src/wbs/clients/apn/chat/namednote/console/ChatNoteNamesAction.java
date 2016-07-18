@@ -59,11 +59,13 @@ class ChatNoteNamesAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatNoteNamesAction.goReal ()",
 				this);
 
 		ChatRec chat =
-			chatHelper.findOrNull (
-				requestContext.stuffInt ("chatId"));
+			chatHelper.findRequired (
+				requestContext.stuffInt (
+					"chatId"));
 
 		List<ChatNoteNameRec> chatNoteNames =
 			chatNoteNameHelper.findNotDeleted (

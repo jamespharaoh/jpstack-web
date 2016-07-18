@@ -10,8 +10,6 @@ import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 
-import com.google.common.base.Optional;
-
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -114,6 +112,7 @@ class BroadcastSystemsReportFile
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"BroadcastSystemsReportFile.updateDatabase (data)",
 				this);
 
 		MessageReportCodeRec reportCode =
@@ -127,14 +126,13 @@ class BroadcastSystemsReportFile
 				data.statusCode);
 
 		RouteRec route =
-			routeHelper.findOrNull (
+			routeHelper.findRequired (
 				data.routeId);
 
 		reportLogic.deliveryReport (
 			route,
 			data.transactionId,
-			Optional.of (
-				data.status),
+			data.status,
 			null,
 			reportCode);
 

@@ -2,6 +2,7 @@ package wbs.integrations.oxygen8.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -92,11 +93,14 @@ class Oxygen8Sender
 
 		// lookup route out
 
-		Oxygen8RouteOutRec oxygen8RouteOut =
-			oxygen8RouteOutHelper.findOrNull (
+		Optional<Oxygen8RouteOutRec> oxygen8RouteOutOptional =
+			oxygen8RouteOutHelper.find (
 				route.getId ());
 
-		if (oxygen8RouteOut == null) {
+		if (
+			isNotPresent (
+				oxygen8RouteOutOptional)
+		) {
 
 			return new SetupSendResult ()
 
@@ -109,6 +113,9 @@ class Oxygen8Sender
 						route.getCode ()));
 
 		}
+
+		Oxygen8RouteOutRec oxygen8RouteOut =
+			oxygen8RouteOutOptional.get ();
 
 		// lookup network
 

@@ -69,19 +69,14 @@ class ChatMonitorInboxUpdateNoteAction
 	Responder goReal ()
 		throws ServletException {
 
-		String id =
-			requestContext.parameterOrNull ("id");
-
-		if (id == null)
-			throw new RuntimeException ();
-
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatMonitorInboxUpdateNodeAction.goReal ()",
 				this);
 
 		ChatMonitorInboxRec chatMonitorInbox =
-			chatMonitorInboxHelper.findOrNull (
+			chatMonitorInboxHelper.findRequired (
 				requestContext.stuffInt (
 					"chatMonitorInboxId"));
 
@@ -89,8 +84,9 @@ class ChatMonitorInboxUpdateNoteAction
 			chatMonitorInbox.getMonitorChatUser ();
 
 		ChatContactNoteRec note =
-			chatContactNoteHelper.findOrNull (
-				Integer.parseInt (id));
+			chatContactNoteHelper.findRequired (
+				requestContext.parameterInteger (
+					"id"));
 
 		if (
 			isNotNull (
@@ -117,6 +113,7 @@ class ChatMonitorInboxUpdateNoteAction
 					"pegNote"))
 
 		) {
+
 			note.setPegged (true);
 
 			transaction.commit ();

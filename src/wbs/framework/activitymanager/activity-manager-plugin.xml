@@ -2,8 +2,4 @@
 	name="activity-manager"
 	package="activitymanager">
 
-	<layer name="activity-manager">
-		<bean class="ActivityManagerImplementation"/>
-	</layer>
-
 </plugin>

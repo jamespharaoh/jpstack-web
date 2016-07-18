@@ -38,6 +38,7 @@ class ManualResponderRequestDaoHibernate
 			@NonNull Integer maxResults) {
 
 		return findMany (
+			"findRecentLimit (manualResponder, number, maxResults)",
 			ManualResponderRequestRec.class,
 
 			createCriteria (
@@ -69,7 +70,7 @@ class ManualResponderRequestDaoHibernate
 			.setMaxResults (
 				maxResults)
 
-			.list ());
+		);
 
 	}
 
@@ -281,8 +282,9 @@ class ManualResponderRequestDaoHibernate
 			Projections.id ());
 
 		return findMany (
+			"searchIds (search)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 
@@ -381,8 +383,9 @@ class ManualResponderRequestDaoHibernate
 				search);
 
 		return findMany (
+			"searchServiceReports (search)",
 			ManualResponderServiceReport.class,
-			criteria.list ());
+			criteria);
 
 	}
 
@@ -503,8 +506,9 @@ class ManualResponderRequestDaoHibernate
 				search);
 
 		return findMany (
+			"searchOperatorReports (search)",
 			ManualResponderOperatorReport.class,
-			criteria.list ());
+			criteria);
 
 	}
 

@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -64,17 +65,23 @@ class ChatUserAdminOnlineAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserAdminOnlineAction.goReal ()",
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		String userType =
 			Misc.capitalise (
 				chatUser.getType ().name ());
 
-		if (requestContext.parameterOrNull ("online") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"online"))
+		) {
 
 			if (chatUser.getOnline ()) {
 
@@ -153,7 +160,11 @@ class ChatUserAdminOnlineAction
 
 		}
 
-		if (requestContext.parameterOrNull ("offline") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"offline"))
+		) {
 
 			if (! chatUser.getOnline ()) {
 

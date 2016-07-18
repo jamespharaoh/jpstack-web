@@ -2,6 +2,11 @@ package wbs.clients.apn.chat.namednote.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameDao;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameRec;
@@ -15,26 +20,31 @@ class ChatNoteNameDaoHibernate
 	@Override
 	public
 	List<ChatNoteNameRec> findNotDeleted (
-			ChatRec chat) {
+			@NonNull ChatRec chat) {
 
 		return findMany (
+			"findNotDeleted (chat)",
 			ChatNoteNameRec.class,
 
-			createQuery (
-				"FROM ChatNoteNameRec noteName " +
-				"WHERE noteName.chat = :chat " +
-					"AND noteName.deleted = :deleted " +
-				"ORDER BY noteName.index")
+			createCriteria (
+				ChatNoteNameRec.class,
+				"_chatNoteName")
 
-			.setEntity (
-				"chat",
-				chat)
+			.add (
+				Restrictions.eq (
+					"_chatNoteName.chat",
+					chat))
 
-			.setBoolean (
-				"deleted",
-				false)
+			.add (
+				Restrictions.eq (
+					"_chatNoteName.deleted",
+					false))
 
-			.list ());
+			.addOrder (
+				Order.asc (
+					"_chatNoteName.index"))
+
+		);
 
 	}
 

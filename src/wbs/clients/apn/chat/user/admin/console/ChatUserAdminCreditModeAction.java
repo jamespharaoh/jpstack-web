@@ -79,7 +79,8 @@ class ChatUserAdminCreditModeAction
 		ChatUserCreditMode newCreditMode =
 			toEnum (
 				ChatUserCreditMode.class,
-				requestContext.parameterOrNull ("creditMode"));
+				requestContext.parameterRequired (
+					"creditMode"));
 
 		if (newCreditMode == null) {
 
@@ -93,11 +94,13 @@ class ChatUserAdminCreditModeAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserAdminCreditModeAction.goReal ()",
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		ChatUserCreditMode oldCreditMode =
 			chatUser.getCreditMode ();

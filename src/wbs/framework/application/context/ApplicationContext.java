@@ -36,6 +36,7 @@ import javax.inject.Qualifier;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -49,6 +50,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
+import wbs.framework.activitymanager.ActiveTask;
+import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.EasyReadWriteLock.HeldLock;
@@ -86,6 +89,9 @@ class ApplicationContext {
 
 	@Getter @Setter
 	String outputPath;
+
+	@Getter @Setter
+	ActivityManager activityManager;
 
 	List<BeanDefinition> beanDefinitions =
 		new ArrayList<BeanDefinition> ();
@@ -151,7 +157,8 @@ class ApplicationContext {
 		}
 
 		return beanClass.cast (
-			getBean (beanDefinition));
+			getBean (
+				beanDefinition));
 
 	}
 
@@ -269,9 +276,11 @@ class ApplicationContext {
 		HeldLock heldlock =
 			lock.read ();
 
-		if (equal (
+		if (
+			equal (
 				beanDefinition.scope (),
-				"prototype")) {
+				"prototype")
+		) {
 
 			return instantiateBean (
 				beanDefinition);
@@ -322,7 +331,8 @@ class ApplicationContext {
 			try {
 
 				bean =
-					instantiateBean (beanDefinition);
+					instantiateBean (
+						beanDefinition);
 
 				singletonBeans.put (
 					beanDefinition.name (),
@@ -356,11 +366,20 @@ class ApplicationContext {
 	@SneakyThrows (Exception.class)
 	public
 	Object instantiateBean (
-			BeanDefinition beanDefinition) {
+			@NonNull BeanDefinition beanDefinition) {
 
 		@Cleanup
 		HeldLock heldlock =
 			lock.read ();
+
+		@Cleanup
+		ActiveTask activeTask =
+			activityManager.start (
+				"application-context",
+				stringFormat (
+					"instantiateBean (%s)",
+					beanDefinition.name ()),
+				this);
 
 		log.debug (
 			stringFormat (
@@ -415,26 +434,30 @@ class ApplicationContext {
 
 		// run post construct
 
-		for (
-			Method method
-				: bean.getClass ().getMethods ()
-		) {
+		if (beanDefinition.owned ()) {
 
-			PostConstruct postConstructAnnotation =
-				method.getAnnotation (
-					PostConstruct.class);
+			for (
+				Method method
+					: bean.getClass ().getMethods ()
+			) {
 
-			if (postConstructAnnotation == null)
-				continue;
+				PostConstruct postConstructAnnotation =
+					method.getAnnotation (
+						PostConstruct.class);
 
-			log.debug (
-				stringFormat (
-					"Running post construct method %s.%s",
-					beanDefinition.name (),
-					method.getName ()));
+				if (postConstructAnnotation == null)
+					continue;
 
-			method.invoke (
-				bean);
+				log.debug (
+					stringFormat (
+						"Running post construct method %s.%s",
+						beanDefinition.name (),
+						method.getName ()));
+
+				method.invoke (
+					bean);
+
+			}
 
 		}
 
@@ -678,7 +701,7 @@ class ApplicationContext {
 
 	public
 	ApplicationContext registerBeanDefinition (
-			BeanDefinition beanDefinition) {
+			@NonNull BeanDefinition beanDefinition) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -989,6 +1012,10 @@ class ApplicationContext {
 		registerSingleton (
 			"applicationContext",
 			this);
+
+		registerSingleton (
+			"activityManager",
+			activityManager);
 
 		// work out dependencies
 
@@ -1704,8 +1731,10 @@ class ApplicationContext {
 
 		}
 
-		for (BeanDefinition beanDefinition
-				: beanDefinitions) {
+		for (
+			BeanDefinition beanDefinition
+				: beanDefinitions
+		) {
 
 			String outputFile =
 				stringFormat (
@@ -1759,7 +1788,12 @@ class ApplicationContext {
 
 			.addValueProperty (
 				"object",
-				object));
+				object)
+
+			.owned (
+				false)
+
+		);
 
 		return this;
 

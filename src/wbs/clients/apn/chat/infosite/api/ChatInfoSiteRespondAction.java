@@ -50,10 +50,11 @@ class ChatInfoSiteRespondAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatInfoSiteRespondAction.goApi ()",
 				this);
 
 		ChatInfoSiteRec infoSite =
-			chatInfoSiteHelper.findOrNull (
+			chatInfoSiteHelper.findRequired (
 				requestContext.requestIntRequired (
 					"chatInfoSiteId"));
 
@@ -70,7 +71,7 @@ class ChatInfoSiteRespondAction
 		}
 
 		ChatUserRec otherUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				requestContext.parameterInteger (
 					"otherUserId"));
 

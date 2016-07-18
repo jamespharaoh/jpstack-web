@@ -88,6 +88,7 @@ class ChatUserJoinOutboundDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ChatUserJoinOutboundDaemon.runOnce ()",
 				this);
 
 		List<ChatUserRec> chatUsers =
@@ -131,12 +132,13 @@ class ChatUserJoinOutboundDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserJoinOutboundDaemon.doChatUserJoinOutbound (chatUserId)",
 				this);
 
 		// find the user
 
 		ChatUserRec user =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				chatUserId);
 
 		// check and clear the outbound message flag

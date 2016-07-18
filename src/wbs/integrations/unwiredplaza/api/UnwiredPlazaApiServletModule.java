@@ -9,7 +9,6 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -127,6 +126,7 @@ class UnwiredPlazaApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"UnwiredPlazaApiServletModule.reportFile.doGet ()",
 					this);
 
 			int routeId =
@@ -170,17 +170,8 @@ class UnwiredPlazaApiServletModule
 				statusResults.get (status);
 
 			RouteRec route =
-				routeHelper.findOrNull (
+				routeHelper.findRequired (
 					routeId);
-
-			if (route == null) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"Route not found: %s",
-						routeId));
-
-			}
 
 			// update message report code
 
@@ -204,8 +195,7 @@ class UnwiredPlazaApiServletModule
 			reportLogic.deliveryReport (
 				route,
 				id.toString (),
-				Optional.of (
-					result),
+				result,
 				null,
 				messageReportCode);
 
@@ -219,7 +209,8 @@ class UnwiredPlazaApiServletModule
 
 	final
 	RegexpPathHandler.Entry routeEntry =
-		new RegexpPathHandler.Entry ("/route/([0-9]+)/([^/]+)") {
+		new RegexpPathHandler.Entry (
+			"/route/([0-9]+)/([^/]+)") {
 
 		@Override
 		protected

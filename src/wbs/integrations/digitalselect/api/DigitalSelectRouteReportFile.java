@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -93,21 +92,12 @@ class DigitalSelectRouteReportFile
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"DigitalSelectRouteReportFile.doPost ()",
 				this);
 
 		DigitalSelectRouteOutRec digitalSelectRouteOut =
-			digitalSelectRouteOutHelper.findOrNull (
+			digitalSelectRouteOutHelper.findRequired (
 				routeId);
-
-		if (digitalSelectRouteOut == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"No Digital Select inbound route info for route %s",
-					routeId));
-
-		}
-
 
 		// store report
 
@@ -116,8 +106,7 @@ class DigitalSelectRouteReportFile
 			reportLogic.deliveryReport (
 				digitalSelectRouteOut.getRoute (),
 				msgidParam,
-				Optional.of (
-					newMessageStatus),
+				newMessageStatus,
 				null,
 				null);
 

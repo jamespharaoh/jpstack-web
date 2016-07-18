@@ -20,7 +20,6 @@ import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogSearch;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.framework.hibernate.HibernateDao;
-import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 
 public
 class ChatUserInitiationLogDaoHibernate
@@ -30,33 +29,37 @@ class ChatUserInitiationLogDaoHibernate
 	@Override
 	public
 	List<ChatUserInitiationLogRec> findByTimestamp (
-			ChatRec chat,
-			Interval timestampInterval) {
+			@NonNull ChatRec chat,
+			@NonNull Interval timestamp) {
 
 		return findMany (
+			"findByTimestamp (chat, timestamp)",
 			ChatUserInitiationLogRec.class,
 
-			createQuery (
-				"FROM ChatUserInitiationLogRec log " +
-				"WHERE log.chatUser.chat = :chat " +
-					"AND log.timestamp >= :startTime " +
-					"AND log.timestamp < :endTime")
+			createCriteria (
+				ChatUserInitiationLogRec.class,
+				"_chatUserInitiationLog")
 
-			.setEntity (
-				"chat",
-				chat)
+			.createAlias (
+				"_chatUserInitiationLog.chatUser",
+				"_chatUser")
 
-			.setParameter (
-				"startTime",
-				timestampInterval.getStart (),
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"_chatUser.chat",
+					chat))
 
-			.setParameter (
-				"endTime",
-				timestampInterval.getEnd (),
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.ge (
+					"_chatUserInitiationLog.timestamp",
+					timestamp.getStart ()))
 
-			.list ());
+			.add (
+				Restrictions.lt (
+					"_chatUserInitiationLog.timestamp",
+					timestamp.getEnd ()))
+
+		);
 
 	}
 
@@ -163,8 +166,9 @@ class ChatUserInitiationLogDaoHibernate
 			Projections.id ());
 
 		return findMany (
+			"search (search)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 

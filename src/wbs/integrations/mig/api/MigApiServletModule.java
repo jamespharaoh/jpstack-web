@@ -1,5 +1,7 @@
 package wbs.integrations.mig.api;
 
+import static wbs.framework.utils.etc.Misc.stringFormat;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
@@ -173,6 +175,7 @@ class MigApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"MigApiServletModule.inFile.doGet ()",
 					this);
 
 			try {
@@ -199,15 +202,12 @@ class MigApiServletModule
 				// String retryCount = requestContext.getParameter ("RETRYCOUNT");
 
 				MigRouteInRec migRouteIn =
-					migRouteInHelper.findOrNull (
-						routeId);
-
-				if (migRouteIn == null) {
-
-					throw new RuntimeException (
-						"No mig inbound route information for " + routeId);
-
-				}
+					migRouteInHelper.findOrThrow (
+						routeId,
+						() -> new RuntimeException (
+							stringFormat (
+								"No mig inbound route information for %s",
+								routeId)));
 
 				NetworkRec network =
 					migLogic.getNetwork (
@@ -224,7 +224,8 @@ class MigApiServletModule
 				}
 
 				RouteRec route =
-					routeHelper.findOrNull (routeId);
+					routeHelper.findRequired (
+						routeId);
 
 				// insert the message
 
@@ -303,6 +304,7 @@ class MigApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"MigApiServletModule.reportFile.doGet ()",
 					this);
 
 			try {
@@ -364,16 +366,19 @@ class MigApiServletModule
 				// lookup the message
 
 				RouteRec route =
-					routeHelper.findOrNull (
+					routeHelper.findRequired (
 						routeId);
 
-				MessageRec message = null;
+				MessageRec message;
 
 				if (messageID != null) {
 
 					message =
-						messageHelper.findOrNull (
-							Integer.parseInt (messageID));
+						messageHelper.findOrThrow (
+							Integer.parseInt (
+								messageID),
+							() -> new NoSuchMessageException (
+								"Message ID: " + messageID));
 
 				} else if (guid != null) {
 
@@ -383,12 +388,10 @@ class MigApiServletModule
 							route,
 							guid);
 
-				}
+				} else {
 
-				if (message == null) {
-
-					throw new NoSuchMessageException (
-						"Message ID: " + messageID);
+					throw new RuntimeException (
+						"No message id or guid");
 
 				}
 
@@ -437,8 +440,7 @@ class MigApiServletModule
 
 				reportLogic.deliveryReport (
 					message,
-					Optional.of (
-						newMessageStatus),
+					newMessageStatus,
 					null,
 					reportCode);
 
@@ -452,7 +454,7 @@ class MigApiServletModule
 						&& message.getCharge () > 0) {
 
 					ChatUserNumberReportRec numberReportRec =
-						chatUserNumberReportHelper.findOrNull (
+						chatUserNumberReportHelper.findRequired (
 							message.getNumber ().getId ());
 
 					// undelivered

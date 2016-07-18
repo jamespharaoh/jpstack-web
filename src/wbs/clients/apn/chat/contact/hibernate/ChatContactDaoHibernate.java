@@ -1,6 +1,9 @@
 package wbs.clients.apn.chat.contact.hibernate;
 
+import lombok.NonNull;
+
 import org.hibernate.FlushMode;
+import org.hibernate.criterion.Restrictions;
 
 import wbs.clients.apn.chat.contact.model.ChatContactDao;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
@@ -14,30 +17,32 @@ class ChatContactDaoHibernate
 
 	@Override
 	public
-	ChatContactRec find (
-			ChatUserRec fromChatUser,
-			ChatUserRec toChatUser) {
+	ChatContactRec findNoFlush (
+			@NonNull ChatUserRec fromChatUser,
+			@NonNull ChatUserRec toChatUser) {
 
 		return findOne (
+			"findOne (fromChatUser, toChatUser)",
 			ChatContactRec.class,
 
-			createQuery (
-				"FROM ChatContactRec chatContact " +
-				"WHERE chatContact.fromUser = :fromChatUser " +
-					"AND chatContact.toUser = :toChatUser")
+			createCriteria(
+				ChatContactRec.class,
+				"_chatContact")
 
-			.setEntity (
-				"fromChatUser",
-				fromChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatContact.fromUser",
+					fromChatUser))
 
-			.setEntity (
-				"toChatUser",
-				toChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatContact.toUser",
+					toChatUser))
 
 			.setFlushMode (
 				FlushMode.MANUAL)
 
-			.list ());
+		);
 
 	}
 

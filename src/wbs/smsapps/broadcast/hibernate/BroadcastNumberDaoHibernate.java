@@ -2,10 +2,16 @@ package wbs.smsapps.broadcast.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.hibernate.HibernateDao;
+import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.broadcast.model.BroadcastNumberDao;
 import wbs.smsapps.broadcast.model.BroadcastNumberRec;
 import wbs.smsapps.broadcast.model.BroadcastNumberState;
+import wbs.smsapps.broadcast.model.BroadcastRec;
 
 public
 class BroadcastNumberDaoHibernate
@@ -14,56 +20,60 @@ class BroadcastNumberDaoHibernate
 
 	@Override
 	public
-	BroadcastNumberRec findByBroadcastAndNumber (
-			int broadcastId,
-			int numberId) {
+	BroadcastNumberRec find (
+			@NonNull BroadcastRec broadcast,
+			@NonNull NumberRec number) {
 
 		return findOne (
+			"find (broadcast, number)",
 			BroadcastNumberRec.class,
 
-			createQuery (
-				"FROM BroadcastNumberRec broadcastNumber " +
-				"WHERE broadcastNumber.broadcast.id = :broadcastId " +
-					"AND broadcastNumber.number.id = :numberId")
+			createCriteria (
+				BroadcastNumberRec.class,
+				"_broadcastNumber")
 
-			.setInteger (
-				"broadcastId",
-				broadcastId)
+			.add (
+				Restrictions.eq (
+					"_broadcastNumber.broadcast",
+					broadcast))
 
-			.setInteger (
-				"numberId",
-				numberId)
+			.add (
+				Restrictions.eq (
+					"_broadcastNumber.number",
+					number))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
-	List<BroadcastNumberRec> findAcceptedByBroadcastLimit (
-			int broadcastId,
-			int limit) {
+	List<BroadcastNumberRec> findAcceptedLimit (
+			@NonNull BroadcastRec broadcast,
+			int maxResults) {
 
 		return findMany (
+			"findAcceptedByBroadcastLimit (broadcastId, limit)",
 			BroadcastNumberRec.class,
 
-			createQuery (
-				"FROM BroadcastNumberRec broadcastNumber " +
-				"WHERE broadcastNumber.broadcast.id = :broadcastId " +
-					"AND broadcastNumber.state = :broadcastNumberAcceptedState")
+			createCriteria (
+				BroadcastNumberRec.class,
+				"_broadcastNumber")
 
-			.setInteger (
-				"broadcastId",
-				broadcastId)
+			.add (
+				Restrictions.eq (
+					"_broadcastNumber.broadcast",
+					broadcast))
 
-			.setParameter (
-				"broadcastNumberAcceptedState",
-				BroadcastNumberState.accepted)
+			.add (
+				Restrictions.eq (
+					"_broadcastNumber.state",
+					BroadcastNumberState.accepted))
 
 			.setMaxResults (
-				limit)
+				maxResults)
 
-			.list ());
+		);
 
 	}
 

@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.classForName;
 import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.sql.Types;
@@ -14,6 +15,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import lombok.Cleanup;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
@@ -27,6 +29,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import wbs.framework.activitymanager.ActiveTask;
+import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
 import wbs.framework.application.scaffold.PluginEnumTypeSpec;
@@ -43,6 +47,9 @@ class SchemaTypesHelperImplementation
 	implements SchemaTypesHelper {
 
 	// dependencies
+
+	@Inject
+	ActivityManager activityManager;
 
 	@Inject
 	SchemaNamesHelper schemaNamesHelper;
@@ -63,7 +70,9 @@ class SchemaTypesHelperImplementation
 	@PostConstruct
 	public
 	void init () {
+
 		initTypeNames ();
+
 	}
 
 	void initTypeNames () {
@@ -150,6 +159,13 @@ class SchemaTypesHelperImplementation
 			ImmutableMap.Builder<String,List<String>> enumTypesBuilder,
 			PluginEnumTypeSpec enumType) {
 
+		@Cleanup
+		ActiveTask activeTask =
+			activityManager.start (
+				"schema",
+				"schemaTypesHelper.initEnumType (...)",
+				this);
+
 		String enumClassName =
 			stringFormat (
 				"%s.model.%s",
@@ -223,6 +239,22 @@ class SchemaTypesHelperImplementation
 			ImmutableMap.Builder<Class<?>,List<String>> fieldTypeNamesBuilder,
 			ImmutableMap.Builder<String,List<String>> enumTypesBuilder,
 			PluginCustomTypeSpec customType) {
+
+		@Cleanup
+		ActiveTask activeTask =
+			activityManager.start (
+				"schema",
+				stringFormat (
+					"schemaTypesHelper.initCustomType (%s)",
+					joinWithSeparator (
+						", ",
+						"taskLog",
+						"fieldTypeNamesBuilder",
+						"enumTypesBuilder",
+						stringFormat (
+							"customType:%s",
+							customType.name ()))),
+				this);
 
 		String objectClassName =
 			stringFormat (

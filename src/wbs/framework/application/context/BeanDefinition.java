@@ -41,6 +41,10 @@ class BeanDefinition {
 	@Getter @Setter
 	Boolean hide = false;
 
+	@DataAttribute
+	@Getter @Setter
+	Boolean owned = true;
+
 	@DataChildren
 	@Getter @Setter
 	Map<String,Object> valueProperties =

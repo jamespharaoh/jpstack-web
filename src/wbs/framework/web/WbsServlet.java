@@ -1,6 +1,5 @@
 package wbs.framework.web;
 
-import static wbs.framework.utils.etc.Misc.lowercase;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -13,9 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-
-import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
@@ -37,25 +35,16 @@ class WbsServlet
 	RequestContext requestContext;
 
 	private
-	ActiveTask startTask () {
+	ActiveTask startTask (
+			@NonNull String methodName) {
 
 		return activityManager.start (
-			"web request",
-			this,
-			ImmutableMap.<String,Object>builder ()
-
-			.put (
-				"method",
-				lowercase (
-					requestContext.method ()))
-
-			.put (
-				"request path",
-				requestContext.requestPath ())
-
-			.build ()
-
-		);
+			"web-request",
+			stringFormat (
+				"WbsServlet.%s () %s",
+				methodName,
+				requestContext.requestPath ()),
+			this);
 
 	}
 
@@ -67,7 +56,8 @@ class WbsServlet
 
 		@Cleanup
 		ActiveTask activeTask =
-			startTask ();
+			startTask (
+				"doGet");
 
 		try {
 
@@ -106,7 +96,8 @@ class WbsServlet
 
 		@Cleanup
 		ActiveTask activeTask =
-			startTask ();
+			startTask (
+				"doPost");
 
 		try {
 
@@ -140,7 +131,8 @@ class WbsServlet
 
 		@Cleanup
 		ActiveTask activeTask =
-			startTask ();
+			startTask (
+				"doOptions");
 
 		try {
 

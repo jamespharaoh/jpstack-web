@@ -38,6 +38,8 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.module.ConsoleModuleFactory;
 import wbs.console.module.ConsoleModuleSpec;
 import wbs.console.module.ConsoleModuleSpecFactory;
+import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.activitymanager.ActivityManagerImplementation;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.annotations.ProxiedRequestComponent;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -91,6 +93,8 @@ class ApplicationContextBuilder {
 
 	// state
 
+	ActivityManager activityManager;
+
 	List<PluginSpec> plugins;
 	PluginManager pluginManager;
 
@@ -120,6 +124,9 @@ class ApplicationContextBuilder {
 	@SneakyThrows (Exception.class)
 	public
 	ApplicationContext build () {
+
+		activityManager =
+			new ActivityManagerImplementation ();
 
 		loadPlugins ();
 
@@ -1556,6 +1563,9 @@ class ApplicationContextBuilder {
 
 		applicationContext =
 			new ApplicationContext ()
+
+			.activityManager (
+				activityManager)
 
 			.outputPath (
 				outputPath);

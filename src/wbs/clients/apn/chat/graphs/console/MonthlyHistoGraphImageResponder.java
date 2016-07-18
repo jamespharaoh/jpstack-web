@@ -77,7 +77,8 @@ class MonthlyHistoGraphImageResponder
 
 		yearMonth =
 			YearMonth.parse (
-				requestContext.parameterOrNull ("month"));
+				requestContext.parameterRequired (
+					"month"));
 
 		minTime =
 			yearMonth

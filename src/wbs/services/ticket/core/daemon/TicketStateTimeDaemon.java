@@ -111,6 +111,7 @@ class TicketStateTimeDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"TicketStateTimeDaemon.runOnce ()",
 				this);
 
 		List<TicketRec> tickets =
@@ -157,12 +158,13 @@ class TicketStateTimeDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"TicketStateTimeDaemon.doTicketTImeCheck (ticketId)",
 				this);
 
 		// find the ticket
 
 		TicketRec ticket =
-			ticketHelper.findOrNull (
+			ticketHelper.findRequired (
 				ticketId);
 
 		// check if the ticket is already in a queue

@@ -82,19 +82,17 @@ class ImChatMediaJpegAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ImChatMediaJpegAction.handle ()",
 				this);
 
 		// retrieve media data
 
 		MediaRec media =
-			mediaHelper.findOrNull (
+			mediaHelper.findOrThrow (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
-						"mediaId")));
-
-		if (media == null) {
-			throw new PageNotFoundException ();
-		}
+						"mediaId")),
+				() -> new PageNotFoundException ());
 
 		// check content hash
 

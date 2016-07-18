@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.core.console;
 
+import static wbs.framework.utils.etc.Misc.isZero;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -56,8 +58,9 @@ class ChatStatisticsPart
 	void prepare () {
 
 		chat =
-			chatHelper.findOrNull (
-				requestContext.stuffInt ("chatId"));
+			chatHelper.findRequired (
+				requestContext.stuffInt (
+					"chatId"));
 
 		List<ChatAffiliateUsersSummaryRec> chatAffiliateUsersSummaries =
 			chatAffiliateUsersSummaryHelper.findByParent (
@@ -112,7 +115,7 @@ class ChatStatisticsPart
 		}
 
 		users =
-			chatUsersSummaryHelper.findOrNull (
+			chatUsersSummaryHelper.findRequired (
 				chat.getId ());
 
 	}
@@ -121,9 +124,18 @@ class ChatStatisticsPart
 	public
 	void renderHtmlBodyContent () {
 
-		if (numAffiliates == 0
-				&& ! privChecker.canRecursive (chat, "monitor"))
+		if (
+
+			isZero (
+				numAffiliates)
+
+			&& ! privChecker.canRecursive (
+				chat,
+				"monitor")
+
+		) {
 			return;
+		}
 
 		if (numAffiliates > 0) {
 

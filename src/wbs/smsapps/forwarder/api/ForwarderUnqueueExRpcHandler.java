@@ -1,5 +1,9 @@
 package wbs.smsapps.forwarder.api;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.optionalOrNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +73,7 @@ class ForwarderUnqueueExRpcHandler
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ForwarderUnqueueExRpcHandler.handle (source)",
 				this);
 
 		// authenticate
@@ -169,21 +174,26 @@ class ForwarderUnqueueExRpcHandler
 	private
 	void findMessages () {
 
-		for (UnqueueExMessage unqueueExMessage
-				: unqueueExMessages) {
+		for (
+			UnqueueExMessage unqueueExMessage
+				: unqueueExMessages
+		) {
 
 			// lookup the message
 
 			unqueueExMessage.forwarderMessageIn =
-				forwarderMessageInHelper.findOrNull (
-					unqueueExMessage.serverId);
+				optionalOrNull (
+					forwarderMessageInHelper.find (
+						unqueueExMessage.serverId));
 
 			if (unqueueExMessage.forwarderMessageIn != null) {
 
 				// if this report doesn't belong to this forwarder pretend
 				// it doesn't exist
+
 				if (unqueueExMessage.forwarderMessageIn.getForwarder() != forwarder)
 					unqueueExMessage.forwarderMessageIn = null;
+
 			}
 
 			// keep track of whether any failed
@@ -197,20 +207,32 @@ class ForwarderUnqueueExRpcHandler
 	private
 	void findReports () {
 
-		for (UnqueueExReport unqueueExReport : reports) {
+		for (
+			UnqueueExReport unqueueExReport
+				: reports
+		) {
 
 			// lookup the report
 
 			unqueueExReport.fmOutReport =
-				forwarderMessageOutReportHelper.findOrNull (
+				forwarderMessageOutReportHelper.findRequired (
 					unqueueExReport.reportId);
 
-			if (unqueueExReport.fmOutReport != null) {
+			if (
+				isNotNull (
+					unqueueExReport.fmOutReport)
+			) {
 
 				// if this report doesn't belong to this forwarder pretend
 				// it doesn't exist
-				if (unqueueExReport.fmOutReport.getForwarderMessageOut().getForwarder() != forwarder)
+
+				if (
+					notEqual (
+						unqueueExReport.fmOutReport.getForwarderMessageOut ().getForwarder (),
+						forwarder)
+				) {
 					unqueueExReport.fmOutReport = null;
+				}
 
 				// if this report is not pending yet then pretend it doesn't
 				// exist

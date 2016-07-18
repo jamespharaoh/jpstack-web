@@ -2,6 +2,11 @@ package wbs.clients.apn.chat.user.core.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
 import wbs.clients.apn.chat.user.core.model.ChatUserNoteDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserNoteRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -15,21 +20,26 @@ class ChatUserNoteDaoHibernate
 	@Override
 	public
 	List<ChatUserNoteRec> find (
-			ChatUserRec chatUser) {
+			@NonNull ChatUserRec chatUser) {
 
 		return findMany (
+			"find (chatUser)",
 			ChatUserNoteRec.class,
 
-			createQuery (
-				"FROM ChatUserNoteRec note " +
-				"WHERE note.chatUser = :chatUser " +
-				"ORDER BY note.timestamp DESC")
+			createCriteria (
+				ChatUserNoteRec.class,
+				"_chatUserNote")
 
-			.setEntity (
-				"chatUser",
-				chatUser)
+			.add (
+				Restrictions.eq (
+					"_chatUserNote.chatUser",
+					chatUser))
 
-			.list ());
+			.addOrder (
+				Order.desc (
+					"_chatUserNote.timestamp"))
+
+		);
 
 	}
 

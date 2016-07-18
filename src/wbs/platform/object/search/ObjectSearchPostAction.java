@@ -183,6 +183,7 @@ class ObjectSearchPostAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ObjectSearchPostAction.goReal ()",
 				this);
 
 		Serializable search =

@@ -2,6 +2,8 @@ package wbs.clients.apn.chat.broadcast.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Restrictions;
 
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberDao;
@@ -18,10 +20,11 @@ class ChatBroadcastNumberDaoHibernate
 	@Override
 	public
 	List<ChatBroadcastNumberRec> findAcceptedLimit (
-			ChatBroadcastRec chatBroadcast,
+			@NonNull ChatBroadcastRec chatBroadcast,
 			int maxResults) {
 
 		return findMany (
+			"findAcceptedLimit (chatBroadcast, maxResults)",
 			ChatBroadcastNumberRec.class,
 
 			createCriteria (
@@ -41,7 +44,7 @@ class ChatBroadcastNumberDaoHibernate
 			.setMaxResults (
 				maxResults)
 
-			.list ());
+		);
 
 	}
 

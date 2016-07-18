@@ -99,17 +99,12 @@ class HybyteSender
 		// lookup hybyte route
 
 		hybyteOutbox.hybyteRouteOut =
-			hybyteRouteOutHelper.findOrNull (
-				hybyteOutbox.route.getId ());
-
-		if (hybyteOutbox.hybyteRouteOut == null) {
-
-			throw tempFailure (
-				stringFormat (
-					"Hybyte outbound route not found for %s",
-					hybyteOutbox.route.getCode ()));
-
-		}
+			hybyteRouteOutHelper.findOrThrow (
+				hybyteOutbox.route.getId (),
+				() -> tempFailure (
+					stringFormat (
+						"Hybyte outbound route not found for %s",
+						hybyteOutbox.route.getCode ())));
 
 		if (hybyteOutbox.route.getOutCharge () > 0) {
 
@@ -121,7 +116,7 @@ class HybyteSender
 			// lookup hybyte network
 
 			hybyteOutbox.hybyteNetwork =
-				hybyteNetworkHelper.findOrNull (
+				hybyteNetworkHelper.findRequired (
 					network.getId ());
 
 		}
@@ -138,28 +133,27 @@ class HybyteSender
 
 		// pick a handler
 
-		if (equal (
+		if (
+			equal (
 				hybyteOutbox.message.getMessageType ().getCode (),
-				"sms")) {
+				"sms")
+		) {
 
 			// no action required
 
-		} else if (equal (
+		} else if (
+			equal (
 				hybyteOutbox.message.getMessageType ().getCode (),
-				"wap_push")) {
+				"wap_push")
+		) {
 
 			hybyteOutbox.wapPushMessage =
-				wapPushMessageHelper.findOrNull (
-					outbox.getId ());
-
-			if (hybyteOutbox.wapPushMessage == null) {
-
-				throw tempFailure (
-					stringFormat (
-						"Wap push message not found for message %s",
-						outbox.getId ()));
-
-			}
+				wapPushMessageHelper.findOrThrow (
+					outbox.getId (),
+					() -> tempFailure (
+						stringFormat (
+							"Wap push message not found for message %s",
+							outbox.getId ())));
 
 			hybyteOutbox.wapPushMessage
 				.getUrlText ().getText ();

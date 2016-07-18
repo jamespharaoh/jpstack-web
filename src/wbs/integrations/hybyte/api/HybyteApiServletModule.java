@@ -1,6 +1,7 @@
 package wbs.integrations.hybyte.api;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -125,6 +126,7 @@ class HybyteApiServletModule
 				@Cleanup
 				Transaction transaction =
 					database.beginReadWrite (
+						"HybyteApiServletModule.inFile.doPost ()",
 						this);
 
 				// get ids
@@ -148,7 +150,7 @@ class HybyteApiServletModule
 				// lookup route
 
 				HybyteRouteRec hybyteRoute =
-					hybyteRouteHelper.findOrNull (
+					hybyteRouteHelper.findRequired (
 						routeId);
 
 				log.debug (
@@ -350,24 +352,22 @@ class HybyteApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"HybyteApiServletModule.reportFile.doPost ()",
 					this);
 
 			// get route
 
+			int routeId =
+				requestContext.requestIntRequired (
+					"routeId");
+
 			HybyteRouteOutRec hybyteRouteOut =
-				hybyteRouteOutHelper.findOrNull (
-					requestContext.requestIntRequired (
-						"routeId"));
-
-			if (hybyteRouteOut == null) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"No such hybyte route out: %s",
-						requestContext.requestInt (
-							"routeId")));
-
-			}
+				hybyteRouteOutHelper.findOrThrow (
+					routeId,
+					() -> new RuntimeException (
+						stringFormat (
+							"No such hybyte route out: %s",
+							routeId)));
 
 			Long statusCode;
 
@@ -408,10 +408,10 @@ class HybyteApiServletModule
 					reportLogic.deliveryReport (
 						hybyteRouteOut.getRoute (),
 						req.otherId,
-						Optional.of (
-							req.success
-								? MessageStatus.delivered
-								: MessageStatus.undelivered),
+						ifElse (
+							req.success,
+							() -> MessageStatus.delivered,
+							() -> MessageStatus.undelivered),
 						null,
 						messageReportCode);
 
@@ -428,10 +428,10 @@ class HybyteApiServletModule
 						reportLogic.deliveryReport (
 							hybyteRouteOut.getFreeRoute ().getRoute (),
 							req.otherId,
-							Optional.of (
-								req.success
-									? MessageStatus.delivered
-									: MessageStatus.undelivered),
+							ifElse (
+								req.success,
+								() -> MessageStatus.delivered,
+								() -> MessageStatus.undelivered),
 							null,
 							messageReportCode);
 

@@ -205,6 +205,7 @@ class PlatformExceptionLogger
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"PlatformExceptionLogger.realLogException (...)",
 				this);
 
 		ExceptionLogRec exceptionLog =

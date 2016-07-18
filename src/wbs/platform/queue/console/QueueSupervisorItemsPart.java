@@ -55,17 +55,13 @@ class QueueSupervisorItemsPart
 
 		Interval interval =
 			timeFormatter.isoStringToInterval (
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"interval"));
 
-		int userId =
-			Integer.parseInt (
-				requestContext.parameterOrNull (
-					"userId"));
-
 		user =
-			userHelper.findOrNull (
-				userId);
+			userHelper.findRequired (
+				requestContext.parameterInteger (
+					"userId"));
 
 		queueItems =
 			new TreeSet<QueueItemRec> (

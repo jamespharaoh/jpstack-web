@@ -78,12 +78,13 @@ class ForwarderDaemon
 			@Cleanup
 			Transaction transaction =
 				database.beginReadOnly (
+					"ForwarderDaemon.MainThread.doQuery ()",
 					this);
 
 			// get the list
 
 			forwarderMessageIns =
-				forwarderMessageInHelper.findNexts (
+				forwarderMessageInHelper.findNextLimit (
 					transaction.now (),
 					buffer.getFullSize ());
 
@@ -403,10 +404,11 @@ class ForwarderDaemon
 			@Cleanup
 			Transaction checkTransaction =
 				database.beginReadWrite (
+					"ForwarderDaemon.WorkerThread.doMessage (forwarderMessageInId)",
 					this);
 
 			ForwarderMessageInRec forwarderMessageIn =
-				forwarderMessageInHelper.findOrNull (
+				forwarderMessageInHelper.findRequired (
 					forwarderMessageInId);
 
 			// check if we should cancel it
@@ -428,7 +430,7 @@ class ForwarderDaemon
 			) {
 
 				forwarderMessageIn =
-					forwarderMessageInHelper.findOrNull (
+					forwarderMessageInHelper.findRequired (
 						forwarderMessageIn.getId ());
 
 				forwarderMessageIn
@@ -455,6 +457,7 @@ class ForwarderDaemon
 			@Cleanup
 			Transaction resultTransaction =
 				database.beginReadWrite (
+					"ForwarderDaemon.WorkerThread.doMessage",
 					this);
 
 			doResult (
@@ -474,7 +477,7 @@ class ForwarderDaemon
 				database.currentTransaction ();
 
 			ForwarderMessageInRec forwarderMessageIn =
-				forwarderMessageInHelper.findOrNull (
+				forwarderMessageInHelper.findRequired (
 					forwarderMessageInId);
 
 			if (! forwarderMessageIn.getPending ())

@@ -80,10 +80,11 @@ class ImChatConversationEmailDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ImChatConversationEmailDaemon.runOnce ()",
 				this);
 
 		List<ImChatConversationRec> conversations =
-			imChatConversationHelper.findPendingEmail (
+			imChatConversationHelper.findPendingEmailLimit (
 				1000);
 
 		transaction.close ();
@@ -106,10 +107,11 @@ class ImChatConversationEmailDaemon
 		@Cleanup
 		Transaction updateTransaction =
 			database.beginReadWrite (
+				"ImChatConcersationEmailDaemon.doConversation (conversationId) begin",
 				this);
 
 		ImChatConversationRec conversation =
-			imChatConversationHelper.findOrNull (
+			imChatConversationHelper.findRequired (
 				conversationId);
 
 		if (
@@ -129,10 +131,11 @@ class ImChatConversationEmailDaemon
 		@Cleanup
 		Transaction emailTransaction =
 			database.beginReadOnly (
+				"ImChatConversationEmailDaemon.doConversation (conversationId) end",
 				this);
 
 		conversation =
-			imChatConversationHelper.findOrNull (
+			imChatConversationHelper.findRequired (
 				conversationId);
 
 		imChatLogic.conversationEmailSend (

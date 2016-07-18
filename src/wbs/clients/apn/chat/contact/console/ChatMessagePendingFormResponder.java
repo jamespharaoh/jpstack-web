@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -44,8 +45,9 @@ class ChatMessagePendingFormResponder
 	void prepare () {
 
 		chatMessage =
-			chatMessageHelper.findOrNull (
-				requestContext.stuffInt ("chatMessageId"));
+			chatMessageHelper.findRequired (
+				requestContext.stuffInt (
+					"chatMessageId"));
 
 		chatHelpTemplates =
 			chatHelpTemplateHelper.findByParentAndType (
@@ -228,8 +230,9 @@ class ChatMessagePendingFormResponder
 			" cols=\"48\"",
 			">%h</textarea></td>\n",
 			ifNull (
-				requestContext.parameterOrNull ("message"),
-				chatMessage.getOriginalText ().getText ()),
+				requestContext.parameterOrElse (
+					"message",
+					() -> chatMessage.getOriginalText ().getText ())),
 
 			"</tr>\n");
 
@@ -274,8 +277,8 @@ class ChatMessagePendingFormResponder
 			"</table>\n");
 
 		if (
-			isNotNull (
-				requestContext.parameterOrNull (
+			isPresent (
+				requestContext.parameter (
 					"reject"))
 		) {
 
@@ -285,7 +288,8 @@ class ChatMessagePendingFormResponder
 				"showReject ();\n",
 
 				"document.getElementById ('message').value = '%j';\n",
-				requestContext.parameterOrNull ("message"),
+				requestContext.parameterRequired (
+					"message"),
 
 				"</script>\n");
 

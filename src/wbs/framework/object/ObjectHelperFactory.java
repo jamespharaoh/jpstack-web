@@ -17,14 +17,20 @@ public
 class ObjectHelperFactory
 	implements BeanFactory {
 
+	// dependencies
+
 	@Inject
 	ObjectHelperBuilder objectHelperManager;
+
+	// properties
 
 	@Getter @Setter
 	String objectName;
 
 	@Getter @Setter
 	Class<?> objectHelperClass;
+
+	// implementation
 
 	@Override
 	public

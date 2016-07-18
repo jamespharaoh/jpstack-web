@@ -58,13 +58,12 @@ class ChatMessageUserStatsProvider
 		if (conditions.containsKey ("chatId")) {
 
 			ChatRec chat =
-				chatHelper.findOrNull (
-					(Integer) conditions.get ("chatId"));
+				chatHelper.findRequired (
+					(Integer) conditions.get (
+						"chatId"));
 
-			if (chat == null)
-				throw new RuntimeException ();
-
-			chats.add (chat);
+			chats.add (
+				chat);
 
 		} else {
 

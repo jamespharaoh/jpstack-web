@@ -77,8 +77,9 @@ class ChatAffiliateComparePart
 		// get objects
 
 		ChatRec chat =
-			chatHelper.findOrNull (
-				requestContext.stuffInt ("chatId"));
+			chatHelper.findRequired (
+				requestContext.stuffInt (
+					"chatId"));
 
 		// work out first join time
 
@@ -115,11 +116,13 @@ class ChatAffiliateComparePart
 		Map<Integer,ChatAffiliateWithNewUserCount> map =
 			new HashMap<Integer,ChatAffiliateWithNewUserCount> ();
 
-		for (Integer chatUserId
-				: newUserIds) {
+		for (
+			Integer chatUserId
+				: newUserIds
+		) {
 
 			ChatUserRec chatUser =
-				chatUserHelper.findOrNull (
+				chatUserHelper.findRequired (
 					chatUserId);
 
 			Integer chatAffiliateId =

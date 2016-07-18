@@ -86,12 +86,13 @@ class ImChatMessageTemplateSetGetAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ImChatMessageTemplateSetGetAction.handle ()",
 				this);
 
 		// lookup message template set
 
 		ImChatRec imChat =
-			imChatHelper.findOrNull (
+			imChatHelper.findRequired (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));

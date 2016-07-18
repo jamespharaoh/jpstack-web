@@ -2,7 +2,8 @@ package wbs.integrations.dialogue.api;
 
 import static wbs.framework.utils.etc.Misc.dateToInstantNullSafe;
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.nullIf;
+import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -20,7 +21,6 @@ import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.fileupload.FileItem;
@@ -103,9 +103,12 @@ class DialogueMmsApiServletModule
 	SimpleDateFormat getDateFormat () {
 
 		SimpleDateFormat ret =
-			new SimpleDateFormat ("yyyy-MM-dd'T'HH:mm:ss");
+			new SimpleDateFormat (
+				"yyyy-MM-dd'T'HH:mm:ss");
 
-		ret.setTimeZone (TimeZone.getTimeZone ("GMT"));
+		ret.setTimeZone (
+			TimeZone.getTimeZone (
+				"GMT"));
 
 		return ret;
 
@@ -121,9 +124,6 @@ class DialogueMmsApiServletModule
 		new AbstractWebFile () {
 
 		@Override
-		@SneakyThrows ({
-			ParseException.class
-		})
 		public
 		void doPost ()
 			throws
@@ -133,6 +133,7 @@ class DialogueMmsApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"DialogueMmsApiServletModule.inFile.doPost ()",
 					this);
 
 			requestContext.debugDump (log);
@@ -140,9 +141,9 @@ class DialogueMmsApiServletModule
 			// process attachments
 
 			String text =
-				nullIf (
-					requestContext.header ("x-mms-subject"),
-					"");
+				nullIfEmptyString (
+					requestContext.header (
+						"x-mms-subject"));
 
 			List<MediaRec> medias =
 				new ArrayList<MediaRec> ();
@@ -179,13 +180,14 @@ class DialogueMmsApiServletModule
 
 				if (
 					text == null
-					&& equal (type, "text/plain")
+					&& equal (
+						type,
+						"text/plain")
 				) {
 
 					text =
-						nullIf (
-							item.getString (),
-							"");
+						nullIfEmptyString (
+							item.getString ());
 
 				}
 
@@ -207,15 +209,26 @@ class DialogueMmsApiServletModule
 					"x-mms-recipient-address");
 
 			RouteRec route =
-				routeHelper.findOrNull (
+				routeHelper.findRequired (
 					requestContext.requestIntRequired (
 						"routeId"));
 
-			Instant mmsDate =
-				dateToInstantNullSafe (
-					getDateFormat ().parse (
-						requestContext.header (
-							"x-mms-date")));
+			Instant mmsDate;
+
+			try {
+
+				mmsDate =
+					dateToInstantNullSafe (
+						getDateFormat ().parse (
+							requestContext.header (
+								"x-mms-date")));
+
+			} catch (ParseException parseException) {
+
+				throw new RuntimeException (
+					parseException);
+
+			}
 
 			String mmsSubject =
 				requestContext.header (
@@ -263,10 +276,12 @@ class DialogueMmsApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"DialogueMmsApiServletModule.reportFile.doPost ()",
 					this);
 
-			if (requestContext.parameterMap ().size () == 0)
+			if (requestContext.parameterMap ().size () == 0) {
 				return;
+			}
 
 			// temporary, output all parameters
 
@@ -308,19 +323,14 @@ class DialogueMmsApiServletModule
 			}
 
 			MessageRec message =
-				messageHelper.findOrNull (
+				messageHelper.findRequired (
 					messageId);
 
-			if (message == null) {
-
-				throw new ServletException (
-					stringFormat (
-						"Message ID invalid: %s",
-						messageId));
-
-			}
-
-			if (! equal (message.getMessageType ().getCode (), "mms")) {
+			if (
+				notEqual (
+					message.getMessageType ().getCode (),
+					"mms")
+			) {
 
 				throw new ServletException (
 					"Message is not MMS: " + messageId);
@@ -369,8 +379,7 @@ class DialogueMmsApiServletModule
 
 			reportLogic.deliveryReport (
 				message,
-				Optional.of (
-					newMessageStatus),
+				newMessageStatus,
 				null,
 				messageReportCode);
 

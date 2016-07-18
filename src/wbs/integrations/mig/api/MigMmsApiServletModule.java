@@ -362,6 +362,7 @@ logger.error ("Got item");
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"MigMmsApiServletModule.inFile.doGet ()",
 					this);
 
 			requestContext.debugDump (
@@ -408,7 +409,7 @@ logger.error ("Got item");
 					sender);
 
 			RouteRec route =
-				routeHelper.findOrNull (
+				routeHelper.findRequired (
 					requestContext.requestIntRequired (
 						"routeId"));
 
@@ -458,6 +459,7 @@ logger.error ("Got item");
 
 			Transaction transaction =
 				database.beginReadWrite (
+					"MigMmsApiServletModule.reportFile.doGet ()",
 					this);
 
 			try {

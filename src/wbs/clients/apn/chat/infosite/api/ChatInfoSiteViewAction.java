@@ -36,10 +36,11 @@ class ChatInfoSiteViewAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatInfoSiteViewAction.goApi ()",
 				this);
 
 		ChatInfoSiteRec infoSite =
-			chatInfoSiteHelper.findOrNull (
+			chatInfoSiteHelper.findRequired (
 				requestContext.requestIntRequired (
 					"chatInfoSiteId"));
 

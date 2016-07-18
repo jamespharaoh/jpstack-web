@@ -105,10 +105,11 @@ class ImChatPurchaseConfirmAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ImChatPurchaseConfirmAction.handle ()",
 				this);
 
 		ImChatRec imChat =
-			imChatHelper.findOrNull (
+			imChatHelper.findRequired (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));

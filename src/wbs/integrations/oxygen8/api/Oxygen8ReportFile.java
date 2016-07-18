@@ -10,8 +10,6 @@ import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 
-import com.google.common.base.Optional;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -95,20 +93,12 @@ class Oxygen8ReportFile
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"Oxygen8ReportFile.updateDatabase (state)",
 				this);
 
 		Oxygen8RouteOutRec routeOut =
-			oxygen8RouteOutCodeHelper.findOrNull (
+			oxygen8RouteOutCodeHelper.findRequired (
 				state.routeId);
-
-		if (routeOut == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"No such route id %s",
-					state.routeId));
-
-		}
 
 		if (! routeOut.getRoute ().getDeliveryReports ()) {
 
@@ -126,14 +116,13 @@ class Oxygen8ReportFile
 				state.status);
 
 		RouteRec route =
-			routeHelper.findOrNull (
+			routeHelper.findRequired (
 				state.routeId);
 
 		reportLogic.deliveryReport (
 			route,
 			state.reference,
-			Optional.of (
-				reportCode.getMessageStatus ()),
+			reportCode.getMessageStatus (),
 			null,
 			null);
 

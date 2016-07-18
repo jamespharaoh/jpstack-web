@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.bill.hibernate;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Restrictions;
 
 import wbs.clients.apn.chat.bill.model.ChatNetworkDao;
@@ -18,10 +20,11 @@ class ChatNetworkDaoHibernate
 	@Override
 	public
 	ChatNetworkRec find (
-			ChatRec chat,
-			NetworkRec network) {
+			@NonNull ChatRec chat,
+			@NonNull NetworkRec network) {
 
 		return findOne (
+			"find (chat, network)",
 			ChatNetworkRec.class,
 
 			createCriteria (
@@ -38,7 +41,7 @@ class ChatNetworkDaoHibernate
 					"_chatNetwork.network",
 					network))
 
-			.list ());
+		);
 
 	}
 

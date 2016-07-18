@@ -70,24 +70,27 @@ class DigitalSelectSender
 			database.currentTransaction ();
 
 		DigitalSelectRouteOutRec digitalSelectRouteOut =
-			digitalSelectRouteOutHelper.findOrNull (
-				outbox.getRoute ().getId ());
-
-		if (digitalSelectRouteOut == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"No digital select route out %s",
-					outbox.getRoute ().getId ()));
-
-		}
+			digitalSelectRouteOutHelper.findOrThrow (
+				outbox.getRoute ().getId (),
+				() -> new RuntimeException (
+					stringFormat (
+						"No digital select route out %s",
+						outbox.getRoute ().getId ())));
 
 		State state =
 			new State ()
-				.outbox (outbox)
-				.message (outbox.getMessage ())
-				.route (outbox.getRoute ())
-				.digitalSelectRouteOut (digitalSelectRouteOut);
+
+			.outbox (
+				outbox)
+
+			.message (
+				outbox.getMessage ())
+
+			.route (
+				outbox.getRoute ())
+
+			.digitalSelectRouteOut (
+				digitalSelectRouteOut);
 
 		transaction.fetch (
 			state.outbox (),

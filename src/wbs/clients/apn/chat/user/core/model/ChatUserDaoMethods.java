@@ -17,7 +17,7 @@ interface ChatUserDaoMethods {
 			ChatRec chat,
 			NumberRec number);
 
-	int countOnline (
+	Long countOnline (
 			ChatRec chat,
 			ChatUserType type);
 

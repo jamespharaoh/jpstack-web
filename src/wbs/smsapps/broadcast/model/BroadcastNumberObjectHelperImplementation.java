@@ -1,7 +1,5 @@
 package wbs.smsapps.broadcast.model;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -59,32 +57,6 @@ class BroadcastNumberObjectHelperImplementation
 		// return
 
 		return broadcastNumber;
-
-	}
-
-	@Override
-	public
-	BroadcastNumberRec find (
-			BroadcastRec broadcast,
-			NumberRec number) {
-
-		return broadcastNumberHelper.get ()
-			.findByBroadcastAndNumber (
-				broadcast.getId (),
-				number.getId ());
-
-	}
-
-	@Override
-	public
-	List<BroadcastNumberRec> findAcceptedLimit (
-			BroadcastRec broadcast,
-			int limit) {
-
-		return broadcastNumberHelper.get ()
-			.findAcceptedByBroadcastLimit (
-				broadcast.getId (),
-				limit);
 
 	}
 

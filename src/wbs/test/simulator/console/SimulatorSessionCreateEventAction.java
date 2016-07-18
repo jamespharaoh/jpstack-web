@@ -2,6 +2,7 @@ package wbs.test.simulator.console;
 
 import static wbs.framework.utils.etc.Misc.doesNotStartWith;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toBoolean;
 import static wbs.framework.utils.etc.Misc.toInteger;
@@ -195,36 +196,34 @@ class SimulatorSessionCreateEventAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"SimulatorSessionCreateEventAction.sendMessage ()",
 				this);
 
-System.out.println (
-	requestContext.stuffInt (
-		"simulatorSessionId"));
-
 		SimulatorSessionRec simulatorSession =
-			simulatorSessionHelper.findOrNull (
+			simulatorSessionHelper.findRequired (
 				requestContext.stuffInt (
 					"simulatorSessionId"));
-
-System.out.println (
-	simulatorSession);
 
 		SimulatorRec simulator =
 			simulatorSession.getSimulator ();
 
 		String numFrom =
-			requestContext.getForm ("numFrom");
+			requestContext.getForm (
+				"numFrom");
 
 		String numTo =
-			requestContext.getForm ("numTo");
+			requestContext.getForm (
+				"numTo");
 
 		String messageText =
-			requestContext.getForm ("message");
+			requestContext.getForm (
+				"message");
 
 		NetworkRec network =
-			networkHelper.findOrNull (
+			networkHelper.findRequired (
 				toInteger (
-					requestContext.getForm ("networkId")));
+					requestContext.getForm (
+						"networkId")));
 
 		// store in session
 
@@ -347,10 +346,11 @@ System.out.println (
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"SimulatorSessionCreateEventAction.deliveryReport ()",
 				this);
 
 		SimulatorSessionRec simulatorSession =
-			simulatorSessionHelper.findOrNull (
+			simulatorSessionHelper.findRequired (
 				requestContext.stuffInt (
 					"simulatorSessionId"));
 
@@ -368,10 +368,10 @@ System.out.println (
 
 		reportLogic.deliveryReport (
 			messageId,
-			Optional.of (
-				success
-					? MessageStatus.delivered
-					: MessageStatus.undelivered),
+			ifElse (
+				success,
+				() -> MessageStatus.delivered,
+				() -> MessageStatus.undelivered),
 			transaction.now (),
 			null);
 

@@ -64,10 +64,11 @@ class CoreLogoffAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"CoreLogoffAction.goReal ()",
 				this);
 
 		UserRec user =
-			userHelper.findOrNull (
+			userHelper.findRequired (
 				userId);
 
 		userLogic.userLogoff (

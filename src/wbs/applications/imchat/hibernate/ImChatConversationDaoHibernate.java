@@ -15,10 +15,11 @@ class ImChatConversationDaoHibernate
 
 	@Override
 	public
-	List<ImChatConversationRec> findPendingEmail (
+	List<ImChatConversationRec> findPendingEmailLimit (
 			int maxResults) {
 
 		return findMany (
+			"findPendingEmailLimit (maxResults)",
 			ImChatConversationRec.class,
 
 			createCriteria (
@@ -36,7 +37,7 @@ class ImChatConversationDaoHibernate
 			.setMaxResults (
 				maxResults)
 
-			.list ());
+		);
 
 	}
 

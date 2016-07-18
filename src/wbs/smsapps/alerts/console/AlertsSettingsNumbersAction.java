@@ -101,6 +101,7 @@ class AlertsSettingsNumbersAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"AlertsSettingsNumbersAction.goReal ()",
 				this);
 
 		AlertsSettingsRec alertsSettings =

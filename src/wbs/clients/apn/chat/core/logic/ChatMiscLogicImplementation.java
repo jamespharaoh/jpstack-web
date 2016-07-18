@@ -476,6 +476,7 @@ class ChatMiscLogicImplementation
 					@Cleanup
 					Transaction transaction =
 						database.beginReadWrite (
+							"ChatMiscLogicImplementation.userJoin.locatorCallback.success (..)",
 							this);
 
 					ChatUserRec chatUser =

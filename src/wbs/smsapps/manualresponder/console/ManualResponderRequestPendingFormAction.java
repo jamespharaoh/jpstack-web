@@ -153,6 +153,7 @@ class ManualResponderRequestPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ManualResponderRequestPendingFormAction.goIgnore (manualResponderRequestId)",
 				this);
 
 		ManualResponderRequestRec manualResponderRequest =
@@ -209,6 +210,7 @@ class ManualResponderRequestPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ManualResponderRequestPendingFormAction.goSend (...)",
 				this);
 
 		ManualResponderRequestRec request =

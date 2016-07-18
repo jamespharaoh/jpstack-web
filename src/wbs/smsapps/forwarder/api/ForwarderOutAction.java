@@ -1,6 +1,9 @@
 package wbs.smsapps.forwarder.api;
 
 import static wbs.framework.utils.etc.Misc.isInt;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -11,6 +14,8 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.base.Optional;
 
 import wbs.api.mvc.ApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -64,6 +69,7 @@ class ForwarderOutAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ForwarderOutAction.goApi ()",
 				this);
 
 		try {
@@ -224,20 +230,37 @@ class ForwarderOutAction
 				throw new ReportableException (
 					"Parameter numto must be supplied");
 
-			ForwarderMessageInRec forwarderMessageIn =
-				null;
+			Optional<ForwarderMessageInRec> forwarderMessageInOptional;
 
-			if (inId != null) {
+			if (
+				isNotNull (
+					inId)
+			) {
 
-				forwarderMessageIn =
-					forwarderMessageInHelper.findOrNull (
+				forwarderMessageInOptional =
+					forwarderMessageInHelper.find (
 						inId);
 
-				if (forwarderMessageIn == null
-						|| forwarderMessageIn.getForwarder () != forwarder)
+				if (
+
+					isNotPresent (
+						forwarderMessageInOptional)
+
+					|| notEqual (
+						forwarderMessageInOptional.get ().getForwarder (),
+						forwarder)
+
+				) {
 
 					throw new ReportableException (
 						"Invalid in_id");
+
+				}
+
+			} else {
+
+				forwarderMessageInOptional =
+					Optional.absent ();
 
 			}
 
@@ -248,7 +271,7 @@ class ForwarderOutAction
 				forwarderMessageOut =
 					forwarderLogic.sendMessage (
 						forwarder,
-						forwarderMessageIn,
+						forwarderMessageInOptional.orNull (),
 						message,
 						null,
 						numfrom,

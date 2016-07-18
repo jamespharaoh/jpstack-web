@@ -85,22 +85,20 @@ class MediaburstProteusSender
 			new State ();
 
 		// get stuff
-		proteusOutbox.messageId = outbox.getId();
-		proteusOutbox.message = outbox.getMessage();
-		proteusOutbox.route = proteusOutbox.message.getRoute();
+
+		proteusOutbox.messageId = outbox.getId ();
+		proteusOutbox.message = outbox.getMessage ();
+		proteusOutbox.route = proteusOutbox.message.getRoute ();
 
 		// lookup proteus route
 
 		proteusOutbox.proteusRouteOut =
-			mediaburstProteusRouteOutHelper.findOrNull (
-				proteusOutbox.route.getId ());
-
-		if (proteusOutbox.proteusRouteOut == null) {
-
-			throw tempFailure (
-				"Proteus outbound route not found for " + proteusOutbox.route.getCode ());
-
-		}
+			mediaburstProteusRouteOutHelper.findOrThrow (
+				proteusOutbox.route.getId (),
+				() -> tempFailure (
+					stringFormat (
+						"Proteus outbound route not found for %s",
+						proteusOutbox.route.getCode ())));
 
 		if (proteusOutbox.route.getOutCharge() > 0) {
 
@@ -127,17 +125,12 @@ class MediaburstProteusSender
 			// lookup mediaburst network
 
 			proteusOutbox.mediaburstNetwork =
-				mediaburstNetworkHelper.findOrNull (
-					network.getId ());
-
-			if (proteusOutbox.mediaburstNetwork == null) {
-
-				throw permFailure (
-					stringFormat (
-						"Cannot find Mediaburst network information for message %s",
-						proteusOutbox.messageId));
-
-			}
+				mediaburstNetworkHelper.findOrThrow (
+					network.getId (),
+					() -> permFailure (
+						stringFormat (
+							"Cannot find Mediaburst network information for message %s",
+							proteusOutbox.messageId)));
 
 		}
 
@@ -168,17 +161,12 @@ class MediaburstProteusSender
 			// load wap push stuff
 
 			proteusOutbox.wapPushMessage =
-				wapPushMessageHelper.findOrNull (
-					outbox.getId ());
-
-			if (proteusOutbox.wapPushMessage == null) {
-
-				throw tempFailure (
-					stringFormat (
-						"Wap push message not found for message %s",
-						outbox.getId ()));
-
-			}
+				wapPushMessageHelper.findOrThrow (
+					outbox.getId (),
+					() -> tempFailure (
+						stringFormat (
+							"Wap push message not found for message %s",
+							outbox.getId ())));
 
 			proteusOutbox.wapPushMessage.getUrlText ().getText ();
 

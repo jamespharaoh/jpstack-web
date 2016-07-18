@@ -77,19 +77,21 @@ class ChatUserAdminInfoPart
 	public
 	void prepare () {
 
-		int chatUserId =
-			requestContext.stuffInt ("chatUserId");
-
 		chatUser =
-			chatUserHelper.findOrNull (
-				chatUserId);
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
+
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent() {
 
-		if (requestContext.canContext ("chat.userAdmin")) {
+		if (
+			requestContext.canContext (
+				"chat.userAdmin")
+		) {
 
 			printFormat (
 				"<form",

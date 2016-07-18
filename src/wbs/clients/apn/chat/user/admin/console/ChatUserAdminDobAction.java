@@ -68,7 +68,8 @@ class ChatUserAdminDobAction
 
 		String dobString =
 			nullIfEmptyString (
-				requestContext.parameterOrNull ("dob"));
+				requestContext.parameterRequired (
+					"dob"));
 
 		if (dobString == null) {
 
@@ -98,17 +99,21 @@ class ChatUserAdminDobAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserAdminDobAction.goReal ()",
 				this);
 
 		// lookup database stuff
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				chatUserId);
 
 		// update chat user
 
-		chatUser.setDob (dobLocalDate);
+		chatUser
+
+			.setDob (
+				dobLocalDate);
 
 		// create event
 

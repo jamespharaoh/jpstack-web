@@ -96,10 +96,11 @@ class DialogueLocator
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"DialogueLocator.lookupDialogueLocator (...)",
 				this);
 
 		LocatorRec locator =
-			locatorHelper.findOrNull (
+			locatorHelper.findRequired (
 				locatorId);
 
 		DialogueLocatorRec dialogueLocator =

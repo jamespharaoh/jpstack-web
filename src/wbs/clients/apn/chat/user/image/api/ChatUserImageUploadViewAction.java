@@ -39,6 +39,7 @@ class ChatUserImageUploadViewAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserImageUploadViewAction.goApi ()",
 				this);
 
 		ChatUserImageUploadTokenRec imageUploadToken =

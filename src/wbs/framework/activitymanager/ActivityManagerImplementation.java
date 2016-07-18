@@ -1,16 +1,21 @@
 package wbs.framework.activitymanager;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.max;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -23,31 +28,31 @@ import org.apache.commons.io.IOUtils;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.utils.RandomLogic;
+import com.google.common.collect.ImmutableMap;
+
+import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.etc.FormatWriterWriter;
 
 @Log4j
-@SingletonComponent ("activityManager")
 public
 class ActivityManagerImplementation
 	implements ActivityManager {
-
-	// dependencies
-
-	@Inject
-	RandomLogic randomLogic;
 
 	// properties
 
 	@Getter @Setter
 	Duration slowTaskDuration =
-		Duration.millis (100);
+		Duration.millis (
+			1000);
 
 	// state
 
 	String hostname;
 	int processId;
 	long nextTaskId;
+
+	ThreadLocal<Task> currentTask =
+		new ThreadLocal<Task> ();
 
 	Map<Long,Task> activeTasks =
 		new LinkedHashMap<Long,Task> ();
@@ -57,15 +62,18 @@ class ActivityManagerImplementation
 	@PostConstruct
 	public
 	void init () {
+		throw new RuntimeException ();
+	}
+
+	public
+	ActivityManagerImplementation () {
 
 		log.debug (
 			stringFormat (
 				"Initialising"));
 
 		nextTaskId =
-			randomLogic.randomInteger (
-				Integer.MAX_VALUE
-			) << 32;
+			new Random ().nextLong ();
 
 		log.debug (
 			stringFormat (
@@ -120,14 +128,31 @@ class ActivityManagerImplementation
 	@Override
 	public synchronized
 	ActiveTask start (
-			@NonNull String taskName,
+			@NonNull String taskType,
+			@NonNull String summary,
+			@NonNull Object owner) {
+
+		return start (
+			taskType,
+			summary,
+			owner,
+			ImmutableMap.<String,String>of ());
+
+	}
+
+	@Override
+	public synchronized
+	ActiveTask start (
+			@NonNull String taskType,
+			@NonNull String summary,
 			@NonNull Object owner,
-			@NonNull Map<String,Object> parameters) {
+			@NonNull Map<String,String> parameters) {
 
 		log.debug (
 			stringFormat (
-				"Begin task %s",
-				taskName));
+				"Begin %s task: %s",
+				taskType,
+				summary));
 
 		Task task =
 			new Task ()
@@ -135,11 +160,17 @@ class ActivityManagerImplementation
 			.taskId (
 				nextTaskId ++)
 
+			.parent (
+				currentTask.get ())
+
 			.owner (
 				owner)
 
-			.taskName (
-				taskName)
+			.taskType (
+				taskType)
+
+			.summary (
+				summary)
 
 			.hostname (
 				hostname)
@@ -151,10 +182,10 @@ class ActivityManagerImplementation
 				Thread.currentThread ().getName ())
 
 			.startTime (
-				Instant.now ())
+				Instant.now ());
 
-			.parameters (
-				parameters);
+		task.parameters ().putAll (
+			parameters);
 
 		ActiveTask activeTask =
 			new ActiveTaskImplementation (
@@ -164,16 +195,37 @@ class ActivityManagerImplementation
 			task.taskId (),
 			task);
 
+		if (
+			isNotNull (
+				task.parent ())
+		) {
+
+			task.parent ().children ().add (
+				task);
+
+		}
+
+		currentTask.set (
+			task);
+
 		return activeTask;
 
 	}
 
 	private synchronized
 	void postProcessTask (
-			Task task) {
+			@NonNull Task task) {
 
 		task.endTime (
 			Instant.now ());
+
+		if (
+			notEqual (
+				task,
+				currentTask.get ())
+		) {
+			throw new RuntimeException ();
+		}
 
 		Duration taskDuration =
 			new Duration (
@@ -182,82 +234,169 @@ class ActivityManagerImplementation
 
 		log.debug (
 			stringFormat (
-				"End task %s (%s) after %s",
-				task.taskName (),
-				task.state ().toString (),
-				taskDuration.toString ()));
+				"End %s task %s after %s: %s",
+				task.taskType (),
+				task.summary (),
+				taskDuration.toString (),
+				task.state ().toString ()));
 
 		if (
-			taskDuration.isLongerThan (
+
+			isNull (
+				task.parent ())
+
+			&& taskDuration.isLongerThan (
 				slowTaskDuration)
+
 		) {
 
+			StringWriter stringWriter =
+				new StringWriter ();
+
+			FormatWriter formatWriter =
+				new FormatWriterWriter (
+					stringWriter);
+
+			formatWriter.writeFormat (
+				"Slow %s task took %s: %s\n",
+					task.taskType (),
+					taskDuration,
+					task.summary ());
+
+			writeTaskRecursive (
+				formatWriter,
+				"  ",
+				task);
+
 			log.warn (
-				stringFormat (
-					"Slow task %s took %s",
-					task.taskName (),
-					taskDuration));
+				stringWriter.toString ());
 
 		}
 
 		activeTasks.remove (
 			task.taskId ());
 
+		currentTask.set (
+			task.parent ());
+
 	}
 
 	public synchronized
-	void dump () {
+	void logActiveTasks () {
 
-		log.info (
-			"Begin active task dump");
+		StringWriter stringWriter =
+			new StringWriter ();
+
+		FormatWriter formatWriter =
+			new FormatWriterWriter (
+				stringWriter);
+
+		if (
+			isEmpty (
+				activeTasks)
+		) {
+
+			log.info (
+				"No active tasks");
+
+		} else {
+
+			formatWriter.writeFormat (
+				"Dumping active tasks\n");
+
+			writeActiveTasks (
+				formatWriter,
+				"  ");
+
+			log.info (
+				stringWriter.toString ());
+
+		}
+
+	}
+
+	public synchronized
+	void writeActiveTasks (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String indent) {
 
 		for (
 			Task task
 				: activeTasks.values ()
 		) {
 
-			log.info (
-				joinWithSeparator (
-					", ",
+			if (
+				isNotNull (
+					task.parent ())
+			) {
+				continue;
+			}
 
-					stringFormat (
-						"id=%s",
-						task.taskId ()),
-
-					stringFormat (
-						"owner=%s",
-						task.owner ().getClass ().getName ()),
-
-					stringFormat (
-						"name=%s",
-						task.taskName ()),
-
-					stringFormat (
-						"host=%s",
-						task.hostname ()),
-
-					stringFormat (
-						"pid=%s",
-						task.processId ()),
-
-					stringFormat (
-						"thread=%s",
-						task.threadName ()),
-
-					stringFormat (
-						"start=%s",
-						task.startTime ()),
-
-					stringFormat (
-						"end=%s",
-						ifNull (
-							task.endTime (),
-							""))));
+			writeTask (
+				formatWriter,
+				indent,
+				task);
 
 		}
 
-		log.info (
-			"End active task dump");
+	}
+
+	public
+	void writeTask (
+			@NonNull FormatWriter writer,
+			@NonNull String indent,
+			@NonNull Task task) {
+
+		long meterLength =
+			max (
+				0l,
+				(long) Math.log (
+					task.duration ().getMillis ()));
+
+		char[] meterCharacters =
+			new char [
+				(int) meterLength];
+
+		Arrays.fill (
+			meterCharacters,
+			'=');
+
+		writer.writeFormat (
+			"%s%s: %s (%sms) [%s]\n",
+			indent,
+			task.taskType (),
+			task.summary (),
+			task.duration ().getMillis (),
+			new String (
+				meterCharacters));
+
+	}
+
+	public
+	void writeTaskRecursive (
+			@NonNull FormatWriter writer,
+			@NonNull String indent,
+			@NonNull Task task) {
+
+		writeTask (
+			writer,
+			indent,
+			task);
+
+		String nextIndent =
+			indent + "  ";
+
+		for (
+			Task childTask
+				: task.children ()
+		) {
+
+			writeTaskRecursive (
+				writer,
+				nextIndent,
+				childTask);
+
+		}
 
 	}
 
@@ -354,6 +493,20 @@ class ActivityManagerImplementation
 					task);
 
 			}
+
+		}
+
+		@Override
+		public
+		ActiveTask put (
+				@NonNull String key,
+				@NonNull String value) {
+
+			task.parameters.put (
+				key,
+				value);
+
+			return this;
 
 		}
 

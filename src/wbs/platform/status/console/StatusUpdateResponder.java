@@ -82,7 +82,8 @@ class StatusUpdateResponder
 		// find objects
 
 		root =
-			rootHelper.findOrNull (0);
+			rootHelper.findRequired (
+				0);
 
 		// create the html
 

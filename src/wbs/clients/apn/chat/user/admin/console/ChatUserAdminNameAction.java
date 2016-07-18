@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.user.admin.console;
 
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
 import javax.inject.Inject;
@@ -77,27 +78,33 @@ class ChatUserAdminNameAction
 		ChatUserEditReason editReason =
 			toEnum (
 				ChatUserEditReason.class,
-				requestContext.parameterOrNull("editReason"));
+				requestContext.parameterRequired (
+					"editReason"));
 
 		if (editReason == null) {
-			requestContext.addError ("Please select a valid reason");
+
+			requestContext.addError (
+				"Please select a valid reason");
+
 			return null;
+
 		}
 
 		String name =
-			requestContext.parameterOrNull ("name");
-
-		if (name.equals (""))
-			name = null;
+			nullIfEmptyString (
+				requestContext.parameterRequired (
+					"name"));
 
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserAdminNameAction.goReal ()",
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		if (
 			notEqual (

@@ -222,6 +222,7 @@ class TicketerApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"TicketerApiServletModule.QueryAction.myGo ()",
 					this);
 
 			Optional<SliceRec> sliceOptional =

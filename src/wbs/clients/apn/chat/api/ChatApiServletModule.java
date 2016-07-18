@@ -241,6 +241,7 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadOnly (
+					"ChatApiServletModule.MediaFile.doGet ()",
 					this);
 
 			Optional<MediaRec> mediaOptional =
@@ -651,6 +652,7 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadOnly (
+					"ChatApiServletModule.ProfilesRpcHandler.handle (source)",
 					this);
 
 			// get params
@@ -1188,6 +1190,7 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadOnly (
+					"ChatApiServletModule.MediaRpcHandler.handle (source)",
 					this);
 
 			// get params
@@ -1378,6 +1381,7 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"ChatApiServletModule.ProfileRpcHandler.handle (source)",
 					this);
 
 			// get params
@@ -2001,6 +2005,7 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"ChatApiServletModule.ProfileDeleteRpcHandler.handle (source)",
 					this);
 
 			// get params
@@ -2188,6 +2193,7 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"ChatApiServletModule.MessageSendRpcHandler.handle (source)",
 					this);
 
 			// get params
@@ -2452,6 +2458,7 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"ChatApiServletModule.MessagePollRpcHandler.handle (source)",
 					this);
 
 			// get params
@@ -2829,6 +2836,7 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"ChatApiServletModule.ImageUpdateRpcHandler.handle (source)",
 					this);
 
 			// get params
@@ -3347,6 +3355,7 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"ChatApiServletModule.CreditRpcHandler.handle (source)",
 					this);
 
 			// get params

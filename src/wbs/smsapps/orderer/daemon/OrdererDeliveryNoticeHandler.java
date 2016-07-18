@@ -66,14 +66,15 @@ class OrdererDeliveryNoticeHandler
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"OrdererDeliveryNoticeHandler.handle (deliveryId, ref)",
 				this);
 
 		DeliveryRec delivery =
-			deliveryHelper.findOrNull (
+			deliveryHelper.findRequired (
 				deliveryId);
 
 		OrdererOrderRec order =
-			ordererOrderHelper.findOrNull (
+			ordererOrderHelper.findRequired (
 				delivery.getMessage ().getRef ());
 
 		OrdererRec orderer =

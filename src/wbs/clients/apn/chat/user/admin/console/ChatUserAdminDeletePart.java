@@ -38,10 +38,14 @@ class ChatUserAdminDeletePart
 	void prepare () {
 
 		chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
-		if (chatUser.getOldNumber () != null) {
+		if (
+			isNotNull (
+				chatUser.getOldNumber ())
+		) {
 
 			newChatUser =
 				chatUserHelper.find (

@@ -46,6 +46,7 @@ class ForwarderInAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ForwarderInAction.goApi ()",
 				this);
 
 		try {

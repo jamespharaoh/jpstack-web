@@ -156,10 +156,11 @@ class ChatBillDeliveryHandler
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatBillDeliveryHandler.handle (deliveryId, ref)",
 				this);
 
 		DeliveryRec delivery =
-			deliveryHelper.findOrNull (
+			deliveryHelper.findRequired (
 				deliveryId);
 
 		MessageRec message =
@@ -169,7 +170,7 @@ class ChatBillDeliveryHandler
 			message.getDeliveryType ();
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				message.getRef ());
 
 		// work out strict mode

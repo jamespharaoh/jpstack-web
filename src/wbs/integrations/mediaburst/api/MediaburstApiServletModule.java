@@ -192,6 +192,7 @@ class MediaburstApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"MediaburstApiServletModule.inFile.doPost ()",
 					this);
 
 			// debugging
@@ -248,12 +249,14 @@ class MediaburstApiServletModule
 			// load the stuff
 
 			RouteRec route =
-				routeHelper.findOrNull (routeId);
+				routeHelper.findRequired (
+					routeId);
 
 			NetworkRec network =
 				networkId == null
 					? null
-					: networkHelper.findOrNull (networkId);
+					: networkHelper.findRequired (
+						networkId);
 
 			// check for concatenation
 
@@ -372,10 +375,11 @@ class MediaburstApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"MediaburstApiServletModule.reportFile.doGet ()",
 					this);
 
 			RouteRec route =
-				routeHelper.findOrNull (
+				routeHelper.findRequired (
 					requestContext.requestIntRequired (
 						"routeId"));
 
@@ -442,8 +446,7 @@ class MediaburstApiServletModule
 					reportLogic.deliveryReport (
 						route,
 						requestContext.parameter ("msg_id"),
-						Optional.of (
-							newMessageStatus),
+						newMessageStatus,
 						null,
 						messageReportCode);
 

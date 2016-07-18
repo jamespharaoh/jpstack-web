@@ -60,12 +60,13 @@ class ChatUserImageListPart
 		type =
 			toEnum (
 				ChatUserImageType.class,
-				(String)
-				requestContext.stuff ("chatUserImageType"));
+				requestContext.stuffString (
+					"chatUserImageType"));
 
 		chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 		switch (type) {
 

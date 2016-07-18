@@ -32,13 +32,16 @@ import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.model.UserObjectHelper;
+import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.gazetteer.model.GazetteerObjectHelper;
 import wbs.sms.network.model.NetworkObjectHelper;
+import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
@@ -128,8 +131,14 @@ class ChatCoreFixtureProvider
 	public
 	void createFixtures () {
 
-		Transaction transaction =
-			database.currentTransaction ();
+		createMenuItems ();
+
+		createChatServices ();
+
+	}
+
+	private
+	void createMenuItems () {
 
 		menuItemHelper.insert (
 			menuItemHelper.createInstance ()
@@ -160,6 +169,25 @@ class ChatCoreFixtureProvider
 
 		);
 
+	}
+
+	private
+	void createChatServices () {
+
+		Transaction transaction =
+			database.currentTransaction ();
+
+		List<NetworkRec> allNetworks =
+			networkHelper.findAll ();
+
+		List<UserRec> allUsers =
+			userHelper.findAll ();
+
+		SliceRec testSlice =
+			sliceHelper.findByCodeRequired (
+				GlobalId.root,
+				"test");
+
 		// routes
 
 		RouteRec billRoute =
@@ -167,9 +195,7 @@ class ChatCoreFixtureProvider
 				routeHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+				testSlice)
 
 			.setCode (
 				"chat_5_00")
@@ -207,9 +233,7 @@ class ChatCoreFixtureProvider
 				routeHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+				testSlice)
 
 			.setCode (
 				"chat_free")
@@ -247,9 +271,7 @@ class ChatCoreFixtureProvider
 			routeHelper.createInstance ()
 
 			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+				testSlice)
 
 			.setCode (
 				"chat_magic")
@@ -416,7 +438,11 @@ class ChatCoreFixtureProvider
 		List<ChatUserRec> chatUsers =
 			new ArrayList<ChatUserRec> ();
 
-		for (int index = 0; index < 260; index ++) {
+		for (
+			int index = 0;
+			index < 260;
+			index ++
+		) {
 
 			String code =
 				String.format (
@@ -436,9 +462,8 @@ class ChatCoreFixtureProvider
 					numberString)
 
 				.setNetwork (
-					networkHelper.findByCodeRequired (
-						GlobalId.root,
-						"unknown"))
+					randomLogic.sample (
+						allNetworks))
 
 			);
 
@@ -661,7 +686,7 @@ class ChatCoreFixtureProvider
 
 				.setSender (
 					randomLogic.sample (
-						userHelper.findAll ()))
+						allUsers))
 
 				.setMethod (
 					ChatMessageMethod.api)

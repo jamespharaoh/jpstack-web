@@ -116,6 +116,7 @@ class ChatAffiliateKeywordsCreateAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatAffiliateKeywordCreateAction.goReal ()",
 				this);
 
 		ChatAffiliateRec chatAffiliate =

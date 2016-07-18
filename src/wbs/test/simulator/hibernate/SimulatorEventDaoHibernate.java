@@ -21,6 +21,7 @@ class SimulatorEventDaoHibernate
 			int maxResults) {
 
 		return findMany (
+			"findAfterLimit (afterId, maxResults)",
 			SimulatorEventRec.class,
 
 			createCriteria (
@@ -39,7 +40,7 @@ class SimulatorEventDaoHibernate
 			.setMaxResults (
 				maxResults)
 
-			.list ());
+		);
 
 	}
 

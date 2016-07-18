@@ -28,6 +28,7 @@ class SubscriptionNumberDaoHibernate
 			@NonNull NumberRec number) {
 
 		return findOne (
+			"find (subscription, number)",
 			SubscriptionNumberRec.class,
 
 			createCriteria (
@@ -44,14 +45,14 @@ class SubscriptionNumberDaoHibernate
 					"_subscriptionNumber.number",
 					number))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<Integer> searchIds (
-			@NonNull SubscriptionNumberSearch search) {
+			@NonNull SubscriptionNumberSearch subscriptionNumberSearch) {
 
 		// create criteria
 
@@ -71,48 +72,48 @@ class SubscriptionNumberDaoHibernate
 
 		// apply filters
 
-		if (search.subscriptionId () != null) {
+		if (subscriptionNumberSearch.subscriptionId () != null) {
 
 			criteria.add (
 				Restrictions.eq (
 					"_subscription.id",
-					search.subscriptionId ()));
+					subscriptionNumberSearch.subscriptionId ()));
 
 		}
 
-		if (search.numberLike () != null) {
+		if (subscriptionNumberSearch.numberLike () != null) {
 
 			criteria.add (
 				Restrictions.ilike (
 					"_number.number",
-					search.numberLike ()));
+					subscriptionNumberSearch.numberLike ()));
 
 		}
 
-		if (search.active () != null) {
+		if (subscriptionNumberSearch.active () != null) {
 
 			criteria.add (
 				Restrictions.eq (
 					"_subscriptionNumber.active",
-					search.active ()));
+					subscriptionNumberSearch.active ()));
 
 		}
 
-		if (search.joinedAfter () != null) {
+		if (subscriptionNumberSearch.joinedAfter () != null) {
 
 			criteria.add (
 				Restrictions.ge (
 					"_subscriptionNumber.lastJoin",
-					search.joinedAfter ()));
+					subscriptionNumberSearch.joinedAfter ()));
 
 		}
 
-		if (search.joinedBefore () != null) {
+		if (subscriptionNumberSearch.joinedBefore () != null) {
 
 			criteria.add (
 				Restrictions.lt (
 					"_subscriptionNumber.firstJoin",
-					search.joinedBefore ()));
+					subscriptionNumberSearch.joinedBefore ()));
 
 		}
 
@@ -133,8 +134,9 @@ class SubscriptionNumberDaoHibernate
 		// perform and return
 
 		return findMany (
+			"searchIds (subscriptionNumberSearch)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 

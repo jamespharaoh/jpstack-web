@@ -1,5 +1,9 @@
 package wbs.platform.updatelog.hibernate;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.updatelog.model.UpdateLogDao;
@@ -14,26 +18,28 @@ class UpdateLogDaoHibernate
 	@Override
 	public
 	UpdateLogRec findByTableAndRef (
-			String table,
+			@NonNull String table,
 			long ref) {
 
 		return findOne (
+			"findByTableAndRef (table, ref)",
 			UpdateLogRec.class,
 
-			createQuery (
-				"FROM UpdateLogRec updateLog " +
-				"WHERE updateLog.code = :code " +
-					"AND ref = :ref")
+			createCriteria (
+				UpdateLogRec.class,
+				"_updateLog")
 
-			.setString (
-				"code",
-				table)
+			.add (
+				Restrictions.eq (
+					"_updateLog.code",
+					table))
 
-			.setInteger (
-				"ref",
-				(int) ref)
+			.add (
+				Restrictions.eq (
+					"_updateLog.ref",
+					(int) ref))
 
-			.list ());
+		);
 
 	}
 

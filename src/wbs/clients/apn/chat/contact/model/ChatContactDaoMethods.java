@@ -5,7 +5,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 public
 interface ChatContactDaoMethods {
 
-	ChatContactRec find (
+	ChatContactRec findNoFlush (
 			ChatUserRec fromChatUser,
 			ChatUserRec toChatUser);
 

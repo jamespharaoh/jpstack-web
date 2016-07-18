@@ -1,5 +1,7 @@
 package wbs.integrations.mediaburst.api;
 
+import static wbs.framework.utils.etc.Misc.isNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -16,7 +18,6 @@ import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Nodes;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -115,9 +116,17 @@ class MediaburstProteusApiServletModule
 				processReportRequest (
 					requestContext.inputStream ());
 
+			if (
+				isNull (
+					reportRequestResult.status)
+			) {
+				return;
+			}
+
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"MediaburstProteusApiServletModule.reportFile.doPost ()",
 					this);
 
 			Long statusCode;
@@ -153,15 +162,14 @@ class MediaburstProteusApiServletModule
 					reportRequestResult.statusString);
 
 			RouteRec route =
-				routeHelper.findOrNull (
+				routeHelper.findRequired (
 					requestContext.requestIntRequired (
 						"routeId"));
 
 			reportLogic.deliveryReport (
 				route,
 				reportRequestResult.otherId,
-				Optional.fromNullable (
-					reportRequestResult.status),
+				reportRequestResult.status,
 				null,
 				messageReportCode);
 

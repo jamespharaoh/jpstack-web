@@ -108,10 +108,11 @@ class ChatUserAdminCreditAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserAdminCreditAction.goReal ()",
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				requestContext.stuffInt (
 					"chatUserId"));
 

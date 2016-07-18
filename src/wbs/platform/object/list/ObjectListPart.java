@@ -3,6 +3,7 @@ package wbs.platform.object.list;
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.optionalIf;
 import static wbs.framework.utils.etc.Misc.presentInstances;
@@ -212,10 +213,13 @@ class ObjectListPart<
 			requestContext.stuff (
 				consoleHelper.objectName () + "Id");
 
-		if (objectId != null) {
+		if (
+			isNotNull (
+				objectId)
+		) {
 
 			currentObject =
-				consoleHelper.findOrNull (
+				consoleHelper.findRequired (
 					objectId);
 
 		}
@@ -239,10 +243,13 @@ class ObjectListPart<
 				requestContext.stuff (
 					parentHelper.idKey ());
 
-			if (parentId != null) {
+			if (
+				isNotNull (
+					parentId)
+			) {
 
 				parent =
-					parentHelper.findOrNull (
+					parentHelper.findRequired (
 						parentId);
 
 				prepareAllObjectsViaParent (
@@ -348,18 +355,13 @@ class ObjectListPart<
 				currentListBrowserSpec.get ();
 
 			Record<?> grandParentObject =
-				grandParentHelper.findOrNull (
-					grandParentId);
-
-			if (grandParentObject == null) {
-
-				throw new NullPointerException (
-					stringFormat (
-						"Can't find grand parent object %s with id %s",
-						grandParentHelper.objectName (),
-						grandParentId));
-
-			}
+				grandParentHelper.findOrThrow (
+					grandParentId,
+					() -> new NullPointerException (
+						stringFormat (
+							"Can't find grand parent object %s with id %s",
+							grandParentHelper.objectName (),
+							grandParentId)));
 
 			String daoMethodName =
 				stringFormat (

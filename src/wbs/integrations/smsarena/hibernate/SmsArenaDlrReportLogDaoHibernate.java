@@ -2,6 +2,8 @@ package wbs.integrations.smsarena.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -22,7 +24,7 @@ class SmsArenaDlrReportLogDaoHibernate
 	@Override
 	public
 	List<Integer> searchIds (
-			SmsArenaDlrReportLogSearch search) {
+			@NonNull SmsArenaDlrReportLogSearch search) {
 
 		Criteria criteria =
 			createCriteria (
@@ -77,8 +79,9 @@ class SmsArenaDlrReportLogDaoHibernate
 		// perform and return
 
 		return findMany (
+			"searchIds (search)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 

@@ -98,6 +98,7 @@ class BroadcastNumbersAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"BroadcastNumbersAction.goReal ()",
 				this);
 
 		BroadcastRec broadcast =

@@ -204,10 +204,11 @@ class ChatUserImageUploadAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserImageUploadAction.goReal ()",
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				requestContext.stuffInt (
 					"chatUserId"));
 

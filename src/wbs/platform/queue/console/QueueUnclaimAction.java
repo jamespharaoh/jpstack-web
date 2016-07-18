@@ -51,17 +51,19 @@ class QueueUnclaimAction
 	protected
 	Responder goReal () {
 
-		int queueItemId =
-			Integer.parseInt (
-				requestContext.parameterOrNull ("queueItemId"));
+		long queueItemId =
+			requestContext.parameterInteger (
+				"queueItemId");
 
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"QueueUnclaimAction.goReal ()",
 				this);
 
 		QueueItemRec queueItem =
-			queueItemHelper.findOrNull (queueItemId);
+			queueItemHelper.findRequired (
+				queueItemId);
 
 		if (
 			notEqual (

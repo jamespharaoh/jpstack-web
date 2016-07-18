@@ -93,6 +93,7 @@ class ImChatMessageSendAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ImChatMessageSendAction.handle ()",
 				this);
 
 		ImChatRec imChat =

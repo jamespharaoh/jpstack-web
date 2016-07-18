@@ -44,7 +44,7 @@ class ChatInfoSiteViewResponder
 	void prepare () {
 
 		infoSite =
-			chatInfoSiteHelper.findOrNull (
+			chatInfoSiteHelper.findRequired (
 				requestContext.requestIntRequired (
 					"chatInfoSiteId"));
 

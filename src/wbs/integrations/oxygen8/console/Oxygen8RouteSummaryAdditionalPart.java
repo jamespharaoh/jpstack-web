@@ -30,7 +30,6 @@ class Oxygen8RouteSummaryAdditionalPart
 
 	// state
 
-	Integer routeId;
 	RouteRec route;
 	Oxygen8RouteOutRec oxygen8RouteOut;
 
@@ -40,15 +39,14 @@ class Oxygen8RouteSummaryAdditionalPart
 	public
 	void prepare () {
 
-		routeId =
-			requestContext.stuffInt ("routeId");
-
 		route =
-			routeHelper.findOrNull (routeId);
+			routeHelper.findRequired (
+				requestContext.stuffInt (
+					"routeId"));
 
 		oxygen8RouteOut =
-			oxygen8RouteOutHelper.findOrNull (
-				routeId);
+			oxygen8RouteOutHelper.findRequired (
+				route.getId ());
 
 	}
 
@@ -115,7 +113,7 @@ class Oxygen8RouteSummaryAdditionalPart
 					"/oxygen8",
 					"/route",
 					"/%u",
-					routeId,
+					route.getId (),
 					"/in"),
 				"</tr>\n");
 
@@ -137,7 +135,7 @@ class Oxygen8RouteSummaryAdditionalPart
 					"/oxygen8",
 					"/route",
 					"/%u",
-					routeId,
+					route.getId (),
 					"/report"));
 
 		}

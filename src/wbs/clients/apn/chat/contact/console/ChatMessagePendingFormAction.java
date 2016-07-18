@@ -1,6 +1,9 @@
 package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.trim;
 
 import javax.inject.Inject;
 
@@ -91,7 +94,8 @@ class ChatMessagePendingFormAction
 
 		int chatMessageId =
 			Integer.parseInt (
-				requestContext.parameterOrNull ("chat_message_id"));
+				requestContext.parameterRequired (
+					"chat_message_id"));
 
 		requestContext.request (
 			"chatMessageId",
@@ -99,12 +103,26 @@ class ChatMessagePendingFormAction
 
 		// delegate appropriately
 
-		if (requestContext.parameterOrNull ("send") != null
-				|| requestContext.parameterOrNull ("sendWithoutApproval") != null)
-			return goSend ();
+		if (
 
-		if (requestContext.parameterOrNull ("reject") != null)
+			isPresent (
+				requestContext.parameter (
+					"send"))
+
+			|| isPresent (
+				requestContext.parameter (
+					"sendWithoutApproval"))
+		) {
+			return goSend ();
+		}
+
+		if (
+			isPresent (
+				requestContext.parameter (
+					"reject"))
+		) {
 			return goReject ();
+		}
 
 		throw new RuntimeException (
 			"Expected send or reject parameters");
@@ -117,25 +135,32 @@ class ChatMessagePendingFormAction
 		// get params
 
 		String messageParam =
-			requestContext.parameterOrNull ("message");
+			requestContext.parameterRequired (
+				"message");
 
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatMessagePendingFormAction.goSend ()",
 				this);
 
 		// get database objects
 
 		ChatMessageRec chatMessage =
-			chatMessageHelper.findOrNull (
-				requestContext.stuffInt ("chatMessageId"));
+			chatMessageHelper.findRequired (
+				requestContext.stuffInt (
+					"chatMessageId"));
 
 		ChatRec chat =
 			chatMessage.getChat ();
 
 		// check message is ok
 
-		if (requestContext.parameterOrNull ("sendWithoutApproval") == null) {
+		if (
+			isNotPresent (
+				requestContext.parameter (
+					"sendWithoutApproval"))
+		) {
 
 			ChatMessageLogic.ApprovalResult approvalResult =
 				chatMessageLogic.checkForApproval (
@@ -300,10 +325,11 @@ class ChatMessagePendingFormAction
 		// get params
 
 		String messageParam =
-			requestContext.parameterOrNull ("message")
-				.trim ();
+			trim (
+				requestContext.parameterRequired (
+					"message"));
 
-		if (Gsm.length(messageParam) == 0) {
+		if (Gsm.length (messageParam) == 0) {
 
 			requestContext.addError (
 				"Please enter a message to send");
@@ -324,13 +350,15 @@ class ChatMessagePendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatMessagePendingFormAction.goReject ()",
 				this);
 
 		// get database objects
 
 		ChatMessageRec chatMessage =
-			chatMessageHelper.findOrNull (
-				requestContext.stuffInt ("chatMessageId"));
+			chatMessageHelper.findRequired (
+				requestContext.stuffInt (
+					"chatMessageId"));
 
 		// confirm message status
 

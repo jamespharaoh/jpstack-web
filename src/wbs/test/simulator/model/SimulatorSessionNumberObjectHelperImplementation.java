@@ -1,7 +1,13 @@
 package wbs.test.simulator.model;
 
+import static wbs.framework.utils.etc.Misc.isPresent;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import lombok.NonNull;
+
+import com.google.common.base.Optional;
 
 import wbs.sms.number.core.model.NumberRec;
 
@@ -20,19 +26,23 @@ class SimulatorSessionNumberObjectHelperImplementation
 	@Override
 	public
 	SimulatorSessionNumberRec findOrCreate (
-			NumberRec number) {
+			@NonNull NumberRec number) {
 
 		SimulatorSessionNumberObjectHelper simulatorSessionNumberHelper =
 			simulatorSessionNumberHelperProvider.get ();
 
 		// find existing
 
-		SimulatorSessionNumberRec existingSimulatorSessionNumber =
-			simulatorSessionNumberHelper.findOrNull (
+		Optional<SimulatorSessionNumberRec> existingSimulatorSessionNumber =
+			simulatorSessionNumberHelper.find (
 				number.getId ());
 
-		if (existingSimulatorSessionNumber != null)
-			return existingSimulatorSessionNumber;
+		if (
+			isPresent (
+				existingSimulatorSessionNumber)
+		) {
+			return existingSimulatorSessionNumber.get ();
+		}
 
 		// create new
 

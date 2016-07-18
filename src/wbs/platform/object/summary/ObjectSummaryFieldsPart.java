@@ -1,5 +1,7 @@
 package wbs.platform.object.summary;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
+
 import javax.inject.Inject;
 
 import lombok.Getter;
@@ -82,7 +84,7 @@ class ObjectSummaryFieldsPart<
 		if (parentHelper.isRoot ()) {
 
 			parent =
-				parentHelper.findOrNull (
+				parentHelper.findRequired (
 					0);
 
 			return;
@@ -93,12 +95,15 @@ class ObjectSummaryFieldsPart<
 			requestContext.stuffInt (
 				parentHelper.idKey ());
 
-		if (parentId != null) {
+		if (
+			isNotNull (
+				parentId)
+		) {
 
 			// use specific parent
 
 			parent =
-				parentHelper.findOrNull (
+				parentHelper.findRequired (
 					parentId);
 
 			return;

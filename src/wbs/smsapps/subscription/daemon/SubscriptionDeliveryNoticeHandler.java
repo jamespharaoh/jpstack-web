@@ -76,17 +76,18 @@ class SubscriptionDeliveryNoticeHandler
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"SubscriptionDeliveryNoticeHandler.handle (deliveryId, ref)",
 				this);
 
 		DeliveryRec delivery =
-			deliveryHelper.findOrNull (
+			deliveryHelper.findRequired (
 				deliveryId);
 
 		MessageRec message =
 			delivery.getMessage ();
 
 		SubscriptionBillRec subscriptionBill =
-			subscriptionBillHelper.findOrNull (
+			subscriptionBillHelper.findRequired (
 				message.getRef ());
 
 		SubscriptionNumberRec subscriptionNumber =

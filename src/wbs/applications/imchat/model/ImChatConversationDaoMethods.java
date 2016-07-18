@@ -5,7 +5,7 @@ import java.util.List;
 public
 interface ImChatConversationDaoMethods {
 
-	List<ImChatConversationRec> findPendingEmail (
+	List<ImChatConversationRec> findPendingEmailLimit (
 			int maxResults);
 
 }

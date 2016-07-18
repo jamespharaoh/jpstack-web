@@ -55,7 +55,7 @@ class QueueItemActionsPart
 	void prepare () {
 
 		queueItem =
-			queueItemHelper.findOrNull (
+			queueItemHelper.findRequired (
 				requestContext.stuffInt (
 					"queueItemId"));
 

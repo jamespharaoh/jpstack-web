@@ -21,7 +21,6 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.apache.log4j.Level;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
@@ -41,7 +40,6 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TextualInterval;
 import wbs.framework.utils.etc.Html;
-import wbs.framework.utils.etc.ProfileLogger;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.media.logic.MediaLogic;
@@ -175,15 +173,6 @@ class ManualResponderRequestPendingSummaryPart
 			manualResponderRequestPendingConsoleModule.formFieldSets ().get (
 				"customer-details");
 
-		ProfileLogger profileLogger =
-			new ProfileLogger (
-				log,
-				Level.INFO,
-				"prepare");
-
-		profileLogger.lap (
-			"load basics");
-
 		manualResponderRequest =
 			manualResponderRequestHelper.findRequired (
 				requestContext.stuffInt (
@@ -219,14 +208,13 @@ class ManualResponderRequestPendingSummaryPart
 
 		// get routes
 
-		profileLogger.lap (
-			"load routes");
-
 		Set<RouteRec> routes =
 			new HashSet<RouteRec> ();
 
-		for (ManualResponderTemplateRec manualResponderTemplate
-				: manualResponder.getTemplates ()) {
+		for (
+			ManualResponderTemplateRec manualResponderTemplate
+				: manualResponder.getTemplates ()
+		) {
 
 			RouteRec route =
 				routerLogic.resolveRouter (
@@ -244,9 +232,6 @@ class ManualResponderRequestPendingSummaryPart
 		}
 
 		// get bill counts per route
-
-		profileLogger.lap (
-			"load route bill counts");
 
 		Instant startOfToday =
 			LocalDate.now ()
@@ -290,8 +275,10 @@ class ManualResponderRequestPendingSummaryPart
 				messageHelper.search (
 					messageSearch);
 
-			for (MessageRec message
-					: messages) {
+			for (
+				MessageRec message
+					: messages
+			) {
 
 				if (
 					in (
@@ -358,9 +345,6 @@ class ManualResponderRequestPendingSummaryPart
 
 		// get request history
 
-		profileLogger.lap (
-			"load request history");
-
 		oldRequests =
 			manualResponderRequestHelper.findRecentLimit (
 				manualResponder,
@@ -369,8 +353,6 @@ class ManualResponderRequestPendingSummaryPart
 
 		Collections.sort (
 			oldRequests);
-
-		profileLogger.end ();
 
 	}
 

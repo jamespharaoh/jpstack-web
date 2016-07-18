@@ -117,6 +117,7 @@ class ChatUserAdminInfoAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserAdminInfoAction.goReal ()",
 				this);
 
 		// load database objects

@@ -165,10 +165,11 @@ class ImChatPurchaseStartAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ImChatPurchaseStartAction.createPurchase ()",
 				this);
 
 		ImChatRec imChat =
-			imChatHelper.findOrNull (
+			imChatHelper.findRequired (
 				Integer.parseInt (
 					requestContext.requestStringRequired (
 						"imChatId")));
@@ -418,12 +419,13 @@ class ImChatPurchaseStartAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ImChatPurchaseStartAction.updatePurchase",
 				this);
 
 		// update purchase
 
 		ImChatPurchaseRec purchase =
-			imChatPurchaseHelper.findOrNull (
+			imChatPurchaseHelper.findRequired (
 				purchaseId);
 
 		purchase
@@ -436,7 +438,7 @@ class ImChatPurchaseStartAction
 		// process customer
 
 		ImChatCustomerRec customer =
-			imChatCustomerHelper.findOrNull (
+			imChatCustomerHelper.findRequired (
 				customerId);
 
 		customerData =

@@ -57,7 +57,7 @@ class ChatUserHistoryPart
 	void prepare () {
 
 		chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				requestContext.stuffInt (
 					"chatUserId"));
 

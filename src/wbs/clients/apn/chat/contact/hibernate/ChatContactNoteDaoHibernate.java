@@ -4,6 +4,8 @@ import java.util.List;
 
 import lombok.NonNull;
 
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
 
 import wbs.clients.apn.chat.contact.model.ChatContactNoteDao;
@@ -11,7 +13,6 @@ import wbs.clients.apn.chat.contact.model.ChatContactNoteRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.hibernate.HibernateDao;
-import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 
 public
 class ChatContactNoteDaoHibernate
@@ -22,33 +23,34 @@ class ChatContactNoteDaoHibernate
 	public
 	List<ChatContactNoteRec> findByTimestamp (
 			@NonNull ChatRec chat,
-			@NonNull Interval timestampInterval) {
+			@NonNull Interval timestamp) {
 
 		return findMany (
+			"findByTimestamp (chat, timestamp)",
 			ChatContactNoteRec.class,
 
-			createQuery (
-				"FROM ChatContactNoteRec note " +
-				"WHERE note.chat = :chat " +
-					"AND note.timestamp >= :start " +
-					"AND note.timestamp < :end " +
-				"ORDER BY note.timestamp")
+			createCriteria (
+				ChatContactNoteRec.class,
+				"_chatContactNote")
 
-			.setEntity (
-				"chat",
-				chat)
+			.add (
+				Restrictions.eq (
+					"_chatContactNote.chat",
+					chat))
 
-			.setParameter (
-				"start",
-				timestampInterval.getStart (),
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.ge (
+					"_chatContactNote.timestamp",
+					timestamp.getStart ()))
 
-			.setParameter (
-				"end",
-				timestampInterval.getEnd (),
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.lt (
+					"_chatContactNote.timestamp",
+					timestamp.getEnd ()))
 
-			.list ()
+			.addOrder (
+				Order.asc (
+					"_chatContactNote.timestamp"))
 
 		);
 
@@ -57,29 +59,36 @@ class ChatContactNoteDaoHibernate
 	@Override
 	public
 	List<ChatContactNoteRec> find (
-			ChatUserRec userChatUser,
-			ChatUserRec monitorChatUser) {
+			@NonNull ChatUserRec userChatUser,
+			@NonNull ChatUserRec monitorChatUser) {
 
 		return findMany (
+			"find (userChatUser, monitorChatUser)",
 			ChatContactNoteRec.class,
 
-			createQuery (
-				"FROM ChatContactNoteRec note " +
-				"WHERE note.user = :userChatUser " +
-					"AND note.monitor = :monitorChatUser " +
-				"ORDER BY " +
-					"note.pegged DESC, " +
-					"note.timestamp")
+			createCriteria (
+				ChatContactNoteRec.class,
+				"_chatContactNote")
 
-			.setEntity (
-				"userChatUser",
-				userChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatContactNote.user",
+					userChatUser))
 
-			.setEntity (
-				"monitorChatUser",
-				monitorChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatContactNote.monitor",
+					monitorChatUser))
 
-			.list ());
+			.addOrder (
+				Order.desc (
+					"_chatContactNote.pegged"))
+
+			.addOrder (
+				Order.asc (
+					"_chatContactNote.timestamp"))
+
+		);
 
 	}
 

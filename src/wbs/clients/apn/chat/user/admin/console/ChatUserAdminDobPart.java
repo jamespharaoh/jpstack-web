@@ -34,8 +34,9 @@ class ChatUserAdminDobPart
 	void prepare () {
 
 		chatUser =
-			chatUserHelper.findOrNull (
-				requestContext.stuffInt ("chatUserId"));
+			chatUserHelper.findRequired (
+				requestContext.stuffInt (
+					"chatUserId"));
 
 	}
 

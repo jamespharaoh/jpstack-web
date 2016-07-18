@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.help.console;
 
+import static wbs.framework.utils.etc.Misc.isPresent;
+
 import javax.inject.Inject;
 
 import lombok.Cleanup;
@@ -65,23 +67,34 @@ class ChatHelpLogPendingFormAction
 		// get params
 
 		String text =
-			requestContext.parameterOrNull ("text");
+			requestContext.parameterRequired (
+				"text");
 
 		boolean ignore =
-			requestContext.parameterOrNull ("ignore") != null;
+			isPresent (
+				requestContext.parameter (
+					"ignore"));
 
 		// check params
 
 		if (! ignore) {
 
 			if (text.length () == 0) {
-				requestContext.addError ("Please type a message");
+
+				requestContext.addError (
+					"Please type a message");
+
 				return null;
+
 			}
 
 			if (! Gsm.isGsm (text)) {
-				requestContext.addError ("Reply contains invalid characters");
+
+				requestContext.addError (
+					"Reply contains invalid characters");
+
 				return null;
+
 			}
 
 			/*
@@ -96,13 +109,15 @@ class ChatHelpLogPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatHelpLogPendingFormAction.goReal ()",
 				this);
 
 		// load objects from database
 
 		ChatHelpLogRec helpRequest =
-			chatHelpLogHelper.findOrNull (
-				requestContext.stuffInt ("chatHelpLogId"));
+			chatHelpLogHelper.findRequired (
+				requestContext.stuffInt (
+					"chatHelpLogId"));
 
 		ChatUserRec chatUser =
 			helpRequest.getChatUser ();

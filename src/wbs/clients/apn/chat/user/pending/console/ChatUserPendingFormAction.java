@@ -119,6 +119,7 @@ class ChatUserPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserPendingFormAction.backupResponder ()",
 				this);
 
 		ChatUserRec chatUser =
@@ -256,6 +257,7 @@ class ChatUserPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserPendingFormAction.goDismiss ()",
 				this);
 
 		ChatUserRec chatUser =
@@ -280,6 +282,7 @@ class ChatUserPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserPendingFormAction.goApproveName ()",
 				this);
 
 		// get database objects
@@ -373,6 +376,7 @@ class ChatUserPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserPendingFormAction.goApproveInfo ()",
 				this);
 
 		// get database objects
@@ -479,6 +483,7 @@ class ChatUserPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserPendingFormAction.goApproveImage",
 				this);
 
 		// get database objects
@@ -627,6 +632,7 @@ class ChatUserPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserPendingFormAction.goRejectName ()",
 				this);
 
 		// get database objects
@@ -725,6 +731,7 @@ class ChatUserPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserPendingFormAction.goRejectInfo ()",
 				this);
 
 		// get database objects
@@ -954,6 +961,7 @@ class ChatUserPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserPendingFormAction.goRejectImage ()",
 				this);
 
 		ChatUserRec chatUser =

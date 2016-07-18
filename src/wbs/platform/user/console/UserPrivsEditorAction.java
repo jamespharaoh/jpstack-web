@@ -72,15 +72,18 @@ class UserPrivsEditorAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"UserPrivsEditorAction.goReal ()",
 				this);
 
 		UserRec user =
-			userHelper.findOrNull (
-				requestContext.stuffInt ("userId"));
+			userHelper.findRequired (
+				requestContext.stuffInt (
+					"userId"));
 
 		Matcher matcher =
 			privDataPattern.matcher (
-				requestContext.parameterOrNull ("privdata"));
+				requestContext.parameterRequired (
+					"privdata"));
 
 		while (matcher.find ()) {
 
@@ -94,7 +97,8 @@ class UserPrivsEditorAction
 				matcher.group (3).equals ("1");
 
 			PrivRec priv =
-				privHelper.findOrNull (privId);
+				privHelper.findRequired (
+					privId);
 
 			UserPrivRec userPriv =
 				userPrivHelper.find (

@@ -70,6 +70,7 @@ class MessageTemplateMessagesGetAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"MessageTemplateMessagesGetAction.handle ()",
 				this);
 
 		// lookup message template stuff

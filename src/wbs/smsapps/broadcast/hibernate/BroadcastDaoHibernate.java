@@ -2,6 +2,9 @@ package wbs.smsapps.broadcast.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.Instant;
 
 import wbs.framework.hibernate.HibernateDao;
@@ -19,42 +22,46 @@ class BroadcastDaoHibernate
 	List<BroadcastRec> findSending () {
 
 		return findMany (
+			"findSending ()",
 			BroadcastRec.class,
 
-			createQuery (
-				"FROM BroadcastRec broadcast " +
-				"WHERE broadcast.state = :broadcastSendingState")
+			createCriteria (
+				BroadcastRec.class,
+				"_broadcast")
 
-			.setParameter (
-				"broadcastSendingState",
-				BroadcastState.sending)
+			.add (
+				Restrictions.eq (
+					"_broadcast.state",
+					BroadcastState.sending))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<BroadcastRec> findScheduled (
-			Instant scheduledTime) {
+			@NonNull Instant scheduledTime) {
 
 		return findMany (
+			"findScheduled (scheduledTime)",
 			BroadcastRec.class,
 
-			createQuery (
-				"FROM BroadcastRec broadcast " +
-				"WHERE broadcast.state = :broadcastScheduledState " +
-					"AND broadcast.scheduledTime <= :scheduledTime")
+			createCriteria (
+				BroadcastRec.class,
+				"_broadcast")
 
-			.setParameter (
-				"broadcastScheduledState",
-				BroadcastState.scheduled)
+			.add (
+				Restrictions.eq (
+					"_broadcast.state",
+					BroadcastState.scheduled))
 
-			.setParameter (
-				"scheduledTime",
-				scheduledTime)
+			.add (
+				Restrictions.le (
+					"_broadcast.scheduledTime",
+					scheduledTime))
 
-			.list ());
+		);
 
 	}
 

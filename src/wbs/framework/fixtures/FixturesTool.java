@@ -113,6 +113,7 @@ class FixturesTool {
 					@Cleanup
 					Transaction transaction =
 						database.beginReadWrite (
+							"FixturesTool.runFixtureProviders (arguments)",
 							this);
 
 					fixtureProvider.createFixtures ();

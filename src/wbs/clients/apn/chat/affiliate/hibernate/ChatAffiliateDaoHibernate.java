@@ -2,6 +2,10 @@ package wbs.clients.apn.chat.affiliate.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateDao;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -17,20 +21,22 @@ class ChatAffiliateDaoHibernate
 	@Override
 	public
 	List<ChatAffiliateRec> find (
-			ChatRec chat) {
+			@NonNull ChatRec chat) {
 
 		return findMany (
+			"find (chat)",
 			ChatAffiliateRec.class,
 
-			createQuery (
-				"FROM ChatAffiliateRec chatAffiliate " +
-				"WHERE chatAffiliate.chat = :chat")
+			createCriteria (
+				ChatAffiliateRec.class,
+				"_chatAffiliate")
 
-			.setEntity (
-				"chat",
-				chat)
+			.add (
+				Restrictions.eq (
+					"_chatAffiliate.chat",
+					chat))
 
-			.list ());
+		);
 
 	}
 

@@ -2,6 +2,10 @@ package wbs.smsapps.orderer.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.orderer.model.OrdererOrderDao;
@@ -16,26 +20,28 @@ class OrdererOrderDaoHibernate
 	@Override
 	public
 	List<OrdererOrderRec> find (
-			OrdererRec orderer,
-			NumberRec number) {
+			@NonNull OrdererRec orderer,
+			@NonNull NumberRec number) {
 
 		return findMany (
+			"find (orderer, number)",
 			OrdererOrderRec.class,
 
-			createQuery (
-				"FROM OrdererOrderRec ordererOrder " +
-				"WHERE ordererOrder.orderer = :orderer " +
-					"AND ordererOrder.number = :number")
+			createCriteria (
+				OrdererOrderRec.class,
+				"_ordererOrder")
 
-			.setEntity (
-				"orderer",
-				orderer)
+			.add (
+				Restrictions.eq (
+					"_ordererOrder.orderer",
+					orderer))
 
-			.setEntity (
-				"number",
-				number)
+			.add (
+				Restrictions.eq (
+					"_ordererOrder.number",
+					number))
 
-			.list ());
+		);
 
 	}
 

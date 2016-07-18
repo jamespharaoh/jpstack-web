@@ -214,6 +214,7 @@ class Oxygen8InboundSmsAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"Oxygen8InboundSmsAction.storeLog ()",
 				this);
 
 		oxygen8InboundLogHelper.insert (
@@ -314,6 +315,7 @@ class Oxygen8InboundSmsAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"Oxygen8InboundSmsAction.updateDatabase ()",
 				this);
 
 		RouteRec route =

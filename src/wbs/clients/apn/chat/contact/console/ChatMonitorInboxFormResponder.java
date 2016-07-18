@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.contact.console;
 
+import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Set;
@@ -8,6 +9,7 @@ import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
@@ -71,11 +73,15 @@ class ChatMonitorInboxFormResponder
 	public
 	void prepare () {
 
-		chatMonitorInbox =
-			chatMonitorInboxHelper.findOrNull (
-				requestContext.stuffInt ("chatMonitorInboxId"));
+		Optional<ChatMonitorInboxRec> chatMonitorInboxOptional =
+			chatMonitorInboxHelper.find (
+				requestContext.stuffInt (
+					"chatMonitorInboxId"));
 
-		if (chatMonitorInbox == null) {
+		if (
+			isNotPresent (
+				chatMonitorInboxOptional)
+		) {
 
 			requestContext.addError (
 				"Chat monitor inbox item not found");
@@ -83,11 +89,15 @@ class ChatMonitorInboxFormResponder
 			log.error (
 				stringFormat (
 					"Chat monitor inbox not found: %d",
-					requestContext.stuffInt ("chatMonitorInboxId")));
+					requestContext.stuffInt (
+						"chatMonitorInboxId")));
 
 			return;
 
 		}
+
+		chatMonitorInbox =
+			chatMonitorInboxOptional.get ();
 
 		userChatUser =
 			chatMonitorInbox.getUserChatUser ();

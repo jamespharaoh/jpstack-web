@@ -1,9 +1,12 @@
 package wbs.framework.hibernate;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -12,6 +15,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.hibernate.Criteria;
@@ -19,11 +24,16 @@ import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import wbs.framework.activitymanager.ActiveTask;
+import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.record.IdObject;
 
 @Log4j
 public abstract
 class HibernateDao {
+
+	@Inject
+	ActivityManager activityManager;
 
 	@Inject
 	HibernateDatabase database;
@@ -118,6 +128,7 @@ class HibernateDao {
 
 	}
 
+	@Deprecated
 	protected
 	Query createQuery (
 			String query) {
@@ -190,10 +201,11 @@ class HibernateDao {
 
 	}
 
+	@Deprecated
 	protected <Record>
 	Record findOne (
-			Class<Record> theClass,
-			List<?> list) {
+			@NonNull Class<Record> theClass,
+			@NonNull List<?> list) {
 
 		if (list.isEmpty ())
 			return null;
@@ -204,9 +216,67 @@ class HibernateDao {
 	}
 
 	protected <Record>
+	Record findOne (
+			@NonNull String methodName,
+			@NonNull Class<Record> theClass,
+			@NonNull Criteria criteria) {
+
+		@Cleanup
+		ActiveTask activeTask =
+			activityManager.start (
+				"hibernate",
+				stringFormat (
+					"%s.%s",
+					getClass ().getSimpleName (),
+					methodName),
+				this);
+
+		// perform the operation
+
+		List<?> objectList =
+			criteria.list ();
+
+		// handle empty list
+
+		if (
+			isEmpty (
+				objectList)
+		) {
+			return null;
+		}
+
+		// handle multiple results error
+
+		if (
+			notEqual (
+				objectList.size (),
+				1)
+		) {
+			shouldNeverHappen ();
+		}
+
+		// check the object type
+
+		if (
+			isNotInstanceOf (
+				theClass,
+				objectList.get (0))
+		) {
+			throw new ClassCastException ();
+		}
+
+		// cast and return
+
+		return theClass.cast (
+			objectList.get (0));
+
+	}
+
+	@Deprecated
+	protected <Record>
 	List<Record> findMany (
-			Class<Record> theClass,
-			List<?> list) {
+			@NonNull Class<Record> theClass,
+			@NonNull List<?> list) {
 
 		@SuppressWarnings ("unchecked")
 		List<Record> ret =
@@ -228,6 +298,56 @@ class HibernateDao {
 		}
 
 		return ret;
+
+	}
+
+	protected <Record>
+	List<Record> findMany (
+			@NonNull String methodName,
+			@NonNull Class<Record> theClass,
+			@NonNull Criteria criteria) {
+
+		@Cleanup
+		ActiveTask activeTask =
+			activityManager.start (
+				"hibernate",
+				stringFormat (
+					"%s.%s",
+					getClass ().getSimpleName (),
+					methodName),
+				this);
+
+		// perform the operation
+
+		List<?> objectList =
+			criteria.list ();
+
+		// check the first object at least is of the right type
+
+		if (
+
+			isNotEmpty (
+				objectList)
+
+			&& isNotInstanceOf (
+				theClass,
+				objectList.get (0))
+
+		) {
+
+			throw new ClassCastException ();
+
+		}
+
+		// forcibly cast the whole list
+
+		@SuppressWarnings ("unchecked")
+		List<Record> recordList =
+			(List<Record>) objectList;
+
+		// and return
+
+		return recordList;
 
 	}
 

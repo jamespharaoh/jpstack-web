@@ -42,7 +42,7 @@ interface ChatMessageDaoMethods {
 
 	// all messages between two users
 
-	List<ChatMessageRec> find (
+	List<ChatMessageRec> findFromTo (
 			ChatUserRec fromChatUser,
 			ChatUserRec toChatUser);
 

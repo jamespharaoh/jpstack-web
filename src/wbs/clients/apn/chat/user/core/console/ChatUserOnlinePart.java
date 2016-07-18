@@ -107,8 +107,9 @@ class ChatUserOnlinePart
 			database.currentTransaction ();
 
 		ChatRec chat =
-			chatHelper.findOrNull (
-				requestContext.stuffInt ("chatId"));
+			chatHelper.findRequired (
+				requestContext.stuffInt (
+					"chatId"));
 
 		users =
 			new TreeSet<ChatUserRec> (

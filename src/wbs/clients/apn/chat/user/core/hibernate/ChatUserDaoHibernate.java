@@ -24,7 +24,6 @@ import org.joda.time.Instant;
 import com.google.common.collect.ImmutableList;
 
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
-import wbs.clients.apn.chat.bill.hibernate.ChatUserCreditModeType;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.category.model.ChatCategoryRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -39,7 +38,6 @@ import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.framework.hibernate.HibernateDao;
-import wbs.framework.hibernate.TimestampWithTimezoneUserType;
 import wbs.sms.number.core.model.NumberRec;
 
 public
@@ -54,50 +52,60 @@ class ChatUserDaoHibernate
 			@NonNull NumberRec number) {
 
 		return findOne (
+			"find (chat, number)",
 			ChatUserRec.class,
 
-			createQuery (
-				"FROM ChatUserRec chatUser " +
-				"WHERE chatUser.chat = :chat " +
-				"AND chatUser.number = :number")
+			createCriteria (
+				ChatUserRec.class,
+				"_chatUser")
 
-			.setEntity (
-				"chat", chat)
+			.add (
+				Restrictions.eq (
+					"_chatUser.chat",
+					chat))
 
-			.setEntity (
-				"number",
-				number)
+			.add (
+				Restrictions.eq (
+					"_chatUser.number",
+					number))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
-	int countOnline (
+	Long countOnline (
 			@NonNull ChatRec chat,
 			@NonNull ChatUserType type) {
 
-		return (int) (long) findOne (
+		return findOne (
+			"countOnline (chat, type)",
 			Long.class,
 
-			createQuery (
-				"SELECT count (*) " +
-				"FROM ChatUserRec cu " +
-				"WHERE cu.chat = :chat " +
-				"AND cu.type = :type " +
-				"AND cu.online = true")
+			createCriteria (
+				ChatUserRec.class,
+				"_chatUser")
 
-			.setEntity (
-				"chat",
-				chat)
+			.add (
+				Restrictions.eq (
+					"_chatUser.chat",
+					chat))
 
-			.setParameter (
-				"type",
-				type,
-				ChatUserTypeType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"_chatUser.type",
+					type))
 
-			.list ());
+			.add (
+				Restrictions.eq (
+					"_chatUser.online",
+					true))
+
+			.setProjection (
+				Projections.rowCount ())
+
+		);
 
 	}
 
@@ -107,32 +115,37 @@ class ChatUserDaoHibernate
 			@NonNull Instant startTime) {
 
 		return findMany (
+			"findWantingBill",
 			ChatUserRec.class,
 
-			createQuery (
-				"FROM ChatUserRec cu " +
-				"WHERE cu.type = :type " +
-				"AND cu.credit < 0 " +
-				"AND cu.creditMode = :creditModeStrict " +
-				"AND cu.lastAction >= :date " +
-				"AND cu.credit + cu.creditRevoked < 0")
+			createCriteria (
+				ChatUserRec.class)
 
-			.setParameter (
-				"type",
-				ChatUserType.user,
-				ChatUserTypeType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"type",
+					ChatUserType.user))
 
-			.setParameter (
-				"creditModeStrict",
-				ChatUserCreditMode.strict,
-				ChatUserCreditModeType.INSTANCE)
+			.add (
+				Restrictions.lt (
+					"credit",
+					0l))
 
-			.setParameter (
-				"date",
-				startTime,
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"creditMode",
+					ChatUserCreditMode.strict))
 
-			.list ());
+			.add (
+				Restrictions.ge (
+					"lastAction",
+					startTime))
+
+			.add (
+				Restrictions.sqlRestriction (
+					"credit + credit_revoked < 0"))
+
+		);
 
 	}
 
@@ -141,6 +154,7 @@ class ChatUserDaoHibernate
 	List<ChatUserRec> findWantingWarning () {
 
 		return findMany (
+			"findWantingWarning",
 			ChatUserRec.class,
 
 			createCriteria (
@@ -169,7 +183,7 @@ class ChatUserDaoHibernate
 					"_chatUser.valueSinceWarning",
 					"_chatSchemeCharges.spendWarningEvery"))
 
-			.list ());
+		);
 
 	}
 
@@ -180,44 +194,51 @@ class ChatUserDaoHibernate
 			int maxResults) {
 
 		return findMany (
+			"findAdultExpiryLimit",
 			ChatUserRec.class,
 
-			createQuery (
-				"FROM ChatUserRec cu " +
-				"WHERE cu.adultExpiry < :now")
+			createCriteria (
+				ChatUserRec.class)
 
-			.setParameter (
-				"now",
-				now,
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.lt (
+					"adultExpiry",
+					now))
 
 			.setMaxResults (
 				maxResults)
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatUserRec> findOnline (
-			ChatUserType type) {
+			@NonNull ChatUserType type) {
 
 		return findMany (
+			"findOnline",
 			ChatUserRec.class,
 
-			createQuery (
-				"FROM ChatUserRec cu " +
-				"WHERE cu.online = true " +
-					"AND cu.type = :type " +
-				"ORDER BY cu.lastAction DESC")
+			createCriteria (
+				ChatUserRec.class)
 
-			.setParameter (
-				"type",
-				type,
-				ChatUserTypeType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"online",
+					true))
 
-			.list ());
+			.add (
+				Restrictions.eq (
+					"type",
+					type))
+
+			.addOrder (
+				Order.desc (
+					"lastAction"))
+
+		);
 
 	}
 
@@ -255,113 +276,120 @@ class ChatUserDaoHibernate
 				"_chatUser.lastAction"));
 
 		return findMany (
+			"findOnlineOrMonitorCategory",
 			ChatUserRec.class,
-			criteria.list ());
+			criteria);
 
 	}
 
 	@Override
 	public
 	List<ChatUserRec> find (
-			ChatRec chat,
-			ChatUserType type,
-			Orient orient,
-			Gender gender) {
+			@NonNull ChatRec chat,
+			@NonNull ChatUserType type,
+			@NonNull Orient orient,
+			@NonNull Gender gender) {
 
 		return findMany (
+			"find (chat, type, orient, gender)",
 			ChatUserRec.class,
 
-			createQuery (
-				"FROM ChatUserRec cu " +
-				"WHERE cu.chat = :chat " +
-				"AND cu.type = :type " +
-				"AND cu.orient = :orient " +
-				"AND cu.gender = :gender")
+			createCriteria (
+				ChatUserRec.class)
 
-			.setEntity (
-				"chat",
-				chat)
+			.add (
+				Restrictions.eq (
+					"chat",
+					chat))
 
-			.setParameter (
-				"type",
-				type,
-				ChatUserTypeType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"type",
+					type))
 
-			.setParameter (
-				"orient",
-				orient,
-				OrientType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"orient",
+					orient))
 
-			.setParameter (
-				"gender",
-				gender,
-				GenderType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"gender",
+					gender))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatUserRec> findWantingJoinOutbound (
-			Instant now) {
+			@NonNull Instant now) {
 
 		return findMany (
+			"findWantingJoinOutbound (now)",
 			ChatUserRec.class,
 
-			createQuery (
-				"FROM ChatUserRec cu " +
-				"WHERE cu.nextJoinOutbound <= :now")
+			createCriteria (
+				ChatUserRec.class)
 
-			.setParameter (
-				"now",
-				now,
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.le (
+					"nextJoinOutbound",
+					now))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatUserRec> findWantingAdultAd (
-			Instant now) {
+			@NonNull Instant now) {
 
 		return findMany (
+			"findWantingAdultAdd (now)",
 			ChatUserRec.class,
 
-			createQuery (
-				"FROM ChatUserRec cu " +
-				"WHERE cu.nextAdultAd < :now ")
+			createCriteria (
+				ChatUserRec.class)
 
-			.setParameter (
-				"now",
-				now,
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.lt (
+					"nextAdultAd",
+					now))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatUserRec> findOnline (
-			ChatRec chat) {
+			@NonNull ChatRec chat) {
 
 		return findMany (
+			"findOnline (chat)",
 			ChatUserRec.class,
 
-			createQuery (
-				"FROM ChatUserRec cu " +
-				"WHERE cu.chat = :chat " +
-					"AND cu.online = true " +
-				"ORDER BY cu.lastAction DESC")
+			createCriteria (
+				ChatUserRec.class)
 
-			.setEntity (
-				"chat",
-				chat)
+			.add (
+				Restrictions.eq (
+					"chat",
+					chat))
 
-			.list ());
+			.add (
+				Restrictions.eq (
+					"online",
+					true))
+
+			.addOrder (
+				Order.desc (
+					"lastAction"))
+
+		);
 
 	}
 
@@ -899,8 +927,9 @@ class ChatUserDaoHibernate
 		}
 
 		return findMany (
+			"searchIds (searchMap)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 
@@ -1294,99 +1323,110 @@ class ChatUserDaoHibernate
 			Projections.id ());
 
 		return findMany (
+			"searchIds (search)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 
 	@Override
 	public
 	List<ChatUserRec> find (
-			ChatAffiliateRec chatAffiliate) {
+			@NonNull ChatAffiliateRec chatAffiliate) {
 
 		return findMany (
+			"find (chatAffiliate)",
 			ChatUserRec.class,
 
-			createQuery (
-				"FROM ChatUserRec cu " +
-				"WHERE cu.chatAffiliate = :chatAffiliate")
+			createCriteria (
+				ChatUserRec.class)
 
-			.setEntity (
-				"chatAffiliate",
-				chatAffiliate)
+			.add (
+				Restrictions.eq (
+					"chatAffiliate",
+					chatAffiliate))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatUserRec> findDating (
-			ChatRec chat) {
+			@NonNull ChatRec chat) {
 
 		return findMany (
+			"findDating (chat)",
 			ChatUserRec.class,
 
-			createQuery (
-				"FROM ChatUserRec cu " +
-				"WHERE cu.dateMode != :dateModeNone " +
-					"AND cu.gender IS NOT NULL " +
-					"AND cu.orient IS NOT NULL " +
-					"AND cu.locationLongLat IS NOT NULL " +
-					"AND cu.chat = :chat")
+			createCriteria (
+				ChatUserRec.class)
 
-			.setParameter (
-				"dateModeNone",
-				ChatUserDateMode.none,
-				ChatUserDateModeType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"chat",
+					chat))
 
-			.setEntity (
-				"chat",
-				chat)
+			.add (
+				Restrictions.eq (
+					"dateMode",
+					ChatUserDateMode.none))
 
-			.list ());
+			.add (
+				Restrictions.isNotNull (
+					"gender"))
+
+			.add (
+				Restrictions.isNotNull (
+					"orient"))
+
+			.add (
+				Restrictions.isNotNull (
+					"locationLongLat"))
+
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatUserRec> findWantingAd (
-			Instant now) {
+			@NonNull Instant now) {
 
 		return findMany (
+			"findWantingAd (now)",
 			ChatUserRec.class,
 
-			createQuery (
-				"FROM ChatUserRec chatUser " +
-				"WHERE chatUser.nextAd < :now ")
+			createCriteria (
+				ChatUserRec.class)
 
-			.setParameter (
-				"now",
-				now,
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.lt (
+					"nextAd",
+					now))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<ChatUserRec> findWantingQuietOutbound (
-			Instant now) {
+			@NonNull Instant now) {
 
 		return findMany (
+			"findWantingQuietOutbound",
 			ChatUserRec.class,
 
-			createQuery (
-				"FROM ChatUserRec cu " +
-				"WHERE cu.nextQuietOutbound <= :now")
+			createCriteria (
+				ChatUserRec.class)
 
-			.setParameter (
-				"now",
-				now,
-				TimestampWithTimezoneUserType.INSTANCE)
+			.add (
+				Restrictions.le (
+					"nextQuietOutbound",
+					now))
 
-			.list ());
+		);
 
 	}
 

@@ -45,6 +45,8 @@ import lombok.extern.log4j.Log4j;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import wbs.framework.activitymanager.ActiveTask;
+import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.application.context.NoSuchBeanException;
@@ -68,6 +70,11 @@ import wbs.framework.record.UnsavedRecordDetector;
 public
 class ObjectHelperBuilder {
 
+	// dependencies
+
+	@Inject
+	ActivityManager activityManager;
+
 	@Inject
 	ApplicationContext applicationContext;
 
@@ -79,6 +86,8 @@ class ObjectHelperBuilder {
 
 	@Inject
 	ObjectHelperProviderManager objectHelperProviderManager;
+
+	// state
 
 	List<ObjectHelper<?>> list =
 		new ArrayList<ObjectHelper<?>> ();
@@ -113,7 +122,16 @@ class ObjectHelperBuilder {
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ObjectHelperBuilder.init ()",
 				this);
+
+		Map<String,ObjectTypeEntry> objectTypesByCode =
+			objectTypeRegistry.findAll ().stream ()
+
+			.collect (
+				Collectors.toMap (
+					objectType -> objectType.getCode (),
+					objectType -> objectType));
 
 		for (
 			ObjectHelperProvider objectHelperProvider
@@ -122,8 +140,14 @@ class ObjectHelperBuilder {
 
 			ObjectHelper<?> objectHelper =
 				new Builder ()
-					.objectHelperProvider (objectHelperProvider)
-					.build ();
+
+				.objectTypesByCode (
+					objectTypesByCode)
+
+				.objectHelperProvider (
+					objectHelperProvider)
+
+				.build ();
 
 			log.debug (
 				stringFormat (
@@ -289,6 +313,9 @@ class ObjectHelperBuilder {
 	class Builder {
 
 		@Getter @Setter
+		Map<String,ObjectTypeEntry> objectTypesByCode;
+
+		@Getter @Setter
 		ObjectHelperProvider objectHelperProvider;
 
 		Model model;
@@ -318,11 +345,20 @@ class ObjectHelperBuilder {
 		public
 		ObjectHelper<?> build () {
 
+			@Cleanup
+			ActiveTask activeTask =
+				activityManager.start (
+					"function",
+					stringFormat (
+						"%sObjectHelperBuilder.build ()",
+						objectHelperProvider.model ().objectName ()),
+					this);
+
 			model =
 				objectHelperProvider.model ();
 
 			ObjectTypeEntry objectType =
-				objectTypeRegistry.findByCode (
+				objectTypesByCode.get (
 					objectHelperProvider.objectTypeCode ());
 
 			objectTypeCode =
@@ -351,7 +387,7 @@ class ObjectHelperBuilder {
 				}
 
 				ObjectTypeEntry parentType =
-					objectTypeRegistry.findByCode (
+					objectTypesByCode.get (
 						parentHelperProvider.objectTypeCode ());
 
 				parentTypeCode =
@@ -385,7 +421,8 @@ class ObjectHelperBuilder {
 					stringFormat (
 						"%s.%sObjectHelperMethods",
 						objectHelperProvider.objectClass ().getPackage ().getName (),
-						capitalise (objectHelperProvider.objectName ()));
+						capitalise (
+							objectHelperProvider.objectName ()));
 
 				extraInterface =
 					Class.forName (
@@ -535,7 +572,6 @@ class ObjectHelperBuilder {
 			public
 			Class<?> objectClass () {
 				return objectHelperProvider.objectClass ();
-
 			}
 
 			@Override

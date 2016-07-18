@@ -126,6 +126,7 @@ class ChatAdDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ChatAdDaemon.runOnce ()",
 				this);
 
 		List<ChatUserRec> chatUsers =
@@ -173,12 +174,13 @@ class ChatAdDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatAdDaemon.doChatUserAd",
 				this);
 
 		// find the user
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				chatUserId);
 
 		ChatRec chat =

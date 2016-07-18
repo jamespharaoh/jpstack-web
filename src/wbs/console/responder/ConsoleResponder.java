@@ -51,6 +51,7 @@ class ConsoleResponder
 		try (
 			Transaction transaction =
 				database.beginReadOnly (
+					"ConsoleResponder.execute ()",
 					this)
 		) {
 

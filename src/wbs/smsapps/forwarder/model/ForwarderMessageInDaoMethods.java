@@ -11,7 +11,7 @@ interface ForwarderMessageInDaoMethods {
 			Instant now,
 			ForwarderRec forwarder);
 
-	List<ForwarderMessageInRec> findNexts (
+	List<ForwarderMessageInRec> findNextLimit (
 			Instant now,
 			int maxResults);
 

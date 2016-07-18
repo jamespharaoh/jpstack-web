@@ -243,7 +243,7 @@ class SubscriptionSendHelper
 				batchHelper.createInstance ()
 
 			.setParentType (
-				objectTypeHelper.findOrNull (
+				objectTypeHelper.findRequired (
 					subscriptionSendHelper.objectTypeId ()))
 
 			.setParentId (

@@ -11,4 +11,8 @@ interface ActiveTask {
 	ExceptionType fail (
 			ExceptionType exception);
 
+	ActiveTask put (
+			String key,
+			String value);
+
 }

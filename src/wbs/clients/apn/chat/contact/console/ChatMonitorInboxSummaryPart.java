@@ -875,13 +875,13 @@ class ChatMonitorInboxSummaryPart
 			" name=\"alarmTime\"",
 			" size=\"10\"",
 			" value=\"%h\"",
-			requestContext.parameterOrNull ("alarmTime") != null
-				? requestContext.parameterOrNull ("alarmTime")
-				: timeFormatter.timeString (
+			requestContext.parameterOrElse (
+				"alarmTime",
+				() -> timeFormatter.timeString (
 					chatTimezone,
 					alarm == null
 						? now
-						: alarm.getAlarmTime ()),
+						: alarm.getAlarmTime ())),
 			">\n");
 
 		printFormat (

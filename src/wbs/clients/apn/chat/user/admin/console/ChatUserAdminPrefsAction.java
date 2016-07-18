@@ -62,17 +62,20 @@ class ChatUserAdminPrefsAction
 		// get stuff
 
 		int chatUserId =
-			requestContext.stuffInt ("chatUserId");
+			requestContext.stuffInt (
+				"chatUserId");
 
 		// get params
 
 		String genderParam =
 			nullIfEmptyString (
-				requestContext.parameterOrNull ("gender"));
+				requestContext.parameterRequired (
+					"gender"));
 
 		String orientParam =
 			nullIfEmptyString (
-				requestContext.parameterOrNull ("orient"));
+				requestContext.parameterRequired (
+					"orient"));
 
 		// check params
 
@@ -88,12 +91,13 @@ class ChatUserAdminPrefsAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatUserAdminPrefsAction.goReal ()",
 				this);
 
 		// lookup database stuff
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				chatUserId);
 
 		// check changes

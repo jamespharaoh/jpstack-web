@@ -852,6 +852,17 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
+	String stuffString (
+			@NonNull String key) {
+
+		return (String)
+			contextStuff ().get (
+				key);
+
+	}
+
+	@Override
+	public
 	boolean canContext (
 			@NonNull String... privKeys) {
 

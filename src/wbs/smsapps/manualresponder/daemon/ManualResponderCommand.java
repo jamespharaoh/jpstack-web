@@ -34,7 +34,6 @@ import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.TimeFormatter;
-import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;

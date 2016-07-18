@@ -79,6 +79,7 @@ class ImChatCustomerCreditAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ImChatCustomerCreditAction.goReal ()",
 				this);
 
 		// process form fields
@@ -101,7 +102,7 @@ class ImChatCustomerCreditAction
 		);
 
 		request.customer (
-			imChatCustomerHelper.findOrNull (
+			imChatCustomerHelper.findRequired (
 				requestContext.stuffInt (
 					"imChatCustomerId")));
 

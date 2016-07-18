@@ -126,6 +126,7 @@ class ChatStatsDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ChatStatsDaemon.doStats (timestamp)",
 				this);
 
 		List<ChatRec> chats =
@@ -151,6 +152,7 @@ class ChatStatsDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatStatsDaemon.doStats (timestamp, chatId)",
 				this);
 
 		ChatRec chat =

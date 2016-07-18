@@ -1,5 +1,9 @@
 package wbs.clients.apn.chat.contact.hibernate;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxDao;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -13,26 +17,28 @@ class ChatMonitorInboxDaoHibernate
 	@Override
 	public
 	ChatMonitorInboxRec find (
-			ChatUserRec monitorChatUser,
-			ChatUserRec userChatUser) {
+			@NonNull ChatUserRec monitorChatUser,
+			@NonNull ChatUserRec userChatUser) {
 
 		return findOne (
+			"find (monitorChatUser, userChatUser)",
 			ChatMonitorInboxRec.class,
 
-			createQuery (
-				"FROM ChatMonitorInboxRec cmi " +
-				"WHERE cmi.monitorChatUser = :monitorChatUser " +
-					"AND cmi.userChatUser = :userChatUser")
+			createCriteria (
+				ChatMonitorInboxRec.class,
+				"_chatMonitorInbox")
 
-			.setEntity (
-				"monitorChatUser",
-				monitorChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatMonitorInbox.monitorChatUser",
+					monitorChatUser))
 
-			.setEntity (
-				"userChatUser",
-				userChatUser)
+			.add (
+				Restrictions.eq (
+					"_chatMonitorInbox.userChatUser",
+					userChatUser))
 
-			.list ());
+		);
 
 	}
 

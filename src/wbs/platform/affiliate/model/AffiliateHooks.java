@@ -1,13 +1,17 @@
 package wbs.platform.affiliate.model;
 
-import java.util.HashSet;
+import static wbs.framework.utils.etc.Misc.doesNotContain;
+
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -34,8 +38,8 @@ class AffiliateHooks
 
 	// state
 
-	Set<Integer> parentObjectTypeIds =
-		new HashSet<Integer> ();
+	Map<Long,List<Long>> affiliateTypeIdsByParentTypeId =
+		new HashMap<> ();
 
 	// lifecycle
 
@@ -46,27 +50,20 @@ class AffiliateHooks
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"AffiliateHooks.init ()",
 				this);
 
-		List<ObjectTypeRec> objectTypes =
-			objectTypeDao.findAll ();
+		affiliateTypeIdsByParentTypeId =
+			affiliateTypeDao.findAll ().stream ()
 
-		for (
-			ObjectTypeRec objectType
-				: objectTypes
-		) {
-
-			List<AffiliateTypeRec> affiliateTypes =
-				affiliateTypeDao.findByParentObjectType (
-					objectType);
-
-			if (affiliateTypes.isEmpty ())
-				continue;
-
-			parentObjectTypeIds.add (
-				objectType.getId ());
-
-		}
+			.collect (
+				Collectors.groupingBy (
+					affiliateType -> (long)
+						affiliateType.getParentType ().getId (),
+					Collectors.mapping (
+						affiliateType -> (long)
+							affiliateType.getId (),
+						Collectors.toList ())));
 
 	}
 
@@ -75,13 +72,14 @@ class AffiliateHooks
 	@Override
 	public
 	void createSingletons (
-			ObjectHelper<AffiliateRec> affiliateHelper,
-			ObjectHelper<?> parentHelper,
-			Record<?> parentObject) {
+			@NonNull ObjectHelper<AffiliateRec> affiliateHelper,
+			@NonNull ObjectHelper<?> parentHelper,
+			@NonNull Record<?> parent) {
 
 		if (
-			! parentObjectTypeIds.contains (
-				parentHelper.objectTypeId ())
+			doesNotContain (
+				affiliateTypeIdsByParentTypeId.keySet (),
+				(long) parentHelper.objectTypeId ())
 		) {
 			return;
 		}
@@ -90,14 +88,15 @@ class AffiliateHooks
 			objectTypeDao.findById (
 				parentHelper.objectTypeId ());
 
-		List<AffiliateTypeRec> affiliateTypes =
-			affiliateTypeDao.findByParentObjectType (
-				parentType);
-
 		for (
-			AffiliateTypeRec affiliateType
-				: affiliateTypes
+			Long affiliateTypeId
+				: affiliateTypeIdsByParentTypeId.get (
+					(long) parentHelper.objectTypeId ())
 		) {
+
+			AffiliateTypeRec affiliateType =
+				affiliateTypeDao.findRequired (
+					affiliateTypeId);
 
 			affiliateHelper.insert (
 				affiliateHelper.createInstance ()
@@ -115,7 +114,7 @@ class AffiliateHooks
 					parentType)
 
 				.setParentId (
-					parentObject.getId ())
+					parent.getId ())
 
 			);
 

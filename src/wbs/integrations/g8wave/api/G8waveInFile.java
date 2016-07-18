@@ -70,6 +70,7 @@ class G8waveInFile
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"G8waveInFile.doPost ()",
 				this);
 
 		// get request stuff
@@ -127,12 +128,14 @@ class G8waveInFile
 		// load the stuff
 
 		RouteRec route =
-			routeHelper.findOrNull (routeId);
+			routeHelper.findRequired (
+				routeId);
 
 		NetworkRec network =
 			networkId == null
 				? null
-				: networkHelper.findOrNull (networkId);
+				: networkHelper.findRequired (
+					networkId);
 
 		// insert the message
 

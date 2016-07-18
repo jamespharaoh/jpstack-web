@@ -81,10 +81,11 @@ class ChatCreditDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ChatCreditDaemon.doUserCredit (chatUserId)",
 				this);
 
 		ChatUserRec chatUser =
-			chatUserHelper.findOrNull (
+			chatUserHelper.findRequired (
 				chatUserId);
 
 		chatCreditLogic.userBill (
@@ -105,6 +106,7 @@ class ChatCreditDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"ChatCreditDaemon.runOnce ()",
 				this);
 
 		Instant threeMonthsAgo =

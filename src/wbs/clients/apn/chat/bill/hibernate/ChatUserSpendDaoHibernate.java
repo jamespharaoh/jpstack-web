@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.bill.hibernate;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.LocalDate;
 
@@ -16,10 +18,11 @@ class ChatUserSpendDaoHibernate
 	@Override
 	public
 	ChatUserSpendRec findByDate (
-			ChatUserRec chatUser,
-			LocalDate date) {
+			@NonNull ChatUserRec chatUser,
+			@NonNull LocalDate date) {
 
 		return findOne (
+			"findByDate (chatUser, date)",
 			ChatUserSpendRec.class,
 
 			createCriteria (
@@ -35,7 +38,7 @@ class ChatUserSpendDaoHibernate
 					"date",
 					date))
 
-			.list ());
+		);
 
 	}
 
