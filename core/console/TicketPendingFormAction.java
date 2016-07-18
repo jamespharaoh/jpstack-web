@@ -1,7 +1,6 @@
 package wbs.services.ticket.core.console;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.toInteger;
 
 import javax.inject.Inject;
 
@@ -73,12 +72,13 @@ class TicketPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"TicketPendingFormAction.goReal ()",
 				this);
 
 		// find message
 
 		TicketRec ticket =
-			ticketHelper.findOrNull (
+			ticketHelper.findRequired (
 				requestContext.stuffInt (
 					"ticketId"));
 
@@ -89,19 +89,14 @@ class TicketPendingFormAction
 
 		// select template
 
-		String templateString =
-			requestContext.parameterOrNull ("template");
-
 		TicketTemplateRec template;
 
 		// action to be performed
 
 		template =
-			ticketTemplateHelper.findOrNull (
-				toInteger (templateString));
-
-		if (template == null)
-			throw new RuntimeException ();
+			ticketTemplateHelper.findRequired (
+				requestContext.parameterInteger (
+					"template"));
 
 		// remove old queue item
 
@@ -117,7 +112,7 @@ class TicketPendingFormAction
 		// update ticket timestamp
 
 		String timpestampString =
-			requestContext.parameterOrNull (
+			requestContext.parameterRequired (
 				stringFormat (
 					"timestamp-%s",
 					template.getTicketState ().getId ()));
@@ -157,10 +152,10 @@ class TicketPendingFormAction
 		// check if a new note was added
 
 		String noteText =
-			requestContext.parameterOrNull (
+			requestContext.parameterRequired (
 				"note-text");
 
-		if (!noteText.isEmpty()) {
+		if (! noteText.isEmpty ()) {
 
 			ticketNoteHelper.insert (
 				ticketNoteHelper.createInstance ()
@@ -178,8 +173,9 @@ class TicketPendingFormAction
 			);
 
 			ticket
-			.setNumNotes (
-				ticket.getNumNotes () + 1);
+
+				.setNumNotes (
+					ticket.getNumNotes () + 1);
 
 		}
 

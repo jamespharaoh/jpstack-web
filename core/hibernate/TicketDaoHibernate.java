@@ -2,6 +2,8 @@ package wbs.services.ticket.core.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -20,10 +22,11 @@ class TicketDaoHibernate
 	@Override
 	public
 	TicketFieldValueRec findTicketFieldValue (
-			TicketRec ticket,
-			TicketFieldTypeRec ticketFieldType) {
+			@NonNull TicketRec ticket,
+			@NonNull TicketFieldTypeRec ticketFieldType) {
 
 		return findOne (
+			"findTicketFieldValue (ticket, ticketFieldType)",
 			TicketFieldValueRec.class,
 
 			createCriteria (
@@ -40,7 +43,7 @@ class TicketDaoHibernate
 					"_ticketFieldValue.ticketFieldType",
 					ticketFieldType))
 
-			.list ());
+		);
 
 	}
 
@@ -49,14 +52,20 @@ class TicketDaoHibernate
 	List<TicketRec> findUnqueuedTickets () {
 
 		return findMany (
+			"findUnqueuedTickets ()",
+			TicketRec.class,
+
+			createCriteria (
 				TicketRec.class,
+				"_ticket")
 
-				createQuery (
-					"FROM TicketRec" +
-					" WHERE queued = 'false'")
+			.add (
+				Restrictions.eq (
+					"_ticket.queued",
+					false))
 
-				.list ());
+		);
 
-		}
+	}
 
 }
