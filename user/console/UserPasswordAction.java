@@ -60,20 +60,23 @@ class UserPasswordAction
 	Responder goReal () {
 
 		String password1 =
-			requestContext.parameterOrNull ("password_1");
+			requestContext.parameterRequired (
+				"password_1");
 
 		String password2 =
-			requestContext.parameterOrNull ("password_2");
+			requestContext.parameterRequired (
+				"password_2");
 
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"UserPasswordAction.goReal ()",
 				this);
 
 		// load user
 
 		UserRec user =
-			userHelper.findOrNull (
+			userHelper.findRequired (
 				requestContext.stuffInt (
 					"userId"));
 

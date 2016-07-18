@@ -51,7 +51,7 @@ class UserPrivsSummaryPart
 			new HashMap<Integer,PrivStuff> ();
 
 		UserRec user =
-			userHelper.findOrNull (
+			userHelper.findRequired (
 				requestContext.stuffInt (
 					"userId"));
 

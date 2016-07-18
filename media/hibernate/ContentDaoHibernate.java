@@ -2,6 +2,8 @@ package wbs.platform.media.hibernate;
 
 import java.util.List;
 
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.media.model.ContentDao;
 import wbs.platform.media.model.ContentRec;
@@ -17,17 +19,19 @@ class ContentDaoHibernate
 			int hash) {
 
 		return findMany (
+			"findByHash (hash)",
 			ContentRec.class,
 
-			createQuery (
-				"FROM ContentRec content " +
-				"WHERE content.hash = :hash")
+			createCriteria (
+				ContentRec.class,
+				"_content")
 
-			.setInteger (
-				"hash",
-				hash)
+			.add (
+				Restrictions.eq (
+					"_content.hash",
+					hash))
 
-			.list ());
+		);
 
 	}
 

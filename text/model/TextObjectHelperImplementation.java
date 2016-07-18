@@ -96,7 +96,7 @@ class TextObjectHelperImplementation
 		) {
 
 			text =
-				textHelper.findByText (
+				textHelper.findByTextNoFlush (
 					stringValue);
 
 			if (text != null) {

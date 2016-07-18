@@ -2,6 +2,8 @@ package wbs.platform.exception.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -25,14 +27,22 @@ class ExceptionLogDaoHibernate
 	int countWithAlert () {
 
 		return (int) (long) findOne (
+			"countWithAlert ()",
 			Long.class,
 
-			createQuery (
-				"SELECT count (*) " +
-				"FROM ExceptionLogRec AS e " +
-				"WHERE e.alert = true")
+			createCriteria (
+				ExceptionLogRec.class,
+				"_exceptionLog")
 
-			.list ());
+			.add (
+				Restrictions.eq (
+					"_exceptionLog.alert",
+					true))
+
+			.setProjection (
+				Projections.rowCount ())
+
+		);
 
 	}
 
@@ -41,15 +51,27 @@ class ExceptionLogDaoHibernate
 	int countWithAlertAndFatal () {
 
 		return (int) (long) findOne (
+			"countWithAlertAndFatal ()",
 			Long.class,
 
-			createQuery (
-				"SELECT count (*) " +
-				"FROM ExceptionLogRec AS exception " +
-				"WHERE exception.alert = true " +
-				"AND exception.fatal = true")
+			createCriteria (
+				ExceptionLogRec.class,
+				"_exceptionLog")
 
-			.list ());
+			.add (
+				Restrictions.eq (
+					"_exceptionLog.alert",
+					true))
+
+			.add (
+				Restrictions.eq (
+					"_exceptionLog.fatal",
+					true))
+
+			.setProjection (
+				Projections.rowCount ())
+
+		);
 
 	}
 
@@ -139,18 +161,20 @@ class ExceptionLogDaoHibernate
 			Projections.id ());
 
 		return findMany (
+			"searchIds (search)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 
 	@Override
 	public
 	List<ExceptionLogRec> findOldLimit (
-			Instant cutoffTime,
+			@NonNull Instant cutoffTime,
 			int maxResults) {
 
 		return findMany (
+			"findOldLimit (cutoffTime, maxResults)",
 			ExceptionLogRec.class,
 
 			createCriteria (
@@ -168,8 +192,6 @@ class ExceptionLogDaoHibernate
 
 			.setMaxResults (
 				maxResults)
-
-			.list ()
 
 		);
 

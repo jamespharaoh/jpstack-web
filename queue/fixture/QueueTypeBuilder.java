@@ -109,6 +109,7 @@ class QueueTypeBuilder {
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"QueueTypeBuilder.createQueueType ()",
 				this);
 
 		// lookup parent type

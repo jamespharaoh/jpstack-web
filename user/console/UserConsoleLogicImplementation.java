@@ -67,9 +67,8 @@ class UserConsoleLogicImplementation
 	public
 	UserRec userRequired () {
 
-		return requiredValue (
-			userHelper.findOrNull (
-				userIdRequired ()));
+		return userHelper.findRequired (
+			userIdRequired ());
 
 	}
 

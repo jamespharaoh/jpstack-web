@@ -2,6 +2,10 @@ package wbs.platform.object.core.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.framework.object.ObjectTypeRegistry;
@@ -32,27 +36,25 @@ class ObjectTypeDaoHibernate
 	@Override
 	public
 	ObjectTypeRec findByCode (
-			String code) {
+			@NonNull String code) {
 
-		List<?> list =
-			createQuery (
-				"FROM ObjectTypeRec dot " +
-				"WHERE dot.code = :code")
+		return findOne (
+			"findByCode (code)",
+			ObjectTypeRec.class,
 
-			.setString (
-				"code",
-				code)
+			createCriteria (
+				ObjectTypeRec.class,
+				"_objectType")
+
+			.add (
+				Restrictions.eq (
+					"_objectType.code",
+					code))
 
 			.setCacheable (
 				true)
 
-			.list ();
-
-		if (list.isEmpty ())
-			return null;
-
-		return (ObjectTypeRec)
-			list.get (0);
+		);
 
 	}
 
@@ -61,12 +63,13 @@ class ObjectTypeDaoHibernate
 	List<ObjectTypeRec> findAll () {
 
 		return findMany (
+			"findAll ()",
 			ObjectTypeRec.class,
 
-			createQuery (
-				"FROM ObjectTypeRec")
+			createCriteria (
+				ObjectTypeRec.class)
 
-			.list ());
+		);
 
 	}
 

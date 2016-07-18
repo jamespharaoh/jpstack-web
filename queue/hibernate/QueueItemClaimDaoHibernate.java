@@ -2,6 +2,10 @@ package wbs.platform.queue.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.queue.model.QueueItemClaimDaoMethods;
 import wbs.platform.queue.model.QueueItemClaimRec;
@@ -18,44 +22,44 @@ class QueueItemClaimDaoHibernate
 	List<QueueItemClaimRec> findClaimed () {
 
 		return findMany (
+			"findClaimed ()",
 			QueueItemClaimRec.class,
 
-			createQuery (
-				"FROM QueueItemClaimRec queueItemClaim " +
-				"WHERE queueItemClaim.status = :claimedStatus")
+			createCriteria (
+				QueueItemClaimRec.class)
 
-			.setParameter (
-				"claimedStatus",
-				QueueItemClaimStatus.claimed,
-				QueueItemClaimStatusType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"status",
+					QueueItemClaimStatus.claimed))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<QueueItemClaimRec> findClaimed (
-			UserRec user) {
+			@NonNull UserRec user) {
 
 		return findMany (
+			"findClaimed (user)",
 			QueueItemClaimRec.class,
 
-			createQuery (
-				"FROM QueueItemClaimRec queueItemClaim " +
-				"WHERE queueItemClaim.user = :user " +
-					"AND queueItemClaim.status = :claimedStatus")
+			createCriteria (
+				QueueItemClaimRec.class)
 
-			.setEntity (
-				"user",
-				user)
+			.add (
+				Restrictions.eq (
+					"user",
+					user))
 
-			.setParameter (
-				"claimedStatus",
-				QueueItemClaimStatus.claimed,
-				QueueItemClaimStatusType.INSTANCE)
+			.add (
+				Restrictions.eq (
+					"status",
+					QueueItemClaimStatus.claimed))
 
-			.list ());
+		);
 
 	}
 

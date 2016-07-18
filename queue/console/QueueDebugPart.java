@@ -3,6 +3,7 @@ package wbs.platform.queue.console;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.optionalOrNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -102,8 +103,9 @@ class QueueDebugPart
 			queueSubjectSorterProvider.get ()
 
 			.effectiveUser (
-				userHelper.findOrNull (
-					form.userId ()))
+				optionalOrNull (
+					userHelper.find (
+						form.userId ())))
 
 			.sort ();
 
@@ -174,7 +176,7 @@ class QueueDebugPart
 					queueInfo.queue ());
 
 			ObjectTypeRec queueParentType =
-				objectTypeHelper.findOrNull (
+				objectTypeHelper.findRequired (
 					objectManager.getObjectTypeId (
 						queueParent));
 

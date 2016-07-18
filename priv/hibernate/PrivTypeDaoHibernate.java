@@ -2,8 +2,9 @@ package wbs.platform.priv.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import wbs.framework.hibernate.HibernateDao;
-import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.priv.model.PrivTypeDao;
 import wbs.platform.priv.model.PrivTypeRec;
 
@@ -14,21 +15,27 @@ class PrivTypeDaoHibernate
 
 	@Override
 	public
-	List<PrivTypeRec> findByParentObjectType (
-			ObjectTypeRec parentObjectType) {
+	List<PrivTypeRec> findAll () {
 
 		return findMany (
+			"findAll ()",
 			PrivTypeRec.class,
 
-			createQuery (
-				"FROM PrivTypeRec privType " +
-				"WHERE privType.parentObjectType = :parentObjectType")
+			createCriteria (
+				PrivTypeRec.class)
 
-			.setEntity (
-				"parentObjectType",
-				parentObjectType)
+		);
 
-			.list ());
+	}
+
+	@Override
+	public
+	PrivTypeRec findRequired (
+			@NonNull Long privTypeId) {
+
+		return get (
+			PrivTypeRec.class,
+			(int) (long) privTypeId);
 
 	}
 

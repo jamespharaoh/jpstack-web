@@ -76,6 +76,7 @@ class ExceptionLogRemovalDaemon
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
+					"ExceptionLogRemovalDaemon.runOnce ()",
 					this);
 
 			Instant cutoffTime =

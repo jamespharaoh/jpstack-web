@@ -160,34 +160,37 @@ class QueueItemDaoHibernate
 			Projections.id ());
 
 		return findMany (
+			"searchIds (search)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 
 	@Override
 	public
 	QueueItemRec findByIndex (
-			QueueSubjectRec queueSubject,
+			@NonNull QueueSubjectRec queueSubject,
 			int index) {
 
 		return findOne (
+			"findByIndex (queueSubject, index)",
 			QueueItemRec.class,
 
-			createQuery (
-				"FROM QueueItemRec queueItem " +
-				"WHERE queueItem.queueSubject = :queueSubject " +
-					"AND queueItem.index = :index")
+			createCriteria (
+				QueueItemRec.class,
+				"_queueItemRec")
 
-			.setEntity (
-				"queueSubject",
-				queueSubject)
+			.add (
+				Restrictions.eq (
+					"_queueItem.queueSubject",
+					queueSubject))
 
-			.setInteger (
-				"index",
-				index)
+			.add (
+				Restrictions.eq (
+					"_queueItem.index",
+					index))
 
-			.list ());
+		);
 
 	}
 
@@ -196,6 +199,7 @@ class QueueItemDaoHibernate
 	List<QueueItemRec> findActive () {
 
 		return findMany (
+			"findActive ()",
 			QueueItemRec.class,
 
 			createCriteria (
@@ -210,16 +214,17 @@ class QueueItemDaoHibernate
 						QueueItemState.waiting,
 						QueueItemState.claimed)))
 
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<QueueItemRec> findByCreatedTime (
-			@NonNull Interval createdTimeInterval) {
+			@NonNull Interval createdTime) {
 
 		return findMany (
+			"findByCreatedTime (createdTime)",
 			QueueItemRec.class,
 
 			createCriteria (
@@ -229,14 +234,14 @@ class QueueItemDaoHibernate
 			.add (
 				Restrictions.ge (
 					"_queueItem.createdTime",
-					createdTimeInterval.getStart ().toInstant ()))
+					createdTime.getStart ()))
 
 			.add (
 				Restrictions.lt (
 					"_queueItem.createdTime",
-					createdTimeInterval.getEnd ().toInstant ()))
+					createdTime.getEnd ()))
 
-			.list ());
+		);
 
 	}
 
@@ -244,9 +249,10 @@ class QueueItemDaoHibernate
 	public
 	List<QueueItemRec> findByCreatedTime (
 			@NonNull QueueRec queue,
-			@NonNull Interval createdTimeInterval) {
+			@NonNull Interval createdTime) {
 
 		return findMany (
+			"findByCreatedTime (queue, createdTime)",
 			QueueItemRec.class,
 
 			createCriteria (
@@ -265,70 +271,74 @@ class QueueItemDaoHibernate
 			.add (
 				Restrictions.ge (
 					"_queueItem.createdTime",
-					createdTimeInterval.getStart ().toInstant ()))
+					createdTime.getStart ()))
 
 			.add (
 				Restrictions.lt (
 					"_queueItem.createdTime",
-					createdTimeInterval.getEnd ().toInstant ()))
+					createdTime.getEnd ()))
 
-			.list ());
-
-	}
-
-	@Override
-	public
-	List<QueueItemRec> findByProcessedTime (
-			Interval processedTimeInterval) {
-
-		return findMany (
-			QueueItemRec.class,
-
-			createQuery (
-				"FROM QueueItemRec queueItem " +
-				"WHERE queueItem.processedTime >= :start " +
-					"AND queueItem.processedTime < :end")
-
-			.setTimestamp (
-				"start",
-				processedTimeInterval.getStart ().toDate ())
-
-			.setTimestamp (
-				"end",
-				processedTimeInterval.getEnd ().toDate ())
-
-			.list ());
+		);
 
 	}
 
 	@Override
 	public
 	List<QueueItemRec> findByProcessedTime (
-			UserRec user,
-			Interval processedTimeInterval) {
+			@NonNull Interval processedTime) {
 
 		return findMany (
+			"findByProcessedTime (processedTime)",
 			QueueItemRec.class,
 
-			createQuery (
-				"FROM QueueItemRec queueItem " +
-				"WHERE queueItem.processedUser = :user " +
-					"AND queueItem.processedTime >= :startTime " +
-					"AND queueItem.processedTime < :endTime")
+			createCriteria (
+				QueueItemRec.class,
+				"_queueItem")
 
-			.setEntity (
-				"user",
-				user)
+			.add (
+				Restrictions.ge (
+					"_queueItem.processedTime",
+					processedTime.getStart ()))
 
-			.setTimestamp (
-				"startTime",
-				processedTimeInterval.getStart ().toDate ())
+			.add (
+				Restrictions.lt (
+					"_queueItem.processedTime",
+					processedTime.getEnd ()))
 
-			.setTimestamp (
-				"endTime",
-				processedTimeInterval.getEnd ().toDate ())
+		);
 
-			.list ());
+	}
+
+	@Override
+	public
+	List<QueueItemRec> findByProcessedTime (
+			@NonNull UserRec user,
+			@NonNull Interval processedTime) {
+
+		return findMany (
+			"findByProcessedTime (user, processedTime)",
+			QueueItemRec.class,
+
+			createCriteria (
+				QueueItemRec.class,
+				"_queueItem")
+
+			.add (
+				Restrictions.eq (
+					"_queueItem.processsedUser",
+					user))
+
+			.add (
+				Restrictions.ge (
+					"_queueItem.processedTime",
+					processedTime.getStart ()))
+
+			.add (
+				Restrictions.lt (
+					"_queueItem.processedTime",
+					processedTime.getEnd ()))
+
+		);
 
 	}
 

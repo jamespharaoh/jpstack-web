@@ -2,15 +2,17 @@ package wbs.platform.service.model;
 
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import com.google.common.base.Optional;
 
@@ -46,8 +48,8 @@ class ServiceHooks
 
 	// state
 
-	Set<Integer> parentObjectTypeIds =
-		new HashSet<Integer> ();
+	Map<Long,List<Long>> serviceTypeIdsByParentTypeId =
+		new HashMap<> ();
 
 	// lifecycle
 
@@ -58,25 +60,26 @@ class ServiceHooks
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"serviceHooks.init ()",
 				this);
 
-		List<ObjectTypeRec> objectTypes =
-			objectTypeDao.findAll ();
+		// preload object types
 
-		for (ObjectTypeRec objectType
-				: objectTypes) {
+		objectTypeDao.findAll ();
 
-			List<ServiceTypeRec> serviceTypes =
-				serviceTypeDao.findByParentType (
-					objectType);
+		// load service types and construct index
 
-			if (serviceTypes.isEmpty ())
-				continue;
+		serviceTypeIdsByParentTypeId =
+			serviceTypeDao.findAll ().stream ()
 
-			parentObjectTypeIds.add (
-				objectType.getId ());
-
-		}
+			.collect (
+				Collectors.groupingBy (
+					serviceType -> (long)
+						serviceType.getParentType ().getId (),
+					Collectors.mapping (
+						serviceType -> (long)
+							serviceType.getId (),
+						Collectors.toList ())));
 
 	}
 
@@ -85,38 +88,39 @@ class ServiceHooks
 	@Override
 	public
 	void createSingletons (
-			ObjectHelper<ServiceRec> serviceHelper,
-			ObjectHelper<?> parentHelper,
-			Record<?> parent) {
+			@NonNull ObjectHelper<ServiceRec> serviceHelper,
+			@NonNull ObjectHelper<?> parentHelper,
+			@NonNull Record<?> parent) {
 
 		if (
 			doesNotContain (
-				parentObjectTypeIds,
-				parentHelper.objectTypeId ())
+				serviceTypeIdsByParentTypeId.keySet (),
+				(long) parentHelper.objectTypeId ())
 		) {
 			return;
 		}
 
 		ObjectManager objectManager =
-			objectManagerProvider.get ();
-
-		ObjectTypeRec parentType =
-			objectTypeDao.findById (
-				parentHelper.objectTypeId ());
+	       objectManagerProvider.get ();
 
 		Optional<SliceRec> slice =
 			objectManager.getAncestor (
 				SliceRec.class,
 				parent);
 
-		List<ServiceTypeRec> serviceTypes =
-			serviceTypeDao.findByParentType (
-				parentType);
+		ObjectTypeRec parentType =
+			objectTypeDao.findById (
+				parentHelper.objectTypeId ());
 
 		for (
-			ServiceTypeRec serviceType
-				: serviceTypes
+			Long serviceTypeId
+				: serviceTypeIdsByParentTypeId.get (
+					(long) parentHelper.objectTypeId ())
 		) {
+
+			ServiceTypeRec serviceType =
+				serviceTypeDao.findRequired (
+					serviceTypeId);
 
 			serviceHelper.insert (
 				serviceHelper.createInstance ()

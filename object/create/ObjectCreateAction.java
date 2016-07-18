@@ -161,6 +161,7 @@ class ObjectCreateAction<
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ObjectCreateAction.goReal ()",
 				this);
 
 		// determine parent
@@ -419,7 +420,7 @@ class ObjectCreateAction<
 			@SuppressWarnings ("unchecked")
 			ParentType parentTemp1 =
 				(ParentType)
-				rootHelper.findOrNull (
+				rootHelper.findRequired (
 					0);
 
 			parent =
@@ -462,15 +463,8 @@ class ObjectCreateAction<
 		// retrieve from database
 
 		parent =
-			parentHelper.findOrNull (
+			parentHelper.findRequired (
 				parentId);
-
-		if (parent == null) {
-
-			throw new RuntimeException (
-				"Parent object not found");
-
-		}
 
 	}
 

@@ -77,15 +77,18 @@ class GroupPrivsAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"GroupPrivsAction.goReal ()",
 				this);
 
 		GroupRec group =
-			groupHelper.findOrNull (
-				requestContext.stuffInt ("groupId"));
+			groupHelper.findRequired (
+				requestContext.stuffInt (
+					"groupId"));
 
 		Matcher matcher =
 			privDataPattern.matcher (
-				requestContext.parameterOrNull ("privdata"));
+				requestContext.parameterRequired (
+					"privdata"));
 
 		while (matcher.find ()) {
 
@@ -96,7 +99,8 @@ class GroupPrivsAction
 				matcher.group (2).equals ("1");
 
 			PrivRec priv =
-				privHelper.findOrNull (privId);
+				privHelper.findRequired (
+					privId);
 
 			boolean oldCan =
 				group.getPrivs ().contains (priv);

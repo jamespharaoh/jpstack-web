@@ -89,8 +89,9 @@ class EventDaoHibernate
 		// perform and return
 
 		return findMany (
+			"searchIds (search)",
 			Integer.class,
-			criteria.list ());
+			criteria);
 
 	}
 

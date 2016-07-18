@@ -115,6 +115,7 @@ class ObjectLinksAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ObjectLinksAction.goReal ()",
 				this);
 
 		Record<?> contextObject =

@@ -91,6 +91,7 @@ class GenericScheduleDaemon<
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"GenericScheduleDaemon.runOnce ()",
 				this);
 
 		List<Job> jobs =
@@ -128,10 +129,11 @@ class GenericScheduleDaemon<
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"GenericScheduleDaemon.runJob (jobId)",
 				this);
 
 		Job job =
-			helper ().jobHelper ().findOrNull (
+			helper ().jobHelper ().findRequired (
 				jobId);
 
 		Service service =

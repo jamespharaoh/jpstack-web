@@ -106,6 +106,7 @@ class PrivTypeBuilder {
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"PrivTypeBuilder.createPrivType ()",
 				this);
 
 		// lookup parent type

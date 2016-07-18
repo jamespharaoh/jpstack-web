@@ -1,5 +1,9 @@
 package wbs.platform.user.hibernate;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.priv.model.PrivRec;
 import wbs.platform.user.model.UserPrivDao;
@@ -14,26 +18,28 @@ class UserPrivDaoHibernate
 	@Override
 	public
 	UserPrivRec find (
-			UserRec user,
-			PrivRec priv) {
+			@NonNull UserRec user,
+			@NonNull PrivRec priv) {
 
 		return findOne (
+			"find (user, priv)",
 			UserPrivRec.class,
 
-			createQuery (
-				"FROM UserPrivRec userPriv " +
-				"WHERE userPriv.user = :user " +
-					"AND userPriv.priv = :priv")
+			createCriteria (
+				UserPrivRec.class,
+				"_userPriv")
 
-			.setEntity (
-				"user",
-				user)
+			.add (
+				Restrictions.eq (
+					"_userPriv.user",
+					user))
 
-			.setEntity (
-				"priv",
-				priv)
+			.add (
+				Restrictions.eq (
+					"_userPriv.priv",
+					priv))
 
-			.list ());
+		);
 
 	}
 

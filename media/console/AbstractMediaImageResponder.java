@@ -50,7 +50,7 @@ class AbstractMediaImageResponder
 	void prepare () {
 
 		media =
-			mediaHelper.findOrNull (
+			mediaHelper.findRequired (
 				requestContext.stuffInt (
 					"mediaId"));
 
@@ -62,7 +62,7 @@ class AbstractMediaImageResponder
 	void transform () {
 
 		String rotate =
-			requestContext.parameterOrNull (
+			requestContext.parameterOrEmptyString (
 				"rotate");
 
 		if (

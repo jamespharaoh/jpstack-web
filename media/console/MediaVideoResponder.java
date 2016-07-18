@@ -43,11 +43,10 @@ class MediaVideoResponder
 	public
 	void prepare () {
 
-		int mediaId =
-			requestContext.stuffInt ("mediaId");
-
 		MediaRec media =
-			mediaHelper.findOrNull (mediaId);
+			mediaHelper.findRequired (
+				requestContext.stuffInt (
+					"mediaId"));
 
 		data =
 			runFilter (

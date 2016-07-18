@@ -1,5 +1,6 @@
 package wbs.platform.queue.console;
 
+import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -62,29 +63,44 @@ class QueueUsersAction
 
 		// get params
 
-		int userId =
-			Integer.parseInt (
-				requestContext.parameterOrNull ("userId"));
+		long userId =
+			requestContext.parameterInteger (
+				"userId");
 
 		boolean reclaim;
 
-		if (requestContext.parameterOrNull ("reclaim") != null) {
+		if (
+			isPresent (
+				requestContext.parameter (
+					"reclaim"))
+		) {
+
 			reclaim = true;
-		} else if (requestContext.parameterOrNull ("unclaim") != null) {
+
+		} else if (
+			isPresent (
+				requestContext.parameter (
+					"unclaim"))
+		) {
+
 			reclaim = false;
+
 		} else {
+
 			throw new RuntimeException ();
+
 		}
 
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"QueueUsersAction.goReal ()",
 				this);
 
 		// load stuff
 
 		UserRec theUser =
-			userHelper.findOrNull (
+			userHelper.findRequired (
 				userId);
 
 		// load items

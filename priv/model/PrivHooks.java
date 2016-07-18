@@ -1,13 +1,17 @@
 package wbs.platform.priv.model;
 
-import java.util.HashSet;
+import static wbs.framework.utils.etc.Misc.doesNotContain;
+
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -34,8 +38,8 @@ class PrivHooks
 
 	// state
 
-	Set<Integer> parentObjectTypeIds =
-		new HashSet<Integer> ();
+	Map<Long,List<Long>> privTypeIdsByParentTypeId =
+		new HashMap<> ();
 
 	// lifecycle
 
@@ -46,24 +50,26 @@ class PrivHooks
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"privHooks.init ()",
 				this);
 
-		List<ObjectTypeRec> objectTypes =
-			objectTypeDao.findAll ();
+		// preload object types
 
-		for (ObjectTypeRec objectType : objectTypes) {
+		objectTypeDao.findAll ();
 
-			List<PrivTypeRec> privTypes =
-				privTypeDao.findByParentObjectType (
-					objectType);
+		// load priv types and construct index
 
-			if (privTypes.isEmpty ())
-				continue;
+		privTypeIdsByParentTypeId =
+			privTypeDao.findAll ().stream ()
 
-			parentObjectTypeIds.add (
-				objectType.getId ());
-
-		}
+			.collect (
+				Collectors.groupingBy (
+					privType -> (long)
+						privType.getParentObjectType ().getId (),
+					Collectors.mapping (
+						privType -> (long)
+							privType.getId (),
+						Collectors.toList ())));
 
 	}
 
@@ -72,26 +78,31 @@ class PrivHooks
 	@Override
 	public
 	void createSingletons (
-			ObjectHelper<PrivRec> privHelper,
-			ObjectHelper<?> parentHelper,
-			Record<?> parent) {
+			@NonNull ObjectHelper<PrivRec> privHelper,
+			@NonNull ObjectHelper<?> parentHelper,
+			@NonNull Record<?> parent) {
 
-		if (! parentObjectTypeIds.contains (
-				parentHelper.objectTypeId ()))
+		if (
+			doesNotContain (
+				privTypeIdsByParentTypeId.keySet (),
+				(long) parentHelper.objectTypeId ())
+		) {
 			return;
+		}
 
 		ObjectTypeRec parentType =
 			objectTypeDao.findById (
 				parentHelper.objectTypeId ());
 
-		List<PrivTypeRec> privTypes =
-			privTypeDao.findByParentObjectType (
-				parentType);
-
 		for (
-			PrivTypeRec privType
-				: privTypes
+			Long privTypeId
+				: privTypeIdsByParentTypeId.get (
+					(long) parentHelper.objectTypeId ())
 		) {
+
+			PrivTypeRec privType =
+				privTypeDao.findRequired (
+					privTypeId);
 
 			privHelper.insert (
 				privHelper.createInstance ()

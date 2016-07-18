@@ -63,15 +63,18 @@ class CoreLogonAction
 
 		@NonNull
 		String slice =
-			requestContext.parameterOrNull ("slice");
+			requestContext.parameterRequired (
+				"slice");
 
 		@NonNull
 		String username =
-			requestContext.parameterOrNull ("username");
+			requestContext.parameterRequired (
+				"username");
 
 		@NonNull
 		String password =
-			requestContext.parameterOrNull ("password");
+			requestContext.parameterRequired (
+				"password");
 
 		// check we got the right params
 
@@ -84,6 +87,7 @@ class CoreLogonAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"CoreLogonAction.goReal ()",
 				this);
 
 		// attempt logon

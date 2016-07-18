@@ -93,6 +93,7 @@ class EventTypeBuilder {
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"EventTypeBuilder.createEventType ()",
 				this);
 
 		// create event type

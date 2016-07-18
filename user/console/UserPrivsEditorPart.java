@@ -111,19 +111,28 @@ class UserPrivsEditorPart
 		// and fill the current priv data sets
 
 		UserRec user =
-			userHelper.findOrNull (
-				requestContext.stuffInt ("userId"));
+			userHelper.findRequired (
+				requestContext.stuffInt (
+					"userId"));
 
-		for (UserPrivRec userPriv
-				: user.getUserPrivs ()) {
+		for (
+			UserPrivRec userPriv
+				: user.getUserPrivs ()
+		) {
 
-			if (userPriv.getCan ())
+			if (userPriv.getCan ()) {
+
 				canPrivIds.add (
 					userPriv.getPriv ().getId ());
 
-			if (userPriv.getCanGrant ())
+			}
+
+			if (userPriv.getCanGrant ()) {
+
 				canGrantPrivIds.add (
 					userPriv.getPriv ().getId ());
+
+			}
 
 		}
 

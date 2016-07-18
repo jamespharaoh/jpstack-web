@@ -98,11 +98,14 @@ class GroupPrivsPart
 		// and fill the current priv data sets
 
 		GroupRec group =
-			groupHelper.findOrNull (
-				requestContext.stuffInt ("groupId"));
+			groupHelper.findRequired (
+				requestContext.stuffInt (
+					"groupId"));
 
-		for (PrivRec priv
-				: group.getPrivs ()) {
+		for (
+			PrivRec priv
+				: group.getPrivs ()
+		) {
 
 			canPrivIds.add (
 				priv.getId ());

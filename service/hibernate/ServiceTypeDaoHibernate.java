@@ -2,8 +2,9 @@ package wbs.platform.service.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import wbs.framework.hibernate.HibernateDao;
-import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.service.model.ServiceTypeDao;
 import wbs.platform.service.model.ServiceTypeRec;
 
@@ -14,21 +15,27 @@ class ServiceTypeDaoHibernate
 
 	@Override
 	public
-	List<ServiceTypeRec> findByParentType (
-			ObjectTypeRec parentType) {
+	List<ServiceTypeRec> findAll () {
 
 		return findMany (
+			"findAll ()",
 			ServiceTypeRec.class,
 
-			createQuery (
-				"FROM ServiceTypeRec serviceType " +
-				"WHERE serviceType.parentType = :parentType")
+			createCriteria (
+				ServiceTypeRec.class)
 
-			.setEntity (
-				"parentType",
-				parentType)
+		);
 
-			.list ());
+	}
+
+	@Override
+	public
+	ServiceTypeRec findRequired (
+			@NonNull Long serviceTypeId) {
+
+		return get (
+			ServiceTypeRec.class,
+			(int) (long) serviceTypeId);
 
 	}
 

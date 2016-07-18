@@ -23,12 +23,12 @@ import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Instant;
 
-import wbs.console.priv.UserPrivDataLoader;
 import wbs.console.priv.UserPrivData;
 import wbs.console.priv.UserPrivData.ObjectData;
 import wbs.console.priv.UserPrivData.PrivPair;
 import wbs.console.priv.UserPrivData.SharedData;
 import wbs.console.priv.UserPrivData.UserData;
+import wbs.console.priv.UserPrivDataLoader;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -199,6 +199,7 @@ class PrivDataLoaderImplementation
 			@Cleanup
 			Transaction transaction =
 				database.beginReadOnlyJoin (
+					"PrivDataLoaderImplementation.PrivDataReloader.get ()",
 					this);
 
 			// start timer
@@ -483,6 +484,7 @@ class PrivDataLoaderImplementation
 			@Cleanup
 			Transaction transaction =
 				database.beginReadOnly (
+					"PrivDataLoaderImplementation.UserDataReloader.get ()",
 					this);
 
 			// start timer
@@ -498,7 +500,8 @@ class PrivDataLoaderImplementation
 			// get user
 
 			UserRec user =
-				userHelper.findOrNull (userId);
+				userHelper.findRequired (
+					userId);
 
 			// do user-specific privs
 

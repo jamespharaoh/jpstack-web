@@ -2,10 +2,11 @@ package wbs.platform.affiliate.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.affiliate.model.AffiliateTypeDao;
 import wbs.platform.affiliate.model.AffiliateTypeRec;
-import wbs.platform.object.core.model.ObjectTypeRec;
 
 public
 class AffiliateTypeDaoHibernate
@@ -14,21 +15,27 @@ class AffiliateTypeDaoHibernate
 
 	@Override
 	public
-	List<AffiliateTypeRec> findByParentObjectType (
-			ObjectTypeRec parentType) {
+	List<AffiliateTypeRec> findAll () {
 
 		return findMany (
+			"findAll ()",
 			AffiliateTypeRec.class,
 
-			createQuery (
-				"FROM AffiliateTypeRec affiliateType " +
-				"WHERE affiliateType.parentType = :parentType")
+			createCriteria (
+				AffiliateTypeRec.class)
 
-			.setEntity (
-				"parentType",
-				parentType)
+		);
 
-			.list ());
+	}
+
+	@Override
+	public
+	AffiliateTypeRec findRequired (
+			@NonNull Long affiliateTypeId) {
+
+		return get (
+			AffiliateTypeRec.class,
+			(int) (long) affiliateTypeId);
 
 	}
 

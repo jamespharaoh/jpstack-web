@@ -2,6 +2,10 @@ package wbs.platform.queue.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
+import org.hibernate.criterion.Restrictions;
+
 import wbs.framework.hibernate.HibernateDao;
 import wbs.framework.record.Record;
 import wbs.platform.queue.model.QueueRec;
@@ -16,47 +20,55 @@ class QueueSubjectDaoHibernate
 	@Override
 	public
 	List<QueueSubjectRec> findActive (
-			QueueRec queue) {
+			@NonNull QueueRec queue) {
 
 		return findMany (
+			"findActive (queue)",
 			QueueSubjectRec.class,
 
-			createQuery (
-				"FROM QueueSubjectRec queueSubject " +
-				"WHERE queueSubject.activeItems > 0 " +
-					"AND queueSubject.queue.id = :queueId")
+			createCriteria (
+				QueueSubjectRec.class,
+				"_queueSubject")
 
-			.setInteger (
-				"queueId",
-				queue.getId ())
+			.add (
+				Restrictions.gt (
+					"_queueSubject.activeItems",
+					0l))
 
-			.list ());
+			.add (
+				Restrictions.eq (
+					"_queueSubject.queue",
+					queue))
+
+		);
 
 	}
 
 	@Override
 	public
 	QueueSubjectRec find (
-			QueueRec queue,
-			Record<?> object) {
+			@NonNull QueueRec queue,
+			@NonNull Record<?> object) {
 
 		return findOne (
+			"find (queue, object)",
 			QueueSubjectRec.class,
 
-			createQuery (
-				"FROM QueueSubjectRec queueSubject " +
-				"WHERE queueSubject.queue.id = :queueId " +
-					"AND queueSubject.objectId = :objectId")
+			createCriteria (
+				QueueSubjectRec.class,
+				"_queueSubject")
 
-			.setInteger (
-				"queueId",
-				queue.getId ())
+			.add (
+				Restrictions.eq (
+					"_queueSubject.queue",
+					queue))
 
-			.setInteger (
-				"objectId",
-				object.getId ())
+			.add (
+				Restrictions.eq (
+					"_queueSubject.objectId",
+					object.getId ()))
 
-			.list ());
+		);
 
 	}
 
@@ -65,13 +77,19 @@ class QueueSubjectDaoHibernate
 	List<QueueSubjectRec> findActive () {
 
 		return findMany (
+			"findActive ()",
 			QueueSubjectRec.class,
 
-			createQuery (
-				"FROM QueueSubjectRec queueSubject " +
-				"WHERE queueSubject.activeItems > 0")
+			createCriteria (
+				QueueSubjectRec.class,
+				"_queueSubject")
 
-			.list ());
+			.add (
+				Restrictions.gt (
+					"_queueSubject.activeItems",
+					0l))
+
+		);
 
 	}
 

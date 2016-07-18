@@ -1,6 +1,9 @@
 package wbs.platform.text.hibernate;
 
+import lombok.NonNull;
+
 import org.hibernate.FlushMode;
+import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
@@ -15,27 +18,26 @@ class TextDaoHibernate
 
 	@Override
 	public
-	TextRec findByText (
-			String textValue) {
+	TextRec findByTextNoFlush (
+			@NonNull String textValue) {
 
 		return findOne (
+			"findByText (textValue)",
 			TextRec.class,
 
-			createQuery (
-				"FROM TextRec t " +
-				"WHERE t.text = :text")
+			createCriteria (
+				TextRec.class,
+				"_text")
 
-			.setString (
-				"text",
-				textValue)
-
-			//.setCacheable (
-			//	true)
+			.add (
+				Restrictions.eq (
+					"_text.text",
+					textValue))
 
 			.setFlushMode (
 				FlushMode.MANUAL)
 
-			.list ());
+		);
 
 	}
 

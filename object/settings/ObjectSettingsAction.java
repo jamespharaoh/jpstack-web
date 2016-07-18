@@ -121,6 +121,7 @@ class ObjectSettingsAction<
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"ObjectSettingsAction.goReal ()",
 				this);
 
 		object =
@@ -228,7 +229,7 @@ class ObjectSettingsAction<
 		if (parentHelper.isRoot ()) {
 
 			parent =
-				parentHelper.findOrNull (
+				parentHelper.findRequired (
 					0);
 
 			return;
@@ -244,7 +245,7 @@ class ObjectSettingsAction<
 			// use specific parent
 
 			parent =
-				parentHelper.findOrNull (
+				parentHelper.findRequired (
 					parentId);
 
 			return;

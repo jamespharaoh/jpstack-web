@@ -55,9 +55,10 @@ class QueueStatsFilter {
 
 			slice =
 				Optional.of (
-					sliceHelper.findOrNull (
+					sliceHelper.findRequired (
 						(Integer)
-						conditions.get ("sliceId")));
+						conditions.get (
+							"sliceId")));
 
 		} else {
 
@@ -81,7 +82,7 @@ class QueueStatsFilter {
 			) {
 
 				queuesBuilder.add (
-					queueHelper.findOrNull (
+					queueHelper.findRequired (
 						(Integer)
 						queueId));
 

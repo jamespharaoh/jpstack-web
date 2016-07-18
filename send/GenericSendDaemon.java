@@ -88,6 +88,7 @@ class GenericSendDaemon<
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
+				"GenericSendDaemon.runOnce ()",
 				this);
 
 		log ().debug (
@@ -135,10 +136,11 @@ class GenericSendDaemon<
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
+				"GenericSendDaemon.runJob (jobId)",
 				this);
 
 		Job job =
-			helper ().jobHelper ().findOrNull (
+			helper ().jobHelper ().findRequired (
 				jobId);
 
 		Service service =
