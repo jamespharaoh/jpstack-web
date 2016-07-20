@@ -101,7 +101,7 @@ class ServiceHooks
 		}
 
 		ObjectManager objectManager =
-	       objectManagerProvider.get ();
+		   objectManagerProvider.get ();
 
 		Optional<SliceRec> slice =
 			objectManager.getAncestor (
