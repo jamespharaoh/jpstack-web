@@ -170,7 +170,10 @@ class MediaburstApiServletModule
 				stringBuilder.toString ());
 
 		} catch (Exception exception) {
-			throw new RuntimeException (exception);
+
+			throw new RuntimeException (
+				exception);
+
 		}
 
 	}

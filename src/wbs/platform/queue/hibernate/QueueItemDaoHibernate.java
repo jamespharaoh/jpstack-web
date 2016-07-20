@@ -325,7 +325,7 @@ class QueueItemDaoHibernate
 
 			.add (
 				Restrictions.eq (
-					"_queueItem.processsedUser",
+					"_queueItem.processedUser",
 					user))
 
 			.add (
