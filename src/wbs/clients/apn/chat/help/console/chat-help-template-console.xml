@@ -68,12 +68,23 @@
 	</field-set>
 
 	<field-set
+		name="create"
+		object-name="chatHelpTemplate">
+
+		<code-field/>
+		<description-field/>
+
+		<text-area-field
+			name="text"/>
+
+	</field-set>
+
+	<field-set
 		name="summary"
 		object-name="chatHelpTemplate">
 
 		<id-field/>
 		<parent-field/>
-		<text-field name="type"/>
 		<code-field/>
 		<description-field/>
 
@@ -86,8 +97,6 @@
 		name="settings"
 		object-name="chatHelpTemplate">
 
-		<id-field/>
-		<text-field name="type" read-only="yes"/>
 		<code-field/>
 		<description-field/>
 

@@ -348,6 +348,9 @@ class ChatHelpTemplateContextBuilder {
 			.typeCode (
 				typeCode)
 
+			.fieldsName (
+				"list")
+
 			.targetContextTypeName (
 				contextTypeNameCombined)
 
