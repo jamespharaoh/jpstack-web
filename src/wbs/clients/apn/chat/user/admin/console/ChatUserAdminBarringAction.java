@@ -1,6 +1,8 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
+import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
+import static wbs.framework.utils.etc.Misc.trim;
 
 import javax.inject.Inject;
 
@@ -23,6 +25,8 @@ import wbs.platform.user.model.UserObjectHelper;
 public
 class ChatUserAdminBarringAction
 	extends ConsoleAction {
+
+	// dependencies
 
 	@Inject
 	ChatUserLogic chatUserLogic;
@@ -51,7 +55,8 @@ class ChatUserAdminBarringAction
 	public
 	Responder backupResponder () {
 
-		return responder ("chatUserAdminBarringResponder");
+		return responder (
+			"chatUserAdminBarringResponder");
 
 	}
 
@@ -61,9 +66,13 @@ class ChatUserAdminBarringAction
 	public
 	Responder goReal () {
 
-		if (! requestContext.canContext ("chat.userAdmin")) {
+		if (
+			! requestContext.canContext (
+				"chat.userAdmin")
+		) {
 
-			requestContext.addError ("Access denied");
+			requestContext.addError (
+				"Access denied");
 
 			return null;
 
@@ -72,28 +81,34 @@ class ChatUserAdminBarringAction
 		// get stuff
 
 		int chatUserId =
-			requestContext.stuffInt ("chatUserId");
+			requestContext.stuffInt (
+				"chatUserId");
 
 		// get params
 
-		String barOn =
-			nullIfEmptyString (
-				requestContext.parameterRequired (
-					"bar_on"));
+		Boolean barOn =
+			requestContext.parameterIsOn (
+				"bar_on");
 
-		String barOff =
-			nullIfEmptyString (
-				requestContext.parameterRequired (
-					"bar_off"));
+		Boolean barOff =
+			requestContext.parameterIsOn (
+				"bar_off");
 
 		String reason =
-			nullIfEmptyString (
+			trim (
 				requestContext.parameterRequired (
 					"reason"));
 
 		// check params
 
-		if ((barOn == null && barOff == null) || reason == null) {
+		if (
+
+			(! barOn && ! barOff)
+
+			|| isEmpty (
+				reason)
+
+		) {
 
 			requestContext.addError (
 				"Please fill in the form properly");
@@ -115,41 +130,60 @@ class ChatUserAdminBarringAction
 				chatUserId);
 
 		// do the work
+
 		String eventType = null;
+		String notice = null;
 
-		if (barOn != null && barOn.equals("on")) {
+		if (barOn) {
 
-			chatUserLogic.logoff (chatUser, true);
+			chatUserLogic.logoff (
+				chatUser,
+				true);
 
-			chatUser.setBarred(true);
+			chatUser
 
-			eventType = "chat_user_barred";
+				.setBarred (
+					true);
 
-		} else if (barOff != null && barOff.equals("on")) {
+			eventType =
+				"chat_user_barred";
 
-			chatUser.setBarred(false);
+			notice =
+				"Chat user barred";
 
-			eventType = "chat_user_unbarred";
+		} else if (barOff) {
+
+			chatUser
+
+				.setBarred (
+					false);
+
+			eventType =
+				"chat_user_unbarred";
+
+			notice =
+				"Chat user unbarred";
+
+		} else {
+
+			throw shouldNeverHappen ();
 
 		}
 
 		// create an event
 
-		if (eventType != null) {
-
-			eventLogic.createEvent (
-				eventType,
-				userConsoleLogic.userRequired (),
-				chatUser,
-				reason);
-
-		}
+		eventLogic.createEvent (
+			eventType,
+			userConsoleLogic.userRequired (),
+			chatUser,
+			reason);
 
 		transaction.commit ();
 
 		// return
 
-		requestContext.addNotice ("User updated");
+		requestContext.addNotice (
+			notice);
 
 		return null;
 

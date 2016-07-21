@@ -8,6 +8,7 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.Misc.optionalEquals;
 import static wbs.framework.utils.etc.Misc.orNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -257,6 +258,18 @@ class ConsoleRequestContextImplementation
 		return emptyStringIfNull (
 			requestContext.parameter (
 				key));
+
+	}
+
+	@Override
+	public
+	Boolean parameterIsOn (
+			@NonNull String key) {
+
+		return optionalEquals (
+			parameter (
+				key),
+			"on");
 
 	}
 

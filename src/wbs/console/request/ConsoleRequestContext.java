@@ -72,6 +72,9 @@ interface ConsoleRequestContext {
 	String parameterOrEmptyString (
 			String key);
 
+	Boolean parameterIsOn (
+			String key);
+
 	void session (
 			String key,
 			Serializable object);
