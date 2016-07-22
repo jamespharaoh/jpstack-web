@@ -58,8 +58,8 @@ class ChatUserSearchOldPart
 			"  picture: '',\n",
 			"  creditMode: '',\n",
 			"  online: '',\n",
-			"  output: '',\n",
-			"  order: ''\n",
+			"  output: 'normal',\n",
+			"  order: 'code'\n",
 			"}\n",
 
 			"function clearForm () {\n",
@@ -491,7 +491,7 @@ class ChatUserSearchOldPart
 
 	static Map<String,String> searchOutputOptions =
 		ImmutableMap.<String,String>builder ()
-			.put ("", "Normal")
+			.put ("normal", "Normal")
 			.put ("imageZip", "ZIP file with photos")
 			.build ();
 
