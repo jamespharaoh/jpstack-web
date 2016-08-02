@@ -9,9 +9,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
-import wbs.framework.utils.ThreadManager;
-
 import lombok.extern.log4j.Log4j;
+
+import wbs.framework.utils.ThreadManager;
 
 /**
  * AffiliateObjectHelper class for those wishing to implement DaemonService.
@@ -46,8 +46,12 @@ class AbstractDaemonService {
 	void deinit () {
 	}
 
-	protected abstract
-	String getThreadName ();
+	protected
+	String getThreadName () {
+
+		throw new UnsupportedOperationException ();
+
+	}
 
 	/**
 	 * Should be called for each thread created so that stopService can manage
@@ -95,7 +99,8 @@ class AbstractDaemonService {
 
 		thread.start ();
 
-		registerThread (thread);
+		registerThread (
+			thread);
 
 	}
 
