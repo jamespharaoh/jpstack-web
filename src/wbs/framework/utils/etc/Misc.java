@@ -2018,6 +2018,14 @@ class Misc {
 	}
 
 	public static
+	boolean isZero (
+			long value) {
+
+		return value == 0l;
+
+	}
+
+	public static
 	boolean notLessThanZero (
 			int value) {
 

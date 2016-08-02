@@ -28,6 +28,14 @@ class IntegerFieldSpec
 	Long defaultValue;
 
 	@DataAttribute (
+		name = "minimum")
+	Long minimumValue;
+
+	@DataAttribute (
+		name = "maximum")
+	Long maximumValue;
+
+	@DataAttribute (
 		name = "column")
 	String columnName;
 

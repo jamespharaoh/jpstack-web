@@ -185,9 +185,9 @@ class ConsoleMetaManagerImplementation
 
 			try {
 
-				new DataToXml ()
-					.object (consoleMetaModule)
-					.write (outputFileName);
+				new DataToXml ().writeToFile (
+					outputFileName,
+					consoleMetaModule);
 
 			} catch (IOException exception) {
 

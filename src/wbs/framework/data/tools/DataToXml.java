@@ -3,13 +3,15 @@ package wbs.framework.data.tools;
 import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -18,9 +20,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import lombok.Cleanup;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import org.dom4j.Branch;
@@ -31,22 +31,22 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
 import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataName;
 import wbs.framework.data.annotations.DataReference;
 import wbs.framework.utils.etc.BeanLogic;
+import wbs.framework.utils.etc.RuntimeIoException;
 
 @Accessors (fluent = true)
 public
 class DataToXml {
 
-	@Getter @Setter
-	Object object;
-
 	public
 	void write (
-			String filename)
+			@NonNull Writer writer,
+			@NonNull Object object)
 		throws IOException {
 
 		Document document =
@@ -59,24 +59,48 @@ class DataToXml {
 		OutputFormat format =
 			OutputFormat.createPrettyPrint ();
 
+		XMLWriter xmlWriter =
+			new XMLWriter (
+				writer,
+				format);
+
+		xmlWriter.write (
+			document);
+
+	}
+
+	public
+	void writeToFile (
+			@NonNull String filename,
+			@NonNull Object object)
+		throws IOException {
+
+		write (
+			new FileWriter (
+				new File (filename)),
+			object);
+
+	}
+
+	public
+	String writeToString (
+			@NonNull Object object) {
+
 		try {
 
-			@Cleanup
-			OutputStream outputStream =
-				new FileOutputStream (
-					new File (filename));
+			StringWriter stringWriter =
+				new StringWriter ();
 
-			XMLWriter writer =
-				new XMLWriter (
-					outputStream,
-					format);
+			write (
+				stringWriter,
+				object);
 
-			writer.write (
-				document);
+			return stringWriter.toString ();
 
-		} catch (UnsupportedOperationException exception) {
+		} catch (IOException ioException) {
 
-			throw new RuntimeException (exception);
+			throw new RuntimeIoException (
+				ioException);
 
 		}
 
@@ -255,6 +279,44 @@ class DataToXml {
 					element.addAttribute (
 						attributeName,
 						attributeValue);
+
+				}
+
+				if (annotation instanceof DataChild) {
+
+					DataChild dataChildAnnotation =
+						(DataChild)
+						annotation;
+
+					String childElementName =
+						ifNull (
+							nullIfEmptyString (
+								dataChildAnnotation.name ()),
+							camelToHyphen (
+								field.getName ()));
+
+					Object childValueObject =
+						BeanLogic.get (
+							object,
+							field.getName ());
+
+					if (
+						isNull (
+							childValueObject)
+					) {
+						continue;
+					}
+
+					String childValueString =
+						toString (
+							childValueObject);
+
+					Element childElement =
+						element.addElement (
+							childElementName);
+
+					childElement.setText (
+						childValueString);
 
 				}
 

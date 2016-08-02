@@ -15,7 +15,7 @@ import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
-import wbs.sms.message.outbox.logic.OutboxLogic;
+import wbs.sms.message.outbox.logic.SmsOutboxLogic;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutReportObjectHelper;
@@ -39,7 +39,7 @@ class ForwarderDelivery
 	ForwarderMessageOutReportObjectHelper forwarderMessageOutReportHelper;
 
 	@Inject
-	OutboxLogic outboxLogic;
+	SmsOutboxLogic outboxLogic;
 
 	@Override
 	public

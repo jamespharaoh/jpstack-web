@@ -591,6 +591,10 @@
 			package="wbs.integrations.broadcastsystems"/>
 
 		<plugin
+			name="clockwork-sms"
+			package="wbs.integrations.clockworksms"/>
+
+		<plugin
 			name="comshen"
 			package="wbs.integrations.comshen"/>
 

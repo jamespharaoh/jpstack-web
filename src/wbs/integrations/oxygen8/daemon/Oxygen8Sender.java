@@ -155,7 +155,7 @@ class Oxygen8Sender
 
 		}
 
-		int gsmLength =
+		long gsmLength =
 			Gsm.length (
 				message.getText ().getText ());
 

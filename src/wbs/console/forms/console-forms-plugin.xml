@@ -107,6 +107,7 @@
 		<bean class="UploadFormFieldBuilder"/>
 		<bean class="UploadFormFieldRenderer"/>
 		<bean class="UploadFormFieldSpec"/>
+		<bean class="Utf8StringFormFieldNativeMapping"/>
 		<bean class="YesNoCsvFormFieldInterfaceMapping"/>
 		<bean class="YesNoFormFieldBuilder"/>
 		<bean class="YesNoFormFieldRenderer"/>

@@ -228,6 +228,7 @@
       <fileset dir="src/wbs/services/messagetemplate/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
+      <fileset dir="src/wbs/integrations/clockworksms/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
       <fileset dir="src/wbs/integrations/dialogue/console/files"/>
       <fileset dir="src/wbs/integrations/digitalselect/console/files"/>
@@ -400,6 +401,7 @@
       <fileset dir="src/wbs/services/messagetemplate/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
+      <fileset dir="src/wbs/integrations/clockworksms/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
       <fileset dir="src/wbs/integrations/dialogue/api/files"/>
       <fileset dir="src/wbs/integrations/digitalselect/api/files"/>
@@ -606,6 +608,7 @@
       <fileset dir="src/wbs/services/messagetemplate/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
+      <fileset dir="src/wbs/integrations/clockworksms/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
       <fileset dir="src/wbs/integrations/dialogue/console/files"/>
       <fileset dir="src/wbs/integrations/digitalselect/console/files"/>
@@ -778,6 +781,7 @@
       <fileset dir="src/wbs/services/messagetemplate/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
       <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
+      <fileset dir="src/wbs/integrations/clockworksms/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
       <fileset dir="src/wbs/integrations/dialogue/api/files"/>
       <fileset dir="src/wbs/integrations/digitalselect/api/files"/>

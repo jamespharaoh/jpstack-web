@@ -1,11 +1,16 @@
 package wbs.test.simulator.daemon;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import org.json.simple.JSONValue;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -72,8 +77,8 @@ class SimulatorSender
 
 	@Override
 	protected
-	Object sendMessage (
-			Integer messageId) {
+	Optional<List<String>> sendMessage (
+			@NonNull Integer messageId) {
 
 		@Cleanup
 		Transaction transaction =
@@ -153,8 +158,10 @@ class SimulatorSender
 
 		transaction.commit ();
 
-		return Integer.toString (
-			event.getId ());
+		return Optional.of (
+			ImmutableList.of (
+				Integer.toString (
+					event.getId ())));
 
 	}
 

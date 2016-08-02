@@ -888,13 +888,9 @@ class ConsoleManagerImplementation
 
 			try {
 
-				new DataToXml ()
-
-					.object (
-						consoleModule)
-
-					.write (
-						outputFileName);
+				new DataToXml ().writeToFile (
+					outputFileName,
+					consoleModule);
 
 			} catch (IOException exception) {
 

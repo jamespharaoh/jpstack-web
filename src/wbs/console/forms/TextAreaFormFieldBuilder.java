@@ -2,6 +2,7 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 
 import java.util.ArrayList;
@@ -68,6 +69,10 @@ class TextAreaFormFieldBuilder {
 	@Inject
 	Provider<UpdatableFormField>
 	updatableFormFieldProvider;
+
+	@Inject
+	Provider<Utf8StringFormFieldNativeMapping>
+	utf8StringFormFieldNativeMappingProvider;
 
 	// builder
 
@@ -199,13 +204,29 @@ class TextAreaFormFieldBuilder {
 
 		// native mapping
 
-		FormFieldNativeMapping nativeMapping =
-			formFieldPluginManager.getNativeMappingRequired (
-				context,
-				context.containerClass (),
-				name,
-				String.class,
-				propertyClass);
+		FormFieldNativeMapping nativeMapping;
+
+		if (
+			equal (
+				propertyClass,
+				byte[].class)
+		) {
+
+			nativeMapping =
+				utf8StringFormFieldNativeMappingProvider.get ();
+
+
+		} else {
+
+			nativeMapping =
+				formFieldPluginManager.getNativeMappingRequired (
+					context,
+					context.containerClass (),
+					name,
+					String.class,
+					propertyClass);
+
+		}
 
 		// value validator
 

@@ -9,9 +9,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -19,6 +21,9 @@ import nu.xom.Element;
 import nu.xom.Nodes;
 import nu.xom.ParsingException;
 import nu.xom.Serializer;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
@@ -188,8 +193,8 @@ class MediaburstProteusSender
 
 	@Override
 	protected
-	String sendMessage (
-			State proteusOutbox) {
+	Optional<List<String>> sendMessage (
+			@NonNull State proteusOutbox) {
 
 		log.info (
 			"Sending message " + proteusOutbox.messageId);
@@ -210,8 +215,10 @@ class MediaburstProteusSender
 
 			// and interpret the response
 
-			return readResponse (
-				urlConnection.getInputStream ());
+			return Optional.of (
+				ImmutableList.of (
+					readResponse (
+						urlConnection.getInputStream ())));
 
 		} catch (IOException exception) {
 

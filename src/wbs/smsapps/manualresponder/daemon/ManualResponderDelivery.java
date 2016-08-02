@@ -19,7 +19,7 @@ import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
-import wbs.sms.message.outbox.logic.OutboxLogic;
+import wbs.sms.message.outbox.logic.SmsOutboxLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
 
@@ -43,7 +43,7 @@ class ManualResponderDelivery
 	MessageLogic messageLogic;
 
 	@Inject
-	OutboxLogic outboxLogic;
+	SmsOutboxLogic outboxLogic;
 
 	@Inject
 	ServiceObjectHelper serviceHelper;

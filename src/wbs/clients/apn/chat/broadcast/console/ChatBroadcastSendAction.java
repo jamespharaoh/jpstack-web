@@ -659,7 +659,7 @@ class ChatBroadcastSendAction
 						form.prefix (),
 						form.message ());
 
-				int messageLength =
+				long messageLength =
 					Gsm.length (
 						messageString);
 

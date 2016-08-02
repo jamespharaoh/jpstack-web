@@ -1,0 +1,32 @@
+<console-module
+	name="clockwork-sms">
+
+	<simple-context
+		name="clockworkSms">
+
+		<priv-key
+			name="clockworkSms.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-link
+			name="config"
+			link="clockworkSmsConfig"
+			label="Configs"
+			priv-key="clockworkSms.manage"/>
+
+		<section
+			name="route"
+			label="Routes">
+
+			<context-link
+				name="out"
+				link="clockworkSmsRouteOut"
+				label="Outbound routes"
+				priv-key="clockworkSms.manage"/>
+
+		</section>
+
+	</simple-context>
+
+</console-module>

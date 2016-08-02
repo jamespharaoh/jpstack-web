@@ -1,0 +1,128 @@
+<console-module
+	name="clockwork-sms-route-out">
+
+	<console-helper-provider
+		object-name="clockworkSmsRouteOut"
+		view-priv="root:manage">
+
+		<priv-key
+			name="clockworkSms.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<priv-key
+			name="clockworkSmsRouteOut.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="clockworkSmsRouteOutName"
+			delegate="route"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="clockworkSmsRouteOut"
+		object-name="clockworkSmsRouteOut">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="clockworkSmsRouteOut">
+
+		<parent-field/>
+
+		<object-field
+			name="clockworkSmsConfig"
+			label="Config"
+			object-type="clockworkSmsConfig"/>
+
+		<text-field
+			name="url"/>
+
+		<text-field
+			name="key"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="clockworkSmsRouteOut">
+
+		<parent-field/>
+
+		<object-field
+			name="clockworkSmsConfig"
+			label="Config"
+			object-type="clockworkSmsConfig"/>
+
+		<text-field
+			name="url"/>
+
+		<text-field
+			name="key"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="clockworkSmsRouteOut">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="clockworkSmsConfig"
+			label="Config"
+			object-type="clockworkSmsConfig"/>
+
+		<text-field
+			name="url"/>
+
+		<text-field
+			name="key"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="clockworkSmsRouteOut">
+
+		<object-field
+			name="clockworkSmsConfig"
+			label="Config"
+			object-type="clockworkSmsConfig"/>
+
+		<text-field
+			name="url"/>
+
+		<text-field
+			name="key"/>
+
+	</field-set>
+
+</console-module>

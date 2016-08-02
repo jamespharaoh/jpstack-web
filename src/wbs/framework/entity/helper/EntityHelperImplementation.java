@@ -220,13 +220,14 @@ class EntityHelperImplementation
 			String outputFilename =
 				stringFormat (
 					"work/model/%s.xml",
-					camelToHyphen (model.objectName ()));
+					camelToHyphen (
+						model.objectName ()));
 
 			try {
 
-				new DataToXml ()
-					.object (model)
-					.write (outputFilename);
+				new DataToXml ().writeToFile (
+					outputFilename,
+					model);
 
 			} catch (IOException exception) {
 

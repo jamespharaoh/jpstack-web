@@ -3,12 +3,14 @@ package wbs.integrations.digitalselect.daemon;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
 import lombok.Data;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
@@ -22,6 +24,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -105,8 +108,8 @@ class DigitalSelectSender
 
 	@Override
 	protected
-	Object sendMessage (
-			State state)
+	Optional<List<String>> sendMessage (
+			@NonNull State state)
 		throws SendFailureException {
 
 		log.info (
@@ -116,9 +119,11 @@ class DigitalSelectSender
 
 		try {
 
-			openConnection (state);
+			openConnection (
+				state);
 
-			return readResponse (state);
+			return readResponse (
+				state);
 
 		} catch (IOException exception) {
 
@@ -214,8 +219,8 @@ class DigitalSelectSender
 			"^44[0-9]{10}$");
 
 	public
-	String readResponse (
-			State state)
+	Optional<List<String>> readResponse (
+			@NonNull State state)
 		throws
 			IOException,
 			SendFailureException {
@@ -271,7 +276,9 @@ class DigitalSelectSender
 		String otherId =
 			matcher.group (1);
 
-		return otherId;
+		return Optional.of (
+			ImmutableList.of (
+				otherId));
 
 	}
 

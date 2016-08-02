@@ -1,0 +1,35 @@
+<plugin
+	name="clockwork-sms"
+	package="wbs.integrations.clockworksms">
+
+	<plugin-dependencies>
+		<plugin-dependency name="integrations-common"/>
+		<plugin-dependency name="scaffold"/>
+	</plugin-dependencies>
+
+	<models>
+		<model name="clockworkSmsConfig"/>
+		<model name="clockworkSmsRouteOut"/>
+	</models>
+
+	<layer name="daemon">
+		<bean class="daemon.ClockworkSmsSenderHelper"/>
+		<bean class="daemon.ClockworkSmsSenderService"/>
+	</layer>
+
+	<layer name="logic">
+		<bean class="foreignapi.ClockworkSmsForeignApiConfig"/>
+		<bean class="foreignapi.ClockworkSmsMessageSender"/>
+	</layer>
+
+	<fixtures>
+		<fixture name="clockworkSms"/>
+	</fixtures>
+
+	<console-modules>
+		<console-module name="clockwork-sms"/>
+		<console-module name="clockwork-sms-config"/>
+		<console-module name="clockwork-sms-route-out"/>
+	</console-modules>
+
+</plugin>

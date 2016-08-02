@@ -1744,9 +1744,9 @@ class ApplicationContext {
 
 			try {
 
-				new DataToXml ()
-					.object (beanDefinition)
-					.write (outputFile);
+				new DataToXml ().writeToFile (
+					outputFile,
+					beanDefinition);
 
 			} catch (IOException exception) {
 

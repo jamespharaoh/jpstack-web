@@ -5,12 +5,17 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.hibernate.JDBCException;
 import org.hibernate.exception.ConstraintViolationException;
+import org.json.simple.JSONObject;
+
+import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
 
@@ -196,6 +201,43 @@ class ExceptionUtilsImplementation
 		return substituteNuls (
 			source,
 			"<NUL>");
+
+	}
+
+	@Override
+	public
+	JSONObject throwableDumpJson (
+			@NonNull Throwable throwable) {
+
+		return new JSONObject (
+			ImmutableMap.<String,Object>builder ()
+
+			.put (
+				"class",
+				throwable.getClass ().getName ())
+
+			.put (
+				"message",
+				throwable.getMessage ())
+
+			.put (
+				"stacktrace",
+				Arrays.asList (
+					throwable.getStackTrace ())
+
+					.stream ()
+
+					.map (
+						Object::toString)
+
+					.collect (
+						Collectors.toList ())
+
+			)
+
+			.build ()
+
+		);
 
 	}
 

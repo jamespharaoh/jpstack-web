@@ -16,6 +16,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.http.HttpResponse;
@@ -28,6 +29,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
@@ -111,8 +115,8 @@ class DialogueMmsSender
 
 	@Override
 	protected
-	String sendMessage (
-			DialogueMmsOutbox dialogueMmsOutbox)
+	Optional<List<String>> sendMessage (
+			@NonNull DialogueMmsOutbox dialogueMmsOutbox)
 		throws SendFailureException {
 
 		try {
@@ -277,8 +281,8 @@ class DialogueMmsSender
 
 	}
 
-	String doResponse (
-			HttpResponse response)
+	Optional<List<String>> doResponse (
+			@NonNull HttpResponse response)
 		throws
 			IOException,
 			SendFailureException {
@@ -370,7 +374,9 @@ class DialogueMmsSender
 
 		}
 
-		return handler.messageId;
+		return Optional.of (
+			ImmutableList.of (
+				handler.messageId));
 
 	}
 

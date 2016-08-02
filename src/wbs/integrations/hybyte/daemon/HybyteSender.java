@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -20,6 +21,9 @@ import nu.xom.Nodes;
 import nu.xom.ParsingException;
 
 import org.apache.commons.codec.binary.Base64;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
@@ -176,7 +180,7 @@ class HybyteSender
 
 	@Override
 	protected
-	String sendMessage (
+	Optional<List<String>> sendMessage (
 			HybyteOutbox hybyteOutbox) {
 
 		log.info (
@@ -199,12 +203,15 @@ class HybyteSender
 
 			// and interpret the response
 
-			return readResponse (
-				urlConn.getInputStream ());
+			return Optional.of (
+				ImmutableList.of (
+					readResponse (
+						urlConn.getInputStream ())));
 
 		} catch (IOException e) {
 
-			throw tempFailure ("IO error " + e.getMessage());
+			throw tempFailure (
+				"IO error " + e.getMessage ());
 
 		}
 

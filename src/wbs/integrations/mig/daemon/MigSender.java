@@ -13,10 +13,15 @@ import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.List;
 
 import javax.inject.Inject;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -154,8 +159,8 @@ class MigSender
 
 	@Override
 	protected
-	String sendMessage (
-			MIGOutbox migOutbox)
+	Optional<List<String>> sendMessage (
+			@NonNull MIGOutbox migOutbox)
 		throws SendFailureException {
 
 		log.info ("Sending message " + migOutbox.messageId);
@@ -194,7 +199,9 @@ class MigSender
 
 			// and return
 
-			return otherId;
+			return Optional.of (
+				ImmutableList.of (
+					otherId));
 
 		} catch (IOException exception) {
 

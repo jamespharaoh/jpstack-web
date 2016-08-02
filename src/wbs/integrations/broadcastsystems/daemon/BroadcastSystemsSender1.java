@@ -6,6 +6,7 @@ import static wbs.framework.utils.etc.Misc.stringFormat;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +18,7 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.io.IOUtils;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
@@ -121,7 +123,7 @@ class BroadcastSystemsSender1
 
 	@Override
 	protected
-	String sendMessage (
+	Optional<List<String>> sendMessage (
 			State state) {
 
 		log.info (
@@ -131,9 +133,11 @@ class BroadcastSystemsSender1
 
 		try {
 
-			openConnection (state);
+			openConnection (
+				state);
 
-			return readResponse (state);
+			return readResponse (
+				state);
 
 		} catch (IOException exception) {
 
@@ -203,7 +207,7 @@ class BroadcastSystemsSender1
 			"^error=(.+)$");
 
 	public
-	String readResponse (
+	Optional<List<String>> readResponse (
 			@NonNull State state)
 		throws
 			IOException,
@@ -246,7 +250,9 @@ class BroadcastSystemsSender1
 
 			}
 
-			return matcher.group (1);
+			return Optional.of (
+				ImmutableList.of (
+					matcher.group (1)));
 
 		} else {
 

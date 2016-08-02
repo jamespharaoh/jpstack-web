@@ -1,5 +1,7 @@
 package wbs.framework.exception;
 
+import org.json.simple.JSONObject;
+
 public
 interface ExceptionUtils {
 
@@ -7,6 +9,9 @@ interface ExceptionUtils {
 			Throwable throwable);
 
 	String throwableDump (
+			Throwable throwable);
+
+	JSONObject throwableDumpJson (
 			Throwable throwable);
 
 }
