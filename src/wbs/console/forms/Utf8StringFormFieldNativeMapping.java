@@ -1,13 +1,13 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.bytesToString;
-import static wbs.framework.utils.etc.Misc.stringToBytes;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
+import static wbs.framework.utils.etc.StringUtils.utf8ToString;
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 @PrototypeComponent ("utf8StringFormFieldNativeMapping")
 public
@@ -28,9 +28,8 @@ class Utf8StringFormFieldNativeMapping<Container>
 		}
 
 		return Optional.of (
-			bytesToString (
-				nativeValue.get (),
-				"utf-8"));
+			utf8ToString (
+				nativeValue.get ()));
 
 	}
 
@@ -48,9 +47,8 @@ class Utf8StringFormFieldNativeMapping<Container>
 		}
 
 		return Optional.of (
-			stringToBytes (
-				genericValue.get (),
-				"utf-8"));
+			stringToUtf8 (
+				genericValue.get ()));
 
 	}
 

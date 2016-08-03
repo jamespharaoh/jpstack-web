@@ -3,6 +3,7 @@ package wbs.integrations.dialogue.daemon;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -316,7 +317,8 @@ class DialogueMmsSender
 
 			ByteArrayInputStream byteArrayInputStream =
 				new ByteArrayInputStream (
-					stringBuilder.toString ().getBytes ("UTF-8"));
+					stringToUtf8 (
+						stringBuilder.toString ()));
 
 			SAXParserFactory saxParserFactory =
 				SAXParserFactory.newInstance ();

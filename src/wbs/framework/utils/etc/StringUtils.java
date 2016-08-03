@@ -3,6 +3,7 @@ package wbs.framework.utils.etc;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.nullIf;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -12,6 +13,14 @@ import lombok.NonNull;
 
 public
 class StringUtils {
+
+	public static
+	boolean isNotEmptyString (
+			@NonNull String string) {
+
+		return ! string.isEmpty ();
+
+	}
 
 	public static
 	String emptyStringIfNull (
@@ -574,6 +583,78 @@ class StringUtils {
 
 		return ! string.startsWith (
 			prefix);
+
+	}
+
+	public static
+	byte[] stringToUtf8 (
+			@NonNull String string) {
+
+		return stringToBytes (
+			string,
+			"utf-8");
+
+	}
+
+
+	public static
+	byte[] stringToBytes (
+			@NonNull String string,
+			@NonNull String charset) {
+
+		try {
+
+			return string.getBytes (
+				charset);
+
+		} catch (UnsupportedEncodingException exception) {
+
+			throw new RuntimeException (exception);
+
+		}
+
+	}
+
+	public static
+	String bytesToString (
+			byte[] bytes,
+			String charset) {
+
+		try {
+
+			return new String (
+				bytes,
+				charset);
+
+		} catch (UnsupportedEncodingException exception) {
+
+			throw new RuntimeException (exception);
+
+		}
+
+	}
+
+	public static
+	String utf8ToString (
+			@NonNull byte[] bytes) {
+
+		return bytesToString (
+			bytes,
+			"utf-8");
+
+	}
+
+	private final static
+	Pattern nonAlphanumericWordsPattern =
+		Pattern.compile ("[^a-z0-9]+");
+
+	public static
+	String simplify (
+			@NonNull String s) {
+
+		return nonAlphanumericWordsPattern.matcher (
+			s.toLowerCase()).replaceAll(
+				" ").trim();
 
 	}
 

@@ -16,7 +16,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
-import wbs.sms.gsm.Gsm;
+import wbs.sms.gsm.GsmUtils;
 
 @PrototypeComponent ("chatUserHelpFormAction")
 public
@@ -61,12 +61,12 @@ class ChatUserHelpFormAction
 			return null;
 		}
 
-		if (!Gsm.isGsm(text)) {
+		if (!GsmUtils.isValidGsm(text)) {
 			requestContext.addError("Reply contains invalid characters");
 			return null;
 		}
 
-		if (Gsm.length(text) > 149) {
+		if (GsmUtils.length(text) > 149) {
 			requestContext.addError("Text is too long!");
 			return null;
 		}

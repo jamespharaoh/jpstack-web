@@ -1,8 +1,8 @@
 package wbs.smsapps.autoresponder.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.simplify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.simplify;
 
 import java.util.List;
 import java.util.Map;
@@ -132,10 +132,14 @@ class AutoResponderVotesPart
 		votes =
 			new TreeMap<String,Integer> ();
 
-		for (MessageRec message : messages) {
+		for (
+			MessageRec message
+				: messages
+		) {
 
 			String body =
-				simplify (message.getText ().getText ());
+				simplify (
+					message.getText ().getText ());
 
 			Integer oldVal =
 				ifNull (votes.get (body), 0);

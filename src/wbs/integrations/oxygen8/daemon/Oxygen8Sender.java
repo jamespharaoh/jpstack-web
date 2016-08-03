@@ -38,7 +38,7 @@ import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutRec;
-import wbs.sms.gsm.Gsm;
+import wbs.sms.gsm.GsmUtils;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender2;
 import wbs.sms.message.outbox.model.OutboxRec;
@@ -143,7 +143,7 @@ class Oxygen8Sender
 		// validate message text
 
 		if (
-			! Gsm.isGsm (
+			! GsmUtils.isValidGsm (
 				message.getText ().getText ())
 		) {
 
@@ -158,7 +158,7 @@ class Oxygen8Sender
 		}
 
 		long gsmLength =
-			Gsm.length (
+			GsmUtils.length (
 				message.getText ().getText ());
 
 		boolean needMultipart =

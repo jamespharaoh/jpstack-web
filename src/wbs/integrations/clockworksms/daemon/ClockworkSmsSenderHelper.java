@@ -1,10 +1,12 @@
 package wbs.integrations.clockworksms.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.sms.gsm.GsmUtils.isNotValidGsm;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -22,7 +24,9 @@ import wbs.integrations.clockworksms.foreignapi.ClockworkSmsMessageResponse;
 import wbs.integrations.clockworksms.foreignapi.ClockworkSmsMessageSender;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutRec;
-import wbs.sms.gsm.Gsm;
+import wbs.platform.scaffold.model.RootObjectHelper;
+import wbs.platform.scaffold.model.RootRec;
+import wbs.sms.gsm.GsmUtils;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.SmsSenderHelper;
 import wbs.sms.message.outbox.logic.SmsOutboxLogic.FailureType;
@@ -37,10 +41,13 @@ class ClockworkSmsSenderHelper
 	// dependencies
 
 	@Inject
+	ClockworkSmsRouteOutObjectHelper clockworkSmsRouteOutHelper;
+
+	@Inject
 	ObjectManager objectManager;
 
 	@Inject
-	ClockworkSmsRouteOutObjectHelper clockworkSmsRouteOutHelper;
+	RootObjectHelper rootHelper;
 
 	@Inject
 	WbsConfig wbsConfig;
@@ -102,7 +109,7 @@ class ClockworkSmsSenderHelper
 		// validate message text
 
 		if (
-			! Gsm.isGsm (
+			isNotValidGsm (
 				smsMessage.getText ().getText ())
 		) {
 
@@ -117,11 +124,11 @@ class ClockworkSmsSenderHelper
 		}
 
 		long gsmLength =
-			Gsm.length (
+			GsmUtils.length (
 				smsMessage.getText ().getText ());
 
 		long gsmParts =
-			Gsm.parts (
+			GsmUtils.parts (
 				gsmLength);
 
 		if (
@@ -172,6 +179,9 @@ class ClockworkSmsSenderHelper
 
 		// create request
 
+		RootRec root =
+			rootHelper.findRequired (0);
+
 		ClockworkSmsMessageRequest clockworkRequest =
 			new ClockworkSmsMessageRequest ()
 
@@ -198,8 +208,17 @@ class ClockworkSmsSenderHelper
 					clockworkSmsRouteOut.getMaxParts ())
 
 				.clientId (
-					Integer.toString (
-						smsMessage.getId ()))
+					ifElse (
+						isNotNull (
+							root.getFixturesSeed ()),
+
+					() -> stringFormat (
+						"test-%s-%s",
+						root.getFixturesSeed (),
+						smsMessage.getId ()),
+
+					() -> Integer.toString (
+						smsMessage.getId ())))
 
 				.dlrType (
 					4l)
@@ -321,16 +340,8 @@ class ClockworkSmsSenderHelper
 				clockworkSmsResponse.errNo ())
 		) {
 
-			return new ProcessResponseResult ()
-
-				.status (
-					ProcessResponseStatus.remoteError)
-
-				.statusMessage (
-					clockworkSmsResponse.errDesc ())
-
-				.failureType (
-					FailureType.temporary);
+			return handleSpecificError (
+				clockworkSmsResponse);
 
 		}
 
@@ -360,6 +371,54 @@ class ClockworkSmsSenderHelper
 
 			.failureType (
 				FailureType.temporary);
+
+	}
+
+	ProcessResponseResult handleSpecificError (
+			@NonNull ClockworkSmsMessageResponse.SmsResp clockworkSmsResponse) {
+
+		switch (clockworkSmsResponse.errNo ()) {
+
+		case 25: // client id duplicated
+
+			return new ProcessResponseResult ()
+
+				.status (
+					ProcessResponseStatus.success)
+
+				.statusMessage (
+					"Duplicate client ID, message already sent");
+
+		case 60: // blocked by spam filter
+
+			return new ProcessResponseResult ()
+
+				.status (
+					ProcessResponseStatus.remoteError)
+
+				.statusMessage (
+					"Blocked by Clockwork SMS's spam filter")
+
+				.failureType (
+					FailureType.permanent);
+
+		default:
+
+			return new ProcessResponseResult ()
+
+				.status (
+					ProcessResponseStatus.remoteError)
+
+				.statusMessage (
+					stringFormat (
+						"Server error %s: %s",
+						clockworkSmsResponse.errNo (),
+						clockworkSmsResponse.errDesc ()))
+
+				.failureType (
+					FailureType.temporary);
+
+		}
 
 	}
 

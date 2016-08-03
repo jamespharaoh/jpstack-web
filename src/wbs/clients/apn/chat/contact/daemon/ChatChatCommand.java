@@ -43,7 +43,7 @@ import wbs.platform.text.model.TextRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.KeywordFinder;
-import wbs.sms.gsm.Gsm;
+import wbs.sms.gsm.GsmUtils;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
@@ -328,7 +328,7 @@ class ChatChatCommand
 		Optional<ChatKeywordRec> chatKeywordOptional =
 			chatKeywordHelper.findByCode (
 				chat,
-				Gsm.toSimpleAlpha (keyword));
+				GsmUtils.toSimpleAlpha (keyword));
 
 		if (
 			isNotPresent (

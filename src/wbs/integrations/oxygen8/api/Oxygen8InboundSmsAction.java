@@ -1,8 +1,8 @@
 package wbs.integrations.oxygen8.api;
 
-import static wbs.framework.utils.etc.Misc.bytesToString;
 import static wbs.framework.utils.etc.Misc.fromHex;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.bytesToString;
 import static wbs.framework.utils.etc.TimeUtils.secondsToInstant;
 
 import java.util.Collections;

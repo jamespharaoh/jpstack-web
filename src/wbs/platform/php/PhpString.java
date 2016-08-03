@@ -1,7 +1,7 @@
 package wbs.platform.php;
 
-import static wbs.framework.utils.etc.Misc.bytesToString;
-import static wbs.framework.utils.etc.Misc.stringToBytes;
+import static wbs.framework.utils.etc.StringUtils.bytesToString;
+import static wbs.framework.utils.etc.StringUtils.stringToBytes;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;

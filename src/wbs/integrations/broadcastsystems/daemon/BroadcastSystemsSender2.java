@@ -2,7 +2,6 @@ package wbs.integrations.broadcastsystems.daemon;
 
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.stringToBytes;
 import static wbs.framework.utils.etc.Misc.stringToUrl;
 
 import java.net.HttpURLConnection;
@@ -30,7 +29,11 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
+
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringToBytes;
+import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
+
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutRec;
 import wbs.platform.exception.logic.ExceptionLogLogic;
@@ -152,9 +155,8 @@ class BroadcastSystemsSender2
 				Html.urlPathElementEncode (
 					message.getNumTo ()),
 				Base64.encodeBase64String (
-					stringToBytes (
-						message.getText ().getText (),
-						"utf-8")));
+					stringToUtf8 (
+						message.getText ().getText ())));
 
 		log.debug (
 			stringFormat (

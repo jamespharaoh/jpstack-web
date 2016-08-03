@@ -1,8 +1,8 @@
 package wbs.integrations.mediaburst.api;
 
 import static wbs.framework.utils.etc.Misc.fromHex;
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.isNotEmptyString;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -266,7 +266,7 @@ class MediaburstApiServletModule
 			UserDataHeader userDataHeader;
 
 			if (
-				isNotEmpty (
+				isNotEmptyString (
 					udhParam)
 			) {
 

@@ -32,7 +32,7 @@ import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.integrations.smsarena.model.SmsArenaRouteOutObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaRouteOutRec;
 import wbs.platform.exception.logic.ExceptionLogLogic;
-import wbs.sms.gsm.Gsm;
+import wbs.sms.gsm.GsmUtils;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender2;
 import wbs.sms.message.outbox.model.OutboxRec;
@@ -244,7 +244,7 @@ class SmsArenaSender
 		// set multipart
 
 		if (
-			! Gsm.isGsm (
+			! GsmUtils.isValidGsm (
 				params.get("text"))
 		) {
 

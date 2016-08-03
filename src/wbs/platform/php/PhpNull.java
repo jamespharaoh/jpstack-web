@@ -1,6 +1,6 @@
 package wbs.platform.php;
 
-import static wbs.framework.utils.etc.Misc.stringToBytes;
+import static wbs.framework.utils.etc.StringUtils.stringToBytes;
 
 import java.util.List;
 import java.util.Map;

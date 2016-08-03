@@ -18,7 +18,7 @@ class ClockworkSmsMessageResponse {
 
 	@DataChildren (
 		direct = true,
-		childElement = "SMS")
+		childElement = "SMS_Resp")
 	List<SmsResp> smsResp =
 		new ArrayList<SmsResp> ();
 
@@ -57,6 +57,11 @@ class ClockworkSmsMessageResponse {
 			name = "ErrDesc",
 			required = false)
 		String errDesc;
+
+		@DataChild (
+			name = "ClientID",
+			required = false)
+		String clientId;
 
 	}
 

@@ -55,7 +55,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
-import wbs.sms.gsm.Gsm;
+import wbs.sms.gsm.GsmUtils;
 import wbs.sms.message.core.model.MessageRec;
 
 @PrototypeComponent ("chatUserPendingFormAction")
@@ -611,7 +611,7 @@ class ChatUserPendingFormAction
 				requestContext.parameterRequired (
 					"message"));
 
-		if (Gsm.length (messageParam) == 0) {
+		if (GsmUtils.length (messageParam) == 0) {
 
 			requestContext.addError (
 				"Please enter a message to send");
@@ -620,7 +620,7 @@ class ChatUserPendingFormAction
 
 		}
 
-		if (Gsm.length (messageParam) > 160) {
+		if (GsmUtils.length (messageParam) > 160) {
 
 			requestContext.addError (
 				"Message is too long");
@@ -710,7 +710,7 @@ class ChatUserPendingFormAction
 				requestContext.parameterRequired (
 					"message"));
 
-		if (Gsm.length (messageParam) == 0) {
+		if (GsmUtils.length (messageParam) == 0) {
 
 			requestContext.addError (
 				"Please enter a message to send");
@@ -719,7 +719,7 @@ class ChatUserPendingFormAction
 
 		}
 
-		if (Gsm.length (messageParam) > 160) {
+		if (GsmUtils.length (messageParam) > 160) {
 
 			requestContext.addError (
 				"Message is too long");
@@ -931,7 +931,7 @@ class ChatUserPendingFormAction
 
 		if (
 			isZero (
-				Gsm.length (
+				GsmUtils.length (
 					messageParam))
 		) {
 
@@ -944,7 +944,7 @@ class ChatUserPendingFormAction
 
 		if (
 			moreThan (
-				Gsm.length (
+				GsmUtils.length (
 					messageParam),
 				160)
 		) {

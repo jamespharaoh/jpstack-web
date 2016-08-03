@@ -1,7 +1,7 @@
 package wbs.console.request;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.stringToUnicodeBytes;
+import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
 
 import java.security.SecureRandom;
 
@@ -46,7 +46,7 @@ class CryptorFactory {
 					"SHA1PRNG");
 
 			secureRandom.setSeed (
-				stringToUnicodeBytes (
+				stringToUtf8 (
 					stringFormat (
 						"%s/%s",
 						wbsConfig.cryptorSeed (),

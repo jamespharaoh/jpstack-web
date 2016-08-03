@@ -33,7 +33,7 @@ import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.sms.gsm.Gsm;
+import wbs.sms.gsm.GsmUtils;
 
 @PrototypeComponent ("chatMessagePendingFormAction")
 public
@@ -329,7 +329,7 @@ class ChatMessagePendingFormAction
 				requestContext.parameterRequired (
 					"message"));
 
-		if (Gsm.length (messageParam) == 0) {
+		if (GsmUtils.length (messageParam) == 0) {
 
 			requestContext.addError (
 				"Please enter a message to send");
@@ -338,7 +338,7 @@ class ChatMessagePendingFormAction
 
 		}
 
-		if (Gsm.length (messageParam) > 149) {
+		if (GsmUtils.length (messageParam) > 149) {
 
 			requestContext.addError (
 				"Message is too long");

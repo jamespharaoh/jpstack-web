@@ -1,5 +1,6 @@
 package wbs.applications.imchat.api;
 
+
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 
 import java.util.Map;

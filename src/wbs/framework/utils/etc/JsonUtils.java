@@ -1,6 +1,6 @@
 package wbs.framework.utils.etc;
 
-import static wbs.framework.utils.etc.Misc.stringToBytes;
+import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
 
 import java.io.StringWriter;
 
@@ -19,10 +19,9 @@ class JsonUtils {
 	byte[] jsonToBytes (
 			@NonNull Object object) {
 
-		return stringToBytes (
+		return stringToUtf8 (
 			JSONValue.toJSONString (
-				object),
-			"utf-8");
+				object));
 
 	}
 

@@ -19,7 +19,7 @@ import wbs.framework.web.Responder;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.sms.gsm.Gsm;
+import wbs.sms.gsm.GsmUtils;
 
 @PrototypeComponent ("chatHelpLogPendingFormAction")
 public
@@ -87,7 +87,7 @@ class ChatHelpLogPendingFormAction
 
 			}
 
-			if (! Gsm.isGsm (text)) {
+			if (! GsmUtils.isValidGsm (text)) {
 
 				requestContext.addError (
 					"Reply contains invalid characters");

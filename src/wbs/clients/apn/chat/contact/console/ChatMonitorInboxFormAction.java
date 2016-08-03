@@ -35,7 +35,7 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
-import wbs.sms.gsm.Gsm;
+import wbs.sms.gsm.GsmUtils;
 
 @PrototypeComponent ("chatMonitorInboxFormAction")
 public
@@ -144,7 +144,7 @@ class ChatMonitorInboxFormAction
 
 			}
 
-			if (! Gsm.isGsm (text)) {
+			if (! GsmUtils.isValidGsm (text)) {
 
 				requestContext.addError (
 					"Message text is invalid");
@@ -155,7 +155,7 @@ class ChatMonitorInboxFormAction
 
 			if (
 				moreThan (
-					Gsm.length (text),
+					GsmUtils.length (text),
 					ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
 						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES)
 			) {
@@ -207,7 +207,7 @@ class ChatMonitorInboxFormAction
 
 			if (
 				lessThan (
-					Gsm.length (text),
+					GsmUtils.length (text),
 					chat.getMinMonitorMessageLength ())
 			) {
 

@@ -26,7 +26,7 @@ import wbs.platform.text.model.TextRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.customer.logic.SmsCustomerLogic;
-import wbs.sms.gsm.Gsm;
+import wbs.sms.gsm.GsmUtils;
 import wbs.sms.gsm.MessageSplitter;
 import wbs.sms.keyword.logic.KeywordLogic;
 import wbs.sms.message.outbox.logic.MessageSender;
@@ -149,7 +149,7 @@ class ManualResponderLogicImplementation
 			}
 
 			long singleMessageLength =
-				Gsm.length (
+				GsmUtils.length (
 					singleMessage);
 
 			messageParts =

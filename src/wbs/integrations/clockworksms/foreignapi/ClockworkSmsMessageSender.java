@@ -108,8 +108,6 @@ class ClockworkSmsMessageSender {
 				dataToXml.writeToString (
 					request);
 
-System.out.println (xmlRequest);
-
 			httpPost =
 				new HttpPost (
 					url);
@@ -233,17 +231,7 @@ System.out.println (xmlRequest);
 
 		try {
 
-			// check response
-
-			if (
-				notEqual (
-					httpResponse.getStatusLine ().getStatusCode (),
-					200)
-			) {
-
-				throw new RuntimeException ();
-
-			}
+			// receive responsea
 
 			try {
 
@@ -258,7 +246,48 @@ System.out.println (xmlRequest);
 
 			}
 
-System.out.println (xmlResponse);
+			// store raw response
+
+			responseTrace =
+				new JSONObject (
+					ImmutableMap.<String,Object>builder ()
+
+				.put (
+					"statusCode",
+					httpResponse.getStatusLine ().getStatusCode ())
+
+				.put (
+					"statusMessage",
+					httpResponse.getStatusLine ().getReasonPhrase ())
+
+				.put (
+					"headers",
+					Arrays.asList (
+						httpResponse.getAllHeaders ()
+					).stream ().collect (
+						Collectors.toMap (
+							Header::getName,
+							Header::getValue)))
+
+				.put (
+					"body",
+					xmlResponse)
+
+				.build ()
+
+			);
+
+			// check response
+
+			if (
+				notEqual (
+					httpResponse.getStatusLine ().getStatusCode (),
+					200)
+			) {
+
+				throw new RuntimeException ();
+
+			}
 
 			state =
 				State.received;

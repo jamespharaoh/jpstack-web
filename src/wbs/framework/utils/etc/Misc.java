@@ -1,5 +1,6 @@
 package wbs.framework.utils.etc;
 
+import static wbs.framework.utils.etc.StringUtils.bytesToString;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 
 import java.io.BufferedReader;
@@ -227,68 +228,6 @@ class Misc {
 				exception);
 
 		}
-
-	}
-
-	public static
-	byte[] stringToUnicodeBytes (
-			@NonNull String string) {
-
-		return stringToBytes (
-			string,
-			"utf-8");
-
-	}
-
-
-	public static
-	byte[] stringToBytes (
-			@NonNull String string,
-			@NonNull String charset) {
-
-		try {
-
-			return string.getBytes (
-				charset);
-
-		} catch (UnsupportedEncodingException exception) {
-
-			throw new RuntimeException (exception);
-
-		}
-
-	}
-
-	public static
-	String bytesToString (
-			byte[] bytes,
-			String charset) {
-
-		try {
-
-			return new String (
-				bytes,
-				charset);
-
-		} catch (UnsupportedEncodingException exception) {
-
-			throw new RuntimeException (exception);
-
-		}
-
-	}
-
-	private final static
-	Pattern nonAlphanumericWordsPattern =
-		Pattern.compile ("[^a-z0-9]+");
-
-	public static
-	String simplify (
-			@NonNull String s) {
-
-		return nonAlphanumericWordsPattern.matcher (
-			s.toLowerCase()).replaceAll(
-				" ").trim();
 
 	}
 
@@ -1434,17 +1373,6 @@ class Misc {
 			Map<?,?> collection) {
 
 		return ! collection.isEmpty ();
-
-	}
-
-	public static
-	boolean isNotEmpty (
-			String string) {
-
-		if (string == null)
-			return false;
-
-		return ! string.isEmpty ();
 
 	}
 

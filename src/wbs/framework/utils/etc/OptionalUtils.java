@@ -412,4 +412,13 @@ class OptionalUtils {
 
 	}
 
+	public static <Type>
+	Optional<Type> optionalFromNullable (
+			Type value) {
+
+		return Optional.fromNullable (
+			value);
+
+	}
+
 }

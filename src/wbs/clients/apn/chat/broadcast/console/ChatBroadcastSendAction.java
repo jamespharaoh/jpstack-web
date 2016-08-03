@@ -65,7 +65,7 @@ import wbs.platform.text.model.TextRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.sms.command.model.CommandObjectHelper;
-import wbs.sms.gsm.Gsm;
+import wbs.sms.gsm.GsmUtils;
 import wbs.sms.magicnumber.logic.MagicNumberLogic;
 import wbs.sms.message.batch.logic.BatchLogic;
 import wbs.sms.message.batch.model.BatchObjectHelper;
@@ -662,7 +662,7 @@ class ChatBroadcastSendAction
 						form.message ());
 
 				long messageLength =
-					Gsm.length (
+					GsmUtils.length (
 						messageString);
 
 				if (messageLength > 160) {

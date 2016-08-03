@@ -31,7 +31,7 @@ import wbs.platform.text.model.TextRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
-import wbs.sms.gsm.Gsm;
+import wbs.sms.gsm.GsmUtils;
 import wbs.sms.keyword.logic.KeywordLogic;
 import wbs.sms.message.outbox.logic.MessageSender;
 import wbs.sms.route.core.model.RouteRec;
@@ -264,7 +264,7 @@ class ManualResponderRequestPendingFormAction
 				? messageParam
 				: template.getDefaultText ();
 
-		if (! Gsm.isGsm (messageString)) {
+		if (! GsmUtils.isValidGsm (messageString)) {
 
 			requestContext.addError (
 				"Message contains characters which cannot be sent via SMS");

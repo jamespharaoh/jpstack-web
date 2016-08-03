@@ -27,7 +27,9 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
+
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.updatelog.logic.UpdateManager;
