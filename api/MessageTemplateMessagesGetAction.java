@@ -1,10 +1,6 @@
 package wbs.services.messagetemplate.api;
 
-import static wbs.framework.utils.etc.Misc.hyphenToUnderscore;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.joinWithFullStop;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -18,6 +14,12 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
+import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
+import static wbs.framework.utils.etc.StringUtils.underscoreToHyphen;
+
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
