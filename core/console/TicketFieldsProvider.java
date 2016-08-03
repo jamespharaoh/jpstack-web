@@ -1,7 +1,7 @@
 package wbs.services.ticket.core.console;
 
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.underscoreToCamel;
+import static wbs.framework.utils.etc.StringUtils.underscoreToCamel;
 
 import java.util.ArrayList;
 import java.util.List;
