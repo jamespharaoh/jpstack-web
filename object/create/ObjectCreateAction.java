@@ -1,11 +1,11 @@
 package wbs.platform.object.create;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.instantToDateNullSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.toInteger;
+import static wbs.framework.utils.etc.TimeUtils.instantToDateNullSafe;
 
 import java.util.Date;
 

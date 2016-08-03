@@ -1,6 +1,6 @@
 package wbs.platform.priv.console;
 
-import static wbs.framework.utils.etc.Misc.implode;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 
 import java.util.List;
 import java.util.Map;
@@ -223,10 +223,12 @@ class ObjectSummaryPrivPart
 				userPath,
 
 				"<td>%h</td>\n",
-				implode (", ", userPrivSets.canPrivCodes),
+				joinWithCommaAndSpace (
+					userPrivSets.canPrivCodes),
 
 				"<td>%h</td>\n",
-				implode (", ", userPrivSets.canGrantPrivCodes),
+				joinWithCommaAndSpace (
+					userPrivSets.canGrantPrivCodes),
 
 				"</tr>\n");
 
@@ -304,7 +306,8 @@ class ObjectSummaryPrivPart
 				groupPath,
 
 				"<td>%h</td>\n",
-				implode (", ", privCodes),
+				joinWithCommaAndSpace (
+					privCodes),
 
 				"</tr>\n");
 

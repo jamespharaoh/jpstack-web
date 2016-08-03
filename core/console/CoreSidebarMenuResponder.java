@@ -1,8 +1,6 @@
 package wbs.platform.core.console;
 
-import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.optionalOrNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +19,10 @@ import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.ABSwap;
+
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
+
 import wbs.platform.menu.console.MenuGroupConsoleHelper;
 import wbs.platform.menu.model.MenuGroupRec;
 import wbs.platform.menu.model.MenuItemRec;

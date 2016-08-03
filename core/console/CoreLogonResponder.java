@@ -1,8 +1,7 @@
 package wbs.platform.core.console;
 
 import static wbs.framework.utils.etc.Misc.isEmpty;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.isPresent;
+import static wbs.framework.utils.etc.Misc.isEmptyString;
 
 import java.util.Set;
 
@@ -19,6 +18,10 @@ import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.record.GlobalId;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+
 import wbs.platform.scaffold.console.SliceConsoleHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleHelper;
@@ -121,8 +124,12 @@ class CoreLogonResponder
 
 	void goTestUsers () {
 
-		if (isEmpty (wbsConfig.testUsers ()))
+		if (
+			isEmpty (
+				wbsConfig.testUsers ())
+		) {
 			return;
+		}
 
 		printFormat (
 			"<h2>Quick login</h2>\n");

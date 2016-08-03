@@ -1,7 +1,6 @@
 package wbs.platform.currency.console;
 
 import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
@@ -22,6 +21,7 @@ import fj.data.Either;
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.currency.model.CurrencyRec;
 

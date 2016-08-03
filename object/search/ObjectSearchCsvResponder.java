@@ -1,11 +1,11 @@
 package wbs.platform.object.search;
 
-import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.methodInvoke;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

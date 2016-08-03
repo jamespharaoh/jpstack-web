@@ -1,7 +1,7 @@
 package wbs.platform.queue.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
+import static wbs.framework.utils.etc.StringUtils.joinWithNewline;
 
 import java.io.IOException;
 
@@ -76,8 +76,7 @@ class QueueFilterResponder
 
 	final static
 	String defaultFilter =
-		joinWithSeparator (
-			"\n",
+		joinWithNewline (
 			"---",
 			"- name: No Filter",
 			"  options:",

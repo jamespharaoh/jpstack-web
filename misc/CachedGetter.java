@@ -1,7 +1,7 @@
 package wbs.platform.misc;
 
-import static wbs.framework.utils.etc.Misc.earlierThan;
-import static wbs.framework.utils.etc.Misc.millisToInstant;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
+import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
 import javax.inject.Provider;
 

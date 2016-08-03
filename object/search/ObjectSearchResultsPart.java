@@ -4,13 +4,8 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isPresent;
-import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.methodInvoke;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.optionalIf;
-import static wbs.framework.utils.etc.Misc.optionalOrNull;
-import static wbs.framework.utils.etc.Misc.presentInstances;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -50,6 +45,13 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.IdObject;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
+
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
+
 import wbs.platform.user.console.UserConsoleLogic;
 
 @Accessors (fluent = true)

@@ -1,9 +1,7 @@
 package wbs.platform.queue.console;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.optionalOrNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
@@ -28,6 +26,10 @@ import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
+
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
+
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
@@ -305,8 +307,7 @@ class QueueDebugPart
 					"<td",
 					" colspan=\"3\"",
 					" style=\"%h\"",
-					joinWithSeparator (
-						"; ",
+					joinWithSemicolonAndSpace (
 						"text-align: center",
 						"background: #dddddd"),
 					">Subject: <a",

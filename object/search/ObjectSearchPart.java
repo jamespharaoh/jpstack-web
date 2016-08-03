@@ -2,7 +2,6 @@ package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.optionalCast;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -30,6 +29,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
+import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchPart")

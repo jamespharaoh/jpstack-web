@@ -1,6 +1,5 @@
 package wbs.platform.media.console;
 
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Map;
@@ -13,6 +12,7 @@ import fj.data.Either;
 
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.application.annotations.PrototypeComponent;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.platform.media.model.MediaRec;
 
 @PrototypeComponent ("imageCsvFormFieldInterfaceMapping")

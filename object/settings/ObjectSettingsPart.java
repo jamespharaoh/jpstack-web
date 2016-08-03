@@ -1,7 +1,6 @@
 package wbs.platform.object.settings;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.optionalCast;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -27,6 +26,7 @@ import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
+import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 @Accessors (fluent = true)

@@ -1,11 +1,11 @@
 package wbs.platform.queue.console;
 
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.joinWithFullStop;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
+import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
 
 import java.util.Map;
 
@@ -112,8 +112,7 @@ class QueueConsoleLogic {
 				) {
 
 					String queueTypeName =
-						stringFormat (
-							"%s.%s",
+						joinWithFullStop (
 							camelToUnderscore (
 								modelMeta.name ()),
 							simplifyToCodeRequired (

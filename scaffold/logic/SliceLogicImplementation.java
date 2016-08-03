@@ -1,9 +1,6 @@
 package wbs.platform.scaffold.logic;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.isPresent;
-import static wbs.framework.utils.etc.Misc.laterThan;
-import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.orNull;
 
 import java.util.HashMap;
@@ -29,6 +26,11 @@ import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.utils.ThreadManager;
+
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.TimeUtils.laterThan;
+
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 

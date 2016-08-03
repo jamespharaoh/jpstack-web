@@ -1,6 +1,6 @@
 package wbs.platform.user.console;
 
-import static wbs.framework.utils.etc.Misc.implode;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -197,8 +197,7 @@ class UserPrivsSummaryPart
 					: "no",
 
 				"<td>%h</td>\n",
-				implode (
-					", ",
+				joinWithCommaAndSpace (
 					privStuff.groups),
 
 				"</tr>\n");

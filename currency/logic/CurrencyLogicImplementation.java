@@ -4,12 +4,12 @@ import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
-import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
-import static wbs.framework.utils.etc.Misc.optionalRequired;
-import static wbs.framework.utils.etc.Misc.presentInstances;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
+import static wbs.framework.utils.etc.StringUtils.joinWithPipe;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.currency.model.CurrencyRec;
@@ -266,25 +265,20 @@ class CurrencyLogicImplementation
 				"\\s*",
 				"(?:",
 
-				joinWithSeparator (
-					"|",
+				joinWithPipe (
+					presentInstances (
 
-					ImmutableList.copyOf (
-						presentInstances (
+					Optional.fromNullable (
+						nullIfEmptyString (
+							Pattern.quote (
+								currency.getSingularSuffix ().trim ()))),
 
-						Optional.fromNullable (
-							nullIfEmptyString (
-								Pattern.quote (
-									currency.getSingularSuffix ().trim ()))),
+					Optional.fromNullable (
+						nullIfEmptyString (
+							Pattern.quote (
+								currency.getPluralSuffix ().trim ())))
 
-						Optional.fromNullable (
-							nullIfEmptyString (
-								Pattern.quote (
-									currency.getPluralSuffix ().trim ())))
-
-					))
-
-				),
+				)),
 
 				")\\s*"
 

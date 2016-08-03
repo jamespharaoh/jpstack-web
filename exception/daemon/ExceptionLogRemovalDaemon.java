@@ -1,6 +1,7 @@
 package wbs.platform.exception.daemon;
 
 import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isEmptyString;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.List;
