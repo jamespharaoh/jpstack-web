@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.utils.RandomLogic;
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 @PrototypeComponent ("rootFixtureProvider")
@@ -12,6 +13,9 @@ class RootFixtureProvider
 	implements FixtureProvider {
 
 	// dependencies
+
+	@Inject
+	RandomLogic randomLogic;
 
 	@Inject
 	RootObjectHelper rootHelper;
@@ -30,6 +34,10 @@ class RootFixtureProvider
 
 			.setCode (
 				"root")
+
+			.setFixturesSeed (
+				randomLogic.generateLowercase (
+					20))
 
 		);
 

@@ -173,9 +173,10 @@ class QueueSubjectSorter {
 					? QueueInfo.oldestAvailableComparator
 					: QueueInfo.oldestComparator)
 
-			.filter (queueInfo ->
-				isNotEmpty (
-					queueInfo.subjectInfos))
+			.filter (
+				queueInfo ->
+					isNotEmpty (
+						queueInfo.subjectInfos))
 
 			.collect (
 				Collectors.toList ());

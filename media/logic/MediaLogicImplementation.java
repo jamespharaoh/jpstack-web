@@ -9,7 +9,6 @@ import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.runFilter;
 import static wbs.framework.utils.etc.Misc.runFilterAdvanced;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.stringToBytes;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -40,9 +39,12 @@ import com.google.common.collect.ImmutableSet;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.GlobalId;
+
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.StringUtils.stringToBytes;
+
 import wbs.platform.media.model.ContentObjectHelper;
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaObjectHelper;
