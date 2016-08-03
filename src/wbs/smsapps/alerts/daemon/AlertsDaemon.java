@@ -1,10 +1,10 @@
 package wbs.smsapps.alerts.daemon;
 
-import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
 import java.util.HashMap;
 import java.util.List;

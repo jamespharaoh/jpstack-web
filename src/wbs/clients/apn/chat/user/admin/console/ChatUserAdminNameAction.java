@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.user.admin.console;
 
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.toEnum;
+import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
 
 import javax.inject.Inject;
 

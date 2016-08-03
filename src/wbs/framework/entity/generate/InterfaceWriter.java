@@ -1,7 +1,7 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormatArray;
+import static wbs.framework.utils.etc.StringUtils.joinWithSeparator;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.user.admin.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.millisToInstant;
+import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
 import java.util.List;
 

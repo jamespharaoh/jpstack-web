@@ -1,12 +1,12 @@
 package wbs.clients.apn.chat.contact.logic;
 
 import static wbs.framework.utils.etc.Misc.allOf;
-import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.isoDate;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
+import static wbs.framework.utils.etc.TimeUtils.isoDate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -197,8 +197,7 @@ class ChatMessageLogicImplementation
 		log.debug (
 			stringFormat (
 				"chatMessageSendFromUser (%s)",
-				joinWithSeparator (
-					", ",
+				joinWithCommaAndSpace (
 					objectManager.objectPathMini (
 						fromUser),
 					objectManager.objectPathMini (

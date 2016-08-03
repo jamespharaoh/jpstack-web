@@ -50,6 +50,10 @@
 		<bean class="IntegerFormFieldValueValidator"/>
 		<bean class="JqueryScriptRefFormFieldBuilder"/>
 		<bean class="JqueryScriptRefFormFieldSpec"/>
+		<bean class="JsonFormFieldBuilder"/>
+		<bean class="JsonFormFieldInterfaceMapping"/>
+		<bean class="JsonFormFieldNativeMapping"/>
+		<bean class="JsonFormFieldSpec"/>
 		<bean class="NameFormFieldAccessor"/>
 		<bean class="NameFormFieldBuilder"/>
 		<bean class="NameFormFieldConstraintValidator"/>

@@ -1,12 +1,12 @@
 package wbs.console.module;
 
-import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 
 import java.io.File;
 import java.io.IOException;

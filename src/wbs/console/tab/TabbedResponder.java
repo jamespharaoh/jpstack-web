@@ -1,8 +1,8 @@
 package wbs.console.tab;
 
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -307,8 +307,7 @@ class TabbedResponder
 
 		printFormat (
 			"<div style=\"%h\"></div>\n",
-			joinWithSeparator (
-				"; ",
+			joinWithSemicolonAndSpace (
 				"clear: both",
 				"border-top: 1px solid white",
 				"margin-bottom: 1ex"));

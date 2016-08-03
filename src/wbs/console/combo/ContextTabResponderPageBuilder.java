@@ -1,9 +1,9 @@
 package wbs.console.combo;
 
-import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 
 import java.util.Collections;
 
@@ -181,7 +181,9 @@ class ContextTabResponderPageBuilder<
 		tabLabel =
 			ifNull (
 				spec.tabLabel (),
-				capitalise (camelToSpaces (name)));
+				capitalise (
+					camelToSpaces (
+						name)));
 
 		fileName =
 			ifNull (

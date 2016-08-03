@@ -1,6 +1,5 @@
 package wbs.integrations.broadcastsystems.daemon;
 
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBytes;
@@ -31,6 +30,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutRec;
 import wbs.platform.exception.logic.ExceptionLogLogic;

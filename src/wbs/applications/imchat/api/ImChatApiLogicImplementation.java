@@ -1,14 +1,11 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isEmptyString;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +38,11 @@ import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.TimeFormatter;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
+import static wbs.framework.utils.etc.StringUtils.underscoreToHyphen;
+
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.media.model.ContentRec;
@@ -535,7 +537,7 @@ class ImChatApiLogicImplementation
 
 					detailType.getRequired ()
 
-					&& isEmpty (
+					&& isEmptyString (
 						stringValue.trim ())
 
 				) {
@@ -557,7 +559,7 @@ class ImChatApiLogicImplementation
 
 					detailType.getRequired ()
 
-					&& isEmpty (
+					&& isEmptyString (
 						stringValue.trim ())
 
 				) {

@@ -5,8 +5,6 @@ import static wbs.framework.utils.etc.Misc.classForName;
 import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.presentInstances;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -39,6 +37,8 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.record.Record;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 

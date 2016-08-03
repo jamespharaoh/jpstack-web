@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isPresent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +27,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.updatelog.logic.UpdateManager;

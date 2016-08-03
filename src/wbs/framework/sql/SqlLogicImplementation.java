@@ -1,6 +1,6 @@
 package wbs.framework.sql;
 
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
 import java.sql.Connection;
 import java.sql.SQLException;

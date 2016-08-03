@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.core.logic;
 
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -17,6 +15,10 @@ import com.google.common.base.Optional;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.TimeUtils.laterThan;
+
 import wbs.sms.number.core.model.ChatUserNumberReportObjectHelper;
 import wbs.sms.number.core.model.ChatUserNumberReportRec;
 import wbs.sms.number.core.model.NumberRec;

@@ -1,9 +1,9 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.spacify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.spacify;
 
 import java.util.List;
 

@@ -1,10 +1,10 @@
 package wbs.integrations.dialogue.api;
 
-import static wbs.framework.utils.etc.Misc.dateToInstantNullSafe;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
+import static wbs.framework.utils.etc.TimeUtils.dateToInstantNullSafe;
 
 import java.io.IOException;
 import java.io.PrintWriter;

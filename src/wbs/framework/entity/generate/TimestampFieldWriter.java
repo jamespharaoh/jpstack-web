@@ -16,7 +16,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.entity.meta.PropertyWriter;
 import wbs.framework.entity.meta.TimestampFieldSpec;
 import wbs.framework.utils.etc.FormatWriter;
-import wbs.framework.utils.etc.Misc;
+import wbs.framework.utils.etc.TimeUtils;
 
 @PrototypeComponent ("timestampFieldWriter")
 @ModelWriter
@@ -62,7 +62,7 @@ class TimestampFieldWriter {
 
 			.setterConversion (
 				getStaticMethodRequired (
-					Misc.class,
+					TimeUtils.class,
 					"toInstantNullSafe",
 					ImmutableList.of (
 						ReadableInstant.class)));

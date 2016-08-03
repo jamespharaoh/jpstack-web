@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.ad.daemon;
 
-import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.laterThan;
 
 import java.util.ArrayList;
 import java.util.List;

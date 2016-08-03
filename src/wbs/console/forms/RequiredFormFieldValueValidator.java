@@ -1,11 +1,11 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 
 @PrototypeComponent ("requiredFormFieldValueValidator")
 public

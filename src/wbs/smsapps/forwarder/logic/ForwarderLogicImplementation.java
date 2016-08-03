@@ -3,7 +3,6 @@ package wbs.smsapps.forwarder.logic;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.util.ArrayList;
@@ -23,6 +22,7 @@ import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.GlobalId;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;

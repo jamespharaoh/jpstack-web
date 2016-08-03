@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.toStringNull;
+import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.utils.etc.RuntimeIoException;
@@ -42,6 +43,9 @@ class ClockworkSmsMessageSender {
 
 	@Inject @Named
 	DataFromXml clockworkSmsForeignApiDataFromXml;
+
+	@Inject
+	WbsConfig wbsConfig;
 
 	// properties
 
@@ -109,6 +113,10 @@ System.out.println (xmlRequest);
 			httpPost =
 				new HttpPost (
 					url);
+
+			httpPost.setHeader (
+				"User-Agent",
+				wbsConfig.httpUserAgent ());
 
 			httpPost.setEntity (
 				new StringEntity (

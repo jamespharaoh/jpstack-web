@@ -1,15 +1,18 @@
 package wbs.framework.data.tools;
 
-import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.Misc.hyphenToCamel;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
-import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
+import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
 import static wbs.framework.utils.etc.Misc.toEnumGeneric;
 import static wbs.framework.utils.etc.Misc.uncapitalise;
+import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
+import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
 
 import java.io.File;
 import java.io.InputStream;
@@ -499,8 +502,7 @@ class DataFromXml {
 						"Multiple mappings for <%s> with parent %s: %s",
 						element.getName (),
 						parentClass.getName (),
-						joinWithSeparator (
-							", ",
+						joinWithCommaAndSpace (
 							matchingDataClassNames)));
 
 			}
@@ -777,26 +779,50 @@ class DataFromXml {
 					field.getName (),
 					namedObject);
 
-			} else if (field.getType () == String.class) {
+			} else {
+
+				setScalarFieldRequired (
+					object,
+					field,
+					attributeValue);
+
+			}
+
+		}
+
+		boolean tryToSetScalarField (
+				@NonNull Object object,
+				@NonNull Field field,
+				@NonNull String stringValue) {
+
+			if (field.getType () == String.class) {
 
 				BeanLogic.set (
 					object,
 					field.getName (),
-					attributeValue);
+					stringValue);
+
+				return true;
 
 			} else if (field.getType () == Integer.class) {
 
 				BeanLogic.set (
 					object,
 					field.getName (),
-					Integer.parseInt (attributeValue));
+					Integer.parseInt (
+						stringValue));
+
+				return true;
 
 			} else if (field.getType () == Long.class) {
 
 				BeanLogic.set (
 					object,
 					field.getName (),
-					Long.parseLong (attributeValue));
+					Long.parseLong (
+						stringValue));
+
+				return true;
 
 			} else if (field.getType () == Boolean.class) {
 
@@ -804,10 +830,12 @@ class DataFromXml {
 					object,
 					field.getName (),
 					stringToBoolean (
-						attributeValue,
+						stringValue,
 						"yes",
 						"no",
 						""));
+
+				return true;
 
 			} else if (field.getType ().isEnum ()) {
 
@@ -815,14 +843,34 @@ class DataFromXml {
 					toEnumGeneric (
 						field.getType (),
 						hyphenToCamel (
-							attributeValue));
+							stringValue));
 
 				BeanLogic.set (
 					object,
 					field.getName (),
 					enumValue);
 
+				return true;
+
 			} else {
+
+				return false;
+
+			}
+
+		}
+
+		void setScalarFieldRequired (
+				@NonNull Object object,
+				@NonNull Field field,
+				@NonNull String stringValue) {
+
+			if (
+				! tryToSetScalarField (
+					object,
+					field,
+					stringValue)
+			) {
 
 				throw new RuntimeException (
 					stringFormat (
@@ -860,50 +908,74 @@ class DataFromXml {
 		}
 
 		void buildChildField (
-				Field field,
-				DataChild dataChildAnnotation,
-				String filename) {
+				@NonNull Field field,
+				@NonNull DataChild dataChildAnnotation,
+				@NonNull String filename) {
 
 			String childElementName =
-				camelToHyphen (
-					field.getName ());
+				ifNull (
+					nullIfEmptyString (
+						dataChildAnnotation.name ()),
+					camelToHyphen (
+						field.getName ()));
 
 			Element childElement =
 				element.element (
 					childElementName);
 
-			if (childElement == null)
+			if (
+				isNull (
+					childElement)
+			) {
 				return;
+			}
 
 			matchedElementNames.add (
 				childElementName);
 
-			Object nextParent =
-				object;
+			if (
 
-			Iterable<Object> nextParents =
-				Iterables.concat (
-					Collections.singletonList (nextParent),
-					parents);
+				isNotEmpty (
+					childElement.attributes ())
 
-			Object child =
-				new ElementBuilder ()
+				|| isNotEmpty (
+					childElement.elements ())
 
-				.element (
-					childElement)
+				|| ! tryToSetScalarField (
+					object,
+					field,
+					childElement.getText ())
 
-				.parents (
-					nextParents)
+			) {
 
-				.contextString (
-					filename)
+				Object nextParent =
+					object;
 
-				.build ();
+				Iterable<Object> nextParents =
+					Iterables.concat (
+						Collections.singletonList (nextParent),
+						parents);
 
-			BeanLogic.set (
-				object,
-				field.getName (),
-				child);
+				Object child =
+					new ElementBuilder ()
+
+					.element (
+						childElement)
+
+					.parents (
+						nextParents)
+
+					.contextString (
+						filename)
+
+					.build ();
+
+				BeanLogic.set (
+					object,
+					field.getName (),
+					child);
+
+			}
 
 		}
 

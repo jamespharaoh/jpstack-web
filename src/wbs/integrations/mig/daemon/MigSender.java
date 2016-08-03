@@ -1,8 +1,8 @@
 package wbs.integrations.mig.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -275,8 +275,7 @@ class MigSender
 
 			urlConn.setRequestProperty (
 				"Content-Type",
-				joinWithSeparator (
-					"; ",
+				joinWithSemicolonAndSpace (
 					"application/x-www-form-urlencoded",
 					"charset=\"iso-8859-1\""));
 

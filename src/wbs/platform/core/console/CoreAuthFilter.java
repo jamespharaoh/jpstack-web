@@ -1,11 +1,11 @@
 package wbs.platform.core.console;
 
-import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.millisToInstant;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
+import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -71,8 +71,7 @@ class CoreAuthFilter
 	int logoffTime = 5 * 60 * 1000;
 
 	Instant lastReload =
-		millisToInstant (
-			0);
+		millisToInstant (0);
 
 	Map<Long,String> onlineSessionIdsByUserId;
 

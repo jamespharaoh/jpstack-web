@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.broadcast.console;
 
-import static wbs.framework.utils.etc.Misc.optionalCast;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +29,7 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.utils.TimeFormatter;
+import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 
 @PrototypeComponent ("chatBroadcastVerifyPart")
 public

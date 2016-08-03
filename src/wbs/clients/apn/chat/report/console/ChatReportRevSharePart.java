@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.report.console;
 
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -51,6 +50,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.hibernate.HibernateDatabase;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.TextualInterval;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.platform.affiliate.console.AffiliateConsoleHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.scaffold.model.RootRec;

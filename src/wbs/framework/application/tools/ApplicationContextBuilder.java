@@ -2,10 +2,10 @@ package wbs.framework.application.tools;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.hyphenToCamel;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

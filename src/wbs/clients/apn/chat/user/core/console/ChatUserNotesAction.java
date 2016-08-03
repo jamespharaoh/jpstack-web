@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isEmptyString;
 import static wbs.framework.utils.etc.Misc.trim;
 
 import javax.inject.Inject;
@@ -85,7 +85,7 @@ class ChatUserNotesAction
 					"note"));
 
 		if (
-			isEmpty (
+			isEmptyString (
 				noteString)
 		) {
 

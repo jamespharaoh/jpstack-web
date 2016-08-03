@@ -3,7 +3,6 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.object.ObjectManager;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("nameFormFieldBuilder")

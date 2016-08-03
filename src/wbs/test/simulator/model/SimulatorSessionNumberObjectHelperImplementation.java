@@ -1,7 +1,5 @@
 package wbs.test.simulator.model;
 
-import static wbs.framework.utils.etc.Misc.isPresent;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -9,6 +7,7 @@ import lombok.NonNull;
 
 import com.google.common.base.Optional;
 
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.sms.number.core.model.NumberRec;
 
 public

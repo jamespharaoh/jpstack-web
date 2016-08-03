@@ -1,7 +1,7 @@
 package wbs.applications.imchat.fixture;
 
-import static wbs.framework.utils.etc.Misc.joinWithSlash;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithSlash;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -239,7 +239,7 @@ class ImChatCoreFixtureProvider
 				paypalAccountHelper.findByCodeRequired (
 					GlobalId.root,
 					"test",
-					"wbs_sandbox"))
+					"sandbox"))
 
 			.setBillingCurrency (
 				currencyHelper.findByCodeRequired (

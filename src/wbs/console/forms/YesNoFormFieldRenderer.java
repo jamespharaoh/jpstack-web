@@ -3,7 +3,6 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.booleanToString;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
 import static wbs.framework.utils.etc.Misc.successResult;
@@ -22,6 +21,7 @@ import fj.data.Either;
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("yesNoFormFieldRenderer")

@@ -1,8 +1,6 @@
 package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.trim;
 
 import javax.inject.Inject;
@@ -27,6 +25,8 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.queue.logic.QueueLogic;

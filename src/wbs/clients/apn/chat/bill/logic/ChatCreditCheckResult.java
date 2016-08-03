@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.bill.logic;
 
-import static wbs.framework.utils.etc.Misc.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import lombok.experimental.Accessors;
 
 @Accessors (fluent = true)

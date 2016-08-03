@@ -1,6 +1,5 @@
 package wbs.platform.object.create;
 
-import static wbs.framework.utils.etc.Misc.optionalCast;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.LinkedHashMap;
@@ -30,6 +29,7 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
+import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 @Accessors (fluent = true)

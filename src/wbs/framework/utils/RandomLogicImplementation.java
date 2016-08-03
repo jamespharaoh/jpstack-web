@@ -1,6 +1,6 @@
 package wbs.framework.utils;
 
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
 import java.util.List;
 import java.util.Random;

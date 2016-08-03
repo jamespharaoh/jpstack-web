@@ -1,6 +1,5 @@
 package wbs.smsapps.forwarder.api;
 
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.io.UnsupportedEncodingException;
@@ -22,6 +21,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.rpc.core.Rpc;

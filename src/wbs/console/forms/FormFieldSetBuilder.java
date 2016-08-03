@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
 
 import javax.inject.Inject;
 
@@ -130,8 +130,7 @@ class FormFieldSetBuilder {
 			new FormFieldSet ()
 
 			.name (
-				joinWithSeparator (
-					".",
+				joinWithFullStop (
 					spec.consoleModule ().name (),
 					spec.name ()));
 
@@ -142,8 +141,7 @@ class FormFieldSetBuilder {
 			MissingBuilderBehaviour.error);
 
 		String fullName =
-			joinWithSeparator (
-				".",
+			joinWithFullStop (
 				spec.consoleModule ().name (),
 				spec.name ());
 

@@ -2,9 +2,7 @@ package wbs.smsapps.subscription.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.optionalToGoogle;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -21,6 +19,8 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalToGoogle;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.service.model.ServiceObjectHelper;

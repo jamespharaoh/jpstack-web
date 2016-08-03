@@ -1,7 +1,6 @@
 package wbs.console.helper;
 
 import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.optionalOrNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.lang.reflect.Constructor;
@@ -35,6 +34,7 @@ import wbs.framework.object.ObjectHelperMethods;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleHelperBuilder")

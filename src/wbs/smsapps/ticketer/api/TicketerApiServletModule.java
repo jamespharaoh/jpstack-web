@@ -1,9 +1,9 @@
 package wbs.smsapps.ticketer.api;
 
-import static wbs.framework.utils.etc.Misc.earlierThan;
-import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
 import java.util.Map;
 
@@ -169,7 +169,8 @@ class TicketerApiServletModule
 
 			if (
 				equal (
-					emptyStringIfNull (sliceParam),
+					emptyStringIfNull (
+						sliceParam),
 					"")
 			) {
 

@@ -1,21 +1,21 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.isPresent;
-import static wbs.framework.utils.etc.Misc.joinWithFullStop;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
-import static wbs.framework.utils.etc.Misc.optionalOrNull;
-import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -915,8 +915,7 @@ class ObjectHelperBuilder {
 							"No such %s with ids %s",
 							camelToSpaces (
 								model.objectName ()),
-							joinWithSeparator (
-								", ",
+							joinWithCommaAndSpace (
 								missingIds.stream ()
 									.map (longValue -> longValue.toString ())
 									.collect (Collectors.toList ()))));
@@ -928,8 +927,7 @@ class ObjectHelperBuilder {
 							"No such %s with ids %s (and %s others)",
 							camelToSpaces (
 								model.objectName ()),
-							joinWithSeparator (
-								", ",
+							joinWithCommaAndSpace (
 								missingIds.subList (0, 5).stream ()
 									.map (longValue -> longValue.toString ())
 									.collect (Collectors.toList ())),

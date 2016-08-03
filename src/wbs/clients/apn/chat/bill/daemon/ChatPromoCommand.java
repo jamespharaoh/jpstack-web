@@ -1,10 +1,10 @@
 package wbs.clients.apn.chat.bill.daemon;
 
-import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.laterThan;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
+import static wbs.framework.utils.etc.TimeUtils.laterThan;
 
 import javax.inject.Inject;
 import javax.inject.Provider;

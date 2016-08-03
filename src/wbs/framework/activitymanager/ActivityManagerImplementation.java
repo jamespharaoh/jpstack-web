@@ -1,11 +1,13 @@
 package wbs.framework.activitymanager;
 
 import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isEmptyString;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.max;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.notShorterThan;
 
 import java.io.File;
 import java.io.IOException;
@@ -266,6 +268,7 @@ class ActivityManagerImplementation
 			writeTaskRecursive (
 				formatWriter,
 				"  ",
+				Duration.millis (1),
 				task);
 
 			log.warn (
@@ -376,6 +379,7 @@ class ActivityManagerImplementation
 	void writeTaskRecursive (
 			@NonNull FormatWriter writer,
 			@NonNull String indent,
+			@NonNull Duration minDuration,
 			@NonNull Task task) {
 
 		writeTask (
@@ -386,17 +390,21 @@ class ActivityManagerImplementation
 		String nextIndent =
 			indent + "  ";
 
-		for (
-			Task childTask
-				: task.children ()
-		) {
+		task.children ().stream ()
 
-			writeTaskRecursive (
-				writer,
-				nextIndent,
-				childTask);
+			.filter (
+				childTask ->
+					notShorterThan (
+						childTask.duration (),
+						minDuration))
 
-		}
+			.forEach (
+				childTask ->
+					writeTaskRecursive (
+						writer,
+						nextIndent,
+						minDuration,
+						childTask));
 
 	}
 

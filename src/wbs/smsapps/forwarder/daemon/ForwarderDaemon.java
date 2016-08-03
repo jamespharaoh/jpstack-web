@@ -1,7 +1,7 @@
 package wbs.smsapps.forwarder.daemon;
 
-import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

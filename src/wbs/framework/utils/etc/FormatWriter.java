@@ -9,6 +9,12 @@ interface FormatWriter {
 	void writeFormatArray (
 			Object[] arguments);
 
+	void writeString (
+			String string);
+
+	void writeCharacter (
+			int character);
+
 	void close ();
 
 	void indent ();

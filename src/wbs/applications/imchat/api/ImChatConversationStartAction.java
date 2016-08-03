@@ -1,9 +1,9 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.hyphenToUnderscore;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
 
 import javax.inject.Inject;
 import javax.inject.Provider;

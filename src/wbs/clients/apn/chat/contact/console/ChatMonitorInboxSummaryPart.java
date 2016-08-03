@@ -3,9 +3,9 @@ package wbs.clients.apn.chat.contact.console;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -920,8 +920,7 @@ class ChatMonitorInboxSummaryPart
 					"<span",
 
 					" style=\"%h\"",
-					joinWithSeparator (
-						"; ",
+					joinWithSemicolonAndSpace (
 						"background: red",
 						"color: white",
 						"font-weight: bold",

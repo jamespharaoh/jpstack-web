@@ -3,10 +3,8 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.eitherGetLeft;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isError;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.Misc.split;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.LinkedHashSet;
@@ -33,6 +31,9 @@ import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.FormatWriter;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.split;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("hiddenFormField")

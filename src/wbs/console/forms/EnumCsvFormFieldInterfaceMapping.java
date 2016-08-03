@@ -1,8 +1,8 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.camelToHyphen;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 
 import java.util.Map;
 

@@ -2,8 +2,6 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Map;
@@ -18,6 +16,8 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("yesNoCsvFormFieldInterfaceMapping")

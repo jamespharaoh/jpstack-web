@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.help.logic;
 
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -18,6 +16,7 @@ import wbs.clients.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;

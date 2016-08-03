@@ -1,17 +1,17 @@
 package wbs.integrations.paypal.fixture;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
-import java.io.File;
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import lombok.NonNull;
 
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.fixtures.TestAccounts;
 import wbs.framework.record.GlobalId;
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
@@ -36,6 +36,9 @@ class PaypalFixtureProvider
 
 	@Inject
 	SliceObjectHelper sliceHelper;
+
+	@Inject
+	TestAccounts testAccounts;
 
 	// implementation
 
@@ -72,47 +75,14 @@ class PaypalFixtureProvider
 
 		);
 
-		File testAccountsFile =
-			new File ("conf/test-accounts.xml");
-
-		if (testAccountsFile.exists ()) {
-
-			DataFromXml dataFromXml =
-				new DataFromXml ()
-
-				.registerBuilderClasses (
-					TestAccountsSpec.class,
-					TestAccountSpec.class);
-
-			TestAccountsSpec testAccounts =
-				(TestAccountsSpec)
-				dataFromXml.readFilename (
-					"conf/test-accounts.xml");
-
-			for (
-				TestAccountSpec testAccount
-					: testAccounts.accounts ()
-			) {
-
-				if (! equal (testAccount.type (), "paypal"))
-					continue;
-
-				if (! equal (testAccount.name (), "wbs-sandbox"))
-					continue;
-
-				createTestAccount (
-					testAccount);
-
-				break;
-
-			}
-
-		}
+		testAccounts.forEach (
+			"paypal",
+			this::createTestAccount);
 
 	}
 
 	void createTestAccount (
-			@NonNull TestAccountSpec testAccount) {
+			@NonNull Map<String,String> params) {
 
 		paypalAccountHelper.insert (
 			paypalAccountHelper.createInstance ()
@@ -123,25 +93,26 @@ class PaypalFixtureProvider
 					"test"))
 
 			.setCode (
-				"wbs_sandbox")
+				simplifyToCodeRequired (
+					params.get ("name")))
 
 			.setName (
-				"WBS Sandbox")
+				params.get ("name"))
 
 			.setDescription (
-				"Test paypal account")
+				params.get ("description"))
 
 			.setUsername (
-				testAccount.params ().get ("username"))
+				params.get ("username"))
 
 			.setPassword (
-				testAccount.params ().get ("password"))
+				params.get ("password"))
 
 			.setSignature (
-				testAccount.params ().get ("signature"))
+				params.get ("signature"))
 
 			.setAppId (
-				testAccount.params ().get ("app-id"))
+				params.get ("app-id"))
 
 			.setServiceEndpointPaypalApi (
 				"https://api-3t.sandbox.paypal.com/2.0")

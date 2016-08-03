@@ -1,8 +1,8 @@
 package wbs.framework.entity.build;
 
-import static wbs.framework.utils.etc.Misc.camelToSpaces;
-import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 
 import javax.inject.Inject;
 

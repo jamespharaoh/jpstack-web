@@ -4,8 +4,6 @@ import static wbs.framework.utils.etc.Misc.errorResult;
 import static wbs.framework.utils.etc.Misc.getError;
 import static wbs.framework.utils.etc.Misc.getValue;
 import static wbs.framework.utils.etc.Misc.isError;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Map;
@@ -24,6 +22,8 @@ import fj.data.Either;
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("rangeFormFieldRenderer")

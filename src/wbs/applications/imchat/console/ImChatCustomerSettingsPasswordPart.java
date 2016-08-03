@@ -2,6 +2,7 @@ package wbs.applications.imchat.console;
 
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isEmptyString;
 
 import java.util.List;
 import java.util.stream.Collectors;

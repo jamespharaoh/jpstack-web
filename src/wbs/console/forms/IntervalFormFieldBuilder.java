@@ -1,9 +1,9 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 
 import java.util.ArrayList;
 import java.util.List;

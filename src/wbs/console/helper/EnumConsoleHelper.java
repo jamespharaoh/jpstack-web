@@ -1,6 +1,6 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.Misc.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

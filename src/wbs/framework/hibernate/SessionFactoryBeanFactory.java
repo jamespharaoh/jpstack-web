@@ -6,8 +6,6 @@ import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.File;
@@ -61,6 +59,9 @@ import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.schema.helper.SchemaNamesHelperImplementation;
 import wbs.framework.sql.SqlLogicImplementation;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 
 @Accessors (fluent = true)
 @Log4j

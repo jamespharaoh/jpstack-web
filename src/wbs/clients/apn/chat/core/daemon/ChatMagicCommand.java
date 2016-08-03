@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.core.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isPresent;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -19,6 +18,7 @@ import wbs.clients.apn.chat.keyword.model.ChatKeywordRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.KeywordFinder;

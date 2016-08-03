@@ -3,8 +3,6 @@ package wbs.framework.object;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.optionalOrNull;
-import static wbs.framework.utils.etc.Misc.split;
 import static wbs.framework.utils.etc.Misc.startsWith;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -31,6 +29,9 @@ import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
+
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.framework.utils.etc.StringUtils.split;
 
 @Accessors (fluent = true)
 @SingletonComponent ("objectManager")

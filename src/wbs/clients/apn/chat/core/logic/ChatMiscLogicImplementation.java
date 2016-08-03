@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.core.logic;
 
-import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
 import java.util.ArrayList;
 import java.util.Collection;

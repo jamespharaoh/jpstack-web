@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.help.console;
 
-import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 
 import java.util.Collection;
 

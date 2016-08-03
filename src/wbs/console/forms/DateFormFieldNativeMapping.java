@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.dateToInstantNullSafe;
-import static wbs.framework.utils.etc.Misc.instantToDateNullSafe;
+import static wbs.framework.utils.etc.TimeUtils.dateToInstantNullSafe;
+import static wbs.framework.utils.etc.TimeUtils.instantToDateNullSafe;
 
 import java.util.Date;
 

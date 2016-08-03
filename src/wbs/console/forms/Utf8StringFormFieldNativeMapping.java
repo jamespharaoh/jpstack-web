@@ -1,13 +1,13 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.bytesToString;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringToBytes;
 import lombok.NonNull;
 
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 @PrototypeComponent ("utf8StringFormFieldNativeMapping")
 public

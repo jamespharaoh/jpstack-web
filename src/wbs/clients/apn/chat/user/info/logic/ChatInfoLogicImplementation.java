@@ -2,9 +2,9 @@ package wbs.clients.apn.chat.user.info.logic;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.laterThan;
 
 import java.util.ArrayList;
 import java.util.Collection;

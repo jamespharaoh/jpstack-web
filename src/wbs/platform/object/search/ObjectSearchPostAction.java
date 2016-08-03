@@ -3,7 +3,6 @@ package wbs.platform.object.search;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.methodInvoke;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -40,6 +39,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 
 @Accessors (fluent = true)

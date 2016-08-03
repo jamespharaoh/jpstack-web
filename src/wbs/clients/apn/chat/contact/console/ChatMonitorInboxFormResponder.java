@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Set;
@@ -24,6 +23,7 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 @Log4j
 @PrototypeComponent ("chatMonitorInboxFormResponder")

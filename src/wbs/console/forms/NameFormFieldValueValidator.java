@@ -1,7 +1,6 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCode;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.regex.Pattern;
@@ -14,6 +13,7 @@ import lombok.experimental.Accessors;
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("nameFormFieldValueValidator")

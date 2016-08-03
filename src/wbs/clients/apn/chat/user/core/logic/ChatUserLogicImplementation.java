@@ -1,13 +1,9 @@
 package wbs.clients.apn.chat.user.core.logic;
 
-import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.isPresent;
-import static wbs.framework.utils.etc.Misc.localDate;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -60,6 +56,12 @@ import wbs.framework.record.GlobalId;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.RandomLogic;
 import wbs.framework.utils.TimeFormatter;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
+import static wbs.framework.utils.etc.TimeUtils.localDate;
+
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.event.logic.EventLogic;

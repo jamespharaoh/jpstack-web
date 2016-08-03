@@ -1,6 +1,6 @@
 package wbs.console.context;
 
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
 import java.util.ArrayList;
 import java.util.List;

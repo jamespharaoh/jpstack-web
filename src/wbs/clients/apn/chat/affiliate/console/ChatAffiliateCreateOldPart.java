@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.affiliate.console;
 
-import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -159,7 +159,8 @@ class ChatAffiliateCreateOldPart
 			" size=\"32\"",
 			" value=\"%h\"",
 			emptyStringIfNull (
-				requestContext.getForm ("name")),
+				requestContext.getForm (
+					"name")),
 			"></td>\n",
 
 			"</tr>\n");
@@ -175,7 +176,8 @@ class ChatAffiliateCreateOldPart
 			" size=\"32\"",
 			" value=\"%h\"",
 			emptyStringIfNull (
-				requestContext.getForm ("description")),
+				requestContext.getForm (
+					"description")),
 			"></td>\n",
 
 			"</tr>\n");

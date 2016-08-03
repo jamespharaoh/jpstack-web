@@ -1,6 +1,5 @@
 package wbs.framework.utils;
 
-import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.regex.Matcher;
@@ -11,6 +10,7 @@ import lombok.NonNull;
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.SingletonComponent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 
 @SingletonComponent ("intervalFormatter")
 public

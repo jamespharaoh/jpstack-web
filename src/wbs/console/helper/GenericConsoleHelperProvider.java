@@ -5,11 +5,7 @@ import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.naivePluralise;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.optionalCast;
-import static wbs.framework.utils.etc.Misc.optionalOrNull;
-import static wbs.framework.utils.etc.Misc.split;
 import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.underscoreToCamel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +32,11 @@ import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.framework.utils.StringSubstituter;
 import wbs.framework.utils.etc.BeanLogic;
+
+import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.framework.utils.etc.StringUtils.split;
+import static wbs.framework.utils.etc.StringUtils.underscoreToCamel;
 
 @Accessors (fluent = true)
 @Log4j

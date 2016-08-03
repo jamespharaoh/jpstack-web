@@ -1,8 +1,8 @@
 package wbs.framework.entity.helper;
 
-import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 
 import java.io.File;
 import java.io.IOException;

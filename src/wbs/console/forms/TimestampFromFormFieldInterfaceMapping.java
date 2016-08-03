@@ -1,9 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.Misc.isEmpty;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.optionalRequired;
+import static wbs.framework.utils.etc.Misc.isEmptyString;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 
@@ -25,6 +23,8 @@ import fj.data.Either;
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TextualInterval;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("timestampFromFormFieldInterfaceMapping")
@@ -56,7 +56,7 @@ class TimestampFromFormFieldInterfaceMapping<Container>
 			isNotPresent (
 				interfaceValue)
 
-			|| isEmpty (
+			|| isEmptyString (
 				optionalRequired (
 					interfaceValue))
 		) {

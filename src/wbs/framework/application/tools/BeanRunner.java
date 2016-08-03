@@ -1,8 +1,8 @@
 package wbs.framework.application.tools;
 
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.uncapitalise;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -135,8 +135,7 @@ class BeanRunner {
 			throw new RuntimeException (
 				stringFormat (
 					"Expects five or more parameters: %s",
-					joinWithSeparator (
-						", ",
+					joinWithCommaAndSpace (
 						"primary project name",
 						"primary project package name",
 						"layer names (comma separated)",

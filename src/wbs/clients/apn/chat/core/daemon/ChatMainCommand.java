@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.core.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notIn;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -43,6 +42,7 @@ import wbs.clients.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.clients.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.sms.command.logic.CommandLogic;

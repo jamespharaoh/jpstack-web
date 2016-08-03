@@ -6,11 +6,8 @@ import static wbs.framework.utils.etc.Misc.getError;
 import static wbs.framework.utils.etc.Misc.getValue;
 import static wbs.framework.utils.etc.Misc.isError;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.isRight;
-import static wbs.framework.utils.etc.Misc.optionalOr;
 import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.Misc.split;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -37,6 +34,10 @@ import wbs.framework.data.annotations.DataClass;
 import wbs.framework.record.PermanentRecord;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.FormatWriter;
+
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOr;
+import static wbs.framework.utils.etc.StringUtils.split;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("updatableFormField")

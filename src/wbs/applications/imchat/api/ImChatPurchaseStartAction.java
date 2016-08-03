@@ -1,8 +1,5 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.hyphenToUnderscore;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
 
 import java.util.Map;
@@ -33,6 +30,11 @@ import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.RandomLogic;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
+
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;

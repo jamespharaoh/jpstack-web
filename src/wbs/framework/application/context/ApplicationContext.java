@@ -4,9 +4,10 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
-import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.framework.utils.etc.StringUtils.joinWithSeparator;
+import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
 
 import java.io.File;
 import java.io.IOException;
@@ -307,8 +308,7 @@ class ApplicationContext {
 					stringFormat (
 						"Singleton bean %s already in creation (%s)",
 						beanDefinition.name (),
-						joinWithSeparator (
-							", ",
+						joinWithCommaAndSpace (
 							singletonBeansInCreation)));
 
 			}
@@ -1331,7 +1331,8 @@ class ApplicationContext {
 
 		String targetBeanDefinitionName =
 			ifNull (
-				nullIfEmptyString (namedAnnotation.value ()),
+				nullIfEmptyString (
+					namedAnnotation.value ()),
 				field.getName ());
 
 		BeanDefinition targetBeanDefinition =

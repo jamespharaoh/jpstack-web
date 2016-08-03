@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -30,6 +29,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.utils.TextualInterval;
 import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.TimeFormatException;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;

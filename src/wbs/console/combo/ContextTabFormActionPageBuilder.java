@@ -1,8 +1,8 @@
 package wbs.console.combo;
 
-import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -293,7 +293,8 @@ class ContextTabFormActionPageBuilder {
 				stringFormat (
 					"%s %s",
 					container.friendlyName (),
-					camelToSpaces (name)));
+					camelToSpaces (
+						name)));
 
 	}
 

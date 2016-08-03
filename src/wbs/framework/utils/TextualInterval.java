@@ -1,13 +1,13 @@
 package wbs.framework.utils;
 
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.lowercase;
-import static wbs.framework.utils.etc.Misc.millisToInstant;
-import static wbs.framework.utils.etc.Misc.optionalRequired;
-import static wbs.framework.utils.etc.Misc.split;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.StringUtils.split;
+import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
 import java.util.List;
 import java.util.regex.Matcher;

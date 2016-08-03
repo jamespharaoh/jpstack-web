@@ -1,13 +1,13 @@
 package wbs.platform.object.list;
 
-import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.joinWithSpace;
-import static wbs.framework.utils.etc.Misc.optionalIf;
-import static wbs.framework.utils.etc.Misc.presentInstances;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
+import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
+import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

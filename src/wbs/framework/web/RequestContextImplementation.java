@@ -4,8 +4,6 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
-import static wbs.framework.utils.etc.Misc.optionalCast;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -43,6 +41,9 @@ import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.ProxiedRequestComponent;
 import wbs.framework.utils.etc.RuntimeIoException;
+
+import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
 @Accessors (fluent = true)
 @ProxiedRequestComponent (

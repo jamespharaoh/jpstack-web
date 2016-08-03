@@ -1,6 +1,6 @@
 package wbs.test.simulator.console;
 
-import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
+import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

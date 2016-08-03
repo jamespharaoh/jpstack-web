@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.image.daemon;
 
-import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -26,6 +25,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;

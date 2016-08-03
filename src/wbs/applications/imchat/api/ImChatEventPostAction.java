@@ -3,11 +3,11 @@ package wbs.applications.imchat.api;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
-import static wbs.framework.utils.etc.Misc.millisToInstant;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.objectToString;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -183,8 +183,7 @@ class ImChatEventPostAction
 
 				.setSource (
 					requestContext.header ("x-forwarded-for") != null
-						? joinWithSeparator (
-							", ",
+						? joinWithCommaAndSpace (
 							requestContext.header ("x-forwarded-for"),
 							requestContext.request ().getRemoteHost ())
 						: requestContext.request ().getRemoteHost ())

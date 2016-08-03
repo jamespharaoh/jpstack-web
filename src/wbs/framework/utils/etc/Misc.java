@@ -1,5 +1,7 @@
 package wbs.framework.utils.etc;
 
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,8 +18,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -29,9 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.NonNull;
@@ -40,12 +38,6 @@ import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-import org.joda.time.ReadableInstant;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -55,15 +47,6 @@ import fj.data.Either;
 // TODO lots to deprecate here
 public
 class Misc {
-
-	public final static
-	SimpleDateFormat timestampFormatSeconds =
-		new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
-
-	private
-	Misc () {
-		// never instantiated
-	}
 
 	@SafeVarargs
 	public static
@@ -104,26 +87,6 @@ class Misc {
 			return null;
 
 		return input;
-
-	}
-
-	public static
-	String emptyStringIfNull (
-			String string) {
-
-		return ifNull (
-			string,
-			"");
-
-	}
-
-	public static
-	String nullIfEmptyString (
-			String string) {
-
-		return nullIf (
-			string,
-			"");
 
 	}
 
@@ -347,68 +310,6 @@ class Misc {
 	}
 
 	public static
-	String implode (
-			String glue,
-			Collection<? extends Object> pieces) {
-
-		boolean first = true;
-
-		StringBuffer sb = new StringBuffer();
-
-		for (Object piece : pieces) {
-			if (first)
-				first = false;
-			else
-				sb.append(glue);
-			sb.append(piece.toString());
-		}
-		return sb.toString();
-	}
-
-	@Deprecated
-	public static
-	String implode (
-			String glue,
-			Object... pieces) {
-
-		return implode (
-			glue,
-			Arrays.asList (
-				pieces));
-
-	}
-
-	@Deprecated
-	public static
-	String implode (
-			String glue,
-			String... pieces) {
-
-		return implode (
-			glue,
-			Arrays.asList (
-				pieces));
-
-	}
-
-	static DateTimeFormatter isoDateFormat =
-		DateTimeFormat.forPattern (
-				"yyyy-MM-dd'T'HH:mm:ss'Z'")
-			.withZoneUTC ();
-
-	public static
-	String isoDate (
-			@NonNull Instant instant) {
-
-		return instant.toString (
-			isoDateFormat);
-
-	}
-
-	/**
-	 * Does a null-safe equals.
-	 */
-	public static
 	boolean equal (
 			Object object1,
 			Object object2) {
@@ -420,81 +321,6 @@ class Misc {
 			return false;
 
 		return object1.equals (object2);
-
-	}
-
-	public static <Type>
-	Optional<Type> optionalToGoogle (
-			@NonNull java.util.Optional<Type> javaOptional) {
-
-		if (javaOptional.isPresent ()) {
-
-			return Optional.of (
-				javaOptional.get ());
-
-		} else {
-
-			return Optional.absent ();
-
-		}
-
-	}
-
-	public static <Type>
-	boolean optionalEquals (
-			@NonNull Optional<Type> left,
-			@NonNull Type right) {
-
-		if (left.isPresent ()) {
-
-			return left.get ().equals (
-				right);
-
-		} else {
-
-			return false;
-
-		}
-
-	}
-
-	@SafeVarargs
-	public static <Type>
-	boolean optionalIn (
-			@NonNull Optional<Type> left,
-			@NonNull Type... rights) {
-
-		if (left.isPresent ()) {
-
-			return in (
-				left.get (),
-				rights);
-
-		} else {
-
-			return false;
-
-		}
-
-	}
-
-	@SafeVarargs
-	public static <Type>
-	boolean optionalNotIn (
-			@NonNull Optional<Type> left,
-			@NonNull Type... rights) {
-
-		if (left.isPresent ()) {
-
-			return ! in (
-				left.get (),
-				rights);
-
-		} else {
-
-			return true;
-
-		}
 
 	}
 
@@ -1025,10 +851,12 @@ class Misc {
 		logger.info (
 			stringFormat (
 				"Executing %s",
-				implode (" ", command)));
+				joinWithSpace (
+					command)));
 
 		Process process =
-			Runtime.getRuntime ().exec (command);
+			Runtime.getRuntime ().exec (
+				command);
 
 		InputStream inputStream = null;
 
@@ -1249,184 +1077,6 @@ class Misc {
 
 	}
 
-	public static
-	String substring (
-			@NonNull Object object,
-			int start,
-			int end) {
-
-		String string =
-			object.toString ();
-
-		if (start < 0) start = 0;
-
-		if (end > string.length ())
-			end = string.length ();
-
-		return string.substring (start, end);
-
-	}
-
-	public static
-	String hyphenToCamel (
-			@NonNull String string) {
-
-		return delimitedToCamel (
-			string,
-			"-");
-
-	}
-
-	public static
-	String underscoreToCamel (
-			@NonNull String string) {
-
-		return delimitedToCamel (
-			string,
-			"_");
-
-	}
-
-	public static
-	String replaceAll (
-			@NonNull String source,
-			@NonNull String find,
-			@NonNull String replaceWith) {
-
-		return source.replaceAll (
-			Pattern.quote (
-				find),
-			replaceWith);
-
-	}
-
-	public static
-	String underscoreToHyphen (
-			@NonNull String string) {
-
-		return replaceAll (
-			string,
-			"_",
-			"-");
-
-	}
-
-	public static
-	String hyphenToUnderscore (
-			@NonNull String string) {
-
-		return replaceAll (
-			string,
-			"-",
-			"_");
-
-	}
-
-	public static
-	String delimitedToCamel (
-			@NonNull String string,
-			@NonNull String delimiter) {
-
-		String[] parts =
-			string.split (delimiter);
-
-		StringBuilder ret =
-			new StringBuilder (parts [0]);
-
-		for (
-			int index = 1;
-			index < parts.length;
-			index ++
-		) {
-
-			ret.append (
-				Character.toUpperCase (
-					parts [index].charAt (0)));
-
-			ret.append (
-				parts [index].substring (1));
-
-		}
-
-		return ret.toString ();
-
-	}
-
-	public static
-	String camelToUnderscore (
-			String string) {
-
-		return camelToDelimited (
-			string,
-			"_");
-
-	}
-
-	public static
-	String camelToHyphen (
-			String string) {
-
-		return camelToDelimited (
-			string,
-			"-");
-
-	}
-
-	public static
-	String camelToSpaces (
-			String string) {
-
-		return camelToDelimited (
-			string,
-			" ");
-
-	}
-
-	public static
-	String camelToDelimited (
-			String string,
-			String delimiter) {
-
-		if (string == null)
-			return null;
-
-		StringBuilder stringBuilder =
-			new StringBuilder (
-				string.length () * 2);
-
-		stringBuilder.append (
-			Character.toLowerCase (
-				string.charAt (0)));
-
-		for (
-			int pos = 1;
-			pos < string.length ();
-			pos ++
-		) {
-
-			char ch =
-				string.charAt (pos);
-
-			if (Character.isUpperCase (ch)) {
-
-				stringBuilder.append (
-					delimiter);
-
-				stringBuilder.append (
-					Character.toLowerCase (ch));
-
-			} else {
-
-				stringBuilder.append (ch);
-
-			}
-
-		}
-
-		return stringBuilder.toString ();
-
-	}
-
 	private static final
 	char[] lowercaseLetters =
 		new char [26];
@@ -1458,199 +1108,6 @@ class Misc {
 				(char) ('0' + index);
 
 		}
-
-	}
-
-	public static
-	String joinWithSeparator (
-			@NonNull String separator,
-			@NonNull String prefix,
-			@NonNull Iterable<String> parts,
-			@NonNull String suffix) {
-
-		StringBuilder stringBuilder =
-			new StringBuilder ();
-
-		boolean first = true;
-
-		for (
-			String part
-				: parts
-		) {
-
-			if (first) {
-
-				first = false;
-
-			} else {
-
-				stringBuilder.append (
-					separator);
-
-			}
-
-			stringBuilder.append (
-				prefix);
-
-			stringBuilder.append (
-				part);
-
-			stringBuilder.append (
-				suffix);
-
-		}
-
-		return stringBuilder.toString ();
-
-	}
-
-	public static
-	String joinWithoutSeparator (
-			Iterable<String> parts) {
-
-		return joinWithSeparator (
-			"",
-			"",
-			parts,
-			"");
-
-	}
-
-	public static
-	String joinWithSeparator (
-			String separator,
-			Iterable<String> parts) {
-
-		return joinWithSeparator (
-			separator,
-			"",
-			parts,
-			"");
-
-	}
-
-	public static
-	String joinWithSeparator (
-			@NonNull String separator,
-			@NonNull String... parts) {
-
-		return joinWithSeparator (
-			separator,
-			"",
-			Arrays.asList (parts),
-			"");
-
-	}
-
-	public static
-	String joinWithoutSeparator (
-			@NonNull String... parts) {
-
-		return joinWithSeparator (
-			"",
-			"",
-			Arrays.asList (parts),
-			"");
-
-	}
-
-	public static
-	String joinWithSpace (
-			@NonNull Iterable<String> parts) {
-
-		return joinWithSeparator (
-			" ",
-			"",
-			parts,
-			"");
-
-	}
-
-	public static
-	String joinWithSpace (
-			String... parts) {
-
-		return joinWithSeparator (
-			" ",
-			"",
-			Arrays.asList (
-				parts),
-			"");
-
-	}
-
-	public static
-	String joinWithFullStop (
-			@NonNull Iterable<String> parts) {
-
-		return joinWithSeparator (
-			".",
-			"",
-			parts,
-			"");
-
-	}
-
-	public static
-	String joinWithFullStop (
-			@NonNull String... parts) {
-
-		return joinWithSeparator (
-			".",
-			"",
-			Arrays.asList (
-				parts),
-			"");
-
-	}
-
-	public static
-	String joinWithSlash (
-			@NonNull Iterable<String> parts) {
-
-		return joinWithSeparator (
-			"/",
-			"",
-			parts,
-			"");
-
-	}
-
-	public static
-	String joinWithSlash (
-			@NonNull String... parts) {
-
-		return joinWithSeparator (
-			"/",
-			"",
-			Arrays.asList (
-				parts),
-			"");
-
-	}
-
-	public static
-	String joinWithPipe (
-			@NonNull List<String> parts) {
-
-		return joinWithSeparator (
-			"|",
-			"",
-			parts,
-			"");
-
-	}
-
-	public static
-	String joinWithPipe (
-			@NonNull String... parts) {
-
-		return joinWithSeparator (
-			"|",
-			"",
-			Arrays.asList (
-				parts),
-			"");
 
 	}
 
@@ -1691,160 +1148,6 @@ class Misc {
 
 		return Base64.encodeBase64String (
 			messageDigest.digest ());
-
-	}
-
-	public static
-	String spacify (
-			String input) {
-
-		return spacify (
-			input,
-			32);
-
-	}
-
-	private final static
-	Pattern nonWhitespaceWordsPattern =
-		Pattern.compile ("\\S+");
-
-	/**
-	 * Returns a transformed version of a string, with all whitespace replaced
-	 * by a single space and all words longer than wordLength split into
-	 * wordLength or less.
-	 *
-	 * @param input
-	 *            the input string
-	 * @param wordLength
-	 *            the maximum word length in the output string
-	 * @return the transformed string
-	 */
-	public static
-	String spacify (
-			String input,
-			int wordLength) {
-
-		StringBuilder stringBuilder =
-			new StringBuilder ();
-
-		Matcher matcher =
-			nonWhitespaceWordsPattern.matcher (input);
-
-		while (matcher.find ()) {
-
-			String string =
-				matcher.group (0);
-
-			int position = 0;
-
-			int length =
-				string.length ();
-
-			while (true) {
-
-				if (stringBuilder.length () > 0)
-					stringBuilder.append (' ');
-
-				if (position + wordLength > length) {
-
-					stringBuilder.append (
-						string,
-						position,
-						length);
-
-					break;
-
-				}
-
-				stringBuilder.append (
-					string,
-					position,
-					position + wordLength);
-
-				position += wordLength;
-
-			}
-
-		}
-
-		return stringBuilder.toString ();
-
-	}
-
-	public static
-	Instant toInstant (
-			@NonNull ReadableInstant readableInstant) {
-
-		return readableInstant.toInstant ();
-
-	}
-
-	public static
-	Instant toInstantNullSafe (
-			ReadableInstant readableInstant) {
-
-		return readableInstant != null
-			? readableInstant.toInstant ()
-			: null;
-
-	}
-
-	public static
-	Instant dateToInstantNullSafe (
-			Date date) {
-
-		if (date == null)
-			return null;
-
-		return new Instant (
-			date);
-
-	}
-
-	public static
-	Date instantToDateNullSafe (
-			ReadableInstant instant) {
-
-		if (instant == null)
-			return null;
-
-		return instant.toInstant ().toDate ();
-
-	}
-
-	public static
-	Instant millisToInstant (
-			long millis) {
-
-		return new Instant (
-			millis);
-
-	}
-
-	public static
-	Instant secondsToInstant (
-			long seconds) {
-
-		return new Instant (
-			seconds * 1000);
-
-	}
-
-	public static
-	Timestamp toSqlTimestamp (
-			@NonNull ReadableInstant instant) {
-
-		return new Timestamp (
-			instant.getMillis ());
-
-	}
-
-	public static
-	Instant toInstant (
-			@NonNull Timestamp timestamp) {
-
-		return millisToInstant (
-			timestamp.getTime ());
 
 	}
 
@@ -1897,16 +1200,6 @@ class Misc {
 			stringFormat (
 				"Invalid boolean string: \"%s\"",
 				string));
-
-	}
-
-	public static
-	List<String> split (
-			String source,
-			String regex) {
-
-		return Arrays.asList (
-			source.split (regex));
 
 	}
 
@@ -2034,15 +1327,6 @@ class Misc {
 	}
 
 	public static
-	boolean doesNotStartWith (
-			String string,
-			String prefix) {
-
-		return ! string.startsWith (prefix);
-
-	}
-
-	public static
 	int sum (
 			int value0,
 			int value1) {
@@ -2130,7 +1414,7 @@ class Misc {
 	}
 
 	public static
-	boolean isEmpty (
+	boolean isEmptyString (
 			String string) {
 
 		return string.isEmpty ();
@@ -2179,99 +1463,6 @@ class Misc {
 				exception);
 
 		}
-
-	}
-
-	public static
-	Instant earliest (
-			Instant... instants) {
-
-		Instant earliest =
-			null;
-
-		for (
-			Instant instant
-				: instants
-		) {
-
-			if (
-
-				earliest == null
-
-				|| instant.isBefore (
-					earliest)
-
-			) {
-
-				earliest =
-					instant;
-
-			}
-
-		}
-
-		return earliest;
-
-	}
-
-	public static
-	boolean isPresent (
-			@NonNull Optional<?> optional) {
-
-		return optional.isPresent ();
-
-	}
-
-	public static
-	boolean isNotPresent (
-			@NonNull Optional<?> optional) {
-
-		return ! optional.isPresent ();
-
-	}
-
-	public static <Type>
-	Type optionalRequired (
-			@NonNull Optional<Type> optional) {
-
-		return optional.get ();
-
-	}
-
-	public static <Type>
-	Type optionalOrNull (
-			@NonNull Optional<Type> optional) {
-
-		return optional.orNull ();
-
-	}
-
-	public static <Type>
-	Type optionalOrElse (
-			@NonNull Optional<Type> optional,
-			@NonNull Supplier<Type> orElse) {
-
-		if (optional.isPresent ()) {
-
-			return optional.get ();
-
-		} else {
-
-			return orElse.get ();
-
-		}
-
-	}
-
-	public static <Type>
-	Optional<Type> requiredOptional (
-			@NonNull Optional<Type> optional) {
-
-		if (! optional.isPresent ()) {
-			throw new RuntimeException ();
-		}
-
-		return optional;
 
 	}
 
@@ -2359,26 +1550,6 @@ class Misc {
 	}
 
 	public static
-	boolean earlierThan (
-			@NonNull Instant left,
-			@NonNull Instant right) {
-
-		return left.isBefore (
-			right);
-
-	}
-
-	public static
-	boolean laterThan (
-			@NonNull Instant left,
-			@NonNull Instant right) {
-
-		return left.isAfter (
-			right);
-
-	}
-
-	public static
 	Class<?> classForNameRequired (
 			@NonNull String className) {
 
@@ -2442,97 +1613,6 @@ class Misc {
 	}
 
 	public static <Type>
-	Iterable<Type> presentInstances (
-			@NonNull Iterable<Optional<Type>> collection) {
-
-		return Optional.presentInstances (
-			collection);
-
-	}
-
-	public static <Type>
-	Iterable<Type> presentInstances () {
-
-		return ImmutableList.<Type>of ();
-
-	}
-
-	public static <Type>
-	Iterable<Type> presentInstances (
-			@NonNull Optional<Type> argument) {
-
-		return presentInstances (
-			ImmutableList.<Optional<Type>>of (
-				argument));
-
-	}
-
-	public static <Type>
-	Iterable<Type> presentInstances (
-			@NonNull Optional<Type> argument0,
-			@NonNull Optional<Type> argument1) {
-
-		return presentInstances (
-			ImmutableList.<Optional<Type>>of (
-				argument0,
-				argument1));
-
-	}
-
-	public static <Type>
-	Iterable<Type> presentInstances (
-			@NonNull Optional<Type> argument0,
-			@NonNull Optional<Type> argument1,
-			@NonNull Optional<Type> argument2) {
-
-		return presentInstances (
-			ImmutableList.<Optional<Type>>of (
-				argument0,
-				argument1,
-				argument2));
-
-	}
-
-	public static <Type>
-	Iterable<Type> presentInstances (
-			@NonNull Optional<Type> argument0,
-			@NonNull Optional<Type> argument1,
-			@NonNull Optional<Type> argument2,
-			@NonNull Optional<Type> argument3) {
-
-		return presentInstances (
-			ImmutableList.<Optional<Type>>of (
-				argument0,
-				argument1,
-				argument2,
-				argument3));
-
-	}
-
-	@SafeVarargs
-	public static <Type>
-	Iterable<Type> presentInstances (
-			@NonNull Optional<Type>... arguments) {
-
-		return Optional.presentInstances (
-			Arrays.asList (
-				arguments));
-
-	}
-
-	public static <Type>
-	Optional<Type> optionalIf (
-			@NonNull Boolean present,
-			@NonNull Type value) {
-
-		return present
-			? Optional.<Type>of (
-				value)
-			: Optional.<Type>absent ();
-
-	}
-
-	public static <Type>
 	Type requiredValue (
 			@NonNull Type value) {
 
@@ -2561,16 +1641,6 @@ class Misc {
 			long value) {
 
 		return value > 0;
-
-	}
-
-	public static <T>
-	T optionalOr (
-			Optional<T> optional,
-			T instead) {
-
-		return optional.or (
-			instead);
 
 	}
 
@@ -2784,112 +1854,6 @@ class Misc {
 
 	}
 
-	@SafeVarargs
-	public static <Type>
-	Type ifNotPresent (
-			@NonNull Optional<Type>... optionalValues) {
-
-		for (
-			Optional<Type> optionalValue
-				: optionalValues
-		) {
-
-			if (
-				isPresent (
-					optionalValue)
-			) {
-
-				return optionalValue.get ();
-
-			}
-
-		}
-
-		throw new IllegalArgumentException ();
-
-	}
-
-	public static <Type>
-	Type ifNotPresent (
-			@NonNull Optional<? extends Type> optionalValueOne) {
-
-		if (
-			isPresent (
-				optionalValueOne)
-		) {
-
-			return optionalValueOne.get ();
-
-		}
-
-		throw new IllegalArgumentException ();
-
-	}
-
-	public static <Type>
-	Type ifNotPresent (
-			@NonNull Optional<? extends Type> optionalValueOne,
-			@NonNull Optional<? extends Type> optionalValueTwo) {
-
-		if (
-			isPresent (
-				optionalValueOne)
-		) {
-
-			return optionalValueOne.get ();
-
-		}
-
-		if (
-			isPresent (
-				optionalValueTwo)
-		) {
-
-			return optionalValueTwo.get ();
-
-		}
-
-		throw new IllegalArgumentException ();
-
-	}
-
-	public static <Type>
-	Type ifNotPresent (
-			@NonNull Optional<? extends Type> optionalValueOne,
-			@NonNull Optional<? extends Type> optionalValueTwo,
-			@NonNull Optional<? extends Type> optionalValueThree) {
-
-		if (
-			isPresent (
-				optionalValueOne)
-		) {
-
-			return optionalValueOne.get ();
-
-		}
-
-		if (
-			isPresent (
-				optionalValueTwo)
-		) {
-
-			return optionalValueTwo.get ();
-
-		}
-
-		if (
-			isPresent (
-				optionalValueThree)
-		) {
-
-			return optionalValueThree.get ();
-
-		}
-
-		throw new IllegalArgumentException ();
-
-	}
-
 	public static <Type>
 	Type cast (
 			@NonNull Class<Type> classToCastTo,
@@ -2897,63 +1861,6 @@ class Misc {
 
 		return classToCastTo.cast (
 			value);
-
-	}
-
-	public static <Type>
-	Optional<Type> optionalCast (
-			@NonNull Class<Type> classToCastTo,
-			@NonNull Optional<?> optionalValue) {
-
-		if (
-			isPresent (
-				optionalValue)
-		) {
-
-			if (
-				isInstanceOf (
-					classToCastTo,
-					optionalValue.get ())
-			) {
-
-				return Optional.of (
-					cast (
-						classToCastTo,
-						optionalValue.get ()));
-
-			} else {
-
-				throw new ClassCastException ();
-
-			}
-
-		} else {
-
-			return Optional.<Type>absent ();
-
-		}
-
-	}
-
-	public static <Type>
-	Optional<Type> optionalMap (
-			@NonNull Optional<Type> optionalValue,
-			@NonNull Function<? super Type,? extends Type> mappingFunction) {
-
-		if (
-			isPresent (
-				optionalValue)
-		) {
-
-			return Optional.of (
-				mappingFunction.apply (
-					optionalValue.get ()));
-
-		} else {
-
-			return Optional.absent ();
-
-		}
 
 	}
 
@@ -2986,22 +1893,6 @@ class Misc {
 		}
 
 		return method;
-
-	}
-
-	public static
-	LocalDate localDate (
-			@NonNull ReadableInstant instant,
-			@NonNull DateTimeZone timezone) {
-
-		return instant
-
-			.toInstant ()
-
-			.toDateTime (
-				timezone)
-
-			.toLocalDate ();
 
 	}
 

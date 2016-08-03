@@ -1,7 +1,7 @@
 package wbs.framework.schema.helper;
 
-import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,7 +19,8 @@ class SchemaNamesHelperImplementation
 			Class<?> entityClass) {
 
 		return camelToUnderscore (
-			objectName (entityClass));
+			objectName (
+				entityClass));
 
 	}
 

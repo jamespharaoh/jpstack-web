@@ -4,7 +4,7 @@
 package wbs.console.param;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.instantToDateNullSafe;
+import static wbs.framework.utils.etc.TimeUtils.instantToDateNullSafe;
 
 import java.util.Date;
 

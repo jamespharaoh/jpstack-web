@@ -2,9 +2,10 @@ package wbs.framework.hibernate;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isEmpty;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
+import static wbs.framework.utils.etc.Misc.isEmptyString;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 
 import java.util.List;
 import java.util.Map;
@@ -1716,8 +1717,7 @@ class HibernateHelperProviderBuilder {
 					"%sHelperProvider.%s (%s)",
 					objectName (),
 					methodName,
-					joinWithSeparator (
-						", ",
+					joinWithCommaAndSpace (
 						arguments)),
 				this);
 

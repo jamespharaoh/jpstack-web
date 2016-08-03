@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.supervisor.console;
 
-import static wbs.framework.utils.etc.Misc.earlierThan;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
 import java.util.ArrayList;
 import java.util.HashSet;

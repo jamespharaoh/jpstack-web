@@ -1,6 +1,7 @@
 package wbs.framework.exception;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -209,35 +210,64 @@ class ExceptionUtilsImplementation
 	JSONObject throwableDumpJson (
 			@NonNull Throwable throwable) {
 
-		return new JSONObject (
-			ImmutableMap.<String,Object>builder ()
+		ImmutableMap.Builder<String,Object> dumpBuilder =
+			ImmutableMap.<String,Object>builder ();
 
-			.put (
-				"class",
-				throwable.getClass ().getName ())
+		// class
 
-			.put (
-				"message",
+		dumpBuilder.put (
+			"class",
+			throwable.getClass ().getName ());
+
+		// message
+
+		if (
+			isNotNull (
 				throwable.getMessage ())
+		) {
 
-			.put (
-				"stacktrace",
-				Arrays.asList (
-					throwable.getStackTrace ())
+			dumpBuilder.put (
+				"message",
+				emptyStringIfNull (
+					throwable.getMessage ()));
 
-					.stream ()
+		}
 
-					.map (
-						Object::toString)
+		// stack trace
 
-					.collect (
-						Collectors.toList ())
+		dumpBuilder.put (
+			"stacktrace",
+			Arrays.asList (
+				throwable.getStackTrace ())
 
-			)
+				.stream ()
 
-			.build ()
+				.map (
+					Object::toString)
+
+				.collect (
+					Collectors.toList ())
 
 		);
+
+		// cause
+
+		if (
+			isNotNull (
+				throwable.getCause ())
+		) {
+
+			dumpBuilder.put (
+				"cause",
+				throwableDumpJson (
+					throwable.getCause ()));
+
+		}
+
+		// return
+
+		return new JSONObject (
+			dumpBuilder.build ());
 
 	}
 

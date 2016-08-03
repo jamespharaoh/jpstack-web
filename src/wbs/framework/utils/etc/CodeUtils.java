@@ -1,7 +1,6 @@
 package wbs.framework.utils.etc;
 
-import static wbs.framework.utils.etc.Misc.isPresent;
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,7 +48,7 @@ class CodeUtils {
 				string);
 
 		if (
-			isPresent (
+			OptionalUtils.isPresent (
 				optionalCode)
 		) {
 

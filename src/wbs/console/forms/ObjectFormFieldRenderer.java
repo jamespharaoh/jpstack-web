@@ -3,8 +3,6 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
@@ -32,6 +30,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.etc.OptionalUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectFormFieldRenderer")
@@ -192,7 +191,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 			nullable ()
 
-			|| isNotPresent (
+			|| OptionalUtils.isNotPresent (
 				currentValue)
 
 			|| in (
@@ -399,7 +398,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		// render object path
 
 		if (
-			isPresent (
+			OptionalUtils.isPresent (
 				interfaceValue)
 		) {
 
@@ -436,7 +435,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		if (
 
-			isPresent (
+			OptionalUtils.isPresent (
 				interfaceValue)
 
 			&& isNotNull (

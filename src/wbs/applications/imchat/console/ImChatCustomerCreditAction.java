@@ -1,8 +1,5 @@
 package wbs.applications.imchat.console;
 
-import static wbs.framework.utils.etc.Misc.ifNotPresent;
-import static wbs.framework.utils.etc.Misc.optionalCast;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletException;
@@ -21,6 +18,10 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+
+import static wbs.framework.utils.etc.OptionalUtils.ifNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
+
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;

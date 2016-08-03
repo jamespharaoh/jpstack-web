@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.affiliate.console;
 
-import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 
 import javax.inject.Inject;
 
@@ -55,7 +55,8 @@ class ChatAffiliateKeywordsCreatePart
 				" name=\"keyword\"",
 				" value=\"%h\"",
 				emptyStringIfNull (
-					requestContext.getForm ("keyword")),
+					requestContext.getForm (
+						"keyword")),
 				">"),
 
 			"</tr>\n");

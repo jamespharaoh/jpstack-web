@@ -60,6 +60,26 @@ class AtomicFileWriter
 
 	@Override
 	public
+	void writeString (
+			@NonNull String string) {
+
+		stringBuilder.append (
+			string);
+
+	}
+
+	@Override
+	public
+	void writeCharacter (
+			int character) {
+
+		stringBuilder.append (
+			(char) character);
+
+	}
+
+	@Override
+	public
 	void close () {
 
 		String newContents =

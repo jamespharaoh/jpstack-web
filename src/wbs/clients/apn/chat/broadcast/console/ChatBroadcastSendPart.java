@@ -1,8 +1,5 @@
 package wbs.clients.apn.chat.broadcast.console;
 
-import static wbs.framework.utils.etc.Misc.ifNotPresent;
-import static wbs.framework.utils.etc.Misc.optionalCast;
-
 import java.util.Map;
 import java.util.Set;
 
@@ -25,6 +22,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.etc.OptionalUtils;
 
 @PrototypeComponent ("chatBroadcastSendPart")
 public
@@ -111,14 +109,14 @@ class ChatBroadcastSendPart
 
 		form =
 			(ChatBroadcastSendForm)
-			ifNotPresent (
+			OptionalUtils.ifNotPresent (
 				requestContext.request (
 					"chatBroadcastForm"),
 				Optional.<ChatBroadcastSendForm>of (
 					new ChatBroadcastSendForm ()));
 
 		updateResults =
-			optionalCast (
+			OptionalUtils.optionalCast (
 				UpdateResultSet.class,
 				requestContext.request (
 					"chatBroadcastUpdates"));

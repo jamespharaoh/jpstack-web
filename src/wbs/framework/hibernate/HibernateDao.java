@@ -2,6 +2,7 @@ package wbs.framework.hibernate;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.Misc.isEmptyString;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNull;

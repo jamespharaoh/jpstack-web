@@ -1,10 +1,10 @@
 package wbs.console.context;
 
-import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -272,7 +272,8 @@ class ConsoleContextSectionBuilder<
 		label =
 			ifNull (
 				spec.label (),
-				camelToSpaces (name));
+				camelToSpaces (
+					name));
 
 		contextTypeName =
 			structuralName;

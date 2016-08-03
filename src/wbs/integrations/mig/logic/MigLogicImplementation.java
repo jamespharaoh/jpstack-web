@@ -1,7 +1,6 @@
 package wbs.integrations.mig.logic;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -10,6 +9,7 @@ import lombok.NonNull;
 
 import com.google.common.base.Optional;
 
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.integrations.mig.model.MigNetworkObjectHelper;
 import wbs.integrations.mig.model.MigNetworkRec;
 import wbs.sms.network.model.NetworkRec;

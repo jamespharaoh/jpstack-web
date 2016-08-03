@@ -1,8 +1,8 @@
 package wbs.framework.entity.meta;
 
-import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 
 import java.io.InputStream;
 import java.util.Map;

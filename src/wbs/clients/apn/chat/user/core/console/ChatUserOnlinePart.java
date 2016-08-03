@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.spacify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.spacify;
 
 import java.util.Collection;
 import java.util.Set;
@@ -227,7 +227,8 @@ class ChatUserOnlinePart
 			printFormat (
 				"<td>%h</td>\n",
 				chatUser.getInfoText () != null
-					? spacify (chatUser.getInfoText ().getText ())
+					? spacify (
+						chatUser.getInfoText ().getText ())
 					: "");
 
 			String placeName = "-";

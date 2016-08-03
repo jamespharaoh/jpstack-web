@@ -1,12 +1,12 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.dateToInstantNullSafe;
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.isPresent;
-import static wbs.framework.utils.etc.Misc.nullIfEmptyString;
 import static wbs.framework.utils.etc.Misc.toBoolean;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.Misc.toInteger;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
+import static wbs.framework.utils.etc.TimeUtils.dateToInstantNullSafe;
 
 import java.io.Serializable;
 import java.util.Date;

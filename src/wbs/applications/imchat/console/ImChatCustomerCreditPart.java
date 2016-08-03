@@ -1,8 +1,8 @@
 package wbs.applications.imchat.console;
 
-import static wbs.framework.utils.etc.Misc.ifNotPresent;
 import static wbs.framework.utils.etc.Misc.max;
-import static wbs.framework.utils.etc.Misc.optionalCast;
+import static wbs.framework.utils.etc.OptionalUtils.ifNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 
 import java.util.List;
 

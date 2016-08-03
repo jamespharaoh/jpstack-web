@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.broadcast.console;
 
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,9 +125,9 @@ class ChatBroadcastListPart
 			printFormat (
 				"<td>%h</td>\n",
 				chatBroadcast.getSearch ()
-					? joinWithSeparator (
-						", ",
-						getSearchParams (chatBroadcast))
+					? joinWithCommaAndSpace (
+						getSearchParams (
+							chatBroadcast))
 					: "manual number selection");
 
 			printFormat (

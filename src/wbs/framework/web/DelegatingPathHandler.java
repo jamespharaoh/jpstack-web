@@ -1,7 +1,7 @@
 package wbs.framework.web;
 
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -174,7 +174,8 @@ class DelegatingPathHandler
 
 				remain =
 					joinWithoutSeparator (
-						path.substring (slashPosition),
+						path.substring (
+							slashPosition),
 						remain);
 
 				path =

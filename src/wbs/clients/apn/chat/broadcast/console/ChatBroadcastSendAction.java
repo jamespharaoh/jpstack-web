@@ -3,8 +3,6 @@ package wbs.clients.apn.chat.broadcast.console;
 import static wbs.framework.utils.etc.Misc.allOf;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
 import static wbs.framework.utils.etc.Misc.moreThanZero;
 import static wbs.framework.utils.etc.Misc.orNull;
 import static wbs.framework.utils.etc.Misc.stringFormat;
@@ -55,6 +53,10 @@ import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.TextualInterval;
 import wbs.framework.utils.etc.ProfileLogger;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+
 import wbs.framework.web.Responder;
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.service.console.ServiceConsoleHelper;

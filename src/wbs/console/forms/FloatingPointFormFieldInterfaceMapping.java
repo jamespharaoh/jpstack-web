@@ -1,7 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.isEmpty;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
+import static wbs.framework.utils.etc.Misc.isEmptyString;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Map;
@@ -13,6 +12,7 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 @PrototypeComponent ("doubleFormFieldInterfaceMapping")
 public
@@ -31,7 +31,7 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 			isNotPresent (
 				interfaceValue)
 
-			|| isEmpty (
+			|| isEmptyString (
 				interfaceValue.get ())
 
 		) {

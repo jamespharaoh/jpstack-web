@@ -2,7 +2,6 @@ package wbs.clients.apn.chat.user.join.daemon;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -57,6 +56,7 @@ import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.RandomLogic;
 import wbs.framework.utils.TimeFormatter;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.service.model.ServiceObjectHelper;

@@ -1,7 +1,7 @@
 package wbs.framework.hibernate;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.toInstant;
+import static wbs.framework.utils.etc.TimeUtils.toInstant;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;

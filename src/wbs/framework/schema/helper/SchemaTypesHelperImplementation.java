@@ -1,11 +1,11 @@
 package wbs.framework.schema.helper;
 
-import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.classForName;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 
 import java.sql.Types;
 import java.util.Date;
@@ -246,7 +246,7 @@ class SchemaTypesHelperImplementation
 				"schema",
 				stringFormat (
 					"schemaTypesHelper.initCustomType (%s)",
-					joinWithSeparator (
+					joinWithCommaAndSpace (
 						", ",
 						"taskLog",
 						"fieldTypeNamesBuilder",

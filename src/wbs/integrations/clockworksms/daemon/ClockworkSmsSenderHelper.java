@@ -2,9 +2,9 @@ package wbs.integrations.clockworksms.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -305,7 +305,10 @@ class ClockworkSmsSenderHelper
 			isNotNull (
 				clockworkResponse.errNo ())
 		) {
-			throw new RuntimeException ();
+
+			return handleGeneralError (
+				clockworkResponse);
+
 		}
 
 		// check for individual error
@@ -341,6 +344,22 @@ class ClockworkSmsSenderHelper
 			.otherIds (
 				ImmutableList.of (
 					clockworkSmsResponse.messageId ()));
+
+	}
+
+	ProcessResponseResult handleGeneralError (
+			@NonNull ClockworkSmsMessageResponse clockworkResponse) {
+
+		return new ProcessResponseResult ()
+
+			.status (
+				ProcessResponseStatus.remoteError)
+
+			.statusMessage (
+				clockworkResponse.errDesc ())
+
+			.failureType (
+				FailureType.temporary);
 
 	}
 

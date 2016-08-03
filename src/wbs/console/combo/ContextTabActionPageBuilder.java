@@ -1,9 +1,7 @@
 package wbs.console.combo;
 
-import static wbs.framework.utils.etc.Misc.camelToSpaces;
 import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.presentInstances;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.util.Collections;
@@ -32,6 +30,9 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.record.Record;
+
+import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
+import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 
 @PrototypeComponent ("contextTabActionPageBuider")
 @ConsoleModuleBuilderHandler
@@ -190,7 +191,9 @@ class ContextTabActionPageBuilder<
 		tabLabel =
 			ifNull (
 				spec.tabLabel (),
-				capitalise (camelToSpaces (name)));
+				capitalise (
+					camelToSpaces (
+						name)));
 
 		localFile =
 			ifNull (

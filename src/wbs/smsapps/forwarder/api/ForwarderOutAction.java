@@ -2,7 +2,6 @@ package wbs.smsapps.forwarder.api;
 
 import static wbs.framework.utils.etc.Misc.isInt;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -21,6 +20,7 @@ import wbs.api.mvc.ApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.text.web.TextResponder;

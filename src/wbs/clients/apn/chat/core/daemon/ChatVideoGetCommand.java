@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.core.daemon;
 
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +29,7 @@ import wbs.clients.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;

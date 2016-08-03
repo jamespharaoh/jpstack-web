@@ -1,7 +1,7 @@
 package wbs.applications.imchat.hibernate;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.toInstant;
+import static wbs.framework.utils.etc.TimeUtils.toInstant;
 
 import java.util.List;
 

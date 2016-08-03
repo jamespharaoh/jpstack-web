@@ -2,9 +2,9 @@ package wbs.clients.apn.chat.user.core.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
-import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.sum;
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 
 import java.util.ArrayList;
 import java.util.Iterator;

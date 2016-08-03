@@ -1,7 +1,6 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Map;
@@ -20,6 +19,7 @@ import fj.data.Either;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCsvFormFieldInterfaceMapping")

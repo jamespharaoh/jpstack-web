@@ -2,9 +2,7 @@ package wbs.platform.queue.logic;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.laterThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -25,6 +23,10 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.TimeUtils.laterThan;
+
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimStatus;
 import wbs.platform.queue.model.QueueItemObjectHelper;

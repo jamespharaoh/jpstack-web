@@ -1,7 +1,7 @@
 package wbs.services.messagetemplate.logic;
 
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
+import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 import lombok.NonNull;
 
 import com.google.common.collect.ImmutableList;

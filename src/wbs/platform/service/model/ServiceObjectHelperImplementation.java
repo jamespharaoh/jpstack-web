@@ -1,7 +1,5 @@
 package wbs.platform.service.model;
 
-import static wbs.framework.utils.etc.Misc.isPresent;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -11,6 +9,7 @@ import com.google.common.base.Optional;
 
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.scaffold.model.SliceRec;

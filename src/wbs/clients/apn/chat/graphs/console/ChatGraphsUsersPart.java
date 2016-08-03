@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.graphs.console;
 
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import javax.inject.Inject;
@@ -10,6 +9,7 @@ import org.joda.time.LocalDate;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TimeFormatter;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 
 @PrototypeComponent ("chatGraphsUsersPart")
 public

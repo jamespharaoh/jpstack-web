@@ -2,8 +2,6 @@ package wbs.integrations.oxygen8.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
 import java.io.IOException;
@@ -32,6 +30,10 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
+
 import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutObjectHelper;
@@ -344,8 +346,7 @@ class Oxygen8Sender
 
 			urlConnection.setRequestProperty (
 				"Content-Type",
-				joinWithSeparator (
-					"; ",
+				joinWithSemicolonAndSpace (
 					"application/x-www-form-urlencoded",
 					"charset=UTF-8"));
 

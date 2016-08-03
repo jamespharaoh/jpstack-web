@@ -2,8 +2,8 @@ package wbs.platform.media.console;
 
 import static wbs.framework.utils.etc.Misc.bytesToString;
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
 
 import java.util.Map;
 
@@ -129,12 +129,10 @@ class MediaConsoleLogicImplementation
 						"/media.video"),
 
 					" style=\"%h\"",
-					joinWithSeparator (
-						"; ",
-						ImmutableList.<String>of (
-							"display: block",
-							"width: 300px",
-							"height: 225px;")),
+					joinWithSemicolonAndSpace (
+						"display: block",
+						"width: 300px",
+						"height: 225px;"),
 
 					" id=\"player%d\"",
 					playerCount,
@@ -194,7 +192,7 @@ class MediaConsoleLogicImplementation
 						"/media.audio.mp3"),
 
 					" style=\"%h\"",
-					joinWithSeparator ("; ",
+					joinWithSemicolonAndSpace (
 						"display: block",
 						"width: 300px",
 						"height: 60px;"),

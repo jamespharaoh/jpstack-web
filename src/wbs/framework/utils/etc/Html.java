@@ -1,8 +1,8 @@
 package wbs.framework.utils.etc;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.replaceAll;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.replaceAll;
 
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;

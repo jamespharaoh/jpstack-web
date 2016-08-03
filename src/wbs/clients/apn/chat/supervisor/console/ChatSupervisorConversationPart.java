@@ -1,10 +1,10 @@
 package wbs.clients.apn.chat.supervisor.console;
 
 import static wbs.framework.utils.etc.Misc.anyOf;
-import static wbs.framework.utils.etc.Misc.emptyStringIfNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.spacify;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
+import static wbs.framework.utils.etc.StringUtils.spacify;
 
 import java.util.ArrayList;
 import java.util.Collections;

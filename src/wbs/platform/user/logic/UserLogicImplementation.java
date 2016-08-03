@@ -2,7 +2,6 @@ package wbs.platform.user.logic;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.hashSha1;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -17,6 +16,7 @@ import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;

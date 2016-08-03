@@ -1,14 +1,14 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.hyphenToCamel;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 import static wbs.framework.utils.etc.Misc.toEnum;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
+import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
 
 import java.util.Map;
 

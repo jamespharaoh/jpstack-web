@@ -1,14 +1,8 @@
 package wbs.console.module;
 
-import static wbs.framework.utils.etc.Misc.camelToHyphen;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-import static wbs.framework.utils.etc.Misc.isPresent;
-import static wbs.framework.utils.etc.Misc.joinWithSeparator;
-import static wbs.framework.utils.etc.Misc.joinWithoutSeparator;
-import static wbs.framework.utils.etc.Misc.optionalRequired;
 import static wbs.framework.utils.etc.Misc.pluralise;
 import static wbs.framework.utils.etc.Misc.stringFormat;
 
@@ -50,6 +44,14 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+
 import wbs.framework.web.ExternalRedirectException;
 import wbs.framework.web.PageNotFoundException;
 import wbs.framework.web.PathHandler;
@@ -397,8 +399,7 @@ class ConsoleManagerImplementation
 							"Unknown context type %s ",
 							contextTypeName,
 							"referenced from tabs %s ",
-							joinWithSeparator (
-								", ",
+							joinWithCommaAndSpace (
 								contextTabNames),
 							"in %s",
 							consoleModuleName));
@@ -1532,8 +1533,7 @@ class ConsoleManagerImplementation
 					"Multiple contexts with parent %s of type %s: %s",
 					parentContext.name (),
 					contextType.name (),
-					joinWithSeparator (
-						", ",
+					joinWithCommaAndSpace (
 						contextNames)));
 
 		}

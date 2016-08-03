@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.underscoreToHyphen;
+import static wbs.framework.utils.etc.StringUtils.underscoreToHyphen;
 
 import javax.inject.Inject;
 import javax.inject.Provider;

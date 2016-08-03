@@ -3,8 +3,8 @@ package wbs.platform.queue.console;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.joinWithSpace;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 
 import java.util.ArrayList;
 import java.util.HashSet;

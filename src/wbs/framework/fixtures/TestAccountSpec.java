@@ -1,4 +1,4 @@
-package wbs.integrations.paypal.fixture;
+package wbs.framework.fixtures;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

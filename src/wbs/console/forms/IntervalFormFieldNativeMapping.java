@@ -1,7 +1,5 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.isNotPresent;
-
 import javax.inject.Inject;
 
 import lombok.NonNull;
@@ -14,6 +12,7 @@ import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.utils.TextualInterval;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 @PrototypeComponent ("intervalFormFieldNativeMapping")
 public

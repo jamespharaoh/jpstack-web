@@ -1,7 +1,7 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.Misc.camelToUnderscore;
 import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
@@ -248,8 +248,10 @@ class HibernateEnumType<EnumType extends Enum<?>>
 
 		}
 
-		for (EnumType enumValue
-				: enumClass.getEnumConstants ()) {
+		for (
+			EnumType enumValue
+				: enumClass.getEnumConstants ()
+		) {
 
 			add (
 				camelToUnderscore (

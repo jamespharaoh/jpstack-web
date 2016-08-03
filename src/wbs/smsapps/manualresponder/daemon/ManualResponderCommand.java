@@ -1,11 +1,8 @@
 package wbs.smsapps.manualresponder.daemon;
 
-import static wbs.framework.utils.etc.Misc.earlierThan;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNotPresent;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.isPresent;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
@@ -34,6 +31,11 @@ import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.TimeFormatter;
+
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
+
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;
