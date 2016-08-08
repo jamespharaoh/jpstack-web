@@ -1,9 +1,9 @@
 package wbs.platform.object.list;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
 import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;

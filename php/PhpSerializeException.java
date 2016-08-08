@@ -1,6 +1,6 @@
 package wbs.platform.php;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 public
 class PhpSerializeException

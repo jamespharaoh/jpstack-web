@@ -1,8 +1,8 @@
 package wbs.platform.object.settings;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 
 import java.util.ArrayList;

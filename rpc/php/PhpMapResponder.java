@@ -1,6 +1,6 @@
 package wbs.platform.rpc.php;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

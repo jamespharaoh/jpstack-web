@@ -1,6 +1,6 @@
 package wbs.platform.hooks.logic;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;

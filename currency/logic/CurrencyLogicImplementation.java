@@ -3,10 +3,10 @@ package wbs.platform.currency.logic;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
-import static wbs.framework.utils.etc.StringUtils.isNotEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
 import static wbs.framework.utils.etc.StringUtils.joinWithPipe;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
@@ -254,10 +254,10 @@ class CurrencyLogicImplementation
 
 		if (
 
-			isNotEmptyString (
+			stringIsNotEmpty (
 				currency.getSingularSuffix ().trim ())
 
-			|| isNotEmptyString (
+			|| stringIsNotEmpty (
 				currency.getPluralSuffix ().trim ())
 
 		) {

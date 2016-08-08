@@ -8,7 +8,7 @@ import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.runFilter;
 import static wbs.framework.utils.etc.Misc.runFilterAdvanced;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

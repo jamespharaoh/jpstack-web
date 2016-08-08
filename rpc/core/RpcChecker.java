@@ -1,6 +1,6 @@
 package wbs.platform.rpc.core;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
 
 import java.lang.reflect.Field;
