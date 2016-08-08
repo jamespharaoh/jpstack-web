@@ -1,6 +1,6 @@
 package wbs.services.ticket.core.console;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.underscoreToCamel;
 
 import java.util.ArrayList;

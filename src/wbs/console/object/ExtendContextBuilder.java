@@ -1,6 +1,6 @@
 package wbs.console.object;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 

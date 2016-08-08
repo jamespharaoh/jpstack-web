@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.isEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
 import static wbs.framework.utils.etc.Misc.trim;
 
@@ -105,7 +105,7 @@ class ChatUserAdminBarringAction
 
 			(! barOn && ! barOff)
 
-			|| isEmptyString (
+			|| stringIsEmpty (
 				reason)
 
 		) {

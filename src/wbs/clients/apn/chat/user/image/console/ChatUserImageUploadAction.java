@@ -1,9 +1,10 @@
 package wbs.clients.apn.chat.user.image.console;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -31,7 +32,6 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.framework.web.Responder;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;

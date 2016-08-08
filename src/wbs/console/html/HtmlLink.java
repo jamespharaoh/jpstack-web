@@ -1,6 +1,6 @@
 package wbs.console.html;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import lombok.Builder;
 import lombok.experimental.Accessors;
 

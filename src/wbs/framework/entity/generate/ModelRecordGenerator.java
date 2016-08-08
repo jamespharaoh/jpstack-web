@@ -1,9 +1,9 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.File;
 import java.io.IOException;

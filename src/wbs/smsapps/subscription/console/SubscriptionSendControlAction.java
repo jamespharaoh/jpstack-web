@@ -1,7 +1,7 @@
 package wbs.smsapps.subscription.console;
 
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
 

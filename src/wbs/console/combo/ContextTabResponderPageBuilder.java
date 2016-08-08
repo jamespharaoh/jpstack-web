@@ -1,9 +1,9 @@
 package wbs.console.combo;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import java.util.Collections;
 
@@ -199,7 +199,8 @@ class ContextTabResponderPageBuilder<
 				stringFormat (
 					"%s%sResponder",
 					container.newBeanNamePrefix (),
-					capitalise (name)));
+					capitalise (
+						name)));
 
 		pageTitle =
 			ifNull (
@@ -212,7 +213,8 @@ class ContextTabResponderPageBuilder<
 				stringFormat (
 					"%s%sPart",
 					container.existingBeanNamePrefix (),
-					capitalise (name)));
+					capitalise (
+						name)));
 
 		hideTab =
 			spec.hideTab ();

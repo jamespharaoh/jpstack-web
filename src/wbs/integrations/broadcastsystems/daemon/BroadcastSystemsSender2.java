@@ -1,7 +1,7 @@
 package wbs.integrations.broadcastsystems.daemon;
 
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToUrl;
 
 import java.net.HttpURLConnection;
@@ -31,7 +31,6 @@ import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
 
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringToBytes;
 import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
 
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;

@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.user.image.api;
 
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.FileOutputStream;
 import java.util.List;

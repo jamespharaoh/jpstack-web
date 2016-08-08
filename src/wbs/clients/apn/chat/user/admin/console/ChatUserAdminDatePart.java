@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.user.admin.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.toStringNull;
+import static wbs.framework.utils.etc.StringUtils.objectToStringNullSafe;
 
 import javax.inject.Inject;
 
@@ -86,7 +86,7 @@ class ChatUserAdminDatePart
 					"dateMode",
 					ifNull (
 						requestContext.getForm ("dateMode"),
-						toStringNull (
+						objectToStringNullSafe (
 							chatUser.getDateMode ()))),
 
 				"</tr>\n");

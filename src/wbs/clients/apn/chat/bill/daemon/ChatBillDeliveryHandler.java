@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.bill.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Arrays;
 import java.util.Collection;

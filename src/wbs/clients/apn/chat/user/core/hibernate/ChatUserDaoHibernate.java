@@ -2,7 +2,7 @@ package wbs.clients.apn.chat.user.core.hibernate;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collection;
 import java.util.Collections;

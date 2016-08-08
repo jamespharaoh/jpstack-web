@@ -1,8 +1,8 @@
 package wbs.framework.application.tools;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
-import static wbs.framework.utils.etc.Misc.uncapitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.framework.utils.etc.StringUtils.uncapitalise;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

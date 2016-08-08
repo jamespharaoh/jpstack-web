@@ -1,6 +1,6 @@
 package wbs.applications.imchat.fixture;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithSlash;
 
 import java.io.FileInputStream;

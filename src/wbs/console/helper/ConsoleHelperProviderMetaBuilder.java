@@ -1,7 +1,7 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
 import static wbs.framework.utils.etc.StringUtils.split;
 
@@ -69,7 +69,8 @@ class ConsoleHelperProviderMetaBuilder {
 					packageNameParts.subList (
 						0,
 						packageNameParts.size () - 1)),
-				capitalise (objectHelper.objectName ()));
+				capitalise (
+					objectHelper.objectName ()));
 
 		Class<?> consoleHelperClass;
 

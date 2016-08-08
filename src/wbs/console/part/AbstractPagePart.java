@@ -1,6 +1,6 @@
 package wbs.console.part;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.PrintWriter;
 import java.util.Map;

@@ -1,7 +1,6 @@
 package wbs.platform.core.console;
 
 import static wbs.framework.utils.etc.Misc.isEmpty;
-import static wbs.framework.utils.etc.Misc.isEmptyString;
 
 import java.util.Set;
 

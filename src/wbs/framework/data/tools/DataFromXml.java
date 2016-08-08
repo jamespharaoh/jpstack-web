@@ -4,15 +4,14 @@ import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
 import static wbs.framework.utils.etc.Misc.toEnumGeneric;
-import static wbs.framework.utils.etc.Misc.uncapitalise;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
+import static wbs.framework.utils.etc.StringUtils.uncapitalise;
 
 import java.io.File;
 import java.io.InputStream;
@@ -1251,7 +1250,8 @@ class DataFromXml {
 				matcher.group (1);
 
 			String indexFieldName =
-				uncapitalise (matcher.group (2));
+				uncapitalise (
+					matcher.group (2));
 
 			Map<Object,Object> childrenIndex =
 				new LinkedHashMap<Object,Object> ();

@@ -2,7 +2,6 @@ package wbs.clients.apn.chat.user.admin.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isEmpty;
-import static wbs.framework.utils.etc.Misc.isEmptyString;
 
 import javax.inject.Inject;
 

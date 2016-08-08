@@ -3,8 +3,14 @@ package wbs.console.module;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.pluralise;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.pluralise;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,14 +50,6 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
-import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
-
 import wbs.framework.web.ExternalRedirectException;
 import wbs.framework.web.PageNotFoundException;
 import wbs.framework.web.PathHandler;
@@ -224,7 +222,9 @@ class ConsoleManagerImplementation
 			throw new RuntimeException (
 				stringFormat (
 					"%s initialising context manager",
-					pluralise (errors, "error")));
+					pluralise (
+						errors,
+						"error")));
 
 		}
 

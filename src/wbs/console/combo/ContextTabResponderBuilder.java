@@ -1,8 +1,8 @@
 package wbs.console.combo;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -89,7 +89,8 @@ class ContextTabResponderBuilder<
 		title =
 			ifNull (
 				spec.title (),
-				capitalise (name));
+				capitalise (
+					name));
 
 		responderName =
 			ifNull (
@@ -97,7 +98,8 @@ class ContextTabResponderBuilder<
 				stringFormat (
 					"%s%sResponder",
 					container.newBeanNamePrefix (),
-					capitalise (name)));
+					capitalise (
+						name)));
 
 
 		pagePartName =
@@ -106,7 +108,8 @@ class ContextTabResponderBuilder<
 				stringFormat (
 					"%s%sPart",
 					container.existingBeanNamePrefix (),
-					capitalise (name)));
+					capitalise (
+						name)));
 
 	}
 

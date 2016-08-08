@@ -1,6 +1,6 @@
 package wbs.framework.entity.meta;
 
-import static wbs.framework.utils.etc.Misc.stringFormatArray;
+import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

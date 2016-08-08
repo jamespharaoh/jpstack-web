@@ -1,7 +1,7 @@
 package wbs.framework.entity.meta;
 
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 
 import java.io.InputStream;

@@ -1,6 +1,6 @@
 package wbs.console.reporting;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.Writer;

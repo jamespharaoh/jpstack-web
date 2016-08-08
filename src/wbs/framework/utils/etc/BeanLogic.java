@@ -1,6 +1,6 @@
 package wbs.framework.utils.etc;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

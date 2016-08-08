@@ -1,6 +1,8 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import javax.inject.Inject;
 
@@ -15,8 +17,6 @@ import wbs.console.action.ConsoleAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.etc.Misc;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -74,7 +74,7 @@ class ChatUserAdminOnlineAction
 					"chatUserId"));
 
 		String userType =
-			Misc.capitalise (
+			capitalise (
 				chatUser.getType ().name ());
 
 		if (

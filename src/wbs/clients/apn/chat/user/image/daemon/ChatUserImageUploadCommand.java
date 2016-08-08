@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.image.daemon;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
 

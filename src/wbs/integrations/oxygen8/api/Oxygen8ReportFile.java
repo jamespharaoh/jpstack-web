@@ -1,6 +1,6 @@
 package wbs.integrations.oxygen8.api;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.PrintWriter;

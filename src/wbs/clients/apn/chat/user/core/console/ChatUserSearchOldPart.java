@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.user.core.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.toStringNull;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
+import static wbs.framework.utils.etc.StringUtils.objectToStringNullSafe;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -121,7 +121,7 @@ class ChatUserSearchOldPart
 			Html.select (
 				"type",
 				searchTypeOptions,
-				toStringNull (
+				objectToStringNullSafe (
 					params.get ("type"))),
 
 			"</tr>\n");
@@ -151,7 +151,7 @@ class ChatUserSearchOldPart
 			Html.select (
 				"gender",
 				searchGenderOptions,
-				toStringNull (
+				objectToStringNullSafe (
 					params.get ("gender"))),
 
 			"</tr>\n");
@@ -164,7 +164,7 @@ class ChatUserSearchOldPart
 			Html.select (
 				"orient",
 				searchOrientOptions,
-				toStringNull (
+				objectToStringNullSafe (
 					params.get ("orient"))),
 
 			"</tr>\n");
@@ -254,7 +254,7 @@ class ChatUserSearchOldPart
 			Html.select (
 				"picture",
 				searchTrueFalseOptions,
-				toStringNull (
+				objectToStringNullSafe (
 					params.get ("picture"))),
 
 			"</tr>\n");
@@ -267,7 +267,7 @@ class ChatUserSearchOldPart
 			Html.select (
 				"video",
 				searchTrueFalseOptions,
-				toStringNull (
+				objectToStringNullSafe (
 					params.get ("video"))),
 
 			"</tr>\n");
@@ -280,7 +280,7 @@ class ChatUserSearchOldPart
 			Html.select (
 				"adultVerified",
 				searchTrueFalseOptions,
-				toStringNull (
+				objectToStringNullSafe (
 					params.get ("adultVerified"))),
 
 			"</tr>\n");
@@ -292,7 +292,7 @@ class ChatUserSearchOldPart
 			"<td>%s</td>\n",
 			chatUserCreditModeConsoleHelper.select (
 				"creditMode",
-				toStringNull (
+				objectToStringNullSafe (
 					params.get ("creditMode"))),
 
 			"</tr>\n");
@@ -377,7 +377,7 @@ class ChatUserSearchOldPart
 			"<td>%s</td>\n",
 			chatUserDateModeConsoleHelper.select (
 				"dateMode",
-				toStringNull (
+				objectToStringNullSafe (
 					params.get ("dateMode"))),
 
 			"</tr>\n");
@@ -390,7 +390,7 @@ class ChatUserSearchOldPart
 			Html.select (
 				"online",
 				searchOnlineOptions,
-				toStringNull (
+				objectToStringNullSafe (
 					params.get ("online"))),
 
 			"</tr>\n");
@@ -403,7 +403,7 @@ class ChatUserSearchOldPart
 			Html.select (
 				"output",
 				searchOutputOptions,
-				toStringNull (
+				objectToStringNullSafe (
 					params.get ("output"))),
 
 			"</tr>\n");
@@ -416,7 +416,7 @@ class ChatUserSearchOldPart
 			Html.select (
 				"order",
 				searchOrderOptions,
-				toStringNull (
+				objectToStringNullSafe (
 					params.get ("order"))),
 
 			"</tr>\n");

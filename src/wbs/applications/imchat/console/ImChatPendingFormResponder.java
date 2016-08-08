@@ -1,7 +1,7 @@
 package wbs.applications.imchat.console;
 
 import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.Set;

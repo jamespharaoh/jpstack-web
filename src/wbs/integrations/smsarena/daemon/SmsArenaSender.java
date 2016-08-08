@@ -2,7 +2,7 @@ package wbs.integrations.smsarena.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToUrl;
 
 import java.net.HttpURLConnection;

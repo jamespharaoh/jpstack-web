@@ -1,6 +1,6 @@
 package wbs.framework.schema.helper;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 
 import java.util.regex.Matcher;

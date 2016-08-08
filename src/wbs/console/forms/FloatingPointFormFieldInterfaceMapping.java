@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.isEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Map;
@@ -31,7 +31,7 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 			isNotPresent (
 				interfaceValue)
 
-			|| isEmptyString (
+			|| stringIsEmpty (
 				interfaceValue.get ())
 
 		) {

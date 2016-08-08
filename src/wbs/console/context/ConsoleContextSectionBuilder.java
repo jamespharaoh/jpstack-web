@@ -1,9 +1,9 @@
 package wbs.console.context;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
 import java.util.HashMap;
@@ -120,13 +120,15 @@ class ConsoleContextSectionBuilder<
 				stringFormat (
 					"%s%s",
 					container.existingBeanNamePrefix (),
-					capitalise (aliasOf)))
+					capitalise (
+						aliasOf)))
 
 			.newBeanNamePrefix (
 				stringFormat (
 					"%s%s",
 					container.newBeanNamePrefix (),
-					capitalise (name)))
+					capitalise (
+						name)))
 
 			.tabLocation (
 				"end")

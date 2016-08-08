@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +96,8 @@ class DeletedFormFieldBuilder {
 		String label =
 			ifNull (
 				spec.label (),
-				capitalise (consoleHelper.deletedLabel ()));
+				capitalise (
+					consoleHelper.deletedLabel ()));
 
 		Boolean readOnly =
 			ifNull (

@@ -15,7 +15,15 @@ public
 class StringUtils {
 
 	public static
-	boolean isNotEmptyString (
+	boolean stringIsEmpty (
+			@NonNull String string) {
+
+		return string.isEmpty ();
+
+	}
+
+	public static
+	boolean stringIsNotEmpty (
 			@NonNull String string) {
 
 		return ! string.isEmpty ();
@@ -655,6 +663,190 @@ class StringUtils {
 		return nonAlphanumericWordsPattern.matcher (
 			s.toLowerCase()).replaceAll(
 				" ").trim();
+
+	}
+
+	public static
+	String objectToStringNullSafe (
+			Object object) {
+
+		if (object == null)
+			return null;
+
+		return object.toString ();
+
+	}
+
+	public static
+	String objectToString (
+			@NonNull Object object) {
+
+		return object.toString ();
+
+	}
+
+	public static
+	boolean equalIgnoreCase (
+			@NonNull String... strings) {
+
+		if (strings.length == 0)
+			return true;
+
+		String firstString =
+			strings [0];
+
+		for (
+			String string
+				: strings
+		) {
+
+			if (string == firstString)
+				continue;
+
+			if (! firstString.equalsIgnoreCase (string))
+				return false;
+
+		}
+
+		return true;
+
+	}
+
+	public static
+	String naivePluralise (
+			@NonNull String singular) {
+
+		if (
+			endsWith (
+				singular,
+				"s")
+		) {
+
+			return singular + "es";
+
+		} else {
+
+			return singular + "s";
+
+		}
+
+	}
+
+	public static
+	boolean startsWith (
+			@NonNull String subject,
+			@NonNull String suffix) {
+
+		return subject.startsWith (
+			suffix);
+
+	}
+
+	public static
+	boolean endsWith (
+			@NonNull String subject,
+			@NonNull String suffix) {
+
+		return subject.endsWith (
+			suffix);
+
+	}
+
+	public static
+	String pluralise (
+			long quantity,
+			@NonNull String singularNoun,
+			@NonNull String pluralNoun) {
+
+		return quantity == 1L
+			? "" + quantity + " " + singularNoun
+			: "" + quantity + " " + pluralNoun;
+
+	}
+
+	public static
+	String pluralise (
+			long quantity,
+			@NonNull String singularNoun) {
+
+		return quantity == 1L
+
+			? joinWithSpace (
+				Long.toString (
+					quantity),
+				singularNoun)
+
+			: joinWithSpace (
+				Long.toString (
+					quantity),
+				naivePluralise (
+					singularNoun));
+
+	}
+
+	public static
+	String lowercase (
+			@NonNull String string) {
+
+		return string.toLowerCase ();
+
+	}
+
+	public static
+	String capitalise (
+			@NonNull String string) {
+
+		if (string.length () == 0)
+			return "";
+
+		return (
+			Character.toUpperCase (
+				string.charAt (0))
+			+ string.substring (1)
+		);
+
+	}
+
+	public static
+	String uncapitalise (
+			@NonNull String string) {
+
+		if (string.length () == 0)
+			return "";
+
+		return (
+			Character.toLowerCase (
+				string.charAt (0))
+			+ string.substring (1)
+		);
+
+	}
+
+	public static
+	String stringFormat (
+			Object... arguments) {
+
+		return StringFormatter.standardArray (
+			arguments);
+
+	}
+
+	public static
+	String stringFormatArray (
+			Object[] args) {
+
+		return stringFormat (
+			args);
+
+	}
+
+	public static
+	String fixNewlines (
+			@NonNull String input) {
+
+		return input
+			.replaceAll ("\r\n", "\n")
+			.replaceAll ("\r", "\n");
 
 	}
 

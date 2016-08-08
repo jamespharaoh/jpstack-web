@@ -1,6 +1,6 @@
 package wbs.framework.utils;
 
-import static wbs.framework.utils.etc.StringUtils.isNotEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
@@ -47,7 +47,7 @@ class EmailLogicImplementation
 				System.getProperties ());
 
 		if (
-			isNotEmptyString (
+			stringIsNotEmpty (
 				wbsConfig.smtpHostname ())
 		) {
 
@@ -58,7 +58,7 @@ class EmailLogicImplementation
 		}
 
 		if (
-			isNotEmptyString (
+			stringIsNotEmpty (
 				wbsConfig.smtpPort ())
 		) {
 
@@ -69,7 +69,7 @@ class EmailLogicImplementation
 		}
 
 		if (
-			isNotEmptyString (
+			stringIsNotEmpty (
 				wbsConfig.smtpUsername ())
 		) {
 
@@ -78,7 +78,7 @@ class EmailLogicImplementation
 		}
 
 		if (
-			isNotEmptyString (
+			stringIsNotEmpty (
 				wbsConfig.smtpPassword ())
 		) {
 

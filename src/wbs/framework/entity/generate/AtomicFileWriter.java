@@ -2,7 +2,7 @@ package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.stringFormatArray;
+import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
 
 import java.io.File;
 import java.io.IOException;

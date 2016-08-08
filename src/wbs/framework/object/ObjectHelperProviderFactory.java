@@ -1,6 +1,6 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

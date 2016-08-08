@@ -1,6 +1,6 @@
 package wbs.integrations.digitalselect.daemon;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.util.List;

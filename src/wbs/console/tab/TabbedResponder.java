@@ -1,6 +1,6 @@
 package wbs.console.tab;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 

@@ -1,7 +1,7 @@
 package wbs.platform.postgresql.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -1,7 +1,7 @@
 package wbs.framework.object;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import wbs.framework.record.Record;
 

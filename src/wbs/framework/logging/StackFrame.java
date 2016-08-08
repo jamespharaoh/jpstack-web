@@ -1,6 +1,6 @@
 package wbs.framework.logging;
 
-import static wbs.framework.utils.etc.Misc.stringFormatArray;
+import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
 
 public
 class StackFrame {

@@ -1,11 +1,11 @@
 package wbs.framework.utils;
 
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.lowercase;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.StringUtils.lowercase;
 import static wbs.framework.utils.etc.StringUtils.split;
 import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
@@ -47,7 +47,8 @@ class TextualInterval {
 
 		if (
 			in (
-				lowercase (string),
+				lowercase (
+					string),
 				"today",
 				"yesterday",
 				"this month",

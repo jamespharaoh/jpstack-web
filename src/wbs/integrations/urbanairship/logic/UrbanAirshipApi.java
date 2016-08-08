@@ -1,6 +1,6 @@
 package wbs.integrations.urbanairship.logic;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.StringWriter;
 import java.io.Writer;

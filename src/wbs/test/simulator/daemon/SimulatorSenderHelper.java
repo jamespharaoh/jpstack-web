@@ -1,11 +1,15 @@
 package wbs.test.simulator.daemon;
 
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+
 import java.util.List;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
+import lombok.Data;
 import lombok.NonNull;
+import lombok.experimental.Accessors;
 
 import org.json.simple.JSONValue;
 
@@ -18,10 +22,11 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
+import wbs.sms.message.outbox.daemon.SmsSenderHelper;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.test.simulator.daemon.SimulatorSenderHelper.State;
 import wbs.test.simulator.model.SimulatorEventObjectHelper;
 import wbs.test.simulator.model.SimulatorEventRec;
 import wbs.test.simulator.model.SimulatorSessionNumberObjectHelper;
@@ -30,8 +35,8 @@ import wbs.test.simulator.model.SimulatorSessionObjectHelper;
 
 @SingletonComponent ("simulatorSender")
 public
-class SimulatorSender
-	extends AbstractSmsSender1<Integer> {
+class SimulatorSenderHelper
+	implements SmsSenderHelper<State> {
 
 	// dependencies
 
@@ -53,32 +58,37 @@ class SimulatorSender
 	// details
 
 	@Override
-	protected
-	String getSenderCode () {
+	public
+	String senderCode () {
 		return "simulator";
-	}
-
-	@Override
-	protected
-	String getThreadName () {
-		return "SimSender";
 	}
 
 	// implementation
 
 	@Override
-	protected
-	Integer getMessage (
-			OutboxRec outbox) {
+	public
+	SetupRequestResult<State> setupRequest (
+			@NonNull OutboxRec outbox) {
 
-		return outbox.getId ();
+		return new SetupRequestResult<State> ()
+
+			.status (
+				SetupRequestStatus.success)
+
+			.state (
+				new State ()
+
+				.messageId (
+					(long) (int) outbox.getId ())
+
+			);
 
 	}
 
 	@Override
-	protected
-	Optional<List<String>> sendMessage (
-			@NonNull Integer messageId) {
+	public
+	PerformSendResult performSend (
+			@NonNull State state) {
 
 		@Cleanup
 		Transaction transaction =
@@ -88,7 +98,7 @@ class SimulatorSender
 
 		MessageRec message =
 			messageHelper.findRequired (
-				messageId);
+				state.messageId);
 
 		RouteRec route =
 			message.getRoute ();
@@ -129,11 +139,27 @@ class SimulatorSender
 
 		// lookup session
 
+		Optional<SimulatorSessionNumberRec> simulatorSessionNumberOptional =
+			simulatorSessionNumberHelper.find (
+				message.getNumber ().getId ());
+
+		if (
+			isNotPresent (
+				simulatorSessionNumberOptional)
+		) {
+
+			return new PerformSendResult ()
+
+				.status (
+					PerformSendStatus.remoteError)
+
+				.statusMessage (
+					"No session for number");
+
+		}
+
 		SimulatorSessionNumberRec simulatorSessionNumber =
-			simulatorSessionNumberHelper.findOrThrow (
-				message.getNumber ().getId (),
-				() -> permFailure (
-					"No session for number"));
+			simulatorSessionNumberOptional.get ();
 
 		// create event
 
@@ -153,24 +179,48 @@ class SimulatorSender
 			.setData (
 				JSONValue.toJSONString (data)));
 
-
 		// finish up
 
 		transaction.commit ();
 
-		return Optional.of (
+		state.otherIds (
 			ImmutableList.of (
 				Integer.toString (
 					event.getId ())));
 
+		return new PerformSendResult ()
+
+			.status (
+				PerformSendStatus.success)
+
+			.statusMessage (
+				"No session for number");
+
 	}
 
-	// data structures
+	@Override
+	public
+	ProcessResponseResult processSend (
+			@NonNull State state) {
 
-	static
-	class Work {
-		OutboxRec outbox;
-		MessageRec message;
+		return new ProcessResponseResult ()
+
+			.status (
+				ProcessResponseStatus.success)
+
+			.otherIds (
+				state.otherIds);
+
+	}
+
+	@Accessors (fluent = true)
+	@Data
+	public static
+	class State {
+
+		Long messageId;
+		List<String> otherIds;
+
 	}
 
 }

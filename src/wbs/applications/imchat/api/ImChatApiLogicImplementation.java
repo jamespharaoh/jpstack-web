@@ -2,10 +2,10 @@ package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.isEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.Map;
@@ -537,7 +537,7 @@ class ImChatApiLogicImplementation
 
 					detailType.getRequired ()
 
-					&& isEmptyString (
+					&& stringIsEmpty (
 						stringValue.trim ())
 
 				) {
@@ -559,7 +559,7 @@ class ImChatApiLogicImplementation
 
 					detailType.getRequired ()
 
-					&& isEmptyString (
+					&& stringIsEmpty (
 						stringValue.trim ())
 
 				) {

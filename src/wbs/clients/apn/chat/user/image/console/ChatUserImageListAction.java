@@ -1,11 +1,11 @@
 package wbs.clients.apn.chat.user.image.console;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -68,7 +68,8 @@ class ChatUserImageListAction
 		return responder (
 			stringFormat (
 				"chatUser%sListResponder",
-				capitalise (type.toString ())));
+				capitalise (
+					type.toString ())));
 
 	}
 

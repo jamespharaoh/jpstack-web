@@ -1,8 +1,8 @@
 package wbs.console.combo;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -257,7 +257,8 @@ class ContextTabFormActionPageBuilder {
 			stringFormat (
 				"%s%sFormActionHelper",
 				container.newBeanNamePrefix (),
-				capitalise (name));
+				capitalise (
+					name));
 
 		tabName =
 			stringFormat (
@@ -280,13 +281,15 @@ class ContextTabFormActionPageBuilder {
 			stringFormat (
 				"%s%sFormResponder",
 				container.newBeanNamePrefix (),
-				capitalise (name));
+				capitalise (
+					name));
 
 		actionName =
 			stringFormat (
 				"%s%sFormAction",
 				container.existingBeanNamePrefix (),
-				capitalise (name));
+				capitalise (
+					name));
 
 		title =
 			capitalise (

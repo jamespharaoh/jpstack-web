@@ -1,8 +1,8 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.Misc.isEmptyString;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Map;
@@ -55,7 +55,7 @@ class TimestampTimezoneFormFieldInterfaceMapping<Container>
 			isNotPresent (
 				interfaceValue)
 
-			|| isEmptyString (
+			|| stringIsEmpty (
 				optionalRequired (
 					interfaceValue))
 

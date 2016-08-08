@@ -1,7 +1,7 @@
 package wbs.framework.fixtures;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import java.util.List;
 import java.util.Map;

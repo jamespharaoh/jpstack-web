@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.adult.daemon;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
 import java.util.Collections;

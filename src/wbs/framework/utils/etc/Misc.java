@@ -2,6 +2,7 @@ package wbs.framework.utils.etc;
 
 import static wbs.framework.utils.etc.StringUtils.bytesToString;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -194,25 +195,6 @@ class Misc {
 	}
 
 	public static
-	String toStringNull (
-			Object object) {
-
-		if (object == null)
-			return null;
-
-		return object.toString ();
-
-	}
-
-	public static
-	String objectToString (
-			@NonNull Object object) {
-
-		return object.toString ();
-
-	}
-
-	public static
 	String urlEncode (
 			String string) {
 
@@ -278,34 +260,6 @@ class Misc {
 
 	}
 
-	/**
-	 * Does a equalsIgnoreCase between any number of strings.
-	 */
-	public static
-	boolean equalIgnoreCase (
-			String... strings) {
-
-		if (strings.length == 0)
-			return true;
-
-		String firstString =
-			strings [0];
-
-		for (String string
-				: strings) {
-
-			if (string == firstString)
-				continue;
-
-			if (! firstString.equalsIgnoreCase (string))
-				return false;
-
-		}
-
-		return true;
-
-	}
-
 	public static
 	boolean referenceEqual (
 			@NonNull Object object1,
@@ -339,78 +293,6 @@ class Misc {
 			return falseValue.get ();
 
 		}
-
-	}
-
-	public static
-	String naivePluralise (
-			@NonNull String singular) {
-
-		if (
-			endsWith (
-				singular,
-				"s")
-		) {
-
-			return singular + "es";
-
-		} else {
-
-			return singular + "s";
-
-		}
-
-	}
-
-	public static
-	boolean startsWith (
-			@NonNull String subject,
-			@NonNull String suffix) {
-
-		return subject.startsWith (
-			suffix);
-
-	}
-
-	public static
-	boolean endsWith (
-			@NonNull String subject,
-			@NonNull String suffix) {
-
-		return subject.endsWith (
-			suffix);
-
-	}
-
-	public static
-	String pluralise (
-			long quantity,
-			String singularNoun,
-			String pluralNoun) {
-
-		return quantity == 1L
-			? "" + quantity + " " + singularNoun
-			: "" + quantity + " " + pluralNoun;
-
-	}
-
-	public static
-	String pluralise (
-			long quantity,
-			String singularNoun) {
-
-		return quantity == 1L
-
-			? stringFormat (
-				"%s %s",
-				quantity,
-				singularNoun)
-
-			: stringFormat (
-				"%s %s",
-				quantity,
-				naivePluralise (
-					singularNoun));
 
 	}
 
@@ -603,40 +485,6 @@ class Misc {
 	}
 
 	public static
-	String lowercase (
-			@NonNull String string) {
-
-		return string.toLowerCase ();
-
-	}
-
-	public static
-	String capitalise (
-			@NonNull String string) {
-
-		if (string.length () == 0)
-			return "";
-
-		return (
-			Character.toUpperCase (string.charAt (0))
-			+ string.substring (1)
-		);
-
-	}
-
-	public static
-	String uncapitalise (
-			@NonNull String string) {
-
-		if (string.length () == 0)
-			return "";
-
-		return Character.toLowerCase (string.charAt (0))
-			+ string.substring (1);
-
-	}
-
-	public static
 	String prettyHour (
 			long hour) {
 
@@ -656,16 +504,6 @@ class Misc {
 
 	}
 
-	public static
-	String fixNewlines (
-			@NonNull String input) {
-
-		return input
-			.replaceAll ("\r\n", "\n")
-			.replaceAll ("\r", "\n");
-
-	}
-
 	public static <T>
 	Iterable<T> iterable (
 			final Iterator<T> iterator) {
@@ -679,24 +517,6 @@ class Misc {
 			}
 
 		};
-
-	}
-
-	public static
-	String stringFormat (
-			Object... arguments) {
-
-		return StringFormatter.standardArray (
-			arguments);
-
-	}
-
-	public static
-	String stringFormatArray (
-			Object[] args) {
-
-		return stringFormat (
-			args);
 
 	}
 
@@ -1349,14 +1169,6 @@ class Misc {
 			@NonNull Map<?,?> map) {
 
 		return map.isEmpty ();
-
-	}
-
-	public static
-	boolean isEmptyString (
-			String string) {
-
-		return string.isEmpty ();
 
 	}
 

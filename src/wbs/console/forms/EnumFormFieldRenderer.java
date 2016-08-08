@@ -3,7 +3,7 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;

@@ -1,6 +1,6 @@
 package wbs.platform.exception.logic;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
 import javax.inject.Provider;

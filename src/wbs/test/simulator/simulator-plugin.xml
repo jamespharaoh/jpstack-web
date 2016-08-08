@@ -24,7 +24,8 @@
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.SimulatorSender"/>
+		<bean class="daemon.SimulatorSenderHelper"/>
+		<bean class="daemon.SimulatorSenderService"/>
 	</layer>
 
 	<fixtures>

@@ -1,7 +1,7 @@
 package wbs.integrations.txtnation.api;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.PrintWriter;
 import java.util.Collections;

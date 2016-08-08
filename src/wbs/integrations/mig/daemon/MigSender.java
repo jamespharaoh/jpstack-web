@@ -1,7 +1,7 @@
 package wbs.integrations.mig.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
 
 import java.io.IOException;

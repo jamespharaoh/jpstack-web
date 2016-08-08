@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.affiliate.console;
 
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.Misc.isEmptyString;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.Misc.toInteger;
 
@@ -130,7 +130,7 @@ class ChatAffiliateCreateOldAction
 					"keyword" + i);
 
 			if (
-				isEmptyString (
+				stringIsEmpty (
 					keyword)
 			) {
 				continue;
@@ -146,7 +146,7 @@ class ChatAffiliateCreateOldAction
 			}
 
 			if (
-				isEmptyString (
+				stringIsEmpty (
 					requestContext.parameterRequired (
 						"joinType" + i))
 			) {
@@ -219,7 +219,7 @@ class ChatAffiliateCreateOldAction
 					"keyword" + i);
 
 			if (
-				isEmptyString (
+				stringIsEmpty (
 					keyword)
 			) {
 				continue;
@@ -294,7 +294,7 @@ class ChatAffiliateCreateOldAction
 					"keyword" + index);
 
 			if (
-				isEmptyString (
+				stringIsEmpty (
 					keyword)
 			) {
 				continue;

@@ -1,7 +1,7 @@
 package wbs.smsapps.autoresponder.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.simplify;
 
 import java.util.List;

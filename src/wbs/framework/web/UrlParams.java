@@ -1,6 +1,6 @@
 package wbs.framework.web;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;

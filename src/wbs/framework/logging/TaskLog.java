@@ -1,6 +1,6 @@
 package wbs.framework.logging;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

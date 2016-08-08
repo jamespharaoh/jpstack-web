@@ -2,7 +2,7 @@ package wbs.smsapps.photograbber.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

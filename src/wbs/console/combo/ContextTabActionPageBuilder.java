@@ -1,8 +1,7 @@
 package wbs.console.combo;
 
-import static wbs.framework.utils.etc.Misc.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +32,7 @@ import wbs.framework.record.Record;
 
 import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 @PrototypeComponent ("contextTabActionPageBuider")
 @ConsoleModuleBuilderHandler
@@ -212,7 +212,8 @@ class ContextTabActionPageBuilder<
 				stringFormat (
 					"%s%sResponder",
 					container.newBeanNamePrefix (),
-					capitalise (name)));
+					capitalise (
+						name)));
 
 		actionName =
 			ifNull (
@@ -220,7 +221,8 @@ class ContextTabActionPageBuilder<
 				stringFormat (
 					"%s%sAction",
 					container.existingBeanNamePrefix (),
-					capitalise (name)));
+					capitalise (
+						name)));
 
 		title =
 			ifNull (

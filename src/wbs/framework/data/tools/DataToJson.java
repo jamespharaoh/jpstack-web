@@ -1,6 +1,6 @@
 package wbs.framework.data.tools;
 
-import static wbs.framework.utils.etc.Misc.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
 import java.util.List;
