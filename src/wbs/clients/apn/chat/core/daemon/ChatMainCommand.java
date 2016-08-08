@@ -54,7 +54,7 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.CommandManager;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
 
@@ -108,7 +108,7 @@ class ChatMainCommand
 	CommandLogic commandLogic;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	Database database;
@@ -190,7 +190,7 @@ class ChatMainCommand
 					inbox.getId (),
 					code));
 
-			return inboxLogic.inboxProcessed (
+			return smsInboxLogic.inboxProcessed (
 				inbox,
 				Optional.of (
 					serviceHelper.findByCodeRequired (
@@ -255,7 +255,7 @@ class ChatMainCommand
 
 		}
 
-		return inboxLogic.inboxProcessed (
+		return smsInboxLogic.inboxProcessed (
 			inbox,
 			Optional.of (
 				serviceHelper.findByCodeRequired (
@@ -723,7 +723,7 @@ class ChatMainCommand
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 
-				return inboxLogic.inboxProcessed (
+				return smsInboxLogic.inboxProcessed (
 					inbox,
 					Optional.of (
 						serviceHelper.findByCodeRequired (
@@ -779,7 +779,7 @@ class ChatMainCommand
 				null,
 				true);
 
-			return inboxLogic.inboxProcessed (
+			return smsInboxLogic.inboxProcessed (
 				inbox,
 				Optional.of (
 					serviceHelper.findByCodeRequired (
@@ -809,7 +809,7 @@ class ChatMainCommand
 					inbox.getId ()));
 
 			return Optional.of (
-				inboxLogic.inboxNotProcessed (
+				smsInboxLogic.inboxNotProcessed (
 					inbox,
 					Optional.of (
 						serviceHelper.findByCodeRequired (
@@ -848,7 +848,7 @@ class ChatMainCommand
 				true);
 
 			return Optional.of (
-				inboxLogic.inboxProcessed (
+				smsInboxLogic.inboxProcessed (
 					inbox,
 					Optional.of (
 						serviceHelper.findByCodeRequired (

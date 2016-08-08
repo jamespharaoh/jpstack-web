@@ -220,7 +220,7 @@ class ConsoleRequestContextImplementation
 			@NonNull String key) {
 
 		return Optional.fromNullable (
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				key));
 
 	}
@@ -231,7 +231,7 @@ class ConsoleRequestContextImplementation
 			@NonNull String key) {
 
 		String value =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				key);
 
 		if (
@@ -256,7 +256,7 @@ class ConsoleRequestContextImplementation
 			@NonNull String key) {
 
 		return emptyStringIfNull (
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				key));
 
 	}
@@ -279,7 +279,7 @@ class ConsoleRequestContextImplementation
 			@NonNull String key) {
 
 		return requestContext
-			.parameter (key);
+			.parameterOrNull (key);
 
 	}
 
@@ -290,7 +290,7 @@ class ConsoleRequestContextImplementation
 			@NonNull Supplier<String> orElse) {
 
 		String value =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				key);
 
 		if (
@@ -1049,7 +1049,7 @@ class ConsoleRequestContextImplementation
 			String defaultValue) {
 
 		return requestContext
-			.parameter (
+			.parameterOrDefault (
 				key,
 				defaultValue);
 

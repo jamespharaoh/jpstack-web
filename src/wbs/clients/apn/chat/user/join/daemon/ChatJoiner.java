@@ -70,7 +70,7 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
 
@@ -143,7 +143,7 @@ class ChatJoiner {
 	EventLogic eventLogic;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	MessageObjectHelper messageHelper;
@@ -1012,7 +1012,7 @@ class ChatJoiner {
 			chatUserLogic.getAffiliate (
 				chatUser);
 
-		return inboxLogic.inboxProcessed (
+		return smsInboxLogic.inboxProcessed (
 			inbox,
 			Optional.of (defaultService),
 			Optional.of (affiliate),

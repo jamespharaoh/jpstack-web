@@ -47,7 +47,7 @@ import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
 
@@ -90,7 +90,7 @@ class ChatPromoCommand
 	Database database;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	ObjectManager objectManager;
@@ -194,7 +194,7 @@ class ChatPromoCommand
 				command,
 				true);
 
-			return inboxLogic.inboxProcessed (
+			return smsInboxLogic.inboxProcessed (
 				inbox,
 				Optional.of (
 					promoService),
@@ -243,7 +243,7 @@ class ChatPromoCommand
 				Optional.of (
 					helpCommand));
 
-			return inboxLogic.inboxProcessed (
+			return smsInboxLogic.inboxProcessed (
 				inbox,
 				Optional.of (
 					promoService),
@@ -282,7 +282,7 @@ class ChatPromoCommand
 				Optional.of (
 					helpCommand));
 
-			return inboxLogic.inboxProcessed (
+			return smsInboxLogic.inboxProcessed (
 				inbox,
 				Optional.of (
 					promoService),
@@ -324,7 +324,7 @@ class ChatPromoCommand
 				Optional.of (
 					helpCommand));
 
-			return inboxLogic.inboxProcessed (
+			return smsInboxLogic.inboxProcessed (
 				inbox,
 				Optional.of (
 					promoService),
@@ -465,7 +465,7 @@ class ChatPromoCommand
 
 		// process inbox
 
-		return inboxLogic.inboxProcessed (
+		return smsInboxLogic.inboxProcessed (
 			inbox,
 			Optional.of (
 				promoService),

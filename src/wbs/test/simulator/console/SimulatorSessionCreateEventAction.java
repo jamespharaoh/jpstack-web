@@ -37,7 +37,7 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.report.logic.ReportLogic;
 import wbs.sms.network.console.NetworkConsoleHelper;
 import wbs.sms.network.model.NetworkRec;
@@ -70,7 +70,7 @@ class SimulatorSessionCreateEventAction
 	ExceptionLogger exceptionLogger;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	NetworkConsoleHelper networkHelper;
@@ -263,7 +263,7 @@ class SimulatorSessionCreateEventAction
 		// insert inbox
 
 		MessageRec message =
-			inboxLogic.inboxInsert (
+			smsInboxLogic.inboxInsert (
 				Optional.<String>absent (),
 				textHelper.findOrCreate (messageText),
 				numFrom,

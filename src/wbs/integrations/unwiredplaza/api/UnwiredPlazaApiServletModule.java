@@ -134,21 +134,21 @@ class UnwiredPlazaApiServletModule
 					"routeId");
 
 			Integer id =
-				Integer.parseInt (requestContext.parameter ("id"));
+				Integer.parseInt (requestContext.parameterOrNull ("id"));
 
 			Long status =
 				Long.parseLong (
-					requestContext.parameter (
+					requestContext.parameterOrNull (
 						"status"));
 
 			Long subStatus =
 				Long.parseLong (
-					requestContext.parameter (
+					requestContext.parameterOrNull (
 						"substatus"));
 
 			Long finalParam =
 				Long.parseLong (
-					requestContext.parameter (
+					requestContext.parameterOrNull (
 						"final"));
 
 			//String phone =

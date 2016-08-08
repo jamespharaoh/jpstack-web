@@ -43,7 +43,7 @@ import wbs.sms.message.core.model.MessageDirection;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.report.logic.ReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.message.report.model.MessageReportCodeRec;
@@ -74,7 +74,7 @@ class MigApiServletModule
 	ExceptionUtils exceptionLogic;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	MessageObjectHelper messageHelper;
@@ -189,15 +189,15 @@ class MigApiServletModule
 				// get params in local variables
 				// String ifVersion = requestContext.getParameter ("IFVERSION");
 				// String messageType = requestContext.getParameter ("MESSAGETYPE");
-				String oadc = requestContext.parameter("OADC");
-				String messageID = requestContext.parameter("GUID");
+				String oadc = requestContext.parameterOrNull("OADC");
+				String messageID = requestContext.parameterOrNull("GUID");
 				// String receiveTime = requestContext.getParameter ("RECEIVETIME");
-				String body = requestContext.parameter("BODY");
+				String body = requestContext.parameterOrNull("BODY");
 				// String mclass = requestContext.getParameter ("MCLASS");
 				// String header = requestContext.getParameter ("HEADER");
-				String destAddress = requestContext.parameter("DESTADDRESS");
-				String connection = requestContext.parameter("CONNECTION");
-				String avStatus = requestContext.parameter("AVSTATUS");
+				String destAddress = requestContext.parameterOrNull("DESTADDRESS");
+				String connection = requestContext.parameterOrNull("CONNECTION");
+				String avStatus = requestContext.parameterOrNull("AVSTATUS");
 				// String dcs = requestContext.getParameter ("DCS");
 				// String retryCount = requestContext.getParameter ("RETRYCOUNT");
 
@@ -230,7 +230,7 @@ class MigApiServletModule
 				// insert the message
 
 				MessageRec message =
-					inboxLogic.inboxInsert (
+					smsInboxLogic.inboxInsert (
 						Optional.of (messageID),
 						textHelper.findOrCreate (body),
 						oadc,
@@ -316,16 +316,16 @@ class MigApiServletModule
 						"routeId");
 
 				// String ifVersion = requestContext.getParameter ("IFVERSION");
-				String statusType = requestContext.parameter("STATUSTYPE");
-				String guid = requestContext.parameter("GUID");
-				String messageID = requestContext.parameter("MESSAGEID");
+				String statusType = requestContext.parameterOrNull("STATUSTYPE");
+				String guid = requestContext.parameterOrNull("GUID");
+				String messageID = requestContext.parameterOrNull("MESSAGEID");
 				// String statusTime = requestContext.getParameter ("STATUSTIME");
 				// String dischargeTime = requestContext.getParameter ("DISCHARGETIME");
-				String status = requestContext.parameter("STATUS");
-				String reason = requestContext.parameter("REASONCODE");
-				String description = requestContext.parameter("DESCRIPTION");
-				String destAddress = requestContext.parameter("DESTADDRESS");
-				String connection = requestContext.parameter("CONNECTION");
+				String status = requestContext.parameterOrNull("STATUS");
+				String reason = requestContext.parameterOrNull("REASONCODE");
+				String description = requestContext.parameterOrNull("DESCRIPTION");
+				String destAddress = requestContext.parameterOrNull("DESTADDRESS");
+				String connection = requestContext.parameterOrNull("CONNECTION");
 				// String retryCount = requestContext.getParameter ("RETRYCOUNT");
 
 				NetworkRec network =

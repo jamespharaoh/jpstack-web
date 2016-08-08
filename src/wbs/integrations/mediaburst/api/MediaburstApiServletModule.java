@@ -43,8 +43,8 @@ import wbs.sms.gsm.ConcatenatedInformationElement;
 import wbs.sms.gsm.UserDataHeader;
 import wbs.sms.message.core.logic.InvalidMessageStateException;
 import wbs.sms.message.core.model.MessageStatus;
-import wbs.sms.message.inbox.logic.InboxLogic;
-import wbs.sms.message.inbox.logic.InboxMultipartLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxMultipartLogic;
 import wbs.sms.message.report.logic.ReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.message.report.model.MessageReportCodeRec;
@@ -66,10 +66,10 @@ class MediaburstApiServletModule
 	Database database;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
-	InboxMultipartLogic inboxMultipartLogic;
+	SmsInboxMultipartLogic inboxMultipartLogic;
 
 	@Inject
 	MessageReportCodeObjectHelper messageReportCodeHelper;
@@ -212,22 +212,22 @@ class MediaburstApiServletModule
 			// get params in local variables
 
 			String numFromParam =
-				requestContext.parameter ("phonenumber");
+				requestContext.parameterOrNull ("phonenumber");
 
 			String numToParam =
-				requestContext.parameter ("tonumber");
+				requestContext.parameterOrNull ("tonumber");
 
 			String networkParam =
-				requestContext.parameter ("netid");
+				requestContext.parameterOrNull ("netid");
 
 			String messageParam =
-				requestContext.parameter ("message");
+				requestContext.parameterOrNull ("message");
 
 			String msgIdParam =
-				requestContext.parameter ("msg_id");
+				requestContext.parameterOrNull ("msg_id");
 
 			String udhParam =
-				requestContext.parameter ("udh");
+				requestContext.parameterOrNull ("udh");
 
 			Integer networkId = null;
 
@@ -320,7 +320,7 @@ class MediaburstApiServletModule
 
 			} else {
 
-				inboxLogic.inboxInsert (
+				smsInboxLogic.inboxInsert (
 					Optional.of (msgIdParam),
 					messageText,
 					numFromParam,
@@ -387,7 +387,7 @@ class MediaburstApiServletModule
 						"routeId"));
 
 			String statusParam =
-				requestContext.parameter ("status").toLowerCase ();
+				requestContext.parameterOrNull ("status").toLowerCase ();
 
 			if (statusParam == null) {
 
@@ -415,7 +415,7 @@ class MediaburstApiServletModule
 
 					statusCode =
 						Long.parseLong (
-							requestContext.parameter (
+							requestContext.parameterOrNull (
 								"deliver_code"));
 
 				} catch (NumberFormatException exception) {
@@ -448,7 +448,7 @@ class MediaburstApiServletModule
 
 					reportLogic.deliveryReport (
 						route,
-						requestContext.parameter ("msg_id"),
+						requestContext.parameterOrNull ("msg_id"),
 						newMessageStatus,
 						null,
 						messageReportCode);
@@ -463,7 +463,7 @@ class MediaburstApiServletModule
 					stringFormat (
 						"Ignoring report for unknown message %s/%s",
 						requestContext.requestInt ("routeId"),
-						requestContext.parameter ("msg_id")));
+						requestContext.parameterOrNull ("msg_id")));
 
 			} catch (InvalidMessageStateException exception) {
 
@@ -471,7 +471,7 @@ class MediaburstApiServletModule
 					stringFormat (
 						"Ignoring report for message %s/%s: %s",
 						requestContext.requestInt ("routeId"),
-						requestContext.parameter ("msg_id"),
+						requestContext.parameterOrNull ("msg_id"),
 						exception.getMessage ()));
 
 			}

@@ -44,8 +44,8 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.gsm.ConcatenatedInformationElement;
 import wbs.sms.gsm.UserDataHeader;
 import wbs.sms.message.core.model.MessageStatus;
-import wbs.sms.message.inbox.logic.InboxLogic;
-import wbs.sms.message.inbox.logic.InboxMultipartLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxMultipartLogic;
 import wbs.sms.message.report.logic.ReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.message.report.model.MessageReportCodeRec;
@@ -67,10 +67,10 @@ class DialogueApiServletModule
 	Database database;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
-	InboxMultipartLogic inboxMultipartLogic;
+	SmsInboxMultipartLogic inboxMultipartLogic;
 
 	@Inject
 	MessageReportCodeObjectHelper messageReportCodeHelper;
@@ -141,25 +141,25 @@ class DialogueApiServletModule
 			// get params in local variables
 
 			String numFromParam =
-				requestContext.parameter ("X-E3-Originating-Address");
+				requestContext.parameterOrNull ("X-E3-Originating-Address");
 
 			String numToParam =
-				requestContext.parameter ("X-E3-Recipients");
+				requestContext.parameterOrNull ("X-E3-Recipients");
 
 			String idParam =
-				requestContext.parameter ("X-E3-ID");
+				requestContext.parameterOrNull ("X-E3-ID");
 
 			String networkParam =
-				requestContext.parameter ("X-E3-Network");
+				requestContext.parameterOrNull ("X-E3-Network");
 
 			String hexMessageParam =
-				requestContext.parameter ("X-E3-Hex-Message");
+				requestContext.parameterOrNull ("X-E3-Hex-Message");
 
 			String userDataHeaderIndicatorParam =
-				requestContext.parameter ("X-E3-User-Data-Header-Indicator");
+				requestContext.parameterOrNull ("X-E3-User-Data-Header-Indicator");
 
 			String dataCodingSchemeParam =
-				requestContext.parameter ("X-E3-Data-Coding-Scheme");
+				requestContext.parameterOrNull ("X-E3-Data-Coding-Scheme");
 
 			// decode the network
 
@@ -330,7 +330,7 @@ class DialogueApiServletModule
 
 				// insert a message
 
-				inboxLogic.inboxInsert (
+				smsInboxLogic.inboxInsert (
 					Optional.of (idParam),
 					textHelper.findOrCreate (message),
 					numFromParam,
@@ -366,16 +366,16 @@ class DialogueApiServletModule
 		Responder handle () {
 
 			String idParam =
-				requestContext.parameter ("X-E3-ID");
+				requestContext.parameterOrNull ("X-E3-ID");
 
 			String deliveryReportParam =
-				requestContext.parameter ("X-E3-Delivery-Report");
+				requestContext.parameterOrNull ("X-E3-Delivery-Report");
 
 			String submissionReportParam =
-				requestContext.parameter ("X-E3-Submission-Report");
+				requestContext.parameterOrNull ("X-E3-Submission-Report");
 
 			String userKeyParam =
-				requestContext.parameter ("X-E3-User-Key");
+				requestContext.parameterOrNull ("X-E3-User-Key");
 
 			// [TEMP] dump params
 

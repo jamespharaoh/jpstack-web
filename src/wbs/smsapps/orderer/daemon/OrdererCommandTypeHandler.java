@@ -25,7 +25,7 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.model.DeliveryDao;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.message.outbox.logic.MessageSender;
@@ -58,7 +58,7 @@ class OrdererCommandTypeHandler
 	EmailLogic emailUtils;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	MessageObjectHelper messageHelper;
@@ -145,7 +145,7 @@ class OrdererCommandTypeHandler
 
 			if (! ordererOrders.isEmpty ()) {
 
-				return inboxLogic.inboxProcessed (
+				return smsInboxLogic.inboxProcessed (
 					inbox,
 					Optional.of (defaultService),
 					Optional.<AffiliateRec>absent (),
@@ -212,7 +212,7 @@ class OrdererCommandTypeHandler
 			.setBilledMessage (
 				billedMessage);
 
-		return inboxLogic.inboxProcessed (
+		return smsInboxLogic.inboxProcessed (
 			inbox,
 			Optional.of (defaultService),
 			Optional.<AffiliateRec>absent (),

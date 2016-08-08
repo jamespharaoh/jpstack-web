@@ -94,15 +94,15 @@ class ComshenApiServletModule
 					"routeId");
 
 			String idParam =
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"id");
 
 			String statParam =
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"stat");
 
 			String errParam =
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"err");
 
 			RouteRec route =

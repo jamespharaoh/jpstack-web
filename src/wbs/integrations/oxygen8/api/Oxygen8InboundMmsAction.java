@@ -36,7 +36,7 @@ import wbs.platform.text.model.TextRec;
 import wbs.platform.text.web.TextResponder;
 import wbs.sms.message.core.model.MessageTypeObjectHelper;
 import wbs.sms.message.core.model.MessageTypeRec;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
@@ -54,7 +54,7 @@ class Oxygen8InboundMmsAction
 	Database database;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	MediaLogic mediaLogic;
@@ -410,7 +410,7 @@ class Oxygen8InboundMmsAction
 			textHelper.findOrCreate (
 				messageString);
 
-		inboxLogic.inboxInsert (
+		smsInboxLogic.inboxInsert (
 			Optional.of (mmsMessageId),
 			messageText,
 			mmsSenderAddress,

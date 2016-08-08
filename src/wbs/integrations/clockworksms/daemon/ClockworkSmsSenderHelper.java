@@ -4,8 +4,8 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.sms.gsm.GsmUtils.isNotValidGsm;
 
 import javax.inject.Inject;
@@ -225,7 +225,7 @@ class ClockworkSmsSenderHelper
 
 				.dlrUrl (
 					stringFormat (
-						"%s/clockworkSms/route/%s/report",
+						"%s/clockwork-sms/route/%s/report",
 						wbsConfig.apiUrl (),
 						smsRoute.getId ()))
 

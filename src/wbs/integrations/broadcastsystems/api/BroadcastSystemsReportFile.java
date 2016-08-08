@@ -72,10 +72,10 @@ class BroadcastSystemsReportFile
 				"routeId");
 
 		data.transactionId =
-			requestContext.parameter ("message_id");
+			requestContext.parameterOrNull ("message_id");
 
 		data.statusCode =
-			requestContext.parameter ("status");
+			requestContext.parameterOrNull ("status");
 
 		if (equal (data.statusCode, "delivered")) {
 			data.status = MessageStatus.delivered;

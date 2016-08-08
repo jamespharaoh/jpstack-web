@@ -39,6 +39,12 @@
 
 			<object-settings-page/>
 
+			<context-link
+				name="network"
+				link="clockworkSmsNetwork"
+				label="Networks"
+				priv-key="clockworkSms.manage"/>
+
 			<object-events-page/>
 
 		</object>

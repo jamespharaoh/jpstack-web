@@ -42,7 +42,7 @@ import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
@@ -64,7 +64,7 @@ class MigMmsApiServletModule
 	ExceptionUtils exceptionLogic;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	MediaObjectHelper mediaHelper;
@@ -413,7 +413,7 @@ logger.error ("Got item");
 					requestContext.requestIntRequired (
 						"routeId"));
 
-			inboxLogic.inboxInsert (
+			smsInboxLogic.inboxInsert (
 				Optional.of (guid),
 				textHelper.findOrCreate (
 					getText (subject, medias)),

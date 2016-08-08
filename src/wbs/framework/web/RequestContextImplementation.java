@@ -4,6 +4,10 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -41,9 +45,6 @@ import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.ProxiedRequestComponent;
 import wbs.framework.utils.etc.RuntimeIoException;
-
-import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
 @Accessors (fluent = true)
 @ProxiedRequestComponent (
@@ -92,10 +93,18 @@ class RequestContextImplementation
 
 	@Override
 	public
-	InputStream inputStream ()
-		throws IOException {
+	InputStream inputStream () {
 
-		return request ().getInputStream ();
+		try {
+
+			return request ().getInputStream ();
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
 
 	}
 
@@ -107,8 +116,58 @@ class RequestContextImplementation
 
 	@Override
 	public
-	String parameter (
-			String key) {
+	Optional<String> parameter (
+			@NonNull String key) {
+
+		if (
+			isMultipart ()
+			&& fileItemFields ().containsKey (key)
+		) {
+
+			return Optional.fromNullable (
+				fileItemFields ().get (key));
+
+		} else {
+
+			return Optional.fromNullable (
+				request ().getParameter (key));
+
+		}
+
+	}
+
+	@Override
+	public
+	String parameterRequired (
+			@NonNull String key) {
+
+		Optional<String> valueOptional =
+			parameter (
+				key);
+
+		if (
+			isPresent (
+				valueOptional)
+		) {
+
+			return optionalRequired (
+				valueOptional);
+
+		} else {
+
+			throw new IllegalArgumentException (
+				stringFormat (
+					"No such request parameter: %s",
+					key));
+
+		}
+
+	}
+
+	@Override
+	public
+	String parameterOrNull (
+			@NonNull String key) {
 
 		if (
 			isMultipart ()
@@ -127,12 +186,12 @@ class RequestContextImplementation
 
 	@Override
 	public
-	String parameter (
+	String parameterOrDefault (
 			String key,
 			String defaultValue) {
 
 		return ifNull (
-			parameter (key),
+			parameterOrNull (key),
 			defaultValue);
 
 	}
@@ -143,7 +202,7 @@ class RequestContextImplementation
 			@NonNull String key) {
 
 		return Long.parseLong (
-			parameter (
+			parameterOrNull (
 				key));
 
 	}
@@ -257,7 +316,7 @@ class RequestContextImplementation
 			String key) {
 
 		String value =
-			parameter (key);
+			parameterOrNull (key);
 
 		if (value == null)
 			return false;

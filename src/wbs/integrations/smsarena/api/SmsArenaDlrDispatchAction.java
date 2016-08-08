@@ -178,13 +178,13 @@ class SmsArenaDlrDispatchAction
 		// get request parameters
 
 		id =
-			requestContext.parameter ("id");
+			requestContext.parameterOrNull ("id");
 
 		dlr =
-			requestContext.parameter ("dlr");
+			requestContext.parameterOrNull ("dlr");
 
 		desc =
-			requestContext.parameter ("desc");
+			requestContext.parameterOrNull ("desc");
 
 		// begin transaction
 

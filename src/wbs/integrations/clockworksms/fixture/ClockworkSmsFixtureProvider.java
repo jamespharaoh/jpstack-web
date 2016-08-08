@@ -1,6 +1,7 @@
 package wbs.integrations.clockworksms.fixture;
 
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
 import wbs.framework.record.GlobalId;
 import wbs.integrations.clockworksms.model.ClockworkSmsConfigObjectHelper;
+import wbs.integrations.clockworksms.model.ClockworkSmsRouteInObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
@@ -30,6 +32,9 @@ class ClockworkSmsFixtureProvider
 
 	@Inject
 	ClockworkSmsConfigObjectHelper clockworkSmsConfigHelper;
+
+	@Inject
+	ClockworkSmsRouteInObjectHelper clockworkSmsRouteInHelper;
 
 	@Inject
 	ClockworkSmsRouteOutObjectHelper clockworkSmsRouteOutHelper;
@@ -132,6 +137,83 @@ class ClockworkSmsFixtureProvider
 	void createRoute (
 			@NonNull Map<String,String> params) {
 
+		switch (
+			params.get (
+				"direction")
+		) {
+
+		case "in":
+
+			createInboundRoute (
+				params);
+
+			break;
+
+		case "out":
+
+			createOutboundRoute (
+				params);
+
+			break;
+
+		default:
+
+			throw new RuntimeException (
+				stringFormat (
+					"Clockwork SMS route has invalid direction %s",
+					params.get ("direction")));
+
+		}
+
+	}
+
+	private
+	void createInboundRoute (
+			@NonNull Map<String,String> params) {
+
+		RouteRec route =
+			routeHelper.insert (
+				routeHelper.createInstance ()
+
+			.setSlice (
+				sliceHelper.findByCodeRequired (
+					GlobalId.root,
+					"test"))
+
+			.setCode (
+				simplifyToCodeRequired (
+					params.get ("name")))
+
+			.setName (
+				params.get ("name"))
+
+			.setDescription (
+				params.get ("description"))
+
+			.setCanReceive (
+				true)
+
+		);
+
+		clockworkSmsRouteInHelper.insert (
+			clockworkSmsRouteInHelper.createInstance ()
+
+			.setRoute (
+				route)
+
+			.setClockworkSmsConfig (
+				clockworkSmsConfigHelper.findByCodeRequired (
+					GlobalId.root,
+					"default"))
+
+		);
+
+	}
+
+	private
+	void createOutboundRoute (
+			@NonNull Map<String,String> params) {
+
 		RouteRec route =
 			routeHelper.insert (
 				routeHelper.createInstance ()
@@ -152,6 +234,9 @@ class ClockworkSmsFixtureProvider
 				params.get ("description"))
 
 			.setCanSend (
+				true)
+
+			.setDeliveryReports (
 				true)
 
 			.setSender (

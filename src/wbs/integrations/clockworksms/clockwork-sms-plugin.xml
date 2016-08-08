@@ -8,9 +8,22 @@
 	</plugin-dependencies>
 
 	<models>
+		<enum-type name="clockworkSmsInboundLogType"/>
 		<model name="clockworkSmsConfig"/>
+		<model name="clockworkSmsInboundLog"/>
+		<model name="clockworkSmsNetwork"/>
+		<model name="clockworkSmsRouteIn"/>
 		<model name="clockworkSmsRouteOut"/>
 	</models>
+
+	<sql-scripts>
+		<sql-schema name="clockwork-sms"/>
+	</sql-scripts>
+
+	<layer name="api">
+		<bean class="api.ClockworkSmsRouteInAction"/>
+		<bean class="api.ClockworkSmsRouteReportAction"/>
+	</layer>
 
 	<layer name="daemon">
 		<bean class="daemon.ClockworkSmsSenderHelper"/>
@@ -26,9 +39,15 @@
 		<fixture name="clockworkSms"/>
 	</fixtures>
 
+	<api-modules>
+		<api-module name="clockwork-sms"/>
+	</api-modules>
+
 	<console-modules>
 		<console-module name="clockwork-sms"/>
 		<console-module name="clockwork-sms-config"/>
+		<console-module name="clockwork-sms-network"/>
+		<console-module name="clockwork-sms-route-in"/>
 		<console-module name="clockwork-sms-route-out"/>
 	</console-modules>
 

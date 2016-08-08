@@ -38,15 +38,20 @@ interface RequestContext {
 	String resolveApplicationUrl (
 			String applicationUrl);
 
-	InputStream inputStream ()
-		throws IOException;
+	InputStream inputStream ();
 
 	String method ();
 
-	String parameter (
+	Optional<String> parameter (
 			String key);
 
-	String parameter (
+	String parameterRequired (
+			String key);
+
+	String parameterOrNull (
+			String key);
+
+	String parameterOrDefault (
 			String key,
 			String defaultValue);
 

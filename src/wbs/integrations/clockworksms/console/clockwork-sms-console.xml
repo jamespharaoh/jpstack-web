@@ -25,6 +25,12 @@
 				label="Outbound routes"
 				priv-key="clockworkSms.manage"/>
 
+			<context-link
+				name="in"
+				link="clockworkSmsRouteIn"
+				label="Inbound routes"
+				priv-key="clockworkSms.manage"/>
+
 		</section>
 
 	</simple-context>

@@ -921,6 +921,7 @@
       <script name="src/wbs/clients/apn/chat/user/core/model/chat-users-summary.sql"/>
       <script name="src/wbs/clients/apn/chat/user/image/model/chat-user-image.sql"/>
       <script name="src/wbs/applications/imchat/model/im-chat-core.sql"/>
+      <script name="src/wbs/integrations/clockworksms/model/clockwork-sms.sql"/>
       <script name="src/wbs/integrations/txtnation/model/txt-nation.sql"/>
     </database-init>
   </target>

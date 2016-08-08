@@ -32,7 +32,7 @@ import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
 
@@ -63,7 +63,7 @@ class ChatDateCommand
 	CommandObjectHelper commandHelper;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	MessageObjectHelper messageHelper;
@@ -167,7 +167,7 @@ class ChatDateCommand
 
 			// process inbox
 
-			return inboxLogic.inboxProcessed (
+			return smsInboxLogic.inboxProcessed (
 				inbox,
 				Optional.of (defaultService),
 				Optional.of (affiliate),
@@ -203,7 +203,7 @@ class ChatDateCommand
 
 			// process inbox
 
-			return inboxLogic.inboxProcessed (
+			return smsInboxLogic.inboxProcessed (
 				inbox,
 				Optional.<ServiceRec>absent (),
 				Optional.<AffiliateRec>absent (),
@@ -222,7 +222,7 @@ class ChatDateCommand
 
 		// process inbox
 
-		return inboxLogic.inboxProcessed (
+		return smsInboxLogic.inboxProcessed (
 			inbox,
 			Optional.<ServiceRec>absent (),
 			Optional.<AffiliateRec>absent (),

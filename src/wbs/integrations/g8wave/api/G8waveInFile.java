@@ -20,7 +20,7 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.WebFile;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
@@ -35,7 +35,7 @@ class G8waveInFile
 	Database database;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	NetworkObjectHelper networkHelper;
@@ -82,16 +82,16 @@ class G8waveInFile
 		// get params in local variables
 
 		String numFromParam =
-			requestContext.parameter ("telno");
+			requestContext.parameterOrNull ("telno");
 
 		String numToParam =
-			requestContext.parameter ("shortcode");
+			requestContext.parameterOrNull ("shortcode");
 
 		String networkParam =
-			requestContext.parameter ("network");
+			requestContext.parameterOrNull ("network");
 
 		String messageParam =
-			requestContext.parameter ("message");
+			requestContext.parameterOrNull ("message");
 
 		if (
 			numFromParam == null
@@ -139,7 +139,7 @@ class G8waveInFile
 
 		// insert the message
 
-		inboxLogic.inboxInsert (
+		smsInboxLogic.inboxInsert (
 			Optional.<String>absent (),
 			textHelper.findOrCreate (messageParam),
 			numFromParam,

@@ -44,7 +44,7 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.report.logic.ReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.message.report.model.MessageReportCodeRec;
@@ -65,7 +65,7 @@ class DialogueMmsApiServletModule
 	Database database;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	MediaLogic mediaLogic;
@@ -236,7 +236,7 @@ class DialogueMmsApiServletModule
 
 			// insert into inbox
 
-			inboxLogic.inboxInsert (
+			smsInboxLogic.inboxInsert (
 				Optional.of (
 					mmsMessageId),
 				textHelper.findOrCreate (
@@ -301,7 +301,7 @@ class DialogueMmsApiServletModule
 			// int routeId = requestContext.getRequestInt ("routeId");
 
 			String userKeyParam =
-				requestContext.parameter (
+				requestContext.parameterOrNull (
 					"X-Mms-User-Key");
 
 			final int messageId;
@@ -338,7 +338,7 @@ class DialogueMmsApiServletModule
 			}
 
 			String deliveryReportParam =
-				requestContext.parameter ("X-Mms-Delivery-Report");
+				requestContext.parameterOrNull ("X-Mms-Delivery-Report");
 
 			if (deliveryReportParam == null) {
 				throw new ServletException("Unrecognised MMS report for "

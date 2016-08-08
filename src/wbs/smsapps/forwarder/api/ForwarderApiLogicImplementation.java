@@ -242,7 +242,7 @@ class ForwarderApiLogicImplementation
 		// get the message id
 
 		String tempString =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"id");
 
 		if (tempString == null) {

@@ -156,16 +156,16 @@ class TicketerApiServletModule
 				RequestContext requestContext) {
 
 			String sliceParam =
-				requestContext.parameter ("slice");
+				requestContext.parameterOrNull ("slice");
 
 			String codeParam =
-				requestContext.parameter ("code");
+				requestContext.parameterOrNull ("code");
 
 			String numberParam =
-				requestContext.parameter ("number");
+				requestContext.parameterOrNull ("number");
 
 			String ticketParam =
-				requestContext.parameter ("ticket");
+				requestContext.parameterOrNull ("ticket");
 
 			if (
 				equal (

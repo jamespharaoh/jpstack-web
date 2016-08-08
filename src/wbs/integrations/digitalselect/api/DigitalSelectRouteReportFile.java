@@ -22,7 +22,7 @@ import wbs.integrations.digitalselect.model.DigitalSelectRouteOutRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
 import wbs.sms.message.core.model.MessageStatus;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.report.logic.ReportLogic;
 
 @Log4j
@@ -40,7 +40,7 @@ class DigitalSelectRouteReportFile
 	DigitalSelectRouteOutObjectHelper digitalSelectRouteOutHelper;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	ReportLogic reportLogic;
@@ -63,10 +63,10 @@ class DigitalSelectRouteReportFile
 				"routeId");
 
 		String msgidParam =
-			requestContext.parameter ("msgid");
+			requestContext.parameterOrNull ("msgid");
 
 		String statParam =
-			requestContext.parameter ("stat");
+			requestContext.parameterOrNull ("stat");
 
 		// debugging
 

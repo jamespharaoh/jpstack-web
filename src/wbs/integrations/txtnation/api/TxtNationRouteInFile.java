@@ -25,7 +25,7 @@ import wbs.integrations.txtnation.model.TxtNationRouteInObjectHelper;
 import wbs.integrations.txtnation.model.TxtNationRouteInRec;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
@@ -42,7 +42,7 @@ class TxtNationRouteInFile
 	Database database;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	NumberFormatLogic numberFormatLogic;
@@ -67,30 +67,30 @@ class TxtNationRouteInFile
 				"routeId");
 
 		String actionParam =
-			requestContext.parameter ("action");
+			requestContext.parameterOrNull ("action");
 
 		String idParam =
-			requestContext.parameter ("id");
+			requestContext.parameterOrNull ("id");
 
 		String numberParam =
-			requestContext.parameter ("number");
+			requestContext.parameterOrNull ("number");
 
 		@SuppressWarnings ("unused")
 		String networkParam =
-			requestContext.parameter ("network");
+			requestContext.parameterOrNull ("network");
 
 		String messageParam =
-			requestContext.parameter ("message");
+			requestContext.parameterOrNull ("message");
 
 		String shortcodeParam =
-			requestContext.parameter ("shortcode");
+			requestContext.parameterOrNull ("shortcode");
 
 		String countryParam =
-			requestContext.parameter ("country");
+			requestContext.parameterOrNull ("country");
 
 		@SuppressWarnings ("unused")
 		String billingParam =
-			requestContext.parameter ("billing");
+			requestContext.parameterOrNull ("billing");
 
 		// debugging
 
@@ -175,7 +175,7 @@ class TxtNationRouteInFile
 
 		// store message
 
-		inboxLogic.inboxInsert (
+		smsInboxLogic.inboxInsert (
 			Optional.of (idParam),
 			textHelper.findOrCreate (messageParam),
 			numberFrom,

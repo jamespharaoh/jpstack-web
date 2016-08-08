@@ -51,8 +51,8 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
-import wbs.sms.message.inbox.logic.InboxLogic;
-import wbs.sms.message.inbox.logic.InboxMultipartLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxMultipartLogic;
 import wbs.sms.message.report.logic.ReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.message.report.model.MessageReportCodeRec;
@@ -87,10 +87,10 @@ class HybyteApiServletModule
 	HybyteRouteOutObjectHelper hybyteRouteOutHelper;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
-	InboxMultipartLogic inboxMultipartLogic;
+	SmsInboxMultipartLogic inboxMultipartLogic;
 
 	@Inject
 	MessageReportCodeObjectHelper messageReportCodeHelper;
@@ -192,7 +192,7 @@ class HybyteApiServletModule
 					// insert message
 
 					MessageRec message =
-						inboxLogic.inboxInsert (
+						smsInboxLogic.inboxInsert (
 							Optional.of (inRequestResult.uuid),
 							textHelper.findOrCreate (
 								inRequestResult.message),

@@ -52,16 +52,16 @@ class ForwarderInAction
 		try {
 
 			String slice =
-				requestContext.parameter ("slice");
+				requestContext.parameterOrNull ("slice");
 
 			String code =
-				requestContext.parameter ("code");
+				requestContext.parameterOrNull ("code");
 
 			String password =
-				requestContext.parameter ("password");
+				requestContext.parameterOrNull ("password");
 
 			String action =
-				requestContext.parameter ("action");
+				requestContext.parameterOrNull ("action");
 
 			if (
 				code == null

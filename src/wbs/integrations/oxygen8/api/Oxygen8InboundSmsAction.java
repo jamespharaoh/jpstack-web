@@ -34,7 +34,7 @@ import wbs.integrations.oxygen8.model.Oxygen8RouteInRec;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
-import wbs.sms.message.inbox.logic.InboxLogic;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -52,7 +52,7 @@ class Oxygen8InboundSmsAction
 	ExceptionUtils exceptionLogic;
 
 	@Inject
-	InboxLogic inboxLogic;
+	SmsInboxLogic smsInboxLogic;
 
 	@Inject
 	ObjectManager objectManager;
@@ -247,32 +247,32 @@ class Oxygen8InboundSmsAction
 				"routeId");
 
 		channel =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"Channel");
 
 		reference =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"Reference");
 
 		trigger =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"Trigger");
 
 		shortcode =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"Shortcode");
 
 		msisdn =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"MSISDN");
 
 		rawContent =
-			requestContext.parameter (
+			requestContext.parameterOrNull (
 				"Content");
 
 		dataType =
 			Integer.parseInt (
-				requestContext.parameter ("DataType"));
+				requestContext.parameterOrNull ("DataType"));
 
 		switch (dataType) {
 
@@ -302,11 +302,11 @@ class Oxygen8InboundSmsAction
 
 		dateReceived =
 			Long.parseLong (
-				requestContext.parameter ("DateReceived"));
+				requestContext.parameterOrNull ("DateReceived"));
 
 		campaignId =
 			Integer.parseInt (
-				requestContext.parameter ("CampaignID"));
+				requestContext.parameterOrNull ("CampaignID"));
 
 	}
 
@@ -343,7 +343,7 @@ class Oxygen8InboundSmsAction
 
 		}
 
-		inboxLogic.inboxInsert (
+		smsInboxLogic.inboxInsert (
 			Optional.of (
 				reference),
 			textHelper.findOrCreate (

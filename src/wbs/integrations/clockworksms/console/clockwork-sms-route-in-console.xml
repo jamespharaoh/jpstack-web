@@ -1,0 +1,104 @@
+<console-module
+	name="clockwork-sms-route-in">
+
+	<console-helper-provider
+		object-name="clockworkSmsRouteIn"
+		view-priv="root:manage">
+
+		<priv-key
+			name="clockworkSms.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<priv-key
+			name="clockworkSmsRouteIn.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="clockworkSmsRouteInName"
+			delegate="route"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="clockworkSmsRouteIn"
+		object-name="clockworkSmsRouteIn">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="clockworkSmsRouteIn">
+
+		<parent-field/>
+
+		<object-field
+			name="clockworkSmsConfig"
+			label="Config"
+			object-type="clockworkSmsConfig"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="clockworkSmsRouteIn">
+
+		<parent-field/>
+
+		<object-field
+			name="clockworkSmsConfig"
+			label="Config"
+			object-type="clockworkSmsConfig"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="clockworkSmsRouteIn">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="clockworkSmsConfig"
+			label="Config"
+			object-type="clockworkSmsConfig"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="clockworkSmsRouteIn">
+
+		<object-field
+			name="clockworkSmsConfig"
+			label="Config"
+			object-type="clockworkSmsConfig"/>
+
+	</field-set>
+
+</console-module>

@@ -1,0 +1,117 @@
+<console-module
+	name="clockwork-sms-network">
+
+	<console-helper-provider
+		object-name="clockworkSmsNetwork"
+		view-priv="root:manage">
+
+		<priv-key
+			name="clockworkSmsNetwork.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="clockworkSmsNetworkName"
+			delegate="network"
+			field="name"/>
+
+		<context-stuff
+			name="clockworkSmsConfigId"
+			delegate="clockworkSmsConfig"
+			field="id"/>
+
+		<run-post-processor
+			name="clockworkSmsConfig"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="clockworkSmsNetwork"
+		object-name="clockworkSmsNetwork">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"
+				create-priv-delegate="root"
+				create-priv-code="manage"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="clockworkSmsNetwork">
+
+		<object-field
+			name="network"
+			object-type="network"/>
+
+		<integer-field
+			name="theirId"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="clockworkSmsNetwork">
+
+		<object-field
+			name="network"
+			object-type="network"/>
+
+		<integer-field
+			name="theirId"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="clockworkSmsNetwork">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="network"
+			object-type="network"/>
+
+		<deleted-field/>
+
+		<integer-field
+			name="theirId"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="clockworkSmsNetwork">
+
+		<object-field
+			name="network"
+			object-type="network"/>
+
+		<deleted-field/>
+
+		<integer-field
+			name="theirId"/>
+
+	</field-set>
+
+</console-module>
