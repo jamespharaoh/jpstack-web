@@ -10,6 +10,8 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -25,7 +27,7 @@ import wbs.integrations.smsarena.model.SmsArenaRouteInObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaRouteInRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
-import wbs.sms.message.report.logic.ReportLogic;
+import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -43,7 +45,7 @@ class SmsArenaDlrDispatchAction
 	ExceptionUtils exceptionLogic;
 
 	@Inject
-	ReportLogic reportLogic;
+	SmsDeliveryReportLogic reportLogic;
 
 	@Inject
 	SmsArenaDlrReportLogObjectHelper smsArenaDlrReportLogHelper;
@@ -217,8 +219,11 @@ class SmsArenaDlrDispatchAction
 			route,
 			id,
 			reportCode.getMessageStatus (),
-			transaction.now (),
-			null);
+			Optional.of (
+				dlr),
+			Optional.absent (),
+			Optional.absent (),
+			Optional.absent ());
 
 		transaction.commit ();
 

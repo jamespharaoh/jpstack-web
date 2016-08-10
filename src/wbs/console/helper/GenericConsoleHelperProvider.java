@@ -8,7 +8,7 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
-import static wbs.framework.utils.etc.StringUtils.split;
+import static wbs.framework.utils.etc.StringUtils.stringSplitRegexp;
 import static wbs.framework.utils.etc.StringUtils.underscoreToCamel;
 
 import java.util.ArrayList;
@@ -155,7 +155,7 @@ class GenericConsoleHelperProvider
 		) {
 
 			List<String> viewPrivParts =
-				split (
+				stringSplitRegexp (
 					consoleHelperProviderSpec.viewPriv (),
 					":");
 

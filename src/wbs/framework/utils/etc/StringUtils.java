@@ -574,13 +574,25 @@ class StringUtils {
 	}
 
 	public static
-	List<String> split (
+	List<String> stringSplitRegexp (
 			@NonNull String source,
-			@NonNull String regex) {
+			@NonNull String pattern) {
 
 		return Arrays.asList (
 			source.split (
-				regex));
+				pattern));
+
+	}
+
+	public static
+	List<String> stringSplitSimple (
+			@NonNull String source,
+			@NonNull String separator) {
+
+		return Arrays.asList (
+			source.split (
+				Pattern.quote (
+					separator)));
 
 	}
 
@@ -781,6 +793,14 @@ class StringUtils {
 					quantity),
 				naivePluralise (
 					singularNoun));
+
+	}
+
+	public static
+	String uppercase (
+			@NonNull String string) {
+
+		return string.toUpperCase ();
 
 	}
 

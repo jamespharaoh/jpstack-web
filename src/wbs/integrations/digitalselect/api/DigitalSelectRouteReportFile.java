@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -23,7 +24,7 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
-import wbs.sms.message.report.logic.ReportLogic;
+import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 
 @Log4j
 @SingletonComponent ("digitalSelectRouteReportFile")
@@ -43,7 +44,7 @@ class DigitalSelectRouteReportFile
 	SmsInboxLogic smsInboxLogic;
 
 	@Inject
-	ReportLogic reportLogic;
+	SmsDeliveryReportLogic reportLogic;
 
 	@Inject
 	RequestContext requestContext;
@@ -107,8 +108,11 @@ class DigitalSelectRouteReportFile
 				digitalSelectRouteOut.getRoute (),
 				msgidParam,
 				newMessageStatus,
-				null,
-				null);
+				Optional.of (
+					statParam),
+				Optional.absent (),
+				Optional.absent (),
+				Optional.absent ());
 
 		} catch (NoSuchMessageException exception) {
 

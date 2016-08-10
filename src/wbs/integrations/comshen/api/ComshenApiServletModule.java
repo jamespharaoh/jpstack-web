@@ -1,5 +1,6 @@
 package wbs.integrations.comshen.api;
 
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
@@ -9,6 +10,7 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -24,10 +26,8 @@ import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.sms.command.logic.CommandLogic;
 import wbs.sms.message.core.model.MessageDao;
 import wbs.sms.message.core.model.MessageStatus;
-import wbs.sms.message.report.logic.ReportLogic;
+import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
-import wbs.sms.message.report.model.MessageReportCodeRec;
-import wbs.sms.message.report.model.MessageReportCodeType;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -57,7 +57,7 @@ class ComshenApiServletModule
 	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
-	ReportLogic reportLogic;
+	SmsDeliveryReportLogic reportLogic;
 
 	@Inject
 	RouteObjectHelper routeHelper;
@@ -113,31 +113,24 @@ class ComshenApiServletModule
 				statToResult.get (
 					statParam);
 
-			// update message report code
-
-			MessageReportCodeRec messageReportCode =
-				messageReportCodeHelper.findOrCreate (
-					null,
-					null,
-					null,
-					MessageReportCodeType.comshen,
-					result != null
-						? result.isGoodType ()
-						: false,
-					false,
-					stringFormat (
-						"%s / %s",
-						statParam,
-						errParam));
-
 			// process delivery report
 
 			reportLogic.deliveryReport (
 				route,
 				idParam,
 				result,
-				null,
-				messageReportCode);
+				Optional.of (
+					statParam),
+				Optional.absent (),
+				Optional.of (
+					joinWithSpace (
+						stringFormat (
+							"stat=%s",
+							statParam),
+						stringFormat (
+							"err=%s",
+							errParam))),
+				Optional.absent ());
 
 			transaction.commit ();
 

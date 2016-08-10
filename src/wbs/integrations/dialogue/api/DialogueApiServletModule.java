@@ -46,10 +46,8 @@ import wbs.sms.gsm.UserDataHeader;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.logic.SmsInboxMultipartLogic;
-import wbs.sms.message.report.logic.ReportLogic;
+import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
-import wbs.sms.message.report.model.MessageReportCodeRec;
-import wbs.sms.message.report.model.MessageReportCodeType;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
@@ -79,7 +77,7 @@ class DialogueApiServletModule
 	NetworkObjectHelper networkHelper;
 
 	@Inject
-	ReportLogic reportLogic;
+	SmsDeliveryReportLogic reportLogic;
 
 	@Inject
 	RequestContext requestContext;
@@ -484,24 +482,14 @@ class DialogueApiServletModule
 					"DialogueApiServletModule.reportAction.handle ()",
 					this);
 
-			Long statusType = null;
-			Long reason = null;
-
-			MessageReportCodeRec messageReportCode =
-				messageReportCodeHelper.findOrCreate (
-					statusCode,
-					statusType,
-					reason,
-					MessageReportCodeType.dialogue,
-					newMessageStatus == MessageStatus.delivered,
-					false,
-					null);
-
 			reportLogic.deliveryReport (
 				messageId,
 				newMessageStatus,
-				null,
-				messageReportCode);
+				Optional.of (
+					deliveryReportParam),
+				Optional.absent (),
+				Optional.absent (),
+				Optional.absent ());
 
 			transaction.commit ();
 

@@ -1,5 +1,6 @@
 package wbs.integrations.unwiredplaza.api;
 
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
@@ -9,6 +10,7 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.SingletonComponent;
@@ -22,10 +24,8 @@ import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
 import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.sms.message.core.model.MessageStatus;
-import wbs.sms.message.report.logic.ReportLogic;
+import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
-import wbs.sms.message.report.model.MessageReportCodeRec;
-import wbs.sms.message.report.model.MessageReportCodeType;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -46,7 +46,7 @@ class UnwiredPlazaApiServletModule
 	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
-	ReportLogic reportLogic;
+	SmsDeliveryReportLogic reportLogic;
 
 	@Inject
 	RequestContext requestContext;
@@ -123,72 +123,67 @@ class UnwiredPlazaApiServletModule
 		public
 		void doGet () {
 
+			// process request
+
+			int routeId =
+				requestContext.requestIntRequired (
+					"routeId");
+
+			String idParam =
+				requestContext.parameterRequired (
+					"id");
+
+			Integer id =
+				Integer.parseInt (
+					idParam);
+
+			String statusParam =
+				requestContext.parameterRequired (
+					"status");
+
+			String subStatusParam =
+				requestContext.parameterRequired (
+					"status");
+
+			String finalParam =
+				requestContext.parameterRequired (
+					"final");
+
+			Long status =
+				Long.parseLong (
+					statusParam);
+
+			Long subStatus =
+				Long.parseLong (
+					subStatusParam);
+
+			Long finalValue =
+				Long.parseLong (
+					finalParam);
+
+			String statusCode =
+				statusCodes.get (
+					status);
+
+			String subStatusCode =
+				subStatusCodes.get (
+					subStatus);
+
+			MessageStatus result =
+				statusResults.get (
+					status);
+
+			// begin transaction
+
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
 					"UnwiredPlazaApiServletModule.reportFile.doGet ()",
 					this);
 
-			int routeId =
-				requestContext.requestIntRequired (
-					"routeId");
-
-			Integer id =
-				Integer.parseInt (requestContext.parameterOrNull ("id"));
-
-			Long status =
-				Long.parseLong (
-					requestContext.parameterOrNull (
-						"status"));
-
-			Long subStatus =
-				Long.parseLong (
-					requestContext.parameterOrNull (
-						"substatus"));
-
-			Long finalParam =
-				Long.parseLong (
-					requestContext.parameterOrNull (
-						"final"));
-
-			//String phone =
-			//	requestContext.getParameter ("phone");
-
-			//String refid =
-			//	requestContext.getParameter ("refid");
-
-			//Integer charged =
-			//	Integer.parseInt (requestContext.getParameter ("charged"));
-
-			String statusCode =
-				statusCodes.get (status);
-
-			String subStatusCode =
-				subStatusCodes.get (subStatus);
-
-			MessageStatus result =
-				statusResults.get (status);
-
 			RouteRec route =
 				routeHelper.findRequired (
 					routeId);
-
-			// update message report code
-
-			MessageReportCodeRec messageReportCode =
-				messageReportCodeHelper.findOrCreate (
-					status,
-					null,
-					subStatus,
-					MessageReportCodeType.unwiredPlaza,
-					result != null
-						? result.isGoodType ()
-						: false,
-					finalParam == 1,
-					stringFormat (
-						"%s / %s",
-						statusCode,
-						subStatusCode));
 
 			// process delivery report
 
@@ -196,8 +191,25 @@ class UnwiredPlazaApiServletModule
 				route,
 				id.toString (),
 				result,
-				null,
-				messageReportCode);
+				Optional.of (
+					statusParam),
+				Optional.of (
+					stringFormat (
+						"%s — %s",
+						statusCode,
+						subStatusCode)),
+				Optional.of (
+					joinWithSpace (
+						stringFormat (
+							"status=%s",
+							statusParam),
+						stringFormat (
+							"substatus=%s",
+							subStatusParam),
+						stringFormat (
+							"final=%s",
+							finalValue))),
+				Optional.absent ());
 
 			transaction.commit ();
 

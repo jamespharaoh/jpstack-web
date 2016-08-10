@@ -3,7 +3,7 @@ package wbs.console.helper;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
-import static wbs.framework.utils.etc.StringUtils.split;
+import static wbs.framework.utils.etc.StringUtils.stringSplitRegexp;
 
 import java.util.List;
 
@@ -58,7 +58,7 @@ class ConsoleHelperProviderMetaBuilder {
 				consoleHelperProviderSpec.objectName ());
 
 		List<String> packageNameParts =
-			split (
+			stringSplitRegexp (
 				objectHelper.objectClass ().getPackage ().getName (),
 				"\\.");
 

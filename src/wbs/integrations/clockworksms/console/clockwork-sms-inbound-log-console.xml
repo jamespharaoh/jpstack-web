@@ -1,0 +1,89 @@
+<console-module
+	name="clockwork-sms-inbound-log">
+
+	<console-helper-provider
+		object-name="clockworkSmsInboundLog"
+		view-priv="root:manage">
+
+		<priv-key
+			name="clockworkSmsInboundLog.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="clockworkSmsInboundLogName"
+			field="id"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="clockworkSmsInboundLog"
+		object-name="clockworkSmsInboundLog">
+
+		<list>
+
+			<object-search-page
+				search-fields="search"
+				results-fields="results"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="search"
+		class="wbs.integrations.clockworksms.model.ClockworkSmsInboundLogSearch">
+
+		<object-field
+			name="routeId"
+			label="Route"
+			object-type="route"
+			nullable="yes"/>
+
+		<interval-field
+			name="timestamp"
+			nullable="yes"/>
+
+		<text-field
+			name="details"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="results"
+		object-name="clockworkSmsInboundLog">
+
+		<id-field/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<object-field
+			name="route"
+			object-type="route"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="clockworkSmsInboundLog">
+
+		<id-field/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<text-area-field
+			name="details"/>
+
+	</field-set>
+
+</console-module>

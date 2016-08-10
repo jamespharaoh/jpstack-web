@@ -3,12 +3,13 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
 
@@ -274,6 +275,17 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			interfaceValue.isPresent ()
 				? interfaceValue.get ().toString ()
 				: "");
+
+	}
+
+	@Override
+	public 
+	Optional<String> htmlClass (
+			@NonNull Optional<Interface> interfaceValueOptional) {
+
+		return optionalMapOptional (
+			interfaceValueOptional,
+			enumConsoleHelper::htmlClass);
 
 	}
 

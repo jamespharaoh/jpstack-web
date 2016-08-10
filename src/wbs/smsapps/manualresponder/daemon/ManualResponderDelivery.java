@@ -13,7 +13,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.sms.message.core.logic.MessageLogic;
+import wbs.sms.message.core.logic.SmsMessageLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
@@ -40,7 +40,7 @@ class ManualResponderDelivery
 	ManualResponderReplyObjectHelper manualResponderReplyHelper;
 
 	@Inject
-	MessageLogic messageLogic;
+	SmsMessageLogic messageLogic;
 
 	@Inject
 	SmsOutboxLogic outboxLogic;

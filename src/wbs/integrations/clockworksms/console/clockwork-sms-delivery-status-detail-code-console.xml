@@ -1,0 +1,123 @@
+<console-module
+	name="clockwork-sms-delivery-status-detail-code">
+
+	<console-helper-provider
+		object-name="clockworkSmsDeliveryStatusDetailCode"
+		view-priv="root:manage">
+
+		<priv-key
+			name="clockworkSmsDeliveryStatusDetailCode.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="clockworkSmsDeliveryStatusDetailCodeName"
+			field="code"/>
+
+		<context-stuff
+			name="clockworkSmsConfigId"
+			delegate="clockworkSmsConfig"
+			field="id"/>
+
+		<run-post-processor
+			name="clockworkSmsConfig"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="clockworkSmsDeliveryStatusDetailCode"
+		object-name="clockworkSmsDeliveryStatusDetailCode">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"
+				create-priv-delegate="root"
+				create-priv-code="manage"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="clockworkSmsDeliveryStatusDetailCode">
+
+		<code-field/>
+		<description-field/>
+
+		<text-field
+			name="theirDescription"/>
+
+		<yes-no-field
+			name="permanent"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="clockworkSmsDeliveryStatusDetailCode">
+
+		<code-field pattern="0|[1-9][0-9]*"/>
+		<description-field/>
+
+		<text-field
+			name="theirDescription"/>
+
+		<yes-no-field
+			name="permanent"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="clockworkSmsDeliveryStatusDetailCode">
+
+		<id-field/>
+		<parent-field/>
+		<code-field/>
+		<description-field/>
+		<deleted-field/>
+
+		<text-field
+			name="theirDescription"/>
+
+		<yes-no-field
+			name="permanent"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="clockworkSmsDeliveryStatusDetailCode">
+
+		<code-field pattern="0|[1-9][0-9]*"/>
+		<description-field/>
+		<deleted-field/>
+
+		<text-field
+			name="theirDescription"/>
+
+		<yes-no-field
+			name="permanent"
+			nullable="yes"/>
+
+	</field-set>
+
+</console-module>

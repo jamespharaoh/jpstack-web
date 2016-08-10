@@ -1,7 +1,6 @@
 package wbs.integrations.clockworksms.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
@@ -25,8 +24,8 @@ import wbs.integrations.clockworksms.foreignapi.ClockworkSmsMessageSender;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutRec;
 import wbs.platform.scaffold.model.RootObjectHelper;
-import wbs.platform.scaffold.model.RootRec;
 import wbs.sms.gsm.GsmUtils;
+import wbs.sms.message.core.logic.SmsMessageLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.SmsSenderHelper;
 import wbs.sms.message.outbox.logic.SmsOutboxLogic.FailureType;
@@ -48,6 +47,9 @@ class ClockworkSmsSenderHelper
 
 	@Inject
 	RootObjectHelper rootHelper;
+
+	@Inject
+	SmsMessageLogic smsMessageLogic;
 
 	@Inject
 	WbsConfig wbsConfig;
@@ -179,9 +181,6 @@ class ClockworkSmsSenderHelper
 
 		// create request
 
-		RootRec root =
-			rootHelper.findRequired (0);
-
 		ClockworkSmsMessageRequest clockworkRequest =
 			new ClockworkSmsMessageRequest ()
 
@@ -208,17 +207,8 @@ class ClockworkSmsSenderHelper
 					clockworkSmsRouteOut.getMaxParts ())
 
 				.clientId (
-					ifElse (
-						isNotNull (
-							root.getFixturesSeed ()),
-
-					() -> stringFormat (
-						"test-%s-%s",
-						root.getFixturesSeed (),
-						smsMessage.getId ()),
-
-					() -> Integer.toString (
-						smsMessage.getId ())))
+					smsMessageLogic.mangleMessageId (
+						(long) smsMessage.getId ()))
 
 				.dlrType (
 					4l)

@@ -10,6 +10,8 @@
 	<models>
 		<enum-type name="clockworkSmsInboundLogType"/>
 		<model name="clockworkSmsConfig"/>
+		<model name="clockworkSmsDeliveryStatus"/>
+		<model name="clockworkSmsDeliveryStatusDetailCode"/>
 		<model name="clockworkSmsInboundLog"/>
 		<model name="clockworkSmsNetwork"/>
 		<model name="clockworkSmsRouteIn"/>
@@ -46,6 +48,9 @@
 	<console-modules>
 		<console-module name="clockwork-sms"/>
 		<console-module name="clockwork-sms-config"/>
+		<console-module name="clockwork-sms-delivery-status"/>
+		<console-module name="clockwork-sms-delivery-status-detail-code"/>
+		<console-module name="clockwork-sms-inbound-log"/>
 		<console-module name="clockwork-sms-network"/>
 		<console-module name="clockwork-sms-route-in"/>
 		<console-module name="clockwork-sms-route-out"/>

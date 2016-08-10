@@ -901,7 +901,7 @@ class ConsoleRequestContextImplementation
 		Integer unique =
 			ifNotPresent (
 
-			OptionalUtils.<Integer,Integer>optionalMap (
+			OptionalUtils.<Integer,Integer>optionalMapRequired (
 				requestInt (
 					"unique"),
 				value ->

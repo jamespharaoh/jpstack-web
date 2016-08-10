@@ -10,16 +10,16 @@ import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.RequestContext;
 import wbs.sms.message.core.model.MessageStatus;
-import wbs.sms.message.report.logic.ReportLogic;
+import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
-import wbs.sms.message.report.model.MessageReportCodeRec;
-import wbs.sms.message.report.model.MessageReportCodeType;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -40,7 +40,7 @@ class BroadcastSystemsReportFile
 	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
-	ReportLogic reportLogic;
+	SmsDeliveryReportLogic reportLogic;
 
 	@Inject
 	RouteObjectHelper routeHelper;
@@ -115,16 +115,6 @@ class BroadcastSystemsReportFile
 				"BroadcastSystemsReportFile.updateDatabase (data)",
 				this);
 
-		MessageReportCodeRec reportCode =
-			messageReportCodeHelper.findOrCreate (
-				(long) data.statusCode.hashCode (),
-				null,
-				null,
-				MessageReportCodeType.broadcastSystems,
-				data.status.isGoodType (),
-				! data.status.isPending (),
-				data.statusCode);
-
 		RouteRec route =
 			routeHelper.findRequired (
 				data.routeId);
@@ -133,8 +123,11 @@ class BroadcastSystemsReportFile
 			route,
 			data.transactionId,
 			data.status,
-			null,
-			reportCode);
+			Optional.of (
+				data.statusCode),
+			Optional.absent (),
+			Optional.absent (),
+			Optional.absent ());
 
 		transaction.commit ();
 

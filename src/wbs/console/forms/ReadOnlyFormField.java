@@ -33,7 +33,7 @@ import wbs.framework.record.Record;
 import wbs.framework.utils.etc.FormatWriter;
 
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.StringUtils.split;
+import static wbs.framework.utils.etc.StringUtils.stringSplitRegexp;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("readOnlyFormField")
@@ -112,7 +112,7 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 		}
 
 		List<String> privParts =
-			split (
+			stringSplitRegexp (
 				viewPriv,
 				":");
 

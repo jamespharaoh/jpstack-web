@@ -38,8 +38,6 @@ interface RequestContext {
 	String resolveApplicationUrl (
 			String applicationUrl);
 
-	InputStream inputStream ();
-
 	String method ();
 
 	Optional<String> parameter (
@@ -188,5 +186,11 @@ interface RequestContext {
 
 	Integer requestIntRequired (
 			String key);
+
+	// request body
+
+	InputStream inputStream ();
+
+	byte[] requestBodyRaw ();
 
 }

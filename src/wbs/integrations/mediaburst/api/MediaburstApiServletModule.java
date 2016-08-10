@@ -1,13 +1,15 @@
 package wbs.integrations.mediaburst.api;
 
 import static wbs.framework.utils.etc.Misc.fromHex;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
+import static wbs.framework.utils.etc.StringUtils.lowercase;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -45,10 +47,8 @@ import wbs.sms.message.core.logic.InvalidMessageStateException;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.logic.SmsInboxMultipartLogic;
-import wbs.sms.message.report.logic.ReportLogic;
+import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
-import wbs.sms.message.report.model.MessageReportCodeRec;
-import wbs.sms.message.report.model.MessageReportCodeType;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
@@ -78,7 +78,7 @@ class MediaburstApiServletModule
 	NetworkObjectHelper networkHelper;
 
 	@Inject
-	ReportLogic reportLogic;
+	SmsDeliveryReportLogic reportLogic;
 
 	@Inject
 	RequestContext requestContext;
@@ -273,7 +273,8 @@ class MediaburstApiServletModule
 				userDataHeader =
 					UserDataHeader.decode (
 						ByteBuffer.wrap (
-							fromHex (udhParam)));
+							fromHex (
+								udhParam)));
 
 			} else {
 
@@ -387,14 +388,9 @@ class MediaburstApiServletModule
 						"routeId"));
 
 			String statusParam =
-				requestContext.parameterOrNull ("status").toLowerCase ();
-
-			if (statusParam == null) {
-
-				throw new RuntimeException (
-					"Required parameter 'status' not provided");
-
-			}
+				lowercase (
+					requestContext.parameterRequired (
+						"status"));
 
 			if (! messageStatusStrings.contains (statusParam)) {
 
@@ -407,51 +403,35 @@ class MediaburstApiServletModule
 				stringToMessageStatus.get (
 					statusParam.toLowerCase ());
 
+			String deliverCodeParam =
+				requestContext.parameterOrDefault (
+					"deliver_code",
+					"");
+
 			try {
 
-				Long statusCode;
-
-				try {
-
-					statusCode =
-						Long.parseLong (
-							requestContext.parameterOrNull (
-								"deliver_code"));
-
-				} catch (NumberFormatException exception) {
-
-					statusCode = null;
-
-				}
-
-				Long statusType = null;
-				Long reason = null;
-
-				statusType =
-					(long)
-					Arrays.asList (
-						stringToMessageStatus.keySet ().toArray ()
-					).indexOf (
-						statusParam.toLowerCase ());
-
-				MessageReportCodeRec messageReportCode =
-					messageReportCodeHelper.findOrCreate (
-						statusCode,
-						statusType,
-						reason,
-						MessageReportCodeType.mediaburst,
-						newMessageStatus == MessageStatus.delivered,
-						false,
-						statusParam);
-
-				if (newMessageStatus != null) {
+				if (
+					isNotNull (
+						newMessageStatus)
+				) {
 
 					reportLogic.deliveryReport (
 						route,
-						requestContext.parameterOrNull ("msg_id"),
+						requestContext.parameterRequired (
+							"msg_id"),
 						newMessageStatus,
-						null,
-						messageReportCode);
+						Optional.of (
+							statusParam),
+						Optional.absent (),
+						Optional.of (
+							joinWithSpace (
+								stringFormat (
+									"status=%s",
+									statusParam),
+								stringFormat (
+									"deliver_code=%s",
+									deliverCodeParam))),
+						Optional.absent ());
 
 				}
 

@@ -37,6 +37,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import com.google.common.base.Optional;
@@ -98,6 +99,24 @@ class RequestContextImplementation
 		try {
 
 			return request ().getInputStream ();
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
+
+	}
+
+	@Override
+	public
+	byte[] requestBodyRaw () {
+
+		try {
+
+			return IOUtils.toByteArray (
+				inputStream ());
 
 		} catch (IOException ioException) {
 

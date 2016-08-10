@@ -116,4 +116,12 @@ interface FormFieldRenderer<Container,Interface> {
 
 	}
 
+	default
+	Optional<String> htmlClass (
+			Optional<Interface> interfaceValue) {
+
+		return Optional.absent ();
+
+	}
+
 }

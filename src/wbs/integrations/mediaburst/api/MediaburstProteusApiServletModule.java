@@ -1,6 +1,8 @@
 package wbs.integrations.mediaburst.api;
 
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +20,7 @@ import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Nodes;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -31,10 +34,8 @@ import wbs.framework.web.RequestContext;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
 import wbs.sms.message.core.model.MessageStatus;
-import wbs.sms.message.report.logic.ReportLogic;
+import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
-import wbs.sms.message.report.model.MessageReportCodeRec;
-import wbs.sms.message.report.model.MessageReportCodeType;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -53,7 +54,7 @@ class MediaburstProteusApiServletModule
 	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
-	ReportLogic reportLogic;
+	SmsDeliveryReportLogic reportLogic;
 
 	@Inject
 	RequestContext requestContext;
@@ -129,38 +130,6 @@ class MediaburstProteusApiServletModule
 					"MediaburstProteusApiServletModule.reportFile.doPost ()",
 					this);
 
-			Long statusCode;
-
-			try {
-
-				statusCode =
-					Long.parseLong (
-						reportRequestResult.errCode);
-
-			} catch (NumberFormatException exception) {
-
-				statusCode = null;
-
-			}
-
-			Long statusType = null;
-			Long reason = null;
-
-			statusType =
-				(long) (int)
-				allMessageStatuses.indexOf (
-					reportRequestResult.statusString.toLowerCase ());
-
-			MessageReportCodeRec messageReportCode =
-				messageReportCodeHelper.findOrCreate (
-					statusCode,
-					statusType,
-					reason,
-					MessageReportCodeType.mediaburst,
-					reportRequestResult.status == MessageStatus.delivered,
-					false,
-					reportRequestResult.statusString);
-
 			RouteRec route =
 				routeHelper.findRequired (
 					requestContext.requestIntRequired (
@@ -170,8 +139,18 @@ class MediaburstProteusApiServletModule
 				route,
 				reportRequestResult.otherId,
 				reportRequestResult.status,
-				null,
-				messageReportCode);
+				Optional.of (
+					reportRequestResult.statusString),
+				Optional.absent (),
+				Optional.of (
+					joinWithSpace (
+						stringFormat (
+							"status=%s",
+							reportRequestResult.statusString),
+						stringFormat (
+							"errCode=%s",
+							reportRequestResult.errCode))),
+				Optional.absent ());
 
 			transaction.commit ();
 

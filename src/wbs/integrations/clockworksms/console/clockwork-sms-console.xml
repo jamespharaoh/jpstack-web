@@ -33,6 +33,18 @@
 
 		</section>
 
+		<section
+			name="log"
+			label="Logs">
+
+			<context-link
+				name="Inbound"
+				link="clockworkSmsInboundLog"
+				label="Inbound"
+				priv-key="clockworkSms.manage"/>
+
+		</section>
+
 	</simple-context>
 
 </console-module>

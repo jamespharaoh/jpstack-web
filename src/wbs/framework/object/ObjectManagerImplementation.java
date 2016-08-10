@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.split;
+import static wbs.framework.utils.etc.StringUtils.stringSplitRegexp;
 import static wbs.framework.utils.etc.StringUtils.startsWith;
 
 import java.util.ArrayList;
@@ -581,7 +581,7 @@ class ObjectManagerImplementation
 		// iterate through path
 
 		List<String> pathParts =
-			split (
+			stringSplitRegexp (
 				path,
 				"\\.");
 
@@ -693,7 +693,7 @@ class ObjectManagerImplementation
 			return objectClass;
 
 		List<String> pathParts =
-			split (
+			stringSplitRegexp (
 				path.get (),
 				"\\.");
 

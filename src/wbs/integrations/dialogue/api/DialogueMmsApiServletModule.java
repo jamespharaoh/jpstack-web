@@ -2,8 +2,8 @@ package wbs.integrations.dialogue.api;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.dateToInstantNullSafe;
 
 import java.io.IOException;
@@ -45,10 +45,8 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
-import wbs.sms.message.report.logic.ReportLogic;
+import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
-import wbs.sms.message.report.model.MessageReportCodeRec;
-import wbs.sms.message.report.model.MessageReportCodeType;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
@@ -77,7 +75,7 @@ class DialogueMmsApiServletModule
 	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
-	ReportLogic reportLogic;
+	SmsDeliveryReportLogic reportLogic;
 
 	@Inject
 	RequestContext requestContext;
@@ -364,24 +362,14 @@ class DialogueMmsApiServletModule
 
 			}
 
-			Long statusType = null;
-			Long reason = null;
-
-			MessageReportCodeRec messageReportCode =
-				messageReportCodeHelper.findOrCreate (
-					statusCode,
-					statusType,
-					reason,
-					MessageReportCodeType.dialogue,
-					newMessageStatus == MessageStatus.delivered,
-					false,
-					null);
-
 			reportLogic.deliveryReport (
 				message,
 				newMessageStatus,
-				null,
-				messageReportCode);
+				Optional.of (
+					deliveryReportParam),
+				Optional.absent (),
+				Optional.absent (),
+				Optional.absent ());
 
 			transaction.commit ();
 

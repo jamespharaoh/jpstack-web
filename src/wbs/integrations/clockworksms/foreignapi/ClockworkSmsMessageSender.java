@@ -3,7 +3,9 @@ package wbs.integrations.clockworksms.foreignapi;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -20,7 +22,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONObject;
@@ -116,9 +118,15 @@ class ClockworkSmsMessageSender {
 				"User-Agent",
 				wbsConfig.httpUserAgent ());
 
+			httpPost.setHeader (
+				"Content-Type",
+				"application/xml; charset=utf-8");
+
 			httpPost.setEntity (
-				new StringEntity (
-					xmlRequest,
+				new InputStreamEntity (
+					new ByteArrayInputStream (
+						stringToUtf8 (
+							xmlRequest)),
 					ContentType.APPLICATION_XML));
 
 			requestTrace =

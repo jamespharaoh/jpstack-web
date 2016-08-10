@@ -2,10 +2,10 @@ package wbs.test.simulator.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifElse;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.toBoolean;
 import static wbs.framework.utils.etc.Misc.toInteger;
 import static wbs.framework.utils.etc.StringUtils.doesNotStartWith;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
 
@@ -38,7 +38,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
-import wbs.sms.message.report.logic.ReportLogic;
+import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.network.console.NetworkConsoleHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.core.console.NumberConsoleHelper;
@@ -82,7 +82,7 @@ class SimulatorSessionCreateEventAction
 	ObjectManager objectManager;
 
 	@Inject
-	ReportLogic reportLogic;
+	SmsDeliveryReportLogic reportLogic;
 
 	@Inject
 	RootConsoleHelper rootHelper;
@@ -372,8 +372,10 @@ class SimulatorSessionCreateEventAction
 				success,
 				() -> MessageStatus.delivered,
 				() -> MessageStatus.undelivered),
-			transaction.now (),
-			null);
+			Optional.absent (),
+			Optional.absent (),
+			Optional.absent (),
+			Optional.absent ());
 
 		// create event data
 

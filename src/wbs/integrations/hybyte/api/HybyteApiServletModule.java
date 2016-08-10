@@ -53,10 +53,8 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.logic.SmsInboxMultipartLogic;
-import wbs.sms.message.report.logic.ReportLogic;
+import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
-import wbs.sms.message.report.model.MessageReportCodeRec;
-import wbs.sms.message.report.model.MessageReportCodeType;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 
@@ -99,7 +97,7 @@ class HybyteApiServletModule
 	NumberFormatLogic numberFormatLogic;
 
 	@Inject
-	ReportLogic reportLogic;
+	SmsDeliveryReportLogic reportLogic;
 
 	@Inject
 	RequestContext requestContext;
@@ -383,37 +381,23 @@ class HybyteApiServletModule
 
 			}
 
-			Long statusType = null;
-			Long reason = null;
-
-			// update message report code
-
-			MessageReportCodeRec messageReportCode =
-				messageReportCodeHelper.findOrCreate (
-					statusCode,
-					statusType,
-					reason,
-					MessageReportCodeType.hybyte,
-					req.success,
-					false,
-					req.description);
-
 			// process delivery report
-
-			//MessageRec message;
 
 			try {
 
-				//message =
-					reportLogic.deliveryReport (
-						hybyteRouteOut.getRoute (),
-						req.otherId,
-						ifElse (
-							req.success,
-							() -> MessageStatus.delivered,
-							() -> MessageStatus.undelivered),
-						null,
-						messageReportCode);
+				reportLogic.deliveryReport (
+					hybyteRouteOut.getRoute (),
+					req.otherId,
+					ifElse (
+						req.success,
+						() -> MessageStatus.delivered,
+						() -> MessageStatus.undelivered),
+					Optional.of (
+						req.code),
+					Optional.of (
+						req.description),
+					Optional.absent (),
+					Optional.absent ());
 
 			} catch (NoSuchMessageException exception) {
 
@@ -424,16 +408,19 @@ class HybyteApiServletModule
 
 				try {
 
-					//message =
-						reportLogic.deliveryReport (
-							hybyteRouteOut.getFreeRoute ().getRoute (),
-							req.otherId,
-							ifElse (
-								req.success,
-								() -> MessageStatus.delivered,
-								() -> MessageStatus.undelivered),
-							null,
-							messageReportCode);
+					reportLogic.deliveryReport (
+						hybyteRouteOut.getFreeRoute ().getRoute (),
+						req.otherId,
+						ifElse (
+							req.success,
+							() -> MessageStatus.delivered,
+							() -> MessageStatus.undelivered),
+						Optional.of (
+							req.code),
+						Optional.of (
+							req.description),
+						Optional.absent (),
+						Optional.absent ());
 
 				} catch (NoSuchMessageException noSuchMessageException) {
 

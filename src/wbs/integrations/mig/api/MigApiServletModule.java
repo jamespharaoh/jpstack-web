@@ -1,5 +1,7 @@
 package wbs.integrations.mig.api;
 
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.framework.utils.etc.StringUtils.joinWithNewline;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -38,13 +40,13 @@ import wbs.integrations.mig.model.MigRouteInRec;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
-import wbs.sms.message.core.logic.MessageLogic;
+import wbs.sms.message.core.logic.SmsMessageLogic;
 import wbs.sms.message.core.model.MessageDirection;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
-import wbs.sms.message.report.logic.ReportLogic;
+import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.message.report.model.MessageReportCodeRec;
 import wbs.sms.message.report.model.MessageReportCodeType;
@@ -80,7 +82,7 @@ class MigApiServletModule
 	MessageObjectHelper messageHelper;
 
 	@Inject
-	MessageLogic messageLogic;
+	SmsMessageLogic messageLogic;
 
 	@Inject
 	MessageReportCodeObjectHelper messageReportCodeHelper;
@@ -92,7 +94,7 @@ class MigApiServletModule
 	MigRouteInObjectHelper migRouteInHelper;
 
 	@Inject
-	ReportLogic reportLogic;
+	SmsDeliveryReportLogic reportLogic;
 
 	@Inject
 	RequestContext requestContext;
@@ -441,8 +443,22 @@ class MigApiServletModule
 				reportLogic.deliveryReport (
 					message,
 					newMessageStatus,
-					null,
-					reportCode);
+					Optional.of (
+						status),
+					optionalFromNullable (
+						description),
+					Optional.of (
+						joinWithNewline (
+							stringFormat (
+								"status=%s",
+								status),
+							stringFormat (
+								"statusType=%s",
+								statusType),
+							stringFormat (
+								"reason=%s",
+								reason))),
+					Optional.absent ());
 
 				// error handling
 				// int netID = networkID;

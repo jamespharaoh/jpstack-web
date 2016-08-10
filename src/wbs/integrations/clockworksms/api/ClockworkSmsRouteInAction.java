@@ -20,6 +20,7 @@ import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.web.PageNotFoundException;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
@@ -77,15 +78,16 @@ class ClockworkSmsRouteInAction
 
 	@Override
 	protected
-	void processRequest () {
+	void processRequest (
+			@NonNull FormatWriter debugWriter) {
+
+		// decode request
 
 		DataFromXml dataFromXml =
 			new DataFromXml ()
 
 			.registerBuilderClasses (
 				ClockworkSmsRouteInRequest.class);
-
-		// decode request
 
 		request =
 			(ClockworkSmsRouteInRequest)
@@ -195,7 +197,8 @@ class ClockworkSmsRouteInAction
 
 	@Override
 	protected
-	Responder createResponse () {
+	Responder createResponse (
+			@NonNull FormatWriter debugWriter) {
 
 		return textResponderProvider.get ()
 

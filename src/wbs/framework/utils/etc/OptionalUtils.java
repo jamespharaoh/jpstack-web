@@ -391,7 +391,7 @@ class OptionalUtils {
 	}
 
 	public static <From,To>
-	Optional<To> optionalMap (
+	Optional<To> optionalMapRequired (
 			@NonNull Optional<From> optionalValue,
 			@NonNull Function<? super From,To> mappingFunction) {
 
@@ -403,6 +403,27 @@ class OptionalUtils {
 			return Optional.of (
 				mappingFunction.apply (
 					optionalValue.get ()));
+
+		} else {
+
+			return Optional.absent ();
+
+		}
+
+	}
+
+	public static <From,To>
+	Optional<To> optionalMapOptional (
+			@NonNull Optional<From> optionalValue,
+			@NonNull Function<? super From,Optional<To>> mappingFunction) {
+
+		if (
+			isPresent (
+				optionalValue)
+		) {
+
+			return mappingFunction.apply (
+				optionalValue.get ());
 
 		} else {
 

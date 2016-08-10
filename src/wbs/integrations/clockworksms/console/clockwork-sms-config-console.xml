@@ -45,6 +45,24 @@
 				label="Networks"
 				priv-key="clockworkSms.manage"/>
 
+			<section
+				name="delivery"
+				label="Delivery">
+
+				<context-link
+					name="status"
+					link="clockworkSmsDeliveryStatus"
+					label="Statuses"
+					priv-key="clockworkSms.manage"/>
+
+				<context-link
+					name="statusDetailCode"
+					link="clockworkSmsDeliveryStatusDetailCode"
+					label="Status detail codes"
+					priv-key="clockworkSms.manage"/>
+
+			</section>
+
 			<object-events-page/>
 
 		</object>
