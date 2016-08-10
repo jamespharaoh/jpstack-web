@@ -1,5 +1,7 @@
 package wbs.platform.text.web;
 
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+
 import java.io.PrintWriter;
 
 import javax.inject.Inject;
@@ -29,14 +31,25 @@ class TextResponder
 	@Getter @Setter
 	String text;
 
+	@Getter @Setter
+	String contentType =
+		"text/plain";
+
 	@Override
 	public
 	void execute () {
 
+		requestContext.setHeader (
+			"Content-Type",
+			stringFormat (
+				"%s; charset=utf-8",
+				contentType));
+
 		PrintWriter out =
 			requestContext.writer ();
 
-		out.print (text);
+		out.print (
+			text);
 
 	}
 
