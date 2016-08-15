@@ -6,7 +6,7 @@ public
 interface ObjectTypeDaoMethods {
 
 	ObjectTypeRec findById (
-			int id);
+			Long id);
 
 	ObjectTypeRec findByCode (
 			String code);

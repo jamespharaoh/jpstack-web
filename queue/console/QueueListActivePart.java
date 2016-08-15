@@ -22,7 +22,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TimeFormatter;
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
+import wbs.platform.queue.logic.DummyQueueCache;
 import wbs.platform.queue.model.QueueRec;
+import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("queueListActivePart")
 public
@@ -35,15 +37,21 @@ class QueueListActivePart
 	ConsoleManager consoleManager;
 
 	@Inject
+	DummyQueueCache dummyQueueCache;
+
+	@Inject
 	ConsoleObjectManager objectManager;
 
 	@Inject
 	TimeFormatter timeFormatter;
 
+	@Inject
+	UserConsoleLogic userConsoleLogic;
+
 	// prototype dependencies
 
 	@Inject
-	Provider<QueueSubjectSorter> queueSubjectSorter;
+	Provider<QueueSubjectSorter> queueSubjectSorterProvider;
 
 	// state
 
@@ -77,7 +85,13 @@ class QueueListActivePart
 	void prepare () {
 
 		List<QueueInfo> queueInfosTemp =
-			queueSubjectSorter.get ()
+			queueSubjectSorterProvider.get ()
+
+			.queueCache (
+				dummyQueueCache)
+
+			.loggedInUser (
+				userConsoleLogic.userRequired ())
 
 			.sort ()
 

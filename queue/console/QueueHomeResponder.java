@@ -3,8 +3,8 @@ package wbs.platform.queue.console;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,6 +30,7 @@ import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
+import wbs.platform.queue.logic.DummyQueueCache;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimRec;
 import wbs.platform.queue.model.QueueItemRec;
@@ -45,6 +46,9 @@ class QueueHomeResponder
 	extends HtmlResponder {
 
 	// dependencies
+
+	@Inject
+	DummyQueueCache dummyQueueCache;
 
 	@Inject
 	UserPrivChecker privChecker;
@@ -67,7 +71,7 @@ class QueueHomeResponder
 	// prototype dependencies
 
 	@Inject
-	Provider<QueueSubjectSorter> queueSubjectSorter;
+	Provider<QueueSubjectSorter> queueSubjectSorterProvider;
 
 	// state
 
@@ -141,7 +145,13 @@ class QueueHomeResponder
 		// load queue list
 
 		List<QueueInfo> queueInfosTemp =
-			queueSubjectSorter.get ()
+			queueSubjectSorterProvider.get ()
+
+			.queueCache (
+				dummyQueueCache)
+
+			.loggedInUser (
+				userConsoleLogic.userRequired ())
 
 			.effectiveUser (
 				userConsoleLogic.userRequired ())

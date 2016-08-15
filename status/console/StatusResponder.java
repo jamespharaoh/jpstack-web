@@ -124,7 +124,7 @@ class StatusResponder
 				"/status.update"));
 
 		printFormat (
-			"var statusRequestTime = 1000;\n");
+			"var statusRequestTime = 800;\n");
 
 		printFormat (
 			"</script>\n");

@@ -1,6 +1,9 @@
 package wbs.platform.exception.console;
 
+import static wbs.framework.utils.etc.ConcurrentUtils.futureValue;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+
+import java.util.concurrent.Future;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -54,7 +57,7 @@ class ExceptionStatusLine
 
 	@Override
 	public
-	String getUpdateScript () {
+	Future<String> getUpdateScript () {
 
 		int numExceptions = 0;
 		int numExceptionsFatal = 0;
@@ -80,10 +83,11 @@ class ExceptionStatusLine
 
 		// return
 
-		return stringFormat (
-			"updateExceptions (%s, %s);\n",
-			numExceptions,
-			numExceptionsFatal);
+		return futureValue (
+			stringFormat (
+				"updateExceptions (%s, %s);\n",
+				numExceptions,
+				numExceptionsFatal));
 
 	}
 

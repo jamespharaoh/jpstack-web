@@ -1,6 +1,7 @@
 package wbs.platform.queue.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
@@ -8,7 +9,10 @@ import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.notIn;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
+import static wbs.framework.utils.etc.TimeUtils.laterThan;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,34 +27,30 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Data;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import lombok.Cleanup;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.priv.UserPrivCheckerBuilder;
+import wbs.framework.activitymanager.ActiveTask;
+import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
-
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
-import static wbs.framework.utils.etc.TimeUtils.earlierThan;
-import static wbs.framework.utils.etc.TimeUtils.laterThan;
-
+import wbs.platform.queue.logic.QueueCache;
 import wbs.platform.queue.logic.QueueLogic;
-import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemState;
 import wbs.platform.queue.model.QueueObjectHelper;
 import wbs.platform.queue.model.QueueRec;
-import wbs.platform.queue.model.QueueSubjectObjectHelper;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserRec;
@@ -63,28 +63,22 @@ class QueueSubjectSorter {
 	// dependencies
 
 	@Inject
+	ActivityManager activityManager;
+
+	@Inject
 	Database database;
 
 	@Inject
 	ObjectManager objectManager;
 
 	@Inject
-	UserPrivChecker loggedInUserPrivChecker;
-
-	@Inject
 	QueueObjectHelper queueHelper;
-
-	@Inject
-	QueueItemObjectHelper queueItemHelper;
 
 	@Inject
 	QueueLogic queueLogic;
 
 	@Inject
 	QueueManager queueManager;
-
-	@Inject
-	QueueSubjectObjectHelper queueSubjectHelper;
 
 	// prototype dependencies
 
@@ -94,13 +88,20 @@ class QueueSubjectSorter {
 	// inputs
 
 	@Setter
+	QueueCache queueCache;
+
+	@Setter
 	QueueRec queue;
+
+	@Setter
+	UserRec loggedInUser;
 
 	@Setter
 	UserRec effectiveUser;
 
 	// state
 
+	UserPrivChecker loggedInUserPrivChecker;
 	UserPrivChecker effectiveUserPrivChecker;
 
 	Transaction transaction;
@@ -118,6 +119,35 @@ class QueueSubjectSorter {
 
 	public
 	SortedQueueSubjects sort () {
+
+		@Cleanup
+		ActiveTask activeTask =
+			activityManager.start (
+				"logic",
+				stringFormat (
+					"%s.%s (%s)",
+					getClass ().getSimpleName (),
+					"sort",
+					joinWithCommaAndSpace (
+						stringFormat (	
+							"queue=%s",
+							ifNull (
+								queue,
+								"null")),
+						stringFormat (
+							"effectiveUser=%s",
+							ifNull (
+								effectiveUser,
+								"null")))),
+				this);
+						
+		loggedInUserPrivChecker =
+			userPrivCheckerBuilderProvider.get ()
+
+			.userId (
+				(long) loggedInUser.getId ())
+
+			.build ();
 
 		if (
 			isNotNull (
@@ -138,10 +168,21 @@ class QueueSubjectSorter {
 		transaction =
 			database.currentTransaction ();
 
+		// process queue subjects
+
 		List<QueueSubjectRec> queueSubjects =
-			queue != null
-				? queueSubjectHelper.findActive (queue)
-				: queueSubjectHelper.findActive ();
+			ifElse (
+				isNotNull (
+					queue),
+
+			() ->
+				queueCache.findQueueSubjects (
+					queue),
+
+			() ->
+				queueCache.findQueueSubjects ()
+
+		);
 
 		queueSubjects.forEach (
 			this::processSubject);
@@ -194,12 +235,13 @@ class QueueSubjectSorter {
 
 		// sort subjects in each queue
 
-		result.allQueues.forEach (queueInfo ->
-			Collections.sort (
-				queueInfo.subjectInfos,
-				effectiveUser != null
-					? SubjectInfo.effectiveTimeComparator
-					: SubjectInfo.createdTimeComparator));
+		result.allQueues.forEach (
+			queueInfo ->
+				Collections.sort (
+					queueInfo.subjectInfos,
+					effectiveUser != null
+						? SubjectInfo.effectiveTimeComparator
+						: SubjectInfo.createdTimeComparator));
 
 		// and return
 
@@ -474,10 +516,7 @@ class QueueSubjectSorter {
 			queue;
 
 		queueInfo.slice =
-			optionalRequired (
-				objectManager.getAncestor (
-					SliceRec.class,
-					queueInfo.queue));
+			queue.getSlice ();
 
 		queueInfo.configuredPreferredUserDelay =
 			queueManager.getPreferredUserDelay (
@@ -624,7 +663,7 @@ class QueueSubjectSorter {
 			- subject.getActiveItems ();
 
 		QueueItemRec item =
-			queueItemHelper.findByIndex (
+			queueCache.findQueueItemByIndex (
 				subject,
 				nextItemIndex);
 

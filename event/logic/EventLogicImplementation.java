@@ -4,11 +4,10 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -157,7 +156,6 @@ class EventLogicImplementation
 					index)
 
 				.setTypeId (
-					(long) (int)
 					objectManager.getObjectTypeId (
 						dataObject))
 

@@ -11,9 +11,11 @@
 		<!-- identity -->
 
 		<parent-field
-			type="event"/>
+			type="event"
+			cacheable="yes"/>
 
-		<index-field/>
+		<index-field
+			cacheable="yes"/>
 
 		<!-- data -->
 

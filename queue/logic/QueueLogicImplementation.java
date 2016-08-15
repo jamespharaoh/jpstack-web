@@ -4,30 +4,29 @@ import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.laterThan;
 
 import java.util.List;
 
 import javax.inject.Inject;
-
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.TimeUtils.laterThan;
-
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
+import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.queue.model.QueueItemClaimStatus;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
@@ -355,7 +354,7 @@ class QueueLogicImplementation
 				- queueSubject.getActiveItems ();
 
 			QueueItemRec nextQueueItem =
-				queueItemHelper.findByIndex (
+				queueItemHelper.findByIndexOrNull (
 					queueSubject,
 					nextItemIndex);
 
@@ -484,7 +483,7 @@ class QueueLogicImplementation
 				- queueSubject.getActiveItems ();
 
 			QueueItemRec nextQueueItem =
-				queueItemHelper.findByIndex (
+				queueItemHelper.findByIndexOrNull (
 					queueSubject,
 					nextItemIndex);
 

@@ -1,5 +1,7 @@
 package wbs.platform.status.console;
 
+import java.util.concurrent.Future;
+
 import wbs.console.part.PagePart;
 
 public
@@ -18,5 +20,6 @@ interface StatusLine {
 	/**
 	 * Generates any javascript code to update the status page.
 	 */
-	String getUpdateScript ();
+	Future<String> getUpdateScript ();
+
 }

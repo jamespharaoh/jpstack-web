@@ -10,7 +10,6 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -21,7 +20,6 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.Record;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
@@ -93,8 +91,7 @@ class ObjectRemoveAction
 				"ObjectRemoveAction.goReal ()",
 				this);
 
-		EphemeralRecord<?> ephemeralObject =
-			(EphemeralRecord<?>)
+		Record<?> ephemeralObject =
 			objectHelper.lookupObject (
 				requestContext.contextStuff ());
 
