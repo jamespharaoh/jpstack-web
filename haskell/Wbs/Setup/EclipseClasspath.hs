@@ -60,7 +60,7 @@ writeClasspath world = do
 				".jar" ]
 
 			sourcePath = concat [
-				"/home/vagrant/",
+				"/root/",
 				bldName build,
 				"/binaries/libraries/",
 				libName library,

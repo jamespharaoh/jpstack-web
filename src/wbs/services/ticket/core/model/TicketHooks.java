@@ -121,7 +121,7 @@ class TicketHooks
 
 				ObjectHelper<?> objectHelper =
 					objectManager.get ().objectHelperForTypeId (
-						objectType.getId ());
+						(long) objectType.getId ());
 
 				Object object =
 					objectHelper.findRequired (

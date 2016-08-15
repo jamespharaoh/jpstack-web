@@ -1,6 +1,6 @@
 package wbs.platform.media.logic;
 
-import static wbs.framework.utils.etc.Misc.allOf;
+import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.iterable;
@@ -8,7 +8,11 @@ import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.runFilter;
 import static wbs.framework.utils.etc.Misc.runFilterAdvanced;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringToBytes;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -29,22 +33,15 @@ import javax.imageio.stream.ImageInputStreamImpl;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.inject.Inject;
 
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.GlobalId;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
-import static wbs.framework.utils.etc.StringUtils.stringToBytes;
-
 import wbs.platform.media.model.ContentObjectHelper;
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaObjectHelper;
@@ -1040,11 +1037,17 @@ class MediaLogicImplementation
 
 		// same image if already fits
 
-		if (
-			allOf (
-				image.getWidth () < maxWidth,
-				image.getHeight () < maxHeight)
-		) {
+		if (allOf (
+		
+			() -> lessThan (
+				image.getWidth (),
+				maxWidth),
+
+			() -> lessThan (
+				image.getHeight (),
+				maxHeight)
+		
+		)) {
 
 			return image;
 
@@ -1132,11 +1135,17 @@ class MediaLogicImplementation
 
 		// same image if already fits
 
-		if (
-			allOf (
-				sourceImage.getWidth () == targetWidth,
-				sourceImage.getHeight () == targetHeight)
-		) {
+		if (allOf (
+
+			() -> equal (
+				sourceImage.getWidth (),
+				targetWidth),
+
+			() -> equal (
+				sourceImage.getHeight (),
+				targetHeight)
+
+		)) {
 
 			return sourceImage;
 

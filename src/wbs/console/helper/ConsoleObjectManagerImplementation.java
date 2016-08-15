@@ -11,11 +11,10 @@ import java.util.SortedMap;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.object.ObjectHelper;
@@ -447,11 +446,11 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForClass (
+	ObjectHelper<?> objectHelperForClassRequired (
 			Class<?> objectClass) {
 
 		return objectManager
-			.objectHelperForClass (objectClass);
+			.objectHelperForClassRequired (objectClass);
 
 	}
 
@@ -654,21 +653,21 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	int getObjectTypeId (
+	Long getObjectTypeId (
 			Record<?> parentObject) {
 
-		return objectManager
-			.getObjectTypeId (parentObject);
+		return objectManager.getObjectTypeId (
+			parentObject);
 
 	}
 
 	@Override
 	public
-	int objectClassToTypeId (
-			Class<?> objectClass) {
+	Long objectClassToTypeId (
+			@NonNull Class<?> objectClass) {
 
-		return objectManager
-			.objectClassToTypeId (objectClass);
+		return objectManager.objectClassToTypeId (
+			objectClass);
 
 	}
 
@@ -684,10 +683,10 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	ObjectHelper<?> objectHelperForTypeId (
-			Integer typeId) {
+			@NonNull Long typeId) {
 
-		return objectManager
-			.objectHelperForTypeId (typeId);
+		return objectManager.objectHelperForTypeId (
+			typeId);
 
 	}
 

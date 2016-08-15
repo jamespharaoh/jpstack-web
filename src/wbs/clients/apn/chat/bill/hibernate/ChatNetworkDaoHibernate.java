@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.bill.hibernate;
 
 import lombok.NonNull;
 
+import org.hibernate.FlushMode;
 import org.hibernate.criterion.Restrictions;
 
 import wbs.clients.apn.chat.bill.model.ChatNetworkDao;
@@ -40,6 +41,12 @@ class ChatNetworkDaoHibernate
 				Restrictions.eq (
 					"_chatNetwork.network",
 					network))
+
+			.setCacheable (
+				true)
+
+			.setFlushMode (
+				FlushMode.MANUAL)
 
 		);
 

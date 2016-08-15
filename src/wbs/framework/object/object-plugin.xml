@@ -4,7 +4,14 @@
 
 	<layer name="object">
 		<bean class="ObjectHelperBuilder"/>
-		<bean class="ObjectHelperProviderManager"/>
+		<bean class="ObjectHelperChildrenImplementation"/>
+		<bean class="ObjectHelperCodeImplementation"/>
+		<bean class="ObjectHelperFindImplementation"/>
+		<bean class="ObjectHelperIdImplementation"/>
+		<bean class="ObjectHelperIndexImplementation"/>
+		<bean class="ObjectHelperModelImplementation"/>
+		<bean class="ObjectHelperPropertyImplementation"/>
+		<bean class="ObjectHelperUpdateImplementation"/>
 		<bean class="ObjectManagerImplementation"/>
 	</layer>
 

@@ -12,6 +12,7 @@ cd "$BASEDIR"
 # set java
 
 JAVA_OPTS="-Xmx4096m"
+JAVA_OPTS="$JAVA_OPTS -XX:-OmitStackTraceInFastThrow"
 
 # setup classpath
 

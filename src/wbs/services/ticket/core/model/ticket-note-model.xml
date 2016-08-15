@@ -11,10 +11,12 @@
 		<!-- identity -->
 
 		<parent-field
-			type="ticket"/>
+			type="ticket"
+			cacheable="yes"/>
 
 		<index-field
-			counter="numNotes"/>
+			counter="numNotes"
+			cacheable="yes"/>
 
 		<!-- data -->
 

@@ -1,22 +1,23 @@
 package wbs.smsapps.manualresponder.console;
 
+import static wbs.framework.utils.etc.ConcurrentUtils.futureValue;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -83,7 +84,7 @@ class ManualResponderStatusLine
 
 	@Override
 	public
-	String getUpdateScript () {
+	Future<String> getUpdateScript () {
 
 		// find or create per-operator caches
 
@@ -107,10 +108,11 @@ class ManualResponderStatusLine
 
 		// return update script
 
-		return stringFormat (
-			"updateManualResponder (%s, %s);\n",
-			caches.numTodayCache.get (),
-			caches.numThisHourCache.get ());
+		return futureValue (
+			stringFormat (
+				"updateManualResponder (%s, %s);\n",
+				caches.numTodayCache.get (),
+				caches.numThisHourCache.get ()));
 
 	}
 

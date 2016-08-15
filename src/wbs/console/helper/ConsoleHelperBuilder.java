@@ -1,5 +1,8 @@
 package wbs.console.helper;
 
+import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.lang.reflect.Constructor;
@@ -7,18 +10,20 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.forms.EntityFinder;
 import wbs.console.lookup.ObjectLookup;
@@ -33,9 +38,6 @@ import wbs.framework.object.ObjectHelperMethods;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
-
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleHelperBuilder")
@@ -130,7 +132,7 @@ class ConsoleHelperBuilder {
 		try {
 
 			extraImplementation =
-				applicationContext.getBean (
+				applicationContext.getBeanRequired (
 					extraImplementationBeanName,
 					Object.class);
 
@@ -163,7 +165,7 @@ class ConsoleHelperBuilder {
 		try {
 
 			daoImplementation =
-				applicationContext.getBean (
+				applicationContext.getBeanRequired (
 					daoImplementationBeanName,
 					Object.class);
 
@@ -207,7 +209,7 @@ class ConsoleHelperBuilder {
 		try {
 
 			consoleHooks =
-				applicationContext.getBean (
+				applicationContext.getBeanRequired (
 					consoleHooksBeanName,
 					ConsoleHooks.class);
 
@@ -248,8 +250,11 @@ class ConsoleHelperBuilder {
 			Class<?> declaringClass =
 				method.getDeclaringClass ();
 
-			if (declaringClass == ObjectHelperMethods.class
-					|| declaringClass == ModelMethods.class) {
+			if (
+				in (
+					declaringClass,
+					objectHelperInterfaces)
+			) {
 
 				return method.invoke (
 					objectHelper,
@@ -477,54 +482,19 @@ class ConsoleHelperBuilder {
 
 		}
 
-		/*
-		@Override
-		public
-		String contextNameForChild (
-				Record object) {
-
-			return consoleHelperProvider
-				.contextNameForChild (object);
-
-		}
-
-		@Override
-		public
-		boolean hasListContext () {
-			return consoleHelperProvider.hasListContext ();
-		}
-
-		@Override
-		public
-		boolean hasObjectContext () {
-			return consoleHelperProvider.hasObjectContext ();
-		}
-
-		@Override
-		public
-		boolean hasBothContexts () {
-			return consoleHelperProvider.hasBothContexts ();
-		}
-
-		@Override
-		public
-		String[] objectContextTypes () {
-			return consoleHelperProvider.objectContextTypes ();
-		}
-
-		@Override
-		public
-		String[] listContextTypes () {
-			return consoleHelperProvider.listContextTypes ();
-		}
-
-		@Override
-		public
-		List<Pair<String,String>> contextLinkSpecs () {
-			return consoleHelperProvider.contextLinkSpecs ();
-		}
-		*/
-
 	}
+
+	public final static
+	Set<Class<?>> objectHelperInterfaces =
+		ImmutableSet.<Class<?>>builder ()
+
+		.add (
+			ModelMethods.class)
+
+		.addAll (
+			Arrays.asList (
+				ObjectHelperMethods.class.getInterfaces ()))
+
+		.build ();
 
 }

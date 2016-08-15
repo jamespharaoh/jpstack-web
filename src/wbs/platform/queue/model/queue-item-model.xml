@@ -11,9 +11,11 @@
 		<!-- identity -->
 
 		<parent-field
-			type="queueSubject"/>
+			type="queueSubject"
+			cacheable="yes"/>
 
-		<index-field/>
+		<index-field
+			cacheable="yes"/>
 
 		<timestamp-field
 			name="createdTime"

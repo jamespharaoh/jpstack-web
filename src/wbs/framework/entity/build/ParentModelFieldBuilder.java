@@ -105,6 +105,11 @@ class ParentModelFieldBuilder {
 			.nullable (
 				false)
 
+			.cacheable (
+				ifNull (
+					spec.cacheable (),
+					false))
+
 			.columnNames (
 				ImmutableList.<String>of (
 					ifNull (

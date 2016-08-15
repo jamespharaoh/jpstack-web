@@ -8,14 +8,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
-
-import com.google.common.collect.ImmutableMap;
-
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -61,11 +59,18 @@ class ChatSettingsMonitorsPart
 
 		List<Integer> onlineMonitorIds =
 			chatUserHelper.searchIds (
-				ImmutableMap.<String,Object>builder ()
-					.put ("chatId", chat.getId ())
-					.put ("type", ChatUserType.monitor)
-					.put ("online", true)
-					.build ());
+				new ChatUserSearch ()
+
+			.chatId (
+				(long) chat.getId ())
+
+			.type (
+				ChatUserType.monitor)
+
+			.online (
+				true)
+
+		);
 
 		log.debug ("Got " + onlineMonitorIds.size ());
 

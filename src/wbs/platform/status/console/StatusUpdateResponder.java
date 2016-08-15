@@ -1,11 +1,15 @@
 package wbs.platform.status.console;
 
+import static wbs.framework.utils.etc.ConcurrentUtils.futureGet;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -85,6 +89,18 @@ class StatusUpdateResponder
 			rootHelper.findRequired (
 				0);
 
+		// get status lines
+
+		List<Future<String>> futures =
+			statusLineManager.getStatusLines ().stream ()
+
+			.map (
+				statusLine ->
+					statusLine.getUpdateScript ())
+
+			.collect (
+				Collectors.toList ());
+
 		// create the html
 
 		StringWriter stringWriter =
@@ -117,15 +133,19 @@ class StatusUpdateResponder
 
 		}
 
-		for (
-			StatusLine statusLine
-				: statusLineManager.getStatusLines ()
-		) {
+		// close transaction
 
-			printWriter.print (
-				statusLine.getUpdateScript ());
+		transaction.close ();
 
-		}
+		// wait for status lines
+
+		futures.forEach (
+			future ->
+				printWriter.print (
+					futureGet (
+						future)));
+
+		// convert to string
 
 		javascript =
 			stringWriter.toString ();

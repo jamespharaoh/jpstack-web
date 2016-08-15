@@ -168,35 +168,8 @@ class QueueItemDaoHibernate
 
 	@Override
 	public
-	QueueItemRec findByIndex (
-			@NonNull QueueSubjectRec queueSubject,
-			int index) {
-
-		return findOne (
-			"findByIndex (queueSubject, index)",
-			QueueItemRec.class,
-
-			createCriteria (
-				QueueItemRec.class,
-				"_queueItemRec")
-
-			.add (
-				Restrictions.eq (
-					"_queueItem.queueSubject",
-					queueSubject))
-
-			.add (
-				Restrictions.eq (
-					"_queueItem.index",
-					index))
-
-		);
-
-	}
-
-	@Override
-	public
-	List<QueueItemRec> findActive () {
+	List<QueueItemRec> find (
+			@NonNull List<QueueItemState> states) {
 
 		return findMany (
 			"findActive ()",
@@ -209,10 +182,7 @@ class QueueItemDaoHibernate
 			.add (
 				Restrictions.in (
 					"_queueItem.state",
-					ImmutableList.of (
-						QueueItemState.pending,
-						QueueItemState.waiting,
-						QueueItemState.claimed)))
+					states))
 
 		);
 

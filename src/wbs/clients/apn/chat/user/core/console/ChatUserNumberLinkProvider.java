@@ -2,17 +2,15 @@ package wbs.clients.apn.chat.user.core.console;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.joda.time.Instant;
 
-import com.google.common.collect.ImmutableMap;
-
 import wbs.clients.apn.chat.user.core.model.ChatUserDao;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -57,18 +55,14 @@ class ChatUserNumberLinkProvider
 
 		// find relevant subs
 
-		Map<String,Object> searchMap =
-			ImmutableMap.<String,Object>builder ()
-
-				.put (
-					"numberId",
-					number.getId ())
-
-				.build ();
-
 		List<Integer> chatUserIds =
 			chatUserHelper.searchIds (
-				searchMap);
+				new ChatUserSearch ()
+
+			.numberId (
+				(long) number.getId ())
+
+		);
 
 		// create advices
 

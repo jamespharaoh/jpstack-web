@@ -1,23 +1,24 @@
 package wbs.clients.apn.chat.graphs.console;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
+import org.joda.time.Interval;
 
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
+import wbs.framework.utils.TextualInterval;
 
 @PrototypeComponent ("chatGraphsJoinersImageResponder")
 public
@@ -81,41 +82,27 @@ class ChatGraphsJoinersImageResponder
 			chatHelper.findRequired (
 				chatId);
 
-		Map<String,Object> searchMap =
-			new LinkedHashMap<String,Object> ();
-
-		searchMap.put (
-			"chatId",
-			chat.getId ());
-
-		searchMap.put (
-			"firstJoinAfter",
-			minTime);
-
-		searchMap.put (
-			"firstJoinBefore",
-			maxTime);
-
-		searchMap.put (
-			"chatId",
-			chat.getId ());
-
-		Integer chatAffiliateId =
-			(Integer)
-			contextStuff.get (
-				"chatAffiliateId");
-
-		if (chatAffiliateId != null) {
-
-			searchMap.put (
-				"chatAffiliateId",
-				chatAffiliateId);
-
-		}
-
 		List<Integer> chatUserIds =
 			chatUserHelper.searchIds (
-				searchMap);
+				new ChatUserSearch ()
+
+			.chatId (
+				(long) chat.getId ())
+
+			.firstJoin (
+				TextualInterval.forInterval (
+					DateTimeZone.UTC,
+					new Interval (
+						minTime,
+						maxTime)))
+
+			.chatAffiliateId (
+				(long)
+				(Integer)
+				contextStuff.get (
+					"chatAffiliateId"))
+
+		);
 
 		timezone =
 			chatMiscLogic.timezone (

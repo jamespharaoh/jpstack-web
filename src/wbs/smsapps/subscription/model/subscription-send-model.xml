@@ -11,9 +11,11 @@
 		<!-- identity -->
 
 		<parent-field
-			type="subscription"/>
+			type="subscription"
+			cacheable="yes"/>
 
-		<index-field/>
+		<index-field
+			cacheable="yes"/>
 
 		<!-- details -->
 

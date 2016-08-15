@@ -22,4 +22,8 @@ class CodeFieldSpec
 	@DataAttribute
 	String columnName;
 
+	@DataAttribute (
+		name = "cacheable")
+	Boolean cacheable;
+
 }

@@ -11,9 +11,11 @@
 		<!-- identity -->
 
 		<parent-field
-			type="chatContact"/>
+			type="chatContact"
+			cacheable="yes"/>
 
-		<index-field/>
+		<index-field
+			cacheable="yes"/>
 
 		<!-- data -->
 

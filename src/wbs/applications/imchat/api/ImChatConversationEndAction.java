@@ -165,7 +165,7 @@ class ImChatConversationEndAction
 		}
 
 		ImChatConversationRec conversation =
-			imChatConversationHelper.findByIndex (
+			imChatConversationHelper.findByIndexOrNull (
 				customer,
 				endRequest.conversationIndex ());
 

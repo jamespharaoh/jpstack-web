@@ -1,10 +1,11 @@
 package wbs.clients.apn.chat.contact.logic;
 
-import static wbs.framework.utils.etc.Misc.allOf;
+import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 import static wbs.framework.utils.etc.TimeUtils.isoDate;
 
@@ -18,9 +19,6 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
@@ -28,6 +26,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.approval.model.ChatApprovalRegexpObjectHelper;
 import wbs.clients.apn.chat.approval.model.ChatApprovalRegexpRec;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
@@ -248,14 +248,18 @@ class ChatMessageLogicImplementation
 
 		// ignored duplicated messages
 
-		if (
-			allOf (
-				source != ChatMessageMethod.iphone,
-				chatMessageIsRecentDupe (
-					fromUser,
-					toUser,
-					originalText))
-		) {
+		if (allOf (
+
+			() -> notEqual (
+				source,
+				ChatMessageMethod.iphone),
+
+			() -> chatMessageIsRecentDupe (
+				fromUser,
+				toUser,
+				originalText)
+
+		)) {
 
 			String errorMessage =
 				stringFormat (

@@ -123,7 +123,7 @@ class WbsServletListener
 
 			ThreadLocalProxyBeanFactory.Control control =
 				(ThreadLocalProxyBeanFactory.Control)
-				applicationContext.getBean (
+				applicationContext.getBeanRequired (
 					requestBeanName,
 					Object.class);
 
@@ -168,7 +168,7 @@ class WbsServletListener
 
 				ThreadLocalProxyBeanFactory.Control control =
 					(ThreadLocalProxyBeanFactory.Control)
-					applicationContext.getBean (
+					applicationContext.getBeanRequired (
 						requestBeanName,
 						Object.class);
 
@@ -178,7 +178,7 @@ class WbsServletListener
 						requestBeanName);
 
 				Object targetBean =
-					applicationContext.getBean (
+					applicationContext.getBeanRequired (
 						targetBeanName,
 						Object.class);
 
@@ -201,7 +201,7 @@ class WbsServletListener
 
 					ThreadLocalProxyBeanFactory.Control control =
 						(ThreadLocalProxyBeanFactory.Control)
-						applicationContext.getBean (
+						applicationContext.getBeanRequired (
 							requestBeanName,
 							Object.class);
 

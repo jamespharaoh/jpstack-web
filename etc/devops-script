@@ -233,11 +233,16 @@ class DevopsScript
 		@config_root =
 			@config_document.root
 
+		@config_connection =
+			@config_root.find_first "connection"
+
+		# home
+
 		@config_home =
 			@config_root.find_first "home"
 
-		@config_connection =
-			@config_root.find_first "connection"
+		@home_path =
+			@config_home["path"].gsub(/\$HOME/, ENV["HOME"])
 
 		# logs
 
@@ -273,7 +278,7 @@ class DevopsScript
 	def setup
 
 		Dir.chdir \
-			@config_home["path"]
+			@home_path
 
 	end
 

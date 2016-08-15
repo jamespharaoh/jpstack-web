@@ -1,9 +1,10 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.framework.utils.etc.Misc.allOf;
+import static wbs.framework.utils.etc.LogicUtils.allOf;
+import static wbs.framework.utils.etc.LogicUtils.not;
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.not;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Set;
@@ -25,7 +26,6 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
@@ -296,21 +296,19 @@ class ManualResponderRequestPendingFormResponder
 
 			goAccessDenied ();
 
-		} else if (
+		} else if (allOf (
 
-			allOf (
+			() -> templates.isEmpty (),
 
-				templates.isEmpty (),
+			() -> not (
+				manualResponder.getCanIgnore ()),
 
-				not (
-					manualResponder.getCanIgnore ()),
+			() -> not (
+				privChecker.canRecursive (
+					manualResponder,
+					"manage"))
 
-				not (
-					privChecker.canRecursive (
-						manualResponder,
-						"manage")))
-
-		) {
+		)) {
 
 			goNoTemplates ();
 

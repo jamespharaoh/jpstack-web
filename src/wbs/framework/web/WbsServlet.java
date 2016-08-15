@@ -328,7 +328,7 @@ class WbsServlet
 		}
 
 		requestContext =
-			applicationContext.getBean (
+			applicationContext.getBeanRequired (
 				"requestContext",
 				RequestContext.class);
 

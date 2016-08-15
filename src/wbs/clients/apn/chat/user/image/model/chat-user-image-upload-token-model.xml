@@ -11,9 +11,11 @@
 		<!-- identity -->
 
 		<parent-field
-			type="chatUser"/>
+			type="chatUser"
+			cacheable="yes"/>
 
-		<index-field/>
+		<index-field
+			cacheable="yes"/>
 
 		<!-- secondary identity -->
 

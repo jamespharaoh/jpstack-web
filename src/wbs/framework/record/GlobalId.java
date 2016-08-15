@@ -30,6 +30,18 @@ class GlobalId {
 
 	}
 
+	public static
+	GlobalId of (
+			long typeId,
+			long objectId) {
+
+		return new GlobalId (
+			typeId,
+			objectId);
+
+	}
+			
+
 	public final static
 	GlobalId root =
 		new GlobalId (

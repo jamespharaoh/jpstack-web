@@ -106,7 +106,7 @@ class BeanRunner {
 		// find runnable and run it
 
 		Object runner =
-			applicationContext.getBean (
+			applicationContext.getBeanRequired (
 				uncapitalise (
 					runnerClass.getSimpleName ()),
 				runnerClass);

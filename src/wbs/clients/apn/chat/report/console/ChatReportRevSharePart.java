@@ -391,7 +391,7 @@ class ChatReportRevSharePart
 				new ChatUserSearch ()
 
 			.chatId (
-				chat.getId ())
+				(long) chat.getId ())
 
 			.firstJoin (
 				TextualInterval.forInterval (

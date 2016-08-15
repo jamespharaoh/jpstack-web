@@ -2,9 +2,9 @@ package wbs.framework.entity.model;
 
 import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.uncapitalise;
 
 import java.lang.annotation.Annotation;
@@ -15,7 +15,6 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
@@ -23,6 +22,8 @@ import wbs.framework.entity.build.ModelBuilderManager;
 import wbs.framework.entity.build.ModelFieldBuilderContext;
 import wbs.framework.entity.build.ModelFieldBuilderTarget;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.object.ObjectHelper;
+import wbs.framework.record.Record;
 import wbs.framework.schema.helper.SchemaNamesHelper;
 import wbs.framework.schema.helper.SchemaTypesHelper;
 
@@ -52,15 +53,15 @@ class ModelBuilder {
 	PluginModelSpec pluginModel;
 	PluginSpec plugin;
 
-	Model model;
+	ModelImplementation model;
 
 	String recordClassName;
 	String recordClassNameFull;
-	Class<?> recordClass;
+	Class<? extends Record<?>> recordClass;
 
 	String objectHelperClassName;
 	String objectHelperClassNameFull;
-	Class<?> objectHelperClass;
+	Class<? extends ObjectHelper<?>> objectHelperClass;
 
 	// implementation
 
@@ -103,9 +104,14 @@ class ModelBuilder {
 				plugin.packageName (),
 				recordClassName);
 
-		recordClass =
+		@SuppressWarnings ("unchecked")
+		Class<? extends Record<?>> recordClassTemp =
+			(Class<? extends Record<?>>)
 			classForNameRequired (
 				recordClassNameFull);
+
+		recordClass =
+			recordClassTemp;
 
 		// object helper class
 
@@ -121,14 +127,19 @@ class ModelBuilder {
 				plugin.packageName (),
 				objectHelperClassName);
 
-		objectHelperClass =
+		@SuppressWarnings ("unchecked")
+		Class<? extends ObjectHelper<?>> objectHelperClassTemp =
+			(Class<? extends ObjectHelper<?>>)
 			classForNameRequired (
 				objectHelperClassNameFull);
+
+		objectHelperClass =
+			objectHelperClassTemp;
 
 		// model
 
 		model =
-			new Model ()
+			new ModelImplementation ()
 
 			.objectClass (
 				recordClass)

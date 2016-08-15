@@ -61,6 +61,7 @@ class ChatUserConsoleHooks
 			search
 
 				.chatId (
+					(long)
 					requestContext.stuffInt (
 						"chatId"))
 

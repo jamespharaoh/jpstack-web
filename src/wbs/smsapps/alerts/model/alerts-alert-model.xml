@@ -7,9 +7,11 @@
 		<generated-id-field/>
 
 		<parent-field
-			type="alertsSettings"/>
+			type="alertsSettings"
+			cacheable="yes"/>
 
-		<index-field/>
+		<index-field
+			cacheable="yes"/>
 
 		<timestamp-field
 			name="timestamp"

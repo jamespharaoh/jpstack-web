@@ -3,11 +3,10 @@ package wbs.clients.apn.chat.user.core.model;
 import java.io.Serializable;
 import java.util.Collection;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import org.apache.commons.lang3.Range;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.framework.utils.TextualInterval;
@@ -18,22 +17,33 @@ public
 class ChatUserSearch
 	implements Serializable {
 
-	Integer chatId;
+	Long chatId;
 
 	ChatUserType type;
+	Collection<ChatUserType> typeIn;
 
 	String code;
+	Collection<String> codeIn;
 
+	Long numberId;
 	String numberLike;
 
 	Boolean blockAll;
+	Boolean barred;
 	Boolean deleted;
 
+	Boolean hasGender;
 	Gender gender;
+	Collection<Gender> genderIn;
+
+	Boolean hasOrient;
 	Orient orient;
+	Collection<Orient> orientIn;
+
+	Long chatAffiliateId;
 
 	Boolean hasCategory;
-	Integer categoryId;
+	Long categoryId;
 
 	String name;
 	String info;
@@ -43,6 +53,7 @@ class ChatUserSearch
 
 	Boolean hasPicture;
 	Boolean hasVideo;
+	Boolean hasAudio;
 
 	Boolean adultVerified;
 
@@ -57,6 +68,7 @@ class ChatUserSearch
 	TextualInterval lastJoin;
 
 	ChatUserDateMode datingMode;
+	Boolean hasDatingMode;
 
 	Collection<ChatMessageMethod> deliveryMethodIn;
 

@@ -100,7 +100,10 @@ class MasterModelFieldBuilder {
 					fullFieldTypeName))
 
 			.nullable (
-				false);
+				false)
+
+			.cacheable (
+				true);
 
 		// store field
 

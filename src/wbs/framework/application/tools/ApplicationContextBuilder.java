@@ -3,9 +3,9 @@ package wbs.framework.application.tools;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -16,15 +16,14 @@ import java.util.Map;
 
 import javax.inject.Named;
 
+import com.google.common.collect.ImmutableList;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-
-import com.google.common.collect.ImmutableList;
-
 import wbs.api.module.ApiModule;
 import wbs.api.module.ApiModuleFactory;
 import wbs.api.module.ApiModuleSpec;
@@ -63,8 +62,6 @@ import wbs.framework.application.scaffold.PluginModelsSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.object.ObjectHelperFactory;
-import wbs.framework.object.ObjectHelperProvider;
-import wbs.framework.object.ObjectHelperProviderFactory;
 import wbs.framework.object.ObjectHooks;
 
 @Accessors (fluent = true)
@@ -752,10 +749,6 @@ class ApplicationContextBuilder {
 					projectModelSpec);
 
 			errorCount +=
-				registerObjectHelperProvider (
-					projectModelSpec);
-
-			errorCount +=
 				registerObjectHelper (
 					projectModelSpec);
 
@@ -1339,49 +1332,6 @@ class ApplicationContextBuilder {
 
 			.scope (
 				"singleton")
-
-		);
-
-		return 0;
-
-	}
-
-	int registerObjectHelperProvider (
-			@NonNull PluginModelSpec model)
-		throws Exception {
-
-		String objectHooksBeanName =
-			stringFormat (
-				"%sHooks",
-				model.name ());
-
-		String objectHelperProviderBeanName =
-			stringFormat (
-				"%sObjectHelperProvider",
-				model.name ());
-
-		applicationContext.registerBeanDefinition (
-			new BeanDefinition ()
-
-			.name (
-				objectHelperProviderBeanName)
-
-			.beanClass (
-				ObjectHelperProvider.class)
-
-			.scope (
-				"singleton")
-
-			.factoryClass (
-				ObjectHelperProviderFactory.class)
-
-			.addValueProperty (
-				"objectName",
-				model.name ())
-
-			.addReferenceProperty (
-				"objectHooks",
-				objectHooksBeanName)
 
 		);
 

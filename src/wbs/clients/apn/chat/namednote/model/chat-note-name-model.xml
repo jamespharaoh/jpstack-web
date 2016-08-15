@@ -11,7 +11,8 @@
 		<!-- identity -->
 
 		<parent-field
-			type="chat"/>
+			type="chat"
+			cacheable="yes"/>
 
 		<index-field/>
 

@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.allOf;
+import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 
@@ -137,11 +137,15 @@ class ChatUserAdminDeletePart
 				" value=\"delete user\"",
 				"></p>\n");
 
-		} else if (
-			allOf (
-				isNotNull (chatUser.getOldNumber ()),
-				isNull (newChatUser))
-		) {
+		} else if (allOf (
+		
+			() -> isNotNull (
+				chatUser.getOldNumber ()),
+
+			() -> isNull (
+				newChatUser)
+
+		)) {
 
 			printFormat (
 				"<p><input",
@@ -150,11 +154,15 @@ class ChatUserAdminDeletePart
 				" value=\"undelete user\"",
 				"></p>\n");
 
-		} else if (
-			allOf (
-				isNull (chatUser.getOldNumber ()),
-				isNotNull (newChatUser))
-		) {
+		} else if (allOf (
+
+			() -> isNull (
+				chatUser.getOldNumber ()),
+
+			() -> isNotNull (
+				newChatUser)
+
+		)) {
 
 			printFormat (
 				"<p>This user cannot be undeleted, because there is a new ",

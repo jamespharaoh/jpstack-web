@@ -961,6 +961,7 @@ class ChatUserDaoHibernate
 			criteria.add (
 				Restrictions.eq (
 					"_chat.id",
+					(int) (long)
 					search.chatId ()));
 
 		}
@@ -979,6 +980,18 @@ class ChatUserDaoHibernate
 
 		if (
 			isNotNull (
+				search.typeIn ())
+		) {
+
+			criteria.add (
+				Restrictions.in (
+					"_chatUser.type",
+					search.typeIn ()));
+
+		}
+
+		if (
+			isNotNull (
 				search.code ())
 		) {
 
@@ -991,6 +1004,18 @@ class ChatUserDaoHibernate
 
 		if (
 			isNotNull (
+				search.codeIn ())
+		) {
+
+			criteria.add (
+				Restrictions.in (
+					"_chatUser.code",
+					search.codeIn ()));
+
+		}
+
+		if (
+			isNotNull (
 				search.blockAll ())
 		) {
 
@@ -998,6 +1023,18 @@ class ChatUserDaoHibernate
 				Restrictions.eq (
 					"_chatUser.blockAll",
 					search.blockAll ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.barred ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatUser.barred",
+					search.barred ()));
 
 		}
 
@@ -1027,6 +1064,27 @@ class ChatUserDaoHibernate
 
 		if (
 			isNotNull (
+				search.hasGender ())
+		) {
+
+			if (search.hasGender ()) {
+
+				criteria.add (
+					Restrictions.isNotNull (
+						"_chatUser.gender"));
+
+			} else {
+
+				criteria.add (
+					Restrictions.isNull (
+						"_chatUser.gender"));
+
+			}
+
+		}
+
+		if (
+			isNotNull (
 				search.gender ())
 		) {
 
@@ -1034,6 +1092,39 @@ class ChatUserDaoHibernate
 				Restrictions.eq (
 					"_chatUser.gender",
 					search.gender ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.genderIn ())
+		) {
+
+			criteria.add (
+				Restrictions.in (
+					"_chatUser.genderIn",
+					search.genderIn ()));
+
+		}		
+
+		if (
+			isNotNull (
+				search.hasOrient ())
+		) {
+
+			if (search.hasOrient ()) {
+
+				criteria.add (
+					Restrictions.isNotNull (
+						"_chatUser.orient"));
+
+			} else {
+
+				criteria.add (
+					Restrictions.isNull (
+						"_chatUser.orient"));
+
+			}
 
 		}
 
@@ -1051,15 +1142,42 @@ class ChatUserDaoHibernate
 
 		if (
 			isNotNull (
+				search.orientIn ())
+		) {
+
+			criteria.add (
+				Restrictions.in (
+					"_chatUser.orientIn",
+					search.orientIn ()));
+
+		}		
+
+		if (
+			isNotNull (
+				search.chatAffiliateId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatUser.chatAffiliate.id",
+					(int) (long)
+					search.chatAffiliateId ()));
+
+		}
+
+		if (
+			isNotNull (
 				search.hasCategory ())
 		) {
 
 			criteria.add (
 				search.hasCategory ()
-					? Restrictions.isNotNull (
-						"_chatUser.category")
-					: Restrictions.isNull (
-						"_chatUser.category"));
+
+				? Restrictions.isNotNull (
+					"_chatUser.category")
+
+				: Restrictions.isNull (
+					"_chatUser.category"));
 
 		}
 
@@ -1071,7 +1189,21 @@ class ChatUserDaoHibernate
 			criteria.add (
 				Restrictions.eq (
 					"_chatUser.category.id",
+					(int) (long)
 					search.categoryId ()));
+
+		}
+		
+		if (
+			isNotNull (
+				search.numberId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_chatUser.number.id",
+					(int) (long)
+					search.numberId ()));
 
 		}
 
@@ -1148,10 +1280,14 @@ class ChatUserDaoHibernate
 
 			criteria.add (
 				search.hasPicture ()
-					? Restrictions.isNotNull (
-						"_chatUser.mainChatUserImage")
-					: Restrictions.isNull (
-						"_chatUser.mainChatUserImage"));
+
+				? Restrictions.isNotNull (
+					"_chatUser.mainChatUserImage")
+
+				: Restrictions.isNull (
+					"_chatUser.mainChatUserImage")
+
+			);
 
 		}
 
@@ -1162,10 +1298,32 @@ class ChatUserDaoHibernate
 
 			criteria.add (
 				search.hasVideo ()
-					? Restrictions.isNotNull (
-						"_chatUser.mainChatUserVideo")
-					: Restrictions.isNull (
-						"_chatUser.mainChatUserVideo"));
+
+				? Restrictions.isNotNull (
+					"_chatUser.mainChatUserVideo")
+
+				: Restrictions.isNull (
+					"_chatUser.mainChatUserVideo")
+
+			);
+
+		}
+
+		if (
+			isNotNull (
+				search.hasAudio ())
+		) {
+
+			criteria.add (
+				search.hasAudio ()
+
+				? Restrictions.isNotNull (
+					"_chatUser.mainChatUserAudio")
+
+				: Restrictions.isNull (
+					"_chatUser.mainChatUserAudio")
+
+			);
 
 		}
 
@@ -1304,6 +1462,24 @@ class ChatUserDaoHibernate
 				Restrictions.eq (
 					"_chatUser.dateMode",
 					search.datingMode ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.hasDatingMode ())
+		) {
+
+			criteria.add (
+				search.hasDatingMode ()
+
+				? Restrictions.isNotNull (
+					"_chatUser.dateMode")
+
+				: Restrictions.isNull (
+					"_chatUser.dateMode")
+
+			);
 
 		}
 

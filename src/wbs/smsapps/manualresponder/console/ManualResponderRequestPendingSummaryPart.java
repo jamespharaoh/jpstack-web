@@ -201,7 +201,7 @@ class ManualResponderRequestPendingSummaryPart
 		smsCustomerSession =
 			smsCustomer != null
 			&& smsCustomer.getNumSessions () > 0
-				? smsCustomerSessionHelper.findByIndex (
+				? smsCustomerSessionHelper.findByIndexOrNull (
 					smsCustomer,
 					smsCustomer.getNumSessions () - 1)
 				: null;

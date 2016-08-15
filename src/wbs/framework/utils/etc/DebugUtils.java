@@ -8,7 +8,7 @@ class DebugUtils {
 
 	public static
 	void debugFormat (
-			@NonNull String... arguments) {
+			@NonNull Object... arguments) {
 
 		System.out.print (
 			"====== ");

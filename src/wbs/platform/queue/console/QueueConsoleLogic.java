@@ -3,9 +3,9 @@ package wbs.platform.queue.console;
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
 
@@ -13,19 +13,19 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.object.ObjectManager;
+import wbs.platform.queue.logic.DummyQueueCache;
 import wbs.platform.queue.metamodel.QueueTypeSpec;
 import wbs.platform.queue.metamodel.QueueTypesSpec;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
@@ -38,6 +38,7 @@ import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.queue.model.QueueTypeRec;
 import wbs.platform.scaffold.logic.SliceLogic;
+import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
 
 @SingletonComponent ("queueConsoleLogic")
@@ -48,6 +49,9 @@ class QueueConsoleLogic {
 
 	@Inject
 	Database database;
+
+	@Inject
+	DummyQueueCache dummyQueueCache;
 
 	@Inject
 	ObjectManager objectManager;
@@ -64,10 +68,13 @@ class QueueConsoleLogic {
 	@Inject
 	SliceLogic sliceLogic;
 
+	@Inject
+	UserConsoleLogic userConsoleLogic;
+
 	// prototype dependencies
 
 	@Inject
-	Provider<QueueSubjectSorter> queueSubjectSorter;
+	Provider<QueueSubjectSorter> queueSubjectSorterProvider;
 
 	// state
 
@@ -175,10 +182,16 @@ class QueueConsoleLogic {
 		// find the next waiting item
 
 		SortedQueueSubjects subjects =
-			queueSubjectSorter.get ()
+			queueSubjectSorterProvider.get ()
+
+			.queueCache (
+				dummyQueueCache)
 
 			.queue (
 				queue)
+
+			.loggedInUser (
+				userConsoleLogic.userRequired ())
 
 			.effectiveUser (
 				user)
@@ -196,7 +209,7 @@ class QueueConsoleLogic {
 			- queueSubject.getActiveItems ();
 
 		QueueItemRec queueItem =
-			queueItemHelper.findByIndex (
+			queueItemHelper.findByIndexOrNull (
 				queueSubject,
 				nextQueueItemId);
 

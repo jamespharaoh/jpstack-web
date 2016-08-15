@@ -4,10 +4,10 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringSplitRegexp;
 import static wbs.framework.utils.etc.StringUtils.underscoreToCamel;
 
@@ -22,7 +22,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.context.ConsoleContextStuffSpec;
 import wbs.console.module.ConsoleManager;
@@ -84,7 +83,7 @@ class GenericConsoleHelperProvider
 	// console helper properties
 
 	@Getter @Setter
-	Class<Record<?>> objectClass;
+	Class<? extends Record<?>> objectClass;
 
 	@Getter @Setter
 	String objectName;
@@ -183,7 +182,7 @@ class GenericConsoleHelperProvider
 		if (consoleHelperProviderSpec.cryptorBeanName () != null) {
 
 			cryptor (
-				applicationContext.getBean (
+				applicationContext.getBeanRequired (
 					consoleHelperProviderSpec.cryptorBeanName (),
 					Cryptor.class));
 

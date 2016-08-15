@@ -372,7 +372,7 @@ class ObjectTicketCreatePageBuilder<
 			@SuppressWarnings ("unchecked")
 			FieldsProvider<TicketRec,TicketManagerRec> fieldsProviderTemp =
 				(FieldsProvider<TicketRec,TicketManagerRec>)
-				applicationContext.getBean (
+				applicationContext.getBeanRequired (
 					spec.fieldsProviderName (),
 					FieldsProvider.class);
 

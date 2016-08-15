@@ -326,7 +326,7 @@ class ObjectSummaryPageBuilder<
 			PagePart get () {
 
 				Object object =
-					applicationContext.getBean (
+					applicationContext.getBeanRequired (
 						beanName,
 						Object.class);
 
@@ -385,7 +385,7 @@ class ObjectSummaryPageBuilder<
 			@SuppressWarnings ("unchecked")
 			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
 				(FieldsProvider<ObjectType,ParentType>)
-				applicationContext.getBean (
+				applicationContext.getBeanRequired (
 					spec.fieldsProviderName (),
 					FieldsProvider.class);
 

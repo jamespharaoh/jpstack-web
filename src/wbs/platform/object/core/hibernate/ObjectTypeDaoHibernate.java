@@ -2,10 +2,9 @@ package wbs.platform.object.core.hibernate;
 
 import java.util.List;
 
-import lombok.NonNull;
-
 import org.hibernate.criterion.Restrictions;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.framework.object.ObjectTypeRegistry;
@@ -31,6 +30,16 @@ class ObjectTypeDaoHibernate
 			ObjectTypeRec.class,
 			id);
 
+	}
+
+	@Override
+	public 
+	ObjectTypeRec findById (
+			@NonNull Long id) {
+	
+		return findById (
+			(int) (long) id);
+	
 	}
 
 	@Override

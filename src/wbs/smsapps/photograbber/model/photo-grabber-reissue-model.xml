@@ -11,9 +11,11 @@
 		<!-- identity -->
 
 		<parent-field
-			type="photoGrabberRequest"/>
+			type="photoGrabberRequest"
+			cacheable="yes"/>
 
-		<index-field/>
+		<index-field
+			cacheable="yes"/>
 
 		<!-- details -->
 

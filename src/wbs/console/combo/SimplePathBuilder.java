@@ -56,7 +56,7 @@ class SimplePathBuilder {
 	void buildPath () {
 
 		PathHandler pathHandler =
-			applicationContext.getBean (
+			applicationContext.getBeanRequired (
 				pathHandlerName,
 				PathHandler.class);
 

@@ -11,10 +11,12 @@
 		<!-- identity -->
 
 		<parent-field
-			type="broadcastConfig"/>
+			type="broadcastConfig"
+			cacheable="yes"/>
 
 		<index-field
-			counter="numTotal"/>
+			counter="numTotal"
+			cacheable="yes"/>
 
 		<!-- details -->
 

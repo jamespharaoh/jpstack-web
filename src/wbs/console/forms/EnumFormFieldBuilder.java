@@ -123,7 +123,7 @@ class EnumFormFieldBuilder {
 				false);
 
 		EnumConsoleHelper enumConsoleHelper =
-			applicationContext.getBean (
+			applicationContext.getBeanRequired (
 				spec.helperBeanName (),
 				EnumConsoleHelper.class);
 

@@ -1,10 +1,10 @@
 package wbs.clients.apn.chat.supervisor.console;
 
-import static wbs.framework.utils.etc.Misc.anyOf;
+import static wbs.framework.utils.etc.LogicUtils.anyOf;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 import static wbs.framework.utils.etc.StringUtils.spacify;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,14 +93,16 @@ class ChatSupervisorConversationPart
 			chatUserHelper.findRequired (
 				chatUserId2);
 
-		if (
-			anyOf (
-				notEqual (
-					userChatUser.getChat (),
-					chat),
-				notEqual (
-					monitorChatUser.getChat (),
-					chat))
+		if (anyOf (
+
+			() -> notEqual (
+				userChatUser.getChat (),
+				chat),
+
+			() -> notEqual (
+				monitorChatUser.getChat (),
+				chat))
+
 		) {
 
 			throw new RuntimeException (

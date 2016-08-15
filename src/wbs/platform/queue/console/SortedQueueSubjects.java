@@ -22,30 +22,30 @@ class SortedQueueSubjects {
 	List<QueueInfo> allQueues;
 
 	@Getter
-	int totalItems = 0;
+	long totalItems = 0;
 
 	@Getter
-	int waitingItems = 0;
+	long waitingItems = 0;
 
 	@Getter
-	int totalAvailableItems = 0;
+	long totalAvailableItems = 0;
 
 	@Getter
-	int totalAvailableSubjects = 0;
+	long totalAvailableSubjects = 0;
 
 	@Getter
-	int totalClaimedItems = 0;
+	long totalClaimedItems = 0;
 
 	@Getter
-	int userClaimedItems = 0;
+	long userClaimedItems = 0;
 
 	@Getter
-	int totalClaimedSubjects = 0;
+	long totalClaimedSubjects = 0;
 
 	@Getter
-	int totalUnavailableItems = 0;
+	long totalUnavailableItems = 0;
 
 	@Getter
-	int totalUnavailableSubjects = 0;
+	long totalUnavailableSubjects = 0;
 
 }

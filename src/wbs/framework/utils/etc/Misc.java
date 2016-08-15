@@ -1104,59 +1104,6 @@ class Misc {
 	}
 
 	public static
-	boolean allOf (
-			boolean... values) {
-
-		for (boolean value : values) {
-
-			if (! value)
-				return false;
-
-		}
-
-		return true;
-
-	}
-
-	public static
-	boolean anyOf (
-			boolean... values) {
-
-		for (boolean value : values) {
-
-			if (value)
-				return true;
-
-		}
-
-		return false;
-
-	}
-
-	public static
-	boolean not (
-			boolean value) {
-
-		return ! value;
-
-	}
-
-	public static
-	boolean allFalse (
-			boolean... values) {
-
-		for (boolean value : values) {
-
-			if (value)
-				return false;
-
-		}
-
-		return true;
-
-	}
-
-	public static
 	boolean isEmpty (
 			@NonNull Collection<?> collection) {
 

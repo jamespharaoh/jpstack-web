@@ -123,7 +123,7 @@ class ImChatMessageListAction
 		// find conversation
 
 		ImChatConversationRec conversation =
-			imChatConversationHelper.findByIndex (
+			imChatConversationHelper.findByIndexOrNull (
 				customer,
 				request.conversationIndex ());
 

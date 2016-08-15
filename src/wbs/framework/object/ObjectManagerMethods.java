@@ -6,11 +6,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
 import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
@@ -34,7 +33,7 @@ interface ObjectManagerMethods {
 			Record<?> object,
 			Class<ObjectType> childClass);
 
-	int getObjectTypeId (
+	Long getObjectTypeId (
 			Record<?> object);
 
 	String getCode (
@@ -74,9 +73,9 @@ interface ObjectManagerMethods {
 			String typeCode);
 
 	ObjectHelper<?> objectHelperForTypeId (
-			Integer typeId);
+			Long typeId);
 
-	int objectClassToTypeId (
+	Long objectClassToTypeId (
 			Class<?> objectClass);
 
 	boolean isParent (
@@ -245,7 +244,7 @@ interface ObjectManagerMethods {
 	ObjectHelper<?> objectHelperForObject (
 			Record<?> object);
 
-	ObjectHelper<?> objectHelperForClass (
+	ObjectHelper<?> objectHelperForClassRequired (
 			Class<?> objectClass);
 
 }

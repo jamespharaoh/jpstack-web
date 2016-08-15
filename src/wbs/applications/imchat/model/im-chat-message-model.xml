@@ -11,10 +11,12 @@
 		<!-- identity -->
 
 		<parent-field
-			type="imChatConversation"/>
+			type="imChatConversation"
+			cacheable="yes"/>
 
 		<index-field
-			counter="numMessages"/>
+			counter="numMessages"
+			cacheable="yes"/>
 
 		<!-- state -->
 

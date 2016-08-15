@@ -27,4 +27,8 @@ class IndexFieldSpec
 		name = "column")
 	String columnName;
 
+	@DataAttribute (
+		name = "cacheable")
+	Boolean cacheable;
+
 }

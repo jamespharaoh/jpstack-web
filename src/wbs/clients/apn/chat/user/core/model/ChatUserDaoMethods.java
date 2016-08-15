@@ -52,6 +52,7 @@ interface ChatUserDaoMethods {
 	List<ChatUserRec> findWantingAdultAd (
 			Instant now);
 
+	@Deprecated
 	List<Integer> searchIds (
 			Map<String,Object> searchMap);
 

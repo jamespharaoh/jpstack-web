@@ -1,12 +1,12 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.anyOf;
+import static wbs.framework.utils.etc.LogicUtils.anyOf;
+import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.Gender;
@@ -105,48 +105,28 @@ class ChatUserAdminPrefsAction
 		Gender oldGender =
 			chatUser.getGender ();
 
-		Gender newGender = null;
-
-		if (genderParam.equals ("male")) {
-
-			newGender =
-				Gender.male;
-
-		} else if (genderParam.equals("female")) {
-
-			newGender =
-				Gender.female;
-
-		}
+		Gender newGender =
+			Gender.valueOf (
+				genderParam);
 
 		Orient oldOrient =
 			chatUser.getOrient ();
 
 		Orient newOrient =
-			null;
+			Orient.valueOf (
+				orientParam);
 
-		if (orientParam.equals ("gay")) {
+		if (anyOf (
+		
+			() -> notEqual (
+				oldGender,
+				newGender),
 
-			newOrient =
-				Orient.gay;
+			() -> notEqual (
+				oldOrient,
+				newOrient)
 
-		} else if (orientParam.equals ("bi")) {
-
-			newOrient =
-				Orient.bi;
-
-		} else if (orientParam.equals ("straight")) {
-
-			newOrient =
-				Orient.straight;
-
-		}
-
-		if (
-			anyOf (
-				oldGender != newGender,
-				oldOrient != newOrient)
-		) {
+		)) {
 
 			chatUser
 

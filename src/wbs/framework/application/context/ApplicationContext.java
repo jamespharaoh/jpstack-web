@@ -4,10 +4,10 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.joinWithSeparator;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,14 +35,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Qualifier;
 
-import lombok.Cleanup;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -51,6 +43,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
+import lombok.Cleanup;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.PrototypeDependency;
@@ -135,9 +134,8 @@ class ApplicationContext {
 	EasyReadWriteLock lock =
 		EasyReadWriteLock.instantiate ();
 
-	public
-	<BeanType>
-	BeanType getBean (
+	public <BeanType>
+	BeanType getBeanRequired (
 			String beanName,
 			Class<BeanType> beanClass) {
 
@@ -146,7 +144,8 @@ class ApplicationContext {
 			lock.read ();
 
 		BeanDefinition beanDefinition =
-			beanDefinitionsByName.get (beanName);
+			beanDefinitionsByName.get (
+				beanName);
 
 		if (beanDefinition == null) {
 
@@ -155,6 +154,33 @@ class ApplicationContext {
 					"Bean definition with name %s does not exist",
 					beanName));
 
+		}
+
+		return beanClass.cast (
+			getBean (
+				beanDefinition));
+
+	}
+
+	public <BeanType>
+	BeanType getBeanOrElse (
+			String beanName,
+			Class<BeanType> beanClass,
+			Provider<BeanType> orElse) {
+
+		@Cleanup
+		HeldLock heldLock =
+			lock.read ();
+
+		BeanDefinition beanDefinition =
+			beanDefinitionsByName.get (
+				beanName);
+
+		if (
+			isNull (
+				beanDefinition)
+		) {
+			return orElse.get ();
 		}
 
 		return beanClass.cast (
@@ -522,7 +548,7 @@ class ApplicationContext {
 					entry.getKey ()));
 
 			Object target =
-				getBean (
+				getBeanRequired (
 					entry.getValue (),
 					Object.class);
 
@@ -1175,7 +1201,7 @@ class ApplicationContext {
 				continue;
 			}
 
-			getBean (
+			getBeanRequired (
 				beanDefinition.name (),
 				Object.class);
 

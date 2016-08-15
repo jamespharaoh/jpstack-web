@@ -334,7 +334,7 @@ class ActivityManagerImplementation
 				continue;
 			}
 
-			writeTask (
+			writeActiveTaskRecursive (
 				formatWriter,
 				indent,
 				task);
@@ -403,6 +403,36 @@ class ActivityManagerImplementation
 						writer,
 						nextIndent,
 						minDuration,
+						childTask));
+
+	}
+
+	public
+	void writeActiveTaskRecursive (
+			@NonNull FormatWriter writer,
+			@NonNull String indent,
+			@NonNull Task task) {
+
+		writeTask (
+			writer,
+			indent,
+			task);
+
+		String nextIndent =
+			indent + "  ";
+
+		task.children ().stream ()
+
+			.filter (
+				childTask ->
+					isNull (
+						childTask.endTime ()))
+
+			.forEach (
+				childTask ->
+					writeActiveTaskRecursive (
+						writer,
+						nextIndent,
 						childTask));
 
 	}

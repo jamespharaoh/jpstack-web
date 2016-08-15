@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.broadcast.console;
 
-import static wbs.framework.utils.etc.Misc.allOf;
+import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.moreThanZero;
@@ -427,7 +427,7 @@ class ChatBroadcastSendAction
 						new ChatUserSearch ()
 
 						.chatId (
-							chat.getId ())
+							(long) chat.getId ())
 
 						.type (
 							ChatUserType.user)
@@ -564,17 +564,23 @@ class ChatBroadcastSendAction
 
 				int loop1 = 0;
 
-				boolean includeBlocked =
-					allOf (
-						requestContext.canContext (
-							"chat.manage"),
-						form.includeBlocked ());
+				boolean includeBlocked = allOf (
 
-				boolean includeOptedOut =
-					allOf (
-						requestContext.canContext (
-							"chat.manage"),
-						form.includeOptedOut ());
+					() -> requestContext.canContext (
+						"chat.manage"),
+
+					() -> form.includeBlocked ()
+
+				);
+
+				boolean includeOptedOut = allOf (
+
+					() -> requestContext.canContext (
+						"chat.manage"),
+
+					() -> form.includeOptedOut ()
+
+				);
 
 				for (
 					Integer chatUserId

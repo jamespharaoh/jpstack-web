@@ -11,9 +11,11 @@
 		<!-- identity -->
 
 		<parent-field
-			type="manualResponderNumber"/>
+			type="manualResponderNumber"
+			cacheable="yes"/>
 
-		<index-field/>
+		<index-field
+			cacheable="yes"/>
 
 		<timestamp-field
 			name="timestamp"

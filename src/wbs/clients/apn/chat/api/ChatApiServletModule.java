@@ -1,25 +1,26 @@
 
 package wbs.clients.apn.chat.api;
 
+import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.Misc.age;
-import static wbs.framework.utils.etc.Misc.allOf;
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,11 +34,9 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.http.HttpStatus;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
@@ -45,6 +44,9 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.WebApiAction;
 import wbs.api.mvc.WebApiManager;
@@ -69,6 +71,7 @@ import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.clients.apn.chat.user.core.model.Orient;
@@ -85,8 +88,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import wbs.framework.utils.TextualInterval;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.RegexpPathHandler;
@@ -709,6 +711,10 @@ class ChatApiServletModule
 		private
 		RpcResult makeResponse () {
 
+			@Cleanup
+			Transaction transaction =
+				database.currentTransaction ();
+
 			if (number != null) {
 
 				ChatRec chat =
@@ -743,56 +749,71 @@ class ChatApiServletModule
 
 			// find users
 
-			Map<String,Object> searchMap =
-				new LinkedHashMap<String,Object> ();
+			ChatUserSearch search =
+				new ChatUserSearch ()
 
-			searchMap.put ("chatId", chatId);
-			searchMap.put ("hasGender", true);
-			searchMap.put ("hasOrient", true);
-			searchMap.put ("blockAll", false);
-			searchMap.put ("barred", false);
-			searchMap.put ("notDeleted", true);
+				.chatId (
+					(long) chatId)
 
-			if (codes != null){
+				.hasGender (
+					true)
 
-				searchMap.put (
-					"codeIn",
-					codes);
+				.hasOrient (
+					true)
+		
+				.blockAll (
+					false)
+		
+				.barred (
+					false)
 
-			}
+				.deleted (
+					false)
 
-			if (lastAction != null) {
+				.codeIn (
+					codes)
 
-				searchMap.put (
-					"lastActionAfter",
-					new Timestamp (
-						+ System.currentTimeMillis ()
-						- (long) lastAction * 1000L));
+				.lastAction (
+					ifElse (
+						isNotNull (
+							lastAction),
+						() ->
+							TextualInterval.after (
+								DateTimeZone.UTC,
+								transaction.now ().minus (
+									Duration.standardSeconds (
+										lastAction))),
+						() -> null))
 
-			}
+				.typeIn (
+					types)
 
-			if (types != null)
-				searchMap.put ("typeIn", types);
-			if (hasImage != null)
-				searchMap.put ("hasImage", hasImage);
-			if (hasVideo != null)
-				searchMap.put ("hasVideo", hasVideo);
-			if (hasAudio != null)
-				searchMap.put ("hasAudio", hasAudio);
-			if (isDating != null)
-				searchMap.put ("hasDateMode", isDating);
-			if (isOnline != null)
-				searchMap.put ("online", isOnline);
-			if (genders != null)
-				searchMap.put ("genderIn", genders);
-			if (orients != null)
-				searchMap.put ("orientIn", orients);
+				.hasPicture (
+					hasImage)
+
+				.hasVideo (
+					hasVideo)
+
+				.hasAudio (
+					hasAudio)
+
+				.hasDatingMode (
+					isDating)
+
+				.online (
+					isOnline)
+
+				.genderIn (
+					genders)
+
+				.orientIn (
+					orients);
 
 			long nanoTime = System.nanoTime ();
 
 			List<Integer> userIds =
 				chatUserHelper.searchIds (
-					searchMap);
+					search);
 
 			log.info ("Search took " + (int) ((System.nanoTime () - nanoTime) / 1000000) + "ms");
 
@@ -3452,14 +3473,19 @@ class ChatApiServletModule
 
 			// check send count and amount match
 
-			if (
-				allOf (
-					isNotNull (sendCount),
-					isNotNull (sendAmount),
-					notEqual (
-						sendCount * routeCharge,
-						sendAmount))
-			) {
+			if (allOf (
+
+				() -> isNotNull (
+					sendCount),
+
+				() -> isNotNull (
+					sendAmount),
+
+				() -> notEqual (
+					sendCount * routeCharge,
+					sendAmount)
+
+			)) {
 
 				throw new RpcException (
 					"chat-credit-response",

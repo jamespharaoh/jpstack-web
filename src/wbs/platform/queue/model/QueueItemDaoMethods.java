@@ -26,11 +26,8 @@ interface QueueItemDaoMethods {
 			QueueItemSearch search,
 			List<Integer> ids);
 
-	QueueItemRec findByIndex (
-			QueueSubjectRec queueSubject,
-			int index);
-
-	List<QueueItemRec> findActive ();
+	List<QueueItemRec> find (
+			List<QueueItemState> state);
 
 	List<QueueItemRec> findByCreatedTime (
 			Interval createdTimeInterval);

@@ -12,7 +12,6 @@ import java.util.Map;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
@@ -73,6 +72,9 @@ class ModelField {
 
 	@DataAttribute
 	Boolean nullable;
+
+	@DataAttribute
+	Boolean cacheable;
 
 	@DataAttribute
 	String foreignFieldName;

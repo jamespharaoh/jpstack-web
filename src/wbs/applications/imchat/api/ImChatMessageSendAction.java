@@ -141,7 +141,7 @@ class ImChatMessageSendAction
 		// lookup converation
 
 		ImChatConversationRec conversation =
-			imChatConversationHelper.findByIndex (
+			imChatConversationHelper.findByIndexOrNull (
 				customer,
 				messageSendRequest.conversationIndex ());
 

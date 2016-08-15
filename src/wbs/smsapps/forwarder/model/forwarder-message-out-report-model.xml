@@ -11,9 +11,11 @@
 		<!-- identity -->
 
 		<parent-field
-			type="forwarderMessageOut"/>
+			type="forwarderMessageOut"
+			cacheable="yes"/>
 
-		<index-field/>
+		<index-field
+			cacheable="yes"/>
 
 		<!-- data -->
 

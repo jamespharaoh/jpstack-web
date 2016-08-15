@@ -12,17 +12,17 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
-import com.google.common.collect.ImmutableMap;
-
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.IntervalFormatter;
+import wbs.framework.utils.TextualInterval;
 
 @PrototypeComponent ("chatAffiliateComparePart")
 public
@@ -99,17 +99,17 @@ class ChatAffiliateComparePart
 
 		List<Integer> newUserIds =
 			chatUserHelper.searchIds (
-				ImmutableMap.<String,Object>builder ()
+				new ChatUserSearch ()
 
-			.put (
-				"chatId",
-				chat.getId ())
+			.chatId (
+				(long) chat.getId ())
 
-			.put (
-				"firstJoinAfter",
-				firstJoinAfter)
+			.firstJoin (
+				TextualInterval.after (
+					DateTimeZone.UTC,
+					firstJoinAfter))
 
-			.build ());
+		);
 
 		// count them grouping by affiliate
 

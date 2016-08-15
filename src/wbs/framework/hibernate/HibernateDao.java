@@ -6,7 +6,6 @@ import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -15,15 +14,14 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import org.hibernate.Criteria;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.record.IdObject;
@@ -252,7 +250,15 @@ class HibernateDao {
 				objectList.size (),
 				1)
 		) {
-			shouldNeverHappen ();
+
+			throw new RuntimeException (
+				stringFormat (
+					"%s.%s (...) ",
+					getClass ().getSimpleName (),
+					methodName,
+					"should only find zero or one results but found %s",
+					objectList.size ()));
+
 		}
 
 		// check the object type

@@ -3,10 +3,10 @@ package wbs.framework.object;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.stringSplitRegexp;
 import static wbs.framework.utils.etc.StringUtils.startsWith;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringSplitRegexp;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,13 +20,13 @@ import java.util.TreeMap;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import lombok.NonNull;
-import lombok.experimental.Accessors;
-
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
+import wbs.framework.object.ObjectHelperBuilder.ObjectHelperBuilderMethods;
 import wbs.framework.record.EphemeralRecord;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
@@ -44,7 +44,7 @@ class ObjectManagerImplementation
 	Database database;
 
 	@Inject
-	ObjectHelperBuilder objectHelperManager;
+	ObjectHelperBuilder objectHelperBuilder;
 
 	@Inject
 	ObjectTypeRegistry objectTypeRegistry;
@@ -59,9 +59,25 @@ class ObjectManagerImplementation
 	public
 	void init () {
 
+		// lookup root object helper, which we use a lot
+
 		rootHelper =
-			objectHelperManager.forObjectName (
+			objectHelperBuilder.forObjectName (
 				"root");
+
+		// inject us back into the object helpers
+
+		objectHelperBuilder.asList ().forEach (
+			objectHelper -> {
+
+			ObjectHelperBuilderMethods objectHelperBuilder =
+				(ObjectHelperBuilderMethods)
+				objectHelper;
+
+			objectHelperBuilder.objectManager (
+				this);
+
+		});
 
 	}
 
@@ -72,8 +88,8 @@ class ObjectManagerImplementation
 	ObjectHelper<?> objectHelperForTypeCode (
 			@NonNull String typeCode) {
 
-		return objectHelperManager
-			.forObjectTypeCode (typeCode);
+		return objectHelperBuilder.forObjectTypeCode (
+			typeCode);
 
 	}
 
@@ -82,7 +98,7 @@ class ObjectManagerImplementation
 	ObjectHelper<?> objectHelperForObjectName (
 			@NonNull String objectName) {
 
-		return objectHelperManager
+		return objectHelperBuilder
 			.forObjectName (objectName);
 
 	}
@@ -108,7 +124,7 @@ class ObjectManagerImplementation
 			@NonNull Record<?> object) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForClass (
+			objectHelperForClassRequired (
 				object.getClass ());
 
 		return objectHelper.getParent (
@@ -133,17 +149,17 @@ class ObjectManagerImplementation
 	ObjectHelper<?> objectHelperForObject (
 			@NonNull Record<?> object) {
 
-		return objectHelperForClass (
+		return objectHelperForClassRequired (
 			object.getClass ());
 
 	}
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForClass (
+	ObjectHelper<?> objectHelperForClassRequired (
 			@NonNull Class<?> objectClass) {
 
-		return objectHelperManager.forObjectClassRequired (
+		return objectHelperBuilder.forObjectClassRequired (
 			objectClass);
 
 	}
@@ -369,7 +385,7 @@ class ObjectManagerImplementation
 			@NonNull RecordType object) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForClass (object.getClass ());
+			objectHelperForClassRequired (object.getClass ());
 
 		return objectHelper.update (
 			object);
@@ -382,7 +398,7 @@ class ObjectManagerImplementation
 			@NonNull Record<?> object) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForClass (object.getClass ());
+			objectHelperForClassRequired (object.getClass ());
 
 		return objectHelper.getCode (object);
 
@@ -394,8 +410,7 @@ class ObjectManagerImplementation
 			@NonNull GlobalId objectGlobalId) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperManager.forObjectTypeId (
-				(int) (long)
+			objectHelperBuilder.forObjectTypeId (
 				objectGlobalId.typeId ());
 
 		return optionalOrNull (
@@ -412,8 +427,8 @@ class ObjectManagerImplementation
 		ObjectHelper<?> objectHelper =
 			objectHelperForObject (parent);
 
-		return objectHelper
-			.getMinorChildren (parent);
+		return objectHelper.getMinorChildren (
+			parent);
 
 	}
 
@@ -444,7 +459,7 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	int getObjectTypeId (
+	Long getObjectTypeId (
 			@NonNull Record<?> object) {
 
 		ObjectHelper<?> objectHelper =
@@ -456,11 +471,12 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	int objectClassToTypeId (
+	Long objectClassToTypeId (
 			@NonNull Class<?> objectClass) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForClass (objectClass);
+			objectHelperForClassRequired (
+				objectClass);
 
 		return objectHelper.objectTypeId ();
 
@@ -469,10 +485,10 @@ class ObjectManagerImplementation
 	@Override
 	public
 	ObjectHelper<?> objectHelperForTypeId (
-			Integer typeId) {
+			@NonNull Long typeId) {
 
-		return objectHelperManager
-			.forObjectTypeId (typeId);
+		return objectHelperBuilder.forObjectTypeId (
+			typeId);
 
 	}
 
@@ -480,7 +496,7 @@ class ObjectManagerImplementation
 	public
 	List<ObjectHelper<?>> objectHelpers () {
 
-		return objectHelperManager
+		return objectHelperBuilder
 			.asList ();
 
 	}
@@ -672,7 +688,7 @@ class ObjectManagerImplementation
 			return Optional.absent ();
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForClass (
+			objectHelperForClassRequired (
 				objectClass.get ());
 
 		if (! objectHelper.parentTypeIsFixed ())
