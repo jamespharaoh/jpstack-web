@@ -8,13 +8,14 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -72,8 +73,11 @@ class TicketStateTimeDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
-		return 5 * 1000;
+	Duration getSleepDuration () {
+
+		return Duration.standardSeconds (
+			5);
+
 	}
 
 	@Override
@@ -148,12 +152,13 @@ class TicketStateTimeDaemon
 
 	private
 	void doTicketTimeCheck (
-			int ticketId) {
+			@NonNull Long ticketId) {
 
 		log.debug (
 			stringFormat (
 				"Checking timestamp for ticket",
-				String.valueOf(ticketId)));
+				String.valueOf (
+					ticketId)));
 
 		@Cleanup
 		Transaction transaction =

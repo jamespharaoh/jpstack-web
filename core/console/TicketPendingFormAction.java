@@ -4,10 +4,9 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import org.joda.time.Instant;
 
+import lombok.Cleanup;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -79,7 +78,7 @@ class TicketPendingFormAction
 
 		TicketRec ticket =
 			ticketHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"ticketId"));
 
 		// sanity check
@@ -164,7 +163,6 @@ class TicketPendingFormAction
 					ticket)
 
 				.setIndex (
-					(int) (long)
 					ticket.getNumNotes ())
 
 				.setNoteText (
