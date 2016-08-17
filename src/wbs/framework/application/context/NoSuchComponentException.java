@@ -1,18 +1,18 @@
 package wbs.framework.application.context;
 
 public
-class NoSuchBeanException
+class NoSuchComponentException
 	extends RuntimeException {
 
 	private static final
 	long serialVersionUID = -3974499830789636133L;
 
 	public
-	NoSuchBeanException () {
+	NoSuchComponentException () {
 	}
 
 	public
-	NoSuchBeanException (
+	NoSuchComponentException (
 			String message) {
 
 		super (

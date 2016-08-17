@@ -43,8 +43,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.annotations.ProxiedRequestComponent;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.context.ApplicationContext;
-import wbs.framework.application.context.BeanDefinition;
-import wbs.framework.application.context.MethodBeanFactory;
+import wbs.framework.application.context.ComponentDefinition;
+import wbs.framework.application.context.MethodComponentFactory;
 import wbs.framework.application.scaffold.BuildPluginSpec;
 import wbs.framework.application.scaffold.BuildSpec;
 import wbs.framework.application.scaffold.PluginApiModuleSpec;
@@ -98,7 +98,7 @@ class ApplicationContextBuilder {
 	Map <String, Object> singletonBeans =
 		new LinkedHashMap<> ();
 
-	List <BeanDefinition> beanDefinitionsToRegister =
+	List <ComponentDefinition> beanDefinitionsToRegister =
 		new ArrayList<> ();
 
 	ApplicationContext applicationContext;
@@ -244,7 +244,7 @@ class ApplicationContextBuilder {
 		}
 
 		for (
-			BeanDefinition beanDefinition
+			ComponentDefinition beanDefinition
 				: beanDefinitionsToRegister
 		) {
 
@@ -432,7 +432,7 @@ class ApplicationContextBuilder {
 					pluginApiModuleSpec.name ()));
 
 		applicationContext.registerBeanDefinition (
-			new BeanDefinition ()
+			new ComponentDefinition ()
 
 			.name (
 				apiModuleSpecBeanName)
@@ -453,7 +453,7 @@ class ApplicationContextBuilder {
 		);
 
 		applicationContext.registerBeanDefinition (
-			new BeanDefinition ()
+			new ComponentDefinition ()
 
 			.name (
 				apiModuleBeanName)
@@ -509,7 +509,7 @@ class ApplicationContextBuilder {
 					pluginConsoleModuleSpec.name ()));
 
 		applicationContext.registerBeanDefinition (
-			new BeanDefinition ()
+			new ComponentDefinition ()
 
 			.name (
 				consoleSpecBeanName)
@@ -530,7 +530,7 @@ class ApplicationContextBuilder {
 		);
 
 		applicationContext.registerBeanDefinition (
-			new BeanDefinition ()
+			new ComponentDefinition ()
 
 			.name (
 				consoleModuleBeanName)
@@ -551,7 +551,7 @@ class ApplicationContextBuilder {
 		);
 
 		applicationContext.registerBeanDefinition (
-			new BeanDefinition ()
+			new ComponentDefinition ()
 
 			.name (
 				consoleMetaModuleBeanName)
@@ -624,7 +624,7 @@ class ApplicationContextBuilder {
 			}
 
 			applicationContext.registerBeanDefinition (
-				new BeanDefinition ()
+				new ComponentDefinition ()
 
 				.name (
 					fixtureProviderBeanName)
@@ -852,7 +852,7 @@ class ApplicationContextBuilder {
 				singletonComponent.value ();
 
 			applicationContext.registerBeanDefinition (
-				new BeanDefinition ()
+				new ComponentDefinition ()
 
 				.name (
 					beanName)
@@ -877,7 +877,7 @@ class ApplicationContextBuilder {
 				prototypeComponent.value ();
 
 			applicationContext.registerBeanDefinition (
-				new BeanDefinition ()
+				new ComponentDefinition ()
 
 				.name (
 					beanName)
@@ -907,7 +907,7 @@ class ApplicationContextBuilder {
 					beanName);
 
 			applicationContext.registerBeanDefinition (
-				new BeanDefinition ()
+				new ComponentDefinition ()
 
 				.name (
 					targetBeanName)
@@ -924,7 +924,7 @@ class ApplicationContextBuilder {
 			);
 
 			applicationContext.registerBeanDefinition (
-				new BeanDefinition ()
+				new ComponentDefinition ()
 
 				.name (
 					beanName)
@@ -948,7 +948,7 @@ class ApplicationContextBuilder {
 
 			);
 
-			applicationContext.requestBeanNames ().add (
+			applicationContext.requestComponentNames ().add (
 				beanName);
 
 		}
@@ -995,7 +995,7 @@ class ApplicationContextBuilder {
 				}
 
 				applicationContext.registerBeanDefinition (
-					new BeanDefinition ()
+					new ComponentDefinition ()
 
 					.name (
 						singletonComponentAnnotation.value ())
@@ -1007,7 +1007,7 @@ class ApplicationContextBuilder {
 						"singleton")
 
 					.factoryClass (
-						MethodBeanFactory.class)
+						MethodComponentFactory.class)
 
 					.addReferenceProperty (
 						"factoryBean",
@@ -1051,7 +1051,7 @@ class ApplicationContextBuilder {
 				}
 
 				applicationContext.registerBeanDefinition (
-					new BeanDefinition ()
+					new ComponentDefinition ()
 
 					.name (
 						prototypeComponentAnnotation.value ())
@@ -1063,7 +1063,7 @@ class ApplicationContextBuilder {
 						"prototype")
 
 					.factoryClass (
-						MethodBeanFactory.class)
+						MethodComponentFactory.class)
 
 					.addReferenceProperty (
 						"factoryBean",
@@ -1115,7 +1115,7 @@ class ApplicationContextBuilder {
 					objectHooksClassName);
 
 			applicationContext.registerBeanDefinition (
-				new BeanDefinition ()
+				new ComponentDefinition ()
 
 				.name (
 					objectHooksBeanName)
@@ -1133,7 +1133,7 @@ class ApplicationContextBuilder {
 		} catch (ClassNotFoundException exception) {
 
 			applicationContext.registerBeanDefinition (
-				new BeanDefinition ()
+				new ComponentDefinition ()
 
 				.name (
 					objectHooksBeanName)
@@ -1171,7 +1171,7 @@ class ApplicationContextBuilder {
 			Class.forName (objectHelperClassName);
 
 		applicationContext.registerBeanDefinition (
-			new BeanDefinition ()
+			new ComponentDefinition ()
 
 			.name (
 				objectHelperBeanName)
@@ -1237,7 +1237,7 @@ class ApplicationContextBuilder {
 		}
 
 		applicationContext.registerBeanDefinition (
-			new BeanDefinition ()
+			new ComponentDefinition ()
 
 			.name (
 				objectHelperImplementationBeanName)
@@ -1330,7 +1330,7 @@ class ApplicationContextBuilder {
 		}
 
 		applicationContext.registerBeanDefinition (
-			new BeanDefinition ()
+			new ComponentDefinition ()
 
 			.name (
 				daoBeanName)
@@ -1387,7 +1387,7 @@ class ApplicationContextBuilder {
 		}
 
 		applicationContext.registerBeanDefinition (
-			new BeanDefinition ()
+			new ComponentDefinition ()
 
 			.name (
 				consoleHelperBeanName)
@@ -1450,7 +1450,7 @@ class ApplicationContextBuilder {
 				enumType.name ());
 
 		applicationContext.registerBeanDefinition (
-			new BeanDefinition ()
+			new ComponentDefinition ()
 
 			.name (
 				enumConsoleHelperBeanName)
@@ -1532,7 +1532,7 @@ class ApplicationContextBuilder {
 
 	public
 	ApplicationContextBuilder registerBeanDefinition (
-			@NonNull BeanDefinition beanDefinition) {
+			@NonNull ComponentDefinition beanDefinition) {
 
 		beanDefinitionsToRegister.add (
 			beanDefinition);

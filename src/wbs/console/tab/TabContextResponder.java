@@ -67,7 +67,7 @@ class TabContextResponder
 			PagePart get () {
 
 				Object bean =
-					applicationContext.getBeanRequired (
+					applicationContext.getComponentRequired (
 						pagePartName,
 						Object.class);
 

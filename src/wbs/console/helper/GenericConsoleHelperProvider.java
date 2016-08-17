@@ -181,7 +181,7 @@ class GenericConsoleHelperProvider
 		if (consoleHelperProviderSpec.cryptorBeanName () != null) {
 
 			cryptor (
-				applicationContext.getBeanRequired (
+				applicationContext.getComponentRequired (
 					consoleHelperProviderSpec.cryptorBeanName (),
 					Cryptor.class));
 

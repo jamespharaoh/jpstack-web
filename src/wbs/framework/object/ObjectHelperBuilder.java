@@ -35,7 +35,7 @@ import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.context.ApplicationContext;
-import wbs.framework.application.context.NoSuchBeanException;
+import wbs.framework.application.context.NoSuchComponentException;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.helper.EntityHelper;
@@ -205,7 +205,7 @@ class ObjectHelperBuilder {
 					model.objectName ());
 
 			Object daoImplementation =
-				applicationContext.getBeanOrElse (
+				applicationContext.getComponentOrElse (
 					daoImplementationBeanName,
 					Object.class,
 					() -> null);
@@ -236,7 +236,7 @@ class ObjectHelperBuilder {
 					model.objectName ());
 
 			ObjectHooks hooksImplementation =
-				applicationContext.getBeanOrElse (
+				applicationContext.getComponentOrElse (
 					hooksImplementationBeanName,
 					ObjectHooks.class,
 					() ->
@@ -517,11 +517,11 @@ class ObjectHelperBuilder {
 			try {
 
 				extraImplementation =
-					applicationContext.getBeanRequired (
+					applicationContext.getComponentRequired (
 						extraImplementationBeanName,
 						Object.class);
 
-			} catch (NoSuchBeanException exception) {
+			} catch (NoSuchComponentException exception) {
 			}
 
 			try {

@@ -5,6 +5,4 @@ interface ComponentFactory {
 
 	Object makeComponent ();
 
-	Boolean initialized ();
-
 }

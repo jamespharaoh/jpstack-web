@@ -1,10 +1,10 @@
 package wbs.framework.application.context;
 
 import static wbs.framework.utils.etc.CollectionUtils.iterableCount;
-import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isZero;
 import static wbs.framework.utils.etc.Misc.moreThanOne;
@@ -102,149 +102,156 @@ class ApplicationContext {
 	@Getter @Setter
 	ActivityManager activityManager;
 
-	List <BeanDefinition> beanDefinitions =
+	List <ComponentDefinition> componentDefinitions =
 		new ArrayList <> ();
 
-	Map <String, BeanDefinition> beanDefinitionsByName =
+	Map <String, ComponentDefinition> componentDefinitionsByName =
 		new HashMap <> ();
 
-	Map <Class <?>, Map <String, BeanDefinition>> beanDefinitionsByClass =
+	Map <Class <?>, Map <String, ComponentDefinition>>
+	componentDefinitionsByClass =
 		new HashMap <> ();
 
-	Map <Class <?>, Map <String, BeanDefinition>> singletonBeanDefinitionsByClass =
+	Map <Class <?>, Map <String, ComponentDefinition>>
+	singletonComponentDefinitionsByClass =
 		new HashMap <> ();
 
-	Map <Class <?>, Map <String,BeanDefinition>> prototypeBeanDefinitionsByClass =
+	Map <Class <?>, Map <String,ComponentDefinition>>
+	prototypeComponentDefinitionsByClass =
 		new HashMap<> ();
 
-	Map <Annotation, List <BeanDefinition>> beanDefinitionsByQualifier =
+	Map <Annotation, List <ComponentDefinition>>
+	componentDefinitionsByQualifier =
 		new HashMap<> ();
 
-	Map <Annotation, List <BeanDefinition>> singletonBeanDefinitionsByQualifier =
+	Map <Annotation, List <ComponentDefinition>>
+	singletonComponentDefinitionsByQualifier =
 		new HashMap<> ();
 
-	Map <Annotation, List <BeanDefinition>> prototypeBeanDefinitionsByQualifier =
-		new HashMap <Annotation, List <BeanDefinition>> ();
+	Map <Annotation, List <ComponentDefinition>>
+	prototypeComponentDefinitionsByQualifier =
+		new HashMap <Annotation, List <ComponentDefinition>> ();
 
-	Map <String, Object> singletonBeans =
+	Map <String, Object> singletonComponents =
 		new HashMap <> ();
 
-	Set <String> singletonBeansInCreation =
+	Set <String> singletonComponentsInCreation =
 		new LinkedHashSet <> ();
 
-	Set <String> singletonBeansFailed =
+	Set <String> singletonComponentsFailed =
 		new HashSet <> ();
 
-	Map <Object, BeanData> beanDatas =
+	Map <Object, ComponentMetaData> componentMetaDatas =
 		new MapMaker ()
 			.weakKeys ()
 			.makeMap ();
 
 	// TODO not pretty
 	@Getter
-	List<String> requestBeanNames =
-		new ArrayList<String> ();
+	List <String> requestComponentNames =
+		new ArrayList <String> ();
 
 	EasyReadWriteLock lock =
 		EasyReadWriteLock.instantiate ();
 
-	public <BeanType>
-	BeanType getBeanRequired (
-			String beanName,
-			Class <BeanType> beanClass) {
+	public <ComponentType>
+	ComponentType getComponentRequired (
+			String componentName,
+			Class <ComponentType> componentClass) {
 
 		@Cleanup
 		HeldLock heldLock =
 			lock.read ();
 
-		BeanDefinition beanDefinition =
-			beanDefinitionsByName.get (
-				beanName);
+		ComponentDefinition componentDefinition =
+			componentDefinitionsByName.get (
+				componentName);
 
-		if (beanDefinition == null) {
+		if (componentDefinition == null) {
 
-			throw new NoSuchBeanException (
+			throw new NoSuchComponentException (
 				stringFormat (
 					"Bean definition with name %s does not exist",
-					beanName));
+					componentName));
 
 		}
 
-		return beanClass.cast (
-			getBean (
-				beanDefinition,
+		return componentClass.cast (
+			getComponent (
+				componentDefinition,
 				true));
 
 	}
 
-	public <BeanType>
-	BeanType getBeanOrElse (
-			String beanName,
-			Class<BeanType> beanClass,
-			Provider<BeanType> orElse) {
+	public <ComponentType>
+	ComponentType getComponentOrElse (
+			String componentName,
+			Class <ComponentType> componentClass,
+			Provider <ComponentType> orElse) {
 
 		@Cleanup
 		HeldLock heldLock =
 			lock.read ();
 
-		BeanDefinition beanDefinition =
-			beanDefinitionsByName.get (
-				beanName);
+		ComponentDefinition componentDefinition =
+			componentDefinitionsByName.get (
+				componentName);
 
 		if (
 			isNull (
-				beanDefinition)
+				componentDefinition)
 		) {
 			return orElse.get ();
 		}
 
-		return beanClass.cast (
-			getBean (
-				beanDefinition,
+		return componentClass.cast (
+			getComponent (
+				componentDefinition,
 				true));
 
 	}
 
-	public <BeanType>
-	Provider <BeanType> getBeanProvider (
-			String beanName,
-			Class <BeanType> beanClass) {
+	public <ComponentType>
+	Provider <ComponentType> getComponentProvider (
+			String componentName,
+			Class <ComponentType> componentClass) {
 
 		@Cleanup
 		HeldLock heldlock =
 			lock.read ();
 
-		BeanDefinition beanDefinition =
-			beanDefinitionsByName.get (beanName);
+		ComponentDefinition componentDefinition =
+			componentDefinitionsByName.get (
+				componentName);
 
-		if (beanDefinition == null) {
+		if (componentDefinition == null) {
 
-			throw new NoSuchBeanException (
+			throw new NoSuchComponentException (
 				stringFormat (
 					"Bean definition with name %s does not exist",
-					beanName));
+					componentName));
 
 		}
 
 		if (
-			! beanClass.isAssignableFrom (
-				beanDefinition.beanClass ())
+			! componentClass.isAssignableFrom (
+				componentDefinition.beanClass ())
 		) {
 
-			throw new NoSuchBeanException (
+			throw new NoSuchComponentException (
 				stringFormat (
 					"Bean definition with name %s is of type %s instead of %s",
-					beanName,
-					beanDefinition.beanClass ().getName (),
-					beanClass.getName ()));
+					componentName,
+					componentDefinition.beanClass ().getName (),
+					componentClass.getName ()));
 
 		}
 
 		@SuppressWarnings ("unchecked")
-		Provider<BeanType> beanProvider =
-			(Provider<BeanType>)
+		Provider<ComponentType> beanProvider =
+			(Provider<ComponentType>)
 			getBeanProvider (
-				beanDefinition);
+				componentDefinition);
 
 		return beanProvider;
 
@@ -260,8 +267,8 @@ class ApplicationContext {
 		Map<String,Object> map =
 			new HashMap<String,Object> ();
 
-		for (BeanDefinition beanDefinition
-				: beanDefinitions) {
+		for (ComponentDefinition beanDefinition
+				: componentDefinitions) {
 
 			if (! equal (
 					beanDefinition.scope (),
@@ -270,7 +277,7 @@ class ApplicationContext {
 
 			map.put (
 				beanDefinition.name (),
-				getBean (
+				getComponent (
 					beanDefinition,
 					true));
 
@@ -281,20 +288,20 @@ class ApplicationContext {
 	}
 
 	public
-	List<BeanDefinition> getBeanDefinitionsWithAnnotation (
+	List<ComponentDefinition> getBeanDefinitionsWithAnnotation (
 			Class<? extends Annotation> annotationClass) {
 
 		@Cleanup
 		HeldLock heldlock =
 			lock.read ();
 
-		ImmutableList.Builder<BeanDefinition>
+		ImmutableList.Builder<ComponentDefinition>
 			beanDefinitionsWithAnnotationBuilder =
-				ImmutableList.<BeanDefinition>builder ();
+				ImmutableList.<ComponentDefinition>builder ();
 
 		for (
-			BeanDefinition beanDefinition
-				: beanDefinitions
+			ComponentDefinition beanDefinition
+				: componentDefinitions
 		) {
 
 			Annotation annotation =
@@ -313,8 +320,8 @@ class ApplicationContext {
 	}
 
 	private
-	Object getBean (
-			BeanDefinition beanDefinition,
+	Object getComponent (
+			ComponentDefinition beanDefinition,
 			Boolean initialize) {
 
 		@Cleanup
@@ -342,14 +349,14 @@ class ApplicationContext {
 			}
 
 			Object bean =
-				singletonBeans.get (
+				singletonComponents.get (
 					beanDefinition.name ());
 
 			if (bean != null)
 				return bean;
 
 			if (
-				singletonBeansInCreation.contains (
+				singletonComponentsInCreation.contains (
 					beanDefinition.name ())
 			) {
 
@@ -358,12 +365,12 @@ class ApplicationContext {
 						"Singleton bean %s already in creation (%s)",
 						beanDefinition.name (),
 						joinWithCommaAndSpace (
-							singletonBeansInCreation)));
+							singletonComponentsInCreation)));
 
 			}
 
 			if (
-				singletonBeansFailed.contains (
+				singletonComponentsFailed.contains (
 					beanDefinition.name ())
 			) {
 
@@ -374,7 +381,7 @@ class ApplicationContext {
 
 			}
 
-			singletonBeansInCreation.add (
+			singletonComponentsInCreation.add (
 				beanDefinition.name ());
 
 			try {
@@ -384,17 +391,17 @@ class ApplicationContext {
 						beanDefinition,
 						true);
 
-				singletonBeans.put (
+				singletonComponents.put (
 					beanDefinition.name (),
 					bean);
 
 			} finally {
 
-				singletonBeansInCreation.remove (
+				singletonComponentsInCreation.remove (
 					beanDefinition.name ());
 
 				if (bean == null)
-					singletonBeansFailed.add (
+					singletonComponentsFailed.add (
 						beanDefinition.name ());
 
 			}
@@ -416,7 +423,7 @@ class ApplicationContext {
 	@SneakyThrows (Exception.class)
 	public
 	Object instantiateBean (
-			@NonNull BeanDefinition beanDefinition,
+			@NonNull ComponentDefinition beanDefinition,
 			@NonNull Boolean initialize) {
 
 		@Cleanup
@@ -445,56 +452,44 @@ class ApplicationContext {
 				beanDefinition.factoryClass (),
 				beanDefinition.beanClass ());
 
-		Object bean =
+		Object protoComponent =
 			instantiateClass.newInstance ();
 
 		// set properties
 
 		setBeanValueProperties (
 			beanDefinition,
-			bean);
+			protoComponent);
 
 		setBeanReferenceProperties (
 			beanDefinition,
-			bean);
+			protoComponent);
 
 		setBeanInjectedProperties (
 			beanDefinition,
-			bean);
-
-		// create bean info
-
-		BeanData beanData =
-			beanDatas.computeIfAbsent (
-				bean,
-				_bean -> {
-
-			BeanData newBeanData =
-				new BeanData ();
-
-			newBeanData.definition =
-				beanDefinition;
-
-			newBeanData.state =
-				beanDefinition.owned ()
-					? BeanState.uninitialized
-					: BeanState.unmanaged;
-
-			return newBeanData;
-
-		});
+			protoComponent);
 
 		// call factory
 
-		if (beanDefinition.factoryClass () != null) {
+		Object component;
+		ComponentMetaData componentMetaData;
+
+		if (
+			isNotNull (
+				beanDefinition.factoryClass ())
+		) {
 
 			ComponentFactory componentFactory =
-				(ComponentFactory) bean;
+				(ComponentFactory)
+				protoComponent;
 
-			bean =
+			component =
 				componentFactory.makeComponent ();
 
-			if (bean == null) {
+			if (
+				isNull (
+					component)
+			) {
 
 				throw new RuntimeException (
 					stringFormat (
@@ -503,51 +498,22 @@ class ApplicationContext {
 
 			}
 
-			if (
-				equal (
-					beanData.state,
-					BeanState.unmanaged)
-			) {
+			componentMetaData =
+				findOrCreateMetaDataForComponent (
+					beanDefinition,
+					component);
 
-				doNothing ();
+		} else {
 
-			} else if (componentFactory.initialized ()) {
+			component =
+				protoComponent;
 
-				if (
-					equal (
-						beanData.state,
-						BeanState.uninitialized)
-				) {
+			componentMetaData =
+				findOrCreateMetaDataForComponent (
+					beanDefinition,
+					component);
 
-					throw new IllegalStateException (
-						stringFormat (
-							"Initialized component factory %s (%s) ",
-							beanDefinition.name (),
-							componentFactory.getClass ().getSimpleName (),
-							"returned uninitialized component"));
-
-				}
-
-			} else {
-
-				if (
-					notEqual (
-						beanData.state,
-						BeanState.uninitialized)
-				) {
-
-					throw new IllegalStateException (
-						stringFormat (
-							"Uninitialized component factory %s (%s) ",
-							beanDefinition.name (),
-							componentFactory.getClass ().getSimpleName (),
-							"returned initialized component"));
-
-				}
-
-			}
-
-		} 
+		}
 
 		// initialize
 
@@ -556,15 +522,15 @@ class ApplicationContext {
 			initialize
 
 			&& equal (
-				beanData.state,
+				componentMetaData.state,
 				BeanState.uninitialized)
 
 		) {
 
 			initializeBean (
 				beanDefinition,
-				bean,
-				beanData);
+				component,
+				componentMetaData);
 
 		}
 
@@ -575,29 +541,31 @@ class ApplicationContext {
 				"Bean %s instantiated successfully",
 				beanDefinition.name ()));
 
-		return bean;
+		return component;
 
 	}
 
 	@SneakyThrows (Exception.class)
 	private
 	void initializeBean (
-			@NonNull BeanDefinition beanDefinition,
+			@NonNull ComponentDefinition beanDefinition,
 			@NonNull Object bean,
-			@NonNull BeanData beanData) {
+			@NonNull ComponentMetaData beanMetaData) {
 
-		synchronized (beanData) {
+		synchronized (beanMetaData) {
 
 			if (
 				notEqual (
-					beanData.state,
+					beanMetaData.state,
 					BeanState.uninitialized)
 			) {
 
 				throw new IllegalStateException (
 					stringFormat (
-						"Bean %s initialized multiple times",
-						beanData.definition.name ()));
+						"Tried to initialize component %s ",
+						beanMetaData.definition.name (),
+						"in %s state",
+						beanMetaData.state.name ()));
 
 			}
 		
@@ -605,45 +573,41 @@ class ApplicationContext {
 
 				// run post construct
 		
-				if (beanDefinition.owned ()) {
-		
-					for (
-						Method method
-							: bean.getClass ().getMethods ()
-					) {
-		
-						PostConstruct postConstructAnnotation =
-							method.getAnnotation (
-								PostConstruct.class);
-		
-						if (postConstructAnnotation == null)
-							continue;
-		
-						log.debug (
-							stringFormat (
-								"Running post construct method %s.%s",
-								beanDefinition.name (),
-								method.getName ()));
-		
-						method.invoke (
-							bean);
-		
-					}
-		
+				for (
+					Method method
+						: bean.getClass ().getMethods ()
+				) {
+	
+					PostConstruct postConstructAnnotation =
+						method.getAnnotation (
+							PostConstruct.class);
+	
+					if (postConstructAnnotation == null)
+						continue;
+	
+					log.debug (
+						stringFormat (
+							"Running post construct method %s.%s",
+							beanDefinition.name (),
+							method.getName ()));
+	
+					method.invoke (
+						bean);
+	
 				}
 
-				beanData.state =
+				beanMetaData.state =
 					BeanState.active;
 
 			} finally {
 
 				if (
 					notEqual (
-						beanData.state,
+						beanMetaData.state,
 						BeanState.active)
 				) {
 
-					beanData.state =
+					beanMetaData.state =
 						BeanState.error;
 
 				}
@@ -655,8 +619,36 @@ class ApplicationContext {
 	}
 
 	private
+	ComponentMetaData findOrCreateMetaDataForComponent (
+			@NonNull ComponentDefinition componentDefinition,
+			@NonNull Object component) {
+
+		// create bean info
+
+		return componentMetaDatas.computeIfAbsent (
+			component,
+			_component -> {
+
+			ComponentMetaData newBeanMetaData =
+				new ComponentMetaData ();
+
+			newBeanMetaData.definition =
+				componentDefinition;
+
+			newBeanMetaData.state =
+				componentDefinition.owned ()
+					? BeanState.uninitialized
+					: BeanState.unmanaged;
+
+			return newBeanMetaData;
+
+		});
+
+	}
+
+	private
 	void setBeanValueProperties (
-			BeanDefinition beanDefinition,
+			ComponentDefinition beanDefinition,
 			Object bean) {
 
 		@Cleanup
@@ -685,7 +677,7 @@ class ApplicationContext {
 
 	private
 	void setBeanReferenceProperties (
-			BeanDefinition beanDefinition,
+			ComponentDefinition beanDefinition,
 			Object bean) {
 
 		@Cleanup
@@ -704,7 +696,7 @@ class ApplicationContext {
 					entry.getKey ()));
 
 			Object target =
-				getBeanRequired (
+				getComponentRequired (
 					entry.getValue (),
 					Object.class);
 
@@ -719,7 +711,7 @@ class ApplicationContext {
 
 	private
 	void setBeanInjectedProperties (
-			BeanDefinition beanDefinition,
+			ComponentDefinition beanDefinition,
 			Object bean)
 		throws Exception {
 
@@ -740,16 +732,16 @@ class ApplicationContext {
 
 			// lookup target beans
 
-			List<Pair<BeanDefinition,Object>> targetBeans =
-				new ArrayList<Pair<BeanDefinition,Object>> ();
+			List<Pair<ComponentDefinition,Object>> targetBeans =
+				new ArrayList<Pair<ComponentDefinition,Object>> ();
 
 			for (
 				String targetBeanDefinitionName
 					: injectedProperty.targetBeanNames ()
 			) {
 
-				BeanDefinition targetBeanDefinition =
-					beanDefinitionsByName.get (
+				ComponentDefinition targetBeanDefinition =
+					componentDefinitionsByName.get (
 						targetBeanDefinitionName);
 
 				Object injectValue;
@@ -764,7 +756,7 @@ class ApplicationContext {
 				} else {
 
 					injectValue =
-						getBean (
+						getComponent (
 							targetBeanDefinition,
 							injectedProperty.initialized ());
 
@@ -789,7 +781,7 @@ class ApplicationContext {
 					new LinkedHashMap<Class<?>,Object> ();
 
 				for (
-					Pair<BeanDefinition,Object> pair
+					Pair<ComponentDefinition,Object> pair
 						: targetBeans
 				) {
 
@@ -809,7 +801,7 @@ class ApplicationContext {
 					new LinkedHashMap<String,Object> ();
 
 				for (
-					Pair<BeanDefinition,Object> pair
+					Pair<ComponentDefinition,Object> pair
 						: targetBeans
 				) {
 
@@ -828,7 +820,7 @@ class ApplicationContext {
 				List<Object> beansList =
 					new ArrayList<Object> ();
 
-				for (Pair<BeanDefinition,Object> pair
+				for (Pair<ComponentDefinition,Object> pair
 						: targetBeans) {
 
 					beansList.add (
@@ -885,7 +877,7 @@ class ApplicationContext {
 
 	public
 	ApplicationContext registerBeanDefinition (
-			@NonNull BeanDefinition beanDefinition) {
+			@NonNull ComponentDefinition beanDefinition) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -919,7 +911,7 @@ class ApplicationContext {
 
 		}
 
-		if (beanDefinitionsByName.containsKey (
+		if (componentDefinitionsByName.containsKey (
 				beanDefinition.name ())) {
 
 			throw new RuntimeException (
@@ -1005,10 +997,10 @@ class ApplicationContext {
 
 		// store bean definition
 
-		beanDefinitions.add (
+		componentDefinitions.add (
 			beanDefinition);
 
-		beanDefinitionsByName.put (
+		componentDefinitionsByName.put (
 			beanDefinition.name (),
 			beanDefinition);
 
@@ -1031,7 +1023,7 @@ class ApplicationContext {
 					beanDefinition.beanClass ()));
 
 			updateIndexByClass (
-				beanDefinitionsByClass,
+				componentDefinitionsByClass,
 				beanClasses,
 				beanDefinition);
 
@@ -1042,7 +1034,7 @@ class ApplicationContext {
 			) {
 
 				updateIndexByClass (
-					singletonBeanDefinitionsByClass,
+					singletonComponentDefinitionsByClass,
 					beanClasses,
 					beanDefinition);
 
@@ -1055,7 +1047,7 @@ class ApplicationContext {
 			) {
 
 				updateIndexByClass (
-					prototypeBeanDefinitionsByClass,
+					prototypeComponentDefinitionsByClass,
 					beanClasses,
 					beanDefinition);
 
@@ -1081,7 +1073,7 @@ class ApplicationContext {
 					continue;
 
 				updateIndexByQualifier (
-					beanDefinitionsByQualifier,
+					componentDefinitionsByQualifier,
 					annotation,
 					beanDefinition);
 
@@ -1092,7 +1084,7 @@ class ApplicationContext {
 				) {
 
 					updateIndexByQualifier (
-						singletonBeanDefinitionsByQualifier,
+						singletonComponentDefinitionsByQualifier,
 						annotation,
 						beanDefinition);
 
@@ -1105,7 +1097,7 @@ class ApplicationContext {
 				) {
 
 					updateIndexByQualifier (
-						prototypeBeanDefinitionsByQualifier,
+						prototypeComponentDefinitionsByQualifier,
 						annotation,
 						beanDefinition);
 
@@ -1121,9 +1113,9 @@ class ApplicationContext {
 
 	private
 	void updateIndexByClass (
-			Map<Class<?>,Map<String,BeanDefinition>> index,
+			Map<Class<?>,Map<String,ComponentDefinition>> index,
 			Set<Class<?>> beanClasses,
-			BeanDefinition beanDefinition) {
+			ComponentDefinition beanDefinition) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -1134,7 +1126,7 @@ class ApplicationContext {
 				: beanClasses
 		) {
 
-			Map<String,BeanDefinition> beanDefinitionsForClass =
+			Map<String,ComponentDefinition> beanDefinitionsForClass =
 				index.get (
 					beanClass);
 
@@ -1143,7 +1135,7 @@ class ApplicationContext {
 				index.put (
 					beanClass,
 					beanDefinitionsForClass =
-						new HashMap<String,BeanDefinition> ());
+						new HashMap<String,ComponentDefinition> ());
 
 			}
 
@@ -1157,15 +1149,15 @@ class ApplicationContext {
 
 	private
 	void updateIndexByQualifier (
-			Map<Annotation,List<BeanDefinition>> index,
+			Map<Annotation,List<ComponentDefinition>> index,
 			Annotation annotation,
-			BeanDefinition beanDefinition) {
+			ComponentDefinition beanDefinition) {
 
 		@Cleanup
 		HeldLock heldlock =
 			lock.write ();
 
-		List<BeanDefinition> beanDefinitionsForQualifier =
+		List<ComponentDefinition> beanDefinitionsForQualifier =
 			index.get (annotation);
 
 		if (beanDefinitionsForQualifier == null) {
@@ -1173,7 +1165,7 @@ class ApplicationContext {
 			index.put (
 				annotation,
 				beanDefinitionsForQualifier =
-					new ArrayList<BeanDefinition> ());
+					new ArrayList<ComponentDefinition> ());
 
 		}
 
@@ -1204,8 +1196,8 @@ class ApplicationContext {
 		// work out dependencies
 
 		for (
-			BeanDefinition beanDefinition
-				: beanDefinitions
+			ComponentDefinition beanDefinition
+				: componentDefinitions
 		) {
 
 			errors +=
@@ -1217,8 +1209,8 @@ class ApplicationContext {
 		// check dependencies exist
 
 		for (
-			BeanDefinition beanDefinition
-				: beanDefinitions
+			ComponentDefinition beanDefinition
+				: componentDefinitions
 		) {
 
 			for (
@@ -1227,7 +1219,7 @@ class ApplicationContext {
 			) {
 
 				if (
-					! beanDefinitionsByName.containsKey (
+					! componentDefinitionsByName.containsKey (
 						dependency)
 				) {
 
@@ -1247,25 +1239,25 @@ class ApplicationContext {
 
 		// order bean definitions
 
-		List<BeanDefinition> unorderedBeanDefinitions =
-			new ArrayList<BeanDefinition> (
-				beanDefinitions);
+		List<ComponentDefinition> unorderedBeanDefinitions =
+			new ArrayList<ComponentDefinition> (
+				componentDefinitions);
 
-		Map<String,BeanDefinition> orderedBeanDefinitions =
-			new LinkedHashMap<String,BeanDefinition> ();
+		Map<String,ComponentDefinition> orderedBeanDefinitions =
+			new LinkedHashMap<String,ComponentDefinition> ();
 
 		while (! unorderedBeanDefinitions.isEmpty ()) {
 
 			boolean madeProgress = false;
 
-			ListIterator<BeanDefinition> unorderedBeanDefinitionIterator =
+			ListIterator<ComponentDefinition> unorderedBeanDefinitionIterator =
 				unorderedBeanDefinitions.listIterator ();
 
 			OUTER: while (
 				unorderedBeanDefinitionIterator.hasNext ()
 			) {
 
-				BeanDefinition beanDefinition =
+				ComponentDefinition beanDefinition =
 					unorderedBeanDefinitionIterator.next ();
 
 				for (
@@ -1273,7 +1265,7 @@ class ApplicationContext {
 						: beanDefinition.orderedDependencies ()
 				) {
 
-					if (! beanDefinitionsByName.containsKey (
+					if (! componentDefinitionsByName.containsKey (
 							targetBeanDefinitionName))
 						continue OUTER;
 
@@ -1297,7 +1289,7 @@ class ApplicationContext {
 			if (! madeProgress) {
 
 				for (
-					BeanDefinition beanDefinition
+					ComponentDefinition beanDefinition
 						: unorderedBeanDefinitions
 				) {
 
@@ -1347,8 +1339,8 @@ class ApplicationContext {
 		// instantiate singletons
 
 		for (
-			BeanDefinition beanDefinition
-				: beanDefinitions
+			ComponentDefinition beanDefinition
+				: componentDefinitions
 		) {
 
 			if (
@@ -1359,7 +1351,7 @@ class ApplicationContext {
 				continue;
 			}
 
-			getBeanRequired (
+			getComponentRequired (
 				beanDefinition.name (),
 				Object.class);
 
@@ -1371,7 +1363,7 @@ class ApplicationContext {
 
 	public
 	int initBeanDefinition (
-			BeanDefinition beanDefinition) {
+			ComponentDefinition beanDefinition) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -1530,7 +1522,7 @@ class ApplicationContext {
 
 	private
 	int initInjectedFieldByName (
-			BeanDefinition beanDefinition,
+			ComponentDefinition beanDefinition,
 			Named namedAnnotation,
 			Field field,
 			Boolean initialized) {
@@ -1547,8 +1539,8 @@ class ApplicationContext {
 					namedAnnotation.value ()),
 				field.getName ());
 
-		BeanDefinition targetBeanDefinition =
-			beanDefinitionsByName.get (
+		ComponentDefinition targetBeanDefinition =
+			componentDefinitionsByName.get (
 				targetBeanDefinitionName);
 
 		if (targetBeanDefinition == null) {
@@ -1595,7 +1587,7 @@ class ApplicationContext {
 
 	private
 	int initInjectedPropertyField (
-			BeanDefinition beanDefinition,
+			ComponentDefinition beanDefinition,
 			Field field,
 			InjectedProperty injectedProperty) {
 
@@ -1744,7 +1736,7 @@ class ApplicationContext {
 
 	private
 	int initInjectedPropertyTargetByClass (
-			BeanDefinition beanDefinition,
+			ComponentDefinition beanDefinition,
 			Field field,
 			InjectedProperty injectedProperty) {
 
@@ -1764,14 +1756,14 @@ class ApplicationContext {
 				? (Class<?>) parameterizedTargetType.getRawType ()
 				: (Class<?>) injectedProperty.targetType ();
 
-		Map<String,BeanDefinition> targetBeanDefinitions =
+		Map<String,ComponentDefinition> targetBeanDefinitions =
 			ifNull (
 				injectedProperty.provider ()
 					? ifNull (
-						prototypeBeanDefinitionsByClass.get (targetClass),
-						singletonBeanDefinitionsByClass.get (targetClass))
-					: singletonBeanDefinitionsByClass.get (targetClass),
-				Collections.<String,BeanDefinition>emptyMap ());
+						prototypeComponentDefinitionsByClass.get (targetClass),
+						singletonComponentDefinitionsByClass.get (targetClass))
+					: singletonComponentDefinitionsByClass.get (targetClass),
+				Collections.<String,ComponentDefinition>emptyMap ());
 
 		if (injectedProperty.collectionType () == CollectionType.single) {
 
@@ -1814,7 +1806,7 @@ class ApplicationContext {
 
 		if (! injectedProperty.provider ()) {
 
-			for (BeanDefinition targetBeanDefinition
+			for (ComponentDefinition targetBeanDefinition
 					: targetBeanDefinitions.values ()) {
 
 				beanDefinition.orderedDependencies ().add (
@@ -1836,7 +1828,7 @@ class ApplicationContext {
 
 	private
 	int initInjectedPropertyTargetByQualifier (
-			BeanDefinition beanDefinition,
+			ComponentDefinition beanDefinition,
 			Annotation qualifier,
 			InjectedProperty injectedProperty) {
 
@@ -1846,14 +1838,14 @@ class ApplicationContext {
 
 		// lookup target beans
 
-		List<BeanDefinition> targetBeanDefinitions =
+		List<ComponentDefinition> targetBeanDefinitions =
 			ifNull (
 				injectedProperty.provider ()
 					? ifNull (
-						prototypeBeanDefinitionsByQualifier.get (qualifier),
-						singletonBeanDefinitionsByQualifier.get (qualifier))
-					: singletonBeanDefinitionsByQualifier.get (qualifier),
-				Collections.<BeanDefinition>emptyList ());
+						prototypeComponentDefinitionsByQualifier.get (qualifier),
+						singletonComponentDefinitionsByQualifier.get (qualifier))
+					: singletonComponentDefinitionsByQualifier.get (qualifier),
+				Collections.<ComponentDefinition>emptyList ());
 
 		if (injectedProperty.collectionType () == CollectionType.single) {
 
@@ -1890,7 +1882,7 @@ class ApplicationContext {
 
 		if (! injectedProperty.provider ()) {
 
-			for (BeanDefinition targetBeanDefinition
+			for (ComponentDefinition targetBeanDefinition
 					: targetBeanDefinitions) {
 
 				beanDefinition.orderedDependencies ().add (
@@ -1905,7 +1897,7 @@ class ApplicationContext {
 		List<String> targetBeanDefinitionNames =
 			new ArrayList<String> ();
 
-		for (BeanDefinition targetBeanDefinition
+		for (ComponentDefinition targetBeanDefinition
 				: targetBeanDefinitions) {
 
 			targetBeanDefinitionNames.add (
@@ -1948,8 +1940,8 @@ class ApplicationContext {
 		}
 
 		for (
-			BeanDefinition beanDefinition
-				: beanDefinitions
+			ComponentDefinition beanDefinition
+				: componentDefinitions
 		) {
 
 			String outputFile =
@@ -1987,8 +1979,8 @@ class ApplicationContext {
 		HeldLock heldlock =
 			lock.write ();
 
-		BeanDefinition beanDefinition =
-			new BeanDefinition ()
+		ComponentDefinition beanDefinition =
+			new ComponentDefinition ()
 
 			.name (
 				beanName)
@@ -2013,14 +2005,14 @@ class ApplicationContext {
 			beanDefinition);
 
 		if (
-			beanDatas.containsKey (
+			componentMetaDatas.containsKey (
 				object)
 		) {
 			throw new IllegalStateException ();
 		}
 
-		BeanData beanData =
-			new BeanData ();
+		ComponentMetaData beanData =
+			new ComponentMetaData ();
 
 		beanData.definition =
 			beanDefinition;
@@ -2028,7 +2020,7 @@ class ApplicationContext {
 		beanData.state =
 			BeanState.unmanaged;		
 
-		beanDatas.put (
+		componentMetaDatas.put (
 			object,
 			beanData);
 
@@ -2133,7 +2125,7 @@ class ApplicationContext {
 
 	public
 	Provider<?> getBeanProvider (
-			@NonNull BeanDefinition beanDefinition) {
+			@NonNull ComponentDefinition beanDefinition) {
 
 		return getBeanProvider (
 			beanDefinition,
@@ -2143,7 +2135,7 @@ class ApplicationContext {
 
 	public
 	Provider<?> getBeanProvider (
-			final BeanDefinition beanDefinition,
+			final ComponentDefinition beanDefinition,
 			final Boolean initialized) {
 
 		@Cleanup
@@ -2156,7 +2148,7 @@ class ApplicationContext {
 			public
 			Object get () {
 
-				return getBean (
+				return getComponent (
 					beanDefinition,
 					initialized);
 
@@ -2176,8 +2168,8 @@ class ApplicationContext {
 		HeldLock heldlock =
 			lock.read ();
 
-		BeanDefinition beanDefinition =
-			new BeanDefinition ()
+		ComponentDefinition beanDefinition =
+			new ComponentDefinition ()
 
 			.name (
 				bean.getClass ().getSimpleName ())
@@ -2211,8 +2203,8 @@ class ApplicationContext {
 	}
 
 	public static
-	class BeanData {
-		BeanDefinition definition;
+	class ComponentMetaData {
+		ComponentDefinition definition;
 		BeanState state;
 	}
 

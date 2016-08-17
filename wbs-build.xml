@@ -60,6 +60,10 @@
 		<!-- api -->
 
 		<plugin
+			name="api-misc"
+			package="wbs.api.misc"/>
+
+		<plugin
 			name="api-module"
 			package="wbs.api.module"/>
 

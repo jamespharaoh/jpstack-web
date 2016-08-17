@@ -18,7 +18,7 @@ import wbs.framework.data.annotations.DataName;
 @Accessors (fluent = true)
 @DataClass
 public
-class BeanDefinition {
+class ComponentDefinition {
 
 	@DataName
 	@Getter @Setter
@@ -65,7 +65,7 @@ class BeanDefinition {
 		new HashSet<String> ();
 
 	public
-	BeanDefinition addValueProperty (
+	ComponentDefinition addValueProperty (
 			String name,
 			Object value) {
 
@@ -78,7 +78,7 @@ class BeanDefinition {
 	}
 
 	public
-	BeanDefinition addReferenceProperty (
+	ComponentDefinition addReferenceProperty (
 			String name,
 			String referencedBeanName) {
 

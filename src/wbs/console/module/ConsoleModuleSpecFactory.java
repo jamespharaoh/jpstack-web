@@ -2,23 +2,28 @@ package wbs.console.module;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.application.context.UninitializedComponentFactory;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.context.ComponentFactory;
 
 @Accessors (fluent = true)
 public
 class ConsoleModuleSpecFactory
-	implements UninitializedComponentFactory {
+	implements ComponentFactory {
 
-	@Inject
+	// dependencies
+
+	@SingletonDependency
 	ConsoleModuleSpecReader consoleSpecReader;
+
+	// properties
 
 	@Getter @Setter
 	String xmlResourceName;
+
+	// implementation
 
 	@Override
 	public

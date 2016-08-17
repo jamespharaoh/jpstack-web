@@ -31,7 +31,7 @@ import wbs.console.module.ConsoleMetaManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
-import wbs.framework.application.context.NoSuchBeanException;
+import wbs.framework.application.context.NoSuchComponentException;
 import wbs.framework.entity.model.ModelMethods;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHelperMethods;
@@ -132,11 +132,11 @@ class ConsoleHelperBuilder {
 		try {
 
 			extraImplementation =
-				applicationContext.getBeanRequired (
+				applicationContext.getComponentRequired (
 					extraImplementationBeanName,
 					Object.class);
 
-		} catch (NoSuchBeanException exception) {
+		} catch (NoSuchComponentException exception) {
 		}
 
 		try {
@@ -165,11 +165,11 @@ class ConsoleHelperBuilder {
 		try {
 
 			daoImplementation =
-				applicationContext.getBeanRequired (
+				applicationContext.getComponentRequired (
 					daoImplementationBeanName,
 					Object.class);
 
-		} catch (NoSuchBeanException exception) {
+		} catch (NoSuchComponentException exception) {
 		}
 
 		String daoMethodsInterfaceName =
@@ -209,11 +209,11 @@ class ConsoleHelperBuilder {
 		try {
 
 			consoleHooks =
-				applicationContext.getBeanRequired (
+				applicationContext.getComponentRequired (
 					consoleHooksBeanName,
 					ConsoleHooks.class);
 
-		} catch (NoSuchBeanException exception) {
+		} catch (NoSuchComponentException exception) {
 
 			consoleHooks =
 				new ConsoleHooks.DefaultImplementation ();

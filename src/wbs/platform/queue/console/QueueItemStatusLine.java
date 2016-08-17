@@ -228,8 +228,6 @@ class QueueItemStatusLine
 	private
 	void updateAllUsers () {
 
-System.out.println ("=========== UPDATE USERS NOW ======");
-
 		Instant startTime =
 			Instant.now ();
 
@@ -272,8 +270,6 @@ System.out.println ("=========== UPDATE USERS NOW ======");
 		userDatas.values ().forEach (
 			userData -> {
 
-System.out.println ("-- updating user " + userData.userId ());
-
 			UserRec user =
 				userHelper.findRequired (
 					userData.userId ());
@@ -315,8 +311,6 @@ System.out.println ("-- updating user " + userData.userId ());
 
 		lastUpdate =
 			startTime;
-
-System.out.println ("=========== UPDATE USERS COMPLETE ======");
 
 	}
 

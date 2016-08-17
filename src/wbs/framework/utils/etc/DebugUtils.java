@@ -1,6 +1,7 @@
 package wbs.framework.utils.etc;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
+
 import lombok.NonNull;
 
 public
@@ -10,20 +11,20 @@ class DebugUtils {
 	void debugFormat (
 			@NonNull Object... arguments) {
 
-		System.out.print (
+		System.err.print (
 			"====== ");
 
-		System.out.print (
+		System.err.print (
 			Thread.currentThread ().getName ());
 
-		System.out.print (
+		System.err.print (
 			" ");
 
-		System.out.print (
+		System.err.print (
 			stringFormatArray (
 				arguments));
 
-		System.out.print (
+		System.err.print (
 			"\n");
 
 	}

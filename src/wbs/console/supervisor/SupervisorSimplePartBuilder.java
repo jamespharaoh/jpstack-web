@@ -48,7 +48,7 @@ class SupervisorSimplePartBuilder {
 			spec.beanName ();
 
 		Provider<PagePart> pagePartFactory =
-			applicationContext.getBeanProvider (
+			applicationContext.getComponentProvider (
 				beanName,
 				PagePart.class);
 

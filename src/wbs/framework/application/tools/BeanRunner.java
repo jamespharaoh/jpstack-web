@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.context.ApplicationContext;
-import wbs.framework.application.context.BeanDefinition;
+import wbs.framework.application.context.ComponentDefinition;
 
 /**
  * Create an application context, instantiate a bean in it and invoke a
@@ -83,7 +83,7 @@ class BeanRunner {
 				configNames)
 
 			.registerBeanDefinition (
-				new BeanDefinition ()
+				new ComponentDefinition ()
 
 				.beanClass (
 					runnerClass)
@@ -106,7 +106,7 @@ class BeanRunner {
 		// find runnable and run it
 
 		Object runner =
-			applicationContext.getBeanRequired (
+			applicationContext.getComponentRequired (
 				uncapitalise (
 					runnerClass.getSimpleName ()),
 				runnerClass);

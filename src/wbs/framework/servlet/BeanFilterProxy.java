@@ -55,7 +55,7 @@ class BeanFilterProxy
 			servletContext.getAttribute ("wbs-application-context");
 
 		target =
-			applicationContext.getBeanRequired (
+			applicationContext.getComponentRequired (
 				filterConfig.getFilterName (),
 				Filter.class);
 

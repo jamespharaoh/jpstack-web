@@ -148,7 +148,7 @@ class TextAreaFormFieldBuilder {
 				String.class;
 
 			dataProvider =
-				applicationContext.getBeanRequired (
+				applicationContext.getComponentRequired (
 					spec.dataProvider (),
 					FormFieldDataProvider.class);
 
@@ -284,7 +284,7 @@ class TextAreaFormFieldBuilder {
 		FormFieldUpdateHook formFieldUpdateHook =
 			updateHookBeanName != null
 
-			? applicationContext.getBeanRequired (
+			? applicationContext.getComponentRequired (
 				updateHookBeanName,
 				FormFieldUpdateHook.class)
 

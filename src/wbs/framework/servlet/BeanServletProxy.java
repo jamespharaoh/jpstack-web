@@ -52,7 +52,7 @@ class BeanServletProxy
 				"wbs-application-context");
 
 		target =
-			applicationContext.getBeanRequired (
+			applicationContext.getComponentRequired (
 				servletConfig.getServletName (),
 				Servlet.class);
 

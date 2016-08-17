@@ -9,10 +9,9 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-
 import wbs.framework.application.context.ApplicationContext;
-import wbs.framework.application.context.BeanDefinition;
-import wbs.framework.application.context.InitializedComponentFactory;
+import wbs.framework.application.context.ComponentDefinition;
+import wbs.framework.application.context.ComponentFactory;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 
@@ -55,14 +54,14 @@ class BeansSpec {
 
 			}
 
-			Class<? extends InitializedComponentFactory> factoryClass = null;
+			Class <? extends ComponentFactory> factoryClass = null;
 
 			try {
 
 				factoryClass =
 					bean.factoryClassName () != null
 						? Class.forName (bean.factoryClassName ())
-							.asSubclass (InitializedComponentFactory.class)
+							.asSubclass (ComponentFactory.class)
 						: null;
 
 			} catch (ClassNotFoundException exception) {
@@ -90,8 +89,8 @@ class BeansSpec {
 			if (errors > 0)
 				continue;
 
-			BeanDefinition beanDefinition =
-				new BeanDefinition ()
+			ComponentDefinition beanDefinition =
+				new ComponentDefinition ()
 
 				.name (
 					bean.name ())

@@ -130,7 +130,7 @@ class ContextTabFormActionPageBuilder {
 	void initFormActionHelper () {
 
 		formActionHelperProvider =
-			applicationContext.getBeanProvider (
+			applicationContext.getComponentProvider (
 				helperBeanName,
 				ConsoleFormActionHelper.class);
 

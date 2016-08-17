@@ -113,12 +113,12 @@ class WbsServletListener
 
 		for (
 			String requestBeanName
-				: applicationContext.requestBeanNames ()
+				: applicationContext.requestComponentNames ()
 		) {
 
 			ThreadLocalProxyBeanFactory.Control control =
 				(ThreadLocalProxyBeanFactory.Control)
-				applicationContext.getBeanRequired (
+				applicationContext.getComponentRequired (
 					requestBeanName,
 					Object.class);
 
@@ -158,12 +158,14 @@ class WbsServletListener
 
 			setServletRequest = true;
 
-			for (String requestBeanName
-					: applicationContext.requestBeanNames ()) {
+			for (
+				String requestBeanName
+					: applicationContext.requestComponentNames ()
+			) {
 
 				ThreadLocalProxyBeanFactory.Control control =
 					(ThreadLocalProxyBeanFactory.Control)
-					applicationContext.getBeanRequired (
+					applicationContext.getComponentRequired (
 						requestBeanName,
 						Object.class);
 
@@ -173,7 +175,7 @@ class WbsServletListener
 						requestBeanName);
 
 				Object targetBean =
-					applicationContext.getBeanRequired (
+					applicationContext.getComponentRequired (
 						targetBeanName,
 						Object.class);
 
@@ -196,7 +198,7 @@ class WbsServletListener
 
 					ThreadLocalProxyBeanFactory.Control control =
 						(ThreadLocalProxyBeanFactory.Control)
-						applicationContext.getBeanRequired (
+						applicationContext.getComponentRequired (
 							requestBeanName,
 							Object.class);
 

@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 
 @Accessors (fluent = true)
 public
-class MethodBeanFactory
+class MethodComponentFactory
 	implements ComponentFactory {
 
 	@Getter @Setter

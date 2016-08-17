@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.framework.application.context.BeanDefinition;
+import wbs.framework.application.context.ComponentDefinition;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
@@ -35,7 +35,7 @@ class BeansReferencePropertySpec
 	@Override
 	public
 	int register (
-			BeanDefinition beanDefinition) {
+			ComponentDefinition beanDefinition) {
 
 		beanDefinition.addReferenceProperty (
 			name,

@@ -74,7 +74,7 @@ class XmlRpcAction
 					RpcSource source) {
 
 				RpcHandler delegate =
-					applicationContext.getBeanRequired (
+					applicationContext.getComponentRequired (
 						name,
 						RpcHandler.class);
 

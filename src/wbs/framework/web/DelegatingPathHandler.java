@@ -44,18 +44,6 @@ class DelegatingPathHandler
 	public
 	void afterPropertiesSet () {
 
-System.out.println ("");
-System.out.println ("");
-System.out.println ("#################################################");
-System.out.println ("#################################################");
-System.out.println ("############                      ###############");
-System.out.println ("############ AFTER PROPERTIES SET ###############");
-System.out.println ("############                      ###############");
-System.out.println ("#################################################");
-System.out.println ("#################################################");
-System.out.println ("");
-System.out.println ("");
-
 		Map <String, String> pathDeclaredByModule =
 			new HashMap<> ();
 

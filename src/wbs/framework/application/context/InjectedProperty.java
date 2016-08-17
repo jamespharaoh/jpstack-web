@@ -19,7 +19,7 @@ class InjectedProperty {
 
 	@DataParent
 	@Getter @Setter
-	BeanDefinition beanDefinition;
+	ComponentDefinition beanDefinition;
 
 	@DataAttribute
 	@Getter @Setter

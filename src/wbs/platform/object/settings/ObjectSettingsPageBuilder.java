@@ -489,7 +489,7 @@ class ObjectSettingsPageBuilder<
 			@SuppressWarnings ("unchecked")
 			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
 				(FieldsProvider<ObjectType,ParentType>)
-				applicationContext.getBeanRequired (
+				applicationContext.getComponentRequired (
 					spec.fieldsProviderName (),
 					FieldsProvider.class);
 

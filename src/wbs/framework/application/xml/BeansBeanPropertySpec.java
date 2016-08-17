@@ -1,11 +1,11 @@
 package wbs.framework.application.xml;
 
-import wbs.framework.application.context.BeanDefinition;
+import wbs.framework.application.context.ComponentDefinition;
 
 public
 interface BeansBeanPropertySpec {
 
 	int register (
-			BeanDefinition beanDefinition);
+			ComponentDefinition beanDefinition);
 
 }

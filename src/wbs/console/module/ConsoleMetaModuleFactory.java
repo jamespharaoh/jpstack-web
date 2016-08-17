@@ -7,14 +7,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.console.context.ConsoleContextMetaBuilderContainer;
-import wbs.framework.application.context.UninitializedComponentFactory;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.context.ComponentFactory;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
 
 @Accessors (fluent = true)
 public
 class ConsoleMetaModuleFactory
-	implements UninitializedComponentFactory {
+	implements ComponentFactory {
 
 	// dependencies
 
@@ -23,11 +24,11 @@ class ConsoleMetaModuleFactory
 
 	// prototype dependencies
 
-	@Inject
-	Provider<BuilderFactory> builderFactoryProvider;
+	@PrototypeDependency
+	Provider <BuilderFactory> builderFactoryProvider;
 
-	@Inject
-	Provider<ConsoleMetaModuleImplementation> consoleMetaModuleProvider;
+	@PrototypeDependency
+	Provider <ConsoleMetaModuleImplementation> consoleMetaModuleProvider;
 
 	// properties
 

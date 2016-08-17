@@ -122,7 +122,7 @@ class AbstractFile
 					IOException {
 
 				RequestHandler handler =
-					applicationContext.getBeanRequired (
+					applicationContext.getComponentRequired (
 						handlerName,
 						RequestHandler.class);
 
@@ -172,7 +172,7 @@ class AbstractFile
 					IOException {
 
 				Responder responder =
-					applicationContext.getBeanRequired (
+					applicationContext.getComponentRequired (
 						responderName,
 						Responder.class);
 

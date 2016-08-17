@@ -538,7 +538,7 @@ class ObjectContextBuilder<
 
 		cryptor =
 			spec.cryptorBeanName () != null
-				? applicationContext.getBeanRequired (
+				? applicationContext.getComponentRequired (
 					spec.cryptorBeanName (),
 					Cryptor.class)
 				: null;

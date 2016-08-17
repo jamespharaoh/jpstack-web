@@ -323,7 +323,7 @@ class SupervisorPart
 				(SupervisorDataSetSpec) object;
 
 			StatsProvider statsProvider =
-				applicationContext.getBeanRequired (
+				applicationContext.getComponentRequired (
 					supervisorDataSetSpec.providerBeanName (),
 					StatsProvider.class);
 
