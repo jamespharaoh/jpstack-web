@@ -81,8 +81,14 @@ class TicketFixtureProvider
 	public
 	void createFixtures () {
 
-		Transaction transaction =
-			database.currentTransaction ();
+		createMenuItems ();
+
+		createTicketManager ();
+
+	}
+
+	private
+	void createMenuItems () {
 
 		menuHelper.insert (
 			menuHelper.createInstance ()
@@ -116,6 +122,14 @@ class TicketFixtureProvider
 
 		);
 
+	}
+
+	private
+	void createTicketManager () {
+
+		Transaction transaction =
+			database.currentTransaction ();
+
 		TicketManagerRec ticketManager =
 			ticketManagerHelper.insert (
 				ticketManagerHelper.createInstance ()
@@ -135,6 +149,8 @@ class TicketFixtureProvider
 				"Ticket manager description")
 
 		);
+
+		database.flush ();
 
 		TicketStateRec submittedState =
 			ticketStateHelper.insert (
@@ -289,6 +305,8 @@ class TicketFixtureProvider
 				15l)
 
 		);
+
+		database.flush ();
 
 		TicketRec ticket =
 			ticketHelper.insert (
