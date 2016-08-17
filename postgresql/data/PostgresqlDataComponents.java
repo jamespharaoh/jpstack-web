@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import org.postgresql.ds.PGSimpleDataSource;
 
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.UninitializedDependency;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.DbPool;
 
@@ -27,7 +28,7 @@ class PostgresqlDataComponents {
 
 	// prototype depdencies
 
-	@Inject
+	@UninitializedDependency
 	Provider <DbPool> dbPoolProvider;
 
 	// components
