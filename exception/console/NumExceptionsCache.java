@@ -9,7 +9,7 @@ import wbs.platform.misc.CachedGetter;
 @SingletonComponent ("numExceptionsCache")
 public
 class NumExceptionsCache
-	extends CachedGetter<Integer> {
+	extends CachedGetter <Long> {
 
 	@Inject
 	ExceptionLogObjectHelper exceptionLogHelper;
@@ -21,7 +21,7 @@ class NumExceptionsCache
 
 	@Override
 	public
-	Integer refresh () {
+	Long refresh () {
 		return exceptionLogHelper.countWithAlert ();
 	}
 

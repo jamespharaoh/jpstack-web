@@ -1,5 +1,6 @@
 package wbs.platform.event.logic;
 
+import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -109,7 +110,8 @@ class EventLogicImplementation
 				createEventLink (
 					event,
 					linkObject,
-					index);
+					fromJavaInteger (
+						index));
 
 			eventLinkHelper.insert (
 				eventLink);
@@ -130,7 +132,7 @@ class EventLogicImplementation
 	EventLinkRec createEventLink (
 			@NonNull EventRec event,
 			@NonNull Object linkObject,
-			int index) {
+			@NonNull Long index) {
 
 		linkObject =
 			normaliseLinkObject (
@@ -139,10 +141,10 @@ class EventLogicImplementation
 
 		// handle permanent records as object ids
 
-		if (linkObject instanceof PermanentRecord<?>) {
+		if (linkObject instanceof PermanentRecord <?>) {
 
-			PermanentRecord<?> dataObject =
-				(PermanentRecord<?>) linkObject;
+			PermanentRecord <?> dataObject =
+				(PermanentRecord <?>) linkObject;
 
 			if (dataObject.getId () == null)
 				throw new IllegalArgumentException ();
@@ -160,7 +162,7 @@ class EventLogicImplementation
 						dataObject))
 
 				.setRefId (
-					(long) dataObject.getId ());
+					dataObject.getId ());
 
 		}
 
@@ -242,7 +244,7 @@ class EventLogicImplementation
 
 	Object normaliseLinkObject (
 			@NonNull Object linkObject,
-			int index) {
+			@NonNull Long index) {
 
 		// don't allow null
 
@@ -274,8 +276,9 @@ class EventLogicImplementation
 		if (linkObject instanceof Integer) {
 
 			linkObject =
-				(long) (Integer)
-				linkObject;
+				fromJavaInteger (
+					(Integer)
+					linkObject);
 
 		}
 
@@ -284,7 +287,8 @@ class EventLogicImplementation
 		if (linkObject instanceof String) {
 
 			return textHelper.findOrCreate (
-				(String) linkObject);
+				(String)
+				linkObject);
 
 		}
 

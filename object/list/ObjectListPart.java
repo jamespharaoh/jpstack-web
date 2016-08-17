@@ -1,13 +1,13 @@
 package wbs.platform.object.list;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
 import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,16 +19,16 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import org.joda.time.Interval;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.forms.FieldsProvider;
@@ -208,8 +208,8 @@ class ObjectListPart<
 
 	void prepareCurrentObject () {
 
-		Integer objectId =
-			(Integer)
+		Long objectId =
+			(Long)
 			requestContext.stuff (
 				consoleHelper.objectName () + "Id");
 
@@ -238,8 +238,8 @@ class ObjectListPart<
 				objectManager.findConsoleHelper (
 					consoleHelper.parentClass ());
 
-			Integer parentId =
-				(Integer)
+			Long parentId =
+				(Long)
 				requestContext.stuff (
 					parentHelper.idKey ());
 
@@ -271,8 +271,8 @@ class ObjectListPart<
 					objectManager.findConsoleHelper (
 						parentHelper.parentClass ());
 
-				Integer grandParentId =
-					(Integer)
+				Long grandParentId =
+					(Long)
 					requestContext.stuff (
 						grandParentHelper.idKey ());
 
@@ -311,8 +311,8 @@ class ObjectListPart<
 	}
 
 	void prepareAllObjectsViaParent (
-			ConsoleHelper<?> parentHelper,
-			Integer parentId) {
+			@NonNull ConsoleHelper<?> parentHelper,
+			@NonNull Long parentId) {
 
 		if (currentListBrowserSpec.isPresent ()) {
 
@@ -347,7 +347,7 @@ class ObjectListPart<
 	void prepareAllObjectsViaGrandParent (
 			ConsoleHelper<?> parentHelper,
 			ConsoleHelper<?> grandParentHelper,
-			Integer grandParentId) {
+			Long grandParentId) {
 
 		if (currentListBrowserSpec.isPresent ()) {
 

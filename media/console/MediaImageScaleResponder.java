@@ -27,13 +27,11 @@ class MediaImageScaleResponder
 	byte[] getData (
 			MediaRec media) {
 
-		long maxWidth =
-			(long)
+		Long maxWidth =
 			requestContext.parameterInteger (
 				"width");
 
-		long maxHeight =
-			(long)
+		Long maxHeight =
 			requestContext.parameterInteger (
 				"height");
 

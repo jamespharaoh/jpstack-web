@@ -3,6 +3,7 @@ package wbs.platform.daemon;
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
+import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 
@@ -25,7 +26,7 @@ class SleepingDaemonService
 	// hooks to override
 
 	abstract protected
-	int getDelayMs ();
+	Duration getSleepDuration ();
 
 	abstract protected
 	void runOnce ();
@@ -44,9 +45,10 @@ class SleepingDaemonService
 
 		// work out initial delay
 
-		int delay =
-			randomLogic.randomInteger (
-				getDelayMs ());
+		Duration delay =
+			Duration.millis (
+				randomLogic.randomInteger (
+					getSleepDuration ().getMillis ()));
 
 		while (true) {
 
@@ -55,7 +57,7 @@ class SleepingDaemonService
 			try {
 
 				Thread.sleep (
-					delay);
+					delay.getMillis ());
 
 			} catch (InterruptedException exception) {
 
@@ -92,11 +94,17 @@ class SleepingDaemonService
 			// work out next delay
 
 			delay =
-				+ getDelayMs ()
-				+ randomLogic.randomInteger (
-					getDelayMs () / 2)
-				- randomLogic.randomInteger (
-					getDelayMs () / 2);
+				getSleepDuration ()
+
+				.plus (
+					Duration.millis (
+						randomLogic.randomInteger (
+							getSleepDuration ().getMillis () / 2)))
+
+				.minus (
+					Duration.millis (
+						randomLogic.randomInteger (
+							getSleepDuration ().getMillis () / 2)));
 
 		}
 

@@ -11,11 +11,10 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.NonNull;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHelper;
@@ -74,12 +73,16 @@ class QueueHooks
 
 			.collect (
 				Collectors.groupingBy (
-					queueType -> (long)
-						queueType.getParentType ().getId (),
-					Collectors.mapping (
-						queueType -> (long)
-							queueType.getId (),
-						Collectors.toList ())));
+
+				queueType ->
+					queueType.getParentType ().getId (),
+
+				Collectors.mapping (
+					queueType ->
+						queueType.getId (),
+					Collectors.toList ()))
+
+			);
 
 	}
 
@@ -95,7 +98,7 @@ class QueueHooks
 		if (
 			doesNotContain (
 				queueTypeIdsByParentTypeId.keySet (),
-				(long) parentHelper.objectTypeId ())
+				parentHelper.objectTypeId ())
 		) {
 			return;
 		}
@@ -115,7 +118,7 @@ class QueueHooks
 		for (
 			Long queueTypeId
 				: queueTypeIdsByParentTypeId.get (
-					(long) parentHelper.objectTypeId ())
+					parentHelper.objectTypeId ())
 		) {
 
 			QueueTypeRec queueType =

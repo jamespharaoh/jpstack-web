@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,6 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.priv.UserPrivChecker;
@@ -27,9 +27,6 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
-
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.updatelog.logic.UpdateManager;
@@ -155,9 +152,10 @@ class ObjectLinksAction
 
 			}
 
-			int linkId =
-				Integer.parseInt (
-					matcher.group (1));
+			Long linkId =
+				Long.parseLong (
+					matcher.group (
+						1));
 
 			boolean oldIsMember =
 				matcher.group (2).equals ("true");

@@ -51,7 +51,7 @@ class AbstractMediaImageResponder
 
 		media =
 			mediaHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"mediaId"));
 
 		transform ();

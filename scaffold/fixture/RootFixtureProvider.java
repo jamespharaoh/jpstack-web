@@ -30,7 +30,7 @@ class RootFixtureProvider
 			rootHelper.createInstance ()
 
 			.setId (
-				0)
+				0l)
 
 			.setCode (
 				"root")

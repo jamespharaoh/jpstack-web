@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.methodInvoke;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.Serializable;
@@ -14,16 +15,15 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -39,7 +39,6 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 
 @Accessors (fluent = true)
@@ -264,7 +263,7 @@ class ObjectSearchPostAction
 
 		// perform search
 
-		List<Integer> objectIds;
+		List<Long> objectIds;
 
 		if (
 			isNotNull (
@@ -279,8 +278,8 @@ class ObjectSearchPostAction
 						searchClass));
 
 			@SuppressWarnings ("unchecked")
-			List<Integer> objectIdsTemp =
-				(List<Integer>)
+			List<Long> objectIdsTemp =
+				(List<Long>)
 				methodInvoke (
 					method,
 					consoleHelper,
@@ -343,7 +342,8 @@ class ObjectSearchPostAction
 								targetContext.get ().pathPrefix (),
 								"/%s",
 								consoleHelper.getPathId (
-									objectIds.get (0)))));
+									objectIds.get (
+										0)))));
 
 			} else {
 

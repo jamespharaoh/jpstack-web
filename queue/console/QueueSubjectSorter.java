@@ -145,7 +145,7 @@ class QueueSubjectSorter {
 			userPrivCheckerBuilderProvider.get ()
 
 			.userId (
-				(long) loggedInUser.getId ())
+				loggedInUser.getId ())
 
 			.build ();
 
@@ -158,7 +158,6 @@ class QueueSubjectSorter {
 				userPrivCheckerBuilderProvider.get ()
 
 				.userId (
-					(long) (int)
 					effectiveUser.getId ())
 
 				.build ();
@@ -227,8 +226,10 @@ class QueueSubjectSorter {
 		result.availableQueues =
 			result.allQueues.stream ()
 
-			.filter (queueInfo ->
-				effectiveUser == null || queueInfo.availableItems > 0)
+			.filter (
+				queueInfo ->
+					effectiveUser == null
+						|| queueInfo.availableItems > 0)
 
 			.collect (
 				Collectors.toList ());
@@ -392,7 +393,6 @@ class QueueSubjectSorter {
 				userPrivCheckerBuilderProvider.get ()
 
 				.userId (
-					(long) (int)
 					subjectInfo.preferredUser.getId ())
 
 				.build ();

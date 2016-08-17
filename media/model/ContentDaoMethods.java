@@ -5,7 +5,7 @@ import java.util.List;
 public
 interface ContentDaoMethods {
 
-	List<ContentRec> findByHash (
-			int hash);
+	List <ContentRec> findByShortHash (
+			Long shortHash);
 
 }

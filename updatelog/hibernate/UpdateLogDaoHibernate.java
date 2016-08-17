@@ -1,9 +1,8 @@
 package wbs.platform.updatelog.hibernate;
 
-import lombok.NonNull;
-
 import org.hibernate.criterion.Restrictions;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.updatelog.model.UpdateLogDao;
@@ -19,7 +18,7 @@ class UpdateLogDaoHibernate
 	public
 	UpdateLogRec findByTableAndRef (
 			@NonNull String table,
-			long ref) {
+			@NonNull Long ref) {
 
 		return findOne (
 			"findByTableAndRef (table, ref)",
@@ -37,7 +36,7 @@ class UpdateLogDaoHibernate
 			.add (
 				Restrictions.eq (
 					"_updateLog.ref",
-					(int) ref))
+					ref))
 
 		);
 

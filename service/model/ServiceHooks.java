@@ -11,11 +11,10 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.NonNull;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHelper;
@@ -74,12 +73,16 @@ class ServiceHooks
 
 			.collect (
 				Collectors.groupingBy (
-					serviceType -> (long)
-						serviceType.getParentType ().getId (),
-					Collectors.mapping (
-						serviceType -> (long)
-							serviceType.getId (),
-						Collectors.toList ())));
+
+				serviceType ->
+					serviceType.getParentType ().getId (),
+
+				Collectors.mapping (
+					serviceType ->
+						serviceType.getId (),
+					Collectors.toList ()))
+
+			);
 
 	}
 
@@ -88,14 +91,14 @@ class ServiceHooks
 	@Override
 	public
 	void createSingletons (
-			@NonNull ObjectHelper<ServiceRec> serviceHelper,
-			@NonNull ObjectHelper<?> parentHelper,
-			@NonNull Record<?> parent) {
+			@NonNull ObjectHelper <ServiceRec> serviceHelper,
+			@NonNull ObjectHelper <?> parentHelper,
+			@NonNull Record <?> parent) {
 
 		if (
 			doesNotContain (
 				serviceTypeIdsByParentTypeId.keySet (),
-				(long) parentHelper.objectTypeId ())
+				parentHelper.objectTypeId ())
 		) {
 			return;
 		}
@@ -103,7 +106,7 @@ class ServiceHooks
 		ObjectManager objectManager =
 		   objectManagerProvider.get ();
 
-		Optional<SliceRec> slice =
+		Optional <SliceRec> slice =
 			objectManager.getAncestor (
 				SliceRec.class,
 				parent);
@@ -115,7 +118,7 @@ class ServiceHooks
 		for (
 			Long serviceTypeId
 				: serviceTypeIdsByParentTypeId.get (
-					(long) parentHelper.objectTypeId ())
+					parentHelper.objectTypeId ())
 		) {
 
 			ServiceTypeRec serviceType =

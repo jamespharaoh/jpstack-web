@@ -87,7 +87,7 @@ class StatusUpdateResponder
 
 		root =
 			rootHelper.findRequired (
-				0);
+				0l);
 
 		// get status lines
 

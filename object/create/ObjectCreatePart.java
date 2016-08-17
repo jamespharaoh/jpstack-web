@@ -1,5 +1,6 @@
 package wbs.platform.object.create;
 
+import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.LinkedHashMap;
@@ -10,12 +11,11 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
@@ -29,7 +29,6 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
-import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 @Accessors (fluent = true)
@@ -158,7 +157,7 @@ class ObjectCreatePart<
 			ParentType parentTemp =
 				(ParentType)
 				rootHelper.findRequired (
-					0);
+					0l);
 
 			parent =
 				parentTemp;
@@ -167,8 +166,8 @@ class ObjectCreatePart<
 
 		}
 
-		Integer parentId =
-			requestContext.stuffInt (
+		Long parentId =
+			requestContext.stuffInteger (
 				parentHelper.idKey ());
 
 		if (parentId != null) {
@@ -187,8 +186,8 @@ class ObjectCreatePart<
 			objectManager.findConsoleHelper (
 				parentHelper.parentClass ());
 
-		Integer grandParentId =
-			requestContext.stuffInt (
+		Long grandParentId =
+			requestContext.stuffInteger (
 				grandParentHelper.objectName () + "Id");
 
 		if (grandParentId != null) {

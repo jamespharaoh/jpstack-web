@@ -19,6 +19,10 @@
 		<model name="postgresqlStatActivity"/>
 	</models>
 
+	<layer name="data">
+		<bean class="data.PostgresqlDataComponents"/>
+	</layer>
+
 	<layer name="daemon">
 		<bean class="daemon.PostgresqlMaintenanceDaemon"/>
 	</layer>

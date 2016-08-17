@@ -11,9 +11,9 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
-
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -347,8 +347,8 @@ class UpdateManager {
 	}
 
 	void realSignalUpdate (
-			String table,
-			int ref) {
+			@NonNull String table,
+			@NonNull Long ref) {
 
 		UpdateLogRec updateLog =
 			updateLogHelper.findByTableAndRef (
@@ -381,8 +381,8 @@ class UpdateManager {
 
 	public
 	void signalUpdate (
-			String table,
-			int ref) {
+			@NonNull String table,
+			@NonNull Long ref) {
 
 		realSignalUpdate (
 			table,
@@ -390,17 +390,17 @@ class UpdateManager {
 
 		realSignalUpdate (
 			table,
-			0);
+			0l);
 
 		realSignalUpdate (
 			"master",
-			0);
+			0l);
 
 	}
 
 	public
 	Watcher makeWatcher (
-			String table) {
+			@NonNull String table) {
 
 		return new Watcher (
 			table);

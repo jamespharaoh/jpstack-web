@@ -4,8 +4,8 @@ import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.methodInvoke;
 import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -13,14 +13,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
@@ -69,7 +68,7 @@ class ObjectSearchCsvResponder
 	FormatWriter formatWriter;
 
 	Object searchObject;
-	List<Integer> objectIds;
+	List<Long> objectIds;
 
 	// implementation
 
@@ -99,8 +98,8 @@ class ObjectSearchCsvResponder
 		// get object ids
 
 		@SuppressWarnings ("unchecked")
-		List<Integer> objectIdsTemp =
-			(List<Integer>)
+		List<Long> objectIdsTemp =
+			(List<Long>)
 			requiredValue (
 				requestContext.session (
 					sessionKey + "Results"));
@@ -146,7 +145,7 @@ class ObjectSearchCsvResponder
 		int batchesSinceFlush = 0;
 
 		for (
-			List<Integer> batch
+			List<Long> batch
 				: Lists.partition (
 					objectIds,
 					64)
@@ -183,10 +182,10 @@ class ObjectSearchCsvResponder
 			} else {
 
 				objects =
-					new ArrayList<IdObject> ();
+					new ArrayList<> ();
 
 				for (
-					Integer objectId
+					Long objectId
 						: batch
 				) {
 

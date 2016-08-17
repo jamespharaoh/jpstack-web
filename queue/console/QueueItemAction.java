@@ -3,7 +3,6 @@ package wbs.platform.queue.console;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -39,8 +38,8 @@ class QueueItemAction
 	protected
 	Responder goReal () {
 
-		int queueItemId =
-			Integer.parseInt (
+		Long queueItemId =
+			Long.parseLong (
 				requestContext.parameterRequired (
 					"id"));
 

@@ -8,7 +8,7 @@ public
 class RpcResult {
 
 	private final
-	int status;
+	long status;
 
 	private final
 	String statusCode;
@@ -22,7 +22,7 @@ class RpcResult {
 	public
 	RpcResult (
 			String name,
-			int newStatus,
+			long newStatus,
 			String newStatusCode,
 			List<String> newStatusMessages,
 			RpcElem... members) {
@@ -35,7 +35,7 @@ class RpcResult {
 
 		rpcStruct =
 			Rpc.rpcStruct (name,
-				Rpc.rpcElem ("status", (long) status),
+				Rpc.rpcElem ("status", status),
 				Rpc.rpcElem ("status-code", statusCode),
 				Rpc.rpcElem ("status-message", getStatusMessage ()),
 				Rpc.rpcList ("status-messages", "status-message", statusMessages),
@@ -70,7 +70,7 @@ class RpcResult {
 	}
 
 	public
-	int getStatus () {
+	long getStatus () {
 
 		return status;
 

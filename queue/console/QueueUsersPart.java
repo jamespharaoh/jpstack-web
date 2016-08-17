@@ -10,12 +10,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.Instant;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
@@ -61,8 +60,8 @@ class QueueUsersPart
 	public
 	void prepare () {
 
-		Map<Integer,UserData> temp =
-			new HashMap<Integer,UserData> ();
+		Map<Long,UserData> temp =
+			new HashMap<> ();
 
 		List<QueueItemClaimRec> queueItemClaims =
 			queueItemClaimHelper.findClaimed ();

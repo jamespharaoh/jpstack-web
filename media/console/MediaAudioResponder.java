@@ -39,13 +39,10 @@ class MediaAudioResponder
 	public
 	void prepare () {
 
-		int mediaId =
-			requestContext.stuffInt (
-				"mediaId");
-
 		MediaRec media =
 			mediaHelper.findRequired (
-				mediaId);
+				requestContext.stuffInteger (
+					"mediaId"));
 
 		data =
 			media.getContent ().getData ();

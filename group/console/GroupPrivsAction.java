@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-
 import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
@@ -82,7 +81,7 @@ class GroupPrivsAction
 
 		GroupRec group =
 			groupHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"groupId"));
 
 		Matcher matcher =
@@ -92,8 +91,9 @@ class GroupPrivsAction
 
 		while (matcher.find ()) {
 
-			int privId =
-				Integer.parseInt (matcher.group (1));
+			Long privId =
+				Long.parseLong (
+					matcher.group (1));
 
 			boolean newCan =
 				matcher.group (2).equals ("1");
@@ -139,8 +139,10 @@ class GroupPrivsAction
 
 		}
 
-		for (UserRec user
-				: group.getUsers ()) {
+		for (
+			UserRec user
+				: group.getUsers ()
+		) {
 
 			updateManager.signalUpdate (
 				"user_privs",

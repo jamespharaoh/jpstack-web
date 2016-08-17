@@ -7,12 +7,11 @@ import static wbs.framework.utils.etc.Misc.requiredValue;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import org.joda.time.DateTimeZone;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -119,7 +118,6 @@ class UserConsoleLogicImplementation
 
 		return loggedIn ()
 			? Optional.of (
-				(long) (int)
 				userRequired ().getSlice ().getId ())
 			: Optional.absent ();
 
@@ -129,8 +127,7 @@ class UserConsoleLogicImplementation
 	public
 	Long sliceIdRequired () {
 
-		return (long) (int)
-			userRequired ().getSlice ().getId ();
+		return userRequired ().getSlice ().getId ();
 
 	}
 
@@ -171,10 +168,9 @@ class UserConsoleLogicImplementation
 
 	@Override
 	public
-	Integer hourOffset () {
+	Long hourOffset () {
 
-		return (int) (long)
-			sliceRequired ().getDefaultHourOffset ();
+		return sliceRequired ().getDefaultHourOffset ();
 
 	}
 

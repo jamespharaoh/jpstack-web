@@ -15,6 +15,7 @@
 
 	<layer name="logic">
 		<bean class="logic.ExceptionLogLogicImplementation"/>
+		<bean class="logic.PlatformExceptionLogger"/>
 	</layer>
 
 	<layer name="daemon">

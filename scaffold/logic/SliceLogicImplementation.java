@@ -2,6 +2,9 @@ package wbs.platform.scaffold.logic;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.orNull;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.TimeUtils.laterThan;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,16 +12,15 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.joda.time.Instant;
+
+import com.google.common.base.Optional;
+
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import org.joda.time.Instant;
-
-import com.google.common.base.Optional;
-
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.tools.BackgroundProcess;
 import wbs.framework.database.Database;
@@ -26,11 +28,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.utils.ThreadManager;
-
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
-import static wbs.framework.utils.etc.TimeUtils.laterThan;
-
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 
@@ -63,10 +60,10 @@ class SliceLogicImplementation
 
 	// state
 
-	Map<Integer,Optional<Instant>> nextTimestampBySlice =
+	Map<Long,Optional<Instant>> nextTimestampBySlice =
 		new HashMap<> ();
 
-	Map<Integer,Optional<Instant>> nextUpdateTimestampBySlice =
+	Map<Long,Optional<Instant>> nextUpdateTimestampBySlice =
 		new HashMap<> ();
 
 	// lifecycle
@@ -129,7 +126,7 @@ class SliceLogicImplementation
 		// iterate slices
 
 		for (
-			Integer sliceId
+			Long sliceId
 				: nextUpdateTimestampBySlice.keySet ()
 		) {
 

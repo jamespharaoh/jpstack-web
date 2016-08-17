@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
-
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
@@ -63,8 +62,8 @@ class QueueItemUserStatsProvider
 
 		// setup data structures
 
-		Map<Integer,int[]> numProcessedPerUser =
-			new TreeMap<Integer,int[]> ();
+		Map<Long,long[]> numProcessedPerUser =
+			new TreeMap<> ();
 
 		Set<Object> userIds =
 			new HashSet<Object> ();
@@ -122,11 +121,12 @@ class QueueItemUserStatsProvider
 
 				numProcessedPerUser.put (
 					queueItem.getProcessedUser ().getId (),
-					new int [statsPeriod.size ()]);
+					new long [
+						statsPeriod.size ()]);
 
 			}
 
-			int[] numProcessedForUser =
+			long[] numProcessedForUser =
 				numProcessedPerUser.get (
 					queueItem.getProcessedUser ().getId ());
 

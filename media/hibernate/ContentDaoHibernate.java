@@ -15,8 +15,8 @@ class ContentDaoHibernate
 
 	@Override
 	public
-	List<ContentRec> findByHash (
-			int hash) {
+	List <ContentRec> findByShortHash (
+			Long shortHash) {
 
 		return findMany (
 			"findByHash (hash)",
@@ -29,7 +29,7 @@ class ContentDaoHibernate
 			.add (
 				Restrictions.eq (
 					"_content.hash",
-					hash))
+					shortHash))
 
 		);
 

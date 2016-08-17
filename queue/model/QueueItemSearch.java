@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
@@ -14,16 +13,16 @@ public
 class QueueItemSearch
 	implements Serializable {
 
-	Integer sliceId;
+	Long sliceId;
 
-	Integer parentTypeId;
+	Long parentTypeId;
 
 	TextualInterval createdTime;
 
-	Integer processedUserId;
+	Long processedUserId;
 
 	boolean filter;
 
-	Collection<Integer> filterQueueIds;
+	Collection<Long> filterQueueIds;
 
 }

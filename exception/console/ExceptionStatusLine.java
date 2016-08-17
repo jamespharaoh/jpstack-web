@@ -59,14 +59,16 @@ class ExceptionStatusLine
 	public
 	Future<String> getUpdateScript () {
 
-		int numExceptions = 0;
-		int numExceptionsFatal = 0;
+		Long numExceptions = 0l;
+		Long numExceptionsFatal = 0l;
 
 		// count exceptions (if visible)
 
-		if (privChecker.canRecursive (
+		if (
+			privChecker.canRecursive (
 				GlobalId.root,
-				"alert")) {
+				"alert")
+		) {
 
 			numExceptions =
 				numExceptionsCache.get ();
