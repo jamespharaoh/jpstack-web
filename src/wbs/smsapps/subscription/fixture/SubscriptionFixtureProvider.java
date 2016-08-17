@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.database.Database;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
@@ -38,6 +39,9 @@ class SubscriptionFixtureProvider
 
 	@Inject
 	CommandObjectHelper commandHelper;
+
+	@Inject
+	Database database;
 
 	@Inject
 	KeywordObjectHelper keywordHelper;
@@ -168,6 +172,8 @@ class SubscriptionFixtureProvider
 
 		);
 
+		database.flush ();
+
 		KeywordSetRec inboundKeywordSet =
 			keywordSetHelper.findByCodeRequired (
 				GlobalId.root,
@@ -278,6 +284,8 @@ class SubscriptionFixtureProvider
 					affiliateSpecEntry.getValue ())
 
 			);
+
+			database.flush ();
 
 			keywordHelper.insert (
 				keywordHelper.createInstance ()

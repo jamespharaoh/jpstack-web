@@ -45,9 +45,7 @@ import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
-import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.model.RouterObjectHelper;
-import wbs.sms.route.router.model.RouterRec;
 import wbs.sms.route.sender.model.SenderObjectHelper;
 
 @PrototypeComponent ("chatCoreFixtureProvider")
@@ -133,6 +131,8 @@ class ChatCoreFixtureProvider
 
 		createMenuItems ();
 
+		createRoutes ();
+
 		createChatServices ();
 
 	}
@@ -172,39 +172,26 @@ class ChatCoreFixtureProvider
 	}
 
 	private
-	void createChatServices () {
-
-		Transaction transaction =
-			database.currentTransaction ();
-
-		List<NetworkRec> allNetworks =
-			networkHelper.findAll ();
-
-		List<UserRec> allUsers =
-			userHelper.findAll ();
-
-		SliceRec testSlice =
-			sliceHelper.findByCodeRequired (
-				GlobalId.root,
-				"test");
+	void createRoutes () {
 
 		// routes
 
-		RouteRec billRoute =
-			routeHelper.insert (
-				routeHelper.createInstance ()
+		routeHelper.insert (
+			routeHelper.createInstance ()
 
 			.setSlice (
-				testSlice)
+				sliceHelper.findByCodeRequired (
+					GlobalId.root,
+					"test"))
 
 			.setCode (
 				"chat_5_00")
 
 			.setName (
-				"Chat ��5.00")
+				"Chat £5.00")
 
 			.setDescription (
-				"Chat billed ��1")
+				"Chat billed £5.00")
 
 			.setNumber (
 				"c500")
@@ -228,12 +215,13 @@ class ChatCoreFixtureProvider
 
 		);
 
-		RouteRec freeRoute =
-			routeHelper.insert (
-				routeHelper.createInstance ()
+		routeHelper.insert (
+			routeHelper.createInstance ()
 
 			.setSlice (
-				testSlice)
+				sliceHelper.findByCodeRequired (
+					GlobalId.root,
+					"test"))
 
 			.setCode (
 				"chat_free")
@@ -257,10 +245,26 @@ class ChatCoreFixtureProvider
 
 		);
 
-		RouterRec freeRouter =
-			routerHelper.findByCodeRequired (
-				freeRoute,
-				"static");
+		database.flush ();
+
+	}
+
+	private
+	void createChatServices () {
+
+		Transaction transaction =
+			database.currentTransaction ();
+
+		List<NetworkRec> allNetworks =
+			networkHelper.findAll ();
+
+		List<UserRec> allUsers =
+			userHelper.findAll ();
+
+		SliceRec testSlice =
+			sliceHelper.findByCodeRequired (
+				GlobalId.root,
+				"test");
 
 		CommandRec magicCommand =
 			commandHelper.findByCodeRequired (
@@ -391,16 +395,34 @@ class ChatCoreFixtureProvider
 				"Left")
 
 			.setRbBillRoute (
-				billRoute)
+				routeHelper.findByCodeRequired (
+					GlobalId.root,
+					"test",
+					"chat_5_00"))
 
 			.setRbFreeRouter (
-				freeRouter)
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"chat_free"),
+					"static"))
 
 			.setMagicRouter (
-				freeRouter)
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"chat_free"),
+					"static"))
 
 			.setWapRouter (
-				freeRouter)
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"chat_free"),
+					"static"))
 
 		);
 
@@ -420,23 +442,41 @@ class ChatCoreFixtureProvider
 				"Right")
 
 			.setRbBillRoute (
-				billRoute)
+				routeHelper.findByCodeRequired (
+					GlobalId.root,
+					"test",
+					"chat_5_00"))
 
 			.setRbFreeRouter (
-				freeRouter)
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"chat_free"),
+					"static"))
 
 			.setMagicRouter (
-				freeRouter)
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"chat_free"),
+					"static"))
 
 			.setWapRouter (
-				freeRouter)
+				routerHelper.findByCodeRequired (
+					routeHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"chat_free"),
+					"static"))
 
 		);
 
 		// chat users, regular
 
-		List<ChatUserRec> chatUsers =
-			new ArrayList<ChatUserRec> ();
+		List <ChatUserRec> chatUsers =
+			new ArrayList<> ();
 
 		for (
 			int index = 0;
@@ -501,8 +541,8 @@ class ChatCoreFixtureProvider
 
 		// chat users, monitors
 
-		List<ChatUserRec> chatMonitors =
-			new ArrayList<ChatUserRec> ();
+		List <ChatUserRec> chatMonitors =
+			new ArrayList<> ();
 
 		for (
 			int index = 0;

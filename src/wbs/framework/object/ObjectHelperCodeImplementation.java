@@ -64,7 +64,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 		)) { 
 
 			parentIdAndCodeCache =
-				new AdvancedCache.IdBuilder<Pair<Long,String>,Long,RecordType> ()
+				new AdvancedCache.IdBuilder <Pair<Long,String>,Long,RecordType> ()
 
 				.dummy (! allOf (				
 					() -> model.parentField ().cacheable (),
@@ -169,11 +169,13 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 
 			throw new RuntimeException (
 				stringFormat (
-					"No such object %s ",
+					"No such %s with parent %s and code %s",
+					model.objectName (),
+					objectManager.objectPath (
+						objectManager.findObject (
+							ancestorGlobalId)),
 					joinWithFullStop (
-						codes),
-					"with parent %s",
-					ancestorGlobalId));
+						codes)));
 
 		}
 
@@ -335,7 +337,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 			@NonNull Record<?> parent,
 			@NonNull String... codes) {
 
-		ObjectHelper<?> parentHelper =
+		ObjectHelper <?> parentHelper =
 			objectManager.objectHelperForClassRequired (
 				parent.getClass ());
 
@@ -344,10 +346,9 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 				parentHelper.objectTypeId (),
 				parent.getId ());
 
-		return optionalRequired (
-			findByCode (
-				parentGlobalId,
-				codes));
+		return findByCodeRequired (
+			parentGlobalId,
+			codes);
 
 	}
 

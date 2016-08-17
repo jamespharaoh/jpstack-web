@@ -3,6 +3,7 @@ package wbs.smsapps.manualresponder.fixture;
 import javax.inject.Inject;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.database.Database;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.record.GlobalId;
 import wbs.platform.currency.model.CurrencyObjectHelper;
@@ -31,6 +32,9 @@ class ManualResponderFixtureProvider
 
 	@Inject
 	CurrencyObjectHelper currencyHelper;
+
+	@Inject
+	Database database;
 
 	@Inject
 	KeywordObjectHelper keywordHelper;
@@ -145,6 +149,8 @@ class ManualResponderFixtureProvider
 				18l)
 
 		);
+
+		database.flush ();
 
 		keywordHelper.insert (
 			keywordHelper.createInstance ()
