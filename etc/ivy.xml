@@ -35,7 +35,7 @@
 		<dependency
 			org="org.apache.commons"
 			name="commons-lang3"
-			rev="3.2.1"/>
+			rev="3.4"/>
 
 		<!-- functional java -->
 

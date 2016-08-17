@@ -2,7 +2,6 @@ package wbs.applications.imchat.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import wbs.framework.record.IdObject;
 import wbs.platform.user.model.UserRec;
 
@@ -19,7 +18,7 @@ class ImChatOperatorReport
 
 	@Override
 	public
-	Integer getId () {
+	Long getId () {
 		return user.getId ();
 	}
 

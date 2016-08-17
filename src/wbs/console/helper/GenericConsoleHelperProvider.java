@@ -243,9 +243,10 @@ class GenericConsoleHelperProvider
 
 		// lookup object
 
-		Integer id =
-			(Integer)
-			contextStuff.get (idKey ());
+		Long id =
+			(Long)
+			contextStuff.get (
+				idKey ());
 
 		Record<?> object =
 			objectHelper.findRequired (
@@ -347,16 +348,16 @@ class GenericConsoleHelperProvider
 	@Override
 	public
 	String getPathId (
-			Integer objectId) {
+			@NonNull Long objectId) {
 
 		if (cryptor != null) {
 
-			return cryptor.encryptInt (
+			return cryptor.encryptInteger (
 				objectId);
 
 		} else {
 
-			return Integer.toString (
+			return Long.toString (
 				objectId);
 
 		}
@@ -534,8 +535,8 @@ class GenericConsoleHelperProvider
 	Record<?> lookupObject (
 			@NonNull ConsoleContextStuff contextStuff) {
 
-		int objectId =
-			(Integer)
+		Long objectId =
+			(Long)
 			contextStuff.get (
 				idKey);
 

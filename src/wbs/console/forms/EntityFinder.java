@@ -8,7 +8,7 @@ public
 interface EntityFinder<Entity extends Record<Entity>> {
 
 	Entity findEntity (
-			int id);
+			Long id);
 
 	List<Entity> findEntities ();
 

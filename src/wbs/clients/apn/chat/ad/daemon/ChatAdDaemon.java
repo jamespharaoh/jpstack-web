@@ -8,11 +8,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.ad.model.ChatAdTemplateRec;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
@@ -31,6 +33,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.record.IdObject;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -96,8 +99,11 @@ class ChatAdDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
-		return 60 * 1000;
+	Duration getSleepDuration () {
+
+		return Duration.standardSeconds (
+			600);
+
 	}
 
 	@Override
@@ -164,7 +170,7 @@ class ChatAdDaemon
 
 	private
 	void doChatUserAd (
-			int chatUserId) {
+			@NonNull Long chatUserId) {
 
 		log.debug (
 			stringFormat (
@@ -247,7 +253,7 @@ class ChatAdDaemon
 			while (! adTemplates.isEmpty ()) {
 
 				int templateNumber =
-					randomLogic.randomInteger (
+					randomLogic.randomJavaInteger (
 						adTemplates.size ());
 
 				ChatAdTemplateRec chatAdTemplate =
@@ -333,10 +339,10 @@ class ChatAdDaemon
 						chat,
 						"magic"),
 					adService,
-					(long) commandHelper.findByCodeRequired (
-						chat,
-						"join_next"
-					).getId ());
+					IdObject.objectId (
+						commandHelper.findByCodeRequired (
+							chat,
+							"join_next")));
 
 			}
 

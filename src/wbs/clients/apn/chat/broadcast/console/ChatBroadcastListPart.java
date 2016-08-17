@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.broadcast.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ class ChatBroadcastListPart
 
 		chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		broadcasts =

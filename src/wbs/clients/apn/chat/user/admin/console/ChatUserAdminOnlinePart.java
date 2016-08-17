@@ -24,7 +24,7 @@ class ChatUserAdminOnlinePart
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 	}

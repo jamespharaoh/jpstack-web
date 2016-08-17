@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
@@ -15,7 +16,6 @@ import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 
 @PrototypeComponent ("chatMessagePendingFormResponder")
 public
@@ -46,7 +46,7 @@ class ChatMessagePendingFormResponder
 
 		chatMessage =
 			chatMessageHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatMessageId"));
 
 		chatHelpTemplates =

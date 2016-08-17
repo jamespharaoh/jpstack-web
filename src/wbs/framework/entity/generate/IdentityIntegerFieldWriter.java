@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -31,7 +32,7 @@ class IdentityIntegerFieldWriter {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		// write field
 
@@ -42,7 +43,7 @@ class IdentityIntegerFieldWriter {
 				context.recordClassName ())
 
 			.typeNameFormat (
-				"Integer")
+				"Long")
 
 			.propertyNameFormat (
 				"%s",

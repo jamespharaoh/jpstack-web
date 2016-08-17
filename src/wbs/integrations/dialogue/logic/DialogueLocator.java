@@ -13,8 +13,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -22,6 +20,8 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
+import lombok.Cleanup;
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -63,8 +63,8 @@ class DialogueLocator
 	@Override
 	public
 	LongLat lookup (
-			int locatorId,
-			String number) {
+			@NonNull Long locatorId,
+			@NonNull String number) {
 
 		LocatorInfo locatorInfo =
 			new LocatorInfo ();
@@ -90,8 +90,8 @@ class DialogueLocator
 	}
 
 	void lookupDialogueLocator (
-			LocatorInfo locatorInfo,
-			int locatorId) {
+			@NonNull LocatorInfo locatorInfo,
+			@NonNull Long locatorId) {
 
 		@Cleanup
 		Transaction transaction =
@@ -104,7 +104,7 @@ class DialogueLocator
 				locatorId);
 
 		DialogueLocatorRec dialogueLocator =
-			(DialogueLocatorRec) (Object)
+			(DialogueLocatorRec)
 			objectManager.getParent (
 				locator);
 

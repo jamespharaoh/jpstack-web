@@ -82,7 +82,7 @@ class ChatGraphsDailyUsersImageResponder
 
 		ChatRec chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		searchMap.put (

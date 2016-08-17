@@ -3,6 +3,7 @@ package wbs.smsapps.alerts.daemon;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
@@ -14,14 +15,14 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -103,8 +104,11 @@ class AlertsDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
-		return 20 * 1000;
+	Duration getSleepDuration () {
+
+		return Duration.standardSeconds (
+			20);
+
 	}
 
 	@Override
@@ -142,7 +146,7 @@ class AlertsDaemon
 
 		// find alerts settings pending
 
-		List<Integer> alertsSettingsIds =
+		List<Long> alertsSettingsIds =
 			alertsSettingsHelper.findAll ().stream ()
 
 			.filter (
@@ -177,7 +181,7 @@ class AlertsDaemon
 		// process alerts settings
 
 		for (
-			Integer alertsSettingsId
+			Long alertsSettingsId
 				: alertsSettingsIds
 		) {
 
@@ -209,7 +213,7 @@ class AlertsDaemon
 
 	protected
 	void runOnce (
-			int alertsSettingsId) {
+			@NonNull Long alertsSettingsId) {
 
 		log.debug (
 			stringFormat (
@@ -329,10 +333,10 @@ class AlertsDaemon
 				now);
 
 		Long maxDurationSeconds =
-			(long)
-			maxDurationFoundInQueue
-				.toStandardSeconds ()
-				.getSeconds ();
+			fromJavaInteger (
+				maxDurationFoundInQueue
+					.toStandardSeconds ()
+					.getSeconds ());
 
 		log.debug (
 			stringFormat (
@@ -433,7 +437,6 @@ class AlertsDaemon
 					alertsSettings)
 
 				.setIndex (
-					(int) (long)
 					alertsSettings.getNumAlerts ())
 
 				.setTimestamp (
@@ -474,7 +477,6 @@ class AlertsDaemon
 				alertsSettings)
 
 			.setIndex (
-				(int) (long)
 				alertsSettings.getNumStatusChecks ())
 
 			.setTimestamp (

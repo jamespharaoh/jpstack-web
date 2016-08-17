@@ -33,7 +33,7 @@ class AlertsSubjectsPart
 
 		AlertsSettingsRec alertsSettings =
 			alertsSettingsHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"alertsSettingsId"));
 
 		alertsSubjects =

@@ -13,7 +13,7 @@ interface ConsoleHelperMethods<ObjectType extends Record<ObjectType>> {
 			Record<?> object);
 
 	String getPathId (
-			Integer objectId);
+			Long objectId);
 
 	String getDefaultContextPath (
 			Record<?> object);

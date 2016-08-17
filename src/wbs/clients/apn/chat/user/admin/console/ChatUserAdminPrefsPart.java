@@ -27,7 +27,7 @@ class ChatUserAdminPrefsPart
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 	}
 

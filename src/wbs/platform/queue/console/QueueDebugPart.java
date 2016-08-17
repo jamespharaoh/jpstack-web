@@ -174,7 +174,6 @@ class QueueDebugPart
 
 				&& notEqual (
 					form.sliceId (),
-					(long) (int)
 					queueInfo.slice.getId ())
 
 			) {

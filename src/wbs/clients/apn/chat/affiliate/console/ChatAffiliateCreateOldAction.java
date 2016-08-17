@@ -1,18 +1,17 @@
 package wbs.clients.apn.chat.affiliate.console;
 
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
-import static wbs.framework.utils.etc.Misc.toInteger;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.experimental.Accessors;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.experimental.Accessors;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.core.console.ChatConsoleHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -35,7 +34,6 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 import wbs.sms.keyword.logic.KeywordLogic;
 
@@ -108,19 +106,10 @@ class ChatAffiliateCreateOldAction
 			simplifyToCodeRequired (
 				name);
 
-		Integer chatSchemeId =
-			toInteger (
+		Long chatSchemeId =
+			Long.parseLong (
 				requestContext.parameterRequired (
 					"chatScheme"));
-
-		if (chatSchemeId == null) {
-
-			requestContext.addError (
-				"Please fill in the form properly");
-
-			return null;
-
-		}
 
 		// check keywords
 		for (int i = 0; i < 3; i++) {
@@ -168,7 +157,7 @@ class ChatAffiliateCreateOldAction
 
 		ChatRec chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		ChatSchemeRec chatScheme =

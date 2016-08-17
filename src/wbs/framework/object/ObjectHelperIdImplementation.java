@@ -50,7 +50,7 @@ class ObjectHelperIdImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	Optional<RecordType> find (
-			long id) {
+			@NonNull Long id) {
 
 		return Optional.fromNullable (
 			objectDatabaseHelper.find (
@@ -61,7 +61,7 @@ class ObjectHelperIdImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	RecordType findRequired (
-			long id) {
+			@NonNull Long id) {
 
 		RecordType record =
 			objectDatabaseHelper.find (
@@ -89,17 +89,17 @@ class ObjectHelperIdImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	RecordType findOrNull (
-			long id) {
+			@NonNull Long id) {
 
-		return objectDatabaseHelper
-			.find (id);
+		return objectDatabaseHelper.find (
+			id);
 
 	}
 
 	@Override
 	public
 	RecordType findOrThrow (
-			long id,
+			@NonNull Long id,
 			@NonNull Supplier<? extends RuntimeException> orThrow) {
 
 		RecordType object =

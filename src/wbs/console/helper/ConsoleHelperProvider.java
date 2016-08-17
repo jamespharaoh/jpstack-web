@@ -9,7 +9,7 @@ interface ConsoleHelperProvider<ConcreteType extends Record<ConcreteType>> {
 	String objectName ();
 
 	String getPathId (
-			Integer objectId);
+			Long objectId);
 
 	String getDefaultContextPath (
 			Record<?> object);

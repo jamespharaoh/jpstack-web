@@ -11,11 +11,10 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogLogic;
@@ -281,7 +280,6 @@ class ChatSendLogicImplementation
 				deliveryTypeCode)
 
 			.ref (
-				(long)
 				chatUser.getId ())
 
 			.tags (

@@ -68,7 +68,7 @@ class ChatHelpLogPendingSummaryPart
 
 		chatHelpLog =
 			chatHelpLogHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatHelpLogId"));
 
 		chatUser =
@@ -170,7 +170,7 @@ class ChatHelpLogPendingSummaryPart
 			"<td>%s</td>\n",
 			currencyLogic.formatHtml (
 				chatUser.getChat ().getCurrency (),
-				(long) chatUser.getCredit ()),
+				chatUser.getCredit ()),
 
 			"</tr>\n");
 

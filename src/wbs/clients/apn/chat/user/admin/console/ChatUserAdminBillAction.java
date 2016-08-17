@@ -83,7 +83,7 @@ class ChatUserAdminBillAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		// lock prevents race condition between limit check and update
@@ -91,7 +91,7 @@ class ChatUserAdminBillAction
 		chatUserHelper.lock (
 			chatUser);
 
-		// enforce £30/day limit
+		// enforce ��30/day limit
 
 		if (chatCreditLogic.userBillLimitApplies (chatUser)) {
 

@@ -6,10 +6,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditObjectHelper;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -113,7 +112,7 @@ class ChatUserAdminCreditAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		ChatUserCreditRec chatUserCredit =

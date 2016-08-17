@@ -8,10 +8,9 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -19,7 +18,6 @@ import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.RequestContext;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
-import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -35,9 +33,6 @@ class BroadcastSystemsReportFile
 
 	@Inject
 	Database database;
-
-	@Inject
-	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
 	SmsDeliveryReportLogic reportLogic;
@@ -68,7 +63,7 @@ class BroadcastSystemsReportFile
 			Data data) {
 
 		data.routeId =
-			requestContext.requestIntRequired (
+			requestContext.requestIntegerRequired (
 				"routeId");
 
 		data.transactionId =
@@ -136,7 +131,7 @@ class BroadcastSystemsReportFile
 	static
 	class Data {
 
-		int routeId;
+		Long routeId;
 		String transactionId;
 		MessageStatus status;
 		String statusCode;

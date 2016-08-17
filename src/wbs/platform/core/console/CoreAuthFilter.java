@@ -20,10 +20,9 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import lombok.Cleanup;
-
 import org.joda.time.Instant;
 
+import lombok.Cleanup;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
@@ -134,7 +133,7 @@ class CoreAuthFilter
 			// ok put him in the ok list
 
 			onlineSessionIdsByUserId.put (
-				(long) (int) user.getId (),
+				user.getId (),
 				online.getSessionId ());
 
 		}

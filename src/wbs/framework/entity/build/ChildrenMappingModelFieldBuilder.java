@@ -1,17 +1,20 @@
 package wbs.framework.entity.build;
 
 import static wbs.framework.utils.etc.Misc.classForNameRequired;
+import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.reflect.TypeUtils;
+
+import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginManager;
@@ -74,16 +77,29 @@ class ChildrenMappingModelFieldBuilder {
 				capitalise (
 					spec.typeName ()));
 
-		Class<?> fieldTypeClass =
+		Class <?> fieldTypeClass =
 			classForNameRequired (
 				fullFieldTypeName);
 
-		Class<?> mapTypeClass =
-			classForNameRequired (
+		if (
+			doesNotContain (
+				mapTypeClasses.keySet (),
+				spec.mapType ())
+		) {
+
+			throw new RuntimeException (
 				stringFormat (
-					"java.lang.%s",
-					capitalise (
-						spec.mapType ())));
+					"Invalid map type %s ",
+					spec.mapType (),
+					"for model child field %s.%s",
+					context.modelMeta.name (),
+					fieldName));
+
+		}
+
+		Class <?> mapTypeClass =
+			mapTypeClasses.get (
+				spec.mapType ());
 
 		// create model field
 
@@ -149,5 +165,19 @@ class ChildrenMappingModelFieldBuilder {
 			modelField);
 
 	}
+
+	public final static
+	Map <String, Class <?>> mapTypeClasses =
+		ImmutableMap.<String, Class <?>> builder ()
+
+		.put (
+			"string",
+			String.class)
+
+		.put (
+			"integer",
+			Long.class)
+
+		.build ();
 
 }

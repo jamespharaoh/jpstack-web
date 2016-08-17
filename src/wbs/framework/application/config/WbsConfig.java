@@ -3,14 +3,14 @@ package wbs.framework.application.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-
-import com.google.common.collect.ImmutableList;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.tools.DataFromXml;
@@ -46,10 +46,6 @@ class WbsConfig {
 
 	@DataAttribute (
 		required = true)
-	String databaseName;
-
-	@DataAttribute (
-		required = true)
 	String defaultSlice;
 
 	@DataAttribute
@@ -57,41 +53,13 @@ class WbsConfig {
 
 	// email settings
 
-	@DataAttribute (
+	@DataChild (
 		required = true)
-	String smtpHostname;
+	WbsConfigDatabase database;
 
-	@DataAttribute (
+	@DataChild (
 		required = true)
-	String smtpPort;
-
-	@DataAttribute (
-		required = true)
-	String smtpUsername;
-
-	@DataAttribute (
-		required = true)
-	String smtpPassword;
-
-	@DataAttribute (
-		required = true)
-	String defaultEmailEnvelopeFrom;
-
-	@DataAttribute (
-		required = true)
-	String defaultEmailFromAddress;
-
-	@DataAttribute (
-		required = true)
-	String defaultEmailFromName;
-
-	@DataAttribute (
-		required = true)
-	String defaultEmailReplyToAddress;
-
-	@DataAttribute (
-		required = true)
-	String developerEmailAddress;
+	WbsConfigEmail email; 
 
 	// security
 
@@ -105,8 +73,8 @@ class WbsConfig {
 		childrenElement = "test-users",
 		childElement = "test-user",
 		valueAttribute = "name")
-	List<String> testUsers =
-		new ArrayList<String> ();
+	List <String> testUsers =
+		new ArrayList<> ();
 
 	// implementation
 
@@ -118,8 +86,10 @@ class WbsConfig {
 			new DataFromXml ()
 
 			.registerBuilderClasses (
-				ImmutableList.<Class<?>> of (
-					WbsConfig.class));
+				ImmutableList.of (
+					WbsConfig.class,
+					WbsConfigDatabase.class,
+					WbsConfigEmail.class));
 
 		WbsConfig wbsConfig =
 			(WbsConfig)

@@ -3,16 +3,15 @@ package wbs.clients.apn.chat.user.core.logic;
 import java.util.Collection;
 import java.util.List;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.experimental.Accessors;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.DateTimeZone;
 
 import com.google.common.base.Optional;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -33,7 +32,7 @@ interface ChatUserLogic {
 	AffiliateRec getAffiliate (
 			ChatUserRec chatUser);
 
-	Integer getAffiliateId (
+	Long getAffiliateId (
 			ChatUserRec chatUser);
 
 	void logoff (
@@ -49,10 +48,10 @@ interface ChatUserLogic {
 	boolean compatible (
 			Gender thisGender,
 			Orient thisOrient,
-			Optional<Integer> thisCategoryId,
+			Optional<Long> thisCategoryId,
 			Gender thatGender,
 			Orient thatOrient,
-			Optional<Integer> thatCategoryId);
+			Optional<Long> thatCategoryId);
 
 	boolean compatible (
 			ChatUserRec thisUser,
@@ -99,9 +98,6 @@ interface ChatUserLogic {
 	}
 
 	void adultVerify (
-			ChatUserRec chatUser);
-
-	void monitorCap (
 			ChatUserRec chatUser);
 
 	ChatUserRec createChatMonitor (

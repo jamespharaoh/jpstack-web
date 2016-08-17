@@ -13,18 +13,18 @@ public
 interface ObjectHelperIdMethods<RecordType extends Record<RecordType>> {
 
 	Optional<RecordType> find (
-			long id);
+			Long id);
 
 	@Nonnull
 	RecordType findRequired (
-			long id);
+			Long id);
 
 	@Deprecated
 	RecordType findOrNull (
-			long id);
+			Long id);
 
 	RecordType findOrThrow (
-			long id,
+			Long id,
 			Supplier<? extends RuntimeException> orThrow);
 
 	List<RecordType> findManyRequired (

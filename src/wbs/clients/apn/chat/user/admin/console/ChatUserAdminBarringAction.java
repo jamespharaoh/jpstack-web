@@ -1,13 +1,12 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
 import static wbs.framework.utils.etc.Misc.trim;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -80,8 +79,8 @@ class ChatUserAdminBarringAction
 
 		// get stuff
 
-		int chatUserId =
-			requestContext.stuffInt (
+		Long chatUserId =
+			requestContext.stuffInteger (
 				"chatUserId");
 
 		// get params

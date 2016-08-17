@@ -95,7 +95,7 @@ class ImChatPendingFormResponder
 
 		message =
 			imChatMessageHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"imChatMessageId"));
 
 		conversation =

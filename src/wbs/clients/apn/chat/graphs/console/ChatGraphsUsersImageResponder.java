@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.graphs.console;
 
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+
 import java.awt.Color;
 import java.util.Collections;
 import java.util.List;
@@ -73,7 +75,7 @@ class ChatGraphsUsersImageResponder
 
 		chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		timezone =
@@ -123,25 +125,26 @@ class ChatGraphsUsersImageResponder
 	protected
 	void prepareVerticalScale () {
 
-		int realMax = 0;
+		long realMax = 0;
 
 		for (
-			ChatStatsRec cs
+			ChatStatsRec chatStats
 				: allChatStats
 		) {
 
-			if (cs.getNumUsers() > realMax) {
+			if (chatStats.getNumUsers() > realMax) {
 
 				realMax =
-					(int) (long)
-					cs.getNumUsers ();
+					chatStats.getNumUsers ();
 
 			}
 
 		}
 
 		verticalScale =
-			GraphScale.setScale (realMax, 0);
+			GraphScale.setScale (
+				realMax,
+				0);
 
 	}
 
@@ -170,10 +173,10 @@ class ChatGraphsUsersImageResponder
 
 			int x =
 				+ xOrigin
-				+ (int) (1
-					* (double) plotWidth
-					* (double) (instant.getMillis () - minTime.getMillis ())
-					/ (double) (maxTime.getMillis () - minTime.getMillis ()));
+				+ toJavaIntegerRequired (1l
+					* plotWidth
+					* (instant.getMillis () - minTime.getMillis ())
+					/ (maxTime.getMillis () - minTime.getMillis ()));
 
 			graphics.setColor (
 				new Color (192, 192, 192));
@@ -244,18 +247,18 @@ class ChatGraphsUsersImageResponder
 
 			xPoints [index] =
 				+ xOrigin
-				+ (int) (1
-					* (double) plotWidth
-					* (double) (
+				+ toJavaIntegerRequired (1l
+					* plotWidth
+					* (
 						+ chatStats.getTimestamp ().getMillis ()
 						- minTime.getMillis ())
-					/ (double) (
+					/ (
 						+ maxTime.getMillis ()
 						- minTime.getMillis ()));
 
 			yPoints [index] =
 				+ yOrigin
-				- (int) (1
+				- toJavaIntegerRequired (1l
 					* chatStats.getNumUsers ()
 					* plotHeight
 					* verticalScale.getMultiplier ()

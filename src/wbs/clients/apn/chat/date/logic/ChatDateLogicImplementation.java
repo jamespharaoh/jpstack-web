@@ -6,11 +6,10 @@ import java.util.Collections;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -21,6 +20,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.record.IdObject;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
@@ -97,17 +97,17 @@ class ChatDateLogicImplementation
 
 		chatSendLogic.sendSystemMagic (
 			chatUser,
-			Optional.<Long>absent (),
+			Optional.absent (),
 			"date_hint_upgrade",
 			commandHelper.findByCodeRequired (
 				chat,
 				"magic"),
-			(long) commandHelper.findByCodeRequired (
-				chat,
-				"date_join_photo"
-			).getId (),
+			IdObject.objectId (
+				commandHelper.findByCodeRequired (
+					chat,
+					"date_join_photo")),
 			TemplateMissing.error,
-			Collections.<String,String>emptyMap ());
+			Collections.emptyMap ());
 
 		// and update the chat user
 
@@ -265,10 +265,10 @@ class ChatDateLogicImplementation
 				commandHelper.findByCodeRequired (
 					chat,
 					"magic"),
-				(long) commandHelper.findByCodeRequired (
-					chat,
-					"help"
-				).getId (),
+				IdObject.objectId (
+					commandHelper.findByCodeRequired (
+						chat,
+						"help")),
 				TemplateMissing.ignore,
 				ImmutableMap.<String,String>builder ()
 

@@ -1,6 +1,7 @@
 package wbs.framework.data.tools;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
@@ -10,12 +11,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.NonNull;
-import lombok.SneakyThrows;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import lombok.NonNull;
+import lombok.SneakyThrows;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 
@@ -109,14 +109,15 @@ class DataFromJson {
 
 			field.set (
 				dataValue,
-				(int) (long) (Long)
-				fieldValue);
+				toJavaIntegerRequired (
+					(Long)
+					fieldValue));
 
 		} else if (field.getType () == Long.class) {
 
 			field.set (
 				dataValue,
-				(long) (Long)
+				(Long)
 				fieldValue);
 
 		} else if (field.getType () == String.class) {

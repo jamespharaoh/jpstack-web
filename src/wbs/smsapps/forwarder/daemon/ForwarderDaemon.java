@@ -20,12 +20,11 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import org.joda.time.Duration;
+
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-
-import org.joda.time.Duration;
-
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -59,8 +58,8 @@ class ForwarderDaemon
 
 	// state
 
-	QueueBuffer<Integer,Integer> buffer =
-		new QueueBuffer<Integer,Integer> (
+	QueueBuffer<Long,Long> buffer =
+		new QueueBuffer<> (
 			bufferSize);
 
 	private
@@ -70,7 +69,7 @@ class ForwarderDaemon
 		public
 		boolean doQuery () {
 
-			Set<Integer> activeIds =
+			Set<Long> activeIds =
 				buffer.getKeys ();
 
 			List<ForwarderMessageInRec> forwarderMessageIns;
@@ -230,7 +229,7 @@ class ForwarderDaemon
 
 						stringBuilder.append (
 							URLEncoder.encode (
-								Integer.toString (
+								Long.toString (
 									forwarderMessageIn.getId ()),
 								"utf-8"));
 
@@ -399,7 +398,7 @@ class ForwarderDaemon
 
 		private
 		void doMessage (
-				@NonNull Integer forwarderMessageInId) {
+				@NonNull Long forwarderMessageInId) {
 
 			@Cleanup
 			Transaction checkTransaction =
@@ -470,8 +469,8 @@ class ForwarderDaemon
 
 		private
 		void doResult (
-				int forwarderMessageInId,
-				boolean success) {
+				@NonNull Long forwarderMessageInId,
+				@NonNull Boolean success) {
 
 			Transaction transaction =
 				database.currentTransaction ();
@@ -522,7 +521,7 @@ class ForwarderDaemon
 
 			while (true) {
 
-				Integer forwarderMessageInId;
+				Long forwarderMessageInId;
 
 				try {
 

@@ -1,11 +1,11 @@
 package wbs.platform.queue.console;
 
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
 
 import java.util.Map;
 
@@ -209,7 +209,7 @@ class QueueConsoleLogic {
 			- queueSubject.getActiveItems ();
 
 		QueueItemRec queueItem =
-			queueItemHelper.findByIndexOrNull (
+			queueItemHelper.findByIndexRequired (
 				queueSubject,
 				nextQueueItemId);
 

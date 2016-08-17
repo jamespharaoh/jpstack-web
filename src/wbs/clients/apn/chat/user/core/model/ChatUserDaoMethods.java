@@ -53,10 +53,10 @@ interface ChatUserDaoMethods {
 			Instant now);
 
 	@Deprecated
-	List<Integer> searchIds (
+	List<Long> searchIds (
 			Map<String,Object> searchMap);
 
-	List<Integer> searchIds (
+	List<Long> searchIds (
 			ChatUserSearch search);
 
 	List<ChatUserRec> find (

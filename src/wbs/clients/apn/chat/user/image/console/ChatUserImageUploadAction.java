@@ -1,10 +1,11 @@
 package wbs.clients.apn.chat.user.image.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
+import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -12,11 +13,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import lombok.Cleanup;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -209,7 +209,7 @@ class ChatUserImageUploadAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		// create media
@@ -257,8 +257,8 @@ class ChatUserImageUploadAction
 				chatUserImageType)
 
 			.setIndex (
-				(long)
-				chatUserImageList.size ())
+				fromJavaInteger (
+					chatUserImageList.size ()))
 
 		);
 

@@ -2,13 +2,13 @@ package wbs.framework.web;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,10 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import lombok.experimental.Accessors;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.FileUploadException;
@@ -44,6 +40,9 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
+import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.ProxiedRequestComponent;
 import wbs.framework.utils.etc.RuntimeIoException;
 
@@ -217,7 +216,7 @@ class RequestContextImplementation
 
 	@Override
 	public
-	long parameterInteger (
+	Long parameterInteger (
 			@NonNull String key) {
 
 		return Long.parseLong (
@@ -997,11 +996,11 @@ class RequestContextImplementation
 
 	@Override
 	public
-	Optional<Integer> requestInt (
+	Optional <Long> requestInteger (
 			@NonNull String key) {
 
 		return optionalCast (
-			Integer.class,
+			Long.class,
 			request (
 				key));
 
@@ -1009,7 +1008,7 @@ class RequestContextImplementation
 
 	@Override
 	public
-	Integer requestIntRequired (
+	Long requestIntegerRequired (
 			@NonNull String key) {
 
 		Object requestValue =
@@ -1030,7 +1029,7 @@ class RequestContextImplementation
 
 		if (
 			isNotInstanceOf (
-				Integer.class,
+				Long.class,
 				requestValue)
 		) {
 
@@ -1042,14 +1041,14 @@ class RequestContextImplementation
 
 		}
 
-		return (Integer)
+		return (Long)
 			requestValue;
 
 	}
 
 	@Override
 	public
-	Optional<String> requestString (
+	Optional <String> requestString (
 			@NonNull String key) {
 
 		Object requestValue =

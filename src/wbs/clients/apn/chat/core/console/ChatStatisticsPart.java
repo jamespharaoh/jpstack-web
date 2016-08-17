@@ -59,7 +59,7 @@ class ChatStatisticsPart
 
 		chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		List<ChatAffiliateUsersSummaryRec> chatAffiliateUsersSummaries =

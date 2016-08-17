@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.infosite.api;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -43,7 +44,7 @@ class ChatInfoSiteImageResponder
 
 		infoSite =
 			chatInfoSiteHelper.findRequired (
-				requestContext.requestIntRequired (
+				requestContext.requestIntegerRequired (
 					"chatInfoSiteId"));
 
 		if (
@@ -58,13 +59,14 @@ class ChatInfoSiteImageResponder
 
 		}
 
-		int index =
-			requestContext.requestIntRequired (
+		Long index =
+			requestContext.requestIntegerRequired (
 				"chatInfoSiteIndex");
 
 		ChatUserRec chatUser =
 			infoSite.getOtherChatUsers ().get (
-				index);
+				toJavaIntegerRequired (
+					index));
 
 		if (chatUser == null) {
 

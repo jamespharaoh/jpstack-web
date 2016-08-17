@@ -17,43 +17,43 @@ interface ChatMessageDaoMethods {
 	ChatMessageRec findSignup (
 			ChatUserRec chatUser);
 
-	List<ChatMessageRec> findSignupTimeout (
+	List <ChatMessageRec> findSignupTimeout (
 			ChatRec chat,
 			Instant timestamp);
 
 	// messages sent by console user
 
-	List<ChatMessageRec> findBySenderAndTimestamp (
+	List <ChatMessageRec> findBySenderAndTimestamp (
 			ChatRec chat,
 			UserRec senderUser,
 			Interval timestampInterval);
 
 	// all messages to/from user
 
-	int count (
+	Long count (
 			ChatUserRec chatUser);
 
-	List<ChatMessageRec> find (
+	List <ChatMessageRec> find (
 			ChatUserRec chatUser);
 
-	List<ChatMessageRec> findLimit (
+	List <ChatMessageRec> findLimit (
 			ChatUserRec chatUser,
-			int maxResults);
+			Long maxResults);
 
 	// all messages between two users
 
-	List<ChatMessageRec> findFromTo (
+	List <ChatMessageRec> findFromTo (
 			ChatUserRec fromChatUser,
 			ChatUserRec toChatUser);
 
-	List<ChatMessageRec> findLimit (
+	List <ChatMessageRec> findLimit (
 			ChatUserRec fromChatUser,
 			ChatUserRec toChatUser,
-			int maxResults);
+			Long maxResults);
 
 	// search
 
-	List<ChatMessageRec> search (
+	List <ChatMessageRec> search (
 			ChatMessageSearch search);
 
 }

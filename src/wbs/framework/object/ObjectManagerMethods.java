@@ -66,32 +66,32 @@ interface ObjectManagerMethods {
 
 	// utilities
 
-	Class<?> objectTypeCodeToClass (
+	Class <?> objectTypeCodeToClass (
 			String typeCode);
 
-	ObjectHelper<?> objectHelperForTypeCode (
+	ObjectHelper <?> objectHelperForTypeCode (
 			String typeCode);
 
-	ObjectHelper<?> objectHelperForTypeId (
+	ObjectHelper <?> objectHelperForTypeId (
 			Long typeId);
 
 	Long objectClassToTypeId (
-			Class<?> objectClass);
+			Class <?> objectClass);
 
 	boolean isParent (
-			Record<?> object,
-			Record<?> parent);
+			Record <?> object,
+			Record <?> parent);
 
-	<ObjectType extends Record<?>>
+	<ObjectType extends Record <?>>
 	ObjectType firstParent (
-			Record<?> object,
-			Set<ObjectType> parents);
+			Record <?> object,
+			Set <ObjectType> parents);
 
 	// object paths
 
 	String objectPath (
-			Record<?> dataObject,
-			Optional<Record<?>> assumedRoot,
+			Record <?> dataObject,
+			Optional <Record <?>> assumedRoot,
 			boolean mini,
 			boolean preload);
 

@@ -1,17 +1,17 @@
 package wbs.clients.apn.chat.contact.console;
 
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
-
-import lombok.Cleanup;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.Seconds;
 
+import lombok.Cleanup;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
@@ -29,7 +29,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.utils.TextualInterval;
 import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.TimeFormatException;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
@@ -97,7 +96,7 @@ class ChatMonitorInboxAlarmAction
 
 		ChatMonitorInboxRec chatMonitorInbox =
 			chatMonitorInboxHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatMonitorInboxId"));
 
 		ChatUserRec userChatUser =
@@ -158,7 +157,7 @@ class ChatMonitorInboxAlarmAction
 					TextualInterval.parseRequired (
 						timeZone,
 						timestampString,
-						0);
+						0l);
 
 				alarmTime =
 					interval.start ();

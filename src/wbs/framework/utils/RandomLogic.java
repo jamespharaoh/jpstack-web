@@ -5,7 +5,7 @@ import java.util.List;
 public
 interface RandomLogic {
 
-	int randomInteger (
+	int randomJavaInteger (
 			int limit);
 
 	long randomInteger (

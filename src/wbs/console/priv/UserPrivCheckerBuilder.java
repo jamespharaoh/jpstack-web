@@ -14,7 +14,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
@@ -60,7 +59,7 @@ class UserPrivCheckerBuilder {
 		@Override
 		public
 		boolean canRecursive (
-				int privId) {
+				@NonNull Long privId) {
 
 			return userPrivData.canNormal (
 				privId);
@@ -83,11 +82,11 @@ class UserPrivCheckerBuilder {
 		@Override
 		public
 		boolean canRecursive (
-				Class<? extends Record<?>> parentClass,
-				int parentId,
-				String... privCodes) {
+				@NonNull Class<? extends Record<?>> parentClass,
+				@NonNull Long parentId,
+				@NonNull String... privCodes) {
 
-			int parentTypeId =
+			Long parentTypeId =
 				userPrivData.coreGetObjectTypeId (
 					parentClass);
 
@@ -107,7 +106,7 @@ class UserPrivCheckerBuilder {
 				@NonNull Record<?> parentObject,
 				@NonNull String... privCodes) {
 
-			int parentObjectTypeId =
+			Long parentObjectTypeId =
 				userPrivData.coreGetObjectTypeId (
 					parentObject.getClass ());
 
@@ -140,7 +139,7 @@ class UserPrivCheckerBuilder {
 				@NonNull Record<?> parentObject,
 				@NonNull String... privCodes) {
 
-			int parentObjectTypeId =
+			Long parentObjectTypeId =
 				userPrivData.coreGetObjectTypeId (
 					parentObject.getClass ());
 
@@ -180,7 +179,7 @@ class UserPrivCheckerBuilder {
 					Record<?> parentObject =
 						(Record<?>) key;
 
-					int parentObjectTypeId =
+					Long parentObjectTypeId =
 						userPrivData.coreGetObjectTypeId (
 							parentObject.getClass ());
 
@@ -232,9 +231,9 @@ class UserPrivCheckerBuilder {
 		@Override
 		public
 		boolean canGrant (
-				int privId) {
+				@NonNull Long privId) {
 
-			Integer managePrivId =
+			Long managePrivId =
 				userPrivData.sharedData.managePrivIds.get (
 					privId);
 

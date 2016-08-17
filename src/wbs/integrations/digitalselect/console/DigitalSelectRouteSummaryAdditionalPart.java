@@ -40,7 +40,7 @@ class DigitalSelectRouteSummaryAdditionalPart
 
 		route =
 			routeHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"routeId"));
 
 		digitalSelectRouteOut =

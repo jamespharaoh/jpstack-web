@@ -1,12 +1,11 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 import static wbs.framework.utils.etc.Misc.trim;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-
 import wbs.clients.apn.chat.user.core.model.ChatUserNoteObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
@@ -74,7 +73,7 @@ class ChatUserNotesAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		// check params

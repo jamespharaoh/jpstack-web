@@ -1,0 +1,9 @@
+<plugin
+	name="fixtures"
+	package="wbs.framework.fixtures">
+
+	<layer name="fixture">
+		<bean class="FixturesComponents"/>
+	</layer>
+
+</plugin>

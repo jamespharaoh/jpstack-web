@@ -2,11 +2,10 @@ package wbs.smsapps.manualresponder.hibernate;
 
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import lombok.NonNull;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
@@ -16,6 +15,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 
+import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderOperatorReport;
@@ -35,7 +35,7 @@ class ManualResponderRequestDaoHibernate
 	List<ManualResponderRequestRec> findRecentLimit (
 			@NonNull ManualResponderRec manualResponder,
 			@NonNull NumberRec number,
-			@NonNull Integer maxResults) {
+			@NonNull Long maxResults) {
 
 		return findMany (
 			"findRecentLimit (manualResponder, number, maxResults)",
@@ -68,7 +68,8 @@ class ManualResponderRequestDaoHibernate
 					"_manualResponderRequest.id"))
 
 			.setMaxResults (
-				maxResults)
+				toJavaIntegerRequired (
+					maxResults))
 
 		);
 
@@ -245,7 +246,7 @@ class ManualResponderRequestDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
+	List<Long> searchIds (
 			@NonNull ManualResponderRequestSearch search) {
 
 		Criteria criteria =
@@ -283,7 +284,7 @@ class ManualResponderRequestDaoHibernate
 
 		return findMany (
 			"searchIds (search)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}
@@ -331,7 +332,7 @@ class ManualResponderRequestDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchServiceReportIds (
+	List<Long> searchServiceReportIds (
 			@NonNull ManualResponderRequestSearch search) {
 
 		Criteria criteria =
@@ -393,7 +394,7 @@ class ManualResponderRequestDaoHibernate
 	public
 	List<ManualResponderServiceReport> searchServiceReports (
 			@NonNull ManualResponderRequestSearch search,
-			@NonNull List<Integer> objectIds) {
+			@NonNull List<Long> objectIds) {
 
 		Criteria criteria =
 			searchServiceReportCriteria (
@@ -454,7 +455,7 @@ class ManualResponderRequestDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchOperatorReportIds (
+	List<Long> searchOperatorReportIds (
 			@NonNull ManualResponderRequestSearch search) {
 
 		Criteria criteria =
@@ -516,7 +517,7 @@ class ManualResponderRequestDaoHibernate
 	public
 	List<ManualResponderOperatorReport> searchOperatorReports (
 			@NonNull ManualResponderRequestSearch search,
-			@NonNull List<Integer> objectIds) {
+			@NonNull List<Long> objectIds) {
 
 		Criteria criteria =
 			searchOperatorReportCriteria (

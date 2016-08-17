@@ -6,11 +6,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import junit.framework.TestCase;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import junit.framework.TestCase;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.Gender;
@@ -98,16 +97,16 @@ class ChatUserLogicTest
 
 					(boolean)
 					chatUserLogic.compatible (
-						compatibleGenders
-							.get (indexLeft),
-						compatibleOrients
-							.get (indexLeft),
-						Optional.<Integer>absent (),
-						compatibleGenders
-							.get (indexRight),
-						compatibleOrients
-							.get (indexRight),
-						Optional.<Integer>absent ()));
+						compatibleGenders.get (
+							indexLeft),
+						compatibleOrients.get (
+							indexLeft),
+						Optional.absent (),
+						compatibleGenders.get (
+							indexRight),
+						compatibleOrients.get (
+							indexRight),
+						Optional.absent ()));
 
 			}
 

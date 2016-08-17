@@ -8,6 +8,8 @@ import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.runFilter;
 import static wbs.framework.utils.etc.Misc.runFilterAdvanced;
+import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
@@ -347,17 +349,18 @@ class MediaLogicImplementation
 
 		// work out hash code
 
-		int hash =
-			Arrays.hashCode (
-				data);
+		Long shortHash =
+			fromJavaInteger (
+				Arrays.hashCode (
+					data));
 
 		// look for existing content
 
-		List<ContentRec> list =
-			contentHelper.findByHash (
-				hash);
+		List <ContentRec> list =
+			contentHelper.findByShortHash (
+				shortHash);
 
-		int index = 0;
+		long index = 0;
 
 		for (
 			ContentRec content
@@ -390,7 +393,7 @@ class MediaLogicImplementation
 				data)
 
 			.setHash (
-				hash)
+				shortHash)
 
 			.setI (
 				index)
@@ -495,8 +498,10 @@ class MediaLogicImplementation
 			image,
 			mimeType,
 			filename,
-			(long) image.getWidth (),
-			(long) image.getHeight ());
+			fromJavaInteger (
+				image.getWidth ()),
+			fromJavaInteger (
+				image.getHeight ()));
 
 	}
 
@@ -526,12 +531,14 @@ class MediaLogicImplementation
 					image,
 					mimeType,
 					filename,
-					(long) image.getWidth (),
-					(long) image.getHeight ()));
+					fromJavaInteger (
+						image.getWidth ()),
+					fromJavaInteger (
+						image.getHeight ())));
 
 		} else {
 
-			return Optional.<MediaRec>absent ();
+			return Optional.absent ();
 
 		}
 
@@ -675,8 +682,10 @@ class MediaLogicImplementation
 				videoFrameImage,
 				mimeType,
 				filename,
-				(long) videoFrameImage.getWidth (),
-				(long) videoFrameImage.getHeight ()));
+				fromJavaInteger (
+					videoFrameImage.getWidth ()),
+				fromJavaInteger (
+					videoFrameImage.getHeight ())));
 
 	}
 
@@ -810,9 +819,18 @@ class MediaLogicImplementation
 		public
 		int read () {
 
-			return streamPos < data.length
-				? data [(int) (streamPos++)] & 0x000000ff
-				: -1;
+			if (streamPos < data.length) {
+
+				return Byte.toUnsignedInt (
+					data [
+						toJavaIntegerRequired (
+							streamPos ++)]);
+
+			} else {
+
+				return -1;
+
+			}
 
 		}
 
@@ -827,7 +845,8 @@ class MediaLogicImplementation
 
 				System.arraycopy (
 					data,
-					(int) streamPos,
+					toJavaIntegerRequired (
+						streamPos),
 					bytes,
 					offset,
 					length);
@@ -840,11 +859,14 @@ class MediaLogicImplementation
 			} else if (streamPos < data.length) {
 
 				int numread =
-					data.length - (int) streamPos;
+					toJavaIntegerRequired (
+						+ data.length
+						- streamPos);
 
 				System.arraycopy (
 					data,
-					(int) streamPos,
+					toJavaIntegerRequired (
+						streamPos),
 					bytes,
 					offset,
 					numread);
@@ -1101,8 +1123,10 @@ class MediaLogicImplementation
 
 		BufferedImage targetImage =
 			new BufferedImage (
-				(int) targetWidth,
-				(int) targetHeight,
+				toJavaIntegerRequired (
+					targetWidth),
+				toJavaIntegerRequired (
+					targetHeight),
 				imageType);
 
 		Graphics2D graphics =
@@ -1112,8 +1136,10 @@ class MediaLogicImplementation
 			image,
 			0,
 			0,
-			(int) targetWidth,
-			(int) targetHeight,
+			toJavaIntegerRequired (
+				targetWidth),
+			toJavaIntegerRequired (
+				targetHeight),
 			0,
 			0,
 			image.getWidth (),
@@ -1239,10 +1265,10 @@ class MediaLogicImplementation
 
 		BufferedImage targetImage =
 			new BufferedImage (
-				(int) (long)
-				targetWidth,
-				(int) (long)
-				targetHeight,
+				toJavaIntegerRequired (
+					targetWidth),
+				toJavaIntegerRequired (
+					targetHeight),
 				imageType);
 
 		Graphics2D graphics =
@@ -1252,12 +1278,18 @@ class MediaLogicImplementation
 			sourceImage,
 			0,
 			0,
-			(int) (long) targetWidth,
-			(int) (long) targetHeight,
-			(int) sourceOffsetHorizontal,
-			(int) sourceOffsetVertical,
-			(int) (sourceOffsetHorizontal + sourceWidth),
-			(int) (sourceOffsetVertical + sourceHeight),
+			toJavaIntegerRequired (
+				targetWidth),
+			toJavaIntegerRequired (
+				targetHeight),
+			toJavaIntegerRequired (
+				sourceOffsetHorizontal),
+			toJavaIntegerRequired (
+				sourceOffsetVertical),
+			toJavaIntegerRequired (
+				sourceOffsetHorizontal + sourceWidth),
+			toJavaIntegerRequired (
+				sourceOffsetVertical + sourceHeight),
 			null);
 
 		graphics.dispose ();

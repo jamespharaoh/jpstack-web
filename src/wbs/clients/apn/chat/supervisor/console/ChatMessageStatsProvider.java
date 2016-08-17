@@ -5,10 +5,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import org.joda.time.Instant;
 
+import lombok.NonNull;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageSearch;
@@ -42,17 +41,21 @@ class ChatMessageStatsProvider
 
 		// setup data structures
 
-		int[] receivedTotal =
-			new int [period.size ()];
+		long[] receivedTotal =
+			new long [
+				period.size ()];
 
-		int[] sentTotal =
-			new int [period.size ()];
+		long[] sentTotal =
+			new long [
+				period.size ()];
 
-		int[] missedTotal =
-			new int [period.size ()];
+		long[] missedTotal =
+			new long [
+				period.size ()];
 
-		int[] charsTotal =
-			new int [period.size ()];
+		long[] charsTotal =
+			new long [
+				period.size ()];
 
 		// retrieve messages
 
@@ -61,7 +64,9 @@ class ChatMessageStatsProvider
 				new ChatMessageSearch ()
 
 			.chatId (
-				(Integer) conditions.get ("chatId"))
+				(Long)
+				conditions.get (
+					"chatId"))
 
 			.timestampAfter (
 				period.startTime ())

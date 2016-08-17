@@ -61,8 +61,7 @@ class ChatUserConsoleHooks
 			search
 
 				.chatId (
-					(long)
-					requestContext.stuffInt (
+					requestContext.stuffInteger (
 						"chatId"))
 
 				.deleted (

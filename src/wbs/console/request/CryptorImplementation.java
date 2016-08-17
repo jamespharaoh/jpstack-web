@@ -4,10 +4,10 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @PrototypeComponent ("cryptorImplementation")
@@ -26,16 +26,20 @@ class CryptorImplementation
 
 	@Override
 	public
-	String encryptInt (
-			int input) {
+	String encryptInteger (
+			@NonNull Long input) {
 
 		try {
 
 			byte[] clearText = new byte[] {
-				(byte) ((input & 0xff000000) >> 24),
-				(byte) ((input & 0x00ff0000) >> 16),
-				(byte) ((input & 0x0000ff00) >> 8),
-				(byte) ((input & 0x000000ff) >> 0)
+				(byte) ((input & 0xff00000000000000l) >> 56),
+				(byte) ((input & 0x00ff000000000000l) >> 48),
+				(byte) ((input & 0x0000ff0000000000l) >> 40),
+				(byte) ((input & 0x000000ff00000000l) >> 32),
+				(byte) ((input & 0x00000000ff000000l) >> 24),
+				(byte) ((input & 0x0000000000ff0000l) >> 16),
+				(byte) ((input & 0x000000000000ff00l) >> 8),
+				(byte) ((input & 0x00000000000000ffl) >> 0)
 			};
 
 			Cipher cipher =
@@ -65,13 +69,14 @@ class CryptorImplementation
 
 	@Override
 	public
-	int decryptInt (
-			String input) {
+	Long decryptInteger (
+			@NonNull String input) {
 
 		try {
 
 			byte[] cipherText =
-				fromHex (input);
+				fromHex (
+					input);
 
 			Cipher cipher =
 				Cipher.getInstance (
@@ -82,13 +87,18 @@ class CryptorImplementation
 				secretKey);
 
 			byte[] clearText =
-				cipher.doFinal (cipherText);
+				cipher.doFinal (
+					cipherText);
 
-			int ret =
-				((clearText[0] & 0xff) << 24)
-				| ((clearText[1] & 0xff) << 16)
-				| ((clearText[2] & 0xff) << 8)
-				| ((clearText[3] & 0xff) << 0);
+			Long ret = 0l
+				| ((clearText[0] & 0xff) << 56)
+				| ((clearText[1] & 0xff) << 48)
+				| ((clearText[2] & 0xff) << 40)
+				| ((clearText[3] & 0xff) << 32)
+				| ((clearText[4] & 0xff) << 24)
+				| ((clearText[5] & 0xff) << 16)
+				| ((clearText[6] & 0xff) << 8)
+				| ((clearText[7] & 0xff) << 0);
 
 			log.debug ("decrypted " + input + " as " + ret);
 

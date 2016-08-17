@@ -49,7 +49,7 @@ class ChatUserAdminDatePart
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 	}

@@ -16,10 +16,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -34,6 +30,9 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.integrations.dialogue.model.DialogueMmsRouteObjectHelper;
@@ -194,7 +193,7 @@ class DialogueMmsSender
 
 		multipartEntityBuilder.addTextBody (
 			"X-Mms-User-Key",
-			Integer.toString (
+			Long.toString (
 				smsMessage.getId ()));
 
 		if (isNotNull (
@@ -282,7 +281,7 @@ class DialogueMmsSender
 
 	}
 
-	Optional<List<String>> doResponse (
+	Optional <List <String>> doResponse (
 			@NonNull HttpResponse response)
 		throws
 			IOException,

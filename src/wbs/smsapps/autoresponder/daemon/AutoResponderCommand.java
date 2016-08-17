@@ -5,13 +5,12 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -190,7 +189,7 @@ class AutoResponderCommand
 					"auto_responder")
 
 				.ref (
-					(long) (int) request.getId ())
+					request.getId ())
 
 				.send ();
 

@@ -48,7 +48,7 @@ class ImChatCustomerSettingsPasswordPart
 
 		customer =
 			imChatCustomerHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"imChatCustomerId"));
 
 		// get recent password change events

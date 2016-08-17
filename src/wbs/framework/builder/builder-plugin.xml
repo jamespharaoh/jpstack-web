@@ -2,7 +2,7 @@
 	name="builder"
 	package="wbs.framework.builder">
 
-	<layer name="data">
+	<layer name="utils">
 		<bean class="BuilderFactoryImplementation"/>
 	</layer>
 

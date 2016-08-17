@@ -119,9 +119,9 @@ class TicketHooks
 				Long objectId =
 					ticketFieldValue.getIntegerValue ();
 
-				ObjectHelper<?> objectHelper =
+				ObjectHelper <?> objectHelper =
 					objectManager.get ().objectHelperForTypeId (
-						(long) objectType.getId ());
+						objectType.getId ());
 
 				Object object =
 					objectHelper.findRequired (
@@ -227,7 +227,6 @@ class TicketHooks
 				(Record<?>) value;
 
 			ticketFieldValue.setIntegerValue (
-				(long) (int)
 				record.getId ());
 
 			break;

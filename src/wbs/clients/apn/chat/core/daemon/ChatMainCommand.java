@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.core.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notIn;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
@@ -9,16 +10,15 @@ import java.util.Collections;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.joda.time.LocalDate;
+
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-
-import org.joda.time.LocalDate;
-
-import com.google.common.base.Optional;
-
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
@@ -42,7 +42,7 @@ import wbs.clients.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.clients.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import wbs.framework.record.IdObject;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.sms.command.logic.CommandLogic;
@@ -246,12 +246,12 @@ class ChatMainCommand
 				commandHelper.findByCodeRequired (
 					chat,
 					"magic"),
-				(long) commandHelper.findByCodeRequired (
-					userChatScheme,
-					"chat_dob"
-				).getId (),
+				IdObject.objectId (
+					commandHelper.findByCodeRequired (
+						userChatScheme,
+						"chat_dob")),
 				TemplateMissing.error,
-				Collections.<String,String>emptyMap ());
+				Collections.emptyMap ());
 
 		}
 
@@ -318,7 +318,7 @@ class ChatMainCommand
 
 			}
 
-			Integer chatAffiliateId =
+			Long chatAffiliateId =
 				chatSchemeKeyword.getJoinChatAffiliate () != null
 					? chatSchemeKeyword.getJoinChatAffiliate ().getId ()
 					: null;
@@ -441,7 +441,7 @@ class ChatMainCommand
 					"is join type %s",
 					chatKeyword.getJoinType ()));
 
-			Integer chatAffiliateId =
+			Long chatAffiliateId =
 				chatKeyword.getJoinChatAffiliate () != null
 					? chatKeyword.getJoinChatAffiliate ().getId ()
 					: null;

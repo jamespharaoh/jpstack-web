@@ -1,5 +1,6 @@
 package wbs.framework.utils;
 
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
 import java.util.List;
@@ -33,7 +34,7 @@ class RandomLogicImplementation
 
 	@Override
 	public
-	int randomInteger (
+	int randomJavaInteger (
 			int limit) {
 
 		return random.nextInt (
@@ -46,15 +47,19 @@ class RandomLogicImplementation
 	long randomInteger (
 			long limit) {
 
-		if (limit == Long.MAX_VALUE) {
+		if (limit < 0) {
+
+			throw new IllegalArgumentException ();
+
+		} else if (limit == Long.MAX_VALUE) {
 
 			return random.nextLong ();
 
 		} else if (limit <= Integer.MAX_VALUE) {
 
-			return (long)
-				random.nextInt (
-					(int) limit);
+			return random.nextInt (
+				toJavaIntegerRequired (
+					limit));
 
 		} else {
 
@@ -78,7 +83,7 @@ class RandomLogicImplementation
 
 			stringBuilder.append (
 				chars.charAt (
-					randomInteger (
+					randomJavaInteger (
 						chars.length ())));
 
 		}
@@ -137,10 +142,11 @@ class RandomLogicImplementation
 			Type[] options) {
 
 		int index =
-			randomInteger (
+			randomJavaInteger (
 				options.length);
 
-		return options [index];
+		return options [
+			index];
 
 	}
 
@@ -157,7 +163,7 @@ class RandomLogicImplementation
 		}
 
 		int index =
-			randomInteger (
+			randomJavaInteger (
 				options.size ());
 
 		return options.get (

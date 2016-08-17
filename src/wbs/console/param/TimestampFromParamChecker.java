@@ -53,7 +53,7 @@ class TimestampFromParamChecker
 					DateTimeZone.forID (
 						"Europe/London"),
 					param,
-					0);
+					0l);
 
 			return instantToDateNullSafe (
 				interval.start ());

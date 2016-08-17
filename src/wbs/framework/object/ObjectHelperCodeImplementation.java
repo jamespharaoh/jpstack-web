@@ -91,7 +91,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 
 				.getId (
 					record ->
-						(long) record.getId ())
+						record.getId ())
 
 				.build ();
 

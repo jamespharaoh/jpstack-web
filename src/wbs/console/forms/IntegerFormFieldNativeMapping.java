@@ -1,10 +1,12 @@
 package wbs.console.forms;
 
-import lombok.NonNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalMapRequired;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.utils.etc.NumberUtils;
 
 @PrototypeComponent ("integerFormFieldNativeMapping")
 public
@@ -13,31 +15,25 @@ class IntegerFormFieldNativeMapping<Container>
 
 	@Override
 	public
-	Optional<Long> nativeToGeneric (
+	Optional <Long> nativeToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<Integer> nativeValue) {
+			@NonNull Optional <Integer> nativeValue) {
 
-		if (! nativeValue.isPresent ()) {
-			return Optional.<Long>absent ();
-		}
-
-		return Optional.of (
-			(long) nativeValue.get ());
+		return optionalMapRequired (
+			nativeValue,
+			NumberUtils::fromJavaInteger);
 
 	}
 
 	@Override
 	public
-	Optional<Integer> genericToNative (
+	Optional <Integer> genericToNative (
 			@NonNull Container container,
-			@NonNull Optional<Long> genericValue) {
+			@NonNull Optional <Long> genericValue) {
 
-		if (! genericValue.isPresent ()) {
-			return Optional.<Integer>absent ();
-		}
-
-		return Optional.of (
-			(int) (long) genericValue.get ());
+		return optionalMapRequired (
+			genericValue,
+			NumberUtils::toJavaIntegerRequired);
 
 	}
 

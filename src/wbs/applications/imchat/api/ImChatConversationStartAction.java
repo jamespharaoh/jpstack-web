@@ -8,13 +8,12 @@ import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
@@ -101,9 +100,8 @@ class ImChatConversationStartAction
 
 		ImChatRec imChat =
 			imChatHelper.findRequired (
-				Integer.parseInt (
-					requestContext.requestStringRequired (
-						"imChatId")));
+				requestContext.requestIntegerRequired (
+					"imChatId"));
 
 		// lookup session and customer
 
@@ -212,7 +210,6 @@ class ImChatConversationStartAction
 				profile)
 
 			.setIndex (
-				(int) (long)
 				customer.getNumConversations ())
 
 			.setStartTime (

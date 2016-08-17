@@ -4,8 +4,8 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,15 +15,13 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
+import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
-import fj.data.Either;
-
 import wbs.console.forms.FormField.FormType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -350,8 +348,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		} else {
 
-			Integer objectId =
-				Integer.parseInt (
+			Long objectId =
+				Long.parseLong (
 					param);
 
 			Interface interfaceValue =

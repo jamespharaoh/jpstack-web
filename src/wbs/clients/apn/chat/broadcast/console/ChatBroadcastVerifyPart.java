@@ -1,9 +1,10 @@
 package wbs.clients.apn.chat.broadcast.console;
 
+import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,7 +30,6 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.utils.TimeFormatter;
-import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 
 @PrototypeComponent ("chatBroadcastVerifyPart")
 public
@@ -109,7 +109,7 @@ class ChatBroadcastVerifyPart
 
 		chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		searchFields =
@@ -147,7 +147,7 @@ class ChatBroadcastVerifyPart
 			.put (
 				"chat",
 				chatHelper.findRequired (
-					requestContext.stuffInt (
+					requestContext.stuffInteger (
 						"chatId")))
 
 			.build ();
@@ -331,8 +331,8 @@ class ChatBroadcastVerifyPart
 			"<h3>Recipients</h3>\n");
 
 		@SuppressWarnings ("unchecked")
-		List<Integer> chatUserIds =
-			(List<Integer>)
+		List <Long> chatUserIds =
+			(List <Long>)
 			requestContext.requestRequired (
 				"chatBroadcastChatUserIds");
 
@@ -348,11 +348,9 @@ class ChatBroadcastVerifyPart
 
 		}
 
-		List<ChatUserRec> chatUsers =
+		List <ChatUserRec> chatUsers =
 			chatUserHelper.findManyRequired (
-				chatUserIds.stream ()
-					.map (value -> (long) (int) value)
-					.collect (Collectors.toList ()));
+				chatUserIds);
 
 		formFieldLogic.outputListTable (
 			formatWriter,

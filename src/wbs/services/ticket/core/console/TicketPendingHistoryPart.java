@@ -74,7 +74,7 @@ class TicketPendingHistoryPart
 
 		ticket =
 			ticketHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"ticketId"));
 
 	}

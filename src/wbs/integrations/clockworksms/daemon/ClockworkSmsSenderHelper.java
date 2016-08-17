@@ -10,11 +10,10 @@ import static wbs.sms.gsm.GsmUtils.isNotValidGsm;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
@@ -208,7 +207,7 @@ class ClockworkSmsSenderHelper
 
 				.clientId (
 					smsMessageLogic.mangleMessageId (
-						(long) smsMessage.getId ()))
+						smsMessage.getId ()))
 
 				.dlrType (
 					4l)

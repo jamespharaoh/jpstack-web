@@ -16,13 +16,12 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.sql.DataSource;
 
+import org.joda.time.Instant;
+
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
-
-import org.joda.time.Instant;
-
 import wbs.console.priv.UserPrivData;
 import wbs.console.priv.UserPrivData.ObjectData;
 import wbs.console.priv.UserPrivData.PrivPair;
@@ -324,7 +323,7 @@ class PrivDataLoaderImplementation
 
 					if (grandParent != null) {
 
-						Integer chainedPrivId =
+						Long chainedPrivId =
 							getChainedPrivId (
 								newData,
 								grandParent,
@@ -359,7 +358,7 @@ class PrivDataLoaderImplementation
 
 					} else {
 
-						Integer managePrivId =
+						Long managePrivId =
 							getChainedPrivId (
 								newData,
 								parent,
@@ -419,7 +418,8 @@ class PrivDataLoaderImplementation
 		 * name. Uses newData.privIdsByCodeByObjectId so only searches objects
 		 * included there. That is sufficient for our purposes here.
 		 */
-		private Integer getChainedPrivId (
+		private
+		Long getChainedPrivId (
 				SharedData newData,
 				Record<?> object,
 				String code) {
@@ -434,8 +434,9 @@ class PrivDataLoaderImplementation
 
 				if (objectData != null) {
 
-					Integer chainedPrivId =
-						objectData.privIdsByCode.get (code);
+					Long chainedPrivId =
+						objectData.privIdsByCode.get (
+							code);
 
 					if (chainedPrivId != null)
 						return chainedPrivId;

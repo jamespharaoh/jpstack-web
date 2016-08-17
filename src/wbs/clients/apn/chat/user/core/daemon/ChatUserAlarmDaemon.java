@@ -6,10 +6,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
+import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.NonNull;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
@@ -61,8 +63,11 @@ class ChatUserAlarmDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
-		return 1000 * 10;
+	Duration getSleepDuration () {
+
+		return Duration.standardSeconds (
+			10);
+
 	}
 
 	@Override
@@ -127,7 +132,7 @@ class ChatUserAlarmDaemon
 	}
 
 	void doOneAlarm (
-			int alarmId) {
+			@NonNull Long alarmId) {
 
 		@Cleanup
 		Transaction transaction =

@@ -9,11 +9,10 @@ import static wbs.framework.utils.etc.Misc.notLessThan;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import lombok.Cleanup;
 import wbs.applications.imchat.logic.ImChatLogic;
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
@@ -103,9 +102,8 @@ class ImChatConversationEndAction
 
 		ImChatRec imChat =
 			imChatHelper.findRequired (
-				Integer.parseInt (
-					requestContext.requestStringRequired (
-						"imChatId")));
+				requestContext.requestIntegerRequired (
+					"imChatId"));
 
 		// lookup session and customer
 
@@ -165,7 +163,7 @@ class ImChatConversationEndAction
 		}
 
 		ImChatConversationRec conversation =
-			imChatConversationHelper.findByIndexOrNull (
+			imChatConversationHelper.findByIndexRequired (
 				customer,
 				endRequest.conversationIndex ());
 

@@ -5,8 +5,8 @@ import java.util.List;
 public
 interface SimulatorEventDaoMethods {
 
-	List<SimulatorEventRec> findAfterLimit (
-			int afterId,
-			int maxResults);
+	List <SimulatorEventRec> findAfterLimit (
+			Long afterId,
+			Long maxResults);
 
 }

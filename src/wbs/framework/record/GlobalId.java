@@ -2,6 +2,7 @@ package wbs.framework.record;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
@@ -12,15 +13,15 @@ public
 class GlobalId {
 
 	@Getter
-	long typeId;
+	Long typeId;
 
 	@Getter
-	long objectId;
+	Long objectId;
 
 	public
 	GlobalId (
-			long newTypeId,
-			long newObjectId) {
+			@NonNull Long newTypeId,
+			@NonNull Long newObjectId) {
 
 		typeId =
 			newTypeId;
@@ -32,8 +33,8 @@ class GlobalId {
 
 	public static
 	GlobalId of (
-			long typeId,
-			long objectId) {
+			@NonNull Long typeId,
+			@NonNull Long objectId) {
 
 		return new GlobalId (
 			typeId,
@@ -45,7 +46,7 @@ class GlobalId {
 	public final static
 	GlobalId root =
 		new GlobalId (
-			0,
-			0);
+			0l,
+			0l);
 
 }

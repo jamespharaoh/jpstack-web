@@ -65,7 +65,7 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 	@Override
 	public
 	RecordType find (
-			long id) {
+			@NonNull Long id) {
 
 		Session session =
 			hibernateDatabase.currentSession ();
@@ -75,7 +75,7 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 			(RecordType)
 			session.get (
 				model.objectClass (),
-				(int) id);
+				id);
 
 		return object;
 
@@ -106,36 +106,26 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 			session.createCriteria (
 				model.objectClass ());
 
-		List<Integer> intIds =
-			ids.stream ()
-
-			.map (
-				id ->
-					(int) (long) id)
-
-			.collect (
-				Collectors.toList ());
-
 		criteria.add (
 			Restrictions.in (
 				"id",
-				intIds));
+				ids));
 
-		List<?> recordsUncast =
+		List <?> recordsUncast =
 			criteria.list ();
 
 		@SuppressWarnings ("unchecked")
-		List<RecordType> records =
-			(List<RecordType>)
+		List <RecordType> records =
+			(List <RecordType>)
 			recordsUncast;
 
-		Map<Long,RecordType> recordsById =
+		Map <Long, RecordType> recordsById =
 			records.stream ()
 
 			.collect (
 				Collectors.toMap (
 					record ->
-						(long) record.getId (),
+						record.getId (),
 					record ->
 						record));
 
@@ -258,9 +248,8 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					model.objectName (),
 					model.codeField ().name ()))
 
-				.setInteger (
+				.setLong (
 					"parentId",
-					(int) (long)
 					parentGlobalId.objectId ())
 
 				.setString (
@@ -305,14 +294,12 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					model.objectName (),
 					model.codeField ().name ()))
 
-				.setInteger (
+				.setLong (
 					"parentTypeId",
-					(int) (long)
 					parentGlobalId.typeId ())
 
-				.setInteger (
+				.setLong (
 					"parentId",
-					(int) (long)
 					parentGlobalId.objectId ())
 
 				.setString (
@@ -396,9 +383,8 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					model.objectName (),
 					model.indexField ().name ()))
 
-				.setInteger (
+				.setLong (
 					"index",
-					(int) (long)
 					index)
 
 				.setFlushMode (
@@ -448,14 +434,12 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					model.objectName (),
 					model.indexField ().name ()))
 
-				.setInteger (
+				.setLong (
 					"parentId",
-					(int) (long)
 					parentGlobalId.objectId ())
 
-				.setInteger (
+				.setLong (
 					"index",
-					(int) (long)
 					index)
 
 				.setFlushMode (
@@ -496,19 +480,16 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					model.objectName (),
 					model.indexField ().name ()))
 
-				.setInteger (
+				.setLong (
 					"parentTypeId",
-					(int) (long)
 					parentGlobalId.typeId ())
 
-				.setInteger (
+				.setLong (
 					"parentId",
-					(int) (long)
 					parentGlobalId.objectId ())
 
-				.setInteger (
+				.setLong (
 					"index",
-					(int) (long)
 					index)
 
 				.setFlushMode (
@@ -657,9 +638,8 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					model.codeField ().name (),
 					model.codeField ().name ()))
 
-				.setInteger (
+				.setLong (
 					"parentId",
-					(int) (long)
 					parentGlobalId.objectId ())
 
 				.setString (
@@ -713,14 +693,12 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					model.objectName (),
 					model.codeField ().name ()))
 
-				.setInteger (
+				.setLong (
 					"parentTypeId",
-					(int) (long)
 					parentGlobalId.typeId ())
 
-				.setInteger (
+				.setLong (
 					"parentId",
-					(int) (long)
 					parentGlobalId.objectId ())
 
 				.setString (
@@ -865,9 +843,8 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					model.objectName (),
 					model.parentField ().name ()))
 
-				.setInteger (
+				.setLong (
 					"parentId",
-					(int) (long)
 					parentGlobalId.objectId ())
 
 				.setFlushMode (
@@ -876,15 +853,15 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 				.list ();
 
 			@SuppressWarnings ("unchecked")
-			List<RecordType> objects =
-				(List<RecordType>)
+			List <RecordType> objects =
+				(List <RecordType>)
 				objectsUncast;
 
 			return objects;
 
 		} else {
 
-			List<?> objectsUncast =
+			List <?> objectsUncast =
 				session.createQuery (
 
 				stringFormat (
@@ -901,14 +878,12 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					model.objectName (),
 					model.parentIdField ().name ()))
 
-				.setInteger (
+				.setLong (
 					"parentTypeId",
-					(int) (long)
 					parentGlobalId.typeId ())
 
-				.setInteger (
+				.setLong (
 					"parentId",
-					(int) (long)
 					parentGlobalId.objectId ())
 
 				.setFlushMode (
@@ -917,8 +892,8 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 				.list ();
 
 			@SuppressWarnings ("unchecked")
-			List<RecordType> objects =
-				(List<RecordType>)
+			List <RecordType> objects =
+				(List <RecordType>)
 				objectsUncast;
 
 			return objects;
@@ -974,7 +949,7 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 						"_%s.%s.id",
 						model.objectName (),
 						model.parentField ().name ()),
-					(int) parentGlobalId.objectId ()));
+					parentGlobalId.objectId ()));
 
 		} else {
 
@@ -984,7 +959,7 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 						"_%s.%s.id",
 						model.objectName (),
 						model.parentTypeField ().name ()),
-					(int) parentGlobalId.typeId ()));
+					parentGlobalId.typeId ()));
 
 			criteria.add (
 				Restrictions.eq (
@@ -992,7 +967,6 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 						"_%s.%s",
 						model.objectName (),
 						model.parentIdField ().name ()),
-					(int)
 					parentGlobalId.objectId ()));
 
 		}
@@ -1036,7 +1010,6 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					"_%s.%s",
 					model.objectName (),
 					model.indexField ().name ()),
-				(int) (long)
 				indexStart));
 
 		criteria.add (
@@ -1045,7 +1018,6 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					"_%s.%s",
 					model.objectName (),
 					model.indexField ().name ()),
-				(int) (long)
 				indexEnd));
 
 		// order by index ascending
@@ -1270,9 +1242,9 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					model.typeCodeField ().name (),
 					model.typeCodeField ().name ()))
 
-				.setInteger (
+				.setLong (
 					"parentId",
-					(int) parentGlobalId.objectId ())
+					parentGlobalId.objectId ())
 
 				.setString (
 					model.typeCodeField ().name (),
@@ -1314,13 +1286,13 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 					model.typeCodeField ().name (),
 					model.typeCodeField ().name ()))
 
-				.setInteger (
+				.setLong (
 					"parentTypeId",
-					(int) parentGlobalId.typeId ())
+					parentGlobalId.typeId ())
 
-				.setInteger (
+				.setLong (
 					"parentId",
-					(int) parentGlobalId.objectId ())
+					parentGlobalId.objectId ())
 
 				.setString (
 					model.typeCodeField ().name (),

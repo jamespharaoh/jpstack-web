@@ -2,6 +2,9 @@ package wbs.integrations.oxygen8.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -15,10 +18,6 @@ import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONObject;
 
@@ -26,14 +25,13 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
-
 import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutObjectHelper;
@@ -335,12 +333,12 @@ class Oxygen8Sender
 			urlConnection.setRequestMethod ("POST");
 
 			urlConnection.setConnectTimeout (
-				(int) (long)
-				oxygen8RouteOut.getConnectTimeout () * 1000);
+				toJavaIntegerRequired (
+					oxygen8RouteOut.getConnectTimeout () * 1000));
 
 			urlConnection.setReadTimeout (
-				(int) (long)
-				oxygen8RouteOut.getReadTimeout () * 1000);
+				toJavaIntegerRequired (
+					oxygen8RouteOut.getReadTimeout () * 1000));
 
 			// set request params
 

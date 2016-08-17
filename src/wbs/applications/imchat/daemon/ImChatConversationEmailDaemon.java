@@ -6,9 +6,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import org.joda.time.Duration;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.applications.imchat.logic.ImChatLogic;
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
@@ -38,9 +40,10 @@ class ImChatConversationEmailDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
+	Duration getSleepDuration () {
 
-		return 5 * 1000;
+		return Duration.standardSeconds (
+			5);
 
 	}
 
@@ -102,7 +105,7 @@ class ImChatConversationEmailDaemon
 	}
 
 	void doConversation (
-			int conversationId) {
+			@NonNull Long conversationId) {
 
 		@Cleanup
 		Transaction updateTransaction =

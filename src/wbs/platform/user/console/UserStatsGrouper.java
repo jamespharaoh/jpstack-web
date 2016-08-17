@@ -43,7 +43,8 @@ class UserStatsGrouper
 
 		UserRec user =
 			userHelper.findRequired (
-				(Integer) group);
+				(Long)
+				group);
 
 		return consoleObjectManager.tdForObjectMiniLink (
 			user);
@@ -64,12 +65,10 @@ class UserStatsGrouper
 				: groups
 		) {
 
-			Integer userId =
-				(Integer) group;
-
 			users.add (
 				userHelper.findRequired (
-					userId));
+					(Long)
+					group));
 
 		}
 

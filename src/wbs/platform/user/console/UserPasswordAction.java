@@ -7,10 +7,9 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import org.apache.commons.codec.binary.Base64;
 
+import lombok.Cleanup;
 import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
@@ -77,7 +76,7 @@ class UserPasswordAction
 
 		UserRec user =
 			userHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"userId"));
 
 		// check privs

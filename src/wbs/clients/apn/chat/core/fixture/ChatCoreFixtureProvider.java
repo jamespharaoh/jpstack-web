@@ -201,10 +201,10 @@ class ChatCoreFixtureProvider
 				"chat_5_00")
 
 			.setName (
-				"Chat £5.00")
+				"Chat ��5.00")
 
 			.setDescription (
-				"Chat billed £1")
+				"Chat billed ��1")
 
 			.setNumber (
 				"c500")
@@ -713,8 +713,9 @@ class ChatCoreFixtureProvider
 	Instant pastInstant (
 			Instant now) {
 
-		int choice =
-			randomLogic.randomInteger (1000);
+		long choice =
+			randomLogic.randomInteger (
+				1000l);
 
 		return now.minus (
 			choice * choice);

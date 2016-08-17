@@ -1,17 +1,17 @@
 package wbs.clients.apn.chat.core.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 import java.util.Collections;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
@@ -25,7 +25,7 @@ import wbs.clients.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import wbs.framework.record.IdObject;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -193,12 +193,12 @@ class ChatPhotoCommand
 					commandHelper.findByCodeRequired (
 						chat,
 						"magic"),
-					(long) commandHelper.findByCodeRequired (
-						chat,
-						"help"
-					).getId (),
+					IdObject.objectId (
+						commandHelper.findByCodeRequired (
+							chat,
+							"help")),
 					TemplateMissing.error,
-					Collections.<String,String>emptyMap ());
+					Collections.emptyMap ());
 
 			} else if (
 				isNull (
@@ -215,10 +215,10 @@ class ChatPhotoCommand
 					commandHelper.findByCodeRequired (
 						chat,
 						"magic"),
-					(long) commandHelper.findByCodeRequired (
-						chat,
-						"help"
-					).getId (),
+					IdObject.objectId (
+						commandHelper.findByCodeRequired (
+							chat,
+							"help")),
 					TemplateMissing.error,
 					Collections.<String,String>emptyMap ());
 

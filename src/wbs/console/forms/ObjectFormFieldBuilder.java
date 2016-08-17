@@ -1,8 +1,11 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -23,10 +26,6 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.object.ObjectManager;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIn;
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("objectFormFieldBuilder")
@@ -147,7 +146,7 @@ class ObjectFormFieldBuilder {
 				false);
 		*/
 
-		Optional<ConsoleHelper<?>> consoleHelper;
+		Optional <ConsoleHelper <?>> consoleHelper;
 
 		if (
 			isNotNull (
@@ -155,7 +154,7 @@ class ObjectFormFieldBuilder {
 		) {
 
 			consoleHelper =
-				Optional.<ConsoleHelper<?>>fromNullable (
+				Optional.fromNullable (
 					consoleHelperRegistry.findByObjectName (
 						spec.objectTypeName ()));
 
@@ -223,22 +222,16 @@ class ObjectFormFieldBuilder {
 		FormFieldNativeMapping nativeMapping;
 
 		if (
-
-			optionalIn (
+			equal (
 				propertyClass,
-				Integer.class,
 				Long.class)
-
 		) {
 
 			nativeMapping =
 				objectIdFormFieldNativeMappingProvider.get ()
 
 				.consoleHelper (
-					consoleHelper.orNull ())
-
-				.propertyClass (
-					propertyClass.get ());
+					consoleHelper.orNull ());
 
 		} else {
 
@@ -249,7 +242,7 @@ class ObjectFormFieldBuilder {
 
 		// value validator
 
-		List<FormFieldValueValidator> valueValidators =
+		List <FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
 
 		if (! nullable) {

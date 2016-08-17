@@ -47,12 +47,12 @@ class UserPrivsSummaryPart
 	public
 	void prepare () {
 
-		Map<Integer,PrivStuff> privStuffsByPrivId =
-			new HashMap<Integer,PrivStuff> ();
+		Map<Long,PrivStuff> privStuffsByPrivId =
+			new HashMap<> ();
 
 		UserRec user =
 			userHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"userId"));
 
 		// load up some info about the acting user

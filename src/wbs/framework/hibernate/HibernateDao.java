@@ -3,10 +3,10 @@ package wbs.framework.hibernate;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
-import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,8 +45,8 @@ class HibernateDao {
 
 	protected <Record>
 	Record get (
-			Class<Record> theClass,
-			int id) {
+			@NonNull Class<Record> theClass,
+			@NonNull Long id) {
 
 		Session session =
 			database.currentSession ();
@@ -358,11 +358,11 @@ class HibernateDao {
 	}
 
 	protected
-	List<Integer> findIdsOnly (
-			List<?> list) {
+	List <Long> findIdsOnly (
+			@NonNull List<?> list) {
 
-		List<Integer> idList =
-			new ArrayList<Integer> ();
+		List <Long> idList =
+			new ArrayList<> ();
 
 		for (
 			Object rowObject
@@ -374,7 +374,7 @@ class HibernateDao {
 				rowObject;
 
 			idList.add (
-				(Integer)
+				(Long)
 				rowArray [0]);
 
 		}
@@ -385,12 +385,12 @@ class HibernateDao {
 
 	protected <RowType extends IdObject>
 	List<RowType> findOrdered (
-			Class<RowType> rowTypeClass,
-			List<Integer> objectIds,
-			List<?> unorderedList) {
+			@NonNull Class<RowType> rowTypeClass,
+			@NonNull List<Long> objectIds,
+			@NonNull List<?> unorderedList) {
 
-		HashMap<Integer,RowType> indexedList =
-			new HashMap<Integer,RowType> ();
+		HashMap<Long,RowType> indexedList =
+			new HashMap<Long,RowType> ();
 
 		for (
 			int index = 0;
@@ -412,7 +412,7 @@ class HibernateDao {
 
 			}
 
-			Integer objectId =
+			Long objectId =
 				object.getId ();
 
 			indexedList.put (
@@ -425,7 +425,7 @@ class HibernateDao {
 			new ArrayList<RowType> ();
 
 		for (
-			Integer objectId
+			Long objectId
 				: objectIds
 		) {
 

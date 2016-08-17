@@ -251,7 +251,7 @@ class ObjectHelperBuilder {
 					model)
 
 				.objectTypeId (
-					(long) objectType.getId ())
+					objectType.getId ())
 
 				.objectTypeCode (
 					objectType.getCode ())
@@ -260,7 +260,7 @@ class ObjectHelperBuilder {
 					ifElse (
 						isNotNull (
 							parentType),
-						() -> (long) parentType.getId (),
+						() -> parentType.getId (),
 						() -> null))
 
 				.parentClass (

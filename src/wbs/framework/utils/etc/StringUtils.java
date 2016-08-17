@@ -2,12 +2,16 @@ package wbs.framework.utils.etc;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.nullIf;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
@@ -320,19 +324,71 @@ class StringUtils {
 
 	public static
 	String substring (
-			@NonNull Object object,
+			@NonNull String string,
 			int start,
 			int end) {
 
-		String string =
-			object.toString ();
+		return string.substring (
+			start,
+			end);
 
-		if (start < 0) start = 0;
+	}
 
-		if (end > string.length ())
-			end = string.length ();
+	public static
+	String substring (
+			@NonNull String string,
+			long start,
+			long end) {
 
-		return string.substring (start, end);
+		return string.substring (
+			Math.toIntExact (
+				start),
+			Math.toIntExact (
+				end));
+
+	}
+
+	public static
+	String substringFrom (
+			@NonNull String string,
+			int start) {
+
+		return string.substring (
+			start);
+
+	}
+
+	public static
+	String substringFrom (
+			@NonNull String string,
+			long start) {
+
+		return string.substring (
+			Math.toIntExact (
+				start));
+
+	}
+
+	public static
+	String substringTo (
+			@NonNull String string,
+			int end) {
+
+		return string.substring (
+			0,
+			end);
+
+	}
+
+	public static
+	String substringTo (
+			@NonNull String string,
+			long end) {
+
+		return string.substring (
+			0,
+			Math.toIntExact (
+				end));
 
 	}
 
@@ -574,25 +630,41 @@ class StringUtils {
 	}
 
 	public static
-	List<String> stringSplitRegexp (
+	List <String> stringSplitRegexp (
 			@NonNull String source,
 			@NonNull String pattern) {
 
-		return Arrays.asList (
-			source.split (
-				pattern));
+		if (source.isEmpty ()) {
+
+			return Collections.emptyList ();
+
+		} else {
+
+			return Arrays.asList (
+				source.split (
+					pattern));
+
+		}
 
 	}
 
 	public static
-	List<String> stringSplitSimple (
+	List <String> stringSplitSimple (
 			@NonNull String source,
 			@NonNull String separator) {
 
-		return Arrays.asList (
-			source.split (
-				Pattern.quote (
-					separator)));
+		if (source.isEmpty ()) {
+
+			return Collections.emptyList ();
+
+		} else {
+
+			return Arrays.asList (
+				source.split (
+					Pattern.quote (
+						separator)));
+
+		}
 
 	}
 
@@ -867,6 +939,17 @@ class StringUtils {
 		return input
 			.replaceAll ("\r\n", "\n")
 			.replaceAll ("\r", "\n");
+
+	}
+
+	public static
+	Optional <String> emptyStringToAbsent (
+			@NonNull String source) {
+
+		return optionalIf (
+			stringIsEmpty (
+				source),
+			source);
 
 	}
 

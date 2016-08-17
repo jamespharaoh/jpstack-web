@@ -1,11 +1,13 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.Misc.classForName;
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.File;
@@ -23,12 +25,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
-
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.FileUtils;
 import org.dom4j.Document;
@@ -49,7 +45,13 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-import wbs.framework.application.context.BeanFactory;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
+import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.config.WbsConfig;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
 import wbs.framework.application.scaffold.PluginEnumTypeSpec;
 import wbs.framework.application.scaffold.PluginManager;
@@ -60,16 +62,16 @@ import wbs.framework.entity.model.ModelField;
 import wbs.framework.schema.helper.SchemaNamesHelperImplementation;
 import wbs.framework.sql.SqlLogicImplementation;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-
 @Accessors (fluent = true)
 @Log4j
+@PrototypeComponent ("hibernateSessionFactoryBuilder")
 public
-class SessionFactoryBeanFactory
-	implements BeanFactory {
+class HibernateSessionFactoryBuilder {
 
 	// implementation
+
+	@Inject
+	DataSource dataSource;
 
 	@Inject
 	EntityHelper entityHelper;
@@ -83,21 +85,21 @@ class SessionFactoryBeanFactory
 	@Inject
 	PluginManager pluginManager;
 
+	@Inject
+	WbsConfig wbsConfig;
+
 	// properties
 
 	@Getter @Setter
-	Properties hibernateProperties;
-
-	@Getter @Setter
-	DataSource dataSource;
+	Properties configProperties;
 
 	// state
 
-	Map<Class<?>,String> customTypes =
-		new HashMap<Class<?>,String> ();
+	Map <Class <?>, String> customTypes =
+		new HashMap <Class <?>, String> ();
 
-	Set<Class<?>> enumTypes =
-		new HashSet<Class<?>> ();
+	Set <Class <?>> enumTypes =
+		new HashSet <Class <?>> ();
 
 	int errorTypes = 0;
 	int classErrors = 0;
@@ -177,7 +179,7 @@ class SessionFactoryBeanFactory
 				capitalise (
 					type.name ()));
 
-		Optional<Class<?>> objectClassOptional =
+		Optional <Class <?>> objectClassOptional =
 			classForName (
 				objectClassName);
 
@@ -200,7 +202,7 @@ class SessionFactoryBeanFactory
 				capitalise (
 					type.name ()));
 
-		Optional<Class<?>> helperClassOptional =
+		Optional <Class <?>> helperClassOptional =
 			classForName (
 				helperClassName);
 
@@ -289,9 +291,8 @@ class SessionFactoryBeanFactory
 
 	}
 
-	@Override
 	public
-	Object instantiate () {
+	SessionFactory build () {
 
 		initCustomTypes ();
 
@@ -299,8 +300,8 @@ class SessionFactoryBeanFactory
 			new Configuration ();
 
 		config.setProperties (
-			hibernateProperties);
-
+			configProperties);
+				
 		SessionFactory sessionFactory =
 			buildSessionFactory (
 				config);
@@ -1768,7 +1769,7 @@ class SessionFactoryBeanFactory
 	Map<Class<?>,String> basicTypes =
 		ImmutableMap.<Class<?>,String>builder ()
 			.put (String.class, "string")
-			.put (Integer.class, "integer")
+			.put (Long.class, "long")
 			.build ();
 
 	Set<Class<?>> builtinFieldTypes =

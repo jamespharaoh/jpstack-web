@@ -6,4 +6,8 @@
 		<bean class="TransactionCacheFactory"/>
 	</layer>
 
+	<layer name="utils">
+		<bean class="DbPool"/>
+	</layer>
+
 </plugin>

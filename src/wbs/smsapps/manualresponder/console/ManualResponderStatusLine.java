@@ -151,7 +151,6 @@ class ManualResponderStatusLine
 						new ManualResponderRequestSearch ()
 
 					.processedByUserId (
-						(int) (long)
 						userConsoleLogic.userIdRequired ())
 
 					.processedTime (
@@ -217,7 +216,6 @@ class ManualResponderStatusLine
 						new ManualResponderRequestSearch ()
 
 					.processedByUserId (
-						(int) (long)
 						userConsoleLogic.userIdRequired ())
 
 					.processedTime (

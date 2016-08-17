@@ -18,16 +18,14 @@ import java.util.regex.Matcher;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -48,7 +46,6 @@ import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.logic.SmsInboxMultipartLogic;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
-import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
@@ -70,9 +67,6 @@ class MediaburstApiServletModule
 
 	@Inject
 	SmsInboxMultipartLogic inboxMultipartLogic;
-
-	@Inject
-	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
 	NetworkObjectHelper networkHelper;
@@ -126,6 +120,7 @@ class MediaburstApiServletModule
 
 	}
 
+	/*
 	String testContent (
 			@NonNull String messageParam) {
 
@@ -138,7 +133,7 @@ class MediaburstApiServletModule
 
 			for (int i = 0; i < bytes.length; i ++) {
 
-				if ((int) bytes [i] != 0)
+				if (bytes [i] != 0)
 					continue;
 
 				zeroBytes = true;
@@ -157,7 +152,7 @@ class MediaburstApiServletModule
 
 			for (int i = 0; i < bytes.length; i ++) {
 
-				if ((int) bytes [i] != 0) {
+				if (bytes [i] != 0) {
 
 					stringBuilder.append (
 						Integer.toHexString (bytes [i]));
@@ -177,6 +172,7 @@ class MediaburstApiServletModule
 		}
 
 	}
+	*/
 
 	/** WebFile to handle incoming messages. */
 
@@ -205,8 +201,8 @@ class MediaburstApiServletModule
 
 			// get request stuff
 
-			int routeId =
-				requestContext.requestIntRequired (
+			Long routeId =
+				requestContext.requestIntegerRequired (
 					"routeId");
 
 			// get params in local variables
@@ -229,25 +225,28 @@ class MediaburstApiServletModule
 			String udhParam =
 				requestContext.parameterOrNull ("udh");
 
-			Integer networkId = null;
+			Long networkId = null;
 
 			if (networkParam != null) {
 				if (networkParam.equals("51"))
-					networkId = 1;
+					networkId = 1l;
 				else if (networkParam.equals("81"))
-					networkId = 2;
+					networkId = 2l;
 				else if (networkParam.equals("3"))
-					networkId = 3;
+					networkId = 3l;
 				else if (networkParam.equals("1"))
-					networkId = 4;
+					networkId = 4l;
 				else if (networkParam.equals("9"))
-					networkId = 6;
+					networkId = 6l;
 				// else throw new RuntimeException ("Unknown network: " +
 				// networkParam);
 			}
 
+			/*
 			messageParam =
-				testContent (messageParam);
+				testContent (
+					messageParam);
+			*/
 
 			// load the stuff
 
@@ -384,7 +383,7 @@ class MediaburstApiServletModule
 
 			RouteRec route =
 				routeHelper.findRequired (
-					requestContext.requestIntRequired (
+					requestContext.requestIntegerRequired (
 						"routeId"));
 
 			String statusParam =
@@ -442,16 +441,20 @@ class MediaburstApiServletModule
 				log.fatal (
 					stringFormat (
 						"Ignoring report for unknown message %s/%s",
-						requestContext.requestInt ("routeId"),
-						requestContext.parameterOrNull ("msg_id")));
+						requestContext.requestInteger (
+							"routeId"),
+						requestContext.parameterOrNull (
+							"msg_id")));
 
 			} catch (InvalidMessageStateException exception) {
 
 				log.fatal (
 					stringFormat (
 						"Ignoring report for message %s/%s: %s",
-						requestContext.requestInt ("routeId"),
-						requestContext.parameterOrNull ("msg_id"),
+						requestContext.requestInteger (
+							"routeId"),
+						requestContext.parameterOrNull (
+							"msg_id"),
 						exception.getMessage ()));
 
 			}

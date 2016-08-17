@@ -11,12 +11,12 @@ interface ForwarderMessageInDaoMethods {
 			Instant now,
 			ForwarderRec forwarder);
 
-	List<ForwarderMessageInRec> findNextLimit (
+	List <ForwarderMessageInRec> findNextLimit (
 			Instant now,
-			int maxResults);
+			Long maxResults);
 
-	List<ForwarderMessageInRec> findPendingLimit (
+	List <ForwarderMessageInRec> findPendingLimit (
 			ForwarderRec forwarder,
-			int maxResults);
+			Long maxResults);
 
 }

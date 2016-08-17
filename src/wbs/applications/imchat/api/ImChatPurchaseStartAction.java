@@ -1,19 +1,21 @@
 package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
@@ -30,11 +32,6 @@ import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.RandomLogic;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
-
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
@@ -104,12 +101,12 @@ class ImChatPurchaseStartAction
 
 	Boolean imChatDevelopmentMode;
 
-	Integer customerId;
+	Long customerId;
 	ImChatCustomerData customerData;
 
 	Map<String,String> paypalExpressCheckoutProperties;
 
-	Integer purchaseId;
+	Long purchaseId;
 	String purchasePriceString;
 	String purchaseSuccessUrl;
 	String purchaseFailureUrl;
@@ -172,9 +169,8 @@ class ImChatPurchaseStartAction
 
 		ImChatRec imChat =
 			imChatHelper.findRequired (
-				Integer.parseInt (
-					requestContext.requestStringRequired (
-						"imChatId")));
+				requestContext.requestIntegerRequired (
+					"imChatId"));
 
 		imChatDevelopmentMode =
 			imChat.getDevelopmentMode ();
@@ -312,11 +308,11 @@ class ImChatPurchaseStartAction
 				customer)
 
 			.setIndex (
-				(int) (long)
 				customer.getNumPurchases ())
 
 			.setToken (
-				randomLogic.generateLowercase (20))
+				randomLogic.generateLowercase (
+					20))
 
 			.setImChatSession (
 				session)

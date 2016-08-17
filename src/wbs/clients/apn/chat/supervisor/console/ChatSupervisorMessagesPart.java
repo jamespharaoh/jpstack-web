@@ -91,7 +91,7 @@ class ChatSupervisorMessagesPart
 
 		chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		Interval interval =

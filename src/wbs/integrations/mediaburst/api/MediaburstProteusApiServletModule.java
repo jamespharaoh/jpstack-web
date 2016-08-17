@@ -13,17 +13,16 @@ import java.util.regex.Matcher;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Nodes;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -35,7 +34,6 @@ import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
-import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -49,9 +47,6 @@ class MediaburstProteusApiServletModule
 
 	@Inject
 	Database database;
-
-	@Inject
-	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
 	SmsDeliveryReportLogic reportLogic;
@@ -132,7 +127,7 @@ class MediaburstProteusApiServletModule
 
 			RouteRec route =
 				routeHelper.findRequired (
-					requestContext.requestIntRequired (
+					requestContext.requestIntegerRequired (
 						"routeId"));
 
 			reportLogic.deliveryReport (

@@ -8,7 +8,7 @@ import java.util.Collection;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-
+import lombok.NonNull;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -64,8 +64,8 @@ class ManualResponderDelivery
 	@Override
 	public
 	void handle (
-			int deliveryId,
-			Long ref) {
+			@NonNull Long deliveryId,
+			@NonNull Long ref) {
 
 		@Cleanup
 		Transaction transaction =

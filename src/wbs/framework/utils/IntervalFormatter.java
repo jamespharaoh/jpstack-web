@@ -5,16 +5,16 @@ import com.google.common.base.Optional;
 public
 interface IntervalFormatter {
 
-	Optional<Integer> parseIntervalStringSeconds (
+	Optional <Long> parseIntervalStringSeconds (
 			String input);
 
-	Integer parseIntervalStringSecondsRequired (
+	Long parseIntervalStringSecondsRequired (
 			String input);
 
 	String createTextualIntervalStringSeconds (
-			int input);
+			Long input);
 
 	String createNumericIntervalStringSeconds (
-			int input);
+			Long input);
 
 }

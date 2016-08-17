@@ -1,6 +1,6 @@
 package wbs.test.simulator.console;
 
-import static wbs.framework.utils.etc.Misc.toInteger;
+import static wbs.framework.utils.etc.NumberUtils.parseLongRequired;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -10,12 +10,11 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import org.json.simple.JSONValue;
 
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -65,13 +64,13 @@ class SimulatorSessionPollAction
 	protected
 	Responder goReal () {
 
-		int lastId =
-			toInteger (
+		Long lastId =
+			parseLongRequired (
 				requestContext.getForm (
 					"last"));
 
-		int limit =
-			toInteger (
+		Long limit =
+			parseLongRequired (
 				requestContext.getForm (
 					"limit"));
 
@@ -81,7 +80,7 @@ class SimulatorSessionPollAction
 				"SimulatorSessionPollAction.goReal ()",
 				this);
 
-		List<SimulatorEventRec> events =
+		List <SimulatorEventRec> events =
 			simulatorEventHelper.findAfterLimit (
 				lastId,
 				limit);

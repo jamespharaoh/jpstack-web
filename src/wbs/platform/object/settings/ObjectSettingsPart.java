@@ -1,19 +1,19 @@
 package wbs.platform.object.settings;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
@@ -26,7 +26,6 @@ import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
-import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 @Accessors (fluent = true)
@@ -139,14 +138,14 @@ class ObjectSettingsPart<
 
 			parent =
 				parentHelper.findRequired (
-					0);
+					0l);
 
 			return;
 
 		}
 
-		Integer parentId =
-			requestContext.stuffInt (
+		Long parentId =
+			requestContext.stuffInteger (
 				parentHelper.idKey ());
 
 		if (

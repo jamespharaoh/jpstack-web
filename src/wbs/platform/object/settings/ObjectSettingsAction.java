@@ -3,14 +3,13 @@ package wbs.platform.object.settings;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
-
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.forms.FieldsProvider;
@@ -230,14 +229,14 @@ class ObjectSettingsAction<
 
 			parent =
 				parentHelper.findRequired (
-					0);
+					0l);
 
 			return;
 
 		}
 
-		Integer parentId =
-			requestContext.stuffInt (
+		Long parentId =
+			requestContext.stuffInteger (
 				parentHelper.idKey ());
 
 		if (parentId != null) {

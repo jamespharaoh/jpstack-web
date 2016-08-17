@@ -38,7 +38,7 @@ class ChatUserImageHistoryPart
 
 	ChatUserImageType type;
 	ChatUserRec chatUser;
-	Set<ChatUserImageRec> chatUserImages;
+	Set <ChatUserImageRec> chatUserImages;
 
 	@Override
 	public
@@ -47,20 +47,19 @@ class ChatUserImageHistoryPart
 		type =
 			toEnum (
 				ChatUserImageType.class,
-				(String)
-				requestContext.stuff (
+				requestContext.stuffString (
 					"chatUserImageType"));
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		chatUserImages =
-			new TreeSet<ChatUserImageRec> (
+			new TreeSet<> (
 				chatUser.getChatUserImages ());
 
-		Iterator<ChatUserImageRec> iterator =
+		Iterator <ChatUserImageRec> iterator =
 			chatUserImages.iterator ();
 
 		while (iterator.hasNext ()) {

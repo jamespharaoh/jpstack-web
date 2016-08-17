@@ -7,11 +7,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -47,8 +47,11 @@ class ExceptionLogRemovalDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
-		return 60 * 1000;
+	Duration getSleepDuration () {
+
+		return Duration.standardSeconds (
+			60);
+
 	}
 
 	@Override
@@ -88,7 +91,7 @@ class ExceptionLogRemovalDaemon
 			List<ExceptionLogRec> oldExceptionLogs =
 				exceptionLogHelper.findOldLimit (
 					cutoffTime,
-					1000);
+					1000l);
 
 			if (
 				isEmpty (

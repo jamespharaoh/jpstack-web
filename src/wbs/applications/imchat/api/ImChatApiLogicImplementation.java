@@ -2,18 +2,19 @@ package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
+import static wbs.framework.utils.etc.StringUtils.underscoreToHyphen;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-
-import lombok.NonNull;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
@@ -23,6 +24,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerDetailTypeRec;
 import wbs.applications.imchat.model.ImChatCustomerDetailValueObjectHelper;
@@ -38,11 +40,6 @@ import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.TimeFormatter;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
-import static wbs.framework.utils.etc.StringUtils.underscoreToHyphen;
-
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.media.model.ContentRec;
@@ -123,7 +120,7 @@ class ImChatApiLogicImplementation
 		ContentRec content =
 			image.getContent ();
 
-		Integer hash =
+		Long hash =
 			Math.abs (
 				content.getHash ());
 

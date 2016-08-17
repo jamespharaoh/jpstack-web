@@ -7,7 +7,6 @@ import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
-
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -69,7 +68,7 @@ class ChatMonitorInboxAddNoteAction
 
 		ChatMonitorInboxRec chatMonitorInbox =
 			chatMonitorInboxHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatMonitorInboxId"));
 
 		ChatUserRec userChatUser =

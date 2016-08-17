@@ -43,8 +43,8 @@ class ChatUserInitiationLogConsoleHooks
 
 		// chats
 
-		ImmutableList.Builder<Integer> chatsBuilder =
-			ImmutableList.<Integer>builder ();
+		ImmutableList.Builder<Long> chatsBuilder =
+			ImmutableList.builder ();
 
 		for (
 			ChatRec chat

@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.contact.logic;
 
 import static wbs.framework.utils.etc.LogicUtils.allOf;
+import static wbs.framework.utils.etc.LogicUtils.not;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.notEqual;
@@ -65,6 +66,7 @@ import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.record.IdObject;
 import wbs.integrations.jigsaw.api.JigsawApi;
 import wbs.integrations.urbanairship.logic.UrbanAirshipApi;
 import wbs.platform.media.model.MediaRec;
@@ -332,7 +334,8 @@ class ChatMessageLogicImplementation
 				alarm.getResetTime (),
 				transaction.now ())
 
-			&& alarm.getSticky () == false
+			&& not (
+				alarm.getSticky ())
 
 		) {
 
@@ -474,11 +477,12 @@ class ChatMessageLogicImplementation
 				commandHelper.findByCodeRequired (
 					chat,
 					"magic"),
-				(long) commandHelper.findByCodeRequired (
-					chat,
-					"help").getId (),
+				IdObject.objectId (
+					commandHelper.findByCodeRequired (
+						chat,
+						"help")),
 				TemplateMissing.error,
-				Collections.<String,String>emptyMap ());
+				Collections.emptyMap ());
 
 			fromUser
 
@@ -923,14 +927,13 @@ class ChatMessageLogicImplementation
 				ChatMessageMethod.iphone)
 
 			.statusIn (
-				ImmutableSet.<ChatMessageStatus>of (
+				ImmutableSet.of (
 					ChatMessageStatus.sent,
 					ChatMessageStatus.moderatorApproved,
 					ChatMessageStatus.moderatorAutoEdited,
 					ChatMessageStatus.moderatorEdited))
 
 			.deliveryIdGreaterThan (
-				(int) (long)
 				toUser.getLastMessagePollId ())
 
 			.orderBy (
@@ -1326,7 +1329,7 @@ class ChatMessageLogicImplementation
 				serviceHelper.findByCodeRequired (
 					chat,
 					serviceCode),
-				(long) fromUser.getId (),
+				fromUser.getId (),
 				Optional.fromNullable (
 					chatMessage.getSender ()));
 
@@ -1435,55 +1438,20 @@ class ChatMessageLogicImplementation
 		if (chatUser.getRejectionCount () % 5 != 1)
 			return;
 
-		// handle different networks differently
+		// send the hint explaining how to adult verify
 
-		switch (chatUser.getNumber ().getNetwork ().getId ()) {
-
-		case 1:
-		case 4: // orange, o2
-			/*
-			 * // send the hint explaining how to adult verify sendSystemRbFree
-			 * ( chatUser, threadId, "adult_hint_out"); // send the adult
-			 * verification request sendSystem ( chatUser, threadId,
-			 * "adult_tag_out", routeDao.findRouteByCode ("hybyte_89451_free"),
-			 * "89505", set ("adult"), smsDao.findDeliveryNoticeTypeByCode
-			 * ("chat_adult"));
-			 *
-			 * break;
-			 */
-
-		case 2:
-		case 3:
-		case 5:
-		case 6: // vodafone, tmobile, virgin, three
-
-			// send the hint explaining how to adult verify
-
-			chatSendLogic.sendSystem (
-				chatUser,
-				Optional.fromNullable (
-					threadId),
-				"adult_hint_in",
-				chatScheme.getRbFreeRouter (),
-				"89505",
-				Collections.<String>emptySet (),
-				Optional.<String>absent (),
-				"system",
-				TemplateMissing.error,
-				Collections.<String,String>emptyMap ());
-
-			break;
-
-		default:
-
-			throw new RuntimeException (
-				stringFormat (
-					"Don't know how to handle adult verification for chat ",
-					"user %s",
-					objectManager.objectPathMini (
-						chatUser)));
-
-		}
+		chatSendLogic.sendSystem (
+			chatUser,
+			Optional.fromNullable (
+				threadId),
+			"adult_hint_in",
+			chatScheme.getRbFreeRouter (),
+			"89505",
+			Collections.<String>emptySet (),
+			Optional.<String>absent (),
+			"system",
+			TemplateMissing.error,
+			Collections.<String,String>emptyMap ());
 
 	}
 

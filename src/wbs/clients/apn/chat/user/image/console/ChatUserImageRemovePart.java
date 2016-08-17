@@ -27,7 +27,7 @@ class ChatUserImageRemovePart
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 	}

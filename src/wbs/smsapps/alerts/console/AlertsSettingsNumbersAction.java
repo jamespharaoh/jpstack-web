@@ -5,8 +5,8 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.pluralise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,10 +15,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
-
 import com.google.common.collect.ImmutableSet;
 
+import lombok.Cleanup;
 import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
@@ -106,7 +105,7 @@ class AlertsSettingsNumbersAction
 
 		AlertsSettingsRec alertsSettings =
 			alertsSettingsHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"alertsSettingsId"));
 
 		// add/delete

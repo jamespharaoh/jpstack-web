@@ -9,7 +9,6 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.ProxiedRequestComponent;
@@ -73,7 +72,7 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canRecursive (
-			int privId) {
+			@NonNull Long privId) {
 
 		return target.canRecursive (
 			privId);
@@ -95,9 +94,9 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canRecursive (
-			Class<? extends Record<?>> parentClass,
-			int parentId,
-			String... privCodes) {
+			@NonNull Class<? extends Record<?>> parentClass,
+			@NonNull Long parentId,
+			@NonNull String... privCodes) {
 
 		return target.canRecursive (
 			parentClass,
@@ -155,7 +154,7 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canGrant (
-			int privId) {
+			@NonNull Long privId) {
 
 		return target.canGrant (
 			privId);

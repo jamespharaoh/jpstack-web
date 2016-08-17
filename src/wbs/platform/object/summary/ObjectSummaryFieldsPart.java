@@ -4,12 +4,11 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableMap;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.collect.ImmutableMap;
-
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -85,14 +84,14 @@ class ObjectSummaryFieldsPart<
 
 			parent =
 				parentHelper.findRequired (
-					0);
+					0l);
 
 			return;
 
 		}
 
-		Integer parentId =
-			requestContext.stuffInt (
+		Long parentId =
+			requestContext.stuffInteger (
 				parentHelper.idKey ());
 
 		if (

@@ -41,7 +41,7 @@ class Oxygen8RouteSummaryAdditionalPart
 
 		route =
 			routeHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"routeId"));
 
 		oxygen8RouteOut =

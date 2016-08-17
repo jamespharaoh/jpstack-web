@@ -3,6 +3,7 @@ package wbs.clients.apn.chat.user.info.logic;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.moreThan;
+import static wbs.framework.utils.etc.NumberUtils.roundToIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.laterThan;
 
@@ -14,9 +15,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
@@ -24,6 +22,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
@@ -49,6 +49,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.record.IdObject;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.logic.MediaLogic;
@@ -59,7 +60,6 @@ import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
-import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.gsm.MessageSplitter;
 import wbs.sms.locator.logic.LocatorLogic;
@@ -179,10 +179,11 @@ class ChatInfoLogicImplementation
 
 		// work out distance
 
-		int miles =
-			(int) locatorLogic.distanceMiles (
-				thisUser.getLocationLongLat (),
-				otherUser.getLocationLongLat ());
+		long miles =
+			roundToIntegerRequired (
+				locatorLogic.distanceMiles (
+					thisUser.getLocationLongLat (),
+					otherUser.getLocationLongLat ()));
 
 		// construct message parts
 
@@ -280,8 +281,8 @@ class ChatInfoLogicImplementation
 			serviceHelper.findByCodeRequired (
 				chat,
 				serviceCode),
-			(long) otherUser.getId (),
-			Optional.<UserRec>absent ());
+			otherUser.getId (),
+			Optional.absent ());
 
 	}
 
@@ -371,14 +372,6 @@ class ChatInfoLogicImplementation
 			stringFormat (
 				"User: %s\n",
 				otherUser.getCode ()));
-
-		/*
-		if (thisUser.getLocLongLat () != null
-				&& otherUser.getLocLongLat () != null)
-			message.append (sf ("Distance: %d miles\n", (int) LocatorLogicImpl
-					.distanceMiles (thisUser.getLocLongLat (), otherUser
-							.getLocLongLat ())));
-		*/
 
 		if (otherUser.getInfoText () != null) {
 
@@ -1504,17 +1497,17 @@ class ChatInfoLogicImplementation
 
 		chatSendLogic.sendSystemMagic (
 			chatUser,
-			Optional.<Long>absent (),
+			Optional.absent (),
 			"name_hint",
 			commandHelper.findByCodeRequired (
 				chat,
 				"magic"),
-			(long) commandHelper.findByCodeRequired (
-				chat,
-				"name"
-			).getId (),
+			IdObject.objectId (
+				commandHelper.findByCodeRequired (
+					chat,
+					"name")),
 			TemplateMissing.error,
-			Collections.<String,String>emptyMap ());
+			Collections.emptyMap ());
 
 		// and update the chat user
 

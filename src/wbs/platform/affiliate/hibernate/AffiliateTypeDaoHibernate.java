@@ -3,7 +3,6 @@ package wbs.platform.affiliate.hibernate;
 import java.util.List;
 
 import lombok.NonNull;
-
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.affiliate.model.AffiliateTypeDao;
 import wbs.platform.affiliate.model.AffiliateTypeRec;
@@ -35,7 +34,7 @@ class AffiliateTypeDaoHibernate
 
 		return get (
 			AffiliateTypeRec.class,
-			(int) (long) affiliateTypeId);
+			affiliateTypeId);
 
 	}
 

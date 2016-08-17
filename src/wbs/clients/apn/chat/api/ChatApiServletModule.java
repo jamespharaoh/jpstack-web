@@ -236,8 +236,8 @@ class ChatApiServletModule
 				requestContext.requestStringRequired (
 					"format");
 
-			Integer mediaId =
-				requestContext.requestIntRequired (
+			Long mediaId =
+				requestContext.requestIntegerRequired (
 					"mediaId");
 
 			@Cleanup
@@ -629,7 +629,7 @@ class ChatApiServletModule
 		List<String> errors =
 			new ArrayList<String> ();
 
-		Integer chatId;
+		Long chatId;
 		String number;
 		Long limit;
 
@@ -691,7 +691,7 @@ class ChatApiServletModule
 			if (params == null)
 				return;
 
-			chatId = (int) (long) (Long) params.get ("chat-id");
+			chatId = (Long) params.get ("chat-id");
 			number = (String) params.get ("number");
 			limit = (Long) params.get ("limit");
 
@@ -753,7 +753,7 @@ class ChatApiServletModule
 				new ChatUserSearch ()
 
 				.chatId (
-					(long) chatId)
+					chatId)
 
 				.hasGender (
 					true)
@@ -809,13 +809,9 @@ class ChatApiServletModule
 				.orientIn (
 					orients);
 
-			long nanoTime = System.nanoTime ();
-
-			List<Integer> userIds =
+			List <Long> userIds =
 				chatUserHelper.searchIds (
 					search);
-
-			log.info ("Search took " + (int) ((System.nanoTime () - nanoTime) / 1000000) + "ms");
 
 			long time =
 				System.currentTimeMillis ();
@@ -840,7 +836,7 @@ class ChatApiServletModule
 					RpcType.rStructure);
 
 			for (
-				Integer userId
+				Long userId
 					: userIds
 			) {
 
@@ -1201,7 +1197,7 @@ class ChatApiServletModule
 		List<String> errors =
 			new ArrayList<String> ();
 
-		Set<Integer> mediaIds;
+		Set<Long> mediaIds;
 
 		@Override
 		public
@@ -1257,7 +1253,7 @@ class ChatApiServletModule
 					"media-ids")
 			)
 				.stream ()
-				.map (value -> (int) (long) (Long) value)
+				.map (value -> (Long) value)
 				.collect (Collectors.toSet ());
 
 		}
@@ -1274,7 +1270,7 @@ class ChatApiServletModule
 					RpcType.rStructure);
 
 			for (
-				Integer mediaId
+				Long mediaId
 					: mediaIds
 			) {
 
@@ -1369,7 +1365,7 @@ class ChatApiServletModule
 		List<String> errorCodes =
 			new ArrayList<String> ();
 
-		Integer chatId;
+		Long chatId;
 		String number;
 		String schemeCode;
 		String affiliateCode;
@@ -1450,7 +1446,7 @@ class ChatApiServletModule
 			if (params == null)
 				return;
 
-			chatId = (int) (long) (Long) params.get ("chat-id");
+			chatId = (Long) params.get ("chat-id");
 			number = (String) params.get ("number");
 			schemeCode = (String) params.get ("scheme-code");
 			affiliateCode = (String) params.get ("affiliate-code");
@@ -2013,7 +2009,7 @@ class ChatApiServletModule
 		List<String> errorCodes =
 			new ArrayList<String> ();
 
-		Integer chatId;
+		Long chatId;
 		String number;
 
 		ChatUserRec chatUser;
@@ -2075,7 +2071,7 @@ class ChatApiServletModule
 				return;
 
 			chatId =
-				(Integer)
+				(Long)
 				params.get ("chat-id");
 
 			number =
@@ -2197,7 +2193,7 @@ class ChatApiServletModule
 		List<String> errors =
 			new ArrayList<String> ();
 
-		Integer chatId;
+		Long chatId;
 		String number;
 		String toCode;
 		String message;
@@ -2250,15 +2246,21 @@ class ChatApiServletModule
 		}
 
 		@SuppressWarnings ("unchecked")
-		private void getParams (RpcSource source) {
+		private
+		void getParams (
+				@NonNull RpcSource source) {
 
-			Map<String,Object> params = (Map<String,Object>)
-				source.obtain (messageSendRequestDef, errors, true);
+			Map<String,Object> params =
+				(Map<String,Object>)
+				source.obtain (
+					messageSendRequestDef,
+					errors,
+					true);
 
 			if (params == null)
 				return;
 
-			chatId = (int) (long) (Long) params.get ("chat-id");
+			chatId = (Long) params.get ("chat-id");
 			number = (String) params.get ("number");
 			toCode = (String) params.get ("to-code");
 			message = (String) params.get ("message");
@@ -2461,7 +2463,7 @@ class ChatApiServletModule
 		List<String> errors =
 			new ArrayList<String> ();
 
-		Integer chatId;
+		Long chatId;
 		String number;
 		Long gotDeliveryId;
 		Boolean ignoreCredit;
@@ -2525,7 +2527,7 @@ class ChatApiServletModule
 			if (params == null)
 				return;
 
-			chatId = (int) (long) (Long) params.get ("chat-id");
+			chatId = (Long) params.get ("chat-id");
 			number = (String) params.get ("number");
 			gotDeliveryId = (Long) params.get ("got-delivery-id");
 			ignoreCredit = (Boolean) params.get ("ignore-credit");
@@ -2660,7 +2662,6 @@ class ChatApiServletModule
 						chatUser.getId ())
 
 					.deliveryId (
-						(int) (long)
 						gotDeliveryId));
 
 				if (
@@ -2718,7 +2719,6 @@ class ChatApiServletModule
 						ChatMessageStatus.moderatorEdited))
 
 				.deliveryIdGreaterThan (
-					(int) (long)
 					chatUser.getLastMessagePollId ())
 
 				.orderBy (
@@ -2838,13 +2838,13 @@ class ChatApiServletModule
 		List<String> errors =
 			new ArrayList<String> ();
 
-		Integer chatId;
+		Long chatId;
 		String number;
 		ChatUserImageType type;
 		List<ImageUpdateAdd> add;
 		List<Long> reorder;
 		List<Long> delete;
-		Integer selectedImageId;
+		Long selectedImageId;
 
 		RpcList respImages;
 		RpcList respOtherImages;
@@ -2903,12 +2903,33 @@ class ChatApiServletModule
 			if (params == null)
 				return;
 
-			chatId = (int) (long) (Long) params.get ("chat-id");
-			number = (String) params.get ("number");
-			type = (ChatUserImageType) params.get ("type");
-			add = new ArrayList<ImageUpdateAdd> ();
-			if (params.get ("add-files") != null)
-				add.addAll ((List<ImageUpdateAdd>) params.get ("add-files"));
+			chatId =
+				(Long)
+				params.get (
+					"chat-id");
+
+			number =
+				(String)
+				params.get (
+					"number");
+
+			type =
+				(ChatUserImageType)
+				params.get (
+					"type");
+
+			add =
+				new ArrayList<> ();
+
+			if (params.get ("add-files") != null) {
+
+				add.addAll (
+					(List <ImageUpdateAdd>)
+					params.get (
+						"add-files"));
+
+			}
+
 			if (params.get ("add") != null) {
 				for (byte[] data : (List<byte[]>) params.get ("add")) {
 					ImageUpdateAdd imageUpdateAdd = new ImageUpdateAdd ();
@@ -2917,11 +2938,20 @@ class ChatApiServletModule
 				}
 			}
 
-			reorder = (List<Long>) params.get ("reorder");
+			reorder =
+				(List <Long>)
+				params.get (
+					"reorder");
 
-			delete = (List<Long>) params.get ("delete");
+			delete =
+				(List <Long>)
+				params.get (
+					"delete");
 
-			selectedImageId = (int) (long) (Long) params.get ("selected-image-id");
+			selectedImageId =
+				(Long)
+				params.get (
+					"selected-image-id");
 
 		}
 
@@ -2952,14 +2982,16 @@ class ChatApiServletModule
 
 				// check the delete image ids are valid
 
-				Set<Long> userImageIds =
-					images
-						.stream ()
-						.map (ChatUserImageRec::getId)
-						.map (value -> (long) value)
-						.collect (Collectors.toSet ());
+				Set <Long> userImageIds =
+					images.stream ()
 
-				Set<Long> requestImageIds =
+					.map (
+						ChatUserImageRec::getId)
+
+					.collect (
+						Collectors.toSet ());
+
+				Set <Long> requestImageIds =
 					new HashSet<> ();
 
 				for (
@@ -3037,14 +3069,16 @@ class ChatApiServletModule
 
 				// check the reorder image ids are valid
 
-				Set<Long> userImageIds =
-					images
-						.stream ()
-						.map (ChatUserImageRec::getId)
-						.map (value -> (long) value)
-						.collect (Collectors.toSet ());
+				Set <Long> userImageIds =
+					images.stream ()
 
-				Set<Long> requestImageIds =
+					.map (
+						ChatUserImageRec::getId)
+
+					.collect (
+						Collectors.toSet ());
+
+				Set <Long> requestImageIds =
 					new HashSet<> ();
 
 				for (
@@ -3356,7 +3390,7 @@ class ChatApiServletModule
 		List<String> errors =
 			new ArrayList<String> ();
 
-		Integer chatId;
+		Long chatId;
 		String number;
 
 		Long sendCount;
@@ -3430,7 +3464,7 @@ class ChatApiServletModule
 			if (params == null)
 				return;
 
-			chatId = (int) (long) (Long) params.get ("chat-id");
+			chatId = (Long) params.get ("chat-id");
 			number = (String) params.get ("number");
 			sendCount = (Long) params.get ("send-count");
 			sendAmount = (Long) params.get ("send-amount");

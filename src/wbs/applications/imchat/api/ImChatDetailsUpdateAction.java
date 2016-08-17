@@ -10,11 +10,10 @@ import static wbs.framework.utils.etc.StringUtils.underscoreToHyphen;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import lombok.Cleanup;
 import wbs.applications.imchat.model.ImChatCustomerDetailTypeRec;
 import wbs.applications.imchat.model.ImChatCustomerDetailValueObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerDetailValueRec;
@@ -97,9 +96,8 @@ class ImChatDetailsUpdateAction
 
 		ImChatRec imChat =
 			imChatHelper.findRequired (
-				Integer.parseInt (
-					requestContext.requestStringRequired (
-						"imChatId")));
+				requestContext.requestIntegerRequired (
+					"imChatId"));
 
 		// lookup session
 

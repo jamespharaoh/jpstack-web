@@ -5,7 +5,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.experimental.Accessors;
-
 import wbs.clients.apn.chat.contact.model.ChatContactNoteObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatContactNoteRec;
 import wbs.clients.apn.chat.core.console.ChatConsoleHelper;
@@ -60,7 +59,7 @@ class ChatSupervisorNotesPart
 
 		chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		// get notes

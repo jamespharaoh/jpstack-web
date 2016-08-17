@@ -1,8 +1,8 @@
 package wbs.smsapps.autoresponder.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.simplify;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.Map;
@@ -10,11 +10,10 @@ import java.util.TreeMap;
 
 import javax.inject.Inject;
 
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import lombok.extern.log4j.Log4j;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.IntervalFormatter;
@@ -70,7 +69,7 @@ class AutoResponderVotesPart
 				"timePeriod",
 				"12 hours");
 
-		Integer timePeriodSeconds =
+		Long timePeriodSeconds =
 			intervalFormatter.parseIntervalStringSecondsRequired (
 				timePeriodString);
 
@@ -87,7 +86,7 @@ class AutoResponderVotesPart
 
 		AutoResponderRec autoResponder =
 			autoResponderHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"autoResponderId"));
 
 		ServiceRec autoResponderService =

@@ -3,6 +3,7 @@ package wbs.smsapps.forwarder.api;
 import static wbs.framework.utils.etc.Misc.isInt;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
@@ -11,16 +12,14 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 import wbs.api.mvc.ApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.text.web.TextResponder;
@@ -77,7 +76,7 @@ class ForwarderOutAction
 			String slice = null, code = null, password = null;
 			String message = null, numfrom = null, numto = null;
 			String route = null;
-			Integer inId = null;
+			Long inId = null;
 			String myId = null;
 			Long pri = null;
 
@@ -143,7 +142,8 @@ class ForwarderOutAction
 					try {
 
 						inId =
-							Integer.parseInt (value);
+							Long.parseLong (
+								value);
 
 					} catch (NumberFormatException exception) {
 

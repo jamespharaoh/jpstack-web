@@ -8,10 +8,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
+import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.NonNull;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
@@ -61,8 +63,11 @@ class ChatUserJoinOutboundDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
-		return 10 * 1000;
+	Duration getSleepDuration () {
+
+		return Duration.standardSeconds (
+			10);
+
 	}
 
 	@Override
@@ -127,7 +132,7 @@ class ChatUserJoinOutboundDaemon
 	}
 
 	void doChatUserJoinOutbound (
-			int chatUserId) {
+			@NonNull Long chatUserId) {
 
 		@Cleanup
 		Transaction transaction =

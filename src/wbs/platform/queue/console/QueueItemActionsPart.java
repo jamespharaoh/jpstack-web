@@ -56,7 +56,7 @@ class QueueItemActionsPart
 
 		queueItem =
 			queueItemHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"queueItemId"));
 
 		queueTypeSpec =

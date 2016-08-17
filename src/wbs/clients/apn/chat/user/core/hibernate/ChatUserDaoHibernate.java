@@ -2,14 +2,13 @@ package wbs.clients.apn.chat.user.core.hibernate;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import lombok.NonNull;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.DetachedCriteria;
@@ -23,6 +22,7 @@ import org.joda.time.Instant;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.category.model.ChatCategoryRec;
@@ -395,8 +395,8 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
-			@NonNull Map<String,Object> searchMap) {
+	List <Long> searchIds (
+			@NonNull Map <String, Object> searchMap) {
 
 		Criteria criteria =
 			createCriteria (
@@ -711,13 +711,13 @@ class ChatUserDaoHibernate
 
 			} else if (equal (key, "typeIn")) {
 
-				if (((Collection<?>) value).size () == 0)
-					return ImmutableList.<Integer>of ();
+				if (((Collection <?>) value).size () == 0)
+					return ImmutableList.of ();
 
 				criteria.add (
 					Restrictions.in (
 						"_chatUser.type",
-						(Collection<?>) value));
+						(Collection <?>) value));
 
 			} else if (key.equals ("hasGender")) {
 
@@ -730,8 +730,8 @@ class ChatUserDaoHibernate
 
 			} else if (equal (key, "genderIn")) {
 
-				if (((Collection<?>) value).size () == 0)
-					return ImmutableList.<Integer>of ();
+				if (((Collection <?>) value).size () == 0)
+					return ImmutableList.of ();
 
 				criteria.add (
 					Restrictions.in (
@@ -740,11 +740,16 @@ class ChatUserDaoHibernate
 
 			} else if (key.equals ("hasOrient")) {
 
-				criteria.add ((Boolean) value
+				criteria.add (
+					(Boolean) value
+
 					? Restrictions.isNotNull (
 						"_chatUser.orient")
+
 					: Restrictions.isNull (
-						"_chatUser.orient"));
+						"_chatUser.orient")
+
+				);
 
 			} else if (equal (key, "orientIn")) {
 
@@ -912,8 +917,9 @@ class ChatUserDaoHibernate
 			} else if (equal (key, "limit")) {
 
 				criteria.setMaxResults (
-					(int) (long) (Long)
-					value);
+					toJavaIntegerRequired (
+						(Long)
+						value));
 
 			} else {
 
@@ -928,14 +934,14 @@ class ChatUserDaoHibernate
 
 		return findMany (
 			"searchIds (searchMap)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}
 
 	@Override
 	public
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			@NonNull ChatUserSearch search) {
 
 		Criteria criteria =
@@ -961,7 +967,6 @@ class ChatUserDaoHibernate
 			criteria.add (
 				Restrictions.eq (
 					"_chat.id",
-					(int) (long)
 					search.chatId ()));
 
 		}
@@ -1160,7 +1165,6 @@ class ChatUserDaoHibernate
 			criteria.add (
 				Restrictions.eq (
 					"_chatUser.chatAffiliate.id",
-					(int) (long)
 					search.chatAffiliateId ()));
 
 		}
@@ -1189,7 +1193,6 @@ class ChatUserDaoHibernate
 			criteria.add (
 				Restrictions.eq (
 					"_chatUser.category.id",
-					(int) (long)
 					search.categoryId ()));
 
 		}
@@ -1202,7 +1205,6 @@ class ChatUserDaoHibernate
 			criteria.add (
 				Restrictions.eq (
 					"_chatUser.number.id",
-					(int) (long)
 					search.numberId ()));
 
 		}
@@ -1500,7 +1502,7 @@ class ChatUserDaoHibernate
 
 		return findMany (
 			"searchIds (search)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}

@@ -3,7 +3,6 @@ package wbs.test.simulator.console;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.toBoolean;
-import static wbs.framework.utils.etc.Misc.toInteger;
 import static wbs.framework.utils.etc.StringUtils.doesNotStartWith;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -12,14 +11,13 @@ import java.util.Collections;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import org.joda.time.Instant;
 import org.json.simple.JSONValue;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -201,7 +199,7 @@ class SimulatorSessionCreateEventAction
 
 		SimulatorSessionRec simulatorSession =
 			simulatorSessionHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"simulatorSessionId"));
 
 		SimulatorRec simulator =
@@ -221,7 +219,7 @@ class SimulatorSessionCreateEventAction
 
 		NetworkRec network =
 			networkHelper.findRequired (
-				toInteger (
+				Long.parseLong (
 					requestContext.getForm (
 						"networkId")));
 
@@ -351,11 +349,11 @@ class SimulatorSessionCreateEventAction
 
 		SimulatorSessionRec simulatorSession =
 			simulatorSessionHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"simulatorSessionId"));
 
-		Integer messageId =
-			toInteger (
+		Long messageId =
+			Long.parseLong (
 				requestContext.getForm (
 					"messageId"));
 

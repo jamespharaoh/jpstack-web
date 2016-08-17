@@ -5,7 +5,6 @@ import static wbs.framework.utils.etc.Misc.notEqual;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-
 import wbs.api.mvc.ApiAction;
 import wbs.clients.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
 import wbs.clients.apn.chat.infosite.model.ChatInfoSiteRec;
@@ -41,7 +40,7 @@ class ChatInfoSiteViewAction
 
 		ChatInfoSiteRec infoSite =
 			chatInfoSiteHelper.findRequired (
-				requestContext.requestIntRequired (
+				requestContext.requestIntegerRequired (
 					"chatInfoSiteId"));
 
 		// update first view time

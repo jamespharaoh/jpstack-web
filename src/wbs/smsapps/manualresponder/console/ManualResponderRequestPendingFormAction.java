@@ -5,6 +5,7 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
@@ -12,17 +13,16 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import org.apache.commons.lang3.tuple.Pair;
 
+import lombok.Cleanup;
+import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -117,8 +117,8 @@ class ManualResponderRequestPendingFormAction
 	public
 	Responder goReal () {
 
-		int manualResponderRequestId =
-			requestContext.stuffInt (
+		Long manualResponderRequestId =
+			requestContext.stuffInteger (
 				"manualResponderRequestId");
 
 		String templateIdStr =
@@ -146,7 +146,7 @@ class ManualResponderRequestPendingFormAction
 	}
 
 	Responder goIgnore (
-			int manualResponderRequestId) {
+			@NonNull Long manualResponderRequestId) {
 
 		// start transaction
 
@@ -186,16 +186,16 @@ class ManualResponderRequestPendingFormAction
 	}
 
 	Responder goSend (
-			int manualResponderRequestId,
-			String templateIdString) {
+			@NonNull Long manualResponderRequestId,
+			@NonNull String templateIdString) {
 
 		boolean sendAgain =
 			false;
 
 		// get params
 
-		int templateId =
-			Integer.parseInt (
+		Long templateId =
+			Long.parseLong (
 				templateIdString);
 
 		// get message
@@ -425,7 +425,6 @@ class ManualResponderRequestPendingFormAction
 					"manual_responder")
 
 				.ref (
-					(long)
 					reply.getId ())
 
 				.sendNow (

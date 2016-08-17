@@ -55,12 +55,12 @@ class ChatUserNumberLinkProvider
 
 		// find relevant subs
 
-		List<Integer> chatUserIds =
+		List<Long> chatUserIds =
 			chatUserHelper.searchIds (
 				new ChatUserSearch ()
 
 			.numberId (
-				(long) number.getId ())
+				number.getId ())
 
 		);
 
@@ -70,7 +70,7 @@ class ChatUserNumberLinkProvider
 			new ArrayList<Link> ();
 
 		for (
-			Integer chatUserId
+			Long chatUserId
 				: chatUserIds
 		) {
 

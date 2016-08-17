@@ -4,8 +4,8 @@ import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,8 +17,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
@@ -27,6 +25,7 @@ import org.joda.time.Years;
 
 import com.google.common.collect.ImmutableSet;
 
+import lombok.NonNull;
 import wbs.clients.apn.chat.contact.model.ChatContactNoteObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatContactNoteRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
@@ -111,13 +110,13 @@ class ChatMonitorInboxSummaryPart
 	ChatRec chat;
 	ChatUserRec userChatUser;
 	ChatUserRec monitorChatUser;
-	List<ChatMessageRec> chatMessageHistory;
+	List <ChatMessageRec> chatMessageHistory;
 	ChatUserAlarmRec alarm;
-	List<ChatContactNoteRec> notes;
-	List<ChatNoteNameRec> chatNoteNames;
+	List <ChatContactNoteRec> notes;
+	List <ChatNoteNameRec> chatNoteNames;
 
-	Map<Integer,ChatNamedNoteRec> userNamedNotes;
-	Map<Integer,ChatNamedNoteRec> monitorNamedNotes;
+	Map <Long, ChatNamedNoteRec> userNamedNotes;
+	Map <Long, ChatNamedNoteRec> monitorNamedNotes;
 
 	// implementation
 
@@ -127,7 +126,7 @@ class ChatMonitorInboxSummaryPart
 
 	static
 	class ChatMessageComparator
-		implements Comparator<ChatMessageRec> {
+		implements Comparator <ChatMessageRec> {
 
 		@Override
 		public
@@ -146,11 +145,11 @@ class ChatMonitorInboxSummaryPart
 		}
 
 		static
-		Comparator<ChatMessageRec> ascending =
+		Comparator <ChatMessageRec> ascending =
 			new ChatMessageComparator ();
 
 		static
-		Comparator<ChatMessageRec> descending =
+		Comparator <ChatMessageRec> descending =
 			Collections.reverseOrder (
 				ascending);
 
@@ -170,7 +169,7 @@ class ChatMonitorInboxSummaryPart
 
 		monitorInbox =
 			chatMonitorInboxHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
  					"chatMonitorInboxId"));
 
 		monitorChatUser =
@@ -191,17 +190,17 @@ class ChatMonitorInboxSummaryPart
 
 		// 7 days limit
 
-		List<ChatMessageRec> history1 =
+		List <ChatMessageRec> history1 =
 			chatMessageHelper.findLimit (
 				userChatUser,
 				monitorChatUser,
-				50);
+				50l);
 
-		List<ChatMessageRec> history2 =
+		List <ChatMessageRec> history2 =
 			chatMessageHelper.findLimit (
 				monitorChatUser,
 				userChatUser,
-				50);
+				50l);
 
 		chatMessageHistory =
 			new ArrayList<ChatMessageRec> (
@@ -245,14 +244,14 @@ class ChatMonitorInboxSummaryPart
 
 	}
 
-	Map<Integer,ChatNamedNoteRec> getNamedNotes (
+	Map <Long, ChatNamedNoteRec> getNamedNotes (
 			@NonNull ChatUserRec thisUser,
 			@NonNull ChatUserRec thatUser) {
 
-		Map<Integer,ChatNamedNoteRec> namedNotes =
-			new HashMap<Integer,ChatNamedNoteRec> ();
+		Map <Long, ChatNamedNoteRec> namedNotes =
+			new HashMap<> ();
 
-		List<ChatNamedNoteRec> namedNotesTemp =
+		List <ChatNamedNoteRec> namedNotesTemp =
 			chatNamedNoteHelper.find (
 				thisUser,
 				thatUser);

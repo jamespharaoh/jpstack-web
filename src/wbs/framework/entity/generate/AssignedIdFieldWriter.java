@@ -42,7 +42,7 @@ class AssignedIdFieldWriter {
 				context.recordClassName ())
 
 			.typeNameFormat (
-				"Integer")
+				"Long")
 
 			.propertyNameFormat (
 				"id")

@@ -1,7 +1,8 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -50,6 +51,23 @@ class ReferenceFieldWriter {
 		PluginModelSpec fieldTypePluginModel =
 			pluginManager.pluginModelsByName ().get (
 				spec.typeName ());
+
+		if (
+			isNull (
+				fieldTypePluginModel)
+		) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Field type %s ",
+					spec.typeName (),
+					"does not exist while building reference field %s.%s",
+					context.modelMeta ().name (),
+					ifNull (
+						spec.name (),
+						spec.typeName ())));
+
+		}
 
 		PluginSpec fieldTypePlugin =
 			fieldTypePluginModel.plugin ();

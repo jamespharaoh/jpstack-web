@@ -12,12 +12,12 @@ interface ManualResponderRequestDaoMethods {
 	List<ManualResponderRequestRec> findRecentLimit (
 			ManualResponderRec manualResponder,
 			NumberRec number,
-			Integer maxResults);
+			Long maxResults);
 
 	Criteria searchCriteria (
 			ManualResponderRequestSearch search);
 
-	List<Integer> searchIds (
+	List<Long> searchIds (
 			ManualResponderRequestSearch search);
 
 	// service report
@@ -25,7 +25,7 @@ interface ManualResponderRequestDaoMethods {
 	Criteria searchServiceReportCriteria (
 			ManualResponderRequestSearch search);
 
-	List<Integer> searchServiceReportIds (
+	List<Long> searchServiceReportIds (
 			ManualResponderRequestSearch search);
 
 	List<ManualResponderServiceReport> searchServiceReports (
@@ -33,14 +33,14 @@ interface ManualResponderRequestDaoMethods {
 
 	List<ManualResponderServiceReport> searchServiceReports (
 			ManualResponderRequestSearch search,
-			List<Integer> ids);
+			List<Long> ids);
 
 	// operator report
 
 	Criteria searchOperatorReportCriteria (
 			ManualResponderRequestSearch search);
 
-	List<Integer> searchOperatorReportIds (
+	List<Long> searchOperatorReportIds (
 			ManualResponderRequestSearch search);
 
 	List<ManualResponderOperatorReport> searchOperatorReports (
@@ -48,6 +48,6 @@ interface ManualResponderRequestDaoMethods {
 
 	List<ManualResponderOperatorReport> searchOperatorReports (
 			ManualResponderRequestSearch search,
-			List<Integer> ids);
+			List<Long> ids);
 
 }

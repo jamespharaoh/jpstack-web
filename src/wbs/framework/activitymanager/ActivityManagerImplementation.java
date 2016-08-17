@@ -5,6 +5,8 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.max;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NumberUtils.roundToIntegerRequired;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.notShorterThan;
 
@@ -18,19 +20,18 @@ import java.util.Random;
 
 import javax.annotation.PostConstruct;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.io.IOUtils;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.FormatWriterWriter;
 
@@ -352,12 +353,14 @@ class ActivityManagerImplementation
 		long meterLength =
 			max (
 				0l,
-				(long) Math.log (
-					task.duration ().getMillis ()));
+				roundToIntegerRequired (
+					Math.log (
+						task.duration ().getMillis ())));
 
 		char[] meterCharacters =
 			new char [
-				(int) meterLength];
+				toJavaIntegerRequired (
+					meterLength)];
 
 		Arrays.fill (
 			meterCharacters,

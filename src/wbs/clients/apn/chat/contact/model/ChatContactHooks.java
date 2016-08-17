@@ -47,7 +47,7 @@ class ChatContactHooks
 
 		// update cache
 
-		Pair<Integer,Integer> cacheKey =
+		Pair <Long,Long> cacheKey =
 			Pair.of (
 				chatContact.getFromUser ().getId (),
 				chatContact.getToUser ().getId ());

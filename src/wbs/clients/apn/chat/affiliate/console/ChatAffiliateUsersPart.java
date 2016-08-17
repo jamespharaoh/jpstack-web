@@ -31,7 +31,7 @@ class ChatAffiliateUsersPart
 
 		ChatAffiliateRec chatAffiliate =
 			chatAffiliateHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatAffiliateId"));
 
 		chatUsers =

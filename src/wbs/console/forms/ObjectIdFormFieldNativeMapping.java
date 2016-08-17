@@ -1,13 +1,11 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.console.helper.ConsoleHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
@@ -15,56 +13,30 @@ import wbs.framework.record.Record;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectIdFormFieldNativeMapping")
 public
-class ObjectIdFormFieldNativeMapping<Container,Type extends Record<Type>,Native>
-	implements FormFieldNativeMapping<Container,Type,Native> {
+class ObjectIdFormFieldNativeMapping
+		<Container, RecordType extends Record <RecordType>>
+	implements FormFieldNativeMapping <Container, RecordType, Long> {
 
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<Type> consoleHelper;
-
-	@Getter @Setter
-	Class<Native> propertyClass;
+	ConsoleHelper <RecordType> consoleHelper;
 
 	// implementation
 
 	@Override
 	public
-	Optional<Type> nativeToGeneric (
+	Optional <RecordType> nativeToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<Native> nativeValue) {
+			@NonNull Optional <Long> nativeValue) {
 
 		if (! nativeValue.isPresent ()) {
-			return Optional.<Type>absent ();
+			return Optional.absent ();
 		}
 
-		Integer objectId;
-
-		if (
-			equal (
-				propertyClass,
-				Integer.class)
-		) {
-
-			objectId =
-				(Integer)
-				nativeValue.get ();
-
-		} else if (
-			equal (
-				propertyClass,
-				Long.class)
-		) {
-
-			objectId =
-				(int) (long) (Long)
-				nativeValue.get ();
-
-		} else {
-
-			throw new RuntimeException ();
-
-		}
+		Long objectId =
+			(Long)
+			nativeValue.get ();
 
 		return Optional.of (
 			consoleHelper.findRequired (
@@ -74,40 +46,16 @@ class ObjectIdFormFieldNativeMapping<Container,Type extends Record<Type>,Native>
 
 	@Override
 	public
-	Optional<Native> genericToNative (
+	Optional <Long> genericToNative (
 			@NonNull Container container,
-			@NonNull Optional<Type> genericValue) {
+			@NonNull Optional <RecordType> genericValue) {
 
 		if (! genericValue.isPresent ()) {
-			return Optional.<Native>absent ();
+			return Optional.absent ();
 		}
 
-		if (
-			equal (
-				propertyClass,
-				Integer.class)
-		) {
-
-			return Optional.of (
-				propertyClass.cast (
-					genericValue.get ().getId ()));
-
-		} else if (
-			equal (
-				propertyClass,
-				Long.class)
-		) {
-
-			return Optional.of (
-				propertyClass.cast (
-					(long) (int)
-					genericValue.get ().getId ()));
-
-		} else {
-
-			throw new RuntimeException ();
-
-		}
+		return Optional.of (
+			genericValue.get ().getId ());
 
 	}
 

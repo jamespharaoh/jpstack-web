@@ -4,6 +4,7 @@
 
 	<layer name="utils">
 		<bean class="ExceptionUtilsImplementation"/>
+		<bean class="SimpleExceptionLogger"/>
 	</layer>
 
 </plugin>

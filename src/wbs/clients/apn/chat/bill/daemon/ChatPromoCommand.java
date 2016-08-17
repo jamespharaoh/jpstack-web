@@ -9,12 +9,11 @@ import static wbs.framework.utils.etc.TimeUtils.laterThan;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.bill.model.ChatPromoRec;
@@ -230,7 +229,7 @@ class ChatPromoCommand
 					chatPromo.getPromoNotStartedText (),
 					magicCommand,
 					promoService,
-					(long) helpCommand.getId ());
+					helpCommand.getId ());
 
 			chatHelpLogLogic.createChatHelpLogOut (
 				chatUser,
@@ -269,7 +268,7 @@ class ChatPromoCommand
 					chatPromo.getPromoEndedText (),
 					magicCommand,
 					promoService,
-					(long) helpCommand.getId ());
+					helpCommand.getId ());
 
 			chatHelpLogLogic.createChatHelpLogOut (
 				chatUser,
@@ -311,7 +310,7 @@ class ChatPromoCommand
 					chatPromo.getAlreadyClaimedText (),
 					magicCommand,
 					promoService,
-					(long) helpCommand.getId ());
+					helpCommand.getId ());
 
 			chatHelpLogLogic.createChatHelpLogOut (
 				chatUser,
@@ -377,7 +376,7 @@ class ChatPromoCommand
 				chatPromo.getSuccessText (),
 				magicCommand,
 				promoService,
-				(long) helpCommand.getId ());
+				helpCommand.getId ());
 
 		chatHelpLogLogic.createChatHelpLogOut (
 			chatUser,

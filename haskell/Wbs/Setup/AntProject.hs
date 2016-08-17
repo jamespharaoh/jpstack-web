@@ -639,8 +639,8 @@ writeBuildFile world = do
 				] [
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
-					makeArgValue "data,model-meta,model-generate,utils",
-					makeArgValue "build",
+					makeArgValue "model-meta,model-generate,utils",
+					makeArgValue "",
 					makeArgValue "wbs.framework.entity.generate.ModelGeneratorTool",
 					makeArgValue "generateModels"
 				]
@@ -663,7 +663,7 @@ writeBuildFile world = do
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
 					makeArgValue "utils,config,data,entity,model-meta,schema,sql,schema-tool",
-					makeArgValue "script",
+					makeArgValue "",
 					makeArgValue "wbs.framework.schema.tool.SchemaTool",
 					makeArgValue "schemaCreate"
 				]
@@ -687,7 +687,7 @@ writeBuildFile world = do
 					makeArgValue "wbs.test",
 					makeArgValue ("utils,config,data,entity,schema,sql," ++
 						"model,model-meta,hibernate,object,logic,fixture"),
-					makeArgValue "script,hibernate",
+					makeArgValue "",
 					makeArgValue "wbs.framework.entity.meta.ModelFixtureCreator",
 					makeArgValue "runModelFixtureCreators"
 				],
@@ -702,7 +702,7 @@ writeBuildFile world = do
 					makeArgValue "wbs.test",
 					makeArgValue ("utils,config,data,entity,schema,sql," ++
 						"model,model-meta,hibernate,object,logic,fixture"),
-					makeArgValue "script,hibernate",
+					makeArgValue "",
 					makeArgValue "wbs.framework.fixtures.FixturesTool",
 					makeArgValue "runFixtureProviders"
 				]

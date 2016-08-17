@@ -1,4 +1,4 @@
-package wbs.framework.dbpool;
+package wbs.framework.database;
 
 import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
 
@@ -28,9 +28,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.application.annotations.PrototypeComponent;
 
 /**
  * TODO a maximum connection life would be nice
@@ -45,6 +45,7 @@ import wbs.framework.activitymanager.ActivityManager;
  */
 @Accessors (fluent = true)
 @Log4j
+@PrototypeComponent ("dbPool")
 public
 class DbPool
 	implements DataSource {

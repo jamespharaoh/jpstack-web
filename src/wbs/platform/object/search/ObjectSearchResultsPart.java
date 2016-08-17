@@ -2,12 +2,17 @@ package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
-import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.methodInvoke;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.requiredValue;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -15,11 +20,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
@@ -29,6 +29,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.forms.FormFieldLogic;
@@ -45,13 +49,6 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.IdObject;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
-
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-
 import wbs.platform.user.console.UserConsoleLogic;
 
 @Accessors (fluent = true)
@@ -147,8 +144,8 @@ class ObjectSearchResultsPart
 				resultsClass)
 		) {
 
-			Integer currentObjectId =
-				(Integer)
+			Long currentObjectId =
+				(Long)
 				requestContext.stuff (
 					consoleHelper.objectName () + "Id");
 
@@ -172,8 +169,8 @@ class ObjectSearchResultsPart
 		// get search results for page
 
 		@SuppressWarnings ("unchecked")
-		List<Integer> allObjectIds =
-			(List<Integer>)
+		List<Long> allObjectIds =
+			(List<Long>)
 			requiredValue (
 				requestContext.session (
 					sessionKey + "Results"));
@@ -203,7 +200,7 @@ class ObjectSearchResultsPart
 
 		}
 
-		List<Integer> pageObjectIds =
+		List<Long> pageObjectIds =
 			singlePage
 				? allObjectIds
 				: allObjectIds.subList (
@@ -249,7 +246,7 @@ class ObjectSearchResultsPart
 				new ArrayList<IdObject> ();
 
 			for (
-				Integer objectId
+				Long objectId
 					: pageObjectIds
 			) {
 

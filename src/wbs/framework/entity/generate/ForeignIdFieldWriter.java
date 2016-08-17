@@ -42,7 +42,7 @@ class ForeignIdFieldWriter {
 				context.recordClassName ())
 
 			.typeNameFormat (
-				"Integer")
+				"Long")
 
 			.propertyNameFormat (
 				"id")

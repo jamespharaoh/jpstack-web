@@ -13,18 +13,18 @@ interface QueueItemDaoMethods {
 	Criteria searchCriteria (
 			QueueItemSearch search);
 
-	List<Integer> searchIds (
+	List<Long> searchIds (
 			QueueItemSearch search);
 
 	Criteria searchUserQueueReportCriteria (
 			QueueItemSearch search);
 
-	List<Integer> searchUserQueueReportIds (
+	List<Long> searchUserQueueReportIds (
 			QueueItemSearch search);
 
 	List<UserQueueReport> searchUserQueueReports (
 			QueueItemSearch search,
-			List<Integer> ids);
+			List<Long> ids);
 
 	List<QueueItemRec> find (
 			List<QueueItemState> state);

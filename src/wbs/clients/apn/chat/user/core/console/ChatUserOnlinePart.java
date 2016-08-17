@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.spacify;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collection;
 import java.util.Set;
@@ -108,7 +108,7 @@ class ChatUserOnlinePart
 
 		ChatRec chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		users =

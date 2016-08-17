@@ -2,9 +2,9 @@ package wbs.clients.apn.chat.user.core.console;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.sum;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -143,8 +143,9 @@ class ChatUserSearchOldResultsPart
 				requestContext.consoleContext (),
 				targetContextType);
 
-		List<?> chatUserSearchResult =
-			(List<?>)
+		@SuppressWarnings ("unchecked")
+		List<Long> chatUserSearchResult =
+			(List<Long>)
 			requestContext.requestRequired (
 				"chatUserSearchResult");
 
@@ -152,13 +153,12 @@ class ChatUserSearchOldResultsPart
 			new ArrayList<ChatUserRec> ();
 
 		for (
-			Object chatUserIdObject
+			Long chatUserIdObject
 				: chatUserSearchResult
 		) {
 
 			chatUsers.add (
 				chatUserHelper.findRequired (
-					(Integer)
 					chatUserIdObject));
 
 		}
@@ -353,13 +353,13 @@ class ChatUserSearchOldResultsPart
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					(long) chatUser.getValueSinceEver ()));
+					chatUser.getValueSinceEver ()));
 
 			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					(long) chatUser.getCredit ()));
+					chatUser.getCredit ()));
 
 			pageBuilder.writer ().writeFormat (
 				"%s\n",
@@ -370,7 +370,7 @@ class ChatUserSearchOldResultsPart
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					(long) sum (
+					sum (
 						+ chatUser.getCreditPending (),
 						+ chatUser.getCreditPendingStrict ())));
 
@@ -378,13 +378,13 @@ class ChatUserSearchOldResultsPart
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					(long) chatUser.getCreditSuccess ()));
+					chatUser.getCreditSuccess ()));
 
 			pageBuilder.writer ().writeFormat (
 				"%s\n",
 				currencyLogic.formatHtmlTd (
 					chatUser.getChat ().getCurrency (),
-					(long) chatUser.getCreditFailed ()));
+					chatUser.getCreditFailed ()));
 
 			pageBuilder.writer ().writeFormat (
 				"<td>%h</td>\n",

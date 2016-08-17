@@ -7,12 +7,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -59,15 +58,17 @@ class DigitalSelectRouteReportFile
 	void doPost ()
 		throws IOException {
 
-		int routeId =
-			requestContext.requestIntRequired (
+		Long routeId =
+			requestContext.requestIntegerRequired (
 				"routeId");
 
 		String msgidParam =
-			requestContext.parameterOrNull ("msgid");
+			requestContext.parameterOrNull (
+				"msgid");
 
 		String statParam =
-			requestContext.parameterOrNull ("stat");
+			requestContext.parameterOrNull (
+				"stat");
 
 		// debugging
 

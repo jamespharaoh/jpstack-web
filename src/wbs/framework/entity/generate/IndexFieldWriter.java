@@ -44,7 +44,7 @@ class IndexFieldWriter {
 				context.recordClassName ())
 
 			.typeNameFormat (
-				"Integer")
+				"Long")
 
 			.propertyNameFormat (
 				"%s",

@@ -6,6 +6,7 @@
 		<bean class="RandomLogicImplementation"/>
 		<bean class="TimeFormatterImplementation"/>
 		<bean class="IntervalFormatterImplementation"/>
+		<bean class="ThreadManagerImplementation"/>
 	</layer>
 
 	<layer name="logic">

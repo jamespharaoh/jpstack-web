@@ -8,11 +8,10 @@ import java.util.regex.Matcher;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -25,7 +24,6 @@ import wbs.framework.web.WebFile;
 import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
-import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -41,9 +39,6 @@ class UnwiredPlazaApiServletModule
 
 	@Inject
 	ExceptionLogLogic exceptionLogic;
-
-	@Inject
-	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
 	SmsDeliveryReportLogic reportLogic;
@@ -125,8 +120,8 @@ class UnwiredPlazaApiServletModule
 
 			// process request
 
-			int routeId =
-				requestContext.requestIntRequired (
+			Long routeId =
+				requestContext.requestIntegerRequired (
 					"routeId");
 
 			String idParam =

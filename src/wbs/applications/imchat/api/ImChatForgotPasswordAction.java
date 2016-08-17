@@ -3,13 +3,12 @@ package wbs.applications.imchat.api;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.applications.imchat.logic.ImChatLogic;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
@@ -89,9 +88,8 @@ class ImChatForgotPasswordAction
 
 		ImChatRec imChat =
 			imChatHelper.findRequired (
-				Integer.parseInt (
-					requestContext.requestStringRequired (
-						"imChatId")));
+				requestContext.requestIntegerRequired (
+					"imChatId"));
 
 		// check for existing
 

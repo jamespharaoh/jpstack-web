@@ -10,16 +10,16 @@ public
 interface UserConsoleLogic
 	extends TimezoneTimeFormatter {
 
-	Optional<UserRec> user ();
+	Optional <UserRec> user ();
 	UserRec userRequired ();
 
-	Optional<SliceRec> slice ();
+	Optional <SliceRec> slice ();
 	SliceRec sliceRequired ();
 
-	Optional<Long> userId ();
+	Optional <Long> userId ();
 	Long userIdRequired ();
 
-	Optional<Long> sliceId ();
+	Optional <Long> sliceId ();
 	Long sliceIdRequired ();
 
 	boolean loggedIn ();

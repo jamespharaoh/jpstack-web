@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
@@ -53,7 +53,7 @@ class ChatUserNotesPart
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		chatUserNotes =

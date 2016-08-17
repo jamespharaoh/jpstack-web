@@ -5,6 +5,9 @@ import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.moreThanZero;
 import static wbs.framework.utils.etc.Misc.orNull;
+import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -14,9 +17,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.lang3.Range;
 import org.apache.log4j.Level;
 
@@ -24,6 +24,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.broadcast.logic.ChatBroadcastLogic;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberObjectHelper;
@@ -53,10 +55,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
 import wbs.framework.utils.TextualInterval;
 import wbs.framework.utils.etc.ProfileLogger;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
-
 import wbs.framework.web.Responder;
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.service.console.ServiceConsoleHelper;
@@ -236,7 +234,7 @@ class ChatBroadcastSendAction
 				.put (
 					"chat",
 					chatHelper.findRequired (
-						requestContext.stuffInt (
+						requestContext.stuffInteger (
 							"chatId")))
 
 				.build ();
@@ -361,7 +359,7 @@ class ChatBroadcastSendAction
 
 				ChatRec chat =
 					chatHelper.findRequired (
-						requestContext.stuffInt (
+						requestContext.stuffInteger (
 							"chatId"));
 
 				// lookup user
@@ -416,8 +414,8 @@ class ChatBroadcastSendAction
 
 				// perform search
 
-				List<Integer> allChatUserIds =
-					new ArrayList<Integer> ();
+				List<Long> allChatUserIds =
+					new ArrayList<> ();
 
 				if (form.search ()) {
 
@@ -427,7 +425,7 @@ class ChatBroadcastSendAction
 						new ChatUserSearch ()
 
 						.chatId (
-							(long) chat.getId ())
+							chat.getId ())
 
 						.type (
 							ChatUserType.user)
@@ -559,8 +557,8 @@ class ChatBroadcastSendAction
 
 				int removedNumbers = 0;
 
-				List<Integer> remainingChatUserIds =
-					new ArrayList<Integer> ();
+				List<Long> remainingChatUserIds =
+					new ArrayList<> ();
 
 				int loop1 = 0;
 
@@ -583,7 +581,7 @@ class ChatBroadcastSendAction
 				);
 
 				for (
-					Integer chatUserId
+					Long chatUserId
 						: allChatUserIds
 				) {
 
@@ -712,8 +710,8 @@ class ChatBroadcastSendAction
 						text)
 
 					.setNumAccepted (
-						(long)
-						remainingChatUserIds.size ())
+						fromJavaInteger (
+							remainingChatUserIds.size ()))
 
 					.setSearch (
 						form.search ());
@@ -794,7 +792,7 @@ class ChatBroadcastSendAction
 				int loop3 = 0;
 
 				for (
-					Integer toChatUserId
+					Long toChatUserId
 						: remainingChatUserIds
 				) {
 

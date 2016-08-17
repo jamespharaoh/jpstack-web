@@ -6,17 +6,16 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
-
 import org.json.simple.JSONValue;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -79,7 +78,7 @@ class SimulatorSenderHelper
 				new State ()
 
 				.messageId (
-					(long) (int) outbox.getId ())
+					outbox.getId ())
 
 			);
 
@@ -185,7 +184,7 @@ class SimulatorSenderHelper
 
 		state.otherIds (
 			ImmutableList.of (
-				Integer.toString (
+				Long.toString (
 					event.getId ())));
 
 		return new PerformSendResult ()

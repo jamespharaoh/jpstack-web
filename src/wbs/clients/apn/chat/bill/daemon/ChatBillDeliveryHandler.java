@@ -9,13 +9,13 @@ import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -145,8 +145,8 @@ class ChatBillDeliveryHandler
 	@Override
 	public
 	void handle (
-			int deliveryId,
-			Long ref) {
+			@NonNull Long deliveryId,
+			@NonNull Long ref) {
 
 		@Cleanup
 		HeldLock lock =

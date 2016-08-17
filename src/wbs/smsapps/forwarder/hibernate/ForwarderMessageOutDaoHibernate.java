@@ -1,12 +1,13 @@
 package wbs.smsapps.forwarder.hibernate;
 
-import java.util.List;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
-import lombok.NonNull;
+import java.util.List;
 
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutDao;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
@@ -47,9 +48,9 @@ class ForwarderMessageOutDaoHibernate
 
 	@Override
 	public
-	List<ForwarderMessageOutRec> findPendingLimit (
+	List <ForwarderMessageOutRec> findPendingLimit (
 			@NonNull ForwarderRec forwarder,
-			int maxResults) {
+			@NonNull Long maxResults) {
 
 		return findMany (
 			"findPendingLimit (forwarder, maxResults)",
@@ -77,7 +78,8 @@ class ForwarderMessageOutDaoHibernate
 					"_forwarderMessageOut.id"))
 
 			.setMaxResults (
-				maxResults)
+				toJavaIntegerRequired (
+					maxResults))
 
 		);
 

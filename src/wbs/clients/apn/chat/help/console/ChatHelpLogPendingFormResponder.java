@@ -74,7 +74,7 @@ class ChatHelpLogPendingFormResponder
 
 		chatHelpLog =
 			chatHelpLogHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatHelpLogId"));
 
 		chatHelpTemplates =

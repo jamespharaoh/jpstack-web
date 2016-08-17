@@ -173,7 +173,7 @@ interface ConsoleRequestContext {
 	Object stuff (
 			String key);
 
-	Integer stuffInt (
+	Long stuffInteger (
 			String key);
 
 	String stuffString (
@@ -185,7 +185,7 @@ interface ConsoleRequestContext {
 	boolean canView (
 			Record<?> object);
 
-	int requestUnique ();
+	Long requestUnique ();
 
 	void grant (
 			String string);
@@ -231,7 +231,7 @@ interface ConsoleRequestContext {
 			String key,
 			Supplier<String> orElse);
 
-	long parameterInteger (
+	Long parameterInteger (
 			String key);
 
 	String sessionId ();
@@ -282,19 +282,19 @@ interface ConsoleRequestContext {
 			String key,
 			Object value);
 
-	Optional<?> request (
+	Optional <?> request (
 			String key);
 
 	Object requestRequired (
 			String key);
 
-	Optional<Integer> requestInt (
+	Optional <Long> requestInteger (
 			String key);
 
-	Integer requestIntRequired (
+	Long requestIntegerRequired (
 			String key);
 
-	Optional<String> requestString (
+	Optional <String> requestString (
 			String key);
 
 	String requestStringRequired (

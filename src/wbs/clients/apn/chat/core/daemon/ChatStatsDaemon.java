@@ -4,13 +4,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.core.model.ChatStatsObjectHelper;
@@ -134,8 +134,10 @@ class ChatStatsDaemon
 
 		transaction.close ();
 
-		for (ChatRec chat
-				: chats) {
+		for (
+			ChatRec chat
+				: chats
+		) {
 
 			doStats (
 				timestamp,
@@ -146,8 +148,8 @@ class ChatStatsDaemon
 	}
 
 	void doStats (
-			Instant timestamp,
-			int chatId) {
+			@NonNull Instant timestamp,
+			@NonNull Long chatId) {
 
 		@Cleanup
 		Transaction transaction =

@@ -1,8 +1,8 @@
 package wbs.framework.utils.etc;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.replaceAll;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -61,33 +61,60 @@ class Html {
 			index ++
 		) {
 
-			char ch =
-				source.charAt (index);
+			char character =
+				source.charAt (
+					index);
 
-			switch (ch) {
+			switch (character) {
 
 			case '<':
-				dest.append ("&lt;");
+
+				dest.append (
+					"&lt;");
+
 				break;
 
 			case '>':
-				dest.append ("&gt;");
+
+				dest.append (
+					"&gt;");
+
 				break;
 
 			case '&':
-				dest.append ("&amp;");
+
+				dest.append (
+					"&amp;");
+
 				break;
 
 			case '"':
-				dest.append ("&quot;");
+
+				dest.append (
+					"&quot;");
+
 				break;
 
 			default:
 
-				if (ch < 128)
-					dest.append (ch);
-				else
-					dest.append ("&#" + (int) ch + ";");
+				if (character < 128) {
+
+					dest.append (
+						character);
+
+				} else {
+
+					dest.append (
+						"&#");
+
+					dest.append (
+						Character.getNumericValue (
+							character));
+
+					dest.append (
+						";");
+
+				}
 
 			}
 

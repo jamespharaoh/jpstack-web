@@ -4,6 +4,7 @@
 
 	<layer name="config">
 		<bean class="WbsConfigFactory"/>
+		<bean class="GenericConfigLoader"/>
 	</layer>
 
 </plugin>

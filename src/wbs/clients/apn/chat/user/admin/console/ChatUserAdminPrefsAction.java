@@ -61,8 +61,8 @@ class ChatUserAdminPrefsAction
 
 		// get stuff
 
-		int chatUserId =
-			requestContext.stuffInt (
+		Long chatUserId =
+			requestContext.stuffInteger (
 				"chatUserId");
 
 		// get params

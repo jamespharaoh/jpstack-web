@@ -118,7 +118,7 @@ class ManualResponderRequestPendingFormResponder
 
 		request =
 			manualResponderRequestHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"manualResponderRequestId"));
 
 		manualResponderNumber =
@@ -128,7 +128,7 @@ class ManualResponderRequestPendingFormResponder
 			manualResponderNumber.getManualResponder ();
 
 		templates =
-			new TreeSet<ManualResponderTemplateRec> ();
+			new TreeSet<> ();
 
 		for (
 			ManualResponderTemplateRec template

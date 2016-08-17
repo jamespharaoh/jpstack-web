@@ -16,9 +16,6 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.MultipartStream;
 import org.joda.time.Instant;
@@ -26,6 +23,8 @@ import org.joda.time.Instant;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -410,7 +409,7 @@ logger.error ("Got item");
 
 			RouteRec route =
 				routeHelper.findRequired (
-					requestContext.requestIntRequired (
+					requestContext.requestIntegerRequired (
 						"routeId"));
 
 			smsInboxLogic.inboxInsert (

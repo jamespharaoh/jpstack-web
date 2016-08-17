@@ -91,6 +91,7 @@
       <fileset dir="src/wbs/framework/builder/console/files"/>
       <fileset dir="src/wbs/framework/database/console/files"/>
       <fileset dir="src/wbs/framework/entity/console/files"/>
+      <fileset dir="src/wbs/framework/fixtures/console/files"/>
       <fileset dir="src/wbs/framework/exception/console/files"/>
       <fileset dir="src/wbs/framework/hibernate/console/files"/>
       <fileset dir="src/wbs/framework/object/console/files"/>
@@ -264,6 +265,7 @@
       <fileset dir="src/wbs/framework/builder/api/files"/>
       <fileset dir="src/wbs/framework/database/api/files"/>
       <fileset dir="src/wbs/framework/entity/api/files"/>
+      <fileset dir="src/wbs/framework/fixtures/api/files"/>
       <fileset dir="src/wbs/framework/exception/api/files"/>
       <fileset dir="src/wbs/framework/hibernate/api/files"/>
       <fileset dir="src/wbs/framework/object/api/files"/>
@@ -471,6 +473,7 @@
       <fileset dir="src/wbs/framework/builder/console/files"/>
       <fileset dir="src/wbs/framework/database/console/files"/>
       <fileset dir="src/wbs/framework/entity/console/files"/>
+      <fileset dir="src/wbs/framework/fixtures/console/files"/>
       <fileset dir="src/wbs/framework/exception/console/files"/>
       <fileset dir="src/wbs/framework/hibernate/console/files"/>
       <fileset dir="src/wbs/framework/object/console/files"/>
@@ -644,6 +647,7 @@
       <fileset dir="src/wbs/framework/builder/api/files"/>
       <fileset dir="src/wbs/framework/database/api/files"/>
       <fileset dir="src/wbs/framework/entity/api/files"/>
+      <fileset dir="src/wbs/framework/fixtures/api/files"/>
       <fileset dir="src/wbs/framework/exception/api/files"/>
       <fileset dir="src/wbs/framework/hibernate/api/files"/>
       <fileset dir="src/wbs/framework/object/api/files"/>
@@ -936,8 +940,8 @@
     <java classname="wbs.framework.application.tools.BeanRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
-      <arg value="data,model-meta,model-generate,utils"/>
-      <arg value="build"/>
+      <arg value="model-meta,model-generate,utils"/>
+      <arg value=""/>
       <arg value="wbs.framework.entity.generate.ModelGeneratorTool"/>
       <arg value="generateModels"/>
     </java>
@@ -947,7 +951,7 @@
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="utils,config,data,entity,model-meta,schema,sql,schema-tool"/>
-      <arg value="script"/>
+      <arg value=""/>
       <arg value="wbs.framework.schema.tool.SchemaTool"/>
       <arg value="schemaCreate"/>
     </java>
@@ -957,7 +961,7 @@
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="utils,config,data,entity,schema,sql,model,model-meta,hibernate,object,logic,fixture"/>
-      <arg value="script,hibernate"/>
+      <arg value=""/>
       <arg value="wbs.framework.entity.meta.ModelFixtureCreator"/>
       <arg value="runModelFixtureCreators"/>
     </java>
@@ -965,7 +969,7 @@
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="utils,config,data,entity,schema,sql,model,model-meta,hibernate,object,logic,fixture"/>
-      <arg value="script,hibernate"/>
+      <arg value=""/>
       <arg value="wbs.framework.fixtures.FixturesTool"/>
       <arg value="runFixtureProviders"/>
     </java>

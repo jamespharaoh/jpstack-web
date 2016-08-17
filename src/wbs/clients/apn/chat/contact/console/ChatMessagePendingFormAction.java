@@ -2,13 +2,14 @@ package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.trim;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
@@ -25,8 +26,6 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.queue.logic.QueueLogic;
@@ -148,7 +147,7 @@ class ChatMessagePendingFormAction
 
 		ChatMessageRec chatMessage =
 			chatMessageHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatMessageId"));
 
 		ChatRec chat =
@@ -357,7 +356,7 @@ class ChatMessagePendingFormAction
 
 		ChatMessageRec chatMessage =
 			chatMessageHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatMessageId"));
 
 		// confirm message status

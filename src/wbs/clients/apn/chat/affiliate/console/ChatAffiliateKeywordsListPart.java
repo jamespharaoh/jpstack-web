@@ -32,11 +32,11 @@ class ChatAffiliateKeywordsListPart
 
 		ChatAffiliateRec chatAffiliate =
 			chatAffiliateHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatAffiliateId"));
 
 		chatSchemeKeywords =
-			new ArrayList<ChatSchemeKeywordRec> (
+			new ArrayList <> (
 				chatAffiliate.getChatSchemeKeywords ());
 
 		Collections.sort (

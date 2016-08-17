@@ -1,18 +1,18 @@
 package wbs.clients.apn.chat.contact.daemon;
 
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.model.ChatBlockObjectHelper;
@@ -33,7 +33,6 @@ import wbs.clients.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -224,7 +223,7 @@ class ChatChatCommand
 			text,
 			magicCommand,
 			systemService,
-			(long) helpCommand.getId ());
+			helpCommand.getId ());
 
 		// process inbox
 

@@ -34,7 +34,7 @@ class SubscriptionSendControlPart
 
 		subscriptionSend =
 			subscriptionSendHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"subscriptionSendId"));
 
 	}

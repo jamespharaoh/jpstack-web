@@ -13,6 +13,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import nu.xom.Builder;
@@ -21,10 +24,6 @@ import nu.xom.Element;
 import nu.xom.Nodes;
 import nu.xom.ParsingException;
 import nu.xom.Serializer;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
@@ -234,7 +233,7 @@ class MediaburstProteusSender
 	 */
 	public static
 	class State {
-		int messageId;
+		Long messageId;
 		OutboxRec outbox;
 		MessageRec message;
 		RouteRec route;

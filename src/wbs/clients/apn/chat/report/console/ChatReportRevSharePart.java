@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.report.console;
 
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -11,8 +12,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import lombok.NonNull;
-
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
@@ -20,6 +19,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
 import wbs.clients.apn.chat.affiliate.console.ChatAffiliateConsoleHelper;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.console.ChatRouteConsoleHelper;
@@ -50,7 +50,6 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.hibernate.HibernateDatabase;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.TextualInterval;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.platform.affiliate.console.AffiliateConsoleHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.scaffold.model.RootRec;
@@ -176,7 +175,7 @@ class ChatReportRevSharePart
 
 		chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		totalReport =
@@ -226,8 +225,8 @@ class ChatReportRevSharePart
 				chat,
 				ServiceRec.class);
 
-		ArrayList<Integer> serviceIds =
-			new ArrayList<Integer> ();
+		ArrayList<Long> serviceIds =
+			new ArrayList<> ();
 
 		for (
 			ServiceRec service
@@ -271,8 +270,8 @@ class ChatReportRevSharePart
 		chatReportsByAffiliate =
 			new HashMap<AffiliateRec,ChatReportRevShareItem> ();
 
-		ArrayList<Integer> errorRoutes =
-			new ArrayList<Integer> ();
+		List<Long> errorRoutes =
+			new ArrayList<> ();
 
 		for (
 			MessageStatsRec messageStats
@@ -391,7 +390,7 @@ class ChatReportRevSharePart
 				new ChatUserSearch ()
 
 			.chatId (
-				(long) chat.getId ())
+				chat.getId ())
 
 			.firstJoin (
 				TextualInterval.forInterval (

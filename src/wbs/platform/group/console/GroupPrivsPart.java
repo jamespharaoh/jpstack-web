@@ -55,8 +55,8 @@ class GroupPrivsPart
 	PrivsNode rootNode =
 		new PrivsNode ();
 
-	Set<Integer> canPrivIds =
-		new HashSet<Integer> ();
+	Set<Long> canPrivIds =
+		new HashSet<> ();
 
 	Map<GlobalId,PrivsNode> nodesByDataObjectId =
 		new HashMap<GlobalId,PrivsNode> ();
@@ -76,12 +76,17 @@ class GroupPrivsPart
 		List<PrivRec> privs =
 			privHelper.findAll ();
 
-		for (PrivRec priv
-				: privs) {
+		for (
+			PrivRec priv
+				: privs
+		) {
 
-			if (! privChecker.canGrant (
-					priv.getId ()))
+			if (
+				! privChecker.canGrant (
+					priv.getId ())
+			) {
 				continue;
+			}
 
 			Record<?> parentObject =
 				objectManager.getParent (priv);
@@ -99,7 +104,7 @@ class GroupPrivsPart
 
 		GroupRec group =
 			groupHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"groupId"));
 
 		for (

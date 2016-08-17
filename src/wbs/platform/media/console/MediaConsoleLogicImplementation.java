@@ -1,18 +1,17 @@
 package wbs.platform.media.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.bytesToString;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.media.logic.MediaLogic;
@@ -98,8 +97,8 @@ class MediaConsoleLogicImplementation
 				mimeType)
 		) {
 
-			Integer playerCount =
-				requestContext.requestIntRequired (
+			Long playerCount =
+				requestContext.requestIntegerRequired (
 					PLAYER_COUNT_KEY);
 
 			StringBuilder stringBuilder =
@@ -113,7 +112,8 @@ class MediaConsoleLogicImplementation
 						" src=\"/flowplayer-3.1.2.min.js\"",
 						"></script>\n"));
 
-				playerCount = 0;
+				playerCount =
+					0l;
 
 			}
 
@@ -160,8 +160,8 @@ class MediaConsoleLogicImplementation
 			mediaLogic.isAudio (mimeType)
 		) {
 
-			Integer playerCount =
-				requestContext.requestIntRequired (
+			Long playerCount =
+				requestContext.requestIntegerRequired (
 					PLAYER_COUNT_KEY);
 
 			StringBuilder stringBuilder =
@@ -175,7 +175,7 @@ class MediaConsoleLogicImplementation
 						" src=\"/flowplayer-3.1.2.min.js\"",
 						"></script>\n"));
 
-				playerCount = 0;
+				playerCount = 0l;
 
 			}
 

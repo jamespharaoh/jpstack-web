@@ -1,19 +1,20 @@
 package wbs.platform.send;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.experimental.Accessors;
-
 import org.apache.log4j.Logger;
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.Record;
@@ -56,8 +57,11 @@ class GenericScheduleDaemon<
 
 	@Override
 	protected
-	int getDelayMs () {
-		return 5000;
+	Duration getSleepDuration () {
+
+		return Duration.standardSeconds (
+			5);
+
 	}
 
 	@Override
@@ -98,8 +102,8 @@ class GenericScheduleDaemon<
 			helper ().findScheduledJobs (
 				transaction.now ());
 
-		List<Integer> jobIds =
-			new ArrayList<Integer> ();
+		List<Long> jobIds =
+			new ArrayList<> ();
 
 		for (
 			Job job
@@ -113,18 +117,13 @@ class GenericScheduleDaemon<
 
 		transaction.close ();
 
-		for (Integer jobId
-				: jobIds) {
-
-			runJob (
-				jobId);
-
-		}
+		jobIds.forEach (
+			this::runJob);
 
 	}
 
 	void runJob (
-			int jobId) {
+			@NonNull Long jobId) {
 
 		@Cleanup
 		Transaction transaction =

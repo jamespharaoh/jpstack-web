@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.min;
+import static wbs.framework.utils.etc.NumberUtils.roundToIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -165,12 +166,11 @@ class ChatDateDaemon
 				"ChatDateDaemon.doRun ()",
 				this);
 
-		List<Long> chatIds =
+		List <Long> chatIds =
 			chatHelper.findAll ().stream ()
 
 			.map (
-				chat ->
-					(long) chat.getId ())
+				ChatRec::getId)
 
 			.collect (
 				Collectors.toList ());
@@ -226,7 +226,7 @@ class ChatDateDaemon
 		int max = 1000;
 
 		for (
-			Integer thisUserId
+			Long thisUserId
 				: chatData.datingUserIds
 		) {
 
@@ -408,7 +408,7 @@ class ChatDateDaemon
 
 			// then add all the monitors too
 	
-			Collection<Integer> monitorIds =
+			Collection<Long> monitorIds =
 				chatUserHelper.searchIds (
 					new ChatUserSearch ()
 
@@ -421,7 +421,7 @@ class ChatDateDaemon
 			);
 	
 			for (
-				Integer chatUserId
+				Long chatUserId
 					: monitorIds
 			) {
 	
@@ -565,7 +565,7 @@ class ChatDateDaemon
 
 	boolean doUser (
 			@NonNull Collection<DatingUserInfo> otherUserInfos,
-			int thisUserId) {
+			@NonNull Long thisUserId) {
 
 		log.info (
 			stringFormat (
@@ -810,8 +810,10 @@ class ChatDateDaemon
 		List<ChatUserRec> otherUsers =
 			new ArrayList<ChatUserRec> ();
 
-		for (DatingUserDistance datingUserDistance
-				: prospectiveUserDistances) {
+		for (
+			DatingUserDistance datingUserDistance
+				: prospectiveUserDistances
+		) {
 
 			if (otherUsers.size () == num)
 				break;
@@ -905,9 +907,9 @@ class ChatDateDaemon
 				thisUser.getGender (),
 				thisUser.getOrient (),
 				thisUser.getCategory () != null
-					? Optional.<Integer>of (
+					? Optional.of (
 						thisUser.getCategory ().getId ())
-					: Optional.<Integer>absent (),
+					: Optional.absent (),
 				thatUserInfo.gender,
 				thatUserInfo.orient,
 				thatUserInfo.categoryId)
@@ -1018,10 +1020,11 @@ class ChatDateDaemon
 
 		}
 
-		int miles = (int)
-			locatorLogic.distanceMiles (
-				thisUser.getLocationLongLat (),
-				thatUserInfo.longLat);
+		Long miles =
+			roundToIntegerRequired (
+				locatorLogic.distanceMiles (
+					thisUser.getLocationLongLat (),
+					thatUserInfo.longLat));
 
 		if (miles > thisUser.getDateRadius ()) {
 
@@ -1057,13 +1060,13 @@ class ChatDateDaemon
 	static
 	class DatingUserInfo {
 
-		int id;
+		Long id;
 		LongLat longLat;
 		boolean photo;
 
 		Gender gender;
 		Orient orient;
-		Optional<Integer> categoryId;
+		Optional<Long> categoryId;
 
 		DatingUserInfo (
 				@NonNull ChatUserRec chatUser) {
@@ -1077,9 +1080,9 @@ class ChatDateDaemon
 
 			categoryId =
 				chatUser.getCategory () != null
-					? Optional.<Integer>of (
+					? Optional.of (
 						chatUser.getCategory ().getId ())
-					: Optional.<Integer>absent ();
+					: Optional.absent ();
 
 		}
 
@@ -1089,25 +1092,29 @@ class ChatDateDaemon
 	class DatingUserDistance
 		implements Comparable<DatingUserDistance> {
 
-		int id;
-		int miles;
+		Long id;
+		Long miles;
 
 		DatingUserDistance (
-				int newId,
-				int newMiles) {
+				@NonNull Long newId,
+				@NonNull Long newMiles) {
 
-			id = newId;
-			miles = newMiles;
+			id =
+				newId;
+
+			miles =
+				newMiles;
 
 		}
 
 		@Override
 		public
 		int compareTo (
-				DatingUserDistance other) {
+				@NonNull DatingUserDistance other) {
 
-			return (Integer.valueOf (miles)).compareTo (
-				Integer.valueOf (other.miles));
+			return (
+				miles.compareTo (
+					other.miles));
 
 		}
 
@@ -1138,8 +1145,8 @@ class ChatDateDaemon
 		List<DatingUserInfo> otherUserInfos =
 			new ArrayList<DatingUserInfo> ();
 
-		List<Integer> datingUserIds =
-			new ArrayList<Integer> ();
+		List<Long> datingUserIds =
+			new ArrayList<Long> ();
 
 		long numUsers;
 		long numCredit;

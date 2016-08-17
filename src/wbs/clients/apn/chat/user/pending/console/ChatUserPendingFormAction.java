@@ -8,18 +8,19 @@ import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isZero;
 import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.trim;
+import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.NonNull;
 import wbs.clients.apn.chat.contact.console.ChatMessageConsoleHelper;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
@@ -45,7 +46,6 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.etc.BeanLogic;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -124,7 +124,7 @@ class ChatUserPendingFormAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		return nextResponder (
@@ -262,7 +262,7 @@ class ChatUserPendingFormAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		Responder responder =
@@ -289,7 +289,7 @@ class ChatUserPendingFormAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		// confirm there is something to approve
@@ -383,7 +383,7 @@ class ChatUserPendingFormAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		// confirm there is something to approve
@@ -490,7 +490,7 @@ class ChatUserPendingFormAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		// confirm there is something to approve
@@ -543,8 +543,8 @@ class ChatUserPendingFormAction
 				transaction.now ())
 
 			.setIndex (
-				(long)
-				list.size ())
+				fromJavaInteger (
+					list.size ()))
 
 			.setClassification (
 				requestContext.parameterRequired (
@@ -639,7 +639,7 @@ class ChatUserPendingFormAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		if (
@@ -738,7 +738,7 @@ class ChatUserPendingFormAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		// confirm there is something to approve
@@ -966,7 +966,7 @@ class ChatUserPendingFormAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		ChatRec chat =

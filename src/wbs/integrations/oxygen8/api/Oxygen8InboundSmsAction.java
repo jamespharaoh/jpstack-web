@@ -1,8 +1,8 @@
 package wbs.integrations.oxygen8.api;
 
 import static wbs.framework.utils.etc.Misc.fromHex;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.bytesToString;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.secondsToInstant;
 
 import java.util.Collections;
@@ -12,10 +12,9 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.api.mvc.ApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -85,7 +84,7 @@ class Oxygen8InboundSmsAction
 	StringBuilder debugLog =
 		new StringBuilder ();
 
-	int routeId;
+	Long routeId;
 
 	String channel;
 	String reference;
@@ -222,7 +221,7 @@ class Oxygen8InboundSmsAction
 
 			.setRoute (
 				routeHelper.findRequired (
-					requestContext.requestIntRequired (
+					requestContext.requestIntegerRequired (
 						"routeId")))
 
 			.setType (
@@ -243,7 +242,7 @@ class Oxygen8InboundSmsAction
 	void processRequest () {
 
 		routeId =
-			requestContext.requestIntRequired (
+			requestContext.requestIntegerRequired (
 				"routeId");
 
 		channel =

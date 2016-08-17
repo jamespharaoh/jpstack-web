@@ -53,14 +53,14 @@ class UserPrivsEditorPart
 	PrivsEditorNode rootNode =
 		new PrivsEditorNode ();
 
-	Set<Integer> canPrivIds =
-		new HashSet<Integer> ();
+	Set<Long> canPrivIds =
+		new HashSet<> ();
 
-	Set<Integer> canGrantPrivIds =
-		new HashSet<Integer> ();
+	Set<Long> canGrantPrivIds =
+		new HashSet<> ();
 
-	Set<Integer> groupPrivIds =
-		new HashSet<Integer> ();
+	Set<Long> groupPrivIds =
+		new HashSet<> ();
 
 	Map<GlobalId,PrivsEditorNode> nodesByDataObjectId =
 		new HashMap<GlobalId,PrivsEditorNode> ();
@@ -112,7 +112,7 @@ class UserPrivsEditorPart
 
 		UserRec user =
 			userHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"userId"));
 
 		for (

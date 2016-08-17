@@ -2,12 +2,11 @@ package wbs.clients.apn.chat.user.admin.console;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.clients.apn.chat.user.admin.console.ChatUserAdminLocationFormActionHelper.ChatUserAdminLocationForm;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -59,7 +58,7 @@ class ChatUserAdminLocationFormActionHelper
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		formState
@@ -100,7 +99,7 @@ class ChatUserAdminLocationFormActionHelper
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		boolean success =

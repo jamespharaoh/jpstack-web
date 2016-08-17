@@ -7,12 +7,11 @@ import java.util.Collections;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
-
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -75,8 +74,8 @@ class G8waveInFile
 
 		// get request stuff
 
-		int routeId =
-			requestContext.requestIntRequired (
+		Long routeId =
+			requestContext.requestIntegerRequired (
 				"route_id");
 
 		// get params in local variables
@@ -101,24 +100,24 @@ class G8waveInFile
 			throw new ServletException ("Parameter not supplied");
 		}
 
-		Integer networkId = null;
+		Long networkId = null;
 
 		if (networkParam != null) {
 
 			if (networkParam.equals("ORANGE"))
-				networkId = 1;
+				networkId = 1l;
 
 			else if (networkParam.equals("VODA"))
-				networkId = 2;
+				networkId = 2l;
 
 			else if (networkParam.equals("TMOB"))
-				networkId = 3;
+				networkId = 3l;
 
 			else if (networkParam.equals("O2"))
-				networkId = 4;
+				networkId = 4l;
 
 			else if (networkParam.equals("THREE"))
-				networkId = 6;
+				networkId = 6l;
 
 			else
 				throw new ServletException (

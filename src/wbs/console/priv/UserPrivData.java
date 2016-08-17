@@ -11,7 +11,6 @@ import java.util.Map;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
 
@@ -27,11 +26,11 @@ class UserPrivData {
 
 	public
 	boolean canSingle (
-			int privId) {
+			@NonNull Long privId) {
 
 		PrivPair privPair =
-			userData.privPairsByPrivId
-				.get (privId);
+			userData.privPairsByPrivId.get (
+				privId);
 
 		return privPair != null
 			&& privPair.can;
@@ -40,16 +39,20 @@ class UserPrivData {
 
 	public
 	boolean canChain (
-			int privId) {
+			@NonNull Long privId) {
 
 		while (true) {
 
-			if (canSingle (privId))
+			if (
+				canSingle (
+					privId)
+			) {
 				return true;
+			}
 
-			Integer nextPrivId =
-				sharedData.chainedPrivIds
-					.get (privId);
+			Long nextPrivId =
+				sharedData.chainedPrivIds.get (
+					privId);
 
 			if (nextPrivId == null)
 				return false;
@@ -63,18 +66,22 @@ class UserPrivData {
 
 	public
 	boolean canNormal (
-			int privId) {
+			@NonNull Long privId) {
 
 		// try this priv and chain
 
-		if (canChain (privId))
+		if (
+			canChain (
+				privId)
+		) {
 			return true;
+		}
 
 		// look for a manage priv and try that and its chain
 
-		Integer managePrivId =
-			sharedData.managePrivIds
-				.get (privId);
+		Long managePrivId =
+			sharedData.managePrivIds.get (
+				privId);
 
 		return managePrivId != null
 			&& ! equal (managePrivId, privId)
@@ -83,15 +90,15 @@ class UserPrivData {
 	}
 
 	public
-	int coreGetObjectTypeId (
-			Class<?> objectClassParam) {
+	Long coreGetObjectTypeId (
+			@NonNull Class<?> objectClassParam) {
 
 		Class<?> objectClass =
 			objectClassParam;
 
 		while (Record.class.isAssignableFrom (objectClass)) {
 
-			Integer id =
+			Long id =
 				sharedData.objectTypeIdsByClassName.get (
 					objectClass.getName ());
 
@@ -167,7 +174,7 @@ class UserPrivData {
 					continue;
 				}
 
-				Integer privId =
+				Long privId =
 					objectData.privIdsByCode.get (
 						privCode);
 
@@ -178,7 +185,6 @@ class UserPrivData {
 
 					String objectTypeCode =
 						sharedData.objectTypeCodesById.get (
-							(int) (long)
 							parentObjectId.typeId ());
 
 					if (
@@ -231,7 +237,7 @@ class UserPrivData {
 			// check all this object's privs
 
 			for (
-				Integer privId
+				Long privId
 					: objectData.privIdsByCode.values ()
 			) {
 
@@ -258,19 +264,19 @@ class UserPrivData {
 			new HashMap<GlobalId,ObjectData> ();
 
 		public
-		Map<String,Integer> objectTypeIdsByClassName =
-			new HashMap<String,Integer> ();
+		Map<String,Long> objectTypeIdsByClassName =
+			new HashMap<> ();
 
 		public
-		Map<Integer,Integer> chainedPrivIds =
-			new HashMap<Integer,Integer> ();
+		Map<Long,Long> chainedPrivIds =
+			new HashMap<> ();
 
 		public
-		Map<Integer,Integer> managePrivIds =
-			new HashMap<Integer,Integer> ();
+		Map<Long,Long> managePrivIds =
+			new HashMap<> ();
 
 		public
-		Map<Integer,String> objectTypeCodesById;
+		Map<Long,String> objectTypeCodesById;
 
 	}
 
@@ -278,8 +284,8 @@ class UserPrivData {
 	class UserData {
 
 		public
-		Map<Integer,PrivPair> privPairsByPrivId =
-			new HashMap<Integer,PrivPair> ();
+		Map <Long, PrivPair> privPairsByPrivId =
+			new HashMap <> ();
 
 	}
 
@@ -295,11 +301,11 @@ class UserPrivData {
 	class ObjectData {
 
 		public
-		Map<String,Integer> privIdsByCode =
-			new HashMap<String,Integer> ();
+		Map<String,Long> privIdsByCode =
+			new HashMap<String,Long> ();
 
 		public
-		Integer managePrivId;
+		Long managePrivId;
 
 	}
 

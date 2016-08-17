@@ -8,10 +8,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
+import lombok.Cleanup;
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatPricePointObjectHelper;
 import wbs.applications.imchat.model.ImChatPricePointRec;
@@ -71,9 +70,8 @@ class ImChatPricePointListAction
 
 		ImChatRec imChat =
 			imChatHelper.findRequired (
-				Integer.parseInt (
-					requestContext.requestStringRequired (
-						"imChatId")));
+				requestContext.requestIntegerRequired (
+					"imChatId"));
 
 		// retrieve price points
 

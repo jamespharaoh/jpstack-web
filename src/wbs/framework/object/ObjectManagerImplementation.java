@@ -614,7 +614,7 @@ class ObjectManagerImplementation
 
 				object =
 					rootHelper.findRequired (
-						0);
+						0l);
 
 			} else if (
 				equal (

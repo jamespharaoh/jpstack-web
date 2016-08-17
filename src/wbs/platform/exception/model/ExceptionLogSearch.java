@@ -18,13 +18,13 @@ class ExceptionLogSearch
 	Boolean alert;
 	Boolean fatal;
 
-	Integer typeId;
-	Integer userId;
+	Long typeId;
+	Long userId;
 
 	Order order =
 		Order.timestampDesc;
 
-	Integer maxResults;
+	Long maxResults;
 
 	public static
 	enum Order {

@@ -22,6 +22,10 @@
 			package="wbs.framework.entity"/>
 
 		<plugin
+			name="fixtures"
+			package="wbs.framework.fixtures"/>
+
+		<plugin
 			name="framework-exception"
 			package="wbs.framework.exception"/>
 

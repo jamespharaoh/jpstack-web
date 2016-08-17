@@ -1,13 +1,16 @@
 package wbs.framework.utils.etc;
 
+import static wbs.framework.utils.etc.TypeUtils.dynamicCast;
+import static wbs.framework.utils.etc.TypeUtils.isInstanceOf;
+
 import java.util.Arrays;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+
+import lombok.NonNull;
 
 public
 class OptionalUtils {
@@ -356,9 +359,9 @@ class OptionalUtils {
 	}
 
 	public static <Type>
-	Optional<Type> optionalCast (
-			@NonNull Class<Type> classToCastTo,
-			@NonNull Optional<?> optionalValue) {
+	Optional <Type> optionalCast (
+			@NonNull Class <Type> classToCastTo,
+			@NonNull Optional <?> optionalValue) {
 
 		if (
 			isPresent (
@@ -366,13 +369,13 @@ class OptionalUtils {
 		) {
 
 			if (
-				Misc.isInstanceOf (
+				isInstanceOf (
 					classToCastTo,
 					optionalValue.get ())
 			) {
 
 				return Optional.of (
-					Misc.cast (
+					dynamicCast (
 						classToCastTo,
 						optionalValue.get ()));
 
@@ -384,7 +387,7 @@ class OptionalUtils {
 
 		} else {
 
-			return Optional.<Type>absent ();
+			return Optional.absent ();
 
 		}
 

@@ -7,7 +7,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;
@@ -85,7 +84,7 @@ class ImChatPendingCustomerNoteUpdateAction
 
 		ImChatMessageRec message =
 			imChatMessageHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"imChatMessageId"));
 
 		ImChatConversationRec conversation =

@@ -10,13 +10,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Data;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
 import com.google.common.base.Joiner;
 
+import lombok.Data;
 import wbs.framework.application.config.WbsConfig;
 
 public
@@ -174,7 +173,7 @@ class DatabaseInitTask
 				Joiner.on ("; ").join (parts),
 				stringFormat (
 					"psql %s",
-					wbsConfig.databaseName ()));
+					wbsConfig.database ().databaseName ()));
 
 		System.out.println (
 			command);

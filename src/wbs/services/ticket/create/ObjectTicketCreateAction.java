@@ -7,14 +7,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
-
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldLogic;
@@ -164,8 +163,8 @@ class ObjectTicketCreateAction<
 	Responder goReal () {
 
 		@SuppressWarnings ("unchecked")
-		ConsoleHelper<ParentType> parentHelperTemp =
-			(ConsoleHelper<ParentType>)
+		ConsoleHelper <ParentType> parentHelperTemp =
+			(ConsoleHelper <ParentType>)
 			objectManager.findConsoleHelper (
 				consoleHelper.parentClass ());
 
@@ -184,7 +183,7 @@ class ObjectTicketCreateAction<
 
 		Record<?> contextObject =
 			consoleHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					consoleHelper.idKey ()));
 
 		// determine ticket
@@ -283,8 +282,8 @@ class ObjectTicketCreateAction<
 
 			case object:
 
-				Integer objectId = (
-					(Record<?>)
+				Long objectId = (
+					(Record <?>)
 					objectManager.dereference (
 						contextObject,
 						ticketFieldSpec.valuePath ())
@@ -293,7 +292,6 @@ class ObjectTicketCreateAction<
 				ticketFieldValue
 
 					.setIntegerValue (
-						(long)
 						objectId);
 
 				break;

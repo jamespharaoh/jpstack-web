@@ -5,7 +5,7 @@ set -e
 rm -f binaries/libraries/*
 
 java -jar \
-	"$HOME/apache-ivy-2.3.0/ivy-2.3.0.jar" \
+	"/usr/share/java/ivy.jar" \
 	-ivy "etc/ivy.xml" \
 	-retrieve "binaries/libraries/[artifact]-[type]-[revision].[ext]"
 

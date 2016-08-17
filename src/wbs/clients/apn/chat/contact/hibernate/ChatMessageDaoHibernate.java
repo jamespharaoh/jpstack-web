@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.contact.hibernate;
 
-import java.util.List;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
-import lombok.NonNull;
+import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
@@ -11,6 +11,7 @@ import org.hibernate.criterion.Restrictions;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
+import lombok.NonNull;
 import wbs.clients.apn.chat.contact.model.ChatMessageDao;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageSearch;
@@ -89,10 +90,10 @@ class ChatMessageDaoHibernate
 
 	@Override
 	public
-	List<ChatMessageRec> findLimit (
+	List <ChatMessageRec> findLimit (
 			@NonNull ChatUserRec fromChatUser,
 			@NonNull ChatUserRec toChatUser,
-			int maxResults) {
+			Long maxResults) {
 
 		return findMany (
 			"findLimit (fromChatUser, toChatUser)",
@@ -117,7 +118,8 @@ class ChatMessageDaoHibernate
 					"_chatMessage.timestamp"))
 
 			.setMaxResults (
-				maxResults)
+				toJavaIntegerRequired (
+					maxResults))
 
 		);
 
@@ -397,10 +399,10 @@ class ChatMessageDaoHibernate
 
 	@Override
 	public
-	int count (
+	Long count (
 			@NonNull ChatUserRec chatUser) {
 
-		return (int) (long) findOne (
+		return findOne (
 			"count (chatUser)",
 			Long.class,
 
@@ -426,9 +428,9 @@ class ChatMessageDaoHibernate
 
 	@Override
 	public
-	List<ChatMessageRec> findLimit (
+	List <ChatMessageRec> findLimit (
 			@NonNull ChatUserRec chatUser,
-			int maxResults) {
+			Long maxResults) {
 
 		return findMany (
 			"findLimit (chatUser, maxResults)",
@@ -452,7 +454,8 @@ class ChatMessageDaoHibernate
 					"_chatMessage.timestamp"))
 
 			.setMaxResults (
-				maxResults)
+				toJavaIntegerRequired (
+					maxResults))
 
 		);
 

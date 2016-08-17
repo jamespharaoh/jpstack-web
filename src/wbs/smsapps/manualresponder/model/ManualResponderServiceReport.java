@@ -2,7 +2,6 @@ package wbs.smsapps.manualresponder.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import wbs.framework.record.IdObject;
 
 @Accessors (fluent = true)
@@ -23,7 +22,7 @@ class ManualResponderServiceReport
 
 	@Override
 	public
-	Integer getId () {
+	Long getId () {
 		return manualResponder.getId ();
 	}
 

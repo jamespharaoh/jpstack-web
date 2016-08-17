@@ -8,11 +8,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
@@ -64,8 +66,11 @@ class ChatUserQuietDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
-		return 60 * 1000;
+	Duration getSleepDuration () {
+
+		return Duration.standardSeconds (
+			30);
+
 	}
 
 	@Override
@@ -129,7 +134,7 @@ class ChatUserQuietDaemon
 
 	private
 	void doUser (
-			int chatUserId) {
+			@NonNull Long chatUserId) {
 
 		@Cleanup
 		Transaction transaction =

@@ -8,7 +8,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.extern.log4j.Log4j;
-
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.helper.ConsoleObjectManager;
@@ -68,7 +67,7 @@ class AbstractObjectContext
 		return stringFormat (
 			"/%s",
 			encodeId (
-				(Integer)
+				(Long)
 				stuff.get (
 					requestIdKey ())));
 
@@ -98,17 +97,17 @@ class AbstractObjectContext
 	}
 
 	protected
-	int decodeId (
+	Long decodeId (
 			String encodedId) {
 
 		if (cryptor () != null) {
 
-			return cryptor ().decryptInt (
+			return cryptor ().decryptInteger (
 				encodedId);
 
 		} else {
 
-			return Integer.parseInt (
+			return Long.parseLong (
 				encodedId);
 
 		}
@@ -117,16 +116,16 @@ class AbstractObjectContext
 
 	protected
 	String encodeId (
-			int numericId) {
+			Long numericId) {
 
 		if (cryptor () != null) {
 
-			return cryptor ().encryptInt (
+			return cryptor ().encryptInteger (
 				numericId);
 
 		} else {
 
-			return Integer.toString (
+			return Long.toString (
 				numericId);
 
 		}
@@ -139,8 +138,9 @@ class AbstractObjectContext
 			PathSupply pathParts,
 			ConsoleContextStuff contextStuff) {
 
-		int localId =
-			decodeId (pathParts.next ());
+		Long localId =
+			decodeId (
+				pathParts.next ());
 
 		contextStuff.set (
 			requestIdKey (),

@@ -1,4 +1,4 @@
-package wbs.framework.dbpool;
+package wbs.framework.database;
 
 import java.sql.Connection;
 

@@ -7,7 +7,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 class ChatContactCache {
 
-	Map<Pair<Integer,Integer>,ChatContactRec> byUserIds =
-		new HashMap<Pair<Integer,Integer>,ChatContactRec> ();
+	Map <Pair <Long,Long>, ChatContactRec> byUserIds =
+		new HashMap<> ();
 
 }

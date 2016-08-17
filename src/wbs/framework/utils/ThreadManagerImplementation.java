@@ -5,19 +5,20 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-
-import com.google.common.base.Optional;
-
+import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 
 @Accessors (fluent = true)
 @Log4j
+@PrototypeComponent ("threadManagerImplementation")
 public
 class ThreadManagerImplementation
 	implements ThreadManager {

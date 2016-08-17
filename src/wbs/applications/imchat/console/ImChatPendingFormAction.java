@@ -3,12 +3,10 @@ package wbs.applications.imchat.console;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.Misc.toInteger;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;
@@ -81,7 +79,7 @@ class ImChatPendingFormAction
 
 		ImChatMessageRec customerMessage =
 			imChatMessageHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"imChatMessageId"));
 
 		ImChatConversationRec conversation =
@@ -176,7 +174,7 @@ class ImChatPendingFormAction
 
 			template =
 				imChatTemplateHelper.findRequired (
-					toInteger (
+					Long.parseLong (
 						templateString));
 
 			if (template.getImChat () != imChat)
@@ -257,7 +255,6 @@ class ImChatPendingFormAction
 					conversation)
 
 				.setIndex (
-					(int) (long)
 					conversation.getNumMessages ())
 
 				.setSenderUser (

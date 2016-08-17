@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.user.image.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
@@ -65,7 +65,7 @@ class ChatUserImageListPart
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		switch (type) {

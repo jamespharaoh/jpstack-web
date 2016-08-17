@@ -4,11 +4,11 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -60,8 +60,8 @@ class OrdererDeliveryNoticeHandler
 	@Override
 	public
 	void handle (
-			int deliveryId,
-			Long ref) {
+			@NonNull Long deliveryId,
+			@NonNull Long ref) {
 
 		@Cleanup
 		Transaction transaction =

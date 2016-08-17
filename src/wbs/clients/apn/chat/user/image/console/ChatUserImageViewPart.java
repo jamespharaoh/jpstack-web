@@ -37,7 +37,7 @@ class ChatUserImageViewPart
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		image =

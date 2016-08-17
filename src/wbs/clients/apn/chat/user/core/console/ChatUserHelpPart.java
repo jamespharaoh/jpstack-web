@@ -54,7 +54,7 @@ class ChatUserHelpPart
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		chatHelpLogs =

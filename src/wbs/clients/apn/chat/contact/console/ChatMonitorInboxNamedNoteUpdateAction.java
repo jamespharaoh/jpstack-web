@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
-
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.namednote.model.ChatNamedNoteLogObjectHelper;
@@ -108,12 +107,14 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 		}
 
-		int noteNameId =
-			Integer.parseInt (
-				idMatcher.group (1));
+		Long noteNameId =
+			Long.parseLong (
+				idMatcher.group (
+					1));
 
 		String typeString =
-			idMatcher.group (2);
+			idMatcher.group (
+				2);
 
 		String newValue =
 			trim (
@@ -130,7 +131,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 		ChatMonitorInboxRec monitorInbox =
 			chatMonitorInboxHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatMonitorInboxId"));
 
 		ChatNoteNameRec chatNoteName =

@@ -5,7 +5,12 @@ import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
+import static wbs.framework.utils.etc.TimeUtils.localDate;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -17,8 +22,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
@@ -28,6 +31,7 @@ import org.joda.time.LocalTime;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
@@ -56,12 +60,6 @@ import wbs.framework.record.GlobalId;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.RandomLogic;
 import wbs.framework.utils.TimeFormatter;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-import static wbs.framework.utils.etc.TimeUtils.earlierThan;
-import static wbs.framework.utils.etc.TimeUtils.localDate;
-
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.event.logic.EventLogic;
@@ -181,15 +179,16 @@ class ChatUserLogicImplementation
 
 	@Override
 	public
-	Integer getAffiliateId (
+	Long getAffiliateId (
 			@NonNull ChatUserRec chatUser) {
 
 		AffiliateRec affiliate =
 			getAffiliate (
 				chatUser);
 
-		return affiliate != null ?
-			affiliate.getId () : null;
+		return affiliate != null
+			? affiliate.getId ()
+			: null;
 
 	}
 
@@ -309,9 +308,9 @@ class ChatUserLogicImplementation
 
 		LocalTime timeOfDay =
 			new LocalTime (
-				10 + randomLogic.randomInteger (10),
-				randomLogic.randomInteger (60),
-				randomLogic.randomInteger (60));
+				10 + randomLogic.randomJavaInteger (10),
+				randomLogic.randomJavaInteger (60),
+				randomLogic.randomJavaInteger (60));
 
 		// try and schedule first ad
 
@@ -319,8 +318,8 @@ class ChatUserLogicImplementation
 			startDate
 
 			.plusDays (
-				(int) (long)
-				chat.getAdTimeFirst () / 60 / 60 / 24)
+				toJavaIntegerRequired (
+					chat.getAdTimeFirst () / 60 / 60 / 24))
 
 			.toDateTime (
 				timeOfDay,
@@ -352,8 +351,8 @@ class ChatUserLogicImplementation
 				startDate
 
 				.plusDays (
-					(int) (long)
-					chat.getAdTime () / 60 / 60 / 24 * index)
+					toJavaIntegerRequired (
+						chat.getAdTime () / 60 / 60 / 24 * index))
 
 				.toDateTime (
 					timeOfDay,
@@ -389,10 +388,10 @@ class ChatUserLogicImplementation
 	boolean compatible (
 			@NonNull Gender thisGender,
 			@NonNull Orient thisOrient,
-			@NonNull Optional<Integer> thisCategoryId,
+			@NonNull Optional<Long> thisCategoryId,
 			@NonNull Gender thatGender,
 			@NonNull Orient thatOrient,
-			@NonNull Optional<Integer> thatCategoryId) {
+			@NonNull Optional<Long> thatCategoryId) {
 
 		if (
 
@@ -472,15 +471,15 @@ class ChatUserLogicImplementation
 				thisUser.getGender (),
 				thisUser.getOrient (),
 				thisUser.getCategory () != null
-					? Optional.<Integer>of (
+					? Optional.of (
 						thisUser.getCategory ().getId ())
-					: Optional.<Integer>absent (),
+					: Optional.absent (),
 				thatUser.getGender (),
 				thatUser.getOrient (),
 				thatUser.getCategory () != null
-					? Optional.<Integer>of (
+					? Optional.of (
 						thatUser.getCategory ().getId ())
-					: Optional.<Integer>absent ());
+					: Optional.absent ());
 
 		}
 
@@ -610,26 +609,6 @@ class ChatUserLogicImplementation
 
 			.setAdultExpiry (
 				adultExpiryTime);
-
-	}
-
-	@Override
-	public
-	void monitorCap (
-			@NonNull ChatUserRec chatUser) {
-
-		long number =
-			randomLogic.randomInteger (
-				100);
-
-		if (number < 10) {
-
-			chatUser
-
-				.setMonitorCap (
-					number);
-
-		}
 
 	}
 

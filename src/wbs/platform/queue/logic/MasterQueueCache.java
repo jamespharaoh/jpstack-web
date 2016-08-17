@@ -72,8 +72,8 @@ class MasterQueueCache
 	
 				queueItem ->
 					Pair.of (
-						(long) queueItem.getQueueSubject ().getId (),
-						(long) queueItem.getIndex ()),
+						queueItem.getQueueSubject ().getId (),
+						queueItem.getIndex ()),
 	
 				queueItem ->
 					queueItem)
@@ -86,20 +86,16 @@ class MasterQueueCache
 
 		queueSubjects =
 			ImmutableList.copyOf (
-
-			queueSubjectHelper.findActive ()
-
-		);
+				queueSubjectHelper.findActive ());
 
 		queueSubjectsByQueue =
 			ImmutableMap.copyOf (
-
-			queueSubjects.stream ()
+				queueSubjects.stream ()
 
 			.collect (
 				Collectors.groupingBy (
 					queueSubject ->
-						(long) queueSubject.getQueue ().getId ()))
+						queueSubject.getQueue ().getId ()))
 
 		);
 
@@ -115,7 +111,7 @@ class MasterQueueCache
 
 		return queueItemsBySubjectAndIndex.get (
 			Pair.of (
-				(long) subject.getId (),
+				subject.getId (),
 				index));
 
 	}
@@ -134,7 +130,7 @@ class MasterQueueCache
 			@NonNull QueueRec queue) {
 
 		return queueSubjectsByQueue.get (
-			(long) queue.getId ());
+			queue.getId ());
 
 	}
 

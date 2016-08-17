@@ -81,7 +81,7 @@ class ChatUserSummaryPart
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		creditCheckResult =
@@ -495,14 +495,14 @@ class ChatUserSummaryPart
 						"%s (%s)",
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
-							(long) charges.getCreditLimit ()),
+							charges.getCreditLimit ()),
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
-							(long) chatUser.getCreditLimit ()))
+							chatUser.getCreditLimit ()))
 
 					: currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
-						(long) chatUser.getCreditLimit ()),
+						chatUser.getCreditLimit ()),
 
 				"</tr>\n");
 
@@ -515,7 +515,7 @@ class ChatUserSummaryPart
 				"<td>%s</td>\n",
 				currencyLogic.formatHtml (
 					chatUser.getChat ().getCurrency (),
-					(long) chatUser.getCreditDailyAmount ()),
+					chatUser.getCreditDailyAmount ()),
 				"<tr>\n");
 
 			printFormat (

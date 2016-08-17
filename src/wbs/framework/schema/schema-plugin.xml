@@ -11,6 +11,7 @@
 		<bean class="builder.SchemaFromModel"/>
 		<bean class="builder.SchemaTableFromModel"/>
 		<bean class="tool.SchemaToSqlImplementation"/>
+		<bean class="tool.SchemaToolComponents"/>
 	</layer>
 
 </plugin>

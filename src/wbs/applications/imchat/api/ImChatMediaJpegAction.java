@@ -13,7 +13,6 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatProfileObjectHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -89,7 +88,7 @@ class ImChatMediaJpegAction
 
 		MediaRec media =
 			mediaHelper.findOrThrow (
-				Integer.parseInt (
+				Long.parseLong (
 					requestContext.requestStringRequired (
 						"mediaId")),
 				() -> new PageNotFoundException ());
@@ -99,7 +98,7 @@ class ImChatMediaJpegAction
 		ContentRec content =
 			media.getContent ();
 
-		Integer hash =
+		Long hash =
 			Math.abs (
 				content.getHash ());
 
@@ -144,10 +143,12 @@ class ImChatMediaJpegAction
 					originalImage,
 					ifNull (
 						targetWidth,
-						(long) Integer.MAX_VALUE),
+						Long.valueOf (
+							Integer.MAX_VALUE)),
 					ifNull (
 						targetHeight,
-						(long) Integer.MAX_VALUE));
+						Long.valueOf (
+							Integer.MAX_VALUE)));
 
 		}
 

@@ -2,11 +2,15 @@ package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+
+import java.util.Map;
 
 import javax.inject.Inject;
+
+import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginManager;
@@ -90,6 +94,10 @@ class ChildrenMappingWriter {
 				capitalise (
 					spec.typeName ()));
 
+		Class <?> keyType =
+			mapTypeClasses.get (
+				spec.mapType ());
+
 		// write field
 
 		new PropertyWriter ()
@@ -99,9 +107,8 @@ class ChildrenMappingWriter {
 				context.recordClassName ())
 
 			.typeNameFormat (
-				"Map<%s,%s>",
-				capitalise (
-					spec.mapType ()),
+				"Map <%s, %s>",
+				keyType.getSimpleName (),
 				fullFieldTypeName)
 
 			.propertyNameFormat (
@@ -109,9 +116,8 @@ class ChildrenMappingWriter {
 				fieldName)
 
 			.defaultValueFormat (
-				"new LinkedHashMap<%s,%s> ()",
-				capitalise (
-					spec.mapType ()),
+				"new LinkedHashMap <%s, %s> ()",
+				keyType.getSimpleName (),
 				fullFieldTypeName)
 
 			.write (
@@ -120,5 +126,19 @@ class ChildrenMappingWriter {
 
 
 	}
+
+	public final static
+	Map <String, Class <?>> mapTypeClasses =
+		ImmutableMap.<String, Class <?>> builder ()
+
+		.put (
+			"string",
+			String.class)
+
+		.put (
+			"integer",
+			Long.class)
+
+		.build ();
 
 }

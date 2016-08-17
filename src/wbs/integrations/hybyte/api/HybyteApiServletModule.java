@@ -14,9 +14,6 @@ import java.util.regex.Matcher;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -28,6 +25,8 @@ import org.joda.time.Instant;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -54,7 +53,6 @@ import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.logic.SmsInboxMultipartLogic;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
-import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 
@@ -89,9 +87,6 @@ class HybyteApiServletModule
 
 	@Inject
 	SmsInboxMultipartLogic inboxMultipartLogic;
-
-	@Inject
-	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
 	NumberFormatLogic numberFormatLogic;
@@ -129,8 +124,8 @@ class HybyteApiServletModule
 
 				// get ids
 
-				int routeId =
-					requestContext.requestIntRequired (
+				Long routeId =
+					requestContext.requestIntegerRequired (
 						"routeId");
 
 				// process xml
@@ -355,8 +350,8 @@ class HybyteApiServletModule
 
 			// get route
 
-			int routeId =
-				requestContext.requestIntRequired (
+			Long routeId =
+				requestContext.requestIntegerRequired (
 					"routeId");
 
 			HybyteRouteOutRec hybyteRouteOut =
@@ -366,20 +361,6 @@ class HybyteApiServletModule
 						stringFormat (
 							"No such hybyte route out: %s",
 							routeId)));
-
-			Long statusCode;
-
-			try {
-
-				statusCode =
-					Long.parseLong (
-						req.code);
-
-			} catch (NumberFormatException exception) {
-
-				statusCode = null;
-
-			}
 
 			// process delivery report
 

@@ -2,6 +2,7 @@ package wbs.smsapps.forwarder.api;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,11 +12,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import lombok.Cleanup;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import wbs.platform.rpc.core.Rpc;
 import wbs.platform.rpc.core.RpcDefinition;
 import wbs.platform.rpc.core.RpcHandler;
@@ -136,34 +135,60 @@ class ForwarderUnqueueExRpcHandler
 					statusMessages,
 					true));
 
-		allowPartial = (Boolean)
-			params.get ("allow-partial");
+		allowPartial =
+			(Boolean)
+			params.get (
+				"allow-partial");
 
-		List<Map<String,Object>> mpList =
+		List <Map <String, Object>> messageParamsList =
 			forwarderApiLogic.unsafeListMapStringObject (
-				params.get ("unqueueExMessages"));
+				params.get (
+					"unqueueExMessages"));
 
-		if (mpList != null) {
+		if (messageParamsList != null) {
 
-			for (Map<String, Object> mp : mpList) {
-				UnqueueExMessage uem = new UnqueueExMessage ();
-				uem.serverId = (Integer) mp.get("server-id");
-				unqueueExMessages.add(uem);
+			for (
+				Map <String, Object> messageParams
+					: messageParamsList
+			) {
+
+				UnqueueExMessage unqueueExMessage =
+					new UnqueueExMessage ();
+
+				unqueueExMessage.serverId =
+					(Long)
+					messageParams.get (
+						"server-id");
+
+				unqueueExMessages.add (
+					unqueueExMessage);
+
 			}
 
 		}
 
-		List<Map<String,Object>> rpList =
+		List<Map<String,Object>> reportParamsList =
 			forwarderApiLogic.unsafeListMapStringObject (
-				params.get ("reports"));
+				params.get (
+					"reports"));
 
-		if (rpList != null) {
+		if (reportParamsList != null) {
 
-			for (Map<String, Object> rp : rpList) {
+			for (
+				Map <String, Object> reportParams
+					: reportParamsList
+			) {
 
-				UnqueueExReport uer = new UnqueueExReport();
-				uer.reportId = (Integer) rp.get("report-id");
-				reports.add(uer);
+				UnqueueExReport unqueueExReport =
+					new UnqueueExReport ();
+				
+				unqueueExReport.reportId =
+					(Long)
+					reportParams.get (
+						"report-id");
+
+				reports.add (
+					unqueueExReport);
 
 			}
 
@@ -728,13 +753,13 @@ class ForwarderUnqueueExRpcHandler
 
 	static
 	class UnqueueExMessage {
-		Integer serverId;
+		Long serverId;
 		ForwarderMessageInRec forwarderMessageIn;
 	}
 
 	static
 	class UnqueueExReport {
-		Integer reportId;
+		Long reportId;
 		ForwarderMessageOutReportRec fmOutReport;
 	}
 

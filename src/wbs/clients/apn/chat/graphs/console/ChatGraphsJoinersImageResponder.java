@@ -14,7 +14,6 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
-import wbs.console.context.ConsoleContextStuff;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -70,24 +69,17 @@ class ChatGraphsJoinersImageResponder
 			Instant minTime,
 			Instant maxTime) {
 
-		ConsoleContextStuff contextStuff =
-			requestContext.contextStuff ();
-
-		Integer chatId =
-			(Integer)
-			contextStuff.get (
-				"chatId");
-
 		ChatRec chat =
 			chatHelper.findRequired (
-				chatId);
+				requestContext.stuffInteger (
+					"chatId"));
 
-		List<Integer> chatUserIds =
+		List<Long> chatUserIds =
 			chatUserHelper.searchIds (
 				new ChatUserSearch ()
 
 			.chatId (
-				(long) chat.getId ())
+				chat.getId ())
 
 			.firstJoin (
 				TextualInterval.forInterval (
@@ -97,9 +89,7 @@ class ChatGraphsJoinersImageResponder
 						maxTime)))
 
 			.chatAffiliateId (
-				(long)
-				(Integer)
-				contextStuff.get (
+				requestContext.stuffInteger (
 					"chatAffiliateId"))
 
 		);
@@ -109,7 +99,7 @@ class ChatGraphsJoinersImageResponder
 				chat);
 
 		for (
-			Integer chatUserId
+			Long chatUserId
 				: chatUserIds
 		) {
 

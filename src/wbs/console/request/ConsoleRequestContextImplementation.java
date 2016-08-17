@@ -5,12 +5,12 @@ import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.orNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.ifNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalEquals;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,11 +33,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import org.apache.commons.fileupload.FileItem;
 
 import com.google.common.base.Optional;
@@ -45,6 +40,10 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.helper.ConsoleObjectManager;
@@ -845,11 +844,12 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	Integer stuffInt (
+	Long stuffInteger (
 			@NonNull String key) {
 
-		return (Integer)
-			contextStuff ().get (key);
+		return (Long)
+			contextStuff ().get (
+				key);
 
 	}
 
@@ -896,19 +896,19 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	int requestUnique () {
+	Long requestUnique () {
 
-		Integer unique =
+		Long unique =
 			ifNotPresent (
 
-			OptionalUtils.<Integer,Integer>optionalMapRequired (
-				requestInt (
+			OptionalUtils.optionalMapRequired (
+				requestInteger (
 					"unique"),
 				value ->
-					value + 1),
+					value + 1l),
 
 			Optional.of (
-				0)
+				0l)
 
 		);
 
@@ -1057,17 +1057,17 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	Optional<Integer> requestInt (
+	Optional <Long> requestInteger (
 			@NonNull String key) {
 
-		return requestContext.requestInt (
+		return requestContext.requestInteger (
 			key);
 
 	}
 
 	@Override
 	public
-	long parameterInteger (
+	Long parameterInteger (
 			@NonNull String key) {
 
 		return requestContext.parameterInteger (
@@ -1238,10 +1238,10 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	Integer requestIntRequired (
+	Long requestIntegerRequired (
 			@NonNull String key) {
 
-		return requestContext.requestIntRequired (
+		return requestContext.requestIntegerRequired (
 			key);
 
 	}

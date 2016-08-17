@@ -74,7 +74,7 @@ class ChatSupervisorConversationPart
 
 		chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		long chatUserId1 =

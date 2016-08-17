@@ -12,14 +12,13 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.io.IOUtils;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.exception.ExceptionLogger;
@@ -150,7 +149,7 @@ class BroadcastSystemsSender1
 
 	public static
 	class State {
-		int messageId;
+		Long messageId;
 		OutboxRec outbox;
 		MessageRec message;
 		RouteRec route;

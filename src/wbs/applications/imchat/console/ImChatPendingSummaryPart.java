@@ -146,7 +146,7 @@ class ImChatPendingSummaryPart
 
 		message =
 			imChatMessageHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"imChatMessageId"));
 
 		conversation =

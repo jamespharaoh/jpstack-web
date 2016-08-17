@@ -10,13 +10,13 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @Accessors (fluent = true)
@@ -26,16 +26,16 @@ class PluginManager {
 	// state
 
 	@Getter @Setter
-	List<PluginSpec> plugins;
+	List <PluginSpec> plugins;
 
 	@Getter @Setter
-	Map<String,PluginModelSpec> pluginModelsByName;
+	Map <String, PluginModelSpec> pluginModelsByName;
 
 	@Getter @Setter
-	Map<String,PluginEnumTypeSpec> pluginEnumTypesByName;
+	Map <String, PluginEnumTypeSpec> pluginEnumTypesByName;
 
 	@Getter @Setter
-	Map<String,PluginCustomTypeSpec> pluginCustomTypesByName;
+	Map <String, PluginCustomTypeSpec> pluginCustomTypesByName;
 
 	// implementation
 
@@ -46,37 +46,37 @@ class PluginManager {
 		// properties
 
 		@Setter
-		List<PluginSpec> plugins;
+		List <PluginSpec> plugins;
 
 		// state
 
-		Set<String> donePluginNames;
+		Set <String> donePluginNames;
 
 		// implementation
 
 		public
 		PluginManager build () {
 
-			ImmutableList.Builder<PluginSpec> pluginsBuilder =
-				ImmutableList.<PluginSpec>builder ();
+			ImmutableList.Builder <PluginSpec> pluginsBuilder =
+				ImmutableList.builder ();
 
-			ImmutableMap.Builder<String,PluginModelSpec>
+			ImmutableMap.Builder <String, PluginModelSpec>
 			pluginModelsByNameBuilder =
-				ImmutableMap.<String,PluginModelSpec>builder ();
+				ImmutableMap.builder ();
 
-			ImmutableMap.Builder<String,PluginEnumTypeSpec>
+			ImmutableMap.Builder <String, PluginEnumTypeSpec>
 			pluginEnumTypesByNameBuilder =
-				ImmutableMap.<String,PluginEnumTypeSpec>builder ();
+				ImmutableMap.builder ();
 
-			ImmutableMap.Builder<String,PluginCustomTypeSpec>
+			ImmutableMap.Builder <String, PluginCustomTypeSpec>
 			pluginCustomTypesByNameBuilder =
-				ImmutableMap.<String,PluginCustomTypeSpec>builder ();
+				ImmutableMap.builder ();
 
 			donePluginNames =
-				new HashSet<String> ();
+				new HashSet<> ();
 
-			List<PluginSpec> remainingPlugins =
-				new LinkedList<PluginSpec> (
+			List <PluginSpec> remainingPlugins =
+				new LinkedList<> (
 					plugins);
 
 			Collections.sort (
@@ -85,7 +85,7 @@ class PluginManager {
 			OUTER:
 			for (;;) {
 
-				ListIterator<PluginSpec> iterator =
+				ListIterator <PluginSpec> iterator =
 					remainingPlugins.listIterator ();
 
 				while (iterator.hasNext ()) {

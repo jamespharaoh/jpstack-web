@@ -12,16 +12,15 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
@@ -47,6 +46,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.record.IdObject;
 import wbs.framework.utils.RandomLogic;
 import wbs.framework.utils.TimeFormatter;
 import wbs.platform.event.logic.EventLogic;
@@ -426,11 +426,12 @@ class ChatMiscLogicImplementation
 				commandHelper.findByCodeRequired (
 					chat,
 					"magic"),
-				(long) commandHelper.findByCodeRequired (
-					chat,
-					"help").getId (),
+				IdObject.objectId (
+					commandHelper.findByCodeRequired (
+						chat,
+						"help")),
 				TemplateMissing.error,
-				Collections.<String,String>emptyMap ());
+				Collections.emptyMap ());
 
 		}
 
@@ -453,10 +454,10 @@ class ChatMiscLogicImplementation
 
 		) {
 
-			final int chatUserId =
+			final Long chatUserId =
 				chatUser.getId ();
 
-			final int locatorId =
+			final Long locatorId =
 				chat.getLocator ().getId ();
 
 			locatorManager.locate (
@@ -735,9 +736,10 @@ class ChatMiscLogicImplementation
 				commandHelper.findByCodeRequired (
 					chat,
 					"magic"),
-				(long) commandHelper.findByCodeRequired (
-					chat,
-					"name").getId (),
+				IdObject.objectId (
+					commandHelper.findByCodeRequired (
+						chat,
+						"name")),
 				TemplateMissing.error,
 				ImmutableMap.<String,String>builder ()
 					.put ("newName", name)

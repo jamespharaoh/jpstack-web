@@ -1,6 +1,8 @@
 package wbs.clients.apn.chat.namednote.console;
 
 import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
 
@@ -11,7 +13,6 @@ import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
-
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameObjectHelper;
@@ -64,10 +65,10 @@ class ChatNoteNamesAction
 
 		ChatRec chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
-		List<ChatNoteNameRec> chatNoteNames =
+		List <ChatNoteNameRec> chatNoteNames =
 			chatNoteNameHelper.findNotDeleted (
 				chat);
 
@@ -77,8 +78,10 @@ class ChatNoteNamesAction
 
 			int numUpdated = 0;
 
-			for (ChatNoteNameRec noteName
-					: chatNoteNames) {
+			for (
+				ChatNoteNameRec noteName
+					: chatNoteNames
+			) {
 
 				String formKey =
 					stringFormat (
@@ -86,7 +89,8 @@ class ChatNoteNamesAction
 						noteName.getId ());
 
 				String newName =
-					requestContext.getForm (formKey);
+					requestContext.getForm (
+						formKey);
 
 				if (newName == null)
 					continue;
@@ -130,7 +134,8 @@ class ChatNoteNamesAction
 						chat)
 
 					.setIndex (
-						chatNoteNames.size ())
+						fromJavaInteger (
+							chatNoteNames.size ()))
 
 					.setName (
 						requestContext.getForm (
@@ -161,21 +166,36 @@ class ChatNoteNamesAction
 			if (requestContext.getForm (noteMoveUpKey) != null
 					&& chatNoteName.getIndex () > 0) {
 
-				int index =
+				long index =
 					chatNoteName.getIndex ();
 
 				ChatNoteNameRec otherNote =
-					chatNoteNames.get (index - 1);
+					chatNoteNames.get (
+						toJavaIntegerRequired (
+							index - 1));
 
-				chatNoteName.setIndex (- 1);
-				otherNote.setIndex (- 2);
+				// first set to non-conflicting values
+
+				chatNoteName.setIndex (
+					-1l);
+
+				otherNote.setIndex (
+					-2l);
 
 				transaction.flush ();
 
-				chatNoteName.setIndex (index - 1);
-				otherNote.setIndex (index);
+				// then to new values
 
-				notices.add ("Note moved up");
+				chatNoteName.setIndex (
+					index - 1);
+
+				otherNote.setIndex (
+					index);
+
+				// done
+
+				notices.add (
+					"Note moved up");
 
 				break;
 
@@ -191,21 +211,30 @@ class ChatNoteNamesAction
 					&& chatNoteName.getIndex ()
 						< chatNoteNames.size () - 1) {
 
-				int index =
+				long index =
 					chatNoteName.getIndex ();
 
 				ChatNoteNameRec otherNote =
-					chatNoteNames.get (index + 1);
+					chatNoteNames.get (
+						toJavaIntegerRequired (
+							index + 1));
 
-				chatNoteName.setIndex (- 1);
-				otherNote.setIndex (- 2);
+				chatNoteName.setIndex (
+					-1l);
+
+				otherNote.setIndex (
+					-2l);
 
 				transaction.flush ();
 
-				chatNoteName.setIndex (index + 1);
-				otherNote.setIndex (index);
+				chatNoteName.setIndex (
+					index + 1);
 
-				notices.add ("Note moved down");
+				otherNote.setIndex (
+					index);
+
+				notices.add (
+					"Note moved down");
 
 				break;
 
@@ -218,18 +247,35 @@ class ChatNoteNamesAction
 
 			if (requestContext.getForm (noteDeleteKey) != null) {
 
-				int index =
+				long index =
 					chatNoteName.getIndex ();
 
-				chatNoteName.setIndex (null);
-				chatNoteName.setDeleted (true);
+				chatNoteName.setIndex (
+					null);
+
+				chatNoteName.setDeleted (
+					true);
 
 				transaction.flush ();
 
-				for (int i = index; i < chatNoteNames.size () - 1; i ++)
-					chatNoteNames.get (i + 1).setIndex (i);
+				for (
+					long otherIndex = index;
+					otherIndex < chatNoteNames.size () - 1;
+					otherIndex ++
+				) {
 
-				notices.add ("Note deleted");
+					ChatNoteNameRec otherChatNoteName =
+						chatNoteNames.get (
+							toJavaIntegerRequired (
+								otherIndex + 1));
+
+					otherChatNoteName.setIndex (
+						otherIndex + 1);
+
+				}
+
+				notices.add (
+					"Note deleted");
 
 				break;
 

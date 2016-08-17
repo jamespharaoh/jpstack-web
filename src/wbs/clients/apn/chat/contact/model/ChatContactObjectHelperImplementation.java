@@ -53,7 +53,7 @@ class ChatContactObjectHelperImplementation
 
 		ChatContactRec chatContact;
 
-		Pair<Integer,Integer> cacheKey =
+		Pair <Long, Long> cacheKey =
 			Pair.of (
 				fromUser.getId (),
 				toUser.getId ());
@@ -91,7 +91,7 @@ class ChatContactObjectHelperImplementation
 
 		// find inverse TODO not atomic!
 
-		Pair<Integer,Integer> inverseCacheKey =
+		Pair <Long, Long> inverseCacheKey =
 			Pair.of (
 				toUser.getId (),
 				fromUser.getId ());

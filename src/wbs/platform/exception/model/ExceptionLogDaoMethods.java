@@ -7,15 +7,15 @@ import org.joda.time.Instant;
 public
 interface ExceptionLogDaoMethods {
 
-	int countWithAlert ();
+	Long countWithAlert ();
 
-	int countWithAlertAndFatal ();
+	Long countWithAlertAndFatal ();
 
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			ExceptionLogSearch search);
 
-	List<ExceptionLogRec> findOldLimit (
+	List <ExceptionLogRec> findOldLimit (
 			Instant cutoffTime,
-			int maxResults);
+			Long maxResults);
 
 }

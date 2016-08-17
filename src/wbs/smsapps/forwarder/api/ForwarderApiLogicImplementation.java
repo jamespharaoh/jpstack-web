@@ -1,6 +1,7 @@
 package wbs.smsapps.forwarder.api;
 
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -11,17 +12,15 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-
 import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.record.GlobalId;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.rpc.core.Rpc;
@@ -254,8 +253,9 @@ class ForwarderApiLogicImplementation
 
 		}
 
-		int forwarderMessageInId =
-			Integer.parseInt (tempString);
+		Long forwarderMessageInId =
+			Long.parseLong (
+				tempString);
 
 		// find the message
 
@@ -319,7 +319,7 @@ class ForwarderApiLogicImplementation
 
 			return "MESSAGE\n"
 					+ "in_id="
-					+ URLEncoder.encode(Integer.toString(fmi.getId()), "utf-8")
+					+ URLEncoder.encode(Long.toString(fmi.getId()), "utf-8")
 					+ "&"
 					+ "numfrom="
 					+ URLEncoder.encode(fmi.getMessage().getNumFrom(), "utf-8")

@@ -2,17 +2,12 @@ package wbs.clients.apn.chat.user.join.daemon;
 
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
 
 import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
@@ -21,6 +16,11 @@ import org.joda.time.LocalDate;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
@@ -56,7 +56,6 @@ import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.RandomLogic;
 import wbs.framework.utils.TimeFormatter;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -169,7 +168,7 @@ class ChatJoiner {
 	// properties
 
 	@Getter @Setter
-	Integer chatId;
+	Long chatId;
 
 	@Getter @Setter
 	JoinType joinType;
@@ -181,10 +180,10 @@ class ChatJoiner {
 	Orient orient;
 
 	@Getter @Setter
-	Integer chatAffiliateId;
+	Long chatAffiliateId;
 
 	@Getter @Setter
-	Integer chatSchemeId;
+	Long chatSchemeId;
 
 	@Getter @Setter
 	Boolean confirmCharges = false;
@@ -203,7 +202,7 @@ class ChatJoiner {
 	MessageRec message;
 	ChatRec chat;
 	ChatUserRec chatUser;
-	Integer deliveryId;
+	Long deliveryId;
 	DeliveryRec delivery;
 	boolean gotPlace;
 
@@ -356,7 +355,7 @@ class ChatJoiner {
 
 			emailLogic.sendSystemEmail (
 				ImmutableList.of (
-					wbsConfig.developerEmailAddress ()),
+					wbsConfig.email ().developerAddress ()),
 				"DOB error",
 				stringFormat (
 

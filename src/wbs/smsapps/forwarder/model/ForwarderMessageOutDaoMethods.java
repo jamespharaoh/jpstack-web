@@ -9,8 +9,8 @@ interface ForwarderMessageOutDaoMethods {
 			ForwarderRec forwarder,
 			String otherId);
 
-	List<ForwarderMessageOutRec> findPendingLimit (
+	List <ForwarderMessageOutRec> findPendingLimit (
 			ForwarderRec forwarder,
-			int maxResults);
+			Long maxResults);
 
 }

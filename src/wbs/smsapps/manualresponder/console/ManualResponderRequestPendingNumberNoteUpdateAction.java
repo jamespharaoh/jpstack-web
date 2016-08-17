@@ -13,7 +13,6 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
@@ -114,9 +113,10 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 		}
 
-		int numberId =
-			Integer.parseInt (
-				idMatcher.group (1));
+		Long numberId =
+			Long.parseLong (
+				idMatcher.group (
+					1));
 
 		valueParam =
 			trim (
@@ -133,7 +133,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 		manualResponder =
 			manualResponderHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"manualResponderId"));
 
 		number =

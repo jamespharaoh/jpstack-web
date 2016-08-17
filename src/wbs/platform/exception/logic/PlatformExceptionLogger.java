@@ -5,12 +5,12 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-
-import com.google.common.base.Optional;
-
+import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -19,6 +19,7 @@ import wbs.framework.exception.GenericExceptionResolution;
 import wbs.platform.exception.model.ExceptionLogRec;
 
 @Log4j
+@SingletonComponent ("platformExceptionLogger")
 public
 class PlatformExceptionLogger
 	implements ExceptionLogger {

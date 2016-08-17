@@ -1,13 +1,13 @@
 package wbs.clients.apn.chat.affiliate.console;
 
 import static wbs.framework.utils.etc.Misc.toEnum;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.keyword.console.ChatKeywordConsoleHelper;
 import wbs.clients.apn.chat.keyword.model.ChatKeywordJoinType;
@@ -23,7 +23,6 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 import wbs.sms.keyword.logic.KeywordLogic;
 
@@ -121,7 +120,7 @@ class ChatAffiliateKeywordsCreateAction
 
 		ChatAffiliateRec chatAffiliate =
 			chatAffiliateHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatAffiliateId"));
 
 		ChatSchemeRec chatScheme =

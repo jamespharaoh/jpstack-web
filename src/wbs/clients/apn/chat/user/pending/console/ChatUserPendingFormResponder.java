@@ -89,7 +89,7 @@ class ChatUserPendingFormResponder
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		if (

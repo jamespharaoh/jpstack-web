@@ -4,11 +4,10 @@ import static wbs.framework.utils.etc.Misc.notEqual;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.Cleanup;
 import wbs.api.mvc.ApiAction;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
@@ -55,7 +54,7 @@ class ChatInfoSiteRespondAction
 
 		ChatInfoSiteRec infoSite =
 			chatInfoSiteHelper.findRequired (
-				requestContext.requestIntRequired (
+				requestContext.requestIntegerRequired (
 					"chatInfoSiteId"));
 
 		if (

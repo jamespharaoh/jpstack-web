@@ -1,16 +1,16 @@
 package wbs.framework.utils;
 
+import static wbs.framework.utils.etc.NumberUtils.parseLongRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 
 @SingletonComponent ("intervalFormatter")
 public
@@ -19,7 +19,7 @@ class IntervalFormatterImplementation
 
 	@Override
 	public
-	Optional<Integer> parseIntervalStringSeconds (
+	Optional <Long> parseIntervalStringSeconds (
 			@NonNull String input) {
 
 		for (
@@ -27,7 +27,7 @@ class IntervalFormatterImplementation
 				: intervalMatchers
 		) {
 
-			Integer interval =
+			Long interval =
 				intervalMatcher.match (
 					input);
 
@@ -39,13 +39,13 @@ class IntervalFormatterImplementation
 
 		}
 
-		return Optional.<Integer>absent ();
+		return Optional.absent ();
 
 	}
 
 	@Override
 	public
-	Integer parseIntervalStringSecondsRequired (
+	Long parseIntervalStringSecondsRequired (
 			@NonNull String input) {
 
 		return optionalRequired (
@@ -57,7 +57,7 @@ class IntervalFormatterImplementation
 	@Override
 	public
 	String createTextualIntervalStringSeconds (
-			int input) {
+			Long input) {
 
 		for (
 			IntervalMatcher intervalMatcher
@@ -82,7 +82,10 @@ class IntervalFormatterImplementation
 	@Override
 	public
 	String createNumericIntervalStringSeconds (
-			int input) {
+			@NonNull Long inputObject) {
+
+		long input =
+			inputObject;
 
 		if (input < 60) {
 
@@ -112,11 +115,11 @@ class IntervalFormatterImplementation
 	private static
 	interface IntervalMatcher {
 
-		Integer match (
+		Long match (
 				String input);
 
 		String textify (
-				int input);
+				long input);
 
 	}
 
@@ -127,13 +130,13 @@ class IntervalFormatterImplementation
 		String singularLabel;
 		String pluralLabel;
 		Pattern pattern;
-		int scale;
+		long scale;
 
 		SimpleIntervalMatcher (
-				int newScale,
-				String newSingularLabel,
-				String newPluralLabel,
-				String... otherLabels) {
+				@NonNull Long newScale,
+				@NonNull String newSingularLabel,
+				@NonNull String newPluralLabel,
+				@NonNull String... otherLabels) {
 
 			scale =
 				newScale;
@@ -169,14 +172,16 @@ class IntervalFormatterImplementation
 
 		@Override
 		public
-		Integer match (
-				String input) {
+		Long match (
+				@NonNull String input) {
 
 			Matcher matcher =
-				pattern.matcher (input);
+				pattern.matcher (
+					input);
 
 			return matcher.matches ()
-				? Integer.parseInt (matcher.group (1)) * scale
+				? scale * parseLongRequired (
+					matcher.group (1))
 				: null;
 
 		}
@@ -184,7 +189,7 @@ class IntervalFormatterImplementation
 		@Override
 		public
 		String textify (
-				int input) {
+				long input) {
 
 			if (input % scale != 0)
 				return null;
@@ -211,11 +216,11 @@ class IntervalFormatterImplementation
 
 			@Override
 			public
-			Integer match (
+			Long match (
 					String input) {
 
 				return zeroPattern.matcher (input).matches ()
-					? 0
+					? 0l
 					: null;
 
 			}
@@ -223,7 +228,7 @@ class IntervalFormatterImplementation
 			@Override
 			public
 			String textify (
-					int input) {
+					long input) {
 
 				return input == 0 ? "0" : null;
 
@@ -232,29 +237,29 @@ class IntervalFormatterImplementation
 		},
 
 		new SimpleIntervalMatcher (
-			31556736,
+			31556736l,
 			"year",
 			"years"),
 
 		new SimpleIntervalMatcher (
-			2629728,
+			2629728l,
 			"month",
 			"months"),
 
 		new SimpleIntervalMatcher (
-			86400,
+			86400l,
 			"day",
 			"days",
 			"d"),
 
 		new SimpleIntervalMatcher (
-			3600,
+			3600l,
 			"hour",
 			"hours",
 			"h"),
 
 		new SimpleIntervalMatcher (
-			60,
+			60l,
 			"minute",
 			"minutes",
 			"mins",
@@ -262,7 +267,7 @@ class IntervalFormatterImplementation
 			"m"),
 
 		new SimpleIntervalMatcher (
-			1,
+			1l,
 			"second",
 			"seconds",
 			"secs",

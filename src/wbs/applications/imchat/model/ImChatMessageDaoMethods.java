@@ -13,11 +13,11 @@ interface ImChatMessageDaoMethods {
 	Criteria searchOperatorReportCriteria (
 			ImChatMessageSearch search);
 
-	List<Integer> searchOperatorReportIds (
+	List <Long> searchOperatorReportIds (
 			ImChatMessageSearch search);
 
-	List<ImChatOperatorReport> findOperatorReports (
+	List <ImChatOperatorReport> findOperatorReports (
 			ImChatMessageSearch search,
-			List<Integer> ids);
+			List <Long> ids);
 
 }

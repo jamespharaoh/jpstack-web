@@ -8,13 +8,12 @@ import java.util.Collections;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -62,35 +61,43 @@ class TxtNationRouteInFile
 	public
 	void doPost () {
 
-		int routeId =
-			requestContext.requestIntRequired (
+		Long routeId =
+			requestContext.requestIntegerRequired (
 				"routeId");
 
 		String actionParam =
-			requestContext.parameterOrNull ("action");
+			requestContext.parameterOrNull (
+				"action");
 
 		String idParam =
-			requestContext.parameterOrNull ("id");
+			requestContext.parameterOrNull (
+				"id");
 
 		String numberParam =
-			requestContext.parameterOrNull ("number");
+			requestContext.parameterOrNull (
+				"number");
 
 		@SuppressWarnings ("unused")
 		String networkParam =
-			requestContext.parameterOrNull ("network");
+			requestContext.parameterOrNull (
+				"network");
 
 		String messageParam =
-			requestContext.parameterOrNull ("message");
+			requestContext.parameterOrNull (
+				"message");
 
 		String shortcodeParam =
-			requestContext.parameterOrNull ("shortcode");
+			requestContext.parameterOrNull (
+				"shortcode");
 
 		String countryParam =
-			requestContext.parameterOrNull ("country");
+			requestContext.parameterOrNull (
+				"country");
 
 		@SuppressWarnings ("unused")
 		String billingParam =
-			requestContext.parameterOrNull ("billing");
+			requestContext.parameterOrNull (
+				"billing");
 
 		// debugging
 

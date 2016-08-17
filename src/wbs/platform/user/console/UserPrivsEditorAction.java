@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-
 import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
@@ -77,7 +76,7 @@ class UserPrivsEditorAction
 
 		UserRec user =
 			userHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"userId"));
 
 		Matcher matcher =
@@ -87,8 +86,10 @@ class UserPrivsEditorAction
 
 		while (matcher.find ()) {
 
-			int privId =
-				Integer.parseInt (matcher.group (1));
+			Long privId =
+				Long.parseLong (
+					matcher.group (
+						1));
 
 			boolean grant =
 				matcher.group (2).equals ("cangrant");
@@ -216,7 +217,7 @@ class UserPrivsEditorAction
 
 		updateManager.signalUpdate (
 			"privs",
-			0);
+			0l);
 
 		transaction.commit ();
 

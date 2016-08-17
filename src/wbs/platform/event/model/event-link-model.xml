@@ -22,7 +22,7 @@
 		<integer-field
 			name="typeId"/>
 
-		<large-integer-field
+		<integer-field
 			name="refId"/>
 
 	</fields>

@@ -9,11 +9,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -56,8 +58,11 @@ class ChatMonitorSwapDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
-		return 10 * 1000;
+	Duration getSleepDuration () {
+
+		return Duration.standardSeconds (
+			10);
+
 	}
 
 	@Override
@@ -130,9 +135,9 @@ class ChatMonitorSwapDaemon
 	}
 
 	void doMonitorSwap (
-			int chatId,
-			Gender gender,
-			Orient orient) {
+			@NonNull Long chatId,
+			@NonNull Gender gender,
+			@NonNull Orient orient) {
 
 		try {
 
@@ -159,9 +164,9 @@ class ChatMonitorSwapDaemon
 	}
 
 	void doMonitorSwapReal (
-			int chatId,
-			Gender gender,
-			Orient orient) {
+			@NonNull Long chatId,
+			@NonNull Gender gender,
+			@NonNull Orient orient) {
 
 		@Cleanup
 		Transaction transaction =

@@ -3,9 +3,10 @@ package wbs.clients.apn.chat.user.image.console;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
+import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -14,10 +15,9 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -87,13 +87,13 @@ class ChatUserImageListAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		ChatUserImageType type =
 			toEnum (
 				ChatUserImageType.class,
-				(String) requestContext.stuff (
+				requestContext.stuffString (
 					"chatUserImageType"));
 
 		List<ChatUserImageRec> list =
@@ -142,7 +142,10 @@ class ChatUserImageListAction
 
 				}
 
-				list.get (index).setIndex (null);
+				list.get (index)
+
+					.setIndex (
+						null);
 
 				for (
 					int otherIndex = index + 1;
@@ -153,7 +156,7 @@ class ChatUserImageListAction
 					list.get (otherIndex)
 
 						.setIndex (
-							(long) otherIndex - 1l);
+							otherIndex - 1l);
 
 				}
 
@@ -260,12 +263,12 @@ class ChatUserImageListAction
 				transaction.flush ();
 
 				thisImage.setIndex (
-					(long) (int)
-					otherIndex);
+					fromJavaInteger (
+						otherIndex));
 
 				otherImage.setIndex (
-					(long) (int)
-					index);
+					fromJavaInteger (
+						index));
 
 				notice =
 					"Image/video moved";
@@ -275,7 +278,8 @@ class ChatUserImageListAction
 			if (in (command, "select")) {
 
 				ChatUserImageRec chatUserImage =
-					list.get (index);
+					list.get (
+						index);
 
 				if (
 					equal (

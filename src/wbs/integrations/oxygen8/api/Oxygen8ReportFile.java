@@ -8,10 +8,9 @@ import java.io.PrintWriter;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -22,7 +21,6 @@ import wbs.integrations.oxygen8.model.Oxygen8ReportCodeRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutRec;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
-import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -35,9 +33,6 @@ class Oxygen8ReportFile
 
 	@Inject
 	Database database;
-
-	@Inject
-	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
 	Oxygen8ReportCodeObjectHelper oxygen8ReportCodeHelper;
@@ -78,7 +73,7 @@ class Oxygen8ReportFile
 			State state) {
 
 		state.routeId =
-			requestContext.requestIntRequired (
+			requestContext.requestIntegerRequired (
 				"routeId");
 
 		state.reference =
@@ -152,7 +147,7 @@ class Oxygen8ReportFile
 	static
 	class State {
 
-		int routeId;
+		Long routeId;
 
 		String reference;
 		String status;

@@ -3,8 +3,9 @@ package wbs.clients.apn.chat.user.core.console;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.toBoolean;
 import static wbs.framework.utils.etc.Misc.toEnum;
-import static wbs.framework.utils.etc.Misc.toInteger;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalMapRequired;
+import static wbs.framework.utils.etc.StringUtils.emptyStringToAbsent;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
 import static wbs.framework.utils.etc.TimeUtils.dateToInstantNullSafe;
 
@@ -16,13 +17,13 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -44,6 +45,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.utils.etc.NumberUtils;
 import wbs.framework.web.Responder;
 
 @PrototypeComponent ("chatUserSearchOldAction")
@@ -176,10 +178,12 @@ class ChatUserSearchOldAction
 				requestContext.parameterRequired (
 					"dateMode"));
 
-		Integer searchOnline =
-			toInteger (
-				requestContext.parameterRequired (
-					"online"));
+		Optional <Long> searchOnline =
+			optionalMapRequired (
+				emptyStringToAbsent (
+					requestContext.parameterRequired (
+						"online")),
+				NumberUtils::parseLongRequired);
 
 		String searchOutput =
 			nullIfEmptyString (
@@ -244,7 +248,7 @@ class ChatUserSearchOldAction
 
 		searchMap.put (
 			"chatId",
-			requestContext.stuffInt (
+			requestContext.stuffInteger (
 				"chatId"));
 
 		// check we are not being stupid
@@ -382,13 +386,16 @@ class ChatUserSearchOldAction
 
 		}
 
-		if (searchOnline != null) {
+		if (
+			isPresent (
+				searchOnline)
+		) {
 
 			searchMap.put (
 				"onlineAfter",
 				transaction.now ().minus (
 					Duration.standardSeconds (
-						searchOnline)));
+						searchOnline.get ())));
 
 		}
 
@@ -474,7 +481,7 @@ class ChatUserSearchOldAction
 
 		// and search!
 
-		List<Integer> chatUserIds =
+		List <Long> chatUserIds =
 			chatUserHelper.searchIds (
 				searchMap);
 
@@ -504,8 +511,9 @@ class ChatUserSearchOldAction
 
 				// one user, go straight to details
 
-				Integer chatUserId =
-					chatUserIds.get (0);
+				Long chatUserId =
+					chatUserIds.get (
+						0);
 
 				requestContext.addNotice (
 					"Found single user");

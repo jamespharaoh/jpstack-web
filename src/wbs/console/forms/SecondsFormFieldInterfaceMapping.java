@@ -1,27 +1,25 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
+import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
-import fj.data.Either;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.IntervalFormatter;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("secondsFormFieldInterfaceMapping")
@@ -46,10 +44,10 @@ class SecondsFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Either<Optional<Long>,String> interfaceToGeneric (
+	Either <Optional <Long>, String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue) {
 
 		if (
 
@@ -67,7 +65,7 @@ class SecondsFormFieldInterfaceMapping<Container>
 
 		} else {
 
-			Optional<Integer> genericValue =
+			Optional <Long> genericValue =
 				intervalFormatter.parseIntervalStringSeconds (
 					interfaceValue.get ());
 
@@ -85,7 +83,6 @@ class SecondsFormFieldInterfaceMapping<Container>
 
 			return successResult (
 				Optional.of (
-					(long)
 					genericValue.get ()));
 
 		}
@@ -94,10 +91,10 @@ class SecondsFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Either<Optional<String>,String> genericToInterface (
+	Either <Optional <String>, String> genericToInterface (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Long> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Long> genericValue) {
 
 		if (
 			isNotPresent (
@@ -116,7 +113,6 @@ class SecondsFormFieldInterfaceMapping<Container>
 				return successResult (
 					Optional.of (
 						intervalFormatter.createTextualIntervalStringSeconds (
-							(int) (long)
 							genericValue.get ())));
 
 			case numeric:
@@ -124,7 +120,6 @@ class SecondsFormFieldInterfaceMapping<Container>
 				return successResult (
 					Optional.of (
 						intervalFormatter.createNumericIntervalStringSeconds (
-							(int) (long)
 							genericValue.get ())));
 
 			default:

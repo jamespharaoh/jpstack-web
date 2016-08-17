@@ -7,7 +7,6 @@ import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserEditReason;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -103,7 +102,7 @@ class ChatUserAdminNameAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		if (

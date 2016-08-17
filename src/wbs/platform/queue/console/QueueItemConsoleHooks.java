@@ -2,10 +2,9 @@ package wbs.platform.queue.console;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
 import wbs.console.helper.ConsoleHooks;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -49,8 +48,8 @@ class QueueItemConsoleHooks
 
 		// queues
 
-		ImmutableList.Builder<Integer> queuesBuilder =
-			ImmutableList.<Integer>builder ();
+		ImmutableList.Builder<Long> queuesBuilder =
+			ImmutableList.builder ();
 
 		for (
 			QueueRec queue

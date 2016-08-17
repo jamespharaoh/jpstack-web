@@ -8,7 +8,7 @@ public
 interface ConsoleUserHelper
 	extends TimezoneTimeFormatter {
 
-	Optional<Long> loggedInUserId ();
+	Optional <Long> loggedInUserId ();
 	Long loggedInUserIdRequired ();
 
 	void login (
@@ -19,6 +19,6 @@ interface ConsoleUserHelper
 	boolean loggedIn ();
 	boolean notLoggedIn ();
 
-	Integer hourOffset ();
+	Long hourOffset ();
 
 }

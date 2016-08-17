@@ -5,14 +5,13 @@ import lombok.NonNull;
 public
 interface IdObject {
 
-	Integer getId ();
+	Long getId ();
 
 	public static
 	Long objectId (
 			@NonNull IdObject object) {
 
-		return (long) (int)
-			object.getId ();
+		return object.getId ();
 
 	}
 

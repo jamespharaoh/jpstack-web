@@ -42,7 +42,7 @@ class ChatUserAdminCreditPart
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 	}
@@ -205,13 +205,13 @@ class ChatUserAdminCreditPart
 					"<td>%s</td>\n",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
-						(long) chatUserCredit.getCreditAmount ()));
+						chatUserCredit.getCreditAmount ()));
 
 				printFormat (
 					"<td>%s</td>\n",
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
-						(long) chatUserCredit.getBillAmount ()));
+						chatUserCredit.getBillAmount ()));
 
 				printFormat (
 					"<td>%h</td>\n",

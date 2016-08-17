@@ -1,8 +1,10 @@
 package wbs.integrations.broadcastsystems.daemon;
 
 import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToUrl;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -11,10 +13,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
-
-import lombok.Data;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -25,14 +23,13 @@ import org.json.simple.parser.ParseException;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
-
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutRec;
 import wbs.platform.exception.logic.ExceptionLogLogic;
@@ -211,7 +208,7 @@ class BroadcastSystemsSender2
 	class PerformSendCallable
 		implements Callable<PerformSendResult> {
 
-		int messageId;
+		Long messageId;
 		URL url;
 
 		@Override

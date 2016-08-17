@@ -16,10 +16,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
@@ -27,6 +23,9 @@ import org.joda.time.LocalDate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -74,7 +73,7 @@ class ManualResponderRequestPendingSummaryPart
 	extends AbstractPagePart {
 
 	final
-	int maxResults = 1000;
+	long maxResults = 1000;
 
 	// dependencies
 
@@ -175,7 +174,7 @@ class ManualResponderRequestPendingSummaryPart
 
 		manualResponderRequest =
 			manualResponderRequestHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"manualResponderRequestId"));
 
 		manualResponderNumber =

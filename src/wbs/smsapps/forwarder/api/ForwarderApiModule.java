@@ -3,6 +3,8 @@ package wbs.smsapps.forwarder.api;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.BufferedInputStream;
@@ -23,18 +25,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.WebApiAction;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.ServletModule;
 import wbs.framework.web.WebFile;
@@ -337,7 +337,7 @@ class ForwarderApiModule
 		String clientId;
 		String route;
 		String service;
-		Integer replyToServerId;
+		Long replyToServerId;
 		Long pri;
 
 		ForwarderRec forwarder;
@@ -438,7 +438,7 @@ class ForwarderApiModule
 			clientId = (String) params.get("client-id");
 			route = (String) params.get("route");
 			service = (String) params.get("service");
-			replyToServerId = (int) (long) (Long) params.get("reply-to-server-id");
+			replyToServerId = (Long) params.get("reply-to-server-id");
 			pri = (Long) params.get("pri");
 
 		}
@@ -617,7 +617,7 @@ class ForwarderApiModule
 	private static
 	class SendExMessageChain {
 
-		Integer replyToServerId;
+		Long replyToServerId;
 
 		List<SendExMessage> messages =
 			new ArrayList<SendExMessage> ();
@@ -873,8 +873,10 @@ class ForwarderApiModule
 
 			if (messageChainPartList != null)
 
-				for (Map<String,Object> messageChainPart
-						: messageChainPartList) {
+				for (
+					Map<String,Object> messageChainPart
+						: messageChainPartList
+				) {
 
 					SendExMessageChain sendExMessageChain =
 						new SendExMessageChain ();
@@ -882,13 +884,14 @@ class ForwarderApiModule
 					messageChains.add (sendExMessageChain);
 
 					sendExMessageChain.replyToServerId =
-						(int) (long) (Long)
+						(Long)
 						params.get (
 							"reply-to-server-id");
 
 					List<Map<String,Object>> mpList =
 						forwarderApiLogic.unsafeListMapStringObject (
-							messageChainPart.get ("unqueueExMessages"));
+							messageChainPart.get (
+								"unqueueExMessages"));
 
 					if (mpList != null)
 
@@ -1469,7 +1472,7 @@ class ForwarderApiModule
 	class QueryExMessage {
 
 		String clientId;
-		Integer serverId;
+		Long serverId;
 		ForwarderMessageOutRec fmOut;
 
 	}
@@ -1544,13 +1547,16 @@ class ForwarderApiModule
 
 			List<Map<String,Object>> mpList =
 				forwarderApiLogic.unsafeListMapStringObject (
-					params.get ("unqueueExMessages"));
+					params.get (
+						"unqueueExMessages"));
 
 			if (mpList == null)
 				return;
 
-			for (Map<String,Object> mp
-					: mpList) {
+			for (
+				Map<String,Object> mp
+					: mpList
+			) {
 
 				if (mp == null)
 					continue;
@@ -1560,13 +1566,16 @@ class ForwarderApiModule
 
 				queryExMessage.clientId =
 					(String)
-					mp.get ("client-id");
+					mp.get (
+						"client-id");
 
 				queryExMessage.serverId =
-					(Integer)
-					mp.get ("server-id");
+					(Long)
+					mp.get (
+						"server-id");
 
-				messages.add(queryExMessage);
+				messages.add (
+					queryExMessage);
 
 			}
 
@@ -1823,7 +1832,7 @@ class ForwarderApiModule
 
 		Boolean getMessages;
 		Boolean getReports;
-		Integer maxResults;
+		Long maxResults;
 		Boolean advancedReporting;
 
 		ForwarderRec forwarder;
@@ -1882,17 +1891,25 @@ class ForwarderApiModule
 						errors,
 						true));
 
-			getMessages = (Boolean)
-				params.get ("get-unqueueExMessages");
+			getMessages =
+				(Boolean)
+				params.get (
+					"get-unqueueExMessages");
 
-			getReports = (Boolean)
-				params.get ("get-reports");
+			getReports =
+				(Boolean)
+				params.get (
+					"get-reports");
 
-			maxResults = (Integer)
-				params.get ("max-results");
+			maxResults =
+				(Long)
+				params.get (
+					"max-results");
 
-			advancedReporting = (Boolean)
-				params.get ("advanced-reporting");
+			advancedReporting =
+				(Boolean)
+				params.get (
+					"advanced-reporting");
 
 		}
 
@@ -1921,7 +1938,7 @@ class ForwarderApiModule
 
 			if (getMessages) {
 
-				List<ForwarderMessageInRec> pendingMessageList =
+				List <ForwarderMessageInRec> pendingMessageList =
 					forwarderMessageInHelper.findPendingLimit (
 						forwarder,
 						maxResults);
@@ -1983,22 +2000,24 @@ class ForwarderApiModule
 
 			if (getReports) {
 
-				List<ForwarderMessageOutRec> pendingReportList =
+				List <ForwarderMessageOutRec> pendingReportList =
 					forwarderMessageOutHelper.findPendingLimit (
 						forwarder,
 						maxResults);
 
 				// create the return data list
 
-				for (ForwarderMessageOutRec forwarderMessageOut
-						: pendingReportList) {
+				for (
+					ForwarderMessageOutRec forwarderMessageOut
+						: pendingReportList
+				) {
 
 					log.debug ("fmo.id=" + forwarderMessageOut.getId ());
 
 					ForwarderMessageOutReportRec forwarderMessageOutReport =
 						forwarderMessageOut.getReports ().get (
-							(int) (long)
-							forwarderMessageOut.getReportIndexPending ());
+							toJavaIntegerRequired (
+								forwarderMessageOut.getReportIndexPending ()));
 
 					ForwarderMessageStatus forwarderMessageStatus =
 						statusMap.get (

@@ -4,14 +4,15 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
+import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.Record;
 
 @Log4j
+@PrototypeComponent ("simpleExceptionLogger")
 public
 class SimpleExceptionLogger
 	implements ExceptionLogger {

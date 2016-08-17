@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
@@ -24,6 +23,6 @@ class ChatUserInitiationLogSearch
 
 	boolean filter;
 
-	Collection<Integer> filterChatIds;
+	Collection<Long> filterChatIds;
 
 }

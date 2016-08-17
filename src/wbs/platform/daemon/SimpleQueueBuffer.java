@@ -3,28 +3,28 @@ package wbs.platform.daemon;
 import java.util.Set;
 
 public
-class SimpleQueueBuffer<K> {
+class SimpleQueueBuffer <Key> {
 
-	QueueBuffer<K,K> queueBuffer;
+	QueueBuffer <Key, Key> queueBuffer;
 
 	public
 	SimpleQueueBuffer (
-			int fullSize) {
+			long fullSize) {
 
 		queueBuffer =
-			new QueueBuffer<K,K> (
+			new QueueBuffer <> (
 				fullSize);
 
 	}
 
 	public
-	int getFullSize () {
-		return queueBuffer.getFullSize();
+	long getFullSize () {
+		return queueBuffer.getFullSize ();
 	}
 
 	public
 	void add (
-			K key) {
+			Key key) {
 
 		queueBuffer.add (
 			key,
@@ -33,7 +33,7 @@ class SimpleQueueBuffer<K> {
 	}
 
 	public
-	K next ()
+	Key next ()
 		throws InterruptedException {
 
 		return queueBuffer.next ();
@@ -42,7 +42,7 @@ class SimpleQueueBuffer<K> {
 
 	public
 	void remove (
-			K key) {
+			Key key) {
 
 		queueBuffer.remove (
 			key);
@@ -58,7 +58,7 @@ class SimpleQueueBuffer<K> {
 	}
 
 	public
-	Set<K> getKeys () {
+	Set<Key> getKeys () {
 
 		return queueBuffer.getKeys ();
 

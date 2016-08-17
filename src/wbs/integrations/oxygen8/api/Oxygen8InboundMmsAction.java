@@ -11,14 +11,13 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.fileupload.FileItem;
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 import wbs.api.mvc.ApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -87,7 +86,7 @@ class Oxygen8InboundMmsAction
 
 	// state
 
-	Integer routeId;
+	Long routeId;
 
 	String mmsMessageId;
 	String mmsMessageType;
@@ -128,13 +127,13 @@ class Oxygen8InboundMmsAction
 
 	void processRequestHeaders () {
 
-		List<String> errors =
-			new ArrayList<String> ();
+		List <String> errors =
+			new ArrayList<> ();
 
 		// route id
 
 		routeId =
-			requestContext.requestIntRequired (
+			requestContext.requestIntegerRequired (
 				"routeId");
 
 		// message id
@@ -402,7 +401,7 @@ class Oxygen8InboundMmsAction
 
 		NetworkRec network =
 			networkHelper.findRequired (
-				0);
+				0l);
 
 		// insert message
 

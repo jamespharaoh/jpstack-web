@@ -2,6 +2,7 @@ package wbs.smsapps.manualresponder.logic;
 
 import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,16 +11,14 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
@@ -297,7 +296,6 @@ class ManualResponderLogicImplementation
 					"manual_responder")
 
 				.ref (
-					(long)
 					reply.getId ())
 
 				.sendNow (

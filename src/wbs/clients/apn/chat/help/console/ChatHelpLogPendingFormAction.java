@@ -1,11 +1,12 @@
 package wbs.clients.apn.chat.help.console;
 
-import javax.inject.Inject;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 
-import lombok.Cleanup;
+import javax.inject.Inject;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogic;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -14,7 +15,6 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -115,7 +115,7 @@ class ChatHelpLogPendingFormAction
 
 		ChatHelpLogRec helpRequest =
 			chatHelpLogHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatHelpLogId"));
 
 		ChatUserRec chatUser =

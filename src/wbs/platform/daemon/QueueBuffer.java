@@ -15,7 +15,7 @@ import java.util.Set;
  * the database when the item has been processed.
  */
 public
-class QueueBuffer<K,V> {
+class QueueBuffer<Key,Value> {
 
 	static
 	class BufferEntry<K,V> {
@@ -37,13 +37,13 @@ class QueueBuffer<K,V> {
 
 	}
 
-	int fullSize;
+	long fullSize;
 
-	Map<K,BufferEntry<K,V>> buffer =
-		new HashMap<K,BufferEntry<K,V>> ();
+	Map <Key, BufferEntry <Key, Value>> buffer =
+		new HashMap<> ();
 
-	List<BufferEntry<K,V>> queue =
-		new LinkedList<BufferEntry<K,V>> ();
+	List <BufferEntry <Key, Value>> queue =
+		new LinkedList<> ();
 
 	boolean full = false;
 
@@ -61,7 +61,7 @@ class QueueBuffer<K,V> {
 	 */
 	public
 	QueueBuffer (
-			int fullSize) {
+			long fullSize) {
 
 		if (fullSize < 1)
 			throw new IllegalArgumentException (
@@ -77,7 +77,7 @@ class QueueBuffer<K,V> {
 	 * @return the value.
 	 */
 	public
-	int getFullSize () {
+	long getFullSize () {
 		return fullSize;
 	}
 
@@ -93,11 +93,11 @@ class QueueBuffer<K,V> {
 	 */
 	public
 	void add (
-			K key,
-			V item) {
+			Key key,
+			Value item) {
 
-		BufferEntry<K,V> bufferEntry =
-			new BufferEntry<K,V> (
+		BufferEntry<Key,Value> bufferEntry =
+			new BufferEntry<Key,Value> (
 				key,
 				item);
 
@@ -133,7 +133,7 @@ class QueueBuffer<K,V> {
 	 * @return the next item in the queue.
 	 */
 	public
-	V next ()
+	Value next ()
 		throws InterruptedException {
 
 		synchronized (buffer) {
@@ -141,7 +141,7 @@ class QueueBuffer<K,V> {
 			while (queue.isEmpty ())
 				buffer.wait ();
 
-			BufferEntry<K,V> bufferEntry =
+			BufferEntry<Key,Value> bufferEntry =
 				queue.get (0);
 
 			queue.remove (0);
@@ -168,12 +168,12 @@ class QueueBuffer<K,V> {
 	 */
 	public
 	void remove (
-			K key) {
+			Key key) {
 
 		synchronized (buffer) {
 			if (!buffer.containsKey(key))
 				throw new NoSuchElementException();
-			BufferEntry<K, V> bufferEntry = buffer.get(key);
+			BufferEntry<Key, Value> bufferEntry = buffer.get(key);
 			if (bufferEntry.queued)
 				throw new IllegalStateException();
 			buffer.remove(key);
@@ -208,11 +208,11 @@ class QueueBuffer<K,V> {
 	 * @return a set containing each key currently present in the buffer.
 	 */
 	public
-	Set<K> getKeys () {
+	Set<Key> getKeys () {
 
 		synchronized (buffer) {
 
-			return new HashSet<K> (
+			return new HashSet<Key> (
 				buffer.keySet ());
 
 		}

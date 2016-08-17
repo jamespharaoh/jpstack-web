@@ -14,11 +14,10 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 
-import lombok.NonNull;
-import lombok.experimental.Accessors;
-
 import com.sun.mail.smtp.SMTPMessage;
 
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 
@@ -48,29 +47,29 @@ class EmailLogicImplementation
 
 		if (
 			stringIsNotEmpty (
-				wbsConfig.smtpHostname ())
+				wbsConfig.email ().smtpHostname ())
 		) {
 
 			properties.setProperty (
 				"mail.smtp.host",
-				wbsConfig.smtpHostname ());
+				wbsConfig.email ().smtpHostname ());
 
 		}
 
 		if (
 			stringIsNotEmpty (
-				wbsConfig.smtpPort ())
+				wbsConfig.email ().smtpPort ())
 		) {
 
 			properties.setProperty (
 				"mail.smtp.port",
-				wbsConfig.smtpPort ());
+				wbsConfig.email ().smtpPort ());
 
 		}
 
 		if (
 			stringIsNotEmpty (
-				wbsConfig.smtpUsername ())
+				wbsConfig.email ().smtpUsername ())
 		) {
 
 			throw new RuntimeException ();
@@ -79,7 +78,7 @@ class EmailLogicImplementation
 
 		if (
 			stringIsNotEmpty (
-				wbsConfig.smtpPassword ())
+				wbsConfig.email ().smtpPassword ())
 		) {
 
 			throw new RuntimeException ();
@@ -111,7 +110,7 @@ class EmailLogicImplementation
 					mailSession);
 
 			smtpMessage.setEnvelopeFrom (
-				wbsConfig.defaultEmailEnvelopeFrom ());
+				wbsConfig.email ().defaultEnvelopeFrom ());
 
 			try {
 
@@ -166,9 +165,9 @@ class EmailLogicImplementation
 			@NonNull String message) {
 
 		sendEmail (
-			wbsConfig.defaultEmailFromName (),
-			wbsConfig.defaultEmailFromAddress (),
-			wbsConfig.defaultEmailReplyToAddress (),
+			wbsConfig.email ().defaultFromName (),
+			wbsConfig.email ().defaultFromAddress (),
+			wbsConfig.email ().defaultReplyToAddress (),
 			toAddresses,
 			subject,
 			message);

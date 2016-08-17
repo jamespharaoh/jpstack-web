@@ -14,15 +14,12 @@ import java.util.regex.Matcher;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
-import org.joda.time.Instant;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -37,7 +34,6 @@ import wbs.framework.web.WebFile;
 import wbs.integrations.mig.logic.MigLogic;
 import wbs.integrations.mig.model.MigRouteInObjectHelper;
 import wbs.integrations.mig.model.MigRouteInRec;
-import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.core.logic.NoSuchMessageException;
 import wbs.sms.message.core.logic.SmsMessageLogic;
@@ -47,12 +43,8 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
-import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
-import wbs.sms.message.report.model.MessageReportCodeRec;
-import wbs.sms.message.report.model.MessageReportCodeType;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.core.model.ChatUserNumberReportObjectHelper;
-import wbs.sms.number.core.model.ChatUserNumberReportRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -83,9 +75,6 @@ class MigApiServletModule
 
 	@Inject
 	SmsMessageLogic messageLogic;
-
-	@Inject
-	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
 	MigLogic migLogic;
@@ -184,15 +173,19 @@ class MigApiServletModule
 
 				// get request stuff
 
-				int routeId =
-					requestContext.requestIntRequired (
+				Long routeId =
+					requestContext.requestIntegerRequired (
 						"routeId");
 
 				// get params in local variables
 				// String ifVersion = requestContext.getParameter ("IFVERSION");
 				// String messageType = requestContext.getParameter ("MESSAGETYPE");
 				String oadc = requestContext.parameterOrNull("OADC");
-				String messageID = requestContext.parameterOrNull("GUID");
+
+				String guidParam =
+					requestContext.parameterOrNull (
+						"GUID");
+
 				// String receiveTime = requestContext.getParameter ("RECEIVETIME");
 				String body = requestContext.parameterOrNull("BODY");
 				// String mclass = requestContext.getParameter ("MCLASS");
@@ -233,18 +226,22 @@ class MigApiServletModule
 
 				MessageRec message =
 					smsInboxLogic.inboxInsert (
-						Optional.of (messageID),
-						textHelper.findOrCreate (body),
+						Optional.of (
+							guidParam),
+						textHelper.findOrCreate (
+							body),
 						oadc,
 						destAddress,
 						route,
 						migRouteIn.getSetNetwork ()
-							? Optional.of (network)
-							: Optional.<NetworkRec>absent (),
-						Optional.<Instant>absent (),
-						Collections.<MediaRec>emptyList (),
-						Optional.of (avStatus),
-						Optional.<String>absent ());
+							? Optional.of (
+								network)
+							: Optional.absent (),
+						Optional.absent (),
+						Collections.emptyList (),
+						Optional.of (
+							avStatus),
+						Optional.absent ());
 
 				transaction.commit ();
 
@@ -313,8 +310,8 @@ class MigApiServletModule
 
 				// get request stuff
 
-				int routeId =
-					requestContext.requestIntRequired (
+				Long routeId =
+					requestContext.requestIntegerRequired (
 						"routeId");
 
 				// String ifVersion = requestContext.getParameter ("IFVERSION");
@@ -377,7 +374,7 @@ class MigApiServletModule
 
 					message =
 						messageHelper.findOrThrow (
-							Integer.parseInt (
+							Long.parseLong (
 								messageID),
 							() -> new NoSuchMessageException (
 								"Message ID: " + messageID));
@@ -396,49 +393,6 @@ class MigApiServletModule
 						"No message id or guid");
 
 				}
-
-				long statusInt =
-					Long.parseLong (
-						status);
-
-				Long statusTypeInt;
-
-				try {
-
-					statusTypeInt =
-						Long.parseLong (
-							statusType);
-
-				} catch (NumberFormatException e) {
-
-					statusTypeInt = null;
-
-				}
-
-				Long reasonInt;
-
-				try {
-
-					reasonInt =
-						Long.parseLong (
-							reason);
-
-				} catch (NumberFormatException e) {
-
-					reasonInt =
-						null;
-
-				}
-
-				MessageReportCodeRec reportCode =
-					messageReportCodeHelper.findOrCreate (
-						statusInt,
-						statusTypeInt,
-						reasonInt,
-						MessageReportCodeType.mig,
-						newMessageStatus == MessageStatus.delivered,
-						false,
-						description);
 
 				reportLogic.deliveryReport (
 					message,
@@ -460,63 +414,7 @@ class MigApiServletModule
 								reason))),
 					Optional.absent ());
 
-				// error handling
-				// int netID = networkID;
-				// if (netID==5) netID=3;
-
-				// chat code, needs moving elsewhere
-
-				if (messageLogic.isChatMessage (message)
-						&& message.getCharge () > 0) {
-
-					ChatUserNumberReportRec numberReportRec =
-						chatUserNumberReportHelper.findRequired (
-							message.getNumber ().getId ());
-
-					// undelivered
-
-					if (newMessageStatus == MessageStatus.undelivered) {
-
-						// update chat user permanent failure
-
-						if (
-							! reportCode.getSuccess ()
-							&& reportCode.getPermanent ()
-							&& ! (
-								network.getId () == 6
-								&& statusInt == 5
-								&& description != null
-								&& description.contains ("credit")
-							)
-						) {
-
-							numberReportRec
-
-								.setPermanentFailureReceived (
-									transaction.now ())
-
-								.setPermanentFailureCount (
-									numberReportRec.getPermanentFailureCount () + 1);
-
-						}
-
-					// delivered
-
-					} else if (newMessageStatus == MessageStatus.delivered) {
-
-						numberReportRec
-
-							.setPermanentFailureReceived (
-								null)
-
-							.setPermanentFailureCount (
-								0l);
-
-					}
-
-				}
-
-				transaction.commit();
+				transaction.commit ();
 
 				String response = "000";
 				PrintWriter out = requestContext.writer();

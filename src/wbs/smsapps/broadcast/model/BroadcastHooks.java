@@ -5,6 +5,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import lombok.NonNull;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectHooks;
 import wbs.platform.object.core.model.ObjectTypeDao;
@@ -47,7 +48,7 @@ class BroadcastHooks
 	@Override
 	public
 	void beforeInsert (
-			BroadcastRec broadcast) {
+			@NonNull BroadcastRec broadcast) {
 
 		BroadcastConfigRec broadcastConfig =
 			broadcast.getBroadcastConfig ();
@@ -55,7 +56,6 @@ class BroadcastHooks
 		// set index
 
 		broadcast.setIndex (
-			(int) (long)
 			broadcastConfig.getNumTotal ());
 
 	}
@@ -63,7 +63,7 @@ class BroadcastHooks
 	@Override
 	public
 	void afterInsert (
-			BroadcastRec broadcast) {
+			@NonNull BroadcastRec broadcast) {
 
 		BroadcastConfigRec broadcastConfig =
 			broadcast.getBroadcastConfig ();

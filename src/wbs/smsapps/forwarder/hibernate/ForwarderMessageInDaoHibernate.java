@@ -1,13 +1,14 @@
 package wbs.smsapps.forwarder.hibernate;
 
-import java.util.List;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
-import lombok.NonNull;
+import java.util.List;
 
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Instant;
 
+import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.smsapps.forwarder.model.ForwarderMessageInDaoMethods;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
@@ -67,9 +68,9 @@ class ForwarderMessageInDaoHibernate
 
 	@Override
 	public
-	List<ForwarderMessageInRec> findNextLimit (
+	List <ForwarderMessageInRec> findNextLimit (
 			@NonNull Instant now,
-			int maxResults) {
+			@NonNull Long maxResults) {
 
 		return findMany (
 			"findNextLimit (now, maxResults)",
@@ -90,7 +91,8 @@ class ForwarderMessageInDaoHibernate
 					now))
 
 			.setMaxResults (
-				maxResults)
+				toJavaIntegerRequired (
+					maxResults))
 
 		);
 
@@ -98,9 +100,9 @@ class ForwarderMessageInDaoHibernate
 
 	@Override
 	public
-	List<ForwarderMessageInRec> findPendingLimit (
+	List <ForwarderMessageInRec> findPendingLimit (
 			@NonNull ForwarderRec forwarder,
-			int maxResults) {
+			@NonNull Long maxResults) {
 
 		return findMany (
 			"findPendingLimit (forwarder, maxResults)",
@@ -125,7 +127,8 @@ class ForwarderMessageInDaoHibernate
 					"_forwarderMessageIn.id"))
 
 			.setMaxResults (
-				maxResults)
+				toJavaIntegerRequired (
+					maxResults))
 
 		);
 

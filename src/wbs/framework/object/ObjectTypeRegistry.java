@@ -8,7 +8,7 @@ public
 interface ObjectTypeRegistry {
 
 	ObjectTypeEntry findById (
-			int id);
+			Long id);
 
 	ObjectTypeEntry findByCode (
 			String code);

@@ -1,11 +1,11 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.Misc.cast;
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.isNotInstanceOf;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.dynamicCast;
+import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
 
 import javax.inject.Inject;
 
@@ -56,7 +56,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 		@SuppressWarnings ("unchecked")
 		RecordType object =
 			(RecordType)
-			cast (
+			dynamicCast (
 				model.objectClass (),
 				objectUncast);
 
@@ -73,7 +73,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 		@SuppressWarnings ("unchecked")
 		RecordType object =
 			(RecordType)
-			cast (
+			dynamicCast (
 				model.objectClass (),
 				objectUncast);
 
@@ -90,7 +90,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 		@SuppressWarnings ("unchecked")
 		RecordType object =
 			(RecordType)
-			cast (
+			dynamicCast (
 				model.objectClass (),
 				objectUncast);
 
@@ -107,7 +107,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 		@SuppressWarnings ("unchecked")
 		RecordType object =
 			(RecordType)
-			cast (
+			dynamicCast (
 				model.objectClass (),
 				objectUncast);
 
@@ -124,7 +124,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 		@SuppressWarnings ("unchecked")
 		RecordType object =
 			(RecordType)
-			cast (
+			dynamicCast (
 				model.objectClass (),
 				objectUncast);
 
@@ -159,8 +159,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 				model.getParentType (
 					object);
 
-			return (long)
-				parentType.getId ();
+			return parentType.getId ();
 
 		}
 
@@ -169,7 +168,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	Long getParentId (
-			@NonNull Record<?> object) {
+			@NonNull Record <?> object) {
 
 		if (
 			isNotInstanceOf (
@@ -189,15 +188,15 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 
 		} else if (model.canGetParent ()) {
 
-			Record<?> parent =
+			Record <?> parent =
 				getParent (
 					object);
 
-			return (long) parent.getId ();
+			return parent.getId ();
 
 		} else {
 
-			return (long) (Integer)
+			return (Long)
 				BeanLogic.getProperty (
 					object,
 					model.parentIdField ().name ());
@@ -215,7 +214,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 		@SuppressWarnings ("unchecked")
 		RecordType object =
 			(RecordType)
-			cast (
+			dynamicCast (
 				model.objectClass (),
 				objectUncast);
 
@@ -231,7 +230,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	GlobalId getParentGlobalId (
-			@NonNull Record<?> object) {
+			@NonNull Record <?> object) {
 
 		if (model.isRoot ()) {
 
@@ -251,8 +250,8 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	Record<?> getParent (
-			@NonNull Record<?> object) {
+	Record <?> getParent (
+			@NonNull Record <?> object) {
 
 		if (model.isRoot ()) {
 
@@ -260,16 +259,16 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 
 		} else if (model.isRooted ()) {
 
-			ObjectHelper<?> rootHelper =
+			ObjectHelper <?> rootHelper =
 				objectManager.objectHelperForClassRequired (
 					objectTypeRegistry.rootRecordClass ());
 
 			return rootHelper.findRequired (
-				0);
+				0l);
 
 		} else if (model.canGetParent ()) {
 
-			Record<?> parent =
+			Record <?> parent =
 				model.getParent (
 					object);
 
@@ -287,8 +286,8 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 
 		} else {
 
-			Record<?> parentObjectType =
-				(Record<?>)
+			Record <?> parentObjectType =
+				(Record <?>)
 				model.getParentType (
 					object);
 
@@ -306,9 +305,9 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 
 			}
 
-			ObjectHelper<?> parentHelper=
+			ObjectHelper <?> parentHelper=
 				objectManager.objectHelperForTypeId (
-					(long) parentObjectType.getId ());
+					parentObjectType.getId ());
 
 			if (parentHelper == null) {
 
@@ -430,7 +429,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 
 				currentHelper =
 					objectManager.objectHelperForTypeId (
-						(long) parentType.getId ());
+						parentType.getId ());
 
 				currentObject =
 					currentHelper.findRequired (
@@ -451,7 +450,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 		@SuppressWarnings ("unchecked")
 		RecordType object =
 			(RecordType)
-			cast (
+			dynamicCast (
 				model.objectClass (),
 				objectUncast);
 
@@ -471,7 +470,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 		@SuppressWarnings ("unchecked")
 		RecordType object =
 			(RecordType)
-			cast (
+			dynamicCast (
 				model.objectClass (),
 				objectUncast);
 

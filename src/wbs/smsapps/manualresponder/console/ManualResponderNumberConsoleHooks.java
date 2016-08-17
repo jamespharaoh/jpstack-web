@@ -3,7 +3,6 @@ package wbs.smsapps.manualresponder.console;
 import javax.inject.Inject;
 
 import lombok.NonNull;
-
 import wbs.console.helper.ConsoleHooks;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -42,7 +41,7 @@ class ManualResponderNumberConsoleHooks
 		search
 
 			.manualResponderId (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"manualResponderId"));
 
 	}

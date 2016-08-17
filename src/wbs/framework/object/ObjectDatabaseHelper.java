@@ -11,20 +11,20 @@ interface ObjectDatabaseHelper<RecordType extends Record<RecordType>> {
 
 	// getters
 
-	ObjectModel<RecordType> model ();
+	ObjectModel <RecordType> model ();
 
 	// setters
 
-	ObjectDatabaseHelper<RecordType> model (
-			ObjectModel<RecordType> model);
+	ObjectDatabaseHelper <RecordType> model (
+			ObjectModel <RecordType> model);
 
 	// database
 
 	RecordType find (
-			long id);
+			Long id);
 
-	List<RecordType> findMany (
-			List<Long> ids);
+	List <RecordType> findMany (
+			List <Long> ids);
 
 	RecordType findByParentAndCode (
 			GlobalId parentGlobalId,
@@ -39,17 +39,17 @@ interface ObjectDatabaseHelper<RecordType extends Record<RecordType>> {
 			String typeCode,
 			String code);
 
-	List<RecordType> findAll ();
+	List <RecordType> findAll ();
 
-	List<RecordType> findAllByParent (
+	List <RecordType> findAllByParent (
 			GlobalId parentGlobalId);
 
-	List<RecordType> findByParentAndIndexRange (
+	List <RecordType> findByParentAndIndexRange (
 			GlobalId parentGlobalId,
 			Long indexStart,
 			Long indexEnd);
 
-	List<RecordType> findAllByParentAndType (
+	List <RecordType> findAllByParentAndType (
 			GlobalId parentGlobalId,
 			String typeCode);
 
@@ -62,7 +62,7 @@ interface ObjectDatabaseHelper<RecordType extends Record<RecordType>> {
 	RecordType update (
 			RecordType object);
 
-	<ObjectType extends EphemeralRecord<RecordType>>
+	<ObjectType extends EphemeralRecord <RecordType>>
 	ObjectType remove (
 			ObjectType object);
 

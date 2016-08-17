@@ -2,10 +2,9 @@ package wbs.smsapps.manualresponder.console;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
 import wbs.console.helper.ConsoleHooks;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -53,8 +52,8 @@ class ManualResponderRequestConsoleHooks
 
 		// manual responders
 
-		ImmutableList.Builder<Integer> manualRespondersBuilder =
-			ImmutableList.<Integer>builder ();
+		ImmutableList.Builder<Long> manualRespondersBuilder =
+			ImmutableList.builder ();
 
 		for (
 			ManualResponderRec manualResponder
@@ -76,8 +75,8 @@ class ManualResponderRequestConsoleHooks
 
 		// users
 
-		ImmutableList.Builder<Integer> usersBuilder =
-			ImmutableList.<Integer>builder ();
+		ImmutableList.Builder<Long> usersBuilder =
+			ImmutableList.builder ();
 
 		for (
 			UserRec user

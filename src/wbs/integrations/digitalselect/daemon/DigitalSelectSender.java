@@ -9,11 +9,6 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import lombok.Data;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -27,6 +22,10 @@ import org.apache.http.message.BasicNameValuePair;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.Data;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -184,7 +183,7 @@ class DigitalSelectSender
 
 					new BasicNameValuePair (
 						"reference",
-						Integer.toString (
+						Long.toString (
 							state.message ().getId ())),
 
 					new BasicNameValuePair (
@@ -204,7 +203,8 @@ class DigitalSelectSender
 			stringFormat (
 				"Making request to %s with %s",
 				state.digitalSelectRouteOut ().getUrl (),
-				IOUtils.toString (formEntity.getContent ())));
+				IOUtils.toString (
+					formEntity.getContent ())));
 
 		state.httpResponse (
 			state

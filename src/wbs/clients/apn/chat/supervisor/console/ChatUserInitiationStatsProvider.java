@@ -8,10 +8,9 @@ import java.util.TreeMap;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import org.joda.time.Instant;
 
+import lombok.NonNull;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationReason;
@@ -49,8 +48,8 @@ class ChatUserInitiationStatsProvider
 
 		// setup data structures
 
-		Map<Integer,int[]> alarmsPerUser =
-			new TreeMap<Integer,int[]> ();
+		Map<Long,long[]> alarmsPerUser =
+			new TreeMap<Long,long[]> ();
 
 		Set<Object> userIds =
 			new HashSet<Object> ();
@@ -59,7 +58,7 @@ class ChatUserInitiationStatsProvider
 
 		ChatRec chat =
 			chatHelper.findRequired (
-				(Integer)
+				(Long)
 				conditions.get (
 					"chatId"));
 
@@ -96,11 +95,12 @@ class ChatUserInitiationStatsProvider
 
 				alarmsPerUser.put (
 					log.getMonitorUser ().getId (),
-					new int [period.size ()]);
+					new long [
+						period.size ()]);
 
 			}
 
-			int[] userAlarms =
+			long[] userAlarms =
 				alarmsPerUser.get (
 					log.getMonitorUser ().getId ());
 

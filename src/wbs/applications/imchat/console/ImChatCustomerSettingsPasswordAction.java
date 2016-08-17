@@ -5,10 +5,9 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.applications.imchat.logic.ImChatLogic;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.console.action.ConsoleAction;
@@ -75,7 +74,7 @@ class ImChatCustomerSettingsPasswordAction
 
 		ImChatCustomerRec customer =
 			imChatCustomerHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"imChatCustomerId"));
 
 		// generate new password

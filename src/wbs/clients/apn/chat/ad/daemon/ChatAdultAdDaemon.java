@@ -8,11 +8,13 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -86,8 +88,11 @@ class ChatAdultAdDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
-		return 60 * 1000;
+	Duration getSleepDuration () {
+
+		return Duration.standardSeconds (
+			60);
+
 	}
 
 	@Override
@@ -154,7 +159,7 @@ class ChatAdultAdDaemon
 
 	private
 	void doAdultAd (
-			int chatUserId) {
+			@NonNull Long chatUserId) {
 
 		log.debug (
 			stringFormat (

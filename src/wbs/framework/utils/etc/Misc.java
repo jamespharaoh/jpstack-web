@@ -34,9 +34,6 @@ import java.util.TimeZone;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import lombok.NonNull;
-import lombok.SneakyThrows;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -45,14 +42,16 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import fj.data.Either;
+import lombok.NonNull;
+import lombok.SneakyThrows;
 
 // TODO lots to deprecate here
 public
 class Misc {
 
 	@SafeVarargs
-	public static
-	<Type> Type ifNull (
+	public static <Type>
+	Type ifNull (
 			@NonNull Type... values) {
 
 		for (Type value : values) {
@@ -66,8 +65,8 @@ class Misc {
 
 	}
 
-	public static
-	<Type> Type ifNull (
+	public static <Type>
+	Type ifNull (
 			Type input,
 			Type ifNull) {
 
@@ -108,6 +107,7 @@ class Misc {
 	Pattern intPattern =
 		Pattern.compile ("[0-9]+");
 
+	@Deprecated
 	public static
 	boolean isInt (
 			String string) {
@@ -121,6 +121,7 @@ class Misc {
 
 	}
 
+	@Deprecated
 	public static
 	Integer toInteger (
 			String string) {
@@ -135,6 +136,7 @@ class Misc {
 
 	}
 
+	@Deprecated
 	public static
 	Long toLong (
 			String string) {
@@ -931,6 +933,16 @@ class Misc {
 	}
 
 	public static
+	String booleanToYesNo (
+			@NonNull Boolean value) {
+
+		return value
+			? "yes"
+			: "no";
+
+	}
+
+	public static
 	Boolean stringToBoolean (
 			@NonNull String string,
 			@NonNull String yesString,
@@ -968,7 +980,7 @@ class Misc {
 	}
 
 	public static <Type>
-	List<Type> maybeList (
+	List <Type> maybeList (
 			List<Type> value) {
 
 		return value != null
@@ -978,7 +990,7 @@ class Misc {
 	}
 
 	public static <Type>
-	List<Type> maybeList (
+	List <Type> maybeList (
 			boolean condition,
 			Type value) {
 
@@ -1508,46 +1520,6 @@ class Misc {
 			@NonNull Either<Left,Right> either) {
 
 		return either.right ().value ();
-
-	}
-
-	public static
-	boolean isInstanceOf (
-			@NonNull Class<?> theClass,
-			@NonNull Object object) {
-
-		return theClass.isInstance (
-			object);
-
-	}
-
-	public static
-	boolean isNotInstanceOf (
-			@NonNull Class<?> theClass,
-			@NonNull Object object) {
-
-		return ! theClass.isInstance (
-			object);
-
-	}
-
-	public static
-	Integer toIntegerNullSafe (
-			Long longValue) {
-
-		return longValue == null
-			? null
-			: (int) (long) longValue;
-
-	}
-
-	public static <Type>
-	Type cast (
-			@NonNull Class<Type> classToCastTo,
-			@NonNull Object value) {
-
-		return classToCastTo.cast (
-			value);
 
 	}
 

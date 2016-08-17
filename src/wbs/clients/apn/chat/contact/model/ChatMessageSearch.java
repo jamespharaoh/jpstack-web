@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.joda.time.Instant;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import org.joda.time.Instant;
 
 @Accessors (fluent = true)
 @Data
@@ -15,22 +15,22 @@ public
 class ChatMessageSearch
 	implements Serializable {
 
-	Integer chatId;
+	Long chatId;
 
-	Integer fromUserId;
-	Integer toUserId;
+	Long fromUserId;
+	Long toUserId;
 
-	Integer originalTextId;
+	Long originalTextId;
 
 	Instant timestampAfter;
 	Instant timestampBefore;
 
 	Boolean hasSender;
 
-	Integer idGreaterThan;
+	Long idGreaterThan;
 
-	Integer deliveryId;
-	Integer deliveryIdGreaterThan;
+	Long deliveryId;
+	Long deliveryIdGreaterThan;
 
 	ChatMessageMethod method;
 

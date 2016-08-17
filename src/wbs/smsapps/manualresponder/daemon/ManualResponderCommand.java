@@ -6,13 +6,12 @@ import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
 import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
@@ -23,6 +22,9 @@ import org.joda.time.Years;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -31,11 +33,6 @@ import wbs.framework.object.ObjectManager;
 import wbs.framework.record.Record;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.TimeFormatter;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-import static wbs.framework.utils.etc.TimeUtils.earlierThan;
-
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -286,7 +283,6 @@ class ManualResponderCommand
 				manualResponderNumber)
 
 			.setIndex (
-				(int) (long)
 				manualResponderNumber.getNumRequests ())
 
 			.setMessage (
@@ -361,7 +357,7 @@ class ManualResponderCommand
 
 			emailLogic.sendSystemEmail (
 				ImmutableList.of (
-					wbsConfig.developerEmailAddress ()),
+					wbsConfig.email ().developerAddress ()),
 				"DOB error",
 				stringFormat (
 

@@ -7,12 +7,12 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -42,9 +42,10 @@ class ChatCreditDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
+	Duration getSleepDuration () {
 
-		return 15 * 1000;
+		return Duration.standardSeconds (
+			15);
 
 	}
 
@@ -76,7 +77,7 @@ class ChatCreditDaemon
 
 	private
 	void doUserCredit (
-			int chatUserId) {
+			@NonNull Long chatUserId) {
 
 		@Cleanup
 		Transaction transaction =
@@ -118,7 +119,7 @@ class ChatCreditDaemon
 				"Chat billing after %s",
 				threeMonthsAgo));
 
-		List<Integer> chatUserIds =
+		List<Long> chatUserIds =
 			chatUserHelper.findWantingBill (
 				threeMonthsAgo)
 
@@ -138,7 +139,7 @@ class ChatCreditDaemon
 				chatUserIds.size ()));
 
 		for (
-			Integer chatUserId
+			Long chatUserId
 				: chatUserIds
 		) {
 

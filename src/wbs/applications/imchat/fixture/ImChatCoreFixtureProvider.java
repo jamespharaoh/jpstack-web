@@ -1,7 +1,7 @@
 package wbs.applications.imchat.fixture;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithSlash;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -9,10 +9,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.SneakyThrows;
-
 import org.apache.commons.io.IOUtils;
 
+import lombok.SneakyThrows;
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerDetailDataType;
@@ -723,7 +722,6 @@ class ImChatCoreFixtureProvider
 				imChatCustomer)
 
 			.setIndex (
-				(int) (long)
 				imChatCustomer.getNumConversations ())
 
 			.setImChatProfile (
@@ -784,7 +782,6 @@ class ImChatCoreFixtureProvider
 				imChatCustomer)
 
 			.setIndex (
-				(int) (long)
 				imChatCustomer.getNumPurchases ())
 
 			.setImChatSession (
@@ -824,7 +821,6 @@ class ImChatCoreFixtureProvider
 				imChatConversation)
 
 			.setIndex (
-				(int) (long)
 				imChatConversation.getNumMessages ())
 
 			.setMessageText (

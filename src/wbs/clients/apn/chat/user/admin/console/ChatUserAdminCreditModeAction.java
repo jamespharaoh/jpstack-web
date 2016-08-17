@@ -99,7 +99,7 @@ class ChatUserAdminCreditModeAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		ChatUserCreditMode oldCreditMode =

@@ -1,5 +1,7 @@
 package wbs.platform.rpc.core;
 
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,9 +47,12 @@ class Rpc {
 
 	public static
 	int statusToHttpStatus (
-			int status) {
+			long status) {
 
-		switch (status & 0xf000) {
+		switch (
+			toJavaIntegerRequired (
+				status & 0xf000l)
+		) {
 
 		case 0x0000:
 			return HttpStatus.httpOk;

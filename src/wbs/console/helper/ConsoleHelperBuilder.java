@@ -314,8 +314,8 @@ class ConsoleHelperBuilder {
 		Record<?> lookupObject (
 				ConsoleContextStuff contextStuff) {
 
-			Integer id =
-				(Integer)
+			Long id =
+				(Long)
 				contextStuff.get (
 					consoleHelperProvider.idKey ());
 
@@ -345,7 +345,7 @@ class ConsoleHelperBuilder {
 		@Override
 		public
 		Record<?> findEntity (
-				int id) {
+				@NonNull Long id) {
 
 			return optionalOrNull (
 				objectHelper.find (
@@ -390,7 +390,7 @@ class ConsoleHelperBuilder {
 		@Override
 		public
 		String getPathId (
-				Record object) {
+				@NonNull Record object) {
 
 			return consoleHelperProvider.getPathId (
 				object.getId ());
@@ -400,7 +400,7 @@ class ConsoleHelperBuilder {
 		@Override
 		public
 		String getPathId (
-				Integer objectId) {
+				@NonNull Long objectId) {
 
 			return consoleHelperProvider.getPathId (
 				objectId);

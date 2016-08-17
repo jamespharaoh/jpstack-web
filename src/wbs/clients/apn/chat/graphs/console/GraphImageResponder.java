@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.graphs.console;
 
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -175,21 +177,25 @@ class GraphImageResponder
 		graphics.setColor (
 			new Color (224, 224, 224));
 
-		for (GraphScale.Step step
-				: verticalScale.getSteps ()) {
+		for (
+			GraphScale.Step step
+				: verticalScale.getSteps ()
+		) {
 
 			if (! step.isOdd () || step.isLast ())
 				continue;
 
 			graphics.fillRect (
 				xOrigin,
-				yOrigin
-				- plotHeight
-					* (step.getStep () + 1)
-					/ verticalScale.getNumSteps (),
+				toJavaIntegerRequired (
+					yOrigin
+					- plotHeight
+						* (step.getStep () + 1)
+						/ verticalScale.getNumSteps ()),
 				plotWidth,
-				plotHeight
-				/ verticalScale.getNumSteps ());
+				toJavaIntegerRequired (
+					plotHeight
+						/ verticalScale.getNumSteps ()));
 
 		}
 
@@ -218,17 +224,20 @@ class GraphImageResponder
 			xOrigin + plotWidth,
 			yOrigin);
 
-		for (GraphScale.Step step
-				: verticalScale.getSteps ()) {
+		for (
+			GraphScale.Step step
+				: verticalScale.getSteps ()
+		) {
 
 			String string =
 				step.getLabel ();
 
 			int y =
-				+ yOrigin
-				- plotHeight
-					* step.getStep ()
-					/ verticalScale.getNumSteps ();
+				toJavaIntegerRequired (
+					+ yOrigin
+					- plotHeight
+						* step.getStep ()
+						/ verticalScale.getNumSteps ());
 
 			graphics.drawString (
 				string,

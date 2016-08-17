@@ -8,10 +8,9 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -200,9 +199,8 @@ class SmsArenaDlrDispatchAction
 
 		RouteRec route =
 			routeHelper.findRequired (
-				Integer.parseInt (
-					requestContext.requestStringRequired (
-						"routeId")));
+				requestContext.requestIntegerRequired (
+					"routeId"));
 
 		SmsArenaRouteInRec smsArenaRouteIn =
 			smsArenaRouteInHelper.findRequired (
@@ -245,9 +243,8 @@ class SmsArenaDlrDispatchAction
 
 		RouteRec route =
 			routeHelper.findRequired (
-				Integer.parseInt (
-					requestContext.requestStringRequired (
-						"routeId")));
+				requestContext.requestIntegerRequired (
+					"routeId"));
 
 		smsArenaDlrReportLogHelper.insert (
 			smsArenaDlrReportLogHelper.createInstance ()

@@ -1,5 +1,7 @@
 package wbs.platform.php;
 
+import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
+
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,7 @@ class PhpInteger
 	public
 	Integer asInteger () {
 
-		return (int) value;
+		return value;
 
 	}
 
@@ -45,7 +47,8 @@ class PhpInteger
 	public
 	Long asLong () {
 
-		return (long) value;
+		return fromJavaInteger (
+			value);
 
 	}
 
@@ -137,7 +140,7 @@ class PhpInteger
 	public
 	int hashCode () {
 
-		return (int) (value & 0xffffffff);
+		return value;
 
 	}
 

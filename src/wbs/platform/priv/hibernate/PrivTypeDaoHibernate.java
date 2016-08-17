@@ -3,7 +3,6 @@ package wbs.platform.priv.hibernate;
 import java.util.List;
 
 import lombok.NonNull;
-
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.priv.model.PrivTypeDao;
 import wbs.platform.priv.model.PrivTypeRec;
@@ -35,7 +34,7 @@ class PrivTypeDaoHibernate
 
 		return get (
 			PrivTypeRec.class,
-			(int) (long) privTypeId);
+			privTypeId);
 
 	}
 

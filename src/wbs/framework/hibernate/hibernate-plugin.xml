@@ -3,9 +3,11 @@
 	package="wbs.framework.hibernate">
 
 	<layer name="hibernate">
+		<bean class="HibernateComponents"/>
 		<bean class="HibernateDatabase"/>
-		<bean class="HibernateObjectDatabaseHelper"/>
 		<bean class="HibernateInterceptor"/>
+		<bean class="HibernateObjectDatabaseHelper"/>
+		<bean class="HibernateSessionFactoryBuilder"/>
 	</layer>
 
 </plugin>

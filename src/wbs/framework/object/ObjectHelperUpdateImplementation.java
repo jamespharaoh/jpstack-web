@@ -1,8 +1,8 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.Misc.cast;
-import static wbs.framework.utils.etc.Misc.isInstanceOf;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.dynamicCast;
+import static wbs.framework.utils.etc.TypeUtils.isInstanceOf;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -187,9 +187,9 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 			@NonNull RecordTypeAgain objectUncast) {
 
 		@SuppressWarnings ("unchecked")
-		EphemeralRecord<RecordType> object =
-			(EphemeralRecord<RecordType>)
-			cast (
+		EphemeralRecord <RecordType> object =
+			(EphemeralRecord <RecordType>)
+			dynamicCast (
 				model.objectClass (),
 				objectUncast);
 
@@ -273,7 +273,7 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 		@SuppressWarnings ("unchecked")
 		RecordType object =
 			(RecordType)
-			cast (
+			dynamicCast (
 				model.objectClass (),
 				objectUncast);
 

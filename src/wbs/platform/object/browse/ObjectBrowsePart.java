@@ -1,5 +1,8 @@
 package wbs.platform.object.browse;
 
+import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
+import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -8,14 +11,13 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.forms.FormFieldLogic;
@@ -31,10 +33,6 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.record.GlobalId;
 import wbs.framework.record.Record;
-
-import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
-import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectBrowsePart")
@@ -115,9 +113,8 @@ class ObjectBrowsePart
 
 	void prepareCurrentObject () {
 
-		Integer objectId =
-			(Integer)
-			requestContext.stuff (
+		Long objectId =
+			requestContext.stuffInteger (
 				consoleHelper.objectName () + "Id");
 
 		if (objectId != null) {
@@ -138,9 +135,8 @@ class ObjectBrowsePart
 			objectManager.findConsoleHelper (
 				consoleHelper.parentClass ());
 
-		Integer parentId =
-			(Integer)
-			requestContext.stuff (
+		Long parentId =
+			requestContext.stuffInteger (
 				parentHelper.idKey ());
 
 		if (parentId != null) {
@@ -175,15 +171,14 @@ class ObjectBrowsePart
 			objectManager.findConsoleHelper (
 				parentHelper.parentClass ());
 
-		Integer grandParentId =
-			(Integer)
-			requestContext.stuff (
+		Long grandParentId =
+			requestContext.stuffInteger (
 				grandParentHelper.idKey ());
 
 		if (grandParentId != null) {
 
 			GlobalId grandParentGlobalId =
-				new GlobalId (
+				GlobalId.of (
 					grandParentHelper.objectTypeId (),
 					grandParentId);
 

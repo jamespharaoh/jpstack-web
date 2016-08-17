@@ -1,26 +1,24 @@
 package wbs.platform.object.create;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.Misc.toInteger;
 import static wbs.framework.utils.etc.TimeUtils.instantToDateNullSafe;
 
 import java.util.Date;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -421,7 +419,7 @@ class ObjectCreateAction<
 			ParentType parentTemp1 =
 				(ParentType)
 				rootHelper.findRequired (
-					0);
+					0l);
 
 			parent =
 				parentTemp1;
@@ -432,26 +430,41 @@ class ObjectCreateAction<
 
 		// get parent id from context
 
-		Integer parentId =
-			requestContext.stuffInt (
+		Long parentId =
+			requestContext.stuffInteger (
 				parentHelper.idKey ());
 
 		// or from form
 
-		if (parentId == null) {
+		if (
+			isNull (
+				parentId)
+		) {
 
-			parentId =
-				toInteger (
-					requestContext.getForm (
-						stringFormat (
-							"create-%s",
-							consoleHelper.parentFieldName ())));
+			String parentIdString =
+				requestContext.getForm (
+					stringFormat (
+						"create-%s",
+						consoleHelper.parentFieldName ()));
+			if (
+				isNotNull (
+					parentIdString)
+			) {
+
+				parentId =
+					Long.parseLong (
+						parentIdString);
+
+			}
 
 		}
 
 		// error if not found
 
-		if (parentId == null) {
+		if (
+			isNull (
+				parentId)
+		) {
 
 			requestContext.addError (
 				"Must set parent");

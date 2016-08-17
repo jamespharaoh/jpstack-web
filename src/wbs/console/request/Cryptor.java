@@ -3,9 +3,10 @@ package wbs.console.request;
 public
 interface Cryptor {
 
-	String encryptInt (
-			int input);
+	String encryptInteger (
+			Long input);
 
-	int decryptInt (
+	Long decryptInteger (
 			String input);
+
 }

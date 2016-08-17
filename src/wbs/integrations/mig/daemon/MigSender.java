@@ -1,8 +1,8 @@
 package wbs.integrations.mig.daemon;
 
 import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,12 +17,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.integrations.mig.model.MigRouteOutObjectHelper;
@@ -60,7 +59,7 @@ class MigSender
 	 */
 	public static
 	class MIGOutbox {
-		int messageId;
+		Long messageId;
 		OutboxRec outbox;
 		MessageRec message;
 		RouteRec route;
@@ -476,18 +475,18 @@ class MigSender
 
 		String connection = null;
 
-		int networkID =
+		Long networkID =
 			migOutbox.network.getId ();
 
-		if (networkID == 1) {
+		if (networkID == 1l) {
 			connection = "MIG01OU";
-		} else if (networkID == 2) {
+		} else if (networkID == 2l) {
 			connection = "MIG00VU";
-		} else if (networkID == 3 || networkID == 5) {
+		} else if (networkID == 3l || networkID == 5l) {
 			connection = "MIG01TU";
-		} else if (networkID == 4) {
+		} else if (networkID == 4l) {
 			connection = "MIG01XU";
-		} else if (networkID == 6) {
+		} else if (networkID == 6l) {
 			connection = "MIG01HU";
 		}
 
@@ -538,7 +537,7 @@ class MigSender
 
 		stringBuilder.append ("&OADC=" + URLEncoder.encode (numFrom, encoding));
 		stringBuilder.append ("&OADCTYPE=" + Long.toString (migOutbox.migRouteOut.getOadctype ()));
-		stringBuilder.append ("&MESSAGEID=" + Integer.toString (migOutbox.messageId));
+		stringBuilder.append ("&MESSAGEID=" + Long.toString (migOutbox.messageId));
 		stringBuilder.append ("&TIMETOLIVE=" + (migOutbox.route.getExpirySecs () / 60));
 		stringBuilder.append ("&NUMBERS=" + URLEncoder.encode ((connection == null ? "" : (connection + ".")) + numTo, encoding));
 		stringBuilder.append ("&PRIORITY=" + "N");

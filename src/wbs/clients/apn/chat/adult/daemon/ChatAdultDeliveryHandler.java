@@ -8,11 +8,11 @@ import java.util.Collections;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.Cleanup;
+import lombok.NonNull;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -61,8 +61,8 @@ class ChatAdultDeliveryHandler
 	@Override
 	public
 	void handle (
-			int deliveryId,
-			Long ref) {
+			@NonNull Long deliveryId,
+			@NonNull Long ref) {
 
 		@Cleanup
 		Transaction transaction =
@@ -172,13 +172,10 @@ class ChatAdultDeliveryHandler
 			ChatJoiner.convertJoinType (
 				chatUser.getNextJoinType ());
 
-		int chatId =
-			chatUser.getChat ().getId ();
-
 		joinerProvider.get ()
 
 			.chatId (
-				chatId)
+				chatUser.getChat ().getId ())
 
 			.joinType (
 				joinType)

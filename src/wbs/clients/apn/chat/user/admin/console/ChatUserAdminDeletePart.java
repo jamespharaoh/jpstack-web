@@ -39,7 +39,7 @@ class ChatUserAdminDeletePart
 
 		chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		if (

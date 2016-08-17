@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,16 +14,14 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.record.GlobalId;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -106,7 +105,7 @@ class ForwarderLogicImplementation
 		ForwarderRec forwarder;
 
 		public
-		Integer fmInId;
+		Long fmInId;
 
 		public
 		ForwarderMessageInRec fmIn;
@@ -155,7 +154,7 @@ class ForwarderLogicImplementation
 		ServiceRec service;
 
 		public
-		Integer networkId;
+		Long networkId;
 
 		public
 		NetworkRec network;
@@ -993,7 +992,6 @@ class ForwarderLogicImplementation
 					"forwarder")
 
 				.ref (
-					(long) (int)
 					forwarderMessageOut.getId ())
 
 				.subjectString (
@@ -1029,7 +1027,6 @@ class ForwarderLogicImplementation
 					deliveryTypeHelper.findByCodeRequired (
 						GlobalId.root,
 						"forwarder"),
-					(long) (int)
 					forwarderMessageOut.getId (),
 					sendNow,
 					tags,

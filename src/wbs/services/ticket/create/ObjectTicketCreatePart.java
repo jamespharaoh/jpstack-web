@@ -4,13 +4,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
@@ -92,7 +91,7 @@ class ObjectTicketCreatePart<
 
 		Record<?> contextObject =
 			consoleHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					consoleHelper.idKey ()));
 
 		ticketManager =
@@ -172,13 +171,12 @@ class ObjectTicketCreatePart<
 
 				// TODO check type
 
-				Integer objectId =
+				Long objectId =
 					objectValue.getId ();
 
 				ticketFieldValue
 
 					.setIntegerValue (
-						(long)
 						objectId);
 
 				break;

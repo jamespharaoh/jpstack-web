@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.graphs.console;
 
 import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
@@ -121,7 +122,9 @@ class MonthlyHistoGraphImageResponder
 	void prepareImageShadingVertical () {
 
 		int space =
-			(int) (plotWidth / 31 / 10);
+			plotWidth
+				/ 31
+				/ 10;
 
 		// draw dates
 
@@ -219,7 +222,9 @@ class MonthlyHistoGraphImageResponder
 
 		return
 			+ xOrigin
-			+ (int) (plotWidth * index / values.size ());
+			+ plotWidth
+				* index
+				/ values.size ();
 
 	}
 
@@ -228,7 +233,9 @@ class MonthlyHistoGraphImageResponder
 	void prepareImageData () {
 
 		int space =
-			(int) (plotWidth / 31 / 10);
+			plotWidth
+				/ 31
+				/ 10;
 
 		graphics.setColor (
 			new Color (0.0F, 0.0F, 0.7F, 0.7F));
@@ -246,12 +253,13 @@ class MonthlyHistoGraphImageResponder
 				+ xBound (i + 1)
 				- space + 1;
 
-			int height = 1
-				* plotHeight
-				* value
-				* verticalScale.getMultiplier ()
-				/ verticalScale.getStepSize ()
-				/ verticalScale.getNumSteps ();
+			int height =
+				toJavaIntegerRequired (1
+					* plotHeight
+					* value
+					* verticalScale.getMultiplier ()
+					/ verticalScale.getStepSize ()
+					/ verticalScale.getNumSteps ());
 
 			Rectangle2D rect =
 				new Rectangle2D.Float (

@@ -7,8 +7,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.NonNull;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -19,15 +17,13 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 import org.joda.time.Interval;
 
-import com.google.common.collect.ImmutableList;
-
+import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.queue.model.QueueItemDao;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemSearch;
 import wbs.platform.queue.model.QueueItemState;
 import wbs.platform.queue.model.QueueRec;
-import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.queue.model.UserQueueReport;
 import wbs.platform.user.model.UserRec;
 
@@ -145,7 +141,7 @@ class QueueItemDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			@NonNull QueueItemSearch search) {
 
 		Criteria criteria =
@@ -161,7 +157,7 @@ class QueueItemDaoHibernate
 
 		return findMany (
 			"searchIds (search)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}
@@ -375,7 +371,7 @@ class QueueItemDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchUserQueueReportIds (
+	List <Long> searchUserQueueReportIds (
 			@NonNull QueueItemSearch search) {
 
 		Criteria criteria =
@@ -421,7 +417,7 @@ class QueueItemDaoHibernate
 	public
 	List<UserQueueReport> searchUserQueueReports (
 			@NonNull QueueItemSearch search,
-			@NonNull List<Integer> objectIds) {
+			@NonNull List<Long> objectIds) {
 
 		Criteria criteria =
 			searchUserQueueReportCriteria (

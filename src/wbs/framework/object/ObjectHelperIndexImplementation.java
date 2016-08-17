@@ -88,7 +88,7 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 
 				.getId (
 					record ->
-						(long) record.getId ())
+						record.getId ())
 
 				.build ();
 
@@ -129,7 +129,7 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 
 				.getId (
 					record ->
-						(long) record.getId ())
+						record.getId ())
 
 				.build ();
 
@@ -146,19 +146,19 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	Optional<RecordType> findByIndex (
-			@NonNull Record<?> parent,
+			@NonNull Record <?> parent,
 			@NonNull Long index) {
 
 		if (model.canGetParent ()) {
 
 			return parentIdAndIndexCache.get (
 				Pair.of (
-					(long) parent.getId (),
+					parent.getId (),
 					index));
 
 		} else {
 
-			ObjectHelper<?> parentHelper =
+			ObjectHelper <?> parentHelper =
 				objectManager.objectHelperForClassRequired (
 					parent.getClass ());
 
@@ -166,7 +166,7 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 				Pair.of (
 					GlobalId.of (
 						parentHelper.objectTypeId (),
-						(long) parent.getId ()),
+						parent.getId ()),
 					index));
 
 		}
@@ -176,10 +176,10 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	RecordType findByIndexRequired (
-			@NonNull Record<?> parent,
+			@NonNull Record <?> parent,
 			@NonNull Long index) {
 
-		Optional<RecordType> recordOptional =
+		Optional <RecordType> recordOptional =
 			findByIndex (
 				parent,
 				index);
@@ -205,7 +205,7 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	RecordType findByIndexOrNull (
-			@NonNull Record<?> parent,
+			@NonNull Record <?> parent,
 			@NonNull Long index) {
 
 		return optionalOrNull (
@@ -217,7 +217,7 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	List<RecordType> findByIndexRange (
+	List <RecordType> findByIndexRange (
 			@NonNull GlobalId parentGlobalId,
 			@NonNull Long indexStart,
 			@NonNull Long indexEnd) {
@@ -231,12 +231,12 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	List<RecordType> findByIndexRange (
-			@NonNull Record<?> parent,
+	List <RecordType> findByIndexRange (
+			@NonNull Record <?> parent,
 			@NonNull Long indexStart,
 			@NonNull Long indexEnd) {
 
-		ObjectHelper<?> parentHelper =
+		ObjectHelper <?> parentHelper =
 			objectManager.objectHelperForObject (
 				parent);
 

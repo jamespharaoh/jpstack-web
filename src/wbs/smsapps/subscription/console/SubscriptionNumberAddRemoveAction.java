@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.moreThanZero;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -12,10 +13,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import lombok.Cleanup;
-
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -24,7 +24,6 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.number.core.model.NumberObjectHelper;
@@ -102,7 +101,7 @@ class SubscriptionNumberAddRemoveAction
 
 		SubscriptionRec subscription =
 			subscriptionHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"subscriptionId"));
 
 		// process form
@@ -208,7 +207,6 @@ class SubscriptionNumberAddRemoveAction
 						subscriptionNumber)
 
 					.setIndex (
-						(int) (long)
 						subscriptionNumber.getNumSubs ())
 
 					.setSubscriptionList (

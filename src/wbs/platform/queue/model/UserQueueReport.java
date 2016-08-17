@@ -1,10 +1,9 @@
 package wbs.platform.queue.model;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import org.joda.time.Instant;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
 import wbs.framework.record.IdObject;
 import wbs.platform.user.model.UserRec;
 
@@ -25,7 +24,7 @@ class UserQueueReport
 
 	@Override
 	public
-	Integer getId () {
+	Long getId () {
 		return user.getId ();
 	}
 

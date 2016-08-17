@@ -12,7 +12,6 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHelper;
@@ -58,12 +57,16 @@ class AffiliateHooks
 
 			.collect (
 				Collectors.groupingBy (
-					affiliateType -> (long)
-						affiliateType.getParentType ().getId (),
-					Collectors.mapping (
-						affiliateType -> (long)
-							affiliateType.getId (),
-						Collectors.toList ())));
+
+				affiliateType ->
+					affiliateType.getParentType ().getId (),
+
+				Collectors.mapping (
+					affiliateType ->
+						affiliateType.getId (),
+					Collectors.toList ()))
+
+			);
 
 	}
 
@@ -79,7 +82,7 @@ class AffiliateHooks
 		if (
 			doesNotContain (
 				affiliateTypeIdsByParentTypeId.keySet (),
-				(long) parentHelper.objectTypeId ())
+				parentHelper.objectTypeId ())
 		) {
 			return;
 		}
@@ -91,7 +94,7 @@ class AffiliateHooks
 		for (
 			Long affiliateTypeId
 				: affiliateTypeIdsByParentTypeId.get (
-					(long) parentHelper.objectTypeId ())
+					parentHelper.objectTypeId ())
 		) {
 
 			AffiliateTypeRec affiliateType =

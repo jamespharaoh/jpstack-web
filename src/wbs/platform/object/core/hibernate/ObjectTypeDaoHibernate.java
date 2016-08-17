@@ -24,22 +24,12 @@ class ObjectTypeDaoHibernate
 	@Override
 	public
 	ObjectTypeRec findById (
-			int id) {
+			@NonNull Long id) {
 
 		return get (
 			ObjectTypeRec.class,
 			id);
 
-	}
-
-	@Override
-	public 
-	ObjectTypeRec findById (
-			@NonNull Long id) {
-	
-		return findById (
-			(int) (long) id);
-	
 	}
 
 	@Override

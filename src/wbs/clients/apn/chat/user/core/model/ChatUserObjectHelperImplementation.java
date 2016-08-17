@@ -7,7 +7,6 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.logic.ChatNumberReportLogic;
@@ -191,9 +190,6 @@ class ChatUserObjectHelperImplementation
 				number.getFree ()
 					? ChatUserCreditMode.free
 					: ChatUserCreditMode.strict);
-
-		chatUserLogic.monitorCap (
-			chatUser);
 
 		// set adult verify on some services
 		// TODO this should probably not be here

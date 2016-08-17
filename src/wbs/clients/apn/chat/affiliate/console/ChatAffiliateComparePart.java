@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.affiliate.console;
 
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,7 +63,7 @@ class ChatAffiliateComparePart
 				"timePeriod",
 				"7 days");
 
-		Integer timePeriodSeconds =
+		Long timePeriodSeconds =
 			intervalFormatter.parseIntervalStringSecondsRequired (
 				timePeriodString);
 
@@ -78,7 +80,7 @@ class ChatAffiliateComparePart
 
 		ChatRec chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		// work out first join time
@@ -88,21 +90,23 @@ class ChatAffiliateComparePart
 				chat.getTimezone ());
 
 		Instant firstJoinAfter =
-			DateTime
-				.now (
-					timeZone)
-				.minusSeconds (
-					timePeriodSeconds)
-				.toInstant ();
+			DateTime.now (
+				timeZone)
+
+			.minusSeconds (
+				toJavaIntegerRequired (
+					timePeriodSeconds))
+
+			.toInstant ();
 
 		// get all relevant users
 
-		List<Integer> newUserIds =
+		List <Long> newUserIds =
 			chatUserHelper.searchIds (
 				new ChatUserSearch ()
 
 			.chatId (
-				(long) chat.getId ())
+				chat.getId ())
 
 			.firstJoin (
 				TextualInterval.after (
@@ -113,11 +117,11 @@ class ChatAffiliateComparePart
 
 		// count them grouping by affiliate
 
-		Map<Integer,ChatAffiliateWithNewUserCount> map =
-			new HashMap<Integer,ChatAffiliateWithNewUserCount> ();
+		Map <Long, ChatAffiliateWithNewUserCount> map =
+			new HashMap<> ();
 
 		for (
-			Integer chatUserId
+			Long chatUserId
 				: newUserIds
 		) {
 
@@ -125,12 +129,14 @@ class ChatAffiliateComparePart
 				chatUserHelper.findRequired (
 					chatUserId);
 
-			Integer chatAffiliateId =
-				chatUser.getChatAffiliate () != null ?
-					chatUser.getChatAffiliate ().getId () : null;
+			Long chatAffiliateId =
+				chatUser.getChatAffiliate () != null
+					? chatUser.getChatAffiliate ().getId ()
+					: null;
 
 			ChatAffiliateWithNewUserCount chatAffiliateWithNewUserCount =
-				map.get (chatAffiliateId);
+				map.get (
+					chatAffiliateId);
 
 			if (chatAffiliateWithNewUserCount == null) {
 
@@ -138,7 +144,11 @@ class ChatAffiliateComparePart
 					chatAffiliateId,
 					chatAffiliateWithNewUserCount =
 						new ChatAffiliateWithNewUserCount ()
-							.chatAffiliate (chatUser.getChatAffiliate ()));
+
+							.chatAffiliate (
+								chatUser.getChatAffiliate ())
+
+				);
 
 			}
 

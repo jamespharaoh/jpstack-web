@@ -25,7 +25,6 @@
 		<bean class="meta.IdentityStringFieldSpec"/>
 		<bean class="meta.IndexFieldSpec"/>
 		<bean class="meta.IntegerFieldSpec"/>
-		<bean class="meta.LargeIntegerFieldSpec"/>
 		<bean class="meta.MasterFieldSpec"/>
 		<bean class="meta.ModelCollectionsSpec"/>
 		<bean class="meta.ModelFieldsSpec"/>
@@ -69,8 +68,8 @@
 		<bean class="generate.IdentityStringFieldWriter"/>
 		<bean class="generate.IndexFieldWriter"/>
 		<bean class="generate.IntegerFieldWriter"/>
-		<bean class="generate.LargeIntegerFieldWriter"/>
 		<bean class="generate.MasterFieldWriter"/>
+		<bean class="generate.ModelGenerateComponents"/>
 		<bean class="generate.ModelInterfacesGenerator"/>
 		<bean class="generate.ModelRecordGenerator"/>
 		<bean class="generate.ModelWriterManager"/>
@@ -110,7 +109,6 @@
 		<bean class="build.IdentityStringModelFieldBuilder"/>
 		<bean class="build.IndexModelFieldBuilder"/>
 		<bean class="build.IntegerModelFieldBuilder"/>
-		<bean class="build.LargeIntegerModelFieldBuilder"/>
 		<bean class="build.MasterModelFieldBuilder"/>
 		<bean class="build.ModelBuilderManager"/>
 		<bean class="build.NameModelFieldBuilder"/>

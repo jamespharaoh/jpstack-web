@@ -1,14 +1,16 @@
 package wbs.clients.apn.chat.user.join.daemon;
 
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+
 import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import lombok.Cleanup;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageStatus;
@@ -39,9 +41,10 @@ class ChatJoinTimeoutDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
+	Duration getSleepDuration () {
 
-		return 60 * 1000;
+		return Duration.standardSeconds (
+			60);
 
 	}
 
@@ -90,8 +93,8 @@ class ChatJoinTimeoutDaemon
 				DateTime.now ()
 
 				.minusSeconds (
-					(int) (long)
-					chat.getTimeSignupTimeout ())
+					toJavaIntegerRequired (
+						chat.getTimeSignupTimeout ()))
 
 				.toInstant ();
 

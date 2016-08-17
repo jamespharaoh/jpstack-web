@@ -11,10 +11,9 @@ import java.util.TreeMap;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import org.joda.time.Instant;
 
+import lombok.NonNull;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
@@ -59,7 +58,8 @@ class ChatMessageUserStatsProvider
 
 			ChatRec chat =
 				chatHelper.findRequired (
-					(Integer) conditions.get (
+					(Long)
+					conditions.get (
 						"chatId"));
 
 			chats.add (
@@ -112,17 +112,17 @@ class ChatMessageUserStatsProvider
 
 		// setup data structures
 
-		Map<Integer,int[]> countPerUser =
-			new TreeMap<Integer,int[]> ();
+		Map<Long,long[]> countPerUser =
+			new TreeMap<> ();
 
-		Map<Integer,int[]> charsPerUser =
-			new TreeMap<Integer,int[]> ();
+		Map<Long,long[]> charsPerUser =
+			new TreeMap<> ();
 
-		Map<Integer,int[]> finalCountPerUser =
-			new TreeMap<Integer,int[]> ();
+		Map<Long,long[]> finalCountPerUser =
+			new TreeMap<> ();
 
 		Set<Object> userIds =
-			new HashSet<Object> ();
+			new HashSet<> ();
 
 		// retrieve messages
 
@@ -164,32 +164,37 @@ class ChatMessageUserStatsProvider
 
 					countPerUser.put (
 						chatMessage.getSender ().getId (),
-						new int [period.size ()]);
+						new long [
+							period.size ()]);
 
 					charsPerUser.put (
 						chatMessage.getSender ().getId (),
-						new int [period.size ()]);
+						new long [
+							period.size ()]);
 
 					finalCountPerUser.put (
 						chatMessage.getSender ().getId (),
-						new int [period.size ()]);
+						new long [
+							period.size ()]);
 
 				}
 
-				int[] userCounts =
+				long[] userCounts =
 					countPerUser.get (
 						chatMessage.getSender ().getId ());
 
 				userCounts [hour] ++;
 
-				int[] userChars =
+				long[] userChars =
 					charsPerUser.get (
 						chatMessage.getSender ().getId ());
 
-				int length =
+				long length =
 					chatMessage.getOriginalText ().getText ().length ();
 
-				userChars [hour] += length;
+				userChars [
+					hour] +=
+						length;
 
 				ChatContactRec chatContact =
 					chatMessage.getChatContact ();
@@ -229,7 +234,7 @@ class ChatMessageUserStatsProvider
 
 				) {
 
-					int[] finalCounts =
+					long[] finalCounts =
 						finalCountPerUser.get (
 							chatMessage.getSender ().getId ());
 

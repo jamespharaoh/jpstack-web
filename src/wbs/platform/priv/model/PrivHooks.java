@@ -12,7 +12,6 @@ import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHelper;
@@ -64,12 +63,16 @@ class PrivHooks
 
 			.collect (
 				Collectors.groupingBy (
-					privType -> (long)
-						privType.getParentObjectType ().getId (),
-					Collectors.mapping (
-						privType -> (long)
-							privType.getId (),
-						Collectors.toList ())));
+
+				privType ->
+					privType.getParentObjectType ().getId (),
+
+				Collectors.mapping (
+					privType ->
+						privType.getId (),
+					Collectors.toList ()))
+
+			);
 
 	}
 
@@ -85,7 +88,7 @@ class PrivHooks
 		if (
 			doesNotContain (
 				privTypeIdsByParentTypeId.keySet (),
-				(long) parentHelper.objectTypeId ())
+				parentHelper.objectTypeId ())
 		) {
 			return;
 		}
@@ -97,7 +100,7 @@ class PrivHooks
 		for (
 			Long privTypeId
 				: privTypeIdsByParentTypeId.get (
-					(long) parentHelper.objectTypeId ())
+					parentHelper.objectTypeId ())
 		) {
 
 			PrivTypeRec privType =

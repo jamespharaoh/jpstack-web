@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
 import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
@@ -18,21 +17,21 @@ public
 class ManualResponderRequestSearch
 	implements Serializable {
 
-	Integer manualResponderId;
-	Integer manualResponderSliceId;
+	Long manualResponderId;
+	Long manualResponderSliceId;
 
 	String numberLike;
 
 	TextualInterval createdTime;
 	TextualInterval processedTime;
 
-	Integer processedByUserId;
-	Integer processedByUserSliceId;
+	Long processedByUserId;
+	Long processedByUserSliceId;
 
 	boolean filter;
 
-	Collection<Integer> filterManualResponderIds;
-	Collection<Integer> filterProcessedByUserIds;
+	Collection<Long> filterManualResponderIds;
+	Collection<Long> filterProcessedByUserIds;
 
 	Order order =
 		Order.timestampDesc;

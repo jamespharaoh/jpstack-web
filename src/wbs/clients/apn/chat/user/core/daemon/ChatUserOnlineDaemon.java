@@ -13,12 +13,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -63,9 +63,10 @@ class ChatUserOnlineDaemon
 
 	@Override
 	protected
-	int getDelayMs () {
+	Duration getSleepDuration () {
 
-		return 30 * 1000;
+		return Duration.standardSeconds (
+			30);
 
 	}
 
@@ -113,8 +114,10 @@ class ChatUserOnlineDaemon
 
 		transaction.close ();
 
-		for (ChatUserRec chatUser
-				: onlineUsers) {
+		for (
+			ChatUserRec chatUser
+				: onlineUsers
+		) {
 
 			doUser (
 				chatUser.getId ());
@@ -124,7 +127,7 @@ class ChatUserOnlineDaemon
 	}
 
 	void doUser (
-			int chatUserId) {
+			@NonNull Long chatUserId) {
 
 		@Cleanup
 		Transaction transaction =

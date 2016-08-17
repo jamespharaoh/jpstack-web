@@ -1,5 +1,7 @@
 package wbs.platform.php;
 
+import static wbs.framework.utils.etc.NumberUtils.roundToIntegerRequired;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.stringToBytes;
 
 import java.util.ArrayList;
@@ -11,7 +13,8 @@ import com.google.common.collect.ImmutableMap;
 class PhpDouble
 	extends AbstractPhpEntity {
 
-	private double value;
+	private 
+	double value;
 
 	public
 	PhpDouble (
@@ -37,7 +40,9 @@ class PhpDouble
 	public
 	Integer asInteger () {
 
-		return (int) value;
+		return toJavaIntegerRequired (
+			roundToIntegerRequired (
+				value));
 
 	}
 
@@ -45,7 +50,8 @@ class PhpDouble
 	public
 	Long asLong () {
 
-		return (long) value;
+		return roundToIntegerRequired (
+			value);
 
 	}
 

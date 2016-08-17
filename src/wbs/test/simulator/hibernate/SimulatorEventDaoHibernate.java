@@ -1,10 +1,13 @@
 package wbs.test.simulator.hibernate;
 
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+
 import java.util.List;
 
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.test.simulator.model.SimulatorEventDao;
 import wbs.test.simulator.model.SimulatorEventRec;
@@ -16,9 +19,9 @@ class SimulatorEventDaoHibernate
 
 	@Override
 	public
-	List<SimulatorEventRec> findAfterLimit (
-			int afterId,
-			int maxResults) {
+	List <SimulatorEventRec> findAfterLimit (
+			@NonNull Long afterId,
+			@NonNull Long maxResults) {
 
 		return findMany (
 			"findAfterLimit (afterId, maxResults)",
@@ -38,7 +41,8 @@ class SimulatorEventDaoHibernate
 					"_simulatorEvent.id"))
 
 			.setMaxResults (
-				maxResults)
+				toJavaIntegerRequired (
+					maxResults))
 
 		);
 

@@ -1,39 +1,43 @@
 package wbs.platform.graph.console;
 
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.LongStream;
 
 public
 class GraphScale {
 
 	/** Size of each step, divided by multiplier */
 	private final
-	int stepSize;
+	long stepSize;
 
 	/** Number of steps */
 	private final
-	int numSteps;
+	long numSteps;
 
 	/** Number of places to shift scale */
 	private final
-	int places;
+	long places;
 
 	/** Multiplier, equal to 10 ^ places */
 	private final
-	int multiplier;
+	long multiplier;
 
 	/** List of Steps as iteratable */
 	private final
-	List<Step> steps;
+	List <Step> steps;
 
 	/** Private constructor */
 	private
 	GraphScale (
-			int newStepSize,
-			int newNumSteps,
-			int newPlaces,
-			int newMultiplier) {
+			long newStepSize,
+			long newNumSteps,
+			long newPlaces,
+			long newMultiplier) {
 
 		stepSize = newStepSize;
 		numSteps = newNumSteps;
@@ -41,7 +45,9 @@ class GraphScale {
 		multiplier = newMultiplier;
 
 		Step[] stepsSource =
-			new Step [numSteps + 1];
+			new Step [
+				toJavaIntegerRequired (
+					numSteps + 1)];
 
 		for (
 			int step = 0;
@@ -62,34 +68,34 @@ class GraphScale {
 	}
 
 	public
-	int getStepSize () {
+	long getStepSize () {
 		return stepSize;
 	}
 
 	public
-	int getNumSteps () {
+	long getNumSteps () {
 		return numSteps;
 	}
 
 	public
-	int getPlaces () {
+	long getPlaces () {
 		return places;
 	}
 
 	public
-	int getMultiplier () {
+	long getMultiplier () {
 		return multiplier;
 	}
 
 	public
-	List<Step> getSteps () {
+	List <Step> getSteps () {
 		return steps;
 	}
 
 	private static
-	int iPow (
-			int input,
-			int power) {
+	long iPow (
+			long input,
+			long power) {
 
 		if (power < 0) {
 
@@ -101,7 +107,7 @@ class GraphScale {
 		if (power == 0)
 			return 1;
 
-		int value = input;
+		long value = input;
 
 		for (power--; power > 0; power--)
 			value *= input;
@@ -116,8 +122,8 @@ class GraphScale {
 	 */
 	public static
 	GraphScale setScale (
-			int inputMax,
-			int inputPlaces) {
+			long inputMax,
+			long inputPlaces) {
 
 		// if there is no maximum, just use a default scale
 
@@ -134,10 +140,12 @@ class GraphScale {
 		// adjust to our working scale with a max between 10 and 100. realMax =
 		// workingMax * workingMultiplier /
 		// workingDivider.
-		int max = inputMax;
-		int multiplier = iPow(10, inputPlaces);
-		int places = inputPlaces;
-		int divider = 1;
+
+		long max = inputMax;
+		long multiplier = iPow(10, inputPlaces);
+		long places = inputPlaces;
+		long divider = 1;
+
 		while (max <= 100) {
 			max *= 10;
 			multiplier *= 10;
@@ -213,7 +221,8 @@ class GraphScale {
 
 			label =
 				shiftString (
-					Integer.toString (stepSize * step),
+					Long.toString (
+						stepSize * step),
 					places);
 
 			odd =
@@ -257,20 +266,55 @@ class GraphScale {
 	 * Given a positive integer string, and a number of places, will shift the
 	 * number to the right. Eg ("20", 2) would give "0.2".
 	 */
-	private static String shiftString(String s, int places) {
+	private static
+	String shiftString (
+			String source,
+			long places) {
 
-		if (s.length() <= places) {
-			StringBuffer sb = new StringBuffer();
-			sb.append("0.");
-			int numZeros = places - s.length();
-			for (int i = 0; i < numZeros; i++)
-				sb.append('0');
-			sb.append(s);
-			return sb.toString().replaceAll("\\.?0*$", "");
+		if (source.length () <= places) {
+
+			StringBuilder stringBuilder =
+				new StringBuilder ();
+
+			stringBuilder.append (
+				"0.");
+
+			long numZeros =
+				places - source.length ();
+
+			LongStream.range (0l, numZeros).forEach (
+				index ->
+					stringBuilder.append (
+						'0'));
+
+			stringBuilder.append (
+				source);
+
+			String target =
+				stringBuilder.toString ();
+
+			return target.replaceAll (
+				"\\.?0*$",
+				"");
+
+		} else {
+
+			String target =
+				joinWithFullStop (
+					source.substring (
+						0,
+						toJavaIntegerRequired (
+							source.length () - places)),
+					source.substring (
+						toJavaIntegerRequired (
+							source.length () - places)));
+
+			return target.replaceAll (
+				"\\.?0*$",
+				"");
+
 		}
 
-		String t = s.substring(0, s.length() - places) + "."
-				+ s.substring(s.length() - places);
-		return t.replaceAll("\\.?0*$", "");
 	}
+
 }

@@ -53,12 +53,12 @@ interface RequestContext {
 			String key,
 			String defaultValue);
 
-	long parameterInteger (
+	Long parameterInteger (
 			String key);
 
-	Map<String,List<String>> parameterMap ();
+	Map <String, List <String>> parameterMap ();
 
-	Map<String,String> parameterMapSimple ();
+	Map <String, String> parameterMapSimple ();
 
 	boolean parameterOn (
 			String key);
@@ -169,22 +169,22 @@ interface RequestContext {
 			String key,
 			Object value);
 
-	Optional<Object> request (
+	Optional <Object> request (
 			String key);
 
 	Object requestRequired (
 			String key);
 
-	Optional<String> requestString (
+	Optional <String> requestString (
 			String key);
 
 	String requestStringRequired (
 			String key);
 
-	Optional<Integer> requestInt (
+	Optional <Long> requestInteger (
 			String key);
 
-	Integer requestIntRequired (
+	Long requestIntegerRequired (
 			String key);
 
 	// request body

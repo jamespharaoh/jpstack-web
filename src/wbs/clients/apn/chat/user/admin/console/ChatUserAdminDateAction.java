@@ -6,7 +6,6 @@ import static wbs.framework.utils.etc.Misc.toLong;
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-
 import wbs.clients.apn.chat.date.logic.ChatDateLogic;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
@@ -138,7 +137,7 @@ class ChatUserAdminDateAction
 
 		ChatUserRec chatUser =
 			chatUserHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatUserId"));
 
 		chatDateLogic.userDateStuff (

@@ -32,7 +32,7 @@ class BroadcastSendPart
 
 		broadcast =
 			broadcastHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"broadcastId"));
 
 	}

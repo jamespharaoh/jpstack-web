@@ -29,7 +29,7 @@ class SubscriptionNumberOverviewPart
 
 		subscription =
 			subscriptionHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"subscriptionId"));
 
 	}

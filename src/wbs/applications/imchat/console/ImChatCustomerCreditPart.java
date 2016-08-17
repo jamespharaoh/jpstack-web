@@ -87,7 +87,7 @@ class ImChatCustomerCreditPart
 
 		request.customer (
 			imChatCustomerHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"imChatCustomerId")));
 
 		updateResultSet =

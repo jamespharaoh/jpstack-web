@@ -95,7 +95,7 @@ class ChildrenCollectionWriter {
 				context.recordClassName ())
 
 			.typeNameFormat (
-				"Set<%s>",
+				"Set <%s>",
 				fullFieldTypeName)
 
 			.propertyNameFormat (
@@ -103,7 +103,7 @@ class ChildrenCollectionWriter {
 				fieldName)
 
 			.defaultValueFormat (
-				"new LinkedHashSet<%s> ()",
+				"new LinkedHashSet <%s> ()",
 				fullFieldTypeName)
 
 			.write (

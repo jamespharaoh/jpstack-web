@@ -484,7 +484,6 @@ class TicketFixtureProvider
 				ticket)
 
 			.setIndex (
-				(int) (long)
 				ticket.getNumNotes ())
 
 			.setNoteText (
@@ -503,7 +502,6 @@ class TicketFixtureProvider
 				ticket)
 
 			.setIndex (
-				(int) (long)
 				ticket.getNumNotes ())
 
 			.setNoteText (

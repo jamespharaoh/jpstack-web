@@ -85,7 +85,7 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 	List<RecordType> search (
 			@NonNull Object search) {
 
-		List<Integer> objectIds =
+		List<Long> objectIds =
 			searchIds (
 				search);
 
@@ -93,7 +93,7 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 			ImmutableList.builder ();
 
 		for (
-			Integer objectId
+			Long objectId
 				: objectIds
 		) {
 
@@ -110,7 +110,7 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	List<Integer> searchIds (
+	List<Long> searchIds (
 			@NonNull Object search) {
 
 		Class<?> searchClass;
@@ -137,8 +137,8 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 		try {
 
 			@SuppressWarnings ("unchecked")
-			List<Integer> objectIds =
-				(List<Integer>)
+			List<Long> objectIds =
+				(List<Long>)
 				searchIdsMethod.invoke (
 					model.daoImplementation (),
 					search);

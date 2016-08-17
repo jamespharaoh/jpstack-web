@@ -16,9 +16,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.joda.time.Instant;
@@ -26,6 +23,8 @@ import org.joda.time.Instant;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 import wbs.api.mvc.ApiFile;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
@@ -47,7 +46,6 @@ import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.logic.SmsInboxMultipartLogic;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
-import wbs.sms.message.report.model.MessageReportCodeObjectHelper;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
@@ -69,9 +67,6 @@ class DialogueApiServletModule
 
 	@Inject
 	SmsInboxMultipartLogic inboxMultipartLogic;
-
-	@Inject
-	MessageReportCodeObjectHelper messageReportCodeHelper;
 
 	@Inject
 	NetworkObjectHelper networkHelper;
@@ -100,14 +95,15 @@ class DialogueApiServletModule
 
 	// TODO this belongs in the database
 
-	private final static Map<String,Integer> networks =
-		ImmutableMap.<String,Integer>builder ()
-			.put ("Orange", 1)
-			.put ("Vodafone", 2)
-			.put ("One2One", 3)
-			.put ("Cellnet", 4)
-			.put ("Virgin", 5)
-			.put ("ThreeUK", 6)
+	private final static
+	Map<String,Long> networks =
+		ImmutableMap.<String,Long>builder ()
+			.put ("Orange", 1l)
+			.put ("Vodafone", 2l)
+			.put ("One2One", 3l)
+			.put ("Cellnet", 4l)
+			.put ("Virgin", 5l)
+			.put ("ThreeUK", 6l)
 			.build ();
 
 	// ============================================================ files
@@ -132,8 +128,8 @@ class DialogueApiServletModule
 
 			// get request stuff
 
-			int routeId =
-				requestContext.requestIntRequired (
+			Long routeId =
+				requestContext.requestIntegerRequired (
 					"route_id");
 
 			// get params in local variables
@@ -161,8 +157,9 @@ class DialogueApiServletModule
 
 			// decode the network
 
-			Integer networkId =
-				networks.get (networkParam);
+			Long networkId =
+				networks.get (
+					networkParam);
 
 			// determine the character set from the data coding scheme
 
@@ -405,23 +402,9 @@ class DialogueApiServletModule
 
 			}
 
-			final int messageId;
-
-//			try {
-
-				messageId =
-					Integer.parseInt (userKeyParam);
-
-//			} catch (NumberFormatException e) {
-
-//				logger.warn (sf (
-//					"Ignoring dialogue report with invalid user key, " +
-//						"X-E3-ID=%s",
-//					idParam));
-
-//				return dialogueResponder;
-
-//			}
+			Long messageId =
+				Long.parseLong (
+					userKeyParam);
 
 			// work out the delivery report's meaning
 

@@ -1,21 +1,18 @@
 package wbs.framework.utils;
 
 import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 import static wbs.framework.utils.etc.StringUtils.lowercase;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringSplitRegexp;
 import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import lombok.NonNull;
-import lombok.Value;
-import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.joda.time.DateTime;
@@ -31,6 +28,10 @@ import org.joda.time.format.DateTimeFormatter;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+
+import lombok.NonNull;
+import lombok.Value;
+import lombok.experimental.Accessors;
 
 @Accessors (fluent = true)
 @Value
@@ -113,7 +114,7 @@ class TextualInterval {
 	Optional<Pair<Interval,String>> parsePartialSymbolic (
 			@NonNull DateTimeZone timezone,
 			@NonNull String string,
-			@NonNull Integer hourOffset) {
+			@NonNull Long hourOffset) {
 
 		DateTime now =
 			DateTime.now (
@@ -140,10 +141,16 @@ class TextualInterval {
 				Pair.of (
 					new Interval (
 						today.toDateTime (
-							new LocalTime (hourOffset, 0),
+							new LocalTime (
+								toJavaIntegerRequired (
+									hourOffset),
+								0),
 							timezone),
 						tomorrow.toDateTime (
-							new LocalTime (hourOffset, 0),
+							new LocalTime (
+								toJavaIntegerRequired (
+									hourOffset),
+								0),
 							timezone)),
 					today.toString (
 						dateFormat)));
@@ -157,10 +164,16 @@ class TextualInterval {
 				Pair.of (
 					new Interval (
 						yesterday.toDateTime (
-							new LocalTime (hourOffset, 0),
+							new LocalTime (
+								toJavaIntegerRequired (
+									hourOffset),
+								0),
 							timezone),
 						today.toDateTime (
-							new LocalTime (hourOffset, 0),
+							new LocalTime (
+								toJavaIntegerRequired (
+									hourOffset),
+								0),
 							timezone)),
 					yesterday.toString (
 						dateFormat)));
@@ -174,10 +187,16 @@ class TextualInterval {
 				Pair.of (
 					new Interval (
 						thisMonth.toLocalDate (1).toDateTime (
-							new LocalTime (hourOffset, 0),
+							new LocalTime (
+								toJavaIntegerRequired (
+									hourOffset),
+								0),
 							timezone),
 						nextMonth.toLocalDate (1).toDateTime (
-							new LocalTime (hourOffset, 0),
+							new LocalTime (
+								toJavaIntegerRequired (
+									hourOffset),
+								0),
 							timezone)),
 					nextMonth.toString (
 						monthFormat)));
@@ -191,10 +210,16 @@ class TextualInterval {
 				Pair.of (
 					new Interval (
 						lastMonth.toLocalDate (1).toDateTime (
-							new LocalTime (hourOffset, 0),
+							new LocalTime (
+								toJavaIntegerRequired (
+									hourOffset),
+								0),
 							timezone),
 						thisMonth.toLocalDate (1).toDateTime (
-							new LocalTime (hourOffset, 0),
+							new LocalTime (
+								toJavaIntegerRequired (
+									hourOffset), 
+								0),
 							timezone)),
 					lastMonth.toString (
 						monthFormat)));
@@ -206,17 +231,17 @@ class TextualInterval {
 	}
 
 	public static
-	Optional<Pair<Interval,String>> parsePartialNumeric (
+	Optional <Pair <Interval, String>> parsePartialNumeric (
 			@NonNull DateTimeZone timeZone,
 			@NonNull String string,
-			@NonNull Integer hourOffset) {
+			@NonNull Long hourOffset) {
 
-		int fromYear = 0;
-		int fromMonth = 1;
-		int fromDate = 1;
-		int fromHour = hourOffset;
-		int fromMinute = 0;
-		int fromSecond = 0;
+		long fromYear = 0;
+		long fromMonth = 1;
+		long fromDate = 1;
+		long fromHour = hourOffset;
+		long fromMinute = 0;
+		long fromSecond = 0;
 
 		for (
 			Pattern pattern
@@ -285,12 +310,18 @@ class TextualInterval {
 
 			DateTime fromDateTime =
 				new DateTime (
-					fromYear,
-					fromMonth,
-					fromDate,
-					fromHour,
-					fromMinute,
-					fromSecond,
+					toJavaIntegerRequired (
+						fromYear),
+					toJavaIntegerRequired (
+						fromMonth),
+					toJavaIntegerRequired (
+						fromDate),
+					toJavaIntegerRequired (
+						fromHour),
+					toJavaIntegerRequired (
+						fromMinute),
+					toJavaIntegerRequired (
+						fromSecond),
 					timeZone);
 
 			// work out time to
@@ -362,9 +393,9 @@ class TextualInterval {
 	Optional<Pair<Interval,String>> parsePartial (
 			@NonNull DateTimeZone timeZone,
 			@NonNull String string,
-			@NonNull Integer hourOffset) {
+			@NonNull Long hourOffset) {
 
-		Optional<Pair<Interval,String>> symbolicResult =
+		Optional <Pair <Interval, String>> symbolicResult =
 			parsePartialSymbolic (
 				timeZone,
 				string,
@@ -377,7 +408,7 @@ class TextualInterval {
 			return symbolicResult;
 		}
 
-		Optional<Pair<Interval,String>> numericResult =
+		Optional <Pair <Interval, String>> numericResult =
 			parsePartialNumeric (
 				timeZone,
 				string,
@@ -398,16 +429,16 @@ class TextualInterval {
 	Optional<TextualInterval> parse (
 			@NonNull DateTimeZone timezone,
 			@NonNull String source,
-			@NonNull Integer hourOffset) {
+			@NonNull Long hourOffset) {
 
-		List<String> parts =
+		List <String> parts =
 			stringSplitRegexp (
 				source,
 				" to ");
 
 		if (parts.size () == 1) {
 
-			Optional<Pair<Interval,String>> optionalInterval =
+			Optional <Pair <Interval, String>> optionalInterval =
 				parsePartial (
 					timezone,
 					source.trim (),
@@ -480,7 +511,7 @@ class TextualInterval {
 	TextualInterval parseRequired (
 			@NonNull DateTimeZone timeZone,
 			@NonNull String string,
-			@NonNull Integer hourOffset) {
+			@NonNull Long hourOffset) {
 
 		return optionalRequired (
 			parse (

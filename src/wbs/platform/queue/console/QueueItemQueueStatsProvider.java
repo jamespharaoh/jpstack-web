@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
-
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
@@ -59,20 +58,20 @@ class QueueItemQueueStatsProvider
 
 		// setup data structures
 
-		Map<Integer,int[]> numProcessedPerQueue =
-			new TreeMap<Integer,int[]> ();
+		Map<Long,long[]> numProcessedPerQueue =
+			new TreeMap<> ();
 
-		Map<Integer,int[]> numCreatedPerQueue =
-			new TreeMap<Integer,int[]> ();
+		Map<Long,long[]> numCreatedPerQueue =
+			new TreeMap<> ();
 
-		Map<Integer,int[]> numPreferredPerQueue =
-			new TreeMap<Integer,int[]> ();
+		Map<Long,long[]> numPreferredPerQueue =
+			new TreeMap<> ();
 
-		Map<Integer,int[]> numNotPreferredPerQueue =
-			new TreeMap<Integer,int[]> ();
+		Map<Long,long[]> numNotPreferredPerQueue =
+			new TreeMap<> ();
 
 		Set<Object> queueIds =
-			new HashSet<Object> ();
+			new HashSet<> ();
 
 		// retrieve queue items
 
@@ -128,23 +127,27 @@ class QueueItemQueueStatsProvider
 
 				numCreatedPerQueue.put (
 					queue.getId (),
-					new int [statsPeriod.size ()]);
+					new long [
+						statsPeriod.size ()]);
 
 				numProcessedPerQueue.put (
 					queue.getId (),
-					new int [statsPeriod.size ()]);
+					new long [
+						statsPeriod.size ()]);
 
 				numPreferredPerQueue.put (
 					queue.getId (),
-					new int [statsPeriod.size ()]);
+					new long [
+						statsPeriod.size ()]);
 
 				numNotPreferredPerQueue.put (
 					queue.getId (),
-					new int [statsPeriod.size ()]);
+					new long [
+						statsPeriod.size ()]);
 
 			}
 
-			int[] numCreatedForQueue =
+			long[] numCreatedForQueue =
 				numCreatedPerQueue.get (
 					queue.getId ());
 
@@ -188,23 +191,27 @@ class QueueItemQueueStatsProvider
 
 				numCreatedPerQueue.put (
 					queue.getId (),
-					new int [statsPeriod.size ()]);
+					new long [
+						statsPeriod.size ()]);
 
 				numProcessedPerQueue.put (
 					queue.getId (),
-					new int [statsPeriod.size ()]);
+					new long [
+						statsPeriod.size ()]);
 
 				numPreferredPerQueue.put (
 					queue.getId (),
-					new int [statsPeriod.size ()]);
+					new long [
+						statsPeriod.size ()]);
 
 				numNotPreferredPerQueue.put (
 					queue.getId (),
-					new int [statsPeriod.size ()]);
+					new long [
+						statsPeriod.size ()]);
 
 			}
 
-			int[] numProcessedForQueue =
+			long[] numProcessedForQueue =
 				numProcessedPerQueue.get (
 					queue.getId ());
 
@@ -214,7 +221,7 @@ class QueueItemQueueStatsProvider
 
 				if (queueItem.getProcessedByPreferredUser ()) {
 
-					int[] numPreferredForQueue =
+					long[] numPreferredForQueue =
 						numPreferredPerQueue.get (
 							queue.getId ());
 
@@ -222,7 +229,7 @@ class QueueItemQueueStatsProvider
 
 				} else {
 
-					int[] numNotPreferredForQueue =
+					long[] numNotPreferredForQueue =
 						numNotPreferredPerQueue.get (
 							queue.getId ());
 

@@ -107,7 +107,7 @@ class ModelImplementation
 	// methods
 
 	public
-	Integer getId (
+	Long getId (
 			@NonNull Record<?> object) {
 
 		return object.getId ();
@@ -140,8 +140,9 @@ class ModelImplementation
 
 		}
 
-		return Integer.toString (
-			getId (object));
+		return Long.toString (
+			getId (
+				object));
 
 	}
 
@@ -239,7 +240,7 @@ class ModelImplementation
 
 		}
 
-		return (long) (Integer)
+		return (Long)
 			BeanLogic.getProperty (
 				object,
 				parentIdField.name ());
@@ -249,7 +250,7 @@ class ModelImplementation
 	@Override
 	public
 	Record<?> getParentType (
-			@NonNull Record<?> object) {
+			@NonNull Record <?> object) {
 
 		if (parentTypeIsFixed ()) {
 
@@ -260,7 +261,7 @@ class ModelImplementation
 
 		}
 
-		return (Record<?>)
+		return (Record <?>)
 			BeanLogic.getProperty (
 				object,
 				parentTypeField.name ());
@@ -269,7 +270,7 @@ class ModelImplementation
 
 	@Override
 	public
-	Class<? extends Record<?>> parentClass () {
+	Class <? extends Record <?>> parentClass () {
 
 		if (parentTypeField != null) {
 

@@ -1,8 +1,8 @@
 package wbs.platform.exception.hibernate;
 
-import java.util.List;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
-import lombok.NonNull;
+import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
@@ -10,6 +10,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Instant;
 
+import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.exception.model.ExceptionLogDao;
 import wbs.platform.exception.model.ExceptionLogRec;
@@ -24,9 +25,9 @@ class ExceptionLogDaoHibernate
 
 	@Override
 	public
-	int countWithAlert () {
+	Long countWithAlert () {
 
-		return (int) (long) findOne (
+		return findOne (
 			"countWithAlert ()",
 			Long.class,
 
@@ -48,9 +49,9 @@ class ExceptionLogDaoHibernate
 
 	@Override
 	public
-	int countWithAlertAndFatal () {
+	Long countWithAlertAndFatal () {
 
-		return (int) (long) findOne (
+		return findOne (
 			"countWithAlertAndFatal ()",
 			Long.class,
 
@@ -77,7 +78,7 @@ class ExceptionLogDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			ExceptionLogSearch search) {
 
 		Criteria criteria =
@@ -153,7 +154,8 @@ class ExceptionLogDaoHibernate
 		if (search.maxResults () != null) {
 
 			criteria.setMaxResults (
-				search.maxResults ());
+				toJavaIntegerRequired (
+					search.maxResults ()));
 
 		}
 
@@ -162,16 +164,16 @@ class ExceptionLogDaoHibernate
 
 		return findMany (
 			"searchIds (search)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}
 
 	@Override
 	public
-	List<ExceptionLogRec> findOldLimit (
+	List <ExceptionLogRec> findOldLimit (
 			@NonNull Instant cutoffTime,
-			int maxResults) {
+			@NonNull Long maxResults) {
 
 		return findMany (
 			"findOldLimit (cutoffTime, maxResults)",
@@ -191,7 +193,8 @@ class ExceptionLogDaoHibernate
 					"_exceptionLog.timestamp"))
 
 			.setMaxResults (
-				maxResults)
+				toJavaIntegerRequired (
+					maxResults))
 
 		);
 

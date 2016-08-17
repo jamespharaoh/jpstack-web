@@ -4,12 +4,11 @@ import java.util.Collections;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
@@ -22,6 +21,7 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
+import wbs.framework.record.IdObject;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -173,14 +173,15 @@ class ChatSetPhotoCommand
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
-				Optional.<Long>absent (),
+				Optional.absent (),
 				"photo_confirm",
 				commandHelper.findByCodeRequired (
 					chat,
 					"magic"),
-				(long) commandHelper.findByCodeRequired (
-					chat,
-					"help").getId (),
+				IdObject.objectId (
+					commandHelper.findByCodeRequired (
+						chat,
+						"help")),
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 

@@ -27,7 +27,7 @@ interface ObjectHelperFindMethods<RecordType extends Record<RecordType>> {
 	List<RecordType> search (
 			Object search);
 
-	List<Integer> searchIds (
+	List<Long> searchIds (
 			Object search);
 
 }

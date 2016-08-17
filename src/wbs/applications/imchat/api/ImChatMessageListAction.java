@@ -1,19 +1,19 @@
 package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.Cleanup;
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
@@ -157,8 +157,8 @@ class ImChatMessageListAction
 		List<ImChatMessageRec> newMessages =
 			ImmutableList.copyOf (
 				allMessages.subList (
-					(int) (long)
-					request.messageIndex (),
+					toJavaIntegerRequired (
+						request.messageIndex ()),
 					allMessages.size ()));
 
 		// create response

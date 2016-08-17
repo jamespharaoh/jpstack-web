@@ -10,7 +10,7 @@ public
 interface UserPrivChecker {
 
 	boolean canRecursive (
-		int privId);
+		Long privId);
 
 	boolean canRecursive (
 		GlobalId parentObjectId,
@@ -18,7 +18,7 @@ interface UserPrivChecker {
 
 	boolean canRecursive (
 		Class<? extends Record<?>> parentObjectClass,
-		int parentObjectId,
+		Long parentObjectId,
 		String... privCodes);
 
 	boolean canRecursive (
@@ -37,7 +37,7 @@ interface UserPrivChecker {
 		Map<Object,Collection<String>> map);
 
 	boolean canGrant (
-		int privId);
+		Long privId);
 
 	void refresh ();
 

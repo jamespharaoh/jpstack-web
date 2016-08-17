@@ -1,18 +1,18 @@
 package wbs.clients.apn.chat.user.image.daemon;
 
+import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -25,7 +25,6 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.RandomLogic;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -166,11 +165,11 @@ class ChatUserImageUploadCommand
 						messageIn.getThreadId ()),
 					"image_upload_link",
 					magicCommand,
-					(long) helpCommand.getId (),
+					helpCommand.getId (),
 					TemplateMissing.error,
-					ImmutableMap.<String,String>builder ()
-						.put ("url", url)
-						.build ()));
+					ImmutableMap.of (
+						"url",
+						url)));
 
 		// save token in database
 
@@ -181,7 +180,6 @@ class ChatUserImageUploadCommand
 				chatUser)
 
 			.setIndex (
-				(int) (long)
 				chatUser.getNumImageUploadTokens ())
 
 			.setToken (

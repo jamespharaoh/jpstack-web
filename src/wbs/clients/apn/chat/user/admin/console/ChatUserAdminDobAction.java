@@ -4,10 +4,9 @@ import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
 
 import javax.inject.Inject;
 
-import lombok.Cleanup;
-
 import org.joda.time.LocalDate;
 
+import lombok.Cleanup;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
@@ -61,8 +60,9 @@ class ChatUserAdminDobAction
 
 		// get stuff
 
-		int chatUserId =
-			requestContext.stuffInt ("chatUserId");
+		Long chatUserId =
+			requestContext.stuffInteger (
+				"chatUserId");
 
 		// get params
 

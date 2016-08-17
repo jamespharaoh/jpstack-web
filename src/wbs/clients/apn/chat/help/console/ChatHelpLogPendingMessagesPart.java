@@ -57,7 +57,7 @@ class ChatHelpLogPendingMessagesPart
 
 		chatHelpLog =
 			chatHelpLogHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatHelpLogId"));
 
 		chatUser =

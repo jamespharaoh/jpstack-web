@@ -13,18 +13,17 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import org.apache.commons.codec.binary.Base64;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+
 import lombok.extern.log4j.Log4j;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Nodes;
 import nu.xom.ParsingException;
-
-import org.apache.commons.codec.binary.Base64;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
@@ -222,7 +221,7 @@ class HybyteSender
 	 */
 	public static
 	class HybyteOutbox {
-		int messageId;
+		Long messageId;
 		OutboxRec outbox;
 		MessageRec message;
 		RouteRec route;
@@ -298,31 +297,39 @@ class HybyteSender
 		Element messageElem, bodyElem;
 
 		Element airbyteElem =
-
 			Xom.xomElem (
 				"Airbyte",
 
-				Xom.xomAttr (
-					"xsi:noNamespaceSchemaLocation",
-					"http://airbyte-dtds.airmessaging.net/airbyte.xsd",
-					"http://www.w3.org/23001/XMLSchema-instance"),
+			Xom.xomAttr (
+				"xsi:noNamespaceSchemaLocation",
+				"http://airbyte-dtds.airmessaging.net/airbyte.xsd",
+				"http://www.w3.org/23001/XMLSchema-instance"),
 
-				messageElem = Xom.xomElem (
+			messageElem =
+				Xom.xomElem (
 					"message",
 
-					Xom.xomAttr (
-						"id",
-						Integer.toString (hybyteOutbox.messageId)),
+				Xom.xomAttr (
+					"id",
+					Long.toString (
+						hybyteOutbox.messageId)),
 
-					Xom.xomAttr (
-						"from",
-						originatorFiddle (
-							hybyteOutbox.message.getNumFrom ())),
+				Xom.xomAttr (
+					"from",
+					originatorFiddle (
+						hybyteOutbox.message.getNumFrom ())),
 
-					bodyElem = Xom.xomElem ("body"),
+				bodyElem =
 					Xom.xomElem (
-						"to",
-						"+" + hybyteOutbox.message.getNumTo ())));
+						"body"),
+
+				Xom.xomElem (
+					"to",
+					"+" + hybyteOutbox.message.getNumTo ())
+
+			)
+
+		);
 
 		if (hybyteOutbox.wapPushMessage != null) {
 

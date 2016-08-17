@@ -54,15 +54,15 @@ class ChatSettingsMonitorsPart
 
 		ChatRec chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
-		List<Integer> onlineMonitorIds =
+		List<Long> onlineMonitorIds =
 			chatUserHelper.searchIds (
 				new ChatUserSearch ()
 
 			.chatId (
-				(long) chat.getId ())
+				chat.getId ())
 
 			.type (
 				ChatUserType.monitor)
@@ -75,7 +75,7 @@ class ChatSettingsMonitorsPart
 		log.debug ("Got " + onlineMonitorIds.size ());
 
 		for (
-			Integer monitorId
+			Long monitorId
 				: onlineMonitorIds
 		) {
 

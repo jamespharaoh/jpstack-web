@@ -4,7 +4,7 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -46,7 +46,7 @@ class ChatAffiliateCreateOldPart
 
 	// state
 
-	Map<String,Integer> chatSchemes;
+	Map<String,Long> chatSchemes;
 
 	// implementation
 
@@ -56,32 +56,25 @@ class ChatAffiliateCreateOldPart
 
 		ChatRec chat =
 			chatHelper.findRequired (
-				requestContext.stuffInt (
+				requestContext.stuffInteger (
 					"chatId"));
 
 		chatSchemes =
-			new TreeMap<String,Integer> ();
+			chat.getChatSchemes ().stream ()
 
-		for (
-			ChatSchemeRec chatScheme
-				: chat.getChatSchemes ()
-		) {
+			.filter (
+				chatScheme ->
+					privChecker.canRecursive (
+						chatScheme,
+						"affiliate_create"))
 
-			if (
-				! privChecker.canRecursive (
-					chatScheme,
-					"affiliate_create")
-			) {
-				continue;
-			}
-
-			chatSchemes.put (
-				objectManager.objectPathMini (
-					chatScheme,
-					chat),
-				chatScheme.getId ());
-
-		}
+			.collect (
+				Collectors.toMap (
+					chatScheme ->
+						objectManager.objectPathMini (
+							chatScheme,
+							chat),
+					ChatSchemeRec::getId));
 
 	}
 
@@ -122,8 +115,10 @@ class ChatAffiliateCreateOldPart
 			"<td><select name=\"chatScheme\">\n",
 			"<option>\n");
 
-		for (Map.Entry<String,Integer> schemeEntry
-				: chatSchemes.entrySet ()) {
+		for (
+			Map.Entry<String,Long> schemeEntry
+				: chatSchemes.entrySet ()
+		) {
 
 			printFormat (
 				"<option",

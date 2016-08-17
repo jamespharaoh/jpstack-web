@@ -10,20 +10,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Cleanup;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
-
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.jdbc.ReturningWork;
 import org.joda.time.Instant;
 
+import lombok.Cleanup;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.database.Transaction;
-import wbs.framework.dbpool.WbsConnection;
+import wbs.framework.database.WbsConnection;
 import wbs.framework.record.UnsavedRecordDetector;
 
 @Accessors (fluent = true)
@@ -401,7 +400,8 @@ class HibernateTransaction
 	public
 	int hashCode () {
 
-		return (int) (id ^ (id >>> 32)); // from Long.hashCode
+		return Long.hashCode (
+			id);
 
 	}
 
