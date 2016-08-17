@@ -8,7 +8,7 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringSplitRegexp;
+import static wbs.framework.utils.etc.StringUtils.stringSplitColon;
 import static wbs.framework.utils.etc.StringUtils.underscoreToCamel;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ import wbs.framework.utils.etc.BeanLogic;
 @Accessors (fluent = true)
 @Log4j
 @PrototypeComponent ("genericConsoleHelperProvider")
-@SuppressWarnings ({ "rawtypes", "unchecked" })
+@SuppressWarnings ({ "rawtypes" })
 public
 class GenericConsoleHelperProvider
 	implements ConsoleHelperProvider {
@@ -55,19 +55,19 @@ class GenericConsoleHelperProvider
 	// indirect dependencies
 
 	@Inject
-	Provider<ConsoleHelperProviderRegistry> consoleHelperProviderRegistry;
+	Provider <ConsoleHelperProviderRegistry> consoleHelperProviderRegistry;
 
 	@Inject
-	Provider<ConsoleManager> consoleManager;
+	Provider <ConsoleManager> consoleManager;
 
 	@Inject
-	Provider<ConsoleObjectManager> consoleObjectManager;
+	Provider <ConsoleObjectManager> consoleObjectManager;
 
 	@Inject
-	Provider<ConsoleRequestContext> requestContext;
+	Provider <ConsoleRequestContext> requestContext;
 
 	@Inject
-	Provider<UserPrivChecker> privChecker;
+	Provider <UserPrivChecker> privChecker;
 
 	// required properties
 
@@ -153,10 +153,9 @@ class GenericConsoleHelperProvider
 				consoleHelperProviderSpec.viewPriv ())
 		) {
 
-			List<String> viewPrivParts =
-				stringSplitRegexp (
-					consoleHelperProviderSpec.viewPriv (),
-					":");
+			List <String> viewPrivParts =
+				stringSplitColon (
+					consoleHelperProviderSpec.viewPriv ());
 
 			if (viewPrivParts.size () == 1) {
 

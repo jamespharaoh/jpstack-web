@@ -7,14 +7,14 @@ import lombok.experimental.Accessors;
 @Accessors (fluent = true)
 public
 class SingletonBeanFactory
-	implements BeanFactory {
+	implements InitializedComponentFactory {
 
 	@Getter @Setter
 	Object object;
 
 	@Override
 	public
-	Object instantiate () {
+	Object makeComponent () {
 		return object;
 	}
 

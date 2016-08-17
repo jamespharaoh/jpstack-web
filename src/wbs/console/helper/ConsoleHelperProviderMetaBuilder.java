@@ -1,9 +1,9 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
-import static wbs.framework.utils.etc.StringUtils.stringSplitRegexp;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
 
 import java.util.List;
 
@@ -53,14 +53,13 @@ class ConsoleHelperProviderMetaBuilder {
 	void build (
 			Builder builder) {
 
-		ObjectHelper<?> objectHelper =
+		ObjectHelper <?> objectHelper =
 			objectManager.objectHelperForObjectName (
 				consoleHelperProviderSpec.objectName ());
 
-		List<String> packageNameParts =
-			stringSplitRegexp (
-				objectHelper.objectClass ().getPackage ().getName (),
-				"\\.");
+		List <String> packageNameParts =
+			stringSplitFullStop (
+				objectHelper.objectClass ().getPackage ().getName ());
 
 		String consoleHelperClassName =
 			stringFormat (
@@ -72,7 +71,7 @@ class ConsoleHelperProviderMetaBuilder {
 				capitalise (
 					objectHelper.objectName ()));
 
-		Class<?> consoleHelperClass;
+		Class <?> consoleHelperClass;
 
 		try {
 

@@ -1,9 +1,10 @@
 package wbs.platform.servlet;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringSplitComma;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -14,7 +15,6 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.log4j.Log4j;
-
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.application.tools.ApplicationContextBuilder;
 import wbs.framework.application.tools.ThreadLocalProxyBeanFactory;
@@ -71,17 +71,10 @@ class WbsServletListener
 			servletContext.getInitParameter (
 				"beanDefinitionOutputPath");
 
-		List<String> layerNames =
-			Arrays.asList (
-				servletContext
-					.getInitParameter ("layerNames")
-					.split (","));
-
-		List<String> configNames =
-			Arrays.asList (
-				servletContext
-					.getInitParameter ("configNames")
-					.split (","));
+		List <String> layerNames =
+			stringSplitComma (
+				servletContext.getInitParameter (
+					"layerNames"));
 
 		applicationContext =
 			new ApplicationContextBuilder ()
@@ -96,7 +89,7 @@ class WbsServletListener
 				layerNames)
 
 			.configNames (
-				configNames)
+				Collections.emptyList ())
 
 			.outputPath (
 				beanDefinitionOutputPath)
@@ -118,8 +111,10 @@ class WbsServletListener
 	void requestDestroyed (
 			ServletRequestEvent event) {
 
-		for (String requestBeanName
-				: applicationContext.requestBeanNames ()) {
+		for (
+			String requestBeanName
+				: applicationContext.requestBeanNames ()
+		) {
 
 			ThreadLocalProxyBeanFactory.Control control =
 				(ThreadLocalProxyBeanFactory.Control)
@@ -145,8 +140,8 @@ class WbsServletListener
 		boolean setServletContext = false;
 		boolean setServletRequest = false;
 
-		List<String> setRequestBeanNames =
-			new ArrayList<String> ();
+		List <String> setRequestBeanNames =
+			new ArrayList<> ();
 
 		boolean success = false;
 

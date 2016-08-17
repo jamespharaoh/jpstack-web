@@ -59,22 +59,6 @@ declare variable $config external;
 
 	</context-param>
 
-	<context-param>
-
-		<param-name>{
-			'configNames'
-		}</param-name>
-
-		<param-value>{
-			string-join ((
-				$mode,
-				'hibernate',
-				$config
-			), ',')
-		}</param-value>
-
-	</context-param>
-
 	<!-- filters -->
 
 	<filter>

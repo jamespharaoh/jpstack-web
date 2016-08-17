@@ -7,7 +7,7 @@ import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 import static wbs.framework.utils.etc.StringUtils.lowercase;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringSplitRegexp;
+import static wbs.framework.utils.etc.StringUtils.stringSplitSimple;
 import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
 import java.util.List;
@@ -80,10 +80,10 @@ class TextualInterval {
 	boolean valid (
 			@NonNull String string) {
 
-		List<String> parts =
-			stringSplitRegexp (
-				string,
-				" to ");
+		List <String> parts =
+			stringSplitSimple (
+				" to ",
+				string);
 
 		if (parts.size () == 1) {
 
@@ -432,9 +432,9 @@ class TextualInterval {
 			@NonNull Long hourOffset) {
 
 		List <String> parts =
-			stringSplitRegexp (
-				source,
-				" to ");
+			stringSplitSimple (
+				" to ",
+				source);
 
 		if (parts.size () == 1) {
 

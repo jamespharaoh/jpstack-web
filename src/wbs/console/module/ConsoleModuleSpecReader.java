@@ -6,11 +6,10 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-import lombok.experimental.Accessors;
-
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataFromXml;
 
@@ -21,7 +20,7 @@ class ConsoleModuleSpecReader {
 
 	@Inject
 	@ConsoleModuleData
-	Map<Class<?>,Provider<ConsoleModuleSpec>> consoleModuleSpecProviders;
+	Map <Class <?>, Provider <ConsoleModuleSpec>> consoleModuleSpecProviders;
 
 	DataFromXml dataFromXml;
 
@@ -33,7 +32,7 @@ class ConsoleModuleSpecReader {
 			new DataFromXml ();
 
 		for (
-			Map.Entry<Class<?>,Provider<ConsoleModuleSpec>> entry
+			Map.Entry <Class <?>, Provider <ConsoleModuleSpec>> entry
 				: consoleModuleSpecProviders.entrySet ()
 		) {
 

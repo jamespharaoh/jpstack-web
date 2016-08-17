@@ -10,14 +10,13 @@ import java.lang.reflect.Proxy;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import wbs.framework.application.context.BeanFactory;
+import wbs.framework.application.context.UninitializedComponentFactory;
 
 @Accessors (fluent = true)
 public
 class ThreadLocalProxyBeanFactory
 	implements
-		BeanFactory,
+		UninitializedComponentFactory,
 		InvocationHandler {
 
 	@Getter @Setter
@@ -31,7 +30,7 @@ class ThreadLocalProxyBeanFactory
 
 	@Override
 	public
-	Object instantiate () {
+	Object makeComponent () {
 
 		return Proxy.newProxyInstance (
 			beanClass.getClassLoader (),

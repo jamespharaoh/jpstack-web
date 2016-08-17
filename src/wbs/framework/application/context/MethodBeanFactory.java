@@ -1,16 +1,16 @@
 package wbs.framework.application.context;
 
+import org.apache.commons.lang3.reflect.MethodUtils;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
-import org.apache.commons.lang3.reflect.MethodUtils;
-
 @Accessors (fluent = true)
 public
 class MethodBeanFactory
-	implements BeanFactory {
+	implements ComponentFactory {
 
 	@Getter @Setter
 	Object factoryBean;
@@ -18,10 +18,13 @@ class MethodBeanFactory
 	@Getter @Setter
 	String factoryMethodName;
 
+	@Getter @Setter
+	Boolean initialized;
+
 	@Override
 	@SneakyThrows (Exception.class)
 	public
-	Object instantiate () {
+	Object makeComponent () {
 
 		return MethodUtils.invokeMethod (
 			factoryBean,

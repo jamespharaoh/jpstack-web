@@ -74,21 +74,6 @@ declare variable $mode external;
 
 	</context-param>
 
-	<context-param>
-
-		<param-name>{
-			'configNames'
-		}</param-name>
-
-		<param-value>{
-			concat (
-				$mode,
-				',hibernate,api'
-			)
-		}</param-value>
-
-	</context-param>
-
 	<!-- listeners -->
 
 	<listener>

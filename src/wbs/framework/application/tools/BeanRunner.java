@@ -2,7 +2,7 @@ package wbs.framework.application.tools;
 
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringSplitSimple;
+import static wbs.framework.utils.etc.StringUtils.stringSplitComma;
 import static wbs.framework.utils.etc.StringUtils.uncapitalise;
 
 import java.lang.reflect.Method;
@@ -155,14 +155,12 @@ class BeanRunner {
 				arguments.get (1))
 
 			.layerNames (
-				stringSplitSimple (
-					arguments.get (2),
-					","))
+				stringSplitComma (
+					arguments.get (2)))
 
 			.configNames (
-				stringSplitSimple (
-					arguments.get (3),
-					","))
+				stringSplitComma (
+					arguments.get (3)))
 
 			.runnerName (
 				arguments.get (4))

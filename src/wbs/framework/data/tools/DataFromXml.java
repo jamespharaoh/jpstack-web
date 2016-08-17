@@ -4,13 +4,13 @@ import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
 import static wbs.framework.utils.etc.Misc.toEnumGeneric;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.uncapitalise;
 
 import java.io.File;
@@ -36,12 +36,6 @@ import java.util.regex.Pattern;
 
 import javax.inject.Provider;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -53,6 +47,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChild;
@@ -75,17 +74,16 @@ import wbs.framework.utils.etc.BeanLogic;
 public
 class DataFromXml {
 
-	Map<String,List<DataClassInfo>>
-		dataClassesMap =
-			new HashMap<String,List<DataClassInfo>> ();
+	Map <String, List <DataClassInfo>> dataClassesMap =
+		new HashMap<> ();
 
-	Map<String,Map<String,?>> namedObjectCollections =
-		new HashMap<String,Map<String,?>> ();
+	Map <String, Map <String, ?>> namedObjectCollections =
+		new HashMap<> ();
 
 	public
 	DataFromXml addNamedObjectCollection (
 			String collectionName,
-			Map<String,?> namedObjectCollection) {
+			Map <String, ?> namedObjectCollection) {
 
 		if (namedObjectCollection.containsKey (collectionName)) {
 
@@ -132,10 +130,10 @@ class DataFromXml {
 
 	public
 	DataFromXml registerBuilderClass (
-			final Class<?> builderClass) {
+			final Class <?> builderClass) {
 
-		Provider<?> builderProvider =
-			new Provider<Object> () {
+		Provider <?> builderProvider =
+			new Provider <Object> () {
 
 			@Override
 			public
@@ -169,8 +167,8 @@ class DataFromXml {
 
 	public
 	DataFromXml registerBuilder (
-			Class<?> dataClass,
-			Provider<?> builderProvider) {
+			Class <?> dataClass,
+			Provider <?> builderProvider) {
 
 		DataClass dataClassAnnotation =
 			dataClass.getAnnotation (
@@ -195,14 +193,14 @@ class DataFromXml {
 		Field parentField =
 			findParentField (dataClass);
 
-		Class<?> parentClass =
+		Class <?> parentClass =
 			parentField != null
 				? parentField.getType ()
 				: Object.class;
 
 		// add to map
 
-		List<DataClassInfo> dataClassInfos =
+		List <DataClassInfo> dataClassInfos =
 			dataClassesMap.get (
 				elementName);
 
@@ -444,7 +442,7 @@ class DataFromXml {
 
 			// find the appropriate builder
 
-			List<DataClassInfo> dataClassInfosForElementName =
+			List <DataClassInfo> dataClassInfosForElementName =
 				dataClassesMap.get (element.getName ());
 
 			if (dataClassInfosForElementName == null) {
@@ -506,7 +504,7 @@ class DataFromXml {
 
 			}
 
-			Provider<?> builder =
+			Provider <?> builder =
 				matchingDataClassInfos.get (0).provider ();
 
 			// build it

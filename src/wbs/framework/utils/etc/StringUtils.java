@@ -631,8 +631,8 @@ class StringUtils {
 
 	public static
 	List <String> stringSplitRegexp (
-			@NonNull String source,
-			@NonNull String pattern) {
+			@NonNull String pattern,
+			@NonNull String source) {
 
 		if (source.isEmpty ()) {
 
@@ -650,8 +650,8 @@ class StringUtils {
 
 	public static
 	List <String> stringSplitSimple (
-			@NonNull String source,
-			@NonNull String separator) {
+			@NonNull String separator,
+			@NonNull String source) {
 
 		if (source.isEmpty ()) {
 
@@ -665,6 +665,56 @@ class StringUtils {
 						separator)));
 
 		}
+
+	}
+
+	public static
+	List <String> stringSplitComma (
+			@NonNull String source) {
+
+		return stringSplitSimple (
+			",",
+			source);
+
+	}
+
+	public static
+	List <String> stringSplitColon (
+			@NonNull String source) {
+
+		return stringSplitSimple (
+			":",
+			source);
+
+	}
+
+	public static
+	List <String> stringSplitFullStop (
+			@NonNull String source) {
+
+		return stringSplitSimple (
+			".",
+			source);
+
+	}
+
+	public static
+	List <String> stringSplitSlash (
+			@NonNull String source) {
+
+		return stringSplitSimple (
+			"/",
+			source);
+
+	}
+
+	public static
+	List <String> stringSplitHyphen (
+			@NonNull String source) {
+
+		return stringSplitSimple (
+			"-",
+			source);
 
 	}
 

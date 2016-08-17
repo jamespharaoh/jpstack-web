@@ -637,7 +637,10 @@ class ObjectHelperBuilder {
 
 				try {
 
-					if (declaringClass == ObjectHelperBuilderMethods.class) {
+					if (
+						declaringClass == ObjectHelperBuilderMethods.class
+						|| declaringClass == Object.class
+					) {
 
 						return method.invoke (
 							Builder.this,

@@ -1090,6 +1090,14 @@ class Misc {
 	}
 
 	public static
+	boolean moreThanOne (
+			long value) {
+
+		return value > 1l;
+
+	}
+
+	public static
 	boolean notLessThanZero (
 			int value) {
 

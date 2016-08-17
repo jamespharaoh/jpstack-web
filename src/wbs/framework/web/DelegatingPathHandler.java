@@ -1,7 +1,7 @@
 package wbs.framework.web;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,26 +13,28 @@ import javax.servlet.ServletException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
+import wbs.framework.application.annotations.PrototypeComponent;
 
 /**
  * Implementation of PathHandler which delegates to other PathHandlers or
  * WebFiles based on simple string mappings.
  */
 @Log4j
+@PrototypeComponent ("delegatingPathHandler")
 public
 class DelegatingPathHandler
 	implements PathHandler {
 
 	@Getter @Setter
-	Map<String,PathHandler> paths =
-		new HashMap<String,PathHandler> ();
+	Map <String, PathHandler> paths =
+		new HashMap<> ();
 
 	@Getter @Setter
-	Map<String,WebFile> files =
-		new HashMap<String,WebFile> ();
+	Map <String, WebFile> files =
+		new HashMap<> ();
 
 	@Inject
-	Map<String,ServletModule> servletModules;
+	Map <String, ServletModule> servletModules;
 
 	/**
 	 * Populates paths and files properties with values obtained from any
@@ -42,36 +44,80 @@ class DelegatingPathHandler
 	public
 	void afterPropertiesSet () {
 
+System.out.println ("");
+System.out.println ("");
+System.out.println ("#################################################");
+System.out.println ("#################################################");
+System.out.println ("############                      ###############");
+System.out.println ("############ AFTER PROPERTIES SET ###############");
+System.out.println ("############                      ###############");
+System.out.println ("#################################################");
+System.out.println ("#################################################");
+System.out.println ("");
+System.out.println ("");
+
+		Map <String, String> pathDeclaredByModule =
+			new HashMap<> ();
+
+		Map <String, String> fileDeclaredByModule =
+			new HashMap<> ();
+
 		// for each one...
 
-		for (ServletModule servletModule
-				: servletModules.values ()) {
+		for (
+			Map.Entry <String, ServletModule> servletModuleEntry
+				: servletModules.entrySet ()
+		) {
+
+			String servletModuleName =
+				servletModuleEntry.getKey ();
+
+			ServletModule servletModule =
+				servletModuleEntry.getValue ();
 
 			// import all its paths
 
-			Map<String,? extends PathHandler> modulePaths =
+			Map <String, ? extends PathHandler> modulePaths =
 				servletModule.paths ();
 
 			if (modulePaths != null) {
 
-				for (Map.Entry<String,? extends PathHandler> ent
-						: modulePaths.entrySet ()) {
+				for (
+					Map.Entry <String, ? extends PathHandler> modulePathEntry
+						: modulePaths.entrySet ()
+				) {
 
-					if (paths.containsKey (
-							ent.getKey ())) {
+					String modulePathName =
+						modulePathEntry.getKey ();
+
+					PathHandler modulePathHandler =
+						modulePathEntry.getValue ();
+
+					if (
+						pathDeclaredByModule.containsKey (
+							modulePathName)
+					) {
 
 						throw new RuntimeException (
-							"Duplicated path: " +
-							ent.getKey ());
+							stringFormat (
+							"Duplicated path '%s' (in %s and %s)",
+							modulePathName,
+							pathDeclaredByModule.get (
+								modulePathName),
+							servletModuleName));
 
 					}
 
+					pathDeclaredByModule.put (
+						modulePathName,
+						servletModuleName);
+
 					log.debug (
-						"Adding path " + ent.getKey ());
+						"Adding path " + modulePathName);
 
 					paths.put (
-						ent.getKey (),
-						ent.getValue ());
+						modulePathName,
+						modulePathHandler);
 
 				}
 
@@ -79,29 +125,44 @@ class DelegatingPathHandler
 
 			// import all its files
 
-			Map<String,? extends WebFile> moduleFiles =
+			Map <String, ? extends WebFile> moduleFiles =
 				servletModule.files ();
 
 			if (moduleFiles != null) {
 
-				for (Map.Entry<String,? extends WebFile> ent
-						: moduleFiles.entrySet ()) {
+				for (
+					Map.Entry <String, ? extends WebFile> moduleFileEntry
+						: moduleFiles.entrySet ()
+				) {
 
-					if (files.containsKey (
-							ent.getKey ())) {
+					String moduleFileName =
+						moduleFileEntry.getKey ();
+
+					if (
+						fileDeclaredByModule.containsKey (
+							moduleFileName)
+					) {
 
 						throw new RuntimeException (
-							"Duplicated file: " +
-							ent.getKey ());
+							stringFormat (
+							"Duplicated file '%s' (in %s and %s)",
+							moduleFileName,
+							fileDeclaredByModule.get (
+								moduleFileName),
+							servletModuleName));
 
 					}
 
+					fileDeclaredByModule.put (
+						moduleFileName,
+						servletModuleName);
+
 					log.debug (
-						"Adding file " + ent.getKey ());
+						"Adding file " + moduleFileName);
 
 					files.put (
-						ent.getKey (),
-						ent.getValue ());
+						moduleFileName,
+						moduleFileEntry.getValue ());
 
 				}
 

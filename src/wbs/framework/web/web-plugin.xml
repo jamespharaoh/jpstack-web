@@ -5,6 +5,7 @@
 	<layer name="web">
 		<bean class="ActionRequestHandler"/>
 		<bean class="JsonResponder"/>
+		<bean class="DelegatingPathHandler"/>
 		<bean class="PathHandlerServlet"/>
 		<bean class="RequestContextImplementation"/>
 		<bean class="ResponseFilter"/>

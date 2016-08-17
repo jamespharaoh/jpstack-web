@@ -14,10 +14,6 @@
 		<param-name>layerNames</param-name>
 		<param-value>utils,config,data,entity,schema,sql,model,model-meta,hibernate,object,logic,web,api</param-value>
 	</context-param>
-	<context-param>
-		<param-name>configNames</param-name>
-		<param-value>live,hibernate,api</param-value>
-	</context-param>
 	<!-- listeners -->
 	<listener>
 		<listener-class>wbs.platform.servlet.WbsServletListener</listener-class>

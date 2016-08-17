@@ -5,7 +5,9 @@ import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isError;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.requiredValue;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringSplitColon;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -14,15 +16,13 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
+import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
-import fj.data.Either;
-
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
@@ -31,9 +31,6 @@ import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.record.Record;
 import wbs.framework.utils.etc.FormatWriter;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringSplitRegexp;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("hiddenFormField")
@@ -103,10 +100,9 @@ class HiddenFormField<Container,Generic,Native>
 			return true;
 		}
 
-		List<String> privParts =
-			stringSplitRegexp (
-				viewPriv,
-				":");
+		List <String> privParts =
+			stringSplitColon (
+				viewPriv);
 
 		if (
 			equal (

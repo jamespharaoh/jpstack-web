@@ -6,16 +6,15 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import wbs.console.context.ConsoleContextMetaBuilderContainer;
-import wbs.framework.application.context.BeanFactory;
+import wbs.framework.application.context.UninitializedComponentFactory;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
 
 @Accessors (fluent = true)
 public
 class ConsoleMetaModuleFactory
-	implements BeanFactory {
+	implements UninitializedComponentFactory {
 
 	// dependencies
 
@@ -39,7 +38,7 @@ class ConsoleMetaModuleFactory
 
 	@Override
 	public
-	Object instantiate () {
+	Object makeComponent () {
 
 		ConsoleMetaModuleImplementation consoleMetaModule =
 			consoleMetaModuleProvider.get ();

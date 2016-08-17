@@ -9,15 +9,14 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import wbs.framework.application.context.BeanFactory;
+import wbs.framework.application.context.UninitializedComponentFactory;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 
 @Accessors (fluent = true)
 public
 class ConsoleModuleFactory
-	implements BeanFactory {
+	implements UninitializedComponentFactory {
 
 	// dependencies
 
@@ -39,7 +38,7 @@ class ConsoleModuleFactory
 
 	@Override
 	public
-	Object instantiate () {
+	Object makeComponent () {
 
 		ConsoleModuleImplementation consoleModule =
 			consoleModuleProvider.get ();

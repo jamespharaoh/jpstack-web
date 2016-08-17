@@ -10,10 +10,6 @@
 		<param-name>layerNames</param-name>
 		<param-value>utils,config,data,entity,schema,sql,model,hibernate,model-meta,object,logic,web,console</param-value>
 	</context-param>
-	<context-param>
-		<param-name>configNames</param-name>
-		<param-value>live,hibernate,console</param-value>
-	</context-param>
 	<!-- filters -->
 	<filter>
 		<filter-name>encodingFilter</filter-name>

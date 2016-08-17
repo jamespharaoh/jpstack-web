@@ -479,7 +479,7 @@ writeBuildFile world = do
 				(tomcatDir ++ "/conf/server.xml"),
 
 			makeCopyFileToFile
-				"conf/tomcat-users.xml"
+				"config/tomcat-users.xml"
 				(tomcatDir ++ "/conf/tomcat-users.xml"),
 
 			-- deploy console

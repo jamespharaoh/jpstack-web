@@ -438,7 +438,7 @@
     <delete dir="work/live/tomcat/**"/>
     <move file="temp/apache-tomcat-7.0.67" tofile="work/live/tomcat"/>
     <copy file="console/server-live.xml" tofile="work/live/tomcat/conf/server.xml" overwrite="true"/>
-    <copy file="conf/tomcat-users.xml" tofile="work/live/tomcat/conf/tomcat-users.xml"/>
+    <copy file="config/tomcat-users.xml" tofile="work/live/tomcat/conf/tomcat-users.xml"/>
     <delete dir="work/live/tomcat/apps/console/ROOT"/>
     <copy todir="work/live/tomcat/apps/console/ROOT">
       <fileset dir="work/live/console"/>
@@ -820,7 +820,7 @@
     <delete dir="work/test/tomcat/**"/>
     <move file="temp/apache-tomcat-7.0.67" tofile="work/test/tomcat"/>
     <copy file="console/server-test.xml" tofile="work/test/tomcat/conf/server.xml" overwrite="true"/>
-    <copy file="conf/tomcat-users.xml" tofile="work/test/tomcat/conf/tomcat-users.xml"/>
+    <copy file="config/tomcat-users.xml" tofile="work/test/tomcat/conf/tomcat-users.xml"/>
     <delete dir="work/test/tomcat/apps/console/ROOT"/>
     <copy todir="work/test/tomcat/apps/console/ROOT">
       <fileset dir="work/test/console"/>

@@ -1,9 +1,9 @@
 package wbs.framework.entity.generate;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.UninitializedDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.SimpleExceptionLogger;
 
@@ -13,7 +13,7 @@ class ModelGenerateComponents {
 
 	// prototype dependencies
 
-	@Inject
+	@UninitializedDependency
 	Provider <SimpleExceptionLogger> simpleExceptionLoggerProvider;
 
 	// components

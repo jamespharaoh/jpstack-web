@@ -7,13 +7,12 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import wbs.framework.application.context.BeanFactory;
+import wbs.framework.application.context.UninitializedComponentFactory;
 
 @Accessors (fluent = true)
 public
 class ConsoleModuleSpecFactory
-	implements BeanFactory {
+	implements UninitializedComponentFactory {
 
 	@Inject
 	ConsoleModuleSpecReader consoleSpecReader;
@@ -23,7 +22,7 @@ class ConsoleModuleSpecFactory
 
 	@Override
 	public
-	Object instantiate () {
+	Object makeComponent () {
 
 		try {
 

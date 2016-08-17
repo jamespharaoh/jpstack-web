@@ -78,12 +78,12 @@ class ApplicationContextBuilder {
 	String primaryProjectName;
 
 	@Getter @Setter
-	List<String> configNames =
-		new ArrayList<String> ();
+	List <String> configNames =
+		new ArrayList<> ();
 
 	@Getter @Setter
-	List<String> layerNames =
-		new ArrayList<String> ();
+	List <String> layerNames =
+		new ArrayList<> ();
 
 	@Getter @Setter
 	String outputPath;
@@ -95,11 +95,11 @@ class ApplicationContextBuilder {
 	List<PluginSpec> plugins;
 	PluginManager pluginManager;
 
-	Map<String,Object> singletonBeans =
-		new LinkedHashMap<String,Object> ();
+	Map <String, Object> singletonBeans =
+		new LinkedHashMap<> ();
 
-	List<BeanDefinition> beanDefinitionsToRegister =
-		new ArrayList<BeanDefinition> ();
+	List <BeanDefinition> beanDefinitionsToRegister =
+		new ArrayList<> ();
 
 	ApplicationContext applicationContext;
 
@@ -1017,6 +1017,10 @@ class ApplicationContextBuilder {
 						"factoryMethodName",
 						method.getName ())
 
+					.addValueProperty (
+						"initialized",
+						false)
+
 					.hide (
 						isNotNull (
 							namedAnnotation))
@@ -1068,6 +1072,10 @@ class ApplicationContextBuilder {
 					.addValueProperty (
 						"factoryMethodName",
 						method.getName ())
+
+					.addValueProperty (
+						"initialized",
+						false)
 
 					.hide (
 						isNotNull (
@@ -1495,11 +1503,11 @@ class ApplicationContextBuilder {
 	int registerSingletonBeans () {
 
 		for (
-			Map.Entry<String,Object> entry
+			Map.Entry <String,Object> entry
 				: singletonBeans.entrySet ()
 		) {
 
-			applicationContext.registerSingleton (
+			applicationContext.registerUnmanagedSingleton (
 				entry.getKey (),
 				entry.getValue ());
 

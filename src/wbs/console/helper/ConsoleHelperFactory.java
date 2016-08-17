@@ -9,16 +9,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-
 import wbs.console.module.ConsoleMetaManager;
-import wbs.framework.application.context.BeanFactory;
+import wbs.framework.application.context.UninitializedComponentFactory;
 import wbs.framework.object.ObjectHelper;
 
 @Accessors (fluent = true)
 @Log4j
 public
 class ConsoleHelperFactory
-	implements BeanFactory {
+	implements UninitializedComponentFactory {
 
 	// dependencies
 
@@ -51,7 +50,7 @@ class ConsoleHelperFactory
 
 	@Override
 	public
-	Object instantiate () {
+	Object makeComponent () {
 
 		if (consoleHelperClass == null)
 			throw new NullPointerException ("consoleHelperClass");

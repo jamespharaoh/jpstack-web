@@ -1,9 +1,16 @@
 package wbs.framework.application.context;
 
+import static wbs.framework.utils.etc.CollectionUtils.iterableCount;
+import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.Misc.isZero;
+import static wbs.framework.utils.etc.Misc.moreThanOne;
+import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.joinWithSeparator;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
@@ -41,6 +48,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 
 import lombok.Cleanup;
@@ -54,6 +62,7 @@ import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.annotations.UninitializedDependency;
 import wbs.framework.application.context.EasyReadWriteLock.HeldLock;
 import wbs.framework.application.context.InjectedProperty.CollectionType;
 import wbs.framework.application.xml.BeansBeanSpec;
@@ -93,38 +102,43 @@ class ApplicationContext {
 	@Getter @Setter
 	ActivityManager activityManager;
 
-	List<BeanDefinition> beanDefinitions =
-		new ArrayList<BeanDefinition> ();
+	List <BeanDefinition> beanDefinitions =
+		new ArrayList <> ();
 
-	Map<String,BeanDefinition> beanDefinitionsByName =
-		new HashMap<String,BeanDefinition> ();
+	Map <String, BeanDefinition> beanDefinitionsByName =
+		new HashMap <> ();
 
-	Map<Class<?>,Map<String,BeanDefinition>> beanDefinitionsByClass =
-		new HashMap<Class<?>,Map<String,BeanDefinition>> ();
+	Map <Class <?>, Map <String, BeanDefinition>> beanDefinitionsByClass =
+		new HashMap <> ();
 
-	Map<Class<?>,Map<String,BeanDefinition>> singletonBeanDefinitionsByClass =
-		new HashMap<Class<?>,Map<String,BeanDefinition>> ();
+	Map <Class <?>, Map <String, BeanDefinition>> singletonBeanDefinitionsByClass =
+		new HashMap <> ();
 
-	Map<Class<?>,Map<String,BeanDefinition>> prototypeBeanDefinitionsByClass =
-		new HashMap<Class<?>,Map<String,BeanDefinition>> ();
+	Map <Class <?>, Map <String,BeanDefinition>> prototypeBeanDefinitionsByClass =
+		new HashMap<> ();
 
-	Map<Annotation,List<BeanDefinition>> beanDefinitionsByQualifier =
-		new HashMap<Annotation,List<BeanDefinition>> ();
+	Map <Annotation, List <BeanDefinition>> beanDefinitionsByQualifier =
+		new HashMap<> ();
 
-	Map<Annotation,List<BeanDefinition>> singletonBeanDefinitionsByQualifier =
-		new HashMap<Annotation,List<BeanDefinition>> ();
+	Map <Annotation, List <BeanDefinition>> singletonBeanDefinitionsByQualifier =
+		new HashMap<> ();
 
-	Map<Annotation,List<BeanDefinition>> prototypeBeanDefinitionsByQualifier =
-		new HashMap<Annotation,List<BeanDefinition>> ();
+	Map <Annotation, List <BeanDefinition>> prototypeBeanDefinitionsByQualifier =
+		new HashMap <Annotation, List <BeanDefinition>> ();
 
-	Map<String,Object> singletonBeans =
-		new HashMap<String,Object> ();
+	Map <String, Object> singletonBeans =
+		new HashMap <> ();
 
-	Set<String> singletonBeansInCreation =
-		new LinkedHashSet<String> ();
+	Set <String> singletonBeansInCreation =
+		new LinkedHashSet <> ();
 
-	Set<String> singletonBeansFailed =
-		new HashSet<String> ();
+	Set <String> singletonBeansFailed =
+		new HashSet <> ();
+
+	Map <Object, BeanData> beanDatas =
+		new MapMaker ()
+			.weakKeys ()
+			.makeMap ();
 
 	// TODO not pretty
 	@Getter
@@ -137,7 +151,7 @@ class ApplicationContext {
 	public <BeanType>
 	BeanType getBeanRequired (
 			String beanName,
-			Class<BeanType> beanClass) {
+			Class <BeanType> beanClass) {
 
 		@Cleanup
 		HeldLock heldLock =
@@ -158,7 +172,8 @@ class ApplicationContext {
 
 		return beanClass.cast (
 			getBean (
-				beanDefinition));
+				beanDefinition,
+				true));
 
 	}
 
@@ -185,15 +200,15 @@ class ApplicationContext {
 
 		return beanClass.cast (
 			getBean (
-				beanDefinition));
+				beanDefinition,
+				true));
 
 	}
 
-	public
-	<BeanType>
-	Provider<BeanType> getBeanProvider (
+	public <BeanType>
+	Provider <BeanType> getBeanProvider (
 			String beanName,
-			Class<BeanType> beanClass) {
+			Class <BeanType> beanClass) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -255,7 +270,9 @@ class ApplicationContext {
 
 			map.put (
 				beanDefinition.name (),
-				getBean (beanDefinition));
+				getBean (
+					beanDefinition,
+					true));
 
 		}
 
@@ -297,7 +314,8 @@ class ApplicationContext {
 
 	private
 	Object getBean (
-			BeanDefinition beanDefinition) {
+			BeanDefinition beanDefinition,
+			Boolean initialize) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -310,13 +328,18 @@ class ApplicationContext {
 		) {
 
 			return instantiateBean (
-				beanDefinition);
+				beanDefinition,
+				initialize);
 
 		} else if (
 			equal (
 				beanDefinition.scope (),
 				"singleton")
 		) {
+
+			if (! initialize) {
+				throw new IllegalArgumentException ();
+			}
 
 			Object bean =
 				singletonBeans.get (
@@ -358,7 +381,8 @@ class ApplicationContext {
 
 				bean =
 					instantiateBean (
-						beanDefinition);
+						beanDefinition,
+						true);
 
 				singletonBeans.put (
 					beanDefinition.name (),
@@ -392,7 +416,8 @@ class ApplicationContext {
 	@SneakyThrows (Exception.class)
 	public
 	Object instantiateBean (
-			@NonNull BeanDefinition beanDefinition) {
+			@NonNull BeanDefinition beanDefinition,
+			@NonNull Boolean initialize) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -415,7 +440,7 @@ class ApplicationContext {
 
 		// instantiate
 
-		Class<?> instantiateClass =
+		Class <?> instantiateClass =
 			ifNull (
 				beanDefinition.factoryClass (),
 				beanDefinition.beanClass ());
@@ -437,15 +462,37 @@ class ApplicationContext {
 			beanDefinition,
 			bean);
 
+		// create bean info
+
+		BeanData beanData =
+			beanDatas.computeIfAbsent (
+				bean,
+				_bean -> {
+
+			BeanData newBeanData =
+				new BeanData ();
+
+			newBeanData.definition =
+				beanDefinition;
+
+			newBeanData.state =
+				beanDefinition.owned ()
+					? BeanState.uninitialized
+					: BeanState.unmanaged;
+
+			return newBeanData;
+
+		});
+
 		// call factory
 
 		if (beanDefinition.factoryClass () != null) {
 
-			BeanFactory beanFactory =
-				(BeanFactory) bean;
+			ComponentFactory componentFactory =
+				(ComponentFactory) bean;
 
 			bean =
-				beanFactory.instantiate ();
+				componentFactory.makeComponent ();
 
 			if (bean == null) {
 
@@ -456,34 +503,68 @@ class ApplicationContext {
 
 			}
 
-		}
-
-		// run post construct
-
-		if (beanDefinition.owned ()) {
-
-			for (
-				Method method
-					: bean.getClass ().getMethods ()
+			if (
+				equal (
+					beanData.state,
+					BeanState.unmanaged)
 			) {
 
-				PostConstruct postConstructAnnotation =
-					method.getAnnotation (
-						PostConstruct.class);
+				doNothing ();
 
-				if (postConstructAnnotation == null)
-					continue;
+			} else if (componentFactory.initialized ()) {
 
-				log.debug (
-					stringFormat (
-						"Running post construct method %s.%s",
-						beanDefinition.name (),
-						method.getName ()));
+				if (
+					equal (
+						beanData.state,
+						BeanState.uninitialized)
+				) {
 
-				method.invoke (
-					bean);
+					throw new IllegalStateException (
+						stringFormat (
+							"Initialized component factory %s (%s) ",
+							beanDefinition.name (),
+							componentFactory.getClass ().getSimpleName (),
+							"returned uninitialized component"));
+
+				}
+
+			} else {
+
+				if (
+					notEqual (
+						beanData.state,
+						BeanState.uninitialized)
+				) {
+
+					throw new IllegalStateException (
+						stringFormat (
+							"Uninitialized component factory %s (%s) ",
+							beanDefinition.name (),
+							componentFactory.getClass ().getSimpleName (),
+							"returned initialized component"));
+
+				}
 
 			}
+
+		} 
+
+		// initialize
+
+		if (
+
+			initialize
+
+			&& equal (
+				beanData.state,
+				BeanState.uninitialized)
+
+		) {
+
+			initializeBean (
+				beanDefinition,
+				bean,
+				beanData);
 
 		}
 
@@ -495,6 +576,81 @@ class ApplicationContext {
 				beanDefinition.name ()));
 
 		return bean;
+
+	}
+
+	@SneakyThrows (Exception.class)
+	private
+	void initializeBean (
+			@NonNull BeanDefinition beanDefinition,
+			@NonNull Object bean,
+			@NonNull BeanData beanData) {
+
+		synchronized (beanData) {
+
+			if (
+				notEqual (
+					beanData.state,
+					BeanState.uninitialized)
+			) {
+
+				throw new IllegalStateException (
+					stringFormat (
+						"Bean %s initialized multiple times",
+						beanData.definition.name ()));
+
+			}
+		
+			try {
+
+				// run post construct
+		
+				if (beanDefinition.owned ()) {
+		
+					for (
+						Method method
+							: bean.getClass ().getMethods ()
+					) {
+		
+						PostConstruct postConstructAnnotation =
+							method.getAnnotation (
+								PostConstruct.class);
+		
+						if (postConstructAnnotation == null)
+							continue;
+		
+						log.debug (
+							stringFormat (
+								"Running post construct method %s.%s",
+								beanDefinition.name (),
+								method.getName ()));
+		
+						method.invoke (
+							bean);
+		
+					}
+		
+				}
+
+				beanData.state =
+					BeanState.active;
+
+			} finally {
+
+				if (
+					notEqual (
+						beanData.state,
+						BeanState.active)
+				) {
+
+					beanData.state =
+						BeanState.error;
+
+				}
+
+			}
+
+		}
 
 	}
 
@@ -602,13 +758,15 @@ class ApplicationContext {
 
 					injectValue =
 						getBeanProvider (
-							targetBeanDefinition);
+							targetBeanDefinition,
+							injectedProperty.initialized ());
 
 				} else {
 
 					injectValue =
 						getBean (
-							targetBeanDefinition);
+							targetBeanDefinition,
+							injectedProperty.initialized ());
 
 				}
 
@@ -807,7 +965,7 @@ class ApplicationContext {
 
 			throw new RuntimeException (
 				stringFormat (
-					"Bean definition %s refers to abstract class %s",
+					"Bean definition %s ref	ers to abstract class %s",
 					beanDefinition.name (),
 					instantiationClass.getName ()));
 
@@ -1035,11 +1193,11 @@ class ApplicationContext {
 
 		// automatic beans
 
-		registerSingleton (
+		registerUnmanagedSingleton (
 			"applicationContext",
 			this);
 
-		registerSingleton (
+		registerUnmanagedSingleton (
 			"activityManager",
 			activityManager);
 
@@ -1247,19 +1405,34 @@ class ApplicationContext {
 				field.getAnnotation (
 					SingletonDependency.class);
 
+			UninitializedDependency uninitializedDependencyAnnotation =
+				field.getAnnotation (
+					UninitializedDependency.class);
+
+			long numAnnotations =
+				iterableCount (
+					presentInstances (
+						optionalFromNullable (
+							injectAnnotation),
+						optionalFromNullable (
+							prototypeDependencyAnnotation),
+						optionalFromNullable (
+							singletonDependencyAnnotation),
+						optionalFromNullable (
+							uninitializedDependencyAnnotation)));
+
 			if (
-
-				isNull (
-					injectAnnotation)
-
-				&& isNull (
-					prototypeDependencyAnnotation)
-
-				&& isNull (
-					singletonDependencyAnnotation)
-
+				isZero (
+					numAnnotations)
 			) {
 				continue;
+			}
+
+			if (
+				moreThanOne (
+					numAnnotations)
+			) {
+				throw new RuntimeException ();
 			}
 
 			Named namedAnnotation =
@@ -1272,12 +1445,14 @@ class ApplicationContext {
 					initInjectedFieldByName (
 						beanDefinition,
 						namedAnnotation,
-						field);
+						field,
+						isNull (
+							uninitializedDependencyAnnotation));
 
 			} else {
 
-				List<Annotation> qualifierAnnotations =
-					new ArrayList<Annotation> ();
+				List <Annotation> qualifierAnnotations =
+					new ArrayList <Annotation> ();
 
 				for (
 					Annotation annotation
@@ -1304,9 +1479,19 @@ class ApplicationContext {
 
 				InjectedProperty injectedProperty =
 					new InjectedProperty ()
-						.beanDefinition (beanDefinition)
-						.fieldDeclaringClass (field.getDeclaringClass ())
-						.fieldName (field.getName ());
+
+					.beanDefinition (
+						beanDefinition)
+
+					.fieldDeclaringClass (
+						field.getDeclaringClass ())
+
+					.fieldName (
+						field.getName ())
+
+					.initialized (
+						isNull (
+							uninitializedDependencyAnnotation));
 
 				errors +=
 					initInjectedPropertyField (
@@ -1347,7 +1532,8 @@ class ApplicationContext {
 	int initInjectedFieldByName (
 			BeanDefinition beanDefinition,
 			Named namedAnnotation,
-			Field field) {
+			Field field,
+			Boolean initialized) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -1395,6 +1581,9 @@ class ApplicationContext {
 
 			.provider (
 				field.getType () == Provider.class)
+
+			.initialized (
+				initialized)
 
 			.targetBeanNames (
 				Collections.singletonList (
@@ -1790,15 +1979,15 @@ class ApplicationContext {
 	}
 
 	public
-	ApplicationContext registerSingleton (
-			String beanName,
-			Object object) {
+	ApplicationContext registerUnmanagedSingleton (
+			@NonNull String beanName,
+			@NonNull Object object) {
 
 		@Cleanup
 		HeldLock heldlock =
 			lock.write ();
 
-		registerBeanDefinition (
+		BeanDefinition beanDefinition =
 			new BeanDefinition ()
 
 			.name (
@@ -1818,9 +2007,30 @@ class ApplicationContext {
 				object)
 
 			.owned (
-				false)
+				false);
 
-		);
+		registerBeanDefinition (
+			beanDefinition);
+
+		if (
+			beanDatas.containsKey (
+				object)
+		) {
+			throw new IllegalStateException ();
+		}
+
+		BeanData beanData =
+			new BeanData ();
+
+		beanData.definition =
+			beanDefinition;
+
+		beanData.state =
+			BeanState.unmanaged;		
+
+		beanDatas.put (
+			object,
+			beanData);
 
 		return this;
 
@@ -1923,18 +2133,33 @@ class ApplicationContext {
 
 	public
 	Provider<?> getBeanProvider (
-			final BeanDefinition beanDefinition) {
+			@NonNull BeanDefinition beanDefinition) {
+
+		return getBeanProvider (
+			beanDefinition,
+			true);
+
+	}
+
+	public
+	Provider<?> getBeanProvider (
+			final BeanDefinition beanDefinition,
+			final Boolean initialized) {
 
 		@Cleanup
 		HeldLock heldlock =
 			lock.read ();
 
-		return new Provider<Object> () {
+		return new Provider <Object> () {
 
 			@Override
 			public
 			Object get () {
-				return getBean (beanDefinition);
+
+				return getBean (
+					beanDefinition,
+					initialized);
+
 			}
 
 		};
@@ -1983,6 +2208,21 @@ class ApplicationContext {
 
 		return bean;
 
+	}
+
+	public static
+	class BeanData {
+		BeanDefinition definition;
+		BeanState state;
+	}
+
+	public static
+	enum BeanState {
+		uninitialized,
+		active,
+		tornDown,
+		error,
+		unmanaged;
 	}
 
 }

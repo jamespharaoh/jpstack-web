@@ -12,7 +12,7 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.application.context.BeanDefinition;
-import wbs.framework.application.context.BeanFactory;
+import wbs.framework.application.context.InitializedComponentFactory;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 
@@ -55,14 +55,14 @@ class BeansSpec {
 
 			}
 
-			Class<? extends BeanFactory> factoryClass = null;
+			Class<? extends InitializedComponentFactory> factoryClass = null;
 
 			try {
 
 				factoryClass =
 					bean.factoryClassName () != null
 						? Class.forName (bean.factoryClassName ())
-							.asSubclass (BeanFactory.class)
+							.asSubclass (InitializedComponentFactory.class)
 						: null;
 
 			} catch (ClassNotFoundException exception) {
