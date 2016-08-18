@@ -1,6 +1,7 @@
 /RemoteSystemsTempFiles
 /binaries
 /conf
+/config
 /env*
 /.bin
 /bin
@@ -12,7 +13,8 @@
 /.Trash-*
 /hs_err_*.log
 
-# cabal
+# haskell
 /.cabal-sandbox
 /cabal.sandbox.config
 /dist
+/.stack-work
