@@ -128,17 +128,14 @@
 
 		<enum-field
 			name="joinType"
-			helper="chatKeywordJoinTypeConsoleHelper"
 			nullable="yes"/>
 
 		<enum-field
 			name="joinGender"
-			helper="genderConsoleHelper"
 			nullable="yes"/>
 
 		<enum-field
 			name="joinOrient"
-			helper="orientConsoleHelper"
 			nullable="yes"/>
 
 		<object-field

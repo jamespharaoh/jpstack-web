@@ -31,8 +31,8 @@ interface ModelMethods {
 	ModelField timestampField ();
 	ModelField typeCodeField ();
 
-	List<ModelField> fields ();
-	Map<String,ModelField> fieldsByName ();
+	List <ModelField> fields ();
+	Map <String, ModelField> fieldsByName ();
 
 	ModelField field (
 			String name);

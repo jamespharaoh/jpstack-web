@@ -3,6 +3,8 @@ package wbs.framework.hibernate;
 import static wbs.framework.utils.etc.LogicUtils.notEqualSafe;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -517,6 +519,19 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 			@NonNull String typeCode,
 			@NonNull String code) {
 
+		if (
+			isNull (
+				model.typeCodeField ())
+		) {
+
+			throw new UnsupportedOperationException (
+				stringFormat (
+					"Cannot call findAllByParentAndType for '%s', ",
+					model.objectName (),
+					"because it has no type code field"));
+
+		}
+
 		@Cleanup
 		ActiveTask activeTask =
 			startTask (
@@ -527,18 +542,6 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 
 		Session session =
 			hibernateDatabase.currentSession ();
-
-		if (
-			isNotNull (
-				model.typeCodeField ())
-		) {
-
-			throw new UnsupportedOperationException (
-				stringFormat (
-					"Object type %s has no type code",
-					getClass ().getSimpleName ()));
-
-		}
 
 		if (model.isRooted ()) {
 
@@ -1153,6 +1156,19 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 			@NonNull GlobalId parentGlobalId,
 			@NonNull String typeCode) {
 
+		if (
+			isNull (
+				model.typeCodeField ())
+		) {
+
+			throw new UnsupportedOperationException (
+				stringFormat (
+					"Cannot call findAllByParentAndType for '%s', ",
+					model.objectName (),
+					"because it has no type code field"));
+
+		}
+
 		@Cleanup
 		ActiveTask activeTask =
 			startTask (
@@ -1184,8 +1200,19 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 				session.createQuery (
 
 				stringFormat (
-					"FROM %s",
-					model.objectClass ().getSimpleName ()))
+
+					"FROM %s _%s ",
+					model.objectClass ().getSimpleName (),
+					model.objectName (),
+
+					"WHERE _%s.%s = :%s",
+					model.objectName (),
+					model.typeCodeField ().name (),
+					model.typeCodeField ().name ()))
+
+				.setString (
+					model.typeCodeField ().name (),
+					typeCode)
 
 				.setFlushMode (
 					FlushMode.MANUAL)
@@ -1201,27 +1228,22 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 
 		}
 
-		if (
-			isNotNull (
-				model.typeCodeField ())
-		) {
-			throw new RuntimeException ();
-		}
-
 		if (model.canGetParent ()) {
 
-			/*
-			if (parentGlobalId.getTypeId ()
-					!= parentObjectHelperProvider ().objectTypeId ()) {
+			if (
+				integerNotEqualSafe (
+					parentGlobalId.typeId (),
+					model.parentTypeId ())
+			) {
 
-				throw new IllegalArgumentException (sf (
-					"Invalid parent type id %s for %s (should be %s)",
-					parentGlobalId.getTypeId (),
-					objectClass ().getSimpleName (),
-					parentObjectHelperProvider ().objectTypeId ()));
+				throw new IllegalArgumentException (
+					stringFormat (
+						"Invalid parent type id %s for %s (should be %s)",
+						parentGlobalId.typeId (),
+						model.objectName (),
+						model.parentTypeId ()));
 
 			}
-			*/
 
 			List<?> objectsUncast =
 				session.createQuery (
