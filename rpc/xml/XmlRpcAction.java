@@ -1,8 +1,9 @@
 package wbs.platform.rpc.xml;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.fromHex;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +16,8 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.joda.time.LocalDate;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -26,9 +29,6 @@ import nu.xom.Elements;
 import nu.xom.ParsingException;
 import nu.xom.Serializer;
 import nu.xom.ValidityException;
-
-import org.joda.time.LocalDate;
-
 import wbs.api.mvc.WebApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
@@ -294,9 +294,11 @@ class XmlRpcAction
 
 		// check the element type is correct
 
-		if (! equal (
+		if (
+			stringNotEqualSafe (
 				rpcDefinition.name (),
-				element.getLocalName ())) {
+				element.getLocalName ())
+		) {
 
 			errors.add (
 				stringFormat (
@@ -406,11 +408,21 @@ class XmlRpcAction
 		String text =
 			element.getValue ();
 
-		if (equal (text, "true"))
+		if (
+			stringEqual (
+				text,
+				"true")
+		) {
 			return true;
+		}
 
-		if (equal (text, "false"))
+		if (
+			stringEqual (
+				text,
+				"false")
+		) {
 			return false;
+		}
 
 		errors.add (
 			stringFormat (

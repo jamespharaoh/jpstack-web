@@ -1,11 +1,10 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
-
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -52,7 +51,7 @@ class QueueUnclaimAction
 	Responder goReal () {
 
 		long queueItemId =
-			requestContext.parameterInteger (
+			requestContext.parameterIntegerRequired (
 				"queueItemId");
 
 		@Cleanup
@@ -66,7 +65,7 @@ class QueueUnclaimAction
 				queueItemId);
 
 		if (
-			notEqual (
+			referenceNotEqualSafe (
 				queueItem.getQueueItemClaim ().getUser (),
 				userConsoleLogic.userRequired ())
 		) {

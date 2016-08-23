@@ -1,8 +1,8 @@
 package wbs.platform.media.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.StringUtils.bytesToString;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
@@ -399,9 +399,11 @@ class MediaConsoleLogicImplementation
 	String mediaThumb100OrText (
 			MediaRec media) {
 
-		if (equal (
+		if (
+			stringEqual (
 				media.getMediaType ().getMimeType (),
-				"text/plain")) {
+				"text/plain")
+		) {
 
 			return
 
@@ -500,9 +502,11 @@ class MediaConsoleLogicImplementation
 	String mediaThumb32OrText (
 			MediaRec media) {
 
-		if (equal (
+		if (
+			stringEqual (
 				media.getMediaType ().getMimeType (),
-				"text/plain")) {
+				"text/plain")
+		) {
 
 			return stringFormat (
 				"%h",
@@ -519,10 +523,17 @@ class MediaConsoleLogicImplementation
 
 	}
 
-	Map<String,String> iconNames =
-		ImmutableMap.<String,String>builder ()
-			.put ("text/plain", "txt.png")
-			.put ("application/smil", "xml6.png")
-			.build ();
+	Map <String, String> iconNames =
+		ImmutableMap.<String, String> builder ()
+
+		.put (
+			"text/plain",
+			"txt.png")
+
+		.put (
+			"application/smil",
+			"xml6.png")
+
+		.build ();
 
 }

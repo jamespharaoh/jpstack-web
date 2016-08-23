@@ -1,7 +1,7 @@
 package wbs.platform.queue.console;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -172,7 +172,7 @@ class QueueDebugPart
 				isNotNull (
 					form.sliceId ())
 
-				&& notEqual (
+				&& integerNotEqualSafe (
 					form.sliceId (),
 					queueInfo.slice.getId ())
 

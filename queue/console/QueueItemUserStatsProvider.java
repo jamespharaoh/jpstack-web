@@ -55,18 +55,18 @@ class QueueItemUserStatsProvider
 	public
 	StatsDataSet getStats (
 			@NonNull StatsPeriod statsPeriod,
-			@NonNull Map<String,Object> conditions) {
+			@NonNull Map <String, Object> conditions) {
 
 		if (statsPeriod.granularity () != StatsGranularity.hour)
 			throw new IllegalArgumentException ();
 
 		// setup data structures
 
-		Map<Long,long[]> numProcessedPerUser =
+		Map <Long, long[]> numProcessedPerUser =
 			new TreeMap<> ();
 
-		Set<Object> userIds =
-			new HashSet<Object> ();
+		Set <Object> userIdObjects =
+			new HashSet<> ();
 
 		// retrieve queue items
 
@@ -76,7 +76,7 @@ class QueueItemUserStatsProvider
 		queueStatsFilter.conditions (
 			conditions);
 
-		List<QueueItemRec> queueItems =
+		List <QueueItemRec> queueItems =
 			queueStatsFilter.filterQueueItems (
 				queueItemHelper.findByProcessedTime (
 					statsPeriod.toInterval ()));
@@ -113,10 +113,10 @@ class QueueItemUserStatsProvider
 					queueItem.getProcessedTime ());
 
 
-			if (! userIds.contains (
+			if (! userIdObjects.contains (
 					queueItem.getProcessedUser ().getId ())) {
 
-				userIds.add (
+				userIdObjects.add (
 					queueItem.getProcessedUser ().getId ());
 
 				numProcessedPerUser.put (
@@ -139,8 +139,9 @@ class QueueItemUserStatsProvider
 		StatsDataSet statsDataSet =
 			new StatsDataSet ();
 
-		statsDataSet.indexValues ()
-			.put ("userId", userIds);
+		statsDataSet.indexValues ().put (
+			"userId",
+			userIdObjects);
 
 		for (
 			int hour = 0;
@@ -148,17 +149,21 @@ class QueueItemUserStatsProvider
 			hour ++
 		) {
 
-			for (Object userIdObject
-					: userIds) {
+			for (
+				Object userIdObject
+					: userIdObjects
+			) {
 
-				Integer userId =
-					(Integer) userIdObject;
+				Long userId =
+					(Long)
+					userIdObject;
 
 				statsDataSet.data ().add (
 					new StatsDatum ()
 
 					.startTime (
-						statsPeriod.step (hour))
+						statsPeriod.step (
+							hour))
 
 					.addIndex (
 						"userId",

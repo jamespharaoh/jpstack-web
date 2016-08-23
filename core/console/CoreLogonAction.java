@@ -1,14 +1,13 @@
 package wbs.platform.core.console;
 
-import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 
 import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -78,11 +77,15 @@ class CoreLogonAction
 
 		// check we got the right params
 
-		if (in ("",
+		if (
+			stringInSafe (
+				"",
 				slice,
 				username,
-				password))
+				password)
+		) {
 			return null;
+		}
 
 		@Cleanup
 		Transaction transaction =

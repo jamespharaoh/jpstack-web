@@ -1,23 +1,23 @@
 package wbs.platform.currency.logic;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
-import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
 import static wbs.framework.utils.etc.StringUtils.joinWithPipe;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.platform.currency.model.CurrencyRec;
 
@@ -304,38 +304,38 @@ class CurrencyLogicImplementation
 
 		if (! matcher.matches ()) {
 
-			return Optional.<Long>absent ();
+			return Optional.absent ();
 
 		}
 
 		// return the result
 
 		boolean positive =
-			equal (
+			stringEqual (
 				ifNull (
 					matcher.group (1),
 					"+"),
 				"+");
 
-		Long units =
-			Long.parseLong (
+		long units =
+			parseIntegerRequired (
 				matcher.group (2));
 
-		Long subDivisions =
+		long subDivisions =
 			decimalPlaces > 0
-				? Long.parseLong (
+				? parseIntegerRequired (
 					matcher.group (3))
 				: 0;
 
 		if (positive) {
 
-			return Optional.<Long>of (
+			return Optional.of (
 				+ units * currency.getDivisions ()
 				+ subDivisions);
 
 		} else {
 
-			return Optional.<Long>of (
+			return Optional.of (
 				- units * currency.getDivisions ()
 				- subDivisions);
 
@@ -349,7 +349,7 @@ class CurrencyLogicImplementation
 			@NonNull CurrencyRec currency,
 			@NonNull String text) {
 
-		return optionalRequired (
+		return optionalGetRequired (
 			parseText (
 				currency,
 				text));

@@ -1,14 +1,16 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifElse;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.notIn;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualWithClass;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
@@ -169,8 +171,8 @@ class QueueSubjectSorter {
 
 		// process queue subjects
 
-		List<QueueSubjectRec> queueSubjects =
-			ifElse (
+		List <QueueSubjectRec> queueSubjects =
+			ifThenElse (
 				isNotNull (
 					queue),
 
@@ -296,7 +298,7 @@ class QueueSubjectSorter {
 		// claimed items are not available
 
 		if (
-			equal (
+			enumEqualSafe (
 				subjectInfo.state,
 				QueueItemState.claimed)
 		) {
@@ -371,8 +373,10 @@ class QueueSubjectSorter {
 
 			subjectInfo.preferred
 
-			&& equal (
-				subjectInfo.preferredUser,
+			&& optionalValueEqualWithClass (
+				UserRec.class,
+				optionalFromNullable (
+					subjectInfo.preferredUser),
 				effectiveUser)
 
 		);
@@ -381,8 +385,10 @@ class QueueSubjectSorter {
 
 			subjectInfo.preferred
 
-			&& notEqual (
-				subjectInfo.preferredUser,
+			&& optionalValueEqualWithClass (
+				UserRec.class,
+				optionalFromNullable (
+					subjectInfo.preferredUser),
 				effectiveUser)
 
 		);
@@ -476,7 +482,7 @@ class QueueSubjectSorter {
 		// check claimed user
 
 		if (
-			equal (
+			enumEqualSafe (
 				subjectInfo.state (),
 				QueueItemState.claimed)
 		) {
@@ -668,7 +674,7 @@ class QueueSubjectSorter {
 				nextItemIndex);
 
 		if (
-			notIn (
+			enumNotInSafe (
 				item.getState (),
 				QueueItemState.pending,
 				QueueItemState.claimed)
@@ -748,10 +754,15 @@ class QueueSubjectSorter {
 		queueInfo.claimedItems ++;
 
 		if (
-			effectiveUser != null
-			&& equal (
+
+			isNotNull (
+				effectiveUser)
+
+			&& referenceEqualWithClass (
+				UserRec.class,
 				effectiveUser,
 				subjectInfo.item.getQueueItemClaim ().getUser ())
+
 		) {
 
 			result.userClaimedItems ++;

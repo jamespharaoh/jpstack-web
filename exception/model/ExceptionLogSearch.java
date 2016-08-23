@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
 @Data
@@ -15,11 +16,19 @@ public
 class ExceptionLogSearch
 	implements Serializable {
 
-	Boolean alert;
-	Boolean fatal;
+	TextualInterval timestamp;
 
 	Long typeId;
 	Long userId;
+
+	String sourceContains;
+	String summaryContains;
+	String dumpContains;
+
+	Boolean alert;
+	Boolean fatal;
+
+	ConcreteExceptionResolution resolution;
 
 	Order order =
 		Order.timestampDesc;

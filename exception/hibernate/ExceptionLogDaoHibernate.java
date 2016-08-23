@@ -1,5 +1,6 @@
 package wbs.platform.exception.hibernate;
 
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;
@@ -15,8 +16,6 @@ import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.exception.model.ExceptionLogDao;
 import wbs.platform.exception.model.ExceptionLogRec;
 import wbs.platform.exception.model.ExceptionLogSearch;
-import wbs.platform.exception.model.ExceptionLogTypeRec;
-import wbs.platform.user.model.UserRec;
 
 public
 class ExceptionLogDaoHibernate
@@ -85,7 +84,87 @@ class ExceptionLogDaoHibernate
 			createCriteria (
 				ExceptionLogRec.class);
 
-		if (search.alert () != null) {
+		if (
+			isNotNull (
+				search.timestamp ())
+		) {
+
+			criteria.add (
+				Restrictions.ge (
+					"timestamp",
+					search.timestamp ().start ()));
+
+			criteria.add (
+				Restrictions.lt (
+					"timestamp",
+					search.timestamp ().end ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.typeId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"type.id",
+					search.typeId ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.userId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"user.id",
+					search.userId ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.sourceContains ())
+		) {
+
+			criteria.add (
+				Restrictions.ilike (
+					"source",
+					"%" + search.sourceContains () + "%"));
+
+		}
+
+		if (
+			isNotNull (
+				search.summaryContains ())
+		) {
+
+			criteria.add (
+				Restrictions.ilike (
+					"summary",
+					"%" + search.summaryContains () + "%"));
+
+		}
+
+		if (
+			isNotNull (
+				search.dumpContains ())
+		) {
+
+			criteria.add (
+				Restrictions.ilike (
+					"dump.text",
+					"%" + search.dumpContains () + "%"));
+
+		}
+
+		if (
+			isNotNull (
+				search.alert ())
+		) {
 
 			criteria.add (
 				Restrictions.eq (
@@ -94,7 +173,10 @@ class ExceptionLogDaoHibernate
 
 		}
 
-		if (search.fatal () != null) {
+		if (
+			isNotNull (
+				search.fatal ())
+		) {
 
 			criteria.add (
 				Restrictions.eq (
@@ -103,31 +185,15 @@ class ExceptionLogDaoHibernate
 
 		}
 
-		if (search.typeId () != null) {
-
-			ExceptionLogTypeRec type =
-				get (
-					ExceptionLogTypeRec.class,
-					search.typeId ());
+		if (
+			isNotNull (
+				search.resolution ())
+		) {
 
 			criteria.add (
 				Restrictions.eq (
-					"type",
-					type));
-
-		}
-
-		if (search.userId () != null) {
-
-			UserRec user =
-				get (
-					UserRec.class,
-					search.userId ());
-
-			criteria.add (
-				Restrictions.eq (
-					"user",
-					user));
+					"resolution",
+					search.resolution ()));
 
 		}
 

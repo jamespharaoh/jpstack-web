@@ -14,19 +14,19 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ExceptionLogLogicImplementation"/>
-		<bean class="logic.PlatformExceptionLogger"/>
+		<component class="logic.ExceptionLogLogicImplementation"/>
+		<component class="logic.PlatformExceptionLogger"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.ExceptionLogRemovalDaemon"/>
+		<component class="daemon.ExceptionLogRemovalDaemon"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.ExceptionStatusLine"/>
-		<bean class="console.ExceptionStatusLinePart"/>
-		<bean class="console.NumExceptionsCache"/>
-		<bean class="console.NumFatalExceptionsCache"/>
+		<component class="console.ExceptionStatusLine"/>
+		<component class="console.ExceptionStatusLinePart"/>
+		<component class="console.NumExceptionsCache"/>
+		<component class="console.NumFatalExceptionsCache"/>
 	</layer>
 
 	<console-modules>

@@ -8,18 +8,18 @@
 	</models>
 
 	<layer name="fixture">
-		<bean class="fixture.PrivTypeBuilder"/>
-		<bean class="fixture.PrivTypesBuilder"/>
+		<component class="fixture.PrivTypeBuilder"/>
+		<component class="fixture.PrivTypesBuilder"/>
 	</layer>
 
 	<layer name="model-meta">
-		<bean class="metamodel.PrivTypeSpec"/>
-		<bean class="metamodel.PrivTypesSpec"/>
+		<component class="metamodel.PrivTypeSpec"/>
+		<component class="metamodel.PrivTypesSpec"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.ObjectSummaryPrivPart"/>
-		<bean class="console.PrivDataLoaderImplementation"/>
+		<component class="console.ObjectSummaryPrivPart"/>
+		<component class="console.PrivDataLoaderImplementation"/>
 	</layer>
 
 	<console-modules>

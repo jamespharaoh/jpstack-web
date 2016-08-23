@@ -63,8 +63,7 @@
 			name="endTime"/>
 
 		<enum-field
-			name="status"
-			helper="queueItemClaimStatusConsoleHelper"/>
+			name="status"/>
 
 	</field-set>
 

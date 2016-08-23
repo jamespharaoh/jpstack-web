@@ -15,8 +15,8 @@
 	</models>
 
 	<layer name="console">
-		<bean class="console.GroupPrivsAction"/>
-		<bean class="console.GroupPrivsPart"/>
+		<component class="console.GroupPrivsAction"/>
+		<component class="console.GroupPrivsPart"/>
 	</layer>
 
 	<fixtures>

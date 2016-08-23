@@ -1,10 +1,12 @@
 package wbs.platform.object.search;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.Misc.classForName;
 import static wbs.framework.utils.etc.Misc.classForNameRequired;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
@@ -12,11 +14,10 @@ import java.util.Collections;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -37,8 +38,6 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.record.Record;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 
@@ -115,7 +114,7 @@ class ObjectSearchPageBuilder<
 	String fileName;
 	String searchResponderName;
 	String searchResultsResponderName;
-	Integer itemsPerPage;
+	Long itemsPerPage;
 
 	Action searchGetAction;
 	Action searchPostAction;
@@ -343,8 +342,8 @@ class ObjectSearchPageBuilder<
 
 		// search results responder
 
-		Provider<PagePart> searchResultsPartFactory =
-			new Provider<PagePart> () {
+		Provider <PagePart> searchResultsPartFactory =
+			new Provider <PagePart> () {
 
 			@Override
 			public
@@ -534,7 +533,7 @@ class ObjectSearchPageBuilder<
 						name)));
 
 		itemsPerPage =
-			100;
+			100l;
 
 	}
 

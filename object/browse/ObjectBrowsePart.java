@@ -280,11 +280,15 @@ class ObjectBrowsePart
 				" class=\"%h\"",
 				joinWithSpace (
 					presentInstances (
-						Optional.of (
-							"magic-table-row"),
-						optionalIf (
-							object == currentObject,
-							"selected"))),
+
+					Optional.of (
+						"magic-table-row"),
+
+					optionalIf (
+						object == currentObject,
+						() -> "selected")
+
+				)),
 
 				" data-target-href=\"%h\"",
 				requestContext.resolveContextUrl (

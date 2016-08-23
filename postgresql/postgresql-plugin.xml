@@ -20,17 +20,17 @@
 	</models>
 
 	<layer name="data">
-		<bean class="data.PostgresqlDataComponents"/>
+		<component class="data.PostgresqlDataComponents"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.PostgresqlMaintenanceDaemon"/>
+		<component class="daemon.PostgresqlMaintenanceDaemon"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.PostgresqlMaintenanceListPart"/>
-		<bean class="console.PostgresqlActivityPart"/>
-		<bean class="console.PostgresqlTablesPart"/>
+		<component class="console.PostgresqlMaintenanceListPart"/>
+		<component class="console.PostgresqlActivityPart"/>
+		<component class="console.PostgresqlTablesPart"/>
 	</layer>
 
 	<fixtures>

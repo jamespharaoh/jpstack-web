@@ -8,13 +8,13 @@
 	</models>
 
 	<layer name="fixture">
-		<bean class="fixture.ServiceTypeBuilder"/>
-		<bean class="fixture.ServiceTypesBuilder"/>
+		<component class="fixture.ServiceTypeBuilder"/>
+		<component class="fixture.ServiceTypesBuilder"/>
 	</layer>
 
 	<layer name="model-meta">
-		<bean class="metamodel.ServiceTypeSpec"/>
-		<bean class="metamodel.ServiceTypesSpec"/>
+		<component class="metamodel.ServiceTypeSpec"/>
+		<component class="metamodel.ServiceTypesSpec"/>
 	</layer>
 
 	<console-modules>

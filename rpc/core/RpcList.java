@@ -1,7 +1,8 @@
 package wbs.platform.rpc.core;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -86,9 +87,11 @@ class RpcList
 	void add (
 			RpcElem newMember) {
 
-		if (! equal (
+		if (
+			stringNotEqualSafe (
 				newMember.getName (),
-				memberName)) {
+				memberName)
+		) {
 
 			throw new RuntimeException (
 				stringFormat (
@@ -97,9 +100,11 @@ class RpcList
 
 		}
 
-		if (! equal (
+		if (
+			enumNotEqualSafe (
 				newMember.getType (),
-				memberType)) {
+				memberType)
+		) {
 
 			throw new RuntimeException (
 				stringFormat (

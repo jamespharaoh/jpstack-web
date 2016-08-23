@@ -8,13 +8,13 @@
 	</models>
 
 	<layer name="fixture">
-		<bean class="fixture.AffiliateTypeBuilder"/>
-		<bean class="fixture.AffiliateTypesBuilder"/>
+		<component class="fixture.AffiliateTypeBuilder"/>
+		<component class="fixture.AffiliateTypesBuilder"/>
 	</layer>
 
 	<layer name="model-meta">
-		<bean class="metamodel.AffiliateTypeSpec"/>
-		<bean class="metamodel.AffiliateTypesSpec"/>
+		<component class="metamodel.AffiliateTypeSpec"/>
+		<component class="metamodel.AffiliateTypesSpec"/>
 	</layer>
 
 	<console-modules>

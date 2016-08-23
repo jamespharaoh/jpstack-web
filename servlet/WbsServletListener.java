@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.application.tools.ApplicationContextBuilder;
-import wbs.framework.application.tools.ThreadLocalProxyBeanFactory;
+import wbs.framework.application.tools.ThreadLocalProxyComponentFactory;
 import wbs.framework.web.RequestContextImplementation;
 
 @Log4j
@@ -94,7 +94,7 @@ class WbsServletListener
 			.outputPath (
 				beanDefinitionOutputPath)
 
-			.addSingletonBean (
+			.addSingletonComponent (
 				"servletContext",
 				event.getServletContext ())
 
@@ -116,8 +116,8 @@ class WbsServletListener
 				: applicationContext.requestComponentNames ()
 		) {
 
-			ThreadLocalProxyBeanFactory.Control control =
-				(ThreadLocalProxyBeanFactory.Control)
+			ThreadLocalProxyComponentFactory.Control control =
+				(ThreadLocalProxyComponentFactory.Control)
 				applicationContext.getComponentRequired (
 					requestBeanName,
 					Object.class);
@@ -163,8 +163,8 @@ class WbsServletListener
 					: applicationContext.requestComponentNames ()
 			) {
 
-				ThreadLocalProxyBeanFactory.Control control =
-					(ThreadLocalProxyBeanFactory.Control)
+				ThreadLocalProxyComponentFactory.Control control =
+					(ThreadLocalProxyComponentFactory.Control)
 					applicationContext.getComponentRequired (
 						requestBeanName,
 						Object.class);
@@ -196,8 +196,8 @@ class WbsServletListener
 				for (String requestBeanName
 						: setRequestBeanNames) {
 
-					ThreadLocalProxyBeanFactory.Control control =
-						(ThreadLocalProxyBeanFactory.Control)
+					ThreadLocalProxyComponentFactory.Control control =
+						(ThreadLocalProxyComponentFactory.Control)
 						applicationContext.getComponentRequired (
 							requestBeanName,
 							Object.class);

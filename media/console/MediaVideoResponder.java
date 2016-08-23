@@ -47,17 +47,28 @@ class MediaVideoResponder
 				requestContext.stuffInteger (
 					"mediaId"));
 
-		data =
-			runFilter (
-				log,
-				media.getContent ().getData (),
-				".3gp",
-				".flv",
-				"ffmpeg",
-				"-y",
-				"-i",
-				"<in>",
-				"<out>");
+		try {
+
+			data =
+				runFilter (
+					log,
+					media.getContent ().getData (),
+					".3gp",
+					".flv",
+					"ffmpeg",
+					"-y",
+					"-i",
+					"<in>",
+					"<out>");
+
+		} catch (InterruptedException interruptedException) {
+
+			Thread.currentThread ().interrupt ();
+
+			throw new RuntimeException (
+				interruptedException);
+
+		}
 
 	}
 

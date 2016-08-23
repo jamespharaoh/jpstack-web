@@ -1,6 +1,6 @@
 package wbs.platform.rpc.php;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -15,13 +15,12 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.joda.time.LocalDate;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-
-import org.joda.time.LocalDate;
-
 import wbs.api.mvc.WebApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
@@ -575,8 +574,13 @@ class PhpRpcAction
 
 			// ignore encoding, this is handled separately
 
-			if (equal (key, "encoding"))
+			if (
+				stringEqual (
+					key,
+					"encoding")
+			) {
 				continue;
+			}
 
 			// check it is defined
 

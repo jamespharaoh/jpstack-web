@@ -1,9 +1,10 @@
 package wbs.platform.core.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.framework.utils.etc.OptionalUtils.optionalValueNotEqualSafe;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
@@ -72,10 +73,10 @@ class CoreAuthFilter
 	Instant lastReload =
 		millisToInstant (0);
 
-	Map<Long,String> onlineSessionIdsByUserId;
+	Map <Long, String> onlineSessionIdsByUserId;
 
-	Map<String,Instant> activeSessions =
-		new HashMap<String,Instant> ();
+	Map <String, Instant> activeSessions =
+		new HashMap<> ();
 
 	private synchronized
 	void reload () {
@@ -87,7 +88,7 @@ class CoreAuthFilter
 				this);
 
 		onlineSessionIdsByUserId =
-			new HashMap<Long,String> ();
+			new HashMap <> ();
 
 		for (
 			UserOnlineRec online
@@ -160,7 +161,6 @@ class CoreAuthFilter
 		// check there is a user id
 
 		if (userConsoleLogic.notLoggedIn ()) {
-System.out.println ("NOT LOGGED IN");
 			return false;
 		}
 
@@ -178,7 +178,7 @@ System.out.println ("NOT LOGGED IN");
 					reloadTime),
 				now)
 
-			|| equal (
+			|| stringEqual (
 				requestContext.servletPath (),
 				"/")
 
@@ -196,9 +196,10 @@ System.out.println ("NOT LOGGED IN");
 		// check his session is valid, reload if it doesn't look right still
 
 		if (
-			notEqual (
-				onlineSessionIdsByUserId.get (
-					userConsoleLogic.userIdRequired ()),
+			optionalValueNotEqualSafe (
+				optionalFromNullable (
+					onlineSessionIdsByUserId.get (
+						userConsoleLogic.userIdRequired ())),
 				requestContext.sessionId ())
 		) {
 
@@ -211,9 +212,10 @@ System.out.println ("NOT LOGGED IN");
 				now;
 
 			if (
-				notEqual (
-					onlineSessionIdsByUserId.get (
-						userConsoleLogic.userIdRequired ()),
+				optionalValueNotEqualSafe (
+					optionalFromNullable (
+						onlineSessionIdsByUserId.get (
+							userConsoleLogic.userIdRequired ())),
 					requestContext.sessionId ())
 			) {
 				return false;
@@ -273,7 +275,7 @@ System.out.println ("NOT LOGGED IN");
 
 				} else {
 
-					Provider<Responder> logonResponder =
+					Provider <Responder> logonResponder =
 						consoleManagerProvider.get ().responder (
 							"coreLogonResponder",
 							true);
@@ -286,7 +288,8 @@ System.out.println ("NOT LOGGED IN");
 
 			} else if (
 
-				in (path,
+				stringInSafe (
+					path,
 					"/style/basic.css",
 					"/favicon.ico",
 					"/status.update",

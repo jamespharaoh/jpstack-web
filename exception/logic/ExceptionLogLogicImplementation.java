@@ -1,16 +1,15 @@
 package wbs.platform.exception.logic;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 
 import java.util.Map;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -101,7 +100,7 @@ class ExceptionLogLogicImplementation
 					dump))
 
 			.setFatal (
-				equal (
+				enumEqualSafe (
 					resolution,
 					GenericExceptionResolution.fatalError))
 

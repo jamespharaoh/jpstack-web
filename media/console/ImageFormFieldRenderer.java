@@ -1,19 +1,14 @@
 package wbs.platform.media.console;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.moreThanZero;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.NumberUtils.moreThanZero;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.util.Map;
 
 import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
@@ -21,7 +16,10 @@ import org.apache.commons.io.IOUtils;
 import com.google.common.base.Optional;
 
 import fj.data.Either;
-
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldRenderer;
 import wbs.console.forms.FormFieldSubmission;

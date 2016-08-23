@@ -1,6 +1,6 @@
 package wbs.platform.object.list;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
 import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
@@ -682,11 +682,15 @@ class ObjectListPart<
 				" class=\"%h\"",
 				joinWithSpace (
 					presentInstances (
-						Optional.of (
-							"magic-table-row"),
-						optionalIf (
-							object == currentObject,
-							"selected"))),
+
+					Optional.of (
+						"magic-table-row"),
+
+					optionalIf (
+						object == currentObject,
+						() -> "selected")
+
+				)),
 
 				" data-target-href=\"%h\"",
 				requestContext.resolveContextUrl (

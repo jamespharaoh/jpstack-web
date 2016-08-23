@@ -5,7 +5,7 @@ import java.util.List;
 public
 interface EventDaoMethods {
 
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			EventSearch eventSearch);
 
 }

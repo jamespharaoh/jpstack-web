@@ -2,17 +2,17 @@ package wbs.platform.media.logic;
 
 import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.iterable;
 import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.Misc.runFilter;
 import static wbs.framework.utils.etc.Misc.runFilterAdvanced;
 import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.framework.utils.etc.NumberUtils.moreThan;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringToBytes;
 
@@ -95,10 +95,10 @@ class MediaLogicImplementation
 
 		boolean twoPass;
 
-		Optional<String> videoCodec;
-		Optional<String> videoResolution;
-		Optional<String> videoBitrate;
-		Optional<String> videoDuration;
+		Optional <String> videoCodec;
+		Optional <String> videoResolution;
+		Optional <String> videoBitrate;
+		Optional <String> videoDuration;
 
 		public
 		FfmpegVideoProfile (
@@ -467,7 +467,7 @@ class MediaLogicImplementation
 			@NonNull String filename,
 			@NonNull Optional<String> encoding) {
 
-		return optionalRequired (
+		return optionalGetRequired (
 			createMedia (
 				data,
 				mimeType,
@@ -551,7 +551,7 @@ class MediaLogicImplementation
 			@NonNull String mimeType,
 			@NonNull String filename) {
 
-		return optionalRequired (
+		return optionalGetRequired (
 			createMediaFromImage (
 				data,
 				mimeType,
@@ -696,7 +696,7 @@ class MediaLogicImplementation
 			@NonNull String mimeType,
 			@NonNull String filename) {
 
-		return optionalRequired (
+		return optionalGetRequired (
 			createMediaFromVideo (
 				data,
 				mimeType,
@@ -941,7 +941,7 @@ class MediaLogicImplementation
 			@NonNull byte[] data,
 			@NonNull String mimeType) {
 
-		return optionalRequired (
+		return optionalGetRequired (
 			readImage (
 				data,
 				mimeType));
@@ -1163,11 +1163,11 @@ class MediaLogicImplementation
 
 		if (allOf (
 
-			() -> equal (
+			() -> integerEqualSafe (
 				sourceImage.getWidth (),
 				targetWidth),
 
-			() -> equal (
+			() -> integerEqualSafe (
 				sourceImage.getHeight (),
 				targetHeight)
 
@@ -1191,7 +1191,7 @@ class MediaLogicImplementation
 		long sourceHeight;
 
 		if (
-			equal (
+			integerEqualSafe (
 				sourceRatio,
 				targetRatio)
 		) {
@@ -1431,7 +1431,7 @@ class MediaLogicImplementation
 			@NonNull String profileName,
 			@NonNull byte[] data) {
 
-		return optionalRequired (
+		return optionalGetRequired (
 			videoConvert (
 				profileName,
 				data));
@@ -1440,33 +1440,44 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	Optional<byte[]> videoFrameBytes (
+	Optional <byte[]> videoFrameBytes (
 			@NonNull byte[] data) {
 
-		return Optional.of (
-			runFilter (
-				log,
-				data,
-				".mp4",
-				".mjpeg",
-				"ffmpeg",
-				"-y",
-				"-i",
-				"<in>",
-				"-vcodec",
-				"mjpeg",
-				"-vframes",
-				"1",
-				"<out>"));
+		try {
+
+			return Optional.of (
+				runFilter (
+					log,
+					data,
+					".mp4",
+					".mjpeg",
+					"ffmpeg",
+					"-y",
+					"-i",
+					"<in>",
+					"-vcodec",
+					"mjpeg",
+					"-vframes",
+					"1",
+					"<out>"));
+
+		} catch (InterruptedException interruptedException) {
+
+			Thread.currentThread ().interrupt ();
+
+			return Optional.absent ();
+
+
+		}
 
 	}
 
 	@Override
 	public
-	Optional<BufferedImage> videoFrame (
+	Optional <BufferedImage> videoFrame (
 			@NonNull byte[] data) {
 
-		Optional<byte[]> videoFrameBytesOptional =
+		Optional <byte[]> videoFrameBytesOptional =
 			videoFrameBytes (
 				data);
 
@@ -1481,7 +1492,7 @@ class MediaLogicImplementation
 
 		} else {
 
-			return Optional.<BufferedImage>absent ();
+			return Optional.absent ();
 
 		}
 
@@ -1648,38 +1659,38 @@ class MediaLogicImplementation
 	// data
 
 	public final static
-	Set<String> imageTypes =
-		ImmutableSet.<String>of (
+	Set <String> imageTypes =
+		ImmutableSet.of (
 			"image/gif",
 			"image/jpeg",
 			"image/jpg",
 			"image/png");
 
 	public final static
-	Set<String> textTypes =
-		ImmutableSet.<String>of (
+	Set <String> textTypes =
+		ImmutableSet.of (
 			"text/plain");
 
 	public final static
-	Set<String> applicationTypes =
-		ImmutableSet.<String>of (
+	Set <String> applicationTypes =
+		ImmutableSet.of (
 			"application/smil");
 
 	public final static
-	Set<String> videoTypes =
-		ImmutableSet.<String>of (
+	Set <String> videoTypes =
+		ImmutableSet.of (
 			"video/3gpp",
 			"video/mpeg",
 			"video/mp4");
 
 	public final static
-	Set<String> audioTypes =
-		ImmutableSet.<String>of (
+	Set <String> audioTypes =
+		ImmutableSet.of (
 			"audio/mpeg");
 
 	public final static
-	Set<String>textualTypes =
-		ImmutableSet.<String>of (
+	Set <String> textualTypes =
+		ImmutableSet.of (
 			"text/plain",
 			"application/smil");
 

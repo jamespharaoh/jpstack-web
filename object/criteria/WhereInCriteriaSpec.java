@@ -1,13 +1,12 @@
 package wbs.platform.object.criteria;
 
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 
 import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.module.ConsoleModuleData;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -53,7 +52,7 @@ class WhereInCriteriaSpec
 			return false;
 		}
 
-		return in (
+		return stringInSafe (
 			fieldValue.toString (),
 			values);
 

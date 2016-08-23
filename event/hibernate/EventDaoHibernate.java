@@ -9,6 +9,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.event.model.EventDao;
 import wbs.platform.event.model.EventRec;
@@ -21,8 +22,8 @@ class EventDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
-			EventSearch eventSearch) {
+	List <Long> searchIds (
+			@NonNull EventSearch eventSearch) {
 
 		Criteria criteria =
 			createCriteria (
@@ -90,7 +91,7 @@ class EventDaoHibernate
 
 		return findMany (
 			"searchIds (search)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}

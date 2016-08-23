@@ -70,7 +70,7 @@ class QueueItemQueueStatsProvider
 		Map<Long,long[]> numNotPreferredPerQueue =
 			new TreeMap<> ();
 
-		Set<Object> queueIds =
+		Set<Object> queueIdObjects =
 			new HashSet<> ();
 
 		// retrieve queue items
@@ -81,12 +81,12 @@ class QueueItemQueueStatsProvider
 		queueStatsFilter.conditions (
 			conditions);
 
-		List<QueueItemRec> createdQueueItems =
+		List <QueueItemRec> createdQueueItems =
 			queueStatsFilter.filterQueueItems (
 				queueItemHelper.findByCreatedTime (
 					statsPeriod.toInterval ()));
 
-		List<QueueItemRec> processedQueueItems =
+		List <QueueItemRec> processedQueueItems =
 			queueStatsFilter.filterQueueItems (
 				queueItemHelper.findByProcessedTime (
 					statsPeriod.toInterval ()));
@@ -119,10 +119,10 @@ class QueueItemQueueStatsProvider
 				statsPeriod.assign (
 					queueItem.getCreatedTime ());
 
-			if (! queueIds.contains (
+			if (! queueIdObjects.contains (
 					queue.getId ())) {
 
-				queueIds.add (
+				queueIdObjects.add (
 					queue.getId ());
 
 				numCreatedPerQueue.put (
@@ -183,10 +183,10 @@ class QueueItemQueueStatsProvider
 				statsPeriod.assign (
 					queueItem.getProcessedTime ());
 
-			if (! queueIds.contains (
+			if (! queueIdObjects.contains (
 					queue.getId ())) {
 
-				queueIds.add (
+				queueIdObjects.add (
 					queue.getId ());
 
 				numCreatedPerQueue.put (
@@ -246,8 +246,9 @@ class QueueItemQueueStatsProvider
 		StatsDataSet statsDataSet =
 			new StatsDataSet ();
 
-		statsDataSet.indexValues ()
-			.put ("queueId", queueIds);
+		statsDataSet.indexValues ().put (
+			"queueId",
+			queueIdObjects);
 
 		for (
 			int hour = 0;
@@ -255,11 +256,14 @@ class QueueItemQueueStatsProvider
 			hour ++
 		) {
 
-			for (Object queueIdObject
-					: queueIds) {
+			for (
+				Object queueIdObject
+					: queueIdObjects
+			) {
 
-				Integer queueId =
-					(Integer) queueIdObject;
+				Long queueId =
+					(Long)
+					queueIdObject;
 
 				statsDataSet.data ().add (
 					new StatsDatum ()

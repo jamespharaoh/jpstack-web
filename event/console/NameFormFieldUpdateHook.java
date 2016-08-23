@@ -1,14 +1,13 @@
 package wbs.platform.event.console;
 
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.forms.FormFieldUpdateHook;
 import wbs.console.request.ConsoleRequestContext;
@@ -38,11 +37,11 @@ class NameFormFieldUpdateHook
 	@Override
 	public
 	void onUpdate (
-			@NonNull UpdateResult<String,String> updateResult,
-			@NonNull Record<?> container,
-			@NonNull Record<?> linkObject,
-			@NonNull Optional<Object> objectRef,
-			@NonNull Optional<String> objectType) {
+			@NonNull UpdateResult <String, String> updateResult,
+			@NonNull Record <?> container,
+			@NonNull Record <?> linkObject,
+			@NonNull Optional <Object> objectRef,
+			@NonNull Optional <String> objectType) {
 
 		// don't create event on initial creation
 
@@ -61,7 +60,7 @@ class NameFormFieldUpdateHook
 				updateResult.newNativeValue ().get ());
 
 		boolean codeChanged =
-			notEqual (
+			stringNotEqualSafe (
 				oldCode,
 				newCode);
 

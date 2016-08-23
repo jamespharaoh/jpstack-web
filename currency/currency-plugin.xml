@@ -12,13 +12,13 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.CurrencyLogicImplementation"/>
+		<component class="logic.CurrencyLogicImplementation"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.CurrencyFormFieldBuilder"/>
-		<bean class="console.CurrencyFormFieldInterfaceMapping"/>
-		<bean class="console.CurrencyFormFieldSpec"/>
+		<component class="console.CurrencyFormFieldBuilder"/>
+		<component class="console.CurrencyFormFieldInterfaceMapping"/>
+		<component class="console.CurrencyFormFieldSpec"/>
 	</layer>
 
 	<fixtures>

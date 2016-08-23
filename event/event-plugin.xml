@@ -13,30 +13,30 @@
 	</models>
 
 	<layer name="fixture">
-		<bean class="fixture.EventTypeBuilder"/>
-		<bean class="fixture.EventTypesBuilder"/>
+		<component class="fixture.EventTypeBuilder"/>
+		<component class="fixture.EventTypesBuilder"/>
 	</layer>
 
 	<layer name="model-meta">
-		<bean class="metamodel.EventTypeSpec"/>
-		<bean class="metamodel.EventTypesSpec"/>
+		<component class="metamodel.EventTypeSpec"/>
+		<component class="metamodel.EventTypesSpec"/>
 	</layer>
 
 	<layer name="logic">
-		<bean class="logic.EventLogicImplementation"/>
+		<component class="logic.EventLogicImplementation"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.EventConsoleLogicImplementation"/>
-		<bean class="console.EventDetailsFormFieldBuilder"/>
-		<bean class="console.EventDetailsFormFieldInterfaceMapping"/>
-		<bean class="console.EventDetailsFormFieldSpec"/>
-		<bean class="console.EventFormFieldPluginProvider"/>
-		<bean class="console.NameFormFieldUpdateHook"/>
-		<bean class="console.ObjectEventsPageBuilder"/>
-		<bean class="console.ObjectEventsPageSpec"/>
-		<bean class="console.ObjectEventsPart"/>
-		<bean class="console.SimpleFormFieldUpdateHook"/>
+		<component class="console.EventConsoleLogicImplementation"/>
+		<component class="console.EventDetailsFormFieldBuilder"/>
+		<component class="console.EventDetailsFormFieldInterfaceMapping"/>
+		<component class="console.EventDetailsFormFieldSpec"/>
+		<component class="console.EventFormFieldPluginProvider"/>
+		<component class="console.NameFormFieldUpdateHook"/>
+		<component class="console.ObjectEventsPageBuilder"/>
+		<component class="console.ObjectEventsPageSpec"/>
+		<component class="console.ObjectEventsPart"/>
+		<component class="console.SimpleFormFieldUpdateHook"/>
 	</layer>
 
 	<fixtures>
