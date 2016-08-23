@@ -23,17 +23,17 @@
 	</fixtures>
 
 	<layer name="logic">
-		<bean class="logic.MessageTemplateLogicImplementation"/>
+		<component class="logic.MessageTemplateLogicImplementation"/>
 	</layer>
 
 	<layer name="api">
-		<bean class="api.MessageTemplateMessagesGetAction"/>
+		<component class="api.MessageTemplateMessagesGetAction"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.MessageTemplateEntryValueFieldsProvider"/>
-		<bean class="console.MessageTemplateEntryValueFieldsProvider$Config"/>
-		<bean class="console.MessageTemplateEntryValueFormFieldDataProvider"/>
+		<component class="console.MessageTemplateEntryValueFieldsProvider"/>
+		<component class="console.MessageTemplateEntryValueFieldsProvider$Config"/>
+		<component class="console.MessageTemplateEntryValueFormFieldDataProvider"/>
 	</layer>
 
 	<api-modules>
